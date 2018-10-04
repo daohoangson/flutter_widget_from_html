@@ -1,0 +1,16 @@
+name: tinhte_html_widget
+description: A new Flutter project.
+
+environment:
+  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+
+dependencies:
+  cached_network_image: ^0.4.2
+  flutter:
+    sdk: flutter
+  html: ^0.13.3
+  url_launcher: ^4.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
