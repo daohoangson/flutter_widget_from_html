@@ -1,28 +1,23 @@
 import 'package:flutter/material.dart';
 
 import 'html_parser.dart';
+import 'widget_factory.dart';
 
 class HtmlWidget extends StatelessWidget {
-  final String baseUrl;
-  final Color colorHyperlink;
   final String html;
-  final List<double> sizeHeadings;
+  final WidgetFactory widgetFactory;
 
   HtmlWidget({
-    this.baseUrl, 
-    this.colorHyperlink = const Color(0xFF1965B5),
     @required this.html,
-    this.sizeHeadings = const [32.0, 24.0, 20.8, 16.0, 12.8, 11.2],
+    this.widgetFactory = const WidgetFactory(),
     Key key
   }): super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final p = HtmlParser(
-      baseUrl: baseUrl,
       context: context,
-      colorHyperlink: colorHyperlink,
-      sizeHeadings: sizeHeadings,
+      widgetFactory: widgetFactory,
     );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -2,9 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:tinhte_html_widget/config.dart';
 import 'package:tinhte_html_widget/html_widget.dart';
+import 'package:tinhte_html_widget/widget_factory.dart';
 
-Future<String> pumpWidgetThenExplain(WidgetTester tester, String html) async {
+Future<String> explain(WidgetTester tester, String html) async {
   final key = new UniqueKey();
 
   await tester.pumpWidget(
@@ -13,10 +15,14 @@ Future<String> pumpWidgetThenExplain(WidgetTester tester, String html) async {
         return MaterialApp(
           home: Material(
             child: HtmlWidget(
-              colorHyperlink: const Color(0xFF0000FF),
               html: html,
               key: key,
-              sizeHeadings: const [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+              widgetFactory: const WidgetFactory(
+                config: const Config(
+                  colorHyperlink: const Color(0xFF0000FF),
+                  sizeHeadings: const [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+                ),
+              ),
             )
           ),
         );

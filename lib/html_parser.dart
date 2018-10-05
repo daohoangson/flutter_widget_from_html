@@ -1,27 +1,22 @@
-import 'dart:convert';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
-import 'package:url_launcher/url_launcher.dart';
+
+import 'config.dart';
+import 'widget_factory.dart';
 
 class HtmlParser {
-  final String baseUrl;
-  final colorHyperlink;
+  final Config config;
   final BuildContext context;
-  final List<double> sizeHeadings;
+  final WidgetFactory widgetFactory;
 
-  final _dataUriRegExp = RegExp(r'^data:.*;base64,');
   var _isParsed = false;
   final List<Widget> _widgets = List();
 
   HtmlParser({
-    this.baseUrl,
-    @required this.colorHyperlink,
     @required this.context,
-    @required this.sizeHeadings,
-  });
+    @required this.widgetFactory,
+  }): config = widgetFactory.config;
 
   List<Widget> parse(String html) {
     if (_isParsed) {
@@ -35,13 +30,12 @@ class HtmlParser {
     return List.unmodifiable(_widgets);
   }
 
-  TapGestureRecognizer recognizer(String url) {
-    return TapGestureRecognizer()
-      ..onTap = () async {
-        if (await canLaunch(url)) {
-          await launch(url);
-        }
-      };
+  void _addWidgetIfNotNull(Widget widget) {
+    if (widget == null) {
+      return;
+    }
+
+    _widgets.add(widget);
   }
 
   _parseElement(dom.Element e) {
@@ -83,42 +77,33 @@ class HtmlParser {
 
     final src = e.attributes['src'];
 
-    if (src.startsWith("http") || src.startsWith("https")) {
-      _widgets.add(new CachedNetworkImage(
-        imageUrl: src,
-        fit: BoxFit.cover,
-      ));
-    } else if (src.startsWith('data:image')) {
-      final bytes = base64.decode(src.replaceAll(_dataUriRegExp, ''));
-      _widgets.add(new Image.memory(bytes, fit: BoxFit.cover));
-    } else if (baseUrl != null && baseUrl.isNotEmpty) {
-      _widgets.add(new CachedNetworkImage(
-        imageUrl: baseUrl + src,
-        fit: BoxFit.cover,
-      ));
+    if (src.startsWith('data:image')) {
+      _addWidgetIfNotNull(widgetFactory.buildImageWidgetFromDataUri(src));
+    } else {
+      _addWidgetIfNotNull(widgetFactory.buildImageWidgetFromUrl(src));
     }
   }
 
   void _parseTexts({dom.Element element, List<dom.Node> nodes}) {
     final textSpan = _TextParser(this).parse(element: element, nodes: nodes);
-    if (textSpan != null) {
-      _widgets.add(new RichText(
-        softWrap: true,
-        text: textSpan,
-      ));
+    if (textSpan == null) {
+      return;
     }
+
+    _addWidgetIfNotNull(widgetFactory.buildTextWidget(textSpan));
   }
 }
 
 class _TextParser {
   final HtmlParser p;
 
-  final _attributeStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
   final List<TextSpan> _children = List();
   final TextStyle _parentStyle;
   TextStyle _style;
-  final _spaceRegExp = RegExp(r'(^\s+|\s+$)');
-  final _styleColorRegExp = RegExp(r'^#([a-fA-F0-9]{6})$');
+
+  static final _attributeStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
+  static final _spaceRegExp = RegExp(r'(^\s+|\s+$)');
+  static final _styleColorRegExp = RegExp(r'^#([a-fA-F0-9]{6})$');
 
   _TextParser(this.p, {TextStyle parentStyle}):
     _parentStyle = parentStyle != null ? parentStyle : DefaultTextStyle.of(p.context).style;
@@ -134,7 +119,7 @@ class _TextParser {
       switch (node.nodeType) {
         case dom.Node.TEXT_NODE:
           if (isFirstNode) {
-            text = node.text.replaceAll(_spaceRegExp, '');
+            text = node.text.replaceAll(_spaceRegExp, ' ');
           } else {
             _parseText(node);
           }
@@ -151,16 +136,13 @@ class _TextParser {
       return null;
     }
 
-    TapGestureRecognizer recognizer;
-    if (element != null && element.localName == 'a' && element.attributes.containsKey('href')) {
-      recognizer = p.recognizer(element.attributes['href']);
-    }
+    final url = element.attributes.containsKey('href') ? element.attributes['href'] : null;
 
-    return TextSpan(
-      style: _style,
+    return p.widgetFactory.buildTextSpan(
       children: _children,
-      recognizer: recognizer,
+      style: _style,
       text: text,
+      url: url,
     );
   }
 
@@ -187,6 +169,7 @@ class _TextParser {
   }
 
   TextStyle _parseTextStyle(dom.Element e) {
+    final config = p.config;
     var color = _parentStyle.color;
     var decoration = _parentStyle.decoration;
     var fontSize = _parentStyle.fontSize;
@@ -196,26 +179,26 @@ class _TextParser {
     switch (e.localName) {
       case 'a':
         decoration = TextDecoration.underline;
-        color = p.colorHyperlink;
+        color = config.colorHyperlink;
         break;
 
       case 'h1':
-        fontSize = p.sizeHeadings[0];
+        fontSize = config.sizeHeadings[0];
         break;
       case 'h2':
-        fontSize = p.sizeHeadings[1];
+        fontSize = config.sizeHeadings[1];
         break;
       case 'h3':
-        fontSize = p.sizeHeadings[2];
+        fontSize = config.sizeHeadings[2];
         break;
       case 'h4':
-        fontSize = p.sizeHeadings[3];
+        fontSize = config.sizeHeadings[3];
         break;
       case 'h5':
-        fontSize = p.sizeHeadings[4];
+        fontSize = config.sizeHeadings[4];
         break;
       case 'h6':
-        fontSize = p.sizeHeadings[5];
+        fontSize = config.sizeHeadings[5];
         break;
 
       case 'b':
@@ -241,7 +224,7 @@ class _TextParser {
 
         switch (param) {
           case 'color':
-            if (this._styleColorRegExp.hasMatch(value)) {
+            if (_styleColorRegExp.hasMatch(value)) {
               color = new Color(int.parse('0xFF' + value.replaceAll('#', '').trim()));
             }
             break;
