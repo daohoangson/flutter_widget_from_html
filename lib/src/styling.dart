@@ -14,6 +14,7 @@ ParsedNodeStyle parseNodeStyle(Config config, dom.Element e) {
   FontStyle fontStyle;
   FontWeight fontWeight;
   bool isBlockElement;
+  TextAlign textAlign;
 
   switch (e.localName) {
     case 'a':
@@ -128,6 +129,25 @@ ParsedNodeStyle parseNodeStyle(Config config, dom.Element e) {
           }
           break;
 
+        case 'text-align':
+          isBlockElement = true;
+
+          switch (value) {
+            case 'center':
+              textAlign = TextAlign.center;
+              break;
+            case 'justify':
+              textAlign = TextAlign.justify;
+              break;
+            case 'left':
+              textAlign = TextAlign.left;
+              break;
+            case 'right':
+              textAlign = TextAlign.right;
+              break;
+          }
+          break;
+
         case 'text-decoration':
           decoration =
               TextDecoration.combine(value.split(_spacingRegExp).map((v) {
@@ -152,7 +172,8 @@ ParsedNodeStyle parseNodeStyle(Config config, dom.Element e) {
       fontSize == null &&
       fontStyle == null &&
       fontWeight == null &&
-      isBlockElement == null) {
+      isBlockElement == null &&
+      textAlign == null) {
     return null;
   }
 
@@ -163,6 +184,7 @@ ParsedNodeStyle parseNodeStyle(Config config, dom.Element e) {
     fontStyle: fontStyle,
     fontWeight: fontWeight,
     isBlockElement: isBlockElement,
+    textAlign: textAlign,
   );
 }
 

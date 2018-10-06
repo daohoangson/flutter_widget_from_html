@@ -16,6 +16,7 @@ abstract class ParsedNode {
   var processor;
 
   bool get isBlockElement => false;
+  TextAlign get textAlign => null;
 }
 
 class ParsedNodeImage extends ParsedNode {
@@ -40,18 +41,24 @@ class ParsedNodeStyle extends ParsedNode {
   final FontStyle fontStyle;
   final FontWeight fontWeight;
   final bool _isBlockElement;
+  final TextAlign _textAlign;
 
-  ParsedNodeStyle(
-      {this.color,
-      this.decoration,
-      this.fontSize,
-      this.fontStyle,
-      this.fontWeight,
-      bool isBlockElement})
-      : _isBlockElement = isBlockElement;
+  ParsedNodeStyle({
+    this.color,
+    this.decoration,
+    this.fontSize,
+    this.fontStyle,
+    this.fontWeight,
+    bool isBlockElement,
+    TextAlign textAlign,
+  })  : _isBlockElement = isBlockElement,
+        _textAlign = textAlign;
 
   @override
   bool get isBlockElement => _isBlockElement == true;
+
+  @override
+  TextAlign get textAlign => _textAlign;
 }
 
 class ParsedNodeText extends ParsedNode {

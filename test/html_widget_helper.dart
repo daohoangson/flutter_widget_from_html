@@ -60,6 +60,23 @@ class _Explainer {
     return _widget(widget);
   }
 
+  String _textAlign(TextAlign textAlign) {
+    switch (textAlign) {
+      case TextAlign.center:
+        return 'center';
+      case TextAlign.end:
+        return 'end';
+      case TextAlign.justify:
+        return 'justify';
+      case TextAlign.left:
+        return 'left';
+      case TextAlign.right:
+        return 'right';
+      default:
+        return '';
+    }
+  }
+
   String _textSpan(TextSpan textSpan) {
     final style = _textStyle(textSpan.style);
     final text = textSpan.text != null ? textSpan.text : '';
@@ -139,13 +156,17 @@ class _Explainer {
   }
 
   String _widget(Widget widget) {
-    final String type = widget.runtimeType.toString();
-    final String text = widget is RichText
+    final type = widget.runtimeType.toString();
+    final text = widget is RichText
         ? _textSpan(widget.text)
         : (widget is Text ? widget.data : '');
-    final String children = (widget is MultiChildRenderObjectWidget
+    final textAlign = _textAlign(widget is RichText
+        ? widget.textAlign
+        : (widget is Text ? widget.textAlign : null));
+    final textAlignStr = textAlign.isNotEmpty ? ",align=$textAlign" : '';
+    final children = (widget is MultiChildRenderObjectWidget
         ? widget.children.map(_widget).join('')
         : '');
-    return "[$type:$text$children]";
+    return "[$type$textAlignStr:$text$children]";
   }
 }

@@ -20,7 +20,7 @@ class WidgetFactory {
   Widget buildColumn({List<Widget> children, String url}) {
     Widget widget = Column(
       children: children,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
     );
 
     if (url != null && url.isNotEmpty) {
@@ -122,11 +122,27 @@ class WidgetFactory {
     );
   }
 
-  Widget buildTextWidgetSimple(String text) =>
-      _checkTextIsUseless(text) ? null : Text(text.trim());
+  Widget buildTextWidgetSimple({
+    @required String text,
+    TextAlign textAlign,
+  }) =>
+      _checkTextIsUseless(text)
+          ? null
+          : Text(
+              text.trim(),
+              textAlign: textAlign ?? TextAlign.start,
+            );
 
-  Widget buildTextWidgetWithStyling(TextSpan text) =>
-      text == null ? null : RichText(text: text);
+  Widget buildTextWidgetWithStyling({
+    @required TextSpan text,
+    TextAlign textAlign,
+  }) =>
+      text == null
+          ? null
+          : RichText(
+              text: text,
+              textAlign: textAlign ?? TextAlign.start,
+            );
 
   GestureTapCallback prepareGestureTapCallbackToLaunchUrl(String url) {
     return () async {

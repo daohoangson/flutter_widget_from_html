@@ -102,8 +102,7 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals(
-                '[RichText:(:(+w0:one)(: )(+w1:two)(: )(+w2:three)(: )(:four)(: )' +
+            equals('[RichText:(:(+w0:one)(: )(+w1:two)(: )(+w2:three)(: )(:four)(: )' +
                 '(+w4:five)(: )(+w5:six)(: )(+b:seven)(: )(+w7:eight)(: )(+w8:nine))]'));
       });
     });
@@ -130,6 +129,26 @@ void main() {
         final explained = await explain(tester, html);
         expect(explained,
             equals('[RichText:(:This is an (+i:inlined)(: text.))]'));
+      });
+    });
+
+    group('text-align', () {
+      testWidgets('renders center', (WidgetTester tester) async {
+        final html = '<div style="text-align: center">_X_</div>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText,align=center:(:_X_)]'));
+      });
+
+      testWidgets('renders left', (WidgetTester tester) async {
+        final html = '<div style="text-align: left">X__</div>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText,align=left:(:X__)]'));
+      });
+
+      testWidgets('renders right', (WidgetTester tester) async {
+        final html = '<div style="text-align: right">__X</div>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText,align=right:(:__X)]'));
       });
     });
 
@@ -168,10 +187,12 @@ First line.<br/>Second line.<br>Third line.
 <p>This <b>setence</b> <em>has</em> <span style="text-decoration: underline">everything</span>.</p>
 """;
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(@1.0:Header)]' +
-          '[Text:First line.][Text:Second line.][Text:Third line.]' +
-          '[Text:src=image.png]' +
-          '[RichText:(:This (+b:setence)(: )(+i:has)(: )(+u:everything)(:.))]'));
+      expect(
+          explained,
+          equals('[RichText:(@1.0:Header)]' +
+              '[Text:First line.][Text:Second line.][Text:Third line.]' +
+              '[Text:src=image.png]' +
+              '[RichText:(:This (+b:setence)(: )(+i:has)(: )(+u:everything)(:.))]'));
     });
   });
 }
