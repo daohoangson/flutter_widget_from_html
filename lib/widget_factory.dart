@@ -6,15 +6,32 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'config.dart';
 
-class WidgetFactory {
+final _baseUriTrimmingRegExp = RegExp(r'/+$');
+final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
+final _httpSchemeRegExp = RegExp(r'^https?://');
+final _spacingRegExp = RegExp(r'\s+');
+final _textIsUselessRegExp = RegExp(r'^\s*$');
 
+class WidgetFactory {
   final Config config;
-  
-  static final _baseUriTrimmingRegExp = RegExp(r'/+$');
-  static final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
-  static final _httpSchemeRegExp = RegExp(r'^https?://');
 
   const WidgetFactory({this.config = const Config()});
+
+  Widget buildColumn({List<Widget> children, String url}) {
+    Widget widget = Column(
+      children: children,
+      crossAxisAlignment: CrossAxisAlignment.start,
+    );
+
+    if (url != null && url.isNotEmpty) {
+      widget = GestureDetector(
+        child: widget,
+        onTap: prepareGestureTapCallbackToLaunchUrl(buildFullUrl(url)),
+      );
+    }
+
+    return widget;
+  }
 
   String buildFullUrl(String url) {
     var imageUrl = url;
@@ -26,9 +43,14 @@ class WidgetFactory {
       }
 
       if (url.startsWith('/')) {
-        imageUrl = baseUrl.scheme + '://' + baseUrl.host + (baseUrl.hasPort ? ":${baseUrl.port}" : '') + url;
+        imageUrl = baseUrl.scheme +
+            '://' +
+            baseUrl.host +
+            (baseUrl.hasPort ? ":${baseUrl.port}" : '') +
+            url;
       } else {
-        final baseUrlTrimmed = baseUrl.toString().replaceAll(_baseUriTrimmingRegExp, '');
+        final baseUrlTrimmed =
+            baseUrl.toString().replaceAll(_baseUriTrimmingRegExp, '');
         imageUrl = "$baseUrlTrimmed/$url";
       }
     }
@@ -49,6 +71,14 @@ class WidgetFactory {
     }
 
     return bytes;
+  }
+
+  Widget buildImageWidget(String src) {
+    if (src.startsWith('data:image')) {
+      return buildImageWidgetFromDataUri(src);
+    } else {
+      return buildImageWidgetFromUrl(src);
+    }
   }
 
   Widget buildImageWidgetFromDataUri(String dataUri) {
@@ -72,33 +102,40 @@ class WidgetFactory {
     );
   }
 
-  TextSpan buildTextSpan({List<TextSpan> children, TextStyle style, String text, String url}) {
+  TextSpan buildTextSpan(
+      {List<TextSpan> children, TextStyle style, String text, String url}) {
+    if (!(children?.isEmpty == false) && text?.isEmpty != false) {
+      return null;
+    }
+
     TapGestureRecognizer recognizer;
     if (url != null && url.isNotEmpty) {
-      recognizer = buildRecognizerToLaunchUrl(buildFullUrl(url));
+      final onTap = prepareGestureTapCallbackToLaunchUrl(buildFullUrl(url));
+      recognizer = TapGestureRecognizer()..onTap = onTap;
     }
 
     return TextSpan(
       children: children,
       style: style,
       recognizer: recognizer,
-      text: text,
+      text: text.replaceAll(_spacingRegExp, ' '),
     );
   }
 
-  Widget buildTextWidget(TextSpan textSpan) {
-    return RichText(
-      softWrap: true,
-      text: textSpan,
-    );
+  Widget buildTextWidgetSimple(String text) =>
+      _checkTextIsUseless(text) ? null : Text(text.trim());
+
+  Widget buildTextWidgetWithStyling(TextSpan text) =>
+      text == null ? null : RichText(text: text);
+
+  GestureTapCallback prepareGestureTapCallbackToLaunchUrl(String url) {
+    return () async {
+      if (await canLaunch(url)) {
+        await launch(url);
+      }
+    };
   }
 
-  TapGestureRecognizer buildRecognizerToLaunchUrl(String url) {
-    return TapGestureRecognizer()
-      ..onTap = () async {
-        if (await canLaunch(url)) {
-          await launch(url);
-        }
-      };
-  }
+  bool _checkTextIsUseless(String text) =>
+      _textIsUselessRegExp.firstMatch(text) != null;
 }

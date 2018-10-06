@@ -52,19 +52,21 @@ void main() {
 
         test('with baseUrls', () {
           final builts = testBaseUrls(relativePath);
-          expect(builts, equals([
-            'http://domain.com/relative/image.jpg',
-            'http://domain.com/relative/image.jpg',
-            'http://domain.com/path/relative/image.jpg',
-            'http://domain.com/path/relative/image.jpg',
-            'http://domain.com:123/relative/image.jpg',
-            'http://domain.com:123/relative/image.jpg',
-            'http://domain.com:123/path/relative/image.jpg',
-            'http://domain.com:123/path/relative/image.jpg',
-          ]));
+          expect(
+              builts,
+              equals([
+                'http://domain.com/relative/image.jpg',
+                'http://domain.com/relative/image.jpg',
+                'http://domain.com/path/relative/image.jpg',
+                'http://domain.com/path/relative/image.jpg',
+                'http://domain.com:123/relative/image.jpg',
+                'http://domain.com:123/relative/image.jpg',
+                'http://domain.com:123/path/relative/image.jpg',
+                'http://domain.com:123/path/relative/image.jpg',
+              ]));
         });
       });
-      
+
       group('absolute path', () {
         final absolutePath = '/absolute/image.jpg';
 
@@ -75,16 +77,18 @@ void main() {
 
         test('with baseUrls', () {
           final builts = testBaseUrls(absolutePath);
-          expect(builts, equals([
-            'http://domain.com/absolute/image.jpg',
-            'http://domain.com/absolute/image.jpg',
-            'http://domain.com/absolute/image.jpg',
-            'http://domain.com/absolute/image.jpg',
-            'http://domain.com:123/absolute/image.jpg',
-            'http://domain.com:123/absolute/image.jpg',
-            'http://domain.com:123/absolute/image.jpg',
-            'http://domain.com:123/absolute/image.jpg',
-          ]));
+          expect(
+              builts,
+              equals([
+                'http://domain.com/absolute/image.jpg',
+                'http://domain.com/absolute/image.jpg',
+                'http://domain.com/absolute/image.jpg',
+                'http://domain.com/absolute/image.jpg',
+                'http://domain.com:123/absolute/image.jpg',
+                'http://domain.com:123/absolute/image.jpg',
+                'http://domain.com:123/absolute/image.jpg',
+                'http://domain.com:123/absolute/image.jpg',
+              ]));
         });
       });
     });

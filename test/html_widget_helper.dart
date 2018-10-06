@@ -14,17 +14,11 @@ Future<String> explain(WidgetTester tester, String html) async {
       builder: (BuildContext context, StateSetter setState) {
         return MaterialApp(
           home: Material(
-            child: HtmlWidget(
-              html: html,
-              key: key,
-              widgetFactory: const WidgetFactory(
-                config: const Config(
-                  colorHyperlink: const Color(0xFF0000FF),
-                  sizeHeadings: const [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
-                ),
-              ),
-            )
-          ),
+              child: HtmlWidget(
+            html: html,
+            key: key,
+            widgetFactory: const _WidgetFactory(),
+          )),
         );
       },
     ),
@@ -39,11 +33,24 @@ Future<String> explain(WidgetTester tester, String html) async {
   return explainer.explain(htmlWidget.build(found));
 }
 
+class _WidgetFactory extends WidgetFactory {
+  const _WidgetFactory()
+      : super(
+            config: const Config(
+          colorHyperlink: const Color(0xFF0000FF),
+          sizeHeadings: const [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        ));
+
+  Widget buildImageWidget(String src) {
+    return Text("src=$src");
+  }
+}
+
 class _Explainer {
   final TextStyle _defaultStyle;
 
-  _Explainer(BuildContext context):
-    _defaultStyle = DefaultTextStyle.of(context).style;
+  _Explainer(BuildContext context)
+      : _defaultStyle = DefaultTextStyle.of(context).style;
 
   String explain(Widget widget) {
     if (widget is Column) {
@@ -56,7 +63,9 @@ class _Explainer {
   String _textSpan(TextSpan textSpan) {
     final style = _textStyle(textSpan.style);
     final text = textSpan.text != null ? textSpan.text : '';
-    final children = textSpan.children != null ? textSpan.children.map(_textSpan).join('') : '';
+    final children = textSpan.children != null
+        ? textSpan.children.map(_textSpan).join('')
+        : '';
     return "($style:$text$children)";
   }
 
@@ -67,7 +76,7 @@ class _Explainer {
     }
 
     if (style.color != _defaultStyle.color) {
-      s += "(${style.color.red},${style.color.green},${style.color.blue},${style.color.alpha})";
+      s += _textStyleColor(style.color);
     }
 
     s += _textStyleDecoration(style, TextDecoration.lineThrough, 'l');
@@ -82,6 +91,14 @@ class _Explainer {
     s += _textStyleFontWeight(style);
 
     return s;
+  }
+
+  String _textStyleColor(Color color) =>
+      "#${_textStyleColorHex(color.alpha)}${_textStyleColorHex(color.red)}${_textStyleColorHex(color.green)}${_textStyleColorHex(color.blue)}";
+
+  String _textStyleColorHex(int i) {
+    final h = i.toRadixString(16).toUpperCase();
+    return h.length == 1 ? "0$h" : h;
   }
 
   String _textStyleDecoration(TextStyle style, TextDecoration d, String str) {
@@ -105,6 +122,8 @@ class _Explainer {
       case FontStyle.normal:
         return '-i';
     }
+
+    return '';
   }
 
   String _textStyleFontWeight(TextStyle style) {
@@ -121,8 +140,12 @@ class _Explainer {
 
   String _widget(Widget widget) {
     final String type = widget.runtimeType.toString();
-    final String textSpan = (widget is RichText ? _textSpan(widget.text) : '');
-    final String children = (widget is MultiChildRenderObjectWidget ? widget.children.map(_widget).join('') : '');
-    return "[$type:$textSpan$children]";
+    final String text = widget is RichText
+        ? _textSpan(widget.text)
+        : (widget is Text ? widget.data : '');
+    final String children = (widget is MultiChildRenderObjectWidget
+        ? widget.children.map(_widget).join('')
+        : '');
+    return "[$type:$text$children]";
   }
 }

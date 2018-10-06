@@ -6,8 +6,65 @@ class Config {
   final List<double> sizeHeadings;
 
   const Config({
-    this.baseUrl, 
+    this.baseUrl,
     this.colorHyperlink = const Color(0xFF1965B5),
     this.sizeHeadings = const [32.0, 24.0, 20.8, 16.0, 12.8, 11.2],
   });
+}
+
+abstract class ParsedNode {
+  var processor;
+
+  bool get isBlockElement => false;
+}
+
+class ParsedNodeImage extends ParsedNode {
+  final String src;
+
+  ParsedNodeImage({@required this.src});
+
+  @override
+  bool get isBlockElement => true;
+
+  static ParsedNodeImage fromAttributes(Map<dynamic, String> attribs,
+      {String key = 'src'}) {
+    if (!attribs.containsKey(key)) return null;
+    return ParsedNodeImage(src: attribs[key]);
+  }
+}
+
+class ParsedNodeStyle extends ParsedNode {
+  final Color color;
+  final TextDecoration decoration;
+  final double fontSize;
+  final FontStyle fontStyle;
+  final FontWeight fontWeight;
+  final bool _isBlockElement;
+
+  ParsedNodeStyle(
+      {this.color,
+      this.decoration,
+      this.fontSize,
+      this.fontStyle,
+      this.fontWeight,
+      bool isBlockElement})
+      : _isBlockElement = isBlockElement;
+
+  @override
+  bool get isBlockElement => _isBlockElement == true;
+}
+
+class ParsedNodeText extends ParsedNode {
+  final String text;
+
+  ParsedNodeText({this.text});
+
+  @override
+  set processor(v) {}
+}
+
+class ParsedNodeUrl extends ParsedNode {
+  final String href;
+
+  ParsedNodeUrl({@required this.href});
 }
