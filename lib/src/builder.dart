@@ -71,15 +71,15 @@ class TextProcessor {
     final results = process(from, to);
     for (final result in results) {
       if (result.hasStyling) {
-        addWidget(b.wf.buildTextWidgetWithStyling(
+        addWidget(b.wf.wrapTextWidget(b.wf.buildTextWidgetWithStyling(
           text: result._buildTextSpan(b.wf),
           textAlign: pn?.textAlign,
-        ));
+        )));
       } else if (result.hasText) {
-        addWidget(b.wf.buildTextWidgetSimple(
+        addWidget(b.wf.wrapTextWidget(b.wf.buildTextWidgetSimple(
           text: result.text,
           textAlign: pn?.textAlign,
-        ));
+        )));
       }
 
       if (result.hasWidgets) {

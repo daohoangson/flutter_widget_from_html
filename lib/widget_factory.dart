@@ -164,6 +164,13 @@ class WidgetFactory {
     };
   }
 
+  Widget wrapTextWidget(Widget widget) => config.textWidgetPadding == null
+      ? widget
+      : Container(
+          padding: config.textWidgetPadding,
+          child: widget,
+        );
+
   bool _checkTextIsUseless(String text) =>
       _textIsUselessRegExp.firstMatch(text) != null;
 
