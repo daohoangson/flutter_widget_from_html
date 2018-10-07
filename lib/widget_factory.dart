@@ -73,11 +73,16 @@ class WidgetFactory {
     return bytes;
   }
 
-  Widget buildImageWidget(String src) {
+  Widget buildImageWidget(ParsedNodeImage pni) {
+    final src = pni?.src;
     if (src.startsWith('data:image')) {
       return buildImageWidgetFromDataUri(src);
     } else {
-      return buildImageWidgetFromUrl(src);
+      return buildImageWidgetFromUrl(
+        height: pni.height,
+        url: src,
+        width: pni.width,
+      );
     }
   }
 
@@ -90,16 +95,23 @@ class WidgetFactory {
     return Image.memory(bytes, fit: BoxFit.cover);
   }
 
-  Widget buildImageWidgetFromUrl(String url) {
+  Widget buildImageWidgetFromUrl({int height, String url, int width}) {
     final imageUrl = buildFullUrl(url);
-    if (imageUrl == null) {
-      return null;
-    }
+    if (imageUrl?.isEmpty != false) return null;
 
-    return CachedNetworkImage(
+    Widget widget = CachedNetworkImage(
       imageUrl: imageUrl,
       fit: BoxFit.cover,
     );
+
+    if (height != null && height > 0 && width != null && width > 0) {
+      widget = AspectRatio(
+        aspectRatio: width / height,
+        child: widget,
+      );
+    }
+
+    return widget;
   }
 
   TextSpan buildTextSpan(

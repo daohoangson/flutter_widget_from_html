@@ -1,5 +1,18 @@
 import 'package:flutter/widgets.dart';
 
+String getValueFromAttributes(
+    Map<dynamic, String> map, String key, String prefix) {
+  if (map.containsKey(key)) return map[key];
+  final keyWithPrefix = prefix + key;
+  if (map.containsKey(keyWithPrefix)) return map[keyWithPrefix];
+  return null;
+}
+
+int parseInt(String value) {
+  if (value?.isEmpty != false) return null;
+  return int.parse(value);
+}
+
 class Config {
   final Uri baseUrl;
   final Color colorHyperlink;
@@ -20,17 +33,29 @@ abstract class ParsedNode {
 }
 
 class ParsedNodeImage extends ParsedNode {
+  final int height;
   final String src;
+  final int width;
 
-  ParsedNodeImage({@required this.src});
+  ParsedNodeImage({this.height, @required this.src, this.width});
 
   @override
   bool get isBlockElement => true;
 
-  static ParsedNodeImage fromAttributes(Map<dynamic, String> attribs,
-      {String key = 'src'}) {
-    if (!attribs.containsKey(key)) return null;
-    return ParsedNodeImage(src: attribs[key]);
+  static ParsedNodeImage fromAttributes(
+    Map<dynamic, String> map, {
+    String keyHeight = 'height',
+    String keyPrefix = 'data-',
+    String keySrc = 'src',
+    String keyWidth = 'width',
+  }) {
+    final src = getValueFromAttributes(map, keySrc, keyPrefix);
+    if (src?.isEmpty != false) return null;
+    return ParsedNodeImage(
+      height: parseInt(getValueFromAttributes(map, keyHeight, keyPrefix)),
+      src: src,
+      width: parseInt(getValueFromAttributes(map, keyWidth, keyPrefix)),
+    );
   }
 }
 

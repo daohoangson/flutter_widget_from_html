@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -17,7 +18,13 @@ Future<String> explain(WidgetTester tester, String html) async {
               child: HtmlWidget(
             html: html,
             key: key,
-            widgetFactory: const _WidgetFactory(),
+            widgetFactory: WidgetFactory(
+              config: Config(
+                baseUrl: Uri.parse('http://domain.com'),
+                colorHyperlink: Color(0xFF0000FF),
+                sizeHeadings: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+              ),
+            ),
           )),
         );
       },
@@ -31,19 +38,6 @@ Future<String> explain(WidgetTester tester, String html) async {
   final htmlWidget = found.widget as HtmlWidget;
 
   return explainer.explain(htmlWidget.build(found));
-}
-
-class _WidgetFactory extends WidgetFactory {
-  const _WidgetFactory()
-      : super(
-            config: const Config(
-          colorHyperlink: const Color(0xFF0000FF),
-          sizeHeadings: const [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
-        ));
-
-  Widget buildImageWidget(String src) {
-    return Text("src=$src");
-  }
 }
 
 class _Explainer {
@@ -157,9 +151,15 @@ class _Explainer {
 
   String _widget(Widget widget) {
     final type = widget.runtimeType.toString();
-    final text = widget is RichText
-        ? _textSpan(widget.text)
-        : (widget is Text ? widget.data : '');
+    final text = widget is AspectRatio
+        ? "aspectRatio=${widget.aspectRatio.toStringAsFixed(2)},child=${_widget(widget.child)}"
+        : widget is CachedNetworkImage
+            ? "imageUrl=${widget.imageUrl}"
+            : widget is Image
+                ? "image=${widget.image.runtimeType}"
+                : widget is RichText
+                    ? _textSpan(widget.text)
+                    : widget is Text ? widget.data : '';
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));

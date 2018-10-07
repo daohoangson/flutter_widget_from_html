@@ -22,16 +22,18 @@ class Builder {
     @required int to,
   }) {
     if (pn is ParsedNodeImage) {
-      return [wf.buildImageWidget(pn.src)];
+      final imageWidget = wf.buildImageWidget(pn);
+      if (imageWidget == null) return [];
+      return [imageWidget];
     }
 
     if (pn is ParsedNodeUrl) {
-      return [
-        wf.buildColumn(
-          children: build(from: from, to: to),
-          url: pn.href,
-        ),
-      ];
+      final column = wf.buildColumn(
+        children: build(from: from, to: to),
+        url: pn.href,
+      );
+      if (column == null) return [];
+      return [column];
     }
 
     final tp = TextProcessor(

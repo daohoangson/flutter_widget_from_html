@@ -36,10 +36,39 @@ void main() {
     });
 
     group('IMG tag', () {
-      testWidgets('renders alone', (WidgetTester tester) async {
+      testWidgets('renders src', (WidgetTester tester) async {
         final html = '<img src="image.png" />';
         final explained = await explain(tester, html);
-        expect(explained, equals('[Text:src=image.png]'));
+        expect(
+            explained,
+            equals(
+                '[CachedNetworkImage:imageUrl=http://domain.com/image.png]'));
+      });
+
+      testWidgets('renders data-src', (WidgetTester tester) async {
+        final html = '<img data-src="image.png" />';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals(
+                '[CachedNetworkImage:imageUrl=http://domain.com/image.png]'));
+      });
+
+      testWidgets('renders data uri', (WidgetTester tester) async {
+        // https://stackoverflow.com/questions/6018611/smallest-data-uri-image-possible-for-a-transparent-image
+        final html =
+            '<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[Image:image=MemoryImage]'));
+      });
+
+      testWidgets('renders dimensions', (WidgetTester tester) async {
+        final html = '<img src="image.png" width="800" height="600" />';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[AspectRatio:aspectRatio=1.33,' +
+                'child=[CachedNetworkImage:imageUrl=http://domain.com/image.png]]'));
       });
 
       testWidgets('renders between texts', (WidgetTester tester) async {
@@ -47,8 +76,9 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals(
-                '[Text:Before text.][Text:src=image.png][Text:After text.]'));
+            equals('[Text:Before text.]' +
+                '[CachedNetworkImage:imageUrl=http://domain.com/image.png]' +
+                '[Text:After text.]'));
       });
     });
 
@@ -191,7 +221,7 @@ First line.<br/>Second line.<br>Third line.
           explained,
           equals('[RichText:(@1.0:Header)]' +
               '[Text:First line.][Text:Second line.][Text:Third line.]' +
-              '[Text:src=image.png]' +
+              '[CachedNetworkImage:imageUrl=http://domain.com/image.png]' +
               '[RichText:(:This (+b:setence)(: )(+i:has)(: )(+u:everything)(:.))]'));
     });
   });
