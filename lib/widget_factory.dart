@@ -137,7 +137,7 @@ class WidgetFactory {
     @required TextSpan text,
     TextAlign textAlign,
   }) =>
-      text == null
+      _checkTextSpanIsUseless(text)
           ? null
           : RichText(
               text: text,
@@ -154,4 +154,10 @@ class WidgetFactory {
 
   bool _checkTextIsUseless(String text) =>
       _textIsUselessRegExp.firstMatch(text) != null;
+
+  bool _checkTextSpanIsUseless(TextSpan span) {
+    if (span == null) return true;
+    if (span.children?.isNotEmpty != false) return false;
+    return _checkTextIsUseless(span.text);
+  }
 }

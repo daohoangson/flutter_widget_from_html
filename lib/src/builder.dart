@@ -104,7 +104,7 @@ class TextProcessor {
     setUpProcessing(init: true);
 
     final wrapUpProcessing = () {
-      if (inProcess.hasStyling || inProcess.textLength > 0) {
+      if (inProcess.hasStyling || inProcess.hasText) {
         results.add(inProcess);
       }
 
@@ -168,10 +168,9 @@ class _TextProcessorResult {
 
   bool get hasChildren => _spans != null;
   bool get hasStyling => style != null || hasChildren;
-  bool get hasText => _texts != null;
+  bool get hasText => _texts?.isNotEmpty == true;
   bool get hasWidgets => widgets != null;
   String get text => _texts.toString();
-  int get textLength => _texts.length;
 
   void _addSpan(TextSpan span) {
     if (span == null) return;
@@ -188,7 +187,7 @@ class _TextProcessorResult {
   }
 
   TextSpan _buildTextSpan(WidgetFactory wf) {
-    if (style == null && textLength == 0 && _spans.length == 1) {
+    if (!hasText && style == null && _spans.length == 1) {
       return _spans[0];
     }
 
