@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:html/dom.dart' as dom;
 
 String getValueFromAttributes(
     Map<dynamic, String> map, String key, String prefix) {
@@ -13,15 +14,19 @@ int parseInt(String value) {
   return int.parse(value);
 }
 
+typedef bool ParseElementCallback(dom.Element e);
+
 class Config {
   final Uri baseUrl;
   final Color colorHyperlink;
+  final ParseElementCallback parseElementCallback;
   final List<double> sizeHeadings;
   final EdgeInsetsGeometry textWidgetPadding;
 
   const Config({
     this.baseUrl,
     this.colorHyperlink = const Color(0xFF1965B5),
+    this.parseElementCallback,
     this.sizeHeadings = const [32.0, 24.0, 20.8, 16.0, 12.8, 11.2],
     this.textWidgetPadding = const EdgeInsets.all(5.0),
   });

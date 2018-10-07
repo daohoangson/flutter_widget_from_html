@@ -48,6 +48,11 @@ class ParsedNodeProcessor {
   }
 
   int _parseElement(dom.Element e) {
+    if (config.parseElementCallback != null &&
+        !config.parseElementCallback(e)) {
+      return -1;
+    }
+
     switch (e.localName) {
       case 'a':
         if (e.attributes.containsKey('href')) {
