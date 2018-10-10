@@ -37,6 +37,7 @@ abstract class ParsedNode {
 
   bool get isBlockElement => false;
   TextAlign get textAlign => null;
+  String get url => null;
 }
 
 class ParsedNodeImage extends ParsedNode {
@@ -72,8 +73,9 @@ class ParsedNodeStyle extends ParsedNode {
   final double fontSize;
   final FontStyle fontStyle;
   final FontWeight fontWeight;
-  final bool _isBlockElement;
-  final TextAlign _textAlign;
+  final bool isBlockElement;
+  final TextAlign textAlign;
+  final String url;
 
   ParsedNodeStyle({
     this.color,
@@ -81,16 +83,10 @@ class ParsedNodeStyle extends ParsedNode {
     this.fontSize,
     this.fontStyle,
     this.fontWeight,
-    bool isBlockElement,
-    TextAlign textAlign,
-  })  : _isBlockElement = isBlockElement,
-        _textAlign = textAlign;
-
-  @override
-  bool get isBlockElement => _isBlockElement == true;
-
-  @override
-  TextAlign get textAlign => _textAlign;
+    this.isBlockElement,
+    this.textAlign,
+    this.url,
+  });
 }
 
 class ParsedNodeText extends ParsedNode {
@@ -100,10 +96,4 @@ class ParsedNodeText extends ParsedNode {
 
   @override
   set processor(v) {}
-}
-
-class ParsedNodeUrl extends ParsedNode {
-  final String href;
-
-  ParsedNodeUrl({@required this.href});
 }

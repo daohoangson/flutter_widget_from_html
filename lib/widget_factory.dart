@@ -18,12 +18,18 @@ class WidgetFactory {
   const WidgetFactory({this.config = const Config()});
 
   Widget buildColumn({List<Widget> children, String url}) {
-    Widget widget = Column(
-      children: children,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-    );
+    Widget widget;
 
-    if (url != null && url.isNotEmpty) {
+    if (children.length == 1) {
+      widget = children.first;
+    } else {
+      widget = Column(
+        children: children,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+      );
+    }
+
+    if (url?.isNotEmpty == true) {
       widget = GestureDetector(
         child: widget,
         onTap: prepareGestureTapCallbackToLaunchUrl(buildFullUrl(url)),
@@ -121,22 +127,29 @@ class WidgetFactory {
     String text,
     String url,
   }) {
-    if (!(children?.isEmpty == false) && text?.isEmpty != false) {
+    if (children?.isEmpty != false && text?.isEmpty != false) {
       return null;
     }
 
-    TapGestureRecognizer recognizer;
-    if (url != null && url.isNotEmpty) {
-      final onTap = prepareGestureTapCallbackToLaunchUrl(buildFullUrl(url));
-      recognizer = TapGestureRecognizer()..onTap = onTap;
+    TextSpan span;
+    text = text?.replaceAll(_spacingRegExp, ' ') ?? '';
+    if (text.isEmpty && children?.isNotEmpty == true && children.length == 1) {
+      span = children.first;
+    } else {
+      span = TextSpan(
+        children: children,
+        style: style ?? DefaultTextStyle.of(context).style,
+        text: text,
+      );
     }
 
-    return TextSpan(
-      children: children,
-      style: style ?? DefaultTextStyle.of(context).style,
-      recognizer: recognizer,
-      text: text.replaceAll(_spacingRegExp, ' '),
-    );
+    if (url?.isNotEmpty == true) {
+      final onTap = prepareGestureTapCallbackToLaunchUrl(buildFullUrl(url));
+      final recognizer = TapGestureRecognizer()..onTap = onTap;
+      span = _rebuildTextSpanWithRecognizer(span, recognizer);
+    }
+
+    return span;
   }
 
   Widget buildTextWidgetSimple({
@@ -169,12 +182,13 @@ class WidgetFactory {
     };
   }
 
-  Widget wrapTextWidget(Widget widget) => config.textWidgetPadding == null
-      ? widget
-      : Container(
-          padding: config.textWidgetPadding,
-          child: widget,
-        );
+  Widget wrapTextWidget(Widget widget) =>
+      (config.textWidgetPadding == null || widget == null)
+          ? widget
+          : Container(
+              padding: config.textWidgetPadding,
+              child: widget,
+            );
 
   bool _checkTextIsUseless(String text) =>
       _textIsUselessRegExp.firstMatch(text) != null;
@@ -183,5 +197,24 @@ class WidgetFactory {
     if (span == null) return true;
     if (span.children?.isNotEmpty != false) return false;
     return _checkTextIsUseless(span.text);
+  }
+
+  TextSpan _rebuildTextSpanWithRecognizer(
+      TextSpan span, GestureRecognizer recognizer) {
+    // this is required because recognizer does not trigger for children
+    // https://github.com/flutter/flutter/issues/10623
+    final children = span.children == null
+        ? null
+        : span.children
+            .map((TextSpan subSpan) =>
+                _rebuildTextSpanWithRecognizer(subSpan, recognizer))
+            .toList();
+
+    return TextSpan(
+      children: children,
+      style: span.style,
+      recognizer: recognizer,
+      text: span.text,
+    );
   }
 }

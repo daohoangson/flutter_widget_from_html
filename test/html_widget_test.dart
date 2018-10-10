@@ -10,11 +10,24 @@ void main() {
       expect(explained, equals('[Text:Hello world]'));
     });
 
-    testWidgets('renders A tag', (WidgetTester tester) async {
-      final html = 'This is a <a>hyperlink</a>.';
-      final explained = await explain(tester, html);
-      expect(explained,
-          equals('[RichText:(:This is a (#FF0000FF+u:hyperlink)(:.))]'));
+    group('A tag', () {
+      testWidgets('renders stylings and on tap', (WidgetTester tester) async {
+        final html = 'This is a <a href="href">hyperlink</a>.';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals(
+                '[RichText:(:This is a (#FF0000FF+u+onTap:hyperlink)(:.))]'));
+      });
+
+      testWidgets('renders inner stylings', (WidgetTester tester) async {
+        final html = 'This is a <a href="href"><b><i>hyperlink</i></b></a>.';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals(
+                '[RichText:(:This is a (#FF0000FF+u+i+b+onTap:hyperlink)(:.))]'));
+      });
     });
 
     testWidgets('renders heading tags', (WidgetTester tester) async {
@@ -27,12 +40,12 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:(@1.0:This is heading 1)]' +
-              '[RichText:(@2.0:This is heading 2)]' +
-              '[RichText:(@3.0:This is heading 3)]' +
-              '[RichText:(@4.0:This is heading 4)]' +
-              '[RichText:(@5.0:This is heading 5)]' +
-              '[RichText:(@6.0:This is heading 6)]'));
+          equals('[Column:children=[RichText:(@1.0:This is heading 1)],' +
+              '[RichText:(@2.0:This is heading 2)],' +
+              '[RichText:(@3.0:This is heading 3)],' +
+              '[RichText:(@4.0:This is heading 4)],' +
+              '[RichText:(@5.0:This is heading 5)],' +
+              '[RichText:(@6.0:This is heading 6)]]'));
     });
 
     group('IMG tag', () {
@@ -76,9 +89,18 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals('[Text:Before text.]' +
-                '[CachedNetworkImage:imageUrl=http://domain.com/image.png]' +
-                '[Text:After text.]'));
+            equals('[Column:children=[Text:Before text.],' +
+                '[CachedNetworkImage:imageUrl=http://domain.com/image.png],' +
+                '[Text:After text.]]'));
+      });
+
+      testWidgets('renders inside A tag', (WidgetTester tester) async {
+        final html = '<a href="href"><img src="image.png" /></a>';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[GestureDetector:child=' +
+                '[CachedNetworkImage:imageUrl=http://domain.com/image.png]]'));
       });
     });
 
@@ -86,21 +108,28 @@ void main() {
       testWidgets('renders BR tag', (WidgetTester tester) async {
         final html = 'First block.<br />Second one.';
         final explained = await explain(tester, html);
-        expect(explained, equals('[Text:First block.][Text:Second one.]'));
+        expect(
+            explained,
+            equals('[Column:children=[Text:First block.],' +
+                '[Text:Second one.]]'));
       });
 
       testWidgets('renders DIV tag', (WidgetTester tester) async {
         final html = '<div>First block.</div><div>Second one.</div>';
         final explained = await explain(tester, html);
-        expect(explained,
-            equals('[RichText:(:First block.)][RichText:(:Second one.)]'));
+        expect(
+            explained,
+            equals('[Column:children=[RichText:(:First block.)],' +
+                '[RichText:(:Second one.)]]'));
       });
 
       testWidgets('renders P tag', (WidgetTester tester) async {
         final html = '<p>First paragraph.</p><p>Second one.</p>';
         final explained = await explain(tester, html);
-        expect(explained,
-            equals('[RichText:(:First paragraph.)][RichText:(:Second one.)]'));
+        expect(
+            explained,
+            equals('[Column:children=[RichText:(:First paragraph.)],' +
+                '[RichText:(:Second one.)]]'));
       });
     });
 
@@ -219,10 +248,10 @@ First line.<br/>Second line.<br>Third line.
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:(@1.0:Header)]' +
-              '[Text:First line.][Text:Second line.][Text:Third line.]' +
-              '[CachedNetworkImage:imageUrl=http://domain.com/image.png]' +
-              '[RichText:(:This (+b:setence)(: )(+i:has)(: )(+u:everything)(:.))]'));
+          equals('[Column:children=[RichText:(@1.0:Header)],' +
+              '[Text:First line.],[Text:Second line.],[Text:Third line.],' +
+              '[CachedNetworkImage:imageUrl=http://domain.com/image.png],' +
+              '[RichText:(:This (+b:setence)(: )(+i:has)(: )(+u:everything)(:.))]]'));
     });
   });
 }

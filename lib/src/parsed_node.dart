@@ -54,11 +54,6 @@ class ParsedNodeProcessor {
     }
 
     switch (e.localName) {
-      case 'a':
-        if (e.attributes.containsKey('href')) {
-          queue(ParsedNodeUrl(href: e.attributes['href']));
-        }
-        break;
       case 'img':
         return _subNp().queue(ParsedNodeImage.fromAttributes(e.attributes));
     }

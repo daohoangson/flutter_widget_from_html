@@ -27,15 +27,6 @@ class Builder {
       return [imageWidget];
     }
 
-    if (pn is ParsedNodeUrl) {
-      final column = wf.buildColumn(
-        children: build(from: from, to: to),
-        url: pn.href,
-      );
-      if (column == null) return [];
-      return [column];
-    }
-
     final tp = TextProcessor(
       builder: this,
       pn: pn,
@@ -100,6 +91,7 @@ class TextProcessor {
         builder: b,
         style: hasTextStyle ? _textStyle : null,
         texts: true,
+        url: pn?.url,
       );
       if (init && pn is ParsedNodeText)
         inProcess._write((pn as ParsedNodeText).text, b.wf);
@@ -122,7 +114,7 @@ class TextProcessor {
       final pn = b.parsedNodes[i];
       final indexEnd = (pn.processor as ParsedNodeProcessor)?.indexEnd ?? i;
 
-      if (pn.isBlockElement) {
+      if (pn.isBlockElement == true) {
         wrapUpProcessing();
 
         final subWidgets = b.build(pn: pn, from: i + 1, to: indexEnd);
@@ -144,7 +136,17 @@ class TextProcessor {
 
           if (subResult.hasWidgets) {
             wrapUpProcessing();
-            results.add(subResult);
+
+            if (pn?.url?.isNotEmpty == true) {
+              results.add(_TextProcessorResult(builder: b, widgets: <Widget>[
+                b.wf.buildColumn(
+                  children: subResult.widgets,
+                  url: pn.url,
+                )
+              ]));
+            } else {
+              results.add(subResult);
+            }
           }
         }
       }
@@ -161,6 +163,7 @@ class TextProcessor {
 class _TextProcessorResult {
   final Builder b;
   final TextStyle style;
+  final String url;
   final List<Widget> widgets;
 
   final StringBuffer _texts;
@@ -170,6 +173,7 @@ class _TextProcessorResult {
     @required Builder builder,
     this.style,
     bool texts = false,
+    this.url,
     this.widgets,
   })  : b = builder,
         _texts = texts ? StringBuffer() : null,

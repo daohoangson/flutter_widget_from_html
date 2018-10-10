@@ -13,6 +13,7 @@ ParsedNodeStyle parseNodeStyle(Config config, dom.Element e) {
   double fontSize;
   FontStyle fontStyle;
   FontWeight fontWeight;
+  String url;
   bool isBlockElement;
   TextAlign textAlign;
 
@@ -20,6 +21,7 @@ ParsedNodeStyle parseNodeStyle(Config config, dom.Element e) {
     case 'a':
       decoration = TextDecoration.underline;
       color = config.colorHyperlink;
+      url = e.attributes['href'];
       break;
 
     case 'br':
@@ -172,6 +174,7 @@ ParsedNodeStyle parseNodeStyle(Config config, dom.Element e) {
       fontSize == null &&
       fontStyle == null &&
       fontWeight == null &&
+      url == null &&
       isBlockElement == null &&
       textAlign == null) {
     return null;
@@ -183,6 +186,7 @@ ParsedNodeStyle parseNodeStyle(Config config, dom.Element e) {
     fontSize: fontSize,
     fontStyle: fontStyle,
     fontWeight: fontWeight,
+    url: url,
     isBlockElement: isBlockElement,
     textAlign: textAlign,
   );

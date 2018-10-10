@@ -47,13 +47,7 @@ class _Explainer {
   _Explainer(BuildContext context)
       : _defaultStyle = DefaultTextStyle.of(context).style;
 
-  String explain(Widget widget) {
-    if (widget is Column) {
-      return widget.children.map(_widget).join('');
-    }
-
-    return _widget(widget);
-  }
+  String explain(Widget widget) => _widget(widget);
 
   String _textAlign(TextAlign textAlign) {
     switch (textAlign) {
@@ -74,11 +68,12 @@ class _Explainer {
 
   String _textSpan(TextSpan textSpan) {
     final style = _textStyle(textSpan.style);
+    final onTap = textSpan.recognizer != null ? '+onTap' : '';
     final text = textSpan.text != null ? textSpan.text : '';
     final children = textSpan.children != null
         ? textSpan.children.map(_textSpan).join('')
         : '';
-    return "($style:$text$children)";
+    return "($style$onTap:$text$children)";
   }
 
   String _textStyle(TextStyle style) {
@@ -156,17 +151,19 @@ class _Explainer {
         ? "aspectRatio=${widget.aspectRatio.toStringAsFixed(2)},child=${_widget(widget.child)}"
         : widget is CachedNetworkImage
             ? "imageUrl=${widget.imageUrl}"
-            : widget is Image
-                ? "image=${widget.image.runtimeType}"
-                : widget is RichText
-                    ? _textSpan(widget.text)
-                    : widget is Text ? widget.data : '';
+            : widget is GestureDetector
+                ? "child=${_widget(widget.child)}"
+                : widget is Image
+                    ? "image=${widget.image.runtimeType}"
+                    : widget is RichText
+                        ? _textSpan(widget.text)
+                        : widget is Text ? widget.data : '';
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));
     final textAlignStr = textAlign.isNotEmpty ? ",align=$textAlign" : '';
     final children = (widget is MultiChildRenderObjectWidget
-        ? widget.children.map(_widget).join('')
+        ? "children=${widget.children.map(_widget).join(',')}"
         : '');
     return "[$type$textAlignStr:$text$children]";
   }
