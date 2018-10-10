@@ -72,7 +72,7 @@ class TextProcessor {
     for (final result in results) {
       if (result.hasStyling) {
         addWidget(b.wf.wrapTextWidget(b.wf.buildTextWidgetWithStyling(
-          text: result._buildTextSpan(b.wf),
+          text: result._buildTextSpan(b.wf, trimLeft: true),
           textAlign: pn?.textAlign,
         )));
       } else if (result.hasText) {
@@ -195,7 +195,7 @@ class _TextProcessorResult {
     }
   }
 
-  TextSpan _buildTextSpan(WidgetFactory wf) {
+  TextSpan _buildTextSpan(WidgetFactory wf, {bool trimLeft = false}) {
     if (!hasText && style == null && _spans.length == 1) {
       return _spans[0];
     }
@@ -204,7 +204,8 @@ class _TextProcessorResult {
       context: b.context,
       children: _spans,
       style: style,
-      text: text,
+      text: trimLeft ? text.trimLeft() : text,
+      url: url,
     );
   }
 
