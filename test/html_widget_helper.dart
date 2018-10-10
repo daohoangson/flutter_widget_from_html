@@ -23,6 +23,7 @@ Future<String> explain(WidgetTester tester, String html) async {
                 baseUrl: Uri.parse('http://domain.com'),
                 colorHyperlink: Color(0xFF0000FF),
                 sizeHeadings: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+                textWidgetPadding: null,
               ),
             ),
           )),

@@ -97,6 +97,7 @@ class TextProcessor {
     _TextProcessorResult inProcess;
     final setUpProcessing = ({bool init = false}) {
       inProcess = _TextProcessorResult(
+        builder: b,
         style: hasTextStyle ? _textStyle : null,
         texts: true,
       );
@@ -125,7 +126,7 @@ class TextProcessor {
         wrapUpProcessing();
 
         final subWidgets = b.build(pn: pn, from: i + 1, to: indexEnd);
-        results.add(_TextProcessorResult(widgets: subWidgets));
+        results.add(_TextProcessorResult(builder: b, widgets: subWidgets));
       } else {
         final subProcessor = TextProcessor(
           builder: b,
@@ -158,14 +159,20 @@ class TextProcessor {
 }
 
 class _TextProcessorResult {
+  final Builder b;
   final TextStyle style;
   final List<Widget> widgets;
 
   final StringBuffer _texts;
   List<TextSpan> _spans;
 
-  _TextProcessorResult({this.style, bool texts = false, this.widgets})
-      : _texts = texts ? StringBuffer() : null,
+  _TextProcessorResult({
+    @required Builder builder,
+    this.style,
+    bool texts = false,
+    this.widgets,
+  })  : b = builder,
+        _texts = texts ? StringBuffer() : null,
         assert(((texts ? 1 : 0) + (widgets != null ? 1 : 0)) == 1);
 
   bool get hasChildren => _spans != null;
@@ -194,6 +201,7 @@ class _TextProcessorResult {
     }
 
     return wf.buildTextSpan(
+      context: b.context,
       children: _spans,
       style: style,
       text: text,
@@ -202,5 +210,5 @@ class _TextProcessorResult {
 
   void _write(String text, WidgetFactory wf) => !hasChildren
       ? _texts.write(text)
-      : _addSpan(wf.buildTextSpan(text: text));
+      : _addSpan(wf.buildTextSpan(context: b.context, text: text));
 }

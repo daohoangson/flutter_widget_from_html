@@ -114,8 +114,13 @@ class WidgetFactory {
     return widget;
   }
 
-  TextSpan buildTextSpan(
-      {List<TextSpan> children, TextStyle style, String text, String url}) {
+  TextSpan buildTextSpan({
+    @required BuildContext context,
+    List<TextSpan> children,
+    TextStyle style,
+    String text,
+    String url,
+  }) {
     if (!(children?.isEmpty == false) && text?.isEmpty != false) {
       return null;
     }
@@ -128,7 +133,7 @@ class WidgetFactory {
 
     return TextSpan(
       children: children,
-      style: style,
+      style: style ?? DefaultTextStyle.of(context).style,
       recognizer: recognizer,
       text: text.replaceAll(_spacingRegExp, ' '),
     );
