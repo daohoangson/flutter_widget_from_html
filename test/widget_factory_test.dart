@@ -12,15 +12,27 @@ void main() {
 
     group('buildFullUrl', () {
       test('http url', () {
-        final httpUrl = 'http://domain.com/image.jpg';
+        final httpUrl = 'http://http.domain.com/image.jpg';
         final built = widgetFactory.buildFullUrl(httpUrl);
         expect(built, equals(httpUrl));
       });
 
       test('https url', () {
-        final httpUrl = 'https://domain.com/image.jpg';
+        final httpUrl = 'https://https.domain.com/image.jpg';
         final built = widgetFactory.buildFullUrl(httpUrl);
         expect(built, equals(httpUrl));
+      });
+
+      test('protocol-relative url', () {
+        final protocolRelativeUrl = '//protocol-relative.domain.com/image.jpg';
+
+        final httpsWf = WidgetFactory(config: Config(baseUrl: Uri.parse('https://domain.com')));
+        final httpsBuilt = httpsWf.buildFullUrl(protocolRelativeUrl);
+        expect(httpsBuilt, equals("https:$protocolRelativeUrl"));
+
+        final httpWf = WidgetFactory(config: Config(baseUrl: Uri.parse('http://domain.com')));
+        final httpBuilt = httpWf.buildFullUrl(protocolRelativeUrl);
+        expect(httpBuilt, equals("http:$protocolRelativeUrl"));
       });
 
       var testBaseUrls = (String path) {

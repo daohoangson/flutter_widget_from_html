@@ -48,7 +48,9 @@ class WidgetFactory {
         return null;
       }
 
-      if (url.startsWith('/')) {
+      if (url.startsWith('//')) {
+        imageUrl = "${baseUrl.scheme}:$url";
+      } else if (url.startsWith('/')) {
         imageUrl = baseUrl.scheme +
             '://' +
             baseUrl.host +
