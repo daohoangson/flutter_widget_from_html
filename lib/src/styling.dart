@@ -7,21 +7,29 @@ final _attributeStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
 final _styleColorRegExp = RegExp(r'^#([a-fA-F0-9]{6})$');
 final _spacingRegExp = RegExp(r'\s+');
 
-ParsedNodeStyle parseNodeStyle(Config config, dom.Element e) {
+NodeMetadata collectMetadata(Config config, dom.Element e) {
   Color color;
-  TextDecoration decoration;
+  bool decorationLineThrough;
+  bool decorationOverline;
+  bool decorationUnderline;
   double fontSize;
-  FontStyle fontStyle;
+  bool fontStyleItalic;
   FontWeight fontWeight;
-  String url;
+  String href;
+  NodeImage image;
   bool isBlockElement;
   TextAlign textAlign;
 
   switch (e.localName) {
     case 'a':
-      decoration = TextDecoration.underline;
+      decorationUnderline = true;
       color = config.colorHyperlink;
-      url = e.attributes['href'];
+      href = e.attributes['href'];
+      break;
+
+    case 'img':
+      image = NodeImage.fromAttributes(e.attributes);
+      isBlockElement = true;
       break;
 
     case 'br':
@@ -62,11 +70,11 @@ ParsedNodeStyle parseNodeStyle(Config config, dom.Element e) {
 
     case 'i':
     case 'em':
-      fontStyle = FontStyle.italic;
+      fontStyleItalic = true;
       break;
 
     case 'u':
-      decoration = TextDecoration.underline;
+      decorationUnderline = true;
       break;
   }
 
@@ -123,10 +131,10 @@ ParsedNodeStyle parseNodeStyle(Config config, dom.Element e) {
         case 'font-style':
           switch (value) {
             case 'italic':
-              fontStyle = FontStyle.italic;
+              fontStyleItalic = true;
               break;
             case 'normal':
-              fontStyle = FontStyle.normal;
+              fontStyleItalic = false;
               break;
           }
           break;
@@ -151,64 +159,113 @@ ParsedNodeStyle parseNodeStyle(Config config, dom.Element e) {
           break;
 
         case 'text-decoration':
-          decoration =
-              TextDecoration.combine(value.split(_spacingRegExp).map((v) {
+          for (final v in value.split(_spacingRegExp)) {
             switch (v) {
               case 'line-through':
-                return TextDecoration.lineThrough;
+                decorationLineThrough = true;
+                break;
+              case 'none':
+                decorationLineThrough = false;
+                decorationOverline = false;
+                decorationUnderline = false;
+                break;
               case 'overline':
-                return TextDecoration.overline;
+                decorationOverline = true;
+                break;
               case 'underline':
-                return TextDecoration.underline;
+                decorationUnderline = true;
+                break;
             }
-
-            return null;
-          }).toList());
+          }
           break;
       }
     }
   }
 
   if (color == null &&
-      decoration == null &&
+      decorationLineThrough == null &&
+      decorationOverline == null &&
+      decorationUnderline == null &&
       fontSize == null &&
-      fontStyle == null &&
+      fontStyleItalic == null &&
       fontWeight == null &&
-      url == null &&
+      href == null &&
+      image == null &&
       isBlockElement == null &&
       textAlign == null) {
     return null;
   }
 
-  return ParsedNodeStyle(
+  return NodeMetadata(
     color: color,
-    decoration: decoration,
+    decorationLineThrough: decorationLineThrough,
+    decorationOverline: decorationOverline,
+    decorationUnderline: decorationUnderline,
     fontSize: fontSize,
-    fontStyle: fontStyle,
+    fontStyleItalic: fontStyleItalic,
     fontWeight: fontWeight,
-    url: url,
+    href: href,
+    image: image,
     isBlockElement: isBlockElement,
     textAlign: textAlign,
   );
 }
 
-TextStyle buildTextStyle(ParsedNode pn, TextStyle parent) {
-  if (pn is! ParsedNodeStyle) {
-    return parent;
+FontStyle buildFontSize(NodeMetadata meta) {
+  if (!meta.hasFontStyle) {
+    return null;
   }
 
-  final pns = pn as ParsedNodeStyle;
-  final decoration = parent.decoration == null
-      ? pns.decoration
-      : (pns.decoration == null
-          ? parent.decoration
-          : TextDecoration.combine([parent.decoration, pns.decoration]));
+  return meta.fontStyleItalic ? FontStyle.italic : FontStyle.normal;
+}
 
-  return parent.copyWith(
-    color: pns.color,
-    decoration: decoration,
-    fontSize: pns.fontSize,
-    fontStyle: pns.fontStyle,
-    fontWeight: pns.fontWeight,
-  );
+TextDecoration buildTextDecoration(NodeMetadata meta, TextStyle parent) {
+  if (!meta.hasDecoration) {
+    return null;
+  }
+
+  final pd = parent.decoration;
+  final pdLineThough = pd?.contains(TextDecoration.lineThrough) == true;
+  final pdOverline = pd?.contains(TextDecoration.overline) == true;
+  final pdUnderline = pd?.contains(TextDecoration.underline) == true;
+
+  final List<TextDecoration> list = List();
+  if (meta.decorationLineThrough == true ||
+      (pdLineThough && meta.decorationLineThrough != false)) {
+    list.add(TextDecoration.lineThrough);
+  }
+  if (meta.decorationOverline == true ||
+      (pdOverline && meta.decorationOverline != false)) {
+    list.add(TextDecoration.overline);
+  }
+  if (meta.decorationUnderline == true ||
+      (pdUnderline && meta.decorationUnderline != false)) {
+    list.add(TextDecoration.underline);
+  }
+
+  return TextDecoration.combine(list);
+}
+
+TextStyle buildTextStyle(NodeMetadata meta, TextStyle parent) =>
+    metaHasStyling(meta)
+        ? parent.copyWith(
+            color: meta.color,
+            decoration: buildTextDecoration(meta, parent),
+            fontSize: meta.fontSize,
+            fontStyle: buildFontSize(meta),
+            fontWeight: meta.fontWeight,
+          )
+        : null;
+
+bool metaHasStyling(NodeMetadata meta) {
+  if (meta == null) return false;
+  if (meta.color == null &&
+      !meta.hasDecoration &&
+      meta.fontSize == null &&
+      !meta.hasFontStyle &&
+      meta.fontWeight == null) {
+    return false;
+  }
+
+  return true;
 }

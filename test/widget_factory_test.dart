@@ -26,11 +26,13 @@ void main() {
       test('protocol-relative url', () {
         final protocolRelativeUrl = '//protocol-relative.domain.com/image.jpg';
 
-        final httpsWf = WidgetFactory(config: Config(baseUrl: Uri.parse('https://domain.com')));
+        final httpsWf = WidgetFactory(
+            config: Config(baseUrl: Uri.parse('https://domain.com')));
         final httpsBuilt = httpsWf.buildFullUrl(protocolRelativeUrl);
         expect(httpsBuilt, equals("https:$protocolRelativeUrl"));
 
-        final httpWf = WidgetFactory(config: Config(baseUrl: Uri.parse('http://domain.com')));
+        final httpWf = WidgetFactory(
+            config: Config(baseUrl: Uri.parse('http://domain.com')));
         final httpBuilt = httpWf.buildFullUrl(protocolRelativeUrl);
         expect(httpBuilt, equals("http:$protocolRelativeUrl"));
       });

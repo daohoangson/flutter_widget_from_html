@@ -119,17 +119,17 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals('[Column:children=[RichText:(:First block.)],' +
-                '[RichText:(:Second one.)]]'));
+            equals('[Column:children=[Text:First block.],' +
+                '[Text:Second one.]]'));
       });
 
       testWidgets('renders P tag', (WidgetTester tester) async {
-        final html = '<p>First paragraph.</p><p>Second one.</p>';
+        final html = '<p>First paragraph.</p><p><b>Second</b> one.</p>';
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals('[Column:children=[RichText:(:First paragraph.)],' +
-                '[RichText:(:Second one.)]]'));
+            equals('[Column:children=[Text:First paragraph.],' +
+                '[RichText:(:(+b:Second)(: one.))]]'));
       });
     });
 
@@ -195,19 +195,19 @@ void main() {
       testWidgets('renders center', (WidgetTester tester) async {
         final html = '<div style="text-align: center">_X_</div>';
         final explained = await explain(tester, html);
-        expect(explained, equals('[RichText,align=center:(:_X_)]'));
+        expect(explained, equals('[Text,align=center:_X_]'));
       });
 
       testWidgets('renders left', (WidgetTester tester) async {
         final html = '<div style="text-align: left">X__</div>';
         final explained = await explain(tester, html);
-        expect(explained, equals('[RichText,align=left:(:X__)]'));
+        expect(explained, equals('[Text,align=left:X__]'));
       });
 
       testWidgets('renders right', (WidgetTester tester) async {
-        final html = '<div style="text-align: right">__X</div>';
+        final html = '<div style="text-align: right">__<b>X</b></div>';
         final explained = await explain(tester, html);
-        expect(explained, equals('[RichText,align=right:(:__X)]'));
+        expect(explained, equals('[RichText,align=right:(:__(+b:X))]'));
       });
     });
 

@@ -81,15 +81,15 @@ class WidgetFactory {
     return bytes;
   }
 
-  Widget buildImageWidget(ParsedNodeImage pni) {
-    final src = pni?.src;
-    if (src.startsWith('data:image')) {
+  Widget buildImageWidget(NodeImage image) {
+    final src = image?.src;
+    if (src?.startsWith('data:image') == true) {
       return buildImageWidgetFromDataUri(src);
     } else {
       return buildImageWidgetFromUrl(
-        height: pni.height,
+        height: image?.height,
         url: src,
-        width: pni.width,
+        width: image?.width,
       );
     }
   }

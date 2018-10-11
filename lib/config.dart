@@ -14,6 +14,10 @@ int parseInt(String value) {
   return int.parse(value);
 }
 
+bool shouldParseElement(Config config, dom.Element e) =>
+    (config?.parseElementCallback == null ||
+        config.parseElementCallback(e) == true);
+
 typedef bool ParseElementCallback(dom.Element e);
 
 class Config {
@@ -32,25 +36,53 @@ class Config {
   });
 }
 
-abstract class ParsedNode {
-  var processor;
+class NodeMetadata {
+  final Color color;
+  final bool decorationLineThrough;
+  final bool decorationOverline;
+  final bool decorationUnderline;
+  final double fontSize;
+  final bool fontStyleItalic;
+  final FontWeight fontWeight;
+  final String href;
+  final NodeImage image;
+  final bool _isBlockElement;
+  final TextAlign _textAlign;
 
-  bool get isBlockElement => false;
-  TextAlign get textAlign => null;
-  String get url => null;
+  NodeMetadata({
+    this.color,
+    this.decorationLineThrough,
+    this.decorationOverline,
+    this.decorationUnderline,
+    this.fontSize,
+    this.fontStyleItalic,
+    this.fontWeight,
+    this.href,
+    this.image,
+    bool isBlockElement,
+    TextAlign textAlign,
+  })  : assert(href == null || href.isNotEmpty),
+        assert(image == null || image.src?.isNotEmpty == true),
+        _isBlockElement = isBlockElement,
+        _textAlign = textAlign;
+
+  bool get hasDecoration =>
+      decorationLineThrough != null ||
+      decorationOverline != null ||
+      decorationUnderline != null;
+  bool get hasFontStyle => fontStyleItalic != null;
+  bool get isBlockElement => _isBlockElement == true;
+  TextAlign get textAlign => _textAlign ?? TextAlign.start;
 }
 
-class ParsedNodeImage extends ParsedNode {
+class NodeImage {
   final int height;
   final String src;
   final int width;
 
-  ParsedNodeImage({this.height, @required this.src, this.width});
+  NodeImage({this.height, @required this.src, this.width});
 
-  @override
-  bool get isBlockElement => true;
-
-  static ParsedNodeImage fromAttributes(
+  static NodeImage fromAttributes(
     Map<dynamic, String> map, {
     String keyHeight = 'height',
     String keyPrefix = 'data-',
@@ -59,41 +91,10 @@ class ParsedNodeImage extends ParsedNode {
   }) {
     final src = getValueFromAttributes(map, keySrc, keyPrefix);
     if (src?.isEmpty != false) return null;
-    return ParsedNodeImage(
+    return NodeImage(
       height: parseInt(getValueFromAttributes(map, keyHeight, keyPrefix)),
       src: src,
       width: parseInt(getValueFromAttributes(map, keyWidth, keyPrefix)),
     );
   }
-}
-
-class ParsedNodeStyle extends ParsedNode {
-  final Color color;
-  final TextDecoration decoration;
-  final double fontSize;
-  final FontStyle fontStyle;
-  final FontWeight fontWeight;
-  final bool isBlockElement;
-  final TextAlign textAlign;
-  final String url;
-
-  ParsedNodeStyle({
-    this.color,
-    this.decoration,
-    this.fontSize,
-    this.fontStyle,
-    this.fontWeight,
-    this.isBlockElement,
-    this.textAlign,
-    this.url,
-  });
-}
-
-class ParsedNodeText extends ParsedNode {
-  final String text;
-
-  ParsedNodeText({this.text});
-
-  @override
-  set processor(v) {}
 }

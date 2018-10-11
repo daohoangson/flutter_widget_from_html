@@ -1,166 +1,133 @@
 import 'package:flutter/widgets.dart';
+import 'package:html/dom.dart' as dom;
 
 import '../config.dart';
 import '../widget_factory.dart';
-import 'parsed_node.dart';
 import 'styling.dart';
 
 class Builder {
   final BuildContext context;
-  final List<ParsedNode> parsedNodes;
+  final List<dom.Node> domNodes;
+  final NodeMetadata parentMeta;
   final WidgetFactory wf;
 
-  Builder(
-      {@required this.context,
-      @required this.parsedNodes,
-      @required WidgetFactory widgetFactory})
-      : wf = widgetFactory;
+  final TextStyle _parentStyle;
+  _BuiltPiece _piece;
+  final List<_BuiltPiece> _pieces = List();
 
-  List<Widget> build({
-    ParsedNode pn,
-    @required int from,
-    @required int to,
-  }) {
-    if (pn is ParsedNodeImage) {
-      final imageWidget = wf.buildImageWidget(pn);
-      if (imageWidget == null) return [];
-      return [imageWidget];
-    }
+  Builder({
+    @required this.context,
+    @required this.domNodes,
+    this.parentMeta,
+    TextStyle parentStyle,
+    @required WidgetFactory widgetFactory,
+  })  : wf = widgetFactory,
+        _parentStyle = parentStyle ?? DefaultTextStyle.of(context).style;
 
-    final tp = TextProcessor(
-      builder: this,
-      pn: pn,
-      textStyleParent: DefaultTextStyle.of(context).style,
-    );
-    return tp.buildTextWidgets(from, to);
-  }
-
-  List<Widget> buildAll() => build(from: 0, to: parsedNodes.length - 1);
-}
-
-class TextProcessor {
-  final Builder b;
-  final TextProcessor parent;
-  final ParsedNode pn;
-
-  final TextStyle _textStyle;
-
-  bool get hasTextStyle => pn is ParsedNodeStyle;
-
-  TextProcessor(
-      {@required Builder builder,
-      this.parent,
-      @required this.pn,
-      @required TextStyle textStyleParent})
-      : b = builder,
-        _textStyle = buildTextStyle(pn, textStyleParent);
-
-  List<Widget> buildTextWidgets(final int from, final int to) {
+  List<Widget> build() {
     final List<Widget> widgets = List();
-    final addWidget = (Widget w) => w != null ? widgets.add(w) : null;
+    final addWidgetIfNotNull = (Widget w) => w != null ? widgets.add(w) : null;
 
-    final results = process(from, to);
-    for (final result in results) {
-      if (result.hasStyling) {
-        addWidget(b.wf.wrapTextWidget(b.wf.buildTextWidgetWithStyling(
-          text: result._buildTextSpan(b.wf, trimLeft: true),
-          textAlign: pn?.textAlign,
-        )));
-      } else if (result.hasText) {
-        addWidget(b.wf.wrapTextWidget(b.wf.buildTextWidgetSimple(
-          text: result.text,
-          textAlign: pn?.textAlign,
-        )));
-      }
+    final image = parentMeta?.image;
+    if (image != null) {
+      addWidgetIfNotNull(wf.buildImageWidget(image));
+    }
 
-      if (result.hasWidgets) {
-        widgets.addAll(result.widgets);
+    for (final piece in process()) {
+      if (piece.hasTextSpan) {
+        addWidgetIfNotNull(wf.wrapTextWidget(wf.buildTextWidgetWithStyling(
+          text: piece._buildTextSpan(trimLeft: true),
+          textAlign: parentMeta?.textAlign,
+        )));
+      } else if (piece.hasText) {
+        addWidgetIfNotNull(wf.wrapTextWidget(wf.buildTextWidgetSimple(
+          text: piece.text,
+          textAlign: parentMeta?.textAlign,
+        )));
+      } else if (piece.hasWidgets) {
+        piece.widgets.forEach(addWidgetIfNotNull);
       }
     }
 
-    return List.unmodifiable(widgets);
+    return widgets;
   }
 
-  List<_TextProcessorResult> process(final int from, final int to) {
-    var i = from;
-    final List<_TextProcessorResult> results = List();
+  List<_BuiltPiece> process() {
+    _pieces.clear();
+    _newPiece();
 
-    _TextProcessorResult inProcess;
-    final setUpProcessing = ({bool init = false}) {
-      inProcess = _TextProcessorResult(
-        builder: b,
-        style: hasTextStyle ? _textStyle : null,
-        texts: true,
-        url: pn?.url,
+    for (final domNode in domNodes) {
+      NodeMetadata meta;
+      switch (domNode.nodeType) {
+        case dom.Node.ELEMENT_NODE:
+          if (!shouldParseElement(wf.config, domNode)) continue;
+          meta = collectMetadata(wf.config, domNode);
+          break;
+        case dom.Node.TEXT_NODE:
+          _piece._write(domNode.text);
+          break;
+      }
+
+      final style = buildTextStyle(meta, _parentStyle);
+      final __builder = Builder(
+        context: context,
+        domNodes: domNode.nodes,
+        parentMeta: meta,
+        parentStyle: style ?? _parentStyle,
+        widgetFactory: wf,
       );
-      if (init && pn is ParsedNodeText)
-        inProcess._write((pn as ParsedNodeText).text, b.wf);
-    };
-    setUpProcessing(init: true);
 
-    final wrapUpProcessing = () {
-      if (inProcess.hasStyling || inProcess.hasText) {
-        results.add(inProcess);
+      if (meta?.isBlockElement == true) {
+        _savePiece();
+        _pieces.add(_BuiltPiece(builder: this, widgets: __builder.build()));
+        continue;
       }
 
-      setUpProcessing();
-    };
+      for (final __piece in __builder.process()) {
+        if (__piece.hasTextSpan) {
+          _piece._addSpan(__piece._buildTextSpan());
+        } else if (__piece.hasText) {
+          _piece._write(__piece.text);
+        } else if (__piece.hasWidgets) {
+          _savePiece();
 
-    while (true) {
-      if (i > to) {
-        break;
-      }
-
-      final pn = b.parsedNodes[i];
-      final indexEnd = (pn.processor as ParsedNodeProcessor)?.indexEnd ?? i;
-
-      if (pn.isBlockElement == true) {
-        wrapUpProcessing();
-
-        final subWidgets = b.build(pn: pn, from: i + 1, to: indexEnd);
-        results.add(_TextProcessorResult(builder: b, widgets: subWidgets));
-      } else {
-        final subProcessor = TextProcessor(
-          builder: b,
-          parent: this,
-          pn: pn,
-          textStyleParent: _textStyle,
-        );
-        final subResults = subProcessor.process(i + 1, indexEnd);
-        for (final subResult in subResults) {
-          if (subResult.hasStyling) {
-            inProcess._addSpan(subResult._buildTextSpan(b.wf));
-          } else if (subResult.hasText) {
-            inProcess._write(subResult.text, b.wf);
-          }
-
-          if (subResult.hasWidgets) {
-            wrapUpProcessing();
-
-            if (pn?.url?.isNotEmpty == true) {
-              results.add(_TextProcessorResult(builder: b, widgets: <Widget>[
-                b.wf.buildColumn(
-                  children: subResult.widgets,
-                  url: pn.url,
-                )
-              ]));
-            } else {
-              results.add(subResult);
-            }
+          if (meta?.href?.isNotEmpty == true) {
+            _pieces.add(_BuiltPiece(builder: this, widgets: <Widget>[
+              wf.buildColumn(
+                children: __piece.widgets,
+                url: meta.href,
+              )
+            ]));
+          } else {
+            _pieces.add(__piece);
           }
         }
       }
-
-      i = indexEnd + 1;
     }
 
-    wrapUpProcessing();
+    _savePiece();
 
-    return List.unmodifiable(results);
+    return _pieces;
+  }
+
+  _newPiece() {
+    _piece = _BuiltPiece(
+      builder: this,
+      style: metaHasStyling(parentMeta) ? _parentStyle : null,
+      url: parentMeta?.href,
+    );
+  }
+
+  _savePiece() {
+    if (_piece.hasText || _piece.hasTextSpan) {
+      _pieces.add(_piece);
+    }
+
+    _newPiece();
   }
 }
 
-class _TextProcessorResult {
+class _BuiltPiece {
   final Builder b;
   final TextStyle style;
   final String url;
@@ -169,25 +136,22 @@ class _TextProcessorResult {
   final StringBuffer _texts;
   List<TextSpan> _spans;
 
-  _TextProcessorResult({
+  _BuiltPiece({
     @required Builder builder,
     this.style,
-    bool texts = false,
     this.url,
     this.widgets,
   })  : b = builder,
-        _texts = texts ? StringBuffer() : null,
-        assert(((texts ? 1 : 0) + (widgets != null ? 1 : 0)) == 1);
+        _texts = widgets == null ? StringBuffer() : null;
 
-  bool get hasChildren => _spans != null;
-  bool get hasStyling => style != null || hasChildren;
   bool get hasText => _texts?.isNotEmpty == true;
+  bool get hasTextSpan => style != null || _spans != null;
   bool get hasWidgets => widgets != null;
   String get text => _texts.toString();
 
   void _addSpan(TextSpan span) {
     if (span == null) return;
-    if (hasWidgets) throw ('Cannot add spans into result with widgets');
+    if (hasWidgets) throw ('Cannot add spans into piece with widgets');
     if (_spans == null) _spans = List();
 
     if (span.style != null || span.text?.isNotEmpty != false) {
@@ -199,12 +163,12 @@ class _TextProcessorResult {
     }
   }
 
-  TextSpan _buildTextSpan(WidgetFactory wf, {bool trimLeft = false}) {
+  TextSpan _buildTextSpan({bool trimLeft = false}) {
     if (!hasText && style == null && _spans.length == 1) {
       return _spans[0];
     }
 
-    return wf.buildTextSpan(
+    return b.wf.buildTextSpan(
       context: b.context,
       children: _spans,
       style: style,
@@ -213,7 +177,7 @@ class _TextProcessorResult {
     );
   }
 
-  void _write(String text, WidgetFactory wf) => !hasChildren
+  void _write(String text) => _spans == null
       ? _texts.write(text)
-      : _addSpan(wf.buildTextSpan(context: b.context, text: text));
+      : _addSpan(b.wf.buildTextSpan(context: b.context, text: text));
 }
