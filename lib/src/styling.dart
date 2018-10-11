@@ -18,6 +18,7 @@ NodeMetadata collectMetadata(Config config, dom.Element e) {
   String href;
   NodeImage image;
   bool isBlockElement;
+  ListType listType;
   TextAlign textAlign;
 
   switch (e.localName) {
@@ -30,6 +31,20 @@ NodeMetadata collectMetadata(Config config, dom.Element e) {
     case 'img':
       image = NodeImage.fromAttributes(e.attributes);
       isBlockElement = true;
+      break;
+
+    case 'li':
+      isBlockElement = true;
+      break;
+
+    case 'ol':
+      isBlockElement = true;
+      listType = ListType.Ordered;
+      break;
+
+    case 'ul':
+      isBlockElement = true;
+      listType = ListType.Unordered;
       break;
 
     case 'br':
@@ -192,6 +207,7 @@ NodeMetadata collectMetadata(Config config, dom.Element e) {
       href == null &&
       image == null &&
       isBlockElement == null &&
+      listType == null &&
       textAlign == null) {
     return null;
   }
@@ -207,6 +223,7 @@ NodeMetadata collectMetadata(Config config, dom.Element e) {
     href: href,
     image: image,
     isBlockElement: isBlockElement,
+    listType: listType,
     textAlign: textAlign,
   );
 }

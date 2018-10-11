@@ -23,6 +23,7 @@ typedef bool ParseElementCallback(dom.Element e);
 class Config {
   final Uri baseUrl;
   final Color colorHyperlink;
+  final EdgeInsetsGeometry indentPadding;
   final ParseElementCallback parseElementCallback;
   final List<double> sizeHeadings;
   final EdgeInsetsGeometry textWidgetPadding;
@@ -30,11 +31,22 @@ class Config {
   const Config({
     this.baseUrl,
     this.colorHyperlink = const Color(0xFF1965B5),
+    this.indentPadding = const EdgeInsets.only(left: 20.0),
     this.parseElementCallback,
     this.sizeHeadings = const [32.0, 24.0, 20.8, 16.0, 12.8, 11.2],
     this.textWidgetPadding = const EdgeInsets.all(5.0),
   });
+
+  String getTextPrefixForList(int value) {
+    if (value == 0) {
+      return '•  ';
+    } else {
+      return "$value. ";
+    }
+  }
 }
+
+enum ListType { Ordered, Unordered }
 
 class NodeMetadata {
   final Color color;
@@ -46,6 +58,8 @@ class NodeMetadata {
   final FontWeight fontWeight;
   final String href;
   final NodeImage image;
+  final ListType listType;
+
   final bool _isBlockElement;
   final TextAlign _textAlign;
 
@@ -60,6 +74,7 @@ class NodeMetadata {
     this.href,
     this.image,
     bool isBlockElement,
+    this.listType,
     TextAlign textAlign,
   })  : assert(href == null || href.isNotEmpty),
         assert(image == null || image.src?.isNotEmpty == true),

@@ -17,9 +17,16 @@ class WidgetFactory {
 
   const WidgetFactory({this.config = const Config()});
 
-  Widget buildColumn({List<Widget> children, String url}) {
-    Widget widget;
+  Widget buildColumn({
+    List<Widget> children,
+    bool indent = false,
+    String url,
+  }) {
+    if (children?.isNotEmpty != true) {
+      return null;
+    }
 
+    Widget widget;
     if (children.length == 1) {
       widget = children.first;
     } else {
@@ -33,6 +40,13 @@ class WidgetFactory {
       widget = GestureDetector(
         child: widget,
         onTap: prepareGestureTapCallbackToLaunchUrl(buildFullUrl(url)),
+      );
+    }
+
+    if (indent) {
+      widget = Padding(
+        padding: config.indentPadding,
+        child: widget,
       );
     }
 

@@ -148,7 +148,7 @@ class _Explainer {
   String _widget(Widget widget) {
     final type = widget.runtimeType.toString();
     final text = widget is AspectRatio
-        ? "aspectRatio=${widget.aspectRatio.toStringAsFixed(2)},child=${_widget(widget.child)}"
+        ? "aspectRatio=${widget.aspectRatio.toStringAsFixed(2)},"
         : widget is CachedNetworkImage
             ? "imageUrl=${widget.imageUrl}"
             : widget is GestureDetector
@@ -162,9 +162,11 @@ class _Explainer {
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));
     final textAlignStr = textAlign.isNotEmpty ? ",align=$textAlign" : '';
-    final children = (widget is MultiChildRenderObjectWidget
+    final children = widget is MultiChildRenderObjectWidget
         ? "children=${widget.children.map(_widget).join(',')}"
-        : '');
+        : widget is SingleChildRenderObjectWidget
+            ? "child=${_widget(widget.child)}"
+            : '';
     return "[$type$textAlignStr:$text$children]";
   }
 }

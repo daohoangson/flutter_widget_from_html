@@ -30,24 +30,6 @@ void main() {
       });
     });
 
-    testWidgets('renders heading tags', (WidgetTester tester) async {
-      final html = """<h1>This is heading 1</h1>
-<h2>This is heading 2</h2>
-<h3>This is heading 3</h3>
-<h4>This is heading 4</h4>
-<h5>This is heading 5</h5>
-<h6>This is heading 6</h6>""";
-      final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[Column:children=[RichText:(@1.0:This is heading 1)],' +
-              '[RichText:(@2.0:This is heading 2)],' +
-              '[RichText:(@3.0:This is heading 3)],' +
-              '[RichText:(@4.0:This is heading 4)],' +
-              '[RichText:(@5.0:This is heading 5)],' +
-              '[RichText:(@6.0:This is heading 6)]]'));
-    });
-
     group('IMG tag', () {
       testWidgets('renders src', (WidgetTester tester) async {
         final html = '<img src="image.png" />';
@@ -104,6 +86,37 @@ void main() {
       });
     });
 
+    group('lists', () {
+      testWidgets('renders ordered list', (WidgetTester tester) async {
+        final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[Padding:child=[Column:children=[Text:1. One],' +
+                '[Text:2. Two],[RichText:(:3. (+b:Three))]]]'));
+      });
+
+      testWidgets('renders unordered list', (WidgetTester tester) async {
+        final html = '<ul><li>One</li><li>Two</li><li><b>Three</b></li><ul>';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[Padding:child=[Column:children=[Text:- One],' +
+                '[Text:- Two],[RichText:(:- (+b:Three))]]]'));
+      });
+
+      testWidgets('renders nested list', (WidgetTester tester) async {
+        final html = '<ol><li>One</li><li>Two</li><li>Three ' +
+            '<ul><li>3.1</li><li>3.2</li></ul></li><ol>';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[Padding:child=[Column:children=[Text:1. One],' +
+                '[Text:2. Two],[Text:3. Three],[Padding:child=' +
+                '[Column:children=[Text:- 3.1],[Text:- 3.2]]]]]'));
+      });
+    });
+
     group('block elements', () {
       testWidgets('renders BR tag', (WidgetTester tester) async {
         final html = 'First block.<br />Second one.';
@@ -131,6 +144,24 @@ void main() {
             equals('[Column:children=[Text:First paragraph.],' +
                 '[RichText:(:(+b:Second)(: one.))]]'));
       });
+    });
+
+    testWidgets('renders heading tags', (WidgetTester tester) async {
+      final html = """<h1>This is heading 1</h1>
+<h2>This is heading 2</h2>
+<h3>This is heading 3</h3>
+<h4>This is heading 4</h4>
+<h5>This is heading 5</h5>
+<h6>This is heading 6</h6>""";
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Column:children=[RichText:(@1.0:This is heading 1)],' +
+              '[RichText:(@2.0:This is heading 2)],' +
+              '[RichText:(@3.0:This is heading 3)],' +
+              '[RichText:(@4.0:This is heading 4)],' +
+              '[RichText:(@5.0:This is heading 5)],' +
+              '[RichText:(@6.0:This is heading 6)]]'));
     });
 
     group('font-weight', () {

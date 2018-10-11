@@ -9,6 +9,7 @@ class Builder {
   final BuildContext context;
   final List<dom.Node> domNodes;
   final NodeMetadata parentMeta;
+  final int textPrefixForList;
   final WidgetFactory wf;
 
   final TextStyle _parentStyle;
@@ -20,6 +21,7 @@ class Builder {
     @required this.domNodes,
     this.parentMeta,
     TextStyle parentStyle,
+    this.textPrefixForList,
     @required WidgetFactory widgetFactory,
   })  : wf = widgetFactory,
         _parentStyle = parentStyle ?? DefaultTextStyle.of(context).style;
@@ -49,12 +51,25 @@ class Builder {
       }
     }
 
+    if (parentMeta?.listType != null && widgets.isNotEmpty) {
+      return <Widget>[
+        wf.buildColumn(
+          children: widgets,
+          indent: true,
+        )
+      ];
+    }
+
     return widgets;
   }
 
   List<_BuiltPiece> process() {
     _pieces.clear();
-    _newPiece();
+    _newPiece(
+      textPrefix: textPrefixForList != null
+          ? wf.config.getTextPrefixForList(textPrefixForList)
+          : null,
+    );
 
     for (final domNode in domNodes) {
       NodeMetadata meta;
@@ -74,6 +89,9 @@ class Builder {
         domNodes: domNode.nodes,
         parentMeta: meta,
         parentStyle: style ?? _parentStyle,
+        textPrefixForList: parentMeta?.listType == null
+            ? null
+            : parentMeta.listType == ListType.Ordered ? _pieces.length + 1 : 0,
         widgetFactory: wf,
       );
 
@@ -110,10 +128,11 @@ class Builder {
     return _pieces;
   }
 
-  _newPiece() {
+  _newPiece({String textPrefix}) {
     _piece = _BuiltPiece(
       builder: this,
       style: metaHasStyling(parentMeta) ? _parentStyle : null,
+      textPrefix: textPrefix,
       url: parentMeta?.href,
     );
   }
@@ -131,14 +150,17 @@ class _BuiltPiece {
   final Builder b;
   final TextStyle style;
   final String url;
+  final String textPrefix;
   final List<Widget> widgets;
 
   final StringBuffer _texts;
   List<TextSpan> _spans;
+  bool _textPrefixWritten = false;
 
   _BuiltPiece({
     @required Builder builder,
     this.style,
+    this.textPrefix,
     this.url,
     this.widgets,
   })  : b = builder,
@@ -150,6 +172,8 @@ class _BuiltPiece {
   String get text => _texts.toString();
 
   void _addSpan(TextSpan span) {
+    writeTextPrefixIfNeeded();
+
     if (span == null) return;
     if (hasWidgets) throw ('Cannot add spans into piece with widgets');
     if (_spans == null) _spans = List();
@@ -177,7 +201,20 @@ class _BuiltPiece {
     );
   }
 
-  void _write(String text) => _spans == null
-      ? _texts.write(text)
-      : _addSpan(b.wf.buildTextSpan(context: b.context, text: text));
+  void _write(String text) {
+    writeTextPrefixIfNeeded();
+
+    if (_spans == null) {
+      _texts.write(text);
+    } else {
+      _addSpan(b.wf.buildTextSpan(context: b.context, text: text));
+    }
+  }
+
+  void writeTextPrefixIfNeeded() {
+    if (textPrefix != null && !_textPrefixWritten) {
+      _textPrefixWritten = true;
+      _write(textPrefix);
+    }
+  }
 }
