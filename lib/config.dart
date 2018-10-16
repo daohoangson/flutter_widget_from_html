@@ -26,7 +26,8 @@ class Config {
   final EdgeInsetsGeometry indentPadding;
   final ParseElementCallback parseElementCallback;
   final List<double> sizeHeadings;
-  final EdgeInsetsGeometry textWidgetPadding;
+  final EdgeInsetsGeometry widgetImagePadding;
+  final EdgeInsetsGeometry widgetTextPadding;
 
   const Config({
     this.baseUrl,
@@ -34,7 +35,8 @@ class Config {
     this.indentPadding = const EdgeInsets.only(left: 20.0),
     this.parseElementCallback,
     this.sizeHeadings = const [32.0, 24.0, 20.8, 16.0, 12.8, 11.2],
-    this.textWidgetPadding = const EdgeInsets.all(5.0),
+    this.widgetImagePadding = const EdgeInsets.symmetric(vertical: 5.0),
+    this.widgetTextPadding = const EdgeInsets.all(10.0),
   });
 
   String getTextPrefixForList(int value) {

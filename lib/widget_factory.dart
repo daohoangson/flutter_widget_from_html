@@ -97,15 +97,26 @@ class WidgetFactory {
 
   Widget buildImageWidget(NodeImage image) {
     final src = image?.src;
+
+    Widget widget;
     if (src?.startsWith('data:image') == true) {
-      return buildImageWidgetFromDataUri(src);
+      widget = buildImageWidgetFromDataUri(src);
     } else {
-      return buildImageWidgetFromUrl(
+      widget = buildImageWidgetFromUrl(
         height: image?.height,
         url: src,
         width: image?.width,
       );
     }
+
+    if (config.widgetImagePadding != null) {
+      widget = Padding(
+        child: widget,
+        padding: config.widgetImagePadding,
+      );
+    }
+
+    return widget;
   }
 
   Widget buildImageWidgetFromDataUri(String dataUri) {
@@ -199,10 +210,10 @@ class WidgetFactory {
   }
 
   Widget wrapTextWidget(Widget widget) =>
-      (config.textWidgetPadding == null || widget == null)
+      (config.widgetTextPadding == null || widget == null)
           ? widget
           : Container(
-              padding: config.textWidgetPadding,
+              padding: config.widgetTextPadding,
               child: widget,
             );
 

@@ -101,8 +101,8 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals('[Padding:child=[Column:children=[Text:- One],' +
-                '[Text:- Two],[RichText:(:- (+b:Three))]]]'));
+            equals('[Padding:child=[Column:children=[Text:•  One],' +
+                '[Text:•  Two],[RichText:(:•  (+b:Three))]]]'));
       });
 
       testWidgets('renders nested list', (WidgetTester tester) async {
@@ -113,7 +113,7 @@ void main() {
             explained,
             equals('[Padding:child=[Column:children=[Text:1. One],' +
                 '[Text:2. Two],[Text:3. Three],[Padding:child=' +
-                '[Column:children=[Text:- 3.1],[Text:- 3.2]]]]]'));
+                '[Column:children=[Text:•  3.1],[Text:•  3.2]]]]]'));
       });
     });
 
