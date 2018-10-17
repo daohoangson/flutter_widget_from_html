@@ -75,13 +75,18 @@ class Builder {
       NodeMetadata meta;
       switch (domNode.nodeType) {
         case dom.Node.ELEMENT_NODE:
-          if (!shouldParseElement(wf.config, domNode)) continue;
           meta = collectMetadata(wf.config, domNode);
+
+          if (wf.config.parseElementCallback != null) {
+            meta = wf.config.parseElementCallback(domNode, meta);
+          }
           break;
         case dom.Node.TEXT_NODE:
           _piece._write(domNode.text);
           break;
       }
+
+      if (meta?.isNotRenderable == true) continue;
 
       final style = buildTextStyle(meta, _parentStyle);
       final __builder = Builder(

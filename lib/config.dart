@@ -14,11 +14,42 @@ int parseInt(String value) {
   return int.parse(value);
 }
 
-bool shouldParseElement(Config config, dom.Element e) =>
-    (config?.parseElementCallback == null ||
-        config.parseElementCallback(e) == true);
+NodeMetadata lazySet(
+  NodeMetadata meta, {
+  Color color,
+  bool decorationLineThrough,
+  bool decorationOverline,
+  bool decorationUnderline,
+  double fontSize,
+  bool fontStyleItalic,
+  FontWeight fontWeight,
+  String href,
+  NodeImage image,
+  bool isBlockElement,
+  bool isNotRenderable,
+  ListType listType,
+  TextAlign textAlign,
+}) {
+  if (meta == null) meta = NodeMetadata();
 
-typedef bool ParseElementCallback(dom.Element e);
+  if (color != null) meta.color = color;
+  if (decorationLineThrough != null)
+    meta.decorationLineThrough = decorationLineThrough;
+  if (decorationOverline != null) meta.decorationOverline = decorationOverline;
+  if (decorationUnderline != null)
+    meta.decorationUnderline = decorationUnderline;
+  if (fontSize != null) meta.fontSize = fontSize;
+  if (fontStyleItalic != null) meta.fontStyleItalic = fontStyleItalic;
+  if (fontWeight != null) meta.fontWeight = fontWeight;
+  if (href != null) meta.href = href;
+  if (image != null) meta.image = image;
+  if (isBlockElement != null) meta.isBlockElement = isBlockElement;
+  if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
+  if (listType != null) meta.listType = listType;
+  if (textAlign != null) meta.textAlign = textAlign;
+
+  return meta;
+}
 
 class Config {
   final Uri baseUrl;
@@ -41,7 +72,7 @@ class Config {
 
   String getTextPrefixForList(int value) {
     if (value == 0) {
-      return '•  ';
+      return '• ';
     } else {
       return "$value. ";
     }
@@ -49,48 +80,6 @@ class Config {
 }
 
 enum ListType { Ordered, Unordered }
-
-class NodeMetadata {
-  final Color color;
-  final bool decorationLineThrough;
-  final bool decorationOverline;
-  final bool decorationUnderline;
-  final double fontSize;
-  final bool fontStyleItalic;
-  final FontWeight fontWeight;
-  final String href;
-  final NodeImage image;
-  final ListType listType;
-
-  final bool _isBlockElement;
-  final TextAlign _textAlign;
-
-  NodeMetadata({
-    this.color,
-    this.decorationLineThrough,
-    this.decorationOverline,
-    this.decorationUnderline,
-    this.fontSize,
-    this.fontStyleItalic,
-    this.fontWeight,
-    this.href,
-    this.image,
-    bool isBlockElement,
-    this.listType,
-    TextAlign textAlign,
-  })  : assert(href == null || href.isNotEmpty),
-        assert(image == null || image.src?.isNotEmpty == true),
-        _isBlockElement = isBlockElement,
-        _textAlign = textAlign;
-
-  bool get hasDecoration =>
-      decorationLineThrough != null ||
-      decorationOverline != null ||
-      decorationUnderline != null;
-  bool get hasFontStyle => fontStyleItalic != null;
-  bool get isBlockElement => _isBlockElement == true;
-  TextAlign get textAlign => _textAlign ?? TextAlign.start;
-}
 
 class NodeImage {
   final int height;
@@ -115,3 +104,21 @@ class NodeImage {
     );
   }
 }
+
+class NodeMetadata {
+  Color color;
+  bool decorationLineThrough;
+  bool decorationOverline;
+  bool decorationUnderline;
+  double fontSize;
+  bool fontStyleItalic;
+  FontWeight fontWeight;
+  String href;
+  NodeImage image;
+  bool isBlockElement;
+  bool isNotRenderable;
+  ListType listType;
+  TextAlign textAlign = TextAlign.start;
+}
+
+typedef NodeMetadata ParseElementCallback(dom.Element e, NodeMetadata meta);

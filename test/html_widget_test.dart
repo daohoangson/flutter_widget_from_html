@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tinhte_html_widget/config.dart';
+import 'package:tinhte_html_widget/widget_factory.dart';
 
 import 'html_widget_helper.dart';
 
@@ -101,8 +103,8 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals('[Padding:child=[Column:children=[Text:•  One],' +
-                '[Text:•  Two],[RichText:(:•  (+b:Three))]]]'));
+            equals('[Padding:child=[Column:children=[Text:• One],' +
+                '[Text:• Two],[RichText:(:• (+b:Three))]]]'));
       });
 
       testWidgets('renders nested list', (WidgetTester tester) async {
@@ -113,7 +115,7 @@ void main() {
             explained,
             equals('[Padding:child=[Column:children=[Text:1. One],' +
                 '[Text:2. Two],[Text:3. Three],[Padding:child=' +
-                '[Column:children=[Text:•  3.1],[Text:•  3.2]]]]]'));
+                '[Column:children=[Text:• 3.1],[Text:• 3.2]]]]]'));
       });
     });
 
@@ -143,6 +145,49 @@ void main() {
             explained,
             equals('[Column:children=[Text:First paragraph.],' +
                 '[RichText:(:(+b:Second)(: one.))]]'));
+      });
+    });
+
+    group('non renderable elements', () {
+      testWidgets('skips IFRAME tag', (WidgetTester tester) async {
+        final html = '<iframe src="iframe.html">Something</iframe>Bye iframe.';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[Text:Bye iframe.]'));
+      });
+
+      testWidgets('skips SCRIPT tag', (WidgetTester tester) async {
+        final html = '<script>foo = bar</script>Bye script.';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[Text:Bye script.]'));
+      });
+
+      testWidgets('skips STYLE tag', (WidgetTester tester) async {
+        final html = '<style>body { background: #fff; }</style>Bye style.';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[Text:Bye style.]'));
+      });
+
+      testWidgets('skips via callback', (WidgetTester tester) async {
+        final html = '<span class="skipMe">Foo.</span>Bar.';
+        final explained1 = await explain(tester, html, wf: WidgetFactory());
+        expect(explained1, equals('[Container:child=[Text:Foo.Bar.]]'));
+
+        final explained2 = await explain(
+          tester,
+          html,
+          wf: WidgetFactory(
+            config: Config(
+              parseElementCallback: (e, meta) {
+                if (e.className == 'skipMe') {
+                  meta = lazySet(meta, isNotRenderable: true);
+                }
+
+                return meta;
+              },
+            ),
+          ),
+        );
+        expect(explained2, equals('[Container:child=[Text:Bar.]]'));
       });
     });
 

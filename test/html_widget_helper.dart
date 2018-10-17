@@ -7,8 +7,20 @@ import 'package:tinhte_html_widget/config.dart';
 import 'package:tinhte_html_widget/html_widget.dart';
 import 'package:tinhte_html_widget/widget_factory.dart';
 
-Future<String> explain(WidgetTester tester, String html) async {
+Future<String> explain(WidgetTester tester, String html,
+    {WidgetFactory wf}) async {
   final key = new UniqueKey();
+
+  wf = wf ??
+      WidgetFactory(
+        config: Config(
+          baseUrl: Uri.parse('http://domain.com'),
+          colorHyperlink: Color(0xFF0000FF),
+          sizeHeadings: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+          widgetImagePadding: null,
+          widgetTextPadding: null,
+        ),
+      );
 
   await tester.pumpWidget(
     StatefulBuilder(
@@ -18,15 +30,7 @@ Future<String> explain(WidgetTester tester, String html) async {
               child: HtmlWidget(
             html: html,
             key: key,
-            widgetFactory: WidgetFactory(
-              config: Config(
-                baseUrl: Uri.parse('http://domain.com'),
-                colorHyperlink: Color(0xFF0000FF),
-                sizeHeadings: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
-                widgetImagePadding: null,
-                widgetTextPadding: null,
-              ),
-            ),
+            widgetFactory: wf,
           )),
         );
       },
@@ -163,11 +167,13 @@ class _Explainer {
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));
     final textAlignStr = textAlign.isNotEmpty ? ",align=$textAlign" : '';
-    final children = widget is MultiChildRenderObjectWidget
-        ? "children=${widget.children.map(_widget).join(',')}"
-        : widget is SingleChildRenderObjectWidget
-            ? "child=${_widget(widget.child)}"
-            : '';
+    final children = widget is Container
+        ? "child=${_widget(widget.child)}"
+        : widget is MultiChildRenderObjectWidget
+            ? "children=${widget.children.map(_widget).join(',')}"
+            : widget is SingleChildRenderObjectWidget
+                ? "child=${_widget(widget.child)}"
+                : '';
     return "[$type$textAlignStr:$text$children]";
   }
 }
