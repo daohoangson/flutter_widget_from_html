@@ -91,7 +91,7 @@ class Builder {
       final style = buildTextStyle(meta, _parentStyle);
       final __builder = Builder(
         context: context,
-        domNodes: domNode.nodes,
+        domNodes: meta?.domNodes ?? domNode.nodes,
         parentMeta: meta,
         parentStyle: style ?? _parentStyle,
         textPrefixForList: parentMeta?.listType == null

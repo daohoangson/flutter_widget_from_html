@@ -312,6 +312,21 @@ void main() {
       });
     });
 
+    testWidgets('renders custom text', (WidgetTester tester) async {
+      final html = 'This is <span class="x">black</span> text.';
+      final explained = await explain(
+        tester,
+        html,
+        wf: WidgetFactory(
+          config: Config(parseElementCallback: (e, meta) {
+            if (e.className == 'x') meta = lazyAddNode(meta, text: 'white');
+            return meta;
+          }),
+        ),
+      );
+      expect(explained, equals('[Container:child=[Text:This is white text.]]'));
+    });
+
     testWidgets('a little bit of everything', (WidgetTester tester) async {
       final html = """<h1>Header</h1>
 

@@ -51,6 +51,22 @@ NodeMetadata lazySet(
   return meta;
 }
 
+NodeMetadata lazyAddNode(NodeMetadata meta,
+    {dom.Node node, List<dom.Node> nodes, String text}) {
+  if (meta == null) meta = NodeMetadata();
+  if (meta.domNodes == null) meta.domNodes = List();
+
+  if (node != null) {
+    meta.domNodes.add(node);
+  } else if (nodes != null) {
+    meta.domNodes.addAll(nodes);
+  } else {
+    meta.domNodes.add(dom.Text(text));
+  }
+
+  return meta;
+}
+
 class Config {
   final Uri baseUrl;
   final Color colorHyperlink;
@@ -110,6 +126,7 @@ class NodeMetadata {
   bool decorationLineThrough;
   bool decorationOverline;
   bool decorationUnderline;
+  List<dom.Node> domNodes;
   double fontSize;
   bool fontStyleItalic;
   FontWeight fontWeight;
