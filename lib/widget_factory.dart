@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +39,20 @@ class WidgetFactory {
 
     if (url?.isNotEmpty == true) {
       widget = GestureDetector(
-        child: widget,
+        child: Stack(
+          children: <Widget>[
+            widget,
+            Positioned.fill(
+              child: LayoutBuilder(
+                builder: (context, bc) => Icon(
+                      Icons.open_in_new,
+                      color: Theme.of(context).accentColor.withAlpha(204),
+                      size: min(bc.maxHeight, bc.maxWidth) / 2.5,
+                    ),
+              ),
+            ),
+          ],
+        ),
         onTap: prepareGestureTapCallbackToLaunchUrl(buildFullUrl(url)),
       );
     }
