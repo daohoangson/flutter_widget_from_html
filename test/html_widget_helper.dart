@@ -71,23 +71,25 @@ class _Explainer {
     }
   }
 
-  String _textSpan(TextSpan textSpan) {
-    final style = _textStyle(textSpan.style);
+  String _textSpan(TextSpan textSpan, {TextStyle parentStyle}) {
+    final style = _textStyle(textSpan.style, parentStyle ?? _defaultStyle);
     final onTap = textSpan.recognizer != null ? '+onTap' : '';
     final text = textSpan.text != null ? textSpan.text : '';
     final children = textSpan.children != null
-        ? textSpan.children.map(_textSpan).join('')
+        ? textSpan.children
+            .map((c) => _textSpan(c, parentStyle: textSpan.style))
+            .join('')
         : '';
     return "($style$onTap:$text$children)";
   }
 
-  String _textStyle(TextStyle style) {
+  String _textStyle(TextStyle style, TextStyle parent) {
     String s = '';
     if (style == null) {
       return s;
     }
 
-    if (style.color != _defaultStyle.color) {
+    if (style.color != parent.color) {
       s += _textStyleColor(style.color);
     }
 
@@ -95,7 +97,11 @@ class _Explainer {
     s += _textStyleDecoration(style, TextDecoration.overline, 'o');
     s += _textStyleDecoration(style, TextDecoration.underline, 'u');
 
-    if (style.fontSize != _defaultStyle.fontSize) {
+    if (style.fontFamily != parent.fontFamily) {
+      s += "+font=${style.fontFamily}";
+    }
+
+    if (style.fontSize != parent.fontSize) {
       s += "@${style.fontSize}";
     }
 

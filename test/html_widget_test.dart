@@ -191,6 +191,29 @@ void main() {
       });
     });
 
+    group('code', () {
+      testWidgets('renders CODE tag', (WidgetTester tester) async {
+        final html =
+            """<code><span style="color: #000000"><span style="color: #0000BB">&lt;?php phpinfo</span><span style="color: #007700">(); </span><span style="color: #0000BB">?&gt;</span></span></code>""";
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[RichText:(#FF000000+font=monospace:' +
+                '(#FF0000BB:<?php phpinfo)(#FF007700:(); )(#FF0000BB:?>))]'));
+      });
+
+      testWidgets('renders PRE tag', (WidgetTester tester) async {
+        final html = """<pre>&lt;?php
+highlight_string('&lt;?php phpinfo(); ?&gt;');
+?&gt;</pre>""";
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[RichText:(+font=monospace:<?php ' +
+                'highlight_string(\'<?php phpinfo(); ?>\'); ?>)]'));
+      });
+    });
+
     testWidgets('renders heading tags', (WidgetTester tester) async {
       final html = """<h1>This is heading 1</h1>
 <h2>This is heading 2</h2>

@@ -38,6 +38,15 @@ NodeMetadata collectMetadata(Config config, dom.Element e) {
       meta = lazySet(meta, isBlockElement: true);
       break;
 
+    case 'code':
+    case 'pre':
+      meta = lazySet(
+        meta,
+        fontFamily: 'monospace',
+        isBlockElement: true,
+      );
+      break;
+
     case 'h1':
       meta = lazySet(
         meta,
@@ -132,6 +141,10 @@ NodeMetadata collectMetadata(Config config, dom.Element e) {
                   Color(int.parse('0xFF' + value.replaceAll('#', '').trim())),
             );
           }
+          break;
+
+        case 'font-family':
+          meta = lazySet(meta, fontFamily: value);
           break;
 
         case 'font-weight':
@@ -267,6 +280,7 @@ TextStyle buildTextStyle(NodeMetadata meta, TextStyle parent) =>
         ? parent.copyWith(
             color: meta.color,
             decoration: buildTextDecoration(meta, parent),
+            fontFamily: meta.fontFamily,
             fontSize: meta.fontSize,
             fontStyle: buildFontSize(meta),
             fontWeight: meta.fontWeight,
@@ -279,6 +293,7 @@ bool metaHasStyling(NodeMetadata meta) {
       meta.decorationLineThrough == null &&
       meta.decorationOverline == null &&
       meta.decorationUnderline == null &&
+      meta.fontFamily == null &&
       meta.fontSize == null &&
       meta.fontStyleItalic == null &&
       meta.fontWeight == null) {

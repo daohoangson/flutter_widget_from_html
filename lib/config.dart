@@ -20,6 +20,7 @@ NodeMetadata lazySet(
   bool decorationLineThrough,
   bool decorationOverline,
   bool decorationUnderline,
+  String fontFamily,
   double fontSize,
   bool fontStyleItalic,
   FontWeight fontWeight,
@@ -38,6 +39,7 @@ NodeMetadata lazySet(
   if (decorationOverline != null) meta.decorationOverline = decorationOverline;
   if (decorationUnderline != null)
     meta.decorationUnderline = decorationUnderline;
+  if (fontFamily != null) meta.fontFamily = fontFamily;
   if (fontSize != null) meta.fontSize = fontSize;
   if (fontStyleItalic != null) meta.fontStyleItalic = fontStyleItalic;
   if (fontWeight != null) meta.fontWeight = fontWeight;
@@ -127,6 +129,7 @@ class NodeMetadata {
   bool decorationOverline;
   bool decorationUnderline;
   List<dom.Node> domNodes;
+  String fontFamily;
   double fontSize;
   bool fontStyleItalic;
   FontWeight fontWeight;
