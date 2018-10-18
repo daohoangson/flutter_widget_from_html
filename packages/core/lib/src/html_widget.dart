@@ -1,29 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:html/parser.dart' as parser;
 
-import 'src/builder.dart' as builder;
+import 'builder.dart' as builder;
 import 'widget_factory.dart';
 
 class HtmlWidget extends StatelessWidget {
   final String html;
-  final WidgetFactory widgetFactory;
 
-  HtmlWidget(
-      {@required this.html,
-      this.widgetFactory = const WidgetFactory(),
-      Key key})
-      : super(key: key);
+  HtmlWidget(this.html, {Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final domNodes = parser.parse(html).body.nodes;
-
+    final wf = newWidgetFactory(context);
     final widgets = builder.Builder(
-      context: context,
       domNodes: domNodes,
-      widgetFactory: widgetFactory,
+      widgetFactory: wf,
     ).build();
 
-    return widgetFactory.buildColumn(children: widgets);
+    return wf.buildColumn(children: widgets);
   }
+
+  WidgetFactory newWidgetFactory(BuildContext context) =>
+      WidgetFactory(context);
 }

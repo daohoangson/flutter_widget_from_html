@@ -1,13 +1,68 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import '../config.dart';
-
 final _attributeStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
 final _styleColorRegExp = RegExp(r'^#([a-fA-F0-9]{6})$');
 final _spacingRegExp = RegExp(r'\s+');
 
-NodeMetadata collectMetadata(Config config, dom.Element e) {
+NodeMetadata lazySet(
+  NodeMetadata meta, {
+  Color color,
+  bool decorationLineThrough,
+  bool decorationOverline,
+  bool decorationUnderline,
+  String fontFamily,
+  double fontSize,
+  bool fontStyleItalic,
+  FontWeight fontWeight,
+  String href,
+  NodeImage image,
+  bool isBlockElement,
+  bool isNotRenderable,
+  ListType listType,
+  StyleType style,
+  TextAlign textAlign,
+}) {
+  if (meta == null) meta = NodeMetadata();
+
+  if (color != null) meta.color = color;
+  if (decorationLineThrough != null)
+    meta.decorationLineThrough = decorationLineThrough;
+  if (decorationOverline != null) meta.decorationOverline = decorationOverline;
+  if (decorationUnderline != null)
+    meta.decorationUnderline = decorationUnderline;
+  if (fontFamily != null) meta.fontFamily = fontFamily;
+  if (fontSize != null) meta.fontSize = fontSize;
+  if (fontStyleItalic != null) meta.fontStyleItalic = fontStyleItalic;
+  if (fontWeight != null) meta.fontWeight = fontWeight;
+  if (href != null) meta.href = href;
+  if (image != null) meta.image = image;
+  if (isBlockElement != null) meta.isBlockElement = isBlockElement;
+  if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
+  if (listType != null) meta.listType = listType;
+  if (style != null) meta.style = style;
+  if (textAlign != null) meta.textAlign = textAlign;
+
+  return meta;
+}
+
+NodeMetadata lazyAddNode(NodeMetadata meta,
+    {dom.Node node, List<dom.Node> nodes, String text}) {
+  if (meta == null) meta = NodeMetadata();
+  if (meta.domNodes == null) meta.domNodes = List();
+
+  if (node != null) {
+    meta.domNodes.add(node);
+  } else if (nodes != null) {
+    meta.domNodes.addAll(nodes);
+  } else {
+    meta.domNodes.add(dom.Text(text));
+  }
+
+  return meta;
+}
+
+NodeMetadata parseElement(dom.Element e) {
   NodeMetadata meta;
 
   switch (e.localName) {
@@ -15,7 +70,6 @@ NodeMetadata collectMetadata(Config config, dom.Element e) {
       meta = lazySet(
         meta,
         decorationUnderline: true,
-        color: config.colorHyperlink,
         href: e.attributes['href'],
       );
       break;
@@ -50,42 +104,42 @@ NodeMetadata collectMetadata(Config config, dom.Element e) {
     case 'h1':
       meta = lazySet(
         meta,
-        fontSize: config.sizeHeadings[0],
+        style: StyleType.Heading1,
         isBlockElement: true,
       );
       break;
     case 'h2':
       meta = lazySet(
         meta,
-        fontSize: config.sizeHeadings[1],
+        style: StyleType.Heading2,
         isBlockElement: true,
       );
       break;
     case 'h3':
       meta = lazySet(
         meta,
-        fontSize: config.sizeHeadings[2],
+        style: StyleType.Heading3,
         isBlockElement: true,
       );
       break;
     case 'h4':
       meta = lazySet(
         meta,
-        fontSize: config.sizeHeadings[3],
+        style: StyleType.Heading4,
         isBlockElement: true,
       );
       break;
     case 'h5':
       meta = lazySet(
         meta,
-        fontSize: config.sizeHeadings[4],
+        style: StyleType.Heading5,
         isBlockElement: true,
       );
       break;
     case 'h6':
       meta = lazySet(
         meta,
-        fontSize: config.sizeHeadings[5],
+        style: StyleType.Heading6,
         isBlockElement: true,
       );
       break;
@@ -242,63 +296,88 @@ NodeMetadata collectMetadata(Config config, dom.Element e) {
   return meta;
 }
 
-FontStyle buildFontSize(NodeMetadata meta) => meta.fontStyleItalic != null
-    ? (meta.fontStyleItalic ? FontStyle.italic : FontStyle.normal)
-    : null;
+enum ListType { Ordered, Unordered }
 
-TextDecoration buildTextDecoration(NodeMetadata meta, TextStyle parent) {
-  if (meta.decorationLineThrough == null &&
-      meta.decorationOverline == null &&
-      meta.decorationUnderline == null) {
-    return null;
-  }
+class NodeImage {
+  final int height;
+  final String src;
+  final int width;
 
-  final pd = parent.decoration;
-  final pdLineThough = pd?.contains(TextDecoration.lineThrough) == true;
-  final pdOverline = pd?.contains(TextDecoration.overline) == true;
-  final pdUnderline = pd?.contains(TextDecoration.underline) == true;
+  NodeImage({this.height, @required this.src, this.width});
 
-  final List<TextDecoration> list = List();
-  if (meta.decorationLineThrough == true ||
-      (pdLineThough && meta.decorationLineThrough != false)) {
-    list.add(TextDecoration.lineThrough);
+  static NodeImage fromAttributes(
+    Map<dynamic, String> map, {
+    String keyHeight = 'height',
+    String keyPrefix = 'data-',
+    String keySrc = 'src',
+    String keyWidth = 'width',
+  }) {
+    final src = _getValueFromAttributes(map, keySrc, keyPrefix);
+    if (src?.isEmpty != false) return null;
+    return NodeImage(
+      height: _parseInt(_getValueFromAttributes(map, keyHeight, keyPrefix)),
+      src: src,
+      width: _parseInt(_getValueFromAttributes(map, keyWidth, keyPrefix)),
+    );
   }
-  if (meta.decorationOverline == true ||
-      (pdOverline && meta.decorationOverline != false)) {
-    list.add(TextDecoration.overline);
-  }
-  if (meta.decorationUnderline == true ||
-      (pdUnderline && meta.decorationUnderline != false)) {
-    list.add(TextDecoration.underline);
-  }
-
-  return TextDecoration.combine(list);
 }
 
-TextStyle buildTextStyle(NodeMetadata meta, TextStyle parent) =>
-    metaHasStyling(meta)
-        ? parent.copyWith(
-            color: meta.color,
-            decoration: buildTextDecoration(meta, parent),
-            fontFamily: meta.fontFamily,
-            fontSize: meta.fontSize,
-            fontStyle: buildFontSize(meta),
-            fontWeight: meta.fontWeight,
-          )
-        : null;
+class NodeMetadata {
+  Color color;
+  bool decorationLineThrough;
+  bool decorationOverline;
+  bool decorationUnderline;
+  List<dom.Node> domNodes;
+  String fontFamily;
+  double fontSize;
+  bool fontStyleItalic;
+  FontWeight fontWeight;
+  String href;
+  NodeImage image;
+  bool isBlockElement;
+  bool isNotRenderable;
+  ListType listType;
+  StyleType style;
+  TextAlign textAlign = TextAlign.start;
 
-bool metaHasStyling(NodeMetadata meta) {
-  if (meta == null) return false;
-  if (meta.color == null &&
-      meta.decorationLineThrough == null &&
-      meta.decorationOverline == null &&
-      meta.decorationUnderline == null &&
-      meta.fontFamily == null &&
-      meta.fontSize == null &&
-      meta.fontStyleItalic == null &&
-      meta.fontWeight == null) {
-    return false;
-  }
+  bool get hasStyling =>
+      color != null ||
+      fontFamily != null ||
+      fontSize != null ||
+      fontWeight != null ||
+      hasDecoration ||
+      hasFontStyle ||
+      href != null ||
+      style != null;
 
-  return true;
+  bool get hasDecoration =>
+      decorationLineThrough != null ||
+      decorationOverline != null ||
+      decorationUnderline != null;
+
+  bool get hasFontStyle => fontStyleItalic != null;
 }
+
+typedef NodeMetadata ParseElementCallback(dom.Element e, NodeMetadata meta);
+
+enum StyleType {
+  Heading1,
+  Heading2,
+  Heading3,
+  Heading4,
+  Heading5,
+  Heading6,
+}
+
+String _getValueFromAttributes(
+    Map<dynamic, String> map, String key, String prefix) {
+  if (map.containsKey(key)) return map[key];
+
+  final keyWithPrefix = prefix + key;
+  if (map.containsKey(keyWithPrefix)) return map[keyWithPrefix];
+
+  return null;
+}
+
+int _parseInt(String value) =>
+    value?.isNotEmpty == true ? int.parse(value) : null;

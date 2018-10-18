@@ -1,47 +1,52 @@
 import 'dart:async';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/core.dart';
 
-import 'package:tinhte_html_widget/config.dart';
-import 'package:tinhte_html_widget/html_widget.dart';
-import 'package:tinhte_html_widget/widget_factory.dart';
+class _WidgetFactory extends WidgetFactory {
+  _WidgetFactory(BuildContext context) : super(context);
+
+  Widget buildImageWidgetFromUrl(String url) => Text("imageUrl=$url");
+}
+
+class _HtmlWidget extends HtmlWidget {
+  _HtmlWidget(String html) : super(html);
+
+  WidgetFactory newWidgetFactory(BuildContext context) =>
+      _WidgetFactory(context);
+}
 
 Future<String> explain(WidgetTester tester, String html,
-    {WidgetFactory wf}) async {
+    {HtmlWidget hw}) async {
   final key = new UniqueKey();
-
-  wf = wf ??
-      WidgetFactory(
-        config: Config(
-          baseUrl: Uri.parse('http://domain.com'),
-          colorHyperlink: Color(0xFF0000FF),
-          sizeHeadings: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
-          widgetImagePadding: null,
-          widgetTextPadding: null,
-        ),
-      );
 
   await tester.pumpWidget(
     StatefulBuilder(
       builder: (BuildContext context, StateSetter setState) {
         return MaterialApp(
+          theme: ThemeData(
+            accentColor: Color(0xFF0000FF),
+          ),
           home: Material(
-              child: HtmlWidget(
-            html: html,
-            key: key,
-            widgetFactory: wf,
-          )),
+            child: DefaultTextStyle(
+              key: key,
+              style: DefaultTextStyle.of(context).style.copyWith(
+                    fontSize: 10.0,
+                    fontWeight: FontWeight.normal,
+                  ),
+              child: hw ?? _HtmlWidget(html),
+            ),
+          ),
         );
       },
     ),
   );
 
   final found = find.byKey(key).evaluate().first;
-  expect(found.widget, isInstanceOf<HtmlWidget>());
+  expect(found.widget, isInstanceOf<DefaultTextStyle>());
 
   final explainer = _Explainer(found);
-  final htmlWidget = found.widget as HtmlWidget;
+  final htmlWidget = (found.widget as DefaultTextStyle).child as HtmlWidget;
 
   return explainer.explain(htmlWidget.build(found));
 }
@@ -53,6 +58,10 @@ class _Explainer {
       : _defaultStyle = DefaultTextStyle.of(context).style;
 
   String explain(Widget widget) => _widget(widget);
+
+  String _edgeInsets(EdgeInsets e) =>
+      "(${e.top.truncate()},${e.right.truncate()}," +
+      "${e.bottom.truncate()},${e.left.truncate()})";
 
   String _textAlign(TextAlign textAlign) {
     switch (textAlign) {
@@ -102,7 +111,7 @@ class _Explainer {
     }
 
     if (style.fontSize != parent.fontSize) {
-      s += "@${style.fontSize}";
+      s += "@${style.fontSize.toStringAsFixed(1)}";
     }
 
     s += _textStyleFontStyle(style);
@@ -120,8 +129,8 @@ class _Explainer {
   }
 
   String _textStyleDecoration(TextStyle style, TextDecoration d, String str) {
-    final defaultHasIt = _defaultStyle.decoration.contains(d);
-    final styleHasIt = style.decoration.contains(d);
+    final defaultHasIt = _defaultStyle.decoration?.contains(d) == true;
+    final styleHasIt = style.decoration?.contains(d) == true;
     if (defaultHasIt == styleHasIt) {
       return '';
     }
@@ -160,12 +169,12 @@ class _Explainer {
     final type = widget.runtimeType.toString();
     final text = widget is AspectRatio
         ? "aspectRatio=${widget.aspectRatio.toStringAsFixed(2)},"
-        : widget is CachedNetworkImage
-            ? "imageUrl=${widget.imageUrl}"
-            : widget is GestureDetector
-                ? "child=${_widget(widget.child)}"
-                : widget is Image
-                    ? "image=${widget.image.runtimeType}"
+        : widget is GestureDetector
+            ? "child=${_widget(widget.child)}"
+            : widget is Image
+                ? "image=${widget.image.runtimeType}"
+                : widget is Padding
+                    ? "padding=${_edgeInsets(widget.padding)},"
                     : widget is RichText
                         ? _textSpan(widget.text)
                         : widget is Text ? widget.data : '';

@@ -1,16 +1,13 @@
-name: flutter_widget_from_html
+name: flutter_widget_from_html_core
 description: Flutter plugin for widget tree building from html.
 
 environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
 
 dependencies:
-  cached_network_image: ^0.4.2
   flutter:
     sdk: flutter
-  flutter_widget_from_html_core:
-    path: ./packages/core
-  url_launcher: ^4.0.0
+  html: ^0.13.3
 
 dev_dependencies:
   flutter_test:

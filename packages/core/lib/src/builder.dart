@@ -1,12 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import '../config.dart';
-import '../widget_factory.dart';
-import 'styling.dart';
+import 'metadata.dart';
+import 'widget_factory.dart';
 
 class Builder {
-  final BuildContext context;
   final List<dom.Node> domNodes;
   final NodeMetadata parentMeta;
   final int textPrefixForList;
@@ -17,14 +15,13 @@ class Builder {
   final List<_BuiltPiece> _pieces = List();
 
   Builder({
-    @required this.context,
     @required this.domNodes,
     this.parentMeta,
     TextStyle parentStyle,
     this.textPrefixForList,
     @required WidgetFactory widgetFactory,
   })  : wf = widgetFactory,
-        _parentStyle = parentStyle ?? DefaultTextStyle.of(context).style;
+        _parentStyle = parentStyle ?? widgetFactory.defaultTextStyle;
 
   List<Widget> build() {
     final List<Widget> widgets = List();
@@ -37,27 +34,22 @@ class Builder {
 
     for (final piece in process()) {
       if (piece.hasTextSpan) {
-        addWidgetIfNotNull(wf.wrapTextWidget(wf.buildTextWidgetWithStyling(
-          text: piece._buildTextSpan(trimLeft: true),
+        addWidgetIfNotNull(wf.buildTextWidget(
+          piece._buildTextSpan(trimLeft: true),
           textAlign: parentMeta?.textAlign,
-        )));
+        ));
       } else if (piece.hasText) {
-        addWidgetIfNotNull(wf.wrapTextWidget(wf.buildTextWidgetSimple(
-          text: piece.text,
+        addWidgetIfNotNull(wf.buildTextWidget(
+          piece.text,
           textAlign: parentMeta?.textAlign,
-        )));
+        ));
       } else if (piece.hasWidgets) {
         piece.widgets.forEach(addWidgetIfNotNull);
       }
     }
 
     if (parentMeta?.listType != null && widgets.isNotEmpty) {
-      return <Widget>[
-        wf.buildColumn(
-          children: widgets,
-          indent: true,
-        )
-      ];
+      return <Widget>[wf.buildColumnForList(widgets)];
     }
 
     return widgets;
@@ -67,7 +59,7 @@ class Builder {
     _pieces.clear();
     _newPiece(
       textPrefix: textPrefixForList != null
-          ? wf.config.getTextPrefixForList(textPrefixForList)
+          ? wf.getTextPrefixForList(textPrefixForList)
           : null,
     );
 
@@ -75,11 +67,7 @@ class Builder {
       NodeMetadata meta;
       switch (domNode.nodeType) {
         case dom.Node.ELEMENT_NODE:
-          meta = collectMetadata(wf.config, domNode);
-
-          if (wf.config.parseElementCallback != null) {
-            meta = wf.config.parseElementCallback(domNode, meta);
-          }
+          meta = wf.collectMetadata(domNode);
           break;
         case dom.Node.TEXT_NODE:
           _piece._write(domNode.text);
@@ -88,9 +76,8 @@ class Builder {
 
       if (meta?.isNotRenderable == true) continue;
 
-      final style = buildTextStyle(meta, _parentStyle);
+      final style = wf.buildTextStyle(meta, _parentStyle);
       final __builder = Builder(
-        context: context,
         domNodes: meta?.domNodes ?? domNode.nodes,
         parentMeta: meta,
         parentStyle: style ?? _parentStyle,
@@ -136,7 +123,7 @@ class Builder {
   _newPiece({String textPrefix}) {
     _piece = _BuiltPiece(
       builder: this,
-      style: metaHasStyling(parentMeta) ? _parentStyle : null,
+      style: parentMeta?.hasStyling == true ? _parentStyle : null,
       textPrefix: textPrefix,
       url: parentMeta?.href,
     );
@@ -198,10 +185,9 @@ class _BuiltPiece {
     }
 
     return b.wf.buildTextSpan(
-      context: b.context,
+      trimLeft ? text.trimLeft() : text,
       children: _spans,
       style: style,
-      text: trimLeft ? text.trimLeft() : text,
       url: url,
     );
   }
@@ -212,7 +198,7 @@ class _BuiltPiece {
     if (_spans == null) {
       _texts.write(text);
     } else {
-      _addSpan(b.wf.buildTextSpan(context: b.context, text: text));
+      _addSpan(b.wf.buildTextSpan(text));
     }
   }
 
