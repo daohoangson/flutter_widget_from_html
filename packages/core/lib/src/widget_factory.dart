@@ -16,36 +16,28 @@ class WidgetFactory {
 
   TextStyle get defaultTextStyle => DefaultTextStyle.of(context).style;
 
-  Widget buildColumn({
-    List<Widget> children,
-    String url,
-  }) {
-    Widget widget;
-    if (children?.length == 1) {
-      widget = children.first;
-    } else {
-      widget = Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: children,
-      );
-    }
+  Widget buildColumn(List<Widget> children) => children?.isNotEmpty == true
+      ? children?.length == 1
+          ? children.first
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: children,
+            )
+      : null;
 
-    if (url?.isNotEmpty == true) {
-      widget = GestureDetector(
-        onTap: prepareGestureTapCallbackToLaunchUrl(url),
-        child: widget,
-      );
-    }
-
-    return widget;
-  }
-
-  Widget buildColumnForList(List<Widget> children) =>
-      buildColumn(children: children);
+  Widget buildColumnForList(List<Widget> children) => buildColumn(children);
 
   FontStyle buildFontSize(NodeMetadata meta) => meta?.hasFontStyle == true
       ? (meta.fontStyleItalic == true ? FontStyle.italic : FontStyle.normal)
       : null;
+
+  Widget buildGestureDetectorToLaunchUrl(Widget child, String url) =>
+      (child != null && url?.isNotEmpty == true)
+          ? GestureDetector(
+              onTap: prepareGestureTapCallbackToLaunchUrl(url),
+              child: child,
+            )
+          : null;
 
   List buildImageBytes(String dataUri) {
     final match = _dataUriRegExp.matchAsPrefix(dataUri);

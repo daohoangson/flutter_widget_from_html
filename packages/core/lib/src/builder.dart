@@ -102,12 +102,11 @@ class Builder {
           _savePiece();
 
           if (meta?.href?.isNotEmpty == true) {
-            _pieces.add(_BuiltPiece(builder: this, widgets: <Widget>[
-              wf.buildColumn(
-                children: __piece.widgets,
-                url: meta.href,
-              )
-            ]));
+            final gd = wf.buildGestureDetectorToLaunchUrl(
+                wf.buildColumn(__piece.widgets), meta.href);
+            if (gd != null) {
+              _pieces.add(_BuiltPiece(builder: this, widgets: <Widget>[gd]));
+            }
           } else {
             _pieces.add(__piece);
           }
