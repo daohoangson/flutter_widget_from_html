@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html_core/core.dart' as core;
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart' as core;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'config.dart';

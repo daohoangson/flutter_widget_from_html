@@ -201,6 +201,17 @@ NodeMetadata parseElement(dom.Element e) {
           meta = lazySet(meta, fontFamily: value);
           break;
 
+        case 'font-style':
+          switch (value) {
+            case 'italic':
+              meta = lazySet(meta, fontStyleItalic: true);
+              break;
+            case 'normal':
+              meta = lazySet(meta, fontStyleItalic: false);
+              break;
+          }
+          break;
+
         case 'font-weight':
           switch (value) {
             case 'bold':
@@ -232,17 +243,6 @@ NodeMetadata parseElement(dom.Element e) {
               break;
             case '900':
               meta = lazySet(meta, fontWeight: FontWeight.w900);
-              break;
-          }
-          break;
-
-        case 'font-style':
-          switch (value) {
-            case 'italic':
-              meta = lazySet(meta, fontStyleItalic: true);
-              break;
-            case 'normal':
-              meta = lazySet(meta, fontStyleItalic: false);
               break;
           }
           break;
