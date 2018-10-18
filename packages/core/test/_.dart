@@ -9,13 +9,6 @@ class _WidgetFactory extends WidgetFactory {
   Widget buildImageWidgetFromUrl(String url) => Text("imageUrl=$url");
 }
 
-class _HtmlWidget extends HtmlWidget {
-  _HtmlWidget(String html) : super(html);
-
-  WidgetFactory newWidgetFactory(BuildContext context) =>
-      _WidgetFactory(context);
-}
-
 Future<String> explain(WidgetTester tester, String html,
     {HtmlWidget hw}) async {
   final key = new UniqueKey();
@@ -34,7 +27,11 @@ Future<String> explain(WidgetTester tester, String html,
                     fontSize: 10.0,
                     fontWeight: FontWeight.normal,
                   ),
-              child: hw ?? _HtmlWidget(html),
+              child: hw ??
+                  HtmlWidget(
+                    html,
+                    wfBuilder: (context) => _WidgetFactory(context),
+                  ),
             ),
           ),
         );

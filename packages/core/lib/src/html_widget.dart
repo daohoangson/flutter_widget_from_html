@@ -6,13 +6,14 @@ import 'widget_factory.dart';
 
 class HtmlWidget extends StatelessWidget {
   final String html;
+  final WidgetFactoryBuilder wfBuilder;
 
-  HtmlWidget(this.html, {Key key}) : super(key: key);
+  HtmlWidget(this.html, {Key key, this.wfBuilder}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final domNodes = parser.parse(html).body.nodes;
-    final wf = newWidgetFactory(context);
+    final wf = wfBuilder != null ? wfBuilder(context) : WidgetFactory(context);
     final widgets = builder.Builder(
       domNodes: domNodes,
       widgetFactory: wf,
@@ -20,7 +21,6 @@ class HtmlWidget extends StatelessWidget {
 
     return wf.buildColumn(widgets);
   }
-
-  WidgetFactory newWidgetFactory(BuildContext context) =>
-      WidgetFactory(context);
 }
+
+typedef WidgetFactory WidgetFactoryBuilder(BuildContext context);

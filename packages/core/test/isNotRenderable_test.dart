@@ -19,20 +19,20 @@ class _DoNotRenderSkipMe extends WidgetFactory {
   }
 }
 
-class _HtmlWidget extends HtmlWidget {
-  _HtmlWidget(String html) : super(html);
-
-  WidgetFactory newWidgetFactory(BuildContext context) =>
-      _DoNotRenderSkipMe(context);
-}
-
 void main() {
   testWidgets('skips via callback', (WidgetTester tester) async {
     final html = '<span class="skipMe">Foo.</span>Bar.';
     final explained1 = await explain(tester, html);
     expect(explained1, equals('[Text:Foo.Bar.]'));
 
-    final explained2 = await explain(tester, html, hw: _HtmlWidget(html));
+    final explained2 = await explain(
+      tester,
+      html,
+      hw: HtmlWidget(
+        html,
+        wfBuilder: (context) => _DoNotRenderSkipMe(context),
+      ),
+    );
     expect(explained2, equals('[Text:Bar.]'));
   });
 }

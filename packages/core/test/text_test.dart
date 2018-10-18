@@ -17,19 +17,20 @@ class _WhiteText extends WidgetFactory {
   }
 }
 
-class _HtmlWidget extends HtmlWidget {
-  _HtmlWidget(String html) : super(html);
-
-  WidgetFactory newWidgetFactory(BuildContext context) => _WhiteText(context);
-}
-
 void main() {
   testWidgets('skips via callback', (WidgetTester tester) async {
     final html = 'This is <span class="x">black</span> text.';
     final explained1 = await explain(tester, html);
     expect(explained1, equals('[Text:This is black text.]'));
 
-    final explained2 = await explain(tester, html, hw: _HtmlWidget(html));
+    final explained2 = await explain(
+      tester,
+      html,
+      hw: HtmlWidget(
+        html,
+        wfBuilder: (context) => _WhiteText(context),
+      ),
+    );
     expect(explained2, equals('[Text:This is white text.]'));
   });
 }
