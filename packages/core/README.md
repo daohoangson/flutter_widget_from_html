@@ -50,13 +50,11 @@ Below tags are the ones that have special meaning / styling, all other tag will 
 - H1/H2/H3/H4/H5/H6
 - I
 - IMG: no caching, no relative url support (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
-- LI
-- OL
+- LI/OL/UL: no marker (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
 - P
 - PRE
 - STRONG
 - U
-- UL
 
 ### Inline stylings
 

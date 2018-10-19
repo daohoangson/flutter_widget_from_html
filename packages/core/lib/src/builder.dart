@@ -7,7 +7,6 @@ import 'widget_factory.dart';
 class Builder {
   final List<dom.Node> domNodes;
   final NodeMetadata parentMeta;
-  final int textPrefixForList;
   final WidgetFactory wf;
 
   final TextStyle _parentStyle;
@@ -18,7 +17,6 @@ class Builder {
     @required this.domNodes,
     this.parentMeta,
     TextStyle parentStyle,
-    this.textPrefixForList,
     @required WidgetFactory widgetFactory,
   })  : wf = widgetFactory,
         _parentStyle = parentStyle ?? widgetFactory.defaultTextStyle;
@@ -49,7 +47,7 @@ class Builder {
     }
 
     if (parentMeta?.listType != null && widgets.isNotEmpty) {
-      return <Widget>[wf.buildColumnForList(widgets)];
+      return <Widget>[wf.buildColumnForList(widgets, parentMeta.listType)];
     }
 
     return widgets;
@@ -57,11 +55,7 @@ class Builder {
 
   List<_BuiltPiece> process() {
     _pieces.clear();
-    _newPiece(
-      textPrefix: textPrefixForList != null
-          ? wf.getTextPrefixForList(textPrefixForList)
-          : null,
-    );
+    _newPiece();
 
     for (final domNode in domNodes) {
       NodeMetadata meta;
@@ -81,9 +75,6 @@ class Builder {
         domNodes: meta?.domNodes ?? domNode.nodes,
         parentMeta: meta,
         parentStyle: style ?? _parentStyle,
-        textPrefixForList: parentMeta?.listType == null
-            ? null
-            : parentMeta.listType == ListType.Ordered ? _pieces.length + 1 : 0,
         widgetFactory: wf,
       );
 
@@ -119,11 +110,10 @@ class Builder {
     return _pieces;
   }
 
-  _newPiece({String textPrefix}) {
+  _newPiece() {
     _piece = _BuiltPiece(
       builder: this,
       style: parentMeta?.hasStyling == true ? _parentStyle : null,
-      textPrefix: textPrefix,
       url: parentMeta?.href,
     );
   }

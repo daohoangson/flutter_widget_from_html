@@ -79,28 +79,29 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children=[Text:1. One],' +
-              '[Text:2. Two],[RichText:(:3. (+b:Three))]]'));
+          equals('[Column:children=[Text:One],' +
+              '[Text:Two],[RichText:(+b:Three)]]'));
     });
 
     testWidgets('renders unordered list', (WidgetTester tester) async {
-      final html = '<ul><li>One</li><li>Two</li><li><b>Three</b></li><ul>';
+      final html = '<ul><li>One</li><li>Two</li><li><em>Three</em></li><ul>';
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children=[Text:• One],' +
-              '[Text:• Two],[RichText:(:• (+b:Three))]]'));
+          equals('[Column:children=[Text:One],' +
+              '[Text:Two],[RichText:(+i:Three)]]'));
     });
 
     testWidgets('renders nested list', (WidgetTester tester) async {
       final html = '<ol><li>One</li><li>Two</li><li>Three ' +
-          '<ul><li>3.1</li><li>3.2</li></ul></li><ol>';
+          '<ul><li>3.1</li><li>3.2</li></ul></li><li>Four</li><ol>';
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children=[Text:1. One],' +
-              '[Text:2. Two],[Text:3. Three],' +
-              '[Column:children=[Text:• 3.1],[Text:• 3.2]]]'));
+          equals('[Column:children=[Text:One],' +
+              '[Text:Two],' +
+              '[Column:children=[Text:Three],[Column:children=[Text:3.1],[Text:3.2]]],' +
+              '[Text:Four]]'));
     });
   });
 

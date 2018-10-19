@@ -44,6 +44,6 @@ This package has all the features of [`flutter_widget_from_html_core`](https://p
 
 - Renders A tag with theme accent color, launch url via [`url_launcher`](https://pub.dartlang.org/packages/url_launcher)
 - Renders IMG tag with [`CachedNetworkImage`](https://pub.dartlang.org/packages/cached_network_image) and padding (`Config.imagePadding`)
-- Renders lists (OL/UL) with padding (`Config.listPadding`)
+- Renders lists (OL/UL) with marker and padding (`Config.listBullet`, `Config.listPaddingLeft`)
 - Renders texts with padding (`Config.textPadding`)
 - Supports relative url (A href, IMG src)

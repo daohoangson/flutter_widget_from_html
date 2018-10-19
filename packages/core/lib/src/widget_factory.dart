@@ -22,10 +22,12 @@ class WidgetFactory {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: children,
+              key: UniqueKey(),
             )
       : null;
 
-  Widget buildColumnForList(List<Widget> children) => buildColumn(children);
+  Widget buildColumnForList(List<Widget> children, ListType type) =>
+      buildColumn(children);
 
   FontStyle buildFontSize(NodeMetadata meta) => meta?.hasFontStyle == true
       ? (meta.fontStyleItalic == true ? FontStyle.italic : FontStyle.normal)
@@ -206,9 +208,8 @@ class WidgetFactory {
 
   NodeMetadata collectMetadata(dom.Element e) => parseElement(e);
 
-  String getTextPrefixForList(int value) => value == 0 ? '• ' : "$value. ";
-
-  GestureTapCallback prepareGestureTapCallbackToLaunchUrl(String url) => null;
+  GestureTapCallback prepareGestureTapCallbackToLaunchUrl(String url) =>
+      () => null;
 
   bool _checkTextIsUseless(String text) =>
       _textIsUselessRegExp.firstMatch(text) != null;

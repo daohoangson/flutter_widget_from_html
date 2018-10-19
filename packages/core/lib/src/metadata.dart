@@ -161,7 +161,11 @@ NodeMetadata parseElement(dom.Element e) {
       break;
 
     case 'li':
-      meta = lazySet(meta, isBlockElement: true);
+      meta = lazySet(
+        meta,
+        isBlockElement: true,
+        listType: ListType.Item,
+      );
       break;
     case 'ol':
       meta = lazySet(
@@ -296,7 +300,7 @@ NodeMetadata parseElement(dom.Element e) {
   return meta;
 }
 
-enum ListType { Ordered, Unordered }
+enum ListType { Item, Ordered, Unordered }
 
 class NodeImage {
   final int height;

@@ -49,10 +49,10 @@ Future<String> explain(WidgetTester tester, String html,
 }
 
 class _Explainer {
+  final BuildContext context;
   final TextStyle _defaultStyle;
 
-  _Explainer(BuildContext context)
-      : _defaultStyle = DefaultTextStyle.of(context).style;
+  _Explainer(this.context) : _defaultStyle = DefaultTextStyle.of(context).style;
 
   String explain(Widget widget) => _widget(widget);
 
@@ -171,7 +171,7 @@ class _Explainer {
             : widget is Image
                 ? "image=${widget.image.runtimeType}"
                 : widget is Padding
-                    ? "padding=${_edgeInsets(widget.padding)},"
+                    ? "${_edgeInsets(widget.padding)},"
                     : widget is RichText
                         ? _textSpan(widget.text)
                         : widget is Text ? widget.data : '';
@@ -181,11 +181,15 @@ class _Explainer {
     final textAlignStr = textAlign.isNotEmpty ? ",align=$textAlign" : '';
     final children = widget is Container
         ? "child=${_widget(widget.child)}"
-        : widget is MultiChildRenderObjectWidget
-            ? "children=${widget.children.map(_widget).join(',')}"
-            : widget is SingleChildRenderObjectWidget
-                ? "child=${_widget(widget.child)}"
-                : '';
+        : widget is LayoutBuilder
+            ? "built=${_widget(widget.builder(context, BoxConstraints()))}"
+            : widget is MultiChildRenderObjectWidget
+                ? "children=${widget.children.map(_widget).join(',')}"
+                : widget is ProxyWidget
+                    ? "child=${_widget(widget.child)}"
+                    : widget is SingleChildRenderObjectWidget
+                        ? "child=${_widget(widget.child)}"
+                        : '';
     return "[$type$textAlignStr:$text$children]";
   }
 }
