@@ -189,7 +189,9 @@ class _Explainer {
                     ? "child=${_widget(widget.child)}"
                     : widget is SingleChildRenderObjectWidget
                         ? "child=${_widget(widget.child)}"
-                        : '';
+                        : widget is SingleChildScrollView
+                            ? "child=${_widget(widget.child)}"
+                            : '';
     return "[$type$textAlignStr:$text$children]";
   }
 }

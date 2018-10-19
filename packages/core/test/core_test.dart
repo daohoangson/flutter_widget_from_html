@@ -167,8 +167,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:(#FF000000+font=monospace:' +
-              '(#FF0000BB:<?php phpinfo)(#FF007700:(); )(#FF0000BB:?>))]'));
+          equals('[SingleChildScrollView:child=[RichText:' +
+              '(#FF000000+font=monospace:(#FF0000BB:<?php phpinfo)' +
+              '(#FF007700:(); )(#FF0000BB:?>))]]'));
     });
 
     testWidgets('renders PRE tag', (WidgetTester tester) async {
@@ -178,8 +179,9 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:(+font=monospace:<?php\n' +
-              'highlight_string(\'<?php phpinfo(); ?>\');\n?>)]'));
+          equals('[SingleChildScrollView:child=[RichText:' +
+              '(+font=monospace:<?php\nhighlight_string(\'' +
+              '<?php phpinfo(); ?>\');\n?>)]]'));
     });
   });
 
