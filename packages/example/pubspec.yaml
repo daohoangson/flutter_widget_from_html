@@ -9,9 +9,9 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_widget_from_html:
-    path: ./..
+    path: ../..
   flutter_widget_from_html_core:
-    path: ./../packages/core
+    path: ../../packages/core
   html: ^0.13.3
 
 flutter:

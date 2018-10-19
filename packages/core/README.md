@@ -10,6 +10,8 @@ If this is your first time here, consider using the [`flutter_widget_from_html`]
 
 To use this plugin, add `flutter_widget_from_html_core` as a [dependency in your pubspec.yaml file](https://flutter.io/using-packages/).
 
+See the [Example app](https://github.com/daohoangson/flutter_widget_from_html/tree/master/packages/example) for inspiration.
+
 ### Example
 
 ```dart
@@ -33,7 +35,7 @@ class HelloWorldCoreScreen extends StatelessWidget {
 }
 ```
 
-![](../../example/screenshots/HelloWorldCoreScreen.jpg?raw=true)
+![](../../packages/example/screenshots/HelloWorldCoreScreen.jpg?raw=true)
 
 ## Features
 
@@ -118,4 +120,4 @@ class SmilieWf extends WidgetFactory {
 }
 ```
 
-![](../../example/screenshots/SmilieScreen.png?raw=true)
+![](../../packages/example/screenshots/SmilieScreen.png?raw=true)

@@ -8,6 +8,8 @@ This package extends the [`flutter_widget_from_html_core`](https://pub.dartlang.
 
 To use this plugin, add `flutter_widget_from_html` as a [dependency in your pubspec.yaml file](https://flutter.io/using-packages/).
 
+See the [Example app](https://github.com/daohoangson/flutter_widget_from_html/tree/master/packages/example) for inspiration.
+
 ## Example
 
 Note: `HtmlWidget.config` is optional, see dartdoc for all available configuration keys and their default values.
@@ -36,7 +38,7 @@ class HelloWorldScreen extends StatelessWidget {
 }
 ```
 
-![](example/screenshots/HelloWorldScreen.jpg?raw=true)
+![](packages/example/screenshots/HelloWorldScreen.jpg?raw=true)
 
 ## Features
 
