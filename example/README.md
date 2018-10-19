@@ -1,4 +1,4 @@
-# flutter_widge_from_html_example
+# flutter_widget_from_html_example
 
 Flutter Widget from HTML demo app.
 
