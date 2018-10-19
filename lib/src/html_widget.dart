@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart' as core;
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
+    as core;
 
 import 'config.dart';
 import 'widget_factory.dart';
