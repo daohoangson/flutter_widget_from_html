@@ -19,7 +19,7 @@ class HtmlWidget extends StatelessWidget {
       widgetFactory: wf,
     ).build();
 
-    return wf.buildColumn(widgets);
+    return wf.buildColumn(widgets) ?? Text(html);
   }
 }
 

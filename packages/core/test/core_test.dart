@@ -3,6 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import '_.dart';
 
 void main() {
+  testWidgets('renders empty string', (WidgetTester tester) async {
+    final html = '';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[Text:]'));
+  });
+
   testWidgets('renders bare string', (WidgetTester tester) async {
     final html = 'Hello world';
     final explained = await explain(tester, html);
