@@ -101,7 +101,7 @@ class SmilieWf extends WidgetFactory {
     var meta = super.collectMetadata(e);
 
     if (e.classes.contains('smilie')) {
-      meta.isBlockElement = false;
+      meta = lazySet(meta, display: DisplayType.Inline);
 
       final alt = e.attributes['alt'];
       if (_kSmilies.containsKey(alt)) {

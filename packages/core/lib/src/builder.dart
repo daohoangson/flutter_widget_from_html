@@ -22,7 +22,7 @@ class Builder {
         _parentStyle = parentStyle ?? widgetFactory.defaultTextStyle;
 
   List<Widget> build() {
-    final List<Widget> widgets = List();
+    List<Widget> widgets = List();
     final addWidgetIfNotNull = (Widget w) => w != null ? widgets.add(w) : null;
 
     final image = parentMeta?.image;
@@ -47,7 +47,11 @@ class Builder {
     }
 
     if (parentMeta?.listType != null && widgets.isNotEmpty) {
-      return <Widget>[wf.buildColumnForList(widgets, parentMeta.listType)];
+      widgets = <Widget>[wf.buildColumnForList(widgets, parentMeta.listType)];
+    }
+
+    if (parentMeta?.display == DisplayType.BlockScrollable) {
+      widgets = <Widget>[wf.buildScrollView(widgets)];
     }
 
     return widgets;
@@ -114,6 +118,7 @@ class Builder {
     _piece = _BuiltPiece(
       builder: this,
       style: parentMeta?.hasStyling == true ? _parentStyle : null,
+      textSpaceCollapse: parentMeta?.textSpaceCollapse,
       url: parentMeta?.href,
     );
   }
@@ -130,8 +135,9 @@ class Builder {
 class _BuiltPiece {
   final Builder b;
   final TextStyle style;
-  final String url;
   final String textPrefix;
+  final bool textSpaceCollapse;
+  final String url;
   final List<Widget> widgets;
 
   final StringBuffer _texts;
@@ -142,6 +148,7 @@ class _BuiltPiece {
     @required Builder builder,
     this.style,
     this.textPrefix,
+    this.textSpaceCollapse,
     this.url,
     this.widgets,
   })  : b = builder,
@@ -177,6 +184,7 @@ class _BuiltPiece {
       trimLeft ? text.trimLeft() : text,
       children: _spans,
       style: style,
+      textSpaceCollapse: textSpaceCollapse,
       url: url,
     );
   }

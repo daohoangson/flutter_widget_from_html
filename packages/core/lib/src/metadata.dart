@@ -11,17 +11,18 @@ NodeMetadata lazySet(
   bool decorationLineThrough,
   bool decorationOverline,
   bool decorationUnderline,
+  DisplayType display,
   String fontFamily,
   double fontSize,
   bool fontStyleItalic,
   FontWeight fontWeight,
   String href,
   NodeImage image,
-  bool isBlockElement,
   bool isNotRenderable,
   ListType listType,
   StyleType style,
   TextAlign textAlign,
+  bool textSpaceCollapse,
 }) {
   if (meta == null) meta = NodeMetadata();
 
@@ -31,17 +32,18 @@ NodeMetadata lazySet(
   if (decorationOverline != null) meta.decorationOverline = decorationOverline;
   if (decorationUnderline != null)
     meta.decorationUnderline = decorationUnderline;
+  if (display != null) meta.display = display;
   if (fontFamily != null) meta.fontFamily = fontFamily;
   if (fontSize != null) meta.fontSize = fontSize;
   if (fontStyleItalic != null) meta.fontStyleItalic = fontStyleItalic;
   if (fontWeight != null) meta.fontWeight = fontWeight;
   if (href != null) meta.href = href;
   if (image != null) meta.image = image;
-  if (isBlockElement != null) meta.isBlockElement = isBlockElement;
   if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
   if (listType != null) meta.listType = listType;
   if (style != null) meta.style = style;
   if (textAlign != null) meta.textAlign = textAlign;
+  if (textSpaceCollapse != null) meta.textSpaceCollapse = textSpaceCollapse;
 
   return meta;
 }
@@ -89,58 +91,65 @@ NodeMetadata parseElement(dom.Element e) {
     case 'br':
     case 'div':
     case 'p':
-      meta = lazySet(meta, isBlockElement: true);
+      meta = lazySet(meta, display: DisplayType.Block);
       break;
 
     case 'code':
+      meta = lazySet(
+        meta,
+        display: DisplayType.BlockScrollable,
+        fontFamily: 'monospace',
+      );
+      break;
     case 'pre':
       meta = lazySet(
         meta,
+        display: DisplayType.BlockScrollable,
         fontFamily: 'monospace',
-        isBlockElement: true,
+        textSpaceCollapse: false,
       );
       break;
 
     case 'h1':
       meta = lazySet(
         meta,
+        display: DisplayType.Block,
         style: StyleType.Heading1,
-        isBlockElement: true,
       );
       break;
     case 'h2':
       meta = lazySet(
         meta,
+        display: DisplayType.Block,
         style: StyleType.Heading2,
-        isBlockElement: true,
       );
       break;
     case 'h3':
       meta = lazySet(
         meta,
+        display: DisplayType.Block,
         style: StyleType.Heading3,
-        isBlockElement: true,
       );
       break;
     case 'h4':
       meta = lazySet(
         meta,
         style: StyleType.Heading4,
-        isBlockElement: true,
+        display: DisplayType.Block,
       );
       break;
     case 'h5':
       meta = lazySet(
         meta,
+        display: DisplayType.Block,
         style: StyleType.Heading5,
-        isBlockElement: true,
       );
       break;
     case 'h6':
       meta = lazySet(
         meta,
         style: StyleType.Heading6,
-        isBlockElement: true,
+        display: DisplayType.Block,
       );
       break;
 
@@ -155,29 +164,29 @@ NodeMetadata parseElement(dom.Element e) {
     case 'img':
       meta = lazySet(
         meta,
+        display: DisplayType.Block,
         image: NodeImage.fromAttributes(e.attributes),
-        isBlockElement: true,
       );
       break;
 
     case 'li':
       meta = lazySet(
         meta,
-        isBlockElement: true,
+        display: DisplayType.Block,
         listType: ListType.Item,
       );
       break;
     case 'ol':
       meta = lazySet(
         meta,
-        isBlockElement: true,
+        display: DisplayType.Block,
         listType: ListType.Ordered,
       );
       break;
     case 'ul':
       meta = lazySet(
         meta,
-        isBlockElement: true,
+        display: DisplayType.Block,
         listType: ListType.Unordered,
       );
       break;
@@ -252,7 +261,7 @@ NodeMetadata parseElement(dom.Element e) {
           break;
 
         case 'text-align':
-          meta = lazySet(meta, isBlockElement: true);
+          meta = lazySet(meta, display: DisplayType.Block);
 
           switch (value) {
             case 'center':
@@ -326,11 +335,18 @@ class NodeImage {
   }
 }
 
+enum DisplayType {
+  Block,
+  BlockScrollable,
+  Inline,
+}
+
 class NodeMetadata {
   Color color;
   bool decorationLineThrough;
   bool decorationOverline;
   bool decorationUnderline;
+  DisplayType display;
   List<dom.Node> domNodes;
   String fontFamily;
   double fontSize;
@@ -338,11 +354,11 @@ class NodeMetadata {
   FontWeight fontWeight;
   String href;
   NodeImage image;
-  bool isBlockElement;
   bool isNotRenderable;
   ListType listType;
   StyleType style;
   TextAlign textAlign = TextAlign.start;
+  bool textSpaceCollapse;
 
   bool get hasStyling =>
       color != null ||
@@ -352,7 +368,8 @@ class NodeMetadata {
       hasDecoration ||
       hasFontStyle ||
       href != null ||
-      style != null;
+      style != null ||
+      textSpaceCollapse != null;
 
   bool get hasDecoration =>
       decorationLineThrough != null ||
@@ -360,6 +377,9 @@ class NodeMetadata {
       decorationUnderline != null;
 
   bool get hasFontStyle => fontStyleItalic != null;
+
+  bool get isBlockElement =>
+      display == DisplayType.Block || display == DisplayType.BlockScrollable;
 }
 
 typedef NodeMetadata ParseElementCallback(dom.Element e, NodeMetadata meta);

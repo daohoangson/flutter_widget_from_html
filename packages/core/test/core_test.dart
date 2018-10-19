@@ -172,8 +172,8 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:(+font=monospace:<?php ' +
-              'highlight_string(\'<?php phpinfo(); ?>\'); ?>)]'));
+          equals('[RichText:(+font=monospace:<?php\n' +
+              'highlight_string(\'<?php phpinfo(); ?>\');\n?>)]'));
     });
   });
 

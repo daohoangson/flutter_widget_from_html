@@ -85,6 +85,11 @@ class WidgetFactory {
   Widget buildImageWidgetFromUrl(String url) =>
       url?.isNotEmpty == true ? Image.network(url, fit: BoxFit.cover) : null;
 
+  Widget buildScrollView(List<Widget> widgets) => SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: widgets.length == 1 ? widgets.first : buildColumn(widgets),
+      );
+
   TextDecoration buildTextDecoration(NodeMetadata meta, TextStyle parent) {
     if (meta?.hasDecoration != true) return null;
 
@@ -114,14 +119,19 @@ class WidgetFactory {
     String text, {
     List<TextSpan> children,
     TextStyle style,
+    bool textSpaceCollapse,
     String url,
   }) {
     final hasChildren = children?.isNotEmpty == true;
     final hasText = text?.isNotEmpty == true;
     if (!hasChildren && !hasText) return null;
 
+    text = text ?? '';
+    if (textSpaceCollapse != false) {
+      text = text.replaceAll(_spacingRegExp, ' ');
+    }
+
     TextSpan span;
-    text = text?.replaceAll(_spacingRegExp, ' ') ?? '';
     if (text.isEmpty && children?.length == 1) {
       span = children.first;
     } else {
