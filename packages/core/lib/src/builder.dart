@@ -84,7 +84,7 @@ class Builder {
 
       if (meta?.isBlockElement == true) {
         _savePiece();
-        _pieces.add(_BuiltPiece(builder: this, widgets: __builder.build()));
+        _pieces.add(_BuiltPiece(builder: this, widgets: meta?.widgets ?? __builder.build()));
         continue;
       }
 

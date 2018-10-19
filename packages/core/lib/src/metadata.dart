@@ -24,7 +24,7 @@ NodeMetadata lazySet(
   TextAlign textAlign,
   bool textSpaceCollapse,
 }) {
-  if (meta == null) meta = NodeMetadata();
+  meta ??= NodeMetadata();
 
   if (color != null) meta.color = color;
   if (decorationLineThrough != null)
@@ -50,8 +50,8 @@ NodeMetadata lazySet(
 
 NodeMetadata lazyAddNode(NodeMetadata meta,
     {dom.Node node, List<dom.Node> nodes, String text}) {
-  if (meta == null) meta = NodeMetadata();
-  if (meta.domNodes == null) meta.domNodes = List();
+  meta ??= NodeMetadata();
+  meta.domNodes ??= List();
 
   if (node != null) {
     meta.domNodes.add(node);
@@ -60,6 +60,16 @@ NodeMetadata lazyAddNode(NodeMetadata meta,
   } else {
     meta.domNodes.add(dom.Text(text));
   }
+
+  return meta;
+}
+
+NodeMetadata lazyAddWidget(NodeMetadata meta, Widget widget) {
+  meta ??= NodeMetadata();
+  meta.display ??= DisplayType.Block;
+
+  meta.widgets ??= List();
+  meta.widgets.add(widget);
 
   return meta;
 }
@@ -359,6 +369,7 @@ class NodeMetadata {
   StyleType style;
   TextAlign textAlign = TextAlign.start;
   bool textSpaceCollapse;
+  List<Widget> widgets;
 
   bool get hasStyling =>
       color != null ||
