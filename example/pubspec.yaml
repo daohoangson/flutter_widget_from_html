@@ -1,0 +1,18 @@
+name: flutter_widge_from_html_example
+description: Flutter Widget from HTML demo app.
+version: 0.0.1
+
+environment:
+  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_widget_from_html:
+    path: ./..
+  flutter_widget_from_html_core:
+    path: ./../packages/core
+  html: ^0.13.3
+
+flutter:
+  uses-material-design: true

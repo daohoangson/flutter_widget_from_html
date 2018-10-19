@@ -13,11 +13,11 @@ To use this plugin, add `flutter_widget_from_html_core` as a [dependency in your
 ### Example
 
 ```dart
-class HelloWorldScreen extends StatelessWidget {
+class HelloWorldCoreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('HelloWorldScreen'),
+          title: Text('HelloWorldCoreScreen'),
         ),
         body: HtmlWidget("""<h1>Heading 1</h1>
 <h2>Heading 2</h2>
@@ -33,7 +33,7 @@ class HelloWorldScreen extends StatelessWidget {
 }
 ```
 
-![](../../example/screenshots/core/HelloWorldScreen.jpg?raw=true)
+![](../../example/screenshots/HelloWorldCoreScreen.jpg?raw=true)
 
 ## Features
 
@@ -118,4 +118,4 @@ class SmilieWf extends WidgetFactory {
 }
 ```
 
-![](../../example/screenshots/core/SmilieScreen.png?raw=true)
+![](../../example/screenshots/SmilieScreen.png?raw=true)
