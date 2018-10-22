@@ -2,74 +2,44 @@ import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 final _attributeStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
-final _styleColorRegExp = RegExp(r'^#([a-fA-F0-9]{6})$');
 final _spacingRegExp = RegExp(r'\s+');
+final _styleColorRegExp = RegExp(r'^#([a-fA-F0-9]{6})$');
 
 NodeMetadata lazySet(
   NodeMetadata meta, {
+  BuildOp buildOp,
   Color color,
   bool decorationLineThrough,
   bool decorationOverline,
   bool decorationUnderline,
-  DisplayType display,
   String fontFamily,
   double fontSize,
   bool fontStyleItalic,
   FontWeight fontWeight,
-  String href,
-  NodeImage image,
+  bool isBlockElement,
   bool isNotRenderable,
-  ListType listType,
   StyleType style,
   TextAlign textAlign,
   bool textSpaceCollapse,
 }) {
   meta ??= NodeMetadata();
 
+  if (buildOp != null) meta.buildOp = buildOp;
   if (color != null) meta.color = color;
   if (decorationLineThrough != null)
     meta.decorationLineThrough = decorationLineThrough;
   if (decorationOverline != null) meta.decorationOverline = decorationOverline;
   if (decorationUnderline != null)
     meta.decorationUnderline = decorationUnderline;
-  if (display != null) meta.display = display;
   if (fontFamily != null) meta.fontFamily = fontFamily;
   if (fontSize != null) meta.fontSize = fontSize;
   if (fontStyleItalic != null) meta.fontStyleItalic = fontStyleItalic;
   if (fontWeight != null) meta.fontWeight = fontWeight;
-  if (href != null) meta.href = href;
-  if (image != null) meta.image = image;
+  if (isBlockElement != null) meta._isBlockElement = isBlockElement;
   if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
-  if (listType != null) meta.listType = listType;
   if (style != null) meta.style = style;
   if (textAlign != null) meta.textAlign = textAlign;
   if (textSpaceCollapse != null) meta.textSpaceCollapse = textSpaceCollapse;
-
-  return meta;
-}
-
-NodeMetadata lazyAddNode(NodeMetadata meta,
-    {dom.Node node, List<dom.Node> nodes, String text}) {
-  meta ??= NodeMetadata();
-  meta.domNodes ??= List();
-
-  if (node != null) {
-    meta.domNodes.add(node);
-  } else if (nodes != null) {
-    meta.domNodes.addAll(nodes);
-  } else {
-    meta.domNodes.add(dom.Text(text));
-  }
-
-  return meta;
-}
-
-NodeMetadata lazyAddWidget(NodeMetadata meta, Widget widget) {
-  meta ??= NodeMetadata();
-  meta.display ??= DisplayType.Block;
-
-  meta.widgets ??= List();
-  meta.widgets.add(widget);
 
   return meta;
 }
@@ -78,14 +48,6 @@ NodeMetadata parseElement(dom.Element e) {
   NodeMetadata meta;
 
   switch (e.localName) {
-    case 'a':
-      meta = lazySet(
-        meta,
-        decorationUnderline: true,
-        href: e.attributes['href'],
-      );
-      break;
-
     case 'b':
     case 'strong':
       meta = lazySet(meta, fontWeight: FontWeight.bold);
@@ -100,66 +62,53 @@ NodeMetadata parseElement(dom.Element e) {
 
     case 'br':
     case 'div':
+    case 'li':
     case 'p':
-      meta = lazySet(meta, display: DisplayType.Block);
-      break;
-
-    case 'code':
-      meta = lazySet(
-        meta,
-        display: DisplayType.BlockScrollable,
-        fontFamily: 'monospace',
-      );
-      break;
-    case 'pre':
-      meta = lazySet(
-        meta,
-        display: DisplayType.BlockScrollable,
-        fontFamily: 'monospace',
-        textSpaceCollapse: false,
-      );
+    case 'ol':
+    case 'ul':
+      meta = lazySet(meta, isBlockElement: true);
       break;
 
     case 'h1':
       meta = lazySet(
         meta,
-        display: DisplayType.Block,
+        isBlockElement: true,
         style: StyleType.Heading1,
       );
       break;
     case 'h2':
       meta = lazySet(
         meta,
-        display: DisplayType.Block,
+        isBlockElement: true,
         style: StyleType.Heading2,
       );
       break;
     case 'h3':
       meta = lazySet(
         meta,
-        display: DisplayType.Block,
+        isBlockElement: true,
         style: StyleType.Heading3,
       );
       break;
     case 'h4':
       meta = lazySet(
         meta,
+        isBlockElement: true,
         style: StyleType.Heading4,
-        display: DisplayType.Block,
       );
       break;
     case 'h5':
       meta = lazySet(
         meta,
-        display: DisplayType.Block,
+        isBlockElement: true,
         style: StyleType.Heading5,
       );
       break;
     case 'h6':
       meta = lazySet(
         meta,
+        isBlockElement: true,
         style: StyleType.Heading6,
-        display: DisplayType.Block,
       );
       break;
 
@@ -169,36 +118,6 @@ NodeMetadata parseElement(dom.Element e) {
       // actually `script` and `style` are not required here
       // our parser will put those elements into document.head anyway
       meta = lazySet(meta, isNotRenderable: true);
-      break;
-
-    case 'img':
-      meta = lazySet(
-        meta,
-        display: DisplayType.Block,
-        image: NodeImage.fromAttributes(e.attributes),
-      );
-      break;
-
-    case 'li':
-      meta = lazySet(
-        meta,
-        display: DisplayType.Block,
-        listType: ListType.Item,
-      );
-      break;
-    case 'ol':
-      meta = lazySet(
-        meta,
-        display: DisplayType.Block,
-        listType: ListType.Ordered,
-      );
-      break;
-    case 'ul':
-      meta = lazySet(
-        meta,
-        display: DisplayType.Block,
-        listType: ListType.Unordered,
-      );
       break;
   }
 
@@ -271,7 +190,7 @@ NodeMetadata parseElement(dom.Element e) {
           break;
 
         case 'text-align':
-          meta = lazySet(meta, display: DisplayType.Block);
+          meta = lazySet(meta, isBlockElement: true);
 
           switch (value) {
             case 'center':
@@ -319,7 +238,58 @@ NodeMetadata parseElement(dom.Element e) {
   return meta;
 }
 
-enum ListType { Item, Ordered, Unordered }
+class BuildOp {
+  final bool hasStyling;
+  final bool _isBlockElement;
+  final BuildOpOnPieces onPieces;
+  final BuildOpOnProcess onProcess;
+  final BuildOpOnWidgets onWidgets;
+
+  BuildOp({
+    this.hasStyling,
+    bool isBlockElement,
+    this.onPieces,
+    this.onProcess,
+    this.onWidgets,
+  }) : this._isBlockElement = isBlockElement;
+
+  bool get isBlockElement =>
+      _isBlockElement != null ? _isBlockElement : onWidgets != null;
+}
+
+typedef List<BuiltPiece> BuildOpOnPieces(List<BuiltPiece> pieces);
+typedef void BuildOpOnProcess(BuildOpOnProcessAddSpan addSpan,
+    BuildOpOnProcessAddWidgets addWidgets, BuildOpOnProcessWrite write);
+typedef void BuildOpOnProcessAddSpan(TextSpan span);
+typedef void BuildOpOnProcessAddWidgets(List<Widget> widgets);
+typedef void BuildOpOnProcessWrite(String text);
+typedef List<Widget> BuildOpOnWidgets(List<Widget> widgets);
+
+abstract class BuiltPiece {
+  bool get hasText;
+  bool get hasTextSpan;
+  bool get hasWidgets;
+
+  TextStyle get style;
+  String get text;
+  TextSpan get textSpan;
+  TextSpan get textSpanTrimmedLeft;
+  List<Widget> get widgets;
+}
+
+class BuiltPieceSimple extends BuiltPiece {
+  final TextStyle style;
+  final String text;
+  final TextSpan textSpan;
+  final List<Widget> widgets;
+
+  BuiltPieceSimple({this.style, this.text, this.textSpan, this.widgets});
+
+  bool get hasText => text != null;
+  bool get hasTextSpan => textSpan != null;
+  bool get hasWidgets => widgets != null;
+  TextSpan get textSpanTrimmedLeft => textSpan;
+}
 
 class NodeImage {
   final int height;
@@ -345,40 +315,30 @@ class NodeImage {
   }
 }
 
-enum DisplayType {
-  Block,
-  BlockScrollable,
-  Inline,
-}
-
 class NodeMetadata {
+  BuildOp buildOp;
   Color color;
   bool decorationLineThrough;
   bool decorationOverline;
   bool decorationUnderline;
-  DisplayType display;
-  List<dom.Node> domNodes;
   String fontFamily;
   double fontSize;
   bool fontStyleItalic;
   FontWeight fontWeight;
-  String href;
-  NodeImage image;
+  bool _isBlockElement;
   bool isNotRenderable;
-  ListType listType;
   StyleType style;
   TextAlign textAlign = TextAlign.start;
   bool textSpaceCollapse;
-  List<Widget> widgets;
 
   bool get hasStyling =>
+      buildOp?.hasStyling == true ||
       color != null ||
       fontFamily != null ||
       fontSize != null ||
       fontWeight != null ||
       hasDecoration ||
       hasFontStyle ||
-      href != null ||
       style != null ||
       textSpaceCollapse != null;
 
@@ -390,10 +350,8 @@ class NodeMetadata {
   bool get hasFontStyle => fontStyleItalic != null;
 
   bool get isBlockElement =>
-      display == DisplayType.Block || display == DisplayType.BlockScrollable;
+      _isBlockElement == true || buildOp?.isBlockElement == true;
 }
-
-typedef NodeMetadata ParseElementCallback(dom.Element e, NodeMetadata meta);
 
 enum StyleType {
   Heading1,

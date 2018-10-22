@@ -4,6 +4,18 @@ import 'package:html/dom.dart' as dom;
 import 'metadata.dart';
 import 'widget_factory.dart';
 
+final _textIsUselessRegExp = RegExp(r'^\s*$');
+
+bool checkTextIsUseless(String text) =>
+    text != null && _textIsUselessRegExp.firstMatch(text) != null;
+
+bool checkTextSpanIsUseless(TextSpan span) {
+  if (span == null) return true;
+  if (span.children?.isNotEmpty == true) return false;
+
+  return checkTextIsUseless(span.text);
+}
+
 class Builder {
   final List<dom.Node> domNodes;
   final NodeMetadata parentMeta;
@@ -11,7 +23,7 @@ class Builder {
 
   final TextStyle _parentStyle;
   _BuiltPiece _piece;
-  final List<_BuiltPiece> _pieces = List();
+  final List<BuiltPiece> _pieces = List();
 
   Builder({
     @required this.domNodes,
@@ -25,15 +37,10 @@ class Builder {
     List<Widget> widgets = List();
     final addWidgetIfNotNull = (Widget w) => w != null ? widgets.add(w) : null;
 
-    final image = parentMeta?.image;
-    if (image != null) {
-      addWidgetIfNotNull(wf.buildImageWidget(image));
-    }
-
     for (final piece in process()) {
       if (piece.hasTextSpan) {
         addWidgetIfNotNull(wf.buildTextWidget(
-          piece._buildTextSpan(trimLeft: true),
+          piece.textSpanTrimmedLeft,
           textAlign: parentMeta?.textAlign,
         ));
       } else if (piece.hasText) {
@@ -46,85 +53,82 @@ class Builder {
       }
     }
 
-    if (parentMeta?.listType != null && widgets.isNotEmpty) {
-      widgets = <Widget>[wf.buildColumnForList(widgets, parentMeta.listType)];
-    }
-
-    if (parentMeta?.display == DisplayType.BlockScrollable) {
-      widgets = <Widget>[wf.buildScrollView(widgets)];
-    }
+    final buildOpOnWidgets = parentMeta?.buildOp?.onWidgets;
+    if (buildOpOnWidgets != null) widgets = buildOpOnWidgets(widgets);
 
     return widgets;
   }
 
-  List<_BuiltPiece> process() {
+  List<BuiltPiece> process() {
     _pieces.clear();
     _newPiece();
 
     for (final domNode in domNodes) {
-      NodeMetadata meta;
-      switch (domNode.nodeType) {
-        case dom.Node.ELEMENT_NODE:
-          meta = wf.collectMetadata(domNode);
-          break;
-        case dom.Node.TEXT_NODE:
-          _piece._write(domNode.text);
-          break;
+      if (domNode.nodeType == dom.Node.TEXT_NODE) {
+        _piece._write(domNode.text);
+        continue;
       }
-
+      if (domNode.nodeType != dom.Node.ELEMENT_NODE) {
+        continue;
+      }
+      final meta = wf.collectMetadata(domNode);
       if (meta?.isNotRenderable == true) continue;
+
+      final buildOpOnProcess = meta?.buildOp?.onProcess;
+      if (buildOpOnProcess != null) {
+        buildOpOnProcess(_piece._addSpan, _addWidgets, _piece._write);
+        continue;
+      }
 
       final style = wf.buildTextStyle(meta, _parentStyle);
       final __builder = Builder(
-        domNodes: meta?.domNodes ?? domNode.nodes,
+        domNodes: domNode.nodes,
         parentMeta: meta,
         parentStyle: style ?? _parentStyle,
         widgetFactory: wf,
       );
 
       if (meta?.isBlockElement == true) {
-        _savePiece();
-        _pieces.add(_BuiltPiece(builder: this, widgets: meta?.widgets ?? __builder.build()));
+        _addWidgets(__builder.build());
         continue;
       }
 
       for (final __piece in __builder.process()) {
         if (__piece.hasTextSpan) {
-          _piece._addSpan(__piece._buildTextSpan());
+          _piece._addSpan(__piece.textSpan);
         } else if (__piece.hasText) {
           _piece._write(__piece.text);
         } else if (__piece.hasWidgets) {
           _savePiece();
-
-          if (meta?.href?.isNotEmpty == true) {
-            final gd = wf.buildGestureDetectorToLaunchUrl(
-                wf.buildColumn(__piece.widgets), meta.href);
-            if (gd != null) {
-              _pieces.add(_BuiltPiece(builder: this, widgets: <Widget>[gd]));
-            }
-          } else {
-            _pieces.add(__piece);
-          }
+          _pieces.add(__piece);
         }
       }
     }
 
     _savePiece();
 
+    final buildOpOnPieces = parentMeta?.buildOp?.onPieces;
+    if (buildOpOnPieces != null) return buildOpOnPieces(_pieces);
+
     return _pieces;
   }
 
-  _newPiece() {
+  void _addWidgets(List<Widget> widgets) {
+    _savePiece();
+    _pieces.add(_BuiltPiece(builder: this, widgets: widgets));
+  }
+
+  void _newPiece() {
     _piece = _BuiltPiece(
       builder: this,
       style: parentMeta?.hasStyling == true ? _parentStyle : null,
       textSpaceCollapse: parentMeta?.textSpaceCollapse,
-      url: parentMeta?.href,
     );
   }
 
-  _savePiece() {
-    if (_piece.hasText || _piece.hasTextSpan) {
+  void _savePiece() {
+    if ((_piece.hasText && !checkTextIsUseless(_piece.text)) ||
+        (_piece.hasTextSpan && !checkTextSpanIsUseless(_piece.textSpan))) {
       _pieces.add(_piece);
     }
 
@@ -132,12 +136,11 @@ class Builder {
   }
 }
 
-class _BuiltPiece {
+class _BuiltPiece extends BuiltPiece {
   final Builder b;
   final TextStyle style;
   final String textPrefix;
   final bool textSpaceCollapse;
-  final String url;
   final List<Widget> widgets;
 
   final StringBuffer _texts;
@@ -149,15 +152,27 @@ class _BuiltPiece {
     this.style,
     this.textPrefix,
     this.textSpaceCollapse,
-    this.url,
     this.widgets,
   })  : b = builder,
         _texts = widgets == null ? StringBuffer() : null;
 
+  @override
   bool get hasText => _texts?.isNotEmpty == true;
+
+  @override
   bool get hasTextSpan => style != null || _spans != null;
+
+  @override
   bool get hasWidgets => widgets != null;
+
+  @override
   String get text => _texts.toString();
+
+  @override
+  TextSpan get textSpan => _buildTextSpan();
+
+  @override
+  TextSpan get textSpanTrimmedLeft => _buildTextSpan(trimLeft: true);
 
   void _addSpan(TextSpan span) {
     writeTextPrefixIfNeeded();
@@ -168,7 +183,7 @@ class _BuiltPiece {
 
     if (span.style != null || span.text?.isNotEmpty != false) {
       _spans.add(span);
-    } else {
+    } else if (span.children != null) {
       for (final subSpan in span.children) {
         _spans.add(subSpan);
       }
@@ -185,7 +200,6 @@ class _BuiltPiece {
       children: _spans,
       style: style,
       textSpaceCollapse: textSpaceCollapse,
-      url: url,
     );
   }
 

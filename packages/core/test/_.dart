@@ -6,6 +6,7 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 class _WidgetFactory extends WidgetFactory {
   _WidgetFactory(BuildContext context) : super(context);
 
+  @override
   Widget buildImageWidgetFromUrl(String url) => Text("imageUrl=$url");
 }
 

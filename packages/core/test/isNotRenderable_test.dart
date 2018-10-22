@@ -8,6 +8,7 @@ import '_.dart';
 class _DoNotRenderSkipMe extends WidgetFactory {
   _DoNotRenderSkipMe(BuildContext context) : super(context);
 
+  @override
   NodeMetadata collectMetadata(dom.Element e) {
     final meta = super.collectMetadata(e);
 

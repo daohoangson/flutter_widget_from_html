@@ -16,18 +16,18 @@ void main() {
   });
 
   group('A tag', () {
-    testWidgets('renders stylings and on tap', (WidgetTester tester) async {
+    testWidgets('renders stylings', (WidgetTester tester) async {
       final html = 'This is a <a href="href">hyperlink</a>.';
       final explained = await explain(tester, html);
       expect(explained,
-          equals('[RichText:(:This is a (+u+onTap:hyperlink)(:.))]'));
+          equals('[RichText:(:This is a (+u:hyperlink)(:.))]'));
     });
 
     testWidgets('renders inner stylings', (WidgetTester tester) async {
       final html = 'This is a <a href="href"><b><i>hyperlink</i></b></a>.';
       final explained = await explain(tester, html);
       expect(explained,
-          equals('[RichText:(:This is a (+u+i+b+onTap:hyperlink)(:.))]'));
+          equals('[RichText:(:This is a (+u+i+b:hyperlink)(:.))]'));
     });
   });
 
@@ -70,13 +70,6 @@ void main() {
               '[Text:imageUrl=image.png],' +
               '[Text:After text.]]'));
     });
-
-    testWidgets('renders inside A tag', (WidgetTester tester) async {
-      final html = '<a href="href"><img src="image.png" /></a>';
-      final explained = await explain(tester, html);
-      expect(explained,
-          equals('[GestureDetector:child=[Text:imageUrl=image.png]]'));
-    });
   });
 
   group('lists', () {
@@ -106,7 +99,7 @@ void main() {
           explained,
           equals('[Column:children=[Text:One],' +
               '[Text:Two],' +
-              '[Column:children=[Text:Three],[Column:children=[Text:3.1],[Text:3.2]]],' +
+              '[Text:Three],[Text:3.1],[Text:3.2],' +
               '[Text:Four]]'));
     });
   });

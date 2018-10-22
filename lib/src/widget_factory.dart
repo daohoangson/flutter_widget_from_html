@@ -2,8 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
-import 'package:url_launcher/url_launcher.dart';
+import 'package:html/dom.dart' as dom;
 
+import 'ops/tag_a.dart';
+import 'ops/tag_li.dart';
 import 'config.dart';
 
 final _baseUriTrimmingRegExp = RegExp(r'/+$');
@@ -36,67 +38,10 @@ Widget wrapPadding(Widget widget, EdgeInsetsGeometry padding) =>
 
 class WidgetFactory extends core.WidgetFactory {
   final Config config;
-  final List<Key> listItemKeys = List();
+
+  TagLi _tagLi;
 
   WidgetFactory(BuildContext context, this.config) : super(context);
-
-  @override
-  Widget buildColumnForList(List<Widget> children, core.ListType type) {
-    if (type == core.ListType.Item) {
-      final item = super.buildColumnForList(children, type);
-      listItemKeys.add(item.key);
-      return item;
-    }
-
-    final bullet = config.listBullet;
-    final isOrdered = type == core.ListType.Ordered;
-    final padding = config.listPaddingLeft;
-    final tp = config.textPadding;
-    if (bullet == null || padding == null) {
-      return super.buildColumnForList(children, type);
-    }
-
-    final List<Stack> stacks = List(children.length);
-    int i = 0;
-    for (final widget in children) {
-      final markerNumber = i + 1;
-      final marker = LayoutBuilder(
-        builder: (context, bc) => Text(
-              isOrdered ? "$markerNumber." : bullet,
-              maxLines: 1,
-              overflow: TextOverflow.clip,
-              style: DefaultTextStyle.of(context).style.copyWith(
-                    color: Theme.of(context).disabledColor,
-                  ),
-              textAlign: TextAlign.right,
-            ),
-      );
-
-      stacks[i] = Stack(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(left: padding),
-            child: widget,
-          ),
-          Positioned(
-            left: 0.0,
-            top: 0.0,
-            width: padding,
-            child: tp?.top != null
-                ? Padding(
-                    padding: EdgeInsets.only(top: tp.top),
-                    child: marker,
-                  )
-                : marker,
-          )
-        ],
-      );
-
-      i++;
-    }
-
-    return buildColumn(stacks);
-  }
 
   @override
   Widget buildImageWidget(core.NodeImage image) => wrapPadding(
@@ -116,22 +61,47 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
-  TextStyle buildTextStyleForHref(String href, TextStyle textStyle) =>
-      textStyle.copyWith(color: Theme.of(context).accentColor);
-
-  @override
   Widget buildTextWidget(text, {TextAlign textAlign}) => wrapPadding(
         super.buildTextWidget(text, textAlign: textAlign),
         config.textPadding,
       );
 
   @override
-  GestureTapCallback prepareGestureTapCallbackToLaunchUrl(String url) =>
-      () async {
-        final fullUrl = buildFullUrl(url, config.baseUrl);
+  core.NodeMetadata collectMetadata(dom.Element e) {
+    var meta = super.collectMetadata(e);
 
-        if (await canLaunch(fullUrl)) {
-          await launch(fullUrl);
+    switch (e.localName) {
+      case 'a':
+        meta = core.lazySet(meta, color: Theme.of(context).accentColor);
+
+        if (e.attributes.containsKey('href')) {
+          final href = e.attributes['href'];
+          final fullUrl = buildFullUrl(href, config.baseUrl);
+          if (fullUrl?.isNotEmpty == true) {
+            meta = core.lazySet(meta, buildOp: tagA(fullUrl));
+          }
         }
-      };
+        break;
+
+      case 'li':
+      case 'ol':
+      case 'ul':
+        meta = core.lazySet(null, buildOp: tagLi(e.localName));
+        break;
+    }
+
+    return meta;
+  }
+
+  core.BuildOp tagA(String fullUrl) => core.BuildOp(
+        onPieces: TagA(fullUrl, this).onPieces,
+      );
+
+  core.BuildOp tagLi(String tag) {
+    _tagLi ??= TagLi(this);
+
+    return core.BuildOp(
+      onWidgets: (widgets) => <Widget>[_tagLi.build(widgets, tag)],
+    );
+  }
 }

@@ -28,12 +28,36 @@ void main() {
         equals('[Padding:(5,10,5,10),child=[RichText:(:Hi (+b:there)(:!))]]'));
   });
 
-  testWidgets('renders A tag with color', (WidgetTester tester) async {
-    final html = 'This is a <a href="href">hyperlink</a>.';
-    final noTextPaddingConfig = Config(textPadding: null);
-    final explained = await explain(tester, html, config: noTextPaddingConfig);
-    expect(explained,
-        equals('[RichText:(:This is a (#FF0000FF+u+onTap:hyperlink)(:.))]'));
+  group('A tag', () {
+    testWidgets('renders stylings and on tap', (WidgetTester tester) async {
+      final html = 'This is a <a href="http://domain.com/href">hyperlink</a>.';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Padding:(5,10,5,10),child=' +
+              '[RichText:(:This is a (#FF0000FF+u+onTap:hyperlink)(:.))]]'));
+    });
+
+    testWidgets('renders inner stylings', (WidgetTester tester) async {
+      final html = 'This is a <a href="http://domain.com/href">' +
+          '<b><i>hyperlink</i></b></a>.';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Padding:(5,10,5,10),child=' +
+              '[RichText:(:This is a (#FF0000FF+u+i+b+onTap:hyperlink)(:.))]]'));
+    });
+
+    testWidgets('renders IMG tag inside', (WidgetTester tester) async {
+      final html = '<a href="http://domain.com/href">' +
+          '<img src="http://domain.com/image.png" /></a>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[GestureDetector:child=[Stack:children=' +
+              '[Padding:(10,0,0,0),child=[CachedNetworkImage:]],' +
+              '[Positioned:child=[Padding:(10,10,10,10),child=[Icon:]]]]]'));
+    });
   });
 
   testWidgets('renders IMG tag', (WidgetTester tester) async {
