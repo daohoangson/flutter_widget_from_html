@@ -4,6 +4,7 @@ import 'package:html/dom.dart' as dom;
 import 'metadata.dart';
 import 'widget_factory.dart';
 
+final _attributeStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
 final _textIsUselessRegExp = RegExp(r'^\s*$');
 
 bool checkTextIsUseless(String text) =>
@@ -39,15 +40,9 @@ class Builder {
 
     for (final piece in process()) {
       if (piece.hasTextSpan) {
-        addWidgetIfNotNull(wf.buildTextWidget(
-          piece.textSpanTrimmedLeft,
-          textAlign: parentMeta?.textAlign,
-        ));
+        addWidgetIfNotNull(wf.buildTextWidget(piece.textSpanTrimmedLeft));
       } else if (piece.hasText) {
-        addWidgetIfNotNull(wf.buildTextWidget(
-          piece.text,
-          textAlign: parentMeta?.textAlign,
-        ));
+        addWidgetIfNotNull(wf.buildTextWidget(piece.text));
       } else if (piece.hasWidgets) {
         piece.widgets.forEach(addWidgetIfNotNull);
       }
@@ -57,6 +52,23 @@ class Builder {
     if (buildOpOnWidgets != null) widgets = buildOpOnWidgets(widgets);
 
     return widgets;
+  }
+
+  NodeMetadata collectMetadata(dom.Element e) {
+    var meta = wf.parseElement(e);
+
+    final attribs = e.attributes;
+    if (attribs.containsKey('style')) {
+      final styles = _attributeStyleRegExp.allMatches(attribs['style']);
+      for (final style in styles) {
+        final styleKey = style[1].trim();
+        final styleValue = style[2].trim();
+
+        meta = wf.parseElementStyle(meta, styleKey, styleValue);
+      }
+    }
+
+    return meta;
   }
 
   List<BuiltPiece> process() {
@@ -71,7 +83,7 @@ class Builder {
       if (domNode.nodeType != dom.Node.ELEMENT_NODE) {
         continue;
       }
-      final meta = wf.collectMetadata(domNode);
+      final meta = collectMetadata(domNode);
       if (meta?.isNotRenderable == true) continue;
 
       final buildOpOnProcess = meta?.buildOp?.onProcess;

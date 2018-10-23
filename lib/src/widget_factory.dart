@@ -66,8 +66,8 @@ class WidgetFactory extends core.WidgetFactory {
       );
 
   @override
-  core.NodeMetadata collectMetadata(dom.Element e) {
-    var meta = super.collectMetadata(e);
+  core.NodeMetadata parseElement(dom.Element e) {
+    var meta = super.parseElement(e);
 
     switch (e.localName) {
       case 'a':

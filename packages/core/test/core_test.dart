@@ -19,15 +19,14 @@ void main() {
     testWidgets('renders stylings', (WidgetTester tester) async {
       final html = 'This is a <a href="href">hyperlink</a>.';
       final explained = await explain(tester, html);
-      expect(explained,
-          equals('[RichText:(:This is a (+u:hyperlink)(:.))]'));
+      expect(explained, equals('[RichText:(:This is a (+u:hyperlink)(:.))]'));
     });
 
     testWidgets('renders inner stylings', (WidgetTester tester) async {
       final html = 'This is a <a href="href"><b><i>hyperlink</i></b></a>.';
       final explained = await explain(tester, html);
-      expect(explained,
-          equals('[RichText:(:This is a (+u+i+b:hyperlink)(:.))]'));
+      expect(
+          explained, equals('[RichText:(:This is a (+u+i+b:hyperlink)(:.))]'));
     });
   });
 
@@ -253,22 +252,56 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
   });
 
   group('text-align', () {
-    testWidgets('renders center', (WidgetTester tester) async {
+    testWidgets('renders center text', (WidgetTester tester) async {
       final html = '<div style="text-align: center">_X_</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[Text,align=center:_X_]'));
     });
 
-    testWidgets('renders left', (WidgetTester tester) async {
+    testWidgets('renders justify text', (WidgetTester tester) async {
+      final html = '<div style="text-align: justify">X_X_X</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Text,align=justify:X_X_X]'));
+    });
+
+    testWidgets('renders left text', (WidgetTester tester) async {
       final html = '<div style="text-align: left">X__</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[Text,align=left:X__]'));
     });
 
-    testWidgets('renders right', (WidgetTester tester) async {
+    testWidgets('renders right text', (WidgetTester tester) async {
       final html = '<div style="text-align: right">__<b>X</b></div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText,align=right:(:__(+b:X))]'));
+    });
+
+    testWidgets('renders center image', (WidgetTester tester) async {
+      final html =
+          '<div style="text-align: center"><img src="image.png"></div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Align:alignment=topCenter,' +
+              'child=[Text:imageUrl=image.png]]'));
+    });
+
+    testWidgets('renders left image', (WidgetTester tester) async {
+      final html = '<div style="text-align: left"><img src="image.png"></div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Align:alignment=topLeft,' +
+              'child=[Text:imageUrl=image.png]]'));
+    });
+
+    testWidgets('renders right image', (WidgetTester tester) async {
+      final html = '<div style="text-align: right"><img src="image.png"></div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Align:alignment=topRight,' +
+              'child=[Text:imageUrl=image.png]]'));
     });
   });
 

@@ -165,17 +165,19 @@ class _Explainer {
 
   String _widget(Widget widget) {
     final type = widget.runtimeType.toString();
-    final text = widget is AspectRatio
-        ? "aspectRatio=${widget.aspectRatio.toStringAsFixed(2)},"
-        : widget is GestureDetector
-            ? "child=${_widget(widget.child)}"
-            : widget is Image
-                ? "image=${widget.image.runtimeType}"
-                : widget is Padding
-                    ? "${_edgeInsets(widget.padding)},"
-                    : widget is RichText
-                        ? _textSpan(widget.text)
-                        : widget is Text ? widget.data : '';
+    final text = widget is Align
+        ? "alignment=${widget.alignment},"
+        : widget is AspectRatio
+            ? "aspectRatio=${widget.aspectRatio.toStringAsFixed(2)},"
+            : widget is GestureDetector
+                ? "child=${_widget(widget.child)}"
+                : widget is Image
+                    ? "image=${widget.image.runtimeType}"
+                    : widget is Padding
+                        ? "${_edgeInsets(widget.padding)},"
+                        : widget is RichText
+                            ? _textSpan(widget.text)
+                            : widget is Text ? widget.data : '';
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));

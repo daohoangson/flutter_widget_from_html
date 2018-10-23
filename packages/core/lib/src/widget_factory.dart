@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'ops/style_text_align.dart';
 import 'metadata.dart';
+import 'parser.dart' as parser;
 
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
 final _spacingRegExp = RegExp(r'\s+');
@@ -185,8 +187,8 @@ class WidgetFactory {
     return null;
   }
 
-  NodeMetadata collectMetadata(dom.Element e) {
-    NodeMetadata meta = parseElement(e);
+  NodeMetadata parseElement(dom.Element e) {
+    NodeMetadata meta = parser.parseElement(e);
 
     switch (e.localName) {
       case 'a':
@@ -199,7 +201,6 @@ class WidgetFactory {
           buildOp: BuildOp(
             onWidgets: (widgets) => <Widget>[buildScrollView(widgets)],
           ),
-          isBlockElement: true,
           fontFamily: 'monospace',
         );
         break;
@@ -209,7 +210,6 @@ class WidgetFactory {
           buildOp: BuildOp(
             onWidgets: (widgets) => <Widget>[buildScrollView(widgets)],
           ),
-          isBlockElement: true,
           fontFamily: 'monospace',
           textSpaceCollapse: false,
         );
@@ -227,6 +227,21 @@ class WidgetFactory {
             },
           ),
         );
+        break;
+    }
+
+    return meta;
+  }
+
+  NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
+    meta = parser.parseElementStyle(meta, key, value);
+
+    switch (key) {
+      case 'text-align':
+        final sta = StyleTextAlign.fromString(value, this);
+        if (sta != null) {
+          meta = lazySet(meta, buildOp: BuildOp(onPieces: sta.onPieces));
+        }
         break;
     }
 

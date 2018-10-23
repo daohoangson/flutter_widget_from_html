@@ -38,7 +38,7 @@ class TagA {
       );
 
   List<BuiltPiece> onPieces(List<BuiltPiece> pieces) {
-    List<BuiltPiece> newPieces = new List();
+    List<BuiltPiece> newPieces = List();
 
     final onTap = prepareGestureTapCallback(fullUrl);
     final recognizer = TapGestureRecognizer()..onTap = onTap;

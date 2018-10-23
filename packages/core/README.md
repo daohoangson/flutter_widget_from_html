@@ -99,8 +99,8 @@ class SmilieWf extends WidgetFactory {
   SmilieWf(BuildContext context) : super(context);
 
   @override
-  NodeMetadata collectMetadata(dom.Element e) {
-    var meta = super.collectMetadata(e);
+  NodeMetadata parseElement(dom.Element e) {
+    var meta = super.parseElement(e);
 
     if (e.classes.contains('smilie') && e.attributes.containsKey('alt')) {
       final alt = e.attributes['alt'];

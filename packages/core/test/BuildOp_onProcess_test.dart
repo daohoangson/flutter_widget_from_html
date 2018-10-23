@@ -8,7 +8,8 @@ import '_.dart';
 class _BlockText extends WidgetFactory {
   _BlockText(BuildContext context) : super(context);
 
-  NodeMetadata collectMetadata(dom.Element e) => e.className == 'x'
+  @override
+  NodeMetadata parseElement(dom.Element e) => e.className == 'x'
       ? lazySet(
           null,
           buildOp: BuildOp(
@@ -16,21 +17,21 @@ class _BlockText extends WidgetFactory {
                 addWidgets(<Widget>[Text('block')]),
           ),
         )
-      : super.collectMetadata(e);
+      : super.parseElement(e);
 }
 
 class _WhiteText extends WidgetFactory {
   _WhiteText(BuildContext context) : super(context);
 
   @override
-  NodeMetadata collectMetadata(dom.Element e) => e.className == 'x'
+  NodeMetadata parseElement(dom.Element e) => e.className == 'x'
       ? lazySet(
           null,
           buildOp: BuildOp(
             onProcess: (_, __, write) => write('white'),
           ),
         )
-      : super.collectMetadata(e);
+      : super.parseElement(e);
 }
 
 void main() {
