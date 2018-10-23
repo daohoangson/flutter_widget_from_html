@@ -31,15 +31,14 @@ String buildFullUrl(String url, Uri baseUrl) {
   return "${baseUrl.toString().replaceAll(_baseUriTrimmingRegExp, '')}/$url";
 }
 
-Widget wrapPadding(Widget widget, EdgeInsetsGeometry padding) =>
-    (widget != null && padding != null)
-        ? Padding(padding: padding, child: widget)
-        : widget;
+Widget wrapPadding(Widget widget, EdgeInsets padding) => (widget != null &&
+        padding != null &&
+        padding.top + padding.right + padding.bottom + padding.left > 0)
+    ? Padding(padding: padding, child: widget)
+    : widget;
 
 class WidgetFactory extends core.WidgetFactory {
   final Config config;
-
-  TagLi _tagLi;
 
   WidgetFactory(BuildContext context, this.config) : super(context);
 
@@ -97,11 +96,7 @@ class WidgetFactory extends core.WidgetFactory {
         onPieces: TagA(fullUrl, this).onPieces,
       );
 
-  core.BuildOp tagLi(String tag) {
-    _tagLi ??= TagLi(this);
-
-    return core.BuildOp(
-      onWidgets: (widgets) => <Widget>[_tagLi.build(widgets, tag)],
-    );
-  }
+  core.BuildOp tagLi(String tag) => core.BuildOp(
+        onWidgets: (widgets) => <Widget>[TagLi(this).build(widgets, tag)],
+      );
 }

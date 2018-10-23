@@ -77,9 +77,9 @@ void main() {
       expect(
           explained,
           equals('[Column:children=' +
-              '[Stack:children=[Padding:(0,0,0,30),child=[Text:One]],[Positioned:child=[LayoutBuilder:built=[Text,align=right:1.]]]],' +
-              '[Stack:children=[Padding:(0,0,0,30),child=[Text:Two]],[Positioned:child=[LayoutBuilder:built=[Text,align=right:2.]]]],' +
-              '[Stack:children=[Padding:(0,0,0,30),child=[RichText:(+b:Three)]],[Positioned:child=[LayoutBuilder:built=[Text,align=right:3.]]]]' +
+              '[Stack:children=[Padding:(0,0,0,30),child=[Text:One]],[Positioned:child=[Text,align=right:1.]]],' +
+              '[Stack:children=[Padding:(0,0,0,30),child=[Text:Two]],[Positioned:child=[Text,align=right:2.]]],' +
+              '[Stack:children=[Padding:(0,0,0,30),child=[RichText:(+b:Three)]],[Positioned:child=[Text,align=right:3.]]]' +
               ']'));
     });
 
@@ -90,9 +90,9 @@ void main() {
       expect(
           explained,
           equals('[Column:children=' +
-              '[Stack:children=[Padding:(0,0,0,30),child=[Text:One]],[Positioned:child=[LayoutBuilder:built=[Text,align=right:•]]]],' +
-              '[Stack:children=[Padding:(0,0,0,30),child=[Text:Two]],[Positioned:child=[LayoutBuilder:built=[Text,align=right:•]]]],' +
-              '[Stack:children=[Padding:(0,0,0,30),child=[RichText:(+i:Three)]],[Positioned:child=[LayoutBuilder:built=[Text,align=right:•]]]]' +
+              '[Stack:children=[Padding:(0,0,0,30),child=[Text:One]],[Positioned:child=[Text,align=right:•]]],' +
+              '[Stack:children=[Padding:(0,0,0,30),child=[Text:Two]],[Positioned:child=[Text,align=right:•]]],' +
+              '[Stack:children=[Padding:(0,0,0,30),child=[RichText:(+i:Three)]],[Positioned:child=[Text,align=right:•]]]' +
               ']'));
     });
 
@@ -104,14 +104,14 @@ void main() {
       expect(
           explained,
           equals('[Column:children=' +
-              '[Stack:children=[Padding:(0,0,0,30),child=[Text:One]],[Positioned:child=[LayoutBuilder:built=[Text,align=right:1.]]]],' +
-              '[Stack:children=[Padding:(0,0,0,30),child=[Text:Two]],[Positioned:child=[LayoutBuilder:built=[Text,align=right:2.]]]],' +
+              '[Stack:children=[Padding:(0,0,0,30),child=[Text:One]],[Positioned:child=[Text,align=right:1.]]],' +
+              '[Stack:children=[Padding:(0,0,0,30),child=[Text:Two]],[Positioned:child=[Text,align=right:2.]]],' +
               '[Stack:children=[Padding:(0,0,0,30),child=[Column:children=[Text:Three],' +
               '[Column:children=' +
-              '[Stack:children=[Padding:(0,0,0,30),child=[Text:3.1]],[Positioned:child=[LayoutBuilder:built=[Text,align=right:•]]]],' +
-              '[Stack:children=[Padding:(0,0,0,30),child=[Text:3.2]],[Positioned:child=[LayoutBuilder:built=[Text,align=right:•]]]]' +
-              ']]],[Positioned:child=[LayoutBuilder:built=[Text,align=right:3.]]]],' +
-              '[Stack:children=[Padding:(0,0,0,30),child=[Text:Four]],[Positioned:child=[LayoutBuilder:built=[Text,align=right:4.]]]]]'));
+              '[Stack:children=[Padding:(0,0,0,30),child=[Text:3.1]],[Positioned:child=[Text,align=right:•]]],' +
+              '[Stack:children=[Padding:(0,0,0,30),child=[Text:3.2]],[Positioned:child=[Text,align=right:•]]]' +
+              ']]],[Positioned:child=[Text,align=right:3.]]],' +
+              '[Stack:children=[Padding:(0,0,0,30),child=[Text:Four]],[Positioned:child=[Text,align=right:4.]]]]'));
     });
   });
 }
