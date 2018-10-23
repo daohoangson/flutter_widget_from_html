@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../metadata.dart';
-import '../widget_factory.dart';
+import '../core_wf.dart';
 
 class StyleTextAlign {
   final Alignment alignment;

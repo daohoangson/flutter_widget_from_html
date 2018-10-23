@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'ops/style_text_align.dart';
+import 'ops/tag_img.dart';
 import 'metadata.dart';
 import 'parser.dart' as parser;
 
@@ -45,8 +46,7 @@ class WidgetFactory {
     return bytes;
   }
 
-  Widget buildImageWidget(NodeImage image) {
-    final src = image?.src;
+  Widget buildImageWidget(String src, {int height, int width}) {
     if (src?.isNotEmpty != true) return null;
 
     final imageWidget = src.startsWith('data:image')
@@ -54,8 +54,8 @@ class WidgetFactory {
         : buildImageWidgetFromUrl(src);
     if (imageWidget == null) return null;
 
-    final height = image.height ?? 0;
-    final width = image.width ?? 0;
+    height ??= 0;
+    width ??= 0;
     if (height == 0 || width == 0) return imageWidget;
 
     return AspectRatio(
@@ -216,17 +216,7 @@ class WidgetFactory {
         break;
 
       case 'img':
-        meta = lazySet(
-          meta,
-          buildOp: BuildOp(
-            onProcess: (_, addWidgets, __) {
-              final image = NodeImage.fromAttributes(e.attributes);
-              final widget = buildImageWidget(image);
-              if (widget == null) return;
-              addWidgets(<Widget>[widget]);
-            },
-          ),
-        );
+        meta = lazySet(meta, buildOp: tagImg(e));
         break;
     }
 
@@ -247,4 +237,7 @@ class WidgetFactory {
 
     return meta;
   }
+
+  BuildOp tagImg(dom.Element e) =>
+      BuildOp(onProcess: TagImg(e, this).onProcess);
 }

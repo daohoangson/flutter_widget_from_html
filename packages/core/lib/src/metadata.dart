@@ -90,30 +90,6 @@ class BuiltPieceSimple extends BuiltPiece {
   TextSpan get textSpanTrimmedLeft => textSpan;
 }
 
-class NodeImage {
-  final int height;
-  final String src;
-  final int width;
-
-  NodeImage({this.height, @required this.src, this.width});
-
-  static NodeImage fromAttributes(
-    Map<dynamic, String> map, {
-    String keyHeight = 'height',
-    String keyPrefix = 'data-',
-    String keySrc = 'src',
-    String keyWidth = 'width',
-  }) {
-    final src = _getValueFromAttributes(map, keySrc, keyPrefix);
-    if (src?.isEmpty != false) return null;
-    return NodeImage(
-      height: _parseInt(_getValueFromAttributes(map, keyHeight, keyPrefix)),
-      src: src,
-      width: _parseInt(_getValueFromAttributes(map, keyWidth, keyPrefix)),
-    );
-  }
-}
-
 class NodeMetadata {
   BuildOp buildOp;
   Color color;
@@ -159,16 +135,3 @@ enum StyleType {
   Heading5,
   Heading6,
 }
-
-String _getValueFromAttributes(
-    Map<dynamic, String> map, String key, String prefix) {
-  if (map.containsKey(key)) return map[key];
-
-  final keyWithPrefix = prefix + key;
-  if (map.containsKey(keyWithPrefix)) return map[keyWithPrefix];
-
-  return null;
-}
-
-int _parseInt(String value) =>
-    value?.isNotEmpty == true ? int.parse(value) : null;
