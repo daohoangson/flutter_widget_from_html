@@ -1,3 +1,5 @@
-export 'src/html_widget.dart';
+export 'src/ops/style_text_align.dart';
+export 'src/ops/tag_img.dart';
+export 'src/core_wf.dart';
 export 'src/metadata.dart';
-export 'src/widget_factory.dart';
+export 'src/html_widget.dart';

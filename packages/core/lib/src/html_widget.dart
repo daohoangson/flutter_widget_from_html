@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:html/parser.dart' as parser;
 
 import 'builder.dart' as builder;
-import 'widget_factory.dart';
+import 'core_wf.dart';
 
 class HtmlWidget extends StatelessWidget {
   final String html;

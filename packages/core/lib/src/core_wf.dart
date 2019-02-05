@@ -1,13 +1,14 @@
 import 'dart:convert';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'ops/style_text_align.dart';
+import 'ops/tag_img.dart';
 import 'metadata.dart';
+import 'parser.dart' as parser;
 
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
 final _spacingRegExp = RegExp(r'\s+');
-final _textIsUselessRegExp = RegExp(r'^\s*$');
 
 class WidgetFactory {
   final BuildContext context;
@@ -26,20 +27,9 @@ class WidgetFactory {
             )
       : null;
 
-  Widget buildColumnForList(List<Widget> children, ListType type) =>
-      buildColumn(children);
-
   FontStyle buildFontSize(NodeMetadata meta) => meta?.hasFontStyle == true
       ? (meta.fontStyleItalic == true ? FontStyle.italic : FontStyle.normal)
       : null;
-
-  Widget buildGestureDetectorToLaunchUrl(Widget child, String url) =>
-      (child != null && url?.isNotEmpty == true)
-          ? GestureDetector(
-              onTap: prepareGestureTapCallbackToLaunchUrl(url),
-              child: child,
-            )
-          : null;
 
   List buildImageBytes(String dataUri) {
     final match = _dataUriRegExp.matchAsPrefix(dataUri);
@@ -56,8 +46,7 @@ class WidgetFactory {
     return bytes;
   }
 
-  Widget buildImageWidget(NodeImage image) {
-    final src = image?.src;
+  Widget buildImageWidget(String src, {int height, int width}) {
     if (src?.isNotEmpty != true) return null;
 
     final imageWidget = src.startsWith('data:image')
@@ -65,8 +54,8 @@ class WidgetFactory {
         : buildImageWidgetFromUrl(src);
     if (imageWidget == null) return null;
 
-    final height = image.height ?? 0;
-    final width = image.width ?? 0;
+    height ??= 0;
+    width ??= 0;
     if (height == 0 || width == 0) return imageWidget;
 
     return AspectRatio(
@@ -120,7 +109,6 @@ class WidgetFactory {
     List<TextSpan> children,
     TextStyle style,
     bool textSpaceCollapse,
-    String url,
   }) {
     final hasChildren = children?.isNotEmpty == true;
     final hasText = text?.isNotEmpty == true;
@@ -142,12 +130,6 @@ class WidgetFactory {
       );
     }
 
-    if (url?.isNotEmpty == true) {
-      final onTap = prepareGestureTapCallbackToLaunchUrl(url);
-      final recognizer = TapGestureRecognizer()..onTap = onTap;
-      span = _rebuildTextSpanWithRecognizer(span, recognizer);
-    }
-
     return span;
   }
 
@@ -155,10 +137,6 @@ class WidgetFactory {
     if (meta?.hasStyling != true) return null;
 
     var textStyle = parent;
-
-    if (meta.href != null) {
-      textStyle = buildTextStyleForHref(meta.href, textStyle);
-    }
 
     if (meta.style != null) {
       textStyle = buildTextStyleForStyle(meta.style, textStyle);
@@ -175,9 +153,6 @@ class WidgetFactory {
 
     return textStyle;
   }
-
-  TextStyle buildTextStyleForHref(String href, TextStyle textStyle) =>
-      textStyle;
 
   TextStyle buildTextStyleForStyle(StyleType style, TextStyle textStyle) {
     switch (style) {
@@ -202,50 +177,67 @@ class WidgetFactory {
     final _textAlign = textAlign ?? TextAlign.start;
 
     if (text is String) {
-      return _checkTextIsUseless(text)
-          ? null
-          : Text(text.trim(), textAlign: _textAlign);
+      return Text(text.trim(), textAlign: _textAlign);
     }
 
     if (text is TextSpan) {
-      return _checkTextSpanIsUseless(text)
-          ? null
-          : RichText(text: text, textAlign: _textAlign);
+      return RichText(text: text, textAlign: _textAlign);
     }
 
     return null;
   }
 
-  NodeMetadata collectMetadata(dom.Element e) => parseElement(e);
+  NodeMetadata parseElement(dom.Element e) {
+    NodeMetadata meta = parser.parseElement(e);
 
-  GestureTapCallback prepareGestureTapCallbackToLaunchUrl(String url) =>
-      () => null;
+    switch (e.localName) {
+      case 'a':
+        meta = lazySet(meta, decorationUnderline: true);
+        break;
 
-  bool _checkTextIsUseless(String text) =>
-      _textIsUselessRegExp.firstMatch(text) != null;
+      case 'code':
+        meta = lazySet(
+          meta,
+          buildOp: BuildOp(
+            onWidgets: (widgets) => <Widget>[buildScrollView(widgets)],
+          ),
+          fontFamily: 'monospace',
+        );
+        break;
+      case 'pre':
+        meta = lazySet(
+          meta,
+          buildOp: BuildOp(
+            onWidgets: (widgets) => <Widget>[buildScrollView(widgets)],
+          ),
+          fontFamily: 'monospace',
+          textSpaceCollapse: false,
+        );
+        break;
 
-  bool _checkTextSpanIsUseless(TextSpan span) {
-    if (span == null) return true;
-    if (span.children?.isNotEmpty == true) return false;
+      case 'img':
+        meta = lazySet(meta, buildOp: tagImg(e));
+        break;
+    }
 
-    return _checkTextIsUseless(span.text);
+    return meta;
   }
 
-  TextSpan _rebuildTextSpanWithRecognizer(TextSpan span, GestureRecognizer r) {
-    // this is required because recognizer does not trigger for children
-    // https://github.com/flutter/flutter/issues/10623
-    final children = span.children == null
-        ? null
-        : span.children
-            .map((TextSpan subSpan) =>
-                _rebuildTextSpanWithRecognizer(subSpan, r))
-            .toList();
+  NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
+    meta = parser.parseElementStyle(meta, key, value);
 
-    return TextSpan(
-      children: children,
-      style: span.style,
-      recognizer: r,
-      text: span.text,
-    );
+    switch (key) {
+      case 'text-align':
+        final sta = StyleTextAlign.fromString(value, this);
+        if (sta != null) {
+          meta = lazySet(meta, buildOp: BuildOp(onPieces: sta.onPieces));
+        }
+        break;
+    }
+
+    return meta;
   }
+
+  BuildOp tagImg(dom.Element e) =>
+      BuildOp(onProcess: TagImg(e, this).onProcess);
 }

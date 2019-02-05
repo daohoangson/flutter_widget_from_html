@@ -99,20 +99,20 @@ class SmilieWf extends WidgetFactory {
   SmilieWf(BuildContext context) : super(context);
 
   @override
-  NodeMetadata collectMetadata(dom.Element e) {
-    var meta = super.collectMetadata(e);
+  NodeMetadata parseElement(dom.Element e) {
+    var meta = super.parseElement(e);
 
-    if (e.classes.contains('smilie')) {
-      meta = lazySet(meta, display: DisplayType.Inline);
-
+    if (e.classes.contains('smilie') && e.attributes.containsKey('alt')) {
       final alt = e.attributes['alt'];
-      if (_kSmilies.containsKey(alt)) {
-        meta = lazyAddNode(meta, text: _kSmilies[alt]);
-      } else {
-        // render alt text if mapping not found
-        // because inline image is not supported
-        meta = lazyAddNode(meta, text: alt);
-      }
+      // render alt text if mapping not found
+      // because inline image is not supported
+      final text = _kSmilies.containsKey(alt) ? _kSmilies[alt] : alt;
+      meta = lazySet(
+        null,
+        buildOp: BuildOp(
+          onProcess: (_, __, write) => write(text),
+        ),
+      );
     }
 
     return meta;

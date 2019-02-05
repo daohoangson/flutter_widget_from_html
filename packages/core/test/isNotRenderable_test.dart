@@ -8,8 +8,9 @@ import '_.dart';
 class _DoNotRenderSkipMe extends WidgetFactory {
   _DoNotRenderSkipMe(BuildContext context) : super(context);
 
-  NodeMetadata collectMetadata(dom.Element e) {
-    final meta = super.collectMetadata(e);
+  @override
+  NodeMetadata parseElement(dom.Element e) {
+    final meta = super.parseElement(e);
 
     if (e.className == 'skipMe') {
       return lazySet(meta, isNotRenderable: true);

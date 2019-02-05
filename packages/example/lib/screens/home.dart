@@ -42,8 +42,7 @@ class HomeScreen extends StatelessWidget {
   </li>
   <li>Three</li>
   <li>
-    <p><img src="https://media.giphy.com/media/6VoDJzfRjJNbG/giphy-downsized.gif" /></p>
-    <div style="text-align: center">Source: <a href="https://gph.is/QFgPA0">https://gph.is/QFgPA0</a></div>
+    <a href="https://gph.is/QFgPA0"><img src="https://media.giphy.com/media/6VoDJzfRjJNbG/giphy-downsized.gif" /></a>
   </li>
   <li>Five</li>
   <li>Six</li>
