@@ -13,6 +13,7 @@ NodeMetadata lazySet(
   FontWeight fontWeight,
   bool isBlockElement,
   bool isNotRenderable,
+  EdgeInsetsGeometry margin,
   StyleType style,
   bool textSpaceCollapse,
 }) {
@@ -31,6 +32,7 @@ NodeMetadata lazySet(
   if (fontWeight != null) meta.fontWeight = fontWeight;
   if (isBlockElement != null) meta._isBlockElement = isBlockElement;
   if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
+  if (margin != null) meta.margin = margin;
   if (style != null) meta.style = style;
   if (textSpaceCollapse != null) meta.textSpaceCollapse = textSpaceCollapse;
 
@@ -102,6 +104,7 @@ class NodeMetadata {
   FontWeight fontWeight;
   bool _isBlockElement;
   bool isNotRenderable;
+  EdgeInsetsGeometry margin;
   StyleType style;
   bool textSpaceCollapse;
 
@@ -124,7 +127,9 @@ class NodeMetadata {
   bool get hasFontStyle => fontStyleItalic != null;
 
   bool get isBlockElement =>
-      _isBlockElement == true || buildOp?.isBlockElement == true;
+      buildOp?.isBlockElement == true ||
+      _isBlockElement == true ||
+      margin != null;
 }
 
 enum StyleType {
