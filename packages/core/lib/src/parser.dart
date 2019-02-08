@@ -3,6 +3,8 @@ import 'package:html/dom.dart' as dom;
 
 import 'metadata.dart';
 
+part 'parser/_margin.dart';
+
 final _spacingRegExp = RegExp(r'\s+');
 final _styleColorRegExp = RegExp(r'^#([a-fA-F0-9]{6})$');
 
@@ -144,6 +146,22 @@ NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
         case '900':
           meta = lazySet(meta, fontWeight: FontWeight.w900);
           break;
+      }
+      break;
+
+    case 'margin':
+      final margin = _marginParseAll(value);
+      if (margin != null) {
+        meta = lazySet(meta, margin: margin);
+      }
+      break;
+    case 'margin-bottom':
+    case 'margin-left':
+    case 'margin-right':
+    case 'margin-top':
+      final margin = _marginParseOne(meta, key, value);
+      if (margin != null) {
+        meta = lazySet(meta, margin: margin);
       }
       break;
 

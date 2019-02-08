@@ -74,6 +74,11 @@ class WidgetFactory {
   Widget buildImageWidgetFromUrl(String url) =>
       url?.isNotEmpty == true ? Image.network(url, fit: BoxFit.cover) : null;
 
+  Widget buildMargin(List<Widget> children, EdgeInsetsGeometry margin) => Padding(
+        child: buildColumn(children),
+        padding: margin,
+      );
+
   Widget buildScrollView(List<Widget> widgets) => SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: widgets.length == 1 ? widgets.first : buildColumn(widgets),

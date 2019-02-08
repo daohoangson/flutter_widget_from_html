@@ -65,6 +65,11 @@ class HomeScreen extends StatelessWidget {
 CODE tag:
 
 <code><span style="color: #000000"><span style="color: #0000BB">&lt;?php phpinfo</span><span style="color: #007700">(); </span><span style="color: #0000BB">?&gt;</span></span></code>""",
+    'Margin': """<div>No margin</div>
+<div style="margin: 5px 10px">margin: 5px 10px</div>
+<div style="margin: 3px">margin: 3px</div>
+<div style="margin: 1px"><div style="margin: 2px">Margin within another</div></div>
+"""
   };
 
   @override
