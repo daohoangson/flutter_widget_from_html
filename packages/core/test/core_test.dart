@@ -196,10 +196,16 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
   });
 
   group('color (inline style)', () {
-    testWidgets('renders RGB hex value', (WidgetTester tester) async {
-      final html = '<span style="color: #FF0000">red</span>';
+    testWidgets('renders hex values', (WidgetTester tester) async {
+      final html = '<span style="color: #F00">red</span>' +
+          '<span style="color: #0F08">red 53%</span>' +
+          '<span style="color: #00FF00">green</span>' +
+          '<span style="color: #00FF0080">green 50%</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(#FFFF0000:red)]'));
+      expect(
+          explained,
+          equals('[RichText:(:(#FFFF0000:red)(#8800FF00:red 53%)' +
+              '(#FF00FF00:green)(#8000FF00:green 50%))]'));
     });
 
     testWidgets('renders overlaps', (WidgetTester tester) async {

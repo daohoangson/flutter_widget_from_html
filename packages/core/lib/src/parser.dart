@@ -6,7 +6,7 @@ import 'metadata.dart';
 part 'parser/_margin.dart';
 
 final _spacingRegExp = RegExp(r'\s+');
-final _styleColorRegExp = RegExp(r'^#([a-fA-F0-9]{6})$');
+final _styleColorRegExp = RegExp(r'^#([a-f0-9]{3,8})$', caseSensitive: false);
 
 NodeMetadata parseElement(dom.Element e) {
   NodeMetadata meta;
@@ -91,12 +91,31 @@ NodeMetadata parseElement(dom.Element e) {
 NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
   switch (key) {
     case 'color':
-      if (_styleColorRegExp.hasMatch(value)) {
-        meta = lazySet(
-          meta,
-          color: Color(int.parse('0xFF' + value.replaceAll('#', '').trim())),
-        );
+      final m = _styleColorRegExp.firstMatch(value);
+      if (m == null) return meta;
+      final hex = m.group(1);
+
+      Color color;
+      switch (hex.length) {
+        case 3:
+          color =
+              Color(int.parse('0xFF' + hex[0] * 2 + hex[1] * 2 + hex[2] * 2));
+          break;
+        case 4:
+          color = Color(int.parse(
+              '0x' + hex[3] * 2 + hex[0] * 2 + hex[1] * 2 + hex[2] * 2));
+          break;
+        case 6:
+          color = Color(int.parse('0xFF' + hex));
+          break;
+        case 8:
+          color = Color(
+              int.parse('0x' + hex.substring(6, 8) + hex.substring(0, 6)));
+          break;
       }
+      if (color == null) return meta;
+
+      meta = lazySet(meta, color: color);
       break;
 
     case 'font-family':

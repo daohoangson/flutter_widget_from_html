@@ -60,7 +60,7 @@ Below tags are the ones that have special meaning / styling, all other tag will 
 
 ### Inline stylings
 
-- color: hex code only
+- color: hex values only (`#F00`, `#0F08`, `#00FF00` or `#00FF0080`)
 - font-family
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
