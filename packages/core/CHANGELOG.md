@@ -1,6 +1,10 @@
+## 0.1.3
+
+* Fix bug stylings got lost during block rendering (#10)
+
 ## 0.1.2
 
-* Fix bug rendering overlapping elements with styling.
+* Fix bug rendering overlapping elements with styling (#11)
 * Expand CSS color hex values support
 
 ## 0.1.1

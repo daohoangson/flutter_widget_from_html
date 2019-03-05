@@ -1,3 +1,7 @@
+## 0.1.3
+
+* Update flutter_widget_from_html_core 0.1.3
+
 ## 0.1.2
 
 * Update flutter_widget_from_html_core 0.1.2
