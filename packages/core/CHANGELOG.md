@@ -1,3 +1,8 @@
+## 0.1.2
+
+* Fix bug rendering overlapping elements with styling.
+* Expand CSS color hex values support
+
 ## 0.1.1
 
 * Bug fixes
