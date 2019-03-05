@@ -96,7 +96,7 @@ class _Explainer {
       return s;
     }
 
-    if (style.color != parent.color) {
+    if (style.color != null) {
       s += _textStyleColor(style.color);
     }
 

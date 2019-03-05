@@ -195,6 +195,24 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
             '[RichText:(@7.5:This is heading 6)]]'));
   });
 
+  group('color (inline style)', () {
+    testWidgets('renders RGB hex value', (WidgetTester tester) async {
+      final html = '<span style="color: #FF0000">red</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(#FFFF0000:red)]'));
+    });
+
+    testWidgets('renders overlaps', (WidgetTester tester) async {
+      final html = '<span style="color: #FF0000">red ' +
+          '<span style="color: #00FF00">green</span> red again</span>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[RichText:(#FFFF0000:red ' +
+              '(#FF00FF00:green)(#FFFF0000: red again))]'));
+    });
+  });
+
   group('font-weight', () {
     testWidgets('renders B tag', (WidgetTester tester) async {
       final html = 'This is a <b>bold</b> text.';

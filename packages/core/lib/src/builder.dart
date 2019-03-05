@@ -184,10 +184,10 @@ class _BuiltPiece extends BuiltPiece {
   String get text => _texts.toString();
 
   @override
-  TextSpan get textSpan => _buildTextSpan();
+  TextSpan get textSpan => _getTextSpan();
 
   @override
-  TextSpan get textSpanTrimmedLeft => _buildTextSpan(trimLeft: true);
+  TextSpan get textSpanTrimmedLeft => _getTextSpan(trimLeft: true);
 
   void _addSpan(TextSpan span) {
     writeTextPrefixIfNeeded();
@@ -205,17 +205,20 @@ class _BuiltPiece extends BuiltPiece {
     }
   }
 
-  TextSpan _buildTextSpan({bool trimLeft = false}) {
+  TextSpan _buildTextSpan(String text, {List<TextSpan> children}) =>
+      b.wf.buildTextSpan(
+        text,
+        children: children,
+        style: style,
+        textSpaceCollapse: textSpaceCollapse,
+      );
+
+  TextSpan _getTextSpan({bool trimLeft = false}) {
     if (!hasText && style == null && _spans.length == 1) {
       return _spans[0];
     }
 
-    return b.wf.buildTextSpan(
-      trimLeft ? text.trimLeft() : text,
-      children: _spans,
-      style: style,
-      textSpaceCollapse: textSpaceCollapse,
-    );
+    return _buildTextSpan(trimLeft ? text.trimLeft() : text, children: _spans);
   }
 
   void _write(String text) {
@@ -224,7 +227,7 @@ class _BuiltPiece extends BuiltPiece {
     if (_spans == null) {
       _texts.write(text);
     } else {
-      _addSpan(b.wf.buildTextSpan(text));
+      _addSpan(_buildTextSpan(text));
     }
   }
 
