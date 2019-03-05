@@ -327,6 +327,14 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           equals('[Align:alignment=topRight,' +
               'child=[Text:imageUrl=image.png]]'));
     });
+
+    testWidgets('renders styling from outside', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/10
+      final html = '<em><span style="color: red;">' +
+          '<div style="text-align: right;">right</div></span></em>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText,align=right:(+i:right)]'));
+    });
   });
 
   group('text-decoration', () {

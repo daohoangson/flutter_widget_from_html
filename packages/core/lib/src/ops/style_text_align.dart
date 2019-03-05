@@ -10,28 +10,22 @@ class StyleTextAlign {
 
   StyleTextAlign(this.alignment, this.textAlign, this.wf);
 
-  Widget buildAlign(List<Widget> children) => Align(
-        alignment: alignment,
-        child: wf.buildColumn(children),
-      );
-
-  Widget buildTextWidgetWithTextAlign(text) =>
-      wf.buildTextWidget(text, textAlign: textAlign);
-
   List<BuiltPiece> onPieces(List<BuiltPiece> pieces) {
-    List<Widget> newWidgets = List();
+    final List<BuiltPiece> newPieces = List();
     for (final piece in pieces) {
-      if (piece.hasTextSpan) {
-        newWidgets.add(buildTextWidgetWithTextAlign(piece.textSpan));
-      } else if (piece.hasText) {
-        newWidgets.add(buildTextWidgetWithTextAlign(piece.text));
-      } else if (piece.hasWidgets) {
-        newWidgets.add(buildAlign(piece.widgets));
+      if (piece.hasWidgets) {
+        newPieces.add(BuiltPieceSimple(widgets: [
+          Align(
+            alignment: alignment,
+            child: wf.buildColumn(piece.widgets),
+          ),
+        ]));
+      } else {
+        piece.textAlign = textAlign;
+        newPieces.add(piece);
       }
     }
 
-    List<BuiltPiece> newPieces = List();
-    newPieces.add(BuiltPieceSimple(widgets: newWidgets));
     return newPieces;
   }
 

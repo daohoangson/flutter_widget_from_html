@@ -71,20 +71,22 @@ abstract class BuiltPiece {
   bool get hasTextSpan;
   bool get hasWidgets;
 
-  TextStyle get style;
   String get text;
+  TextAlign get textAlign;
   TextSpan get textSpan;
   TextSpan get textSpanTrimmedLeft;
   List<Widget> get widgets;
+
+  set textAlign(TextAlign textAlign);
 }
 
 class BuiltPieceSimple extends BuiltPiece {
-  final TextStyle style;
   final String text;
+  TextAlign textAlign;
   final TextSpan textSpan;
   final List<Widget> widgets;
 
-  BuiltPieceSimple({this.style, this.text, this.textSpan, this.widgets});
+  BuiltPieceSimple({this.text, this.textSpan, this.widgets});
 
   bool get hasText => text != null;
   bool get hasTextSpan => textSpan != null;

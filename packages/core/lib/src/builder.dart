@@ -22,17 +22,18 @@ class Builder {
   final NodeMetadata parentMeta;
   final WidgetFactory wf;
 
-  final TextStyle _parentStyle;
+  final _ParentStyle _parentStyle;
   _BuiltPiece _piece;
   final List<BuiltPiece> _pieces = List();
 
   Builder({
     @required this.domNodes,
     this.parentMeta,
-    TextStyle parentStyle,
+    _ParentStyle parentStyle,
     @required WidgetFactory widgetFactory,
   })  : wf = widgetFactory,
-        _parentStyle = parentStyle ?? widgetFactory.defaultTextStyle;
+        _parentStyle =
+            parentStyle ?? _ParentStyle(false, widgetFactory.defaultTextStyle);
 
   List<Widget> build() {
     List<Widget> widgets = List();
@@ -40,9 +41,15 @@ class Builder {
 
     for (final piece in process()) {
       if (piece.hasTextSpan) {
-        addWidgetIfNotNull(wf.buildTextWidget(piece.textSpanTrimmedLeft));
+        addWidgetIfNotNull(wf.buildTextWidget(
+          piece.textSpanTrimmedLeft,
+          textAlign: piece.textAlign,
+        ));
       } else if (piece.hasText) {
-        addWidgetIfNotNull(wf.buildTextWidget(piece.text));
+        addWidgetIfNotNull(wf.buildTextWidget(
+          piece.text,
+          textAlign: piece.textAlign,
+        ));
       } else if (piece.hasWidgets) {
         piece.widgets.forEach(addWidgetIfNotNull);
       }
@@ -95,11 +102,11 @@ class Builder {
         continue;
       }
 
-      final style = wf.buildTextStyle(meta, _parentStyle);
+      final style = wf.buildTextStyle(meta, _parentStyle.textStyle);
       final __builder = Builder(
         domNodes: domNode.nodes,
         parentMeta: meta,
-        parentStyle: style ?? _parentStyle,
+        parentStyle: style != null ? _ParentStyle(true, style) : _parentStyle,
         widgetFactory: wf,
       );
 
@@ -136,7 +143,7 @@ class Builder {
   void _newPiece() {
     _piece = _BuiltPiece(
       builder: this,
-      style: parentMeta?.hasStyling == true ? _parentStyle : null,
+      parentStyle: _parentStyle,
       textSpaceCollapse: parentMeta?.textSpaceCollapse,
     );
   }
@@ -153,19 +160,17 @@ class Builder {
 
 class _BuiltPiece extends BuiltPiece {
   final Builder b;
-  final TextStyle style;
-  final String textPrefix;
+  final _ParentStyle parentStyle;
+  TextAlign textAlign;
   final bool textSpaceCollapse;
   final List<Widget> widgets;
 
   final StringBuffer _texts;
   List<TextSpan> _spans;
-  bool _textPrefixWritten = false;
 
   _BuiltPiece({
     @required Builder builder,
-    this.style,
-    this.textPrefix,
+    this.parentStyle,
     this.textSpaceCollapse,
     this.widgets,
   })  : b = builder,
@@ -175,7 +180,7 @@ class _BuiltPiece extends BuiltPiece {
   bool get hasText => _texts?.isNotEmpty == true;
 
   @override
-  bool get hasTextSpan => style != null || _spans != null;
+  bool get hasTextSpan => parentStyle?.hasStyling == true || _spans != null;
 
   @override
   bool get hasWidgets => widgets != null;
@@ -190,8 +195,6 @@ class _BuiltPiece extends BuiltPiece {
   TextSpan get textSpanTrimmedLeft => _getTextSpan(trimLeft: true);
 
   void _addSpan(TextSpan span) {
-    writeTextPrefixIfNeeded();
-
     if (span == null) return;
     if (hasWidgets) throw ('Cannot add spans into piece with widgets');
     if (_spans == null) _spans = List();
@@ -209,12 +212,12 @@ class _BuiltPiece extends BuiltPiece {
       b.wf.buildTextSpan(
         text,
         children: children,
-        style: style,
+        style: parentStyle?.textStyle,
         textSpaceCollapse: textSpaceCollapse,
       );
 
   TextSpan _getTextSpan({bool trimLeft = false}) {
-    if (!hasText && style == null && _spans.length == 1) {
+    if (!hasText && parentStyle?.hasStyling != true && _spans?.length == 1) {
       return _spans[0];
     }
 
@@ -222,19 +225,17 @@ class _BuiltPiece extends BuiltPiece {
   }
 
   void _write(String text) {
-    writeTextPrefixIfNeeded();
-
     if (_spans == null) {
       _texts.write(text);
     } else {
       _addSpan(_buildTextSpan(text));
     }
   }
+}
 
-  void writeTextPrefixIfNeeded() {
-    if (textPrefix != null && !_textPrefixWritten) {
-      _textPrefixWritten = true;
-      _write(textPrefix);
-    }
-  }
+class _ParentStyle {
+  final bool hasStyling;
+  final TextStyle textStyle;
+
+  _ParentStyle(this.hasStyling, this.textStyle);
 }
