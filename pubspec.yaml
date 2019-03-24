@@ -8,7 +8,7 @@ environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
 
 dependencies:
-  cached_network_image: ^0.4.2
+  cached_network_image: ^0.7.0
   flutter:
     sdk: flutter
   flutter_widget_from_html_core: ^0.1.3
