@@ -7,8 +7,9 @@ import 'core_wf.dart';
 class HtmlWidget extends StatelessWidget {
   final String html;
   final WidgetFactoryBuilder wfBuilder;
+  final TextStyle style;
 
-  HtmlWidget(this.html, {Key key, this.wfBuilder}) : super(key: key);
+  HtmlWidget(this.html, {Key key, this.wfBuilder, this.style}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +20,10 @@ class HtmlWidget extends StatelessWidget {
       widgetFactory: wf,
     ).build();
 
-    return wf.buildColumn(widgets) ?? Text(html);
+    return DefaultTextStyle(
+      style: style,
+      child: wf.buildColumn(widgets) ?? Text(html),
+    );
   }
 }
 

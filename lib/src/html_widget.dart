@@ -13,9 +13,11 @@ class HtmlWidget extends core.HtmlWidget {
     this.config = const Config(),
     Key key,
     core.WidgetFactoryBuilder wfBuilder,
+    TextStyle style,
   }) : super(
           html,
           key: key,
           wfBuilder: wfBuilder ?? (context) => WidgetFactory(context, config),
+          style: style,
         );
 }
