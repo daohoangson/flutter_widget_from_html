@@ -20,10 +20,13 @@ class HtmlWidget extends StatelessWidget {
       widgetFactory: wf,
     ).build();
 
-    return DefaultTextStyle(
-      style: style,
-      child: wf.buildColumn(widgets) ?? Text(html),
-    );
+    final child = wf.buildColumn(widgets) ?? Text(html);
+    return style != null
+      ? DefaultTextStyle(
+          style: style,
+          child: child,
+        )
+      : child;
   }
 }
 
