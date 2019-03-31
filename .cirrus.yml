@@ -5,3 +5,4 @@ test_task:
   pub_cache:
     folder: ~/.pub-cache
   test_script: COVERAGE=1 ./tool/test.sh
+  codecov_script: bash <(curl -s https://codecov.io/bash)
