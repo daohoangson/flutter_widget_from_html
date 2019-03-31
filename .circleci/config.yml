@@ -1,9 +1,42 @@
+defaults: &defaults
+  docker:
+    - image: cirrusci/flutter
+  working_directory: ~/repo
+
 version: 2
 jobs:
-  build:
-    docker:
-      - image: cirrusci/flutter
+  checkout:
+    <<: *defaults
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/repo
+      - restore_cache:
+          keys:
+            - pub-cache-{{ .Branch }}-{{ checksum "pubspec.lock" }}
+            - pub-cache-{{ .Branch }}
+            - pub-cache
+      - run: npm ci
+      - save_cache:
+          key: pub-cache-{{ .Branch }}-{{ checksum "pubspec.lock" }}
+          paths:
+            - ~/.pub-cache
+      - persist_to_workspace:
+          root: .
+          paths: .
+  test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
       - run: COVERAGE=1 ./tool/test.sh
       - run: bash <(curl -s https://codecov.io/bash)
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - checkout
+      - test:
+          requires:
+            - checkout
