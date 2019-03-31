@@ -6,3 +6,4 @@ jobs:
     steps:
       - checkout
       - run: COVERAGE=1 ./tool/test.sh
+      - run: bash <(curl -s https://codecov.io/bash)
