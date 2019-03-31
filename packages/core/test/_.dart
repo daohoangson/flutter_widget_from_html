@@ -3,13 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
-class _WidgetFactory extends WidgetFactory {
-  _WidgetFactory(BuildContext context) : super(context);
-
-  @override
-  Widget buildImageWidgetFromUrl(String url) => Text("imageUrl=$url");
-}
-
 typedef String WidgetExplainer(Widget widget);
 
 Future<String> explain(WidgetTester tester, String html,
@@ -19,6 +12,14 @@ Future<String> explain(WidgetTester tester, String html,
   await tester.pumpWidget(
     StatefulBuilder(
       builder: (BuildContext context, StateSetter setState) {
+        precacheImage(
+          NetworkImage("image.png"),
+          context,
+          onError: (dynamic exception, StackTrace stackTrace) {
+            // this is required to avoid http 400 error for Image.network instances
+          },
+        );
+
         return MaterialApp(
           theme: ThemeData(
             accentColor: Color(0xFF0000FF),
@@ -30,11 +31,7 @@ Future<String> explain(WidgetTester tester, String html,
                     fontSize: 10.0,
                     fontWeight: FontWeight.normal,
                   ),
-              child: hw ??
-                  HtmlWidget(
-                    html,
-                    wfBuilder: (context) => _WidgetFactory(context),
-                  ),
+              child: hw ?? HtmlWidget(html),
             ),
           ),
         );
@@ -64,6 +61,12 @@ class _Explainer {
   String _edgeInsets(EdgeInsets e) =>
       "(${e.top.truncate()},${e.right.truncate()}," +
       "${e.bottom.truncate()},${e.left.truncate()})";
+
+  String _image(ImageProvider i) {
+    final type = i.runtimeType.toString();
+    final description = i is NetworkImage ? "url=${i.url}" : '';
+    return "[$type:$description]";
+  }
 
   String _textAlign(TextAlign textAlign) {
     switch (textAlign) {
@@ -179,7 +182,7 @@ class _Explainer {
             : widget is GestureDetector
                 ? "child=${_widget(widget.child)}"
                 : widget is Image
-                    ? "image=${widget.image.runtimeType}"
+                    ? "image=${_image(widget.image)}"
                     : widget is Padding
                         ? "${_edgeInsets(widget.padding)},"
                         : widget is RichText

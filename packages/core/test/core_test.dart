@@ -34,13 +34,13 @@ void main() {
     testWidgets('renders src', (WidgetTester tester) async {
       final html = '<img src="image.png" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:imageUrl=image.png]'));
+      expect(explained, equals('[Image:image=[NetworkImage:url=image.png]]'));
     });
 
     testWidgets('renders data-src', (WidgetTester tester) async {
       final html = '<img data-src="image.png" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:imageUrl=image.png]'));
+      expect(explained, equals('[Image:image=[NetworkImage:url=image.png]]'));
     });
 
     testWidgets('renders data uri', (WidgetTester tester) async {
@@ -48,7 +48,7 @@ void main() {
       final html = '<img src="data:image/gif;base64,' +
           'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Image:image=MemoryImage]'));
+      expect(explained, equals('[Image:image=[MemoryImage:]]'));
     });
 
     testWidgets('renders dimensions', (WidgetTester tester) async {
@@ -57,7 +57,7 @@ void main() {
       expect(
           explained,
           equals('[AspectRatio:aspectRatio=1.33,' +
-              'child=[Text:imageUrl=image.png]]'));
+              'child=[Image:image=[NetworkImage:url=image.png]]]'));
     });
 
     testWidgets('renders between texts', (WidgetTester tester) async {
@@ -66,7 +66,7 @@ void main() {
       expect(
           explained,
           equals('[Column:children=[Text:Before text.],' +
-              '[Text:imageUrl=image.png],' +
+              '[Image:image=[NetworkImage:url=image.png]],' +
               '[Text:After text.]]'));
     });
   });
@@ -307,7 +307,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(
           explained,
           equals('[Align:alignment=topCenter,' +
-              'child=[Text:imageUrl=image.png]]'));
+              'child=[Image:image=[NetworkImage:url=image.png]]]'));
     });
 
     testWidgets('renders left image', (WidgetTester tester) async {
@@ -316,7 +316,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(
           explained,
           equals('[Align:alignment=topLeft,' +
-              'child=[Text:imageUrl=image.png]]'));
+              'child=[Image:image=[NetworkImage:url=image.png]]]'));
     });
 
     testWidgets('renders right image', (WidgetTester tester) async {
@@ -325,7 +325,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(
           explained,
           equals('[Align:alignment=topRight,' +
-              'child=[Text:imageUrl=image.png]]'));
+              'child=[Image:image=[NetworkImage:url=image.png]]]'));
     });
 
     testWidgets('renders styling from outside', (WidgetTester tester) async {
@@ -376,7 +376,7 @@ First line.<br/>Second line.<br>Third line.
         explained,
         equals('[Column:children=[RichText:(@20.0:Header)],' +
             '[Text:First line.],[Text:Second line.],[Text:Third line.],' +
-            '[Text:imageUrl=image.png],' +
+            '[Image:image=[NetworkImage:url=image.png]],' +
             '[RichText:(:This (+b:setence)(: )(+i:has)(: )(+u:everything)(:.))]]'));
   });
 }
