@@ -13,12 +13,12 @@ jobs:
           at: ~/repo
       - restore_cache:
           keys:
-            - pub-cache-{{ .Branch }}-{{ checksum "pubspec.lock" }}
+            - pub-cache-{{ .Branch }}-{{ checksum "pubspec.yaml" }}-{{ checksum "packages/core/pubspec.yaml" }}
             - pub-cache-{{ .Branch }}
             - pub-cache
-      - run: npm ci
+      - run: flutter packages get
       - save_cache:
-          key: pub-cache-{{ .Branch }}-{{ checksum "pubspec.lock" }}
+          key: pub-cache-{{ .Branch }}-{{ checksum "pubspec.yaml" }}-{{ checksum "packages/core/pubspec.yaml" }}
           paths:
             - ~/.pub-cache
       - persist_to_workspace:
