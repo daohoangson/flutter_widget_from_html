@@ -5,5 +5,4 @@ jobs:
       - image: cirrusci/flutter
     steps:
       - checkout
-      - run: flutter doctor
       - run: COVERAGE=1 ./tool/test.sh
