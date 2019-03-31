@@ -1,7 +1,7 @@
 # Flutter Widget from HTML
 
 [![CircleCI](https://circleci.com/gh/daohoangson/flutter_widget_from_html.svg?style=svg)](https://circleci.com/gh/daohoangson/flutter_widget_from_html)
-[![Codecov](https://img.shields.io/codecov/c/github/daohoangson/flutter_widget_from_html.svg)](https://codecov.io/github/daohoangson/flutter_widget_from_html)
+[![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
 
 A Flutter plugin for building Flutter-widget tree from html.
 
