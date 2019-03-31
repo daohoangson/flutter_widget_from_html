@@ -28,14 +28,24 @@ void main() {
               '[RichText:(:This is a (#FF0000FF+u+onTap:hyperlink)(:.))]]'));
     });
 
-    testWidgets('renders inner stylings', (WidgetTester tester) async {
-      final html = 'This is a <a href="http://domain.com/href">' +
-          '<b><i>hyperlink</i></b></a>.';
+    testWidgets('renders inner text', (WidgetTester tester) async {
+      final html = '<a href="http://domain.com/href">Text</a>';
       final explained = await explain(tester, html);
       expect(
           explained,
           equals('[Padding:(5,10,5,10),child=' +
-              '[RichText:(:This is a (#FF0000FF+u+i+b+onTap:hyperlink)(:.))]]'));
+              '[RichText:(#FF0000FF+u+onTap:Text)]]'));
+    });
+
+    testWidgets('renders inner stylings', (WidgetTester tester) async {
+      final html = 'This is a <a href="http://domain.com/href">' +
+          '<b><i>hyperlink</i></b>.</a>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Padding:(5,10,5,10),child=' +
+              '[RichText:(:This is a (#FF0000FF+u+onTap:(#FF0000FF+u+i+b+onTap:hyperlink)' +
+              '(#FF0000FF+u+onTap:.)))]]'));
     });
 
     testWidgets('renders IMG tag inside', (WidgetTester tester) async {
