@@ -10,8 +10,10 @@ class _WidgetFactory extends WidgetFactory {
   Widget buildImageWidgetFromUrl(String url) => Text("imageUrl=$url");
 }
 
+typedef String WidgetExplainer(Widget widget);
+
 Future<String> explain(WidgetTester tester, String html,
-    {HtmlWidget hw}) async {
+    {HtmlWidget hw, WidgetExplainer explainer}) async {
   final key = new UniqueKey();
 
   await tester.pumpWidget(
@@ -43,17 +45,19 @@ Future<String> explain(WidgetTester tester, String html,
   final found = find.byKey(key).evaluate().first;
   expect(found.widget, isInstanceOf<DefaultTextStyle>());
 
-  final explainer = _Explainer(found);
+  final _ = _Explainer(found, explainer: explainer);
   final htmlWidget = (found.widget as DefaultTextStyle).child as HtmlWidget;
 
-  return explainer.explain(htmlWidget.build(found));
+  return _.explain(htmlWidget.build(found));
 }
 
 class _Explainer {
   final BuildContext context;
+  final WidgetExplainer explainer;
   final TextStyle _defaultStyle;
 
-  _Explainer(this.context) : _defaultStyle = DefaultTextStyle.of(context).style;
+  _Explainer(this.context, {this.explainer})
+      : _defaultStyle = DefaultTextStyle.of(context).style;
 
   String explain(Widget widget) => _widget(widget);
 
@@ -164,6 +168,9 @@ class _Explainer {
   }
 
   String _widget(Widget widget) {
+    final explained = this.explainer?.call(widget);
+    if (explained != null) return explained;
+
     final type = widget.runtimeType.toString();
     final text = widget is Align
         ? "alignment=${widget.alignment},"
