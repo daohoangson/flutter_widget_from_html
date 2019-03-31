@@ -23,8 +23,10 @@ jobs:
           paths:
             - ~/.pub-cache
       - persist_to_workspace:
-          root: .
-          paths: .
+          root: /home/cirrus
+          paths:
+            - .pub-cache
+            - repo
   test:
     <<: *defaults
     steps:
