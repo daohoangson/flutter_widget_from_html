@@ -1,0 +1,7 @@
+container:
+  image: cirrusci/flutter
+  
+test_task:
+  pub_cache:
+    folder: ~/.pub-cache
+  test_script: COVERAGE=1 ./tool/test.sh
