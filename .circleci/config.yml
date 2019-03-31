@@ -16,3 +16,9 @@ jobs:
           key: pub-cache-{{ .Branch }}-{{ checksum "pubspec.yaml" }}-{{ checksum "packages/core/pubspec.yaml" }}
           paths:
             - ~/.pub-cache
+
+workflows:
+  version: 2
+  workflow:
+    jobs:
+    - test
