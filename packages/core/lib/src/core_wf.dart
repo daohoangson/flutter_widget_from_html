@@ -15,8 +15,6 @@ class WidgetFactory {
 
   const WidgetFactory(this.context);
 
-  TextStyle get defaultTextStyle => DefaultTextStyle.of(context).style;
-
   Widget buildColumn(List<Widget> children) => children?.isNotEmpty == true
       ? children?.length == 1
           ? children.first
@@ -130,7 +128,7 @@ class WidgetFactory {
     } else {
       span = TextSpan(
         children: children,
-        style: style ?? defaultTextStyle,
+        style: style,
         text: text,
       );
     }

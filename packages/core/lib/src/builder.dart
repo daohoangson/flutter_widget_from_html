@@ -32,8 +32,11 @@ class Builder {
     _ParentStyle parentStyle,
     @required WidgetFactory widgetFactory,
   })  : wf = widgetFactory,
-        _parentStyle =
-            parentStyle ?? _ParentStyle(false, widgetFactory.defaultTextStyle);
+        _parentStyle = parentStyle ??
+            _ParentStyle(
+              false,
+              DefaultTextStyle.of(widgetFactory.context).style,
+            );
 
   List<Widget> build() {
     List<Widget> widgets = List();
