@@ -339,26 +339,39 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 
   group('text-decoration', () {
     testWidgets('renders line-through', (WidgetTester tester) async {
-      final html =
-          'This is a <span style="text-decoration: line-through">bad</span> good text.';
+      final html = '<span style="text-decoration: line-through">line</span>';
       final explained = await explain(tester, html);
-      expect(
-          explained, equals('[RichText:(:This is a (+l:bad)(: good text.))]'));
+      expect(explained, equals('[RichText:(+l:line)]'));
     });
 
     testWidgets('renders overline', (WidgetTester tester) async {
-      final html =
-          'This is <span style="text-decoration: overline">some</span> text.';
+      final html = '<span style="text-decoration: overline">over</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:This is (+o:some)(: text.))]'));
+      expect(explained, equals('[RichText:(+o:over)]'));
     });
 
     testWidgets('renders underline', (WidgetTester tester) async {
-      final html =
-          'This is an <span style="text-decoration: underline">important</span> text.';
+      final html = '<span style="text-decoration: underline">under</span>';
       final explained = await explain(tester, html);
-      expect(explained,
-          equals('[RichText:(:This is an (+u:important)(: text.))]'));
+      expect(explained, equals('[RichText:(+u:under)]'));
+    });
+
+    testWidgets('renders all', (WidgetTester tester) async {
+      final html = '<span style="text-decoration: line-through">' +
+          '<span style="text-decoration: overline">' +
+          '<span style="text-decoration: underline">' +
+          'foo bar</span></span></span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+l+o+u:foo bar)]'));
+    });
+
+    testWidgets('skips rendering', (WidgetTester tester) async {
+      final html = '<span style="text-decoration: line-through">' +
+          '<span style="text-decoration: overline">' +
+          '<span style="text-decoration: underline">' +
+          'foo <span style="text-decoration: none">bar</span></span></span></span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+l+o+u:foo (:bar))]'));
     });
   });
 

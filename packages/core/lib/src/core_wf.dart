@@ -85,7 +85,7 @@ class WidgetFactory {
       );
 
   TextDecoration buildTextDecoration(NodeMetadata meta, TextStyle parent) {
-    if (meta?.hasDecoration != true) return null;
+    if (meta.hasDecoration != true) return null;
 
     final pd = parent.decoration;
     final pdLineThough = pd?.contains(TextDecoration.lineThrough) == true;
