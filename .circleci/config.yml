@@ -17,6 +17,7 @@ jobs:
             - pub-cache-{{ .Branch }}
             - pub-cache
       - run: flutter packages get
+      - run: ls ~/.pub-cache/hosted/pub.dartlang.org/
       - save_cache:
           key: pub-cache-{{ .Branch }}-{{ checksum "pubspec.yaml" }}-{{ checksum "packages/core/pubspec.yaml" }}
           paths:
