@@ -1,5 +1,8 @@
 # Flutter Widget from HTML
 
+[![CircleCI](https://circleci.com/gh/daohoangson/flutter_widget_from_html.svg?style=svg)](https://circleci.com/gh/daohoangson/flutter_widget_from_html)
+[![Codecov](https://img.shields.io/codecov/c/github/daohoangson/flutter_widget_from_html.svg)](https://codecov.io/github/daohoangson/flutter_widget_from_html)
+
 A Flutter plugin for building Flutter-widget tree from html.
 
 This package extends the [`flutter_widget_from_html_core`](https://pub.dartlang.org/packages/flutter_widget_from_html_core) package with extra functionalities by using external depedencies like `cached_network_image` or `url_launcher`. It should be good enough as a quick starting point but you can always use the `core` directly if you dislike the dependencies.
