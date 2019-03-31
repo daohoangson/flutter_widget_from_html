@@ -1,46 +1,18 @@
-defaults: &defaults
-  docker:
-    - image: cirrusci/flutter
-  working_directory: ~/repo
-
 version: 2
 jobs:
-  checkout:
-    <<: *defaults
+  test:
+    docker:
+      - image: cirrusci/flutter
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/repo
       - restore_cache:
           keys:
             - pub-cache-{{ .Branch }}-{{ checksum "pubspec.yaml" }}-{{ checksum "packages/core/pubspec.yaml" }}
             - pub-cache-{{ .Branch }}
             - pub-cache
-      - run: flutter packages get
-      - run: ls -al ~/.pub-cache/hosted/pub.dartlang.org/
+      - run: COVERAGE=1 ./tool/test.sh
+      - run: bash <(curl -s https://codecov.io/bash)
       - save_cache:
           key: pub-cache-{{ .Branch }}-{{ checksum "pubspec.yaml" }}-{{ checksum "packages/core/pubspec.yaml" }}
           paths:
             - ~/.pub-cache
-      - persist_to_workspace:
-          root: /home/cirrus
-          paths:
-            - .pub-cache
-            - repo
-  test:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/repo
-      - run: ls -al ~/.pub-cache/hosted/pub.dartlang.org/
-      - run: COVERAGE=1 ./tool/test.sh
-      - run: bash <(curl -s https://codecov.io/bash)
-
-workflows:
-  version: 2
-  test:
-    jobs:
-      - checkout
-      - test:
-          requires:
-            - checkout
