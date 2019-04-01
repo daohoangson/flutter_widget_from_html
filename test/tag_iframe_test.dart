@@ -26,6 +26,17 @@ void main() {
             'child=[WebView:http://domain.com]]]'));
   });
 
+  testWidgets('renders web view with specified ratio',
+      (WidgetTester tester) async {
+    final html = '<iframe src="http://domain.com" ' +
+        'width="400" height="300"></iframe>';
+    final explained = await explain(tester, html, config: configWithWebView);
+    expect(
+        explained,
+        equals('[Padding:(5,0,5,0),child=[AspectRatio:aspectRatio=1.33,' +
+            'child=[WebView:http://domain.com]]]'));
+  });
+
   group('errors', () {
     testWidgets('no src', (WidgetTester tester) async {
       final html = '<iframe></iframe>';
