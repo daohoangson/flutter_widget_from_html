@@ -48,7 +48,8 @@ class HelloWorldScreen extends StatelessWidget {
 
 ### HTML tags
 
-Below tags are the ones that have special meaning / styling, all other tag will be parsed as text. Note: all texts are rendered with padding (`Config.textPadding`).
+Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
+All texts will be rendered with padding (`Config.textPadding`).
 
 - A: underline with theme accent color, launch url via [`url_launcher`](https://pub.dartlang.org/packages/url_launcher), support base url resolver
 - B
@@ -58,12 +59,22 @@ Below tags are the ones that have special meaning / styling, all other tag will 
 - EM
 - H1/H2/H3/H4/H5/H6
 - I
+- IFRAME via [`WebView`](https://pub.dartlang.org/packages/webview_flutter). Available configurations:
+  - `Config.webView`, default=false
+  - `Config.webViewJs`, default=true
+  - `Config.webViewPadding`
+  - To render IFRAME as web view: set `webView=true` in config and [setup iOS project manually](https://pub.dartlang.org/packages/webview_flutter#ios).
 - IMG via [`CachedNetworkImage`](https://pub.dartlang.org/packages/cached_network_image) with padding (`Config.imagePadding`), support base url resolver
 - LI/OL/UL with marker and padding (`Config.listBullet`, `Config.listPaddingLeft`)
 - P
 - PRE
 - STRONG
 - U
+
+These tags and their contents will be ignored:
+
+- SCRIPT
+- STYLE
 
 ### Inline stylings
 
