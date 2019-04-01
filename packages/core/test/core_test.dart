@@ -374,22 +374,4 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(explained, equals('[RichText:(+l+o+u:foo (:bar))]'));
     });
   });
-
-  testWidgets('a little bit of everything', (WidgetTester tester) async {
-    final html = """<h1>Header</h1>
-
-First line.<br/>Second line.<br>Third line.
-
-<div><img src="image.png" /></div>
-
-<p>This <b>setence</b> <em>has</em> <span style="text-decoration: underline">everything</span>.</p>
-""";
-    final explained = await explain(tester, html);
-    expect(
-        explained,
-        equals('[Column:children=[RichText:(@20.0:Header)],' +
-            '[Text:First line.],[Text:Second line.],[Text:Third line.],' +
-            '[Image:image=[NetworkImage:url=image.png]],' +
-            '[RichText:(:This (+b:setence)(: )(+i:has)(: )(+u:everything)(:.))]]'));
-  });
 }
