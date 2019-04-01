@@ -14,19 +14,20 @@ class TagIframe {
 
   Widget build(dom.Element e) {
     final a = e.attributes;
-    if (!a.containsKey('src')) {
-      return null;
-    }
+    if (!a.containsKey('src')) return null;
 
     final config = wf.config;
     final src = buildFullUrl(a['src'], config.baseUrl);
+    if (src == null) return null;
 
     if (!config.webView) {
-      final tagA = TagA(src, wf, icon: false);
-      final pieces = tagA.onPieces(<BuiltPiece>[
-        BuiltPieceSimple(widgets: <Widget>[wf.buildTextWidget(src)]),
-      ]);
-      return pieces.first?.widgets?.first;
+      return TagA(src, wf, icon: false)
+          .onPieces(<BuiltPiece>[
+            BuiltPieceSimple(widgets: <Widget>[wf.buildTextWidget(src)]),
+          ])
+          .first
+          ?.widgets
+          ?.first;
     }
 
     var width = 16.0;

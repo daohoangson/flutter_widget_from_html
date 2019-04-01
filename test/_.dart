@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import '../packages/core/test/_.dart' as _coreTesting;
 
@@ -9,6 +10,11 @@ String _explainer(Widget widget) {
   if (widget is CachedNetworkImage) {
     return "[CachedNetworkImage:${widget.imageUrl}]";
   }
+
+  if (widget is WebView) {
+    return "[WebView:${widget.initialUrl}]";
+  }
+
   return null;
 }
 
