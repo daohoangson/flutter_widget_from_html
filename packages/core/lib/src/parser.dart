@@ -4,6 +4,7 @@ import 'package:html/dom.dart' as dom;
 import 'metadata.dart';
 
 part 'parser/_margin.dart';
+part 'parser/_unit.dart';
 
 final _spacingRegExp = RegExp(r'\s+');
 final _styleColorRegExp = RegExp(r'^#([a-f0-9]{3,8})$', caseSensitive: false);
@@ -120,6 +121,10 @@ NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
 
     case 'font-family':
       meta = lazySet(meta, fontFamily: value);
+      break;
+
+    case 'font-size':
+      meta = lazySet(meta, fontSize: _unitParseValue(value));
       break;
 
     case 'font-style':

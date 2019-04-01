@@ -65,8 +65,10 @@ Below tags are the ones that have special meaning / styling, all other tag will 
 
 - color: hex values only (`#F00`, `#0F08`, `#00FF00` or `#00FF0080`)
 - font-family
+- font-size (value in px only)
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
+- margin, margin-top, margin-right, margin-bottom, margin-left (values in px only)
 - text-align: center/justify/left/right
 - text-decoration: line-through/none/overline/underline
 

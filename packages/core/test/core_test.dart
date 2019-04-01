@@ -225,6 +225,41 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     expect(explained, equals('[RichText:(+font=Monospace:Foo)]'));
   });
 
+  testWidgets('renders font-size inline style', (WidgetTester tester) async {
+    final html = '<span style="font-size: 100px">Foo</span>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[RichText:(@100.0:Foo)]'));
+  });
+
+  group('font-style', () {
+    testWidgets('renders I tag', (WidgetTester tester) async {
+      final html = 'This is an <i>italic</i> text.';
+      final explained = await explain(tester, html);
+      expect(
+          explained, equals('[RichText:(:This is an (+i:italic)(: text.))]'));
+    });
+
+    testWidgets('renders EM tag', (WidgetTester tester) async {
+      final html = 'This is an <em>emphasized</em> text.';
+      final explained = await explain(tester, html);
+      expect(explained,
+          equals('[RichText:(:This is an (+i:emphasized)(: text.))]'));
+    });
+
+    testWidgets('renders inline style: italic', (WidgetTester tester) async {
+      final html = '<span style="font-style: italic">Italic text</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+i:Italic text)]'));
+    });
+
+    testWidgets('renders inline style: normal', (WidgetTester tester) async {
+      final html = '<span style="font-style: italic">Italic ' +
+          '<span style="font-style: normal">normal</span></span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+i:Italic (-i:normal))]'));
+    });
+  });
+
   group('font-weight', () {
     testWidgets('renders B tag', (WidgetTester tester) async {
       final html = 'This is a <b>bold</b> text.';
@@ -255,35 +290,6 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           explained,
           equals('[RichText:(:(+b:bold)(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: )(:four)(: )' +
               '(+w4:five)(: )(+w5:six)(: )(+b:seven)(: )(+w7:eight)(: )(+w8:nine))]'));
-    });
-  });
-
-  group('font-style', () {
-    testWidgets('renders I tag', (WidgetTester tester) async {
-      final html = 'This is an <i>italic</i> text.';
-      final explained = await explain(tester, html);
-      expect(
-          explained, equals('[RichText:(:This is an (+i:italic)(: text.))]'));
-    });
-
-    testWidgets('renders EM tag', (WidgetTester tester) async {
-      final html = 'This is an <em>emphasized</em> text.';
-      final explained = await explain(tester, html);
-      expect(explained,
-          equals('[RichText:(:This is an (+i:emphasized)(: text.))]'));
-    });
-
-    testWidgets('renders inline style: italic', (WidgetTester tester) async {
-      final html = '<span style="font-style: italic">Italic text</span>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(+i:Italic text)]'));
-    });
-
-    testWidgets('renders inline style: normal', (WidgetTester tester) async {
-      final html = '<span style="font-style: italic">Italic ' +
-          '<span style="font-style: normal">normal</span></span>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(+i:Italic (-i:normal))]'));
     });
   });
 
