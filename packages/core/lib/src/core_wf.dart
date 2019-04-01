@@ -21,7 +21,6 @@ class WidgetFactory {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: children,
-              key: UniqueKey(),
             )
       : null;
 

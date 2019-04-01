@@ -54,6 +54,7 @@ class _State extends State<IframeScreen> {
               webView: webView,
               webViewJs: webViewJs,
             ),
+            key: Key("$webView$webViewJs"),
           ),
         ]),
       );
