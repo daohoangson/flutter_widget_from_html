@@ -2,6 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/daohoangson/flutter_widget_from_html.svg?style=svg)](https://circleci.com/gh/daohoangson/flutter_widget_from_html)
 [![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
+[![Pub](https://img.shields.io/pub/v/flutter_widget_from_html.svg)](https://pub.dartlang.org/packages/flutter_widget_from_html)
 
 A Flutter plugin for building Flutter-widget tree from html.
 
@@ -45,10 +46,36 @@ class HelloWorldScreen extends StatelessWidget {
 
 ## Features
 
-This package has all the features of [`flutter_widget_from_html_core`](https://pub.dartlang.org/packages/flutter_widget_from_html_core) and some nice extras:
+### HTML tags
 
-- Renders A tag with theme accent color, launch url via [`url_launcher`](https://pub.dartlang.org/packages/url_launcher)
-- Renders IMG tag with [`CachedNetworkImage`](https://pub.dartlang.org/packages/cached_network_image) and padding (`Config.imagePadding`)
-- Renders lists (OL/UL) with marker and padding (`Config.listBullet`, `Config.listPaddingLeft`)
-- Renders texts with padding (`Config.textPadding`)
-- Supports relative url (A href, IMG src)
+Below tags are the ones that have special meaning / styling, all other tag will be parsed as text. Note: all texts are rendered with padding (`Config.textPadding`).
+
+- A: underline with theme accent color, launch url via [`url_launcher`](https://pub.dartlang.org/packages/url_launcher), support base url resolver
+- B
+- BR
+- CODE
+- DIV
+- EM
+- H1/H2/H3/H4/H5/H6
+- I
+- IMG via [`CachedNetworkImage`](https://pub.dartlang.org/packages/cached_network_image) with padding (`Config.imagePadding`), support base url resolver
+- LI/OL/UL with marker and padding (`Config.listBullet`, `Config.listPaddingLeft`)
+- P
+- PRE
+- STRONG
+- U
+
+### Inline stylings
+
+- color: hex values only (`#F00`, `#0F08`, `#00FF00` or `#00FF0080`)
+- font-family
+- font-size (value in px only)
+- font-style: italic/normal
+- font-weight: bold/normal/100..900
+- margin, margin-top, margin-right, margin-bottom, margin-left (values in px only)
+- text-align: center/justify/left/right
+- text-decoration: line-through/none/overline/underline
+
+## Extensibility
+
+See [flutter_widget_from_html_core](https://pub.dartlang.org/packages/flutter_widget_from_html_core#extensibility) for details.

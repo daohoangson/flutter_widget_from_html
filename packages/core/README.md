@@ -2,6 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/daohoangson/flutter_widget_from_html.svg?style=svg)](https://circleci.com/gh/daohoangson/flutter_widget_from_html)
 [![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
+[![Pub](https://img.shields.io/pub/v/flutter_widget_from_html_core.svg)](https://pub.dartlang.org/packages/flutter_widget_from_html_core)
 
 A Flutter plugin for building Flutter-widget tree from html.
 
@@ -74,7 +75,7 @@ Below tags are the ones that have special meaning / styling, all other tag will 
 
 ## Extensibility
 
-As previously mentioned, this package focuses on the core parsing-building routine with lots of tests to make sure it works correctly. If the [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) package does not suite your need or you don't like any of the dependencies included in that package, it's time to extend `flutter_widget_from_html_core` and make it work for you.
+As previously mentioned, this package focuses on the core parsing-building routine with lots of tests to make sure it works correctly. If the [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) package does not suite your need or you don't like any of the dependencies included in that package, it's time to extend `flutter_widget_from_html_core`.
 
 Here is how it works:
 
