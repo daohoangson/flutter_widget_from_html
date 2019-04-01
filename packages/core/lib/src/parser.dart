@@ -168,16 +168,16 @@ NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
       }
       break;
 
-    case 'margin':
+    case _kMargin:
       final margin = _marginParseAll(value);
       if (margin != null) {
         meta = lazySet(meta, margin: margin);
       }
       break;
-    case 'margin-bottom':
-    case 'margin-left':
-    case 'margin-right':
-    case 'margin-top':
+    case _kMarginBottom:
+    case _kMarginLeft:
+    case _kMarginRight:
+    case _kMarginTop:
       final margin = _marginParseOne(meta, key, value);
       if (margin != null) {
         meta = lazySet(meta, margin: margin);

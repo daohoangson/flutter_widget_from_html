@@ -56,4 +56,16 @@ void main() {
     final explained = await explain(tester, html);
     expect(explained, equals('[Padding:(0,0,0,3),child=[Text:Foo]]'));
   });
+
+  testWidgets('handles invalid value', (WidgetTester tester) async {
+    final html = '<div style="margin: xxx">Foo</div>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[Text:Foo]'));
+  });
+
+  testWidgets('handles invalid value for margin-top', (WidgetTester tester) async {
+    final html = '<div style="margin-top: xxx">Foo</div>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[Text:Foo]'));
+  });
 }

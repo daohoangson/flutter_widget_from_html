@@ -1,5 +1,11 @@
 part of '../parser.dart';
 
+const _kMargin = "margin";
+const _kMarginBottom = "margin-bottom";
+const _kMarginLeft = "margin-left";
+const _kMarginRight = "margin-right";
+const _kMarginTop = "margin-top";
+
 final _kMarginValuesFourRegex =
     RegExp(r'^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)$');
 final _kMarginValuesTwoRegex = RegExp(r'^([^\s]+)\s+([^\s]+)$');
@@ -36,16 +42,14 @@ EdgeInsetsGeometry _marginParseOne(
   final existing = meta.margin ?? EdgeInsets.all(0);
 
   switch (key) {
-    case 'margin-bottom':
+    case _kMarginBottom:
       return existing.add(EdgeInsets.only(bottom: parsed));
-    case 'margin-left':
+    case _kMarginLeft:
       return existing.add(EdgeInsets.only(left: parsed));
-    case 'margin-right':
+    case _kMarginRight:
       return existing.add(EdgeInsets.only(right: parsed));
-    case 'margin-top':
-      return existing.add(EdgeInsets.only(top: parsed));
     default:
-      return meta.margin;
+      return existing.add(EdgeInsets.only(top: parsed));
   }
 }
 
