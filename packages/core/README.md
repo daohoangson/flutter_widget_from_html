@@ -1,5 +1,8 @@
 # Flutter Widget from HTML (core)
 
+[![CircleCI](https://circleci.com/gh/daohoangson/flutter_widget_from_html.svg?style=svg)](https://circleci.com/gh/daohoangson/flutter_widget_from_html)
+[![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
+
 A Flutter plugin for building Flutter-widget tree from html.
 
 This `core` package implements html parsing and widget building logic so it's easy to extend and fit your app's use case. It tries to render an optimal tree: use `Text` instead of `RichText` as much as possible, merge text spans together, show images in `AspectRatio`, etc.
@@ -62,8 +65,10 @@ Below tags are the ones that have special meaning / styling, all other tag will 
 
 - color: hex values only (`#F00`, `#0F08`, `#00FF00` or `#00FF0080`)
 - font-family
+- font-size (value in px only)
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
+- margin, margin-top, margin-right, margin-bottom, margin-left (values in px only)
 - text-align: center/justify/left/right
 - text-decoration: line-through/none/overline/underline
 

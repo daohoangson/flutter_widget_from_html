@@ -15,6 +15,17 @@ class HomeScreen extends StatelessWidget {
 <p><em>EM</em>, <i>I</i> or <span style="font-style: italic">inline style</span></p>
 <p><u>U</u> or <span style="text-decoration: underline">inline style</span></p>
 <p><span style="color: #ff0000">Red</span>, <span style="color: #00ff00">green</span>, <span style="color: #0000ff">blue</span></p>
+
+<p>
+  <span style="text-decoration: line-through">
+    <span style="text-decoration: overline">
+      <span style="text-decoration: underline">
+        All decorations...
+        <span style="text-decoration: none">and none</span>
+      </span>
+    </span>
+  </span>
+</p>
 """,
     'Alignments': """<div style="text-align: left">Left</div>
 <div style="text-align: center">Center</div>

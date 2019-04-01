@@ -32,8 +32,11 @@ class Builder {
     _ParentStyle parentStyle,
     @required WidgetFactory widgetFactory,
   })  : wf = widgetFactory,
-        _parentStyle =
-            parentStyle ?? _ParentStyle(false, widgetFactory.defaultTextStyle);
+        _parentStyle = parentStyle ??
+            _ParentStyle(
+              false,
+              DefaultTextStyle.of(widgetFactory.context).style,
+            );
 
   List<Widget> build() {
     List<Widget> widgets = List();
@@ -199,13 +202,7 @@ class _BuiltPiece extends BuiltPiece {
     if (hasWidgets) throw ('Cannot add spans into piece with widgets');
     if (_spans == null) _spans = List();
 
-    if (span.style != null || span.text?.isNotEmpty != false) {
-      _spans.add(span);
-    } else if (span.children != null) {
-      for (final subSpan in span.children) {
-        _spans.add(subSpan);
-      }
-    }
+    _spans.add(span);
   }
 
   TextSpan _buildTextSpan(String text, {List<TextSpan> children}) =>

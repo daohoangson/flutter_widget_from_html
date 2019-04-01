@@ -3,20 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
-class _WidgetFactory extends WidgetFactory {
-  _WidgetFactory(BuildContext context) : super(context);
-
-  @override
-  Widget buildImageWidgetFromUrl(String url) => Text("imageUrl=$url");
-}
+typedef String WidgetExplainer(Widget widget);
 
 Future<String> explain(WidgetTester tester, String html,
-    {HtmlWidget hw}) async {
+    {HtmlWidget hw, WidgetExplainer explainer}) async {
   final key = new UniqueKey();
 
   await tester.pumpWidget(
     StatefulBuilder(
       builder: (BuildContext context, StateSetter setState) {
+        precacheImage(
+          NetworkImage("image.png"),
+          context,
+          onError: (dynamic exception, StackTrace stackTrace) {
+            // this is required to avoid http 400 error for Image.network instances
+          },
+        );
+
         return MaterialApp(
           theme: ThemeData(
             accentColor: Color(0xFF0000FF),
@@ -28,11 +31,7 @@ Future<String> explain(WidgetTester tester, String html,
                     fontSize: 10.0,
                     fontWeight: FontWeight.normal,
                   ),
-              child: hw ??
-                  HtmlWidget(
-                    html,
-                    wfBuilder: (context) => _WidgetFactory(context),
-                  ),
+              child: hw ?? HtmlWidget(html),
             ),
           ),
         );
@@ -43,23 +42,31 @@ Future<String> explain(WidgetTester tester, String html,
   final found = find.byKey(key).evaluate().first;
   expect(found.widget, isInstanceOf<DefaultTextStyle>());
 
-  final explainer = _Explainer(found);
+  final _ = _Explainer(found, explainer: explainer);
   final htmlWidget = (found.widget as DefaultTextStyle).child as HtmlWidget;
 
-  return explainer.explain(htmlWidget.build(found));
+  return _.explain(htmlWidget.build(found));
 }
 
 class _Explainer {
   final BuildContext context;
+  final WidgetExplainer explainer;
   final TextStyle _defaultStyle;
 
-  _Explainer(this.context) : _defaultStyle = DefaultTextStyle.of(context).style;
+  _Explainer(this.context, {this.explainer})
+      : _defaultStyle = DefaultTextStyle.of(context).style;
 
   String explain(Widget widget) => _widget(widget);
 
   String _edgeInsets(EdgeInsets e) =>
       "(${e.top.truncate()},${e.right.truncate()}," +
       "${e.bottom.truncate()},${e.left.truncate()})";
+
+  String _image(ImageProvider i) {
+    final type = i.runtimeType.toString();
+    final description = i is NetworkImage ? "url=${i.url}" : '';
+    return "[$type:$description]";
+  }
 
   String _textAlign(TextAlign textAlign) {
     switch (textAlign) {
@@ -164,6 +171,9 @@ class _Explainer {
   }
 
   String _widget(Widget widget) {
+    final explained = this.explainer?.call(widget);
+    if (explained != null) return explained;
+
     final type = widget.runtimeType.toString();
     final text = widget is Align
         ? "alignment=${widget.alignment},"
@@ -172,7 +182,7 @@ class _Explainer {
             : widget is GestureDetector
                 ? "child=${_widget(widget.child)}"
                 : widget is Image
-                    ? "image=${widget.image.runtimeType}"
+                    ? "image=${_image(widget.image)}"
                     : widget is Padding
                         ? "${_edgeInsets(widget.padding)},"
                         : widget is RichText

@@ -34,13 +34,13 @@ void main() {
     testWidgets('renders src', (WidgetTester tester) async {
       final html = '<img src="image.png" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:imageUrl=image.png]'));
+      expect(explained, equals('[Image:image=[NetworkImage:url=image.png]]'));
     });
 
     testWidgets('renders data-src', (WidgetTester tester) async {
       final html = '<img data-src="image.png" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:imageUrl=image.png]'));
+      expect(explained, equals('[Image:image=[NetworkImage:url=image.png]]'));
     });
 
     testWidgets('renders data uri', (WidgetTester tester) async {
@@ -48,7 +48,7 @@ void main() {
       final html = '<img src="data:image/gif;base64,' +
           'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Image:image=MemoryImage]'));
+      expect(explained, equals('[Image:image=[MemoryImage:]]'));
     });
 
     testWidgets('renders dimensions', (WidgetTester tester) async {
@@ -57,7 +57,7 @@ void main() {
       expect(
           explained,
           equals('[AspectRatio:aspectRatio=1.33,' +
-              'child=[Text:imageUrl=image.png]]'));
+              'child=[Image:image=[NetworkImage:url=image.png]]]'));
     });
 
     testWidgets('renders between texts', (WidgetTester tester) async {
@@ -66,7 +66,7 @@ void main() {
       expect(
           explained,
           equals('[Column:children=[Text:Before text.],' +
-              '[Text:imageUrl=image.png],' +
+              '[Image:image=[NetworkImage:url=image.png]],' +
               '[Text:After text.]]'));
     });
   });
@@ -219,36 +219,16 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     });
   });
 
-  group('font-weight', () {
-    testWidgets('renders B tag', (WidgetTester tester) async {
-      final html = 'This is a <b>bold</b> text.';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:This is a (+b:bold)(: text.))]'));
-    });
+  testWidgets('renders font-family inline style', (WidgetTester tester) async {
+    final html = '<span style="font-family: Monospace">Foo</span>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[RichText:(+font=Monospace:Foo)]'));
+  });
 
-    testWidgets('renders STRONG tag', (WidgetTester tester) async {
-      final html = 'This is a <strong>strong</strong> text.';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:This is a (+b:strong)(: text.))]'));
-    });
-
-    testWidgets('renders font-weight inline style',
-        (WidgetTester tester) async {
-      final html = """<span style="font-weight: 100">one</span>
-<span style="font-weight: 200">two</span>
-<span style="font-weight: 300">three</span>
-<span style="font-weight: 400">four</span>
-<span style="font-weight: 500">five</span>
-<span style="font-weight: 600">six</span>
-<span style="font-weight: 700">seven</span>
-<span style="font-weight: 800">eight</span>
-<span style="font-weight: 900">nine</span>""";
-      final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[RichText:(:(+w0:one)(: )(+w1:two)(: )(+w2:three)(: )(:four)(: )' +
-              '(+w4:five)(: )(+w5:six)(: )(+b:seven)(: )(+w7:eight)(: )(+w8:nine))]'));
-    });
+  testWidgets('renders font-size inline style', (WidgetTester tester) async {
+    final html = '<span style="font-size: 100px">Foo</span>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[RichText:(@100.0:Foo)]'));
   });
 
   group('font-style', () {
@@ -266,12 +246,50 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           equals('[RichText:(:This is an (+i:emphasized)(: text.))]'));
     });
 
-    testWidgets('renders font-style inline style', (WidgetTester tester) async {
-      final html =
-          "This is an <span style=\"font-style: italic\">inlined</span> text.";
+    testWidgets('renders inline style: italic', (WidgetTester tester) async {
+      final html = '<span style="font-style: italic">Italic text</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+i:Italic text)]'));
+    });
+
+    testWidgets('renders inline style: normal', (WidgetTester tester) async {
+      final html = '<span style="font-style: italic">Italic ' +
+          '<span style="font-style: normal">normal</span></span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+i:Italic (-i:normal))]'));
+    });
+  });
+
+  group('font-weight', () {
+    testWidgets('renders B tag', (WidgetTester tester) async {
+      final html = 'This is a <b>bold</b> text.';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:This is a (+b:bold)(: text.))]'));
+    });
+
+    testWidgets('renders STRONG tag', (WidgetTester tester) async {
+      final html = 'This is a <strong>strong</strong> text.';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:This is a (+b:strong)(: text.))]'));
+    });
+
+    testWidgets('renders font-weight inline style',
+        (WidgetTester tester) async {
+      final html = """<span style="font-weight: bold">bold</span>
+<span style="font-weight: 100">one</span>
+<span style="font-weight: 200">two</span>
+<span style="font-weight: 300">three</span>
+<span style="font-weight: 400">four</span>
+<span style="font-weight: 500">five</span>
+<span style="font-weight: 600">six</span>
+<span style="font-weight: 700">seven</span>
+<span style="font-weight: 800">eight</span>
+<span style="font-weight: 900">nine</span>""";
       final explained = await explain(tester, html);
       expect(
-          explained, equals('[RichText:(:This is an (+i:inlined)(: text.))]'));
+          explained,
+          equals('[RichText:(:(+b:bold)(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: )(:four)(: )' +
+              '(+w4:five)(: )(+w5:six)(: )(+b:seven)(: )(+w7:eight)(: )(+w8:nine))]'));
     });
   });
 
@@ -307,7 +325,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(
           explained,
           equals('[Align:alignment=topCenter,' +
-              'child=[Text:imageUrl=image.png]]'));
+              'child=[Image:image=[NetworkImage:url=image.png]]]'));
     });
 
     testWidgets('renders left image', (WidgetTester tester) async {
@@ -316,7 +334,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(
           explained,
           equals('[Align:alignment=topLeft,' +
-              'child=[Text:imageUrl=image.png]]'));
+              'child=[Image:image=[NetworkImage:url=image.png]]]'));
     });
 
     testWidgets('renders right image', (WidgetTester tester) async {
@@ -325,7 +343,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(
           explained,
           equals('[Align:alignment=topRight,' +
-              'child=[Text:imageUrl=image.png]]'));
+              'child=[Image:image=[NetworkImage:url=image.png]]]'));
     });
 
     testWidgets('renders styling from outside', (WidgetTester tester) async {
@@ -338,45 +356,47 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
   });
 
   group('text-decoration', () {
-    testWidgets('renders line-through', (WidgetTester tester) async {
-      final html =
-          'This is a <span style="text-decoration: line-through">bad</span> good text.';
+    testWidgets('renders U tag', (WidgetTester tester) async {
+      final html = 'This is an <u>underline</u> text.';
       final explained = await explain(tester, html);
-      expect(
-          explained, equals('[RichText:(:This is a (+l:bad)(: good text.))]'));
+      expect(explained,
+          equals('[RichText:(:This is an (+u:underline)(: text.))]'));
+    });
+
+    testWidgets('renders line-through', (WidgetTester tester) async {
+      final html = '<span style="text-decoration: line-through">line</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+l:line)]'));
     });
 
     testWidgets('renders overline', (WidgetTester tester) async {
-      final html =
-          'This is <span style="text-decoration: overline">some</span> text.';
+      final html = '<span style="text-decoration: overline">over</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:This is (+o:some)(: text.))]'));
+      expect(explained, equals('[RichText:(+o:over)]'));
     });
 
     testWidgets('renders underline', (WidgetTester tester) async {
-      final html =
-          'This is an <span style="text-decoration: underline">important</span> text.';
+      final html = '<span style="text-decoration: underline">under</span>';
       final explained = await explain(tester, html);
-      expect(explained,
-          equals('[RichText:(:This is an (+u:important)(: text.))]'));
+      expect(explained, equals('[RichText:(+u:under)]'));
     });
-  });
 
-  testWidgets('a little bit of everything', (WidgetTester tester) async {
-    final html = """<h1>Header</h1>
+    testWidgets('renders all', (WidgetTester tester) async {
+      final html = '<span style="text-decoration: line-through">' +
+          '<span style="text-decoration: overline">' +
+          '<span style="text-decoration: underline">' +
+          'foo bar</span></span></span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+l+o+u:foo bar)]'));
+    });
 
-First line.<br/>Second line.<br>Third line.
-
-<div><img src="image.png" /></div>
-
-<p>This <b>setence</b> <em>has</em> <span style="text-decoration: underline">everything</span>.</p>
-""";
-    final explained = await explain(tester, html);
-    expect(
-        explained,
-        equals('[Column:children=[RichText:(@20.0:Header)],' +
-            '[Text:First line.],[Text:Second line.],[Text:Third line.],' +
-            '[Text:imageUrl=image.png],' +
-            '[RichText:(:This (+b:setence)(: )(+i:has)(: )(+u:everything)(:.))]]'));
+    testWidgets('skips rendering', (WidgetTester tester) async {
+      final html = '<span style="text-decoration: line-through">' +
+          '<span style="text-decoration: overline">' +
+          '<span style="text-decoration: underline">' +
+          'foo <span style="text-decoration: none">bar</span></span></span></span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+l+o+u:foo (:bar))]'));
+    });
   });
 }
