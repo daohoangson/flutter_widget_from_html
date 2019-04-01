@@ -219,6 +219,12 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     });
   });
 
+  testWidgets('renders font-family inline style', (WidgetTester tester) async {
+    final html = '<span style="font-family: Monospace">Foo</span>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[RichText:(+font=Monospace:Foo)]'));
+  });
+
   group('font-weight', () {
     testWidgets('renders B tag', (WidgetTester tester) async {
       final html = 'This is a <b>bold</b> text.';
@@ -234,7 +240,8 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 
     testWidgets('renders font-weight inline style',
         (WidgetTester tester) async {
-      final html = """<span style="font-weight: 100">one</span>
+      final html = """<span style="font-weight: bold">bold</span>
+<span style="font-weight: 100">one</span>
 <span style="font-weight: 200">two</span>
 <span style="font-weight: 300">three</span>
 <span style="font-weight: 400">four</span>
@@ -246,7 +253,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:(:(+w0:one)(: )(+w1:two)(: )(+w2:three)(: )(:four)(: )' +
+          equals('[RichText:(:(+b:bold)(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: )(:four)(: )' +
               '(+w4:five)(: )(+w5:six)(: )(+b:seven)(: )(+w7:eight)(: )(+w8:nine))]'));
     });
   });
@@ -266,12 +273,17 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           equals('[RichText:(:This is an (+i:emphasized)(: text.))]'));
     });
 
-    testWidgets('renders font-style inline style', (WidgetTester tester) async {
-      final html =
-          "This is an <span style=\"font-style: italic\">inlined</span> text.";
+    testWidgets('renders inline style: italic', (WidgetTester tester) async {
+      final html = '<span style="font-style: italic">Italic text</span>';
       final explained = await explain(tester, html);
-      expect(
-          explained, equals('[RichText:(:This is an (+i:inlined)(: text.))]'));
+      expect(explained, equals('[RichText:(+i:Italic text)]'));
+    });
+
+    testWidgets('renders inline style: normal', (WidgetTester tester) async {
+      final html = '<span style="font-style: italic">Italic ' +
+          '<span style="font-style: normal">normal</span></span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+i:Italic (-i:normal))]'));
     });
   });
 
@@ -338,6 +350,13 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
   });
 
   group('text-decoration', () {
+    testWidgets('renders U tag', (WidgetTester tester) async {
+      final html = 'This is an <u>underline</u> text.';
+      final explained = await explain(tester, html);
+      expect(explained,
+          equals('[RichText:(:This is an (+u:underline)(: text.))]'));
+    });
+
     testWidgets('renders line-through', (WidgetTester tester) async {
       final html = '<span style="text-decoration: line-through">line</span>';
       final explained = await explain(tester, html);
