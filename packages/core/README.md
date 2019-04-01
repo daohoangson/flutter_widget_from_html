@@ -45,7 +45,7 @@ class HelloWorldCoreScreen extends StatelessWidget {
 
 ### HTML tags
 
-Below tags are the ones that have special meaning / styling, all other tag will be parsed as text.
+Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
 
 - A: underline without color, no action on tap (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
 - B
@@ -61,6 +61,12 @@ Below tags are the ones that have special meaning / styling, all other tag will 
 - PRE
 - STRONG
 - U
+
+However, these tags and their contents will be ignored:
+
+- IFRAME (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for web view support)
+- SCRIPT
+- STYLE
 
 ### Inline stylings
 

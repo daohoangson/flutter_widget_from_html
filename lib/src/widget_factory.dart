@@ -5,6 +5,7 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:html/dom.dart' as dom;
 
 import 'ops/tag_a.dart';
+import 'ops/tag_iframe.dart';
 import 'ops/tag_li.dart';
 import 'config.dart';
 
@@ -82,6 +83,14 @@ class WidgetFactory extends core.WidgetFactory {
         }
         break;
 
+      case 'iframe':
+        meta = core.lazySet(
+          meta,
+          buildOp: tagIframe(e),
+          isNotRenderable: false,
+        );
+        break;
+
       case 'li':
       case 'ol':
       case 'ul':
@@ -95,6 +104,9 @@ class WidgetFactory extends core.WidgetFactory {
   core.BuildOp tagA(String fullUrl) => core.BuildOp(
         onPieces: TagA(fullUrl, this).onPieces,
       );
+
+  core.BuildOp tagIframe(dom.Element e) =>
+      core.BuildOp(onWidgets: (_) => <Widget>[TagIframe(this).build(e)]);
 
   core.BuildOp tagLi(String tag) => core.BuildOp(
         onWidgets: (widgets) => <Widget>[TagLi(this).build(widgets, tag)],

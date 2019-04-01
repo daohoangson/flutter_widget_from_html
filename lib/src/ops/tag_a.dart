@@ -9,19 +9,26 @@ import '../widget_factory.dart';
 class TagA {
   final String fullUrl;
   final WidgetFactory wf;
+  final bool icon;
 
-  TagA(this.fullUrl, this.wf);
+  TagA(
+    this.fullUrl,
+    this.wf, {
+    this.icon = true,
+  });
 
   Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
       child != null
           ? GestureDetector(
               onTap: onTap,
-              child: Stack(
-                children: <Widget>[
-                  child,
-                  buildGestureDetectorIcon(),
-                ],
-              ),
+              child: icon
+                  ? Stack(
+                      children: <Widget>[
+                        child,
+                        buildGestureDetectorIcon(),
+                      ],
+                    )
+                  : child,
             )
           : null;
 
