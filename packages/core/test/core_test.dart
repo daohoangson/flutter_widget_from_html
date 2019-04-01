@@ -15,6 +15,23 @@ void main() {
     expect(explained, equals('[Text:Hello world]'));
   });
 
+  testWidgets('renders without erroneous white spaces', (WidgetTester t) async {
+    final html = """
+<p>
+  <span style="text-decoration: line-through">
+    <span style="text-decoration: overline">
+      <span style="text-decoration: underline">
+        All decorations...
+        <span style="text-decoration: none">and none</span>
+      </span>
+    </span>
+  </span>
+</p>
+""";
+    final str = await explain(t, html);
+    expect(str, equals('[RichText:(+l+o+u:All decorations... (:and none))]'));
+  });
+
   group('A tag', () {
     testWidgets('renders stylings', (WidgetTester tester) async {
       final html = 'This is a <a href="href">hyperlink</a>.';
