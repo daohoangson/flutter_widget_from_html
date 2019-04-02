@@ -4,12 +4,19 @@ import 'package:webview_flutter/webview_flutter.dart' as lib;
 
 class WebView extends StatefulWidget {
   final String url;
+  final List<Duration> getDimensionsDurations;
   final double height;
   final bool js;
   final double width;
 
   WebView(
     this.url, {
+    this.getDimensionsDurations = const [
+      Duration(milliseconds: 500),
+      Duration(seconds: 1),
+      Duration(seconds: 2),
+      Duration(seconds: 4),
+    ],
     this.height,
     this.js,
     Key key,
@@ -60,13 +67,10 @@ class _WebViewState extends State<WebView> {
         onPageFinished: (url) {
           if (url != widget.url) return;
 
-          _getDimensions("onPageFinished");
+          _getDimensions();
 
-          Future.delayed(const Duration(seconds: 3))
-              .then((_) => _getDimensions("3s"));
-
-          Future.delayed(const Duration(seconds: 10))
-              .then((_) => _getDimensions("10s"));
+          widget.getDimensionsDurations
+              .forEach((t) => Future.delayed(t).then((_) => _getDimensions()));
         },
         onWebViewCreated: (c) => _controller = c,
       );
@@ -80,7 +84,7 @@ class _WebViewState extends State<WebView> {
     );
   }
 
-  void _getDimensions(String caller) => _controller
+  void _getDimensions() => _controller
       ?.evaluateJavascript("document.body.scrollWidth")
       ?.then((scrollWidth) => _controller
               .evaluateJavascript("document.body.scrollHeight")
