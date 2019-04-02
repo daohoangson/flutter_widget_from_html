@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
 import 'package:html/dom.dart' as dom;
+import 'package:webview_flutter/webview_flutter.dart';
 
 import 'ops/tag_a.dart';
 import 'ops/tag_iframe.dart';
@@ -65,6 +66,34 @@ class WidgetFactory extends core.WidgetFactory {
         super.buildTextWidget(text, textAlign: textAlign),
         config.textPadding,
       );
+
+  Widget buildWebView(
+    String initialUrl, {
+    double height,
+    double width,
+  }) =>
+      wrapPadding(
+        AspectRatio(
+          aspectRatio:
+              (height != null && height > 0 && width != null && width > 0)
+                  ? (width / height)
+                  : (16 / 9),
+          child: WebView(
+              initialUrl: initialUrl,
+              javascriptMode: config.webViewJs
+                  ? JavascriptMode.unrestricted
+                  : JavascriptMode.disabled),
+        ),
+        config.webViewPadding,
+      );
+
+  Widget buildWebViewLinkOnly(String url) => TagA(url, this, icon: false)
+      .onPieces(<core.BuiltPiece>[
+        core.BuiltPieceSimple(widgets: <Widget>[buildTextWidget(url)]),
+      ])
+      .first
+      ?.widgets
+      ?.first;
 
   @override
   core.NodeMetadata parseElement(dom.Element e) {
