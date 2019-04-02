@@ -1,9 +1,13 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart' as lib;
 
 class WebView extends StatefulWidget {
   final String url;
+
+  final double defaultAspectRatio;
   final List<Duration> getDimensionsDurations;
   final double height;
   final bool js;
@@ -11,6 +15,7 @@ class WebView extends StatefulWidget {
 
   WebView(
     this.url, {
+    this.defaultAspectRatio = 16 / 9,
     this.getDimensionsDurations = const [
       Duration(milliseconds: 500),
       Duration(seconds: 1),
@@ -32,11 +37,10 @@ class WebView extends StatefulWidget {
 }
 
 class _WebViewState extends State<WebView> {
-  double _width;
-  double _height;
   lib.WebViewController _controller;
-
-  bool get hasDimensions => (_height != null && _width != null);
+  double _aspectRatio;
+  double _aspectRatioInitial;
+  bool _widgetHasDimensions = false;
 
   @override
   initState() {
@@ -46,37 +50,44 @@ class _WebViewState extends State<WebView> {
         widget.height > 0 &&
         widget.width != null &&
         widget.width > 0) {
-      _width = widget.width;
-      _height = widget.height;
+      _aspectRatio = widget.width / widget.height;
+      _widgetHasDimensions = true;
+    } else {
+      _aspectRatio = widget.defaultAspectRatio;
     }
+
+    _aspectRatioInitial = _aspectRatio;
   }
 
   @override
   Widget build(BuildContext context) => _buildAspectRatio(_buildWebView());
 
   Widget _buildAspectRatio(Widget child) => AspectRatio(
-        aspectRatio: hasDimensions ? (_width / _height) : (16 / 9),
+        aspectRatio: _aspectRatio,
         child: child,
       );
 
   Widget _buildWebView() {
-    if (!hasDimensions && widget.js) {
+    final Set<Factory<OneSequenceGestureRecognizer>> gestureRecognizers =
+        !_widgetHasDimensions && _aspectRatio == _aspectRatioInitial
+            ? (Set()
+              ..add(Factory<VerticalDragGestureRecognizer>(
+                () => VerticalDragGestureRecognizer(),
+              )))
+            : null;
+
+    if (!_widgetHasDimensions && widget.js) {
       return lib.WebView(
+        gestureRecognizers: gestureRecognizers,
         initialUrl: widget.url,
         javascriptMode: lib.JavascriptMode.unrestricted,
-        onPageFinished: (url) {
-          if (url != widget.url) return;
-
-          _getDimensions();
-
-          widget.getDimensionsDurations
-              .forEach((t) => Future.delayed(t).then((_) => _getDimensions()));
-        },
+        onPageFinished: (u) => (u == widget.url) ? _getDimensionsAll() : null,
         onWebViewCreated: (c) => _controller = c,
       );
     }
 
     return lib.WebView(
+      gestureRecognizers: gestureRecognizers,
       initialUrl: widget.url,
       javascriptMode: widget.js
           ? lib.JavascriptMode.unrestricted
@@ -92,11 +103,18 @@ class _WebViewState extends State<WebView> {
             final width = double.tryParse(scrollWidth);
             final height = double.tryParse(scrollHeight);
             if (height != null && height > 0 && width != null && width > 0) {
-              setState(() {
-                _height = height;
-                _width = width;
-              });
+              final aspectRatio = width / height;
+              if ((aspectRatio - _aspectRatio).abs() > 0.01) {
+                setState(() => _aspectRatio = aspectRatio);
+              }
             }
           }))
       ?.catchError((_) {/*ignore error */});
+
+  void _getDimensionsAll() {
+    _getDimensions();
+
+    widget.getDimensionsDurations
+        .forEach((t) => Future.delayed(t).then((_) => _getDimensions()));
+  }
 }
