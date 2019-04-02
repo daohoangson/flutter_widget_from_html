@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
 import 'package:html/dom.dart' as dom;
-import 'package:webview_flutter/webview_flutter.dart';
 
 import 'ops/tag_a.dart';
 import 'ops/tag_iframe.dart';
 import 'ops/tag_li.dart';
 import 'config.dart';
+import 'web_view.dart';
 
 final _baseUriTrimmingRegExp = RegExp(r'/+$');
 final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
@@ -68,22 +68,12 @@ class WidgetFactory extends core.WidgetFactory {
       );
 
   Widget buildWebView(
-    String initialUrl, {
+    String url, {
     double height,
     double width,
   }) =>
       wrapPadding(
-        AspectRatio(
-          aspectRatio:
-              (height != null && height > 0 && width != null && width > 0)
-                  ? (width / height)
-                  : (16 / 9),
-          child: WebView(
-              initialUrl: initialUrl,
-              javascriptMode: config.webViewJs
-                  ? JavascriptMode.unrestricted
-                  : JavascriptMode.disabled),
-        ),
+        WebView(url, height: height, js: config.webViewJs, width: width),
         config.webViewPadding,
       );
 

@@ -24,7 +24,7 @@ class IframeScreen extends StatefulWidget {
 }
 
 class _State extends State<IframeScreen> {
-  bool webView = false;
+  bool webView = true;
   bool webViewJs = true;
 
   @override
