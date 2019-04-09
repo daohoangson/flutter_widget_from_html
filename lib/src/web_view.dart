@@ -81,7 +81,7 @@ class _WebViewState extends State<WebView> {
         gestureRecognizers: gestureRecognizers,
         initialUrl: widget.url,
         javascriptMode: lib.JavascriptMode.unrestricted,
-        onPageFinished: (u) => (u == widget.url) ? _getDimensionsAll() : null,
+        onPageFinished: (_) => _getDimensionsAll(),
         onWebViewCreated: (c) => _controller = c,
       );
     }
