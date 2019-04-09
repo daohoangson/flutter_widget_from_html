@@ -23,7 +23,7 @@ class WebView extends StatefulWidget {
       Duration(seconds: 4),
     ],
     this.height,
-    this.js,
+    this.js = true,
     Key key,
     this.width,
   }) : super(key: key);
