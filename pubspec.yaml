@@ -13,7 +13,7 @@ dependencies:
     sdk: flutter
   flutter_widget_from_html_core:
     path: packages/core
-  html: ^0.13.4
+  html: ^0.14.0
   url_launcher: ^5.0.2
   webview_flutter: ^0.3.5+2
 
