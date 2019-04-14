@@ -41,10 +41,24 @@ void main() {
     });
   });
 
-  testWidgets('parses margin with 2 values', (WidgetTester tester) async {
-    final html = '<div style="margin: 5px 10px">Foo</div>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[Padding:(5,10,5,10),child=[Text:Foo]]'));
+  group('2 values', () {
+    testWidgets('parses both', (WidgetTester tester) async {
+      final html = '<div style="margin: 5px 10px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Padding:(5,10,5,10),child=[Text:Foo]]'));
+    });
+
+    testWidgets('parses vertical only', (WidgetTester tester) async {
+      final html = '<div style="margin: 5px 0">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Padding:(5,0,5,0),child=[Text:Foo]]'));
+    });
+
+    testWidgets('parses horizontal only', (WidgetTester tester) async {
+      final html = '<div style="margin: 0 10px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Padding:(0,10,0,10),child=[Text:Foo]]'));
+    });
   });
 
   testWidgets('parses margin with 1 value', (WidgetTester tester) async {
@@ -88,7 +102,19 @@ void main() {
   });
 
   group('invalid values', () {
-    testWidgets('all', (WidgetTester tester) async {
+    testWidgets('4 values', (WidgetTester tester) async {
+      final html = '<div style="margin: a b c d">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Text:Foo]'));
+    });
+
+    testWidgets('2 values', (WidgetTester tester) async {
+      final html = '<div style="margin: xxx yyy">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Text:Foo]'));
+    });
+
+    testWidgets('1 value', (WidgetTester tester) async {
       final html = '<div style="margin: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[Text:Foo]'));
