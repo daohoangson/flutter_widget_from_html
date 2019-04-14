@@ -187,7 +187,11 @@ class _Explainer {
                         ? "${_edgeInsets(widget.padding)},"
                         : widget is RichText
                             ? _textSpan(widget.text)
-                            : widget is Text ? widget.data : '';
+                            : widget is Text
+                                ? widget.data
+                                : widget is DefaultTextStyle
+                                    ? "style=${widget.style},"
+                                    : '';
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));
