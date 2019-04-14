@@ -18,7 +18,7 @@ EdgeInsetsGeometry _marginParseAll(String value) {
     final b = _unitParseValue(valuesFour.group(3));
     final l = _unitParseValue(valuesFour.group(4));
     if (t == null && r == null && b == null && l == null) return null;
-    return EdgeInsets.fromLTRB(l, t, r, b);
+    return EdgeInsets.fromLTRB(l ?? 0, t ?? 0, r ?? 0, b ?? 0);
   }
 
   final valuesTwo = _kMarginValuesTwoRegex.firstMatch(value);
