@@ -12,7 +12,7 @@ dependencies:
     path: ../..
   flutter_widget_from_html_core:
     path: ../../packages/core
-  html: ^0.13.3
+  html: any
 
 flutter:
   uses-material-design: true
