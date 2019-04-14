@@ -1,3 +1,8 @@
+## 0.1.4
+
+* Update dependencies (#12)
+* Add support for web view (#19)
+
 ## 0.1.3
 
 * Update flutter_widget_from_html_core 0.1.3

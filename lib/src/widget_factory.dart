@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
 import 'package:html/dom.dart' as dom;
+import 'package:webview_flutter/webview_flutter.dart';
 
 import 'ops/tag_a.dart';
+import 'ops/tag_iframe.dart';
 import 'ops/tag_li.dart';
 import 'config.dart';
 
@@ -65,6 +67,34 @@ class WidgetFactory extends core.WidgetFactory {
         config.textPadding,
       );
 
+  Widget buildWebView(
+    String initialUrl, {
+    double height,
+    double width,
+  }) =>
+      wrapPadding(
+        AspectRatio(
+          aspectRatio:
+              (height != null && height > 0 && width != null && width > 0)
+                  ? (width / height)
+                  : (16 / 9),
+          child: WebView(
+              initialUrl: initialUrl,
+              javascriptMode: config.webViewJs
+                  ? JavascriptMode.unrestricted
+                  : JavascriptMode.disabled),
+        ),
+        config.webViewPadding,
+      );
+
+  Widget buildWebViewLinkOnly(String url) => TagA(url, this, icon: false)
+      .onPieces(<core.BuiltPiece>[
+        core.BuiltPieceSimple(widgets: <Widget>[buildTextWidget(url)]),
+      ])
+      .first
+      ?.widgets
+      ?.first;
+
   @override
   core.NodeMetadata parseElement(dom.Element e) {
     var meta = super.parseElement(e);
@@ -82,6 +112,14 @@ class WidgetFactory extends core.WidgetFactory {
         }
         break;
 
+      case 'iframe':
+        meta = core.lazySet(
+          meta,
+          buildOp: tagIframe(e),
+          isNotRenderable: false,
+        );
+        break;
+
       case 'li':
       case 'ol':
       case 'ul':
@@ -95,6 +133,9 @@ class WidgetFactory extends core.WidgetFactory {
   core.BuildOp tagA(String fullUrl) => core.BuildOp(
         onPieces: TagA(fullUrl, this).onPieces,
       );
+
+  core.BuildOp tagIframe(dom.Element e) =>
+      core.BuildOp(onWidgets: (_) => <Widget>[TagIframe(this).build(e)]);
 
   core.BuildOp tagLi(String tag) => core.BuildOp(
         onWidgets: (widgets) => <Widget>[TagLi(this).build(widgets, tag)],

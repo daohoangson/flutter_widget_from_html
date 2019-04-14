@@ -9,19 +9,26 @@ import '../widget_factory.dart';
 class TagA {
   final String fullUrl;
   final WidgetFactory wf;
+  final bool icon;
 
-  TagA(this.fullUrl, this.wf);
+  TagA(
+    this.fullUrl,
+    this.wf, {
+    this.icon = true,
+  });
 
   Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
       child != null
           ? GestureDetector(
               onTap: onTap,
-              child: Stack(
-                children: <Widget>[
-                  child,
-                  buildGestureDetectorIcon(),
-                ],
-              ),
+              child: icon
+                  ? Stack(
+                      children: <Widget>[
+                        child,
+                        buildGestureDetectorIcon(),
+                      ],
+                    )
+                  : child,
             )
           : null;
 
@@ -48,10 +55,6 @@ class TagA {
         newPieces.add(BuiltPieceSimple(
           textSpan: rebuildTextSpanWithRecognizer(piece.textSpan, recognizer),
         ));
-      } else if (piece.hasText) {
-        newPieces.add(BuiltPieceSimple(
-          textSpan: TextSpan(text: piece.text, recognizer: recognizer),
-        ));
       } else if (piece.hasWidgets) {
         final gd = buildGestureDetector(wf.buildColumn(piece.widgets), onTap);
         if (gd != null) {
@@ -71,7 +74,7 @@ class TagA {
         }
       };
 
-// this is required because recognizer does not trigger for children
+  // this is required because recognizer does not trigger for children
   // https://github.com/flutter/flutter/issues/10623
   TextSpan rebuildTextSpanWithRecognizer(TextSpan span, GestureRecognizer r) =>
       TextSpan(

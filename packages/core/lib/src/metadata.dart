@@ -74,7 +74,6 @@ abstract class BuiltPiece {
   String get text;
   TextAlign get textAlign;
   TextSpan get textSpan;
-  TextSpan get textSpanTrimmedLeft;
   List<Widget> get widgets;
 
   set textAlign(TextAlign textAlign);
@@ -91,7 +90,6 @@ class BuiltPieceSimple extends BuiltPiece {
   bool get hasText => text != null;
   bool get hasTextSpan => textSpan != null;
   bool get hasWidgets => widgets != null;
-  TextSpan get textSpanTrimmedLeft => textSpan;
 }
 
 class NodeMetadata {

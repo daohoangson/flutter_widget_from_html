@@ -3,24 +3,37 @@ import 'package:flutter/material.dart';
 import 'compare.dart';
 import 'hello_world.dart';
 import 'hello_world_core.dart';
+import 'iframe.dart';
 import 'smilie.dart';
 
 class HomeScreen extends StatelessWidget {
   final _htmls = {
-    'Hello World (core)': '',
-    'Hello World': '',
-    'Smilie': '',
+    'Hello World (core)': () => HelloWorldCoreScreen(),
+    'Hello World': () => HelloWorldScreen(),
+    'Smilie': () => SmilieScreen(),
     'Styling':
         """<p><b>B</b>, <strong>strong</strong> or <span style="font-weight: bold">inline style</span></p>
 <p><em>EM</em>, <i>I</i> or <span style="font-style: italic">inline style</span></p>
 <p><u>U</u> or <span style="text-decoration: underline">inline style</span></p>
 <p><span style="color: #ff0000">Red</span>, <span style="color: #00ff00">green</span>, <span style="color: #0000ff">blue</span></p>
+
+<p>
+  <span style="text-decoration: line-through">
+    <span style="text-decoration: overline">
+      <span style="text-decoration: underline">
+        All decorations...
+        <span style="text-decoration: none">and none</span>
+      </span>
+    </span>
+  </span>
+</p>
 """,
     'Alignments': """<div style="text-align: left">Left</div>
 <div style="text-align: center">Center</div>
 <div style="text-align: right">Right</div>
 <div style="text-align: justify">${"J u s t i f y. " * 20}</div>
 """,
+    'Iframe': () => IframeScreen(),
     'List ordered': """<ol>
   <li>One</li>
   <li>Two</li>
@@ -86,16 +99,10 @@ CODE tag:
               onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => key == 'Hello World (core)'
-                            ? HelloWorldCoreScreen()
-                            : key == 'Hello World'
-                                ? HelloWorldScreen()
-                                : key == 'Smilie'
-                                    ? SmilieScreen()
-                                    : CompareScreen(
-                                        html: html,
-                                        title: key,
-                                      )),
+                      builder: (_) => html is String
+                          ? CompareScreen(html: html, title: key)
+                          : (html as Function)(),
+                    ),
                   ),
             );
           },

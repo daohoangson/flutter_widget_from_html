@@ -1,5 +1,9 @@
 # Flutter Widget from HTML (core)
 
+[![CircleCI](https://circleci.com/gh/daohoangson/flutter_widget_from_html.svg?style=svg)](https://circleci.com/gh/daohoangson/flutter_widget_from_html)
+[![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
+[![Pub](https://img.shields.io/pub/v/flutter_widget_from_html_core.svg)](https://pub.dartlang.org/packages/flutter_widget_from_html_core)
+
 A Flutter plugin for building Flutter-widget tree from html.
 
 This `core` package implements html parsing and widget building logic so it's easy to extend and fit your app's use case. It tries to render an optimal tree: use `Text` instead of `RichText` as much as possible, merge text spans together, show images in `AspectRatio`, etc.
@@ -41,7 +45,7 @@ class HelloWorldCoreScreen extends StatelessWidget {
 
 ### HTML tags
 
-Below tags are the ones that have special meaning / styling, all other tag will be parsed as text.
+Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
 
 - A: underline without color, no action on tap (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
 - B
@@ -58,18 +62,26 @@ Below tags are the ones that have special meaning / styling, all other tag will 
 - STRONG
 - U
 
+However, these tags and their contents will be ignored:
+
+- IFRAME (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for web view support)
+- SCRIPT
+- STYLE
+
 ### Inline stylings
 
 - color: hex values only (`#F00`, `#0F08`, `#00FF00` or `#00FF0080`)
 - font-family
+- font-size (value in px only)
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
+- margin, margin-top, margin-right, margin-bottom, margin-left (values in px only)
 - text-align: center/justify/left/right
 - text-decoration: line-through/none/overline/underline
 
 ## Extensibility
 
-As previously mentioned, this package focuses on the core parsing-building routine with lots of tests to make sure it works correctly. If the [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) package does not suite your need or you don't like any of the dependencies included in that package, it's time to extend `flutter_widget_from_html_core` and make it work for you.
+As previously mentioned, this package focuses on the core parsing-building routine with lots of tests to make sure it works correctly. If the [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) package does not suite your need or you don't like any of the dependencies included in that package, it's time to extend `flutter_widget_from_html_core`.
 
 Here is how it works:
 

@@ -32,8 +32,11 @@ class Builder {
     _ParentStyle parentStyle,
     @required WidgetFactory widgetFactory,
   })  : wf = widgetFactory,
-        _parentStyle =
-            parentStyle ?? _ParentStyle(false, widgetFactory.defaultTextStyle);
+        _parentStyle = parentStyle ??
+            _ParentStyle(
+              false,
+              DefaultTextStyle.of(widgetFactory.context).style,
+            );
 
   List<Widget> build() {
     List<Widget> widgets = List();
@@ -42,7 +45,7 @@ class Builder {
     for (final piece in process()) {
       if (piece.hasTextSpan) {
         addWidgetIfNotNull(wf.buildTextWidget(
-          piece.textSpanTrimmedLeft,
+          piece.textSpan,
           textAlign: piece.textAlign,
         ));
       } else if (piece.hasText) {
@@ -85,9 +88,14 @@ class Builder {
     _pieces.clear();
     _newPiece();
 
-    for (final domNode in domNodes) {
+    final domNodesLength = domNodes.length;
+    for (var domNodeId = 0; domNodeId < domNodesLength; domNodeId++) {
+      final domNode = domNodes[domNodeId];
       if (domNode.nodeType == dom.Node.TEXT_NODE) {
-        _piece._write(domNode.text);
+        _piece._write(
+          domNode.text,
+          isLast: domNodeId == domNodesLength - 1,
+        );
         continue;
       }
       if (domNode.nodeType != dom.Node.ELEMENT_NODE) {
@@ -115,11 +123,14 @@ class Builder {
         continue;
       }
 
-      for (final __piece in __builder.process()) {
+      final __pieces = __builder.process();
+      final __piecesLength = __pieces.length;
+      for (var __pieceId = 0; __pieceId < __piecesLength; __pieceId++) {
+        final __piece = __pieces[__pieceId];
         if (__piece.hasTextSpan) {
           _piece._addSpan(__piece.textSpan);
         } else if (__piece.hasText) {
-          _piece._write(__piece.text);
+          _piece._write(__piece.text, isLast: __pieceId == __piecesLength - 1);
         } else if (__piece.hasWidgets) {
           _savePiece();
           _pieces.add(__piece);
@@ -189,23 +200,20 @@ class _BuiltPiece extends BuiltPiece {
   String get text => _texts.toString();
 
   @override
-  TextSpan get textSpan => _getTextSpan();
+  TextSpan get textSpan {
+    if (!hasText && _spans?.length == 1) {
+      return _spans[0];
+    }
 
-  @override
-  TextSpan get textSpanTrimmedLeft => _getTextSpan(trimLeft: true);
+    return _buildTextSpan(text, children: _spans);
+  }
 
   void _addSpan(TextSpan span) {
     if (span == null) return;
     if (hasWidgets) throw ('Cannot add spans into piece with widgets');
     if (_spans == null) _spans = List();
 
-    if (span.style != null || span.text?.isNotEmpty != false) {
-      _spans.add(span);
-    } else if (span.children != null) {
-      for (final subSpan in span.children) {
-        _spans.add(subSpan);
-      }
-    }
+    _spans.add(span);
   }
 
   TextSpan _buildTextSpan(String text, {List<TextSpan> children}) =>
@@ -216,15 +224,14 @@ class _BuiltPiece extends BuiltPiece {
         textSpaceCollapse: textSpaceCollapse,
       );
 
-  TextSpan _getTextSpan({bool trimLeft = false}) {
-    if (!hasText && parentStyle?.hasStyling != true && _spans?.length == 1) {
-      return _spans[0];
+  void _write(String text, {bool isLast = false}) {
+    final isFirst = _texts.isEmpty && _spans?.isEmpty != false;
+    if (isFirst && !isLast) {
+      text = text.trimLeft();
+    } else if (isLast && !isFirst) {
+      text = text.trimRight();
     }
 
-    return _buildTextSpan(trimLeft ? text.trimLeft() : text, children: _spans);
-  }
-
-  void _write(String text) {
     if (_spans == null) {
       _texts.write(text);
     } else {

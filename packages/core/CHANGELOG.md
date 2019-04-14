@@ -1,3 +1,8 @@
+## 0.1.4
+
+* Update dependencies (#12)
+* Fix layout rebuild loop because of `Column`'s `UniqueKey` (#19)
+
 ## 0.1.3
 
 * Fix bug stylings got lost during block rendering (#10)

@@ -1,5 +1,9 @@
 # Flutter Widget from HTML
 
+[![CircleCI](https://circleci.com/gh/daohoangson/flutter_widget_from_html.svg?style=svg)](https://circleci.com/gh/daohoangson/flutter_widget_from_html)
+[![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
+[![Pub](https://img.shields.io/pub/v/flutter_widget_from_html.svg)](https://pub.dartlang.org/packages/flutter_widget_from_html)
+
 A Flutter plugin for building Flutter-widget tree from html.
 
 This package extends the [`flutter_widget_from_html_core`](https://pub.dartlang.org/packages/flutter_widget_from_html_core) package with extra functionalities by using external depedencies like `cached_network_image` or `url_launcher`. It should be good enough as a quick starting point but you can always use the `core` directly if you dislike the dependencies.
@@ -42,10 +46,48 @@ class HelloWorldScreen extends StatelessWidget {
 
 ## Features
 
-This package has all the features of [`flutter_widget_from_html_core`](https://pub.dartlang.org/packages/flutter_widget_from_html_core) and some nice extras:
+### HTML tags
 
-- Renders A tag with theme accent color, launch url via [`url_launcher`](https://pub.dartlang.org/packages/url_launcher)
-- Renders IMG tag with [`CachedNetworkImage`](https://pub.dartlang.org/packages/cached_network_image) and padding (`Config.imagePadding`)
-- Renders lists (OL/UL) with marker and padding (`Config.listBullet`, `Config.listPaddingLeft`)
-- Renders texts with padding (`Config.textPadding`)
-- Supports relative url (A href, IMG src)
+Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
+All texts will be rendered with padding (`Config.textPadding`).
+
+- A: underline with theme accent color, launch url via [`url_launcher`](https://pub.dartlang.org/packages/url_launcher), support base url resolver
+- B
+- BR
+- CODE
+- DIV
+- EM
+- H1/H2/H3/H4/H5/H6
+- I
+- IFRAME via [`WebView`](https://pub.dartlang.org/packages/webview_flutter). Available configurations:
+  - `Config.webView`, default=false
+  - `Config.webViewJs`, default=true
+  - `Config.webViewPadding`
+  - To render IFRAME as web view: set `webView=true` in config and [setup iOS project manually](https://pub.dartlang.org/packages/webview_flutter#ios).
+  - Web view will be rendered in a 16:9 box unless `width` and `height` attributes are specified in the IFRAME.
+- IMG via [`CachedNetworkImage`](https://pub.dartlang.org/packages/cached_network_image) with padding (`Config.imagePadding`), support base url resolver
+- LI/OL/UL with marker and padding (`Config.listBullet`, `Config.listPaddingLeft`)
+- P
+- PRE
+- STRONG
+- U
+
+These tags and their contents will be ignored:
+
+- SCRIPT
+- STYLE
+
+### Inline stylings
+
+- color: hex values only (`#F00`, `#0F08`, `#00FF00` or `#00FF0080`)
+- font-family
+- font-size (value in px only)
+- font-style: italic/normal
+- font-weight: bold/normal/100..900
+- margin, margin-top, margin-right, margin-bottom, margin-left (values in px only)
+- text-align: center/justify/left/right
+- text-decoration: line-through/none/overline/underline
+
+## Extensibility
+
+See [flutter_widget_from_html_core](https://pub.dartlang.org/packages/flutter_widget_from_html_core#extensibility) for details.

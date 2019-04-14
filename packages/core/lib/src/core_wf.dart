@@ -15,15 +15,12 @@ class WidgetFactory {
 
   const WidgetFactory(this.context);
 
-  TextStyle get defaultTextStyle => DefaultTextStyle.of(context).style;
-
   Widget buildColumn(List<Widget> children) => children?.isNotEmpty == true
       ? children?.length == 1
           ? children.first
           : Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: children,
-              key: UniqueKey(),
             )
       : null;
 
@@ -85,7 +82,7 @@ class WidgetFactory {
       );
 
   TextDecoration buildTextDecoration(NodeMetadata meta, TextStyle parent) {
-    if (meta?.hasDecoration != true) return null;
+    if (meta.hasDecoration != true) return null;
 
     final pd = parent.decoration;
     final pdLineThough = pd?.contains(TextDecoration.lineThrough) == true;
@@ -130,7 +127,7 @@ class WidgetFactory {
     } else {
       span = TextSpan(
         children: children,
-        style: style ?? defaultTextStyle,
+        style: style,
         text: text,
       );
     }
