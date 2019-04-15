@@ -1,3 +1,7 @@
+## 0.1.5
+
+* Fix margin with partial invalid values (#21)
+
 ## 0.1.4
 
 * Update dependencies (#12)
