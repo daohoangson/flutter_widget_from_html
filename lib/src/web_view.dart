@@ -15,7 +15,6 @@ class WebView extends StatefulWidget {
   final String url;
 
   final double aspectRatio;
-  final Set<Factory<OneSequenceGestureRecognizer>> gestureRecognizers;
   final bool getDimensions;
   final GetDimensionsDone getDimensionsDone;
   final List<Duration> getDimensionsDurations;
@@ -24,7 +23,6 @@ class WebView extends StatefulWidget {
   WebView(
     this.url, {
     this.aspectRatio,
-    this.gestureRecognizers,
     this.getDimensions = false,
     this.getDimensionsDone,
     this.getDimensionsDurations = const [
@@ -69,7 +67,6 @@ class _WebViewState extends State<WebView> {
       _wvc?.evaluateJavascript(js)?.catchError((_) => '');
 
   Widget _buildWebView() => lib.WebView(
-        gestureRecognizers: widget.gestureRecognizers,
         initialUrl: widget.url,
         javascriptMode: widget.js
             ? lib.JavascriptMode.unrestricted
