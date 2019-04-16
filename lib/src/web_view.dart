@@ -65,6 +65,9 @@ class _WebViewState extends State<WebView> {
         child: _buildWebView(),
       );
 
+  Future<String> eval(String js) =>
+      _wvc?.evaluateJavascript(js)?.catchError((_) => '');
+
   Widget _buildWebView() => lib.WebView(
         gestureRecognizers: widget.gestureRecognizers,
         initialUrl: widget.url,
@@ -75,20 +78,22 @@ class _WebViewState extends State<WebView> {
         onPageFinished: widget.getDimensions
             ? (_) => widget.getDimensionsDurations.forEach((t) => t == null
                 // get dimensions immediately
-                ? _getDimensions(null)
+                ? _getDimensions()
                 // or wait for the specified duration
-                : Future.delayed(t).then(_getDimensions))
+                : Future.delayed(t).then((_) => _getDimensions()))
             : null,
         onWebViewCreated: (c) => _wvc = c,
       );
 
-  void _getDimensions(_) async {
+  void _getDimensions() async {
     // TODO: enable codecov when `flutter drive --coverage` is available
     // https://github.com/flutter/flutter/issues/7474
-    final strW = await _wvc?.evaluateJavascript("document.body.scrollWidth");
-    final strH = await _wvc?.evaluateJavascript("document.body.scrollHeight");
-    final w = double.tryParse(strW ?? '') ?? 0;
-    final h = double.tryParse(strH ?? '') ?? 0;
+    final evals = await Future.wait([
+      eval("document.body.scrollWidth"),
+      eval("document.body.scrollHeight"),
+    ]);
+    final w = double.tryParse(evals[0] ?? '') ?? 0;
+    final h = double.tryParse(evals[1] ?? '') ?? 0;
 
     final r = (h > 0 && w > 0) ? (w / h) : _aspectRatio;
     final changed = (r - _aspectRatio).abs() > 0.0001;
