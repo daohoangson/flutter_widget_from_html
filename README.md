@@ -22,27 +22,31 @@ Note: `HtmlWidget.config` is optional, see dartdoc for all available configurati
 class HelloWorldScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(
-        title: Text('HelloWorldScreen'),
-      ),
-      body: ListView(
-        children: <Widget>[
-          HtmlWidget("""<h1>Heading 1</h1>
-<h2>Heading 2</h2>
-<h3>Heading 3</h3>
-<h4>Heading 4</h4>
-<h5>Heading 5</h5>
-<h6>Heading 6</h6>
+        appBar: AppBar(title: Text('HelloWorldScreen')),
+        body: HtmlWidget(
+          """<h1>Heading</h1>
 <p>A paragraph with <strong>strong</strong> <em>emphasized</em> text.</p>
-<p>And of course, cat image: <img src="https://media.giphy.com/media/6VoDJzfRjJNbG/giphy-downsized.gif" /></p>
-<div style="text-align: center">Source: <a href="https://gph.is/QFgPA0">https://gph.is/QFgPA0</a></div>
-"""),
-        ],
-      ));
+<ol>
+  <li>List item number one</li>
+  <li>
+    Two
+    <ul>
+      <li>2.1 (nested)</li>
+      <li>2.2</li>
+    </ul>
+  </li>
+  <li>Three</li>
+</ol>
+<p>And YouTube video!</p>
+<iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="560" height="315"></iframe>
+""",
+          config: Config(webView: true),
+        ),
+      );
 }
 ```
 
-![](packages/example/screenshots/HelloWorldScreen.jpg?raw=true)
+![](packages/example/screenshots/HelloWorldScreen.png?raw=true)
 
 ## Features
 
@@ -64,7 +68,7 @@ All texts will be rendered with padding (`Config.textPadding`).
   - `Config.webViewJs`, default=true
   - `Config.webViewPadding`
   - To render IFRAME as web view: set `webView=true` in config and [setup iOS project manually](https://pub.dartlang.org/packages/webview_flutter#ios).
-  - If the IFRAME has no `width` and `height` attributes, the web view will be rendered in a 16:9 box initially and automatically resize itself after the page is loaded.
+  - If the IFRAME has no `width` and `height` attributes, the web view will be rendered initially in a 16:9 box and automatically resize itself afterwards.
 - IMG via [`CachedNetworkImage`](https://pub.dartlang.org/packages/cached_network_image) with padding (`Config.imagePadding`), support base url resolver
 - LI/OL/UL with marker and padding (`Config.listBullet`, `Config.listPaddingLeft`)
 - P
