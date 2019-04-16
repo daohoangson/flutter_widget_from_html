@@ -11,11 +11,20 @@ const html = """
 <body style="background: gray; margin: 0">
   <div id="block" style="background: black; color: white;">&nbsp;</div>
   <script>
+    var attempts = 0;
     var block = document.getElementById('block');
-    var width = window.innerWidth;
-    var height = width / {input};
-    block.innerHTML = '{input}';
-    block.style.height = height + 'px';
+
+    function resize() {
+      attempts++;
+      var width = window.innerWidth;
+      if (width === 0) return setTimeout(resize, 10);
+
+      var height = width / {input};
+      block.style.height = height + 'px';
+      block.innerHTML = 'input={input}, attempts=' + attempts;
+    }
+
+    resize();
   </script>
 </body>
 """;
@@ -72,7 +81,6 @@ class _TestAppState extends State<TestApp> {
                   getDimensions: true,
                   getDimensionsDone: (v, _c, _h, _w) =>
                       setState(() => output = v),
-                  getDimensionsDurations: [null],
                   key: Key(input),
                 )
               : Container(),
