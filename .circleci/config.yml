@@ -66,7 +66,7 @@ jobs:
           name: setup
           command: |
             _package=$( sdkmanager --list --verbose | grep system-images | grep v7a | grep default | tail -n 1 )
-            echo "_package=$package"
+            echo "_package=$_package"
             sdkmanager $_package
             echo no | avdmanager create avd -n test -k $_package
       - run:
