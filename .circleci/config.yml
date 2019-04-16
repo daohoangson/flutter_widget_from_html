@@ -22,6 +22,8 @@ jobs:
       - run: flutter packages get
       - save_cache:
           key: pub-cache-{{ .Branch }}-{{ checksum "pubspec.yaml" }}-{{ checksum "packages/core/pubspec.yaml" }}-{{ checksum "packages/example/pubspec.yaml" }}
+          paths:
+            - ~/.pub-cache
       - run: curl -s https://codecov.io/bash >codecov.sh && chmod +x codecov.sh
       - persist_to_workspace:
           root: .
