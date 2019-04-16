@@ -1,24 +1,49 @@
 version: 2
+
+defaults: &defaults
+  docker:
+    - image: cirrusci/flutter
+  working_directory: ~/repo
+
 jobs:
-  test:
-    docker:
-      - image: cirrusci/flutter
+  checkout:
+    <<: *defaults
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - pub-cache-{{ .Branch }}-{{ checksum "pubspec.yaml" }}-{{ checksum "packages/core/pubspec.yaml" }}
-            - pub-cache-{{ .Branch }}
-            - pub-cache
-      - run: COVERAGE=1 ./tool/test.sh
-      - run: bash <(curl -s https://codecov.io/bash)
-      - save_cache:
-          key: pub-cache-{{ .Branch }}-{{ checksum "pubspec.yaml" }}-{{ checksum "packages/core/pubspec.yaml" }}
+      - attach_workspace:
+          at: ~/repo
+      - run: cd packages/core && flutter packages get
+      - run: cd packages/example && flutter packages get
+      - run: flutter packages get
+      - run: curl -s https://codecov.io/bash >codecov.sh && chmod +x codecov.sh
+      - persist_to_workspace:
+          root: /home/cirrus
           paths:
-            - ~/.pub-cache
+            - .pub-cache
+            - repos
+  unit_test_core:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run: cd packages/core && flutter test --coverage
+      - run: ./codecov.sh -F unit_test_core
+  unit_test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run: flutter test --coverage
+      - run: ./codecov.sh -F unit_test
 
 workflows:
   version: 2
   workflow:
     jobs:
-    - test
+      - checkout
+      - unit_test_core:
+          requires:
+            - checkout
+      - unit_test:
+          requires:
+            - checkout
