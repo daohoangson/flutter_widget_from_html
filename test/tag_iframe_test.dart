@@ -24,7 +24,8 @@ void main() {
     final explained = await explain(tester, html, config: configWithWebView);
     expect(
       explained,
-      equals('[WebView:url=http://domain.com,height=null,js=true,width=null]'),
+      equals('[WebView:url=http://domain.com,aspectRatio=1.78,' +
+          'getDimensions=true,js=true]'),
     );
   });
 
@@ -35,8 +36,8 @@ void main() {
     final explained = await explain(tester, html, config: configWithWebView);
     expect(
       explained,
-      equals('[WebView:url=http://domain.com,height=300.0,' +
-          'js=true,width=400.0]'),
+      equals('[WebView:url=http://domain.com,aspectRatio=1.33,' +
+          'getDimensions=false,js=true]'),
     );
   });
 

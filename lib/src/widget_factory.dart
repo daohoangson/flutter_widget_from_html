@@ -71,11 +71,18 @@ class WidgetFactory extends core.WidgetFactory {
     String url, {
     double height,
     double width,
-  }) =>
-      wrapPadding(
-        WebView(url, height: height, js: config.webViewJs, width: width),
-        config.webViewPadding,
-      );
+  }) {
+    final dimensOk = height != null && height > 0 && width != null && width > 0;
+    return wrapPadding(
+      WebView(
+        url,
+        aspectRatio: dimensOk ? width / height : 16 / 9,
+        getDimensions: !dimensOk && config.webViewJs,
+        js: config.webViewJs,
+      ),
+      config.webViewPadding,
+    );
+  }
 
   Widget buildWebViewLinkOnly(String url) => TagA(url, this, icon: false)
       .onPieces(<core.BuiltPiece>[

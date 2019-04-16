@@ -14,5 +14,10 @@ dependencies:
     path: ../../packages/core
   html: any
 
+dev_dependencies:
+  flutter_driver:
+    sdk: flutter
+  test: any
+
 flutter:
   uses-material-design: true
