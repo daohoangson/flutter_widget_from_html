@@ -11,7 +11,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/repo
+          at: /tmp/workspace
       - run: cd packages/core && flutter packages get
       - run: cd packages/example && flutter packages get
       - run: flutter packages get
@@ -25,14 +25,14 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: ~/repo
+          at: /tmp/workspace
       - run: cd packages/core && flutter test --coverage
       - run: ./codecov.sh -F unit_test_core
   unit_test:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: ~/repo
+          at: /tmp/workspace
       - run: flutter test --coverage
       - run: ./codecov.sh -F unit_test
 
