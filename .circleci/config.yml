@@ -53,40 +53,25 @@ jobs:
       - run: flutter test --coverage
       - run: ./codecov.sh -F unit_test
   integration_test:
-    <<: *defaults
+    macos:
+      xcode: '10.2.0'
     steps:
-      - attach_workspace:
-          at: ~/repo
-      - restore_cache:
-          keys:
-            - pub-cache-{{ .Branch }}-{{ checksum "pubspec.yaml" }}-{{ checksum "packages/core/pubspec.yaml" }}-{{ checksum "packages/example/pubspec.yaml" }}
-            - pub-cache-{{ .Branch }}
-            - pub-cache
+      - checkout
       - run:
           name: setup
           command: |
-            _package=$( sdkmanager --list --verbose | grep system-images | grep v7a | grep default | tail -n 1 )
-            echo "_package=$_package"
-            sdkmanager $_package
-            echo no | avdmanager create avd -n test -k $_package
+            brew update
+            brew install ideviceinstaller ios-deploy libimobiledevice
+            pod repo update
+            git clone --single-branch --branch stable https://github.com/flutter/flutter.git
+            export PATH=`pwd`/flutter/bin:`pwd`/flutter/bin/cache/dart-sdk/bin:$PATH
+            flutter doctor
+            xcrun simctl create Flutter-iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-X com.apple.CoreSimulator.SimRuntime.iOS-12-1 | xargs xcrun simctl boot
       - run:
-          name: launch
+          name: test
           command: |
-            cd ${ANDROID_HOME}/tools
-            export LD_LIBRARY_PATH=${ANDROID_HOME}/emulator/lib64:${ANDROID_HOME}/emulator/lib64/qt/lib
-            emulator -avd test -no-window -noaudio -no-boot-anim -no-window -accel on
-          background: true
-      - run:
-          name: wait
-          command: |
-            curl -s https://raw.githubusercontent.com/nenick/android-circleci-2.0/master/android-wait-for-boot.sh > wait-for-boot.sh
-            chmod +x wait-for-boot.sh
-            ./wait-for-boot.sh
-
-            # unlock the emulator screen
-            sleep 30
-            adb shell input keyevent 82
-      - run: tool/integration.sh
+            export PATH=`pwd`/flutter/bin:`pwd`/flutter/bin/cache/dart-sdk/bin:$PATH
+            ./tool/integration.sh
 
 workflows:
   version: 2
