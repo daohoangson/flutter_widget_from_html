@@ -20,7 +20,7 @@ jobs:
           root: /home/cirrus
           paths:
             - .pub-cache
-            - repos
+            - repo
   unit_test_core:
     <<: *defaults
     steps:
