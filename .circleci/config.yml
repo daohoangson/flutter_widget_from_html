@@ -93,12 +93,12 @@ workflows:
   workflow:
     jobs:
       - checkout
-      # - unit_test_core:
-      #     requires:
-      #       - checkout
-      # - unit_test:
-      #     requires:
-      #       - checkout
+      - unit_test_core:
+          requires:
+            - checkout
+      - unit_test:
+          requires:
+            - checkout
       - integration_test:
           requires:
             - checkout
