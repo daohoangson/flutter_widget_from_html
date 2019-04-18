@@ -68,6 +68,14 @@ class _Explainer {
     return "[$type:$description]";
   }
 
+  String _tableCell(TableCell cell) => _widget(cell.child);
+
+  String _tableRow(TableRow row) =>
+      row.children.map((c) => _tableCell(c)).toList().join(' | ');
+
+  String _tableRows(Table table) =>
+      table.children.map((r) => _tableRow(r)).toList().join('\n');
+
   String _textAlign(TextAlign textAlign) {
     switch (textAlign) {
       case TextAlign.center:
@@ -204,7 +212,9 @@ class _Explainer {
                         ? "child=${_widget(widget.child)}"
                         : widget is SingleChildScrollView
                             ? "child=${_widget(widget.child)}"
-                            : '';
+                            : widget is Table
+                                ? "\n${_tableRows(widget)}\n"
+                                : '';
     return "[$type$textAlignStr:$text$children]";
   }
 }

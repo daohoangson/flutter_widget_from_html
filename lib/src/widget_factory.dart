@@ -120,10 +120,10 @@ class WidgetFactory extends core.WidgetFactory {
         );
         break;
 
-      case 'li':
-      case 'ol':
-      case 'ul':
-        meta = core.lazySet(null, buildOp: tagLi(e.localName));
+      case kTagListItem:
+      case kTagOrderedList:
+      case kTagUnorderedList:
+        meta = core.lazySet(meta, buildOp: tagLi(e.localName));
         break;
     }
 

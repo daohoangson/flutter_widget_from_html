@@ -4,6 +4,7 @@ import 'package:html/dom.dart' as dom;
 
 import 'ops/style_text_align.dart';
 import 'ops/tag_img.dart';
+import 'ops/tag_table.dart';
 import 'metadata.dart';
 import 'parser.dart' as parser;
 
@@ -220,6 +221,17 @@ class WidgetFactory {
       case 'img':
         meta = lazySet(meta, buildOp: tagImg(e));
         break;
+
+      case kTagTable:
+      case kTagTableRow:
+        meta = lazySet(meta, buildOp: tagTable(e));
+        break;
+      case kTagTableCell:
+        meta = lazySet(meta, isBlockElement: true);
+        break;
+      case kTagTableHeader:
+        meta = tagTableHeaderStyle(meta);
+        break;
     }
 
     return meta;
@@ -242,4 +254,11 @@ class WidgetFactory {
 
   BuildOp tagImg(dom.Element e) =>
       BuildOp(onProcess: TagImg(e, this).onProcess);
+
+  BuildOp tagTable(dom.Element e) => BuildOp(
+        onWidgets: (widgets) => <Widget>[TagTable(e, this).build(widgets)],
+      );
+
+  NodeMetadata tagTableHeaderStyle(NodeMetadata meta) =>
+      lazySet(meta, fontWeight: FontWeight.bold, isBlockElement: true);
 }
