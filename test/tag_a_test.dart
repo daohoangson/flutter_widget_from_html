@@ -21,6 +21,16 @@ void main() {
             '[RichText:(#FF0000FF+u+onTap:Text)]]'));
   });
 
+  testWidgets('renders inline stylings', (WidgetTester tester) async {
+    final html = 'This is a <a href="http://domain.com/href" ' +
+        'style="color: #f00">hyperlink</a>.';
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[Padding:(5,10,5,10),child=' +
+            '[RichText:(:This is a (#FFFF0000+u+onTap:hyperlink)(:.))]]'));
+  });
+
   testWidgets('renders inner stylings', (WidgetTester tester) async {
     final html = 'This is a <a href="http://domain.com/href">' +
         '<b><i>hyperlink</i></b>.</a>';

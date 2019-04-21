@@ -1,40 +1,63 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    show BuiltPiece, BuiltPieceSimple, NodeMetadata;
+    show BuildOp, BuiltPieceSimple, NodeMetadata, loopElementStyle;
 
 import '../widget_factory.dart';
 
+// this is required because recognizer does not trigger for children
+// https://github.com/flutter/flutter/issues/10623
+TextSpan _buildTextSpan(TextSpan span, GestureRecognizer r) => TextSpan(
+      children: span?.children == null
+          ? null
+          : span.children.map((s) => _buildTextSpan(s, r)).toList(),
+      style: span?.style,
+      recognizer: r,
+      text: span?.text,
+    );
+
 class TagA {
-  final String fullUrl;
   final WidgetFactory wf;
   final bool icon;
 
+  BuildOp _buildOp;
+
   TagA(
-    this.fullUrl,
     this.wf, {
     this.icon = true,
   });
 
-  Iterable<BuiltPiece> onPieces(NodeMetadata _, Iterable<BuiltPiece> pieces) =>
-      pieces.map(
-        (piece) => piece.hasWidgets
-            ? BuiltPieceSimple(
-                widgets: <Widget>[
-                  _buildGestureDetector(
-                    wf.buildColumn(piece.widgets),
-                    wf.buildGestureTapCallbackForUrl(fullUrl),
+  BuildOp get buildOp {
+    _buildOp ??= BuildOp(
+      collectMetadata: (meta) {
+        loopElementStyle(
+          meta.buildOpElement,
+          (k, v) => meta = wf.parseElementStyle(meta, k, v),
+        );
+        return meta;
+      },
+      onPieces: (meta, pieces) {
+        final onTap = _buildGestureTapCallback(meta);
+
+        return pieces.map(
+          (piece) => piece.hasWidgets
+              ? BuiltPieceSimple(
+                  widgets: <Widget>[
+                    _buildGestureDetector(wf.buildColumn(piece.widgets), onTap),
+                  ],
+                )
+              : BuiltPieceSimple(
+                  textSpan: _buildTextSpan(
+                    piece.textSpan,
+                    TapGestureRecognizer()..onTap = onTap,
                   ),
-                ],
-              )
-            : BuiltPieceSimple(
-                textSpan: _buildTextSpan(
-                  piece.textSpan,
-                  TapGestureRecognizer()
-                    ..onTap = wf.buildGestureTapCallbackForUrl(fullUrl),
                 ),
-              ),
-      );
+        );
+      },
+    );
+
+    return _buildOp;
+  }
 
   Widget _buildGestureDetector(Widget child, GestureTapCallback onTap) =>
       child != null
@@ -45,6 +68,13 @@ class TagA {
               onTap: onTap,
             )
           : null;
+
+  GestureTapCallback _buildGestureTapCallback(NodeMetadata meta) {
+    final attrs = meta.buildOpElement.attributes;
+    final href = attrs.containsKey('href') ? attrs['href'] : '';
+    final fullUrl = buildFullUrl(href, wf.config.baseUrl) ?? href;
+    return wf.buildGestureTapCallbackForUrl(fullUrl);
+  }
 
   Widget _buildIconOpenInNew() => Positioned(
         top: 0.0,
@@ -57,16 +87,5 @@ class TagA {
             size: 40.0,
           ),
         ),
-      );
-
-  // this is required because recognizer does not trigger for children
-  // https://github.com/flutter/flutter/issues/10623
-  TextSpan _buildTextSpan(TextSpan span, GestureRecognizer r) => TextSpan(
-        children: span?.children == null
-            ? null
-            : span.children.map((s) => _buildTextSpan(s, r)).toList(),
-        style: span?.style,
-        recognizer: r,
-        text: span?.text,
       );
 }

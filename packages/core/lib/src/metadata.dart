@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:html/dom.dart' as dom;
 
 NodeMetadata lazySet(
   NodeMetadata meta, {
@@ -40,11 +41,13 @@ NodeMetadata lazySet(
 }
 
 class BuildOp {
+  final BuildOpCollectMetadata collectMetadata;
   final BuildOpOnPieces onPieces;
   final BuildOpOnProcess onProcess;
   final BuildOpOnWidgets onWidgets;
 
   BuildOp({
+    this.collectMetadata,
     this.onPieces,
     this.onProcess,
     this.onWidgets,
@@ -53,6 +56,7 @@ class BuildOp {
   bool get isBlockElement => onWidgets != null;
 }
 
+typedef NodeMetadata BuildOpCollectMetadata(NodeMetadata meta);
 typedef Iterable<BuiltPiece> BuildOpOnPieces(
   NodeMetadata meta,
   Iterable<BuiltPiece> pieces,
@@ -96,6 +100,7 @@ class BuiltPieceSimple extends BuiltPiece {
 
 class NodeMetadata {
   BuildOp buildOp;
+  dom.Element buildOpElement;
   Color color;
   bool decorationLineThrough;
   bool decorationOverline;

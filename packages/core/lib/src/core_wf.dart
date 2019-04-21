@@ -13,7 +13,11 @@ final _spacingRegExp = RegExp(r'\s+');
 class WidgetFactory {
   final BuildContext context;
 
-  const WidgetFactory(this.context);
+  BuildOp _styleTextAlign;
+  BuildOp _tagCode;
+  BuildOp _tagImg;
+
+  WidgetFactory(this.context);
 
   Widget buildColumn(List<Widget> children) => children?.isNotEmpty == true
       ? children?.length == 1
@@ -71,7 +75,8 @@ class WidgetFactory {
   Widget buildImageWidgetFromUrl(String url) =>
       url?.isNotEmpty == true ? Image.network(url, fit: BoxFit.cover) : null;
 
-  Widget buildMargin(List<Widget> children, EdgeInsetsGeometry margin) => Padding(
+  Widget buildMargin(List<Widget> children, EdgeInsetsGeometry margin) =>
+      Padding(
         child: buildColumn(children),
         padding: margin,
       );
@@ -194,21 +199,21 @@ class WidgetFactory {
       case 'code':
         meta = lazySet(
           meta,
-          buildOp: BuildOp(onWidgets: (_, w) => buildScrollView(w)),
+          buildOp: tagCode(),
           fontFamily: 'monospace',
         );
         break;
       case 'pre':
         meta = lazySet(
           meta,
-          buildOp: BuildOp(onWidgets: (_, w) => buildScrollView(w)),
+          buildOp: tagCode(),
           fontFamily: 'monospace',
           textSpaceCollapse: false,
         );
         break;
 
       case 'img':
-        meta = lazySet(meta, buildOp: tagImg(e));
+        meta = lazySet(meta, buildOp: tagImg());
         break;
     }
 
@@ -217,17 +222,26 @@ class WidgetFactory {
 
   NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
     switch (key) {
-      case 'text-align':
-        final sta = StyleTextAlign.fromString(value, this);
-        if (sta != null) {
-          meta = lazySet(meta, buildOp: BuildOp(onPieces: sta.onPieces));
-        }
+      case kCssTextAlign:
+        meta = lazySet(meta, buildOp: styleTextAlign());
         break;
     }
 
     return parser.parseElementStyle(meta, key, value);
   }
 
-  BuildOp tagImg(dom.Element e) =>
-      BuildOp(onProcess: TagImg(e, this).onProcess);
+  BuildOp styleTextAlign() {
+    _styleTextAlign ??= StyleTextAlign(this).buildOp;
+    return _styleTextAlign;
+  }
+
+  BuildOp tagCode() {
+    _tagCode ??= BuildOp(onWidgets: (_, widgets) => buildScrollView(widgets));
+    return _tagCode;
+  }
+
+  BuildOp tagImg() {
+    _tagImg ??= TagImg(this).buildOp;
+    return _tagImg;
+  }
 }

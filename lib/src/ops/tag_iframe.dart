@@ -1,4 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
+    show BuildOp;
 import 'package:html/dom.dart' as dom;
 
 import '../widget_factory.dart';
@@ -6,7 +8,14 @@ import '../widget_factory.dart';
 class TagIframe {
   final WidgetFactory wf;
 
+  BuildOp _buildOp;
+
   TagIframe(this.wf);
+
+  BuildOp get buildOp {
+    _buildOp ??= BuildOp(onWidgets: (meta, __) => build(meta.buildOpElement));
+    return _buildOp;
+  }
 
   Widget build(dom.Element e) {
     final a = e.attributes;

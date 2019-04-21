@@ -43,6 +43,10 @@ Widget wrapPadding(Widget widget, EdgeInsets padding) => (widget != null &&
 class WidgetFactory extends core.WidgetFactory {
   final Config config;
 
+  core.BuildOp _tagA;
+  core.BuildOp _tagIframe;
+  core.BuildOp _tagLi;
+
   WidgetFactory(
     BuildContext context, {
     this.config = const Config(),
@@ -94,53 +98,51 @@ class WidgetFactory extends core.WidgetFactory {
         config.webViewPadding,
       );
 
-  Widget buildWebViewLinkOnly(String url) => TagA(url, this, icon: false)
-      .onPieces(null, <core.BuiltPiece>[
-        core.BuiltPieceSimple(widgets: <Widget>[buildTextWidget(url)]),
-      ])
-      .first
-      ?.widgets
-      ?.first;
+  Widget buildWebViewLinkOnly(String fullUrl) => GestureDetector(
+        child: buildTextWidget(fullUrl),
+        onTap: buildGestureTapCallbackForUrl(fullUrl),
+      );
 
   @override
   core.NodeMetadata parseElement(core.NodeMetadata meta, dom.Element e) {
     switch (e.localName) {
       case 'a':
-        meta = core.lazySet(meta, color: Theme.of(context).accentColor);
-
-        if (e.attributes.containsKey('href')) {
-          final href = e.attributes['href'];
-          final fullUrl = buildFullUrl(href, config.baseUrl);
-          if (fullUrl?.isNotEmpty == true) {
-            meta = core.lazySet(meta, buildOp: tagA(fullUrl));
-          }
-        }
+        meta = core.lazySet(
+          meta,
+          buildOp: tagA(),
+          color: Theme.of(context).accentColor,
+        );
         break;
 
       case 'iframe':
         return core.lazySet(
           meta,
-          buildOp: tagIframe(e),
+          buildOp: tagIframe(),
           isNotRenderable: false,
         );
 
       case kTagListItem:
       case kTagOrderedList:
       case kTagUnorderedList:
-        return core.lazySet(meta, buildOp: tagLi(e.localName));
+        meta = core.lazySet(meta, buildOp: tagLi());
+        break;
     }
 
     return super.parseElement(meta, e);
   }
 
-  core.BuildOp tagA(String fullUrl) => core.BuildOp(
-        onPieces: TagA(fullUrl, this).onPieces,
-      );
+  core.BuildOp tagA() {
+    _tagA ??= TagA(this).buildOp;
+    return _tagA;
+  }
 
-  core.BuildOp tagIframe(dom.Element e) =>
-      core.BuildOp(onWidgets: (_, __) => TagIframe(this).build(e));
+  core.BuildOp tagIframe() {
+    _tagA ??= TagIframe(this).buildOp;
+    return _tagA;
+  }
 
-  core.BuildOp tagLi(String tag) => core.BuildOp(
-        onWidgets: (_, w) => TagLi(this).build(w, tag),
-      );
+  core.BuildOp tagLi() {
+    _tagLi ??= TagLi(this).buildOp;
+    return _tagLi;
+  }
 }

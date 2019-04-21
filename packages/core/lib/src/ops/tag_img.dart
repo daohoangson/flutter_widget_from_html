@@ -1,32 +1,34 @@
 import 'package:flutter/widgets.dart';
-import 'package:html/dom.dart' as dom;
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
+    show BuildOp;
 
 import '../core_wf.dart';
 import '../metadata.dart';
 
 class TagImg {
-  final dom.Element e;
   final WidgetFactory wf;
 
-  TagImg(this.e, this.wf);
+  BuildOp _buildOp;
 
-  void onProcess(
-    NodeMetadata meta,
-    BuildOpOnProcessAddSpan _,
-    BuildOpOnProcessAddWidgets addWidgets,
-    BuildOpOnProcessWrite __,
-  ) {
-    final image = _ImageMetadata.fromAttributes(e.attributes);
-    if (image == null) return;
+  TagImg(this.wf);
 
-    final widget = wf.buildImageWidget(
-      image.src,
-      height: image.height,
-      width: image.width,
-    );
-    if (widget == null) return;
+  BuildOp get buildOp {
+    _buildOp ??= BuildOp(onProcess: (meta, _, addWidgets, __) {
+      final e = meta.buildOpElement;
+      final image = _ImageMetadata.fromAttributes(e.attributes);
+      if (image == null) return;
 
-    addWidgets(<Widget>[widget]);
+      final widget = wf.buildImageWidget(
+        image.src,
+        height: image.height,
+        width: image.width,
+      );
+      if (widget == null) return;
+
+      addWidgets(<Widget>[widget]);
+    });
+
+    return _buildOp;
   }
 }
 

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
+    show BuildOp;
 
 import '../widget_factory.dart';
 
@@ -9,11 +11,20 @@ const kTagUnorderedList = 'ul';
 class TagLi {
   final WidgetFactory wf;
 
+  BuildOp _buildOp;
+
   TagLi(this.wf);
 
   String get bullet => '•';
   double get markerPaddingTop => wf.config.textPadding?.top ?? 0.0;
   double get markerWidth => 30.0;
+
+  BuildOp get buildOp {
+    _buildOp ??= BuildOp(
+      onWidgets: (meta, w) => build(w, meta.buildOpElement.localName),
+    );
+    return _buildOp;
+  }
 
   Widget build(List<Widget> children, String tag) {
     if (tag == kTagListItem) return wf.buildColumn(children);

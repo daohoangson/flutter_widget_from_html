@@ -17,6 +17,13 @@ bool checkTextSpanIsUseless(TextSpan span) {
   return checkTextIsUseless(span.text);
 }
 
+void loopElementStyle(dom.Element e, void f(String k, String v)) =>
+    e.attributes.containsKey('style')
+        ? _attributeStyleRegExp
+            .allMatches(e.attributes['style'])
+            .forEach((match) => f(match[1].trim(), match[2].trim()))
+        : null;
+
 class Builder {
   final List<dom.Node> domNodes;
   final NodeMetadata parentMeta;
@@ -72,15 +79,16 @@ class Builder {
 
   NodeMetadata collectMetadata(dom.Element e) {
     var meta = wf.parseElement(null, e);
+    loopElementStyle(e, (k, v) => meta = wf.parseElementStyle(meta, k, v));
 
-    final attribs = e.attributes;
-    if (attribs.containsKey('style')) {
-      final styles = _attributeStyleRegExp.allMatches(attribs['style']);
-      for (final style in styles) {
-        final styleKey = style[1].trim();
-        final styleValue = style[2].trim();
+    if (meta?.buildOp != null) {
+      meta.buildOpElement = e;
 
-        meta = wf.parseElementStyle(meta, styleKey, styleValue);
+      BuildOp buildOp;
+      while (meta.buildOp != buildOp) {
+        buildOp = meta.buildOp;
+        final f = buildOp.collectMetadata;
+        if (f != null) meta = f(meta);
       }
     }
 
