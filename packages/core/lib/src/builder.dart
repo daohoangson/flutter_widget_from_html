@@ -87,7 +87,7 @@ class Builder {
     return meta;
   }
 
-  List<BuiltPiece> process() {
+  Iterable<BuiltPiece> process() {
     _pieces.clear();
     _newPiece();
 
@@ -127,18 +127,17 @@ class Builder {
       }
 
       final __pieces = __builder.process();
-      final __piecesLength = __pieces.length;
-      for (var __pieceId = 0; __pieceId < __piecesLength; __pieceId++) {
-        final __piece = __pieces[__pieceId];
+      final __lastPiece = __pieces.last;
+      __pieces.forEach((__piece) {
         if (__piece.hasTextSpan) {
           _piece._addSpan(__piece.textSpan);
         } else if (__piece.hasText) {
-          _piece._write(__piece.text, isLast: __pieceId == __piecesLength - 1);
+          _piece._write(__piece.text, isLast: __piece == __lastPiece);
         } else if (__piece.hasWidgets) {
           _savePiece();
           _pieces.add(__piece);
         }
-      }
+      });
     }
 
     _savePiece();

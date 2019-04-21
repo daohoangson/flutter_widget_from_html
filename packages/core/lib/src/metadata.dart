@@ -53,9 +53,9 @@ class BuildOp {
   bool get isBlockElement => onWidgets != null;
 }
 
-typedef List<BuiltPiece> BuildOpOnPieces(
+typedef Iterable<BuiltPiece> BuildOpOnPieces(
   NodeMetadata meta,
-  List<BuiltPiece> pieces,
+  Iterable<BuiltPiece> pieces,
 );
 typedef void BuildOpOnProcess(
   NodeMetadata meta,

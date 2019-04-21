@@ -10,24 +10,19 @@ class StyleTextAlign {
 
   StyleTextAlign(this.alignment, this.textAlign, this.wf);
 
-  List<BuiltPiece> onPieces(NodeMetadata meta, List<BuiltPiece> pieces) {
-    final List<BuiltPiece> newPieces = List();
-    for (final piece in pieces) {
-      if (piece.hasWidgets) {
-        newPieces.add(BuiltPieceSimple(widgets: [
-          Align(
-            alignment: alignment,
-            child: wf.buildColumn(piece.widgets),
-          ),
-        ]));
-      } else {
-        piece.textAlign = textAlign;
-        newPieces.add(piece);
-      }
-    }
-
-    return newPieces;
-  }
+  Iterable<BuiltPiece> onPieces(NodeMetadata _, Iterable<BuiltPiece> pieces) =>
+      pieces.map(
+        (piece) => piece.hasWidgets
+            ? BuiltPieceSimple(
+                widgets: [
+                  Align(
+                    alignment: alignment,
+                    child: wf.buildColumn(piece.widgets),
+                  ),
+                ],
+              )
+            : (piece..textAlign = textAlign),
+      );
 
   static StyleTextAlign fromString(String textAlign, WidgetFactory wf) {
     switch (textAlign) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
 import 'package:html/dom.dart' as dom;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'ops/tag_a.dart';
@@ -43,6 +44,9 @@ class WidgetFactory extends core.WidgetFactory {
   final Config config;
 
   WidgetFactory(BuildContext context, this.config) : super(context);
+
+  GestureTapCallback buildGestureTapCallbackForUrl(String fullUrl) =>
+      () => canLaunch(fullUrl).then((ok) => ok ? launch(fullUrl) : null);
 
   @override
   Widget buildImageWidget(String src, {int height, int width}) => wrapPadding(
