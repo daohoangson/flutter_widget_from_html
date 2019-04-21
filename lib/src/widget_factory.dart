@@ -43,7 +43,10 @@ Widget wrapPadding(Widget widget, EdgeInsets padding) => (widget != null &&
 class WidgetFactory extends core.WidgetFactory {
   final Config config;
 
-  WidgetFactory(BuildContext context, this.config) : super(context);
+  WidgetFactory(
+    BuildContext context, {
+    this.config = const Config(),
+  }) : super(context);
 
   GestureTapCallback buildGestureTapCallbackForUrl(String fullUrl) =>
       () => canLaunch(fullUrl).then((ok) => ok ? launch(fullUrl) : null);
