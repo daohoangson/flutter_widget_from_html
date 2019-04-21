@@ -66,7 +66,7 @@ typedef void BuildOpOnProcess(
 typedef void BuildOpOnProcessAddSpan(TextSpan span);
 typedef void BuildOpOnProcessAddWidgets(List<Widget> widgets);
 typedef void BuildOpOnProcessWrite(String text);
-typedef List<Widget> BuildOpOnWidgets(NodeMetadata meta, List<Widget> widgets);
+typedef Widget BuildOpOnWidgets(NodeMetadata meta, List<Widget> widgets);
 
 abstract class BuiltPiece {
   bool get hasText;

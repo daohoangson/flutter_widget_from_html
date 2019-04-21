@@ -131,9 +131,9 @@ class WidgetFactory extends core.WidgetFactory {
       );
 
   core.BuildOp tagIframe(dom.Element e) =>
-      core.BuildOp(onWidgets: (_, __) => <Widget>[TagIframe(this).build(e)]);
+      core.BuildOp(onWidgets: (_, __) => TagIframe(this).build(e));
 
   core.BuildOp tagLi(String tag) => core.BuildOp(
-        onWidgets: (_, w) => <Widget>[TagLi(this).build(w, tag)],
+        onWidgets: (_, w) => TagLi(this).build(w, tag),
       );
 }

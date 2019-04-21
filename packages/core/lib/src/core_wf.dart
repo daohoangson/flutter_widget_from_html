@@ -194,14 +194,14 @@ class WidgetFactory {
       case 'code':
         meta = lazySet(
           meta,
-          buildOp: BuildOp(onWidgets: (_, w) => <Widget>[buildScrollView(w)]),
+          buildOp: BuildOp(onWidgets: (_, w) => buildScrollView(w)),
           fontFamily: 'monospace',
         );
         break;
       case 'pre':
         meta = lazySet(
           meta,
-          buildOp: BuildOp(onWidgets: (_, w) => <Widget>[buildScrollView(w)]),
+          buildOp: BuildOp(onWidgets: (_, w) => buildScrollView(w)),
           fontFamily: 'monospace',
           textSpaceCollapse: false,
         );

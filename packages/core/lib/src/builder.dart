@@ -59,7 +59,10 @@ class Builder {
     }
 
     final onWidgets = parentMeta?.buildOp?.onWidgets;
-    if (onWidgets != null) widgets = onWidgets(parentMeta, widgets);
+    if (onWidgets != null) {
+      final widget = onWidgets(parentMeta, widgets);
+      if (widget != null) widgets = <Widget>[widget];
+    }
 
     final margin = parentMeta?.margin;
     if (margin != null) widgets = [wf.buildMargin(widgets, margin)];
