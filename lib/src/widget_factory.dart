@@ -88,7 +88,7 @@ class WidgetFactory extends core.WidgetFactory {
       );
 
   Widget buildWebViewLinkOnly(String url) => TagA(url, this, icon: false)
-      .onPieces(<core.BuiltPiece>[
+      .onPieces(null, <core.BuiltPiece>[
         core.BuiltPieceSimple(widgets: <Widget>[buildTextWidget(url)]),
       ])
       .first
@@ -96,9 +96,7 @@ class WidgetFactory extends core.WidgetFactory {
       ?.first;
 
   @override
-  core.NodeMetadata parseElement(dom.Element e) {
-    var meta = super.parseElement(e);
-
+  core.NodeMetadata parseElement(core.NodeMetadata meta, dom.Element e) {
     switch (e.localName) {
       case 'a':
         meta = core.lazySet(meta, color: Theme.of(context).accentColor);
@@ -113,21 +111,19 @@ class WidgetFactory extends core.WidgetFactory {
         break;
 
       case 'iframe':
-        meta = core.lazySet(
+        return core.lazySet(
           meta,
           buildOp: tagIframe(e),
           isNotRenderable: false,
         );
-        break;
 
-      case 'li':
-      case 'ol':
-      case 'ul':
-        meta = core.lazySet(null, buildOp: tagLi(e.localName));
-        break;
+      case kTagListItem:
+      case kTagOrderedList:
+      case kTagUnorderedList:
+        return core.lazySet(meta, buildOp: tagLi(e.localName));
     }
 
-    return meta;
+    return super.parseElement(meta, e);
   }
 
   core.BuildOp tagA(String fullUrl) => core.BuildOp(
@@ -135,9 +131,9 @@ class WidgetFactory extends core.WidgetFactory {
       );
 
   core.BuildOp tagIframe(dom.Element e) =>
-      core.BuildOp(onWidgets: (_) => <Widget>[TagIframe(this).build(e)]);
+      core.BuildOp(onWidgets: (_, __) => <Widget>[TagIframe(this).build(e)]);
 
   core.BuildOp tagLi(String tag) => core.BuildOp(
-        onWidgets: (widgets) => <Widget>[TagLi(this).build(widgets, tag)],
+        onWidgets: (_, w) => <Widget>[TagLi(this).build(w, tag)],
       );
 }

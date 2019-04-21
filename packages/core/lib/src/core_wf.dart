@@ -189,29 +189,19 @@ class WidgetFactory {
     return null;
   }
 
-  NodeMetadata parseElement(dom.Element e) {
-    NodeMetadata meta = parser.parseElement(e);
-
+  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     switch (e.localName) {
-      case 'a':
-        meta = lazySet(meta, decorationUnderline: true);
-        break;
-
       case 'code':
         meta = lazySet(
           meta,
-          buildOp: BuildOp(
-            onWidgets: (widgets) => <Widget>[buildScrollView(widgets)],
-          ),
+          buildOp: BuildOp(onWidgets: (_, w) => <Widget>[buildScrollView(w)]),
           fontFamily: 'monospace',
         );
         break;
       case 'pre':
         meta = lazySet(
           meta,
-          buildOp: BuildOp(
-            onWidgets: (widgets) => <Widget>[buildScrollView(widgets)],
-          ),
+          buildOp: BuildOp(onWidgets: (_, w) => <Widget>[buildScrollView(w)]),
           fontFamily: 'monospace',
           textSpaceCollapse: false,
         );
@@ -222,12 +212,10 @@ class WidgetFactory {
         break;
     }
 
-    return meta;
+    return parser.parseElement(meta, e);
   }
 
   NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
-    meta = parser.parseElementStyle(meta, key, value);
-
     switch (key) {
       case 'text-align':
         final sta = StyleTextAlign.fromString(value, this);
@@ -237,7 +225,7 @@ class WidgetFactory {
         break;
     }
 
-    return meta;
+    return parser.parseElementStyle(meta, key, value);
   }
 
   BuildOp tagImg(dom.Element e) =>

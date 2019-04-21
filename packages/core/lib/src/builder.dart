@@ -58,8 +58,8 @@ class Builder {
       }
     }
 
-    final buildOpOnWidgets = parentMeta?.buildOp?.onWidgets;
-    if (buildOpOnWidgets != null) widgets = buildOpOnWidgets(widgets);
+    final onWidgets = parentMeta?.buildOp?.onWidgets;
+    if (onWidgets != null) widgets = onWidgets(parentMeta, widgets);
 
     final margin = parentMeta?.margin;
     if (margin != null) widgets = [wf.buildMargin(widgets, margin)];
@@ -68,7 +68,7 @@ class Builder {
   }
 
   NodeMetadata collectMetadata(dom.Element e) {
-    var meta = wf.parseElement(e);
+    var meta = wf.parseElement(null, e);
 
     final attribs = e.attributes;
     if (attribs.containsKey('style')) {
@@ -104,9 +104,9 @@ class Builder {
       final meta = collectMetadata(domNode);
       if (meta?.isNotRenderable == true) continue;
 
-      final buildOpOnProcess = meta?.buildOp?.onProcess;
-      if (buildOpOnProcess != null) {
-        buildOpOnProcess(_piece._addSpan, _addWidgets, _piece._write);
+      final onProcess = meta?.buildOp?.onProcess;
+      if (onProcess != null) {
+        onProcess(meta, _piece._addSpan, _addWidgets, _piece._write);
         continue;
       }
 
@@ -140,8 +140,8 @@ class Builder {
 
     _savePiece();
 
-    final buildOpOnPieces = parentMeta?.buildOp?.onPieces;
-    if (buildOpOnPieces != null) return buildOpOnPieces(_pieces);
+    final onPieces = parentMeta?.buildOp?.onPieces;
+    if (onPieces != null) return onPieces(parentMeta, _pieces);
 
     return _pieces;
   }

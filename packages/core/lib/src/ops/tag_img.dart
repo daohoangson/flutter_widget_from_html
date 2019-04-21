@@ -11,6 +11,7 @@ class TagImg {
   TagImg(this.e, this.wf);
 
   void onProcess(
+    NodeMetadata meta,
     BuildOpOnProcessAddSpan _,
     BuildOpOnProcessAddWidgets addWidgets,
     BuildOpOnProcessWrite __,

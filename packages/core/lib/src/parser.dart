@@ -9,10 +9,12 @@ part 'parser/_unit.dart';
 final _spacingRegExp = RegExp(r'\s+');
 final _styleColorRegExp = RegExp(r'^#([a-f0-9]{3,8})$', caseSensitive: false);
 
-NodeMetadata parseElement(dom.Element e) {
-  NodeMetadata meta;
-
+NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
   switch (e.localName) {
+    case 'a':
+      meta = lazySet(meta, decorationUnderline: true);
+      break;
+
     case 'b':
     case 'strong':
       meta = lazySet(meta, fontWeight: FontWeight.bold);

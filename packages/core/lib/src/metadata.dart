@@ -40,31 +40,33 @@ NodeMetadata lazySet(
 }
 
 class BuildOp {
-  final bool hasStyling;
-  final bool _isBlockElement;
   final BuildOpOnPieces onPieces;
   final BuildOpOnProcess onProcess;
   final BuildOpOnWidgets onWidgets;
 
   BuildOp({
-    this.hasStyling,
-    bool isBlockElement,
     this.onPieces,
     this.onProcess,
     this.onWidgets,
-  }) : this._isBlockElement = isBlockElement;
+  });
 
-  bool get isBlockElement =>
-      _isBlockElement != null ? _isBlockElement : onWidgets != null;
+  bool get isBlockElement => onWidgets != null;
 }
 
-typedef List<BuiltPiece> BuildOpOnPieces(List<BuiltPiece> pieces);
-typedef void BuildOpOnProcess(BuildOpOnProcessAddSpan addSpan,
-    BuildOpOnProcessAddWidgets addWidgets, BuildOpOnProcessWrite write);
+typedef List<BuiltPiece> BuildOpOnPieces(
+  NodeMetadata meta,
+  List<BuiltPiece> pieces,
+);
+typedef void BuildOpOnProcess(
+  NodeMetadata meta,
+  BuildOpOnProcessAddSpan addSpan,
+  BuildOpOnProcessAddWidgets addWidgets,
+  BuildOpOnProcessWrite write,
+);
 typedef void BuildOpOnProcessAddSpan(TextSpan span);
 typedef void BuildOpOnProcessAddWidgets(List<Widget> widgets);
 typedef void BuildOpOnProcessWrite(String text);
-typedef List<Widget> BuildOpOnWidgets(List<Widget> widgets);
+typedef List<Widget> BuildOpOnWidgets(NodeMetadata meta, List<Widget> widgets);
 
 abstract class BuiltPiece {
   bool get hasText;
@@ -109,7 +111,6 @@ class NodeMetadata {
   bool textSpaceCollapse;
 
   bool get hasStyling =>
-      buildOp?.hasStyling == true ||
       color != null ||
       fontFamily != null ||
       fontSize != null ||

@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    show BuiltPiece, BuiltPieceSimple;
+    show BuiltPiece, BuiltPieceSimple, NodeMetadata;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../widget_factory.dart';
@@ -44,7 +44,7 @@ class TagA {
             )),
       );
 
-  List<BuiltPiece> onPieces(List<BuiltPiece> pieces) {
+  List<BuiltPiece> onPieces(NodeMetadata meta, List<BuiltPiece> pieces) {
     List<BuiltPiece> newPieces = List();
 
     final onTap = prepareGestureTapCallback(fullUrl);

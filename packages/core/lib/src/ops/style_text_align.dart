@@ -10,7 +10,7 @@ class StyleTextAlign {
 
   StyleTextAlign(this.alignment, this.textAlign, this.wf);
 
-  List<BuiltPiece> onPieces(List<BuiltPiece> pieces) {
+  List<BuiltPiece> onPieces(NodeMetadata meta, List<BuiltPiece> pieces) {
     final List<BuiltPiece> newPieces = List();
     for (final piece in pieces) {
       if (piece.hasWidgets) {
