@@ -117,16 +117,12 @@ abstract class BuiltPiece {
   bool get hasWidgets;
 
   String get text;
-  TextAlign get textAlign;
   TextSpan get textSpan;
   List<Widget> get widgets;
-
-  set textAlign(TextAlign textAlign);
 }
 
 class BuiltPieceSimple extends BuiltPiece {
   final String text;
-  TextAlign textAlign;
   final TextSpan textSpan;
   final List<Widget> widgets;
 

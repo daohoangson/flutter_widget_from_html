@@ -28,15 +28,9 @@ class Builder {
 
     for (final piece in process()) {
       if (piece.hasTextSpan) {
-        addWidgetIfNotNull(wf.buildTextWidget(
-          piece.textSpan,
-          textAlign: piece.textAlign,
-        ));
+        addWidgetIfNotNull(wf.buildTextWidget(piece.textSpan));
       } else if (piece.hasText) {
-        addWidgetIfNotNull(wf.buildTextWidget(
-          piece.text,
-          textAlign: piece.textAlign,
-        ));
+        addWidgetIfNotNull(wf.buildTextWidget(piece.text));
       } else if (piece.hasWidgets) {
         piece.widgets.forEach(addWidgetIfNotNull);
       }
@@ -128,7 +122,6 @@ class Builder {
 class _BuiltPiece extends BuiltPiece {
   final Builder b;
   final _ParentStyle parentStyle;
-  TextAlign textAlign;
   final bool textSpaceCollapse;
   final List<Widget> widgets;
 

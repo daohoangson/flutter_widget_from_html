@@ -57,18 +57,22 @@ class StyleTextAlign {
         );
         if (textAlign == null) return pieces;
 
-        return pieces.map(
-          (piece) => piece.hasWidgets
-              ? BuiltPieceSimple(
-                  widgets: [
-                    Align(
-                      alignment: _getAlignment(textAlign),
-                      child: wf.buildColumn(piece.widgets),
-                    ),
-                  ],
-                )
-              : (piece..textAlign = _getTextAlign(textAlign)),
-        );
+        final widgets = <Widget>[];
+        for (final piece in pieces) {
+          widgets.add(
+            piece.hasWidgets
+                ? wf.buildAlign(
+                    wf.buildColumn(piece.widgets),
+                    _getAlignment(textAlign),
+                  )
+                : wf.buildTextWidget(
+                    piece.hasTextSpan ? piece.textSpan : piece.text,
+                    textAlign: _getTextAlign(textAlign),
+                  ),
+          );
+        }
+
+        return <BuiltPiece>[BuiltPieceSimple(widgets: widgets)];
       },
     );
 

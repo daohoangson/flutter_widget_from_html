@@ -21,6 +21,11 @@ class WidgetFactory {
 
   WidgetFactory(this.context);
 
+  Widget buildAlign(Widget child, Alignment alignment) {
+    if (alignment == null) return child;
+    return child != null ? Align(alignment: alignment, child: child) : null;
+  }
+
   Widget buildColumn(List<Widget> children) => children?.isNotEmpty == true
       ? children?.length == 1
           ? children.first
