@@ -51,14 +51,6 @@ class Builder {
       final meta = collectMetadata(domNode);
       if (meta?.isNotRenderable == true) return;
 
-      if (meta?.buildOps != null) {
-        final _as = _piece._addSpan;
-        final _w = _piece._write;
-        for (final buildOp in meta.buildOps.reversed) {
-          if (buildOp.onProcess(meta, _as, _addWidgets, _w)) return;
-        }
-      }
-
       final style = wf.buildTextStyle(meta, _parentStyle.textStyle);
       final __builder = Builder(
         domNode.nodes,

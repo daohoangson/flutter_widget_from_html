@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     show BuildOp;
 
@@ -13,19 +12,16 @@ class TagImg {
   TagImg(this.wf);
 
   BuildOp get buildOp {
-    _buildOp ??= BuildOp(onProcess: (meta, _, addWidgets, __) {
+    _buildOp ??= BuildOp(onWidgets: (meta, widgets) {
       final e = meta.buildOpElement;
       final image = _ImageMetadata.fromAttributes(e.attributes);
-      if (image == null) return;
+      if (image == null) return null;
 
-      final widget = wf.buildImageWidget(
+      return wf.buildImageWidget(
         image.src,
         height: image.height,
         width: image.width,
       );
-      if (widget == null) return;
-
-      addWidgets(<Widget>[widget]);
     });
 
     return _buildOp;

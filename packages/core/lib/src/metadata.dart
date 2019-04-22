@@ -49,18 +49,15 @@ class BuildOp {
 
   final BuildOpCollectMetadata _collectMetadata;
   final BuildOpOnPieces _onPieces;
-  final BuildOpOnProcess _onProcess;
   final BuildOpOnWidgets _onWidgets;
 
   BuildOp({
     BuildOpCollectMetadata collectMetadata,
     BuildOpOnPieces onPieces,
-    BuildOpOnProcess onProcess,
     BuildOpOnWidgets onWidgets,
     this.priority = 10,
   })  : _collectMetadata = collectMetadata,
         _onPieces = onPieces,
-        _onProcess = onProcess,
         _onWidgets = onWidgets;
 
   bool get isBlockElement => _onWidgets != null;
@@ -73,17 +70,6 @@ class BuildOp {
     Iterable<BuiltPiece> pieces,
   ) =>
       _onPieces != null ? _onPieces(meta, pieces) : pieces;
-
-  bool onProcess(
-    NodeMetadata meta,
-    BuildOpOnProcessAddSpan addSpan,
-    BuildOpOnProcessAddWidgets addWidgets,
-    BuildOpOnProcessWrite write,
-  ) {
-    if (_onProcess == null) return false;
-    _onProcess(meta, addSpan, addWidgets, write);
-    return true;
-  }
 
   List<Widget> onWidgets(NodeMetadata meta, List<Widget> widgets) {
     if (_onWidgets == null) return widgets;
@@ -100,15 +86,6 @@ typedef Iterable<BuiltPiece> BuildOpOnPieces(
   NodeMetadata meta,
   Iterable<BuiltPiece> pieces,
 );
-typedef void BuildOpOnProcess(
-  NodeMetadata meta,
-  BuildOpOnProcessAddSpan addSpan,
-  BuildOpOnProcessAddWidgets addWidgets,
-  BuildOpOnProcessWrite write,
-);
-typedef void BuildOpOnProcessAddSpan(TextSpan span);
-typedef void BuildOpOnProcessAddWidgets(List<Widget> widgets);
-typedef void BuildOpOnProcessWrite(String text);
 typedef Widget BuildOpOnWidgets(NodeMetadata meta, List<Widget> widgets);
 
 abstract class BuiltPiece {
