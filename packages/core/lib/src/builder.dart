@@ -58,10 +58,14 @@ class Builder {
       }
     }
 
-    final onWidgets = parentMeta?.buildOp?.onWidgets;
-    if (onWidgets != null) {
-      final widget = onWidgets(parentMeta, widgets);
-      if (widget != null) widgets = <Widget>[widget];
+    if (parentMeta?.buildOps != null) {
+      parentMeta.buildOps.forEach((buildOp) {
+        final f = buildOp.onWidgets;
+        if (f != null) {
+          final widget = f(parentMeta, widgets);
+          if (widget != null) widgets = <Widget>[widget];
+        }
+      });
     }
 
     final margin = parentMeta?.margin;
@@ -74,15 +78,15 @@ class Builder {
     var meta = wf.parseElement(null, e);
     attrStyleLoop(e, (k, v) => meta = wf.parseElementStyle(meta, k, v));
 
-    if (meta?.buildOp != null) {
+    if (meta?.buildOps != null) {
       meta.buildOpElement = e;
+      meta.buildOps.sort((a, b) => a.priority.compareTo(b.priority));
+      meta.buildOps = List.unmodifiable(meta.buildOps);
 
-      BuildOp buildOp;
-      while (meta.buildOp != buildOp) {
-        buildOp = meta.buildOp;
+      meta.buildOps.forEach((buildOp) {
         final f = buildOp.collectMetadata;
-        if (f != null) meta = f(meta);
-      }
+        if (f != null) f(meta);
+      });
     }
 
     return meta;
@@ -108,10 +112,16 @@ class Builder {
       final meta = collectMetadata(domNode);
       if (meta?.isNotRenderable == true) continue;
 
-      final onProcess = meta?.buildOp?.onProcess;
-      if (onProcess != null) {
-        onProcess(meta, _piece._addSpan, _addWidgets, _piece._write);
-        continue;
+      if (meta?.buildOps != null) {
+        var buildOpProcessed = false;
+        meta.buildOps.forEach((buildOp) {
+          final f = buildOp.onProcess;
+          if (f != null) {
+            f(meta, _piece._addSpan, _addWidgets, _piece._write);
+            buildOpProcessed = true;
+          }
+        });
+        if (buildOpProcessed) continue;
       }
 
       final style = wf.buildTextStyle(meta, _parentStyle.textStyle);
@@ -143,8 +153,16 @@ class Builder {
 
     _savePiece();
 
-    final onPieces = parentMeta?.buildOp?.onPieces;
-    if (onPieces != null) return onPieces(parentMeta, _pieces);
+    if (parentMeta?.buildOps != null) {
+      Iterable<BuiltPiece> buildOpPieces = _pieces;
+      parentMeta.buildOps.forEach((buildOp) {
+        final f = buildOp.onPieces;
+        if (f != null) {
+          buildOpPieces = f(parentMeta, buildOpPieces);
+        }
+      });
+      if (buildOpPieces != _pieces) return buildOpPieces;
+    }
 
     return _pieces;
   }

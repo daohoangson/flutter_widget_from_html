@@ -20,7 +20,10 @@ NodeMetadata lazySet(
 }) {
   meta ??= NodeMetadata();
 
-  if (buildOp != null) meta.buildOp = buildOp;
+  if (buildOp != null) {
+    meta.buildOps ??= [];
+    meta.buildOps.add(buildOp);
+  }
   if (color != null) meta.color = color;
   if (decorationLineThrough != null)
     meta.decorationLineThrough = decorationLineThrough;
@@ -46,17 +49,21 @@ class BuildOp {
   final BuildOpOnProcess onProcess;
   final BuildOpOnWidgets onWidgets;
 
+  // lower will run first
+  final int priority;
+
   BuildOp({
     this.collectMetadata,
     this.onPieces,
     this.onProcess,
     this.onWidgets,
+    this.priority = 10,
   });
 
   bool get isBlockElement => onWidgets != null;
 }
 
-typedef NodeMetadata BuildOpCollectMetadata(NodeMetadata meta);
+typedef void BuildOpCollectMetadata(NodeMetadata meta);
 typedef Iterable<BuiltPiece> BuildOpOnPieces(
   NodeMetadata meta,
   Iterable<BuiltPiece> pieces,
@@ -99,8 +106,8 @@ class BuiltPieceSimple extends BuiltPiece {
 }
 
 class NodeMetadata {
-  BuildOp buildOp;
   dom.Element buildOpElement;
+  List<BuildOp> buildOps;
   Color color;
   bool decorationLineThrough;
   bool decorationOverline;
@@ -132,10 +139,13 @@ class NodeMetadata {
 
   bool get hasFontStyle => fontStyleItalic != null;
 
-  bool get isBlockElement =>
-      buildOp?.isBlockElement == true ||
-      _isBlockElement == true ||
-      margin != null;
+  bool get isBlockElement {
+    if (_isBlockElement == true || margin != null) {
+      return true;
+    }
+
+    return buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
+  }
 }
 
 enum StyleType {
