@@ -58,4 +58,52 @@ void main() {
             '[RichText:(:Value (+i:1))] | [RichText:(+b:Value 2)]\n' +
             ']'));
   });
+
+  group('border', () {
+    testWidgets('renders border=0', (WidgetTester tester) async {
+      final html = '<table border="0"><tr><td>Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Table:\n[Text:Foo]\n]'));
+    });
+
+    testWidgets('renders border=1', (WidgetTester tester) async {
+      final html = '<table border="1"><tr><td>Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals('[Table:border=(Color(0xff000000),w=1.0)\n[Text:Foo]\n]'),
+      );
+    });
+
+    testWidgets('renders style="border: 1px"', (WidgetTester tester) async {
+      final html = '<table style="border: 1px"><tr><td>Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals('[Table:border=(Color(0xff000000),w=1.0)\n[Text:Foo]\n]'),
+      );
+    });
+
+    testWidgets('renders style="border: 2px"', (WidgetTester tester) async {
+      final html = '<table style="border: 2px"><tr><td>Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals('[Table:border=(Color(0xff000000),w=2.0)\n[Text:Foo]\n]'),
+      );
+    });
+
+    testWidgets(
+      'renders style="border: 1px solid #f00"',
+      (WidgetTester tester) async {
+        final html = '<table style="border: 1px solid #f00">' +
+            '<tr><td>Foo</td></tr></table>';
+        final explained = await explain(tester, html);
+        expect(
+          explained,
+          equals('[Table:border=(Color(0xffff0000),w=1.0)\n[Text:Foo]\n]'),
+        );
+      },
+    );
+  });
 }

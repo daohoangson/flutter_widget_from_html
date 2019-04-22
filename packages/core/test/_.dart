@@ -58,6 +58,8 @@ class _Explainer {
 
   String explain(Widget widget) => _widget(widget);
 
+  String _borderSide(BorderSide s) => "${s.color},w=${s.width}";
+
   String _edgeInsets(EdgeInsets e) =>
       "(${e.top.truncate()},${e.right.truncate()}," +
       "${e.bottom.truncate()},${e.left.truncate()})";
@@ -66,6 +68,21 @@ class _Explainer {
     final type = i.runtimeType.toString();
     final description = i is NetworkImage ? "url=${i.url}" : '';
     return "[$type:$description]";
+  }
+
+  String _tableBorder(TableBorder b) {
+    if (b == null) return '';
+
+    final top = _borderSide(b.top);
+    final right = _borderSide(b.right);
+    final bottom = _borderSide(b.bottom);
+    final left = _borderSide(b.left);
+
+    if (top == right && right == bottom && bottom == left) {
+      return "border=($top)";
+    }
+
+    return "borders=($top;$right;$bottom;$left)";
   }
 
   String _tableCell(TableCell cell) => _widget(cell.child);
@@ -195,7 +212,9 @@ class _Explainer {
                         ? "${_edgeInsets(widget.padding)},"
                         : widget is RichText
                             ? _textSpan(widget.text)
-                            : widget is Text ? widget.data : '';
+                            : widget is Table
+                                ? _tableBorder(widget.border)
+                                : widget is Text ? widget.data : '';
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));

@@ -68,7 +68,7 @@ class HomeScreen extends StatelessWidget {
     'Table': """Table data from
 <a href="https://www.w3schools.com/html/html_tables.asp">w3schools</a>:
     
-<table>
+<table border="1">
   <tr>
     <th>Firstname</th>
     <th>Lastname</th> 

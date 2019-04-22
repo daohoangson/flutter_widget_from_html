@@ -70,6 +70,9 @@ All texts will be rendered with padding (`Config.textPadding`).
 - P
 - PRE
 - STRONG
+- TABLE/TR/TD/TH with support for:
+  - `<table border="1">`
+  - `<table style="border: 1px solid #f00">`
 - U
 
 These tags and their contents will be ignored:

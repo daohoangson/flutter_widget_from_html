@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    show BuildOp;
+    show BuildOp, NodeMetadata, attrStyleLoop, borderParseAll;
 
 import '../core_wf.dart';
 
@@ -29,7 +29,7 @@ class TagTable {
 
         switch (e.localName) {
           case kTagTable:
-            return buildTable(widgets);
+            return buildTable(meta, widgets);
           case kTagTableCell:
           case kTagTableHeader:
             return buildTableCell(child: wf.buildColumn(widgets));
@@ -45,15 +45,14 @@ class TagTable {
     return _buildOp;
   }
 
-  Widget buildTable(List<Widget> children) {
+  Widget buildTable(NodeMetadata meta, List<Widget> children) {
     final rowWidgets = <_TableRowWidget>[];
     children.forEach((c) => (c is _TableRowWidget ? rowWidgets.add(c) : null));
 
-    // first pass
+    // first pass to find number of columns
     int cols = 0;
     rowWidgets.forEach((rw) => cols = cols > rw.cols ? cols : rw.cols);
 
-    // second pass
     final rows = <TableRow>[];
     rowWidgets.forEach((rw) {
       final cells = rw.cells.toList();
@@ -65,7 +64,7 @@ class TagTable {
     });
 
     return Table(
-      border: TableBorder.all(),
+      border: _buildTableBorder(meta),
       children: rows,
     );
   }
@@ -76,6 +75,31 @@ class TagTable {
   Widget buildTableRow(List<Widget> children) => _TableRowWidget(
         children.map((c) => c is TableCell ? c : buildTableCell(child: c)),
       );
+
+  TableBorder _buildTableBorder(NodeMetadata meta) {
+    final e = meta.buildOpElement;
+
+    String styleBorder;
+    attrStyleLoop(e, (k, v) => k == 'border' ? styleBorder = v : null);
+    if (styleBorder != null) {
+      final borderParsed = borderParseAll(styleBorder);
+      if (borderParsed != null) {
+        return TableBorder.all(
+          color: borderParsed.color ?? const Color(0xFF000000),
+          width: borderParsed.width,
+        );
+      }
+    }
+
+    if (e.attributes.containsKey('border')) {
+      final width = double.tryParse(e.attributes['border']);
+      if (width != null && width > 0) {
+        return TableBorder.all(width: width);
+      }
+    }
+
+    return null;
+  }
 }
 
 class _TableRowWidget extends StatelessWidget {
