@@ -13,7 +13,7 @@ class Builder {
   final _ParentStyle _parentStyle;
   final _pieces = <BuiltPiece>[];
 
-  _BuiltPiece _piece;
+  _Piece _piece;
 
   Builder(this.domNodes, this.wf, {this.parentMeta, _ParentStyle parentStyle})
       : _parentStyle = parentStyle ?? _ParentStyle(wf: wf);
@@ -83,11 +83,11 @@ class Builder {
 
   void _addWidgets(List<Widget> widgets) {
     _savePiece();
-    _pieces.add(_BuiltPiece(builder: this, widgets: widgets));
+    _pieces.add(_Piece(this, widgets: widgets));
   }
 
-  void _newPiece() => _piece = _BuiltPiece(
-        builder: this,
+  void _newPiece() => _piece = _Piece(
+        this,
         parentStyle: _parentStyle,
         textSpaceCollapse: parentMeta?.textSpaceCollapse,
       );
@@ -101,7 +101,7 @@ class Builder {
   }
 }
 
-class _BuiltPiece extends BuiltPiece {
+class _Piece extends BuiltPiece {
   final Builder b;
   final _ParentStyle parentStyle;
   final bool textSpaceCollapse;
@@ -110,13 +110,12 @@ class _BuiltPiece extends BuiltPiece {
   final StringBuffer _texts;
   List<TextSpan> _spans;
 
-  _BuiltPiece({
-    @required Builder builder,
+  _Piece(
+    this.b, {
     this.parentStyle,
     this.textSpaceCollapse,
     this.widgets,
-  })  : b = builder,
-        _texts = widgets == null ? StringBuffer() : null;
+  }) : _texts = widgets == null ? StringBuffer() : null;
 
   @override
   bool get hasText => _texts?.isNotEmpty == true;
@@ -131,13 +130,9 @@ class _BuiltPiece extends BuiltPiece {
   String get text => _texts.toString();
 
   @override
-  TextSpan get textSpan {
-    if (!hasText && _spans?.length == 1) {
-      return _spans[0];
-    }
-
-    return _buildTextSpan(text, children: _spans);
-  }
+  TextSpan get textSpan => (!hasText && _spans?.length == 1)
+      ? _spans[0]
+      : _buildTextSpan(text, children: _spans);
 
   void _addSpan(TextSpan span) {
     if (span == null || hasWidgets) return;
@@ -161,11 +156,7 @@ class _BuiltPiece extends BuiltPiece {
       text = text.trimRight();
     }
 
-    if (_spans == null) {
-      _texts.write(text);
-    } else {
-      _addSpan(_buildTextSpan(text));
-    }
+    _spans == null ? _texts.write(text) : _addSpan(_buildTextSpan(text));
   }
 }
 
