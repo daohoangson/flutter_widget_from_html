@@ -56,7 +56,7 @@ class TagLi {
         left: 0.0,
         top: 0.0,
         width: markerWidth,
-        child: wrapPadding(
+        child: wf.buildPadding(
           Text(
             text,
             maxLines: 1,

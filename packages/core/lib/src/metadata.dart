@@ -14,7 +14,6 @@ NodeMetadata lazySet(
   FontWeight fontWeight,
   bool isBlockElement,
   bool isNotRenderable,
-  EdgeInsetsGeometry margin,
   StyleType style,
   bool textSpaceCollapse,
 }) {
@@ -22,7 +21,9 @@ NodeMetadata lazySet(
 
   if (buildOp != null) {
     meta.buildOps ??= [];
-    meta.buildOps.add(buildOp);
+    if (meta.buildOps.indexOf(buildOp) == -1) {
+      meta.buildOps.add(buildOp);
+    }
   }
   if (color != null) meta.color = color;
   if (decorationLineThrough != null)
@@ -36,7 +37,6 @@ NodeMetadata lazySet(
   if (fontWeight != null) meta.fontWeight = fontWeight;
   if (isBlockElement != null) meta._isBlockElement = isBlockElement;
   if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
-  if (margin != null) meta.margin = margin;
   if (style != null) meta.style = style;
   if (textSpaceCollapse != null) meta.textSpaceCollapse = textSpaceCollapse;
 
@@ -150,7 +150,6 @@ class NodeMetadata {
   FontWeight fontWeight;
   bool _isBlockElement;
   bool isNotRenderable;
-  EdgeInsetsGeometry margin;
   StyleType style;
   bool textSpaceCollapse;
 
@@ -174,10 +173,7 @@ class NodeMetadata {
   bool get hasFontStyle => fontStyleItalic != null;
 
   bool get isBlockElement {
-    if (_isBlockElement == true || margin != null) {
-      return true;
-    }
-
+    if (_isBlockElement == true) return true;
     return buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
   }
 

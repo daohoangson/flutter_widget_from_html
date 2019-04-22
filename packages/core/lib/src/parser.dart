@@ -4,7 +4,6 @@ import 'package:html/dom.dart' as dom;
 import 'metadata.dart';
 
 part 'parser/attr_style.dart';
-part 'parser/margin.dart';
 part 'parser/text.dart';
 part 'parser/unit.dart';
 
@@ -177,22 +176,6 @@ NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
         case '900':
           meta = lazySet(meta, fontWeight: FontWeight.w900);
           break;
-      }
-      break;
-
-    case _kMargin:
-      final margin = marginParseAll(value);
-      if (margin != null) {
-        meta = lazySet(meta, margin: margin);
-      }
-      break;
-    case _kMarginBottom:
-    case _kMarginLeft:
-    case _kMarginRight:
-    case _kMarginTop:
-      final margin = marginParseOne(meta, key, value);
-      if (margin != null) {
-        meta = lazySet(meta, margin: margin);
       }
       break;
 

@@ -45,9 +45,6 @@ class Builder {
 
     parentMeta?.forEachOp((o) => widgets = o.onWidgets(parentMeta, widgets));
 
-    final margin = parentMeta?.margin;
-    if (margin != null) widgets = [wf.buildMargin(widgets, margin)];
-
     return widgets;
   }
 

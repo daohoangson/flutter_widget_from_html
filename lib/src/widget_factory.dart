@@ -34,12 +34,6 @@ String buildFullUrl(String url, Uri baseUrl) {
   return "${baseUrl.toString().replaceAll(_baseUriTrimmingRegExp, '')}/$url";
 }
 
-Widget wrapPadding(Widget widget, EdgeInsets padding) => (widget != null &&
-        padding != null &&
-        padding.top + padding.right + padding.bottom + padding.left > 0)
-    ? Padding(padding: padding, child: widget)
-    : widget;
-
 class WidgetFactory extends core.WidgetFactory {
   final Config config;
 
@@ -56,7 +50,7 @@ class WidgetFactory extends core.WidgetFactory {
       () => canLaunch(fullUrl).then((ok) => ok ? launch(fullUrl) : null);
 
   @override
-  Widget buildImageWidget(String src, {int height, int width}) => wrapPadding(
+  Widget buildImageWidget(String src, {int height, int width}) => buildPadding(
         super.buildImageWidget(src, height: height, width: width),
         config.imagePadding,
       );
@@ -73,7 +67,7 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
-  Widget buildTextWidget(text, {TextAlign textAlign}) => wrapPadding(
+  Widget buildTextWidget(text, {TextAlign textAlign}) => buildPadding(
         super.buildTextWidget(text, textAlign: textAlign),
         config.textPadding,
       );
@@ -83,7 +77,7 @@ class WidgetFactory extends core.WidgetFactory {
     double height,
     double width,
   }) =>
-      wrapPadding(
+      buildPadding(
         AspectRatio(
           aspectRatio:
               (height != null && height > 0 && width != null && width > 0)

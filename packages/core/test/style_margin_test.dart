@@ -77,28 +77,42 @@ void main() {
             '[Padding:(2,2,2,2),child=[Text:Foo]]]'));
   });
 
-  testWidgets('parses margin-top', (WidgetTester tester) async {
-    final html = '<div style="margin-top: 3px">Foo</div>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[Padding:(3,0,0,0),child=[Text:Foo]]'));
-  });
+  group('margin-xxx', () {
+    testWidgets('parses margin-top', (WidgetTester tester) async {
+      final html = '<div style="margin-top: 3px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Padding:(3,0,0,0),child=[Text:Foo]]'));
+    });
 
-  testWidgets('parses margin-right', (WidgetTester tester) async {
-    final html = '<div style="margin-right: 3px">Foo</div>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[Padding:(0,3,0,0),child=[Text:Foo]]'));
-  });
+    testWidgets('parses margin-right', (WidgetTester tester) async {
+      final html = '<div style="margin-right: 3px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Padding:(0,3,0,0),child=[Text:Foo]]'));
+    });
 
-  testWidgets('parses margin-bottom', (WidgetTester tester) async {
-    final html = '<div style="margin-bottom: 3px">Foo</div>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[Padding:(0,0,3,0),child=[Text:Foo]]'));
-  });
+    testWidgets('parses margin-bottom', (WidgetTester tester) async {
+      final html = '<div style="margin-bottom: 3px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Padding:(0,0,3,0),child=[Text:Foo]]'));
+    });
 
-  testWidgets('parses margin-left', (WidgetTester tester) async {
-    final html = '<div style="margin-left: 3px">Foo</div>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[Padding:(0,0,0,3),child=[Text:Foo]]'));
+    testWidgets('parses margin-left', (WidgetTester tester) async {
+      final html = '<div style="margin-left: 3px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Padding:(0,0,0,3),child=[Text:Foo]]'));
+    });
+
+    testWidgets('overwrites margin with margin-top', (WidgetTester t) async {
+      final html = '<div style="margin: 3px; margin-top: 5px">Foo</div>';
+      final explained = await explain(t, html);
+      expect(explained, equals('[Padding:(5,3,3,3),child=[Text:Foo]]'));
+    });
+
+    testWidgets('reset margin with margin-bottom', (WidgetTester t) async {
+      final html = '<div style="margin: 3px; margin-bottom: 0">Foo</div>';
+      final explained = await explain(t, html);
+      expect(explained, equals('[Padding:(3,3,0,3),child=[Text:Foo]]'));
+    });
   });
 
   group('invalid values', () {

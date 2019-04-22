@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'ops/style_margin.dart';
 import 'ops/style_text_align.dart';
 import 'ops/tag_img.dart';
 import 'metadata.dart';
@@ -13,6 +14,7 @@ final _spacingRegExp = RegExp(r'\s+');
 class WidgetFactory {
   final BuildContext context;
 
+  BuildOp _styleMargin;
   BuildOp _styleTextAlign;
   BuildOp _tagCode;
   BuildOp _tagImg;
@@ -75,11 +77,10 @@ class WidgetFactory {
   Widget buildImageWidgetFromUrl(String url) =>
       url?.isNotEmpty == true ? Image.network(url, fit: BoxFit.cover) : null;
 
-  Widget buildMargin(List<Widget> children, EdgeInsetsGeometry margin) =>
-      Padding(
-        child: buildColumn(children),
-        padding: margin,
-      );
+  Widget buildPadding(Widget child, EdgeInsetsGeometry padding) {
+    if (padding == null || padding == EdgeInsets.all(0)) return child;
+    return child != null ? Padding(child: child, padding: padding) : null;
+  }
 
   Widget buildScrollView(List<Widget> widgets) => SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -222,12 +223,25 @@ class WidgetFactory {
 
   NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
     switch (key) {
+      case kCssMargin:
+      case kCssMarginBottom:
+      case kCssMarginLeft:
+      case kCssMarginRight:
+      case kCssMarginTop:
+        meta = lazySet(meta, buildOp: styleMargin());
+        break;
+
       case kCssTextAlign:
         meta = lazySet(meta, buildOp: styleTextAlign());
         break;
     }
 
     return parser.parseElementStyle(meta, key, value);
+  }
+
+  BuildOp styleMargin() {
+    _styleMargin ??= StyleMargin(this).buildOp;
+    return _styleMargin;
   }
 
   BuildOp styleTextAlign() {
