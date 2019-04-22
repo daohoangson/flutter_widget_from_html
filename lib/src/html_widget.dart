@@ -16,6 +16,6 @@ class HtmlWidget extends core.HtmlWidget {
   }) : super(
           html,
           key: key,
-          wfBuilder: wfBuilder ?? (context) => WidgetFactory(context, config),
+          wfBuilder: wfBuilder ?? (c) => WidgetFactory(c, config: config),
         );
 }

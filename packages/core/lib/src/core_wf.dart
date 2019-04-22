@@ -14,7 +14,12 @@ final _spacingRegExp = RegExp(r'\s+');
 class WidgetFactory {
   final BuildContext context;
 
-  const WidgetFactory(this.context);
+  BuildOp _styleTextAlign;
+  BuildOp _tagCode;
+  BuildOp _tagImg;
+  BuildOp _tagTable;
+
+  WidgetFactory(this.context);
 
   Widget buildColumn(List<Widget> children) => children?.isNotEmpty == true
       ? children?.length == 1
@@ -35,7 +40,7 @@ class WidgetFactory {
       return null;
     }
 
-    final prefix = match.group(0);
+    final prefix = match[0];
     final bytes = base64.decode(dataUri.substring(prefix.length));
     if (bytes.length == 0) {
       return null;
@@ -72,7 +77,8 @@ class WidgetFactory {
   Widget buildImageWidgetFromUrl(String url) =>
       url?.isNotEmpty == true ? Image.network(url, fit: BoxFit.cover) : null;
 
-  Widget buildMargin(List<Widget> children, EdgeInsetsGeometry margin) => Padding(
+  Widget buildMargin(List<Widget> children, EdgeInsetsGeometry margin) =>
+      Padding(
         child: buildColumn(children),
         padding: margin,
       );
@@ -190,75 +196,66 @@ class WidgetFactory {
     return null;
   }
 
-  NodeMetadata parseElement(dom.Element e) {
-    NodeMetadata meta = parser.parseElement(e);
-
+  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     switch (e.localName) {
-      case 'a':
-        meta = lazySet(meta, decorationUnderline: true);
-        break;
-
       case 'code':
         meta = lazySet(
           meta,
-          buildOp: BuildOp(
-            onWidgets: (widgets) => <Widget>[buildScrollView(widgets)],
-          ),
+          buildOp: tagCode(),
           fontFamily: 'monospace',
         );
         break;
       case 'pre':
         meta = lazySet(
           meta,
-          buildOp: BuildOp(
-            onWidgets: (widgets) => <Widget>[buildScrollView(widgets)],
-          ),
+          buildOp: tagCode(),
           fontFamily: 'monospace',
           textSpaceCollapse: false,
         );
         break;
 
       case 'img':
-        meta = lazySet(meta, buildOp: tagImg(e));
+        meta = lazySet(meta, buildOp: tagImg());
         break;
 
       case kTagTable:
-      case kTagTableRow:
-        meta = lazySet(meta, buildOp: tagTable(e));
-        break;
       case kTagTableCell:
-        meta = lazySet(meta, isBlockElement: true);
-        break;
       case kTagTableHeader:
-        meta = tagTableHeaderStyle(meta);
+      case kTagTableRow:
+        meta = lazySet(meta, buildOp: tagTable());
         break;
     }
 
-    return meta;
+    return parser.parseElement(meta, e);
   }
 
   NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
-    meta = parser.parseElementStyle(meta, key, value);
-
     switch (key) {
-      case 'text-align':
-        final sta = StyleTextAlign.fromString(value, this);
-        if (sta != null) {
-          meta = lazySet(meta, buildOp: BuildOp(onPieces: sta.onPieces));
-        }
+      case kCssTextAlign:
+        meta = lazySet(meta, buildOp: styleTextAlign());
         break;
     }
 
-    return meta;
+    return parser.parseElementStyle(meta, key, value);
   }
 
-  BuildOp tagImg(dom.Element e) =>
-      BuildOp(onProcess: TagImg(e, this).onProcess);
+  BuildOp styleTextAlign() {
+    _styleTextAlign ??= StyleTextAlign(this).buildOp;
+    return _styleTextAlign;
+  }
 
-  BuildOp tagTable(dom.Element e) => BuildOp(
-        onWidgets: (widgets) => <Widget>[TagTable(e, this).build(widgets)],
-      );
+  BuildOp tagCode() {
+    _tagCode ??= BuildOp(onWidgets: (_, widgets) => buildScrollView(widgets));
+    return _tagCode;
+  }
 
-  NodeMetadata tagTableHeaderStyle(NodeMetadata meta) =>
-      lazySet(meta, fontWeight: FontWeight.bold, isBlockElement: true);
+  BuildOp tagImg() {
+    _tagImg ??= TagImg(this).buildOp;
+    return _tagImg;
+  }
+
+  BuildOp tagTable() {
+    _tagTable ??= TagTable(this).buildOp;
+    return _tagTable;
+  }
 }

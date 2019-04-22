@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:html/dom.dart' as dom;
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
+    show BuildOp;
 
 import '../core_wf.dart';
 
@@ -9,20 +10,39 @@ const kTagTableHeader = 'th';
 const kTagTableRow = 'tr';
 
 class TagTable {
-  final dom.Element e;
   final WidgetFactory wf;
 
-  TagTable(this.e, this.wf);
+  BuildOp _buildOp;
 
-  Widget build(List<Widget> children) {
-    switch (e.localName) {
-      case kTagTable:
-        return buildTable(children);
-      case kTagTableRow:
-        return buildTableRow(children);
-    }
+  TagTable(this.wf);
 
-    return Container();
+  BuildOp get buildOp {
+    _buildOp ??= BuildOp(
+      collectMetadata: (meta) {
+        final e = meta.buildOpElement;
+        if (e.localName == kTagTableHeader) {
+          meta.fontWeight = FontWeight.bold;
+        }
+      },
+      onWidgets: (meta, widgets) {
+        final e = meta.buildOpElement;
+
+        switch (e.localName) {
+          case kTagTable:
+            return buildTable(widgets);
+          case kTagTableCell:
+          case kTagTableHeader:
+            return buildTableCell(child: wf.buildColumn(widgets));
+          case kTagTableRow:
+            return buildTableRow(widgets);
+        }
+
+        return Container();
+      },
+      priority: 100,
+    );
+
+    return _buildOp;
   }
 
   Widget buildTable(List<Widget> children) {
@@ -36,7 +56,7 @@ class TagTable {
     // second pass
     final rows = <TableRow>[];
     rowWidgets.forEach((rw) {
-      final cells = rw.cells;
+      final cells = rw.cells.toList();
       while (cells.length < cols) {
         cells.add(buildTableCell());
       }
@@ -54,11 +74,12 @@ class TagTable {
       TableCell(child: child ?? Container());
 
   Widget buildTableRow(List<Widget> children) => _TableRowWidget(
-      children.map<TableCell>((c) => buildTableCell(child: c)).toList());
+        children.map((c) => c is TableCell ? c : buildTableCell(child: c)),
+      );
 }
 
 class _TableRowWidget extends StatelessWidget {
-  final List<TableCell> cells;
+  final Iterable<TableCell> cells;
   int get cols => cells.length;
 
   _TableRowWidget(this.cells);

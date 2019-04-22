@@ -9,29 +9,29 @@ class _BlockText extends WidgetFactory {
   _BlockText(BuildContext context) : super(context);
 
   @override
-  NodeMetadata parseElement(dom.Element e) => e.className == 'x'
+  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) => e.className == 'x'
       ? lazySet(
           null,
           buildOp: BuildOp(
-            onProcess: (_, addWidgets, __) =>
+            onProcess: (_, __, addWidgets, ___) =>
                 addWidgets(<Widget>[Text('block')]),
           ),
         )
-      : super.parseElement(e);
+      : super.parseElement(meta, e);
 }
 
 class _WhiteText extends WidgetFactory {
   _WhiteText(BuildContext context) : super(context);
 
   @override
-  NodeMetadata parseElement(dom.Element e) => e.className == 'x'
+  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) => e.className == 'x'
       ? lazySet(
           null,
           buildOp: BuildOp(
-            onProcess: (_, __, write) => write('white'),
+            onProcess: (_, __, ___, write) => write('white'),
           ),
         )
-      : super.parseElement(e);
+      : super.parseElement(meta, e);
 }
 
 void main() {

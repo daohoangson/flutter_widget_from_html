@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:html/dom.dart' as dom;
 
 NodeMetadata lazySet(
   NodeMetadata meta, {
@@ -19,7 +20,10 @@ NodeMetadata lazySet(
 }) {
   meta ??= NodeMetadata();
 
-  if (buildOp != null) meta.buildOp = buildOp;
+  if (buildOp != null) {
+    meta.buildOps ??= [];
+    meta.buildOps.add(buildOp);
+  }
   if (color != null) meta.color = color;
   if (decorationLineThrough != null)
     meta.decorationLineThrough = decorationLineThrough;
@@ -40,31 +44,40 @@ NodeMetadata lazySet(
 }
 
 class BuildOp {
-  final bool hasStyling;
-  final bool _isBlockElement;
+  final BuildOpCollectMetadata collectMetadata;
   final BuildOpOnPieces onPieces;
   final BuildOpOnProcess onProcess;
   final BuildOpOnWidgets onWidgets;
 
+  // lower will run first
+  final int priority;
+
   BuildOp({
-    this.hasStyling,
-    bool isBlockElement,
+    this.collectMetadata,
     this.onPieces,
     this.onProcess,
     this.onWidgets,
-  }) : this._isBlockElement = isBlockElement;
+    this.priority = 10,
+  });
 
-  bool get isBlockElement =>
-      _isBlockElement != null ? _isBlockElement : onWidgets != null;
+  bool get isBlockElement => onWidgets != null;
 }
 
-typedef List<BuiltPiece> BuildOpOnPieces(List<BuiltPiece> pieces);
-typedef void BuildOpOnProcess(BuildOpOnProcessAddSpan addSpan,
-    BuildOpOnProcessAddWidgets addWidgets, BuildOpOnProcessWrite write);
+typedef void BuildOpCollectMetadata(NodeMetadata meta);
+typedef Iterable<BuiltPiece> BuildOpOnPieces(
+  NodeMetadata meta,
+  Iterable<BuiltPiece> pieces,
+);
+typedef void BuildOpOnProcess(
+  NodeMetadata meta,
+  BuildOpOnProcessAddSpan addSpan,
+  BuildOpOnProcessAddWidgets addWidgets,
+  BuildOpOnProcessWrite write,
+);
 typedef void BuildOpOnProcessAddSpan(TextSpan span);
 typedef void BuildOpOnProcessAddWidgets(List<Widget> widgets);
 typedef void BuildOpOnProcessWrite(String text);
-typedef List<Widget> BuildOpOnWidgets(List<Widget> widgets);
+typedef Widget BuildOpOnWidgets(NodeMetadata meta, List<Widget> widgets);
 
 abstract class BuiltPiece {
   bool get hasText;
@@ -93,7 +106,8 @@ class BuiltPieceSimple extends BuiltPiece {
 }
 
 class NodeMetadata {
-  BuildOp buildOp;
+  dom.Element buildOpElement;
+  List<BuildOp> buildOps;
   Color color;
   bool decorationLineThrough;
   bool decorationOverline;
@@ -109,7 +123,6 @@ class NodeMetadata {
   bool textSpaceCollapse;
 
   bool get hasStyling =>
-      buildOp?.hasStyling == true ||
       color != null ||
       fontFamily != null ||
       fontSize != null ||
@@ -126,10 +139,13 @@ class NodeMetadata {
 
   bool get hasFontStyle => fontStyleItalic != null;
 
-  bool get isBlockElement =>
-      buildOp?.isBlockElement == true ||
-      _isBlockElement == true ||
-      margin != null;
+  bool get isBlockElement {
+    if (_isBlockElement == true || margin != null) {
+      return true;
+    }
+
+    return buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
+  }
 }
 
 enum StyleType {

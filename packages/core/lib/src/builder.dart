@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'metadata.dart';
 import 'core_wf.dart';
+import 'metadata.dart';
+import 'parser.dart';
 
-final _attributeStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
 final _textIsUselessRegExp = RegExp(r'^\s*$');
 
 bool checkTextIsUseless(String text) =>
@@ -58,8 +58,15 @@ class Builder {
       }
     }
 
-    final buildOpOnWidgets = parentMeta?.buildOp?.onWidgets;
-    if (buildOpOnWidgets != null) widgets = buildOpOnWidgets(widgets);
+    if (parentMeta?.buildOps != null) {
+      parentMeta.buildOps.forEach((buildOp) {
+        final f = buildOp.onWidgets;
+        if (f != null) {
+          final widget = f(parentMeta, widgets);
+          if (widget != null) widgets = <Widget>[widget];
+        }
+      });
+    }
 
     final margin = parentMeta?.margin;
     if (margin != null) widgets = [wf.buildMargin(widgets, margin)];
@@ -68,23 +75,24 @@ class Builder {
   }
 
   NodeMetadata collectMetadata(dom.Element e) {
-    var meta = wf.parseElement(e);
+    var meta = wf.parseElement(null, e);
+    attrStyleLoop(e, (k, v) => meta = wf.parseElementStyle(meta, k, v));
 
-    final attribs = e.attributes;
-    if (attribs.containsKey('style')) {
-      final styles = _attributeStyleRegExp.allMatches(attribs['style']);
-      for (final style in styles) {
-        final styleKey = style[1].trim();
-        final styleValue = style[2].trim();
+    if (meta?.buildOps != null) {
+      meta.buildOpElement = e;
+      meta.buildOps.sort((a, b) => a.priority.compareTo(b.priority));
+      meta.buildOps = List.unmodifiable(meta.buildOps);
 
-        meta = wf.parseElementStyle(meta, styleKey, styleValue);
-      }
+      meta.buildOps.forEach((buildOp) {
+        final f = buildOp.collectMetadata;
+        if (f != null) f(meta);
+      });
     }
 
     return meta;
   }
 
-  List<BuiltPiece> process() {
+  Iterable<BuiltPiece> process() {
     _pieces.clear();
     _newPiece();
 
@@ -104,10 +112,16 @@ class Builder {
       final meta = collectMetadata(domNode);
       if (meta?.isNotRenderable == true) continue;
 
-      final buildOpOnProcess = meta?.buildOp?.onProcess;
-      if (buildOpOnProcess != null) {
-        buildOpOnProcess(_piece._addSpan, _addWidgets, _piece._write);
-        continue;
+      if (meta?.buildOps != null) {
+        var buildOpProcessed = false;
+        meta.buildOps.forEach((buildOp) {
+          final f = buildOp.onProcess;
+          if (f != null) {
+            f(meta, _piece._addSpan, _addWidgets, _piece._write);
+            buildOpProcessed = true;
+          }
+        });
+        if (buildOpProcessed) continue;
       }
 
       final style = wf.buildTextStyle(meta, _parentStyle.textStyle);
@@ -124,24 +138,31 @@ class Builder {
       }
 
       final __pieces = __builder.process();
-      final __piecesLength = __pieces.length;
-      for (var __pieceId = 0; __pieceId < __piecesLength; __pieceId++) {
-        final __piece = __pieces[__pieceId];
+      final __lastPiece = __pieces.last;
+      __pieces.forEach((__piece) {
         if (__piece.hasTextSpan) {
           _piece._addSpan(__piece.textSpan);
         } else if (__piece.hasText) {
-          _piece._write(__piece.text, isLast: __pieceId == __piecesLength - 1);
+          _piece._write(__piece.text, isLast: __piece == __lastPiece);
         } else if (__piece.hasWidgets) {
           _savePiece();
           _pieces.add(__piece);
         }
-      }
+      });
     }
 
     _savePiece();
 
-    final buildOpOnPieces = parentMeta?.buildOp?.onPieces;
-    if (buildOpOnPieces != null) return buildOpOnPieces(_pieces);
+    if (parentMeta?.buildOps != null) {
+      Iterable<BuiltPiece> buildOpPieces = _pieces;
+      parentMeta.buildOps.forEach((buildOp) {
+        final f = buildOp.onPieces;
+        if (f != null) {
+          buildOpPieces = f(parentMeta, buildOpPieces);
+        }
+      });
+      if (buildOpPieces != _pieces) return buildOpPieces;
+    }
 
     return _pieces;
   }
