@@ -15,26 +15,16 @@ class Builder {
 
   _BuiltPiece _piece;
 
-  Builder(
-    this.domNodes,
-    this.wf, {
-    this.parentMeta,
-    _ParentStyle parentStyle,
-  }) : _parentStyle = parentStyle ?? _ParentStyle(wf: wf);
+  Builder(this.domNodes, this.wf, {this.parentMeta, _ParentStyle parentStyle})
+      : _parentStyle = parentStyle ?? _ParentStyle(wf: wf);
 
   List<Widget> build() {
     var widgets = <Widget>[];
-    final addWidgetIfNotNull = (Widget w) => w != null ? widgets.add(w) : null;
 
-    for (final piece in process()) {
-      if (piece.hasTextSpan) {
-        addWidgetIfNotNull(wf.buildTextWidget(piece.textSpan));
-      } else if (piece.hasText) {
-        addWidgetIfNotNull(wf.buildTextWidget(piece.text));
-      } else if (piece.hasWidgets) {
-        piece.widgets.forEach(addWidgetIfNotNull);
-      }
-    }
+    final addWidget = (Widget w) => w != null ? widgets.add(w) : null;
+    process().forEach((p) => p.hasWidgets
+        ? p.widgets.forEach(addWidget)
+        : addWidget(wf.buildTextWidget(p.hasTextSpan ? p.textSpan : p.text)));
 
     parentMeta?.forEachOp((o) => widgets = o.onWidgets(parentMeta, widgets));
 
