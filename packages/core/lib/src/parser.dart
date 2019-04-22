@@ -5,6 +5,7 @@ import 'metadata.dart';
 
 part 'parser/attr_style.dart';
 part 'parser/margin.dart';
+part 'parser/text.dart';
 part 'parser/unit.dart';
 
 final _spacingRegExp = RegExp(r'\s+');

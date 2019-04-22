@@ -44,23 +44,55 @@ NodeMetadata lazySet(
 }
 
 class BuildOp {
-  final BuildOpCollectMetadata collectMetadata;
-  final BuildOpOnPieces onPieces;
-  final BuildOpOnProcess onProcess;
-  final BuildOpOnWidgets onWidgets;
-
-  // lower will run first
+  // op with lower priority will run first
   final int priority;
 
-  BuildOp({
-    this.collectMetadata,
-    this.onPieces,
-    this.onProcess,
-    this.onWidgets,
-    this.priority = 10,
-  });
+  final BuildOpCollectMetadata _collectMetadata;
+  final BuildOpOnPieces _onPieces;
+  final BuildOpOnProcess _onProcess;
+  final BuildOpOnWidgets _onWidgets;
 
-  bool get isBlockElement => onWidgets != null;
+  BuildOp({
+    BuildOpCollectMetadata collectMetadata,
+    BuildOpOnPieces onPieces,
+    BuildOpOnProcess onProcess,
+    BuildOpOnWidgets onWidgets,
+    this.priority = 10,
+  })  : _collectMetadata = collectMetadata,
+        _onPieces = onPieces,
+        _onProcess = onProcess,
+        _onWidgets = onWidgets;
+
+  bool get isBlockElement => _onWidgets != null;
+
+  void collectMetadata(NodeMetadata meta) =>
+      _collectMetadata != null ? _collectMetadata(meta) : null;
+
+  Iterable<BuiltPiece> onPieces(
+    NodeMetadata meta,
+    Iterable<BuiltPiece> pieces,
+  ) =>
+      _onPieces != null ? _onPieces(meta, pieces) : pieces;
+
+  bool onProcess(
+    NodeMetadata meta,
+    BuildOpOnProcessAddSpan addSpan,
+    BuildOpOnProcessAddWidgets addWidgets,
+    BuildOpOnProcessWrite write,
+  ) {
+    if (_onProcess == null) return false;
+    _onProcess(meta, addSpan, addWidgets, write);
+    return true;
+  }
+
+  List<Widget> onWidgets(NodeMetadata meta, List<Widget> widgets) {
+    if (_onWidgets == null) return widgets;
+
+    final widget = _onWidgets(meta, widgets);
+    if (widget == null) return widgets;
+
+    return <Widget>[widget];
+  }
 }
 
 typedef void BuildOpCollectMetadata(NodeMetadata meta);
@@ -106,7 +138,7 @@ class BuiltPieceSimple extends BuiltPiece {
 }
 
 class NodeMetadata {
-  dom.Element buildOpElement;
+  dom.Element _buildOpElement;
   List<BuildOp> buildOps;
   Color color;
   bool decorationLineThrough;
@@ -121,6 +153,8 @@ class NodeMetadata {
   EdgeInsetsGeometry margin;
   StyleType style;
   bool textSpaceCollapse;
+
+  dom.Element get buildOpElement => _buildOpElement;
 
   bool get hasStyling =>
       color != null ||
@@ -145,6 +179,18 @@ class NodeMetadata {
     }
 
     return buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
+  }
+
+  void forEachOp(void f(BuildOp element)) => buildOps?.forEach(f);
+
+  List<BuildOp> freezeOps(dom.Element e) {
+    if (buildOps == null) return null;
+
+    _buildOpElement = e;
+    buildOps.sort((a, b) => a.priority.compareTo(b.priority));
+    buildOps = List.unmodifiable(buildOps);
+
+    return buildOps;
   }
 }
 

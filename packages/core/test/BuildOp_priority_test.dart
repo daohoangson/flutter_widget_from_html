@@ -5,19 +5,19 @@ import 'package:html/dom.dart' as dom;
 
 import '_.dart';
 
+Iterable<BuiltPiece> _a(NodeMetadata meta, Iterable<BuiltPiece> pieces) =>
+    pieces.map((p) => BuiltPieceSimple(text: p.text + ' A'));
+
+Iterable<BuiltPiece> _b(NodeMetadata meta, Iterable<BuiltPiece> pieces) =>
+    pieces.map((p) => BuiltPieceSimple(text: p.text + ' B'));
+
 class _AFirst extends WidgetFactory {
   _AFirst(BuildContext context) : super(context);
 
   @override
   NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
-    meta = lazySet(
-      meta,
-      buildOp: BuildOp(onProcess: (_, __, ___, w) => w('A'), priority: 1),
-    );
-    meta = lazySet(
-      meta,
-      buildOp: BuildOp(onProcess: (_, __, ___, w) => w('B'), priority: 2),
-    );
+    meta = lazySet(meta, buildOp: BuildOp(onPieces: _a, priority: 1));
+    meta = lazySet(meta, buildOp: BuildOp(onPieces: _b, priority: 2));
 
     return super.parseElement(meta, e);
   }
@@ -28,14 +28,8 @@ class _BFirst extends WidgetFactory {
 
   @override
   NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
-    meta = lazySet(
-      meta,
-      buildOp: BuildOp(onProcess: (_, __, ___, w) => w('A'), priority: 2),
-    );
-    meta = lazySet(
-      meta,
-      buildOp: BuildOp(onProcess: (_, __, ___, w) => w('B'), priority: 1),
-    );
+    meta = lazySet(meta, buildOp: BuildOp(onPieces: _a, priority: 2));
+    meta = lazySet(meta, buildOp: BuildOp(onPieces: _b, priority: 1));
 
     return super.parseElement(meta, e);
   }
@@ -53,7 +47,7 @@ void main() {
         wfBuilder: (context) => _AFirst(context),
       ),
     );
-    expect(explained, equals('[Text:AB]'));
+    expect(explained, equals('[Text:Foo A B]'));
   });
 
   testWidgets('renders B first', (WidgetTester tester) async {
@@ -65,6 +59,6 @@ void main() {
         wfBuilder: (context) => _BFirst(context),
       ),
     );
-    expect(explained, equals('[Text:BA]'));
+    expect(explained, equals('[Text:Foo B A]'));
   });
 }
