@@ -20,8 +20,7 @@ class Builder {
     this.wf, {
     this.parentMeta,
     _ParentStyle parentStyle,
-  }) : _parentStyle = parentStyle ??
-            _ParentStyle(false, DefaultTextStyle.of(wf.context).style);
+  }) : _parentStyle = parentStyle ?? _ParentStyle(wf: wf);
 
   List<Widget> build() {
     var widgets = <Widget>[];
@@ -81,7 +80,7 @@ class Builder {
         domNode.nodes,
         wf,
         parentMeta: meta,
-        parentStyle: style != null ? _ParentStyle(true, style) : _parentStyle,
+        parentStyle: style != null ? _ParentStyle(style: style) : _parentStyle,
       );
 
       if (meta?.isBlockElement == true) return _addWidgets(__builder.build());
@@ -199,5 +198,8 @@ class _ParentStyle {
   final bool hasStyling;
   final TextStyle textStyle;
 
-  _ParentStyle(this.hasStyling, this.textStyle);
+  _ParentStyle({WidgetFactory wf, TextStyle style})
+      : assert((wf == null) != (style == null)),
+        hasStyling = style != null,
+        textStyle = style ?? DefaultTextStyle.of(wf.context).style;
 }
