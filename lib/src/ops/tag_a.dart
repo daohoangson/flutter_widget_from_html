@@ -29,13 +29,6 @@ class TagA {
 
   BuildOp get buildOp {
     _buildOp ??= BuildOp(
-      collectMetadata: (meta) {
-        loopElementStyle(
-          meta.buildOpElement,
-          (k, v) => meta = wf.parseElementStyle(meta, k, v),
-        );
-        return meta;
-      },
       onPieces: (meta, pieces) {
         final onTap = _buildGestureTapCallback(meta);
 

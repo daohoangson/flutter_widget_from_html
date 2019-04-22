@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 
-import '../builder.dart';
 import '../core_wf.dart';
 import '../metadata.dart';
+import '../parser.dart';
 
 const kCssTextAlign = 'text-align';
 const kCssTextAlignCenter = 'center';
@@ -51,7 +51,7 @@ class StyleTextAlign {
     _buildOp ??= BuildOp(
       onPieces: (meta, pieces) {
         String textAlign;
-        loopElementStyle(
+        attrStyleLoop(
           meta.buildOpElement,
           (k, v) => k == kCssTextAlign ? textAlign = v : null,
         );

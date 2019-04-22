@@ -10,37 +10,31 @@ final _kMarginValuesFourRegex =
     RegExp(r'^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)$');
 final _kMarginValuesTwoRegex = RegExp(r'^([^\s]+)\s+([^\s]+)$');
 
-double _parseMarginValue(String str) {
-  final d = _unitParseValue(str);
-  return (d == null || d < 0) ? 0 : d;
-}
-
-EdgeInsetsGeometry _marginParseAll(String value) {
+EdgeInsetsGeometry marginParseAll(String value) {
   final valuesFour = _kMarginValuesFourRegex.firstMatch(value);
   if (valuesFour != null) {
-    final t = _parseMarginValue(valuesFour.group(1));
-    final r = _parseMarginValue(valuesFour.group(2));
-    final b = _parseMarginValue(valuesFour.group(3));
-    final l = _parseMarginValue(valuesFour.group(4));
+    final t = marginParseValue(valuesFour[1]);
+    final r = marginParseValue(valuesFour[2]);
+    final b = marginParseValue(valuesFour[3]);
+    final l = marginParseValue(valuesFour[4]);
     if (t == 0 && r == 0 && b == 0 && l == 0) return null;
     return EdgeInsets.fromLTRB(l, t, r, b);
   }
 
   final valuesTwo = _kMarginValuesTwoRegex.firstMatch(value);
   if (valuesTwo != null) {
-    final v = _parseMarginValue(valuesTwo.group(1));
-    final h = _parseMarginValue(valuesTwo.group(2));
+    final v = marginParseValue(valuesTwo[1]);
+    final h = marginParseValue(valuesTwo[2]);
     if (v == 0 && h == 0) return null;
     return EdgeInsets.symmetric(horizontal: h, vertical: v);
   }
 
-  final all = _parseMarginValue(value);
+  final all = marginParseValue(value);
   return all == 0 ? null : EdgeInsets.all(all);
 }
 
-EdgeInsetsGeometry _marginParseOne(
-    NodeMetadata meta, String key, String value) {
-  final parsed = _unitParseValue(value);
+EdgeInsetsGeometry marginParseOne(NodeMetadata meta, String key, String value) {
+  final parsed = unitParseValue(value);
   if (parsed == null) return meta.margin;
 
   final existing = meta.margin ?? EdgeInsets.all(0);
@@ -55,4 +49,9 @@ EdgeInsetsGeometry _marginParseOne(
     default:
       return existing.add(EdgeInsets.only(top: parsed));
   }
+}
+
+double marginParseValue(String str) {
+  final d = unitParseValue(str);
+  return (d == null || d < 0) ? 0 : d;
 }

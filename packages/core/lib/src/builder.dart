@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'metadata.dart';
 import 'core_wf.dart';
+import 'metadata.dart';
+import 'parser.dart';
 
-final _attributeStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
 final _textIsUselessRegExp = RegExp(r'^\s*$');
 
 bool checkTextIsUseless(String text) =>
@@ -16,13 +16,6 @@ bool checkTextSpanIsUseless(TextSpan span) {
 
   return checkTextIsUseless(span.text);
 }
-
-void loopElementStyle(dom.Element e, void f(String k, String v)) =>
-    e.attributes.containsKey('style')
-        ? _attributeStyleRegExp
-            .allMatches(e.attributes['style'])
-            .forEach((match) => f(match[1].trim(), match[2].trim()))
-        : null;
 
 class Builder {
   final List<dom.Node> domNodes;
@@ -79,7 +72,7 @@ class Builder {
 
   NodeMetadata collectMetadata(dom.Element e) {
     var meta = wf.parseElement(null, e);
-    loopElementStyle(e, (k, v) => meta = wf.parseElementStyle(meta, k, v));
+    attrStyleLoop(e, (k, v) => meta = wf.parseElementStyle(meta, k, v));
 
     if (meta?.buildOp != null) {
       meta.buildOpElement = e;

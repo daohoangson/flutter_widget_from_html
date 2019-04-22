@@ -38,7 +38,7 @@ class WidgetFactory {
       return null;
     }
 
-    final prefix = match.group(0);
+    final prefix = match[0];
     final bytes = base64.decode(dataUri.substring(prefix.length));
     if (bytes.length == 0) {
       return null;
