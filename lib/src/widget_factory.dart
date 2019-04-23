@@ -1,15 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
+    show BuildOp, BuiltPieceSimple, NodeMetadata, lazySet;
 import 'package:html/dom.dart' as dom;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import 'ops/tag_a.dart';
-import 'ops/tag_iframe.dart';
-import 'ops/tag_li.dart';
 import 'config.dart';
+
+part 'ops/tag_a.dart';
+part 'ops/tag_iframe.dart';
+part 'ops/tag_li.dart';
 
 final _baseUriTrimmingRegExp = RegExp(r'/+$');
 final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
@@ -17,9 +21,9 @@ final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
 class WidgetFactory extends core.WidgetFactory {
   final Config config;
 
-  core.BuildOp _tagA;
-  core.BuildOp _tagIframe;
-  core.BuildOp _tagLi;
+  BuildOp _tagA;
+  BuildOp _tagIframe;
+  BuildOp _tagLi;
 
   WidgetFactory(
     BuildContext context, {
@@ -95,37 +99,37 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
-  core.NodeMetadata parseElement(core.NodeMetadata meta, dom.Element e) {
+  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     switch (e.localName) {
       case 'a':
-        meta = core.lazySet(meta, buildOp: tagA());
+        meta = lazySet(meta, buildOp: tagA());
         break;
 
       case 'iframe':
         // return asap to avoid being disabled by core
-        return core.lazySet(meta, buildOp: tagIframe());
+        return lazySet(meta, buildOp: tagIframe());
 
       case kTagListItem:
       case kTagOrderedList:
       case kTagUnorderedList:
-        meta = core.lazySet(meta, buildOp: tagLi());
+        meta = lazySet(meta, buildOp: tagLi());
         break;
     }
 
     return super.parseElement(meta, e);
   }
 
-  core.BuildOp tagA() {
+  BuildOp tagA() {
     _tagA ??= TagA(this).buildOp;
     return _tagA;
   }
 
-  core.BuildOp tagIframe() {
+  BuildOp tagIframe() {
     _tagIframe ??= TagIframe(this).buildOp;
     return _tagIframe;
   }
 
-  core.BuildOp tagLi() {
+  BuildOp tagLi() {
     _tagLi ??= TagLi(this).buildOp;
     return _tagLi;
   }

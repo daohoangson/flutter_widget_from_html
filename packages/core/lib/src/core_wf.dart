@@ -2,13 +2,14 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'ops/style_margin.dart';
-import 'ops/style_text_align.dart';
-import 'ops/tag_code.dart';
-import 'ops/tag_img.dart';
-import 'ops/tag_table.dart';
-import 'metadata.dart';
+import 'data_classes.dart';
 import 'parser.dart' as parser;
+
+part 'ops/style_margin.dart';
+part 'ops/style_text_align.dart';
+part 'ops/tag_code.dart';
+part 'ops/tag_img.dart';
+part 'ops/tag_table.dart';
 
 const kFontSizeXxLarge = 2.0;
 const kFontSizeXLarge = 1.5;
@@ -33,6 +34,8 @@ class WidgetFactory {
   BuildOp _tagTable;
 
   WidgetFactory(this.context);
+
+  double get defaultFontSize => DefaultTextStyle.of(context).style.fontSize;
 
   Widget buildAlign(Widget child, Alignment alignment) {
     if (alignment == null) return child;
@@ -133,32 +136,30 @@ class WidgetFactory {
     return TextDecoration.combine(list);
   }
 
-  double buildTextFontSize(String value, double parent) {
-    final parsed = parser.unitParseValue(value);
-    if (parsed != null) return parsed;
-
-    final root = DefaultTextStyle.of(context).style.fontSize;
+  double buildTextFontSize(String value, TextStyle parent) {
+    final parsed = parser.lengthParseValue(value);
+    if (parsed != null) return parsed.getValue(parent);
 
     switch (value) {
       case 'xx-large':
-        return root * kFontSizeXxLarge;
+        return defaultFontSize * kFontSizeXxLarge;
       case 'x-large':
-        return root * kFontSizeXLarge;
+        return defaultFontSize * kFontSizeXLarge;
       case 'large':
-        return root * kFontSizeLarge;
+        return defaultFontSize * kFontSizeLarge;
       case 'medium':
-        return root;
+        return defaultFontSize;
       case 'small':
-        return root * kFontSizeSmall;
+        return defaultFontSize * kFontSizeSmall;
       case 'x-small':
-        return root * kFontSizeXSmall;
+        return defaultFontSize * kFontSizeXSmall;
       case 'xx-small':
-        return root * kFontSizeXxSmall;
+        return defaultFontSize * kFontSizeXxSmall;
 
       case 'larger':
-        return parent * kFontSizeLarger;
+        return parent.fontSize * kFontSizeLarger;
       case 'smaller':
-        return parent * kFontSizeSmaller;
+        return parent.fontSize * kFontSizeSmaller;
     }
 
     return null;
@@ -198,7 +199,7 @@ class WidgetFactory {
       decoration: buildTextDecoration(meta, parent),
       decorationStyle: meta.decorationStyle,
       fontFamily: meta.fontFamily,
-      fontSize: buildTextFontSize(meta.fontSize, parent.fontSize),
+      fontSize: buildTextFontSize(meta.fontSize, parent),
       fontStyle: buildFontSize(meta),
       fontWeight: meta.fontWeight,
     );

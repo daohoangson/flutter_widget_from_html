@@ -1,13 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'metadata.dart';
+import 'data_classes.dart';
 
-part 'parser/attr_style.dart';
 part 'parser/border.dart';
 part 'parser/color.dart';
+part 'parser/css.dart';
 part 'parser/text.dart';
-part 'parser/unit.dart';
 
 final _spacingRegExp = RegExp(r'\s+');
 

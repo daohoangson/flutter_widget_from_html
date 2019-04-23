@@ -1,8 +1,4 @@
-import 'package:flutter/widgets.dart';
-
-import '../core_wf.dart';
-import '../metadata.dart';
-import '../parser.dart';
+part of '../core_wf.dart';
 
 const kCssTextAlign = 'text-align';
 const kCssTextAlignCenter = 'center';
@@ -68,7 +64,7 @@ String _parseValue(NodeMetadata meta) {
   String value;
 
   final e = meta.buildOpElement;
-  attrStyleLoop(e, (k, v) => k == kCssTextAlign ? value = v : null);
+  parser.attrStyleLoop(e, (k, v) => k == kCssTextAlign ? value = v : null);
 
   return value;
 }

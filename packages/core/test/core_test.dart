@@ -396,6 +396,13 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(explained, equals('[RichText:(@8.3:F(@6.9:o)(:o))]'));
     });
 
+    testWidgets('renders 2em', (WidgetTester tester) async {
+      final html = '<span style="font-size: 2em">F' +
+          '<span style="font-size: 2em">o</span>o</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(@20.0:F(@40.0:o)(:o))]'));
+    });
+
     testWidgets('renders invalid', (WidgetTester tester) async {
       final html = '<span style="font-size: xxx">Foo</span>';
       final explained = await explain(tester, html);

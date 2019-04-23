@@ -133,7 +133,7 @@ class BuiltPieceSimple extends BuiltPiece {
 class CssBorderSide {
   Color color;
   CssBorderStyle style;
-  double width;
+  CssLength width;
 }
 
 enum CssBorderStyle { dashed, dotted, double, solid }
@@ -145,8 +145,33 @@ class CssBorders {
   CssBorderSide top;
 }
 
+class CssLength {
+  final double number;
+  final CssLengthUnit unit;
+
+  CssLength(this.number, {this.unit});
+
+  double getValue(TextStyle parent) {
+    if (number == 0) return 0;
+
+    switch (this.unit) {
+      case CssLengthUnit.em:
+        return parent.fontSize * number / 1;
+      case CssLengthUnit.px:
+      default:
+        return number;
+    }
+  }
+}
+
+enum CssLengthUnit {
+  em,
+  px,
+}
+
 class NodeMetadata {
   dom.Element _buildOpElement;
+  TextStyle _buildOpTextStyle;
   Iterable<BuildOp> _buildOps;
   Color color;
   bool decorationLineThrough;
@@ -162,6 +187,8 @@ class NodeMetadata {
   StyleType style;
 
   dom.Element get buildOpElement => _buildOpElement;
+
+  TextStyle get buildOpTextStyle => _buildOpTextStyle;
 
   bool get hasStyling =>
       color != null ||
@@ -196,6 +223,14 @@ class NodeMetadata {
     _buildOps = List.unmodifiable(ops);
 
     return _buildOps;
+  }
+
+  freezeTextStyle(TextStyle textStyle) {
+    if (_buildOpTextStyle != null) {
+      throw new StateError('TextStyle has already been set');
+    }
+
+    _buildOpTextStyle = textStyle;
   }
 }
 

@@ -1,8 +1,4 @@
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    show BuildOp;
-
-import '../core_wf.dart';
-import '../metadata.dart';
+part of '../core_wf.dart';
 
 class TagImg {
   final WidgetFactory wf;

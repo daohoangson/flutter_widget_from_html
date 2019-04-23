@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'core_wf.dart';
-import 'metadata.dart';
+import 'data_classes.dart';
 import 'parser.dart';
 
 class Builder {
@@ -16,7 +16,9 @@ class Builder {
   _Piece _piece;
 
   Builder(this.domNodes, this.wf, {this.parentMeta, _ParentStyle parentStyle})
-      : _parentStyle = parentStyle ?? _ParentStyle(wf: wf);
+      : _parentStyle = parentStyle ?? _ParentStyle(wf: wf) {
+    parentMeta?.freezeTextStyle(_parentStyle.textStyle);
+  }
 
   List<Widget> build() {
     var widgets = <Widget>[];

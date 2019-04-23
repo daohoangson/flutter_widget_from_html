@@ -6,8 +6,8 @@ final _borderValuesTwoRegExp = RegExp(r'^(.+)\s+(.+)$');
 CssBorderSide borderParse(String value) {
   final valuesThree = _borderValuesThreeRegExp.firstMatch(value);
   if (valuesThree != null) {
-    final width = unitParseValue(valuesThree[1]);
-    if (width == null || width < 0) return null;
+    final width = lengthParseValue(valuesThree[1]);
+    if (width == null || width.number <= 0) return null;
     return CssBorderSide()
       ..color = colorParseValue(valuesThree[3])
       ..style = borderStyleParseValue(valuesThree[2])
@@ -16,15 +16,15 @@ CssBorderSide borderParse(String value) {
 
   final valuesTwo = _borderValuesTwoRegExp.firstMatch(value);
   if (valuesTwo != null) {
-    final width = unitParseValue(valuesTwo[1]);
-    if (width == null || width < 0) return null;
+    final width = lengthParseValue(valuesTwo[1]);
+    if (width == null || width.number <= 0) return null;
     return CssBorderSide()
       ..style = borderStyleParseValue(valuesTwo[2])
       ..width = width;
   }
 
-  final width = unitParseValue(value);
-  if (width == null || width < 0) return null;
+  final width = lengthParseValue(value);
+  if (width == null || width.number <= 0) return null;
   return CssBorderSide()
     ..style = CssBorderStyle.solid
     ..width = width;

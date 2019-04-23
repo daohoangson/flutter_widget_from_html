@@ -1,8 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    show BuildOp, NodeMetadata, attrStyleLoop, borderParse;
-
-import '../core_wf.dart';
+part of '../core_wf.dart';
 
 const kTagTable = 'table';
 const kTagTableCell = 'td';
@@ -71,13 +67,13 @@ TableBorder _buildTableBorder(NodeMetadata meta) {
   final e = meta.buildOpElement;
 
   String styleBorder;
-  attrStyleLoop(e, (k, v) => k == 'border' ? styleBorder = v : null);
+  parser.attrStyleLoop(e, (k, v) => k == 'border' ? styleBorder = v : null);
   if (styleBorder != null) {
-    final borderParsed = borderParse(styleBorder);
+    final borderParsed = parser.borderParse(styleBorder);
     if (borderParsed != null) {
       return TableBorder.all(
         color: borderParsed.color ?? const Color(0xFF000000),
-        width: borderParsed.width,
+        width: borderParsed.width.getValue(meta.buildOpTextStyle),
       );
     }
   }
