@@ -44,6 +44,7 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     case 'strong':
       meta = lazySet(meta, fontWeight: FontWeight.bold);
       break;
+    case 'cite':
     case 'em':
     case 'i':
       meta = lazySet(meta, fontStyleItalic: true);

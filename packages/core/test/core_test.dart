@@ -417,18 +417,28 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
   });
 
   group('font-style', () {
+    testWidgets('renders CITE tag', (WidgetTester tester) async {
+      final html = 'This is a <cite>citation</cite>.';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:This is a (+i:citation)(:.))]'));
+    });
+
     testWidgets('renders I tag', (WidgetTester tester) async {
       final html = 'This is an <i>italic</i> text.';
       final explained = await explain(tester, html);
       expect(
-          explained, equals('[RichText:(:This is an (+i:italic)(: text.))]'));
+        explained,
+        equals('[RichText:(:This is an (+i:italic)(: text.))]'),
+      );
     });
 
     testWidgets('renders EM tag', (WidgetTester tester) async {
       final html = 'This is an <em>emphasized</em> text.';
       final explained = await explain(tester, html);
-      expect(explained,
-          equals('[RichText:(:This is an (+i:emphasized)(: text.))]'));
+      expect(
+        explained,
+        equals('[RichText:(:This is an (+i:emphasized)(: text.))]'),
+      );
     });
 
     testWidgets('renders inline style: italic', (WidgetTester tester) async {
