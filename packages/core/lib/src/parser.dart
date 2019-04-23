@@ -4,11 +4,12 @@ import 'package:html/dom.dart' as dom;
 import 'metadata.dart';
 
 part 'parser/attr_style.dart';
+part 'parser/border.dart';
+part 'parser/color.dart';
 part 'parser/text.dart';
 part 'parser/unit.dart';
 
 final _spacingRegExp = RegExp(r'\s+');
-final _styleColorRegExp = RegExp(r'^#([a-f0-9]{3,8})$', caseSensitive: false);
 
 NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
   switch (e.localName) {
@@ -95,34 +96,8 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
 NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
   switch (key) {
     case 'color':
-      final m = _styleColorRegExp.firstMatch(value);
-      if (m == null) return meta;
-      final hex = m[1];
-
-      Color color;
-      switch (hex.length) {
-        case 3:
-          color = Color(
-            int.parse('0xFF' + hex[0] * 2 + hex[1] * 2 + hex[2] * 2),
-          );
-          break;
-        case 4:
-          color = Color(
-            int.parse('0x' + hex[3] * 2 + hex[0] * 2 + hex[1] * 2 + hex[2] * 2),
-          );
-          break;
-        case 6:
-          color = Color(int.parse('0xFF' + hex));
-          break;
-        case 8:
-          color = Color(
-            int.parse('0x' + hex.substring(6, 8) + hex.substring(0, 6)),
-          );
-          break;
-      }
-      if (color == null) return meta;
-
-      meta = lazySet(meta, color: color);
+      final color = colorParseValue(value);
+      if (color != null) meta = lazySet(meta, color: color);
       break;
 
     case 'font-family':

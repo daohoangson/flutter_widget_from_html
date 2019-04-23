@@ -6,6 +6,7 @@ import 'ops/style_margin.dart';
 import 'ops/style_text_align.dart';
 import 'ops/tag_code.dart';
 import 'ops/tag_img.dart';
+import 'ops/tag_table.dart';
 import 'metadata.dart';
 import 'parser.dart' as parser;
 
@@ -19,6 +20,7 @@ class WidgetFactory {
   BuildOp _styleTextAlign;
   BuildOp _tagCode;
   BuildOp _tagImg;
+  BuildOp _tagTable;
 
   WidgetFactory(this.context);
 
@@ -88,6 +90,13 @@ class WidgetFactory {
         scrollDirection: Axis.horizontal,
         child: widgets.length == 1 ? widgets.first : buildColumn(widgets),
       );
+
+  Widget buildTable(List<TableRow> rows, {TableBorder border}) => Table(
+        border: border,
+        children: rows,
+      );
+
+  Widget buildTableCell(Widget child) => TableCell(child: child);
 
   TextDecoration buildTextDecoration(NodeMetadata meta, TextStyle parent) {
     if (meta.hasDecoration != true) return null;
@@ -198,6 +207,13 @@ class WidgetFactory {
       case 'img':
         meta = lazySet(meta, buildOp: tagImg());
         break;
+
+      case kTagTable:
+      case kTagTableCell:
+      case kTagTableHeader:
+      case kTagTableRow:
+        meta = lazySet(meta, buildOp: tagTable());
+        break;
     }
 
     return parser.parseElement(meta, e);
@@ -239,5 +255,10 @@ class WidgetFactory {
   BuildOp tagImg() {
     _tagImg ??= TagImg(this).buildOp;
     return _tagImg;
+  }
+
+  BuildOp tagTable() {
+    _tagTable ??= TagTable(this).buildOp;
+    return _tagTable;
   }
 }

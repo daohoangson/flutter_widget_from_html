@@ -60,6 +60,9 @@ Below tags are the ones that have special meaning / styling, all other tags will
 - P
 - PRE
 - STRONG
+- TABLE/TR/TD/TH with support for:
+  - `<table border="1">`
+  - `<table style="border: 1px solid #f00">`
 - U
 
 However, these tags and their contents will be ignored:
