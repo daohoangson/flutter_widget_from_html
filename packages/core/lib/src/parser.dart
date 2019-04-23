@@ -26,6 +26,10 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
       );
       break;
 
+    case 'address':
+      meta = lazySet(meta, isBlockElement: true, fontStyleItalic: true);
+      break;
+
     case 'b':
     case 'strong':
       meta = lazySet(meta, fontWeight: FontWeight.bold);

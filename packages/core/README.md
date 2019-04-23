@@ -48,23 +48,13 @@ class HelloWorldCoreScreen extends StatelessWidget {
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
 
 - A: underline without color, no action on tap (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
-- ABBR/ACRONYM
-- B
-- BR
-- CODE
-- DIV
-- EM
 - H1/H2/H3/H4/H5/H6
-- I
 - IMG: no caching, no relative url support (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
 - LI/OL/UL: no marker (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
-- P
-- PRE
-- STRONG
 - TABLE/TR/TD/TH with support for:
   - `<table border="1">`
   - `<table style="border: 1px solid #f00">`
-- U
+- ABBR, ACRONYM, ADDRESS, B, BR, CODE, DIV, EM, I, P, PRE, STRONG, U
 
 However, these tags and their contents will be ignored:
 

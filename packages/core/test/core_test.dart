@@ -61,6 +61,15 @@ void main() {
     });
   });
 
+  testWidgets('renders ADDRESS tag', (WidgetTester tester) async {
+    final html = '<p>This is an <address>ADDRESS</address></p>';
+    final explained = await explain(tester, html);
+    expect(
+      explained,
+      equals('[Column:children=[Text:This is an],[RichText:(+i:ADDRESS)]]'),
+    );
+  });
+
   group('IMG tag', () {
     testWidgets('renders src', (WidgetTester tester) async {
       final html = '<img src="image.png" />';
