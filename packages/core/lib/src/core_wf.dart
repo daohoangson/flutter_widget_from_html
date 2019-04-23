@@ -2,8 +2,11 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'ops/style_margin.dart';
 import 'ops/style_text_align.dart';
+import 'ops/tag_code.dart';
 import 'ops/tag_img.dart';
+import 'ops/tag_table.dart';
 import 'metadata.dart';
 import 'parser.dart' as parser;
 
@@ -13,7 +16,18 @@ final _spacingRegExp = RegExp(r'\s+');
 class WidgetFactory {
   final BuildContext context;
 
-  const WidgetFactory(this.context);
+  BuildOp _styleMargin;
+  BuildOp _styleTextAlign;
+  BuildOp _tagCode;
+  BuildOp _tagImg;
+  BuildOp _tagTable;
+
+  WidgetFactory(this.context);
+
+  Widget buildAlign(Widget child, Alignment alignment) {
+    if (alignment == null) return child;
+    return child != null ? Align(alignment: alignment, child: child) : null;
+  }
 
   Widget buildColumn(List<Widget> children) => children?.isNotEmpty == true
       ? children?.length == 1
@@ -30,15 +44,11 @@ class WidgetFactory {
 
   List buildImageBytes(String dataUri) {
     final match = _dataUriRegExp.matchAsPrefix(dataUri);
-    if (match == null) {
-      return null;
-    }
+    if (match == null) return null;
 
-    final prefix = match.group(0);
+    final prefix = match[0];
     final bytes = base64.decode(dataUri.substring(prefix.length));
-    if (bytes.length == 0) {
-      return null;
-    }
+    if (bytes.length == 0) return null;
 
     return bytes;
   }
@@ -71,15 +81,22 @@ class WidgetFactory {
   Widget buildImageWidgetFromUrl(String url) =>
       url?.isNotEmpty == true ? Image.network(url, fit: BoxFit.cover) : null;
 
-  Widget buildMargin(List<Widget> children, EdgeInsetsGeometry margin) => Padding(
-        child: buildColumn(children),
-        padding: margin,
-      );
+  Widget buildPadding(Widget child, EdgeInsetsGeometry padding) {
+    if (padding == null || padding == EdgeInsets.all(0)) return child;
+    return child != null ? Padding(child: child, padding: padding) : null;
+  }
 
   Widget buildScrollView(List<Widget> widgets) => SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: widgets.length == 1 ? widgets.first : buildColumn(widgets),
       );
+
+  Widget buildTable(List<TableRow> rows, {TableBorder border}) => Table(
+        border: border,
+        children: rows,
+      );
+
+  Widget buildTableCell(Widget child) => TableCell(child: child);
 
   TextDecoration buildTextDecoration(NodeMetadata meta, TextStyle parent) {
     if (meta.hasDecoration != true) return null;
@@ -89,7 +106,7 @@ class WidgetFactory {
     final pdOverline = pd?.contains(TextDecoration.overline) == true;
     final pdUnderline = pd?.contains(TextDecoration.underline) == true;
 
-    final List<TextDecoration> list = List();
+    final List<TextDecoration> list = [];
     if (meta.decorationLineThrough == true ||
         (pdLineThough && meta.decorationLineThrough != false)) {
       list.add(TextDecoration.lineThrough);
@@ -121,18 +138,9 @@ class WidgetFactory {
       text = text.replaceAll(_spacingRegExp, ' ');
     }
 
-    TextSpan span;
-    if (text.isEmpty && children?.length == 1) {
-      span = children.first;
-    } else {
-      span = TextSpan(
-        children: children,
-        style: style,
-        text: text,
-      );
-    }
-
-    return span;
+    return (text.isEmpty && children?.length == 1)
+        ? children.first
+        : TextSpan(children: children, style: style, text: text);
   }
 
   TextStyle buildTextStyle(NodeMetadata meta, TextStyle parent) {
@@ -189,57 +197,68 @@ class WidgetFactory {
     return null;
   }
 
-  NodeMetadata parseElement(dom.Element e) {
-    NodeMetadata meta = parser.parseElement(e);
-
+  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     switch (e.localName) {
-      case 'a':
-        meta = lazySet(meta, decorationUnderline: true);
-        break;
-
-      case 'code':
-        meta = lazySet(
-          meta,
-          buildOp: BuildOp(
-            onWidgets: (widgets) => <Widget>[buildScrollView(widgets)],
-          ),
-          fontFamily: 'monospace',
-        );
-        break;
-      case 'pre':
-        meta = lazySet(
-          meta,
-          buildOp: BuildOp(
-            onWidgets: (widgets) => <Widget>[buildScrollView(widgets)],
-          ),
-          fontFamily: 'monospace',
-          textSpaceCollapse: false,
-        );
+      case kTagCode:
+      case kTagPre:
+        meta = lazySet(meta, buildOp: tagCode());
         break;
 
       case 'img':
-        meta = lazySet(meta, buildOp: tagImg(e));
+        meta = lazySet(meta, buildOp: tagImg());
+        break;
+
+      case kTagTable:
+      case kTagTableCell:
+      case kTagTableHeader:
+      case kTagTableRow:
+        meta = lazySet(meta, buildOp: tagTable());
         break;
     }
 
-    return meta;
+    return parser.parseElement(meta, e);
   }
 
   NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
-    meta = parser.parseElementStyle(meta, key, value);
-
     switch (key) {
-      case 'text-align':
-        final sta = StyleTextAlign.fromString(value, this);
-        if (sta != null) {
-          meta = lazySet(meta, buildOp: BuildOp(onPieces: sta.onPieces));
-        }
+      case kCssMargin:
+      case kCssMarginBottom:
+      case kCssMarginLeft:
+      case kCssMarginRight:
+      case kCssMarginTop:
+        meta = lazySet(meta, buildOp: styleMargin());
+        break;
+
+      case kCssTextAlign:
+        meta = lazySet(meta, buildOp: styleTextAlign());
         break;
     }
 
-    return meta;
+    return parser.parseElementStyle(meta, key, value);
   }
 
-  BuildOp tagImg(dom.Element e) =>
-      BuildOp(onProcess: TagImg(e, this).onProcess);
+  BuildOp styleMargin() {
+    _styleMargin ??= StyleMargin(this).buildOp;
+    return _styleMargin;
+  }
+
+  BuildOp styleTextAlign() {
+    _styleTextAlign ??= StyleTextAlign(this).buildOp;
+    return _styleTextAlign;
+  }
+
+  BuildOp tagCode() {
+    _tagCode ??= TagCode(this).buildOp;
+    return _tagCode;
+  }
+
+  BuildOp tagImg() {
+    _tagImg ??= TagImg(this).buildOp;
+    return _tagImg;
+  }
+
+  BuildOp tagTable() {
+    _tagTable ??= TagTable(this).buildOp;
+    return _tagTable;
+  }
 }

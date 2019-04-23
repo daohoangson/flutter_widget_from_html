@@ -3,16 +3,20 @@ import 'package:html/dom.dart' as dom;
 
 import 'metadata.dart';
 
-part 'parser/_margin.dart';
-part 'parser/_unit.dart';
+part 'parser/attr_style.dart';
+part 'parser/border.dart';
+part 'parser/color.dart';
+part 'parser/text.dart';
+part 'parser/unit.dart';
 
 final _spacingRegExp = RegExp(r'\s+');
-final _styleColorRegExp = RegExp(r'^#([a-f0-9]{3,8})$', caseSensitive: false);
 
-NodeMetadata parseElement(dom.Element e) {
-  NodeMetadata meta;
-
+NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
   switch (e.localName) {
+    case 'a':
+      meta = lazySet(meta, decorationUnderline: true);
+      break;
+
     case 'b':
     case 'strong':
       meta = lazySet(meta, fontWeight: FontWeight.bold);
@@ -92,31 +96,8 @@ NodeMetadata parseElement(dom.Element e) {
 NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
   switch (key) {
     case 'color':
-      final m = _styleColorRegExp.firstMatch(value);
-      if (m == null) return meta;
-      final hex = m.group(1);
-
-      Color color;
-      switch (hex.length) {
-        case 3:
-          color =
-              Color(int.parse('0xFF' + hex[0] * 2 + hex[1] * 2 + hex[2] * 2));
-          break;
-        case 4:
-          color = Color(int.parse(
-              '0x' + hex[3] * 2 + hex[0] * 2 + hex[1] * 2 + hex[2] * 2));
-          break;
-        case 6:
-          color = Color(int.parse('0xFF' + hex));
-          break;
-        case 8:
-          color = Color(
-              int.parse('0x' + hex.substring(6, 8) + hex.substring(0, 6)));
-          break;
-      }
-      if (color == null) return meta;
-
-      meta = lazySet(meta, color: color);
+      final color = colorParseValue(value);
+      if (color != null) meta = lazySet(meta, color: color);
       break;
 
     case 'font-family':
@@ -124,7 +105,7 @@ NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
       break;
 
     case 'font-size':
-      meta = lazySet(meta, fontSize: _unitParseValue(value));
+      meta = lazySet(meta, fontSize: unitParseValue(value));
       break;
 
     case 'font-style':
@@ -170,22 +151,6 @@ NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
         case '900':
           meta = lazySet(meta, fontWeight: FontWeight.w900);
           break;
-      }
-      break;
-
-    case _kMargin:
-      final margin = _marginParseAll(value);
-      if (margin != null) {
-        meta = lazySet(meta, margin: margin);
-      }
-      break;
-    case _kMarginBottom:
-    case _kMarginLeft:
-    case _kMarginRight:
-    case _kMarginTop:
-      final margin = _marginParseOne(meta, key, value);
-      if (margin != null) {
-        meta = lazySet(meta, margin: margin);
       }
       break;
 

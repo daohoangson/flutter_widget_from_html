@@ -1,46 +1,74 @@
 import 'package:flutter/widgets.dart';
 
-import '../metadata.dart';
 import '../core_wf.dart';
+import '../metadata.dart';
+import '../parser.dart';
+
+const kCssTextAlign = 'text-align';
+const kCssTextAlignCenter = 'center';
+const kCssTextAlignJustify = 'justify';
+const kCssTextAlignLeft = 'left';
+const kCssTextAlignRight = 'right';
 
 class StyleTextAlign {
-  final Alignment alignment;
-  final TextAlign textAlign;
   final WidgetFactory wf;
 
-  StyleTextAlign(this.alignment, this.textAlign, this.wf);
+  StyleTextAlign(this.wf);
 
-  List<BuiltPiece> onPieces(List<BuiltPiece> pieces) {
-    final List<BuiltPiece> newPieces = List();
-    for (final piece in pieces) {
-      if (piece.hasWidgets) {
-        newPieces.add(BuiltPieceSimple(widgets: [
-          Align(
-            alignment: alignment,
-            child: wf.buildColumn(piece.widgets),
-          ),
-        ]));
-      } else {
-        piece.textAlign = textAlign;
-        newPieces.add(piece);
-      }
-    }
+  BuildOp get buildOp => BuildOp(
+        onPieces: (meta, pieces) {
+          final v = _parseValue(meta);
+          if (v == null) return pieces;
 
-    return newPieces;
+          final widgets = pieces.map(
+            (piece) => piece.hasWidgets
+                ? wf.buildAlign(wf.buildColumn(piece.widgets), _getAlignment(v))
+                : wf.buildTextWidget(
+                    piece.hasTextSpan ? piece.textSpan : piece.text,
+                    textAlign: _getTextAlign(v),
+                  ),
+          );
+
+          return <BuiltPiece>[BuiltPieceSimple(widgets: widgets)];
+        },
+      );
+}
+
+Alignment _getAlignment(String textAlign) {
+  switch (textAlign) {
+    case kCssTextAlignCenter:
+      return Alignment.topCenter;
+    case kCssTextAlignJustify:
+      return Alignment.topLeft;
+    case kCssTextAlignLeft:
+      return Alignment.topLeft;
+    case kCssTextAlignRight:
+      return Alignment.topRight;
   }
 
-  static StyleTextAlign fromString(String textAlign, WidgetFactory wf) {
-    switch (textAlign) {
-      case 'center':
-        return StyleTextAlign(Alignment.topCenter, TextAlign.center, wf);
-      case 'justify':
-        return StyleTextAlign(Alignment.topLeft, TextAlign.justify, wf);
-      case 'left':
-        return StyleTextAlign(Alignment.topLeft, TextAlign.left, wf);
-      case 'right':
-        return StyleTextAlign(Alignment.topRight, TextAlign.right, wf);
-    }
+  return null;
+}
 
-    return null;
+TextAlign _getTextAlign(String textAlign) {
+  switch (textAlign) {
+    case kCssTextAlignCenter:
+      return TextAlign.center;
+    case kCssTextAlignJustify:
+      return TextAlign.justify;
+    case kCssTextAlignLeft:
+      return TextAlign.left;
+    case kCssTextAlignRight:
+      return TextAlign.right;
   }
+
+  return null;
+}
+
+String _parseValue(NodeMetadata meta) {
+  String value;
+
+  final e = meta.buildOpElement;
+  attrStyleLoop(e, (k, v) => k == kCssTextAlign ? value = v : null);
+
+  return value;
 }

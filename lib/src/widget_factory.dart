@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
 import 'package:html/dom.dart' as dom;
+import 'package:url_launcher/url_launcher.dart';
 
 import 'ops/tag_a.dart';
 import 'ops/tag_iframe.dart';
@@ -13,46 +14,30 @@ import 'web_view.dart';
 final _baseUriTrimmingRegExp = RegExp(r'/+$');
 final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
 
-String buildFullUrl(String url, Uri baseUrl) {
-  if (url?.isNotEmpty != true) return null;
-  if (url.startsWith(_isFullUrlRegExp)) return url;
-  if (baseUrl == null) return null;
-
-  if (url.startsWith('//')) {
-    return "${baseUrl.scheme}:$url";
-  }
-
-  if (url.startsWith('/')) {
-    return baseUrl.scheme +
-        '://' +
-        baseUrl.host +
-        (baseUrl.hasPort ? ":${baseUrl.port}" : '') +
-        url;
-  }
-
-  return "${baseUrl.toString().replaceAll(_baseUriTrimmingRegExp, '')}/$url";
-}
-
-Widget wrapPadding(Widget widget, EdgeInsets padding) => (widget != null &&
-        padding != null &&
-        padding.top + padding.right + padding.bottom + padding.left > 0)
-    ? Padding(padding: padding, child: widget)
-    : widget;
-
 class WidgetFactory extends core.WidgetFactory {
   final Config config;
 
-  WidgetFactory(BuildContext context, this.config) : super(context);
+  core.BuildOp _tagA;
+  core.BuildOp _tagIframe;
+  core.BuildOp _tagLi;
+
+  WidgetFactory(
+    BuildContext context, {
+    this.config = const Config(),
+  }) : super(context);
+
+  GestureTapCallback buildGestureTapCallbackForUrl(String fullUrl) =>
+      () => canLaunch(fullUrl).then((ok) => ok ? launch(fullUrl) : null);
 
   @override
-  Widget buildImageWidget(String src, {int height, int width}) => wrapPadding(
+  Widget buildImageWidget(String src, {int height, int width}) => buildPadding(
         super.buildImageWidget(src, height: height, width: width),
         config.imagePadding,
       );
 
   @override
   Widget buildImageWidgetFromUrl(String url) {
-    final imageUrl = buildFullUrl(url, config.baseUrl);
+    final imageUrl = constructFullUrl(url);
     if (imageUrl?.isEmpty != false) return null;
 
     return CachedNetworkImage(
@@ -62,7 +47,7 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
-  Widget buildTextWidget(text, {TextAlign textAlign}) => wrapPadding(
+  Widget buildTextWidget(text, {TextAlign textAlign}) => buildPadding(
         super.buildTextWidget(text, textAlign: textAlign),
         config.textPadding,
       );
@@ -73,7 +58,7 @@ class WidgetFactory extends core.WidgetFactory {
     double width,
   }) {
     final dimensOk = height != null && height > 0 && width != null && width > 0;
-    return wrapPadding(
+    return buildPadding(
       WebView(
         url,
         aspectRatio: dimensOk ? width / height : 16 / 9,
@@ -84,57 +69,61 @@ class WidgetFactory extends core.WidgetFactory {
     );
   }
 
-  Widget buildWebViewLinkOnly(String url) => TagA(url, this, icon: false)
-      .onPieces(<core.BuiltPiece>[
-        core.BuiltPieceSimple(widgets: <Widget>[buildTextWidget(url)]),
-      ])
-      .first
-      ?.widgets
-      ?.first;
+  Widget buildWebViewLinkOnly(String fullUrl) => GestureDetector(
+        child: buildTextWidget(fullUrl),
+        onTap: buildGestureTapCallbackForUrl(fullUrl),
+      );
+
+  String constructFullUrl(String url) {
+    if (url?.isNotEmpty != true) return null;
+    if (url.startsWith(_isFullUrlRegExp)) return url;
+
+    final b = config.baseUrl;
+    if (b == null) return null;
+
+    if (url.startsWith('//')) return "${b.scheme}:$url";
+
+    if (url.startsWith('/')) {
+      final port = b.hasPort ? ":${b.port}" : '';
+      return "${b.scheme}://${b.host}$port$url";
+    }
+
+    return "${b.toString().replaceAll(_baseUriTrimmingRegExp, '')}/$url";
+  }
 
   @override
-  core.NodeMetadata parseElement(dom.Element e) {
-    var meta = super.parseElement(e);
-
+  core.NodeMetadata parseElement(core.NodeMetadata meta, dom.Element e) {
     switch (e.localName) {
       case 'a':
-        meta = core.lazySet(meta, color: Theme.of(context).accentColor);
-
-        if (e.attributes.containsKey('href')) {
-          final href = e.attributes['href'];
-          final fullUrl = buildFullUrl(href, config.baseUrl);
-          if (fullUrl?.isNotEmpty == true) {
-            meta = core.lazySet(meta, buildOp: tagA(fullUrl));
-          }
-        }
+        meta = core.lazySet(meta, buildOp: tagA());
         break;
 
       case 'iframe':
-        meta = core.lazySet(
-          meta,
-          buildOp: tagIframe(e),
-          isNotRenderable: false,
-        );
-        break;
+        // return asap to avoid being disabled by core
+        return core.lazySet(meta, buildOp: tagIframe());
 
-      case 'li':
-      case 'ol':
-      case 'ul':
-        meta = core.lazySet(null, buildOp: tagLi(e.localName));
+      case kTagListItem:
+      case kTagOrderedList:
+      case kTagUnorderedList:
+        meta = core.lazySet(meta, buildOp: tagLi());
         break;
     }
 
-    return meta;
+    return super.parseElement(meta, e);
   }
 
-  core.BuildOp tagA(String fullUrl) => core.BuildOp(
-        onPieces: TagA(fullUrl, this).onPieces,
-      );
+  core.BuildOp tagA() {
+    _tagA ??= TagA(this).buildOp;
+    return _tagA;
+  }
 
-  core.BuildOp tagIframe(dom.Element e) =>
-      core.BuildOp(onWidgets: (_) => <Widget>[TagIframe(this).build(e)]);
+  core.BuildOp tagIframe() {
+    _tagIframe ??= TagIframe(this).buildOp;
+    return _tagIframe;
+  }
 
-  core.BuildOp tagLi(String tag) => core.BuildOp(
-        onWidgets: (widgets) => <Widget>[TagLi(this).build(widgets, tag)],
-      );
+  core.BuildOp tagLi() {
+    _tagLi ??= TagLi(this).buildOp;
+    return _tagLi;
+  }
 }
