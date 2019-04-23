@@ -91,6 +91,13 @@ class WidgetFactory {
         child: widgets.length == 1 ? widgets.first : buildColumn(widgets),
       );
 
+  Widget buildTable(List<TableRow> rows, {TableBorder border}) => Table(
+        border: border,
+        children: rows,
+      );
+
+  Widget buildTableCell(Widget child) => TableCell(child: child);
+
   TextDecoration buildTextDecoration(NodeMetadata meta, TextStyle parent) {
     if (meta.hasDecoration != true) return null;
 
