@@ -66,7 +66,7 @@ All texts will be rendered with padding (`Config.textPadding`).
   - To render IFRAME as web view: set `webView=true` in config and [setup iOS project manually](https://pub.dartlang.org/packages/webview_flutter#ios).
   - Web view will be rendered in a 16:9 box unless `width` and `height` attributes are specified in the IFRAME.
 - IMG via [`CachedNetworkImage`](https://pub.dartlang.org/packages/cached_network_image) with padding (`Config.imagePadding`), support base url resolver
-- LI/OL/UL with marker and padding (`Config.listBullet`, `Config.listPaddingLeft`)
+- LI/OL/UL with marker and padding (`Config.listBullet`, `Config.listMarkerPaddingTop` and `Config.listMarkerWidth`)
 - P
 - PRE
 - STRONG

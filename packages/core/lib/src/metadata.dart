@@ -14,15 +14,16 @@ NodeMetadata lazySet(
   FontWeight fontWeight,
   bool isBlockElement,
   bool isNotRenderable,
-  EdgeInsetsGeometry margin,
   StyleType style,
-  bool textSpaceCollapse,
 }) {
   meta ??= NodeMetadata();
 
   if (buildOp != null) {
-    meta.buildOps ??= [];
-    meta.buildOps.add(buildOp);
+    meta._buildOps ??= [];
+    final ops = meta._buildOps as List<BuildOp>;
+    if (ops.indexOf(buildOp) == -1) {
+      ops.add(buildOp);
+    }
   }
   if (color != null) meta.color = color;
   if (decorationLineThrough != null)
@@ -36,31 +37,47 @@ NodeMetadata lazySet(
   if (fontWeight != null) meta.fontWeight = fontWeight;
   if (isBlockElement != null) meta._isBlockElement = isBlockElement;
   if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
-  if (margin != null) meta.margin = margin;
   if (style != null) meta.style = style;
-  if (textSpaceCollapse != null) meta.textSpaceCollapse = textSpaceCollapse;
 
   return meta;
 }
 
 class BuildOp {
-  final BuildOpCollectMetadata collectMetadata;
-  final BuildOpOnPieces onPieces;
-  final BuildOpOnProcess onProcess;
-  final BuildOpOnWidgets onWidgets;
-
-  // lower will run first
+  // op with lower priority will run first
   final int priority;
 
-  BuildOp({
-    this.collectMetadata,
-    this.onPieces,
-    this.onProcess,
-    this.onWidgets,
-    this.priority = 10,
-  });
+  final BuildOpCollectMetadata _collectMetadata;
+  final BuildOpOnPieces _onPieces;
+  final BuildOpOnWidgets _onWidgets;
 
-  bool get isBlockElement => onWidgets != null;
+  BuildOp({
+    BuildOpCollectMetadata collectMetadata,
+    BuildOpOnPieces onPieces,
+    BuildOpOnWidgets onWidgets,
+    this.priority = 10,
+  })  : _collectMetadata = collectMetadata,
+        _onPieces = onPieces,
+        _onWidgets = onWidgets;
+
+  bool get isBlockElement => _onWidgets != null;
+
+  void collectMetadata(NodeMetadata meta) =>
+      _collectMetadata != null ? _collectMetadata(meta) : null;
+
+  Iterable<BuiltPiece> onPieces(
+    NodeMetadata meta,
+    Iterable<BuiltPiece> pieces,
+  ) =>
+      _onPieces != null ? _onPieces(meta, pieces) : pieces;
+
+  Iterable<Widget> onWidgets(NodeMetadata meta, Iterable<Widget> widgets) {
+    if (_onWidgets == null) return widgets;
+
+    final widget = _onWidgets(meta, widgets);
+    if (widget == null) return widgets;
+
+    return <Widget>[widget];
+  }
 }
 
 typedef void BuildOpCollectMetadata(NodeMetadata meta);
@@ -68,16 +85,7 @@ typedef Iterable<BuiltPiece> BuildOpOnPieces(
   NodeMetadata meta,
   Iterable<BuiltPiece> pieces,
 );
-typedef void BuildOpOnProcess(
-  NodeMetadata meta,
-  BuildOpOnProcessAddSpan addSpan,
-  BuildOpOnProcessAddWidgets addWidgets,
-  BuildOpOnProcessWrite write,
-);
-typedef void BuildOpOnProcessAddSpan(TextSpan span);
-typedef void BuildOpOnProcessAddWidgets(List<Widget> widgets);
-typedef void BuildOpOnProcessWrite(String text);
-typedef Widget BuildOpOnWidgets(NodeMetadata meta, List<Widget> widgets);
+typedef Widget BuildOpOnWidgets(NodeMetadata meta, Iterable<Widget> widgets);
 
 abstract class BuiltPiece {
   bool get hasText;
@@ -85,20 +93,18 @@ abstract class BuiltPiece {
   bool get hasWidgets;
 
   String get text;
-  TextAlign get textAlign;
   TextSpan get textSpan;
-  List<Widget> get widgets;
-
-  set textAlign(TextAlign textAlign);
+  TextStyle get textStyle;
+  Iterable<Widget> get widgets;
 }
 
 class BuiltPieceSimple extends BuiltPiece {
   final String text;
-  TextAlign textAlign;
   final TextSpan textSpan;
-  final List<Widget> widgets;
+  final TextStyle textStyle;
+  final Iterable<Widget> widgets;
 
-  BuiltPieceSimple({this.text, this.textSpan, this.widgets});
+  BuiltPieceSimple({this.text, this.textSpan, this.textStyle, this.widgets});
 
   bool get hasText => text != null;
   bool get hasTextSpan => textSpan != null;
@@ -106,8 +112,8 @@ class BuiltPieceSimple extends BuiltPiece {
 }
 
 class NodeMetadata {
-  dom.Element buildOpElement;
-  List<BuildOp> buildOps;
+  dom.Element _buildOpElement;
+  Iterable<BuildOp> _buildOps;
   Color color;
   bool decorationLineThrough;
   bool decorationOverline;
@@ -118,9 +124,9 @@ class NodeMetadata {
   FontWeight fontWeight;
   bool _isBlockElement;
   bool isNotRenderable;
-  EdgeInsetsGeometry margin;
   StyleType style;
-  bool textSpaceCollapse;
+
+  dom.Element get buildOpElement => _buildOpElement;
 
   bool get hasStyling =>
       color != null ||
@@ -129,8 +135,7 @@ class NodeMetadata {
       fontWeight != null ||
       hasDecoration ||
       hasFontStyle ||
-      style != null ||
-      textSpaceCollapse != null;
+      style != null;
 
   bool get hasDecoration =>
       decorationLineThrough != null ||
@@ -140,11 +145,22 @@ class NodeMetadata {
   bool get hasFontStyle => fontStyleItalic != null;
 
   bool get isBlockElement {
-    if (_isBlockElement == true || margin != null) {
-      return true;
-    }
+    if (_isBlockElement == true) return true;
+    return _buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
+  }
 
-    return buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
+  void forEachOp(void f(BuildOp element)) => _buildOps?.forEach(f);
+
+  Iterable<BuildOp> freezeOps(dom.Element e) {
+    if (_buildOps == null) return null;
+
+    _buildOpElement = e;
+
+    final ops = _buildOps.toList();
+    ops.sort((a, b) => a.priority.compareTo(b.priority));
+    _buildOps = List.unmodifiable(ops);
+
+    return _buildOps;
   }
 }
 

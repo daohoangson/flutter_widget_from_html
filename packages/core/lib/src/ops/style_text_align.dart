@@ -10,6 +10,30 @@ const kCssTextAlignJustify = 'justify';
 const kCssTextAlignLeft = 'left';
 const kCssTextAlignRight = 'right';
 
+class StyleTextAlign {
+  final WidgetFactory wf;
+
+  StyleTextAlign(this.wf);
+
+  BuildOp get buildOp => BuildOp(
+        onPieces: (meta, pieces) {
+          final v = _parseValue(meta);
+          if (v == null) return pieces;
+
+          final widgets = pieces.map(
+            (piece) => piece.hasWidgets
+                ? wf.buildAlign(wf.buildColumn(piece.widgets), _getAlignment(v))
+                : wf.buildTextWidget(
+                    piece.hasTextSpan ? piece.textSpan : piece.text,
+                    textAlign: _getTextAlign(v),
+                  ),
+          );
+
+          return <BuiltPiece>[BuiltPieceSimple(widgets: widgets)];
+        },
+      );
+}
+
 Alignment _getAlignment(String textAlign) {
   switch (textAlign) {
     case kCssTextAlignCenter:
@@ -40,38 +64,11 @@ TextAlign _getTextAlign(String textAlign) {
   return null;
 }
 
-class StyleTextAlign {
-  final WidgetFactory wf;
+String _parseValue(NodeMetadata meta) {
+  String value;
 
-  BuildOp _buildOp;
+  final e = meta.buildOpElement;
+  attrStyleLoop(e, (k, v) => k == kCssTextAlign ? value = v : null);
 
-  StyleTextAlign(this.wf);
-
-  BuildOp get buildOp {
-    _buildOp ??= BuildOp(
-      onPieces: (meta, pieces) {
-        String textAlign;
-        attrStyleLoop(
-          meta.buildOpElement,
-          (k, v) => k == kCssTextAlign ? textAlign = v : null,
-        );
-        if (textAlign == null) return pieces;
-
-        return pieces.map(
-          (piece) => piece.hasWidgets
-              ? BuiltPieceSimple(
-                  widgets: [
-                    Align(
-                      alignment: _getAlignment(textAlign),
-                      child: wf.buildColumn(piece.widgets),
-                    ),
-                  ],
-                )
-              : (piece..textAlign = _getTextAlign(textAlign)),
-        );
-      },
-    );
-
-    return _buildOp;
-  }
+  return value;
 }

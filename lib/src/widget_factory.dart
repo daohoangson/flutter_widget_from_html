@@ -14,32 +14,6 @@ import 'config.dart';
 final _baseUriTrimmingRegExp = RegExp(r'/+$');
 final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
 
-String buildFullUrl(String url, Uri baseUrl) {
-  if (url?.isNotEmpty != true) return null;
-  if (url.startsWith(_isFullUrlRegExp)) return url;
-  if (baseUrl == null) return null;
-
-  if (url.startsWith('//')) {
-    return "${baseUrl.scheme}:$url";
-  }
-
-  if (url.startsWith('/')) {
-    return baseUrl.scheme +
-        '://' +
-        baseUrl.host +
-        (baseUrl.hasPort ? ":${baseUrl.port}" : '') +
-        url;
-  }
-
-  return "${baseUrl.toString().replaceAll(_baseUriTrimmingRegExp, '')}/$url";
-}
-
-Widget wrapPadding(Widget widget, EdgeInsets padding) => (widget != null &&
-        padding != null &&
-        padding.top + padding.right + padding.bottom + padding.left > 0)
-    ? Padding(padding: padding, child: widget)
-    : widget;
-
 class WidgetFactory extends core.WidgetFactory {
   final Config config;
 
@@ -56,14 +30,14 @@ class WidgetFactory extends core.WidgetFactory {
       () => canLaunch(fullUrl).then((ok) => ok ? launch(fullUrl) : null);
 
   @override
-  Widget buildImageWidget(String src, {int height, int width}) => wrapPadding(
+  Widget buildImageWidget(String src, {int height, int width}) => buildPadding(
         super.buildImageWidget(src, height: height, width: width),
         config.imagePadding,
       );
 
   @override
   Widget buildImageWidgetFromUrl(String url) {
-    final imageUrl = buildFullUrl(url, config.baseUrl);
+    final imageUrl = constructFullUrl(url);
     if (imageUrl?.isEmpty != false) return null;
 
     return CachedNetworkImage(
@@ -73,7 +47,7 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
-  Widget buildTextWidget(text, {TextAlign textAlign}) => wrapPadding(
+  Widget buildTextWidget(text, {TextAlign textAlign}) => buildPadding(
         super.buildTextWidget(text, textAlign: textAlign),
         config.textPadding,
       );
@@ -83,7 +57,7 @@ class WidgetFactory extends core.WidgetFactory {
     double height,
     double width,
   }) =>
-      wrapPadding(
+      buildPadding(
         AspectRatio(
           aspectRatio:
               (height != null && height > 0 && width != null && width > 0)
@@ -103,23 +77,33 @@ class WidgetFactory extends core.WidgetFactory {
         onTap: buildGestureTapCallbackForUrl(fullUrl),
       );
 
+  String constructFullUrl(String url) {
+    if (url?.isNotEmpty != true) return null;
+    if (url.startsWith(_isFullUrlRegExp)) return url;
+
+    final b = config.baseUrl;
+    if (b == null) return null;
+
+    if (url.startsWith('//')) return "${b.scheme}:$url";
+
+    if (url.startsWith('/')) {
+      final port = b.hasPort ? ":${b.port}" : '';
+      return "${b.scheme}://${b.host}$port$url";
+    }
+
+    return "${b.toString().replaceAll(_baseUriTrimmingRegExp, '')}/$url";
+  }
+
   @override
   core.NodeMetadata parseElement(core.NodeMetadata meta, dom.Element e) {
     switch (e.localName) {
       case 'a':
-        meta = core.lazySet(
-          meta,
-          buildOp: tagA(),
-          color: Theme.of(context).accentColor,
-        );
+        meta = core.lazySet(meta, buildOp: tagA());
         break;
 
       case 'iframe':
-        return core.lazySet(
-          meta,
-          buildOp: tagIframe(),
-          isNotRenderable: false,
-        );
+        // return asap to avoid being disabled by core
+        return core.lazySet(meta, buildOp: tagIframe());
 
       case kTagListItem:
       case kTagOrderedList:

@@ -8,21 +8,17 @@ import '../widget_factory.dart';
 class TagIframe {
   final WidgetFactory wf;
 
-  BuildOp _buildOp;
-
   TagIframe(this.wf);
 
-  BuildOp get buildOp {
-    _buildOp ??= BuildOp(onWidgets: (meta, __) => build(meta.buildOpElement));
-    return _buildOp;
-  }
+  BuildOp get buildOp =>
+      BuildOp(onWidgets: (meta, __) => build(meta.buildOpElement));
 
   Widget build(dom.Element e) {
     final a = e.attributes;
     if (!a.containsKey('src')) return null;
 
     final config = wf.config;
-    final src = buildFullUrl(a['src'], config.baseUrl);
+    final src = wf.constructFullUrl(a['src']);
     if (src == null) return null;
     if (!config.webView) return wf.buildWebViewLinkOnly(src);
 

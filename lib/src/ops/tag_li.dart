@@ -11,52 +11,37 @@ const kTagUnorderedList = 'ul';
 class TagLi {
   final WidgetFactory wf;
 
-  BuildOp _buildOp;
-
   TagLi(this.wf);
 
-  String get bullet => '•';
-  double get markerPaddingTop => wf.config.textPadding?.top ?? 0.0;
-  double get markerWidth => 30.0;
+  BuildOp get buildOp =>
+      BuildOp(onWidgets: (meta, w) => build(w, meta.buildOpElement.localName));
 
-  BuildOp get buildOp {
-    _buildOp ??= BuildOp(
-      onWidgets: (meta, w) => build(w, meta.buildOpElement.localName),
-    );
-    return _buildOp;
-  }
-
-  Widget build(List<Widget> children, String tag) {
+  Widget build(Iterable<Widget> children, String tag) {
     if (tag == kTagListItem) return wf.buildColumn(children);
 
     int i = 0;
-    final List<Stack> stacks = List(children.length);
-    for (final widget in children) {
-      stacks[i] = Stack(
-        children: <Widget>[
-          buildBody(widget),
-          buildMarker(tag == kTagOrderedList
-              ? "${i + 1}."
-              : tag == kTagUnorderedList ? bullet : ''),
-        ],
-      );
-
-      i++;
-    }
-
-    return wf.buildColumn(stacks);
+    return wf.buildColumn(children
+        .map((widget) => Stack(children: <Widget>[
+              _buildBody(widget),
+              _buildMarker(
+                tag == kTagOrderedList
+                    ? "${++i}."
+                    : tag == kTagUnorderedList ? wf.config.listBullet : '',
+              ),
+            ]))
+        .toList());
   }
 
-  Widget buildBody(Widget widget) => Padding(
-        padding: EdgeInsets.only(left: markerWidth),
+  Widget _buildBody(Widget widget) => Padding(
+        padding: EdgeInsets.only(left: wf.config.listMarkerWidth),
         child: widget,
       );
 
-  Widget buildMarker(String text) => Positioned(
+  Widget _buildMarker(String text) => Positioned(
         left: 0.0,
         top: 0.0,
-        width: markerWidth,
-        child: wrapPadding(
+        width: wf.config.listMarkerWidth,
+        child: wf.buildPadding(
           Text(
             text,
             maxLines: 1,
@@ -66,7 +51,11 @@ class TagLi {
                 ),
             textAlign: TextAlign.right,
           ),
-          EdgeInsets.only(top: markerPaddingTop),
+          EdgeInsets.only(
+            top: wf.config.listMarkerPaddingTop ??
+                wf.config.textPadding?.top ??
+                0.0,
+          ),
         ),
       );
 }
