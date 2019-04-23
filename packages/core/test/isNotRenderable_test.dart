@@ -9,15 +9,10 @@ class _DoNotRenderSkipMe extends WidgetFactory {
   _DoNotRenderSkipMe(BuildContext context) : super(context);
 
   @override
-  NodeMetadata parseElement(dom.Element e) {
-    final meta = super.parseElement(e);
-
-    if (e.className == 'skipMe') {
-      return lazySet(meta, isNotRenderable: true);
-    }
-
-    return meta;
-  }
+  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) =>
+      e.className == 'skipMe'
+          ? lazySet(meta, isNotRenderable: true)
+          : super.parseElement(meta, e);
 }
 
 void main() {

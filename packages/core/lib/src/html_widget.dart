@@ -14,10 +14,7 @@ class HtmlWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final domNodes = parser.parse(html).body.nodes;
     final wf = wfBuilder != null ? wfBuilder(context) : WidgetFactory(context);
-    final widgets = builder.Builder(
-      domNodes: domNodes,
-      widgetFactory: wf,
-    ).build();
+    final widgets = builder.Builder(domNodes, wf).build();
 
     return wf.buildColumn(widgets) ?? Text(html);
   }
