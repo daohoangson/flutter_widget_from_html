@@ -13,11 +13,6 @@ class TagLi {
 
   TagLi(this.wf);
 
-  String get bullet => wf.config.liBullet;
-  double get markerPaddingTop =>
-      wf.config.liMarkerPaddingTop ?? wf.config.textPadding?.top ?? 0.0;
-  double get markerWidth => wf.config.liMarkerWidth;
-
   BuildOp get buildOp =>
       BuildOp(onWidgets: (meta, w) => build(w, meta.buildOpElement.localName));
 
@@ -31,21 +26,21 @@ class TagLi {
               _buildMarker(
                 tag == kTagOrderedList
                     ? "${++i}."
-                    : tag == kTagUnorderedList ? bullet : '',
+                    : tag == kTagUnorderedList ? wf.config.listBullet : '',
               ),
             ]))
         .toList());
   }
 
   Widget _buildBody(Widget widget) => Padding(
-        padding: EdgeInsets.only(left: markerWidth),
+        padding: EdgeInsets.only(left: wf.config.listMarkerWidth),
         child: widget,
       );
 
   Widget _buildMarker(String text) => Positioned(
         left: 0.0,
         top: 0.0,
-        width: markerWidth,
+        width: wf.config.listMarkerWidth,
         child: wf.buildPadding(
           Text(
             text,
@@ -56,7 +51,11 @@ class TagLi {
                 ),
             textAlign: TextAlign.right,
           ),
-          EdgeInsets.only(top: markerPaddingTop),
+          EdgeInsets.only(
+            top: wf.config.listMarkerPaddingTop ??
+                wf.config.textPadding?.top ??
+                0.0,
+          ),
         ),
       );
 }
