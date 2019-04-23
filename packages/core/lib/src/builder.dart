@@ -81,7 +81,7 @@ class Builder {
     return output;
   }
 
-  void _addWidgets(List<Widget> widgets) {
+  void _addWidgets(Iterable<Widget> widgets) {
     _savePiece();
     _pieces.add(_Piece(this, widgets: widgets));
   }
@@ -100,7 +100,7 @@ class Builder {
 class _Piece extends BuiltPiece {
   final Builder b;
   final _ParentStyle parentStyle;
-  final List<Widget> widgets;
+  final Iterable<Widget> widgets;
 
   final StringBuffer _texts;
   List<TextSpan> _spans;

@@ -10,6 +10,42 @@ const kCssMarginLeft = 'margin-left';
 const kCssMarginRight = 'margin-right';
 const kCssMarginTop = 'margin-top';
 
+class StyleMargin {
+  final WidgetFactory wf;
+
+  StyleMargin(this.wf);
+
+  BuildOp get buildOp => BuildOp(
+        onWidgets: (meta, widgets) {
+          final padding = _parseMargin(meta);
+          if (padding == null) return null;
+
+          return wf.buildPadding(wf.buildColumn(widgets), padding);
+        },
+      );
+
+  EdgeInsets _parseMargin(NodeMetadata meta) {
+    EdgeInsets output;
+
+    attrStyleLoop(meta.buildOpElement, (key, value) {
+      switch (key) {
+        case kCssMargin:
+          output = _parseAll(value);
+          break;
+
+        case kCssMarginBottom:
+        case kCssMarginLeft:
+        case kCssMarginRight:
+        case kCssMarginTop:
+          output = _parseOne(output, key, value);
+          break;
+      }
+    });
+
+    return output;
+  }
+}
+
 final _valuesFourRegExp =
     RegExp(r'^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)$');
 final _valuesTwoRegExp = RegExp(r'^([^\s]+)\s+([^\s]+)$');
@@ -53,44 +89,4 @@ EdgeInsets _parseOne(EdgeInsets existing, String key, String value) {
 double _parseValue(String str) {
   final d = unitParseValue(str);
   return (d == null || d < 0) ? 0 : d;
-}
-
-class StyleMargin {
-  final WidgetFactory wf;
-
-  BuildOp _buildOp;
-
-  StyleMargin(this.wf);
-
-  BuildOp get buildOp {
-    _buildOp ??= BuildOp(
-      onWidgets: (meta, widgets) {
-        final padding = _parseMargin(meta);
-        if (padding == null) return null;
-        return wf.buildPadding(wf.buildColumn(widgets), padding);
-      },
-    );
-
-    return _buildOp;
-  }
-
-  EdgeInsets _parseMargin(NodeMetadata meta) {
-    EdgeInsets output;
-
-    attrStyleLoop(meta.buildOpElement, (key, value) {
-      switch (key) {
-        case kCssMargin:
-          output = _parseAll(value);
-          break;
-        case kCssMarginBottom:
-        case kCssMarginLeft:
-        case kCssMarginRight:
-        case kCssMarginTop:
-          output = _parseOne(output, key, value);
-          break;
-      }
-    });
-
-    return output;
-  }
 }

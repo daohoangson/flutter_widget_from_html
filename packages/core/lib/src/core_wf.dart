@@ -101,7 +101,7 @@ class WidgetFactory {
     final pdOverline = pd?.contains(TextDecoration.overline) == true;
     final pdUnderline = pd?.contains(TextDecoration.underline) == true;
 
-    final List<TextDecoration> list = List();
+    final List<TextDecoration> list = [];
     if (meta.decorationLineThrough == true ||
         (pdLineThough && meta.decorationLineThrough != false)) {
       list.add(TextDecoration.lineThrough);

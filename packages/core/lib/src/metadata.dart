@@ -19,9 +19,10 @@ NodeMetadata lazySet(
   meta ??= NodeMetadata();
 
   if (buildOp != null) {
-    meta.buildOps ??= [];
-    if (meta.buildOps.indexOf(buildOp) == -1) {
-      meta.buildOps.add(buildOp);
+    meta._buildOps ??= [];
+    final ops = meta._buildOps as List<BuildOp>;
+    if (ops.indexOf(buildOp) == -1) {
+      ops.add(buildOp);
     }
   }
   if (color != null) meta.color = color;
@@ -69,7 +70,7 @@ class BuildOp {
   ) =>
       _onPieces != null ? _onPieces(meta, pieces) : pieces;
 
-  List<Widget> onWidgets(NodeMetadata meta, List<Widget> widgets) {
+  Iterable<Widget> onWidgets(NodeMetadata meta, Iterable<Widget> widgets) {
     if (_onWidgets == null) return widgets;
 
     final widget = _onWidgets(meta, widgets);
@@ -84,7 +85,7 @@ typedef Iterable<BuiltPiece> BuildOpOnPieces(
   NodeMetadata meta,
   Iterable<BuiltPiece> pieces,
 );
-typedef Widget BuildOpOnWidgets(NodeMetadata meta, List<Widget> widgets);
+typedef Widget BuildOpOnWidgets(NodeMetadata meta, Iterable<Widget> widgets);
 
 abstract class BuiltPiece {
   bool get hasText;
@@ -94,14 +95,14 @@ abstract class BuiltPiece {
   String get text;
   TextSpan get textSpan;
   TextStyle get textStyle;
-  List<Widget> get widgets;
+  Iterable<Widget> get widgets;
 }
 
 class BuiltPieceSimple extends BuiltPiece {
   final String text;
   final TextSpan textSpan;
   final TextStyle textStyle;
-  final List<Widget> widgets;
+  final Iterable<Widget> widgets;
 
   BuiltPieceSimple({this.text, this.textSpan, this.textStyle, this.widgets});
 
@@ -112,7 +113,7 @@ class BuiltPieceSimple extends BuiltPiece {
 
 class NodeMetadata {
   dom.Element _buildOpElement;
-  List<BuildOp> buildOps;
+  Iterable<BuildOp> _buildOps;
   Color color;
   bool decorationLineThrough;
   bool decorationOverline;
@@ -145,19 +146,21 @@ class NodeMetadata {
 
   bool get isBlockElement {
     if (_isBlockElement == true) return true;
-    return buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
+    return _buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
   }
 
-  void forEachOp(void f(BuildOp element)) => buildOps?.forEach(f);
+  void forEachOp(void f(BuildOp element)) => _buildOps?.forEach(f);
 
-  List<BuildOp> freezeOps(dom.Element e) {
-    if (buildOps == null) return null;
+  Iterable<BuildOp> freezeOps(dom.Element e) {
+    if (_buildOps == null) return null;
 
     _buildOpElement = e;
-    buildOps.sort((a, b) => a.priority.compareTo(b.priority));
-    buildOps = List.unmodifiable(buildOps);
 
-    return buildOps;
+    final ops = _buildOps.toList();
+    ops.sort((a, b) => a.priority.compareTo(b.priority));
+    _buildOps = List.unmodifiable(ops);
+
+    return _buildOps;
   }
 }
 

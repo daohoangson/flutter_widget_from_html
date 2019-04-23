@@ -10,35 +10,26 @@ const kTagPre = 'pre';
 class TagCode {
   final WidgetFactory wf;
 
-  BuildOp _buildOp;
-
   TagCode(this.wf);
 
-  BuildOp get buildOp {
-    _buildOp ??= BuildOp(
-      collectMetadata: (meta) => meta.fontFamily ??= 'monospace',
-      onPieces: (meta, pieces) {
-        if (meta.buildOpElement.localName != kTagPre) return pieces;
+  BuildOp get buildOp => BuildOp(
+        collectMetadata: (meta) => meta.fontFamily ??= 'monospace',
+        onPieces: (meta, pieces) => meta.buildOpElement.localName == kTagPre
+            ? _buildTextSpansForPre(pieces)
+            : pieces,
+        onWidgets: (_, widgets) => wf.buildScrollView(widgets),
+      );
 
-        // special processing for PRE tag:
-        // build text spans with `textSpaceCollapse=false`
-        final output = <BuiltPiece>[];
-        for (final piece in pieces) {
-          if (!piece.hasText) continue;
-          output.add(BuiltPieceSimple(
-            textSpan: wf.buildTextSpan(
-              piece.text,
-              style: piece.textStyle,
-              textSpaceCollapse: false,
-            ),
-          ));
-        }
+  Iterable<BuiltPiece> _buildTextSpansForPre(Iterable<BuiltPiece> pieces) =>
+      pieces.map((piece) {
+        if (!piece.hasText) return BuiltPieceSimple(text: '');
 
-        return output;
-      },
-      onWidgets: (_, widgets) => wf.buildScrollView(widgets),
-    );
-
-    return _buildOp;
-  }
+        return BuiltPieceSimple(
+          textSpan: wf.buildTextSpan(
+            piece.text,
+            style: piece.textStyle,
+            textSpaceCollapse: false,
+          ),
+        );
+      });
 }

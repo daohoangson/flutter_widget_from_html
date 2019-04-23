@@ -7,47 +7,21 @@ import '../metadata.dart';
 class TagImg {
   final WidgetFactory wf;
 
-  BuildOp _buildOp;
-
   TagImg(this.wf);
 
-  BuildOp get buildOp {
-    _buildOp ??= BuildOp(onWidgets: (meta, widgets) {
-      final e = meta.buildOpElement;
-      final image = _ImageMetadata.fromAttributes(e.attributes);
-      if (image == null) return null;
+  BuildOp get buildOp => BuildOp(onWidgets: (meta, widgets) {
+        final attributes = meta.buildOpElement.attributes;
+        final src = _getAttr(attributes, 'src', 'data-src');
+        if (src?.isNotEmpty != true) return null;
 
-      return wf.buildImageWidget(
-        image.src,
-        height: image.height,
-        width: image.width,
-      );
-    });
+        final h = _parseInt(_getAttr(attributes, 'height', 'data-height'));
+        final w = _parseInt(_getAttr(attributes, 'width', 'data-width'));
 
-    return _buildOp;
-  }
+        return wf.buildImageWidget(src, height: h, width: w);
+      });
 }
 
-class _ImageMetadata {
-  final int height;
-  final String src;
-  final int width;
-
-  _ImageMetadata({this.height, this.src, this.width});
-
-  static _ImageMetadata fromAttributes(Map<dynamic, String> map) {
-    final src = _getValue(map, 'src', 'data-src');
-    if (src?.isNotEmpty != true) return null;
-
-    return _ImageMetadata(
-      height: _parseInt(_getValue(map, 'height', 'data-height')),
-      src: src,
-      width: _parseInt(_getValue(map, 'width', 'data-width')),
-    );
-  }
-}
-
-String _getValue(Map<dynamic, String> map, String key, String key2) =>
+String _getAttr(Map<dynamic, String> map, String key, String key2) =>
     map.containsKey(key) ? map[key] : map.containsKey(key2) ? map[key2] : null;
 
 int _parseInt(String value) =>
