@@ -11,7 +11,7 @@ NodeMetadata lazySet(
   CssBorderStyle decorationStyleFromCssBorderStyle,
   bool decorationUnderline,
   String fontFamily,
-  double fontSize,
+  String fontSize,
   bool fontStyleItalic,
   FontWeight fontWeight,
   bool isBlockElement,
@@ -154,7 +154,7 @@ class NodeMetadata {
   TextDecorationStyle decorationStyle;
   bool decorationUnderline;
   String fontFamily;
-  double fontSize;
+  String fontSize;
   bool fontStyleItalic;
   FontWeight fontWeight;
   bool _isBlockElement;

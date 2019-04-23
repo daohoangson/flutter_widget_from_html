@@ -10,6 +10,16 @@ import 'ops/tag_table.dart';
 import 'metadata.dart';
 import 'parser.dart' as parser;
 
+const kFontSizeXxLarge = 2.0;
+const kFontSizeXLarge = 1.5;
+const kFontSizeLarge = 1.125;
+const kFontSizeMedium = 1;
+const kFontSizeSmall = .8125;
+const kFontSizeXSmall = .625;
+const kFontSizeXxSmall = .5625;
+const kFontSizeLarger = 1.2;
+const kFontSizeSmaller = 15 / 18;
+
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
 final _spacingRegExp = RegExp(r'\s+');
 
@@ -123,6 +133,37 @@ class WidgetFactory {
     return TextDecoration.combine(list);
   }
 
+  double buildTextFontSize(String value, double parent) {
+    final parsed = parser.unitParseValue(value);
+    if (parsed != null) return parsed;
+
+    final root = DefaultTextStyle.of(context).style.fontSize;
+
+    switch (value) {
+      case 'xx-large':
+        return root * kFontSizeXxLarge;
+      case 'x-large':
+        return root * kFontSizeXLarge;
+      case 'large':
+        return root * kFontSizeLarge;
+      case 'medium':
+        return root;
+      case 'small':
+        return root * kFontSizeSmall;
+      case 'x-small':
+        return root * kFontSizeXSmall;
+      case 'xx-small':
+        return root * kFontSizeXxSmall;
+
+      case 'larger':
+        return parent * kFontSizeLarger;
+      case 'smaller':
+        return parent * kFontSizeSmaller;
+    }
+
+    return null;
+  }
+
   TextSpan buildTextSpan(
     String text, {
     List<TextSpan> children,
@@ -149,7 +190,7 @@ class WidgetFactory {
     var textStyle = parent;
 
     if (meta.style != null) {
-      textStyle = buildTextStyleForStyle(meta.style, textStyle);
+      textStyle = buildTextStyleForStyle(meta.style);
     }
 
     textStyle = textStyle.copyWith(
@@ -157,7 +198,7 @@ class WidgetFactory {
       decoration: buildTextDecoration(meta, parent),
       decorationStyle: meta.decorationStyle,
       fontFamily: meta.fontFamily,
-      fontSize: meta.fontSize,
+      fontSize: buildTextFontSize(meta.fontSize, parent.fontSize),
       fontStyle: buildFontSize(meta),
       fontWeight: meta.fontWeight,
     );
@@ -165,7 +206,9 @@ class WidgetFactory {
     return textStyle;
   }
 
-  TextStyle buildTextStyleForStyle(StyleType style, TextStyle textStyle) {
+  TextStyle buildTextStyleForStyle(StyleType style) {
+    final textStyle = DefaultTextStyle.of(context).style;
+
     switch (style) {
       case StyleType.Heading1:
         return textStyle.copyWith(fontSize: textStyle.fontSize * 2);

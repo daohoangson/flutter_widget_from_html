@@ -64,7 +64,7 @@ All texts will be rendered with padding (`Config.textPadding`).
 - TABLE/TR/TD/TH with support for:
   - `<table border="1">`
   - `<table style="border: 1px solid #f00">`
-- ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BR, CODE, DIV, EM, I, P, PRE, STRONG, U
+- ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BR, CODE, DIV, EM, I, P, PRE, STRONG, U
 
 These tags and their contents will be ignored:
 
@@ -76,7 +76,7 @@ These tags and their contents will be ignored:
 - border-top, border-bottom: overline/underline with support for dashed/dotted/double/solid style
 - color: hex values only (`#F00`, `#0F08`, `#00FF00` or `#00FF0080`)
 - font-family
-- font-size (value in px only)
+- font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) and value in px
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
 - margin, margin-top, margin-right, margin-bottom, margin-left (values in px only)

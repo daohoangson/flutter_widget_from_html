@@ -42,6 +42,13 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
       meta = lazySet(meta, decorationUnderline: true);
       break;
 
+    case 'big':
+      meta = lazySet(meta, fontSize: 'larger');
+      break;
+    case 'small':
+      meta = lazySet(meta, fontSize: 'smaller');
+      break;
+
     case 'article':
     case 'aside':
     case 'br':
@@ -145,7 +152,7 @@ NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
       break;
 
     case 'font-size':
-      meta = lazySet(meta, fontSize: unitParseValue(value));
+      meta = lazySet(meta, fontSize: value);
       break;
 
     case 'font-style':

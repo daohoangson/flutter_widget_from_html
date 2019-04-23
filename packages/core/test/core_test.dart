@@ -321,10 +321,86 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     expect(explained, equals('[RichText:(+font=Monospace:Foo)]'));
   });
 
-  testWidgets('renders font-size inline style', (WidgetTester tester) async {
-    final html = '<span style="font-size: 100px">Foo</span>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[RichText:(@100.0:Foo)]'));
+  group('font-size', () {
+    testWidgets('renders BIG tag', (WidgetTester tester) async {
+      final html = '<big>Foo</big>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(@12.0:Foo)]'));
+    });
+
+    testWidgets('renders SMALL tag', (WidgetTester tester) async {
+      final html = '<small>Foo</small>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(@8.3:Foo)]'));
+    });
+    testWidgets('renders length value', (WidgetTester tester) async {
+      final html = '<span style="font-size: 100px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(@100.0:Foo)]'));
+    });
+
+    testWidgets('renders xx-large', (WidgetTester tester) async {
+      final html = '<span style="font-size: xx-large">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(@20.0:Foo)]'));
+    });
+
+    testWidgets('renders x-large', (WidgetTester tester) async {
+      final html = '<span style="font-size: x-large">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(@15.0:Foo)]'));
+    });
+
+    testWidgets('renders large', (WidgetTester tester) async {
+      final html = '<span style="font-size: large">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(@11.3:Foo)]'));
+    });
+
+    testWidgets('renders medium', (WidgetTester tester) async {
+      final html = '<span style="font-size: 100px">F' +
+          '<span style="font-size: medium">o</span>o</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(@100.0:F(@10.0:o)(:o))]'));
+    });
+
+    testWidgets('renders small', (WidgetTester tester) async {
+      final html = '<span style="font-size: small">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(@8.1:Foo)]'));
+    });
+
+    testWidgets('renders x-small', (WidgetTester tester) async {
+      final html = '<span style="font-size: x-small">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(@6.3:Foo)]'));
+    });
+
+    testWidgets('renders xx-small', (WidgetTester tester) async {
+      final html = '<span style="font-size: xx-small">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(@5.6:Foo)]'));
+    });
+
+    testWidgets('renders larger', (WidgetTester tester) async {
+      final html = '<span style="font-size: larger">F' +
+          '<span style="font-size: larger">o</span>o</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(@12.0:F(@14.4:o)(:o))]'));
+    });
+
+    testWidgets('renders smaller', (WidgetTester tester) async {
+      final html = '<span style="font-size: smaller">F' +
+          '<span style="font-size: smaller">o</span>o</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(@8.3:F(@6.9:o)(:o))]'));
+    });
+
+    testWidgets('renders invalid', (WidgetTester tester) async {
+      final html = '<span style="font-size: xxx">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
   });
 
   group('font-style', () {
