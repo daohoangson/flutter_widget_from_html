@@ -5,6 +5,8 @@ import 'core_wf.dart';
 import 'data_classes.dart';
 import 'parser.dart';
 
+final _attrStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
+
 class Builder {
   final List<dom.Node> domNodes;
   final NodeMetadata parentMeta;
@@ -35,7 +37,13 @@ class Builder {
 
   NodeMetadata collectMetadata(dom.Element e) {
     var meta = wf.parseElement(null, e);
-    attrStyleLoop(e, (k, v) => meta = wf.parseElementStyle(meta, k, v));
+
+    if (e.attributes.containsKey('style')) {
+      _attrStyleRegExp.allMatches(e.attributes['style']).forEach((m) =>
+          meta = lazySet(meta, inlineStyles: [m[1].trim(), m[2].trim()]));
+    }
+    meta?.forEachInlineStyle((k, v) => meta = wf.parseElementStyle(meta, k, v));
+
     meta?.freezeOps(e)?.forEach((o) => o.collectMetadata(meta));
 
     return meta;

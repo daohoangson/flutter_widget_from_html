@@ -64,7 +64,7 @@ String _parseValue(NodeMetadata meta) {
   String value;
 
   final e = meta.buildOpElement;
-  parser.attrStyleLoop(e, (k, v) => k == kCssTextAlign ? value = v : null);
+  meta.forEachInlineStyle((k, v) => k == kCssTextAlign ? value = v : null);
 
   return value;
 }

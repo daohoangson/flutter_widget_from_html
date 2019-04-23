@@ -1,14 +1,6 @@
 part of '../parser.dart';
 
-final _attrStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
 final _lengthRegExp = RegExp(r'^([\d\.]+)(em|px)$');
-
-void attrStyleLoop(dom.Element e, void f(String k, String v)) =>
-    e.attributes.containsKey('style')
-        ? _attrStyleRegExp
-            .allMatches(e.attributes['style'])
-            .forEach((match) => f(match[1].trim(), match[2].trim()))
-        : null;
 
 CssLength lengthParseValue(String value) {
   if (value == null) return null;

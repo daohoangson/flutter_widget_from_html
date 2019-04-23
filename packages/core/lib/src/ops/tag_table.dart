@@ -64,10 +64,8 @@ class _RowWidget extends StatelessWidget {
 }
 
 TableBorder _buildTableBorder(NodeMetadata meta) {
-  final e = meta.buildOpElement;
-
   String styleBorder;
-  parser.attrStyleLoop(e, (k, v) => k == 'border' ? styleBorder = v : null);
+  meta.forEachInlineStyle((k, v) => k == 'border' ? styleBorder = v : null);
   if (styleBorder != null) {
     final borderParsed = parser.borderParse(styleBorder);
     if (borderParsed != null) {
@@ -78,6 +76,7 @@ TableBorder _buildTableBorder(NodeMetadata meta) {
     }
   }
 
+  final e = meta.buildOpElement;
   if (e.attributes.containsKey('border')) {
     final width = double.tryParse(e.attributes['border']);
     if (width != null && width > 0) {

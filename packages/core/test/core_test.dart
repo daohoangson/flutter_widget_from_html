@@ -70,6 +70,12 @@ void main() {
     );
   });
 
+  testWidgets('renders BLOCKQUOTE tag', (WidgetTester tester) async {
+    final html = '<blockquote>Foo</blockquote>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[Padding:(10,40,10,40),child=[Text:Foo]]'));
+  });
+
   group('IMG tag', () {
     testWidgets('renders src', (WidgetTester tester) async {
       final html = '<img src="image.png" />';

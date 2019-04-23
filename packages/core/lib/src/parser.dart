@@ -29,6 +29,17 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
       meta = lazySet(meta, isBlockElement: true, fontStyleItalic: true);
       break;
 
+    case 'article':
+    case 'aside':
+    case 'br':
+    case 'div':
+    case 'li':
+    case 'p':
+    case 'ol':
+    case 'ul':
+      meta = lazySet(meta, isBlockElement: true);
+      break;
+
     case 'b':
     case 'strong':
       meta = lazySet(meta, fontWeight: FontWeight.bold);
@@ -48,15 +59,8 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
       meta = lazySet(meta, fontSize: 'smaller');
       break;
 
-    case 'article':
-    case 'aside':
-    case 'br':
-    case 'div':
-    case 'li':
-    case 'p':
-    case 'ol':
-    case 'ul':
-      meta = lazySet(meta, isBlockElement: true);
+    case 'blockquote':
+      meta = lazySet(meta, inlineStyles: ['margin', '1em 40px']);
       break;
 
     case 'h1':

@@ -14,6 +14,7 @@ NodeMetadata lazySet(
   String fontSize,
   bool fontStyleItalic,
   FontWeight fontWeight,
+  Iterable<String> inlineStyles,
   bool isBlockElement,
   bool isNotRenderable,
   StyleType style,
@@ -54,6 +55,16 @@ NodeMetadata lazySet(
   if (fontSize != null) meta.fontSize = fontSize;
   if (fontStyleItalic != null) meta.fontStyleItalic = fontStyleItalic;
   if (fontWeight != null) meta.fontWeight = fontWeight;
+  if (inlineStyles != null) {
+    if (inlineStyles.length % 2 != 0) {
+      throw new ArgumentError('inlineStyles must have an even number of items');
+    }
+    if (meta._inlineStylesFrozen) {
+      throw new StateError('inlineStyles has already been frozen');
+    }
+    meta._inlineStyles ??= [];
+    meta._inlineStyles.addAll(inlineStyles);
+  }
   if (isBlockElement != null) meta._isBlockElement = isBlockElement;
   if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
   if (style != null) meta.style = style;
@@ -182,6 +193,8 @@ class NodeMetadata {
   String fontSize;
   bool fontStyleItalic;
   FontWeight fontWeight;
+  List<String> _inlineStyles;
+  bool _inlineStylesFrozen = false;
   bool _isBlockElement;
   bool isNotRenderable;
   StyleType style;
@@ -211,6 +224,18 @@ class NodeMetadata {
     return _buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
   }
 
+  void forEachInlineStyle(void f(String key, String value)) {
+    _inlineStylesFrozen = true;
+    if (_inlineStyles == null) return;
+
+    final iterator = _inlineStyles.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current;
+      if (!iterator.moveNext()) return;
+      f(key, iterator.current);
+    }
+  }
+
   void forEachOp(void f(BuildOp element)) => _buildOps?.forEach(f);
 
   Iterable<BuildOp> freezeOps(dom.Element e) {
@@ -218,7 +243,7 @@ class NodeMetadata {
 
     _buildOpElement = e;
 
-    final ops = _buildOps.toList();
+    final ops = _buildOps as List;
     ops.sort((a, b) => a.priority.compareTo(b.priority));
     _buildOps = List.unmodifiable(ops);
 
