@@ -52,6 +52,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
 All texts will be rendered with padding (`Config.textPadding`).
 
 - A: underline with theme accent color, launch url via [`url_launcher`](https://pub.dartlang.org/packages/url_launcher), support base url resolver
+- ABBR/ACRONYM
 - B
 - BR
 - CODE
@@ -82,6 +83,7 @@ These tags and their contents will be ignored:
 
 ### Inline stylings
 
+- border-top, border-bottom: overline/underline with support for dashed/dotted/double/solid style
 - color: hex values only (`#F00`, `#0F08`, `#00FF00` or `#00FF0080`)
 - font-family
 - font-size (value in px only)

@@ -48,6 +48,7 @@ class HelloWorldCoreScreen extends StatelessWidget {
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
 
 - A: underline without color, no action on tap (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
+- ABBR/ACRONYM
 - B
 - BR
 - CODE
@@ -73,6 +74,7 @@ However, these tags and their contents will be ignored:
 
 ### Inline stylings
 
+- border-top, border-bottom: overline/underline with support for dashed/dotted/double/solid style
 - color: hex values only (`#F00`, `#0F08`, `#00FF00` or `#00FF0080`)
 - font-family
 - font-size (value in px only)

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    show BuildOp, NodeMetadata, attrStyleLoop, borderParseAll;
+    show BuildOp, NodeMetadata, attrStyleLoop, borderParse;
 
 import '../core_wf.dart';
 
@@ -73,7 +73,7 @@ TableBorder _buildTableBorder(NodeMetadata meta) {
   String styleBorder;
   attrStyleLoop(e, (k, v) => k == 'border' ? styleBorder = v : null);
   if (styleBorder != null) {
-    final borderParsed = borderParseAll(styleBorder);
+    final borderParsed = borderParse(styleBorder);
     if (borderParsed != null) {
       return TableBorder.all(
         color: borderParsed.color ?? const Color(0xFF000000),

@@ -47,6 +47,20 @@ void main() {
     });
   });
 
+  group('ABBR tag', () {
+    testWidgets('renders ABBR', (WidgetTester tester) async {
+      final html = '<abbr>ABBR</abbr>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+u/dotted:ABBR)]'));
+    });
+
+    testWidgets('renders ACRONYM', (WidgetTester tester) async {
+      final html = '<acronym>ACRONYM</acronym>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+u/dotted:ACRONYM)]'));
+    });
+  });
+
   group('IMG tag', () {
     testWidgets('renders src', (WidgetTester tester) async {
       final html = '<img src="image.png" />';
@@ -210,6 +224,57 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
             '[RichText:(@11.2:This is heading 4)],' +
             '[RichText:(@8.3:This is heading 5)],' +
             '[RichText:(@7.5:This is heading 6)]]'));
+  });
+
+  group('border', () {
+    testWidgets('renders border-top', (WidgetTester tester) async {
+      final html = '<span style="border-top: 1px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+o:Foo)]'));
+    });
+
+    testWidgets('resets border-top', (WidgetTester tester) async {
+      final html = '<span style="text-decoration: overline">F' +
+          '<span style="border-top: 0">o</span>o</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+o:F(:o)(+o:o))]'));
+    });
+
+    testWidgets('renders border-bottom', (WidgetTester tester) async {
+      final html = '<span style="border-bottom: 1px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+u:Foo)]'));
+    });
+
+    testWidgets('resets border-bottom', (WidgetTester tester) async {
+      final html = '<u>F<span style="border-bottom: 0">o</span>o</u>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+u:F(:o)(+u:o))]'));
+    });
+
+    testWidgets('renders dashed', (WidgetTester tester) async {
+      final html = '<span style="border-top: 1px dashed">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+o/dashed:Foo)]'));
+    });
+
+    testWidgets('renders dotted', (WidgetTester tester) async {
+      final html = '<span style="border-top: 1px dotted">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+o/dotted:Foo)]'));
+    });
+
+    testWidgets('renders double', (WidgetTester tester) async {
+      final html = '<span style="border-bottom: 1px double">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+u/double:Foo)]'));
+    });
+
+    testWidgets('renders solid', (WidgetTester tester) async {
+      final html = '<span style="border-bottom: 1px solid">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+u:Foo)]'));
+    });
   });
 
   group('color (inline style)', () {

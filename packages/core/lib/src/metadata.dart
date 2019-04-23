@@ -7,6 +7,8 @@ NodeMetadata lazySet(
   Color color,
   bool decorationLineThrough,
   bool decorationOverline,
+  TextDecorationStyle decorationStyle,
+  CssBorderStyle decorationStyleFromCssBorderStyle,
   bool decorationUnderline,
   String fontFamily,
   double fontSize,
@@ -29,6 +31,23 @@ NodeMetadata lazySet(
   if (decorationLineThrough != null)
     meta.decorationLineThrough = decorationLineThrough;
   if (decorationOverline != null) meta.decorationOverline = decorationOverline;
+  if (decorationStyle != null) meta.decorationStyle = decorationStyle;
+  if (decorationStyleFromCssBorderStyle != null) {
+    switch (decorationStyleFromCssBorderStyle) {
+      case CssBorderStyle.dashed:
+        meta.decorationStyle = TextDecorationStyle.dashed;
+        break;
+      case CssBorderStyle.dotted:
+        meta.decorationStyle = TextDecorationStyle.dotted;
+        break;
+      case CssBorderStyle.double:
+        meta.decorationStyle = TextDecorationStyle.double;
+        break;
+      case CssBorderStyle.solid:
+        meta.decorationStyle = TextDecorationStyle.solid;
+        break;
+    }
+  }
   if (decorationUnderline != null)
     meta.decorationUnderline = decorationUnderline;
   if (fontFamily != null) meta.fontFamily = fontFamily;
@@ -111,12 +130,28 @@ class BuiltPieceSimple extends BuiltPiece {
   bool get hasWidgets => widgets != null;
 }
 
+class CssBorderSide {
+  Color color;
+  CssBorderStyle style;
+  double width;
+}
+
+enum CssBorderStyle { dashed, dotted, double, solid }
+
+class CssBorders {
+  CssBorderSide bottom;
+  CssBorderSide left;
+  CssBorderSide right;
+  CssBorderSide top;
+}
+
 class NodeMetadata {
   dom.Element _buildOpElement;
   Iterable<BuildOp> _buildOps;
   Color color;
   bool decorationLineThrough;
   bool decorationOverline;
+  TextDecorationStyle decorationStyle;
   bool decorationUnderline;
   String fontFamily;
   double fontSize;

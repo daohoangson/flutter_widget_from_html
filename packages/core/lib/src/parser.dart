@@ -17,6 +17,15 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
       meta = lazySet(meta, decorationUnderline: true);
       break;
 
+    case 'abbr':
+    case 'acronym':
+      meta = lazySet(
+        meta,
+        decorationStyle: TextDecorationStyle.dotted,
+        decorationUnderline: true,
+      );
+      break;
+
     case 'b':
     case 'strong':
       meta = lazySet(meta, fontWeight: FontWeight.bold);
@@ -95,6 +104,31 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
 
 NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
   switch (key) {
+    case 'border-bottom':
+      final borderBottom = borderParse(value);
+      if (borderBottom != null) {
+        meta = lazySet(
+          meta,
+          decorationUnderline: true,
+          decorationStyleFromCssBorderStyle: borderBottom.style,
+        );
+      } else {
+        meta = lazySet(meta, decorationUnderline: false);
+      }
+      break;
+    case 'border-top':
+      final borderTop = borderParse(value);
+      if (borderTop != null) {
+        meta = lazySet(
+          meta,
+          decorationOverline: true,
+          decorationStyleFromCssBorderStyle: borderTop.style,
+        );
+      } else {
+        meta = lazySet(meta, decorationOverline: false);
+      }
+      break;
+
     case 'color':
       final color = colorParseValue(value);
       if (color != null) meta = lazySet(meta, color: color);

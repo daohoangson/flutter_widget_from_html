@@ -155,6 +155,7 @@ class WidgetFactory {
     textStyle = textStyle.copyWith(
       color: meta.color,
       decoration: buildTextDecoration(meta, parent),
+      decorationStyle: meta.decorationStyle,
       fontFamily: meta.fontFamily,
       fontSize: meta.fontSize,
       fontStyle: buildFontSize(meta),

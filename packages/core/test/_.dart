@@ -165,7 +165,12 @@ class _Explainer {
       return '';
     }
 
-    return (styleHasIt ? '+' : '-') + str;
+    final decorationStyle = (style.decorationStyle == null ||
+            style.decorationStyle == TextDecorationStyle.solid)
+        ? ''
+        : "${style.decorationStyle}".replaceFirst(RegExp(r'^.+\.'), '/');
+
+    return "${styleHasIt ? '+' : '-'}$str$decorationStyle";
   }
 
   String _textStyleFontStyle(TextStyle style) {
