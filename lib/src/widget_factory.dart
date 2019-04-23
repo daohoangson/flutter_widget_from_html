@@ -4,12 +4,12 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
     as core;
 import 'package:html/dom.dart' as dom;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 import 'ops/tag_a.dart';
 import 'ops/tag_iframe.dart';
 import 'ops/tag_li.dart';
 import 'config.dart';
+import 'web_view.dart';
 
 final _baseUriTrimmingRegExp = RegExp(r'/+$');
 final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
@@ -53,24 +53,21 @@ class WidgetFactory extends core.WidgetFactory {
       );
 
   Widget buildWebView(
-    String initialUrl, {
+    String url, {
     double height,
     double width,
-  }) =>
-      buildPadding(
-        AspectRatio(
-          aspectRatio:
-              (height != null && height > 0 && width != null && width > 0)
-                  ? (width / height)
-                  : (16 / 9),
-          child: WebView(
-              initialUrl: initialUrl,
-              javascriptMode: config.webViewJs
-                  ? JavascriptMode.unrestricted
-                  : JavascriptMode.disabled),
-        ),
-        config.webViewPadding,
-      );
+  }) {
+    final dimensOk = height != null && height > 0 && width != null && width > 0;
+    return buildPadding(
+      WebView(
+        url,
+        aspectRatio: dimensOk ? width / height : 16 / 9,
+        getDimensions: !dimensOk && config.webViewJs,
+        js: config.webViewJs,
+      ),
+      config.webViewPadding,
+    );
+  }
 
   Widget buildWebViewLinkOnly(String fullUrl) => GestureDetector(
         child: buildTextWidget(fullUrl),

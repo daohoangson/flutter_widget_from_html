@@ -8,3 +8,12 @@ unit_test_task:
     folder: ~/.pub-cache
   test_script: COVERAGE=1 ./tool/test.sh
   codecov_script: bash <(curl -s https://codecov.io/bash)
+
+integration_test_task:
+  osx_instance:
+    image: mojave-xcode-10.2-flutter
+  pub_cache:
+    folder: ~/.pub-cache
+  setup_script:
+    - xcrun simctl create iPhoneX com.apple.CoreSimulator.SimDeviceType.iPhone-X com.apple.CoreSimulator.SimRuntime.iOS-12-2 | xargs xcrun simctl boot
+  test_script: ./tool/integration.sh

@@ -4,21 +4,25 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 class HelloWorldScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(
-        title: Text('HelloWorldScreen'),
-      ),
-      body: ListView(
-        children: <Widget>[
-          HtmlWidget("""<h1>Heading 1</h1>
-<h2>Heading 2</h2>
-<h3>Heading 3</h3>
-<h4>Heading 4</h4>
-<h5>Heading 5</h5>
-<h6>Heading 6</h6>
+        appBar: AppBar(title: Text('HelloWorldScreen')),
+        body: HtmlWidget(
+          """<h1>Heading</h1>
 <p>A paragraph with <strong>strong</strong> <em>emphasized</em> text.</p>
-<p>And of course, cat image: <img src="https://media.giphy.com/media/6VoDJzfRjJNbG/giphy-downsized.gif" /></p>
-<div style="text-align: center">Source: <a href="https://gph.is/QFgPA0">https://gph.is/QFgPA0</a></div>
-"""),
-        ],
-      ));
+<ol>
+  <li>List item number one</li>
+  <li>
+    Two
+    <ul>
+      <li>2.1 (nested)</li>
+      <li>2.2</li>
+    </ul>
+  </li>
+  <li>Three</li>
+</ol>
+<p>And YouTube video!</p>
+<iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="560" height="315"></iframe>
+""",
+          config: Config(webView: true),
+        ),
+      );
 }
