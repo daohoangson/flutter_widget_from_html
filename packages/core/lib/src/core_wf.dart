@@ -4,6 +4,7 @@ import 'package:html/dom.dart' as dom;
 
 import 'ops/style_margin.dart';
 import 'ops/style_text_align.dart';
+import 'ops/tag_code.dart';
 import 'ops/tag_img.dart';
 import 'metadata.dart';
 import 'parser.dart' as parser;
@@ -132,18 +133,9 @@ class WidgetFactory {
       text = text.replaceAll(_spacingRegExp, ' ');
     }
 
-    TextSpan span;
-    if (text.isEmpty && children?.length == 1) {
-      span = children.first;
-    } else {
-      span = TextSpan(
-        children: children,
-        style: style,
-        text: text,
-      );
-    }
-
-    return span;
+    return (text.isEmpty && children?.length == 1)
+        ? children.first
+        : TextSpan(children: children, style: style, text: text);
   }
 
   TextStyle buildTextStyle(NodeMetadata meta, TextStyle parent) {
@@ -202,20 +194,9 @@ class WidgetFactory {
 
   NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     switch (e.localName) {
-      case 'code':
-        meta = lazySet(
-          meta,
-          buildOp: tagCode(),
-          fontFamily: 'monospace',
-        );
-        break;
-      case 'pre':
-        meta = lazySet(
-          meta,
-          buildOp: tagCode(),
-          fontFamily: 'monospace',
-          textSpaceCollapse: false,
-        );
+      case kTagCode:
+      case kTagPre:
+        meta = lazySet(meta, buildOp: tagCode());
         break;
 
       case 'img':
@@ -255,7 +236,7 @@ class WidgetFactory {
   }
 
   BuildOp tagCode() {
-    _tagCode ??= BuildOp(onWidgets: (_, widgets) => buildScrollView(widgets));
+    _tagCode ??= TagCode(this).buildOp;
     return _tagCode;
   }
 

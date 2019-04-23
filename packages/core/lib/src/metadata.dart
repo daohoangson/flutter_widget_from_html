@@ -15,7 +15,6 @@ NodeMetadata lazySet(
   bool isBlockElement,
   bool isNotRenderable,
   StyleType style,
-  bool textSpaceCollapse,
 }) {
   meta ??= NodeMetadata();
 
@@ -38,7 +37,6 @@ NodeMetadata lazySet(
   if (isBlockElement != null) meta._isBlockElement = isBlockElement;
   if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
   if (style != null) meta.style = style;
-  if (textSpaceCollapse != null) meta.textSpaceCollapse = textSpaceCollapse;
 
   return meta;
 }
@@ -95,15 +93,17 @@ abstract class BuiltPiece {
 
   String get text;
   TextSpan get textSpan;
+  TextStyle get textStyle;
   List<Widget> get widgets;
 }
 
 class BuiltPieceSimple extends BuiltPiece {
   final String text;
   final TextSpan textSpan;
+  final TextStyle textStyle;
   final List<Widget> widgets;
 
-  BuiltPieceSimple({this.text, this.textSpan, this.widgets});
+  BuiltPieceSimple({this.text, this.textSpan, this.textStyle, this.widgets});
 
   bool get hasText => text != null;
   bool get hasTextSpan => textSpan != null;
@@ -124,7 +124,6 @@ class NodeMetadata {
   bool _isBlockElement;
   bool isNotRenderable;
   StyleType style;
-  bool textSpaceCollapse;
 
   dom.Element get buildOpElement => _buildOpElement;
 
@@ -135,8 +134,7 @@ class NodeMetadata {
       fontWeight != null ||
       hasDecoration ||
       hasFontStyle ||
-      style != null ||
-      textSpaceCollapse != null;
+      style != null;
 
   bool get hasDecoration =>
       decorationLineThrough != null ||

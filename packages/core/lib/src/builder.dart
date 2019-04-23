@@ -86,11 +86,7 @@ class Builder {
     _pieces.add(_Piece(this, widgets: widgets));
   }
 
-  void _newPiece() => _piece = _Piece(
-        this,
-        parentStyle: _parentStyle,
-        textSpaceCollapse: parentMeta?.textSpaceCollapse,
-      );
+  void _newPiece() => _piece = _Piece(this, parentStyle: _parentStyle);
 
   void _savePiece() {
     if ((_piece.hasText && !checkTextIsUseless(_piece.text)) ||
@@ -104,7 +100,6 @@ class Builder {
 class _Piece extends BuiltPiece {
   final Builder b;
   final _ParentStyle parentStyle;
-  final bool textSpaceCollapse;
   final List<Widget> widgets;
 
   final StringBuffer _texts;
@@ -113,7 +108,6 @@ class _Piece extends BuiltPiece {
   _Piece(
     this.b, {
     this.parentStyle,
-    this.textSpaceCollapse,
     this.widgets,
   }) : _texts = widgets == null ? StringBuffer() : null;
 
@@ -134,6 +128,9 @@ class _Piece extends BuiltPiece {
       ? _spans[0]
       : _buildTextSpan(text, children: _spans);
 
+  @override
+  TextStyle get textStyle => parentStyle?.textStyle;
+
   void _addSpan(TextSpan span) {
     if (span == null || hasWidgets) return;
     _spans ??= List();
@@ -141,12 +138,7 @@ class _Piece extends BuiltPiece {
   }
 
   TextSpan _buildTextSpan(String text, {List<TextSpan> children}) =>
-      b.wf.buildTextSpan(
-        text,
-        children: children,
-        style: parentStyle?.textStyle,
-        textSpaceCollapse: textSpaceCollapse,
-      );
+      b.wf.buildTextSpan(text, children: children, style: textStyle);
 
   void _write(String text, {bool isLast = false}) {
     final isFirst = _texts.isEmpty && _spans?.isEmpty != false;
