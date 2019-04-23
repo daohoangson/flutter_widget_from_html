@@ -1,6 +1,7 @@
 part of '../core_wf.dart';
 
 const kTagTable = 'table';
+const kTagTableCaption = 'caption';
 const kTagTableCell = 'td';
 const kTagTableHeader = 'th';
 const kTagTableRow = 'tr';
@@ -16,18 +17,22 @@ class TagTable {
             meta.fontWeight ??= FontWeight.bold;
           }
         },
+        getInlineStyles: (e) {
+          if (e.localName == kTagTableCaption) {
+            return [kCssTextAlign, kCssTextAlignCenter];
+          }
+        },
         onWidgets: (meta, widgets) {
           switch (meta.buildOpElement.localName) {
             case kTagTable:
               return _buildTable(meta, widgets);
-            case kTagTableCell:
-            case kTagTableHeader:
-              return wf.buildColumn(widgets);
+            case kTagTableCaption:
+              return _CaptionWidget(wf.buildColumn(widgets));
             case kTagTableRow:
               return _RowWidget(widgets.map((w) => _wrapCell(w)));
           }
 
-          return Container();
+          return wf.buildColumn(widgets);
         },
         priority: 100,
       );
@@ -35,6 +40,7 @@ class TagTable {
   Widget _buildTable(NodeMetadata meta, Iterable<Widget> children) {
     final rowWidgets = <_RowWidget>[];
     children.forEach((c) => (c is _RowWidget ? rowWidgets.add(c) : null));
+    if (rowWidgets.isEmpty) return null;
 
     // first pass to find number of columns
     int cols = 0;
@@ -46,11 +52,29 @@ class TagTable {
       return TableRow(children: cells);
     });
 
-    return wf.buildTable(rows.toList(), border: _buildTableBorder(meta));
+    final widgets = <Widget>[];
+
+    if (children.isNotEmpty) {
+      final first = children.first;
+      if (first is _CaptionWidget) widgets.add(first.child);
+    }
+
+    widgets.add(wf.buildTable(rows.toList(), border: _buildTableBorder(meta)));
+
+    return wf.buildColumn(widgets);
   }
 
   Widget _wrapCell(Widget widget) =>
       widget is TableCell ? widget : wf.buildTableCell(widget);
+}
+
+class _CaptionWidget extends StatelessWidget {
+  final Widget child;
+
+  _CaptionWidget(this.child);
+
+  @override
+  Widget build(BuildContext context) => child;
 }
 
 class _RowWidget extends StatelessWidget {
@@ -60,7 +84,9 @@ class _RowWidget extends StatelessWidget {
   _RowWidget(this.cells);
 
   @override
-  Widget build(BuildContext context) => null;
+  Widget build(BuildContext context) => Table(
+        children: <TableRow>[TableRow(children: cells.toList())],
+      );
 }
 
 TableBorder _buildTableBorder(NodeMetadata meta) {

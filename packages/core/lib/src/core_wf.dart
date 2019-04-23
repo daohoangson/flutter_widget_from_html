@@ -254,6 +254,7 @@ class WidgetFactory {
         break;
 
       case kTagTable:
+      case kTagTableCaption:
       case kTagTableCell:
       case kTagTableHeader:
       case kTagTableRow:

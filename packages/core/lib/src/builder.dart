@@ -38,6 +38,7 @@ class Builder {
   NodeMetadata collectMetadata(dom.Element e) {
     var meta = wf.parseElement(null, e);
 
+    meta?.forEachOp((o) => lazySet(meta, inlineStyles: o.getInlineStyles(e)));
     if (e.attributes.containsKey('style')) {
       _attrStyleRegExp.allMatches(e.attributes['style']).forEach((m) =>
           meta = lazySet(meta, inlineStyles: [m[1].trim(), m[2].trim()]));

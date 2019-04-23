@@ -77,15 +77,18 @@ class BuildOp {
   final int priority;
 
   final BuildOpCollectMetadata _collectMetadata;
+  final BuildOpGetInlineStyles _getInlineStyles;
   final BuildOpOnPieces _onPieces;
   final BuildOpOnWidgets _onWidgets;
 
   BuildOp({
     BuildOpCollectMetadata collectMetadata,
+    BuildOpGetInlineStyles getInlineStyles,
     BuildOpOnPieces onPieces,
     BuildOpOnWidgets onWidgets,
     this.priority = 10,
   })  : _collectMetadata = collectMetadata,
+        _getInlineStyles = getInlineStyles,
         _onPieces = onPieces,
         _onWidgets = onWidgets;
 
@@ -93,6 +96,9 @@ class BuildOp {
 
   void collectMetadata(NodeMetadata meta) =>
       _collectMetadata != null ? _collectMetadata(meta) : null;
+
+  List<String> getInlineStyles(dom.Element e) =>
+      _getInlineStyles != null ? _getInlineStyles(e) : null;
 
   Iterable<BuiltPiece> onPieces(
     NodeMetadata meta,
@@ -111,6 +117,7 @@ class BuildOp {
 }
 
 typedef void BuildOpCollectMetadata(NodeMetadata meta);
+typedef List<String> BuildOpGetInlineStyles(dom.Element e);
 typedef Iterable<BuiltPiece> BuildOpOnPieces(
   NodeMetadata meta,
   Iterable<BuiltPiece> pieces,
