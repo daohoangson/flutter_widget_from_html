@@ -42,15 +42,11 @@ class WidgetFactory {
 
   List buildImageBytes(String dataUri) {
     final match = _dataUriRegExp.matchAsPrefix(dataUri);
-    if (match == null) {
-      return null;
-    }
+    if (match == null) return null;
 
     final prefix = match[0];
     final bytes = base64.decode(dataUri.substring(prefix.length));
-    if (bytes.length == 0) {
-      return null;
-    }
+    if (bytes.length == 0) return null;
 
     return bytes;
   }

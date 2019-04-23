@@ -12,6 +12,7 @@ class TagA {
   TagA(this.wf, {this.icon = true});
 
   BuildOp get buildOp => BuildOp(
+        collectMetadata: (m) => m.color ??= Theme.of(wf.context).accentColor,
         onPieces: (meta, pieces) {
           final tap = _buildGestureTapCallback(meta);
           final r = TapGestureRecognizer()..onTap = tap;
@@ -36,7 +37,7 @@ class TagA {
   GestureTapCallback _buildGestureTapCallback(NodeMetadata meta) {
     final attrs = meta.buildOpElement.attributes;
     final href = attrs.containsKey('href') ? attrs['href'] : '';
-    final fullUrl = buildFullUrl(href, wf.config.baseUrl) ?? href;
+    final fullUrl = wf.constructFullUrl(href) ?? href;
     return wf.buildGestureTapCallbackForUrl(fullUrl);
   }
 
