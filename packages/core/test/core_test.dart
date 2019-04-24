@@ -311,6 +311,26 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     );
   });
 
+  group('background-color', () {
+    testWidgets('renders MARK tag', (WidgetTester tester) async {
+      final html = '<mark>Foo</mark>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(bg=#FFFFFF00#FF000000:Foo)]'));
+    });
+
+    testWidgets('renders block', (WidgetTester tester) async {
+      final html = '<div style="background-color: #f00"><div>Foo</div></div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[DecoratedBox:bg=#FFFF0000,child=[Text:Foo]]'));
+    });
+
+    testWidgets('renders inline', (WidgetTester tester) async {
+      final html = 'Foo <span style="background-color: #f00">bar</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo (bg=#FFFF0000:bar))]'));
+    });
+  });
+
   group('border', () {
     testWidgets('renders border-top', (WidgetTester tester) async {
       final html = '<span style="border-top: 1px">Foo</span>';

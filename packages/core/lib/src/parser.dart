@@ -146,6 +146,13 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     case 'kbd':
       meta = lazySet(meta, fontFamily: 'monospace');
       break;
+
+    case 'mark':
+      meta = lazySet(
+        meta,
+        inlineStyles: ['background-color', '#ff0', 'color', '#000'],
+      );
+      break;
   }
 
   return meta;

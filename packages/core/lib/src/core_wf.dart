@@ -5,6 +5,7 @@ import 'package:html/dom.dart' as dom;
 import 'data_classes.dart';
 import 'parser.dart' as parser;
 
+part 'ops/style_bg_color.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_text_align.dart';
 part 'ops/tag_code.dart';
@@ -28,6 +29,7 @@ final _spacingRegExp = RegExp(r'\s+');
 class WidgetFactory {
   final BuildContext context;
 
+  BuildOp _styleBgColor;
   BuildOp _styleMargin;
   BuildOp _styleTextAlign;
   BuildOp _tagCode;
@@ -52,6 +54,19 @@ class WidgetFactory {
               children: children,
             )
       : null;
+
+  Widget buildDecoratedBox(
+    Widget child, {
+    Color color,
+  }) =>
+      child != null
+          ? DecoratedBox(
+              child: child,
+              decoration: BoxDecoration(
+                color: color,
+              ),
+            )
+          : null;
 
   Widget buildDivider() => DecoratedBox(
         decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 1)),
@@ -187,10 +202,16 @@ class WidgetFactory {
       text = text.replaceAll(_spacingRegExp, ' ');
     }
 
-    return (text.isEmpty && children?.length == 1)
-        ? children.first
-        : TextSpan(children: children, style: style, text: text);
+    return TextSpan(children: children, style: style, text: text);
   }
+
+  TextSpan buildTextSpanAgain(TextSpan textSpan, TextStyle textStyle) =>
+      TextSpan(
+        children: textSpan.children,
+        recognizer: textSpan.recognizer,
+        style: textStyle,
+        text: textSpan.text,
+      );
 
   TextStyle buildTextStyle(NodeMetadata meta, TextStyle parent) {
     if (meta?.hasStyling != true) return null;
@@ -249,6 +270,10 @@ class WidgetFactory {
 
   NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
     switch (key) {
+      case kCssBackgroundColor:
+        meta = lazySet(meta, buildOp: styleBgColor());
+        break;
+
       case kCssMargin:
       case kCssMarginBottom:
       case kCssMarginLeft:
@@ -263,6 +288,11 @@ class WidgetFactory {
     }
 
     return parser.parseElementStyle(meta, key, value);
+  }
+
+  BuildOp styleBgColor() {
+    _styleBgColor ??= StyleBgColor(this).buildOp;
+    return _styleBgColor;
   }
 
   BuildOp styleMargin() {

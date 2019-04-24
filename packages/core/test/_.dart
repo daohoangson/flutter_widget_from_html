@@ -60,6 +60,22 @@ class _Explainer {
 
   String _borderSide(BorderSide s) => "${s.color},w=${s.width}";
 
+  String _boxDecoration(BoxDecoration d) {
+    String s = '';
+
+    if (d.color != null) s += "bg=${_color(d.color)},";
+
+    return s;
+  }
+
+  String _color(Color c) =>
+      "#${_colorHex(c.alpha)}${_colorHex(c.red)}${_colorHex(c.green)}${_colorHex(c.blue)}";
+
+  String _colorHex(int i) {
+    final h = i.toRadixString(16).toUpperCase();
+    return h.length == 1 ? "0$h" : h;
+  }
+
   String _edgeInsets(EdgeInsets e) =>
       "(${e.top.truncate()},${e.right.truncate()}," +
       "${e.bottom.truncate()},${e.left.truncate()})";
@@ -128,8 +144,12 @@ class _Explainer {
       return s;
     }
 
+    if (style.background != null) {
+      s += "bg=${_color(style.background.color)}";
+    }
+
     if (style.color != null) {
-      s += _textStyleColor(style.color);
+      s += _color(style.color);
     }
 
     s += _textStyleDecoration(style, TextDecoration.lineThrough, 'l');
@@ -148,14 +168,6 @@ class _Explainer {
     s += _textStyleFontWeight(style);
 
     return s;
-  }
-
-  String _textStyleColor(Color color) =>
-      "#${_textStyleColorHex(color.alpha)}${_textStyleColorHex(color.red)}${_textStyleColorHex(color.green)}${_textStyleColorHex(color.blue)}";
-
-  String _textStyleColorHex(int i) {
-    final h = i.toRadixString(16).toUpperCase();
-    return h.length == 1 ? "0$h" : h;
   }
 
   String _textStyleDecoration(TextStyle style, TextDecoration d, String str) {
@@ -209,17 +221,19 @@ class _Explainer {
         ? "alignment=${widget.alignment},"
         : widget is AspectRatio
             ? "aspectRatio=${widget.aspectRatio.toStringAsFixed(2)},"
-            : widget is GestureDetector
-                ? "child=${_widget(widget.child)}"
-                : widget is Image
-                    ? "image=${_image(widget.image)}"
-                    : widget is Padding
-                        ? "${_edgeInsets(widget.padding)},"
-                        : widget is RichText
-                            ? _textSpan(widget.text)
-                            : widget is Table
-                                ? _tableBorder(widget.border)
-                                : widget is Text ? widget.data : '';
+            : widget is DecoratedBox
+                ? _boxDecoration(widget.decoration)
+                : widget is GestureDetector
+                    ? "child=${_widget(widget.child)}"
+                    : widget is Image
+                        ? "image=${_image(widget.image)}"
+                        : widget is Padding
+                            ? "${_edgeInsets(widget.padding)},"
+                            : widget is RichText
+                                ? _textSpan(widget.text)
+                                : widget is Table
+                                    ? _tableBorder(widget.border)
+                                    : widget is Text ? widget.data : '';
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));
