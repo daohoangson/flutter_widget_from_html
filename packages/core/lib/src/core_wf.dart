@@ -191,18 +191,16 @@ class WidgetFactory {
     String text, {
     List<TextSpan> children,
     TextStyle style,
-    bool textSpaceCollapse,
   }) {
     final hasChildren = children?.isNotEmpty == true;
     final hasText = text?.isNotEmpty == true;
     if (!hasChildren && !hasText) return null;
 
-    text = text ?? '';
-    if (textSpaceCollapse != false) {
-      text = text.replaceAll(_spacingRegExp, ' ');
-    }
-
-    return TextSpan(children: children, style: style, text: text);
+    return TextSpan(
+      children: children,
+      style: style,
+      text: text?.replaceAll(_spacingRegExp, ' '),
+    );
   }
 
   TextSpan buildTextSpanAgain(TextSpan textSpan, TextStyle textStyle) =>
