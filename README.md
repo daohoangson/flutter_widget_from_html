@@ -65,7 +65,7 @@ All texts will be rendered with padding (`Config.textPadding`).
   - `<table border="1">`
   - `<table style="border: 1px solid #f00">`
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CITE, CODE,
-  DIV, EM, I, P, PRE, STRONG, U
+  DD, DIV, DL, DT, EM, I, P, PRE, STRONG, U
 
 These tags and their contents will be ignored:
 

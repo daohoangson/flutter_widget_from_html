@@ -76,6 +76,15 @@ void main() {
     expect(explained, equals('[Padding:(10,40,10,40),child=[Text:Foo]]'));
   });
 
+  testWidgets('renders DD/DL/DT tags', (WidgetTester tester) async {
+    final html = '<dl><dt>Foo</dt><dd>Bar</dd></dt>';
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[Column:children=[RichText:(+b:Foo)],' +
+            '[Padding:(0,0,10,40),child=[Text:Bar]]]'));
+  });
+
   group('IMG tag', () {
     testWidgets('renders src', (WidgetTester tester) async {
       final html = '<img src="image.png" />';

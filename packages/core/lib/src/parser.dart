@@ -66,6 +66,16 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
       meta = lazySet(meta, inlineStyles: ['margin', '1em 40px']);
       break;
 
+    case 'dd':
+      meta = lazySet(meta, inlineStyles: ['margin', '0 0 1em 40px']);
+      break;
+    case 'dl':
+      meta = lazySet(meta, isBlockElement: true);
+      break;
+    case 'dt':
+      meta = lazySet(meta, isBlockElement: true, fontWeight: FontWeight.bold);
+      break;
+
     case 'h1':
       meta = lazySet(
         meta,
