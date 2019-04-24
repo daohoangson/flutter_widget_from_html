@@ -36,7 +36,7 @@ class _BFirst extends WidgetFactory {
 }
 
 void main() {
-  final html = '<p class="classA classB">Foo</p>';
+  final html = '<span class="classA classB">Foo</span>';
 
   testWidgets('renders A first', (WidgetTester tester) async {
     final explained = await explain(

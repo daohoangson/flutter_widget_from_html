@@ -17,7 +17,7 @@ void main() {
 
   testWidgets('renders without erroneous white spaces', (WidgetTester t) async {
     final html = """
-<p>
+<div>
   <span style="text-decoration: line-through">
     <span style="text-decoration: overline">
       <span style="text-decoration: underline">
@@ -26,7 +26,7 @@ void main() {
       </span>
     </span>
   </span>
-</p>
+</div>
 """;
     final str = await explain(t, html);
     expect(str, equals('[RichText:(+l+o+u:All decorations... (:and none))]'));
@@ -62,7 +62,7 @@ void main() {
   });
 
   testWidgets('renders ADDRESS tag', (WidgetTester tester) async {
-    final html = '<p>This is an <address>ADDRESS</address></p>';
+    final html = 'This is an <address>ADDRESS</address>';
     final explained = await explain(tester, html);
     expect(
       explained,
@@ -179,7 +179,11 @@ void main() {
     testWidgets('renders P tag', (WidgetTester tester) async {
       final html = '<p>First.</p><p>Second one.</p>';
       final explained = await explain(tester, html);
-      expect(explained, equals(blockOutput));
+      expect(
+        explained,
+        equals('[Column:children=[Padding:(0,0,10,0),child=[Text:First.]],' +
+            '[Padding:(0,0,10,0),child=[Text:Second one.]]]'),
+      );
     });
   });
 
