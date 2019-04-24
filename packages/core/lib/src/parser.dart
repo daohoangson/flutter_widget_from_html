@@ -34,8 +34,13 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     case 'br':
     case 'div':
     case 'figcaption':
+    case 'footer':
+    case 'header':
     case 'li':
+    case 'main':
+    case 'nav':
     case 'ol':
+    case 'section':
     case 'ul':
       meta = lazySet(meta, isBlockElement: true);
       break;

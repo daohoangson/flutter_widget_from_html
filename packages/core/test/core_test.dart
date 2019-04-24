@@ -200,6 +200,18 @@ void main() {
       );
     });
 
+    testWidgets('renders HEADER/FOOTER tag', (WidgetTester tester) async {
+      final html = '<header>First.</header><footer>Second one.</footer>';
+      final explained = await explain(tester, html);
+      expect(explained, equals(blockOutput));
+    });
+
+    testWidgets('renders MAIN/NAV tag', (WidgetTester tester) async {
+      final html = '<main>First.</main><nav>Second one.</nav>';
+      final explained = await explain(tester, html);
+      expect(explained, equals(blockOutput));
+    });
+
     testWidgets('renders P tag', (WidgetTester tester) async {
       final html = '<p>First.</p><p>Second one.</p>';
       final explained = await explain(tester, html);
@@ -208,6 +220,12 @@ void main() {
         equals('[Column:children=[Padding:(0,0,10,0),child=[Text:First.]],' +
             '[Padding:(0,0,10,0),child=[Text:Second one.]]]'),
       );
+    });
+
+    testWidgets('renders SECTION tag', (WidgetTester tester) async {
+      final html = '<section>First.</section><section>Second one.</section>';
+      final explained = await explain(tester, html);
+      expect(explained, equals(blockOutput));
     });
   });
 
