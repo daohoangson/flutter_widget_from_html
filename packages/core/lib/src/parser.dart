@@ -33,10 +33,15 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     case 'aside':
     case 'br':
     case 'div':
+    case 'figcaption':
     case 'li':
     case 'ol':
     case 'ul':
       meta = lazySet(meta, isBlockElement: true);
+      break;
+    case 'blockquote':
+    case 'figure':
+      meta = lazySet(meta, inlineStyles: ['margin', '0.5em 40px']);
       break;
     case 'p':
       meta = lazySet(meta, inlineStyles: ['margin-bottom', '1em']);
@@ -65,10 +70,6 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
       break;
     case 'small':
       meta = lazySet(meta, fontSize: 'smaller');
-      break;
-
-    case 'blockquote':
-      meta = lazySet(meta, inlineStyles: ['margin', '1em 40px']);
       break;
 
     case 'dd':

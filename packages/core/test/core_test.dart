@@ -70,12 +70,6 @@ void main() {
     );
   });
 
-  testWidgets('renders BLOCKQUOTE tag', (WidgetTester tester) async {
-    final html = '<blockquote>Foo</blockquote>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[Padding:(10,40,10,40),child=[Text:Foo]]'));
-  });
-
   testWidgets('renders DD/DL/DT tags', (WidgetTester tester) async {
     final html = '<dl><dt>Foo</dt><dd>Bar</dd></dt>';
     final explained = await explain(tester, html);
@@ -173,6 +167,11 @@ void main() {
       expect(explained, equals(blockOutput));
     });
 
+    testWidgets('renders BLOCKQUOTE tag', (WidgetTester tester) async {
+      final html = '<blockquote>Foo</blockquote>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Padding:(5,40,5,40),child=[Text:Foo]]'));
+    });
     testWidgets('renders BR tag', (WidgetTester tester) async {
       final html = 'First.<br />Second one.';
       final explained = await explain(tester, html);
@@ -183,6 +182,22 @@ void main() {
       final html = '<div>First.</div><div>Second one.</div>';
       final explained = await explain(tester, html);
       expect(explained, equals(blockOutput));
+    });
+
+    testWidgets('renders FIGURE/FIGCAPTION tags', (WidgetTester tester) async {
+      final html = """
+<figure>
+  <img src="image.png">
+  <figcaption><i>fig. 1</i> Foo</figcaption>
+</figure>
+""";
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals('[Padding:(5,40,5,40),child=[Column:children=' +
+            '[Image:image=[NetworkImage:url=image.png]],' +
+            '[RichText:(:(+i:fig. 1)(: Foo))]]]'),
+      );
     });
 
     testWidgets('renders P tag', (WidgetTester tester) async {
