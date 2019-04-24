@@ -13,7 +13,7 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[GestureDetector:child=[Padding:(5,10,5,10),' +
+        equals('[GestureDetector:child=[Padding:(0,10,0,10),' +
             'child=[Text:http://domain.com]]]'));
   });
 

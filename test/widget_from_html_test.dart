@@ -8,14 +8,14 @@ void main() {
   testWidgets('renders text with padding', (WidgetTester tester) async {
     final html = 'Hello world';
     final explained = await explain(tester, html);
-    expect(explained, equals('[Padding:(5,10,5,10),child=[Text:Hello world]]'));
+    expect(explained, equals('[Padding:(0,10,0,10),child=[Text:Hello world]]'));
   });
 
   testWidgets('renders rich text with padding', (WidgetTester tester) async {
     final html = 'Hi <b>there</b>!';
     final explained = await explain(tester, html);
     expect(explained,
-        equals('[Padding:(5,10,5,10),child=[RichText:(:Hi (+b:there)(:!))]]'));
+        equals('[Padding:(0,10,0,10),child=[RichText:(:Hi (+b:there)(:!))]]'));
   });
 
   group('IMG tag', () {

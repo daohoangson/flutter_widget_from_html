@@ -8,7 +8,7 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[Padding:(5,10,5,10),child=' +
+        equals('[Padding:(0,10,0,10),child=' +
             '[RichText:(:This is a (#FF0000FF+u+onTap:hyperlink)(:.))]]'));
   });
 
@@ -17,7 +17,7 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[Padding:(5,10,5,10),child=' +
+        equals('[Padding:(0,10,0,10),child=' +
             '[RichText:(#FF0000FF+u+onTap:Text)]]'));
   });
 
@@ -27,7 +27,7 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[Padding:(5,10,5,10),child=' +
+        equals('[Padding:(0,10,0,10),child=' +
             '[RichText:(:This is a (#FFFF0000+u+onTap:hyperlink)(:.))]]'));
   });
 
@@ -37,7 +37,7 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[Padding:(5,10,5,10),child=' +
+        equals('[Padding:(0,10,0,10),child=' +
             '[RichText:(:This is a (#FF0000FF+u+onTap:(#FF0000FF+u+i+b+onTap:hyperlink)' +
             '(#FF0000FF+u+onTap:.)))]]'));
   });
