@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'data_classes.dart';
@@ -8,6 +8,7 @@ import 'parser.dart' as parser;
 part 'ops/style_margin.dart';
 part 'ops/style_text_align.dart';
 part 'ops/tag_code.dart';
+part 'ops/tag_hr.dart';
 part 'ops/tag_img.dart';
 part 'ops/tag_table.dart';
 
@@ -30,6 +31,7 @@ class WidgetFactory {
   BuildOp _styleMargin;
   BuildOp _styleTextAlign;
   BuildOp _tagCode;
+  BuildOp _tagHr;
   BuildOp _tagImg;
   BuildOp _tagTable;
 
@@ -220,6 +222,10 @@ class WidgetFactory {
         meta = lazySet(meta, buildOp: tagCode());
         break;
 
+      case 'hr':
+        meta = lazySet(meta, buildOp: tagHr());
+        break;
+
       case 'img':
         meta = lazySet(meta, buildOp: tagImg());
         break;
@@ -267,6 +273,11 @@ class WidgetFactory {
   BuildOp tagCode() {
     _tagCode ??= TagCode(this).buildOp;
     return _tagCode;
+  }
+
+  BuildOp tagHr() {
+    _tagHr ??= TagHr(this).buildOp;
+    return _tagHr;
   }
 
   BuildOp tagImg() {
