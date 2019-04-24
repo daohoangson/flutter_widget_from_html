@@ -436,6 +436,12 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(explained, equals('[RichText:(:This is a (+i:citation)(:.))]'));
     });
 
+    testWidgets('renders DFN tag', (WidgetTester tester) async {
+      final html = 'This is a <cite>definition</cite>.';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:This is a (+i:definition)(:.))]'));
+    });
+
     testWidgets('renders I tag', (WidgetTester tester) async {
       final html = 'This is an <i>italic</i> text.';
       final explained = await explain(tester, html);
