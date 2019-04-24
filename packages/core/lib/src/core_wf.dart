@@ -188,13 +188,7 @@ class WidgetFactory {
   TextStyle buildTextStyle(NodeMetadata meta, TextStyle parent) {
     if (meta?.hasStyling != true) return null;
 
-    var textStyle = parent;
-
-    if (meta.style != null) {
-      textStyle = buildTextStyleForStyle(meta.style);
-    }
-
-    textStyle = textStyle.copyWith(
+    return parent.copyWith(
       color: meta.color,
       decoration: buildTextDecoration(meta, parent),
       decorationStyle: meta.decorationStyle,
@@ -203,29 +197,6 @@ class WidgetFactory {
       fontStyle: buildFontSize(meta),
       fontWeight: meta.fontWeight,
     );
-
-    return textStyle;
-  }
-
-  TextStyle buildTextStyleForStyle(StyleType style) {
-    final textStyle = DefaultTextStyle.of(context).style;
-
-    switch (style) {
-      case StyleType.Heading1:
-        return textStyle.copyWith(fontSize: textStyle.fontSize * 2);
-      case StyleType.Heading2:
-        return textStyle.copyWith(fontSize: textStyle.fontSize * 1.5);
-      case StyleType.Heading3:
-        return textStyle.copyWith(fontSize: textStyle.fontSize * 1.17);
-      case StyleType.Heading4:
-        return textStyle.copyWith(fontSize: textStyle.fontSize * 1.12);
-      case StyleType.Heading5:
-        return textStyle.copyWith(fontSize: textStyle.fontSize * .83);
-      case StyleType.Heading6:
-        return textStyle.copyWith(fontSize: textStyle.fontSize * .75);
-    }
-
-    return textStyle;
   }
 
   Widget buildTextWidget(text, {TextAlign textAlign}) {

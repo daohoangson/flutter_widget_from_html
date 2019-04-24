@@ -283,13 +283,14 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 <h6>This is heading 6</h6>""";
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[Column:children=[RichText:(@20.0:This is heading 1)],' +
-            '[RichText:(@15.0:This is heading 2)],' +
-            '[RichText:(@11.7:This is heading 3)],' +
-            '[RichText:(@11.2:This is heading 4)],' +
-            '[RichText:(@8.3:This is heading 5)],' +
-            '[RichText:(@7.5:This is heading 6)]]'));
+      explained,
+      equals('[Column:children=[Padding:(13,0,13,0),child=[RichText:(@20.0+b:This is heading 1)]],' +
+          '[Padding:(12,0,12,0),child=[RichText:(@15.0+b:This is heading 2)]],' +
+          '[Padding:(11,0,11,0),child=[RichText:(@11.7+b:This is heading 3)]],' +
+          '[Padding:(13,0,13,0),child=[RichText:(+b:This is heading 4)]],' +
+          '[Padding:(13,0,13,0),child=[RichText:(@8.3+b:This is heading 5)]],' +
+          '[Padding:(15,0,15,0),child=[RichText:(@6.7+b:This is heading 6)]]]'),
+    );
   });
 
   group('border', () {

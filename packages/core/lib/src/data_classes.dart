@@ -17,7 +17,6 @@ NodeMetadata lazySet(
   Iterable<String> inlineStyles,
   bool isBlockElement,
   bool isNotRenderable,
-  StyleType style,
 }) {
   meta ??= NodeMetadata();
 
@@ -67,7 +66,6 @@ NodeMetadata lazySet(
   }
   if (isBlockElement != null) meta._isBlockElement = isBlockElement;
   if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
-  if (style != null) meta.style = style;
 
   return meta;
 }
@@ -204,7 +202,6 @@ class NodeMetadata {
   bool _inlineStylesFrozen = false;
   bool _isBlockElement;
   bool isNotRenderable;
-  StyleType style;
 
   dom.Element get buildOpElement => _buildOpElement;
 
@@ -216,8 +213,7 @@ class NodeMetadata {
       fontSize != null ||
       fontWeight != null ||
       hasDecoration ||
-      hasFontStyle ||
-      style != null;
+      hasFontStyle;
 
   bool get hasDecoration =>
       decorationLineThrough != null ||
@@ -264,13 +260,4 @@ class NodeMetadata {
 
     _buildOpTextStyle = textStyle;
   }
-}
-
-enum StyleType {
-  Heading1,
-  Heading2,
-  Heading3,
-  Heading4,
-  Heading5,
-  Heading6,
 }

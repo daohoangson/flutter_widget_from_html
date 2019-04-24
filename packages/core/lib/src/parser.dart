@@ -90,43 +90,48 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     case 'h1':
       meta = lazySet(
         meta,
-        isBlockElement: true,
-        style: StyleType.Heading1,
+        fontSize: '2em',
+        fontWeight: FontWeight.bold,
+        inlineStyles: ['margin', '0.67em 0'],
       );
       break;
     case 'h2':
       meta = lazySet(
         meta,
-        isBlockElement: true,
-        style: StyleType.Heading2,
+        fontSize: '1.5em',
+        fontWeight: FontWeight.bold,
+        inlineStyles: ['margin', '0.83em 0'],
       );
       break;
     case 'h3':
       meta = lazySet(
         meta,
-        isBlockElement: true,
-        style: StyleType.Heading3,
+        fontSize: '1.17em',
+        fontWeight: FontWeight.bold,
+        inlineStyles: ['margin', '1em 0'],
       );
       break;
     case 'h4':
       meta = lazySet(
         meta,
-        isBlockElement: true,
-        style: StyleType.Heading4,
+        fontWeight: FontWeight.bold,
+        inlineStyles: ['margin', '1.33em 0'],
       );
       break;
     case 'h5':
       meta = lazySet(
         meta,
-        isBlockElement: true,
-        style: StyleType.Heading5,
+        fontSize: '0.83em',
+        fontWeight: FontWeight.bold,
+        inlineStyles: ['margin', '1.67em 0'],
       );
       break;
     case 'h6':
       meta = lazySet(
         meta,
-        isBlockElement: true,
-        style: StyleType.Heading6,
+        fontSize: '0.67em',
+        fontWeight: FontWeight.bold,
+        inlineStyles: ['margin', '2.33em 0'],
       );
       break;
 
