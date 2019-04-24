@@ -100,6 +100,18 @@ void main() {
       expect(explained, equals('[Image:image=[MemoryImage:]]'));
     });
 
+    testWidgets('renders alt', (WidgetTester tester) async {
+      final html = '<img alt="Foo" />';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Text:Foo]'));
+    });
+
+    testWidgets('renders title', (WidgetTester tester) async {
+      final html = '<img title="Foo" />';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Text:Foo]'));
+    });
+
     testWidgets('renders dimensions', (WidgetTester tester) async {
       final html = '<img src="image.png" width="800" height="600" />';
       final explained = await explain(tester, html);

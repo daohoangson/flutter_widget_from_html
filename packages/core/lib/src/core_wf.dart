@@ -68,17 +68,17 @@ class WidgetFactory {
     return bytes;
   }
 
-  Widget buildImageWidget(String src, {int height, int width}) {
-    if (src?.isNotEmpty != true) return null;
+  Widget buildImageWidget(String src, {int height, String text, int width}) {
+    if (src?.isNotEmpty != true) return buildTextWidget(text);
 
     final imageWidget = src.startsWith('data:image')
         ? buildImageWidgetFromDataUri(src)
         : buildImageWidgetFromUrl(src);
-    if (imageWidget == null) return null;
+    if (imageWidget == null) return buildTextWidget(text);
 
     height ??= 0;
     width ??= 0;
-    if (height == 0 || width == 0) return imageWidget;
+    if (height <= 0 || width <= 0) return imageWidget;
 
     return AspectRatio(
       aspectRatio: width / height,

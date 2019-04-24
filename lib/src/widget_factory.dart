@@ -34,8 +34,9 @@ class WidgetFactory extends core.WidgetFactory {
       () => canLaunch(fullUrl).then((ok) => ok ? launch(fullUrl) : null);
 
   @override
-  Widget buildImageWidget(String src, {int height, int width}) => buildPadding(
-        super.buildImageWidget(src, height: height, width: width),
+  Widget buildImageWidget(String src, {int height, String text, int width}) =>
+      buildPadding(
+        super.buildImageWidget(src, height: height, text: text, width: width),
         config.imagePadding,
       );
 

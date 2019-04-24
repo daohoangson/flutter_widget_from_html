@@ -8,12 +8,11 @@ class TagImg {
   BuildOp get buildOp => BuildOp(onWidgets: (meta, widgets) {
         final attributes = meta.buildOpElement.attributes;
         final src = _getAttr(attributes, 'src', 'data-src');
-        if (src?.isNotEmpty != true) return null;
-
         final h = _parseInt(_getAttr(attributes, 'height', 'data-height'));
         final w = _parseInt(_getAttr(attributes, 'width', 'data-width'));
+        final t = _getAttr(attributes, 'alt', 'title');
 
-        return wf.buildImageWidget(src, height: h, width: w);
+        return wf.buildImageWidget(src, height: h, text: t, width: w);
       });
 }
 
