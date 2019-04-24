@@ -132,6 +132,12 @@ void main() {
     });
   });
 
+  testWidgets('renders KBD tag', (WidgetTester tester) async {
+    final html = '<kbd>ESC</kbd> = exit';
+    final actual = await explain(tester, html);
+    expect(actual, equals('[RichText:(:(+font=monospace:ESC)(: = exit))]'));
+  });
+
   group('lists', () {
     testWidgets('renders ordered list', (WidgetTester tester) async {
       final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';

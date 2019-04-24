@@ -142,6 +142,10 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
       // our parser will put those elements into document.head anyway
       meta = lazySet(meta, isNotRenderable: true);
       break;
+
+    case 'kbd':
+      meta = lazySet(meta, fontFamily: 'monospace');
+      break;
   }
 
   return meta;
