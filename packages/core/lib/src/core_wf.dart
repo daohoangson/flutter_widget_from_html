@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'data_classes.dart';
@@ -52,6 +52,11 @@ class WidgetFactory {
               children: children,
             )
       : null;
+
+  Widget buildDivider() => DecoratedBox(
+        decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 1)),
+        child: SizedBox(height: 1),
+      );
 
   FontStyle buildFontSize(NodeMetadata meta) => meta?.hasFontStyle == true
       ? (meta.fontStyleItalic == true ? FontStyle.italic : FontStyle.normal)

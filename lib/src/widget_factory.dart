@@ -30,6 +30,9 @@ class WidgetFactory extends core.WidgetFactory {
     this.config = const Config(),
   }) : super(context);
 
+  @override
+  Widget buildDivider() => Divider(height: 1);
+
   GestureTapCallback buildGestureTapCallbackForUrl(String fullUrl) =>
       () => canLaunch(fullUrl).then((ok) => ok ? launch(fullUrl) : null);
 
