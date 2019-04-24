@@ -564,11 +564,22 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
   });
 
   group('text-decoration', () {
+    testWidgets('renders DEL/INS tags', (WidgetTester tester) async {
+      final html = 'This is some <del>deleted</del> <ins>inserted</ins> text.';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[RichText:(:This is some (+l:deleted)(: )' +
+              '(+u:inserted)(: text.))]'));
+    });
+
     testWidgets('renders U tag', (WidgetTester tester) async {
       final html = 'This is an <u>underline</u> text.';
       final explained = await explain(tester, html);
-      expect(explained,
-          equals('[RichText:(:This is an (+u:underline)(: text.))]'));
+      expect(
+        explained,
+        equals('[RichText:(:This is an (+u:underline)(: text.))]'),
+      );
     });
 
     testWidgets('renders line-through', (WidgetTester tester) async {

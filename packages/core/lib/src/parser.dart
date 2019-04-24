@@ -51,6 +51,10 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     case 'i':
       meta = lazySet(meta, fontStyleItalic: true);
       break;
+    case 'del':
+      meta = lazySet(meta, decorationLineThrough: true);
+      break;
+    case 'ins':
     case 'u':
       meta = lazySet(meta, decorationUnderline: true);
       break;
