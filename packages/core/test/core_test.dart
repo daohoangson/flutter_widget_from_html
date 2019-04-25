@@ -652,6 +652,12 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
   });
 
   group('text-align', () {
+    testWidgets('renders CENTER tag', (WidgetTester tester) async {
+      final html = '<center>Foo</center>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Text,align=center:Foo]'));
+    });
+
     testWidgets('renders center text', (WidgetTester tester) async {
       final html = '<div style="text-align: center">_X_</div>';
       final explained = await explain(tester, html);

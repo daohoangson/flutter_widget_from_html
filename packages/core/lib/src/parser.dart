@@ -78,6 +78,10 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
       meta = lazySet(meta, fontSize: 'smaller');
       break;
 
+    case 'center':
+      meta = lazySet(meta, inlineStyles: ['text-align', 'center']);
+      break;
+
     case 'dd':
       meta = lazySet(meta, inlineStyles: ['margin', '0 0 1em 40px']);
       break;

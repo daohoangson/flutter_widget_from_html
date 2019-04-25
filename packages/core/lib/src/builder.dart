@@ -91,8 +91,18 @@ class Builder {
         continue;
       }
 
+      int i = 0;
       for (final __piece in __builder.process()) {
-        if (__piece.block?.isSub == true) continue;
+        i++;
+        if (i == 1) {
+          if (__piece.block?.isSubOf(_textPiece.block) == true) {
+            continue;
+          } else {
+            // discard the active text piece
+            // because sub builder somehow consumed it already
+            _newTextPiece();
+          }
+        }
 
         _saveTextPiece();
         _pieces.add(__piece);

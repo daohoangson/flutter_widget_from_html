@@ -309,7 +309,6 @@ class TextBlock {
       : false;
   bool get isEmpty => _indexEnd == _indexStart;
   bool get isNotEmpty => !isEmpty;
-  bool get isSub => _parent != null;
 
   bool addBit(TextBit bit) {
     if (_parent != null) {
@@ -340,6 +339,8 @@ class TextBlock {
 
   bool addText(String text, [TextStyle style]) =>
       addBit(TextBit(data: text, style: style));
+
+  bool isSubOf(TextBlock other) => _parent == other;
 
   void rebuildBits(TextBit f(TextBit bit), {int start, int end}) {
     start ??= _indexStart;
