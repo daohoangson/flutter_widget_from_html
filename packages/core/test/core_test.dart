@@ -702,6 +702,12 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
               '(+u:inserted)(: text.))]'));
     });
 
+    testWidgets('renders S tag', (WidgetTester tester) async {
+      final html = '<s>Foo</s>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+l:Foo)]'));
+    });
+
     testWidgets('renders U tag', (WidgetTester tester) async {
       final html = 'This is an <u>underline</u> text.';
       final explained = await explain(tester, html);
