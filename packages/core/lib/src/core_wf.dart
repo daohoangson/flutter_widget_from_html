@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -12,6 +13,7 @@ part 'ops/tag_code.dart';
 part 'ops/tag_hr.dart';
 part 'ops/tag_img.dart';
 part 'ops/tag_table.dart';
+part 'ops/text.dart';
 
 const kFontSizeXxLarge = 2.0;
 const kFontSizeXLarge = 1.5;
@@ -24,7 +26,6 @@ const kFontSizeLarger = 1.2;
 const kFontSizeSmaller = 15 / 18;
 
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
-final _spacingRegExp = RegExp(r'\s+');
 
 class WidgetFactory {
   final BuildContext context;
@@ -32,6 +33,7 @@ class WidgetFactory {
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
   BuildOp _styleTextAlign;
+  BuildOp _tagBr;
   BuildOp _tagCode;
   BuildOp _tagHr;
   BuildOp _tagImg;
@@ -39,7 +41,8 @@ class WidgetFactory {
 
   WidgetFactory(this.context);
 
-  double get defaultFontSize => DefaultTextStyle.of(context).style.fontSize;
+  double get defaultFontSize => defaultTextStyle.fontSize;
+  TextStyle get defaultTextStyle => DefaultTextStyle.of(context).style;
 
   Widget buildAlign(Widget child, Alignment alignment) {
     if (alignment == null) return child;
@@ -77,24 +80,13 @@ class WidgetFactory {
       ? (meta.fontStyleItalic == true ? FontStyle.italic : FontStyle.normal)
       : null;
 
-  List buildImageBytes(String dataUri) {
-    final match = _dataUriRegExp.matchAsPrefix(dataUri);
-    if (match == null) return null;
-
-    final prefix = match[0];
-    final bytes = base64.decode(dataUri.substring(prefix.length));
-    if (bytes.length == 0) return null;
-
-    return bytes;
-  }
-
-  Widget buildImageWidget(String src, {int height, String text, int width}) {
-    if (src?.isNotEmpty != true) return buildTextWidget(text);
+  Widget buildImage(String src, {int height, String text, int width}) {
+    if (src?.isNotEmpty != true) return buildText(text: text);
 
     final imageWidget = src.startsWith('data:image')
-        ? buildImageWidgetFromDataUri(src)
-        : buildImageWidgetFromUrl(src);
-    if (imageWidget == null) return buildTextWidget(text);
+        ? buildImageFromDataUri(src)
+        : buildImageFromUrl(src);
+    if (imageWidget == null) return buildText(text: text);
 
     height ??= 0;
     width ??= 0;
@@ -106,14 +98,25 @@ class WidgetFactory {
     );
   }
 
-  Widget buildImageWidgetFromDataUri(String dataUri) {
+  List buildImageBytes(String dataUri) {
+    final match = _dataUriRegExp.matchAsPrefix(dataUri);
+    if (match == null) return null;
+
+    final prefix = match[0];
+    final bytes = base64.decode(dataUri.substring(prefix.length));
+    if (bytes.length == 0) return null;
+
+    return bytes;
+  }
+
+  Widget buildImageFromDataUri(String dataUri) {
     final bytes = buildImageBytes(dataUri);
     if (bytes == null) return null;
 
     return Image.memory(bytes, fit: BoxFit.cover);
   }
 
-  Widget buildImageWidgetFromUrl(String url) =>
+  Widget buildImageFromUrl(String url) =>
       url?.isNotEmpty == true ? Image.network(url, fit: BoxFit.cover) : null;
 
   Widget buildPadding(Widget child, EdgeInsetsGeometry padding) {
@@ -132,6 +135,25 @@ class WidgetFactory {
       );
 
   Widget buildTableCell(Widget child) => TableCell(child: child);
+
+  Widget buildText({
+    TextBlock block,
+    String text,
+    TextAlign textAlign,
+  }) {
+    assert((text == null) != (block == null));
+    final _textAlign = textAlign ?? TextAlign.start;
+
+    if (block?.hasStyle == true) {
+      final span = compileToTextSpan(block, defaultTextStyle);
+      if (span != null) return RichText(text: span, textAlign: _textAlign);
+    }
+
+    final data = compileToString(block) ?? text;
+    if (data != null) return Text(data, textAlign: _textAlign);
+
+    return null;
+  }
 
   TextDecoration buildTextDecoration(NodeMetadata meta, TextStyle parent) {
     if (meta.hasDecoration != true) return null;
@@ -187,30 +209,6 @@ class WidgetFactory {
     return null;
   }
 
-  TextSpan buildTextSpan(
-    String text, {
-    List<TextSpan> children,
-    TextStyle style,
-  }) {
-    final hasChildren = children?.isNotEmpty == true;
-    final hasText = text?.isNotEmpty == true;
-    if (!hasChildren && !hasText) return null;
-
-    return TextSpan(
-      children: children,
-      style: style,
-      text: text?.replaceAll(_spacingRegExp, ' '),
-    );
-  }
-
-  TextSpan buildTextSpanAgain(TextSpan textSpan, TextStyle textStyle) =>
-      TextSpan(
-        children: textSpan.children,
-        recognizer: textSpan.recognizer,
-        style: textStyle,
-        text: textSpan.text,
-      );
-
   TextStyle buildTextStyle(NodeMetadata meta, TextStyle parent) {
     if (meta?.hasStyling != true) return null;
 
@@ -225,22 +223,12 @@ class WidgetFactory {
     );
   }
 
-  Widget buildTextWidget(text, {TextAlign textAlign}) {
-    final _textAlign = textAlign ?? TextAlign.start;
-
-    if (text is String) {
-      return Text(text.trim(), textAlign: _textAlign);
-    }
-
-    if (text is TextSpan) {
-      return RichText(text: text, textAlign: _textAlign);
-    }
-
-    return null;
-  }
-
   NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     switch (e.localName) {
+      case 'br':
+        meta = lazySet(meta, buildOp: tagBr());
+        break;
+
       case kTagCode:
       case kTagPre:
         meta = lazySet(meta, buildOp: tagCode());
@@ -301,6 +289,14 @@ class WidgetFactory {
   BuildOp styleTextAlign() {
     _styleTextAlign ??= StyleTextAlign(this).buildOp;
     return _styleTextAlign;
+  }
+
+  BuildOp tagBr() {
+    _tagBr ??= BuildOp(
+      getInlineStyles: (_) => ['margin-bottom', '0.5em'],
+      onWidgets: (_, __) => Container(),
+      );
+    return _tagBr;
   }
 
   BuildOp tagCode() {

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    show BuildOp, BuiltPieceSimple, NodeMetadata, lazySet;
+    show BuildOp, BuiltPiece, BuiltPieceSimple, NodeMetadata, TextBlock, lazySet;
 import 'package:html/dom.dart' as dom;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -37,14 +37,14 @@ class WidgetFactory extends core.WidgetFactory {
       () => canLaunch(fullUrl).then((ok) => ok ? launch(fullUrl) : null);
 
   @override
-  Widget buildImageWidget(String src, {int height, String text, int width}) =>
+  Widget buildImage(String src, {int height, String text, int width}) =>
       buildPadding(
-        super.buildImageWidget(src, height: height, text: text, width: width),
+        super.buildImage(src, height: height, text: text, width: width),
         config.imagePadding,
       );
 
   @override
-  Widget buildImageWidgetFromUrl(String url) {
+  Widget buildImageFromUrl(String url) {
     final imageUrl = constructFullUrl(url);
     if (imageUrl?.isEmpty != false) return null;
 
@@ -55,8 +55,17 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
-  Widget buildTextWidget(text, {TextAlign textAlign}) => buildPadding(
-        super.buildTextWidget(text, textAlign: textAlign),
+  Widget buildText({
+    TextBlock block,
+    String text,
+    TextAlign textAlign,
+  }) =>
+      buildPadding(
+        super.buildText(
+          block: block,
+          text: text,
+          textAlign: textAlign,
+        ),
         config.textPadding,
       );
 
@@ -81,7 +90,7 @@ class WidgetFactory extends core.WidgetFactory {
       );
 
   Widget buildWebViewLinkOnly(String fullUrl) => GestureDetector(
-        child: buildTextWidget(fullUrl),
+        child: buildText(text: fullUrl),
         onTap: buildGestureTapCallbackForUrl(fullUrl),
       );
 

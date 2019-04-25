@@ -21,22 +21,20 @@ class StyleBgColor {
           return pieces.map(
             (piece) =>
                 (piece.hasWidgets
-                    ? _buildWidgets(bgColor, piece.widgets)
-                    : _buildTextSpan(bgColor, piece.textSpan)) ??
+                    ? _buildWidgets(piece.widgets, bgColor)
+                    : _buildBlock(piece, bgColor)) ??
                 piece,
           );
         },
       );
 
-  BuiltPiece _buildTextSpan(Color bgColor, TextSpan textSpan) =>
-      BuiltPieceSimple(
-        textSpan: wf.buildTextSpanAgain(
-          textSpan,
-          textSpan.style.copyWith(background: Paint()..color = bgColor),
-        ),
-      );
+  BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) => piece
+    ..block.rebuildBits((bit) => bit.rebuild(
+          style: (bit.style ?? piece.style)
+              .copyWith(background: Paint()..color = bgColor),
+        ));
 
-  BuiltPiece _buildWidgets(Color bgColor, Iterable<Widget> widgets) {
+  BuiltPiece _buildWidgets(Iterable<Widget> widgets, Color bgColor) {
     final column = wf.buildColumn(widgets);
     final box = wf.buildDecoratedBox(column, color: bgColor);
     if (box == null) return null;

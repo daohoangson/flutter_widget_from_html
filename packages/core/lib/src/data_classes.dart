@@ -123,26 +123,24 @@ typedef Iterable<BuiltPiece> BuildOpOnPieces(
 typedef Widget BuildOpOnWidgets(NodeMetadata meta, Iterable<Widget> widgets);
 
 abstract class BuiltPiece {
-  bool get hasText;
-  bool get hasTextSpan;
   bool get hasWidgets;
 
-  String get text;
-  TextSpan get textSpan;
-  TextStyle get textStyle;
+  TextBlock get block;
+  TextStyle get style;
   Iterable<Widget> get widgets;
 }
 
 class BuiltPieceSimple extends BuiltPiece {
-  final String text;
-  final TextSpan textSpan;
-  final TextStyle textStyle;
+  final TextBlock block;
+  final TextStyle style;
   final Iterable<Widget> widgets;
 
-  BuiltPieceSimple({this.text, this.textSpan, this.textStyle, this.widgets});
+  BuiltPieceSimple({
+    this.block,
+    this.style,
+    this.widgets,
+  }) : assert((block == null) != (widgets == null));
 
-  bool get hasText => text != null;
-  bool get hasTextSpan => textSpan != null;
   bool get hasWidgets => widgets != null;
 }
 
@@ -260,4 +258,105 @@ class NodeMetadata {
 
     _buildOpTextStyle = textStyle;
   }
+}
+
+class TextBit {
+  final String data;
+  final VoidCallback onTap;
+  final TextStyle style;
+
+  bool get isSpace => data == null;
+  String get text => isSpace ? ' ' : data;
+
+  const TextBit({this.data, this.onTap, this.style});
+
+  TextBit rebuild({
+    String data,
+    VoidCallback onTap,
+    TextStyle style,
+  }) =>
+      TextBit(
+        data: data ?? this.data,
+        onTap: onTap ?? this.onTap,
+        style: style ?? this.style,
+      );
+
+  static TextBit space({TextStyle style}) =>
+      style == null ? const TextBit() : TextBit(style: style);
+}
+
+class TextBlock {
+  final List<TextBit> _bits;
+  final TextBlock _parent;
+
+  bool _hasStyle = false;
+  bool _hasTrailingSpace = true;
+  int _indexEnd;
+  int _indexStart;
+
+  TextBlock({List<TextBit> bits, TextBlock parent})
+      : assert((bits == null) == (parent == null)),
+        _bits = bits ?? [],
+        _parent = parent {
+    _indexStart = _bits.length;
+    _indexEnd = _indexStart;
+  }
+
+  bool get hasStyle => _parent?.hasStyle ?? _hasStyle;
+  Iterable<TextBit> get iterable => _bits.getRange(_indexStart, _indexEnd);
+  bool get hasTrailingSpace => _indexEnd == _bits.length
+      ? _parent?.hasTrailingSpace ?? _hasTrailingSpace
+      : false;
+  bool get isEmpty => _indexEnd == _indexStart;
+  bool get isNotEmpty => !isEmpty;
+  bool get isSub => _parent != null;
+
+  bool addBit(TextBit bit) {
+    if (_parent != null) {
+      if (_indexEnd != _bits.length) {
+        throw new StateError('Cannot add TextBit in the middle of a block');
+      }
+      final added = _parent.addBit(bit);
+      if (added) _indexEnd++;
+      return added;
+    }
+
+    if (bit.isSpace) {
+      if (_bits.isEmpty || _hasTrailingSpace) return false;
+      _hasTrailingSpace = true;
+    } else {
+      _hasTrailingSpace = false;
+    }
+
+    if (bit.style != null) _hasStyle = true;
+
+    _bits.add(bit);
+    _indexEnd++;
+
+    return true;
+  }
+
+  void addBits(Iterable<TextBit> bits) => bits.forEach((b) => addBit(b));
+
+  bool addText(String text, [TextStyle style]) =>
+      addBit(TextBit(data: text, style: style));
+
+  void rebuildBits(TextBit f(TextBit bit), {int start, int end}) {
+    start ??= _indexStart;
+    end ??= _indexEnd;
+    if (_parent != null) {
+      return _parent.rebuildBits(f, start: start, end: end);
+    }
+
+    for (var i = start; i < end; i++) {
+      final bit = _bits[i];
+
+      final rebuilt = f(bit);
+      if (rebuilt.style != null) _hasStyle = true;
+
+      _bits[i] = f(bit);
+    }
+  }
+
+  TextBlock sub() => TextBlock(bits: this._bits, parent: this);
 }

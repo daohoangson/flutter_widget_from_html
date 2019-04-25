@@ -11,19 +11,14 @@ class TagCode {
   BuildOp get buildOp => BuildOp(
         collectMetadata: (meta) => meta.fontFamily ??= 'monospace',
         onPieces: (meta, pieces) => meta.buildOpElement.localName == kTagPre
-            ? _buildTextSpansForPre(meta, pieces.first)
+            ? [_buildPreTag(meta, pieces.first.style)]
             : pieces,
         onWidgets: (_, widgets) => wf.buildScrollView(widgets),
       );
 
-  Iterable<BuiltPiece> _buildTextSpansForPre(
-          NodeMetadata meta, BuiltPiece first) =>
-      [
-        BuiltPieceSimple(
-          textSpan: TextSpan(
-            style: first.textStyle,
-            text: meta.buildOpElement.text,
-          ),
-        )
-      ];
+  BuiltPiece _buildPreTag(NodeMetadata meta, TextStyle textStyle) =>
+      BuiltPieceSimple(
+        block: TextBlock()
+          ..addBit(TextBit(data: meta.buildOpElement.text, style: textStyle)),
+      );
 }

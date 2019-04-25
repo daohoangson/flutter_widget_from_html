@@ -38,8 +38,8 @@ void main() {
     expect(
         explained,
         equals('[Padding:(0,10,0,10),child=' +
-            '[RichText:(:This is a (#FF0000FF+u+onTap:(#FF0000FF+u+i+b+onTap:hyperlink)' +
-            '(#FF0000FF+u+onTap:.)))]]'));
+            '[RichText:(:This is a (#FF0000FF+u+i+b+onTap:hyperlink)' +
+            '(#FF0000FF+u+onTap:.))]]'));
   });
 
   testWidgets('renders IMG tag inside', (WidgetTester tester) async {

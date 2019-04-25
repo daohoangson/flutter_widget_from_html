@@ -12,7 +12,7 @@ class TagImg {
         final w = _parseInt(_getAttr(attributes, 'width', 'data-width'));
         final t = _getAttr(attributes, 'alt', 'title');
 
-        return wf.buildImageWidget(src, height: h, text: t, width: w);
+        return wf.buildImage(src, height: h, text: t, width: w);
       });
 }
 

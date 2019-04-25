@@ -10,15 +10,16 @@ class TagA {
         collectMetadata: (m) => m.color ??= Theme.of(wf.context).accentColor,
         onPieces: (meta, pieces) {
           final tap = _buildGestureTapCallback(meta);
-          final r = TapGestureRecognizer()..onTap = tap;
-
           return pieces.map(
             (p) => p.hasWidgets
                 ? BuiltPieceSimple(widgets: <Widget>[_buildGd(p.widgets, tap)])
-                : BuiltPieceSimple(textSpan: _buildTextSpan(p.textSpan, r)),
+                : _buildBlock(p, tap),
           );
         },
       );
+
+  BuiltPiece _buildBlock(BuiltPiece piece, GestureTapCallback onTap) =>
+      piece..block.rebuildBits((bit) => bit.rebuild(onTap: onTap));
 
   Widget _buildGd(List<Widget> widgets, GestureTapCallback onTap) {
     final w = wf.buildColumn(widgets);
@@ -49,14 +50,3 @@ class TagA {
         ),
       );
 }
-
-// this is required because recognizer does not trigger for children
-// https://github.com/flutter/flutter/issues/10623
-TextSpan _buildTextSpan(TextSpan span, GestureRecognizer r) => TextSpan(
-      children: span?.children == null
-          ? null
-          : span.children.map((s) => _buildTextSpan(s, r)).toList(),
-      style: span?.style,
-      recognizer: r,
-      text: span?.text,
-    );

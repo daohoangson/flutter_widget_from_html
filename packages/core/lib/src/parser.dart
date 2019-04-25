@@ -6,7 +6,6 @@ import 'data_classes.dart';
 part 'parser/border.dart';
 part 'parser/color.dart';
 part 'parser/css.dart';
-part 'parser/text.dart';
 
 final _spacingRegExp = RegExp(r'\s+');
 
@@ -31,7 +30,6 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
 
     case 'article':
     case 'aside':
-    case 'br':
     case 'div':
     case 'figcaption':
     case 'footer':

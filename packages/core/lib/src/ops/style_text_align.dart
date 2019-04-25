@@ -13,19 +13,16 @@ class StyleTextAlign {
 
   BuildOp get buildOp => BuildOp(
         onPieces: (meta, pieces) {
-          String value;
+          String v;
           meta.forEachInlineStyle(
-            (k, v) => k == kCssTextAlign ? value = v : null,
+            (k, _v) => k == kCssTextAlign ? v = _v : null,
           );
-          if (value == null) return pieces;
+          if (v == null) return pieces;
 
           final widgets = pieces.map(
-            (piece) => piece.hasWidgets
-                ? wf.buildAlign(wf.buildColumn(piece.widgets), _getAlignment(value))
-                : wf.buildTextWidget(
-                    piece.hasTextSpan ? piece.textSpan : piece.text,
-                    textAlign: _getTextAlign(value),
-                  ),
+            (p) => p.hasWidgets
+                ? wf.buildAlign(wf.buildColumn(p.widgets), _getAlignment(v))
+                : wf.buildText(block: p.block, textAlign: _getTextAlign(v)),
           );
 
           return <BuiltPiece>[BuiltPieceSimple(widgets: widgets)];

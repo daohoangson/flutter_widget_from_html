@@ -105,23 +105,21 @@ class SmilieScreen extends StatelessWidget {
 const _kSmilies = {':)': '🙂'};
 
 class SmilieWf extends WidgetFactory {
+  final smilieOp = BuildOp(
+    onPieces: (meta, pieces) {
+      final alt = meta.buildOpElement.attributes['alt'];
+      final text = _kSmilies.containsKey(alt) ? _kSmilies[alt] : alt;
+      return pieces..first?.block?.addText(text);
+    },
+  );
+
   SmilieWf(BuildContext context) : super(context);
 
   @override
-  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
-    if (e.classes.contains('smilie') && e.attributes.containsKey('alt')) {
-      final alt = e.attributes['alt'];
-      // render alt text if mapping not found
-      // because inline image is not supported
-      final text = _kSmilies.containsKey(alt) ? _kSmilies[alt] : alt;
-      return lazySet(null,
-          buildOp: BuildOp(
-            onPieces: (_, __) => <BuiltPiece>[BuiltPieceSimple(text: text)],
-          ));
-    }
-
-    return super.parseElement(meta, e);
-  }
+  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) =>
+      e.classes.contains('smilie')
+          ? lazySet(null, buildOp: smilieOp)
+          : super.parseElement(meta, e);
 }
 ```
 

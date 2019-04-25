@@ -156,7 +156,7 @@ class _Explainer {
     s += _textStyleDecoration(style, TextDecoration.overline, 'o');
     s += _textStyleDecoration(style, TextDecoration.underline, 'u');
 
-    if (style.fontFamily != parent.fontFamily) {
+    if (style.fontFamily != null && style.fontFamily != parent.fontFamily) {
       s += "+font=${style.fontFamily}";
     }
 
@@ -239,7 +239,7 @@ class _Explainer {
         : (widget is Text ? widget.textAlign : null));
     final textAlignStr = textAlign.isNotEmpty ? ",align=$textAlign" : '';
     final children = widget is Container
-        ? "child=${_widget(widget.child)}"
+        ? (widget.child != null ? "child=${_widget(widget.child)}" : '')
         : widget is LayoutBuilder
             ? "built=${_widget(widget.builder(context, BoxConstraints()))}"
             : widget is MultiChildRenderObjectWidget

@@ -135,7 +135,7 @@ void main() {
   testWidgets('renders KBD tag', (WidgetTester tester) async {
     final html = '<kbd>ESC</kbd> = exit';
     final actual = await explain(tester, html);
-    expect(actual, equals('[RichText:(:(+font=monospace:ESC)(: = exit))]'));
+    expect(actual, equals('[RichText:(+font=monospace:ESC(: = exit))]'));
   });
 
   group('lists', () {
@@ -190,10 +190,14 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, equals('[Padding:(5,40,5,40),child=[Text:Foo]]'));
     });
+
     testWidgets('renders BR tag', (WidgetTester tester) async {
       final html = 'First.<br />Second one.';
       final explained = await explain(tester, html);
-      expect(explained, equals(blockOutput));
+      expect(
+          explained,
+          equals('[Column:children=[Text:First.],' +
+              '[Container:],[Text:Second one.]]'));
     });
 
     testWidgets('renders DIV tag', (WidgetTester tester) async {
@@ -214,7 +218,7 @@ void main() {
         explained,
         equals('[Padding:(5,40,5,40),child=[Column:children=' +
             '[Image:image=[NetworkImage:url=image.png]],' +
-            '[RichText:(:(+i:fig. 1)(: Foo))]]]'),
+            '[RichText:(+i:fig. 1(: Foo))]]]'),
       );
     });
 
@@ -274,8 +278,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[SingleChildScrollView:child=[RichText:' +
-              '(#FF000000+font=monospace:(#FF0000BB:<?php phpinfo)' +
+          equals('[SingleChildScrollView:child=' +
+              '[RichText:(#FF0000BB+font=monospace:<?php phpinfo' +
               '(#FF007700:(); )(#FF0000BB:?>))]]'));
     });
 
@@ -391,7 +395,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:(:(#FFFF0000:red)(#8800FF00:red 53%)' +
+          equals('[RichText:(#FFFF0000:red(#8800FF00:red 53%)' +
               '(#FF00FF00:green)(#8000FF00:green 50%))]'));
     });
 
@@ -574,7 +578,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:(:(+b:bold)(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: )(:four)(: )' +
+          equals('[RichText:(+b:bold(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: )(:four)(: )' +
               '(+w4:five)(: )(+w5:six)(: )(+b:seven)(: )(+w7:eight)(: )(+w8:nine))]'));
     });
   });
