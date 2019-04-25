@@ -575,7 +575,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     });
 
     testWidgets('renders DFN tag', (WidgetTester tester) async {
-      final html = 'This is a <cite>definition</cite>.';
+      final html = 'This is a <dfn>definition</dfn>.';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:This is a (+i:definition)(:.))]'));
     });
@@ -596,6 +596,12 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
         explained,
         equals('[RichText:(:This is an (+i:emphasized)(: text.))]'),
       );
+    });
+
+    testWidgets('renders VAR tag', (WidgetTester tester) async {
+      final html = '<var>x</var> = 1';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+i:x(: = 1))]'));
     });
 
     testWidgets('renders inline style: italic', (WidgetTester tester) async {

@@ -58,6 +58,7 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     case 'dfn':
     case 'em':
     case 'i':
+    case 'var':
       meta = lazySet(meta, fontStyleItalic: true);
       break;
     case 'del':
