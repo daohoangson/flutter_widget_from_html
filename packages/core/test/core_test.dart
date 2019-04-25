@@ -138,6 +138,29 @@ void main() {
     expect(actual, equals('[RichText:(+font=monospace:ESC(: = exit))]'));
   });
 
+  group('Q tag', () {
+    testWidgets('renders quotes', (WidgetTester tester) async {
+      final html = 'Someone said <q>Foo</q>.';
+      final actual = await explain(tester, html);
+      expect(actual, equals('[Text:Someone said “Foo”.]'));
+    });
+
+    testWidgets('renders styling', (WidgetTester tester) async {
+      final html = 'Someone said <q><em>Foo</em></q>.';
+      final actual = await explain(tester, html);
+      expect(actual, equals('[RichText:(:Someone said (+i:“Foo”)(:.))]'));
+    });
+
+    testWidgets('renders complicated styling', (WidgetTester tester) async {
+      final html = 'Someone said <q><u><em>F</em>o<b>o</b></u></q>.';
+      final actual = await explain(tester, html);
+      expect(
+        actual,
+        equals('[RichText:(:Someone said (+u+i:“F)(+u:o)(+u+b:o”)(:.))]'),
+      );
+    });
+  });
+
   group('lists', () {
     testWidgets('renders ordered list', (WidgetTester tester) async {
       final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';

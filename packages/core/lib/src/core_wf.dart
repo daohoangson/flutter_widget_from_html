@@ -10,7 +10,6 @@ part 'ops/style_bg_color.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_text_align.dart';
 part 'ops/tag_code.dart';
-part 'ops/tag_hr.dart';
 part 'ops/tag_img.dart';
 part 'ops/tag_table.dart';
 part 'ops/text.dart';
@@ -37,6 +36,7 @@ class WidgetFactory {
   BuildOp _tagCode;
   BuildOp _tagHr;
   BuildOp _tagImg;
+  BuildOp _tagQ;
   BuildOp _tagTable;
 
   WidgetFactory(this.context);
@@ -265,6 +265,10 @@ class WidgetFactory {
         meta = lazySet(meta, buildOp: tagImg());
         break;
 
+      case 'q':
+        meta = lazySet(meta, buildOp: tagQ());
+        break;
+
       case kTagTable:
       case kTagTableCaption:
       case kTagTableCell:
@@ -328,13 +332,40 @@ class WidgetFactory {
   }
 
   BuildOp tagHr() {
-    _tagHr ??= TagHr(this).buildOp;
+    _tagHr ??= BuildOp(
+      getInlineStyles: (e) => const [kCssMarginBottom, '1em'],
+      onWidgets: (_, __) => buildDivider(),
+    );
     return _tagHr;
   }
 
   BuildOp tagImg() {
     _tagImg ??= TagImg(this).buildOp;
     return _tagImg;
+  }
+
+  BuildOp tagQ() {
+    _tagQ ??= BuildOp(onPieces: (_, pieces) {
+      final first = pieces.first;
+      final last = pieces.last;
+
+      if (!first.hasWidgets && !last.hasWidgets) {
+        final firstBlock = first.block;
+        final firstBit = firstBlock.iterable.first;
+        firstBlock.rebuildBits(
+          (b) => b == firstBit ? b.rebuild(data: '“' + b.data) : b,
+        );
+
+        final lastBlock = last.block;
+        final lastBit = lastBlock.iterable.last;
+        lastBlock.rebuildBits(
+          (b) => b == lastBit ? b.rebuild(data: b.data + '”') : b,
+        );
+      }
+
+      return pieces;
+    });
+    return _tagQ;
   }
 
   BuildOp tagTable() {
