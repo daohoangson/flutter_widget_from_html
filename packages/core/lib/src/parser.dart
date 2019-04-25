@@ -62,6 +62,7 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
       break;
     case 'del':
     case 's':
+    case 'strike':
       meta = lazySet(meta, decorationLineThrough: true);
       break;
     case 'ins':

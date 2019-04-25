@@ -708,10 +708,10 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
               '(+u:inserted)(: text.))]'));
     });
 
-    testWidgets('renders S tag', (WidgetTester tester) async {
-      final html = '<s>Foo</s>';
+    testWidgets('renders S/STRIKE tag', (WidgetTester tester) async {
+      final html = '<s>Foo</s> <strike>bar</strike>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(+l:Foo)]'));
+      expect(explained, equals('[RichText:(+l:Foo(: )(+l:bar))]'));
     });
 
     testWidgets('renders U tag', (WidgetTester tester) async {
