@@ -4,7 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    show BuildOp, BuiltPiece, BuiltPieceSimple, NodeMetadata, TextBlock, lazySet;
+    show
+        BuildOp,
+        BuiltPiece,
+        BuiltPieceSimple,
+        NodeMetadata,
+        TextBlock,
+        lazySet;
 import 'package:html/dom.dart' as dom;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -29,6 +35,13 @@ class WidgetFactory extends core.WidgetFactory {
     BuildContext context, {
     this.config = const Config(),
   }) : super(context);
+
+  @override
+  Widget buildBody(List<Widget> children) {
+    final body = super.buildBody(children);
+    if (body == null || config.bodyPadding == null) return body;
+    return Padding(child: body, padding: config.bodyPadding);
+  }
 
   @override
   Widget buildDivider() => Divider(height: 1);

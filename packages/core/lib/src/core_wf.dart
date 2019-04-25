@@ -49,14 +49,23 @@ class WidgetFactory {
     return child != null ? Align(alignment: alignment, child: child) : null;
   }
 
-  Widget buildColumn(List<Widget> children) => children?.isNotEmpty == true
-      ? children?.length == 1
-          ? children.first
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: children,
-            )
-      : null;
+  Widget buildBody(List<Widget> children) =>
+      buildColumn(children, fixPadding: true);
+
+  Widget buildColumn(
+    List<Widget> children, {
+    bool fixPadding = false,
+  }) {
+    if (children?.isNotEmpty != true) return null;
+    final fixed = fixPadding ? fixOverlappingPaddings(children) : children;
+
+    return fixed.length == 1
+        ? fixed.first
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: fixed,
+          );
+  }
 
   Widget buildDecoratedBox(
     Widget child, {
@@ -119,9 +128,23 @@ class WidgetFactory {
   Widget buildImageFromUrl(String url) =>
       url?.isNotEmpty == true ? Image.network(url, fit: BoxFit.cover) : null;
 
-  Widget buildPadding(Widget child, EdgeInsetsGeometry padding) {
-    if (padding == null || padding == EdgeInsets.all(0)) return child;
-    return child != null ? Padding(child: child, padding: padding) : null;
+  Widget buildPadding(Widget child, EdgeInsets padding) {
+    if (child == null) return null;
+    if (padding == null || padding == const EdgeInsets.all(0)) return child;
+
+    if (child is Padding) {
+      final p = child as Padding;
+      final pp = p.padding as EdgeInsets;
+      child = p.child;
+      padding = EdgeInsets.fromLTRB(
+        pp.left + padding.left,
+        pp.top > padding.top ? pp.top : padding.top,
+        pp.right + padding.right,
+        pp.bottom > padding.bottom ? pp.bottom : padding.bottom,
+      );
+    }
+
+    return Padding(child: child, padding: padding);
   }
 
   Widget buildScrollView(List<Widget> widgets) => SingleChildScrollView(
@@ -293,9 +316,9 @@ class WidgetFactory {
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      getInlineStyles: (_) => ['margin-bottom', '0.5em'],
+      getInlineStyles: (_) => ['margin-bottom', '1em'],
       onWidgets: (_, __) => Container(),
-      );
+    );
     return _tagBr;
   }
 

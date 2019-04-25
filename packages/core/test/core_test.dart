@@ -72,11 +72,11 @@ void main() {
 
   testWidgets('renders DD/DL/DT tags', (WidgetTester tester) async {
     final html = '<dl><dt>Foo</dt><dd>Bar</dd></dt>';
-    final explained = await explain(tester, html);
+    final explained = await explainMargin(tester, html);
     expect(
-        explained,
-        equals('[Column:children=[RichText:(+b:Foo)],' +
-            '[Padding:(0,0,10,40),child=[Text:Bar]]]'));
+      explained,
+      equals('[RichText:(+b:Foo)],[Padding:(0,0,10,40),child=[Text:Bar]]'),
+    );
   });
 
   group('IMG tag', () {
@@ -186,9 +186,13 @@ void main() {
     });
 
     testWidgets('renders BLOCKQUOTE tag', (WidgetTester tester) async {
-      final html = '<blockquote>Foo</blockquote>';
+      final html = 'x<blockquote>Foo</blockquote>x';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Padding:(5,40,5,40),child=[Text:Foo]]'));
+      expect(
+          explained,
+          equals('[Column:children=[Text:x],' +
+              '[Padding:(10,40,10,40),child=[Text:Foo]]' +
+              ',[Text:x]]'));
     });
 
     testWidgets('renders BR tag', (WidgetTester tester) async {
@@ -197,7 +201,8 @@ void main() {
       expect(
           explained,
           equals('[Column:children=[Text:First.],' +
-              '[Container:],[Text:Second one.]]'));
+              '[Padding:(0,0,10,0),child=[Container:]],' +
+              '[Text:Second one.]]'));
     });
 
     testWidgets('renders DIV tag', (WidgetTester tester) async {
@@ -213,10 +218,10 @@ void main() {
   <figcaption><i>fig. 1</i> Foo</figcaption>
 </figure>
 """;
-      final explained = await explain(tester, html);
+      final explained = await explainMargin(tester, html);
       expect(
         explained,
-        equals('[Padding:(5,40,5,40),child=[Column:children=' +
+        equals('[Padding:(10,40,10,40),child=[Column:children=' +
             '[Image:image=[NetworkImage:url=image.png]],' +
             '[RichText:(+i:fig. 1(: Foo))]]]'),
       );
@@ -236,11 +241,11 @@ void main() {
 
     testWidgets('renders P tag', (WidgetTester tester) async {
       final html = '<p>First.</p><p>Second one.</p>';
-      final explained = await explain(tester, html);
+      final explained = await explainMargin(tester, html);
       expect(
         explained,
-        equals('[Column:children=[Padding:(0,0,10,0),child=[Text:First.]],' +
-            '[Padding:(0,0,10,0),child=[Text:Second one.]]]'),
+        equals('[Padding:(10,0,10,0),child=[Text:First.]],' +
+            '[Padding:(0,0,10,0),child=[Text:Second one.]]'),
       );
     });
 
@@ -296,23 +301,42 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     });
   });
 
-  testWidgets('renders heading tags', (WidgetTester tester) async {
-    final html = """<h1>This is heading 1</h1>
-<h2>This is heading 2</h2>
-<h3>This is heading 3</h3>
-<h4>This is heading 4</h4>
-<h5>This is heading 5</h5>
-<h6>This is heading 6</h6>""";
-    final explained = await explain(tester, html);
-    expect(
-      explained,
-      equals('[Column:children=[Padding:(13,0,13,0),child=[RichText:(@20.0+b:This is heading 1)]],' +
-          '[Padding:(12,0,12,0),child=[RichText:(@15.0+b:This is heading 2)]],' +
-          '[Padding:(11,0,11,0),child=[RichText:(@11.7+b:This is heading 3)]],' +
-          '[Padding:(13,0,13,0),child=[RichText:(+b:This is heading 4)]],' +
-          '[Padding:(13,0,13,0),child=[RichText:(@8.3+b:This is heading 5)]],' +
-          '[Padding:(15,0,15,0),child=[RichText:(@6.7+b:This is heading 6)]]]'),
-    );
+  group('headings', () {
+    testWidgets('render H1 tag', (WidgetTester tester) async {
+      final html = '<h1>X</h1>';
+      final e = await explainMargin(tester, html);
+      expect(e, equals('[Padding:(13,0,13,0),child=[RichText:(@20.0+b:X)]]'));
+    });
+
+    testWidgets('render H2 tag', (WidgetTester tester) async {
+      final html = '<h2>X</h2>';
+      final e = await explainMargin(tester, html);
+      expect(e, equals('[Padding:(12,0,12,0),child=[RichText:(@15.0+b:X)]]'));
+    });
+
+    testWidgets('render H3 tag', (WidgetTester tester) async {
+      final html = '<h3>X</h3>';
+      final e = await explainMargin(tester, html);
+      expect(e, equals('[Padding:(11,0,11,0),child=[RichText:(@11.7+b:X)]]'));
+    });
+
+    testWidgets('render H4 tag', (WidgetTester tester) async {
+      final html = '<h4>X</h4>';
+      final e = await explainMargin(tester, html);
+      expect(e, equals('[Padding:(13,0,13,0),child=[RichText:(+b:X)]]'));
+    });
+
+    testWidgets('render H5 tag', (WidgetTester tester) async {
+      final html = '<h5>X</h5>';
+      final e = await explainMargin(tester, html);
+      expect(e, equals('[Padding:(13,0,13,0),child=[RichText:(@8.3+b:X)]]'));
+    });
+
+    testWidgets('render H6 tag', (WidgetTester tester) async {
+      final html = '<h6>X</h6>';
+      final e = await explainMargin(tester, html);
+      expect(e, equals('[Padding:(15,0,15,0),child=[RichText:(@6.7+b:X)]]'));
+    });
   });
 
   group('background-color', () {

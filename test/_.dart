@@ -25,7 +25,7 @@ Future<String> explain(WidgetTester tester, String html,
       null,
       hw: HtmlWidget(
         html,
-        config: config ?? const Config(),
+        config: config ?? const Config(bodyPadding: null),
       ),
       explainer: _explainer,
     );

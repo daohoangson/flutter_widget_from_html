@@ -3,8 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 import '_.dart';
 
 void main() {
+  final explain = explainMargin;
+
   testWidgets('renders text without margin', (WidgetTester tester) async {
-    final html = 'Foo';
+    final html = '<div>Foo</div>';
     final explained = await explain(tester, html);
     expect(explained, equals('[Text:Foo]'));
   });
@@ -71,10 +73,7 @@ void main() {
     final html = '<div style="margin: 1px">' +
         '<div style="margin: 2px">Foo</div></div>';
     final explained = await explain(tester, html);
-    expect(
-        explained,
-        equals('[Padding:(1,1,1,1),child=' +
-            '[Padding:(2,2,2,2),child=[Text:Foo]]]'));
+    expect(explained, equals('[Padding:(2,3,2,3),child=[Text:Foo]]'));
   });
 
   group('margin-xxx', () {

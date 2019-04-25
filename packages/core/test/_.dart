@@ -48,6 +48,15 @@ Future<String> explain(WidgetTester tester, String html,
   return _.explain(htmlWidget.build(found));
 }
 
+final _explainMarginRegExp =
+    RegExp(r'^\[Column:children=\[Text:x\],(.+),\[Text:x\]\]$');
+
+Future<String> explainMargin(WidgetTester tester, String html) async {
+  final explained = await explain(tester, "x${html}x");
+  final match = _explainMarginRegExp.firstMatch(explained);
+  return match == null ? explained : match[1];
+}
+
 class _Explainer {
   final BuildContext context;
   final WidgetExplainer explainer;

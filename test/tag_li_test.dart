@@ -4,11 +4,14 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import '_.dart';
 
 void main() {
-  final noTextPaddingConfig = Config(textPadding: null);
+  final config = Config(
+    bodyPadding: null,
+    textPadding: null,
+  );
 
   testWidgets('renders ordered list', (WidgetTester tester) async {
     final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';
-    final explained = await explain(tester, html, config: noTextPaddingConfig);
+    final explained = await explain(tester, html, config: config);
     expect(
         explained,
         equals('[Column:children=' +
@@ -20,7 +23,7 @@ void main() {
 
   testWidgets('renders unordered list', (WidgetTester tester) async {
     final html = '<ul><li>One</li><li>Two</li><li><em>Three</em></li><ul>';
-    final explained = await explain(tester, html, config: noTextPaddingConfig);
+    final explained = await explain(tester, html, config: config);
     expect(
         explained,
         equals('[Column:children=' +
@@ -33,7 +36,7 @@ void main() {
   testWidgets('renders nested list', (WidgetTester tester) async {
     final html = '<ol><li>One</li><li>Two</li><li>Three ' +
         '<ul><li>3.1</li><li>3.2</li></ul></li><li>Four</li><ol>';
-    final explained = await explain(tester, html, config: noTextPaddingConfig);
+    final explained = await explain(tester, html, config: config);
     expect(
         explained,
         equals('[Column:children=' +

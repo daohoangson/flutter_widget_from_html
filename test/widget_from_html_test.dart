@@ -21,16 +21,18 @@ void main() {
   group('IMG tag', () {
     final configImg = Config(
       baseUrl: Uri.parse('http://base.com/path'),
-      imagePadding: const EdgeInsets.all(0),
+      bodyPadding: null,
+      imagePadding: null,
     );
 
     testWidgets('renders with padding', (WidgetTester tester) async {
-      final html = '<img src="http://domain.com/image.png" />';
+      final html = 'x<img src="http://domain.com/image.png" />x';
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              '[Padding:(5,0,5,0),child=[CachedNetworkImage:http://domain.com/image.png]]'));
+          equals('[Column:children=[Padding:(0,10,0,10),child=[Text:x]],' +
+              '[Padding:(5,0,5,0),child=[CachedNetworkImage:http://domain.com/image.png]]' +
+              ',[Padding:(0,10,0,10),child=[Text:x]]]'));
     });
 
     testWidgets('renders full url', (WidgetTester tester) async {

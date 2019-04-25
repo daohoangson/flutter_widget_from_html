@@ -44,10 +44,10 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
       break;
     case 'blockquote':
     case 'figure':
-      meta = lazySet(meta, inlineStyles: ['margin', '0.5em 40px']);
+      meta = lazySet(meta, inlineStyles: ['margin', '1em 40px']);
       break;
     case 'p':
-      meta = lazySet(meta, inlineStyles: ['margin-bottom', '1em']);
+      meta = lazySet(meta, inlineStyles: ['margin', '1em 0']);
       break;
 
     case 'b':
