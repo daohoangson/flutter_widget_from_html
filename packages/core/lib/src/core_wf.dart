@@ -254,6 +254,7 @@ class WidgetFactory {
 
       case kTagCode:
       case kTagPre:
+      case kTagTt:
         meta = lazySet(meta, buildOp: tagCode());
         break;
 

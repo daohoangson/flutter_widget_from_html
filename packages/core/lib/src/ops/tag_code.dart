@@ -2,6 +2,7 @@ part of '../core_wf.dart';
 
 const kTagCode = 'code';
 const kTagPre = 'pre';
+const kTagTt = 'tt';
 
 class TagCode {
   final WidgetFactory wf;

@@ -328,6 +328,15 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final actual = await explain(tester, html);
       expect(actual, equals('[RichText:(+font=monospace:Disk fault)]'));
     });
+
+    testWidgets('renders TT tag', (WidgetTester tester) async {
+      final html = '<tt>Teletype</tt>';
+      final actual = await explain(tester, html);
+      expect(
+          actual,
+          equals('[SingleChildScrollView:child='
+              '[RichText:(+font=monospace:Teletype)]]'));
+    });
   });
 
   group('headings', () {
