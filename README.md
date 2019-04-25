@@ -61,7 +61,7 @@ All texts will be rendered with padding (`Config.textPadding`).
   - Web view will be rendered in a 16:9 box unless `width` and `height` attributes are specified in the IFRAME.
 - IMG via [`CachedNetworkImage`](https://pub.dartlang.org/packages/cached_network_image) with padding (`Config.imagePadding`), support base url resolver
 - LI/OL/UL with marker and padding (`Config.listBullet`, `Config.listMarkerPaddingTop` and `Config.listMarkerWidth`)
-- TABLE/CAPTION/TR/TD/TH with support for:
+- TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
   - `<table border="1">`
   - `<table style="border: 1px solid #f00">`
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CITE, CODE,

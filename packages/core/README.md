@@ -51,7 +51,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
 - H1/H2/H3/H4/H5/H6
 - IMG: no caching, no relative url support (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
 - LI/OL/UL: no marker (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
-- TABLE/CAPTION/TR/TD/TH with support for:
+- TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
   - `<table border="1">`
   - `<table style="border: 1px solid #f00">`
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CITE, CODE,

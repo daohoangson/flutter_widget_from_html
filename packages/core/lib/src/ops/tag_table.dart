@@ -1,8 +1,11 @@
 part of '../core_wf.dart';
 
 const kTagTable = 'table';
+const kTagTableBody = 'tbody';
 const kTagTableCaption = 'caption';
 const kTagTableCell = 'td';
+const kTagTableFoot = 'tfoot';
+const kTagTableHead = 'thead';
 const kTagTableHeader = 'th';
 const kTagTableRow = 'tr';
 
@@ -30,6 +33,10 @@ class TagTable {
               return _CaptionWidget(wf.buildColumn(widgets));
             case kTagTableRow:
               return _RowWidget(widgets.map((w) => _wrapCell(w)));
+            case kTagTableBody:
+            case kTagTableHead:
+            case kTagTableFoot:
+              return _SemanticWidget(meta.buildOpElement.localName, widgets);
           }
 
           return wf.buildColumn(widgets);
@@ -38,8 +45,28 @@ class TagTable {
       );
 
   Widget _buildTable(NodeMetadata meta, Iterable<Widget> children) {
-    final rowWidgets = <_RowWidget>[];
-    children.forEach((c) => (c is _RowWidget ? rowWidgets.add(c) : null));
+    final headWidgets = <_RowWidget>[];
+    final bodyWidgets = <_RowWidget>[];
+    final footWidgets = <_RowWidget>[];
+    for (final c in children) {
+      if (c is _RowWidget) {
+        bodyWidgets.add(c);
+      } else if (c is _SemanticWidget) {
+        final list = c.tag == kTagTableHead
+            ? headWidgets
+            : c.tag == kTagTableBody
+                ? bodyWidgets
+                : c.tag == kTagTableFoot ? footWidgets : null;
+        for (final cc in c.widgets) {
+          if (cc is _RowWidget) list?.add(cc);
+        }
+      }
+    }
+
+    final rowWidgets = List()
+      ..addAll(headWidgets)
+      ..addAll(bodyWidgets)
+      ..addAll(footWidgets);
     if (rowWidgets.isEmpty) return null;
 
     // first pass to find number of columns
@@ -87,6 +114,16 @@ class _RowWidget extends StatelessWidget {
   Widget build(BuildContext context) => Table(
         children: <TableRow>[TableRow(children: cells.toList())],
       );
+}
+
+class _SemanticWidget extends StatelessWidget {
+  final String tag;
+  final Iterable<Widget> widgets;
+
+  _SemanticWidget(this.tag, this.widgets);
+
+  @override
+  Widget build(BuildContext context) => Column(children: widgets.toList());
 }
 
 TableBorder _buildTableBorder(NodeMetadata meta) {
