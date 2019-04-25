@@ -143,6 +143,7 @@ NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
       break;
 
     case 'kbd':
+    case 'samp':
       meta = lazySet(meta, fontFamily: 'monospace');
       break;
 
