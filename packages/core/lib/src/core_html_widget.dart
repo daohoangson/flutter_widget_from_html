@@ -6,18 +6,23 @@ import 'core_wf.dart';
 
 class HtmlWidget extends StatelessWidget {
   final String html;
-  final WidgetFactoryBuilder wfBuilder;
+  final WidgetFactoryBuilder wf;
 
-  HtmlWidget(this.html, {Key key, this.wfBuilder}) : super(key: key);
+  const HtmlWidget(this.html, {Key key, this.wf})
+      : assert(html != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final domNodes = parser.parse(html).body.nodes;
-    final wf = wfBuilder != null ? wfBuilder(context) : WidgetFactory(context);
+    final wf = initFactory(context);
     final widgets = builder.Builder(domNodes, wf).build();
 
     return wf.buildBody(widgets) ?? Text(html);
   }
+
+  WidgetFactory initFactory(BuildContext context) =>
+      wf != null ? wf(context) : WidgetFactory(context);
 }
 
 typedef WidgetFactory WidgetFactoryBuilder(BuildContext context);

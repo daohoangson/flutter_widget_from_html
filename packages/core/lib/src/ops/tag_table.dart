@@ -20,7 +20,7 @@ class TagTable {
             meta.fontWeight ??= FontWeight.bold;
           }
         },
-        getInlineStyles: (e) {
+        getInlineStyles: (_, e) {
           if (e.localName == kTagTableCaption) {
             return [kCssTextAlign, kCssTextAlignCenter];
           }
@@ -128,7 +128,7 @@ class _SemanticWidget extends StatelessWidget {
 
 TableBorder _buildTableBorder(NodeMetadata meta) {
   String styleBorder;
-  meta.forEachInlineStyle((k, v) => k == 'border' ? styleBorder = v : null);
+  meta.styles((k, v) => k == 'border' ? styleBorder = v : null);
   if (styleBorder != null) {
     final borderParsed = parser.borderParse(styleBorder);
     if (borderParsed != null) {

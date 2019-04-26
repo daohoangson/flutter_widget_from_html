@@ -6,13 +6,18 @@ class TagImg {
   TagImg(this.wf);
 
   BuildOp get buildOp => BuildOp(onWidgets: (meta, widgets) {
-        final attributes = meta.buildOpElement.attributes;
-        final src = _getAttr(attributes, 'src', 'data-src');
-        final h = _parseInt(_getAttr(attributes, 'height', 'data-height'));
-        final w = _parseInt(_getAttr(attributes, 'width', 'data-width'));
-        final t = _getAttr(attributes, 'alt', 'title');
+        final attrs = meta.buildOpElement.attributes;
+        final src = _getAttr(attrs, 'src', 'data-src');
+        final height = _parseInt(_getAttr(attrs, 'height', 'data-height'));
+        final width = _parseInt(_getAttr(attrs, 'width', 'data-width'));
+        final text = _getAttr(attrs, 'alt', 'title');
 
-        return wf.buildImage(src, height: h, text: t, width: w);
+        return wf.buildImage(
+          wf.constructFullUrl(src) ?? src,
+          height: height,
+          text: text,
+          width: width,
+        );
       });
 }
 

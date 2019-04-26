@@ -24,10 +24,7 @@ void main() {
     final explained2 = await explain(
       tester,
       html,
-      hw: HtmlWidget(
-        html,
-        wfBuilder: (context) => _DoNotRenderSkipMe(context),
-      ),
+      wf: (c) => _DoNotRenderSkipMe(c),
     );
     expect(explained2, equals('[Text:Bar.]'));
   });

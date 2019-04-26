@@ -22,7 +22,7 @@ class HelloWorldScreen extends StatelessWidget {
 <p>And YouTube video!</p>
 <iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="560" height="315"></iframe>
 """,
-          config: Config(webView: true),
+          wf: (context) => WidgetFactory(context, webView: true),
         ),
       );
 }

@@ -2,20 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
 
-import 'config.dart';
-import 'widget_factory.dart';
+import 'widget_factory.dart' as extended;
 
 class HtmlWidget extends core.HtmlWidget {
-  final Config config;
-
-  HtmlWidget(
+  const HtmlWidget(
     String html, {
-    this.config = const Config(),
     Key key,
-    core.WidgetFactoryBuilder wfBuilder,
+    core.WidgetFactoryBuilder wf,
   }) : super(
           html,
           key: key,
-          wfBuilder: wfBuilder ?? (c) => WidgetFactory(c, config: config),
+          wf: wf,
         );
+
+  core.WidgetFactory initFactory(BuildContext context) =>
+      wf != null ? wf(context) : extended.WidgetFactory(context);
 }

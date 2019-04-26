@@ -4,36 +4,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    show BuildOp, NodeMetadata, TextBlock, lazySet;
+    show BuildOp, NodeMetadata, lazySet;
 import 'package:html/dom.dart' as dom;
 import 'package:url_launcher/url_launcher.dart';
 
-import 'config.dart';
 import 'web_view.dart';
 
 part 'ops/tag_iframe.dart';
-part 'ops/tag_li.dart';
-
-final _baseUriTrimmingRegExp = RegExp(r'/+$');
-final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
 
 class WidgetFactory extends core.WidgetFactory {
-  final Config config;
+  final bool webView;
+  final bool webViewJs;
 
   BuildOp _tagIframe;
-  BuildOp _tagLi;
 
   WidgetFactory(
     BuildContext context, {
-    this.config = const Config(),
-  }) : super(context);
-
-  @override
-  Widget buildBody(List<Widget> children) {
-    final body = super.buildBody(children);
-    if (body == null || config.bodyPadding == null) return body;
-    return Padding(child: body, padding: config.bodyPadding);
-  }
+    Uri baseUrl,
+    this.webView = false,
+    this.webViewJs = true,
+  }) : super(
+          context,
+          baseUrl: baseUrl,
+        );
 
   @override
   Widget buildDivider() => Divider(height: 1);
@@ -43,36 +36,9 @@ class WidgetFactory extends core.WidgetFactory {
       () => canLaunch(url).then((ok) => ok ? launch(url) : null);
 
   @override
-  Widget buildImage(String src, {int height, String text, int width}) =>
-      buildPadding(
-        super.buildImage(src, height: height, text: text, width: width),
-        config.imagePadding,
-      );
-
-  @override
-  Widget buildImageFromUrl(String url) {
-    final imageUrl = constructFullUrl(url);
-    if (imageUrl?.isEmpty != false) return null;
-
-    return CachedNetworkImage(
-      imageUrl: imageUrl,
-      fit: BoxFit.cover,
-    );
-  }
-
-  @override
-  Widget buildText({
-    TextBlock block,
-    String text,
-    TextAlign textAlign,
-  }) =>
-      buildPadding(
-        super.buildText(
-          block: block,
-          text: text,
-          textAlign: textAlign,
-        ),
-        config.textPadding,
+  Widget buildImageFromUrl(String url) => CachedNetworkImage(
+        imageUrl: url,
+        fit: BoxFit.cover,
       );
 
   Widget buildWebView(
@@ -81,14 +47,11 @@ class WidgetFactory extends core.WidgetFactory {
     double width,
   }) {
     final dimensOk = height != null && height > 0 && width != null && width > 0;
-    return buildPadding(
-      WebView(
-        url,
-        aspectRatio: dimensOk ? width / height : 16 / 9,
-        getDimensions: !dimensOk && config.webViewJs,
-        js: config.webViewJs,
-      ),
-      config.webViewPadding,
+    return WebView(
+      url,
+      aspectRatio: dimensOk ? width / height : 16 / 9,
+      getDimensions: !dimensOk && webViewJs,
+      js: webViewJs,
     );
   }
 
@@ -96,24 +59,6 @@ class WidgetFactory extends core.WidgetFactory {
         child: buildText(text: fullUrl),
         onTap: buildGestureTapCallbackForUrl(fullUrl),
       );
-
-  @override
-  String constructFullUrl(String url) {
-    if (url?.isNotEmpty != true) return null;
-    if (url.startsWith(_isFullUrlRegExp)) return url;
-
-    final b = config.baseUrl;
-    if (b == null) return null;
-
-    if (url.startsWith('//')) return "${b.scheme}:$url";
-
-    if (url.startsWith('/')) {
-      final port = b.hasPort ? ":${b.port}" : '';
-      return "${b.scheme}://${b.host}$port$url";
-    }
-
-    return "${b.toString().replaceAll(_baseUriTrimmingRegExp, '')}/$url";
-  }
 
   @override
   NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
@@ -125,12 +70,6 @@ class WidgetFactory extends core.WidgetFactory {
       case 'iframe':
         // return asap to avoid being disabled by core
         return lazySet(meta, buildOp: tagIframe());
-
-      case kTagListItem:
-      case kTagOrderedList:
-      case kTagUnorderedList:
-        meta = lazySet(meta, buildOp: tagLi());
-        break;
     }
 
     return super.parseElement(meta, e);
@@ -139,10 +78,5 @@ class WidgetFactory extends core.WidgetFactory {
   BuildOp tagIframe() {
     _tagIframe ??= TagIframe(this).buildOp;
     return _tagIframe;
-  }
-
-  BuildOp tagLi() {
-    _tagLi ??= TagLi(this).buildOp;
-    return _tagLi;
   }
 }

@@ -79,7 +79,7 @@ class _StyleMarginParser {
   EdgeInsets parse() {
     EdgeInsets output;
 
-    meta.forEachInlineStyle((key, value) {
+    meta.styles((key, value) {
       switch (key) {
         case kCssMargin:
           output = _parseAll(value);

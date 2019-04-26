@@ -12,13 +12,17 @@ part 'ops/style_text_align.dart';
 part 'ops/tag_a.dart';
 part 'ops/tag_code.dart';
 part 'ops/tag_img.dart';
+part 'ops/tag_li.dart';
 part 'ops/tag_table.dart';
 part 'ops/text.dart';
 
+final _baseUriTrimmingRegExp = RegExp(r'/+$');
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
+final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
 
 class WidgetFactory {
   final BuildContext context;
+  final Uri baseUrl;
 
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
@@ -28,10 +32,14 @@ class WidgetFactory {
   BuildOp _tagCode;
   BuildOp _tagHr;
   BuildOp _tagImg;
+  BuildOp _tagLi;
   BuildOp _tagQ;
   BuildOp _tagTable;
 
-  WidgetFactory(this.context);
+  WidgetFactory(
+    this.context, {
+    this.baseUrl,
+  });
 
   double get defaultFontSize => defaultTextStyle.fontSize;
   TextStyle get defaultTextStyle => DefaultTextStyle.of(context).style;
@@ -263,7 +271,31 @@ class WidgetFactory {
     );
   }
 
-  String constructFullUrl(String url) => null;
+  String constructFullUrl(String url) {
+    if (url?.isNotEmpty != true) return null;
+    if (url.startsWith(_isFullUrlRegExp)) return url;
+    if (baseUrl == null) return null;
+
+    if (url.startsWith('//')) return "${baseUrl.scheme}:$url";
+
+    if (url.startsWith('/')) {
+      final port = baseUrl.hasPort ? ":${baseUrl.port}" : '';
+      return "${baseUrl.scheme}://${baseUrl.host}$port$url";
+    }
+
+    return "${baseUrl.toString().replaceAll(_baseUriTrimmingRegExp, '')}/$url";
+  }
+
+  String getListStyleMarker(String type, int i) {
+    switch (type) {
+      case kCssListStyleTypeDecimal:
+        return "$i.";
+      case kCssListStyleTypeDisc:
+        return '•';
+    }
+
+    return '';
+  }
 
   NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     switch (e.localName) {
@@ -287,6 +319,12 @@ class WidgetFactory {
 
       case 'img':
         meta = lazySet(meta, buildOp: tagImg());
+        break;
+
+      case kTagListItem:
+      case kTagOrderedList:
+      case kTagUnorderedList:
+        meta = lazySet(meta, buildOp: tagLi());
         break;
 
       case 'q':
@@ -352,7 +390,7 @@ class WidgetFactory {
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      getInlineStyles: (_) => ['margin-bottom', '1em'],
+      getInlineStyles: (_, __) => ['margin-bottom', '1em'],
       onWidgets: (_, __) => Container(),
     );
     return _tagBr;
@@ -365,7 +403,7 @@ class WidgetFactory {
 
   BuildOp tagHr() {
     _tagHr ??= BuildOp(
-      getInlineStyles: (e) => const [kCssMarginBottom, '1em'],
+      getInlineStyles: (_, __) => const [kCssMarginBottom, '1em'],
       onWidgets: (_, __) => buildDivider(),
     );
     return _tagHr;
@@ -374,6 +412,11 @@ class WidgetFactory {
   BuildOp tagImg() {
     _tagImg ??= TagImg(this).buildOp;
     return _tagImg;
+  }
+
+  BuildOp tagLi() {
+    _tagLi ??= TagLi(this).buildOp;
+    return _tagLi;
   }
 
   BuildOp tagQ() {
