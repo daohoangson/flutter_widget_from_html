@@ -1,6 +1,6 @@
 # Flutter Widget from HTML (core)
 
-[![CircleCI](https://circleci.com/gh/daohoangson/flutter_widget_from_html.svg?style=svg)](https://circleci.com/gh/daohoangson/flutter_widget_from_html)
+[![CirrusCI](https://api.cirrus-ci.com/github/daohoangson/flutter_widget_from_html.svg)](https://cirrus-ci.com/github/daohoangson/flutter_widget_from_html)
 [![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html_core.svg)](https://pub.dartlang.org/packages/flutter_widget_from_html_core)
 
