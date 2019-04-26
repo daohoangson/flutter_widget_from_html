@@ -11,10 +11,6 @@ final _spacingRegExp = RegExp(r'\s+');
 
 NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
   switch (e.localName) {
-    case 'a':
-      meta = lazySet(meta, decorationUnderline: true);
-      break;
-
     case 'abbr':
     case 'acronym':
       meta = lazySet(

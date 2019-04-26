@@ -9,6 +9,7 @@ import 'parser.dart' as parser;
 part 'ops/style_bg_color.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_text_align.dart';
+part 'ops/tag_a.dart';
 part 'ops/tag_code.dart';
 part 'ops/tag_img.dart';
 part 'ops/tag_table.dart';
@@ -22,6 +23,7 @@ class WidgetFactory {
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
   BuildOp _styleTextAlign;
+  BuildOp _tagA;
   BuildOp _tagBr;
   BuildOp _tagCode;
   BuildOp _tagHr;
@@ -78,6 +80,33 @@ class WidgetFactory {
   FontStyle buildFontSize(NodeMetadata meta) => meta?.hasFontStyle == true
       ? (meta.fontStyleItalic == true ? FontStyle.italic : FontStyle.normal)
       : null;
+
+  Widget buildGestureDetector(Widget child, GestureTapCallback onTap) {
+    if (child == null || onTap == null) return child;
+
+    if (child is Column) {
+      final column = child;
+      return buildColumn(column.children
+          .map(
+            (c) => buildGestureDetector(c, onTap),
+          )
+          .toList());
+    }
+
+    if (child is Padding) {
+      final padding = child;
+      return buildPadding(
+        buildGestureDetector(padding.child, onTap),
+        padding.padding,
+      );
+    }
+
+    return GestureDetector(child: child, onTap: onTap);
+  }
+
+  GestureTapCallback buildGestureTapCallbackForUrl(String url) => () {
+        debugPrint(url);
+      };
 
   Widget buildImage(String src, {int height, String text, int width}) {
     final imageWidget = src?.startsWith('data:image') == true
@@ -234,8 +263,14 @@ class WidgetFactory {
     );
   }
 
+  String constructFullUrl(String url) => null;
+
   NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     switch (e.localName) {
+      case 'a':
+        meta = lazySet(meta, buildOp: tagA());
+        break;
+
       case 'br':
         meta = lazySet(meta, buildOp: tagBr());
         break;
@@ -308,6 +343,11 @@ class WidgetFactory {
   BuildOp styleTextAlign() {
     _styleTextAlign ??= StyleTextAlign(this).buildOp;
     return _styleTextAlign;
+  }
+
+  BuildOp tagA() {
+    _tagA ??= TagA(this).buildOp;
+    return _tagA;
   }
 
   BuildOp tagBr() {

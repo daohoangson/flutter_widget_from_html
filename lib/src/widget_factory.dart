@@ -4,20 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    show
-        BuildOp,
-        BuiltPiece,
-        BuiltPieceSimple,
-        NodeMetadata,
-        TextBlock,
-        lazySet;
+    show BuildOp, NodeMetadata, TextBlock, lazySet;
 import 'package:html/dom.dart' as dom;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'config.dart';
 import 'web_view.dart';
 
-part 'ops/tag_a.dart';
 part 'ops/tag_iframe.dart';
 part 'ops/tag_li.dart';
 
@@ -27,7 +20,6 @@ final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
 class WidgetFactory extends core.WidgetFactory {
   final Config config;
 
-  BuildOp _tagA;
   BuildOp _tagIframe;
   BuildOp _tagLi;
 
@@ -46,8 +38,9 @@ class WidgetFactory extends core.WidgetFactory {
   @override
   Widget buildDivider() => Divider(height: 1);
 
-  GestureTapCallback buildGestureTapCallbackForUrl(String fullUrl) =>
-      () => canLaunch(fullUrl).then((ok) => ok ? launch(fullUrl) : null);
+  @override
+  GestureTapCallback buildGestureTapCallbackForUrl(String url) =>
+      () => canLaunch(url).then((ok) => ok ? launch(url) : null);
 
   @override
   Widget buildImage(String src, {int height, String text, int width}) =>
@@ -104,6 +97,7 @@ class WidgetFactory extends core.WidgetFactory {
         onTap: buildGestureTapCallbackForUrl(fullUrl),
       );
 
+  @override
   String constructFullUrl(String url) {
     if (url?.isNotEmpty != true) return null;
     if (url.startsWith(_isFullUrlRegExp)) return url;
@@ -125,7 +119,7 @@ class WidgetFactory extends core.WidgetFactory {
   NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     switch (e.localName) {
       case 'a':
-        meta = lazySet(meta, buildOp: tagA());
+        meta = lazySet(meta, color: Theme.of(context).accentColor);
         break;
 
       case 'iframe':
@@ -140,11 +134,6 @@ class WidgetFactory extends core.WidgetFactory {
     }
 
     return super.parseElement(meta, e);
-  }
-
-  BuildOp tagA() {
-    _tagA ??= TagA(this).buildOp;
-    return _tagA;
   }
 
   BuildOp tagIframe() {

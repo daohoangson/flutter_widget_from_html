@@ -32,21 +32,6 @@ void main() {
     expect(str, equals('[RichText:(+l+o+u:All decorations... (:and none))]'));
   });
 
-  group('A tag', () {
-    testWidgets('renders stylings', (WidgetTester tester) async {
-      final html = 'This is a <a href="href">hyperlink</a>.';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:This is a (+u:hyperlink)(:.))]'));
-    });
-
-    testWidgets('renders inner stylings', (WidgetTester tester) async {
-      final html = 'This is a <a href="href"><b><i>hyperlink</i></b></a>.';
-      final explained = await explain(tester, html);
-      expect(
-          explained, equals('[RichText:(:This is a (+u+i+b:hyperlink)(:.))]'));
-    });
-  });
-
   group('ABBR tag', () {
     testWidgets('renders ABBR', (WidgetTester tester) async {
       final html = '<abbr>ABBR</abbr>';
