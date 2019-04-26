@@ -79,6 +79,12 @@ void main() {
     );
   });
 
+  testWidgets('renders HR tag', (WidgetTester tester) async {
+    final html = '<hr/>';
+    final explained = await explainMargin(tester, html);
+    expect(explained, startsWith('[Padding:(0,0,10,0)'));
+  });
+
   group('IMG tag', () {
     testWidgets('renders src', (WidgetTester tester) async {
       final html = '<img src="image.png" />';

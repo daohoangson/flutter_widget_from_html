@@ -14,16 +14,6 @@ part 'ops/tag_img.dart';
 part 'ops/tag_table.dart';
 part 'ops/text.dart';
 
-const kFontSizeXxLarge = 2.0;
-const kFontSizeXLarge = 1.5;
-const kFontSizeLarge = 1.125;
-const kFontSizeMedium = 1;
-const kFontSizeSmall = .8125;
-const kFontSizeXSmall = .625;
-const kFontSizeXxSmall = .5625;
-const kFontSizeLarger = 1.2;
-const kFontSizeSmaller = 15 / 18;
-
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
 
 class WidgetFactory {
@@ -90,9 +80,7 @@ class WidgetFactory {
       : null;
 
   Widget buildImage(String src, {int height, String text, int width}) {
-    if (src?.isNotEmpty != true) return buildText(text: text);
-
-    final imageWidget = src.startsWith('data:image')
+    final imageWidget = src?.startsWith('data:image') == true
         ? buildImageFromDataUri(src)
         : buildImageFromUrl(src);
     if (imageWidget == null) return buildText(text: text);
@@ -209,24 +197,24 @@ class WidgetFactory {
 
     switch (value) {
       case 'xx-large':
-        return defaultFontSize * kFontSizeXxLarge;
+        return defaultFontSize * 2.0;
       case 'x-large':
-        return defaultFontSize * kFontSizeXLarge;
+        return defaultFontSize * 1.5;
       case 'large':
-        return defaultFontSize * kFontSizeLarge;
+        return defaultFontSize * 1.125;
       case 'medium':
         return defaultFontSize;
       case 'small':
-        return defaultFontSize * kFontSizeSmall;
+        return defaultFontSize * .8125;
       case 'x-small':
-        return defaultFontSize * kFontSizeXSmall;
+        return defaultFontSize * .625;
       case 'xx-small':
-        return defaultFontSize * kFontSizeXxSmall;
+        return defaultFontSize * .5625;
 
       case 'larger':
-        return parent.fontSize * kFontSizeLarger;
+        return parent.fontSize * 1.2;
       case 'smaller':
-        return parent.fontSize * kFontSizeSmaller;
+        return parent.fontSize * (15 / 18);
     }
 
     return null;
