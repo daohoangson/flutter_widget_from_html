@@ -14,7 +14,6 @@ class TagIframe {
 
     final src = wf.constructFullUrl(a['src']);
     if (src == null) return null;
-    if (!wf.webView) return wf.buildWebViewLinkOnly(src);
 
     return wf.buildWebView(
       src,

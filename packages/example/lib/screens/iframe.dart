@@ -51,11 +51,8 @@ class _State extends State<IframeScreen> {
           HtmlWidget(
             html,
             key: Key("$webView$webViewJs"),
-            wf: (context) => WidgetFactory(
-                  context,
-                  webView: webView,
-                  webViewJs: webViewJs,
-                ),
+            webView: webView,
+            webViewJs: webViewJs,
           ),
         ]),
       );

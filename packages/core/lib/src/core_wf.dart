@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'core_config.dart';
 import 'data_classes.dart';
 import 'parser.dart' as parser;
 
@@ -22,7 +23,8 @@ final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
 
 class WidgetFactory {
   final BuildContext context;
-  final Uri baseUrl;
+
+  Config _config;
 
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
@@ -36,13 +38,16 @@ class WidgetFactory {
   BuildOp _tagQ;
   BuildOp _tagTable;
 
-  WidgetFactory(
-    this.context, {
-    this.baseUrl,
-  });
+  WidgetFactory(this.context);
 
   double get defaultFontSize => defaultTextStyle.fontSize;
   TextStyle get defaultTextStyle => DefaultTextStyle.of(context).style;
+
+  set config(Config config) {
+    assert(_config == null);
+    assert(config != null);
+    _config = config;
+  }
 
   Widget buildAlign(Widget child, Alignment alignment) {
     if (alignment == null) return child;
@@ -274,16 +279,18 @@ class WidgetFactory {
   String constructFullUrl(String url) {
     if (url?.isNotEmpty != true) return null;
     if (url.startsWith(_isFullUrlRegExp)) return url;
-    if (baseUrl == null) return null;
 
-    if (url.startsWith('//')) return "${baseUrl.scheme}:$url";
+    final b = _config?.baseUrl;
+    if (b == null) return null;
+
+    if (url.startsWith('//')) return "${b.scheme}:$url";
 
     if (url.startsWith('/')) {
-      final port = baseUrl.hasPort ? ":${baseUrl.port}" : '';
-      return "${baseUrl.scheme}://${baseUrl.host}$port$url";
+      final port = b.hasPort ? ":${b.port}" : '';
+      return "${b.scheme}://${b.host}$port$url";
     }
 
-    return "${baseUrl.toString().replaceAll(_baseUriTrimmingRegExp, '')}/$url";
+    return "${b.toString().replaceAll(_baseUriTrimmingRegExp, '')}/$url";
   }
 
   String getListStyleMarker(String type, int i) {

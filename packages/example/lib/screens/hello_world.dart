@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
-class HelloWorldScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text('HelloWorldScreen')),
-        body: HtmlWidget(
-          """<h1>Heading</h1>
+const kHtml = """
+<h1>Heading</h1>
 <p>A paragraph with <strong>strong</strong> <em>emphasized</em> text.</p>
 <ol>
   <li>List item number one</li>
@@ -21,8 +17,12 @@ class HelloWorldScreen extends StatelessWidget {
 </ol>
 <p>And YouTube video!</p>
 <iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="560" height="315"></iframe>
-""",
-          wf: (context) => WidgetFactory(context, webView: true),
-        ),
+""";
+
+class HelloWorldScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: Text('HelloWorldScreen')),
+        body: HtmlWidget(kHtml, webView: true),
       );
 }

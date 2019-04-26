@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
-typedef String WidgetExplainer(Widget widget);
-
 Future<String> explain(
   WidgetTester tester,
   String html, {
-  WidgetExplainer explainer,
+  Uri baseUrl,
+  _WidgetExplainer explainer,
+  _HtmlWidgetBuilder hw,
   String imageUrlToPrecache,
   WidgetFactoryBuilder wf,
 }) async {
@@ -38,7 +38,9 @@ Future<String> explain(
                     fontSize: 10.0,
                     fontWeight: FontWeight.normal,
                   ),
-              child: HtmlWidget(html, wf: wf),
+              child: hw != null
+                  ? hw()
+                  : HtmlWidget(html, baseUrl: baseUrl, wf: wf),
             ),
           ),
         );
@@ -72,9 +74,12 @@ Future<String> explainMargin(
   return match == null ? explained : match[1];
 }
 
+typedef String _WidgetExplainer(Widget widget);
+typedef HtmlWidget _HtmlWidgetBuilder();
+
 class _Explainer {
   final BuildContext context;
-  final WidgetExplainer explainer;
+  final _WidgetExplainer explainer;
   final TextStyle _defaultStyle;
 
   _Explainer(this.context, {this.explainer})

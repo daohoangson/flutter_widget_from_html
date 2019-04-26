@@ -1,6 +1,4 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import '_.dart' as _;
 
@@ -71,11 +69,8 @@ void main() {
             .explain(
               tester,
               html,
+              baseUrl: Uri.parse('http://base.com/path'),
               imageUrlToPrecache: fullUrl,
-              wf: (BuildContext context) => WidgetFactory(
-                    context,
-                    baseUrl: Uri.parse('http://base.com/path'),
-                  ),
             )
             .then((explained) => expect(
                   explained,

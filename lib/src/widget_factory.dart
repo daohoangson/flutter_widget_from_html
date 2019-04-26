@@ -8,25 +8,22 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:html/dom.dart' as dom;
 import 'package:url_launcher/url_launcher.dart';
 
+import 'config.dart';
 import 'web_view.dart';
 
 part 'ops/tag_iframe.dart';
 
 class WidgetFactory extends core.WidgetFactory {
-  final bool webView;
-  final bool webViewJs;
-
+  Config _config;
   BuildOp _tagIframe;
 
-  WidgetFactory(
-    BuildContext context, {
-    Uri baseUrl,
-    this.webView = false,
-    this.webViewJs = true,
-  }) : super(
-          context,
-          baseUrl: baseUrl,
-        );
+  WidgetFactory(BuildContext context) : super(context);
+
+  @override
+  set config(core.Config config) {
+    super.config = config;
+    if (config is Config) _config = config;
+  }
 
   @override
   Widget buildDivider() => Divider(height: 1);
@@ -46,18 +43,20 @@ class WidgetFactory extends core.WidgetFactory {
     double height,
     double width,
   }) {
+    if (!_config.webView) return buildWebViewLinkOnly(url);
+
     final dimensOk = height != null && height > 0 && width != null && width > 0;
     return WebView(
       url,
       aspectRatio: dimensOk ? width / height : 16 / 9,
-      getDimensions: !dimensOk && webViewJs,
-      js: webViewJs,
+      getDimensions: !dimensOk && _config?.webViewJs == true,
+      js: _config?.webViewJs == true,
     );
   }
 
-  Widget buildWebViewLinkOnly(String fullUrl) => GestureDetector(
-        child: buildText(text: fullUrl),
-        onTap: buildGestureTapCallbackForUrl(fullUrl),
+  Widget buildWebViewLinkOnly(String url) => GestureDetector(
+        child: buildText(text: url),
+        onTap: buildGestureTapCallbackForUrl(url),
       );
 
   @override

@@ -3,19 +3,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart' as lib;
 
-typedef void GetDimensionsDone(
-  double aspectRatio,
-  bool changed,
-  double height,
-  double width,
-);
-
 class WebView extends StatefulWidget {
   final String url;
 
   final double aspectRatio;
   final bool getDimensions;
-  final GetDimensionsDone getDimensionsDone;
+  final _GetDimensionsDone getDimensionsDone;
   final List<Duration> getDimensionsDurations;
   final bool js;
 
@@ -99,3 +92,10 @@ class _WebViewState extends State<WebView> {
     if (f != null) f(r, changed, h, w);
   }
 }
+
+typedef void _GetDimensionsDone(
+  double aspectRatio,
+  bool changed,
+  double height,
+  double width,
+);
