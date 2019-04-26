@@ -6,10 +6,10 @@ import 'package:html/dom.dart' as dom;
 import '_.dart';
 
 Iterable<BuiltPiece> _a(NodeMetadata meta, Iterable<BuiltPiece> pieces) =>
-    pieces.map((p) => BuiltPieceSimple(text: p.text + ' A'));
+    pieces.map((p) => p..block?.addText(' A'));
 
 Iterable<BuiltPiece> _b(NodeMetadata meta, Iterable<BuiltPiece> pieces) =>
-    pieces.map((p) => BuiltPieceSimple(text: p.text + ' B'));
+    pieces.map((p) => p..block?.addText(' B'));
 
 class _AFirst extends WidgetFactory {
   _AFirst(BuildContext context) : super(context);
@@ -36,7 +36,7 @@ class _BFirst extends WidgetFactory {
 }
 
 void main() {
-  final html = '<p class="classA classB">Foo</p>';
+  final html = '<span class="classA classB">Foo</span>';
 
   testWidgets('renders A first', (WidgetTester tester) async {
     final explained = await explain(

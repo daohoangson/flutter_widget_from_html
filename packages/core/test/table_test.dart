@@ -5,43 +5,32 @@ import '_.dart';
 void main() {
   testWidgets('renders basic table', (WidgetTester tester) async {
     final html = """<table>
+      <caption>Caption</caption>
       <tr><th>Header 1</th><th>Header 2</th></tr>
       <tr><td>Value 1</td><td>Value 2</td></tr>
     </table>""";
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[Table:\n' +
+        equals('[Column:children=[Text,align=center:Caption],[Table:\n' +
             '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n' +
             '[Text:Value 1] | [Text:Value 2]\n' +
-            ']'));
+            ']]'));
   });
 
-  testWidgets('renders missing header', (WidgetTester tester) async {
+  testWidgets('renders THEAD/TBODY/TFOOT tags', (WidgetTester tester) async {
     final html = """<table>
-      <tr><th>Header 1</th></tr>
-      <tr><td>Value 1</td><td>Value 2</td></tr>
+      <tfoot><tr><td>Footer 1</td><td>Footer 2</td></tr></tfoot>
+      <tbody><tr><td>Value 1</td><td>Value 2</td></tr></tbody>
+      <thead><tr><th>Header 1</th><th>Header 2</th></tr></thead>
     </table>""";
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[Table:\n' +
-            '[RichText:(+b:Header 1)] | [Container:child=[Null:]]\n' +
-            '[Text:Value 1] | [Text:Value 2]\n' +
-            ']'));
-  });
-
-  testWidgets('renders missing cell', (WidgetTester tester) async {
-    final html = """<table>
-      <tr><th>Header 1</th><th>Header 2</th></tr>
-      <tr><td>Value 1</td></tr>
-    </table>""";
-    final explained = await explain(tester, html);
-    expect(
-        explained,
-        equals('[Table:\n' +
-            '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n' +
-            '[Text:Value 1] | [Container:child=[Null:]]\n' +
+        equals('[Table:\n'
+            '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n'
+            '[Text:Value 1] | [Text:Value 2]\n'
+            '[Text:Footer 1] | [Text:Footer 2]\n'
             ']'));
   });
 
@@ -105,5 +94,65 @@ void main() {
         );
       },
     );
+  });
+
+  group('error handling', () {
+    testWidgets('missing header', (WidgetTester tester) async {
+      final html = """<table>
+      <tr><th>Header 1</th></tr>
+      <tr><td>Value 1</td><td>Value 2</td></tr>
+    </table>""";
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Table:\n' +
+              '[RichText:(+b:Header 1)] | [Container:]\n' +
+              '[Text:Value 1] | [Text:Value 2]\n' +
+              ']'));
+    });
+
+    testWidgets('missing cell', (WidgetTester tester) async {
+      final html = """<table>
+      <tr><th>Header 1</th><th>Header 2</th></tr>
+      <tr><td>Value 1</td></tr>
+    </table>""";
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Table:\n' +
+              '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n' +
+              '[Text:Value 1] | [Container:]\n' +
+              ']'));
+    });
+
+    testWidgets('standalone CAPTION', (WidgetTester tester) async {
+      final html = '<caption>Foo</caption>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Text:Foo]'));
+    });
+
+    testWidgets('standalone TABLE', (WidgetTester tester) async {
+      final html = '<table>Foo</table>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Text:Foo]'));
+    });
+
+    testWidgets('standalone TD', (WidgetTester tester) async {
+      final html = '<td>Foo</td>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Text:Foo]'));
+    });
+
+    testWidgets('standalone TH', (WidgetTester tester) async {
+      final html = '<th>Foo</th>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Text:Foo]'));
+    });
+
+    testWidgets('standalone TR', (WidgetTester tester) async {
+      final html = '<tr>Foo</tr>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Text:Foo]'));
+    });
   });
 }

@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    show BuildOp, NodeMetadata, attrStyleLoop, borderParseAll;
-
-import '../core_wf.dart';
+part of '../core_wf.dart';
 
 const kTagTable = 'table';
+const kTagTableBody = 'tbody';
+const kTagTableCaption = 'caption';
 const kTagTableCell = 'td';
+const kTagTableFoot = 'tfoot';
+const kTagTableHead = 'thead';
 const kTagTableHeader = 'th';
 const kTagTableRow = 'tr';
 
@@ -20,25 +20,54 @@ class TagTable {
             meta.fontWeight ??= FontWeight.bold;
           }
         },
+        getInlineStyles: (e) {
+          if (e.localName == kTagTableCaption) {
+            return [kCssTextAlign, kCssTextAlignCenter];
+          }
+        },
         onWidgets: (meta, widgets) {
           switch (meta.buildOpElement.localName) {
             case kTagTable:
               return _buildTable(meta, widgets);
-            case kTagTableCell:
-            case kTagTableHeader:
-              return wf.buildColumn(widgets);
+            case kTagTableCaption:
+              return _CaptionWidget(wf.buildColumn(widgets));
             case kTagTableRow:
               return _RowWidget(widgets.map((w) => _wrapCell(w)));
+            case kTagTableBody:
+            case kTagTableHead:
+            case kTagTableFoot:
+              return _SemanticWidget(meta.buildOpElement.localName, widgets);
           }
 
-          return Container();
+          return wf.buildColumn(widgets);
         },
         priority: 100,
       );
 
   Widget _buildTable(NodeMetadata meta, Iterable<Widget> children) {
-    final rowWidgets = <_RowWidget>[];
-    children.forEach((c) => (c is _RowWidget ? rowWidgets.add(c) : null));
+    final headWidgets = <_RowWidget>[];
+    final bodyWidgets = <_RowWidget>[];
+    final footWidgets = <_RowWidget>[];
+    for (final c in children) {
+      if (c is _RowWidget) {
+        bodyWidgets.add(c);
+      } else if (c is _SemanticWidget) {
+        final list = c.tag == kTagTableHead
+            ? headWidgets
+            : c.tag == kTagTableBody
+                ? bodyWidgets
+                : c.tag == kTagTableFoot ? footWidgets : null;
+        for (final cc in c.widgets) {
+          if (cc is _RowWidget) list?.add(cc);
+        }
+      }
+    }
+
+    final rowWidgets = List()
+      ..addAll(headWidgets)
+      ..addAll(bodyWidgets)
+      ..addAll(footWidgets);
+    if (rowWidgets.isEmpty) return null;
 
     // first pass to find number of columns
     int cols = 0;
@@ -50,11 +79,29 @@ class TagTable {
       return TableRow(children: cells);
     });
 
-    return wf.buildTable(rows.toList(), border: _buildTableBorder(meta));
+    final widgets = <Widget>[];
+
+    if (children.isNotEmpty) {
+      final first = children.first;
+      if (first is _CaptionWidget) widgets.add(first.child);
+    }
+
+    widgets.add(wf.buildTable(rows.toList(), border: _buildTableBorder(meta)));
+
+    return wf.buildColumn(widgets);
   }
 
   Widget _wrapCell(Widget widget) =>
       widget is TableCell ? widget : wf.buildTableCell(widget);
+}
+
+class _CaptionWidget extends StatelessWidget {
+  final Widget child;
+
+  _CaptionWidget(this.child);
+
+  @override
+  Widget build(BuildContext context) => child;
 }
 
 class _RowWidget extends StatelessWidget {
@@ -64,24 +111,35 @@ class _RowWidget extends StatelessWidget {
   _RowWidget(this.cells);
 
   @override
-  Widget build(BuildContext context) => null;
+  Widget build(BuildContext context) => Table(
+        children: <TableRow>[TableRow(children: cells.toList())],
+      );
+}
+
+class _SemanticWidget extends StatelessWidget {
+  final String tag;
+  final Iterable<Widget> widgets;
+
+  _SemanticWidget(this.tag, this.widgets);
+
+  @override
+  Widget build(BuildContext context) => Column(children: widgets.toList());
 }
 
 TableBorder _buildTableBorder(NodeMetadata meta) {
-  final e = meta.buildOpElement;
-
   String styleBorder;
-  attrStyleLoop(e, (k, v) => k == 'border' ? styleBorder = v : null);
+  meta.forEachInlineStyle((k, v) => k == 'border' ? styleBorder = v : null);
   if (styleBorder != null) {
-    final borderParsed = borderParseAll(styleBorder);
+    final borderParsed = parser.borderParse(styleBorder);
     if (borderParsed != null) {
       return TableBorder.all(
         color: borderParsed.color ?? const Color(0xFF000000),
-        width: borderParsed.width,
+        width: borderParsed.width.getValue(meta.buildOpTextStyle),
       );
     }
   }
 
+  final e = meta.buildOpElement;
   if (e.attributes.containsKey('border')) {
     final width = double.tryParse(e.attributes['border']);
     if (width != null && width > 0) {

@@ -1,29 +1,44 @@
 part of '../parser.dart';
 
-class BorderParsed {
-  Color color;
-  double width;
-}
+final _borderValuesThreeRegExp = RegExp(r'^(.+)\s+(.+)\s+(.+)$');
+final _borderValuesTwoRegExp = RegExp(r'^(.+)\s+(.+)$');
 
-final _borderValueRegExp = RegExp(r'^(.+)\s+(.+)\s+(.+)$');
+CssBorderSide borderParse(String value) {
+  final valuesThree = _borderValuesThreeRegExp.firstMatch(value);
+  if (valuesThree != null) {
+    final width = lengthParseValue(valuesThree[1]);
+    if (width == null || width.number <= 0) return null;
+    return CssBorderSide()
+      ..color = colorParseValue(valuesThree[3])
+      ..style = borderStyleParseValue(valuesThree[2])
+      ..width = width;
+  }
 
-BorderParsed borderParseAll(String value) {
-  final match = _borderValueRegExp.firstMatch(value);
-  if (match == null) return borderParseValue(value);
+  final valuesTwo = _borderValuesTwoRegExp.firstMatch(value);
+  if (valuesTwo != null) {
+    final width = lengthParseValue(valuesTwo[1]);
+    if (width == null || width.number <= 0) return null;
+    return CssBorderSide()
+      ..style = borderStyleParseValue(valuesTwo[2])
+      ..width = width;
+  }
 
-  final width = unitParseValue(match[1]);
-  if (width == null || width < 0) return null;
-
-  final color = colorParseValue(match[3]);
-
-  return BorderParsed()
-    ..color = color
+  final width = lengthParseValue(value);
+  if (width == null || width.number <= 0) return null;
+  return CssBorderSide()
+    ..style = CssBorderStyle.solid
     ..width = width;
 }
 
-BorderParsed borderParseValue(String str) {
-  final width = unitParseValue(str);
-  if (width == null || width < 0) return null;
+CssBorderStyle borderStyleParseValue(String value) {
+  switch (value) {
+    case 'dotted':
+      return CssBorderStyle.dotted;
+    case 'dashed':
+      return CssBorderStyle.dashed;
+    case 'double':
+      return CssBorderStyle.double;
+  }
 
-  return BorderParsed()..width = width;
+  return CssBorderStyle.solid;
 }

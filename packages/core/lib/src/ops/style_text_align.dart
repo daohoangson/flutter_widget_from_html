@@ -1,8 +1,4 @@
-import 'package:flutter/widgets.dart';
-
-import '../core_wf.dart';
-import '../metadata.dart';
-import '../parser.dart';
+part of '../core_wf.dart';
 
 const kCssTextAlign = 'text-align';
 const kCssTextAlignCenter = 'center';
@@ -17,16 +13,16 @@ class StyleTextAlign {
 
   BuildOp get buildOp => BuildOp(
         onPieces: (meta, pieces) {
-          final v = _parseValue(meta);
+          String v;
+          meta.forEachInlineStyle(
+            (k, _v) => k == kCssTextAlign ? v = _v : null,
+          );
           if (v == null) return pieces;
 
           final widgets = pieces.map(
-            (piece) => piece.hasWidgets
-                ? wf.buildAlign(wf.buildColumn(piece.widgets), _getAlignment(v))
-                : wf.buildTextWidget(
-                    piece.hasTextSpan ? piece.textSpan : piece.text,
-                    textAlign: _getTextAlign(v),
-                  ),
+            (p) => p.hasWidgets
+                ? wf.buildAlign(wf.buildColumn(p.widgets), _getAlignment(v))
+                : wf.buildText(block: p.block, textAlign: _getTextAlign(v)),
           );
 
           return <BuiltPiece>[BuiltPieceSimple(widgets: widgets)];
@@ -62,13 +58,4 @@ TextAlign _getTextAlign(String textAlign) {
   }
 
   return null;
-}
-
-String _parseValue(NodeMetadata meta) {
-  String value;
-
-  final e = meta.buildOpElement;
-  attrStyleLoop(e, (k, v) => k == kCssTextAlign ? value = v : null);
-
-  return value;
 }

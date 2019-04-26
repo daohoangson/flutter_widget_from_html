@@ -1,9 +1,4 @@
-import 'package:flutter/widgets.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    show BuildOp;
-import 'package:html/dom.dart' as dom;
-
-import '../widget_factory.dart';
+part of '../widget_factory.dart';
 
 class TagIframe {
   final WidgetFactory wf;

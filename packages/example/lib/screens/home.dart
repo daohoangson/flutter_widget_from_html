@@ -12,9 +12,11 @@ class HomeScreen extends StatelessWidget {
     'Hello World': () => HelloWorldScreen(),
     'Smilie': () => SmilieScreen(),
     'Styling':
-        """<p><b>B</b>, <strong>strong</strong> or <span style="font-weight: bold">inline style</span></p>
+        """
+<p><abbr>ABBR</abbr>, <acronym>ACRONYM</acronym> or <span style="border-bottom: 1px dotted">inline style</span></p>
+<p><b>B</b>, <strong>STRONG</strong> or <span style="font-weight: bold">inline style</span></p>
 <p><em>EM</em>, <i>I</i> or <span style="font-style: italic">inline style</span></p>
-<p><u>U</u> or <span style="text-decoration: underline">inline style</span></p>
+<p><u>U</u> or <span style="text-decoration: underline">inline</span> <span style="border-bottom: 1px">style</span></p>
 <p><span style="color: #ff0000">Red</span>, <span style="color: #00ff00">green</span>, <span style="color: #0000ff">blue</span></p>
 
 <p>
@@ -65,10 +67,9 @@ class HomeScreen extends StatelessWidget {
   <li>Ten</li>
   <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nibh quam, sodales in sollicitudin ut, scelerisque non sapien. Nam nec mi malesuada libero euismod tincidunt sit amet mattis ipsum. Etiam dapibus sem ac accumsan elementum. Vivamus mattis at diam ac pellentesque. Sed id eros condimentum, dignissim risus id, semper enim. Etiam tempor mauris id lorem fringilla, dapibus feugiat enim placerat. In hac habitasse platea dictumst. Nam est felis, accumsan et sapien ac, molestie convallis sapien. Vivamus ligula sapien, ultrices quis nisl ac, blandit hendrerit massa. Maecenas eleifend, nisi eget commodo mollis, elit magna pellentesque odio, sit amet auctor quam nibh vel purus. Integer ultricies lacinia ipsum, in tincidunt erat finibus eget.</li>
 </ol>""",
-    'Table': """Table data from
-<a href="https://www.w3schools.com/html/html_tables.asp">w3schools</a>:
-    
+    'Table': """
 <table border="1">
+  <caption>Source: <a href="https://www.w3schools.com/html/html_tables.asp">w3schools</a></caption>
   <tr>
     <th>Firstname</th>
     <th>Lastname</th> 

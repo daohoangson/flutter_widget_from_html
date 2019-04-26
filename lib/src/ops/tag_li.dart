@@ -1,8 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    show BuildOp;
-
-import '../widget_factory.dart';
+part of '../widget_factory.dart';
 
 const kTagListItem = 'li';
 const kTagOrderedList = 'ol';

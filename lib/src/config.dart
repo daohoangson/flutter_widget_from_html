@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class Config {
   final Uri baseUrl;
+  final EdgeInsets bodyPadding;
   final EdgeInsets imagePadding;
   final String listBullet;
   final double listMarkerPaddingTop;
@@ -13,16 +14,14 @@ class Config {
 
   const Config({
     this.baseUrl,
-    this.imagePadding = const EdgeInsets.only(top: 5.0, bottom: 5.0),
+    this.bodyPadding = const EdgeInsets.symmetric(vertical: 5.0),
+    this.imagePadding = const EdgeInsets.symmetric(vertical: 5.0),
     this.listBullet = '•',
     this.listMarkerPaddingTop,
     this.listMarkerWidth = 30.0,
-    this.textPadding = const EdgeInsets.symmetric(
-      horizontal: 10.0,
-      vertical: 5.0,
-    ),
+    this.textPadding = const EdgeInsets.symmetric(horizontal: 10.0),
     this.webView = false,
     this.webViewJs = true,
-    this.webViewPadding = const EdgeInsets.only(top: 5.0, bottom: 5.0),
+    this.webViewPadding = const EdgeInsets.symmetric(vertical: 5.0),
   });
 }

@@ -56,13 +56,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
 All texts will be rendered with padding (`Config.textPadding`).
 
 - A: underline with theme accent color, launch url via [`url_launcher`](https://pub.dartlang.org/packages/url_launcher), support base url resolver
-- B
-- BR
-- CODE
-- DIV
-- EM
 - H1/H2/H3/H4/H5/H6
-- I
 - IFRAME via [`WebView`](https://pub.dartlang.org/packages/webview_flutter). Available configurations:
   - `Config.webView`, default=false
   - `Config.webViewJs`, default=true
@@ -71,13 +65,12 @@ All texts will be rendered with padding (`Config.textPadding`).
   - If the IFRAME has no `width` and `height` attributes, the web view will be rendered initially in a 16:9 box and automatically resize itself afterwards.
 - IMG via [`CachedNetworkImage`](https://pub.dartlang.org/packages/cached_network_image) with padding (`Config.imagePadding`), support base url resolver
 - LI/OL/UL with marker and padding (`Config.listBullet`, `Config.listMarkerPaddingTop` and `Config.listMarkerWidth`)
-- P
-- PRE
-- STRONG
-- TABLE/TR/TD/TH with support for:
+- TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
   - `<table border="1">`
   - `<table style="border: 1px solid #f00">`
-- U
+- ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
+  DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FOOTER, HEADER, HR, I, INS,
+  KBD, MAIN, NAV, P, PRE, Q, S, SAMP, SECTION, STRIKE, STRONG, TT, U, VAR
 
 These tags and their contents will be ignored:
 
@@ -86,9 +79,10 @@ These tags and their contents will be ignored:
 
 ### Inline stylings
 
+- border-top, border-bottom: overline/underline with support for dashed/dotted/double/solid style
 - color: hex values only (`#F00`, `#0F08`, `#00FF00` or `#00FF0080`)
 - font-family
-- font-size (value in px only)
+- font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) and value in em/px
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
 - margin, margin-top, margin-right, margin-bottom, margin-left (values in px only)

@@ -48,22 +48,15 @@ class HelloWorldCoreScreen extends StatelessWidget {
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
 
 - A: underline without color, no action on tap (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
-- B
-- BR
-- CODE
-- DIV
-- EM
 - H1/H2/H3/H4/H5/H6
-- I
 - IMG: no caching, no relative url support (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
 - LI/OL/UL: no marker (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
-- P
-- PRE
-- STRONG
-- TABLE/TR/TD/TH with support for:
+- TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
   - `<table border="1">`
   - `<table style="border: 1px solid #f00">`
-- U
+- ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
+  DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FOOTER, HEADER, HR, I, INS,
+  KBD, MAIN, NAV, P, PRE, Q, S, SAMP, SECTION, STRIKE, STRONG, TT, U, VAR
 
 However, these tags and their contents will be ignored:
 
@@ -73,9 +66,10 @@ However, these tags and their contents will be ignored:
 
 ### Inline stylings
 
+- border-top, border-bottom: overline/underline with support for dashed/dotted/double/solid style
 - color: hex values only (`#F00`, `#0F08`, `#00FF00` or `#00FF0080`)
 - font-family
-- font-size (value in px only)
+- font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) and value in em/px
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
 - margin, margin-top, margin-right, margin-bottom, margin-left (values in px only)
@@ -111,23 +105,21 @@ class SmilieScreen extends StatelessWidget {
 const _kSmilies = {':)': '🙂'};
 
 class SmilieWf extends WidgetFactory {
+  final smilieOp = BuildOp(
+    onPieces: (meta, pieces) {
+      final alt = meta.buildOpElement.attributes['alt'];
+      final text = _kSmilies.containsKey(alt) ? _kSmilies[alt] : alt;
+      return pieces..first?.block?.addText(text);
+    },
+  );
+
   SmilieWf(BuildContext context) : super(context);
 
   @override
-  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
-    if (e.classes.contains('smilie') && e.attributes.containsKey('alt')) {
-      final alt = e.attributes['alt'];
-      // render alt text if mapping not found
-      // because inline image is not supported
-      final text = _kSmilies.containsKey(alt) ? _kSmilies[alt] : alt;
-      return lazySet(null,
-          buildOp: BuildOp(
-            onPieces: (_, __) => <BuiltPiece>[BuiltPieceSimple(text: text)],
-          ));
-    }
-
-    return super.parseElement(meta, e);
-  }
+  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) =>
+      e.classes.contains('smilie')
+          ? lazySet(null, buildOp: smilieOp)
+          : super.parseElement(meta, e);
 }
 ```
 

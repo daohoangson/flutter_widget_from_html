@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:html/parser.dart' as parser;
 
 import 'builder.dart' as builder;
@@ -16,7 +16,7 @@ class HtmlWidget extends StatelessWidget {
     final wf = wfBuilder != null ? wfBuilder(context) : WidgetFactory(context);
     final widgets = builder.Builder(domNodes, wf).build();
 
-    return wf.buildColumn(widgets) ?? Text(html);
+    return wf.buildBody(widgets) ?? Text(html);
   }
 }
 
