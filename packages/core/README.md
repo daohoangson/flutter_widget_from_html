@@ -33,7 +33,9 @@ const kHtml = """<h1>Heading 1</h1>
 class HelloWorldCoreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text('HelloWorldCoreScreen')),
+        appBar: AppBar(
+          title: Text('HelloWorldCoreScreen'),
+        ),
         body: HtmlWidget(kHtml),
       );
 }
