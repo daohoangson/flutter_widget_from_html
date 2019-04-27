@@ -24,6 +24,8 @@ Future<String> explain(
       html,
       hw: () => HtmlWidget(
             html,
+            bodyPadding: const EdgeInsets.all(0),
+            textPadding: const EdgeInsets.all(0),
             webView: webView,
           ),
       explainer: _explainer,

@@ -6,16 +6,32 @@ import 'core_config.dart';
 import 'core_wf.dart';
 
 class HtmlWidget extends StatelessWidget implements Config {
-  final Uri baseUrl;
   final String html;
   final WidgetFactoryBuilder wf;
 
+  final Uri baseUrl;
+  final EdgeInsets bodyPadding;
+  final EdgeInsets tableCellPadding;
+  final EdgeInsets tablePadding;
+  final EdgeInsets textPadding;
+
   const HtmlWidget(
     this.html, {
-    this.baseUrl,
-    Key key,
     this.wf,
+    Key key,
+    this.baseUrl,
+    EdgeInsets bodyPadding,
+    EdgeInsets tableCellPadding,
+    EdgeInsets tablePadding,
+    EdgeInsets textPadding,
   })  : assert(html != null),
+        this.bodyPadding =
+            bodyPadding ?? const EdgeInsets.symmetric(vertical: 10),
+        this.tableCellPadding = tableCellPadding ?? const EdgeInsets.all(5),
+        this.tablePadding =
+            tablePadding ?? const EdgeInsets.symmetric(horizontal: 10),
+        this.textPadding =
+            textPadding ?? const EdgeInsets.symmetric(horizontal: 10),
         super(key: key);
 
   @override

@@ -14,7 +14,7 @@ class TagCode {
         onPieces: (meta, pieces) => meta.buildOpElement.localName == kTagPre
             ? [_buildPreTag(meta, pieces.first.style)]
             : pieces,
-        onWidgets: (_, widgets) => wf.buildScrollView(widgets),
+        onWidgets: (_, widgets) => wf.buildScrollView(wf.buildBody(widgets)),
       );
 
   BuiltPiece _buildPreTag(NodeMetadata meta, TextStyle textStyle) =>

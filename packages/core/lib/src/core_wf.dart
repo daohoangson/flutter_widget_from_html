@@ -54,8 +54,22 @@ class WidgetFactory {
     return child != null ? Align(alignment: alignment, child: child) : null;
   }
 
-  Widget buildBody(List<Widget> children) =>
-      buildColumn(children, fixPadding: true);
+  Widget buildBody(List<Widget> children) {
+    if (_config.textPadding != null) {
+      children = children.map((child) {
+        var isText = _isText(child);
+
+        if (isText) child = buildPadding(child, _config.textPadding);
+
+        return child;
+      }).toList();
+    }
+
+    return buildPadding(
+      buildColumn(children, fixPadding: true),
+      _config.bodyPadding,
+    );
+  }
 
   Widget buildColumn(
     List<Widget> children, {
@@ -177,17 +191,18 @@ class WidgetFactory {
     return Padding(child: child, padding: padding);
   }
 
-  Widget buildScrollView(List<Widget> widgets) => SingleChildScrollView(
+  Widget buildScrollView(Widget child) => SingleChildScrollView(
+        child: child,
         scrollDirection: Axis.horizontal,
-        child: widgets.length == 1 ? widgets.first : buildColumn(widgets),
       );
 
-  Widget buildTable(List<TableRow> rows, {TableBorder border}) => Table(
-        border: border,
-        children: rows,
+  Widget buildTable(List<TableRow> rows, {TableBorder border}) => buildPadding(
+        Table(border: border, children: rows),
+        _config.tablePadding,
       );
 
-  Widget buildTableCell(Widget child) => TableCell(child: child);
+  Widget buildTableCell(Widget child) =>
+      TableCell(child: buildPadding(child, _config.tableCellPadding));
 
   Widget buildText({
     TextBlock block,
@@ -454,4 +469,13 @@ class WidgetFactory {
     _tagTable ??= TagTable(this).buildOp;
     return _tagTable;
   }
+}
+
+bool _isText(Widget widget) {
+  if (widget is Text || widget is RichText) return true;
+
+  if (widget is SingleChildRenderObjectWidget) return _isText(widget.child);
+  if (widget is GestureDetector) return _isText(widget.child);
+
+  return false;
 }

@@ -6,11 +6,15 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 Future<String> explain(
   WidgetTester tester,
   String html, {
-  Uri baseUrl,
   _WidgetExplainer explainer,
   _HtmlWidgetBuilder hw,
   String imageUrlToPrecache,
   WidgetFactoryBuilder wf,
+  Uri baseUrl,
+  double bodyVerticalPadding = 0,
+  double tableCellPadding = 0,
+  double tablePadding = 0,
+  double textHorizontalPadding = 0,
 }) async {
   final key = new UniqueKey();
 
@@ -40,7 +44,17 @@ Future<String> explain(
                   ),
               child: hw != null
                   ? hw()
-                  : HtmlWidget(html, baseUrl: baseUrl, wf: wf),
+                  : HtmlWidget(
+                      html,
+                      baseUrl: baseUrl,
+                      bodyPadding:
+                          EdgeInsets.symmetric(vertical: bodyVerticalPadding),
+                      tableCellPadding: EdgeInsets.all(tableCellPadding),
+                      tablePadding: EdgeInsets.all(tablePadding),
+                      textPadding: EdgeInsets.symmetric(
+                          horizontal: textHorizontalPadding),
+                      wf: wf,
+                    ),
             ),
           ),
         );

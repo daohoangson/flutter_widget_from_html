@@ -11,14 +11,26 @@ class HtmlWidget extends core.HtmlWidget implements Config {
 
   const HtmlWidget(
     String html, {
-    Key key,
     core.WidgetFactoryBuilder wf,
-    this.webView = false,
-    this.webViewJs = true,
-  }) : super(
+    Key key,
+    Uri baseUrl,
+    EdgeInsets bodyPadding,
+    EdgeInsets tableCellPadding,
+    EdgeInsets tablePadding,
+    EdgeInsets textPadding,
+    bool webView,
+    bool webViewJs,
+  })  : this.webView = webView ?? false,
+        this.webViewJs = webViewJs ?? true,
+        super(
           html,
-          key: key,
           wf: wf,
+          key: key,
+          baseUrl: baseUrl,
+          bodyPadding: bodyPadding,
+          tableCellPadding: tableCellPadding,
+          tablePadding: tablePadding,
+          textPadding: textPadding,
         );
 
   core.WidgetFactory initFactory(BuildContext context) =>
