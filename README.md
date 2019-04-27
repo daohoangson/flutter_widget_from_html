@@ -19,12 +19,8 @@ See the [Example app](https://github.com/daohoangson/flutter_widget_from_html/tr
 Note: `HtmlWidget.config` is optional, see dartdoc for all available configuration keys and their default values.
 
 ```dart
-class HelloWorldScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text('HelloWorldScreen')),
-        body: HtmlWidget(
-          """<h1>Heading</h1>
+const kHtml = """
+<h1>Heading</h1>
 <p>A paragraph with <strong>strong</strong> <em>emphasized</em> text.</p>
 <ol>
   <li>List item number one</li>
@@ -39,8 +35,17 @@ class HelloWorldScreen extends StatelessWidget {
 </ol>
 <p>And YouTube video!</p>
 <iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="560" height="315"></iframe>
-""",
-          config: Config(webView: true),
+""";
+
+class HelloWorldScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: Text('HelloWorldScreen'),
+        ),
+        body: HtmlWidget(
+          kHtml,
+          webView: true,
         ),
       );
 }
@@ -53,18 +58,17 @@ class HelloWorldScreen extends StatelessWidget {
 ### HTML tags
 
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
-All texts will be rendered with padding (`Config.textPadding`).
 
-- A: underline with theme accent color, launch url via [`url_launcher`](https://pub.dartlang.org/packages/url_launcher), support base url resolver. Override `WidgetFactory.buildGestureTapCallbackForUrl` if you want to do something else onTap.
+- A: underline with theme accent color, launch url via [`url_launcher`](https://pub.dartlang.org/packages/url_launcher), support base url resolver. Override `WidgetFactory::buildGestureTapCallbackForUrl` if you want to do something else onTap.
 - H1/H2/H3/H4/H5/H6
 - IFRAME via [`WebView`](https://pub.dartlang.org/packages/webview_flutter). Available configurations:
-  - `Config.webView`, default=false
-  - `Config.webViewJs`, default=true
-  - `Config.webViewPadding`
+  - `.webView`, default=false
+  - `.webViewJs`, default=true
+  - `.webViewPadding`
   - To render IFRAME as web view: set `webView=true` in config and [setup iOS project manually](https://pub.dartlang.org/packages/webview_flutter#ios).
   - If the IFRAME has no `width` and `height` attributes, the web view will be rendered initially in a 16:9 box and automatically resize itself afterwards.
-- IMG via [`CachedNetworkImage`](https://pub.dartlang.org/packages/cached_network_image) with padding (`Config.imagePadding`), support base url resolver
-- LI/OL/UL with marker and padding (`Config.listBullet`, `Config.listMarkerPaddingTop` and `Config.listMarkerWidth`)
+- IMG via [`CachedNetworkImage`](https://pub.dartlang.org/packages/cached_network_image), support base url resolver
+- LI/OL/UL
 - TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
   - `<table border="1">`
   - `<table style="border: 1px solid #f00">`

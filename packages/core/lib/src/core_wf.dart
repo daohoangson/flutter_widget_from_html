@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'core_config.dart';
 import 'data_classes.dart';
 import 'parser.dart' as parser;
 
@@ -12,13 +13,18 @@ part 'ops/style_text_align.dart';
 part 'ops/tag_a.dart';
 part 'ops/tag_code.dart';
 part 'ops/tag_img.dart';
+part 'ops/tag_li.dart';
 part 'ops/tag_table.dart';
 part 'ops/text.dart';
 
+final _baseUriTrimmingRegExp = RegExp(r'/+$');
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
+final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
 
 class WidgetFactory {
   final BuildContext context;
+
+  Config _config;
 
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
@@ -28,6 +34,7 @@ class WidgetFactory {
   BuildOp _tagCode;
   BuildOp _tagHr;
   BuildOp _tagImg;
+  BuildOp _tagLi;
   BuildOp _tagQ;
   BuildOp _tagTable;
 
@@ -36,28 +43,39 @@ class WidgetFactory {
   double get defaultFontSize => defaultTextStyle.fontSize;
   TextStyle get defaultTextStyle => DefaultTextStyle.of(context).style;
 
+  set config(Config config) {
+    assert(_config == null);
+    assert(config != null);
+    _config = config;
+  }
+
   Widget buildAlign(Widget child, Alignment alignment) {
     if (alignment == null) return child;
     return child != null ? Align(alignment: alignment, child: child) : null;
   }
 
-  Widget buildBody(List<Widget> children) =>
-      buildColumn(children, fixPadding: true);
+  Widget buildBody(List<Widget> children) {
+    if (_config.textPadding != EdgeInsets.all(0)) {
+      children = children
+          .map((child) => checkWidgetIsText(child)
+              ? buildPadding(child, _config.textPadding)
+              : child)
+          .toList();
+    }
 
-  Widget buildColumn(
-    List<Widget> children, {
-    bool fixPadding = false,
-  }) {
-    if (children?.isNotEmpty != true) return null;
-    final fixed = fixPadding ? fixOverlappingPaddings(children) : children;
+    children = fixOverlappingPaddings(children);
 
-    return fixed.length == 1
-        ? fixed.first
-        : Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: fixed,
-          );
+    return buildPadding(buildColumn(children), _config.bodyPadding);
   }
+
+  Widget buildColumn(List<Widget> children) => children?.isNotEmpty == true
+      ? children.length == 1
+          ? children.first
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: children,
+            )
+      : null;
 
   Widget buildDecoratedBox(
     Widget child, {
@@ -164,17 +182,18 @@ class WidgetFactory {
     return Padding(child: child, padding: padding);
   }
 
-  Widget buildScrollView(List<Widget> widgets) => SingleChildScrollView(
+  Widget buildScrollView(Widget child) => SingleChildScrollView(
+        child: child,
         scrollDirection: Axis.horizontal,
-        child: widgets.length == 1 ? widgets.first : buildColumn(widgets),
       );
 
-  Widget buildTable(List<TableRow> rows, {TableBorder border}) => Table(
-        border: border,
-        children: rows,
+  Widget buildTable(List<TableRow> rows, {TableBorder border}) => buildPadding(
+        Table(border: border, children: rows),
+        _config.tablePadding,
       );
 
-  Widget buildTableCell(Widget child) => TableCell(child: child);
+  Widget buildTableCell(Widget child) =>
+      TableCell(child: buildPadding(child, _config.tableCellPadding));
 
   Widget buildText({
     TextBlock block,
@@ -263,7 +282,89 @@ class WidgetFactory {
     );
   }
 
-  String constructFullUrl(String url) => null;
+  bool checkWidgetIsText(Widget widget) {
+    if (widget is Text || widget is RichText) return true;
+
+    if (widget is SingleChildRenderObjectWidget)
+      return checkWidgetIsText(widget.child);
+    if (widget is GestureDetector) return checkWidgetIsText(widget.child);
+
+    return false;
+  }
+
+  String constructFullUrl(String url) {
+    if (url?.isNotEmpty != true) return null;
+    if (url.startsWith(_isFullUrlRegExp)) return url;
+
+    final b = _config?.baseUrl;
+    if (b == null) return null;
+
+    if (url.startsWith('//')) return "${b.scheme}:$url";
+
+    if (url.startsWith('/')) {
+      final port = b.hasPort ? ":${b.port}" : '';
+      return "${b.scheme}://${b.host}$port$url";
+    }
+
+    return "${b.toString().replaceAll(_baseUriTrimmingRegExp, '')}/$url";
+  }
+
+  List<Widget> fixOverlappingPaddings(List<Widget> widgets) {
+    final fixed = <Widget>[];
+
+    int i = 0;
+    EdgeInsets prev;
+    final length = widgets.length;
+    for (final widget in widgets) {
+      i++;
+      if (!(widget is Padding)) {
+        fixed.add(widget);
+        continue;
+      }
+
+      final p = widget as Padding;
+      final pp = p.padding as EdgeInsets;
+      var v = pp;
+
+      if (i == 1 && v.top > 0) {
+        // remove padding at the top
+        v = v.copyWith(top: 0);
+      }
+
+      if (i == length && v.bottom > 0) {
+        // remove padding at the bottom
+        v = v.copyWith(bottom: 0);
+      }
+
+      if (prev != null && prev.bottom > 0 && v.top > 0) {
+        if (v.top > prev.bottom) {
+          v = v.copyWith(top: v.top - prev.bottom);
+        } else {
+          v = v.copyWith(top: 0);
+        }
+      }
+
+      fixed.add(v != pp
+          ? v == const EdgeInsets.all(0)
+              ? p.child
+              : Padding(child: p.child, padding: v)
+          : widget);
+      prev = v;
+    }
+
+    return fixed;
+  }
+
+  String getListStyleMarker(String type, int i) {
+    switch (type) {
+      case kCssListStyleTypeDecimal:
+        return "$i.";
+      case kCssListStyleTypeDisc:
+        return '•';
+    }
+
+    return '';
+  }
 
   NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     switch (e.localName) {
@@ -287,6 +388,12 @@ class WidgetFactory {
 
       case 'img':
         meta = lazySet(meta, buildOp: tagImg());
+        break;
+
+      case kTagListItem:
+      case kTagOrderedList:
+      case kTagUnorderedList:
+        meta = lazySet(meta, buildOp: tagLi());
         break;
 
       case 'q':
@@ -352,7 +459,7 @@ class WidgetFactory {
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      getInlineStyles: (_) => ['margin-bottom', '1em'],
+      getInlineStyles: (_, __) => ['margin-bottom', '1em'],
       onWidgets: (_, __) => Container(),
     );
     return _tagBr;
@@ -365,7 +472,7 @@ class WidgetFactory {
 
   BuildOp tagHr() {
     _tagHr ??= BuildOp(
-      getInlineStyles: (e) => const [kCssMarginBottom, '1em'],
+      getInlineStyles: (_, __) => const [kCssMarginBottom, '1em'],
       onWidgets: (_, __) => buildDivider(),
     );
     return _tagHr;
@@ -374,6 +481,11 @@ class WidgetFactory {
   BuildOp tagImg() {
     _tagImg ??= TagImg(this).buildOp;
     return _tagImg;
+  }
+
+  BuildOp tagLi() {
+    _tagLi ??= TagLi(this).buildOp;
+    return _tagLi;
   }
 
   BuildOp tagQ() {

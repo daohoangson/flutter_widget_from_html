@@ -14,9 +14,7 @@ class StyleTextAlign {
   BuildOp get buildOp => BuildOp(
         onPieces: (meta, pieces) {
           String v;
-          meta.forEachInlineStyle(
-            (k, _v) => k == kCssTextAlign ? v = _v : null,
-          );
+          meta.styles((k, _v) => k == kCssTextAlign ? v = _v : null);
           if (v == null) return pieces;
 
           final widgets = pieces.map(

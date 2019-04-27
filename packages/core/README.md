@@ -19,13 +19,7 @@ See the [Example app](https://github.com/daohoangson/flutter_widget_from_html/tr
 ### Example
 
 ```dart
-class HelloWorldCoreScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text('HelloWorldCoreScreen'),
-        ),
-        body: HtmlWidget("""<h1>Heading 1</h1>
+const kHtml = """<h1>Heading 1</h1>
 <h2>Heading 2</h2>
 <h3>Heading 3</h3>
 <h4>Heading 4</h4>
@@ -34,7 +28,15 @@ class HelloWorldCoreScreen extends StatelessWidget {
 <p>A paragraph with <strong>strong</strong> <em>emphasized</em> text.</p>
 <p>And of course, cat image: <img src="https://media.giphy.com/media/6VoDJzfRjJNbG/giphy-downsized.gif" /></p>
 <div style="text-align: center">Source: <a href="https://gph.is/QFgPA0">https://gph.is/QFgPA0</a></div>
-"""),
+""";
+
+class HelloWorldCoreScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: Text('HelloWorldCoreScreen'),
+        ),
+        body: HtmlWidget(kHtml),
       );
 }
 ```
@@ -47,10 +49,10 @@ class HelloWorldCoreScreen extends StatelessWidget {
 
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
 
-- A: underline with no default onTap action (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that). Or override `WidgetFactory.buildGestureTapCallbackForUrl` yourself.
+- A: underline with no default onTap action (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that). Or override `WidgetFactory::buildGestureTapCallbackForUrl` yourself.
 - H1/H2/H3/H4/H5/H6
 - IMG: no caching, no relative url support (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
-- LI/OL/UL: no marker (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
+- LI/OL/UL
 - TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
   - `<table border="1">`
   - `<table style="border: 1px solid #f00">`
@@ -97,7 +99,7 @@ class SmilieScreen extends StatelessWidget {
         ),
         body: HtmlWidget(
           '<p>Hello <img class="smilie smilie-1" alt=":)" src="http://domain.com/sprites.png" />!</p>',
-          wfBuilder: (context) => SmilieWf(context),
+          wf: (context) => SmilieWf(context),
         ),
       );
 }

@@ -10,9 +10,7 @@ class StyleBgColor {
   BuildOp get buildOp => BuildOp(
         onPieces: (meta, pieces) {
           String value;
-          meta.forEachInlineStyle(
-            (k, v) => k == kCssBackgroundColor ? value = v : null,
-          );
+          meta.styles((k, v) => k == kCssBackgroundColor ? value = v : null);
           if (value == null) return pieces;
 
           final bgColor = parser.colorParseValue(value);

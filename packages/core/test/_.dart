@@ -3,22 +3,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
-typedef String WidgetExplainer(Widget widget);
-
-Future<String> explain(WidgetTester tester, String html,
-    {HtmlWidget hw, WidgetExplainer explainer}) async {
+Future<String> explain(
+  WidgetTester tester,
+  String html, {
+  _WidgetExplainer explainer,
+  _HtmlWidgetBuilder hw,
+  String imageUrlToPrecache,
+  WidgetFactoryBuilder wf,
+  Uri baseUrl,
+  double bodyVerticalPadding = 0,
+  double tableCellPadding = 0,
+  double tablePadding = 0,
+  double textHorizontalPadding = 0,
+}) async {
   final key = new UniqueKey();
 
   await tester.pumpWidget(
     StatefulBuilder(
       builder: (BuildContext context, StateSetter setState) {
-        precacheImage(
-          NetworkImage("image.png"),
-          context,
-          onError: (dynamic exception, StackTrace stackTrace) {
-            // this is required to avoid http 400 error for Image.network instances
-          },
-        );
+        if (imageUrlToPrecache != null) {
+          precacheImage(
+            NetworkImage(imageUrlToPrecache),
+            context,
+            onError: (dynamic exception, StackTrace stackTrace) {
+              // this is required to avoid http 400 error for Image.network instances
+            },
+          );
+        }
 
         return MaterialApp(
           theme: ThemeData(
@@ -31,7 +42,19 @@ Future<String> explain(WidgetTester tester, String html,
                     fontSize: 10.0,
                     fontWeight: FontWeight.normal,
                   ),
-              child: hw ?? HtmlWidget(html),
+              child: hw != null
+                  ? hw()
+                  : HtmlWidget(
+                      html,
+                      baseUrl: baseUrl,
+                      bodyPadding:
+                          EdgeInsets.symmetric(vertical: bodyVerticalPadding),
+                      tableCellPadding: EdgeInsets.all(tableCellPadding),
+                      tablePadding: EdgeInsets.all(tablePadding),
+                      textPadding: EdgeInsets.symmetric(
+                          horizontal: textHorizontalPadding),
+                      wf: wf,
+                    ),
             ),
           ),
         );
@@ -51,15 +74,26 @@ Future<String> explain(WidgetTester tester, String html,
 final _explainMarginRegExp =
     RegExp(r'^\[Column:children=\[Text:x\],(.+),\[Text:x\]\]$');
 
-Future<String> explainMargin(WidgetTester tester, String html) async {
-  final explained = await explain(tester, "x${html}x");
+Future<String> explainMargin(
+  WidgetTester tester,
+  String html, {
+  String imageUrlToPrecache,
+}) async {
+  final explained = await explain(
+    tester,
+    "x${html}x",
+    imageUrlToPrecache: imageUrlToPrecache,
+  );
   final match = _explainMarginRegExp.firstMatch(explained);
   return match == null ? explained : match[1];
 }
 
+typedef String _WidgetExplainer(Widget widget);
+typedef HtmlWidget _HtmlWidgetBuilder();
+
 class _Explainer {
   final BuildContext context;
-  final WidgetExplainer explainer;
+  final _WidgetExplainer explainer;
   final TextStyle _defaultStyle;
 
   _Explainer(this.context, {this.explainer})

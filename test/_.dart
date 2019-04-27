@@ -14,14 +14,19 @@ String _explainer(Widget widget) {
   return null;
 }
 
-Future<String> explain(WidgetTester tester, String html,
-        {Config config}) async =>
+Future<String> explain(
+  WidgetTester tester,
+  String html, {
+  bool webView = false,
+}) async =>
     _coreTesting.explain(
       tester,
-      null,
-      hw: HtmlWidget(
-        html,
-        config: config ?? const Config(bodyPadding: null),
-      ),
+      html,
+      hw: () => HtmlWidget(
+            html,
+            bodyPadding: const EdgeInsets.all(0),
+            textPadding: const EdgeInsets.all(0),
+            webView: webView,
+          ),
       explainer: _explainer,
     );

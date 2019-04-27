@@ -3,19 +3,37 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
     as core;
 
 import 'config.dart';
-import 'widget_factory.dart';
+import 'widget_factory.dart' as extended;
 
-class HtmlWidget extends core.HtmlWidget {
-  final Config config;
+class HtmlWidget extends core.HtmlWidget implements Config {
+  final bool webView;
+  final bool webViewJs;
 
-  HtmlWidget(
+  const HtmlWidget(
     String html, {
-    this.config = const Config(),
+    core.WidgetFactoryBuilder wf,
     Key key,
-    core.WidgetFactoryBuilder wfBuilder,
-  }) : super(
+    Uri baseUrl,
+    EdgeInsets bodyPadding,
+    EdgeInsets tableCellPadding,
+    EdgeInsets tablePadding,
+    EdgeInsets textPadding,
+    bool webView,
+    bool webViewJs,
+  })  : this.webView = webView ?? false,
+        this.webViewJs = webViewJs ?? true,
+        super(
           html,
+          wf: wf,
           key: key,
-          wfBuilder: wfBuilder ?? (c) => WidgetFactory(c, config: config),
+          baseUrl: baseUrl,
+          bodyPadding: bodyPadding,
+          tableCellPadding: tableCellPadding,
+          tablePadding: tablePadding,
+          textPadding: textPadding,
         );
+
+  core.WidgetFactory initFactory(BuildContext context) =>
+      (wf != null ? wf(context) : extended.WidgetFactory(context))
+        ..config = this;
 }

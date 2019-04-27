@@ -70,59 +70,6 @@ void main() {
     expect(explained, startsWith('[Padding:(0,0,10,0)'));
   });
 
-  group('IMG tag', () {
-    testWidgets('renders src', (WidgetTester tester) async {
-      final html = '<img src="image.png" />';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[Image:image=[NetworkImage:url=image.png]]'));
-    });
-
-    testWidgets('renders data-src', (WidgetTester tester) async {
-      final html = '<img data-src="image.png" />';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[Image:image=[NetworkImage:url=image.png]]'));
-    });
-
-    testWidgets('renders data uri', (WidgetTester tester) async {
-      // https://stackoverflow.com/questions/6018611/smallest-data-uri-image-possible-for-a-transparent-image
-      final html = '<img src="data:image/gif;base64,' +
-          'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[Image:image=[MemoryImage:]]'));
-    });
-
-    testWidgets('renders alt', (WidgetTester tester) async {
-      final html = '<img alt="Foo" />';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[Text:Foo]'));
-    });
-
-    testWidgets('renders title', (WidgetTester tester) async {
-      final html = '<img title="Foo" />';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[Text:Foo]'));
-    });
-
-    testWidgets('renders dimensions', (WidgetTester tester) async {
-      final html = '<img src="image.png" width="800" height="600" />';
-      final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[AspectRatio:aspectRatio=1.33,' +
-              'child=[Image:image=[NetworkImage:url=image.png]]]'));
-    });
-
-    testWidgets('renders between texts', (WidgetTester tester) async {
-      final html = 'Before text. <img src="image.png" /> After text.';
-      final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[Column:children=[Text:Before text.],' +
-              '[Image:image=[NetworkImage:url=image.png]],' +
-              '[Text:After text.]]'));
-    });
-  });
-
   group('Q tag', () {
     testWidgets('renders quotes', (WidgetTester tester) async {
       final html = 'Someone said <q>Foo</q>.';
@@ -143,38 +90,6 @@ void main() {
         actual,
         equals('[RichText:(:Someone said (+u+i:“F)(+u:o)(+u+b:o”)(:.))]'),
       );
-    });
-  });
-
-  group('lists', () {
-    testWidgets('renders ordered list', (WidgetTester tester) async {
-      final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';
-      final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[Column:children=[Text:One],' +
-              '[Text:Two],[RichText:(+b:Three)]]'));
-    });
-
-    testWidgets('renders unordered list', (WidgetTester tester) async {
-      final html = '<ul><li>One</li><li>Two</li><li><em>Three</em></li><ul>';
-      final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[Column:children=[Text:One],' +
-              '[Text:Two],[RichText:(+i:Three)]]'));
-    });
-
-    testWidgets('renders nested list', (WidgetTester tester) async {
-      final html = '<ol><li>One</li><li>Two</li><li>Three ' +
-          '<ul><li>3.1</li><li>3.2</li></ul></li><li>Four</li><ol>';
-      final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[Column:children=[Text:One],' +
-              '[Text:Two],' +
-              '[Text:Three],[Text:3.1],[Text:3.2],' +
-              '[Text:Four]]'));
     });
   });
 
@@ -226,7 +141,11 @@ void main() {
   <figcaption><i>fig. 1</i> Foo</figcaption>
 </figure>
 """;
-      final explained = await explainMargin(tester, html);
+      final explained = await explainMargin(
+        tester,
+        html,
+        imageUrlToPrecache: 'image.png',
+      );
       expect(
         explained,
         equals('[Padding:(10,40,10,40),child=[Column:children=' +

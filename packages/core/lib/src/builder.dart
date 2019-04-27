@@ -38,20 +38,28 @@ class Builder {
         ? p.widgets.forEach(addWidget)
         : addWidget(wf.buildText(block: p.block)));
 
-    parentMeta?.forEachOp((o) => widgets = o.onWidgets(parentMeta, widgets));
+    parentMeta?.ops((o) => widgets = o.onWidgets(parentMeta, widgets));
 
     return widgets;
   }
 
   NodeMetadata collectMetadata(dom.Element e) {
-    var meta = wf.parseElement(null, e);
+    NodeMetadata meta;
 
-    meta?.forEachOp((o) => lazySet(meta, inlineStyles: o.getInlineStyles(e)));
+    parentMeta?.keys((k) => meta = lazySet(meta, key: k));
+
+    meta = wf.parseElement(meta, e);
+
+    meta?.ops((o) => lazySet(
+          meta,
+          inlineStyles: o.getInlineStyles(meta, e),
+          inlineStylesPrepend: true,
+        ));
     if (e.attributes.containsKey('style')) {
       _attrStyleRegExp.allMatches(e.attributes['style']).forEach((m) =>
           meta = lazySet(meta, inlineStyles: [m[1].trim(), m[2].trim()]));
     }
-    meta?.forEachInlineStyle((k, v) => meta = wf.parseElementStyle(meta, k, v));
+    meta?.styles((k, v) => meta = wf.parseElementStyle(meta, k, v));
 
     meta?.freezeOps(e)?.forEach((o) => o.collectMetadata(meta));
 
@@ -112,7 +120,7 @@ class Builder {
     _saveTextPiece();
 
     Iterable<BuiltPiece> output = _pieces;
-    parentMeta?.forEachOp((o) => output = o.onPieces(parentMeta, output));
+    parentMeta?.ops((o) => output = o.onPieces(parentMeta, output));
     return output;
   }
 

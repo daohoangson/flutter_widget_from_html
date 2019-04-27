@@ -12,15 +12,13 @@ class TagIframe {
     final a = e.attributes;
     if (!a.containsKey('src')) return null;
 
-    final config = wf.config;
     final src = wf.constructFullUrl(a['src']);
     if (src == null) return null;
-    if (!config.webView) return wf.buildWebViewLinkOnly(src);
 
     return wf.buildWebView(
       src,
-      height: a.containsKey("height") ? double.tryParse(a["height"]) : null,
-      width: a.containsKey("width") ? double.tryParse(a["width"]) : null,
+      height: a.containsKey('height') ? double.tryParse(a['height']) : null,
+      width: a.containsKey('width') ? double.tryParse(a['width']) : null,
     );
   }
 }

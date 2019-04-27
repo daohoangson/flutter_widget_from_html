@@ -15,8 +15,10 @@ NodeMetadata lazySet(
   bool fontStyleItalic,
   FontWeight fontWeight,
   Iterable<String> inlineStyles,
+  bool inlineStylesPrepend = false,
   bool isBlockElement,
   bool isNotRenderable,
+  Key key,
 }) {
   meta ??= NodeMetadata();
 
@@ -27,9 +29,12 @@ NodeMetadata lazySet(
       ops.add(buildOp);
     }
   }
+
   if (color != null) meta.color = color;
+
   if (decorationLineThrough != null)
     meta.decorationLineThrough = decorationLineThrough;
+
   if (decorationOverline != null) meta.decorationOverline = decorationOverline;
   if (decorationStyle != null) meta.decorationStyle = decorationStyle;
   if (decorationStyleFromCssBorderStyle != null) {
@@ -48,12 +53,15 @@ NodeMetadata lazySet(
         break;
     }
   }
+
   if (decorationUnderline != null)
     meta.decorationUnderline = decorationUnderline;
+
   if (fontFamily != null) meta.fontFamily = fontFamily;
   if (fontSize != null) meta.fontSize = fontSize;
   if (fontStyleItalic != null) meta.fontStyleItalic = fontStyleItalic;
   if (fontWeight != null) meta.fontWeight = fontWeight;
+
   if (inlineStyles != null) {
     if (inlineStyles.length % 2 != 0) {
       throw new ArgumentError('inlineStyles must have an even number of items');
@@ -62,10 +70,20 @@ NodeMetadata lazySet(
       throw new StateError('inlineStyles has already been frozen');
     }
     meta._inlineStyles ??= [];
-    meta._inlineStyles.addAll(inlineStyles);
+    if (inlineStylesPrepend) {
+      meta._inlineStyles.insertAll(0, inlineStyles);
+    } else {
+      meta._inlineStyles.addAll(inlineStyles);
+    }
   }
+
   if (isBlockElement != null) meta._isBlockElement = isBlockElement;
   if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
+
+  if (key != null) {
+    meta._keys ??= [];
+    meta._keys.add(key);
+  }
 
   return meta;
 }
@@ -95,8 +113,8 @@ class BuildOp {
   void collectMetadata(NodeMetadata meta) =>
       _collectMetadata != null ? _collectMetadata(meta) : null;
 
-  List<String> getInlineStyles(dom.Element e) =>
-      _getInlineStyles != null ? _getInlineStyles(e) : null;
+  List<String> getInlineStyles(NodeMetadata meta, dom.Element e) =>
+      _getInlineStyles != null ? _getInlineStyles(meta, e) : null;
 
   Iterable<BuiltPiece> onPieces(
     NodeMetadata meta,
@@ -115,7 +133,7 @@ class BuildOp {
 }
 
 typedef void BuildOpCollectMetadata(NodeMetadata meta);
-typedef List<String> BuildOpGetInlineStyles(dom.Element e);
+typedef List<String> BuildOpGetInlineStyles(NodeMetadata meta, dom.Element e);
 typedef Iterable<BuiltPiece> BuildOpOnPieces(
   NodeMetadata meta,
   Iterable<BuiltPiece> pieces,
@@ -187,6 +205,7 @@ class NodeMetadata {
   dom.Element _buildOpElement;
   TextStyle _buildOpTextStyle;
   Iterable<BuildOp> _buildOps;
+  List<Key> _keys;
   Color color;
   bool decorationLineThrough;
   bool decorationOverline;
@@ -225,20 +244,6 @@ class NodeMetadata {
     return _buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
   }
 
-  void forEachInlineStyle(void f(String key, String value)) {
-    _inlineStylesFrozen = true;
-    if (_inlineStyles == null) return;
-
-    final iterator = _inlineStyles.iterator;
-    while (iterator.moveNext()) {
-      final key = iterator.current;
-      if (!iterator.moveNext()) return;
-      f(key, iterator.current);
-    }
-  }
-
-  void forEachOp(void f(BuildOp element)) => _buildOps?.forEach(f);
-
   Iterable<BuildOp> freezeOps(dom.Element e) {
     if (_buildOps == null) return null;
 
@@ -257,6 +262,22 @@ class NodeMetadata {
     }
 
     _buildOpTextStyle = textStyle;
+  }
+
+  void keys(void f(Key key)) => _keys?.forEach(f);
+
+  void ops(void f(BuildOp element)) => _buildOps?.forEach(f);
+
+  void styles(void f(String key, String value)) {
+    _inlineStylesFrozen = true;
+    if (_inlineStyles == null) return;
+
+    final iterator = _inlineStyles.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current;
+      if (!iterator.moveNext()) return;
+      f(key, iterator.current);
+    }
   }
 }
 

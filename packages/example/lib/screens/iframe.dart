@@ -36,7 +36,7 @@ class _State extends State<IframeScreen> {
           CheckboxListTile(
             value: webView,
             onChanged: (v) => setState(() => webView = v),
-            title: const Text('Config.webView'),
+            title: const HtmlWidget('<var>.webView</var>'),
             subtitle: const Text('Renders web view, default ❌'),
           ),
           CheckboxListTile(
@@ -45,16 +45,14 @@ class _State extends State<IframeScreen> {
                   if (v) webView = true;
                   webViewJs = v;
                 }),
-            title: const Text('Config.webViewJs'),
+            title: const HtmlWidget('<var>.webViewJs</var>'),
             subtitle: const Text('Allows JavaScript execution, default ✅'),
           ),
           HtmlWidget(
             html,
-            config: Config(
-              webView: webView,
-              webViewJs: webViewJs,
-            ),
             key: Key("$webView$webViewJs"),
+            webView: webView,
+            webViewJs: webViewJs,
           ),
         ]),
       );
