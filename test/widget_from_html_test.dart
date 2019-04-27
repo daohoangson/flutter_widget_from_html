@@ -17,6 +17,12 @@ void main() {
         equals('[Padding:(0,10,0,10),child=[RichText:(:Hi (+b:there)(:!))]]'));
   });
 
+  testWidgets('renders HR tag', (WidgetTester tester) async {
+    final html = '<hr/>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[Divider:]'));
+  });
+
   group('IMG tag', () {
     final configImg = Config(
       baseUrl: Uri.parse('http://base.com/path'),
