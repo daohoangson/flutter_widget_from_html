@@ -55,36 +55,27 @@ class WidgetFactory {
   }
 
   Widget buildBody(List<Widget> children) {
-    if (_config.textPadding != null) {
-      children = children.map((child) {
-        var isText = _isText(child);
-
-        if (isText) child = buildPadding(child, _config.textPadding);
-
-        return child;
-      }).toList();
+    if (_config.textPadding != EdgeInsets.all(0)) {
+      children = children
+          .map((child) => checkWidgetIsText(child)
+              ? buildPadding(child, _config.textPadding)
+              : child)
+          .toList();
     }
 
-    return buildPadding(
-      buildColumn(children, fixPadding: true),
-      _config.bodyPadding,
-    );
+    children = fixOverlappingPaddings(children);
+
+    return buildPadding(buildColumn(children), _config.bodyPadding);
   }
 
-  Widget buildColumn(
-    List<Widget> children, {
-    bool fixPadding = false,
-  }) {
-    if (children?.isNotEmpty != true) return null;
-    final fixed = fixPadding ? fixOverlappingPaddings(children) : children;
-
-    return fixed.length == 1
-        ? fixed.first
-        : Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: fixed,
-          );
-  }
+  Widget buildColumn(List<Widget> children) => children?.isNotEmpty == true
+      ? children.length == 1
+          ? children.first
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: children,
+            )
+      : null;
 
   Widget buildDecoratedBox(
     Widget child, {
@@ -291,6 +282,16 @@ class WidgetFactory {
     );
   }
 
+  bool checkWidgetIsText(Widget widget) {
+    if (widget is Text || widget is RichText) return true;
+
+    if (widget is SingleChildRenderObjectWidget)
+      return checkWidgetIsText(widget.child);
+    if (widget is GestureDetector) return checkWidgetIsText(widget.child);
+
+    return false;
+  }
+
   String constructFullUrl(String url) {
     if (url?.isNotEmpty != true) return null;
     if (url.startsWith(_isFullUrlRegExp)) return url;
@@ -306,6 +307,52 @@ class WidgetFactory {
     }
 
     return "${b.toString().replaceAll(_baseUriTrimmingRegExp, '')}/$url";
+  }
+
+  List<Widget> fixOverlappingPaddings(List<Widget> widgets) {
+    final fixed = <Widget>[];
+
+    int i = 0;
+    EdgeInsets prev;
+    final length = widgets.length;
+    for (final widget in widgets) {
+      i++;
+      if (!(widget is Padding)) {
+        fixed.add(widget);
+        continue;
+      }
+
+      final p = widget as Padding;
+      final pp = p.padding as EdgeInsets;
+      var v = pp;
+
+      if (i == 1 && v.top > 0) {
+        // remove padding at the top
+        v = v.copyWith(top: 0);
+      }
+
+      if (i == length && v.bottom > 0) {
+        // remove padding at the bottom
+        v = v.copyWith(bottom: 0);
+      }
+
+      if (prev != null && prev.bottom > 0 && v.top > 0) {
+        if (v.top > prev.bottom) {
+          v = v.copyWith(top: v.top - prev.bottom);
+        } else {
+          v = v.copyWith(top: 0);
+        }
+      }
+
+      fixed.add(v != pp
+          ? v == const EdgeInsets.all(0)
+              ? p.child
+              : Padding(child: p.child, padding: v)
+          : widget);
+      prev = v;
+    }
+
+    return fixed;
   }
 
   String getListStyleMarker(String type, int i) {
@@ -469,13 +516,4 @@ class WidgetFactory {
     _tagTable ??= TagTable(this).buildOp;
     return _tagTable;
   }
-}
-
-bool _isText(Widget widget) {
-  if (widget is Text || widget is RichText) return true;
-
-  if (widget is SingleChildRenderObjectWidget) return _isText(widget.child);
-  if (widget is GestureDetector) return _isText(widget.child);
-
-  return false;
 }
