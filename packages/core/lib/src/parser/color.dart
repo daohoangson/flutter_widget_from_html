@@ -1,4 +1,6 @@
-part of '../parser.dart';
+part of '../core_widget_factory.dart';
+
+const kCssColor = 'color';
 
 final _colorRegExp = RegExp(r'^#([a-f0-9]{3,8})$', caseSensitive: false);
 

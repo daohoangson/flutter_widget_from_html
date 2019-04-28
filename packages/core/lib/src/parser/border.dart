@@ -1,4 +1,8 @@
-part of '../parser.dart';
+part of '../core_widget_factory.dart';
+
+const kCssBorder = 'border';
+const kCssBorderBottom = 'border-bottom';
+const kCssBorderTop = 'border-top';
 
 final _borderValuesThreeRegExp = RegExp(r'^(.+)\s+(.+)\s+(.+)$');
 final _borderValuesTwoRegExp = RegExp(r'^(.+)\s+(.+)$');

@@ -1,4 +1,4 @@
-part of '../core_wf.dart';
+part of '../core_widget_factory.dart';
 
 const kTagCode = 'code';
 const kTagPre = 'pre';

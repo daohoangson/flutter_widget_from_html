@@ -1,4 +1,4 @@
-part of '../core_wf.dart';
+part of '../core_widget_factory.dart';
 
 const kCssBackgroundColor = 'background-color';
 
@@ -13,7 +13,7 @@ class StyleBgColor {
           meta.styles((k, v) => k == kCssBackgroundColor ? value = v : null);
           if (value == null) return pieces;
 
-          final bgColor = parser.colorParseValue(value);
+          final bgColor = colorParseValue(value);
           if (bgColor == null) return pieces;
 
           return pieces.map(

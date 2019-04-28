@@ -1,4 +1,4 @@
-part of '../core_wf.dart';
+part of '../core_widget_factory.dart';
 
 const kCssTextAlign = 'text-align';
 const kCssTextAlignCenter = 'center';

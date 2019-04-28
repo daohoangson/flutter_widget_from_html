@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'core_wf.dart';
+import 'core_widget_factory.dart';
 import 'data_classes.dart';
 
 final _attrStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');

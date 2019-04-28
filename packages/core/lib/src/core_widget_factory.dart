@@ -5,7 +5,6 @@ import 'package:html/dom.dart' as dom;
 
 import 'core_config.dart';
 import 'data_classes.dart';
-import 'parser.dart' as parser;
 
 part 'ops/style_bg_color.dart';
 part 'ops/style_margin.dart';
@@ -16,6 +15,10 @@ part 'ops/tag_img.dart';
 part 'ops/tag_li.dart';
 part 'ops/tag_table.dart';
 part 'ops/text.dart';
+
+part 'parser/border.dart';
+part 'parser/color.dart';
+part 'parser/css.dart';
 
 final _baseUriTrimmingRegExp = RegExp(r'/+$');
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
@@ -218,21 +221,18 @@ class WidgetFactory {
     if (meta.hasDecoration != true) return null;
 
     final pd = parent.decoration;
-    final pdLineThough = pd?.contains(TextDecoration.lineThrough) == true;
-    final pdOverline = pd?.contains(TextDecoration.overline) == true;
-    final pdUnderline = pd?.contains(TextDecoration.underline) == true;
+    final lineThough = pd?.contains(TextDecoration.lineThrough) == true;
+    final overline = pd?.contains(TextDecoration.overline) == true;
+    final underline = pd?.contains(TextDecoration.underline) == true;
 
     final List<TextDecoration> list = [];
-    if (meta.decorationLineThrough == true ||
-        (pdLineThough && meta.decorationLineThrough != false)) {
+    if (meta.decoStrike == true || (lineThough && meta.decoStrike != false)) {
       list.add(TextDecoration.lineThrough);
     }
-    if (meta.decorationOverline == true ||
-        (pdOverline && meta.decorationOverline != false)) {
+    if (meta.decoOver == true || (overline && meta.decoOver != false)) {
       list.add(TextDecoration.overline);
     }
-    if (meta.decorationUnderline == true ||
-        (pdUnderline && meta.decorationUnderline != false)) {
+    if (meta.decoUnder == true || (underline && meta.decoUnder != false)) {
       list.add(TextDecoration.underline);
     }
 
@@ -240,28 +240,28 @@ class WidgetFactory {
   }
 
   double buildTextFontSize(String value, TextStyle parent) {
-    final parsed = parser.lengthParseValue(value);
+    final parsed = lengthParseValue(value);
     if (parsed != null) return parsed.getValue(parent);
 
     switch (value) {
-      case 'xx-large':
+      case kCssFontSizeXxLarge:
         return defaultFontSize * 2.0;
-      case 'x-large':
+      case kCssFontSizeXLarge:
         return defaultFontSize * 1.5;
-      case 'large':
+      case kCssFontSizeLarge:
         return defaultFontSize * 1.125;
-      case 'medium':
+      case kCssFontSizeMedium:
         return defaultFontSize;
-      case 'small':
+      case kCssFontSizeSmall:
         return defaultFontSize * .8125;
-      case 'x-small':
+      case kCssFontSizeXSmall:
         return defaultFontSize * .625;
-      case 'xx-small':
+      case kCssFontSizeXxSmall:
         return defaultFontSize * .5625;
 
-      case 'larger':
+      case kCssFontSizeLarger:
         return parent.fontSize * 1.2;
-      case 'smaller':
+      case kCssFontSizeSmaller:
         return parent.fontSize * (15 / 18);
     }
 
@@ -372,8 +372,60 @@ class WidgetFactory {
         meta = lazySet(meta, buildOp: tagA());
         break;
 
+      case 'abbr':
+      case 'acronym':
+        meta = lazySet(
+          meta,
+          decorationStyle: TextDecorationStyle.dotted,
+          decoUnder: true,
+        );
+        break;
+
+      case 'address':
+        meta = lazySet(meta, isBlockElement: true, fontStyleItalic: true);
+        break;
+
+      case 'article':
+      case 'aside':
+      case 'div':
+      case 'figcaption':
+      case 'footer':
+      case 'header':
+      case 'main':
+      case 'nav':
+      case 'section':
+        meta = lazySet(meta, isBlockElement: true);
+        break;
+
+      case 'blockquote':
+      case 'figure':
+        meta = lazySet(meta, inlineStyles: [kCssMargin, '1em 40px']);
+        break;
+
+      case 'b':
+      case 'strong':
+        meta = lazySet(meta, fontWeight: FontWeight.bold);
+        break;
+
+      case 'big':
+        meta = lazySet(meta, fontSize: kCssFontSizeLarger);
+        break;
+
       case 'br':
         meta = lazySet(meta, buildOp: tagBr());
+        break;
+
+      case 'center':
+        meta =
+            lazySet(meta, inlineStyles: [kCssTextAlign, kCssTextAlignCenter]);
+        break;
+
+      case 'cite':
+      case 'dfn':
+      case 'em':
+      case 'i':
+      case 'var':
+        meta = lazySet(meta, fontStyleItalic: true);
         break;
 
       case kTagCode:
@@ -382,12 +434,94 @@ class WidgetFactory {
         meta = lazySet(meta, buildOp: tagCode());
         break;
 
+      case 'dd':
+        meta = lazySet(meta, inlineStyles: [kCssMargin, '0 0 1em 40px']);
+        break;
+      case 'dl':
+        meta = lazySet(meta, isBlockElement: true);
+        break;
+      case 'dt':
+        meta = lazySet(meta, isBlockElement: true, fontWeight: FontWeight.bold);
+        break;
+
+      case 'del':
+      case 's':
+      case 'strike':
+        meta = lazySet(meta, decoStrike: true);
+        break;
+
       case 'hr':
         meta = lazySet(meta, buildOp: tagHr());
         break;
 
+      case 'h1':
+        meta = lazySet(
+          meta,
+          fontSize: '2em',
+          fontWeight: FontWeight.bold,
+          inlineStyles: [kCssMargin, '0.67em 0'],
+        );
+        break;
+      case 'h2':
+        meta = lazySet(
+          meta,
+          fontSize: '1.5em',
+          fontWeight: FontWeight.bold,
+          inlineStyles: [kCssMargin, '0.83em 0'],
+        );
+        break;
+      case 'h3':
+        meta = lazySet(
+          meta,
+          fontSize: '1.17em',
+          fontWeight: FontWeight.bold,
+          inlineStyles: [kCssMargin, '1em 0'],
+        );
+        break;
+      case 'h4':
+        meta = lazySet(
+          meta,
+          fontWeight: FontWeight.bold,
+          inlineStyles: [kCssMargin, '1.33em 0'],
+        );
+        break;
+      case 'h5':
+        meta = lazySet(
+          meta,
+          fontSize: '0.83em',
+          fontWeight: FontWeight.bold,
+          inlineStyles: [kCssMargin, '1.67em 0'],
+        );
+        break;
+      case 'h6':
+        meta = lazySet(
+          meta,
+          fontSize: '0.67em',
+          fontWeight: FontWeight.bold,
+          inlineStyles: [kCssMargin, '2.33em 0'],
+        );
+        break;
+
+      case 'iframe':
+      case 'script':
+      case 'style':
+        // actually `script` and `style` are not required here
+        // our parser will put those elements into document.head anyway
+        meta = lazySet(meta, isNotRenderable: true);
+        break;
+
       case 'img':
         meta = lazySet(meta, buildOp: tagImg());
+        break;
+
+      case 'ins':
+      case 'u':
+        meta = lazySet(meta, decoUnder: true);
+        break;
+
+      case 'kbd':
+      case 'samp':
+        meta = lazySet(meta, fontFamily: 'monospace');
         break;
 
       case kTagListItem:
@@ -396,8 +530,23 @@ class WidgetFactory {
         meta = lazySet(meta, buildOp: tagLi());
         break;
 
+      case 'mark':
+        meta = lazySet(
+          meta,
+          inlineStyles: [kCssBackgroundColor, '#ff0', kCssColor, '#000'],
+        );
+        break;
+
+      case 'p':
+        meta = lazySet(meta, inlineStyles: [kCssMargin, '1em 0']);
+        break;
+
       case 'q':
         meta = lazySet(meta, buildOp: tagQ());
+        break;
+
+      case 'small':
+        meta = lazySet(meta, fontSize: kCssFontSizeSmaller);
         break;
 
       case kTagTable:
@@ -412,13 +561,97 @@ class WidgetFactory {
         break;
     }
 
-    return parser.parseElement(meta, e);
+    return meta;
   }
 
   NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
     switch (key) {
       case kCssBackgroundColor:
         meta = lazySet(meta, buildOp: styleBgColor());
+        break;
+
+      case kCssBorderBottom:
+        final borderBottom = borderParse(value);
+        if (borderBottom != null) {
+          meta = lazySet(
+            meta,
+            decoUnder: true,
+            decorationStyleFromCssBorderStyle: borderBottom.style,
+          );
+        } else {
+          meta = lazySet(meta, decoUnder: false);
+        }
+        break;
+      case kCssBorderTop:
+        final borderTop = borderParse(value);
+        if (borderTop != null) {
+          meta = lazySet(
+            meta,
+            decoOver: true,
+            decorationStyleFromCssBorderStyle: borderTop.style,
+          );
+        } else {
+          meta = lazySet(meta, decoOver: false);
+        }
+        break;
+
+      case kCssColor:
+        final color = colorParseValue(value);
+        if (color != null) meta = lazySet(meta, color: color);
+        break;
+
+      case kCssFontFamily:
+        meta = lazySet(meta, fontFamily: value);
+        break;
+
+      case kCssFontSize:
+        meta = lazySet(meta, fontSize: value);
+        break;
+
+      case kCssFontStyle:
+        switch (value) {
+          case kCssFontStyleItalic:
+            meta = lazySet(meta, fontStyleItalic: true);
+            break;
+          case kCssFontStyleNormal:
+            meta = lazySet(meta, fontStyleItalic: false);
+            break;
+        }
+        break;
+
+      case kCssFontWeight:
+        switch (value) {
+          case kCssFontWeightBold:
+            meta = lazySet(meta, fontWeight: FontWeight.bold);
+            break;
+          case kCssFontWeight100:
+            meta = lazySet(meta, fontWeight: FontWeight.w100);
+            break;
+          case kCssFontWeight200:
+            meta = lazySet(meta, fontWeight: FontWeight.w200);
+            break;
+          case kCssFontWeight300:
+            meta = lazySet(meta, fontWeight: FontWeight.w300);
+            break;
+          case kCssFontWeight400:
+            meta = lazySet(meta, fontWeight: FontWeight.w400);
+            break;
+          case kCssFontWeight500:
+            meta = lazySet(meta, fontWeight: FontWeight.w500);
+            break;
+          case kCssFontWeight600:
+            meta = lazySet(meta, fontWeight: FontWeight.w600);
+            break;
+          case kCssFontWeight700:
+            meta = lazySet(meta, fontWeight: FontWeight.w700);
+            break;
+          case kCssFontWeight800:
+            meta = lazySet(meta, fontWeight: FontWeight.w800);
+            break;
+          case kCssFontWeight900:
+            meta = lazySet(meta, fontWeight: FontWeight.w900);
+            break;
+        }
         break;
 
       case kCssMargin:
@@ -432,9 +665,33 @@ class WidgetFactory {
       case kCssTextAlign:
         meta = lazySet(meta, buildOp: styleTextAlign());
         break;
+
+      case kCssTextDecoration:
+        for (final v in value.split(_spacingRegExp)) {
+          switch (v) {
+            case kCssTextDecorationLineThrough:
+              meta = lazySet(meta, decoStrike: true);
+              break;
+            case kCssTextDecorationNone:
+              meta = lazySet(
+                meta,
+                decoStrike: false,
+                decoOver: false,
+                decoUnder: false,
+              );
+              break;
+            case kCssTextDecorationOverline:
+              meta = lazySet(meta, decoOver: true);
+              break;
+            case kCssTextDecorationUnderline:
+              meta = lazySet(meta, decoUnder: true);
+              break;
+          }
+        }
+        break;
     }
 
-    return parser.parseElementStyle(meta, key, value);
+    return meta;
   }
 
   BuildOp styleBgColor() {
@@ -459,7 +716,7 @@ class WidgetFactory {
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      getInlineStyles: (_, __) => ['margin-bottom', '1em'],
+      getInlineStyles: (_, __) => [kCssMarginBottom, '1em'],
       onWidgets: (_, __) => Container(),
     );
     return _tagBr;

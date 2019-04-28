@@ -1,6 +1,7 @@
-part of '../core_wf.dart';
+part of '../core_widget_factory.dart';
 
 const kTagTable = 'table';
+const kTagTableAttrBorder = 'border';
 const kTagTableBody = 'tbody';
 const kTagTableCaption = 'caption';
 const kTagTableCell = 'td';
@@ -128,9 +129,9 @@ class _SemanticWidget extends StatelessWidget {
 
 TableBorder _buildTableBorder(NodeMetadata meta) {
   String styleBorder;
-  meta.styles((k, v) => k == 'border' ? styleBorder = v : null);
+  meta.styles((k, v) => k == kCssBorder ? styleBorder = v : null);
   if (styleBorder != null) {
-    final borderParsed = parser.borderParse(styleBorder);
+    final borderParsed = borderParse(styleBorder);
     if (borderParsed != null) {
       return TableBorder.all(
         color: borderParsed.color ?? const Color(0xFF000000),
@@ -140,8 +141,8 @@ TableBorder _buildTableBorder(NodeMetadata meta) {
   }
 
   final e = meta.buildOpElement;
-  if (e.attributes.containsKey('border')) {
-    final width = double.tryParse(e.attributes['border']);
+  if (e.attributes.containsKey(kTagTableAttrBorder)) {
+    final width = double.tryParse(e.attributes[kTagTableAttrBorder]);
     if (width != null && width > 0) {
       return TableBorder.all(width: width);
     }
