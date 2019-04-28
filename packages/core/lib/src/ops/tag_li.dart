@@ -1,4 +1,4 @@
-part of '../core_wf.dart';
+part of '../core_widget_factory.dart';
 
 const kTagListItem = 'li';
 const kTagOrderedList = 'ol';
@@ -24,7 +24,7 @@ class TagLi {
           meta.keys((k) => k == key ? isWithinAnotherList = true : null);
 
           return [
-            'margin',
+            kCssMargin,
             isWithinAnotherList ? '0' : '1em 0',
             _kCssPaddingLeft,
             '${_kCssPaddingLeftDefault}px',
@@ -54,7 +54,7 @@ class TagLi {
           listStyleType = value;
           break;
         case _kCssPaddingLeft:
-          final parsed = parser.lengthParseValue(value);
+          final parsed = lengthParseValue(value);
           paddingLeft = parsed?.getValue(meta.buildOpTextStyle) ??
               _kCssPaddingLeftDefault;
       }

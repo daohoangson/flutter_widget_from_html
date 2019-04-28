@@ -42,11 +42,11 @@ class _GetInlineStylesTest extends WidgetFactory {
   NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     meta = lazySet(meta,
         buildOp: BuildOp(
-          getInlineStyles: (_, __) => ['color', '#f00'],
+          getInlineStyles: (_, __) => [kCssColor, '#f00'],
         ));
     meta = lazySet(meta,
         buildOp: BuildOp(
-          getInlineStyles: (_, __) => ['color', '#0f0'],
+          getInlineStyles: (_, __) => [kCssColor, '#0f0'],
         ));
 
     return super.parseElement(meta, e);

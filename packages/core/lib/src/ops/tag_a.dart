@@ -1,4 +1,4 @@
-part of '../core_wf.dart';
+part of '../core_widget_factory.dart';
 
 class TagA {
   final WidgetFactory wf;
@@ -6,7 +6,7 @@ class TagA {
   TagA(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        collectMetadata: (meta) => lazySet(meta, decorationUnderline: true),
+        collectMetadata: (meta) => lazySet(meta, decoUnder: true),
         onPieces: (meta, pieces) {
           final tap = _buildGestureTapCallback(meta);
           if (tap == null) return pieces;

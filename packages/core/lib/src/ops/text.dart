@@ -1,4 +1,4 @@
-part of '../core_wf.dart';
+part of '../core_widget_factory.dart';
 
 TextSpan compileToTextSpan(TextBlock b, TextStyle defaultStyle) {
   if (b == null || b.isEmpty) return null;

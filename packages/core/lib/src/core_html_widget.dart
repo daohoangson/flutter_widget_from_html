@@ -3,7 +3,7 @@ import 'package:html/parser.dart' as parser;
 
 import 'builder.dart' as builder;
 import 'core_config.dart';
-import 'core_wf.dart';
+import 'core_widget_factory.dart';
 
 class HtmlWidget extends StatelessWidget implements Config {
   final String html;

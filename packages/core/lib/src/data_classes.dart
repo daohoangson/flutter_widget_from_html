@@ -5,11 +5,11 @@ NodeMetadata lazySet(
   NodeMetadata meta, {
   BuildOp buildOp,
   Color color,
-  bool decorationLineThrough,
-  bool decorationOverline,
+  bool decoOver,
+  bool decoStrike,
+  bool decoUnder,
   TextDecorationStyle decorationStyle,
   CssBorderStyle decorationStyleFromCssBorderStyle,
-  bool decorationUnderline,
   String fontFamily,
   String fontSize,
   bool fontStyleItalic,
@@ -32,10 +32,10 @@ NodeMetadata lazySet(
 
   if (color != null) meta.color = color;
 
-  if (decorationLineThrough != null)
-    meta.decorationLineThrough = decorationLineThrough;
+  if (decoStrike != null) meta.decoStrike = decoStrike;
+  if (decoOver != null) meta.decoOver = decoOver;
+  if (decoUnder != null) meta.decoUnder = decoUnder;
 
-  if (decorationOverline != null) meta.decorationOverline = decorationOverline;
   if (decorationStyle != null) meta.decorationStyle = decorationStyle;
   if (decorationStyleFromCssBorderStyle != null) {
     switch (decorationStyleFromCssBorderStyle) {
@@ -53,9 +53,6 @@ NodeMetadata lazySet(
         break;
     }
   }
-
-  if (decorationUnderline != null)
-    meta.decorationUnderline = decorationUnderline;
 
   if (fontFamily != null) meta.fontFamily = fontFamily;
   if (fontSize != null) meta.fontSize = fontSize;
@@ -207,10 +204,10 @@ class NodeMetadata {
   Iterable<BuildOp> _buildOps;
   List<Key> _keys;
   Color color;
-  bool decorationLineThrough;
-  bool decorationOverline;
+  bool decoOver;
+  bool decoStrike;
+  bool decoUnder;
   TextDecorationStyle decorationStyle;
-  bool decorationUnderline;
   String fontFamily;
   String fontSize;
   bool fontStyleItalic;
@@ -233,9 +230,7 @@ class NodeMetadata {
       hasFontStyle;
 
   bool get hasDecoration =>
-      decorationLineThrough != null ||
-      decorationOverline != null ||
-      decorationUnderline != null;
+      decoStrike != null || decoOver != null || decoUnder != null;
 
   bool get hasFontStyle => fontStyleItalic != null;
 

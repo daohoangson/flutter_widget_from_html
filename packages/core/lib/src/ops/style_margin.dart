@@ -1,4 +1,4 @@
-part of '../core_wf.dart';
+part of '../core_widget_factory.dart';
 
 const kCssMargin = 'margin';
 const kCssMarginBottom = 'margin-bottom';
@@ -88,7 +88,7 @@ class _StyleMarginParser {
   }
 
   double _parseValue(String str) {
-    final parsed = parser.lengthParseValue(str);
+    final parsed = lengthParseValue(str);
     if (parsed == null) return 0;
 
     final value = parsed.getValue(meta.buildOpTextStyle);
