@@ -9,7 +9,7 @@ void main() {
   testWidgets('renders underline', (WidgetTester tester) async {
     final html = '<a href="$kHref">Foo</a>';
     final explained = await explain(tester, html);
-    expect(explained, equals('[RichText:(+u+onTap:Foo)]'));
+    expect(explained, equals('[RichText:(#FF0000FF+u+onTap:Foo)]'));
   });
 
   testWidgets('renders inline stylings', (WidgetTester tester) async {
@@ -21,7 +21,7 @@ void main() {
   testWidgets('renders inner stylings', (WidgetTester tester) async {
     final html = '<a href="$kHref"><b><i>Foo</i></b></a>';
     final explained = await explain(tester, html);
-    expect(explained, equals('[RichText:(+u+i+b+onTap:Foo)]'));
+    expect(explained, equals('[RichText:(#FF0000FF+u+i+b+onTap:Foo)]'));
   });
 
   testWidgets('renders DIV tag inside', (WidgetTester tester) async {
@@ -29,7 +29,7 @@ void main() {
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals('[GestureDetector:child=[RichText:(+u:Foo)]]'),
+      equals('[GestureDetector:child=[RichText:(#FF0000FF+u:Foo)]]'),
     );
   });
 
@@ -40,8 +40,8 @@ void main() {
       explained,
       equals(
         '[Column:children='
-        '[GestureDetector:child=[RichText:(+u:Foo)]],'
-        '[GestureDetector:child=[RichText:(+u:Bar)]]]',
+        '[GestureDetector:child=[RichText:(#FF0000FF+u:Foo)]],'
+        '[GestureDetector:child=[RichText:(#FF0000FF+u:Bar)]]]',
       ),
     );
   });
@@ -61,6 +61,6 @@ void main() {
     expect(
         explained,
         equals('[Padding:(5,5,5,5),child='
-            '[GestureDetector:child=[RichText:(+u:Foo)]]]'));
+            '[GestureDetector:child=[RichText:(#FF0000FF+u:Foo)]]]'));
   });
 }

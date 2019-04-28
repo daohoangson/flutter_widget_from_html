@@ -49,7 +49,7 @@ class HelloWorldCoreScreen extends StatelessWidget {
 
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
 
-- A: underline with no default onTap action (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that). Or override `WidgetFactory::buildGestureTapCallbackForUrl` yourself.
+- A: no onTap action (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that). Or override `WidgetFactory::buildGestureTapCallbackForUrl` yourself.
 - H1/H2/H3/H4/H5/H6
 - IMG: no caching, no relative url support (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
 - LI/OL/UL
@@ -91,16 +91,18 @@ Here is how it works:
 If you want to, you can change the way metadata is collected (in step 2) and build widget however you like (in step 3) by extending the `WidgetFactory` and give it to `HtmlWidget`. The example below replace smilie inline image with an emoji:
 
 ```dart
+const kHtml = """
+<p>Hello <img class="smilie smilie-1" alt=":)" src="http://domain.com/sprites.png" />!</p>
+<p>How are you <img class="smilie smilie-2" alt=":P" src="http://domain.com/sprites.png" />?
+""";
+
 class SmilieScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           title: Text('SmilieScreen'),
         ),
-        body: HtmlWidget(
-          '<p>Hello <img class="smilie smilie-1" alt=":)" src="http://domain.com/sprites.png" />!</p>',
-          wf: (context) => SmilieWf(context),
-        ),
+        body: HtmlWidget(kHtml, wf: SmilieWf()),
       );
 }
 
@@ -114,8 +116,6 @@ class SmilieWf extends WidgetFactory {
       return pieces..first?.block?.addText(text);
     },
   );
-
-  SmilieWf(BuildContext context) : super(context);
 
   @override
   NodeMetadata parseElement(NodeMetadata meta, dom.Element e) =>

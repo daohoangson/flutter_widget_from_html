@@ -20,7 +20,7 @@ class StyleTextAlign {
           final widgets = pieces.map(
             (p) => p.hasWidgets
                 ? wf.buildAlign(wf.buildColumn(p.widgets), _getAlignment(v))
-                : wf.buildText(block: p.block, textAlign: _getTextAlign(v)),
+                : wf.buildText(p.block, textAlign: _getTextAlign(v)),
           );
 
           return <BuiltPiece>[BuiltPieceSimple(widgets: widgets)];

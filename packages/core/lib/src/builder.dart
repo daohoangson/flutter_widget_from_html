@@ -10,25 +10,29 @@ final _textTrailingSpacingRegExp = RegExp(r'\s+$');
 final _whitespaceDuplicateRegExp = RegExp(r'\s+');
 
 class Builder {
+  final BuildContext context;
   final List<dom.Node> domNodes;
   final TextBlock parentBlock;
   final NodeMetadata parentMeta;
+  final TextStyle parentTextStyle;
   final WidgetFactory wf;
 
-  final _ParentStyle _parentStyle;
   final _pieces = <BuiltPiece>[];
 
   _Piece _textPiece;
 
-  Builder(
-    this.domNodes,
-    this.wf, {
+  Builder({
+    @required this.context,
+    @required this.domNodes,
     this.parentBlock,
     this.parentMeta,
-    _ParentStyle parentStyle,
-  }) : _parentStyle = parentStyle ?? _ParentStyle(wf: wf) {
-    parentMeta?.freezeTextStyle(_parentStyle.textStyle);
-  }
+    TextStyle parentTextStyle,
+    @required this.wf,
+  })  : assert(context != null),
+        assert(domNodes != null),
+        assert(wf != null),
+        this.parentTextStyle =
+            parentTextStyle ?? DefaultTextStyle.of(context).style;
 
   List<Widget> build() {
     var widgets = <Widget>[];
@@ -36,7 +40,7 @@ class Builder {
     final addWidget = (Widget w) => w != null ? widgets.add(w) : null;
     process().forEach((p) => p.hasWidgets
         ? p.widgets.forEach(addWidget)
-        : addWidget(wf.buildText(block: p.block)));
+        : addWidget(wf.buildText(p.block)));
 
     parentMeta?.ops((o) => widgets = o.onWidgets(parentMeta, widgets));
 
@@ -77,25 +81,25 @@ class Builder {
       if (domNode.nodeType != dom.Node.ELEMENT_NODE) continue;
 
       final meta = collectMetadata(domNode);
+      meta?.freezeTextStyle(
+        context,
+        wf.buildTextStyle(meta, context, parentTextStyle),
+      );
       if (meta?.isNotRenderable == true) continue;
 
-      final style = wf.buildTextStyle(meta, _parentStyle.textStyle);
       final isBlockElement = meta?.isBlockElement == true;
       final __builder = Builder(
-        domNode.nodes,
-        wf,
+        context: context,
+        domNodes: domNode.nodes,
         parentBlock: isBlockElement ? null : _textPiece.block,
         parentMeta: meta,
-        parentStyle: style != null ? _ParentStyle(style: style) : _parentStyle,
+        parentTextStyle: meta?.textStyle ?? parentTextStyle,
+        wf: wf,
       );
 
       if (isBlockElement) {
         _saveTextPiece();
-        _pieces.add(_Piece(
-          this,
-          parentStyle: _parentStyle,
-          widgets: __builder.build(),
-        ));
+        _pieces.add(_Piece(this, widgets: __builder.build()));
         continue;
       }
 
@@ -126,8 +130,8 @@ class Builder {
 
   void _newTextPiece() => _textPiece = _Piece(
         this,
-        block: (_pieces.isEmpty ? parentBlock?.sub() : null) ?? TextBlock(),
-        parentStyle: _parentStyle,
+        block: (_pieces.isEmpty ? parentBlock?.sub(parentTextStyle) : null) ??
+            TextBlock(parentTextStyle),
       );
 
   void _saveTextPiece() {
@@ -138,24 +142,17 @@ class Builder {
 
 class _Piece extends BuiltPiece {
   final Builder b;
-  final _ParentStyle parentStyle;
-  final Iterable<Widget> widgets;
-
   final TextBlock block;
+  final Iterable<Widget> widgets;
 
   _Piece(
     this.b, {
     this.block,
-    this.parentStyle,
     this.widgets,
-  })  : assert((block == null) != (widgets == null)),
-        assert(parentStyle != null);
+  }) : assert((block == null) != (widgets == null));
 
   @override
   bool get hasWidgets => widgets != null;
-
-  @override
-  TextStyle get style => parentStyle.textStyle;
 
   void _write(String text) {
     final leading = _textLeadingSpacingRegExp.firstMatch(text);
@@ -170,23 +167,10 @@ class _Piece extends BuiltPiece {
     if (end < text.length) __addSpace();
   }
 
-  void __addSpace() =>
-      block.addBit(TextBit.space(style: parentStyle.textBitStyle));
+  void __addSpace() => block.addBit(TextBit.space(block.style));
 
   void __addText(String data) => block.addBit(TextBit(
-        data: data..replaceAll(_whitespaceDuplicateRegExp, ' '),
-        style: parentStyle.textBitStyle,
+        data..replaceAll(_whitespaceDuplicateRegExp, ' '),
+        block.style,
       ));
-}
-
-class _ParentStyle {
-  final bool hasStyling;
-  final TextStyle textStyle;
-
-  _ParentStyle({WidgetFactory wf, TextStyle style})
-      : assert((wf == null) != (style == null)),
-        hasStyling = style != null,
-        textStyle = style ?? DefaultTextStyle.of(wf.context).style;
-
-  TextStyle get textBitStyle => hasStyling ? textStyle : null;
 }

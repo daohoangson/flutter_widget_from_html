@@ -141,18 +141,15 @@ abstract class BuiltPiece {
   bool get hasWidgets;
 
   TextBlock get block;
-  TextStyle get style;
   Iterable<Widget> get widgets;
 }
 
 class BuiltPieceSimple extends BuiltPiece {
   final TextBlock block;
-  final TextStyle style;
   final Iterable<Widget> widgets;
 
   BuiltPieceSimple({
     this.block,
-    this.style,
     this.widgets,
   }) : assert((block == null) != (widgets == null));
 
@@ -200,9 +197,11 @@ enum CssLengthUnit {
 
 class NodeMetadata {
   dom.Element _buildOpElement;
-  TextStyle _buildOpTextStyle;
   Iterable<BuildOp> _buildOps;
+  BuildContext _context;
   List<Key> _keys;
+  TextStyle _textStyle;
+
   Color color;
   bool decoOver;
   bool decoStrike;
@@ -217,22 +216,11 @@ class NodeMetadata {
   bool _isBlockElement;
   bool isNotRenderable;
 
+  BuildContext get context => _context;
+
   dom.Element get buildOpElement => _buildOpElement;
 
-  TextStyle get buildOpTextStyle => _buildOpTextStyle;
-
-  bool get hasStyling =>
-      color != null ||
-      fontFamily != null ||
-      fontSize != null ||
-      fontWeight != null ||
-      hasDecoration ||
-      hasFontStyle;
-
-  bool get hasDecoration =>
-      decoStrike != null || decoOver != null || decoUnder != null;
-
-  bool get hasFontStyle => fontStyleItalic != null;
+  TextStyle get textStyle => _textStyle;
 
   bool get isBlockElement {
     if (_isBlockElement == true) return true;
@@ -251,12 +239,13 @@ class NodeMetadata {
     return _buildOps;
   }
 
-  freezeTextStyle(TextStyle textStyle) {
-    if (_buildOpTextStyle != null) {
+  void freezeTextStyle(BuildContext context, TextStyle textStyle) {
+    if (_textStyle != null) {
       throw new StateError('TextStyle has already been set');
     }
 
-    _buildOpTextStyle = textStyle;
+    _context = context;
+    _textStyle = textStyle;
   }
 
   void keys(void f(Key key)) => _keys?.forEach(f);
@@ -284,7 +273,7 @@ class TextBit {
   bool get isSpace => data == null;
   String get text => isSpace ? ' ' : data;
 
-  const TextBit({this.data, this.onTap, this.style});
+  const TextBit(this.data, this.style, {this.onTap}) : assert(style != null);
 
   TextBit rebuild({
     String data,
@@ -292,33 +281,32 @@ class TextBit {
     TextStyle style,
   }) =>
       TextBit(
-        data: data ?? this.data,
+        data ?? this.data,
+        style ?? this.style,
         onTap: onTap ?? this.onTap,
-        style: style ?? this.style,
       );
 
-  static TextBit space({TextStyle style}) =>
-      style == null ? const TextBit() : TextBit(style: style);
+  static TextBit space(TextStyle style) => TextBit(null, style);
 }
 
 class TextBlock {
+  final TextStyle style;
   final List<TextBit> _bits;
   final TextBlock _parent;
 
-  bool _hasStyle = false;
   bool _hasTrailingSpace = true;
   int _indexEnd;
   int _indexStart;
 
-  TextBlock({List<TextBit> bits, TextBlock parent})
-      : assert((bits == null) == (parent == null)),
+  TextBlock(this.style, {List<TextBit> bits, TextBlock parent})
+      : assert(style != null),
+        assert((bits == null) == (parent == null)),
         _bits = bits ?? [],
         _parent = parent {
     _indexStart = _bits.length;
     _indexEnd = _indexStart;
   }
 
-  bool get hasStyle => _parent?.hasStyle ?? _hasStyle;
   Iterable<TextBit> get iterable => _bits.getRange(_indexStart, _indexEnd);
   bool get hasTrailingSpace => _indexEnd == _bits.length
       ? _parent?.hasTrailingSpace ?? _hasTrailingSpace
@@ -343,8 +331,6 @@ class TextBlock {
       _hasTrailingSpace = false;
     }
 
-    if (bit.style != null) _hasStyle = true;
-
     _bits.add(bit);
     _indexEnd++;
 
@@ -354,7 +340,7 @@ class TextBlock {
   void addBits(Iterable<TextBit> bits) => bits.forEach((b) => addBit(b));
 
   bool addText(String text, [TextStyle style]) =>
-      addBit(TextBit(data: text, style: style));
+      addBit(TextBit(text, style ?? this.style));
 
   bool isSubOf(TextBlock other) => _parent == other;
 
@@ -367,13 +353,10 @@ class TextBlock {
 
     for (var i = start; i < end; i++) {
       final bit = _bits[i];
-
-      final rebuilt = f(bit);
-      if (rebuilt.style != null) _hasStyle = true;
-
       _bits[i] = f(bit);
     }
   }
 
-  TextBlock sub() => TextBlock(bits: this._bits, parent: this);
+  TextBlock sub(TextStyle style) =>
+      TextBlock(style ?? this.style, bits: this._bits, parent: this);
 }

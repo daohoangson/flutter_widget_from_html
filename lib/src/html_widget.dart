@@ -11,10 +11,11 @@ class HtmlWidget extends core.HtmlWidget implements Config {
 
   const HtmlWidget(
     String html, {
-    core.WidgetFactoryBuilder wf,
+    core.WidgetFactory wf,
     Key key,
     Uri baseUrl,
     EdgeInsets bodyPadding,
+    Color hyperlinkColor,
     EdgeInsets tableCellPadding,
     EdgeInsets tablePadding,
     EdgeInsets textPadding,
@@ -33,7 +34,6 @@ class HtmlWidget extends core.HtmlWidget implements Config {
           textPadding: textPadding,
         );
 
-  core.WidgetFactory initFactory(BuildContext context) =>
-      (wf != null ? wf(context) : extended.WidgetFactory(context))
-        ..config = this;
+  core.WidgetFactory initFactory() =>
+      (wf ?? extended.WidgetFactory.getInstance())..config = this;
 }
