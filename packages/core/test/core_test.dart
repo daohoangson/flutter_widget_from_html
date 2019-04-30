@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '_.dart';
@@ -13,6 +14,19 @@ void main() {
     final html = 'Hello world';
     final explained = await explain(tester, html);
     expect(explained, equals('[RichText:(:Hello world)]'));
+  });
+
+  testWidgets('renders textStyle', (WidgetTester tester) async {
+    final html = 'Hello world';
+    final explained = await explain(
+      tester,
+      html,
+      textStyle: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+    expect(explained, equals('[RichText:(@20.0+b:Hello world)]'));
   });
 
   testWidgets('renders without erroneous white spaces', (WidgetTester t) async {

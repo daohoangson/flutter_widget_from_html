@@ -19,6 +19,7 @@ class HtmlWidget extends core.HtmlWidget implements Config {
     EdgeInsets tableCellPadding,
     EdgeInsets tablePadding,
     EdgeInsets textPadding,
+    TextStyle textStyle,
     bool webView,
     bool webViewJs,
   })  : this.webView = webView ?? false,
@@ -33,6 +34,7 @@ class HtmlWidget extends core.HtmlWidget implements Config {
           tableCellPadding: tableCellPadding,
           tablePadding: tablePadding,
           textPadding: textPadding,
+          textStyle: textStyle,
         );
 
   core.WidgetFactory initFactory() =>

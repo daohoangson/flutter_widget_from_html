@@ -15,6 +15,7 @@ Future<String> explain(
   double tableCellPadding = 0,
   double tablePadding = 0,
   double textHorizontalPadding = 0,
+  TextStyle textStyle,
 }) async {
   final key = UniqueKey();
 
@@ -55,6 +56,7 @@ Future<String> explain(
           tableCellPadding: EdgeInsets.all(tableCellPadding),
           tablePadding: EdgeInsets.all(tablePadding),
           textPadding: EdgeInsets.symmetric(horizontal: textHorizontalPadding),
+          textStyle: textStyle,
           wf: wf,
         );
 

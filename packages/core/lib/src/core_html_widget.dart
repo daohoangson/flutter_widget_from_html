@@ -1,5 +1,13 @@
 import 'package:flutter/widgets.dart'
-    show BuildContext, Color, EdgeInsets, Key, StatelessWidget, Text, Widget;
+    show
+        BuildContext,
+        Color,
+        EdgeInsets,
+        Key,
+        StatelessWidget,
+        Text,
+        TextStyle,
+        Widget;
 import 'package:html/parser.dart' as parser;
 
 import 'builder.dart';
@@ -16,6 +24,7 @@ class HtmlWidget extends StatelessWidget implements Config {
   final EdgeInsets tableCellPadding;
   final EdgeInsets tablePadding;
   final EdgeInsets textPadding;
+  final TextStyle textStyle;
 
   const HtmlWidget(
     this.html, {
@@ -27,6 +36,7 @@ class HtmlWidget extends StatelessWidget implements Config {
     EdgeInsets tableCellPadding,
     EdgeInsets tablePadding,
     EdgeInsets textPadding,
+    this.textStyle,
   })  : assert(html != null),
         this.bodyPadding =
             bodyPadding ?? const EdgeInsets.symmetric(vertical: 10),
@@ -46,6 +56,7 @@ class HtmlWidget extends StatelessWidget implements Config {
     final widgets = Builder(
       context: context,
       domNodes: domNodes,
+      parentTextStyle: textStyle,
       wf: wf,
     ).build();
 
