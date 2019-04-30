@@ -53,9 +53,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children=[Text:Before text.],'
+          equals('[Column:children=[RichText:(:Before text.)],'
               '[Image:image=[NetworkImage:url=image.png]],'
-              '[Text:After text.]]'));
+              '[RichText:(:After text.)]]'));
     });
   });
 

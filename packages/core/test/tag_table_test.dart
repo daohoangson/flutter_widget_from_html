@@ -12,9 +12,9 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[Column:children=[Text,align=center:Caption],[Table:\n' +
+        equals('[Column:children=[RichText,align=center:(:Caption)],[Table:\n' +
             '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n' +
-            '[Text:Value 1] | [Text:Value 2]\n' +
+            '[RichText:(:Value 1)] | [RichText:(:Value 2)]\n' +
             ']]'));
   });
 
@@ -29,8 +29,8 @@ void main() {
         explained,
         equals('[Table:\n'
             '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n'
-            '[Text:Value 1] | [Text:Value 2]\n'
-            '[Text:Footer 1] | [Text:Footer 2]\n'
+            '[RichText:(:Value 1)] | [RichText:(:Value 2)]\n'
+            '[RichText:(:Footer 1)] | [RichText:(:Footer 2)]\n'
             ']'));
   });
 
@@ -52,7 +52,7 @@ void main() {
     testWidgets('renders border=0', (WidgetTester tester) async {
       final html = '<table border="0"><tr><td>Foo</td></tr></table>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Table:\n[Text:Foo]\n]'));
+      expect(explained, equals('[Table:\n[RichText:(:Foo)]\n]'));
     });
 
     testWidgets('renders border=1', (WidgetTester tester) async {
@@ -60,7 +60,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Table:border=(Color(0xff000000),w=1.0)\n[Text:Foo]\n]'),
+        equals('[Table:border=(Color(0xff000000),w=1.0)\n[RichText:(:Foo)]\n]'),
       );
     });
 
@@ -69,7 +69,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Table:border=(Color(0xff000000),w=1.0)\n[Text:Foo]\n]'),
+        equals('[Table:border=(Color(0xff000000),w=1.0)\n[RichText:(:Foo)]\n]'),
       );
     });
 
@@ -78,7 +78,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Table:border=(Color(0xff000000),w=2.0)\n[Text:Foo]\n]'),
+        equals('[Table:border=(Color(0xff000000),w=2.0)\n[RichText:(:Foo)]\n]'),
       );
     });
 
@@ -90,7 +90,7 @@ void main() {
         final explained = await explain(tester, html);
         expect(
           explained,
-          equals('[Table:border=(Color(0xffff0000),w=1.0)\n[Text:Foo]\n]'),
+          equals('[Table:border=(Color(0xffff0000),w=1.0)\n[RichText:(:Foo)]\n]'),
         );
       },
     );
@@ -107,7 +107,7 @@ void main() {
           explained,
           equals('[Table:\n' +
               '[RichText:(+b:Header 1)] | [Container:]\n' +
-              '[Text:Value 1] | [Text:Value 2]\n' +
+              '[RichText:(:Value 1)] | [RichText:(:Value 2)]\n' +
               ']'));
     });
 
@@ -121,38 +121,38 @@ void main() {
           explained,
           equals('[Table:\n' +
               '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n' +
-              '[Text:Value 1] | [Container:]\n' +
+              '[RichText:(:Value 1)] | [Container:]\n' +
               ']'));
     });
 
     testWidgets('standalone CAPTION', (WidgetTester tester) async {
       final html = '<caption>Foo</caption>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:Foo]'));
+      expect(explained, equals('[RichText:(:Foo)]'));
     });
 
     testWidgets('standalone TABLE', (WidgetTester tester) async {
       final html = '<table>Foo</table>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:Foo]'));
+      expect(explained, equals('[RichText:(:Foo)]'));
     });
 
     testWidgets('standalone TD', (WidgetTester tester) async {
       final html = '<td>Foo</td>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:Foo]'));
+      expect(explained, equals('[RichText:(:Foo)]'));
     });
 
     testWidgets('standalone TH', (WidgetTester tester) async {
       final html = '<th>Foo</th>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:Foo]'));
+      expect(explained, equals('[RichText:(:Foo)]'));
     });
 
     testWidgets('standalone TR', (WidgetTester tester) async {
       final html = '<tr>Foo</tr>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:Foo]'));
+      expect(explained, equals('[RichText:(:Foo)]'));
     });
   });
 }

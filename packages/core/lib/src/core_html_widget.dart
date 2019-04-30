@@ -1,16 +1,18 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart'
+    show BuildContext, Color, EdgeInsets, Key, StatelessWidget, Text, Widget;
 import 'package:html/parser.dart' as parser;
 
-import 'builder.dart' as builder;
+import 'builder.dart';
 import 'core_config.dart';
 import 'core_widget_factory.dart';
 
 class HtmlWidget extends StatelessWidget implements Config {
   final String html;
-  final WidgetFactoryBuilder wf;
+  final WidgetFactory wf;
 
   final Uri baseUrl;
   final EdgeInsets bodyPadding;
+  final Color hyperlinkColor;
   final EdgeInsets tableCellPadding;
   final EdgeInsets tablePadding;
   final EdgeInsets textPadding;
@@ -21,12 +23,15 @@ class HtmlWidget extends StatelessWidget implements Config {
     Key key,
     this.baseUrl,
     EdgeInsets bodyPadding,
+    Color hyperlinkColor,
     EdgeInsets tableCellPadding,
     EdgeInsets tablePadding,
     EdgeInsets textPadding,
   })  : assert(html != null),
         this.bodyPadding =
             bodyPadding ?? const EdgeInsets.symmetric(vertical: 10),
+        this.hyperlinkColor =
+            hyperlinkColor ?? const Color.fromRGBO(0, 0, 255, 1),
         this.tableCellPadding = tableCellPadding ?? const EdgeInsets.all(5),
         this.tablePadding =
             tablePadding ?? const EdgeInsets.symmetric(horizontal: 10),
@@ -37,14 +42,16 @@ class HtmlWidget extends StatelessWidget implements Config {
   @override
   Widget build(BuildContext context) {
     final domNodes = parser.parse(html).body.nodes;
-    final wf = initFactory(context);
-    final widgets = builder.Builder(domNodes, wf).build();
+    final wf = initFactory();
+    final widgets = Builder(
+      context: context,
+      domNodes: domNodes,
+      wf: wf,
+    ).build();
 
     return wf.buildBody(widgets) ?? Text(html);
   }
 
-  WidgetFactory initFactory(BuildContext context) =>
-      (wf != null ? wf(context) : WidgetFactory(context))..config = this;
+  WidgetFactory initFactory() =>
+      (wf ?? WidgetFactory.getInstance())..config = this;
 }
-
-typedef WidgetFactory WidgetFactoryBuilder(BuildContext context);

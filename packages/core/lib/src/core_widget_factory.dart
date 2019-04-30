@@ -25,8 +25,6 @@ final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
 final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
 
 class WidgetFactory {
-  final BuildContext context;
-
   Config _config;
 
   BuildOp _styleBgColor;
@@ -41,13 +39,7 @@ class WidgetFactory {
   BuildOp _tagQ;
   BuildOp _tagTable;
 
-  WidgetFactory(this.context);
-
-  double get defaultFontSize => defaultTextStyle.fontSize;
-  TextStyle get defaultTextStyle => DefaultTextStyle.of(context).style;
-
   set config(Config config) {
-    assert(_config == null);
     assert(config != null);
     _config = config;
   }
@@ -98,7 +90,7 @@ class WidgetFactory {
         child: SizedBox(height: 1),
       );
 
-  FontStyle buildFontSize(NodeMetadata meta) => meta?.hasFontStyle == true
+  FontStyle buildFontStyle(NodeMetadata meta) => meta?.fontStyleItalic != null
       ? (meta.fontStyleItalic == true ? FontStyle.italic : FontStyle.normal)
       : null;
 
@@ -133,7 +125,7 @@ class WidgetFactory {
     final imageWidget = src?.startsWith('data:image') == true
         ? buildImageFromDataUri(src)
         : buildImageFromUrl(src);
-    if (imageWidget == null) return buildText(text: text);
+    if (imageWidget == null) return Text(text);
 
     height ??= 0;
     width ??= 0;
@@ -198,27 +190,21 @@ class WidgetFactory {
   Widget buildTableCell(Widget child) =>
       TableCell(child: buildPadding(child, _config.tableCellPadding));
 
-  Widget buildText({
-    TextBlock block,
-    String text,
-    TextAlign textAlign,
-  }) {
-    assert((text == null) != (block == null));
+  Widget buildText(TextBlock block, {TextAlign textAlign}) {
     final _textAlign = textAlign ?? TextAlign.start;
 
-    if (block?.hasStyle == true) {
-      final span = compileToTextSpan(block, defaultTextStyle);
-      if (span != null) return RichText(text: span, textAlign: _textAlign);
-    }
-
-    final data = compileToString(block) ?? text;
-    if (data != null) return Text(data, textAlign: _textAlign);
+    final span = compileToTextSpan(block);
+    if (span != null) return RichText(text: span, textAlign: _textAlign);
 
     return null;
   }
 
   TextDecoration buildTextDecoration(NodeMetadata meta, TextStyle parent) {
-    if (meta.hasDecoration != true) return null;
+    if (meta?.decoOver == null &&
+        meta?.decoStrike == null &&
+        meta?.decoUnder == null) {
+      return null;
+    }
 
     final pd = parent.decoration;
     final lineThough = pd?.contains(TextDecoration.lineThrough) == true;
@@ -226,11 +212,11 @@ class WidgetFactory {
     final underline = pd?.contains(TextDecoration.underline) == true;
 
     final List<TextDecoration> list = [];
-    if (meta.decoStrike == true || (lineThough && meta.decoStrike != false)) {
-      list.add(TextDecoration.lineThrough);
-    }
     if (meta.decoOver == true || (overline && meta.decoOver != false)) {
       list.add(TextDecoration.overline);
+    }
+    if (meta.decoStrike == true || (lineThough && meta.decoStrike != false)) {
+      list.add(TextDecoration.lineThrough);
     }
     if (meta.decoUnder == true || (underline && meta.decoUnder != false)) {
       list.add(TextDecoration.underline);
@@ -239,25 +225,32 @@ class WidgetFactory {
     return TextDecoration.combine(list);
   }
 
-  double buildTextFontSize(String value, TextStyle parent) {
+  double buildTextFontSize(
+    NodeMetadata meta,
+    BuildContext context,
+    TextStyle parent,
+  ) {
+    final value = meta?.fontSize;
+    if (value == null) return null;
+
     final parsed = lengthParseValue(value);
     if (parsed != null) return parsed.getValue(parent);
 
     switch (value) {
       case kCssFontSizeXxLarge:
-        return defaultFontSize * 2.0;
+        return DefaultTextStyle.of(context).style.fontSize * 2.0;
       case kCssFontSizeXLarge:
-        return defaultFontSize * 1.5;
+        return DefaultTextStyle.of(context).style.fontSize * 1.5;
       case kCssFontSizeLarge:
-        return defaultFontSize * 1.125;
+        return DefaultTextStyle.of(context).style.fontSize * 1.125;
       case kCssFontSizeMedium:
-        return defaultFontSize;
+        return DefaultTextStyle.of(context).style.fontSize;
       case kCssFontSizeSmall:
-        return defaultFontSize * .8125;
+        return DefaultTextStyle.of(context).style.fontSize * .8125;
       case kCssFontSizeXSmall:
-        return defaultFontSize * .625;
+        return DefaultTextStyle.of(context).style.fontSize * .625;
       case kCssFontSizeXxSmall:
-        return defaultFontSize * .5625;
+        return DefaultTextStyle.of(context).style.fontSize * .5625;
 
       case kCssFontSizeLarger:
         return parent.fontSize * 1.2;
@@ -268,16 +261,33 @@ class WidgetFactory {
     return null;
   }
 
-  TextStyle buildTextStyle(NodeMetadata meta, TextStyle parent) {
-    if (meta?.hasStyling != true) return null;
+  TextStyle buildTextStyle(
+    NodeMetadata meta,
+    BuildContext context,
+    TextStyle parent,
+  ) {
+    if (meta == null) return parent;
+
+    final decoration = buildTextDecoration(meta, parent);
+    final fontSize = buildTextFontSize(meta, context, parent);
+    final fontStyle = buildFontStyle(meta);
+    if (meta.color == null &&
+        decoration == null &&
+        meta.decorationStyle == null &&
+        meta.fontFamily == null &&
+        fontSize == null &&
+        fontStyle == null &&
+        meta.fontWeight == null) {
+      return parent;
+    }
 
     return parent.copyWith(
       color: meta.color,
-      decoration: buildTextDecoration(meta, parent),
+      decoration: decoration,
       decorationStyle: meta.decorationStyle,
       fontFamily: meta.fontFamily,
-      fontSize: buildTextFontSize(meta.fontSize, parent),
-      fontStyle: buildFontSize(meta),
+      fontSize: fontSize,
+      fontStyle: fontStyle,
       fontWeight: meta.fontWeight,
     );
   }
@@ -772,5 +782,12 @@ class WidgetFactory {
   BuildOp tagTable() {
     _tagTable ??= TagTable(this).buildOp;
     return _tagTable;
+  }
+
+  static WidgetFactory _instance;
+
+  static WidgetFactory getInstance() {
+    _instance ??= WidgetFactory();
+    return _instance;
   }
 }

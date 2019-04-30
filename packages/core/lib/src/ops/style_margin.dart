@@ -91,7 +91,7 @@ class _StyleMarginParser {
     final parsed = lengthParseValue(str);
     if (parsed == null) return 0;
 
-    final value = parsed.getValue(meta.buildOpTextStyle);
+    final value = parsed.getValue(meta.textStyle);
     if (value < 0) return 0;
 
     return value;

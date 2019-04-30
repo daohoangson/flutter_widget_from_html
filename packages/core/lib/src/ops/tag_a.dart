@@ -6,7 +6,10 @@ class TagA {
   TagA(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        collectMetadata: (meta) => lazySet(meta, decoUnder: true),
+        collectMetadata: (meta) {
+          meta.color ??= wf._config.hyperlinkColor;
+          meta.decoUnder ??= true;
+        },
         onPieces: (meta, pieces) {
           final tap = _buildGestureTapCallback(meta);
           if (tap == null) return pieces;

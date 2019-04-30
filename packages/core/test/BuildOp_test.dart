@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:html/dom.dart' as dom;
@@ -15,7 +14,7 @@ void main() {
 
     testWidgets('renders getInlineStyles in reversed', (WidgetTester t) async {
       final html = '<span>Foo</span>';
-      final e = await explain(t, html, wf: (c) => _GetInlineStylesTest(c));
+      final e = await explain(t, html, wf: _GetInlineStylesTest());
       expect(e, equals('[RichText:(#FFFF0000:Foo)]'));
     });
   });
@@ -24,20 +23,18 @@ void main() {
     final html = '<span>Foo</span>';
 
     testWidgets('renders A first', (WidgetTester t) async {
-      final e = await explain(t, html, wf: (c) => _PriorityTest(c, a: 1, b: 2));
-      expect(e, equals('[Text:Foo A B]'));
+      final e = await explain(t, html, wf: _PriorityTest(a: 1, b: 2));
+      expect(e, equals('[RichText:(:Foo A B)]'));
     });
 
     testWidgets('renders B first', (WidgetTester t) async {
-      final e = await explain(t, html, wf: (c) => _PriorityTest(c, a: 2, b: 1));
-      expect(e, equals('[Text:Foo B A]'));
+      final e = await explain(t, html, wf: _PriorityTest(a: 2, b: 1));
+      expect(e, equals('[RichText:(:Foo B A)]'));
     });
   });
 }
 
 class _GetInlineStylesTest extends WidgetFactory {
-  _GetInlineStylesTest(BuildContext context) : super(context);
-
   @override
   NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     meta = lazySet(meta,
@@ -56,7 +53,7 @@ class _GetInlineStylesTest extends WidgetFactory {
 class _PriorityTest extends WidgetFactory {
   final int a;
   final int b;
-  _PriorityTest(BuildContext context, {this.a, this.b}) : super(context);
+  _PriorityTest({this.a, this.b});
 
   @override
   NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {

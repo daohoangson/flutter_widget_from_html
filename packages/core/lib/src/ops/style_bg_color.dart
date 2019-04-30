@@ -28,8 +28,7 @@ class StyleBgColor {
 
   BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) => piece
     ..block.rebuildBits((bit) => bit.rebuild(
-          style: (bit.style ?? piece.style)
-              .copyWith(background: Paint()..color = bgColor),
+          style: bit.style.copyWith(background: Paint()..color = bgColor),
         ));
 
   BuiltPiece _buildWidgets(Iterable<Widget> widgets, Color bgColor) {

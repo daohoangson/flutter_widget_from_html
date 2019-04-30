@@ -135,7 +135,7 @@ TableBorder _buildTableBorder(NodeMetadata meta) {
     if (borderParsed != null) {
       return TableBorder.all(
         color: borderParsed.color ?? const Color(0xFF000000),
-        width: borderParsed.width.getValue(meta.buildOpTextStyle),
+        width: borderParsed.width.getValue(meta.textStyle),
       );
     }
   }

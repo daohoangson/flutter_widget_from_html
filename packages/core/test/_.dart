@@ -9,14 +9,14 @@ Future<String> explain(
   _WidgetExplainer explainer,
   _HtmlWidgetBuilder hw,
   String imageUrlToPrecache,
-  WidgetFactoryBuilder wf,
+  WidgetFactory wf,
   Uri baseUrl,
   double bodyVerticalPadding = 0,
   double tableCellPadding = 0,
   double tablePadding = 0,
   double textHorizontalPadding = 0,
 }) async {
-  final key = new UniqueKey();
+  final key = UniqueKey();
 
   await tester.pumpWidget(
     StatefulBuilder(
@@ -31,33 +31,13 @@ Future<String> explain(
           );
         }
 
-        return MaterialApp(
-          theme: ThemeData(
-            accentColor: Color(0xFF0000FF),
-          ),
-          home: Material(
-            child: DefaultTextStyle(
-              key: key,
-              style: DefaultTextStyle.of(context).style.copyWith(
-                    fontSize: 10.0,
-                    fontWeight: FontWeight.normal,
-                  ),
-              child: hw != null
-                  ? hw()
-                  : HtmlWidget(
-                      html,
-                      baseUrl: baseUrl,
-                      bodyPadding:
-                          EdgeInsets.symmetric(vertical: bodyVerticalPadding),
-                      tableCellPadding: EdgeInsets.all(tableCellPadding),
-                      tablePadding: EdgeInsets.all(tablePadding),
-                      textPadding: EdgeInsets.symmetric(
-                          horizontal: textHorizontalPadding),
-                      wf: wf,
-                    ),
-            ),
-          ),
+        final defaultStyle = DefaultTextStyle.of(context).style;
+        final style = defaultStyle.copyWith(
+          fontSize: 10.0,
+          fontWeight: FontWeight.normal,
         );
+
+        return DefaultTextStyle(key: key, style: style, child: Container());
       },
     ),
   );
@@ -66,13 +46,23 @@ Future<String> explain(
   expect(found.widget, isInstanceOf<DefaultTextStyle>());
 
   final _ = _Explainer(found, explainer: explainer);
-  final htmlWidget = (found.widget as DefaultTextStyle).child as HtmlWidget;
+  final htmlWidget = hw != null
+      ? hw()
+      : HtmlWidget(
+          html,
+          baseUrl: baseUrl,
+          bodyPadding: EdgeInsets.symmetric(vertical: bodyVerticalPadding),
+          tableCellPadding: EdgeInsets.all(tableCellPadding),
+          tablePadding: EdgeInsets.all(tablePadding),
+          textPadding: EdgeInsets.symmetric(horizontal: textHorizontalPadding),
+          wf: wf,
+        );
 
   return _.explain(htmlWidget.build(found));
 }
 
-final _explainMarginRegExp =
-    RegExp(r'^\[Column:children=\[Text:x\],(.+),\[Text:x\]\]$');
+final _explainMarginRegExp = RegExp(
+    r'^\[Column:children=\[RichText:\(:x\)\],(.+),\[RichText:\(:x\)\]\]$');
 
 Future<String> explainMargin(
   WidgetTester tester,

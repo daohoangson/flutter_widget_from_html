@@ -1,6 +1,6 @@
 part of '../core_widget_factory.dart';
 
-TextSpan compileToTextSpan(TextBlock b, TextStyle defaultStyle) {
+TextSpan compileToTextSpan(TextBlock b) {
   if (b == null || b.isEmpty) return null;
 
   final i = _getNoTrailing(b).iterator;
@@ -16,7 +16,7 @@ TextSpan compileToTextSpan(TextBlock b, TextStyle defaultStyle) {
     if (prevSb != firstSb && prevSb.length > 0) {
       children.add(TextSpan(
         recognizer: _buildGestureRecognizer(prevBit),
-        style: prevBit.style ?? defaultStyle,
+        style: prevBit.style,
         text: prevSb.toString(),
       ));
     }
@@ -37,18 +37,9 @@ TextSpan compileToTextSpan(TextBlock b, TextStyle defaultStyle) {
   return TextSpan(
     children: children,
     recognizer: _buildGestureRecognizer(first),
-    style: first.style ?? defaultStyle,
+    style: first.style,
     text: firstSb.toString(),
   );
-}
-
-String compileToString(TextBlock b) {
-  if (b == null || b.isEmpty) return null;
-
-  final sb = StringBuffer();
-  _getNoTrailing(b).forEach((b) => sb.write(b.text));
-
-  return sb.toString();
 }
 
 GestureRecognizer _buildGestureRecognizer(TextBit bit) =>

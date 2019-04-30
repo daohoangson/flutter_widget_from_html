@@ -55,8 +55,8 @@ class TagLi {
           break;
         case _kCssPaddingLeft:
           final parsed = lengthParseValue(value);
-          paddingLeft = parsed?.getValue(meta.buildOpTextStyle) ??
-              _kCssPaddingLeftDefault;
+          paddingLeft =
+              parsed?.getValue(meta.textStyle) ?? _kCssPaddingLeftDefault;
       }
     });
 
@@ -66,6 +66,7 @@ class TagLi {
               _buildBody(widget, paddingLeft),
               _buildMarker(
                 wf.getListStyleMarker(listStyleType, ++i),
+                meta.textStyle,
                 paddingLeft,
               ),
             ]))
@@ -77,14 +78,15 @@ class TagLi {
         child: widget,
       );
 
-  Widget _buildMarker(String text, double paddingLeft) => Positioned(
+  Widget _buildMarker(String text, TextStyle style, double paddingLeft) =>
+      Positioned(
         left: 0.0,
         top: 0.0,
         width: paddingLeft * .8,
-        child: Text(
-          text,
+        child: RichText(
           maxLines: 1,
           overflow: TextOverflow.clip,
+          text: TextSpan(style: style, text: text),
           textAlign: TextAlign.right,
         ),
       );
