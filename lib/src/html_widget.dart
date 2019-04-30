@@ -29,6 +29,7 @@ class HtmlWidget extends core.HtmlWidget implements Config {
           key: key,
           baseUrl: baseUrl,
           bodyPadding: bodyPadding,
+          hyperlinkColor: hyperlinkColor,
           tableCellPadding: tableCellPadding,
           tablePadding: tablePadding,
           textPadding: textPadding,
