@@ -24,5 +24,4 @@ class TagImg {
 String _getAttr(Map<dynamic, String> map, String key, String key2) =>
     map.containsKey(key) ? map[key] : map.containsKey(key2) ? map[key2] : null;
 
-int _parseInt(String value) =>
-    value?.isNotEmpty == true ? int.parse(value) : null;
+int _parseInt(String value) => int.tryParse(value ?? '');
