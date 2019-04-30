@@ -49,10 +49,9 @@ void main() {
             '[Stack:children=[$padding,child=[RichText:(:One)]],[Positioned:child=[RichText,align=right:(:1.)]]],'
             '[Stack:children=[$padding,child=[RichText:(:Two)]],[Positioned:child=[RichText,align=right:(:2.)]]],'
             '[Stack:children=[$padding,child=[Column:children=[RichText:(:Three)],'
-            '[Column:children='
             '[Stack:children=[$padding,child=[RichText:(:3.1)]],[Positioned:child=[RichText,align=right:(:•)]]],'
             '[Stack:children=[$padding,child=[RichText:(:3.2)]],[Positioned:child=[RichText,align=right:(:•)]]]'
-            ']]],[Positioned:child=[RichText,align=right:(:3.)]]],'
+            ']],[Positioned:child=[RichText,align=right:(:3.)]]],'
             '[Stack:children=[$padding,child=[RichText:(:Four)]],[Positioned:child=[RichText,align=right:(:4.)]]]]'));
   });
 }

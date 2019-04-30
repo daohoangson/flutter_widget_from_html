@@ -147,11 +147,11 @@ void main() {
         imageUrlToPrecache: 'image.png',
       );
       expect(
-        explained,
-        equals('[Padding:(10,40,10,40),child=[Column:children=' +
-            '[Image:image=[NetworkImage:url=image.png]],' +
-            '[RichText:(+i:fig. 1(: Foo))]]]'),
-      );
+          explained,
+          equals(
+            '[Padding:(10,40,0,40),child=[Image:image=[NetworkImage:url=image.png]]],'
+            '[Padding:(0,40,10,40),child=[RichText:(+i:fig. 1(: Foo))]]',
+          ));
     });
 
     testWidgets('renders HEADER/FOOTER tag', (WidgetTester tester) async {
