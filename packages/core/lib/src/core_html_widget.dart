@@ -15,6 +15,7 @@ class HtmlWidget extends StatelessWidget implements Config {
   final EdgeInsets bodyPadding;
   final NodeMetadataCollector builderCallback;
   final Color hyperlinkColor;
+  final OnTapUrl onTapUrl;
   final EdgeInsets tableCellPadding;
   final EdgeInsets tablePadding;
   final EdgeInsets textPadding;
@@ -28,6 +29,7 @@ class HtmlWidget extends StatelessWidget implements Config {
     EdgeInsets bodyPadding,
     this.builderCallback,
     Color hyperlinkColor,
+    this.onTapUrl,
     EdgeInsets tableCellPadding,
     EdgeInsets tablePadding,
     EdgeInsets textPadding,

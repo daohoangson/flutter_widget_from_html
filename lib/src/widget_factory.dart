@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
@@ -27,7 +26,9 @@ class WidgetFactory extends core.WidgetFactory {
 
   @override
   GestureTapCallback buildGestureTapCallbackForUrl(String url) =>
-      () => canLaunch(url).then((ok) => ok ? launch(url) : null);
+      () => _config.onTapUrl != null
+          ? _config.onTapUrl(url)
+          : canLaunch(url).then((ok) => ok ? launch(url) : null);
 
   @override
   Widget buildImageFromUrl(String url) => CachedNetworkImage(

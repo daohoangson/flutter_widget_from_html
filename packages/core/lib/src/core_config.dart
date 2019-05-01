@@ -7,7 +7,10 @@ abstract class Config {
   EdgeInsets get bodyPadding;
   NodeMetadataCollector get builderCallback;
   Color get hyperlinkColor;
+  OnTapUrl get onTapUrl;
   EdgeInsets get tableCellPadding;
   EdgeInsets get tablePadding;
   EdgeInsets get textPadding;
 }
+
+typedef void OnTapUrl(String url);

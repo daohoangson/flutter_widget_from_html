@@ -127,9 +127,8 @@ class WidgetFactory {
     return GestureDetector(child: child, onTap: onTap);
   }
 
-  GestureTapCallback buildGestureTapCallbackForUrl(String url) => () {
-        debugPrint(url);
-      };
+  GestureTapCallback buildGestureTapCallbackForUrl(String url) =>
+      () => _config.onTapUrl != null ? _config.onTapUrl(url) : debugPrint(url);
 
   Widget buildImage(String src, {int height, String text, int width}) {
     final imageWidget = src?.startsWith('data:image') == true
