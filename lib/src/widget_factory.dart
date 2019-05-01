@@ -3,12 +3,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    show BuildOp, NodeMetadata, lazySet;
-import 'package:html/dom.dart' as dom;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'config.dart';
+import 'data_classes.dart';
 import 'web_view.dart';
 
 part 'ops/tag_iframe.dart';
@@ -59,14 +57,14 @@ class WidgetFactory extends core.WidgetFactory {
       );
 
   @override
-  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
-    switch (e.localName) {
+  NodeMetadata parseElement(NodeMetadata meta, String tag) {
+    switch (tag) {
       case 'iframe':
         // return asap to avoid being disabled by core
         return lazySet(meta, buildOp: tagIframe());
     }
 
-    return super.parseElement(meta, e);
+    return super.parseElement(meta, tag);
   }
 
   BuildOp tagIframe() {

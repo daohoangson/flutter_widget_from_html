@@ -6,7 +6,7 @@ class TagA {
   TagA(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        collectMetadata: (meta) {
+        onMetadata: (meta) {
           meta.color ??= wf._config.hyperlinkColor;
           meta.decoUnder ??= true;
         },
@@ -29,7 +29,7 @@ class TagA {
       wf.buildGestureDetector(wf.buildColumn(widgets), onTap);
 
   GestureTapCallback _buildGestureTapCallback(NodeMetadata meta) {
-    final attrs = meta.buildOpElement.attributes;
+    final attrs = meta.domElement.attributes;
     final href = attrs.containsKey('href') ? attrs['href'] : '';
     final url = wf.constructFullUrl(href) ?? href;
     return wf.buildGestureTapCallbackForUrl(url);

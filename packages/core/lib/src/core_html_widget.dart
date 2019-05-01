@@ -1,18 +1,11 @@
-import 'package:flutter/widgets.dart'
-    show
-        BuildContext,
-        Color,
-        EdgeInsets,
-        Key,
-        StatelessWidget,
-        Text,
-        TextStyle,
-        Widget;
+import 'package:flutter/widgets.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:html/parser.dart' as parser;
 
-import 'builder.dart';
+import 'builder.dart' as core;
 import 'core_config.dart';
 import 'core_widget_factory.dart';
+import 'data_classes.dart';
 
 class HtmlWidget extends StatelessWidget implements Config {
   final String html;
@@ -20,6 +13,7 @@ class HtmlWidget extends StatelessWidget implements Config {
 
   final Uri baseUrl;
   final EdgeInsets bodyPadding;
+  final NodeMetadataCollector builderCallback;
   final Color hyperlinkColor;
   final EdgeInsets tableCellPadding;
   final EdgeInsets tablePadding;
@@ -32,6 +26,7 @@ class HtmlWidget extends StatelessWidget implements Config {
     Key key,
     this.baseUrl,
     EdgeInsets bodyPadding,
+    this.builderCallback,
     Color hyperlinkColor,
     EdgeInsets tableCellPadding,
     EdgeInsets tablePadding,
@@ -53,9 +48,10 @@ class HtmlWidget extends StatelessWidget implements Config {
   Widget build(BuildContext context) {
     final domNodes = parser.parse(html).body.nodes;
     final wf = initFactory();
-    final widgets = Builder(
+    final widgets = core.Builder(
       context: context,
       domNodes: domNodes,
+      metadataCallback: builderCallback,
       parentTextStyle: textStyle,
       wf: wf,
     ).build();

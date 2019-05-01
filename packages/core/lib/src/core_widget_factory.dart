@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-import 'package:html/dom.dart' as dom;
 
 import 'core_config.dart';
 import 'data_classes.dart';
@@ -236,11 +235,7 @@ class WidgetFactory {
     return TextDecoration.combine(list);
   }
 
-  double buildTextFontSize(
-    NodeMetadata meta,
-    BuildContext context,
-    TextStyle parent,
-  ) {
+  double buildTextFontSize(NodeMetadata meta, TextStyle parent) {
     final value = meta?.fontSize;
     if (value == null) return null;
 
@@ -249,19 +244,19 @@ class WidgetFactory {
 
     switch (value) {
       case kCssFontSizeXxLarge:
-        return DefaultTextStyle.of(context).style.fontSize * 2.0;
+        return DefaultTextStyle.of(meta.context).style.fontSize * 2.0;
       case kCssFontSizeXLarge:
-        return DefaultTextStyle.of(context).style.fontSize * 1.5;
+        return DefaultTextStyle.of(meta.context).style.fontSize * 1.5;
       case kCssFontSizeLarge:
-        return DefaultTextStyle.of(context).style.fontSize * 1.125;
+        return DefaultTextStyle.of(meta.context).style.fontSize * 1.125;
       case kCssFontSizeMedium:
-        return DefaultTextStyle.of(context).style.fontSize;
+        return DefaultTextStyle.of(meta.context).style.fontSize;
       case kCssFontSizeSmall:
-        return DefaultTextStyle.of(context).style.fontSize * .8125;
+        return DefaultTextStyle.of(meta.context).style.fontSize * .8125;
       case kCssFontSizeXSmall:
-        return DefaultTextStyle.of(context).style.fontSize * .625;
+        return DefaultTextStyle.of(meta.context).style.fontSize * .625;
       case kCssFontSizeXxSmall:
-        return DefaultTextStyle.of(context).style.fontSize * .5625;
+        return DefaultTextStyle.of(meta.context).style.fontSize * .5625;
 
       case kCssFontSizeLarger:
         return parent.fontSize * 1.2;
@@ -272,15 +267,11 @@ class WidgetFactory {
     return null;
   }
 
-  TextStyle buildTextStyle(
-    NodeMetadata meta,
-    BuildContext context,
-    TextStyle parent,
-  ) {
+  TextStyle buildTextStyle(NodeMetadata meta, TextStyle parent) {
     if (meta == null) return parent;
 
     final decoration = buildTextDecoration(meta, parent);
-    final fontSize = buildTextFontSize(meta, context, parent);
+    final fontSize = buildTextFontSize(meta, parent);
     final fontStyle = buildFontStyle(meta);
     if (meta.color == null &&
         decoration == null &&
@@ -423,8 +414,8 @@ class WidgetFactory {
     return '';
   }
 
-  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
-    switch (e.localName) {
+  NodeMetadata parseElement(NodeMetadata meta, String tag) {
+    switch (tag) {
       case 'a':
         meta = lazySet(meta, buildOp: tagA());
         break;
@@ -456,7 +447,7 @@ class WidgetFactory {
 
       case 'blockquote':
       case 'figure':
-        meta = lazySet(meta, inlineStyles: [kCssMargin, '1em 40px']);
+        meta = lazySet(meta, styles: [kCssMargin, '1em 40px']);
         break;
 
       case 'b':
@@ -473,8 +464,7 @@ class WidgetFactory {
         break;
 
       case 'center':
-        meta =
-            lazySet(meta, inlineStyles: [kCssTextAlign, kCssTextAlignCenter]);
+        meta = lazySet(meta, styles: [kCssTextAlign, kCssTextAlignCenter]);
         break;
 
       case 'cite':
@@ -492,7 +482,7 @@ class WidgetFactory {
         break;
 
       case 'dd':
-        meta = lazySet(meta, inlineStyles: [kCssMargin, '0 0 1em 40px']);
+        meta = lazySet(meta, styles: [kCssMargin, '0 0 1em 40px']);
         break;
       case 'dl':
         meta = lazySet(meta, isBlockElement: true);
@@ -516,7 +506,7 @@ class WidgetFactory {
           meta,
           fontSize: '2em',
           fontWeight: FontWeight.bold,
-          inlineStyles: [kCssMargin, '0.67em 0'],
+          styles: [kCssMargin, '0.67em 0'],
         );
         break;
       case 'h2':
@@ -524,7 +514,7 @@ class WidgetFactory {
           meta,
           fontSize: '1.5em',
           fontWeight: FontWeight.bold,
-          inlineStyles: [kCssMargin, '0.83em 0'],
+          styles: [kCssMargin, '0.83em 0'],
         );
         break;
       case 'h3':
@@ -532,14 +522,14 @@ class WidgetFactory {
           meta,
           fontSize: '1.17em',
           fontWeight: FontWeight.bold,
-          inlineStyles: [kCssMargin, '1em 0'],
+          styles: [kCssMargin, '1em 0'],
         );
         break;
       case 'h4':
         meta = lazySet(
           meta,
           fontWeight: FontWeight.bold,
-          inlineStyles: [kCssMargin, '1.33em 0'],
+          styles: [kCssMargin, '1.33em 0'],
         );
         break;
       case 'h5':
@@ -547,7 +537,7 @@ class WidgetFactory {
           meta,
           fontSize: '0.83em',
           fontWeight: FontWeight.bold,
-          inlineStyles: [kCssMargin, '1.67em 0'],
+          styles: [kCssMargin, '1.67em 0'],
         );
         break;
       case 'h6':
@@ -555,7 +545,7 @@ class WidgetFactory {
           meta,
           fontSize: '0.67em',
           fontWeight: FontWeight.bold,
-          inlineStyles: [kCssMargin, '2.33em 0'],
+          styles: [kCssMargin, '2.33em 0'],
         );
         break;
 
@@ -590,12 +580,12 @@ class WidgetFactory {
       case 'mark':
         meta = lazySet(
           meta,
-          inlineStyles: [kCssBackgroundColor, '#ff0', kCssColor, '#000'],
+          styles: [kCssBackgroundColor, '#ff0', kCssColor, '#000'],
         );
         break;
 
       case 'p':
-        meta = lazySet(meta, inlineStyles: [kCssMargin, '1em 0']);
+        meta = lazySet(meta, styles: [kCssMargin, '1em 0']);
         break;
 
       case 'q':
@@ -621,7 +611,7 @@ class WidgetFactory {
     return meta;
   }
 
-  NodeMetadata parseElementStyle(NodeMetadata meta, String key, String value) {
+  NodeMetadata parseStyle(NodeMetadata meta, String key, String value) {
     switch (key) {
       case kCssBackgroundColor:
         meta = lazySet(meta, buildOp: styleBgColor());
@@ -773,7 +763,7 @@ class WidgetFactory {
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      getInlineStyles: (_, __) => [kCssMarginBottom, '1em'],
+      defaultStyles: (_, __) => [kCssMarginBottom, '1em'],
       onWidgets: (_, __) => Container(),
     );
     return _tagBr;
@@ -786,7 +776,7 @@ class WidgetFactory {
 
   BuildOp tagHr() {
     _tagHr ??= BuildOp(
-      getInlineStyles: (_, __) => const [kCssMarginBottom, '1em'],
+      defaultStyles: (_, __) => const [kCssMarginBottom, '1em'],
       onWidgets: (_, __) => buildDivider(),
     );
     return _tagHr;

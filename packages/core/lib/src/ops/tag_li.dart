@@ -17,7 +17,7 @@ class TagLi {
   TagLi(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        getInlineStyles: (meta, e) {
+        defaultStyles: (meta, e) {
           if (e.localName == kTagListItem) return null;
 
           var isWithinAnotherList = false;
@@ -34,13 +34,12 @@ class TagLi {
                 : kCssListStyleTypeDisc,
           ];
         },
-        collectMetadata: (meta) => meta.buildOpElement.localName == kTagListItem
+        onMetadata: (meta) => meta.domElement.localName == kTagListItem
             ? null
             : lazySet(meta, key: key),
-        onWidgets: (meta, widgets) =>
-            meta.buildOpElement.localName == kTagListItem
-                ? _buildItem(widgets)
-                : _buildList(meta, widgets),
+        onWidgets: (meta, widgets) => meta.domElement.localName == kTagListItem
+            ? _buildItem(widgets)
+            : _buildList(meta, widgets),
       );
 
   Widget _buildItem(Iterable<Widget> widgets) => wf.buildColumn(widgets);

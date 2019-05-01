@@ -6,7 +6,7 @@ class TagImg {
   TagImg(this.wf);
 
   BuildOp get buildOp => BuildOp(onWidgets: (meta, widgets) {
-        final attrs = meta.buildOpElement.attributes;
+        final attrs = meta.domElement.attributes;
         final src = _getAttr(attrs, 'src', 'data-src');
         final height = _parseInt(_getAttr(attrs, 'height', 'data-height'));
         final width = _parseInt(_getAttr(attrs, 'width', 'data-width'));

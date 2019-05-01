@@ -16,18 +16,18 @@ class TagTable {
   TagTable(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        collectMetadata: (meta) {
-          if (meta.buildOpElement.localName == kTagTableHeader) {
-            meta.fontWeight ??= FontWeight.bold;
-          }
-        },
-        getInlineStyles: (_, e) {
+        defaultStyles: (_, e) {
           if (e.localName == kTagTableCaption) {
             return [kCssTextAlign, kCssTextAlignCenter];
           }
         },
+        onMetadata: (meta) {
+          if (meta.domElement.localName == kTagTableHeader) {
+            meta.fontWeight ??= FontWeight.bold;
+          }
+        },
         onWidgets: (meta, widgets) {
-          switch (meta.buildOpElement.localName) {
+          switch (meta.domElement.localName) {
             case kTagTable:
               return _buildTable(meta, widgets);
             case kTagTableCaption:
@@ -37,7 +37,7 @@ class TagTable {
             case kTagTableBody:
             case kTagTableHead:
             case kTagTableFoot:
-              return _SemanticWidget(meta.buildOpElement.localName, widgets);
+              return _SemanticWidget(meta.domElement.localName, widgets);
           }
 
           return wf.buildColumn(widgets);
@@ -140,9 +140,9 @@ TableBorder _buildTableBorder(NodeMetadata meta) {
     }
   }
 
-  final e = meta.buildOpElement;
-  if (e.attributes.containsKey(kTagTableAttrBorder)) {
-    final width = double.tryParse(e.attributes[kTagTableAttrBorder]);
+  final a = meta.domElement.attributes;
+  if (a.containsKey(kTagTableAttrBorder)) {
+    final width = double.tryParse(a[kTagTableAttrBorder]);
     if (width != null && width > 0) {
       return TableBorder.all(width: width);
     }

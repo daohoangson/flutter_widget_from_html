@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:html/dom.dart' as dom;
 
 import '_.dart';
 
@@ -36,17 +35,13 @@ void main() {
 
 class _GetInlineStylesTest extends WidgetFactory {
   @override
-  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
+  NodeMetadata parseElement(NodeMetadata meta, String tag) {
     meta = lazySet(meta,
-        buildOp: BuildOp(
-          getInlineStyles: (_, __) => [kCssColor, '#f00'],
-        ));
+        buildOp: BuildOp(defaultStyles: (_, __) => [kCssColor, '#f00']));
     meta = lazySet(meta,
-        buildOp: BuildOp(
-          getInlineStyles: (_, __) => [kCssColor, '#0f0'],
-        ));
+        buildOp: BuildOp(defaultStyles: (_, __) => [kCssColor, '#0f0']));
 
-    return super.parseElement(meta, e);
+    return super.parseElement(meta, tag);
   }
 }
 
@@ -56,7 +51,7 @@ class _PriorityTest extends WidgetFactory {
   _PriorityTest({this.a, this.b});
 
   @override
-  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
+  NodeMetadata parseElement(NodeMetadata meta, String tag) {
     meta = lazySet(meta,
         buildOp: BuildOp(
           onPieces: (_, pieces) => pieces.map((p) => p..block?.addText(' A')),
@@ -68,6 +63,6 @@ class _PriorityTest extends WidgetFactory {
           priority: b,
         ));
 
-    return super.parseElement(meta, e);
+    return super.parseElement(meta, tag);
   }
 }

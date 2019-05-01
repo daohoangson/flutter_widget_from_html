@@ -14,11 +14,11 @@ NodeMetadata lazySet(
   String fontSize,
   bool fontStyleItalic,
   FontWeight fontWeight,
-  Iterable<String> inlineStyles,
-  bool inlineStylesPrepend = false,
   bool isBlockElement,
   bool isNotRenderable,
   Key key,
+  Iterable<String> styles,
+  Iterable<String> stylesPrepend,
 }) {
   meta ??= NodeMetadata();
 
@@ -59,27 +59,26 @@ NodeMetadata lazySet(
   if (fontStyleItalic != null) meta.fontStyleItalic = fontStyleItalic;
   if (fontWeight != null) meta.fontWeight = fontWeight;
 
-  if (inlineStyles != null) {
-    if (inlineStyles.length % 2 != 0) {
-      throw new ArgumentError('inlineStyles must have an even number of items');
-    }
-    if (meta._inlineStylesFrozen) {
-      throw new StateError('inlineStyles has already been frozen');
-    }
-    meta._inlineStyles ??= [];
-    if (inlineStylesPrepend) {
-      meta._inlineStyles.insertAll(0, inlineStyles);
-    } else {
-      meta._inlineStyles.addAll(inlineStyles);
-    }
-  }
-
   if (isBlockElement != null) meta._isBlockElement = isBlockElement;
   if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
 
   if (key != null) {
     meta._keys ??= [];
     meta._keys.add(key);
+  }
+
+  if (stylesPrepend != null) {
+    styles = stylesPrepend;
+  }
+  if (styles != null) {
+    assert(styles.length % 2 == 0);
+    assert(!meta._stylesFrozen);
+    meta._styles ??= [];
+    if (styles == stylesPrepend) {
+      meta._styles.insertAll(0, styles);
+    } else {
+      meta._styles.addAll(styles);
+    }
   }
 
   return meta;
@@ -89,29 +88,29 @@ class BuildOp {
   // op with lower priority will run first
   final int priority;
 
-  final BuildOpCollectMetadata _collectMetadata;
-  final BuildOpGetInlineStyles _getInlineStyles;
+  final BuildOpDefaultStyles _defaultStyles;
+  final BuildOpOnMetadata _onMetadata;
   final BuildOpOnPieces _onPieces;
   final BuildOpOnWidgets _onWidgets;
 
   BuildOp({
-    BuildOpCollectMetadata collectMetadata,
-    BuildOpGetInlineStyles getInlineStyles,
+    BuildOpDefaultStyles defaultStyles,
+    BuildOpOnMetadata onMetadata,
     BuildOpOnPieces onPieces,
     BuildOpOnWidgets onWidgets,
     this.priority = 10,
-  })  : _collectMetadata = collectMetadata,
-        _getInlineStyles = getInlineStyles,
+  })  : _defaultStyles = defaultStyles,
+        _onMetadata = onMetadata,
         _onPieces = onPieces,
         _onWidgets = onWidgets;
 
   bool get isBlockElement => _onWidgets != null;
 
-  void collectMetadata(NodeMetadata meta) =>
-      _collectMetadata != null ? _collectMetadata(meta) : null;
+  List<String> defaultStyles(NodeMetadata meta, dom.Element e) =>
+      _defaultStyles != null ? _defaultStyles(meta, e) : null;
 
-  List<String> getInlineStyles(NodeMetadata meta, dom.Element e) =>
-      _getInlineStyles != null ? _getInlineStyles(meta, e) : null;
+  void onMetadata(NodeMetadata meta) =>
+      _onMetadata != null ? _onMetadata(meta) : null;
 
   Iterable<BuiltPiece> onPieces(
     NodeMetadata meta,
@@ -129,8 +128,8 @@ class BuildOp {
   }
 }
 
-typedef void BuildOpCollectMetadata(NodeMetadata meta);
-typedef List<String> BuildOpGetInlineStyles(NodeMetadata meta, dom.Element e);
+typedef Iterable<String> BuildOpDefaultStyles(NodeMetadata meta, dom.Element e);
+typedef void BuildOpOnMetadata(NodeMetadata meta);
 typedef Iterable<BuiltPiece> BuildOpOnPieces(
   NodeMetadata meta,
   Iterable<BuiltPiece> pieces,
@@ -196,9 +195,9 @@ enum CssLengthUnit {
 }
 
 class NodeMetadata {
-  dom.Element _buildOpElement;
   Iterable<BuildOp> _buildOps;
   BuildContext _context;
+  dom.Element _domElement;
   List<Key> _keys;
   TextStyle _textStyle;
 
@@ -211,41 +210,41 @@ class NodeMetadata {
   String fontSize;
   bool fontStyleItalic;
   FontWeight fontWeight;
-  List<String> _inlineStyles;
-  bool _inlineStylesFrozen = false;
   bool _isBlockElement;
   bool isNotRenderable;
+  List<String> _styles;
+  bool _stylesFrozen = false;
 
   BuildContext get context => _context;
 
-  dom.Element get buildOpElement => _buildOpElement;
+  dom.Element get domElement => _domElement;
 
   TextStyle get textStyle => _textStyle;
+
+  set domElement(dom.Element e) {
+    assert(_domElement == null);
+    _domElement = e;
+
+    if (_buildOps != null) {
+      final ops = _buildOps as List;
+      ops.sort((a, b) => a.priority.compareTo(b.priority));
+      _buildOps = List.unmodifiable(ops);
+    }
+  }
+
+  set context(BuildContext context) {
+    assert(_context == null);
+    _context = context;
+  }
+
+  set textStyle(TextStyle textStyle) {
+    assert(_textStyle == null);
+    _textStyle = textStyle;
+  }
 
   bool get isBlockElement {
     if (_isBlockElement == true) return true;
     return _buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
-  }
-
-  Iterable<BuildOp> freezeOps(dom.Element e) {
-    if (_buildOps == null) return null;
-
-    _buildOpElement = e;
-
-    final ops = _buildOps as List;
-    ops.sort((a, b) => a.priority.compareTo(b.priority));
-    _buildOps = List.unmodifiable(ops);
-
-    return _buildOps;
-  }
-
-  void freezeTextStyle(BuildContext context, TextStyle textStyle) {
-    if (_textStyle != null) {
-      throw new StateError('TextStyle has already been set');
-    }
-
-    _context = context;
-    _textStyle = textStyle;
   }
 
   void keys(void f(Key key)) => _keys?.forEach(f);
@@ -253,10 +252,10 @@ class NodeMetadata {
   void ops(void f(BuildOp element)) => _buildOps?.forEach(f);
 
   void styles(void f(String key, String value)) {
-    _inlineStylesFrozen = true;
-    if (_inlineStyles == null) return;
+    _stylesFrozen = true;
+    if (_styles == null) return;
 
-    final iterator = _inlineStyles.iterator;
+    final iterator = _styles.iterator;
     while (iterator.moveNext()) {
       final key = iterator.current;
       if (!iterator.moveNext()) return;
@@ -264,6 +263,8 @@ class NodeMetadata {
     }
   }
 }
+
+typedef NodeMetadata NodeMetadataCollector(NodeMetadata meta, dom.Element e);
 
 class TextBit {
   final String data;

@@ -96,32 +96,29 @@ const kHtml = """
 <p>How are you <img class="smilie smilie-2" alt=":P" src="http://domain.com/sprites.png" />?
 """;
 
+const kSmilies = {':)': '🙂'};
+
 class SmilieScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text('SmilieScreen'),
-        ),
-        body: HtmlWidget(kHtml, wf: SmilieWf()),
-      );
-}
-
-const _kSmilies = {':)': '🙂'};
-
-class SmilieWf extends WidgetFactory {
   final smilieOp = BuildOp(
     onPieces: (meta, pieces) {
-      final alt = meta.buildOpElement.attributes['alt'];
-      final text = _kSmilies.containsKey(alt) ? _kSmilies[alt] : alt;
+      final alt = meta.domElement.attributes['alt'];
+      final text = kSmilies.containsKey(alt) ? kSmilies[alt] : alt;
       return pieces..first?.block?.addText(text);
     },
   );
 
   @override
-  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) =>
-      e.classes.contains('smilie')
-          ? lazySet(null, buildOp: smilieOp)
-          : super.parseElement(meta, e);
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: Text('SmilieScreen'),
+        ),
+        body: HtmlWidget(
+          kHtml,
+          builderCallback: (meta, e) => e.classes.contains('smilie')
+              ? lazySet(null, buildOp: smilieOp)
+              : meta,
+        ),
+      );
 }
 ```
 

@@ -10,6 +10,7 @@ final _textTrailingSpacingRegExp = RegExp(r'\s+$');
 final _whitespaceDuplicateRegExp = RegExp(r'\s+');
 
 class Builder {
+  final NodeMetadataCollector metadataCallback;
   final BuildContext context;
   final List<dom.Node> domNodes;
   final TextBlock parentBlock;
@@ -24,6 +25,7 @@ class Builder {
   Builder({
     @required this.context,
     @required this.domNodes,
+    this.metadataCallback,
     this.parentBlock,
     this.parentMeta,
     TextStyle parentTextStyle,
@@ -42,7 +44,7 @@ class Builder {
         ? p.widgets.forEach(addWidget)
         : addWidget(wf.buildText(p.block)));
 
-    parentMeta?.ops((o) => widgets = o.onWidgets(parentMeta, widgets));
+    parentMeta?.ops((op) => widgets = op.onWidgets(parentMeta, widgets));
 
     return widgets;
   }
@@ -52,20 +54,26 @@ class Builder {
 
     parentMeta?.keys((k) => meta = lazySet(meta, key: k));
 
-    meta = wf.parseElement(meta, e);
+    meta = wf.parseElement(meta, e.localName);
 
-    meta?.ops((o) => lazySet(
-          meta,
-          inlineStyles: o.getInlineStyles(meta, e),
-          inlineStylesPrepend: true,
-        ));
+    // stylings, step 1: get default styles from tag-based build ops
+    meta?.ops((op) => lazySet(meta, stylesPrepend: op.defaultStyles(meta, e)));
+    // stylings, step 2: get styles from `style` attribute
     if (e.attributes.containsKey('style')) {
-      _attrStyleRegExp.allMatches(e.attributes['style']).forEach((m) =>
-          meta = lazySet(meta, inlineStyles: [m[1].trim(), m[2].trim()]));
+      for (final m in _attrStyleRegExp.allMatches(e.attributes['style'])) {
+        meta = lazySet(meta, styles: [m[1].trim(), m[2].trim()]);
+      }
     }
-    meta?.styles((k, v) => meta = wf.parseElementStyle(meta, k, v));
 
-    meta?.freezeOps(e)?.forEach((o) => o.collectMetadata(meta));
+    meta?.styles((k, v) => meta = wf.parseStyle(meta, k, v));
+
+    if (metadataCallback != null) meta = metadataCallback(meta, e);
+
+    meta?.context = context;
+    meta?.domElement = e;
+    meta?.ops((op) => op.onMetadata(meta));
+
+    meta?.textStyle = wf.buildTextStyle(meta, parentTextStyle);
 
     return meta;
   }
@@ -81,16 +89,13 @@ class Builder {
       if (domNode.nodeType != dom.Node.ELEMENT_NODE) continue;
 
       final meta = collectMetadata(domNode);
-      meta?.freezeTextStyle(
-        context,
-        wf.buildTextStyle(meta, context, parentTextStyle),
-      );
       if (meta?.isNotRenderable == true) continue;
 
       final isBlockElement = meta?.isBlockElement == true;
       final __builder = Builder(
         context: context,
         domNodes: domNode.nodes,
+        metadataCallback: metadataCallback,
         parentBlock: isBlockElement ? null : _textPiece.block,
         parentMeta: meta,
         parentTextStyle: meta?.textStyle ?? parentTextStyle,
@@ -124,7 +129,7 @@ class Builder {
     _saveTextPiece();
 
     Iterable<BuiltPiece> output = _pieces;
-    parentMeta?.ops((o) => output = o.onPieces(parentMeta, output));
+    parentMeta?.ops((op) => output = op.onPieces(parentMeta, output));
     return output;
   }
 

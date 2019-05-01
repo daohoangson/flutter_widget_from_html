@@ -3,6 +3,7 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
     as core;
 
 import 'config.dart';
+import 'data_classes.dart';
 import 'widget_factory.dart' as extended;
 
 class HtmlWidget extends core.HtmlWidget implements Config {
@@ -15,6 +16,7 @@ class HtmlWidget extends core.HtmlWidget implements Config {
     Key key,
     Uri baseUrl,
     EdgeInsets bodyPadding,
+    NodeMetadataCollector builderCallback,
     Color hyperlinkColor,
     EdgeInsets tableCellPadding,
     EdgeInsets tablePadding,
@@ -30,6 +32,7 @@ class HtmlWidget extends core.HtmlWidget implements Config {
           key: key,
           baseUrl: baseUrl,
           bodyPadding: bodyPadding,
+          builderCallback: builderCallback,
           hyperlinkColor: hyperlinkColor,
           tableCellPadding: tableCellPadding,
           tablePadding: tablePadding,
