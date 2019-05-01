@@ -43,5 +43,5 @@ class HtmlWidget extends core.HtmlWidget implements Config {
         );
 
   core.WidgetFactory initFactory() =>
-      (wf ?? extended.WidgetFactory.getInstance())..config = this;
+      (wf ?? extended.WidgetFactory())..config = this;
 }

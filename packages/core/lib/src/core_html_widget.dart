@@ -61,6 +61,5 @@ class HtmlWidget extends StatelessWidget implements Config {
     return wf.buildBody(widgets) ?? Text(html);
   }
 
-  WidgetFactory initFactory() =>
-      (wf ?? WidgetFactory.getInstance())..config = this;
+  WidgetFactory initFactory() => (wf ?? WidgetFactory())..config = this;
 }

@@ -819,11 +819,4 @@ class WidgetFactory {
     _tagTable ??= TagTable(this).buildOp;
     return _tagTable;
   }
-
-  static WidgetFactory _instance;
-
-  static WidgetFactory getInstance() {
-    _instance ??= WidgetFactory();
-    return _instance;
-  }
 }
