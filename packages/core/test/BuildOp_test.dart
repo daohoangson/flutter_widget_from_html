@@ -35,13 +35,13 @@ void main() {
 
 class _GetInlineStylesTest extends WidgetFactory {
   @override
-  NodeMetadata parseElement(NodeMetadata meta, String tag) {
+  NodeMetadata parseLocalName(NodeMetadata meta, String localName) {
     meta = lazySet(meta,
         buildOp: BuildOp(defaultStyles: (_, __) => [kCssColor, '#f00']));
     meta = lazySet(meta,
         buildOp: BuildOp(defaultStyles: (_, __) => [kCssColor, '#0f0']));
 
-    return super.parseElement(meta, tag);
+    return super.parseLocalName(meta, localName);
   }
 }
 
@@ -51,7 +51,7 @@ class _PriorityTest extends WidgetFactory {
   _PriorityTest({this.a, this.b});
 
   @override
-  NodeMetadata parseElement(NodeMetadata meta, String tag) {
+  NodeMetadata parseLocalName(NodeMetadata meta, String localName) {
     meta = lazySet(meta,
         buildOp: BuildOp(
           onPieces: (_, pieces) => pieces.map((p) => p..block?.addText(' A')),
@@ -63,6 +63,6 @@ class _PriorityTest extends WidgetFactory {
           priority: b,
         ));
 
-    return super.parseElement(meta, tag);
+    return super.parseLocalName(meta, localName);
   }
 }

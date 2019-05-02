@@ -53,7 +53,6 @@ class HtmlWidget extends StatelessWidget implements Config {
     final widgets = core.Builder(
       context: context,
       domNodes: domNodes,
-      metadataCallback: builderCallback,
       parentTextStyle: textStyle,
       wf: wf,
     ).build();

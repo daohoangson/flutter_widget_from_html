@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
+import 'package:html/dom.dart' as dom;
 
 import 'core_config.dart';
 import 'data_classes.dart';
@@ -413,8 +414,16 @@ class WidgetFactory {
     return '';
   }
 
-  NodeMetadata parseElement(NodeMetadata meta, String tag) {
-    switch (tag) {
+  NodeMetadata parseElement(NodeMetadata meta, dom.Element element) {
+    if (_config.builderCallback != null) {
+      meta = _config.builderCallback(meta, element);
+    }
+
+    return meta;
+  }
+
+  NodeMetadata parseLocalName(NodeMetadata meta, String localName) {
+    switch (localName) {
       case 'a':
         meta = lazySet(meta, buildOp: tagA());
         break;

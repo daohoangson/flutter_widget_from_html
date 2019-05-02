@@ -10,7 +10,6 @@ final _textTrailingSpacingRegExp = RegExp(r'\s+$');
 final _whitespaceDuplicateRegExp = RegExp(r'\s+');
 
 class Builder {
-  final NodeMetadataCollector metadataCallback;
   final BuildContext context;
   final List<dom.Node> domNodes;
   final TextBlock parentBlock;
@@ -25,7 +24,6 @@ class Builder {
   Builder({
     @required this.context,
     @required this.domNodes,
-    this.metadataCallback,
     this.parentBlock,
     this.parentMeta,
     TextStyle parentTextStyle,
@@ -54,7 +52,7 @@ class Builder {
 
     parentMeta?.keys((k) => meta = lazySet(meta, key: k));
 
-    meta = wf.parseElement(meta, e.localName);
+    meta = wf.parseLocalName(meta, e.localName);
 
     // stylings, step 1: get default styles from tag-based build ops
     meta?.ops((op) => lazySet(meta, stylesPrepend: op.defaultStyles(meta, e)));
@@ -67,7 +65,7 @@ class Builder {
 
     meta?.styles((k, v) => meta = wf.parseStyle(meta, k, v));
 
-    if (metadataCallback != null) meta = metadataCallback(meta, e);
+    meta = wf.parseElement(meta, e);
 
     meta?.context = context;
     meta?.domElement = e;
@@ -95,7 +93,6 @@ class Builder {
       final __builder = Builder(
         context: context,
         domNodes: domNode.nodes,
-        metadataCallback: metadataCallback,
         parentBlock: isBlockElement ? null : _textPiece.block,
         parentMeta: meta,
         parentTextStyle: meta?.textStyle ?? parentTextStyle,

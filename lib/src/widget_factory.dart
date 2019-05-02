@@ -58,14 +58,14 @@ class WidgetFactory extends core.WidgetFactory {
       );
 
   @override
-  NodeMetadata parseElement(NodeMetadata meta, String tag) {
-    switch (tag) {
+  NodeMetadata parseLocalName(NodeMetadata meta, String localName) {
+    switch (localName) {
       case 'iframe':
         // return asap to avoid being disabled by core
         return lazySet(meta, buildOp: tagIframe());
     }
 
-    return super.parseElement(meta, tag);
+    return super.parseLocalName(meta, localName);
   }
 
   BuildOp tagIframe() {
