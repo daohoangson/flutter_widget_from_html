@@ -1,9 +1,9 @@
 part of '../core_widget_factory.dart';
 
-const kTagListItem = 'li';
 const kTagOrderedList = 'ol';
 const kTagUnorderedList = 'ul';
 const kCssListStyleType = 'list-style-type';
+const kCssListStyleTypeCircle = 'circle';
 const kCssListStyleTypeDecimal = 'decimal';
 const kCssListStyleTypeDisc = 'disc';
 
@@ -11,36 +11,46 @@ const _kCssPaddingLeft = 'padding-left';
 const _kCssPaddingLeftDefault = 40.0;
 
 class TagLi {
-  final key = ValueKey('TagLi');
   final WidgetFactory wf;
+
+  BuildOp _buildOp;
+  BuildOp _liOp;
 
   TagLi(this.wf);
 
-  BuildOp get buildOp => BuildOp(
-        defaultStyles: (meta, e) {
-          if (e.localName == kTagListItem) return null;
+  BuildOp get buildOp {
+    _buildOp ??= BuildOp(
+      defaultStyles: (meta, e) {
+        var parents = 0;
+        meta.parents((op) => op == _buildOp ? parents++ : null);
 
-          var isWithinAnotherList = false;
-          meta.keys((k) => k == key ? isWithinAnotherList = true : null);
+        final styles = [
+          _kCssPaddingLeft,
+          '${_kCssPaddingLeftDefault}px',
+          kCssListStyleType,
+          e.localName == kTagOrderedList
+              ? kCssListStyleTypeDecimal
+              : parents == 0 ? kCssListStyleTypeDisc : kCssListStyleTypeCircle,
+        ];
 
-          return [
-            kCssMargin,
-            isWithinAnotherList ? '0' : '1em 0',
-            _kCssPaddingLeft,
-            '${_kCssPaddingLeftDefault}px',
-            kCssListStyleType,
-            e.localName == kTagOrderedList
-                ? kCssListStyleTypeDecimal
-                : kCssListStyleTypeDisc,
-          ];
-        },
-        onMetadata: (meta) => meta.domElement.localName == kTagListItem
-            ? null
-            : lazySet(meta, key: key),
-        onWidgets: (meta, widgets) => meta.domElement.localName == kTagListItem
-            ? _buildItem(widgets)
-            : _buildList(meta, widgets),
-      );
+        if (parents == 0) styles.addAll([kCssMargin, '1em 0']);
+
+        return styles;
+      },
+      onChild: (meta) => meta.domElement.localName == 'li'
+          ? lazySet(meta, buildOp: liOp)
+          : null,
+      onWidgets: (meta, widgets) => _buildList(meta, widgets),
+    );
+    return _buildOp;
+  }
+
+  BuildOp get liOp {
+    _liOp ??= BuildOp(
+      onWidgets: (_, widgets) => _buildItem(widgets),
+    );
+    return _liOp;
+  }
 
   Widget _buildItem(Iterable<Widget> widgets) => wf.buildColumn(widgets);
 

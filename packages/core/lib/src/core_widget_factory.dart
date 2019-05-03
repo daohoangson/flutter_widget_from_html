@@ -405,6 +405,8 @@ class WidgetFactory {
 
   String getListStyleMarker(String type, int i) {
     switch (type) {
+      case kCssListStyleTypeCircle:
+        return '⚬';
       case kCssListStyleTypeDecimal:
         return "$i.";
       case kCssListStyleTypeDisc:
@@ -579,7 +581,6 @@ class WidgetFactory {
         meta = lazySet(meta, fontFamily: 'monospace');
         break;
 
-      case kTagListItem:
       case kTagOrderedList:
       case kTagUnorderedList:
         meta = lazySet(meta, buildOp: tagLi());

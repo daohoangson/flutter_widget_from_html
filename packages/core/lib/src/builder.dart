@@ -14,6 +14,7 @@ class Builder {
   final List<dom.Node> domNodes;
   final TextBlock parentBlock;
   final NodeMetadata parentMeta;
+  final Iterable<BuildOp> parentOps;
   final TextStyle parentTextStyle;
   final WidgetFactory wf;
 
@@ -26,11 +27,13 @@ class Builder {
     @required this.domNodes,
     this.parentBlock,
     this.parentMeta,
+    Iterable<BuildOp> parentParentOps,
     TextStyle parentTextStyle,
     @required this.wf,
   })  : assert(context != null),
         assert(domNodes != null),
         assert(wf != null),
+        parentOps = _prepareParentOps(parentParentOps, parentMeta),
         this.parentTextStyle =
             parentTextStyle ?? DefaultTextStyle.of(context).style;
 
@@ -50,7 +53,7 @@ class Builder {
   NodeMetadata collectMetadata(dom.Element e) {
     NodeMetadata meta;
 
-    parentMeta?.keys((k) => meta = lazySet(meta, key: k));
+    if (parentOps != null) meta = lazySet(meta, parentOps: parentOps);
 
     meta = wf.parseLocalName(meta, e.localName);
 
@@ -69,6 +72,7 @@ class Builder {
 
     meta?.context = context;
     meta?.domElement = e;
+    meta?.parents((op) => op.onChild(meta));
     meta?.ops((op) => op.onMetadata(meta));
 
     meta?.textStyle = wf.buildTextStyle(meta, parentTextStyle);
@@ -95,6 +99,7 @@ class Builder {
         domNodes: domNode.nodes,
         parentBlock: isBlockElement ? null : _textPiece.block,
         parentMeta: meta,
+        parentParentOps: parentOps,
         parentTextStyle: meta?.textStyle ?? parentTextStyle,
         wf: wf,
       );
@@ -175,4 +180,17 @@ class _Piece extends BuiltPiece {
         data..replaceAll(_whitespaceDuplicateRegExp, ' '),
         block.style,
       ));
+}
+
+Iterable<BuildOp> _prepareParentOps(
+  Iterable<BuildOp> parentParentOps,
+  NodeMetadata parentMeta,
+) {
+  // try to reuse existing list if possible
+  final hasOnChildOps = parentMeta?.opsWhere((op) => op.hasOnChild)?.toList();
+  if (hasOnChildOps?.isNotEmpty != true) return parentParentOps;
+
+  return List.unmodifiable(
+    (parentParentOps?.toList() ?? <BuildOp>[])..addAll(hasOnChildOps),
+  );
 }

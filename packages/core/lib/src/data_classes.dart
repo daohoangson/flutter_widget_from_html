@@ -16,7 +16,7 @@ NodeMetadata lazySet(
   FontWeight fontWeight,
   bool isBlockElement,
   bool isNotRenderable,
-  Key key,
+  Iterable<BuildOp> parentOps,
   Iterable<String> styles,
   Iterable<String> stylesPrepend,
 }) {
@@ -62,9 +62,9 @@ NodeMetadata lazySet(
   if (isBlockElement != null) meta._isBlockElement = isBlockElement;
   if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
 
-  if (key != null) {
-    meta._keys ??= [];
-    meta._keys.add(key);
+  if (parentOps != null) {
+    assert(meta._parentOps == null);
+    meta._parentOps = parentOps;
   }
 
   if (stylesPrepend != null) {
@@ -88,26 +88,33 @@ class BuildOp {
   // op with lower priority will run first
   final int priority;
 
-  final BuildOpDefaultStyles _defaultStyles;
-  final BuildOpOnMetadata _onMetadata;
-  final BuildOpOnPieces _onPieces;
-  final BuildOpOnWidgets _onWidgets;
+  final _BuildOpDefaultStyles _defaultStyles;
+  final _BuildOpOnMetadata _onChild;
+  final _BuildOpOnMetadata _onMetadata;
+  final _BuildOpOnPieces _onPieces;
+  final _BuildOpOnWidgets _onWidgets;
 
   BuildOp({
-    BuildOpDefaultStyles defaultStyles,
-    BuildOpOnMetadata onMetadata,
-    BuildOpOnPieces onPieces,
-    BuildOpOnWidgets onWidgets,
+    _BuildOpDefaultStyles defaultStyles,
+    _BuildOpOnMetadata onChild,
+    _BuildOpOnMetadata onMetadata,
+    _BuildOpOnPieces onPieces,
+    _BuildOpOnWidgets onWidgets,
     this.priority = 10,
   })  : _defaultStyles = defaultStyles,
+        _onChild = onChild,
         _onMetadata = onMetadata,
         _onPieces = onPieces,
         _onWidgets = onWidgets;
+
+  bool get hasOnChild => _onChild != null;
 
   bool get isBlockElement => _onWidgets != null;
 
   List<String> defaultStyles(NodeMetadata meta, dom.Element e) =>
       _defaultStyles != null ? _defaultStyles(meta, e) : null;
+
+  void onChild(NodeMetadata meta) => _onChild != null ? _onChild(meta) : null;
 
   void onMetadata(NodeMetadata meta) =>
       _onMetadata != null ? _onMetadata(meta) : null;
@@ -128,13 +135,16 @@ class BuildOp {
   }
 }
 
-typedef Iterable<String> BuildOpDefaultStyles(NodeMetadata meta, dom.Element e);
-typedef void BuildOpOnMetadata(NodeMetadata meta);
-typedef Iterable<BuiltPiece> BuildOpOnPieces(
+typedef Iterable<String> _BuildOpDefaultStyles(
+  NodeMetadata meta,
+  dom.Element e,
+);
+typedef void _BuildOpOnMetadata(NodeMetadata meta);
+typedef Iterable<BuiltPiece> _BuildOpOnPieces(
   NodeMetadata meta,
   Iterable<BuiltPiece> pieces,
 );
-typedef Widget BuildOpOnWidgets(NodeMetadata meta, Iterable<Widget> widgets);
+typedef Widget _BuildOpOnWidgets(NodeMetadata meta, Iterable<Widget> widgets);
 
 abstract class BuiltPiece {
   bool get hasWidgets;
@@ -198,7 +208,7 @@ class NodeMetadata {
   Iterable<BuildOp> _buildOps;
   BuildContext _context;
   dom.Element _domElement;
-  List<Key> _keys;
+  Iterable<BuildOp> _parentOps;
   TextStyle _textStyle;
 
   Color color;
@@ -247,9 +257,11 @@ class NodeMetadata {
     return _buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
   }
 
-  void keys(void f(Key key)) => _keys?.forEach(f);
+  void parents(void f(BuildOp op)) => _parentOps?.forEach(f);
 
-  void ops(void f(BuildOp element)) => _buildOps?.forEach(f);
+  void ops(void f(BuildOp op)) => _buildOps?.forEach(f);
+
+  Iterable<BuildOp> opsWhere(bool test(BuildOp op)) => _buildOps?.where(test);
 
   void styles(void f(String key, String value)) {
     _stylesFrozen = true;
