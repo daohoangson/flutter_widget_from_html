@@ -6,10 +6,12 @@ class TagA {
   TagA(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onMetadata: (meta) {
-          meta.color ??= wf._config.hyperlinkColor;
-          meta.decoUnder ??= true;
-        },
+        defaultStyles: (_, __) => [
+              kCssColor,
+              colorToHex(wf._config.hyperlinkColor),
+              kCssTextDecoration,
+              kCssTextDecorationUnderline,
+            ],
         onPieces: (meta, pieces) {
           final tap = _buildGestureTapCallback(meta);
           if (tap == null) return pieces;

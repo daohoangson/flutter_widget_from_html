@@ -37,9 +37,8 @@ class TagLi {
 
         return styles;
       },
-      onChild: (meta) => meta.domElement.localName == 'li'
-          ? lazySet(meta, buildOp: liOp)
-          : null,
+      onChild: (meta, e) =>
+          e.localName == 'li' ? lazySet(meta, buildOp: liOp) : meta,
       onWidgets: (meta, widgets) => _buildList(meta, widgets),
     );
     return _buildOp;

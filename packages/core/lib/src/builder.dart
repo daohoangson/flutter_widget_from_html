@@ -56,6 +56,7 @@ class Builder {
     if (parentOps != null) meta = lazySet(meta, parentOps: parentOps);
 
     meta = wf.parseLocalName(meta, e.localName);
+    meta?.parents((op) => meta = op.onChild(meta, e));
 
     // stylings, step 1: get default styles from tag-based build ops
     meta?.ops((op) => lazySet(meta, stylesPrepend: op.defaultStyles(meta, e)));
@@ -72,9 +73,6 @@ class Builder {
 
     meta?.context = context;
     meta?.domElement = e;
-    meta?.parents((op) => op.onChild(meta));
-    meta?.ops((op) => op.onMetadata(meta));
-
     meta?.textStyle = wf.buildTextStyle(meta, parentTextStyle);
 
     return meta;

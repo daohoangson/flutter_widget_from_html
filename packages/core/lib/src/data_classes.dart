@@ -89,21 +89,18 @@ class BuildOp {
   final int priority;
 
   final _BuildOpDefaultStyles _defaultStyles;
-  final _BuildOpOnMetadata _onChild;
-  final _BuildOpOnMetadata _onMetadata;
+  final _BuildOpOnChild _onChild;
   final _BuildOpOnPieces _onPieces;
   final _BuildOpOnWidgets _onWidgets;
 
   BuildOp({
     _BuildOpDefaultStyles defaultStyles,
-    _BuildOpOnMetadata onChild,
-    _BuildOpOnMetadata onMetadata,
+    _BuildOpOnChild onChild,
     _BuildOpOnPieces onPieces,
     _BuildOpOnWidgets onWidgets,
     this.priority = 10,
   })  : _defaultStyles = defaultStyles,
         _onChild = onChild,
-        _onMetadata = onMetadata,
         _onPieces = onPieces,
         _onWidgets = onWidgets;
 
@@ -114,10 +111,8 @@ class BuildOp {
   List<String> defaultStyles(NodeMetadata meta, dom.Element e) =>
       _defaultStyles != null ? _defaultStyles(meta, e) : null;
 
-  void onChild(NodeMetadata meta) => _onChild != null ? _onChild(meta) : null;
-
-  void onMetadata(NodeMetadata meta) =>
-      _onMetadata != null ? _onMetadata(meta) : null;
+  NodeMetadata onChild(NodeMetadata meta, dom.Element e) =>
+      _onChild != null ? _onChild(meta, e) : meta;
 
   Iterable<BuiltPiece> onPieces(
     NodeMetadata meta,
@@ -139,7 +134,7 @@ typedef Iterable<String> _BuildOpDefaultStyles(
   NodeMetadata meta,
   dom.Element e,
 );
-typedef void _BuildOpOnMetadata(NodeMetadata meta);
+typedef NodeMetadata _BuildOpOnChild(NodeMetadata meta, dom.Element e);
 typedef Iterable<BuiltPiece> _BuildOpOnPieces(
   NodeMetadata meta,
   Iterable<BuiltPiece> pieces,

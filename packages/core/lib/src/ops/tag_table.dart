@@ -17,13 +17,11 @@ class TagTable {
 
   BuildOp get buildOp => BuildOp(
         defaultStyles: (_, e) {
-          if (e.localName == kTagTableCaption) {
-            return [kCssTextAlign, kCssTextAlignCenter];
-          }
-        },
-        onMetadata: (meta) {
-          if (meta.domElement.localName == kTagTableHeader) {
-            meta.fontWeight ??= FontWeight.bold;
+          switch (e.localName) {
+            case kTagTableCaption:
+              return [kCssTextAlign, kCssTextAlignCenter];
+            case kTagTableHeader:
+              return [kCssFontWeight, kCssFontWeightBold];
           }
         },
         onWidgets: (meta, widgets) {
