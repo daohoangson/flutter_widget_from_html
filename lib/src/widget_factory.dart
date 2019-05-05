@@ -22,6 +22,9 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
+  Config get config => _config;
+
+  @override
   Widget buildDivider() => Divider(height: 1);
 
   @override

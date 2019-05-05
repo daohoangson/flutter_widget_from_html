@@ -4,21 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'core_config.dart';
+import 'core_helpers.dart';
 import 'data_classes.dart';
-
-part 'ops/style_bg_color.dart';
-part 'ops/style_margin.dart';
-part 'ops/style_text_align.dart';
-part 'ops/tag_a.dart';
-part 'ops/tag_code.dart';
-part 'ops/tag_img.dart';
-part 'ops/tag_li.dart';
-part 'ops/tag_table.dart';
-part 'ops/text.dart';
-
-part 'parser/border.dart';
-part 'parser/color.dart';
-part 'parser/css.dart';
 
 final _baseUriTrimmingRegExp = RegExp(r'/+$');
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
@@ -43,6 +30,8 @@ class WidgetFactory {
     assert(config != null);
     _config = config;
   }
+
+  Config get config => _config;
 
   Widget buildAlign(Widget child, Alignment alignment) {
     if (alignment == null) return child;
@@ -741,7 +730,7 @@ class WidgetFactory {
         break;
 
       case kCssTextDecoration:
-        for (final v in value.split(_spacingRegExp)) {
+        for (final v in cssSplit(value)) {
           switch (v) {
             case kCssTextDecorationLineThrough:
               meta = lazySet(meta, decoStrike: true);

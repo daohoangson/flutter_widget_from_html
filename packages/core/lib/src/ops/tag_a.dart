@@ -1,4 +1,4 @@
-part of '../core_widget_factory.dart';
+part of '../core_helpers.dart';
 
 class TagA {
   final WidgetFactory wf;
@@ -8,7 +8,7 @@ class TagA {
   BuildOp get buildOp => BuildOp(
         defaultStyles: (_, __) => [
               kCssColor,
-              colorToHex(wf._config.hyperlinkColor),
+              colorToHex(wf.config.hyperlinkColor),
               kCssTextDecoration,
               kCssTextDecorationUnderline,
             ],

@@ -1,4 +1,4 @@
-part of '../core_widget_factory.dart';
+part of '../core_helpers.dart';
 
 const kCssFontFamily = 'font-family';
 
@@ -57,3 +57,5 @@ CssLength lengthParseValue(String value) {
 
   return null;
 }
+
+Iterable<String> cssSplit(String value) => value.split(_spacingRegExp);
