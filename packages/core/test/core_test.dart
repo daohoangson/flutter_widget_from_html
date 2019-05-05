@@ -163,7 +163,7 @@ void main() {
       expect(
           explained,
           equals(
-            '[Padding:(10,40,0,40),child=[Image:image=[NetworkImage:url=image.png]]],'
+            '[Padding:(10,40,0,40),child=[Wrap:children=[Image:image=[NetworkImage:url=image.png]]]],'
             '[Padding:(0,40,10,40),child=[RichText:(+i:fig. 1(: Foo))]]',
           ));
     });
@@ -612,8 +612,8 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(t, h, imageUrlToPrecache: 'image.png');
       expect(
           explained,
-          equals('[Align:alignment=topCenter,' +
-              'child=[Image:image=[NetworkImage:url=image.png]]]'));
+          equals('[Align:alignment=center,child=[Wrap:children='
+              '[Image:image=[NetworkImage:url=image.png]]]]'));
     });
 
     testWidgets('renders left image', (WidgetTester tester) async {
@@ -621,8 +621,8 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Align:alignment=topLeft,' +
-              'child=[Image:image=[NetworkImage:url=image.png]]]'));
+          equals('[Align:alignment=centerLeft,child=[Wrap:children='
+              '[Image:image=[NetworkImage:url=image.png]]]]'));
     });
 
     testWidgets('renders right image', (WidgetTester tester) async {
@@ -630,8 +630,8 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Align:alignment=topRight,' +
-              'child=[Image:image=[NetworkImage:url=image.png]]]'));
+          equals('[Align:alignment=centerRight,child=[Wrap:children='
+              '[Image:image=[NetworkImage:url=image.png]]]]'));
     });
 
     testWidgets('renders styling from outside', (WidgetTester tester) async {

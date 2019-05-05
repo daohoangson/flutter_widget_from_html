@@ -123,6 +123,13 @@ class _Explainer {
     return "[$type:$description]";
   }
 
+  String _limitBox(LimitedBox box) {
+    String s = '';
+    if (box.maxHeight != null) s += 'h=${box.maxHeight},';
+    if (box.maxWidth != null) s += 'w=${box.maxWidth},';
+    return s;
+  }
+
   String _tableBorder(TableBorder b) {
     if (b == null) return '';
 
@@ -264,13 +271,15 @@ class _Explainer {
                     ? "child=${_widget(widget.child)}"
                     : widget is Image
                         ? "image=${_image(widget.image)}"
-                        : widget is Padding
-                            ? "${_edgeInsets(widget.padding)},"
-                            : widget is RichText
-                                ? _textSpan(widget.text)
-                                : widget is Table
-                                    ? _tableBorder(widget.border)
-                                    : widget is Text ? widget.data : '';
+                        : widget is LimitedBox
+                            ? _limitBox(widget)
+                            : widget is Padding
+                                ? "${_edgeInsets(widget.padding)},"
+                                : widget is RichText
+                                    ? _textSpan(widget.text)
+                                    : widget is Table
+                                        ? _tableBorder(widget.border)
+                                        : widget is Text ? widget.data : '';
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));

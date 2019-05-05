@@ -31,13 +31,13 @@ class StyleTextAlign {
 Alignment _getAlignment(String textAlign) {
   switch (textAlign) {
     case kCssTextAlignCenter:
-      return Alignment.topCenter;
+      return Alignment.center;
     case kCssTextAlignJustify:
-      return Alignment.topLeft;
+      return Alignment.centerLeft;
     case kCssTextAlignLeft:
-      return Alignment.topLeft;
+      return Alignment.centerLeft;
     case kCssTextAlignRight:
-      return Alignment.topRight;
+      return Alignment.centerRight;
   }
 
   return null;

@@ -20,6 +20,7 @@ class HtmlWidget extends StatelessWidget implements Config {
   final EdgeInsets tablePadding;
   final EdgeInsets textPadding;
   final TextStyle textStyle;
+  final double wrapSpacing;
 
   const HtmlWidget(
     this.html, {
@@ -34,6 +35,7 @@ class HtmlWidget extends StatelessWidget implements Config {
     EdgeInsets tablePadding,
     EdgeInsets textPadding,
     this.textStyle,
+    double wrapSpacing,
   })  : assert(html != null),
         this.bodyPadding =
             bodyPadding ?? const EdgeInsets.symmetric(vertical: 10),
@@ -44,6 +46,7 @@ class HtmlWidget extends StatelessWidget implements Config {
             tablePadding ?? const EdgeInsets.symmetric(horizontal: 10),
         this.textPadding =
             textPadding ?? const EdgeInsets.symmetric(horizontal: 10),
+        this.wrapSpacing = wrapSpacing ?? 5,
         super(key: key);
 
   @override

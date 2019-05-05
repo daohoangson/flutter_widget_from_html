@@ -51,8 +51,8 @@ void main() {
     final explained = await explain(tester, html, imageUrlToPrecache: kImgSrc);
     expect(
         explained,
-        equals('[GestureDetector:child=[Image:image='
-            '[NetworkImage:url=http://domain.com/image.png]]]'));
+        equals('[GestureDetector:child=[Wrap:children='
+            '[Image:image=[NetworkImage:url=$kImgSrc]]]]'));
   });
 
   testWidgets('renders margin inside', (WidgetTester tester) async {

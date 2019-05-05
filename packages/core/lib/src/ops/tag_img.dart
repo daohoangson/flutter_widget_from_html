@@ -5,23 +5,41 @@ class TagImg {
 
   TagImg(this.wf);
 
-  BuildOp get buildOp => BuildOp(onWidgets: (meta, widgets) {
-        final attrs = meta.domElement.attributes;
-        final src = _getAttr(attrs, 'src', 'data-src');
-        final height = _parseInt(_getAttr(attrs, 'height', 'data-height'));
-        final width = _parseInt(_getAttr(attrs, 'width', 'data-width'));
-        final text = _getAttr(attrs, 'alt', 'title');
+  BuildOp get buildOp => BuildOp(
+        onPieces: (meta, pieces) {
+          final attrs = meta.domElement.attributes;
+          final src = _getAttr(attrs, 'src', 'data-src');
+          final height = _getDouble(attrs, 'height', 'data-height');
+          final width = _getDouble(attrs, 'width', 'data-width');
+          final text = _getAttr(attrs, 'alt', 'title');
+          final fullUrl = wf.constructFullUrl(src) ?? src;
 
-        return wf.buildImage(
-          wf.constructFullUrl(src) ?? src,
-          height: height,
-          text: text,
-          width: width,
-        );
-      });
+          if (fullUrl?.isNotEmpty != true && text?.isNotEmpty == true) {
+            pieces.last.block.addText(text);
+            return pieces;
+          }
+
+          return pieces.toList()
+            ..add(
+              BuiltPieceSimple(
+                widgets: <Widget>[
+                  wf.buildWrap(wf.buildImage(
+                    wf.constructFullUrl(src) ?? src,
+                    height: height,
+                    text: text,
+                    width: width,
+                  ))
+                ],
+              ),
+            );
+        },
+      );
 }
 
 String _getAttr(Map<dynamic, String> map, String key, String key2) =>
     map.containsKey(key) ? map[key] : map.containsKey(key2) ? map[key2] : null;
 
-int _parseInt(String value) => int.tryParse(value ?? '');
+double _getDouble(Map<dynamic, String> map, String key, String key2) {
+  final value = _getAttr(map, key, key2);
+  return value != null ? double.tryParse(value) : null;
+}

@@ -11,6 +11,7 @@ abstract class Config {
   EdgeInsets get tableCellPadding;
   EdgeInsets get tablePadding;
   EdgeInsets get textPadding;
+  double get wrapSpacing;
 }
 
 typedef void OnTapUrl(String url);

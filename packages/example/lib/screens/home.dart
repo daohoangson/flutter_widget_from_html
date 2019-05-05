@@ -4,6 +4,7 @@ import 'compare.dart';
 import 'hello_world.dart';
 import 'hello_world_core.dart';
 import 'iframe.dart';
+import 'img.dart';
 import 'smilie.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -11,8 +12,7 @@ class HomeScreen extends StatelessWidget {
     'Hello World (core)': () => HelloWorldCoreScreen(),
     'Hello World': () => HelloWorldScreen(),
     'Smilie': () => SmilieScreen(),
-    'Styling':
-        """
+    'Styling': """
 <p><abbr>ABBR</abbr>, <acronym>ACRONYM</acronym> or <span style="border-bottom: 1px dotted">inline style</span></p>
 <p><b>B</b>, <strong>STRONG</strong> or <span style="font-weight: bold">inline style</span></p>
 <p><em>EM</em>, <i>I</i> or <span style="font-style: italic">inline style</span></p>
@@ -36,6 +36,7 @@ class HomeScreen extends StatelessWidget {
 <div style="text-align: justify">${"J u s t i f y. " * 20}</div>
 """,
     'Iframe': () => IframeScreen(),
+    'Images': () => ImgScreen(),
     'List ordered': """<ol>
   <li>One</li>
   <li>Two</li>

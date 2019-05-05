@@ -51,6 +51,7 @@ class WidgetFactory {
 
   Widget buildBody(List<Widget> children) {
     children = fixColumnWithinColumn(children);
+    children = fixWraps(children);
     if (children?.isNotEmpty != true) return null;
 
     if (_config.textPadding != EdgeInsets.all(0)) {
@@ -74,6 +75,7 @@ class WidgetFactory {
 
   Widget buildColumn(List<Widget> children) {
     children = fixColumnWithinColumn(children);
+    children = fixWraps(children);
     if (children?.isNotEmpty != true) return null;
     if (children.length == 1) return children.first;
 
@@ -131,19 +133,23 @@ class WidgetFactory {
   GestureTapCallback buildGestureTapCallbackForUrl(String url) =>
       () => _config.onTapUrl != null ? _config.onTapUrl(url) : debugPrint(url);
 
-  Widget buildImage(String src, {int height, String text, int width}) {
+  Widget buildImage(String src, {double height, String text, double width}) {
     final imageWidget = src?.startsWith('data:image') == true
         ? buildImageFromDataUri(src)
         : buildImageFromUrl(src);
-    if (imageWidget == null) return Text(text);
+    if (imageWidget == null) return Text(text ?? '');
 
     height ??= 0;
     width ??= 0;
     if (height <= 0 || width <= 0) return imageWidget;
 
-    return AspectRatio(
-      aspectRatio: width / height,
-      child: imageWidget,
+    return LimitedBox(
+      child: AspectRatio(
+        aspectRatio: width / height,
+        child: imageWidget,
+      ),
+      maxHeight: height,
+      maxWidth: width,
     );
   }
 
@@ -294,6 +300,12 @@ class WidgetFactory {
     );
   }
 
+  Widget buildWrap(Widget child) => Wrap(
+        children: <Widget>[child],
+        runSpacing: _config.wrapSpacing,
+        spacing: _config.wrapSpacing,
+      );
+
   bool checkWidgetIsText(Widget widget) {
     if (widget is Text || widget is RichText) return true;
 
@@ -358,6 +370,7 @@ class WidgetFactory {
   }
 
   List<Widget> fixOverlappingPaddings(List<Widget> widgets) {
+    if (widgets?.isNotEmpty != true) return null;
     final fixed = <Widget>[];
 
     int i = 0;
@@ -401,6 +414,54 @@ class WidgetFactory {
     }
 
     return fixed;
+  }
+
+  Iterable<Widget> fixWraps(Iterable<Widget> widgets) {
+    if (widgets?.isNotEmpty != true) return null;
+    final groups = <List<int>>[];
+
+    var i = -1;
+    int i0;
+    for (final widget in widgets) {
+      i++;
+      if (!(widget is Wrap)) continue;
+
+      if (i0 == i - 1) {
+        groups.last.add(i);
+      } else {
+        groups.add(<int>[i]);
+      }
+
+      i0 = i;
+    }
+
+    if (groups.isEmpty) return widgets;
+
+    final list = widgets.toList();
+    final merged = <Widget>[];
+    List<int> g0;
+    for (final g in groups) {
+      merged.addAll(list.getRange(g0 == null ? 0 : g0.last + 1, g.first));
+
+      final children = <Widget>[];
+      for (final i in g) {
+        final w = list[i] as Wrap;
+        children.addAll(w.children);
+      }
+      merged.add(Wrap(
+        children: children,
+        runSpacing: _config.wrapSpacing,
+        spacing: _config.wrapSpacing,
+      ));
+
+      if (g == groups.last) {
+        merged.addAll(list.skip(g.last + 1));
+      } else {
+        g0 = g;
+      }
+    }
+
+    return merged;
   }
 
   String getListStyleMarker(String type, int i) {
