@@ -8,8 +8,12 @@ const kHtml = """<h1>Heading 1</h1>
 <h5>Heading 5</h5>
 <h6>Heading 6</h6>
 <p>A paragraph with <strong>strong</strong> <em>emphasized</em> text.</p>
-<p>And of course, cat image: <img src="https://media.giphy.com/media/6VoDJzfRjJNbG/giphy-downsized.gif" /></p>
-<div style="text-align: center">Source: <a href="https://gph.is/QFgPA0">https://gph.is/QFgPA0</a></div>
+
+<p>And of course, cat image:</p>
+<figure>
+  <img src="https://media.giphy.com/media/6VoDJzfRjJNbG/giphy-downsized.gif" width="250" height="171" />
+  <figcaption>Source: <a href="https://gph.is/QFgPA0">https://gph.is/QFgPA0</a></figcaption>
+</figure>
 """;
 
 class HelloWorldCoreScreen extends StatelessWidget {
