@@ -10,7 +10,11 @@ class HtmlWidget extends core.HtmlWidget implements Config {
   final bool webView;
   final bool webViewJs;
 
-  const HtmlWidget(
+  Color _hyperlinkColor;
+
+  Color get hyperlinkColor => _hyperlinkColor ?? super.hyperlinkColor;
+
+  HtmlWidget(
     String html, {
     core.WidgetFactory wf,
     Key key,
@@ -44,6 +48,9 @@ class HtmlWidget extends core.HtmlWidget implements Config {
           wrapSpacing: wrapSpacing,
         );
 
-  core.WidgetFactory initFactory() =>
-      (wf ?? extended.WidgetFactory())..config = this;
+  @override
+  core.WidgetFactory initFactory(BuildContext context) {
+    _hyperlinkColor = Theme.of(context).accentColor;
+    return (wf ?? extended.WidgetFactory())..config = this;
+  }
 }

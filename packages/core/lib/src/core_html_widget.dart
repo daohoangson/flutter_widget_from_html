@@ -22,7 +22,7 @@ class HtmlWidget extends StatelessWidget implements Config {
   final TextStyle textStyle;
   final double wrapSpacing;
 
-  const HtmlWidget(
+  HtmlWidget(
     this.html, {
     this.wf,
     Key key,
@@ -52,7 +52,7 @@ class HtmlWidget extends StatelessWidget implements Config {
   @override
   Widget build(BuildContext context) {
     final domNodes = parser.parse(html).body.nodes;
-    final wf = initFactory();
+    final wf = initFactory(context);
     final widgets = core.Builder(
       context: context,
       domNodes: domNodes,
@@ -63,5 +63,6 @@ class HtmlWidget extends StatelessWidget implements Config {
     return wf.buildBody(widgets) ?? Text(html);
   }
 
-  WidgetFactory initFactory() => (wf ?? WidgetFactory())..config = this;
+  WidgetFactory initFactory(BuildContext context) =>
+      (wf ?? WidgetFactory())..config = this;
 }

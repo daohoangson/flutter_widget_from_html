@@ -39,7 +39,12 @@ Future<String> explain(
           fontWeight: FontWeight.normal,
         );
 
-        return DefaultTextStyle(key: key, style: style, child: Container());
+        return Theme(
+          child: DefaultTextStyle(key: key, style: style, child: Container()),
+          data: ThemeData(
+            accentColor: const Color(0xFF123456),
+          ),
+        );
       },
     ),
   );
