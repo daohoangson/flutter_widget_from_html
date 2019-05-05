@@ -27,18 +27,18 @@ class TagTable {
         onWidgets: (meta, widgets) {
           switch (meta.domElement.localName) {
             case kTagTable:
-              return _buildTable(meta, widgets);
+              return [_buildTable(meta, widgets)];
             case kTagTableCaption:
-              return _CaptionWidget(wf.buildColumn(widgets));
+              return [_CaptionWidget(wf.buildColumn(widgets))];
             case kTagTableRow:
-              return _RowWidget(widgets.map((w) => _wrapCell(w)));
+              return [_RowWidget(widgets.map((w) => _wrapCell(w)))];
             case kTagTableBody:
             case kTagTableHead:
             case kTagTableFoot:
-              return _SemanticWidget(meta.domElement.localName, widgets);
+              return [_SemanticWidget(meta.domElement.localName, widgets)];
           }
 
-          return wf.buildColumn(widgets);
+          return null;
         },
         priority: 100,
       );

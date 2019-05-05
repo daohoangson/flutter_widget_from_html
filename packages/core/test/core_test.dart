@@ -229,6 +229,12 @@ void main() {
               '(#FF007700:(); )(#FF0000BB:?>))]]'));
     });
 
+    testWidgets('renders empty CODE tag', (WidgetTester tester) async {
+      final html = '<code></code>';
+      final actual = await explain(tester, html);
+      expect(actual, equals('[Text:<code></code>]'));
+    });
+
     testWidgets('renders KBD tag', (WidgetTester tester) async {
       final html = '<kbd>ESC</kbd> = exit';
       final actual = await explain(tester, html);

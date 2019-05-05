@@ -21,8 +21,7 @@ class TagLi {
   BuildOp get buildOp {
     _buildOp ??= BuildOp(
       defaultStyles: (meta, e) {
-        var parents = 0;
-        meta.parents((op) => op == _buildOp ? parents++ : null);
+        final p = meta.parents?.where((op) => op == _buildOp)?.length ?? 0;
 
         final styles = [
           _kCssPaddingLeft,
@@ -30,10 +29,10 @@ class TagLi {
           kCssListStyleType,
           e.localName == kTagOrderedList
               ? kCssListStyleTypeDecimal
-              : parents == 0 ? kCssListStyleTypeDisc : kCssListStyleTypeCircle,
+              : p == 0 ? kCssListStyleTypeDisc : kCssListStyleTypeCircle,
         ];
 
-        if (parents == 0) styles.addAll([kCssMargin, '1em 0']);
+        if (p == 0) styles.addAll([kCssMargin, '1em 0']);
 
         return styles;
       },
@@ -46,14 +45,14 @@ class TagLi {
 
   BuildOp get liOp {
     _liOp ??= BuildOp(
-      onWidgets: (_, widgets) => _buildItem(widgets),
+      onWidgets: (_, widgets) => [_buildItem(widgets)],
     );
     return _liOp;
   }
 
   Widget _buildItem(Iterable<Widget> widgets) => wf.buildColumn(widgets);
 
-  Widget _buildList(NodeMetadata meta, Iterable<Widget> children) {
+  Iterable<Widget> _buildList(NodeMetadata meta, Iterable<Widget> children) {
     String listStyleType = kCssListStyleTypeDisc;
     double paddingLeft = _kCssPaddingLeftDefault;
     meta.styles((key, value) {
@@ -69,16 +68,14 @@ class TagLi {
     });
 
     int i = 0;
-    return wf.buildColumn(children
-        .map((widget) => Stack(children: <Widget>[
-              _buildBody(widget, paddingLeft),
-              _buildMarker(
-                wf.getListStyleMarker(listStyleType, ++i),
-                meta.textStyle,
-                paddingLeft,
-              ),
-            ]))
-        .toList());
+    return children.map((widget) => Stack(children: <Widget>[
+          _buildBody(widget, paddingLeft),
+          _buildMarker(
+            wf.getListStyleMarker(listStyleType, ++i),
+            meta.textStyle,
+            paddingLeft,
+          ),
+        ]));
   }
 
   Widget _buildBody(Widget widget, double paddingLeft) => Padding(

@@ -49,8 +49,7 @@ class WidgetFactory {
     return child != null ? Align(alignment: alignment, child: child) : null;
   }
 
-  Widget buildBody(List<Widget> children) {
-    children = fixColumnWithinColumn(children);
+  Widget buildBody(Iterable<Widget> children) {
     children = fixWraps(children);
     if (children?.isNotEmpty != true) return null;
 
@@ -73,8 +72,7 @@ class WidgetFactory {
     return buildPadding(column, _config.bodyPadding);
   }
 
-  Widget buildColumn(List<Widget> children) {
-    children = fixColumnWithinColumn(children);
+  Widget buildColumn(Iterable<Widget> children) {
     children = fixWraps(children);
     if (children?.isNotEmpty != true) return null;
     if (children.length == 1) return children.first;
@@ -193,10 +191,12 @@ class WidgetFactory {
     return Padding(child: child, padding: padding);
   }
 
-  Widget buildScrollView(Widget child) => SingleChildScrollView(
-        child: child,
-        scrollDirection: Axis.horizontal,
-      );
+  Widget buildScrollView(Widget child) => child != null
+      ? SingleChildScrollView(
+          child: child,
+          scrollDirection: Axis.horizontal,
+        )
+      : null;
 
   Widget buildTable(List<TableRow> rows, {TableBorder border}) => buildPadding(
         Table(border: border, children: rows),
@@ -331,42 +331,6 @@ class WidgetFactory {
     }
 
     return "${b.toString().replaceAll(_baseUriTrimmingRegExp, '')}/$url";
-  }
-
-  List<Widget> fixColumnWithinColumn(
-    Iterable<Widget> widgets, {
-    List<Widget> fixed,
-  }) {
-    if (widgets?.isNotEmpty != true) return null;
-    fixed ??= <Widget>[];
-
-    for (final widget in widgets) {
-      if (widget is Column) {
-        fixColumnWithinColumn(widget.children, fixed: fixed);
-        continue;
-      }
-
-      if (widget is Padding && widget.child is Column) {
-        final padding = widget.padding as EdgeInsets;
-        final column = widget.child as Column;
-        final iMax = column.children.length - 1;
-        for (var i = 0; i <= iMax; i++) {
-          fixed.add(buildPadding(
-            column.children[i],
-            i == 0
-                ? padding.copyWith(bottom: 0)
-                : i == iMax
-                    ? padding.copyWith(top: 0)
-                    : padding.copyWith(top: 0, bottom: 0),
-          ));
-        }
-        continue;
-      }
-
-      fixed.add(widget);
-    }
-
-    return fixed;
   }
 
   List<Widget> fixOverlappingPaddings(List<Widget> widgets) {
@@ -834,7 +798,7 @@ class WidgetFactory {
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
       defaultStyles: (_, __) => [kCssMarginBottom, '1em'],
-      onWidgets: (_, __) => Container(),
+      onWidgets: (_, __) => [Container()],
     );
     return _tagBr;
   }
@@ -847,7 +811,7 @@ class WidgetFactory {
   BuildOp tagHr() {
     _tagHr ??= BuildOp(
       defaultStyles: (_, __) => const [kCssMarginBottom, '1em'],
-      onWidgets: (_, __) => buildDivider(),
+      onWidgets: (_, __) => [buildDivider()],
     );
     return _tagHr;
   }

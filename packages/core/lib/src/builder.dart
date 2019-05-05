@@ -37,15 +37,26 @@ class Builder {
         this.parentTextStyle =
             parentTextStyle ?? DefaultTextStyle.of(context).style;
 
-  List<Widget> build() {
-    var widgets = <Widget>[];
+  Iterable<Widget> build() {
+    final list = <Widget>[];
 
-    final addWidget = (Widget w) => w != null ? widgets.add(w) : null;
-    process().forEach((p) => p.hasWidgets
-        ? p.widgets.forEach(addWidget)
-        : addWidget(wf.buildText(p.block)));
+    for (final piece in process()) {
+      if (piece.hasWidgets) {
+        for (final widget in piece.widgets) {
+          if (widget != null) list.add(widget);
+        }
+      } else {
+        final text = wf.buildText(piece.block);
+        if (text != null) list.add(text);
+      }
+    }
 
-    parentMeta?.ops((op) => widgets = op.onWidgets(parentMeta, widgets));
+    Iterable<Widget> widgets = list;
+    if (parentMeta?.hasOps == true) {
+      for (final op in parentMeta.ops) {
+        widgets = op.onWidgets(parentMeta, widgets);
+      }
+    }
 
     return widgets;
   }
@@ -56,10 +67,20 @@ class Builder {
     if (parentOps != null) meta = lazySet(meta, parentOps: parentOps);
 
     meta = wf.parseLocalName(meta, e.localName);
-    meta?.parents((op) => meta = op.onChild(meta, e));
+
+    if (meta?.hasParents == true) {
+      for (final op in meta?.parents) {
+        meta = op.onChild(meta, e);
+      }
+    }
 
     // stylings, step 1: get default styles from tag-based build ops
-    meta?.ops((op) => lazySet(meta, stylesPrepend: op.defaultStyles(meta, e)));
+    if (meta?.hasOps == true) {
+      for (final op in meta.ops) {
+        lazySet(meta, stylesPrepend: op.defaultStyles(meta, e));
+      }
+    }
+
     // stylings, step 2: get styles from `style` attribute
     if (e.attributes.containsKey('style')) {
       for (final m in _attrStyleRegExp.allMatches(e.attributes['style'])) {
@@ -129,7 +150,12 @@ class Builder {
     _saveTextPiece();
 
     Iterable<BuiltPiece> output = _pieces;
-    parentMeta?.ops((op) => output = op.onPieces(parentMeta, output));
+    if (parentMeta?.hasOps == true) {
+      for (final op in parentMeta.ops) {
+        output = op.onPieces(parentMeta, output);
+      }
+    }
+
     return output;
   }
 
@@ -185,10 +211,10 @@ Iterable<BuildOp> _prepareParentOps(
   NodeMetadata parentMeta,
 ) {
   // try to reuse existing list if possible
-  final hasOnChildOps = parentMeta?.opsWhere((op) => op.hasOnChild)?.toList();
-  if (hasOnChildOps?.isNotEmpty != true) return parentParentOps;
+  final withOnChild = parentMeta?.ops?.where((op) => op.hasOnChild)?.toList();
+  if (withOnChild?.isNotEmpty != true) return parentParentOps;
 
   return List.unmodifiable(
-    (parentParentOps?.toList() ?? <BuildOp>[])..addAll(hasOnChildOps),
+    (parentParentOps?.toList() ?? <BuildOp>[])..addAll(withOnChild),
   );
 }

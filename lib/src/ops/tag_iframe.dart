@@ -5,7 +5,10 @@ class TagIframe {
 
   TagIframe(this.wf);
 
-  BuildOp get buildOp => BuildOp(onWidgets: (meta, _) => build(meta));
+  BuildOp get buildOp => BuildOp(onWidgets: (meta, _) {
+        final webView = build(meta);
+        return webView != null ? [webView] : null;
+      });
 
   Widget build(NodeMetadata meta) {
     final a = meta.domElement.attributes;

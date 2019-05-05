@@ -120,14 +120,8 @@ class BuildOp {
   ) =>
       _onPieces != null ? _onPieces(meta, pieces) : pieces;
 
-  Iterable<Widget> onWidgets(NodeMetadata meta, Iterable<Widget> widgets) {
-    if (_onWidgets == null) return widgets;
-
-    final widget = _onWidgets(meta, widgets);
-    if (widget == null) return widgets;
-
-    return <Widget>[widget];
-  }
+  Iterable<Widget> onWidgets(NodeMetadata meta, Iterable<Widget> widgets) =>
+      (_onWidgets != null ? _onWidgets(meta, widgets) : null) ?? widgets;
 }
 
 typedef Iterable<String> _BuildOpDefaultStyles(
@@ -139,7 +133,8 @@ typedef Iterable<BuiltPiece> _BuildOpOnPieces(
   NodeMetadata meta,
   Iterable<BuiltPiece> pieces,
 );
-typedef Widget _BuildOpOnWidgets(NodeMetadata meta, Iterable<Widget> widgets);
+typedef Iterable<Widget> _BuildOpOnWidgets(
+    NodeMetadata meta, Iterable<Widget> widgets);
 
 abstract class BuiltPiece {
   bool get hasWidgets;
@@ -224,6 +219,14 @@ class NodeMetadata {
 
   dom.Element get domElement => _domElement;
 
+  bool get hasOps => _buildOps != null;
+
+  bool get hasParents => _parentOps != null;
+
+  Iterable<BuildOp> get ops => _buildOps;
+
+  Iterable<BuildOp> get parents => _parentOps;
+
   TextStyle get textStyle => _textStyle;
 
   set domElement(dom.Element e) {
@@ -251,12 +254,6 @@ class NodeMetadata {
     if (_isBlockElement == true) return true;
     return _buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
   }
-
-  void parents(void f(BuildOp op)) => _parentOps?.forEach(f);
-
-  void ops(void f(BuildOp op)) => _buildOps?.forEach(f);
-
-  Iterable<BuildOp> opsWhere(bool test(BuildOp op)) => _buildOps?.where(test);
 
   void styles(void f(String key, String value)) {
     _stylesFrozen = true;
@@ -344,8 +341,6 @@ class TextBlock {
 
     return true;
   }
-
-  void addBits(Iterable<TextBit> bits) => bits.forEach((b) => addBit(b));
 
   bool addText(String text, [TextStyle style]) =>
       addBit(TextBit(text, style ?? this.style));

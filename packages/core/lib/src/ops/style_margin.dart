@@ -13,10 +13,27 @@ class StyleMargin {
 
   BuildOp get buildOp => BuildOp(
         onWidgets: (meta, widgets) {
+          if (widgets?.isNotEmpty != true) return null;
           final padding = _StyleMarginParser(meta).parse();
           if (padding == null) return null;
 
-          return wf.buildPadding(wf.buildColumn(widgets), padding);
+          final iMax = widgets.length - 1;
+          if (iMax == 0) return [wf.buildPadding(widgets.first, padding)];
+
+          final list = <Widget>[];
+          var i = 0;
+          for (final widget in widgets) {
+            list.add(wf.buildPadding(
+                widget,
+                i == 0
+                    ? padding.copyWith(bottom: 0)
+                    : i == iMax
+                        ? padding.copyWith(top: 0)
+                        : padding.copyWith(top: 0, bottom: 0)));
+            i++;
+          }
+
+          return list;
         },
       );
 }
