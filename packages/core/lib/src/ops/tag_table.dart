@@ -9,39 +9,77 @@ const kTagTableFoot = 'tfoot';
 const kTagTableHead = 'thead';
 const kTagTableHeader = 'th';
 const kTagTableRow = 'tr';
+const _kTagTableOpPriority = 100;
 
 class TagTable {
   final WidgetFactory wf;
 
+  BuildOp _captionOp;
+  BuildOp _cellOp;
+  BuildOp _rowOp;
+  BuildOp _semanticOp;
+
   TagTable(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        defaultStyles: (_, e) {
+        onChild: (meta, e) {
           switch (e.localName) {
             case kTagTableCaption:
-              return [kCssTextAlign, kCssTextAlignCenter];
+              return lazySet(meta, buildOp: captionOp);
+            case kTagTableCell:
             case kTagTableHeader:
-              return [kCssFontWeight, kCssFontWeightBold];
-          }
-        },
-        onWidgets: (meta, widgets) {
-          switch (meta.domElement.localName) {
-            case kTagTable:
-              return [_buildTable(meta, widgets)];
-            case kTagTableCaption:
-              return [_CaptionWidget(wf.buildColumn(widgets))];
+              return lazySet(meta, buildOp: cellOp);
             case kTagTableRow:
-              return [_RowWidget(widgets.map((w) => _wrapCell(w)))];
+              return lazySet(meta, buildOp: rowOp);
             case kTagTableBody:
             case kTagTableHead:
             case kTagTableFoot:
-              return [_SemanticWidget(meta.domElement.localName, widgets)];
+              return lazySet(meta, buildOp: semanticOp);
           }
 
-          return null;
+          return meta;
         },
-        priority: 100,
+        onWidgets: (meta, widgets) => [_buildTable(meta, widgets)],
+        priority: _kTagTableOpPriority,
       );
+
+  BuildOp get captionOp {
+    _captionOp ??= BuildOp(
+      defaultStyles: (_, __) => [kCssTextAlign, kCssTextAlignCenter],
+      onWidgets: (_, widgets) => [_CaptionWidget(wf.buildColumn(widgets))],
+      priority: _kTagTableOpPriority,
+    );
+    return _captionOp;
+  }
+
+  BuildOp get cellOp {
+    _cellOp ??= BuildOp(
+      defaultStyles: (_, e) => e.localName == kTagTableHeader
+          ? [kCssFontWeight, kCssFontWeightBold]
+          : null,
+      onWidgets: (_, __) => null,
+      priority: _kTagTableOpPriority,
+    );
+    return _cellOp;
+  }
+
+  BuildOp get rowOp {
+    _rowOp ??= BuildOp(
+      onWidgets: (_, ws) => [_RowWidget(ws.map((w) => _wrapCell(w)))],
+      priority: _kTagTableOpPriority,
+    );
+    return _rowOp;
+  }
+
+  BuildOp get semanticOp {
+    _semanticOp ??= BuildOp(
+      onWidgets: (meta, widgets) => [
+            _SemanticWidget(meta.domElement.localName, widgets),
+          ],
+      priority: _kTagTableOpPriority,
+    );
+    return _semanticOp;
+  }
 
   Widget _buildTable(NodeMetadata meta, Iterable<Widget> children) {
     final headWidgets = <_RowWidget>[];

@@ -631,13 +631,6 @@ class WidgetFactory {
         break;
 
       case kTagTable:
-      case kTagTableBody:
-      case kTagTableCaption:
-      case kTagTableCell:
-      case kTagTableFoot:
-      case kTagTableHead:
-      case kTagTableHeader:
-      case kTagTableRow:
         meta = lazySet(meta, buildOp: tagTable());
         break;
     }
