@@ -321,6 +321,16 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           equals('[DecoratedBox:bg=#FFFF0000,child=[RichText:(:Foo)]]'));
     });
 
+    testWidgets('renders blocks', (WidgetTester tester) async {
+      final h = '<div style="background-color: #f00"><p>A</p><p>B</p></div>';
+      final explained = await explain(tester, h);
+      expect(
+          explained,
+          equals('[DecoratedBox:bg=#FFFF0000,child=[Column:children='
+              '[Padding:(0,0,10,0),child=[RichText:(:A)]],'
+              '[RichText:(:B)]]]'));
+    });
+
     testWidgets('renders inline', (WidgetTester tester) async {
       final html = 'Foo <span style="background-color: #f00">bar</span>';
       final explained = await explain(tester, html);

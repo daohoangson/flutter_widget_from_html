@@ -39,14 +39,14 @@ class TagTable {
 
           return meta;
         },
-        onWidgets: (meta, widgets) => [_buildTable(meta, widgets)],
+        onWidgets: (meta, widgets) => _buildTable(meta, widgets),
         priority: _kTagTableOpPriority,
       );
 
   BuildOp get captionOp {
     _captionOp ??= BuildOp(
       defaultStyles: (_, __) => [kCssTextAlign, kCssTextAlignCenter],
-      onWidgets: (_, widgets) => [_CaptionWidget(wf.buildColumn(widgets))],
+      onWidgets: (_, widgets) => [_CaptionWidget(widgets)],
       priority: _kTagTableOpPriority,
     );
     return _captionOp;
@@ -81,7 +81,7 @@ class TagTable {
     return _semanticOp;
   }
 
-  Widget _buildTable(NodeMetadata meta, Iterable<Widget> children) {
+  Iterable<Widget> _buildTable(NodeMetadata meta, Iterable<Widget> children) {
     final headWidgets = <_RowWidget>[];
     final bodyWidgets = <_RowWidget>[];
     final footWidgets = <_RowWidget>[];
@@ -120,12 +120,12 @@ class TagTable {
 
     if (children.isNotEmpty) {
       final first = children.first;
-      if (first is _CaptionWidget) widgets.add(first.child);
+      if (first is _CaptionWidget) widgets.addAll(first.children);
     }
 
     widgets.add(wf.buildTable(rows.toList(), border: _buildTableBorder(meta)));
 
-    return wf.buildColumn(widgets);
+    return widgets;
   }
 
   Widget _wrapCell(Widget widget) =>
@@ -133,12 +133,12 @@ class TagTable {
 }
 
 class _CaptionWidget extends StatelessWidget {
-  final Widget child;
+  final Iterable<Widget> children;
 
-  _CaptionWidget(this.child);
+  _CaptionWidget(this.children);
 
   @override
-  Widget build(BuildContext context) => child;
+  Widget build(BuildContext context) => Column(children: children);
 }
 
 class _RowWidget extends StatelessWidget {

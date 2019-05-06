@@ -85,6 +85,8 @@ NodeMetadata lazySet(
 }
 
 class BuildOp {
+  final bool isBlockElement;
+
   // op with lower priority will run first
   final int priority;
 
@@ -95,18 +97,18 @@ class BuildOp {
 
   BuildOp({
     _BuildOpDefaultStyles defaultStyles,
+    bool isBlockElement,
     _BuildOpOnChild onChild,
     _BuildOpOnPieces onPieces,
     _BuildOpOnWidgets onWidgets,
     this.priority = 10,
   })  : _defaultStyles = defaultStyles,
+        this.isBlockElement = isBlockElement ?? onWidgets != null,
         _onChild = onChild,
         _onPieces = onPieces,
         _onWidgets = onWidgets;
 
   bool get hasOnChild => _onChild != null;
-
-  bool get isBlockElement => _onWidgets != null;
 
   List<String> defaultStyles(NodeMetadata meta, dom.Element e) =>
       _defaultStyles != null ? _defaultStyles(meta, e) : null;

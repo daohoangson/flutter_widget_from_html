@@ -68,14 +68,18 @@ class TagLi {
     });
 
     int i = 0;
-    return children.map((widget) => Stack(children: <Widget>[
-          _buildBody(widget, paddingLeft),
-          _buildMarker(
-            wf.getListStyleMarker(listStyleType, ++i),
-            meta.textStyle,
-            paddingLeft,
+    return children.map(
+      (widget) => Stack(
+            children: <Widget>[
+              _buildBody(widget, paddingLeft),
+              _buildMarker(
+                wf.getListStyleMarker(listStyleType, ++i),
+                meta.textStyle,
+                paddingLeft,
+              ),
+            ],
           ),
-        ]));
+    );
   }
 
   Widget _buildBody(Widget widget, double paddingLeft) => Padding(
@@ -87,7 +91,7 @@ class TagLi {
       Positioned(
         left: 0.0,
         top: 0.0,
-        width: paddingLeft * .8,
+        width: paddingLeft,
         child: RichText(
           maxLines: 1,
           overflow: TextOverflow.clip,

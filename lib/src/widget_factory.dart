@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'config.dart';
 import 'data_classes.dart';
+import 'helpers.dart';
 import 'web_view.dart';
 
 part 'ops/tag_iframe.dart';
@@ -26,6 +27,10 @@ class WidgetFactory extends core.WidgetFactory {
 
   @override
   Widget buildDivider() => Divider(height: 1);
+
+  @override
+  Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
+      TextHint(InkWell(child: child, onTap: onTap), child);
 
   @override
   GestureTapCallback buildGestureTapCallbackForUrl(String url) =>

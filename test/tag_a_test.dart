@@ -29,7 +29,7 @@ void main() {
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals('[GestureDetector:child=[RichText:(#FF123456+u:Foo)]]'),
+      equals('[InkWell:child=[RichText:(#FF123456+u:Foo)]]'),
     );
   });
 
@@ -40,8 +40,8 @@ void main() {
       explained,
       equals(
         '[Column:children='
-        '[GestureDetector:child=[RichText:(#FF123456+u:Foo)]],'
-        '[GestureDetector:child=[RichText:(#FF123456+u:Bar)]]]',
+        '[InkWell:child=[RichText:(#FF123456+u:Foo)]],'
+        '[InkWell:child=[RichText:(#FF123456+u:Bar)]]]',
       ),
     );
   });

@@ -82,23 +82,18 @@ void main() {
     });
 
     testWidgets('renders background-color', (WidgetTester tester) async {
-      final html = '<span style="background-color: #f00">Foo</a>';
+      final html = '<span style="background-color: #f00">Foo</span>';
       await test(tester, html);
     });
 
     testWidgets('renders DIV tag inside background-color', (t) async {
-      final html = '<span style="background-color: #f00">Foo</a>';
+      final html = '<span style="background-color: #f00">Foo</span>';
       await test(t, html);
     });
 
     testWidgets('renders text-align', (WidgetTester tester) async {
-      final html = '<span style="text-align: center">Foo</a>';
+      final html = '<span style="text-align: center">Foo</span>';
       await test(tester, html);
-    });
-
-    testWidgets('renders DIV tag inside text-align', (WidgetTester t) async {
-      final html = '<span style="text-align: center"><div>Foo</div></a>';
-      await test(t, html);
     });
   });
 }

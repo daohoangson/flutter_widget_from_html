@@ -13,22 +13,21 @@ class TagA {
               kCssTextDecorationUnderline,
             ],
         onPieces: (meta, pieces) {
-          final tap = _buildGestureTapCallback(meta);
-          if (tap == null) return pieces;
+          final onTap = _buildGestureTapCallback(meta);
+          if (onTap == null) return pieces;
 
           return pieces.map(
-            (p) => p.hasWidgets
-                ? BuiltPieceSimple(widgets: <Widget>[_buildGd(p.widgets, tap)])
-                : _buildBlock(p, tap),
+            (piece) => piece.hasWidgets
+                ? BuiltPieceSimple(
+                    widgets: wf.buildGestureDetectors(piece.widgets, onTap),
+                  )
+                : _buildBlock(piece, onTap),
           );
         },
       );
 
   BuiltPiece _buildBlock(BuiltPiece piece, GestureTapCallback onTap) =>
       piece..block.rebuildBits((bit) => bit.rebuild(onTap: onTap));
-
-  Widget _buildGd(List<Widget> widgets, GestureTapCallback onTap) =>
-      wf.buildGestureDetector(wf.buildColumn(widgets), onTap);
 
   GestureTapCallback _buildGestureTapCallback(NodeMetadata meta) {
     final attrs = meta.domElement.attributes;

@@ -34,11 +34,15 @@ class WidgetFactory {
   Config get config => _config;
 
   Widget buildAlign(Widget child, Alignment alignment) {
+    if (child == null) return null;
     if (alignment == null) return child;
-    return child != null ? Align(alignment: alignment, child: child) : null;
+    return Align(alignment: alignment, child: child);
   }
 
-  Widget buildBody(Iterable<Widget> children) {
+  Widget buildBody(Iterable<Widget> children) =>
+      buildPadding(buildColumn(children), _config.bodyPadding);
+
+  Widget buildColumn(Iterable<Widget> children) {
     children = fixWraps(children);
     if (children?.isNotEmpty != true) return null;
 
@@ -51,25 +55,13 @@ class WidgetFactory {
     }
 
     children = fixOverlappingPaddings(children);
-    final column = children.length > 1
+
+    return children.length > 1
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: children,
           )
         : children.first;
-
-    return buildPadding(column, _config.bodyPadding);
-  }
-
-  Widget buildColumn(Iterable<Widget> children) {
-    children = fixWraps(children);
-    if (children?.isNotEmpty != true) return null;
-    if (children.length == 1) return children.first;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: children,
-    );
   }
 
   Widget buildDecoratedBox(
@@ -94,27 +86,23 @@ class WidgetFactory {
       ? (meta.fontStyleItalic == true ? FontStyle.italic : FontStyle.normal)
       : null;
 
-  Widget buildGestureDetector(Widget child, GestureTapCallback onTap) {
-    if (child == null || onTap == null) return child;
+  Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
+      TextHint(GestureDetector(child: child, onTap: onTap), child);
 
-    if (child is Column) {
-      final column = child;
-      return buildColumn(column.children
-          .map(
-            (c) => buildGestureDetector(c, onTap),
-          )
-          .toList());
-    }
+  Iterable<Widget> buildGestureDetectors(
+    Iterable<Widget> widgets,
+    GestureTapCallback onTap,
+  ) {
+    if (widgets?.isNotEmpty != true || onTap == null) return widgets;
 
-    if (child is Padding) {
-      final padding = child;
-      return buildPadding(
-        buildGestureDetector(padding.child, onTap),
-        padding.padding,
-      );
-    }
+    return widgets.map((widget) {
+      if (widget is Padding) {
+        final p = widget;
+        return buildPadding(buildGestureDetector(p.child, onTap), p.padding);
+      }
 
-    return GestureDetector(child: child, onTap: onTap);
+      return buildGestureDetector(widget, onTap);
+    });
   }
 
   GestureTapCallback buildGestureTapCallbackForUrl(String url) =>
@@ -298,9 +286,10 @@ class WidgetFactory {
   bool checkWidgetIsText(Widget widget) {
     if (widget is Text || widget is RichText) return true;
 
-    if (widget is SingleChildRenderObjectWidget)
-      return checkWidgetIsText(widget.child);
-    if (widget is GestureDetector) return checkWidgetIsText(widget.child);
+    if (widget is Padding) return checkWidgetIsText(widget.child);
+
+    if (widget is TextHint)
+      return widget.hint == null ? true : checkWidgetIsText(widget.hint);
 
     return false;
   }
@@ -333,6 +322,7 @@ class WidgetFactory {
       i++;
       if (!(widget is Padding)) {
         fixed.add(widget);
+        prev = null;
         continue;
       }
 

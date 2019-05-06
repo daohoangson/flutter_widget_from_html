@@ -265,6 +265,8 @@ class _Explainer {
     final explained = this.explainer?.call(widget);
     if (explained != null) return explained;
 
+    if (widget is TextHint) return _widget(widget.child);
+
     final type = widget.runtimeType.toString();
     final text = widget is Align
         ? "alignment=${widget.alignment},"
@@ -276,15 +278,17 @@ class _Explainer {
                     ? "child=${_widget(widget.child)}"
                     : widget is Image
                         ? "image=${_image(widget.image)}"
-                        : widget is LimitedBox
-                            ? _limitBox(widget)
-                            : widget is Padding
-                                ? "${_edgeInsets(widget.padding)},"
-                                : widget is RichText
-                                    ? _textSpan(widget.text)
-                                    : widget is Table
-                                        ? _tableBorder(widget.border)
-                                        : widget is Text ? widget.data : '';
+                        : widget is InkWell
+                            ? "child=${_widget(widget.child)}"
+                            : widget is LimitedBox
+                                ? _limitBox(widget)
+                                : widget is Padding
+                                    ? "${_edgeInsets(widget.padding)},"
+                                    : widget is RichText
+                                        ? _textSpan(widget.text)
+                                        : widget is Table
+                                            ? _tableBorder(widget.border)
+                                            : widget is Text ? widget.data : '';
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));
