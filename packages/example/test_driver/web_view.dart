@@ -83,7 +83,7 @@ class _TestAppState extends State<TestApp> {
                       setState(() => output = v),
                   key: Key(input),
                 )
-              : Container(),
+              : widget0,
         ],
       );
 }

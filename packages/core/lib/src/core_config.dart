@@ -9,8 +9,6 @@ abstract class Config {
   Color get hyperlinkColor;
   OnTapUrl get onTapUrl;
   EdgeInsets get tableCellPadding;
-  EdgeInsets get tablePadding;
-  EdgeInsets get textPadding;
   double get wrapSpacing;
 }
 

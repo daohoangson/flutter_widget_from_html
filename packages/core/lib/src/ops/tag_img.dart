@@ -19,19 +19,18 @@ class TagImg {
             return pieces;
           }
 
+          var widget = wf.buildImage(
+            wf.constructFullUrl(src) ?? src,
+            height: height,
+            text: text,
+            width: width,
+          );
+          if (!meta.isBlockElement || widget is LimitedBox) {
+            widget = wf.buildWrapable(widget);
+          }
+
           return pieces.toList()
-            ..add(
-              BuiltPieceSimple(
-                widgets: <Widget>[
-                  wf.buildWrap(wf.buildImage(
-                    wf.constructFullUrl(src) ?? src,
-                    height: height,
-                    text: text,
-                    width: width,
-                  ))
-                ],
-              ),
-            );
+            ..add(BuiltPieceSimple(widgets: <Widget>[widget]));
         },
       );
 }

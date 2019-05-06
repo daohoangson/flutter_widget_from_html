@@ -24,8 +24,6 @@ class HtmlWidget extends core.HtmlWidget implements Config {
     Color hyperlinkColor,
     core.OnTapUrl onTapUrl,
     EdgeInsets tableCellPadding,
-    EdgeInsets tablePadding,
-    EdgeInsets textPadding,
     TextStyle textStyle,
     double wrapSpacing,
     bool webView,
@@ -42,8 +40,6 @@ class HtmlWidget extends core.HtmlWidget implements Config {
           hyperlinkColor: hyperlinkColor,
           onTapUrl: onTapUrl,
           tableCellPadding: tableCellPadding,
-          tablePadding: tablePadding,
-          textPadding: textPadding,
           textStyle: textStyle,
           wrapSpacing: wrapSpacing,
         );

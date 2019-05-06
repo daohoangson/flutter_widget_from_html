@@ -1,5 +1,11 @@
 part of '../core_helpers.dart';
 
+const kCssDisplay = 'display';
+const kCssDisplayBlock = 'block';
+const kCssDisplayInline = 'inline';
+const kCssDisplayInlineBlock = 'inline-block';
+const kCssDisplayNone = 'none';
+
 const kCssFontFamily = 'font-family';
 
 const kCssFontSize = 'font-size';

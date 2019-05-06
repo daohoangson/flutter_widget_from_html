@@ -17,8 +17,6 @@ class HtmlWidget extends StatelessWidget implements Config {
   final Color hyperlinkColor;
   final OnTapUrl onTapUrl;
   final EdgeInsets tableCellPadding;
-  final EdgeInsets tablePadding;
-  final EdgeInsets textPadding;
   final TextStyle textStyle;
   final double wrapSpacing;
 
@@ -32,20 +30,14 @@ class HtmlWidget extends StatelessWidget implements Config {
     Color hyperlinkColor,
     this.onTapUrl,
     EdgeInsets tableCellPadding,
-    EdgeInsets tablePadding,
-    EdgeInsets textPadding,
     this.textStyle,
     double wrapSpacing,
   })  : assert(html != null),
         this.bodyPadding =
-            bodyPadding ?? const EdgeInsets.symmetric(vertical: 10),
+            bodyPadding ?? const EdgeInsets.all(10),
         this.hyperlinkColor =
             hyperlinkColor ?? const Color.fromRGBO(0, 0, 255, 1),
         this.tableCellPadding = tableCellPadding ?? const EdgeInsets.all(5),
-        this.tablePadding =
-            tablePadding ?? const EdgeInsets.symmetric(horizontal: 10),
-        this.textPadding =
-            textPadding ?? const EdgeInsets.symmetric(horizontal: 10),
         this.wrapSpacing = wrapSpacing ?? 5,
         super(key: key);
 

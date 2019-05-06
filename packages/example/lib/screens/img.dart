@@ -50,22 +50,22 @@ class _State extends State<ImgScreen> {
 
 <p>
   Block (small image):
-  <img src="${_src(100, 10)}" width="100" height="10" />
+  <img src="${_src(100, 10)}" width="100" height="10" style="display: block" />
 </p>
 
 <p>
   Block (small image, without dimensions):
-  <img src="${_src(100, 10)}" />
+  <img src="${_src(100, 10)}" style="display: block" />
 </p>
 
 <p>
   Block (big image):
-  <img src="${_src(2000, 200)}" width="2000" height="200" />
+  <img src="${_src(2000, 200)}" width="2000" height="200" style="display: block" />
 </p>
 
 <p>
   Block (big image, without dimensions):
-  <img src="${_src(2000, 200)}" />
+  <img src="${_src(2000, 200)}" style="display: block" />
 </p>
 
 <p>

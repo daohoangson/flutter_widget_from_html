@@ -14,8 +14,6 @@ Future<String> explain(
   double bodyVerticalPadding = 0,
   NodeMetadataCollector builderCallback,
   double tableCellPadding = 0,
-  double tablePadding = 0,
-  double textHorizontalPadding = 0,
   TextStyle textStyle,
 }) async {
   final key = UniqueKey();
@@ -40,7 +38,7 @@ Future<String> explain(
         );
 
         return Theme(
-          child: DefaultTextStyle(key: key, style: style, child: Container()),
+          child: DefaultTextStyle(key: key, style: style, child: widget0),
           data: ThemeData(
             accentColor: const Color(0xFF123456),
           ),
@@ -61,8 +59,6 @@ Future<String> explain(
           bodyPadding: EdgeInsets.symmetric(vertical: bodyVerticalPadding),
           builderCallback: builderCallback,
           tableCellPadding: EdgeInsets.all(tableCellPadding),
-          tablePadding: EdgeInsets.all(tablePadding),
-          textPadding: EdgeInsets.symmetric(horizontal: textHorizontalPadding),
           textStyle: textStyle,
           wf: wf,
         );
@@ -265,7 +261,9 @@ class _Explainer {
     final explained = this.explainer?.call(widget);
     if (explained != null) return explained;
 
-    if (widget is TextHint) return _widget(widget.child);
+    if (widget is Wrapable) {
+      return "[Wrap:children=${widget.widgets.map(_widget).join(',')}]";
+    }
 
     final type = widget.runtimeType.toString();
     final text = widget is Align

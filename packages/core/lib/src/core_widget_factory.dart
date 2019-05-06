@@ -44,17 +44,8 @@ class WidgetFactory {
 
   Widget buildColumn(Iterable<Widget> children) {
     children = fixWraps(children);
-    if (children?.isNotEmpty != true) return null;
-
-    if (_config.textPadding != EdgeInsets.all(0)) {
-      children = children
-          .map((child) => checkWidgetIsText(child)
-              ? buildPadding(child, _config.textPadding)
-              : child)
-          .toList();
-    }
-
     children = fixOverlappingPaddings(children);
+    if (children?.isNotEmpty != true) return null;
 
     return children.length > 1
         ? Column(
@@ -87,7 +78,7 @@ class WidgetFactory {
       : null;
 
   Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
-      TextHint(GestureDetector(child: child, onTap: onTap), child);
+      GestureDetector(child: child, onTap: onTap);
 
   Iterable<Widget> buildGestureDetectors(
     Iterable<Widget> widgets,
@@ -175,10 +166,8 @@ class WidgetFactory {
         )
       : null;
 
-  Widget buildTable(List<TableRow> rows, {TableBorder border}) => buildPadding(
-        Table(border: border, children: rows),
-        _config.tablePadding,
-      );
+  Widget buildTable(List<TableRow> rows, {TableBorder border}) =>
+      Table(border: border, children: rows);
 
   Widget buildTableCell(Widget child) =>
       TableCell(child: buildPadding(child, _config.tableCellPadding));
@@ -277,22 +266,13 @@ class WidgetFactory {
     );
   }
 
-  Widget buildWrap(Widget child) => Wrap(
-        children: <Widget>[child],
+  Widget buildWrap(List<Widget> children) => Wrap(
+        children: children,
         runSpacing: _config.wrapSpacing,
         spacing: _config.wrapSpacing,
       );
 
-  bool checkWidgetIsText(Widget widget) {
-    if (widget is Text || widget is RichText) return true;
-
-    if (widget is Padding) return checkWidgetIsText(widget.child);
-
-    if (widget is TextHint)
-      return widget.hint == null ? true : checkWidgetIsText(widget.hint);
-
-    return false;
-  }
+  Widget buildWrapable(Widget widget) => Wrapable(this, [widget]);
 
   String constructFullUrl(String url) {
     if (url?.isNotEmpty != true) return null;
@@ -314,6 +294,7 @@ class WidgetFactory {
   List<Widget> fixOverlappingPaddings(List<Widget> widgets) {
     if (widgets?.isNotEmpty != true) return null;
     final fixed = <Widget>[];
+    final skipWidget0 = (Widget w) => w == widget0 ? null : fixed.add(w);
 
     int i = 0;
     EdgeInsets prev;
@@ -341,14 +322,10 @@ class WidgetFactory {
       }
 
       if (prev != null && prev.bottom > 0 && v.top > 0) {
-        if (v.top > prev.bottom) {
-          v = v.copyWith(top: v.top - prev.bottom);
-        } else {
-          v = v.copyWith(top: 0);
-        }
+        v = v.copyWith(top: v.top > prev.bottom ? v.top - prev.bottom : 0);
       }
 
-      fixed.add(v != pp
+      skipWidget0(v != pp
           ? v == const EdgeInsets.all(0)
               ? p.child
               : Padding(child: p.child, padding: v)
@@ -359,52 +336,23 @@ class WidgetFactory {
     return fixed;
   }
 
-  Iterable<Widget> fixWraps(Iterable<Widget> widgets) {
+  List<Widget> fixWraps(Iterable<Widget> widgets) {
     if (widgets?.isNotEmpty != true) return null;
-    final groups = <List<int>>[];
+    final fixed = <Widget>[];
 
-    var i = -1;
-    int i0;
     for (final widget in widgets) {
-      i++;
-      if (!(widget is Wrap)) continue;
-
-      if (i0 == i - 1) {
-        groups.last.add(i);
-      } else {
-        groups.add(<int>[i]);
+      if (fixed.isEmpty || !(widget is Wrapable) || !(fixed.last is Wrapable)) {
+        fixed.add(widget);
+        continue;
       }
 
-      i0 = i;
+      final last = fixed.isEmpty ? null : fixed.removeLast() as Wrapable;
+      final merged = (last?.widgets?.toList() ?? <Widget>[])
+        ..addAll((widget as Wrapable).widgets);
+      fixed.add(Wrapable(this, merged));
     }
 
-    if (groups.isEmpty) return widgets;
-
-    final list = widgets.toList();
-    final merged = <Widget>[];
-    List<int> g0;
-    for (final g in groups) {
-      merged.addAll(list.getRange(g0 == null ? 0 : g0.last + 1, g.first));
-
-      final children = <Widget>[];
-      for (final i in g) {
-        final w = list[i] as Wrap;
-        children.addAll(w.children);
-      }
-      merged.add(Wrap(
-        children: children,
-        runSpacing: _config.wrapSpacing,
-        spacing: _config.wrapSpacing,
-      ));
-
-      if (g == groups.last) {
-        merged.addAll(list.skip(g.last + 1));
-      } else {
-        g0 = g;
-      }
-    }
-
-    return merged;
+    return fixed;
   }
 
   String getListStyleMarker(String type, int i) {
@@ -653,6 +601,21 @@ class WidgetFactory {
         if (color != null) meta = lazySet(meta, color: color);
         break;
 
+      case kCssDisplay:
+        switch (value) {
+          case kCssDisplayBlock:
+            meta = lazySet(meta, isBlockElement: true);
+            break;
+          case kCssDisplayInline:
+          case kCssDisplayInlineBlock:
+            meta = lazySet(meta, isBlockElement: false);
+            break;
+          case kCssDisplayNone:
+            meta = lazySet(meta, isNotRenderable: true);
+            break;
+        }
+        break;
+
       case kCssFontFamily:
         meta = lazySet(meta, fontFamily: value);
         break;
@@ -770,7 +733,7 @@ class WidgetFactory {
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
       defaultStyles: (_, __) => [kCssMarginBottom, '1em'],
-      onWidgets: (_, __) => [Container()],
+      onWidgets: (_, __) => [widget0],
     );
     return _tagBr;
   }

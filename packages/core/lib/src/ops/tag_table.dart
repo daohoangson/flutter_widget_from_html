@@ -112,7 +112,7 @@ class TagTable {
 
     final rows = rowWidgets.map((rw) {
       final cells = rw.cells.toList();
-      while (cells.length < cols) cells.add(wf.buildTableCell(Container()));
+      while (cells.length < cols) cells.add(wf.buildTableCell(widget0));
       return TableRow(children: cells);
     });
 

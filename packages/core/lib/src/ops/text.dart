@@ -1,15 +1,5 @@
 part of '../core_helpers.dart';
 
-class TextHint extends StatelessWidget {
-  final Widget child;
-  final Widget hint;
-
-  TextHint(this.child, this.hint, {Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) => child;
-}
-
 TextSpan compileToTextSpan(TextBlock b) {
   if (b == null || b.isEmpty) return null;
 

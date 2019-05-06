@@ -138,7 +138,7 @@ void main() {
       expect(
           explained,
           equals('[Column:children=[RichText:(:First.)],' +
-              '[Padding:(0,0,10,0),child=[Container:]],' +
+              '[Padding:(0,0,10,0),child=[ZeroContainer:]],' +
               '[RichText:(:Second one.)]]'));
     });
 
@@ -163,8 +163,10 @@ void main() {
       expect(
           explained,
           equals(
-            '[Padding:(10,40,0,40),child=[Wrap:children=[Image:image=[NetworkImage:url=image.png]]]],'
-            '[Padding:(0,40,10,40),child=[RichText:(+i:fig. 1(: Foo))]]',
+            '[Padding:(10,0,0,0),child=[ZeroContainer:]],'
+            '[Padding:(0,40,0,40),child=[Wrap:children=[Image:image=[NetworkImage:url=image.png]]]],'
+            '[Padding:(0,40,0,40),child=[RichText:(+i:fig. 1(: Foo))]],'
+            '[Padding:(0,0,10,0),child=[ZeroContainer:]]',
           ));
     });
 
@@ -410,6 +412,80 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           explained,
           equals('[RichText:(#FFFF0000:red ' +
               '(#FF00FF00:green)(#FFFF0000: red again))]'));
+    });
+  });
+
+  group('display', () {
+    testWidgets('renders SPAN inline by default', (WidgetTester tester) async {
+      final html = '<div>1 <span>2</span></div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:1 2)]'));
+    });
+
+    testWidgets('renders display: block', (WidgetTester tester) async {
+      final html = '<div>1 <span style="display: block">2</span></div>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Column:children=[RichText:(:1)],[RichText:(:2)]]'));
+    });
+
+    testWidgets('renders DIV block by default', (WidgetTester tester) async {
+      final html = '<div>1 <div>2</div></div>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Column:children=[RichText:(:1)],[RichText:(:2)]]'));
+    });
+
+    testWidgets('renders display: inline', (WidgetTester tester) async {
+      final html = '<div>1 <div style="display: inline">2</div></div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:1 2)]'));
+    });
+
+    testWidgets('renders display: inline-block', (WidgetTester tester) async {
+      final html = '<div>1 <div style="display: inline-block">2</div></div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:1 2)]'));
+    });
+
+    testWidgets('renders display: none', (WidgetTester tester) async {
+      final html = '<div>1 <div style="display: none">2</div></div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:1)]'));
+    });
+
+    testWidgets('renders IMG inline by default', (WidgetTester tester) async {
+      final html = '<img src="image.png" />';
+      final e = await explain(tester, html, imageUrlToPrecache: "image.png");
+      expect(
+        e,
+        equals('[Wrap:children=[Image:image=[NetworkImage:url=image.png]]]'),
+      );
+    });
+
+    testWidgets('renders IMG as block', (WidgetTester tester) async {
+      final html = '<img src="image.png" style="display: block" />';
+      final e = await explain(tester, html, imageUrlToPrecache: "image.png");
+      expect(e, equals('[Image:image=[NetworkImage:url=image.png]]'));
+    });
+
+    testWidgets('renders IMG with dimensions', (WidgetTester tester) async {
+      final html = '<img src="image.png" width="1" height="1" />';
+      final e = await explain(tester, html, imageUrlToPrecache: "image.png");
+      expect(
+          e,
+          equals('[Wrap:children=[LimitedBox:h=1.0,w=1.0,child='
+              '[AspectRatio:aspectRatio=1.00,child='
+              '[Image:image=[NetworkImage:url=image.png]]]]]'));
+    });
+
+    testWidgets('renders IMG with dimensions 2', (tester) async {
+      final html = '<img src="image.png" width="1" '
+          'height="1" style="display: block" />';
+      final e = await explain(tester, html, imageUrlToPrecache: "image.png");
+      expect(
+          e,
+          equals('[Wrap:children=[LimitedBox:h=1.0,w=1.0,child='
+              '[AspectRatio:aspectRatio=1.00,child='
+              '[Image:image=[NetworkImage:url=image.png]]]]]'));
     });
   });
 

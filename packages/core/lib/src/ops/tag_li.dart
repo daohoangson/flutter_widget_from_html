@@ -91,7 +91,7 @@ class TagLi {
       Positioned(
         left: 0.0,
         top: 0.0,
-        width: paddingLeft,
+        width: paddingLeft * .8,
         child: RichText(
           maxLines: 1,
           overflow: TextOverflow.clip,

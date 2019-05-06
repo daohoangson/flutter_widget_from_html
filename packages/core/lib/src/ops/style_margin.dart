@@ -17,23 +17,28 @@ class StyleMargin {
           final padding = _StyleMarginParser(meta).parse();
           if (padding == null) return null;
 
-          final iMax = widgets.length - 1;
-          if (iMax == 0) return [wf.buildPadding(widgets.first, padding)];
-
-          final list = <Widget>[];
-          var i = 0;
-          for (final widget in widgets) {
-            list.add(wf.buildPadding(
-                widget,
-                i == 0
-                    ? padding.copyWith(bottom: 0)
-                    : i == iMax
-                        ? padding.copyWith(top: 0)
-                        : padding.copyWith(top: 0, bottom: 0)));
-            i++;
+          if (widgets.length == 1) {
+            return [wf.buildPadding(widgets.first, padding)];
           }
 
-          return list;
+          return <Widget>[]
+            ..add(padding.top > 0
+                ? Padding(
+                    child: widget0,
+                    padding: EdgeInsets.only(top: padding.top),
+                  )
+                : null)
+            ..addAll(
+              widgets.map(
+                (w) => wf.buildPadding(w, padding.copyWith(top: 0, bottom: 0)),
+              ),
+            )
+            ..add(padding.bottom > 0
+                ? Padding(
+                    child: widget0,
+                    padding: EdgeInsets.only(bottom: padding.bottom),
+                  )
+                : null);
         },
       );
 }

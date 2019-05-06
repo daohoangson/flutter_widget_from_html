@@ -46,8 +46,8 @@ void main() {
   group('2 values', () {
     testWidgets('parses both', (WidgetTester tester) async {
       final html = '<div style="margin: 5px 10px">Foo</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[Padding:(5,10,5,10),child=[RichText:(:Foo)]]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[Padding:(5,10,5,10),child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('parses vertical only', (WidgetTester tester) async {
@@ -58,8 +58,8 @@ void main() {
 
     testWidgets('parses horizontal only', (WidgetTester tester) async {
       final html = '<div style="margin: 0 10px">Foo</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[Padding:(0,10,0,10),child=[RichText:(:Foo)]]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[Padding:(0,10,0,10),child=[RichText:(:Foo)]]'));
     });
   });
 
@@ -74,6 +74,33 @@ void main() {
         '<div style="margin: 2px">Foo</div></div>';
     final explained = await explain(tester, html);
     expect(explained, equals('[Padding:(2,3,2,3),child=[RichText:(:Foo)]]'));
+  });
+
+  testWidgets('renders margins back to back', (WidgetTester tester) async {
+    final html = '<div style="margin: 3px">1</div>'
+        '<div style="margin: 3px">2</div>'
+        '<div style="margin: 3px">3</div>';
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[Padding:(3,3,3,3),child=[RichText:(:1)]],'
+            '[Padding:(0,3,3,3),child=[RichText:(:2)]],'
+            '[Padding:(0,3,3,3),child=[RichText:(:3)]]'));
+  });
+
+  testWidgets('renders block margins back to back', (tester) async {
+    final html = '<div style="margin: 3px"><div>1a</div><div>1b</div></div>'
+        '<div style="margin: 3px"><div>2a</div><div>2b</div></div>';
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[Padding:(3,0,0,0),child=[ZeroContainer:]],'
+            '[Padding:(0,3,0,3),child=[RichText:(:1a)]],'
+            '[Padding:(0,3,0,3),child=[RichText:(:1b)]],'
+            '[Padding:(0,0,3,0),child=[ZeroContainer:]],'
+            '[Padding:(0,3,0,3),child=[RichText:(:2a)]],'
+            '[Padding:(0,3,0,3),child=[RichText:(:2b)]],'
+            '[Padding:(0,0,3,0),child=[ZeroContainer:]]'));
   });
 
   group('margin-xxx', () {
