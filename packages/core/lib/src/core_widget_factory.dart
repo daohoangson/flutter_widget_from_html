@@ -358,11 +358,13 @@ class WidgetFactory {
   String getListStyleMarker(String type, int i) {
     switch (type) {
       case kCssListStyleTypeCircle:
-        return '⚬';
+        return '-';
       case kCssListStyleTypeDecimal:
         return "$i.";
       case kCssListStyleTypeDisc:
-        return '•';
+        return '⚬';
+      case kCssListStyleTypeSquare:
+        return '+';
     }
 
     return '';

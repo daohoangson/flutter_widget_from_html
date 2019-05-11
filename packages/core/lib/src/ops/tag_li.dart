@@ -6,9 +6,9 @@ const kCssListStyleType = 'list-style-type';
 const kCssListStyleTypeCircle = 'circle';
 const kCssListStyleTypeDecimal = 'decimal';
 const kCssListStyleTypeDisc = 'disc';
+const kCssListStyleTypeSquare = 'square';
 
 const _kCssPaddingLeft = 'padding-left';
-const _kCssPaddingLeftDefault = 40.0;
 
 class TagLi {
   final WidgetFactory wf;
@@ -25,11 +25,13 @@ class TagLi {
 
         final styles = [
           _kCssPaddingLeft,
-          '${_kCssPaddingLeftDefault}px',
+          '2em',
           kCssListStyleType,
           e.localName == kTagOrderedList
               ? kCssListStyleTypeDecimal
-              : p == 0 ? kCssListStyleTypeDisc : kCssListStyleTypeCircle,
+              : p == 0
+                  ? kCssListStyleTypeDisc
+                  : p == 1 ? kCssListStyleTypeCircle : kCssListStyleTypeSquare,
         ];
 
         if (p == 0) styles.addAll([kCssMargin, '1em 0']);
@@ -54,16 +56,15 @@ class TagLi {
 
   Iterable<Widget> _buildList(NodeMetadata meta, Iterable<Widget> children) {
     String listStyleType = kCssListStyleTypeDisc;
-    double paddingLeft = _kCssPaddingLeftDefault;
+    double paddingLeft;
     meta.styles((key, value) {
       switch (key) {
         case kCssListStyleType:
           listStyleType = value;
           break;
         case _kCssPaddingLeft:
-          final parsed = lengthParseValue(value);
-          paddingLeft =
-              parsed?.getValue(meta.textStyle) ?? _kCssPaddingLeftDefault;
+          final parsed = lengthParseValue(value)?.getValue(meta.textStyle);
+          paddingLeft = parsed ?? paddingLeft;
       }
     });
 
@@ -91,7 +92,7 @@ class TagLi {
       Positioned(
         left: 0.0,
         top: 0.0,
-        width: paddingLeft * .8,
+        width: paddingLeft * .9,
         child: RichText(
           maxLines: 1,
           overflow: TextOverflow.clip,
