@@ -35,7 +35,7 @@ void main() {
   <span style="text-decoration: line-through">
     <span style="text-decoration: overline">
       <span style="text-decoration: underline">
-        All decorations...
+        All   decorations...
         <span style="text-decoration: none">and none</span>
       </span>
     </span>

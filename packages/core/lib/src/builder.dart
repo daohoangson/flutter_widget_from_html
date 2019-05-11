@@ -201,7 +201,7 @@ class _Piece extends BuiltPiece {
   void __addSpace() => block.addBit(TextBit.space(block.style));
 
   void __addText(String data) => block.addBit(TextBit(
-        data..replaceAll(_whitespaceDuplicateRegExp, ' '),
+        data.replaceAll(_whitespaceDuplicateRegExp, ' '),
         block.style,
       ));
 }
