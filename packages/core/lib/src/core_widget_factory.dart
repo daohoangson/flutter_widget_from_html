@@ -734,7 +734,7 @@ class WidgetFactory {
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      defaultStyles: (_, __) => [kCssMarginBottom, '1em'],
+      defaultStyles: (_, __) => [kCssMargin, '0.5em 0'],
       onWidgets: (_, __) => [widget0],
     );
     return _tagBr;

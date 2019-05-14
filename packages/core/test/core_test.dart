@@ -138,7 +138,7 @@ void main() {
       expect(
           explained,
           equals('[Column:children=[RichText:(:First.)],' +
-              '[Padding:(0,0,10,0),child=[ZeroContainer:]],' +
+              '[Padding:(5,0,5,0),child=[ZeroContainer:]],' +
               '[RichText:(:Second one.)]]'));
     });
 
