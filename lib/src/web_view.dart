@@ -78,8 +78,8 @@ class _WebViewState extends State<WebView> {
     // TODO: enable codecov when `flutter drive --coverage` is available
     // https://github.com/flutter/flutter/issues/7474
     final evals = await Future.wait([
-      eval("document.body.clientWidth"),
-      eval("document.body.clientHeight"),
+      eval("document.body.scrollWidth"),
+      eval("document.body.scrollHeight"),
     ]);
     final w = double.tryParse(evals[0] ?? '') ?? 0;
     final h = double.tryParse(evals[1] ?? '') ?? 0;
