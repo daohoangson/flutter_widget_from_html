@@ -8,14 +8,14 @@ environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
 
 dependencies:
-  cached_network_image: ^0.7.0
+  cached_network_image: ^0.8.0
   flutter:
     sdk: flutter
   flutter_widget_from_html_core:
     path: packages/core
-  html: ^0.14.0
+  html: any
   url_launcher: ^5.0.2
-  webview_flutter: ^0.3.5+2
+  webview_flutter: ^0.3.6
 
 dev_dependencies:
   flutter_test:
