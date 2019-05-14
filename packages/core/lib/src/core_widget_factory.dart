@@ -296,11 +296,28 @@ class WidgetFactory {
     final fixed = <Widget>[];
     final skipWidget0 = (Widget w) => w == widget0 ? null : fixed.add(w);
 
-    int i = 0;
+    var iMin = 0;
+    var iMax = widgets.length - 1;
+    while (iMin < iMax) {
+      final wMin = widgets[iMin];
+      if (wMin is Padding && wMin.child == widget0) {
+        iMin++;
+      } else {
+        break;
+      }
+    }
+    while (iMax > iMin) {
+      final wMax = widgets[iMax];
+      if (wMax is Padding && wMax.child == widget0) {
+        iMax--;
+      } else {
+        break;
+      }
+    }
+
     EdgeInsets prev;
-    final length = widgets.length;
-    for (final widget in widgets) {
-      i++;
+    for (var i = iMin; i <= iMax; i++) {
+      final widget = widgets[i];
       if (!(widget is Padding)) {
         fixed.add(widget);
         prev = null;
@@ -311,12 +328,12 @@ class WidgetFactory {
       final pp = p.padding as EdgeInsets;
       var v = pp;
 
-      if (i == 1 && v.top > 0) {
+      if (i == iMin && v.top > 0) {
         // remove padding at the top
         v = v.copyWith(top: 0);
       }
 
-      if (i == length && v.bottom > 0) {
+      if (i == iMax && v.bottom > 0) {
         // remove padding at the bottom
         v = v.copyWith(bottom: 0);
       }

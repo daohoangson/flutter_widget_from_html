@@ -15,6 +15,30 @@ void main() {
     expect(explained, equals('[RichText:(:Foo)]'));
   });
 
+  group('BR tag', () {
+    testWidgets('trims top intances', (WidgetTester tester) async {
+      final html = '<br/><br/>Foo';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('trims bottom instances', (WidgetTester tester) async {
+      final html = 'Foo<br/><br/>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('skip others', (WidgetTester tester) async {
+      final html = '<br/>Foo<br/>Bar<br/>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Column:children=[RichText:(:Foo)],'
+              '[Padding:(5,0,5,0),child=[ZeroContainer:]],'
+              '[RichText:(:Bar)]]'));
+    });
+  });
+
   group('table paddings', () {
     testWidgets('renders table cell padding', (WidgetTester tester) async {
       final html = '<table><tr><td>Foo</td></tr></table>';
