@@ -36,6 +36,10 @@ class WidgetFactory {
   Widget buildAlign(Widget child, Alignment alignment) {
     if (child == null) return null;
     if (alignment == null) return child;
+
+    if (child is Padding)
+      return buildPadding(buildAlign(child.child, alignment), child.padding);
+
     return Align(alignment: alignment, child: child);
   }
 

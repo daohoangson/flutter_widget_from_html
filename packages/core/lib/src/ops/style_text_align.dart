@@ -17,11 +17,16 @@ class StyleTextAlign {
           meta.styles((k, _v) => k == kCssTextAlign ? v = _v : null);
           if (v == null) return pieces;
 
-          final widgets = pieces.map(
-            (p) => p.hasWidgets
-                ? wf.buildAlign(wf.buildColumn(p.widgets), _getAlignment(v))
-                : wf.buildText(p.block, textAlign: _getTextAlign(v)),
-          );
+          final widgets = <Widget>[];
+          for (final p in pieces) {
+            if (!p.hasWidgets) {
+              widgets.add(wf.buildText(p.block, textAlign: _getTextAlign(v)));
+              continue;
+            }
+
+            widgets.addAll(
+                p.widgets.map((w) => wf.buildAlign(w, _getAlignment(v))));
+          }
 
           return <BuiltPiece>[BuiltPieceSimple(widgets: widgets)];
         },

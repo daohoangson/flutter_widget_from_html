@@ -46,7 +46,7 @@ void main() {
     expect(str, equals('[RichText:(+l+o+u:All decorations... (:and none))]'));
   });
 
-  testWidgets('renders white spaces with parent style', (WidgetTester tester) async {
+  testWidgets('renders white spaces with parent style', (tester) async {
     final html = ' <b>One<em> <u>two </u></em> three</b> ';
     final explained = await explain(tester, html);
     expect(explained, equals('[RichText:(+b:One (+u+i+b:two)(+b: three))]'));
@@ -738,6 +738,16 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           '<div style="text-align: right;">right</div></span></em>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText,align=right:(+i:right)]'));
+    });
+
+    testWidgets('renders margin inside', (WidgetTester tester) async {
+      final html = '<div style="text-align: center">'
+          '<div style="margin: 5px">Foo</div></div>';
+      final explained = await explainMargin(tester, html);
+      expect(
+          explained,
+          equals('[Padding:(5,5,5,5),child='
+              '[Align:alignment=center,child=[RichText:(:Foo)]]]'));
     });
   });
 
