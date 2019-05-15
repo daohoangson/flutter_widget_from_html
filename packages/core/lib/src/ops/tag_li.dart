@@ -25,7 +25,7 @@ class TagLi {
 
         final styles = [
           _kCssPaddingLeft,
-          '2em',
+          '2.5em',
           kCssListStyleType,
           e.localName == kTagOrderedList
               ? kCssListStyleTypeDecimal
@@ -92,7 +92,7 @@ class TagLi {
       Positioned(
         left: 0.0,
         top: 0.0,
-        width: paddingLeft * .9,
+        width: paddingLeft * .75,
         child: RichText(
           maxLines: 1,
           overflow: TextOverflow.clip,

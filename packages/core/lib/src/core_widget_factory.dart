@@ -379,7 +379,7 @@ class WidgetFactory {
       case kCssListStyleTypeDecimal:
         return "$i.";
       case kCssListStyleTypeDisc:
-        return '⚬';
+        return '•';
       case kCssListStyleTypeSquare:
         return '+';
     }

@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '_.dart';
 
 void main() {
-  final padding = 'Padding:(0,0,0,20)';
+  final padding = 'Padding:(0,0,0,25)';
 
   testWidgets('renders list with padding', (WidgetTester tester) async {
     final html = '<ul><li>Foo</li></ul>';
@@ -12,7 +12,7 @@ void main() {
         explained,
         equals('[Padding:(10,0,10,0),child='
             '[Stack:children=[$padding,child=[RichText:(:Foo)]],'
-            '[Positioned:child=[RichText,align=right:(:⚬)]]]]'));
+            '[Positioned:child=[RichText,align=right:(:•)]]]]'));
   });
 
   testWidgets('renders ordered list', (WidgetTester tester) async {
@@ -33,9 +33,9 @@ void main() {
     expect(
         explained,
         equals('[Column:children='
-            '[Stack:children=[$padding,child=[RichText:(:One)]],[Positioned:child=[RichText,align=right:(:⚬)]]],'
-            '[Stack:children=[$padding,child=[RichText:(:Two)]],[Positioned:child=[RichText,align=right:(:⚬)]]],'
-            '[Stack:children=[$padding,child=[RichText:(+i:Three)]],[Positioned:child=[RichText,align=right:(:⚬)]]]'
+            '[Stack:children=[$padding,child=[RichText:(:One)]],[Positioned:child=[RichText,align=right:(:•)]]],'
+            '[Stack:children=[$padding,child=[RichText:(:Two)]],[Positioned:child=[RichText,align=right:(:•)]]],'
+            '[Stack:children=[$padding,child=[RichText:(+i:Three)]],[Positioned:child=[RichText,align=right:(:•)]]]'
             ']'));
   });
 
@@ -63,7 +63,7 @@ void main() {
     expect(
         explained,
         equals('[Column:children='
-            '[Stack:children=[$padding,child=[RichText:(:One)]],[Positioned:child=[RichText,align=right:(:⚬)]]],'
+            '[Stack:children=[$padding,child=[RichText:(:One)]],[Positioned:child=[RichText,align=right:(:•)]]],'
             '[Stack:children=[$padding,child='
             '[Column:children=[RichText:(:Two)],'
             '[Stack:children=[$padding,child=[RichText:(:2.1)]],[Positioned:child=[RichText,align=right:(:-)]]],'
@@ -73,8 +73,8 @@ void main() {
             '[Stack:children=[$padding,child=[RichText:(:2.2.2)]],[Positioned:child=[RichText,align=right:(:+)]]]'
             ']],[Positioned:child=[RichText,align=right:(:-)]]],'
             '[Stack:children=[$padding,child=[RichText:(:2.3)]],[Positioned:child=[RichText,align=right:(:-)]]]'
-            ']],[Positioned:child=[RichText,align=right:(:⚬)]]],'
-            '[Stack:children=[$padding,child=[RichText:(:Three)]],[Positioned:child=[RichText,align=right:(:⚬)]]]'
+            ']],[Positioned:child=[RichText,align=right:(:•)]]],'
+            '[Stack:children=[$padding,child=[RichText:(:Three)]],[Positioned:child=[RichText,align=right:(:•)]]]'
             ']'));
   });
 }
