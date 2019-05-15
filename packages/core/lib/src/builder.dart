@@ -133,7 +133,7 @@ class Builder {
       for (final __piece in __builder.process()) {
         i++;
         if (i == 1) {
-          if (__piece.block?.isSubOf(_textPiece.block) == true) {
+          if (__piece.block?.parent == _textPiece.block) {
             continue;
           } else {
             // discard the active text piece
@@ -185,25 +185,24 @@ class _Piece extends BuiltPiece {
   @override
   bool get hasWidgets => widgets != null;
 
-  void _write(String text) {
+  bool _write(String text) {
     final leading = _textLeadingSpacingRegExp.firstMatch(text);
     final trailing = _textTrailingSpacingRegExp.firstMatch(text);
     final start = leading == null ? 0 : leading.end;
     final end = trailing == null ? text.length : trailing.start;
 
-    if (end <= start) return __addSpace();
+    if (end <= start) return block.addSpace();
 
-    if (start > 0) __addSpace();
-    __addText(text.substring(start, end));
-    if (end < text.length) __addSpace();
+    if (start > 0) block.addSpace();
+
+    final substring = text.substring(start, end);
+    final dedup = substring.replaceAll(_whitespaceDuplicateRegExp, ' ');
+    if (!block.addText(dedup)) return false;
+
+    if (end < text.length) block.addSpace();
+
+    return true;
   }
-
-  void __addSpace() => block.addBit(TextBit.space(block.style));
-
-  void __addText(String data) => block.addBit(TextBit(
-        data.replaceAll(_whitespaceDuplicateRegExp, ' '),
-        block.style,
-      ));
 }
 
 Iterable<BuildOp> _prepareParentOps(

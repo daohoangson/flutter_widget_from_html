@@ -273,65 +273,74 @@ class NodeMetadata {
 typedef NodeMetadata NodeMetadataCollector(NodeMetadata meta, dom.Element e);
 
 class TextBit {
+  final TextBlock block;
   final String data;
   final VoidCallback onTap;
   final TextStyle style;
 
-  bool get isSpace => data == null;
-  String get text => isSpace ? ' ' : data;
+  TextBit(this.block, this.data, this.style, {this.onTap})
+      : assert(block != null),
+        assert(data != null),
+        assert(style != null);
 
-  const TextBit(this.data, this.style, {this.onTap}) : assert(style != null);
+  TextBit.space(this.block)
+      : assert(block != null),
+        data = null,
+        onTap = null,
+        style = null;
 
   TextBit rebuild({
+    TextBlock block,
     String data,
     VoidCallback onTap,
     TextStyle style,
   }) =>
       TextBit(
+        block ?? this.block,
         data ?? this.data,
         style ?? this.style,
         onTap: onTap ?? this.onTap,
       );
-
-  static TextBit space(TextStyle style) => TextBit(null, style);
 }
 
 class TextBlock {
+  final TextBlock parent;
   final TextStyle style;
   final List<TextBit> _bits;
-  final TextBlock _parent;
 
   bool _hasTrailingSpace = true;
   int _indexEnd;
   int _indexStart;
 
-  TextBlock(this.style, {List<TextBit> bits, TextBlock parent})
+  TextBlock(this.style, {List<TextBit> bits, this.parent})
       : assert(style != null),
         assert((bits == null) == (parent == null)),
-        _bits = bits ?? [],
-        _parent = parent {
+        _bits = bits ?? [] {
     _indexStart = _bits.length;
     _indexEnd = _indexStart;
   }
 
-  Iterable<TextBit> get iterable => _bits.getRange(_indexStart, _indexEnd);
   bool get hasTrailingSpace => _indexEnd == _bits.length
-      ? _parent?.hasTrailingSpace ?? _hasTrailingSpace
+      ? parent?.hasTrailingSpace ?? _hasTrailingSpace
       : false;
+  int get indexEnd => _indexEnd;
+  int get indexStart => _indexStart;
   bool get isEmpty => _indexEnd == _indexStart;
   bool get isNotEmpty => !isEmpty;
+  Iterable<TextBit> get iterable => _bits.getRange(_indexStart, _indexEnd);
+  TextBit get next => _bits.length > _indexEnd ? _bits[_indexEnd] : null;
 
   bool addBit(TextBit bit) {
-    if (_parent != null) {
+    if (parent != null) {
       if (_indexEnd != _bits.length) {
         throw new StateError('Cannot add TextBit in the middle of a block');
       }
-      final added = _parent.addBit(bit);
+      final added = parent.addBit(bit);
       if (added) _indexEnd++;
       return added;
     }
 
-    if (bit.isSpace) {
+    if (bit.data == null) {
       if (_bits.isEmpty || _hasTrailingSpace) return false;
       _hasTrailingSpace = true;
     } else {
@@ -344,17 +353,14 @@ class TextBlock {
     return true;
   }
 
-  bool addText(String text, [TextStyle style]) =>
-      addBit(TextBit(text, style ?? this.style));
+  bool addSpace() => addBit(TextBit.space(this));
 
-  bool isSubOf(TextBlock other) => _parent == other;
+  bool addText(String data) => addBit(TextBit(this, data, style));
 
   void rebuildBits(TextBit f(TextBit bit), {int start, int end}) {
     start ??= _indexStart;
     end ??= _indexEnd;
-    if (_parent != null) {
-      return _parent.rebuildBits(f, start: start, end: end);
-    }
+    if (parent != null) return parent.rebuildBits(f, start: start, end: end);
 
     for (var i = start; i < end; i++) {
       final bit = _bits[i];

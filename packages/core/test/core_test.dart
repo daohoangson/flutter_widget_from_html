@@ -46,6 +46,12 @@ void main() {
     expect(str, equals('[RichText:(+l+o+u:All decorations... (:and none))]'));
   });
 
+  testWidgets('renders white spaces with parent style', (WidgetTester tester) async {
+    final html = ' <b>One<em> <u>two </u></em> three</b> ';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[RichText:(+b:One (+u+i+b:two)(+b: three))]'));
+  });
+
   group('ABBR tag', () {
     testWidgets('renders ABBR', (WidgetTester tester) async {
       final html = '<abbr>ABBR</abbr>';
