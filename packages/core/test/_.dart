@@ -9,14 +9,14 @@ Future<String> explain(
   _WidgetExplainer explainer,
   _HtmlWidgetBuilder hw,
   String imageUrlToPrecache,
-  WidgetFactoryBuilder wf,
+  WidgetFactory wf,
   Uri baseUrl,
   double bodyVerticalPadding = 0,
+  NodeMetadataCollector builderCallback,
   double tableCellPadding = 0,
-  double tablePadding = 0,
-  double textHorizontalPadding = 0,
+  TextStyle textStyle,
 }) async {
-  final key = new UniqueKey();
+  final key = UniqueKey();
 
   await tester.pumpWidget(
     StatefulBuilder(
@@ -31,31 +31,16 @@ Future<String> explain(
           );
         }
 
-        return MaterialApp(
-          theme: ThemeData(
-            accentColor: Color(0xFF0000FF),
-          ),
-          home: Material(
-            child: DefaultTextStyle(
-              key: key,
-              style: DefaultTextStyle.of(context).style.copyWith(
-                    fontSize: 10.0,
-                    fontWeight: FontWeight.normal,
-                  ),
-              child: hw != null
-                  ? hw()
-                  : HtmlWidget(
-                      html,
-                      baseUrl: baseUrl,
-                      bodyPadding:
-                          EdgeInsets.symmetric(vertical: bodyVerticalPadding),
-                      tableCellPadding: EdgeInsets.all(tableCellPadding),
-                      tablePadding: EdgeInsets.all(tablePadding),
-                      textPadding: EdgeInsets.symmetric(
-                          horizontal: textHorizontalPadding),
-                      wf: wf,
-                    ),
-            ),
+        final defaultStyle = DefaultTextStyle.of(context).style;
+        final style = defaultStyle.copyWith(
+          fontSize: 10.0,
+          fontWeight: FontWeight.normal,
+        );
+
+        return Theme(
+          child: DefaultTextStyle(key: key, style: style, child: widget0),
+          data: ThemeData(
+            accentColor: const Color(0xFF123456),
           ),
         );
       },
@@ -66,13 +51,23 @@ Future<String> explain(
   expect(found.widget, isInstanceOf<DefaultTextStyle>());
 
   final _ = _Explainer(found, explainer: explainer);
-  final htmlWidget = (found.widget as DefaultTextStyle).child as HtmlWidget;
+  final htmlWidget = hw != null
+      ? hw()
+      : HtmlWidget(
+          html,
+          baseUrl: baseUrl,
+          bodyPadding: EdgeInsets.symmetric(vertical: bodyVerticalPadding),
+          builderCallback: builderCallback,
+          tableCellPadding: EdgeInsets.all(tableCellPadding),
+          textStyle: textStyle,
+          wf: wf,
+        );
 
   return _.explain(htmlWidget.build(found));
 }
 
-final _explainMarginRegExp =
-    RegExp(r'^\[Column:children=\[Text:x\],(.+),\[Text:x\]\]$');
+final _explainMarginRegExp = RegExp(
+    r'^\[Column:children=\[RichText:\(:x\)\],(.+),\[RichText:\(:x\)\]\]$');
 
 Future<String> explainMargin(
   WidgetTester tester,
@@ -127,6 +122,13 @@ class _Explainer {
     final type = i.runtimeType.toString();
     final description = i is NetworkImage ? "url=${i.url}" : '';
     return "[$type:$description]";
+  }
+
+  String _limitBox(LimitedBox box) {
+    String s = '';
+    if (box.maxHeight != null) s += 'h=${box.maxHeight},';
+    if (box.maxWidth != null) s += 'w=${box.maxWidth},';
+    return s;
   }
 
   String _tableBorder(TableBorder b) {
@@ -259,6 +261,10 @@ class _Explainer {
     final explained = this.explainer?.call(widget);
     if (explained != null) return explained;
 
+    if (widget is Wrapable) {
+      return "[Wrap:children=${widget.widgets.map(_widget).join(',')}]";
+    }
+
     final type = widget.runtimeType.toString();
     final text = widget is Align
         ? "alignment=${widget.alignment},"
@@ -270,13 +276,17 @@ class _Explainer {
                     ? "child=${_widget(widget.child)}"
                     : widget is Image
                         ? "image=${_image(widget.image)}"
-                        : widget is Padding
-                            ? "${_edgeInsets(widget.padding)},"
-                            : widget is RichText
-                                ? _textSpan(widget.text)
-                                : widget is Table
-                                    ? _tableBorder(widget.border)
-                                    : widget is Text ? widget.data : '';
+                        : widget is InkWell
+                            ? "child=${_widget(widget.child)}"
+                            : widget is LimitedBox
+                                ? _limitBox(widget)
+                                : widget is Padding
+                                    ? "${_edgeInsets(widget.padding)},"
+                                    : widget is RichText
+                                        ? _textSpan(widget.text)
+                                        : widget is Table
+                                            ? _tableBorder(widget.border)
+                                            : widget is Text ? widget.data : '';
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));

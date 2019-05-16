@@ -1,4 +1,4 @@
-part of '../core_widget_factory.dart';
+part of '../core_helpers.dart';
 
 const kCssTextAlign = 'text-align';
 const kCssTextAlignCenter = 'center';
@@ -17,11 +17,16 @@ class StyleTextAlign {
           meta.styles((k, _v) => k == kCssTextAlign ? v = _v : null);
           if (v == null) return pieces;
 
-          final widgets = pieces.map(
-            (p) => p.hasWidgets
-                ? wf.buildAlign(wf.buildColumn(p.widgets), _getAlignment(v))
-                : wf.buildText(block: p.block, textAlign: _getTextAlign(v)),
-          );
+          final widgets = <Widget>[];
+          for (final p in pieces) {
+            if (!p.hasWidgets) {
+              widgets.add(wf.buildText(p.block, textAlign: _getTextAlign(v)));
+              continue;
+            }
+
+            widgets.addAll(
+                p.widgets.map((w) => wf.buildAlign(w, _getAlignment(v))));
+          }
 
           return <BuiltPiece>[BuiltPieceSimple(widgets: widgets)];
         },
@@ -31,13 +36,13 @@ class StyleTextAlign {
 Alignment _getAlignment(String textAlign) {
   switch (textAlign) {
     case kCssTextAlignCenter:
-      return Alignment.topCenter;
+      return Alignment.center;
     case kCssTextAlignJustify:
-      return Alignment.topLeft;
+      return Alignment.centerLeft;
     case kCssTextAlignLeft:
-      return Alignment.topLeft;
+      return Alignment.centerLeft;
     case kCssTextAlignRight:
-      return Alignment.topRight;
+      return Alignment.centerRight;
   }
 
   return null;

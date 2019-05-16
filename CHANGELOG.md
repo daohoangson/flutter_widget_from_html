@@ -1,3 +1,17 @@
+## 0.2.0
+
+* Add support for new tags:
+  ABBR ACRONYM ADDRESS ARTICLE ASIDE BIG BLOCKQUOTE CITE CENTER DD/DL/DT DEL DFN
+  FIGURE FIGCAPTION FOOTER HEADER HR INS KBD MAIN MARK NAV Q S SAMP STRIKE SECTION
+  SMALL TT VAR
+* Add support for table tags: TABLE CAPTION THEAD TBODY TFOOT TR TD TH
+* Add support for `background-color`
+* Add support for `em` CSS unit
+* Improve support for existing tags: BR H1 H2 H3 H4 H5 H6 IMG P PRE
+* Improve support for IFRAME: `WebView` can now resize itself to fit its contents
+* Simplify config for easy usage and customization
+* Fix bug using int.parse (#34)
+
 ## 0.1.5
 
 * Fix margin with partial invalid values (#21)

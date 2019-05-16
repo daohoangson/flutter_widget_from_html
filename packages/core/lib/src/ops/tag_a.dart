@@ -1,4 +1,4 @@
-part of '../core_widget_factory.dart';
+part of '../core_helpers.dart';
 
 class TagA {
   final WidgetFactory wf;
@@ -6,15 +6,22 @@ class TagA {
   TagA(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        collectMetadata: (meta) => lazySet(meta, decoUnder: true),
+        defaultStyles: (_, __) => [
+              kCssColor,
+              colorToHex(wf.config.hyperlinkColor),
+              kCssTextDecoration,
+              kCssTextDecorationUnderline,
+            ],
         onPieces: (meta, pieces) {
-          final tap = _buildGestureTapCallback(meta);
-          if (tap == null) return pieces;
+          final onTap = _buildGestureTapCallback(meta);
+          if (onTap == null) return pieces;
 
           return pieces.map(
-            (p) => p.hasWidgets
-                ? BuiltPieceSimple(widgets: <Widget>[_buildGd(p.widgets, tap)])
-                : _buildBlock(p, tap),
+            (piece) => piece.hasWidgets
+                ? BuiltPieceSimple(
+                    widgets: wf.buildGestureDetectors(piece.widgets, onTap),
+                  )
+                : _buildBlock(piece, onTap),
           );
         },
       );
@@ -22,11 +29,8 @@ class TagA {
   BuiltPiece _buildBlock(BuiltPiece piece, GestureTapCallback onTap) =>
       piece..block.rebuildBits((bit) => bit.rebuild(onTap: onTap));
 
-  Widget _buildGd(List<Widget> widgets, GestureTapCallback onTap) =>
-      wf.buildGestureDetector(wf.buildColumn(widgets), onTap);
-
   GestureTapCallback _buildGestureTapCallback(NodeMetadata meta) {
-    final attrs = meta.buildOpElement.attributes;
+    final attrs = meta.domElement.attributes;
     final href = attrs.containsKey('href') ? attrs['href'] : '';
     final url = wf.constructFullUrl(href) ?? href;
     return wf.buildGestureTapCallbackForUrl(url);

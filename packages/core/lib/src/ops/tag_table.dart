@@ -1,4 +1,4 @@
-part of '../core_widget_factory.dart';
+part of '../core_helpers.dart';
 
 const kTagTable = 'table';
 const kTagTableAttrBorder = 'border';
@@ -9,43 +9,79 @@ const kTagTableFoot = 'tfoot';
 const kTagTableHead = 'thead';
 const kTagTableHeader = 'th';
 const kTagTableRow = 'tr';
+const _kTagTableOpPriority = 100;
 
 class TagTable {
   final WidgetFactory wf;
 
+  BuildOp _captionOp;
+  BuildOp _cellOp;
+  BuildOp _rowOp;
+  BuildOp _semanticOp;
+
   TagTable(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        collectMetadata: (meta) {
-          if (meta.buildOpElement.localName == kTagTableHeader) {
-            meta.fontWeight ??= FontWeight.bold;
-          }
-        },
-        getInlineStyles: (_, e) {
-          if (e.localName == kTagTableCaption) {
-            return [kCssTextAlign, kCssTextAlignCenter];
-          }
-        },
-        onWidgets: (meta, widgets) {
-          switch (meta.buildOpElement.localName) {
-            case kTagTable:
-              return _buildTable(meta, widgets);
+        onChild: (meta, e) {
+          switch (e.localName) {
             case kTagTableCaption:
-              return _CaptionWidget(wf.buildColumn(widgets));
+              return lazySet(meta, buildOp: captionOp);
+            case kTagTableCell:
+            case kTagTableHeader:
+              return lazySet(meta, buildOp: cellOp);
             case kTagTableRow:
-              return _RowWidget(widgets.map((w) => _wrapCell(w)));
+              return lazySet(meta, buildOp: rowOp);
             case kTagTableBody:
             case kTagTableHead:
             case kTagTableFoot:
-              return _SemanticWidget(meta.buildOpElement.localName, widgets);
+              return lazySet(meta, buildOp: semanticOp);
           }
 
-          return wf.buildColumn(widgets);
+          return meta;
         },
-        priority: 100,
+        onWidgets: (meta, widgets) => _buildTable(meta, widgets),
+        priority: _kTagTableOpPriority,
       );
 
-  Widget _buildTable(NodeMetadata meta, Iterable<Widget> children) {
+  BuildOp get captionOp {
+    _captionOp ??= BuildOp(
+      defaultStyles: (_, __) => [kCssTextAlign, kCssTextAlignCenter],
+      onWidgets: (_, widgets) => [_CaptionWidget(widgets)],
+      priority: _kTagTableOpPriority,
+    );
+    return _captionOp;
+  }
+
+  BuildOp get cellOp {
+    _cellOp ??= BuildOp(
+      defaultStyles: (_, e) => e.localName == kTagTableHeader
+          ? [kCssFontWeight, kCssFontWeightBold]
+          : null,
+      onWidgets: (_, __) => null,
+      priority: _kTagTableOpPriority,
+    );
+    return _cellOp;
+  }
+
+  BuildOp get rowOp {
+    _rowOp ??= BuildOp(
+      onWidgets: (_, ws) => [_RowWidget(ws.map((w) => _wrapCell(w)))],
+      priority: _kTagTableOpPriority,
+    );
+    return _rowOp;
+  }
+
+  BuildOp get semanticOp {
+    _semanticOp ??= BuildOp(
+      onWidgets: (meta, widgets) => [
+            _SemanticWidget(meta.domElement.localName, widgets),
+          ],
+      priority: _kTagTableOpPriority,
+    );
+    return _semanticOp;
+  }
+
+  Iterable<Widget> _buildTable(NodeMetadata meta, Iterable<Widget> children) {
     final headWidgets = <_RowWidget>[];
     final bodyWidgets = <_RowWidget>[];
     final footWidgets = <_RowWidget>[];
@@ -76,7 +112,7 @@ class TagTable {
 
     final rows = rowWidgets.map((rw) {
       final cells = rw.cells.toList();
-      while (cells.length < cols) cells.add(wf.buildTableCell(Container()));
+      while (cells.length < cols) cells.add(wf.buildTableCell(widget0));
       return TableRow(children: cells);
     });
 
@@ -84,12 +120,12 @@ class TagTable {
 
     if (children.isNotEmpty) {
       final first = children.first;
-      if (first is _CaptionWidget) widgets.add(first.child);
+      if (first is _CaptionWidget) widgets.addAll(first.children);
     }
 
     widgets.add(wf.buildTable(rows.toList(), border: _buildTableBorder(meta)));
 
-    return wf.buildColumn(widgets);
+    return widgets;
   }
 
   Widget _wrapCell(Widget widget) =>
@@ -97,12 +133,12 @@ class TagTable {
 }
 
 class _CaptionWidget extends StatelessWidget {
-  final Widget child;
+  final Iterable<Widget> children;
 
-  _CaptionWidget(this.child);
+  _CaptionWidget(this.children);
 
   @override
-  Widget build(BuildContext context) => child;
+  Widget build(BuildContext context) => Column(children: children);
 }
 
 class _RowWidget extends StatelessWidget {
@@ -135,14 +171,14 @@ TableBorder _buildTableBorder(NodeMetadata meta) {
     if (borderParsed != null) {
       return TableBorder.all(
         color: borderParsed.color ?? const Color(0xFF000000),
-        width: borderParsed.width.getValue(meta.buildOpTextStyle),
+        width: borderParsed.width.getValue(meta.textStyle),
       );
     }
   }
 
-  final e = meta.buildOpElement;
-  if (e.attributes.containsKey(kTagTableAttrBorder)) {
-    final width = double.tryParse(e.attributes[kTagTableAttrBorder]);
+  final a = meta.domElement.attributes;
+  if (a.containsKey(kTagTableAttrBorder)) {
+    final width = double.tryParse(a[kTagTableAttrBorder]);
     if (width != null && width > 0) {
       return TableBorder.all(width: width);
     }

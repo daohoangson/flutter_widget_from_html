@@ -1,23 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    show BuildOp, NodeMetadata, lazySet;
-import 'package:html/dom.dart' as dom;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'config.dart';
+import 'data_classes.dart';
 import 'web_view.dart';
 
 part 'ops/tag_iframe.dart';
 
 class WidgetFactory extends core.WidgetFactory {
   Config _config;
-  BuildOp _tagIframe;
 
-  WidgetFactory(BuildContext context) : super(context);
+  BuildOp _tagIframe;
 
   @override
   set config(core.Config config) {
@@ -26,11 +22,20 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
+  Config get config => _config;
+
+  @override
   Widget buildDivider() => Divider(height: 1);
 
   @override
+  Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
+      InkWell(child: child, onTap: onTap);
+
+  @override
   GestureTapCallback buildGestureTapCallbackForUrl(String url) =>
-      () => canLaunch(url).then((ok) => ok ? launch(url) : null);
+      () => _config.onTapUrl != null
+          ? _config.onTapUrl(url)
+          : canLaunch(url).then((ok) => ok ? launch(url) : null);
 
   @override
   Widget buildImageFromUrl(String url) => CachedNetworkImage(
@@ -55,23 +60,19 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   Widget buildWebViewLinkOnly(String url) => GestureDetector(
-        child: buildText(text: url),
+        child: Text(url),
         onTap: buildGestureTapCallbackForUrl(url),
       );
 
   @override
-  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
-    switch (e.localName) {
-      case 'a':
-        meta = lazySet(meta, color: Theme.of(context).accentColor);
-        break;
-
+  NodeMetadata parseLocalName(NodeMetadata meta, String localName) {
+    switch (localName) {
       case 'iframe':
         // return asap to avoid being disabled by core
         return lazySet(meta, buildOp: tagIframe());
     }
 
-    return super.parseElement(meta, e);
+    return super.parseLocalName(meta, localName);
   }
 
   BuildOp tagIframe() {

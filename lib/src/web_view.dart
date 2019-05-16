@@ -77,6 +77,8 @@ class _WebViewState extends State<WebView> {
   void _getDimensions() async {
     // TODO: enable codecov when `flutter drive --coverage` is available
     // https://github.com/flutter/flutter/issues/7474
+    if (!mounted) return;
+
     final evals = await Future.wait([
       eval("document.body.scrollWidth"),
       eval("document.body.scrollHeight"),
@@ -86,7 +88,7 @@ class _WebViewState extends State<WebView> {
 
     final r = (h > 0 && w > 0) ? (w / h) : _aspectRatio;
     final changed = (r - _aspectRatio).abs() > 0.0001;
-    if (changed) setState(() => _aspectRatio = r);
+    if (changed && mounted) setState(() => _aspectRatio = r);
 
     final f = widget.getDimensionsDone;
     if (f != null) f(r, changed, h, w);

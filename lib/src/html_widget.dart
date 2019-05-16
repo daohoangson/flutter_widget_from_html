@@ -3,6 +3,7 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
     as core;
 
 import 'config.dart';
+import 'data_classes.dart';
 import 'widget_factory.dart' as extended;
 
 class HtmlWidget extends core.HtmlWidget implements Config {
@@ -29,15 +30,22 @@ class HtmlWidget extends core.HtmlWidget implements Config {
 
   final bool webViewJs;
 
-  const HtmlWidget(
+  Color _hyperlinkColor;
+
+  Color get hyperlinkColor => _hyperlinkColor ?? super.hyperlinkColor;
+
+  HtmlWidget(
     String html, {
-    core.WidgetFactoryBuilder wf,
+    core.WidgetFactory wf,
     Key key,
     Uri baseUrl,
     EdgeInsets bodyPadding,
+    NodeMetadataCollector builderCallback,
+    Color hyperlinkColor,
+    core.OnTapUrl onTapUrl,
     EdgeInsets tableCellPadding,
-    EdgeInsets tablePadding,
-    EdgeInsets textPadding,
+    TextStyle textStyle,
+    double wrapSpacing,
     bool webView,
     bool webViewJs,
   })  : this.webView = webView ?? false,
@@ -48,12 +56,17 @@ class HtmlWidget extends core.HtmlWidget implements Config {
           key: key,
           baseUrl: baseUrl,
           bodyPadding: bodyPadding,
+          builderCallback: builderCallback,
+          hyperlinkColor: hyperlinkColor,
+          onTapUrl: onTapUrl,
           tableCellPadding: tableCellPadding,
-          tablePadding: tablePadding,
-          textPadding: textPadding,
+          textStyle: textStyle,
+          wrapSpacing: wrapSpacing,
         );
 
-  core.WidgetFactory initFactory(BuildContext context) =>
-      (wf != null ? wf(context) : extended.WidgetFactory(context))
-        ..config = this;
+  @override
+  core.WidgetFactory initFactory(BuildContext context) {
+    _hyperlinkColor = Theme.of(context).accentColor;
+    return (wf ?? extended.WidgetFactory())..config = this;
+  }
 }

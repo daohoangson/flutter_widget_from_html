@@ -14,11 +14,11 @@ NodeMetadata lazySet(
   String fontSize,
   bool fontStyleItalic,
   FontWeight fontWeight,
-  Iterable<String> inlineStyles,
-  bool inlineStylesPrepend = false,
   bool isBlockElement,
   bool isNotRenderable,
-  Key key,
+  Iterable<BuildOp> parentOps,
+  Iterable<String> styles,
+  Iterable<String> stylesPrepend,
 }) {
   meta ??= NodeMetadata();
 
@@ -59,59 +59,62 @@ NodeMetadata lazySet(
   if (fontStyleItalic != null) meta.fontStyleItalic = fontStyleItalic;
   if (fontWeight != null) meta.fontWeight = fontWeight;
 
-  if (inlineStyles != null) {
-    if (inlineStyles.length % 2 != 0) {
-      throw new ArgumentError('inlineStyles must have an even number of items');
-    }
-    if (meta._inlineStylesFrozen) {
-      throw new StateError('inlineStyles has already been frozen');
-    }
-    meta._inlineStyles ??= [];
-    if (inlineStylesPrepend) {
-      meta._inlineStyles.insertAll(0, inlineStyles);
-    } else {
-      meta._inlineStyles.addAll(inlineStyles);
-    }
-  }
-
   if (isBlockElement != null) meta._isBlockElement = isBlockElement;
   if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
 
-  if (key != null) {
-    meta._keys ??= [];
-    meta._keys.add(key);
+  if (parentOps != null) {
+    assert(meta._parentOps == null);
+    meta._parentOps = parentOps;
+  }
+
+  if (stylesPrepend != null) {
+    styles = stylesPrepend;
+  }
+  if (styles != null) {
+    assert(styles.length % 2 == 0);
+    assert(!meta._stylesFrozen);
+    meta._styles ??= [];
+    if (styles == stylesPrepend) {
+      meta._styles.insertAll(0, styles);
+    } else {
+      meta._styles.addAll(styles);
+    }
   }
 
   return meta;
 }
 
 class BuildOp {
+  final bool isBlockElement;
+
   // op with lower priority will run first
   final int priority;
 
-  final BuildOpCollectMetadata _collectMetadata;
-  final BuildOpGetInlineStyles _getInlineStyles;
-  final BuildOpOnPieces _onPieces;
-  final BuildOpOnWidgets _onWidgets;
+  final _BuildOpDefaultStyles _defaultStyles;
+  final _BuildOpOnChild _onChild;
+  final _BuildOpOnPieces _onPieces;
+  final _BuildOpOnWidgets _onWidgets;
 
   BuildOp({
-    BuildOpCollectMetadata collectMetadata,
-    BuildOpGetInlineStyles getInlineStyles,
-    BuildOpOnPieces onPieces,
-    BuildOpOnWidgets onWidgets,
+    _BuildOpDefaultStyles defaultStyles,
+    bool isBlockElement,
+    _BuildOpOnChild onChild,
+    _BuildOpOnPieces onPieces,
+    _BuildOpOnWidgets onWidgets,
     this.priority = 10,
-  })  : _collectMetadata = collectMetadata,
-        _getInlineStyles = getInlineStyles,
+  })  : _defaultStyles = defaultStyles,
+        this.isBlockElement = isBlockElement ?? onWidgets != null,
+        _onChild = onChild,
         _onPieces = onPieces,
         _onWidgets = onWidgets;
 
-  bool get isBlockElement => _onWidgets != null;
+  bool get hasOnChild => _onChild != null;
 
-  void collectMetadata(NodeMetadata meta) =>
-      _collectMetadata != null ? _collectMetadata(meta) : null;
+  List<String> defaultStyles(NodeMetadata meta, dom.Element e) =>
+      _defaultStyles != null ? _defaultStyles(meta, e) : null;
 
-  List<String> getInlineStyles(NodeMetadata meta, dom.Element e) =>
-      _getInlineStyles != null ? _getInlineStyles(meta, e) : null;
+  NodeMetadata onChild(NodeMetadata meta, dom.Element e) =>
+      _onChild != null ? _onChild(meta, e) : meta;
 
   Iterable<BuiltPiece> onPieces(
     NodeMetadata meta,
@@ -119,40 +122,35 @@ class BuildOp {
   ) =>
       _onPieces != null ? _onPieces(meta, pieces) : pieces;
 
-  Iterable<Widget> onWidgets(NodeMetadata meta, Iterable<Widget> widgets) {
-    if (_onWidgets == null) return widgets;
-
-    final widget = _onWidgets(meta, widgets);
-    if (widget == null) return widgets;
-
-    return <Widget>[widget];
-  }
+  Iterable<Widget> onWidgets(NodeMetadata meta, Iterable<Widget> widgets) =>
+      (_onWidgets != null ? _onWidgets(meta, widgets) : null) ?? widgets;
 }
 
-typedef void BuildOpCollectMetadata(NodeMetadata meta);
-typedef List<String> BuildOpGetInlineStyles(NodeMetadata meta, dom.Element e);
-typedef Iterable<BuiltPiece> BuildOpOnPieces(
+typedef Iterable<String> _BuildOpDefaultStyles(
+  NodeMetadata meta,
+  dom.Element e,
+);
+typedef NodeMetadata _BuildOpOnChild(NodeMetadata meta, dom.Element e);
+typedef Iterable<BuiltPiece> _BuildOpOnPieces(
   NodeMetadata meta,
   Iterable<BuiltPiece> pieces,
 );
-typedef Widget BuildOpOnWidgets(NodeMetadata meta, Iterable<Widget> widgets);
+typedef Iterable<Widget> _BuildOpOnWidgets(
+    NodeMetadata meta, Iterable<Widget> widgets);
 
 abstract class BuiltPiece {
   bool get hasWidgets;
 
   TextBlock get block;
-  TextStyle get style;
   Iterable<Widget> get widgets;
 }
 
 class BuiltPieceSimple extends BuiltPiece {
   final TextBlock block;
-  final TextStyle style;
   final Iterable<Widget> widgets;
 
   BuiltPieceSimple({
     this.block,
-    this.style,
     this.widgets,
   }) : assert((block == null) != (widgets == null));
 
@@ -199,10 +197,12 @@ enum CssLengthUnit {
 }
 
 class NodeMetadata {
-  dom.Element _buildOpElement;
-  TextStyle _buildOpTextStyle;
   Iterable<BuildOp> _buildOps;
-  List<Key> _keys;
+  BuildContext _context;
+  dom.Element _domElement;
+  Iterable<BuildOp> _parentOps;
+  TextStyle _textStyle;
+
   Color color;
   bool decoOver;
   bool decoStrike;
@@ -212,62 +212,56 @@ class NodeMetadata {
   String fontSize;
   bool fontStyleItalic;
   FontWeight fontWeight;
-  List<String> _inlineStyles;
-  bool _inlineStylesFrozen = false;
   bool _isBlockElement;
   bool isNotRenderable;
+  List<String> _styles;
+  bool _stylesFrozen = false;
 
-  dom.Element get buildOpElement => _buildOpElement;
+  BuildContext get context => _context;
 
-  TextStyle get buildOpTextStyle => _buildOpTextStyle;
+  dom.Element get domElement => _domElement;
 
-  bool get hasStyling =>
-      color != null ||
-      fontFamily != null ||
-      fontSize != null ||
-      fontWeight != null ||
-      hasDecoration ||
-      hasFontStyle;
+  bool get hasOps => _buildOps != null;
 
-  bool get hasDecoration =>
-      decoStrike != null || decoOver != null || decoUnder != null;
+  bool get hasParents => _parentOps != null;
 
-  bool get hasFontStyle => fontStyleItalic != null;
+  Iterable<BuildOp> get ops => _buildOps;
+
+  Iterable<BuildOp> get parents => _parentOps;
+
+  TextStyle get textStyle => _textStyle;
+
+  set domElement(dom.Element e) {
+    assert(_domElement == null);
+    _domElement = e;
+
+    if (_buildOps != null) {
+      final ops = _buildOps as List;
+      ops.sort((a, b) => a.priority.compareTo(b.priority));
+      _buildOps = List.unmodifiable(ops);
+    }
+  }
+
+  set context(BuildContext context) {
+    assert(_context == null);
+    _context = context;
+  }
+
+  set textStyle(TextStyle textStyle) {
+    assert(_textStyle == null);
+    _textStyle = textStyle;
+  }
 
   bool get isBlockElement {
     if (_isBlockElement == true) return true;
     return _buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
   }
 
-  Iterable<BuildOp> freezeOps(dom.Element e) {
-    if (_buildOps == null) return null;
-
-    _buildOpElement = e;
-
-    final ops = _buildOps as List;
-    ops.sort((a, b) => a.priority.compareTo(b.priority));
-    _buildOps = List.unmodifiable(ops);
-
-    return _buildOps;
-  }
-
-  freezeTextStyle(TextStyle textStyle) {
-    if (_buildOpTextStyle != null) {
-      throw new StateError('TextStyle has already been set');
-    }
-
-    _buildOpTextStyle = textStyle;
-  }
-
-  void keys(void f(Key key)) => _keys?.forEach(f);
-
-  void ops(void f(BuildOp element)) => _buildOps?.forEach(f);
-
   void styles(void f(String key, String value)) {
-    _inlineStylesFrozen = true;
-    if (_inlineStyles == null) return;
+    _stylesFrozen = true;
+    if (_styles == null) return;
 
-    final iterator = _inlineStyles.iterator;
+    final iterator = _styles.iterator;
     while (iterator.moveNext()) {
       final key = iterator.current;
       if (!iterator.moveNext()) return;
@@ -276,74 +270,82 @@ class NodeMetadata {
   }
 }
 
+typedef NodeMetadata NodeMetadataCollector(NodeMetadata meta, dom.Element e);
+
 class TextBit {
+  final TextBlock block;
   final String data;
   final VoidCallback onTap;
   final TextStyle style;
 
-  bool get isSpace => data == null;
-  String get text => isSpace ? ' ' : data;
+  TextBit(this.block, this.data, this.style, {this.onTap})
+      : assert(block != null),
+        assert(data != null),
+        assert(style != null);
 
-  const TextBit({this.data, this.onTap, this.style});
+  TextBit.space(this.block)
+      : assert(block != null),
+        data = null,
+        onTap = null,
+        style = null;
 
   TextBit rebuild({
+    TextBlock block,
     String data,
     VoidCallback onTap,
     TextStyle style,
   }) =>
       TextBit(
-        data: data ?? this.data,
+        block ?? this.block,
+        data ?? this.data,
+        style ?? this.style,
         onTap: onTap ?? this.onTap,
-        style: style ?? this.style,
       );
-
-  static TextBit space({TextStyle style}) =>
-      style == null ? const TextBit() : TextBit(style: style);
 }
 
 class TextBlock {
+  final TextBlock parent;
+  final TextStyle style;
   final List<TextBit> _bits;
-  final TextBlock _parent;
 
-  bool _hasStyle = false;
   bool _hasTrailingSpace = true;
   int _indexEnd;
   int _indexStart;
 
-  TextBlock({List<TextBit> bits, TextBlock parent})
-      : assert((bits == null) == (parent == null)),
-        _bits = bits ?? [],
-        _parent = parent {
+  TextBlock(this.style, {List<TextBit> bits, this.parent})
+      : assert(style != null),
+        assert((bits == null) == (parent == null)),
+        _bits = bits ?? [] {
     _indexStart = _bits.length;
     _indexEnd = _indexStart;
   }
 
-  bool get hasStyle => _parent?.hasStyle ?? _hasStyle;
-  Iterable<TextBit> get iterable => _bits.getRange(_indexStart, _indexEnd);
   bool get hasTrailingSpace => _indexEnd == _bits.length
-      ? _parent?.hasTrailingSpace ?? _hasTrailingSpace
+      ? parent?.hasTrailingSpace ?? _hasTrailingSpace
       : false;
+  int get indexEnd => _indexEnd;
+  int get indexStart => _indexStart;
   bool get isEmpty => _indexEnd == _indexStart;
   bool get isNotEmpty => !isEmpty;
+  Iterable<TextBit> get iterable => _bits.getRange(_indexStart, _indexEnd);
+  TextBit get next => _bits.length > _indexEnd ? _bits[_indexEnd] : null;
 
   bool addBit(TextBit bit) {
-    if (_parent != null) {
+    if (parent != null) {
       if (_indexEnd != _bits.length) {
         throw new StateError('Cannot add TextBit in the middle of a block');
       }
-      final added = _parent.addBit(bit);
+      final added = parent.addBit(bit);
       if (added) _indexEnd++;
       return added;
     }
 
-    if (bit.isSpace) {
+    if (bit.data == null) {
       if (_bits.isEmpty || _hasTrailingSpace) return false;
       _hasTrailingSpace = true;
     } else {
       _hasTrailingSpace = false;
     }
-
-    if (bit.style != null) _hasStyle = true;
 
     _bits.add(bit);
     _indexEnd++;
@@ -351,29 +353,21 @@ class TextBlock {
     return true;
   }
 
-  void addBits(Iterable<TextBit> bits) => bits.forEach((b) => addBit(b));
+  bool addSpace() => addBit(TextBit.space(this));
 
-  bool addText(String text, [TextStyle style]) =>
-      addBit(TextBit(data: text, style: style));
-
-  bool isSubOf(TextBlock other) => _parent == other;
+  bool addText(String data) => addBit(TextBit(this, data, style));
 
   void rebuildBits(TextBit f(TextBit bit), {int start, int end}) {
     start ??= _indexStart;
     end ??= _indexEnd;
-    if (_parent != null) {
-      return _parent.rebuildBits(f, start: start, end: end);
-    }
+    if (parent != null) return parent.rebuildBits(f, start: start, end: end);
 
     for (var i = start; i < end; i++) {
       final bit = _bits[i];
-
-      final rebuilt = f(bit);
-      if (rebuilt.style != null) _hasStyle = true;
-
       _bits[i] = f(bit);
     }
   }
 
-  TextBlock sub() => TextBlock(bits: this._bits, parent: this);
+  TextBlock sub(TextStyle style) =>
+      TextBlock(style ?? this.style, bits: this._bits, parent: this);
 }

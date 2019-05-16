@@ -59,7 +59,7 @@ class HelloWorldScreen extends StatelessWidget {
 
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
 
-- A: underline with theme accent color, launch url via [`url_launcher`](https://pub.dartlang.org/packages/url_launcher), support base url resolver. Override `WidgetFactory::buildGestureTapCallbackForUrl` if you want to do something else onTap.
+- A: underline, theme accent color, launch url via [`url_launcher`](https://pub.dartlang.org/packages/url_launcher), support base url resolver.
 - H1/H2/H3/H4/H5/H6
 - IFRAME via [`WebView`](https://pub.dartlang.org/packages/webview_flutter). Available configurations:
   - `.webView`, default=false

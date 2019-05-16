@@ -1,4 +1,10 @@
-part of '../core_widget_factory.dart';
+part of '../core_helpers.dart';
+
+const kCssDisplay = 'display';
+const kCssDisplayBlock = 'block';
+const kCssDisplayInline = 'inline';
+const kCssDisplayInlineBlock = 'inline-block';
+const kCssDisplayNone = 'none';
 
 const kCssFontFamily = 'font-family';
 
@@ -57,3 +63,5 @@ CssLength lengthParseValue(String value) {
 
   return null;
 }
+
+Iterable<String> cssSplit(String value) => value.split(_spacingRegExp);

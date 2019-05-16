@@ -26,8 +26,12 @@ const kHtml = """<h1>Heading 1</h1>
 <h5>Heading 5</h5>
 <h6>Heading 6</h6>
 <p>A paragraph with <strong>strong</strong> <em>emphasized</em> text.</p>
-<p>And of course, cat image: <img src="https://media.giphy.com/media/6VoDJzfRjJNbG/giphy-downsized.gif" /></p>
-<div style="text-align: center">Source: <a href="https://gph.is/QFgPA0">https://gph.is/QFgPA0</a></div>
+
+<p>And of course, cat image:</p>
+<figure>
+  <img src="https://media.giphy.com/media/6VoDJzfRjJNbG/giphy-downsized.gif" width="250" height="171" />
+  <figcaption>Source: <a href="https://gph.is/QFgPA0">https://gph.is/QFgPA0</a></figcaption>
+</figure>
 """;
 
 class HelloWorldCoreScreen extends StatelessWidget {
@@ -36,7 +40,16 @@ class HelloWorldCoreScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text('HelloWorldCoreScreen'),
         ),
-        body: HtmlWidget(kHtml),
+        body: HtmlWidget(
+          kHtml,
+          onTapUrl: (url) => showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                      title: Text('onTapUrl'),
+                      content: Text(url),
+                    ),
+              ),
+        ),
       );
 }
 ```
@@ -49,7 +62,7 @@ class HelloWorldCoreScreen extends StatelessWidget {
 
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
 
-- A: underline with no default onTap action. Use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) or override `WidgetFactory::buildGestureTapCallbackForUrl` yourself.
+- A: underline, blue color, no default onTap action (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
 - H1/H2/H3/H4/H5/H6
 - IMG with support for data uri and remote url but no caching (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
 - TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
@@ -90,37 +103,34 @@ Here is how it works:
 If you want to, you can change the way metadata is collected (in step 2) and build widget however you like (in step 3) by extending the `WidgetFactory` and give it to `HtmlWidget`. The example below replace smilie inline image with an emoji:
 
 ```dart
+const kHtml = """
+<p>Hello <img class="smilie smilie-1" alt=":)" src="http://domain.com/sprites.png" />!</p>
+<p>How are you <img class="smilie smilie-2" alt=":P" src="http://domain.com/sprites.png" />?
+""";
+
+const kSmilies = {':)': '🙂'};
+
 class SmilieScreen extends StatelessWidget {
+  final smilieOp = BuildOp(
+    onPieces: (meta, pieces) {
+      final alt = meta.domElement.attributes['alt'];
+      final text = kSmilies.containsKey(alt) ? kSmilies[alt] : alt;
+      return pieces..first?.block?.addText(text);
+    },
+  );
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           title: Text('SmilieScreen'),
         ),
         body: HtmlWidget(
-          '<p>Hello <img class="smilie smilie-1" alt=":)" src="http://domain.com/sprites.png" />!</p>',
-          wf: (context) => SmilieWf(context),
+          kHtml,
+          builderCallback: (meta, e) => e.classes.contains('smilie')
+              ? lazySet(null, buildOp: smilieOp)
+              : meta,
         ),
       );
-}
-
-const _kSmilies = {':)': '🙂'};
-
-class SmilieWf extends WidgetFactory {
-  final smilieOp = BuildOp(
-    onPieces: (meta, pieces) {
-      final alt = meta.buildOpElement.attributes['alt'];
-      final text = _kSmilies.containsKey(alt) ? _kSmilies[alt] : alt;
-      return pieces..first?.block?.addText(text);
-    },
-  );
-
-  SmilieWf(BuildContext context) : super(context);
-
-  @override
-  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) =>
-      e.classes.contains('smilie')
-          ? lazySet(null, buildOp: smilieOp)
-          : super.parseElement(meta, e);
 }
 ```
 

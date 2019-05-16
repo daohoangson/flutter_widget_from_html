@@ -5,11 +5,13 @@ class TagIframe {
 
   TagIframe(this.wf);
 
-  BuildOp get buildOp =>
-      BuildOp(onWidgets: (meta, __) => build(meta.buildOpElement));
+  BuildOp get buildOp => BuildOp(onWidgets: (meta, _) {
+        final webView = build(meta);
+        return webView != null ? [webView] : null;
+      });
 
-  Widget build(dom.Element e) {
-    final a = e.attributes;
+  Widget build(NodeMetadata meta) {
+    final a = meta.domElement.attributes;
     if (!a.containsKey('src')) return null;
 
     final src = wf.constructFullUrl(a['src']);

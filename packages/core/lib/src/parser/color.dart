@@ -1,4 +1,4 @@
-part of '../core_widget_factory.dart';
+part of '../core_helpers.dart';
 
 const kCssColor = 'color';
 
@@ -33,4 +33,12 @@ Color colorParseValue(String value) {
   }
 
   return null;
+}
+
+String colorToHex(Color value) {
+  final r = value.red.toRadixString(16).padLeft(2, '0');
+  final g = value.green.toRadixString(16).padLeft(2, '0');
+  final b = value.blue.toRadixString(16).padLeft(2, '0');
+  final a = value.alpha.toRadixString(16).padLeft(2, '0');
+  return "#$r$g$b$a";
 }

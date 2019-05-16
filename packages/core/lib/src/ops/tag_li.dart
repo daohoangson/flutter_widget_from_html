@@ -1,75 +1,86 @@
-part of '../core_widget_factory.dart';
+part of '../core_helpers.dart';
 
-const kTagListItem = 'li';
 const kTagOrderedList = 'ol';
 const kTagUnorderedList = 'ul';
 const kCssListStyleType = 'list-style-type';
+const kCssListStyleTypeCircle = 'circle';
 const kCssListStyleTypeDecimal = 'decimal';
 const kCssListStyleTypeDisc = 'disc';
+const kCssListStyleTypeSquare = 'square';
 
 const _kCssPaddingLeft = 'padding-left';
-const _kCssPaddingLeftDefault = 40.0;
 
 class TagLi {
-  final key = ValueKey('TagLi');
   final WidgetFactory wf;
+
+  BuildOp _buildOp;
+  BuildOp _liOp;
 
   TagLi(this.wf);
 
-  BuildOp get buildOp => BuildOp(
-        getInlineStyles: (meta, e) {
-          if (e.localName == kTagListItem) return null;
+  BuildOp get buildOp {
+    _buildOp ??= BuildOp(
+      defaultStyles: (meta, e) {
+        final p = meta.parents?.where((op) => op == _buildOp)?.length ?? 0;
 
-          var isWithinAnotherList = false;
-          meta.keys((k) => k == key ? isWithinAnotherList = true : null);
+        final styles = [
+          _kCssPaddingLeft,
+          '2.5em',
+          kCssListStyleType,
+          e.localName == kTagOrderedList
+              ? kCssListStyleTypeDecimal
+              : p == 0
+                  ? kCssListStyleTypeDisc
+                  : p == 1 ? kCssListStyleTypeCircle : kCssListStyleTypeSquare,
+        ];
 
-          return [
-            kCssMargin,
-            isWithinAnotherList ? '0' : '1em 0',
-            _kCssPaddingLeft,
-            '${_kCssPaddingLeftDefault}px',
-            kCssListStyleType,
-            e.localName == kTagOrderedList
-                ? kCssListStyleTypeDecimal
-                : kCssListStyleTypeDisc,
-          ];
-        },
-        collectMetadata: (meta) => meta.buildOpElement.localName == kTagListItem
-            ? null
-            : lazySet(meta, key: key),
-        onWidgets: (meta, widgets) =>
-            meta.buildOpElement.localName == kTagListItem
-                ? _buildItem(widgets)
-                : _buildList(meta, widgets),
-      );
+        if (p == 0) styles.addAll([kCssMargin, '1em 0']);
+
+        return styles;
+      },
+      onChild: (meta, e) =>
+          e.localName == 'li' ? lazySet(meta, buildOp: liOp) : meta,
+      onWidgets: (meta, widgets) => _buildList(meta, widgets),
+    );
+    return _buildOp;
+  }
+
+  BuildOp get liOp {
+    _liOp ??= BuildOp(
+      onWidgets: (_, widgets) => [_buildItem(widgets)],
+    );
+    return _liOp;
+  }
 
   Widget _buildItem(Iterable<Widget> widgets) => wf.buildColumn(widgets);
 
-  Widget _buildList(NodeMetadata meta, Iterable<Widget> children) {
+  Iterable<Widget> _buildList(NodeMetadata meta, Iterable<Widget> children) {
     String listStyleType = kCssListStyleTypeDisc;
-    double paddingLeft = _kCssPaddingLeftDefault;
+    double paddingLeft;
     meta.styles((key, value) {
       switch (key) {
         case kCssListStyleType:
           listStyleType = value;
           break;
         case _kCssPaddingLeft:
-          final parsed = lengthParseValue(value);
-          paddingLeft = parsed?.getValue(meta.buildOpTextStyle) ??
-              _kCssPaddingLeftDefault;
+          final parsed = lengthParseValue(value)?.getValue(meta.textStyle);
+          paddingLeft = parsed ?? paddingLeft;
       }
     });
 
     int i = 0;
-    return wf.buildColumn(children
-        .map((widget) => Stack(children: <Widget>[
+    return children.map(
+      (widget) => Stack(
+            children: <Widget>[
               _buildBody(widget, paddingLeft),
               _buildMarker(
                 wf.getListStyleMarker(listStyleType, ++i),
+                meta.textStyle,
                 paddingLeft,
               ),
-            ]))
-        .toList());
+            ],
+          ),
+    );
   }
 
   Widget _buildBody(Widget widget, double paddingLeft) => Padding(
@@ -77,14 +88,15 @@ class TagLi {
         child: widget,
       );
 
-  Widget _buildMarker(String text, double paddingLeft) => Positioned(
+  Widget _buildMarker(String text, TextStyle style, double paddingLeft) =>
+      Positioned(
         left: 0.0,
         top: 0.0,
-        width: paddingLeft * .8,
-        child: Text(
-          text,
+        width: paddingLeft * .75,
+        child: RichText(
           maxLines: 1,
           overflow: TextOverflow.clip,
+          text: TextSpan(style: style, text: text),
           textAlign: TextAlign.right,
         ),
       );

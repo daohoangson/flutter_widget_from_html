@@ -1,4 +1,4 @@
-part of '../core_widget_factory.dart';
+part of '../core_helpers.dart';
 
 const kCssMargin = 'margin';
 const kCssMarginBottom = 'margin-bottom';
@@ -13,10 +13,32 @@ class StyleMargin {
 
   BuildOp get buildOp => BuildOp(
         onWidgets: (meta, widgets) {
+          if (widgets?.isNotEmpty != true) return null;
           final padding = _StyleMarginParser(meta).parse();
           if (padding == null) return null;
 
-          return wf.buildPadding(wf.buildColumn(widgets), padding);
+          if (widgets.length == 1) {
+            return [wf.buildPadding(widgets.first, padding)];
+          }
+
+          return <Widget>[]
+            ..add(padding.top > 0
+                ? Padding(
+                    child: widget0,
+                    padding: EdgeInsets.only(top: padding.top),
+                  )
+                : null)
+            ..addAll(
+              widgets.map(
+                (w) => wf.buildPadding(w, padding.copyWith(top: 0, bottom: 0)),
+              ),
+            )
+            ..add(padding.bottom > 0
+                ? Padding(
+                    child: widget0,
+                    padding: EdgeInsets.only(bottom: padding.bottom),
+                  )
+                : null);
         },
       );
 }
@@ -91,7 +113,7 @@ class _StyleMarginParser {
     final parsed = lengthParseValue(str);
     if (parsed == null) return 0;
 
-    final value = parsed.getValue(meta.buildOpTextStyle);
+    final value = parsed.getValue(meta.textStyle);
     if (value < 0) return 0;
 
     return value;

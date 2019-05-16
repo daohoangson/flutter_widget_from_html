@@ -2,14 +2,14 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '_.dart';
 
-const kColor = '#FF0000FF';
 const kHref = 'http://domain.com/href';
+const kImgSrc = 'http://domain.com/image.png';
 
 void main() {
-  testWidgets('renders underline', (WidgetTester tester) async {
+  testWidgets('renders accent color', (WidgetTester tester) async {
     final html = '<a href="$kHref">Foo</a>';
     final explained = await explain(tester, html);
-    expect(explained, equals('[RichText:($kColor+u+onTap:Foo)]'));
+    expect(explained, equals('[RichText:(#FF123456+u+onTap:Foo)]'));
   });
 
   testWidgets('renders inline stylings', (WidgetTester tester) async {
@@ -21,7 +21,7 @@ void main() {
   testWidgets('renders inner stylings', (WidgetTester tester) async {
     final html = '<a href="$kHref"><b><i>Foo</i></b></a>';
     final explained = await explain(tester, html);
-    expect(explained, equals('[RichText:($kColor+u+i+b+onTap:Foo)]'));
+    expect(explained, equals('[RichText:(#FF123456+u+i+b+onTap:Foo)]'));
   });
 
   testWidgets('renders DIV tag inside', (WidgetTester tester) async {
@@ -29,7 +29,20 @@ void main() {
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals('[GestureDetector:child=[RichText:($kColor+u:Foo)]]'),
+      equals('[InkWell:child=[RichText:(#FF123456+u:Foo)]]'),
+    );
+  });
+
+  testWidgets('renders DIV tags inside', (WidgetTester tester) async {
+    final html = '<a href="$kHref"><div>Foo</div><div>Bar</div></a>';
+    final explained = await explain(tester, html);
+    expect(
+      explained,
+      equals(
+        '[Column:children='
+        '[InkWell:child=[RichText:(#FF123456+u:Foo)]],'
+        '[InkWell:child=[RichText:(#FF123456+u:Bar)]]]',
+      ),
     );
   });
 }
