@@ -90,17 +90,17 @@ class BuildOp {
   // op with lower priority will run first
   final int priority;
 
-  final _BuildOpDefaultStyles _defaultStyles;
-  final _BuildOpOnChild _onChild;
-  final _BuildOpOnPieces _onPieces;
-  final _BuildOpOnWidgets _onWidgets;
+  final BuildOpDefaultStyles _defaultStyles;
+  final BuildOpOnChild _onChild;
+  final BuildOpOnPieces _onPieces;
+  final BuildOpOnWidgets _onWidgets;
 
   BuildOp({
-    _BuildOpDefaultStyles defaultStyles,
+    BuildOpDefaultStyles defaultStyles,
     bool isBlockElement,
-    _BuildOpOnChild onChild,
-    _BuildOpOnPieces onPieces,
-    _BuildOpOnWidgets onWidgets,
+    BuildOpOnChild onChild,
+    BuildOpOnPieces onPieces,
+    BuildOpOnWidgets onWidgets,
     this.priority = 10,
   })  : _defaultStyles = defaultStyles,
         this.isBlockElement = isBlockElement ?? onWidgets != null,
@@ -126,16 +126,16 @@ class BuildOp {
       (_onWidgets != null ? _onWidgets(meta, widgets) : null) ?? widgets;
 }
 
-typedef Iterable<String> _BuildOpDefaultStyles(
+typedef Iterable<String> BuildOpDefaultStyles(
   NodeMetadata meta,
   dom.Element e,
 );
-typedef NodeMetadata _BuildOpOnChild(NodeMetadata meta, dom.Element e);
-typedef Iterable<BuiltPiece> _BuildOpOnPieces(
+typedef NodeMetadata BuildOpOnChild(NodeMetadata meta, dom.Element e);
+typedef Iterable<BuiltPiece> BuildOpOnPieces(
   NodeMetadata meta,
   Iterable<BuiltPiece> pieces,
 );
-typedef Iterable<Widget> _BuildOpOnWidgets(
+typedef Iterable<Widget> BuildOpOnWidgets(
     NodeMetadata meta, Iterable<Widget> widgets);
 
 abstract class BuiltPiece {

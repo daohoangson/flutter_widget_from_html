@@ -8,15 +8,14 @@ class WebView extends StatefulWidget {
 
   final double aspectRatio;
   final bool getDimensions;
-  final _GetDimensionsDone getDimensionsDone;
   final List<Duration> getDimensionsDurations;
   final bool js;
+  final WebViewOnDimensions onDimensions;
 
   WebView(
     this.url, {
     this.aspectRatio,
     this.getDimensions = false,
-    this.getDimensionsDone,
     this.getDimensionsDurations = const [
       null,
       Duration(seconds: 1),
@@ -24,6 +23,7 @@ class WebView extends StatefulWidget {
     ],
     this.js = true,
     Key key,
+    this.onDimensions,
   })  : assert(url != null),
         assert(aspectRatio != null),
         // `js` must be true for `getDimensions` to work
@@ -90,12 +90,12 @@ class _WebViewState extends State<WebView> {
     final changed = (r - _aspectRatio).abs() > 0.0001;
     if (changed && mounted) setState(() => _aspectRatio = r);
 
-    final f = widget.getDimensionsDone;
+    final f = widget.onDimensions;
     if (f != null) f(r, changed, h, w);
   }
 }
 
-typedef void _GetDimensionsDone(
+typedef void WebViewOnDimensions(
   double aspectRatio,
   bool changed,
   double height,
