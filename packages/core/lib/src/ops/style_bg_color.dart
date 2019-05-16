@@ -38,6 +38,6 @@ class _StyleBgColor {
     meta.styles((k, v) => k == kCssBackgroundColor ? value = v : null);
     if (value == null) return null;
 
-    return colorParseValue(value);
+    return parseColor(value);
   }
 }

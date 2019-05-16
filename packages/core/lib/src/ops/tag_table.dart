@@ -167,7 +167,7 @@ TableBorder _buildTableBorder(NodeMetadata meta) {
   String styleBorder;
   meta.styles((k, v) => k == kCssBorder ? styleBorder = v : null);
   if (styleBorder != null) {
-    final borderParsed = borderParse(styleBorder);
+    final borderParsed = parseCssBorderSide(styleBorder);
     if (borderParsed != null) {
       return TableBorder.all(
         color: borderParsed.color ?? const Color(0xFF000000),

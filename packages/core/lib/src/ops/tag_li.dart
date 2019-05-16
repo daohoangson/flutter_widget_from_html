@@ -63,7 +63,7 @@ class _TagLi {
           listStyleType = value;
           break;
         case _kCssPaddingLeft:
-          final parsed = lengthParseValue(value)?.getValue(meta.textStyle);
+          final parsed = parseCssLength(value)?.getValue(meta.textStyle);
           paddingLeft = parsed ?? paddingLeft;
       }
     });

@@ -8,7 +8,7 @@ class _TagA {
   BuildOp get buildOp => BuildOp(
         defaultStyles: (_, __) => [
               kCssColor,
-              colorToHex(wf.config.hyperlinkColor),
+              convertColorToHex(wf.config.hyperlinkColor),
               kCssTextDecoration,
               kCssTextDecorationUnderline,
             ],

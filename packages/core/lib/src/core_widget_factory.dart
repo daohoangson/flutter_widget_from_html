@@ -225,7 +225,7 @@ class WidgetFactory {
     final value = meta?.fontSize;
     if (value == null) return null;
 
-    final parsed = lengthParseValue(value);
+    final parsed = parseCssLength(value);
     if (parsed != null) return parsed.getValue(parent);
 
     switch (value) {
@@ -605,7 +605,7 @@ class WidgetFactory {
         break;
 
       case kCssBorderBottom:
-        final borderBottom = borderParse(value);
+        final borderBottom = parseCssBorderSide(value);
         if (borderBottom != null) {
           meta = lazySet(
             meta,
@@ -617,7 +617,7 @@ class WidgetFactory {
         }
         break;
       case kCssBorderTop:
-        final borderTop = borderParse(value);
+        final borderTop = parseCssBorderSide(value);
         if (borderTop != null) {
           meta = lazySet(
             meta,
@@ -630,7 +630,7 @@ class WidgetFactory {
         break;
 
       case kCssColor:
-        final color = colorParseValue(value);
+        final color = parseColor(value);
         if (color != null) meta = lazySet(meta, color: color);
         break;
 
@@ -716,7 +716,7 @@ class WidgetFactory {
         break;
 
       case kCssTextDecoration:
-        for (final v in cssSplit(value)) {
+        for (final v in splitCss(value)) {
           switch (v) {
             case kCssTextDecorationLineThrough:
               meta = lazySet(meta, decoStrike: true);

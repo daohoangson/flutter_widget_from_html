@@ -110,7 +110,7 @@ class _StyleMarginParser {
   }
 
   double _parseValue(String str) {
-    final parsed = lengthParseValue(str);
+    final parsed = parseCssLength(str);
     if (parsed == null) return 0;
 
     final value = parsed.getValue(meta.textStyle);
