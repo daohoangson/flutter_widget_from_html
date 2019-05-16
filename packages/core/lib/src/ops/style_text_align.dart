@@ -1,4 +1,4 @@
-part of '../core_helpers.dart';
+part of '../core_widget_factory.dart';
 
 const kCssTextAlign = 'text-align';
 const kCssTextAlignCenter = 'center';
@@ -6,10 +6,10 @@ const kCssTextAlignJustify = 'justify';
 const kCssTextAlignLeft = 'left';
 const kCssTextAlignRight = 'right';
 
-class StyleTextAlign {
+class _StyleTextAlign {
   final WidgetFactory wf;
 
-  StyleTextAlign(this.wf);
+  _StyleTextAlign(this.wf);
 
   BuildOp get buildOp => BuildOp(
         onPieces: (meta, pieces) {

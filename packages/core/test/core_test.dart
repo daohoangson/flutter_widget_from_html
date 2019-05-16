@@ -144,7 +144,7 @@ void main() {
       expect(
           explained,
           equals('[Column:children=[RichText:(:First.)],' +
-              '[Padding:(5,0,5,0),child=[ZeroContainer:]],' +
+              '[Padding:(5,0,5,0),child=[widget0]],' +
               '[RichText:(:Second one.)]]'));
     });
 
@@ -169,10 +169,10 @@ void main() {
       expect(
           explained,
           equals(
-            '[Padding:(10,0,0,0),child=[ZeroContainer:]],'
+            '[Padding:(10,0,0,0),child=[widget0]],'
             '[Padding:(0,40,0,40),child=[Wrap:children=[Image:image=[NetworkImage:url=image.png]]]],'
             '[Padding:(0,40,0,40),child=[RichText:(+i:fig. 1(: Foo))]],'
-            '[Padding:(0,0,10,0),child=[ZeroContainer:]]',
+            '[Padding:(0,0,10,0),child=[widget0]]',
           ));
     });
 

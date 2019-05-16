@@ -34,7 +34,7 @@ void main() {
       expect(
           explained,
           equals('[Column:children=[RichText:(:Foo)],'
-              '[Padding:(5,0,5,0),child=[ZeroContainer:]],'
+              '[Padding:(5,0,5,0),child=[widget0]],'
               '[RichText:(:Bar)]]'));
     });
   });

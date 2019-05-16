@@ -1,10 +1,10 @@
 part of '../core_helpers.dart';
 
-class ZeroContainer extends StatelessWidget {
-  const ZeroContainer();
+class _ZeroContainer extends StatelessWidget {
+  const _ZeroContainer();
 
   @override
-  Widget build(BuildContext context) => Container(width: 0, height: 0);
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
-const widget0 = const ZeroContainer();
+const widget0 = const _ZeroContainer();

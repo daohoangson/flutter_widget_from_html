@@ -1,9 +1,9 @@
-part of '../core_helpers.dart';
+part of '../core_widget_factory.dart';
 
-class TagA {
+class _TagA {
   final WidgetFactory wf;
 
-  TagA(this.wf);
+  _TagA(this.wf);
 
   BuildOp get buildOp => BuildOp(
         defaultStyles: (_, __) => [

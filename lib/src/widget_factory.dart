@@ -76,7 +76,7 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   BuildOp tagIframe() {
-    _tagIframe ??= TagIframe(this).buildOp;
+    _tagIframe ??= _TagIframe(this).buildOp;
     return _tagIframe;
   }
 }

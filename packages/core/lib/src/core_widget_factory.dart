@@ -7,6 +7,16 @@ import 'core_config.dart';
 import 'core_helpers.dart';
 import 'data_classes.dart';
 
+part 'ops/style_bg_color.dart';
+part 'ops/style_margin.dart';
+part 'ops/style_text_align.dart';
+part 'ops/tag_a.dart';
+part 'ops/tag_code.dart';
+part 'ops/tag_img.dart';
+part 'ops/tag_li.dart';
+part 'ops/tag_table.dart';
+part 'ops/text.dart';
+
 final _baseUriTrimmingRegExp = RegExp(r'/+$');
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
 final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
@@ -179,7 +189,7 @@ class WidgetFactory {
   Widget buildText(TextBlock block, {TextAlign textAlign}) {
     final _textAlign = textAlign ?? TextAlign.start;
 
-    final span = compileToTextSpan(block);
+    final span = _compileToTextSpan(block);
     if (span != null) return RichText(text: span, textAlign: _textAlign);
 
     return null;
@@ -734,22 +744,22 @@ class WidgetFactory {
   }
 
   BuildOp styleBgColor() {
-    _styleBgColor ??= StyleBgColor(this).buildOp;
+    _styleBgColor ??= _StyleBgColor(this).buildOp;
     return _styleBgColor;
   }
 
   BuildOp styleMargin() {
-    _styleMargin ??= StyleMargin(this).buildOp;
+    _styleMargin ??= _StyleMargin(this).buildOp;
     return _styleMargin;
   }
 
   BuildOp styleTextAlign() {
-    _styleTextAlign ??= StyleTextAlign(this).buildOp;
+    _styleTextAlign ??= _StyleTextAlign(this).buildOp;
     return _styleTextAlign;
   }
 
   BuildOp tagA() {
-    _tagA ??= TagA(this).buildOp;
+    _tagA ??= _TagA(this).buildOp;
     return _tagA;
   }
 
@@ -762,7 +772,7 @@ class WidgetFactory {
   }
 
   BuildOp tagCode() {
-    _tagCode ??= TagCode(this).buildOp;
+    _tagCode ??= _TagCode(this).buildOp;
     return _tagCode;
   }
 
@@ -775,12 +785,12 @@ class WidgetFactory {
   }
 
   BuildOp tagImg() {
-    _tagImg ??= TagImg(this).buildOp;
+    _tagImg ??= _TagImg(this).buildOp;
     return _tagImg;
   }
 
   BuildOp tagLi() {
-    _tagLi ??= TagLi(this).buildOp;
+    _tagLi ??= _TagLi(this).buildOp;
     return _tagLi;
   }
 
@@ -809,7 +819,7 @@ class WidgetFactory {
   }
 
   BuildOp tagTable() {
-    _tagTable ??= TagTable(this).buildOp;
+    _tagTable ??= _TagTable(this).buildOp;
     return _tagTable;
   }
 }

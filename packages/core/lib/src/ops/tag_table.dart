@@ -1,4 +1,4 @@
-part of '../core_helpers.dart';
+part of '../core_widget_factory.dart';
 
 const kTagTable = 'table';
 const kTagTableAttrBorder = 'border';
@@ -11,7 +11,7 @@ const kTagTableHeader = 'th';
 const kTagTableRow = 'tr';
 const _kTagTableOpPriority = 100;
 
-class TagTable {
+class _TagTable {
   final WidgetFactory wf;
 
   BuildOp _captionOp;
@@ -19,7 +19,7 @@ class TagTable {
   BuildOp _rowOp;
   BuildOp _semanticOp;
 
-  TagTable(this.wf);
+  _TagTable(this.wf);
 
   BuildOp get buildOp => BuildOp(
         onChild: (meta, e) {

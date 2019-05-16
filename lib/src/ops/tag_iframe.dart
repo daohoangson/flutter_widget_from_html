@@ -1,9 +1,9 @@
 part of '../widget_factory.dart';
 
-class TagIframe {
+class _TagIframe {
   final WidgetFactory wf;
 
-  TagIframe(this.wf);
+  _TagIframe(this.wf);
 
   BuildOp get buildOp => BuildOp(onWidgets: (meta, _) {
         final webView = build(meta);

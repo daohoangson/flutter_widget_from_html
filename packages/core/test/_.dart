@@ -261,6 +261,7 @@ class _Explainer {
     final explained = this.explainer?.call(widget);
     if (explained != null) return explained;
 
+    if (widget == widget0) return '[widget0]';
     if (widget is Wrapable) {
       return "[Wrap:children=${widget.widgets.map(_widget).join(',')}]";
     }

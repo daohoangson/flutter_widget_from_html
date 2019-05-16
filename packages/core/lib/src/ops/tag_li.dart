@@ -1,4 +1,4 @@
-part of '../core_helpers.dart';
+part of '../core_widget_factory.dart';
 
 const kTagOrderedList = 'ol';
 const kTagUnorderedList = 'ul';
@@ -10,13 +10,13 @@ const kCssListStyleTypeSquare = 'square';
 
 const _kCssPaddingLeft = 'padding-left';
 
-class TagLi {
+class _TagLi {
   final WidgetFactory wf;
 
   BuildOp _buildOp;
   BuildOp _liOp;
 
-  TagLi(this.wf);
+  _TagLi(this.wf);
 
   BuildOp get buildOp {
     _buildOp ??= BuildOp(
