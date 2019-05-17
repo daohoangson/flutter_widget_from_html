@@ -52,6 +52,3 @@ class HtmlWidget extends StatelessWidget {
       ? factoryBuilder(context, this)
       : WidgetFactory(this);
 }
-
-typedef void OnTapUrl(String url);
-typedef WidgetFactory FactoryBuilder(BuildContext context, HtmlWidget widget);
