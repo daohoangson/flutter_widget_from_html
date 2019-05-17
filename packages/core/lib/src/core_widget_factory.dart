@@ -280,13 +280,15 @@ class WidgetFactory {
     );
   }
 
-  Widget buildWrap(List<Widget> children) => Wrap(
-        children: children,
-        runSpacing: _config.wrapSpacing,
-        spacing: _config.wrapSpacing,
-      );
+  Widget buildWrap(Iterable<Widget> children) {
+    if (children?.isNotEmpty != true) return null;
 
-  Widget buildWrapable(Widget widget) => Wrapable(this, [widget]);
+    return Wrap(
+      children: children.toList(),
+      runSpacing: config.wrapSpacing,
+      spacing: config.wrapSpacing,
+    );
+  }
 
   String constructFullUrl(String url) {
     if (url?.isNotEmpty != true) return null;
@@ -372,15 +374,15 @@ class WidgetFactory {
     final fixed = <Widget>[];
 
     for (final widget in widgets) {
-      if (fixed.isEmpty || !(widget is Wrapable) || !(fixed.last is Wrapable)) {
+      if (fixed.isEmpty || !(widget is Wrap) || !(fixed.last is Wrap)) {
         fixed.add(widget);
         continue;
       }
 
-      final last = fixed.isEmpty ? null : fixed.removeLast() as Wrapable;
-      final merged = (last?.widgets?.toList() ?? <Widget>[])
-        ..addAll((widget as Wrapable).widgets);
-      fixed.add(Wrapable(this, merged));
+      final last = fixed.isEmpty ? null : fixed.removeLast() as Wrap;
+      final merged = (last?.children?.toList() ?? <Widget>[])
+        ..addAll((widget as Wrap).children);
+      fixed.add(buildWrap(merged));
     }
 
     return fixed;

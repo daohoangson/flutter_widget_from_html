@@ -26,7 +26,7 @@ class _TagImg {
             width: width,
           );
           if (!meta.isBlockElement || widget is LimitedBox) {
-            widget = wf.buildWrapable(widget);
+            widget = wf.buildWrap([widget]);
           }
 
           return pieces.toList()

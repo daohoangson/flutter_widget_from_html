@@ -262,9 +262,6 @@ class _Explainer {
     if (explained != null) return explained;
 
     if (widget == widget0) return '[widget0]';
-    if (widget is Wrapable) {
-      return "[Wrap:children=${widget.widgets.map(_widget).join(',')}]";
-    }
 
     final type = widget.runtimeType.toString();
     final text = widget is Align
