@@ -289,21 +289,15 @@ class _Explainer {
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));
     final textAlignStr = textAlign.isNotEmpty ? ",align=$textAlign" : '';
-    final children = widget is Container
-        ? (widget.child != null ? "child=${_widget(widget.child)}" : '')
-        : widget is LayoutBuilder
-            ? "built=${_widget(widget.builder(context, BoxConstraints()))}"
-            : widget is MultiChildRenderObjectWidget
-                ? "children=${widget.children.map(_widget).join(',')}"
-                : widget is ProxyWidget
+    final children = widget is MultiChildRenderObjectWidget
+        ? "children=${widget.children.map(_widget).join(',')}"
+        : widget is ProxyWidget
+            ? "child=${_widget(widget.child)}"
+            : widget is SingleChildRenderObjectWidget
+                ? "child=${_widget(widget.child)}"
+                : widget is SingleChildScrollView
                     ? "child=${_widget(widget.child)}"
-                    : widget is SingleChildRenderObjectWidget
-                        ? "child=${_widget(widget.child)}"
-                        : widget is SingleChildScrollView
-                            ? "child=${_widget(widget.child)}"
-                            : widget is Table
-                                ? "\n${_tableRows(widget)}\n"
-                                : '';
+                    : widget is Table ? "\n${_tableRows(widget)}\n" : '';
     return "[$type$textAlignStr:$text$children]";
   }
 }

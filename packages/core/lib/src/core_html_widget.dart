@@ -33,8 +33,7 @@ class HtmlWidget extends StatelessWidget implements Config {
     this.textStyle,
     double wrapSpacing,
   })  : assert(html != null),
-        this.bodyPadding =
-            bodyPadding ?? const EdgeInsets.all(10),
+        this.bodyPadding = bodyPadding ?? const EdgeInsets.all(10),
         this.hyperlinkColor =
             hyperlinkColor ?? const Color.fromRGBO(0, 0, 255, 1),
         this.tableCellPadding = tableCellPadding ?? const EdgeInsets.all(5),
