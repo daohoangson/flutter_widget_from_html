@@ -13,7 +13,8 @@ void main() {
 
     testWidgets('renders getInlineStyles in reversed', (WidgetTester t) async {
       final html = '<span>Foo</span>';
-      final e = await explain(t, html, wf: _GetInlineStylesTest());
+      final e = await explain(t, html,
+          factoryBuilder: (_, hw) => _GetInlineStylesTest(hw));
       expect(e, equals('[RichText:(#FFFF0000:Foo)]'));
     });
   });
@@ -22,18 +23,22 @@ void main() {
     final html = '<span>Foo</span>';
 
     testWidgets('renders A first', (WidgetTester t) async {
-      final e = await explain(t, html, wf: _PriorityTest(a: 1, b: 2));
+      final e = await explain(t, html,
+          factoryBuilder: (_, hw) => _PriorityTest(hw, a: 1, b: 2));
       expect(e, equals('[RichText:(:Foo A B)]'));
     });
 
     testWidgets('renders B first', (WidgetTester t) async {
-      final e = await explain(t, html, wf: _PriorityTest(a: 2, b: 1));
+      final e = await explain(t, html,
+          factoryBuilder: (_, hw) => _PriorityTest(hw, a: 2, b: 1));
       expect(e, equals('[RichText:(:Foo B A)]'));
     });
   });
 }
 
 class _GetInlineStylesTest extends WidgetFactory {
+  _GetInlineStylesTest(HtmlWidget hw) : super(hw);
+
   @override
   NodeMetadata parseLocalName(NodeMetadata meta, String localName) {
     meta = lazySet(meta,
@@ -48,7 +53,8 @@ class _GetInlineStylesTest extends WidgetFactory {
 class _PriorityTest extends WidgetFactory {
   final int a;
   final int b;
-  _PriorityTest({this.a, this.b});
+
+  _PriorityTest(HtmlWidget hw, {this.a, this.b}) : super(hw);
 
   @override
   NodeMetadata parseLocalName(NodeMetadata meta, String localName) {

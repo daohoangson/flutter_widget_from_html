@@ -45,7 +45,7 @@ class _TagTable {
 
   BuildOp get captionOp {
     _captionOp ??= BuildOp(
-      defaultStyles: (_, __) => [kCssTextAlign, kCssTextAlignCenter],
+      defaultStyles: (_, __) => const [kCssTextAlign, kCssTextAlignCenter],
       onWidgets: (_, widgets) => [_CaptionWidget(widgets)],
       priority: _kTagTableOpPriority,
     );
@@ -55,7 +55,7 @@ class _TagTable {
   BuildOp get cellOp {
     _cellOp ??= BuildOp(
       defaultStyles: (_, e) => e.localName == kTagTableHeader
-          ? [kCssFontWeight, kCssFontWeightBold]
+          ? const [kCssFontWeight, kCssFontWeightBold]
           : null,
       onWidgets: (_, __) => null,
       priority: _kTagTableOpPriority,

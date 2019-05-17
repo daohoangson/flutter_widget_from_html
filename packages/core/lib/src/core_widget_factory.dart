@@ -3,8 +3,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'core_config.dart';
 import 'core_helpers.dart';
+import 'core_html_widget.dart';
 import 'data_classes.dart';
 
 part 'ops/style_bg_color.dart';
@@ -22,7 +22,7 @@ final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
 final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
 
 class WidgetFactory {
-  Config _config;
+  final HtmlWidget _htmlWidget;
 
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
@@ -36,12 +36,9 @@ class WidgetFactory {
   BuildOp _tagQ;
   BuildOp _tagTable;
 
-  set config(Config config) {
-    assert(config != null);
-    _config = config;
-  }
+  WidgetFactory(this._htmlWidget);
 
-  Config get config => _config;
+  Color get hyperlinkColor => _htmlWidget.hyperlinkColor;
 
   Widget buildAlign(Widget child, Alignment alignment) {
     if (child == null) return null;
@@ -54,7 +51,7 @@ class WidgetFactory {
   }
 
   Widget buildBody(Iterable<Widget> children) =>
-      buildPadding(buildColumn(children), _config.bodyPadding);
+      buildPadding(buildColumn(children), _htmlWidget.bodyPadding);
 
   Widget buildColumn(Iterable<Widget> children) {
     children = fixWraps(children);
@@ -111,7 +108,9 @@ class WidgetFactory {
   }
 
   GestureTapCallback buildGestureTapCallbackForUrl(String url) =>
-      () => _config.onTapUrl != null ? _config.onTapUrl(url) : debugPrint(url);
+      () => _htmlWidget.onTapUrl != null
+          ? _htmlWidget.onTapUrl(url)
+          : debugPrint(url);
 
   Widget buildImage(String src, {double height, String text, double width}) {
     final imageWidget = src?.startsWith('data:image') == true
@@ -184,7 +183,7 @@ class WidgetFactory {
       Table(border: border, children: rows);
 
   Widget buildTableCell(Widget child) =>
-      TableCell(child: buildPadding(child, _config.tableCellPadding));
+      TableCell(child: buildPadding(child, _htmlWidget.tableCellPadding));
 
   Widget buildText(TextBlock block, {TextAlign textAlign}) {
     final _textAlign = textAlign ?? TextAlign.start;
@@ -285,8 +284,8 @@ class WidgetFactory {
 
     return Wrap(
       children: children.toList(),
-      runSpacing: config.wrapSpacing,
-      spacing: config.wrapSpacing,
+      runSpacing: _htmlWidget.wrapSpacing ?? 0,
+      spacing: _htmlWidget.wrapSpacing ?? 0,
     );
   }
 
@@ -294,7 +293,7 @@ class WidgetFactory {
     if (url?.isNotEmpty != true) return null;
     if (url.startsWith(_isFullUrlRegExp)) return url;
 
-    final b = _config?.baseUrl;
+    final b = _htmlWidget.baseUrl;
     if (b == null) return null;
 
     if (url.startsWith('//')) return "${b.scheme}:$url";
@@ -404,8 +403,8 @@ class WidgetFactory {
   }
 
   NodeMetadata parseElement(NodeMetadata meta, dom.Element element) {
-    if (_config.builderCallback != null) {
-      meta = _config.builderCallback(meta, element);
+    if (_htmlWidget.builderCallback != null) {
+      meta = _htmlWidget.builderCallback(meta, element);
     }
 
     return meta;
@@ -767,7 +766,7 @@ class WidgetFactory {
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      defaultStyles: (_, __) => [kCssMargin, '0.5em 0'],
+      defaultStyles: (_, __) => const [kCssMargin, '0.5em 0'],
       onWidgets: (_, __) => [widget0],
     );
     return _tagBr;

@@ -10,7 +10,7 @@ class _TagCode {
   _TagCode(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        defaultStyles: (_, __) => [kCssFontFamily, 'monospace'],
+        defaultStyles: (_, __) => const [kCssFontFamily, 'monospace'],
         onPieces: (meta, pieces) => meta.domElement.localName == kTagPre
             ? [_buildPreTag(meta)]
             : pieces,

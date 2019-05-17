@@ -3,13 +3,12 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:html/parser.dart' as parser;
 
 import 'builder.dart' as core;
-import 'core_config.dart';
 import 'core_widget_factory.dart';
 import 'data_classes.dart';
 
-class HtmlWidget extends StatelessWidget implements Config {
+class HtmlWidget extends StatelessWidget {
   final String html;
-  final WidgetFactory wf;
+  final FactoryBuilder factoryBuilder;
 
   final Uri baseUrl;
   final EdgeInsets bodyPadding;
@@ -22,28 +21,23 @@ class HtmlWidget extends StatelessWidget implements Config {
 
   HtmlWidget(
     this.html, {
-    this.wf,
+    this.factoryBuilder,
     Key key,
     this.baseUrl,
-    EdgeInsets bodyPadding,
+    this.bodyPadding = const EdgeInsets.all(10),
     this.builderCallback,
-    Color hyperlinkColor,
+    this.hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
     this.onTapUrl,
-    EdgeInsets tableCellPadding,
+    this.tableCellPadding = const EdgeInsets.all(5),
     this.textStyle,
-    double wrapSpacing,
+    this.wrapSpacing = 5,
   })  : assert(html != null),
-        this.bodyPadding = bodyPadding ?? const EdgeInsets.all(10),
-        this.hyperlinkColor =
-            hyperlinkColor ?? const Color.fromRGBO(0, 0, 255, 1),
-        this.tableCellPadding = tableCellPadding ?? const EdgeInsets.all(5),
-        this.wrapSpacing = wrapSpacing ?? 5,
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final domNodes = parser.parse(html).body.nodes;
-    final wf = initFactory(context);
+    final wf = buildFactory(context);
     final widgets = core.Builder(
       context: context,
       domNodes: domNodes,
@@ -54,6 +48,10 @@ class HtmlWidget extends StatelessWidget implements Config {
     return wf.buildBody(widgets) ?? Text(html);
   }
 
-  WidgetFactory initFactory(BuildContext context) =>
-      (wf ?? WidgetFactory())..config = this;
+  WidgetFactory buildFactory(BuildContext context) => factoryBuilder != null
+      ? factoryBuilder(context, this)
+      : WidgetFactory(this);
 }
+
+typedef void OnTapUrl(String url);
+typedef WidgetFactory FactoryBuilder(BuildContext context, HtmlWidget widget);

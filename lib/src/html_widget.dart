@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
 
-import 'config.dart';
 import 'data_classes.dart';
 import 'widget_factory.dart' as extended;
 
-class HtmlWidget extends core.HtmlWidget implements Config {
+class HtmlWidget extends core.HtmlWidget {
+  final core.FactoryBuilder factoryBuilder;
 
   /// Flag to render WebView for IFRAME tag.
   ///
@@ -30,29 +30,22 @@ class HtmlWidget extends core.HtmlWidget implements Config {
 
   final bool webViewJs;
 
-  Color _hyperlinkColor;
-
-  Color get hyperlinkColor => _hyperlinkColor ?? super.hyperlinkColor;
-
   HtmlWidget(
     String html, {
-    core.WidgetFactory wf,
+    this.factoryBuilder,
     Key key,
     Uri baseUrl,
-    EdgeInsets bodyPadding,
+    EdgeInsets bodyPadding = const EdgeInsets.all(10),
     NodeMetadataCollector builderCallback,
     Color hyperlinkColor,
     core.OnTapUrl onTapUrl,
-    EdgeInsets tableCellPadding,
+    EdgeInsets tableCellPadding = const EdgeInsets.all(5),
     TextStyle textStyle,
-    double wrapSpacing,
-    bool webView,
-    bool webViewJs,
-  })  : this.webView = webView ?? false,
-        this.webViewJs = webViewJs ?? true,
-        super(
+    double wrapSpacing = 5,
+    this.webView = false,
+    this.webViewJs = true,
+  }) : super(
           html,
-          wf: wf,
           key: key,
           baseUrl: baseUrl,
           bodyPadding: bodyPadding,
@@ -65,8 +58,8 @@ class HtmlWidget extends core.HtmlWidget implements Config {
         );
 
   @override
-  core.WidgetFactory initFactory(BuildContext context) {
-    _hyperlinkColor = Theme.of(context).accentColor;
-    return (wf ?? extended.WidgetFactory())..config = this;
-  }
+  core.WidgetFactory buildFactory(BuildContext context) =>
+      factoryBuilder != null
+          ? factoryBuilder(context, this)
+          : extended.WidgetFactory(context, this);
 }

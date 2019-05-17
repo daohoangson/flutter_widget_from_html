@@ -6,16 +6,18 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 Future<String> explain(
   WidgetTester tester,
   String html, {
-  _WidgetExplainer explainer,
-  _HtmlWidgetBuilder hw,
+  WidgetExplainer explainer,
+  HtmlWidgetBuilder hw,
   String imageUrlToPrecache,
-  WidgetFactory wf,
   Uri baseUrl,
   double bodyVerticalPadding = 0,
   NodeMetadataCollector builderCallback,
+  FactoryBuilder factoryBuilder,
   double tableCellPadding = 0,
   TextStyle textStyle,
+  double wrapSpacing = 0,
 }) async {
+  assert((html == null) != (hw == null));
   final key = UniqueKey();
 
   await tester.pumpWidget(
@@ -52,15 +54,16 @@ Future<String> explain(
 
   final _ = _Explainer(found, explainer: explainer);
   final htmlWidget = hw != null
-      ? hw()
+      ? hw(found)
       : HtmlWidget(
           html,
           baseUrl: baseUrl,
           bodyPadding: EdgeInsets.symmetric(vertical: bodyVerticalPadding),
           builderCallback: builderCallback,
+          factoryBuilder: factoryBuilder,
           tableCellPadding: EdgeInsets.all(tableCellPadding),
           textStyle: textStyle,
-          wf: wf,
+          wrapSpacing: wrapSpacing,
         );
 
   return _.explain(htmlWidget.build(found));
@@ -83,12 +86,12 @@ Future<String> explainMargin(
   return match == null ? explained : match[1];
 }
 
-typedef String _WidgetExplainer(Widget widget);
-typedef HtmlWidget _HtmlWidgetBuilder();
+typedef String WidgetExplainer(Widget widget);
+typedef HtmlWidget HtmlWidgetBuilder(BuildContext context);
 
 class _Explainer {
   final BuildContext context;
-  final _WidgetExplainer explainer;
+  final WidgetExplainer explainer;
   final TextStyle _defaultStyle;
 
   _Explainer(this.context, {this.explainer})
@@ -284,7 +287,11 @@ class _Explainer {
                                         ? _textSpan(widget.text)
                                         : widget is Table
                                             ? _tableBorder(widget.border)
-                                            : widget is Text ? widget.data : '';
+                                            : widget is Text
+                                                ? widget.data
+                                                : widget is Wrap
+                                                    ? _wrap(widget)
+                                                    : '';
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));
@@ -299,5 +306,12 @@ class _Explainer {
                     ? "child=${_widget(widget.child)}"
                     : widget is Table ? "\n${_tableRows(widget)}\n" : '';
     return "[$type$textAlignStr:$text$children]";
+  }
+
+  String _wrap(Wrap wrap) {
+    String s = '';
+    if (wrap.spacing != 0.0) s += 'spacing=${wrap.spacing},';
+    if (wrap.runSpacing != 0.0) s += 'runSpacing=${wrap.runSpacing},';
+    return s;
   }
 }
