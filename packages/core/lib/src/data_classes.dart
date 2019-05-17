@@ -278,10 +278,13 @@ class TextBit {
   final VoidCallback onTap;
   final TextStyle style;
 
-  TextBit(this.block, this.data, this.style, {this.onTap})
+  TextBit({this.block, this.data, this.style, this.onTap});
+
+  TextBit.text(this.block, this.data, this.style)
       : assert(block != null),
         assert(data != null),
-        assert(style != null);
+        assert(style != null),
+        onTap = null;
 
   TextBit.space(this.block)
       : assert(block != null),
@@ -296,9 +299,9 @@ class TextBit {
     TextStyle style,
   }) =>
       TextBit(
-        block ?? this.block,
-        data ?? this.data,
-        style ?? this.style,
+        block: block ?? this.block,
+        data: data ?? this.data,
+        style: style ?? this.style,
         onTap: onTap ?? this.onTap,
       );
 }
@@ -355,7 +358,7 @@ class TextBlock {
 
   bool addSpace() => addBit(TextBit.space(this));
 
-  bool addText(String data) => addBit(TextBit(this, data, style));
+  bool addText(String data) => addBit(TextBit.text(this, data, style));
 
   void rebuildBits(TextBit f(TextBit bit), {int start, int end}) {
     start ??= _indexStart;
