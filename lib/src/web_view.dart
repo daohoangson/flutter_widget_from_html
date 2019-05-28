@@ -12,6 +12,9 @@ class WebView extends StatefulWidget {
   final bool js;
   final WebViewOnDimensions onDimensions;
 
+  // https://github.com/daohoangson/flutter_widget_from_html/issues/37
+  final bool unsupportedWorkaroundForIssue37;
+
   WebView(
     this.url, {
     this.aspectRatio,
@@ -22,6 +25,7 @@ class WebView extends StatefulWidget {
       Duration(seconds: 2),
     ],
     this.js = true,
+    this.unsupportedWorkaroundForIssue37 = false,
     Key key,
     this.onDimensions,
   })  : assert(url != null),
@@ -40,13 +44,19 @@ class WebView extends StatefulWidget {
 }
 
 class _WebViewState extends State<WebView> {
-  lib.WebViewController _wvc;
   double _aspectRatio;
+  _Issue37 _issue37;
+  lib.WebViewController _wvc;
 
   @override
   initState() {
     super.initState();
     _aspectRatio = widget.aspectRatio;
+
+    if (widget.unsupportedWorkaroundForIssue37) {
+      _issue37 = _Issue37(this);
+      WidgetsBinding.instance.addObserver(_issue37);
+    }
   }
 
   @override
@@ -54,6 +64,24 @@ class _WebViewState extends State<WebView> {
         aspectRatio: _aspectRatio,
         child: _buildWebView(),
       );
+
+  @override
+  void deactivate() {
+    super.deactivate();
+
+    if (widget.unsupportedWorkaroundForIssue37) {
+      _wvc?.reload();
+    }
+  }
+
+  @override
+  void dispose() {
+    if (_issue37 != null) {
+      WidgetsBinding.instance.removeObserver(_issue37);
+    }
+
+    super.dispose();
+  }
 
   Future<String> eval(String js) =>
       _wvc?.evaluateJavascript(js)?.catchError((_) => '');
@@ -101,3 +129,16 @@ typedef void WebViewOnDimensions(
   double height,
   double width,
 );
+
+class _Issue37 with WidgetsBindingObserver {
+  final _WebViewState wvs;
+
+  _Issue37(this.wvs);
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      wvs._wvc.reload();
+    }
+  }
+}

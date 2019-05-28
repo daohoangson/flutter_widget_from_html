@@ -1,3 +1,8 @@
+## 0.2.1
+
+* Render IMG inline whenever possible
+* Other bug fixes and improvements
+
 ## 0.2.0
 
 * Add support for new tags:

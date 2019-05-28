@@ -9,6 +9,10 @@ import 'widget_factory.dart' as extended;
 class HtmlWidget extends core.HtmlWidget {
   final core.FactoryBuilder factoryBuilder;
 
+  /// The flag to control whether or not to apply workaround for
+  /// [issue 37](https://github.com/daohoangson/flutter_widget_from_html/issues/37)
+  final bool unsupportedWebViewWorkaroundForIssue37;
+
   /// The flag to control whether or not IFRAME is rendered as WebView.
   ///
   /// You must perform additional configuration for this to work.
@@ -47,6 +51,7 @@ class HtmlWidget extends core.HtmlWidget {
     EdgeInsets tableCellPadding = const EdgeInsets.all(5),
     TextStyle textStyle,
     double wrapSpacing = 5,
+    this.unsupportedWebViewWorkaroundForIssue37 = false,
     this.webView = false,
     this.webViewJs = true,
   }) : super(
