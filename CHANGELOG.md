@@ -1,3 +1,10 @@
+## 0.2.1
+
+* Add `unsupportedWebViewWorkaroundForIssue37` to address WebView issue temporary (#37)
+* Render IMG inline whenever possible
+* Use accent color for tag A
+* Other bug fixes and improvements
+
 ## 0.2.0
 
 * Add support for new tags:
