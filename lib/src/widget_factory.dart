@@ -56,6 +56,8 @@ class WidgetFactory extends core.WidgetFactory {
       aspectRatio: dimensOk ? width / height : 16 / 9,
       getDimensions: !dimensOk && _config?.webViewJs == true,
       js: _config?.webViewJs == true,
+      unsupportedWorkaroundForIssue37:
+          _config?.unsupportedWebViewWorkaroundForIssue37 == true,
     );
   }
 

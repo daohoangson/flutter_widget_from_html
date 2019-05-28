@@ -7,6 +7,7 @@ import 'data_classes.dart';
 import 'widget_factory.dart' as extended;
 
 class HtmlWidget extends core.HtmlWidget implements Config {
+  final bool unsupportedWebViewWorkaroundForIssue37;
   final bool webView;
   final bool webViewJs;
 
@@ -25,10 +26,13 @@ class HtmlWidget extends core.HtmlWidget implements Config {
     core.OnTapUrl onTapUrl,
     EdgeInsets tableCellPadding,
     TextStyle textStyle,
+    bool unsupportedWebViewWorkaroundForIssue37,
     double wrapSpacing,
     bool webView,
     bool webViewJs,
-  })  : this.webView = webView ?? false,
+  })  : this.unsupportedWebViewWorkaroundForIssue37 =
+            unsupportedWebViewWorkaroundForIssue37 ?? false,
+        this.webView = webView ?? false,
         this.webViewJs = webViewJs ?? true,
         super(
           html,
