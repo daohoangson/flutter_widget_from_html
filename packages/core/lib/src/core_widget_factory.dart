@@ -793,13 +793,23 @@ class WidgetFactory {
         final firstBlock = first.block;
         final firstBit = firstBlock.iterable.first;
         firstBlock.rebuildBits(
-          (b) => b == firstBit ? b.rebuild(data: '“' + b.data) : b,
+          (bit) => bit == firstBit
+              ? bit.rebuild(
+                  data: '“' + (bit.data ?? ''),
+                  style: bit.style ?? firstBlock.style,
+                )
+              : bit,
         );
 
         final lastBlock = last.block;
         final lastBit = lastBlock.iterable.last;
         lastBlock.rebuildBits(
-          (b) => b == lastBit ? b.rebuild(data: b.data + '”') : b,
+          (bit) => bit == lastBit
+              ? bit.rebuild(
+                  data: (bit.data ?? '') + '”',
+                  style: bit.style ?? lastBlock.style,
+                )
+              : bit,
         );
       }
 

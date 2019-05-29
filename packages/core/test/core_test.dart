@@ -93,21 +93,35 @@ void main() {
   group('Q tag', () {
     testWidgets('renders quotes', (WidgetTester tester) async {
       final html = 'Someone said <q>Foo</q>.';
-      final actual = await explain(tester, html);
-      expect(actual, equals('[RichText:(:Someone said “Foo”.)]'));
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Someone said “Foo”.)]'));
+    });
+
+    group('renders without erroneous white spaces', () {
+      testWidgets('before', (WidgetTester tester) async {
+        final html = 'Someone said <q> Foo</q>.';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(:Someone said “Foo”.)]'));
+      });
+
+      testWidgets('after', (WidgetTester tester) async {
+        final html = 'Someone said <q>Foo </q>.';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(:Someone said “Foo”.)]'));
+      });
     });
 
     testWidgets('renders styling', (WidgetTester tester) async {
       final html = 'Someone said <q><em>Foo</em></q>.';
-      final actual = await explain(tester, html);
-      expect(actual, equals('[RichText:(:Someone said (+i:“Foo”)(:.))]'));
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Someone said (+i:“Foo”)(:.))]'));
     });
 
     testWidgets('renders complicated styling', (WidgetTester tester) async {
       final html = 'Someone said <q><u><em>F</em>o<b>o</b></u></q>.';
-      final actual = await explain(tester, html);
+      final explained = await explain(tester, html);
       expect(
-        actual,
+        explained,
         equals('[RichText:(:Someone said (+u+i:“F)(+u:o)(+u+b:o”)(:.))]'),
       );
     });
@@ -343,6 +357,20 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final html = 'Foo <span style="background-color: #f00">bar</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo (bg=#FFFF0000:bar))]'));
+    });
+
+    group('renders without erroneous white spaces', () {
+      testWidgets('before', (WidgetTester tester) async {
+        final html = 'Foo <span style="background-color: #f00"> bar</span>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(:Foo (bg=#FFFF0000:bar))]'));
+      });
+
+      testWidgets('after', (WidgetTester tester) async {
+        final html = 'Foo <span style="background-color: #f00">bar </span>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(:Foo (bg=#FFFF0000:bar))]'));
+      });
     });
   });
 
