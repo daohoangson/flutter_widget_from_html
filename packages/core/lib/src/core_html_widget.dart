@@ -33,8 +33,7 @@ class HtmlWidget extends StatelessWidget implements Config {
     this.textStyle,
     double wrapSpacing,
   })  : assert(html != null),
-        this.bodyPadding =
-            bodyPadding ?? const EdgeInsets.all(10),
+        this.bodyPadding = bodyPadding ?? const EdgeInsets.all(10),
         this.hyperlinkColor =
             hyperlinkColor ?? const Color.fromRGBO(0, 0, 255, 1),
         this.tableCellPadding = tableCellPadding ?? const EdgeInsets.all(5),
@@ -44,11 +43,15 @@ class HtmlWidget extends StatelessWidget implements Config {
   @override
   Widget build(BuildContext context) {
     final domNodes = parser.parse(html).body.nodes;
+    final parentTextStyle = (textStyle == null || textStyle.inherit)
+        ? DefaultTextStyle.of(context).style.merge(textStyle)
+        : textStyle;
     final wf = initFactory(context);
+
     final widgets = core.Builder(
       context: context,
       domNodes: domNodes,
-      parentTextStyle: textStyle,
+      parentTextStyle: parentTextStyle,
       wf: wf,
     ).build();
 
