@@ -289,6 +289,8 @@ class TextBit {
         onTap = null,
         style = null;
 
+  bool get isSpace => data == null;
+
   TextBit rebuild({
     TextBlock block,
     String data,
@@ -340,7 +342,7 @@ class TextBlock {
       return added;
     }
 
-    if (bit.data == null) {
+    if (bit.isSpace) {
       if (_bits.isEmpty || _hasTrailingSpace) return false;
       _hasTrailingSpace = true;
     } else {
@@ -364,7 +366,15 @@ class TextBlock {
 
     for (var i = start; i < end; i++) {
       final bit = _bits[i];
+      final wasSpace = bit.isSpace;
       _bits[i] = f(bit);
+
+      if (_hasTrailingSpace &&
+          wasSpace &&
+          i == _bits.length - 1 &&
+          !_bits[i].isSpace) {
+        _hasTrailingSpace = false;
+      }
     }
   }
 

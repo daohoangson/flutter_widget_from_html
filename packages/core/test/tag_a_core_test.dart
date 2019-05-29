@@ -13,13 +13,13 @@ void main() {
   });
 
   group('renders without erroneous white spaces', () {
-    testWidgets('before', (WidgetTester tester) async {
+    testWidgets('first', (WidgetTester tester) async {
       final html = '<a href="$kHref"> Foo</a>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(#FF0000FF+u+onTap:Foo)]'));
     });
 
-    testWidgets('after', (WidgetTester tester) async {
+    testWidgets('last', (WidgetTester tester) async {
       final html = '<a href="$kHref">Foo </a>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(#FF0000FF+u+onTap:Foo)]'));

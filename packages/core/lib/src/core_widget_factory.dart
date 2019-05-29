@@ -572,7 +572,7 @@ class WidgetFactory {
         meta = lazySet(meta, styles: [kCssMargin, '1em 0']);
         break;
 
-      case 'q':
+      case kTagQ:
         meta = lazySet(meta, buildOp: tagQ());
         break;
 
@@ -785,36 +785,7 @@ class WidgetFactory {
   }
 
   BuildOp tagQ() {
-    _tagQ ??= BuildOp(onPieces: (_, pieces) {
-      final first = pieces.first;
-      final last = pieces.last;
-
-      if (!first.hasWidgets && !last.hasWidgets) {
-        final firstBlock = first.block;
-        final firstBit = firstBlock.iterable.first;
-        firstBlock.rebuildBits(
-          (bit) => bit == firstBit
-              ? bit.rebuild(
-                  data: '“' + (bit.data ?? ''),
-                  style: bit.style ?? firstBlock.style,
-                )
-              : bit,
-        );
-
-        final lastBlock = last.block;
-        final lastBit = lastBlock.iterable.last;
-        lastBlock.rebuildBits(
-          (bit) => bit == lastBit
-              ? bit.rebuild(
-                  data: (bit.data ?? '') + '”',
-                  style: bit.style ?? lastBlock.style,
-                )
-              : bit,
-        );
-      }
-
-      return pieces;
-    });
+    _tagQ ??= TagQ(this).buildOp;
     return _tagQ;
   }
 

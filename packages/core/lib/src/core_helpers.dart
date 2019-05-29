@@ -11,6 +11,7 @@ part 'ops/tag_a.dart';
 part 'ops/tag_code.dart';
 part 'ops/tag_img.dart';
 part 'ops/tag_li.dart';
+part 'ops/tag_q.dart';
 part 'ops/tag_table.dart';
 part 'ops/text.dart';
 part 'ops/wrap.dart';

@@ -99,7 +99,7 @@ void main() {
 
     group('renders without erroneous white spaces', () {
       testWidgets('before', (WidgetTester tester) async {
-        final html = 'Someone said <q> Foo</q>.';
+        final html = 'Someone said<q> Foo</q>.';
         final explained = await explain(tester, html);
         expect(explained, equals('[RichText:(:Someone said “Foo”.)]'));
       });
@@ -107,7 +107,25 @@ void main() {
       testWidgets('after', (WidgetTester tester) async {
         final html = 'Someone said <q>Foo </q>.';
         final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:Someone said “Foo”.)]'));
+        expect(explained, equals('[RichText:(:Someone said “Foo” .)]'));
+      });
+
+      testWidgets('first', (WidgetTester tester) async {
+        final html = '<q> Foo</q>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(:“Foo”)]'));
+      });
+
+      testWidgets('last', (WidgetTester tester) async {
+        final html = '<q>Foo </q>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(:“Foo”)]'));
+      });
+
+      testWidgets('only', (WidgetTester tester) async {
+        final html = 'x<q> </q>y';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(:x “” y)]'));
       });
     });
 
@@ -361,7 +379,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 
     group('renders without erroneous white spaces', () {
       testWidgets('before', (WidgetTester tester) async {
-        final html = 'Foo <span style="background-color: #f00"> bar</span>';
+        final html = 'Foo<span style="background-color: #f00"> bar</span>';
         final explained = await explain(tester, html);
         expect(explained, equals('[RichText:(:Foo (bg=#FFFF0000:bar))]'));
       });
