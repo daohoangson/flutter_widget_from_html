@@ -66,11 +66,15 @@ class HtmlWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final domNodes = parser.parse(html).body.nodes;
+    final parentTextStyle = (textStyle == null || textStyle.inherit)
+        ? DefaultTextStyle.of(context).style.merge(textStyle)
+        : textStyle;
     final wf = buildFactory(context);
+
     final widgets = core.Builder(
       context: context,
       domNodes: domNodes,
-      parentTextStyle: textStyle,
+      parentTextStyle: parentTextStyle,
       wf: wf,
     ).build();
 

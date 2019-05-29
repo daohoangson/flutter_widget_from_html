@@ -28,14 +28,13 @@ class Builder {
     this.parentBlock,
     this.parentMeta,
     Iterable<BuildOp> parentParentOps,
-    TextStyle parentTextStyle,
+    @required this.parentTextStyle,
     @required this.wf,
   })  : assert(context != null),
         assert(domNodes != null),
+        assert(parentTextStyle != null),
         assert(wf != null),
-        parentOps = _prepareParentOps(parentParentOps, parentMeta),
-        this.parentTextStyle =
-            parentTextStyle ?? DefaultTextStyle.of(context).style;
+        parentOps = _prepareParentOps(parentParentOps, parentMeta);
 
   Iterable<Widget> build() {
     final list = <Widget>[];
