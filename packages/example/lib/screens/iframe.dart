@@ -51,6 +51,7 @@ class _State extends State<IframeScreen> {
           HtmlWidget(
             html,
             key: Key("$webView$webViewJs"),
+            unsupportedWebViewWorkaroundForIssue37: true,
             webView: webView,
             webViewJs: webViewJs,
           ),

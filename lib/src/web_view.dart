@@ -53,7 +53,7 @@ class _WebViewState extends State<WebView> {
     super.initState();
     _aspectRatio = widget.aspectRatio;
 
-    if (widget.unsupportedWorkaroundForIssue37) {
+    if (widget.unsupportedWorkaroundForIssue37 == true) {
       _issue37 = _Issue37(this);
       WidgetsBinding.instance.addObserver(_issue37);
     }
@@ -69,7 +69,7 @@ class _WebViewState extends State<WebView> {
   void deactivate() {
     super.deactivate();
 
-    if (widget.unsupportedWorkaroundForIssue37) {
+    if (widget.unsupportedWorkaroundForIssue37 == true) {
       _wvc?.reload();
     }
   }
@@ -138,7 +138,7 @@ class _Issue37 with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
-      wvs._wvc.reload();
+      wvs._wvc?.reload();
     }
   }
 }
