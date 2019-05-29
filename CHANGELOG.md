@@ -1,3 +1,8 @@
+## 0.2.1+1
+
+* Merge `textStyle` with default for easy usage (#45)
+* Fix bug in whitespace handling (#44)
+
 ## 0.2.1
 
 * Add `unsupportedWebViewWorkaroundForIssue37` to address WebView issue temporary (#37)
