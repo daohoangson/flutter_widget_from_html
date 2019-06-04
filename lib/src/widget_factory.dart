@@ -6,14 +6,17 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'config.dart';
 import 'data_classes.dart';
+import 'video_player.dart';
 import 'web_view.dart';
 
 part 'ops/tag_iframe.dart';
+part 'ops/tag_video.dart';
 
 class WidgetFactory extends core.WidgetFactory {
   Config _config;
 
   BuildOp _tagIframe;
+  BuildOp _tagVideo;
 
   @override
   set config(core.Config config) {
@@ -42,6 +45,25 @@ class WidgetFactory extends core.WidgetFactory {
         imageUrl: url,
         fit: BoxFit.cover,
       );
+
+  Widget buildVideoPlayer(
+    String url, {
+    bool autoplay,
+    bool controls,
+    double height,
+    bool loop,
+    double width,
+  }) {
+    final dimensOk = height != null && height > 0 && width != null && width > 0;
+    return VideoPlayer(
+      url,
+      aspectRatio: dimensOk ? width / height : 16 / 9,
+      autoResize: !dimensOk,
+      autoplay: autoplay,
+      controls: controls,
+      loop: loop,
+    );
+  }
 
   Widget buildWebView(
     String url, {
@@ -72,6 +94,9 @@ class WidgetFactory extends core.WidgetFactory {
       case 'iframe':
         // return asap to avoid being disabled by core
         return lazySet(meta, buildOp: tagIframe());
+      case 'video':
+        meta = lazySet(meta, buildOp: tagVideo());
+        break;
     }
 
     return super.parseLocalName(meta, localName);
@@ -80,5 +105,10 @@ class WidgetFactory extends core.WidgetFactory {
   BuildOp tagIframe() {
     _tagIframe ??= TagIframe(this).buildOp;
     return _tagIframe;
+  }
+
+  BuildOp tagVideo() {
+    _tagVideo ??= TagVideo(this).buildOp;
+    return _tagVideo;
   }
 }
