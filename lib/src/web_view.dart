@@ -10,6 +10,7 @@ class WebView extends StatefulWidget {
   final bool getDimensions;
   final _GetDimensionsDone getDimensionsDone;
   final List<Duration> getDimensionsDurations;
+  final _InterceptNavigationRequest interceptNavigationRequest;
   final bool js;
 
   // https://github.com/daohoangson/flutter_widget_from_html/issues/37
@@ -25,6 +26,7 @@ class WebView extends StatefulWidget {
       Duration(seconds: 1),
       Duration(seconds: 2),
     ],
+    this.interceptNavigationRequest,
     this.js = true,
     this.unsupportedWorkaroundForIssue37 = false,
     Key key,
@@ -88,10 +90,13 @@ class _WebViewState extends State<WebView> {
 
   Widget _buildWebView() => lib.WebView(
         initialUrl: widget.url,
-        javascriptMode: widget.js
+        javascriptMode: widget.js == true
             ? lib.JavascriptMode.unrestricted
             : lib.JavascriptMode.disabled,
         key: Key(widget.url),
+        navigationDelegate: widget.interceptNavigationRequest != null
+            ? (req) => _interceptNavigationRequest(req.url)
+            : null,
         onPageFinished: widget.getDimensions
             ? (_) => widget.getDimensionsDurations.forEach((t) => t == null
                 // get dimensions immediately
@@ -121,6 +126,19 @@ class _WebViewState extends State<WebView> {
     final f = widget.getDimensionsDone;
     if (f != null) f(r, changed, h, w);
   }
+
+  lib.NavigationDecision _interceptNavigationRequest(String url) {
+    var intercepted = false;
+
+    final f = widget.interceptNavigationRequest;
+    if (f != null) {
+      intercepted = f(url);
+    }
+
+    return intercepted
+        ? lib.NavigationDecision.prevent
+        : lib.NavigationDecision.navigate;
+  }
 }
 
 typedef void _GetDimensionsDone(
@@ -129,6 +147,8 @@ typedef void _GetDimensionsDone(
   double height,
   double width,
 );
+
+typedef bool _InterceptNavigationRequest(String url);
 
 class _Issue37 with WidgetsBindingObserver {
   final _WebViewState wvs;
