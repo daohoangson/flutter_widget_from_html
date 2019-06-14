@@ -80,11 +80,14 @@ class _State extends State<VideoScreen> {
         }
 
         _html = """
-<video ${attributes.join(' ')}>
-  <source src="mov_bbb.mp4" type="video/mp4">
-  <source src="mov_bbb.ogg" type="video/ogg">
-  Your browser does not support HTML5 video.
-</video>
+<figure>
+  <video ${attributes.join(' ')}>
+    <source src="mov_bbb.mp4" type="video/mp4">
+    <source src="mov_bbb.ogg" type="video/ogg">
+    Your browser does not support HTML5 video.
+  </video>
+  <figcaption>Source: <a href="https://www.w3schools.com/html/html5_video.asp">w3schools</a></figcaption>
+</figure>
 """;
       });
 }
