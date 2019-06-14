@@ -34,18 +34,24 @@ class _VideoPlayerState extends State<VideoPlayer> {
   double _aspectRatio;
   VoidCallback _aspectRatioListener;
 
+  bool get needSizing => widget.autoResize == true && _aspectRatio == null;
+
   @override
   void initState() {
     super.initState();
 
     _vpc = lib.VideoPlayerController.network(widget.url);
 
-    if (widget.autoResize) {
+    if (needSizing) {
       _aspectRatioListener = () {
         if (_aspectRatio == null) {
           final vpv = _vpc.value;
           if (!vpv.initialized) return;
-          setState(() => _aspectRatio = vpv.aspectRatio);
+
+          setState(() {
+            _aspectRatio = vpv.aspectRatio;
+            _initChewieController();
+          });
         }
 
         _vpc.removeListener(_aspectRatioListener);
@@ -53,14 +59,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
       _vpc.addListener(_aspectRatioListener);
     }
 
-    _cc = lib.ChewieController(
-      aspectRatio: widget.autoResize ? null : widget.aspectRatio,
-      autoInitialize: true,
-      autoPlay: widget.autoplay == true,
-      looping: widget.loop == true,
-      showControls: widget.controls == true,
-      videoPlayerController: _vpc,
-    );
+    _initChewieController();
   }
 
   @override
@@ -71,8 +70,21 @@ class _VideoPlayerState extends State<VideoPlayer> {
   }
 
   @override
-  Widget build(BuildContext context) => AspectRatio(
-        aspectRatio: _aspectRatio ?? widget.aspectRatio,
-        child: lib.Chewie(controller: _cc),
+  Widget build(BuildContext context) => lib.Chewie(
+        controller: _cc,
+        key: ValueKey(_cc),
       );
+
+  void _initChewieController() {
+    _cc?.dispose();
+
+    _cc = lib.ChewieController(
+      aspectRatio: _aspectRatio ?? widget.aspectRatio,
+      autoInitialize: true,
+      autoPlay: widget.autoplay == true,
+      looping: widget.loop == true,
+      showControls: widget.controls == true && !needSizing,
+      videoPlayerController: _vpc,
+    );
+  }
 }
