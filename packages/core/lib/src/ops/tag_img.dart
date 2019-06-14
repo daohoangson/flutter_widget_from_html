@@ -12,15 +12,10 @@ class _TagImg {
           final height = _getDouble(attrs, 'height', 'data-height');
           final width = _getDouble(attrs, 'width', 'data-width');
           final text = _getAttr(attrs, 'alt', 'title');
-          final fullUrl = wf.constructFullUrl(src) ?? src;
-
-          if (fullUrl?.isNotEmpty != true && text?.isNotEmpty == true) {
-            pieces.last.block.addText(text);
-            return pieces;
-          }
+          final url = wf.constructFullUrl(src);
 
           var widget = wf.buildImage(
-            fullUrl,
+            url,
             height: height,
             text: text,
             width: width,

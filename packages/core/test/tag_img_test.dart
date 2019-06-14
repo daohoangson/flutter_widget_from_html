@@ -4,24 +4,28 @@ import '_.dart' as _;
 
 void main() {
   group('image.png', () {
-    final explain = (WidgetTester t, String h) =>
-        _.explain(t, h, imageUrlToPrecache: "image.png");
+    final src = 'http://domain.com/image.png';
+    final explain = (WidgetTester tester, String html) => _.explain(
+          tester,
+          html,
+          imageUrlToPrecache: src,
+        );
 
     testWidgets('renders src', (WidgetTester tester) async {
-      final html = '<img src="image.png" />';
+      final html = '<img src="$src" />';
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Wrap:children=[Image:image=[NetworkImage:url=image.png]]]'),
+        equals("[Wrap:children=[Image:image=[NetworkImage:url=$src]]]"),
       );
     });
 
     testWidgets('renders data-src', (WidgetTester tester) async {
-      final html = '<img data-src="image.png" />';
+      final html = '<img data-src="$src" />';
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Wrap:children=[Image:image=[NetworkImage:url=image.png]]]'),
+        equals("[Wrap:children=[Image:image=[NetworkImage:url=$src]]]"),
       );
     });
 
@@ -52,44 +56,50 @@ void main() {
     });
 
     testWidgets('renders in one wrap', (WidgetTester tester) async {
-      final html = '<img src="image.png" /><img src="image.png" />';
+      final html = '<img src="$src" /><img src="$src" />';
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Wrap:children=[Image:image=[NetworkImage:url=image.png]],'
-            '[Image:image=[NetworkImage:url=image.png]]]'),
+        equals("[Wrap:children=[Image:image=[NetworkImage:url=$src]],"
+            "[Image:image=[NetworkImage:url=$src]]]"),
       );
     });
 
     testWidgets('renders alt', (WidgetTester tester) async {
       final html = '<img alt="Foo" /> bar';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo bar)]'));
+      expect(
+          explained,
+          equals(
+              '[Column:children=[Wrap:children=[Text:Foo]],[RichText:(:bar)]]'));
     });
 
     testWidgets('renders title', (WidgetTester tester) async {
       final html = '<img title="Foo" /> bar';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo bar)]'));
+      expect(
+          explained,
+          equals(
+              '[Column:children=[Wrap:children=[Text:Foo]],[RichText:(:bar)]]'));
     });
 
     testWidgets('renders dimensions', (WidgetTester tester) async {
-      final html = '<img src="image.png" width="800" height="600" />';
+      final html = '<img src="$src" width="800" height="600" />';
       final explained = await explain(tester, html);
       expect(
           explained,
           equals('[Wrap:children=[LimitedBox:h=600.0,w=800.0,child='
               '[AspectRatio:aspectRatio=1.33,child='
-              '[Image:image=[NetworkImage:url=image.png]]]]]'));
+              '[Image:image=[NetworkImage:url=$src]]]]]'));
     });
 
     testWidgets('renders between texts', (WidgetTester tester) async {
-      final html = 'Before text. <img src="image.png" /> After text.';
+      final html = 'Before text. <img src="$src" /> After text.';
       final explained = await explain(tester, html);
       expect(
           explained,
           equals('[Column:children=[RichText:(:Before text.)],'
-              '[Wrap:children=[Image:image=[NetworkImage:url=image.png]]],'
+              '[Wrap:children=[Image:image=[NetworkImage:url=$src]]],'
               '[RichText:(:After text.)]]'));
     });
   });

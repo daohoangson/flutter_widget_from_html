@@ -9,8 +9,8 @@ Future<String> explain(WidgetTester t, _.HtmlWidgetBuilder hw) =>
 
 void main() {
   group('baseUrl', () {
-    final baseUrl = Uri.parse('http://base.com/path');
-    final html = '<img src="image.png" />';
+    final baseUrl = Uri.parse('http://base.com/path/');
+    final html = '<img src="image.png" alt="image dot png" />';
 
     testWidgets('renders without value', (WidgetTester tester) async {
       final explained = await explain(tester, (_) => HtmlWidget(html));
@@ -18,7 +18,7 @@ void main() {
           explained,
           equals('[Padding:(10,10,10,10),child='
               '[Wrap:spacing=5.0,runSpacing=5.0,'
-              'children=[Image:image=[NetworkImage:url=image.png]]]]'));
+              'children=[Text:image dot png]]]'));
     });
 
     testWidgets('renders with value', (WidgetTester tester) async {
@@ -97,7 +97,7 @@ void main() {
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[RichText:(#FF0000FF+u+onTap:Foo)]]'));
+              '[RichText:(#FF0000FF+u:Foo)]]'));
     });
 
     testWidgets('renders custom value', (WidgetTester tester) async {
@@ -108,7 +108,7 @@ void main() {
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[RichText:(#FFFF0000+u+onTap:Foo)]]'));
+              '[RichText:(#FFFF0000+u:Foo)]]'));
     });
 
     testWidgets('renders null value', (WidgetTester tester) async {
@@ -119,7 +119,7 @@ void main() {
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[RichText:(+u+onTap:Foo)]]'));
+              '[RichText:(+u:Foo)]]'));
     });
   });
 
@@ -190,7 +190,8 @@ void main() {
 
   group('wrapSpacing', () {
     final wrapSpacing = 10.0;
-    final html = '<img src="image.png" />';
+    final src = 'http://domain.com/image.png';
+    final html = '<img src="$src" />';
 
     testWidgets('renders default value', (WidgetTester tester) async {
       final explained = await explain(tester, (_) => HtmlWidget(html));
@@ -198,7 +199,7 @@ void main() {
           explained,
           equals('[Padding:(10,10,10,10),child='
               '[Wrap:spacing=5.0,runSpacing=5.0,'
-              'children=[Image:image=[NetworkImage:url=image.png]]]]'));
+              "children=[Image:image=[NetworkImage:url=$src]]]]"));
     });
 
     testWidgets('renders custom value', (WidgetTester tester) async {
@@ -210,7 +211,7 @@ void main() {
           explained,
           equals('[Padding:(10,10,10,10),child='
               '[Wrap:spacing=10.0,runSpacing=10.0,'
-              'children=[Image:image=[NetworkImage:url=image.png]]]]'));
+              "children=[Image:image=[NetworkImage:url=$src]]]]"));
     });
 
     testWidgets('renders null value', (WidgetTester tester) async {
@@ -221,7 +222,7 @@ void main() {
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[Wrap:children=[Image:image=[NetworkImage:url=image.png]]]]'));
+              "[Wrap:children=[Image:image=[NetworkImage:url=$src]]]]"));
     });
   });
 }
