@@ -14,6 +14,7 @@ part 'ops/tag_a.dart';
 part 'ops/tag_code.dart';
 part 'ops/tag_img.dart';
 part 'ops/tag_li.dart';
+part 'ops/tag_q.dart';
 part 'ops/tag_table.dart';
 part 'ops/text.dart';
 
@@ -583,7 +584,7 @@ class WidgetFactory {
         meta = lazySet(meta, styles: [kCssMargin, '1em 0']);
         break;
 
-      case 'q':
+      case kTagQ:
         meta = lazySet(meta, buildOp: tagQ());
         break;
 
@@ -796,26 +797,7 @@ class WidgetFactory {
   }
 
   BuildOp tagQ() {
-    _tagQ ??= BuildOp(onPieces: (_, pieces) {
-      final first = pieces.first;
-      final last = pieces.last;
-
-      if (!first.hasWidgets && !last.hasWidgets) {
-        final firstBlock = first.block;
-        final firstBit = firstBlock.iterable.first;
-        firstBlock.rebuildBits(
-          (b) => b == firstBit ? b.rebuild(data: '“' + b.data) : b,
-        );
-
-        final lastBlock = last.block;
-        final lastBit = lastBlock.iterable.last;
-        lastBlock.rebuildBits(
-          (b) => b == lastBit ? b.rebuild(data: b.data + '”') : b,
-        );
-      }
-
-      return pieces;
-    });
+    _tagQ ??= _TagQ(this).buildOp;
     return _tagQ;
   }
 

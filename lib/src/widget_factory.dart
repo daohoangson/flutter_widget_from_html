@@ -53,6 +53,12 @@ class WidgetFactory extends core.WidgetFactory {
       url,
       aspectRatio: dimensOk ? width / height : 16 / 9,
       getDimensions: !dimensOk && _htmlWidget.webViewJs == true,
+      interceptNavigationRequest: (newUrl) {
+        if (newUrl == url) return false;
+
+        buildGestureTapCallbackForUrl(newUrl)();
+        return true;
+      },
       js: _htmlWidget.webViewJs == true,
       unsupportedWorkaroundForIssue37:
           _htmlWidget?.unsupportedWebViewWorkaroundForIssue37 == true,

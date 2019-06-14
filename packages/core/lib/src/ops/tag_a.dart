@@ -33,7 +33,7 @@ class _TagA {
       );
 
   BuiltPiece _buildBlock(BuiltPiece piece, GestureTapCallback onTap) =>
-      piece..block.rebuildBits((bit) => bit.rebuild(onTap: onTap));
+      piece..block.rebuildBits((b) => b.isSpace ? b : b.rebuild(onTap: onTap));
 
   GestureTapCallback _buildGestureTapCallback(NodeMetadata meta) {
     final attrs = meta.domElement.attributes;

@@ -26,9 +26,11 @@ class _StyleBgColor {
       });
 
   BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) => piece
-    ..block.rebuildBits((bit) => bit.rebuild(
-          style: bit.style.copyWith(background: Paint()..color = bgColor),
-        ));
+    ..block.rebuildBits((bit) => bit.style != null
+        ? bit.rebuild(
+            style: bit.style.copyWith(background: Paint()..color = bgColor),
+          )
+        : bit);
 
   Widget _buildBox(Iterable<Widget> widgets, Color bgColor) =>
       wf.buildDecoratedBox(wf.buildBody(widgets), color: bgColor);

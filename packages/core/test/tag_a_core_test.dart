@@ -12,6 +12,20 @@ void main() {
     expect(explained, equals('[RichText:(#FF0000FF+u+onTap:Foo)]'));
   });
 
+  group('renders without erroneous white spaces', () {
+    testWidgets('first', (WidgetTester tester) async {
+      final html = '<a href="$kHref"> Foo</a>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(#FF0000FF+u+onTap:Foo)]'));
+    });
+
+    testWidgets('last', (WidgetTester tester) async {
+      final html = '<a href="$kHref">Foo </a>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(#FF0000FF+u+onTap:Foo)]'));
+    });
+  });
+
   testWidgets('renders inline stylings', (WidgetTester tester) async {
     final html = '<a href="$kHref" style="color: #f00">Foo</a>';
     final explained = await explain(tester, html);
