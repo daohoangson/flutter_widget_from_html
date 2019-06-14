@@ -18,9 +18,7 @@ part 'ops/tag_q.dart';
 part 'ops/tag_table.dart';
 part 'ops/text.dart';
 
-final _baseUriTrimmingRegExp = RegExp(r'/+$');
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
-final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
 
 class WidgetFactory {
   final HtmlWidget _htmlWidget;
@@ -292,19 +290,14 @@ class WidgetFactory {
 
   String constructFullUrl(String url) {
     if (url?.isNotEmpty != true) return null;
-    if (url.startsWith(_isFullUrlRegExp)) return url;
+    final p = Uri.tryParse(url);
+    if (p == null) return null;
+    if (p.hasScheme) return p.toString();
 
     final b = _htmlWidget.baseUrl;
     if (b == null) return null;
 
-    if (url.startsWith('//')) return "${b.scheme}:$url";
-
-    if (url.startsWith('/')) {
-      final port = b.hasPort ? ":${b.port}" : '';
-      return "${b.scheme}://${b.host}$port$url";
-    }
-
-    return "${b.toString().replaceAll(_baseUriTrimmingRegExp, '')}/$url";
+    return b.resolveUri(p).toString();
   }
 
   List<Widget> fixOverlappingPaddings(List<Widget> widgets) {

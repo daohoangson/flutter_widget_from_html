@@ -20,7 +20,7 @@ class _TagImg {
           }
 
           var widget = wf.buildImage(
-            wf.constructFullUrl(src) ?? src,
+            fullUrl,
             height: height,
             text: text,
             width: width,

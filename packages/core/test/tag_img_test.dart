@@ -98,12 +98,13 @@ void main() {
     final test = (
       WidgetTester tester,
       String html,
-      String fullUrl,
-    ) async {
+      String fullUrl, {
+      Uri baseUrl,
+    }) async {
       final explained = await _.explain(
         tester,
         html,
-        baseUrl: Uri.parse('http://base.com/path'),
+        baseUrl: baseUrl ?? Uri.parse('http://base.com/path/'),
         imageUrlToPrecache: fullUrl,
       );
       expect(
@@ -122,6 +123,17 @@ void main() {
       final html = '<img src="//protocol.relative" />';
       final fullUrl = 'http://protocol.relative';
       await test(tester, html, fullUrl);
+    });
+
+    testWidgets('renders protocol relative url (https)', (tester) async {
+      final html = '<img src="//protocol.relative/secured" />';
+      final fullUrl = 'https://protocol.relative/secured';
+      await test(
+        tester,
+        html,
+        fullUrl,
+        baseUrl: Uri.parse('https://base.com/secured'),
+      );
     });
 
     testWidgets('renders root relative url', (WidgetTester tester) async {
