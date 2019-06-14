@@ -9,7 +9,7 @@ class WebView extends StatefulWidget {
   final double aspectRatio;
   final bool getDimensions;
   final List<Duration> getDimensionsDurations;
-  final _InterceptNavigationRequest interceptNavigationRequest;
+  final InterceptNavigationRequest interceptNavigationRequest;
   final bool js;
   final WebViewOnDimensions onDimensions;
 
@@ -148,7 +148,7 @@ typedef void WebViewOnDimensions(
   double width,
 );
 
-typedef bool _InterceptNavigationRequest(String url);
+typedef bool InterceptNavigationRequest(String url);
 
 class _Issue37 with WidgetsBindingObserver {
   final _WebViewState wvs;
