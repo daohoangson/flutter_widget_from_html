@@ -54,6 +54,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
     }
 
     _cc = lib.ChewieController(
+      aspectRatio: widget.autoResize ? null : widget.aspectRatio,
       autoInitialize: true,
       autoPlay: widget.autoplay == true,
       looping: widget.loop == true,
