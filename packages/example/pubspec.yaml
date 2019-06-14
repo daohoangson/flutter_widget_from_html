@@ -20,4 +20,6 @@ dev_dependencies:
   test: any
 
 flutter:
+  assets:
+    - logos/
   uses-material-design: true

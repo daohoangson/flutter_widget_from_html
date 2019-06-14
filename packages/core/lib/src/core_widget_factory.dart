@@ -112,10 +112,17 @@ class WidgetFactory {
           : debugPrint(url)
       : null;
 
-  Widget buildImage(String src, {double height, String text, double width}) {
-    final imageWidget = src?.startsWith('data:image') == true
-        ? buildImageFromDataUri(src)
-        : buildImageFromUrl(src);
+  Widget buildImage(String url, {double height, String text, double width}) {
+    Widget imageWidget;
+    if (url != null) {
+      if (url.startsWith('asset:')) {
+        imageWidget = buildImageFromAsset(url);
+      } else if (url.startsWith('data:')) {
+        imageWidget = buildImageFromDataUri(url);
+      } else {
+        imageWidget = buildImageFromUrl(url);
+      }
+    }
     if (imageWidget == null) return Text(text ?? '');
 
     height ??= 0;
@@ -141,6 +148,22 @@ class WidgetFactory {
     if (bytes.length == 0) return null;
 
     return bytes;
+  }
+
+  Widget buildImageFromAsset(String url) {
+    final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
+    if (uri?.scheme != 'asset') return null;
+
+    final assetName = uri.path;
+    if (assetName?.isNotEmpty != true) return null;
+
+    final package = uri.queryParameters?.containsKey('package') == true
+        ? uri.queryParameters['package']
+        : null;
+
+    final asset = AssetImage(assetName, package: package);
+
+    return Image(image: asset, fit: BoxFit.cover);
   }
 
   Widget buildImageFromDataUri(String dataUri) {

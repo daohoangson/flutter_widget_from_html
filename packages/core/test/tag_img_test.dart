@@ -29,32 +29,6 @@ void main() {
       );
     });
 
-    testWidgets('renders data uri', (WidgetTester tester) async {
-      // https://stackoverflow.com/questions/6018611/smallest-data-uri-image-possible-for-a-transparent-image
-      final html = '<img src="data:image/gif;base64,'
-          'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[Wrap:children=[Image:image=[MemoryImage:]]]'));
-    });
-
-    testWidgets('renders bad data uri', (WidgetTester tester) async {
-      final html = '<img src="data:image/xxx" />';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[Wrap:children=[Text:]]'));
-    });
-
-    testWidgets('renders bad data uri with alt text', (WidgetTester t) async {
-      final html = '<img src="data:image/xxx" alt="Foo" />';
-      final explained = await explain(t, html);
-      expect(explained, equals('[Wrap:children=[Text:Foo]]'));
-    });
-
-    testWidgets('renders bad data uri with title text', (WidgetTester t) async {
-      final html = '<img src="data:image/xxx" title="Foo" />';
-      final explained = await explain(t, html);
-      expect(explained, equals('[Wrap:children=[Text:Foo]]'));
-    });
-
     testWidgets('renders in one wrap', (WidgetTester tester) async {
       final html = '<img src="$src" /><img src="$src" />';
       final explained = await explain(tester, html);
@@ -101,6 +75,64 @@ void main() {
           equals('[Column:children=[RichText:(:Before text.)],'
               '[Wrap:children=[Image:image=[NetworkImage:url=$src]]],'
               '[RichText:(:After text.)]]'));
+    });
+  });
+
+  group('asset', () {
+    final explain = _.explain;
+
+    testWidgets('renders asset', (WidgetTester tester) async {
+      final html = '<img src="asset:path/image.png" />';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Wrap:children=[Image:image='
+              '[AssetImage:assetName=path/image.png]]]'));
+    });
+
+    testWidgets('renders asset (specified package)', (tester) async {
+      final html = '<img src="asset:path/image.png?package=package" />';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Wrap:children=[Image:image='
+              '[AssetImage:assetName=path/image.png,package=package]]]'));
+    });
+
+    testWidgets('renders bad asset name', (WidgetTester tester) async {
+      final html = '<img src="asset:" />';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Wrap:children=[Text:]]'));
+    });
+  });
+
+  group('data uri', () {
+    final explain = _.explain;
+
+    testWidgets('renders data uri', (WidgetTester tester) async {
+      // https://stackoverflow.com/questions/6018611/smallest-data-uri-image-possible-for-a-transparent-image
+      final html = '<img src="data:image/gif;base64,'
+          'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Wrap:children=[Image:image=[MemoryImage:]]]'));
+    });
+
+    testWidgets('renders bad data uri', (WidgetTester tester) async {
+      final html = '<img src="data:image/xxx" />';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Wrap:children=[Text:]]'));
+    });
+
+    testWidgets('renders bad data uri with alt text', (WidgetTester t) async {
+      final html = '<img src="data:image/xxx" alt="Foo" />';
+      final explained = await explain(t, html);
+      expect(explained, equals('[Wrap:children=[Text:Foo]]'));
+    });
+
+    testWidgets('renders bad data uri with title text', (WidgetTester t) async {
+      final html = '<img src="data:image/xxx" title="Foo" />';
+      final explained = await explain(t, html);
+      expect(explained, equals('[Wrap:children=[Text:Foo]]'));
     });
   });
 
