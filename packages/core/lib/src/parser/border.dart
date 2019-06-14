@@ -7,34 +7,34 @@ const kCssBorderTop = 'border-top';
 final _borderValuesThreeRegExp = RegExp(r'^(.+)\s+(.+)\s+(.+)$');
 final _borderValuesTwoRegExp = RegExp(r'^(.+)\s+(.+)$');
 
-CssBorderSide borderParse(String value) {
+CssBorderSide parseCssBorderSide(String value) {
   final valuesThree = _borderValuesThreeRegExp.firstMatch(value);
   if (valuesThree != null) {
-    final width = lengthParseValue(valuesThree[1]);
+    final width = parseCssLength(valuesThree[1]);
     if (width == null || width.number <= 0) return null;
     return CssBorderSide()
-      ..color = colorParseValue(valuesThree[3])
-      ..style = borderStyleParseValue(valuesThree[2])
+      ..color = parseColor(valuesThree[3])
+      ..style = parseCssBorderStyle(valuesThree[2])
       ..width = width;
   }
 
   final valuesTwo = _borderValuesTwoRegExp.firstMatch(value);
   if (valuesTwo != null) {
-    final width = lengthParseValue(valuesTwo[1]);
+    final width = parseCssLength(valuesTwo[1]);
     if (width == null || width.number <= 0) return null;
     return CssBorderSide()
-      ..style = borderStyleParseValue(valuesTwo[2])
+      ..style = parseCssBorderStyle(valuesTwo[2])
       ..width = width;
   }
 
-  final width = lengthParseValue(value);
+  final width = parseCssLength(value);
   if (width == null || width.number <= 0) return null;
   return CssBorderSide()
     ..style = CssBorderStyle.solid
     ..width = width;
 }
 
-CssBorderStyle borderStyleParseValue(String value) {
+CssBorderStyle parseCssBorderStyle(String value) {
   switch (value) {
     case 'dotted':
       return CssBorderStyle.dotted;

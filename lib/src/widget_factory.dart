@@ -4,8 +4,8 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
     as core;
 import 'package:url_launcher/url_launcher.dart';
 
-import 'config.dart';
 import 'data_classes.dart';
+import 'html_widget.dart';
 import 'video_player.dart';
 import 'web_view.dart';
 
@@ -13,19 +13,17 @@ part 'ops/tag_iframe.dart';
 part 'ops/tag_video.dart';
 
 class WidgetFactory extends core.WidgetFactory {
-  Config _config;
+  final HtmlWidget _htmlWidget;
+  final Color _hyperlinkColor;
 
   BuildOp _tagIframe;
   BuildOp _tagVideo;
 
-  @override
-  set config(core.Config config) {
-    super.config = config;
-    if (config is Config) _config = config;
-  }
+  WidgetFactory(BuildContext context, this._htmlWidget)
+      : _hyperlinkColor = Theme.of(context).accentColor,
+        super(_htmlWidget);
 
-  @override
-  Config get config => _config;
+  Color get hyperlinkColor => _htmlWidget.hyperlinkColor ?? _hyperlinkColor;
 
   @override
   Widget buildDivider() => Divider(height: 1);
@@ -36,8 +34,8 @@ class WidgetFactory extends core.WidgetFactory {
 
   @override
   GestureTapCallback buildGestureTapCallbackForUrl(String url) =>
-      () => _config.onTapUrl != null
-          ? _config.onTapUrl(url)
+      () => _htmlWidget.onTapUrl != null
+          ? _htmlWidget.onTapUrl(url)
           : canLaunch(url).then((ok) => ok ? launch(url) : null);
 
   @override
@@ -70,16 +68,22 @@ class WidgetFactory extends core.WidgetFactory {
     double height,
     double width,
   }) {
-    if (!_config.webView) return buildWebViewLinkOnly(url);
+    if (_htmlWidget.webView != true) return buildWebViewLinkOnly(url);
 
     final dimensOk = height != null && height > 0 && width != null && width > 0;
     return WebView(
       url,
       aspectRatio: dimensOk ? width / height : 16 / 9,
-      getDimensions: !dimensOk && _config?.webViewJs == true,
-      js: _config?.webViewJs == true,
+      getDimensions: !dimensOk && _htmlWidget.webViewJs == true,
+      interceptNavigationRequest: (newUrl) {
+        if (newUrl == url) return false;
+
+        buildGestureTapCallbackForUrl(newUrl)();
+        return true;
+      },
+      js: _htmlWidget.webViewJs == true,
       unsupportedWorkaroundForIssue37:
-          _config?.unsupportedWebViewWorkaroundForIssue37 == true,
+          _htmlWidget?.unsupportedWebViewWorkaroundForIssue37 == true,
     );
   }
 
@@ -103,7 +107,7 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   BuildOp tagIframe() {
-    _tagIframe ??= TagIframe(this).buildOp;
+    _tagIframe ??= _TagIframe(this).buildOp;
     return _tagIframe;
   }
 

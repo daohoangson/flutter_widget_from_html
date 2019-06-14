@@ -1,11 +1,11 @@
-part of '../core_helpers.dart';
+part of '../core_widget_factory.dart';
 
 const kTagQ = 'q';
 
-class TagQ {
+class _TagQ {
   final WidgetFactory wf;
 
-  TagQ(this.wf);
+  _TagQ(this.wf);
 
   BuildOp get buildOp => BuildOp(
         onPieces: (_, pieces) {

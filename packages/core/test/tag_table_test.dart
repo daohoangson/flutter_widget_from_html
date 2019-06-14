@@ -106,7 +106,7 @@ void main() {
       expect(
           explained,
           equals('[Table:\n' +
-              '[RichText:(+b:Header 1)] | [ZeroContainer:]\n' +
+              '[RichText:(+b:Header 1)] | [widget0]\n' +
               '[RichText:(:Value 1)] | [RichText:(:Value 2)]\n' +
               ']'));
     });
@@ -121,7 +121,7 @@ void main() {
           explained,
           equals('[Table:\n' +
               '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n' +
-              '[RichText:(:Value 1)] | [ZeroContainer:]\n' +
+              '[RichText:(:Value 1)] | [widget0]\n' +
               ']'));
     });
 

@@ -1,4 +1,4 @@
-part of '../core_helpers.dart';
+part of '../core_widget_factory.dart';
 
 const kTagTable = 'table';
 const kTagTableAttrBorder = 'border';
@@ -11,7 +11,7 @@ const kTagTableHeader = 'th';
 const kTagTableRow = 'tr';
 const _kTagTableOpPriority = 100;
 
-class TagTable {
+class _TagTable {
   final WidgetFactory wf;
 
   BuildOp _captionOp;
@@ -19,7 +19,7 @@ class TagTable {
   BuildOp _rowOp;
   BuildOp _semanticOp;
 
-  TagTable(this.wf);
+  _TagTable(this.wf);
 
   BuildOp get buildOp => BuildOp(
         onChild: (meta, e) {
@@ -45,7 +45,7 @@ class TagTable {
 
   BuildOp get captionOp {
     _captionOp ??= BuildOp(
-      defaultStyles: (_, __) => [kCssTextAlign, kCssTextAlignCenter],
+      defaultStyles: (_, __) => const [kCssTextAlign, kCssTextAlignCenter],
       onWidgets: (_, widgets) => [_CaptionWidget(widgets)],
       priority: _kTagTableOpPriority,
     );
@@ -55,7 +55,7 @@ class TagTable {
   BuildOp get cellOp {
     _cellOp ??= BuildOp(
       defaultStyles: (_, e) => e.localName == kTagTableHeader
-          ? [kCssFontWeight, kCssFontWeightBold]
+          ? const [kCssFontWeight, kCssFontWeightBold]
           : null,
       onWidgets: (_, __) => null,
       priority: _kTagTableOpPriority,
@@ -167,7 +167,7 @@ TableBorder _buildTableBorder(NodeMetadata meta) {
   String styleBorder;
   meta.styles((k, v) => k == kCssBorder ? styleBorder = v : null);
   if (styleBorder != null) {
-    final borderParsed = borderParse(styleBorder);
+    final borderParsed = parseCssBorderSide(styleBorder);
     if (borderParsed != null) {
       return TableBorder.all(
         color: borderParsed.color ?? const Color(0xFF000000),

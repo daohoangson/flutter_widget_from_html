@@ -64,13 +64,12 @@ Below tags are the ones that have special meaning / styling, all other tags will
 
 - A: underline, blue color, no default onTap action (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
 - H1/H2/H3/H4/H5/H6
-- IMG: no caching, no relative url support (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
-- LI/OL/UL
+- IMG with support for data uri and remote url but no caching (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
 - TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
   - `<table border="1">`
   - `<table style="border: 1px solid #f00">`
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
-  DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FOOTER, HEADER, HR, I, INS,
+  DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FOOTER, HEADER, HR, I, IMG, INS,
   KBD, MAIN, NAV, P, PRE, Q, S, SAMP, SECTION, STRIKE, STRONG, TT, U, VAR
 
 However, these tags and their contents will be ignored:

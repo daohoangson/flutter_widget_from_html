@@ -1,17 +1,23 @@
-part of '../core_helpers.dart';
+part of '../core_widget_factory.dart';
 
-class TagA {
+class _TagA {
   final WidgetFactory wf;
 
-  TagA(this.wf);
+  _TagA(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        defaultStyles: (_, __) => [
+        defaultStyles: (meta, __) {
+          final styles = [kCssTextDecoration, kCssTextDecorationUnderline];
+
+          if (wf.hyperlinkColor != null) {
+            styles.addAll([
               kCssColor,
-              colorToHex(wf.config.hyperlinkColor),
-              kCssTextDecoration,
-              kCssTextDecorationUnderline,
-            ],
+              convertColorToHex(wf.hyperlinkColor),
+            ]);
+          }
+
+          return styles;
+        },
         onPieces: (meta, pieces) {
           final onTap = _buildGestureTapCallback(meta);
           if (onTap == null) return pieces;

@@ -1,6 +1,6 @@
-part of '../core_helpers.dart';
+part of '../core_widget_factory.dart';
 
-TextSpan compileToTextSpan(TextBlock b) {
+TextSpan _compileToTextSpan(TextBlock b) {
   if (b == null || b.isEmpty) return null;
 
   final i = _getNoTrailing(b).iterator;

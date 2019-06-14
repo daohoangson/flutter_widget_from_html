@@ -1,4 +1,4 @@
-part of '../core_helpers.dart';
+part of '../core_widget_factory.dart';
 
 const kCssMargin = 'margin';
 const kCssMarginBottom = 'margin-bottom';
@@ -6,10 +6,10 @@ const kCssMarginLeft = 'margin-left';
 const kCssMarginRight = 'margin-right';
 const kCssMarginTop = 'margin-top';
 
-class StyleMargin {
+class _StyleMargin {
   final WidgetFactory wf;
 
-  StyleMargin(this.wf);
+  _StyleMargin(this.wf);
 
   BuildOp get buildOp => BuildOp(
         onWidgets: (meta, widgets) {
@@ -110,7 +110,7 @@ class _StyleMarginParser {
   }
 
   double _parseValue(String str) {
-    final parsed = lengthParseValue(str);
+    final parsed = parseCssLength(str);
     if (parsed == null) return 0;
 
     final value = parsed.getValue(meta.textStyle);

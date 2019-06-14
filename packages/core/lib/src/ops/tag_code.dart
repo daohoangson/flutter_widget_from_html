@@ -1,16 +1,16 @@
-part of '../core_helpers.dart';
+part of '../core_widget_factory.dart';
 
 const kTagCode = 'code';
 const kTagPre = 'pre';
 const kTagTt = 'tt';
 
-class TagCode {
+class _TagCode {
   final WidgetFactory wf;
 
-  TagCode(this.wf);
+  _TagCode(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        defaultStyles: (_, __) => [kCssFontFamily, 'monospace'],
+        defaultStyles: (_, __) => const [kCssFontFamily, 'monospace'],
         onPieces: (meta, pieces) => meta.domElement.localName == kTagPre
             ? [_buildPreTag(meta)]
             : pieces,

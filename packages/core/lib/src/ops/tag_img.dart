@@ -1,9 +1,9 @@
-part of '../core_helpers.dart';
+part of '../core_widget_factory.dart';
 
-class TagImg {
+class _TagImg {
   final WidgetFactory wf;
 
-  TagImg(this.wf);
+  _TagImg(this.wf);
 
   BuildOp get buildOp => BuildOp(
         onPieces: (meta, pieces) {
@@ -26,7 +26,7 @@ class TagImg {
             width: width,
           );
           if (!meta.isBlockElement || widget is LimitedBox) {
-            widget = wf.buildWrapable(widget);
+            widget = wf.buildWrap([widget]);
           }
 
           return pieces.toList()

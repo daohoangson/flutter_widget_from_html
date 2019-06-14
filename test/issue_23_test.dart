@@ -18,7 +18,7 @@ class BlockquoteWebViewScreen extends StatelessWidget {
         body: ListView(children: <Widget>[
           HtmlWidget(
             html,
-            wf: _BlockquoteWebViewWf(),
+            factoryBuilder: (c, hw) => _BlockquoteWebViewWf(c, hw),
           ),
         ]),
       );
@@ -39,6 +39,9 @@ class _BlockquoteWebViewWf extends WidgetFactory {
         ],
   );
 
+  _BlockquoteWebViewWf(BuildContext context, HtmlWidget htmlWidget)
+      : super(context, htmlWidget);
+
   @override
   NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
     switch (e.localName) {
@@ -55,10 +58,10 @@ void main() {
     final explained = await explain(
       tester,
       null,
-      hw: () => HtmlWidget(
+      hw: (_) => HtmlWidget(
             html,
             bodyPadding: const EdgeInsets.all(0),
-            wf: _BlockquoteWebViewWf(),
+            factoryBuilder: (c, hw) => _BlockquoteWebViewWf(c, hw),
           ),
     );
     expect(

@@ -79,9 +79,8 @@ class _TestAppState extends State<TestApp> {
                   ).toString(),
                   aspectRatio: 16 / 9,
                   getDimensions: true,
-                  getDimensionsDone: (v, _c, _h, _w) =>
-                      setState(() => output = v),
                   key: Key(input),
+                  onDimensions: (v, _, __, ___) => setState(() => output = v),
                 )
               : widget0,
         ],

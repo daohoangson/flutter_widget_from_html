@@ -1,11 +1,11 @@
-part of '../core_helpers.dart';
+part of '../core_widget_factory.dart';
 
 const kCssBackgroundColor = 'background-color';
 
-class StyleBgColor {
+class _StyleBgColor {
   final WidgetFactory wf;
 
-  StyleBgColor(this.wf);
+  _StyleBgColor(this.wf);
 
   BuildOp get buildOp => BuildOp(
       isBlockElement: false,
@@ -40,6 +40,6 @@ class StyleBgColor {
     meta.styles((k, v) => k == kCssBackgroundColor ? value = v : null);
     if (value == null) return null;
 
-    return colorParseValue(value);
+    return parseColor(value);
   }
 }

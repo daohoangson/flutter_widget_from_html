@@ -3,16 +3,27 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'core_config.dart';
 import 'core_helpers.dart';
+import 'core_html_widget.dart';
 import 'data_classes.dart';
+
+part 'ops/style_bg_color.dart';
+part 'ops/style_margin.dart';
+part 'ops/style_text_align.dart';
+part 'ops/tag_a.dart';
+part 'ops/tag_code.dart';
+part 'ops/tag_img.dart';
+part 'ops/tag_li.dart';
+part 'ops/tag_q.dart';
+part 'ops/tag_table.dart';
+part 'ops/text.dart';
 
 final _baseUriTrimmingRegExp = RegExp(r'/+$');
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
 final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
 
 class WidgetFactory {
-  Config _config;
+  final HtmlWidget _htmlWidget;
 
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
@@ -26,12 +37,9 @@ class WidgetFactory {
   BuildOp _tagQ;
   BuildOp _tagTable;
 
-  set config(Config config) {
-    assert(config != null);
-    _config = config;
-  }
+  WidgetFactory(this._htmlWidget);
 
-  Config get config => _config;
+  Color get hyperlinkColor => _htmlWidget.hyperlinkColor;
 
   Widget buildAlign(Widget child, Alignment alignment) {
     if (child == null) return null;
@@ -44,7 +52,7 @@ class WidgetFactory {
   }
 
   Widget buildBody(Iterable<Widget> children) =>
-      buildPadding(buildColumn(children), _config.bodyPadding);
+      buildPadding(buildColumn(children), _htmlWidget.bodyPadding);
 
   Widget buildColumn(Iterable<Widget> children) {
     children = fixWraps(children);
@@ -101,7 +109,9 @@ class WidgetFactory {
   }
 
   GestureTapCallback buildGestureTapCallbackForUrl(String url) =>
-      () => _config.onTapUrl != null ? _config.onTapUrl(url) : debugPrint(url);
+      () => _htmlWidget.onTapUrl != null
+          ? _htmlWidget.onTapUrl(url)
+          : debugPrint(url);
 
   Widget buildImage(String src, {double height, String text, double width}) {
     final imageWidget = src?.startsWith('data:image') == true
@@ -174,12 +184,12 @@ class WidgetFactory {
       Table(border: border, children: rows);
 
   Widget buildTableCell(Widget child) =>
-      TableCell(child: buildPadding(child, _config.tableCellPadding));
+      TableCell(child: buildPadding(child, _htmlWidget.tableCellPadding));
 
   Widget buildText(TextBlock block, {TextAlign textAlign}) {
     final _textAlign = textAlign ?? TextAlign.start;
 
-    final span = compileToTextSpan(block);
+    final span = _compileToTextSpan(block);
     if (span != null) return RichText(text: span, textAlign: _textAlign);
 
     return null;
@@ -215,7 +225,7 @@ class WidgetFactory {
     final value = meta?.fontSize;
     if (value == null) return null;
 
-    final parsed = lengthParseValue(value);
+    final parsed = parseCssLength(value);
     if (parsed != null) return parsed.getValue(parent);
 
     switch (value) {
@@ -270,19 +280,21 @@ class WidgetFactory {
     );
   }
 
-  Widget buildWrap(List<Widget> children) => Wrap(
-        children: children,
-        runSpacing: _config.wrapSpacing,
-        spacing: _config.wrapSpacing,
-      );
+  Widget buildWrap(Iterable<Widget> children) {
+    if (children?.isNotEmpty != true) return null;
 
-  Widget buildWrapable(Widget widget) => Wrapable(this, [widget]);
+    return Wrap(
+      children: children.toList(),
+      runSpacing: _htmlWidget.wrapSpacing ?? 0,
+      spacing: _htmlWidget.wrapSpacing ?? 0,
+    );
+  }
 
   String constructFullUrl(String url) {
     if (url?.isNotEmpty != true) return null;
     if (url.startsWith(_isFullUrlRegExp)) return url;
 
-    final b = _config?.baseUrl;
+    final b = _htmlWidget.baseUrl;
     if (b == null) return null;
 
     if (url.startsWith('//')) return "${b.scheme}:$url";
@@ -362,15 +374,15 @@ class WidgetFactory {
     final fixed = <Widget>[];
 
     for (final widget in widgets) {
-      if (fixed.isEmpty || !(widget is Wrapable) || !(fixed.last is Wrapable)) {
+      if (fixed.isEmpty || !(widget is Wrap) || !(fixed.last is Wrap)) {
         fixed.add(widget);
         continue;
       }
 
-      final last = fixed.isEmpty ? null : fixed.removeLast() as Wrapable;
-      final merged = (last?.widgets?.toList() ?? <Widget>[])
-        ..addAll((widget as Wrapable).widgets);
-      fixed.add(Wrapable(this, merged));
+      final last = fixed.isEmpty ? null : fixed.removeLast() as Wrap;
+      final merged = (last?.children?.toList() ?? <Widget>[])
+        ..addAll((widget as Wrap).children);
+      fixed.add(buildWrap(merged));
     }
 
     return fixed;
@@ -392,8 +404,8 @@ class WidgetFactory {
   }
 
   NodeMetadata parseElement(NodeMetadata meta, dom.Element element) {
-    if (_config.builderCallback != null) {
-      meta = _config.builderCallback(meta, element);
+    if (_htmlWidget.builderCallback != null) {
+      meta = _htmlWidget.builderCallback(meta, element);
     }
 
     return meta;
@@ -595,7 +607,7 @@ class WidgetFactory {
         break;
 
       case kCssBorderBottom:
-        final borderBottom = borderParse(value);
+        final borderBottom = parseCssBorderSide(value);
         if (borderBottom != null) {
           meta = lazySet(
             meta,
@@ -607,7 +619,7 @@ class WidgetFactory {
         }
         break;
       case kCssBorderTop:
-        final borderTop = borderParse(value);
+        final borderTop = parseCssBorderSide(value);
         if (borderTop != null) {
           meta = lazySet(
             meta,
@@ -620,7 +632,7 @@ class WidgetFactory {
         break;
 
       case kCssColor:
-        final color = colorParseValue(value);
+        final color = parseColor(value);
         if (color != null) meta = lazySet(meta, color: color);
         break;
 
@@ -706,7 +718,7 @@ class WidgetFactory {
         break;
 
       case kCssTextDecoration:
-        for (final v in cssSplit(value)) {
+        for (final v in splitCss(value)) {
           switch (v) {
             case kCssTextDecorationLineThrough:
               meta = lazySet(meta, decoStrike: true);
@@ -734,35 +746,35 @@ class WidgetFactory {
   }
 
   BuildOp styleBgColor() {
-    _styleBgColor ??= StyleBgColor(this).buildOp;
+    _styleBgColor ??= _StyleBgColor(this).buildOp;
     return _styleBgColor;
   }
 
   BuildOp styleMargin() {
-    _styleMargin ??= StyleMargin(this).buildOp;
+    _styleMargin ??= _StyleMargin(this).buildOp;
     return _styleMargin;
   }
 
   BuildOp styleTextAlign() {
-    _styleTextAlign ??= StyleTextAlign(this).buildOp;
+    _styleTextAlign ??= _StyleTextAlign(this).buildOp;
     return _styleTextAlign;
   }
 
   BuildOp tagA() {
-    _tagA ??= TagA(this).buildOp;
+    _tagA ??= _TagA(this).buildOp;
     return _tagA;
   }
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      defaultStyles: (_, __) => [kCssMargin, '0.5em 0'],
+      defaultStyles: (_, __) => const [kCssMargin, '0.5em 0'],
       onWidgets: (_, __) => [widget0],
     );
     return _tagBr;
   }
 
   BuildOp tagCode() {
-    _tagCode ??= TagCode(this).buildOp;
+    _tagCode ??= _TagCode(this).buildOp;
     return _tagCode;
   }
 
@@ -775,22 +787,22 @@ class WidgetFactory {
   }
 
   BuildOp tagImg() {
-    _tagImg ??= TagImg(this).buildOp;
+    _tagImg ??= _TagImg(this).buildOp;
     return _tagImg;
   }
 
   BuildOp tagLi() {
-    _tagLi ??= TagLi(this).buildOp;
+    _tagLi ??= _TagLi(this).buildOp;
     return _tagLi;
   }
 
   BuildOp tagQ() {
-    _tagQ ??= TagQ(this).buildOp;
+    _tagQ ??= _TagQ(this).buildOp;
     return _tagQ;
   }
 
   BuildOp tagTable() {
-    _tagTable ??= TagTable(this).buildOp;
+    _tagTable ??= _TagTable(this).buildOp;
     return _tagTable;
   }
 }

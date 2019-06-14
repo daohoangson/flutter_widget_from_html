@@ -94,13 +94,13 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[Padding:(3,0,0,0),child=[ZeroContainer:]],'
+        equals('[Padding:(3,0,0,0),child=[widget0]],'
             '[Padding:(0,3,0,3),child=[RichText:(:1a)]],'
             '[Padding:(0,3,0,3),child=[RichText:(:1b)]],'
-            '[Padding:(0,0,3,0),child=[ZeroContainer:]],'
+            '[Padding:(0,0,3,0),child=[widget0]],'
             '[Padding:(0,3,0,3),child=[RichText:(:2a)]],'
             '[Padding:(0,3,0,3),child=[RichText:(:2b)]],'
-            '[Padding:(0,0,3,0),child=[ZeroContainer:]]'));
+            '[Padding:(0,0,3,0),child=[widget0]]'));
   });
 
   group('margin-xxx', () {
