@@ -277,35 +277,63 @@ class TextBit {
   final String data;
   final VoidCallback onTap;
   final TextStyle style;
+  final WidgetSpan widgetSpan;
 
-  TextBit({this.block, this.data, this.style, this.onTap});
-
-  TextBit.text(this.block, this.data, this.style)
+  TextBit.text(this.block, this.data, this.style, {this.onTap})
       : assert(block != null),
         assert(data != null),
         assert(style != null),
-        onTap = null;
+        widgetSpan = null;
 
   TextBit.space(this.block)
       : assert(block != null),
         data = null,
         onTap = null,
+        style = null,
+        widgetSpan = null;
+
+  TextBit.widget(this.block, this.widgetSpan)
+      : assert(block != null),
+        assert(widgetSpan != null),
+        data = null,
+        onTap = null,
         style = null;
 
-  bool get isSpace => data == null;
+  bool get isSpace => data == null && widgetSpan == null;
+  bool get isText => data != null;
+  bool get isWidget => widgetSpan != null;
 
   TextBit rebuild({
-    TextBlock block,
     String data,
     VoidCallback onTap,
     TextStyle style,
+    WidgetSpan widgetSpan,
   }) =>
-      TextBit(
-        block: block ?? this.block,
-        data: data ?? this.data,
-        style: style ?? this.style,
-        onTap: onTap ?? this.onTap,
-      );
+      isText
+          ? TextBit.text(
+              block,
+              data ?? this.data,
+              style ?? this.style,
+              onTap: onTap ?? this.onTap,
+            )
+          : isWidget
+              ? TextBit.widget(block, widgetSpan ?? this.widgetSpan)
+              : this;
+
+  TextBit rebuildWidget({
+    PlaceholderAlignment alignment,
+    TextBaseline baseline,
+    Widget child,
+  }) =>
+      isWidget
+          ? rebuild(
+              widgetSpan: WidgetSpan(
+                alignment: alignment ?? this.widgetSpan.alignment,
+                baseline: baseline ?? this.widgetSpan.baseline,
+                child: child ?? this.widgetSpan.child,
+              ),
+            )
+          : this;
 }
 
 class TextBlock {
@@ -361,6 +389,8 @@ class TextBlock {
   bool addSpace() => addBit(TextBit.space(this));
 
   bool addText(String data) => addBit(TextBit.text(this, data, style));
+
+  bool addWidget(WidgetSpan ws) => addBit(TextBit.widget(this, ws));
 
   void rebuildBits(TextBit f(TextBit bit), {int start, int end}) {
     start ??= _indexStart;

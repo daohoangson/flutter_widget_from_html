@@ -3,12 +3,12 @@ part of '../core_widget_factory.dart';
 TextSpan _compileToTextSpan(TextBlock b) {
   if (b == null || b.isEmpty) return null;
 
+  final bits = _getNoTrailing(b);
   final i = _getNoTrailing(b).iterator;
-  final children = <TextSpan>[];
+  final children = <InlineSpan>[];
 
-  i.moveNext();
-  final first = i.current;
-  final firstSb = StringBuffer(first.data ?? '');
+  final first = bits.first;
+  final firstSb = StringBuffer();
 
   var prevOnTap = first.onTap;
   var prevStyle = first.style;
@@ -28,6 +28,12 @@ TextSpan _compileToTextSpan(TextBlock b) {
     final style = _getBitStyle(bit) ?? prevStyle;
     if (bit.onTap != prevOnTap || style != prevStyle) {
       addChild();
+    }
+
+    if (bit.isWidget) {
+      addChild();
+      children.add(bit.widgetSpan);
+      continue;
     }
 
     prevOnTap = bit.onTap;
