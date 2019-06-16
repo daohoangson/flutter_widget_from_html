@@ -297,7 +297,9 @@ class _Explainer {
         : (widget is Text ? widget.textAlign : null));
     final textAlignStr = textAlign.isNotEmpty ? ",align=$textAlign" : '';
     final children = widget is MultiChildRenderObjectWidget
-        ? "children=${widget.children.map(_widget).join(',')}"
+        ? widget.children?.isNotEmpty == true
+            ? "children=${widget.children.map(_widget).join(',')}"
+            : ''
         : widget is ProxyWidget
             ? "child=${_widget(widget.child)}"
             : widget is SingleChildRenderObjectWidget
