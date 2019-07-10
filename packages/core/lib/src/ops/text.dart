@@ -1,6 +1,6 @@
 part of '../core_widget_factory.dart';
 
-TextSpan _compileToTextSpan(TextBlock b) {
+InlineSpan _compileToTextSpan(TextBlock b) {
   if (b == null || b.isEmpty) return null;
 
   final bits = _getNoTrailing(b);
@@ -42,6 +42,10 @@ TextSpan _compileToTextSpan(TextBlock b) {
   }
 
   addChild();
+
+  if (children.length == 1 && first.onTap == null && firstSb.length == 0) {
+    return children[0];
+  }
 
   return TextSpan(
     children: children,

@@ -18,8 +18,7 @@ void main() {
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[Wrap:spacing=5.0,runSpacing=5.0,'
-              'children=[CachedNetworkImage:image.png]]]'));
+              '[RichText:[CachedNetworkImage:image.png]]]'));
     });
 
     testWidgets('renders with value', (WidgetTester tester) async {
@@ -30,8 +29,7 @@ void main() {
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[Wrap:spacing=5.0,runSpacing=5.0,'
-              'children=[CachedNetworkImage:http://base.com/path/image.png]]]'));
+              '[RichText:[CachedNetworkImage:http://base.com/path/image.png]]]'));
     });
   });
 
@@ -165,11 +163,11 @@ void main() {
       final explained = await explain(
         tester,
         (context) => HtmlWidget(
-              html,
-              textStyle: DefaultTextStyle.of(context)
-                  .style
-                  .copyWith(fontStyle: FontStyle.italic),
-            ),
+          html,
+          textStyle: DefaultTextStyle.of(context)
+              .style
+              .copyWith(fontStyle: FontStyle.italic),
+        ),
       );
       expect(
         explained,

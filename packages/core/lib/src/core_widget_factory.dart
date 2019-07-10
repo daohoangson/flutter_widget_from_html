@@ -122,12 +122,10 @@ class WidgetFactory {
     width ??= 0;
     if (height <= 0 || width <= 0) return imageWidget;
 
-    return CustomSingleChildLayout(
+    return ImageLayout(
       child: imageWidget,
-      delegate: ImageLayoutDelegate(
-        height: height,
-        width: width,
-      ),
+      height: height,
+      width: width,
     );
   }
 

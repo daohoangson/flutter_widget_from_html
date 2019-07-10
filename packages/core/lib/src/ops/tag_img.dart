@@ -1,11 +1,31 @@
 part of '../core_widget_factory.dart';
 
-class ImageLayoutDelegate extends SingleChildLayoutDelegate {
+class ImageLayout extends StatelessWidget {
+  final Widget child;
+  final double height;
+  final double width;
+
+  ImageLayout({this.child, this.height, this.width})
+      : assert(child != null),
+        assert(height > 0),
+        assert(width > 0);
+
+  @override
+  Widget build(BuildContext context) => CustomSingleChildLayout(
+        child: child,
+        delegate: _ImageLayoutDelegate(
+          height: height,
+          width: width,
+        ),
+      );
+}
+
+class _ImageLayoutDelegate extends SingleChildLayoutDelegate {
   final double height;
   final double ratio;
   final double width;
 
-  ImageLayoutDelegate({this.height, this.width})
+  _ImageLayoutDelegate({this.height, this.width})
       : assert(height > 0),
         assert(width > 0),
         ratio = width / height;
@@ -23,7 +43,7 @@ class ImageLayoutDelegate extends SingleChildLayoutDelegate {
   }
 
   @override
-  bool shouldRelayout(ImageLayoutDelegate other) =>
+  bool shouldRelayout(_ImageLayoutDelegate other) =>
       height != other.height || width != other.width;
 }
 
@@ -43,8 +63,12 @@ class _TagImg {
             return pieces..last?.block?.addText(img.text);
           }
 
-          var widget = _buildImage(img, wf);
+          final widget = _buildImage(img, wf);
           if (widget == null) return pieces;
+
+          if (widget is Text) {
+            return pieces..last?.block?.addText(widget.data);
+          }
 
           return pieces
             ..last?.block?.addWidget(WidgetSpan(

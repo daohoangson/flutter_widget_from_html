@@ -202,7 +202,7 @@ void main() {
           explained,
           equals(
             '[Padding:(10,0,0,0),child=[widget0]],'
-            '[Padding:(0,40,0,40),child=[Wrap:children=[Image:image=[NetworkImage:url=image.png]]]],'
+            '[Padding:(0,40,0,40),child=[RichText:[NetworkImage:url=image.png]]],'
             '[Padding:(0,40,0,40),child=[RichText:(+i:fig. 1(: Foo))]],'
             '[Padding:(0,0,10,0),child=[widget0]]',
           ));
@@ -507,16 +507,13 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     testWidgets('renders IMG inline by default', (WidgetTester tester) async {
       final html = '<img src="image.png" />';
       final e = await explain(tester, html, imageUrlToPrecache: "image.png");
-      expect(
-        e,
-        equals('[Wrap:children=[Image:image=[NetworkImage:url=image.png]]]'),
-      );
+      expect(e, equals('[RichText:[NetworkImage:url=image.png]]'));
     });
 
     testWidgets('renders IMG as block', (WidgetTester tester) async {
       final html = '<img src="image.png" style="display: block" />';
       final e = await explain(tester, html, imageUrlToPrecache: "image.png");
-      expect(e, equals('[Image:image=[NetworkImage:url=image.png]]'));
+      expect(e, equals('[Wrap:children=[NetworkImage:url=image.png]]'));
     });
 
     testWidgets('renders IMG with dimensions', (WidgetTester tester) async {
@@ -524,9 +521,11 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final e = await explain(tester, html, imageUrlToPrecache: "image.png");
       expect(
           e,
-          equals('[Wrap:children=[LimitedBox:h=1.0,w=1.0,child='
-              '[AspectRatio:aspectRatio=1.00,child='
-              '[Image:image=[NetworkImage:url=image.png]]]]]'));
+          equals('[RichText:[ImageLayout:child='
+              '[NetworkImage:url=image.png],'
+              'height=1.0,'
+              'width=1.0'
+              ']]'));
     });
 
     testWidgets('renders IMG with dimensions 2', (tester) async {
@@ -535,9 +534,11 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final e = await explain(tester, html, imageUrlToPrecache: "image.png");
       expect(
           e,
-          equals('[Wrap:children=[LimitedBox:h=1.0,w=1.0,child='
-              '[AspectRatio:aspectRatio=1.00,child='
-              '[Image:image=[NetworkImage:url=image.png]]]]]'));
+          equals('[Wrap:children=[ImageLayout:child='
+              '[NetworkImage:url=image.png],'
+              'height=1.0,'
+              'width=1.0'
+              ']]'));
     });
   });
 
@@ -754,28 +755,22 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     testWidgets('renders center image', (WidgetTester t) async {
       final h = '<div style="text-align: center"><img src="image.png"></div>';
       final explained = await explain(t, h, imageUrlToPrecache: 'image.png');
-      expect(
-          explained,
-          equals('[Align:alignment=center,child=[Wrap:children='
-              '[Image:image=[NetworkImage:url=image.png]]]]'));
+      expect(explained,
+          equals('[RichText,align=center:[NetworkImage:url=image.png]]'));
     });
 
     testWidgets('renders left image', (WidgetTester tester) async {
       final html = '<div style="text-align: left"><img src="image.png"></div>';
       final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[Align:alignment=centerLeft,child=[Wrap:children='
-              '[Image:image=[NetworkImage:url=image.png]]]]'));
+      expect(explained,
+          equals('[RichText,align=left:[NetworkImage:url=image.png]]'));
     });
 
     testWidgets('renders right image', (WidgetTester tester) async {
       final html = '<div style="text-align: right"><img src="image.png"></div>';
       final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[Align:alignment=centerRight,child=[Wrap:children='
-              '[Image:image=[NetworkImage:url=image.png]]]]'));
+      expect(explained,
+          equals('[RichText,align=right:[NetworkImage:url=image.png]]'));
     });
 
     testWidgets('renders styling from outside', (WidgetTester tester) async {
