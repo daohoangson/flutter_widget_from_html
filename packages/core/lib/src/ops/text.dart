@@ -3,11 +3,11 @@ part of '../core_widget_factory.dart';
 InlineSpan _compileToTextSpan(TextBlock b) {
   if (b == null || b.isEmpty) return null;
 
-  final bits = _getNoTrailing(b);
-  final i = _getNoTrailing(b).iterator;
+  b.trimRight();
+
   final children = <InlineSpan>[];
 
-  final first = bits.first;
+  final first = b.first;
   final firstSb = StringBuffer();
 
   var prevOnTap = first.onTap;
@@ -23,8 +23,8 @@ InlineSpan _compileToTextSpan(TextBlock b) {
     }
     prevSb = StringBuffer();
   };
-  while (i.moveNext()) {
-    final bit = i.current;
+
+  b.forEachBit((bit, i) {
     final style = _getBitStyle(bit) ?? prevStyle;
     if (bit.onTap != prevOnTap || style != prevStyle) {
       addChild();
@@ -33,13 +33,13 @@ InlineSpan _compileToTextSpan(TextBlock b) {
     if (bit.isWidget) {
       addChild();
       children.add(bit.widgetSpan);
-      continue;
+      return;
     }
 
     prevOnTap = bit.onTap;
     prevStyle = style;
     prevSb.write(bit.data ?? ' ');
-  }
+  });
 
   addChild();
 
@@ -63,35 +63,29 @@ TextStyle _getBitStyle(TextBit bit) {
 
   // the below code will find the best style for this whitespace bit
   // easy case: whitespace at the beginning of a tag, use the previous style
-  final iterable = bit.block.iterable;
-  if (bit == iterable.first) return null;
+  final block = bit.block;
+  if (bit == block.first) return null;
 
   // complicated: whitespace at the end of a tag, try to merge with the next
   // unless it has unrelated style (e.g. next bit is a sibling)
-  if (bit == iterable.last) {
-    // next should always has `data` and `style` (thanks to `_getNoTrailing`)
+  if (bit == block.last) {
     final next = bit.block.next;
-    assert(next?.style != null);
+    if (next?.style != null) {
+      // get the outer-most block having this as the last bit
+      var bb = bit.block;
+      while (true) {
+        if (bb.last != bb.parent?.last) break;
+        bb = bb.parent;
+      }
 
-    // get the outer-most block having this as the last bit
-    var bb = bit.block;
-    while (true) {
-      if (bb.indexEnd != bb.parent?.indexEnd) break;
-      bb = bb.parent;
-    }
-
-    if (bb.parent == next.block) {
-      return next.style;
-    } else {
-      return null;
+      if (bb.parent == next.block) {
+        return next.style;
+      } else {
+        return null;
+      }
     }
   }
 
   // fallback to default (style from block)
   return bit.block.style;
-}
-
-Iterable<TextBit> _getNoTrailing(TextBlock block) {
-  final i = block.iterable;
-  return block.hasTrailingSpace ? i.take(i.length - 1) : i;
 }

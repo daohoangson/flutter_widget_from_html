@@ -1,6 +1,8 @@
 part of '../core_widget_factory.dart';
 
 const kTagQ = 'q';
+const kTagQOpening = '“';
+const kTagQClosing = '”';
 
 class _TagQ {
   final WidgetFactory wf;
@@ -14,29 +16,36 @@ class _TagQ {
 
           final last = pieces.last.block;
           if (last?.isNotEmpty != true) return pieces;
-          final lastHasTrailingSpace = last.iterable.last.isSpace;
 
-          first.rebuildBits(
-            (firstBit) => firstBit.rebuild(
-                  data: firstBit.isSpace ? ' “' : '“${firstBit.data}',
-                  style: firstBit.style ?? first.style,
-                ),
-            start: first.indexStart,
-            end: first.indexStart + 1,
-          );
+          var addedOpening = false;
+          var addedClosing = false;
+          first.forEachBit((bit, i) {
+            if (!bit.isSpace) {
+              final bb = bit.block;
+              bb.addBit(TextBit.text(bb, kTagQOpening, bb.style), index: i);
+              addedOpening = true;
+              return false;
+            }
 
-          last.rebuildBits(
-            (lastBit) => lastBit.rebuild(
-                  data: (lastBit.data ?? '') + '”',
-                  style: lastBit.style ?? last.style,
-                ),
-            start: last.indexEnd - 1,
-            end: last.indexEnd,
-          );
+            return null;
+          });
+          if (!addedOpening)
+            first.addBit(
+              TextBit.text(first, kTagQOpening, first.style),
+              index: 0,
+            );
 
-          if (lastHasTrailingSpace) {
-            last.addSpace();
-          }
+          last.forEachBit((bit, i) {
+            if (!bit.isSpace) {
+              final bb = bit.block;
+              bb.addBit(TextBit.text(bb, kTagQClosing, bb.style), index: i + 1);
+              addedClosing = true;
+              return false;
+            }
+
+            return null;
+          }, reversed: true);
+          if (!addedClosing) last.addText(kTagQClosing);
 
           return pieces;
         },

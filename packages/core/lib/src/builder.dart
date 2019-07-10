@@ -196,7 +196,7 @@ class _Piece extends BuiltPiece {
 
     final substring = text.substring(start, end);
     final dedup = substring.replaceAll(_whitespaceDuplicateRegExp, ' ');
-    if (!block.addText(dedup)) return false;
+    block.addText(dedup);
 
     if (end < text.length) block.addSpace();
 
