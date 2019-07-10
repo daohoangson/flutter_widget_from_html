@@ -187,41 +187,4 @@ void main() {
       );
     });
   });
-
-  group('wrapSpacing', () {
-    final wrapSpacing = 10.0;
-    final html = '<img src="image.png" />';
-
-    testWidgets('renders default value', (WidgetTester tester) async {
-      final explained = await explain(tester, (_) => HtmlWidget(html));
-      expect(
-          explained,
-          equals('[Padding:(10,10,10,10),child='
-              '[Wrap:spacing=5.0,runSpacing=5.0,'
-              'children=[Image:image=[NetworkImage:url=image.png]]]]'));
-    });
-
-    testWidgets('renders custom value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        (_) => HtmlWidget(html, wrapSpacing: wrapSpacing),
-      );
-      expect(
-          explained,
-          equals('[Padding:(10,10,10,10),child='
-              '[Wrap:spacing=10.0,runSpacing=10.0,'
-              'children=[Image:image=[NetworkImage:url=image.png]]]]'));
-    });
-
-    testWidgets('renders null value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        (_) => HtmlWidget(html, wrapSpacing: null),
-      );
-      expect(
-          explained,
-          equals('[Padding:(10,10,10,10),child='
-              '[Wrap:children=[Image:image=[NetworkImage:url=image.png]]]]'));
-    });
-  });
 }

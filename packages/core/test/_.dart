@@ -15,7 +15,6 @@ Future<String> explain(
   FactoryBuilder factoryBuilder,
   double tableCellPadding = 0,
   TextStyle textStyle,
-  double wrapSpacing = 0,
 }) async {
   assert((html == null) != (hw == null));
   final key = UniqueKey();
@@ -63,7 +62,6 @@ Future<String> explain(
           factoryBuilder: factoryBuilder,
           tableCellPadding: EdgeInsets.all(tableCellPadding),
           textStyle: textStyle,
-          wrapSpacing: wrapSpacing,
         );
 
   return _.explain(htmlWidget.build(found));
