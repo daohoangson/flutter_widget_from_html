@@ -42,6 +42,8 @@ class HtmlWidget extends StatelessWidget {
   /// The default styling for text elements.
   final TextStyle textStyle;
 
+  Widget _built;
+
   /// Creates a widget that builds Flutter widget tree from html.
   ///
   /// The [html] argument must not be null.
@@ -74,10 +76,14 @@ class HtmlWidget extends StatelessWidget {
       wf: wf,
     ).build();
 
-    return wf.buildBody(widgets) ?? Text(html);
+    _built = wf.buildBody(widgets) ?? Text(html);
+
+    return _built;
   }
 
   WidgetFactory buildFactory(BuildContext context) => factoryBuilder != null
       ? factoryBuilder(context, this)
       : WidgetFactory(this);
+
+  Widget getBuilt() => _built;
 }

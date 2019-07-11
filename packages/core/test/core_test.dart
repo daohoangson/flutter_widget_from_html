@@ -99,8 +99,12 @@ void main() {
 
     testWidgets('renders quotes around IMG', (WidgetTester tester) async {
       final html = '<q><img src="image.png" /></q>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:“[NetworkImage:url=image.png](:”))]'));
+      final e = await explain(
+        tester,
+        html,
+        imageUrlToPrecache: 'image.png',
+      );
+      expect(e, equals('[RichText:(:“[NetworkImage:url=image.png](:”))]'));
     });
 
     group('renders without erroneous white spaces', () {

@@ -7,7 +7,7 @@ Future<String> explain(
   WidgetTester tester,
   String html, {
   WidgetExplainer explainer,
-  HtmlWidgetBuilder hw,
+  HtmlWidget hw,
   String imageUrlToPrecache,
   Uri baseUrl,
   double bodyVerticalPadding = 0,
@@ -17,6 +17,16 @@ Future<String> explain(
   TextStyle textStyle,
 }) async {
   assert((html == null) != (hw == null));
+  hw ??= HtmlWidget(
+    html,
+    baseUrl: baseUrl,
+    bodyPadding: EdgeInsets.symmetric(vertical: bodyVerticalPadding),
+    builderCallback: builderCallback,
+    factoryBuilder: factoryBuilder,
+    tableCellPadding: EdgeInsets.all(tableCellPadding),
+    textStyle: textStyle,
+  );
+
   final key = UniqueKey();
 
   await tester.pumpWidget(
@@ -38,10 +48,12 @@ Future<String> explain(
           fontWeight: FontWeight.normal,
         );
 
-        return Theme(
-          child: DefaultTextStyle(key: key, style: style, child: widget0),
-          data: ThemeData(
+        return MaterialApp(
+          theme: ThemeData(
             accentColor: const Color(0xFF123456),
+          ),
+          home: Scaffold(
+            body: DefaultTextStyle(key: key, style: style, child: hw),
           ),
         );
       },
@@ -51,20 +63,7 @@ Future<String> explain(
   final found = find.byKey(key).evaluate().first;
   expect(found.widget, isInstanceOf<DefaultTextStyle>());
 
-  final _ = _Explainer(found, explainer: explainer);
-  final htmlWidget = hw != null
-      ? hw(found)
-      : HtmlWidget(
-          html,
-          baseUrl: baseUrl,
-          bodyPadding: EdgeInsets.symmetric(vertical: bodyVerticalPadding),
-          builderCallback: builderCallback,
-          factoryBuilder: factoryBuilder,
-          tableCellPadding: EdgeInsets.all(tableCellPadding),
-          textStyle: textStyle,
-        );
-
-  return _.explain(htmlWidget.build(found));
+  return _Explainer(found, explainer: explainer).explain(hw.getBuilt());
 }
 
 final _explainMarginRegExp = RegExp(
@@ -85,7 +84,6 @@ Future<String> explainMargin(
 }
 
 typedef String WidgetExplainer(Widget widget);
-typedef HtmlWidget HtmlWidgetBuilder(BuildContext context);
 
 class _Explainer {
   final BuildContext context;
