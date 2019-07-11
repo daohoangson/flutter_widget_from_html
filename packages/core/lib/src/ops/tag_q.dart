@@ -31,14 +31,6 @@ class _TagQ {
 
             return null;
           });
-          if (!addedOpening) {
-            first.addBit(
-              TextBit.text(first, kTagQOpening, first.style),
-              index: 0,
-            );
-            if (firstBit?.isSpace == true)
-              first.addBit(TextBit.space(first), index: 0);
-          }
 
           var addedClosing = false;
           TextBit lastBit;
@@ -54,6 +46,15 @@ class _TagQ {
 
             return null;
           }, reversed: true);
+
+          if (!addedOpening) {
+            first.addBit(
+              TextBit.text(first, kTagQOpening, first.style),
+              index: 0,
+            );
+            if (firstBit?.isSpace == true)
+              first.addBit(TextBit.space(first), index: 0);
+          }
           if (!addedClosing) {
             last.addText(kTagQClosing);
             if (lastBit?.isSpace == true) last.addBit(TextBit.space(last));

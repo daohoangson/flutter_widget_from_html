@@ -131,7 +131,7 @@ void main() {
       testWidgets('only', (WidgetTester tester) async {
         final html = 'x<q> </q>y';
         final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:x “” y)]'));
+        expect(explained, equals('[RichText:(:x “ ” y)]'));
       });
     });
 
