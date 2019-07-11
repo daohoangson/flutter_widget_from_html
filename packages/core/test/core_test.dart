@@ -97,6 +97,12 @@ void main() {
       expect(explained, equals('[RichText:(:Someone said “Foo”.)]'));
     });
 
+    testWidgets('renders quotes around IMG', (WidgetTester tester) async {
+      final html = '<q><img src="image.png" /></q>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:“[NetworkImage:url=image.png](:”))]'));
+    });
+
     group('renders without erroneous white spaces', () {
       testWidgets('before', (WidgetTester tester) async {
         final html = 'Someone said<q> Foo</q>.';
@@ -125,7 +131,7 @@ void main() {
       testWidgets('only', (WidgetTester tester) async {
         final html = 'x<q> </q>y';
         final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:x“ ”y)]'));
+        expect(explained, equals('[RichText:(:x “” y)]'));
       });
     });
 
@@ -189,7 +195,7 @@ void main() {
     testWidgets('renders FIGURE/FIGCAPTION tags', (WidgetTester tester) async {
       final html = """
 <figure>
-  <img src="image.png">
+  <img src="image.png" />
   <figcaption><i>fig. 1</i> Foo</figcaption>
 </figure>
 """;
@@ -753,21 +759,21 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     });
 
     testWidgets('renders center image', (WidgetTester t) async {
-      final h = '<div style="text-align: center"><img src="image.png"></div>';
+      final h = '<div style="text-align: center"><img src="image.png" /></div>';
       final explained = await explain(t, h, imageUrlToPrecache: 'image.png');
       expect(explained,
           equals('[RichText,align=center:[NetworkImage:url=image.png]]'));
     });
 
     testWidgets('renders left image', (WidgetTester tester) async {
-      final html = '<div style="text-align: left"><img src="image.png"></div>';
+      final html = '<div style="text-align: left"><img src="image.png" /></div>';
       final explained = await explain(tester, html);
       expect(explained,
           equals('[RichText,align=left:[NetworkImage:url=image.png]]'));
     });
 
     testWidgets('renders right image', (WidgetTester tester) async {
-      final html = '<div style="text-align: right"><img src="image.png"></div>';
+      final html = '<div style="text-align: right"><img src="image.png" /></div>';
       final explained = await explain(tester, html);
       expect(explained,
           equals('[RichText,align=right:[NetworkImage:url=image.png]]'));

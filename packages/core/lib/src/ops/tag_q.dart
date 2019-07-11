@@ -18,8 +18,10 @@ class _TagQ {
           if (last?.isNotEmpty != true) return pieces;
 
           var addedOpening = false;
-          var addedClosing = false;
+          TextBit firstBit;
           first.forEachBit((bit, i) {
+            firstBit ??= bit;
+
             if (!bit.isSpace) {
               final bb = bit.block;
               bb.addBit(TextBit.text(bb, kTagQOpening, bb.style), index: i);
@@ -29,13 +31,20 @@ class _TagQ {
 
             return null;
           });
-          if (!addedOpening)
+          if (!addedOpening) {
             first.addBit(
               TextBit.text(first, kTagQOpening, first.style),
               index: 0,
             );
+            if (firstBit?.isSpace == true)
+              first.addBit(TextBit.space(first), index: 0);
+          }
 
+          var addedClosing = false;
+          TextBit lastBit;
           last.forEachBit((bit, i) {
+            lastBit ??= bit;
+
             if (!bit.isSpace) {
               final bb = bit.block;
               bb.addBit(TextBit.text(bb, kTagQClosing, bb.style), index: i + 1);
@@ -45,7 +54,10 @@ class _TagQ {
 
             return null;
           }, reversed: true);
-          if (!addedClosing) last.addText(kTagQClosing);
+          if (!addedClosing) {
+            last.addText(kTagQClosing);
+            if (lastBit?.isSpace == true) last.addBit(TextBit.space(last));
+          }
 
           return pieces;
         },
