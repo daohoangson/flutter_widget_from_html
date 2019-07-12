@@ -7,7 +7,7 @@ Future<String> explain(
   WidgetTester tester,
   String html, {
   WidgetExplainer explainer,
-  HtmlWidgetBuilder hw,
+  HtmlWidget hw,
   String imageUrlToPrecache,
   Uri baseUrl,
   double bodyVerticalPadding = 0,
@@ -15,9 +15,18 @@ Future<String> explain(
   FactoryBuilder factoryBuilder,
   double tableCellPadding = 0,
   TextStyle textStyle,
-  double wrapSpacing = 0,
 }) async {
   assert((html == null) != (hw == null));
+  hw ??= HtmlWidget(
+    html,
+    baseUrl: baseUrl,
+    bodyPadding: EdgeInsets.symmetric(vertical: bodyVerticalPadding),
+    builderCallback: builderCallback,
+    factoryBuilder: factoryBuilder,
+    tableCellPadding: EdgeInsets.all(tableCellPadding),
+    textStyle: textStyle,
+  );
+
   final key = UniqueKey();
 
   await tester.pumpWidget(
@@ -39,10 +48,12 @@ Future<String> explain(
           fontWeight: FontWeight.normal,
         );
 
-        return Theme(
-          child: DefaultTextStyle(key: key, style: style, child: widget0),
-          data: ThemeData(
+        return MaterialApp(
+          theme: ThemeData(
             accentColor: const Color(0xFF123456),
+          ),
+          home: Scaffold(
+            body: DefaultTextStyle(key: key, style: style, child: hw),
           ),
         );
       },
@@ -52,21 +63,7 @@ Future<String> explain(
   final found = find.byKey(key).evaluate().first;
   expect(found.widget, isInstanceOf<DefaultTextStyle>());
 
-  final _ = _Explainer(found, explainer: explainer);
-  final htmlWidget = hw != null
-      ? hw(found)
-      : HtmlWidget(
-          html,
-          baseUrl: baseUrl,
-          bodyPadding: EdgeInsets.symmetric(vertical: bodyVerticalPadding),
-          builderCallback: builderCallback,
-          factoryBuilder: factoryBuilder,
-          tableCellPadding: EdgeInsets.all(tableCellPadding),
-          textStyle: textStyle,
-          wrapSpacing: wrapSpacing,
-        );
-
-  return _.explain(htmlWidget.build(found));
+  return _Explainer(found, explainer: explainer).explain(hw.getBuilt());
 }
 
 final _explainMarginRegExp = RegExp(
@@ -87,7 +84,6 @@ Future<String> explainMargin(
 }
 
 typedef String WidgetExplainer(Widget widget);
-typedef HtmlWidget HtmlWidgetBuilder(BuildContext context);
 
 class _Explainer {
   final BuildContext context;
@@ -125,6 +121,20 @@ class _Explainer {
     final type = i.runtimeType.toString();
     final description = i is NetworkImage ? "url=${i.url}" : '';
     return "[$type:$description]";
+  }
+
+  String _inlineSpan(InlineSpan inlineSpan, {TextStyle parentStyle}) {
+    if (inlineSpan is WidgetSpan) return _widget(inlineSpan.child);
+
+    final style = _textStyle(inlineSpan.style, parentStyle ?? _defaultStyle);
+    final textSpan = inlineSpan is TextSpan ? inlineSpan : null;
+    final onTap = textSpan?.recognizer != null ? '+onTap' : '';
+    final text = textSpan?.text ?? '';
+    final children = textSpan?.children
+            ?.map((c) => _inlineSpan(c, parentStyle: textSpan.style))
+            ?.join('') ??
+        '';
+    return "($style$onTap:$text$children)";
   }
 
   String _limitBox(LimitedBox box) {
@@ -172,18 +182,6 @@ class _Explainer {
       default:
         return '';
     }
-  }
-
-  String _textSpan(TextSpan textSpan, {TextStyle parentStyle}) {
-    final style = _textStyle(textSpan.style, parentStyle ?? _defaultStyle);
-    final onTap = textSpan.recognizer != null ? '+onTap' : '';
-    final text = textSpan.text != null ? textSpan.text : '';
-    final children = textSpan.children != null
-        ? textSpan.children
-            .map((c) => _textSpan(c, parentStyle: textSpan.style))
-            .join('')
-        : '';
-    return "($style$onTap:$text$children)";
   }
 
   String _textStyle(TextStyle style, TextStyle parent) {
@@ -265,6 +263,7 @@ class _Explainer {
     if (explained != null) return explained;
 
     if (widget == widget0) return '[widget0]';
+    if (widget is Image) return _image(widget.image);
 
     final type = widget.runtimeType.toString();
     final text = widget is Align
@@ -275,8 +274,8 @@ class _Explainer {
                 ? _boxDecoration(widget.decoration)
                 : widget is GestureDetector
                     ? "child=${_widget(widget.child)}"
-                    : widget is Image
-                        ? "image=${_image(widget.image)}"
+                    : widget is ImageLayout
+                        ? "child=${_widget(widget.child)},height=${widget.height},width=${widget.width}"
                         : widget is InkWell
                             ? "child=${_widget(widget.child)}"
                             : widget is LimitedBox
@@ -284,7 +283,7 @@ class _Explainer {
                                 : widget is Padding
                                     ? "${_edgeInsets(widget.padding)},"
                                     : widget is RichText
-                                        ? _textSpan(widget.text)
+                                        ? _inlineSpan(widget.text)
                                         : widget is Table
                                             ? _tableBorder(widget.border)
                                             : widget is Text
@@ -297,7 +296,7 @@ class _Explainer {
         : (widget is Text ? widget.textAlign : null));
     final textAlignStr = textAlign.isNotEmpty ? ",align=$textAlign" : '';
     final children = widget is MultiChildRenderObjectWidget
-        ? widget.children?.isNotEmpty == true
+        ? (widget.children?.isNotEmpty == true && !(widget is RichText))
             ? "children=${widget.children.map(_widget).join(',')}"
             : ''
         : widget is ProxyWidget

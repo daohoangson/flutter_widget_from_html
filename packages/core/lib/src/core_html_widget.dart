@@ -42,8 +42,7 @@ class HtmlWidget extends StatelessWidget {
   /// The default styling for text elements.
   final TextStyle textStyle;
 
-  /// The amount of space between [Wrap] children.
-  final double wrapSpacing;
+  Widget _built;
 
   /// Creates a widget that builds Flutter widget tree from html.
   ///
@@ -59,7 +58,6 @@ class HtmlWidget extends StatelessWidget {
     this.onTapUrl,
     this.tableCellPadding = const EdgeInsets.all(5),
     this.textStyle,
-    this.wrapSpacing = 5,
   })  : assert(html != null),
         super(key: key);
 
@@ -78,10 +76,14 @@ class HtmlWidget extends StatelessWidget {
       wf: wf,
     ).build();
 
-    return wf.buildBody(widgets) ?? Text(html);
+    _built = wf.buildBody(widgets) ?? Text(html);
+
+    return _built;
   }
 
   WidgetFactory buildFactory(BuildContext context) => factoryBuilder != null
       ? factoryBuilder(context, this)
       : WidgetFactory(this);
+
+  Widget getBuilt() => _built;
 }

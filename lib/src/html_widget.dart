@@ -50,7 +50,6 @@ class HtmlWidget extends core.HtmlWidget {
     core.OnTapUrl onTapUrl,
     EdgeInsets tableCellPadding = const EdgeInsets.all(5),
     TextStyle textStyle,
-    double wrapSpacing = 5,
     this.unsupportedWebViewWorkaroundForIssue37 = false,
     this.webView = false,
     this.webViewJs = true,
@@ -64,7 +63,6 @@ class HtmlWidget extends core.HtmlWidget {
           onTapUrl: onTapUrl,
           tableCellPadding: tableCellPadding,
           textStyle: textStyle,
-          wrapSpacing: wrapSpacing,
         );
 
   @override

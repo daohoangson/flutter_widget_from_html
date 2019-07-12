@@ -12,7 +12,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Wrap:children=[Image:image=[NetworkImage:url=image.png]]]'),
+        equals('[RichText:[NetworkImage:url=image.png]]'),
       );
     });
 
@@ -21,7 +21,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Wrap:children=[Image:image=[NetworkImage:url=image.png]]]'),
+        equals('[RichText:[NetworkImage:url=image.png]]'),
       );
     });
 
@@ -30,34 +30,37 @@ void main() {
       final html = '<img src="data:image/gif;base64,'
           'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Wrap:children=[Image:image=[MemoryImage:]]]'));
+      expect(explained, equals('[RichText:[MemoryImage:]]'));
     });
 
     testWidgets('renders bad data uri', (WidgetTester tester) async {
       final html = '<img src="data:image/xxx" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Wrap:children=[Text:]]'));
+      expect(explained, equals('[RichText:(:)]'));
     });
 
     testWidgets('renders bad data uri with alt text', (WidgetTester t) async {
       final html = '<img src="data:image/xxx" alt="Foo" />';
       final explained = await explain(t, html);
-      expect(explained, equals('[Wrap:children=[Text:Foo]]'));
+      expect(explained, equals('[RichText:(:Foo)]'));
     });
 
     testWidgets('renders bad data uri with title text', (WidgetTester t) async {
       final html = '<img src="data:image/xxx" title="Foo" />';
       final explained = await explain(t, html);
-      expect(explained, equals('[Wrap:children=[Text:Foo]]'));
+      expect(explained, equals('[RichText:(:Foo)]'));
     });
 
-    testWidgets('renders in one wrap', (WidgetTester tester) async {
-      final html = '<img src="image.png" /><img src="image.png" />';
+    testWidgets('renders in one RichText', (WidgetTester tester) async {
+      final html = '<img src="image.png" /> <img src="image.png" />';
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Wrap:children=[Image:image=[NetworkImage:url=image.png]],'
-            '[Image:image=[NetworkImage:url=image.png]]]'),
+        equals('[RichText:(:'
+            '[NetworkImage:url=image.png]'
+            '(: )'
+            '[NetworkImage:url=image.png]'
+            ')]'),
       );
     });
 
@@ -78,9 +81,11 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Wrap:children=[LimitedBox:h=600.0,w=800.0,child='
-              '[AspectRatio:aspectRatio=1.33,child='
-              '[Image:image=[NetworkImage:url=image.png]]]]]'));
+          equals('[RichText:'
+              '[ImageLayout:child=[NetworkImage:url=image.png],'
+              'height=600.0,'
+              'width=800.0'
+              ']]'));
     });
 
     testWidgets('renders between texts', (WidgetTester tester) async {
@@ -88,9 +93,11 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children=[RichText:(:Before text.)],'
-              '[Wrap:children=[Image:image=[NetworkImage:url=image.png]]],'
-              '[RichText:(:After text.)]]'));
+          equals('[RichText:(:'
+              'Before text. '
+              '[NetworkImage:url=image.png]'
+              '(: After text.)'
+              ')]'));
     });
   });
 
@@ -108,7 +115,7 @@ void main() {
       );
       expect(
         explained,
-        equals('[Wrap:children=[Image:image=[NetworkImage:url=$fullUrl]]]'),
+        equals('[RichText:[NetworkImage:url=$fullUrl]]'),
       );
     };
 

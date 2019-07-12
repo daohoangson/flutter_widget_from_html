@@ -27,16 +27,16 @@ class BlockquoteWebViewScreen extends StatelessWidget {
 class _BlockquoteWebViewWf extends WidgetFactory {
   final buildOp = BuildOp(
     onWidgets: (meta, _) => [
-          WebView(
-            Uri.dataFromString(
-              meta.domElement.innerHtml,
-              mimeType: 'text/html',
-              encoding: Encoding.getByName('utf-8'),
-            ).toString(),
-            aspectRatio: 16 / 9,
-            getDimensions: true,
-          )
-        ],
+      WebView(
+        Uri.dataFromString(
+          meta.domElement.innerHtml,
+          mimeType: 'text/html',
+          encoding: Encoding.getByName('utf-8'),
+        ).toString(),
+        aspectRatio: 16 / 9,
+        getDimensions: true,
+      )
+    ],
   );
 
   _BlockquoteWebViewWf(BuildContext context, HtmlWidget htmlWidget)
@@ -58,11 +58,11 @@ void main() {
     final explained = await explain(
       tester,
       null,
-      hw: (_) => HtmlWidget(
-            html,
-            bodyPadding: const EdgeInsets.all(0),
-            factoryBuilder: (c, hw) => _BlockquoteWebViewWf(c, hw),
-          ),
+      hw: HtmlWidget(
+        html,
+        bodyPadding: const EdgeInsets.all(0),
+        factoryBuilder: (c, hw) => _BlockquoteWebViewWf(c, hw),
+      ),
     );
     expect(
         explained,
