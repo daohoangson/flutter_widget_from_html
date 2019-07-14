@@ -17,17 +17,17 @@ String _explainer(Widget widget) {
 Future<String> explain(
   WidgetTester tester,
   String html, {
-  _coreTesting.HtmlWidgetBuilder hw,
+  HtmlWidget hw,
   bool webView = false,
 }) async =>
     _coreTesting.explain(
       tester,
       null,
       hw: hw ??
-          (_) => HtmlWidget(
-                html,
-                bodyPadding: const EdgeInsets.all(0),
-                webView: webView,
-              ),
+          HtmlWidget(
+            html,
+            bodyPadding: const EdgeInsets.all(0),
+            webView: webView,
+          ),
       explainer: _explainer,
     );

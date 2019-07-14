@@ -53,7 +53,6 @@ class WidgetFactory {
       buildPadding(buildColumn(children), _htmlWidget.bodyPadding);
 
   Widget buildColumn(Iterable<Widget> children) {
-    children = fixWraps(children);
     children = fixOverlappingPaddings(children);
     if (children?.isNotEmpty != true) return null;
 
@@ -129,13 +128,10 @@ class WidgetFactory {
     width ??= 0;
     if (height <= 0 || width <= 0) return imageWidget;
 
-    return LimitedBox(
-      child: AspectRatio(
-        aspectRatio: width / height,
-        child: imageWidget,
-      ),
-      maxHeight: height,
-      maxWidth: width,
+    return ImageLayout(
+      child: imageWidget,
+      height: height,
+      width: width,
     );
   }
 
@@ -302,16 +298,6 @@ class WidgetFactory {
     );
   }
 
-  Widget buildWrap(Iterable<Widget> children) {
-    if (children?.isNotEmpty != true) return null;
-
-    return Wrap(
-      children: children.toList(),
-      runSpacing: _htmlWidget.wrapSpacing ?? 0,
-      spacing: _htmlWidget.wrapSpacing ?? 0,
-    );
-  }
-
   String constructFullUrl(String url) {
     if (url?.isNotEmpty != true) return null;
     final p = Uri.tryParse(url);
@@ -381,25 +367,6 @@ class WidgetFactory {
               : Padding(child: p.child, padding: v)
           : widget);
       prev = v;
-    }
-
-    return fixed;
-  }
-
-  List<Widget> fixWraps(Iterable<Widget> widgets) {
-    if (widgets?.isNotEmpty != true) return null;
-    final fixed = <Widget>[];
-
-    for (final widget in widgets) {
-      if (fixed.isEmpty || !(widget is Wrap) || !(fixed.last is Wrap)) {
-        fixed.add(widget);
-        continue;
-      }
-
-      final last = fixed.isEmpty ? null : fixed.removeLast() as Wrap;
-      final merged = (last?.children?.toList() ?? <Widget>[])
-        ..addAll((widget as Wrap).children);
-      fixed.add(buildWrap(merged));
     }
 
     return fixed;

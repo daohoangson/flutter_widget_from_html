@@ -1,6 +1,8 @@
 part of '../core_widget_factory.dart';
 
 const kTagQ = 'q';
+const kTagQOpening = '“';
+const kTagQClosing = '”';
 
 class _TagQ {
   final WidgetFactory wf;
@@ -14,28 +16,48 @@ class _TagQ {
 
           final last = pieces.last.block;
           if (last?.isNotEmpty != true) return pieces;
-          final lastHasTrailingSpace = last.iterable.last.isSpace;
 
-          first.rebuildBits(
-            (firstBit) => firstBit.rebuild(
-                  data: firstBit.isSpace ? ' “' : '“${firstBit.data}',
-                  style: firstBit.style ?? first.style,
-                ),
-            start: first.indexStart,
-            end: first.indexStart + 1,
-          );
+          var addedOpening = false;
+          TextBit firstBit;
+          first.forEachBit((bit, i) {
+            firstBit ??= bit;
 
-          last.rebuildBits(
-            (lastBit) => lastBit.rebuild(
-                  data: (lastBit.data ?? '') + '”',
-                  style: lastBit.style ?? last.style,
-                ),
-            start: last.indexEnd - 1,
-            end: last.indexEnd,
-          );
+            if (!bit.isSpace) {
+              final bb = bit.block;
+              bb.addBit(TextBit.text(bb, kTagQOpening, bb.style), index: i);
+              addedOpening = true;
+              return false;
+            }
 
-          if (lastHasTrailingSpace) {
-            last.addSpace();
+            return null;
+          });
+
+          var addedClosing = false;
+          TextBit lastBit;
+          last.forEachBit((bit, i) {
+            lastBit ??= bit;
+
+            if (!bit.isSpace) {
+              final bb = bit.block;
+              bb.addBit(TextBit.text(bb, kTagQClosing, bb.style), index: i + 1);
+              addedClosing = true;
+              return false;
+            }
+
+            return null;
+          }, reversed: true);
+
+          if (!addedOpening) {
+            first.addBit(
+              TextBit.text(first, kTagQOpening, first.style),
+              index: 0,
+            );
+            if (firstBit?.isSpace == true)
+              first.addBit(TextBit.space(first), index: 0);
+          }
+          if (!addedClosing) {
+            last.addText(kTagQClosing);
+            if (lastBit?.isSpace == true) last.addBit(TextBit.space(last));
           }
 
           return pieces;
