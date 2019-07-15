@@ -55,10 +55,10 @@ class _State extends State<VideoScreen> {
             subtitle: HtmlWidget(
               _html,
               key: Key(_html),
-              baseUrl: Uri.parse('https://www.w3schools.com/html'),
+              baseUrl: Uri.parse('https://www.w3schools.com/html/'),
             ),
           ),
-          Center(child: Text('---')),
+          Center(child: Text('----')),
         ]),
       );
 

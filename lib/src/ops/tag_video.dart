@@ -1,40 +1,45 @@
 part of '../widget_factory.dart';
 
-class TagVideo {
+class _TagVideo {
   final WidgetFactory wf;
 
-  final _sourceBuildOp = BuildOp(onWidgets: (meta, _) {
-    final a = meta.domElement.attributes;
-    if (!a.containsKey('src')) return null;
-    return [_Source(a['src'])];
-  });
+  BuildOp _sourceOp;
 
-  TagVideo(this.wf);
+  _TagVideo(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onChild: (meta, e) => e.localName == 'source'
-            ? lazySet(null, buildOp: _sourceBuildOp)
-            : null,
+        onChild: (meta, e) =>
+            e.localName == 'source' ? lazySet(null, buildOp: sourceOp) : null,
         onWidgets: (meta, widgets) {
           final player = build(
             meta,
             widgets
-                .map<String>((w) => w is _Source ? w.src : null)
-                .where((s) => s?.isNotEmpty == true),
+                .map<String>((w) => w is _TagVideoSource ? w.url : null)
+                .where((s) => s != null),
           );
           return player != null ? [player] : null;
         },
       );
 
-  Widget build(NodeMetadata meta, Iterable<String> sources) {
-    if (sources.isEmpty) return null;
+  BuildOp get sourceOp {
+    _sourceOp ??= BuildOp(onWidgets: (meta, _) {
+      final a = meta.domElement.attributes;
+      if (!a.containsKey('src')) return null;
 
-    final src = wf.constructFullUrl(sources.first);
-    if (src == null) return null;
+      final url = wf.constructFullUrl(a['src']);
+      if (url == null) return null;
+
+      return [_TagVideoSource(url)];
+    });
+    return _sourceOp;
+  }
+
+  Widget build(NodeMetadata meta, Iterable<String> urls) {
+    if (urls.isEmpty) return null;
 
     final a = meta.domElement.attributes;
     return wf.buildVideoPlayer(
-      src,
+      urls.first,
       autoplay: a.containsKey('autoplay'),
       controls: a.containsKey('controls'),
       height: a.containsKey('height') ? double.tryParse(a['height']) : null,
@@ -44,10 +49,10 @@ class TagVideo {
   }
 }
 
-class _Source extends StatelessWidget {
-  final String src;
+class _TagVideoSource extends StatelessWidget {
+  final String url;
 
-  _Source(this.src);
+  _TagVideoSource(this.url);
 
   @override
   Widget build(BuildContext context) => core.widget0;

@@ -115,7 +115,7 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   BuildOp tagVideo() {
-    _tagVideo ??= TagVideo(this).buildOp;
+    _tagVideo ??= _TagVideo(this).buildOp;
     return _tagVideo;
   }
 }
