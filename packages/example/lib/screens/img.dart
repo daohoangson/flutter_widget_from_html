@@ -49,20 +49,16 @@ class _State extends State<ImgScreen> {
   Android:
 
   <img src="$android" />
-
-  <img src="$android" width="96" height="96" />
-
   <img src="$android" width="48" height="48" />
+  <img src="$android" width="12" height="12" />
 </p>
 
 <p>
   iOS:
 
   <img src="$ios" />
-
-  <img src="$ios" width="96" height="96" />
-
   <img src="$ios" width="48" height="48" />
+  <img src="$ios" width="12" height="12" />
 </p>
 """;
   }
@@ -79,19 +75,16 @@ class _State extends State<ImgScreen> {
 
   <img src="$android" />
 
-  <img width="96" height="96" src="$android" />
-
   <img width="48" height="48" src="$android" />
+  <img width="12" height="12" src="$android" />
 </p>
 
 <p>
   iOS:
 
   <img src="$ios" />
-
-  <img width="96" height="96" src="$ios" />
-
   <img width="48" height="48" src="$ios" />
+  <img width="12" height="12" src="$ios" />
 </p>
 """;
   }

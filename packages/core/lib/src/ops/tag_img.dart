@@ -31,6 +31,10 @@ class _ImageLayoutDelegate extends SingleChildLayoutDelegate {
         ratio = width / height;
 
   @override
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
+      BoxConstraints.tight(getSize(constraints));
+
+  @override
   Size getSize(BoxConstraints bc) {
     final w = width < bc.maxWidth ? width : bc.maxWidth;
     final h = height < bc.maxHeight ? height : bc.maxHeight;
