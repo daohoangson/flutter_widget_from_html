@@ -9,6 +9,7 @@ String _explainer(Widget widget) {
   if (widget is CachedNetworkImage)
     return "[CachedNetworkImage:${widget.imageUrl}]";
 
+  if (widget is VideoPlayer) return widget.toString();
   if (widget is WebView) return widget.toString();
 
   return null;

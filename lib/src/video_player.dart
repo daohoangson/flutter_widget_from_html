@@ -25,6 +25,16 @@ class VideoPlayer extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() => _VideoPlayerState();
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.debug}) =>
+      "[VideoPlayer:url=$url,"
+      "aspectRatio=${aspectRatio.toStringAsFixed(2)},"
+      "autoResize=${autoResize ? 1 : 0},"
+      "autoplay=${autoplay ? 1 : 0},"
+      "controls=${controls ? 1 : 0},"
+      "loop=${loop ? 1 : 0}"
+      ']';
 }
 
 class _VideoPlayerState extends State<VideoPlayer> {
