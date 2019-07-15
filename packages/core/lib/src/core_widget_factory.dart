@@ -18,9 +18,7 @@ part 'ops/tag_q.dart';
 part 'ops/tag_table.dart';
 part 'ops/text.dart';
 
-final _baseUriTrimmingRegExp = RegExp(r'/+$');
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
-final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
 
 class WidgetFactory {
   final HtmlWidget _htmlWidget;
@@ -55,7 +53,6 @@ class WidgetFactory {
       buildPadding(buildColumn(children), _htmlWidget.bodyPadding);
 
   Widget buildColumn(Iterable<Widget> children) {
-    children = fixWraps(children);
     children = fixOverlappingPaddings(children);
     if (children?.isNotEmpty != true) return null;
 
@@ -108,28 +105,33 @@ class WidgetFactory {
     });
   }
 
-  GestureTapCallback buildGestureTapCallbackForUrl(String url) =>
-      () => _htmlWidget.onTapUrl != null
+  GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
+      ? () => _htmlWidget.onTapUrl != null
           ? _htmlWidget.onTapUrl(url)
-          : debugPrint(url);
+          : debugPrint(url)
+      : null;
 
-  Widget buildImage(String src, {double height, String text, double width}) {
-    final imageWidget = src?.startsWith('data:image') == true
-        ? buildImageFromDataUri(src)
-        : buildImageFromUrl(src);
+  Widget buildImage(String url, {double height, String text, double width}) {
+    Widget imageWidget;
+    if (url != null) {
+      if (url.startsWith('asset:')) {
+        imageWidget = buildImageFromAsset(url);
+      } else if (url.startsWith('data:')) {
+        imageWidget = buildImageFromDataUri(url);
+      } else {
+        imageWidget = buildImageFromUrl(url);
+      }
+    }
     if (imageWidget == null) return Text(text ?? '');
 
     height ??= 0;
     width ??= 0;
     if (height <= 0 || width <= 0) return imageWidget;
 
-    return LimitedBox(
-      child: AspectRatio(
-        aspectRatio: width / height,
-        child: imageWidget,
-      ),
-      maxHeight: height,
-      maxWidth: width,
+    return ImageLayout(
+      child: imageWidget,
+      height: height,
+      width: width,
     );
   }
 
@@ -142,6 +144,22 @@ class WidgetFactory {
     if (bytes.length == 0) return null;
 
     return bytes;
+  }
+
+  Widget buildImageFromAsset(String url) {
+    final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
+    if (uri?.scheme != 'asset') return null;
+
+    final assetName = uri.path;
+    if (assetName?.isNotEmpty != true) return null;
+
+    final package = uri.queryParameters?.containsKey('package') == true
+        ? uri.queryParameters['package']
+        : null;
+
+    final asset = AssetImage(assetName, package: package);
+
+    return Image(image: asset, fit: BoxFit.cover);
   }
 
   Widget buildImageFromDataUri(String dataUri) {
@@ -280,31 +298,16 @@ class WidgetFactory {
     );
   }
 
-  Widget buildWrap(Iterable<Widget> children) {
-    if (children?.isNotEmpty != true) return null;
-
-    return Wrap(
-      children: children.toList(),
-      runSpacing: _htmlWidget.wrapSpacing ?? 0,
-      spacing: _htmlWidget.wrapSpacing ?? 0,
-    );
-  }
-
   String constructFullUrl(String url) {
     if (url?.isNotEmpty != true) return null;
-    if (url.startsWith(_isFullUrlRegExp)) return url;
+    final p = Uri.tryParse(url);
+    if (p == null) return null;
+    if (p.hasScheme) return p.toString();
 
     final b = _htmlWidget.baseUrl;
     if (b == null) return null;
 
-    if (url.startsWith('//')) return "${b.scheme}:$url";
-
-    if (url.startsWith('/')) {
-      final port = b.hasPort ? ":${b.port}" : '';
-      return "${b.scheme}://${b.host}$port$url";
-    }
-
-    return "${b.toString().replaceAll(_baseUriTrimmingRegExp, '')}/$url";
+    return b.resolveUri(p).toString();
   }
 
   List<Widget> fixOverlappingPaddings(List<Widget> widgets) {
@@ -364,25 +367,6 @@ class WidgetFactory {
               : Padding(child: p.child, padding: v)
           : widget);
       prev = v;
-    }
-
-    return fixed;
-  }
-
-  List<Widget> fixWraps(Iterable<Widget> widgets) {
-    if (widgets?.isNotEmpty != true) return null;
-    final fixed = <Widget>[];
-
-    for (final widget in widgets) {
-      if (fixed.isEmpty || !(widget is Wrap) || !(fixed.last is Wrap)) {
-        fixed.add(widget);
-        continue;
-      }
-
-      final last = fixed.isEmpty ? null : fixed.removeLast() as Wrap;
-      final merged = (last?.children?.toList() ?? <Widget>[])
-        ..addAll((widget as Wrap).children);
-      fixed.add(buildWrap(merged));
     }
 
     return fixed;

@@ -3,35 +3,30 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '_.dart' as _;
-import '../packages/core/test/_.dart' as _coreTesting;
 
-Future<String> explain(WidgetTester t, _coreTesting.HtmlWidgetBuilder hw) =>
+Future<String> explain(WidgetTester t, HtmlWidget hw) =>
     _.explain(t, null, hw: hw);
 
 void main() {
   group('baseUrl', () {
-    final baseUrl = Uri.parse('http://base.com/path');
-    final html = '<img src="image.png" />';
+    final baseUrl = Uri.parse('http://base.com/path/');
+    final html = '<img src="image.png" alt="image dot png" />';
 
     testWidgets('renders without value', (WidgetTester tester) async {
-      final explained = await explain(tester, (_) => HtmlWidget(html));
-      expect(
-          explained,
-          equals('[Padding:(10,10,10,10),child='
-              '[Wrap:spacing=5.0,runSpacing=5.0,'
-              'children=[CachedNetworkImage:image.png]]]'));
+      final explained = await explain(tester, HtmlWidget(html));
+      expect(explained,
+          equals('[Padding:(10,10,10,10),child=[RichText:(:image dot png)]]'));
     });
 
     testWidgets('renders with value', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        (_) => HtmlWidget(html, baseUrl: baseUrl),
+        HtmlWidget(html, baseUrl: baseUrl),
       );
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[Wrap:spacing=5.0,runSpacing=5.0,'
-              'children=[CachedNetworkImage:http://base.com/path/image.png]]]'));
+              '[RichText:[CachedNetworkImage:http://base.com/path/image.png]]]'));
     });
   });
 
@@ -40,7 +35,7 @@ void main() {
     final html = 'Foo';
 
     testWidgets('renders default value', (WidgetTester tester) async {
-      final explained = await explain(tester, (_) => HtmlWidget(html));
+      final explained = await explain(tester, HtmlWidget(html));
       expect(
         explained,
         equals('[Padding:(10,10,10,10),child=[RichText:(:Foo)]]'),
@@ -50,7 +45,7 @@ void main() {
     testWidgets('renders custom value', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        (_) => HtmlWidget(html, bodyPadding: bodyPadding),
+        HtmlWidget(html, bodyPadding: bodyPadding),
       );
       expect(explained, equals('[Padding:(5,5,5,5),child=[RichText:(:Foo)]]'));
     });
@@ -58,7 +53,7 @@ void main() {
     testWidgets('renders null value', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        (_) => HtmlWidget(html, bodyPadding: null),
+        HtmlWidget(html, bodyPadding: null),
       );
       expect(explained, equals('[RichText:(:Foo)]'));
     });
@@ -70,7 +65,7 @@ void main() {
     final html = '<span>Foo</span>';
 
     testWidgets('renders without value', (WidgetTester tester) async {
-      final explained = await explain(tester, (_) => HtmlWidget(html));
+      final explained = await explain(tester, HtmlWidget(html));
       expect(
         explained,
         equals('[Padding:(10,10,10,10),child=[RichText:(:Foo)]]'),
@@ -80,7 +75,7 @@ void main() {
     testWidgets('renders with value', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        (_) => HtmlWidget(html, builderCallback: builderCallback),
+        HtmlWidget(html, builderCallback: builderCallback),
       );
       expect(
         explained,
@@ -94,22 +89,22 @@ void main() {
     final html = '<a>Foo</a>';
 
     testWidgets('renders without value', (WidgetTester tester) async {
-      final explained = await explain(tester, (_) => HtmlWidget(html));
+      final explained = await explain(tester, HtmlWidget(html));
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[RichText:(#FF123456+u+onTap:Foo)]]'));
+              '[RichText:(#FF123456+u:Foo)]]'));
     });
 
     testWidgets('renders with value', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        (_) => HtmlWidget(html, hyperlinkColor: hyperlinkColor),
+        HtmlWidget(html, hyperlinkColor: hyperlinkColor),
       );
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[RichText:(#FFFF0000+u+onTap:Foo)]]'));
+              '[RichText:(#FFFF0000+u:Foo)]]'));
     });
   });
 
@@ -120,7 +115,7 @@ void main() {
     final html = '<table><tr><td>Foo</td></tr></table>';
 
     testWidgets('renders default value', (WidgetTester tester) async {
-      final explained = await explain(tester, (_) => HtmlWidget(html));
+      final explained = await explain(tester, HtmlWidget(html));
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child=[Table:\n'
@@ -130,7 +125,7 @@ void main() {
     testWidgets('renders custom value', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        (_) => HtmlWidget(html, tableCellPadding: tableCellPadding),
+        HtmlWidget(html, tableCellPadding: tableCellPadding),
       );
       expect(
           explained,
@@ -141,7 +136,7 @@ void main() {
     testWidgets('renders null value', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        (_) => HtmlWidget(html, tableCellPadding: null),
+        HtmlWidget(html, tableCellPadding: null),
       );
       expect(
         explained,
@@ -154,7 +149,7 @@ void main() {
     final html = 'Foo';
 
     testWidgets('renders without value', (WidgetTester tester) async {
-      final explained = await explain(tester, (_) => HtmlWidget(html));
+      final explained = await explain(tester, HtmlWidget(html));
       expect(
         explained,
         equals('[Padding:(10,10,10,10),child=[RichText:(:Foo)]]'),
@@ -164,12 +159,10 @@ void main() {
     testWidgets('renders with value', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        (context) => HtmlWidget(
-              html,
-              textStyle: DefaultTextStyle.of(context)
-                  .style
-                  .copyWith(fontStyle: FontStyle.italic),
-            ),
+        HtmlWidget(
+          html,
+          textStyle: TextStyle(fontStyle: FontStyle.italic),
+        ),
       );
       expect(
         explained,
@@ -178,48 +171,11 @@ void main() {
     });
   });
 
-  group('wrapSpacing', () {
-    final wrapSpacing = 10.0;
-    final html = '<img src="image.png" />';
-
-    testWidgets('renders default value', (WidgetTester tester) async {
-      final explained = await explain(tester, (_) => HtmlWidget(html));
-      expect(
-          explained,
-          equals('[Padding:(10,10,10,10),child='
-              '[Wrap:spacing=5.0,runSpacing=5.0,'
-              'children=[CachedNetworkImage:image.png]]]'));
-    });
-
-    testWidgets('renders custom value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        (_) => HtmlWidget(html, wrapSpacing: wrapSpacing),
-      );
-      expect(
-          explained,
-          equals('[Padding:(10,10,10,10),child='
-              '[Wrap:spacing=10.0,runSpacing=10.0,'
-              'children=[CachedNetworkImage:image.png]]]'));
-    });
-
-    testWidgets('renders null value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        (_) => HtmlWidget(html, wrapSpacing: null),
-      );
-      expect(
-          explained,
-          equals('[Padding:(10,10,10,10),child='
-              '[Wrap:children=[CachedNetworkImage:image.png]]]'));
-    });
-  });
-
   group('webView', () {
     final html = '<iframe src="http://domain.com"></iframe>';
 
     testWidgets('renders default value', (WidgetTester tester) async {
-      final explained = await explain(tester, (_) => HtmlWidget(html));
+      final explained = await explain(tester, HtmlWidget(html));
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
@@ -229,10 +185,10 @@ void main() {
     testWidgets('renders true value', (WidgetTester tester) async {
       final explained = await explain(
           tester,
-          (_) => HtmlWidget(
-                html,
-                webView: true,
-              ));
+          HtmlWidget(
+            html,
+            webView: true,
+          ));
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
@@ -242,10 +198,10 @@ void main() {
     testWidgets('renders false value', (WidgetTester tester) async {
       final explained = await explain(
           tester,
-          (_) => HtmlWidget(
-                html,
-                webView: false,
-              ));
+          HtmlWidget(
+            html,
+            webView: false,
+          ));
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
@@ -255,10 +211,10 @@ void main() {
     testWidgets('renders null value', (WidgetTester tester) async {
       final explained = await explain(
           tester,
-          (_) => HtmlWidget(
-                html,
-                webView: null,
-              ));
+          HtmlWidget(
+            html,
+            webView: null,
+          ));
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
@@ -269,11 +225,11 @@ void main() {
       testWidgets('renders true value', (WidgetTester tester) async {
         final explained = await explain(
             tester,
-            (_) => HtmlWidget(
-                  html,
-                  webView: true,
-                  webViewJs: true,
-                ));
+            HtmlWidget(
+              html,
+              webView: true,
+              webViewJs: true,
+            ));
         expect(
             explained,
             equals('[Padding:(10,10,10,10),child='
@@ -283,11 +239,11 @@ void main() {
       testWidgets('renders false value', (WidgetTester tester) async {
         final explained = await explain(
             tester,
-            (_) => HtmlWidget(
-                  html,
-                  webView: true,
-                  webViewJs: false,
-                ));
+            HtmlWidget(
+              html,
+              webView: true,
+              webViewJs: false,
+            ));
         expect(
             explained,
             equals('[Padding:(10,10,10,10),child='
@@ -297,11 +253,11 @@ void main() {
       testWidgets('renders null value', (WidgetTester tester) async {
         final explained = await explain(
             tester,
-            (_) => HtmlWidget(
-                  html,
-                  webView: true,
-                  webViewJs: null,
-                ));
+            HtmlWidget(
+              html,
+              webView: true,
+              webViewJs: null,
+            ));
         expect(
             explained,
             equals('[Padding:(10,10,10,10),child='

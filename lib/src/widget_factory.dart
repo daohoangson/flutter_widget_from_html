@@ -33,16 +33,19 @@ class WidgetFactory extends core.WidgetFactory {
       InkWell(child: child, onTap: onTap);
 
   @override
-  GestureTapCallback buildGestureTapCallbackForUrl(String url) =>
-      () => _htmlWidget.onTapUrl != null
+  GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
+      ? () => _htmlWidget.onTapUrl != null
           ? _htmlWidget.onTapUrl(url)
-          : canLaunch(url).then((ok) => ok ? launch(url) : null);
+          : canLaunch(url).then((ok) => ok ? launch(url) : null)
+      : null;
 
   @override
-  Widget buildImageFromUrl(String url) => CachedNetworkImage(
-        imageUrl: url,
-        fit: BoxFit.cover,
-      );
+  Widget buildImageFromUrl(String url) => url?.isNotEmpty == true
+      ? CachedNetworkImage(
+          imageUrl: url,
+          fit: BoxFit.cover,
+        )
+      : null;
 
   Widget buildVideoPlayer(
     String url, {

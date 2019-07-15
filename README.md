@@ -67,7 +67,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
   - `.webViewPadding`
   - To render IFRAME as web view: set `webView=true` in config and [setup iOS project manually](https://pub.dartlang.org/packages/webview_flutter#ios).
   - If the IFRAME has no `width` and `height` attributes, the web view will be rendered initially in a 16:9 box and automatically resize itself afterwards.
-- IMG with support for data uri and remote url via [`CachedNetworkImage`](https://pub.dartlang.org/packages/cached_network_image)
+- IMG with support for asset (`asset://`), data uri and network image via [`CachedNetworkImage`](https://pub.dartlang.org/packages/cached_network_image)
 - LI/OL/UL
 - TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
   - `<table border="1">`

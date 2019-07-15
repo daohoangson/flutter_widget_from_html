@@ -97,6 +97,13 @@ void main() {
       expect(explained, equals('[RichText:(:Someone said “Foo”.)]'));
     });
 
+    testWidgets('renders quotes around IMG', (WidgetTester tester) async {
+      final src = 'http://domain.com/image.png';
+      final html = '<q><img src="$src" /></q>';
+      final explained = await explain(tester, html, imageUrlToPrecache: src);
+      expect(explained, equals("[RichText:(:“[NetworkImage:url=$src](:”))]"));
+    });
+
     group('renders without erroneous white spaces', () {
       testWidgets('before', (WidgetTester tester) async {
         final html = 'Someone said<q> Foo</q>.';
@@ -125,7 +132,7 @@ void main() {
       testWidgets('only', (WidgetTester tester) async {
         final html = 'x<q> </q>y';
         final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:x “” y)]'));
+        expect(explained, equals('[RichText:(:x “ ” y)]'));
       });
     });
 
@@ -187,22 +194,23 @@ void main() {
     });
 
     testWidgets('renders FIGURE/FIGCAPTION tags', (WidgetTester tester) async {
+      final src = 'http://domain.com/image.png';
       final html = """
 <figure>
-  <img src="image.png">
+  <img src="$src">
   <figcaption><i>fig. 1</i> Foo</figcaption>
 </figure>
 """;
       final explained = await explainMargin(
         tester,
         html,
-        imageUrlToPrecache: 'image.png',
+        imageUrlToPrecache: src,
       );
       expect(
           explained,
           equals(
             '[Padding:(10,0,0,0),child=[widget0]],'
-            '[Padding:(0,40,0,40),child=[Wrap:children=[Image:image=[NetworkImage:url=image.png]]]],'
+            '[Padding:(0,40,0,40),child=[RichText:[NetworkImage:url=$src]]],'
             '[Padding:(0,40,0,40),child=[RichText:(+i:fig. 1(: Foo))]],'
             '[Padding:(0,0,10,0),child=[widget0]]',
           ));
@@ -504,40 +512,46 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(explained, equals('[RichText:(:1)]'));
     });
 
-    testWidgets('renders IMG inline by default', (WidgetTester tester) async {
-      final html = '<img src="image.png" />';
-      final e = await explain(tester, html, imageUrlToPrecache: "image.png");
-      expect(
-        e,
-        equals('[Wrap:children=[Image:image=[NetworkImage:url=image.png]]]'),
-      );
-    });
+    group('IMG', () {
+      final src = 'http://domain.com/image.png';
 
-    testWidgets('renders IMG as block', (WidgetTester tester) async {
-      final html = '<img src="image.png" style="display: block" />';
-      final e = await explain(tester, html, imageUrlToPrecache: "image.png");
-      expect(e, equals('[Image:image=[NetworkImage:url=image.png]]'));
-    });
+      testWidgets('renders IMG inline by default', (WidgetTester tester) async {
+        final html = '<img src="$src" />';
+        final explained = await explain(tester, html, imageUrlToPrecache: src);
+        expect(explained, equals("[RichText:[NetworkImage:url=$src]]"));
+      });
 
-    testWidgets('renders IMG with dimensions', (WidgetTester tester) async {
-      final html = '<img src="image.png" width="1" height="1" />';
-      final e = await explain(tester, html, imageUrlToPrecache: "image.png");
-      expect(
-          e,
-          equals('[Wrap:children=[LimitedBox:h=1.0,w=1.0,child='
-              '[AspectRatio:aspectRatio=1.00,child='
-              '[Image:image=[NetworkImage:url=image.png]]]]]'));
-    });
+      testWidgets('renders IMG as block', (WidgetTester tester) async {
+        final html = '<img src="$src" style="display: block" />';
+        final explained = await explain(tester, html, imageUrlToPrecache: src);
+        expect(explained, equals("[Wrap:children=[NetworkImage:url=$src]]"));
+      });
 
-    testWidgets('renders IMG with dimensions 2', (tester) async {
-      final html = '<img src="image.png" width="1" '
-          'height="1" style="display: block" />';
-      final e = await explain(tester, html, imageUrlToPrecache: "image.png");
-      expect(
-          e,
-          equals('[Wrap:children=[LimitedBox:h=1.0,w=1.0,child='
-              '[AspectRatio:aspectRatio=1.00,child='
-              '[Image:image=[NetworkImage:url=image.png]]]]]'));
+      testWidgets('renders IMG with dimensions inline',
+          (WidgetTester tester) async {
+        final html = '<img src="$src" width="1" height="1" />';
+        final explained = await explain(tester, html, imageUrlToPrecache: src);
+        expect(
+            explained,
+            equals('[RichText:[ImageLayout:child='
+                "[NetworkImage:url=$src],"
+                'height=1.0,'
+                'width=1.0'
+                ']]'));
+      });
+
+      testWidgets('renders IMG with dimensions as block', (tester) async {
+        final html = '<img src="$src" width="1" '
+            'height="1" style="display: block" />';
+        final explained = await explain(tester, html, imageUrlToPrecache: src);
+        expect(
+            explained,
+            equals('[Wrap:children=[ImageLayout:child='
+                "[NetworkImage:url=$src],"
+                'height=1.0,'
+                'width=1.0'
+                ']]'));
+      });
     });
   });
 
@@ -717,83 +731,6 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           explained,
           equals('[RichText:(+b:bold(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: four )' +
               '(+w4:five)(: )(+w5:six)(: )(+b:seven)(: )(+w7:eight)(: )(+w8:nine))]'));
-    });
-  });
-
-  group('text-align', () {
-    testWidgets('renders CENTER tag', (WidgetTester tester) async {
-      final html = '<center>Foo</center>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=center:(:Foo)]'));
-    });
-
-    testWidgets('renders center text', (WidgetTester tester) async {
-      final html = '<div style="text-align: center">_X_</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=center:(:_X_)]'));
-    });
-
-    testWidgets('renders justify text', (WidgetTester tester) async {
-      final html = '<div style="text-align: justify">X_X_X</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=justify:(:X_X_X)]'));
-    });
-
-    testWidgets('renders left text', (WidgetTester tester) async {
-      final html = '<div style="text-align: left">X__</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=left:(:X__)]'));
-    });
-
-    testWidgets('renders right text', (WidgetTester tester) async {
-      final html = '<div style="text-align: right">__<b>X</b></div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=right:(:__(+b:X))]'));
-    });
-
-    testWidgets('renders center image', (WidgetTester t) async {
-      final h = '<div style="text-align: center"><img src="image.png"></div>';
-      final explained = await explain(t, h, imageUrlToPrecache: 'image.png');
-      expect(
-          explained,
-          equals('[Align:alignment=center,child=[Wrap:children='
-              '[Image:image=[NetworkImage:url=image.png]]]]'));
-    });
-
-    testWidgets('renders left image', (WidgetTester tester) async {
-      final html = '<div style="text-align: left"><img src="image.png"></div>';
-      final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[Align:alignment=centerLeft,child=[Wrap:children='
-              '[Image:image=[NetworkImage:url=image.png]]]]'));
-    });
-
-    testWidgets('renders right image', (WidgetTester tester) async {
-      final html = '<div style="text-align: right"><img src="image.png"></div>';
-      final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[Align:alignment=centerRight,child=[Wrap:children='
-              '[Image:image=[NetworkImage:url=image.png]]]]'));
-    });
-
-    testWidgets('renders styling from outside', (WidgetTester tester) async {
-      // https://github.com/daohoangson/flutter_widget_from_html/issues/10
-      final html = '<em><span style="color: red;">' +
-          '<div style="text-align: right;">right</div></span></em>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=right:(+i:right)]'));
-    });
-
-    testWidgets('renders margin inside', (WidgetTester tester) async {
-      final html = '<div style="text-align: center">'
-          '<div style="margin: 5px">Foo</div></div>';
-      final explained = await explainMargin(tester, html);
-      expect(
-          explained,
-          equals('[Padding:(5,5,5,5),child='
-              '[Align:alignment=center,child=[RichText:(:Foo)]]]'));
     });
   });
 
