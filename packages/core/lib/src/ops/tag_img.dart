@@ -31,6 +31,10 @@ class _ImageLayoutDelegate extends SingleChildLayoutDelegate {
         ratio = width / height;
 
   @override
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
+      BoxConstraints.tight(getSize(constraints));
+
+  @override
   Size getSize(BoxConstraints bc) {
     final w = width < bc.maxWidth ? width : bc.maxWidth;
     final h = height < bc.maxHeight ? height : bc.maxHeight;
@@ -118,7 +122,7 @@ class _TagImg {
     return _TagImgMetadata(
       height: _getDouble(attrs, 'height', 'data-height'),
       text: _getAttr(attrs, 'alt', 'title'),
-      url: wf.constructFullUrl(src) ?? src,
+      url: wf.constructFullUrl(src),
       width: _getDouble(attrs, 'width', 'data-width'),
     );
   }

@@ -18,9 +18,7 @@ part 'ops/tag_q.dart';
 part 'ops/tag_table.dart';
 part 'ops/text.dart';
 
-final _baseUriTrimmingRegExp = RegExp(r'/+$');
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
-final _isFullUrlRegExp = RegExp(r'^(https?://|mailto:|tel:)');
 
 class WidgetFactory {
   final HtmlWidget _htmlWidget;
@@ -107,15 +105,23 @@ class WidgetFactory {
     });
   }
 
-  GestureTapCallback buildGestureTapCallbackForUrl(String url) =>
-      () => _htmlWidget.onTapUrl != null
+  GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
+      ? () => _htmlWidget.onTapUrl != null
           ? _htmlWidget.onTapUrl(url)
-          : debugPrint(url);
+          : debugPrint(url)
+      : null;
 
-  Widget buildImage(String src, {double height, String text, double width}) {
-    final imageWidget = src?.startsWith('data:image') == true
-        ? buildImageFromDataUri(src)
-        : buildImageFromUrl(src);
+  Widget buildImage(String url, {double height, String text, double width}) {
+    Widget imageWidget;
+    if (url != null) {
+      if (url.startsWith('asset:')) {
+        imageWidget = buildImageFromAsset(url);
+      } else if (url.startsWith('data:')) {
+        imageWidget = buildImageFromDataUri(url);
+      } else {
+        imageWidget = buildImageFromUrl(url);
+      }
+    }
     if (imageWidget == null) return Text(text ?? '');
 
     height ??= 0;
@@ -138,6 +144,22 @@ class WidgetFactory {
     if (bytes.length == 0) return null;
 
     return bytes;
+  }
+
+  Widget buildImageFromAsset(String url) {
+    final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
+    if (uri?.scheme != 'asset') return null;
+
+    final assetName = uri.path;
+    if (assetName?.isNotEmpty != true) return null;
+
+    final package = uri.queryParameters?.containsKey('package') == true
+        ? uri.queryParameters['package']
+        : null;
+
+    final asset = AssetImage(assetName, package: package);
+
+    return Image(image: asset, fit: BoxFit.cover);
   }
 
   Widget buildImageFromDataUri(String dataUri) {
@@ -278,19 +300,14 @@ class WidgetFactory {
 
   String constructFullUrl(String url) {
     if (url?.isNotEmpty != true) return null;
-    if (url.startsWith(_isFullUrlRegExp)) return url;
+    final p = Uri.tryParse(url);
+    if (p == null) return null;
+    if (p.hasScheme) return p.toString();
 
     final b = _htmlWidget.baseUrl;
     if (b == null) return null;
 
-    if (url.startsWith('//')) return "${b.scheme}:$url";
-
-    if (url.startsWith('/')) {
-      final port = b.hasPort ? ":${b.port}" : '';
-      return "${b.scheme}://${b.host}$port$url";
-    }
-
-    return "${b.toString().replaceAll(_baseUriTrimmingRegExp, '')}/$url";
+    return b.resolveUri(p).toString();
   }
 
   List<Widget> fixOverlappingPaddings(List<Widget> widgets) {

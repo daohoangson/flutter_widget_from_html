@@ -98,13 +98,10 @@ void main() {
     });
 
     testWidgets('renders quotes around IMG', (WidgetTester tester) async {
-      final html = '<q><img src="image.png" /></q>';
-      final e = await explain(
-        tester,
-        html,
-        imageUrlToPrecache: 'image.png',
-      );
-      expect(e, equals('[RichText:(:“[NetworkImage:url=image.png](:”))]'));
+      final src = 'http://domain.com/image.png';
+      final html = '<q><img src="$src" /></q>';
+      final explained = await explain(tester, html, imageUrlToPrecache: src);
+      expect(explained, equals("[RichText:(:“[NetworkImage:url=$src](:”))]"));
     });
 
     group('renders without erroneous white spaces', () {
@@ -197,22 +194,23 @@ void main() {
     });
 
     testWidgets('renders FIGURE/FIGCAPTION tags', (WidgetTester tester) async {
+      final src = 'http://domain.com/image.png';
       final html = """
 <figure>
-  <img src="image.png" />
+  <img src="$src">
   <figcaption><i>fig. 1</i> Foo</figcaption>
 </figure>
 """;
       final explained = await explainMargin(
         tester,
         html,
-        imageUrlToPrecache: 'image.png',
+        imageUrlToPrecache: src,
       );
       expect(
           explained,
           equals(
             '[Padding:(10,0,0,0),child=[widget0]],'
-            '[Padding:(0,40,0,40),child=[RichText:[NetworkImage:url=image.png]]],'
+            '[Padding:(0,40,0,40),child=[RichText:[NetworkImage:url=$src]]],'
             '[Padding:(0,40,0,40),child=[RichText:(+i:fig. 1(: Foo))]],'
             '[Padding:(0,0,10,0),child=[widget0]]',
           ));
@@ -514,41 +512,46 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(explained, equals('[RichText:(:1)]'));
     });
 
-    testWidgets('renders IMG inline by default', (WidgetTester tester) async {
-      final html = '<img src="image.png" />';
-      final e = await explain(tester, html, imageUrlToPrecache: "image.png");
-      expect(e, equals('[RichText:[NetworkImage:url=image.png]]'));
-    });
+    group('IMG', () {
+      final src = 'http://domain.com/image.png';
 
-    testWidgets('renders IMG as block', (WidgetTester tester) async {
-      final html = '<img src="image.png" style="display: block" />';
-      final e = await explain(tester, html, imageUrlToPrecache: "image.png");
-      expect(e, equals('[Wrap:children=[NetworkImage:url=image.png]]'));
-    });
+      testWidgets('renders IMG inline by default', (WidgetTester tester) async {
+        final html = '<img src="$src" />';
+        final explained = await explain(tester, html, imageUrlToPrecache: src);
+        expect(explained, equals("[RichText:[NetworkImage:url=$src]]"));
+      });
 
-    testWidgets('renders IMG with dimensions', (WidgetTester tester) async {
-      final html = '<img src="image.png" width="1" height="1" />';
-      final e = await explain(tester, html, imageUrlToPrecache: "image.png");
-      expect(
-          e,
-          equals('[RichText:[ImageLayout:child='
-              '[NetworkImage:url=image.png],'
-              'height=1.0,'
-              'width=1.0'
-              ']]'));
-    });
+      testWidgets('renders IMG as block', (WidgetTester tester) async {
+        final html = '<img src="$src" style="display: block" />';
+        final explained = await explain(tester, html, imageUrlToPrecache: src);
+        expect(explained, equals("[Wrap:children=[NetworkImage:url=$src]]"));
+      });
 
-    testWidgets('renders IMG with dimensions 2', (tester) async {
-      final html = '<img src="image.png" width="1" '
-          'height="1" style="display: block" />';
-      final e = await explain(tester, html, imageUrlToPrecache: "image.png");
-      expect(
-          e,
-          equals('[Wrap:children=[ImageLayout:child='
-              '[NetworkImage:url=image.png],'
-              'height=1.0,'
-              'width=1.0'
-              ']]'));
+      testWidgets('renders IMG with dimensions inline',
+          (WidgetTester tester) async {
+        final html = '<img src="$src" width="1" height="1" />';
+        final explained = await explain(tester, html, imageUrlToPrecache: src);
+        expect(
+            explained,
+            equals('[RichText:[ImageLayout:child='
+                "[NetworkImage:url=$src],"
+                'height=1.0,'
+                'width=1.0'
+                ']]'));
+      });
+
+      testWidgets('renders IMG with dimensions as block', (tester) async {
+        final html = '<img src="$src" width="1" '
+            'height="1" style="display: block" />';
+        final explained = await explain(tester, html, imageUrlToPrecache: src);
+        expect(
+            explained,
+            equals('[Wrap:children=[ImageLayout:child='
+                "[NetworkImage:url=$src],"
+                'height=1.0,'
+                'width=1.0'
+                ']]'));
+      });
     });
   });
 

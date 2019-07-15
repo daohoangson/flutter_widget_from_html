@@ -9,15 +9,13 @@ Future<String> explain(WidgetTester t, HtmlWidget hw) =>
 
 void main() {
   group('baseUrl', () {
-    final baseUrl = Uri.parse('http://base.com/path');
-    final html = '<img src="image.png" />';
+    final baseUrl = Uri.parse('http://base.com/path/');
+    final html = '<img src="image.png" alt="image dot png" />';
 
     testWidgets('renders without value', (WidgetTester tester) async {
       final explained = await explain(tester, HtmlWidget(html));
-      expect(
-          explained,
-          equals('[Padding:(10,10,10,10),child='
-              '[RichText:[CachedNetworkImage:image.png]]]'));
+      expect(explained,
+          equals('[Padding:(10,10,10,10),child=[RichText:(:image dot png)]]'));
     });
 
     testWidgets('renders with value', (WidgetTester tester) async {
@@ -95,7 +93,7 @@ void main() {
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[RichText:(#FF123456+u+onTap:Foo)]]'));
+              '[RichText:(#FF123456+u:Foo)]]'));
     });
 
     testWidgets('renders with value', (WidgetTester tester) async {
@@ -106,7 +104,7 @@ void main() {
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[RichText:(#FFFF0000+u+onTap:Foo)]]'));
+              '[RichText:(#FFFF0000+u:Foo)]]'));
     });
   });
 

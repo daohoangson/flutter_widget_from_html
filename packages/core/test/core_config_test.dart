@@ -18,8 +18,8 @@ Future<String> explain(
 
 void main() {
   group('baseUrl', () {
-    final baseUrl = Uri.parse('http://base.com/path');
-    final html = '<img src="image.png" />';
+    final baseUrl = Uri.parse('http://base.com/path/');
+    final html = '<img src="image.png" alt="image dot png" />';
 
     testWidgets('renders without value', (WidgetTester tester) async {
       final explained = await explain(
@@ -30,7 +30,7 @@ void main() {
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[RichText:[NetworkImage:url=image.png]]]'));
+              '[RichText:(:image dot png)]]'));
     });
 
     testWidgets('renders with value', (WidgetTester tester) async {
@@ -109,7 +109,7 @@ void main() {
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[RichText:(#FF0000FF+u+onTap:Foo)]]'));
+              '[RichText:(#FF0000FF+u:Foo)]]'));
     });
 
     testWidgets('renders custom value', (WidgetTester tester) async {
@@ -120,7 +120,7 @@ void main() {
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[RichText:(#FFFF0000+u+onTap:Foo)]]'));
+              '[RichText:(#FFFF0000+u:Foo)]]'));
     });
 
     testWidgets('renders null value', (WidgetTester tester) async {
@@ -131,7 +131,7 @@ void main() {
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[RichText:(+u+onTap:Foo)]]'));
+              '[RichText:(+u:Foo)]]'));
     });
   });
 

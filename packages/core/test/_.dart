@@ -117,9 +117,12 @@ class _Explainer {
       "(${e.top.truncate()},${e.right.truncate()}," +
       "${e.bottom.truncate()},${e.left.truncate()})";
 
-  String _image(ImageProvider i) {
-    final type = i.runtimeType.toString();
-    final description = i is NetworkImage ? "url=${i.url}" : '';
+  String _image(ImageProvider provider) {
+    final type = provider.runtimeType.toString();
+    final description = provider is AssetImage
+        ? "assetName=${provider.assetName}" +
+            (provider.package != null ? ",package=${provider.package}" : '')
+        : provider is NetworkImage ? "url=${provider.url}" : '';
     return "[$type:$description]";
   }
 

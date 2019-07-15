@@ -44,8 +44,8 @@ class _TagA {
 
   GestureTapCallback _buildGestureTapCallback(NodeMetadata meta) {
     final attrs = meta.domElement.attributes;
-    final href = attrs.containsKey('href') ? attrs['href'] : '';
-    final url = wf.constructFullUrl(href) ?? href;
+    final href = attrs.containsKey('href') ? attrs['href'] : null;
+    final url = wf.constructFullUrl(href);
     return wf.buildGestureTapCallbackForUrl(url);
   }
 }

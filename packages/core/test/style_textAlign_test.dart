@@ -57,25 +57,28 @@ void main() {
   });
 
   group('image', () {
-    final kImgHtml = '<img src="image.png" />';
-    final kImgRendered = '[NetworkImage:url=image.png]';
+    final imgSrc = 'http://domain.com/image.png';
+    final imgHtml = '<img src="$imgSrc" />';
+    final imgRendered = "[NetworkImage:url=$imgSrc]";
+    final imgExplain = (WidgetTester tester, String html) =>
+        explain(tester, html, imageUrlToPrecache: imgSrc);
 
-    testWidgets('renders center image', (WidgetTester t) async {
-      final h = '<div style="text-align: center">$kImgHtml</div>';
-      final explained = await explain(t, h, imageUrlToPrecache: 'image.png');
-      expect(explained, equals('[RichText,align=center:$kImgRendered]'));
+    testWidgets('renders center image', (WidgetTester tester) async {
+      final html = '<div style="text-align: center">$imgHtml</div>';
+      final explained = await imgExplain(tester, html);
+      expect(explained, equals('[RichText,align=center:$imgRendered]'));
     });
 
     testWidgets('renders left image', (WidgetTester tester) async {
-      final html = '<div style="text-align: left">$kImgHtml</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=left:$kImgRendered]'));
+      final html = '<div style="text-align: left">$imgHtml</div>';
+      final explained = await imgExplain(tester, html);
+      expect(explained, equals('[RichText,align=left:$imgRendered]'));
     });
 
     testWidgets('renders right image', (WidgetTester tester) async {
-      final html = '<div style="text-align: right">$kImgHtml</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=right:$kImgRendered]'));
+      final html = '<div style="text-align: right">$imgHtml</div>';
+      final explained = await imgExplain(tester, html);
+      expect(explained, equals('[RichText,align=right:$imgRendered]'));
     });
   });
 
