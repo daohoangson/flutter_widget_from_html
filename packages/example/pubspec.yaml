@@ -13,6 +13,7 @@ dependencies:
   flutter_widget_from_html_core:
     path: ../../packages/core
   html: any
+  provider: ^3.0.0+1
 
 dev_dependencies:
   flutter_driver:

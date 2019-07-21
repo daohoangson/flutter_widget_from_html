@@ -6,6 +6,7 @@ import 'hello_world_core.dart';
 import 'iframe.dart';
 import 'img.dart';
 import 'smilie.dart';
+import 'video.dart';
 
 class HomeScreen extends StatelessWidget {
   final _htmls = {
@@ -35,6 +36,19 @@ class HomeScreen extends StatelessWidget {
 <div style="text-align: right">Right</div>
 <div style="text-align: justify">${"J u s t i f y. " * 20}</div>
 """,
+    'Code': """PRE tag:
+
+<pre>
+// this may not show up with the correct monspace font on iOS because of a Flutter bug
+// for more information, see https://github.com/flutter/flutter/issues/19280
+&lt;?php
+    highlight_string('&lt;?php phpinfo(); ?&gt;');
+?&gt;
+</pre>
+
+CODE tag:
+
+<code><span style="color: #000000"><span style="color: #0000BB">&lt;?php phpinfo</span><span style="color: #007700">(); </span><span style="color: #0000BB">?&gt;</span></span></code>""",
     'Iframe': () => IframeScreen(),
     'Images': () => ImgScreen(),
     'List ordered': """<ol>
@@ -75,6 +89,11 @@ class HomeScreen extends StatelessWidget {
   <li>Ten</li>
   <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nibh quam, sodales in sollicitudin ut, scelerisque non sapien. Nam nec mi malesuada libero euismod tincidunt sit amet mattis ipsum. Etiam dapibus sem ac accumsan elementum. Vivamus mattis at diam ac pellentesque. Sed id eros condimentum, dignissim risus id, semper enim. Etiam tempor mauris id lorem fringilla, dapibus feugiat enim placerat. In hac habitasse platea dictumst. Nam est felis, accumsan et sapien ac, molestie convallis sapien. Vivamus ligula sapien, ultrices quis nisl ac, blandit hendrerit massa. Maecenas eleifend, nisi eget commodo mollis, elit magna pellentesque odio, sit amet auctor quam nibh vel purus. Integer ultricies lacinia ipsum, in tincidunt erat finibus eget.</li>
 </ol>""",
+    'Margin': """<div>No margin</div>
+<div style="margin: 5px 10px">margin: 5px 10px</div>
+<div style="margin: 3px">margin: 3px</div>
+<div style="margin: 1px"><div style="margin: 2px">Margin within another</div></div>
+""",
     'Table': """
 <table border="1">
   <caption>Source: <a href="https://www.w3schools.com/html/html_tables.asp">w3schools</a></caption>
@@ -95,24 +114,7 @@ class HomeScreen extends StatelessWidget {
   </tr>
 </table>
 """,
-    'Code': """PRE tag:
-
-<pre>
-// this may not show up with the correct monspace font on iOS because of a Flutter bug
-// for more information, see https://github.com/flutter/flutter/issues/19280
-&lt;?php
-    highlight_string('&lt;?php phpinfo(); ?&gt;');
-?&gt;
-</pre>
-
-CODE tag:
-
-<code><span style="color: #000000"><span style="color: #0000BB">&lt;?php phpinfo</span><span style="color: #007700">(); </span><span style="color: #0000BB">?&gt;</span></span></code>""",
-    'Margin': """<div>No margin</div>
-<div style="margin: 5px 10px">margin: 5px 10px</div>
-<div style="margin: 3px">margin: 3px</div>
-<div style="margin: 1px"><div style="margin: 2px">Margin within another</div></div>
-"""
+    'Video': () => VideoScreen(),
   };
 
   @override

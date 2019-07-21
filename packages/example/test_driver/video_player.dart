@@ -9,28 +9,6 @@ void main() {
   runApp(TestApp());
 }
 
-const html = """
-<body style="background: gray; margin: 0">
-  <div id="block" style="background: black; color: white;">&nbsp;</div>
-  <script>
-    var attempts = 0;
-    var block = document.getElementById('block');
-
-    function resize() {
-      attempts++;
-      var width = window.innerWidth;
-      if (width === 0) return setTimeout(resize, 10);
-
-      var height = width / {input};
-      block.style.height = height + 'px';
-      block.innerHTML = 'input={input}, attempts=' + attempts;
-    }
-
-    resize();
-  </script>
-</body>
-""";
-
 class TestApp extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _TestAppState();
@@ -56,28 +34,34 @@ class _TestAppState extends State<TestApp> {
       );
 
   Widget _buildButton(String value) => RaisedButton(
-        child: Text(value),
-        key: ValueKey("input-$value"),
+        child: Text(
+          value,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        key: ValueKey("$value"),
         onPressed: () => setState(() => input = value),
       );
 
   Widget _buildButtons() => Row(
         children: <Widget>[
-          Expanded(child: _buildButton('1.0')),
-          Expanded(child: _buildButton('2.0')),
-          Expanded(child: _buildButton('3.0')),
+          Expanded(
+            child: _buildButton(''),
+          ),
+          Expanded(
+            child: _buildButton(
+              'https://www.w3schools.com/html/mov_bbb.mp4',
+            ),
+          ),
         ],
       );
 
   Widget _buildAspectRatioTester() => input.length > 0
       ? AspectRatioTester(
-          child: WebView(
-            Uri.dataFromString(
-              html.replaceAll('{input}', input),
-              mimeType: 'text/html',
-            ).toString(),
-            aspectRatio: 16 / 9,
-            getDimensions: true,
+          child: VideoPlayer(
+            input,
+            aspectRatio: 1,
+            autoResize: true,
           ),
           key: ValueKey(input),
           resultKey: ValueKey('output'),

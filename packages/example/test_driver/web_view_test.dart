@@ -20,10 +20,6 @@ void main() {
       }
     });
 
-    test('starts at 0', () async {
-      expect(await driver.getText(rFinder), '0.00');
-    });
-
     test('resizes to 1.0', () async {
       await driver.tap(s1Finder);
       await Future.delayed(Duration(seconds: 10));
