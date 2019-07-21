@@ -1,3 +1,10 @@
+## 0.2.2
+
+* Intercept all navigation requests within IFRAME (#48)
+* Add support for InlineSpan / inline image (PR #53, issue #7)
+* Add support for asset:// image (PR #52, issue #51)
+* Add support for new tag: VIDEO (PR #47, issue #46)
+
 ## 0.2.1+1
 
 * Merge `textStyle` with default for easy usage (#45)

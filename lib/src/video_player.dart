@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart' as lib;
-import 'package:video_player/video_player.dart' as lib;
 
 class VideoPlayer extends StatefulWidget {
   final String url;
