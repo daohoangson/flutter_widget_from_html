@@ -11,7 +11,6 @@ class WebView extends StatefulWidget {
   final List<Duration> getDimensionsDurations;
   final _InterceptNavigationRequest interceptNavigationRequest;
   final bool js;
-  final WebViewOnDimensions onDimensions;
 
   // https://github.com/daohoangson/flutter_widget_from_html/issues/37
   final bool unsupportedWorkaroundForIssue37;
@@ -29,7 +28,6 @@ class WebView extends StatefulWidget {
     this.js = true,
     this.unsupportedWorkaroundForIssue37 = false,
     Key key,
-    this.onDimensions,
   })  : assert(url != null),
         assert(aspectRatio != null),
         // `js` must be true for `getDimensions` to work
@@ -125,9 +123,6 @@ class _WebViewState extends State<WebView> {
     final r = (h > 0 && w > 0) ? (w / h) : _aspectRatio;
     final changed = (r - _aspectRatio).abs() > 0.0001;
     if (changed && mounted) setState(() => _aspectRatio = r);
-
-    final f = widget.onDimensions;
-    if (f != null) f(r, changed, h, w);
   }
 
   lib.NavigationDecision _interceptNavigationRequest(String url) {
@@ -143,13 +138,6 @@ class _WebViewState extends State<WebView> {
         : lib.NavigationDecision.navigate;
   }
 }
-
-typedef void WebViewOnDimensions(
-  double aspectRatio,
-  bool changed,
-  double height,
-  double width,
-);
 
 typedef bool _InterceptNavigationRequest(String url);
 
