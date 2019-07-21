@@ -38,63 +38,68 @@ class VideoPlayer extends StatefulWidget {
 }
 
 class _VideoPlayerState extends State<VideoPlayer> {
-  lib.VideoPlayerController _vpc;
-  lib.ChewieController _cc;
-
-  double _aspectRatio;
-  VoidCallback _aspectRatioListener;
-
-  bool get needSizing => widget.autoResize == true && _aspectRatio == null;
+  _Controller _controller;
 
   @override
   void initState() {
     super.initState();
+    _controller = _Controller(this);
 
-    _vpc = lib.VideoPlayerController.network(widget.url);
-
-    if (needSizing) {
-      _aspectRatioListener = () {
-        if (_aspectRatio == null) {
-          final vpv = _vpc.value;
-          if (!vpv.initialized) return;
-
-          setState(() {
-            _aspectRatio = vpv.aspectRatio;
-            _initChewieController();
-          });
-        }
-
-        _vpc.removeListener(_aspectRatioListener);
-      };
-      _vpc.addListener(_aspectRatioListener);
+    if (widget.autoResize == true) {
+      _controller._autoResize(() => setState(() {}));
     }
-
-    _initChewieController();
   }
 
   @override
   void dispose() {
-    _vpc.dispose();
-    _cc.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => lib.Chewie(
-        controller: _cc,
-        key: ValueKey(_cc),
-      );
+  Widget build(BuildContext context) => lib.Chewie(controller: _controller);
+}
 
-  void _initChewieController() {
-    _cc?.dispose();
+class _Controller extends lib.ChewieController {
+  final VideoPlayer widget;
 
-    _cc = lib.ChewieController(
-      aspectRatio: _aspectRatio ?? widget.aspectRatio,
-      autoInitialize: true,
-      autoPlay: widget.autoplay == true,
-      looping: widget.loop == true,
-      showControls: widget.controls == true && !needSizing,
-      videoPlayerController: _vpc,
-    );
+  double _aspectRatio;
+
+  _Controller(_VideoPlayerState vps)
+      : widget = vps.widget,
+        super(
+          autoInitialize: true,
+          autoPlay: vps.widget.autoplay == true,
+          looping: vps.widget.loop == true,
+          showControls: vps.widget.controls == true,
+          videoPlayerController:
+              lib.VideoPlayerController.network(vps.widget.url),
+        );
+
+  @override
+  double get aspectRatio => _aspectRatio ?? widget.aspectRatio;
+
+  @override
+  void dispose() {
+    super.dispose();
+    videoPlayerController.dispose();
+  }
+
+  void _autoResize(VoidCallback f) {
+    VoidCallback listener;
+
+    listener = () {
+      if (_aspectRatio == null) {
+        final vpv = videoPlayerController.value;
+        if (!vpv.initialized) return;
+
+        _aspectRatio = vpv.aspectRatio;
+        f();
+      }
+
+      videoPlayerController.removeListener(listener);
+    };
+
+    videoPlayerController.addListener(listener);
   }
 }
