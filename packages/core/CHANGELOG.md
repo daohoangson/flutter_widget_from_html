@@ -1,3 +1,7 @@
+## 0.2.2+1
+
+* Update coding convention
+
 ## 0.2.2
 
 * Intercept all navigation requests within IFRAME (#48)
