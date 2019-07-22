@@ -71,15 +71,15 @@ class _TagLi {
     int i = 0;
     return children.map(
       (widget) => Stack(
-            children: <Widget>[
-              _buildBody(widget, paddingLeft),
-              _buildMarker(
-                wf.getListStyleMarker(listStyleType, ++i),
-                meta.textStyle,
-                paddingLeft,
-              ),
-            ],
+        children: <Widget>[
+          _buildBody(widget, paddingLeft),
+          _buildMarker(
+            wf.getListStyleMarker(listStyleType, ++i),
+            meta.textStyle,
+            paddingLeft,
           ),
+        ],
+      ),
     );
   }
 

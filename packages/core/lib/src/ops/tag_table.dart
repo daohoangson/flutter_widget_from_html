@@ -74,8 +74,8 @@ class _TagTable {
   BuildOp get semanticOp {
     _semanticOp ??= BuildOp(
       onWidgets: (meta, widgets) => [
-            _SemanticWidget(meta.domElement.localName, widgets),
-          ],
+        _SemanticWidget(meta.domElement.localName, widgets),
+      ],
       priority: _kTagTableOpPriority,
     );
     return _semanticOp;
