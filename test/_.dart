@@ -5,6 +5,8 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../packages/core/test/_.dart' as _coreTesting;
 
+final coreHwKey = _coreTesting.hwKey;
+
 String _explainer(Widget widget) {
   if (widget is CachedNetworkImage)
     return "[CachedNetworkImage:${widget.imageUrl}]";
@@ -28,6 +30,7 @@ Future<String> explain(
           HtmlWidget(
             html,
             bodyPadding: const EdgeInsets.all(0),
+            key: _coreTesting.hwKey,
             webView: webView,
           ),
       explainer: _explainer,

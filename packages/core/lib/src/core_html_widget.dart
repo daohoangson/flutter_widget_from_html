@@ -7,7 +7,7 @@ import 'core_widget_factory.dart';
 import 'data_classes.dart';
 
 /// A widget that builds Flutter widget tree from html.
-class HtmlWidget extends StatelessWidget {
+class HtmlWidget extends StatefulWidget {
   /// The input string.
   ///
   /// It should contains at least HTML and BODY elements (something like
@@ -42,8 +42,6 @@ class HtmlWidget extends StatelessWidget {
   /// The default styling for text elements.
   final TextStyle textStyle;
 
-  Widget _built;
-
   /// Creates a widget that builds Flutter widget tree from html.
   ///
   /// The [html] argument must not be null.
@@ -61,7 +59,6 @@ class HtmlWidget extends StatelessWidget {
   })  : assert(html != null),
         super(key: key);
 
-  @override
   Widget build(BuildContext context) {
     final domNodes = parser.parse(html).body.nodes;
     final parentTextStyle = (textStyle == null || textStyle.inherit)
@@ -76,14 +73,25 @@ class HtmlWidget extends StatelessWidget {
       wf: wf,
     ).build();
 
-    _built = wf.buildBody(widgets) ?? Text(html);
-
-    return _built;
+    return wf.buildBody(widgets) ?? Text(html);
   }
 
   WidgetFactory buildFactory(BuildContext context) => factoryBuilder != null
       ? factoryBuilder(context, this)
       : WidgetFactory(this);
 
-  Widget getBuilt() => _built;
+  @override
+  State<HtmlWidget> createState() => HtmlWidgetState();
+}
+
+class HtmlWidgetState extends State<HtmlWidget> {
+  Widget _built;
+
+  Widget get built => _built;
+
+  @override
+  Widget build(BuildContext context) {
+    _built = widget.build(context);
+    return _built;
+  }
 }

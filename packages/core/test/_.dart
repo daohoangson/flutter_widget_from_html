@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
+final hwKey = GlobalKey<HtmlWidgetState>();
+
 Future<String> explain(
   WidgetTester tester,
   String html, {
@@ -23,11 +25,10 @@ Future<String> explain(
     bodyPadding: EdgeInsets.symmetric(vertical: bodyVerticalPadding),
     builderCallback: builderCallback,
     factoryBuilder: factoryBuilder,
+    key: hwKey,
     tableCellPadding: EdgeInsets.all(tableCellPadding),
     textStyle: textStyle,
   );
-
-  final key = UniqueKey();
 
   await tester.pumpWidget(
     StatefulBuilder(
@@ -53,17 +54,17 @@ Future<String> explain(
             accentColor: const Color(0xFF123456),
           ),
           home: Scaffold(
-            body: DefaultTextStyle(key: key, style: style, child: hw),
+            body: DefaultTextStyle(style: style, child: hw),
           ),
         );
       },
     ),
   );
 
-  final found = find.byKey(key).evaluate().first;
-  expect(found.widget, isInstanceOf<DefaultTextStyle>());
+  final hws = hwKey.currentState;
+  expect(hws, isNotNull);
 
-  return _Explainer(found, explainer: explainer).explain(hw.getBuilt());
+  return _Explainer(hws.context, explainer: explainer).explain(hws.built);
 }
 
 final _explainMarginRegExp = RegExp(

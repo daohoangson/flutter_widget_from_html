@@ -19,6 +19,7 @@ class BlockquoteWebViewScreen extends StatelessWidget {
           HtmlWidget(
             html,
             factoryBuilder: (c, hw) => _BlockquoteWebViewWf(c, hw),
+            key: coreHwKey,
           ),
         ]),
       );
@@ -62,6 +63,7 @@ void main() {
         html,
         bodyPadding: const EdgeInsets.all(0),
         factoryBuilder: (c, hw) => _BlockquoteWebViewWf(c, hw),
+        key: coreHwKey,
       ),
     );
     expect(

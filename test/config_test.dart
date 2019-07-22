@@ -13,15 +13,15 @@ void main() {
     final html = '<img src="image.png" alt="image dot png" />';
 
     testWidgets('renders without value', (WidgetTester tester) async {
-      final explained = await explain(tester, HtmlWidget(html));
-      expect(explained,
+      final e = await explain(tester, HtmlWidget(html, key: _.coreHwKey));
+      expect(e,
           equals('[Padding:(10,10,10,10),child=[RichText:(:image dot png)]]'));
     });
 
     testWidgets('renders with value', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        HtmlWidget(html, baseUrl: baseUrl),
+        HtmlWidget(html, baseUrl: baseUrl, key: _.coreHwKey),
       );
       expect(
           explained,
@@ -35,17 +35,14 @@ void main() {
     final html = 'Foo';
 
     testWidgets('renders default value', (WidgetTester tester) async {
-      final explained = await explain(tester, HtmlWidget(html));
-      expect(
-        explained,
-        equals('[Padding:(10,10,10,10),child=[RichText:(:Foo)]]'),
-      );
+      final e = await explain(tester, HtmlWidget(html, key: _.coreHwKey));
+      expect(e, equals('[Padding:(10,10,10,10),child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('renders custom value', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        HtmlWidget(html, bodyPadding: bodyPadding),
+        HtmlWidget(html, bodyPadding: bodyPadding, key: _.coreHwKey),
       );
       expect(explained, equals('[Padding:(5,5,5,5),child=[RichText:(:Foo)]]'));
     });
@@ -53,7 +50,7 @@ void main() {
     testWidgets('renders null value', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        HtmlWidget(html, bodyPadding: null),
+        HtmlWidget(html, bodyPadding: null, key: _.coreHwKey),
       );
       expect(explained, equals('[RichText:(:Foo)]'));
     });
@@ -65,17 +62,14 @@ void main() {
     final html = '<span>Foo</span>';
 
     testWidgets('renders without value', (WidgetTester tester) async {
-      final explained = await explain(tester, HtmlWidget(html));
-      expect(
-        explained,
-        equals('[Padding:(10,10,10,10),child=[RichText:(:Foo)]]'),
-      );
+      final e = await explain(tester, HtmlWidget(html, key: _.coreHwKey));
+      expect(e, equals('[Padding:(10,10,10,10),child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('renders with value', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        HtmlWidget(html, builderCallback: builderCallback),
+        HtmlWidget(html, builderCallback: builderCallback, key: _.coreHwKey),
       );
       expect(
         explained,
@@ -89,9 +83,9 @@ void main() {
     final html = '<a>Foo</a>';
 
     testWidgets('renders without value', (WidgetTester tester) async {
-      final explained = await explain(tester, HtmlWidget(html));
+      final e = await explain(tester, HtmlWidget(html, key: _.coreHwKey));
       expect(
-          explained,
+          e,
           equals('[Padding:(10,10,10,10),child='
               '[RichText:(#FF123456+u:Foo)]]'));
     });
@@ -99,7 +93,7 @@ void main() {
     testWidgets('renders with value', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        HtmlWidget(html, hyperlinkColor: hyperlinkColor),
+        HtmlWidget(html, hyperlinkColor: hyperlinkColor, key: _.coreHwKey),
       );
       expect(
           explained,
@@ -115,9 +109,9 @@ void main() {
     final html = '<table><tr><td>Foo</td></tr></table>';
 
     testWidgets('renders default value', (WidgetTester tester) async {
-      final explained = await explain(tester, HtmlWidget(html));
+      final e = await explain(tester, HtmlWidget(html, key: _.coreHwKey));
       expect(
-          explained,
+          e,
           equals('[Padding:(10,10,10,10),child=[Table:\n'
               '[Padding:(5,5,5,5),child=[RichText:(:Foo)]]\n]]'));
     });
@@ -125,7 +119,7 @@ void main() {
     testWidgets('renders custom value', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        HtmlWidget(html, tableCellPadding: tableCellPadding),
+        HtmlWidget(html, key: _.coreHwKey, tableCellPadding: tableCellPadding),
       );
       expect(
           explained,
@@ -136,7 +130,7 @@ void main() {
     testWidgets('renders null value', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        HtmlWidget(html, tableCellPadding: null),
+        HtmlWidget(html, key: _.coreHwKey, tableCellPadding: null),
       );
       expect(
         explained,
@@ -149,25 +143,20 @@ void main() {
     final html = 'Foo';
 
     testWidgets('renders without value', (WidgetTester tester) async {
-      final explained = await explain(tester, HtmlWidget(html));
-      expect(
-        explained,
-        equals('[Padding:(10,10,10,10),child=[RichText:(:Foo)]]'),
-      );
+      final e = await explain(tester, HtmlWidget(html, key: _.coreHwKey));
+      expect(e, equals('[Padding:(10,10,10,10),child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('renders with value', (WidgetTester tester) async {
-      final explained = await explain(
+      final e = await explain(
         tester,
         HtmlWidget(
           html,
+          key: _.coreHwKey,
           textStyle: TextStyle(fontStyle: FontStyle.italic),
         ),
       );
-      expect(
-        explained,
-        equals('[Padding:(10,10,10,10),child=[RichText:(+i:Foo)]]'),
-      );
+      expect(e, equals('[Padding:(10,10,10,10),child=[RichText:(+i:Foo)]]'));
     });
   });
 
@@ -176,9 +165,9 @@ void main() {
     final html = '<iframe src="$webViewSrc"></iframe>';
 
     testWidgets('renders default value', (WidgetTester tester) async {
-      final explained = await explain(tester, HtmlWidget(html));
+      final e = await explain(tester, HtmlWidget(html, key: _.coreHwKey));
       expect(
-          explained,
+          e,
           equals('[Padding:(10,10,10,10),child='
               "[GestureDetector:child=[Text:$webViewSrc]]"
               ']'));
@@ -189,6 +178,7 @@ void main() {
           tester,
           HtmlWidget(
             html,
+            key: _.coreHwKey,
             webView: true,
           ));
       expect(
@@ -203,6 +193,7 @@ void main() {
           tester,
           HtmlWidget(
             html,
+            key: _.coreHwKey,
             webView: false,
           ));
       expect(
@@ -216,6 +207,7 @@ void main() {
           tester,
           HtmlWidget(
             html,
+            key: _.coreHwKey,
             webView: null,
           ));
       expect(
@@ -232,6 +224,7 @@ void main() {
             tester,
             HtmlWidget(
               html,
+              key: _.coreHwKey,
               webView: true,
               webViewJs: true,
             ));
@@ -247,6 +240,7 @@ void main() {
             tester,
             HtmlWidget(
               html,
+              key: _.coreHwKey,
               webView: true,
               webViewJs: false,
             ));
@@ -262,6 +256,7 @@ void main() {
             tester,
             HtmlWidget(
               html,
+              key: _.coreHwKey,
               webView: true,
               webViewJs: null,
             ));
