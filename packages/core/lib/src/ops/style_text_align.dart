@@ -24,8 +24,8 @@ class _StyleTextAlign {
               continue;
             }
 
-            widgets.addAll(
-                p.widgets.map((w) => wf.buildAlign(w, _getAlignment(v))));
+            final alignment = _getAlignment(v);
+            widgets.addAll(p.widgets.map((w) => wf.buildAlign(w, alignment)));
           }
 
           return <BuiltPiece>[BuiltPieceSimple(widgets: widgets)];

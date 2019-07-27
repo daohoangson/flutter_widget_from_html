@@ -56,37 +56,40 @@ class _TagLi {
 
   Iterable<Widget> _buildList(NodeMetadata meta, Iterable<Widget> children) {
     String listStyleType = kCssListStyleTypeDisc;
-    double paddingLeft;
+    CssLength paddingLeft;
     meta.styles((key, value) {
       switch (key) {
         case kCssListStyleType:
           listStyleType = value;
           break;
         case _kCssPaddingLeft:
-          final parsed = parseCssLength(value)?.getValue(meta.textStyle);
-          paddingLeft = parsed ?? paddingLeft;
+          final parsed = parseCssLength(value);
+          if (parsed != null) paddingLeft = parsed;
       }
     });
 
     int i = 0;
     return children.map(
-      (widget) => Stack(
-        children: <Widget>[
-          _buildBody(widget, paddingLeft),
-          _buildMarker(
-            wf.getListStyleMarker(listStyleType, ++i),
-            meta.textStyle,
-            paddingLeft,
-          ),
-        ],
-      ),
+      (widget) {
+        final markerText = wf.getListStyleMarker(listStyleType, ++i);
+
+        return WidgetPlaceholder((context) {
+          final style = meta.textStyle(context);
+          final paddingLeftPx = paddingLeft.getValue(style);
+
+          return Stack(
+            children: <Widget>[
+              _buildBody(widget, paddingLeftPx),
+              _buildMarker(markerText, style, paddingLeftPx),
+            ],
+          );
+        });
+      },
     );
   }
 
-  Widget _buildBody(Widget widget, double paddingLeft) => Padding(
-        padding: EdgeInsets.only(left: paddingLeft),
-        child: widget,
-      );
+  Widget _buildBody(Widget widget, double paddingLeft) =>
+      wf.buildPadding(widget, EdgeInsets.only(left: paddingLeft));
 
   Widget _buildMarker(String text, TextStyle style, double paddingLeft) =>
       Positioned(

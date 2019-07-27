@@ -1,7 +1,7 @@
 part of '../core_widget_factory.dart';
 
-InlineSpan _compileToTextSpan(TextBlock b) {
-  if (b == null || b.isEmpty) return null;
+InlineSpan _compileToTextSpan(BuildContext context, TextBlock b) {
+  if (b == null || b.isEmpty) return TextSpan();
 
   b.trimRight();
 
@@ -9,9 +9,10 @@ InlineSpan _compileToTextSpan(TextBlock b) {
 
   final first = b.first;
   final firstSb = StringBuffer();
+  final firstStyle = first.tsb?.build(context);
 
   var prevOnTap = first.onTap;
-  var prevStyle = first.style;
+  var prevStyle = firstStyle;
   var prevSb = firstSb;
   final addChild = () {
     if (prevSb != firstSb && prevSb.length > 0) {
@@ -25,7 +26,7 @@ InlineSpan _compileToTextSpan(TextBlock b) {
   };
 
   b.forEachBit((bit, i) {
-    final style = _getBitStyle(bit) ?? prevStyle;
+    final style = _getBitTsb(bit)?.build(context) ?? prevStyle;
     if (bit.onTap != prevOnTap || style != prevStyle) {
       addChild();
     }
@@ -50,7 +51,7 @@ InlineSpan _compileToTextSpan(TextBlock b) {
   return TextSpan(
     children: children,
     recognizer: _buildGestureRecognizer(first.onTap),
-    style: first.style,
+    style: firstStyle,
     text: firstSb.toString(),
   );
 }
@@ -58,8 +59,8 @@ InlineSpan _compileToTextSpan(TextBlock b) {
 GestureRecognizer _buildGestureRecognizer(VoidCallback onTap) =>
     onTap != null ? (TapGestureRecognizer()..onTap = onTap) : null;
 
-TextStyle _getBitStyle(TextBit bit) {
-  if (bit.style != null) return bit.style;
+TextStyleBuilders _getBitTsb(TextBit bit) {
+  if (bit.tsb != null) return bit.tsb;
 
   // the below code will find the best style for this whitespace bit
   // easy case: whitespace at the beginning of a tag, use the previous style
@@ -70,7 +71,7 @@ TextStyle _getBitStyle(TextBit bit) {
   // unless it has unrelated style (e.g. next bit is a sibling)
   if (bit == block.last) {
     final next = bit.block.next;
-    if (next?.style != null) {
+    if (next?.tsb != null) {
       // get the outer-most block having this as the last bit
       var bb = bit.block;
       while (true) {
@@ -79,7 +80,7 @@ TextStyle _getBitStyle(TextBit bit) {
       }
 
       if (bb.parent == next.block) {
-        return next.style;
+        return next.tsb;
       } else {
         return null;
       }
@@ -87,5 +88,5 @@ TextStyle _getBitStyle(TextBit bit) {
   }
 
   // fallback to default (style from block)
-  return bit.block.style;
+  return bit.block.tsb;
 }

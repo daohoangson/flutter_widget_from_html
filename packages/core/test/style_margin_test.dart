@@ -15,13 +15,17 @@ void main() {
     testWidgets('parses all', (WidgetTester tester) async {
       final html = '<div style="margin: 1px 2px 3px 4px">Foo</div>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Padding:(1,2,3,4),child=[RichText:(:Foo)]]'));
+      expect(
+          explained,
+          equals('[SizedBox:0.0x1.0],'
+              '[Padding:(0,2,0,4),child=[RichText:(:Foo)]],'
+              '[SizedBox:0.0x3.0]'));
     });
 
     testWidgets('parses top only', (WidgetTester tester) async {
       final html = '<div style="margin: 1px 0 0 0">Foo</div>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Padding:(1,0,0,0),child=[RichText:(:Foo)]]'));
+      expect(explained, equals('[SizedBox:0.0x1.0],[RichText:(:Foo)]'));
     });
 
     testWidgets('parses right only', (WidgetTester tester) async {
@@ -33,7 +37,7 @@ void main() {
     testWidgets('parses bottom only', (WidgetTester tester) async {
       final html = '<div style="margin: 0 0 3px 0">Foo</div>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Padding:(0,0,3,0),child=[RichText:(:Foo)]]'));
+      expect(explained, equals('[RichText:(:Foo)],[SizedBox:0.0x3.0]'));
     });
 
     testWidgets('parses left only', (WidgetTester tester) async {
@@ -47,13 +51,21 @@ void main() {
     testWidgets('parses both', (WidgetTester tester) async {
       final html = '<div style="margin: 5px 10px">Foo</div>';
       final e = await explain(tester, html);
-      expect(e, equals('[Padding:(5,10,5,10),child=[RichText:(:Foo)]]'));
+      expect(
+          e,
+          equals('[SizedBox:0.0x5.0],'
+              '[Padding:(0,10,0,10),child=[RichText:(:Foo)]],'
+              '[SizedBox:0.0x5.0]'));
     });
 
     testWidgets('parses vertical only', (WidgetTester tester) async {
       final html = '<div style="margin: 5px 0">Foo</div>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Padding:(5,0,5,0),child=[RichText:(:Foo)]]'));
+      expect(
+          explained,
+          equals('[SizedBox:0.0x5.0],'
+              '[RichText:(:Foo)],'
+              '[SizedBox:0.0x5.0]'));
     });
 
     testWidgets('parses horizontal only', (WidgetTester tester) async {
@@ -66,14 +78,22 @@ void main() {
   testWidgets('parses margin with 1 value', (WidgetTester tester) async {
     final html = '<div style="margin: 3px">Foo</div>';
     final explained = await explain(tester, html);
-    expect(explained, equals('[Padding:(3,3,3,3),child=[RichText:(:Foo)]]'));
+    expect(
+        explained,
+        equals('[SizedBox:0.0x3.0],'
+            '[Padding:(0,3,0,3),child=[RichText:(:Foo)]],'
+            '[SizedBox:0.0x3.0]'));
   });
 
   testWidgets('renders margin within another', (WidgetTester tester) async {
     final html = '<div style="margin: 1px">' +
         '<div style="margin: 2px">Foo</div></div>';
     final explained = await explain(tester, html);
-    expect(explained, equals('[Padding:(2,3,2,3),child=[RichText:(:Foo)]]'));
+    expect(
+        explained,
+        equals('[SizedBox:0.0x2.0],'
+            '[Padding:(0,3,0,3),child=[RichText:(:Foo)]],'
+            '[SizedBox:0.0x2.0]'));
   });
 
   testWidgets('renders margins back to back', (WidgetTester tester) async {
@@ -83,9 +103,13 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[Padding:(3,3,3,3),child=[RichText:(:1)]],'
-            '[Padding:(0,3,3,3),child=[RichText:(:2)]],'
-            '[Padding:(0,3,3,3),child=[RichText:(:3)]]'));
+        equals('[SizedBox:0.0x3.0],'
+            '[Padding:(0,3,0,3),child=[RichText:(:1)]],'
+            '[SizedBox:0.0x3.0],'
+            '[Padding:(0,3,0,3),child=[RichText:(:2)]],'
+            '[SizedBox:0.0x3.0],'
+            '[Padding:(0,3,0,3),child=[RichText:(:3)]],'
+            '[SizedBox:0.0x3.0]'));
   });
 
   testWidgets('renders block margins back to back', (tester) async {
@@ -94,20 +118,20 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[Padding:(3,0,0,0),child=[widget0]],'
+        equals('[SizedBox:0.0x3.0],'
             '[Padding:(0,3,0,3),child=[RichText:(:1a)]],'
             '[Padding:(0,3,0,3),child=[RichText:(:1b)]],'
-            '[Padding:(0,0,3,0),child=[widget0]],'
+            '[SizedBox:0.0x3.0],'
             '[Padding:(0,3,0,3),child=[RichText:(:2a)]],'
             '[Padding:(0,3,0,3),child=[RichText:(:2b)]],'
-            '[Padding:(0,0,3,0),child=[widget0]]'));
+            '[SizedBox:0.0x3.0]'));
   });
 
   group('margin-xxx', () {
     testWidgets('parses margin-top', (WidgetTester tester) async {
       final html = '<div style="margin-top: 3px">Foo</div>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Padding:(3,0,0,0),child=[RichText:(:Foo)]]'));
+      expect(explained, equals('[SizedBox:0.0x3.0],[RichText:(:Foo)]'));
     });
 
     testWidgets('parses margin-right', (WidgetTester tester) async {
@@ -119,7 +143,7 @@ void main() {
     testWidgets('parses margin-bottom', (WidgetTester tester) async {
       final html = '<div style="margin-bottom: 3px">Foo</div>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Padding:(0,0,3,0),child=[RichText:(:Foo)]]'));
+      expect(explained, equals('[RichText:(:Foo)],[SizedBox:0.0x3.0]'));
     });
 
     testWidgets('parses margin-left', (WidgetTester tester) async {
@@ -131,13 +155,20 @@ void main() {
     testWidgets('overwrites margin with margin-top', (WidgetTester t) async {
       final html = '<div style="margin: 3px; margin-top: 5px">Foo</div>';
       final explained = await explain(t, html);
-      expect(explained, equals('[Padding:(5,3,3,3),child=[RichText:(:Foo)]]'));
+      expect(
+          explained,
+          equals('[SizedBox:0.0x5.0],'
+              '[Padding:(0,3,0,3),child=[RichText:(:Foo)]],'
+              '[SizedBox:0.0x3.0]'));
     });
 
     testWidgets('reset margin with margin-bottom', (WidgetTester t) async {
       final html = '<div style="margin: 3px; margin-bottom: 0">Foo</div>';
       final explained = await explain(t, html);
-      expect(explained, equals('[Padding:(3,3,0,3),child=[RichText:(:Foo)]]'));
+      expect(
+          explained,
+          equals('[SizedBox:0.0x3.0],'
+              '[Padding:(0,3,0,3),child=[RichText:(:Foo)]]'));
     });
   });
 

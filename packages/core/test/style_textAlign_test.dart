@@ -96,7 +96,8 @@ void main() {
     final explained = await explainMargin(tester, html);
     expect(
         explained,
-        equals('[Padding:(5,5,5,5),child='
-            '[Align:alignment=center,child=[RichText:(:Foo)]]]'));
+        equals('[SizedBox:0.0x5.0],'
+            '[Align:alignment=center,child=[Padding:(0,5,0,5),child=[RichText:(:Foo)]]],'
+            '[SizedBox:0.0x5.0]'));
   });
 }

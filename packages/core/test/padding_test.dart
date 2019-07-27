@@ -16,6 +16,12 @@ void main() {
   });
 
   group('BR tag', () {
+    testWidgets('trims all', (WidgetTester tester) async {
+      final html = '<br/>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Text:<br/>]'));
+    });
+
     testWidgets('trims top intances', (WidgetTester tester) async {
       final html = '<br/><br/>Foo';
       final explained = await explain(tester, html);
@@ -34,7 +40,7 @@ void main() {
       expect(
           explained,
           equals('[Column:children=[RichText:(:Foo)],'
-              '[Padding:(5,0,5,0),child=[widget0]],'
+              '[SizedBox:0.0x10.0],'
               '[RichText:(:Bar)]]'));
     });
   });
