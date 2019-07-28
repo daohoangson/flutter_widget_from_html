@@ -1,19 +1,32 @@
-env:
-  CODECOV_TOKEN: ENCRYPTED[0bad38cf59a2fda73e72491e18a564995cf3a5c862b5400834bfa9873713e780a2deed3e57b265279bd1e91168ee492a]
+# env:
+#   CODECOV_TOKEN: ENCRYPTED[0bad38cf59a2fda73e72491e18a564995cf3a5c862b5400834bfa9873713e780a2deed3e57b265279bd1e91168ee492a]
 
-unit_test_task:
-  container:
-    image: cirrusci/flutter
-  pub_cache:
-    folder: ~/.pub-cache
-  test_script: COVERAGE=1 ./tool/test.sh
-  codecov_script: bash <(curl -s https://codecov.io/bash)
+# unit_test_task:
+#   container:
+#     image: cirrusci/flutter
+#   pub_cache:
+#     folder: ~/.pub-cache
+#   test_script: COVERAGE=1 ./tool/test.sh
+#   codecov_script: bash <(curl -s https://codecov.io/bash)
 
-integration_test_task:
+# ios_test_task:
+#   osx_instance:
+#     image: mojave-xcode-10.2-flutter
+#   pub_cache:
+#     folder: ~/.pub-cache
+#   setup_script:
+#     - xcrun simctl create iPhoneX com.apple.CoreSimulator.SimDeviceType.iPhone-X com.apple.CoreSimulator.SimRuntime.iOS-12-2 | xargs xcrun simctl boot
+#   test_script: ./tool/integration.sh
+
+android_test_task:
   osx_instance:
     image: mojave-xcode-10.2-flutter
   pub_cache:
     folder: ~/.pub-cache
-  setup_script:
-    - xcrun simctl create iPhoneX com.apple.CoreSimulator.SimDeviceType.iPhone-X com.apple.CoreSimulator.SimRuntime.iOS-12-2 | xargs xcrun simctl boot
+  create_device_script:
+    - echo no | avdmanager -v create avd -n test -k "system-images;android-21;default;armeabi-v7a"
+  start_emulator_background_script:
+    - $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window
+  wait_for_emulator_script:
+    - adb wait-for-device
   test_script: ./tool/integration.sh
