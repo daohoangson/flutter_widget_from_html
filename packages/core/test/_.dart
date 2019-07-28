@@ -11,6 +11,7 @@ Future<String> explain(
   WidgetExplainer explainer,
   HtmlWidget hw,
   String imageUrlToPrecache,
+  PreTest preTest,
   Uri baseUrl,
   double bodyVerticalPadding = 0,
   NodeMetadataCollector builderCallback,
@@ -32,16 +33,17 @@ Future<String> explain(
 
   await tester.pumpWidget(
     StatefulBuilder(
-      builder: (BuildContext context, StateSetter setState) {
+      builder: (context, _) {
         if (imageUrlToPrecache != null) {
+          // this is required to avoid http 400 error for Image.network instances
           precacheImage(
             NetworkImage(imageUrlToPrecache),
             context,
-            onError: (dynamic exception, StackTrace stackTrace) {
-              // this is required to avoid http 400 error for Image.network instances
-            },
+            onError: (_, __) {},
           );
         }
+
+        if (preTest != null) preTest(context);
 
         final defaultStyle = DefaultTextStyle.of(context).style;
         final style = defaultStyle.copyWith(
@@ -86,6 +88,7 @@ Future<String> explainMargin(
 }
 
 typedef String WidgetExplainer(Widget widget);
+typedef void PreTest(BuildContext context);
 
 class _Explainer {
   final BuildContext context;
