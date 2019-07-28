@@ -1,9 +1,7 @@
 part of '../core_widget_factory.dart';
 
 InlineSpan _compileToTextSpan(BuildContext context, TextBlock b) {
-  if (b == null || b.isEmpty) return TextSpan();
-
-  b.trimRight();
+  if (b?.isNotEmpty != true) return TextSpan();
 
   final children = <InlineSpan>[];
 
@@ -25,7 +23,7 @@ InlineSpan _compileToTextSpan(BuildContext context, TextBlock b) {
     prevSb = StringBuffer();
   };
 
-  b.forEachBit((bit, i) {
+  b.forEachBit((bit, _) {
     final style = _getBitTsb(bit)?.build(context) ?? prevStyle;
     if (bit.onTap != prevOnTap || style != prevStyle) {
       addChild();
@@ -74,9 +72,12 @@ TextStyleBuilders _getBitTsb(TextBit bit) {
     if (next?.tsb != null) {
       // get the outer-most block having this as the last bit
       var bb = bit.block;
+      var bbLast = bb.last;
       while (true) {
-        if (bb.last != bb.parent?.last) break;
+        final parentLast = bb.parent?.last;
+        if (bbLast != parentLast) break;
         bb = bb.parent;
+        bbLast = parentLast;
       }
 
       if (bb.parent == next.block) {

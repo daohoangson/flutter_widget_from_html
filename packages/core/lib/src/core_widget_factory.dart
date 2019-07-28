@@ -199,6 +199,7 @@ class WidgetFactory {
       TableCell(child: buildPadding(child, _config.tableCellPadding));
 
   Widget buildText(TextBlock block, {TextAlign textAlign}) {
+    block?.trimRight();
     if (block?.isNotEmpty != true) return null;
 
     return WidgetPlaceholder(

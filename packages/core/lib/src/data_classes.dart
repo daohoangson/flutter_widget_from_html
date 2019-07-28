@@ -389,7 +389,14 @@ class TextBlock extends _TextBit {
   TextBlock(this.tsb, {this.parent}) : assert(tsb != null);
 
   @override
-  TextBit get first => _children.first.first;
+  TextBit get first {
+    for (final child in _children) {
+      if (child is TextBit) return child;
+      final first = child.first;
+      if (first != null) return first;
+    }
+    return null;
+  }
 
   @override
   bool get hasTrailingSpace {
@@ -405,8 +412,8 @@ class TextBlock extends _TextBit {
 
   @override
   bool get isEmpty {
-    for (var i = 0; i < _children.length; i++) {
-      if (_children[i].isNotEmpty) {
+    for (final child in _children) {
+      if (child.isNotEmpty) {
         return false;
       }
     }
@@ -415,7 +422,17 @@ class TextBlock extends _TextBit {
   }
 
   @override
-  TextBit get last => _children.last.last;
+  TextBit get last {
+    final l = _children.length;
+    for (var i = l - 1; i >= 0; i--) {
+      final child = _children[i];
+      if (child is TextBit) return child;
+      final last = child.last;
+      if (last != null) return last;
+    }
+
+    return null;
+  }
 
   TextBit get next {
     if (parent == null) return null;
@@ -476,7 +493,7 @@ class TextBlock extends _TextBit {
   }
 
   TextBlock sub(TextStyleBuilders tsb) {
-    final sub = TextBlock(tsb ?? this.tsb, parent: this);
+    final sub = TextBlock(tsb, parent: this);
     _children.add(sub);
     return sub;
   }
