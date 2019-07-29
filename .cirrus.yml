@@ -21,8 +21,10 @@
 android_test_task:
   container:
     image: cirrusci/flutter
-  pub_cache:
-    folder: ~/.pub-cache
+    cpu: 4
+    memory: 10G
+  gradle_cache:
+    folder: ~/.gradle/caches
   create_device_script:
     - export "SYSTEM_IMAGE=system-images;android-24;default;armeabi-v7a"
     - yes | sdkmanager "$SYSTEM_IMAGE" || if [ $? -ne '141' ]; then exit $?; fi;
@@ -33,3 +35,6 @@ android_test_task:
   wait_for_emulator_script:
     - adb wait-for-device
   test_script: ./tool/integration.sh
+  gradle_cleanup_before_cache_script:
+    - rm -rf ~/.gradle/caches/$GRADLE_VERSION/
+    - find ~/.gradle/caches/ -name "*.lock" -type f -delete
