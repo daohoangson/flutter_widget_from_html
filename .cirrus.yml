@@ -25,7 +25,7 @@ android_test_task:
     folder: ~/.pub-cache
   create_device_script:
     - export "SYSTEM_IMAGE=system-images;android-21;default;armeabi-v7a"
-    - yes | sdkmanager "platforms;android-27" "build-tools;27.0.3" "$SYSTEM_IMAGE" || if [ $? -ne '141' ]; then exit $?; fi;
+    - yes | sdkmanager "platforms;android-27" "build-tools;27.0.3" "extras;google;m2repository" "extras;android;m2repository" "$SYSTEM_IMAGE" || if [ $? -ne '141' ]; then exit $?; fi;
     - yes | sdkmanager --licenses || if [ $? -ne '141' ]; then exit $?; fi;
     - echo no | avdmanager -v create avd -n test -k "$SYSTEM_IMAGE"
   start_emulator_background_script:
