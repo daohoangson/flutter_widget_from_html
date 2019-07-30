@@ -21,8 +21,8 @@
 android_test_task:
   container:
     image: cirrusci/flutter
-    cpu: 4
-    memory: 10G
+    cpu: 8
+    memory: 24
   gradle_cache:
     folder: ~/.gradle/caches
   create_device_script:
