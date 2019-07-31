@@ -51,6 +51,8 @@ class _WebViewState extends State<WebView> {
   _Issue37 _issue37;
   lib.WebViewController _wvc;
 
+  String _firstFinishedUrl;
+
   @override
   initState() {
     super.initState();
@@ -96,15 +98,9 @@ class _WebViewState extends State<WebView> {
             : lib.JavascriptMode.disabled,
         key: Key(widget.url),
         navigationDelegate: widget.interceptNavigationRequest != null
-            ? (req) => _interceptNavigationRequest(req.url)
+            ? (req) => _interceptNavigationRequest(req)
             : null,
-        onPageFinished: widget.getDimensions
-            ? (_) => widget.getDimensionsDurations.forEach((t) => t == null
-                // get dimensions immediately
-                ? _getDimensions()
-                // or wait for the specified duration
-                : Future.delayed(t).then((_) => _getDimensions()))
-            : null,
+        onPageFinished: _onPageFinished,
         onWebViewCreated: (c) => _wvc = c,
       );
 
@@ -125,17 +121,33 @@ class _WebViewState extends State<WebView> {
     if (changed && mounted) setState(() => _aspectRatio = r);
   }
 
-  lib.NavigationDecision _interceptNavigationRequest(String url) {
+  lib.NavigationDecision _interceptNavigationRequest(
+      lib.NavigationRequest req) {
     var intercepted = false;
 
-    final f = widget.interceptNavigationRequest;
-    if (f != null) {
-      intercepted = f(url);
+    if (widget.interceptNavigationRequest != null &&
+        _firstFinishedUrl != null &&
+        req.isForMainFrame &&
+        req.url != widget.url &&
+        req.url != _firstFinishedUrl) {
+      intercepted = widget.interceptNavigationRequest(req.url);
     }
 
     return intercepted
         ? lib.NavigationDecision.prevent
         : lib.NavigationDecision.navigate;
+  }
+
+  void _onPageFinished(String url) {
+    if (_firstFinishedUrl == null) _firstFinishedUrl = url;
+
+    if (widget.getDimensions == true) {
+      widget.getDimensionsDurations.forEach((t) => t == null
+          // get dimensions immediately
+          ? _getDimensions()
+          // or wait for the specified duration
+          : Future.delayed(t).then((_) => _getDimensions()));
+    }
   }
 }
 
