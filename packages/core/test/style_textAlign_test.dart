@@ -80,6 +80,17 @@ void main() {
       final explained = await imgExplain(tester, html);
       expect(explained, equals('[RichText,align=right:$imgRendered]'));
     });
+
+    testWidgets('renders after image', (WidgetTester tester) async {
+      final html = '$imgHtml <center>Foo</center>';
+      final explained = await imgExplain(tester, html);
+      expect(
+          explained,
+          equals('[Column:children='
+              '[RichText:$imgRendered],'
+              '[RichText,align=center:(:Foo)]'
+              ']'));
+    });
   });
 
   testWidgets('renders styling from outside', (WidgetTester tester) async {

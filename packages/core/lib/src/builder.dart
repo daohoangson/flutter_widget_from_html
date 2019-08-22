@@ -125,17 +125,10 @@ class Builder {
         continue;
       }
 
-      int i = 0;
       for (final __piece in __builder.process()) {
-        i++;
-        if (i == 1) {
-          if (__piece.block?.parent == _textPiece.block) {
-            continue;
-          } else {
-            // discard the active text piece
-            // because sub builder somehow consumed it already
-            _newTextPiece();
-          }
+        if (__piece.block?.parent == _textPiece.block) {
+          // same text block, do nothing
+          continue;
         }
 
         _saveTextPiece();
