@@ -19,13 +19,15 @@ class _StyleTextAlign {
 
           final widgets = <Widget>[];
           for (final p in pieces) {
-            if (!p.hasWidgets) {
+            if (p.block?.detach() == true) {
               widgets.add(wf.buildText(p.block, textAlign: _getTextAlign(v)));
               continue;
             }
 
-            widgets.addAll(
-                p.widgets.map((w) => wf.buildAlign(w, _getAlignment(v))));
+            if (p.widgets?.isNotEmpty == true) {
+              final alignment = _getAlignment(v);
+              widgets.addAll(p.widgets.map((w) => wf.buildAlign(w, alignment)));
+            }
           }
 
           return <BuiltPiece>[BuiltPieceSimple(widgets: widgets)];
