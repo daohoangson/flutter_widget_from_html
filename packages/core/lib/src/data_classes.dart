@@ -420,6 +420,8 @@ class TextBlock extends _TextBit {
 
   void addWidget(WidgetSpan ws) => addBit(TextBit.widget(this, ws));
 
+  bool detach() => parent?._children?.remove(this) ?? true;
+
   bool forEachBit(f(TextBit bit, int index), {bool reversed = false}) {
     final l = _children.length;
     final i0 = reversed ? l - 1 : 0;
