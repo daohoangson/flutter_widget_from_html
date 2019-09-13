@@ -2,6 +2,10 @@ part of '../core_widget_factory.dart';
 
 const kCssBackgroundColor = 'background-color';
 
+TextStyle _styleBgColorTextStyleBuilder(
+        BuildContext context, TextStyle parent, Color bgColor) =>
+    parent.copyWith(background: Paint()..color = bgColor);
+
 class _StyleBgColor {
   final WidgetFactory wf;
 
@@ -26,9 +30,9 @@ class _StyleBgColor {
       });
 
   BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) => piece
-    ..block.rebuildBits((bit) => bit.style != null
+    ..block.rebuildBits((bit) => bit.tsb != null
         ? bit.rebuild(
-            style: bit.style.copyWith(background: Paint()..color = bgColor),
+            tsb: bit.tsb.sub()..enqueue(_styleBgColorTextStyleBuilder, bgColor),
           )
         : bit);
 

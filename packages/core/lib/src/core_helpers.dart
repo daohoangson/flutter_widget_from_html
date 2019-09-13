@@ -13,4 +13,26 @@ const widget0 = const SizedBox.shrink();
 
 typedef void OnTapUrl(String url);
 
-typedef WidgetFactory FactoryBuilder(BuildContext context, HtmlWidget widget);
+typedef Widget WidgetBuilder(BuildContext context);
+
+typedef WidgetFactory FactoryBuilder(HtmlWidgetConfig config);
+
+class WidgetPlaceholder extends StatelessWidget implements IWidgetPlaceholder {
+  final WidgetBuilder builder;
+
+  WidgetPlaceholder(this.builder, {Key key})
+      : assert(builder != null),
+        super(key: key);
+
+  @override
+  Widget build(BuildContext context) => builder(context);
+
+  @override
+  bool isSpacing() => false;
+}
+
+abstract class IWidgetPlaceholder {
+  Widget build(BuildContext context);
+
+  bool isSpacing();
+}

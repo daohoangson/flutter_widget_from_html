@@ -9,21 +9,18 @@ import 'html_widget.dart';
 import 'video_player.dart';
 import 'web_view.dart';
 
+part 'ops/tag_a_extended.dart';
 part 'ops/tag_iframe.dart';
 part 'ops/tag_video.dart';
 
 class WidgetFactory extends core.WidgetFactory {
-  final HtmlWidget _htmlWidget;
-  final Color _hyperlinkColor;
+  final HtmlWidgetConfig _config;
 
+  BuildOp _tagAExtended;
   BuildOp _tagIframe;
   BuildOp _tagVideo;
 
-  WidgetFactory(BuildContext context, this._htmlWidget)
-      : _hyperlinkColor = Theme.of(context).accentColor,
-        super(_htmlWidget);
-
-  Color get hyperlinkColor => _htmlWidget.hyperlinkColor ?? _hyperlinkColor;
+  WidgetFactory(this._config) : super(_config);
 
   @override
   Widget buildDivider() => Divider(height: 1);
@@ -34,8 +31,8 @@ class WidgetFactory extends core.WidgetFactory {
 
   @override
   GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
-      ? () => _htmlWidget.onTapUrl != null
-          ? _htmlWidget.onTapUrl(url)
+      ? () => _config.onTapUrl != null
+          ? _config.onTapUrl(url)
           : canLaunch(url).then((ok) => ok ? launch(url) : null)
       : null;
 
@@ -71,22 +68,22 @@ class WidgetFactory extends core.WidgetFactory {
     double height,
     double width,
   }) {
-    if (_htmlWidget.webView != true) return buildWebViewLinkOnly(url);
+    if (_config.webView != true) return buildWebViewLinkOnly(url);
 
     final dimensOk = height != null && height > 0 && width != null && width > 0;
     return WebView(
       url,
       aspectRatio: dimensOk ? width / height : 16 / 9,
-      getDimensions: !dimensOk && _htmlWidget.webViewJs == true,
+      getDimensions: !dimensOk && _config.webViewJs == true,
       interceptNavigationRequest: (newUrl) {
         if (newUrl == url) return false;
 
         buildGestureTapCallbackForUrl(newUrl)();
         return true;
       },
-      js: _htmlWidget.webViewJs == true,
+      js: _config.webViewJs == true,
       unsupportedWorkaroundForIssue37:
-          _htmlWidget?.unsupportedWebViewWorkaroundForIssue37 == true,
+          _config.unsupportedWebViewWorkaroundForIssue37 == true,
     );
   }
 
@@ -98,6 +95,9 @@ class WidgetFactory extends core.WidgetFactory {
   @override
   NodeMetadata parseLocalName(NodeMetadata meta, String localName) {
     switch (localName) {
+      case 'a':
+        meta = lazySet(meta, buildOp: tagAExtended());
+        break;
       case 'iframe':
         // return asap to avoid being disabled by core
         return lazySet(meta, buildOp: tagIframe());
@@ -107,6 +107,11 @@ class WidgetFactory extends core.WidgetFactory {
     }
 
     return super.parseLocalName(meta, localName);
+  }
+
+  BuildOp tagAExtended() {
+    _tagAExtended ??= _TagAExtended().buildOp;
+    return _tagAExtended;
   }
 
   BuildOp tagIframe() {

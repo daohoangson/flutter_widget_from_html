@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '_.dart' as _;
@@ -103,21 +104,38 @@ void main() {
   });
 
   group('asset', () {
-    final explain = _.explain;
+    final assetName = 'path/image.png';
+    final explain = (
+      WidgetTester tester,
+      String html, {
+      String package,
+    }) =>
+        _.explain(
+          tester,
+          html,
+          preTest: (context) {
+            precacheImage(
+              AssetImage(assetName, package: package),
+              context,
+              onError: (_, __) {},
+            );
+          },
+        );
 
     testWidgets('renders asset', (WidgetTester tester) async {
-      final html = '<img src="asset:path/image.png" />';
+      final html = '<img src="asset:$assetName" />';
       final e = await explain(tester, html);
-      expect(e, equals('[RichText:[AssetImage:assetName=path/image.png]]'));
+      expect(e, equals("[RichText:[AssetImage:assetName=$assetName]]"));
     });
 
     testWidgets('renders asset (specified package)', (tester) async {
-      final html = '<img src="asset:path/image.png?package=package" />';
-      final explained = await explain(tester, html);
+      final package = 'package';
+      final html = '<img src="asset:$assetName?package=$package" />';
+      final explained = await explain(tester, html, package: package);
       expect(
           explained,
           equals(
-            '[RichText:[AssetImage:assetName=path/image.png,package=package]]',
+            "[RichText:[AssetImage:assetName=$assetName,package=$package]]",
           ));
     });
 

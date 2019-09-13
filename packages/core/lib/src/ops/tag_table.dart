@@ -123,7 +123,10 @@ class _TagTable {
       if (first is _CaptionWidget) widgets.addAll(first.children);
     }
 
-    widgets.add(wf.buildTable(rows.toList(), border: _buildTableBorder(meta)));
+    widgets.add(WidgetPlaceholder((context) => wf.buildTable(
+          rows.toList(),
+          border: _buildTableBorder(context, meta),
+        )));
 
     return widgets;
   }
@@ -163,7 +166,7 @@ class _SemanticWidget extends StatelessWidget {
   Widget build(BuildContext context) => Column(children: widgets.toList());
 }
 
-TableBorder _buildTableBorder(NodeMetadata meta) {
+TableBorder _buildTableBorder(BuildContext context, NodeMetadata meta) {
   String styleBorder;
   meta.styles((k, v) => k == kCssBorder ? styleBorder = v : null);
   if (styleBorder != null) {
@@ -171,7 +174,7 @@ TableBorder _buildTableBorder(NodeMetadata meta) {
     if (borderParsed != null) {
       return TableBorder.all(
         color: borderParsed.color ?? const Color(0xFF000000),
-        width: borderParsed.width.getValue(meta.textStyle),
+        width: borderParsed.width.getValue(meta.textStyle(context)),
       );
     }
   }
