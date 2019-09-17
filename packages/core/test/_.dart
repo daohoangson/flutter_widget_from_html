@@ -167,10 +167,10 @@ class _Explainer {
     return "borders=($top;$right;$bottom;$left)";
   }
 
-  String _tableCell(TableCell cell) => _widget(cell.child);
-
-  String _tableRow(TableRow row) =>
-      row.children.map((c) => _tableCell(c)).toList().join(' | ');
+  String _tableRow(TableRow row) => row.children
+      .map((c) => _widget(c is TableCell ? c.child : c))
+      .toList()
+      .join(' | ');
 
   String _tableRows(Table table) =>
       table.children.map((r) => _tableRow(r)).toList().join('\n');
@@ -272,8 +272,7 @@ class _Explainer {
 
     if (widget == widget0) return '[widget0]';
     if (widget is Image) return _image(widget.image);
-    if (widget is IWidgetPlaceholder)
-      return _widget((widget as IWidgetPlaceholder).build(context));
+    if (widget is IWidgetPlaceholder) return _widget(widget.build(context));
 
     final type = widget.runtimeType.toString();
     final text = widget is Align

@@ -1,7 +1,11 @@
 part of '../widget_factory.dart';
 
-TextStyle _tagAExtendedAccentColor(BuildContext context, TextStyle parent, _) =>
-    parent.copyWith(color: Theme.of(context).accentColor);
+TextStyle _tagAExtendedAccentColor(
+  TextStyleBuilders tsb,
+  TextStyle parent,
+  _,
+) =>
+    parent.copyWith(color: Theme.of(tsb.context).accentColor);
 
 class _TagAExtended {
   BuildOp get buildOp => BuildOp(

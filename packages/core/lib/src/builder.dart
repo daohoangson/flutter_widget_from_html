@@ -42,6 +42,7 @@ class Builder {
           if (widget != null) list.add(widget);
         }
       } else {
+        piece.block.trimRight();
         final text = wf.buildText(piece.block);
         if (text != null) list.add(text);
       }
@@ -199,7 +200,8 @@ Iterable<BuildOp> _prepareParentOps(
   NodeMetadata parentMeta,
 ) {
   // try to reuse existing list if possible
-  final withOnChild = parentMeta?.ops?.where((op) => op.hasOnChild)?.toList();
+  final withOnChild =
+      parentMeta?.ops?.where((op) => op.hasOnChild)?.toList(growable: false);
   if (withOnChild?.isNotEmpty != true) return parentParentOps;
 
   return List.unmodifiable(

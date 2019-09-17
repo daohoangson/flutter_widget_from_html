@@ -34,18 +34,50 @@ void main() {
             ']'));
   });
 
-  testWidgets('renders stylings', (WidgetTester tester) async {
-    final html = """<table>
-      <tr><th>Header 1</th><th style="text-align: center">Header 2</th></tr>
-      <tr><td>Value <em>1</em></td><td style="font-weight: bold">Value 2</td></tr>
-    </table>""";
-    final explained = await explain(tester, html);
-    expect(
-        explained,
-        equals('[Table:\n' +
-            '[RichText:(+b:Header 1)] | [RichText,align=center:(+b:Header 2)]\n' +
-            '[RichText:(:Value (+i:1))] | [RichText:(+b:Value 2)]\n' +
-            ']'));
+  group('inline style', () {
+    testWidgets('renders cell stylings', (WidgetTester tester) async {
+      final html = '<table>'
+          '<tr><th>Header 1</th><th style="text-align: center">Header 2</th></tr>'
+          '<tr><td>Value <em>1</em></td><td style="font-weight: bold">Value 2</td></tr>'
+          '</table>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Table:\n'
+              '[RichText:(+b:Header 1)] | [RichText,align=center:(+b:Header 2)]\n'
+              '[RichText:(:Value (+i:1))] | [RichText:(+b:Value 2)]\n'
+              ']'));
+    });
+
+    testWidgets('renders row stylings', (WidgetTester tester) async {
+      final html = '<table>'
+          '<tr style="text-align: center"><th>Header 1</th><th>Header 2</th></tr>'
+          '<tr style="font-weight: bold"><td>Value <em>1</em></td><td>Value 2</td></tr>'
+          '</table>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Table:\n'
+              '[RichText,align=center:(+b:Header 1)] | [RichText,align=center:(+b:Header 2)]\n'
+              '[RichText:(+b:Value (+i+b:1))] | [RichText:(+b:Value 2)]\n'
+              ']'));
+    });
+
+    testWidgets('renders section stylings', (WidgetTester tester) async {
+      final html = '<table>'
+          '<tbody style="text-align: right">'
+          '<tr><th>Header 1</th><th style="text-align: center">Header 2</th></tr>'
+          '<tr><td>Value <em>1</em></td><td style="font-weight: bold">Value 2</td></tr>'
+          '</tbody>'
+          '</table>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Table:\n'
+              '[RichText,align=right:(+b:Header 1)] | [RichText,align=center:(+b:Header 2)]\n'
+              '[RichText,align=right:(:Value (+i:1))] | [RichText,align=right:(+b:Value 2)]\n'
+              ']'));
+    });
   });
 
   group('border', () {
@@ -90,10 +122,22 @@ void main() {
         final explained = await explain(tester, html);
         expect(
           explained,
-          equals('[Table:border=(Color(0xffff0000),w=1.0)\n[RichText:(:Foo)]\n]'),
+          equals('[Table:border=(Color(0xffff0000),w=1.0)\n'
+              '[RichText:(:Foo)]\n]'),
         );
       },
     );
+
+    testWidgets('#70: renders border=1 with inline `text-align`', (t) async {
+      final html = '<table border="1" style="text-align: left">'
+          '<tr><td>Foo</td></tr></table>';
+      final explained = await explain(t, html);
+      expect(
+        explained,
+        equals('[Table:border=(Color(0xff000000),w=1.0)\n'
+            '[RichText,align=left:(:Foo)]\n]'),
+      );
+    });
   });
 
   group('error handling', () {
@@ -134,7 +178,10 @@ void main() {
     testWidgets('standalone TABLE', (WidgetTester tester) async {
       final html = '<table>Foo</table>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(
+        explained,
+        equals('[Column:children=[RichText:(:Foo)],[widget0]]'),
+      );
     });
 
     testWidgets('standalone TD', (WidgetTester tester) async {

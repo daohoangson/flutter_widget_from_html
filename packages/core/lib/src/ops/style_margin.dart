@@ -6,42 +6,25 @@ const kCssMarginLeft = 'margin-left';
 const kCssMarginRight = 'margin-right';
 const kCssMarginTop = 'margin-top';
 
-class MarginPlaceholder extends StatelessWidget implements IWidgetPlaceholder {
-  final Widget child;
-  final CssLength marginLeft;
-  final CssLength marginRight;
-  final NodeMetadata meta;
-  final WidgetFactory wf;
+Iterable<Widget> _marginBuilder(
+  BuildContext context,
+  Iterable<Widget> children,
+  _MarginBuilderInput input,
+) {
+  final style = input.meta.textStyle(context);
+  final padding = EdgeInsets.only(
+    left: input.marginLeft?.getValue(style) ?? 0.0,
+    right: input.marginRight?.getValue(style) ?? 0.0,
+  );
 
-  MarginPlaceholder({
-    this.child,
-    this.marginLeft,
-    this.marginRight,
-    this.meta,
-    Key key,
-    this.wf,
-  })  : assert(child != null),
-        assert(meta != null),
-        assert(wf != null),
-        super(key: key);
+  return children.map((child) => input.wf.buildPadding(child, padding));
+}
 
-  @override
-  Widget build(BuildContext context) {
-    final style = meta.textStyle(context);
-    final padding = EdgeInsets.only(
-      left: marginLeft?.getValue(style) ?? 0.0,
-      right: marginRight?.getValue(style) ?? 0.0,
-    );
-
-    var child = this.child;
-    if (child is MarginPlaceholder)
-      child = (child as MarginPlaceholder).build(context);
-
-    return wf.buildPadding(child, padding);
-  }
-
-  @override
-  bool isSpacing() => false;
+class _MarginBuilderInput {
+  CssLength marginLeft;
+  CssLength marginRight;
+  NodeMetadata meta;
+  WidgetFactory wf;
 }
 
 class SpacingPlaceholder extends StatelessWidget implements IWidgetPlaceholder {
@@ -72,10 +55,10 @@ class SpacingPlaceholder extends StatelessWidget implements IWidgetPlaceholder {
     return SizedBox(height: height);
   }
 
-  @override
-  bool isSpacing() => true;
-
   void mergeWith(SpacingPlaceholder other) => _heights.addAll(other._heights);
+
+  @override
+  Widget wrapWith<T>(WidgetPlaceholderBuilder<T> builder, T input) => this;
 }
 
 class _StyleMargin {
@@ -95,17 +78,23 @@ class _StyleMargin {
                 : null)
             ..addAll(margin.left?.isNotEmpty == true ||
                     margin.right?.isNotEmpty == true
-                ? widgets.map(
-                    (widget) => widget is SpacingPlaceholder
-                        ? widget
-                        : MarginPlaceholder(
-                            child: widget,
-                            marginLeft: margin.left,
-                            marginRight: margin.right,
-                            meta: meta,
-                            wf: wf,
-                          ),
-                  )
+                ? widgets.map((widget) {
+                    final input = _MarginBuilderInput()
+                      ..marginLeft = margin.left
+                      ..marginRight = margin.right
+                      ..meta = meta
+                      ..wf = wf;
+
+                    if (widget is IWidgetPlaceholder)
+                      return widget..wrapWith(_marginBuilder, input);
+
+                    return WidgetPlaceholder(
+                      builder: _marginBuilder,
+                      children: [widget],
+                      input: input,
+                      wf: wf,
+                    );
+                  })
                 : widgets)
             ..add(margin.bottom?.isNotEmpty == true
                 ? SpacingPlaceholder(height: margin.bottom, meta: meta)
