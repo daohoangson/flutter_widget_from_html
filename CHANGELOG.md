@@ -1,3 +1,9 @@
+## 0.2.3
+
+* Re-implement text-align support to avoid conflicts (#66, #74)
+* Fix WebView bug triggering browser for http 301/302 urls
+* Improve performance when being put in list views (#62)
+
 ## 0.2.2+1
 
 * Update coding convention

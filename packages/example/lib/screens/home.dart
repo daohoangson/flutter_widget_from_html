@@ -51,16 +51,6 @@ CODE tag:
 <code><span style="color: #000000"><span style="color: #0000BB">&lt;?php phpinfo</span><span style="color: #007700">(); </span><span style="color: #0000BB">?&gt;</span></span></code>""",
     'Iframe': () => IframeScreen(),
     'Images': () => ImgScreen(),
-    'List ordered': """<ol>
-  <li>One</li>
-  <li>Two</li>
-  <li>Three</li>
-</ol>""",
-    'List unordered': """<ul>
-  <li>One</li>
-  <li>Two</li>
-  <li>Three</li>
-</ul>""",
     'List nested': """<ol>
   <li>One</li>
   <li>
