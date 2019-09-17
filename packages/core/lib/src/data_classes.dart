@@ -461,8 +461,6 @@ class TextBlock extends _TextBit {
 
   void addWidget(WidgetSpan ws) => addBit(TextBit.widget(this, ws));
 
-  bool detach() => parent?._children?.remove(this) ?? true;
-
   bool forEachBit(f(TextBit bit, int index), {bool reversed = false}) {
     final l = _children.length;
     final i0 = reversed ? l - 1 : 0;
@@ -521,38 +519,55 @@ class TextStyleBuilders {
   final _inputs = [];
   final TextStyleBuilders parent;
 
-  BuildContext builtContext;
-  TextStyle output;
+  BuildContext _context;
+  TextStyle _output;
+  TextAlign _textAlign;
+
+  BuildContext get context => _context;
+
+  TextAlign get textAlign => _textAlign ?? parent?.textAlign;
+
+  set textAlign(TextAlign v) => _textAlign = v;
 
   TextStyleBuilders({this.parent});
 
   void enqueue<T>(TextStyleBuilder<T> builder, T input) {
-    assert(output == null, "Cannot add builder after being built");
+    assert(_output == null, "Cannot add builder after being built");
     _builders.add(builder);
     _inputs.add(input);
   }
 
   TextStyle build(BuildContext context) {
-    if (context != builtContext) output = null;
-    if (output != null) return output;
+    _resetContextIfNeeded(context);
+    if (_output != null) return _output;
 
-    builtContext = context;
     if (parent == null) {
-      output = DefaultTextStyle.of(context).style;
+      _output = DefaultTextStyle.of(context).style;
     } else {
-      output = parent.build(context);
+      _output = parent.build(context);
     }
 
     final l = _builders.length;
     for (int i = 0; i < l; i++) {
-      output = _builders[i](context, output, _inputs[i]);
+      _output = _builders[i](this, _output, _inputs[i]);
     }
 
-    return output;
+    return _output;
   }
 
   TextStyleBuilders sub() => TextStyleBuilders(parent: this);
+
+  void _resetContextIfNeeded(BuildContext context) {
+    if (context == _context) return;
+
+    _context = context;
+    _output = null;
+    _textAlign = null;
+  }
 }
 
 typedef TextStyle TextStyleBuilder<T>(
-    BuildContext context, TextStyle textStyle, T input);
+  TextStyleBuilders tsb,
+  TextStyle textStyle,
+  T input,
+);

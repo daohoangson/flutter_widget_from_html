@@ -3,7 +3,10 @@ part of '../core_widget_factory.dart';
 const kCssBackgroundColor = 'background-color';
 
 TextStyle _styleBgColorTextStyleBuilder(
-        BuildContext context, TextStyle parent, Color bgColor) =>
+  TextStyleBuilders _,
+  TextStyle parent,
+  Color bgColor,
+) =>
     parent.copyWith(background: Paint()..color = bgColor);
 
 class _StyleBgColor {

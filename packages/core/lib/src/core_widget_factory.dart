@@ -41,18 +41,23 @@ class WidgetFactory {
 
   Widget buildAlign(Widget child, Alignment alignment) {
     if (child == null) return null;
-    if (alignment == null) return child;
-    if (child is IWidgetPlaceholder &&
-        (child as IWidgetPlaceholder).isSpacing()) return child;
+    if (alignment == null || child is RichText) return child;
+    if (child is IWidgetPlaceholder)
+      return child..wrapWith(buildAlignsWithContext, alignment);
 
     return Align(alignment: alignment, child: child);
   }
+
+  Iterable<Widget> buildAlignsWithContext(
+          BuildContext _, Iterable<Widget> children, Alignment alignment) =>
+      children.map((child) => buildAlign(child, alignment));
 
   Widget buildBody(Iterable<Widget> children) =>
       buildPadding(buildColumn(children), _config.bodyPadding);
 
   Widget buildColumn(Iterable<Widget> children) {
-    children = fixOverlappingSpacings(children);
+    children = fixOverlappingSpacings(
+        children is List ? children : children.toList(growable: false));
     if (children?.isNotEmpty != true) return null;
 
     return children.length > 1
@@ -88,14 +93,18 @@ class WidgetFactory {
   Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
       GestureDetector(child: child, onTap: onTap);
 
+  Iterable<Widget> buildGestureDetectorsWithContext(BuildContext _,
+          Iterable<Widget> children, GestureTapCallback onTap) =>
+      children.map((child) => buildGestureDetector(child, onTap));
+
   Iterable<Widget> buildGestureDetectors(
     Iterable<Widget> widgets,
     GestureTapCallback onTap,
   ) {
     if (widgets?.isNotEmpty != true || onTap == null) return widgets;
     return widgets.map((widget) {
-      if (widget is IWidgetPlaceholder &&
-          (widget as IWidgetPlaceholder).isSpacing()) return widget;
+      if (widget is IWidgetPlaceholder)
+        return widget..wrapWith(buildGestureDetectorsWithContext, onTap);
 
       return buildGestureDetector(widget, onTap);
     });
@@ -198,16 +207,28 @@ class WidgetFactory {
   Widget buildTableCell(Widget child) =>
       TableCell(child: buildPadding(child, _config.tableCellPadding));
 
-  Widget buildText(TextBlock block, {TextAlign textAlign}) {
-    block?.trimRight();
-    if (block?.isNotEmpty != true) return null;
+  Widget buildText(TextBlock block) => block?.isEmpty == false
+      ? WidgetPlaceholder(
+          builder: buildTextWithContext,
+          input: block,
+          wf: this,
+        )
+      : null;
 
-    return WidgetPlaceholder(
-      (context) => RichText(
+  Iterable<Widget> buildTextWithContext(
+    BuildContext context,
+    Iterable<Widget> _,
+    TextBlock block,
+  ) {
+    final tsb = block.tsb;
+    tsb?.build(context);
+
+    return [
+      RichText(
         text: _compileToTextSpan(context, block),
-        textAlign: textAlign ?? TextAlign.start,
+        textAlign: tsb?.textAlign ?? TextAlign.start,
       ),
-    );
+    ];
   }
 
   TextDecoration buildTextDecoration(TextStyle parent, NodeMetadata meta) {
@@ -268,11 +289,11 @@ class WidgetFactory {
     return null;
   }
 
-  TextStyle buildTextStyle(BuildContext c, TextStyle p, NodeMetadata m) {
+  TextStyle buildTextStyle(TextStyleBuilders tsb, TextStyle p, NodeMetadata m) {
     if (m == null) return p;
 
     final decoration = buildTextDecoration(p, m);
-    final fontSize = buildTextFontSize(c, p, m);
+    final fontSize = buildTextFontSize(tsb.context, p, m);
     final fontStyle = buildFontStyle(m);
     if (m.color == null &&
         decoration == null &&

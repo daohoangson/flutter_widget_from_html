@@ -35,24 +35,23 @@ void main() {
 
   group('block', () {
     final kBlockHtml = '<div>Foo</div>';
-    final kBlockRendered = '[RichText:(:Foo)]';
 
     testWidgets('renders center block', (WidgetTester t) async {
       final h = '<div style="text-align: center">$kBlockHtml</div>';
       final e = await explain(t, h, imageUrlToPrecache: 'image.png');
-      expect(e, equals('[Align:alignment=center,child=$kBlockRendered]'));
+      expect(e, equals('[RichText,align=center:(:Foo)]'));
     });
 
     testWidgets('renders left block', (WidgetTester tester) async {
       final html = '<div style="text-align: left">$kBlockHtml</div>';
       final e = await explain(tester, html);
-      expect(e, equals('[Align:alignment=centerLeft,child=$kBlockRendered]'));
+      expect(e, equals('[RichText,align=left:(:Foo)]'));
     });
 
     testWidgets('renders right block', (WidgetTester tester) async {
       final html = '<div style="text-align: right">$kBlockHtml</div>';
       final e = await explain(tester, html);
-      expect(e, equals('[Align:alignment=centerRight,child=$kBlockRendered]'));
+      expect(e, equals('[RichText,align=right:(:Foo)]'));
     });
   });
 
@@ -108,7 +107,9 @@ void main() {
     expect(
         explained,
         equals('[SizedBox:0.0x5.0],'
-            '[Align:alignment=center,child=[Padding:(0,5,0,5),child=[RichText:(:Foo)]]],'
+            '[Align:alignment=center,child='
+            '[Padding:(0,5,0,5),'
+            'child=[RichText,align=center:(:Foo)]]],'
             '[SizedBox:0.0x5.0]'));
   });
 }

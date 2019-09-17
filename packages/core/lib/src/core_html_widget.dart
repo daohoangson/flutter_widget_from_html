@@ -7,7 +7,7 @@ import 'core_widget_factory.dart';
 import 'data_classes.dart';
 
 TextStyle _rootTextStyleBuilder(
-  BuildContext context,
+  TextStyleBuilders _,
   TextStyle parent,
   HtmlWidgetConfig config,
 ) {

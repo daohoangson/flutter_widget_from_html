@@ -73,17 +73,20 @@ class _TagLi {
       (widget) {
         final markerText = wf.getListStyleMarker(listStyleType, ++i);
 
-        return WidgetPlaceholder((context) {
-          final style = meta.textStyle(context);
-          final paddingLeftPx = paddingLeft.getValue(style);
+        return WidgetPlaceholder(
+          builder: (context, _, __) {
+            final style = meta.textStyle(context);
+            final paddingLeftPx = paddingLeft.getValue(style);
 
-          return Stack(
-            children: <Widget>[
-              _buildBody(widget, paddingLeftPx),
-              _buildMarker(markerText, style, paddingLeftPx),
-            ],
-          );
-        });
+            return [
+              Stack(children: <Widget>[
+                _buildBody(widget, paddingLeftPx),
+                _buildMarker(markerText, style, paddingLeftPx),
+              ]),
+            ];
+          },
+          wf: wf,
+        );
       },
     );
   }
