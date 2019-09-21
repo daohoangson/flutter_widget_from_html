@@ -1,3 +1,7 @@
+## 0.2.3+1
+
+* Build `RichText` with proper `textScaleFactor` (#75, #78)
+
 ## 0.2.3
 
 * Re-implement text-align support to avoid conflicts (#66, #74)
