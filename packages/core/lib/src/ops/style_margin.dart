@@ -13,8 +13,8 @@ Iterable<Widget> _marginBuilder(
 ) {
   final style = input.meta.textStyle(context);
   final padding = EdgeInsets.only(
-    left: input.marginLeft?.getValue(style) ?? 0.0,
-    right: input.marginRight?.getValue(style) ?? 0.0,
+    left: input.marginLeft?.getValue(style, context: context) ?? 0.0,
+    right: input.marginRight?.getValue(style, context: context) ?? 0.0,
   );
 
   return children.map((child) => input.wf.buildPadding(child, padding));
@@ -48,7 +48,7 @@ class SpacingPlaceholder extends StatelessWidget implements IWidgetPlaceholder {
     var height = 0.0;
 
     for (final _height in _heights) {
-      final h = _height.getValue(style);
+      final h = _height.getValue(style, context: context);
       if (h > height) height = h;
     }
 

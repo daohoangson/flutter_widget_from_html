@@ -227,6 +227,7 @@ class WidgetFactory {
       RichText(
         text: _compileToTextSpan(context, block),
         textAlign: tsb?.textAlign ?? TextAlign.start,
+        textScaleFactor: MediaQuery.of(context).textScaleFactor,
       ),
     ];
   }
@@ -262,7 +263,7 @@ class WidgetFactory {
     if (value == null) return null;
 
     final parsed = parseCssLength(value);
-    if (parsed != null) return parsed.getValue(p);
+    if (parsed != null) return parsed.getValue(p, context: c);
 
     switch (value) {
       case kCssFontSizeXxLarge:

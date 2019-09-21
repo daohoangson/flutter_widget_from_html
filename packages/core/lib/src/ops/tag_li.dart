@@ -81,7 +81,7 @@ class _TagLi {
             return [
               Stack(children: <Widget>[
                 _buildBody(widget, paddingLeftPx),
-                _buildMarker(markerText, style, paddingLeftPx),
+                _buildMarker(context, style, markerText, paddingLeftPx),
               ]),
             ];
           },
@@ -94,16 +94,17 @@ class _TagLi {
   Widget _buildBody(Widget widget, double paddingLeft) =>
       wf.buildPadding(widget, EdgeInsets.only(left: paddingLeft));
 
-  Widget _buildMarker(String text, TextStyle style, double paddingLeft) =>
+  Widget _buildMarker(BuildContext c, TextStyle s, String t, double l) =>
       Positioned(
         left: 0.0,
         top: 0.0,
-        width: paddingLeft * .75,
+        width: l * .75,
         child: RichText(
           maxLines: 1,
           overflow: TextOverflow.clip,
-          text: TextSpan(style: style, text: text),
+          text: TextSpan(style: s, text: t),
           textAlign: TextAlign.right,
+          textScaleFactor: MediaQuery.of(c).textScaleFactor,
         ),
       );
 }

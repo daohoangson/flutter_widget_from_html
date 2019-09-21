@@ -209,15 +209,23 @@ class CssLength {
 
   bool get isNotEmpty => number > 0;
 
-  double getValue(TextStyle style) {
+  double getValue(TextStyle style, {BuildContext context}) {
+    double value;
+
     switch (this.unit) {
       case CssLengthUnit.em:
-        return style.fontSize * number / 1;
+        value = style.fontSize * number / 1;
+        break;
       case CssLengthUnit.px:
-        return number;
+        value = number;
+        break;
     }
 
-    return 0;
+    if (context != null && value != null) {
+      value = value * MediaQuery.of(context).textScaleFactor;
+    }
+
+    return value;
   }
 }
 
