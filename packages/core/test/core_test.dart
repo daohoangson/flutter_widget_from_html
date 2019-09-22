@@ -32,7 +32,7 @@ void main() {
   testWidgets('renders without erroneous white spaces', (WidgetTester t) async {
     final html = """
 <div>
-  <span></span>
+  <span>&#8203;</span>
   <span style="text-decoration: line-through">
     <span style="text-decoration: overline">
       <span style="text-decoration: underline">

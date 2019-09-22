@@ -5,9 +5,11 @@ import 'core_widget_factory.dart';
 import 'data_classes.dart';
 
 final _attrStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
-final _textLeadingSpacingRegExp = RegExp(r'^\s+');
-final _textTrailingSpacingRegExp = RegExp(r'\s+$');
-final _whitespaceDuplicateRegExp = RegExp(r'\s+');
+
+// https://unicode.org/cldr/utility/character.jsp?a=200B
+final _textLeadingSpacingRegExp = RegExp(r'^[\s\u{200B}]+', unicode: true);
+final _textTrailingSpacingRegExp = RegExp(r'[\s\u{200B}]+$', unicode: true);
+final _whitespaceDuplicateRegExp = RegExp(r'[\s\u{200B}]+', unicode: true);
 
 class Builder {
   final List<dom.Node> domNodes;
