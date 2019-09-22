@@ -115,27 +115,19 @@ class WidgetFactory {
       : null;
 
   Widget buildImage(String url, {double height, String text, double width}) {
-    Widget imageWidget;
+    ImageProvider image;
     if (url != null) {
       if (url.startsWith('asset:')) {
-        imageWidget = buildImageFromAsset(url);
+        image = buildImageFromAsset(url);
       } else if (url.startsWith('data:')) {
-        imageWidget = buildImageFromDataUri(url);
+        image = buildImageFromDataUri(url);
       } else {
-        imageWidget = buildImageFromUrl(url);
+        image = buildImageFromUrl(url);
       }
     }
-    if (imageWidget == null) return Text(text ?? '');
+    if (image == null) return Text(text ?? '');
 
-    height ??= 0;
-    width ??= 0;
-    if (height <= 0 || width <= 0) return imageWidget;
-
-    return ImageLayout(
-      child: imageWidget,
-      height: height,
-      width: width,
-    );
+    return ImageLayout(image, height: height, text: text, width: width);
   }
 
   List buildImageBytes(String dataUri) {
@@ -149,7 +141,7 @@ class WidgetFactory {
     return bytes;
   }
 
-  Widget buildImageFromAsset(String url) {
+  ImageProvider buildImageFromAsset(String url) {
     final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
     if (uri?.scheme != 'asset') return null;
 
@@ -160,20 +152,18 @@ class WidgetFactory {
         ? uri.queryParameters['package']
         : null;
 
-    final asset = AssetImage(assetName, package: package);
-
-    return Image(image: asset, fit: BoxFit.cover);
+    return AssetImage(assetName, package: package);
   }
 
-  Widget buildImageFromDataUri(String dataUri) {
+  ImageProvider buildImageFromDataUri(String dataUri) {
     final bytes = buildImageBytes(dataUri);
     if (bytes == null) return null;
 
-    return Image.memory(bytes, fit: BoxFit.cover);
+    return MemoryImage(bytes);
   }
 
-  Widget buildImageFromUrl(String url) =>
-      url?.isNotEmpty == true ? Image.network(url, fit: BoxFit.cover) : null;
+  ImageProvider buildImageFromUrl(String url) =>
+      url?.isNotEmpty == true ? NetworkImage(url) : null;
 
   Widget buildPadding(Widget child, EdgeInsets padding) {
     if (child == null) return null;

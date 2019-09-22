@@ -557,7 +557,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       testWidgets('renders IMG as block', (WidgetTester tester) async {
         final html = '<img src="$src" style="display: block" />';
         final explained = await explain(tester, html, imageUrlToPrecache: src);
-        expect(explained, equals("[Wrap:children=[NetworkImage:url=$src]]"));
+        expect(explained, equals("[NetworkImage:url=$src]"));
       });
 
       testWidgets('renders IMG with dimensions inline',
@@ -579,11 +579,11 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
         final explained = await explain(tester, html, imageUrlToPrecache: src);
         expect(
             explained,
-            equals('[Wrap:children=[ImageLayout:child='
-                "[NetworkImage:url=$src],"
+            equals('[ImageLayout:'
+                "child=[NetworkImage:url=$src],"
                 'height=1.0,'
                 'width=1.0'
-                ']]'));
+                ']'));
       });
     });
   });

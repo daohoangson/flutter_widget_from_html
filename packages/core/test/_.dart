@@ -131,6 +131,18 @@ class _Explainer {
     return "[$type:$description]";
   }
 
+  String _imageLayout(ImageLayout widget) {
+    if (widget.height == null && widget.text == null && widget.width == null)
+      return _image(widget.image);
+
+    String s = "[ImageLayout:child=${_image(widget.image)}";
+    if (widget.height != null) s += ",height=${widget.height}";
+    if (widget.text != null) s += ",text=${widget.text}";
+    if (widget.width != null) s += ",width=${widget.width}";
+
+    return "$s]";
+  }
+
   String _inlineSpan(InlineSpan inlineSpan, {TextStyle parentStyle}) {
     if (inlineSpan is WidgetSpan) return _widget(inlineSpan.child);
 
@@ -272,6 +284,7 @@ class _Explainer {
 
     if (widget == widget0) return '[widget0]';
     if (widget is Image) return _image(widget.image);
+    if (widget is ImageLayout) return _imageLayout(widget);
     if (widget is IWidgetPlaceholder) return _widget(widget.build(context));
 
     final type = widget.runtimeType.toString();
@@ -283,25 +296,23 @@ class _Explainer {
                 ? _boxDecoration(widget.decoration)
                 : widget is GestureDetector
                     ? "child=${_widget(widget.child)}"
-                    : widget is ImageLayout
-                        ? "child=${_widget(widget.child)},height=${widget.height},width=${widget.width}"
-                        : widget is InkWell
-                            ? "child=${_widget(widget.child)}"
-                            : widget is LimitedBox
-                                ? _limitBox(widget)
-                                : widget is Padding
-                                    ? "${_edgeInsets(widget.padding)},"
-                                    : widget is RichText
-                                        ? _inlineSpan(widget.text)
-                                        : widget is SizedBox
-                                            ? "${widget.width?.toStringAsFixed(1) ?? 0.0}x${widget.height?.toStringAsFixed(1) ?? 0.0}"
-                                            : widget is Table
-                                                ? _tableBorder(widget.border)
-                                                : widget is Text
-                                                    ? widget.data
-                                                    : widget is Wrap
-                                                        ? _wrap(widget)
-                                                        : '';
+                    : widget is InkWell
+                        ? "child=${_widget(widget.child)}"
+                        : widget is LimitedBox
+                            ? _limitBox(widget)
+                            : widget is Padding
+                                ? "${_edgeInsets(widget.padding)},"
+                                : widget is RichText
+                                    ? _inlineSpan(widget.text)
+                                    : widget is SizedBox
+                                        ? "${widget.width?.toStringAsFixed(1) ?? 0.0}x${widget.height?.toStringAsFixed(1) ?? 0.0}"
+                                        : widget is Table
+                                            ? _tableBorder(widget.border)
+                                            : widget is Text
+                                                ? widget.data
+                                                : widget is Wrap
+                                                    ? _wrap(widget)
+                                                    : '';
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));

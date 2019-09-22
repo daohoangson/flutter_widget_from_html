@@ -37,12 +37,8 @@ class WidgetFactory extends core.WidgetFactory {
       : null;
 
   @override
-  Widget buildImageFromUrl(String url) => url?.isNotEmpty == true
-      ? CachedNetworkImage(
-          imageUrl: url,
-          fit: BoxFit.cover,
-        )
-      : null;
+  ImageProvider buildImageFromUrl(String url) =>
+      url?.isNotEmpty == true ? CachedNetworkImageProvider(url) : null;
 
   Widget buildVideoPlayer(
     String url, {
