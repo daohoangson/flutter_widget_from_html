@@ -1,3 +1,9 @@
+## 0.2.3+2
+
+* Fix bug rendering empty TD tag (#81)
+* Improve white space rendering
+* Improve IMG rendering
+
 ## 0.2.3+1
 
 * Build `RichText` with proper `textScaleFactor` (#75, #78)
