@@ -50,7 +50,7 @@ class WidgetPlaceholder<T1> extends StatelessWidget
       output = _builders[i](context, children, _inputs[i]);
     }
 
-    return wf.buildColumn(output);
+    return wf.buildColumn(output) ?? widget0;
   }
 
   @override

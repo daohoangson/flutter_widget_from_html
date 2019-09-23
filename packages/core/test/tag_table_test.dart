@@ -201,5 +201,29 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
+
+    testWidgets('#80: empty TD', (WidgetTester tester) async {
+      final html = '<table><tr><td></td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Table:\n[widget0]\n]'));
+    });
+
+    testWidgets('empty TR', (WidgetTester tester) async {
+      final html = '<table><tr></tr></table>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[widget0]'));
+    });
+
+    testWidgets('empty TBODY', (WidgetTester tester) async {
+      final html = '<table><tbody></tbody></table>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[widget0]'));
+    });
+
+    testWidgets('empty TABLE', (WidgetTester tester) async {
+      final html = '<table></table>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[widget0]'));
+    });
   });
 }
