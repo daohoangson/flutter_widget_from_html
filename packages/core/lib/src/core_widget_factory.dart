@@ -736,12 +736,7 @@ class WidgetFactory {
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      onWidgets: (meta, __) => [
-        SpacingPlaceholder(
-          height: CssLength(1, unit: CssLengthUnit.em),
-          meta: meta,
-        )
-      ],
+      onPieces: (_, pieces) => pieces..last.block.addText('\n'),
     );
     return _tagBr;
   }

@@ -76,6 +76,12 @@ void main() {
             '[RichText:(+i:ADDRESS)]]'));
   });
 
+  testWidgets('renders BR tag', (WidgetTester tester) async {
+    final html = 'Foo<br />Bar';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[RichText:(:Foo\nBar)]'));
+  });
+
   testWidgets('renders DD/DL/DT tags', (WidgetTester tester) async {
     final html = '<dl><dt>Foo</dt><dd>Bar</dd></dt>';
     final explained = await explainMargin(tester, html);
@@ -182,16 +188,6 @@ void main() {
             '[Padding:(0,40,0,40),child=[RichText:(:Foo)]],'
             '[SizedBox:0.0x10.0]'),
       );
-    });
-
-    testWidgets('renders BR tag', (WidgetTester tester) async {
-      final html = 'First.<br />Second one.';
-      final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[Column:children=[RichText:(:First.)],' +
-              '[SizedBox:0.0x10.0],' +
-              '[RichText:(:Second one.)]]'));
     });
 
     testWidgets('renders DIV tag', (WidgetTester tester) async {
