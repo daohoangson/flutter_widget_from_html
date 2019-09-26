@@ -19,21 +19,33 @@
 #   test_script: ./tool/integration.sh
 
 android_test_task:
+  # https://github.com/MaikuB/flutter_app_templates/blob/master/.cirrus.yml
   container:
     image: cirrusci/flutter
     cpu: 8
     memory: 24
+  env:
+    EMULATOR_API_LEVEL: 22
+    ANDROID_ABI: "default;armeabi-v7a"
   gradle_cache:
     folder: ~/.gradle/caches
+  pub_cache:
+    folder: ~/.pub-cache
+  pin_emulator_script:
+    - ${ANDROID_HOME}/emulator/emulator -version
+    - emulator_version=5264690
+    - curl -fo emulator.zip "https://dl.google.com/android/repository/emulator-linux-$emulator_version.zip"
+    - rm -rf "${ANDROID_HOME}/emulator"
+    - unzip -q emulator.zip -d "${ANDROID_HOME}"
+    - rm -f emulator.zip
+    - ${ANDROID_HOME}/emulator/emulator -version
+  install_images_script: sdkmanager "system-images;android-$EMULATOR_API_LEVEL;$ANDROID_ABI"
   create_device_script:
-    - export "SYSTEM_IMAGE=system-images;android-24;default;armeabi-v7a"
-    - yes | sdkmanager "$SYSTEM_IMAGE" || if [ $? -ne '141' ]; then exit $?; fi;
-    - yes | sdkmanager --licenses || if [ $? -ne '141' ]; then exit $?; fi;
-    - echo no | avdmanager -v create avd -n test -k "$SYSTEM_IMAGE"
+    echo no | avdmanager create avd --force -n test -k "system-images;android-$EMULATOR_API_LEVEL;$ANDROID_ABI"
   start_emulator_background_script:
-    - $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window
+    $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window
   wait_for_emulator_script:
-    - adb wait-for-device
+    android-wait-for-emulator
   test_script: ./tool/integration.sh
   gradle_cleanup_before_cache_script:
     - rm -rf ~/.gradle/caches/$GRADLE_VERSION/
