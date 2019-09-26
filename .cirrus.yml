@@ -27,8 +27,6 @@ android_test_task:
   env:
     EMULATOR_API_LEVEL: 22
     ANDROID_ABI: "default;armeabi-v7a"
-  gradle_cache:
-    folder: ~/.gradle/caches
   pub_cache:
     folder: ~/.pub-cache
   pin_emulator_script:
@@ -47,6 +45,3 @@ android_test_task:
   wait_for_emulator_script:
     android-wait-for-emulator
   test_script: ./tool/integration.sh
-  gradle_cleanup_before_cache_script:
-    - rm -rf ~/.gradle/caches/$GRADLE_VERSION/
-    - find ~/.gradle/caches/ -name "*.lock" -type f -delete
