@@ -10,6 +10,9 @@ void main() {
     final s3Finder = find.byValueKey('input-3.0');
     final rFinder = find.byValueKey('output');
 
+    final waitTime = const Duration(seconds: 30);
+    final timeout = const Timeout(Duration(minutes: 1));
+
     setUpAll(() async {
       driver = await FlutterDriver.connect();
     });
@@ -20,22 +23,34 @@ void main() {
       }
     });
 
-    test('resizes to 1.0', () async {
-      await driver.tap(s1Finder);
-      await Future.delayed(Duration(seconds: 20));
-      expect(await driver.getText(rFinder), '1.00');
-    });
+    test(
+      'resizes to 1.0',
+      () async {
+        await driver.tap(s1Finder);
+        await Future.delayed(waitTime);
+        expect(await driver.getText(rFinder), '1.00');
+      },
+      timeout: timeout,
+    );
 
-    test('renders 2.0 without resizing', () async {
-      await driver.tap(s2Finder);
-      await Future.delayed(Duration(seconds: 20));
-      expect(await driver.getText(rFinder), '1.78');
-    });
+    test(
+      'renders 2.0 without resizing',
+      () async {
+        await driver.tap(s2Finder);
+        await Future.delayed(waitTime);
+        expect(await driver.getText(rFinder), '1.78');
+      },
+      timeout: timeout,
+    );
 
-    test('renders 3.0 without resizing', () async {
-      await driver.tap(s3Finder);
-      await Future.delayed(Duration(seconds: 20));
-      expect(await driver.getText(rFinder), '1.78');
-    });
+    test(
+      'renders 3.0 without resizing',
+      () async {
+        await driver.tap(s3Finder);
+        await Future.delayed(waitTime);
+        expect(await driver.getText(rFinder), '1.78');
+      },
+      timeout: timeout,
+    );
   });
 }
