@@ -18,6 +18,18 @@ void main() {
             ']]'));
   });
 
+  testWidgets('renders 2 tables', (WidgetTester tester) async {
+    final html = '<table><tr><td>Foo</td></tr></table>'
+        '<table><tr><td>Bar</td></tr></table>';
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[Column:children='
+            '[Table:\n[RichText:(:Foo)]\n],'
+            '[Table:\n[RichText:(:Bar)]\n]'
+            ']'));
+  });
+
   testWidgets('renders THEAD/TBODY/TFOOT tags', (WidgetTester tester) async {
     final html = """<table>
       <tfoot><tr><td>Footer 1</td><td>Footer 2</td></tr></tfoot>
