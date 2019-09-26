@@ -10,9 +10,10 @@ void main() {
     final explained = await explainMargin(tester, html);
     expect(
         explained,
-        equals('[Padding:(10,0,10,0),child='
+        equals('[SizedBox:0.0x10.0],'
             '[Stack:children=[$padding,child=[RichText:(:Foo)]],'
-            '[Positioned:child=[RichText,align=right:(:•)]]]]'));
+            '[Positioned:child=[RichText,align=right:(:•)]]],'
+            '[SizedBox:0.0x10.0]'));
   });
 
   testWidgets('renders ordered list', (WidgetTester tester) async {

@@ -24,7 +24,7 @@ class _TagQ {
 
             if (!bit.isSpace) {
               final bb = bit.block;
-              bb.addBit(TextBit.text(bb, kTagQOpening, bb.style), index: i);
+              bb.addBit(TextBit.text(bb, kTagQOpening, bb.tsb), index: i);
               addedOpening = true;
               return false;
             }
@@ -39,7 +39,7 @@ class _TagQ {
 
             if (!bit.isSpace) {
               final bb = bit.block;
-              bb.addBit(TextBit.text(bb, kTagQClosing, bb.style), index: i + 1);
+              bb.addBit(TextBit.text(bb, kTagQClosing, bb.tsb), index: i + 1);
               addedClosing = true;
               return false;
             }
@@ -49,7 +49,7 @@ class _TagQ {
 
           if (!addedOpening) {
             first.addBit(
-              TextBit.text(first, kTagQOpening, first.style),
+              TextBit.text(first, kTagQOpening, first.tsb),
               index: 0,
             );
             if (firstBit?.isSpace == true)

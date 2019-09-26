@@ -26,7 +26,10 @@ void main() {
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[RichText:[CachedNetworkImage:http://base.com/path/image.png]]]'));
+              '[RichText:[ImageLayout:'
+              'child=[CachedNetworkImageProvider:],'
+              'text=image dot png'
+              ']]]'));
     });
   });
 

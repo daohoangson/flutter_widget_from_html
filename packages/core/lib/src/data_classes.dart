@@ -172,22 +172,60 @@ class CssBorders {
   CssBorderSide top;
 }
 
+class CssMargin {
+  CssLength bottom;
+  CssLength left;
+  CssLength right;
+  CssLength top;
+
+  bool get isNotEmpty =>
+      bottom?.isNotEmpty == true ||
+      left?.isNotEmpty == true ||
+      right?.isNotEmpty == true ||
+      top?.isNotEmpty == true;
+
+  CssMargin copyWith({
+    CssLength bottom,
+    CssLength left,
+    CssLength right,
+    CssLength top,
+  }) =>
+      CssMargin()
+        ..bottom = bottom ?? this.bottom
+        ..left = left ?? this.left
+        ..right = right ?? this.right
+        ..top = top ?? this.top;
+}
+
 class CssLength {
   final double number;
   final CssLengthUnit unit;
 
-  CssLength(this.number, {this.unit});
+  CssLength(
+    this.number, {
+    this.unit = CssLengthUnit.px,
+  })  : assert(!number.isNegative),
+        assert(unit != null);
 
-  double getValue(TextStyle parent) {
-    if (number == 0) return 0;
+  bool get isNotEmpty => number > 0;
+
+  double getValue(TextStyle style, {BuildContext context}) {
+    double value;
 
     switch (this.unit) {
       case CssLengthUnit.em:
-        return parent.fontSize * number / 1;
+        value = style.fontSize * number / 1;
+        break;
       case CssLengthUnit.px:
-      default:
-        return number;
+        value = number;
+        break;
     }
+
+    if (context != null && value != null) {
+      value = value * MediaQuery.of(context).textScaleFactor;
+    }
+
+    return value;
   }
 }
 
@@ -198,10 +236,9 @@ enum CssLengthUnit {
 
 class NodeMetadata {
   Iterable<BuildOp> _buildOps;
-  BuildContext _context;
   dom.Element _domElement;
   Iterable<BuildOp> _parentOps;
-  TextStyle _textStyle;
+  TextStyleBuilders _tsb;
 
   Color color;
   bool decoOver;
@@ -217,8 +254,6 @@ class NodeMetadata {
   List<String> _styles;
   bool _stylesFrozen = false;
 
-  BuildContext get context => _context;
-
   dom.Element get domElement => _domElement;
 
   bool get hasOps => _buildOps != null;
@@ -229,7 +264,7 @@ class NodeMetadata {
 
   Iterable<BuildOp> get parents => _parentOps;
 
-  TextStyle get textStyle => _textStyle;
+  TextStyleBuilders get tsb => _tsb;
 
   set domElement(dom.Element e) {
     assert(_domElement == null);
@@ -242,14 +277,9 @@ class NodeMetadata {
     }
   }
 
-  set context(BuildContext context) {
-    assert(_context == null);
-    _context = context;
-  }
-
-  set textStyle(TextStyle textStyle) {
-    assert(_textStyle == null);
-    _textStyle = textStyle;
+  set tsb(TextStyleBuilders tsb) {
+    assert(_tsb == null);
+    _tsb = tsb;
   }
 
   bool get isBlockElement {
@@ -268,6 +298,8 @@ class NodeMetadata {
       f(key, iterator.current);
     }
   }
+
+  TextStyle textStyle(BuildContext context) => tsb.build(context);
 }
 
 typedef NodeMetadata NodeMetadataCollector(NodeMetadata meta, dom.Element e);
@@ -285,20 +317,20 @@ class TextBit extends _TextBit {
   final TextBlock block;
   final String data;
   final VoidCallback onTap;
-  final TextStyle style;
+  final TextStyleBuilders tsb;
   final WidgetSpan widgetSpan;
 
-  TextBit.text(this.block, this.data, this.style, {this.onTap})
+  TextBit.text(this.block, this.data, this.tsb, {this.onTap})
       : assert(block != null),
         assert(data != null),
-        assert(style != null),
+        assert(tsb != null),
         widgetSpan = null;
 
   TextBit.space(this.block)
       : assert(block != null),
         data = null,
         onTap = null,
-        style = null,
+        tsb = null,
         widgetSpan = null;
 
   TextBit.widget(this.block, this.widgetSpan)
@@ -306,7 +338,7 @@ class TextBit extends _TextBit {
         assert(widgetSpan != null),
         data = null,
         onTap = null,
-        style = null;
+        tsb = null;
 
   @override
   TextBit get first => this;
@@ -327,14 +359,14 @@ class TextBit extends _TextBit {
   TextBit rebuild({
     String data,
     VoidCallback onTap,
-    TextStyle style,
+    TextStyleBuilders tsb,
     WidgetSpan widgetSpan,
   }) =>
       isText
           ? TextBit.text(
               block,
               data ?? this.data,
-              style ?? this.style,
+              tsb ?? this.tsb,
               onTap: onTap ?? this.onTap,
             )
           : isWidget
@@ -359,13 +391,20 @@ class TextBit extends _TextBit {
 
 class TextBlock extends _TextBit {
   final TextBlock parent;
-  final TextStyle style;
+  final TextStyleBuilders tsb;
   final List<_TextBit> _children = [];
 
-  TextBlock(this.style, {this.parent}) : assert(style != null);
+  TextBlock(this.tsb, {this.parent}) : assert(tsb != null);
 
   @override
-  TextBit get first => _children.first.first;
+  TextBit get first {
+    for (final child in _children) {
+      if (child is TextBit) return child;
+      final first = child.first;
+      if (first != null) return first;
+    }
+    return null;
+  }
 
   @override
   bool get hasTrailingSpace {
@@ -381,8 +420,8 @@ class TextBlock extends _TextBit {
 
   @override
   bool get isEmpty {
-    for (var i = 0; i < _children.length; i++) {
-      if (_children[i].isNotEmpty) {
+    for (final child in _children) {
+      if (child.isNotEmpty) {
         return false;
       }
     }
@@ -391,7 +430,17 @@ class TextBlock extends _TextBit {
   }
 
   @override
-  TextBit get last => _children.last.last;
+  TextBit get last {
+    final l = _children.length;
+    for (var i = l - 1; i >= 0; i--) {
+      final child = _children[i];
+      if (child is TextBit) return child;
+      final last = child.last;
+      if (last != null) return last;
+    }
+
+    return null;
+  }
 
   TextBit get next {
     if (parent == null) return null;
@@ -416,7 +465,7 @@ class TextBlock extends _TextBit {
     return true;
   }
 
-  void addText(String data) => addBit(TextBit.text(this, data, style));
+  void addText(String data) => addBit(TextBit.text(this, data, tsb));
 
   void addWidget(WidgetSpan ws) => addBit(TextBit.widget(this, ws));
 
@@ -451,8 +500,8 @@ class TextBlock extends _TextBit {
     }
   }
 
-  TextBlock sub(TextStyle style) {
-    final sub = TextBlock(style ?? this.style, parent: this);
+  TextBlock sub(TextStyleBuilders tsb) {
+    final sub = TextBlock(tsb, parent: this);
     _children.add(sub);
     return sub;
   }
@@ -472,3 +521,61 @@ class TextBlock extends _TextBit {
     }
   }
 }
+
+class TextStyleBuilders {
+  final _builders = <Function>[];
+  final _inputs = [];
+  final TextStyleBuilders parent;
+
+  BuildContext _context;
+  TextStyle _output;
+  TextAlign _textAlign;
+
+  BuildContext get context => _context;
+
+  TextAlign get textAlign => _textAlign ?? parent?.textAlign;
+
+  set textAlign(TextAlign v) => _textAlign = v;
+
+  TextStyleBuilders({this.parent});
+
+  void enqueue<T>(TextStyleBuilder<T> builder, T input) {
+    assert(_output == null, "Cannot add builder after being built");
+    _builders.add(builder);
+    _inputs.add(input);
+  }
+
+  TextStyle build(BuildContext context) {
+    _resetContextIfNeeded(context);
+    if (_output != null) return _output;
+
+    if (parent == null) {
+      _output = DefaultTextStyle.of(context).style;
+    } else {
+      _output = parent.build(context);
+    }
+
+    final l = _builders.length;
+    for (int i = 0; i < l; i++) {
+      _output = _builders[i](this, _output, _inputs[i]);
+    }
+
+    return _output;
+  }
+
+  TextStyleBuilders sub() => TextStyleBuilders(parent: this);
+
+  void _resetContextIfNeeded(BuildContext context) {
+    if (context == _context) return;
+
+    _context = context;
+    _output = null;
+    _textAlign = null;
+  }
+}
+
+typedef TextStyle TextStyleBuilder<T>(
+  TextStyleBuilders tsb,
+  TextStyle textStyle,
+  T input,
+);

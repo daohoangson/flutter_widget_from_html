@@ -41,8 +41,10 @@ void main() {
       );
       expect(
           explained,
-          equals('[Padding:(10,10,10,10),child='
-              '[RichText:[NetworkImage:url=http://base.com/path/image.png]]]'));
+          equals('[Padding:(10,10,10,10),child=[RichText:[ImageLayout:'
+              'child=[NetworkImage:url=http://base.com/path/image.png],'
+              'text=image dot png'
+              ']]]'));
     });
   });
 

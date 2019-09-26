@@ -15,26 +15,27 @@ void main() {
     expect(explained, equals('[RichText:(:Foo)]'));
   });
 
-  group('BR tag', () {
+  group('trimming', () {
     testWidgets('trims top intances', (WidgetTester tester) async {
-      final html = '<br/><br/>Foo';
+      final html = '<div style="margin-top: 1em">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
     testWidgets('trims bottom instances', (WidgetTester tester) async {
-      final html = 'Foo<br/><br/>';
+      final html = '<div style="margin-bottom: 1em">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
-    testWidgets('skip others', (WidgetTester tester) async {
-      final html = '<br/>Foo<br/>Bar<br/>';
+    testWidgets('trims both ways', (WidgetTester tester) async {
+      final html = '<div style="margin: 1em 0">Foo</div>'
+          '<div style="margin: 1em 0">Bar</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
           equals('[Column:children=[RichText:(:Foo)],'
-              '[Padding:(5,0,5,0),child=[widget0]],'
+              '[SizedBox:0.0x10.0],'
               '[RichText:(:Bar)]]'));
     });
   });

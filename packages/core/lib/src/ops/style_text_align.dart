@@ -6,29 +6,43 @@ const kCssTextAlignJustify = 'justify';
 const kCssTextAlignLeft = 'left';
 const kCssTextAlignRight = 'right';
 
+TextStyle _styleTextAlignBuilder(
+  TextStyleBuilders tsb,
+  TextStyle parent,
+  TextAlign align,
+) {
+  tsb.textAlign = align;
+  return parent;
+}
+
 class _StyleTextAlign {
   final WidgetFactory wf;
 
   _StyleTextAlign(this.wf);
 
   BuildOp get buildOp => BuildOp(
+        isBlockElement: true,
         onPieces: (meta, pieces) {
           String v;
           meta.styles((k, _v) => k == kCssTextAlign ? v = _v : null);
           if (v == null) return pieces;
 
-          final widgets = <Widget>[];
-          for (final p in pieces) {
-            if (!p.hasWidgets) {
-              widgets.add(wf.buildText(p.block, textAlign: _getTextAlign(v)));
-              continue;
-            }
+          // handle texts
+          meta.tsb.enqueue(_styleTextAlignBuilder, _getTextAlign(v));
 
-            widgets.addAll(
-                p.widgets.map((w) => wf.buildAlign(w, _getAlignment(v))));
+          // handle widgets
+          final newPieces = <BuiltPiece>[];
+          for (final p in pieces) {
+            if (p.widgets?.isNotEmpty == true) {
+              final alignment = _getAlignment(v);
+              final widgets = p.widgets.map((w) => wf.buildAlign(w, alignment));
+              newPieces.add(BuiltPieceSimple(widgets: widgets));
+            } else {
+              newPieces.add(p);
+            }
           }
 
-          return <BuiltPiece>[BuiltPieceSimple(widgets: widgets)];
+          return newPieces;
         },
       );
 }

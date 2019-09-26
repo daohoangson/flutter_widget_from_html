@@ -1,23 +1,63 @@
 part of '../core_widget_factory.dart';
 
-class ImageLayout extends StatelessWidget {
-  final Widget child;
+final _dimensionRegExp = RegExp(r'^(.+)px$');
+
+class ImageLayout extends StatefulWidget {
   final double height;
+  final ImageProvider image;
+  final String text;
   final double width;
 
-  ImageLayout({this.child, this.height, this.width})
-      : assert(child != null),
-        assert(height > 0),
-        assert(width > 0);
+  ImageLayout(this.image, {this.height, Key key, this.text, this.width})
+      : assert(image != null),
+        super(key: key);
 
   @override
-  Widget build(BuildContext context) => CustomSingleChildLayout(
-        child: child,
-        delegate: _ImageLayoutDelegate(
-          height: height,
-          width: width,
-        ),
+  _ImageLayoutState createState() => _ImageLayoutState();
+}
+
+class _ImageLayoutState extends State<ImageLayout> {
+  double height;
+  double width;
+
+  ImageStream _stream;
+  ImageStreamListener _streamListener;
+
+  @override
+  void initState() {
+    super.initState();
+
+    height = widget.height;
+    width = widget.width;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _stream?.removeListener(_streamListener);
+  }
+
+  @override
+  Widget build(BuildContext _) {
+    if (height != null && height > 0 && width != null) {
+      return CustomSingleChildLayout(
+        child: Image(image: widget.image, fit: BoxFit.cover),
+        delegate: _ImageLayoutDelegate(height: height, width: width),
       );
+    }
+
+    if (_stream == null) {
+      _streamListener = ImageStreamListener((info, _) => setState(() {
+            height = info.image.height.toDouble();
+            width = info.image.width.toDouble();
+          }));
+      _stream = widget.image.resolve(ImageConfiguration.empty);
+      _stream.addListener(_streamListener);
+    }
+
+    return widget.text != null ? Text(widget.text) : widget0;
+  }
 }
 
 class _ImageLayoutDelegate extends SingleChildLayoutDelegate {
@@ -90,10 +130,7 @@ class _TagImg {
           var widget = _buildImage(img, wf);
           if (widget == null) return widgets;
 
-          // [Wrap] is required to avoid small image width being stretched
-          return [
-            Wrap(children: [widget])
-          ];
+          return [widget];
         },
       );
 
@@ -110,8 +147,23 @@ class _TagImg {
           ? map[key]
           : map.containsKey(key2) ? map[key2] : null;
 
-  static double _getDouble(Map<dynamic, String> map, String key, String key2) {
-    final value = _getAttr(map, key, key2);
+  static double _getDimension(
+    NodeMetadata meta,
+    Map<dynamic, String> map,
+    String key,
+    String key2,
+  ) {
+    String value;
+    meta.styles((k, v) => k == key ? value = v : null);
+    if (value != null) {
+      final match = _dimensionRegExp.matchAsPrefix(value);
+      if (match != null) {
+        final parsed = double.tryParse(match.group(1));
+        if (parsed != null) return parsed;
+      }
+    }
+
+    value = _getAttr(map, key, key2);
     return value != null ? double.tryParse(value) : null;
   }
 
@@ -120,10 +172,10 @@ class _TagImg {
     final src = _getAttr(attrs, 'src', 'data-src');
 
     return _TagImgMetadata(
-      height: _getDouble(attrs, 'height', 'data-height'),
+      height: _getDimension(meta, attrs, 'height', 'data-height'),
       text: _getAttr(attrs, 'alt', 'title'),
       url: wf.constructFullUrl(src),
-      width: _getDouble(attrs, 'width', 'data-width'),
+      width: _getDimension(meta, attrs, 'width', 'data-width'),
     );
   }
 }

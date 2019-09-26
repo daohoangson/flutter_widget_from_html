@@ -21,7 +21,7 @@ part 'ops/text.dart';
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
 
 class WidgetFactory {
-  final HtmlWidget _htmlWidget;
+  final HtmlWidgetConfig _config;
 
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
@@ -35,25 +35,29 @@ class WidgetFactory {
   BuildOp _tagQ;
   BuildOp _tagTable;
 
-  WidgetFactory(this._htmlWidget);
+  WidgetFactory(this._config);
 
-  Color get hyperlinkColor => _htmlWidget.hyperlinkColor;
+  Color get hyperlinkColor => _config.hyperlinkColor;
 
   Widget buildAlign(Widget child, Alignment alignment) {
     if (child == null) return null;
-    if (alignment == null) return child;
-
-    if (child is Padding)
-      return buildPadding(buildAlign(child.child, alignment), child.padding);
+    if (alignment == null || child is RichText) return child;
+    if (child is IWidgetPlaceholder)
+      return child..wrapWith(buildAlignsWithContext, alignment);
 
     return Align(alignment: alignment, child: child);
   }
 
+  Iterable<Widget> buildAlignsWithContext(
+          BuildContext _, Iterable<Widget> children, Alignment alignment) =>
+      children.map((child) => buildAlign(child, alignment));
+
   Widget buildBody(Iterable<Widget> children) =>
-      buildPadding(buildColumn(children), _htmlWidget.bodyPadding);
+      buildPadding(buildColumn(children), _config.bodyPadding);
 
   Widget buildColumn(Iterable<Widget> children) {
-    children = fixOverlappingPaddings(children);
+    children = fixOverlappingSpacings(
+        children is List ? children : children.toList(growable: false));
     if (children?.isNotEmpty != true) return null;
 
     return children.length > 1
@@ -89,50 +93,41 @@ class WidgetFactory {
   Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
       GestureDetector(child: child, onTap: onTap);
 
+  Iterable<Widget> buildGestureDetectorsWithContext(BuildContext _,
+          Iterable<Widget> children, GestureTapCallback onTap) =>
+      children.map((child) => buildGestureDetector(child, onTap));
+
   Iterable<Widget> buildGestureDetectors(
     Iterable<Widget> widgets,
     GestureTapCallback onTap,
   ) {
     if (widgets?.isNotEmpty != true || onTap == null) return widgets;
-
     return widgets.map((widget) {
-      if (widget is Padding) {
-        final p = widget;
-        return buildPadding(buildGestureDetector(p.child, onTap), p.padding);
-      }
+      if (widget is IWidgetPlaceholder)
+        return widget..wrapWith(buildGestureDetectorsWithContext, onTap);
 
       return buildGestureDetector(widget, onTap);
     });
   }
 
   GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
-      ? () => _htmlWidget.onTapUrl != null
-          ? _htmlWidget.onTapUrl(url)
-          : debugPrint(url)
+      ? () => _config.onTapUrl != null ? _config.onTapUrl(url) : debugPrint(url)
       : null;
 
   Widget buildImage(String url, {double height, String text, double width}) {
-    Widget imageWidget;
+    ImageProvider image;
     if (url != null) {
       if (url.startsWith('asset:')) {
-        imageWidget = buildImageFromAsset(url);
+        image = buildImageFromAsset(url);
       } else if (url.startsWith('data:')) {
-        imageWidget = buildImageFromDataUri(url);
+        image = buildImageFromDataUri(url);
       } else {
-        imageWidget = buildImageFromUrl(url);
+        image = buildImageFromUrl(url);
       }
     }
-    if (imageWidget == null) return Text(text ?? '');
+    if (image == null) return Text(text ?? '');
 
-    height ??= 0;
-    width ??= 0;
-    if (height <= 0 || width <= 0) return imageWidget;
-
-    return ImageLayout(
-      child: imageWidget,
-      height: height,
-      width: width,
-    );
+    return ImageLayout(image, height: height, text: text, width: width);
   }
 
   List buildImageBytes(String dataUri) {
@@ -146,7 +141,7 @@ class WidgetFactory {
     return bytes;
   }
 
-  Widget buildImageFromAsset(String url) {
+  ImageProvider buildImageFromAsset(String url) {
     final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
     if (uri?.scheme != 'asset') return null;
 
@@ -157,20 +152,18 @@ class WidgetFactory {
         ? uri.queryParameters['package']
         : null;
 
-    final asset = AssetImage(assetName, package: package);
-
-    return Image(image: asset, fit: BoxFit.cover);
+    return AssetImage(assetName, package: package);
   }
 
-  Widget buildImageFromDataUri(String dataUri) {
+  ImageProvider buildImageFromDataUri(String dataUri) {
     final bytes = buildImageBytes(dataUri);
     if (bytes == null) return null;
 
-    return Image.memory(bytes, fit: BoxFit.cover);
+    return MemoryImage(bytes);
   }
 
-  Widget buildImageFromUrl(String url) =>
-      url?.isNotEmpty == true ? Image.network(url, fit: BoxFit.cover) : null;
+  ImageProvider buildImageFromUrl(String url) =>
+      url?.isNotEmpty == true ? NetworkImage(url) : null;
 
   Widget buildPadding(Widget child, EdgeInsets padding) {
     if (child == null) return null;
@@ -202,18 +195,34 @@ class WidgetFactory {
       Table(border: border, children: rows);
 
   Widget buildTableCell(Widget child) =>
-      TableCell(child: buildPadding(child, _htmlWidget.tableCellPadding));
+      TableCell(child: buildPadding(child, _config.tableCellPadding));
 
-  Widget buildText(TextBlock block, {TextAlign textAlign}) {
-    final _textAlign = textAlign ?? TextAlign.start;
+  Widget buildText(TextBlock block) => block?.isEmpty == false
+      ? WidgetPlaceholder(
+          builder: buildTextWithContext,
+          input: block,
+          wf: this,
+        )
+      : null;
 
-    final span = _compileToTextSpan(block);
-    if (span != null) return RichText(text: span, textAlign: _textAlign);
+  Iterable<Widget> buildTextWithContext(
+    BuildContext context,
+    Iterable<Widget> _,
+    TextBlock block,
+  ) {
+    final tsb = block.tsb;
+    tsb?.build(context);
 
-    return null;
+    return [
+      RichText(
+        text: _compileToTextSpan(context, block),
+        textAlign: tsb?.textAlign ?? TextAlign.start,
+        textScaleFactor: MediaQuery.of(context).textScaleFactor,
+      ),
+    ];
   }
 
-  TextDecoration buildTextDecoration(NodeMetadata meta, TextStyle parent) {
+  TextDecoration buildTextDecoration(TextStyle parent, NodeMetadata meta) {
     if (meta?.decoOver == null &&
         meta?.decoStrike == null &&
         meta?.decoUnder == null) {
@@ -239,62 +248,62 @@ class WidgetFactory {
     return TextDecoration.combine(list);
   }
 
-  double buildTextFontSize(NodeMetadata meta, TextStyle parent) {
-    final value = meta?.fontSize;
+  double buildTextFontSize(BuildContext c, TextStyle p, NodeMetadata m) {
+    final value = m.fontSize;
     if (value == null) return null;
 
     final parsed = parseCssLength(value);
-    if (parsed != null) return parsed.getValue(parent);
+    if (parsed != null) return parsed.getValue(p, context: c);
 
     switch (value) {
       case kCssFontSizeXxLarge:
-        return DefaultTextStyle.of(meta.context).style.fontSize * 2.0;
+        return DefaultTextStyle.of(c).style.fontSize * 2.0;
       case kCssFontSizeXLarge:
-        return DefaultTextStyle.of(meta.context).style.fontSize * 1.5;
+        return DefaultTextStyle.of(c).style.fontSize * 1.5;
       case kCssFontSizeLarge:
-        return DefaultTextStyle.of(meta.context).style.fontSize * 1.125;
+        return DefaultTextStyle.of(c).style.fontSize * 1.125;
       case kCssFontSizeMedium:
-        return DefaultTextStyle.of(meta.context).style.fontSize;
+        return DefaultTextStyle.of(c).style.fontSize;
       case kCssFontSizeSmall:
-        return DefaultTextStyle.of(meta.context).style.fontSize * .8125;
+        return DefaultTextStyle.of(c).style.fontSize * .8125;
       case kCssFontSizeXSmall:
-        return DefaultTextStyle.of(meta.context).style.fontSize * .625;
+        return DefaultTextStyle.of(c).style.fontSize * .625;
       case kCssFontSizeXxSmall:
-        return DefaultTextStyle.of(meta.context).style.fontSize * .5625;
+        return DefaultTextStyle.of(c).style.fontSize * .5625;
 
       case kCssFontSizeLarger:
-        return parent.fontSize * 1.2;
+        return p.fontSize * 1.2;
       case kCssFontSizeSmaller:
-        return parent.fontSize * (15 / 18);
+        return p.fontSize * (15 / 18);
     }
 
     return null;
   }
 
-  TextStyle buildTextStyle(NodeMetadata meta, TextStyle parent) {
-    if (meta == null) return parent;
+  TextStyle buildTextStyle(TextStyleBuilders tsb, TextStyle p, NodeMetadata m) {
+    if (m == null) return p;
 
-    final decoration = buildTextDecoration(meta, parent);
-    final fontSize = buildTextFontSize(meta, parent);
-    final fontStyle = buildFontStyle(meta);
-    if (meta.color == null &&
+    final decoration = buildTextDecoration(p, m);
+    final fontSize = buildTextFontSize(tsb.context, p, m);
+    final fontStyle = buildFontStyle(m);
+    if (m.color == null &&
         decoration == null &&
-        meta.decorationStyle == null &&
-        meta.fontFamily == null &&
+        m.decorationStyle == null &&
+        m.fontFamily == null &&
         fontSize == null &&
         fontStyle == null &&
-        meta.fontWeight == null) {
-      return parent;
+        m.fontWeight == null) {
+      return p;
     }
 
-    return parent.copyWith(
-      color: meta.color,
+    return p.copyWith(
+      color: m.color,
       decoration: decoration,
-      decorationStyle: meta.decorationStyle,
-      fontFamily: meta.fontFamily,
+      decorationStyle: m.decorationStyle,
+      fontFamily: m.fontFamily,
       fontSize: fontSize,
       fontStyle: fontStyle,
-      fontWeight: meta.fontWeight,
+      fontWeight: m.fontWeight,
     );
   }
 
@@ -304,69 +313,45 @@ class WidgetFactory {
     if (p == null) return null;
     if (p.hasScheme) return p.toString();
 
-    final b = _htmlWidget.baseUrl;
+    final b = _config.baseUrl;
     if (b == null) return null;
 
     return b.resolveUri(p).toString();
   }
 
-  List<Widget> fixOverlappingPaddings(List<Widget> widgets) {
+  List<Widget> fixOverlappingSpacings(List<Widget> widgets) {
     if (widgets?.isNotEmpty != true) return null;
-    final fixed = <Widget>[];
-    final skipWidget0 = (Widget w) => w == widget0 ? null : fixed.add(w);
 
     var iMin = 0;
     var iMax = widgets.length - 1;
     while (iMin < iMax) {
-      final wMin = widgets[iMin];
-      if (wMin is Padding && wMin.child == widget0) {
+      if (widgets[iMin] is SpacingPlaceholder) {
         iMin++;
       } else {
         break;
       }
     }
-    while (iMax > iMin) {
-      final wMax = widgets[iMax];
-      if (wMax is Padding && wMax.child == widget0) {
+    while (iMax >= iMin) {
+      if (widgets[iMax] is SpacingPlaceholder) {
         iMax--;
       } else {
         break;
       }
     }
+    if (iMax < iMin) return null;
 
-    EdgeInsets prev;
+    final fixed = <Widget>[];
+    Widget prev;
     for (var i = iMin; i <= iMax; i++) {
       final widget = widgets[i];
-      if (!(widget is Padding)) {
-        fixed.add(widget);
-        prev = null;
+
+      if (widget is SpacingPlaceholder && prev is SpacingPlaceholder) {
+        prev.mergeWith(widget);
         continue;
       }
 
-      final p = widget as Padding;
-      final pp = p.padding as EdgeInsets;
-      var v = pp;
-
-      if (i == iMin && v.top > 0) {
-        // remove padding at the top
-        v = v.copyWith(top: 0);
-      }
-
-      if (i == iMax && v.bottom > 0) {
-        // remove padding at the bottom
-        v = v.copyWith(bottom: 0);
-      }
-
-      if (prev != null && prev.bottom > 0 && v.top > 0) {
-        v = v.copyWith(top: v.top > prev.bottom ? v.top - prev.bottom : 0);
-      }
-
-      skipWidget0(v != pp
-          ? v == const EdgeInsets.all(0)
-              ? p.child
-              : Padding(child: p.child, padding: v)
-          : widget);
-      prev = v;
+      fixed.add(widget);
+      prev = widget;
     }
 
     return fixed;
@@ -388,8 +373,8 @@ class WidgetFactory {
   }
 
   NodeMetadata parseElement(NodeMetadata meta, dom.Element element) {
-    if (_htmlWidget.builderCallback != null) {
-      meta = _htmlWidget.builderCallback(meta, element);
+    if (_config.builderCallback != null) {
+      meta = _config.builderCallback(meta, element);
     }
 
     return meta;
@@ -751,8 +736,7 @@ class WidgetFactory {
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      defaultStyles: (_, __) => const [kCssMargin, '0.5em 0'],
-      onWidgets: (_, __) => [widget0],
+      onPieces: (_, pieces) => pieces..last.block.addText('\n'),
     );
     return _tagBr;
   }

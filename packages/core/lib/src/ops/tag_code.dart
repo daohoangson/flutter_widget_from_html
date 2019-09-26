@@ -18,6 +18,6 @@ class _TagCode {
       );
 
   BuiltPiece _buildPreTag(NodeMetadata meta) => BuiltPieceSimple(
-        block: TextBlock(meta.textStyle)..addText(meta.domElement.text),
+        block: TextBlock(meta.tsb)..addText(meta.domElement.text),
       );
 }
