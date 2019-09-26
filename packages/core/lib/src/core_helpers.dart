@@ -30,12 +30,10 @@ class WidgetPlaceholder<T1> extends StatelessWidget
     WidgetPlaceholderBuilder<T1> builder,
     Iterable<Widget> children,
     T1 input,
-    Key key,
     this.wf,
   })  : assert(builder != null),
         assert(wf != null),
-        _firstChildren = children,
-        super(key: key) {
+        _firstChildren = children {
     _builders.add(builder);
     _inputs.add(input);
   }

@@ -212,18 +212,17 @@ class _TableInput {
 
 class _TablePlaceholder extends WidgetPlaceholder<_TableInput> {
   final Iterable<Widget> _children;
-
-  String get tag => (key as ValueKey).value;
+  final String tag;
 
   _TablePlaceholder(
     _TagTable self,
     this._children,
     _TableInput _input,
-  ) : super(
+  )   : tag = _input.tag,
+        super(
           builder: self._build,
           children: _children,
           input: _input,
-          key: ValueKey(_input.tag),
           wf: _input.wf,
         );
 
