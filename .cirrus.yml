@@ -22,10 +22,8 @@ android_test_task:
   # https://github.com/MaikuB/flutter_app_templates/blob/master/.cirrus.yml
   container:
     image: cirrusci/flutter
-    cpu: 8
-    memory: 24
   env:
-    EMULATOR_API_LEVEL: 23
+    EMULATOR_API_LEVEL: 22
     ANDROID_ABI: "default;armeabi-v7a"
   pub_cache:
     folder: ~/.pub-cache
