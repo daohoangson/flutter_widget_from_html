@@ -22,19 +22,19 @@ void main() {
 
     test('resizes to 1.0', () async {
       await driver.tap(s1Finder);
-      await Future.delayed(Duration(seconds: 10));
+      await Future.delayed(Duration(seconds: 20));
       expect(await driver.getText(rFinder), '1.00');
     });
 
     test('renders 2.0 without resizing', () async {
       await driver.tap(s2Finder);
-      await Future.delayed(Duration(seconds: 10));
+      await Future.delayed(Duration(seconds: 20));
       expect(await driver.getText(rFinder), '1.78');
     });
 
     test('renders 3.0 without resizing', () async {
       await driver.tap(s3Finder);
-      await Future.delayed(Duration(seconds: 10));
+      await Future.delayed(Duration(seconds: 20));
       expect(await driver.getText(rFinder), '1.78');
     });
   });
