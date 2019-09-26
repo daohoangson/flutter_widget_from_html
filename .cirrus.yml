@@ -19,7 +19,6 @@ ios_test_task:
   test_script: ./tool/integration.sh
 
 android_test_task:
-  # https://github.com/MaikuB/flutter_app_templates/blob/master/.cirrus.yml
   container:
     image: cirrusci/flutter
   env:

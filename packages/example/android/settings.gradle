@@ -13,15 +13,3 @@ plugins.each { name, path ->
     include ":$name"
     project(":$name").projectDir = pluginDirectory
 }
-
-// https://medium.com/cirruslabs/mastering-gradle-caching-and-incremental-builds-37eb1af7fcde
-ext.isCiServer = System.getenv().containsKey("CI")
-ext.isMasterBranch = System.getenv()["CIRRUS_BRANCH"] == "master"
-ext.buildCacheHost = System.getenv().getOrDefault("CIRRUS_HTTP_CACHE_HOST", "localhost:12321")
-buildCache {
-    remote(HttpBuildCache) {
-        url = "http://" + buildCacheHost + "/"
-        enabled = isCiServer
-        push = isMasterBranch
-    }
-}
