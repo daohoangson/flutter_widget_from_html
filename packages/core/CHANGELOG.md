@@ -1,3 +1,8 @@
+## 0.2.3+3
+
+* Improve BR rendering to be consistent with browsers (#83, #84)
+* Improve TABLE rendering to support multiple tables (#85, #86)
+
 ## 0.2.3+2
 
 * Fix bug rendering empty TD tag (#81)
