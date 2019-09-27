@@ -47,12 +47,10 @@ class _TagLi {
 
   BuildOp get liOp {
     _liOp ??= BuildOp(
-      onWidgets: (_, widgets) => [_buildItem(widgets)],
+      onWidgets: (_, widgets) => [wf.buildColumn(widgets)],
     );
     return _liOp;
   }
-
-  Widget _buildItem(Iterable<Widget> widgets) => wf.buildColumn(widgets);
 
   Iterable<Widget> _buildList(NodeMetadata meta, Iterable<Widget> children) {
     String listStyleType = kCssListStyleTypeDisc;
@@ -71,16 +69,27 @@ class _TagLi {
     int i = 0;
     return children.map(
       (widget) {
+        if (widget is _TagLiPlaceholder) {
+          return widget
+            ..wrapWith((context, widgets, __) {
+              final style = meta.textStyle(context);
+              final paddingLeftPx = paddingLeft.getValue(style);
+              final padding = EdgeInsets.only(left: paddingLeftPx);
+
+              return widgets.map((widget) => wf.buildPadding(widget, padding));
+            });
+        }
+
         final markerText = wf.getListStyleMarker(listStyleType, ++i);
 
-        return WidgetPlaceholder(
+        return _TagLiPlaceholder(
           builder: (context, _, __) {
             final style = meta.textStyle(context);
             final paddingLeftPx = paddingLeft.getValue(style);
 
             return [
               Stack(children: <Widget>[
-                _buildBody(widget, paddingLeftPx),
+                wf.buildPadding(widget, EdgeInsets.only(left: paddingLeftPx)),
                 _buildMarker(context, style, markerText, paddingLeftPx),
               ]),
             ];
@@ -90,9 +99,6 @@ class _TagLi {
       },
     );
   }
-
-  Widget _buildBody(Widget widget, double paddingLeft) =>
-      wf.buildPadding(widget, EdgeInsets.only(left: paddingLeft));
 
   Widget _buildMarker(BuildContext c, TextStyle s, String t, double l) =>
       Positioned(
@@ -107,4 +113,11 @@ class _TagLi {
           textScaleFactor: MediaQuery.of(c).textScaleFactor,
         ),
       );
+}
+
+class _TagLiPlaceholder extends WidgetPlaceholder {
+  _TagLiPlaceholder({
+    WidgetPlaceholderBuilder builder,
+    WidgetFactory wf,
+  }) : super(builder: builder, wf: wf);
 }
