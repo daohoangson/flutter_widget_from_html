@@ -1,0 +1,3 @@
+ignore:
+  - ^lib/src/video_player.dart$
+  - ^lib/src/web_view.dart$
