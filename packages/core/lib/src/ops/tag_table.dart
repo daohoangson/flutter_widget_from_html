@@ -227,7 +227,7 @@ class _TablePlaceholder extends WidgetPlaceholder<_TableInput> {
         );
 
   @override
-  void wrapWith<T>(WidgetPlaceholderBuilder<T> builder, input) {
+  void wrapWith<T>(WidgetPlaceholderBuilder<T> builder, [T input]) {
     if (tag == kTagTableCell) return super.wrapWith(builder, input);
 
     for (final child in _children)

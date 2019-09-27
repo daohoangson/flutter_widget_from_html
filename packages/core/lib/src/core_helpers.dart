@@ -52,7 +52,7 @@ class WidgetPlaceholder<T1> extends StatelessWidget
   }
 
   @override
-  void wrapWith<T2>(WidgetPlaceholderBuilder<T2> builder, T2 input) {
+  void wrapWith<T2>(WidgetPlaceholderBuilder<T2> builder, [T2 input]) {
     _builders.add(builder);
     _inputs.add(input);
   }
