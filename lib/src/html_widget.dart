@@ -7,8 +7,48 @@ import 'widget_factory.dart' as extended;
 
 /// A widget that builds Flutter widget tree from html.
 class HtmlWidget extends core.HtmlWidget {
-  final core.FactoryBuilder factoryBuilder;
+  /// Creates a widget that builds Flutter widget tree from html.
+  ///
+  /// The [html] argument must not be null.
+  HtmlWidget(
+    String html, {
+    core.FactoryBuilder factoryBuilder,
+    Key key,
+    HtmlWidgetConfig config,
+    Uri baseUrl,
+    EdgeInsets bodyPadding = const EdgeInsets.all(10),
+    NodeMetadataCollector builderCallback,
+    Color hyperlinkColor,
+    core.OnTapUrl onTapUrl,
+    EdgeInsets tableCellPadding = const EdgeInsets.all(5),
+    TextStyle textStyle = const TextStyle(),
+    bool unsupportedWebViewWorkaroundForIssue37 = false,
+    bool webView = false,
+    bool webViewJs = true,
+  })  : assert(html != null),
+        super(
+          html,
+          factoryBuilder:
+              factoryBuilder ?? (config) => extended.WidgetFactory(config),
+          config: config ??
+              HtmlWidgetConfig(
+                baseUrl: baseUrl,
+                bodyPadding: bodyPadding,
+                builderCallback: builderCallback,
+                hyperlinkColor: hyperlinkColor,
+                onTapUrl: onTapUrl,
+                tableCellPadding: tableCellPadding,
+                textStyle: textStyle,
+                unsupportedWebViewWorkaroundForIssue37:
+                    unsupportedWebViewWorkaroundForIssue37,
+                webView: webView,
+                webViewJs: webViewJs,
+              ),
+          key: key,
+        );
+}
 
+class HtmlWidgetConfig extends core.HtmlWidgetConfig {
   /// The flag to control whether or not to apply workaround for
   /// [issue 37](https://github.com/daohoangson/flutter_widget_from_html/issues/37)
   final bool unsupportedWebViewWorkaroundForIssue37;
@@ -36,27 +76,18 @@ class HtmlWidget extends core.HtmlWidget {
   /// The flag to control whether or not WebView has JavaScript enabled.
   final bool webViewJs;
 
-  /// Creates a widget that builds Flutter widget tree from html.
-  ///
-  /// The [html] argument must not be null.
-  HtmlWidget(
-    String html, {
-    this.factoryBuilder,
-    Key key,
+  HtmlWidgetConfig({
     Uri baseUrl,
-    EdgeInsets bodyPadding = const EdgeInsets.all(10),
+    EdgeInsets bodyPadding,
     NodeMetadataCollector builderCallback,
     Color hyperlinkColor,
     core.OnTapUrl onTapUrl,
-    EdgeInsets tableCellPadding = const EdgeInsets.all(5),
+    EdgeInsets tableCellPadding,
     TextStyle textStyle,
-    double wrapSpacing = 5,
-    this.unsupportedWebViewWorkaroundForIssue37 = false,
-    this.webView = false,
-    this.webViewJs = true,
+    this.unsupportedWebViewWorkaroundForIssue37,
+    this.webView,
+    this.webViewJs,
   }) : super(
-          html,
-          key: key,
           baseUrl: baseUrl,
           bodyPadding: bodyPadding,
           builderCallback: builderCallback,
@@ -64,12 +95,5 @@ class HtmlWidget extends core.HtmlWidget {
           onTapUrl: onTapUrl,
           tableCellPadding: tableCellPadding,
           textStyle: textStyle,
-          wrapSpacing: wrapSpacing,
         );
-
-  @override
-  core.WidgetFactory buildFactory(BuildContext context) =>
-      factoryBuilder != null
-          ? factoryBuilder(context, this)
-          : extended.WidgetFactory(context, this);
 }

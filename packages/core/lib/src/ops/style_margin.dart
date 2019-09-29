@@ -6,6 +6,61 @@ const kCssMarginLeft = 'margin-left';
 const kCssMarginRight = 'margin-right';
 const kCssMarginTop = 'margin-top';
 
+Iterable<Widget> _marginBuilder(
+  BuildContext context,
+  Iterable<Widget> children,
+  _MarginBuilderInput input,
+) {
+  final style = input.meta.textStyle(context);
+  final padding = EdgeInsets.only(
+    left: input.marginLeft?.getValue(style, context: context) ?? 0.0,
+    right: input.marginRight?.getValue(style, context: context) ?? 0.0,
+  );
+
+  return children.map((child) => input.wf.buildPadding(child, padding));
+}
+
+class _MarginBuilderInput {
+  CssLength marginLeft;
+  CssLength marginRight;
+  NodeMetadata meta;
+  WidgetFactory wf;
+}
+
+class SpacingPlaceholder extends StatelessWidget implements IWidgetPlaceholder {
+  final NodeMetadata meta;
+
+  final _heights = <CssLength>[];
+
+  SpacingPlaceholder({
+    CssLength height,
+    Key key,
+    this.meta,
+  })  : assert(height != null),
+        assert(meta != null),
+        super(key: key) {
+    _heights.add(height);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final style = meta.textStyle(context);
+    var height = 0.0;
+
+    for (final _height in _heights) {
+      final h = _height.getValue(style, context: context);
+      if (h > height) height = h;
+    }
+
+    return SizedBox(height: height);
+  }
+
+  void mergeWith(SpacingPlaceholder other) => _heights.addAll(other._heights);
+
+  @override
+  Widget wrapWith<T>(WidgetPlaceholderBuilder<T> builder, T input) => this;
+}
+
 class _StyleMargin {
   final WidgetFactory wf;
 
@@ -14,30 +69,35 @@ class _StyleMargin {
   BuildOp get buildOp => BuildOp(
         onWidgets: (meta, widgets) {
           if (widgets?.isNotEmpty != true) return null;
-          final padding = _StyleMarginParser(meta).parse();
-          if (padding == null) return null;
-
-          if (widgets.length == 1) {
-            return [wf.buildPadding(widgets.first, padding)];
-          }
+          final margin = _StyleMarginParser(meta).parse();
+          if (margin == null) return null;
 
           return <Widget>[]
-            ..add(padding.top > 0
-                ? Padding(
-                    child: widget0,
-                    padding: EdgeInsets.only(top: padding.top),
-                  )
+            ..add(margin.top?.isNotEmpty == true
+                ? SpacingPlaceholder(height: margin.top, meta: meta)
                 : null)
-            ..addAll(
-              widgets.map(
-                (w) => wf.buildPadding(w, padding.copyWith(top: 0, bottom: 0)),
-              ),
-            )
-            ..add(padding.bottom > 0
-                ? Padding(
-                    child: widget0,
-                    padding: EdgeInsets.only(bottom: padding.bottom),
-                  )
+            ..addAll(margin.left?.isNotEmpty == true ||
+                    margin.right?.isNotEmpty == true
+                ? widgets.map((widget) {
+                    final input = _MarginBuilderInput()
+                      ..marginLeft = margin.left
+                      ..marginRight = margin.right
+                      ..meta = meta
+                      ..wf = wf;
+
+                    if (widget is IWidgetPlaceholder)
+                      return widget..wrapWith(_marginBuilder, input);
+
+                    return WidgetPlaceholder(
+                      builder: _marginBuilder,
+                      children: [widget],
+                      input: input,
+                      wf: wf,
+                    );
+                  })
+                : widgets)
+            ..add(margin.bottom?.isNotEmpty == true
+                ? SpacingPlaceholder(height: margin.bottom, meta: meta)
                 : null);
         },
       );
@@ -52,8 +112,8 @@ class _StyleMarginParser {
 
   _StyleMarginParser(this.meta);
 
-  EdgeInsets parse() {
-    EdgeInsets output;
+  CssMargin parse() {
+    CssMargin output;
 
     meta.styles((key, value) {
       switch (key) {
@@ -73,29 +133,40 @@ class _StyleMarginParser {
     return output;
   }
 
-  EdgeInsets _parseAll(String value) {
+  CssMargin _parseAll(String value) {
     final valuesFour = _valuesFourRegExp.firstMatch(value);
     if (valuesFour != null) {
-      final t = _parseValue(valuesFour[1]);
-      final r = _parseValue(valuesFour[2]);
-      final b = _parseValue(valuesFour[3]);
-      final l = _parseValue(valuesFour[4]);
-      return EdgeInsets.fromLTRB(l, t, r, b);
+      return CssMargin()
+        ..top = _parseValue(valuesFour[1])
+        ..right = _parseValue(valuesFour[2])
+        ..bottom = _parseValue(valuesFour[3])
+        ..left = _parseValue(valuesFour[4]);
     }
 
     final valuesTwo = _valuesTwoRegExp.firstMatch(value);
     if (valuesTwo != null) {
-      final v = _parseValue(valuesTwo[1]);
-      final h = _parseValue(valuesTwo[2]);
-      return EdgeInsets.symmetric(horizontal: h, vertical: v);
+      final topBottom = _parseValue(valuesTwo[1]);
+      final leftRight = _parseValue(valuesTwo[2]);
+      return CssMargin()
+        ..bottom = topBottom
+        ..left = leftRight
+        ..right = leftRight
+        ..top = topBottom;
     }
 
-    return EdgeInsets.all(_parseValue(value));
+    final all = _parseValue(value);
+    return CssMargin()
+      ..bottom = all
+      ..left = all
+      ..right = all
+      ..top = all;
   }
 
-  EdgeInsets _parseOne(EdgeInsets existing, String key, String value) {
+  CssMargin _parseOne(CssMargin existing, String key, String value) {
     final parsed = _parseValue(value);
-    existing ??= EdgeInsets.all(0);
+    if (parsed == null) return existing;
+
+    existing ??= CssMargin();
 
     switch (key) {
       case kCssMarginBottom:
@@ -109,13 +180,5 @@ class _StyleMarginParser {
     }
   }
 
-  double _parseValue(String str) {
-    final parsed = parseCssLength(str);
-    if (parsed == null) return 0;
-
-    final value = parsed.getValue(meta.textStyle);
-    if (value < 0) return 0;
-
-    return value;
-  }
+  CssLength _parseValue(String str) => parseCssLength(str);
 }

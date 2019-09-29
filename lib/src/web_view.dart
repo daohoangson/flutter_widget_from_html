@@ -11,7 +11,6 @@ class WebView extends StatefulWidget {
   final List<Duration> getDimensionsDurations;
   final InterceptNavigationRequest interceptNavigationRequest;
   final bool js;
-  final WebViewOnDimensions onDimensions;
 
   // https://github.com/daohoangson/flutter_widget_from_html/issues/37
   final bool unsupportedWorkaroundForIssue37;
@@ -29,7 +28,6 @@ class WebView extends StatefulWidget {
     this.js = true,
     this.unsupportedWorkaroundForIssue37 = false,
     Key key,
-    this.onDimensions,
   })  : assert(url != null),
         assert(aspectRatio != null),
         // `js` must be true for `getDimensions` to work
@@ -41,14 +39,19 @@ class WebView extends StatefulWidget {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.debug}) =>
-      "[WebView:url=$url,aspectRatio=${aspectRatio.toStringAsFixed(2)}," +
-      "getDimensions=$getDimensions,js=$js]";
+      "[WebView:url=$url,"
+      "aspectRatio=${aspectRatio.toStringAsFixed(2)},"
+      "getDimensions=${getDimensions ? 1 : 0},"
+      "js=${js ? 1 : 0}"
+      ']';
 }
 
 class _WebViewState extends State<WebView> {
   double _aspectRatio;
   _Issue37 _issue37;
   lib.WebViewController _wvc;
+
+  String _firstFinishedUrl;
 
   @override
   initState() {
@@ -95,15 +98,9 @@ class _WebViewState extends State<WebView> {
             : lib.JavascriptMode.disabled,
         key: Key(widget.url),
         navigationDelegate: widget.interceptNavigationRequest != null
-            ? (req) => _interceptNavigationRequest(req.url)
+            ? (req) => _interceptNavigationRequest(req)
             : null,
-        onPageFinished: widget.getDimensions
-            ? (_) => widget.getDimensionsDurations.forEach((t) => t == null
-                // get dimensions immediately
-                ? _getDimensions()
-                // or wait for the specified duration
-                : Future.delayed(t).then((_) => _getDimensions()))
-            : null,
+        onPageFinished: _onPageFinished,
         onWebViewCreated: (c) => _wvc = c,
       );
 
@@ -122,31 +119,37 @@ class _WebViewState extends State<WebView> {
     final r = (h > 0 && w > 0) ? (w / h) : _aspectRatio;
     final changed = (r - _aspectRatio).abs() > 0.0001;
     if (changed && mounted) setState(() => _aspectRatio = r);
-
-    final f = widget.onDimensions;
-    if (f != null) f(r, changed, h, w);
   }
 
-  lib.NavigationDecision _interceptNavigationRequest(String url) {
+  lib.NavigationDecision _interceptNavigationRequest(
+      lib.NavigationRequest req) {
     var intercepted = false;
 
-    final f = widget.interceptNavigationRequest;
-    if (f != null) {
-      intercepted = f(url);
+    if (widget.interceptNavigationRequest != null &&
+        _firstFinishedUrl != null &&
+        req.isForMainFrame &&
+        req.url != widget.url &&
+        req.url != _firstFinishedUrl) {
+      intercepted = widget.interceptNavigationRequest(req.url);
     }
 
     return intercepted
         ? lib.NavigationDecision.prevent
         : lib.NavigationDecision.navigate;
   }
-}
 
-typedef void WebViewOnDimensions(
-  double aspectRatio,
-  bool changed,
-  double height,
-  double width,
-);
+  void _onPageFinished(String url) {
+    if (_firstFinishedUrl == null) _firstFinishedUrl = url;
+
+    if (widget.getDimensions == true) {
+      widget.getDimensionsDurations.forEach((t) => t == null
+          // get dimensions immediately
+          ? _getDimensions()
+          // or wait for the specified duration
+          : Future.delayed(t).then((_) => _getDimensions()));
+    }
+  }
+}
 
 typedef bool InterceptNavigationRequest(String url);
 

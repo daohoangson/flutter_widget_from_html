@@ -2,13 +2,13 @@
 
 [![CirrusCI](https://api.cirrus-ci.com/github/daohoangson/flutter_widget_from_html.svg)](https://cirrus-ci.com/github/daohoangson/flutter_widget_from_html)
 [![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
-[![Pub](https://img.shields.io/pub/v/flutter_widget_from_html_core.svg)](https://pub.dartlang.org/packages/flutter_widget_from_html_core)
+[![Pub](https://img.shields.io/pub/v/flutter_widget_from_html_core.svg)](https://pub.dev/packages/flutter_widget_from_html_core)
 
 A Flutter plugin for building Flutter-widget tree from html.
 
 This `core` package implements html parsing and widget building logic so it's easy to extend and fit your app's use case. It tries to render an optimal tree: use `Text` instead of `RichText` as much as possible, merge text spans together, show images in `AspectRatio`, etc.
 
-If this is your first time here, consider using the [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) package as a quick starting point.
+If this is your first time here, consider using the [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) package as a quick starting point.
 
 ## Usage
 
@@ -62,9 +62,9 @@ class HelloWorldCoreScreen extends StatelessWidget {
 
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
 
-- A: underline, blue color, no default onTap action (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
+- A: underline, blue color, no default onTap action (use [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) for that)
 - H1/H2/H3/H4/H5/H6
-- IMG with support for data uri and remote url but no caching (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for that)
+- IMG with support for asset (`asset://`), data uri and network image without caching (use [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) for that)
 - TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
   - `<table border="1">`
   - `<table style="border: 1px solid #f00">`
@@ -74,7 +74,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
 
 However, these tags and their contents will be ignored:
 
-- IFRAME (use [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) for web view support)
+- IFRAME (use [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) for web view support)
 - SCRIPT
 - STYLE
 
@@ -92,7 +92,7 @@ However, these tags and their contents will be ignored:
 
 ## Extensibility
 
-As previously mentioned, this package focuses on the core parsing-building routine with lots of tests to make sure it works correctly. If the [`flutter_widget_from_html`](https://pub.dartlang.org/packages/flutter_widget_from_html) package does not suite your need or you don't like any of the dependencies included in that package, it's time to extend `flutter_widget_from_html_core`.
+As previously mentioned, this package focuses on the core parsing-building routine with lots of tests to make sure it works correctly. If the [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) package does not suite your need or you don't like any of the dependencies included in that package, it's time to extend `flutter_widget_from_html_core`.
 
 Here is how it works:
 

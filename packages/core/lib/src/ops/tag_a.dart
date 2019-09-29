@@ -32,13 +32,20 @@ class _TagA {
         },
       );
 
-  BuiltPiece _buildBlock(BuiltPiece piece, GestureTapCallback onTap) =>
-      piece..block.rebuildBits((b) => b.isSpace ? b : b.rebuild(onTap: onTap));
+  BuiltPiece _buildBlock(BuiltPiece piece, GestureTapCallback onTap) => piece
+    ..block.rebuildBits((b) => b.isWidget
+        ? b.rebuildWidget(
+            child: GestureDetector(
+              child: b.widgetSpan.child,
+              onTap: onTap,
+            ),
+          )
+        : b.rebuild(onTap: onTap));
 
   GestureTapCallback _buildGestureTapCallback(NodeMetadata meta) {
     final attrs = meta.domElement.attributes;
-    final href = attrs.containsKey('href') ? attrs['href'] : '';
-    final url = wf.constructFullUrl(href) ?? href;
+    final href = attrs.containsKey('href') ? attrs['href'] : null;
+    final url = wf.constructFullUrl(href);
     return wf.buildGestureTapCallbackForUrl(url);
   }
 }

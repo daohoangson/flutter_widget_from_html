@@ -5,17 +5,18 @@ import 'core_widget_factory.dart';
 import 'data_classes.dart';
 
 final _attrStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
-final _textLeadingSpacingRegExp = RegExp(r'^\s+');
-final _textTrailingSpacingRegExp = RegExp(r'\s+$');
-final _whitespaceDuplicateRegExp = RegExp(r'\s+');
+
+// https://unicode.org/cldr/utility/character.jsp?a=200B
+final _textLeadingSpacingRegExp = RegExp(r'^[\s\u{200B}]+', unicode: true);
+final _textTrailingSpacingRegExp = RegExp(r'[\s\u{200B}]+$', unicode: true);
+final _whitespaceDuplicateRegExp = RegExp(r'[\s\u{200B}]+', unicode: true);
 
 class Builder {
-  final BuildContext context;
   final List<dom.Node> domNodes;
   final TextBlock parentBlock;
   final NodeMetadata parentMeta;
   final Iterable<BuildOp> parentOps;
-  final TextStyle parentTextStyle;
+  final TextStyleBuilders parentTsb;
   final WidgetFactory wf;
 
   final _pieces = <BuiltPiece>[];
@@ -23,16 +24,14 @@ class Builder {
   _Piece _textPiece;
 
   Builder({
-    @required this.context,
     @required this.domNodes,
     this.parentBlock,
     this.parentMeta,
     Iterable<BuildOp> parentParentOps,
-    @required this.parentTextStyle,
+    @required this.parentTsb,
     @required this.wf,
-  })  : assert(context != null),
-        assert(domNodes != null),
-        assert(parentTextStyle != null),
+  })  : assert(domNodes != null),
+        assert(parentTsb != null),
         assert(wf != null),
         parentOps = _prepareParentOps(parentParentOps, parentMeta);
 
@@ -45,6 +44,7 @@ class Builder {
           if (widget != null) list.add(widget);
         }
       } else {
+        piece.block.trimRight();
         final text = wf.buildText(piece.block);
         if (text != null) list.add(text);
       }
@@ -91,9 +91,10 @@ class Builder {
 
     meta = wf.parseElement(meta, e);
 
-    meta?.context = context;
-    meta?.domElement = e;
-    meta?.textStyle = wf.buildTextStyle(meta, parentTextStyle);
+    if (meta != null) {
+      meta.domElement = e;
+      meta.tsb = parentTsb.sub()..enqueue(wf.buildTextStyle, meta);
+    }
 
     return meta;
   }
@@ -113,12 +114,11 @@ class Builder {
 
       final isBlockElement = meta?.isBlockElement == true;
       final __builder = Builder(
-        context: context,
         domNodes: domNode.nodes,
         parentBlock: isBlockElement ? null : _textPiece.block,
         parentMeta: meta,
         parentParentOps: parentOps,
-        parentTextStyle: meta?.textStyle ?? parentTextStyle,
+        parentTsb: meta?.tsb ?? parentTsb,
         wf: wf,
       );
 
@@ -128,17 +128,10 @@ class Builder {
         continue;
       }
 
-      int i = 0;
       for (final __piece in __builder.process()) {
-        i++;
-        if (i == 1) {
-          if (__piece.block?.parent == _textPiece.block) {
-            continue;
-          } else {
-            // discard the active text piece
-            // because sub builder somehow consumed it already
-            _newTextPiece();
-          }
+        if (__piece.block?.parent == _textPiece.block) {
+          // same text block, do nothing
+          continue;
         }
 
         _saveTextPiece();
@@ -160,8 +153,8 @@ class Builder {
 
   void _newTextPiece() => _textPiece = _Piece(
         this,
-        block: (_pieces.isEmpty ? parentBlock?.sub(parentTextStyle) : null) ??
-            TextBlock(parentTextStyle),
+        block: (_pieces.isEmpty ? parentBlock?.sub(parentTsb) : null) ??
+            TextBlock(parentTsb),
       );
 
   void _saveTextPiece() {
@@ -196,7 +189,7 @@ class _Piece extends BuiltPiece {
 
     final substring = text.substring(start, end);
     final dedup = substring.replaceAll(_whitespaceDuplicateRegExp, ' ');
-    if (!block.addText(dedup)) return false;
+    block.addText(dedup);
 
     if (end < text.length) block.addSpace();
 
@@ -209,7 +202,8 @@ Iterable<BuildOp> _prepareParentOps(
   NodeMetadata parentMeta,
 ) {
   // try to reuse existing list if possible
-  final withOnChild = parentMeta?.ops?.where((op) => op.hasOnChild)?.toList();
+  final withOnChild =
+      parentMeta?.ops?.where((op) => op.hasOnChild)?.toList(growable: false);
   if (withOnChild?.isNotEmpty != true) return parentParentOps;
 
   return List.unmodifiable(

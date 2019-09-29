@@ -5,10 +5,13 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../packages/core/test/_.dart' as _coreTesting;
 
+final coreHwKey = _coreTesting.hwKey;
+
 String _explainer(Widget widget) {
   if (widget is CachedNetworkImage)
     return "[CachedNetworkImage:${widget.imageUrl}]";
 
+  if (widget is VideoPlayer) return widget.toString();
   if (widget is WebView) return widget.toString();
 
   return null;
@@ -17,17 +20,18 @@ String _explainer(Widget widget) {
 Future<String> explain(
   WidgetTester tester,
   String html, {
-  _coreTesting.HtmlWidgetBuilder hw,
+  HtmlWidget hw,
   bool webView = false,
 }) async =>
     _coreTesting.explain(
       tester,
       null,
       hw: hw ??
-          (_) => HtmlWidget(
-                html,
-                bodyPadding: const EdgeInsets.all(0),
-                webView: webView,
-              ),
+          HtmlWidget(
+            html,
+            bodyPadding: const EdgeInsets.all(0),
+            key: _coreTesting.hwKey,
+            webView: webView,
+          ),
       explainer: _explainer,
     );

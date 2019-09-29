@@ -172,22 +172,60 @@ class CssBorders {
   CssBorderSide top;
 }
 
+class CssMargin {
+  CssLength bottom;
+  CssLength left;
+  CssLength right;
+  CssLength top;
+
+  bool get isNotEmpty =>
+      bottom?.isNotEmpty == true ||
+      left?.isNotEmpty == true ||
+      right?.isNotEmpty == true ||
+      top?.isNotEmpty == true;
+
+  CssMargin copyWith({
+    CssLength bottom,
+    CssLength left,
+    CssLength right,
+    CssLength top,
+  }) =>
+      CssMargin()
+        ..bottom = bottom ?? this.bottom
+        ..left = left ?? this.left
+        ..right = right ?? this.right
+        ..top = top ?? this.top;
+}
+
 class CssLength {
   final double number;
   final CssLengthUnit unit;
 
-  CssLength(this.number, {this.unit});
+  CssLength(
+    this.number, {
+    this.unit = CssLengthUnit.px,
+  })  : assert(!number.isNegative),
+        assert(unit != null);
 
-  double getValue(TextStyle parent) {
-    if (number == 0) return 0;
+  bool get isNotEmpty => number > 0;
+
+  double getValue(TextStyle style, {BuildContext context}) {
+    double value;
 
     switch (this.unit) {
       case CssLengthUnit.em:
-        return parent.fontSize * number / 1;
+        value = style.fontSize * number / 1;
+        break;
       case CssLengthUnit.px:
-      default:
-        return number;
+        value = number;
+        break;
     }
+
+    if (context != null && value != null) {
+      value = value * MediaQuery.of(context).textScaleFactor;
+    }
+
+    return value;
   }
 }
 
@@ -198,10 +236,9 @@ enum CssLengthUnit {
 
 class NodeMetadata {
   Iterable<BuildOp> _buildOps;
-  BuildContext _context;
   dom.Element _domElement;
   Iterable<BuildOp> _parentOps;
-  TextStyle _textStyle;
+  TextStyleBuilders _tsb;
 
   Color color;
   bool decoOver;
@@ -217,8 +254,6 @@ class NodeMetadata {
   List<String> _styles;
   bool _stylesFrozen = false;
 
-  BuildContext get context => _context;
-
   dom.Element get domElement => _domElement;
 
   bool get hasOps => _buildOps != null;
@@ -229,7 +264,7 @@ class NodeMetadata {
 
   Iterable<BuildOp> get parents => _parentOps;
 
-  TextStyle get textStyle => _textStyle;
+  TextStyleBuilders get tsb => _tsb;
 
   set domElement(dom.Element e) {
     assert(_domElement == null);
@@ -242,14 +277,9 @@ class NodeMetadata {
     }
   }
 
-  set context(BuildContext context) {
-    assert(_context == null);
-    _context = context;
-  }
-
-  set textStyle(TextStyle textStyle) {
-    assert(_textStyle == null);
-    _textStyle = textStyle;
+  set tsb(TextStyleBuilders tsb) {
+    assert(_tsb == null);
+    _tsb = tsb;
   }
 
   bool get isBlockElement {
@@ -268,119 +298,284 @@ class NodeMetadata {
       f(key, iterator.current);
     }
   }
+
+  TextStyle textStyle(BuildContext context) => tsb.build(context);
 }
 
 typedef NodeMetadata NodeMetadataCollector(NodeMetadata meta, dom.Element e);
 
-class TextBit {
+abstract class _TextBit {
+  TextBit get first;
+  bool get hasTrailingSpace;
+  bool get isEmpty;
+  TextBit get last;
+
+  bool get isNotEmpty => !isEmpty;
+}
+
+class TextBit extends _TextBit {
   final TextBlock block;
   final String data;
   final VoidCallback onTap;
-  final TextStyle style;
+  final TextStyleBuilders tsb;
+  final WidgetSpan widgetSpan;
 
-  TextBit({this.block, this.data, this.style, this.onTap});
-
-  TextBit.text(this.block, this.data, this.style)
+  TextBit.text(this.block, this.data, this.tsb, {this.onTap})
       : assert(block != null),
         assert(data != null),
-        assert(style != null),
-        onTap = null;
+        assert(tsb != null),
+        widgetSpan = null;
 
   TextBit.space(this.block)
       : assert(block != null),
         data = null,
         onTap = null,
-        style = null;
+        tsb = null,
+        widgetSpan = null;
 
-  bool get isSpace => data == null;
+  TextBit.widget(this.block, this.widgetSpan)
+      : assert(block != null),
+        assert(widgetSpan != null),
+        data = null,
+        onTap = null,
+        tsb = null;
+
+  @override
+  TextBit get first => this;
+
+  @override
+  bool get hasTrailingSpace => isSpace;
+
+  @override
+  bool get isEmpty => false;
+
+  @override
+  TextBit get last => this;
+
+  bool get isSpace => data == null && widgetSpan == null;
+  bool get isText => data != null;
+  bool get isWidget => widgetSpan != null;
 
   TextBit rebuild({
-    TextBlock block,
     String data,
     VoidCallback onTap,
-    TextStyle style,
+    TextStyleBuilders tsb,
+    WidgetSpan widgetSpan,
   }) =>
-      TextBit(
-        block: block ?? this.block,
-        data: data ?? this.data,
-        style: style ?? this.style,
-        onTap: onTap ?? this.onTap,
-      );
+      isText
+          ? TextBit.text(
+              block,
+              data ?? this.data,
+              tsb ?? this.tsb,
+              onTap: onTap ?? this.onTap,
+            )
+          : isWidget
+              ? TextBit.widget(block, widgetSpan ?? this.widgetSpan)
+              : this;
+
+  TextBit rebuildWidget({
+    PlaceholderAlignment alignment,
+    TextBaseline baseline,
+    Widget child,
+  }) =>
+      isWidget
+          ? rebuild(
+              widgetSpan: WidgetSpan(
+                alignment: alignment ?? this.widgetSpan.alignment,
+                baseline: baseline ?? this.widgetSpan.baseline,
+                child: child ?? this.widgetSpan.child,
+              ),
+            )
+          : this;
 }
 
-class TextBlock {
+class TextBlock extends _TextBit {
   final TextBlock parent;
-  final TextStyle style;
-  final List<TextBit> _bits;
+  final TextStyleBuilders tsb;
+  final List<_TextBit> _children = [];
 
-  bool _hasTrailingSpace = true;
-  int _indexEnd;
-  int _indexStart;
+  TextBlock(this.tsb, {this.parent}) : assert(tsb != null);
 
-  TextBlock(this.style, {List<TextBit> bits, this.parent})
-      : assert(style != null),
-        assert((bits == null) == (parent == null)),
-        _bits = bits ?? [] {
-    _indexStart = _bits.length;
-    _indexEnd = _indexStart;
+  @override
+  TextBit get first {
+    for (final child in _children) {
+      if (child is TextBit) return child;
+      final first = child.first;
+      if (first != null) return first;
+    }
+    return null;
   }
 
-  bool get hasTrailingSpace => _indexEnd == _bits.length
-      ? parent?.hasTrailingSpace ?? _hasTrailingSpace
-      : false;
-  int get indexEnd => _indexEnd;
-  int get indexStart => _indexStart;
-  bool get isEmpty => _indexEnd == _indexStart;
-  bool get isNotEmpty => !isEmpty;
-  Iterable<TextBit> get iterable => _bits.getRange(_indexStart, _indexEnd);
-  TextBit get next => _bits.length > _indexEnd ? _bits[_indexEnd] : null;
+  @override
+  bool get hasTrailingSpace {
+    var i = _children.length;
+    while (i > 0) {
+      i--;
+      final child = _children[i];
+      if (child.isNotEmpty) return child.hasTrailingSpace;
+    }
 
-  bool addBit(TextBit bit) {
-    if (parent != null) {
-      if (_indexEnd != _bits.length) {
-        throw new StateError('Cannot add TextBit in the middle of a block');
+    return parent == null ? true : isEmpty ? parent.hasTrailingSpace : false;
+  }
+
+  @override
+  bool get isEmpty {
+    for (final child in _children) {
+      if (child.isNotEmpty) {
+        return false;
       }
-      final added = parent.addBit(bit);
-      if (added) _indexEnd++;
-      return added;
     }
-
-    if (bit.isSpace) {
-      if (_bits.isEmpty || _hasTrailingSpace) return false;
-      _hasTrailingSpace = true;
-    } else {
-      _hasTrailingSpace = false;
-    }
-
-    _bits.add(bit);
-    _indexEnd++;
 
     return true;
   }
 
-  bool addSpace() => addBit(TextBit.space(this));
+  @override
+  TextBit get last {
+    final l = _children.length;
+    for (var i = l - 1; i >= 0; i--) {
+      final child = _children[i];
+      if (child is TextBit) return child;
+      final last = child.last;
+      if (last != null) return last;
+    }
 
-  bool addText(String data) => addBit(TextBit.text(this, data, style));
+    return null;
+  }
 
-  void rebuildBits(TextBit f(TextBit bit), {int start, int end}) {
-    start ??= _indexStart;
-    end ??= _indexEnd;
-    if (parent != null) return parent.rebuildBits(f, start: start, end: end);
+  TextBit get next {
+    if (parent == null) return null;
+    final siblings = parent._children;
+    final indexOf = siblings.indexOf(this);
+    assert(indexOf != -1);
 
-    for (var i = start; i < end; i++) {
-      final bit = _bits[i];
-      final wasSpace = bit.isSpace;
-      _bits[i] = f(bit);
+    for (var i = indexOf + 1; i < siblings.length; i++) {
+      final next = siblings[i].first;
+      if (next != null) return next;
+    }
 
-      if (_hasTrailingSpace &&
-          wasSpace &&
-          i == _bits.length - 1 &&
-          !_bits[i].isSpace) {
-        _hasTrailingSpace = false;
+    return parent.next;
+  }
+
+  void addBit(TextBit bit, {int index}) =>
+      _children.insert(index ?? _children.length, bit);
+
+  bool addSpace() {
+    if (hasTrailingSpace) return false;
+    addBit(TextBit.space(this));
+    return true;
+  }
+
+  void addText(String data) => addBit(TextBit.text(this, data, tsb));
+
+  void addWidget(WidgetSpan ws) => addBit(TextBit.widget(this, ws));
+
+  bool forEachBit(f(TextBit bit, int index), {bool reversed = false}) {
+    final l = _children.length;
+    final i0 = reversed ? l - 1 : 0;
+    final i1 = reversed ? -1 : l;
+    final ii = reversed ? -1 : 1;
+
+    for (var i = i0; i != i1; i += ii) {
+      final child = _children[i];
+      final shouldContinue = child is TextBit
+          ? f(child, i)
+          : child is TextBlock ? child.forEachBit(f, reversed: reversed) : null;
+      if (shouldContinue == false) return false;
+    }
+
+    return true;
+  }
+
+  void rebuildBits(TextBit f(TextBit bit)) {
+    var i = 0;
+    var l = _children.length;
+    while (i < l) {
+      final child = _children[i];
+      if (child is TextBit) {
+        _children[i] = f(child);
+      } else if (child is TextBlock) {
+        child.rebuildBits(f);
       }
+      i++;
     }
   }
 
-  TextBlock sub(TextStyle style) =>
-      TextBlock(style ?? this.style, bits: this._bits, parent: this);
+  TextBlock sub(TextStyleBuilders tsb) {
+    final sub = TextBlock(tsb, parent: this);
+    _children.add(sub);
+    return sub;
+  }
+
+  void trimRight() {
+    while (isNotEmpty && hasTrailingSpace) {
+      final lastChild = _children.last;
+      if (lastChild is TextBit) {
+        assert(lastChild.isSpace);
+        _children.removeLast();
+      } else if (lastChild is TextBlock) {
+        lastChild.trimRight();
+        if (lastChild.isEmpty) {
+          _children.removeLast();
+        }
+      }
+    }
+  }
 }
+
+class TextStyleBuilders {
+  final _builders = <Function>[];
+  final _inputs = [];
+  final TextStyleBuilders parent;
+
+  BuildContext _context;
+  TextStyle _output;
+  TextAlign _textAlign;
+
+  BuildContext get context => _context;
+
+  TextAlign get textAlign => _textAlign ?? parent?.textAlign;
+
+  set textAlign(TextAlign v) => _textAlign = v;
+
+  TextStyleBuilders({this.parent});
+
+  void enqueue<T>(TextStyleBuilder<T> builder, T input) {
+    assert(_output == null, "Cannot add builder after being built");
+    _builders.add(builder);
+    _inputs.add(input);
+  }
+
+  TextStyle build(BuildContext context) {
+    _resetContextIfNeeded(context);
+    if (_output != null) return _output;
+
+    if (parent == null) {
+      _output = DefaultTextStyle.of(context).style;
+    } else {
+      _output = parent.build(context);
+    }
+
+    final l = _builders.length;
+    for (int i = 0; i < l; i++) {
+      _output = _builders[i](this, _output, _inputs[i]);
+    }
+
+    return _output;
+  }
+
+  TextStyleBuilders sub() => TextStyleBuilders(parent: this);
+
+  void _resetContextIfNeeded(BuildContext context) {
+    if (context == _context) return;
+
+    _context = context;
+    _output = null;
+    _textAlign = null;
+  }
+}
+
+typedef TextStyle TextStyleBuilder<T>(
+  TextStyleBuilders tsb,
+  TextStyle textStyle,
+  T input,
+);

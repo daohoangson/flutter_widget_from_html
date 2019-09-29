@@ -10,9 +10,10 @@ void main() {
     final explained = await explainMargin(tester, html);
     expect(
         explained,
-        equals('[Padding:(10,0,10,0),child='
+        equals('[SizedBox:0.0x10.0],'
             '[Stack:children=[$padding,child=[RichText:(:Foo)]],'
-            '[Positioned:child=[RichText,align=right:(:•)]]]]'));
+            '[Positioned:child=[RichText,align=right:(:•)]]],'
+            '[SizedBox:0.0x10.0]'));
   });
 
   testWidgets('renders ordered list', (WidgetTester tester) async {
@@ -75,6 +76,22 @@ void main() {
             '[Stack:children=[$padding,child=[RichText:(:2.3)]],[Positioned:child=[RichText,align=right:(:-)]]]'
             ']],[Positioned:child=[RichText,align=right:(:•)]]],'
             '[Stack:children=[$padding,child=[RichText:(:Three)]],[Positioned:child=[RichText,align=right:(:•)]]]'
+            ']'));
+  });
+
+  testWidgets('renders nested list (single child)',
+      (WidgetTester tester) async {
+    final html = """
+<ul>
+  <li>Foo</li>
+  <li><ul><li>Bar</li></ul></li>
+</ul>""";
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[Column:children='
+            '[Stack:children=[$padding,child=[RichText:(:Foo)]],[Positioned:child=[RichText,align=right:(:•)]]],'
+            '[$padding,child=[Stack:children=[$padding,child=[RichText:(:Bar)]],[Positioned:child=[RichText,align=right:(:-)]]]]'
             ']'));
   });
 }

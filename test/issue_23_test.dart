@@ -18,7 +18,8 @@ class BlockquoteWebViewScreen extends StatelessWidget {
         body: ListView(children: <Widget>[
           HtmlWidget(
             html,
-            factoryBuilder: (c, hw) => _BlockquoteWebViewWf(c, hw),
+            factoryBuilder: (config) => _BlockquoteWebViewWf(config),
+            key: coreHwKey,
           ),
         ]),
       );
@@ -27,20 +28,19 @@ class BlockquoteWebViewScreen extends StatelessWidget {
 class _BlockquoteWebViewWf extends WidgetFactory {
   final buildOp = BuildOp(
     onWidgets: (meta, _) => [
-          WebView(
-            Uri.dataFromString(
-              meta.domElement.innerHtml,
-              mimeType: 'text/html',
-              encoding: Encoding.getByName('utf-8'),
-            ).toString(),
-            aspectRatio: 16 / 9,
-            getDimensions: true,
-          )
-        ],
+      WebView(
+        Uri.dataFromString(
+          meta.domElement.innerHtml,
+          mimeType: 'text/html',
+          encoding: Encoding.getByName('utf-8'),
+        ).toString(),
+        aspectRatio: 16 / 9,
+        getDimensions: true,
+      )
+    ],
   );
 
-  _BlockquoteWebViewWf(BuildContext context, HtmlWidget htmlWidget)
-      : super(context, htmlWidget);
+  _BlockquoteWebViewWf(HtmlWidgetConfig config) : super(config);
 
   @override
   NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
@@ -58,16 +58,17 @@ void main() {
     final explained = await explain(
       tester,
       null,
-      hw: (_) => HtmlWidget(
-            html,
-            bodyPadding: const EdgeInsets.all(0),
-            factoryBuilder: (c, hw) => _BlockquoteWebViewWf(c, hw),
-          ),
+      hw: HtmlWidget(
+        html,
+        bodyPadding: const EdgeInsets.all(0),
+        factoryBuilder: (hw) => _BlockquoteWebViewWf(hw),
+        key: coreHwKey,
+      ),
     );
     expect(
         explained,
         equals('[Column:children=[RichText:(:Above)],'
-            '[WebView:url=data:text/html;charset=utf-8,Foo,aspectRatio=1.78,getDimensions=true,js=true],'
+            '[WebView:url=data:text/html;charset=utf-8,Foo,aspectRatio=1.78,getDimensions=1,js=1],'
             '[RichText:(:Below)]]'));
   });
 }

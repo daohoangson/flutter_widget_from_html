@@ -1,17 +1,16 @@
 part of '../core_widget_factory.dart';
 
-TextSpan _compileToTextSpan(TextBlock b) {
-  if (b == null || b.isEmpty) return null;
+InlineSpan _compileToTextSpan(BuildContext context, TextBlock b) {
+  if (b?.isNotEmpty != true) return TextSpan();
 
-  final i = _getNoTrailing(b).iterator;
-  final children = <TextSpan>[];
+  final children = <InlineSpan>[];
 
-  i.moveNext();
-  final first = i.current;
-  final firstSb = StringBuffer(first.data ?? '');
+  final first = b.first;
+  final firstSb = StringBuffer();
+  final firstStyle = first.tsb?.build(context);
 
   var prevOnTap = first.onTap;
-  var prevStyle = first.style;
+  var prevStyle = firstStyle;
   var prevSb = firstSb;
   final addChild = () {
     if (prevSb != firstSb && prevSb.length > 0) {
@@ -23,24 +22,34 @@ TextSpan _compileToTextSpan(TextBlock b) {
     }
     prevSb = StringBuffer();
   };
-  while (i.moveNext()) {
-    final bit = i.current;
-    final style = _getBitStyle(bit) ?? prevStyle;
+
+  b.forEachBit((bit, _) {
+    final style = _getBitTsb(bit)?.build(context) ?? prevStyle;
     if (bit.onTap != prevOnTap || style != prevStyle) {
       addChild();
+    }
+
+    if (bit.isWidget) {
+      addChild();
+      children.add(bit.widgetSpan);
+      return;
     }
 
     prevOnTap = bit.onTap;
     prevStyle = style;
     prevSb.write(bit.data ?? ' ');
-  }
+  });
 
   addChild();
+
+  if (children.length == 1 && first.onTap == null && firstSb.length == 0) {
+    return children[0];
+  }
 
   return TextSpan(
     children: children,
     recognizer: _buildGestureRecognizer(first.onTap),
-    style: first.style,
+    style: firstStyle,
     text: firstSb.toString(),
   );
 }
@@ -48,40 +57,37 @@ TextSpan _compileToTextSpan(TextBlock b) {
 GestureRecognizer _buildGestureRecognizer(VoidCallback onTap) =>
     onTap != null ? (TapGestureRecognizer()..onTap = onTap) : null;
 
-TextStyle _getBitStyle(TextBit bit) {
-  if (bit.style != null) return bit.style;
+TextStyleBuilders _getBitTsb(TextBit bit) {
+  if (bit.tsb != null) return bit.tsb;
 
   // the below code will find the best style for this whitespace bit
   // easy case: whitespace at the beginning of a tag, use the previous style
-  final iterable = bit.block.iterable;
-  if (bit == iterable.first) return null;
+  final block = bit.block;
+  if (bit == block.first) return null;
 
   // complicated: whitespace at the end of a tag, try to merge with the next
   // unless it has unrelated style (e.g. next bit is a sibling)
-  if (bit == iterable.last) {
-    // next should always has `data` and `style` (thanks to `_getNoTrailing`)
+  if (bit == block.last) {
     final next = bit.block.next;
-    assert(next?.style != null);
+    if (next?.tsb != null) {
+      // get the outer-most block having this as the last bit
+      var bb = bit.block;
+      var bbLast = bb.last;
+      while (true) {
+        final parentLast = bb.parent?.last;
+        if (bbLast != parentLast) break;
+        bb = bb.parent;
+        bbLast = parentLast;
+      }
 
-    // get the outer-most block having this as the last bit
-    var bb = bit.block;
-    while (true) {
-      if (bb.indexEnd != bb.parent?.indexEnd) break;
-      bb = bb.parent;
-    }
-
-    if (bb.parent == next.block) {
-      return next.style;
-    } else {
-      return null;
+      if (bb.parent == next.block) {
+        return next.tsb;
+      } else {
+        return null;
+      }
     }
   }
 
   // fallback to default (style from block)
-  return bit.block.style;
-}
-
-Iterable<TextBit> _getNoTrailing(TextBlock block) {
-  final i = block.iterable;
-  return block.hasTrailingSpace ? i.take(i.length - 1) : i;
+  return bit.block.tsb;
 }

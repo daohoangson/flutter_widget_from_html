@@ -47,57 +47,77 @@ class _TagLi {
 
   BuildOp get liOp {
     _liOp ??= BuildOp(
-      onWidgets: (_, widgets) => [_buildItem(widgets)],
+      onWidgets: (_, widgets) => [wf.buildColumn(widgets)],
     );
     return _liOp;
   }
 
-  Widget _buildItem(Iterable<Widget> widgets) => wf.buildColumn(widgets);
-
   Iterable<Widget> _buildList(NodeMetadata meta, Iterable<Widget> children) {
     String listStyleType = kCssListStyleTypeDisc;
-    double paddingLeft;
+    CssLength paddingLeft;
     meta.styles((key, value) {
       switch (key) {
         case kCssListStyleType:
           listStyleType = value;
           break;
         case _kCssPaddingLeft:
-          final parsed = parseCssLength(value)?.getValue(meta.textStyle);
-          paddingLeft = parsed ?? paddingLeft;
+          final parsed = parseCssLength(value);
+          if (parsed != null) paddingLeft = parsed;
       }
     });
 
     int i = 0;
     return children.map(
-      (widget) => Stack(
-            children: <Widget>[
-              _buildBody(widget, paddingLeft),
-              _buildMarker(
-                wf.getListStyleMarker(listStyleType, ++i),
-                meta.textStyle,
-                paddingLeft,
-              ),
-            ],
-          ),
+      (widget) {
+        if (widget is _TagLiPlaceholder) {
+          return widget
+            ..wrapWith((context, widgets, __) {
+              final style = meta.textStyle(context);
+              final paddingLeftPx = paddingLeft.getValue(style);
+              final padding = EdgeInsets.only(left: paddingLeftPx);
+
+              return widgets.map((widget) => wf.buildPadding(widget, padding));
+            });
+        }
+
+        final markerText = wf.getListStyleMarker(listStyleType, ++i);
+
+        return _TagLiPlaceholder(
+          builder: (context, _, __) {
+            final style = meta.textStyle(context);
+            final paddingLeftPx = paddingLeft.getValue(style);
+
+            return [
+              Stack(children: <Widget>[
+                wf.buildPadding(widget, EdgeInsets.only(left: paddingLeftPx)),
+                _buildMarker(context, style, markerText, paddingLeftPx),
+              ]),
+            ];
+          },
+          wf: wf,
+        );
+      },
     );
   }
 
-  Widget _buildBody(Widget widget, double paddingLeft) => Padding(
-        padding: EdgeInsets.only(left: paddingLeft),
-        child: widget,
-      );
-
-  Widget _buildMarker(String text, TextStyle style, double paddingLeft) =>
+  Widget _buildMarker(BuildContext c, TextStyle s, String t, double l) =>
       Positioned(
         left: 0.0,
         top: 0.0,
-        width: paddingLeft * .75,
+        width: l * .75,
         child: RichText(
           maxLines: 1,
           overflow: TextOverflow.clip,
-          text: TextSpan(style: style, text: text),
+          text: TextSpan(style: s, text: t),
           textAlign: TextAlign.right,
+          textScaleFactor: MediaQuery.of(c).textScaleFactor,
         ),
       );
+}
+
+class _TagLiPlaceholder extends WidgetPlaceholder {
+  _TagLiPlaceholder({
+    WidgetPlaceholderBuilder builder,
+    WidgetFactory wf,
+  }) : super(builder: builder, wf: wf);
 }

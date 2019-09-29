@@ -1,3 +1,35 @@
+## 0.2.3+3
+
+* Improve BR rendering to be consistent with browsers (#83, #84)
+* Improve TABLE rendering to support multiple tables (#85, #86)
+
+## 0.2.3+2
+
+* Fix bug rendering empty TD tag (#81)
+* Improve white space rendering
+* Improve IMG rendering
+
+## 0.2.3+1
+
+* Build `RichText` with proper `textScaleFactor` (#75, #78)
+
+## 0.2.3
+
+* Re-implement text-align support to avoid conflicts (#66, #74)
+* Fix WebView bug triggering browser for http 301/302 urls
+* Improve performance when being put in list views (#62)
+
+## 0.2.2+1
+
+* Update coding convention
+
+## 0.2.2
+
+* Intercept all navigation requests within IFRAME (#48)
+* Add support for InlineSpan / inline image (PR #53, issue #7)
+* Add support for asset:// image (PR #52, issue #51)
+* Add support for new tag: VIDEO (PR #47, issue #46)
+
 ## 0.2.1+1
 
 * Merge `textStyle` with default for easy usage (#45)

@@ -65,8 +65,8 @@ void main() {
     final explained = await explain(tester, html, imageUrlToPrecache: kImgSrc);
     expect(
         explained,
-        equals('[GestureDetector:child=[Wrap:children='
-            '[Image:image=[NetworkImage:url=$kImgSrc]]]]'));
+        equals(
+            "[RichText:[GestureDetector:child=[NetworkImage:url=$kImgSrc]]]"));
   });
 
   testWidgets('renders margin inside', (WidgetTester tester) async {
@@ -74,7 +74,8 @@ void main() {
     final explained = await explainMargin(tester, html);
     expect(
         explained,
-        equals('[Padding:(5,5,5,5),child='
-            '[GestureDetector:child=[RichText:(#FF0000FF+u:Foo)]]]'));
+        equals('[SizedBox:0.0x5.0],'
+            '[GestureDetector:child=[Padding:(0,5,0,5),child=[RichText:(#FF0000FF+u:Foo)]]],'
+            '[SizedBox:0.0x5.0]'));
   });
 }

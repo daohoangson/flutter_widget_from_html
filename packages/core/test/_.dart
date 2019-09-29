@@ -3,35 +3,47 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
+final hwKey = GlobalKey<HtmlWidgetState>();
+
 Future<String> explain(
   WidgetTester tester,
   String html, {
   WidgetExplainer explainer,
-  HtmlWidgetBuilder hw,
+  HtmlWidget hw,
   String imageUrlToPrecache,
+  PreTest preTest,
   Uri baseUrl,
   double bodyVerticalPadding = 0,
   NodeMetadataCollector builderCallback,
   FactoryBuilder factoryBuilder,
   double tableCellPadding = 0,
   TextStyle textStyle,
-  double wrapSpacing = 0,
 }) async {
   assert((html == null) != (hw == null));
-  final key = UniqueKey();
+  hw ??= HtmlWidget(
+    html,
+    baseUrl: baseUrl,
+    bodyPadding: EdgeInsets.symmetric(vertical: bodyVerticalPadding),
+    builderCallback: builderCallback,
+    factoryBuilder: factoryBuilder,
+    key: hwKey,
+    tableCellPadding: EdgeInsets.all(tableCellPadding),
+    textStyle: textStyle,
+  );
 
   await tester.pumpWidget(
     StatefulBuilder(
-      builder: (BuildContext context, StateSetter setState) {
+      builder: (context, _) {
         if (imageUrlToPrecache != null) {
+          // this is required to avoid http 400 error for Image.network instances
           precacheImage(
             NetworkImage(imageUrlToPrecache),
             context,
-            onError: (dynamic exception, StackTrace stackTrace) {
-              // this is required to avoid http 400 error for Image.network instances
-            },
+            onError: (_, __) {},
           );
         }
+
+        if (preTest != null) preTest(context);
 
         final defaultStyle = DefaultTextStyle.of(context).style;
         final style = defaultStyle.copyWith(
@@ -39,34 +51,23 @@ Future<String> explain(
           fontWeight: FontWeight.normal,
         );
 
-        return Theme(
-          child: DefaultTextStyle(key: key, style: style, child: widget0),
-          data: ThemeData(
+        return MaterialApp(
+          theme: ThemeData(
             accentColor: const Color(0xFF123456),
+          ),
+          home: Scaffold(
+            body: DefaultTextStyle(style: style, child: hw),
           ),
         );
       },
     ),
   );
 
-  final found = find.byKey(key).evaluate().first;
-  expect(found.widget, isInstanceOf<DefaultTextStyle>());
+  final hws = hwKey.currentState;
+  expect(hws, isNotNull);
 
-  final _ = _Explainer(found, explainer: explainer);
-  final htmlWidget = hw != null
-      ? hw(found)
-      : HtmlWidget(
-          html,
-          baseUrl: baseUrl,
-          bodyPadding: EdgeInsets.symmetric(vertical: bodyVerticalPadding),
-          builderCallback: builderCallback,
-          factoryBuilder: factoryBuilder,
-          tableCellPadding: EdgeInsets.all(tableCellPadding),
-          textStyle: textStyle,
-          wrapSpacing: wrapSpacing,
-        );
-
-  return _.explain(htmlWidget.build(found));
+  return _Explainer(hws.context, explainer: explainer)
+      .explain(hws.build(hws.context));
 }
 
 final _explainMarginRegExp = RegExp(
@@ -87,7 +88,7 @@ Future<String> explainMargin(
 }
 
 typedef String WidgetExplainer(Widget widget);
-typedef HtmlWidget HtmlWidgetBuilder(BuildContext context);
+typedef void PreTest(BuildContext context);
 
 class _Explainer {
   final BuildContext context;
@@ -121,10 +122,39 @@ class _Explainer {
       "(${e.top.truncate()},${e.right.truncate()}," +
       "${e.bottom.truncate()},${e.left.truncate()})";
 
-  String _image(ImageProvider i) {
-    final type = i.runtimeType.toString();
-    final description = i is NetworkImage ? "url=${i.url}" : '';
+  String _image(ImageProvider provider) {
+    final type = provider.runtimeType.toString();
+    final description = provider is AssetImage
+        ? "assetName=${provider.assetName}" +
+            (provider.package != null ? ",package=${provider.package}" : '')
+        : provider is NetworkImage ? "url=${provider.url}" : '';
     return "[$type:$description]";
+  }
+
+  String _imageLayout(ImageLayout widget) {
+    if (widget.height == null && widget.text == null && widget.width == null)
+      return _image(widget.image);
+
+    String s = "[ImageLayout:child=${_image(widget.image)}";
+    if (widget.height != null) s += ",height=${widget.height}";
+    if (widget.text != null) s += ",text=${widget.text}";
+    if (widget.width != null) s += ",width=${widget.width}";
+
+    return "$s]";
+  }
+
+  String _inlineSpan(InlineSpan inlineSpan, {TextStyle parentStyle}) {
+    if (inlineSpan is WidgetSpan) return _widget(inlineSpan.child);
+
+    final style = _textStyle(inlineSpan.style, parentStyle ?? _defaultStyle);
+    final textSpan = inlineSpan is TextSpan ? inlineSpan : null;
+    final onTap = textSpan?.recognizer != null ? '+onTap' : '';
+    final text = textSpan?.text ?? '';
+    final children = textSpan?.children
+            ?.map((c) => _inlineSpan(c, parentStyle: textSpan.style))
+            ?.join('') ??
+        '';
+    return "($style$onTap:$text$children)";
   }
 
   String _limitBox(LimitedBox box) {
@@ -149,10 +179,10 @@ class _Explainer {
     return "borders=($top;$right;$bottom;$left)";
   }
 
-  String _tableCell(TableCell cell) => _widget(cell.child);
-
-  String _tableRow(TableRow row) =>
-      row.children.map((c) => _tableCell(c)).toList().join(' | ');
+  String _tableRow(TableRow row) => row.children
+      .map((c) => _widget(c is TableCell ? c.child : c))
+      .toList()
+      .join(' | ');
 
   String _tableRows(Table table) =>
       table.children.map((r) => _tableRow(r)).toList().join('\n');
@@ -172,18 +202,6 @@ class _Explainer {
       default:
         return '';
     }
-  }
-
-  String _textSpan(TextSpan textSpan, {TextStyle parentStyle}) {
-    final style = _textStyle(textSpan.style, parentStyle ?? _defaultStyle);
-    final onTap = textSpan.recognizer != null ? '+onTap' : '';
-    final text = textSpan.text != null ? textSpan.text : '';
-    final children = textSpan.children != null
-        ? textSpan.children
-            .map((c) => _textSpan(c, parentStyle: textSpan.style))
-            .join('')
-        : '';
-    return "($style$onTap:$text$children)";
   }
 
   String _textStyle(TextStyle style, TextStyle parent) {
@@ -265,6 +283,9 @@ class _Explainer {
     if (explained != null) return explained;
 
     if (widget == widget0) return '[widget0]';
+    if (widget is Image) return _image(widget.image);
+    if (widget is ImageLayout) return _imageLayout(widget);
+    if (widget is IWidgetPlaceholder) return _widget(widget.build(context));
 
     final type = widget.runtimeType.toString();
     final text = widget is Align
@@ -275,16 +296,16 @@ class _Explainer {
                 ? _boxDecoration(widget.decoration)
                 : widget is GestureDetector
                     ? "child=${_widget(widget.child)}"
-                    : widget is Image
-                        ? "image=${_image(widget.image)}"
-                        : widget is InkWell
-                            ? "child=${_widget(widget.child)}"
-                            : widget is LimitedBox
-                                ? _limitBox(widget)
-                                : widget is Padding
-                                    ? "${_edgeInsets(widget.padding)},"
-                                    : widget is RichText
-                                        ? _textSpan(widget.text)
+                    : widget is InkWell
+                        ? "child=${_widget(widget.child)}"
+                        : widget is LimitedBox
+                            ? _limitBox(widget)
+                            : widget is Padding
+                                ? "${_edgeInsets(widget.padding)},"
+                                : widget is RichText
+                                    ? _inlineSpan(widget.text)
+                                    : widget is SizedBox
+                                        ? "${widget.width?.toStringAsFixed(1) ?? 0.0}x${widget.height?.toStringAsFixed(1) ?? 0.0}"
                                         : widget is Table
                                             ? _tableBorder(widget.border)
                                             : widget is Text
@@ -297,11 +318,13 @@ class _Explainer {
         : (widget is Text ? widget.textAlign : null));
     final textAlignStr = textAlign.isNotEmpty ? ",align=$textAlign" : '';
     final children = widget is MultiChildRenderObjectWidget
-        ? "children=${widget.children.map(_widget).join(',')}"
+        ? (widget.children?.isNotEmpty == true && !(widget is RichText))
+            ? "children=${widget.children.map(_widget).join(',')}"
+            : ''
         : widget is ProxyWidget
             ? "child=${_widget(widget.child)}"
             : widget is SingleChildRenderObjectWidget
-                ? "child=${_widget(widget.child)}"
+                ? (widget.child != null ? "child=${_widget(widget.child)}" : '')
                 : widget is SingleChildScrollView
                     ? "child=${_widget(widget.child)}"
                     : widget is Table ? "\n${_tableRows(widget)}\n" : '';
