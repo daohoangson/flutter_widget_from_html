@@ -359,17 +359,55 @@ class WidgetFactory {
 
   String getListStyleMarker(String type, int i) {
     switch (type) {
+      case kCssListStyleTypeAlphaLower:
+      case kCssListStyleTypeAlphaLatinLower:
+        if (i >= 1 && i <= 26) {
+          // the specs said it's unspecified after 26th items
+          return "${String.fromCharCode(96 + i)}.";
+        }
+        return '';
+      case kCssListStyleTypeAlphaUpper:
+      case kCssListStyleTypeAlphaLatinUpper:
+        if (i >= 1 && i <= 26) {
+          // the specs said it's unspecified after 26th items
+          return "${String.fromCharCode(64 + i)}.";
+        }
+        return '';
       case kCssListStyleTypeCircle:
         return '-';
       case kCssListStyleTypeDecimal:
         return "$i.";
       case kCssListStyleTypeDisc:
         return '•';
+      case kCssListStyleTypeRomanLower:
+        final roman = getListStyleMarkerRoman(i)?.toLowerCase();
+        return roman != null ? "$roman." : '';
+      case kCssListStyleTypeRomanUpper:
+        final roman = getListStyleMarkerRoman(i);
+        return roman != null ? "$roman." : '';
       case kCssListStyleTypeSquare:
         return '+';
     }
 
     return '';
+  }
+
+  String getListStyleMarkerRoman(int i) {
+    // TODO: find some lib to generate programatically
+    const map = <int, String>{
+      1: 'I',
+      2: 'II',
+      3: 'III',
+      4: 'IV',
+      5: 'V',
+      6: 'VI',
+      7: 'VII',
+      8: 'VIII',
+      9: 'IX',
+      10: 'X',
+    };
+
+    return map.containsKey(i) ? map[i] : null;
   }
 
   NodeMetadata parseElement(NodeMetadata meta, dom.Element element) {

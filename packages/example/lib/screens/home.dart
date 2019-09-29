@@ -51,25 +51,26 @@ CODE tag:
 <code><span style="color: #000000"><span style="color: #0000BB">&lt;?php phpinfo</span><span style="color: #007700">(); </span><span style="color: #0000BB">?&gt;</span></span></code>""",
     'Iframe': () => IframeScreen(),
     'Images': () => ImgScreen(),
-    'List nested': """<ol>
+    'Lists (LI/OL/UL)': """<ol type="I">
   <li>One</li>
   <li>
     Two
-    <ul>
+    <ol type="A">
       <li>2.1</li>
       <li>
         2.2
-        <ul>
+        <ol>
           <li>2.2.1</li>
           <li>2.2.2</li>
-        </ul>
+        </ol>
       </li>
       <li>2.3</li>
-    </ul>
+    </ol>
   </li>
   <li>Three</li>
   <li><ul><li>3.1</li></ul></li>
   <li>
+    Four<br />
     <a href="https://gph.is/QFgPA0"><img src="https://media.giphy.com/media/6VoDJzfRjJNbG/giphy-downsized.gif" /></a>
   </li>
   <li>Five</li>
