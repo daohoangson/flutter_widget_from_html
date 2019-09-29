@@ -98,6 +98,52 @@ void main() {
             ']'));
   });
 
+  group('OL reversed', () {
+    final olReversedLiHtml = '<li>x</li>';
+    final olReversedLiPrefix =
+        'Stack:children=[$padding,child=[RichText:(:x)]],[Positioned:child=[RichText,align=right:';
+    final olReversedLiPostfix = ']]';
+
+    testWidgets('renders 123 (default)', (WidgetTester tester) async {
+      final lis = olReversedLiHtml * 3;
+      final html = '<ol>$lis<ol>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Column:children='
+              '[$olReversedLiPrefix(:1.)$olReversedLiPostfix],'
+              '[$olReversedLiPrefix(:2.)$olReversedLiPostfix],'
+              '[$olReversedLiPrefix(:3.)$olReversedLiPostfix]'
+              ']'));
+    });
+
+    testWidgets('renders 321', (WidgetTester tester) async {
+      final lis = olReversedLiHtml * 3;
+      final html = '<ol reversed>$lis<ol>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Column:children='
+              '[$olReversedLiPrefix(:3.)$olReversedLiPostfix],'
+              '[$olReversedLiPrefix(:2.)$olReversedLiPostfix],'
+              '[$olReversedLiPrefix(:1.)$olReversedLiPostfix]'
+              ']'));
+    });
+
+    testWidgets('renders from 99', (WidgetTester tester) async {
+      final lis = olReversedLiHtml * 3;
+      final html = '<ol reversed start="99">$lis<ol>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Column:children='
+              '[$olReversedLiPrefix(:99.)$olReversedLiPostfix],'
+              '[$olReversedLiPrefix(:98.)$olReversedLiPostfix],'
+              '[$olReversedLiPrefix(:97.)$olReversedLiPostfix]'
+              ']'));
+    });
+  });
+
   group('OL start', () {
     final olStartLiHtml = '<li>x</li>';
     final olStartLiPrefix =

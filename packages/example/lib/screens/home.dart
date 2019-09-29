@@ -55,16 +55,17 @@ CODE tag:
   <li>One</li>
   <li>
     Two
-    <ol type="A">
-      <li>2.1</li>
+    <ol reversed type="A">
+      <li>2.C (reversed)</li>
       <li>
-        2.2
-        <ol>
-          <li>2.2.1</li>
-          <li>2.2.2</li>
+        2.B
+        <ol start="5">
+          <li>2.B.5 (start="5")</li>
+          <li>2.B.6</li>
+          <li>2.B.7</li>
         </ol>
       </li>
-      <li>2.3</li>
+      <li>2.A</li>
     </ol>
   </li>
   <li>Three</li>
@@ -78,7 +79,6 @@ CODE tag:
   <li>Seven</li>
   <li>Eight</li>
   <li>Nine</li>
-  <li>Ten</li>
   <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nibh quam, sodales in sollicitudin ut, scelerisque non sapien. Nam nec mi malesuada libero euismod tincidunt sit amet mattis ipsum. Etiam dapibus sem ac accumsan elementum. Vivamus mattis at diam ac pellentesque. Sed id eros condimentum, dignissim risus id, semper enim. Etiam tempor mauris id lorem fringilla, dapibus feugiat enim placerat. In hac habitasse platea dictumst. Nam est felis, accumsan et sapien ac, molestie convallis sapien. Vivamus ligula sapien, ultrices quis nisl ac, blandit hendrerit massa. Maecenas eleifend, nisi eget commodo mollis, elit magna pellentesque odio, sit amet auctor quam nibh vel purus. Integer ultricies lacinia ipsum, in tincidunt erat finibus eget.</li>
 </ol>""",
     'Margin': """<div>No margin</div>
