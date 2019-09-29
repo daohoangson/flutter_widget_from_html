@@ -362,14 +362,16 @@ class WidgetFactory {
       case kCssListStyleTypeAlphaLower:
       case kCssListStyleTypeAlphaLatinLower:
         if (i >= 1 && i <= 26) {
-          // the specs said it's unspecified after 26th items
+          // the specs said it's unspecified after the 26th item
+          // TODO: generate something like aa, ab, etc. when needed
           return "${String.fromCharCode(96 + i)}.";
         }
         return '';
       case kCssListStyleTypeAlphaUpper:
       case kCssListStyleTypeAlphaLatinUpper:
         if (i >= 1 && i <= 26) {
-          // the specs said it's unspecified after 26th items
+          // the specs said it's unspecified after the 26th item
+          // TODO: generate something like AA, AB, etc. when needed
           return "${String.fromCharCode(64 + i)}.";
         }
         return '';
