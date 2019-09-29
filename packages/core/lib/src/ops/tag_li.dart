@@ -1,7 +1,14 @@
 part of '../core_widget_factory.dart';
 
+const kTagLi = 'li';
 const kTagOrderedList = 'ol';
 const kTagUnorderedList = 'ul';
+const kAttributeLiType = 'type';
+const kAttributeLiTypeAlphaLower = 'a';
+const kAttributeLiTypeAlphaUpper = 'A';
+const kAttributeLiTypeDecimal = '1';
+const kAttributeLiTypeRomanLower = 'i';
+const kAttributeLiTypeRomanUpper = 'I';
 const kCssListStyleType = 'list-style-type';
 const kCssListStyleTypeAlphaLower = 'lower-alpha';
 const kCssListStyleTypeAlphaUpper = 'upper-alpha';
@@ -34,9 +41,9 @@ class _TagLi {
           '2.5em',
           kCssListStyleType,
           e.localName == kTagOrderedList
-              ? (e.attributes.containsKey('type')
+              ? (e.attributes.containsKey(kAttributeLiType)
                       ? _LiInput.listStyleTypeFromAttributeType(
-                          e.attributes['type'])
+                          e.attributes[kAttributeLiType])
                       : null) ??
                   kCssListStyleTypeDecimal
               : p == 0
@@ -49,7 +56,7 @@ class _TagLi {
         return styles;
       },
       onChild: (meta, e) =>
-          e.localName == 'li' ? lazySet(meta, buildOp: liOp) : meta,
+          e.localName == kTagLi ? lazySet(meta, buildOp: liOp) : meta,
       onWidgets: (meta, widgets) => _buildList(meta, widgets),
     );
     return _buildOp;
@@ -134,8 +141,8 @@ class _TagLi {
 
   _LiPlaceholder _placeholder(Iterable<Widget> children, NodeMetadata meta) {
     final a = meta.domElement.attributes;
-    String listStyleType = a.containsKey('type')
-        ? _LiInput.listStyleTypeFromAttributeType(a['type'])
+    String listStyleType = a.containsKey(kAttributeLiType)
+        ? _LiInput.listStyleTypeFromAttributeType(a[kAttributeLiType])
         : null;
     CssLength paddingLeft;
     meta.styles((key, value) {
@@ -186,16 +193,16 @@ class _LiInput {
 
   static String listStyleTypeFromAttributeType(String type) {
     switch (type) {
-      case 'a':
+      case kAttributeLiTypeAlphaLower:
         return kCssListStyleTypeAlphaLower;
-      case 'A':
+      case kAttributeLiTypeAlphaUpper:
         return kCssListStyleTypeAlphaUpper;
-      case 'i':
-        return kCssListStyleTypeRomanLower;
-      case 'I':
-        return kCssListStyleTypeRomanUpper;
-      case '1':
+      case kAttributeLiTypeDecimal:
         return kCssListStyleTypeDecimal;
+      case kAttributeLiTypeRomanLower:
+        return kCssListStyleTypeRomanLower;
+      case kAttributeLiTypeRomanUpper:
+        return kCssListStyleTypeRomanUpper;
     }
 
     return null;
