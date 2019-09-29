@@ -98,6 +98,38 @@ void main() {
             ']'));
   });
 
+  group('OL start', () {
+    final olStartLiHtml = '<li>x</li>';
+    final olStartLiPrefix =
+        'Stack:children=[$padding,child=[RichText:(:x)]],[Positioned:child=[RichText,align=right:';
+    final olStartLiPostfix = ']]';
+
+    testWidgets('renders from 1 (default)', (WidgetTester tester) async {
+      final html = '<ol>$olStartLiHtml<ol>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[$olStartLiPrefix(:1.)$olStartLiPostfix]'));
+    });
+
+    testWidgets('renders from 99', (WidgetTester tester) async {
+      final html = '<ol start="99">$olStartLiHtml<ol>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[$olStartLiPrefix(:99.)$olStartLiPostfix]'));
+    });
+
+    testWidgets('renders xyz', (WidgetTester tester) async {
+      final lis = olStartLiHtml * 3;
+      final html = '<ol start="24" type="a">$lis<ol>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Column:children='
+              '[$olStartLiPrefix(:x.)$olStartLiPostfix],'
+              '[$olStartLiPrefix(:y.)$olStartLiPostfix],'
+              '[$olStartLiPrefix(:z.)$olStartLiPostfix]'
+              ']'));
+    });
+  });
+
   group('OL type', () {
     final olTypeLiHtml = '<li>x</li>';
     final olTypeLiPrefix =

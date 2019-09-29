@@ -9,6 +9,7 @@ const kAttributeLiTypeAlphaUpper = 'A';
 const kAttributeLiTypeDecimal = '1';
 const kAttributeLiTypeRomanLower = 'i';
 const kAttributeLiTypeRomanUpper = 'I';
+const kAttributeOlStart = 'start';
 const kCssListStyleType = 'list-style-type';
 const kCssListStyleTypeAlphaLower = 'lower-alpha';
 const kCssListStyleTypeAlphaUpper = 'upper-alpha';
@@ -100,7 +101,10 @@ class _TagLi {
       }
     });
 
-    int i = 0;
+    final a = meta.domElement.attributes;
+    final start = a.containsKey(kAttributeOlStart) ? a[kAttributeOlStart] : '1';
+    int i = (int.tryParse(start) ?? 1) - 1;
+
     for (final child in children) {
       if (!(child is _LiPlaceholder)) continue;
       final item = child as _LiPlaceholder;
