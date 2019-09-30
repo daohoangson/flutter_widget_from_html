@@ -18,20 +18,7 @@ android_test_task:
   container:
     image: cirrusci/flutter
   env:
-    EMULATOR_API_LEVEL: 22
-    ANDROID_ABI: "default;armeabi-v7a"
-  pin_emulator_script:
-    - ${ANDROID_HOME}/emulator/emulator -version
-    - emulator_version=5264690
-    - curl -fo emulator.zip "https://dl.google.com/android/repository/emulator-linux-$emulator_version.zip"
-    - rm -rf "${ANDROID_HOME}/emulator"
-    - unzip -q emulator.zip -d "${ANDROID_HOME}"
-    - ${ANDROID_HOME}/emulator/emulator -version
-  install_images_script: sdkmanager "system-images;android-$EMULATOR_API_LEVEL;$ANDROID_ABI"
-  create_device_script:
-    echo no | avdmanager create avd --force -n test -k "system-images;android-$EMULATOR_API_LEVEL;$ANDROID_ABI"
-  start_emulator_background_script:
-    $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window
-  wait_for_emulator_script:
-    android-wait-for-emulator
-  test_script: ./tool/integration.sh
+    AWS_ACCESS_KEY_ID: ENCRYPTED[bfad5318e7b922be21065747210e175bff4a016be7b7f32d0e34a5e7c145ac5c685088a16a28488f76259b07bf960e8a]
+    AWS_DEFAULT_REGION: us-west-2
+    AWS_SECRET_ACCESS_KEY: ENCRYPTED[c2e879143bcfa89be383584812034fbef751beb2968629aaef34e427dc834a88cbeb953152d660fd243d8b1018c4c771]
+  test_script: ./tool/sylph/cmd.sh

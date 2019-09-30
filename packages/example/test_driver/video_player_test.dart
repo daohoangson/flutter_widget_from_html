@@ -16,15 +16,11 @@ void main() {
       }
     });
 
-    test(
-      'resizes to 1.82',
-      () async {
-        final src = 'https://www.w3schools.com/html/mov_bbb.mp4';
-        await driver.tap(find.byValueKey(src));
-        await Future.delayed(Duration(minutes: 1));
-        expect(await driver.getText(find.byValueKey('output')), '1.82');
-      },
-      timeout: const Timeout(Duration(minutes: 2)),
-    );
+    test('resizes to 1.82', () async {
+      final src = 'https://www.w3schools.com/html/mov_bbb.mp4';
+      await driver.tap(find.byValueKey(src));
+      await Future.delayed(const Duration(seconds: 20));
+      expect(await driver.getText(find.byValueKey('output')), '1.82');
+    });
   });
 }
