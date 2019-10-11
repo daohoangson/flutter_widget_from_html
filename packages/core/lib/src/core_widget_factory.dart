@@ -165,24 +165,10 @@ class WidgetFactory {
   ImageProvider buildImageFromUrl(String url) =>
       url?.isNotEmpty == true ? NetworkImage(url) : null;
 
-  Widget buildPadding(Widget child, EdgeInsets padding) {
-    if (child == null) return null;
-    if (padding == null || padding == const EdgeInsets.all(0)) return child;
-
-    if (child is Padding) {
-      final p = child as Padding;
-      final pp = p.padding as EdgeInsets;
-      child = p.child;
-      padding = EdgeInsets.fromLTRB(
-        pp.left + padding.left,
-        pp.top > padding.top ? pp.top : padding.top,
-        pp.right + padding.right,
-        pp.bottom > padding.bottom ? pp.bottom : padding.bottom,
-      );
-    }
-
-    return Padding(child: child, padding: padding);
-  }
+  Widget buildPadding(Widget child, EdgeInsets padding) =>
+      child != null && padding != null && padding != const EdgeInsets.all(0)
+          ? Padding(child: child, padding: padding)
+          : child;
 
   Widget buildScrollView(Widget child) => child != null
       ? SingleChildScrollView(

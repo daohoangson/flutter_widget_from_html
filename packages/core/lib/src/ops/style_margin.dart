@@ -17,7 +17,20 @@ Iterable<Widget> _marginBuilder(
     right: input.marginRight?.getValue(style, context: context) ?? 0.0,
   );
 
-  return children.map((child) => input.wf.buildPadding(child, padding));
+  return children.map((child) {
+    if (child is Padding) {
+      final existing = child.padding as EdgeInsets;
+      return input.wf.buildPadding(
+        child.child,
+        existing.copyWith(
+          left: existing.left + padding.left,
+          right: existing.right + padding.right,
+        ),
+      );
+    }
+
+    return input.wf.buildPadding(child, padding);
+  });
 }
 
 class _MarginBuilderInput {
