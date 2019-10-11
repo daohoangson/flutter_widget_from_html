@@ -17,6 +17,7 @@ class ImageLayout extends StatefulWidget {
 }
 
 class _ImageLayoutState extends State<ImageLayout> {
+  var error;
   double height;
   double width;
 
@@ -48,10 +49,14 @@ class _ImageLayoutState extends State<ImageLayout> {
     }
 
     if (_stream == null) {
-      _streamListener = ImageStreamListener((info, _) => setState(() {
-            height = info.image.height.toDouble();
-            width = info.image.width.toDouble();
-          }));
+      _streamListener = ImageStreamListener(
+        (info, _) => setState(() {
+          height = info.image.height.toDouble();
+          width = info.image.width.toDouble();
+        }),
+        onError: (e, _) => print('[flutter_widget_from_html] '
+            "Error resolving image: $e"),
+      );
       _stream = widget.image.resolve(ImageConfiguration.empty);
       _stream.addListener(_streamListener);
     }

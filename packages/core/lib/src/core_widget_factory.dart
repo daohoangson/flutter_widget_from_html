@@ -111,7 +111,9 @@ class WidgetFactory {
   }
 
   GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
-      ? () => _config.onTapUrl != null ? _config.onTapUrl(url) : debugPrint(url)
+      ? () => _config.onTapUrl != null
+          ? _config.onTapUrl(url)
+          : print("[flutter_widget_from_html] Tapped url $url")
       : null;
 
   Widget buildImage(String url, {double height, String text, double width}) {

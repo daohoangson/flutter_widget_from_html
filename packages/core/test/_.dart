@@ -10,7 +10,6 @@ Future<String> explain(
   String html, {
   WidgetExplainer explainer,
   HtmlWidget hw,
-  String imageUrlToPrecache,
   PreTest preTest,
   Uri baseUrl,
   double bodyVerticalPadding = 0,
@@ -34,15 +33,6 @@ Future<String> explain(
   await tester.pumpWidget(
     StatefulBuilder(
       builder: (context, _) {
-        if (imageUrlToPrecache != null) {
-          // this is required to avoid http 400 error for Image.network instances
-          precacheImage(
-            NetworkImage(imageUrlToPrecache),
-            context,
-            onError: (_, __) {},
-          );
-        }
-
         if (preTest != null) preTest(context);
 
         final defaultStyle = DefaultTextStyle.of(context).style;
@@ -73,15 +63,10 @@ Future<String> explain(
 final _explainMarginRegExp = RegExp(
     r'^\[Column:children=\[RichText:\(:x\)\],(.+),\[RichText:\(:x\)\]\]$');
 
-Future<String> explainMargin(
-  WidgetTester tester,
-  String html, {
-  String imageUrlToPrecache,
-}) async {
+Future<String> explainMargin(WidgetTester tester, String html) async {
   final explained = await explain(
     tester,
     "x${html}x",
-    imageUrlToPrecache: imageUrlToPrecache,
   );
   final match = _explainMarginRegExp.firstMatch(explained);
   return match == null ? explained : match[1];
