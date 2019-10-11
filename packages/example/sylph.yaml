@@ -1,7 +1,7 @@
 tmp_dir: /tmp/sylph
 artifacts_dir: /tmp/sylph_artifacts
 sylph_timeout: 900
-concurrent_runs: true
+concurrent_runs: false
 
 project_name: flutter_widget_from_thml
 default_job_timeout: 10
