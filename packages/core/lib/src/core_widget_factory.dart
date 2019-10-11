@@ -39,14 +39,12 @@ class WidgetFactory {
 
   Color get hyperlinkColor => _config.hyperlinkColor;
 
-  Widget buildAlign(Widget child, Alignment alignment) {
-    if (child == null) return null;
-    if (alignment == null || child is RichText) return child;
-    if (child is IWidgetPlaceholder)
-      return child..wrapWith(buildAlignsWithContext, alignment);
-
-    return Align(alignment: alignment, child: child);
-  }
+  Widget buildAlign(Widget child, Alignment alignment) =>
+      child != null && !(child is RichText) && alignment != null
+          ? (child is IWidgetPlaceholder
+              ? (child..wrapWith(buildAlignsWithContext, alignment))
+              : Align(alignment: alignment, child: child))
+          : child;
 
   Iterable<Widget> buildAlignsWithContext(
           BuildContext _, Iterable<Widget> children, Alignment alignment) =>
@@ -79,9 +77,9 @@ class WidgetFactory {
                 color: color,
               ),
             )
-          : null;
+          : child;
 
-  Widget buildDivider() => DecoratedBox(
+  Widget buildDivider() => const DecoratedBox(
         decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 1)),
         child: SizedBox(height: 1),
       );
@@ -91,7 +89,9 @@ class WidgetFactory {
       : null;
 
   Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
-      GestureDetector(child: child, onTap: onTap);
+      child != null && onTap != null
+          ? GestureDetector(child: child, onTap: onTap)
+          : child;
 
   Iterable<Widget> buildGestureDetectorsWithContext(BuildContext _,
           Iterable<Widget> children, GestureTapCallback onTap) =>
@@ -125,9 +125,10 @@ class WidgetFactory {
         image = buildImageFromUrl(url);
       }
     }
-    if (image == null) return Text(text ?? '');
 
-    return ImageLayout(image, height: height, text: text, width: width);
+    return image != null
+        ? ImageLayout(image, height: height, text: text, width: width)
+        : text != null ? Text(text) : null;
   }
 
   List buildImageBytes(String dataUri) {
@@ -178,12 +179,12 @@ class WidgetFactory {
       : null;
 
   Widget buildTable(List<TableRow> rows, {TableBorder border}) =>
-      Table(border: border, children: rows);
+      rows?.isNotEmpty == true ? Table(border: border, children: rows) : null;
 
-  Widget buildTableCell(Widget child) =>
-      TableCell(child: buildPadding(child, _config.tableCellPadding));
+  TableCell buildTableCell(Widget child) => TableCell(
+      child: buildPadding(child, _config.tableCellPadding) ?? widget0);
 
-  Widget buildText(TextBlock block) => block?.isEmpty == false
+  Widget buildText(TextBlock block) => block?.isNotEmpty == true
       ? WidgetPlaceholder(
           builder: buildTextWithContext,
           input: block,
