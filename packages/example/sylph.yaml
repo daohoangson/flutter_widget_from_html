@@ -11,9 +11,9 @@ device_pools:
   - pool_name: android pool
     pool_type: android
     devices:
-      - name: Google Pixel 3 XL
-        model: Pixel 3 XL
-        os: 10.0.0
+      - name: Samsung Galaxy Note 10
+        model: SM-N970U1
+        os: 9
 
 test_suites:
 
