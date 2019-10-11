@@ -6,11 +6,7 @@ import '_.dart' as _;
 void main() {
   group('image.png', () {
     final src = 'http://domain.com/image.png';
-    final explain = (WidgetTester tester, String html) => _.explain(
-          tester,
-          html,
-          imageUrlToPrecache: src,
-        );
+    final explain = (WidgetTester t, String html) => _.explain(t, html);
 
     testWidgets('renders src', (WidgetTester tester) async {
       final html = '<img src="$src" />';
@@ -211,7 +207,6 @@ void main() {
         tester,
         html,
         baseUrl: baseUrl ?? Uri.parse('http://base.com/path/'),
-        imageUrlToPrecache: fullUrl,
       );
       expect(
         explained,

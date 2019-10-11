@@ -62,7 +62,7 @@ void main() {
 
   testWidgets('renders IMG tag inside', (WidgetTester tester) async {
     final html = '<a href="$kHref"><img src="$kImgSrc" /></a>';
-    final explained = await explain(tester, html, imageUrlToPrecache: kImgSrc);
+    final explained = await explain(tester, html);
     expect(
         explained,
         equals(

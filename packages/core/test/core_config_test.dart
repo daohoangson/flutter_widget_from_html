@@ -4,17 +4,8 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 
 import '_.dart' as _;
 
-Future<String> explain(
-  WidgetTester t,
-  HtmlWidget hw, {
-  String imageUrlToPrecache,
-}) =>
-    _.explain(
-      t,
-      null,
-      hw: hw,
-      imageUrlToPrecache: imageUrlToPrecache,
-    );
+Future<String> explain(WidgetTester t, HtmlWidget hw) =>
+    _.explain(t, null, hw: hw);
 
 void main() {
   group('baseUrl', () {
@@ -22,11 +13,7 @@ void main() {
     final html = '<img src="image.png" alt="image dot png" />';
 
     testWidgets('renders without value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        HtmlWidget(html, key: _.hwKey),
-        imageUrlToPrecache: 'image.png',
-      );
+      final explained = await explain(tester, HtmlWidget(html, key: _.hwKey));
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
@@ -37,7 +24,6 @@ void main() {
       final explained = await explain(
         tester,
         HtmlWidget(html, baseUrl: baseUrl, key: _.hwKey),
-        imageUrlToPrecache: 'http://base.com/path/image.png',
       );
       expect(
           explained,

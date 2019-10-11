@@ -111,7 +111,7 @@ void main() {
     testWidgets('renders quotes around IMG', (WidgetTester tester) async {
       final src = 'http://domain.com/image.png';
       final html = '<q><img src="$src" /></q>';
-      final explained = await explain(tester, html, imageUrlToPrecache: src);
+      final explained = await explain(tester, html);
       expect(explained, equals("[RichText:(:“[NetworkImage:url=$src](:”))]"));
     });
 
@@ -204,11 +204,7 @@ void main() {
   <figcaption><i>fig. 1</i> Foo</figcaption>
 </figure>
 """;
-      final explained = await explainMargin(
-        tester,
-        html,
-        imageUrlToPrecache: src,
-      );
+      final explained = await explainMargin(tester, html);
       expect(
           explained,
           equals('[SizedBox:0.0x10.0],'
@@ -546,20 +542,20 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 
       testWidgets('renders IMG inline by default', (WidgetTester tester) async {
         final html = '<img src="$src" />';
-        final explained = await explain(tester, html, imageUrlToPrecache: src);
+        final explained = await explain(tester, html);
         expect(explained, equals("[RichText:[NetworkImage:url=$src]]"));
       });
 
       testWidgets('renders IMG as block', (WidgetTester tester) async {
         final html = '<img src="$src" style="display: block" />';
-        final explained = await explain(tester, html, imageUrlToPrecache: src);
+        final explained = await explain(tester, html);
         expect(explained, equals("[NetworkImage:url=$src]"));
       });
 
       testWidgets('renders IMG with dimensions inline',
           (WidgetTester tester) async {
         final html = '<img src="$src" width="1" height="1" />';
-        final explained = await explain(tester, html, imageUrlToPrecache: src);
+        final explained = await explain(tester, html);
         expect(
             explained,
             equals('[RichText:[ImageLayout:child='
@@ -572,7 +568,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       testWidgets('renders IMG with dimensions as block', (tester) async {
         final html = '<img src="$src" width="1" '
             'height="1" style="display: block" />';
-        final explained = await explain(tester, html, imageUrlToPrecache: src);
+        final explained = await explain(tester, html);
         expect(
             explained,
             equals('[ImageLayout:'
