@@ -1,3 +1,9 @@
+## 0.2.3+4
+
+* Improve IMG error handling (#96)
+* Fix bug rendering nested list (OL/UL) with single child (#88)
+* Fix bug related to null widget (#94, #95)
+
 ## 0.2.3+3
 
 * Improve BR rendering to be consistent with browsers (#83, #84)
