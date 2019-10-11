@@ -23,11 +23,13 @@ class WidgetFactory extends core.WidgetFactory {
   WidgetFactory(this._config) : super(_config);
 
   @override
-  Widget buildDivider() => Divider(height: 1);
+  Widget buildDivider() => const Divider(height: 1);
 
   @override
   Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
-      InkWell(child: child, onTap: onTap);
+      child != null && onTap != null
+          ? InkWell(child: child, onTap: onTap)
+          : child;
 
   @override
   GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null

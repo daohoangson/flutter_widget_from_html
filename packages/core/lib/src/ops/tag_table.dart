@@ -117,15 +117,11 @@ class _TagTable {
     final tableRows = <TableRow>[];
     for (final row in rows) {
       final cells = List<Widget>(cols);
+
       int i = 0;
-      while (i < row.cells.length) {
-        cells[i] = wf.buildTableCell(row.cells[i]);
-        i++;
-      }
-      while (i < cols) {
-        cells[i] = widget0;
-        i++;
-      }
+      for (final cell in row.cells) cells[i++] = wf.buildTableCell(cell);
+      while (i < cols) cells[i++] = widget0;
+
       tableRows.add(TableRow(children: cells));
     }
 
