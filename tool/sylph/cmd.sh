@@ -19,7 +19,7 @@ fi
 
 # https://github.com/mmcc007/sylph
 export PATH="$PATH":"$HOME/.pub-cache/bin"
-pub global activate sylph
+pub global activate --source git https://github.com/daohoangson/sylph.git
 
 cd packages/example
 flutter pub get
