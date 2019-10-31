@@ -8,7 +8,7 @@ environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
 
 dependencies:
-  cached_network_image: ^1.1.1
+  cached_network_image: ^2.0.0-rc
   chewie: ^0.9.8
   flutter:
     sdk: flutter
