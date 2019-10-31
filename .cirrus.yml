@@ -8,13 +8,14 @@ unit_test_task:
   codecov_script: bash <(curl -s https://codecov.io/bash)
 
 ios_test_task:
+  skip: "!changesInclude('lib/src/web_view.dart')"
   osx_instance:
     image: mojave-xcode-10.2-flutter
-  setup_script:
-    xcrun simctl create iPhoneX com.apple.CoreSimulator.SimDeviceType.iPhone-X com.apple.CoreSimulator.SimRuntime.iOS-12-2 | xargs xcrun simctl boot
+  setup_script: xcrun simctl create iPhoneX com.apple.CoreSimulator.SimDeviceType.iPhone-X com.apple.CoreSimulator.SimRuntime.iOS-12-2 | xargs xcrun simctl boot
   test_script: ./tool/integration.sh
 
 android_test_task:
+  skip: "!changesInclude('lib/src/video_player.dart', 'lib/src/web_view.dart')"
   container:
     image: cirrusci/flutter
   env:
