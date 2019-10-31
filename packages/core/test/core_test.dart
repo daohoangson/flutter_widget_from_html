@@ -580,6 +580,70 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     });
   });
 
+  group('FONT', () {
+    testWidgets('renders color attribute', (WidgetTester tester) async {
+      final html = '<font color="#F00">Foo</font>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(#FFFF0000:Foo)]'));
+    });
+
+    testWidgets('renders face attribute', (WidgetTester tester) async {
+      final html = '<font face="Monospace">Foo</font>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+font=Monospace:Foo)]'));
+    });
+
+    group('size attribute', () {
+      testWidgets('renders 7', (WidgetTester tester) async {
+        final html = '<font size="7">Foo</font>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(@20.0:Foo)]'));
+      });
+
+      testWidgets('renders 6', (WidgetTester tester) async {
+        final html = '<font size="6">Foo</font>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(@15.0:Foo)]'));
+      });
+
+      testWidgets('renders 5', (WidgetTester tester) async {
+        final html = '<font size="5">Foo</font>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(@11.3:Foo)]'));
+      });
+
+      testWidgets('renders 4', (WidgetTester tester) async {
+        final html = '<font size="4">Foo</font>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(:Foo)]'));
+      });
+
+      testWidgets('renders 3', (WidgetTester tester) async {
+        final html = '<font size="3">Foo</font>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(@8.1:Foo)]'));
+      });
+
+      testWidgets('renders 2', (WidgetTester tester) async {
+        final html = '<font size="2">Foo</font>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(@6.3:Foo)]'));
+      });
+
+      testWidgets('renders 1', (WidgetTester tester) async {
+        final html = '<font size="1">Foo</font>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(@5.6:Foo)]'));
+      });
+    });
+
+    testWidgets('renders all attributes', (WidgetTester tester) async {
+      final html = '<font color="#00F" face="Monospace" size="7">Foo</font>';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(#FF0000FF+font=Monospace@20.0:Foo)]'));
+    });
+  });
+
   testWidgets('renders font-family inline style', (WidgetTester tester) async {
     final html = '<span style="font-family: Monospace">Foo</span>';
     final explained = await explain(tester, html);

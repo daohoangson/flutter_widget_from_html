@@ -12,6 +12,7 @@ part 'ops/style_margin.dart';
 part 'ops/style_text_align.dart';
 part 'ops/tag_a.dart';
 part 'ops/tag_code.dart';
+part 'ops/tag_font.dart';
 part 'ops/tag_img.dart';
 part 'ops/tag_li.dart';
 part 'ops/tag_q.dart';
@@ -29,6 +30,7 @@ class WidgetFactory {
   BuildOp _tagA;
   BuildOp _tagBr;
   BuildOp _tagCode;
+  BuildOp _tagFont;
   BuildOp _tagHr;
   BuildOp _tagImg;
   BuildOp _tagLi;
@@ -492,6 +494,10 @@ class WidgetFactory {
         meta = lazySet(meta, decoStrike: true);
         break;
 
+      case 'font':
+        meta = lazySet(meta, buildOp: tagFont());
+        break;
+
       case 'hr':
         meta = lazySet(meta, buildOp: tagHr());
         break;
@@ -773,6 +779,11 @@ class WidgetFactory {
   BuildOp tagCode() {
     _tagCode ??= _TagCode(this).buildOp;
     return _tagCode;
+  }
+
+  BuildOp tagFont() {
+    _tagFont ??= _TagFont(this).buildOp;
+    return _tagFont;
   }
 
   BuildOp tagHr() {
