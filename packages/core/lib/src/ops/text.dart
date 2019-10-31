@@ -29,7 +29,7 @@ InlineSpan _compileToTextSpan(BuildContext context, TextBlock b) {
       addChild();
     }
 
-    if (bit.isWidget) {
+    if (bit is WidgetBit) {
       addChild();
       children.add(bit.widgetSpan);
       return;
