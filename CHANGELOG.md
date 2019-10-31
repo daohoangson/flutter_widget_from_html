@@ -1,3 +1,7 @@
+## 0.3.0-rc
+
+* Use `cached_network_image@2.0.0-rc` for compatibility with Flutter 1.10.15 (master channel)
+
 ## 0.2.3+4
 
 * Improve IMG error handling (#96)
