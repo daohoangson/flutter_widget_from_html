@@ -1,3 +1,8 @@
+## 0.2.4
+
+* Add support for `type`/`start`/`reversed` (LI/OL/UL) (#91)
+* Add support for tag FONT (#109)
+
 ## 0.2.3+4
 
 * Improve IMG error handling (#96)

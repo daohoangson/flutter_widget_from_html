@@ -76,7 +76,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
   - Inline style: `<table style="border: 1px solid #f00">`
 - VIDEO via [chewie](https://pub.dev/packages/chewie)
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
-  DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FOOTER, HEADER, HR, I, INS,
+  DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, INS,
   KBD, MAIN, NAV, P, PRE, Q, S, SAMP, SECTION, STRIKE, STRONG, TT, U, VAR
 
 These tags and their contents will be ignored:
