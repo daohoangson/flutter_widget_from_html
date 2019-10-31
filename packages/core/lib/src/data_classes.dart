@@ -343,10 +343,11 @@ class DataBit extends TextBit {
 
 class SpaceBit extends TextBit {
   final TextBlock block;
+  final String data;
 
-  SpaceBit(this.block) : assert(block != null);
+  SpaceBit(this.block, {this.data}) : assert(block != null);
 
-  bool get hasTrailingSpace => true;
+  bool get hasTrailingSpace => data == null;
 }
 
 class WidgetBit extends TextBit {
@@ -442,9 +443,9 @@ class TextBlock extends TextBit {
   void addBit(TextBit bit, {int index}) =>
       _children.insert(index ?? _children.length, bit);
 
-  bool addSpace() {
-    if (hasTrailingSpace) return false;
-    addBit(SpaceBit(this));
+  bool addSpace([String data]) {
+    if (data == null && (last is SpaceBit || hasTrailingSpace)) return false;
+    addBit(SpaceBit(this, data: data));
     return true;
   }
 
