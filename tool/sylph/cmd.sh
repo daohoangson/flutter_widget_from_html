@@ -20,7 +20,7 @@ pub global activate sylph
 
 # Others
 sudo apt-get update
-sudo apt-get install -y zip
+sudo apt-get install -y python zip
 
 cd packages/example
 flutter pub get
