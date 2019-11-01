@@ -771,7 +771,7 @@ class WidgetFactory {
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      onPieces: (_, pieces) => pieces..last.block.addText('\n'),
+      onPieces: (_, pieces) => pieces..last.block.addSpace('\n'),
     );
     return _tagBr;
   }

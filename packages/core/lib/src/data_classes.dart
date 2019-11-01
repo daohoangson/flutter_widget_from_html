@@ -304,102 +304,88 @@ class NodeMetadata {
 
 typedef NodeMetadata NodeMetadataCollector(NodeMetadata meta, dom.Element e);
 
-abstract class _TextBit {
-  TextBit get first;
-  bool get hasTrailingSpace;
-  bool get isEmpty;
-  TextBit get last;
+abstract class TextBit {
+  TextBlock get block;
 
+  String get data => null;
+  TextBit get first => this;
+  bool get hasTrailingSpace => false;
+  bool get isEmpty => false;
   bool get isNotEmpty => !isEmpty;
+  TextBit get last => this;
+  VoidCallback get onTap => null;
+  TextStyleBuilders get tsb => null;
 }
 
-class TextBit extends _TextBit {
+class DataBit extends TextBit {
   final TextBlock block;
   final String data;
   final VoidCallback onTap;
   final TextStyleBuilders tsb;
-  final WidgetSpan widgetSpan;
 
-  TextBit.text(this.block, this.data, this.tsb, {this.onTap})
+  DataBit(this.block, this.data, this.tsb, {this.onTap})
       : assert(block != null),
         assert(data != null),
-        assert(tsb != null),
-        widgetSpan = null;
+        assert(tsb != null);
 
-  TextBit.space(this.block)
-      : assert(block != null),
-        data = null,
-        onTap = null,
-        tsb = null,
-        widgetSpan = null;
-
-  TextBit.widget(this.block, this.widgetSpan)
-      : assert(block != null),
-        assert(widgetSpan != null),
-        data = null,
-        onTap = null,
-        tsb = null;
-
-  @override
-  TextBit get first => this;
-
-  @override
-  bool get hasTrailingSpace => isSpace;
-
-  @override
-  bool get isEmpty => false;
-
-  @override
-  TextBit get last => this;
-
-  bool get isSpace => data == null && widgetSpan == null;
-  bool get isText => data != null;
-  bool get isWidget => widgetSpan != null;
-
-  TextBit rebuild({
+  DataBit rebuild({
     String data,
     VoidCallback onTap,
     TextStyleBuilders tsb,
-    WidgetSpan widgetSpan,
   }) =>
-      isText
-          ? TextBit.text(
-              block,
-              data ?? this.data,
-              tsb ?? this.tsb,
-              onTap: onTap ?? this.onTap,
-            )
-          : isWidget
-              ? TextBit.widget(block, widgetSpan ?? this.widgetSpan)
-              : this;
+      DataBit(
+        block,
+        data ?? this.data,
+        tsb ?? this.tsb,
+        onTap: onTap ?? this.onTap,
+      );
+}
 
-  TextBit rebuildWidget({
+class SpaceBit extends TextBit {
+  final TextBlock block;
+  final String data;
+
+  SpaceBit(this.block, {this.data}) : assert(block != null);
+
+  bool get hasTrailingSpace => data == null;
+}
+
+class WidgetBit extends TextBit {
+  final TextBlock block;
+  final WidgetSpan widgetSpan;
+
+  WidgetBit(this.block, this.widgetSpan)
+      : assert(block != null),
+        assert(widgetSpan != null);
+
+  WidgetBit rebuild({
     PlaceholderAlignment alignment,
     TextBaseline baseline,
     Widget child,
   }) =>
-      isWidget
-          ? rebuild(
-              widgetSpan: WidgetSpan(
-                alignment: alignment ?? this.widgetSpan.alignment,
-                baseline: baseline ?? this.widgetSpan.baseline,
-                child: child ?? this.widgetSpan.child,
-              ),
-            )
-          : this;
+      WidgetBit(
+        block,
+        WidgetSpan(
+          alignment: alignment ?? this.widgetSpan.alignment,
+          baseline: baseline ?? this.widgetSpan.baseline,
+          child: child ?? this.widgetSpan.child,
+        ),
+      );
 }
 
-class TextBlock extends _TextBit {
+class TextBlock extends TextBit {
   final TextBlock parent;
   final TextStyleBuilders tsb;
-  final List<_TextBit> _children = [];
+  final _children = <TextBit>[];
 
   TextBlock(this.tsb, {this.parent}) : assert(tsb != null);
 
   @override
+  TextBlock get block => parent;
+
+  @override
   TextBit get first {
     for (final child in _children) {
-      if (child is TextBit) return child;
       final first = child.first;
       if (first != null) return first;
     }
@@ -433,9 +419,7 @@ class TextBlock extends _TextBit {
   TextBit get last {
     final l = _children.length;
     for (var i = l - 1; i >= 0; i--) {
-      final child = _children[i];
-      if (child is TextBit) return child;
-      final last = child.last;
+      final last = _children[i].last;
       if (last != null) return last;
     }
 
@@ -459,15 +443,15 @@ class TextBlock extends _TextBit {
   void addBit(TextBit bit, {int index}) =>
       _children.insert(index ?? _children.length, bit);
 
-  bool addSpace() {
-    if (hasTrailingSpace) return false;
-    addBit(TextBit.space(this));
+  bool addSpace([String data]) {
+    if (data == null && (last is SpaceBit || hasTrailingSpace)) return false;
+    addBit(SpaceBit(this, data: data));
     return true;
   }
 
-  void addText(String data) => addBit(TextBit.text(this, data, tsb));
+  void addText(String data) => addBit(DataBit(this, data, tsb));
 
-  void addWidget(WidgetSpan ws) => addBit(TextBit.widget(this, ws));
+  void addWidget(WidgetSpan ws) => addBit(WidgetBit(this, ws));
 
   bool forEachBit(f(TextBit bit, int index), {bool reversed = false}) {
     final l = _children.length;
@@ -477,9 +461,9 @@ class TextBlock extends _TextBit {
 
     for (var i = i0; i != i1; i += ii) {
       final child = _children[i];
-      final shouldContinue = child is TextBit
-          ? f(child, i)
-          : child is TextBlock ? child.forEachBit(f, reversed: reversed) : null;
+      final shouldContinue = child is TextBlock
+          ? child.forEachBit(f, reversed: reversed)
+          : f(child, i);
       if (shouldContinue == false) return false;
     }
 
@@ -491,10 +475,10 @@ class TextBlock extends _TextBit {
     var l = _children.length;
     while (i < l) {
       final child = _children[i];
-      if (child is TextBit) {
-        _children[i] = f(child);
-      } else if (child is TextBlock) {
+      if (child is TextBlock) {
         child.rebuildBits(f);
+      } else {
+        _children[i] = f(child);
       }
       i++;
     }
@@ -509,14 +493,14 @@ class TextBlock extends _TextBit {
   void trimRight() {
     while (isNotEmpty && hasTrailingSpace) {
       final lastChild = _children.last;
-      if (lastChild is TextBit) {
-        assert(lastChild.isSpace);
-        _children.removeLast();
-      } else if (lastChild is TextBlock) {
+      if (lastChild is TextBlock) {
         lastChild.trimRight();
         if (lastChild.isEmpty) {
           _children.removeLast();
         }
+      } else {
+        assert(lastChild.hasTrailingSpace);
+        _children.removeLast();
       }
     }
   }

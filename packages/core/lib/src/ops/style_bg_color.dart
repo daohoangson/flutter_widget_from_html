@@ -33,7 +33,7 @@ class _StyleBgColor {
       });
 
   BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) => piece
-    ..block.rebuildBits((bit) => bit.tsb != null
+    ..block.rebuildBits((bit) => bit is DataBit
         ? bit.rebuild(
             tsb: bit.tsb.sub()..enqueue(_styleBgColorTextStyleBuilder, bgColor),
           )

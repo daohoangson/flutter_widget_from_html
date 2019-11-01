@@ -33,14 +33,14 @@ class _TagA {
       );
 
   BuiltPiece _buildBlock(BuiltPiece piece, GestureTapCallback onTap) => piece
-    ..block.rebuildBits((b) => b.isWidget
-        ? b.rebuildWidget(
+    ..block.rebuildBits((b) => b is WidgetBit
+        ? b.rebuild(
             child: GestureDetector(
               child: b.widgetSpan.child,
               onTap: onTap,
             ),
           )
-        : b.rebuild(onTap: onTap));
+        : b is DataBit ? b.rebuild(onTap: onTap) : b);
 
   GestureTapCallback _buildGestureTapCallback(NodeMetadata meta) {
     final attrs = meta.domElement.attributes;

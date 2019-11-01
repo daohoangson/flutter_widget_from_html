@@ -76,10 +76,24 @@ void main() {
             '[RichText:(+i:ADDRESS)]]'));
   });
 
-  testWidgets('renders BR tag', (WidgetTester tester) async {
-    final html = 'Foo<br />Bar';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[RichText:(:Foo\nBar)]'));
+  group('BR', () {
+    testWidgets('renders new line', (WidgetTester tester) async {
+      final html = 'Foo<br />Bar';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo\nBar)]'));
+    });
+
+    testWidgets('renders without whitespace on new line', (tester) async {
+      final html = 'Foo<br />\nBar';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo\nBar)]'));
+    });
+
+    testWidgets('renders multiple new lines', (WidgetTester tester) async {
+      final html = 'Foo<br /><br /><br />';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo\n\n\n)]'));
+    });
   });
 
   testWidgets('renders DD/DL/DT tags', (WidgetTester tester) async {
