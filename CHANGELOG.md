@@ -1,3 +1,9 @@
+## 0.2.4+1
+
+* Improve caching logic (#112)
+* Fix extra space after BR tag (#111)
+* Fix cached image not being rendered on first build (#113)
+
 ## 0.2.4
 
 * Add support for `type`/`start`/`reversed` (LI/OL/UL) (#91)
