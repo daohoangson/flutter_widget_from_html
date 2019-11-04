@@ -270,6 +270,8 @@ class _Explainer {
     if (widget == widget0) return '[widget0]';
     if (widget is Image) return _image(widget.image);
     if (widget is ImageLayout) return _imageLayout(widget);
+
+    // ignore: invalid_use_of_protected_member
     if (widget is IWidgetPlaceholder) return _widget(widget.build(context));
 
     final type = widget.runtimeType.toString();

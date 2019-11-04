@@ -14,12 +14,11 @@ const widget0 = const SizedBox.shrink();
 typedef void OnTapUrl(String url);
 
 typedef Iterable<Widget> WidgetPlaceholderBuilder<T>(
-    BuildContext context, Iterable<Widget> children, T input);
+    BuilderContext bc, Iterable<Widget> children, T input);
 
 typedef WidgetFactory FactoryBuilder(HtmlWidgetConfig config);
 
-class WidgetPlaceholder<T1> extends StatelessWidget
-    implements IWidgetPlaceholder {
+class WidgetPlaceholder<T1> extends IWidgetPlaceholder {
   final WidgetFactory wf;
 
   final _builders = List<Function>();
@@ -39,13 +38,15 @@ class WidgetPlaceholder<T1> extends StatelessWidget
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext c) => buildWithContext(BuilderContext(c));
+
+  Widget buildWithContext(BuilderContext bc) {
     Iterable<Widget> output;
 
     final l = _builders.length;
     for (int i = 0; i < l; i++) {
       final children = i == 0 ? _firstChildren : output;
-      output = _builders[i](context, children, _inputs[i]);
+      output = _builders[i](bc, children, _inputs[i]);
     }
 
     return wf.buildColumn(output) ?? widget0;
@@ -58,8 +59,6 @@ class WidgetPlaceholder<T1> extends StatelessWidget
   }
 }
 
-abstract class IWidgetPlaceholder extends Widget {
-  Widget build(BuildContext context);
-
+abstract class IWidgetPlaceholder extends StatelessWidget {
   void wrapWith<T>(WidgetPlaceholderBuilder<T> builder, T input);
 }

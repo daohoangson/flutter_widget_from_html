@@ -74,12 +74,12 @@ class _TagLi {
     return _liOp;
   }
 
-  Iterable<Widget> _build(BuildContext c, Iterable<Widget> ws, _LiInput i) {
+  Iterable<Widget> _build(BuilderContext bc, Iterable<Widget> ws, _LiInput i) {
     final listMeta = i.listMeta;
-    final style = i.meta.textStyle(c);
     final paddingLeft = i.paddingLeft ?? listMeta.paddingLeft;
-    final paddingLeftPx = paddingLeft.getValue(style);
+    final paddingLeftPx = paddingLeft.getValue(bc, i.meta);
     final padding = EdgeInsets.only(left: paddingLeftPx);
+    final style = i.meta.tsb.build(bc);
     final listStyleType = i.listStyleType ?? listMeta.listStyleType;
     final markerIndex = listMeta.markerReversed
         ? (listMeta.markerStart ?? listMeta.markerCount) - i.markerIndex
@@ -89,7 +89,7 @@ class _TagLi {
     return [
       Stack(children: <Widget>[
         wf.buildPadding(wf.buildColumn(ws), padding),
-        _buildMarker(c, style, markerText, paddingLeftPx),
+        _buildMarker(bc.context, style, markerText, paddingLeftPx),
       ]),
     ];
   }
@@ -117,9 +117,8 @@ class _TagLi {
       final item = child as _LiPlaceholder;
 
       if (item.input.listMeta != null) {
-        item.wrapWith((context, widgets, __) {
-          final style = meta.textStyle(context);
-          final paddingLeftPx = listMeta.paddingLeft.getValue(style);
+        item.wrapWith((bc, widgets, __) {
+          final paddingLeftPx = listMeta.paddingLeft.getValue(bc, meta);
           final padding = EdgeInsets.only(left: paddingLeftPx);
 
           return widgets.map((widget) => wf.buildPadding(widget, padding));

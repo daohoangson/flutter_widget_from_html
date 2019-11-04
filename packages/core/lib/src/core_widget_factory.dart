@@ -49,7 +49,7 @@ class WidgetFactory {
           : child;
 
   Iterable<Widget> buildAlignsWithContext(
-          BuildContext _, Iterable<Widget> children, Alignment alignment) =>
+          BuilderContext _, Iterable<Widget> children, Alignment alignment) =>
       children.map((child) => buildAlign(child, alignment));
 
   Widget buildBody(Iterable<Widget> children) =>
@@ -95,7 +95,7 @@ class WidgetFactory {
           ? GestureDetector(child: child, onTap: onTap)
           : child;
 
-  Iterable<Widget> buildGestureDetectorsWithContext(BuildContext _,
+  Iterable<Widget> buildGestureDetectorsWithContext(BuilderContext _,
           Iterable<Widget> children, GestureTapCallback onTap) =>
       children.map((child) => buildGestureDetector(child, onTap));
 
@@ -197,18 +197,18 @@ class WidgetFactory {
       : null;
 
   Iterable<Widget> buildTextWithContext(
-    BuildContext context,
+    BuilderContext bc,
     Iterable<Widget> _,
     TextBlock block,
   ) {
     final tsb = block.tsb;
-    tsb?.build(context);
+    tsb?.build(bc);
 
     return [
       RichText(
-        text: _compileToTextSpan(context, block),
+        text: _compileToTextSpan(bc, block),
         textAlign: tsb?.textAlign ?? TextAlign.start,
-        textScaleFactor: MediaQuery.of(context).textScaleFactor,
+        textScaleFactor: MediaQuery.of(bc.context).textScaleFactor,
       ),
     ];
   }
@@ -239,13 +239,14 @@ class WidgetFactory {
     return TextDecoration.combine(list);
   }
 
-  double buildTextFontSize(BuildContext c, TextStyle p, NodeMetadata m) {
+  double buildTextFontSize(TextStyleBuilders tsb, TextStyle p, NodeMetadata m) {
     final value = m.fontSize;
     if (value == null) return null;
 
     final parsed = parseCssLength(value);
-    if (parsed != null) return parsed.getValue(p, context: c);
+    if (parsed != null) return parsed.getValue(tsb.bc, m);
 
+    final c = tsb.bc.context;
     switch (value) {
       case kCssFontSizeXxLarge:
         return DefaultTextStyle.of(c).style.fontSize * 2.0;
@@ -275,7 +276,7 @@ class WidgetFactory {
     if (m == null) return p;
 
     final decoration = buildTextDecoration(p, m);
-    final fontSize = buildTextFontSize(tsb.context, p, m);
+    final fontSize = buildTextFontSize(tsb, p, m);
     final fontStyle = buildFontStyle(m);
     if (m.color == null &&
         decoration == null &&

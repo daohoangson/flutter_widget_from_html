@@ -1,13 +1,13 @@
 part of '../core_widget_factory.dart';
 
-InlineSpan _compileToTextSpan(BuildContext context, TextBlock b) {
+InlineSpan _compileToTextSpan(BuilderContext bc, TextBlock b) {
   if (b?.isNotEmpty != true) return TextSpan();
 
   final children = <InlineSpan>[];
 
   final first = b.first;
   final firstSb = StringBuffer();
-  final firstStyle = first.tsb?.build(context);
+  final firstStyle = first.tsb?.build(bc);
 
   var prevOnTap = first.onTap;
   var prevStyle = firstStyle;
@@ -24,7 +24,7 @@ InlineSpan _compileToTextSpan(BuildContext context, TextBlock b) {
   };
 
   b.forEachBit((bit, _) {
-    final style = _getBitTsb(bit)?.build(context) ?? prevStyle;
+    final style = _getBitTsb(bit)?.build(bc) ?? prevStyle;
     if (bit.onTap != prevOnTap || style != prevStyle) {
       addChild();
     }

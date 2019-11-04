@@ -138,6 +138,11 @@ typedef Iterable<BuiltPiece> BuildOpOnPieces(
 typedef Iterable<Widget> BuildOpOnWidgets(
     NodeMetadata meta, Iterable<Widget> widgets);
 
+class BuilderContext {
+  final BuildContext context;
+  BuilderContext(this.context);
+}
+
 abstract class BuiltPiece {
   bool get hasWidgets;
 
@@ -209,20 +214,20 @@ class CssLength {
 
   bool get isNotEmpty => number > 0;
 
-  double getValue(TextStyle style, {BuildContext context}) {
+  double getValue(BuilderContext bc, NodeMetadata meta) {
     double value;
 
     switch (this.unit) {
       case CssLengthUnit.em:
-        value = style.fontSize * number / 1;
+        value = meta.tsb.build(bc).fontSize * number / 1;
         break;
       case CssLengthUnit.px:
         value = number;
         break;
     }
 
-    if (context != null && value != null) {
-      value = value * MediaQuery.of(context).textScaleFactor;
+    if (value != null) {
+      value = value * MediaQuery.of(bc.context).textScaleFactor;
     }
 
     return value;
@@ -298,8 +303,6 @@ class NodeMetadata {
       f(key, iterator.current);
     }
   }
-
-  TextStyle textStyle(BuildContext context) => tsb.build(context);
 }
 
 typedef NodeMetadata NodeMetadataCollector(NodeMetadata meta, dom.Element e);
@@ -511,11 +514,11 @@ class TextStyleBuilders {
   final _inputs = [];
   final TextStyleBuilders parent;
 
-  BuildContext _context;
+  BuilderContext _bc;
   TextStyle _output;
   TextAlign _textAlign;
 
-  BuildContext get context => _context;
+  BuilderContext get bc => _bc;
 
   TextAlign get textAlign => _textAlign ?? parent?.textAlign;
 
@@ -529,14 +532,14 @@ class TextStyleBuilders {
     _inputs.add(input);
   }
 
-  TextStyle build(BuildContext context) {
-    _resetContextIfNeeded(context);
+  TextStyle build(BuilderContext bc) {
+    _resetContextIfNeeded(bc);
     if (_output != null) return _output;
 
     if (parent == null) {
-      _output = DefaultTextStyle.of(context).style;
+      _output = DefaultTextStyle.of(_bc.context).style;
     } else {
-      _output = parent.build(context);
+      _output = parent.build(_bc);
     }
 
     final l = _builders.length;
@@ -549,10 +552,10 @@ class TextStyleBuilders {
 
   TextStyleBuilders sub() => TextStyleBuilders(parent: this);
 
-  void _resetContextIfNeeded(BuildContext context) {
-    if (context == _context) return;
+  void _resetContextIfNeeded(BuilderContext bc) {
+    if (bc == _bc) return;
 
-    _context = context;
+    _bc = bc;
     _output = null;
     _textAlign = null;
   }

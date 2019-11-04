@@ -5,7 +5,7 @@ TextStyle _tagAExtendedAccentColor(
   TextStyle parent,
   _,
 ) =>
-    parent.copyWith(color: Theme.of(tsb.context).accentColor);
+    parent.copyWith(color: Theme.of(tsb.bc.context).accentColor);
 
 class _TagAExtended {
   BuildOp get buildOp => BuildOp(

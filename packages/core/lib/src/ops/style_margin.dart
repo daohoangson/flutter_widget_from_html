@@ -7,14 +7,13 @@ const kCssMarginRight = 'margin-right';
 const kCssMarginTop = 'margin-top';
 
 Iterable<Widget> _marginBuilder(
-  BuildContext context,
+  BuilderContext bc,
   Iterable<Widget> children,
   _MarginBuilderInput input,
 ) {
-  final style = input.meta.textStyle(context);
   final padding = EdgeInsets.only(
-    left: input.marginLeft?.getValue(style, context: context) ?? 0.0,
-    right: input.marginRight?.getValue(style, context: context) ?? 0.0,
+    left: input.marginLeft?.getValue(bc, input.meta) ?? 0.0,
+    right: input.marginRight?.getValue(bc, input.meta) ?? 0.0,
   );
 
   return children.map((child) {
@@ -40,28 +39,26 @@ class _MarginBuilderInput {
   WidgetFactory wf;
 }
 
-class SpacingPlaceholder extends StatelessWidget implements IWidgetPlaceholder {
+class SpacingPlaceholder extends IWidgetPlaceholder {
   final NodeMetadata meta;
 
   final _heights = <CssLength>[];
 
   SpacingPlaceholder({
     CssLength height,
-    Key key,
     this.meta,
   })  : assert(height != null),
-        assert(meta != null),
-        super(key: key) {
+        assert(meta != null) {
     _heights.add(height);
   }
 
   @override
   Widget build(BuildContext context) {
-    final style = meta.textStyle(context);
+    final bc = BuilderContext(context);
     var height = 0.0;
 
     for (final _height in _heights) {
-      final h = _height.getValue(style, context: context);
+      final h = _height.getValue(bc, meta);
       if (h > height) height = h;
     }
 
