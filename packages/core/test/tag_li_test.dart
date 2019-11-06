@@ -578,5 +578,22 @@ void main() {
               '[$padding,child=[Stack:children=[$padding,child=[RichText:(:Three)]],[Positioned:child=[RichText,align=right:(:$circle)]]]]'
               ']'));
     });
+
+    testWidgets('LI has empty A', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/112#issuecomment-550116179
+      final html = """<ol>
+  <li>One</li>
+  <li><a href="https://flutter.dev"></a></li>
+  <li>Three</li>
+</ol>""";
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Column:children='
+              '[Stack:children=[$padding,child=[RichText:(:One)]],[Positioned:child=[RichText,align=right:(:1.)]]],'
+              '[Stack:children=[widget0],[Positioned:child=[RichText,align=right:(:2.)]]],'
+              '[Stack:children=[$padding,child=[RichText:(:Three)]],[Positioned:child=[RichText,align=right:(:3.)]]]'
+              ']'));
+    });
   });
 }

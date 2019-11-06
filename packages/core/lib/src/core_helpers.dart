@@ -62,3 +62,5 @@ class WidgetPlaceholder<T1> extends IWidgetPlaceholder {
 abstract class IWidgetPlaceholder extends StatelessWidget {
   void wrapWith<T>(WidgetPlaceholderBuilder<T> builder, T input);
 }
+
+Iterable<T> listOfNonNullOrNothing<T>(T x) => x == null ? null : [x];

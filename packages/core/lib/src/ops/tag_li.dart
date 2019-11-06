@@ -88,7 +88,7 @@ class _TagLi {
 
     return [
       Stack(children: <Widget>[
-        wf.buildPadding(wf.buildColumn(ws), padding),
+        wf.buildPadding(wf.buildColumn(ws), padding) ?? widget0,
         _buildMarker(bc.context, style, markerText, paddingLeftPx),
       ]),
     ];

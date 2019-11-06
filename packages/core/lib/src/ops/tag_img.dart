@@ -142,10 +142,7 @@ class _TagImg {
           final img = _parseMetadata(meta, wf);
           if (img.url?.isNotEmpty != true) return widgets;
 
-          var widget = _buildImage(img, wf);
-          if (widget == null) return widgets;
-
-          return [widget];
+          return listOfNonNullOrNothing(_buildImage(img, wf));
         },
       );
 

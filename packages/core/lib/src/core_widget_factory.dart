@@ -56,6 +56,7 @@ class WidgetFactory {
       buildPadding(buildColumn(children), _config.bodyPadding);
 
   Widget buildColumn(Iterable<Widget> children) {
+    if (children?.isNotEmpty != true) return null;
     children = fixOverlappingSpacings(
         children is List ? children : children.toList(growable: false));
     if (children?.isNotEmpty != true) return null;

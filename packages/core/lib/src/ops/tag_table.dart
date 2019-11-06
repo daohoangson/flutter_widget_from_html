@@ -79,7 +79,7 @@ class _TagTable {
         return [_buildRows(bc, ws, i)];
     }
 
-    return [_buildTable(bc, ws, i)];
+    return listOfNonNullOrNothing(_buildTable(bc, ws, i));
   }
 
   Widget _buildTable(BuilderContext bc, Iterable<Widget> ws, _TableInput i) {
@@ -107,13 +107,13 @@ class _TagTable {
 
     rows.addAll(bodyRows);
     rows.addAll(footRows);
-    if (rows.isEmpty) return widget0;
+    if (rows.isEmpty) return null;
 
     int cols = 0;
     for (final row in rows) {
       cols = cols > row.cells.length ? cols : row.cells.length;
     }
-    if (cols == 0) return widget0;
+    if (cols == 0) return null;
 
     final tableRows = <TableRow>[];
     for (final row in rows) {
@@ -137,7 +137,7 @@ class _TagTable {
     widgets.add(i.wf.buildTable(tableRows, border: border));
 
     if (widgets.length == 1) return widgets.first;
-    return i.wf.buildColumn(widgets) ?? widget0;
+    return i.wf.buildColumn(widgets);
   }
 
   TableBorder _buildTableBorder(BuilderContext bc, NodeMetadata meta) {
