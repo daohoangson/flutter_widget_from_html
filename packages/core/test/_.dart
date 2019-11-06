@@ -9,7 +9,7 @@ Future<String> explain(
   WidgetTester tester,
   String html, {
   WidgetExplainer explainer,
-  HtmlWidget hw,
+  Widget hw,
   PreTest preTest,
   Uri baseUrl,
   double bodyVerticalPadding = 0,

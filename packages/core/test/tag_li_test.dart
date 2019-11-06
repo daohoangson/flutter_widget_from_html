@@ -1,4 +1,6 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import '_.dart';
 
@@ -510,9 +512,9 @@ void main() {
       });
     });
 
-    group('padding-left', () {
+    group('padding-inline-start', () {
       testWidgets('renders 99px', (WidgetTester tester) async {
-        final html = '<ul style="padding-left: 99px"><li>Foo</li></ul>';
+        final html = '<ul style="padding-inline-start: 99px"><li>Foo</li></ul>';
         final explained = await explain(tester, html);
         expect(
             explained,
@@ -521,11 +523,12 @@ void main() {
                 '[Positioned:child=[RichText,align=right:(:$disc)]]]'));
       });
 
-      testWidgets('renders LI padding-left', (WidgetTester tester) async {
+      testWidgets('renders LI padding-inline-start',
+          (WidgetTester tester) async {
         final html = """
-<ul style="padding-left: 99px">
-  <li style="padding-left: 199px">199px</li>
-  <li style="padding-left: 299px">299px</li>
+<ul style="padding-inline-start: 99px">
+  <li style="padding-inline-start: 199px">199px</li>
+  <li style="padding-inline-start: 299px">299px</li>
   <li>99px</li>
 <ul>
 """;
@@ -593,6 +596,29 @@ void main() {
               '[Stack:children=[$padding,child=[RichText:(:One)]],[Positioned:child=[RichText,align=right:(:1.)]]],'
               '[Stack:children=[widget0],[Positioned:child=[RichText,align=right:(:2.)]]],'
               '[Stack:children=[$padding,child=[RichText:(:Three)]],[Positioned:child=[RichText,align=right:(:3.)]]]'
+              ']'));
+    });
+  });
+
+  group('rtl', () {
+    final rtlPadding = 'Padding:(0,25,0,0)';
+    testWidgets('renders ordered list', (WidgetTester tester) async {
+      final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';
+      final explained = await explain(tester, null,
+          hw: Directionality(
+            child: HtmlWidget(
+              html,
+              key: hwKey,
+              bodyPadding: const EdgeInsets.all(0),
+            ),
+            textDirection: TextDirection.rtl,
+          ));
+      expect(
+          explained,
+          equals('[Column:children='
+              '[Stack:children=[$rtlPadding,child=[RichText:(:One)]],[Positioned:child=[RichText,align=left:(:1.)]]],'
+              '[Stack:children=[$rtlPadding,child=[RichText:(:Two)]],[Positioned:child=[RichText,align=left:(:2.)]]],'
+              '[Stack:children=[$rtlPadding,child=[RichText:(+b:Three)]],[Positioned:child=[RichText,align=left:(:3.)]]]'
               ']'));
     });
   });
