@@ -1,3 +1,8 @@
+## 0.2.4+2
+
+* Add basic detection and support for `Directionality` widget during LI/OL/UL rendering (#115)
+* Fix bug LI has empty A (#112)
+
 ## 0.2.4+1
 
 * Improve caching logic (#112)

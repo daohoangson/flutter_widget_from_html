@@ -1,5 +1,5 @@
 name: flutter_widget_from_html
-version: 0.2.4+1
+version: 0.2.4+2
 description: Flutter plugin for widget tree building from html that supports hyperlink, image, nested list, etc.
 author: Dao Hoang Son <daohoangson@gmail.com>
 homepage: https://github.com/daohoangson/flutter_widget_from_html
