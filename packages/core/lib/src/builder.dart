@@ -44,8 +44,13 @@ class Builder {
           if (widget != null) list.add(widget);
         }
       } else {
-        piece.block.trimRight();
-        final text = wf.buildText(piece.block);
+        final block = piece.block;
+        block.trimRight();
+        if (parentMeta?.isBlockElement != true && block.last?.data == '\n') {
+          block.removeLast();
+          if (block.isEmpty) block.addText('\u{00A0}');
+        }
+        final text = wf.buildText(block);
         if (text != null) list.add(text);
       }
     }

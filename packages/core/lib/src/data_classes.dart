@@ -487,6 +487,24 @@ class TextBlock extends TextBit {
     }
   }
 
+  TextBit removeLast() {
+    while (true) {
+      if (_children.isEmpty) return null;
+
+      final lastChild = _children.last;
+      if (lastChild is TextBlock) {
+        final removed = lastChild.removeLast();
+        if (removed != null) {
+          return removed;
+        } else {
+          _children.removeLast();
+        }
+      } else {
+        return _children.removeLast();
+      }
+    }
+  }
+
   TextBlock sub(TextStyleBuilders tsb) {
     final sub = TextBlock(tsb, parent: this);
     _children.add(sub);
@@ -494,18 +512,7 @@ class TextBlock extends TextBit {
   }
 
   void trimRight() {
-    while (isNotEmpty && hasTrailingSpace) {
-      final lastChild = _children.last;
-      if (lastChild is TextBlock) {
-        lastChild.trimRight();
-        if (lastChild.isEmpty) {
-          _children.removeLast();
-        }
-      } else {
-        assert(lastChild.hasTrailingSpace);
-        _children.removeLast();
-      }
-    }
+    while (isNotEmpty && hasTrailingSpace) removeLast();
   }
 }
 

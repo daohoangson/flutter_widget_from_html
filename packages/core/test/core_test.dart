@@ -90,9 +90,52 @@ void main() {
     });
 
     testWidgets('renders multiple new lines', (WidgetTester tester) async {
-      final html = 'Foo<br /><br /><br />';
+      final html = 'Foo<br /><br /><br />Bar';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo\n\n\n)]'));
+      expect(explained, equals('[RichText:(:Foo\n\n\nBar)]'));
+    });
+
+    testWidgets('renders new line between SPANs, 1 of 2', (tester) async {
+      final html = '<span>Foo<br /></span><span>Bar</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo\nBar)]'));
+    });
+
+    testWidgets('renders new line between SPANs, 2 of 2', (tester) async {
+      final html = '<span>Foo</span><br /><span>Bar</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo\nBar)]'));
+    });
+
+    testWidgets('skips new line between SPAN and DIV, 1 of 2', (tester) async {
+      final html = '<span>Foo<br /></span><div>Bar</div>';
+      final explained = await explain(tester, html);
+      expect(explained,
+          equals('[Column:children=[RichText:(:Foo)],[RichText:(:Bar)]]'));
+    });
+
+    testWidgets('skips new line between SPAN and DIV, 2 of 2', (tester) async {
+      final html = '<span>Foo</span><br /><div>Bar</div>';
+      final explained = await explain(tester, html);
+      expect(explained,
+          equals('[Column:children=[RichText:(:Foo)],[RichText:(:Bar)]]'));
+    });
+
+    testWidgets('renders new line between DIVs, 1 of 2', (tester) async {
+      final html = '<div>Foo<br /></div><div>Bar</div>';
+      final explained = await explain(tester, html);
+      expect(explained,
+          equals('[Column:children=[RichText:(:Foo\n)],[RichText:(:Bar)]]'));
+    });
+
+    testWidgets('renders new line between DIVs, 2 of 2', (tester) async {
+      final html = '<div>Foo</div><br /><div>Bar</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Column:children=[RichText:(:Foo)],'
+              '[RichText:(:\u{00A0})],'
+              '[RichText:(:Bar)]]'));
     });
   });
 
