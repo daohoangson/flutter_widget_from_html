@@ -89,6 +89,12 @@ void main() {
       expect(explained, equals('[RichText:(:Foo\nBar)]'));
     });
 
+    testWidgets('renders without whitespace on next SPAN', (tester) async {
+      final html = 'Foo<br />\n<span>\nBar</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo\nBar)]'));
+    });
+
     testWidgets('renders multiple new lines', (WidgetTester tester) async {
       final html = 'Foo<br /><br /><br />Bar';
       final explained = await explain(tester, html);

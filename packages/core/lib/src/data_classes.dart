@@ -418,15 +418,21 @@ class TextBlock extends TextBit {
     return true;
   }
 
+  bool _lastReturnsNull = false;
+
   @override
   TextBit get last {
+    if (_lastReturnsNull) return null;
     final l = _children.length;
     for (var i = l - 1; i >= 0; i--) {
       final last = _children[i].last;
       if (last != null) return last;
     }
 
-    return null;
+    _lastReturnsNull = true;
+    final parentLast = parent?.last;
+    _lastReturnsNull = false;
+    return parentLast;
   }
 
   TextBit get next {
