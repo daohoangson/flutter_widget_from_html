@@ -51,7 +51,7 @@ class _WebViewState extends State<WebView> {
   _Issue37 _issue37;
   lib.WebViewController _wvc;
 
-  String _firstFinishedUrl;
+  final _knownUrls = <String>[];
 
   @override
   initState() {
@@ -62,6 +62,8 @@ class _WebViewState extends State<WebView> {
       _issue37 = _Issue37(this);
       WidgetsBinding.instance.addObserver(_issue37);
     }
+
+    _knownUrls.add(widget.url);
   }
 
   @override
@@ -126,10 +128,9 @@ class _WebViewState extends State<WebView> {
     var intercepted = false;
 
     if (widget.interceptNavigationRequest != null &&
-        _firstFinishedUrl != null &&
+        req.hasGesture &&
         req.isForMainFrame &&
-        req.url != widget.url &&
-        req.url != _firstFinishedUrl) {
+        _knownUrls.indexOf(req.url) == -1) {
       intercepted = widget.interceptNavigationRequest(req.url);
     }
 
@@ -139,7 +140,7 @@ class _WebViewState extends State<WebView> {
   }
 
   void _onPageFinished(String url) {
-    if (_firstFinishedUrl == null) _firstFinishedUrl = url;
+    if (_knownUrls.indexOf(url) == -1) _knownUrls.add(url);
 
     if (widget.getDimensions == true) {
       widget.getDimensionsDurations.forEach((t) => t == null
