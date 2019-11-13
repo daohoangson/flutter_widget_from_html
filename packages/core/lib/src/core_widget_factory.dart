@@ -214,6 +214,17 @@ class WidgetFactory {
     ];
   }
 
+  Iterable<Widget> buildTextLast(BuilderContext _, Iterable<Widget> ws, __) {
+    if (ws.length > 1 || !(ws.first is RichText)) return ws;
+    final RichText rt = ws.first;
+    if (!(rt.text is TextSpan)) return ws;
+    final TextSpan ts = rt.text;
+    if (ts.text == null || ts.children.length > 0) return ws;
+    final withoutSpaces = ts.text.replaceAll(regExpSpaces, '');
+    if (withoutSpaces.isNotEmpty) return ws;
+    return [widget0];
+  }
+
   TextDecoration buildTextDecoration(TextStyle parent, NodeMetadata meta) {
     if (meta?.decoOver == null &&
         meta?.decoStrike == null &&
@@ -345,6 +356,13 @@ class WidgetFactory {
 
       fixed.add(widget);
       prev = widget;
+    }
+
+    if (fixed.length > 0) {
+      final last = fixed.last;
+      if (last is WidgetPlaceholder<TextBlock>) {
+        last.wrapWith(buildTextLast);
+      }
     }
 
     return fixed;

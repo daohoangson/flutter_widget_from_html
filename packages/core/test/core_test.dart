@@ -140,8 +140,26 @@ void main() {
       expect(
           explained,
           equals('[Column:children=[RichText:(:Foo)],'
-              '[RichText:(:\u{00A0})],'
+              '[RichText:(:\u{200B})],'
               '[RichText:(:Bar)]]'));
+    });
+
+    testWidgets('renders without new line at bottom, 1 of 3', (tester) async {
+      final html = 'Foo<br />';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('renders without new line at bottom, 2 of 3', (tester) async {
+      final html = '<span>Foo</span><br />';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('renders without new line at bottom, 3 of 3', (tester) async {
+      final html = '<div>Foo</div><br />';
+      final e = await explain(tester, html);
+      expect(e, equals('[Column:children=[RichText:(:Foo)],[widget0]]'));
     });
   });
 
