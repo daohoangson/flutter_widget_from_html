@@ -77,7 +77,7 @@ class _TagLi {
   Iterable<Widget> _build(BuilderContext bc, Iterable<Widget> ws, _LiInput i) {
     final listMeta = i.listMeta;
     final paddingCss = i.paddingInlineStart ?? listMeta.paddingInlineStart;
-    final paddingPx = paddingCss.getValue(bc, i.meta);
+    final paddingPx = paddingCss.getValue(bc, i.meta.tsb);
     final padding = Directionality.of(bc.context) == TextDirection.ltr
         ? EdgeInsets.only(left: paddingPx)
         : EdgeInsets.only(right: paddingPx);
@@ -120,7 +120,7 @@ class _TagLi {
 
       if (item.input.listMeta != null) {
         item.wrapWith((bc, widgets, __) {
-          final paddingPx = listMeta.paddingInlineStart.getValue(bc, meta);
+          final paddingPx = listMeta.paddingInlineStart.getValue(bc, meta.tsb);
           final padding = Directionality.of(bc.context) == TextDirection.ltr
               ? EdgeInsets.only(left: paddingPx)
               : EdgeInsets.only(right: paddingPx);
@@ -178,8 +178,7 @@ class _TagLi {
       _LiInput()
         ..listStyleType = listStyleType
         ..meta = meta
-        ..paddingInlineStart = paddingInlineStart
-        ..wf = wf,
+        ..paddingInlineStart = paddingInlineStart,
     );
   }
 }
@@ -195,7 +194,6 @@ class _LiPlaceholder extends WidgetPlaceholder<_LiInput> {
           builder: self._build,
           children: children,
           input: input,
-          wf: input.wf,
         );
 }
 
@@ -205,7 +203,6 @@ class _LiInput {
   int markerIndex;
   NodeMetadata meta;
   CssLength paddingInlineStart;
-  WidgetFactory wf;
 
   static String listStyleTypeFromAttributeType(String type) {
     switch (type) {

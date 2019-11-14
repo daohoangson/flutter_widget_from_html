@@ -41,13 +41,12 @@ class Builder {
         }
       } else {
         final block = piece.block;
-        block.trimRight();
-        if (parentMeta?.isBlockElement != true && block.last?.data == '\n') {
-          block.removeLast();
-          if (block.isEmpty) block.addText('\u{200B}');
+        if ((block..trimRight()).isNotEmpty) {
+          list.add(WidgetPlaceholder(
+            builder: wf.buildText,
+            input: block,
+          ));
         }
-        final text = wf.buildText(block);
-        if (text != null) list.add(text);
       }
     }
 

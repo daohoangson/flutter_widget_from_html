@@ -106,9 +106,8 @@ void main() {
     expect(
         explained,
         equals('[SizedBox:0.0x5.0],'
-            '[Align:alignment=center,child='
             '[Padding:(0,5,0,5),'
-            'child=[RichText,align=center:(:Foo)]]],'
+            'child=[RichText,align=center:(:Foo)]],'
             '[SizedBox:0.0x5.0]'));
   });
 }

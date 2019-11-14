@@ -32,11 +32,12 @@ class _StyleTextAlign {
 
           // handle widgets
           final newPieces = <BuiltPiece>[];
+          final alignment = _getAlignment(v);
           for (final p in pieces) {
             if (p.widgets?.isNotEmpty == true) {
-              final alignment = _getAlignment(v);
-              final widgets = p.widgets.map((w) => wf.buildAlign(w, alignment));
-              newPieces.add(BuiltPieceSimple(widgets: widgets));
+              newPieces.add(BuiltPieceSimple(
+                  widgets: IWidgetPlaceholder.wrap(
+                      p.widgets, wf.buildAligns, wf, alignment)));
             } else {
               newPieces.add(p);
             }

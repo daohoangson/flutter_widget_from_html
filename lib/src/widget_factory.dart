@@ -26,10 +26,12 @@ class WidgetFactory extends core.WidgetFactory {
   Widget buildDivider() => const Divider(height: 1);
 
   @override
-  Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
-      child != null && onTap != null
-          ? InkWell(child: child, onTap: onTap)
-          : child;
+  Iterable<Widget> buildGestureDetectors(
+    BuilderContext bc,
+    Iterable<Widget> widgets,
+    GestureTapCallback onTap,
+  ) =>
+      widgets.map((widget) => InkWell(child: widget, onTap: onTap));
 
   @override
   GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
