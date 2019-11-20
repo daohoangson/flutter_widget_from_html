@@ -4,16 +4,22 @@ env:
 unit_test_task:
   container:
     image: cirrusci/flutter
-  pub_cache:
-    folder: ~/.pub-cache
   test_script: COVERAGE=1 ./tool/test.sh
   codecov_script: bash <(curl -s https://codecov.io/bash)
 
-integration_test_task:
+ios_test_task:
+  skip: "!changesInclude('lib/src/web_view.dart')"
   osx_instance:
-    image: mojave-xcode-10.2-flutter
-  pub_cache:
-    folder: ~/.pub-cache
-  setup_script:
-    - xcrun simctl create iPhoneX com.apple.CoreSimulator.SimDeviceType.iPhone-X com.apple.CoreSimulator.SimRuntime.iOS-12-2 | xargs xcrun simctl boot
+    image: mojave-xcode-11.2.1-flutter
+  setup_script: xcrun simctl create iPhoneX com.apple.CoreSimulator.SimDeviceType.iPhone-11-Pro-Max com.apple.CoreSimulator.SimRuntime.iOS-13-2 | xargs xcrun simctl boot
   test_script: ./tool/integration.sh
+
+android_test_task:
+  skip: "!changesInclude('lib/src/video_player.dart', 'lib/src/web_view.dart')"
+  container:
+    image: cirrusci/flutter
+  env:
+    AWS_ACCESS_KEY_ID: ENCRYPTED[bfad5318e7b922be21065747210e175bff4a016be7b7f32d0e34a5e7c145ac5c685088a16a28488f76259b07bf960e8a]
+    AWS_DEFAULT_REGION: us-west-2
+    AWS_SECRET_ACCESS_KEY: ENCRYPTED[c2e879143bcfa89be383584812034fbef751beb2968629aaef34e427dc834a88cbeb953152d660fd243d8b1018c4c771]
+  test_script: ./tool/sylph/cmd.sh

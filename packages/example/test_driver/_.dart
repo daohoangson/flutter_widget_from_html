@@ -37,7 +37,7 @@ class _AspectRatioTestDelegate extends SingleChildLayoutDelegate {
   @override
   Offset getPositionForChild(Size size, Size childSize) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      print(childSize);
+      debugPrint("[_AspectRatioTestDelegate] childSize=$childSize");
       result.value = childSize.aspectRatio;
     });
 

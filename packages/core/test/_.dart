@@ -9,7 +9,7 @@ Future<String> explain(
   WidgetTester tester,
   String html, {
   WidgetExplainer explainer,
-  HtmlWidget hw,
+  Widget hw,
   PreTest preTest,
   Uri baseUrl,
   double bodyVerticalPadding = 0,
@@ -56,7 +56,7 @@ Future<String> explain(
   final hws = hwKey.currentState;
   expect(hws, isNotNull);
 
-  return _Explainer(hws.context, explainer: explainer)
+  return Explainer(hws.context, explainer: explainer)
       .explain(hws.build(hws.context));
 }
 
@@ -75,12 +75,12 @@ Future<String> explainMargin(WidgetTester tester, String html) async {
 typedef String WidgetExplainer(Widget widget);
 typedef void PreTest(BuildContext context);
 
-class _Explainer {
+class Explainer {
   final BuildContext context;
   final WidgetExplainer explainer;
   final TextStyle _defaultStyle;
 
-  _Explainer(this.context, {this.explainer})
+  Explainer(this.context, {this.explainer})
       : _defaultStyle = DefaultTextStyle.of(context).style;
 
   String explain(Widget widget) => _widget(widget);
@@ -270,6 +270,11 @@ class _Explainer {
     if (widget == widget0) return '[widget0]';
     if (widget is Image) return _image(widget.image);
     if (widget is ImageLayout) return _imageLayout(widget);
+
+    // ignore: invalid_use_of_protected_member
+    if (widget is SimpleColumn) return _widget(widget.build(context));
+
+    // ignore: invalid_use_of_protected_member
     if (widget is IWidgetPlaceholder) return _widget(widget.build(context));
 
     final type = widget.runtimeType.toString();
