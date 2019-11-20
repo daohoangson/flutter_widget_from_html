@@ -1,3 +1,8 @@
+## 0.2.4+3
+
+* Improve BR rendering logic
+* Add `enableCaching` prop to control cache logic
+
 ## 0.2.4+2
 
 * Add basic detection and support for `Directionality` widget during LI/OL/UL rendering (#115)
