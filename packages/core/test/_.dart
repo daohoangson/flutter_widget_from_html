@@ -56,7 +56,7 @@ Future<String> explain(
   final hws = hwKey.currentState;
   expect(hws, isNotNull);
 
-  return _Explainer(hws.context, explainer: explainer)
+  return Explainer(hws.context, explainer: explainer)
       .explain(hws.build(hws.context));
 }
 
@@ -75,12 +75,12 @@ Future<String> explainMargin(WidgetTester tester, String html) async {
 typedef String WidgetExplainer(Widget widget);
 typedef void PreTest(BuildContext context);
 
-class _Explainer {
+class Explainer {
   final BuildContext context;
   final WidgetExplainer explainer;
   final TextStyle _defaultStyle;
 
-  _Explainer(this.context, {this.explainer})
+  Explainer(this.context, {this.explainer})
       : _defaultStyle = DefaultTextStyle.of(context).style;
 
   String explain(Widget widget) => _widget(widget);

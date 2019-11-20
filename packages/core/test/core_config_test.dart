@@ -8,6 +8,50 @@ Future<String> explain(WidgetTester t, HtmlWidget hw) =>
     _.explain(t, null, hw: hw);
 
 void main() {
+  group('enableCaching', () {
+    final explain = (WidgetTester tester, String html, bool enableCaching) =>
+        _.explain(tester, null,
+            hw: HtmlWidget(
+              html,
+              bodyPadding: const EdgeInsets.all(0),
+              enableCaching: enableCaching,
+              key: _.hwKey,
+            ));
+
+    testWidgets('caches built widget tree', (WidgetTester tester) async {
+      final html = 'Foo';
+      final explained = await explain(tester, html, true);
+      expect(explained, equals('[RichText:(:Foo)]'));
+
+      final hws = _.hwKey.currentState;
+      final built1 = hws.build(hws.context);
+      final built2 = hws.build(hws.context);
+      expect(built1 == built2, isTrue);
+    });
+
+    testWidgets('invalidates cache on new html', (WidgetTester tester) async {
+      final html1 = 'Foo';
+      final html2 = 'Bar';
+
+      final explained1 = await explain(tester, html1, true);
+      expect(explained1, equals('[RichText:(:Foo)]'));
+
+      final explained2 = await explain(tester, html2, true);
+      expect(explained2, equals('[RichText:(:Bar)]'));
+    });
+
+    testWidgets('skips caching', (WidgetTester tester) async {
+      final html = 'Foo';
+      final explained = await explain(tester, html, false);
+      expect(explained, equals('[RichText:(:Foo)]'));
+
+      final hws = _.hwKey.currentState;
+      final built1 = hws.build(hws.context);
+      final built2 = hws.build(hws.context);
+      expect(built1 == built2, isFalse);
+    });
+  });
+
   group('baseUrl', () {
     final baseUrl = Uri.parse('http://base.com/path/');
     final html = '<img src="image.png" alt="image dot png" />';

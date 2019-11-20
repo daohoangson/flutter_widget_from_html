@@ -212,13 +212,14 @@ class WidgetFactory {
     final tsb = block.tsb;
     tsb?.build(bc);
 
+    final textScaleFactor = MediaQuery.of(bc.context).textScaleFactor;
     final widgets = <Widget>[];
     for (final compiled in _TextBlockCompiler(block).compile(bc)) {
       if (compiled is InlineSpan) {
         widgets.add(RichText(
           text: compiled,
           textAlign: tsb?.textAlign ?? TextAlign.start,
-          textScaleFactor: MediaQuery.of(bc.context).textScaleFactor,
+          textScaleFactor: textScaleFactor,
         ));
       } else if (compiled is Widget) {
         widgets.add(compiled);
