@@ -14,7 +14,7 @@ const widget0 = const SizedBox.shrink();
 // https://unicode.org/cldr/utility/character.jsp?a=200B
 final regExpSpaceLeading = RegExp(r'^[\s\u{200B}]+', unicode: true);
 final regExpSpaceTrailing = RegExp(r'[\s\u{200B}]+$', unicode: true);
-final regExpSpaces = RegExp(r'[\s\u{200B}]+', unicode: true);
+final regExpSpaces = RegExp(r'\s+');
 
 typedef void OnTapUrl(String url);
 

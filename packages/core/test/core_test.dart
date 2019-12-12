@@ -32,7 +32,6 @@ void main() {
   testWidgets('renders without erroneous white spaces', (WidgetTester t) async {
     final html = """
 <div>
-  <span>&#8203;</span>
   <span style="text-decoration: line-through">
     <span style="text-decoration: overline">
       <span style="text-decoration: underline">
@@ -42,9 +41,18 @@ void main() {
     </span>
   </span>
 </div>
+<!-- https://unicode.org/cldr/utility/character.jsp?a=200B -->
+<div>&#8203;</div>
+<!-- https://github.com/daohoangson/flutter_widget_from_html/issues/119 -->
+<div>I​Like​Playing​football​​game</div>
 """;
     final str = await explain(t, html);
-    expect(str, equals('[RichText:(+l+o+u:All decorations... (:and none))]'));
+    expect(
+        str,
+        equals('[Column:children='
+            '[RichText:(+l+o+u:All decorations... (:and none))],'
+            '[RichText:(:I​Like​Playing​football​​game)]'
+            ']'));
   });
 
   testWidgets('renders white spaces with parent style', (tester) async {

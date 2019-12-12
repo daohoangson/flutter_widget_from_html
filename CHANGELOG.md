@@ -1,3 +1,8 @@
+## 0.3.2-rc
+
+* 0.2.4+4
+  * Fix bug rendering ZERO WIDTH SPACE character (#119)
+
 ## 0.3.1-rc
 
 * 0.2.4+3
