@@ -1,27 +1,27 @@
-## 0.3.2-rc
+## 0.2.4+4
 
-* 0.2.4+4
-  * Fix bug rendering ZERO WIDTH SPACE character (#119)
+* Fix bug rendering ZERO WIDTH SPACE character (#119)
 
-## 0.3.1-rc
+## 0.2.4+3
 
-* 0.2.4+3
-  * Improve BR rendering logic
-  * Add `enableCaching` prop to control cache logic
-* 0.2.4+2
-  * Add basic detection and support for `Directionality` widget during LI/OL/UL rendering (#115)
-  * Fix bug LI has empty A (#112)
-* 0.2.4+1
-  * Improve caching logic (#112)
-  * Fix extra space after BR tag (#111)
-  * Fix cached image not being rendered on first build (#113)
-* 0.2.4
-  * Add support for `type`/`start`/`reversed` (LI/OL/UL) (#91)
-  * Add support for tag FONT (#109)
+* Improve BR rendering logic
+* Add `enableCaching` prop to control cache logic
 
-## 0.3.0-rc
+## 0.2.4+2
 
-* Use `cached_network_image@2.0.0-rc` for compatibility with Flutter 1.10.15 (master channel)
+* Add basic detection and support for `Directionality` widget during LI/OL/UL rendering (#115)
+* Fix bug LI has empty A (#112)
+
+## 0.2.4+1
+
+* Improve caching logic (#112)
+* Fix extra space after BR tag (#111)
+* Fix cached image not being rendered on first build (#113)
+
+## 0.2.4
+
+* Add support for `type`/`start`/`reversed` (LI/OL/UL) (#91)
+* Add support for tag FONT (#109)
 
 ## 0.2.3+4
 
