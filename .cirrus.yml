@@ -1,9 +1,10 @@
 env:
   CODECOV_TOKEN: ENCRYPTED[0bad38cf59a2fda73e72491e18a564995cf3a5c862b5400834bfa9873713e780a2deed3e57b265279bd1e91168ee492a]
+  FLUTTER_VERSION: v1.9.1-hotfix.6
 
 unit_test_task:
   container:
-    image: cirrusci/flutter
+    image: cirrusci/flutter:$FLUTTER_VERSION
   test_script: COVERAGE=1 ./tool/test.sh
   codecov_script: bash <(curl -s https://codecov.io/bash)
 
@@ -17,7 +18,7 @@ ios_test_task:
 android_test_task:
   skip: "!changesInclude('lib/src/video_player.dart', 'lib/src/web_view.dart')"
   container:
-    image: cirrusci/flutter
+    image: cirrusci/flutter:$FLUTTER_VERSION
   env:
     AWS_ACCESS_KEY_ID: ENCRYPTED[bfad5318e7b922be21065747210e175bff4a016be7b7f32d0e34a5e7c145ac5c685088a16a28488f76259b07bf960e8a]
     AWS_DEFAULT_REGION: us-west-2
