@@ -1,10 +1,10 @@
 name: flutter_widget_from_html_core
 version: 0.2.4+4
 description: Flutter plugin for widget tree building from html that focuses on correctness and extensibility.
-author: Dao Hoang Son <daohoangson@gmail.com>
 homepage: https://github.com/daohoangson/flutter_widget_from_html/tree/master/packages/core
 
 environment:
+  flutter: ">=1.6.7 <2.0.0"
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
 
 dependencies:
