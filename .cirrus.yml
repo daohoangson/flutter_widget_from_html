@@ -1,6 +1,6 @@
 env:
   CODECOV_TOKEN: ENCRYPTED[0bad38cf59a2fda73e72491e18a564995cf3a5c862b5400834bfa9873713e780a2deed3e57b265279bd1e91168ee492a]
-  FLUTTER_VERSION: v1.9.1-hotfix.6
+  FLUTTER_VERSION: v1.12.13-hotfix.5
 
 unit_test_task:
   container:
