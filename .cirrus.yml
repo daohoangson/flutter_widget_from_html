@@ -9,14 +9,14 @@ unit_test_task:
   codecov_script: bash <(curl -s https://codecov.io/bash)
 
 ios_test_task:
-  skip: "!changesInclude('lib/src/web_view.dart')"
+  skip: "!changesInclude('pubspec.yaml', 'lib/src/web_view.dart')"
   osx_instance:
     image: mojave-xcode-11.2.1-flutter
   setup_script: xcrun simctl create iPhoneX com.apple.CoreSimulator.SimDeviceType.iPhone-11-Pro-Max com.apple.CoreSimulator.SimRuntime.iOS-13-2 | xargs xcrun simctl boot
   test_script: ./tool/integration.sh
 
 android_test_task:
-  skip: "!changesInclude('lib/src/video_player.dart', 'lib/src/web_view.dart')"
+  skip: "!changesInclude('pubspec.yaml', 'lib/src/video_player.dart', 'lib/src/web_view.dart')"
   container:
     image: cirrusci/flutter:$FLUTTER_VERSION
   env:
