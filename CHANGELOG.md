@@ -1,3 +1,7 @@
+## 0.2.5
+
+* Update supported Flutter version `>=1.6.7 <1.10.15`
+
 ## 0.2.4+4
 
 * Fix bug rendering ZERO WIDTH SPACE character (#119)
