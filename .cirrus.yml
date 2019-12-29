@@ -9,7 +9,7 @@ unit_test_task:
   codecov_script: bash <(curl -s https://codecov.io/bash)
 
 ios_test_task:
-  skip: "!changesInclude('pubspec.yaml', 'lib/src/web_view.dart')"
+  skip: "!changesInclude('lib/src/web_view.dart')"
   osx_instance:
     image: mojave-xcode-11.3
   install_flutter_script:
@@ -29,7 +29,7 @@ ios_test_task:
     - ./tool/integration.sh
 
 android_test_task:
-  skip: "!changesInclude('pubspec.yaml', 'lib/src/video_player.dart', 'lib/src/web_view.dart')"
+  skip: "!changesInclude('lib/src/video_player.dart', 'lib/src/web_view.dart')"
   container:
     image: cirrusci/flutter:$FLUTTER_VERSION
   env:
