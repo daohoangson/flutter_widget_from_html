@@ -2,6 +2,7 @@
 
 set -e
 cd $( dirname $( dirname $( dirname ${BASH_SOURCE[0]})))
+_pwd=$( pwd )
 
 sudo apt-get update
 sudo apt-get install -y python zip
@@ -18,9 +19,14 @@ if [ ! -f /usr/local/bin/aws ]; then
 fi
 
 # https://github.com/mmcc007/sylph
-export PATH="$PATH":"$HOME/.pub-cache/bin"
-pub global activate --source git https://github.com/daohoangson/sylph.git
+_sylphPath=/tmp/sylph-src
+mkdir $_sylphPath && cd $_sylphPath
+git init && git remote add origin https://github.com/daohoangson/sylph.git
+git fetch --depth 1 origin $FLUTTER_VERSION
+git checkout FETCH_HEAD
+export "PATH=$PATH:$HOME/.pub-cache/bin"
+pub global activate --source path $_sylphPath
 
-cd packages/example
+cd "$_pwd/packages/example"
 flutter pub get
 sylph
