@@ -9,8 +9,7 @@ Future<String> explain(
   WidgetTester tester,
   String html, {
   WidgetExplainer explainer,
-  HtmlWidget hw,
-  String imageUrlToPrecache,
+  Widget hw,
   PreTest preTest,
   Uri baseUrl,
   double bodyVerticalPadding = 0,
@@ -34,15 +33,6 @@ Future<String> explain(
   await tester.pumpWidget(
     StatefulBuilder(
       builder: (context, _) {
-        if (imageUrlToPrecache != null) {
-          // this is required to avoid http 400 error for Image.network instances
-          precacheImage(
-            NetworkImage(imageUrlToPrecache),
-            context,
-            onError: (_, __) {},
-          );
-        }
-
         if (preTest != null) preTest(context);
 
         final defaultStyle = DefaultTextStyle.of(context).style;
@@ -66,22 +56,17 @@ Future<String> explain(
   final hws = hwKey.currentState;
   expect(hws, isNotNull);
 
-  return _Explainer(hws.context, explainer: explainer)
+  return Explainer(hws.context, explainer: explainer)
       .explain(hws.build(hws.context));
 }
 
 final _explainMarginRegExp = RegExp(
     r'^\[Column:children=\[RichText:\(:x\)\],(.+),\[RichText:\(:x\)\]\]$');
 
-Future<String> explainMargin(
-  WidgetTester tester,
-  String html, {
-  String imageUrlToPrecache,
-}) async {
+Future<String> explainMargin(WidgetTester tester, String html) async {
   final explained = await explain(
     tester,
     "x${html}x",
-    imageUrlToPrecache: imageUrlToPrecache,
   );
   final match = _explainMarginRegExp.firstMatch(explained);
   return match == null ? explained : match[1];
@@ -90,12 +75,12 @@ Future<String> explainMargin(
 typedef String WidgetExplainer(Widget widget);
 typedef void PreTest(BuildContext context);
 
-class _Explainer {
+class Explainer {
   final BuildContext context;
   final WidgetExplainer explainer;
   final TextStyle _defaultStyle;
 
-  _Explainer(this.context, {this.explainer})
+  Explainer(this.context, {this.explainer})
       : _defaultStyle = DefaultTextStyle.of(context).style;
 
   String explain(Widget widget) => _widget(widget);
@@ -285,6 +270,11 @@ class _Explainer {
     if (widget == widget0) return '[widget0]';
     if (widget is Image) return _image(widget.image);
     if (widget is ImageLayout) return _imageLayout(widget);
+
+    // ignore: invalid_use_of_protected_member
+    if (widget is SimpleColumn) return _widget(widget.build(context));
+
+    // ignore: invalid_use_of_protected_member
     if (widget is IWidgetPlaceholder) return _widget(widget.build(context));
 
     final type = widget.runtimeType.toString();

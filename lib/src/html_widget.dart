@@ -12,6 +12,7 @@ class HtmlWidget extends core.HtmlWidget {
   /// The [html] argument must not be null.
   HtmlWidget(
     String html, {
+    bool enableCaching = true,
     core.FactoryBuilder factoryBuilder,
     Key key,
     HtmlWidgetConfig config,
@@ -28,6 +29,7 @@ class HtmlWidget extends core.HtmlWidget {
   })  : assert(html != null),
         super(
           html,
+          enableCaching: enableCaching,
           factoryBuilder:
               factoryBuilder ?? (config) => extended.WidgetFactory(config),
           config: config ??

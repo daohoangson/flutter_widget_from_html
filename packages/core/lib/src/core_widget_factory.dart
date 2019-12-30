@@ -12,6 +12,7 @@ part 'ops/style_margin.dart';
 part 'ops/style_text_align.dart';
 part 'ops/tag_a.dart';
 part 'ops/tag_code.dart';
+part 'ops/tag_font.dart';
 part 'ops/tag_img.dart';
 part 'ops/tag_li.dart';
 part 'ops/tag_q.dart';
@@ -29,6 +30,7 @@ class WidgetFactory {
   BuildOp _tagA;
   BuildOp _tagBr;
   BuildOp _tagCode;
+  BuildOp _tagFont;
   BuildOp _tagHr;
   BuildOp _tagImg;
   BuildOp _tagLi;
@@ -39,33 +41,69 @@ class WidgetFactory {
 
   Color get hyperlinkColor => _config.hyperlinkColor;
 
-  Widget buildAlign(Widget child, Alignment alignment) {
-    if (child == null) return null;
-    if (alignment == null || child is RichText) return child;
-    if (child is IWidgetPlaceholder)
-      return child..wrapWith(buildAlignsWithContext, alignment);
-
-    return Align(alignment: alignment, child: child);
-  }
-
-  Iterable<Widget> buildAlignsWithContext(
-          BuildContext _, Iterable<Widget> children, Alignment alignment) =>
-      children.map((child) => buildAlign(child, alignment));
+  Iterable<Widget> buildAligns(
+          BuilderContext bc, Iterable<Widget> widgets, Alignment alignment) =>
+      widgets.map((widget) {
+        if (bc.origin is WidgetPlaceholder<TextBlock>) return widget;
+        if (widget is WidgetPlaceholder<TextBlock>) return widget;
+        return Align(alignment: alignment, child: widget);
+      });
 
   Widget buildBody(Iterable<Widget> children) =>
       buildPadding(buildColumn(children), _config.bodyPadding);
 
-  Widget buildColumn(Iterable<Widget> children) {
-    children = fixOverlappingSpacings(
-        children is List ? children : children.toList(growable: false));
-    if (children?.isNotEmpty != true) return null;
+  Widget buildColumn(Iterable<Widget> children) => children?.isNotEmpty == true
+      ? WidgetPlaceholder(
+          builder: _buildColumn,
+          children: children,
+        )
+      : null;
 
-    return children.length > 1
-        ? Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: children,
-          )
-        : children.first;
+  static Iterable<Widget> _buildColumn(
+      BuilderContext bc, Iterable<Widget> ws, _) {
+    final output = <Widget>[];
+    final iter = ws.iterator;
+    while (iter.moveNext()) {
+      if (!(iter.current is SpacingPlaceholder)) break;
+    }
+
+    if (iter.current == null) return null;
+
+    Widget prev;
+    while (output.isEmpty || iter.moveNext()) {
+      var widget = iter.current;
+
+      if (widget is SpacingPlaceholder && prev is SpacingPlaceholder) {
+        prev.mergeWith(widget);
+        continue;
+      }
+
+      if (widget is WidgetPlaceholder<TextBlock>) {
+        final WidgetPlaceholder<TextBlock> textPlaceholder = widget;
+        widget = textPlaceholder.build(bc.context);
+      }
+
+      if (widget is SimpleColumn) {
+        final SimpleColumn column = widget;
+        output.addAll(column.children);
+        widget = column.children.last;
+      } else {
+        output.add(widget);
+      }
+
+      prev = widget;
+    }
+
+    while (output.isNotEmpty) {
+      if (output.last is SpacingPlaceholder) {
+        output.removeLast();
+        continue;
+      }
+
+      break;
+    }
+
+    return output;
   }
 
   Widget buildDecoratedBox(
@@ -79,9 +117,9 @@ class WidgetFactory {
                 color: color,
               ),
             )
-          : null;
+          : child;
 
-  Widget buildDivider() => DecoratedBox(
+  Widget buildDivider() => const DecoratedBox(
         decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 1)),
         child: SizedBox(height: 1),
       );
@@ -90,28 +128,17 @@ class WidgetFactory {
       ? (meta.fontStyleItalic == true ? FontStyle.italic : FontStyle.normal)
       : null;
 
-  Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
-      GestureDetector(child: child, onTap: onTap);
-
-  Iterable<Widget> buildGestureDetectorsWithContext(BuildContext _,
-          Iterable<Widget> children, GestureTapCallback onTap) =>
-      children.map((child) => buildGestureDetector(child, onTap));
-
   Iterable<Widget> buildGestureDetectors(
+    BuilderContext bc,
     Iterable<Widget> widgets,
     GestureTapCallback onTap,
-  ) {
-    if (widgets?.isNotEmpty != true || onTap == null) return widgets;
-    return widgets.map((widget) {
-      if (widget is IWidgetPlaceholder)
-        return widget..wrapWith(buildGestureDetectorsWithContext, onTap);
-
-      return buildGestureDetector(widget, onTap);
-    });
-  }
+  ) =>
+      widgets.map((widget) => GestureDetector(child: widget, onTap: onTap));
 
   GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
-      ? () => _config.onTapUrl != null ? _config.onTapUrl(url) : debugPrint(url)
+      ? () => _config.onTapUrl != null
+          ? _config.onTapUrl(url)
+          : print("[flutter_widget_from_html] Tapped url $url")
       : null;
 
   Widget buildImage(String url, {double height, String text, double width}) {
@@ -125,9 +152,10 @@ class WidgetFactory {
         image = buildImageFromUrl(url);
       }
     }
-    if (image == null) return Text(text ?? '');
 
-    return ImageLayout(image, height: height, text: text, width: width);
+    return image != null
+        ? ImageLayout(image, height: height, text: text, width: width)
+        : text != null ? Text(text) : null;
   }
 
   List buildImageBytes(String dataUri) {
@@ -165,61 +193,40 @@ class WidgetFactory {
   ImageProvider buildImageFromUrl(String url) =>
       url?.isNotEmpty == true ? NetworkImage(url) : null;
 
-  Widget buildPadding(Widget child, EdgeInsets padding) {
-    if (child == null) return null;
-    if (padding == null || padding == const EdgeInsets.all(0)) return child;
-
-    if (child is Padding) {
-      final p = child as Padding;
-      final pp = p.padding as EdgeInsets;
-      child = p.child;
-      padding = EdgeInsets.fromLTRB(
-        pp.left + padding.left,
-        pp.top > padding.top ? pp.top : padding.top,
-        pp.right + padding.right,
-        pp.bottom > padding.bottom ? pp.bottom : padding.bottom,
-      );
-    }
-
-    return Padding(child: child, padding: padding);
-  }
-
-  Widget buildScrollView(Widget child) => child != null
-      ? SingleChildScrollView(
-          child: child,
-          scrollDirection: Axis.horizontal,
-        )
-      : null;
+  Widget buildPadding(Widget child, EdgeInsets padding) =>
+      child != null && padding != null && padding != const EdgeInsets.all(0)
+          ? Padding(child: child, padding: padding)
+          : child;
 
   Widget buildTable(List<TableRow> rows, {TableBorder border}) =>
-      Table(border: border, children: rows);
+      rows?.isNotEmpty == true ? Table(border: border, children: rows) : null;
 
-  Widget buildTableCell(Widget child) =>
-      TableCell(child: buildPadding(child, _config.tableCellPadding));
+  TableCell buildTableCell(Widget child) => TableCell(
+      child: buildPadding(child, _config.tableCellPadding) ?? widget0);
 
-  Widget buildText(TextBlock block) => block?.isEmpty == false
-      ? WidgetPlaceholder(
-          builder: buildTextWithContext,
-          input: block,
-          wf: this,
-        )
-      : null;
-
-  Iterable<Widget> buildTextWithContext(
-    BuildContext context,
+  Iterable<Widget> buildText(
+    BuilderContext bc,
     Iterable<Widget> _,
     TextBlock block,
   ) {
     final tsb = block.tsb;
-    tsb?.build(context);
+    tsb?.build(bc);
 
-    return [
-      RichText(
-        text: _compileToTextSpan(context, block),
-        textAlign: tsb?.textAlign ?? TextAlign.start,
-        textScaleFactor: MediaQuery.of(context).textScaleFactor,
-      ),
-    ];
+    final textScaleFactor = MediaQuery.of(bc.context).textScaleFactor;
+    final widgets = <Widget>[];
+    for (final compiled in _TextBlockCompiler(block).compile(bc)) {
+      if (compiled is InlineSpan) {
+        widgets.add(RichText(
+          text: compiled,
+          textAlign: tsb?.textAlign ?? TextAlign.start,
+          textScaleFactor: textScaleFactor,
+        ));
+      } else if (compiled is Widget) {
+        widgets.add(compiled);
+      }
+    }
+
+    return widgets;
   }
 
   TextDecoration buildTextDecoration(TextStyle parent, NodeMetadata meta) {
@@ -248,13 +255,14 @@ class WidgetFactory {
     return TextDecoration.combine(list);
   }
 
-  double buildTextFontSize(BuildContext c, TextStyle p, NodeMetadata m) {
+  double buildTextFontSize(TextStyleBuilders tsb, TextStyle p, NodeMetadata m) {
     final value = m.fontSize;
     if (value == null) return null;
 
     final parsed = parseCssLength(value);
-    if (parsed != null) return parsed.getValue(p, context: c);
+    if (parsed != null) return parsed.getValue(tsb.bc, m.tsb);
 
+    final c = tsb.bc.context;
     switch (value) {
       case kCssFontSizeXxLarge:
         return DefaultTextStyle.of(c).style.fontSize * 2.0;
@@ -284,7 +292,7 @@ class WidgetFactory {
     if (m == null) return p;
 
     final decoration = buildTextDecoration(p, m);
-    final fontSize = buildTextFontSize(tsb.context, p, m);
+    final fontSize = buildTextFontSize(tsb, p, m);
     final fontStyle = buildFontStyle(m);
     if (m.color == null &&
         decoration == null &&
@@ -319,57 +327,59 @@ class WidgetFactory {
     return b.resolveUri(p).toString();
   }
 
-  List<Widget> fixOverlappingSpacings(List<Widget> widgets) {
-    if (widgets?.isNotEmpty != true) return null;
-
-    var iMin = 0;
-    var iMax = widgets.length - 1;
-    while (iMin < iMax) {
-      if (widgets[iMin] is SpacingPlaceholder) {
-        iMin++;
-      } else {
-        break;
-      }
-    }
-    while (iMax >= iMin) {
-      if (widgets[iMax] is SpacingPlaceholder) {
-        iMax--;
-      } else {
-        break;
-      }
-    }
-    if (iMax < iMin) return null;
-
-    final fixed = <Widget>[];
-    Widget prev;
-    for (var i = iMin; i <= iMax; i++) {
-      final widget = widgets[i];
-
-      if (widget is SpacingPlaceholder && prev is SpacingPlaceholder) {
-        prev.mergeWith(widget);
-        continue;
-      }
-
-      fixed.add(widget);
-      prev = widget;
-    }
-
-    return fixed;
-  }
-
   String getListStyleMarker(String type, int i) {
     switch (type) {
+      case kCssListStyleTypeAlphaLower:
+      case kCssListStyleTypeAlphaLatinLower:
+        if (i >= 1 && i <= 26) {
+          // the specs said it's unspecified after the 26th item
+          // TODO: generate something like aa, ab, etc. when needed
+          return "${String.fromCharCode(96 + i)}.";
+        }
+        return '';
+      case kCssListStyleTypeAlphaUpper:
+      case kCssListStyleTypeAlphaLatinUpper:
+        if (i >= 1 && i <= 26) {
+          // the specs said it's unspecified after the 26th item
+          // TODO: generate something like AA, AB, etc. when needed
+          return "${String.fromCharCode(64 + i)}.";
+        }
+        return '';
       case kCssListStyleTypeCircle:
         return '-';
       case kCssListStyleTypeDecimal:
         return "$i.";
       case kCssListStyleTypeDisc:
         return '•';
+      case kCssListStyleTypeRomanLower:
+        final roman = getListStyleMarkerRoman(i)?.toLowerCase();
+        return roman != null ? "$roman." : '';
+      case kCssListStyleTypeRomanUpper:
+        final roman = getListStyleMarkerRoman(i);
+        return roman != null ? "$roman." : '';
       case kCssListStyleTypeSquare:
         return '+';
     }
 
     return '';
+  }
+
+  String getListStyleMarkerRoman(int i) {
+    // TODO: find some lib to generate programatically
+    const map = <int, String>{
+      1: 'I',
+      2: 'II',
+      3: 'III',
+      4: 'IV',
+      5: 'V',
+      6: 'VI',
+      7: 'VII',
+      8: 'VIII',
+      9: 'IX',
+      10: 'X',
+    };
+
+    return map.containsKey(i) ? map[i] : null;
   }
 
   NodeMetadata parseElement(NodeMetadata meta, dom.Element element) {
@@ -461,6 +471,10 @@ class WidgetFactory {
       case 's':
       case 'strike':
         meta = lazySet(meta, decoStrike: true);
+        break;
+
+      case 'font':
+        meta = lazySet(meta, buildOp: tagFont());
         break;
 
       case 'hr':
@@ -736,7 +750,7 @@ class WidgetFactory {
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      onPieces: (_, pieces) => pieces..last.block.addText('\n'),
+      onPieces: (_, pieces) => pieces..last.block.addSpace('\n'),
     );
     return _tagBr;
   }
@@ -744,6 +758,11 @@ class WidgetFactory {
   BuildOp tagCode() {
     _tagCode ??= _TagCode(this).buildOp;
     return _tagCode;
+  }
+
+  BuildOp tagFont() {
+    _tagFont ??= _TagFont(this).buildOp;
+    return _tagFont;
   }
 
   BuildOp tagHr() {

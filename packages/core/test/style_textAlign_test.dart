@@ -36,22 +36,22 @@ void main() {
   group('block', () {
     final kBlockHtml = '<div>Foo</div>';
 
-    testWidgets('renders center block', (WidgetTester t) async {
-      final h = '<div style="text-align: center">$kBlockHtml</div>';
-      final e = await explain(t, h, imageUrlToPrecache: 'image.png');
-      expect(e, equals('[RichText,align=center:(:Foo)]'));
+    testWidgets('renders center block', (WidgetTester tester) async {
+      final html = '<div style="text-align: center">$kBlockHtml</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText,align=center:(:Foo)]'));
     });
 
     testWidgets('renders left block', (WidgetTester tester) async {
       final html = '<div style="text-align: left">$kBlockHtml</div>';
-      final e = await explain(tester, html);
-      expect(e, equals('[RichText,align=left:(:Foo)]'));
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText,align=left:(:Foo)]'));
     });
 
     testWidgets('renders right block', (WidgetTester tester) async {
       final html = '<div style="text-align: right">$kBlockHtml</div>';
-      final e = await explain(tester, html);
-      expect(e, equals('[RichText,align=right:(:Foo)]'));
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText,align=right:(:Foo)]'));
     });
   });
 
@@ -59,8 +59,7 @@ void main() {
     final imgSrc = 'http://domain.com/image.png';
     final imgHtml = '<img src="$imgSrc" />';
     final imgRendered = "[NetworkImage:url=$imgSrc]";
-    final imgExplain = (WidgetTester tester, String html) =>
-        explain(tester, html, imageUrlToPrecache: imgSrc);
+    final imgExplain = (WidgetTester t, String html) => explain(t, html);
 
     testWidgets('renders center image', (WidgetTester tester) async {
       final html = '<div style="text-align: center">$imgHtml</div>';
@@ -107,9 +106,8 @@ void main() {
     expect(
         explained,
         equals('[SizedBox:0.0x5.0],'
-            '[Align:alignment=center,child='
             '[Padding:(0,5,0,5),'
-            'child=[RichText,align=center:(:Foo)]]],'
+            'child=[RichText,align=center:(:Foo)]],'
             '[SizedBox:0.0x5.0]'));
   });
 }

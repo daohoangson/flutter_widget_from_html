@@ -17,11 +17,14 @@ class ImageLayout extends StatefulWidget {
 }
 
 class _ImageLayoutState extends State<ImageLayout> {
+  var error;
   double height;
   double width;
 
   ImageStream _stream;
   ImageStreamListener _streamListener;
+
+  bool get hasDimensions => height != null && height > 0 && width != null;
 
   @override
   void initState() {
@@ -40,20 +43,32 @@ class _ImageLayoutState extends State<ImageLayout> {
 
   @override
   Widget build(BuildContext _) {
-    if (height != null && height > 0 && width != null) {
+    if (!hasDimensions && _stream == null) {
+      _streamListener = ImageStreamListener(
+        (info, isSync) {
+          height = info.image.height.toDouble();
+          width = info.image.width.toDouble();
+
+          // trigger state change only on async update
+          if (!isSync) setState(() {});
+        },
+        onError: (e, _) => print('[flutter_widget_from_html] '
+            "Error resolving image: $e"),
+      );
+      _stream = widget.image.resolve(ImageConfiguration.empty);
+      _stream.addListener(_streamListener);
+    }
+
+
+    if (hasDimensions) {
+      // we may have dimensions in 3 cases
+      // 1. From the beginning, via widget constructor
+      // 2. From synchronized image info, immediately in the first build
+      // 3. From async update / triggered state change (see above)
       return CustomSingleChildLayout(
         child: Image(image: widget.image, fit: BoxFit.cover),
         delegate: _ImageLayoutDelegate(height: height, width: width),
       );
-    }
-
-    if (_stream == null) {
-      _streamListener = ImageStreamListener((info, _) => setState(() {
-            height = info.image.height.toDouble();
-            width = info.image.width.toDouble();
-          }));
-      _stream = widget.image.resolve(ImageConfiguration.empty);
-      _stream.addListener(_streamListener);
     }
 
     return widget.text != null ? Text(widget.text) : widget0;
@@ -127,10 +142,7 @@ class _TagImg {
           final img = _parseMetadata(meta, wf);
           if (img.url?.isNotEmpty != true) return widgets;
 
-          var widget = _buildImage(img, wf);
-          if (widget == null) return widgets;
-
-          return [widget];
+          return listOfNonNullOrNothing(_buildImage(img, wf));
         },
       );
 

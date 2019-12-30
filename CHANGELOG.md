@@ -1,3 +1,38 @@
+## 0.3.2
+
+* Update supported Flutter version `>=1.10.15 <2.0.0`
+
+## 0.2.4+4
+
+* Fix bug rendering ZERO WIDTH SPACE character (#119)
+
+## 0.2.4+3
+
+* Improve BR rendering logic
+* Add `enableCaching` prop to control cache logic
+
+## 0.2.4+2
+
+* Add basic detection and support for `Directionality` widget during LI/OL/UL rendering (#115)
+* Fix bug LI has empty A (#112)
+
+## 0.2.4+1
+
+* Improve caching logic (#112)
+* Fix extra space after BR tag (#111)
+* Fix cached image not being rendered on first build (#113)
+
+## 0.2.4
+
+* Add support for `type`/`start`/`reversed` (LI/OL/UL) (#91)
+* Add support for tag FONT (#109)
+
+## 0.2.3+4
+
+* Improve IMG error handling (#96)
+* Fix bug rendering nested list (OL/UL) with single child (#88)
+* Fix bug related to null widget (#94, #95)
+
 ## 0.2.3+3
 
 * Improve BR rendering to be consistent with browsers (#83, #84)

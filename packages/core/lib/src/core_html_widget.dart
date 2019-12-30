@@ -19,6 +19,9 @@ TextStyle _rootTextStyleBuilder(
 
 /// A widget that builds Flutter widget tree from html.
 class HtmlWidget extends StatefulWidget {
+  /// The flag to control whether or not to cache built widget tree.
+  final bool enableCaching;
+
   /// The input string.
   ///
   /// It should contains at least HTML and BODY elements (something like
@@ -35,6 +38,7 @@ class HtmlWidget extends StatefulWidget {
   /// The [html] argument must not be null.
   HtmlWidget(
     this.html, {
+    this.enableCaching = true,
     this.factoryBuilder,
     Key key,
     HtmlWidgetConfig config,
@@ -105,10 +109,23 @@ class HtmlWidgetState extends State<HtmlWidget> {
   @override
   void initState() {
     super.initState();
-    _built = _build();
+
+    if (widget.enableCaching) _built = _build();
   }
 
-  Widget build(BuildContext context) => _built;
+  @override
+  void didUpdateWidget(HtmlWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.html != oldWidget.html) _built = null;
+  }
+
+  Widget build(BuildContext context) {
+    if (!widget.enableCaching) return _build();
+
+    _built ??= _build();
+    return _built;
+  }
 
   Widget _build() {
     final domNodes = parser.parse(widget.html).body.nodes;

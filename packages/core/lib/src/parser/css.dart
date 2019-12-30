@@ -18,6 +18,15 @@ const kCssFontSizeXSmall = 'x-small';
 const kCssFontSizeXxSmall = 'xx-small';
 const kCssFontSizeLarger = 'larger';
 const kCssFontSizeSmaller = 'smaller';
+const kCssFontSizes = {
+  "1": kCssFontSizeXxSmall,
+  "2": kCssFontSizeXSmall,
+  "3": kCssFontSizeSmall,
+  "4": kCssFontSizeMedium,
+  "5": kCssFontSizeLarge,
+  "6": kCssFontSizeXLarge,
+  "7": kCssFontSizeXxLarge,
+};
 
 const kCssFontStyle = 'font-style';
 const kCssFontStyleItalic = 'italic';

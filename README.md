@@ -68,13 +68,15 @@ Below tags are the ones that have special meaning / styling, all other tags will
   - To render IFRAME as web view: set `webView=true` in config and [setup iOS project manually](https://pub.dev/packages/webview_flutter#ios).
   - If the IFRAME has no `width` and `height` attributes, the web view will be rendered initially in a 16:9 box and automatically resize itself afterwards.
 - IMG with support for asset (`asset://`), data uri and network image via [`CachedNetworkImage`](https://pub.dev/packages/cached_network_image)
-- LI/OL/UL
+- LI/OL/UL with support for:
+  - Attributes: `type`, `start`, `reversed`
+  - Inline style `list-style-type` values: `lower-alpha`, `upper-alpha`, `lower-latin`, `upper-latin`, `circle`, `decimal`, `disc`, `lower-roman`, `upper-roman`, `square`
 - TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
-  - `<table border="1">`
-  - `<table style="border: 1px solid #f00">`
+  - Attribute: `<table border="1">`
+  - Inline style: `<table style="border: 1px solid #f00">`
 - VIDEO via [chewie](https://pub.dev/packages/chewie)
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
-  DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FOOTER, HEADER, HR, I, INS,
+  DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, INS,
   KBD, MAIN, NAV, P, PRE, Q, S, SAMP, SECTION, STRIKE, STRONG, TT, U, VAR
 
 These tags and their contents will be ignored:

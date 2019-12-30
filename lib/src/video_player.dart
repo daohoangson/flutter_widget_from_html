@@ -44,10 +44,6 @@ class _VideoPlayerState extends State<VideoPlayer> {
   void initState() {
     super.initState();
     _controller = _Controller(this);
-
-    if (widget.autoResize == true) {
-      _controller._autoResize(() => setState(() {}));
-    }
   }
 
   @override
@@ -58,26 +54,31 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   @override
   Widget build(BuildContext context) => lib.Chewie(controller: _controller);
+
+  void _onAspectRatioUpdated() => setState(() {});
 }
 
 class _Controller extends lib.ChewieController {
-  final VideoPlayer widget;
+  final _VideoPlayerState vps;
 
   double _aspectRatio;
 
-  _Controller(_VideoPlayerState vps)
-      : widget = vps.widget,
-        super(
+  _Controller(this.vps)
+      : super(
           autoInitialize: true,
           autoPlay: vps.widget.autoplay == true,
           looping: vps.widget.loop == true,
           showControls: vps.widget.controls == true,
           videoPlayerController:
               lib.VideoPlayerController.network(vps.widget.url),
-        );
+        ) {
+    if (vps.widget.autoResize) {
+      _setupAspectRatioListener();
+    }
+  }
 
   @override
-  double get aspectRatio => _aspectRatio ?? widget.aspectRatio;
+  double get aspectRatio => _aspectRatio ?? vps.widget.aspectRatio;
 
   @override
   void dispose() {
@@ -85,16 +86,19 @@ class _Controller extends lib.ChewieController {
     videoPlayerController.dispose();
   }
 
-  void _autoResize(VoidCallback f) {
+  void _setupAspectRatioListener() {
     VoidCallback listener;
 
     listener = () {
       if (_aspectRatio == null) {
         final vpv = videoPlayerController.value;
-        if (!vpv.initialized) return;
+        debugPrint("[_Controller]: vpv=$vpv");
 
+        if (!vpv.initialized) return;
         _aspectRatio = vpv.aspectRatio;
-        f();
+
+        // workaround because we cannot call `vps.setState()` directly
+        vps._onAspectRatioUpdated();
       }
 
       videoPlayerController.removeListener(listener);

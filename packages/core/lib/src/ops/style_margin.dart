@@ -7,17 +7,30 @@ const kCssMarginRight = 'margin-right';
 const kCssMarginTop = 'margin-top';
 
 Iterable<Widget> _marginBuilder(
-  BuildContext context,
+  BuilderContext bc,
   Iterable<Widget> children,
   _MarginBuilderInput input,
 ) {
-  final style = input.meta.textStyle(context);
+  final tsb = input.meta.tsb;
   final padding = EdgeInsets.only(
-    left: input.marginLeft?.getValue(style, context: context) ?? 0.0,
-    right: input.marginRight?.getValue(style, context: context) ?? 0.0,
+    left: input.marginLeft?.getValue(bc, tsb) ?? 0.0,
+    right: input.marginRight?.getValue(bc, tsb) ?? 0.0,
   );
 
-  return children.map((child) => input.wf.buildPadding(child, padding));
+  return children.map((child) {
+    if (child is Padding) {
+      final existing = child.padding as EdgeInsets;
+      return input.wf.buildPadding(
+        child.child,
+        existing.copyWith(
+          left: existing.left + padding.left,
+          right: existing.right + padding.right,
+        ),
+      );
+    }
+
+    return input.wf.buildPadding(child, padding);
+  });
 }
 
 class _MarginBuilderInput {
@@ -27,28 +40,26 @@ class _MarginBuilderInput {
   WidgetFactory wf;
 }
 
-class SpacingPlaceholder extends StatelessWidget implements IWidgetPlaceholder {
-  final NodeMetadata meta;
+class SpacingPlaceholder extends IWidgetPlaceholder {
+  final TextStyleBuilders tsb;
 
   final _heights = <CssLength>[];
 
   SpacingPlaceholder({
-    CssLength height,
-    Key key,
-    this.meta,
+    @required CssLength height,
+    @required this.tsb,
   })  : assert(height != null),
-        assert(meta != null),
-        super(key: key) {
+        assert(tsb != null) {
     _heights.add(height);
   }
 
   @override
   Widget build(BuildContext context) {
-    final style = meta.textStyle(context);
+    final bc = BuilderContext(context, this);
     var height = 0.0;
 
     for (final _height in _heights) {
-      final h = _height.getValue(style, context: context);
+      final h = _height.getValue(bc, tsb);
       if (h > height) height = h;
     }
 
@@ -69,36 +80,41 @@ class _StyleMargin {
   BuildOp get buildOp => BuildOp(
         onWidgets: (meta, widgets) {
           if (widgets?.isNotEmpty != true) return null;
-          final margin = _StyleMarginParser(meta).parse();
-          if (margin == null) return null;
+          final m = _StyleMarginParser(meta).parse();
+          if (m == null) return null;
 
-          return <Widget>[]
-            ..add(margin.top?.isNotEmpty == true
-                ? SpacingPlaceholder(height: margin.top, meta: meta)
-                : null)
-            ..addAll(margin.left?.isNotEmpty == true ||
-                    margin.right?.isNotEmpty == true
-                ? widgets.map((widget) {
-                    final input = _MarginBuilderInput()
-                      ..marginLeft = margin.left
-                      ..marginRight = margin.right
-                      ..meta = meta
-                      ..wf = wf;
+          final t = m.top?.isNotEmpty == true;
+          final lr = m.left?.isNotEmpty == true || m.right?.isNotEmpty == true;
+          final b = m.bottom?.isNotEmpty == true;
+          final ws = List<Widget>((t ? 1 : 0) + widgets.length + (b ? 1 : 0));
+          final tsb = meta.tsb;
 
-                    if (widget is IWidgetPlaceholder)
-                      return widget..wrapWith(_marginBuilder, input);
+          var i = 0;
+          if (t) ws[i++] = SpacingPlaceholder(height: m.top, tsb: tsb);
 
-                    return WidgetPlaceholder(
+          if (lr) {
+            for (final widget in widgets) {
+              final input = _MarginBuilderInput()
+                ..marginLeft = m.left
+                ..marginRight = m.right
+                ..meta = meta
+                ..wf = wf;
+
+              ws[i++] = widget is IWidgetPlaceholder
+                  ? (widget..wrapWith(_marginBuilder, input))
+                  : WidgetPlaceholder(
                       builder: _marginBuilder,
                       children: [widget],
                       input: input,
-                      wf: wf,
                     );
-                  })
-                : widgets)
-            ..add(margin.bottom?.isNotEmpty == true
-                ? SpacingPlaceholder(height: margin.bottom, meta: meta)
-                : null);
+            }
+          } else {
+            for (final widget in widgets) ws[i++] = widget;
+          }
+
+          if (b) ws[i++] = SpacingPlaceholder(height: m.bottom, tsb: tsb);
+
+          return ws;
         },
       );
 }

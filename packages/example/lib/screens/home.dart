@@ -51,25 +51,27 @@ CODE tag:
 <code><span style="color: #000000"><span style="color: #0000BB">&lt;?php phpinfo</span><span style="color: #007700">(); </span><span style="color: #0000BB">?&gt;</span></span></code>""",
     'Iframe': () => IframeScreen(),
     'Images': () => ImgScreen(),
-    'List nested': """<ol>
+    'Lists (LI/OL/UL)': """<ol type="I">
   <li>One</li>
   <li>
     Two
-    <ul>
-      <li>2.1</li>
+    <ol reversed type="A">
+      <li>2.C (reversed)</li>
       <li>
-        2.2
-        <ul>
-          <li>2.2.1</li>
-          <li>2.2.2</li>
-        </ul>
+        2.B
+        <ol start="5">
+          <li>2.B.5 (start="5")</li>
+          <li>2.B.6</li>
+          <li>2.B.7</li>
+        </ol>
       </li>
-      <li>2.3</li>
-    </ul>
+      <li>2.A</li>
+    </ol>
   </li>
   <li>Three</li>
   <li><ul><li>3.1</li></ul></li>
   <li>
+    Four<br />
     <a href="https://gph.is/QFgPA0"><img src="https://media.giphy.com/media/6VoDJzfRjJNbG/giphy-downsized.gif" /></a>
   </li>
   <li>Five</li>
@@ -77,7 +79,6 @@ CODE tag:
   <li>Seven</li>
   <li>Eight</li>
   <li>Nine</li>
-  <li>Ten</li>
   <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nibh quam, sodales in sollicitudin ut, scelerisque non sapien. Nam nec mi malesuada libero euismod tincidunt sit amet mattis ipsum. Etiam dapibus sem ac accumsan elementum. Vivamus mattis at diam ac pellentesque. Sed id eros condimentum, dignissim risus id, semper enim. Etiam tempor mauris id lorem fringilla, dapibus feugiat enim placerat. In hac habitasse platea dictumst. Nam est felis, accumsan et sapien ac, molestie convallis sapien. Vivamus ligula sapien, ultrices quis nisl ac, blandit hendrerit massa. Maecenas eleifend, nisi eget commodo mollis, elit magna pellentesque odio, sit amet auctor quam nibh vel purus. Integer ultricies lacinia ipsum, in tincidunt erat finibus eget.</li>
 </ol>""",
     'Margin': """<div>No margin</div>

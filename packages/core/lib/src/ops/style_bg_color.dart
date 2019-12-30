@@ -26,14 +26,11 @@ class _StyleBgColor {
         final bgColor = _parseColor(meta);
         if (bgColor == null) return null;
 
-        final box = _buildBox(widgets, bgColor);
-        if (box == null) return null;
-
-        return [box];
+        return listOfNonNullOrNothing(_buildBox(widgets, bgColor));
       });
 
   BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) => piece
-    ..block.rebuildBits((bit) => bit.tsb != null
+    ..block.rebuildBits((bit) => bit is DataBit
         ? bit.rebuild(
             tsb: bit.tsb.sub()..enqueue(_styleBgColorTextStyleBuilder, bgColor),
           )

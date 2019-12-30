@@ -1,15 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'core_helpers.dart';
 import 'core_widget_factory.dart';
 import 'data_classes.dart';
 
 final _attrStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
-
-// https://unicode.org/cldr/utility/character.jsp?a=200B
-final _textLeadingSpacingRegExp = RegExp(r'^[\s\u{200B}]+', unicode: true);
-final _textTrailingSpacingRegExp = RegExp(r'[\s\u{200B}]+$', unicode: true);
-final _whitespaceDuplicateRegExp = RegExp(r'[\s\u{200B}]+', unicode: true);
 
 class Builder {
   final List<dom.Node> domNodes;
@@ -44,9 +40,13 @@ class Builder {
           if (widget != null) list.add(widget);
         }
       } else {
-        piece.block.trimRight();
-        final text = wf.buildText(piece.block);
-        if (text != null) list.add(text);
+        final block = piece.block;
+        if ((block..trimRight()).isNotEmpty) {
+          list.add(WidgetPlaceholder(
+            builder: wf.buildText,
+            input: block,
+          ));
+        }
       }
     }
 
@@ -178,8 +178,8 @@ class _Piece extends BuiltPiece {
   bool get hasWidgets => widgets != null;
 
   bool _write(String text) {
-    final leading = _textLeadingSpacingRegExp.firstMatch(text);
-    final trailing = _textTrailingSpacingRegExp.firstMatch(text);
+    final leading = regExpSpaceLeading.firstMatch(text);
+    final trailing = regExpSpaceTrailing.firstMatch(text);
     final start = leading == null ? 0 : leading.end;
     final end = trailing == null ? text.length : trailing.start;
 
@@ -188,7 +188,7 @@ class _Piece extends BuiltPiece {
     if (start > 0) block.addSpace();
 
     final substring = text.substring(start, end);
-    final dedup = substring.replaceAll(_whitespaceDuplicateRegExp, ' ');
+    final dedup = substring.replaceAll(regExpSpaces, ' ');
     block.addText(dedup);
 
     if (end < text.length) block.addSpace();
