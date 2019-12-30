@@ -10,6 +10,24 @@ analyze_task:
     - ( cd packages/example && flutter pub get )
     - flutter analyze
 
+dartdoc_task:
+  container:
+    image: cirrusci/flutter:$FLUTTER_VERSION
+  env:
+    FLUTTER_ROOT: /home/cirrus/sdks/flutter
+    ZEIT_EMAIL: flutter_widget_from_html@daohoangson.com
+    ZEIT_TOKEN: ENCRYPTED[4aaf3c4bb0aedad605db9ac986f9a54a7843cede69c435a94dbacdddc9551616263fc70180e01d3b73ef5c3d72c8d2e0]
+  generate_document_script:
+    - ( cd packages/core && ../../tool/dartdoc.sh )
+    - ( cd packages/example && flutter pub get )
+    - ./tool/dartdoc.sh
+  install_now_cli_script:
+    - sudo apt-get update
+    - sudo apt-get install -y npm
+    - sudo npm install -g now
+  deploy_to_now_script:
+    - now --name $CIRRUS_BRANCH --token $ZEIT_TOKEN
+
 unit_test_task:
   container:
     image: cirrusci/flutter:$FLUTTER_VERSION
@@ -43,6 +61,7 @@ ios_test_task:
 
 android_test_task:
   skip: "!changesInclude('lib/src/video_player.dart', 'lib/src/web_view.dart')"
+  trigger_type: manual
   container:
     image: cirrusci/flutter:$FLUTTER_VERSION
   depends_on:
