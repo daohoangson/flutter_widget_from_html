@@ -134,10 +134,10 @@ class _TagTable {
     }
 
     final border = _buildTableBorder(bc, i.meta);
-    widgets.add(i.wf.buildTable(tableRows, border: border));
+    widgets.add(wf.buildTable(tableRows, border: border));
 
     if (widgets.length == 1) return widgets.first;
-    return i.wf.buildColumn(widgets);
+    return SimpleColumn.wrap(widgets);
   }
 
   TableBorder _buildTableBorder(BuilderContext bc, NodeMetadata meta) {
@@ -148,7 +148,7 @@ class _TagTable {
       if (borderParsed != null) {
         return TableBorder.all(
           color: borderParsed.color ?? const Color(0xFF000000),
-          width: borderParsed.width.getValue(bc, meta),
+          width: borderParsed.width.getValue(bc, meta.tsb),
         );
       }
     }
@@ -196,15 +196,13 @@ class _TagTable {
         children,
         _TableInput()
           ..meta = meta
-          ..tag = tag ?? meta.domElement.localName
-          ..wf = wf,
+          ..tag = tag ?? meta.domElement.localName,
       );
 }
 
 class _TableInput {
   NodeMetadata meta;
   String tag;
-  WidgetFactory wf;
 }
 
 class _TablePlaceholder extends WidgetPlaceholder<_TableInput> {
@@ -220,7 +218,6 @@ class _TablePlaceholder extends WidgetPlaceholder<_TableInput> {
           builder: self._build,
           children: _children,
           input: _input,
-          wf: _input.wf,
         );
 
   @override

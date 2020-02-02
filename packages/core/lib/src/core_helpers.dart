@@ -11,6 +11,11 @@ part 'parser/css.dart';
 /// A no op placeholder widget.
 const widget0 = const SizedBox.shrink();
 
+// https://unicode.org/cldr/utility/character.jsp?a=200B
+final regExpSpaceLeading = RegExp(r'^[\s\u{200B}]+', unicode: true);
+final regExpSpaceTrailing = RegExp(r'[\s\u{200B}]+$', unicode: true);
+final regExpSpaces = RegExp(r'\s+');
+
 typedef void OnTapUrl(String url);
 
 typedef Iterable<Widget> WidgetPlaceholderBuilder<T>(
@@ -18,27 +23,41 @@ typedef Iterable<Widget> WidgetPlaceholderBuilder<T>(
 
 typedef WidgetFactory FactoryBuilder(HtmlWidgetConfig config);
 
-class WidgetPlaceholder<T1> extends IWidgetPlaceholder {
-  final WidgetFactory wf;
+class SimpleColumn extends StatelessWidget {
+  final List<Widget> children;
 
+  SimpleColumn(this.children);
+
+  @override
+  Widget build(BuildContext _) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: children,
+      );
+
+  static Widget wrap(Iterable<Widget> ws) {
+    if (ws?.isNotEmpty != true) return null;
+    if (ws.length == 1) return ws.first;
+    return SimpleColumn(ws is List ? ws : ws.toList(growable: false));
+  }
+}
+
+class WidgetPlaceholder<T1> extends IWidgetPlaceholder {
   final _builders = List<Function>();
   final Iterable<Widget> _firstChildren;
   final _inputs = [];
 
   WidgetPlaceholder({
-    WidgetPlaceholderBuilder<T1> builder,
+    @required WidgetPlaceholderBuilder<T1> builder,
     Iterable<Widget> children,
     T1 input,
-    this.wf,
   })  : assert(builder != null),
-        assert(wf != null),
         _firstChildren = children {
     _builders.add(builder);
     _inputs.add(input);
   }
 
   @override
-  Widget build(BuildContext c) => buildWithContext(BuilderContext(c));
+  Widget build(BuildContext c) => buildWithContext(BuilderContext(c, this));
 
   Widget buildWithContext(BuilderContext bc) {
     Iterable<Widget> output;
@@ -49,7 +68,7 @@ class WidgetPlaceholder<T1> extends IWidgetPlaceholder {
       output = _builders[i](bc, children, _inputs[i]);
     }
 
-    return wf.buildColumn(output) ?? widget0;
+    return SimpleColumn.wrap(output) ?? widget0;
   }
 
   @override
@@ -61,6 +80,30 @@ class WidgetPlaceholder<T1> extends IWidgetPlaceholder {
 
 abstract class IWidgetPlaceholder extends StatelessWidget {
   void wrapWith<T>(WidgetPlaceholderBuilder<T> builder, T input);
+
+  static Iterable<Widget> wrap<T2>(
+    Iterable<Widget> widgets,
+    WidgetPlaceholderBuilder<T2> builder,
+    WidgetFactory wf, [
+    T2 input,
+  ]) {
+    final wrapped = List<Widget>(widgets.length);
+
+    int i = 0;
+    for (final widget in widgets) {
+      if (widget is IWidgetPlaceholder) {
+        wrapped[i++] = widget..wrapWith(builder, input);
+      } else {
+        wrapped[i++] = WidgetPlaceholder(
+          builder: builder,
+          children: [widget],
+          input: input,
+        );
+      }
+    }
+
+    return wrapped;
+  }
 }
 
 Iterable<T> listOfNonNullOrNothing<T>(T x) => x == null ? null : [x];

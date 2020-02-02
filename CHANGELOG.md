@@ -1,3 +1,16 @@
+## 0.3.2
+
+* Update supported Flutter version `>=1.10.15 <2.0.0`
+
+## 0.2.4+4
+
+* Fix bug rendering ZERO WIDTH SPACE character (#119)
+
+## 0.2.4+3
+
+* Improve BR rendering logic
+* Add `enableCaching` prop to control cache logic
+
 ## 0.2.4+2
 
 * Add basic detection and support for `Directionality` widget during LI/OL/UL rendering (#115)

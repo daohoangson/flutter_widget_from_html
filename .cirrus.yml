@@ -1,23 +1,53 @@
 env:
-  CODECOV_TOKEN: ENCRYPTED[0bad38cf59a2fda73e72491e18a564995cf3a5c862b5400834bfa9873713e780a2deed3e57b265279bd1e91168ee492a]
+  FLUTTER_VERSION: v1.12.13-hotfix.5
+
+analyze_task:
+  container:
+    image: cirrusci/flutter:$FLUTTER_VERSION
+  analyze_core_script:
+    - ( cd packages/core && flutter analyze )
+  analyze_extended_script:
+    - ( cd packages/example && flutter pub get )
+    - flutter analyze
 
 unit_test_task:
   container:
-    image: cirrusci/flutter
+    image: cirrusci/flutter:$FLUTTER_VERSION
+  env:
+    CODECOV_TOKEN: ENCRYPTED[0bad38cf59a2fda73e72491e18a564995cf3a5c862b5400834bfa9873713e780a2deed3e57b265279bd1e91168ee492a]
   test_script: COVERAGE=1 ./tool/test.sh
   codecov_script: bash <(curl -s https://codecov.io/bash)
 
 ios_test_task:
   skip: "!changesInclude('lib/src/web_view.dart')"
+  depends_on:
+    - analyze
+    - unit_test
   osx_instance:
-    image: mojave-xcode-11.2.1-flutter
-  setup_script: xcrun simctl create iPhoneX com.apple.CoreSimulator.SimDeviceType.iPhone-11-Pro-Max com.apple.CoreSimulator.SimRuntime.iOS-13-2 | xargs xcrun simctl boot
-  test_script: ./tool/integration.sh
+    image: mojave-xcode-11.3
+  install_flutter_script:
+    - _stableVersion=$( echo $FLUTTER_VERSION-stable | sed 's/-/+/' )
+    - curl https://storage.googleapis.com/flutter_infra/releases/stable/macos/flutter_macos_$_stableVersion.zip -o flutter.zip
+    - unzip -qq flutter.zip
+    - mv flutter $HOME/flutter
+  create_simulator_script:
+    - brew install jq
+    - _deviceType=$( xcrun simctl list devicetypes iphone -j | jq '.devicetypes[-1]' )
+    - _deviceTypeName=$( echo $_deviceType | jq .name -r )
+    - _deviceTypeId=$( echo $_deviceType | jq .identifier -r )
+    - _runTime=$( xcrun simctl list runtimes ios -j | jq '.runtimes[].identifier' -r | tail -n 1 )
+    - xcrun simctl create "$_deviceTypeName" "$_deviceTypeId" "$_runTime" | xargs xcrun simctl boot
+  test_script:
+    - export PATH=$PATH:$HOME/flutter/bin
+    - ./tool/integration.sh
 
 android_test_task:
   skip: "!changesInclude('lib/src/video_player.dart', 'lib/src/web_view.dart')"
   container:
-    image: cirrusci/flutter
+    image: cirrusci/flutter:$FLUTTER_VERSION
+  depends_on:
+    - analyze
+    - unit_test
   env:
     AWS_ACCESS_KEY_ID: ENCRYPTED[bfad5318e7b922be21065747210e175bff4a016be7b7f32d0e34a5e7c145ac5c685088a16a28488f76259b07bf960e8a]
     AWS_DEFAULT_REGION: us-west-2

@@ -11,9 +11,10 @@ Iterable<Widget> _marginBuilder(
   Iterable<Widget> children,
   _MarginBuilderInput input,
 ) {
+  final tsb = input.meta.tsb;
   final padding = EdgeInsets.only(
-    left: input.marginLeft?.getValue(bc, input.meta) ?? 0.0,
-    right: input.marginRight?.getValue(bc, input.meta) ?? 0.0,
+    left: input.marginLeft?.getValue(bc, tsb) ?? 0.0,
+    right: input.marginRight?.getValue(bc, tsb) ?? 0.0,
   );
 
   return children.map((child) {
@@ -40,25 +41,25 @@ class _MarginBuilderInput {
 }
 
 class SpacingPlaceholder extends IWidgetPlaceholder {
-  final NodeMetadata meta;
+  final TextStyleBuilders tsb;
 
   final _heights = <CssLength>[];
 
   SpacingPlaceholder({
-    CssLength height,
-    this.meta,
+    @required CssLength height,
+    @required this.tsb,
   })  : assert(height != null),
-        assert(meta != null) {
+        assert(tsb != null) {
     _heights.add(height);
   }
 
   @override
   Widget build(BuildContext context) {
-    final bc = BuilderContext(context);
+    final bc = BuilderContext(context, this);
     var height = 0.0;
 
     for (final _height in _heights) {
-      final h = _height.getValue(bc, meta);
+      final h = _height.getValue(bc, tsb);
       if (h > height) height = h;
     }
 
@@ -86,9 +87,10 @@ class _StyleMargin {
           final lr = m.left?.isNotEmpty == true || m.right?.isNotEmpty == true;
           final b = m.bottom?.isNotEmpty == true;
           final ws = List<Widget>((t ? 1 : 0) + widgets.length + (b ? 1 : 0));
+          final tsb = meta.tsb;
 
           var i = 0;
-          if (t) ws[i++] = SpacingPlaceholder(height: m.top, meta: meta);
+          if (t) ws[i++] = SpacingPlaceholder(height: m.top, tsb: tsb);
 
           if (lr) {
             for (final widget in widgets) {
@@ -104,14 +106,13 @@ class _StyleMargin {
                       builder: _marginBuilder,
                       children: [widget],
                       input: input,
-                      wf: wf,
                     );
             }
           } else {
             for (final widget in widgets) ws[i++] = widget;
           }
 
-          if (b) ws[i++] = SpacingPlaceholder(height: m.bottom, meta: meta);
+          if (b) ws[i++] = SpacingPlaceholder(height: m.bottom, tsb: tsb);
 
           return ws;
         },

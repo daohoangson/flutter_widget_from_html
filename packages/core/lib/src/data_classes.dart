@@ -140,7 +140,9 @@ typedef Iterable<Widget> BuildOpOnWidgets(
 
 class BuilderContext {
   final BuildContext context;
-  BuilderContext(this.context);
+  final Widget origin;
+
+  BuilderContext(this.context, this.origin);
 }
 
 abstract class BuiltPiece {
@@ -214,12 +216,12 @@ class CssLength {
 
   bool get isNotEmpty => number > 0;
 
-  double getValue(BuilderContext bc, NodeMetadata meta) {
+  double getValue(BuilderContext bc, TextStyleBuilders tsb) {
     double value;
 
     switch (this.unit) {
       case CssLengthUnit.em:
-        value = meta.tsb.build(bc).fontSize * number / 1;
+        value = tsb.build(bc).fontSize * number / 1;
         break;
       case CssLengthUnit.px:
         value = number;
@@ -346,11 +348,15 @@ class DataBit extends TextBit {
 
 class SpaceBit extends TextBit {
   final TextBlock block;
-  final String data;
+  String _data;
 
-  SpaceBit(this.block, {this.data}) : assert(block != null);
+  SpaceBit(this.block, {String data})
+      : assert(block != null),
+        _data = data;
 
   bool get hasTrailingSpace => data == null;
+
+  String get data => _data;
 }
 
 class WidgetBit extends TextBit {
@@ -396,16 +402,7 @@ class TextBlock extends TextBit {
   }
 
   @override
-  bool get hasTrailingSpace {
-    var i = _children.length;
-    while (i > 0) {
-      i--;
-      final child = _children[i];
-      if (child.isNotEmpty) return child.hasTrailingSpace;
-    }
-
-    return parent == null ? true : isEmpty ? parent.hasTrailingSpace : false;
-  }
+  bool get hasTrailingSpace => last?.hasTrailingSpace ?? true;
 
   @override
   bool get isEmpty {
@@ -453,7 +450,15 @@ class TextBlock extends TextBit {
       _children.insert(index ?? _children.length, bit);
 
   bool addSpace([String data]) {
-    if (data == null && (last is SpaceBit || hasTrailingSpace)) return false;
+    final prev = last;
+    if (prev == null) {
+      if (data == null) return false;
+    } else if (prev is SpaceBit) {
+      if (data == null) return false;
+      prev._data = "${prev._data ?? ''}$data";
+      return true;
+    }
+
     addBit(SpaceBit(this, data: data));
     return true;
   }

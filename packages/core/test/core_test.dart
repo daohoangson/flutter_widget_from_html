@@ -32,7 +32,6 @@ void main() {
   testWidgets('renders without erroneous white spaces', (WidgetTester t) async {
     final html = """
 <div>
-  <span>&#8203;</span>
   <span style="text-decoration: line-through">
     <span style="text-decoration: overline">
       <span style="text-decoration: underline">
@@ -42,9 +41,18 @@ void main() {
     </span>
   </span>
 </div>
+<!-- https://unicode.org/cldr/utility/character.jsp?a=200B -->
+<div>&#8203;</div>
+<!-- https://github.com/daohoangson/flutter_widget_from_html/issues/119 -->
+<div>I​Like​Playing​football​​game</div>
 """;
     final str = await explain(t, html);
-    expect(str, equals('[RichText:(+l+o+u:All decorations... (:and none))]'));
+    expect(
+        str,
+        equals('[Column:children='
+            '[RichText:(+l+o+u:All decorations... (:and none))],'
+            '[RichText:(:I​Like​Playing​football​​game)]'
+            ']'));
   });
 
   testWidgets('renders white spaces with parent style', (tester) async {
@@ -78,70 +86,99 @@ void main() {
 
   group('BR', () {
     testWidgets('renders new line', (WidgetTester tester) async {
-      final html = 'Foo<br />Bar';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo\nBar)]'));
+      final html = '1<br />2';
+      final e = await explain(tester, html);
+      expect(e, equals('[Column:children=[RichText:(:1)],[RichText:(:2)]]'));
     });
 
     testWidgets('renders without whitespace on new line', (tester) async {
-      final html = 'Foo<br />\nBar';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo\nBar)]'));
+      final html = '1<br />\n2';
+      final e = await explain(tester, html);
+      expect(e, equals('[Column:children=[RichText:(:1)],[RichText:(:2)]]'));
     });
 
     testWidgets('renders without whitespace on next SPAN', (tester) async {
-      final html = 'Foo<br />\n<span>\nBar</span>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo\nBar)]'));
+      final html = '1<br />\n<span>\n2</span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Column:children=[RichText:(:1)],[RichText:(:2)]]'));
     });
 
-    testWidgets('renders multiple new lines', (WidgetTester tester) async {
-      final html = 'Foo<br /><br /><br />Bar';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo\n\n\nBar)]'));
-    });
-
-    testWidgets('renders new line between SPANs, 1 of 2', (tester) async {
-      final html = '<span>Foo<br /></span><span>Bar</span>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo\nBar)]'));
-    });
-
-    testWidgets('renders new line between SPANs, 2 of 2', (tester) async {
-      final html = '<span>Foo</span><br /><span>Bar</span>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo\nBar)]'));
-    });
-
-    testWidgets('skips new line between SPAN and DIV, 1 of 2', (tester) async {
-      final html = '<span>Foo<br /></span><div>Bar</div>';
-      final explained = await explain(tester, html);
-      expect(explained,
-          equals('[Column:children=[RichText:(:Foo)],[RichText:(:Bar)]]'));
-    });
-
-    testWidgets('skips new line between SPAN and DIV, 2 of 2', (tester) async {
-      final html = '<span>Foo</span><br /><div>Bar</div>';
-      final explained = await explain(tester, html);
-      expect(explained,
-          equals('[Column:children=[RichText:(:Foo)],[RichText:(:Bar)]]'));
-    });
-
-    testWidgets('renders new line between DIVs, 1 of 2', (tester) async {
-      final html = '<div>Foo<br /></div><div>Bar</div>';
-      final explained = await explain(tester, html);
-      expect(explained,
-          equals('[Column:children=[RichText:(:Foo\n)],[RichText:(:Bar)]]'));
-    });
-
-    testWidgets('renders new line between DIVs, 2 of 2', (tester) async {
-      final html = '<div>Foo</div><br /><div>Bar</div>';
+    testWidgets('renders multiple new lines, 1 of 2', (tester) async {
+      final html = '1<br /><br />2';
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children=[RichText:(:Foo)],'
-              '[RichText:(:\u{00A0})],'
-              '[RichText:(:Bar)]]'));
+          equals('[Column:children=[RichText:(:1)],'
+              '[SizedBox:0.0x10.0],'
+              '[RichText:(:2)]]'));
+    });
+
+    testWidgets('renders multiple new lines, 2 of 2', (tester) async {
+      final html = '1<br /><br /><br />2';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Column:children=[RichText:(:1)],'
+              '[SizedBox:0.0x20.0],'
+              '[RichText:(:2)]]'));
+    });
+
+    testWidgets('renders new line between SPANs, 1 of 2', (tester) async {
+      final html = '<span>1<br /></span><span>2</span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Column:children=[RichText:(:1)],[RichText:(:2)]]'));
+    });
+
+    testWidgets('renders new line between SPANs, 2 of 2', (tester) async {
+      final html = '<span>1</span><br /><span>2</span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Column:children=[RichText:(:1)],[RichText:(:2)]]'));
+    });
+
+    testWidgets('skips new line between SPAN and DIV, 1 of 2', (tester) async {
+      final html = '<span>1<br /></span><div>2</div>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Column:children=[RichText:(:1)],[RichText:(:2)]]'));
+    });
+
+    testWidgets('skips new line between SPAN and DIV, 2 of 2', (tester) async {
+      final html = '<span>1</span><br /><div>2</div>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Column:children=[RichText:(:1)],[RichText:(:2)]]'));
+    });
+
+    testWidgets('renders new line between DIVs, 1 of 2', (tester) async {
+      final html = '<div>1<br /></div><div>2</div>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Column:children=[RichText:(:1)],[RichText:(:2)]]'));
+    });
+
+    testWidgets('renders new line between DIVs, 2 of 2', (tester) async {
+      final html = '<div>1</div><br /><div>2</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Column:children=[RichText:(:1)],'
+              '[SizedBox:0.0x10.0],'
+              '[RichText:(:2)]]'));
+    });
+
+    testWidgets('renders without new line at bottom, 1 of 3', (tester) async {
+      final html = 'Foo<br />';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('renders without new line at bottom, 2 of 3', (tester) async {
+      final html = '<span>Foo</span><br />';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('renders without new line at bottom, 3 of 3', (tester) async {
+      final html = '<div>Foo</div><br />';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(:Foo)]'));
     });
   });
 

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui' as ui show ParagraphBuilder;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
@@ -41,32 +42,69 @@ class WidgetFactory {
 
   Color get hyperlinkColor => _config.hyperlinkColor;
 
-  Widget buildAlign(Widget child, Alignment alignment) =>
-      child != null && !(child is RichText) && alignment != null
-          ? (child is IWidgetPlaceholder
-              ? (child..wrapWith(buildAlignsWithContext, alignment))
-              : Align(alignment: alignment, child: child))
-          : child;
-
-  Iterable<Widget> buildAlignsWithContext(
-          BuilderContext _, Iterable<Widget> children, Alignment alignment) =>
-      children.map((child) => buildAlign(child, alignment));
+  Iterable<Widget> buildAligns(
+          BuilderContext bc, Iterable<Widget> widgets, Alignment alignment) =>
+      widgets.map((widget) {
+        if (bc.origin is WidgetPlaceholder<TextBlock>) return widget;
+        if (widget is WidgetPlaceholder<TextBlock>) return widget;
+        return Align(alignment: alignment, child: widget);
+      });
 
   Widget buildBody(Iterable<Widget> children) =>
       buildPadding(buildColumn(children), _config.bodyPadding);
 
-  Widget buildColumn(Iterable<Widget> children) {
-    if (children?.isNotEmpty != true) return null;
-    children = fixOverlappingSpacings(
-        children is List ? children : children.toList(growable: false));
-    if (children?.isNotEmpty != true) return null;
+  Widget buildColumn(Iterable<Widget> children) => children?.isNotEmpty == true
+      ? WidgetPlaceholder(
+          builder: _buildColumn,
+          children: children,
+        )
+      : null;
 
-    return children.length > 1
-        ? Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: children,
-          )
-        : children.first;
+  static Iterable<Widget> _buildColumn(
+      BuilderContext bc, Iterable<Widget> ws, _) {
+    final output = <Widget>[];
+    final iter = ws.iterator;
+    while (iter.moveNext()) {
+      if (!(iter.current is SpacingPlaceholder)) break;
+    }
+
+    if (iter.current == null) return null;
+
+    Widget prev;
+    while (output.isEmpty || iter.moveNext()) {
+      var widget = iter.current;
+
+      if (widget is SpacingPlaceholder && prev is SpacingPlaceholder) {
+        prev.mergeWith(widget);
+        continue;
+      }
+
+      if (widget is WidgetPlaceholder<TextBlock>) {
+        final WidgetPlaceholder<TextBlock> textPlaceholder = widget;
+        widget = textPlaceholder.build(bc.context);
+      }
+
+      if (widget is SimpleColumn) {
+        final SimpleColumn column = widget;
+        output.addAll(column.children);
+        widget = column.children.last;
+      } else {
+        output.add(widget);
+      }
+
+      prev = widget;
+    }
+
+    while (output.isNotEmpty) {
+      if (output.last is SpacingPlaceholder) {
+        output.removeLast();
+        continue;
+      }
+
+      break;
+    }
+
+    return output;
   }
 
   Widget buildDecoratedBox(
@@ -91,27 +129,12 @@ class WidgetFactory {
       ? (meta.fontStyleItalic == true ? FontStyle.italic : FontStyle.normal)
       : null;
 
-  Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
-      child != null && onTap != null
-          ? GestureDetector(child: child, onTap: onTap)
-          : child;
-
-  Iterable<Widget> buildGestureDetectorsWithContext(BuilderContext _,
-          Iterable<Widget> children, GestureTapCallback onTap) =>
-      children.map((child) => buildGestureDetector(child, onTap));
-
   Iterable<Widget> buildGestureDetectors(
+    BuilderContext bc,
     Iterable<Widget> widgets,
     GestureTapCallback onTap,
-  ) {
-    if (widgets?.isNotEmpty != true || onTap == null) return widgets;
-    return widgets.map((widget) {
-      if (widget is IWidgetPlaceholder)
-        return widget..wrapWith(buildGestureDetectorsWithContext, onTap);
-
-      return buildGestureDetector(widget, onTap);
-    });
-  }
+  ) =>
+      widgets.map((widget) => GestureDetector(child: widget, onTap: onTap));
 
   GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
       ? () => _config.onTapUrl != null
@@ -176,28 +199,13 @@ class WidgetFactory {
           ? Padding(child: child, padding: padding)
           : child;
 
-  Widget buildScrollView(Widget child) => child != null
-      ? SingleChildScrollView(
-          child: child,
-          scrollDirection: Axis.horizontal,
-        )
-      : null;
-
   Widget buildTable(List<TableRow> rows, {TableBorder border}) =>
       rows?.isNotEmpty == true ? Table(border: border, children: rows) : null;
 
   TableCell buildTableCell(Widget child) => TableCell(
       child: buildPadding(child, _config.tableCellPadding) ?? widget0);
 
-  Widget buildText(TextBlock block) => block?.isNotEmpty == true
-      ? WidgetPlaceholder(
-          builder: buildTextWithContext,
-          input: block,
-          wf: this,
-        )
-      : null;
-
-  Iterable<Widget> buildTextWithContext(
+  Iterable<Widget> buildText(
     BuilderContext bc,
     Iterable<Widget> _,
     TextBlock block,
@@ -205,13 +213,21 @@ class WidgetFactory {
     final tsb = block.tsb;
     tsb?.build(bc);
 
-    return [
-      RichText(
-        text: _compileToTextSpan(bc, block),
-        textAlign: tsb?.textAlign ?? TextAlign.start,
-        textScaleFactor: MediaQuery.of(bc.context).textScaleFactor,
-      ),
-    ];
+    final textScaleFactor = MediaQuery.of(bc.context).textScaleFactor;
+    final widgets = <Widget>[];
+    for (final compiled in _TextBlockCompiler(block).compile(bc)) {
+      if (compiled is InlineSpan) {
+        widgets.add(RichText(
+          text: compiled,
+          textAlign: tsb?.textAlign ?? TextAlign.start,
+          textScaleFactor: textScaleFactor,
+        ));
+      } else if (compiled is Widget) {
+        widgets.add(compiled);
+      }
+    }
+
+    return widgets;
   }
 
   TextDecoration buildTextDecoration(TextStyle parent, NodeMetadata meta) {
@@ -245,7 +261,7 @@ class WidgetFactory {
     if (value == null) return null;
 
     final parsed = parseCssLength(value);
-    if (parsed != null) return parsed.getValue(tsb.bc, m);
+    if (parsed != null) return parsed.getValue(tsb.bc, m.tsb);
 
     final c = tsb.bc.context;
     switch (value) {
@@ -310,44 +326,6 @@ class WidgetFactory {
     if (b == null) return null;
 
     return b.resolveUri(p).toString();
-  }
-
-  List<Widget> fixOverlappingSpacings(List<Widget> widgets) {
-    if (widgets?.isNotEmpty != true) return null;
-
-    var iMin = 0;
-    var iMax = widgets.length - 1;
-    while (iMin < iMax) {
-      if (widgets[iMin] is SpacingPlaceholder) {
-        iMin++;
-      } else {
-        break;
-      }
-    }
-    while (iMax >= iMin) {
-      if (widgets[iMax] is SpacingPlaceholder) {
-        iMax--;
-      } else {
-        break;
-      }
-    }
-    if (iMax < iMin) return null;
-
-    final fixed = <Widget>[];
-    Widget prev;
-    for (var i = iMin; i <= iMax; i++) {
-      final widget = widgets[i];
-
-      if (widget is SpacingPlaceholder && prev is SpacingPlaceholder) {
-        prev.mergeWith(widget);
-        continue;
-      }
-
-      fixed.add(widget);
-      prev = widget;
-    }
-
-    return fixed;
   }
 
   String getListStyleMarker(String type, int i) {

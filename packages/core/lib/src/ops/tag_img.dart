@@ -106,6 +106,22 @@ class _ImageLayoutDelegate extends SingleChildLayoutDelegate {
       height != other.height || width != other.width;
 }
 
+class _ImageSpan extends WidgetSpan {
+  const _ImageSpan(Widget child)
+      : super(
+          child: child,
+          alignment: PlaceholderAlignment.baseline,
+          baseline: TextBaseline.alphabetic,
+        );
+
+  @override
+  void build(ui.ParagraphBuilder builder,
+      {double textScaleFactor = 1.0,
+      @required List<PlaceholderDimensions> dimensions}) {
+    super.build(builder, textScaleFactor: 1.0, dimensions: dimensions);
+  }
+}
+
 class _TagImg {
   final WidgetFactory wf;
 
@@ -129,12 +145,7 @@ class _TagImg {
             return pieces..last?.block?.addText(widget.data);
           }
 
-          return pieces
-            ..last?.block?.addWidget(WidgetSpan(
-                  alignment: PlaceholderAlignment.baseline,
-                  baseline: TextBaseline.alphabetic,
-                  child: widget,
-                ));
+          return pieces..last?.block?.addWidget(_ImageSpan(widget));
         },
         onWidgets: (meta, widgets) {
           if (!meta.isBlockElement) return widgets;
