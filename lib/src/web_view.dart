@@ -128,7 +128,7 @@ class _WebViewState extends State<WebView> {
     var intercepted = false;
 
     if (widget.interceptNavigationRequest != null &&
-        req.hasGesture &&
+        req.type != lib.NavigationType.other &&
         req.isForMainFrame &&
         _knownUrls.indexOf(req.url) == -1) {
       intercepted = widget.interceptNavigationRequest(req.url);
