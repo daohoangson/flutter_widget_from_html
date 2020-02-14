@@ -12,6 +12,7 @@ dependencies:
   chewie: ^0.9.8+1
   flutter:
     sdk: flutter
+  flutter_svg: ^0.17.1
   flutter_widget_from_html_core:
     path: packages/core
   html: ^0.14.0+3
