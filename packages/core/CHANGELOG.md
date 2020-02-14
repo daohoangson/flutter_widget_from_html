@@ -1,3 +1,7 @@
+## 0.4.0-rc.2020021401
+
+* Disable rendering of tag SVG
+
 ## 0.3.2+1
 
 * Fix IMG wrong size when device has scaled text (#127)
