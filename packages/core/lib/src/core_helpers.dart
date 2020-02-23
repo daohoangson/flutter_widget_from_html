@@ -31,6 +31,7 @@ class SimpleColumn extends StatelessWidget {
   @override
   Widget build(BuildContext _) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
         children: children,
       );
 
