@@ -15,9 +15,9 @@ dependencies:
   flutter_widget_from_html_core:
     path: packages/core
   html: ^0.14.0+3
-  url_launcher: ^5.4.1
-  video_player: ^0.10.5+1
-  webview_flutter: ^0.3.19+4
+  url_launcher: ^5.4.2
+  video_player: ^0.10.8+1
+  webview_flutter: ^0.3.19+9
 
 dev_dependencies:
   flutter_test:
