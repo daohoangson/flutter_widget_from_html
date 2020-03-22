@@ -20,7 +20,7 @@ dependencies:
   webview_flutter:
     git:
       url: git://github.com/daohoangson/plugins.git
-      ref: 67bb899
+      ref: 275aea7
       path: packages/webview_flutter
 
 dev_dependencies:
