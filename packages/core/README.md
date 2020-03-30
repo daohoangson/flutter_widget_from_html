@@ -81,6 +81,10 @@ However, these tags and their contents will be ignored:
 - SCRIPT
 - STYLE
 
+### Attributes
+
+- dir: `auto`, `ltr` and `rtl`
+
 ### Inline stylings
 
 - border-top, border-bottom: overline/underline with support for dashed/dotted/double/solid style

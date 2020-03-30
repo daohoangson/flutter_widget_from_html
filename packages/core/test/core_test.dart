@@ -984,4 +984,24 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(explained, equals('[RichText:(+l+o+u:foo (:bar))]'));
     });
   });
+
+  group('dir', () {
+    testWidgets('renders auto', (WidgetTester tester) async {
+      final html = '<div dir="auto">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('renders ltr', (WidgetTester tester) async {
+      final html = '<div dir="ltr">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Directionality:ltr,child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('renders rtl', (WidgetTester tester) async {
+      final html = '<div dir="rtl">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Directionality:rtl,child=[RichText:(:Foo)]]'));
+    });
+  });
 }

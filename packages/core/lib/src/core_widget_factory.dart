@@ -25,6 +25,7 @@ final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
 class WidgetFactory {
   final HtmlWidgetConfig _config;
 
+  BuildOp _attrDir;
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
   BuildOp _styleTextAlign;
@@ -384,6 +385,10 @@ class WidgetFactory {
   }
 
   NodeMetadata parseElement(NodeMetadata meta, dom.Element element) {
+    if (element.attributes.containsKey('dir')) {
+      meta = lazySet(meta, buildOp: attrDir());
+    }
+
     if (_config.builderCallback != null) {
       meta = _config.builderCallback(meta, element);
     }
@@ -729,6 +734,23 @@ class WidgetFactory {
     }
 
     return meta;
+  }
+
+  BuildOp attrDir() {
+    _attrDir ??= BuildOp(
+      onWidgets: (meta, ws) {
+        final dir = meta.domElement.attributes['dir'];
+        final textDirection = dir == 'rtl'
+            ? TextDirection.rtl
+            : dir == 'ltr' ? TextDirection.ltr : null;
+
+        if (textDirection == null) return ws;
+        return [
+          Directionality(child: buildColumn(ws), textDirection: textDirection)
+        ];
+      },
+    );
+    return _attrDir;
   }
 
   BuildOp styleBgColor() {
