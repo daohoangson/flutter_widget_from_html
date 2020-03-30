@@ -15,10 +15,3 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  golden_toolkit: ^0.2.3
-
-flutter:
-  # https://github.com/eBay/flutter_glove_box/issues/31
-  uses-material-design: true
-  assets:
-    - empty/

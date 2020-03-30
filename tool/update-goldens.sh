@@ -8,5 +8,5 @@ if [ -z "$CIRRUS_CI" ]; then
   exit 1
 fi
 
-cd "$( dirname $( dirname ${BASH_SOURCE[0]}))"/packages/core
-exec flutter test --update-goldens test/golden/golden_test.dart
+cd "$( dirname $( dirname ${BASH_SOURCE[0]}))"/packages/example
+exec flutter test --update-goldens test/golden_test.dart
