@@ -905,7 +905,8 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 
     testWidgets('renders font-weight inline style',
         (WidgetTester tester) async {
-      final html = """<span style="font-weight: bold">bold</span>
+      final html = """
+<span style="font-weight: bold">bold</span>
 <span style="font-weight: 100">one</span>
 <span style="font-weight: 200">two</span>
 <span style="font-weight: 300">three</span>
@@ -914,7 +915,8 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 <span style="font-weight: 600">six</span>
 <span style="font-weight: 700">seven</span>
 <span style="font-weight: 800">eight</span>
-<span style="font-weight: 900">nine</span>""";
+<span style="font-weight: 900">nine</span>
+""";
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -924,13 +926,18 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
   });
 
   group('text-decoration', () {
-    testWidgets('renders DEL/INS tags', (WidgetTester tester) async {
-      final html = 'This is some <del>deleted</del> <ins>inserted</ins> text.';
+    testWidgets('renders DEL tag', (WidgetTester tester) async {
+      final html = 'This is some <del>deleted</del> text.';
       final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[RichText:(:This is some (+l:deleted)(: )' +
-              '(+u:inserted)(: text.))]'));
+      expect(explained,
+          equals('[RichText:(:This is some (+l:deleted)(: text.))]'));
+    });
+
+    testWidgets('renders INS tag', (WidgetTester tester) async {
+      final html = 'This is some <ins>inserted</ins> text.';
+      final explained = await explain(tester, html);
+      expect(explained,
+          equals('[RichText:(:This is some (+u:inserted)(: text.))]'));
     });
 
     testWidgets('renders S/STRIKE tag', (WidgetTester tester) async {
@@ -967,19 +974,23 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     });
 
     testWidgets('renders all', (WidgetTester tester) async {
-      final html = '<span style="text-decoration: line-through">' +
-          '<span style="text-decoration: overline">' +
-          '<span style="text-decoration: underline">' +
-          'foo bar</span></span></span>';
+      final html = """
+<span style="text-decoration: line-through">
+<span style="text-decoration: overline">
+<span style="text-decoration: underline">
+foo bar</span></span></span>
+""";
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(+l+o+u:foo bar)]'));
     });
 
     testWidgets('skips rendering', (WidgetTester tester) async {
-      final html = '<span style="text-decoration: line-through">' +
-          '<span style="text-decoration: overline">' +
-          '<span style="text-decoration: underline">' +
-          'foo <span style="text-decoration: none">bar</span></span></span></span>';
+      final html = """
+<span style="text-decoration: line-through">
+<span style="text-decoration: overline">
+<span style="text-decoration: underline">
+foo <span style="text-decoration: none">bar</span></span></span></span>
+""";
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(+l+o+u:foo (:bar))]'));
     });
