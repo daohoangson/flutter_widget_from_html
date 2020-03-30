@@ -92,7 +92,7 @@ These tags and their contents will be ignored:
 - font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) and value in em/px
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
-- margin, margin-top, margin-right, margin-bottom, margin-left (values in px only)
+- margin and margin-xxx (values in px only)
 - text-align: center/justify/left/right
 - text-decoration: line-through/none/overline/underline
 

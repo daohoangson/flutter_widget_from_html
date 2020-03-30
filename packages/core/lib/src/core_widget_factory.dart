@@ -691,8 +691,10 @@ class WidgetFactory {
 
       case kCssMargin:
       case kCssMarginBottom:
+      case kCssMarginEnd:
       case kCssMarginLeft:
       case kCssMarginRight:
+      case kCssMarginStart:
       case kCssMarginTop:
         meta = lazySet(meta, buildOp: styleMargin());
         break;

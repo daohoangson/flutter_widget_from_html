@@ -63,10 +63,22 @@ Future<String> explain(
 final _explainMarginRegExp = RegExp(
     r'^\[Column:children=\[RichText:\(:x\)\],(.+),\[RichText:\(:x\)\]\]$');
 
-Future<String> explainMargin(WidgetTester tester, String html) async {
+Future<String> explainMargin(
+  WidgetTester tester,
+  String html, {
+  bool rtl = false,
+}) async {
   final explained = await explain(
     tester,
-    "x${html}x",
+    null,
+    hw: Directionality(
+      textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
+      child: HtmlWidget(
+        "x${html}x",
+        bodyPadding: const EdgeInsets.all(0),
+        key: hwKey,
+      ),
+    ),
   );
   final match = _explainMarginRegExp.firstMatch(explained);
   return match == null ? explained : match[1];
