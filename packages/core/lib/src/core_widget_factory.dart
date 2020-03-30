@@ -25,7 +25,6 @@ final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
 class WidgetFactory {
   final HtmlWidgetConfig _config;
 
-  BuildOp _attrDir;
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
   BuildOp _styleTextAlign;
@@ -386,7 +385,7 @@ class WidgetFactory {
 
   NodeMetadata parseElement(NodeMetadata meta, dom.Element element) {
     if (element.attributes.containsKey('dir')) {
-      meta = lazySet(meta, buildOp: attrDir());
+      meta = lazySet(meta, buildOp: attrDir(element.attributes['dir']));
     }
 
     if (_config.builderCallback != null) {
@@ -731,27 +730,30 @@ class WidgetFactory {
           }
         }
         break;
+
+      case 'direction':
+        meta = lazySet(meta, buildOp: attrDir(value));
+        break;
     }
 
     return meta;
   }
 
-  BuildOp attrDir() {
-    _attrDir ??= BuildOp(
-      onWidgets: (meta, ws) {
-        final dir = meta.domElement.attributes['dir'];
-        final textDirection = dir == 'rtl'
-            ? TextDirection.rtl
-            : dir == 'ltr' ? TextDirection.ltr : null;
+  BuildOp attrDir(final String dir) => BuildOp(
+        onWidgets: (_, ws) {
+          final textDirection = dir == 'rtl'
+              ? TextDirection.rtl
+              : dir == 'ltr' ? TextDirection.ltr : null;
 
-        if (textDirection == null) return ws;
-        return [
-          Directionality(child: buildColumn(ws), textDirection: textDirection)
-        ];
-      },
-    );
-    return _attrDir;
-  }
+          if (textDirection == null) return ws;
+          return [
+            Directionality(
+              child: buildColumn(ws),
+              textDirection: textDirection,
+            )
+          ];
+        },
+      );
 
   BuildOp styleBgColor() {
     _styleBgColor ??= _StyleBgColor(this).buildOp;

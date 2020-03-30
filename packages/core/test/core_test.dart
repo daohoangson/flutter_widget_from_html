@@ -744,6 +744,42 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     });
   });
 
+  group('direction', () {
+    group('attribute', () {
+      testWidgets('renders auto', (WidgetTester tester) async {
+        final html = '<div dir="auto">Foo</div>';
+        final e = await explain(tester, html);
+        expect(e, equals('[RichText:(:Foo)]'));
+      });
+
+      testWidgets('renders ltr', (WidgetTester tester) async {
+        final html = '<div dir="ltr">Foo</div>';
+        final e = await explain(tester, html);
+        expect(e, equals('[Directionality:ltr,child=[RichText:(:Foo)]]'));
+      });
+
+      testWidgets('renders rtl', (WidgetTester tester) async {
+        final html = '<div dir="rtl">Foo</div>';
+        final e = await explain(tester, html);
+        expect(e, equals('[Directionality:rtl,child=[RichText:(:Foo)]]'));
+      });
+    });
+
+    group('inline style', () {
+      testWidgets('renders ltr', (WidgetTester tester) async {
+        final html = '<div style="direction: ltr">Foo</div>';
+        final e = await explain(tester, html);
+        expect(e, equals('[Directionality:ltr,child=[RichText:(:Foo)]]'));
+      });
+
+      testWidgets('renders rtl', (WidgetTester tester) async {
+        final html = '<div style="direction: rtl">Foo</div>';
+        final e = await explain(tester, html);
+        expect(e, equals('[Directionality:rtl,child=[RichText:(:Foo)]]'));
+      });
+    });
+  });
+
   testWidgets('renders font-family inline style', (WidgetTester tester) async {
     final html = '<span style="font-family: Monospace">Foo</span>';
     final explained = await explain(tester, html);
@@ -982,26 +1018,6 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           'foo <span style="text-decoration: none">bar</span></span></span></span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(+l+o+u:foo (:bar))]'));
-    });
-  });
-
-  group('dir', () {
-    testWidgets('renders auto', (WidgetTester tester) async {
-      final html = '<div dir="auto">Foo</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
-    });
-
-    testWidgets('renders ltr', (WidgetTester tester) async {
-      final html = '<div dir="ltr">Foo</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[Directionality:ltr,child=[RichText:(:Foo)]]'));
-    });
-
-    testWidgets('renders rtl', (WidgetTester tester) async {
-      final html = '<div dir="rtl">Foo</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[Directionality:rtl,child=[RichText:(:Foo)]]'));
     });
   });
 }
