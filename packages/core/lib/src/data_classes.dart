@@ -187,14 +187,6 @@ class CssMargin {
   CssLength start;
   CssLength top;
 
-  bool get isNotEmpty =>
-      bottom?.isNotEmpty == true ||
-      end?.isNotEmpty == true ||
-      left?.isNotEmpty == true ||
-      right?.isNotEmpty == true ||
-      start?.isNotEmpty == true ||
-      top?.isNotEmpty == true;
-
   CssMargin copyWith({
     CssLength bottom,
     CssLength end,
