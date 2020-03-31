@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
+
+// https://lipsum.com/feed/html
+const lipsum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
+    'Ut non elementum quam. Suspendisse odio diam, maximus pellentesque nunc a, pulvinar facilisis erat. '
+    'Vivamus a viverra sem. Vivamus vehicula nibh mi, quis ornare orci laoreet vitae. '
+    'Maecenas sagittis rutrum nisl nec dignissim. Suspendisse cursus est ut ultrices volutpat. '
+    'Cras vel vestibulum arcu. Curabitur eget molestie nunc. Quisque fringilla quam vitae rhoncus lacinia. '
+    'Vivamus id laoreet metus. Etiam sed mollis tellus. Vivamus facilisis faucibus libero eu interdum. '
+    'Pellentesque laoreet magna porta viverra faucibus.';
 
 class _TestApp extends StatelessWidget {
   final String html;
@@ -23,8 +33,7 @@ class _TestApp extends StatelessWidget {
       );
 }
 
-void _test(String name, String html) =>
-    testWidgets("Golden test: $name", (tester) async {
+void _test(String name, String html) => testGoldens(name, (tester) async {
       await tester.pumpWidget(_TestApp(html));
       await expectLater(
         find.byType(HtmlWidget),
@@ -162,6 +171,43 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 <span style="text-decoration: underline">
 foo <span style="text-decoration: none">bar</span></span></span></span>
 """,
+    'inline/margin/4_values': """
+----
+<div style="margin: 1px 2px 3px 4px">all</div>
+----
+<div style="margin: 1px 0 0 0">top only</div>
+----
+<div style="margin: 0 2px 0 0">right only</div>
+----
+<div style="margin: 0 0 3px 0">bottom only</div>
+----
+<div style="margin: 0 0 3px 0">left only</div>
+---
+""",
+    'inline/margin/2_values': """
+----
+<div style="margin: 5px 10px">both</div>
+----
+<div style="margin: 5px 0">vertical only</div>
+----
+<div style="margin: 0 10px">horizontal only</div>
+----
+""",
+    'inline/margin/1_value': '----<div style="margin: 3px">Foo</div>----',
+    'inline/margin/margin-top':
+        '----<div style="margin-top: 3px">Foo</div>----',
+    'inline/margin/margin-right':
+        '----<div style="margin-right: 3px">Foo</div>----',
+    'inline/margin/margin-bottom':
+        '----<div style="margin-top: 3px">Foo</div>----',
+    'inline/margin/margin-left':
+        '----<div style="margin-left: 3px">Foo</div>----',
+    'CENTER': '<center>Foo</center>',
+    'inline/text-align/center': '<div style="text-align: center">$lipsum</div>',
+    'inline/text-align/justify':
+        '<div style="text-align: justify">$lipsum</div>',
+    'inline/text-align/left': '<div style="text-align: left">$lipsum</div>',
+    'inline/text-align/right': '<div style="text-align: right">$lipsum</div>',
     'LI': """
 <ul>
   <li>One</li>
