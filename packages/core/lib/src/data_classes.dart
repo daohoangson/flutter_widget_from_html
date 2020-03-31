@@ -461,8 +461,6 @@ class TextBlock extends TextBit {
   void addBit(TextBit bit, {int index}) =>
       _children.insert(index ?? _children.length, bit);
 
-  void addBlock(TextBlock block) => _children.add(block);
-
   bool addSpace([String data]) {
     final prev = last;
     if (prev == null) {
