@@ -11,6 +11,7 @@ import 'data_classes.dart';
 part 'ops/style_bg_color.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_text_align.dart';
+part 'ops/style_vertical_align.dart';
 part 'ops/tag_a.dart';
 part 'ops/tag_code.dart';
 part 'ops/tag_font.dart';
@@ -28,6 +29,7 @@ class WidgetFactory {
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
   BuildOp _styleTextAlign;
+  BuildOp _styleVerticalAlign;
   BuildOp _tagA;
   BuildOp _tagBr;
   BuildOp _tagCode;
@@ -576,6 +578,23 @@ class WidgetFactory {
         meta = lazySet(meta, fontSize: kCssFontSizeSmaller);
         break;
 
+      case 'sub':
+        meta = lazySet(meta, styles: [
+          kCssFontSize,
+          kCssFontSizeSmaller,
+          kCssVerticalAlign,
+          kCssVerticalAlignSub,
+        ]);
+        break;
+      case 'sup':
+        meta = lazySet(meta, styles: [
+          kCssFontSize,
+          kCssFontSizeSmaller,
+          kCssVerticalAlign,
+          kCssVerticalAlignSuper,
+        ]);
+        break;
+
       case kTagTable:
         meta = lazySet(meta, buildOp: tagTable());
         break;
@@ -724,6 +743,10 @@ class WidgetFactory {
           }
         }
         break;
+
+      case kCssVerticalAlign:
+        meta = lazySet(meta, buildOp: styleVerticalAlign());
+        break;
     }
 
     return meta;
@@ -742,6 +765,11 @@ class WidgetFactory {
   BuildOp styleTextAlign() {
     _styleTextAlign ??= _StyleTextAlign(this).buildOp;
     return _styleTextAlign;
+  }
+
+  BuildOp styleVerticalAlign() {
+    _styleVerticalAlign ??= _StyleVerticalAlign(this).buildOp;
+    return _styleVerticalAlign;
   }
 
   BuildOp tagA() {

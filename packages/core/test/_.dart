@@ -129,7 +129,15 @@ class Explainer {
   }
 
   String _inlineSpan(InlineSpan inlineSpan, {TextStyle parentStyle}) {
-    if (inlineSpan is WidgetSpan) return _widget(inlineSpan.child);
+    if (inlineSpan is WidgetSpan) {
+      String s = _widget(inlineSpan.child);
+      if (inlineSpan.alignment != PlaceholderAlignment.baseline) {
+        s += inlineSpan.alignment
+            .toString()
+            .replaceAll('PlaceholderAlignment.', '@');
+      }
+      return s;
+    }
 
     final style = _textStyle(inlineSpan.style, parentStyle ?? _defaultStyle);
     final textSpan = inlineSpan is TextSpan ? inlineSpan : null;
