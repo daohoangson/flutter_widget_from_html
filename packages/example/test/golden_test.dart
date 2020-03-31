@@ -52,6 +52,7 @@ void main() {
     'DD,DT,DD': '<dl><dt>Foo</dt><dd>Bar</dd></dt>',
     'HR': '<hr/>',
     'Q': 'Someone said <q>Foo</q>.',
+    'RUBY,RP,RT': '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>',
     'ARTICLE': '<article>First.</article><article>Second one.</article>',
     'ASIDE': '<aside>First.</aside><aside>Second one.</aside>',
     'BLOCKQUOTE': '<blockquote>Foo</blockquote>',
