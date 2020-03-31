@@ -85,7 +85,7 @@ void main() {
       expect(
           explained,
           equals('[Column:children='
-              '[RichText:$imgRendered],'
+              '$imgRendered,'
               '[RichText,align=center:(:Foo)]'
               ']'));
     });

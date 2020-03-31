@@ -59,7 +59,6 @@ class _ImageLayoutState extends State<ImageLayout> {
       _stream.addListener(_streamListener);
     }
 
-
     if (hasDimensions) {
       // we may have dimensions in 3 cases
       // 1. From the beginning, via widget constructor
