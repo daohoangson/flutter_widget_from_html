@@ -337,7 +337,7 @@ class DataBit extends TextBit {
 
   @override
   DataBit clone(TextBlock block) =>
-      DataBit(block, data, tsb.clone(parent: block.tsb), onTap: onTap);
+      DataBit(block, data, tsb.clone(block.tsb), onTap: onTap);
 
   DataBit rebuild({
     String data,
@@ -448,7 +448,7 @@ class TextBlock extends TextBit {
     if (parent == null) return null;
     final siblings = parent._children;
     final indexOf = siblings.indexOf(this);
-    assert(indexOf != -1);
+    if (indexOf == -1) return null;
 
     for (var i = indexOf + 1; i < siblings.length; i++) {
       final next = siblings[i].first;
@@ -460,6 +460,8 @@ class TextBlock extends TextBit {
 
   void addBit(TextBit bit, {int index}) =>
       _children.insert(index ?? _children.length, bit);
+
+  void addBlock(TextBlock block) => _children.add(block);
 
   bool addSpace([String data]) {
     final prev = last;
@@ -481,10 +483,12 @@ class TextBlock extends TextBit {
 
   @override
   TextBlock clone(TextBlock parent) {
-    final cloned = TextBlock(tsb.clone(), parent: parent);
+    final cloned = TextBlock(tsb.clone(parent.tsb), parent: parent);
     cloned._children.addAll(_children.map((child) => child.clone(cloned)));
     return cloned;
   }
+
+  void detach() => parent?._children?.remove(this);
 
   bool forEachBit(f(TextBit bit, int index), {bool reversed = false}) {
     final l = _children.length;
@@ -515,13 +519,6 @@ class TextBlock extends TextBit {
     }
   }
 
-  void rebuildChild(TextBit f(TextBit bit)) {
-    final l = _children.length;
-    for (var i = 0; i < l; i++) {
-      _children[i] = f(_children[i]);
-    }
-  }
-
   TextBit removeLast() {
     while (true) {
       if (_children.isEmpty) return null;
@@ -549,6 +546,8 @@ class TextBlock extends TextBit {
   void trimRight() {
     while (isNotEmpty && hasTrailingSpace) removeLast();
   }
+
+  void truncate() => _children.clear();
 }
 
 class TextStyleBuilders {
@@ -568,8 +567,8 @@ class TextStyleBuilders {
 
   TextStyleBuilders({this.parent});
 
-  TextStyleBuilders clone({TextStyleBuilders parent}) {
-    final cloned = TextStyleBuilders(parent: parent ?? this.parent);
+  TextStyleBuilders clone(TextStyleBuilders parent) {
+    final cloned = TextStyleBuilders(parent: parent);
 
     final l = _builders.length;
     for (var i = 0; i < l; i++) {

@@ -18,6 +18,7 @@ part 'ops/tag_font.dart';
 part 'ops/tag_img.dart';
 part 'ops/tag_li.dart';
 part 'ops/tag_q.dart';
+part 'ops/tag_ruby.dart';
 part 'ops/tag_table.dart';
 part 'ops/text.dart';
 
@@ -574,6 +575,10 @@ class WidgetFactory {
         meta = lazySet(meta, buildOp: tagQ());
         break;
 
+      case kTagRuby:
+        meta = lazySet(meta, buildOp: tagRuby());
+        break;
+
       case 'small':
         meta = lazySet(meta, fontSize: kCssFontSizeSmaller);
         break;
@@ -816,6 +821,8 @@ class WidgetFactory {
     _tagQ ??= _TagQ(this).buildOp;
     return _tagQ;
   }
+
+  BuildOp tagRuby() => _TagRuby(this).buildOp;
 
   BuildOp tagTable() {
     _tagTable ??= _TagTable(this).buildOp;

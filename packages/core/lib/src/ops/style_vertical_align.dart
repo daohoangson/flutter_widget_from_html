@@ -21,14 +21,11 @@ class _StyleVerticalAlign {
           meta.styles((k, _v) => k == kCssVerticalAlign ? v = _v : null);
           if (v == null || v == kCssVerticalAlignBaseline) return pieces;
 
-          return pieces.map((piece) => _rebuildPiece(piece, v));
+          return pieces.map((piece) => _buildWidgetSpan(piece, v));
         },
       );
 
-  BuiltPiece _rebuildPiece(
-    BuiltPiece piece,
-    String verticalAlign,
-  ) {
+  BuiltPiece _buildWidgetSpan(BuiltPiece piece, String verticalAlign) {
     if (piece.hasWidgets) return piece;
 
     final alignment = _getPlaceholderAlignment(verticalAlign);
@@ -36,37 +33,34 @@ class _StyleVerticalAlign {
       return piece;
 
     final block = piece.block;
-    final parent = block.parent;
-    final replacement =
-        TextBlock(parent?.tsb?.sub() ?? block.tsb.clone(), parent: parent);
-    parent?.rebuildChild((bit) => bit == block ? replacement : bit);
+    final cloned = block.clone(block.parent);
+    block
+      ..truncate()
+      ..addWidget(
+        WidgetSpan(
+          alignment: alignment,
+          child: WidgetPlaceholder(builder: (bc, _, __) {
+            var built = wf.buildText(bc, null, cloned);
 
-    final cloned = block.clone(parent);
-    replacement.addWidget(
-      WidgetSpan(
-        alignment: alignment,
-        child: WidgetPlaceholder(builder: (bc, _, __) {
-          var built = wf.buildText(bc, null, cloned);
+            // `sub` and `super` require additional offset
+            final dy = (verticalAlign == kCssVerticalAlignSub
+                ? 2.5
+                : (verticalAlign == kCssVerticalAlignSuper ? -2.5 : 0.0));
+            if (dy != 0.0) {
+              built = [
+                Transform.translate(
+                  offset: Offset(0, cloned.tsb.build(bc).fontSize / dy),
+                  child: wf.buildColumn(wf.buildText(bc, null, cloned)),
+                )
+              ];
+            }
 
-          // `sub` and `super` require additional offset
-          final dy = (verticalAlign == kCssVerticalAlignSub
-              ? 2.5
-              : (verticalAlign == kCssVerticalAlignSuper ? -2.5 : 0.0));
-          if (dy != 0.0) {
-            built = [
-              Transform.translate(
-                offset: Offset(0, cloned.tsb.build(bc).fontSize / dy),
-                child: wf.buildColumn(wf.buildText(bc, null, cloned)),
-              )
-            ];
-          }
+            return built;
+          }),
+        ),
+      );
 
-          return built;
-        }),
-      ),
-    );
-
-    return BuiltPieceSimple(block: replacement);
+    return piece;
   }
 }
 
