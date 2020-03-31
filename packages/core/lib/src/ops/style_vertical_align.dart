@@ -37,8 +37,9 @@ class _StyleVerticalAlign {
 
     final block = piece.block;
     final parent = block.parent;
-    final replacement = TextBlock(parent.tsb.sub(), parent: parent);
-    parent.rebuildChild((bit) => bit == block ? replacement : bit);
+    final replacement =
+        TextBlock(parent?.tsb?.sub() ?? block.tsb.clone(), parent: parent);
+    parent?.rebuildChild((bit) => bit == block ? replacement : bit);
 
     final cloned = block.clone(parent);
     replacement.addWidget(
