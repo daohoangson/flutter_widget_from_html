@@ -12,6 +12,8 @@ const lipsum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
     'Vivamus id laoreet metus. Etiam sed mollis tellus. Vivamus facilisis faucibus libero eu interdum. '
     'Pellentesque laoreet magna porta viverra faucibus.';
 
+const redX = '<span style="background-color:#f00;font-size:0.75em;">x</span>';
+
 class _TestApp extends StatelessWidget {
   final String html;
 
@@ -208,6 +210,24 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         '<div style="text-align: justify">$lipsum</div>',
     'inline/text-align/left': '<div style="text-align: left">$lipsum</div>',
     'inline/text-align/right': '<div style="text-align: right">$lipsum</div>',
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/sub
+    'SUB': '<p>Almost every developer\'s favorite molecule is '
+        'C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."</p>',
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/sup
+    'SUP': """
+<p>The <b>Pythagorean theorem</b> is often expressed as the following equation:</p>
+<p><var>a<sup>2</sup></var> + <var>b<sup>2</sup></var> = <var>c<sup>2</sup></var></p>
+""",
+    'inline/vertical-align/top':
+        'Foo<span style="vertical-align: top">$redX</span>',
+    'inline/vertical-align/bottom':
+        'Foo<span style="vertical-align: bottom">$redX</span>',
+    'inline/vertical-align/middle':
+        'Foo<span style="vertical-align: middle">$redX</span>',
+    'inline/vertical-align/sub':
+        'Foo<span style="vertical-align: sub">$redX</span>',
+    'inline/vertical-align/super':
+        'Foo<span style="vertical-align: super">$redX</span>',
     'LI': """
 <ul>
   <li>One</li>
