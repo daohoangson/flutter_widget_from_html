@@ -308,7 +308,7 @@ void main() {
       expect(
           explained,
           equals('[SizedBox:0.0x10.0],'
-              '[Padding:(0,40,0,40),child=[RichText:[NetworkImage:url=$src]]],'
+              '[Padding:(0,40,0,40),child=[NetworkImage:url=$src]],'
               '[Padding:(0,40,0,40),child=[RichText:(+i:fig. 1(: Foo))]],'
               '[SizedBox:0.0x10.0]'));
     });
@@ -641,15 +641,20 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final src = 'http://domain.com/image.png';
 
       testWidgets('renders IMG inline by default', (WidgetTester tester) async {
-        final html = '<img src="$src" />';
+        final html = 'Foo <img src="$src" />';
         final explained = await explain(tester, html);
-        expect(explained, equals("[RichText:[NetworkImage:url=$src]]"));
+        expect(explained, equals("[RichText:(:Foo [NetworkImage:url=$src])]"));
       });
 
       testWidgets('renders IMG as block', (WidgetTester tester) async {
-        final html = '<img src="$src" style="display: block" />';
+        final html = 'Foo <img src="$src" style="display: block" />';
         final explained = await explain(tester, html);
-        expect(explained, equals("[NetworkImage:url=$src]"));
+        expect(
+            explained,
+            equals('[Column:children='
+                '[RichText:(:Foo)],'
+                "[NetworkImage:url=$src]"
+                ']'));
       });
 
       testWidgets('renders IMG with dimensions inline',
@@ -658,11 +663,11 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals('[RichText:[ImageLayout:child='
+            equals('[ImageLayout:child='
                 "[NetworkImage:url=$src],"
                 'height=1.0,'
                 'width=1.0'
-                ']]'));
+                ']'));
       });
 
       testWidgets('renders IMG with dimensions as block', (tester) async {
