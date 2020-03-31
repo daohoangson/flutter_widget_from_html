@@ -70,10 +70,10 @@ void main() {
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[RichText:[ImageLayout:'
+              '[ImageLayout:'
               'child=[CachedNetworkImageProvider:],'
               'text=image dot png'
-              ']]]'));
+              ']]'));
     });
   });
 
