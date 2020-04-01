@@ -389,7 +389,7 @@ abstract class TextBits extends TextBit {
   TextBit get last;
   List<TextBit> get _children;
 
-  void addBit(TextBit bit, {int index});
+  void addBit(TextBit bit);
   TextBits sub(TextStyleBuilders tsb);
 }
 
@@ -517,8 +517,7 @@ class TextBlock extends TextBits {
   }
 
   @override
-  void addBit(TextBit bit, {int index}) =>
-      _children.insert(index ?? _children.length, bit);
+  void addBit(TextBit bit) => _children.add(bit);
 
   bool addSpace([String data]) {
     final tail = TextBit.tailOf(this);
