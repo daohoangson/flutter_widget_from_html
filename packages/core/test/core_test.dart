@@ -263,6 +263,17 @@ void main() {
     });
   });
 
+  testWidgets('renders RUBY tag', (WidgetTester tester) async {
+    final html = '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>';
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[RichText:[Stack:children='
+            '[Padding:(3,0,3,0),child=[RichText:(:明日)]],'
+            '[Positioned:child=[Center:alignment=center,child=[RichText:(@5.0:Ashita)]]]'
+            ']@middle]'));
+  });
+
   group('block elements', () {
     final blockOutput =
         '[Column:children=[RichText:(:First.)],[RichText:(:Second one.)]]';

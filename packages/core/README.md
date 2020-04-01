@@ -73,7 +73,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
   - Inline style: `<table style="border: 1px solid #f00">`
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
   DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, IMG, INS,
-  KBD, MAIN, NAV, P, PRE, Q, S, SAMP, SECTION, STRIKE, STRONG, SUB, SUP, TT, U, VAR
+  KBD, MAIN, NAV, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, STRIKE, STRONG, SUB, SUP, TT, U, VAR
 
 However, these tags and their contents will be ignored:
 
