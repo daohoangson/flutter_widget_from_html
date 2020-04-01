@@ -74,6 +74,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
 - TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
   - Attribute: `<table border="1">`
   - Inline style: `<table style="border: 1px solid #f00">`
+- SVG via [flutter_svg](https://pub.dev/packages/flutter_svg)
 - VIDEO via [chewie](https://pub.dev/packages/chewie)
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
   DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, INS,

@@ -536,6 +536,7 @@ class WidgetFactory {
       case 'iframe':
       case 'script':
       case 'style':
+      case 'svg':
         // actually `script` and `style` are not required here
         // our parser will put those elements into document.head anyway
         meta = lazySet(meta, isNotRenderable: true);

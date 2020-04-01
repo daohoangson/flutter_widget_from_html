@@ -80,6 +80,7 @@ However, these tags and their contents will be ignored:
 - IFRAME (use [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) for web view support)
 - SCRIPT
 - STYLE
+- SVG (use [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) for SVG support)
 
 ### Inline stylings
 
