@@ -208,43 +208,23 @@ void main() {
       expect(explained, equals('[RichText:(:Someone said “Foo”.)]'));
     });
 
+    testWidgets('renders quotes without contents', (WidgetTester tester) async {
+      final html = 'x<q></q>y';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:x“”y)]'));
+    });
+
+    testWidgets('renders quotes alone', (WidgetTester tester) async {
+      final html = '<q></q>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:“”)]'));
+    });
+
     testWidgets('renders quotes around IMG', (WidgetTester tester) async {
       final src = 'http://domain.com/image.png';
       final html = '<q><img src="$src" /></q>';
       final explained = await explain(tester, html);
       expect(explained, equals("[RichText:(:“[NetworkImage:url=$src](:”))]"));
-    });
-
-    group('renders without erroneous white spaces', () {
-      testWidgets('before', (WidgetTester tester) async {
-        final html = 'Someone said<q> Foo</q>.';
-        final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:Someone said “Foo”.)]'));
-      });
-
-      testWidgets('after', (WidgetTester tester) async {
-        final html = 'Someone said <q>Foo </q>.';
-        final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:Someone said “Foo” .)]'));
-      });
-
-      testWidgets('first', (WidgetTester tester) async {
-        final html = '<q> Foo</q>';
-        final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:“Foo”)]'));
-      });
-
-      testWidgets('last', (WidgetTester tester) async {
-        final html = '<q>Foo </q>';
-        final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:“Foo”)]'));
-      });
-
-      testWidgets('only', (WidgetTester tester) async {
-        final html = 'x<q> </q>y';
-        final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:x “ ” y)]'));
-      });
     });
 
     testWidgets('renders styling', (WidgetTester tester) async {

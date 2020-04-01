@@ -18,7 +18,9 @@ class _TextBlockCompiler {
     _bc = bc;
     _compiled = [];
 
-    block.forEachBit(_loop);
+    for (final bit in block.bits) {
+      _loop(bit);
+    }
     _completeLoop();
 
     if (_compiled.isEmpty)
@@ -42,7 +44,7 @@ class _TextBlockCompiler {
     _prevOnTap = _bit.onTap;
   }
 
-  void _loop(TextBit bit, int _) {
+  void _loop(final TextBit bit) {
     if (_spans == null) _resetLoop(bit);
 
     final style = _getBitTsb(bit)?.build(_bc) ?? _prevStyle;
@@ -121,21 +123,21 @@ class _TextBlockCompiler {
     // the below code will find the best style for this whitespace bit
     // easy case: whitespace at the beginning of a tag, use the previous style
     final parent = bit.parent;
-    if (bit.isFirst) return null;
+    if (bit == parent.first) return null;
 
     // complicated: whitespace at the end of a tag, try to merge with the next
     // unless it has unrelated style (e.g. next bit is a sibling)
-    if (bit == TextBit.lastOf(parent)) {
+    if (bit == TextBit.tailOf(parent)) {
       final next = TextBit.nextOf(bit);
       if (next?.tsb != null) {
         // get the outer-most block having this as the last bit
         var bp = bit.parent;
-        var bpLast = TextBit.lastOf(bp);
+        var bpTail = TextBit.tailOf(bp);
         while (true) {
-          final parentLast = TextBit.lastOf(bp.parent);
-          if (bpLast != parentLast) break;
+          final parentTail = TextBit.tailOf(bp.parent);
+          if (bpTail != parentTail) break;
           bp = bp.parent;
-          bpLast = parentLast;
+          bpTail = parentTail;
         }
 
         if (bp.parent == next.parent) {

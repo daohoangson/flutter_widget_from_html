@@ -316,7 +316,6 @@ abstract class TextBit {
   String get data => null;
   bool get hasTrailingSpace => false;
   bool get isEmpty => false;
-  bool get isFirst => this == parent?._first;
   bool get isNotEmpty => !isEmpty;
   VoidCallback get onTap => null;
   TextStyleBuilders get tsb => null;
@@ -324,16 +323,26 @@ abstract class TextBit {
   TextBit clone({TextBits parent});
   bool detach() => parent?._children?.remove(this);
 
-  static TextBit lastOf(TextBits bits) {
-    var x = bits;
+  bool insertAfter(TextBit another) {
+    final siblings = another?.parent?._children;
+    if (siblings == null) return false;
 
-    while (x != null) {
-      final last = x._last;
-      if (last != null) return last;
-      x = x.parent;
-    }
+    final indexOf = siblings.indexOf(another);
+    if (indexOf == -1) return false; // detached?
 
-    return null;
+    siblings.insert(indexOf + 1, this);
+    return true;
+  }
+
+  bool insertBefore(TextBit another) {
+    final siblings = another?.parent?._children;
+    if (siblings == null) return false;
+
+    final indexOf = siblings.indexOf(another);
+    if (indexOf == -1) return false; // detached?
+
+    siblings.insert(indexOf, this);
+    return true;
   }
 
   static TextBit nextOf(TextBit bit) {
@@ -346,7 +355,7 @@ abstract class TextBit {
         for (var j = i + 1; j < p._children.length; j++) {
           final candidate = p._children[j];
           if (candidate is TextBits) {
-            final first = candidate._first;
+            final first = candidate.first;
             if (first != null) return first;
           } else {
             return candidate;
@@ -360,13 +369,25 @@ abstract class TextBit {
 
     return null;
   }
+
+  static TextBit tailOf(TextBits bits) {
+    var x = bits;
+
+    while (x != null) {
+      final last = x.last;
+      if (last != null) return last;
+      x = x.parent;
+    }
+
+    return null;
+  }
 }
 
 abstract class TextBits extends TextBit {
   Iterable<TextBit> get bits;
+  TextBit get first;
+  TextBit get last;
   List<TextBit> get _children;
-  TextBit get _first;
-  TextBit get _last;
 
   void addBit(TextBit bit, {int index});
   TextBits sub(TextStyleBuilders tsb);
@@ -464,7 +485,17 @@ class TextBlock extends TextBits {
   }
 
   @override
-  bool get hasTrailingSpace => TextBit.lastOf(this)?.hasTrailingSpace ?? true;
+  TextBit get first {
+    for (final child in _children) {
+      final first = child is TextBits ? child.first : child;
+      if (first != null) return first;
+    }
+
+    return null;
+  }
+
+  @override
+  bool get hasTrailingSpace => TextBit.tailOf(this)?.hasTrailingSpace ?? true;
 
   @override
   bool get isEmpty {
@@ -476,19 +507,9 @@ class TextBlock extends TextBits {
   }
 
   @override
-  TextBit get _first {
-    for (final child in _children) {
-      final first = child is TextBits ? child._first : child;
-      if (first != null) return first;
-    }
-
-    return null;
-  }
-
-  @override
-  TextBit get _last {
+  TextBit get last {
     for (final child in _children.reversed) {
-      final last = child is TextBits ? child._last : child;
+      final last = child is TextBits ? child.last : child;
       if (last != null) return last;
     }
 
@@ -500,12 +521,12 @@ class TextBlock extends TextBits {
       _children.insert(index ?? _children.length, bit);
 
   bool addSpace([String data]) {
-    final prev = TextBit.lastOf(this);
-    if (prev == null) {
+    final tail = TextBit.tailOf(this);
+    if (tail == null) {
       if (data == null) return false;
-    } else if (prev is SpaceBit) {
+    } else if (tail is SpaceBit) {
       if (data == null) return false;
-      prev._buffer.write(data);
+      tail._buffer.write(data);
       return true;
     }
 
@@ -522,23 +543,6 @@ class TextBlock extends TextBits {
     final cloned = TextBlock(tsb._clone(parent: parent.tsb), parent: parent);
     cloned._children.addAll(_children.map((c) => c.clone(parent: cloned)));
     return cloned;
-  }
-
-  bool forEachBit(f(TextBit bit, int index), {bool reversed = false}) {
-    final l = _children.length;
-    final i0 = reversed ? l - 1 : 0;
-    final i1 = reversed ? -1 : l;
-    final ii = reversed ? -1 : 1;
-
-    for (var i = i0; i != i1; i += ii) {
-      final child = _children[i];
-      final shouldContinue = child is TextBlock
-          ? child.forEachBit(f, reversed: reversed)
-          : f(child, i);
-      if (shouldContinue == false) return false;
-    }
-
-    return true;
   }
 
   void rebuildBits(TextBit f(TextBit bit)) {

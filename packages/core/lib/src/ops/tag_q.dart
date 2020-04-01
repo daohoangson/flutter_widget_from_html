@@ -11,50 +11,23 @@ class _TagQ {
 
   BuildOp get buildOp => BuildOp(
         onPieces: (_, pieces) {
-          final first = pieces.first.block;
-          if (first?.isNotEmpty != true) return pieces;
-
-          final last = pieces.last.block;
-          if (last?.isNotEmpty != true) return pieces;
-
-          var addedOpening = false;
-          TextBit firstBit;
-          first.forEachBit((bit, i) {
-            firstBit ??= bit;
-
-            if (!bit.hasTrailingSpace) {
-              final bp = bit.parent;
-              bp.addBit(DataBit(bp, kTagQOpening, bp.tsb), index: i);
-              addedOpening = true;
-              return false;
-            }
-
-            return null;
-          });
-
-          var addedClosing = false;
-          TextBit lastBit;
-          last.forEachBit((bit, i) {
-            lastBit ??= bit;
-
-            if (!bit.hasTrailingSpace) {
-              final bp = bit.parent;
-              bp.addBit(DataBit(bp, kTagQClosing, bp.tsb), index: i + 1);
-              addedClosing = true;
-              return false;
-            }
-
-            return null;
-          }, reversed: true);
-
-          if (!addedOpening) {
-            first.addBit(DataBit(first, kTagQOpening, first.tsb), index: 0);
-            if (firstBit?.hasTrailingSpace == true)
-              first.addBit(SpaceBit(first), index: 0);
+          final firstBlock = pieces.first?.block;
+          final lastBlock = pieces.last?.block;
+          if (firstBlock == lastBlock && firstBlock.isEmpty) {
+            final block = firstBlock;
+            block.addBit(DataBit(block, kTagQOpening, block.tsb));
+            block.addBit(DataBit(block, kTagQClosing, block.tsb));
+            return pieces;
           }
-          if (!addedClosing) {
-            last.addText(kTagQClosing);
-            if (lastBit?.hasTrailingSpace == true) last.addBit(SpaceBit(last));
+
+          final firstBit = firstBlock?.first;
+          final firstBp = firstBit?.parent;
+          final lastBit = lastBlock?.last;
+          final lastBp = lastBit?.parent;
+
+          if (firstBp != null && lastBp != null) {
+            DataBit(firstBp, kTagQOpening, firstBp.tsb).insertBefore(firstBit);
+            DataBit(lastBp, kTagQClosing, lastBp.tsb).insertAfter(lastBit);
           }
 
           return pieces;
