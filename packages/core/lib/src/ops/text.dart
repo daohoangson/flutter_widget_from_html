@@ -86,10 +86,17 @@ class _TextBlockCompiler {
     _saveSpan();
 
     InlineSpan span;
+    Widget widget;
     if (_spans == null) {
       // intentionally left empty
     } else if (_spans.length == 1 && _buffer.isEmpty) {
       span = _spans[0];
+
+      if (span is WidgetSpan &&
+          span.alignment == PlaceholderAlignment.baseline &&
+          (block.tsb?.textAlign ?? TextAlign.start) == TextAlign.start) {
+        widget = span.child;
+      }
     } else if (_spans.isNotEmpty || _buffer.isNotEmpty) {
       span = TextSpan(
         children: _spans,
@@ -102,7 +109,7 @@ class _TextBlockCompiler {
     _spans = null;
 
     if (span == null) return;
-    _compiled.add(span);
+    _compiled.add(widget ?? span);
   }
 
   static GestureRecognizer _buildGestureRecognizer(VoidCallback onTap) =>

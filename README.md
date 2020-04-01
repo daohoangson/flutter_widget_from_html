@@ -74,10 +74,11 @@ Below tags are the ones that have special meaning / styling, all other tags will
 - TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
   - Attribute: `<table border="1">`
   - Inline style: `<table style="border: 1px solid #f00">`
+- SVG via [flutter_svg](https://pub.dev/packages/flutter_svg)
 - VIDEO via [chewie](https://pub.dev/packages/chewie)
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
   DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, INS,
-  KBD, MAIN, NAV, P, PRE, Q, S, SAMP, SECTION, STRIKE, STRONG, TT, U, VAR
+  KBD, MAIN, NAV, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, STRIKE, STRONG, SUB, SUP, TT, U, VAR
 
 These tags and their contents will be ignored:
 
@@ -98,6 +99,7 @@ These tags and their contents will be ignored:
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
 - margin and margin-xxx (values in px only)
+- vertical-align: baseline/top/bottom/middle/sub/super
 - text-align: center/justify/left/right
 - text-decoration: line-through/none/overline/underline
 

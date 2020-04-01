@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
 import 'package:url_launcher/url_launcher.dart';
@@ -11,6 +12,7 @@ import 'web_view.dart';
 
 part 'ops/tag_a_extended.dart';
 part 'ops/tag_iframe.dart';
+part 'ops/tag_svg.dart';
 part 'ops/tag_video.dart';
 
 class WidgetFactory extends core.WidgetFactory {
@@ -18,6 +20,7 @@ class WidgetFactory extends core.WidgetFactory {
 
   BuildOp _tagAExtended;
   BuildOp _tagIframe;
+  BuildOp _tagSvg;
   BuildOp _tagVideo;
 
   WidgetFactory(this._config) : super(_config);
@@ -101,6 +104,9 @@ class WidgetFactory extends core.WidgetFactory {
       case 'iframe':
         // return asap to avoid being disabled by core
         return lazySet(meta, buildOp: tagIframe());
+      case 'svg':
+        // return asap to avoid being disabled by core
+        return lazySet(meta, buildOp: tagSvg());
       case 'video':
         meta = lazySet(meta, buildOp: tagVideo());
         break;
@@ -117,6 +123,11 @@ class WidgetFactory extends core.WidgetFactory {
   BuildOp tagIframe() {
     _tagIframe ??= _TagIframe(this).buildOp;
     return _tagIframe;
+  }
+
+  BuildOp tagSvg() {
+    _tagSvg ??= _TagSvg(this).buildOp;
+    return _tagSvg;
   }
 
   BuildOp tagVideo() {

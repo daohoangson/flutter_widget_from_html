@@ -62,11 +62,8 @@ void main() {
 
   testWidgets('renders IMG tag inside', (WidgetTester tester) async {
     final html = '<a href="$kHref"><img src="$kImgSrc" /></a>';
-    final explained = await explain(tester, html);
-    expect(
-        explained,
-        equals(
-            "[RichText:[GestureDetector:child=[NetworkImage:url=$kImgSrc]]]"));
+    final e = await explain(tester, html);
+    expect(e, equals("[GestureDetector:child=[NetworkImage:url=$kImgSrc]]"));
   });
 
   testWidgets('renders margin inside', (WidgetTester tester) async {

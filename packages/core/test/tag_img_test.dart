@@ -13,14 +13,14 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[RichText:[NetworkImage:url=$src]]'),
+        equals('[NetworkImage:url=$src]'),
       );
     });
 
     testWidgets('renders data-src', (WidgetTester tester) async {
       final html = '<img data-src="$src" />';
       final e = await explain(tester, html);
-      expect(e, equals('[RichText:[NetworkImage:url=$src]]'));
+      expect(e, equals('[NetworkImage:url=$src]'));
     });
 
     testWidgets('renders data uri', (WidgetTester tester) async {
@@ -28,7 +28,7 @@ void main() {
       final html = '<img src="data:image/gif;base64,'
           'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:[MemoryImage:]]'));
+      expect(explained, equals('[MemoryImage:]'));
     });
 
     testWidgets('renders bad data uri', (WidgetTester tester) async {
@@ -79,11 +79,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:'
-              "[ImageLayout:child=[NetworkImage:url=$src],"
-              'height=600.0,'
-              'width=800.0'
-              ']]'));
+          equals("[ImageLayout:child=[NetworkImage:url=$src],"
+              'height=600.0,width=800.0]'));
     });
 
     testWidgets('renders dimensions in inline style', (tester) async {
@@ -91,11 +88,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:'
-              "[ImageLayout:child=[NetworkImage:url=$src],"
-              'height=600.0,'
-              'width=800.0'
-              ']]'));
+          equals("[ImageLayout:child=[NetworkImage:url=$src],"
+              'height=600.0,width=800.0]'));
     });
 
     testWidgets('renders between texts', (WidgetTester tester) async {
@@ -133,18 +127,14 @@ void main() {
     testWidgets('renders asset', (WidgetTester tester) async {
       final html = '<img src="asset:$assetName" />';
       final e = await explain(tester, html);
-      expect(e, equals("[RichText:[AssetImage:assetName=$assetName]]"));
+      expect(e, equals("[AssetImage:assetName=$assetName]"));
     });
 
     testWidgets('renders asset (specified package)', (tester) async {
       final package = 'package';
       final html = '<img src="asset:$assetName?package=$package" />';
-      final explained = await explain(tester, html, package: package);
-      expect(
-          explained,
-          equals(
-            "[RichText:[AssetImage:assetName=$assetName,package=$package]]",
-          ));
+      final e = await explain(tester, html, package: package);
+      expect(e, equals("[AssetImage:assetName=$assetName,package=$package]"));
     });
 
     testWidgets('renders bad asset', (WidgetTester tester) async {
@@ -174,7 +164,7 @@ void main() {
       final html = '<img src="data:image/gif;base64,'
           'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:[MemoryImage:]]'));
+      expect(explained, equals('[MemoryImage:]'));
     });
 
     testWidgets('renders bad data uri', (WidgetTester tester) async {
@@ -203,15 +193,12 @@ void main() {
       String fullUrl, {
       Uri baseUrl,
     }) async {
-      final explained = await _.explain(
+      final e = await _.explain(
         tester,
         html,
         baseUrl: baseUrl ?? Uri.parse('http://base.com/path/'),
       );
-      expect(
-        explained,
-        equals('[RichText:[NetworkImage:url=$fullUrl]]'),
-      );
+      expect(e, equals('[NetworkImage:url=$fullUrl]'));
     };
 
     testWidgets('renders full url', (WidgetTester tester) async {

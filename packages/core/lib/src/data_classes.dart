@@ -320,6 +320,8 @@ abstract class TextBit {
   TextBit get last => this;
   VoidCallback get onTap => null;
   TextStyleBuilders get tsb => null;
+
+  TextBit clone(TextBlock block);
 }
 
 class DataBit extends TextBit {
@@ -332,6 +334,10 @@ class DataBit extends TextBit {
       : assert(block != null),
         assert(data != null),
         assert(tsb != null);
+
+  @override
+  DataBit clone(TextBlock block) =>
+      DataBit(block, data, tsb.clone(block.tsb), onTap: onTap);
 
   DataBit rebuild({
     String data,
@@ -357,6 +363,9 @@ class SpaceBit extends TextBit {
   bool get hasTrailingSpace => data == null;
 
   String get data => _data;
+
+  @override
+  SpaceBit clone(TextBlock block) => SpaceBit(block, data: data);
 }
 
 class WidgetBit extends TextBit {
@@ -366,6 +375,9 @@ class WidgetBit extends TextBit {
   WidgetBit(this.block, this.widgetSpan)
       : assert(block != null),
         assert(widgetSpan != null);
+
+  @override
+  WidgetBit clone(TextBlock block) => WidgetBit(block, widgetSpan);
 
   WidgetBit rebuild({
     PlaceholderAlignment alignment,
@@ -436,7 +448,7 @@ class TextBlock extends TextBit {
     if (parent == null) return null;
     final siblings = parent._children;
     final indexOf = siblings.indexOf(this);
-    assert(indexOf != -1);
+    if (indexOf == -1) return null;
 
     for (var i = indexOf + 1; i < siblings.length; i++) {
       final next = siblings[i].first;
@@ -467,6 +479,15 @@ class TextBlock extends TextBit {
 
   void addWidget(WidgetSpan ws) => addBit(WidgetBit(this, ws));
 
+  @override
+  TextBlock clone(TextBlock parent) {
+    final cloned = TextBlock(tsb.clone(parent.tsb), parent: parent);
+    cloned._children.addAll(_children.map((child) => child.clone(cloned)));
+    return cloned;
+  }
+
+  void detach() => parent?._children?.remove(this);
+
   bool forEachBit(f(TextBit bit, int index), {bool reversed = false}) {
     final l = _children.length;
     final i0 = reversed ? l - 1 : 0;
@@ -485,16 +506,14 @@ class TextBlock extends TextBit {
   }
 
   void rebuildBits(TextBit f(TextBit bit)) {
-    var i = 0;
-    var l = _children.length;
-    while (i < l) {
+    final l = _children.length;
+    for (var i = 0; i < l; i++) {
       final child = _children[i];
       if (child is TextBlock) {
         child.rebuildBits(f);
       } else {
         _children[i] = f(child);
       }
-      i++;
     }
   }
 
@@ -525,6 +544,8 @@ class TextBlock extends TextBit {
   void trimRight() {
     while (isNotEmpty && hasTrailingSpace) removeLast();
   }
+
+  void truncate() => _children.clear();
 }
 
 class TextStyleBuilders {
@@ -543,6 +564,18 @@ class TextStyleBuilders {
   set textAlign(TextAlign v) => _textAlign = v;
 
   TextStyleBuilders({this.parent});
+
+  TextStyleBuilders clone(TextStyleBuilders parent) {
+    final cloned = TextStyleBuilders(parent: parent);
+
+    final l = _builders.length;
+    for (var i = 0; i < l; i++) {
+      cloned._builders.add(_builders[i]);
+      cloned._inputs.add(_inputs[i]);
+    }
+
+    return cloned;
+  }
 
   void enqueue<T>(TextStyleBuilder<T> builder, T input) {
     assert(_output == null, "Cannot add builder after being built");

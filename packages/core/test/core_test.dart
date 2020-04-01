@@ -263,6 +263,17 @@ void main() {
     });
   });
 
+  testWidgets('renders RUBY tag', (WidgetTester tester) async {
+    final html = '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>';
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[RichText:[Stack:children='
+            '[Padding:(3,0,3,0),child=[RichText:(:明日)]],'
+            '[Positioned:child=[Center:alignment=center,child=[RichText:(@5.0:Ashita)]]]'
+            ']@middle]'));
+  });
+
   group('block elements', () {
     final blockOutput =
         '[Column:children=[RichText:(:First.)],[RichText:(:Second one.)]]';
@@ -308,7 +319,7 @@ void main() {
       expect(
           explained,
           equals('[SizedBox:0.0x10.0],'
-              '[Padding:(0,40,0,40),child=[RichText:[NetworkImage:url=$src]]],'
+              '[Padding:(0,40,0,40),child=[NetworkImage:url=$src]],'
               '[Padding:(0,40,0,40),child=[RichText:(+i:fig. 1(: Foo))]],'
               '[SizedBox:0.0x10.0]'));
     });
@@ -641,15 +652,20 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final src = 'http://domain.com/image.png';
 
       testWidgets('renders IMG inline by default', (WidgetTester tester) async {
-        final html = '<img src="$src" />';
+        final html = 'Foo <img src="$src" />';
         final explained = await explain(tester, html);
-        expect(explained, equals("[RichText:[NetworkImage:url=$src]]"));
+        expect(explained, equals("[RichText:(:Foo [NetworkImage:url=$src])]"));
       });
 
       testWidgets('renders IMG as block', (WidgetTester tester) async {
-        final html = '<img src="$src" style="display: block" />';
+        final html = 'Foo <img src="$src" style="display: block" />';
         final explained = await explain(tester, html);
-        expect(explained, equals("[NetworkImage:url=$src]"));
+        expect(
+            explained,
+            equals('[Column:children='
+                '[RichText:(:Foo)],'
+                "[NetworkImage:url=$src]"
+                ']'));
       });
 
       testWidgets('renders IMG with dimensions inline',
@@ -658,11 +674,11 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals('[RichText:[ImageLayout:child='
+            equals('[ImageLayout:child='
                 "[NetworkImage:url=$src],"
                 'height=1.0,'
                 'width=1.0'
-                ']]'));
+                ']'));
       });
 
       testWidgets('renders IMG with dimensions as block', (tester) async {
@@ -941,7 +957,8 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 
     testWidgets('renders font-weight inline style',
         (WidgetTester tester) async {
-      final html = """<span style="font-weight: bold">bold</span>
+      final html = """
+<span style="font-weight: bold">bold</span>
 <span style="font-weight: 100">one</span>
 <span style="font-weight: 200">two</span>
 <span style="font-weight: 300">three</span>
@@ -950,7 +967,8 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 <span style="font-weight: 600">six</span>
 <span style="font-weight: 700">seven</span>
 <span style="font-weight: 800">eight</span>
-<span style="font-weight: 900">nine</span>""";
+<span style="font-weight: 900">nine</span>
+""";
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -960,13 +978,18 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
   });
 
   group('text-decoration', () {
-    testWidgets('renders DEL/INS tags', (WidgetTester tester) async {
-      final html = 'This is some <del>deleted</del> <ins>inserted</ins> text.';
+    testWidgets('renders DEL tag', (WidgetTester tester) async {
+      final html = 'This is some <del>deleted</del> text.';
       final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[RichText:(:This is some (+l:deleted)(: )' +
-              '(+u:inserted)(: text.))]'));
+      expect(explained,
+          equals('[RichText:(:This is some (+l:deleted)(: text.))]'));
+    });
+
+    testWidgets('renders INS tag', (WidgetTester tester) async {
+      final html = 'This is some <ins>inserted</ins> text.';
+      final explained = await explain(tester, html);
+      expect(explained,
+          equals('[RichText:(:This is some (+u:inserted)(: text.))]'));
     });
 
     testWidgets('renders S/STRIKE tag', (WidgetTester tester) async {
@@ -1003,19 +1026,23 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     });
 
     testWidgets('renders all', (WidgetTester tester) async {
-      final html = '<span style="text-decoration: line-through">' +
-          '<span style="text-decoration: overline">' +
-          '<span style="text-decoration: underline">' +
-          'foo bar</span></span></span>';
+      final html = """
+<span style="text-decoration: line-through">
+<span style="text-decoration: overline">
+<span style="text-decoration: underline">
+foo bar</span></span></span>
+""";
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(+l+o+u:foo bar)]'));
     });
 
     testWidgets('skips rendering', (WidgetTester tester) async {
-      final html = '<span style="text-decoration: line-through">' +
-          '<span style="text-decoration: overline">' +
-          '<span style="text-decoration: underline">' +
-          'foo <span style="text-decoration: none">bar</span></span></span></span>';
+      final html = """
+<span style="text-decoration: line-through">
+<span style="text-decoration: overline">
+<span style="text-decoration: underline">
+foo <span style="text-decoration: none">bar</span></span></span></span>
+""";
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(+l+o+u:foo (:bar))]'));
     });

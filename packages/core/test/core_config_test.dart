@@ -71,10 +71,10 @@ void main() {
       );
       expect(
           explained,
-          equals('[Padding:(10,10,10,10),child=[RichText:[ImageLayout:'
+          equals('[Padding:(10,10,10,10),child=[ImageLayout:'
               'child=[NetworkImage:url=http://base.com/path/image.png],'
               'text=image dot png'
-              ']]]'));
+              ']]'));
     });
   });
 
