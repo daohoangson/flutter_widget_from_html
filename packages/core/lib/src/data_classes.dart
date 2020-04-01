@@ -402,15 +402,16 @@ class DataBit extends TextBit {
 
 class SpaceBit extends TextBit {
   final TextBits parent;
-  String _data;
 
-  SpaceBit(this.parent, {String data})
-      : assert(parent != null),
-        _data = data;
+  final _buffer = StringBuffer();
 
-  bool get hasTrailingSpace => data == null;
+  SpaceBit(this.parent, {String data}) : assert(parent != null) {
+    if (data != null) _buffer.write(data);
+  }
 
-  String get data => _data;
+  String get data => _buffer.isEmpty ? null : _buffer.toString();
+
+  bool get hasTrailingSpace => _buffer.isEmpty;
 
   @override
   SpaceBit clone({TextBits parent}) =>
@@ -504,7 +505,7 @@ class TextBlock extends TextBits {
       if (data == null) return false;
     } else if (prev is SpaceBit) {
       if (data == null) return false;
-      prev._data = "${prev._data ?? ''}$data";
+      prev._buffer.write(data);
       return true;
     }
 
