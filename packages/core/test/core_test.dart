@@ -378,8 +378,11 @@ void main() {
 
   group('code', () {
     testWidgets('renders CODE tag', (WidgetTester tester) async {
-      final html =
-          """<code><span style="color: #000000"><span style="color: #0000BB">&lt;?php phpinfo</span><span style="color: #007700">(); </span><span style="color: #0000BB">?&gt;</span></span></code>""";
+      final html = '<code><span style="color: #000000">'
+          '<span style="color: #0000BB">&lt;?php phpinfo</span>'
+          '<span style="color: #007700">(); </span>'
+          '<span style="color: #0000BB">?&gt;</span>'
+          '</span></code>';
       final explained = await explain(tester, html);
       expect(
           explained,

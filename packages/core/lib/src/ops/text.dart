@@ -60,7 +60,7 @@ class _TextBlockCompiler {
       if (newLines > 0) {
         _compiled.add(SpacingPlaceholder(
           height: CssLength(newLines.toDouble(), unit: CssLengthUnit.em),
-          tsb: bit.block.tsb,
+          tsb: bit.parent.tsb,
         ));
       }
       return;
@@ -120,25 +120,25 @@ class _TextBlockCompiler {
 
     // the below code will find the best style for this whitespace bit
     // easy case: whitespace at the beginning of a tag, use the previous style
-    final block = bit.block;
-    if (bit == block.first) return null;
+    final parent = bit.parent;
+    if (bit.isFirst) return null;
 
     // complicated: whitespace at the end of a tag, try to merge with the next
     // unless it has unrelated style (e.g. next bit is a sibling)
-    if (bit == block.last) {
-      final next = bit.block.next;
+    if (bit == TextBit.lastOf(parent)) {
+      final next = TextBit.nextOf(bit);
       if (next?.tsb != null) {
         // get the outer-most block having this as the last bit
-        var bb = bit.block;
-        var bbLast = bb.last;
+        var bp = bit.parent;
+        var bpLast = TextBit.lastOf(bp);
         while (true) {
-          final parentLast = bb.parent?.last;
-          if (bbLast != parentLast) break;
-          bb = bb.parent;
-          bbLast = parentLast;
+          final parentLast = TextBit.lastOf(bp.parent);
+          if (bpLast != parentLast) break;
+          bp = bp.parent;
+          bpLast = parentLast;
         }
 
-        if (bb.parent == next.block) {
+        if (bp.parent == next.parent) {
           return next.tsb;
         } else {
           return null;
@@ -146,7 +146,7 @@ class _TextBlockCompiler {
       }
     }
 
-    // fallback to default (style from block)
-    return bit.block.tsb;
+    // fallback to default (style from parent)
+    return bit.parent.tsb;
   }
 }

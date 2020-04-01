@@ -23,8 +23,8 @@ class _TagQ {
             firstBit ??= bit;
 
             if (!bit.hasTrailingSpace) {
-              final bb = bit.block;
-              bb.addBit(DataBit(bb, kTagQOpening, bb.tsb), index: i);
+              final bp = bit.parent;
+              bp.addBit(DataBit(bp, kTagQOpening, bp.tsb), index: i);
               addedOpening = true;
               return false;
             }
@@ -38,8 +38,8 @@ class _TagQ {
             lastBit ??= bit;
 
             if (!bit.hasTrailingSpace) {
-              final bb = bit.block;
-              bb.addBit(DataBit(bb, kTagQClosing, bb.tsb), index: i + 1);
+              final bp = bit.parent;
+              bp.addBit(DataBit(bp, kTagQClosing, bp.tsb), index: i + 1);
               addedClosing = true;
               return false;
             }

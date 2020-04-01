@@ -33,7 +33,7 @@ class _StyleVerticalAlign {
       return piece;
 
     final block = piece.block;
-    final cloned = block.clone(block.parent);
+    final cloned = block.clone(parent: block.parent);
     block
       ..truncate()
       ..addWidget(
