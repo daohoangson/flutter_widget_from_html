@@ -181,26 +181,26 @@ class CssBorders {
 
 class CssMargin {
   CssLength bottom;
+  CssLength end;
   CssLength left;
   CssLength right;
+  CssLength start;
   CssLength top;
-
-  bool get isNotEmpty =>
-      bottom?.isNotEmpty == true ||
-      left?.isNotEmpty == true ||
-      right?.isNotEmpty == true ||
-      top?.isNotEmpty == true;
 
   CssMargin copyWith({
     CssLength bottom,
+    CssLength end,
     CssLength left,
     CssLength right,
+    CssLength start,
     CssLength top,
   }) =>
       CssMargin()
         ..bottom = bottom ?? this.bottom
+        ..end = end ?? this.end
         ..left = left ?? this.left
         ..right = right ?? this.right
+        ..start = start ?? this.start
         ..top = top ?? this.top;
 }
 

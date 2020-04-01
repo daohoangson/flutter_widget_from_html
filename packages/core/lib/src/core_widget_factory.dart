@@ -387,6 +387,10 @@ class WidgetFactory {
   }
 
   NodeMetadata parseElement(NodeMetadata meta, dom.Element element) {
+    if (element.attributes.containsKey('dir')) {
+      meta = lazySet(meta, buildOp: attrDir(element.attributes['dir']));
+    }
+
     if (_config.builderCallback != null) {
       meta = _config.builderCallback(meta, element);
     }
@@ -716,8 +720,10 @@ class WidgetFactory {
 
       case kCssMargin:
       case kCssMarginBottom:
+      case kCssMarginEnd:
       case kCssMarginLeft:
       case kCssMarginRight:
+      case kCssMarginStart:
       case kCssMarginTop:
         meta = lazySet(meta, buildOp: styleMargin());
         break;
@@ -753,10 +759,30 @@ class WidgetFactory {
       case kCssVerticalAlign:
         meta = lazySet(meta, buildOp: styleVerticalAlign());
         break;
+
+      case 'direction':
+        meta = lazySet(meta, buildOp: attrDir(value));
+        break;
     }
 
     return meta;
   }
+
+  BuildOp attrDir(final String dir) => BuildOp(
+        onWidgets: (_, ws) {
+          final textDirection = dir == 'rtl'
+              ? TextDirection.rtl
+              : dir == 'ltr' ? TextDirection.ltr : null;
+
+          if (textDirection == null) return ws;
+          return [
+            Directionality(
+              child: buildColumn(ws),
+              textDirection: textDirection,
+            )
+          ];
+        },
+      );
 
   BuildOp styleBgColor() {
     _styleBgColor ??= _StyleBgColor(this).buildOp;

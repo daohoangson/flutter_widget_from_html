@@ -2,8 +2,10 @@ part of '../core_widget_factory.dart';
 
 const kCssMargin = 'margin';
 const kCssMarginBottom = 'margin-bottom';
+const kCssMarginEnd = 'margin-end';
 const kCssMarginLeft = 'margin-left';
 const kCssMarginRight = 'margin-right';
+const kCssMarginStart = 'margin-start';
 const kCssMarginTop = 'margin-top';
 
 Iterable<Widget> _marginBuilder(
@@ -11,10 +13,16 @@ Iterable<Widget> _marginBuilder(
   Iterable<Widget> children,
   _MarginBuilderInput input,
 ) {
+  final direction = Directionality.of(bc.context);
+  final marginLeft = input.marginLeft ??
+      (direction == TextDirection.ltr ? input.marginStart : input.marginEnd);
+  final marginRight = input.marginRight ??
+      (direction == TextDirection.ltr ? input.marginEnd : input.marginStart);
+
   final tsb = input.meta.tsb;
   final padding = EdgeInsets.only(
-    left: input.marginLeft?.getValue(bc, tsb) ?? 0.0,
-    right: input.marginRight?.getValue(bc, tsb) ?? 0.0,
+    left: marginLeft?.getValue(bc, tsb) ?? 0.0,
+    right: marginRight?.getValue(bc, tsb) ?? 0.0,
   );
 
   return children.map((child) {
@@ -34,8 +42,10 @@ Iterable<Widget> _marginBuilder(
 }
 
 class _MarginBuilderInput {
+  CssLength marginEnd;
   CssLength marginLeft;
   CssLength marginRight;
+  CssLength marginStart;
   NodeMetadata meta;
   WidgetFactory wf;
 }
@@ -84,7 +94,10 @@ class _StyleMargin {
           if (m == null) return null;
 
           final t = m.top?.isNotEmpty == true;
-          final lr = m.left?.isNotEmpty == true || m.right?.isNotEmpty == true;
+          final lr = m.end?.isNotEmpty == true ||
+              m.left?.isNotEmpty == true ||
+              m.right?.isNotEmpty == true ||
+              m.start?.isNotEmpty == true;
           final b = m.bottom?.isNotEmpty == true;
           final ws = List<Widget>((t ? 1 : 0) + widgets.length + (b ? 1 : 0));
           final tsb = meta.tsb;
@@ -95,8 +108,10 @@ class _StyleMargin {
           if (lr) {
             for (final widget in widgets) {
               final input = _MarginBuilderInput()
+                ..marginEnd = m.end
                 ..marginLeft = m.left
                 ..marginRight = m.right
+                ..marginStart = m.start
                 ..meta = meta
                 ..wf = wf;
 
@@ -138,8 +153,10 @@ class _StyleMarginParser {
           break;
 
         case kCssMarginBottom:
+        case kCssMarginEnd:
         case kCssMarginLeft:
         case kCssMarginRight:
+        case kCssMarginStart:
         case kCssMarginTop:
           output = _parseOne(output, key, value);
           break;
@@ -154,9 +171,9 @@ class _StyleMarginParser {
     if (valuesFour != null) {
       return CssMargin()
         ..top = _parseValue(valuesFour[1])
-        ..right = _parseValue(valuesFour[2])
+        ..end = _parseValue(valuesFour[2])
         ..bottom = _parseValue(valuesFour[3])
-        ..left = _parseValue(valuesFour[4]);
+        ..start = _parseValue(valuesFour[4]);
     }
 
     final valuesTwo = _valuesTwoRegExp.firstMatch(value);
@@ -165,16 +182,16 @@ class _StyleMarginParser {
       final leftRight = _parseValue(valuesTwo[2]);
       return CssMargin()
         ..bottom = topBottom
-        ..left = leftRight
-        ..right = leftRight
+        ..end = leftRight
+        ..start = leftRight
         ..top = topBottom;
     }
 
     final all = _parseValue(value);
     return CssMargin()
       ..bottom = all
-      ..left = all
-      ..right = all
+      ..end = all
+      ..start = all
       ..top = all;
   }
 
@@ -187,11 +204,17 @@ class _StyleMarginParser {
     switch (key) {
       case kCssMarginBottom:
         return existing.copyWith(bottom: parsed);
+      case kCssMarginEnd:
+        return existing.copyWith(end: parsed);
       case kCssMarginLeft:
         return existing.copyWith(left: parsed);
       case kCssMarginRight:
         return existing.copyWith(right: parsed);
+      case kCssMarginStart:
+        return existing.copyWith(start: parsed);
       default:
+        // it's safe to assume key == kCssMarginTop because
+        // this function is only called from within this class
         return existing.copyWith(top: parsed);
     }
   }

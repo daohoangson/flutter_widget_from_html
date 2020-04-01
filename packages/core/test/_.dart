@@ -63,10 +63,22 @@ Future<String> explain(
 final _explainMarginRegExp = RegExp(
     r'^\[Column:children=\[RichText:\(:x\)\],(.+),\[RichText:\(:x\)\]\]$');
 
-Future<String> explainMargin(WidgetTester tester, String html) async {
+Future<String> explainMargin(
+  WidgetTester tester,
+  String html, {
+  bool rtl = false,
+}) async {
   final explained = await explain(
     tester,
-    "x${html}x",
+    null,
+    hw: Directionality(
+      textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
+      child: HtmlWidget(
+        "x${html}x",
+        bodyPadding: const EdgeInsets.all(0),
+        key: hwKey,
+      ),
+    ),
   );
   final match = _explainMarginRegExp.firstMatch(explained);
   return match == null ? explained : match[1];
@@ -180,22 +192,13 @@ class Explainer {
   String _tableRows(Table table) =>
       table.children.map((r) => _tableRow(r)).toList().join('\n');
 
-  String _textAlign(TextAlign textAlign) {
-    switch (textAlign) {
-      case TextAlign.center:
-        return 'center';
-      case TextAlign.end:
-        return 'end';
-      case TextAlign.justify:
-        return 'justify';
-      case TextAlign.left:
-        return 'left';
-      case TextAlign.right:
-        return 'right';
-      default:
-        return '';
-    }
-  }
+  String _textAlign(TextAlign textAlign) =>
+      (textAlign != null && textAlign != TextAlign.start)
+          ? textAlign.toString().replaceAll('TextAlign.', '')
+          : '';
+
+  String _textDirection(TextDirection textDirection) =>
+      textDirection.toString().replaceAll('TextDirection.', '');
 
   String _textStyle(TextStyle style, TextStyle parent) {
     String s = '';
@@ -292,25 +295,27 @@ class Explainer {
             ? "aspectRatio=${widget.aspectRatio.toStringAsFixed(2)},"
             : widget is DecoratedBox
                 ? _boxDecoration(widget.decoration)
-                : widget is GestureDetector
-                    ? "child=${_widget(widget.child)}"
-                    : widget is InkWell
+                : widget is Directionality
+                    ? "${_textDirection(widget.textDirection)},"
+                    : widget is GestureDetector
                         ? "child=${_widget(widget.child)}"
-                        : widget is LimitedBox
-                            ? _limitBox(widget)
-                            : widget is Padding
-                                ? "${_edgeInsets(widget.padding)},"
-                                : widget is RichText
-                                    ? _inlineSpan(widget.text)
-                                    : widget is SizedBox
-                                        ? "${widget.width?.toStringAsFixed(1) ?? 0.0}x${widget.height?.toStringAsFixed(1) ?? 0.0}"
-                                        : widget is Table
-                                            ? _tableBorder(widget.border)
-                                            : widget is Text
-                                                ? widget.data
-                                                : widget is Wrap
-                                                    ? _wrap(widget)
-                                                    : '';
+                        : widget is InkWell
+                            ? "child=${_widget(widget.child)}"
+                            : widget is LimitedBox
+                                ? _limitBox(widget)
+                                : widget is Padding
+                                    ? "${_edgeInsets(widget.padding)},"
+                                    : widget is RichText
+                                        ? _inlineSpan(widget.text)
+                                        : widget is SizedBox
+                                            ? "${widget.width?.toStringAsFixed(1) ?? 0.0}x${widget.height?.toStringAsFixed(1) ?? 0.0}"
+                                            : widget is Table
+                                                ? _tableBorder(widget.border)
+                                                : widget is Text
+                                                    ? widget.data
+                                                    : widget is Wrap
+                                                        ? _wrap(widget)
+                                                        : '';
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));

@@ -85,15 +85,20 @@ These tags and their contents will be ignored:
 - SCRIPT
 - STYLE
 
+### Attributes
+
+- dir: `auto`, `ltr` and `rtl`
+
 ### Inline stylings
 
 - border-top, border-bottom: overline/underline with support for dashed/dotted/double/solid style
 - color: hex values only (`#F00`, `#0F08`, `#00FF00` or `#00FF0080`)
+- direction (similar to `dir` attribute)
 - font-family
 - font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) and value in em/px
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
-- margin, margin-top, margin-right, margin-bottom, margin-left (values in px only)
+- margin and margin-xxx (values in px only)
 - vertical-align: baseline/top/bottom/middle/sub/super
 - text-align: center/justify/left/right
 - text-decoration: line-through/none/overline/underline
