@@ -46,7 +46,8 @@ class _TagRuby {
           rtBlock = null;
 
           final block = piece.block;
-          final cloned = block.clone(parent: block.parent)..trimRight();
+          final cloned = block.clone(parent: block.parent);
+          TextBits.trimRight(cloned);
           if (cloned.isEmpty) break;
 
           block

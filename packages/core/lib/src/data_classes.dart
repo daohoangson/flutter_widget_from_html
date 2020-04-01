@@ -391,6 +391,28 @@ abstract class TextBits extends TextBit {
 
   void addBit(TextBit bit);
   TextBits sub(TextStyleBuilders tsb);
+
+  static int trimRight(TextBits bits) {
+    final children = bits._children;
+    var trimmed = 0;
+
+    while (children.isNotEmpty && bits.hasTrailingSpace) {
+      final child = children.last;
+      if (child is TextBits) {
+        final _trimmed = trimRight(child);
+        if (_trimmed > 0) {
+          trimmed += _trimmed;
+        } else {
+          children.removeLast();
+        }
+      } else {
+        children.removeLast();
+        trimmed++;
+      }
+    }
+
+    return trimmed;
+  }
 }
 
 class DataBit extends TextBit {
@@ -556,33 +578,11 @@ class TextBlock extends TextBits {
     }
   }
 
-  TextBit removeLast() {
-    while (true) {
-      if (_children.isEmpty) return null;
-
-      final lastChild = _children.last;
-      if (lastChild is TextBlock) {
-        final removed = lastChild.removeLast();
-        if (removed != null) {
-          return removed;
-        } else {
-          _children.removeLast();
-        }
-      } else {
-        return _children.removeLast();
-      }
-    }
-  }
-
   @override
   TextBlock sub(TextStyleBuilders tsb) {
     final sub = TextBlock(tsb, parent: this);
     _children.add(sub);
     return sub;
-  }
-
-  void trimRight() {
-    while (isNotEmpty && hasTrailingSpace) removeLast();
   }
 
   void truncate() => _children.clear();

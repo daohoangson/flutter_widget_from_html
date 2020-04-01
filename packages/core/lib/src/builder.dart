@@ -41,7 +41,9 @@ class Builder {
         }
       } else {
         final block = piece.block;
-        if ((block..trimRight()).isNotEmpty) {
+        TextBits.trimRight(block);
+
+        if (block.isNotEmpty) {
           list.add(WidgetPlaceholder(
             builder: wf.buildText,
             input: block,
