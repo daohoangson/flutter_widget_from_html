@@ -576,7 +576,7 @@ class WidgetFactory {
         meta = lazySet(meta, styles: [kCssMargin, '1em 0']);
         break;
 
-      case kTagQ:
+      case 'q':
         meta = lazySet(meta, buildOp: tagQ());
         break;
 

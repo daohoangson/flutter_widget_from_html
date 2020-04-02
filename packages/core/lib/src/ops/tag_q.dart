@@ -1,9 +1,5 @@
 part of '../core_widget_factory.dart';
 
-const kTagQ = 'q';
-const kTagQOpening = '“';
-const kTagQClosing = '”';
-
 class _TagQ {
   final WidgetFactory wf;
 
@@ -15,8 +11,8 @@ class _TagQ {
           final lastBlock = pieces.last?.block;
           if (firstBlock == lastBlock && firstBlock.isEmpty) {
             final block = firstBlock;
-            block.add(DataBit(block, kTagQOpening, block.tsb));
-            block.add(DataBit(block, kTagQClosing, block.tsb));
+            block.add(_TagQBit(block, isOpening: true));
+            block.add(_TagQBit(block, isOpening: false));
             return pieces;
           }
 
@@ -26,11 +22,24 @@ class _TagQ {
           final lastBp = lastBit?.parent;
 
           if (firstBp != null && lastBp != null) {
-            DataBit(firstBp, kTagQOpening, firstBp.tsb).insertBefore(firstBit);
-            DataBit(lastBp, kTagQClosing, lastBp.tsb).insertAfter(lastBit);
+            _TagQBit(firstBp, isOpening: true).insertBefore(firstBit);
+            _TagQBit(lastBp, isOpening: false).insertAfter(lastBit);
           }
 
           return pieces;
         },
       );
+}
+
+class _TagQBit extends TextBit {
+  final bool isOpening;
+
+  _TagQBit(TextBits parent, {@required this.isOpening}) : super(parent);
+
+  String get data => isOpening ? '“' : '”';
+
+  TextStyleBuilders get tsb => parent.tsb;
+
+  @override
+  _TagQBit clone({TextBits parent}) => _TagQBit(parent, isOpening: isOpening);
 }

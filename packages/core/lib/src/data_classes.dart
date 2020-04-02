@@ -348,7 +348,7 @@ abstract class TextBit {
     return true;
   }
 
-  TextBit _clone({TextBits parent});
+  TextBit clone({TextBits parent});
 
   static TextBit nextOf(TextBit bit) {
     var x = bit;
@@ -423,20 +423,20 @@ abstract class TextBits extends TextBit {
   }
 }
 
-class DataBit extends TextBit {
+class _DataBit extends TextBit {
   final String data;
   final TextStyleBuilders tsb;
 
-  DataBit(TextBits parent, this.data, this.tsb)
+  _DataBit(TextBits parent, this.data, this.tsb)
       : assert(parent != null),
         assert(data != null),
         assert(tsb != null),
         super(parent);
 
   @override
-  DataBit _clone({TextBits parent}) {
+  _DataBit clone({TextBits parent}) {
     parent ??= this.parent;
-    return DataBit(parent, data, tsb._clone(parent: parent.tsb));
+    return _DataBit(parent, data, tsb.clone(parent: parent.tsb));
   }
 }
 
@@ -459,7 +459,7 @@ class _SpaceBit extends TextBit {
   bool get isSpacing => true;
 
   @override
-  _SpaceBit _clone({TextBits parent}) =>
+  _SpaceBit clone({TextBits parent}) =>
       _SpaceBit(parent ?? this.parent, data: data);
 }
 
@@ -477,19 +477,19 @@ class WidgetBit extends TextBit {
         assert(widget != null),
         super(parent);
 
+  @override
+  WidgetBit clone({TextBits parent}) => WidgetBit(
+        parent ?? this.parent,
+        widget,
+        alignment: alignment,
+        baseline: baseline,
+      );
+
   WidgetSpan compile(TextStyle style) => WidgetSpan(
         alignment: alignment,
         baseline: baseline,
         child: widget,
         style: style,
-      );
-
-  @override
-  WidgetBit _clone({TextBits parent}) => WidgetBit(
-        parent ?? this.parent,
-        widget,
-        alignment: alignment,
-        baseline: baseline,
       );
 }
 
@@ -563,12 +563,13 @@ class TextBlock extends TextBits {
     return true;
   }
 
-  void addText(String data) => add(DataBit(this, data, tsb));
+  void addText(String data) => add(_DataBit(this, data, tsb));
 
+  @override
   TextBlock clone({TextBits parent}) {
     parent ??= this.parent;
-    final cloned = TextBlock(tsb._clone(parent: parent?.tsb), parent: parent);
-    cloned._children.addAll(_children.map((c) => c._clone(parent: cloned)));
+    final cloned = TextBlock(tsb.clone(parent: parent?.tsb), parent: parent);
+    cloned._children.addAll(_children.map((c) => c.clone(parent: cloned)));
     return cloned;
   }
 
@@ -581,9 +582,6 @@ class TextBlock extends TextBits {
     _children.add(sub);
     return sub;
   }
-
-  @override
-  TextBlock _clone({TextBits parent}) => clone(parent: parent);
 }
 
 class TextStyleBuilders {
@@ -604,6 +602,18 @@ class TextStyleBuilders {
   set textAlign(TextAlign v) => _textAlign = v;
 
   TextStyleBuilders({this.parent});
+
+  TextStyleBuilders clone({TextStyleBuilders parent}) {
+    final cloned = TextStyleBuilders(parent: parent ?? this.parent);
+
+    final l = _builders.length;
+    for (var i = 0; i < l; i++) {
+      cloned._builders.add(_builders[i]);
+      cloned._inputs.add(_inputs[i]);
+    }
+
+    return cloned;
+  }
 
   void enqueue<T>(TextStyleBuilder<T> builder, T input) {
     assert(_output == null, "Cannot add builder after being built");
@@ -630,18 +640,6 @@ class TextStyleBuilders {
   }
 
   TextStyleBuilders sub() => TextStyleBuilders(parent: this);
-
-  TextStyleBuilders _clone({TextStyleBuilders parent}) {
-    final cloned = TextStyleBuilders(parent: parent ?? this.parent);
-
-    final l = _builders.length;
-    for (var i = 0; i < l; i++) {
-      cloned._builders.add(_builders[i]);
-      cloned._inputs.add(_inputs[i]);
-    }
-
-    return cloned;
-  }
 
   void _resetContextIfNeeded(BuilderContext bc) {
     if (bc == _bc) return;

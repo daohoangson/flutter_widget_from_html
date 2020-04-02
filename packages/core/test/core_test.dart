@@ -241,6 +241,12 @@ void main() {
         equals('[RichText:(:Someone said (+u+i:“F)(+u:o)(+u+b:o”)(:.))]'),
       );
     });
+
+    testWidgets('renders within vertical-align middle', (tester) async {
+      final html = '<span style="vertical-align: middle"><q>Foo</q></span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:[RichText:(:“Foo”)]@middle]'));
+    });
   });
 
   testWidgets('renders RUBY tag', (WidgetTester tester) async {
