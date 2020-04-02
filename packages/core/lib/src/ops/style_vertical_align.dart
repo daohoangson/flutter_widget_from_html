@@ -35,8 +35,8 @@ class _StyleVerticalAlign {
     final block = piece.block;
     final cloned = block.clone(parent: block.parent);
     block
-      ..truncate()
-      ..addBit(WidgetBit(
+      ..clear()
+      ..add(WidgetBit(
         block,
         WidgetPlaceholder<_StyleVerticalAlign>(builder: (bc, _, __) {
           var built = wf.buildText(bc, null, cloned);

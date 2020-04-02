@@ -159,7 +159,7 @@ class _TagImg {
             return pieces;
           }
 
-          block.addBit(_ImageBit(block, this, img));
+          block.add(_ImageBit(block, this, img));
           return pieces;
         },
         onWidgets: (meta, widgets) {

@@ -321,7 +321,6 @@ abstract class TextBit {
   bool get isNotEmpty => !isEmpty;
   TextStyleBuilders get tsb => null;
 
-  TextBit clone({TextBits parent});
   bool detach() => parent?._children?.remove(this);
 
   bool insertAfter(TextBit another) {
@@ -345,6 +344,8 @@ abstract class TextBit {
     siblings.insert(indexOf, this);
     return true;
   }
+
+  TextBit _clone({TextBits parent});
 
   static TextBit nextOf(TextBit bit) {
     var x = bit;
@@ -390,7 +391,8 @@ abstract class TextBits extends TextBit {
   TextBit get last;
   List<TextBit> get _children;
 
-  void addBit(TextBit bit);
+  void add(TextBit bit);
+  void clear();
   TextBits sub(TextStyleBuilders tsb);
 
   static int trimRight(TextBits bits) {
@@ -427,17 +429,9 @@ class DataBit extends TextBit {
         assert(tsb != null);
 
   @override
-  DataBit clone({
-    TextBits parent,
-    String data,
-    TextStyleBuilders tsb,
-  }) {
+  DataBit _clone({TextBits parent}) {
     parent ??= this.parent;
-    return DataBit(
-      parent,
-      data ?? this.data,
-      tsb ?? this.tsb._clone(parent: parent.tsb),
-    );
+    return DataBit(parent, data, tsb._clone(parent: parent.tsb));
   }
 }
 
@@ -455,7 +449,7 @@ class SpaceBit extends TextBit {
   bool get hasTrailingSpace => _buffer.isEmpty;
 
   @override
-  SpaceBit clone({TextBits parent}) =>
+  SpaceBit _clone({TextBits parent}) =>
       SpaceBit(parent ?? this.parent, data: data);
 }
 
@@ -481,17 +475,11 @@ class WidgetBit extends TextBit {
       );
 
   @override
-  WidgetBit clone({
-    TextBits parent,
-    PlaceholderAlignment alignment,
-    TextBaseline baseline,
-    Widget widget,
-  }) =>
-      WidgetBit(
+  WidgetBit _clone({TextBits parent}) => WidgetBit(
         parent ?? this.parent,
-        widget ?? this.widget,
-        alignment: alignment ?? this.alignment,
-        baseline: baseline ?? this.baseline,
+        widget,
+        alignment: alignment,
+        baseline: baseline,
       );
 }
 
@@ -548,7 +536,7 @@ class TextBlock extends TextBits {
   }
 
   @override
-  void addBit(TextBit bit) => _children.add(bit);
+  void add(TextBit bit) => _children.add(bit);
 
   bool addSpace([String data]) {
     final tail = TextBit.tailOf(this);
@@ -560,18 +548,21 @@ class TextBlock extends TextBits {
       return true;
     }
 
-    addBit(SpaceBit(this, data: data));
+    add(SpaceBit(this, data: data));
     return true;
   }
 
-  void addText(String data) => addBit(DataBit(this, data, tsb));
+  void addText(String data) => add(DataBit(this, data, tsb));
 
-  @override
   TextBlock clone({TextBits parent}) {
-    final cloned = TextBlock(tsb._clone(parent: parent.tsb), parent: parent);
-    cloned._children.addAll(_children.map((c) => c.clone(parent: cloned)));
+    parent ??= this.parent;
+    final cloned = TextBlock(tsb._clone(parent: parent?.tsb), parent: parent);
+    cloned._children.addAll(_children.map((c) => c._clone(parent: cloned)));
     return cloned;
   }
+
+  @override
+  void clear() => _children.clear();
 
   @override
   TextBlock sub(TextStyleBuilders tsb) {
@@ -580,7 +571,8 @@ class TextBlock extends TextBits {
     return sub;
   }
 
-  void truncate() => _children.clear();
+  @override
+  TextBlock _clone({TextBits parent}) => clone(parent: parent);
 }
 
 class TextStyleBuilders {

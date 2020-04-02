@@ -15,8 +15,8 @@ class _TagQ {
           final lastBlock = pieces.last?.block;
           if (firstBlock == lastBlock && firstBlock.isEmpty) {
             final block = firstBlock;
-            block.addBit(DataBit(block, kTagQOpening, block.tsb));
-            block.addBit(DataBit(block, kTagQClosing, block.tsb));
+            block.add(DataBit(block, kTagQOpening, block.tsb));
+            block.add(DataBit(block, kTagQClosing, block.tsb));
             return pieces;
           }
 

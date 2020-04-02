@@ -51,8 +51,8 @@ class _TagRuby {
           if (cloned.isEmpty) break;
 
           block
-            ..truncate()
-            ..addBit(_buildWidgetBit(block, cloned, _rtBlock));
+            ..clear()
+            ..add(_buildWidgetBit(block, cloned, _rtBlock));
         }
 
         return pieces;
