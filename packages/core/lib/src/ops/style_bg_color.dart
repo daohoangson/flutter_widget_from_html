@@ -35,7 +35,7 @@ class _StyleBgColor {
       });
 
   void _buildBlock(BuiltPiece piece, Color bgColor) {
-    for (final bit in piece.block.bits) {
+    for (final bit in piece.text.bits) {
       bit.tsb?.enqueue(_styleBgColorTextStyleBuilder, bgColor);
     }
   }

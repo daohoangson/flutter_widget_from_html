@@ -60,12 +60,12 @@ class _PriorityTest extends WidgetFactory {
   NodeMetadata parseLocalName(NodeMetadata meta, String localName) {
     meta = lazySet(meta,
         buildOp: BuildOp(
-          onPieces: (_, pieces) => pieces.map((p) => p..block?.addText(' A')),
+          onPieces: (_, pieces) => pieces.map((p) => p..text?.addText(' A')),
           priority: a,
         ));
     meta = lazySet(meta,
         buildOp: BuildOp(
-          onPieces: (_, pieces) => pieces.map((p) => p..block?.addText(' B')),
+          onPieces: (_, pieces) => pieces.map((p) => p..text?.addText(' B')),
           priority: b,
         ));
 

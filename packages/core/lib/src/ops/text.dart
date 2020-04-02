@@ -1,7 +1,7 @@
 part of '../core_widget_factory.dart';
 
-class _TextBlockCompiler {
-  final TextBlock block;
+class _TextCompiler {
+  final TextBits text;
 
   BuilderContext _bc;
   List _compiled;
@@ -11,13 +11,13 @@ class _TextBlockCompiler {
   TextStyle _style, _prevStyle;
   GestureTapCallback _onTap, _prevOnTap;
 
-  _TextBlockCompiler(this.block) : assert(block != null);
+  _TextCompiler(this.text) : assert(text != null);
 
   List compile(BuilderContext bc) {
     _bc = bc;
     _compiled = [];
 
-    for (final bit in block.bits) {
+    for (final bit in text.bits) {
       _loop(bit);
     }
     _completeLoop();
@@ -25,7 +25,7 @@ class _TextBlockCompiler {
     if (_compiled.isEmpty)
       _compiled.add(SpacingPlaceholder(
         height: CssLength(1, unit: CssLengthUnit.em),
-        tsb: block.tsb,
+        tsb: text.tsb,
       ));
 
     return _compiled;
@@ -51,7 +51,7 @@ class _TextBlockCompiler {
     final style = tsb?.build(_bc) ?? _prevStyle;
     if (onTap != _prevOnTap || style != _prevStyle) _saveSpan();
 
-    if (bit is WidgetBit) {
+    if (bit.canCompile) {
       _saveSpan();
       _spans.add(bit.compile(style));
       return;
@@ -97,7 +97,7 @@ class _TextBlockCompiler {
 
       if (span is WidgetSpan &&
           span.alignment == PlaceholderAlignment.baseline &&
-          (block.tsb?.textAlign ?? TextAlign.start) == TextAlign.start) {
+          (text.tsb?.textAlign ?? TextAlign.start) == TextAlign.start) {
         widget = span.child;
       }
     } else if (_spans.isNotEmpty || _buffer.isNotEmpty) {
@@ -131,7 +131,7 @@ class _TextBlockCompiler {
     if (bit == TextBit.tailOf(parent)) {
       final next = TextBit.nextOf(bit);
       if (next?.tsb != null) {
-        // get the outer-most block having this as the last bit
+        // get the outer-most text having this as the last bit
         var bp = bit.parent;
         var bpTail = TextBit.tailOf(bp);
         while (true) {

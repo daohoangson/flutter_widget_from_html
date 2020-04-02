@@ -105,7 +105,7 @@ class _ImageLayoutDelegate extends SingleChildLayoutDelegate {
       height != other.height || width != other.width;
 }
 
-class _ImageBit extends WidgetBit {
+class _ImageBit extends _WidgetBit {
   _ImageBit(TextBits parent, _TagImg self, _TagImgMetadata img)
       : super(
           parent,
@@ -152,14 +152,14 @@ class _TagImg {
         onPieces: (meta, pieces) {
           if (meta.isBlockElement) return pieces;
 
-          final block = pieces.last?.block;
+          final text = pieces.last?.text;
           final img = _parseMetadata(meta, wf);
           if (img.url?.isNotEmpty != true && img.text?.isNotEmpty == true) {
-            block.addText(img.text);
+            text.addText(img.text);
             return pieces;
           }
 
-          block.add(_ImageBit(block, this, img));
+          text.children.add(_ImageBit(text, this, img));
           return pieces;
         },
         onWidgets: (meta, widgets) {

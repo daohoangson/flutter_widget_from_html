@@ -7,20 +7,20 @@ class _TagQ {
 
   BuildOp get buildOp => BuildOp(
         onPieces: (_, pieces) {
-          final firstBlock = pieces.first?.block;
-          final lastBlock = pieces.last?.block;
-          if (firstBlock == lastBlock && firstBlock.isEmpty) {
-            final block = firstBlock;
-            block.add(_TagQBit(block, isOpening: true));
-            block.add(_TagQBit(block, isOpening: false));
+          final firstText = pieces.first?.text;
+          final lastText = pieces.last?.text;
+          if (firstText == lastText && firstText.isEmpty) {
+            final text = firstText;
+            text.children
+              ..add(_TagQBit(text, isOpening: true))
+              ..add(_TagQBit(text, isOpening: false));
             return pieces;
           }
 
-          final firstBit = firstBlock?.first;
+          final firstBit = firstText?.first;
           final firstBp = firstBit?.parent;
-          final lastBit = lastBlock?.last;
+          final lastBit = lastText?.last;
           final lastBp = lastBit?.parent;
-
           if (firstBp != null && lastBp != null) {
             _TagQBit(firstBp, isOpening: true).insertBefore(firstBit);
             _TagQBit(lastBp, isOpening: false).insertAfter(lastBit);

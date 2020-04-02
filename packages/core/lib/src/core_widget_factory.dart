@@ -48,8 +48,8 @@ class WidgetFactory {
   Iterable<Widget> buildAligns(
           BuilderContext bc, Iterable<Widget> widgets, Alignment alignment) =>
       widgets.map((widget) {
-        if (bc.origin is WidgetPlaceholder<TextBlock>) return widget;
-        if (widget is WidgetPlaceholder<TextBlock>) return widget;
+        if (bc.origin is WidgetPlaceholder<TextBits>) return widget;
+        if (widget is WidgetPlaceholder<TextBits>) return widget;
         return Align(alignment: alignment, child: widget);
       });
 
@@ -82,9 +82,8 @@ class WidgetFactory {
         continue;
       }
 
-      if (widget is WidgetPlaceholder<TextBlock>) {
-        final WidgetPlaceholder<TextBlock> textPlaceholder = widget;
-        widget = textPlaceholder.build(bc.context);
+      if (widget is WidgetPlaceholder<TextBits>) {
+        widget = (widget as WidgetPlaceholder).build(bc.context);
       }
 
       if (widget is SimpleColumn) {
@@ -211,14 +210,14 @@ class WidgetFactory {
   Iterable<Widget> buildText(
     BuilderContext bc,
     Iterable<Widget> _,
-    TextBlock block,
+    TextBits text,
   ) {
-    final tsb = block.tsb;
+    final tsb = text.tsb;
     tsb?.build(bc);
 
     final textScaleFactor = MediaQuery.of(bc.context).textScaleFactor;
     final widgets = <Widget>[];
-    for (final compiled in _TextBlockCompiler(block).compile(bc)) {
+    for (final compiled in _TextCompiler(text).compile(bc)) {
       if (compiled is InlineSpan) {
         widgets.add(RichText(
           text: compiled,
@@ -811,7 +810,7 @@ class WidgetFactory {
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      onPieces: (_, pieces) => pieces..last.block.addSpace('\n'),
+      onPieces: (_, pieces) => pieces..last.text.addSpace('\n'),
     );
     return _tagBr;
   }
@@ -855,4 +854,38 @@ class WidgetFactory {
     _tagTable ??= _TagTable(this).buildOp;
     return _tagTable;
   }
+}
+
+class _WidgetBit extends TextBit {
+  final PlaceholderAlignment alignment;
+  final TextBaseline baseline;
+
+  @override
+  final IWidgetPlaceholder widget;
+
+  @override
+  bool get hasWidget => true;
+
+  _WidgetBit(
+    TextBits parent,
+    this.widget, {
+    this.alignment = PlaceholderAlignment.baseline,
+    this.baseline = TextBaseline.alphabetic,
+  })  : assert(parent != null),
+        assert(widget != null),
+        assert(alignment != null),
+        assert(baseline != null),
+        super(parent);
+
+  @override
+  _WidgetBit clone({TextBits parent}) =>
+      _WidgetBit(parent ?? this.parent, widget);
+
+  @override
+  WidgetSpan compile(TextStyle style) => WidgetSpan(
+        alignment: alignment,
+        baseline: baseline,
+        child: widget,
+        style: style,
+      );
 }

@@ -9,9 +9,9 @@ final _attrStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
 
 class Builder {
   final List<dom.Node> domNodes;
-  final TextBlock parentBlock;
   final NodeMetadata parentMeta;
   final Iterable<BuildOp> parentOps;
+  final _Text parentText;
   final TextStyleBuilders parentTsb;
   final WidgetFactory wf;
 
@@ -21,9 +21,9 @@ class Builder {
 
   Builder({
     @required this.domNodes,
-    this.parentBlock,
     this.parentMeta,
     Iterable<BuildOp> parentParentOps,
+    this.parentText,
     @required this.parentTsb,
     @required this.wf,
   })  : assert(domNodes != null),
@@ -40,13 +40,13 @@ class Builder {
           if (widget != null) list.add(widget);
         }
       } else {
-        final block = piece.block;
-        TextBits.trimRight(block);
+        final text = piece.text;
+        TextBits.trimRight(text);
 
-        if (block.isNotEmpty) {
+        if (text.isNotEmpty) {
           list.add(WidgetPlaceholder(
             builder: wf.buildText,
-            input: block,
+            input: text,
           ));
         }
       }
@@ -117,9 +117,9 @@ class Builder {
       final isBlockElement = meta?.isBlockElement == true;
       final __builder = Builder(
         domNodes: domNode.nodes,
-        parentBlock: isBlockElement ? null : _textPiece.block,
         parentMeta: meta,
         parentParentOps: parentOps,
+        parentText: isBlockElement ? null : _textPiece.text,
         parentTsb: meta?.tsb ?? parentTsb,
         wf: wf,
       );
@@ -131,8 +131,8 @@ class Builder {
       }
 
       for (final __piece in __builder.process()) {
-        if (__piece.block?.parent == _textPiece.block) {
-          // same text block, do nothing
+        if (__piece.text?.parent == _textPiece.text) {
+          // same text, do nothing
           continue;
         }
 
@@ -155,8 +155,8 @@ class Builder {
 
   void _newTextPiece() => _textPiece = _Piece(
         this,
-        block: (_pieces.isEmpty ? parentBlock?.sub(parentTsb) : null) ??
-            TextBlock(parentTsb),
+        text: (_pieces.isEmpty ? parentText?.sub(parentTsb) : null) ??
+            _Text(parentTsb),
       );
 
   void _saveTextPiece() {
@@ -167,35 +167,162 @@ class Builder {
 
 class _Piece extends BuiltPiece {
   final Builder b;
-  final TextBlock block;
+  final _Text text;
   final Iterable<Widget> widgets;
 
   _Piece(
     this.b, {
-    this.block,
+    this.text,
     this.widgets,
-  }) : assert((block == null) != (widgets == null));
+  }) : assert((text == null) != (widgets == null));
 
   @override
   bool get hasWidgets => widgets != null;
 
-  bool _write(String text) {
-    final leading = regExpSpaceLeading.firstMatch(text);
-    final trailing = regExpSpaceTrailing.firstMatch(text);
+  bool _write(String data) {
+    final leading = regExpSpaceLeading.firstMatch(data);
+    final trailing = regExpSpaceTrailing.firstMatch(data);
     final start = leading == null ? 0 : leading.end;
-    final end = trailing == null ? text.length : trailing.start;
+    final end = trailing == null ? data.length : trailing.start;
 
-    if (end <= start) return block.addSpace();
+    if (end <= start) return text.addSpace();
 
-    if (start > 0) block.addSpace();
+    if (start > 0) text.addSpace();
 
-    final substring = text.substring(start, end);
+    final substring = data.substring(start, end);
     final dedup = substring.replaceAll(regExpSpaces, ' ');
-    block.addText(dedup);
+    text.addText(dedup);
 
-    if (end < text.length) block.addSpace();
+    if (end < data.length) text.addSpace();
 
     return true;
+  }
+}
+
+class _DataBit extends TextBit {
+  final String data;
+  final TextStyleBuilders tsb;
+
+  _DataBit(TextBits parent, this.data, this.tsb)
+      : assert(parent != null),
+        assert(data != null),
+        assert(tsb != null),
+        super(parent);
+
+  @override
+  _DataBit clone({TextBits parent}) {
+    parent ??= this.parent;
+    return _DataBit(parent, data, tsb.clone(parent: parent.tsb));
+  }
+}
+
+class _SpaceBit extends TextBit {
+  final _buffer = StringBuffer();
+
+  _SpaceBit(TextBit parent, {String data})
+      : assert(parent != null),
+        super(parent) {
+    if (data != null) _buffer.write(data);
+  }
+
+  @override
+  String get data => _buffer.isEmpty ? null : _buffer.toString();
+
+  @override
+  bool get hasTrailingSpace => _buffer.isEmpty;
+
+  @override
+  bool get isSpacing => true;
+
+  @override
+  _SpaceBit clone({TextBits parent}) =>
+      _SpaceBit(parent ?? this.parent, data: data);
+}
+
+class _Text extends TextBits {
+  final TextStyleBuilders tsb;
+
+  @override
+  final children = <TextBit>[];
+
+  _Text(this.tsb, {TextBits parent})
+      : assert(tsb != null),
+        super(parent);
+
+  @override
+  Iterable<TextBit> get bits sync* {
+    for (final child in children) {
+      if (child is TextBits) {
+        yield* child.bits;
+      } else {
+        yield child;
+      }
+    }
+  }
+
+  @override
+  TextBit get first {
+    for (final child in children) {
+      final first = child is TextBits ? child.first : child;
+      if (first != null) return first;
+    }
+
+    return null;
+  }
+
+  @override
+  bool get hasTrailingSpace => TextBit.tailOf(this)?.hasTrailingSpace ?? true;
+
+  @override
+  bool get isEmpty {
+    for (final child in children) {
+      if (child.isNotEmpty) return false;
+    }
+
+    return true;
+  }
+
+  @override
+  TextBit get last {
+    for (final child in children.reversed) {
+      final last = child is TextBits ? child.last : child;
+      if (last != null) return last;
+    }
+
+    return null;
+  }
+
+  @override
+  bool addSpace([String data]) {
+    final tail = TextBit.tailOf(this);
+    if (tail == null) {
+      if (data == null) return false;
+    } else if (tail is _SpaceBit) {
+      if (data == null) return false;
+      tail._buffer.write(data);
+      return true;
+    }
+
+    children.add(_SpaceBit(this, data: data));
+    return true;
+  }
+
+  @override
+  void addText(String data) => children.add(_DataBit(this, data, tsb));
+
+  @override
+  _Text clone({TextBits parent}) {
+    parent ??= this.parent;
+    final cloned = _Text(tsb.clone(parent: parent?.tsb), parent: parent);
+    cloned.children.addAll(children.map((c) => c.clone(parent: cloned)));
+    return cloned;
+  }
+
+  @override
+  _Text sub(TextStyleBuilders tsb) {
+    final sub = _Text(tsb, parent: this);
+    children.add(sub);
+    return sub;
   }
 }
 

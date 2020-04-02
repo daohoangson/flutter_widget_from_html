@@ -32,12 +32,12 @@ class _StyleVerticalAlign {
     if (alignment == null || alignment == PlaceholderAlignment.baseline)
       return piece;
 
-    final block = piece.block;
-    final cloned = block.clone(parent: block.parent);
-    block
+    final text = piece.text;
+    final cloned = text.clone(parent: text.parent);
+    text.children
       ..clear()
-      ..add(WidgetBit(
-        block,
+      ..add(_WidgetBit(
+        text,
         WidgetPlaceholder<_StyleVerticalAlign>(builder: (bc, _, __) {
           var built = wf.buildText(bc, null, cloned);
 

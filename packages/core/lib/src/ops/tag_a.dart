@@ -34,9 +34,9 @@ class _TagA {
       );
 
   BuiltPiece _buildBlock(BuiltPiece piece, GestureTapCallback onTap) {
-    for (final bit in piece.block.bits) {
-      if (bit is WidgetBit) {
-        bit.widget.wrapWith(wf.buildGestureDetectors, onTap);
+    for (final bit in piece.text.bits) {
+      if (bit.hasWidget) {
+        bit.widget?.wrapWith(wf.buildGestureDetectors, onTap);
       } else {
         bit.tsb?.onTap = onTap;
       }

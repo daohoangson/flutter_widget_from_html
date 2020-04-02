@@ -10,7 +10,7 @@ class _TagRuby {
   _TagRuby(this.wf);
 
   BuildOp get buildOp {
-    TextBlock rtBlock;
+    TextBits rtText;
 
     return BuildOp(
       onChild: (meta, e) {
@@ -25,7 +25,7 @@ class _TagRuby {
                 onPieces: (_, pieces) {
                   for (final piece in pieces) {
                     if (piece.hasWidgets) continue;
-                    rtBlock = piece.block..detach();
+                    rtText = piece.text..detach();
                     break;
                   }
 
@@ -41,18 +41,18 @@ class _TagRuby {
       },
       onPieces: (_, pieces) {
         for (final piece in pieces) {
-          if (rtBlock == null) continue;
-          final _rtBlock = rtBlock;
-          rtBlock = null;
+          if (rtText == null) continue;
+          final _rtText = rtText;
+          rtText = null;
 
-          final block = piece.block;
-          final cloned = block.clone(parent: block.parent);
+          final text = piece.text;
+          final cloned = text.clone(parent: text.parent);
           TextBits.trimRight(cloned);
           if (cloned.isEmpty) break;
 
-          block
+          text.children
             ..clear()
-            ..add(_buildWidgetBit(block, cloned, _rtBlock));
+            ..add(_buildWidgetBit(text, cloned, _rtText));
         }
 
         return pieces;
@@ -60,8 +60,8 @@ class _TagRuby {
     );
   }
 
-  WidgetBit _buildWidgetBit(TextBlock parent, TextBlock ruby, TextBlock rt) =>
-      WidgetBit(
+  TextBit _buildWidgetBit(TextBits parent, TextBits ruby, TextBits rt) =>
+      _WidgetBit(
         parent,
         WidgetPlaceholder<_TagRuby>(builder: (bc, _, __) {
           final rubyText = wf.buildText(bc, null, ruby);
