@@ -36,29 +36,28 @@ class _StyleVerticalAlign {
     final cloned = block.clone(parent: block.parent);
     block
       ..truncate()
-      ..addWidget(
-        WidgetSpan(
-          alignment: alignment,
-          child: WidgetPlaceholder(builder: (bc, _, __) {
-            var built = wf.buildText(bc, null, cloned);
+      ..addBit(WidgetBit(
+        block,
+        WidgetPlaceholder<_StyleVerticalAlign>(builder: (bc, _, __) {
+          var built = wf.buildText(bc, null, cloned);
 
-            // `sub` and `super` require additional offset
-            final dy = (verticalAlign == kCssVerticalAlignSub
-                ? 2.5
-                : (verticalAlign == kCssVerticalAlignSuper ? -2.5 : 0.0));
-            if (dy != 0.0) {
-              built = [
-                Transform.translate(
-                  offset: Offset(0, cloned.tsb.build(bc).fontSize / dy),
-                  child: wf.buildColumn(wf.buildText(bc, null, cloned)),
-                )
-              ];
-            }
+          // `sub` and `super` require additional offset
+          final dy = (verticalAlign == kCssVerticalAlignSub
+              ? 2.5
+              : (verticalAlign == kCssVerticalAlignSuper ? -2.5 : 0.0));
+          if (dy != 0.0) {
+            built = [
+              Transform.translate(
+                offset: Offset(0, cloned.tsb.build(bc).fontSize / dy),
+                child: wf.buildColumn(wf.buildText(bc, null, cloned)),
+              )
+            ];
+          }
 
-            return built;
-          }),
-        ),
-      );
+          return built;
+        }),
+        alignment: alignment,
+      ));
 
     return piece;
   }

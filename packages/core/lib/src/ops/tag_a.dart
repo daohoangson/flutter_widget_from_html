@@ -35,12 +35,7 @@ class _TagA {
 
   BuiltPiece _buildBlock(BuiltPiece piece, GestureTapCallback onTap) => piece
     ..block.rebuildBits((b) => b is WidgetBit
-        ? b.clone(
-            child: GestureDetector(
-              child: b.widgetSpan.child,
-              onTap: onTap,
-            ),
-          )
+        ? (b..widget.wrapWith(wf.buildGestureDetectors, onTap))
         : b is DataBit ? b.clone(onTap: onTap) : b);
 
   GestureTapCallback _buildGestureTapCallback(NodeMetadata meta) {

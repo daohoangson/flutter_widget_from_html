@@ -20,7 +20,12 @@ class _StyleBgColor {
         final bgColor = _parseColor(meta);
         if (bgColor == null) return pieces;
 
-        return pieces.map((p) => p.hasWidgets ? p : _buildBlock(p, bgColor));
+        for (final piece in pieces) {
+          if (piece.hasWidgets) continue;
+          _buildBlock(piece, bgColor);
+        }
+
+        return pieces;
       },
       onWidgets: (meta, widgets) {
         final bgColor = _parseColor(meta);
@@ -29,12 +34,11 @@ class _StyleBgColor {
         return listOfNonNullOrNothing(_buildBox(widgets, bgColor));
       });
 
-  BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) => piece
-    ..block.rebuildBits((bit) => bit is DataBit
-        ? bit.clone(
-            tsb: bit.tsb.sub()..enqueue(_styleBgColorTextStyleBuilder, bgColor),
-          )
-        : bit);
+  void _buildBlock(BuiltPiece piece, Color bgColor) {
+    for (final bit in piece.block.bits) {
+      bit.tsb?.enqueue(_styleBgColorTextStyleBuilder, bgColor);
+    }
+  }
 
   Widget _buildBox(Iterable<Widget> widgets, Color bgColor) =>
       wf.buildDecoratedBox(wf.buildBody(widgets), color: bgColor);

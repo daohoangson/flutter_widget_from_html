@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'core_helpers.dart';
+
 NodeMetadata lazySet(
   NodeMetadata meta, {
   BuildOp buildOp,
@@ -462,27 +464,38 @@ class SpaceBit extends TextBit {
 }
 
 class WidgetBit extends TextBit {
+  final PlaceholderAlignment alignment;
+  final TextBaseline baseline;
+  final IWidgetPlaceholder widget;
   final TextBits parent;
-  final WidgetSpan widgetSpan;
 
-  WidgetBit(this.parent, this.widgetSpan)
-      : assert(parent != null),
-        assert(widgetSpan != null);
+  WidgetBit(
+    this.parent,
+    this.widget, {
+    this.alignment = PlaceholderAlignment.baseline,
+    this.baseline = TextBaseline.alphabetic,
+  })  : assert(parent != null),
+        assert(widget != null);
+
+  WidgetSpan compile(TextStyle style) => WidgetSpan(
+        alignment: alignment,
+        baseline: baseline,
+        child: widget,
+        style: style,
+      );
 
   @override
   WidgetBit clone({
     TextBits parent,
     PlaceholderAlignment alignment,
     TextBaseline baseline,
-    Widget child,
+    Widget widget,
   }) =>
       WidgetBit(
         parent ?? this.parent,
-        WidgetSpan(
-          alignment: alignment ?? this.widgetSpan.alignment,
-          baseline: baseline ?? this.widgetSpan.baseline,
-          child: child ?? this.widgetSpan.child,
-        ),
+        widget ?? this.widget,
+        alignment: alignment ?? this.alignment,
+        baseline: baseline ?? this.baseline,
       );
 }
 
@@ -556,8 +569,6 @@ class TextBlock extends TextBits {
   }
 
   void addText(String data) => addBit(DataBit(this, data, tsb));
-
-  void addWidget(WidgetSpan ws) => addBit(WidgetBit(this, ws));
 
   @override
   TextBlock clone({TextBits parent}) {

@@ -105,12 +105,33 @@ class _ImageLayoutDelegate extends SingleChildLayoutDelegate {
       height != other.height || width != other.width;
 }
 
-class _ImageSpan extends WidgetSpan {
-  const _ImageSpan(Widget child)
+class _ImageBit extends WidgetBit {
+  _ImageBit(TextBits parent, _TagImg self, _TagImgMetadata img)
       : super(
+          parent,
+          WidgetPlaceholder(builder: self._buildImage, input: img),
+        );
+
+  @override
+  WidgetSpan compile(TextStyle style) => _ImageSpan(
+        alignment: alignment,
+        baseline: baseline,
+        child: widget,
+        style: style,
+      );
+}
+
+class _ImageSpan extends WidgetSpan {
+  const _ImageSpan({
+    PlaceholderAlignment alignment,
+    TextBaseline baseline,
+    IWidgetPlaceholder child,
+    TextStyle style,
+  }) : super(
+          alignment: alignment,
+          baseline: baseline,
           child: child,
-          alignment: PlaceholderAlignment.baseline,
-          baseline: TextBaseline.alphabetic,
+          style: style,
         );
 
   @override
@@ -131,20 +152,15 @@ class _TagImg {
         onPieces: (meta, pieces) {
           if (meta.isBlockElement) return pieces;
 
+          final block = pieces.last?.block;
           final img = _parseMetadata(meta, wf);
-
           if (img.url?.isNotEmpty != true && img.text?.isNotEmpty == true) {
-            return pieces..last?.block?.addText(img.text);
+            block.addText(img.text);
+            return pieces;
           }
 
-          final widget = _buildImage(img, wf);
-          if (widget == null) return pieces;
-
-          if (widget is Text) {
-            return pieces..last?.block?.addText(widget.data);
-          }
-
-          return pieces..last?.block?.addWidget(_ImageSpan(widget));
+          block.addBit(_ImageBit(block, this, img));
+          return pieces;
         },
         onWidgets: (meta, widgets) {
           if (!meta.isBlockElement) return widgets;
@@ -152,12 +168,18 @@ class _TagImg {
           final img = _parseMetadata(meta, wf);
           if (img.url?.isNotEmpty != true) return widgets;
 
-          return listOfNonNullOrNothing(_buildImage(img, wf));
+          return listOfNonNullOrNothing(_buildImage1(img));
         },
       );
 
-  static Widget _buildImage(_TagImgMetadata img, WidgetFactory wf) =>
-      wf.buildImage(
+  Iterable<Widget> _buildImage(
+    BuilderContext _,
+    Iterable<Widget> __,
+    _TagImgMetadata img,
+  ) =>
+      [_buildImage1(img)];
+
+  Widget _buildImage1(_TagImgMetadata img) => wf.buildImage(
         img.url,
         height: img.height,
         text: img.text,

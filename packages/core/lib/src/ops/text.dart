@@ -52,7 +52,7 @@ class _TextBlockCompiler {
 
     if (bit is WidgetBit) {
       _saveSpan();
-      _spans.add(bit.widgetSpan);
+      _spans.add(bit.compile(style));
       return;
     }
 

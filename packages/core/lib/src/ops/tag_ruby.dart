@@ -52,7 +52,7 @@ class _TagRuby {
 
           block
             ..truncate()
-            ..addWidget(_buildWidgetSpan(cloned, _rtBlock));
+            ..addBit(_buildWidgetBit(block, cloned, _rtBlock));
         }
 
         return pieces;
@@ -60,14 +60,13 @@ class _TagRuby {
     );
   }
 
-  WidgetSpan _buildWidgetSpan(TextBlock rubyBlock, TextBlock rtBlock) =>
-      WidgetSpan(
-        alignment: PlaceholderAlignment.middle,
-        baseline: TextBaseline.alphabetic,
-        child: WidgetPlaceholder<_TagRuby>(builder: (bc, _, __) {
-          final rubyText = wf.buildText(bc, null, rubyBlock);
-          final rtText = wf.buildText(bc, null, rtBlock);
-          final rtStyle = rtBlock.tsb.build(bc);
+  WidgetBit _buildWidgetBit(TextBlock parent, TextBlock ruby, TextBlock rt) =>
+      WidgetBit(
+        parent,
+        WidgetPlaceholder<_TagRuby>(builder: (bc, _, __) {
+          final rubyText = wf.buildText(bc, null, ruby);
+          final rtText = wf.buildText(bc, null, rt);
+          final rtStyle = rt.tsb.build(bc);
           final padding = EdgeInsets.symmetric(
               vertical: rtStyle.fontSize *
                   .75 *
@@ -88,5 +87,6 @@ class _TagRuby {
             )
           ];
         }),
+        alignment: PlaceholderAlignment.middle,
       );
 }
