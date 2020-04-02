@@ -46,7 +46,12 @@ Future<String> explain(
             accentColor: const Color(0xFF123456),
           ),
           home: Scaffold(
-            body: DefaultTextStyle(style: style, child: hw),
+            body: ExcludeSemantics(
+              // exclude semantics for faster run but mostly because of this bug
+              // https://github.com/flutter/flutter/issues/51936
+              // which is failing some of the tests
+              child: DefaultTextStyle(style: style, child: hw),
+            ),
           ),
         );
       },

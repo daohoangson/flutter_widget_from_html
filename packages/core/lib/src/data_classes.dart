@@ -319,7 +319,6 @@ abstract class TextBit {
   bool get hasTrailingSpace => false;
   bool get isEmpty => false;
   bool get isNotEmpty => !isEmpty;
-  VoidCallback get onTap => null;
   TextStyleBuilders get tsb => null;
 
   TextBit clone({TextBits parent});
@@ -420,10 +419,9 @@ abstract class TextBits extends TextBit {
 class DataBit extends TextBit {
   final TextBits parent;
   final String data;
-  final VoidCallback onTap;
   final TextStyleBuilders tsb;
 
-  DataBit(this.parent, this.data, this.tsb, {this.onTap})
+  DataBit(this.parent, this.data, this.tsb)
       : assert(parent != null),
         assert(data != null),
         assert(tsb != null);
@@ -432,7 +430,6 @@ class DataBit extends TextBit {
   DataBit clone({
     TextBits parent,
     String data,
-    VoidCallback onTap,
     TextStyleBuilders tsb,
   }) {
     parent ??= this.parent;
@@ -440,7 +437,6 @@ class DataBit extends TextBit {
       parent,
       data ?? this.data,
       tsb ?? this.tsb._clone(parent: parent.tsb),
-      onTap: onTap ?? this.onTap,
     );
   }
 }
@@ -577,18 +573,6 @@ class TextBlock extends TextBits {
     return cloned;
   }
 
-  void rebuildBits(TextBit f(TextBit bit)) {
-    final l = _children.length;
-    for (var i = 0; i < l; i++) {
-      final child = _children[i];
-      if (child is TextBlock) {
-        child.rebuildBits(f);
-      } else {
-        _children[i] = f(child);
-      }
-    }
-  }
-
   @override
   TextBlock sub(TextStyleBuilders tsb) {
     final sub = TextBlock(tsb, parent: this);
@@ -603,6 +587,8 @@ class TextStyleBuilders {
   final _builders = <Function>[];
   final _inputs = [];
   final TextStyleBuilders parent;
+
+  VoidCallback onTap;
 
   BuilderContext _bc;
   TextStyle _output;

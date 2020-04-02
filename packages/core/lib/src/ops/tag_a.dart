@@ -33,10 +33,17 @@ class _TagA {
         },
       );
 
-  BuiltPiece _buildBlock(BuiltPiece piece, GestureTapCallback onTap) => piece
-    ..block.rebuildBits((b) => b is WidgetBit
-        ? (b..widget.wrapWith(wf.buildGestureDetectors, onTap))
-        : b is DataBit ? b.clone(onTap: onTap) : b);
+  BuiltPiece _buildBlock(BuiltPiece piece, GestureTapCallback onTap) {
+    for (final bit in piece.block.bits) {
+      if (bit is WidgetBit) {
+        bit.widget.wrapWith(wf.buildGestureDetectors, onTap);
+      } else {
+        bit.tsb?.onTap = onTap;
+      }
+    }
+
+    return piece;
+  }
 
   GestureTapCallback _buildGestureTapCallback(NodeMetadata meta) {
     final attrs = meta.domElement.attributes;
