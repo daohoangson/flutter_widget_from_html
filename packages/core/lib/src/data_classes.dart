@@ -313,12 +313,15 @@ typedef NodeMetadata NodeMetadataCollector(NodeMetadata meta, dom.Element e);
 
 @immutable
 abstract class TextBit {
-  TextBits get parent;
+  final TextBits parent;
+
+  TextBit(this.parent);
 
   String get data => null;
   bool get hasTrailingSpace => false;
   bool get isEmpty => false;
   bool get isNotEmpty => !isEmpty;
+  bool get isSpacing => false;
   TextStyleBuilders get tsb => null;
 
   bool detach() => parent?._children?.remove(this);
@@ -386,6 +389,8 @@ abstract class TextBit {
 }
 
 abstract class TextBits extends TextBit {
+  TextBits(TextBits parent) : super(parent);
+
   Iterable<TextBit> get bits;
   TextBit get first;
   TextBit get last;
@@ -419,14 +424,14 @@ abstract class TextBits extends TextBit {
 }
 
 class DataBit extends TextBit {
-  final TextBits parent;
   final String data;
   final TextStyleBuilders tsb;
 
-  DataBit(this.parent, this.data, this.tsb)
+  DataBit(TextBits parent, this.data, this.tsb)
       : assert(parent != null),
         assert(data != null),
-        assert(tsb != null);
+        assert(tsb != null),
+        super(parent);
 
   @override
   DataBit _clone({TextBits parent}) {
@@ -435,37 +440,42 @@ class DataBit extends TextBit {
   }
 }
 
-class SpaceBit extends TextBit {
-  final TextBits parent;
-
+class _SpaceBit extends TextBit {
   final _buffer = StringBuffer();
 
-  SpaceBit(this.parent, {String data}) : assert(parent != null) {
+  _SpaceBit(TextBit parent, {String data})
+      : assert(parent != null),
+        super(parent) {
     if (data != null) _buffer.write(data);
   }
 
+  @override
   String get data => _buffer.isEmpty ? null : _buffer.toString();
 
+  @override
   bool get hasTrailingSpace => _buffer.isEmpty;
 
   @override
-  SpaceBit _clone({TextBits parent}) =>
-      SpaceBit(parent ?? this.parent, data: data);
+  bool get isSpacing => true;
+
+  @override
+  _SpaceBit _clone({TextBits parent}) =>
+      _SpaceBit(parent ?? this.parent, data: data);
 }
 
 class WidgetBit extends TextBit {
   final PlaceholderAlignment alignment;
   final TextBaseline baseline;
   final IWidgetPlaceholder widget;
-  final TextBits parent;
 
   WidgetBit(
-    this.parent,
+    TextBits parent,
     this.widget, {
     this.alignment = PlaceholderAlignment.baseline,
     this.baseline = TextBaseline.alphabetic,
   })  : assert(parent != null),
-        assert(widget != null);
+        assert(widget != null),
+        super(parent);
 
   WidgetSpan compile(TextStyle style) => WidgetSpan(
         alignment: alignment,
@@ -484,13 +494,14 @@ class WidgetBit extends TextBit {
 }
 
 class TextBlock extends TextBits {
-  final TextBits parent;
   final TextStyleBuilders tsb;
 
   @override
   final _children = <TextBit>[];
 
-  TextBlock(this.tsb, {this.parent}) : assert(tsb != null);
+  TextBlock(this.tsb, {TextBits parent})
+      : assert(tsb != null),
+        super(parent);
 
   @override
   Iterable<TextBit> get bits sync* {
@@ -542,13 +553,13 @@ class TextBlock extends TextBits {
     final tail = TextBit.tailOf(this);
     if (tail == null) {
       if (data == null) return false;
-    } else if (tail is SpaceBit) {
+    } else if (tail is _SpaceBit) {
       if (data == null) return false;
       tail._buffer.write(data);
       return true;
     }
 
-    add(SpaceBit(this, data: data));
+    add(_SpaceBit(this, data: data));
     return true;
   }
 

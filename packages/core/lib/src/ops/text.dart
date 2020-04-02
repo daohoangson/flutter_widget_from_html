@@ -57,7 +57,7 @@ class _TextBlockCompiler {
       return;
     }
 
-    if (bit is SpaceBit && bit.data != null) {
+    if (bit.isSpacing && bit.data != null) {
       _completeLoop();
       final newLines = bit.data.length - 1;
       if (newLines > 0) {
