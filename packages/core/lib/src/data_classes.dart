@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -433,7 +434,7 @@ class TextStyleBuilders {
   final _inputs = [];
   final TextStyleBuilders parent;
 
-  VoidCallback onTap;
+  GestureRecognizer recognizer;
 
   BuilderContext _bc;
   TextStyle _output;

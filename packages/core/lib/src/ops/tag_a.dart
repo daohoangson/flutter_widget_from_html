@@ -28,17 +28,25 @@ class _TagA {
                     widgets: IWidgetPlaceholder.wrap(
                         piece.widgets, wf.buildGestureDetectors, wf, onTap),
                   )
-                : _buildBlock(piece, onTap),
+                : _buildBlock(meta, piece, onTap),
           );
         },
       );
 
-  BuiltPiece _buildBlock(BuiltPiece piece, GestureTapCallback onTap) {
+  BuiltPiece _buildBlock(
+    NodeMetadata meta,
+    BuiltPiece piece,
+    GestureTapCallback onTap,
+  ) {
+    GestureRecognizer recognizer;
     for (final bit in piece.text.bits) {
       if (bit.hasWidget) {
         bit.widget?.wrapWith(wf.buildGestureDetectors, onTap);
       } else {
-        bit.tsb?.onTap = onTap;
+        recognizer ??=
+            (TapGestureRecognizer(debugOwner: meta.domElement.outerHtml)
+              ..onTap = onTap);
+        bit.tsb?.recognizer = recognizer;
       }
     }
 
