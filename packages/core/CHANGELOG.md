@@ -102,7 +102,7 @@
 
 ## 0.1.3
 
-* Fix bug stylings got lost during block rendering (#10)
+* Fix bug stylings got lost during text rendering (#10)
 
 ## 0.1.2
 

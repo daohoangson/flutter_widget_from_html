@@ -10,7 +10,7 @@ class _TagRuby {
   _TagRuby(this.wf);
 
   BuildOp get buildOp {
-    TextBlock rtBlock;
+    TextBits rtText;
 
     return BuildOp(
       onChild: (meta, e) {
@@ -25,7 +25,7 @@ class _TagRuby {
                 onPieces: (_, pieces) {
                   for (final piece in pieces) {
                     if (piece.hasWidgets) continue;
-                    rtBlock = piece.block..detach();
+                    rtText = piece.text..detach();
                     break;
                   }
 
@@ -39,34 +39,32 @@ class _TagRuby {
 
         return meta;
       },
-      onPieces: (_, pieces) {
-        for (final piece in pieces) {
-          if (rtBlock == null) continue;
-          final _rtBlock = rtBlock;
-          rtBlock = null;
+      onPieces: (_, pieces) => pieces.map((piece) {
+        if (piece.hasWidgets || rtText == null) return piece;
+        final _rtText = rtText;
+        rtText = null;
 
-          final block = piece.block;
-          final cloned = block.clone(block.parent)..trimRight();
-          if (cloned.isEmpty) break;
+        final text = piece.text..trimRight();
+        if (text.isEmpty) return piece;
 
-          block
-            ..truncate()
-            ..addWidget(_buildWidgetSpan(cloned, _rtBlock));
-        }
+        final parent = text.parent;
+        final replacement = parent.sub(text.tsb)..detach();
+        text.replaceWith(replacement);
 
-        return pieces;
-      },
+        replacement.children..add(_buildWidgetBit(parent, text, _rtText));
+
+        return BuiltPieceSimple(text: replacement);
+      }),
     );
   }
 
-  WidgetSpan _buildWidgetSpan(TextBlock rubyBlock, TextBlock rtBlock) =>
-      WidgetSpan(
-        alignment: PlaceholderAlignment.middle,
-        baseline: TextBaseline.alphabetic,
-        child: WidgetPlaceholder<_TagRuby>(builder: (bc, _, __) {
-          final rubyText = wf.buildText(bc, null, rubyBlock);
-          final rtText = wf.buildText(bc, null, rtBlock);
-          final rtStyle = rtBlock.tsb.build(bc);
+  TextBit _buildWidgetBit(TextBits parent, TextBits ruby, TextBits rt) =>
+      WidgetBit(
+        parent,
+        WidgetPlaceholder<_TagRuby>(builder: (bc, _, __) {
+          final rubyText = wf.buildText(bc, null, ruby);
+          final rtText = wf.buildText(bc, null, rt);
+          final rtStyle = rt.tsb.build(bc);
           final padding = EdgeInsets.symmetric(
               vertical: rtStyle.fontSize *
                   .75 *
@@ -87,5 +85,6 @@ class _TagRuby {
             )
           ];
         }),
+        alignment: PlaceholderAlignment.middle,
       );
 }

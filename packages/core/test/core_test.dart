@@ -208,43 +208,23 @@ void main() {
       expect(explained, equals('[RichText:(:Someone said “Foo”.)]'));
     });
 
+    testWidgets('renders quotes without contents', (WidgetTester tester) async {
+      final html = 'x<q></q>y';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:x“”y)]'));
+    });
+
+    testWidgets('renders quotes alone', (WidgetTester tester) async {
+      final html = '<q></q>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:“”)]'));
+    });
+
     testWidgets('renders quotes around IMG', (WidgetTester tester) async {
       final src = 'http://domain.com/image.png';
       final html = '<q><img src="$src" /></q>';
       final explained = await explain(tester, html);
       expect(explained, equals("[RichText:(:“[NetworkImage:url=$src](:”))]"));
-    });
-
-    group('renders without erroneous white spaces', () {
-      testWidgets('before', (WidgetTester tester) async {
-        final html = 'Someone said<q> Foo</q>.';
-        final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:Someone said “Foo”.)]'));
-      });
-
-      testWidgets('after', (WidgetTester tester) async {
-        final html = 'Someone said <q>Foo </q>.';
-        final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:Someone said “Foo” .)]'));
-      });
-
-      testWidgets('first', (WidgetTester tester) async {
-        final html = '<q> Foo</q>';
-        final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:“Foo”)]'));
-      });
-
-      testWidgets('last', (WidgetTester tester) async {
-        final html = '<q>Foo </q>';
-        final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:“Foo”)]'));
-      });
-
-      testWidgets('only', (WidgetTester tester) async {
-        final html = 'x<q> </q>y';
-        final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:x “ ” y)]'));
-      });
     });
 
     testWidgets('renders styling', (WidgetTester tester) async {
@@ -260,6 +240,12 @@ void main() {
         explained,
         equals('[RichText:(:Someone said (+u+i:“F)(+u:o)(+u+b:o”)(:.))]'),
       );
+    });
+
+    testWidgets('renders within vertical-align middle', (tester) async {
+      final html = '<span style="vertical-align: middle"><q>Foo</q></span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:[RichText:(:“Foo”)]@middle]'));
     });
   });
 
@@ -378,8 +364,11 @@ void main() {
 
   group('code', () {
     testWidgets('renders CODE tag', (WidgetTester tester) async {
-      final html =
-          """<code><span style="color: #000000"><span style="color: #0000BB">&lt;?php phpinfo</span><span style="color: #007700">(); </span><span style="color: #0000BB">?&gt;</span></span></code>""";
+      final html = '<code><span style="color: #000000">'
+          '<span style="color: #0000BB">&lt;?php phpinfo</span>'
+          '<span style="color: #007700">(); </span>'
+          '<span style="color: #0000BB">?&gt;</span>'
+          '</span></code>';
       final explained = await explain(tester, html);
       expect(
           explained,

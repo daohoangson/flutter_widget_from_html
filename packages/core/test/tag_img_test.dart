@@ -34,7 +34,7 @@ void main() {
     testWidgets('renders bad data uri', (WidgetTester tester) async {
       final html = '<img src="data:image/xxx" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:$html]'));
+      expect(explained, equals('[widget0]'));
     });
 
     testWidgets('renders bad data uri with alt text', (WidgetTester t) async {
@@ -140,19 +140,19 @@ void main() {
     testWidgets('renders bad asset', (WidgetTester tester) async {
       final html = '<img src="asset:" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:$html]'));
+      expect(explained, equals('[widget0]'));
     });
 
     testWidgets('renders bad asset with alt text', (WidgetTester tester) async {
       final html = '<img src="asset:" alt="Foo" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(explained, equals('[Text:Foo]'));
     });
 
     testWidgets('renders bad asset with title text', (tester) async {
       final html = '<img src="asset:" title="Foo" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(explained, equals('[Text:Foo]'));
     });
   });
 
@@ -170,7 +170,7 @@ void main() {
     testWidgets('renders bad data uri', (WidgetTester tester) async {
       final html = '<img src="data:image/xxx" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:$html]'));
+      expect(explained, equals('[widget0]'));
     });
 
     testWidgets('renders bad data uri with alt text', (WidgetTester t) async {

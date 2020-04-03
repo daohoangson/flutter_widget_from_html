@@ -30,11 +30,8 @@ class _StyleBgColor {
       });
 
   BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) => piece
-    ..block.rebuildBits((bit) => bit is DataBit
-        ? bit.rebuild(
-            tsb: bit.tsb.sub()..enqueue(_styleBgColorTextStyleBuilder, bgColor),
-          )
-        : bit);
+    ..text.bits.forEach(
+        (bit) => bit.tsb?.enqueue(_styleBgColorTextStyleBuilder, bgColor));
 
   Widget _buildBox(Iterable<Widget> widgets, Color bgColor) =>
       wf.buildDecoratedBox(wf.buildBody(widgets), color: bgColor);

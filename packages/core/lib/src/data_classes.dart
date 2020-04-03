@@ -1,5 +1,10 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
+
+import 'core_helpers.dart';
+
+part 'data/text_bits.dart';
 
 NodeMetadata lazySet(
   NodeMetadata meta, {
@@ -148,18 +153,18 @@ class BuilderContext {
 abstract class BuiltPiece {
   bool get hasWidgets;
 
-  TextBlock get block;
+  TextBits get text;
   Iterable<Widget> get widgets;
 }
 
 class BuiltPieceSimple extends BuiltPiece {
-  final TextBlock block;
+  final TextBits text;
   final Iterable<Widget> widgets;
 
   BuiltPieceSimple({
-    this.block,
+    this.text,
     this.widgets,
-  }) : assert((block == null) != (widgets == null));
+  }) : assert((text == null) != (widgets == null));
 
   bool get hasWidgets => widgets != null;
 }
@@ -309,249 +314,12 @@ class NodeMetadata {
 
 typedef NodeMetadata NodeMetadataCollector(NodeMetadata meta, dom.Element e);
 
-abstract class TextBit {
-  TextBlock get block;
-
-  String get data => null;
-  TextBit get first => this;
-  bool get hasTrailingSpace => false;
-  bool get isEmpty => false;
-  bool get isNotEmpty => !isEmpty;
-  TextBit get last => this;
-  VoidCallback get onTap => null;
-  TextStyleBuilders get tsb => null;
-
-  TextBit clone(TextBlock block);
-}
-
-class DataBit extends TextBit {
-  final TextBlock block;
-  final String data;
-  final VoidCallback onTap;
-  final TextStyleBuilders tsb;
-
-  DataBit(this.block, this.data, this.tsb, {this.onTap})
-      : assert(block != null),
-        assert(data != null),
-        assert(tsb != null);
-
-  @override
-  DataBit clone(TextBlock block) =>
-      DataBit(block, data, tsb.clone(block.tsb), onTap: onTap);
-
-  DataBit rebuild({
-    String data,
-    VoidCallback onTap,
-    TextStyleBuilders tsb,
-  }) =>
-      DataBit(
-        block,
-        data ?? this.data,
-        tsb ?? this.tsb,
-        onTap: onTap ?? this.onTap,
-      );
-}
-
-class SpaceBit extends TextBit {
-  final TextBlock block;
-  String _data;
-
-  SpaceBit(this.block, {String data})
-      : assert(block != null),
-        _data = data;
-
-  bool get hasTrailingSpace => data == null;
-
-  String get data => _data;
-
-  @override
-  SpaceBit clone(TextBlock block) => SpaceBit(block, data: data);
-}
-
-class WidgetBit extends TextBit {
-  final TextBlock block;
-  final WidgetSpan widgetSpan;
-
-  WidgetBit(this.block, this.widgetSpan)
-      : assert(block != null),
-        assert(widgetSpan != null);
-
-  @override
-  WidgetBit clone(TextBlock block) => WidgetBit(block, widgetSpan);
-
-  WidgetBit rebuild({
-    PlaceholderAlignment alignment,
-    TextBaseline baseline,
-    Widget child,
-  }) =>
-      WidgetBit(
-        block,
-        WidgetSpan(
-          alignment: alignment ?? this.widgetSpan.alignment,
-          baseline: baseline ?? this.widgetSpan.baseline,
-          child: child ?? this.widgetSpan.child,
-        ),
-      );
-}
-
-class TextBlock extends TextBit {
-  final TextBlock parent;
-  final TextStyleBuilders tsb;
-  final _children = <TextBit>[];
-
-  TextBlock(this.tsb, {this.parent}) : assert(tsb != null);
-
-  @override
-  TextBlock get block => parent;
-
-  @override
-  TextBit get first {
-    for (final child in _children) {
-      final first = child.first;
-      if (first != null) return first;
-    }
-    return null;
-  }
-
-  @override
-  bool get hasTrailingSpace => last?.hasTrailingSpace ?? true;
-
-  @override
-  bool get isEmpty {
-    for (final child in _children) {
-      if (child.isNotEmpty) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  bool _lastReturnsNull = false;
-
-  @override
-  TextBit get last {
-    if (_lastReturnsNull) return null;
-    final l = _children.length;
-    for (var i = l - 1; i >= 0; i--) {
-      final last = _children[i].last;
-      if (last != null) return last;
-    }
-
-    _lastReturnsNull = true;
-    final parentLast = parent?.last;
-    _lastReturnsNull = false;
-    return parentLast;
-  }
-
-  TextBit get next {
-    if (parent == null) return null;
-    final siblings = parent._children;
-    final indexOf = siblings.indexOf(this);
-    if (indexOf == -1) return null;
-
-    for (var i = indexOf + 1; i < siblings.length; i++) {
-      final next = siblings[i].first;
-      if (next != null) return next;
-    }
-
-    return parent.next;
-  }
-
-  void addBit(TextBit bit, {int index}) =>
-      _children.insert(index ?? _children.length, bit);
-
-  bool addSpace([String data]) {
-    final prev = last;
-    if (prev == null) {
-      if (data == null) return false;
-    } else if (prev is SpaceBit) {
-      if (data == null) return false;
-      prev._data = "${prev._data ?? ''}$data";
-      return true;
-    }
-
-    addBit(SpaceBit(this, data: data));
-    return true;
-  }
-
-  void addText(String data) => addBit(DataBit(this, data, tsb));
-
-  void addWidget(WidgetSpan ws) => addBit(WidgetBit(this, ws));
-
-  @override
-  TextBlock clone(TextBlock parent) {
-    final cloned = TextBlock(tsb.clone(parent.tsb), parent: parent);
-    cloned._children.addAll(_children.map((child) => child.clone(cloned)));
-    return cloned;
-  }
-
-  void detach() => parent?._children?.remove(this);
-
-  bool forEachBit(f(TextBit bit, int index), {bool reversed = false}) {
-    final l = _children.length;
-    final i0 = reversed ? l - 1 : 0;
-    final i1 = reversed ? -1 : l;
-    final ii = reversed ? -1 : 1;
-
-    for (var i = i0; i != i1; i += ii) {
-      final child = _children[i];
-      final shouldContinue = child is TextBlock
-          ? child.forEachBit(f, reversed: reversed)
-          : f(child, i);
-      if (shouldContinue == false) return false;
-    }
-
-    return true;
-  }
-
-  void rebuildBits(TextBit f(TextBit bit)) {
-    final l = _children.length;
-    for (var i = 0; i < l; i++) {
-      final child = _children[i];
-      if (child is TextBlock) {
-        child.rebuildBits(f);
-      } else {
-        _children[i] = f(child);
-      }
-    }
-  }
-
-  TextBit removeLast() {
-    while (true) {
-      if (_children.isEmpty) return null;
-
-      final lastChild = _children.last;
-      if (lastChild is TextBlock) {
-        final removed = lastChild.removeLast();
-        if (removed != null) {
-          return removed;
-        } else {
-          _children.removeLast();
-        }
-      } else {
-        return _children.removeLast();
-      }
-    }
-  }
-
-  TextBlock sub(TextStyleBuilders tsb) {
-    final sub = TextBlock(tsb, parent: this);
-    _children.add(sub);
-    return sub;
-  }
-
-  void trimRight() {
-    while (isNotEmpty && hasTrailingSpace) removeLast();
-  }
-
-  void truncate() => _children.clear();
-}
-
 class TextStyleBuilders {
   final _builders = <Function>[];
   final _inputs = [];
   final TextStyleBuilders parent;
+
+  GestureRecognizer recognizer;
 
   BuilderContext _bc;
   TextStyle _output;
@@ -564,18 +332,6 @@ class TextStyleBuilders {
   set textAlign(TextAlign v) => _textAlign = v;
 
   TextStyleBuilders({this.parent});
-
-  TextStyleBuilders clone(TextStyleBuilders parent) {
-    final cloned = TextStyleBuilders(parent: parent);
-
-    final l = _builders.length;
-    for (var i = 0; i < l; i++) {
-      cloned._builders.add(_builders[i]);
-      cloned._inputs.add(_inputs[i]);
-    }
-
-    return cloned;
-  }
 
   void enqueue<T>(TextStyleBuilder<T> builder, T input) {
     assert(_output == null, "Cannot add builder after being built");
