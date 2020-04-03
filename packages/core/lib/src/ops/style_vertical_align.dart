@@ -33,33 +33,33 @@ class _StyleVerticalAlign {
       return piece;
 
     final text = piece.text;
-    final cloned = text.clone(parent: text.parent);
-    text.children
-      ..clear()
-      ..add(_WidgetBit(
-        text,
-        WidgetPlaceholder<_StyleVerticalAlign>(builder: (bc, _, __) {
-          var built = wf.buildText(bc, null, cloned);
+    final replacement = text.parent.sub(text.tsb)..detach();
+    text.replaceWith(replacement);
 
-          // `sub` and `super` require additional offset
-          final dy = (verticalAlign == kCssVerticalAlignSub
-              ? 2.5
-              : (verticalAlign == kCssVerticalAlignSuper ? -2.5 : 0.0));
-          if (dy != 0.0) {
-            built = [
-              Transform.translate(
-                offset: Offset(0, cloned.tsb.build(bc).fontSize / dy),
-                child: wf.buildColumn(wf.buildText(bc, null, cloned)),
-              )
-            ];
-          }
+    replacement.children.add(_WidgetBit(
+      text,
+      WidgetPlaceholder<_StyleVerticalAlign>(builder: (bc, _, __) {
+        var built = wf.buildText(bc, null, text);
 
-          return built;
-        }),
-        alignment: alignment,
-      ));
+        // `sub` and `super` require additional offset
+        final dy = (verticalAlign == kCssVerticalAlignSub
+            ? 2.5
+            : (verticalAlign == kCssVerticalAlignSuper ? -2.5 : 0.0));
+        if (dy != 0.0) {
+          built = [
+            Transform.translate(
+              offset: Offset(0, text.tsb.build(bc).fontSize / dy),
+              child: wf.buildColumn(wf.buildText(bc, null, text)),
+            )
+          ];
+        }
 
-    return piece;
+        return built;
+      }),
+      alignment: alignment,
+    ));
+
+    return BuiltPieceSimple(text: replacement);
   }
 }
 

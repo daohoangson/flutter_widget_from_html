@@ -208,12 +208,6 @@ class _DataBit extends TextBit {
         assert(data != null),
         assert(tsb != null),
         super(parent);
-
-  @override
-  _DataBit clone({TextBits parent}) {
-    parent ??= this.parent;
-    return _DataBit(parent, data, tsb.clone(parent: parent.tsb));
-  }
 }
 
 class _SpaceBit extends TextBit {
@@ -233,10 +227,6 @@ class _SpaceBit extends TextBit {
 
   @override
   bool get isSpacing => true;
-
-  @override
-  _SpaceBit clone({TextBits parent}) =>
-      _SpaceBit(parent ?? this.parent, data: data);
 }
 
 class _Text extends TextBits {
@@ -309,14 +299,6 @@ class _Text extends TextBits {
 
   @override
   void addText(String data) => children.add(_DataBit(this, data, tsb));
-
-  @override
-  _Text clone({TextBits parent}) {
-    parent ??= this.parent;
-    final cloned = _Text(tsb.clone(parent: parent?.tsb), parent: parent);
-    cloned.children.addAll(children.map((c) => c.clone(parent: cloned)));
-    return cloned;
-  }
 
   @override
   _Text sub(TextStyleBuilders tsb) {

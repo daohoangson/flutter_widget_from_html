@@ -322,6 +322,7 @@ abstract class TextBit {
   String get data => null;
   bool get hasTrailingSpace => false;
   bool get hasWidget => false;
+  int get indexAtParent => parent?.children?.indexOf(this) ?? -1;
   bool get isEmpty => false;
   bool get isNotEmpty => !isEmpty;
   bool get isSpacing => false;
@@ -332,29 +333,29 @@ abstract class TextBit {
 
   bool detach() => parent?.children?.remove(this);
 
+  bool replaceWith(TextBit another) {
+    final i = indexAtParent;
+    if (i == -1) return false;
+
+    parent.children[i] = another;
+    return true;
+  }
+
   bool insertAfter(TextBit another) {
-    final siblings = another?.parent?.children;
-    if (siblings == null) return false;
+    final i = another.indexAtParent;
+    if (i == -1) return false;
 
-    final indexOf = siblings.indexOf(another);
-    if (indexOf == -1) return false; // detached?
-
-    siblings.insert(indexOf + 1, this);
+    another.parent.children.insert(i + 1, this);
     return true;
   }
 
   bool insertBefore(TextBit another) {
-    final siblings = another?.parent?.children;
-    if (siblings == null) return false;
+    final i = another.indexAtParent;
+    if (i == -1) return false;
 
-    final indexOf = siblings.indexOf(another);
-    if (indexOf == -1) return false; // detached?
-
-    siblings.insert(indexOf, this);
+    another.parent.children.insert(i, this);
     return true;
   }
-
-  TextBit clone({TextBits parent});
 
   static TextBit nextOf(TextBit bit) {
     var x = bit;
@@ -447,18 +448,6 @@ class TextStyleBuilders {
   set textAlign(TextAlign v) => _textAlign = v;
 
   TextStyleBuilders({this.parent});
-
-  TextStyleBuilders clone({TextStyleBuilders parent}) {
-    final cloned = TextStyleBuilders(parent: parent ?? this.parent);
-
-    final l = _builders.length;
-    for (var i = 0; i < l; i++) {
-      cloned._builders.add(_builders[i]);
-      cloned._inputs.add(_inputs[i]);
-    }
-
-    return cloned;
-  }
 
   void enqueue<T>(TextStyleBuilder<T> builder, T input) {
     assert(_output == null, "Cannot add builder after being built");

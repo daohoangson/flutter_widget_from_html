@@ -7,13 +7,13 @@ void main() {
     final html = '<sub>Foo</sub>';
     final explained = await explain(tester, html);
     expect(explained,
-        equals('[RichText:[Transform:child=[RichText:(@6.9:Foo)]]@bottom]'));
+        equals('[RichText:[Transform:child=[RichText:(@8.3:Foo)]]@bottom]'));
   });
 
   testWidgets('renders SUP tag', (WidgetTester tester) async {
     final html = '<sup>Foo</sup>';
     final e = await explain(tester, html);
-    expect(e, equals('[RichText:[Transform:child=[RichText:(@6.9:Foo)]]@top]'));
+    expect(e, equals('[RichText:[Transform:child=[RichText:(@8.3:Foo)]]@top]'));
   });
 
   testWidgets('renders top text', (WidgetTester tester) async {
@@ -74,7 +74,7 @@ void main() {
       expect(
           explained,
           equals('[RichText:(:$imgRendered'
-              '[Transform:child=[RichText:(@6.9:Foo)]]@top)]'));
+              '[Transform:child=[RichText:(@8.3:Foo)]]@top)]'));
     });
   });
 

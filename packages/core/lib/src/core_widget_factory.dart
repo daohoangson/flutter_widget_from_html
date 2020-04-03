@@ -878,10 +878,6 @@ class _WidgetBit extends TextBit {
         super(parent);
 
   @override
-  _WidgetBit clone({TextBits parent}) =>
-      _WidgetBit(parent ?? this.parent, widget);
-
-  @override
   WidgetSpan compile(TextStyle style) => WidgetSpan(
         alignment: alignment,
         baseline: baseline,

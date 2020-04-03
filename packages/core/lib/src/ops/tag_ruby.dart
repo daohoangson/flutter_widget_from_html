@@ -39,24 +39,23 @@ class _TagRuby {
 
         return meta;
       },
-      onPieces: (_, pieces) {
-        for (final piece in pieces) {
-          if (rtText == null) continue;
-          final _rtText = rtText;
-          rtText = null;
+      onPieces: (_, pieces) => pieces.map((piece) {
+        if (piece.hasWidgets || rtText == null) return piece;
+        final _rtText = rtText;
+        rtText = null;
 
-          final text = piece.text;
-          final cloned = text.clone(parent: text.parent);
-          TextBits.trimRight(cloned);
-          if (cloned.isEmpty) break;
+        final text = piece.text;
+        TextBits.trimRight(text);
+        if (text.isEmpty) return piece;
 
-          text.children
-            ..clear()
-            ..add(_buildWidgetBit(text, cloned, _rtText));
-        }
+        final parent = text.parent;
+        final replacement = parent.sub(text.tsb)..detach();
+        text.replaceWith(replacement);
 
-        return pieces;
-      },
+        replacement.children..add(_buildWidgetBit(parent, text, _rtText));
+
+        return BuiltPieceSimple(text: replacement);
+      }),
     );
   }
 
