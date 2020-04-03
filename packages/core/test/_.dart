@@ -49,7 +49,7 @@ Future<String> explain(
             body: ExcludeSemantics(
               // exclude semantics for faster run but mostly because of this bug
               // https://github.com/flutter/flutter/issues/51936
-              // which is failing some of the tests
+              // which is failing some of our tests
               child: DefaultTextStyle(style: style, child: hw),
             ),
           ),

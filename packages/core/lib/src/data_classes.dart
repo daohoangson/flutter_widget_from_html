@@ -322,7 +322,7 @@ abstract class TextBit {
   String get data => null;
   bool get hasTrailingSpace => false;
   bool get hasWidget => false;
-  int get indexAtParent => parent?.children?.indexOf(this) ?? -1;
+  int get index => parent?.children?.indexOf(this) ?? -1;
   bool get isEmpty => false;
   bool get isNotEmpty => !isEmpty;
   bool get isSpacing => false;
@@ -334,7 +334,7 @@ abstract class TextBit {
   bool detach() => parent?.children?.remove(this);
 
   bool replaceWith(TextBit another) {
-    final i = indexAtParent;
+    final i = index;
     if (i == -1) return false;
 
     parent.children[i] = another;
@@ -342,7 +342,7 @@ abstract class TextBit {
   }
 
   bool insertAfter(TextBit another) {
-    final i = another.indexAtParent;
+    final i = another.index;
     if (i == -1) return false;
 
     another.parent.children.insert(i + 1, this);
@@ -350,22 +350,29 @@ abstract class TextBit {
   }
 
   bool insertBefore(TextBit another) {
-    final i = another.indexAtParent;
+    final i = another.index;
     if (i == -1) return false;
 
     another.parent.children.insert(i, this);
     return true;
   }
 
+  @override
+  String toString() {
+    final clazz = runtimeType.toString();
+    final contents = hasWidget ? "widget=$widget" : "data=$data";
+    return "[$clazz:$hashCode $contents]";
+  }
+
   static TextBit nextOf(TextBit bit) {
     var x = bit;
-    var p = x?.parent;
 
-    while (p != null) {
-      final i = p.children.indexOf(x);
+    while (x != null) {
+      final i = x.index;
       if (i != -1) {
-        for (var j = i + 1; j < p.children.length; j++) {
-          final candidate = p.children[j];
+        final siblings = x.parent.children;
+        for (var j = i + 1; j < siblings.length; j++) {
+          final candidate = siblings[j];
           if (candidate is TextBits) {
             final first = candidate.first;
             if (first != null) return first;
@@ -375,8 +382,7 @@ abstract class TextBit {
         }
       }
 
-      x = p;
-      p = p.parent;
+      x = x.parent;
     }
 
     return null;
@@ -406,6 +412,24 @@ abstract class TextBits extends TextBit {
   bool addSpace([String data]);
   void addText(String data);
   TextBits sub(TextStyleBuilders tsb);
+
+  @override
+  String toString() {
+    final clazz = runtimeType.toString();
+    final contents = _toStrings().join('\n');
+    return "\n[$clazz:$hashCode]\n$contents\n----";
+  }
+
+  Iterable<String> _toStrings() => children.map((child) {
+        if (child is TextBits)
+          return List<String>()
+            ..add("[${child.runtimeType}:${child.hashCode}]" +
+                (child.parent == this
+                    ? ''
+                    : " ⚠️ parent=${child.parent.hashCode}"))
+            ..addAll(child._toStrings());
+        return [child.toString()];
+      }).map((str) => str.map((s) => "  $s").join('\n'));
 
   static int trimRight(TextBits bits) {
     final children = bits.children;

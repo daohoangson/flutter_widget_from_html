@@ -22,13 +22,17 @@ class _TagA {
           final onTap = _buildGestureTapCallback(meta);
           if (onTap == null) return pieces;
 
+          final recognizer =
+              TapGestureRecognizer(debugOwner: meta.domElement.outerHtml)
+                ..onTap = onTap;
+
           return pieces.map(
             (piece) => piece.hasWidgets
                 ? BuiltPieceSimple(
                     widgets: IWidgetPlaceholder.wrap(
                         piece.widgets, wf.buildGestureDetectors, wf, onTap),
                   )
-                : _buildBlock(meta, piece, onTap),
+                : _buildBlock(meta, piece, onTap, recognizer),
           );
         },
       );
@@ -37,21 +41,12 @@ class _TagA {
     NodeMetadata meta,
     BuiltPiece piece,
     GestureTapCallback onTap,
-  ) {
-    GestureRecognizer recognizer;
-    for (final bit in piece.text.bits) {
-      if (bit.hasWidget) {
-        bit.widget?.wrapWith(wf.buildGestureDetectors, onTap);
-      } else {
-        recognizer ??=
-            (TapGestureRecognizer(debugOwner: meta.domElement.outerHtml)
-              ..onTap = onTap);
-        bit.tsb?.recognizer = recognizer;
-      }
-    }
-
-    return piece;
-  }
+    GestureRecognizer recognizer,
+  ) =>
+      piece
+        ..text.bits.forEach((bit) => bit.hasWidget
+            ? bit.widget?.wrapWith(wf.buildGestureDetectors, onTap)
+            : bit.tsb?.recognizer = recognizer);
 
   GestureTapCallback _buildGestureTapCallback(NodeMetadata meta) {
     final attrs = meta.domElement.attributes;
