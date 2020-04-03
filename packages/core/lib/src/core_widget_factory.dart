@@ -810,7 +810,7 @@ class WidgetFactory {
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      onPieces: (_, pieces) => pieces..last.text.addSpace('\n'),
+      onPieces: (_, pieces) => pieces..last.text.addSpace(SpaceType.newLine),
     );
     return _tagBr;
   }
@@ -854,34 +854,4 @@ class WidgetFactory {
     _tagTable ??= _TagTable(this).buildOp;
     return _tagTable;
   }
-}
-
-class _WidgetBit extends TextBit {
-  final PlaceholderAlignment alignment;
-  final TextBaseline baseline;
-
-  @override
-  final IWidgetPlaceholder widget;
-
-  @override
-  bool get hasWidget => true;
-
-  _WidgetBit(
-    TextBits parent,
-    this.widget, {
-    this.alignment = PlaceholderAlignment.baseline,
-    this.baseline = TextBaseline.alphabetic,
-  })  : assert(parent != null),
-        assert(widget != null),
-        assert(alignment != null),
-        assert(baseline != null),
-        super(parent);
-
-  @override
-  WidgetSpan compile(TextStyle style) => WidgetSpan(
-        alignment: alignment,
-        baseline: baseline,
-        child: widget,
-        style: style,
-      );
 }

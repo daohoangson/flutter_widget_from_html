@@ -44,8 +44,7 @@ class _TagRuby {
         final _rtText = rtText;
         rtText = null;
 
-        final text = piece.text;
-        TextBits.trimRight(text);
+        final text = piece.text..trimRight();
         if (text.isEmpty) return piece;
 
         final parent = text.parent;
@@ -60,7 +59,7 @@ class _TagRuby {
   }
 
   TextBit _buildWidgetBit(TextBits parent, TextBits ruby, TextBits rt) =>
-      _WidgetBit(
+      WidgetBit(
         parent,
         WidgetPlaceholder<_TagRuby>(builder: (bc, _, __) {
           final rubyText = wf.buildText(bc, null, ruby);

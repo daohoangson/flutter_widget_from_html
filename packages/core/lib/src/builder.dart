@@ -11,7 +11,7 @@ class Builder {
   final List<dom.Node> domNodes;
   final NodeMetadata parentMeta;
   final Iterable<BuildOp> parentOps;
-  final _Text parentText;
+  final TextBits parentText;
   final TextStyleBuilders parentTsb;
   final WidgetFactory wf;
 
@@ -40,9 +40,7 @@ class Builder {
           if (widget != null) list.add(widget);
         }
       } else {
-        final text = piece.text;
-        TextBits.trimRight(text);
-
+        final text = piece.text..trimRight();
         if (text.isNotEmpty) {
           list.add(WidgetPlaceholder(
             builder: wf.buildText,
@@ -156,7 +154,7 @@ class Builder {
   void _newTextPiece() => _textPiece = _Piece(
         this,
         text: (_pieces.isEmpty ? parentText?.sub(parentTsb) : null) ??
-            _Text(parentTsb),
+            TextBits(parentTsb),
       );
 
   void _saveTextPiece() {
@@ -167,7 +165,7 @@ class Builder {
 
 class _Piece extends BuiltPiece {
   final Builder b;
-  final _Text text;
+  final TextBits text;
   final Iterable<Widget> widgets;
 
   _Piece(
@@ -179,7 +177,7 @@ class _Piece extends BuiltPiece {
   @override
   bool get hasWidgets => widgets != null;
 
-  bool _write(String data) {
+  TextBit _write(String data) {
     final leading = regExpSpaceLeading.firstMatch(data);
     final trailing = regExpSpaceTrailing.firstMatch(data);
     final start = leading == null ? 0 : leading.end;
@@ -187,124 +185,16 @@ class _Piece extends BuiltPiece {
 
     if (end <= start) return text.addSpace();
 
-    if (start > 0) text.addSpace();
+    TextBit bit;
+    if (start > 0) bit = text.addSpace();
 
     final substring = data.substring(start, end);
     final dedup = substring.replaceAll(regExpSpaces, ' ');
-    text.addText(dedup);
+    bit = text.addText(dedup);
 
-    if (end < data.length) text.addSpace();
+    if (end < data.length) bit = text.addSpace();
 
-    return true;
-  }
-}
-
-class _DataBit extends TextBit {
-  final String data;
-  final TextStyleBuilders tsb;
-
-  _DataBit(TextBits parent, this.data, this.tsb)
-      : assert(parent != null),
-        assert(data != null),
-        assert(tsb != null),
-        super(parent);
-}
-
-class _SpaceBit extends TextBit {
-  final _buffer = StringBuffer();
-
-  _SpaceBit(TextBit parent, {String data})
-      : assert(parent != null),
-        super(parent) {
-    if (data != null) _buffer.write(data);
-  }
-
-  @override
-  String get data => _buffer.isEmpty ? null : _buffer.toString();
-
-  @override
-  bool get hasTrailingSpace => _buffer.isEmpty;
-
-  @override
-  bool get isSpacing => true;
-}
-
-class _Text extends TextBits {
-  final TextStyleBuilders tsb;
-
-  @override
-  final children = <TextBit>[];
-
-  _Text(this.tsb, {TextBits parent})
-      : assert(tsb != null),
-        super(parent);
-
-  @override
-  Iterable<TextBit> get bits sync* {
-    for (final child in children) {
-      if (child is TextBits) {
-        yield* child.bits;
-      } else {
-        yield child;
-      }
-    }
-  }
-
-  @override
-  TextBit get first {
-    for (final child in children) {
-      final first = child is TextBits ? child.first : child;
-      if (first != null) return first;
-    }
-
-    return null;
-  }
-
-  @override
-  bool get hasTrailingSpace => TextBit.tailOf(this)?.hasTrailingSpace ?? true;
-
-  @override
-  bool get isEmpty {
-    for (final child in children) {
-      if (child.isNotEmpty) return false;
-    }
-
-    return true;
-  }
-
-  @override
-  TextBit get last {
-    for (final child in children.reversed) {
-      final last = child is TextBits ? child.last : child;
-      if (last != null) return last;
-    }
-
-    return null;
-  }
-
-  @override
-  bool addSpace([String data]) {
-    final tail = TextBit.tailOf(this);
-    if (tail == null) {
-      if (data == null) return false;
-    } else if (tail is _SpaceBit) {
-      if (data == null) return false;
-      tail._buffer.write(data);
-      return true;
-    }
-
-    children.add(_SpaceBit(this, data: data));
-    return true;
-  }
-
-  @override
-  void addText(String data) => children.add(_DataBit(this, data, tsb));
-
-  @override
-  _Text sub(TextStyleBuilders tsb) {
-    final sub = _Text(tsb, parent: this);
-    children.add(sub);
-    return sub;
+    return bit;
   }
 }
 

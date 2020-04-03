@@ -105,7 +105,7 @@ class _ImageLayoutDelegate extends SingleChildLayoutDelegate {
       height != other.height || width != other.width;
 }
 
-class _ImageBit extends _WidgetBit {
+class _ImageBit extends WidgetBit {
   _ImageBit(TextBits parent, _TagImg self, _TagImgMetadata img)
       : super(
           parent,

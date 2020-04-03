@@ -4,6 +4,8 @@ import 'package:html/dom.dart' as dom;
 
 import 'core_helpers.dart';
 
+part 'data/text_bits.dart';
+
 NodeMetadata lazySet(
   NodeMetadata meta, {
   BuildOp buildOp,
@@ -311,148 +313,6 @@ class NodeMetadata {
 }
 
 typedef NodeMetadata NodeMetadataCollector(NodeMetadata meta, dom.Element e);
-
-@immutable
-abstract class TextBit {
-  final TextBits parent;
-
-  TextBit(this.parent);
-
-  bool get canCompile => hasWidget;
-  String get data => null;
-  bool get hasTrailingSpace => false;
-  bool get hasWidget => false;
-  int get index => parent?.children?.indexOf(this) ?? -1;
-  bool get isEmpty => false;
-  bool get isNotEmpty => !isEmpty;
-  bool get isSpacing => false;
-  TextStyleBuilders get tsb => null;
-  IWidgetPlaceholder get widget => null;
-
-  InlineSpan compile(TextStyle style) => throw UnimplementedError();
-
-  bool detach() => parent?.children?.remove(this);
-
-  bool replaceWith(TextBit another) {
-    final i = index;
-    if (i == -1) return false;
-
-    parent.children[i] = another;
-    return true;
-  }
-
-  bool insertAfter(TextBit another) {
-    final i = another.index;
-    if (i == -1) return false;
-
-    another.parent.children.insert(i + 1, this);
-    return true;
-  }
-
-  bool insertBefore(TextBit another) {
-    final i = another.index;
-    if (i == -1) return false;
-
-    another.parent.children.insert(i, this);
-    return true;
-  }
-
-  @override
-  String toString() {
-    final clazz = runtimeType.toString();
-    final contents = hasWidget ? "widget=$widget" : "data=$data";
-    return "[$clazz:$hashCode $contents]";
-  }
-
-  static TextBit nextOf(TextBit bit) {
-    var x = bit;
-
-    while (x != null) {
-      final i = x.index;
-      if (i != -1) {
-        final siblings = x.parent.children;
-        for (var j = i + 1; j < siblings.length; j++) {
-          final candidate = siblings[j];
-          if (candidate is TextBits) {
-            final first = candidate.first;
-            if (first != null) return first;
-          } else {
-            return candidate;
-          }
-        }
-      }
-
-      x = x.parent;
-    }
-
-    return null;
-  }
-
-  static TextBit tailOf(TextBits bits) {
-    var x = bits;
-
-    while (x != null) {
-      final last = x.last;
-      if (last != null) return last;
-      x = x.parent;
-    }
-
-    return null;
-  }
-}
-
-abstract class TextBits extends TextBit {
-  TextBits(TextBits parent) : super(parent);
-
-  Iterable<TextBit> get bits;
-  List<TextBit> get children;
-  TextBit get first;
-  TextBit get last;
-
-  bool addSpace([String data]);
-  void addText(String data);
-  TextBits sub(TextStyleBuilders tsb);
-
-  @override
-  String toString() {
-    final clazz = runtimeType.toString();
-    final contents = _toStrings().join('\n');
-    return "\n[$clazz:$hashCode]\n$contents\n----";
-  }
-
-  Iterable<String> _toStrings() => children.map((child) {
-        if (child is TextBits)
-          return List<String>()
-            ..add("[${child.runtimeType}:${child.hashCode}]" +
-                (child.parent == this
-                    ? ''
-                    : " ⚠️ parent=${child.parent.hashCode}"))
-            ..addAll(child._toStrings());
-        return [child.toString()];
-      }).map((str) => str.map((s) => "  $s").join('\n'));
-
-  static int trimRight(TextBits bits) {
-    final children = bits.children;
-    var trimmed = 0;
-
-    while (children.isNotEmpty && bits.hasTrailingSpace) {
-      final child = children.last;
-      if (child is TextBits) {
-        final _trimmed = trimRight(child);
-        if (_trimmed > 0) {
-          trimmed += _trimmed;
-        } else {
-          children.removeLast();
-        }
-      } else {
-        children.removeLast();
-        trimmed++;
-      }
-    }
-
-    return trimmed;
-  }
-}
 
 class TextStyleBuilders {
   final _builders = <Function>[];
