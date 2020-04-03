@@ -1,12 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '_.dart' as _;
+import '_.dart' as helper;
 
 void main() {
   group('image.png', () {
     final src = 'http://domain.com/image.png';
-    final explain = (WidgetTester t, String html) => _.explain(t, html);
+    final explain = (WidgetTester t, String html) => helper.explain(t, html);
 
     testWidgets('renders src', (WidgetTester tester) async {
       final html = '<img src="$src" />';
@@ -112,7 +112,7 @@ void main() {
       String html, {
       String package,
     }) =>
-        _.explain(
+        helper.explain(
           tester,
           html,
           preTest: (context) {
@@ -157,7 +157,7 @@ void main() {
   });
 
   group('data uri', () {
-    final explain = _.explain;
+    final explain = helper.explain;
 
     testWidgets('renders data uri', (WidgetTester tester) async {
       // https://stackoverflow.com/questions/6018611/smallest-data-uri-image-possible-for-a-transparent-image
@@ -193,7 +193,7 @@ void main() {
       String fullUrl, {
       Uri baseUrl,
     }) async {
-      final e = await _.explain(
+      final e = await helper.explain(
         tester,
         html,
         baseUrl: baseUrl ?? Uri.parse('http://base.com/path/'),

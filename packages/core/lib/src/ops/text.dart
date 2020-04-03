@@ -22,11 +22,12 @@ class _TextCompiler {
     }
     _completeLoop();
 
-    if (_compiled.isEmpty)
+    if (_compiled.isEmpty) {
       _compiled.add(SpacingPlaceholder(
         height: CssLength(1, unit: CssLengthUnit.em),
         tsb: text.tsb,
       ));
+    }
 
     return _compiled;
   }

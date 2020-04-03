@@ -120,8 +120,12 @@ class _TagTable {
       final cells = List<Widget>(cols);
 
       int i = 0;
-      for (final cell in row.cells) cells[i++] = wf.buildTableCell(cell);
-      while (i < cols) cells[i++] = widget0;
+      for (final cell in row.cells) {
+        cells[i++] = wf.buildTableCell(cell);
+      }
+      while (i < cols) {
+        cells[i++] = widget0;
+      }
 
       tableRows.add(TableRow(children: cells));
     }
@@ -129,8 +133,9 @@ class _TagTable {
     final widgets = <Widget>[];
     if (ws.isNotEmpty) {
       final first = ws.first;
-      if (first is _TablePlaceholder && first.tag == kTagTableCaption)
+      if (first is _TablePlaceholder && first.tag == kTagTableCaption) {
         widgets.add(first);
+      }
     }
 
     final border = _buildTableBorder(bc, i.meta);
@@ -224,8 +229,9 @@ class _TablePlaceholder extends WidgetPlaceholder<_TableInput> {
   void wrapWith<T>(WidgetPlaceholderBuilder<T> builder, [T input]) {
     if (tag == kTagTableCell) return super.wrapWith(builder, input);
 
-    for (final child in _children)
+    for (final child in _children) {
       if (child is IWidgetPlaceholder) child.wrapWith(builder, input);
+    }
   }
 }
 

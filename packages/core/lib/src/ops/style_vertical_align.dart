@@ -29,8 +29,9 @@ class _StyleVerticalAlign {
     if (piece.hasWidgets) return piece;
 
     final alignment = _getPlaceholderAlignment(verticalAlign);
-    if (alignment == null || alignment == PlaceholderAlignment.baseline)
+    if (alignment == null || alignment == PlaceholderAlignment.baseline) {
       return piece;
+    }
 
     final text = piece.text;
     final replacement = text.parent.sub(text.tsb)..detach();

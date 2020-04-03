@@ -111,8 +111,9 @@ class _TagLi {
 
     final a = meta.domElement.attributes;
     if (a.containsKey(kAttributeOlReversed)) listMeta.markerReversed = true;
-    if (a.containsKey(kAttributeOlStart))
+    if (a.containsKey(kAttributeOlStart)) {
       listMeta.markerStart = int.tryParse(a[kAttributeOlStart]);
+    }
 
     for (final child in children) {
       if (!(child is _LiPlaceholder)) continue;
