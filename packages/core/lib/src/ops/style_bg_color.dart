@@ -1,6 +1,6 @@
 part of '../core_widget_factory.dart';
 
-const kCssBackgroundColor = 'background-color';
+const _kCssBackgroundColor = 'background-color';
 
 TextStyle _styleBgColorTextStyleBuilder(
   TextStyleBuilders _,
@@ -38,7 +38,7 @@ class _StyleBgColor {
 
   Color _parseColor(NodeMetadata meta) {
     String value;
-    meta.styles((k, v) => k == kCssBackgroundColor ? value = v : null);
+    meta.styles((k, v) => k == _kCssBackgroundColor ? value = v : null);
     if (value == null) return null;
 
     return parseColor(value);

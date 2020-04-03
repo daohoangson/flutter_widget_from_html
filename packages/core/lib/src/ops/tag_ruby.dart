@@ -16,7 +16,7 @@ class _TagRuby {
       onChild: (meta, e) {
         switch (e.localName) {
           case kTagRp:
-            meta = lazySet(meta, styles: [kCssDisplay, kCssDisplayNone]);
+            meta = lazySet(meta, styles: [_kCssDisplay, _kCssDisplayNone]);
             break;
           case kTagRt:
             meta = lazySet(
@@ -32,7 +32,7 @@ class _TagRuby {
                   return [];
                 },
               ),
-              styles: [kCssFontSize, '0.5em'],
+              styles: [_kCssFontSize, '0.5em'],
             );
             break;
         }

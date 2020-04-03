@@ -1,10 +1,10 @@
 part of '../core_widget_factory.dart';
 
-const kCssTextAlign = 'text-align';
-const kCssTextAlignCenter = 'center';
-const kCssTextAlignJustify = 'justify';
-const kCssTextAlignLeft = 'left';
-const kCssTextAlignRight = 'right';
+const _kCssTextAlign = 'text-align';
+const _kCssTextAlignCenter = 'center';
+const _kCssTextAlignJustify = 'justify';
+const _kCssTextAlignLeft = 'left';
+const _kCssTextAlignRight = 'right';
 
 TextStyle _styleTextAlignBuilder(
   TextStyleBuilders tsb,
@@ -24,7 +24,7 @@ class _StyleTextAlign {
         isBlockElement: true,
         onPieces: (meta, pieces) {
           String v;
-          meta.styles((k, _v) => k == kCssTextAlign ? v = _v : null);
+          meta.styles((k, _v) => k == _kCssTextAlign ? v = _v : null);
           if (v == null) return pieces;
 
           // handle texts
@@ -52,13 +52,13 @@ class _StyleTextAlign {
 
 Alignment _getAlignment(String textAlign) {
   switch (textAlign) {
-    case kCssTextAlignCenter:
+    case _kCssTextAlignCenter:
       return Alignment.center;
-    case kCssTextAlignJustify:
+    case _kCssTextAlignJustify:
       return Alignment.centerLeft;
-    case kCssTextAlignLeft:
+    case _kCssTextAlignLeft:
       return Alignment.centerLeft;
-    case kCssTextAlignRight:
+    case _kCssTextAlignRight:
       return Alignment.centerRight;
   }
 
@@ -67,13 +67,13 @@ Alignment _getAlignment(String textAlign) {
 
 TextAlign _getTextAlign(String textAlign) {
   switch (textAlign) {
-    case kCssTextAlignCenter:
+    case _kCssTextAlignCenter:
       return TextAlign.center;
-    case kCssTextAlignJustify:
+    case _kCssTextAlignJustify:
       return TextAlign.justify;
-    case kCssTextAlignLeft:
+    case _kCssTextAlignLeft:
       return TextAlign.left;
-    case kCssTextAlignRight:
+    case _kCssTextAlignRight:
       return TextAlign.right;
   }
 

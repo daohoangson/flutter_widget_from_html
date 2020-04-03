@@ -7,11 +7,11 @@ class _TagA {
 
   BuildOp get buildOp => BuildOp(
         defaultStyles: (meta, __) {
-          final styles = [kCssTextDecoration, kCssTextDecorationUnderline];
+          final styles = [_kCssTextDecoration, _kCssTextDecorationUnderline];
 
           if (wf.hyperlinkColor != null) {
             styles.addAll([
-              kCssColor,
+              _kCssColor,
               convertColorToHex(wf.hyperlinkColor),
             ]);
           }

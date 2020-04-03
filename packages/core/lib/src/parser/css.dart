@@ -1,54 +1,54 @@
-part of '../core_helpers.dart';
+part of '../core_widget_factory.dart';
 
-const kCssDisplay = 'display';
-const kCssDisplayBlock = 'block';
-const kCssDisplayInline = 'inline';
-const kCssDisplayInlineBlock = 'inline-block';
-const kCssDisplayNone = 'none';
+const _kCssDisplay = 'display';
+const _kCssDisplayBlock = 'block';
+const _kCssDisplayInline = 'inline';
+const _kCssDisplayInlineBlock = 'inline-block';
+const _kCssDisplayNone = 'none';
 
-const kCssFontFamily = 'font-family';
+const _kCssFontFamily = 'font-family';
 
-const kCssFontSize = 'font-size';
-const kCssFontSizeXxLarge = 'xx-large';
-const kCssFontSizeXLarge = 'x-large';
-const kCssFontSizeLarge = 'large';
-const kCssFontSizeMedium = 'medium';
-const kCssFontSizeSmall = 'small';
-const kCssFontSizeXSmall = 'x-small';
-const kCssFontSizeXxSmall = 'xx-small';
-const kCssFontSizeLarger = 'larger';
-const kCssFontSizeSmaller = 'smaller';
-const kCssFontSizes = {
-  "1": kCssFontSizeXxSmall,
-  "2": kCssFontSizeXSmall,
-  "3": kCssFontSizeSmall,
-  "4": kCssFontSizeMedium,
-  "5": kCssFontSizeLarge,
-  "6": kCssFontSizeXLarge,
-  "7": kCssFontSizeXxLarge,
+const _kCssFontSize = 'font-size';
+const _kCssFontSizeXxLarge = 'xx-large';
+const _kCssFontSizeXLarge = 'x-large';
+const _kCssFontSizeLarge = 'large';
+const _kCssFontSizeMedium = 'medium';
+const _kCssFontSizeSmall = 'small';
+const _kCssFontSizeXSmall = 'x-small';
+const _kCssFontSizeXxSmall = 'xx-small';
+const _kCssFontSizeLarger = 'larger';
+const _kCssFontSizeSmaller = 'smaller';
+const _kCssFontSizes = {
+  "1": _kCssFontSizeXxSmall,
+  "2": _kCssFontSizeXSmall,
+  "3": _kCssFontSizeSmall,
+  "4": _kCssFontSizeMedium,
+  "5": _kCssFontSizeLarge,
+  "6": _kCssFontSizeXLarge,
+  "7": _kCssFontSizeXxLarge,
 };
 
-const kCssFontStyle = 'font-style';
-const kCssFontStyleItalic = 'italic';
-const kCssFontStyleNormal = 'normal';
+const _kCssFontStyle = 'font-style';
+const _kCssFontStyleItalic = 'italic';
+const _kCssFontStyleNormal = 'normal';
 
-const kCssFontWeight = 'font-weight';
-const kCssFontWeightBold = 'bold';
-const kCssFontWeight100 = '100';
-const kCssFontWeight200 = '200';
-const kCssFontWeight300 = '300';
-const kCssFontWeight400 = '400';
-const kCssFontWeight500 = '500';
-const kCssFontWeight600 = '600';
-const kCssFontWeight700 = '700';
-const kCssFontWeight800 = '800';
-const kCssFontWeight900 = '900';
+const _kCssFontWeight = 'font-weight';
+const _kCssFontWeightBold = 'bold';
+const _kCssFontWeight100 = '100';
+const _kCssFontWeight200 = '200';
+const _kCssFontWeight300 = '300';
+const _kCssFontWeight400 = '400';
+const _kCssFontWeight500 = '500';
+const _kCssFontWeight600 = '600';
+const _kCssFontWeight700 = '700';
+const _kCssFontWeight800 = '800';
+const _kCssFontWeight900 = '900';
 
-const kCssTextDecoration = 'text-decoration';
-const kCssTextDecorationLineThrough = 'line-through';
-const kCssTextDecorationNone = 'none';
-const kCssTextDecorationOverline = 'overline';
-const kCssTextDecorationUnderline = 'underline';
+const _kCssTextDecoration = 'text-decoration';
+const _kCssTextDecorationLineThrough = 'line-through';
+const _kCssTextDecorationNone = 'none';
+const _kCssTextDecorationOverline = 'overline';
+const _kCssTextDecorationUnderline = 'underline';
 
 final _lengthRegExp = RegExp(r'^([\d\.]+)(em|px)$');
 final _spacingRegExp = RegExp(r'\s+');

@@ -1,12 +1,12 @@
 part of '../core_widget_factory.dart';
 
-const kCssVerticalAlign = 'vertical-align';
-const kCssVerticalAlignBaseline = 'baseline';
-const kCssVerticalAlignTop = 'top';
-const kCssVerticalAlignBottom = 'bottom';
-const kCssVerticalAlignMiddle = 'middle';
-const kCssVerticalAlignSub = 'sub';
-const kCssVerticalAlignSuper = 'super';
+const _kCssVerticalAlign = 'vertical-align';
+const _kCssVerticalAlignBaseline = 'baseline';
+const _kCssVerticalAlignTop = 'top';
+const _kCssVerticalAlignBottom = 'bottom';
+const _kCssVerticalAlignMiddle = 'middle';
+const _kCssVerticalAlignSub = 'sub';
+const _kCssVerticalAlignSuper = 'super';
 
 class _StyleVerticalAlign {
   final WidgetFactory wf;
@@ -18,8 +18,8 @@ class _StyleVerticalAlign {
           if (meta.isBlockElement) return pieces;
 
           String v;
-          meta.styles((k, _v) => k == kCssVerticalAlign ? v = _v : null);
-          if (v == null || v == kCssVerticalAlignBaseline) return pieces;
+          meta.styles((k, _v) => k == _kCssVerticalAlign ? v = _v : null);
+          if (v == null || v == _kCssVerticalAlignBaseline) return pieces;
 
           return pieces.map((piece) => _buildWidgetSpan(piece, v));
         },
@@ -42,9 +42,9 @@ class _StyleVerticalAlign {
         var built = wf.buildText(bc, null, text);
 
         // `sub` and `super` require additional offset
-        final dy = (verticalAlign == kCssVerticalAlignSub
+        final dy = (verticalAlign == _kCssVerticalAlignSub
             ? 2.5
-            : (verticalAlign == kCssVerticalAlignSuper ? -2.5 : 0.0));
+            : (verticalAlign == _kCssVerticalAlignSuper ? -2.5 : 0.0));
         if (dy != 0.0) {
           built = [
             Transform.translate(
@@ -65,15 +65,15 @@ class _StyleVerticalAlign {
 
 PlaceholderAlignment _getPlaceholderAlignment(String verticalAlign) {
   switch (verticalAlign) {
-    case kCssVerticalAlignBaseline:
+    case _kCssVerticalAlignBaseline:
       return PlaceholderAlignment.baseline;
-    case kCssVerticalAlignTop:
-    case kCssVerticalAlignSuper:
+    case _kCssVerticalAlignTop:
+    case _kCssVerticalAlignSuper:
       return PlaceholderAlignment.top;
-    case kCssVerticalAlignBottom:
-    case kCssVerticalAlignSub:
+    case _kCssVerticalAlignBottom:
+    case _kCssVerticalAlignSub:
       return PlaceholderAlignment.bottom;
-    case kCssVerticalAlignMiddle:
+    case _kCssVerticalAlignMiddle:
       return PlaceholderAlignment.middle;
   }
 

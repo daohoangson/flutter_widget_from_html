@@ -12,15 +12,15 @@ class _TagFont {
           final a = e.attributes;
           final styles = <String>[];
           if (a.containsKey('color')) {
-            styles.addAll([kCssColor, a['color']]);
+            styles.addAll([_kCssColor, a['color']]);
           }
           if (a.containsKey('face')) {
-            styles.addAll([kCssFontFamily, a['face']]);
+            styles.addAll([_kCssFontFamily, a['face']]);
           }
           if (a.containsKey('size')) {
             final size = a['size'];
-            if (kCssFontSizes.containsKey(size)) {
-              styles.addAll([kCssFontSize, kCssFontSizes[size]]);
+            if (_kCssFontSizes.containsKey(size)) {
+              styles.addAll([_kCssFontSize, _kCssFontSizes[size]]);
             }
           }
 

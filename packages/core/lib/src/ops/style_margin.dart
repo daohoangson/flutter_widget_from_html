@@ -1,12 +1,12 @@
 part of '../core_widget_factory.dart';
 
-const kCssMargin = 'margin';
-const kCssMarginBottom = 'margin-bottom';
-const kCssMarginEnd = 'margin-end';
-const kCssMarginLeft = 'margin-left';
-const kCssMarginRight = 'margin-right';
-const kCssMarginStart = 'margin-start';
-const kCssMarginTop = 'margin-top';
+const _kCssMargin = 'margin';
+const _kCssMarginBottom = 'margin-bottom';
+const _kCssMarginEnd = 'margin-end';
+const _kCssMarginLeft = 'margin-left';
+const _kCssMarginRight = 'margin-right';
+const _kCssMarginStart = 'margin-start';
+const _kCssMarginTop = 'margin-top';
 
 Iterable<Widget> _marginBuilder(
   BuilderContext bc,
@@ -148,16 +148,16 @@ class _StyleMarginParser {
 
     meta.styles((key, value) {
       switch (key) {
-        case kCssMargin:
+        case _kCssMargin:
           output = _parseAll(value);
           break;
 
-        case kCssMarginBottom:
-        case kCssMarginEnd:
-        case kCssMarginLeft:
-        case kCssMarginRight:
-        case kCssMarginStart:
-        case kCssMarginTop:
+        case _kCssMarginBottom:
+        case _kCssMarginEnd:
+        case _kCssMarginLeft:
+        case _kCssMarginRight:
+        case _kCssMarginStart:
+        case _kCssMarginTop:
           output = _parseOne(output, key, value);
           break;
       }
@@ -202,18 +202,18 @@ class _StyleMarginParser {
     existing ??= CssMargin();
 
     switch (key) {
-      case kCssMarginBottom:
+      case _kCssMarginBottom:
         return existing.copyWith(bottom: parsed);
-      case kCssMarginEnd:
+      case _kCssMarginEnd:
         return existing.copyWith(end: parsed);
-      case kCssMarginLeft:
+      case _kCssMarginLeft:
         return existing.copyWith(left: parsed);
-      case kCssMarginRight:
+      case _kCssMarginRight:
         return existing.copyWith(right: parsed);
-      case kCssMarginStart:
+      case _kCssMarginStart:
         return existing.copyWith(start: parsed);
       default:
-        // it's safe to assume key == kCssMarginTop because
+        // it's safe to assume key == _kCssMarginTop because
         // this function is only called from within this class
         return existing.copyWith(top: parsed);
     }

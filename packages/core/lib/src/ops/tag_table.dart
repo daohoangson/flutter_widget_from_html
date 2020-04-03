@@ -41,7 +41,7 @@ class _TagTable {
 
   BuildOp get captionOp {
     _captionOp ??= BuildOp(
-      defaultStyles: (_, __) => const [kCssTextAlign, kCssTextAlignCenter],
+      defaultStyles: (_, __) => const [_kCssTextAlign, _kCssTextAlignCenter],
       onWidgets: (meta, widgets) => [_placeholder(widgets, meta)],
     );
     return _captionOp;
@@ -50,7 +50,7 @@ class _TagTable {
   BuildOp get cellOp {
     _cellOp ??= BuildOp(
       defaultStyles: (_, e) => e.localName == kTagTableHeader
-          ? const [kCssFontWeight, kCssFontWeightBold]
+          ? const [_kCssFontWeight, _kCssFontWeightBold]
           : null,
       onWidgets: (meta, widgets) =>
           [_placeholder(widgets, meta, kTagTableCell)],
@@ -142,7 +142,7 @@ class _TagTable {
 
   TableBorder _buildTableBorder(BuilderContext bc, NodeMetadata meta) {
     String styleBorder;
-    meta.styles((k, v) => k == kCssBorder ? styleBorder = v : null);
+    meta.styles((k, v) => k == _kCssBorder ? styleBorder = v : null);
     if (styleBorder != null) {
       final borderParsed = parseCssBorderSide(styleBorder);
       if (borderParsed != null) {

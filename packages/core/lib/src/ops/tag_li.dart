@@ -11,19 +11,19 @@ const kAttributeLiTypeRomanLower = 'i';
 const kAttributeLiTypeRomanUpper = 'I';
 const kAttributeOlReversed = 'reversed';
 const kAttributeOlStart = 'start';
-const kCssListStyleType = 'list-style-type';
-const kCssListStyleTypeAlphaLower = 'lower-alpha';
-const kCssListStyleTypeAlphaUpper = 'upper-alpha';
-const kCssListStyleTypeAlphaLatinLower = 'lower-latin';
-const kCssListStyleTypeAlphaLatinUpper = 'upper-latin';
-const kCssListStyleTypeCircle = 'circle';
-const kCssListStyleTypeDecimal = 'decimal';
-const kCssListStyleTypeDisc = 'disc';
-const kCssListStyleTypeRomanLower = 'lower-roman';
-const kCssListStyleTypeRomanUpper = 'upper-roman';
-const kCssListStyleTypeSquare = 'square';
+const _kCssListStyleType = 'list-style-type';
+const _kCssListStyleTypeAlphaLower = 'lower-alpha';
+const _kCssListStyleTypeAlphaUpper = 'upper-alpha';
+const _kCssListStyleTypeAlphaLatinLower = 'lower-latin';
+const _kCssListStyleTypeAlphaLatinUpper = 'upper-latin';
+const _kCssListStyleTypeCircle = 'circle';
+const _kCssListStyleTypeDecimal = 'decimal';
+const _kCssListStyleTypeDisc = 'disc';
+const _kCssListStyleTypeRomanLower = 'lower-roman';
+const _kCssListStyleTypeRomanUpper = 'upper-roman';
+const _kCssListStyleTypeSquare = 'square';
 
-const _kCssPaddingInlineStart = 'padding-inline-start';
+const __kCssPaddingInlineStart = 'padding-inline-start';
 
 class _TagLi {
   final WidgetFactory wf;
@@ -39,21 +39,21 @@ class _TagLi {
         final p = meta.parents?.where((op) => op == _buildOp)?.length ?? 0;
 
         final styles = [
-          _kCssPaddingInlineStart,
+          __kCssPaddingInlineStart,
           '2.5em',
-          kCssListStyleType,
+          _kCssListStyleType,
           e.localName == kTagOrderedList
               ? (e.attributes.containsKey(kAttributeLiType)
                       ? _LiInput.listStyleTypeFromAttributeType(
                           e.attributes[kAttributeLiType])
                       : null) ??
-                  kCssListStyleTypeDecimal
+                  _kCssListStyleTypeDecimal
               : p == 0
-                  ? kCssListStyleTypeDisc
-                  : p == 1 ? kCssListStyleTypeCircle : kCssListStyleTypeSquare,
+                  ? _kCssListStyleTypeDisc
+                  : p == 1 ? _kCssListStyleTypeCircle : _kCssListStyleTypeSquare,
         ];
 
-        if (p == 0) styles.addAll([kCssMargin, '1em 0']);
+        if (p == 0) styles.addAll([_kCssMargin, '1em 0']);
 
         return styles;
       },
@@ -100,10 +100,10 @@ class _TagLi {
     final listMeta = _ListMetadata();
     meta.styles((key, value) {
       switch (key) {
-        case kCssListStyleType:
+        case _kCssListStyleType:
           listMeta.listStyleType = value;
           break;
-        case _kCssPaddingInlineStart:
+        case __kCssPaddingInlineStart:
           final parsed = parseCssLength(value);
           if (parsed != null) listMeta.paddingInlineStart = parsed;
       }
@@ -163,10 +163,10 @@ class _TagLi {
     CssLength paddingInlineStart;
     meta.styles((key, value) {
       switch (key) {
-        case kCssListStyleType:
+        case _kCssListStyleType:
           listStyleType = value;
           break;
-        case _kCssPaddingInlineStart:
+        case __kCssPaddingInlineStart:
           final parsed = parseCssLength(value);
           if (parsed != null) paddingInlineStart = parsed;
       }
@@ -207,15 +207,15 @@ class _LiInput {
   static String listStyleTypeFromAttributeType(String type) {
     switch (type) {
       case kAttributeLiTypeAlphaLower:
-        return kCssListStyleTypeAlphaLower;
+        return _kCssListStyleTypeAlphaLower;
       case kAttributeLiTypeAlphaUpper:
-        return kCssListStyleTypeAlphaUpper;
+        return _kCssListStyleTypeAlphaUpper;
       case kAttributeLiTypeDecimal:
-        return kCssListStyleTypeDecimal;
+        return _kCssListStyleTypeDecimal;
       case kAttributeLiTypeRomanLower:
-        return kCssListStyleTypeRomanLower;
+        return _kCssListStyleTypeRomanLower;
       case kAttributeLiTypeRomanUpper:
-        return kCssListStyleTypeRomanUpper;
+        return _kCssListStyleTypeRomanUpper;
     }
 
     return null;
@@ -223,7 +223,7 @@ class _LiInput {
 }
 
 class _ListMetadata {
-  String listStyleType = kCssListStyleTypeDisc;
+  String listStyleType = _kCssListStyleTypeDisc;
   int markerCount = 0;
   bool markerReversed = false;
   int markerStart;
