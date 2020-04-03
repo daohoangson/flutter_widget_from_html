@@ -47,7 +47,7 @@ abstract class TextBit {
     final clazz = runtimeType.toString();
     final self = this;
     final contents = self is WidgetBit ? "widget=${self.widget}" : "data=$data";
-    return "[$clazz:$hashCode $contents]";
+    return "[$clazz:$hashCode] $contents";
   }
 
   static TextBit nextOf(TextBit bit) {
@@ -219,8 +219,8 @@ class TextBits extends TextBit {
     return bit;
   }
 
-  TextBits sub(TextStyleBuilders tsb) {
-    final sub = TextBits(tsb, this);
+  TextBits sub([TextStyleBuilders tsb]) {
+    final sub = TextBits(tsb ?? this.tsb.sub(), this);
     children.add(sub);
     return sub;
   }
@@ -253,16 +253,22 @@ class TextBits extends TextBit {
     return "\n[$clazz:$hashCode]\n$contents\n----";
   }
 
-  Iterable<String> _toStrings() => children.map((child) {
-        if (child is TextBits)
-          return List<String>()
+  Iterable<String> _toStrings() => children
+      .map((child) => child is TextBits
+          ? (List<String>()
             ..add("[${child.runtimeType}:${child.hashCode}]" +
                 (child.parent == this
                     ? ''
                     : " ⚠️ parent=${child.parent.hashCode}"))
-            ..addAll(child._toStrings());
-        return [child.toString()];
-      }).map((str) => str.map((s) => "  $s").join('\n'));
+            ..addAll(child._toStrings()))
+          : [
+              child.toString() +
+                  (child.parent == this
+                      ? ''
+                      : " ⚠️ parent=${child.parent.hashCode}")
+            ])
+      .map((lines) => lines.map((line) => "  $line"))
+      .reduce((prev, lines) => List.from(prev)..addAll(lines));
 }
 
 enum SpaceType {
