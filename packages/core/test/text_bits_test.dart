@@ -136,8 +136,8 @@ void main() {
 
       test('returns false for widget', () {
         final text = _text();
-        text.children.add(
-            WidgetBit(text, WidgetPlaceholder(builder: (_, ws, __) => ws)));
+        final widget = WidgetPlaceholder(builder: (_, ws, __) => ws);
+        text.add(WidgetBit(text, widget));
 
         expect(text.hasTrailingSpace, isFalse);
       });
@@ -180,11 +180,11 @@ void main() {
       test('adds new bit', () {
         final text = _text();
         text.addText('data');
-        expect(text.children.length, equals(1));
+        expect(text.bits.length, equals(1));
 
         final space = text.addSpace();
         expect(space, isNotNull);
-        expect(text.children.length, equals(2));
+        expect(text.bits.length, equals(2));
       });
 
       test('skips adding to empty text', () {
@@ -220,19 +220,19 @@ void main() {
         final text = _text();
         text.addText('data');
         text.addSpace();
-        expect(text.children.length, equals(2));
+        expect(text.bits.length, equals(2));
 
         text.trimRight();
-        expect(text.children.length, equals(1));
+        expect(text.bits.length, equals(1));
       });
 
       test('skips trimming text', () {
         final text = _text();
         text.addText('data');
-        expect(text.children.length, equals(1));
+        expect(text.bits.length, equals(1));
 
         text.trimRight();
-        expect(text.children.length, equals(1));
+        expect(text.bits.length, equals(1));
       });
 
       test('trims bit from sub', () {
@@ -240,29 +240,32 @@ void main() {
         final text1 = text.sub();
         text1.addText('data');
         text1.addSpace();
-        expect(text1.children.length, equals(2));
+        expect(text1.bits.length, equals(2));
 
         text.trimRight();
-        expect(text1.children.length, equals(1));
+        expect(text1.bits.length, equals(1));
       });
 
       test('trims empty sub', () {
         final text = _text();
-        text.sub();
-        expect(text.children.length, equals(1));
+        final sub = text.sub();
+        expect(sub.index, equals(0));
 
         text.trimRight();
-        expect(text.children.length, equals(0));
+        expect(sub.index, equals(-1));
       });
 
       test('trims bits from sub and the sub itself', () {
         final text = _text();
-        final text1 = text.sub();
-        text1.addSpace();
-        expect(text.children.length, equals(1));
+        text.addText('data');
+        final sub = text.sub();
+        sub.addSpace();
+        expect(text.bits.length, equals(2));
+        expect(sub.index, equals(1));
 
         text.trimRight();
-        expect(text.children.length, equals(0));
+        expect(text.bits.length, equals(1));
+        expect(sub.index, equals(-1));
       });
     });
   });
@@ -277,14 +280,12 @@ void main() {
     text22.addText('(2.2.1)');
     text22.addText('(2.2.2)');
     text2.addText('(2.3)');
-    text.children.add(
-        WidgetBit(text, WidgetPlaceholder<String>(builder: (_, ws, __) => ws)));
+    final widget = WidgetPlaceholder<String>(builder: (_, ws, __) => ws);
+    text.add(WidgetBit(text, widget));
 
     final str = text.toString().replaceAll(RegExp(r':\d+\]'), ']');
 
-    expect(
-        str,
-        equals("""
+    expect(str, equals("""
 
 [TextBits]
   [DataBit] data=1
