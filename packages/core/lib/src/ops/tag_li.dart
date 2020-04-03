@@ -3,14 +3,14 @@ part of '../core_widget_factory.dart';
 const _kTagLi = 'li';
 const _kTagOrderedList = 'ol';
 const _kTagUnorderedList = 'ul';
-const kAttributeLiType = 'type';
-const kAttributeLiTypeAlphaLower = 'a';
-const kAttributeLiTypeAlphaUpper = 'A';
-const kAttributeLiTypeDecimal = '1';
-const kAttributeLiTypeRomanLower = 'i';
-const kAttributeLiTypeRomanUpper = 'I';
-const kAttributeOlReversed = 'reversed';
-const kAttributeOlStart = 'start';
+const _kAttributeLiType = 'type';
+const _kAttributeLiTypeAlphaLower = 'a';
+const _kAttributeLiTypeAlphaUpper = 'A';
+const _kAttributeLiTypeDecimal = '1';
+const _kAttributeLiTypeRomanLower = 'i';
+const _kAttributeLiTypeRomanUpper = 'I';
+const _kAttributeOlReversed = 'reversed';
+const _kAttributeOlStart = 'start';
 const _kCssListStyleType = 'list-style-type';
 const _kCssListStyleTypeAlphaLower = 'lower-alpha';
 const _kCssListStyleTypeAlphaUpper = 'upper-alpha';
@@ -43,9 +43,9 @@ class _TagLi {
           '2.5em',
           _kCssListStyleType,
           e.localName == _kTagOrderedList
-              ? (e.attributes.containsKey(kAttributeLiType)
+              ? (e.attributes.containsKey(_kAttributeLiType)
                       ? _LiInput.listStyleTypeFromAttributeType(
-                          e.attributes[kAttributeLiType])
+                          e.attributes[_kAttributeLiType])
                       : null) ??
                   _kCssListStyleTypeDecimal
               : p == 0
@@ -110,9 +110,9 @@ class _TagLi {
     });
 
     final a = meta.domElement.attributes;
-    if (a.containsKey(kAttributeOlReversed)) listMeta.markerReversed = true;
-    if (a.containsKey(kAttributeOlStart))
-      listMeta.markerStart = int.tryParse(a[kAttributeOlStart]);
+    if (a.containsKey(_kAttributeOlReversed)) listMeta.markerReversed = true;
+    if (a.containsKey(_kAttributeOlStart))
+      listMeta.markerStart = int.tryParse(a[_kAttributeOlStart]);
 
     for (final child in children) {
       if (!(child is _LiPlaceholder)) continue;
@@ -157,8 +157,8 @@ class _TagLi {
 
   _LiPlaceholder _placeholder(Iterable<Widget> children, NodeMetadata meta) {
     final a = meta.domElement.attributes;
-    String listStyleType = a.containsKey(kAttributeLiType)
-        ? _LiInput.listStyleTypeFromAttributeType(a[kAttributeLiType])
+    String listStyleType = a.containsKey(_kAttributeLiType)
+        ? _LiInput.listStyleTypeFromAttributeType(a[_kAttributeLiType])
         : null;
     CssLength paddingInlineStart;
     meta.styles((key, value) {
@@ -206,15 +206,15 @@ class _LiInput {
 
   static String listStyleTypeFromAttributeType(String type) {
     switch (type) {
-      case kAttributeLiTypeAlphaLower:
+      case _kAttributeLiTypeAlphaLower:
         return _kCssListStyleTypeAlphaLower;
-      case kAttributeLiTypeAlphaUpper:
+      case _kAttributeLiTypeAlphaUpper:
         return _kCssListStyleTypeAlphaUpper;
-      case kAttributeLiTypeDecimal:
+      case _kAttributeLiTypeDecimal:
         return _kCssListStyleTypeDecimal;
-      case kAttributeLiTypeRomanLower:
+      case _kAttributeLiTypeRomanLower:
         return _kCssListStyleTypeRomanLower;
-      case kAttributeLiTypeRomanUpper:
+      case _kAttributeLiTypeRomanUpper:
         return _kCssListStyleTypeRomanUpper;
     }
 
