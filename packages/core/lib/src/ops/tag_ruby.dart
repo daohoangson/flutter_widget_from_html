@@ -1,8 +1,8 @@
 part of '../core_widget_factory.dart';
 
-const kTagRuby = 'ruby';
-const kTagRp = 'rp';
-const kTagRt = 'rt';
+const _kTagRuby = 'ruby';
+const _kTagRp = 'rp';
+const _kTagRt = 'rt';
 
 class _TagRuby {
   final WidgetFactory wf;
@@ -15,10 +15,10 @@ class _TagRuby {
     return BuildOp(
       onChild: (meta, e) {
         switch (e.localName) {
-          case kTagRp:
+          case _kTagRp:
             meta = lazySet(meta, styles: [_kCssDisplay, _kCssDisplayNone]);
             break;
-          case kTagRt:
+          case _kTagRt:
             meta = lazySet(
               meta,
               buildOp: BuildOp(

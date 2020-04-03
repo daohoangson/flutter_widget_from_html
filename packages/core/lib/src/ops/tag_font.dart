@@ -1,7 +1,5 @@
 part of '../core_widget_factory.dart';
 
-const kTagFont = 'font';
-
 class _TagFont {
   final WidgetFactory wf;
 

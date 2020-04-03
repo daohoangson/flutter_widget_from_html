@@ -461,9 +461,9 @@ class WidgetFactory {
         meta = lazySet(meta, fontStyleItalic: true);
         break;
 
-      case kTagCode:
-      case kTagPre:
-      case kTagTt:
+      case _kTagCode:
+      case _kTagPre:
+      case _kTagTt:
         meta = lazySet(meta, buildOp: tagCode());
         break;
 
@@ -562,8 +562,8 @@ class WidgetFactory {
         meta = lazySet(meta, fontFamily: 'monospace');
         break;
 
-      case kTagOrderedList:
-      case kTagUnorderedList:
+      case _kTagOrderedList:
+      case _kTagUnorderedList:
         meta = lazySet(meta, buildOp: tagLi());
         break;
 
@@ -582,7 +582,7 @@ class WidgetFactory {
         meta = lazySet(meta, buildOp: tagQ());
         break;
 
-      case kTagRuby:
+      case _kTagRuby:
         meta = lazySet(meta, buildOp: tagRuby());
         break;
 
@@ -607,7 +607,7 @@ class WidgetFactory {
         ]);
         break;
 
-      case kTagTable:
+      case _kTagTable:
         meta = lazySet(meta, buildOp: tagTable());
         break;
     }

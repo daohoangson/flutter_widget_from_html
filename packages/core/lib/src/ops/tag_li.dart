@@ -1,8 +1,8 @@
 part of '../core_widget_factory.dart';
 
-const kTagLi = 'li';
-const kTagOrderedList = 'ol';
-const kTagUnorderedList = 'ul';
+const _kTagLi = 'li';
+const _kTagOrderedList = 'ol';
+const _kTagUnorderedList = 'ul';
 const kAttributeLiType = 'type';
 const kAttributeLiTypeAlphaLower = 'a';
 const kAttributeLiTypeAlphaUpper = 'A';
@@ -42,7 +42,7 @@ class _TagLi {
           __kCssPaddingInlineStart,
           '2.5em',
           _kCssListStyleType,
-          e.localName == kTagOrderedList
+          e.localName == _kTagOrderedList
               ? (e.attributes.containsKey(kAttributeLiType)
                       ? _LiInput.listStyleTypeFromAttributeType(
                           e.attributes[kAttributeLiType])
@@ -58,7 +58,7 @@ class _TagLi {
         return styles;
       },
       onChild: (meta, e) =>
-          e.localName == kTagLi ? lazySet(meta, buildOp: liOp) : meta,
+          e.localName == _kTagLi ? lazySet(meta, buildOp: liOp) : meta,
       onWidgets: (meta, widgets) => _buildList(meta, widgets),
     );
     return _buildOp;

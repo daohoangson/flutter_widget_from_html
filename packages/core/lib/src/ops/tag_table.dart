@@ -1,14 +1,14 @@
 part of '../core_widget_factory.dart';
 
-const kTagTable = 'table';
-const kTagTableAttrBorder = 'border';
-const kTagTableBody = 'tbody';
-const kTagTableCaption = 'caption';
-const kTagTableCell = 'td';
-const kTagTableFoot = 'tfoot';
-const kTagTableHead = 'thead';
-const kTagTableHeader = 'th';
-const kTagTableRow = 'tr';
+const _kTagTable = 'table';
+const _kTagTableAttrBorder = 'border';
+const _kTagTableBody = 'tbody';
+const _kTagTableCaption = 'caption';
+const _kTagTableCell = 'td';
+const _kTagTableFoot = 'tfoot';
+const _kTagTableHead = 'thead';
+const _kTagTableHeader = 'th';
+const _kTagTableRow = 'tr';
 
 class _TagTable {
   final WidgetFactory wf;
@@ -22,15 +22,15 @@ class _TagTable {
   BuildOp get buildOp => BuildOp(
         onChild: (meta, e) {
           switch (e.localName) {
-            case kTagTableCaption:
+            case _kTagTableCaption:
               return lazySet(meta, buildOp: captionOp);
-            case kTagTableCell:
-            case kTagTableHeader:
+            case _kTagTableCell:
+            case _kTagTableHeader:
               return lazySet(meta, buildOp: cellOp);
-            case kTagTableRow:
-            case kTagTableBody:
-            case kTagTableHead:
-            case kTagTableFoot:
+            case _kTagTableRow:
+            case _kTagTableBody:
+            case _kTagTableHead:
+            case _kTagTableFoot:
               return lazySet(meta, buildOp: childOp);
           }
 
@@ -49,11 +49,11 @@ class _TagTable {
 
   BuildOp get cellOp {
     _cellOp ??= BuildOp(
-      defaultStyles: (_, e) => e.localName == kTagTableHeader
+      defaultStyles: (_, e) => e.localName == _kTagTableHeader
           ? const [_kCssFontWeight, _kCssFontWeightBold]
           : null,
       onWidgets: (meta, widgets) =>
-          [_placeholder(widgets, meta, kTagTableCell)],
+          [_placeholder(widgets, meta, _kTagTableCell)],
     );
     return _cellOp;
   }
@@ -68,14 +68,14 @@ class _TagTable {
   Iterable<Widget> _build(
       BuilderContext bc, Iterable<Widget> ws, _TableInput i) {
     switch (i.tag) {
-      case kTagTableCaption:
-      case kTagTableCell:
+      case _kTagTableCaption:
+      case _kTagTableCell:
         return ws;
-      case kTagTableRow:
+      case _kTagTableRow:
         return [_buildRow(bc, ws, i)];
-      case kTagTableHead:
-      case kTagTableBody:
-      case kTagTableFoot:
+      case _kTagTableHead:
+      case _kTagTableBody:
+      case _kTagTableFoot:
         return [_buildRows(bc, ws, i)];
     }
 
@@ -89,16 +89,16 @@ class _TagTable {
     for (final child in ws) {
       if (child is _TablePlaceholder) {
         switch (child.tag) {
-          case kTagTableHead:
+          case _kTagTableHead:
             rows.addAll((child.buildWithContext(bc) as _TableRows).rows);
             break;
-          case kTagTableBody:
+          case _kTagTableBody:
             bodyRows.addAll((child.buildWithContext(bc) as _TableRows).rows);
             break;
-          case kTagTableFoot:
+          case _kTagTableFoot:
             footRows.addAll((child.buildWithContext(bc) as _TableRows).rows);
             break;
-          case kTagTableRow:
+          case _kTagTableRow:
             bodyRows.add(child.buildWithContext(bc));
             break;
         }
@@ -129,7 +129,7 @@ class _TagTable {
     final widgets = <Widget>[];
     if (ws.isNotEmpty) {
       final first = ws.first;
-      if (first is _TablePlaceholder && first.tag == kTagTableCaption)
+      if (first is _TablePlaceholder && first.tag == _kTagTableCaption)
         widgets.add(first);
     }
 
@@ -154,8 +154,8 @@ class _TagTable {
     }
 
     final a = meta.domElement.attributes;
-    if (a.containsKey(kTagTableAttrBorder)) {
-      final width = double.tryParse(a[kTagTableAttrBorder]);
+    if (a.containsKey(_kTagTableAttrBorder)) {
+      final width = double.tryParse(a[_kTagTableAttrBorder]);
       if (width != null && width > 0) {
         return TableBorder.all(width: width);
       }
@@ -167,7 +167,7 @@ class _TagTable {
   Widget _buildRow(BuilderContext bc, Iterable<Widget> ws, _TableInput i) {
     final cells = <Widget>[];
     for (final child in ws) {
-      if (child is _TablePlaceholder && child.tag == kTagTableCell) {
+      if (child is _TablePlaceholder && child.tag == _kTagTableCell) {
         cells.add(child.buildWithContext(bc));
       }
     }
@@ -178,7 +178,7 @@ class _TagTable {
   Widget _buildRows(BuilderContext bc, Iterable<Widget> ws, _TableInput i) {
     final rows = <_TableRow>[];
     for (final child in ws) {
-      if (child is _TablePlaceholder && child.tag == kTagTableRow) {
+      if (child is _TablePlaceholder && child.tag == _kTagTableRow) {
         rows.add(child.buildWithContext(bc));
       }
     }
@@ -222,7 +222,7 @@ class _TablePlaceholder extends WidgetPlaceholder<_TableInput> {
 
   @override
   void wrapWith<T>(WidgetPlaceholderBuilder<T> builder, [T input]) {
-    if (tag == kTagTableCell) return super.wrapWith(builder, input);
+    if (tag == _kTagTableCell) return super.wrapWith(builder, input);
 
     for (final child in _children)
       if (child is IWidgetPlaceholder) child.wrapWith(builder, input);
