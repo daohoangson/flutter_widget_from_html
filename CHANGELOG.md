@@ -1,3 +1,13 @@
+## 0.3.2+2
+
+* Use minimum main axis size
+* Update dependencies
+
+## 0.3.2+1
+
+* Fix IMG wrong size when device has scaled text (#127)
+* Update supported Flutter version `>=1.12.13+hotfix.5 <2.0.0`
+
 ## 0.3.2
 
 * Update supported Flutter version `>=1.10.15 <2.0.0`

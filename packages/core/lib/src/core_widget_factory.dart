@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui' as ui show ParagraphBuilder;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
@@ -10,12 +11,14 @@ import 'data_classes.dart';
 part 'ops/style_bg_color.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_text_align.dart';
+part 'ops/style_vertical_align.dart';
 part 'ops/tag_a.dart';
 part 'ops/tag_code.dart';
 part 'ops/tag_font.dart';
 part 'ops/tag_img.dart';
 part 'ops/tag_li.dart';
 part 'ops/tag_q.dart';
+part 'ops/tag_ruby.dart';
 part 'ops/tag_table.dart';
 part 'ops/text.dart';
 
@@ -27,6 +30,7 @@ class WidgetFactory {
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
   BuildOp _styleTextAlign;
+  BuildOp _styleVerticalAlign;
   BuildOp _tagA;
   BuildOp _tagBr;
   BuildOp _tagCode;
@@ -44,8 +48,8 @@ class WidgetFactory {
   Iterable<Widget> buildAligns(
           BuilderContext bc, Iterable<Widget> widgets, Alignment alignment) =>
       widgets.map((widget) {
-        if (bc.origin is WidgetPlaceholder<TextBlock>) return widget;
-        if (widget is WidgetPlaceholder<TextBlock>) return widget;
+        if (bc.origin is WidgetPlaceholder<TextBits>) return widget;
+        if (widget is WidgetPlaceholder<TextBits>) return widget;
         return Align(alignment: alignment, child: widget);
       });
 
@@ -78,9 +82,8 @@ class WidgetFactory {
         continue;
       }
 
-      if (widget is WidgetPlaceholder<TextBlock>) {
-        final WidgetPlaceholder<TextBlock> textPlaceholder = widget;
-        widget = textPlaceholder.build(bc.context);
+      if (widget is WidgetPlaceholder<TextBits>) {
+        widget = (widget as WidgetPlaceholder).build(bc.context);
       }
 
       if (widget is SimpleColumn) {
@@ -164,7 +167,7 @@ class WidgetFactory {
 
     final prefix = match[0];
     final bytes = base64.decode(dataUri.substring(prefix.length));
-    if (bytes.length == 0) return null;
+    if (bytes.isEmpty) return null;
 
     return bytes;
   }
@@ -207,14 +210,14 @@ class WidgetFactory {
   Iterable<Widget> buildText(
     BuilderContext bc,
     Iterable<Widget> _,
-    TextBlock block,
+    TextBits text,
   ) {
-    final tsb = block.tsb;
+    final tsb = text.tsb;
     tsb?.build(bc);
 
     final textScaleFactor = MediaQuery.of(bc.context).textScaleFactor;
     final widgets = <Widget>[];
-    for (final compiled in _TextBlockCompiler(block).compile(bc)) {
+    for (final compiled in _TextCompiler(text).compile(bc)) {
       if (compiled is InlineSpan) {
         widgets.add(RichText(
           text: compiled,
@@ -383,6 +386,10 @@ class WidgetFactory {
   }
 
   NodeMetadata parseElement(NodeMetadata meta, dom.Element element) {
+    if (element.attributes.containsKey('dir')) {
+      meta = lazySet(meta, buildOp: attrDir(element.attributes['dir']));
+    }
+
     if (_config.builderCallback != null) {
       meta = _config.builderCallback(meta, element);
     }
@@ -532,6 +539,7 @@ class WidgetFactory {
       case 'iframe':
       case 'script':
       case 'style':
+      case 'svg':
         // actually `script` and `style` are not required here
         // our parser will put those elements into document.head anyway
         meta = lazySet(meta, isNotRenderable: true);
@@ -567,12 +575,33 @@ class WidgetFactory {
         meta = lazySet(meta, styles: [kCssMargin, '1em 0']);
         break;
 
-      case kTagQ:
+      case 'q':
         meta = lazySet(meta, buildOp: tagQ());
+        break;
+
+      case kTagRuby:
+        meta = lazySet(meta, buildOp: tagRuby());
         break;
 
       case 'small':
         meta = lazySet(meta, fontSize: kCssFontSizeSmaller);
+        break;
+
+      case 'sub':
+        meta = lazySet(meta, styles: [
+          kCssFontSize,
+          kCssFontSizeSmaller,
+          kCssVerticalAlign,
+          kCssVerticalAlignSub,
+        ]);
+        break;
+      case 'sup':
+        meta = lazySet(meta, styles: [
+          kCssFontSize,
+          kCssFontSizeSmaller,
+          kCssVerticalAlign,
+          kCssVerticalAlignSuper,
+        ]);
         break;
 
       case kTagTable:
@@ -690,8 +719,10 @@ class WidgetFactory {
 
       case kCssMargin:
       case kCssMarginBottom:
+      case kCssMarginEnd:
       case kCssMarginLeft:
       case kCssMarginRight:
+      case kCssMarginStart:
       case kCssMarginTop:
         meta = lazySet(meta, buildOp: styleMargin());
         break;
@@ -723,10 +754,34 @@ class WidgetFactory {
           }
         }
         break;
+
+      case kCssVerticalAlign:
+        meta = lazySet(meta, buildOp: styleVerticalAlign());
+        break;
+
+      case 'direction':
+        meta = lazySet(meta, buildOp: attrDir(value));
+        break;
     }
 
     return meta;
   }
+
+  BuildOp attrDir(final String dir) => BuildOp(
+        onWidgets: (_, ws) {
+          final textDirection = dir == 'rtl'
+              ? TextDirection.rtl
+              : dir == 'ltr' ? TextDirection.ltr : null;
+
+          if (textDirection == null) return ws;
+          return [
+            Directionality(
+              child: buildColumn(ws),
+              textDirection: textDirection,
+            )
+          ];
+        },
+      );
 
   BuildOp styleBgColor() {
     _styleBgColor ??= _StyleBgColor(this).buildOp;
@@ -743,6 +798,11 @@ class WidgetFactory {
     return _styleTextAlign;
   }
 
+  BuildOp styleVerticalAlign() {
+    _styleVerticalAlign ??= _StyleVerticalAlign(this).buildOp;
+    return _styleVerticalAlign;
+  }
+
   BuildOp tagA() {
     _tagA ??= _TagA(this).buildOp;
     return _tagA;
@@ -750,7 +810,7 @@ class WidgetFactory {
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      onPieces: (_, pieces) => pieces..last.block.addSpace('\n'),
+      onPieces: (_, pieces) => pieces..last.text.addSpace(SpaceType.newLine),
     );
     return _tagBr;
   }
@@ -787,6 +847,8 @@ class WidgetFactory {
     _tagQ ??= _TagQ(this).buildOp;
     return _tagQ;
   }
+
+  BuildOp tagRuby() => _TagRuby(this).buildOp;
 
   BuildOp tagTable() {
     _tagTable ??= _TagTable(this).buildOp;

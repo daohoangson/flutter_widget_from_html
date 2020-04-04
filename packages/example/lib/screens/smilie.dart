@@ -13,7 +13,7 @@ class SmilieScreen extends StatelessWidget {
     onPieces: (meta, pieces) {
       final alt = meta.domElement.attributes['alt'];
       final text = kSmilies.containsKey(alt) ? kSmilies[alt] : alt;
-      return pieces..first?.block?.addText(text);
+      return pieces..first?.text?.addText(text);
     },
   );
 

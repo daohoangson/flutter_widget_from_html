@@ -9,9 +9,9 @@ final _attrStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
 
 class Builder {
   final List<dom.Node> domNodes;
-  final TextBlock parentBlock;
   final NodeMetadata parentMeta;
   final Iterable<BuildOp> parentOps;
+  final TextBits parentText;
   final TextStyleBuilders parentTsb;
   final WidgetFactory wf;
 
@@ -21,9 +21,9 @@ class Builder {
 
   Builder({
     @required this.domNodes,
-    this.parentBlock,
     this.parentMeta,
     Iterable<BuildOp> parentParentOps,
+    this.parentText,
     @required this.parentTsb,
     @required this.wf,
   })  : assert(domNodes != null),
@@ -40,11 +40,11 @@ class Builder {
           if (widget != null) list.add(widget);
         }
       } else {
-        final block = piece.block;
-        if ((block..trimRight()).isNotEmpty) {
+        final text = piece.text..trimRight();
+        if (text.isNotEmpty) {
           list.add(WidgetPlaceholder(
             builder: wf.buildText,
-            input: block,
+            input: text,
           ));
         }
       }
@@ -115,9 +115,9 @@ class Builder {
       final isBlockElement = meta?.isBlockElement == true;
       final __builder = Builder(
         domNodes: domNode.nodes,
-        parentBlock: isBlockElement ? null : _textPiece.block,
         parentMeta: meta,
         parentParentOps: parentOps,
+        parentText: isBlockElement ? null : _textPiece.text,
         parentTsb: meta?.tsb ?? parentTsb,
         wf: wf,
       );
@@ -129,8 +129,8 @@ class Builder {
       }
 
       for (final __piece in __builder.process()) {
-        if (__piece.block?.parent == _textPiece.block) {
-          // same text block, do nothing
+        if (__piece.text?.parent == _textPiece.text) {
+          // same text, do nothing
           continue;
         }
 
@@ -153,8 +153,8 @@ class Builder {
 
   void _newTextPiece() => _textPiece = _Piece(
         this,
-        block: (_pieces.isEmpty ? parentBlock?.sub(parentTsb) : null) ??
-            TextBlock(parentTsb),
+        text: (_pieces.isEmpty ? parentText?.sub(parentTsb) : null) ??
+            TextBits(parentTsb),
       );
 
   void _saveTextPiece() {
@@ -165,35 +165,36 @@ class Builder {
 
 class _Piece extends BuiltPiece {
   final Builder b;
-  final TextBlock block;
+  final TextBits text;
   final Iterable<Widget> widgets;
 
   _Piece(
     this.b, {
-    this.block,
+    this.text,
     this.widgets,
-  }) : assert((block == null) != (widgets == null));
+  }) : assert((text == null) != (widgets == null));
 
   @override
   bool get hasWidgets => widgets != null;
 
-  bool _write(String text) {
-    final leading = regExpSpaceLeading.firstMatch(text);
-    final trailing = regExpSpaceTrailing.firstMatch(text);
+  TextBit _write(String data) {
+    final leading = regExpSpaceLeading.firstMatch(data);
+    final trailing = regExpSpaceTrailing.firstMatch(data);
     final start = leading == null ? 0 : leading.end;
-    final end = trailing == null ? text.length : trailing.start;
+    final end = trailing == null ? data.length : trailing.start;
 
-    if (end <= start) return block.addSpace();
+    if (end <= start) return text.addSpace();
 
-    if (start > 0) block.addSpace();
+    TextBit bit;
+    if (start > 0) bit = text.addSpace();
 
-    final substring = text.substring(start, end);
+    final substring = data.substring(start, end);
     final dedup = substring.replaceAll(regExpSpaces, ' ');
-    block.addText(dedup);
+    bit = text.addText(dedup);
 
-    if (end < text.length) block.addSpace();
+    if (end < data.length) bit = text.addSpace();
 
-    return true;
+    return bit;
   }
 }
 

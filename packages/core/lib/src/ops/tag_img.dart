@@ -59,7 +59,6 @@ class _ImageLayoutState extends State<ImageLayout> {
       _stream.addListener(_streamListener);
     }
 
-
     if (hasDimensions) {
       // we may have dimensions in 3 cases
       // 1. From the beginning, via widget constructor
@@ -106,6 +105,43 @@ class _ImageLayoutDelegate extends SingleChildLayoutDelegate {
       height != other.height || width != other.width;
 }
 
+class _ImageBit extends WidgetBit {
+  _ImageBit(TextBits parent, _TagImg self, _TagImgMetadata img)
+      : super(
+          parent,
+          WidgetPlaceholder(builder: self._buildImage, input: img),
+        );
+
+  @override
+  WidgetSpan compile(TextStyle style) => _ImageSpan(
+        alignment: alignment,
+        baseline: baseline,
+        child: widget,
+        style: style,
+      );
+}
+
+class _ImageSpan extends WidgetSpan {
+  const _ImageSpan({
+    PlaceholderAlignment alignment,
+    TextBaseline baseline,
+    IWidgetPlaceholder child,
+    TextStyle style,
+  }) : super(
+          alignment: alignment,
+          baseline: baseline,
+          child: child,
+          style: style,
+        );
+
+  @override
+  void build(ui.ParagraphBuilder builder,
+      {double textScaleFactor = 1.0,
+      @required List<PlaceholderDimensions> dimensions}) {
+    super.build(builder, textScaleFactor: 1.0, dimensions: dimensions);
+  }
+}
+
 class _TagImg {
   final WidgetFactory wf;
 
@@ -116,25 +152,15 @@ class _TagImg {
         onPieces: (meta, pieces) {
           if (meta.isBlockElement) return pieces;
 
+          final text = pieces.last?.text;
           final img = _parseMetadata(meta, wf);
-
           if (img.url?.isNotEmpty != true && img.text?.isNotEmpty == true) {
-            return pieces..last?.block?.addText(img.text);
+            text.addText(img.text);
+            return pieces;
           }
 
-          final widget = _buildImage(img, wf);
-          if (widget == null) return pieces;
-
-          if (widget is Text) {
-            return pieces..last?.block?.addText(widget.data);
-          }
-
-          return pieces
-            ..last?.block?.addWidget(WidgetSpan(
-                  alignment: PlaceholderAlignment.baseline,
-                  baseline: TextBaseline.alphabetic,
-                  child: widget,
-                ));
+          text.add(_ImageBit(text, this, img));
+          return pieces;
         },
         onWidgets: (meta, widgets) {
           if (!meta.isBlockElement) return widgets;
@@ -142,12 +168,18 @@ class _TagImg {
           final img = _parseMetadata(meta, wf);
           if (img.url?.isNotEmpty != true) return widgets;
 
-          return listOfNonNullOrNothing(_buildImage(img, wf));
+          return listOfNonNullOrNothing(_buildImage1(img));
         },
       );
 
-  static Widget _buildImage(_TagImgMetadata img, WidgetFactory wf) =>
-      wf.buildImage(
+  Iterable<Widget> _buildImage(
+    BuilderContext _,
+    Iterable<Widget> __,
+    _TagImgMetadata img,
+  ) =>
+      [_buildImage1(img)];
+
+  Widget _buildImage1(_TagImgMetadata img) => wf.buildImage(
         img.url,
         height: img.height,
         text: img.text,

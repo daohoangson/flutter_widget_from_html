@@ -11,7 +11,7 @@ TextStyle _styleTextAlignBuilder(
   TextStyle parent,
   TextAlign align,
 ) {
-  tsb.textAlign = align;
+  if (align != null) tsb.textAlign = align;
   return parent;
 }
 
@@ -30,9 +30,11 @@ class _StyleTextAlign {
           // handle texts
           meta.tsb.enqueue(_styleTextAlignBuilder, _getTextAlign(v));
 
+          final alignment = _getAlignment(v);
+          if (alignment == null) return pieces;
+
           // handle widgets
           final newPieces = <BuiltPiece>[];
-          final alignment = _getAlignment(v);
           for (final p in pieces) {
             if (p.widgets?.isNotEmpty == true) {
               newPieces.add(BuiltPieceSimple(

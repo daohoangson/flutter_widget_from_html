@@ -29,13 +29,13 @@ void main() {
     test('renders 2.0 without resizing', () async {
       await driver.tap(s2Finder);
       await Future.delayed(const Duration(seconds: 10));
-      expect(await driver.getText(rFinder), '1.78');
+      expect(await driver.getText(rFinder), '1.77');
     });
 
     test('renders 3.0 without resizing', () async {
       await driver.tap(s3Finder);
       await Future.delayed(const Duration(seconds: 10));
-      expect(await driver.getText(rFinder), '1.78');
+      expect(await driver.getText(rFinder), '1.77');
     });
   });
 }

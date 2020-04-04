@@ -9,11 +9,12 @@ part 'parser/color.dart';
 part 'parser/css.dart';
 
 /// A no op placeholder widget.
-const widget0 = const SizedBox.shrink();
+const widget0 = SizedBox.shrink();
 
+// https://ecma-international.org/ecma-262/9.0/#table-32
 // https://unicode.org/cldr/utility/character.jsp?a=200B
-final regExpSpaceLeading = RegExp(r'^[\s\u{200B}]+', unicode: true);
-final regExpSpaceTrailing = RegExp(r'[\s\u{200B}]+$', unicode: true);
+final regExpSpaceLeading = RegExp(r'^[ \n\t\u{200B}]+', unicode: true);
+final regExpSpaceTrailing = RegExp(r'[ \n\t\u{200B}]+$', unicode: true);
 final regExpSpaces = RegExp(r'\s+');
 
 typedef void OnTapUrl(String url);
@@ -31,6 +32,7 @@ class SimpleColumn extends StatelessWidget {
   @override
   Widget build(BuildContext _) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
         children: children,
       );
 
