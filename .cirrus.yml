@@ -8,6 +8,8 @@ analyze_task:
     - flutter pub get
     - ( cd packages/core && flutter pub get )
     - ( cd packages/example && flutter pub get )
+  format_script:
+    - flutter format --dry-run --set-exit-if-changed .
   analyze_script:
     - flutter analyze -v
 

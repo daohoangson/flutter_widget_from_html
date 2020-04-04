@@ -282,9 +282,7 @@ void main() {
 
     final str = text.toString().replaceAll(RegExp(r':\d+\]'), ']');
 
-    expect(
-        str,
-        equals("""
+    expect(str, equals("""
 
 [TextBits]
   [DataBit] data=1

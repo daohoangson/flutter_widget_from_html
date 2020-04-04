@@ -158,13 +158,13 @@ CODE tag:
             return ListTile(
               title: Text(key),
               onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => html is String
-                          ? CompareScreen(html: html, title: key)
-                          : (html as Function)(),
-                    ),
-                  ),
+                context,
+                MaterialPageRoute(
+                  builder: (_) => html is String
+                      ? CompareScreen(html: html, title: key)
+                      : (html as Function)(),
+                ),
+              ),
             );
           },
           itemCount: _htmls.length,
