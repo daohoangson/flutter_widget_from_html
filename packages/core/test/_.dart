@@ -3,7 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
-final hwKey = GlobalKey<HtmlWidgetState>();
+final hwKey = GlobalKey<State<HtmlWidget>>();
+
+Widget buildCurrentState() {
+  final hws = hwKey.currentState;
+  if (hws == null) return null;
+
+  // ignore: invalid_use_of_protected_member
+  return hws.build(hws.context);
+}
 
 Future<String> explain(
   WidgetTester tester,
@@ -62,7 +70,7 @@ Future<String> explain(
   expect(hws, isNotNull);
 
   return Explainer(hws.context, explainer: explainer)
-      .explain(hws.build(hws.context));
+      .explain(buildCurrentState());
 }
 
 final _explainMarginRegExp = RegExp(

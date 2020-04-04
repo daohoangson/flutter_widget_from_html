@@ -23,9 +23,8 @@ void main() {
       final explained = await explain(tester, html, true);
       expect(explained, equals('[RichText:(:Foo)]'));
 
-      final hws = helper.hwKey.currentState;
-      final built1 = hws.build(hws.context);
-      final built2 = hws.build(hws.context);
+      final built1 = helper.buildCurrentState();
+      final built2 = helper.buildCurrentState();
       expect(built1 == built2, isTrue);
     });
 
@@ -45,9 +44,8 @@ void main() {
       final explained = await explain(tester, html, false);
       expect(explained, equals('[RichText:(:Foo)]'));
 
-      final hws = helper.hwKey.currentState;
-      final built1 = hws.build(hws.context);
-      final built2 = hws.build(hws.context);
+      final built1 = helper.buildCurrentState();
+      final built2 = helper.buildCurrentState();
       expect(built1 == built2, isFalse);
     });
   });

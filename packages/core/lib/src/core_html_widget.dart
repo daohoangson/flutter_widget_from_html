@@ -63,7 +63,7 @@ class HtmlWidget extends StatefulWidget {
         super(key: key);
 
   @override
-  State<HtmlWidget> createState() => HtmlWidgetState();
+  State<HtmlWidget> createState() => _HtmlWidgetState();
 }
 
 class HtmlWidgetConfig {
@@ -103,7 +103,7 @@ class HtmlWidgetConfig {
   });
 }
 
-class HtmlWidgetState extends State<HtmlWidget> {
+class _HtmlWidgetState extends State<HtmlWidget> {
   Widget _built;
 
   @override
