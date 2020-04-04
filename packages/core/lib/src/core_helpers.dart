@@ -7,12 +7,6 @@ import 'data_classes.dart';
 /// A no op placeholder widget.
 const widget0 = SizedBox.shrink();
 
-// https://ecma-international.org/ecma-262/9.0/#table-32
-// https://unicode.org/cldr/utility/character.jsp?a=200B
-final regExpSpaceLeading = RegExp(r'^[ \n\t\u{200B}]+', unicode: true);
-final regExpSpaceTrailing = RegExp(r'[ \n\t\u{200B}]+$', unicode: true);
-final regExpSpaces = RegExp(r'\s+');
-
 typedef void OnTapUrl(String url);
 
 typedef Iterable<Widget> WidgetPlaceholderBuilder<T>(

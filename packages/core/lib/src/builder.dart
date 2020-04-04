@@ -7,6 +7,12 @@ import 'data_classes.dart';
 
 final _attrStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
 
+// https://ecma-international.org/ecma-262/9.0/#table-32
+// https://unicode.org/cldr/utility/character.jsp?a=200B
+final _regExpSpaceLeading = RegExp(r'^[ \n\t\u{200B}]+', unicode: true);
+final _regExpSpaceTrailing = RegExp(r'[ \n\t\u{200B}]+$', unicode: true);
+final _regExpSpaces = RegExp(r'\s+');
+
 class Builder {
   final List<dom.Node> domNodes;
   final NodeMetadata parentMeta;
@@ -178,8 +184,8 @@ class _Piece extends BuiltPiece {
   bool get hasWidgets => widgets != null;
 
   TextBit _write(String data) {
-    final leading = regExpSpaceLeading.firstMatch(data);
-    final trailing = regExpSpaceTrailing.firstMatch(data);
+    final leading = _regExpSpaceLeading.firstMatch(data);
+    final trailing = _regExpSpaceTrailing.firstMatch(data);
     final start = leading == null ? 0 : leading.end;
     final end = trailing == null ? data.length : trailing.start;
 
@@ -189,7 +195,7 @@ class _Piece extends BuiltPiece {
     if (start > 0) bit = text.addSpace();
 
     final substring = data.substring(start, end);
-    final dedup = substring.replaceAll(regExpSpaces, ' ');
+    final dedup = substring.replaceAll(_regExpSpaces, ' ');
     bit = text.addText(dedup);
 
     if (end < data.length) bit = text.addSpace();
