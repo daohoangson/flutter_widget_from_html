@@ -149,7 +149,7 @@ class _TagTable {
     String styleBorder;
     meta.styles((k, v) => k == _kCssBorder ? styleBorder = v : null);
     if (styleBorder != null) {
-      final borderParsed = parseCssBorderSide(styleBorder);
+      final borderParsed = wf.parseCssBorderSide(styleBorder);
       if (borderParsed != null) {
         return TableBorder.all(
           color: borderParsed.color ?? const Color(0xFF000000),

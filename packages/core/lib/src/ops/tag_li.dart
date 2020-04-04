@@ -106,7 +106,7 @@ class _TagLi {
           listMeta.listStyleType = value;
           break;
         case __kCssPaddingInlineStart:
-          final parsed = parseCssLength(value);
+          final parsed = wf.parseCssLength(value);
           if (parsed != null) listMeta.paddingInlineStart = parsed;
       }
     });
@@ -170,7 +170,7 @@ class _TagLi {
           listStyleType = value;
           break;
         case __kCssPaddingInlineStart:
-          final parsed = parseCssLength(value);
+          final parsed = wf.parseCssLength(value);
           if (parsed != null) paddingInlineStart = parsed;
       }
     });

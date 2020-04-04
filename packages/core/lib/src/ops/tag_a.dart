@@ -12,7 +12,7 @@ class _TagA {
           if (wf.hyperlinkColor != null) {
             styles.addAll([
               _kCssColor,
-              convertColorToHex(wf.hyperlinkColor),
+              _convertColorToHex(wf.hyperlinkColor),
             ]);
           }
 

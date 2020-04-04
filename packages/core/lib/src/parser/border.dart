@@ -7,34 +7,34 @@ const _kCssBorderTop = 'border-top';
 final _borderValuesThreeRegExp = RegExp(r'^(.+)\s+(.+)\s+(.+)$');
 final _borderValuesTwoRegExp = RegExp(r'^(.+)\s+(.+)$');
 
-CssBorderSide parseCssBorderSide(String value) {
+CssBorderSide _parseCssBorderSide(WidgetFactory wf, String value) {
   final valuesThree = _borderValuesThreeRegExp.firstMatch(value);
   if (valuesThree != null) {
-    final width = parseCssLength(valuesThree[1]);
+    final width = wf.parseCssLength(valuesThree[1]);
     if (width == null || width.number <= 0) return null;
     return CssBorderSide()
-      ..color = parseColor(valuesThree[3])
-      ..style = parseCssBorderStyle(valuesThree[2])
+      ..color = wf.parseColor(valuesThree[3])
+      ..style = wf.parseCssBorderStyle(valuesThree[2])
       ..width = width;
   }
 
   final valuesTwo = _borderValuesTwoRegExp.firstMatch(value);
   if (valuesTwo != null) {
-    final width = parseCssLength(valuesTwo[1]);
+    final width = wf.parseCssLength(valuesTwo[1]);
     if (width == null || width.number <= 0) return null;
     return CssBorderSide()
-      ..style = parseCssBorderStyle(valuesTwo[2])
+      ..style = wf.parseCssBorderStyle(valuesTwo[2])
       ..width = width;
   }
 
-  final width = parseCssLength(value);
+  final width = wf.parseCssLength(value);
   if (width == null || width.number <= 0) return null;
   return CssBorderSide()
     ..style = CssBorderStyle.solid
     ..width = width;
 }
 
-CssBorderStyle parseCssBorderStyle(String value) {
+CssBorderStyle _parseCssBorderStyle(String value) {
   switch (value) {
     case 'dotted':
       return CssBorderStyle.dotted;

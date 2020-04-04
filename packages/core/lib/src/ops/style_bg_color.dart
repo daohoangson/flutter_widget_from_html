@@ -41,6 +41,6 @@ class _StyleBgColor {
     meta.styles((k, v) => k == _kCssBackgroundColor ? value = v : null);
     if (value == null) return null;
 
-    return parseColor(value);
+    return wf.parseColor(value);
   }
 }

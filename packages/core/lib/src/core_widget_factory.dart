@@ -615,6 +615,23 @@ class WidgetFactory {
     return meta;
   }
 
+  Color parseColor(String value) => _parseColor(value);
+
+  CssBorderSide parseCssBorderSide(String value) =>
+      _parseCssBorderSide(this, value);
+
+  CssBorderStyle parseCssBorderStyle(String value) =>
+      _parseCssBorderStyle(value);
+
+  CssLength parseCssLength(String value) => _parseCssLength(value);
+
+  CssMargin parseCssMargin(NodeMetadata meta) => _parseCssMargin(this, meta);
+
+  CssMargin parseCssMarginAll(String value) => _parseCssMarginAll(this, value);
+
+  CssMargin parseCssMarginOne(CssMargin existing, String key, String value) =>
+      _parseCssMarginOne(this, existing, key, value);
+
   NodeMetadata parseStyle(NodeMetadata meta, String key, String value) {
     switch (key) {
       case _kCssBackgroundColor:
@@ -735,7 +752,7 @@ class WidgetFactory {
         break;
 
       case _kCssTextDecoration:
-        for (final v in splitCss(value)) {
+        for (final v in _splitCss(value)) {
           switch (v) {
             case _kCssTextDecorationLineThrough:
               meta = lazySet(meta, decoStrike: true);

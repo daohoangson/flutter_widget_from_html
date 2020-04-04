@@ -53,7 +53,7 @@ const _kCssTextDecorationUnderline = 'underline';
 final _lengthRegExp = RegExp(r'^([\d\.]+)(em|px)$');
 final _spacingRegExp = RegExp(r'\s+');
 
-CssLength parseCssLength(String value) {
+CssLength _parseCssLength(String value) {
   if (value == null) return null;
   if (value == '0') return CssLength(0);
 
@@ -73,4 +73,4 @@ CssLength parseCssLength(String value) {
   return null;
 }
 
-Iterable<String> splitCss(String value) => value.split(_spacingRegExp);
+Iterable<String> _splitCss(String value) => value.split(_spacingRegExp);

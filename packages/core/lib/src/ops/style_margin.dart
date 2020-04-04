@@ -8,6 +8,10 @@ const _kCssMarginRight = 'margin-right';
 const _kCssMarginStart = 'margin-start';
 const _kCssMarginTop = 'margin-top';
 
+final _valuesFourRegExp =
+    RegExp(r'^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)$');
+final _valuesTwoRegExp = RegExp(r'^([^\s]+)\s+([^\s]+)$');
+
 Iterable<Widget> _marginBuilder(
   BuilderContext bc,
   Iterable<Widget> children,
@@ -90,7 +94,7 @@ class _StyleMargin {
   BuildOp get buildOp => BuildOp(
         onWidgets: (meta, widgets) {
           if (widgets?.isNotEmpty != true) return null;
-          final m = _StyleMarginParser(meta).parse();
+          final m = wf.parseCssMargin(meta);
           if (m == null) return null;
 
           final t = m.top?.isNotEmpty == true;
@@ -136,90 +140,79 @@ class _StyleMargin {
       );
 }
 
-final _valuesFourRegExp =
-    RegExp(r'^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)$');
-final _valuesTwoRegExp = RegExp(r'^([^\s]+)\s+([^\s]+)$');
+CssMargin _parseCssMargin(WidgetFactory wf, NodeMetadata meta) {
+  CssMargin output;
 
-class _StyleMarginParser {
-  final NodeMetadata meta;
-
-  _StyleMarginParser(this.meta);
-
-  CssMargin parse() {
-    CssMargin output;
-
-    meta.styles((key, value) {
-      switch (key) {
-        case _kCssMargin:
-          output = _parseAll(value);
-          break;
-
-        case _kCssMarginBottom:
-        case _kCssMarginEnd:
-        case _kCssMarginLeft:
-        case _kCssMarginRight:
-        case _kCssMarginStart:
-        case _kCssMarginTop:
-          output = _parseOne(output, key, value);
-          break;
-      }
-    });
-
-    return output;
-  }
-
-  CssMargin _parseAll(String value) {
-    final valuesFour = _valuesFourRegExp.firstMatch(value);
-    if (valuesFour != null) {
-      return CssMargin()
-        ..top = _parseValue(valuesFour[1])
-        ..end = _parseValue(valuesFour[2])
-        ..bottom = _parseValue(valuesFour[3])
-        ..start = _parseValue(valuesFour[4]);
-    }
-
-    final valuesTwo = _valuesTwoRegExp.firstMatch(value);
-    if (valuesTwo != null) {
-      final topBottom = _parseValue(valuesTwo[1]);
-      final leftRight = _parseValue(valuesTwo[2]);
-      return CssMargin()
-        ..bottom = topBottom
-        ..end = leftRight
-        ..start = leftRight
-        ..top = topBottom;
-    }
-
-    final all = _parseValue(value);
-    return CssMargin()
-      ..bottom = all
-      ..end = all
-      ..start = all
-      ..top = all;
-  }
-
-  CssMargin _parseOne(CssMargin existing, String key, String value) {
-    final parsed = _parseValue(value);
-    if (parsed == null) return existing;
-
-    existing ??= CssMargin();
-
+  meta.styles((key, value) {
     switch (key) {
+      case _kCssMargin:
+        output = wf.parseCssMarginAll(value);
+        break;
+
       case _kCssMarginBottom:
-        return existing.copyWith(bottom: parsed);
       case _kCssMarginEnd:
-        return existing.copyWith(end: parsed);
       case _kCssMarginLeft:
-        return existing.copyWith(left: parsed);
       case _kCssMarginRight:
-        return existing.copyWith(right: parsed);
       case _kCssMarginStart:
-        return existing.copyWith(start: parsed);
-      default:
-        // it's safe to assume key == _kCssMarginTop because
-        // this function is only called from within this class
-        return existing.copyWith(top: parsed);
+      case _kCssMarginTop:
+        output = wf.parseCssMarginOne(output, key, value);
+        break;
     }
+  });
+
+  return output;
+}
+
+CssMargin _parseCssMarginAll(WidgetFactory wf, String value) {
+  final valuesFour = _valuesFourRegExp.firstMatch(value);
+  if (valuesFour != null) {
+    return CssMargin()
+      ..top = wf.parseCssLength(valuesFour[1])
+      ..end = wf.parseCssLength(valuesFour[2])
+      ..bottom = wf.parseCssLength(valuesFour[3])
+      ..start = wf.parseCssLength(valuesFour[4]);
   }
 
-  CssLength _parseValue(String str) => parseCssLength(str);
+  final valuesTwo = _valuesTwoRegExp.firstMatch(value);
+  if (valuesTwo != null) {
+    final topBottom = wf.parseCssLength(valuesTwo[1]);
+    final leftRight = wf.parseCssLength(valuesTwo[2]);
+    return CssMargin()
+      ..bottom = topBottom
+      ..end = leftRight
+      ..start = leftRight
+      ..top = topBottom;
+  }
+
+  final all = wf.parseCssLength(value);
+  return CssMargin()
+    ..bottom = all
+    ..end = all
+    ..start = all
+    ..top = all;
+}
+
+CssMargin _parseCssMarginOne(
+    WidgetFactory wf, CssMargin existing, String key, String value) {
+  final parsed = wf.parseCssLength(value);
+  if (parsed == null) return existing;
+
+  existing ??= CssMargin();
+
+  switch (key) {
+    case _kCssMarginBottom:
+      return existing.copyWith(bottom: parsed);
+    case _kCssMarginEnd:
+      return existing.copyWith(end: parsed);
+    case _kCssMarginLeft:
+      return existing.copyWith(left: parsed);
+    case _kCssMarginRight:
+      return existing.copyWith(right: parsed);
+    case _kCssMarginStart:
+      return existing.copyWith(start: parsed);
+    case _kCssMarginTop:
+      return existing.copyWith(top: parsed);
+  }
+
+  return existing;
 }
