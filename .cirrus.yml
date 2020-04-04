@@ -11,7 +11,7 @@ analyze_task:
   format_script:
     - flutter format --dry-run --set-exit-if-changed .
   analyze_script:
-    - flutter analyze -v
+    - flutter analyze --no-pub
 
 unit_test_task:
   container:
