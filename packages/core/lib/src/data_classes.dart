@@ -30,9 +30,7 @@ NodeMetadata lazySet(
   if (buildOp != null) {
     meta._buildOps ??= [];
     final ops = meta._buildOps as List<BuildOp>;
-    if (ops.indexOf(buildOp) == -1) {
-      ops.add(buildOp);
-    }
+    if (!ops.contains(buildOp)) ops.add(buildOp);
   }
 
   if (color != null) meta.color = color;

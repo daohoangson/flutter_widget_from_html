@@ -4,11 +4,14 @@ env:
 analyze_task:
   container:
     image: cirrusci/flutter:$FLUTTER_VERSION
-  analyze_core_script:
-    - ( cd packages/core && flutter analyze )
-  analyze_extended_script:
+  pub_get_script:
+    - flutter pub get
+    - ( cd packages/core && flutter pub get )
     - ( cd packages/example && flutter pub get )
-    - flutter analyze
+  format_script:
+    - flutter format --dry-run --set-exit-if-changed .
+  analyze_script:
+    - flutter analyze --no-pub
 
 unit_test_task:
   container:

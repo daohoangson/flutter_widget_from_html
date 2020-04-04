@@ -134,8 +134,9 @@ class Explainer {
   }
 
   String _imageLayout(ImageLayout widget) {
-    if (widget.height == null && widget.text == null && widget.width == null)
+    if (widget.height == null && widget.text == null && widget.width == null) {
       return _image(widget.image);
+    }
 
     String s = "[ImageLayout:child=${_image(widget.image)}";
     if (widget.height != null) s += ",height=${widget.height}";

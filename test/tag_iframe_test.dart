@@ -1,16 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import '_.dart' as _;
+import '_.dart' as helper;
 
 Future<String> explain(WidgetTester tester, String html) =>
-    _.explain(tester, html, webView: true);
+    helper.explain(tester, html, webView: true);
 
 void main() {
   final src = 'http://domain.com';
 
   testWidgets('renders clickable text', (tester) async {
     final html = '<iframe src="$src"></iframe>';
-    final explained = await _.explain(tester, html);
+    final explained = await helper.explain(tester, html);
     expect(explained, equals("[GestureDetector:child=[Text:$src]]"));
   });
 

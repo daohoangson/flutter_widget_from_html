@@ -56,7 +56,7 @@ class _TestAppState extends State<TestApp> {
         ],
       );
 
-  Widget _buildAspectRatioTester() => input.length > 0
+  Widget _buildAspectRatioTester() => input.isNotEmpty
       ? AspectRatioTester(
           child: VideoPlayer(
             input,
