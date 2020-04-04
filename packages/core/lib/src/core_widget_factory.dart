@@ -170,7 +170,7 @@ class WidgetFactory {
 
     final prefix = match[0];
     final bytes = base64.decode(dataUri.substring(prefix.length));
-    if (bytes.length == 0) return null;
+    if (bytes.isEmpty) return null;
 
     return bytes;
   }

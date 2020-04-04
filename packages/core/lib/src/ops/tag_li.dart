@@ -50,7 +50,9 @@ class _TagLi {
                   _kCssListStyleTypeDecimal
               : p == 0
                   ? _kCssListStyleTypeDisc
-                  : p == 1 ? _kCssListStyleTypeCircle : _kCssListStyleTypeSquare,
+                  : p == 1
+                      ? _kCssListStyleTypeCircle
+                      : _kCssListStyleTypeSquare,
         ];
 
         if (p == 0) styles.addAll([_kCssMargin, '1em 0']);
@@ -111,8 +113,9 @@ class _TagLi {
 
     final a = meta.domElement.attributes;
     if (a.containsKey(_kAttributeOlReversed)) listMeta.markerReversed = true;
-    if (a.containsKey(_kAttributeOlStart))
+    if (a.containsKey(_kAttributeOlStart)) {
       listMeta.markerStart = int.tryParse(a[_kAttributeOlStart]);
+    }
 
     for (final child in children) {
       if (!(child is _LiPlaceholder)) continue;

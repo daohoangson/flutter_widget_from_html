@@ -29,14 +29,15 @@ class _StyleVerticalAlign {
     if (piece.hasWidgets) return piece;
 
     final alignment = _getPlaceholderAlignment(verticalAlign);
-    if (alignment == null || alignment == PlaceholderAlignment.baseline)
+    if (alignment == null || alignment == PlaceholderAlignment.baseline) {
       return piece;
+    }
 
     final text = piece.text;
     final replacement = text.parent.sub(text.tsb)..detach();
     text.replaceWith(replacement);
 
-    replacement.children.add(WidgetBit(
+    replacement.add(WidgetBit(
       text,
       WidgetPlaceholder<_StyleVerticalAlign>(builder: (bc, _, __) {
         var built = wf.buildText(bc, null, text);

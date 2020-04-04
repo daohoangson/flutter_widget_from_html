@@ -51,7 +51,7 @@ class _TagRuby {
         final replacement = parent.sub(text.tsb)..detach();
         text.replaceWith(replacement);
 
-        replacement.children..add(_buildWidgetBit(parent, text, _rtText));
+        replacement.add(_buildWidgetBit(parent, text, _rtText));
 
         return BuiltPieceSimple(text: replacement);
       }),

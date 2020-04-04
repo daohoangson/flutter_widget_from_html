@@ -11,7 +11,7 @@ class _TagQ {
           final lastText = pieces.last?.text;
           if (firstText == lastText && firstText.isEmpty) {
             final text = firstText;
-            text.children
+            text
               ..add(_TagQBit(text, isOpening: true))
               ..add(_TagQBit(text, isOpening: false));
             return pieces;
