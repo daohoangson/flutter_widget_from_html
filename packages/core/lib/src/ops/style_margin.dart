@@ -54,12 +54,12 @@ class _MarginBuilderInput {
   WidgetFactory wf;
 }
 
-class SpacingPlaceholder extends IWidgetPlaceholder {
+class _MarginPlaceholder extends IWidgetPlaceholder {
   final TextStyleBuilders tsb;
 
   final _heights = <CssLength>[];
 
-  SpacingPlaceholder({
+  _MarginPlaceholder({
     @required CssLength height,
     @required this.tsb,
   })  : assert(height != null),
@@ -80,7 +80,7 @@ class SpacingPlaceholder extends IWidgetPlaceholder {
     return SizedBox(height: height);
   }
 
-  void mergeWith(SpacingPlaceholder other) => _heights.addAll(other._heights);
+  void mergeWith(_MarginPlaceholder other) => _heights.addAll(other._heights);
 
   @override
   Widget wrapWith<T>(WidgetPlaceholderBuilder<T> builder, T input) => this;
@@ -107,7 +107,7 @@ class _StyleMargin {
           final tsb = meta.tsb;
 
           var i = 0;
-          if (t) ws[i++] = SpacingPlaceholder(height: m.top, tsb: tsb);
+          if (t) ws[i++] = _MarginPlaceholder(height: m.top, tsb: tsb);
 
           if (lr) {
             for (final widget in widgets) {
@@ -133,7 +133,7 @@ class _StyleMargin {
             }
           }
 
-          if (b) ws[i++] = SpacingPlaceholder(height: m.bottom, tsb: tsb);
+          if (b) ws[i++] = _MarginPlaceholder(height: m.bottom, tsb: tsb);
 
           return ws;
         },
