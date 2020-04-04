@@ -5,7 +5,7 @@ import 'core_widget_factory.dart';
 import 'data_classes.dart';
 
 /// A no op placeholder widget.
-const widget0 = const SizedBox.shrink();
+const widget0 = SizedBox.shrink();
 
 // https://ecma-international.org/ecma-262/9.0/#table-32
 // https://unicode.org/cldr/utility/character.jsp?a=200B

@@ -124,7 +124,9 @@ class _StyleMargin {
                     );
             }
           } else {
-            for (final widget in widgets) ws[i++] = widget;
+            for (final widget in widgets) {
+              ws[i++] = widget;
+            }
           }
 
           if (b) ws[i++] = SpacingPlaceholder(height: m.bottom, tsb: tsb);

@@ -9,20 +9,20 @@ abstract class TextBit {
   bool get canCompile => false;
   String get data => null;
   bool get hasTrailingSpace => false;
-  int get index => parent?.children?.indexOf(this) ?? -1;
+  int get index => parent?._children?.indexOf(this) ?? -1;
   bool get isEmpty => false;
   bool get isNotEmpty => !isEmpty;
   TextStyleBuilders get tsb => null;
 
   InlineSpan compile(TextStyle style) => throw UnimplementedError();
 
-  bool detach() => parent?.children?.remove(this);
+  bool detach() => parent?._children?.remove(this);
 
   bool insertAfter(TextBit another) {
     final i = another.index;
     if (i == -1) return false;
 
-    another.parent.children.insert(i + 1, this);
+    another.parent._children.insert(i + 1, this);
     return true;
   }
 
@@ -30,7 +30,7 @@ abstract class TextBit {
     final i = another.index;
     if (i == -1) return false;
 
-    another.parent.children.insert(i, this);
+    another.parent._children.insert(i, this);
     return true;
   }
 
@@ -38,7 +38,7 @@ abstract class TextBit {
     final i = index;
     if (i == -1) return false;
 
-    parent.children[i] = another;
+    parent._children[i] = another;
     return true;
   }
 
@@ -56,7 +56,7 @@ abstract class TextBit {
     while (x != null) {
       final i = x.index;
       if (i != -1) {
-        final siblings = x.parent.children;
+        final siblings = x.parent._children;
         for (var j = i + 1; j < siblings.length; j++) {
           final candidate = siblings[j];
           if (candidate is TextBits) {
@@ -151,7 +151,7 @@ class WidgetBit extends TextBit {
 }
 
 class TextBits extends TextBit {
-  final children = <TextBit>[];
+  final _children = <TextBit>[];
 
   @override
   final tsb;
@@ -161,7 +161,7 @@ class TextBits extends TextBit {
         super(parent);
 
   Iterable<TextBit> get bits sync* {
-    for (final child in children) {
+    for (final child in _children) {
       if (child is TextBits) {
         yield* child.bits;
       } else {
@@ -171,7 +171,7 @@ class TextBits extends TextBit {
   }
 
   TextBit get first {
-    for (final child in children) {
+    for (final child in _children) {
       final first = child is TextBits ? child.first : child;
       if (first != null) return first;
     }
@@ -184,7 +184,7 @@ class TextBits extends TextBit {
 
   @override
   bool get isEmpty {
-    for (final child in children) {
+    for (final child in _children) {
       if (child.isNotEmpty) return false;
     }
 
@@ -192,13 +192,15 @@ class TextBits extends TextBit {
   }
 
   TextBit get last {
-    for (final child in children.reversed) {
+    for (final child in _children.reversed) {
       final last = child is TextBits ? child.last : child;
       if (last != null) return last;
     }
 
     return null;
   }
+
+  void add(TextBit bit) => _children.add(bit);
 
   TextBit addSpace([SpaceType type]) {
     final tail = TextBit.tailOf(this);
@@ -209,36 +211,37 @@ class TextBits extends TextBit {
     }
 
     final bit = SpaceBit(this, type);
-    children.add(bit);
+    add(bit);
     return bit;
   }
 
   TextBit addText(String data) {
     final bit = DataBit(this, data, tsb);
-    children.add(bit);
+    add(bit);
     return bit;
   }
 
   TextBits sub([TextStyleBuilders tsb]) {
     final sub = TextBits(tsb ?? this.tsb.sub(), this);
-    children.add(sub);
+    add(sub);
     return sub;
   }
 
   int trimRight() {
     var trimmed = 0;
 
-    while (children.isNotEmpty && hasTrailingSpace) {
-      final child = children.last;
+    while (_children.isNotEmpty && hasTrailingSpace) {
+      final child = _children.last;
       if (child is TextBits) {
         final _trimmed = child.trimRight();
         if (_trimmed > 0) {
           trimmed += _trimmed;
+          if (child.isEmpty) child.detach();
         } else {
-          children.removeLast();
+          child.detach();
         }
       } else {
-        children.removeLast();
+        child.detach();
         trimmed++;
       }
     }
@@ -253,22 +256,24 @@ class TextBits extends TextBit {
     return "\n[$clazz:$hashCode]\n$contents\n----";
   }
 
-  Iterable<String> _toStrings() => children
-      .map((child) => child is TextBits
-          ? (List<String>()
-            ..add("[${child.runtimeType}:${child.hashCode}]" +
-                (child.parent == this
-                    ? ''
-                    : " ⚠️ parent=${child.parent.hashCode}"))
-            ..addAll(child._toStrings()))
-          : [
-              child.toString() +
-                  (child.parent == this
-                      ? ''
-                      : " ⚠️ parent=${child.parent.hashCode}")
-            ])
-      .map((lines) => lines.map((line) => "  $line"))
-      .reduce((prev, lines) => List.from(prev)..addAll(lines));
+  Iterable<String> _toStrings() => _children.isNotEmpty
+      ? (_children
+          .map((child) => child is TextBits
+              ? (List<String>()
+                ..add("[${child.runtimeType}:${child.hashCode}]" +
+                    (child.parent == this
+                        ? ''
+                        : " ⚠️ parent=${child.parent.hashCode}"))
+                ..addAll(child._toStrings()))
+              : [
+                  child.toString() +
+                      (child.parent == this
+                          ? ''
+                          : " ⚠️ parent=${child.parent.hashCode}")
+                ])
+          .map((lines) => lines.map((line) => "  $line"))
+          .reduce((prev, lines) => List.from(prev)..addAll(lines)))
+      : [];
 }
 
 enum SpaceType {
