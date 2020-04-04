@@ -89,8 +89,8 @@ class WidgetFactory {
         widget = (widget as WidgetPlaceholder).build(bc.context);
       }
 
-      if (widget is SimpleColumn) {
-        final SimpleColumn column = widget;
+      if (widget is Column) {
+        final Column column = widget;
         output.addAll(column.children);
         widget = column.children.last;
       } else {

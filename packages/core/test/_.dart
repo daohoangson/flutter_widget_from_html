@@ -297,9 +297,6 @@ class Explainer {
     if (widget is ImageLayout) return _imageLayout(widget);
 
     // ignore: invalid_use_of_protected_member
-    if (widget is SimpleColumn) return _widget(widget.build(context));
-
-    // ignore: invalid_use_of_protected_member
     if (widget is IWidgetPlaceholder) return _widget(widget.build(context));
 
     final type = widget.runtimeType.toString();

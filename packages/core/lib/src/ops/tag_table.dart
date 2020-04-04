@@ -142,7 +142,7 @@ class _TagTable {
     widgets.add(wf.buildTable(tableRows, border: border));
 
     if (widgets.length == 1) return widgets.first;
-    return SimpleColumn.wrap(widgets);
+    return wf.buildColumn(widgets);
   }
 
   TableBorder _buildTableBorder(BuilderContext bc, NodeMetadata meta) {

@@ -14,25 +14,6 @@ typedef Iterable<Widget> WidgetPlaceholderBuilder<T>(
 
 typedef WidgetFactory FactoryBuilder(HtmlWidgetConfig config);
 
-class SimpleColumn extends StatelessWidget {
-  final List<Widget> children;
-
-  SimpleColumn(this.children);
-
-  @override
-  Widget build(BuildContext _) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: children,
-      );
-
-  static Widget wrap(Iterable<Widget> ws) {
-    if (ws?.isNotEmpty != true) return null;
-    if (ws.length == 1) return ws.first;
-    return SimpleColumn(ws is List ? ws : ws.toList(growable: false));
-  }
-}
-
 class WidgetPlaceholder<T1> extends IWidgetPlaceholder {
   final _builders = List<Function>();
   final Iterable<Widget> _firstChildren;
@@ -60,7 +41,15 @@ class WidgetPlaceholder<T1> extends IWidgetPlaceholder {
       output = _builders[i](bc, children, _inputs[i]);
     }
 
-    return SimpleColumn.wrap(output) ?? widget0;
+    output = output?.where((widget) => widget != null);
+    if (output?.isNotEmpty != true) return widget0;
+    if (output.length == 1) return output.first;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: output.toList(growable: false),
+    );
   }
 
   @override
