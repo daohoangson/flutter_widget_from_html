@@ -53,7 +53,7 @@ class _TagRuby {
 
         replacement.add(_buildWidgetBit(parent, text, _rtText));
 
-        return BuiltPieceSimple(text: replacement);
+        return BuiltPiece.text(replacement);
       }),
     );
   }

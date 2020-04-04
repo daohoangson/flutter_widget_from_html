@@ -148,21 +148,13 @@ class BuilderContext {
   BuilderContext(this.context, this.origin);
 }
 
-abstract class BuiltPiece {
-  bool get hasWidgets;
-
-  TextBits get text;
-  Iterable<Widget> get widgets;
-}
-
-class BuiltPieceSimple extends BuiltPiece {
+class BuiltPiece {
   final TextBits text;
   final Iterable<Widget> widgets;
 
-  BuiltPieceSimple({
-    this.text,
-    this.widgets,
-  }) : assert((text == null) != (widgets == null));
+  BuiltPiece.text(this.text) : widgets = null;
+
+  BuiltPiece.widgets(this.widgets) : text = null;
 
   bool get hasWidgets => widgets != null;
 }

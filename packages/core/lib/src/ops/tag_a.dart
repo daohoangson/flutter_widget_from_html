@@ -28,10 +28,8 @@ class _TagA {
 
           return pieces.map(
             (piece) => piece.hasWidgets
-                ? BuiltPieceSimple(
-                    widgets: IWidgetPlaceholder.wrap(
-                        piece.widgets, wf.buildGestureDetectors, wf, onTap),
-                  )
+                ? BuiltPiece.widgets(IWidgetPlaceholder.wrap(
+                    piece.widgets, wf.buildGestureDetectors, wf, onTap))
                 : _buildBlock(meta, piece, onTap, recognizer),
           );
         },

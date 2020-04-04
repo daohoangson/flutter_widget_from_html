@@ -200,11 +200,13 @@ class Explainer {
 
   String _tableRow(TableRow row) => row.children
       .map((c) => _widget(c is TableCell ? c.child : c))
-      .toList()
+      .toList(growable: false)
       .join(' | ');
 
-  String _tableRows(Table table) =>
-      table.children.map((r) => _tableRow(r)).toList().join('\n');
+  String _tableRows(Table table) => table.children
+      .map((r) => _tableRow(r))
+      .toList(growable: false)
+      .join('\n');
 
   String _textAlign(TextAlign textAlign) =>
       (textAlign != null && textAlign != TextAlign.start)

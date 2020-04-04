@@ -48,7 +48,7 @@ class WidgetPlaceholder<T1> extends IWidgetPlaceholder {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
-      children: output.toList(growable: false),
+      children: List.unmodifiable(output),
     );
   }
 

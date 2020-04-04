@@ -28,7 +28,7 @@ class _TagCode {
 
   BuiltPiece _resetText(BuiltPiece piece, NodeMetadata meta) {
     final text = piece.text;
-    List.from(text.bits, growable: false).forEach((bit) => bit.detach());
+    List.unmodifiable(text.bits).forEach((bit) => bit.detach());
     text.addText(meta.domElement.text);
 
     return piece;

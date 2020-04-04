@@ -23,7 +23,7 @@ class Builder {
 
   final _pieces = <BuiltPiece>[];
 
-  _Piece _textPiece;
+  BuiltPiece _textPiece;
 
   Builder({
     @required this.domNodes,
@@ -110,7 +110,7 @@ class Builder {
 
     for (final domNode in domNodes) {
       if (domNode.nodeType == dom.Node.TEXT_NODE) {
-        _textPiece._write(domNode.text);
+        _addText(domNode.text);
         continue;
       }
       if (domNode.nodeType != dom.Node.ELEMENT_NODE) continue;
@@ -130,7 +130,7 @@ class Builder {
 
       if (isBlockElement) {
         _saveTextPiece();
-        _pieces.add(_Piece(this, widgets: __builder.build()));
+        _pieces.add(BuiltPiece.widgets(__builder.build()));
         continue;
       }
 
@@ -157,11 +157,30 @@ class Builder {
     return output;
   }
 
-  void _newTextPiece() => _textPiece = _Piece(
-        this,
-        text: (_pieces.isEmpty ? parentText?.sub(parentTsb) : null) ??
-            TextBits(parentTsb),
-      );
+  void _addText(String data) {
+    final leading = _regExpSpaceLeading.firstMatch(data);
+    final trailing = _regExpSpaceTrailing.firstMatch(data);
+    final start = leading == null ? 0 : leading.end;
+    final end = trailing == null ? data.length : trailing.start;
+
+    final text = _textPiece.text;
+    if (end <= start) {
+      text.addSpace();
+      return;
+    }
+
+    if (start > 0) text.addSpace();
+
+    final substring = data.substring(start, end);
+    final dedup = substring.replaceAll(_regExpSpaces, ' ');
+    text.addText(dedup);
+
+    if (end < data.length) text.addSpace();
+  }
+
+  void _newTextPiece() => _textPiece = BuiltPiece.text(
+      (_pieces.isEmpty ? parentText?.sub(parentTsb) : null) ??
+          TextBits(parentTsb));
 
   void _saveTextPiece() {
     _pieces.add(_textPiece);
@@ -169,51 +188,11 @@ class Builder {
   }
 }
 
-class _Piece extends BuiltPiece {
-  final Builder b;
-  final TextBits text;
-  final Iterable<Widget> widgets;
-
-  _Piece(
-    this.b, {
-    this.text,
-    this.widgets,
-  }) : assert((text == null) != (widgets == null));
-
-  @override
-  bool get hasWidgets => widgets != null;
-
-  TextBit _write(String data) {
-    final leading = _regExpSpaceLeading.firstMatch(data);
-    final trailing = _regExpSpaceTrailing.firstMatch(data);
-    final start = leading == null ? 0 : leading.end;
-    final end = trailing == null ? data.length : trailing.start;
-
-    if (end <= start) return text.addSpace();
-
-    TextBit bit;
-    if (start > 0) bit = text.addSpace();
-
-    final substring = data.substring(start, end);
-    final dedup = substring.replaceAll(_regExpSpaces, ' ');
-    bit = text.addText(dedup);
-
-    if (end < data.length) bit = text.addSpace();
-
-    return bit;
-  }
-}
-
-Iterable<BuildOp> _prepareParentOps(
-  Iterable<BuildOp> parentParentOps,
-  NodeMetadata parentMeta,
-) {
+Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, NodeMetadata meta) {
   // try to reuse existing list if possible
   final withOnChild =
-      parentMeta?.ops?.where((op) => op.hasOnChild)?.toList(growable: false);
-  if (withOnChild?.isNotEmpty != true) return parentParentOps;
+      meta?.ops?.where((op) => op.hasOnChild)?.toList(growable: false);
+  if (withOnChild?.isNotEmpty != true) return ops;
 
-  return List.unmodifiable(
-    (parentParentOps?.toList() ?? <BuildOp>[])..addAll(withOnChild),
-  );
+  return List.unmodifiable((ops?.toList() ?? <BuildOp>[])..addAll(withOnChild));
 }

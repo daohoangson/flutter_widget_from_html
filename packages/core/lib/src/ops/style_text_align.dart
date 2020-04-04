@@ -37,9 +37,8 @@ class _StyleTextAlign {
           final newPieces = <BuiltPiece>[];
           for (final p in pieces) {
             if (p.widgets?.isNotEmpty == true) {
-              newPieces.add(BuiltPieceSimple(
-                  widgets: IWidgetPlaceholder.wrap(
-                      p.widgets, wf.buildAligns, wf, alignment)));
+              newPieces.add(BuiltPiece.widgets(IWidgetPlaceholder.wrap(
+                  p.widgets, wf.buildAligns, wf, alignment)));
             } else {
               newPieces.add(p);
             }

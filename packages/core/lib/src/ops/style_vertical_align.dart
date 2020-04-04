@@ -60,7 +60,7 @@ class _StyleVerticalAlign {
       alignment: alignment,
     ));
 
-    return BuiltPieceSimple(text: replacement);
+    return BuiltPiece.text(replacement);
   }
 }
 
