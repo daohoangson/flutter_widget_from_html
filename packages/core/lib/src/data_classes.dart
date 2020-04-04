@@ -141,13 +141,6 @@ typedef Iterable<BuiltPiece> BuildOpOnPieces(
 typedef Iterable<Widget> BuildOpOnWidgets(
     NodeMetadata meta, Iterable<Widget> widgets);
 
-class BuilderContext {
-  final BuildContext context;
-  final Widget origin;
-
-  BuilderContext(this.context, this.origin);
-}
-
 class BuiltPiece {
   final TextBits text;
   final Iterable<Widget> widgets;
@@ -211,12 +204,12 @@ class CssLength {
 
   bool get isNotEmpty => number > 0;
 
-  double getValue(BuilderContext bc, TextStyleBuilders tsb) {
+  double getValue(BuildContext context, TextStyleBuilders tsb) {
     double value;
 
     switch (this.unit) {
       case CssLengthUnit.em:
-        value = tsb.build(bc).fontSize * number / 1;
+        value = tsb.build(context).fontSize * number / 1;
         break;
       case CssLengthUnit.px:
         value = number;
@@ -224,7 +217,7 @@ class CssLength {
     }
 
     if (value != null) {
-      value = value * MediaQuery.of(bc.context).textScaleFactor;
+      value = value * MediaQuery.of(context).textScaleFactor;
     }
 
     return value;
@@ -311,11 +304,11 @@ class TextStyleBuilders {
 
   GestureRecognizer recognizer;
 
-  BuilderContext _bc;
+  BuildContext _context;
   TextStyle _output;
   TextAlign _textAlign;
 
-  BuilderContext get bc => _bc;
+  BuildContext get context => _context;
 
   TextAlign get textAlign => _textAlign ?? parent?.textAlign;
 
@@ -329,14 +322,14 @@ class TextStyleBuilders {
     _inputs.add(input);
   }
 
-  TextStyle build(BuilderContext bc) {
-    _resetContextIfNeeded(bc);
+  TextStyle build(BuildContext context) {
+    _resetContextIfNeeded(context);
     if (_output != null) return _output;
 
     if (parent == null) {
-      _output = DefaultTextStyle.of(_bc.context).style;
+      _output = DefaultTextStyle.of(_context).style;
     } else {
-      _output = parent.build(_bc);
+      _output = parent.build(_context);
     }
 
     final l = _builders.length;
@@ -349,10 +342,10 @@ class TextStyleBuilders {
 
   TextStyleBuilders sub() => TextStyleBuilders(parent: this);
 
-  void _resetContextIfNeeded(BuilderContext bc) {
-    if (bc == _bc) return;
+  void _resetContextIfNeeded(BuildContext context) {
+    if (context == _context) return;
 
-    _bc = bc;
+    _context = context;
     _output = null;
     _textAlign = null;
   }

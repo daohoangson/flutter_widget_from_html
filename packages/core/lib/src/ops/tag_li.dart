@@ -76,14 +76,14 @@ class _TagLi {
     return _liOp;
   }
 
-  Iterable<Widget> _build(BuilderContext bc, Iterable<Widget> ws, _LiInput i) {
+  Iterable<Widget> _build(BuildContext c, Iterable<Widget> ws, _LiInput i) {
     final listMeta = i.listMeta;
     final paddingCss = i.paddingInlineStart ?? listMeta.paddingInlineStart;
-    final paddingPx = paddingCss.getValue(bc, i.meta.tsb);
-    final padding = Directionality.of(bc.context) == TextDirection.ltr
+    final paddingPx = paddingCss.getValue(c, i.meta.tsb);
+    final padding = Directionality.of(c) == TextDirection.ltr
         ? EdgeInsets.only(left: paddingPx)
         : EdgeInsets.only(right: paddingPx);
-    final style = i.meta.tsb.build(bc);
+    final style = i.meta.tsb.build(c);
     final listStyleType = i.listStyleType ?? listMeta.listStyleType;
     final markerIndex = listMeta.markerReversed
         ? (listMeta.markerStart ?? listMeta.markerCount) - i.markerIndex
@@ -93,7 +93,7 @@ class _TagLi {
     return [
       Stack(children: <Widget>[
         wf.buildPadding(wf.buildColumn(ws), padding) ?? widget0,
-        _buildMarker(bc.context, style, markerText, paddingPx),
+        _buildMarker(c, style, markerText, paddingPx),
       ]),
     ];
   }
@@ -122,9 +122,9 @@ class _TagLi {
       final item = child as _LiPlaceholder;
 
       if (item.input.listMeta != null) {
-        item.wrapWith((bc, widgets, __) {
-          final paddingPx = listMeta.paddingInlineStart.getValue(bc, meta.tsb);
-          final padding = Directionality.of(bc.context) == TextDirection.ltr
+        item.wrapWith((c, widgets, __) {
+          final paddingPx = listMeta.paddingInlineStart.getValue(c, meta.tsb);
+          final padding = Directionality.of(c) == TextDirection.ltr
               ? EdgeInsets.only(left: paddingPx)
               : EdgeInsets.only(right: paddingPx);
 

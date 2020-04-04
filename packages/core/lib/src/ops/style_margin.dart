@@ -13,11 +13,11 @@ final _valuesFourRegExp =
 final _valuesTwoRegExp = RegExp(r'^([^\s]+)\s+([^\s]+)$');
 
 Iterable<Widget> _marginBuilder(
-  BuilderContext bc,
+  BuildContext context,
   Iterable<Widget> children,
   _MarginBuilderInput input,
 ) {
-  final direction = Directionality.of(bc.context);
+  final direction = Directionality.of(context);
   final marginLeft = input.marginLeft ??
       (direction == TextDirection.ltr ? input.marginStart : input.marginEnd);
   final marginRight = input.marginRight ??
@@ -25,8 +25,8 @@ Iterable<Widget> _marginBuilder(
 
   final tsb = input.meta.tsb;
   final padding = EdgeInsets.only(
-    left: marginLeft?.getValue(bc, tsb) ?? 0.0,
-    right: marginRight?.getValue(bc, tsb) ?? 0.0,
+    left: marginLeft?.getValue(context, tsb) ?? 0.0,
+    right: marginRight?.getValue(context, tsb) ?? 0.0,
   );
 
   return children.map((child) {
@@ -69,11 +69,10 @@ class _MarginPlaceholder extends IWidgetPlaceholder {
 
   @override
   Widget build(BuildContext context) {
-    final bc = BuilderContext(context, this);
     var height = 0.0;
 
     for (final _height in _heights) {
-      final h = _height.getValue(bc, tsb);
+      final h = _height.getValue(context, tsb);
       if (h > height) height = h;
     }
 

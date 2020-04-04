@@ -30,7 +30,7 @@ class WidgetFactory extends core.WidgetFactory {
 
   @override
   Iterable<Widget> buildGestureDetectors(
-    BuilderContext bc,
+    BuildContext _,
     Iterable<Widget> widgets,
     GestureTapCallback onTap,
   ) =>

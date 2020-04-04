@@ -39,8 +39,8 @@ class _StyleVerticalAlign {
 
     replacement.add(WidgetBit(
       text,
-      WidgetPlaceholder<_StyleVerticalAlign>(builder: (bc, _, __) {
-        var built = wf.buildText(bc, null, text);
+      WidgetPlaceholder<_StyleVerticalAlign>(builder: (c, _, __) {
+        var built = wf.buildText(c, null, text);
 
         // `sub` and `super` require additional offset
         final dy = (verticalAlign == _kCssVerticalAlignSub
@@ -49,8 +49,8 @@ class _StyleVerticalAlign {
         if (dy != 0.0) {
           built = [
             Transform.translate(
-              offset: Offset(0, text.tsb.build(bc).fontSize / dy),
-              child: wf.buildColumn(wf.buildText(bc, null, text)),
+              offset: Offset(0, text.tsb.build(c).fontSize / dy),
+              child: wf.buildColumn(wf.buildText(c, null, text)),
             )
           ];
         }

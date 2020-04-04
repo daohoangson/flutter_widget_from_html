@@ -78,3 +78,11 @@ TextAlign _getTextAlign(String textAlign) {
 
   return null;
 }
+
+Widget _childOf(Widget widget) {
+  var x = widget;
+  while (x is SingleChildRenderObjectWidget) {
+    x = (x as SingleChildRenderObjectWidget).child;
+  }
+  return x;
+}

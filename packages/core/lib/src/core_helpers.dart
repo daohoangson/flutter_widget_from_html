@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 
 import 'core_html_widget.dart';
 import 'core_widget_factory.dart';
-import 'data_classes.dart';
 
 /// A no op placeholder widget.
 const widget0 = SizedBox.shrink();
@@ -10,7 +9,7 @@ const widget0 = SizedBox.shrink();
 typedef void OnTapUrl(String url);
 
 typedef Iterable<Widget> WidgetPlaceholderBuilder<T>(
-    BuilderContext bc, Iterable<Widget> children, T input);
+    BuildContext context, Iterable<Widget> children, T input);
 
 typedef WidgetFactory FactoryBuilder(HtmlWidgetConfig config);
 
@@ -30,15 +29,13 @@ class WidgetPlaceholder<T1> extends IWidgetPlaceholder {
   }
 
   @override
-  Widget build(BuildContext c) => buildWithContext(BuilderContext(c, this));
-
-  Widget buildWithContext(BuilderContext bc) {
+  Widget build(BuildContext context) {
     Iterable<Widget> output;
 
     final l = _builders.length;
     for (int i = 0; i < l; i++) {
       final children = i == 0 ? _firstChildren : output;
-      output = _builders[i](bc, children, _inputs[i]);
+      output = _builders[i](context, children, _inputs[i]);
     }
 
     output = output?.where((widget) => widget != null);

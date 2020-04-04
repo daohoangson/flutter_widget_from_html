@@ -61,14 +61,14 @@ class _TagRuby {
   TextBit _buildWidgetBit(TextBits parent, TextBits ruby, TextBits rt) =>
       WidgetBit(
         parent,
-        WidgetPlaceholder<_TagRuby>(builder: (bc, _, __) {
-          final rubyText = wf.buildText(bc, null, ruby);
-          final rtText = wf.buildText(bc, null, rt);
-          final rtStyle = rt.tsb.build(bc);
+        WidgetPlaceholder<_TagRuby>(builder: (context, _, __) {
+          final rubyText = wf.buildText(context, null, ruby);
+          final rtText = wf.buildText(context, null, rt);
+          final rtStyle = rt.tsb.build(context);
           final padding = EdgeInsets.symmetric(
               vertical: rtStyle.fontSize *
                   .75 *
-                  MediaQuery.of(bc.context).textScaleFactor);
+                  MediaQuery.of(context).textScaleFactor);
 
           return [
             Stack(

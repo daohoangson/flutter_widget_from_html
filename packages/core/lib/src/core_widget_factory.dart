@@ -49,10 +49,13 @@ class WidgetFactory {
   Color get hyperlinkColor => _config.hyperlinkColor;
 
   Iterable<Widget> buildAligns(
-          BuilderContext bc, Iterable<Widget> widgets, Alignment alignment) =>
+    BuildContext _,
+    Iterable<Widget> widgets,
+    Alignment alignment,
+  ) =>
       widgets.map((widget) {
-        if (bc.origin is WidgetPlaceholder<TextBits>) return widget;
-        if (widget is WidgetPlaceholder<TextBits>) return widget;
+        final x = _childOf(widget);
+        if (x is RichText || x is WidgetPlaceholder<TextBits>) return widget;
         return Align(alignment: alignment, child: widget);
       });
 
@@ -66,8 +69,7 @@ class WidgetFactory {
         )
       : null;
 
-  static Iterable<Widget> _buildColumn(
-      BuilderContext bc, Iterable<Widget> ws, _) {
+  static Iterable<Widget> _buildColumn(BuildContext c, Iterable<Widget> ws, _) {
     final output = <Widget>[];
     final iter = ws.iterator;
     while (iter.moveNext()) {
@@ -86,7 +88,7 @@ class WidgetFactory {
       }
 
       if (widget is WidgetPlaceholder<TextBits>) {
-        widget = (widget as WidgetPlaceholder).build(bc.context);
+        widget = (widget as WidgetPlaceholder).build(c);
       }
 
       if (widget is Column) {
@@ -135,7 +137,7 @@ class WidgetFactory {
       : null;
 
   Iterable<Widget> buildGestureDetectors(
-    BuilderContext bc,
+    BuildContext _,
     Iterable<Widget> widgets,
     GestureTapCallback onTap,
   ) =>
@@ -210,17 +212,13 @@ class WidgetFactory {
   TableCell buildTableCell(Widget child) => TableCell(
       child: buildPadding(child, _config.tableCellPadding) ?? widget0);
 
-  Iterable<Widget> buildText(
-    BuilderContext bc,
-    Iterable<Widget> _,
-    TextBits text,
-  ) {
-    final tsb = text.tsb;
-    tsb?.build(bc);
+  Iterable<Widget> buildText(BuildContext c, Iterable<Widget> _, TextBits t) {
+    final tsb = t.tsb;
+    tsb?.build(c);
 
-    final textScaleFactor = MediaQuery.of(bc.context).textScaleFactor;
+    final textScaleFactor = MediaQuery.of(c).textScaleFactor;
     final widgets = <Widget>[];
-    for (final compiled in _TextCompiler(text).compile(bc)) {
+    for (final compiled in _TextCompiler(t).compile(c)) {
       if (compiled is InlineSpan) {
         widgets.add(RichText(
           text: compiled,
@@ -266,9 +264,9 @@ class WidgetFactory {
     if (value == null) return null;
 
     final parsed = parseCssLength(value);
-    if (parsed != null) return parsed.getValue(tsb.bc, m.tsb);
+    if (parsed != null) return parsed.getValue(tsb.context, m.tsb);
 
-    final c = tsb.bc.context;
+    final c = tsb.context;
     switch (value) {
       case _kCssFontSizeXxLarge:
         return DefaultTextStyle.of(c).style.fontSize * 2.0;

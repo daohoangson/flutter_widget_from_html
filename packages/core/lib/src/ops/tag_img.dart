@@ -173,7 +173,7 @@ class _TagImg {
       );
 
   Iterable<Widget> _buildImage(
-    BuilderContext _,
+    BuildContext _,
     Iterable<Widget> __,
     _TagImgMetadata img,
   ) =>

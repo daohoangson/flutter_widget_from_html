@@ -3,7 +3,7 @@ part of '../core_widget_factory.dart';
 class _TextCompiler {
   final TextBits text;
 
-  BuilderContext _bc;
+  BuildContext _context;
   List _compiled;
 
   List<InlineSpan> _spans;
@@ -13,8 +13,8 @@ class _TextCompiler {
 
   _TextCompiler(this.text) : assert(text != null);
 
-  List compile(BuilderContext bc) {
-    _bc = bc;
+  List compile(BuildContext context) {
+    _context = context;
     _compiled = [];
 
     for (final bit in text.bits) {
@@ -37,7 +37,7 @@ class _TextCompiler {
 
     _buffer = StringBuffer();
     _recognizer = tsb?.recognizer;
-    _style = tsb?.build(_bc);
+    _style = tsb?.build(_context);
 
     _prevBuffer = _buffer;
     _prevStyle = _style;
@@ -49,7 +49,7 @@ class _TextCompiler {
     if (_spans == null) _resetLoop(tsb);
 
     final recognizer = tsb?.recognizer ?? bit.tsb?.recognizer;
-    final style = tsb?.build(_bc) ?? _prevStyle;
+    final style = tsb?.build(_context) ?? _prevStyle;
     if (recognizer != _prevRecognizer || style != _prevStyle) _saveSpan();
 
     if (bit.canCompile) {
