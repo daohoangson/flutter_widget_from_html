@@ -168,7 +168,7 @@ class _TagImg {
           final img = _parseMetadata(meta, wf);
           if (img.url?.isNotEmpty != true) return widgets;
 
-          return listOfNonNullOrNothing(_buildImage1(img));
+          return _listOrNull(_buildImage1(img));
         },
       );
 

@@ -26,7 +26,7 @@ class _StyleBgColor {
         final bgColor = _parseColor(meta);
         if (bgColor == null) return null;
 
-        return listOfNonNullOrNothing(_buildBox(widgets, bgColor));
+        return _listOrNull(_buildBox(widgets, bgColor));
       });
 
   BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) => piece

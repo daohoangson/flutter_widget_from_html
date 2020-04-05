@@ -78,7 +78,7 @@ class _TagTable {
         return [_buildRows(c, ws, i)];
     }
 
-    return listOfNonNullOrNothing(_buildTable(c, ws, i));
+    return _listOrNull(_buildTable(c, ws, i));
   }
 
   Widget _buildTable(BuildContext c, Iterable<Widget> ws, _TableInput i) {

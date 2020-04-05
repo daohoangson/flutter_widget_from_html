@@ -873,3 +873,5 @@ class WidgetFactory {
     return _tagTable;
   }
 }
+
+Iterable<Widget> _listOrNull(Widget x) => x == null ? null : [x];

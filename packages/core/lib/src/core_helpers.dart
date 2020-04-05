@@ -83,5 +83,3 @@ abstract class IWidgetPlaceholder extends StatelessWidget {
     return wrapped;
   }
 }
-
-Iterable<T> listOfNonNullOrNothing<T>(T x) => x == null ? null : [x];
