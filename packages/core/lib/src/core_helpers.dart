@@ -13,7 +13,7 @@ typedef Iterable<Widget> WidgetPlaceholderBuilder<T>(
 
 typedef WidgetFactory FactoryBuilder(HtmlWidgetConfig config);
 
-class WidgetPlaceholder<T1> extends IWidgetPlaceholder {
+class WidgetPlaceholder<T1> extends StatelessWidget {
   final _builders = List<Function>();
   final Iterable<Widget> _firstChildren;
   final _inputs = [];
@@ -28,14 +28,17 @@ class WidgetPlaceholder<T1> extends IWidgetPlaceholder {
     _inputs.add(input);
   }
 
+  Iterable<Function> get builders => _builders.skip(0);
+
+  Iterable get inputs => _inputs.skip(0);
+
   @override
   Widget build(BuildContext context) {
-    Iterable<Widget> output;
+    Iterable<Widget> output = _firstChildren;
 
     final l = _builders.length;
     for (int i = 0; i < l; i++) {
-      final children = i == 0 ? _firstChildren : output;
-      output = _builders[i](context, children, _inputs[i]);
+      output = _builders[i](context, output, _inputs[i]);
     }
 
     output = output?.where((widget) => widget != null);
@@ -49,15 +52,11 @@ class WidgetPlaceholder<T1> extends IWidgetPlaceholder {
     );
   }
 
-  @override
   void wrapWith<T2>(WidgetPlaceholderBuilder<T2> builder, [T2 input]) {
+    assert(builder != null);
     _builders.add(builder);
     _inputs.add(input);
   }
-}
-
-abstract class IWidgetPlaceholder extends StatelessWidget {
-  void wrapWith<T>(WidgetPlaceholderBuilder<T> builder, T input);
 
   static Iterable<Widget> wrap<T2>(
     Iterable<Widget> widgets,
@@ -69,7 +68,7 @@ abstract class IWidgetPlaceholder extends StatelessWidget {
 
     int i = 0;
     for (final widget in widgets) {
-      if (widget is IWidgetPlaceholder) {
+      if (widget is WidgetPlaceholder) {
         wrapped[i++] = widget..wrapWith(builder, input);
       } else {
         wrapped[i++] = WidgetPlaceholder(

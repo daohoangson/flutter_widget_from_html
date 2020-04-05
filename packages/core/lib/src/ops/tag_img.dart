@@ -105,7 +105,7 @@ class _ImageLayoutDelegate extends SingleChildLayoutDelegate {
       height != other.height || width != other.width;
 }
 
-class _TextImage extends TextWidget {
+class _TextImage extends TextWidget<_TagImgMetadata> {
   _TextImage(TextBits parent, _TagImg self, _TagImgMetadata img)
       : super(
           parent,
@@ -125,7 +125,7 @@ class _ImageSpan extends WidgetSpan {
   const _ImageSpan({
     PlaceholderAlignment alignment,
     TextBaseline baseline,
-    IWidgetPlaceholder child,
+    WidgetPlaceholder child,
     TextStyle style,
   }) : super(
           alignment: alignment,

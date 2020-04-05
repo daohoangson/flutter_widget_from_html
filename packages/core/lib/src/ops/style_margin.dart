@@ -12,10 +12,10 @@ final _valuesFourRegExp =
     RegExp(r'^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)$');
 final _valuesTwoRegExp = RegExp(r'^([^\s]+)\s+([^\s]+)$');
 
-Iterable<Widget> _marginBuilder(
+Iterable<Widget> _marginHorizontalBuilder(
   BuildContext context,
   Iterable<Widget> children,
-  _MarginBuilderInput input,
+  _MarginHorizontalInput input,
 ) {
   final direction = Directionality.of(context);
   final marginLeft = input.marginLeft ??
@@ -45,7 +45,7 @@ Iterable<Widget> _marginBuilder(
   });
 }
 
-class _MarginBuilderInput {
+class _MarginHorizontalInput {
   CssLength marginEnd;
   CssLength marginLeft;
   CssLength marginRight;
@@ -54,35 +54,48 @@ class _MarginBuilderInput {
   WidgetFactory wf;
 }
 
-class _MarginPlaceholder extends IWidgetPlaceholder {
+Iterable<Widget> _marginVerticalBuilder(
+  BuildContext context,
+  Iterable<Widget> widgets,
+  _MarginVerticalInput input,
+) {
+  final widget = widgets?.isNotEmpty == true ? widgets.first : null;
+  final existingHeight = widget is SizedBox ? widget.height : 0.0;
+  final height = input.height.getValue(context, input.tsb);
+  if (height > existingHeight) return [SizedBox(height: height)];
+  return widgets;
+}
+
+class _MarginVerticalInput {
   final TextStyleBuilders tsb;
+  final CssLength height;
 
-  final _heights = <CssLength>[];
+  _MarginVerticalInput(this.tsb, this.height);
+}
 
-  _MarginPlaceholder({
-    @required CssLength height,
-    @required this.tsb,
-  })  : assert(height != null),
-        assert(tsb != null) {
-    _heights.add(height);
-  }
+class _MarginVerticalPlaceholder
+    extends WidgetPlaceholder<_MarginVerticalInput> {
+  _MarginVerticalPlaceholder(TextStyleBuilders tsb, CssLength height)
+      : assert(height != null),
+        super(
+          builder: _marginVerticalBuilder,
+          input: _MarginVerticalInput(tsb, height),
+        );
 
-  @override
-  Widget build(BuildContext context) {
-    var height = 0.0;
-
-    for (final _height in _heights) {
-      final h = _height.getValue(context, tsb);
-      if (h > height) height = h;
+  void mergeWith(_MarginVerticalPlaceholder other) {
+    final otherBuilders = other.builders.toList(growable: false);
+    final otherInputs = other.inputs.toList(growable: false);
+    for (var i = 0; i < otherBuilders.length; i++) {
+      if (otherBuilders[i] == _marginVerticalBuilder &&
+          otherInputs[i] is _MarginVerticalInput) {
+        super.wrapWith<_MarginVerticalInput>(
+            _marginVerticalBuilder, otherInputs[i]);
+      }
     }
-
-    return SizedBox(height: height);
   }
 
-  void mergeWith(_MarginPlaceholder other) => _heights.addAll(other._heights);
-
   @override
-  Widget wrapWith<T>(WidgetPlaceholderBuilder<T> builder, T input) => this;
+  void wrapWith<T>(WidgetPlaceholderBuilder<T> builder, [T input]) => this;
 }
 
 class _StyleMargin {
@@ -106,11 +119,11 @@ class _StyleMargin {
           final tsb = meta.tsb;
 
           var i = 0;
-          if (t) ws[i++] = _MarginPlaceholder(height: m.top, tsb: tsb);
+          if (t) ws[i++] = _MarginVerticalPlaceholder(tsb, m.top);
 
           if (lr) {
             for (final widget in widgets) {
-              final input = _MarginBuilderInput()
+              final input = _MarginHorizontalInput()
                 ..marginEnd = m.end
                 ..marginLeft = m.left
                 ..marginRight = m.right
@@ -118,10 +131,10 @@ class _StyleMargin {
                 ..meta = meta
                 ..wf = wf;
 
-              ws[i++] = widget is IWidgetPlaceholder
-                  ? (widget..wrapWith(_marginBuilder, input))
+              ws[i++] = widget is WidgetPlaceholder
+                  ? (widget..wrapWith(_marginHorizontalBuilder, input))
                   : WidgetPlaceholder(
-                      builder: _marginBuilder,
+                      builder: _marginHorizontalBuilder,
                       children: [widget],
                       input: input,
                     );
@@ -132,7 +145,7 @@ class _StyleMargin {
             }
           }
 
-          if (b) ws[i++] = _MarginPlaceholder(height: m.bottom, tsb: tsb);
+          if (b) ws[i++] = _MarginVerticalPlaceholder(tsb, m.bottom);
 
           return ws;
         },

@@ -73,7 +73,7 @@ class WidgetFactory {
     final output = <Widget>[];
     final iter = ws.iterator;
     while (iter.moveNext()) {
-      if (!(iter.current is _MarginPlaceholder)) break;
+      if (!(iter.current is _MarginVerticalPlaceholder)) break;
     }
 
     if (iter.current == null) return null;
@@ -82,7 +82,8 @@ class WidgetFactory {
     while (output.isEmpty || iter.moveNext()) {
       var widget = iter.current;
 
-      if (widget is _MarginPlaceholder && prev is _MarginPlaceholder) {
+      if (widget is _MarginVerticalPlaceholder &&
+          prev is _MarginVerticalPlaceholder) {
         prev.mergeWith(widget);
         continue;
       }
@@ -103,7 +104,7 @@ class WidgetFactory {
     }
 
     while (output.isNotEmpty) {
-      if (output.last is _MarginPlaceholder) {
+      if (output.last is _MarginVerticalPlaceholder) {
         output.removeLast();
         continue;
       }

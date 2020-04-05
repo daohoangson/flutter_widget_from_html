@@ -229,7 +229,7 @@ class _TablePlaceholder extends WidgetPlaceholder<_TableInput> {
     if (tag == _kTagTableCell) return super.wrapWith(builder, input);
 
     for (final child in _children) {
-      if (child is IWidgetPlaceholder) child.wrapWith(builder, input);
+      if (child is WidgetPlaceholder) child.wrapWith(builder, input);
     }
   }
 

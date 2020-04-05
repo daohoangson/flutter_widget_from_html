@@ -296,7 +296,7 @@ void main() {
       [TextData] data=(2.2.1)
       [TextData] data=(2.2.2)
     [TextData] data=(2.3)
-  [TextWidget] widget=WidgetPlaceholder<String>
+  [TextWidget<String>] widget=WidgetPlaceholder<String>
 ----"""));
   });
 }

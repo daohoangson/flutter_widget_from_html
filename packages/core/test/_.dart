@@ -299,7 +299,7 @@ class Explainer {
     if (widget is ImageLayout) return _imageLayout(widget);
 
     // ignore: invalid_use_of_protected_member
-    if (widget is IWidgetPlaceholder) return _widget(widget.build(context));
+    if (widget is WidgetPlaceholder) return _widget(widget.build(context));
 
     final type = widget.runtimeType.toString();
     final text = widget is Align

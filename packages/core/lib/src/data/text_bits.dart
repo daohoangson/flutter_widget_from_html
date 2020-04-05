@@ -122,10 +122,10 @@ class TextWhitespace extends TextBit {
   }
 }
 
-class TextWidget extends TextBit {
+class TextWidget<T> extends TextBit {
   final PlaceholderAlignment alignment;
   final TextBaseline baseline;
-  final IWidgetPlaceholder widget;
+  final WidgetPlaceholder<T> widget;
 
   TextWidget(
     TextBits parent,

@@ -23,9 +23,9 @@ class _TextCompiler {
     _completeLoop();
 
     if (_compiled.isEmpty) {
-      _compiled.add(_MarginPlaceholder(
-        height: CssLength(1, unit: CssLengthUnit.em),
-        tsb: text.tsb,
+      _compiled.add(_MarginVerticalPlaceholder(
+        text.tsb,
+        CssLength(1, unit: CssLengthUnit.em),
       ));
     }
 
@@ -62,9 +62,9 @@ class _TextCompiler {
       _completeLoop();
       final newLines = bit.data.length - 1;
       if (newLines > 0) {
-        _compiled.add(_MarginPlaceholder(
-          height: CssLength(newLines.toDouble(), unit: CssLengthUnit.em),
-          tsb: bit.parent.tsb,
+        _compiled.add(_MarginVerticalPlaceholder(
+          bit.parent.tsb,
+          CssLength(newLines.toDouble(), unit: CssLengthUnit.em),
         ));
       }
       return;
