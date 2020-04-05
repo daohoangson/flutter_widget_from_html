@@ -13,17 +13,17 @@ class BuildOp {
   // op with lower priority will run first
   final int priority;
 
-  final BuildOpDefaultStyles _defaultStyles;
-  final BuildOpOnChild _onChild;
-  final BuildOpOnPieces _onPieces;
-  final BuildOpOnWidgets _onWidgets;
+  final _BuildOpDefaultStyles _defaultStyles;
+  final _BuildOpOnChild _onChild;
+  final _BuildOpOnPieces _onPieces;
+  final _BuildOpOnWidgets _onWidgets;
 
   BuildOp({
-    BuildOpDefaultStyles defaultStyles,
+    _BuildOpDefaultStyles defaultStyles,
     bool isBlockElement,
-    BuildOpOnChild onChild,
-    BuildOpOnPieces onPieces,
-    BuildOpOnWidgets onWidgets,
+    _BuildOpOnChild onChild,
+    _BuildOpOnPieces onPieces,
+    _BuildOpOnWidgets onWidgets,
     this.priority = 10,
   })  : _defaultStyles = defaultStyles,
         this.isBlockElement = isBlockElement ?? onWidgets != null,
@@ -49,16 +49,13 @@ class BuildOp {
       (_onWidgets != null ? _onWidgets(meta, widgets) : null) ?? widgets;
 }
 
-typedef Iterable<String> BuildOpDefaultStyles(
-  NodeMetadata meta,
-  dom.Element e,
-);
-typedef NodeMetadata BuildOpOnChild(NodeMetadata meta, dom.Element e);
-typedef Iterable<BuiltPiece> BuildOpOnPieces(
-  NodeMetadata meta,
-  Iterable<BuiltPiece> pieces,
-);
-typedef Iterable<Widget> BuildOpOnWidgets(
+typedef _BuildOpDefaultStyles = Iterable<String> Function(
+    NodeMetadata meta, dom.Element e);
+typedef _BuildOpOnChild = NodeMetadata Function(
+    NodeMetadata meta, dom.Element e);
+typedef _BuildOpOnPieces = Iterable<BuiltPiece> Function(
+    NodeMetadata meta, Iterable<BuiltPiece> pieces);
+typedef _BuildOpOnWidgets = Iterable<Widget> Function(
     NodeMetadata meta, Iterable<Widget> widgets);
 
 class BuiltPiece {
@@ -147,7 +144,8 @@ enum CssLengthUnit {
   px,
 }
 
-typedef NodeMetadata NodeMetadataCollector(NodeMetadata meta, dom.Element e);
+typedef NodeMetadataCollector = NodeMetadata Function(
+    NodeMetadata meta, dom.Element e);
 
 class TextStyleBuilders {
   final _builders = <Function>[];
@@ -168,7 +166,10 @@ class TextStyleBuilders {
 
   TextStyleBuilders({this.parent});
 
-  void enqueue<T>(TextStyleBuilder<T> builder, T input) {
+  void enqueue<T>(
+    TextStyle Function(TextStyleBuilders, TextStyle, T) builder,
+    T input,
+  ) {
     assert(_output == null, "Cannot add builder after being built");
     _builders.add(builder);
     _inputs.add(input);
@@ -202,9 +203,3 @@ class TextStyleBuilders {
     _textAlign = null;
   }
 }
-
-typedef TextStyle TextStyleBuilder<T>(
-  TextStyleBuilders tsb,
-  TextStyle textStyle,
-  T input,
-);

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html_core/src/core_html_widget.dart'
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
 
 import 'data.dart';
@@ -15,7 +15,7 @@ class HtmlWidget extends core.HtmlWidget {
   HtmlWidget(
     String html, {
     bool enableCaching = true,
-    FactoryBuilder factoryBuilder,
+    core.WidgetFactory Function(core.HtmlConfig) factoryBuilder,
     Key key,
     core.HtmlConfig config,
     Uri baseUrl,

@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 
-import 'core_html_widget.dart';
 import 'core_widget_factory.dart';
 
 part 'widget/image_layout.dart';
@@ -8,12 +7,10 @@ part 'widget/image_layout.dart';
 /// A no op placeholder widget.
 const widget0 = SizedBox.shrink();
 
-typedef void OnTapUrl(String url);
+typedef OnTapUrl = void Function(String url);
 
 typedef Iterable<Widget> WidgetPlaceholderBuilder<T>(
     BuildContext context, Iterable<Widget> children, T input);
-
-typedef WidgetFactory FactoryBuilder(HtmlConfig config);
 
 class WidgetPlaceholder<T1> extends StatelessWidget {
   final _builders = List<Function>();

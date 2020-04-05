@@ -16,13 +16,13 @@ Widget buildCurrentState() {
 Future<String> explain(
   WidgetTester tester,
   String html, {
-  WidgetExplainer explainer,
+  String Function(Widget) explainer,
   Widget hw,
-  PreTest preTest,
+  void Function(BuildContext) preTest,
   Uri baseUrl,
   double bodyVerticalPadding = 0,
   NodeMetadataCollector builderCallback,
-  FactoryBuilder factoryBuilder,
+  WidgetFactory Function(HtmlConfig config) factoryBuilder,
   double tableCellPadding = 0,
   TextStyle textStyle,
 }) async {
@@ -97,12 +97,9 @@ Future<String> explainMargin(
   return match == null ? explained : match[1];
 }
 
-typedef String WidgetExplainer(Widget widget);
-typedef void PreTest(BuildContext context);
-
 class Explainer {
   final BuildContext context;
-  final WidgetExplainer explainer;
+  final String Function(Widget) explainer;
   final TextStyle _defaultStyle;
 
   Explainer(this.context, {this.explainer})

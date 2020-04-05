@@ -13,7 +13,7 @@ final _regExpSpaceLeading = RegExp(r'^[ \n\t\u{200B}]+', unicode: true);
 final _regExpSpaceTrailing = RegExp(r'[ \n\t\u{200B}]+$', unicode: true);
 final _regExpSpaces = RegExp(r'\s+');
 
-class HtmlWidgetBuilder {
+class HtmlBuilder {
   final List<dom.Node> domNodes;
   final NodeMetadata parentMeta;
   final Iterable<BuildOp> parentOps;
@@ -25,7 +25,7 @@ class HtmlWidgetBuilder {
 
   BuiltPiece _textPiece;
 
-  HtmlWidgetBuilder({
+  HtmlBuilder({
     @required this.domNodes,
     this.parentMeta,
     Iterable<BuildOp> parentParentOps,
@@ -128,7 +128,7 @@ class HtmlWidgetBuilder {
       if (meta?.isNotRenderable == true) continue;
 
       final isBlockElement = meta?.isBlockElement == true;
-      final __builder = HtmlWidgetBuilder(
+      final __builder = HtmlBuilder(
         domNodes: domNode.nodes,
         parentMeta: meta,
         parentParentOps: parentOps,

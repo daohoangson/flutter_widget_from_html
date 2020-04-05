@@ -30,7 +30,7 @@ class HtmlWidget extends StatefulWidget {
   final String html;
 
   /// The custom [WidgetFactory] builder.
-  final FactoryBuilder factoryBuilder;
+  final WidgetFactory Function(HtmlConfig) factoryBuilder;
 
   final HtmlConfig _config;
 
@@ -79,7 +79,7 @@ class HtmlConfig {
   ///
   /// See also:
   ///
-  ///  * [HtmlWidgetBuilder]
+  ///  * [HtmlBuilder]
   final NodeMetadataCollector builderCallback;
 
   /// The text color for link elements.
@@ -136,7 +136,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
         ? widget.factoryBuilder(widget._config)
         : WidgetFactory(widget._config);
 
-    final widgets = HtmlWidgetBuilder(
+    final widgets = HtmlBuilder(
       domNodes: domNodes,
       parentTsb: TextStyleBuilders()
         ..enqueue(_rootTextStyleBuilder, widget._config),

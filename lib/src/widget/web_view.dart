@@ -6,7 +6,7 @@ class WebView extends StatefulWidget {
   final double aspectRatio;
   final bool getDimensions;
   final List<Duration> getDimensionsDurations;
-  final InterceptNavigationRequest interceptNavigationRequest;
+  final bool Function(String) interceptNavigationRequest;
   final bool js;
 
   // https://github.com/daohoangson/flutter_widget_from_html/issues/37
@@ -147,8 +147,6 @@ class _WebViewState extends State<WebView> {
     }
   }
 }
-
-typedef bool InterceptNavigationRequest(String url);
 
 class _Issue37 with WidgetsBindingObserver {
   final _WebViewState wvs;

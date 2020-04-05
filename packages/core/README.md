@@ -107,7 +107,7 @@ As previously mentioned, this package focuses on the core parsing-building routi
 Here is how it works:
 
 1. `HtmlWidget` parses input html into dom nodes
-2. `HtmlWidgetBuilder` loops through each node, looking for `NodeMetadata` (text size, styling, hyperlink or image source, etc.)
+2. `HtmlBuilder` loops through each node, looking for `NodeMetadata` (text size, styling, hyperlink or image source, etc.)
 3. Use the metadata to build widget via `WidgetFactory`
 
 If you want to, you can change the way metadata is collected (in step 2) and build widget however you like (in step 3) by extending the `WidgetFactory` and give it to `HtmlWidget`. The example below replace smilie inline image with an emoji:
