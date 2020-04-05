@@ -619,7 +619,7 @@ class WidgetFactory {
   CssBorderSide parseCssBorderSide(String value) =>
       _parseCssBorderSide(this, value);
 
-  CssBorderStyle parseCssBorderStyle(String value) =>
+  TextDecorationStyle parseCssBorderStyle(String value) =>
       _parseCssBorderStyle(value);
 
   CssLength parseCssLength(String value) => _parseCssLength(value);
@@ -643,7 +643,7 @@ class WidgetFactory {
           meta = lazySet(
             meta,
             decoUnder: true,
-            decorationStyleFromCssBorderStyle: borderBottom.style,
+            decorationStyle: borderBottom.style,
           );
         } else {
           meta = lazySet(meta, decoUnder: false);
@@ -655,7 +655,7 @@ class WidgetFactory {
           meta = lazySet(
             meta,
             decoOver: true,
-            decorationStyleFromCssBorderStyle: borderTop.style,
+            decorationStyle: borderTop.style,
           );
         } else {
           meta = lazySet(meta, decoOver: false);

@@ -30,19 +30,19 @@ CssBorderSide _parseCssBorderSide(WidgetFactory wf, String value) {
   final width = wf.parseCssLength(value);
   if (width == null || width.number <= 0) return null;
   return CssBorderSide()
-    ..style = CssBorderStyle.solid
+    ..style = TextDecorationStyle.solid
     ..width = width;
 }
 
-CssBorderStyle _parseCssBorderStyle(String value) {
+TextDecorationStyle _parseCssBorderStyle(String value) {
   switch (value) {
     case 'dotted':
-      return CssBorderStyle.dotted;
+      return TextDecorationStyle.dotted;
     case 'dashed':
-      return CssBorderStyle.dashed;
+      return TextDecorationStyle.dashed;
     case 'double':
-      return CssBorderStyle.double;
+      return TextDecorationStyle.double;
   }
 
-  return CssBorderStyle.solid;
+  return TextDecorationStyle.solid;
 }

@@ -14,7 +14,6 @@ NodeMetadata lazySet(
   bool decoStrike,
   bool decoUnder,
   TextDecorationStyle decorationStyle,
-  CssBorderStyle decorationStyleFromCssBorderStyle,
   String fontFamily,
   String fontSize,
   bool fontStyleItalic,
@@ -38,25 +37,7 @@ NodeMetadata lazySet(
   if (decoStrike != null) meta.decoStrike = decoStrike;
   if (decoOver != null) meta.decoOver = decoOver;
   if (decoUnder != null) meta.decoUnder = decoUnder;
-
   if (decorationStyle != null) meta.decorationStyle = decorationStyle;
-  if (decorationStyleFromCssBorderStyle != null) {
-    switch (decorationStyleFromCssBorderStyle) {
-      case CssBorderStyle.dashed:
-        meta.decorationStyle = TextDecorationStyle.dashed;
-        break;
-      case CssBorderStyle.dotted:
-        meta.decorationStyle = TextDecorationStyle.dotted;
-        break;
-      case CssBorderStyle.double:
-        meta.decorationStyle = TextDecorationStyle.double;
-        break;
-      case CssBorderStyle.solid:
-        meta.decorationStyle = TextDecorationStyle.solid;
-        break;
-    }
-  }
-
   if (fontFamily != null) meta.fontFamily = fontFamily;
   if (fontSize != null) meta.fontSize = fontSize;
   if (fontStyleItalic != null) meta.fontStyleItalic = fontStyleItalic;
@@ -154,11 +135,9 @@ class BuiltPiece {
 
 class CssBorderSide {
   Color color;
-  CssBorderStyle style;
+  TextDecorationStyle style;
   CssLength width;
 }
-
-enum CssBorderStyle { dashed, dotted, double, solid }
 
 class CssBorders {
   CssBorderSide bottom;
