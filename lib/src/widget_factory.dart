@@ -11,8 +11,6 @@ import 'builder.dart';
 import 'data_classes.dart';
 import 'helpers.dart';
 import 'html_widget.dart';
-import 'video_player.dart';
-import 'web_view.dart';
 
 part 'ops/tag_a_extended.dart';
 part 'ops/tag_iframe.dart';

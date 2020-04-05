@@ -1,7 +1,4 @@
-import 'dart:async';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart' as lib;
+part of '../helpers.dart';
 
 class WebView extends StatefulWidget {
   final String url;

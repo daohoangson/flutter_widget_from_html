@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart';
 import 'core_html_widget.dart';
 import 'core_widget_factory.dart';
 
+part 'widget/image_layout.dart';
+
 /// A no op placeholder widget.
 const widget0 = SizedBox.shrink();
 
