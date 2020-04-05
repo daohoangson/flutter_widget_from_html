@@ -37,7 +37,7 @@ class _StyleVerticalAlign {
     final replacement = text.parent.sub(text.tsb)..detach();
     text.replaceWith(replacement);
 
-    replacement.add(WidgetBit(
+    replacement.add(TextWidget(
       text,
       WidgetPlaceholder<_StyleVerticalAlign>(builder: (c, _, __) {
         var built = wf.buildText(c, null, text);

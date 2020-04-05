@@ -105,8 +105,8 @@ class _ImageLayoutDelegate extends SingleChildLayoutDelegate {
       height != other.height || width != other.width;
 }
 
-class _ImageBit extends WidgetBit {
-  _ImageBit(TextBits parent, _TagImg self, _TagImgMetadata img)
+class _TextImage extends TextWidget {
+  _TextImage(TextBits parent, _TagImg self, _TagImgMetadata img)
       : super(
           parent,
           WidgetPlaceholder(builder: self._buildImage, input: img),
@@ -159,7 +159,7 @@ class _TagImg {
             return pieces;
           }
 
-          text.add(_ImageBit(text, this, img));
+          text.add(_TextImage(text, this, img));
           return pieces;
         },
         onWidgets: (meta, widgets) {

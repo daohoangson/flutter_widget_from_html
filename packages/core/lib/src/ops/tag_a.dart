@@ -42,7 +42,7 @@ class _TagA {
     GestureRecognizer recognizer,
   ) =>
       piece
-        ..text.bits.forEach((bit) => bit is WidgetBit
+        ..text.bits.forEach((bit) => bit is TextWidget
             ? bit.widget?.wrapWith(wf.buildGestureDetectors, onTap)
             : bit.tsb?.recognizer = recognizer);
 

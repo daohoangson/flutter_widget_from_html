@@ -51,15 +51,15 @@ class _TagRuby {
         final replacement = parent.sub(text.tsb)..detach();
         text.replaceWith(replacement);
 
-        replacement.add(_buildWidgetBit(parent, text, _rtText));
+        replacement.add(_buildTextBit(parent, text, _rtText));
 
         return BuiltPiece.text(replacement);
       }),
     );
   }
 
-  TextBit _buildWidgetBit(TextBits parent, TextBits ruby, TextBits rt) =>
-      WidgetBit(
+  TextBit _buildTextBit(TextBits parent, TextBits ruby, TextBits rt) =>
+      TextWidget(
         parent,
         WidgetPlaceholder<_TagRuby>(builder: (context, _, __) {
           final rubyText = wf.buildText(context, null, ruby);

@@ -25,7 +25,7 @@ void main() {
       text.addText('3');
       expect(_data(text), equals('13'));
 
-      DataBit(text, '2', text.tsb).insertAfter(bit1);
+      TextData(text, '2', text.tsb).insertAfter(bit1);
       expect(_data(text), equals('123'));
     });
 
@@ -35,7 +35,7 @@ void main() {
       final bit3 = text.addText('3');
       expect(_data(text), equals('13'));
 
-      DataBit(text, '2', text.tsb).insertBefore(bit3);
+      TextData(text, '2', text.tsb).insertBefore(bit3);
       expect(_data(text), equals('123'));
     });
 
@@ -46,7 +46,7 @@ void main() {
       text.addText('3');
       expect(_data(text), equals('1x3'));
 
-      bitX.replaceWith(DataBit(text, '2', text.tsb));
+      bitX.replaceWith(TextData(text, '2', text.tsb));
       expect(_data(text), equals('123'));
     });
 
@@ -114,32 +114,32 @@ void main() {
       });
     });
 
-    group('hasTrailingSpace', () {
+    group('hasTrailingWhitespace', () {
       test('returns true by default', () {
         final text = _text();
-        expect(text.hasTrailingSpace, isTrue);
+        expect(text.hasTrailingWhitespace, isTrue);
       });
 
-      test('returns true for trailing SpaceBit', () {
+      test('returns true for trailing whitespace', () {
         final text = _text();
-        text.addSpace();
+        text.addWhitespace();
 
-        expect(text.hasTrailingSpace, isTrue);
+        expect(text.hasTrailingWhitespace, isTrue);
       });
 
       test('returns false for text', () {
         final text = _text();
         text.addText('data');
 
-        expect(text.hasTrailingSpace, isFalse);
+        expect(text.hasTrailingWhitespace, isFalse);
       });
 
       test('returns false for widget', () {
         final text = _text();
         final widget = WidgetPlaceholder(builder: (_, ws, __) => ws);
-        text.add(WidgetBit(text, widget));
+        text.add(TextWidget(text, widget));
 
-        expect(text.hasTrailingSpace, isFalse);
+        expect(text.hasTrailingWhitespace, isFalse);
       });
     });
 
@@ -176,20 +176,20 @@ void main() {
       });
     });
 
-    group('addSpace', () {
+    group('addWhitespace', () {
       test('adds new bit', () {
         final text = _text();
         text.addText('data');
         expect(text.bits.length, equals(1));
 
-        final space = text.addSpace();
+        final space = text.addWhitespace();
         expect(space, isNotNull);
         expect(text.bits.length, equals(2));
       });
 
       test('skips adding to empty text', () {
         final text = _text();
-        final space = text.addSpace();
+        final space = text.addWhitespace();
 
         expect(space, isNull);
       });
@@ -197,8 +197,8 @@ void main() {
       test('skips adding to trailing space', () {
         final text = _text();
         text.addText('data');
-        final space1 = text.addSpace();
-        final space2 = text.addSpace();
+        final space1 = text.addWhitespace();
+        final space2 = text.addWhitespace();
 
         expect(space2, equals(space1));
         expect(space2.data, isNull);
@@ -207,8 +207,8 @@ void main() {
       test('adds new line to trailing space', () {
         final text = _text();
         text.addText('data');
-        final space1 = text.addSpace();
-        final space2 = text.addSpace(SpaceType.newLine);
+        final space1 = text.addWhitespace();
+        final space2 = text.addWhitespace(TextWhitespaceType.newLine);
 
         expect(space2, equals(space1));
         expect(space2.data, equals('\n'));
@@ -219,7 +219,7 @@ void main() {
       test('trims trailing space', () {
         final text = _text();
         text.addText('data');
-        text.addSpace();
+        text.addWhitespace();
         expect(text.bits.length, equals(2));
 
         text.trimRight();
@@ -239,7 +239,7 @@ void main() {
         final text = _text();
         final text1 = text.sub();
         text1.addText('data');
-        text1.addSpace();
+        text1.addWhitespace();
         expect(text1.bits.length, equals(2));
 
         text.trimRight();
@@ -259,7 +259,7 @@ void main() {
         final text = _text();
         text.addText('data');
         final sub = text.sub();
-        sub.addSpace();
+        sub.addWhitespace();
         expect(text.bits.length, equals(2));
         expect(sub.index, equals(1));
 
@@ -273,7 +273,7 @@ void main() {
   test('toString', () {
     final text = _text();
     text.addText('1');
-    text.addSpace();
+    text.addWhitespace();
     final text2 = text.sub();
     text2.addText('(2.1)');
     final text22 = text2.sub();
@@ -281,22 +281,22 @@ void main() {
     text22.addText('(2.2.2)');
     text2.addText('(2.3)');
     final widget = WidgetPlaceholder<String>(builder: (_, ws, __) => ws);
-    text.add(WidgetBit(text, widget));
+    text.add(TextWidget(text, widget));
 
     final str = text.toString().replaceAll(RegExp(r':\d+\]'), ']');
 
     expect(str, equals("""
 
 [TextBits]
-  [DataBit] data=1
-  [SpaceBit] data=null
+  [TextData] data=1
+  [TextWhitespace] data=null
   [TextBits]
-    [DataBit] data=(2.1)
+    [TextData] data=(2.1)
     [TextBits]
-      [DataBit] data=(2.2.1)
-      [DataBit] data=(2.2.2)
-    [DataBit] data=(2.3)
-  [WidgetBit] widget=WidgetPlaceholder<String>
+      [TextData] data=(2.2.1)
+      [TextData] data=(2.2.2)
+    [TextData] data=(2.3)
+  [TextWidget] widget=WidgetPlaceholder<String>
 ----"""));
   });
 }

@@ -828,7 +828,8 @@ class WidgetFactory {
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      onPieces: (_, pieces) => pieces..last.text.addSpace(SpaceType.newLine),
+      onPieces: (_, pieces) =>
+          pieces..last.text.addWhitespace(TextWhitespaceType.newLine),
     );
     return _tagBr;
   }

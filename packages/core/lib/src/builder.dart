@@ -165,17 +165,17 @@ class Builder {
 
     final text = _textPiece.text;
     if (end <= start) {
-      text.addSpace();
+      text.addWhitespace();
       return;
     }
 
-    if (start > 0) text.addSpace();
+    if (start > 0) text.addWhitespace();
 
     final substring = data.substring(start, end);
     final dedup = substring.replaceAll(_regExpSpaces, ' ');
     text.addText(dedup);
 
-    if (end < data.length) text.addSpace();
+    if (end < data.length) text.addWhitespace();
   }
 
   void _newTextPiece() => _textPiece = BuiltPiece.text(
