@@ -40,7 +40,7 @@ class _BlockquoteWebViewWf extends WidgetFactory {
     ],
   );
 
-  _BlockquoteWebViewWf(HtmlWidgetConfig config) : super(config);
+  _BlockquoteWebViewWf(HtmlConfig config) : super(config);
 
   @override
   NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {

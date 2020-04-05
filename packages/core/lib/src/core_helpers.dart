@@ -11,7 +11,7 @@ typedef void OnTapUrl(String url);
 typedef Iterable<Widget> WidgetPlaceholderBuilder<T>(
     BuildContext context, Iterable<Widget> children, T input);
 
-typedef WidgetFactory FactoryBuilder(HtmlWidgetConfig config);
+typedef WidgetFactory FactoryBuilder(HtmlConfig config);
 
 class WidgetPlaceholder<T1> extends StatelessWidget {
   final _builders = List<Function>();

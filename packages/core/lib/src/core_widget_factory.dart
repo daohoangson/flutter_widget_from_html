@@ -28,8 +28,9 @@ part 'parser/css.dart';
 
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
 
+/// A factory to build widget for HTML elements.
 class WidgetFactory {
-  final HtmlWidgetConfig _config;
+  final HtmlConfig _config;
 
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
