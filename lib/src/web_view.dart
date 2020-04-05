@@ -89,7 +89,7 @@ class _WebViewState extends State<WebView> {
   }
 
   Future<String> eval(String js) =>
-      _wvc?.evaluateJavascript(js)?.catchError((_) => '');
+      _wvc?.evaluateJavascript(js)?.catchError((dynamic _) => '');
 
   Widget _buildWebView() => lib.WebView(
         initialUrl: widget.url,
@@ -146,7 +146,7 @@ class _WebViewState extends State<WebView> {
           // get dimensions immediately
           ? _getDimensions()
           // or wait for the specified duration
-          : Future.delayed(t).then((_) => _getDimensions()));
+          : Future<void>.delayed(t).then((dynamic _) => _getDimensions()));
     }
   }
 }

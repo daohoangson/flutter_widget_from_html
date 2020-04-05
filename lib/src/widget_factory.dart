@@ -5,8 +5,8 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
     as core;
 import 'package:url_launcher/url_launcher.dart';
 
+import 'config.dart';
 import 'data_classes.dart';
-import 'html_widget.dart';
 import 'video_player.dart';
 import 'web_view.dart';
 
@@ -16,14 +16,16 @@ part 'ops/tag_svg.dart';
 part 'ops/tag_video.dart';
 
 class WidgetFactory extends core.WidgetFactory {
-  final HtmlWidgetConfig _config;
+  final HtmlExtendedConfig _config;
 
   BuildOp _tagAExtended;
   BuildOp _tagIframe;
   BuildOp _tagSvg;
   BuildOp _tagVideo;
 
-  WidgetFactory(this._config) : super(_config);
+  WidgetFactory(core.HtmlConfig config)
+      : _config = config is HtmlExtendedConfig ? config : null,
+        super(config);
 
   @override
   Widget buildDivider() => const Divider(height: 1);
@@ -37,11 +39,12 @@ class WidgetFactory extends core.WidgetFactory {
       widgets.map((widget) => InkWell(child: widget, onTap: onTap));
 
   @override
-  GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
-      ? () => _config.onTapUrl != null
-          ? _config.onTapUrl(url)
-          : canLaunch(url).then((ok) => ok ? launch(url) : null)
-      : null;
+  GestureTapCallback buildGestureTapCallbackForUrl(String url) {
+    if (_config == null) return super.buildGestureTapCallbackForUrl(url);
+    if (url == null) return null;
+    if (_config.onTapUrl != null) return () => _config.onTapUrl(url);
+    return () => canLaunch(url).then((ok) => ok ? launch(url) : null);
+  }
 
   @override
   ImageProvider buildImageFromUrl(String url) =>

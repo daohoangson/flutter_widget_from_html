@@ -3,13 +3,14 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:html/parser.dart' as parser;
 
 import 'builder.dart' as core;
+import 'core_config.dart';
 import 'core_widget_factory.dart';
 import 'data_classes.dart';
 
 TextStyle _rootTextStyleBuilder(
   TextStyleBuilders _,
   TextStyle parent,
-  HtmlWidgetConfig config,
+  HtmlConfig config,
 ) {
   var style = config.textStyle;
   if (style == null) return parent;
@@ -31,7 +32,7 @@ class HtmlWidget extends StatefulWidget {
   /// The custom [WidgetFactory] builder.
   final FactoryBuilder factoryBuilder;
 
-  final HtmlWidgetConfig _config;
+  final HtmlConfig _config;
 
   /// Creates a widget that builds Flutter widget tree from html.
   ///
@@ -41,7 +42,7 @@ class HtmlWidget extends StatefulWidget {
     this.enableCaching = true,
     this.factoryBuilder,
     Key key,
-    HtmlWidgetConfig config,
+    HtmlConfig config,
     Uri baseUrl,
     EdgeInsets bodyPadding = const EdgeInsets.all(10),
     NodeMetadataCollector builderCallback,
@@ -51,7 +52,7 @@ class HtmlWidget extends StatefulWidget {
     TextStyle textStyle = const TextStyle(),
   })  : assert(html != null),
         _config = config ??
-            HtmlWidgetConfig(
+            HtmlConfig(
               baseUrl: baseUrl,
               bodyPadding: bodyPadding,
               builderCallback: builderCallback,
@@ -64,43 +65,6 @@ class HtmlWidget extends StatefulWidget {
 
   @override
   State<HtmlWidget> createState() => HtmlWidgetState();
-}
-
-class HtmlWidgetConfig {
-  /// The base url to resolve links and image urls.
-  final Uri baseUrl;
-
-  /// The amount of space by which to inset the built widget tree.
-  final EdgeInsets bodyPadding;
-
-  /// The callback to render custom elements.
-  ///
-  /// See also:
-  ///
-  ///  * [core.Builder]
-  final NodeMetadataCollector builderCallback;
-
-  /// The text color for link elements.
-  final Color hyperlinkColor;
-
-  /// The callback when user taps a link.
-  final OnTapUrl onTapUrl;
-
-  /// The amount of space by which to inset the table cell's contents.
-  final EdgeInsets tableCellPadding;
-
-  /// The default styling for text elements.
-  final TextStyle textStyle;
-
-  HtmlWidgetConfig({
-    this.baseUrl,
-    this.bodyPadding,
-    this.builderCallback,
-    this.hyperlinkColor,
-    this.onTapUrl,
-    this.tableCellPadding,
-    this.textStyle,
-  });
 }
 
 class HtmlWidgetState extends State<HtmlWidget> {

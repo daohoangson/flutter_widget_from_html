@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'core_html_widget.dart';
+import 'core_config.dart';
 import 'core_widget_factory.dart';
 import 'data_classes.dart';
 
@@ -22,7 +22,7 @@ typedef void OnTapUrl(String url);
 typedef Iterable<Widget> WidgetPlaceholderBuilder<T>(
     BuilderContext bc, Iterable<Widget> children, T input);
 
-typedef WidgetFactory FactoryBuilder(HtmlWidgetConfig config);
+typedef WidgetFactory FactoryBuilder(HtmlConfig config);
 
 class SimpleColumn extends StatelessWidget {
   final List<Widget> children;

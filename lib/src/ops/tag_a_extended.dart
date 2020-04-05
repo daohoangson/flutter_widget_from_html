@@ -3,7 +3,7 @@ part of '../widget_factory.dart';
 TextStyle _tagAExtendedAccentColor(
   TextStyleBuilders tsb,
   TextStyle parent,
-  _,
+  dynamic _,
 ) =>
     parent.copyWith(color: Theme.of(tsb.bc.context).accentColor);
 
