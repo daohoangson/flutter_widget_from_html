@@ -1,4 +1,4 @@
-part of '../data_classes.dart';
+part of '../core_data.dart';
 
 @immutable
 abstract class TextBit {

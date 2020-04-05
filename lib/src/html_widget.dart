@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/src/core_html_widget.dart'
     as core;
 
-import 'data_classes.dart';
+import 'data.dart';
 import 'helpers.dart';
 import 'widget_factory.dart';
 

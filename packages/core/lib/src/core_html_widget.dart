@@ -3,8 +3,8 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:html/parser.dart' as parser;
 
 import 'builder.dart';
+import 'core_data.dart';
 import 'core_widget_factory.dart';
-import 'data_classes.dart';
 
 TextStyle _rootTextStyleBuilder(
   TextStyleBuilders _,

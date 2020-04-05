@@ -8,7 +8,7 @@ import 'package:flutter_widget_from_html_core/src/core_widget_factory.dart'
 import 'package:url_launcher/url_launcher.dart';
 
 import 'builder.dart';
-import 'data_classes.dart';
+import 'data.dart';
 import 'helpers.dart';
 import 'html_widget.dart';
 
