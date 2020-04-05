@@ -41,8 +41,8 @@ unit_test_task:
   test_script: COVERAGE=1 ./tool/test.sh
   codecov_script: bash <(curl -s https://codecov.io/bash)
   always:
-    core_golden_artifacts:
-      path: packages/core/test/golden/failures/*
+    golden_failures_artifacts:
+      path: packages/example/test/golden/failures/*
 
 ios_test_task:
   skip: "!changesInclude('lib/src/web_view.dart')"
