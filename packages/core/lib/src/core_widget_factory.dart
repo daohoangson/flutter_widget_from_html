@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'builder.dart';
 import 'core_helpers.dart';
 import 'core_html_widget.dart';
 import 'data_classes.dart';

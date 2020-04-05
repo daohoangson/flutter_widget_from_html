@@ -155,10 +155,10 @@ class _StyleMargin {
 CssMargin _parseCssMargin(WidgetFactory wf, NodeMetadata meta) {
   CssMargin output;
 
-  meta.styles((key, value) {
-    switch (key) {
+  for (final style in meta.styles) {
+    switch (style.key) {
       case _kCssMargin:
-        output = wf.parseCssMarginAll(value);
+        output = wf.parseCssMarginAll(style.value);
         break;
 
       case _kCssMarginBottom:
@@ -167,10 +167,10 @@ CssMargin _parseCssMargin(WidgetFactory wf, NodeMetadata meta) {
       case _kCssMarginRight:
       case _kCssMarginStart:
       case _kCssMarginTop:
-        output = wf.parseCssMarginOne(output, key, value);
+        output = wf.parseCssMarginOne(output, style.key, style.value);
         break;
     }
-  });
+  }
 
   return output;
 }

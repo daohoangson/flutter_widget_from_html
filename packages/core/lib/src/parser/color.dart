@@ -13,6 +13,7 @@ String _convertColorToHex(Color value) {
 }
 
 Color _parseColor(String value) {
+  if (value == null) return null;
   final match = _colorRegExp.firstMatch(value);
   if (match == null) return null;
 

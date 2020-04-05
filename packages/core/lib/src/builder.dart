@@ -13,7 +13,7 @@ final _regExpSpaceLeading = RegExp(r'^[ \n\t\u{200B}]+', unicode: true);
 final _regExpSpaceTrailing = RegExp(r'[ \n\t\u{200B}]+$', unicode: true);
 final _regExpSpaces = RegExp(r'\s+');
 
-class Builder {
+class HtmlWidgetBuilder {
   final List<dom.Node> domNodes;
   final NodeMetadata parentMeta;
   final Iterable<BuildOp> parentOps;
@@ -25,7 +25,7 @@ class Builder {
 
   BuiltPiece _textPiece;
 
-  Builder({
+  HtmlWidgetBuilder({
     @required this.domNodes,
     this.parentMeta,
     Iterable<BuildOp> parentParentOps,
@@ -82,7 +82,12 @@ class Builder {
     // stylings, step 1: get default styles from tag-based build ops
     if (meta?.hasOps == true) {
       for (final op in meta.ops) {
-        lazySet(meta, stylesPrepend: op.defaultStyles(meta, e));
+        final defaultStyles = op.defaultStyles(meta, e);
+        if (defaultStyles != null) {
+          assert(defaultStyles.length % 2 == 0);
+          meta._styles ??= [];
+          meta._styles.insertAll(0, defaultStyles);
+        }
       }
     }
 
@@ -93,7 +98,11 @@ class Builder {
       }
     }
 
-    meta?.styles((k, v) => meta = wf.parseStyle(meta, k, v));
+    if (meta != null) {
+      for (final style in meta?.styles) {
+        meta = wf.parseStyle(meta, style.key, style.value);
+      }
+    }
 
     meta = wf.parseElement(meta, e);
 
@@ -119,7 +128,7 @@ class Builder {
       if (meta?.isNotRenderable == true) continue;
 
       final isBlockElement = meta?.isBlockElement == true;
-      final __builder = Builder(
+      final __builder = HtmlWidgetBuilder(
         domNodes: domNode.nodes,
         parentMeta: meta,
         parentParentOps: parentOps,
@@ -195,4 +204,131 @@ Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, NodeMetadata meta) {
   if (withOnChild?.isNotEmpty != true) return ops;
 
   return List.unmodifiable((ops?.toList() ?? <BuildOp>[])..addAll(withOnChild));
+}
+
+class NodeMetadata {
+  Iterable<BuildOp> _buildOps;
+  dom.Element _domElement;
+  Iterable<BuildOp> _parentOps;
+  TextStyleBuilders _tsb;
+
+  Color color;
+  bool decoOver;
+  bool decoStrike;
+  bool decoUnder;
+  TextDecorationStyle decorationStyle;
+  String fontFamily;
+  String fontSize;
+  bool fontStyleItalic;
+  FontWeight fontWeight;
+  bool _isBlockElement;
+  bool isNotRenderable;
+  List<String> _styles;
+  bool _stylesFrozen = false;
+
+  dom.Element get domElement => _domElement;
+
+  bool get hasOps => _buildOps != null;
+
+  bool get hasParents => _parentOps != null;
+
+  bool get isBlockElement {
+    if (_isBlockElement == true) return true;
+    return _buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
+  }
+
+  Iterable<BuildOp> get ops => _buildOps;
+
+  Iterable<BuildOp> get parents => _parentOps;
+
+  Iterable<MapEntry<String, String>> get styles sync* {
+    _stylesFrozen = true;
+    if (_styles == null) return;
+
+    final iterator = _styles.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current;
+      if (!iterator.moveNext()) return;
+      yield MapEntry(key, iterator.current);
+    }
+  }
+
+  TextStyleBuilders get tsb => _tsb;
+
+  set domElement(dom.Element e) {
+    assert(_domElement == null);
+    _domElement = e;
+
+    if (_buildOps != null) {
+      final ops = _buildOps as List;
+      ops.sort((a, b) => a.priority.compareTo(b.priority));
+      _buildOps = List.unmodifiable(ops);
+    }
+  }
+
+  set tsb(TextStyleBuilders tsb) {
+    assert(_tsb == null);
+    _tsb = tsb;
+  }
+
+  String style(String key) {
+    for (final x in styles) {
+      if (x.key == key) return x.value;
+    }
+    return null;
+  }
+}
+
+NodeMetadata lazySet(
+  NodeMetadata meta, {
+  BuildOp buildOp,
+  Color color,
+  bool decoOver,
+  bool decoStrike,
+  bool decoUnder,
+  TextDecorationStyle decorationStyle,
+  String fontFamily,
+  String fontSize,
+  bool fontStyleItalic,
+  FontWeight fontWeight,
+  bool isBlockElement,
+  bool isNotRenderable,
+  Iterable<BuildOp> parentOps,
+  Iterable<String> styles,
+}) {
+  meta ??= NodeMetadata();
+
+  if (buildOp != null) {
+    meta._buildOps ??= [];
+    final ops = meta._buildOps as List<BuildOp>;
+    if (!ops.contains(buildOp)) ops.add(buildOp);
+  }
+
+  if (color != null) meta.color = color;
+
+  if (decoStrike != null) meta.decoStrike = decoStrike;
+  if (decoOver != null) meta.decoOver = decoOver;
+  if (decoUnder != null) meta.decoUnder = decoUnder;
+  if (decorationStyle != null) meta.decorationStyle = decorationStyle;
+  if (fontFamily != null) meta.fontFamily = fontFamily;
+  if (fontSize != null) meta.fontSize = fontSize;
+  if (fontStyleItalic != null) meta.fontStyleItalic = fontStyleItalic;
+  if (fontWeight != null) meta.fontWeight = fontWeight;
+
+  if (isBlockElement != null) meta._isBlockElement = isBlockElement;
+  if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
+
+  if (parentOps != null) {
+    assert(meta._parentOps == null);
+    meta._parentOps = parentOps;
+  }
+
+  if (styles != null) {
+    assert(styles.length % 2 == 0);
+    assert(!meta._stylesFrozen);
+    meta._styles ??= [];
+    meta._styles.addAll(styles);
+  }
+
+  return meta;
 }

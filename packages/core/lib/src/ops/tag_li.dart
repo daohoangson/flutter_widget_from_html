@@ -100,16 +100,16 @@ class _TagLi {
 
   Iterable<Widget> _buildList(NodeMetadata meta, Iterable<Widget> children) {
     final listMeta = _ListMetadata();
-    meta.styles((key, value) {
-      switch (key) {
+    for (final style in meta?.styles) {
+      switch (style.key) {
         case _kCssListStyleType:
-          listMeta.listStyleType = value;
+          listMeta.listStyleType = style.value;
           break;
         case __kCssPaddingInlineStart:
-          final parsed = wf.parseCssLength(value);
+          final parsed = wf.parseCssLength(style.value);
           if (parsed != null) listMeta.paddingInlineStart = parsed;
       }
-    });
+    }
 
     final a = meta.domElement.attributes;
     if (a.containsKey(_kAttributeOlReversed)) listMeta.markerReversed = true;
@@ -164,16 +164,16 @@ class _TagLi {
         ? _LiInput.listStyleTypeFromAttributeType(a[_kAttributeLiType])
         : null;
     CssLength paddingInlineStart;
-    meta.styles((key, value) {
-      switch (key) {
+    for (final style in meta.styles) {
+      switch (style.key) {
         case _kCssListStyleType:
-          listStyleType = value;
+          listStyleType = style.value;
           break;
         case __kCssPaddingInlineStart:
-          final parsed = wf.parseCssLength(value);
+          final parsed = wf.parseCssLength(style.value);
           if (parsed != null) paddingInlineStart = parsed;
       }
-    });
+    }
 
     return _LiPlaceholder(
       this,

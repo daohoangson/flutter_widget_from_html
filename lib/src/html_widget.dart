@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
+import 'package:flutter_widget_from_html_core/src/core_html_widget.dart'
     as core;
 
 import 'data_classes.dart';
-import 'widget_factory.dart' as extended;
+import 'helpers.dart';
+import 'widget_factory.dart';
 
 /// A widget that builds Flutter widget tree from html.
 class HtmlWidget extends core.HtmlWidget {
@@ -13,14 +14,14 @@ class HtmlWidget extends core.HtmlWidget {
   HtmlWidget(
     String html, {
     bool enableCaching = true,
-    core.FactoryBuilder factoryBuilder,
+    FactoryBuilder factoryBuilder,
     Key key,
     HtmlWidgetConfig config,
     Uri baseUrl,
     EdgeInsets bodyPadding = const EdgeInsets.all(10),
     NodeMetadataCollector builderCallback,
     Color hyperlinkColor,
-    core.OnTapUrl onTapUrl,
+    OnTapUrl onTapUrl,
     EdgeInsets tableCellPadding = const EdgeInsets.all(5),
     TextStyle textStyle = const TextStyle(),
     bool unsupportedWebViewWorkaroundForIssue37 = false,
@@ -30,8 +31,7 @@ class HtmlWidget extends core.HtmlWidget {
         super(
           html,
           enableCaching: enableCaching,
-          factoryBuilder:
-              factoryBuilder ?? (config) => extended.WidgetFactory(config),
+          factoryBuilder: factoryBuilder ?? (config) => WidgetFactory(config),
           config: config ??
               HtmlWidgetConfig(
                 baseUrl: baseUrl,
@@ -83,7 +83,7 @@ class HtmlWidgetConfig extends core.HtmlWidgetConfig {
     EdgeInsets bodyPadding,
     NodeMetadataCollector builderCallback,
     Color hyperlinkColor,
-    core.OnTapUrl onTapUrl,
+    OnTapUrl onTapUrl,
     EdgeInsets tableCellPadding,
     TextStyle textStyle,
     this.unsupportedWebViewWorkaroundForIssue37,

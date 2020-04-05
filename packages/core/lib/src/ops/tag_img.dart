@@ -195,10 +195,8 @@ class _TagImg {
     NodeMetadata meta,
     Map<dynamic, String> map,
     String key,
-    String key2,
   ) {
-    String value;
-    meta.styles((k, v) => k == key ? value = v : null);
+    String value = meta.style(key);
     if (value != null) {
       final match = _dimensionRegExp.matchAsPrefix(value);
       if (match != null) {
@@ -207,7 +205,7 @@ class _TagImg {
       }
     }
 
-    value = _getAttr(map, key, key2);
+    value = _getAttr(map, key, "data-$key");
     return value != null ? double.tryParse(value) : null;
   }
 
@@ -216,10 +214,10 @@ class _TagImg {
     final src = _getAttr(attrs, 'src', 'data-src');
 
     return _TagImgMetadata(
-      height: _getDimension(meta, attrs, 'height', 'data-height'),
+      height: _getDimension(meta, attrs, 'height'),
       text: _getAttr(attrs, 'alt', 'title'),
       url: wf.constructFullUrl(src),
-      width: _getDimension(meta, attrs, 'width', 'data-width'),
+      width: _getDimension(meta, attrs, 'width'),
     );
   }
 }

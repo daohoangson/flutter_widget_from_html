@@ -1,11 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
+import 'package:flutter_widget_from_html_core/src/core_widget_factory.dart'
     as core;
 import 'package:url_launcher/url_launcher.dart';
 
+import 'builder.dart';
 import 'data_classes.dart';
+import 'helpers.dart';
 import 'html_widget.dart';
 import 'video_player.dart';
 import 'web_view.dart';

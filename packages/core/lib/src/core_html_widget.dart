@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:html/parser.dart' as parser;
 
-import 'builder.dart' as core;
+import 'builder.dart';
 import 'core_widget_factory.dart';
 import 'data_classes.dart';
 
@@ -77,7 +77,7 @@ class HtmlWidgetConfig {
   ///
   /// See also:
   ///
-  ///  * [core.Builder]
+  ///  * [HtmlWidgetBuilder]
   final NodeMetadataCollector builderCallback;
 
   /// The text color for link elements.
@@ -133,7 +133,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
         ? widget.factoryBuilder(widget._config)
         : WidgetFactory(widget._config);
 
-    final widgets = core.Builder(
+    final widgets = HtmlWidgetBuilder(
       domNodes: domNodes,
       parentTsb: TextStyleBuilders()
         ..enqueue(_rootTextStyleBuilder, widget._config),

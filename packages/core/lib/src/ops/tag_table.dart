@@ -145,8 +145,7 @@ class _TagTable {
   }
 
   TableBorder _buildTableBorder(BuildContext context, NodeMetadata meta) {
-    String styleBorder;
-    meta.styles((k, v) => k == _kCssBorder ? styleBorder = v : null);
+    String styleBorder = meta.style(_kCssBorder);
     if (styleBorder != null) {
       final borderParsed = wf.parseCssBorderSide(styleBorder);
       if (borderParsed != null) {

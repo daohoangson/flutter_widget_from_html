@@ -23,17 +23,13 @@ class _StyleTextAlign {
   BuildOp get buildOp => BuildOp(
         isBlockElement: true,
         onPieces: (meta, pieces) {
-          String v;
-          meta.styles((k, _v) => k == _kCssTextAlign ? v = _v : null);
-          if (v == null) return pieces;
-
           // handle texts
+          String v = meta.style(_kCssTextAlign);
           meta.tsb.enqueue(_styleTextAlignBuilder, _getTextAlign(v));
 
+          // handle widgets
           final alignment = _getAlignment(v);
           if (alignment == null) return pieces;
-
-          // handle widgets
           final newPieces = <BuiltPiece>[];
           for (final p in pieces) {
             if (p.widgets?.isNotEmpty == true) {

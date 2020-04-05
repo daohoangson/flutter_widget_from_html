@@ -10,10 +10,9 @@ TextStyle _tagAExtendedAccentColor(
 class _TagAExtended {
   BuildOp get buildOp => BuildOp(
         onPieces: (meta, pieces) {
-          var hasStyleColor = false;
-          meta.styles((k, _) => hasStyleColor |= (k == 'color'));
-
-          if (!hasStyleColor) meta.tsb.enqueue(_tagAExtendedAccentColor, null);
+          if (meta.style('color') == null) {
+            meta.tsb.enqueue(_tagAExtendedAccentColor, null);
+          }
 
           return pieces;
         },

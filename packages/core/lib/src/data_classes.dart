@@ -2,71 +2,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'builder.dart';
 import 'core_helpers.dart';
 
 part 'data/text_bits.dart';
-
-NodeMetadata lazySet(
-  NodeMetadata meta, {
-  BuildOp buildOp,
-  Color color,
-  bool decoOver,
-  bool decoStrike,
-  bool decoUnder,
-  TextDecorationStyle decorationStyle,
-  String fontFamily,
-  String fontSize,
-  bool fontStyleItalic,
-  FontWeight fontWeight,
-  bool isBlockElement,
-  bool isNotRenderable,
-  Iterable<BuildOp> parentOps,
-  Iterable<String> styles,
-  Iterable<String> stylesPrepend,
-}) {
-  meta ??= NodeMetadata();
-
-  if (buildOp != null) {
-    meta._buildOps ??= [];
-    final ops = meta._buildOps as List<BuildOp>;
-    if (!ops.contains(buildOp)) ops.add(buildOp);
-  }
-
-  if (color != null) meta.color = color;
-
-  if (decoStrike != null) meta.decoStrike = decoStrike;
-  if (decoOver != null) meta.decoOver = decoOver;
-  if (decoUnder != null) meta.decoUnder = decoUnder;
-  if (decorationStyle != null) meta.decorationStyle = decorationStyle;
-  if (fontFamily != null) meta.fontFamily = fontFamily;
-  if (fontSize != null) meta.fontSize = fontSize;
-  if (fontStyleItalic != null) meta.fontStyleItalic = fontStyleItalic;
-  if (fontWeight != null) meta.fontWeight = fontWeight;
-
-  if (isBlockElement != null) meta._isBlockElement = isBlockElement;
-  if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
-
-  if (parentOps != null) {
-    assert(meta._parentOps == null);
-    meta._parentOps = parentOps;
-  }
-
-  if (stylesPrepend != null) {
-    styles = stylesPrepend;
-  }
-  if (styles != null) {
-    assert(styles.length % 2 == 0);
-    assert(!meta._stylesFrozen);
-    meta._styles ??= [];
-    if (styles == stylesPrepend) {
-      meta._styles.insertAll(0, styles);
-    } else {
-      meta._styles.addAll(styles);
-    }
-  }
-
-  return meta;
-}
 
 class BuildOp {
   final bool isBlockElement;
@@ -206,72 +145,6 @@ class CssLength {
 enum CssLengthUnit {
   em,
   px,
-}
-
-class NodeMetadata {
-  Iterable<BuildOp> _buildOps;
-  dom.Element _domElement;
-  Iterable<BuildOp> _parentOps;
-  TextStyleBuilders _tsb;
-
-  Color color;
-  bool decoOver;
-  bool decoStrike;
-  bool decoUnder;
-  TextDecorationStyle decorationStyle;
-  String fontFamily;
-  String fontSize;
-  bool fontStyleItalic;
-  FontWeight fontWeight;
-  bool _isBlockElement;
-  bool isNotRenderable;
-  List<String> _styles;
-  bool _stylesFrozen = false;
-
-  dom.Element get domElement => _domElement;
-
-  bool get hasOps => _buildOps != null;
-
-  bool get hasParents => _parentOps != null;
-
-  Iterable<BuildOp> get ops => _buildOps;
-
-  Iterable<BuildOp> get parents => _parentOps;
-
-  TextStyleBuilders get tsb => _tsb;
-
-  set domElement(dom.Element e) {
-    assert(_domElement == null);
-    _domElement = e;
-
-    if (_buildOps != null) {
-      final ops = _buildOps as List;
-      ops.sort((a, b) => a.priority.compareTo(b.priority));
-      _buildOps = List.unmodifiable(ops);
-    }
-  }
-
-  set tsb(TextStyleBuilders tsb) {
-    assert(_tsb == null);
-    _tsb = tsb;
-  }
-
-  bool get isBlockElement {
-    if (_isBlockElement == true) return true;
-    return _buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
-  }
-
-  void styles(void f(String key, String value)) {
-    _stylesFrozen = true;
-    if (_styles == null) return;
-
-    final iterator = _styles.iterator;
-    while (iterator.moveNext()) {
-      final key = iterator.current;
-      if (!iterator.moveNext()) return;
-      f(key, iterator.current);
-    }
-  }
 }
 
 typedef NodeMetadata NodeMetadataCollector(NodeMetadata meta, dom.Element e);
