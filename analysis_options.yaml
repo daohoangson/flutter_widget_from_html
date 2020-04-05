@@ -1,9 +1,11 @@
-include: package:pedantic/analysis_options.yaml
-
+# https://dash-overflow.net/articles/getting_started/
+include: analysis_options_all.yaml
 analyzer:
-  exclude:
-    # exclude these directories to avoid `include_file_not_found` warning
-    # probably an Analysis Server bug?
-    # TODO: troubleshoot further and file a Flutter bug if applicable
-    - example
-    - packages/core/example
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
+  errors:
+    included_file_warning: ignore
+
+linter:
+  rules:
