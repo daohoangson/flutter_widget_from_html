@@ -38,32 +38,68 @@ void main() {
   });
 
   group('buildAsyncBuilder', () {
-    final explain = (WidgetTester tester, String html, bool withData) =>
+    final explain = (
+      WidgetTester tester,
+      String html, {
+      AsyncWidgetBuilder<Widget> buildAsyncBuilder,
+      bool withData,
+    }) =>
         tester.runAsync(() => helper.explain(tester, null,
             buildFutureBuilderWithData: withData,
             hw: HtmlWidget(
               html,
               bodyPadding: const EdgeInsets.all(0),
               buildAsync: true,
+              buildAsyncBuilder: buildAsyncBuilder,
               key: helper.hwKey,
             )));
 
-    testWidgets('renders data', (WidgetTester tester) async {
-      final html = 'Foo';
-      final explained = await explain(tester, html, true);
-      expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
+    group('default', () {
+      testWidgets('renders data', (WidgetTester tester) async {
+        final html = 'Foo';
+        final explained = await explain(tester, html, withData: true);
+        expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
+      });
+
+      testWidgets('renders indicator', (WidgetTester tester) async {
+        final html = 'Foo';
+        final explained = await explain(tester, html, withData: false);
+        expect(
+            explained,
+            equals('[FutureBuilder:'
+                '[Center:child='
+                '[Padding:(8,8,8,8),child='
+                '[CircularProgressIndicator:]'
+                ']]]'));
+      });
     });
 
-    testWidgets('renders indicator', (WidgetTester tester) async {
-      final html = 'Foo';
-      final explained = await explain(tester, html, false);
-      expect(
-          explained,
-          equals('[FutureBuilder:'
-              '[Center:child='
-              '[Padding:(8,8,8,8),child='
-              '[CircularProgressIndicator:]'
-              ']]]'));
+    group('custom', () {
+      final buildAsyncBuilder =
+          (BuildContext _, AsyncSnapshot<Widget> snapshot) =>
+              snapshot.hasData ? snapshot.data : Text('No data');
+
+      testWidgets('renders data', (WidgetTester tester) async {
+        final html = 'Foo';
+        final explained = await explain(
+          tester,
+          html,
+          buildAsyncBuilder: buildAsyncBuilder,
+          withData: true,
+        );
+        expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
+      });
+
+      testWidgets('renders indicator', (WidgetTester tester) async {
+        final html = 'Foo';
+        final explained = await explain(
+          tester,
+          html,
+          buildAsyncBuilder: buildAsyncBuilder,
+          withData: false,
+        );
+        expect(explained, equals('[FutureBuilder:[Text:No data]]'));
+      });
     });
   });
 
