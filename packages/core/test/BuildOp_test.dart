@@ -40,13 +40,17 @@ class _GetInlineStylesTest extends WidgetFactory {
   _GetInlineStylesTest(HtmlConfig config) : super(config);
 
   @override
-  NodeMetadata parseLocalName(NodeMetadata meta, String localName) {
+  NodeMetadata parseTag(
+    NodeMetadata meta,
+    String tag,
+    Map<dynamic, String> attributes,
+  ) {
     meta = lazySet(meta,
         buildOp: BuildOp(defaultStyles: (_, __) => ['color', '#f00']));
     meta = lazySet(meta,
         buildOp: BuildOp(defaultStyles: (_, __) => ['color', '#0f0']));
 
-    return super.parseLocalName(meta, localName);
+    return super.parseTag(meta, tag, attributes);
   }
 }
 
@@ -57,7 +61,11 @@ class _PriorityTest extends WidgetFactory {
   _PriorityTest(HtmlConfig config, {this.a, this.b}) : super(config);
 
   @override
-  NodeMetadata parseLocalName(NodeMetadata meta, String localName) {
+  NodeMetadata parseTag(
+    NodeMetadata meta,
+    String tag,
+    Map<dynamic, String> attributes,
+  ) {
     meta = lazySet(meta,
         buildOp: BuildOp(
           onPieces: (_, pieces) => pieces.map((p) => p..text?.addText(' A')),
@@ -69,6 +77,6 @@ class _PriorityTest extends WidgetFactory {
           priority: b,
         ));
 
-    return super.parseLocalName(meta, localName);
+    return super.parseTag(meta, tag, attributes);
   }
 }
