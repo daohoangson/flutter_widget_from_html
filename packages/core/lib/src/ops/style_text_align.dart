@@ -1,5 +1,6 @@
 part of '../core_widget_factory.dart';
 
+const _kAttributeAlign = 'align';
 const _kCssTextAlign = 'text-align';
 const _kCssTextAlignCenter = 'center';
 const _kCssTextAlignJustify = 'justify';

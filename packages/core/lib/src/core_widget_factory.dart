@@ -788,6 +788,9 @@ class WidgetFactory {
 
     for (final attribute in attributes.entries) {
       switch (attribute.key) {
+        case _kAttributeAlign:
+          meta = lazySet(meta, styles: [_kCssTextAlign, attribute.value]);
+          break;
         case _kAttributeDir:
           meta = lazySet(meta, styles: [_kCssDirection, attribute.value]);
           break;
