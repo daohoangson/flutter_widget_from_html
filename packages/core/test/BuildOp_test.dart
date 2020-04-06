@@ -37,14 +37,14 @@ void main() {
 }
 
 class _GetInlineStylesTest extends WidgetFactory {
-  _GetInlineStylesTest(HtmlWidgetConfig config) : super(config);
+  _GetInlineStylesTest(HtmlConfig config) : super(config);
 
   @override
   NodeMetadata parseLocalName(NodeMetadata meta, String localName) {
     meta = lazySet(meta,
-        buildOp: BuildOp(defaultStyles: (_, __) => [kCssColor, '#f00']));
+        buildOp: BuildOp(defaultStyles: (_, __) => ['color', '#f00']));
     meta = lazySet(meta,
-        buildOp: BuildOp(defaultStyles: (_, __) => [kCssColor, '#0f0']));
+        buildOp: BuildOp(defaultStyles: (_, __) => ['color', '#0f0']));
 
     return super.parseLocalName(meta, localName);
   }
@@ -54,7 +54,7 @@ class _PriorityTest extends WidgetFactory {
   final int a;
   final int b;
 
-  _PriorityTest(HtmlWidgetConfig config, {this.a, this.b}) : super(config);
+  _PriorityTest(HtmlConfig config, {this.a, this.b}) : super(config);
 
   @override
   NodeMetadata parseLocalName(NodeMetadata meta, String localName) {

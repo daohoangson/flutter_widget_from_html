@@ -15,7 +15,7 @@ analyze_task:
 
 pipe:
   name: dartdoc
-  only_if: $CIRRUS_BRANCH =~ 'document'
+  only_if: $CIRRUS_BRANCH =~ 'document/.*'
   env:
     FLUTTER_ROOT: /home/cirrus/sdks/flutter
     NOW_PROJECT_JSON: ENCRYPTED[e39b933950795b26ccc4f51665601710bdd72da2dd6066d23fd4392e7d9e303153a230c90335ed49743c79f58aedbcbb]
@@ -41,8 +41,8 @@ unit_test_task:
   test_script: COVERAGE=1 ./tool/test.sh
   codecov_script: bash <(curl -s https://codecov.io/bash)
   always:
-    core_golden_artifacts:
-      path: packages/core/test/golden/failures/*
+    golden_failures_artifacts:
+      path: packages/example/test/golden/failures/*
 
 ios_test_task:
   skip: "!changesInclude('lib/src/web_view.dart')"

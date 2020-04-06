@@ -1,10 +1,10 @@
 part of '../core_widget_factory.dart';
 
-const kCssTextAlign = 'text-align';
-const kCssTextAlignCenter = 'center';
-const kCssTextAlignJustify = 'justify';
-const kCssTextAlignLeft = 'left';
-const kCssTextAlignRight = 'right';
+const _kCssTextAlign = 'text-align';
+const _kCssTextAlignCenter = 'center';
+const _kCssTextAlignJustify = 'justify';
+const _kCssTextAlignLeft = 'left';
+const _kCssTextAlignRight = 'right';
 
 TextStyle _styleTextAlignBuilder(
   TextStyleBuilders tsb,
@@ -23,23 +23,18 @@ class _StyleTextAlign {
   BuildOp get buildOp => BuildOp(
         isBlockElement: true,
         onPieces: (meta, pieces) {
-          String v;
-          meta.styles((k, _v) => k == kCssTextAlign ? v = _v : null);
-          if (v == null) return pieces;
-
           // handle texts
+          String v = meta.style(_kCssTextAlign);
           meta.tsb.enqueue(_styleTextAlignBuilder, _getTextAlign(v));
 
+          // handle widgets
           final alignment = _getAlignment(v);
           if (alignment == null) return pieces;
-
-          // handle widgets
           final newPieces = <BuiltPiece>[];
           for (final p in pieces) {
             if (p.widgets?.isNotEmpty == true) {
-              newPieces.add(BuiltPieceSimple(
-                  widgets: IWidgetPlaceholder.wrap(
-                      p.widgets, wf.buildAligns, wf, alignment)));
+              newPieces.add(BuiltPiece.widgets(WidgetPlaceholder.wrap(
+                  p.widgets, wf.buildAligns, wf, alignment)));
             } else {
               newPieces.add(p);
             }
@@ -52,13 +47,13 @@ class _StyleTextAlign {
 
 Alignment _getAlignment(String textAlign) {
   switch (textAlign) {
-    case kCssTextAlignCenter:
+    case _kCssTextAlignCenter:
       return Alignment.center;
-    case kCssTextAlignJustify:
+    case _kCssTextAlignJustify:
       return Alignment.centerLeft;
-    case kCssTextAlignLeft:
+    case _kCssTextAlignLeft:
       return Alignment.centerLeft;
-    case kCssTextAlignRight:
+    case _kCssTextAlignRight:
       return Alignment.centerRight;
   }
 
@@ -67,15 +62,23 @@ Alignment _getAlignment(String textAlign) {
 
 TextAlign _getTextAlign(String textAlign) {
   switch (textAlign) {
-    case kCssTextAlignCenter:
+    case _kCssTextAlignCenter:
       return TextAlign.center;
-    case kCssTextAlignJustify:
+    case _kCssTextAlignJustify:
       return TextAlign.justify;
-    case kCssTextAlignLeft:
+    case _kCssTextAlignLeft:
       return TextAlign.left;
-    case kCssTextAlignRight:
+    case _kCssTextAlignRight:
       return TextAlign.right;
   }
 
   return null;
+}
+
+Widget _childOf(Widget widget) {
+  var x = widget;
+  while (x is SingleChildRenderObjectWidget) {
+    x = (x as SingleChildRenderObjectWidget).child;
+  }
+  return x;
 }

@@ -3,7 +3,7 @@ part of '../core_widget_factory.dart';
 class _TextCompiler {
   final TextBits text;
 
-  BuilderContext _bc;
+  BuildContext _context;
   List _compiled;
 
   List<InlineSpan> _spans;
@@ -13,8 +13,8 @@ class _TextCompiler {
 
   _TextCompiler(this.text) : assert(text != null);
 
-  List compile(BuilderContext bc) {
-    _bc = bc;
+  List compile(BuildContext context) {
+    _context = context;
     _compiled = [];
 
     for (final bit in text.bits) {
@@ -23,9 +23,9 @@ class _TextCompiler {
     _completeLoop();
 
     if (_compiled.isEmpty) {
-      _compiled.add(SpacingPlaceholder(
-        height: CssLength(1, unit: CssLengthUnit.em),
-        tsb: text.tsb,
+      _compiled.add(_MarginVerticalPlaceholder(
+        text.tsb,
+        CssLength(1, unit: CssLengthUnit.em),
       ));
     }
 
@@ -37,7 +37,7 @@ class _TextCompiler {
 
     _buffer = StringBuffer();
     _recognizer = tsb?.recognizer;
-    _style = tsb?.build(_bc);
+    _style = tsb?.build(_context);
 
     _prevBuffer = _buffer;
     _prevStyle = _style;
@@ -49,7 +49,7 @@ class _TextCompiler {
     if (_spans == null) _resetLoop(tsb);
 
     final recognizer = tsb?.recognizer ?? bit.tsb?.recognizer;
-    final style = tsb?.build(_bc) ?? _prevStyle;
+    final style = tsb?.build(_context) ?? _prevStyle;
     if (recognizer != _prevRecognizer || style != _prevStyle) _saveSpan();
 
     if (bit.canCompile) {
@@ -58,13 +58,13 @@ class _TextCompiler {
       return;
     }
 
-    if (bit is SpaceBit && bit.data != null) {
+    if (bit is TextWhitespace && bit.data != null) {
       _completeLoop();
       final newLines = bit.data.length - 1;
       if (newLines > 0) {
-        _compiled.add(SpacingPlaceholder(
-          height: CssLength(newLines.toDouble(), unit: CssLengthUnit.em),
-          tsb: bit.parent.tsb,
+        _compiled.add(_MarginVerticalPlaceholder(
+          bit.parent.tsb,
+          CssLength(newLines.toDouble(), unit: CssLengthUnit.em),
         ));
       }
       return;

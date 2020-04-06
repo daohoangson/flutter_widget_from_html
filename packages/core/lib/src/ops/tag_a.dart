@@ -7,12 +7,12 @@ class _TagA {
 
   BuildOp get buildOp => BuildOp(
         defaultStyles: (meta, __) {
-          final styles = [kCssTextDecoration, kCssTextDecorationUnderline];
+          final styles = [_kCssTextDecoration, _kCssTextDecorationUnderline];
 
           if (wf.hyperlinkColor != null) {
             styles.addAll([
-              kCssColor,
-              convertColorToHex(wf.hyperlinkColor),
+              _kCssColor,
+              _convertColorToHex(wf.hyperlinkColor),
             ]);
           }
 
@@ -28,10 +28,8 @@ class _TagA {
 
           return pieces.map(
             (piece) => piece.hasWidgets
-                ? BuiltPieceSimple(
-                    widgets: IWidgetPlaceholder.wrap(
-                        piece.widgets, wf.buildGestureDetectors, wf, onTap),
-                  )
+                ? BuiltPiece.widgets(WidgetPlaceholder.wrap(
+                    piece.widgets, wf.buildGestureDetectors, wf, onTap))
                 : _buildBlock(meta, piece, onTap, recognizer),
           );
         },
@@ -44,7 +42,7 @@ class _TagA {
     GestureRecognizer recognizer,
   ) =>
       piece
-        ..text.bits.forEach((bit) => bit is WidgetBit
+        ..text.bits.forEach((bit) => bit is TextWidget
             ? bit.widget?.wrapWith(wf.buildGestureDetectors, onTap)
             : bit.tsb?.recognizer = recognizer);
 

@@ -1,47 +1,55 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
+import 'package:flutter_widget_from_html_core/src/core_html_widget.dart'
+    as core;
+import 'package:flutter_widget_from_html_core/src/core_widget_factory.dart'
     as core;
 import 'package:url_launcher/url_launcher.dart';
 
-import 'data_classes.dart';
+import 'builder.dart';
+import 'data.dart';
+import 'helpers.dart';
 import 'html_widget.dart';
-import 'video_player.dart';
-import 'web_view.dart';
 
 part 'ops/tag_a_extended.dart';
 part 'ops/tag_iframe.dart';
 part 'ops/tag_svg.dart';
 part 'ops/tag_video.dart';
 
+/// A factory to build widget for HTML elements
+/// with support for [WebView] and [VideoPlayer] etc.
 class WidgetFactory extends core.WidgetFactory {
-  final HtmlWidgetConfig _config;
+  final HtmlConfig _config;
 
   BuildOp _tagAExtended;
   BuildOp _tagIframe;
   BuildOp _tagSvg;
   BuildOp _tagVideo;
 
-  WidgetFactory(this._config) : super(_config);
+  WidgetFactory(core.HtmlConfig config)
+      : _config = config is HtmlConfig ? config : null,
+        super(config);
 
   @override
   Widget buildDivider() => const Divider(height: 1);
 
   @override
   Iterable<Widget> buildGestureDetectors(
-    BuilderContext bc,
+    BuildContext _,
     Iterable<Widget> widgets,
     GestureTapCallback onTap,
   ) =>
       widgets.map((widget) => InkWell(child: widget, onTap: onTap));
 
   @override
-  GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
-      ? () => _config.onTapUrl != null
-          ? _config.onTapUrl(url)
-          : canLaunch(url).then((ok) => ok ? launch(url) : null)
-      : null;
+  GestureTapCallback buildGestureTapCallbackForUrl(String url) {
+    if (url == null) return null;
+    if (_config?.onTapUrl == null) {
+      return () => canLaunch(url).then((ok) => ok ? launch(url) : null);
+    }
+    return () => _config.onTapUrl(url);
+  }
 
   @override
   ImageProvider buildImageFromUrl(String url) =>
@@ -71,7 +79,7 @@ class WidgetFactory extends core.WidgetFactory {
     double height,
     double width,
   }) {
-    if (_config.webView != true) return buildWebViewLinkOnly(url);
+    if (_config?.webView != true) return buildWebViewLinkOnly(url);
 
     final dimensOk = height != null && height > 0 && width != null && width > 0;
     return WebView(

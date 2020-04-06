@@ -1,4 +1,4 @@
-part of '../data_classes.dart';
+part of '../core_data.dart';
 
 @immutable
 abstract class TextBit {
@@ -8,7 +8,7 @@ abstract class TextBit {
 
   bool get canCompile => false;
   String get data => null;
-  bool get hasTrailingSpace => false;
+  bool get hasTrailingWhitespace => false;
   int get index => parent?._children?.indexOf(this) ?? -1;
   bool get isEmpty => false;
   bool get isNotEmpty => !isEmpty;
@@ -45,8 +45,8 @@ abstract class TextBit {
   @override
   String toString() {
     final clazz = runtimeType.toString();
-    final self = this;
-    final contents = self is WidgetBit ? "widget=${self.widget}" : "data=$data";
+    final t = this;
+    final contents = t is TextWidget ? "widget=${t.widget}" : "data=$data";
     return "[$clazz:$hashCode] $contents";
   }
 
@@ -87,21 +87,21 @@ abstract class TextBit {
   }
 }
 
-class DataBit extends TextBit {
+class TextData extends TextBit {
   final String data;
   final TextStyleBuilders tsb;
 
-  DataBit(TextBits parent, this.data, this.tsb)
+  TextData(TextBits parent, this.data, this.tsb)
       : assert(parent != null),
         assert(data != null),
         assert(tsb != null),
         super(parent);
 }
 
-class SpaceBit extends TextBit {
+class TextWhitespace extends TextBit {
   final _buffer = StringBuffer();
 
-  SpaceBit(TextBit parent, SpaceType type)
+  TextWhitespace(TextBit parent, TextWhitespaceType type)
       : assert(parent != null),
         super(parent) {
     if (type != null) append(type);
@@ -111,23 +111,23 @@ class SpaceBit extends TextBit {
   String get data => _buffer.isEmpty ? null : _buffer.toString();
 
   @override
-  bool get hasTrailingSpace => _buffer.isEmpty;
+  bool get hasTrailingWhitespace => _buffer.isEmpty;
 
-  void append(SpaceType type) {
+  void append(TextWhitespaceType type) {
     switch (type) {
-      case SpaceType.newLine:
+      case TextWhitespaceType.newLine:
         _buffer.write('\n');
         break;
     }
   }
 }
 
-class WidgetBit extends TextBit {
+class TextWidget<T> extends TextBit {
   final PlaceholderAlignment alignment;
   final TextBaseline baseline;
-  final IWidgetPlaceholder widget;
+  final WidgetPlaceholder<T> widget;
 
-  WidgetBit(
+  TextWidget(
     TextBits parent,
     this.widget, {
     this.alignment = PlaceholderAlignment.baseline,
@@ -180,7 +180,8 @@ class TextBits extends TextBit {
   }
 
   @override
-  bool get hasTrailingSpace => TextBit.tailOf(this)?.hasTrailingSpace ?? true;
+  bool get hasTrailingWhitespace =>
+      TextBit.tailOf(this)?.hasTrailingWhitespace ?? true;
 
   @override
   bool get isEmpty {
@@ -202,21 +203,21 @@ class TextBits extends TextBit {
 
   void add(TextBit bit) => _children.add(bit);
 
-  TextBit addSpace([SpaceType type]) {
+  TextWhitespace addWhitespace([TextWhitespaceType type]) {
     final tail = TextBit.tailOf(this);
     if (tail == null) {
       if (type == null) return null;
-    } else if (tail is SpaceBit) {
+    } else if (tail is TextWhitespace) {
       return tail..append(type);
     }
 
-    final bit = SpaceBit(this, type);
+    final bit = TextWhitespace(this, type);
     add(bit);
     return bit;
   }
 
-  TextBit addText(String data) {
-    final bit = DataBit(this, data, tsb);
+  TextData addText(String data) {
+    final bit = TextData(this, data, tsb);
     add(bit);
     return bit;
   }
@@ -230,7 +231,7 @@ class TextBits extends TextBit {
   int trimRight() {
     var trimmed = 0;
 
-    while (_children.isNotEmpty && hasTrailingSpace) {
+    while (_children.isNotEmpty && hasTrailingWhitespace) {
       final child = _children.last;
       if (child is TextBits) {
         final _trimmed = child.trimRight();
@@ -276,6 +277,6 @@ class TextBits extends TextBit {
       : [];
 }
 
-enum SpaceType {
+enum TextWhitespaceType {
   newLine,
 }

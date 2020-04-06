@@ -1,8 +1,8 @@
 part of '../core_widget_factory.dart';
 
-const kTagRuby = 'ruby';
-const kTagRp = 'rp';
-const kTagRt = 'rt';
+const _kTagRuby = 'ruby';
+const _kTagRp = 'rp';
+const _kTagRt = 'rt';
 
 class _TagRuby {
   final WidgetFactory wf;
@@ -15,10 +15,10 @@ class _TagRuby {
     return BuildOp(
       onChild: (meta, e) {
         switch (e.localName) {
-          case kTagRp:
-            meta = lazySet(meta, styles: [kCssDisplay, kCssDisplayNone]);
+          case _kTagRp:
+            meta = lazySet(meta, styles: [_kCssDisplay, _kCssDisplayNone]);
             break;
-          case kTagRt:
+          case _kTagRt:
             meta = lazySet(
               meta,
               buildOp: BuildOp(
@@ -32,7 +32,7 @@ class _TagRuby {
                   return [];
                 },
               ),
-              styles: [kCssFontSize, '0.5em'],
+              styles: [_kCssFontSize, '0.5em'],
             );
             break;
         }
@@ -51,24 +51,24 @@ class _TagRuby {
         final replacement = parent.sub(text.tsb)..detach();
         text.replaceWith(replacement);
 
-        replacement.add(_buildWidgetBit(parent, text, _rtText));
+        replacement.add(_buildTextBit(parent, text, _rtText));
 
-        return BuiltPieceSimple(text: replacement);
+        return BuiltPiece.text(replacement);
       }),
     );
   }
 
-  TextBit _buildWidgetBit(TextBits parent, TextBits ruby, TextBits rt) =>
-      WidgetBit(
+  TextBit _buildTextBit(TextBits parent, TextBits ruby, TextBits rt) =>
+      TextWidget(
         parent,
-        WidgetPlaceholder<_TagRuby>(builder: (bc, _, __) {
-          final rubyText = wf.buildText(bc, null, ruby);
-          final rtText = wf.buildText(bc, null, rt);
-          final rtStyle = rt.tsb.build(bc);
+        WidgetPlaceholder<_TagRuby>(builder: (context, _, __) {
+          final rubyText = wf.buildText(context, null, ruby);
+          final rtText = wf.buildText(context, null, rt);
+          final rtStyle = rt.tsb.build(context);
           final padding = EdgeInsets.symmetric(
               vertical: rtStyle.fontSize *
                   .75 *
-                  MediaQuery.of(bc.context).textScaleFactor);
+                  MediaQuery.of(context).textScaleFactor);
 
           return [
             Stack(

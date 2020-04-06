@@ -23,9 +23,8 @@ void main() {
       final explained = await explain(tester, html, true);
       expect(explained, equals('[RichText:(:Foo)]'));
 
-      final hws = helper.hwKey.currentState;
-      final built1 = hws.build(hws.context);
-      final built2 = hws.build(hws.context);
+      final built1 = helper.buildCurrentState();
+      final built2 = helper.buildCurrentState();
       expect(built1 == built2, isTrue);
     });
 
@@ -45,9 +44,8 @@ void main() {
       final explained = await explain(tester, html, false);
       expect(explained, equals('[RichText:(:Foo)]'));
 
-      final hws = helper.hwKey.currentState;
-      final built1 = hws.build(hws.context);
-      final built2 = hws.build(hws.context);
+      final built1 = helper.buildCurrentState();
+      final built2 = helper.buildCurrentState();
       expect(built1 == built2, isFalse);
     });
   });
@@ -263,9 +261,57 @@ void main() {
               '[GestureDetector:child=[Text:http://domain.com]]]'));
     });
 
-    group('webViewJs', () {
-      final webViewJsSrc = 'http://domain.com';
+    group('unsupportedWebViewWorkaroundForIssue37', () {
+      testWidgets('renders true value', (WidgetTester tester) async {
+        final explained = await explain(
+            tester,
+            HtmlWidget(
+              html,
+              key: helper.hwKey,
+              unsupportedWebViewWorkaroundForIssue37: true,
+              webView: true,
+            ));
+        expect(
+            explained,
+            equals('[Padding:(10,10,10,10),child='
+                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=1,js=1,issue37]"
+                ']'));
+      });
 
+      testWidgets('renders false value', (WidgetTester tester) async {
+        final explained = await explain(
+            tester,
+            HtmlWidget(
+              html,
+              key: helper.hwKey,
+              unsupportedWebViewWorkaroundForIssue37: false,
+              webView: true,
+            ));
+        expect(
+            explained,
+            equals('[Padding:(10,10,10,10),child='
+                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=1,js=1]"
+                ']'));
+      });
+
+      testWidgets('renders null value', (WidgetTester tester) async {
+        final explained = await explain(
+            tester,
+            HtmlWidget(
+              html,
+              key: helper.hwKey,
+              unsupportedWebViewWorkaroundForIssue37: null,
+              webView: true,
+            ));
+        expect(
+            explained,
+            equals('[Padding:(10,10,10,10),child='
+                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=1,js=1]"
+                ']'));
+      });
+    });
+
+    group('webViewJs', () {
       testWidgets('renders true value', (WidgetTester tester) async {
         final explained = await explain(
             tester,
@@ -278,7 +324,7 @@ void main() {
         expect(
             explained,
             equals('[Padding:(10,10,10,10),child='
-                "[WebView:url=$webViewJsSrc,aspectRatio=1.78,getDimensions=1,js=1]"
+                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=1,js=1]"
                 ']'));
       });
 
@@ -294,7 +340,7 @@ void main() {
         expect(
             explained,
             equals('[Padding:(10,10,10,10),child='
-                "[WebView:url=$webViewJsSrc,aspectRatio=1.78,getDimensions=0,js=0]"
+                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=0,js=0]"
                 ']'));
       });
 
@@ -310,7 +356,7 @@ void main() {
         expect(
             explained,
             equals('[Padding:(10,10,10,10),child='
-                "[WebView:url=$webViewJsSrc,aspectRatio=1.78,getDimensions=0,js=0]"
+                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=0,js=0]"
                 ']'));
       });
     });

@@ -3,18 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
-final hwKey = GlobalKey<HtmlWidgetState>();
+final hwKey = GlobalKey<State<HtmlWidget>>();
+
+Widget buildCurrentState() {
+  final hws = hwKey.currentState;
+  if (hws == null) return null;
+
+  // ignore: invalid_use_of_protected_member
+  return hws.build(hws.context);
+}
 
 Future<String> explain(
   WidgetTester tester,
   String html, {
-  WidgetExplainer explainer,
+  String Function(Widget) explainer,
   Widget hw,
-  PreTest preTest,
+  void Function(BuildContext) preTest,
   Uri baseUrl,
   double bodyVerticalPadding = 0,
   NodeMetadataCollector builderCallback,
-  FactoryBuilder factoryBuilder,
+  WidgetFactory Function(HtmlConfig config) factoryBuilder,
   double tableCellPadding = 0,
   TextStyle textStyle,
 }) async {
@@ -62,7 +70,7 @@ Future<String> explain(
   expect(hws, isNotNull);
 
   return Explainer(hws.context, explainer: explainer)
-      .explain(hws.build(hws.context));
+      .explain(buildCurrentState());
 }
 
 final _explainMarginRegExp = RegExp(
@@ -89,12 +97,9 @@ Future<String> explainMargin(
   return match == null ? explained : match[1];
 }
 
-typedef String WidgetExplainer(Widget widget);
-typedef void PreTest(BuildContext context);
-
 class Explainer {
   final BuildContext context;
-  final WidgetExplainer explainer;
+  final String Function(Widget) explainer;
   final TextStyle _defaultStyle;
 
   Explainer(this.context, {this.explainer})
@@ -192,11 +197,13 @@ class Explainer {
 
   String _tableRow(TableRow row) => row.children
       .map((c) => _widget(c is TableCell ? c.child : c))
-      .toList()
+      .toList(growable: false)
       .join(' | ');
 
-  String _tableRows(Table table) =>
-      table.children.map((r) => _tableRow(r)).toList().join('\n');
+  String _tableRows(Table table) => table.children
+      .map((r) => _tableRow(r))
+      .toList(growable: false)
+      .join('\n');
 
   String _textAlign(TextAlign textAlign) =>
       (textAlign != null && textAlign != TextAlign.start)
@@ -289,10 +296,7 @@ class Explainer {
     if (widget is ImageLayout) return _imageLayout(widget);
 
     // ignore: invalid_use_of_protected_member
-    if (widget is SimpleColumn) return _widget(widget.build(context));
-
-    // ignore: invalid_use_of_protected_member
-    if (widget is IWidgetPlaceholder) return _widget(widget.build(context));
+    if (widget is WidgetPlaceholder) return _widget(widget.build(context));
 
     final type = widget.runtimeType.toString();
     final text = widget is Align
