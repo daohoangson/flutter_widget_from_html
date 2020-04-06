@@ -40,6 +40,7 @@ class WebView extends StatefulWidget {
       "aspectRatio=${aspectRatio.toStringAsFixed(2)},"
       "getDimensions=${getDimensions ? 1 : 0},"
       "js=${js ? 1 : 0}"
+      "${unsupportedWorkaroundForIssue37 == true ? ',issue37' : ''}"
       ']';
 }
 
