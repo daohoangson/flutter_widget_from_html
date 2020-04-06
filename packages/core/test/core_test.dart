@@ -7,7 +7,7 @@ void main() {
   testWidgets('renders empty string', (WidgetTester tester) async {
     final html = '';
     final explained = await explain(tester, html);
-    expect(explained, equals('[Text:]'));
+    expect(explained, equals('[widget0]'));
   });
 
   testWidgets('renders bare string', (WidgetTester tester) async {
@@ -380,7 +380,7 @@ void main() {
     testWidgets('renders empty CODE tag', (WidgetTester tester) async {
       final html = '<code></code>';
       final actual = await explain(tester, html);
-      expect(actual, equals('[Text:<code></code>]'));
+      expect(actual, equals('[widget0]'));
     });
 
     testWidgets('renders KBD tag', (WidgetTester tester) async {
