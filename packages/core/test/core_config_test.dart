@@ -8,6 +8,35 @@ Future<String> explain(WidgetTester t, HtmlWidget hw) =>
     helper.explain(t, null, hw: hw);
 
 void main() {
+  group('buildAsync', () {
+    final explain = (WidgetTester tester, String html, bool buildAsync) =>
+        tester.runAsync(() => helper.explain(tester, null,
+            hw: HtmlWidget(
+              html,
+              bodyPadding: const EdgeInsets.all(0),
+              buildAsync: buildAsync,
+              key: helper.hwKey,
+            )));
+
+    testWidgets('uses FutureBuilder', (WidgetTester tester) async {
+      final html = 'Foo';
+      final explained = await explain(tester, html, true);
+      expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
+    });
+
+    testWidgets('skips FutureBuilder', (WidgetTester tester) async {
+      final html = 'Foo';
+      final explained = await explain(tester, html, false);
+      expect(explained, equals('[RichText:(:$html)]'));
+    });
+
+    testWidgets('uses FutureBuilder automatically', (tester) async {
+      final html = 'Foo' * kShouldBuildAsync;
+      final explained = await explain(tester, html, null);
+      expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
+    });
+  });
+
   group('enableCaching', () {
     final explain = (WidgetTester tester, String html, bool enableCaching) =>
         helper.explain(tester, null,

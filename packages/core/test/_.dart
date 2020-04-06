@@ -13,6 +13,15 @@ Widget buildCurrentState() {
   return hws.build(hws.context);
 }
 
+Future<Widget> buildFutureBuilder(FutureBuilder<Widget> fb) async {
+  final hws = hwKey.currentState;
+  if (hws == null) return Future.value(null);
+
+  final data = await fb.future;
+  final snapshot = AsyncSnapshot.withData(ConnectionState.done, data);
+  return fb.builder(hws.context, snapshot);
+}
+
 Future<String> explain(
   WidgetTester tester,
   String html, {
@@ -69,8 +78,17 @@ Future<String> explain(
   final hws = hwKey.currentState;
   expect(hws, isNotNull);
 
-  return Explainer(hws.context, explainer: explainer)
-      .explain(buildCurrentState());
+  var built = buildCurrentState();
+  var isFutureBuilder = false;
+  if (built is FutureBuilder<Widget>) {
+    built = await buildFutureBuilder(built);
+    isFutureBuilder = true;
+  }
+
+  var explained = Explainer(hws.context, explainer: explainer).explain(built);
+  if (isFutureBuilder) explained = "[FutureBuilder:$explained]";
+
+  return explained;
 }
 
 final _explainMarginRegExp = RegExp(
