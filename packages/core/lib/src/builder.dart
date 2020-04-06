@@ -71,7 +71,7 @@ class HtmlBuilder {
 
     if (parentOps != null) meta = lazySet(meta, parentOps: parentOps);
 
-    meta = wf.parseLocalName(meta, e.localName);
+    meta = wf.parseTag(meta, e.localName, e.attributes);
 
     if (meta?.hasParents == true) {
       for (final op in meta?.parents) {

@@ -104,8 +104,12 @@ class WidgetFactory extends core.WidgetFactory {
       );
 
   @override
-  NodeMetadata parseLocalName(NodeMetadata meta, String localName) {
-    switch (localName) {
+  NodeMetadata parseTag(
+    NodeMetadata meta,
+    String tag,
+    Map<dynamic, String> attributes,
+  ) {
+    switch (tag) {
       case 'a':
         meta = lazySet(meta, buildOp: tagAExtended());
         break;
@@ -120,7 +124,7 @@ class WidgetFactory extends core.WidgetFactory {
         break;
     }
 
-    return super.parseLocalName(meta, localName);
+    return super.parseTag(meta, tag, attributes);
   }
 
   BuildOp tagAExtended() {
