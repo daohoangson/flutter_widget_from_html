@@ -37,6 +37,36 @@ void main() {
     });
   });
 
+  group('buildAsyncBuilder', () {
+    final explain = (WidgetTester tester, String html, bool withData) =>
+        tester.runAsync(() => helper.explain(tester, null,
+            buildFutureBuilderWithData: withData,
+            hw: HtmlWidget(
+              html,
+              bodyPadding: const EdgeInsets.all(0),
+              buildAsync: true,
+              key: helper.hwKey,
+            )));
+
+    testWidgets('renders data', (WidgetTester tester) async {
+      final html = 'Foo';
+      final explained = await explain(tester, html, true);
+      expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
+    });
+
+    testWidgets('renders indicator', (WidgetTester tester) async {
+      final html = 'Foo';
+      final explained = await explain(tester, html, false);
+      expect(
+          explained,
+          equals('[FutureBuilder:'
+              '[Center:child='
+              '[Padding:(8,8,8,8),child='
+              '[CircularProgressIndicator:]'
+              ']]]'));
+    });
+  });
+
   group('enableCaching', () {
     final explain = (WidgetTester tester, String html, bool enableCaching) =>
         helper.explain(tester, null,

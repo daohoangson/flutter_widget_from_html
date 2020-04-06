@@ -65,7 +65,7 @@ class HtmlWidget extends StatefulWidget {
   HtmlWidget(
     this.html, {
     this.buildAsync,
-    this.buildAsyncBuilder = _buildAsyncBuilder,
+    this.buildAsyncBuilder,
     this.enableCaching = true,
     this.factoryBuilder,
     Key key,
@@ -172,7 +172,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
   Widget build(BuildContext context) {
     if (_future != null) {
       return FutureBuilder<Widget>(
-        builder: widget.buildAsyncBuilder,
+        builder: widget.buildAsyncBuilder ?? _buildAsyncBuilder,
         future: _future,
       );
     }
