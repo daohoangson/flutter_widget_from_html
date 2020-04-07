@@ -1,5 +1,11 @@
+import 'dart:async';
+import 'dart:developer';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 
 import 'builder.dart';
@@ -17,9 +23,28 @@ TextStyle _rootTextStyleBuilder(
   return style;
 }
 
+Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
+    snapshot.hasData
+        ? snapshot.data
+        : const Center(
+            child: Padding(
+            padding: EdgeInsets.all(8),
+            child: CircularProgressIndicator(),
+          ));
+
 /// A widget that builds Flutter widget tree from HTML
 /// (supports most popular tags and stylings).
 class HtmlWidget extends StatefulWidget {
+  /// Controls whether the widget tree is built asynchronously.
+  /// If not set, async build will be automatically enabled if the
+  /// input HTML is longer than [kShouldBuildAsync].
+  final bool buildAsync;
+
+  /// The callback to handle async build snapshot.
+  /// By default, a [CircularProgressIndicator] will be shown until
+  /// the widget tree is ready without error handling.
+  final AsyncWidgetBuilder<Widget> buildAsyncBuilder;
+
   /// Controls whether the built widget tree is cached between rebuild.
   final bool enableCaching;
 
@@ -39,6 +64,8 @@ class HtmlWidget extends StatefulWidget {
   /// The [html] argument must not be null.
   HtmlWidget(
     this.html, {
+    this.buildAsync,
+    this.buildAsyncBuilder,
     this.enableCaching = true,
     this.factoryBuilder,
     Key key,
@@ -64,7 +91,9 @@ class HtmlWidget extends StatefulWidget {
         super(key: key);
 
   @override
-  State<HtmlWidget> createState() => _HtmlWidgetState();
+  State<HtmlWidget> createState() => _HtmlWidgetState(
+        buildAsync: buildAsync ?? html.length > kShouldBuildAsync,
+      );
 }
 
 /// A set of configurable options to build widget.
@@ -107,42 +136,85 @@ class HtmlConfig {
 }
 
 class _HtmlWidgetState extends State<HtmlWidget> {
-  Widget _built;
+  final bool buildAsync;
+
+  Widget _cache;
+  Future<Widget> _future;
+  WidgetFactory _wf;
+
+  _HtmlWidgetState({this.buildAsync = false});
 
   @override
   void initState() {
     super.initState();
 
-    if (widget.enableCaching) _built = _build();
+    _wf = widget.factoryBuilder != null
+        ? widget.factoryBuilder(widget._config)
+        : WidgetFactory(widget._config);
+
+    if (buildAsync) {
+      _future = _buildAsync();
+    } else if (widget.enableCaching) {
+      _cache = _buildSync();
+    }
   }
 
   @override
   void didUpdateWidget(HtmlWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.html != oldWidget.html) _built = null;
+    if (widget.html != oldWidget.html) {
+      _cache = null;
+      _future = buildAsync ? _buildAsync() : null;
+    }
   }
 
   Widget build(BuildContext context) {
-    if (!widget.enableCaching) return _build();
+    if (_future != null) {
+      return FutureBuilder<Widget>(
+        builder: widget.buildAsyncBuilder ?? _buildAsyncBuilder,
+        future: _future,
+      );
+    }
 
-    _built ??= _build();
-    return _built;
+    if (!widget.enableCaching) return _buildSync();
+
+    _cache ??= _buildSync();
+    return _cache;
   }
 
-  Widget _build() {
-    final domNodes = parser.parse(widget.html).body.nodes;
-    final wf = widget.factoryBuilder != null
-        ? widget.factoryBuilder(widget._config)
-        : WidgetFactory(widget._config);
+  Future<Widget> _buildAsync() async {
+    final domNodes = await compute(_parseHtml, widget.html);
 
-    final widgets = HtmlBuilder(
-      domNodes: domNodes,
-      parentTsb: TextStyleBuilders()
-        ..enqueue(_rootTextStyleBuilder, widget._config),
-      wf: wf,
-    ).build();
+    Timeline.startSync('Build $widget (async)');
+    final built = _buildBody(_wf, widget._config, domNodes);
+    Timeline.finishSync();
 
-    return wf.buildBody(widgets) ?? Text(widget.html);
+    return built;
   }
+
+  Widget _buildSync() {
+    Timeline.startSync('Build $widget (sync)');
+
+    final domNodes = _parseHtml(widget.html);
+    final built = _buildBody(_wf, widget._config, domNodes);
+
+    Timeline.finishSync();
+
+    return built;
+  }
+
+  static dom.NodeList _parseHtml(String html) => parser.parse(html).body.nodes;
+
+  static Widget _buildBody(
+    WidgetFactory wf,
+    HtmlConfig config,
+    dom.NodeList domNodes,
+  ) =>
+      wf.buildBody(HtmlBuilder(
+        domNodes: domNodes,
+        parentTsb: TextStyleBuilders()..enqueue(_rootTextStyleBuilder, config),
+        wf: wf,
+      ).build()) ??
+      widget0;
 }
