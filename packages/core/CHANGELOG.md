@@ -1,10 +1,17 @@
+## 0.4.0-rc.2020040701
+
+* Use minimum main axis size
+* Improve whitespace handling (#137)
+* Improve support for right-to-left (#141)
+* Add support for async build
+* Add support for tag SUB, SUP and inline style `vertical-align` (#143)
+* Add support for tag RUBY (#144)
+* Add support for attribute `align` (#153) 
+* Fix text bit loop initial state (#156)
+
 ## 0.4.0-rc.2020021401
 
 * Disable rendering of tag SVG
-
-## 0.3.2+2
-
-* Use minimum main axis size
 
 ## 0.3.2+1
 
