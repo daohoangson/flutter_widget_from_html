@@ -7,10 +7,9 @@ class _TextBlockCompiler {
   List _compiled;
 
   List<InlineSpan> _spans;
-  TextBit _bit;
   StringBuffer _buffer, _prevBuffer;
   TextStyle _style, _prevStyle;
-  GestureTapCallback _prevOnTap;
+  GestureTapCallback _onTap, _prevOnTap;
 
   _TextBlockCompiler(this.block) : assert(block != null);
 
@@ -18,6 +17,7 @@ class _TextBlockCompiler {
     _bc = bc;
     _compiled = [];
 
+    _resetLoop(null, block.tsb);
     block.forEachBit(_loop);
     _completeLoop();
 
@@ -30,22 +30,23 @@ class _TextBlockCompiler {
     return _compiled;
   }
 
-  void _resetLoop(TextBit bit) {
+  void _resetLoop(GestureTapCallback onTap, TextStyleBuilders tsb) {
     _spans = <InlineSpan>[];
 
-    _bit = bit;
     _buffer = StringBuffer();
-    _style = _bit.tsb?.build(_bc);
+    _onTap = onTap;
+    _style = tsb?.build(_bc);
 
     _prevBuffer = _buffer;
     _prevStyle = _style;
-    _prevOnTap = _bit.onTap;
+    _prevOnTap = onTap;
   }
 
   void _loop(TextBit bit, int _) {
-    if (_spans == null) _resetLoop(bit);
+    final tsb = _getBitTsb(bit);
+    if (_spans == null) _resetLoop(bit.onTap, tsb);
 
-    final style = _getBitTsb(bit)?.build(_bc) ?? _prevStyle;
+    final style = tsb?.build(_bc) ?? _prevStyle;
     if (bit.onTap != _prevOnTap || style != _prevStyle) _saveSpan();
 
     if (bit is WidgetBit) {
@@ -100,7 +101,7 @@ class _TextBlockCompiler {
     } else if (_spans.isNotEmpty || _buffer.isNotEmpty) {
       span = TextSpan(
         children: _spans,
-        recognizer: _buildGestureRecognizer(_bit.onTap),
+        recognizer: _buildGestureRecognizer(_onTap),
         style: _style,
         text: _buffer.toString(),
       );
