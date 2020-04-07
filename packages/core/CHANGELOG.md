@@ -2,6 +2,10 @@
 
 * Disable rendering of tag SVG
 
+## 0.3.2+2
+
+* Use minimum main axis size
+
 ## 0.3.2+1
 
 * Fix IMG wrong size when device has scaled text (#127)
@@ -102,7 +106,7 @@
 
 ## 0.1.3
 
-* Fix bug stylings got lost during block rendering (#10)
+* Fix bug stylings got lost during text rendering (#10)
 
 ## 0.1.2
 

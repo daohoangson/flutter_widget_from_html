@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
 
-import 'data_classes.dart';
-import 'widget_factory.dart' as extended;
+import 'data.dart';
+import 'helpers.dart';
+import 'widget_factory.dart';
 
-/// A widget that builds Flutter widget tree from html.
+/// A widget that builds Flutter widget tree from HTML
+/// with support for IFRAME, VIDEO and many other tags.
 class HtmlWidget extends core.HtmlWidget {
   /// Creates a widget that builds Flutter widget tree from html.
   ///
@@ -13,14 +15,14 @@ class HtmlWidget extends core.HtmlWidget {
   HtmlWidget(
     String html, {
     bool enableCaching = true,
-    core.FactoryBuilder factoryBuilder,
+    core.WidgetFactory Function(core.HtmlConfig) factoryBuilder,
     Key key,
-    HtmlWidgetConfig config,
+    core.HtmlConfig config,
     Uri baseUrl,
     EdgeInsets bodyPadding = const EdgeInsets.all(10),
     NodeMetadataCollector builderCallback,
     Color hyperlinkColor,
-    core.OnTapUrl onTapUrl,
+    OnTapUrl onTapUrl,
     EdgeInsets tableCellPadding = const EdgeInsets.all(5),
     TextStyle textStyle = const TextStyle(),
     bool unsupportedWebViewWorkaroundForIssue37 = false,
@@ -30,10 +32,9 @@ class HtmlWidget extends core.HtmlWidget {
         super(
           html,
           enableCaching: enableCaching,
-          factoryBuilder:
-              factoryBuilder ?? (config) => extended.WidgetFactory(config),
+          factoryBuilder: factoryBuilder ?? (config) => WidgetFactory(config),
           config: config ??
-              HtmlWidgetConfig(
+              HtmlConfig(
                 baseUrl: baseUrl,
                 bodyPadding: bodyPadding,
                 builderCallback: builderCallback,
@@ -50,7 +51,8 @@ class HtmlWidget extends core.HtmlWidget {
         );
 }
 
-class HtmlWidgetConfig extends core.HtmlWidgetConfig {
+/// A set of configurable options to build widget.
+class HtmlConfig extends core.HtmlConfig {
   /// The flag to control whether or not to apply workaround for
   /// [issue 37](https://github.com/daohoangson/flutter_widget_from_html/issues/37)
   final bool unsupportedWebViewWorkaroundForIssue37;
@@ -78,12 +80,13 @@ class HtmlWidgetConfig extends core.HtmlWidgetConfig {
   /// The flag to control whether or not WebView has JavaScript enabled.
   final bool webViewJs;
 
-  HtmlWidgetConfig({
+  /// Creates a configuration
+  HtmlConfig({
     Uri baseUrl,
     EdgeInsets bodyPadding,
     NodeMetadataCollector builderCallback,
     Color hyperlinkColor,
-    core.OnTapUrl onTapUrl,
+    OnTapUrl onTapUrl,
     EdgeInsets tableCellPadding,
     TextStyle textStyle,
     this.unsupportedWebViewWorkaroundForIssue37,

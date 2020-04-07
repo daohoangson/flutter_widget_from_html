@@ -19,7 +19,7 @@ class BlockquoteWebViewScreen extends StatelessWidget {
           HtmlWidget(
             html,
             factoryBuilder: (config) => _BlockquoteWebViewWf(config),
-            key: coreHwKey,
+            key: hwKey,
           ),
         ]),
       );
@@ -40,7 +40,7 @@ class _BlockquoteWebViewWf extends WidgetFactory {
     ],
   );
 
-  _BlockquoteWebViewWf(HtmlWidgetConfig config) : super(config);
+  _BlockquoteWebViewWf(HtmlConfig config) : super(config);
 
   @override
   NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
@@ -62,7 +62,7 @@ void main() {
         html,
         bodyPadding: const EdgeInsets.all(0),
         factoryBuilder: (hw) => _BlockquoteWebViewWf(hw),
-        key: coreHwKey,
+        key: hwKey,
       ),
     );
     expect(

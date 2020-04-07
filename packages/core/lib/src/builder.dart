@@ -1,29 +1,35 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_widget_factory.dart';
-import 'data_classes.dart';
 
 final _attrStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
 
-class Builder {
+// https://ecma-international.org/ecma-262/9.0/#table-32
+// https://unicode.org/cldr/utility/character.jsp?a=200B
+final _regExpSpaceLeading = RegExp(r'^[ \n\t\u{200B}]+', unicode: true);
+final _regExpSpaceTrailing = RegExp(r'[ \n\t\u{200B}]+$', unicode: true);
+final _regExpSpaces = RegExp(r'\s+');
+
+class HtmlBuilder {
   final List<dom.Node> domNodes;
-  final TextBlock parentBlock;
   final NodeMetadata parentMeta;
   final Iterable<BuildOp> parentOps;
+  final TextBits parentText;
   final TextStyleBuilders parentTsb;
   final WidgetFactory wf;
 
   final _pieces = <BuiltPiece>[];
 
-  _Piece _textPiece;
+  BuiltPiece _textPiece;
 
-  Builder({
+  HtmlBuilder({
     @required this.domNodes,
-    this.parentBlock,
     this.parentMeta,
     Iterable<BuildOp> parentParentOps,
+    this.parentText,
     @required this.parentTsb,
     @required this.wf,
   })  : assert(domNodes != null),
@@ -40,11 +46,11 @@ class Builder {
           if (widget != null) list.add(widget);
         }
       } else {
-        final block = piece.block;
-        if ((block..trimRight()).isNotEmpty) {
+        final text = piece.text..trimRight();
+        if (text.isNotEmpty) {
           list.add(WidgetPlaceholder(
             builder: wf.buildText,
-            input: block,
+            input: text,
           ));
         }
       }
@@ -65,7 +71,7 @@ class Builder {
 
     if (parentOps != null) meta = lazySet(meta, parentOps: parentOps);
 
-    meta = wf.parseLocalName(meta, e.localName);
+    meta = wf.parseTag(meta, e.localName, e.attributes);
 
     if (meta?.hasParents == true) {
       for (final op in meta?.parents) {
@@ -76,7 +82,12 @@ class Builder {
     // stylings, step 1: get default styles from tag-based build ops
     if (meta?.hasOps == true) {
       for (final op in meta.ops) {
-        lazySet(meta, stylesPrepend: op.defaultStyles(meta, e));
+        final defaultStyles = op.defaultStyles(meta, e);
+        if (defaultStyles != null) {
+          assert(defaultStyles.length % 2 == 0);
+          meta._styles ??= [];
+          meta._styles.insertAll(0, defaultStyles);
+        }
       }
     }
 
@@ -87,7 +98,11 @@ class Builder {
       }
     }
 
-    meta?.styles((k, v) => meta = wf.parseStyle(meta, k, v));
+    if (meta != null) {
+      for (final style in meta?.styles) {
+        meta = wf.parseStyle(meta, style.key, style.value);
+      }
+    }
 
     meta = wf.parseElement(meta, e);
 
@@ -104,7 +119,7 @@ class Builder {
 
     for (final domNode in domNodes) {
       if (domNode.nodeType == dom.Node.TEXT_NODE) {
-        _textPiece._write(domNode.text);
+        _addText(domNode.text);
         continue;
       }
       if (domNode.nodeType != dom.Node.ELEMENT_NODE) continue;
@@ -113,24 +128,24 @@ class Builder {
       if (meta?.isNotRenderable == true) continue;
 
       final isBlockElement = meta?.isBlockElement == true;
-      final __builder = Builder(
+      final __builder = HtmlBuilder(
         domNodes: domNode.nodes,
-        parentBlock: isBlockElement ? null : _textPiece.block,
         parentMeta: meta,
         parentParentOps: parentOps,
+        parentText: isBlockElement ? null : _textPiece.text,
         parentTsb: meta?.tsb ?? parentTsb,
         wf: wf,
       );
 
       if (isBlockElement) {
         _saveTextPiece();
-        _pieces.add(_Piece(this, widgets: __builder.build()));
+        _pieces.add(BuiltPiece.widgets(__builder.build()));
         continue;
       }
 
       for (final __piece in __builder.process()) {
-        if (__piece.block?.parent == _textPiece.block) {
-          // same text block, do nothing
+        if (__piece.text?.parent == _textPiece.text) {
+          // same text, do nothing
           continue;
         }
 
@@ -151,11 +166,30 @@ class Builder {
     return output;
   }
 
-  void _newTextPiece() => _textPiece = _Piece(
-        this,
-        block: (_pieces.isEmpty ? parentBlock?.sub(parentTsb) : null) ??
-            TextBlock(parentTsb),
-      );
+  void _addText(String data) {
+    final leading = _regExpSpaceLeading.firstMatch(data);
+    final trailing = _regExpSpaceTrailing.firstMatch(data);
+    final start = leading == null ? 0 : leading.end;
+    final end = trailing == null ? data.length : trailing.start;
+
+    final text = _textPiece.text;
+    if (end <= start) {
+      text.addWhitespace();
+      return;
+    }
+
+    if (start > 0) text.addWhitespace();
+
+    final substring = data.substring(start, end);
+    final dedup = substring.replaceAll(_regExpSpaces, ' ');
+    text.addText(dedup);
+
+    if (end < data.length) text.addWhitespace();
+  }
+
+  void _newTextPiece() => _textPiece = BuiltPiece.text(
+      (_pieces.isEmpty ? parentText?.sub(parentTsb) : null) ??
+          TextBits(parentTsb));
 
   void _saveTextPiece() {
     _pieces.add(_textPiece);
@@ -163,50 +197,138 @@ class Builder {
   }
 }
 
-class _Piece extends BuiltPiece {
-  final Builder b;
-  final TextBlock block;
-  final Iterable<Widget> widgets;
+Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, NodeMetadata meta) {
+  // try to reuse existing list if possible
+  final withOnChild =
+      meta?.ops?.where((op) => op.hasOnChild)?.toList(growable: false);
+  if (withOnChild?.isNotEmpty != true) return ops;
 
-  _Piece(
-    this.b, {
-    this.block,
-    this.widgets,
-  }) : assert((block == null) != (widgets == null));
+  return List.unmodifiable((ops?.toList() ?? <BuildOp>[])..addAll(withOnChild));
+}
 
-  @override
-  bool get hasWidgets => widgets != null;
+class NodeMetadata {
+  Iterable<BuildOp> _buildOps;
+  dom.Element _domElement;
+  Iterable<BuildOp> _parentOps;
+  TextStyleBuilders _tsb;
 
-  bool _write(String text) {
-    final leading = regExpSpaceLeading.firstMatch(text);
-    final trailing = regExpSpaceTrailing.firstMatch(text);
-    final start = leading == null ? 0 : leading.end;
-    final end = trailing == null ? text.length : trailing.start;
+  Color color;
+  bool decoOver;
+  bool decoStrike;
+  bool decoUnder;
+  TextDecorationStyle decorationStyle;
+  String fontFamily;
+  String fontSize;
+  bool fontStyleItalic;
+  FontWeight fontWeight;
+  bool _isBlockElement;
+  bool isNotRenderable;
+  List<String> _styles;
+  bool _stylesFrozen = false;
 
-    if (end <= start) return block.addSpace();
+  dom.Element get domElement => _domElement;
 
-    if (start > 0) block.addSpace();
+  bool get hasOps => _buildOps != null;
 
-    final substring = text.substring(start, end);
-    final dedup = substring.replaceAll(regExpSpaces, ' ');
-    block.addText(dedup);
+  bool get hasParents => _parentOps != null;
 
-    if (end < text.length) block.addSpace();
+  bool get isBlockElement {
+    if (_isBlockElement == true) return true;
+    return _buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
+  }
 
-    return true;
+  Iterable<BuildOp> get ops => _buildOps;
+
+  Iterable<BuildOp> get parents => _parentOps;
+
+  Iterable<MapEntry<String, String>> get styles sync* {
+    _stylesFrozen = true;
+    if (_styles == null) return;
+
+    final iterator = _styles.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current;
+      if (!iterator.moveNext()) return;
+      yield MapEntry(key, iterator.current);
+    }
+  }
+
+  TextStyleBuilders get tsb => _tsb;
+
+  set domElement(dom.Element e) {
+    assert(_domElement == null);
+    _domElement = e;
+
+    if (_buildOps != null) {
+      final ops = _buildOps as List;
+      ops.sort((a, b) => a.priority.compareTo(b.priority));
+      _buildOps = List.unmodifiable(ops);
+    }
+  }
+
+  set tsb(TextStyleBuilders tsb) {
+    assert(_tsb == null);
+    _tsb = tsb;
+  }
+
+  String style(String key) {
+    for (final x in styles) {
+      if (x.key == key) return x.value;
+    }
+    return null;
   }
 }
 
-Iterable<BuildOp> _prepareParentOps(
-  Iterable<BuildOp> parentParentOps,
-  NodeMetadata parentMeta,
-) {
-  // try to reuse existing list if possible
-  final withOnChild =
-      parentMeta?.ops?.where((op) => op.hasOnChild)?.toList(growable: false);
-  if (withOnChild?.isNotEmpty != true) return parentParentOps;
+NodeMetadata lazySet(
+  NodeMetadata meta, {
+  BuildOp buildOp,
+  Color color,
+  bool decoOver,
+  bool decoStrike,
+  bool decoUnder,
+  TextDecorationStyle decorationStyle,
+  String fontFamily,
+  String fontSize,
+  bool fontStyleItalic,
+  FontWeight fontWeight,
+  bool isBlockElement,
+  bool isNotRenderable,
+  Iterable<BuildOp> parentOps,
+  Iterable<String> styles,
+}) {
+  meta ??= NodeMetadata();
 
-  return List.unmodifiable(
-    (parentParentOps?.toList() ?? <BuildOp>[])..addAll(withOnChild),
-  );
+  if (buildOp != null) {
+    meta._buildOps ??= [];
+    final ops = meta._buildOps as List<BuildOp>;
+    if (!ops.contains(buildOp)) ops.add(buildOp);
+  }
+
+  if (color != null) meta.color = color;
+
+  if (decoStrike != null) meta.decoStrike = decoStrike;
+  if (decoOver != null) meta.decoOver = decoOver;
+  if (decoUnder != null) meta.decoUnder = decoUnder;
+  if (decorationStyle != null) meta.decorationStyle = decorationStyle;
+  if (fontFamily != null) meta.fontFamily = fontFamily;
+  if (fontSize != null) meta.fontSize = fontSize;
+  if (fontStyleItalic != null) meta.fontStyleItalic = fontStyleItalic;
+  if (fontWeight != null) meta.fontWeight = fontWeight;
+
+  if (isBlockElement != null) meta._isBlockElement = isBlockElement;
+  if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
+
+  if (parentOps != null) {
+    assert(meta._parentOps == null);
+    meta._parentOps = parentOps;
+  }
+
+  if (styles != null) {
+    assert(styles.length % 2 == 0);
+    assert(!meta._stylesFrozen);
+    meta._styles ??= [];
+    meta._styles.addAll(styles);
+  }
+
+  return meta;
 }

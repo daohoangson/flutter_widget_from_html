@@ -30,6 +30,19 @@ class HomeScreen extends StatelessWidget {
     </span>
   </span>
 </p>
+
+<!-- https://developer.mozilla.org/en-US/docs/Web/HTML/Element/sub -->
+<p>Almost every developer's favorite molecule is
+C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."</p>
+
+<!-- https://developer.mozilla.org/en-US/docs/Web/HTML/Element/sup -->
+<p>The <b>Pythagorean theorem</b> is often expressed as the following equation:</p>
+<p><var>a<sup>2</sup></var> + <var>b<sup>2</sup></var> = <var>c<sup>2</sup></var></p>
+
+<!-- https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ruby -->
+<ruby style="font-size: 2em">
+明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp>
+</ruby>
 """,
     'Alignments': """<div style="text-align: left">Left</div>
 <div style="text-align: center">Center</div>
@@ -145,13 +158,13 @@ CODE tag:
             return ListTile(
               title: Text(key),
               onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => html is String
-                          ? CompareScreen(html: html, title: key)
-                          : (html as Function)(),
-                    ),
-                  ),
+                context,
+                MaterialPageRoute(
+                  builder: (_) => html is String
+                      ? CompareScreen(html: html, title: key)
+                      : (html as Function)(),
+                ),
+              ),
             );
           },
           itemCount: _htmls.length,

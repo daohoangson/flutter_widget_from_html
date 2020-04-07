@@ -73,7 +73,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
   - Inline style: `<table style="border: 1px solid #f00">`
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
   DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, IMG, INS,
-  KBD, MAIN, NAV, P, PRE, Q, S, SAMP, SECTION, STRIKE, STRONG, TT, U, VAR
+  KBD, MAIN, NAV, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, STRIKE, STRONG, SUB, SUP, TT, U, VAR
 
 However, these tags and their contents will be ignored:
 
@@ -82,15 +82,21 @@ However, these tags and their contents will be ignored:
 - STYLE
 - SVG (use [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) for SVG support)
 
+### Attributes
+
+- dir: `auto`, `ltr` and `rtl`
+
 ### Inline stylings
 
 - border-top, border-bottom: overline/underline with support for dashed/dotted/double/solid style
 - color: hex values only (`#F00`, `#0F08`, `#00FF00` or `#00FF0080`)
+- direction (similar to `dir` attribute)
 - font-family
 - font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) and value in em/px
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
-- margin, margin-top, margin-right, margin-bottom, margin-left (values in px only)
+- margin and margin-xxx (values in px only)
+- vertical-align: baseline/top/bottom/middle/sub/super
 - text-align: center/justify/left/right
 - text-decoration: line-through/none/overline/underline
 
@@ -101,7 +107,7 @@ As previously mentioned, this package focuses on the core parsing-building routi
 Here is how it works:
 
 1. `HtmlWidget` parses input html into dom nodes
-2. `Builder` loops through each node, looking for `NodeMetadata` (text size, styling, hyperlink or image source, etc.)
+2. `HtmlBuilder` loops through each node, looking for `NodeMetadata` (text size, styling, hyperlink or image source, etc.)
 3. Use the metadata to build widget via `WidgetFactory`
 
 If you want to, you can change the way metadata is collected (in step 2) and build widget however you like (in step 3) by extending the `WidgetFactory` and give it to `HtmlWidget`. The example below replace smilie inline image with an emoji:
@@ -119,7 +125,7 @@ class SmilieScreen extends StatelessWidget {
     onPieces: (meta, pieces) {
       final alt = meta.domElement.attributes['alt'];
       final text = kSmilies.containsKey(alt) ? kSmilies[alt] : alt;
-      return pieces..first?.block?.addText(text);
+      return pieces..first?.text?.addText(text);
     },
   );
 
