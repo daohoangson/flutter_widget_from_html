@@ -90,7 +90,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:(#FF0000FF+u+onTap:Foo '
+          equals('[RichText:(:(#FF0000FF+u+onTap:Foo )'
               "[GestureDetector:child=[NetworkImage:url=$kImgSrc]])]"));
     });
 
