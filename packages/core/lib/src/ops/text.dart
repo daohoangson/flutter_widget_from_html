@@ -17,6 +17,7 @@ class _TextCompiler {
     _context = context;
     _compiled = [];
 
+    _resetLoop(text.tsb);
     for (final bit in text.bits) {
       _loop(bit);
     }

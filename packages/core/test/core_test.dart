@@ -50,7 +50,7 @@ void main() {
     expect(
         str,
         equals('[Column:children='
-            '[RichText:(+l+o+u:All decorations... (:and none))],'
+            '[RichText:(:(+l+o+u:All decorations... )(:and none))],'
             '[RichText:(:I​Like​Playing​football​​game)]'
             ']'));
   });
@@ -58,7 +58,7 @@ void main() {
   testWidgets('renders white spaces with parent style', (tester) async {
     final html = ' <b>One<em> <u>two </u></em> three</b> ';
     final explained = await explain(tester, html);
-    expect(explained, equals('[RichText:(+b:One (+u+i+b:two)(+b: three))]'));
+    expect(explained, equals('[RichText:(:(+b:One )(+u+i+b:two)(+b: three))]'));
   });
 
   group('ABBR tag', () {
@@ -306,7 +306,7 @@ void main() {
           explained,
           equals('[SizedBox:0.0x10.0],'
               '[Padding:(0,40,0,40),child=[NetworkImage:url=$src]],'
-              '[Padding:(0,40,0,40),child=[RichText:(+i:fig. 1(: Foo))]],'
+              '[Padding:(0,40,0,40),child=[RichText:(:(+i:fig. 1)(: Foo))]],'
               '[SizedBox:0.0x10.0]'));
     });
 
@@ -373,7 +373,7 @@ void main() {
       expect(
           explained,
           equals('[SingleChildScrollView:child=' +
-              '[RichText:(#FF0000BB+font=monospace:<?php phpinfo' +
+              '[RichText:(+font=monospace:(#FF0000BB:<?php phpinfo)' +
               '(#FF007700:(); )(#FF0000BB:?>))]]'));
     });
 
@@ -386,7 +386,7 @@ void main() {
     testWidgets('renders KBD tag', (WidgetTester tester) async {
       final html = '<kbd>ESC</kbd> = exit';
       final actual = await explain(tester, html);
-      expect(actual, equals('[RichText:(+font=monospace:ESC(: = exit))]'));
+      expect(actual, equals('[RichText:(:(+font=monospace:ESC)(: = exit))]'));
     });
 
     testWidgets('renders PRE tag', (WidgetTester tester) async {
@@ -523,6 +523,15 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
         expect(explained, equals('[RichText:(:Foo (bg=#FFFF0000:bar))]'));
       });
     });
+
+    testWidgets('resets in continuous SPANs (#155)', (tester) async {
+      final html =
+          '<span style="color: #ff0; background-color:#00f;">Foo</span>'
+          '<span style="color: #f00;">bar</span>';
+      final explained = await explain(tester, html);
+      expect(explained,
+          equals('[RichText:(:(bg=#FF0000FF#FFFFFF00:Foo)(#FFFF0000:bar))]'));
+    });
   });
 
   group('border', () {
@@ -536,7 +545,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final html = '<span style="text-decoration: overline">F' +
           '<span style="border-top: 0">o</span>o</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(+o:F(:o)(+o:o))]'));
+      expect(explained, equals('[RichText:(:(+o:F)(:o)(+o:o))]'));
     });
 
     testWidgets('renders border-bottom', (WidgetTester tester) async {
@@ -548,7 +557,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     testWidgets('resets border-bottom', (WidgetTester tester) async {
       final html = '<u>F<span style="border-bottom: 0">o</span>o</u>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(+u:F(:o)(+u:o))]'));
+      expect(explained, equals('[RichText:(:(+u:F)(:o)(+u:o))]'));
     });
 
     testWidgets('renders dashed', (WidgetTester tester) async {
@@ -585,7 +594,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:(#FFFF0000:red(#8800FF00:red 53%)' +
+          equals('[RichText:(:(#FFFF0000:red)(#8800FF00:red 53%)' +
               '(#FF00FF00:green)(#8000FF00:green 50%))]'));
     });
 
@@ -595,7 +604,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:(#FFFF0000:red ' +
+          equals('[RichText:(:(#FFFF0000:red )' +
               '(#FF00FF00:green)(#FFFF0000: red again))]'));
     });
   });
@@ -831,7 +840,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final html = '<span style="font-size: 100px">F' +
           '<span style="font-size: medium">o</span>o</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(@100.0:F(@10.0:o)(:o))]'));
+      expect(explained, equals('[RichText:(:(@100.0:F)(:o)(@100.0:o))]'));
     });
 
     testWidgets('renders small', (WidgetTester tester) async {
@@ -856,21 +865,21 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final html = '<span style="font-size: larger">F' +
           '<span style="font-size: larger">o</span>o</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(@12.0:F(@14.4:o)(:o))]'));
+      expect(explained, equals('[RichText:(:(@12.0:F)(@14.4:o)(@12.0:o))]'));
     });
 
     testWidgets('renders smaller', (WidgetTester tester) async {
       final html = '<span style="font-size: smaller">F' +
           '<span style="font-size: smaller">o</span>o</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(@8.3:F(@6.9:o)(:o))]'));
+      expect(explained, equals('[RichText:(:(@8.3:F)(@6.9:o)(@8.3:o))]'));
     });
 
     testWidgets('renders 2em', (WidgetTester tester) async {
       final html = '<span style="font-size: 2em">F' +
           '<span style="font-size: 2em">o</span>o</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(@20.0:F(@40.0:o)(:o))]'));
+      expect(explained, equals('[RichText:(:(@20.0:F)(@40.0:o)(@20.0:o))]'));
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
@@ -914,7 +923,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     testWidgets('renders VAR tag', (WidgetTester tester) async {
       final html = '<var>x</var> = 1';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(+i:x(: = 1))]'));
+      expect(explained, equals('[RichText:(:(+i:x)(: = 1))]'));
     });
 
     testWidgets('renders inline style: italic', (WidgetTester tester) async {
@@ -927,7 +936,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final html = '<span style="font-style: italic">Italic ' +
           '<span style="font-style: normal">normal</span></span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(+i:Italic (-i:normal))]'));
+      expect(explained, equals('[RichText:(:(+i:Italic )(-i:normal))]'));
     });
   });
 
@@ -961,7 +970,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:(+b:bold(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: four )' +
+          equals('[RichText:(:(+b:bold)(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: four )' +
               '(+w4:five)(: )(+w5:six)(: )(+b:seven)(: )(+w7:eight)(: )(+w8:nine))]'));
     });
   });
@@ -984,7 +993,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     testWidgets('renders S/STRIKE tag', (WidgetTester tester) async {
       final html = '<s>Foo</s> <strike>bar</strike>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(+l:Foo(: )(+l:bar))]'));
+      expect(explained, equals('[RichText:(:(+l:Foo)(: )(+l:bar))]'));
     });
 
     testWidgets('renders U tag', (WidgetTester tester) async {
@@ -1033,7 +1042,7 @@ foo bar</span></span></span>
 foo <span style="text-decoration: none">bar</span></span></span></span>
 """;
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(+l+o+u:foo (:bar))]'));
+      expect(explained, equals('[RichText:(:(+l+o+u:foo )(:bar))]'));
     });
   });
 }
