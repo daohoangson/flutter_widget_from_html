@@ -1,3 +1,9 @@
+## 0.3.3
+
+* Improve whitespace handling (#137)
+* Add support for tag SUB, SUP and inline style `vertical-align` (#143)
+* Fix text bit loop initial state (#156)
+
 ## 0.3.2+2
 
 * Use minimum main axis size
