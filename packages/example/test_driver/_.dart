@@ -71,7 +71,10 @@ class _AspectRatioTestResultWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Text(
-        Provider.of<_AspectRatioTestResult>(context).value.toStringAsFixed(2),
+        Provider.of<_AspectRatioTestResult>(context)
+            .value
+            .toStringAsFixed(3)
+            .substring(0, 4),
         key: resultKey,
       );
 }

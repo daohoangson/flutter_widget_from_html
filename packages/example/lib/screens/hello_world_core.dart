@@ -25,12 +25,12 @@ class HelloWorldCoreScreen extends StatelessWidget {
         body: HtmlWidget(
           kHtml,
           onTapUrl: (url) => showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                      title: Text('onTapUrl'),
-                      content: Text(url),
-                    ),
-              ),
+            context: context,
+            builder: (_) => AlertDialog(
+              title: Text('onTapUrl'),
+              content: Text(url),
+            ),
+          ),
         ),
       );
 }

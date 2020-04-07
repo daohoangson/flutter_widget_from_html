@@ -1,29 +1,29 @@
 part of '../core_widget_factory.dart';
 
-const kTagLi = 'li';
-const kTagOrderedList = 'ol';
-const kTagUnorderedList = 'ul';
-const kAttributeLiType = 'type';
-const kAttributeLiTypeAlphaLower = 'a';
-const kAttributeLiTypeAlphaUpper = 'A';
-const kAttributeLiTypeDecimal = '1';
-const kAttributeLiTypeRomanLower = 'i';
-const kAttributeLiTypeRomanUpper = 'I';
-const kAttributeOlReversed = 'reversed';
-const kAttributeOlStart = 'start';
-const kCssListStyleType = 'list-style-type';
-const kCssListStyleTypeAlphaLower = 'lower-alpha';
-const kCssListStyleTypeAlphaUpper = 'upper-alpha';
-const kCssListStyleTypeAlphaLatinLower = 'lower-latin';
-const kCssListStyleTypeAlphaLatinUpper = 'upper-latin';
-const kCssListStyleTypeCircle = 'circle';
-const kCssListStyleTypeDecimal = 'decimal';
-const kCssListStyleTypeDisc = 'disc';
-const kCssListStyleTypeRomanLower = 'lower-roman';
-const kCssListStyleTypeRomanUpper = 'upper-roman';
-const kCssListStyleTypeSquare = 'square';
+const _kTagLi = 'li';
+const _kTagOrderedList = 'ol';
+const _kTagUnorderedList = 'ul';
+const _kAttributeLiType = 'type';
+const _kAttributeLiTypeAlphaLower = 'a';
+const _kAttributeLiTypeAlphaUpper = 'A';
+const _kAttributeLiTypeDecimal = '1';
+const _kAttributeLiTypeRomanLower = 'i';
+const _kAttributeLiTypeRomanUpper = 'I';
+const _kAttributeOlReversed = 'reversed';
+const _kAttributeOlStart = 'start';
+const _kCssListStyleType = 'list-style-type';
+const _kCssListStyleTypeAlphaLower = 'lower-alpha';
+const _kCssListStyleTypeAlphaUpper = 'upper-alpha';
+const _kCssListStyleTypeAlphaLatinLower = 'lower-latin';
+const _kCssListStyleTypeAlphaLatinUpper = 'upper-latin';
+const _kCssListStyleTypeCircle = 'circle';
+const _kCssListStyleTypeDecimal = 'decimal';
+const _kCssListStyleTypeDisc = 'disc';
+const _kCssListStyleTypeRomanLower = 'lower-roman';
+const _kCssListStyleTypeRomanUpper = 'upper-roman';
+const _kCssListStyleTypeSquare = 'square';
 
-const _kCssPaddingInlineStart = 'padding-inline-start';
+const __kCssPaddingInlineStart = 'padding-inline-start';
 
 class _TagLi {
   final WidgetFactory wf;
@@ -39,26 +39,28 @@ class _TagLi {
         final p = meta.parents?.where((op) => op == _buildOp)?.length ?? 0;
 
         final styles = [
-          _kCssPaddingInlineStart,
+          __kCssPaddingInlineStart,
           '2.5em',
-          kCssListStyleType,
-          e.localName == kTagOrderedList
-              ? (e.attributes.containsKey(kAttributeLiType)
+          _kCssListStyleType,
+          e.localName == _kTagOrderedList
+              ? (e.attributes.containsKey(_kAttributeLiType)
                       ? _LiInput.listStyleTypeFromAttributeType(
-                          e.attributes[kAttributeLiType])
+                          e.attributes[_kAttributeLiType])
                       : null) ??
-                  kCssListStyleTypeDecimal
+                  _kCssListStyleTypeDecimal
               : p == 0
-                  ? kCssListStyleTypeDisc
-                  : p == 1 ? kCssListStyleTypeCircle : kCssListStyleTypeSquare,
+                  ? _kCssListStyleTypeDisc
+                  : p == 1
+                      ? _kCssListStyleTypeCircle
+                      : _kCssListStyleTypeSquare,
         ];
 
-        if (p == 0) styles.addAll([kCssMargin, '1em 0']);
+        if (p == 0) styles.addAll([_kCssMargin, '1em 0']);
 
         return styles;
       },
       onChild: (meta, e) =>
-          e.localName == kTagLi ? lazySet(meta, buildOp: liOp) : meta,
+          e.localName == _kTagLi ? lazySet(meta, buildOp: liOp) : meta,
       onWidgets: (meta, widgets) => _buildList(meta, widgets),
     );
     return _buildOp;
@@ -74,14 +76,14 @@ class _TagLi {
     return _liOp;
   }
 
-  Iterable<Widget> _build(BuilderContext bc, Iterable<Widget> ws, _LiInput i) {
+  Iterable<Widget> _build(BuildContext c, Iterable<Widget> ws, _LiInput i) {
     final listMeta = i.listMeta;
     final paddingCss = i.paddingInlineStart ?? listMeta.paddingInlineStart;
-    final paddingPx = paddingCss.getValue(bc, i.meta.tsb);
-    final padding = Directionality.of(bc.context) == TextDirection.ltr
+    final paddingPx = paddingCss.getValue(c, i.meta.tsb);
+    final padding = Directionality.of(c) == TextDirection.ltr
         ? EdgeInsets.only(left: paddingPx)
         : EdgeInsets.only(right: paddingPx);
-    final style = i.meta.tsb.build(bc);
+    final style = i.meta.tsb.build(c);
     final listStyleType = i.listStyleType ?? listMeta.listStyleType;
     final markerIndex = listMeta.markerReversed
         ? (listMeta.markerStart ?? listMeta.markerCount) - i.markerIndex
@@ -91,37 +93,38 @@ class _TagLi {
     return [
       Stack(children: <Widget>[
         wf.buildPadding(wf.buildColumn(ws), padding) ?? widget0,
-        _buildMarker(bc.context, style, markerText, paddingPx),
+        _buildMarker(c, style, markerText, paddingPx),
       ]),
     ];
   }
 
   Iterable<Widget> _buildList(NodeMetadata meta, Iterable<Widget> children) {
     final listMeta = _ListMetadata();
-    meta.styles((key, value) {
-      switch (key) {
-        case kCssListStyleType:
-          listMeta.listStyleType = value;
+    for (final style in meta?.styles) {
+      switch (style.key) {
+        case _kCssListStyleType:
+          listMeta.listStyleType = style.value;
           break;
-        case _kCssPaddingInlineStart:
-          final parsed = parseCssLength(value);
+        case __kCssPaddingInlineStart:
+          final parsed = wf.parseCssLength(style.value);
           if (parsed != null) listMeta.paddingInlineStart = parsed;
       }
-    });
+    }
 
     final a = meta.domElement.attributes;
-    if (a.containsKey(kAttributeOlReversed)) listMeta.markerReversed = true;
-    if (a.containsKey(kAttributeOlStart))
-      listMeta.markerStart = int.tryParse(a[kAttributeOlStart]);
+    if (a.containsKey(_kAttributeOlReversed)) listMeta.markerReversed = true;
+    if (a.containsKey(_kAttributeOlStart)) {
+      listMeta.markerStart = int.tryParse(a[_kAttributeOlStart]);
+    }
 
     for (final child in children) {
       if (!(child is _LiPlaceholder)) continue;
       final item = child as _LiPlaceholder;
 
       if (item.input.listMeta != null) {
-        item.wrapWith((bc, widgets, __) {
-          final paddingPx = listMeta.paddingInlineStart.getValue(bc, meta.tsb);
-          final padding = Directionality.of(bc.context) == TextDirection.ltr
+        item.wrapWith((c, widgets, __) {
+          final paddingPx = listMeta.paddingInlineStart.getValue(c, meta.tsb);
+          final padding = Directionality.of(c) == TextDirection.ltr
               ? EdgeInsets.only(left: paddingPx)
               : EdgeInsets.only(right: paddingPx);
 
@@ -157,20 +160,20 @@ class _TagLi {
 
   _LiPlaceholder _placeholder(Iterable<Widget> children, NodeMetadata meta) {
     final a = meta.domElement.attributes;
-    String listStyleType = a.containsKey(kAttributeLiType)
-        ? _LiInput.listStyleTypeFromAttributeType(a[kAttributeLiType])
+    String listStyleType = a.containsKey(_kAttributeLiType)
+        ? _LiInput.listStyleTypeFromAttributeType(a[_kAttributeLiType])
         : null;
     CssLength paddingInlineStart;
-    meta.styles((key, value) {
-      switch (key) {
-        case kCssListStyleType:
-          listStyleType = value;
+    for (final style in meta.styles) {
+      switch (style.key) {
+        case _kCssListStyleType:
+          listStyleType = style.value;
           break;
-        case _kCssPaddingInlineStart:
-          final parsed = parseCssLength(value);
+        case __kCssPaddingInlineStart:
+          final parsed = wf.parseCssLength(style.value);
           if (parsed != null) paddingInlineStart = parsed;
       }
-    });
+    }
 
     return _LiPlaceholder(
       this,
@@ -206,16 +209,16 @@ class _LiInput {
 
   static String listStyleTypeFromAttributeType(String type) {
     switch (type) {
-      case kAttributeLiTypeAlphaLower:
-        return kCssListStyleTypeAlphaLower;
-      case kAttributeLiTypeAlphaUpper:
-        return kCssListStyleTypeAlphaUpper;
-      case kAttributeLiTypeDecimal:
-        return kCssListStyleTypeDecimal;
-      case kAttributeLiTypeRomanLower:
-        return kCssListStyleTypeRomanLower;
-      case kAttributeLiTypeRomanUpper:
-        return kCssListStyleTypeRomanUpper;
+      case _kAttributeLiTypeAlphaLower:
+        return _kCssListStyleTypeAlphaLower;
+      case _kAttributeLiTypeAlphaUpper:
+        return _kCssListStyleTypeAlphaUpper;
+      case _kAttributeLiTypeDecimal:
+        return _kCssListStyleTypeDecimal;
+      case _kAttributeLiTypeRomanLower:
+        return _kCssListStyleTypeRomanLower;
+      case _kAttributeLiTypeRomanUpper:
+        return _kCssListStyleTypeRomanUpper;
     }
 
     return null;
@@ -223,7 +226,7 @@ class _LiInput {
 }
 
 class _ListMetadata {
-  String listStyleType = kCssListStyleTypeDisc;
+  String listStyleType = _kCssListStyleTypeDisc;
   int markerCount = 0;
   bool markerReversed = false;
   int markerStart;

@@ -1,7 +1,4 @@
-import 'dart:async';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart' as lib;
+part of '../helpers.dart';
 
 class WebView extends StatefulWidget {
   final String url;
@@ -9,7 +6,7 @@ class WebView extends StatefulWidget {
   final double aspectRatio;
   final bool getDimensions;
   final List<Duration> getDimensionsDurations;
-  final _InterceptNavigationRequest interceptNavigationRequest;
+  final bool Function(String) interceptNavigationRequest;
   final bool js;
 
   // https://github.com/daohoangson/flutter_widget_from_html/issues/37
@@ -43,6 +40,7 @@ class WebView extends StatefulWidget {
       "aspectRatio=${aspectRatio.toStringAsFixed(2)},"
       "getDimensions=${getDimensions ? 1 : 0},"
       "js=${js ? 1 : 0}"
+      "${unsupportedWorkaroundForIssue37 == true ? ',issue37' : ''}"
       ']';
 }
 
@@ -151,8 +149,6 @@ class _WebViewState extends State<WebView> {
     }
   }
 }
-
-typedef bool _InterceptNavigationRequest(String url);
 
 class _Issue37 with WidgetsBindingObserver {
   final _WebViewState wvs;

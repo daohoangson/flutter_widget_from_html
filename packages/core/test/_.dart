@@ -3,18 +3,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
-final hwKey = GlobalKey<HtmlWidgetState>();
+final hwKey = GlobalKey<State<HtmlWidget>>();
+
+Widget buildCurrentState() {
+  final hws = hwKey.currentState;
+  if (hws == null) return null;
+
+  // ignore: invalid_use_of_protected_member
+  return hws.build(hws.context);
+}
 
 Future<String> explain(
   WidgetTester tester,
   String html, {
-  WidgetExplainer explainer,
+  String Function(Widget) explainer,
   Widget hw,
-  PreTest preTest,
+  void Function(BuildContext) preTest,
   Uri baseUrl,
   double bodyVerticalPadding = 0,
   NodeMetadataCollector builderCallback,
-  FactoryBuilder factoryBuilder,
+  WidgetFactory Function(HtmlConfig config) factoryBuilder,
   double tableCellPadding = 0,
   TextStyle textStyle,
 }) async {
@@ -46,7 +54,12 @@ Future<String> explain(
             accentColor: const Color(0xFF123456),
           ),
           home: Scaffold(
-            body: DefaultTextStyle(style: style, child: hw),
+            body: ExcludeSemantics(
+              // exclude semantics for faster run but mostly because of this bug
+              // https://github.com/flutter/flutter/issues/51936
+              // which is failing some of our tests
+              child: DefaultTextStyle(style: style, child: hw),
+            ),
           ),
         );
       },
@@ -57,27 +70,36 @@ Future<String> explain(
   expect(hws, isNotNull);
 
   return Explainer(hws.context, explainer: explainer)
-      .explain(hws.build(hws.context));
+      .explain(buildCurrentState());
 }
 
 final _explainMarginRegExp = RegExp(
     r'^\[Column:children=\[RichText:\(:x\)\],(.+),\[RichText:\(:x\)\]\]$');
 
-Future<String> explainMargin(WidgetTester tester, String html) async {
+Future<String> explainMargin(
+  WidgetTester tester,
+  String html, {
+  bool rtl = false,
+}) async {
   final explained = await explain(
     tester,
-    "x${html}x",
+    null,
+    hw: Directionality(
+      textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
+      child: HtmlWidget(
+        "x${html}x",
+        bodyPadding: const EdgeInsets.all(0),
+        key: hwKey,
+      ),
+    ),
   );
   final match = _explainMarginRegExp.firstMatch(explained);
   return match == null ? explained : match[1];
 }
 
-typedef String WidgetExplainer(Widget widget);
-typedef void PreTest(BuildContext context);
-
 class Explainer {
   final BuildContext context;
-  final WidgetExplainer explainer;
+  final String Function(Widget) explainer;
   final TextStyle _defaultStyle;
 
   Explainer(this.context, {this.explainer})
@@ -117,8 +139,9 @@ class Explainer {
   }
 
   String _imageLayout(ImageLayout widget) {
-    if (widget.height == null && widget.text == null && widget.width == null)
+    if (widget.height == null && widget.text == null && widget.width == null) {
       return _image(widget.image);
+    }
 
     String s = "[ImageLayout:child=${_image(widget.image)}";
     if (widget.height != null) s += ",height=${widget.height}";
@@ -129,7 +152,15 @@ class Explainer {
   }
 
   String _inlineSpan(InlineSpan inlineSpan, {TextStyle parentStyle}) {
-    if (inlineSpan is WidgetSpan) return _widget(inlineSpan.child);
+    if (inlineSpan is WidgetSpan) {
+      String s = _widget(inlineSpan.child);
+      if (inlineSpan.alignment != PlaceholderAlignment.baseline) {
+        s += inlineSpan.alignment
+            .toString()
+            .replaceAll('PlaceholderAlignment.', '@');
+      }
+      return s;
+    }
 
     final style = _textStyle(inlineSpan.style, parentStyle ?? _defaultStyle);
     final textSpan = inlineSpan is TextSpan ? inlineSpan : null;
@@ -166,28 +197,21 @@ class Explainer {
 
   String _tableRow(TableRow row) => row.children
       .map((c) => _widget(c is TableCell ? c.child : c))
-      .toList()
+      .toList(growable: false)
       .join(' | ');
 
-  String _tableRows(Table table) =>
-      table.children.map((r) => _tableRow(r)).toList().join('\n');
+  String _tableRows(Table table) => table.children
+      .map((r) => _tableRow(r))
+      .toList(growable: false)
+      .join('\n');
 
-  String _textAlign(TextAlign textAlign) {
-    switch (textAlign) {
-      case TextAlign.center:
-        return 'center';
-      case TextAlign.end:
-        return 'end';
-      case TextAlign.justify:
-        return 'justify';
-      case TextAlign.left:
-        return 'left';
-      case TextAlign.right:
-        return 'right';
-      default:
-        return '';
-    }
-  }
+  String _textAlign(TextAlign textAlign) =>
+      (textAlign != null && textAlign != TextAlign.start)
+          ? textAlign.toString().replaceAll('TextAlign.', '')
+          : '';
+
+  String _textDirection(TextDirection textDirection) =>
+      textDirection.toString().replaceAll('TextDirection.', '');
 
   String _textStyle(TextStyle style, TextStyle parent) {
     String s = '';
@@ -272,10 +296,7 @@ class Explainer {
     if (widget is ImageLayout) return _imageLayout(widget);
 
     // ignore: invalid_use_of_protected_member
-    if (widget is SimpleColumn) return _widget(widget.build(context));
-
-    // ignore: invalid_use_of_protected_member
-    if (widget is IWidgetPlaceholder) return _widget(widget.build(context));
+    if (widget is WidgetPlaceholder) return _widget(widget.build(context));
 
     final type = widget.runtimeType.toString();
     final text = widget is Align
@@ -284,25 +305,27 @@ class Explainer {
             ? "aspectRatio=${widget.aspectRatio.toStringAsFixed(2)},"
             : widget is DecoratedBox
                 ? _boxDecoration(widget.decoration)
-                : widget is GestureDetector
-                    ? "child=${_widget(widget.child)}"
-                    : widget is InkWell
+                : widget is Directionality
+                    ? "${_textDirection(widget.textDirection)},"
+                    : widget is GestureDetector
                         ? "child=${_widget(widget.child)}"
-                        : widget is LimitedBox
-                            ? _limitBox(widget)
-                            : widget is Padding
-                                ? "${_edgeInsets(widget.padding)},"
-                                : widget is RichText
-                                    ? _inlineSpan(widget.text)
-                                    : widget is SizedBox
-                                        ? "${widget.width?.toStringAsFixed(1) ?? 0.0}x${widget.height?.toStringAsFixed(1) ?? 0.0}"
-                                        : widget is Table
-                                            ? _tableBorder(widget.border)
-                                            : widget is Text
-                                                ? widget.data
-                                                : widget is Wrap
-                                                    ? _wrap(widget)
-                                                    : '';
+                        : widget is InkWell
+                            ? "child=${_widget(widget.child)}"
+                            : widget is LimitedBox
+                                ? _limitBox(widget)
+                                : widget is Padding
+                                    ? "${_edgeInsets(widget.padding)},"
+                                    : widget is RichText
+                                        ? _inlineSpan(widget.text)
+                                        : widget is SizedBox
+                                            ? "${widget.width?.toStringAsFixed(1) ?? 0.0}x${widget.height?.toStringAsFixed(1) ?? 0.0}"
+                                            : widget is Table
+                                                ? _tableBorder(widget.border)
+                                                : widget is Text
+                                                    ? widget.data
+                                                    : widget is Wrap
+                                                        ? _wrap(widget)
+                                                        : '';
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));

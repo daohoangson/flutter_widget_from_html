@@ -1,10 +1,19 @@
-part of '../core_helpers.dart';
+part of '../core_widget_factory.dart';
 
-const kCssColor = 'color';
+const _kCssColor = 'color';
 
 final _colorRegExp = RegExp(r'^#([a-f0-9]{3,8})$', caseSensitive: false);
 
-Color parseColor(String value) {
+String _convertColorToHex(Color value) {
+  final r = value.red.toRadixString(16).padLeft(2, '0');
+  final g = value.green.toRadixString(16).padLeft(2, '0');
+  final b = value.blue.toRadixString(16).padLeft(2, '0');
+  final a = value.alpha.toRadixString(16).padLeft(2, '0');
+  return "#$r$g$b$a";
+}
+
+Color _parseColor(String value) {
+  if (value == null) return null;
   final match = _colorRegExp.firstMatch(value);
   if (match == null) return null;
 
@@ -25,14 +34,6 @@ Color parseColor(String value) {
   }
 
   return null;
-}
-
-String convertColorToHex(Color value) {
-  final r = value.red.toRadixString(16).padLeft(2, '0');
-  final g = value.green.toRadixString(16).padLeft(2, '0');
-  final b = value.blue.toRadixString(16).padLeft(2, '0');
-  final a = value.alpha.toRadixString(16).padLeft(2, '0');
-  return "#$r$g$b$a";
 }
 
 String _x2(String value) {

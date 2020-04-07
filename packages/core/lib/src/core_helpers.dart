@@ -1,47 +1,18 @@
 import 'package:flutter/widgets.dart';
 
-import 'core_html_widget.dart';
 import 'core_widget_factory.dart';
-import 'data_classes.dart';
 
-part 'parser/border.dart';
-part 'parser/color.dart';
-part 'parser/css.dart';
+part 'widget/image_layout.dart';
 
 /// A no op placeholder widget.
-const widget0 = const SizedBox.shrink();
+const widget0 = SizedBox.shrink();
 
-// https://unicode.org/cldr/utility/character.jsp?a=200B
-final regExpSpaceLeading = RegExp(r'^[\s\u{200B}]+', unicode: true);
-final regExpSpaceTrailing = RegExp(r'[\s\u{200B}]+$', unicode: true);
-final regExpSpaces = RegExp(r'\s+');
-
-typedef void OnTapUrl(String url);
+typedef OnTapUrl = void Function(String url);
 
 typedef Iterable<Widget> WidgetPlaceholderBuilder<T>(
-    BuilderContext bc, Iterable<Widget> children, T input);
+    BuildContext context, Iterable<Widget> children, T input);
 
-typedef WidgetFactory FactoryBuilder(HtmlWidgetConfig config);
-
-class SimpleColumn extends StatelessWidget {
-  final List<Widget> children;
-
-  SimpleColumn(this.children);
-
-  @override
-  Widget build(BuildContext _) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: children,
-      );
-
-  static Widget wrap(Iterable<Widget> ws) {
-    if (ws?.isNotEmpty != true) return null;
-    if (ws.length == 1) return ws.first;
-    return SimpleColumn(ws is List ? ws : ws.toList(growable: false));
-  }
-}
-
-class WidgetPlaceholder<T1> extends IWidgetPlaceholder {
+class WidgetPlaceholder<T1> extends StatelessWidget {
   final _builders = List<Function>();
   final Iterable<Widget> _firstChildren;
   final _inputs = [];
@@ -56,30 +27,35 @@ class WidgetPlaceholder<T1> extends IWidgetPlaceholder {
     _inputs.add(input);
   }
 
-  @override
-  Widget build(BuildContext c) => buildWithContext(BuilderContext(c, this));
+  Iterable<Function> get builders => _builders.skip(0);
 
-  Widget buildWithContext(BuilderContext bc) {
-    Iterable<Widget> output;
+  Iterable get inputs => _inputs.skip(0);
+
+  @override
+  Widget build(BuildContext context) {
+    Iterable<Widget> output = _firstChildren;
 
     final l = _builders.length;
     for (int i = 0; i < l; i++) {
-      final children = i == 0 ? _firstChildren : output;
-      output = _builders[i](bc, children, _inputs[i]);
+      output = _builders[i](context, output, _inputs[i]);
     }
 
-    return SimpleColumn.wrap(output) ?? widget0;
+    output = output?.where((widget) => widget != null);
+    if (output?.isNotEmpty != true) return widget0;
+    if (output.length == 1) return output.first;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: List.unmodifiable(output),
+    );
   }
 
-  @override
   void wrapWith<T2>(WidgetPlaceholderBuilder<T2> builder, [T2 input]) {
+    assert(builder != null);
     _builders.add(builder);
     _inputs.add(input);
   }
-}
-
-abstract class IWidgetPlaceholder extends StatelessWidget {
-  void wrapWith<T>(WidgetPlaceholderBuilder<T> builder, T input);
 
   static Iterable<Widget> wrap<T2>(
     Iterable<Widget> widgets,
@@ -91,7 +67,7 @@ abstract class IWidgetPlaceholder extends StatelessWidget {
 
     int i = 0;
     for (final widget in widgets) {
-      if (widget is IWidgetPlaceholder) {
+      if (widget is WidgetPlaceholder) {
         wrapped[i++] = widget..wrapWith(builder, input);
       } else {
         wrapped[i++] = WidgetPlaceholder(
@@ -105,5 +81,3 @@ abstract class IWidgetPlaceholder extends StatelessWidget {
     return wrapped;
   }
 }
-
-Iterable<T> listOfNonNullOrNothing<T>(T x) => x == null ? null : [x];

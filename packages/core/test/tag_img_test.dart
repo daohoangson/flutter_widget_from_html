@@ -1,26 +1,26 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '_.dart' as _;
+import '_.dart' as helper;
 
 void main() {
   group('image.png', () {
     final src = 'http://domain.com/image.png';
-    final explain = (WidgetTester t, String html) => _.explain(t, html);
+    final explain = (WidgetTester t, String html) => helper.explain(t, html);
 
     testWidgets('renders src', (WidgetTester tester) async {
       final html = '<img src="$src" />';
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[RichText:[NetworkImage:url=$src]]'),
+        equals('[NetworkImage:url=$src]'),
       );
     });
 
     testWidgets('renders data-src', (WidgetTester tester) async {
       final html = '<img data-src="$src" />';
       final e = await explain(tester, html);
-      expect(e, equals('[RichText:[NetworkImage:url=$src]]'));
+      expect(e, equals('[NetworkImage:url=$src]'));
     });
 
     testWidgets('renders data uri', (WidgetTester tester) async {
@@ -28,13 +28,13 @@ void main() {
       final html = '<img src="data:image/gif;base64,'
           'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:[MemoryImage:]]'));
+      expect(explained, equals('[MemoryImage:]'));
     });
 
     testWidgets('renders bad data uri', (WidgetTester tester) async {
       final html = '<img src="data:image/xxx" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:$html]'));
+      expect(explained, equals('[widget0]'));
     });
 
     testWidgets('renders bad data uri with alt text', (WidgetTester t) async {
@@ -79,11 +79,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:'
-              "[ImageLayout:child=[NetworkImage:url=$src],"
-              'height=600.0,'
-              'width=800.0'
-              ']]'));
+          equals("[ImageLayout:child=[NetworkImage:url=$src],"
+              'height=600.0,width=800.0]'));
     });
 
     testWidgets('renders dimensions in inline style', (tester) async {
@@ -91,11 +88,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:'
-              "[ImageLayout:child=[NetworkImage:url=$src],"
-              'height=600.0,'
-              'width=800.0'
-              ']]'));
+          equals("[ImageLayout:child=[NetworkImage:url=$src],"
+              'height=600.0,width=800.0]'));
     });
 
     testWidgets('renders between texts', (WidgetTester tester) async {
@@ -118,7 +112,7 @@ void main() {
       String html, {
       String package,
     }) =>
-        _.explain(
+        helper.explain(
           tester,
           html,
           preTest: (context) {
@@ -133,54 +127,50 @@ void main() {
     testWidgets('renders asset', (WidgetTester tester) async {
       final html = '<img src="asset:$assetName" />';
       final e = await explain(tester, html);
-      expect(e, equals("[RichText:[AssetImage:assetName=$assetName]]"));
+      expect(e, equals("[AssetImage:assetName=$assetName]"));
     });
 
     testWidgets('renders asset (specified package)', (tester) async {
       final package = 'package';
       final html = '<img src="asset:$assetName?package=$package" />';
-      final explained = await explain(tester, html, package: package);
-      expect(
-          explained,
-          equals(
-            "[RichText:[AssetImage:assetName=$assetName,package=$package]]",
-          ));
+      final e = await explain(tester, html, package: package);
+      expect(e, equals("[AssetImage:assetName=$assetName,package=$package]"));
     });
 
     testWidgets('renders bad asset', (WidgetTester tester) async {
       final html = '<img src="asset:" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:$html]'));
+      expect(explained, equals('[widget0]'));
     });
 
     testWidgets('renders bad asset with alt text', (WidgetTester tester) async {
       final html = '<img src="asset:" alt="Foo" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(explained, equals('[Text:Foo]'));
     });
 
     testWidgets('renders bad asset with title text', (tester) async {
       final html = '<img src="asset:" title="Foo" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(explained, equals('[Text:Foo]'));
     });
   });
 
   group('data uri', () {
-    final explain = _.explain;
+    final explain = helper.explain;
 
     testWidgets('renders data uri', (WidgetTester tester) async {
       // https://stackoverflow.com/questions/6018611/smallest-data-uri-image-possible-for-a-transparent-image
       final html = '<img src="data:image/gif;base64,'
           'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:[MemoryImage:]]'));
+      expect(explained, equals('[MemoryImage:]'));
     });
 
     testWidgets('renders bad data uri', (WidgetTester tester) async {
       final html = '<img src="data:image/xxx" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:$html]'));
+      expect(explained, equals('[widget0]'));
     });
 
     testWidgets('renders bad data uri with alt text', (WidgetTester t) async {
@@ -203,15 +193,12 @@ void main() {
       String fullUrl, {
       Uri baseUrl,
     }) async {
-      final explained = await _.explain(
+      final e = await helper.explain(
         tester,
         html,
         baseUrl: baseUrl ?? Uri.parse('http://base.com/path/'),
       );
-      expect(
-        explained,
-        equals('[RichText:[NetworkImage:url=$fullUrl]]'),
-      );
+      expect(e, equals('[NetworkImage:url=$fullUrl]'));
     };
 
     testWidgets('renders full url', (WidgetTester tester) async {

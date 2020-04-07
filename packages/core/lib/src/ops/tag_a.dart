@@ -7,12 +7,12 @@ class _TagA {
 
   BuildOp get buildOp => BuildOp(
         defaultStyles: (meta, __) {
-          final styles = [kCssTextDecoration, kCssTextDecorationUnderline];
+          final styles = [_kCssTextDecoration, _kCssTextDecorationUnderline];
 
           if (wf.hyperlinkColor != null) {
             styles.addAll([
-              kCssColor,
-              convertColorToHex(wf.hyperlinkColor),
+              _kCssColor,
+              _convertColorToHex(wf.hyperlinkColor),
             ]);
           }
 
@@ -22,26 +22,29 @@ class _TagA {
           final onTap = _buildGestureTapCallback(meta);
           if (onTap == null) return pieces;
 
+          final recognizer =
+              TapGestureRecognizer(debugOwner: meta.domElement.outerHtml)
+                ..onTap = onTap;
+
           return pieces.map(
             (piece) => piece.hasWidgets
-                ? BuiltPieceSimple(
-                    widgets: IWidgetPlaceholder.wrap(
-                        piece.widgets, wf.buildGestureDetectors, wf, onTap),
-                  )
-                : _buildBlock(piece, onTap),
+                ? BuiltPiece.widgets(WidgetPlaceholder.wrap(
+                    piece.widgets, wf.buildGestureDetectors, wf, onTap))
+                : _buildBlock(meta, piece, onTap, recognizer),
           );
         },
       );
 
-  BuiltPiece _buildBlock(BuiltPiece piece, GestureTapCallback onTap) => piece
-    ..block.rebuildBits((b) => b is WidgetBit
-        ? b.rebuild(
-            child: GestureDetector(
-              child: b.widgetSpan.child,
-              onTap: onTap,
-            ),
-          )
-        : b is DataBit ? b.rebuild(onTap: onTap) : b);
+  BuiltPiece _buildBlock(
+    NodeMetadata meta,
+    BuiltPiece piece,
+    GestureTapCallback onTap,
+    GestureRecognizer recognizer,
+  ) =>
+      piece
+        ..text.bits.forEach((bit) => bit is TextWidget
+            ? bit.widget?.wrapWith(wf.buildGestureDetectors, onTap)
+            : bit.tsb?.recognizer = recognizer);
 
   GestureTapCallback _buildGestureTapCallback(NodeMetadata meta) {
     final attrs = meta.domElement.attributes;

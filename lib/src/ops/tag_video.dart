@@ -55,5 +55,5 @@ class _TagVideoSource extends StatelessWidget {
   _TagVideoSource(this.url);
 
   @override
-  Widget build(BuildContext context) => core.widget0;
+  Widget build(BuildContext context) => widget0;
 }

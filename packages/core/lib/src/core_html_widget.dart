@@ -2,14 +2,14 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:html/parser.dart' as parser;
 
-import 'builder.dart' as core;
+import 'builder.dart';
+import 'core_data.dart';
 import 'core_widget_factory.dart';
-import 'data_classes.dart';
 
 TextStyle _rootTextStyleBuilder(
   TextStyleBuilders _,
   TextStyle parent,
-  HtmlWidgetConfig config,
+  HtmlConfig config,
 ) {
   var style = config.textStyle;
   if (style == null) return parent;
@@ -17,9 +17,10 @@ TextStyle _rootTextStyleBuilder(
   return style;
 }
 
-/// A widget that builds Flutter widget tree from html.
+/// A widget that builds Flutter widget tree from HTML
+/// (supports most popular tags and stylings).
 class HtmlWidget extends StatefulWidget {
-  /// The flag to control whether or not to cache built widget tree.
+  /// Controls whether the built widget tree is cached between rebuild.
   final bool enableCaching;
 
   /// The input string.
@@ -29,9 +30,9 @@ class HtmlWidget extends StatefulWidget {
   final String html;
 
   /// The custom [WidgetFactory] builder.
-  final FactoryBuilder factoryBuilder;
+  final WidgetFactory Function(HtmlConfig) factoryBuilder;
 
-  final HtmlWidgetConfig _config;
+  final HtmlConfig _config;
 
   /// Creates a widget that builds Flutter widget tree from html.
   ///
@@ -41,7 +42,7 @@ class HtmlWidget extends StatefulWidget {
     this.enableCaching = true,
     this.factoryBuilder,
     Key key,
-    HtmlWidgetConfig config,
+    HtmlConfig config,
     Uri baseUrl,
     EdgeInsets bodyPadding = const EdgeInsets.all(10),
     NodeMetadataCollector builderCallback,
@@ -51,7 +52,7 @@ class HtmlWidget extends StatefulWidget {
     TextStyle textStyle = const TextStyle(),
   })  : assert(html != null),
         _config = config ??
-            HtmlWidgetConfig(
+            HtmlConfig(
               baseUrl: baseUrl,
               bodyPadding: bodyPadding,
               builderCallback: builderCallback,
@@ -63,10 +64,11 @@ class HtmlWidget extends StatefulWidget {
         super(key: key);
 
   @override
-  State<HtmlWidget> createState() => HtmlWidgetState();
+  State<HtmlWidget> createState() => _HtmlWidgetState();
 }
 
-class HtmlWidgetConfig {
+/// A set of configurable options to build widget.
+class HtmlConfig {
   /// The base url to resolve links and image urls.
   final Uri baseUrl;
 
@@ -77,7 +79,7 @@ class HtmlWidgetConfig {
   ///
   /// See also:
   ///
-  ///  * [core.Builder]
+  ///  * [HtmlBuilder]
   final NodeMetadataCollector builderCallback;
 
   /// The text color for link elements.
@@ -92,7 +94,8 @@ class HtmlWidgetConfig {
   /// The default styling for text elements.
   final TextStyle textStyle;
 
-  HtmlWidgetConfig({
+  /// Creates a configuration
+  HtmlConfig({
     this.baseUrl,
     this.bodyPadding,
     this.builderCallback,
@@ -103,7 +106,7 @@ class HtmlWidgetConfig {
   });
 }
 
-class HtmlWidgetState extends State<HtmlWidget> {
+class _HtmlWidgetState extends State<HtmlWidget> {
   Widget _built;
 
   @override
@@ -133,7 +136,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
         ? widget.factoryBuilder(widget._config)
         : WidgetFactory(widget._config);
 
-    final widgets = core.Builder(
+    final widgets = HtmlBuilder(
       domNodes: domNodes,
       parentTsb: TextStyleBuilders()
         ..enqueue(_rootTextStyleBuilder, widget._config),

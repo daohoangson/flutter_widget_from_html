@@ -4,30 +4,39 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'builder.dart';
+import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_html_widget.dart';
-import 'data_classes.dart';
 
 part 'ops/style_bg_color.dart';
+part 'ops/style_direction.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_text_align.dart';
+part 'ops/style_vertical_align.dart';
 part 'ops/tag_a.dart';
 part 'ops/tag_code.dart';
 part 'ops/tag_font.dart';
 part 'ops/tag_img.dart';
 part 'ops/tag_li.dart';
 part 'ops/tag_q.dart';
+part 'ops/tag_ruby.dart';
 part 'ops/tag_table.dart';
 part 'ops/text.dart';
+part 'parser/border.dart';
+part 'parser/color.dart';
+part 'parser/css.dart';
 
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
 
+/// A factory to build widget for HTML elements.
 class WidgetFactory {
-  final HtmlWidgetConfig _config;
+  final HtmlConfig _config;
 
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
   BuildOp _styleTextAlign;
+  BuildOp _styleVerticalAlign;
   BuildOp _tagA;
   BuildOp _tagBr;
   BuildOp _tagCode;
@@ -43,10 +52,13 @@ class WidgetFactory {
   Color get hyperlinkColor => _config.hyperlinkColor;
 
   Iterable<Widget> buildAligns(
-          BuilderContext bc, Iterable<Widget> widgets, Alignment alignment) =>
+    BuildContext _,
+    Iterable<Widget> widgets,
+    Alignment alignment,
+  ) =>
       widgets.map((widget) {
-        if (bc.origin is WidgetPlaceholder<TextBlock>) return widget;
-        if (widget is WidgetPlaceholder<TextBlock>) return widget;
+        final x = _childOf(widget);
+        if (x is RichText || x is WidgetPlaceholder<TextBits>) return widget;
         return Align(alignment: alignment, child: widget);
       });
 
@@ -60,12 +72,11 @@ class WidgetFactory {
         )
       : null;
 
-  static Iterable<Widget> _buildColumn(
-      BuilderContext bc, Iterable<Widget> ws, _) {
+  static Iterable<Widget> _buildColumn(BuildContext c, Iterable<Widget> ws, _) {
     final output = <Widget>[];
     final iter = ws.iterator;
     while (iter.moveNext()) {
-      if (!(iter.current is SpacingPlaceholder)) break;
+      if (!(iter.current is _MarginVerticalPlaceholder)) break;
     }
 
     if (iter.current == null) return null;
@@ -74,18 +85,18 @@ class WidgetFactory {
     while (output.isEmpty || iter.moveNext()) {
       var widget = iter.current;
 
-      if (widget is SpacingPlaceholder && prev is SpacingPlaceholder) {
+      if (widget is _MarginVerticalPlaceholder &&
+          prev is _MarginVerticalPlaceholder) {
         prev.mergeWith(widget);
         continue;
       }
 
-      if (widget is WidgetPlaceholder<TextBlock>) {
-        final WidgetPlaceholder<TextBlock> textPlaceholder = widget;
-        widget = textPlaceholder.build(bc.context);
+      if (widget is WidgetPlaceholder<TextBits>) {
+        widget = (widget as WidgetPlaceholder).build(c);
       }
 
-      if (widget is SimpleColumn) {
-        final SimpleColumn column = widget;
+      if (widget is Column) {
+        final Column column = widget;
         output.addAll(column.children);
         widget = column.children.last;
       } else {
@@ -96,7 +107,7 @@ class WidgetFactory {
     }
 
     while (output.isNotEmpty) {
-      if (output.last is SpacingPlaceholder) {
+      if (output.last is _MarginVerticalPlaceholder) {
         output.removeLast();
         continue;
       }
@@ -130,7 +141,7 @@ class WidgetFactory {
       : null;
 
   Iterable<Widget> buildGestureDetectors(
-    BuilderContext bc,
+    BuildContext _,
     Iterable<Widget> widgets,
     GestureTapCallback onTap,
   ) =>
@@ -165,7 +176,7 @@ class WidgetFactory {
 
     final prefix = match[0];
     final bytes = base64.decode(dataUri.substring(prefix.length));
-    if (bytes.length == 0) return null;
+    if (bytes.isEmpty) return null;
 
     return bytes;
   }
@@ -205,17 +216,13 @@ class WidgetFactory {
   TableCell buildTableCell(Widget child) => TableCell(
       child: buildPadding(child, _config.tableCellPadding) ?? widget0);
 
-  Iterable<Widget> buildText(
-    BuilderContext bc,
-    Iterable<Widget> _,
-    TextBlock block,
-  ) {
-    final tsb = block.tsb;
-    tsb?.build(bc);
+  Iterable<Widget> buildText(BuildContext c, Iterable<Widget> _, TextBits t) {
+    final tsb = t.tsb;
+    tsb?.build(c);
 
-    final textScaleFactor = MediaQuery.of(bc.context).textScaleFactor;
+    final textScaleFactor = MediaQuery.of(c).textScaleFactor;
     final widgets = <Widget>[];
-    for (final compiled in _TextBlockCompiler(block).compile(bc)) {
+    for (final compiled in _TextCompiler(t).compile(c)) {
       if (compiled is InlineSpan) {
         widgets.add(RichText(
           text: compiled,
@@ -261,28 +268,28 @@ class WidgetFactory {
     if (value == null) return null;
 
     final parsed = parseCssLength(value);
-    if (parsed != null) return parsed.getValue(tsb.bc, m.tsb);
+    if (parsed != null) return parsed.getValue(tsb.context, m.tsb);
 
-    final c = tsb.bc.context;
+    final c = tsb.context;
     switch (value) {
-      case kCssFontSizeXxLarge:
+      case _kCssFontSizeXxLarge:
         return DefaultTextStyle.of(c).style.fontSize * 2.0;
-      case kCssFontSizeXLarge:
+      case _kCssFontSizeXLarge:
         return DefaultTextStyle.of(c).style.fontSize * 1.5;
-      case kCssFontSizeLarge:
+      case _kCssFontSizeLarge:
         return DefaultTextStyle.of(c).style.fontSize * 1.125;
-      case kCssFontSizeMedium:
+      case _kCssFontSizeMedium:
         return DefaultTextStyle.of(c).style.fontSize;
-      case kCssFontSizeSmall:
+      case _kCssFontSizeSmall:
         return DefaultTextStyle.of(c).style.fontSize * .8125;
-      case kCssFontSizeXSmall:
+      case _kCssFontSizeXSmall:
         return DefaultTextStyle.of(c).style.fontSize * .625;
-      case kCssFontSizeXxSmall:
+      case _kCssFontSizeXxSmall:
         return DefaultTextStyle.of(c).style.fontSize * .5625;
 
-      case kCssFontSizeLarger:
+      case _kCssFontSizeLarger:
         return p.fontSize * 1.2;
-      case kCssFontSizeSmaller:
+      case _kCssFontSizeSmaller:
         return p.fontSize * (15 / 18);
     }
 
@@ -330,35 +337,35 @@ class WidgetFactory {
 
   String getListStyleMarker(String type, int i) {
     switch (type) {
-      case kCssListStyleTypeAlphaLower:
-      case kCssListStyleTypeAlphaLatinLower:
+      case _kCssListStyleTypeAlphaLower:
+      case _kCssListStyleTypeAlphaLatinLower:
         if (i >= 1 && i <= 26) {
           // the specs said it's unspecified after the 26th item
           // TODO: generate something like aa, ab, etc. when needed
           return "${String.fromCharCode(96 + i)}.";
         }
         return '';
-      case kCssListStyleTypeAlphaUpper:
-      case kCssListStyleTypeAlphaLatinUpper:
+      case _kCssListStyleTypeAlphaUpper:
+      case _kCssListStyleTypeAlphaLatinUpper:
         if (i >= 1 && i <= 26) {
           // the specs said it's unspecified after the 26th item
           // TODO: generate something like AA, AB, etc. when needed
           return "${String.fromCharCode(64 + i)}.";
         }
         return '';
-      case kCssListStyleTypeCircle:
+      case _kCssListStyleTypeCircle:
         return '-';
-      case kCssListStyleTypeDecimal:
+      case _kCssListStyleTypeDecimal:
         return "$i.";
-      case kCssListStyleTypeDisc:
+      case _kCssListStyleTypeDisc:
         return '•';
-      case kCssListStyleTypeRomanLower:
+      case _kCssListStyleTypeRomanLower:
         final roman = getListStyleMarkerRoman(i)?.toLowerCase();
         return roman != null ? "$roman." : '';
-      case kCssListStyleTypeRomanUpper:
+      case _kCssListStyleTypeRomanUpper:
         final roman = getListStyleMarkerRoman(i);
         return roman != null ? "$roman." : '';
-      case kCssListStyleTypeSquare:
+      case _kCssListStyleTypeSquare:
         return '+';
     }
 
@@ -391,8 +398,184 @@ class WidgetFactory {
     return meta;
   }
 
-  NodeMetadata parseLocalName(NodeMetadata meta, String localName) {
-    switch (localName) {
+  Color parseColor(String value) => _parseColor(value);
+
+  CssBorderSide parseCssBorderSide(String value) =>
+      _parseCssBorderSide(this, value);
+
+  TextDecorationStyle parseCssBorderStyle(String value) =>
+      _parseCssBorderStyle(value);
+
+  CssLength parseCssLength(String value) => _parseCssLength(value);
+
+  CssMargin parseCssMargin(NodeMetadata meta) => _parseCssMargin(this, meta);
+
+  CssMargin parseCssMarginAll(String value) => _parseCssMarginAll(this, value);
+
+  CssMargin parseCssMarginOne(CssMargin existing, String key, String value) =>
+      _parseCssMarginOne(this, existing, key, value);
+
+  NodeMetadata parseStyle(NodeMetadata meta, String key, String value) {
+    switch (key) {
+      case _kCssBackgroundColor:
+        meta = lazySet(meta, buildOp: styleBgColor());
+        break;
+
+      case _kCssBorderBottom:
+        final borderBottom = parseCssBorderSide(value);
+        if (borderBottom != null) {
+          meta = lazySet(
+            meta,
+            decoUnder: true,
+            decorationStyle: borderBottom.style,
+          );
+        } else {
+          meta = lazySet(meta, decoUnder: false);
+        }
+        break;
+      case _kCssBorderTop:
+        final borderTop = parseCssBorderSide(value);
+        if (borderTop != null) {
+          meta = lazySet(
+            meta,
+            decoOver: true,
+            decorationStyle: borderTop.style,
+          );
+        } else {
+          meta = lazySet(meta, decoOver: false);
+        }
+        break;
+
+      case _kCssColor:
+        final color = parseColor(value);
+        if (color != null) meta = lazySet(meta, color: color);
+        break;
+
+      case _kCssDirection:
+        meta = lazySet(meta, buildOp: styleDirection(value));
+        break;
+
+      case _kCssDisplay:
+        switch (value) {
+          case _kCssDisplayBlock:
+            meta = lazySet(meta, isBlockElement: true);
+            break;
+          case _kCssDisplayInline:
+          case _kCssDisplayInlineBlock:
+            meta = lazySet(meta, isBlockElement: false);
+            break;
+          case _kCssDisplayNone:
+            meta = lazySet(meta, isNotRenderable: true);
+            break;
+        }
+        break;
+
+      case _kCssFontFamily:
+        meta = lazySet(meta, fontFamily: value);
+        break;
+
+      case _kCssFontSize:
+        meta = lazySet(meta, fontSize: value);
+        break;
+
+      case _kCssFontStyle:
+        switch (value) {
+          case _kCssFontStyleItalic:
+            meta = lazySet(meta, fontStyleItalic: true);
+            break;
+          case _kCssFontStyleNormal:
+            meta = lazySet(meta, fontStyleItalic: false);
+            break;
+        }
+        break;
+
+      case _kCssFontWeight:
+        switch (value) {
+          case _kCssFontWeightBold:
+            meta = lazySet(meta, fontWeight: FontWeight.bold);
+            break;
+          case _kCssFontWeight100:
+            meta = lazySet(meta, fontWeight: FontWeight.w100);
+            break;
+          case _kCssFontWeight200:
+            meta = lazySet(meta, fontWeight: FontWeight.w200);
+            break;
+          case _kCssFontWeight300:
+            meta = lazySet(meta, fontWeight: FontWeight.w300);
+            break;
+          case _kCssFontWeight400:
+            meta = lazySet(meta, fontWeight: FontWeight.w400);
+            break;
+          case _kCssFontWeight500:
+            meta = lazySet(meta, fontWeight: FontWeight.w500);
+            break;
+          case _kCssFontWeight600:
+            meta = lazySet(meta, fontWeight: FontWeight.w600);
+            break;
+          case _kCssFontWeight700:
+            meta = lazySet(meta, fontWeight: FontWeight.w700);
+            break;
+          case _kCssFontWeight800:
+            meta = lazySet(meta, fontWeight: FontWeight.w800);
+            break;
+          case _kCssFontWeight900:
+            meta = lazySet(meta, fontWeight: FontWeight.w900);
+            break;
+        }
+        break;
+
+      case _kCssMargin:
+      case _kCssMarginBottom:
+      case _kCssMarginEnd:
+      case _kCssMarginLeft:
+      case _kCssMarginRight:
+      case _kCssMarginStart:
+      case _kCssMarginTop:
+        meta = lazySet(meta, buildOp: styleMargin());
+        break;
+
+      case _kCssTextAlign:
+        meta = lazySet(meta, buildOp: styleTextAlign());
+        break;
+
+      case _kCssTextDecoration:
+        for (final v in _splitCss(value)) {
+          switch (v) {
+            case _kCssTextDecorationLineThrough:
+              meta = lazySet(meta, decoStrike: true);
+              break;
+            case _kCssTextDecorationNone:
+              meta = lazySet(
+                meta,
+                decoStrike: false,
+                decoOver: false,
+                decoUnder: false,
+              );
+              break;
+            case _kCssTextDecorationOverline:
+              meta = lazySet(meta, decoOver: true);
+              break;
+            case _kCssTextDecorationUnderline:
+              meta = lazySet(meta, decoUnder: true);
+              break;
+          }
+        }
+        break;
+
+      case _kCssVerticalAlign:
+        meta = lazySet(meta, buildOp: styleVerticalAlign());
+        break;
+    }
+
+    return meta;
+  }
+
+  NodeMetadata parseTag(
+    NodeMetadata meta,
+    String tag,
+    Map<dynamic, String> attributes,
+  ) {
+    switch (tag) {
       case 'a':
         meta = lazySet(meta, buildOp: tagA());
         break;
@@ -424,7 +607,7 @@ class WidgetFactory {
 
       case 'blockquote':
       case 'figure':
-        meta = lazySet(meta, styles: [kCssMargin, '1em 40px']);
+        meta = lazySet(meta, styles: [_kCssMargin, '1em 40px']);
         break;
 
       case 'b':
@@ -433,7 +616,7 @@ class WidgetFactory {
         break;
 
       case 'big':
-        meta = lazySet(meta, fontSize: kCssFontSizeLarger);
+        meta = lazySet(meta, fontSize: _kCssFontSizeLarger);
         break;
 
       case 'br':
@@ -441,7 +624,7 @@ class WidgetFactory {
         break;
 
       case 'center':
-        meta = lazySet(meta, styles: [kCssTextAlign, kCssTextAlignCenter]);
+        meta = lazySet(meta, styles: [_kCssTextAlign, _kCssTextAlignCenter]);
         break;
 
       case 'cite':
@@ -452,14 +635,14 @@ class WidgetFactory {
         meta = lazySet(meta, fontStyleItalic: true);
         break;
 
-      case kTagCode:
-      case kTagPre:
-      case kTagTt:
+      case _kTagCode:
+      case _kTagPre:
+      case _kTagTt:
         meta = lazySet(meta, buildOp: tagCode());
         break;
 
       case 'dd':
-        meta = lazySet(meta, styles: [kCssMargin, '0 0 1em 40px']);
+        meta = lazySet(meta, styles: [_kCssMargin, '0 0 1em 40px']);
         break;
       case 'dl':
         meta = lazySet(meta, isBlockElement: true);
@@ -487,7 +670,7 @@ class WidgetFactory {
           meta,
           fontSize: '2em',
           fontWeight: FontWeight.bold,
-          styles: [kCssMargin, '0.67em 0'],
+          styles: [_kCssMargin, '0.67em 0'],
         );
         break;
       case 'h2':
@@ -495,7 +678,7 @@ class WidgetFactory {
           meta,
           fontSize: '1.5em',
           fontWeight: FontWeight.bold,
-          styles: [kCssMargin, '0.83em 0'],
+          styles: [_kCssMargin, '0.83em 0'],
         );
         break;
       case 'h3':
@@ -503,14 +686,14 @@ class WidgetFactory {
           meta,
           fontSize: '1.17em',
           fontWeight: FontWeight.bold,
-          styles: [kCssMargin, '1em 0'],
+          styles: [_kCssMargin, '1em 0'],
         );
         break;
       case 'h4':
         meta = lazySet(
           meta,
           fontWeight: FontWeight.bold,
-          styles: [kCssMargin, '1.33em 0'],
+          styles: [_kCssMargin, '1.33em 0'],
         );
         break;
       case 'h5':
@@ -518,7 +701,7 @@ class WidgetFactory {
           meta,
           fontSize: '0.83em',
           fontWeight: FontWeight.bold,
-          styles: [kCssMargin, '1.67em 0'],
+          styles: [_kCssMargin, '1.67em 0'],
         );
         break;
       case 'h6':
@@ -526,13 +709,14 @@ class WidgetFactory {
           meta,
           fontSize: '0.67em',
           fontWeight: FontWeight.bold,
-          styles: [kCssMargin, '2.33em 0'],
+          styles: [_kCssMargin, '2.33em 0'],
         );
         break;
 
       case 'iframe':
       case 'script':
       case 'style':
+      case 'svg':
         // actually `script` and `style` are not required here
         // our parser will put those elements into document.head anyway
         meta = lazySet(meta, isNotRenderable: true);
@@ -552,178 +736,65 @@ class WidgetFactory {
         meta = lazySet(meta, fontFamily: 'monospace');
         break;
 
-      case kTagOrderedList:
-      case kTagUnorderedList:
+      case _kTagOrderedList:
+      case _kTagUnorderedList:
         meta = lazySet(meta, buildOp: tagLi());
         break;
 
       case 'mark':
         meta = lazySet(
           meta,
-          styles: [kCssBackgroundColor, '#ff0', kCssColor, '#000'],
+          styles: [_kCssBackgroundColor, '#ff0', _kCssColor, '#000'],
         );
         break;
 
       case 'p':
-        meta = lazySet(meta, styles: [kCssMargin, '1em 0']);
+        meta = lazySet(meta, styles: [_kCssMargin, '1em 0']);
         break;
 
-      case kTagQ:
+      case 'q':
         meta = lazySet(meta, buildOp: tagQ());
         break;
 
-      case 'small':
-        meta = lazySet(meta, fontSize: kCssFontSizeSmaller);
+      case _kTagRuby:
+        meta = lazySet(meta, buildOp: tagRuby());
         break;
 
-      case kTagTable:
+      case 'small':
+        meta = lazySet(meta, fontSize: _kCssFontSizeSmaller);
+        break;
+
+      case 'sub':
+        meta = lazySet(meta, styles: [
+          _kCssFontSize,
+          _kCssFontSizeSmaller,
+          _kCssVerticalAlign,
+          _kCssVerticalAlignSub,
+        ]);
+        break;
+      case 'sup':
+        meta = lazySet(meta, styles: [
+          _kCssFontSize,
+          _kCssFontSizeSmaller,
+          _kCssVerticalAlign,
+          _kCssVerticalAlignSuper,
+        ]);
+        break;
+
+      case _kTagTable:
         meta = lazySet(meta, buildOp: tagTable());
         break;
     }
 
-    return meta;
-  }
-
-  NodeMetadata parseStyle(NodeMetadata meta, String key, String value) {
-    switch (key) {
-      case kCssBackgroundColor:
-        meta = lazySet(meta, buildOp: styleBgColor());
-        break;
-
-      case kCssBorderBottom:
-        final borderBottom = parseCssBorderSide(value);
-        if (borderBottom != null) {
-          meta = lazySet(
-            meta,
-            decoUnder: true,
-            decorationStyleFromCssBorderStyle: borderBottom.style,
-          );
-        } else {
-          meta = lazySet(meta, decoUnder: false);
-        }
-        break;
-      case kCssBorderTop:
-        final borderTop = parseCssBorderSide(value);
-        if (borderTop != null) {
-          meta = lazySet(
-            meta,
-            decoOver: true,
-            decorationStyleFromCssBorderStyle: borderTop.style,
-          );
-        } else {
-          meta = lazySet(meta, decoOver: false);
-        }
-        break;
-
-      case kCssColor:
-        final color = parseColor(value);
-        if (color != null) meta = lazySet(meta, color: color);
-        break;
-
-      case kCssDisplay:
-        switch (value) {
-          case kCssDisplayBlock:
-            meta = lazySet(meta, isBlockElement: true);
-            break;
-          case kCssDisplayInline:
-          case kCssDisplayInlineBlock:
-            meta = lazySet(meta, isBlockElement: false);
-            break;
-          case kCssDisplayNone:
-            meta = lazySet(meta, isNotRenderable: true);
-            break;
-        }
-        break;
-
-      case kCssFontFamily:
-        meta = lazySet(meta, fontFamily: value);
-        break;
-
-      case kCssFontSize:
-        meta = lazySet(meta, fontSize: value);
-        break;
-
-      case kCssFontStyle:
-        switch (value) {
-          case kCssFontStyleItalic:
-            meta = lazySet(meta, fontStyleItalic: true);
-            break;
-          case kCssFontStyleNormal:
-            meta = lazySet(meta, fontStyleItalic: false);
-            break;
-        }
-        break;
-
-      case kCssFontWeight:
-        switch (value) {
-          case kCssFontWeightBold:
-            meta = lazySet(meta, fontWeight: FontWeight.bold);
-            break;
-          case kCssFontWeight100:
-            meta = lazySet(meta, fontWeight: FontWeight.w100);
-            break;
-          case kCssFontWeight200:
-            meta = lazySet(meta, fontWeight: FontWeight.w200);
-            break;
-          case kCssFontWeight300:
-            meta = lazySet(meta, fontWeight: FontWeight.w300);
-            break;
-          case kCssFontWeight400:
-            meta = lazySet(meta, fontWeight: FontWeight.w400);
-            break;
-          case kCssFontWeight500:
-            meta = lazySet(meta, fontWeight: FontWeight.w500);
-            break;
-          case kCssFontWeight600:
-            meta = lazySet(meta, fontWeight: FontWeight.w600);
-            break;
-          case kCssFontWeight700:
-            meta = lazySet(meta, fontWeight: FontWeight.w700);
-            break;
-          case kCssFontWeight800:
-            meta = lazySet(meta, fontWeight: FontWeight.w800);
-            break;
-          case kCssFontWeight900:
-            meta = lazySet(meta, fontWeight: FontWeight.w900);
-            break;
-        }
-        break;
-
-      case kCssMargin:
-      case kCssMarginBottom:
-      case kCssMarginLeft:
-      case kCssMarginRight:
-      case kCssMarginTop:
-        meta = lazySet(meta, buildOp: styleMargin());
-        break;
-
-      case kCssTextAlign:
-        meta = lazySet(meta, buildOp: styleTextAlign());
-        break;
-
-      case kCssTextDecoration:
-        for (final v in splitCss(value)) {
-          switch (v) {
-            case kCssTextDecorationLineThrough:
-              meta = lazySet(meta, decoStrike: true);
-              break;
-            case kCssTextDecorationNone:
-              meta = lazySet(
-                meta,
-                decoStrike: false,
-                decoOver: false,
-                decoUnder: false,
-              );
-              break;
-            case kCssTextDecorationOverline:
-              meta = lazySet(meta, decoOver: true);
-              break;
-            case kCssTextDecorationUnderline:
-              meta = lazySet(meta, decoUnder: true);
-              break;
-          }
-        }
-        break;
+    for (final attribute in attributes.entries) {
+      switch (attribute.key) {
+        case _kAttributeAlign:
+          meta = lazySet(meta, styles: [_kCssTextAlign, attribute.value]);
+          break;
+        case _kAttributeDir:
+          meta = lazySet(meta, styles: [_kCssDirection, attribute.value]);
+          break;
+      }
     }
 
     return meta;
@@ -733,6 +804,8 @@ class WidgetFactory {
     _styleBgColor ??= _StyleBgColor(this).buildOp;
     return _styleBgColor;
   }
+
+  BuildOp styleDirection(final String dir) => _styleDirection(this, dir);
 
   BuildOp styleMargin() {
     _styleMargin ??= _StyleMargin(this).buildOp;
@@ -744,6 +817,11 @@ class WidgetFactory {
     return _styleTextAlign;
   }
 
+  BuildOp styleVerticalAlign() {
+    _styleVerticalAlign ??= _StyleVerticalAlign(this).buildOp;
+    return _styleVerticalAlign;
+  }
+
   BuildOp tagA() {
     _tagA ??= _TagA(this).buildOp;
     return _tagA;
@@ -751,7 +829,8 @@ class WidgetFactory {
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      onPieces: (_, pieces) => pieces..last.block.addSpace('\n'),
+      onPieces: (_, pieces) =>
+          pieces..last.text.addWhitespace(TextWhitespaceType.newLine),
     );
     return _tagBr;
   }
@@ -768,7 +847,7 @@ class WidgetFactory {
 
   BuildOp tagHr() {
     _tagHr ??= BuildOp(
-      defaultStyles: (_, __) => const [kCssMarginBottom, '1em'],
+      defaultStyles: (_, __) => const [_kCssMarginBottom, '1em'],
       onWidgets: (_, __) => [buildDivider()],
     );
     return _tagHr;
@@ -789,8 +868,12 @@ class WidgetFactory {
     return _tagQ;
   }
 
+  BuildOp tagRuby() => _TagRuby(this).buildOp;
+
   BuildOp tagTable() {
     _tagTable ??= _TagTable(this).buildOp;
     return _tagTable;
   }
 }
+
+Iterable<Widget> _listOrNull(Widget x) => x == null ? null : [x];
