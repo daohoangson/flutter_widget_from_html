@@ -128,7 +128,7 @@ class _WebViewState extends State<WebView> {
     if (widget.interceptNavigationRequest != null &&
         req.type != lib.NavigationType.other &&
         req.isForMainFrame &&
-        _knownUrls.indexOf(req.url) == -1) {
+        !_knownUrls.contains(req.url)) {
       intercepted = widget.interceptNavigationRequest(req.url);
     }
 
@@ -138,7 +138,7 @@ class _WebViewState extends State<WebView> {
   }
 
   void _onPageFinished(String url) {
-    if (_knownUrls.indexOf(url) == -1) _knownUrls.add(url);
+    if (!_knownUrls.contains(url)) _knownUrls.add(url);
 
     if (widget.getDimensions == true) {
       widget.getDimensionsDurations.forEach((t) => t == null
