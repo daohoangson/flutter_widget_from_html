@@ -210,11 +210,33 @@ class WidgetFactory {
           ? Padding(child: child, padding: padding)
           : child;
 
-  Widget buildTable(List<TableRow> rows, {TableBorder border}) =>
-      rows?.isNotEmpty == true ? Table(border: border, children: rows) : null;
+  Widget buildTable(TableLayout tableLayout, {TableBorder border}) {
+    final rows = <TableRow>[];
+    final tableCols = tableLayout.cols;
+    final cellIndices = <int>[];
 
-  TableCell buildTableCell(Widget child) => TableCell(
-      child: buildPadding(child, _config.tableCellPadding) ?? widget0);
+    for (final entryRow in tableLayout.grid.entries) {
+      final cells = List<Widget>(tableCols);
+      for (var i = 0; i < tableCols; i++) {
+        final cellIndex = entryRow.value[i];
+        if (cellIndex == null || cellIndices.contains(cellIndex)) {
+          cells[i] = widget0;
+          continue;
+        }
+
+        cellIndices.add(cellIndex);
+        cells[i] = buildTableCell(tableLayout.cells[cellIndex].children);
+      }
+
+      rows.add(TableRow(children: cells));
+    }
+
+    return Table(border: border, children: rows);
+  }
+
+  TableCell buildTableCell(Iterable<Widget> children) => TableCell(
+      child: buildPadding(buildColumn(children), _config.tableCellPadding) ??
+          widget0);
 
   Iterable<Widget> buildText(BuildContext c, Iterable<Widget> _, TextBits t) {
     final tsb = t.tsb;

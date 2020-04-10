@@ -1,7 +1,5 @@
 import 'package:flutter/widgets.dart';
 
-import 'core_widget_factory.dart';
-
 part 'widget/image_layout.dart';
 
 /// A no op placeholder widget.
@@ -16,15 +14,23 @@ class WidgetPlaceholder<T1> extends StatelessWidget {
   final _builders = List<Function>();
   final Iterable<Widget> _firstChildren;
   final _inputs = [];
+  final WidgetPlaceholderBuilder<T1> _lastBuilder;
+  final T1 _lastInput;
 
   WidgetPlaceholder({
-    @required WidgetPlaceholderBuilder<T1> builder,
+    WidgetPlaceholderBuilder<T1> builder,
     Iterable<Widget> children,
     T1 input,
-  })  : assert(builder != null),
-        _firstChildren = children {
-    _builders.add(builder);
-    _inputs.add(input);
+    WidgetPlaceholderBuilder<T1> lastBuilder,
+  })  : assert((builder == null) != (lastBuilder == null),
+            'Either builder or lastBuilder must be set'),
+        _firstChildren = children,
+        _lastBuilder = lastBuilder,
+        _lastInput = (lastBuilder != null ? input : null) {
+    if (builder != null) {
+      _builders.add(builder);
+      _inputs.add(input);
+    }
   }
 
   Iterable<Function> get builders => _builders.skip(0);
@@ -35,9 +41,12 @@ class WidgetPlaceholder<T1> extends StatelessWidget {
   Widget build(BuildContext context) {
     Iterable<Widget> output = _firstChildren;
 
-    final l = _builders.length;
-    for (int i = 0; i < l; i++) {
+    for (var i = 0; i < _builders.length; i++) {
       output = _builders[i](context, output, _inputs[i]);
+    }
+
+    if (_lastBuilder != null) {
+      output = _lastBuilder(context, output, _lastInput);
     }
 
     output = output?.where((widget) => widget != null);
@@ -59,13 +68,12 @@ class WidgetPlaceholder<T1> extends StatelessWidget {
 
   static Iterable<Widget> wrap<T2>(
     Iterable<Widget> widgets,
-    WidgetPlaceholderBuilder<T2> builder,
-    WidgetFactory wf, [
+    WidgetPlaceholderBuilder<T2> builder, [
     T2 input,
   ]) {
     final wrapped = List<Widget>(widgets.length);
 
-    int i = 0;
+    var i = 0;
     for (final widget in widgets) {
       if (widget is WidgetPlaceholder) {
         wrapped[i++] = widget..wrapWith(builder, input);

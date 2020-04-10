@@ -217,7 +217,7 @@ void main() {
     testWidgets('#80: empty TD', (WidgetTester tester) async {
       final html = '<table><tr><td></td></tr></table>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Table:\n[widget0]\n]'));
+      expect(explained, equals('[widget0]'));
     });
 
     testWidgets('empty TR', (WidgetTester tester) async {

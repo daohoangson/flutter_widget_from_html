@@ -5,6 +5,7 @@ import 'package:html/dom.dart' as dom;
 import 'builder.dart';
 import 'core_helpers.dart';
 
+part 'data/table_layout.dart';
 part 'data/text_bits.dart';
 
 class BuildOp {
@@ -185,8 +186,7 @@ class TextStyleBuilders {
       _output = parent.build(_context);
     }
 
-    final l = _builders.length;
-    for (int i = 0; i < l; i++) {
+    for (var i = 0; i < _builders.length; i++) {
       _output = _builders[i](this, _output, _inputs[i]);
     }
 
