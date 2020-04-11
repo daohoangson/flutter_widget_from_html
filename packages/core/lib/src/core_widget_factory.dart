@@ -210,7 +210,7 @@ class WidgetFactory {
           ? Padding(child: child, padding: padding)
           : child;
 
-  Widget buildTable(TableLayout tableLayout, {TableBorder border}) {
+  Widget buildTable(TableLayout tableLayout, {BorderSide border}) {
     final rows = <TableRow>[];
     final tableCols = tableLayout.cols;
     final cellIndices = <int>[];
@@ -231,7 +231,10 @@ class WidgetFactory {
       rows.add(TableRow(children: cells));
     }
 
-    return Table(border: border, children: rows);
+    final tableBorder = border != null
+        ? TableBorder.symmetric(inside: border, outside: border)
+        : null;
+    return Table(border: tableBorder, children: rows);
   }
 
   TableCell buildTableCell(Iterable<Widget> children) => TableCell(

@@ -248,7 +248,12 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
   </li>
   <li>Three</li>
 </ul>""",
-    'TABLE': """<table>
+    'TABLE/border_0': """<table>
+      <caption>Caption</caption>
+      <tr><th>Header 1</th><th>Header 2</th></tr>
+      <tr><td>Value 1</td><td>Value 2</td></tr>
+    </table>""",
+    'TABLE/border_1': """<table border="1">
       <caption>Caption</caption>
       <tr><th>Header 1</th><th>Header 2</th></tr>
       <tr><td>Value 1</td><td>Value 2</td></tr>

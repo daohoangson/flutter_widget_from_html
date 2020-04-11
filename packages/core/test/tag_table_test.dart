@@ -126,19 +126,16 @@ void main() {
       );
     });
 
-    testWidgets(
-      'renders style="border: 1px solid #f00"',
-      (WidgetTester tester) async {
-        final html = '<table style="border: 1px solid #f00">' +
-            '<tr><td>Foo</td></tr></table>';
-        final explained = await explain(tester, html);
-        expect(
-          explained,
-          equals('[Table:border=(Color(0xffff0000),w=1.0)\n'
-              '[RichText:(:Foo)]\n]'),
-        );
-      },
-    );
+    testWidgets('renders style="border: 1px solid #f00"', (tester) async {
+      final html = '<table style="border: 1px solid #f00">' +
+          '<tr><td>Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals('[Table:border=(Color(0xffff0000),w=1.0)\n'
+            '[RichText:(:Foo)]\n]'),
+      );
+    });
 
     testWidgets('#70: renders border=1 with inline `text-align`', (t) async {
       final html = '<table border="1" style="text-align: left">'

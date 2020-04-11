@@ -127,18 +127,18 @@ class _TagTable {
       }
     }
 
-    final border = _parseTableBorder(c, m);
+    final border = _parseBorderSide(c, m);
     widgets.add(wf.buildTable(tableLayout, border: border));
 
     return [wf.buildColumn(widgets)];
   }
 
-  TableBorder _parseTableBorder(BuildContext context, NodeMetadata meta) {
+  BorderSide _parseBorderSide(BuildContext context, NodeMetadata meta) {
     String styleBorder = meta.style(_kCssBorder);
     if (styleBorder != null) {
       final borderParsed = wf.parseCssBorderSide(styleBorder);
       if (borderParsed != null) {
-        return TableBorder.all(
+        return BorderSide(
           color: borderParsed.color ?? const Color(0xFF000000),
           width: borderParsed.width.getValue(context, meta.tsb),
         );
@@ -149,7 +149,7 @@ class _TagTable {
     if (a.containsKey(_kTagTableAttrBorder)) {
       final width = double.tryParse(a[_kTagTableAttrBorder]);
       if (width != null && width > 0) {
-        return TableBorder.all(width: width);
+        return BorderSide(width: width);
       }
     }
 
