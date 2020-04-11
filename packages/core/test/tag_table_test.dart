@@ -235,4 +235,28 @@ void main() {
       expect(explained, equals('[widget0]'));
     });
   });
+
+  group('display: table', () {
+    testWidgets('renders basic table', (WidgetTester tester) async {
+      final html = """<div style="display: table">
+      <div style="display: table-caption; text-align: center">Caption</div>
+      <div style="display: table-row; font-weight: bold">
+        <span style="display: table-cell">Header 1</span>
+        <span style="display: table-cell">Header 2</span>
+      </div>
+      <div style="display: table-row">
+        <span style="display: table-cell">Value 1</span>
+        <span style="display: table-cell">Value 2</span>
+      </div>
+    </div>""";
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals(
+              '[Column:children=[RichText,align=center:(:Caption)],[Table:\n' +
+                  '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n' +
+                  '[RichText:(:Value 1)] | [RichText:(:Value 2)]\n' +
+                  ']]'));
+    });
+  });
 }

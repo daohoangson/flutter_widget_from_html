@@ -84,11 +84,11 @@ class TableLayoutRow extends StatelessWidget {
       prev > cell.rowspan ? prev : cell.rowspan;
 }
 
-class TableLayoutSet extends StatelessWidget {
+class TableLayoutGroup extends StatelessWidget {
   final Iterable<TableLayoutRow> rows;
   final String type;
 
-  const TableLayoutSet({
+  const TableLayoutGroup({
     Key key,
     @required this.rows,
     @required this.type,

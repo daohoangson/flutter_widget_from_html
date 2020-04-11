@@ -248,15 +248,29 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
   </li>
   <li>Three</li>
 </ul>""",
-    'TABLE/border_0': """<table>
-      <caption>Caption</caption>
-      <tr><th>Header 1</th><th>Header 2</th></tr>
-      <tr><td>Value 1</td><td>Value 2</td></tr>
-    </table>""",
-    'TABLE/border_1': """<table border="1">
-      <caption>Caption</caption>
-      <tr><th>Header 1</th><th>Header 2</th></tr>
-      <tr><td>Value 1</td><td>Value 2</td></tr>
-    </table>""",
+    'TABLE/border_0': """
+<table>
+  <caption>Caption</caption>
+  <tr><th>Header 1</th><th>Header 2</th></tr>
+  <tr><td>Value 1</td><td>Value 2</td></tr>
+</table>""",
+    'TABLE/border_1': """
+<table border="1">
+  <caption>Caption</caption>
+  <tr><th>Header 1</th><th>Header 2</th></tr>
+  <tr><td>Value 1</td><td>Value 2</td></tr>
+</table>""",
+    'TABLE/display_table': """
+<div style="display: table">
+  <div style="display: table-caption; text-align: center">Caption</div>
+  <div style="display: table-row; font-weight: bold">
+    <span style="display: table-cell">Header 1</span>
+    <span style="display: table-cell">Header 2</span>
+  </div>
+  <div style="display: table-row">
+    <span style="display: table-cell">Value 1</span>
+    <span style="display: table-cell">Value 2</span>
+  </div>
+</div>""",
   }).entries.forEach((entry) => _test(entry.key, entry.value));
 }

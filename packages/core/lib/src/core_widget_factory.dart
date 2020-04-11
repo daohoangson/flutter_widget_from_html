@@ -492,6 +492,15 @@ class WidgetFactory {
           case _kCssDisplayNone:
             meta = lazySet(meta, isNotRenderable: true);
             break;
+          case _kCssDisplayTable:
+          case _kCssDisplayTableRow:
+          case _kCssDisplayTableHeaderGroup:
+          case _kCssDisplayTableRowGroup:
+          case _kCssDisplayTableFooterGroup:
+          case _kCssDisplayTableCell:
+          case _kCssDisplayTableCaption:
+            meta = lazySet(meta, buildOp: tagTable());
+            break;
         }
         break;
 
@@ -806,8 +815,41 @@ class WidgetFactory {
         ]);
         break;
 
-      case _kTagTable:
-        meta = lazySet(meta, buildOp: tagTable());
+      case 'table':
+        meta = lazySet(meta, styles: [_kCssDisplay, _kCssDisplayTable]);
+        break;
+      case 'tr':
+        meta = lazySet(meta, styles: [_kCssDisplay, _kCssDisplayTableRow]);
+        break;
+      case 'thead':
+        meta =
+            lazySet(meta, styles: [_kCssDisplay, _kCssDisplayTableHeaderGroup]);
+        break;
+      case 'tbody':
+        meta = lazySet(meta, styles: [_kCssDisplay, _kCssDisplayTableRowGroup]);
+        break;
+      case 'tfoot':
+        meta =
+            lazySet(meta, styles: [_kCssDisplay, _kCssDisplayTableFooterGroup]);
+        break;
+      case 'td':
+        meta = lazySet(meta, styles: [_kCssDisplay, _kCssDisplayTableCell]);
+        break;
+      case 'th':
+        meta = lazySet(meta, styles: [
+          _kCssDisplay,
+          _kCssDisplayTableCell,
+          _kCssFontWeight,
+          _kCssFontWeightBold,
+        ]);
+        break;
+      case 'caption':
+        meta = lazySet(meta, styles: [
+          _kCssDisplay,
+          _kCssDisplayTableCaption,
+          _kCssTextAlign,
+          _kCssTextAlignCenter,
+        ]);
         break;
     }
 
