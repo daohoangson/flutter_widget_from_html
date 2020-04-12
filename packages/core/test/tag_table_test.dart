@@ -149,6 +149,59 @@ void main() {
     });
   });
 
+  group('colspan / rowspan', () {
+    testWidgets('renders colspan=1', (WidgetTester tester) async {
+      final html = '<table><tr><td colspan="1">Value 1</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Table:\n[RichText:(:Value 1)]\n]'));
+    });
+
+    testWidgets('renders colspan=2', (WidgetTester tester) async {
+      final html = '<table><tr><td colspan="2">Value 1</td></tr></table>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Table:\n[RichText:(:Value 1)] | [widget0]\n]'));
+    });
+
+    testWidgets('renders rowspan=1', (WidgetTester tester) async {
+      final html = '<table><tr><td rowspan="1">Value 1</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Table:\n[RichText:(:Value 1)]\n]'));
+    });
+
+    testWidgets('renders rowspan=2', (WidgetTester tester) async {
+      final html = '<table><tr><td rowspan="2">Value 1</td></tr></table>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Table:\n[RichText:(:Value 1)]\n[widget0]\n]'));
+    });
+
+    testWidgets('renders colspan=2 rowspan=2', (WidgetTester tester) async {
+      final html = '<table><tr>'
+          '<td colspan="2" rowspan="2">Value 1</td>'
+          '</tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Table:\n'
+              '[RichText:(:Value 1)] | [widget0]\n'
+              '[widget0] | [widget0]\n'
+              ']'));
+    });
+
+    testWidgets('renders cells being split by rowspan from above', (t) async {
+      final html = '<table>'
+          '<tr><td>1.1</td><td rowspan="2">1.2</td><td>1.3</td></tr>'
+          '<tr><td>2.1</td><td>2.2</td></tr>'
+          '</table>';
+      final explained = await explain(t, html);
+      expect(
+          explained,
+          equals('[Table:\n'
+              '[RichText:(:1.1)] | [RichText:(:1.2)] | [RichText:(:1.3)]\n'
+              '[RichText:(:2.1)] | [widget0] | [RichText:(:2.2)]\n'
+              ']'));
+    });
+  });
+
   group('error handling', () {
     testWidgets('missing header', (WidgetTester tester) async {
       final html = """<table>
