@@ -205,6 +205,37 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         '----<div style="margin-top: 3px">Foo</div>----',
     'inline/margin/margin-left':
         '----<div style="margin-left: 3px">Foo</div>----',
+    'inline/padding/4_values': """
+----
+<div style="padding: 1px 2px 3px 4px">all</div>
+----
+<div style="padding: 1px 0 0 0">top only</div>
+----
+<div style="padding: 0 2px 0 0">right only</div>
+----
+<div style="padding: 0 0 3px 0">bottom only</div>
+----
+<div style="padding: 0 0 3px 0">left only</div>
+---
+""",
+    'inline/padding/2_values': """
+----
+<div style="padding: 5px 10px">both</div>
+----
+<div style="padding: 5px 0">vertical only</div>
+----
+<div style="padding: 0 10px">horizontal only</div>
+----
+""",
+    'inline/padding/1_value': '----<div style="padding: 3px">Foo</div>----',
+    'inline/padding/padding-top':
+        '----<div style="padding-top: 3px">Foo</div>----',
+    'inline/padding/padding-right':
+        '----<div style="padding-right: 3px">Foo</div>----',
+    'inline/padding/padding-bottom':
+        '----<div style="padding-top: 3px">Foo</div>----',
+    'inline/padding/padding-left':
+        '----<div style="padding-left: 3px">Foo</div>----',
     'CENTER': '<center>Foo</center>',
     'inline/text-align/center': '<div style="text-align: center">$lipsum</div>',
     'inline/text-align/justify':
