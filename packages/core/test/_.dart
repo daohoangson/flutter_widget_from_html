@@ -298,7 +298,9 @@ class Explainer {
     // ignore: invalid_use_of_protected_member
     if (widget is WidgetPlaceholder) return _widget(widget.build(context));
 
-    final type = widget.runtimeType.toString();
+    final type = widget.runtimeType
+        .toString()
+        .replaceAll('_MarginHorizontal', 'Padding');
     final text = widget is Align
         ? "alignment=${widget.alignment},"
         : widget is AspectRatio

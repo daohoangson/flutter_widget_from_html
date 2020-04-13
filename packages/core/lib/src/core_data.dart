@@ -7,6 +7,10 @@ import 'core_helpers.dart';
 
 part 'data/text_bits.dart';
 
+const kBuildOpPriorityDefault = 10;
+const kBuildOpPriorityPadding = 9999;
+const kBuildOpPriorityMargin = 99999;
+
 class BuildOp {
   final bool isBlockElement;
 
@@ -24,7 +28,7 @@ class BuildOp {
     _BuildOpOnChild onChild,
     _BuildOpOnPieces onPieces,
     _BuildOpOnWidgets onWidgets,
-    this.priority = 10,
+    this.priority = kBuildOpPriorityDefault,
   })  : _defaultStyles = defaultStyles,
         this.isBlockElement = isBlockElement ?? onWidgets != null,
         _onChild = onChild,
@@ -82,39 +86,14 @@ class CssBorders {
   CssBorderSide top;
 }
 
-class CssMargin {
-  CssLength bottom;
-  CssLength end;
-  CssLength left;
-  CssLength right;
-  CssLength start;
-  CssLength top;
-
-  CssMargin copyWith({
-    CssLength bottom,
-    CssLength end,
-    CssLength left,
-    CssLength right,
-    CssLength start,
-    CssLength top,
-  }) =>
-      CssMargin()
-        ..bottom = bottom ?? this.bottom
-        ..end = end ?? this.end
-        ..left = left ?? this.left
-        ..right = right ?? this.right
-        ..start = start ?? this.start
-        ..top = top ?? this.top;
-}
-
 class CssLength {
   final double number;
   final CssLengthUnit unit;
 
-  CssLength(
+  const CssLength(
     this.number, {
     this.unit = CssLengthUnit.px,
-  })  : assert(!number.isNegative),
+  })  : assert(number >= 0),
         assert(unit != null);
 
   bool get isNotEmpty => number > 0;
@@ -137,6 +116,41 @@ class CssLength {
 
     return value;
   }
+}
+
+class CssLengthBox {
+  final CssLength bottom;
+  final CssLength end;
+  final CssLength left;
+  final CssLength right;
+  final CssLength start;
+  final CssLength top;
+
+  const CssLengthBox({
+    this.bottom,
+    this.end,
+    this.left,
+    this.right,
+    this.start,
+    this.top,
+  });
+
+  CssLengthBox copyWith({
+    CssLength bottom,
+    CssLength end,
+    CssLength left,
+    CssLength right,
+    CssLength start,
+    CssLength top,
+  }) =>
+      CssLengthBox(
+        bottom: bottom ?? this.bottom,
+        end: end ?? this.end,
+        left: left ?? this.left,
+        right: right ?? this.right,
+        start: start ?? this.start,
+        top: top ?? this.top,
+      );
 }
 
 enum CssLengthUnit {

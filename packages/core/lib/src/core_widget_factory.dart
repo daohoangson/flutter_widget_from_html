@@ -12,6 +12,7 @@ import 'core_html_widget.dart';
 part 'ops/style_bg_color.dart';
 part 'ops/style_direction.dart';
 part 'ops/style_margin.dart';
+part 'ops/style_padding.dart';
 part 'ops/style_text_align.dart';
 part 'ops/style_vertical_align.dart';
 part 'ops/tag_a.dart';
@@ -26,6 +27,7 @@ part 'ops/text.dart';
 part 'parser/border.dart';
 part 'parser/color.dart';
 part 'parser/css.dart';
+part 'parser/length.dart';
 
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
 
@@ -35,6 +37,7 @@ class WidgetFactory {
 
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
+  BuildOp _stylePadding;
   BuildOp _styleTextAlign;
   BuildOp _styleVerticalAlign;
   BuildOp _tagA;
@@ -66,7 +69,7 @@ class WidgetFactory {
       buildPadding(buildColumn(children), _config.bodyPadding);
 
   Widget buildColumn(Iterable<Widget> children) => children?.isNotEmpty == true
-      ? WidgetPlaceholder(
+      ? WidgetPlaceholder<Column>(
           builder: _buildColumn,
           children: children,
         )
@@ -408,12 +411,14 @@ class WidgetFactory {
 
   CssLength parseCssLength(String value) => _parseCssLength(value);
 
-  CssMargin parseCssMargin(NodeMetadata meta) => _parseCssMargin(this, meta);
+  CssLengthBox parseCssLengthBox(NodeMetadata meta, String key) =>
+      _parseCssLengthBox(meta, key);
 
-  CssMargin parseCssMarginAll(String value) => _parseCssMarginAll(this, value);
+  CssLengthBox parseCssMargin(NodeMetadata meta) =>
+      parseCssLengthBox(meta, _kCssMargin);
 
-  CssMargin parseCssMarginOne(CssMargin existing, String key, String value) =>
-      _parseCssMarginOne(this, existing, key, value);
+  CssLengthBox parseCssPadding(NodeMetadata meta) =>
+      parseCssLengthBox(meta, _kCssPadding);
 
   NodeMetadata parseStyle(NodeMetadata meta, String key, String value) {
     switch (key) {
@@ -524,16 +529,6 @@ class WidgetFactory {
         }
         break;
 
-      case _kCssMargin:
-      case _kCssMarginBottom:
-      case _kCssMarginEnd:
-      case _kCssMarginLeft:
-      case _kCssMarginRight:
-      case _kCssMarginStart:
-      case _kCssMarginTop:
-        meta = lazySet(meta, buildOp: styleMargin());
-        break;
-
       case _kCssTextAlign:
         meta = lazySet(meta, buildOp: styleTextAlign());
         break;
@@ -565,6 +560,14 @@ class WidgetFactory {
       case _kCssVerticalAlign:
         meta = lazySet(meta, buildOp: styleVerticalAlign());
         break;
+    }
+
+    if (key.startsWith(_kCssMargin)) {
+      meta = lazySet(meta, buildOp: styleMargin());
+    }
+
+    if (key.startsWith(_kCssPadding)) {
+      meta = lazySet(meta, buildOp: stylePadding());
     }
 
     return meta;
@@ -812,6 +815,11 @@ class WidgetFactory {
     return _styleMargin;
   }
 
+  BuildOp stylePadding() {
+    _stylePadding ??= _StylePadding(this).buildOp;
+    return _stylePadding;
+  }
+
   BuildOp styleTextAlign() {
     _styleTextAlign ??= _StyleTextAlign(this).buildOp;
     return _styleTextAlign;
@@ -847,7 +855,7 @@ class WidgetFactory {
 
   BuildOp tagHr() {
     _tagHr ??= BuildOp(
-      defaultStyles: (_, __) => const [_kCssMarginBottom, '1em'],
+      defaultStyles: (_, __) => const ['margin-bottom', '1em'],
       onWidgets: (_, __) => [buildDivider()],
     );
     return _tagHr;
