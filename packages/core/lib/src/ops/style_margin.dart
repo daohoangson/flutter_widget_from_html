@@ -9,9 +9,13 @@ Iterable<Widget> _marginHorizontalBuilder(
 ) {
   final direction = Directionality.of(context);
   final marginLeft = input.marginLeft ??
-      (direction == TextDirection.ltr ? input.marginStart : input.marginEnd);
+      (direction == TextDirection.ltr
+          ? input.marginInlineStart
+          : input.marginInlineEnd);
   final marginRight = input.marginRight ??
-      (direction == TextDirection.ltr ? input.marginEnd : input.marginStart);
+      (direction == TextDirection.ltr
+          ? input.marginInlineEnd
+          : input.marginInlineStart);
 
   final tsb = input.meta.tsb;
   final padding = EdgeInsets.only(
@@ -41,10 +45,10 @@ class _MarginHorizontal extends Padding {
 }
 
 class _MarginHorizontalInput {
-  CssLength marginEnd;
+  CssLength marginInlineEnd;
+  CssLength marginInlineStart;
   CssLength marginLeft;
   CssLength marginRight;
-  CssLength marginStart;
   NodeMetadata meta;
   WidgetFactory wf;
 }
@@ -119,10 +123,10 @@ class _StyleMargin {
           if (lr) {
             for (final widget in widgets) {
               final input = _MarginHorizontalInput()
-                ..marginEnd = m.inlineEnd
+                ..marginInlineEnd = m.inlineEnd
+                ..marginInlineStart = m.inlineStart
                 ..marginLeft = m.left
                 ..marginRight = m.right
-                ..marginStart = m.inlineStart
                 ..meta = meta
                 ..wf = wf;
 

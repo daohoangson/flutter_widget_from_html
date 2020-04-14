@@ -86,10 +86,10 @@ class CssLength {
   final double number;
   final CssLengthUnit unit;
 
-  const CssLength(
+  CssLength(
     this.number, {
     this.unit = CssLengthUnit.px,
-  })  : assert(number >= 0),
+  })  : assert(!number.isNegative),
         assert(unit != null);
 
   bool get isNotEmpty => number > 0;

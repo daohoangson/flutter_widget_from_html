@@ -69,7 +69,7 @@ class WidgetFactory {
       buildPadding(buildColumn(children), _config.bodyPadding);
 
   Widget buildColumn(Iterable<Widget> children) => children?.isNotEmpty == true
-      ? WidgetPlaceholder<Column>(
+      ? WidgetPlaceholder(
           builder: _buildColumn,
           children: children,
         )

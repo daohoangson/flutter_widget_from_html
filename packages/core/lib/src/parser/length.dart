@@ -9,16 +9,16 @@ const _kCssLengthBoxSuffixLeft = '-left';
 const _kCssLengthBoxSuffixRight = '-right';
 const _kCssLengthBoxSuffixTop = '-top';
 
-final _lengthValuesFourRegExp =
+final _cssLengthValues4 =
     RegExp(r'^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)$');
-final _lengthValuesTwoRegExp = RegExp(r'^([^\s]+)\s+([^\s]+)$');
-final _lengthRegExp = RegExp(r'^([\d\.]+)(em|px)$');
+final _cssLengthValues2 = RegExp(r'^([^\s]+)\s+([^\s]+)$');
+final _cssLengthValue = RegExp(r'^([\d\.]+)(em|px)$');
 
 CssLength _parseCssLength(String value) {
   if (value == null) return null;
   if (value == '0') return CssLength(0);
 
-  final match = _lengthRegExp.firstMatch(value);
+  final match = _cssLengthValue.firstMatch(value);
   if (match == null) return null;
 
   final number = double.tryParse(match[1]);
@@ -63,7 +63,7 @@ CssLengthBox _parseCssLengthBox(NodeMetadata meta, String key) {
 }
 
 CssLengthBox _parseCssLengthBoxAll(String value) {
-  final valuesFour = _lengthValuesFourRegExp.firstMatch(value);
+  final valuesFour = _cssLengthValues4.firstMatch(value);
   if (valuesFour != null) {
     return CssLengthBox(
       top: _parseCssLength(valuesFour[1]),
@@ -73,7 +73,7 @@ CssLengthBox _parseCssLengthBoxAll(String value) {
     );
   }
 
-  final valuesTwo = _lengthValuesTwoRegExp.firstMatch(value);
+  final valuesTwo = _cssLengthValues2.firstMatch(value);
   if (valuesTwo != null) {
     final topBottom = _parseCssLength(valuesTwo[1]);
     final leftRight = _parseCssLength(valuesTwo[2]);
