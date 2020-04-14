@@ -16,8 +16,7 @@ void main() {
     expect(
         explained,
         equals('[SizedBox:0.0x10.0],'
-            '[Stack:children=[$padding,child=[RichText:(:Foo)]],'
-            '[Positioned:child=[RichText,align=right:(:$disc)]]],'
+            '[$padding,child=[Stack:children=[RichText:(:Foo)],[Positioned:child=[RichText,align=right:(:$disc)]]]],'
             '[SizedBox:0.0x10.0]'));
   });
 
@@ -26,11 +25,11 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[Column:children='
-            '[Stack:children=[$padding,child=[RichText:(:One)]],[Positioned:child=[RichText,align=right:(:1.)]]],'
-            '[Stack:children=[$padding,child=[RichText:(:Two)]],[Positioned:child=[RichText,align=right:(:2.)]]],'
-            '[Stack:children=[$padding,child=[RichText:(+b:Three)]],[Positioned:child=[RichText,align=right:(:3.)]]]'
-            ']'));
+        equals('[$padding,child=[Column:children='
+            '[Stack:children=[RichText:(:One)],[Positioned:child=[RichText,align=right:(:1.)]]],'
+            '[Stack:children=[RichText:(:Two)],[Positioned:child=[RichText,align=right:(:2.)]]],'
+            '[Stack:children=[RichText:(+b:Three)],[Positioned:child=[RichText,align=right:(:3.)]]]'
+            ']]'));
   });
 
   testWidgets('renders unordered list', (WidgetTester tester) async {
@@ -38,11 +37,11 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[Column:children='
-            '[Stack:children=[$padding,child=[RichText:(:One)]],[Positioned:child=[RichText,align=right:(:$disc)]]],'
-            '[Stack:children=[$padding,child=[RichText:(:Two)]],[Positioned:child=[RichText,align=right:(:$disc)]]],'
-            '[Stack:children=[$padding,child=[RichText:(+i:Three)]],[Positioned:child=[RichText,align=right:(:$disc)]]]'
-            ']'));
+        equals('[$padding,child=[Column:children='
+            '[Stack:children=[RichText:(:One)],[Positioned:child=[RichText,align=right:(:$disc)]]],'
+            '[Stack:children=[RichText:(:Two)],[Positioned:child=[RichText,align=right:(:$disc)]]],'
+            '[Stack:children=[RichText:(+i:Three)],[Positioned:child=[RichText,align=right:(:$disc)]]]'
+            ']]'));
   });
 
   testWidgets('renders nested list', (WidgetTester tester) async {
@@ -68,20 +67,20 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[Column:children='
-            '[Stack:children=[$padding,child=[RichText:(:One)]],[Positioned:child=[RichText,align=right:(:$disc)]]],'
-            '[Stack:children=[$padding,child='
-            '[Column:children=[RichText:(:Two)],'
-            '[Stack:children=[$padding,child=[RichText:(:2.1)]],[Positioned:child=[RichText,align=right:(:$circle)]]],'
-            '[Stack:children=[$padding,child='
-            '[Column:children=[RichText:(:2.2)],'
-            '[Stack:children=[$padding,child=[RichText:(:2.2.1)]],[Positioned:child=[RichText,align=right:(:$square)]]],'
-            '[Stack:children=[$padding,child=[RichText:(:2.2.2)]],[Positioned:child=[RichText,align=right:(:$square)]]]'
-            ']],[Positioned:child=[RichText,align=right:(:$circle)]]],'
-            '[Stack:children=[$padding,child=[RichText:(:2.3)]],[Positioned:child=[RichText,align=right:(:$circle)]]]'
-            ']],[Positioned:child=[RichText,align=right:(:$disc)]]],'
-            '[Stack:children=[$padding,child=[RichText:(:Three)]],[Positioned:child=[RichText,align=right:(:$disc)]]]'
-            ']'));
+        equals('[$padding,child=[Column:children='
+            '[Stack:children=[RichText:(:One)],[Positioned:child=[RichText,align=right:(:$disc)]]],'
+            '[Stack:children='
+            '[Column:children=[RichText:(:Two)],[$padding,child=[Column:children='
+            '[Stack:children=[RichText:(:2.1)],[Positioned:child=[RichText,align=right:(:$circle)]]],'
+            '[Stack:children='
+            '[Column:children=[RichText:(:2.2)],[$padding,child=[Column:children='
+            '[Stack:children=[RichText:(:2.2.1)],[Positioned:child=[RichText,align=right:(:$square)]]],'
+            '[Stack:children=[RichText:(:2.2.2)],[Positioned:child=[RichText,align=right:(:$square)]]]'
+            ']]],[Positioned:child=[RichText,align=right:(:$circle)]]],'
+            '[Stack:children=[RichText:(:2.3)],[Positioned:child=[RichText,align=right:(:$circle)]]]'
+            ']]],[Positioned:child=[RichText,align=right:(:$disc)]]],'
+            '[Stack:children=[RichText:(:Three)],[Positioned:child=[RichText,align=right:(:$disc)]]]'
+            ']]'));
   });
 
   testWidgets('renders nested list (single child)',
@@ -94,16 +93,16 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[Column:children='
-            '[Stack:children=[$padding,child=[RichText:(:Foo)]],[Positioned:child=[RichText,align=right:(:$disc)]]],'
-            '[$padding,child=[Stack:children=[$padding,child=[RichText:(:Bar)]],[Positioned:child=[RichText,align=right:(:$circle)]]]]'
-            ']'));
+        equals('[$padding,child=[Column:children='
+            '[Stack:children=[RichText:(:Foo)],[Positioned:child=[RichText,align=right:(:$disc)]]],'
+            '[$padding,child=[Stack:children=[RichText:(:Bar)],[Positioned:child=[RichText,align=right:(:$circle)]]]]'
+            ']]'));
   });
 
   group('OL reversed', () {
     final olReversedLiHtml = '<li>x</li>';
     final olReversedLiPrefix =
-        'Stack:children=[$padding,child=[RichText:(:x)]],[Positioned:child=[RichText,align=right:';
+        'Stack:children=[RichText:(:x)],[Positioned:child=[RichText,align=right:';
     final olReversedLiPostfix = ']]';
 
     testWidgets('renders 123 (default)', (WidgetTester tester) async {
@@ -112,11 +111,11 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children='
+          equals('[$padding,child=[Column:children='
               '[$olReversedLiPrefix(:1.)$olReversedLiPostfix],'
               '[$olReversedLiPrefix(:2.)$olReversedLiPostfix],'
               '[$olReversedLiPrefix(:3.)$olReversedLiPostfix]'
-              ']'));
+              ']]'));
     });
 
     testWidgets('renders 321', (WidgetTester tester) async {
@@ -125,11 +124,11 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children='
+          equals('[$padding,child=[Column:children='
               '[$olReversedLiPrefix(:3.)$olReversedLiPostfix],'
               '[$olReversedLiPrefix(:2.)$olReversedLiPostfix],'
               '[$olReversedLiPrefix(:1.)$olReversedLiPostfix]'
-              ']'));
+              ']]'));
     });
 
     testWidgets('renders from 99', (WidgetTester tester) async {
@@ -138,30 +137,32 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children='
+          equals('[$padding,child=[Column:children='
               '[$olReversedLiPrefix(:99.)$olReversedLiPostfix],'
               '[$olReversedLiPrefix(:98.)$olReversedLiPostfix],'
               '[$olReversedLiPrefix(:97.)$olReversedLiPostfix]'
-              ']'));
+              ']]'));
     });
   });
 
   group('OL start', () {
     final olStartLiHtml = '<li>x</li>';
     final olStartLiPrefix =
-        'Stack:children=[$padding,child=[RichText:(:x)]],[Positioned:child=[RichText,align=right:';
+        'Stack:children=[RichText:(:x)],[Positioned:child=[RichText,align=right:';
     final olStartLiPostfix = ']]';
 
     testWidgets('renders from 1 (default)', (WidgetTester tester) async {
       final html = '<ol>$olStartLiHtml<ol>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[$olStartLiPrefix(:1.)$olStartLiPostfix]'));
+      expect(explained,
+          equals('[$padding,child=[$olStartLiPrefix(:1.)$olStartLiPostfix]]'));
     });
 
     testWidgets('renders from 99', (WidgetTester tester) async {
       final html = '<ol start="99">$olStartLiHtml<ol>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[$olStartLiPrefix(:99.)$olStartLiPostfix]'));
+      expect(explained,
+          equals('[$padding,child=[$olStartLiPrefix(:99.)$olStartLiPostfix]]'));
     });
 
     testWidgets('renders xyz', (WidgetTester tester) async {
@@ -170,19 +171,19 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children='
+          equals('[$padding,child=[Column:children='
               '[$olStartLiPrefix(:x.)$olStartLiPostfix],'
               '[$olStartLiPrefix(:y.)$olStartLiPostfix],'
               '[$olStartLiPrefix(:z.)$olStartLiPostfix]'
-              ']'));
+              ']]'));
     });
   });
 
   group('OL type', () {
     final olTypeLiHtml = '<li>x</li>';
     final olTypeLiPrefix =
-        'Stack:children=[$padding,child=[RichText:(:x)]],[Positioned:child=[RichText,align=right:';
-    final olTypeLiPostfix = ']]';
+        '$padding,child=[Stack:children=[RichText:(:x)],[Positioned:child=[RichText,align=right:';
+    final olTypeLiPostfix = ']]]';
 
     testWidgets('renders 1 (default)', (WidgetTester tester) async {
       final html = '<ol>$olTypeLiHtml<ol>';
@@ -231,11 +232,11 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children='
-              '[Stack:children=[$padding,child=[RichText:(:decimal)]],[Positioned:child=[RichText,align=right:(:1.)]]],'
-              '[Stack:children=[$padding,child=[RichText:(:lower-roman)]],[Positioned:child=[RichText,align=right:(:ii.)]]],'
-              '[Stack:children=[$padding,child=[RichText:(:lower-alpha)]],[Positioned:child=[RichText,align=right:(:c.)]]]'
-              ']'));
+          equals('[$padding,child=[Column:children='
+              '[Stack:children=[RichText:(:decimal)],[Positioned:child=[RichText,align=right:(:1.)]]],'
+              '[Stack:children=[RichText:(:lower-roman)],[Positioned:child=[RichText,align=right:(:ii.)]]],'
+              '[Stack:children=[RichText:(:lower-alpha)],[Positioned:child=[RichText,align=right:(:c.)]]]'
+              ']]'));
     });
   });
 
@@ -246,8 +247,8 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals('[Stack:children=[$padding,child=[RichText:(:Foo)]],'
-                '[Positioned:child=[RichText,align=right:(:$disc)]]]'));
+            equals('[$padding,child=[Stack:children=[RichText:(:Foo)],'
+                '[Positioned:child=[RichText,align=right:(:$disc)]]]]'));
       });
 
       testWidgets('renders disc (OL)', (WidgetTester tester) async {
@@ -255,8 +256,8 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals('[Stack:children=[$padding,child=[RichText:(:Foo)]],'
-                '[Positioned:child=[RichText,align=right:(:$disc)]]]'));
+            equals('[$padding,child=[Stack:children=[RichText:(:Foo)],'
+                '[Positioned:child=[RichText,align=right:(:$disc)]]]]'));
       });
 
       testWidgets('renders circle', (WidgetTester tester) async {
@@ -264,8 +265,8 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals('[Stack:children=[$padding,child=[RichText:(:Foo)]],'
-                '[Positioned:child=[RichText,align=right:(:$circle)]]]'));
+            equals('[$padding,child=[Stack:children=[RichText:(:Foo)],'
+                '[Positioned:child=[RichText,align=right:(:$circle)]]]]'));
       });
 
       testWidgets('renders square', (WidgetTester tester) async {
@@ -273,8 +274,8 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals('[Stack:children=[$padding,child=[RichText:(:Foo)]],'
-                '[Positioned:child=[RichText,align=right:(:$square)]]]'));
+            equals('[$padding,child=[Stack:children=[RichText:(:Foo)],'
+                '[Positioned:child=[RichText,align=right:(:$square)]]]]'));
       });
 
       testWidgets('renders LI list-style-type', (WidgetTester tester) async {
@@ -288,17 +289,17 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals('[Column:children='
-                '[Stack:children=[$padding,child=[RichText:(:disc)]],[Positioned:child=[RichText,align=right:(:$disc)]]],'
-                '[Stack:children=[$padding,child=[RichText:(:square)]],[Positioned:child=[RichText,align=right:(:$square)]]],'
-                '[Stack:children=[$padding,child=[RichText:(:circle)]],[Positioned:child=[RichText,align=right:(:$circle)]]]'
-                ']'));
+            equals('[$padding,child=[Column:children='
+                '[Stack:children=[RichText:(:disc)],[Positioned:child=[RichText,align=right:(:$disc)]]],'
+                '[Stack:children=[RichText:(:square)],[Positioned:child=[RichText,align=right:(:$square)]]],'
+                '[Stack:children=[RichText:(:circle)],[Positioned:child=[RichText,align=right:(:$circle)]]]'
+                ']]'));
       });
 
       group('serial', () {
         final serialLiHtml = '<li>x</li>';
         final serialLiPrefix =
-            'Stack:children=[$padding,child=[RichText:(:x)]],[Positioned:child=[RichText,align=right:';
+            'Stack:children=[RichText:(:x)],[Positioned:child=[RichText,align=right:';
         final serialLiPostfix = ']]';
 
         testWidgets('renders decimal (default for OL)', (tester) async {
@@ -306,11 +307,11 @@ void main() {
           final explained = await explain(tester, html);
           expect(
               explained,
-              equals('[Column:children='
+              equals('[$padding,child=[Column:children='
                   '[$serialLiPrefix(:1.)$serialLiPostfix],'
                   '[$serialLiPrefix(:2.)$serialLiPostfix],'
                   '[$serialLiPrefix(:3.)$serialLiPostfix]'
-                  ']'));
+                  ']]'));
         });
 
         testWidgets('renders decimal (UL)', (WidgetTester tester) async {
@@ -319,11 +320,11 @@ void main() {
           final explained = await explain(tester, html);
           expect(
               explained,
-              equals('[Column:children='
+              equals('[$padding,child=[Column:children='
                   '[$serialLiPrefix(:1.)$serialLiPostfix],'
                   '[$serialLiPrefix(:2.)$serialLiPostfix],'
                   '[$serialLiPrefix(:3.)$serialLiPostfix]'
-                  ']'));
+                  ']]'));
         });
 
         testWidgets('renders lower-alpha', (WidgetTester tester) async {
@@ -332,7 +333,7 @@ void main() {
           final explained = await explain(tester, html);
           expect(
               explained,
-              equals('[Column:children='
+              equals('[$padding,child=[Column:children='
                   '[$serialLiPrefix(:a.)$serialLiPostfix],'
                   '[$serialLiPrefix(:b.)$serialLiPostfix],'
                   '[$serialLiPrefix(:c.)$serialLiPostfix],'
@@ -359,7 +360,7 @@ void main() {
                   '[$serialLiPrefix(:x.)$serialLiPostfix],'
                   '[$serialLiPrefix(:y.)$serialLiPostfix],'
                   '[$serialLiPrefix(:z.)$serialLiPostfix]'
-                  ']'));
+                  ']]'));
         });
 
         testWidgets('renders lower-latin', (WidgetTester tester) async {
@@ -368,7 +369,7 @@ void main() {
           final explained = await explain(tester, html);
           expect(
               explained,
-              equals('[Column:children='
+              equals('[$padding,child=[Column:children='
                   '[$serialLiPrefix(:a.)$serialLiPostfix],'
                   '[$serialLiPrefix(:b.)$serialLiPostfix],'
                   '[$serialLiPrefix(:c.)$serialLiPostfix],'
@@ -395,7 +396,7 @@ void main() {
                   '[$serialLiPrefix(:x.)$serialLiPostfix],'
                   '[$serialLiPrefix(:y.)$serialLiPostfix],'
                   '[$serialLiPrefix(:z.)$serialLiPostfix]'
-                  ']'));
+                  ']]'));
         });
 
         testWidgets('renders lower-roman', (WidgetTester tester) async {
@@ -404,7 +405,7 @@ void main() {
           final explained = await explain(tester, html);
           expect(
               explained,
-              equals('[Column:children='
+              equals('[$padding,child=[Column:children='
                   '[$serialLiPrefix(:i.)$serialLiPostfix],'
                   '[$serialLiPrefix(:ii.)$serialLiPostfix],'
                   '[$serialLiPrefix(:iii.)$serialLiPostfix],'
@@ -415,7 +416,7 @@ void main() {
                   '[$serialLiPrefix(:viii.)$serialLiPostfix],'
                   '[$serialLiPrefix(:ix.)$serialLiPostfix],'
                   '[$serialLiPrefix(:x.)$serialLiPostfix]'
-                  ']'));
+                  ']]'));
         });
 
         testWidgets('renders upper-alpha', (WidgetTester tester) async {
@@ -424,7 +425,7 @@ void main() {
           final explained = await explain(tester, html);
           expect(
               explained,
-              equals('[Column:children='
+              equals('[$padding,child=[Column:children='
                   '[$serialLiPrefix(:A.)$serialLiPostfix],'
                   '[$serialLiPrefix(:B.)$serialLiPostfix],'
                   '[$serialLiPrefix(:C.)$serialLiPostfix],'
@@ -451,7 +452,7 @@ void main() {
                   '[$serialLiPrefix(:X.)$serialLiPostfix],'
                   '[$serialLiPrefix(:Y.)$serialLiPostfix],'
                   '[$serialLiPrefix(:Z.)$serialLiPostfix]'
-                  ']'));
+                  ']]'));
         });
 
         testWidgets('renders upper-latin', (WidgetTester tester) async {
@@ -460,7 +461,7 @@ void main() {
           final explained = await explain(tester, html);
           expect(
               explained,
-              equals('[Column:children='
+              equals('[$padding,child=[Column:children='
                   '[$serialLiPrefix(:A.)$serialLiPostfix],'
                   '[$serialLiPrefix(:B.)$serialLiPostfix],'
                   '[$serialLiPrefix(:C.)$serialLiPostfix],'
@@ -487,7 +488,7 @@ void main() {
                   '[$serialLiPrefix(:X.)$serialLiPostfix],'
                   '[$serialLiPrefix(:Y.)$serialLiPostfix],'
                   '[$serialLiPrefix(:Z.)$serialLiPostfix]'
-                  ']'));
+                  ']]'));
         });
 
         testWidgets('renders upper-roman', (WidgetTester tester) async {
@@ -496,7 +497,7 @@ void main() {
           final explained = await explain(tester, html);
           expect(
               explained,
-              equals('[Column:children='
+              equals('[$padding,child=[Column:children='
                   '[$serialLiPrefix(:I.)$serialLiPostfix],'
                   '[$serialLiPrefix(:II.)$serialLiPostfix],'
                   '[$serialLiPrefix(:III.)$serialLiPostfix],'
@@ -507,7 +508,7 @@ void main() {
                   '[$serialLiPrefix(:VIII.)$serialLiPostfix],'
                   '[$serialLiPrefix(:IX.)$serialLiPostfix],'
                   '[$serialLiPrefix(:X.)$serialLiPostfix]'
-                  ']'));
+                  ']]'));
         });
       });
     });
@@ -519,12 +520,12 @@ void main() {
         expect(
             explained,
             equals(
-                '[Stack:children=[Padding:(0,0,0,99),child=[RichText:(:Foo)]],'
-                '[Positioned:child=[RichText,align=right:(:$disc)]]]'));
+                '[Padding:(0,0,0,99),child=[Stack:children=[RichText:(:Foo)],'
+                '[Positioned:child=[RichText,align=right:(:$disc)]]]]'));
       });
 
-      testWidgets('renders LI padding-inline-start',
-          (WidgetTester tester) async {
+      testWidgets('renders LI padding-inline-start', (tester) async {
+        // TODO: doesn't match browser output
         final html = """
 <ul style="padding-inline-start: 99px">
   <li style="padding-inline-start: 199px">199px</li>
@@ -535,11 +536,11 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals('[Column:children='
-                '[Stack:children=[Padding:(0,0,0,199),child=[RichText:(:199px)]],[Positioned:child=[RichText,align=right:(:$disc)]]],'
-                '[Stack:children=[Padding:(0,0,0,299),child=[RichText:(:299px)]],[Positioned:child=[RichText,align=right:(:$disc)]]],'
-                '[Stack:children=[Padding:(0,0,0,99),child=[RichText:(:99px)]],[Positioned:child=[RichText,align=right:(:$disc)]]]'
-                ']'));
+            equals('[Padding:(0,0,0,99),child=[Column:children='
+                '[Padding:(0,0,0,199),child=[Stack:children=[RichText:(:199px)],[Positioned:child=[RichText,align=right:(:$disc)]]]],'
+                '[Padding:(0,0,0,299),child=[Stack:children=[RichText:(:299px)],[Positioned:child=[RichText,align=right:(:$disc)]]]],'
+                '[Stack:children=[RichText:(:99px)],[Positioned:child=[RichText,align=right:(:$disc)]]]'
+                ']]'));
       });
     });
   });
@@ -548,16 +549,17 @@ void main() {
     testWidgets('standalone UL', (WidgetTester tester) async {
       final html = '<ul>Foo</ul>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(explained, equals('[$padding,child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('standalone OL', (WidgetTester tester) async {
       final html = '<ol>Foo</ol>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(explained, equals('[$padding,child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('standalone LI', (WidgetTester tester) async {
+      // TODO: doesn't match browser output
       final html = '<li>Foo</li>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
@@ -575,11 +577,13 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children='
-              '[Stack:children=[$padding,child=[RichText:(:One)]],[Positioned:child=[RichText,align=right:(:$disc)]]],'
-              '[$padding,child=[Stack:children=[$padding,child=[RichText:(:Two)]],[Positioned:child=[RichText,align=right:(:$circle)]]]],'
-              '[$padding,child=[Stack:children=[$padding,child=[RichText:(:Three)]],[Positioned:child=[RichText,align=right:(:$circle)]]]]'
-              ']'));
+          equals('[$padding,child=[Column:children='
+              '[Stack:children=[RichText:(:One)],[Positioned:child=[RichText,align=right:(:$disc)]]],'
+              '[$padding,child=[Column:children='
+              '[Stack:children=[RichText:(:Two)],[Positioned:child=[RichText,align=right:(:$circle)]]],'
+              '[Stack:children=[RichText:(:Three)],[Positioned:child=[RichText,align=right:(:$circle)]]]'
+              ']]'
+              ']]'));
     });
 
     testWidgets('LI has empty A', (WidgetTester tester) async {
@@ -592,11 +596,11 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children='
-              '[Stack:children=[$padding,child=[RichText:(:One)]],[Positioned:child=[RichText,align=right:(:1.)]]],'
+          equals('[$padding,child=[Column:children='
+              '[Stack:children=[RichText:(:One)],[Positioned:child=[RichText,align=right:(:1.)]]],'
               '[Stack:children=[widget0],[Positioned:child=[RichText,align=right:(:2.)]]],'
-              '[Stack:children=[$padding,child=[RichText:(:Three)]],[Positioned:child=[RichText,align=right:(:3.)]]]'
-              ']'));
+              '[Stack:children=[RichText:(:Three)],[Positioned:child=[RichText,align=right:(:3.)]]]'
+              ']]'));
     });
   });
 
@@ -615,11 +619,11 @@ void main() {
           ));
       expect(
           explained,
-          equals('[Column:children='
-              '[Stack:children=[$rtlPadding,child=[RichText:(:One)]],[Positioned:child=[RichText,align=left:(:1.)]]],'
-              '[Stack:children=[$rtlPadding,child=[RichText:(:Two)]],[Positioned:child=[RichText,align=left:(:2.)]]],'
-              '[Stack:children=[$rtlPadding,child=[RichText:(+b:Three)]],[Positioned:child=[RichText,align=left:(:3.)]]]'
-              ']'));
+          equals('[$rtlPadding,child=[Column:children='
+              '[Stack:children=[RichText:(:One)],[Positioned:child=[RichText,align=left:(:1.)]]],'
+              '[Stack:children=[RichText:(:Two)],[Positioned:child=[RichText,align=left:(:2.)]]],'
+              '[Stack:children=[RichText:(+b:Three)],[Positioned:child=[RichText,align=left:(:3.)]]]'
+              ']]'));
     });
   });
 }
