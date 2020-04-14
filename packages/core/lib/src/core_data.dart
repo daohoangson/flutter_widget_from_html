@@ -83,31 +83,6 @@ class CssBorders {
   CssBorderSide top;
 }
 
-class CssMargin {
-  CssLength bottom;
-  CssLength end;
-  CssLength left;
-  CssLength right;
-  CssLength start;
-  CssLength top;
-
-  CssMargin copyWith({
-    CssLength bottom,
-    CssLength end,
-    CssLength left,
-    CssLength right,
-    CssLength start,
-    CssLength top,
-  }) =>
-      CssMargin()
-        ..bottom = bottom ?? this.bottom
-        ..end = end ?? this.end
-        ..left = left ?? this.left
-        ..right = right ?? this.right
-        ..start = start ?? this.start
-        ..top = top ?? this.top;
-}
-
 class CssLength {
   final double number;
   final CssLengthUnit unit;
@@ -138,6 +113,41 @@ class CssLength {
 
     return value;
   }
+}
+
+class CssLengthBox {
+  final CssLength bottom;
+  final CssLength inlineEnd;
+  final CssLength inlineStart;
+  final CssLength left;
+  final CssLength right;
+  final CssLength top;
+
+  const CssLengthBox({
+    this.bottom,
+    this.inlineEnd,
+    this.inlineStart,
+    this.left,
+    this.right,
+    this.top,
+  });
+
+  CssLengthBox copyWith({
+    CssLength bottom,
+    CssLength inlineEnd,
+    CssLength inlineStart,
+    CssLength left,
+    CssLength right,
+    CssLength top,
+  }) =>
+      CssLengthBox(
+        bottom: bottom ?? this.bottom,
+        inlineEnd: inlineEnd ?? this.inlineEnd,
+        inlineStart: inlineStart ?? this.inlineStart,
+        left: left ?? this.left,
+        right: right ?? this.right,
+        top: top ?? this.top,
+      );
 }
 
 enum CssLengthUnit {
