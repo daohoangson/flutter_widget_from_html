@@ -32,7 +32,7 @@ class _StylePadding {
             )
           ];
         },
-        priority: kBuildOpPriorityPadding,
+        priority: 9999,
       );
 
   Iterable<Widget> _build(

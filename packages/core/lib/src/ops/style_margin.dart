@@ -144,6 +144,6 @@ class _StyleMargin {
 
           return ws;
         },
-        priority: kBuildOpPriorityMargin,
+        priority: 99999,
       );
 }

@@ -7,10 +7,6 @@ import 'core_helpers.dart';
 
 part 'data/text_bits.dart';
 
-const kBuildOpPriorityDefault = 10;
-const kBuildOpPriorityPadding = 9999;
-const kBuildOpPriorityMargin = 99999;
-
 class BuildOp {
   final bool isBlockElement;
 
@@ -28,7 +24,7 @@ class BuildOp {
     _BuildOpOnChild onChild,
     _BuildOpOnPieces onPieces,
     _BuildOpOnWidgets onWidgets,
-    this.priority = kBuildOpPriorityDefault,
+    this.priority = 10,
   })  : _defaultStyles = defaultStyles,
         this.isBlockElement = isBlockElement ?? onWidgets != null,
         _onChild = onChild,
