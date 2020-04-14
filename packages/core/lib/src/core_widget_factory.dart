@@ -216,11 +216,11 @@ class WidgetFactory {
   Widget buildTable(
     BuildContext context,
     TextStyleBuilders tsb,
-    TableLayout table,
+    TableData table,
   ) {
+    final cellIndices = <int>[];
     final rows = <TableRow>[];
     final tableCols = table.cols;
-    final cellIndices = <int>[];
 
     for (final entryRow in table.grid.entries) {
       final cells = List<Widget>(tableCols);

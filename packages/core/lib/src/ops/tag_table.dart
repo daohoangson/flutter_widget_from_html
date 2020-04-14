@@ -43,7 +43,7 @@ class _TagTable {
           }
 
           return [
-            _TableLayoutPlaceholder(
+            _TagTablePlaceholder(
               children: widgets,
               input: meta,
               lastBuilder: lastBuilder,
@@ -56,8 +56,8 @@ class _TagTable {
   Iterable<Widget> _build(BuildContext c, Iterable<Widget> ws, NodeMetadata m) {
     if (ws?.isNotEmpty != true) return ws;
 
-    final rows = <TableLayoutRow>[];
-    List<TableLayoutRow> rowsHeader, rowsFooter;
+    final rows = <_TableDataRow>[];
+    List<_TableDataRow> rowsHeader, rowsFooter;
     final widgets = <Widget>[];
 
     for (var child in ws) {
@@ -66,9 +66,9 @@ class _TagTable {
         child = placeholder.build(c);
       }
 
-      if (child is TableLayoutRow) {
+      if (child is _TableDataRow) {
         rows.add(child);
-      } else if (child is TableLayoutGroup) {
+      } else if (child is _TableDataGroup) {
         if (child.type == _kCssDisplayTableHeaderGroup && rowsHeader == null) {
           rowsHeader = child.rows;
         } else if (child.type == _kCssDisplayTableFooterGroup &&
@@ -86,7 +86,7 @@ class _TagTable {
     if (rowsFooter != null) rows.addAll(rowsFooter);
     if (rows.isEmpty) return widgets;
 
-    final table = TableLayout(
+    final table = TableData(
       border: _parseBorder(c, m),
     );
     for (var i = 0; i < rows.length; i++) {
@@ -132,68 +132,10 @@ class _TagTable {
       });
 }
 
-Iterable<Widget> _cell(BuildContext _, Iterable<Widget> ws, NodeMetadata m) {
-  if (ws?.isNotEmpty != true) return ws;
-
-  final a = m.domElement.attributes;
-  final colspan = a.containsKey('colspan') ? int.tryParse(a['colspan']) : null;
-  final rowspan = a.containsKey('rowspan') ? int.tryParse(a['rowspan']) : null;
-
-  return [
-    TableLayoutCell(
-      children: ws,
-      colspan: colspan ?? 1,
-      rowspan: rowspan ?? 1,
-    )
-  ];
-}
-
-Iterable<Widget> _row(BuildContext c, Iterable<Widget> ws, _) {
-  if (ws?.isNotEmpty != true) return ws;
-
-  final cells = <TableLayoutCell>[];
-
-  for (var child in ws) {
-    if (child is WidgetPlaceholder) {
-      final placeholder = child as WidgetPlaceholder;
-      child = placeholder.build(c);
-    }
-
-    if (child is TableLayoutCell) {
-      cells.add(child);
-    }
-  }
-
-  if (cells.isEmpty) return null;
-
-  return [TableLayoutRow(cells: cells)];
-}
-
-Iterable<Widget> _group(BuildContext c, Iterable<Widget> ws, NodeMetadata m) {
-  if (ws?.isNotEmpty != true) return ws;
-
-  final rows = <TableLayoutRow>[];
-
-  for (var child in ws) {
-    if (child is WidgetPlaceholder) {
-      final placeholder = child as WidgetPlaceholder;
-      child = placeholder.build(c);
-    }
-
-    if (child is TableLayoutRow) {
-      rows.add(child);
-    }
-  }
-
-  if (rows.isEmpty) return null;
-
-  return [TableLayoutGroup(rows: rows, type: m.style(_kCssDisplay))];
-}
-
-class _TableLayoutPlaceholder<T> extends WidgetPlaceholder<T> {
+class _TagTablePlaceholder<T> extends WidgetPlaceholder<T> {
   final Iterable<Widget> children;
 
-  _TableLayoutPlaceholder({
+  _TagTablePlaceholder({
     this.children,
     T input,
     WidgetPlaceholderBuilder<T> lastBuilder,
@@ -209,4 +151,89 @@ class _TableLayoutPlaceholder<T> extends WidgetPlaceholder<T> {
       }
     }
   }
+}
+
+class _TableDataRow extends StatelessWidget {
+  final Iterable<TableDataCell> cells;
+
+  const _TableDataRow({Key key, @required this.cells})
+      : assert(cells != null),
+        super(key: key);
+
+  @override
+  Widget build(BuildContext context) => widget0;
+}
+
+class _TableDataGroup extends StatelessWidget {
+  final Iterable<_TableDataRow> rows;
+  final String type;
+
+  const _TableDataGroup({
+    Key key,
+    @required this.rows,
+    @required this.type,
+  })  : assert(rows != null),
+        assert(type != null),
+        super(key: key);
+
+  @override
+  Widget build(BuildContext context) => widget0;
+}
+
+Iterable<Widget> _cell(BuildContext _, Iterable<Widget> ws, NodeMetadata m) {
+  if (ws?.isNotEmpty != true) return ws;
+
+  final a = m.domElement.attributes;
+  final colspan = a.containsKey('colspan') ? int.tryParse(a['colspan']) : null;
+  final rowspan = a.containsKey('rowspan') ? int.tryParse(a['rowspan']) : null;
+
+  return [
+    TableDataCell(
+      children: ws,
+      colspan: colspan ?? 1,
+      rowspan: rowspan ?? 1,
+    )
+  ];
+}
+
+Iterable<Widget> _row(BuildContext c, Iterable<Widget> ws, _) {
+  if (ws?.isNotEmpty != true) return ws;
+
+  final cells = <TableDataCell>[];
+
+  for (var child in ws) {
+    if (child is WidgetPlaceholder) {
+      final placeholder = child as WidgetPlaceholder;
+      child = placeholder.build(c);
+    }
+
+    if (child is TableDataCell) {
+      cells.add(child);
+    }
+  }
+
+  if (cells.isEmpty) return null;
+
+  return [_TableDataRow(cells: cells)];
+}
+
+Iterable<Widget> _group(BuildContext c, Iterable<Widget> ws, NodeMetadata m) {
+  if (ws?.isNotEmpty != true) return ws;
+
+  final rows = <_TableDataRow>[];
+
+  for (var child in ws) {
+    if (child is WidgetPlaceholder) {
+      final placeholder = child as WidgetPlaceholder;
+      child = placeholder.build(c);
+    }
+
+    if (child is _TableDataRow) {
+      rows.add(child);
+    }
+  }
+
+  if (rows.isEmpty) return null;
+
+  return [_TableDataGroup(rows: rows, type: m.style(_kCssDisplay))];
 }

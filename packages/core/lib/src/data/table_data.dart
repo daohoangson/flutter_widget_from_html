@@ -1,11 +1,11 @@
 part of '../core_data.dart';
 
-class TableLayout extends StatelessWidget {
+class TableData extends StatelessWidget {
   final BorderSide border;
-  final List<TableLayoutCell> cells = [];
+  final List<TableDataCell> cells = [];
   final Map<int, Map<int, int>> grid = Map();
 
-  TableLayout({
+  TableData({
     this.border,
     Key key,
   }) : super(key: key);
@@ -14,7 +14,7 @@ class TableLayout extends StatelessWidget {
 
   int get rows => grid.keys.length;
 
-  int addCell(int rowIndex, TableLayoutCell cell) {
+  int addCell(int rowIndex, TableDataCell cell) {
     final cellIndex = cells.length;
     cells.add(cell);
 
@@ -48,12 +48,12 @@ class TableLayout extends StatelessWidget {
   }
 }
 
-class TableLayoutCell extends StatelessWidget {
+class TableDataCell extends StatelessWidget {
   final Iterable<Widget> children;
   final int colspan;
   final int rowspan;
 
-  const TableLayoutCell({
+  const TableDataCell({
     Key key,
     @required this.children,
     @required this.colspan,
@@ -61,33 +61,6 @@ class TableLayoutCell extends StatelessWidget {
   })  : assert(children != null),
         assert(colspan != null),
         assert(rowspan != null),
-        super(key: key);
-
-  @override
-  Widget build(BuildContext context) => widget0;
-}
-
-class TableLayoutRow extends StatelessWidget {
-  final Iterable<TableLayoutCell> cells;
-
-  const TableLayoutRow({Key key, @required this.cells})
-      : assert(cells != null),
-        super(key: key);
-
-  @override
-  Widget build(BuildContext context) => widget0;
-}
-
-class TableLayoutGroup extends StatelessWidget {
-  final Iterable<TableLayoutRow> rows;
-  final String type;
-
-  const TableLayoutGroup({
-    Key key,
-    @required this.rows,
-    @required this.type,
-  })  : assert(rows != null),
-        assert(type != null),
         super(key: key);
 
   @override
