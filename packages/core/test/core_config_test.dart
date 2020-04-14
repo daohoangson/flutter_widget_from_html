@@ -171,42 +171,6 @@ void main() {
 
   // TODO: onTapUrl
 
-  group('tableCellPadding', () {
-    final tableCellPadding = EdgeInsets.all(10);
-    final html = '<table><tr><td>Foo</td></tr></table>';
-
-    testWidgets('renders default value', (WidgetTester tester) async {
-      final explained =
-          await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(
-          explained,
-          equals('[Padding:(10,10,10,10),child=[Table:\n'
-              '[Padding:(5,5,5,5),child=[RichText:(:Foo)]]\n]]'));
-    });
-
-    testWidgets('renders custom value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        HtmlWidget(html, key: helper.hwKey, tableCellPadding: tableCellPadding),
-      );
-      expect(
-          explained,
-          equals('[Padding:(10,10,10,10),child=[Table:\n'
-              '[Padding:(10,10,10,10),child=[RichText:(:Foo)]]\n]]'));
-    });
-
-    testWidgets('renders null value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        HtmlWidget(html, key: helper.hwKey, tableCellPadding: null),
-      );
-      expect(
-        explained,
-        equals('[Padding:(10,10,10,10),child=[Table:\n[RichText:(:Foo)]\n]]'),
-      );
-    });
-  });
-
   group('textStyle', () {
     final html = 'Foo';
 

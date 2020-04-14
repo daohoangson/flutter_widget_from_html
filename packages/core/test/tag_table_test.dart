@@ -2,6 +2,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '_.dart';
 
+String _padding(String child) => "[Padding:(1,1,1,1),child=$child]";
+
+String _richtext(String text) => _padding('[RichText:(:$text)]');
+
 void main() {
   testWidgets('renders basic table', (WidgetTester tester) async {
     final html = """<table>
@@ -12,9 +16,9 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[Column:children=[RichText,align=center:(:Caption)],[Table:\n' +
-            '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n' +
-            '[RichText:(:Value 1)] | [RichText:(:Value 2)]\n' +
+        equals('[Column:children=[RichText,align=center:(:Caption)],[Table:\n'
+            '${_padding('[RichText:(+b:Header 1)]')} | ${_padding('[RichText:(+b:Header 2)]')}\n'
+            '${_richtext('Value 1')} | ${_richtext('Value 2')}\n'
             ']]'));
   });
 
@@ -25,8 +29,8 @@ void main() {
     expect(
         explained,
         equals('[Column:children='
-            '[Table:\n[RichText:(:Foo)]\n],'
-            '[Table:\n[RichText:(:Bar)]\n]'
+            '[Table:\n${_richtext('Foo')}\n],'
+            '[Table:\n${_richtext('Bar')}\n]'
             ']'));
   });
 
@@ -40,9 +44,9 @@ void main() {
     expect(
         explained,
         equals('[Table:\n'
-            '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n'
-            '[RichText:(:Value 1)] | [RichText:(:Value 2)]\n'
-            '[RichText:(:Footer 1)] | [RichText:(:Footer 2)]\n'
+            '${_padding('[RichText:(+b:Header 1)]')} | ${_padding('[RichText:(+b:Header 2)]')}\n'
+            '${_richtext('Value 1')} | ${_richtext('Value 2')}\n'
+            '${_richtext('Footer 1')} | ${_richtext('Footer 2')}\n'
             ']'));
   });
 
@@ -56,8 +60,8 @@ void main() {
       expect(
           explained,
           equals('[Table:\n'
-              '[RichText:(+b:Header 1)] | [RichText,align=center:(+b:Header 2)]\n'
-              '[RichText:(:Value (+i:1))] | [RichText:(+b:Value 2)]\n'
+              '${_padding('[RichText:(+b:Header 1)]')} | ${_padding('[RichText,align=center:(+b:Header 2)]')}\n'
+              '${_padding('[RichText:(:Value (+i:1))]')} | ${_padding('[RichText:(+b:Value 2)]')}\n'
               ']'));
     });
 
@@ -70,8 +74,8 @@ void main() {
       expect(
           explained,
           equals('[Table:\n'
-              '[RichText,align=center:(+b:Header 1)] | [RichText,align=center:(+b:Header 2)]\n'
-              '[RichText:(+b:Value (+i+b:1))] | [RichText:(+b:Value 2)]\n'
+              '${_padding('[RichText,align=center:(+b:Header 1)]')} | ${_padding('[RichText,align=center:(+b:Header 2)]')}\n'
+              '${_padding('[RichText:(+b:Value (+i+b:1))]')} | ${_padding('[RichText:(+b:Value 2)]')}\n'
               ']'));
     });
 
@@ -86,8 +90,8 @@ void main() {
       expect(
           explained,
           equals('[Table:\n'
-              '[RichText,align=right:(+b:Header 1)] | [RichText,align=center:(+b:Header 2)]\n'
-              '[RichText,align=right:(:Value (+i:1))] | [RichText,align=right:(+b:Value 2)]\n'
+              '${_padding('[RichText,align=right:(+b:Header 1)]')} | ${_padding('[RichText,align=center:(+b:Header 2)]')}\n'
+              '${_padding('[RichText,align=right:(:Value (+i:1))]')} | ${_padding('[RichText,align=right:(+b:Value 2)]')}\n'
               ']'));
     });
   });
@@ -96,7 +100,7 @@ void main() {
     testWidgets('renders border=0', (WidgetTester tester) async {
       final html = '<table border="0"><tr><td>Foo</td></tr></table>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Table:\n[RichText:(:Foo)]\n]'));
+      expect(explained, equals('[Table:\n${_richtext('Foo')}\n]'));
     });
 
     testWidgets('renders border=1', (WidgetTester tester) async {
@@ -104,7 +108,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Table:border=(Color(0xff000000),w=1.0)\n[RichText:(:Foo)]\n]'),
+        equals('[Table:border=(Color(0xff000000),w=1.0)\n'
+            '${_richtext('Foo')}\n'
+            ']'),
       );
     });
 
@@ -113,7 +119,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Table:border=(Color(0xff000000),w=1.0)\n[RichText:(:Foo)]\n]'),
+        equals('[Table:border=(Color(0xff000000),w=1.0)\n'
+            '${_richtext('Foo')}\n'
+            ']'),
       );
     });
 
@@ -122,7 +130,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Table:border=(Color(0xff000000),w=2.0)\n[RichText:(:Foo)]\n]'),
+        equals('[Table:border=(Color(0xff000000),w=2.0)\n'
+            '${_richtext('Foo')}\n'
+            ']'),
       );
     });
 
@@ -133,56 +143,110 @@ void main() {
       expect(
         explained,
         equals('[Table:border=(Color(0xffff0000),w=1.0)\n'
-            '[RichText:(:Foo)]\n]'),
+            '${_richtext('Foo')}\n'
+            ']'),
       );
     });
 
-    testWidgets('#70: renders border=1 with inline `text-align`', (t) async {
+    testWidgets('#70: renders border=1 with inline text-align', (t) async {
       final html = '<table border="1" style="text-align: left">'
           '<tr><td>Foo</td></tr></table>';
       final explained = await explain(t, html);
       expect(
         explained,
         equals('[Table:border=(Color(0xff000000),w=1.0)\n'
-            '[RichText,align=left:(:Foo)]\n]'),
+            '${_padding('[RichText,align=left:(:Foo)]')}\n'
+            ']'),
       );
+    });
+
+    testWidgets('#70: renders border=1 with cell text-align', (t) async {
+      final html = '<table border="1">'
+          '<tr><td style="text-align: left">Foo</td></tr></table>';
+      final explained = await explain(t, html);
+      expect(
+        explained,
+        equals('[Table:border=(Color(0xff000000),w=1.0)\n'
+            '${_padding('[RichText,align=left:(:Foo)]')}\n'
+            ']'),
+      );
+    });
+  });
+
+  group('cellpadding', () {
+    testWidgets('renders cellpadding=1', (WidgetTester tester) async {
+      final html = '<table cellpadding="1"><tr><td>Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Table:\n${_richtext('Foo')}\n]'));
+    });
+
+    testWidgets('renders cellpadding=2', (WidgetTester tester) async {
+      final html = '<table cellpadding="2"><tr><td>Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Table:\n'
+              '[Padding:(2,2,2,2),child=[RichText:(:Foo)]]\n'
+              ']'));
+    });
+
+    group('inline style', () {
+      testWidgets('renders table=1 cell=1', (WidgetTester tester) async {
+        final html = '<table cellpadding="1">'
+            '<tr><td style="padding: 1px">Foo</td></tr>'
+            '</table>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[Table:\n${_richtext('Foo')}\n]'));
+      });
+
+      testWidgets('renders table=1 cell=2', (WidgetTester tester) async {
+        final html = '<table cellpadding="1">'
+            '<tr><td style="padding: 2px">Foo</td></tr>'
+            '</table>';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[Table:\n'
+                '[Padding:(2,2,2,2),child=[RichText:(:Foo)]]\n'
+                ']'));
+      });
     });
   });
 
   group('colspan / rowspan', () {
     testWidgets('renders colspan=1', (WidgetTester tester) async {
-      final html = '<table><tr><td colspan="1">Value 1</td></tr></table>';
+      final html = '<table><tr><td colspan="1">Foo</td></tr></table>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Table:\n[RichText:(:Value 1)]\n]'));
+      expect(explained, equals('[Table:\n${_richtext('Foo')}\n]'));
     });
 
     testWidgets('renders colspan=2', (WidgetTester tester) async {
-      final html = '<table><tr><td colspan="2">Value 1</td></tr></table>';
+      final html = '<table><tr><td colspan="2">Foo</td></tr></table>';
       final e = await explain(tester, html);
-      expect(e, equals('[Table:\n[RichText:(:Value 1)] | [widget0]\n]'));
+      expect(e, equals('[Table:\n${_richtext('Foo')} | [widget0]\n]'));
     });
 
     testWidgets('renders rowspan=1', (WidgetTester tester) async {
-      final html = '<table><tr><td rowspan="1">Value 1</td></tr></table>';
+      final html = '<table><tr><td rowspan="1">Foo</td></tr></table>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Table:\n[RichText:(:Value 1)]\n]'));
+      expect(explained, equals('[Table:\n${_richtext('Foo')}\n]'));
     });
 
     testWidgets('renders rowspan=2', (WidgetTester tester) async {
-      final html = '<table><tr><td rowspan="2">Value 1</td></tr></table>';
+      final html = '<table><tr><td rowspan="2">Foo</td></tr></table>';
       final e = await explain(tester, html);
-      expect(e, equals('[Table:\n[RichText:(:Value 1)]\n[widget0]\n]'));
+      expect(e, equals('[Table:\n${_richtext('Foo')}\n[widget0]\n]'));
     });
 
     testWidgets('renders colspan=2 rowspan=2', (WidgetTester tester) async {
       final html = '<table><tr>'
-          '<td colspan="2" rowspan="2">Value 1</td>'
+          '<td colspan="2" rowspan="2">Foo</td>'
           '</tr></table>';
       final explained = await explain(tester, html);
       expect(
           explained,
           equals('[Table:\n'
-              '[RichText:(:Value 1)] | [widget0]\n'
+              '${_richtext('Foo')} | [widget0]\n'
               '[widget0] | [widget0]\n'
               ']'));
     });
@@ -196,8 +260,8 @@ void main() {
       expect(
           explained,
           equals('[Table:\n'
-              '[RichText:(:1.1)] | [RichText:(:1.2)] | [RichText:(:1.3)]\n'
-              '[RichText:(:2.1)] | [widget0] | [RichText:(:2.2)]\n'
+              '${_richtext('1.1')} | ${_richtext('1.2')} | ${_richtext('1.3')}\n'
+              '${_richtext('2.1')} | [widget0] | ${_richtext('2.2')}\n'
               ']'));
     });
   });
@@ -212,8 +276,8 @@ void main() {
       expect(
           explained,
           equals('[Table:\n' +
-              '[RichText:(+b:Header 1)] | [widget0]\n' +
-              '[RichText:(:Value 1)] | [RichText:(:Value 2)]\n' +
+              '${_padding('[RichText:(+b:Header 1)]')} | [widget0]\n' +
+              '${_richtext('Value 1')} | ${_richtext('Value 2')}\n' +
               ']'));
     });
 
@@ -226,8 +290,8 @@ void main() {
       expect(
           explained,
           equals('[Table:\n' +
-              '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n' +
-              '[RichText:(:Value 1)] | [widget0]\n' +
+              '${_padding('[RichText:(+b:Header 1)]')} | ${_padding('[RichText:(+b:Header 2)]')}\n' +
+              '${_richtext('Value 1')} | [widget0]\n' +
               ']'));
     });
 
@@ -305,11 +369,10 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              '[Column:children=[RichText,align=center:(:Caption)],[Table:\n' +
-                  '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n' +
-                  '[RichText:(:Value 1)] | [RichText:(:Value 2)]\n' +
-                  ']]'));
+          equals('[Column:children=[RichText,align=center:(:Caption)],[Table:\n'
+              '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n'
+              '[RichText:(:Value 1)] | [RichText:(:Value 2)]\n'
+              ']]'));
     });
   });
 }

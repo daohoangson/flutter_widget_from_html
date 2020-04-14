@@ -1,6 +1,7 @@
 part of '../core_widget_factory.dart';
 
 const _kAttributeBorder = 'border';
+const _kAttributeCellPadding = 'cellpadding';
 const _kCssDisplayTable = 'table';
 const _kCssDisplayTableRow = 'table-row';
 const _kCssDisplayTableHeaderGroup = 'table-header-group';
@@ -14,40 +15,43 @@ class _TagTable {
 
   _TagTable(this.wf);
 
-  BuildOp get buildOp => BuildOp(onWidgets: (meta, widgets) {
-        WidgetPlaceholderBuilder<NodeMetadata> lastBuilder;
+  BuildOp get buildOp => BuildOp(
+        onWidgets: (meta, widgets) {
+          WidgetPlaceholderBuilder<NodeMetadata> lastBuilder;
 
-        switch (meta.style(_kCssDisplay)) {
-          case _kCssDisplayTableRow:
-            lastBuilder = _row;
-            break;
-          case _kCssDisplayTableHeaderGroup:
-          case _kCssDisplayTableRowGroup:
-          case _kCssDisplayTableFooterGroup:
-            lastBuilder = _group;
-            break;
-          case _kCssDisplayTableCell:
-            return [
-              WidgetPlaceholder(
-                children: widgets,
-                input: meta,
-                lastBuilder: _cell,
-              ),
-            ];
-          case _kCssDisplayTableCaption:
-            return widgets;
-          default:
-            lastBuilder = _build;
-        }
+          switch (meta.style(_kCssDisplay)) {
+            case _kCssDisplayTableRow:
+              lastBuilder = _row;
+              break;
+            case _kCssDisplayTableHeaderGroup:
+            case _kCssDisplayTableRowGroup:
+            case _kCssDisplayTableFooterGroup:
+              lastBuilder = _group;
+              break;
+            case _kCssDisplayTableCell:
+              return [
+                WidgetPlaceholder(
+                  children: widgets,
+                  input: meta,
+                  lastBuilder: _cell,
+                ),
+              ];
+            case _kCssDisplayTableCaption:
+              return widgets;
+            default:
+              lastBuilder = _build;
+          }
 
-        return [
-          _TableLayoutPlaceholder(
-            children: widgets,
-            input: meta,
-            lastBuilder: lastBuilder,
-          ),
-        ];
-      });
+          return [
+            _TableLayoutPlaceholder(
+              children: widgets,
+              input: meta,
+              lastBuilder: lastBuilder,
+            ),
+          ];
+        },
+        priority: 999999,
+      );
 
   Iterable<Widget> _build(BuildContext c, Iterable<Widget> ws, NodeMetadata m) {
     if (ws?.isNotEmpty != true) return ws;
@@ -82,20 +86,21 @@ class _TagTable {
     if (rowsFooter != null) rows.addAll(rowsFooter);
     if (rows.isEmpty) return widgets;
 
-    final tableLayout = TableLayout();
+    final table = TableLayout(
+      border: _parseBorder(c, m),
+    );
     for (var i = 0; i < rows.length; i++) {
       for (final cell in rows[i].cells) {
-        tableLayout.addCell(i, cell);
+        table.addCell(i, cell);
       }
     }
 
-    final border = _parseBorderSide(c, m);
-    widgets.add(wf.buildTable(tableLayout, border: border));
+    widgets.add(wf.buildTable(c, m.tsb, table));
 
     return [wf.buildColumn(widgets)];
   }
 
-  BorderSide _parseBorderSide(BuildContext context, NodeMetadata meta) {
+  BorderSide _parseBorder(BuildContext context, NodeMetadata meta) {
     String styleBorder = meta.style(_kCssBorder);
     if (styleBorder != null) {
       final borderParsed = wf.parseCssBorderSide(styleBorder);
@@ -117,6 +122,14 @@ class _TagTable {
 
     return null;
   }
+
+  static BuildOp cellPaddingOp(double px) => BuildOp(onChild: (meta, e) {
+        if (e.localName == 'td' || e.localName == 'th') {
+          meta = lazySet(meta, styles: [_kCssPadding, "${px}px"]);
+        }
+
+        return meta;
+      });
 }
 
 Iterable<Widget> _cell(BuildContext _, Iterable<Widget> ws, NodeMetadata m) {

@@ -1,10 +1,14 @@
 part of '../core_data.dart';
 
 class TableLayout extends StatelessWidget {
-  final Map<int, Map<int, int>> grid = Map();
+  final BorderSide border;
   final List<TableLayoutCell> cells = [];
+  final Map<int, Map<int, int>> grid = Map();
 
-  TableLayout({Key key}) : super(key: key);
+  TableLayout({
+    this.border,
+    Key key,
+  }) : super(key: key);
 
   int get cols => grid.values.fold(0, _colsCombine);
 
@@ -70,18 +74,8 @@ class TableLayoutRow extends StatelessWidget {
       : assert(cells != null),
         super(key: key);
 
-  int get colspan => cells.fold(0, _colspanCombine);
-
-  int get rowspan => cells.fold(0, _rowspanCombine);
-
   @override
   Widget build(BuildContext context) => widget0;
-
-  static int _colspanCombine(int prev, TableLayoutCell cell) =>
-      prev + cell.colspan;
-
-  static int _rowspanCombine(int prev, TableLayoutCell cell) =>
-      prev > cell.rowspan ? prev : cell.rowspan;
 }
 
 class TableLayoutGroup extends StatelessWidget {

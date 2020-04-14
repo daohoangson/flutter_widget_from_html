@@ -23,7 +23,6 @@ Future<String> explain(
   double bodyVerticalPadding = 0,
   NodeMetadataCollector builderCallback,
   WidgetFactory Function(HtmlConfig config) factoryBuilder,
-  double tableCellPadding = 0,
   TextStyle textStyle,
 }) async {
   assert((html == null) != (hw == null));
@@ -34,7 +33,6 @@ Future<String> explain(
     builderCallback: builderCallback,
     factoryBuilder: factoryBuilder,
     key: hwKey,
-    tableCellPadding: EdgeInsets.all(tableCellPadding),
     textStyle: textStyle,
   );
 

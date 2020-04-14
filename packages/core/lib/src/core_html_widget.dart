@@ -48,7 +48,6 @@ class HtmlWidget extends StatefulWidget {
     NodeMetadataCollector builderCallback,
     Color hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
     OnTapUrl onTapUrl,
-    EdgeInsets tableCellPadding = const EdgeInsets.all(5),
     TextStyle textStyle = const TextStyle(),
   })  : assert(html != null),
         _config = config ??
@@ -58,7 +57,6 @@ class HtmlWidget extends StatefulWidget {
               builderCallback: builderCallback,
               hyperlinkColor: hyperlinkColor,
               onTapUrl: onTapUrl,
-              tableCellPadding: tableCellPadding,
               textStyle: textStyle,
             ),
         super(key: key);
@@ -88,9 +86,6 @@ class HtmlConfig {
   /// The callback when user taps a link.
   final OnTapUrl onTapUrl;
 
-  /// The amount of space by which to inset the table cell's contents.
-  final EdgeInsets tableCellPadding;
-
   /// The default styling for text elements.
   final TextStyle textStyle;
 
@@ -101,7 +96,6 @@ class HtmlConfig {
     this.builderCallback,
     this.hyperlinkColor,
     this.onTapUrl,
-    this.tableCellPadding,
     this.textStyle,
   });
 }

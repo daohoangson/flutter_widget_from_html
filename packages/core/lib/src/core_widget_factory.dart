@@ -213,12 +213,16 @@ class WidgetFactory {
           ? Padding(child: child, padding: padding)
           : child;
 
-  Widget buildTable(TableLayout tableLayout, {BorderSide border}) {
+  Widget buildTable(
+    BuildContext context,
+    TextStyleBuilders tsb,
+    TableLayout table,
+  ) {
     final rows = <TableRow>[];
-    final tableCols = tableLayout.cols;
+    final tableCols = table.cols;
     final cellIndices = <int>[];
 
-    for (final entryRow in tableLayout.grid.entries) {
+    for (final entryRow in table.grid.entries) {
       final cells = List<Widget>(tableCols);
       for (var i = 0; i < tableCols; i++) {
         final cellIndex = entryRow.value[i];
@@ -228,21 +232,20 @@ class WidgetFactory {
         }
 
         cellIndices.add(cellIndex);
-        cells[i] = buildTableCell(tableLayout.cells[cellIndex].children);
+        cells[i] = TableCell(
+          child: buildColumn(table.cells[cellIndex].children),
+        );
       }
 
       rows.add(TableRow(children: cells));
     }
 
-    final tableBorder = border != null
-        ? TableBorder.symmetric(inside: border, outside: border)
+    final tableBorder = table.border != null
+        // TODO: support different styling for border sides
+        ? TableBorder.symmetric(inside: table.border, outside: table.border)
         : null;
     return Table(border: tableBorder, children: rows);
   }
-
-  TableCell buildTableCell(Iterable<Widget> children) => TableCell(
-      child: buildPadding(buildColumn(children), _config.tableCellPadding) ??
-          widget0);
 
   Iterable<Widget> buildText(BuildContext c, Iterable<Widget> _, TextBits t) {
     final tsb = t.tsb;
@@ -820,6 +823,13 @@ class WidgetFactory {
 
       case 'table':
         meta = lazySet(meta, styles: [_kCssDisplay, _kCssDisplayTable]);
+
+        meta = lazySet(meta,
+            buildOp: _TagTable.cellPaddingOp(
+                (attributes.containsKey(_kAttributeCellPadding)
+                        ? double.tryParse(attributes[_kAttributeCellPadding])
+                        : null) ??
+                    1));
         break;
       case 'tr':
         meta = lazySet(meta, styles: [_kCssDisplay, _kCssDisplayTableRow]);
