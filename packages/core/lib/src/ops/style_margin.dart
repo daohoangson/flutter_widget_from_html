@@ -105,10 +105,10 @@ class _StyleMargin {
           if (m == null) return null;
 
           final t = m.top?.isNotEmpty == true;
-          final lr = m.end?.isNotEmpty == true ||
+          final lr = m.inlineEnd?.isNotEmpty == true ||
               m.left?.isNotEmpty == true ||
               m.right?.isNotEmpty == true ||
-              m.start?.isNotEmpty == true;
+              m.inlineStart?.isNotEmpty == true;
           final b = m.bottom?.isNotEmpty == true;
           final ws = List<Widget>((t ? 1 : 0) + widgets.length + (b ? 1 : 0));
           final tsb = meta.tsb;
@@ -119,10 +119,10 @@ class _StyleMargin {
           if (lr) {
             for (final widget in widgets) {
               final input = _MarginHorizontalInput()
-                ..marginEnd = m.end
+                ..marginEnd = m.inlineEnd
                 ..marginLeft = m.left
                 ..marginRight = m.right
-                ..marginStart = m.start
+                ..marginStart = m.inlineStart
                 ..meta = meta
                 ..wf = wf;
 

@@ -515,7 +515,7 @@ void main() {
 
     group('padding-inline-start', () {
       testWidgets('renders 99px', (WidgetTester tester) async {
-        final html = '<ul style="padding-start: 99px"><li>Foo</li></ul>';
+        final html = '<ul style="padding-inline-start: 99px"><li>Foo</li></ul>';
         final explained = await explain(tester, html);
         expect(
             explained,
@@ -527,9 +527,9 @@ void main() {
       testWidgets('renders LI padding-inline-start', (tester) async {
         // TODO: doesn't match browser output
         final html = """
-<ul style="padding-start: 99px">
-  <li style="padding-start: 199px">199px</li>
-  <li style="padding-start: 299px">299px</li>
+<ul style="padding-inline-start: 99px">
+  <li style="padding-inline-start: 199px">199px</li>
+  <li style="padding-inline-start: 299px">299px</li>
   <li>99px</li>
 <ul>
 """;

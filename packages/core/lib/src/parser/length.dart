@@ -1,10 +1,12 @@
 part of '../core_widget_factory.dart';
 
+const _kCssLengthBoxSuffixBlockEnd = '-block-end';
+const _kCssLengthBoxSuffixBlockStart = '-block-start';
 const _kCssLengthBoxSuffixBottom = '-bottom';
-const _kCssLengthBoxSuffixEnd = '-end';
+const _kCssLengthBoxSuffixInlineEnd = '-inline-end';
+const _kCssLengthBoxSuffixInlineStart = '-inline-start';
 const _kCssLengthBoxSuffixLeft = '-left';
 const _kCssLengthBoxSuffixRight = '-right';
-const _kCssLengthBoxSuffixStart = '-start';
 const _kCssLengthBoxSuffixTop = '-top';
 
 final _lengthValuesFourRegExp =
@@ -44,11 +46,13 @@ CssLengthBox _parseCssLengthBox(NodeMetadata meta, String key) {
         output = _parseCssLengthBoxAll(style.value);
         break;
 
+      case _kCssLengthBoxSuffixBlockEnd:
+      case _kCssLengthBoxSuffixBlockStart:
       case _kCssLengthBoxSuffixBottom:
-      case _kCssLengthBoxSuffixEnd:
+      case _kCssLengthBoxSuffixInlineEnd:
+      case _kCssLengthBoxSuffixInlineStart:
       case _kCssLengthBoxSuffixLeft:
       case _kCssLengthBoxSuffixRight:
-      case _kCssLengthBoxSuffixStart:
       case _kCssLengthBoxSuffixTop:
         output = _parseCssLengthBoxOne(output, suffix, style.value);
         break;
@@ -63,9 +67,9 @@ CssLengthBox _parseCssLengthBoxAll(String value) {
   if (valuesFour != null) {
     return CssLengthBox(
       top: _parseCssLength(valuesFour[1]),
-      end: _parseCssLength(valuesFour[2]),
+      inlineEnd: _parseCssLength(valuesFour[2]),
       bottom: _parseCssLength(valuesFour[3]),
-      start: _parseCssLength(valuesFour[4]),
+      inlineStart: _parseCssLength(valuesFour[4]),
     );
   }
 
@@ -75,14 +79,14 @@ CssLengthBox _parseCssLengthBoxAll(String value) {
     final leftRight = _parseCssLength(valuesTwo[2]);
     return CssLengthBox(
       top: topBottom,
-      end: leftRight,
+      inlineEnd: leftRight,
       bottom: topBottom,
-      start: leftRight,
+      inlineStart: leftRight,
     );
   }
 
   final all = _parseCssLength(value);
-  return CssLengthBox(top: all, end: all, bottom: all, start: all);
+  return CssLengthBox(top: all, inlineEnd: all, bottom: all, inlineStart: all);
 }
 
 CssLengthBox _parseCssLengthBoxOne(
@@ -97,16 +101,18 @@ CssLengthBox _parseCssLengthBoxOne(
 
   switch (suffix) {
     case _kCssLengthBoxSuffixBottom:
+    case _kCssLengthBoxSuffixBlockEnd:
       return existing.copyWith(bottom: parsed);
-    case _kCssLengthBoxSuffixEnd:
-      return existing.copyWith(end: parsed);
+    case _kCssLengthBoxSuffixInlineEnd:
+      return existing.copyWith(inlineEnd: parsed);
+    case _kCssLengthBoxSuffixInlineStart:
+      return existing.copyWith(inlineStart: parsed);
     case _kCssLengthBoxSuffixLeft:
       return existing.copyWith(left: parsed);
     case _kCssLengthBoxSuffixRight:
       return existing.copyWith(right: parsed);
-    case _kCssLengthBoxSuffixStart:
-      return existing.copyWith(start: parsed);
     case _kCssLengthBoxSuffixTop:
+    case _kCssLengthBoxSuffixBlockStart:
       return existing.copyWith(top: parsed);
   }
 

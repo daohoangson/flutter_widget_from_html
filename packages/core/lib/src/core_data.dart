@@ -120,35 +120,35 @@ class CssLength {
 
 class CssLengthBox {
   final CssLength bottom;
-  final CssLength end;
+  final CssLength inlineEnd;
+  final CssLength inlineStart;
   final CssLength left;
   final CssLength right;
-  final CssLength start;
   final CssLength top;
 
   const CssLengthBox({
     this.bottom,
-    this.end,
+    this.inlineEnd,
+    this.inlineStart,
     this.left,
     this.right,
-    this.start,
     this.top,
   });
 
   CssLengthBox copyWith({
     CssLength bottom,
-    CssLength end,
+    CssLength inlineEnd,
+    CssLength inlineStart,
     CssLength left,
     CssLength right,
-    CssLength start,
     CssLength top,
   }) =>
       CssLengthBox(
         bottom: bottom ?? this.bottom,
-        end: end ?? this.end,
+        inlineEnd: inlineEnd ?? this.inlineEnd,
+        inlineStart: inlineStart ?? this.inlineStart,
         left: left ?? this.left,
         right: right ?? this.right,
-        start: start ?? this.start,
         top: top ?? this.top,
       );
 }

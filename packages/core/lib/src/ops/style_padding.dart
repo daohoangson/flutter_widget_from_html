@@ -45,11 +45,15 @@ class _StylePadding {
     final tsb = input.meta.tsb;
     final top = padding.top?.getValue(context, tsb);
     final right = (padding.right ??
-            (direction == TextDirection.ltr ? padding.end : padding.start))
+            (direction == TextDirection.ltr
+                ? padding.inlineEnd
+                : padding.inlineStart))
         ?.getValue(context, tsb);
     final bottom = padding.bottom?.getValue(context, tsb);
     final left = (padding.left ??
-            (direction == TextDirection.ltr ? padding.start : padding.end))
+            (direction == TextDirection.ltr
+                ? padding.inlineStart
+                : padding.inlineEnd))
         ?.getValue(context, tsb);
 
     return _listOrNull(wf.buildPadding(wf.buildColumn(children),

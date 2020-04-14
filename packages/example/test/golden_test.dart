@@ -302,9 +302,9 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
     'LI/list-style-type/square':
         '<ul style="list-style-type: square"><li>Foo</li></ul>',
     'LI/padding-inline-start': """
-<ul style="padding-start: 99px">
-  <li style="padding-start: 199px">199px</li>
-  <li style="padding-start: 299px">299px</li>
+<ul style="padding-inline-start: 99px">
+  <li style="padding-inline-start: 199px">199px</li>
+  <li style="padding-inline-start: 299px">299px</li>
   <li>99px</li>
 <ul>
 """,

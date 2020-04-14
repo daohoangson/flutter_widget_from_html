@@ -160,14 +160,20 @@ void main() {
       expect(explained, equals('[SizedBox:0.0x3.0],[RichText:(:Foo)]'));
     });
 
+    testWidgets('parses margin-block-start', (WidgetTester tester) async {
+      final html = '<div style="margin-block-start: 3px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[SizedBox:0.0x3.0],[RichText:(:Foo)]'));
+    });
+
     testWidgets('parses margin-right', (WidgetTester tester) async {
       final html = '<div style="margin-right: 3px">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[Padding:(0,3,0,0),child=[RichText:(:Foo)]]'));
     });
 
-    group('parses margin-end', () {
-      final html = '<div style="margin-end: 3px">Foo</div>';
+    group('parses margin-inline-end', () {
+      final html = '<div style="margin-inline-end: 3px">Foo</div>';
 
       testWidgets('ltr', (WidgetTester tester) async {
         final e = await explain(tester, html);
@@ -186,14 +192,20 @@ void main() {
       expect(explained, equals('[RichText:(:Foo)],[SizedBox:0.0x3.0]'));
     });
 
+    testWidgets('parses margin-block-end', (WidgetTester tester) async {
+      final html = '<div style="margin-block-end: 3px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)],[SizedBox:0.0x3.0]'));
+    });
+
     testWidgets('parses margin-left', (WidgetTester tester) async {
       final html = '<div style="margin-left: 3px">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[Padding:(0,0,0,3),child=[RichText:(:Foo)]]'));
     });
 
-    group('parses margin-start', () {
-      final html = '<div style="margin-start: 3px">Foo</div>';
+    group('parses margin-inline-start', () {
+      final html = '<div style="margin-inline-start: 3px">Foo</div>';
 
       testWidgets('ltr', (WidgetTester tester) async {
         final e = await explain(tester, html);
@@ -258,7 +270,7 @@ void main() {
     });
 
     testWidgets('end', (WidgetTester tester) async {
-      final html = '<div style="margin-end: xxx">Foo</div>';
+      final html = '<div style="margin-inline-end: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
@@ -276,7 +288,7 @@ void main() {
     });
 
     testWidgets('start', (WidgetTester tester) async {
-      final html = '<div style="margin-start: xxx">Foo</div>';
+      final html = '<div style="margin-inline-start: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });

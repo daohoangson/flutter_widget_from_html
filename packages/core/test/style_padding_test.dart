@@ -132,14 +132,20 @@ void main() {
       expect(explained, equals('[Padding:(3,0,0,0),child=[RichText:(:Foo)]]'));
     });
 
+    testWidgets('parses padding-block-start', (WidgetTester tester) async {
+      final html = '<div style="padding-block-start: 3px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Padding:(3,0,0,0),child=[RichText:(:Foo)]]'));
+    });
+
     testWidgets('parses padding-right', (WidgetTester tester) async {
       final html = '<div style="padding-right: 3px">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[Padding:(0,3,0,0),child=[RichText:(:Foo)]]'));
     });
 
-    group('parses padding-end', () {
-      final html = '<div style="padding-end: 3px">Foo</div>';
+    group('parses padding-inline-end', () {
+      final html = '<div style="padding-inline-end: 3px">Foo</div>';
 
       testWidgets('ltr', (WidgetTester tester) async {
         final e = await explain(tester, html);
@@ -158,14 +164,20 @@ void main() {
       expect(explained, equals('[Padding:(0,0,3,0),child=[RichText:(:Foo)]]'));
     });
 
+    testWidgets('parses padding-block-end', (WidgetTester tester) async {
+      final html = '<div style="padding-block-end: 3px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[Padding:(0,0,3,0),child=[RichText:(:Foo)]]'));
+    });
+
     testWidgets('parses padding-left', (WidgetTester tester) async {
       final html = '<div style="padding-left: 3px">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[Padding:(0,0,0,3),child=[RichText:(:Foo)]]'));
     });
 
-    group('parses padding-start', () {
-      final html = '<div style="padding-start: 3px">Foo</div>';
+    group('parses padding-inline-start', () {
+      final html = '<div style="padding-inline-start: 3px">Foo</div>';
 
       testWidgets('ltr', (WidgetTester tester) async {
         final e = await explain(tester, html);
@@ -223,7 +235,7 @@ void main() {
     });
 
     testWidgets('end', (WidgetTester tester) async {
-      final html = '<div style="padding-end: xxx">Foo</div>';
+      final html = '<div style="padding-inline-end: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
@@ -241,7 +253,7 @@ void main() {
     });
 
     testWidgets('start', (WidgetTester tester) async {
-      final html = '<div style="padding-start: xxx">Foo</div>';
+      final html = '<div style="padding-inline-start: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });

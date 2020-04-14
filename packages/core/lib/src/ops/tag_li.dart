@@ -37,7 +37,7 @@ class _TagLi {
         final p = meta.parents?.where((op) => op == _buildOp)?.length ?? 0;
 
         final styles = [
-          'padding-start',
+          'padding-inline-start',
           '2.5em',
           _kCssListStyleType,
           e.localName == _kTagOrderedList
