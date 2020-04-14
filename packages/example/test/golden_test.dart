@@ -260,7 +260,9 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         'Foo<span style="vertical-align: sub">$redX</span>',
     'inline/vertical-align/super':
         'Foo<span style="vertical-align: super">$redX</span>',
-    'LI': """
+    'LI/OL': '<ol><li>One</li><li>Two</li><li>Three</li><ol>',
+    'LI/UL': '<ul><li>One</li><li>Two</li><li>Three</li><ul>',
+    'LI/nested': """
 <ul>
   <li>One</li>
   <li>
@@ -279,6 +281,34 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
   </li>
   <li>Three</li>
 </ul>""",
+    'LI/OL/reversed':
+        '<ol reversed><li>One</li><li>Two</li><li>Three</li><ol>',
+    'LI/OL/reversed_start_99':
+        '<ol reversed start="99"><li>One</li><li>Two</li><li>Three</li><ol>',
+    'LI/OL/start_99':
+        '<ol start="99"><li>One</li><li>Two</li><li>Three</li><ol>',
+    'LI/OL/type_lower-alpha':
+        '<ol type="a"><li>One</li><li>Two</li><li>Three</li><ol>',
+    'LI/OL/type_upper-alpha':
+        '<ol type="A"><li>One</li><li>Two</li><li>Three</li><ol>',
+    'LI/OL/type_lower-roman':
+        '<ol type="i"><li>One</li><li>Two</li><li>Three</li><ol>',
+    'LI/OL/type_upper-roman':
+        '<ol type="I"><li>One</li><li>Two</li><li>Three</li><ol>',
+    'LI/list-style-type/disc':
+        '<ol style="list-style-type: disc"><li>Foo</li></ol>',
+    'LI/list-style-type/circle':
+        '<ul style="list-style-type: circle"><li>Foo</li></ul>',
+    'LI/list-style-type/square':
+        '<ul style="list-style-type: square"><li>Foo</li></ul>',
+    'LI/padding-inline-start': """
+<ul style="padding-start: 99px">
+  <li style="padding-start: 199px">199px</li>
+  <li style="padding-start: 299px">299px</li>
+  <li>99px</li>
+<ul>
+""",
+    'LI/rtl': '<div dir="rtl"><ol><li>One</li><li>Two</li><li>Three</li><ol></div>',
     'TABLE': """<table>
       <caption>Caption</caption>
       <tr><th>Header 1</th><th>Header 2</th></tr>

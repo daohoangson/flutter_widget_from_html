@@ -298,6 +298,13 @@ class Explainer {
     // ignore: invalid_use_of_protected_member
     if (widget is WidgetPlaceholder) return _widget(widget.build(context));
 
+    if (widget is LayoutBuilder) {
+      return _widget(widget.builder(
+        context,
+        BoxConstraints.tightFor(width: 800, height: 600),
+      ));
+    }
+
     final type = widget.runtimeType
         .toString()
         .replaceAll('_MarginHorizontal', 'Padding');
