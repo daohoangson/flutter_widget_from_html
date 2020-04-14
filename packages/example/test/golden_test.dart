@@ -281,8 +281,7 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
   </li>
   <li>Three</li>
 </ul>""",
-    'LI/OL/reversed':
-        '<ol reversed><li>One</li><li>Two</li><li>Three</li><ol>',
+    'LI/OL/reversed': '<ol reversed><li>One</li><li>Two</li><li>Three</li><ol>',
     'LI/OL/reversed_start_99':
         '<ol reversed start="99"><li>One</li><li>Two</li><li>Three</li><ol>',
     'LI/OL/start_99':
@@ -308,7 +307,8 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
   <li>99px</li>
 <ul>
 """,
-    'LI/rtl': '<div dir="rtl"><ol><li>One</li><li>Two</li><li>Three</li><ol></div>',
+    'LI/rtl':
+        '<div dir="rtl"><ol><li>One</li><li>Two</li><li>Three</li><ol></div>',
     'TABLE': """<table>
       <caption>Caption</caption>
       <tr><th>Header 1</th><th>Header 2</th></tr>
