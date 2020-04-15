@@ -72,8 +72,8 @@ Below tags are the ones that have special meaning / styling, all other tags will
   - Attributes: `type`, `start`, `reversed`
   - Inline style `list-style-type` values: `lower-alpha`, `upper-alpha`, `lower-latin`, `upper-latin`, `circle`, `decimal`, `disc`, `lower-roman`, `upper-roman`, `square`
 - TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
-  - Attribute: `<table border="1">`
-  - Inline style: `<table style="border: 1px solid #f00">`
+  - TABLE attributes (`border`, `cellpadding`) and inline style (`border`)
+  - TD/TH attributes `colspan`, `rowspan` via [flutter_layout_grid](https://pub.dev/packages/flutter_layout_grid)
 - SVG via [flutter_svg](https://pub.dev/packages/flutter_svg)
 - VIDEO via [chewie](https://pub.dev/packages/chewie)
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,

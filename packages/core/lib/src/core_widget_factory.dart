@@ -214,22 +214,23 @@ class WidgetFactory {
           : child;
 
   Widget buildTable(TableData table) {
-    final cellIndices = <int>[];
     final rows = <TableRow>[];
+    final slotIndices = <int>[];
     final tableCols = table.cols;
+    final tableRows = table.rows;
 
-    for (final entryRow in table.grid.entries) {
+    for (var r = 0; r < tableRows; r++) {
       final cells = List<Widget>(tableCols);
-      for (var i = 0; i < tableCols; i++) {
-        final cellIndex = entryRow.value[i];
-        if (cellIndex == null || cellIndices.contains(cellIndex)) {
-          cells[i] = widget0;
+      for (var c = 0; c < tableCols; c++) {
+        final slot = table.getSlot(row: r, col: c);
+        if (slot == null || slotIndices.contains(slot.index)) {
+          cells[c] = widget0;
           continue;
         }
 
-        cellIndices.add(cellIndex);
-        cells[i] = TableCell(
-          child: buildColumn(table.cells[cellIndex].children),
+        slotIndices.add(slot.index);
+        cells[c] = TableCell(
+          child: buildColumn(slot.cell.children),
         );
       }
 

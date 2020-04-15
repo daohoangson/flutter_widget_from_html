@@ -2,45 +2,61 @@ part of '../core_data.dart';
 
 class TableData extends StatelessWidget {
   final BorderSide border;
-  final List<TableDataCell> cells = [];
-  final Map<int, Map<int, int>> grid = Map();
+  final Map<int, Map<int, int>> _grid = Map();
+  final List<TableDataSlot> _slots = [];
 
   TableData({
     this.border,
     Key key,
   }) : super(key: key);
 
-  int get cols => grid.values.fold(0, _colsCombine);
+  Iterable<TableDataSlot> get slots => _slots;
 
-  int get rows => grid.keys.length;
+  int get cols => _grid.values.fold(0, _colsCombine);
 
-  int addCell(int rowIndex, TableDataCell cell) {
-    final cellIndex = cells.length;
-    cells.add(cell);
+  int get rows => _grid.keys.length;
 
-    grid[rowIndex] ??= Map();
-    var cellIndexInRow = 0;
-    while (grid[rowIndex].containsKey(cellIndexInRow)) {
-      cellIndexInRow++;
+  int addCell(int row, TableDataCell cell) {
+    _grid[row] ??= Map();
+    var col = 0;
+    while (_grid[row].containsKey(col)) {
+      col++;
     }
 
-    for (var i = 0; i < cell.colspan; i++) {
-      for (var j = 0; j < cell.rowspan; j++) {
-        var rj = rowIndex + j;
-        grid[rj] ??= Map();
+    final index = _slots.length;
+    _slots.add(TableDataSlot._(index, cell, row, col));
 
-        var ci = cellIndexInRow + i;
-        if (!grid[rj].containsKey(ci)) {
-          grid[rj][ci] = cellIndex;
+    for (var r = 0; r < cell.rowspan; r++) {
+      for (var c = 0; c < cell.colspan; c++) {
+        var rr = row + r;
+        _grid[rr] ??= Map();
+
+        var cc = col + c;
+        if (!_grid[rr].containsKey(cc)) {
+          _grid[rr][cc] = index;
         }
       }
     }
 
-    return cellIndex;
+    return index;
   }
 
   @override
   Widget build(BuildContext context) => widget0;
+
+  TableDataSlot getSlot({int col, int index, int row}) {
+    assert((col == null) == (row == null));
+    assert((col == null) != (index == null));
+
+    if (col != null && row != null) {
+      if (!_grid.containsKey(row)) return null;
+      final map = _grid[row];
+      if (!map.containsKey(col)) return null;
+      index = map[col];
+    }
+
+    return _slots[index];
+  }
 
   static int _colsCombine(int prev, Map<int, int> row) {
     final cols = row.keys.length;
@@ -65,4 +81,14 @@ class TableDataCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => widget0;
+}
+
+@immutable
+class TableDataSlot {
+  final TableDataCell cell;
+  final int col;
+  final int index;
+  final int row;
+
+  TableDataSlot._(this.index, this.cell, this.row, this.col);
 }

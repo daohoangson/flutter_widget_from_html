@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/src/core_html_widget.dart'
     as core;
@@ -54,6 +55,63 @@ class WidgetFactory extends core.WidgetFactory {
   @override
   ImageProvider buildImageFromUrl(String url) =>
       url?.isNotEmpty == true ? CachedNetworkImageProvider(url) : null;
+
+  @override
+  Widget buildTable(TableData table) {
+    final cols = table.cols;
+    final templateColumnSizes = List<TrackSize>(cols);
+    for (var c = 0; c < cols; c++) {
+      templateColumnSizes[c] = FlexibleTrackSize(1);
+    }
+
+    final rows = table.rows;
+    final templateRowSizes = List<TrackSize>(rows);
+    for (var r = 0; r < rows; r++) {
+      templateRowSizes[r] = IntrinsicContentTrackSize();
+    }
+
+    final border = table.border != null
+        ? BoxDecoration(
+            border: Border.fromBorderSide(table.border),
+          )
+        : null;
+
+    final layoutGrid = LayoutGrid(
+      children: table.slots.map((slot) {
+        Widget cell = SizedBox.expand(child: buildColumn(slot.cell.children));
+
+        if (border != null) {
+          cell = Container(
+            child: cell,
+            decoration: border,
+          );
+        }
+
+        return cell.withGridPlacement(
+          columnStart: slot.col,
+          columnSpan: slot.cell.colspan,
+          rowStart: slot.row,
+          rowSpan: slot.cell.rowspan,
+        );
+      }).toList(growable: false),
+      columnGap: -(table.border?.width ?? 0),
+      gridFit: GridFit.passthrough,
+      rowGap: -(table.border?.width ?? 0),
+      templateColumnSizes: templateColumnSizes,
+      templateRowSizes: templateRowSizes,
+    );
+
+    if (border == null) {
+      return layoutGrid;
+    }
+
+    return Stack(
+      children: <Widget>[
+        layoutGrid,
+        Positioned.fill(child: Container(decoration: border))
+      ],
+    );
+  }
 
   Widget buildVideoPlayer(
     String url, {
