@@ -213,11 +213,7 @@ class WidgetFactory {
           ? Padding(child: child, padding: padding)
           : child;
 
-  Widget buildTable(
-    BuildContext context,
-    TextStyleBuilders tsb,
-    TableData table,
-  ) {
+  Widget buildTable(TableData table) {
     final cellIndices = <int>[];
     final rows = <TableRow>[];
     final tableCols = table.cols;

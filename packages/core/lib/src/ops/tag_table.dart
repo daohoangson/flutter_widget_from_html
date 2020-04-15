@@ -95,7 +95,7 @@ class _TagTable {
       }
     }
 
-    widgets.add(wf.buildTable(c, m.tsb, table));
+    widgets.add(wf.buildTable(table));
 
     return [wf.buildColumn(widgets)];
   }
