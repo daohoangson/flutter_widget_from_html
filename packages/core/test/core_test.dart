@@ -249,15 +249,35 @@ void main() {
     });
   });
 
-  testWidgets('renders RUBY tag', (WidgetTester tester) async {
-    final html = '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>';
-    final explained = await explain(tester, html);
-    expect(
-        explained,
-        equals('[RichText:[Stack:children='
-            '[Padding:(3,0,3,0),child=[RichText:(:明日)]],'
-            '[Positioned:child=[Center:alignment=center,child=[RichText:(@5.0:Ashita)]]]'
-            ']@middle]'));
+  group('RUBY', () {
+    testWidgets('renders with RT', (WidgetTester tester) async {
+      final html = '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[RichText:[Stack:children='
+              '[Padding:(3,0,3,0),child=[RichText:(:明日)]],'
+              '[Positioned:child=[Center:alignment=center,child=[RichText:(@5.0:Ashita)]]]'
+              ']@middle]'));
+    });
+
+    testWidgets('renders without RT', (WidgetTester tester) async {
+      final html = '<ruby>明日</ruby>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:明日)]'));
+    });
+
+    testWidgets('renders with empty RT', (WidgetTester tester) async {
+      final html = '<ruby>明日 <rt></rt></ruby>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:明日)]'));
+    });
+
+    testWidgets('renders without contents', (WidgetTester tester) async {
+      final html = 'Foo <ruby></ruby>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
   });
 
   group('block elements', () {

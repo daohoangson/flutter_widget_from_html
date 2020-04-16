@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'core_data.dart';
-import 'core_helpers.dart';
 import 'core_widget_factory.dart';
 
 final _attrStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
@@ -46,13 +45,8 @@ class HtmlBuilder {
           if (widget != null) list.add(widget);
         }
       } else {
-        final text = piece.text..trimRight();
-        if (text.isNotEmpty) {
-          list.add(WidgetPlaceholder(
-            builder: wf.buildText,
-            input: text,
-          ));
-        }
+        final built = wf.buildText(piece.text);
+        if (built != null) list.add(built);
       }
     }
 
