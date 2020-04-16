@@ -33,7 +33,8 @@ class _StyleVerticalAlign {
     }
 
     final text = piece.text;
-    final replacement = text.parent.sub(text.tsb)..detach();
+    final replacement = (text.parent?.sub(text.tsb) ?? TextBits(text.tsb))
+      ..detach();
     text.replaceWith(replacement);
 
     final built = wf.buildText(text);

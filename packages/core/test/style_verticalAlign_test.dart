@@ -102,5 +102,17 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
+
+    testWidgets('renders empty DIV inside', (WidgetTester tester) async {
+      final html = 'Foo <sup><div></div></sup>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('#159: renders CODE of whitespaces inside', (tester) async {
+      final html = 'Foo <sup><code>\n  \n\n\n</code></sup>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
   });
 }
