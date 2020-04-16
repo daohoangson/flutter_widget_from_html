@@ -1,16 +1,6 @@
 part of '../core_widget_factory.dart';
 
 const _kCssMargin = 'margin';
-const _kCssMarginBottom = 'margin-bottom';
-const _kCssMarginEnd = 'margin-end';
-const _kCssMarginLeft = 'margin-left';
-const _kCssMarginRight = 'margin-right';
-const _kCssMarginStart = 'margin-start';
-const _kCssMarginTop = 'margin-top';
-
-final _valuesFourRegExp =
-    RegExp(r'^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)$');
-final _valuesTwoRegExp = RegExp(r'^([^\s]+)\s+([^\s]+)$');
 
 Iterable<Widget> _marginHorizontalBuilder(
   BuildContext context,
@@ -19,9 +9,13 @@ Iterable<Widget> _marginHorizontalBuilder(
 ) {
   final direction = Directionality.of(context);
   final marginLeft = input.marginLeft ??
-      (direction == TextDirection.ltr ? input.marginStart : input.marginEnd);
+      (direction == TextDirection.ltr
+          ? input.marginInlineStart
+          : input.marginInlineEnd);
   final marginRight = input.marginRight ??
-      (direction == TextDirection.ltr ? input.marginEnd : input.marginStart);
+      (direction == TextDirection.ltr
+          ? input.marginInlineEnd
+          : input.marginInlineStart);
 
   final tsb = input.meta.tsb;
   final padding = EdgeInsets.only(
@@ -30,9 +24,9 @@ Iterable<Widget> _marginHorizontalBuilder(
   );
 
   return children.map((child) {
-    if (child is Padding) {
+    if (child is _MarginHorizontal) {
       final existing = child.padding as EdgeInsets;
-      return input.wf.buildPadding(
+      return _MarginHorizontal(
         child.child,
         existing.copyWith(
           left: existing.left + padding.left,
@@ -41,15 +35,20 @@ Iterable<Widget> _marginHorizontalBuilder(
       );
     }
 
-    return input.wf.buildPadding(child, padding);
-  });
+    return _MarginHorizontal(child, padding);
+  }).toList();
+}
+
+class _MarginHorizontal extends Padding {
+  _MarginHorizontal(Widget child, EdgeInsets padding)
+      : super(child: child, padding: padding);
 }
 
 class _MarginHorizontalInput {
-  CssLength marginEnd;
+  CssLength marginInlineEnd;
+  CssLength marginInlineStart;
   CssLength marginLeft;
   CssLength marginRight;
-  CssLength marginStart;
   NodeMetadata meta;
   WidgetFactory wf;
 }
@@ -110,10 +109,10 @@ class _StyleMargin {
           if (m == null) return null;
 
           final t = m.top?.isNotEmpty == true;
-          final lr = m.end?.isNotEmpty == true ||
+          final lr = m.inlineEnd?.isNotEmpty == true ||
               m.left?.isNotEmpty == true ||
               m.right?.isNotEmpty == true ||
-              m.start?.isNotEmpty == true;
+              m.inlineStart?.isNotEmpty == true;
           final b = m.bottom?.isNotEmpty == true;
           final ws = List<Widget>((t ? 1 : 0) + widgets.length + (b ? 1 : 0));
           final tsb = meta.tsb;
@@ -124,10 +123,10 @@ class _StyleMargin {
           if (lr) {
             for (final widget in widgets) {
               final input = _MarginHorizontalInput()
-                ..marginEnd = m.end
+                ..marginInlineEnd = m.inlineEnd
+                ..marginInlineStart = m.inlineStart
                 ..marginLeft = m.left
                 ..marginRight = m.right
-                ..marginStart = m.start
                 ..meta = meta
                 ..wf = wf;
 
@@ -149,82 +148,6 @@ class _StyleMargin {
 
           return ws;
         },
+        priority: 99999,
       );
-}
-
-CssMargin _parseCssMargin(WidgetFactory wf, NodeMetadata meta) {
-  CssMargin output;
-
-  for (final style in meta.styles) {
-    switch (style.key) {
-      case _kCssMargin:
-        output = wf.parseCssMarginAll(style.value);
-        break;
-
-      case _kCssMarginBottom:
-      case _kCssMarginEnd:
-      case _kCssMarginLeft:
-      case _kCssMarginRight:
-      case _kCssMarginStart:
-      case _kCssMarginTop:
-        output = wf.parseCssMarginOne(output, style.key, style.value);
-        break;
-    }
-  }
-
-  return output;
-}
-
-CssMargin _parseCssMarginAll(WidgetFactory wf, String value) {
-  final valuesFour = _valuesFourRegExp.firstMatch(value);
-  if (valuesFour != null) {
-    return CssMargin()
-      ..top = wf.parseCssLength(valuesFour[1])
-      ..end = wf.parseCssLength(valuesFour[2])
-      ..bottom = wf.parseCssLength(valuesFour[3])
-      ..start = wf.parseCssLength(valuesFour[4]);
-  }
-
-  final valuesTwo = _valuesTwoRegExp.firstMatch(value);
-  if (valuesTwo != null) {
-    final topBottom = wf.parseCssLength(valuesTwo[1]);
-    final leftRight = wf.parseCssLength(valuesTwo[2]);
-    return CssMargin()
-      ..bottom = topBottom
-      ..end = leftRight
-      ..start = leftRight
-      ..top = topBottom;
-  }
-
-  final all = wf.parseCssLength(value);
-  return CssMargin()
-    ..bottom = all
-    ..end = all
-    ..start = all
-    ..top = all;
-}
-
-CssMargin _parseCssMarginOne(
-    WidgetFactory wf, CssMargin existing, String key, String value) {
-  final parsed = wf.parseCssLength(value);
-  if (parsed == null) return existing;
-
-  existing ??= CssMargin();
-
-  switch (key) {
-    case _kCssMarginBottom:
-      return existing.copyWith(bottom: parsed);
-    case _kCssMarginEnd:
-      return existing.copyWith(end: parsed);
-    case _kCssMarginLeft:
-      return existing.copyWith(left: parsed);
-    case _kCssMarginRight:
-      return existing.copyWith(right: parsed);
-    case _kCssMarginStart:
-      return existing.copyWith(start: parsed);
-    case _kCssMarginTop:
-      return existing.copyWith(top: parsed);
-  }
-
-  return existing;
 }

@@ -95,7 +95,8 @@ However, these tags and their contents will be ignored:
 - font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) and value in em/px
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
-- margin and margin-xxx (values in px only)
+- margin and margin-xxx (values in `px`, `em`)
+- padding and padding-xxx (values in `px`, `em`)
 - vertical-align: baseline/top/bottom/middle/sub/super
 - text-align: center/justify/left/right
 - text-decoration: line-through/none/overline/underline
