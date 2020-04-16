@@ -9,9 +9,9 @@ void main() {
     expect(
         explained,
         equals('[RichText:[Stack:children='
-            '[Padding:(4,0,4,0),child=[Opacity:child=[RichText:(@8.3:Foo)]]],'
-            '[Positioned:(null,0.0,0.0,0.0),child=[RichText:(@8.3:Foo)]]'
-            ']@middle]'));
+            '[Padding:(0,0,3,0),child=[Opacity:child=[RichText:(@8.3:Foo)]]],'
+            '[Positioned:(null,null,0.0,null),child=[RichText:(@8.3:Foo)]]'
+            ']@top]'));
   });
 
   testWidgets('renders SUP tag', (WidgetTester tester) async {
@@ -20,9 +20,9 @@ void main() {
     expect(
         explained,
         equals('[RichText:[Stack:children='
-            '[Padding:(4,0,4,0),child=[Opacity:child=[RichText:(@8.3:Foo)]]],'
-            '[Positioned:(0.0,0.0,null,0.0),child=[RichText:(@8.3:Foo)]]'
-            ']@middle]'));
+            '[Padding:(3,0,0,0),child=[Opacity:child=[RichText:(@8.3:Foo)]]],'
+            '[Positioned:(0.0,null,null,null),child=[RichText:(@8.3:Foo)]]'
+            ']@bottom]'));
   });
 
   testWidgets('renders top text', (WidgetTester tester) async {
@@ -48,9 +48,9 @@ void main() {
     expect(
         explained,
         equals('[RichText:[Stack:children='
-            '[Padding:(5,0,5,0),child=[Opacity:child=[RichText:(:Foo)]]],'
-            '[Positioned:(null,0.0,0.0,0.0),child=[RichText:(:Foo)]]'
-            ']@middle]'));
+            '[Padding:(0,0,4,0),child=[Opacity:child=[RichText:(:Foo)]]],'
+            '[Positioned:(null,null,0.0,null),child=[RichText:(:Foo)]]'
+            ']@top]'));
   });
 
   testWidgets('renders super text', (WidgetTester tester) async {
@@ -59,9 +59,9 @@ void main() {
     expect(
         explained,
         equals('[RichText:[Stack:children='
-            '[Padding:(5,0,5,0),child=[Opacity:child=[RichText:(:Foo)]]],'
-            '[Positioned:(0.0,0.0,null,0.0),child=[RichText:(:Foo)]]'
-            ']@middle]'));
+            '[Padding:(4,0,0,0),child=[Opacity:child=[RichText:(:Foo)]]],'
+            '[Positioned:(0.0,null,null,null),child=[RichText:(:Foo)]]'
+            ']@bottom]'));
   });
 
   group('image', () {
@@ -94,9 +94,9 @@ void main() {
           explained,
           equals('[RichText:(:$imgRendered'
               '[Stack:children='
-              '[Padding:(4,0,4,0),child=[Opacity:child=[RichText:(@8.3:Foo)]]],'
-              '[Positioned:(0.0,0.0,null,0.0),child=[RichText:(@8.3:Foo)]]'
-              ']@middle)]'));
+              '[Padding:(3,0,0,0),child=[Opacity:child=[RichText:(@8.3:Foo)]]],'
+              '[Positioned:(0.0,null,null,null),child=[RichText:(@8.3:Foo)]]'
+              ']@bottom)]'));
     });
   });
 

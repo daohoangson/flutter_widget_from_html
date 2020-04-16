@@ -27,17 +27,12 @@ class _StyleVerticalAlign {
   BuiltPiece _buildWidgetSpan(BuiltPiece piece, String verticalAlign) {
     if (piece.hasWidgets) return piece;
 
-    final alignment = _getPlaceholderAlignment(verticalAlign);
-    if (alignment == null || alignment == PlaceholderAlignment.baseline) {
+    final text = piece.text;
+    final input = _buildInput(verticalAlign, text.tsb);
+    if (input == null || input.alignment == PlaceholderAlignment.baseline) {
       return piece;
     }
 
-    // `sub` and `super` require additional offset
-    // so we will use `Stack` with extra padding to avoid overlapping
-    final useStack = verticalAlign == _kCssVerticalAlignSub ||
-        verticalAlign == _kCssVerticalAlignSuper;
-
-    final text = piece.text;
     final replacement = (text.parent?.sub(text.tsb) ?? TextBits(text.tsb))
       ..detach();
     text.replaceWith(replacement);
@@ -47,48 +42,83 @@ class _StyleVerticalAlign {
     if (built == null) return newPiece;
 
     replacement.add(TextWidget(
-      text,
-      useStack
-          ? WidgetPlaceholder<_StyleVerticalAlign>(
-              builder: (context, _, __) => [
-                    Stack(children: <Widget>[
-                      wf.buildPadding(
-                        Opacity(child: built, opacity: 0),
-                        EdgeInsets.symmetric(
-                            vertical: text.tsb.build(context).fontSize / 2),
-                      ),
-                      Positioned(
-                        child: built,
-                        left: 0,
-                        right: 0,
-                        bottom:
-                            alignment == PlaceholderAlignment.top ? null : 0,
-                        top:
-                            alignment == PlaceholderAlignment.bottom ? null : 0,
-                      )
-                    ]),
-                  ])
-          : built,
-      alignment: useStack ? PlaceholderAlignment.middle : alignment,
-    ));
+        text,
+        input.padding != null
+            ? built is WidgetPlaceholder
+                ? (built..wrapWith(_build, input))
+                : WidgetPlaceholder(
+                    builder: _build,
+                    children: [built],
+                    input: input,
+                  )
+            : built,
+        alignment: input.alignment));
 
     return newPiece;
   }
+
+  Iterable<Widget> _build(
+    BuildContext context,
+    Iterable<Widget> widgets,
+    _VerticalAlignInput input,
+  ) {
+    final child = wf.buildColumn(widgets);
+    final fontSize = input.tsb.build(context).fontSize;
+    final padding = input.padding;
+    assert(padding != null);
+
+    return [
+      Stack(children: <Widget>[
+        wf.buildPadding(
+          Opacity(child: child, opacity: 0),
+          EdgeInsets.only(
+            bottom: fontSize * padding.bottom,
+            top: fontSize * padding.top,
+          ),
+        ),
+        Positioned(
+          child: child,
+          bottom: padding.top > 0 ? null : 0,
+          top: padding.bottom > 0 ? null : 0,
+        )
+      ]),
+    ];
+  }
 }
 
-PlaceholderAlignment _getPlaceholderAlignment(String verticalAlign) {
+_VerticalAlignInput _buildInput(String verticalAlign, TextStyleBuilders tsb) {
   switch (verticalAlign) {
     case _kCssVerticalAlignBaseline:
-      return PlaceholderAlignment.baseline;
+      return _VerticalAlignInput(PlaceholderAlignment.baseline);
     case _kCssVerticalAlignTop:
-    case _kCssVerticalAlignSuper:
-      return PlaceholderAlignment.top;
+      return _VerticalAlignInput(PlaceholderAlignment.top);
     case _kCssVerticalAlignBottom:
-    case _kCssVerticalAlignSub:
-      return PlaceholderAlignment.bottom;
+      return _VerticalAlignInput(PlaceholderAlignment.bottom);
     case _kCssVerticalAlignMiddle:
-      return PlaceholderAlignment.middle;
+      return _VerticalAlignInput(PlaceholderAlignment.middle);
+    case _kCssVerticalAlignSub:
+      return _VerticalAlignInput(
+        PlaceholderAlignment.top,
+        padding: EdgeInsets.only(bottom: .4),
+        tsb: tsb,
+      );
+    case _kCssVerticalAlignSuper:
+      return _VerticalAlignInput(
+        PlaceholderAlignment.bottom,
+        padding: EdgeInsets.only(top: .4),
+        tsb: tsb,
+      );
   }
 
   return null;
+}
+
+@immutable
+class _VerticalAlignInput {
+  final PlaceholderAlignment alignment;
+  final EdgeInsets padding;
+  final TextStyleBuilders tsb;
+
+  _VerticalAlignInput(this.alignment, {this.padding, this.tsb})
+      : assert((padding == null) == (tsb == null));
 }
