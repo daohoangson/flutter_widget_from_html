@@ -1,3 +1,8 @@
+## 0.4.0-rc.2020041601
+
+* Simplify `WidgetFactory.buildText` (#162)
+* Fix bug vertical-align with block element inside (#159)
+
 ## 0.4.0-rc.2020040701
 
 * Use minimum main axis size
