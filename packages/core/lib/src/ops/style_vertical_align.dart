@@ -36,30 +36,32 @@ class _StyleVerticalAlign {
     final replacement = text.parent.sub(text.tsb)..detach();
     text.replaceWith(replacement);
 
+    final built = wf.buildText(text);
+    final newPiece = BuiltPiece.text(replacement);
+    if (built == null) return newPiece;
+
     replacement.add(TextWidget(
       text,
       WidgetPlaceholder<_StyleVerticalAlign>(builder: (c, _, __) {
-        var built = wf.buildText(c, null, text);
-
         // `sub` and `super` require additional offset
         final dy = (verticalAlign == _kCssVerticalAlignSub
             ? 2.5
             : (verticalAlign == _kCssVerticalAlignSuper ? -2.5 : 0.0));
         if (dy != 0.0) {
-          built = [
+          return [
             Transform.translate(
               offset: Offset(0, text.tsb.build(c).fontSize / dy),
-              child: wf.buildColumn(wf.buildText(c, null, text)),
+              child: built,
             )
           ];
         }
 
-        return built;
+        return [built];
       }),
       alignment: alignment,
     ));
 
-    return BuiltPiece.text(replacement);
+    return newPiece;
   }
 }
 

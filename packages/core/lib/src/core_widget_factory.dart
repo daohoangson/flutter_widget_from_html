@@ -216,13 +216,24 @@ class WidgetFactory {
   TableCell buildTableCell(Widget child) => TableCell(
       child: buildPadding(child, _config.tableCellPadding) ?? widget0);
 
-  Iterable<Widget> buildText(BuildContext c, Iterable<Widget> _, TextBits t) {
-    final tsb = t.tsb;
-    tsb?.build(c);
+  Widget buildText(TextBits text) => (text..trimRight()).isNotEmpty
+      ? WidgetPlaceholder(
+          builder: _buildText,
+          input: text,
+        )
+      : null;
 
-    final textScaleFactor = MediaQuery.of(c).textScaleFactor;
+  static Iterable<Widget> _buildText(
+    BuildContext context,
+    Iterable<Widget> _,
+    TextBits text,
+  ) {
+    final tsb = text.tsb;
+    tsb?.build(context);
+
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
     final widgets = <Widget>[];
-    for (final compiled in _TextCompiler(t).compile(c)) {
+    for (final compiled in _TextCompiler(text).compile(context)) {
       if (compiled is InlineSpan) {
         widgets.add(RichText(
           text: compiled,
