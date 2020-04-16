@@ -6,14 +6,23 @@ void main() {
   testWidgets('renders SUB tag', (WidgetTester tester) async {
     final html = '<sub>Foo</sub>';
     final explained = await explain(tester, html);
-    expect(explained,
-        equals('[RichText:[Transform:child=[RichText:(@8.3:Foo)]]@bottom]'));
+    expect(
+        explained,
+        equals('[RichText:[Stack:children='
+            '[Padding:(4,0,4,0),child=[Opacity:child=[RichText:(@8.3:Foo)]]],'
+            '[Positioned:(null,0.0,0.0,0.0),child=[RichText:(@8.3:Foo)]]'
+            ']@middle]'));
   });
 
   testWidgets('renders SUP tag', (WidgetTester tester) async {
     final html = '<sup>Foo</sup>';
-    final e = await explain(tester, html);
-    expect(e, equals('[RichText:[Transform:child=[RichText:(@8.3:Foo)]]@top]'));
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[RichText:[Stack:children='
+            '[Padding:(4,0,4,0),child=[Opacity:child=[RichText:(@8.3:Foo)]]],'
+            '[Positioned:(0.0,0.0,null,0.0),child=[RichText:(@8.3:Foo)]]'
+            ']@middle]'));
   });
 
   testWidgets('renders top text', (WidgetTester tester) async {
@@ -35,14 +44,24 @@ void main() {
   });
   testWidgets('renders sub text', (WidgetTester tester) async {
     final html = '<span style="vertical-align: sub">Foo</span>';
-    final e = await explain(tester, html);
-    expect(e, equals('[RichText:[Transform:child=[RichText:(:Foo)]]@bottom]'));
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[RichText:[Stack:children='
+            '[Padding:(5,0,5,0),child=[Opacity:child=[RichText:(:Foo)]]],'
+            '[Positioned:(null,0.0,0.0,0.0),child=[RichText:(:Foo)]]'
+            ']@middle]'));
   });
 
   testWidgets('renders super text', (WidgetTester tester) async {
     final html = '<span style="vertical-align: super">Foo</span>';
-    final e = await explain(tester, html);
-    expect(e, equals('[RichText:[Transform:child=[RichText:(:Foo)]]@top]'));
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[RichText:[Stack:children='
+            '[Padding:(5,0,5,0),child=[Opacity:child=[RichText:(:Foo)]]],'
+            '[Positioned:(0.0,0.0,null,0.0),child=[RichText:(:Foo)]]'
+            ']@middle]'));
   });
 
   group('image', () {
@@ -74,7 +93,10 @@ void main() {
       expect(
           explained,
           equals('[RichText:(:$imgRendered'
-              '[Transform:child=[RichText:(@8.3:Foo)]]@top)]'));
+              '[Stack:children='
+              '[Padding:(4,0,4,0),child=[Opacity:child=[RichText:(@8.3:Foo)]]],'
+              '[Positioned:(0.0,0.0,null,0.0),child=[RichText:(@8.3:Foo)]]'
+              ']@middle)]'));
     });
   });
 

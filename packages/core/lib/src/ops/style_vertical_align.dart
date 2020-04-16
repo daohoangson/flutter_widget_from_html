@@ -32,6 +32,11 @@ class _StyleVerticalAlign {
       return piece;
     }
 
+    // `sub` and `super` require additional offset
+    // so we will use `Stack` with extra padding to avoid overlapping
+    final useStack = verticalAlign == _kCssVerticalAlignSub ||
+        verticalAlign == _kCssVerticalAlignSuper;
+
     final text = piece.text;
     final replacement = (text.parent?.sub(text.tsb) ?? TextBits(text.tsb))
       ..detach();
@@ -43,23 +48,28 @@ class _StyleVerticalAlign {
 
     replacement.add(TextWidget(
       text,
-      WidgetPlaceholder<_StyleVerticalAlign>(builder: (c, _, __) {
-        // `sub` and `super` require additional offset
-        final dy = (verticalAlign == _kCssVerticalAlignSub
-            ? 2.5
-            : (verticalAlign == _kCssVerticalAlignSuper ? -2.5 : 0.0));
-        if (dy != 0.0) {
-          return [
-            Transform.translate(
-              offset: Offset(0, text.tsb.build(c).fontSize / dy),
-              child: built,
-            )
-          ];
-        }
-
-        return [built];
-      }),
-      alignment: alignment,
+      useStack
+          ? WidgetPlaceholder<_StyleVerticalAlign>(
+              builder: (context, _, __) => [
+                    Stack(children: <Widget>[
+                      wf.buildPadding(
+                        Opacity(child: built, opacity: 0),
+                        EdgeInsets.symmetric(
+                            vertical: text.tsb.build(context).fontSize / 2),
+                      ),
+                      Positioned(
+                        child: built,
+                        left: 0,
+                        right: 0,
+                        bottom:
+                            alignment == PlaceholderAlignment.top ? null : 0,
+                        top:
+                            alignment == PlaceholderAlignment.bottom ? null : 0,
+                      )
+                    ]),
+                  ])
+          : built,
+      alignment: useStack ? PlaceholderAlignment.middle : alignment,
     ));
 
     return newPiece;
