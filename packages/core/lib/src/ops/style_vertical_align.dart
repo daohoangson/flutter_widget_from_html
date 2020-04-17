@@ -88,8 +88,6 @@ class _StyleVerticalAlign {
 
 _VerticalAlignInput _buildInput(String verticalAlign, TextStyleBuilders tsb) {
   switch (verticalAlign) {
-    case _kCssVerticalAlignBaseline:
-      return _VerticalAlignInput(PlaceholderAlignment.baseline);
     case _kCssVerticalAlignTop:
       return _VerticalAlignInput(PlaceholderAlignment.top);
     case _kCssVerticalAlignBottom:
