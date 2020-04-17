@@ -27,6 +27,12 @@ void main() {
             ']@bottom]'));
   });
 
+  testWidgets('renders baseline text', (WidgetTester tester) async {
+    final html = '<span style="vertical-align: baseline">Foo</span>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[RichText:(:Foo)]'));
+  });
+
   testWidgets('renders top text', (WidgetTester tester) async {
     final html = '<span style="vertical-align: top">Foo</span>';
     final explained = await explain(tester, html);
