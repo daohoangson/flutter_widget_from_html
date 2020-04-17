@@ -6,6 +6,7 @@ import '_.dart';
 
 void main() {
   final padding = 'Padding:(0,0,0,25)';
+  final positioned = 'Positioned:(0.0,810.0,null,null)';
   final disc = '•';
   final circle = '-';
   final square = '+';
@@ -16,7 +17,7 @@ void main() {
     expect(
         explained,
         equals('[SizedBox:0.0x10.0],'
-            '[$padding,child=[Stack:children=[RichText:(:Foo)],[Positioned:child=[RichText,align=right:(:$disc)]]]],'
+            '[$padding,child=[Stack:children=[RichText:(:Foo)],[$positioned,child=[RichText,align=right:(:$disc)]]]],'
             '[SizedBox:0.0x10.0]'));
   });
 
@@ -26,9 +27,9 @@ void main() {
     expect(
         explained,
         equals('[$padding,child=[Column:children='
-            '[Stack:children=[RichText:(:One)],[Positioned:child=[RichText,align=right:(:1.)]]],'
-            '[Stack:children=[RichText:(:Two)],[Positioned:child=[RichText,align=right:(:2.)]]],'
-            '[Stack:children=[RichText:(+b:Three)],[Positioned:child=[RichText,align=right:(:3.)]]]'
+            '[Stack:children=[RichText:(:One)],[$positioned,child=[RichText,align=right:(:1.)]]],'
+            '[Stack:children=[RichText:(:Two)],[$positioned,child=[RichText,align=right:(:2.)]]],'
+            '[Stack:children=[RichText:(+b:Three)],[$positioned,child=[RichText,align=right:(:3.)]]]'
             ']]'));
   });
 
@@ -38,9 +39,9 @@ void main() {
     expect(
         explained,
         equals('[$padding,child=[Column:children='
-            '[Stack:children=[RichText:(:One)],[Positioned:child=[RichText,align=right:(:$disc)]]],'
-            '[Stack:children=[RichText:(:Two)],[Positioned:child=[RichText,align=right:(:$disc)]]],'
-            '[Stack:children=[RichText:(+i:Three)],[Positioned:child=[RichText,align=right:(:$disc)]]]'
+            '[Stack:children=[RichText:(:One)],[$positioned,child=[RichText,align=right:(:$disc)]]],'
+            '[Stack:children=[RichText:(:Two)],[$positioned,child=[RichText,align=right:(:$disc)]]],'
+            '[Stack:children=[RichText:(+i:Three)],[$positioned,child=[RichText,align=right:(:$disc)]]]'
             ']]'));
   });
 
@@ -68,18 +69,18 @@ void main() {
     expect(
         explained,
         equals('[$padding,child=[Column:children='
-            '[Stack:children=[RichText:(:One)],[Positioned:child=[RichText,align=right:(:$disc)]]],'
+            '[Stack:children=[RichText:(:One)],[$positioned,child=[RichText,align=right:(:$disc)]]],'
             '[Stack:children='
             '[Column:children=[RichText:(:Two)],[$padding,child=[Column:children='
-            '[Stack:children=[RichText:(:2.1)],[Positioned:child=[RichText,align=right:(:$circle)]]],'
+            '[Stack:children=[RichText:(:2.1)],[$positioned,child=[RichText,align=right:(:$circle)]]],'
             '[Stack:children='
             '[Column:children=[RichText:(:2.2)],[$padding,child=[Column:children='
-            '[Stack:children=[RichText:(:2.2.1)],[Positioned:child=[RichText,align=right:(:$square)]]],'
-            '[Stack:children=[RichText:(:2.2.2)],[Positioned:child=[RichText,align=right:(:$square)]]]'
-            ']]],[Positioned:child=[RichText,align=right:(:$circle)]]],'
-            '[Stack:children=[RichText:(:2.3)],[Positioned:child=[RichText,align=right:(:$circle)]]]'
-            ']]],[Positioned:child=[RichText,align=right:(:$disc)]]],'
-            '[Stack:children=[RichText:(:Three)],[Positioned:child=[RichText,align=right:(:$disc)]]]'
+            '[Stack:children=[RichText:(:2.2.1)],[$positioned,child=[RichText,align=right:(:$square)]]],'
+            '[Stack:children=[RichText:(:2.2.2)],[$positioned,child=[RichText,align=right:(:$square)]]]'
+            ']]],[$positioned,child=[RichText,align=right:(:$circle)]]],'
+            '[Stack:children=[RichText:(:2.3)],[$positioned,child=[RichText,align=right:(:$circle)]]]'
+            ']]],[$positioned,child=[RichText,align=right:(:$disc)]]],'
+            '[Stack:children=[RichText:(:Three)],[$positioned,child=[RichText,align=right:(:$disc)]]]'
             ']]'));
   });
 
@@ -94,15 +95,15 @@ void main() {
     expect(
         explained,
         equals('[$padding,child=[Column:children='
-            '[Stack:children=[RichText:(:Foo)],[Positioned:child=[RichText,align=right:(:$disc)]]],'
-            '[$padding,child=[Stack:children=[RichText:(:Bar)],[Positioned:child=[RichText,align=right:(:$circle)]]]]'
+            '[Stack:children=[RichText:(:Foo)],[$positioned,child=[RichText,align=right:(:$disc)]]],'
+            '[$padding,child=[Stack:children=[RichText:(:Bar)],[$positioned,child=[RichText,align=right:(:$circle)]]]]'
             ']]'));
   });
 
   group('OL reversed', () {
     final olReversedLiHtml = '<li>x</li>';
     final olReversedLiPrefix =
-        'Stack:children=[RichText:(:x)],[Positioned:child=[RichText,align=right:';
+        'Stack:children=[RichText:(:x)],[$positioned,child=[RichText,align=right:';
     final olReversedLiPostfix = ']]';
 
     testWidgets('renders 123 (default)', (WidgetTester tester) async {
@@ -148,7 +149,7 @@ void main() {
   group('OL start', () {
     final olStartLiHtml = '<li>x</li>';
     final olStartLiPrefix =
-        'Stack:children=[RichText:(:x)],[Positioned:child=[RichText,align=right:';
+        'Stack:children=[RichText:(:x)],[$positioned,child=[RichText,align=right:';
     final olStartLiPostfix = ']]';
 
     testWidgets('renders from 1 (default)', (WidgetTester tester) async {
@@ -182,7 +183,7 @@ void main() {
   group('OL type', () {
     final olTypeLiHtml = '<li>x</li>';
     final olTypeLiPrefix =
-        '$padding,child=[Stack:children=[RichText:(:x)],[Positioned:child=[RichText,align=right:';
+        '$padding,child=[Stack:children=[RichText:(:x)],[$positioned,child=[RichText,align=right:';
     final olTypeLiPostfix = ']]]';
 
     testWidgets('renders 1 (default)', (WidgetTester tester) async {
@@ -233,9 +234,9 @@ void main() {
       expect(
           explained,
           equals('[$padding,child=[Column:children='
-              '[Stack:children=[RichText:(:decimal)],[Positioned:child=[RichText,align=right:(:1.)]]],'
-              '[Stack:children=[RichText:(:lower-roman)],[Positioned:child=[RichText,align=right:(:ii.)]]],'
-              '[Stack:children=[RichText:(:lower-alpha)],[Positioned:child=[RichText,align=right:(:c.)]]]'
+              '[Stack:children=[RichText:(:decimal)],[$positioned,child=[RichText,align=right:(:1.)]]],'
+              '[Stack:children=[RichText:(:lower-roman)],[$positioned,child=[RichText,align=right:(:ii.)]]],'
+              '[Stack:children=[RichText:(:lower-alpha)],[$positioned,child=[RichText,align=right:(:c.)]]]'
               ']]'));
     });
   });
@@ -248,7 +249,7 @@ void main() {
         expect(
             explained,
             equals('[$padding,child=[Stack:children=[RichText:(:Foo)],'
-                '[Positioned:child=[RichText,align=right:(:$disc)]]]]'));
+                '[$positioned,child=[RichText,align=right:(:$disc)]]]]'));
       });
 
       testWidgets('renders disc (OL)', (WidgetTester tester) async {
@@ -257,7 +258,7 @@ void main() {
         expect(
             explained,
             equals('[$padding,child=[Stack:children=[RichText:(:Foo)],'
-                '[Positioned:child=[RichText,align=right:(:$disc)]]]]'));
+                '[$positioned,child=[RichText,align=right:(:$disc)]]]]'));
       });
 
       testWidgets('renders circle', (WidgetTester tester) async {
@@ -266,7 +267,7 @@ void main() {
         expect(
             explained,
             equals('[$padding,child=[Stack:children=[RichText:(:Foo)],'
-                '[Positioned:child=[RichText,align=right:(:$circle)]]]]'));
+                '[$positioned,child=[RichText,align=right:(:$circle)]]]]'));
       });
 
       testWidgets('renders square', (WidgetTester tester) async {
@@ -275,7 +276,7 @@ void main() {
         expect(
             explained,
             equals('[$padding,child=[Stack:children=[RichText:(:Foo)],'
-                '[Positioned:child=[RichText,align=right:(:$square)]]]]'));
+                '[$positioned,child=[RichText,align=right:(:$square)]]]]'));
       });
 
       testWidgets('renders LI list-style-type', (WidgetTester tester) async {
@@ -290,16 +291,16 @@ void main() {
         expect(
             explained,
             equals('[$padding,child=[Column:children='
-                '[Stack:children=[RichText:(:disc)],[Positioned:child=[RichText,align=right:(:$disc)]]],'
-                '[Stack:children=[RichText:(:square)],[Positioned:child=[RichText,align=right:(:$square)]]],'
-                '[Stack:children=[RichText:(:circle)],[Positioned:child=[RichText,align=right:(:$circle)]]]'
+                '[Stack:children=[RichText:(:disc)],[$positioned,child=[RichText,align=right:(:$disc)]]],'
+                '[Stack:children=[RichText:(:square)],[$positioned,child=[RichText,align=right:(:$square)]]],'
+                '[Stack:children=[RichText:(:circle)],[$positioned,child=[RichText,align=right:(:$circle)]]]'
                 ']]'));
       });
 
       group('serial', () {
         final serialLiHtml = '<li>x</li>';
         final serialLiPrefix =
-            'Stack:children=[RichText:(:x)],[Positioned:child=[RichText,align=right:';
+            'Stack:children=[RichText:(:x)],[$positioned,child=[RichText,align=right:';
         final serialLiPostfix = ']]';
 
         testWidgets('renders decimal (default for OL)', (tester) async {
@@ -521,7 +522,7 @@ void main() {
             explained,
             equals(
                 '[Padding:(0,0,0,99),child=[Stack:children=[RichText:(:Foo)],'
-                '[Positioned:child=[RichText,align=right:(:$disc)]]]]'));
+                '[$positioned,child=[RichText,align=right:(:$disc)]]]]'));
       });
 
       testWidgets('renders LI padding-inline-start', (tester) async {
@@ -537,9 +538,9 @@ void main() {
         expect(
             explained,
             equals('[Padding:(0,0,0,99),child=[Column:children='
-                '[Padding:(0,0,0,199),child=[Stack:children=[RichText:(:199px)],[Positioned:child=[RichText,align=right:(:$disc)]]]],'
-                '[Padding:(0,0,0,299),child=[Stack:children=[RichText:(:299px)],[Positioned:child=[RichText,align=right:(:$disc)]]]],'
-                '[Stack:children=[RichText:(:99px)],[Positioned:child=[RichText,align=right:(:$disc)]]]'
+                '[Padding:(0,0,0,199),child=[Stack:children=[RichText:(:199px)],[$positioned,child=[RichText,align=right:(:$disc)]]]],'
+                '[Padding:(0,0,0,299),child=[Stack:children=[RichText:(:299px)],[$positioned,child=[RichText,align=right:(:$disc)]]]],'
+                '[Stack:children=[RichText:(:99px)],[$positioned,child=[RichText,align=right:(:$disc)]]]'
                 ']]'));
       });
     });
@@ -578,10 +579,10 @@ void main() {
       expect(
           explained,
           equals('[$padding,child=[Column:children='
-              '[Stack:children=[RichText:(:One)],[Positioned:child=[RichText,align=right:(:$disc)]]],'
+              '[Stack:children=[RichText:(:One)],[$positioned,child=[RichText,align=right:(:$disc)]]],'
               '[$padding,child=[Column:children='
-              '[Stack:children=[RichText:(:Two)],[Positioned:child=[RichText,align=right:(:$circle)]]],'
-              '[Stack:children=[RichText:(:Three)],[Positioned:child=[RichText,align=right:(:$circle)]]]'
+              '[Stack:children=[RichText:(:Two)],[$positioned,child=[RichText,align=right:(:$circle)]]],'
+              '[Stack:children=[RichText:(:Three)],[$positioned,child=[RichText,align=right:(:$circle)]]]'
               ']]'
               ']]'));
     });
@@ -597,15 +598,16 @@ void main() {
       expect(
           explained,
           equals('[$padding,child=[Column:children='
-              '[Stack:children=[RichText:(:One)],[Positioned:child=[RichText,align=right:(:1.)]]],'
-              '[Stack:children=[widget0],[Positioned:child=[RichText,align=right:(:2.)]]],'
-              '[Stack:children=[RichText:(:Three)],[Positioned:child=[RichText,align=right:(:3.)]]]'
+              '[Stack:children=[RichText:(:One)],[$positioned,child=[RichText,align=right:(:1.)]]],'
+              '[Stack:children=[widget0],[$positioned,child=[RichText,align=right:(:2.)]]],'
+              '[Stack:children=[RichText:(:Three)],[$positioned,child=[RichText,align=right:(:3.)]]]'
               ']]'));
     });
   });
 
   group('rtl', () {
     final rtlPadding = 'Padding:(0,25,0,0)';
+    final rtlPositioned = 'Positioned:(0.0,null,null,810.0)';
     testWidgets('renders ordered list', (WidgetTester tester) async {
       final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';
       final explained = await explain(tester, null,
@@ -620,9 +622,9 @@ void main() {
       expect(
           explained,
           equals('[$rtlPadding,child=[Column:children='
-              '[Stack:children=[RichText:(:One)],[Positioned:child=[RichText,align=left:(:1.)]]],'
-              '[Stack:children=[RichText:(:Two)],[Positioned:child=[RichText,align=left:(:2.)]]],'
-              '[Stack:children=[RichText:(+b:Three)],[Positioned:child=[RichText,align=left:(:3.)]]]'
+              '[Stack:children=[RichText:(:One)],[$rtlPositioned,child=[RichText,align=left:(:1.)]]],'
+              '[Stack:children=[RichText:(:Two)],[$rtlPositioned,child=[RichText,align=left:(:2.)]]],'
+              '[Stack:children=[RichText:(+b:Three)],[$rtlPositioned,child=[RichText,align=left:(:3.)]]]'
               ']]'));
     });
   });
