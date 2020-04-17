@@ -108,7 +108,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Table:border=(Color(0xff000000),w=1.0)\n'
+        equals('[Table:border=1.0@solid#FF000000\n'
             '${_richtext('Foo')}\n'
             ']'),
       );
@@ -119,7 +119,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Table:border=(Color(0xff000000),w=1.0)\n'
+        equals('[Table:border=1.0@solid#FF000000\n'
             '${_richtext('Foo')}\n'
             ']'),
       );
@@ -130,19 +130,19 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Table:border=(Color(0xff000000),w=2.0)\n'
+        equals('[Table:border=2.0@solid#FF000000\n'
             '${_richtext('Foo')}\n'
             ']'),
       );
     });
 
     testWidgets('renders style="border: 1px solid #f00"', (tester) async {
-      final html = '<table style="border: 1px solid #f00">' +
+      final html = '<table style="border: 1px solid #f00">'
           '<tr><td>Foo</td></tr></table>';
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Table:border=(Color(0xffff0000),w=1.0)\n'
+        equals('[Table:border=1.0@solid#FFFF0000\n'
             '${_richtext('Foo')}\n'
             ']'),
       );
@@ -154,7 +154,7 @@ void main() {
       final explained = await explain(t, html);
       expect(
         explained,
-        equals('[Table:border=(Color(0xff000000),w=1.0)\n'
+        equals('[Table:border=1.0@solid#FF000000\n'
             '${_padding('[RichText,align=left:(:Foo)]')}\n'
             ']'),
       );
@@ -166,7 +166,7 @@ void main() {
       final explained = await explain(t, html);
       expect(
         explained,
-        equals('[Table:border=(Color(0xff000000),w=1.0)\n'
+        equals('[Table:border=1.0@solid#FF000000\n'
             '${_padding('[RichText,align=left:(:Foo)]')}\n'
             ']'),
       );
@@ -275,9 +275,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Table:\n' +
-              '${_padding('[RichText:(+b:Header 1)]')} | [widget0]\n' +
-              '${_richtext('Value 1')} | ${_richtext('Value 2')}\n' +
+          equals('[Table:\n'
+              '${_padding('[RichText:(+b:Header 1)]')} | [widget0]\n'
+              '${_richtext('Value 1')} | ${_richtext('Value 2')}\n'
               ']'));
     });
 
@@ -289,9 +289,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Table:\n' +
-              '${_padding('[RichText:(+b:Header 1)]')} | ${_padding('[RichText:(+b:Header 2)]')}\n' +
-              '${_richtext('Value 1')} | [widget0]\n' +
+          equals('[Table:\n'
+              '${_padding('[RichText:(+b:Header 1)]')} | ${_padding('[RichText:(+b:Header 2)]')}\n'
+              '${_richtext('Value 1')} | [widget0]\n'
               ']'));
     });
 
