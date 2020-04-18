@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
+    as extended;
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
+    as core;
 import 'package:golden_toolkit/golden_toolkit.dart';
 
 // https://lipsum.com/feed/html
@@ -16,32 +19,49 @@ const redX = '<span style="background-color:#f00;font-size:0.75em;">x</span>';
 
 class _TestApp extends StatelessWidget {
   final String html;
+  final bool withExtended;
 
-  const _TestApp(this.html, {Key key}) : super(key: key);
+  const _TestApp(this.html, {Key key, this.withExtended}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-        home: Scaffold(
-          body: Column(
-            children: <Widget>[
-              Text(html),
-              Divider(),
-              HtmlWidget(html),
-            ],
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-          ),
+  Widget build(BuildContext context) {
+    final children = <Widget>[
+      Text(html),
+      Divider(),
+      core.HtmlWidget(html),
+    ];
+
+    if (withExtended) {
+      children.addAll(<Widget>[
+        Divider(),
+        extended.HtmlWidget(html),
+      ]);
+    }
+
+    return MaterialApp(
+      home: Scaffold(
+        body: Column(
+          children: children,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
         ),
-        theme: ThemeData.light(),
-      );
+      ),
+      theme: ThemeData.light(),
+    );
+  }
 }
 
 void _test(String name, String html) => testGoldens(name, (tester) async {
-      await tester.pumpWidget(_TestApp(html));
+      await tester.pumpWidget(_TestApp(
+        html,
+        withExtended: _withExtendedRegExp.hasMatch(name),
+      ));
       await expectLater(
-        find.byType(HtmlWidget),
+        find.byType(Scaffold),
         matchesGoldenFile('./images/$name.png'),
       );
     });
+
+final _withExtendedRegExp = RegExp(r'(colspan|rowspan)');
 
 void main() {
   ({
@@ -333,5 +353,42 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
     <span style="display: table-cell">Value 2</span>
   </div>
 </div>""",
+    'TABLE/colspan': """
+<table border="1">
+  <caption>Source: <a href="https://www.w3schools.com/tags/att_td_colspan.asp">w3schools</a></caption>
+  <tr>
+    <th>Month</th>
+    <th>Savings</th>
+  </tr>
+  <tr>
+    <td>January</td>
+    <td>\$100</td>
+  </tr>
+  <tr>
+    <td>February</td>
+    <td>\$80</td>
+  </tr>
+  <tr>
+    <td colspan="2">Sum: \$180</td>
+  </tr>
+</table>""",
+    'TABLE/rowspan': """
+<table border="1">
+  <caption>Source: <a href="https://www.w3schools.com/tags/att_td_colspan.asp">w3schools</a></caption>
+  <tr>
+    <th>Month</th>
+    <th>Savings</th>
+    <th>Savings for holiday!</th>
+  </tr>
+  <tr>
+    <td>January</td>
+    <td>\$100</td>
+    <td rowspan="2">\$50</td>
+  </tr>
+  <tr>
+    <td>February</td>
+    <td>\$80</td>
+  </tr>
+</table>""",
   }).entries.forEach((entry) => _test(entry.key, entry.value));
 }
