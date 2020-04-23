@@ -156,6 +156,17 @@ class WidgetFactory {
           : print("[flutter_widget_from_html] Tapped url $url")
       : null;
 
+  InlineSpan buildGestureTapCallbackSpan(
+    String text,
+    GestureTapCallback onTap,
+    TextStyle style,
+  ) =>
+      TextSpan(
+        text: text,
+        recognizer: TapGestureRecognizer()..onTap = onTap,
+        style: style,
+      );
+
   Widget buildImage(String url, {double height, String text, double width}) {
     ImageProvider image;
     if (url != null) {
@@ -244,13 +255,24 @@ class WidgetFactory {
     return Table(border: tableBorder, children: rows);
   }
 
-  Iterable<Widget> buildText(BuildContext c, Iterable<Widget> _, TextBits t) {
-    final tsb = t.tsb;
-    tsb?.build(c);
+  Widget buildText(TextBits text) => (text..trimRight()).isNotEmpty
+      ? WidgetPlaceholder(
+          builder: _buildText,
+          input: text,
+        )
+      : null;
 
-    final textScaleFactor = MediaQuery.of(c).textScaleFactor;
+  static Iterable<Widget> _buildText(
+    BuildContext context,
+    Iterable<Widget> _,
+    TextBits text,
+  ) {
+    final tsb = text.tsb;
+    tsb?.build(context);
+
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
     final widgets = <Widget>[];
-    for (final compiled in _TextCompiler(t).compile(c)) {
+    for (final compiled in _TextCompiler(text).compile(context)) {
       if (compiled is InlineSpan) {
         widgets.add(RichText(
           text: compiled,

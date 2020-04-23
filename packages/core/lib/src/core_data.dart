@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -162,8 +161,6 @@ class TextStyleBuilders {
   final _builders = <Function>[];
   final _inputs = [];
   final TextStyleBuilders parent;
-
-  GestureRecognizer recognizer;
 
   BuildContext _context;
   TextStyle _output;

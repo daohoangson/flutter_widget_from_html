@@ -374,15 +374,17 @@ class Explainer {
                                 ? _limitBox(widget)
                                 : widget is Padding
                                     ? "${_edgeInsets(widget.padding)},"
-                                    : widget is RichText
-                                        ? _inlineSpan(widget.text)
-                                        : widget is Table
-                                            ? _tableBorder(widget.border)
-                                            : widget is Text
-                                                ? widget.data
-                                                : widget is Wrap
-                                                    ? _wrap(widget)
-                                                    : '';
+                                    : widget is Positioned
+                                        ? "(${widget.top},${widget.right},${widget.bottom},${widget.left}),"
+                                        : widget is RichText
+                                            ? _inlineSpan(widget.text)
+                                            : widget is Table
+                                                ? _tableBorder(widget.border)
+                                                : widget is Text
+                                                    ? widget.data
+                                                    : widget is Wrap
+                                                        ? _wrap(widget)
+                                                        : '';
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));

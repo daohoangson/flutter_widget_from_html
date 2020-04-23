@@ -1,4 +1,6 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import '_.dart';
 
@@ -6,14 +8,29 @@ void main() {
   testWidgets('renders SUB tag', (WidgetTester tester) async {
     final html = '<sub>Foo</sub>';
     final explained = await explain(tester, html);
-    expect(explained,
-        equals('[RichText:[Transform:child=[RichText:(@8.3:Foo)]]@bottom]'));
+    expect(
+        explained,
+        equals('[RichText:[Stack:children='
+            '[Padding:(0,0,3,0),child=[Opacity:child=[RichText:(@8.3:Foo)]]],'
+            '[Positioned:(null,null,0.0,null),child=[RichText:(@8.3:Foo)]]'
+            ']@top]'));
   });
 
   testWidgets('renders SUP tag', (WidgetTester tester) async {
     final html = '<sup>Foo</sup>';
-    final e = await explain(tester, html);
-    expect(e, equals('[RichText:[Transform:child=[RichText:(@8.3:Foo)]]@top]'));
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[RichText:[Stack:children='
+            '[Padding:(3,0,0,0),child=[Opacity:child=[RichText:(@8.3:Foo)]]],'
+            '[Positioned:(0.0,null,null,null),child=[RichText:(@8.3:Foo)]]'
+            ']@bottom]'));
+  });
+
+  testWidgets('renders baseline text', (WidgetTester tester) async {
+    final html = '<span style="vertical-align: baseline">Foo</span>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[RichText:(:Foo)]'));
   });
 
   testWidgets('renders top text', (WidgetTester tester) async {
@@ -35,14 +52,24 @@ void main() {
   });
   testWidgets('renders sub text', (WidgetTester tester) async {
     final html = '<span style="vertical-align: sub">Foo</span>';
-    final e = await explain(tester, html);
-    expect(e, equals('[RichText:[Transform:child=[RichText:(:Foo)]]@bottom]'));
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[RichText:[Stack:children='
+            '[Padding:(0,0,4,0),child=[Opacity:child=[RichText:(:Foo)]]],'
+            '[Positioned:(null,null,0.0,null),child=[RichText:(:Foo)]]'
+            ']@top]'));
   });
 
   testWidgets('renders super text', (WidgetTester tester) async {
     final html = '<span style="vertical-align: super">Foo</span>';
-    final e = await explain(tester, html);
-    expect(e, equals('[RichText:[Transform:child=[RichText:(:Foo)]]@top]'));
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[RichText:[Stack:children='
+            '[Padding:(4,0,0,0),child=[Opacity:child=[RichText:(:Foo)]]],'
+            '[Positioned:(0.0,null,null,null),child=[RichText:(:Foo)]]'
+            ']@bottom]'));
   });
 
   group('image', () {
@@ -74,7 +101,10 @@ void main() {
       expect(
           explained,
           equals('[RichText:(:$imgRendered'
-              '[Transform:child=[RichText:(@8.3:Foo)]]@top)]'));
+              '[Stack:children='
+              '[Padding:(3,0,0,0),child=[Opacity:child=[RichText:(@8.3:Foo)]]],'
+              '[Positioned:(0.0,null,null,null),child=[RichText:(@8.3:Foo)]]'
+              ']@bottom)]'));
     });
   });
 
@@ -89,4 +119,63 @@ void main() {
     final explained = await explain(tester, html);
     expect(explained, equals('[RichText:[RichText:(+i:Foo)]@top]'));
   });
+
+  group('error handling', () {
+    testWidgets('renders empty tag', (WidgetTester tester) async {
+      final html = 'Foo <sub></sub>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('renders empty SPAN inside', (WidgetTester tester) async {
+      final html = 'Foo <sup><span></span></sup>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('renders empty DIV inside', (WidgetTester tester) async {
+      final html = 'Foo <sup><div></div></sup>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('#159: renders CODE of whitespaces inside', (tester) async {
+      final html = 'Foo <sup><code>\n  \n\n\n</code></sup>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+  });
+
+  testWidgets('#163: renders non-WidgetPlaceholder text', (tester) async {
+    final html = '<sub>Foo</sub>';
+    final explained = await explain(
+      tester,
+      null,
+      hw: HtmlWidget(
+        html,
+        bodyPadding: const EdgeInsets.all(0),
+        factoryBuilder: (config) => _Issue163Wf(config),
+        key: hwKey,
+      ),
+    );
+    expect(
+        explained,
+        equals('[RichText:[Stack:children='
+            '[Padding:(0,0,3,0),child=[Opacity:child=[Text:Foo]]],'
+            '[Positioned:(null,null,0.0,null),child=[Text:Foo]]'
+            ']@top]'));
+  });
+}
+
+class _Issue163Wf extends WidgetFactory {
+  _Issue163Wf(HtmlConfig config) : super(config);
+
+  Widget buildText(TextBits text) {
+    final bits = text.bits.toList(growable: false);
+    if (bits.length == 1 && bits[0] is TextData) {
+      return Text(bits[0].data);
+    }
+
+    return super.buildText(text);
+  }
 }
