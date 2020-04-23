@@ -101,11 +101,9 @@ class TextData extends TextBit {
 class TextWhitespace extends TextBit {
   final _buffer = StringBuffer();
 
-  TextWhitespace(TextBit parent, {String data, TextWhitespaceType type})
+  TextWhitespace(TextBit parent, TextWhitespaceType type)
       : assert(parent != null),
-        assert(data == null || type == null),
         super(parent) {
-    if (data != null) _buffer.write(data);
     if (type != null) append(type);
   }
 
@@ -213,7 +211,7 @@ class TextBits extends TextBit {
       return tail..append(type);
     }
 
-    final bit = TextWhitespace(this, type: type);
+    final bit = TextWhitespace(this, type);
     add(bit);
     return bit;
   }
