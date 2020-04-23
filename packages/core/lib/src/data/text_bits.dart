@@ -101,14 +101,16 @@ class TextData extends TextBit {
 class TextWhitespace extends TextBit {
   final _buffer = StringBuffer();
 
-  TextWhitespace(TextBit parent, TextWhitespaceType type)
+  TextWhitespace(TextBit parent, {String data, TextWhitespaceType type})
       : assert(parent != null),
+        assert(data == null || type == null),
         super(parent) {
+    if (data != null) _buffer.write(data);
     if (type != null) append(type);
   }
 
   @override
-  String get data => _buffer.isEmpty ? null : _buffer.toString();
+  String get data => _buffer.isEmpty ? ' ' : _buffer.toString();
 
   @override
   bool get hasTrailingWhitespace => _buffer.isEmpty;
@@ -211,7 +213,7 @@ class TextBits extends TextBit {
       return tail..append(type);
     }
 
-    final bit = TextWhitespace(this, type);
+    final bit = TextWhitespace(this, type: type);
     add(bit);
     return bit;
   }
