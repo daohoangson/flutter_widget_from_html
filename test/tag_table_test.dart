@@ -124,7 +124,7 @@ void main() {
           equals('[Stack:children='
               '[LayoutGrid:children='
               '[0,0:[Container:border=1.0@solid#FF000000,child=${_richtext('Foo')}]]],'
-              '[Positioned:child=[Container:border=1.0@solid#FF000000,]]'
+              '[Positioned:(0.0,0.0,0.0,0.0),child=[Container:border=1.0@solid#FF000000,]]'
               ']'));
     });
 
@@ -136,7 +136,7 @@ void main() {
           equals('[Stack:children='
               '[LayoutGrid:children='
               '[0,0:[Container:border=1.0@solid#FF000000,child=${_richtext('Foo')}]]],'
-              '[Positioned:child=[Container:border=1.0@solid#FF000000,]]'
+              '[Positioned:(0.0,0.0,0.0,0.0),child=[Container:border=1.0@solid#FF000000,]]'
               ']'));
     });
 
@@ -148,7 +148,7 @@ void main() {
           equals('[Stack:children='
               '[LayoutGrid:children='
               '[0,0:[Container:border=2.0@solid#FF000000,child=${_richtext('Foo')}]]],'
-              '[Positioned:child=[Container:border=2.0@solid#FF000000,]]'
+              '[Positioned:(0.0,0.0,0.0,0.0),child=[Container:border=2.0@solid#FF000000,]]'
               ']'));
     });
 
@@ -161,7 +161,7 @@ void main() {
           equals('[Stack:children='
               '[LayoutGrid:children='
               '[0,0:[Container:border=1.0@solid#FFFF0000,child=${_richtext('Foo')}]]],'
-              '[Positioned:child=[Container:border=1.0@solid#FFFF0000,]]'
+              '[Positioned:(0.0,0.0,0.0,0.0),child=[Container:border=1.0@solid#FFFF0000,]]'
               ']'));
     });
 
@@ -174,7 +174,7 @@ void main() {
           equals('[Stack:children='
               '[LayoutGrid:children='
               '[0,0:[Container:border=1.0@solid#FF000000,child=${_padding('[RichText,align=left:(:Foo)]')}]]],'
-              '[Positioned:child=[Container:border=1.0@solid#FF000000,]]'
+              '[Positioned:(0.0,0.0,0.0,0.0),child=[Container:border=1.0@solid#FF000000,]]'
               ']'));
     });
 
@@ -187,7 +187,7 @@ void main() {
           equals('[Stack:children='
               '[LayoutGrid:children='
               '[0,0:[Container:border=1.0@solid#FF000000,child=${_padding('[RichText,align=left:(:Foo)]')}]]],'
-              '[Positioned:child=[Container:border=1.0@solid#FF000000,]]'
+              '[Positioned:(0.0,0.0,0.0,0.0),child=[Container:border=1.0@solid#FF000000,]]'
               ']'));
     });
   });
