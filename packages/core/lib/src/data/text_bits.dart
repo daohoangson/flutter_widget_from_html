@@ -108,7 +108,7 @@ class TextWhitespace extends TextBit {
   }
 
   @override
-  String get data => _buffer.isEmpty ? null : _buffer.toString();
+  String get data => _buffer.isEmpty ? ' ' : _buffer.toString();
 
   @override
   bool get hasTrailingWhitespace => _buffer.isEmpty;

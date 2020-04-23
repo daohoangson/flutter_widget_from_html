@@ -156,6 +156,17 @@ class WidgetFactory {
           : print("[flutter_widget_from_html] Tapped url $url")
       : null;
 
+  InlineSpan buildGestureTapCallbackSpan(
+    String text,
+    GestureTapCallback onTap,
+    TextStyle style,
+  ) =>
+      TextSpan(
+        text: text,
+        recognizer: TapGestureRecognizer()..onTap = onTap,
+        style: style,
+      );
+
   Widget buildImage(String url, {double height, String text, double width}) {
     ImageProvider image;
     if (url != null) {
