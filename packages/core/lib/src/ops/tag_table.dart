@@ -143,6 +143,8 @@ class _TagTablePlaceholder<T> extends WidgetPlaceholder<T> {
 
   @override
   void wrapWith<T2>(WidgetPlaceholderBuilder<T2> builder, [T2 input]) {
+    assert(builder != null);
+
     for (final child in children) {
       if (child is WidgetPlaceholder) {
         child.wrapWith(builder, input);
@@ -154,7 +156,9 @@ class _TagTablePlaceholder<T> extends WidgetPlaceholder<T> {
 class _TableDataRow extends StatelessWidget {
   final Iterable<TableDataCell> cells;
 
-  const _TableDataRow({Key key, @required this.cells}) : super(key: key);
+  const _TableDataRow({Key key, @required this.cells})
+      : assert(cells != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) => widget0;
@@ -168,7 +172,9 @@ class _TableDataGroup extends StatelessWidget {
     Key key,
     @required this.rows,
     @required this.type,
-  }) : super(key: key);
+  })  : assert(rows != null),
+        assert(type != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) => widget0;
