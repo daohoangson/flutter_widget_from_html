@@ -1,3 +1,10 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 90%
+        threshold: 0.5%
+
 ignore:
   - ^lib/src/video_player.dart$
   - ^lib/src/web_view.dart$
