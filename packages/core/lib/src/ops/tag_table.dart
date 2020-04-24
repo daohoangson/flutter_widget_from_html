@@ -23,18 +23,19 @@ class _TagTable {
         onChild: (meta, e) {
           switch (e.localName) {
             case _kTagTableCaption:
-              return lazySet(meta, buildOp: captionOp);
+              meta.op = captionOp;
+              break;
             case _kTagTableCell:
             case _kTagTableHeader:
-              return lazySet(meta, buildOp: cellOp);
+              meta.op = cellOp;
+              break;
             case _kTagTableRow:
             case _kTagTableBody:
             case _kTagTableHead:
             case _kTagTableFoot:
-              return lazySet(meta, buildOp: childOp);
+              meta.op = childOp;
+              break;
           }
-
-          return meta;
         },
         onWidgets: (meta, widgets) => [_placeholder(widgets, meta)],
       );
