@@ -123,13 +123,10 @@ class _TagTable {
     return null;
   }
 
-  static BuildOp cellPaddingOp(double px) => BuildOp(onChild: (meta, e) {
-        if (e.localName == 'td' || e.localName == 'th') {
-          meta = lazySet(meta, styles: [_kCssPadding, "${px}px"]);
-        }
-
-        return meta;
-      });
+  static BuildOp cellPaddingOp(double px) => BuildOp(
+      onChild: (meta, e) => (e.localName == 'td' || e.localName == 'th')
+          ? meta.styles = [_kCssPadding, "${px}px"]
+          : null);
 }
 
 class _TagTablePlaceholder<T> extends WidgetPlaceholder<T> {

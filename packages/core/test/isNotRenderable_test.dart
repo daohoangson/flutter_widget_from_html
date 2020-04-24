@@ -11,14 +11,25 @@ void main() {
     expect(explained, equals('[RichText:(:Foo.Bar.)]'));
   });
 
-  testWidgets('skips via callback', (WidgetTester tester) async {
+  testWidgets('skips element', (WidgetTester tester) async {
     final explained = await explain(
       tester,
       html,
-      builderCallback: (meta, e) => e.classes.contains('skipMe')
-          ? lazySet(null, isNotRenderable: true)
-          : meta,
+      factoryBuilder: (config) => _IsNotRenderableTest(config),
     );
     expect(explained, equals('[RichText:(:Bar.)]'));
   });
+}
+
+class _IsNotRenderableTest extends WidgetFactory {
+  _IsNotRenderableTest(HtmlConfig config) : super(config);
+
+  @override
+  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
+    if (attrs.containsKey('class') && attrs['class'] == 'skipMe') {
+      meta.isNotRenderable = true;
+    }
+
+    return super.parseTag(meta, tag, attrs);
+  }
 }

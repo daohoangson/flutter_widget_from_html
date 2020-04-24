@@ -37,7 +37,7 @@ CssLength _parseCssLength(String value) {
 CssLengthBox _parseCssLengthBox(NodeMetadata meta, String key) {
   CssLengthBox output;
 
-  for (final style in meta.styles) {
+  for (final style in meta.styleEntries) {
     if (!style.key.startsWith(key)) continue;
 
     final suffix = style.key.substring(key.length);

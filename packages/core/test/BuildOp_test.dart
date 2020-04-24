@@ -40,17 +40,11 @@ class _GetInlineStylesTest extends WidgetFactory {
   _GetInlineStylesTest(HtmlConfig config) : super(config);
 
   @override
-  NodeMetadata parseTag(
-    NodeMetadata meta,
-    String tag,
-    Map<dynamic, String> attributes,
-  ) {
-    meta = lazySet(meta,
-        buildOp: BuildOp(defaultStyles: (_, __) => ['color', '#f00']));
-    meta = lazySet(meta,
-        buildOp: BuildOp(defaultStyles: (_, __) => ['color', '#0f0']));
+  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
+    meta.op = BuildOp(defaultStyles: (_, __) => ['color', '#f00']);
+    meta.op = BuildOp(defaultStyles: (_, __) => ['color', '#0f0']);
 
-    return super.parseTag(meta, tag, attributes);
+    return super.parseTag(meta, tag, attrs);
   }
 }
 
@@ -61,22 +55,16 @@ class _PriorityTest extends WidgetFactory {
   _PriorityTest(HtmlConfig config, {this.a, this.b}) : super(config);
 
   @override
-  NodeMetadata parseTag(
-    NodeMetadata meta,
-    String tag,
-    Map<dynamic, String> attributes,
-  ) {
-    meta = lazySet(meta,
-        buildOp: BuildOp(
-          onPieces: (_, pieces) => pieces.map((p) => p..text?.addText(' A')),
-          priority: a,
-        ));
-    meta = lazySet(meta,
-        buildOp: BuildOp(
-          onPieces: (_, pieces) => pieces.map((p) => p..text?.addText(' B')),
-          priority: b,
-        ));
+  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
+    meta.op = BuildOp(
+      onPieces: (_, pieces) => pieces.map((p) => p..text?.addText(' A')),
+      priority: a,
+    );
+    meta.op = BuildOp(
+      onPieces: (_, pieces) => pieces.map((p) => p..text?.addText(' B')),
+      priority: b,
+    );
 
-    return super.parseTag(meta, tag, attributes);
+    return super.parseTag(meta, tag, attrs);
   }
 }

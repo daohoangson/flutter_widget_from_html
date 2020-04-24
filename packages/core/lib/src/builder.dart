@@ -61,20 +61,18 @@ class HtmlBuilder {
   }
 
   NodeMetadata collectMetadata(dom.Element e) {
-    NodeMetadata meta;
+    final meta = NodeMetadata._(parentOps);
 
-    if (parentOps != null) meta = lazySet(meta, parentOps: parentOps);
+    wf.parseTag(meta, e.localName, e.attributes);
 
-    meta = wf.parseTag(meta, e.localName, e.attributes);
-
-    if (meta?.hasParents == true) {
-      for (final op in meta?.parents) {
-        meta = op.onChild(meta, e);
+    if (meta.hasParents) {
+      for (final op in meta.parents) {
+        op.onChild(meta, e);
       }
     }
 
     // stylings, step 1: get default styles from tag-based build ops
-    if (meta?.hasOps == true) {
+    if (meta.hasOps) {
       for (final op in meta.ops) {
         final defaultStyles = op.defaultStyles(meta, e);
         if (defaultStyles != null) {
@@ -85,25 +83,23 @@ class HtmlBuilder {
       }
     }
 
+    // integration point: apply custom builders
+    wf.customStyleBuilder(meta, e);
+    wf.customWidgetBuilder(meta, e);
+
     // stylings, step 2: get styles from `style` attribute
     if (e.attributes.containsKey('style')) {
       for (final m in _attrStyleRegExp.allMatches(e.attributes['style'])) {
-        meta = lazySet(meta, styles: [m[1].trim(), m[2].trim()]);
+        meta.styles = [m[1].trim(), m[2].trim()];
       }
     }
 
-    if (meta != null) {
-      for (final style in meta?.styles) {
-        meta = wf.parseStyle(meta, style.key, style.value);
-      }
+    for (final style in meta.styleEntries) {
+      wf.parseStyle(meta, style.key, style.value);
     }
 
-    meta = wf.parseElement(meta, e);
-
-    if (meta != null) {
-      meta.domElement = e;
-      meta.tsb = parentTsb.sub()..enqueue(wf.buildTextStyle, meta);
-    }
+    meta.domElement = e;
+    meta.tsb = parentTsb.sub()..enqueue(wf.buildTextStyle, meta);
 
     return meta;
   }
@@ -201,9 +197,9 @@ Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, NodeMetadata meta) {
 }
 
 class NodeMetadata {
-  Iterable<BuildOp> _buildOps;
+  List<BuildOp> _buildOps;
   dom.Element _domElement;
-  Iterable<BuildOp> _parentOps;
+  final Iterable<BuildOp> _parentOps;
   TextStyleBuilders _tsb;
 
   Color color;
@@ -220,6 +216,8 @@ class NodeMetadata {
   List<String> _styles;
   bool _stylesFrozen = false;
 
+  NodeMetadata._(this._parentOps);
+
   dom.Element get domElement => _domElement;
 
   bool get hasOps => _buildOps != null;
@@ -235,7 +233,7 @@ class NodeMetadata {
 
   Iterable<BuildOp> get parents => _parentOps;
 
-  Iterable<MapEntry<String, String>> get styles sync* {
+  Iterable<MapEntry<String, String>> get styleEntries sync* {
     _stylesFrozen = true;
     if (_styles == null) return;
 
@@ -254,10 +252,23 @@ class NodeMetadata {
     _domElement = e;
 
     if (_buildOps != null) {
-      final ops = _buildOps as List;
-      ops.sort((a, b) => a.priority.compareTo(b.priority));
-      _buildOps = List.unmodifiable(ops);
+      _buildOps.sort((a, b) => a.priority.compareTo(b.priority));
+      _buildOps = List.unmodifiable(_buildOps);
     }
+  }
+
+  set isBlockElement(bool v) => _isBlockElement = v;
+
+  set op(BuildOp op) {
+    _buildOps ??= [];
+    if (!_buildOps.contains(op)) _buildOps.add(op);
+  }
+
+  set styles(Iterable<String> styles) {
+    assert(styles.length % 2 == 0);
+    assert(!_stylesFrozen);
+    _styles ??= [];
+    _styles.addAll(styles);
   }
 
   set tsb(TextStyleBuilders tsb) {
@@ -266,63 +277,10 @@ class NodeMetadata {
   }
 
   String style(String key) {
-    for (final x in styles) {
-      if (x.key == key) return x.value;
+    String value;
+    for (final x in styleEntries) {
+      if (x.key == key) value = x.value;
     }
-    return null;
+    return value;
   }
-}
-
-NodeMetadata lazySet(
-  NodeMetadata meta, {
-  BuildOp buildOp,
-  Color color,
-  bool decoOver,
-  bool decoStrike,
-  bool decoUnder,
-  TextDecorationStyle decorationStyle,
-  String fontFamily,
-  String fontSize,
-  bool fontStyleItalic,
-  FontWeight fontWeight,
-  bool isBlockElement,
-  bool isNotRenderable,
-  Iterable<BuildOp> parentOps,
-  Iterable<String> styles,
-}) {
-  meta ??= NodeMetadata();
-
-  if (buildOp != null) {
-    meta._buildOps ??= [];
-    final ops = meta._buildOps as List<BuildOp>;
-    if (!ops.contains(buildOp)) ops.add(buildOp);
-  }
-
-  if (color != null) meta.color = color;
-
-  if (decoStrike != null) meta.decoStrike = decoStrike;
-  if (decoOver != null) meta.decoOver = decoOver;
-  if (decoUnder != null) meta.decoUnder = decoUnder;
-  if (decorationStyle != null) meta.decorationStyle = decorationStyle;
-  if (fontFamily != null) meta.fontFamily = fontFamily;
-  if (fontSize != null) meta.fontSize = fontSize;
-  if (fontStyleItalic != null) meta.fontStyleItalic = fontStyleItalic;
-  if (fontWeight != null) meta.fontWeight = fontWeight;
-
-  if (isBlockElement != null) meta._isBlockElement = isBlockElement;
-  if (isNotRenderable != null) meta.isNotRenderable = isNotRenderable;
-
-  if (parentOps != null) {
-    assert(meta._parentOps == null);
-    meta._parentOps = parentOps;
-  }
-
-  if (styles != null) {
-    assert(styles.length % 2 == 0);
-    assert(!meta._stylesFrozen);
-    meta._styles ??= [];
-    meta._styles.addAll(styles);
-  }
-
-  return meta;
 }

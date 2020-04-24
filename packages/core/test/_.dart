@@ -24,7 +24,6 @@ Future<String> explain(
   void Function(BuildContext) preTest,
   Uri baseUrl,
   double bodyVerticalPadding = 0,
-  NodeMetadataCollector builderCallback,
   WidgetFactory Function(HtmlConfig config) factoryBuilder,
   TextStyle textStyle,
 }) async {
@@ -33,7 +32,6 @@ Future<String> explain(
     html,
     baseUrl: baseUrl,
     bodyPadding: EdgeInsets.symmetric(vertical: bodyVerticalPadding),
-    builderCallback: builderCallback,
     factoryBuilder: factoryBuilder,
     key: hwKey,
     textStyle: textStyle,

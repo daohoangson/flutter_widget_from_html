@@ -9,6 +9,19 @@ const kHtml = """
 const kSmilies = {':)': '🙂'};
 
 class SmilieScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: Text('SmilieScreen'),
+        ),
+        body: HtmlWidget(
+          kHtml,
+          factoryBuilder: (config) => _SmiliesWidgetFactory(config),
+        ),
+      );
+}
+
+class _SmiliesWidgetFactory extends WidgetFactory {
   final smilieOp = BuildOp(
     onPieces: (meta, pieces) {
       final alt = meta.domElement.attributes['alt'];
@@ -17,16 +30,18 @@ class SmilieScreen extends StatelessWidget {
     },
   );
 
+  _SmiliesWidgetFactory(HtmlConfig config) : super(config);
+
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text('SmilieScreen'),
-        ),
-        body: HtmlWidget(
-          kHtml,
-          builderCallback: (meta, e) => e.classes.contains('smilie')
-              ? lazySet(null, buildOp: smilieOp)
-              : meta,
-        ),
-      );
+  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
+    if (tag == 'img' &&
+        attrs.containsKey('alt') &&
+        attrs.containsKey('class') &&
+        attrs['class'].contains('smilie')) {
+      meta.op = smilieOp;
+      return;
+    }
+
+    return super.parseTag(meta, tag, attrs);
+  }
 }

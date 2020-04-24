@@ -57,8 +57,7 @@ class _TagLi {
 
         return styles;
       },
-      onChild: (meta, e) =>
-          e.localName == _kTagLi ? lazySet(meta, buildOp: liOp) : meta,
+      onChild: (meta, e) => e.localName == _kTagLi ? meta.op = liOp : null,
       onWidgets: (meta, widgets) => _buildList(meta, widgets),
     );
     return _buildOp;
@@ -100,7 +99,7 @@ class _TagLi {
 
   Iterable<Widget> _buildList(NodeMetadata meta, Iterable<Widget> children) {
     final listMeta = _ListMetadata();
-    for (final style in meta?.styles) {
+    for (final style in meta?.styleEntries) {
       switch (style.key) {
         case _kCssListStyleType:
           listMeta.listStyleType = style.value;
@@ -149,7 +148,7 @@ class _TagLi {
     String listStyleType = a.containsKey(_kAttributeLiType)
         ? _LiInput.listStyleTypeFromAttributeType(a[_kAttributeLiType])
         : null;
-    for (final style in meta.styles) {
+    for (final style in meta.styleEntries) {
       switch (style.key) {
         case _kCssListStyleType:
           listStyleType = style.value;

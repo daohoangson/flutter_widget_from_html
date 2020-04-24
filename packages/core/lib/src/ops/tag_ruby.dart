@@ -16,12 +16,11 @@ class _TagRuby {
       onChild: (meta, e) {
         switch (e.localName) {
           case _kTagRp:
-            meta = lazySet(meta, styles: [_kCssDisplay, _kCssDisplayNone]);
+            meta.styles = [_kCssDisplay, _kCssDisplayNone];
             break;
           case _kTagRt:
-            meta = lazySet(
-              meta,
-              buildOp: BuildOp(
+            meta
+              ..op = BuildOp(
                 onPieces: (_, pieces) {
                   for (final piece in pieces) {
                     if (piece.hasWidgets) continue;
@@ -31,9 +30,8 @@ class _TagRuby {
 
                   return [];
                 },
-              ),
-              styles: [_kCssFontSize, '0.5em'],
-            );
+              )
+              ..styles = [_kCssFontSize, '0.5em'];
             break;
         }
 
