@@ -15,10 +15,25 @@ void main() {
     final explained = await explain(
       tester,
       html,
-      builderCallback: (meta, e) => e.classes.contains('skipMe')
-          ? lazySet(null, isNotRenderable: true)
-          : meta,
+      factoryBuilder: (config) => _IsNotRenderableTest(config),
     );
     expect(explained, equals('[RichText:(:Bar.)]'));
   });
+}
+
+class _IsNotRenderableTest extends WidgetFactory {
+  _IsNotRenderableTest(HtmlConfig config) : super(config);
+
+  @override
+  NodeMetadata parseTag(
+    NodeMetadata meta,
+    String tag,
+    Map<dynamic, String> attributes,
+  ) {
+    if (attributes.containsKey('class') && attributes['class'] == 'skipMe') {
+      return lazySet(null, isNotRenderable: true);
+    }
+
+    return super.parseTag(meta, tag, attributes);
+  }
 }

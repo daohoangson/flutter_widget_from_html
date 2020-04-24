@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
 
-import 'data.dart';
 import 'helpers.dart';
 import 'widget_factory.dart';
 
@@ -20,7 +19,8 @@ class HtmlWidget extends core.HtmlWidget {
     core.HtmlConfig config,
     Uri baseUrl,
     EdgeInsets bodyPadding = const EdgeInsets.all(10),
-    NodeMetadataCollector builderCallback,
+    CustomStylesBuilder customStylesBuilder,
+    CustomWidgetBuilder customWidgetBuilder,
     Color hyperlinkColor,
     OnTapUrl onTapUrl,
     EdgeInsets tableCellPadding = const EdgeInsets.all(5),
@@ -37,7 +37,8 @@ class HtmlWidget extends core.HtmlWidget {
               HtmlConfig(
                 baseUrl: baseUrl,
                 bodyPadding: bodyPadding,
-                builderCallback: builderCallback,
+                customStylesBuilder: customStylesBuilder,
+                customWidgetBuilder: customWidgetBuilder,
                 hyperlinkColor: hyperlinkColor,
                 onTapUrl: onTapUrl,
                 tableCellPadding: tableCellPadding,
@@ -84,7 +85,8 @@ class HtmlConfig extends core.HtmlConfig {
   HtmlConfig({
     Uri baseUrl,
     EdgeInsets bodyPadding,
-    NodeMetadataCollector builderCallback,
+    CustomStylesBuilder customStylesBuilder,
+    CustomWidgetBuilder customWidgetBuilder,
     Color hyperlinkColor,
     OnTapUrl onTapUrl,
     EdgeInsets tableCellPadding,
@@ -95,7 +97,8 @@ class HtmlConfig extends core.HtmlConfig {
   }) : super(
           baseUrl: baseUrl,
           bodyPadding: bodyPadding,
-          builderCallback: builderCallback,
+          customStylesBuilder: customStylesBuilder,
+          customWidgetBuilder: customWidgetBuilder,
           hyperlinkColor: hyperlinkColor,
           onTapUrl: onTapUrl,
           tableCellPadding: tableCellPadding,

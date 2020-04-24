@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:html/dom.dart' as dom;
 
 import 'core_widget_factory.dart';
 
@@ -6,6 +7,10 @@ part 'widget/image_layout.dart';
 
 /// A no op placeholder widget.
 const widget0 = SizedBox.shrink();
+
+typedef CustomStylesBuilder = Iterable<String> Function(dom.Element element);
+
+typedef CustomWidgetBuilder = Widget Function(dom.Element element);
 
 typedef OnTapUrl = void Function(String url);
 

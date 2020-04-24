@@ -360,6 +360,24 @@ class WidgetFactory {
     return b.resolveUri(p).toString();
   }
 
+  NodeMetadata customStyleBuilder(NodeMetadata meta, dom.Element element) {
+    if (_config.customStylesBuilder == null) return meta;
+
+    final styles = _config.customStylesBuilder(element);
+    if (styles == null) return meta;
+
+    return lazySet(meta, styles: styles);
+  }
+
+  NodeMetadata customWidgetBuilder(NodeMetadata meta, dom.Element element) {
+    if (_config.customWidgetBuilder == null) return meta;
+
+    final widget = _config.customWidgetBuilder(element);
+    if (widget == null) return meta;
+
+    return lazySet(meta, buildOp: BuildOp(onWidgets: (_, __) => [widget]));
+  }
+
   String getListStyleMarker(String type, int i) {
     switch (type) {
       case _kCssListStyleTypeAlphaLower:
@@ -413,14 +431,6 @@ class WidgetFactory {
     };
 
     return map.containsKey(i) ? map[i] : null;
-  }
-
-  NodeMetadata parseElement(NodeMetadata meta, dom.Element element) {
-    if (_config.builderCallback != null) {
-      meta = _config.builderCallback(meta, element);
-    }
-
-    return meta;
   }
 
   Color parseColor(String value) => _parseColor(value);

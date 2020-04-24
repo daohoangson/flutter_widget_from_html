@@ -85,6 +85,10 @@ class HtmlBuilder {
       }
     }
 
+    // integration point: apply custom builders
+    meta = wf.customStyleBuilder(meta, e);
+    meta = wf.customWidgetBuilder(meta, e);
+
     // stylings, step 2: get styles from `style` attribute
     if (e.attributes.containsKey('style')) {
       for (final m in _attrStyleRegExp.allMatches(e.attributes['style'])) {
@@ -93,12 +97,10 @@ class HtmlBuilder {
     }
 
     if (meta != null) {
-      for (final style in meta?.styles) {
+      for (final style in meta.styles) {
         meta = wf.parseStyle(meta, style.key, style.value);
       }
     }
-
-    meta = wf.parseElement(meta, e);
 
     if (meta != null) {
       meta.domElement = e;
