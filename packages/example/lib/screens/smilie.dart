@@ -33,18 +33,15 @@ class _SmiliesWidgetFactory extends WidgetFactory {
   _SmiliesWidgetFactory(HtmlConfig config) : super(config);
 
   @override
-  NodeMetadata parseTag(
-    NodeMetadata meta,
-    String tag,
-    Map<dynamic, String> attributes,
-  ) {
+  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
     if (tag == 'img' &&
-        attributes.containsKey('alt') &&
-        attributes.containsKey('class') &&
-        attributes['class'].contains('smilie')) {
-      return lazySet(null, buildOp: smilieOp);
+        attrs.containsKey('alt') &&
+        attrs.containsKey('class') &&
+        attrs['class'].contains('smilie')) {
+      meta.op = smilieOp;
+      return;
     }
 
-    return super.parseTag(meta, tag, attributes);
+    return super.parseTag(meta, tag, attrs);
   }
 }

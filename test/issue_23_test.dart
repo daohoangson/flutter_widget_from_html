@@ -25,7 +25,7 @@ class BlockquoteWebViewScreen extends StatelessWidget {
 }
 
 class _BlockquoteWebViewWf extends WidgetFactory {
-  final buildOp = BuildOp(
+  final blockquoteOp = BuildOp(
     onWidgets: (meta, _) => [
       WebView(
         Uri.dataFromString(
@@ -42,14 +42,13 @@ class _BlockquoteWebViewWf extends WidgetFactory {
   _BlockquoteWebViewWf(HtmlConfig config) : super(config);
 
   @override
-  NodeMetadata parseTag(
-    NodeMetadata meta,
-    String tag,
-    Map<dynamic, String> attributes,
-  ) {
-    if (tag == 'blockquote') return lazySet(null, buildOp: buildOp);
+  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
+    if (tag == 'blockquote') {
+      meta.op = blockquoteOp;
+      return;
+    }
 
-    return super.parseTag(meta, tag, attributes);
+    return super.parseTag(meta, tag, attrs);
   }
 }
 
