@@ -93,4 +93,17 @@ class WidgetPlaceholder<T1> extends StatelessWidget {
 
     return wrapped;
   }
+
+  static Widget wrapOne<T2>(
+    Iterable<Widget> widgets,
+    WidgetPlaceholderBuilder<T2> builder, [
+    T2 input,
+  ]) =>
+      widgets.length == 1
+          ? wrap(widgets, builder, input).first
+          : WidgetPlaceholder(
+              builder: builder,
+              children: widgets,
+              input: input,
+            );
 }
