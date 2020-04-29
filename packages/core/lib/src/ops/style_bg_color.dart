@@ -26,13 +26,13 @@ class _StyleBgColor {
         final bgColor = wf.parseColor(meta.style(_kCssBackgroundColor));
         if (bgColor == null) return null;
 
-        return _listOrNull(_buildBox(widgets, bgColor));
+        return [WidgetPlaceholder.wrapOne(widgets, _build, bgColor)];
       });
+
+  Iterable<Widget> _build(BuildContext _, Iterable<Widget> ws, Color c) =>
+      [wf.buildDecoratedBox(wf.buildBody(ws), color: c)];
 
   BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) => piece
     ..text.bits.forEach(
         (bit) => bit.tsb?.enqueue(_styleBgColorTextStyleBuilder, bgColor));
-
-  Widget _buildBox(Iterable<Widget> widgets, Color bgColor) =>
-      wf.buildDecoratedBox(wf.buildBody(widgets), color: bgColor);
 }

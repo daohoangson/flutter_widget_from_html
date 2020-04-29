@@ -12,6 +12,7 @@ import 'core_html_widget.dart';
 part 'ops/style_bg_color.dart';
 part 'ops/style_direction.dart';
 part 'ops/style_margin.dart';
+part 'ops/style_padding.dart';
 part 'ops/style_text_align.dart';
 part 'ops/style_vertical_align.dart';
 part 'ops/tag_a.dart';
@@ -26,6 +27,7 @@ part 'ops/text.dart';
 part 'parser/border.dart';
 part 'parser/color.dart';
 part 'parser/css.dart';
+part 'parser/length.dart';
 
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
 
@@ -35,6 +37,7 @@ class WidgetFactory {
 
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
+  BuildOp _stylePadding;
   BuildOp _styleTextAlign;
   BuildOp _styleVerticalAlign;
   BuildOp _tagA;
@@ -153,6 +156,17 @@ class WidgetFactory {
           : print("[flutter_widget_from_html] Tapped url $url")
       : null;
 
+  InlineSpan buildGestureTapCallbackSpan(
+    String text,
+    GestureTapCallback onTap,
+    TextStyle style,
+  ) =>
+      TextSpan(
+        text: text,
+        recognizer: TapGestureRecognizer()..onTap = onTap,
+        style: style,
+      );
+
   Widget buildImage(String url, {double height, String text, double width}) {
     ImageProvider image;
     if (url != null) {
@@ -216,13 +230,24 @@ class WidgetFactory {
   TableCell buildTableCell(Widget child) => TableCell(
       child: buildPadding(child, _config.tableCellPadding) ?? widget0);
 
-  Iterable<Widget> buildText(BuildContext c, Iterable<Widget> _, TextBits t) {
-    final tsb = t.tsb;
-    tsb?.build(c);
+  Widget buildText(TextBits text) => (text..trimRight()).isNotEmpty
+      ? WidgetPlaceholder(
+          builder: _buildText,
+          input: text,
+        )
+      : null;
 
-    final textScaleFactor = MediaQuery.of(c).textScaleFactor;
+  static Iterable<Widget> _buildText(
+    BuildContext context,
+    Iterable<Widget> _,
+    TextBits text,
+  ) {
+    final tsb = text.tsb;
+    tsb?.build(context);
+
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
     final widgets = <Widget>[];
-    for (final compiled in _TextCompiler(t).compile(c)) {
+    for (final compiled in _TextCompiler(text).compile(context)) {
       if (compiled is InlineSpan) {
         widgets.add(RichText(
           text: compiled,
@@ -335,6 +360,24 @@ class WidgetFactory {
     return b.resolveUri(p).toString();
   }
 
+  void customStyleBuilder(NodeMetadata meta, dom.Element element) {
+    if (_config.customStylesBuilder == null) return;
+
+    final styles = _config.customStylesBuilder(element);
+    if (styles == null) return;
+
+    meta.styles = styles;
+  }
+
+  void customWidgetBuilder(NodeMetadata meta, dom.Element element) {
+    if (_config.customWidgetBuilder == null) return;
+
+    final widget = _config.customWidgetBuilder(element);
+    if (widget == null) return;
+
+    meta.op = BuildOp(onWidgets: (_, __) => [widget]);
+  }
+
   String getListStyleMarker(String type, int i) {
     switch (type) {
       case _kCssListStyleTypeAlphaLower:
@@ -390,14 +433,6 @@ class WidgetFactory {
     return map.containsKey(i) ? map[i] : null;
   }
 
-  NodeMetadata parseElement(NodeMetadata meta, dom.Element element) {
-    if (_config.builderCallback != null) {
-      meta = _config.builderCallback(meta, element);
-    }
-
-    return meta;
-  }
-
   Color parseColor(String value) => _parseColor(value);
 
   CssBorderSide parseCssBorderSide(String value) =>
@@ -408,83 +443,81 @@ class WidgetFactory {
 
   CssLength parseCssLength(String value) => _parseCssLength(value);
 
-  CssMargin parseCssMargin(NodeMetadata meta) => _parseCssMargin(this, meta);
+  CssLengthBox parseCssLengthBox(NodeMetadata meta, String key) =>
+      _parseCssLengthBox(meta, key);
 
-  CssMargin parseCssMarginAll(String value) => _parseCssMarginAll(this, value);
+  CssLengthBox parseCssMargin(NodeMetadata meta) =>
+      parseCssLengthBox(meta, _kCssMargin);
 
-  CssMargin parseCssMarginOne(CssMargin existing, String key, String value) =>
-      _parseCssMarginOne(this, existing, key, value);
+  CssLengthBox parseCssPadding(NodeMetadata meta) =>
+      parseCssLengthBox(meta, _kCssPadding);
 
-  NodeMetadata parseStyle(NodeMetadata meta, String key, String value) {
+  void parseStyle(NodeMetadata meta, String key, String value) {
     switch (key) {
       case _kCssBackgroundColor:
-        meta = lazySet(meta, buildOp: styleBgColor());
+        meta.op = styleBgColor();
         break;
 
       case _kCssBorderBottom:
         final borderBottom = parseCssBorderSide(value);
         if (borderBottom != null) {
-          meta = lazySet(
-            meta,
-            decoUnder: true,
-            decorationStyle: borderBottom.style,
-          );
+          meta
+            ..decoUnder = true
+            ..decorationStyle = borderBottom.style;
         } else {
-          meta = lazySet(meta, decoUnder: false);
+          meta.decoUnder = false;
         }
         break;
       case _kCssBorderTop:
         final borderTop = parseCssBorderSide(value);
         if (borderTop != null) {
-          meta = lazySet(
-            meta,
-            decoOver: true,
-            decorationStyle: borderTop.style,
-          );
+          meta
+            ..decoOver = true
+            ..decorationStyle = borderTop.style;
         } else {
-          meta = lazySet(meta, decoOver: false);
+          meta.decoOver = false;
         }
         break;
 
       case _kCssColor:
         final color = parseColor(value);
-        if (color != null) meta = lazySet(meta, color: color);
+        if (color != null) meta.color = color;
         break;
 
       case _kCssDirection:
-        meta = lazySet(meta, buildOp: styleDirection(value));
+        meta.op = styleDirection(value);
         break;
 
       case _kCssDisplay:
         switch (value) {
           case _kCssDisplayBlock:
-            meta = lazySet(meta, isBlockElement: true);
+            meta.isBlockElement = true;
             break;
           case _kCssDisplayInline:
           case _kCssDisplayInlineBlock:
-            meta = lazySet(meta, isBlockElement: false);
+            meta.isBlockElement = false;
             break;
           case _kCssDisplayNone:
-            meta = lazySet(meta, isNotRenderable: true);
+            meta.isNotRenderable = true;
             break;
         }
         break;
 
       case _kCssFontFamily:
-        meta = lazySet(meta, fontFamily: value);
+        meta.fontFamily = value;
         break;
 
       case _kCssFontSize:
-        meta = lazySet(meta, fontSize: value);
+        meta.fontSize = value;
         break;
 
       case _kCssFontStyle:
         switch (value) {
           case _kCssFontStyleItalic:
-            meta = lazySet(meta, fontStyleItalic: true);
+            meta.fontStyleItalic = true;
             break;
           case _kCssFontStyleNormal:
-            meta = lazySet(meta, fontStyleItalic: false);
+            meta.fontStyleItalic = false;
             break;
         }
         break;
@@ -492,105 +525,95 @@ class WidgetFactory {
       case _kCssFontWeight:
         switch (value) {
           case _kCssFontWeightBold:
-            meta = lazySet(meta, fontWeight: FontWeight.bold);
+            meta.fontWeight = FontWeight.bold;
             break;
           case _kCssFontWeight100:
-            meta = lazySet(meta, fontWeight: FontWeight.w100);
+            meta.fontWeight = FontWeight.w100;
             break;
           case _kCssFontWeight200:
-            meta = lazySet(meta, fontWeight: FontWeight.w200);
+            meta.fontWeight = FontWeight.w200;
             break;
           case _kCssFontWeight300:
-            meta = lazySet(meta, fontWeight: FontWeight.w300);
+            meta.fontWeight = FontWeight.w300;
             break;
           case _kCssFontWeight400:
-            meta = lazySet(meta, fontWeight: FontWeight.w400);
+            meta.fontWeight = FontWeight.w400;
             break;
           case _kCssFontWeight500:
-            meta = lazySet(meta, fontWeight: FontWeight.w500);
+            meta.fontWeight = FontWeight.w500;
             break;
           case _kCssFontWeight600:
-            meta = lazySet(meta, fontWeight: FontWeight.w600);
+            meta.fontWeight = FontWeight.w600;
             break;
           case _kCssFontWeight700:
-            meta = lazySet(meta, fontWeight: FontWeight.w700);
+            meta.fontWeight = FontWeight.w700;
             break;
           case _kCssFontWeight800:
-            meta = lazySet(meta, fontWeight: FontWeight.w800);
+            meta.fontWeight = FontWeight.w800;
             break;
           case _kCssFontWeight900:
-            meta = lazySet(meta, fontWeight: FontWeight.w900);
+            meta.fontWeight = FontWeight.w900;
             break;
         }
         break;
 
-      case _kCssMargin:
-      case _kCssMarginBottom:
-      case _kCssMarginEnd:
-      case _kCssMarginLeft:
-      case _kCssMarginRight:
-      case _kCssMarginStart:
-      case _kCssMarginTop:
-        meta = lazySet(meta, buildOp: styleMargin());
-        break;
-
       case _kCssTextAlign:
-        meta = lazySet(meta, buildOp: styleTextAlign());
+        meta.op = styleTextAlign();
         break;
 
       case _kCssTextDecoration:
         for (final v in _splitCss(value)) {
           switch (v) {
             case _kCssTextDecorationLineThrough:
-              meta = lazySet(meta, decoStrike: true);
+              meta.decoStrike = true;
               break;
             case _kCssTextDecorationNone:
-              meta = lazySet(
-                meta,
-                decoStrike: false,
-                decoOver: false,
-                decoUnder: false,
-              );
+              meta
+                ..decoStrike = false
+                ..decoOver = false
+                ..decoUnder = false;
               break;
             case _kCssTextDecorationOverline:
-              meta = lazySet(meta, decoOver: true);
+              meta.decoOver = true;
               break;
             case _kCssTextDecorationUnderline:
-              meta = lazySet(meta, decoUnder: true);
+              meta.decoUnder = true;
               break;
           }
         }
         break;
 
       case _kCssVerticalAlign:
-        meta = lazySet(meta, buildOp: styleVerticalAlign());
+        meta.op = styleVerticalAlign();
         break;
     }
 
-    return meta;
+    if (key.startsWith(_kCssMargin)) {
+      meta.op = styleMargin();
+    }
+
+    if (key.startsWith(_kCssPadding)) {
+      meta.op = stylePadding();
+    }
   }
 
-  NodeMetadata parseTag(
-    NodeMetadata meta,
-    String tag,
-    Map<dynamic, String> attributes,
-  ) {
+  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
     switch (tag) {
       case 'a':
-        meta = lazySet(meta, buildOp: tagA());
+        meta.op = tagA();
         break;
 
       case 'abbr':
       case 'acronym':
-        meta = lazySet(
-          meta,
-          decorationStyle: TextDecorationStyle.dotted,
-          decoUnder: true,
-        );
+        meta
+          ..decorationStyle = TextDecorationStyle.dotted
+          ..decoUnder = true;
         break;
 
       case 'address':
-        meta = lazySet(meta, isBlockElement: true, fontStyleItalic: true);
+        meta
+          ..isBlockElement = true
+          ..fontStyleItalic = true;
         break;
 
       case 'article':
@@ -602,29 +625,29 @@ class WidgetFactory {
       case 'main':
       case 'nav':
       case 'section':
-        meta = lazySet(meta, isBlockElement: true);
+        meta.isBlockElement = true;
         break;
 
       case 'blockquote':
       case 'figure':
-        meta = lazySet(meta, styles: [_kCssMargin, '1em 40px']);
+        meta.styles = [_kCssMargin, '1em 40px'];
         break;
 
       case 'b':
       case 'strong':
-        meta = lazySet(meta, fontWeight: FontWeight.bold);
+        meta.fontWeight = FontWeight.bold;
         break;
 
       case 'big':
-        meta = lazySet(meta, fontSize: _kCssFontSizeLarger);
+        meta.fontSize = _kCssFontSizeLarger;
         break;
 
       case 'br':
-        meta = lazySet(meta, buildOp: tagBr());
+        meta.op = tagBr();
         break;
 
       case 'center':
-        meta = lazySet(meta, styles: [_kCssTextAlign, _kCssTextAlignCenter]);
+        meta.styles = [_kCssTextAlign, _kCssTextAlignCenter];
         break;
 
       case 'cite':
@@ -632,85 +655,75 @@ class WidgetFactory {
       case 'em':
       case 'i':
       case 'var':
-        meta = lazySet(meta, fontStyleItalic: true);
+        meta.fontStyleItalic = true;
         break;
 
       case _kTagCode:
       case _kTagPre:
       case _kTagTt:
-        meta = lazySet(meta, buildOp: tagCode());
+        meta.op = tagCode();
         break;
 
       case 'dd':
-        meta = lazySet(meta, styles: [_kCssMargin, '0 0 1em 40px']);
+        meta.styles = [_kCssMargin, '0 0 1em 40px'];
         break;
       case 'dl':
-        meta = lazySet(meta, isBlockElement: true);
+        meta.isBlockElement = true;
         break;
       case 'dt':
-        meta = lazySet(meta, isBlockElement: true, fontWeight: FontWeight.bold);
+        meta
+          ..isBlockElement = true
+          ..fontWeight = FontWeight.bold;
         break;
 
       case 'del':
       case 's':
       case 'strike':
-        meta = lazySet(meta, decoStrike: true);
+        meta..decoStrike = true;
         break;
 
       case 'font':
-        meta = lazySet(meta, buildOp: tagFont());
+        meta.op = tagFont();
         break;
 
       case 'hr':
-        meta = lazySet(meta, buildOp: tagHr());
+        meta.op = tagHr();
         break;
 
       case 'h1':
-        meta = lazySet(
-          meta,
-          fontSize: '2em',
-          fontWeight: FontWeight.bold,
-          styles: [_kCssMargin, '0.67em 0'],
-        );
+        meta
+          ..fontSize = '2em'
+          ..fontWeight = FontWeight.bold
+          ..styles = [_kCssMargin, '0.67em 0'];
         break;
       case 'h2':
-        meta = lazySet(
-          meta,
-          fontSize: '1.5em',
-          fontWeight: FontWeight.bold,
-          styles: [_kCssMargin, '0.83em 0'],
-        );
+        meta
+          ..fontSize = '1.5em'
+          ..fontWeight = FontWeight.bold
+          ..styles = [_kCssMargin, '0.83em 0'];
         break;
       case 'h3':
-        meta = lazySet(
-          meta,
-          fontSize: '1.17em',
-          fontWeight: FontWeight.bold,
-          styles: [_kCssMargin, '1em 0'],
-        );
+        meta
+          ..fontSize = '1.17em'
+          ..fontWeight = FontWeight.bold
+          ..styles = [_kCssMargin, '1em 0'];
         break;
       case 'h4':
-        meta = lazySet(
-          meta,
-          fontWeight: FontWeight.bold,
-          styles: [_kCssMargin, '1.33em 0'],
-        );
+        meta
+          ..fontWeight = FontWeight.bold
+          ..styles = [_kCssMargin, '1.33em 0'];
         break;
       case 'h5':
-        meta = lazySet(
-          meta,
-          fontSize: '0.83em',
-          fontWeight: FontWeight.bold,
-          styles: [_kCssMargin, '1.67em 0'],
-        );
+        meta
+          ..fontSize = '0.83em'
+          ..fontWeight = FontWeight.bold
+          ..styles = [_kCssMargin, '1.67em 0'];
         break;
       case 'h6':
-        meta = lazySet(
-          meta,
-          fontSize: '0.67em',
-          fontWeight: FontWeight.bold,
-          styles: [_kCssMargin, '2.33em 0'],
-        );
+        meta
+          ..fontSize = '0.67em'
+          ..fontWeight = FontWeight.bold
+          ..styles = [_kCssMargin, '2.33em 0'];
         break;
 
       case 'iframe':
@@ -719,85 +732,80 @@ class WidgetFactory {
       case 'svg':
         // actually `script` and `style` are not required here
         // our parser will put those elements into document.head anyway
-        meta = lazySet(meta, isNotRenderable: true);
+        meta.isNotRenderable = true;
         break;
 
       case 'img':
-        meta = lazySet(meta, buildOp: tagImg());
+        meta.op = tagImg();
         break;
 
       case 'ins':
       case 'u':
-        meta = lazySet(meta, decoUnder: true);
+        meta.decoUnder = true;
         break;
 
       case 'kbd':
       case 'samp':
-        meta = lazySet(meta, fontFamily: 'monospace');
+        meta.fontFamily = 'monospace';
         break;
 
       case _kTagOrderedList:
       case _kTagUnorderedList:
-        meta = lazySet(meta, buildOp: tagLi());
+        meta.op = tagLi();
         break;
 
       case 'mark':
-        meta = lazySet(
-          meta,
-          styles: [_kCssBackgroundColor, '#ff0', _kCssColor, '#000'],
-        );
+        meta.styles = [_kCssBackgroundColor, '#ff0', _kCssColor, '#000'];
         break;
 
       case 'p':
-        meta = lazySet(meta, styles: [_kCssMargin, '1em 0']);
+        meta.styles = [_kCssMargin, '1em 0'];
         break;
 
       case 'q':
-        meta = lazySet(meta, buildOp: tagQ());
+        meta.op = tagQ();
         break;
 
       case _kTagRuby:
-        meta = lazySet(meta, buildOp: tagRuby());
+        meta.op = tagRuby();
         break;
 
       case 'small':
-        meta = lazySet(meta, fontSize: _kCssFontSizeSmaller);
+        meta.fontSize = _kCssFontSizeSmaller;
         break;
 
       case 'sub':
-        meta = lazySet(meta, styles: [
+        meta.styles = [
           _kCssFontSize,
           _kCssFontSizeSmaller,
           _kCssVerticalAlign,
           _kCssVerticalAlignSub,
-        ]);
+        ];
         break;
       case 'sup':
-        meta = lazySet(meta, styles: [
+        meta.styles = [
           _kCssFontSize,
           _kCssFontSizeSmaller,
           _kCssVerticalAlign,
           _kCssVerticalAlignSuper,
-        ]);
+        ];
         break;
 
       case _kTagTable:
-        meta = lazySet(meta, buildOp: tagTable());
+        meta.op = tagTable();
         break;
     }
 
-    for (final attribute in attributes.entries) {
+    for (final attribute in attrs.entries) {
       switch (attribute.key) {
         case _kAttributeAlign:
-          meta = lazySet(meta, styles: [_kCssTextAlign, attribute.value]);
+          meta.styles = [_kCssTextAlign, attribute.value];
           break;
         case _kAttributeDir:
-          meta = lazySet(meta, styles: [_kCssDirection, attribute.value]);
+          meta.styles = [_kCssDirection, attribute.value];
           break;
       }
     }
-
-    return meta;
   }
 
   BuildOp styleBgColor() {
@@ -810,6 +818,11 @@ class WidgetFactory {
   BuildOp styleMargin() {
     _styleMargin ??= _StyleMargin(this).buildOp;
     return _styleMargin;
+  }
+
+  BuildOp stylePadding() {
+    _stylePadding ??= _StylePadding(this).buildOp;
+    return _stylePadding;
   }
 
   BuildOp styleTextAlign() {
@@ -847,7 +860,7 @@ class WidgetFactory {
 
   BuildOp tagHr() {
     _tagHr ??= BuildOp(
-      defaultStyles: (_, __) => const [_kCssMarginBottom, '1em'],
+      defaultStyles: (_, __) => const ['margin-bottom', '1em'],
       onWidgets: (_, __) => [buildDivider()],
     );
     return _tagHr;

@@ -9,7 +9,7 @@ class _TagVideo {
 
   BuildOp get buildOp => BuildOp(
         onChild: (meta, e) =>
-            e.localName == 'source' ? lazySet(null, buildOp: sourceOp) : null,
+            e.localName == 'source' ? meta.op = sourceOp : null,
         onWidgets: (meta, widgets) {
           final player = build(
             meta,

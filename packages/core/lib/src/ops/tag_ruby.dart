@@ -16,12 +16,11 @@ class _TagRuby {
       onChild: (meta, e) {
         switch (e.localName) {
           case _kTagRp:
-            meta = lazySet(meta, styles: [_kCssDisplay, _kCssDisplayNone]);
+            meta.styles = [_kCssDisplay, _kCssDisplayNone];
             break;
           case _kTagRt:
-            meta = lazySet(
-              meta,
-              buildOp: BuildOp(
+            meta
+              ..op = BuildOp(
                 onPieces: (_, pieces) {
                   for (final piece in pieces) {
                     if (piece.hasWidgets) continue;
@@ -31,9 +30,8 @@ class _TagRuby {
 
                   return [];
                 },
-              ),
-              styles: [_kCssFontSize, '0.5em'],
-            );
+              )
+              ..styles = [_kCssFontSize, '0.5em'];
             break;
         }
 
@@ -44,27 +42,34 @@ class _TagRuby {
         final _rtText = rtText;
         rtText = null;
 
-        final text = piece.text..trimRight();
-        if (text.isEmpty) return piece;
+        final rtBuilt = wf.buildText(_rtText);
+        if (rtBuilt == null) return piece;
+
+        final text = piece.text;
+        final built = wf.buildText(text);
+        if (built == null) return piece;
 
         final parent = text.parent;
         final replacement = parent.sub(text.tsb)..detach();
         text.replaceWith(replacement);
 
-        replacement.add(_buildTextBit(parent, text, _rtText));
+        replacement.add(_buildTextBit(parent, built, rtBuilt, _rtText.tsb));
 
         return BuiltPiece.text(replacement);
       }),
     );
   }
 
-  TextBit _buildTextBit(TextBits parent, TextBits ruby, TextBits rt) =>
+  TextBit _buildTextBit(
+    TextBits parent,
+    Widget ruby,
+    Widget rt,
+    TextStyleBuilders rtTsb,
+  ) =>
       TextWidget(
         parent,
         WidgetPlaceholder<_TagRuby>(builder: (context, _, __) {
-          final rubyText = wf.buildText(context, null, ruby);
-          final rtText = wf.buildText(context, null, rt);
-          final rtStyle = rt.tsb.build(context);
+          final rtStyle = rtTsb.build(context);
           final padding = EdgeInsets.symmetric(
               vertical: rtStyle.fontSize *
                   .75 *
@@ -73,9 +78,9 @@ class _TagRuby {
           return [
             Stack(
               children: <Widget>[
-                wf.buildPadding(wf.buildColumn(rubyText), padding),
+                wf.buildPadding(ruby, padding),
                 Positioned(
-                  child: Center(child: wf.buildColumn(rtText)),
+                  child: Center(child: rt),
                   left: 0,
                   right: 0,
                   top: 0,

@@ -22,15 +22,11 @@ class _TagA {
           final onTap = _buildGestureTapCallback(meta);
           if (onTap == null) return pieces;
 
-          final recognizer =
-              TapGestureRecognizer(debugOwner: meta.domElement.outerHtml)
-                ..onTap = onTap;
-
           return pieces.map(
             (piece) => piece.hasWidgets
                 ? BuiltPiece.widgets(WidgetPlaceholder.wrap(
                     piece.widgets, wf.buildGestureDetectors, wf, onTap))
-                : _buildBlock(meta, piece, onTap, recognizer),
+                : _buildBlock(meta, piece, onTap),
           );
         },
       );
@@ -39,12 +35,13 @@ class _TagA {
     NodeMetadata meta,
     BuiltPiece piece,
     GestureTapCallback onTap,
-    GestureRecognizer recognizer,
   ) =>
       piece
-        ..text.bits.forEach((bit) => bit is TextWidget
+        ..text.bits.toList(growable: false).forEach((bit) => bit is TextWidget
             ? bit.widget?.wrapWith(wf.buildGestureDetectors, onTap)
-            : bit.tsb?.recognizer = recognizer);
+            : bit is TextData
+                ? bit.replaceWith(_TagATextData(bit, onTap, wf))
+                : null);
 
   GestureTapCallback _buildGestureTapCallback(NodeMetadata meta) {
     final attrs = meta.domElement.attributes;
@@ -52,4 +49,20 @@ class _TagA {
     final url = wf.constructFullUrl(href);
     return wf.buildGestureTapCallbackForUrl(url);
   }
+}
+
+class _TagATextData extends TextData {
+  final TextData bit;
+  final GestureTapCallback onTap;
+  final WidgetFactory wf;
+
+  _TagATextData(this.bit, this.onTap, this.wf)
+      : super(bit.parent, bit.data, bit.tsb);
+
+  @override
+  bool get canCompile => true;
+
+  @override
+  InlineSpan compile(TextStyle style) =>
+      wf.buildGestureTapCallbackSpan(bit.data, onTap, style);
 }

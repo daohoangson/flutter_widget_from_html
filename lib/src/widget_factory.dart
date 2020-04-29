@@ -104,23 +104,25 @@ class WidgetFactory extends core.WidgetFactory {
       );
 
   @override
-  NodeMetadata parseTag(
+  void parseTag(
     NodeMetadata meta,
     String tag,
     Map<dynamic, String> attributes,
   ) {
     switch (tag) {
       case 'a':
-        meta = lazySet(meta, buildOp: tagAExtended());
+        meta.op = tagAExtended();
         break;
       case 'iframe':
+        meta.op = tagIframe();
         // return asap to avoid being disabled by core
-        return lazySet(meta, buildOp: tagIframe());
+        return;
       case 'svg':
+        meta.op = tagSvg();
         // return asap to avoid being disabled by core
-        return lazySet(meta, buildOp: tagSvg());
+        return;
       case 'video':
-        meta = lazySet(meta, buildOp: tagVideo());
+        meta.op = tagVideo();
         break;
     }
 

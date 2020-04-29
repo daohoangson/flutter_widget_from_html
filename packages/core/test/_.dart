@@ -36,7 +36,6 @@ Future<String> explain(
   void Function(BuildContext) preTest,
   Uri baseUrl,
   double bodyVerticalPadding = 0,
-  NodeMetadataCollector builderCallback,
   WidgetFactory Function(HtmlConfig config) factoryBuilder,
   double tableCellPadding = 0,
   TextStyle textStyle,
@@ -46,7 +45,6 @@ Future<String> explain(
     html,
     baseUrl: baseUrl,
     bodyPadding: EdgeInsets.symmetric(vertical: bodyVerticalPadding),
-    builderCallback: builderCallback,
     factoryBuilder: factoryBuilder,
     key: hwKey,
     tableCellPadding: EdgeInsets.all(tableCellPadding),
@@ -325,7 +323,16 @@ class Explainer {
     // ignore: invalid_use_of_protected_member
     if (widget is WidgetPlaceholder) return _widget(widget.build(context));
 
-    final type = widget.runtimeType.toString();
+    if (widget is LayoutBuilder) {
+      return _widget(widget.builder(
+        context,
+        BoxConstraints.tightFor(width: 800, height: 600),
+      ));
+    }
+
+    final type = widget.runtimeType
+        .toString()
+        .replaceAll('_MarginHorizontal', 'Padding');
     final text = widget is Align
         ? "${widget is Center ? '' : 'alignment=${widget.alignment},'}"
         : widget is AspectRatio
@@ -342,17 +349,20 @@ class Explainer {
                                 ? _limitBox(widget)
                                 : widget is Padding
                                     ? "${_edgeInsets(widget.padding)},"
-                                    : widget is RichText
-                                        ? _inlineSpan(widget.text)
-                                        : widget is SizedBox
-                                            ? "${widget.width?.toStringAsFixed(1) ?? 0.0}x${widget.height?.toStringAsFixed(1) ?? 0.0}"
-                                            : widget is Table
-                                                ? _tableBorder(widget.border)
-                                                : widget is Text
-                                                    ? widget.data
-                                                    : widget is Wrap
-                                                        ? _wrap(widget)
-                                                        : '';
+                                    : widget is Positioned
+                                        ? "(${widget.top},${widget.right},${widget.bottom},${widget.left}),"
+                                        : widget is RichText
+                                            ? _inlineSpan(widget.text)
+                                            : widget is SizedBox
+                                                ? "${widget.width?.toStringAsFixed(1) ?? 0.0}x${widget.height?.toStringAsFixed(1) ?? 0.0}"
+                                                : widget is Table
+                                                    ? _tableBorder(
+                                                        widget.border)
+                                                    : widget is Text
+                                                        ? widget.data
+                                                        : widget is Wrap
+                                                            ? _wrap(widget)
+                                                            : '';
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));

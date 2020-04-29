@@ -72,7 +72,8 @@ class HtmlWidget extends StatefulWidget {
     HtmlConfig config,
     Uri baseUrl,
     EdgeInsets bodyPadding = const EdgeInsets.all(10),
-    NodeMetadataCollector builderCallback,
+    CustomStylesBuilder customStylesBuilder,
+    CustomWidgetBuilder customWidgetBuilder,
     Color hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
     OnTapUrl onTapUrl,
     EdgeInsets tableCellPadding = const EdgeInsets.all(5),
@@ -82,7 +83,8 @@ class HtmlWidget extends StatefulWidget {
             HtmlConfig(
               baseUrl: baseUrl,
               bodyPadding: bodyPadding,
-              builderCallback: builderCallback,
+              customStylesBuilder: customStylesBuilder,
+              customWidgetBuilder: customWidgetBuilder,
               hyperlinkColor: hyperlinkColor,
               onTapUrl: onTapUrl,
               tableCellPadding: tableCellPadding,
@@ -104,12 +106,11 @@ class HtmlConfig {
   /// The amount of space by which to inset the built widget tree.
   final EdgeInsets bodyPadding;
 
-  /// The callback to render custom elements.
-  ///
-  /// See also:
-  ///
-  ///  * [HtmlBuilder]
-  final NodeMetadataCollector builderCallback;
+  /// The callback to specify custom stylings.
+  final CustomStylesBuilder customStylesBuilder;
+
+  /// The callback to render custom widget.
+  final CustomWidgetBuilder customWidgetBuilder;
 
   /// The text color for link elements.
   final Color hyperlinkColor;
@@ -127,7 +128,8 @@ class HtmlConfig {
   HtmlConfig({
     this.baseUrl,
     this.bodyPadding,
-    this.builderCallback,
+    this.customStylesBuilder,
+    this.customWidgetBuilder,
     this.hyperlinkColor,
     this.onTapUrl,
     this.tableCellPadding,

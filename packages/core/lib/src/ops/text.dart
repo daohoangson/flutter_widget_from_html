@@ -8,7 +8,6 @@ class _TextCompiler {
 
   List<InlineSpan> _spans;
   StringBuffer _buffer, _prevBuffer;
-  GestureRecognizer _recognizer, _prevRecognizer;
   TextStyle _style, _prevStyle;
 
   _TextCompiler(this.text) : assert(text != null);
@@ -17,6 +16,7 @@ class _TextCompiler {
     _context = context;
     _compiled = [];
 
+    _resetLoop(text.tsb);
     for (final bit in text.bits) {
       _loop(bit);
     }
@@ -36,21 +36,18 @@ class _TextCompiler {
     _spans = <InlineSpan>[];
 
     _buffer = StringBuffer();
-    _recognizer = tsb?.recognizer;
     _style = tsb?.build(_context);
 
     _prevBuffer = _buffer;
     _prevStyle = _style;
-    _prevRecognizer = _recognizer;
   }
 
   void _loop(final TextBit bit) {
     final tsb = _getBitTsb(bit);
     if (_spans == null) _resetLoop(tsb);
 
-    final recognizer = tsb?.recognizer ?? bit.tsb?.recognizer;
     final style = tsb?.build(_context) ?? _prevStyle;
-    if (recognizer != _prevRecognizer || style != _prevStyle) _saveSpan();
+    if (style != _prevStyle) _saveSpan();
 
     if (bit.canCompile) {
       _saveSpan();
@@ -58,7 +55,7 @@ class _TextCompiler {
       return;
     }
 
-    if (bit is TextWhitespace && bit.data != null) {
+    if (bit is TextWhitespace && !bit.hasTrailingWhitespace) {
       _completeLoop();
       final newLines = bit.data.length - 1;
       if (newLines > 0) {
@@ -70,15 +67,13 @@ class _TextCompiler {
       return;
     }
 
-    _prevBuffer.write(bit.data ?? ' ');
-    _prevRecognizer = recognizer;
+    _prevBuffer.write(bit.data);
     _prevStyle = style;
   }
 
   void _saveSpan() {
     if (_prevBuffer != _buffer && _prevBuffer.length > 0) {
       _spans.add(TextSpan(
-        recognizer: _prevRecognizer,
         style: _prevStyle,
         text: _prevBuffer.toString(),
       ));
@@ -104,7 +99,6 @@ class _TextCompiler {
     } else if (_spans.isNotEmpty || _buffer.isNotEmpty) {
       span = TextSpan(
         children: _spans,
-        recognizer: _recognizer,
         style: _style,
         text: _buffer.toString(),
       );
