@@ -202,9 +202,9 @@ void main() {
     });
   });
 
-  group('builderCallback', () {
-    final NodeMetadataCollector builderCallback =
-        (m, e) => lazySet(null, fontStyleItalic: true);
+  group('customStylesBuilder', () {
+    final CustomStylesBuilder customStylesBuilder =
+        (_) => ['font-style', 'italic'];
     final html = '<span>Foo</span>';
 
     testWidgets('renders without value', (WidgetTester tester) async {
@@ -219,12 +219,42 @@ void main() {
     testWidgets('renders with value', (WidgetTester tester) async {
       final explained = await explain(
         tester,
-        HtmlWidget(html, builderCallback: builderCallback, key: helper.hwKey),
+        HtmlWidget(
+          html,
+          customStylesBuilder: customStylesBuilder,
+          key: helper.hwKey,
+        ),
       );
       expect(
         explained,
         equals('[Padding:(10,10,10,10),child=[RichText:(+i:Foo)]]'),
       );
+    });
+  });
+
+  group('customWidgetBuilder', () {
+    final CustomWidgetBuilder customWidgetBuilder = (_) => Text('Bar');
+    final html = '<span>Foo</span>';
+
+    testWidgets('renders without value', (WidgetTester tester) async {
+      final explained =
+          await explain(tester, HtmlWidget(html, key: helper.hwKey));
+      expect(
+        explained,
+        equals('[Padding:(10,10,10,10),child=[RichText:(:Foo)]]'),
+      );
+    });
+
+    testWidgets('renders with value', (WidgetTester tester) async {
+      final explained = await explain(
+        tester,
+        HtmlWidget(
+          html,
+          customWidgetBuilder: customWidgetBuilder,
+          key: helper.hwKey,
+        ),
+      );
+      expect(explained, equals('[Padding:(10,10,10,10),child=[Text:Bar]]'));
     });
   });
 

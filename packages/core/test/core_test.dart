@@ -257,7 +257,7 @@ void main() {
           explained,
           equals('[RichText:[Stack:children='
               '[Padding:(3,0,3,0),child=[RichText:(:明日)]],'
-              '[Positioned:child=[Center:child=[RichText:(@5.0:Ashita)]]]'
+              '[Positioned:(0.0,0.0,null,0.0),child=[Center:child=[RichText:(@5.0:Ashita)]]]'
               ']@middle]'));
     });
 

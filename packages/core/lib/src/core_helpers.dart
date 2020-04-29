@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:html/dom.dart' as dom;
 
 import 'core_widget_factory.dart';
 
@@ -8,6 +9,10 @@ const kShouldBuildAsync = 10000;
 
 /// A no op placeholder widget.
 const widget0 = SizedBox.shrink();
+
+typedef CustomStylesBuilder = Iterable<String> Function(dom.Element element);
+
+typedef CustomWidgetBuilder = Widget Function(dom.Element element);
 
 typedef OnTapUrl = void Function(String url);
 
@@ -82,4 +87,17 @@ class WidgetPlaceholder<T1> extends StatelessWidget {
 
     return wrapped;
   }
+
+  static Widget wrapOne<T2>(
+    Iterable<Widget> widgets,
+    WidgetPlaceholderBuilder<T2> builder, [
+    T2 input,
+  ]) =>
+      widgets.length == 1
+          ? wrap(widgets, builder, null, input).first
+          : WidgetPlaceholder(
+              builder: builder,
+              children: widgets,
+              input: input,
+            );
 }

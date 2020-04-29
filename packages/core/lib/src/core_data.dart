@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -36,7 +35,7 @@ class BuildOp {
   List<String> defaultStyles(NodeMetadata meta, dom.Element e) =>
       _defaultStyles != null ? _defaultStyles(meta, e) : null;
 
-  NodeMetadata onChild(NodeMetadata meta, dom.Element e) =>
+  void onChild(NodeMetadata meta, dom.Element e) =>
       _onChild != null ? _onChild(meta, e) : meta;
 
   Iterable<BuiltPiece> onPieces(
@@ -51,8 +50,7 @@ class BuildOp {
 
 typedef _BuildOpDefaultStyles = Iterable<String> Function(
     NodeMetadata meta, dom.Element e);
-typedef _BuildOpOnChild = NodeMetadata Function(
-    NodeMetadata meta, dom.Element e);
+typedef _BuildOpOnChild = void Function(NodeMetadata meta, dom.Element e);
 typedef _BuildOpOnPieces = Iterable<BuiltPiece> Function(
     NodeMetadata meta, Iterable<BuiltPiece> pieces);
 typedef _BuildOpOnWidgets = Iterable<Widget> Function(
@@ -161,8 +159,6 @@ class TextStyleBuilders {
   final _builders = <Function>[];
   final _inputs = [];
   final TextStyleBuilders parent;
-
-  GestureRecognizer recognizer;
 
   BuildContext _context;
   TextStyle _output;

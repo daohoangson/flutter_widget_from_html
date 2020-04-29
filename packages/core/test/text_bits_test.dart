@@ -201,7 +201,7 @@ void main() {
         final space2 = text.addWhitespace();
 
         expect(space2, equals(space1));
-        expect(space2.data, isNull);
+        expect(space2.hasTrailingWhitespace, isTrue);
       });
 
       test('adds new line to trailing space', () {
@@ -289,7 +289,7 @@ void main() {
 
 [TextBits]
   [TextData] data=1
-  [TextWhitespace] data=null
+  [TextWhitespace] data= 
   [TextBits]
     [TextData] data=(2.1)
     [TextBits]

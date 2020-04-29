@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:html/dom.dart' as dom;
 
 import '_.dart';
 
@@ -26,7 +25,7 @@ class BlockquoteWebViewScreen extends StatelessWidget {
 }
 
 class _BlockquoteWebViewWf extends WidgetFactory {
-  final buildOp = BuildOp(
+  final blockquoteOp = BuildOp(
     onWidgets: (meta, _) => [
       WebView(
         Uri.dataFromString(
@@ -43,13 +42,13 @@ class _BlockquoteWebViewWf extends WidgetFactory {
   _BlockquoteWebViewWf(HtmlConfig config) : super(config);
 
   @override
-  NodeMetadata parseElement(NodeMetadata meta, dom.Element e) {
-    switch (e.localName) {
-      case 'blockquote':
-        return lazySet(null, buildOp: buildOp);
+  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
+    if (tag == 'blockquote') {
+      meta.op = blockquoteOp;
+      return;
     }
 
-    return super.parseElement(meta, e);
+    return super.parseTag(meta, tag, attrs);
   }
 }
 
