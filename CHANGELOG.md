@@ -1,3 +1,7 @@
+## 0.3.3+1
+
+* Fix conflict between TABLE and background-color (#171)
+
 ## 0.3.3
 
 * Improve whitespace handling (#137)
