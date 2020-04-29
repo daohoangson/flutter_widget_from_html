@@ -1,3 +1,12 @@
+## 0.4.0-rc.2020043001
+
+* Improve SUB, SUP to avoid overlapping (#164)
+* Add support for async build (#154)
+* Replace `builderCallback` with `customStylesBuilder` and `customWidgetBuilder` (#169)
+* Remove `TextStyleBuilders.recognizer` (#168)
+* Remove `lazySet` method (#169)
+* Fix conflict between TABLE and background-color (#171)
+
 ## 0.4.0-rc.2020041601
 
 * Simplify `WidgetFactory.buildText` (#162)
