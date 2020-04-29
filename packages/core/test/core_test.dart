@@ -7,7 +7,7 @@ void main() {
   testWidgets('renders empty string', (WidgetTester tester) async {
     final html = '';
     final explained = await explain(tester, html);
-    expect(explained, equals('[Text:]'));
+    expect(explained, equals('[widget0]'));
   });
 
   testWidgets('renders bare string', (WidgetTester tester) async {
@@ -257,7 +257,7 @@ void main() {
           explained,
           equals('[RichText:[Stack:children='
               '[Padding:(3,0,3,0),child=[RichText:(:明日)]],'
-              '[Positioned:(0.0,0.0,null,0.0),child=[Center:alignment=center,child=[RichText:(@5.0:Ashita)]]]'
+              '[Positioned:(0.0,0.0,null,0.0),child=[Center:child=[RichText:(@5.0:Ashita)]]]'
               ']@middle]'));
     });
 
@@ -400,7 +400,7 @@ void main() {
     testWidgets('renders empty CODE tag', (WidgetTester tester) async {
       final html = '<code></code>';
       final actual = await explain(tester, html);
-      expect(actual, equals('[Text:<code></code>]'));
+      expect(actual, equals('[widget0]'));
     });
 
     testWidgets('renders KBD tag', (WidgetTester tester) async {

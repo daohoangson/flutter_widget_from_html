@@ -13,6 +13,8 @@ class HtmlWidget extends core.HtmlWidget {
   /// The [html] argument must not be null.
   HtmlWidget(
     String html, {
+    bool buildAsync,
+    AsyncWidgetBuilder<Widget> buildAsyncBuilder,
     bool enableCaching = true,
     core.WidgetFactory Function(core.HtmlConfig) factoryBuilder,
     Key key,
@@ -31,6 +33,8 @@ class HtmlWidget extends core.HtmlWidget {
   })  : assert(html != null),
         super(
           html,
+          buildAsync: buildAsync,
+          buildAsyncBuilder: buildAsyncBuilder,
           enableCaching: enableCaching,
           factoryBuilder: factoryBuilder ?? (config) => WidgetFactory(config),
           config: config ??

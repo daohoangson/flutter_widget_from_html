@@ -13,9 +13,24 @@ Widget buildCurrentState() {
   return hws.build(hws.context);
 }
 
+Future<Widget> buildFutureBuilder(
+  FutureBuilder<Widget> fb, {
+  bool withData = true,
+}) async {
+  final hws = hwKey.currentState;
+  if (hws == null) return Future.value(null);
+
+  final data = await fb.future;
+  final snapshot = withData
+      ? AsyncSnapshot.withData(ConnectionState.done, data)
+      : AsyncSnapshot<Widget>.nothing();
+  return fb.builder(hws.context, snapshot);
+}
+
 Future<String> explain(
   WidgetTester tester,
   String html, {
+  bool buildFutureBuilderWithData = true,
   String Function(Widget) explainer,
   Widget hw,
   void Function(BuildContext) preTest,
@@ -67,8 +82,20 @@ Future<String> explain(
   final hws = hwKey.currentState;
   expect(hws, isNotNull);
 
-  return Explainer(hws.context, explainer: explainer)
-      .explain(buildCurrentState());
+  var built = buildCurrentState();
+  var isFutureBuilder = false;
+  if (built is FutureBuilder<Widget>) {
+    built = await buildFutureBuilder(
+      built,
+      withData: buildFutureBuilderWithData,
+    );
+    isFutureBuilder = true;
+  }
+
+  var explained = Explainer(hws.context, explainer: explainer).explain(built);
+  if (isFutureBuilder) explained = "[FutureBuilder:$explained]";
+
+  return explained;
 }
 
 final _explainMarginRegExp = RegExp(
@@ -307,7 +334,7 @@ class Explainer {
         .toString()
         .replaceAll('_MarginHorizontal', 'Padding');
     final text = widget is Align
-        ? "alignment=${widget.alignment},"
+        ? "${widget is Center ? '' : 'alignment=${widget.alignment},'}"
         : widget is AspectRatio
             ? "aspectRatio=${widget.aspectRatio.toStringAsFixed(2)},"
             : widget is DecoratedBox

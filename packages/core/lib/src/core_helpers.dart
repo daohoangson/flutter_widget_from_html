@@ -5,6 +5,8 @@ import 'core_widget_factory.dart';
 
 part 'widget/image_layout.dart';
 
+const kShouldBuildAsync = 10000;
+
 /// A no op placeholder widget.
 const widget0 = SizedBox.shrink();
 
