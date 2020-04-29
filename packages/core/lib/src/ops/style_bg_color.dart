@@ -26,8 +26,11 @@ class _StyleBgColor {
         final bgColor = _parseColor(meta);
         if (bgColor == null) return null;
 
-        return listOfNonNullOrNothing(_buildBox(widgets, bgColor));
+        return [IWidgetPlaceholder.wrapOne(widgets, _build, bgColor)];
       });
+
+  Iterable<Widget> _build(BuilderContext _, Iterable<Widget> ws, Color c) =>
+      [wf.buildDecoratedBox(wf.buildBody(ws), color: c)];
 
   BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) => piece
     ..block.rebuildBits((bit) => bit is DataBit
@@ -35,9 +38,6 @@ class _StyleBgColor {
             tsb: bit.tsb.sub()..enqueue(_styleBgColorTextStyleBuilder, bgColor),
           )
         : bit);
-
-  Widget _buildBox(Iterable<Widget> widgets, Color bgColor) =>
-      wf.buildDecoratedBox(wf.buildBody(widgets), color: bgColor);
 
   Color _parseColor(NodeMetadata meta) {
     String value;

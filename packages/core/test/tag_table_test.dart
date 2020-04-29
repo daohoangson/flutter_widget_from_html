@@ -237,5 +237,17 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
     });
+
+    testWidgets('#171: background-color', (WidgetTester tester) async {
+      final html = '<table><tr>'
+          '<td style="background-color: #f00">Foo</td>'
+          '</tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Table:\n'
+              '[DecoratedBox:bg=#FFFF0000,child=[RichText:(bg=#FFFF0000:Foo)]]\n'
+              ']'));
+    });
   });
 }
