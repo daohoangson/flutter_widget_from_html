@@ -1,3 +1,7 @@
+## 0.3.3+2
+
+* Fix bug vertical-align with trailing whitespace (#170)
+
 ## 0.3.3+1
 
 * Fix conflict between TABLE and background-color (#171)
