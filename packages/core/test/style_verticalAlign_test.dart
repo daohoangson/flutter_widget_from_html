@@ -144,6 +144,25 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
+
+    testWidgets('#170: renders whitespace contents', (tester) async {
+      final html = 'Foo <sub> </sub>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('#170: renders trailing whitespace contents', (tester) async {
+      final html = 'Foo <sub>bar </sub>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[RichText:(:'
+              'Foo '
+              '[Stack:children='
+              '[Padding:(0,0,3,0),child=[Opacity:child=[RichText:(@8.3:bar)]]],'
+              '[Positioned:(null,null,0.0,null),child=[RichText:(@8.3:bar)]]'
+              ']@top)]'));
+    });
   });
 
   testWidgets('#163: renders non-WidgetPlaceholder text', (tester) async {
