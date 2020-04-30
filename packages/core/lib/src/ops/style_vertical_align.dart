@@ -41,7 +41,10 @@ class _StyleVerticalAlign {
         TextBlock(parent?.tsb?.sub() ?? block.tsb.clone(), parent: parent);
     parent?.rebuildChild((bit) => bit == block ? replacement : bit);
 
-    final cloned = block.clone(parent);
+    final cloned = block.clone(null)..trimRight();
+    final newPiece = BuiltPieceSimple(block: replacement);
+    if (cloned.isEmpty) return newPiece;
+
     replacement.addWidget(
       WidgetSpan(
         alignment: alignment,
@@ -66,7 +69,7 @@ class _StyleVerticalAlign {
       ),
     );
 
-    return BuiltPieceSimple(block: replacement);
+    return newPiece;
   }
 }
 

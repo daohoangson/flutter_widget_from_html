@@ -89,4 +89,45 @@ void main() {
     final explained = await explain(tester, html);
     expect(explained, equals('[RichText:[RichText:(+i:Foo)]@top]'));
   });
+
+  group('error handling', () {
+    testWidgets('renders empty tag', (WidgetTester tester) async {
+      final html = 'Foo <sub></sub>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('renders empty SPAN inside', (WidgetTester tester) async {
+      final html = 'Foo <sup><span></span></sup>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('renders empty DIV inside', (WidgetTester tester) async {
+      final html = 'Foo <sup><div></div></sup>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('#159: renders CODE of whitespaces inside', (tester) async {
+      final html = 'Foo <sup><code>\n  \n\n\n</code></sup>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('#170: renders whitespace contents', (tester) async {
+      final html = 'Foo <sub> </sub>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('#170: renders trailing whitespace contents', (tester) async {
+      final html = 'Foo <sub>bar </sub>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals(
+              '[RichText:(:Foo [Transform:child=[RichText:(@6.9:bar)]]@bottom)]'));
+    });
+  });
 }
