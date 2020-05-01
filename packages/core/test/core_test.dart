@@ -393,7 +393,7 @@ void main() {
       expect(
           explained,
           equals('[SingleChildScrollView:child=' +
-              '[RichText:(+font=monospace:(#FF0000BB:<?php phpinfo)' +
+              '[RichText:(+font=Courier, Menlo, monospace:(#FF0000BB:<?php phpinfo)' +
               '(#FF007700:(); )(#FF0000BB:?>))]]'));
     });
 
@@ -406,7 +406,7 @@ void main() {
     testWidgets('renders KBD tag', (WidgetTester tester) async {
       final html = '<kbd>ESC</kbd> = exit';
       final actual = await explain(tester, html);
-      expect(actual, equals('[RichText:(:(+font=monospace:ESC)(: = exit))]'));
+      expect(actual, equals('[RichText:(:(+font=Courier, Menlo, monospace:ESC)(: = exit))]'));
     });
 
     testWidgets('renders PRE tag', (WidgetTester tester) async {
@@ -417,14 +417,14 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(
           explained,
           equals('[SingleChildScrollView:child=[RichText:' +
-              '(+font=monospace:<?php\nhighlight_string(\'' +
+              '(+font=Courier, Menlo, monospace:<?php\nhighlight_string(\'' +
               '<?php phpinfo(); ?>\');\n?>)]]'));
     });
 
     testWidgets('renders SAMP tag', (WidgetTester tester) async {
       final html = '<samp>Disk fault</samp>';
       final actual = await explain(tester, html);
-      expect(actual, equals('[RichText:(+font=monospace:Disk fault)]'));
+      expect(actual, equals('[RichText:(+font=Courier, Menlo, monospace:Disk fault)]'));
     });
 
     testWidgets('renders TT tag', (WidgetTester tester) async {
@@ -433,7 +433,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(
           actual,
           equals('[SingleChildScrollView:child='
-              '[RichText:(+font=monospace:Teletype)]]'));
+              '[RichText:(+font=Courier, Menlo, monospace:Teletype)]]'));
     });
   });
 

@@ -750,7 +750,7 @@ class WidgetFactory {
 
       case 'kbd':
       case 'samp':
-        meta.fontFamily = 'monospace';
+        meta.fontFamilies = [_kTagCodeFont1, _kTagCodeFont2, _kTagCodeFont3];
         break;
 
       case _kTagOrderedList:
