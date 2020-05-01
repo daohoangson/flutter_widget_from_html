@@ -14,10 +14,7 @@ class SmilieScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text('SmilieScreen'),
         ),
-        body: HtmlWidget(
-          kHtml,
-          factoryBuilder: (config) => _SmiliesWidgetFactory(config),
-        ),
+        body: HtmlWidget(kHtml, factoryBuilder: () => _SmiliesWidgetFactory()),
       );
 }
 
@@ -29,8 +26,6 @@ class _SmiliesWidgetFactory extends WidgetFactory {
       return pieces..first?.text?.addText(text);
     },
   );
-
-  _SmiliesWidgetFactory(HtmlConfig config) : super(config);
 
   @override
   void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {

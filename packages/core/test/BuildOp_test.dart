@@ -13,8 +13,8 @@ void main() {
 
     testWidgets('renders getInlineStyles in reversed', (WidgetTester t) async {
       final html = '<span>Foo</span>';
-      final e = await explain(t, html,
-          factoryBuilder: (config) => _GetInlineStylesTest(config));
+      final factoryBuilder = () => _GetInlineStylesTest();
+      final e = await explain(t, html, factoryBuilder: factoryBuilder);
       expect(e, equals('[RichText:(#FFFF0000:Foo)]'));
     });
   });
@@ -24,21 +24,19 @@ void main() {
 
     testWidgets('renders A first', (WidgetTester t) async {
       final e = await explain(t, html,
-          factoryBuilder: (config) => _PriorityTest(config, a: 1, b: 2));
+          factoryBuilder: () => _PriorityTest(a: 1, b: 2));
       expect(e, equals('[RichText:(:Foo A B)]'));
     });
 
     testWidgets('renders B first', (WidgetTester t) async {
       final e = await explain(t, html,
-          factoryBuilder: (config) => _PriorityTest(config, a: 2, b: 1));
+          factoryBuilder: () => _PriorityTest(a: 2, b: 1));
       expect(e, equals('[RichText:(:Foo B A)]'));
     });
   });
 }
 
 class _GetInlineStylesTest extends WidgetFactory {
-  _GetInlineStylesTest(HtmlConfig config) : super(config);
-
   @override
   void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
     meta.op = BuildOp(defaultStyles: (_, __) => ['color', '#f00']);
@@ -52,7 +50,7 @@ class _PriorityTest extends WidgetFactory {
   final int a;
   final int b;
 
-  _PriorityTest(HtmlConfig config, {this.a, this.b}) : super(config);
+  _PriorityTest({this.a, this.b});
 
   @override
   void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {

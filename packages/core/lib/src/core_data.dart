@@ -152,34 +152,6 @@ enum CssLengthUnit {
   px,
 }
 
-abstract class HtmlConfig extends StatefulWidget {
-  /// The base url to resolve links and image urls.
-  Uri get baseUrl;
-
-  /// The amount of space by which to inset the built widget tree.
-  EdgeInsets get bodyPadding;
-
-  /// The callback to specify custom stylings.
-  CustomStylesBuilder get customStylesBuilder;
-
-  /// The callback to specify custom stylings.
-  CustomWidgetBuilder get customWidgetBuilder;
-
-  /// The text color for link elements.
-  Color get hyperlinkColor;
-
-  /// The callback when user taps a link.
-  void Function(String) get onTapUrl;
-
-  /// The amount of space by which to inset the table cell's contents.
-  EdgeInsets get tableCellPadding;
-
-  /// The default styling for text elements.
-  TextStyle get textStyle;
-
-  HtmlConfig({Key key}) : super(key: key);
-}
-
 typedef NodeMetadataCollector = NodeMetadata Function(
     NodeMetadata meta, dom.Element e);
 

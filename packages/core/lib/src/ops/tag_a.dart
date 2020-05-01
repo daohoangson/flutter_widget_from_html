@@ -9,7 +9,7 @@ class _TagA {
         defaultStyles: (meta, __) {
           final styles = [_kCssTextDecoration, _kCssTextDecorationUnderline];
 
-          final color = wf.config?.hyperlinkColor;
+          final color = wf.widget?.hyperlinkColor;
           if (color != null) {
             styles.addAll([_kCssColor, _convertColorToHex(color)]);
           }

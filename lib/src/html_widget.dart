@@ -43,9 +43,8 @@ class HtmlWidget extends core.HtmlWidget {
     bool buildAsync,
     AsyncWidgetBuilder<Widget> buildAsyncBuilder,
     bool enableCaching = true,
-    core.WidgetFactory Function(core.HtmlConfig) factoryBuilder,
+    WidgetFactory Function() factoryBuilder = _wfSingleton,
     Key key,
-    core.HtmlConfig config,
     Uri baseUrl,
     EdgeInsets bodyPadding = const EdgeInsets.all(10),
     CustomStylesBuilder customStylesBuilder,
@@ -67,11 +66,18 @@ class HtmlWidget extends core.HtmlWidget {
           customStylesBuilder: customStylesBuilder,
           customWidgetBuilder: customWidgetBuilder,
           enableCaching: enableCaching,
-          factoryBuilder: factoryBuilder ?? (config) => WidgetFactory(config),
+          factoryBuilder: factoryBuilder,
           hyperlinkColor: hyperlinkColor,
           onTapUrl: onTapUrl,
           tableCellPadding: tableCellPadding,
           textStyle: textStyle,
           key: key,
         );
+
+  static WidgetFactory _wf;
+
+  static WidgetFactory _wfSingleton() {
+    _wf ??= WidgetFactory();
+    return _wf;
+  }
 }

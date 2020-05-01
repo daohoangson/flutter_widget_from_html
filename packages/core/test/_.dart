@@ -36,7 +36,7 @@ Future<String> explain(
   void Function(BuildContext) preTest,
   Uri baseUrl,
   double bodyVerticalPadding = 0,
-  WidgetFactory Function(HtmlConfig config) factoryBuilder,
+  WidgetFactory Function() factoryBuilder,
   double tableCellPadding = 0,
   TextStyle textStyle,
 }) async {

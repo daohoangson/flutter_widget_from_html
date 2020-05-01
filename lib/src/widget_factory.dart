@@ -18,16 +18,11 @@ part 'ops/tag_video.dart';
 /// A factory to build widget for HTML elements
 /// with support for [WebView] and [VideoPlayer] etc.
 class WidgetFactory extends core.WidgetFactory {
-  final HtmlWidget widget;
-
   BuildOp _tagAExtended;
   BuildOp _tagIframe;
   BuildOp _tagSvg;
   BuildOp _tagVideo;
-
-  WidgetFactory(core.HtmlConfig config)
-      : widget = config is HtmlWidget ? config : null,
-        super(config);
+  HtmlWidget _widget;
 
   @override
   Widget buildDivider() => const Divider(height: 1);
@@ -43,10 +38,10 @@ class WidgetFactory extends core.WidgetFactory {
   @override
   GestureTapCallback buildGestureTapCallbackForUrl(String url) {
     if (url == null) return null;
-    if (widget?.onTapUrl == null) {
+    if (_widget?.onTapUrl == null) {
       return () => canLaunch(url).then((ok) => ok ? launch(url) : null);
     }
-    return () => widget.onTapUrl(url);
+    return () => _widget.onTapUrl(url);
   }
 
   @override
@@ -77,22 +72,22 @@ class WidgetFactory extends core.WidgetFactory {
     double height,
     double width,
   }) {
-    if (widget?.webView != true) return buildWebViewLinkOnly(url);
+    if (_widget?.webView != true) return buildWebViewLinkOnly(url);
 
     final dimensOk = height != null && height > 0 && width != null && width > 0;
     return WebView(
       url,
       aspectRatio: dimensOk ? width / height : 16 / 9,
-      getDimensions: !dimensOk && widget.webViewJs == true,
+      getDimensions: !dimensOk && _widget.webViewJs == true,
       interceptNavigationRequest: (newUrl) {
         if (newUrl == url) return false;
 
         buildGestureTapCallbackForUrl(newUrl)();
         return true;
       },
-      js: widget.webViewJs == true,
+      js: _widget.webViewJs == true,
       unsupportedWorkaroundForIssue37:
-          widget.unsupportedWebViewWorkaroundForIssue37 == true,
+          _widget.unsupportedWebViewWorkaroundForIssue37 == true,
     );
   }
 
@@ -125,6 +120,12 @@ class WidgetFactory extends core.WidgetFactory {
     }
 
     return super.parseTag(meta, tag, attributes);
+  }
+
+  @override
+  void reset(core.HtmlWidget widget) {
+    if (widget is HtmlWidget) _widget = widget;
+    super.reset(widget);
   }
 
   BuildOp tagAExtended() {

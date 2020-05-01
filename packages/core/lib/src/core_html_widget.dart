@@ -14,8 +14,8 @@ import 'core_widget_factory.dart';
 
 /// A widget that builds Flutter widget tree from HTML
 /// (supports most popular tags and stylings).
-class HtmlWidget extends HtmlConfig {
-  @override
+class HtmlWidget extends StatefulWidget {
+  /// The base url to resolve links and image urls.
   final Uri baseUrl;
 
   /// Controls whether the widget tree is built asynchronously.
@@ -28,13 +28,13 @@ class HtmlWidget extends HtmlConfig {
   /// the widget tree is ready without error handling.
   final AsyncWidgetBuilder<Widget> buildAsyncBuilder;
 
-  @override
+  /// The amount of space by which to inset the built widget tree.
   final EdgeInsets bodyPadding;
 
-  @override
+  /// The callback to specify custom stylings.
   final CustomStylesBuilder customStylesBuilder;
 
-  @override
+  /// The callback to specify custom stylings.
   final CustomWidgetBuilder customWidgetBuilder;
 
   /// Controls whether the built widget tree is cached between rebuild.
@@ -46,19 +46,19 @@ class HtmlWidget extends HtmlConfig {
   /// `<html><body>Contents</body></html>`) to avoid parsing quirks.
   final String html;
 
-  @override
+  /// The text color for link elements.
   final Color hyperlinkColor;
 
   /// The custom [WidgetFactory] builder.
-  final WidgetFactory Function(HtmlWidget) factoryBuilder;
+  final WidgetFactory Function() factoryBuilder;
 
-  @override
+  /// The callback when user taps a link.
   final void Function(String) onTapUrl;
 
-  @override
+  /// The amount of space by which to inset the table cell's contents.
   final EdgeInsets tableCellPadding;
 
-  @override
+  /// The default styling for text elements.
   final TextStyle textStyle;
 
   /// Creates a widget that builds Flutter widget tree from html.
@@ -73,19 +73,27 @@ class HtmlWidget extends HtmlConfig {
     this.customStylesBuilder,
     this.customWidgetBuilder,
     this.enableCaching = true,
-    this.factoryBuilder,
+    this.factoryBuilder = _wfSingleton,
     this.hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
     Key key,
     this.onTapUrl,
     this.tableCellPadding = const EdgeInsets.all(5),
     this.textStyle = const TextStyle(),
   })  : assert(html != null),
+        assert(factoryBuilder != null),
         super(key: key);
 
   @override
   State<HtmlWidget> createState() => _HtmlWidgetState(
         buildAsync: buildAsync ?? html.length > kShouldBuildAsync,
       );
+
+  static WidgetFactory _wf;
+
+  static WidgetFactory _wfSingleton() {
+    _wf ??= WidgetFactory();
+    return _wf;
+  }
 }
 
 class _HtmlWidgetState extends State<HtmlWidget> {
@@ -101,9 +109,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
   void initState() {
     super.initState();
 
-    _wf = widget.factoryBuilder != null
-        ? widget.factoryBuilder(widget)
-        : WidgetFactory(widget);
+    _wf = widget.factoryBuilder();
 
     if (buildAsync) {
       _future = _buildAsync();
