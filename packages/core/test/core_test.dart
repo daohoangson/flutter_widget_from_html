@@ -393,20 +393,20 @@ void main() {
       expect(
           explained,
           equals('[SingleChildScrollView:child=' +
-              '[RichText:(+font=monospace:(#FF0000BB:<?php phpinfo)' +
+              '[RichText:(+font=Courier, Menlo, monospace:(#FF0000BB:<?php phpinfo)' +
               '(#FF007700:(); )(#FF0000BB:?>))]]'));
     });
 
     testWidgets('renders empty CODE tag', (WidgetTester tester) async {
       final html = '<code></code>';
-      final actual = await explain(tester, html);
-      expect(actual, equals('[widget0]'));
+      final explained = await explain(tester, html);
+      expect(explained, equals('[widget0]'));
     });
 
     testWidgets('renders KBD tag', (WidgetTester tester) async {
-      final html = '<kbd>ESC</kbd> = exit';
-      final actual = await explain(tester, html);
-      expect(actual, equals('[RichText:(:(+font=monospace:ESC)(: = exit))]'));
+      final html = '<kbd>ESC</kbd>';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(+font=Courier, Menlo, monospace:ESC)]'));
     });
 
     testWidgets('renders PRE tag', (WidgetTester tester) async {
@@ -417,23 +417,23 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(
           explained,
           equals('[SingleChildScrollView:child=[RichText:' +
-              '(+font=monospace:<?php\nhighlight_string(\'' +
+              '(+font=Courier, Menlo, monospace:<?php\nhighlight_string(\'' +
               '<?php phpinfo(); ?>\');\n?>)]]'));
     });
 
     testWidgets('renders SAMP tag', (WidgetTester tester) async {
-      final html = '<samp>Disk fault</samp>';
-      final actual = await explain(tester, html);
-      expect(actual, equals('[RichText:(+font=monospace:Disk fault)]'));
+      final html = '<samp>Error</samp>';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(+font=Courier, Menlo, monospace:Error)]'));
     });
 
     testWidgets('renders TT tag', (WidgetTester tester) async {
       final html = '<tt>Teletype</tt>';
-      final actual = await explain(tester, html);
+      final explained = await explain(tester, html);
       expect(
-          actual,
+          explained,
           equals('[SingleChildScrollView:child='
-              '[RichText:(+font=monospace:Teletype)]]'));
+              '[RichText:(+font=Courier, Menlo, monospace:Teletype)]]'));
     });
   });
 
@@ -814,10 +814,30 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     });
   });
 
-  testWidgets('renders font-family inline style', (WidgetTester tester) async {
-    final html = '<span style="font-family: Monospace">Foo</span>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[RichText:(+font=Monospace:Foo)]'));
+  group('font-family', () {
+    testWidgets('renders one font', (WidgetTester tester) async {
+      final html = '<span style="font-family: Monospace">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+font=Monospace:Foo)]'));
+    });
+
+    testWidgets('renders multiple fonts', (WidgetTester tester) async {
+      final html = '<span style="font-family: Arial, sans-serif">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+font=Arial, sans-serif:Foo)]'));
+    });
+
+    testWidgets('renders font in single quote', (WidgetTester tester) async {
+      final html = """<span style="font-family: 'Arial'">Foo</span>""";
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+font=Arial:Foo)]'));
+    });
+
+    testWidgets('renders font in double quote', (WidgetTester tester) async {
+      final html = """<span style='font-family: "Arial"'>Foo</span>""";
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+font=Arial:Foo)]'));
+    });
   });
 
   group('font-size', () {
