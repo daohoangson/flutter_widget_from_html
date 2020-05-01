@@ -12,29 +12,12 @@ import 'builder.dart';
 import 'core_data.dart';
 import 'core_widget_factory.dart';
 
-TextStyle _rootTextStyleBuilder(
-  TextStyleBuilders _,
-  TextStyle parent,
-  HtmlConfig config,
-) {
-  var style = config.textStyle;
-  if (style == null) return parent;
-  if (style.inherit) return parent.merge(style);
-  return style;
-}
-
-Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
-    snapshot.hasData
-        ? snapshot.data
-        : const Center(
-            child: Padding(
-            padding: EdgeInsets.all(8),
-            child: CircularProgressIndicator(),
-          ));
-
 /// A widget that builds Flutter widget tree from HTML
 /// (supports most popular tags and stylings).
-class HtmlWidget extends StatefulWidget {
+class HtmlWidget extends HtmlConfig {
+  @override
+  final Uri baseUrl;
+
   /// Controls whether the widget tree is built asynchronously.
   /// If not set, async build will be automatically enabled if the
   /// input HTML is longer than [kShouldBuildAsync].
@@ -45,6 +28,15 @@ class HtmlWidget extends StatefulWidget {
   /// the widget tree is ready without error handling.
   final AsyncWidgetBuilder<Widget> buildAsyncBuilder;
 
+  @override
+  final EdgeInsets bodyPadding;
+
+  @override
+  final CustomStylesBuilder customStylesBuilder;
+
+  @override
+  final CustomWidgetBuilder customWidgetBuilder;
+
   /// Controls whether the built widget tree is cached between rebuild.
   final bool enableCaching;
 
@@ -54,87 +46,46 @@ class HtmlWidget extends StatefulWidget {
   /// `<html><body>Contents</body></html>`) to avoid parsing quirks.
   final String html;
 
-  /// The custom [WidgetFactory] builder.
-  final WidgetFactory Function(HtmlConfig) factoryBuilder;
+  @override
+  final Color hyperlinkColor;
 
-  final HtmlConfig _config;
+  /// The custom [WidgetFactory] builder.
+  final WidgetFactory Function(HtmlWidget) factoryBuilder;
+
+  @override
+  final void Function(String) onTapUrl;
+
+  @override
+  final EdgeInsets tableCellPadding;
+
+  @override
+  final TextStyle textStyle;
 
   /// Creates a widget that builds Flutter widget tree from html.
   ///
   /// The [html] argument must not be null.
   HtmlWidget(
     this.html, {
+    this.baseUrl,
     this.buildAsync,
     this.buildAsyncBuilder,
+    this.bodyPadding = const EdgeInsets.all(10),
+    this.customStylesBuilder,
+    this.customWidgetBuilder,
     this.enableCaching = true,
     this.factoryBuilder,
+    this.hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
     Key key,
-    HtmlConfig config,
-    Uri baseUrl,
-    EdgeInsets bodyPadding = const EdgeInsets.all(10),
-    CustomStylesBuilder customStylesBuilder,
-    CustomWidgetBuilder customWidgetBuilder,
-    Color hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
-    OnTapUrl onTapUrl,
-    EdgeInsets tableCellPadding = const EdgeInsets.all(5),
-    TextStyle textStyle = const TextStyle(),
+    this.onTapUrl,
+    this.tableCellPadding = const EdgeInsets.all(5),
+    this.textStyle = const TextStyle(),
   })  : assert(html != null),
-        _config = config ??
-            HtmlConfig(
-              baseUrl: baseUrl,
-              bodyPadding: bodyPadding,
-              customStylesBuilder: customStylesBuilder,
-              customWidgetBuilder: customWidgetBuilder,
-              hyperlinkColor: hyperlinkColor,
-              onTapUrl: onTapUrl,
-              tableCellPadding: tableCellPadding,
-              textStyle: textStyle,
-            ),
         super(key: key);
 
   @override
   State<HtmlWidget> createState() => _HtmlWidgetState(
         buildAsync: buildAsync ?? html.length > kShouldBuildAsync,
       );
-}
-
-/// A set of configurable options to build widget.
-class HtmlConfig {
-  /// The base url to resolve links and image urls.
-  final Uri baseUrl;
-
-  /// The amount of space by which to inset the built widget tree.
-  final EdgeInsets bodyPadding;
-
-  /// The callback to specify custom stylings.
-  final CustomStylesBuilder customStylesBuilder;
-
-  /// The callback to render custom widget.
-  final CustomWidgetBuilder customWidgetBuilder;
-
-  /// The text color for link elements.
-  final Color hyperlinkColor;
-
-  /// The callback when user taps a link.
-  final OnTapUrl onTapUrl;
-
-  /// The amount of space by which to inset the table cell's contents.
-  final EdgeInsets tableCellPadding;
-
-  /// The default styling for text elements.
-  final TextStyle textStyle;
-
-  /// Creates a configuration
-  HtmlConfig({
-    this.baseUrl,
-    this.bodyPadding,
-    this.customStylesBuilder,
-    this.customWidgetBuilder,
-    this.hyperlinkColor,
-    this.onTapUrl,
-    this.tableCellPadding,
-    this.textStyle,
-  });
 }
 
 class _HtmlWidgetState extends State<HtmlWidget> {
@@ -151,8 +102,8 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     super.initState();
 
     _wf = widget.factoryBuilder != null
-        ? widget.factoryBuilder(widget._config)
-        : WidgetFactory(widget._config);
+        ? widget.factoryBuilder(widget)
+        : WidgetFactory(widget);
 
     if (buildAsync) {
       _future = _buildAsync();
@@ -189,7 +140,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     final domNodes = await compute(_parseHtml, widget.html);
 
     Timeline.startSync('Build $widget (async)');
-    final built = _buildBody(_wf, widget._config, domNodes);
+    final built = _buildBody(_wf, widget.textStyle, domNodes);
     Timeline.finishSync();
 
     return built;
@@ -199,24 +150,32 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     Timeline.startSync('Build $widget (sync)');
 
     final domNodes = _parseHtml(widget.html);
-    final built = _buildBody(_wf, widget._config, domNodes);
+    final built = _buildBody(_wf, widget.textStyle, domNodes);
 
     Timeline.finishSync();
 
     return built;
   }
-
-  static dom.NodeList _parseHtml(String html) => parser.parse(html).body.nodes;
-
-  static Widget _buildBody(
-    WidgetFactory wf,
-    HtmlConfig config,
-    dom.NodeList domNodes,
-  ) =>
-      wf.buildBody(HtmlBuilder(
-        domNodes: domNodes,
-        parentTsb: TextStyleBuilders()..enqueue(_rootTextStyleBuilder, config),
-        wf: wf,
-      ).build()) ??
-      widget0;
 }
+
+Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
+    snapshot.hasData
+        ? snapshot.data
+        : const Center(
+            child: Padding(
+            padding: EdgeInsets.all(8),
+            child: CircularProgressIndicator(),
+          ));
+
+Widget _buildBody(WidgetFactory wf, TextStyle style, dom.NodeList domNodes) =>
+    wf.buildBody(HtmlBuilder(
+      domNodes: domNodes,
+      parentTsb: TextStyleBuilders()..enqueue(_tsb, style),
+      wf: wf,
+    ).build()) ??
+    widget0;
+
+dom.NodeList _parseHtml(String html) => parser.parse(html).body.nodes;
+
+TextStyle _tsb(TextStyleBuilders _, TextStyle parent, TextStyle style) =>
+    style == null ? parent : style.inherit ? parent.merge(style) : style;
