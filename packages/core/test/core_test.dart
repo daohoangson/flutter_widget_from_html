@@ -814,10 +814,30 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     });
   });
 
-  testWidgets('renders font-family inline style', (WidgetTester tester) async {
-    final html = '<span style="font-family: Monospace">Foo</span>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[RichText:(+font=Monospace:Foo)]'));
+  group('font-family', () {
+    testWidgets('renders one font', (WidgetTester tester) async {
+      final html = '<span style="font-family: Monospace">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+font=Monospace:Foo)]'));
+    });
+
+    testWidgets('renders multiple fonts', (WidgetTester tester) async {
+      final html = '<span style="font-family: Arial, sans-serif">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+font=Arial, sans-serif:Foo)]'));
+    });
+
+    testWidgets('renders font in single quote', (WidgetTester tester) async {
+      final html = """<span style="font-family: 'Arial'">Foo</span>""";
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+font=Arial:Foo)]'));
+    });
+
+    testWidgets('renders font in double quote', (WidgetTester tester) async {
+      final html = """<span style='font-family: "Arial"'>Foo</span>""";
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+font=Arial:Foo)]'));
+    });
   });
 
   group('font-size', () {
