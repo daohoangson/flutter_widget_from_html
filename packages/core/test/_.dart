@@ -260,6 +260,11 @@ class Explainer {
       s += "+font=${style.fontFamily}";
     }
 
+    if (style.fontFamilyFallback != null &&
+        style.fontFamilyFallback != parent.fontFamilyFallback) {
+      s += "+font=${style.fontFamilyFallback.join(', ')}";
+    }
+
     if (style.fontSize != parent.fontSize) {
       s += "@${style.fontSize.toStringAsFixed(1)}";
     }

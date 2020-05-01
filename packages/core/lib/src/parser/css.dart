@@ -52,4 +52,18 @@ const _kCssTextDecorationUnderline = 'underline';
 
 final _spacingRegExp = RegExp(r'\s+');
 
+Iterable<String> _parseCssFontFamilies(String value) {
+  final parts = value.split(',');
+  final fontFamilies = <String>[];
+
+  for (final part in parts) {
+    final fontFamily = part
+        .trim()
+        .replaceFirstMapped(RegExp(r"""^("|')(.+)\1$"""), (m) => m.group(2));
+    if (fontFamily.isNotEmpty) fontFamilies.add(fontFamily);
+  }
+
+  return fontFamilies;
+}
+
 Iterable<String> _splitCss(String value) => value.split(_spacingRegExp);

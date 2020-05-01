@@ -330,7 +330,7 @@ class WidgetFactory {
     if (m.color == null &&
         decoration == null &&
         m.decorationStyle == null &&
-        m.fontFamily == null &&
+        m.fontFamilies == null &&
         fontSize == null &&
         fontStyle == null &&
         m.fontWeight == null) {
@@ -341,7 +341,8 @@ class WidgetFactory {
       color: m.color,
       decoration: decoration,
       decorationStyle: m.decorationStyle,
-      fontFamily: m.fontFamily,
+      fontFamily: null,
+      fontFamilyFallback: m.fontFamilies?.toList(growable: false),
       fontSize: fontSize,
       fontStyle: fontStyle,
       fontWeight: m.fontWeight,
@@ -441,6 +442,9 @@ class WidgetFactory {
   TextDecorationStyle parseCssBorderStyle(String value) =>
       _parseCssBorderStyle(value);
 
+  Iterable<String> parseCssFontFamilies(String value) =>
+      _parseCssFontFamilies(value);
+
   CssLength parseCssLength(String value) => _parseCssLength(value);
 
   CssLengthBox parseCssLengthBox(NodeMetadata meta, String key) =>
@@ -504,7 +508,7 @@ class WidgetFactory {
         break;
 
       case _kCssFontFamily:
-        meta.fontFamily = value;
+        meta.fontFamilies = parseCssFontFamilies(value);
         break;
 
       case _kCssFontSize:

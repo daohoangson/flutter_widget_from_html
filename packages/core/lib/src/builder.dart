@@ -207,7 +207,7 @@ class NodeMetadata {
   bool decoStrike;
   bool decoUnder;
   TextDecorationStyle decorationStyle;
-  String fontFamily;
+  Iterable<String> fontFamilies;
   String fontSize;
   bool fontStyleItalic;
   FontWeight fontWeight;
