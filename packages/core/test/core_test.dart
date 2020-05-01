@@ -399,14 +399,14 @@ void main() {
 
     testWidgets('renders empty CODE tag', (WidgetTester tester) async {
       final html = '<code></code>';
-      final actual = await explain(tester, html);
-      expect(actual, equals('[widget0]'));
+      final explained = await explain(tester, html);
+      expect(explained, equals('[widget0]'));
     });
 
     testWidgets('renders KBD tag', (WidgetTester tester) async {
-      final html = '<kbd>ESC</kbd> = exit';
-      final actual = await explain(tester, html);
-      expect(actual, equals('[RichText:(:(+font=Courier, Menlo, monospace:ESC)(: = exit))]'));
+      final html = '<kbd>ESC</kbd>';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(+font=Courier, Menlo, monospace:ESC)]'));
     });
 
     testWidgets('renders PRE tag', (WidgetTester tester) async {
@@ -422,16 +422,16 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     });
 
     testWidgets('renders SAMP tag', (WidgetTester tester) async {
-      final html = '<samp>Disk fault</samp>';
-      final actual = await explain(tester, html);
-      expect(actual, equals('[RichText:(+font=Courier, Menlo, monospace:Disk fault)]'));
+      final html = '<samp>Error</samp>';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(+font=Courier, Menlo, monospace:Error)]'));
     });
 
     testWidgets('renders TT tag', (WidgetTester tester) async {
       final html = '<tt>Teletype</tt>';
-      final actual = await explain(tester, html);
+      final explained = await explain(tester, html);
       expect(
-          actual,
+          explained,
           equals('[SingleChildScrollView:child='
               '[RichText:(+font=Courier, Menlo, monospace:Teletype)]]'));
     });
