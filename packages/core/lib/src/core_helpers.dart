@@ -14,8 +14,6 @@ typedef CustomStylesBuilder = Iterable<String> Function(dom.Element element);
 
 typedef CustomWidgetBuilder = Widget Function(dom.Element element);
 
-typedef OnTapUrl = void Function(String url);
-
 typedef Iterable<Widget> WidgetPlaceholderBuilder<T>(
     BuildContext context, Iterable<Widget> children, T input);
 

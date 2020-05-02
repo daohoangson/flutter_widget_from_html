@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
@@ -12,18 +13,18 @@ void main() {
   });
 
   testWidgets('skips element', (WidgetTester tester) async {
-    final explained = await explain(
-      tester,
-      html,
-      factoryBuilder: (config) => _IsNotRenderableTest(config),
-    );
+    final explained = await explain(tester, null,
+        hw: HtmlWidget(
+          html,
+          bodyPadding: const EdgeInsets.all(0),
+          factoryBuilder: () => _IsNotRenderableTest(),
+          key: hwKey,
+        ));
     expect(explained, equals('[RichText:(:Bar.)]'));
   });
 }
 
 class _IsNotRenderableTest extends WidgetFactory {
-  _IsNotRenderableTest(HtmlConfig config) : super(config);
-
   @override
   void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
     if (attrs.containsKey('class') && attrs['class'] == 'skipMe') {

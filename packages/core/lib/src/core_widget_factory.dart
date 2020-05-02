@@ -5,9 +5,9 @@ import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'builder.dart';
+import 'core_html_widget.dart';
 import 'core_data.dart';
 import 'core_helpers.dart';
-import 'core_html_widget.dart';
 
 part 'ops/style_bg_color.dart';
 part 'ops/style_direction.dart';
@@ -33,8 +33,6 @@ final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
 
 /// A factory to build widget for HTML elements.
 class WidgetFactory {
-  final HtmlConfig _config;
-
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
   BuildOp _stylePadding;
@@ -49,10 +47,9 @@ class WidgetFactory {
   BuildOp _tagLi;
   BuildOp _tagQ;
   BuildOp _tagTable;
+  HtmlWidget _widget;
 
-  WidgetFactory(this._config);
-
-  Color get hyperlinkColor => _config.hyperlinkColor;
+  HtmlWidget get widget => _widget;
 
   Iterable<Widget> buildAligns(
     BuildContext _,
@@ -66,7 +63,7 @@ class WidgetFactory {
       });
 
   Widget buildBody(Iterable<Widget> children) =>
-      buildPadding(buildColumn(children), _config.bodyPadding);
+      buildPadding(buildColumn(children), widget.bodyPadding);
 
   Widget buildColumn(Iterable<Widget> children) => children?.isNotEmpty == true
       ? WidgetPlaceholder(
@@ -151,8 +148,8 @@ class WidgetFactory {
       widgets.map((widget) => GestureDetector(child: widget, onTap: onTap));
 
   GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
-      ? () => _config.onTapUrl != null
-          ? _config.onTapUrl(url)
+      ? () => widget.onTapUrl != null
+          ? widget.onTapUrl(url)
           : print("[flutter_widget_from_html] Tapped url $url")
       : null;
 
@@ -227,8 +224,8 @@ class WidgetFactory {
   Widget buildTable(List<TableRow> rows, {TableBorder border}) =>
       rows?.isNotEmpty == true ? Table(border: border, children: rows) : null;
 
-  TableCell buildTableCell(Widget child) => TableCell(
-      child: buildPadding(child, _config.tableCellPadding) ?? widget0);
+  TableCell buildTableCell(Widget child) =>
+      TableCell(child: buildPadding(child, widget.tableCellPadding) ?? widget0);
 
   Widget buildText(TextBits text) => (text..trimRight()).isNotEmpty
       ? WidgetPlaceholder(
@@ -355,28 +352,28 @@ class WidgetFactory {
     if (p == null) return null;
     if (p.hasScheme) return p.toString();
 
-    final b = _config.baseUrl;
+    final b = widget.baseUrl;
     if (b == null) return null;
 
     return b.resolveUri(p).toString();
   }
 
   void customStyleBuilder(NodeMetadata meta, dom.Element element) {
-    if (_config.customStylesBuilder == null) return;
+    if (widget.customStylesBuilder == null) return;
 
-    final styles = _config.customStylesBuilder(element);
+    final styles = widget.customStylesBuilder(element);
     if (styles == null) return;
 
     meta.styles = styles;
   }
 
   void customWidgetBuilder(NodeMetadata meta, dom.Element element) {
-    if (_config.customWidgetBuilder == null) return;
+    if (widget.customWidgetBuilder == null) return;
 
-    final widget = _config.customWidgetBuilder(element);
-    if (widget == null) return;
+    final built = widget.customWidgetBuilder(element);
+    if (built == null) return;
 
-    meta.op = BuildOp(onWidgets: (_, __) => [widget]);
+    meta.op = BuildOp(onWidgets: (_, __) => [built]);
   }
 
   String getListStyleMarker(String type, int i) {
@@ -811,6 +808,9 @@ class WidgetFactory {
       }
     }
   }
+
+  @mustCallSuper
+  void reset(HtmlWidget widget) => _widget = widget;
 
   BuildOp styleBgColor() {
     _styleBgColor ??= _StyleBgColor(this).buildOp;

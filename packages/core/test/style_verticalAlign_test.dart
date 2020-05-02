@@ -173,7 +173,7 @@ void main() {
       hw: HtmlWidget(
         html,
         bodyPadding: const EdgeInsets.all(0),
-        factoryBuilder: (config) => _Issue163Wf(config),
+        factoryBuilder: () => _Issue163Wf(),
         key: hwKey,
       ),
     );
@@ -187,8 +187,6 @@ void main() {
 }
 
 class _Issue163Wf extends WidgetFactory {
-  _Issue163Wf(HtmlConfig config) : super(config);
-
   Widget buildText(TextBits text) {
     final bits = text.bits.toList(growable: false);
     if (bits.length == 1 && bits[0] is TextData) {

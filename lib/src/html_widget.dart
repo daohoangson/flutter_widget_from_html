@@ -8,56 +8,6 @@ import 'widget_factory.dart';
 /// A widget that builds Flutter widget tree from HTML
 /// with support for IFRAME, VIDEO and many other tags.
 class HtmlWidget extends core.HtmlWidget {
-  /// Creates a widget that builds Flutter widget tree from html.
-  ///
-  /// The [html] argument must not be null.
-  HtmlWidget(
-    String html, {
-    bool buildAsync,
-    AsyncWidgetBuilder<Widget> buildAsyncBuilder,
-    bool enableCaching = true,
-    core.WidgetFactory Function(core.HtmlConfig) factoryBuilder,
-    Key key,
-    core.HtmlConfig config,
-    Uri baseUrl,
-    EdgeInsets bodyPadding = const EdgeInsets.all(10),
-    CustomStylesBuilder customStylesBuilder,
-    CustomWidgetBuilder customWidgetBuilder,
-    Color hyperlinkColor,
-    OnTapUrl onTapUrl,
-    EdgeInsets tableCellPadding = const EdgeInsets.all(5),
-    TextStyle textStyle = const TextStyle(),
-    bool unsupportedWebViewWorkaroundForIssue37 = false,
-    bool webView = false,
-    bool webViewJs = true,
-  })  : assert(html != null),
-        super(
-          html,
-          buildAsync: buildAsync,
-          buildAsyncBuilder: buildAsyncBuilder,
-          enableCaching: enableCaching,
-          factoryBuilder: factoryBuilder ?? (config) => WidgetFactory(config),
-          config: config ??
-              HtmlConfig(
-                baseUrl: baseUrl,
-                bodyPadding: bodyPadding,
-                customStylesBuilder: customStylesBuilder,
-                customWidgetBuilder: customWidgetBuilder,
-                hyperlinkColor: hyperlinkColor,
-                onTapUrl: onTapUrl,
-                tableCellPadding: tableCellPadding,
-                textStyle: textStyle,
-                unsupportedWebViewWorkaroundForIssue37:
-                    unsupportedWebViewWorkaroundForIssue37,
-                webView: webView,
-                webViewJs: webViewJs,
-              ),
-          key: key,
-        );
-}
-
-/// A set of configurable options to build widget.
-class HtmlConfig extends core.HtmlConfig {
   /// The flag to control whether or not to apply workaround for
   /// [issue 37](https://github.com/daohoangson/flutter_widget_from_html/issues/37)
   final bool unsupportedWebViewWorkaroundForIssue37;
@@ -85,27 +35,49 @@ class HtmlConfig extends core.HtmlConfig {
   /// The flag to control whether or not WebView has JavaScript enabled.
   final bool webViewJs;
 
-  /// Creates a configuration
-  HtmlConfig({
+  /// Creates a widget that builds Flutter widget tree from html.
+  ///
+  /// The [html] argument must not be null.
+  HtmlWidget(
+    String html, {
+    bool buildAsync,
+    AsyncWidgetBuilder<Widget> buildAsyncBuilder,
+    bool enableCaching = true,
+    WidgetFactory Function() factoryBuilder = _singleton,
+    Key key,
     Uri baseUrl,
-    EdgeInsets bodyPadding,
+    EdgeInsets bodyPadding = const EdgeInsets.all(10),
     CustomStylesBuilder customStylesBuilder,
     CustomWidgetBuilder customWidgetBuilder,
     Color hyperlinkColor,
-    OnTapUrl onTapUrl,
-    EdgeInsets tableCellPadding,
-    TextStyle textStyle,
-    this.unsupportedWebViewWorkaroundForIssue37,
-    this.webView,
-    this.webViewJs,
-  }) : super(
+    void Function(String) onTapUrl,
+    EdgeInsets tableCellPadding = const EdgeInsets.all(5),
+    TextStyle textStyle = const TextStyle(),
+    this.unsupportedWebViewWorkaroundForIssue37 = false,
+    this.webView = false,
+    this.webViewJs = true,
+  })  : assert(html != null),
+        super(
+          html,
           baseUrl: baseUrl,
+          buildAsync: buildAsync,
+          buildAsyncBuilder: buildAsyncBuilder,
           bodyPadding: bodyPadding,
           customStylesBuilder: customStylesBuilder,
           customWidgetBuilder: customWidgetBuilder,
+          enableCaching: enableCaching,
+          factoryBuilder: factoryBuilder,
           hyperlinkColor: hyperlinkColor,
           onTapUrl: onTapUrl,
           tableCellPadding: tableCellPadding,
           textStyle: textStyle,
+          key: key,
         );
+
+  static WidgetFactory _wf;
+
+  static WidgetFactory _singleton() {
+    _wf ??= WidgetFactory();
+    return _wf;
+  }
 }

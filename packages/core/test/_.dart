@@ -34,20 +34,14 @@ Future<String> explain(
   String Function(Widget) explainer,
   Widget hw,
   void Function(BuildContext) preTest,
-  Uri baseUrl,
-  double bodyVerticalPadding = 0,
-  WidgetFactory Function(HtmlConfig config) factoryBuilder,
-  double tableCellPadding = 0,
   TextStyle textStyle,
 }) async {
   assert((html == null) != (hw == null));
   hw ??= HtmlWidget(
     html,
-    baseUrl: baseUrl,
-    bodyPadding: EdgeInsets.symmetric(vertical: bodyVerticalPadding),
-    factoryBuilder: factoryBuilder,
+    bodyPadding: const EdgeInsets.all(0),
     key: hwKey,
-    tableCellPadding: EdgeInsets.all(tableCellPadding),
+    tableCellPadding: const EdgeInsets.all(0),
     textStyle: textStyle,
   );
 

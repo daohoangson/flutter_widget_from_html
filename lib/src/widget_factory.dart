@@ -1,9 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_widget_from_html_core/src/core_html_widget.dart'
-    as core;
-import 'package:flutter_widget_from_html_core/src/core_widget_factory.dart'
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
 import 'package:url_launcher/url_launcher.dart';
 
@@ -20,16 +18,11 @@ part 'ops/tag_video.dart';
 /// A factory to build widget for HTML elements
 /// with support for [WebView] and [VideoPlayer] etc.
 class WidgetFactory extends core.WidgetFactory {
-  final HtmlConfig _config;
-
   BuildOp _tagAExtended;
   BuildOp _tagIframe;
   BuildOp _tagSvg;
   BuildOp _tagVideo;
-
-  WidgetFactory(core.HtmlConfig config)
-      : _config = config is HtmlConfig ? config : null,
-        super(config);
+  HtmlWidget _widget;
 
   @override
   Widget buildDivider() => const Divider(height: 1);
@@ -45,10 +38,10 @@ class WidgetFactory extends core.WidgetFactory {
   @override
   GestureTapCallback buildGestureTapCallbackForUrl(String url) {
     if (url == null) return null;
-    if (_config?.onTapUrl == null) {
+    if (_widget?.onTapUrl == null) {
       return () => canLaunch(url).then((ok) => ok ? launch(url) : null);
     }
-    return () => _config.onTapUrl(url);
+    return () => _widget.onTapUrl(url);
   }
 
   @override
@@ -79,22 +72,22 @@ class WidgetFactory extends core.WidgetFactory {
     double height,
     double width,
   }) {
-    if (_config?.webView != true) return buildWebViewLinkOnly(url);
+    if (_widget?.webView != true) return buildWebViewLinkOnly(url);
 
     final dimensOk = height != null && height > 0 && width != null && width > 0;
     return WebView(
       url,
       aspectRatio: dimensOk ? width / height : 16 / 9,
-      getDimensions: !dimensOk && _config.webViewJs == true,
+      getDimensions: !dimensOk && _widget.webViewJs == true,
       interceptNavigationRequest: (newUrl) {
         if (newUrl == url) return false;
 
         buildGestureTapCallbackForUrl(newUrl)();
         return true;
       },
-      js: _config.webViewJs == true,
+      js: _widget.webViewJs == true,
       unsupportedWorkaroundForIssue37:
-          _config.unsupportedWebViewWorkaroundForIssue37 == true,
+          _widget.unsupportedWebViewWorkaroundForIssue37 == true,
     );
   }
 
@@ -127,6 +120,12 @@ class WidgetFactory extends core.WidgetFactory {
     }
 
     return super.parseTag(meta, tag, attributes);
+  }
+
+  @override
+  void reset(core.HtmlWidget widget) {
+    if (widget is HtmlWidget) _widget = widget;
+    super.reset(widget);
   }
 
   BuildOp tagAExtended() {
