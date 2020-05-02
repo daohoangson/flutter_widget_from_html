@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import '_.dart' as helper;
 
@@ -193,12 +194,14 @@ void main() {
       String fullUrl, {
       Uri baseUrl,
     }) async {
-      final e = await helper.explain(
-        tester,
-        html,
-        baseUrl: baseUrl ?? Uri.parse('http://base.com/path/'),
-      );
-      expect(e, equals('[NetworkImage:url=$fullUrl]'));
+      final explained = await helper.explain(tester, null,
+          hw: HtmlWidget(
+            html,
+            baseUrl: baseUrl ?? Uri.parse('http://base.com/path/'),
+            bodyPadding: const EdgeInsets.all(0),
+            key: helper.hwKey,
+          ));
+      expect(explained, equals('[NetworkImage:url=$fullUrl]'));
     };
 
     testWidgets('renders full url', (WidgetTester tester) async {
