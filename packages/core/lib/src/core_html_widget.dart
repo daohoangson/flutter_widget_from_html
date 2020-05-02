@@ -73,7 +73,7 @@ class HtmlWidget extends StatefulWidget {
     this.customStylesBuilder,
     this.customWidgetBuilder,
     this.enableCaching = true,
-    this.factoryBuilder = _wfSingleton,
+    this.factoryBuilder = _singleton,
     this.hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
     Key key,
     this.onTapUrl,
@@ -90,7 +90,7 @@ class HtmlWidget extends StatefulWidget {
 
   static WidgetFactory _wf;
 
-  static WidgetFactory _wfSingleton() {
+  static WidgetFactory _singleton() {
     _wf ??= WidgetFactory();
     return _wf;
   }

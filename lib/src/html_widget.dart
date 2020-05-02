@@ -43,7 +43,7 @@ class HtmlWidget extends core.HtmlWidget {
     bool buildAsync,
     AsyncWidgetBuilder<Widget> buildAsyncBuilder,
     bool enableCaching = true,
-    WidgetFactory Function() factoryBuilder = _wfSingleton,
+    WidgetFactory Function() factoryBuilder = _singleton,
     Key key,
     Uri baseUrl,
     EdgeInsets bodyPadding = const EdgeInsets.all(10),
@@ -76,7 +76,7 @@ class HtmlWidget extends core.HtmlWidget {
 
   static WidgetFactory _wf;
 
-  static WidgetFactory _wfSingleton() {
+  static WidgetFactory _singleton() {
     _wf ??= WidgetFactory();
     return _wf;
   }
