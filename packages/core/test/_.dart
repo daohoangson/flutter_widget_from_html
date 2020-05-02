@@ -36,7 +36,6 @@ Future<String> explain(
   void Function(BuildContext) preTest,
   Uri baseUrl,
   double bodyVerticalPadding = 0,
-  WidgetFactory Function() factoryBuilder,
   double tableCellPadding = 0,
   TextStyle textStyle,
 }) async {
@@ -45,7 +44,6 @@ Future<String> explain(
     html,
     baseUrl: baseUrl,
     bodyPadding: EdgeInsets.symmetric(vertical: bodyVerticalPadding),
-    factoryBuilder: factoryBuilder,
     key: hwKey,
     tableCellPadding: EdgeInsets.all(tableCellPadding),
     textStyle: textStyle,

@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
@@ -12,8 +13,13 @@ void main() {
   });
 
   testWidgets('skips element', (WidgetTester tester) async {
-    final explained = await explain(tester, html,
-        factoryBuilder: () => _IsNotRenderableTest());
+    final explained = await explain(tester, null,
+        hw: HtmlWidget(
+          html,
+          bodyPadding: const EdgeInsets.all(0),
+          factoryBuilder: () => _IsNotRenderableTest(),
+          key: hwKey,
+        ));
     expect(explained, equals('[RichText:(:Bar.)]'));
   });
 }

@@ -9,9 +9,9 @@ void main() {
     expect(explained, equals('[Padding:(10,0,10,0),child=[RichText:(:Foo)]]'));
   });
 
-  testWidgets("doesn't render body padding", (WidgetTester t) async {
+  testWidgets("doesn't render body padding", (tester) async {
     final html = 'Foo';
-    final explained = await explain(t, html);
+    final explained = await explain(tester, html);
     expect(explained, equals('[RichText:(:Foo)]'));
   });
 

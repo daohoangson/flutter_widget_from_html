@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
@@ -5,16 +6,21 @@ import '_.dart';
 
 void main() {
   group('getInlineStyles', () {
-    testWidgets('renders inline style normally', (WidgetTester t) async {
+    testWidgets('renders inline style normally', (tester) async {
       final html = '<span style="color: #f00; color: #0f0;">Foo</span>';
-      final e = await explain(t, html);
+      final e = await explain(tester, html);
       expect(e, equals('[RichText:(#FF00FF00:Foo)]'));
     });
 
-    testWidgets('renders getInlineStyles in reversed', (WidgetTester t) async {
+    testWidgets('renders getInlineStyles in reversed', (tester) async {
       final html = '<span>Foo</span>';
-      final factoryBuilder = () => _GetInlineStylesTest();
-      final e = await explain(t, html, factoryBuilder: factoryBuilder);
+      final e = await explain(tester, null,
+          hw: HtmlWidget(
+            html,
+            bodyPadding: const EdgeInsets.all(0),
+            factoryBuilder: () => _GetInlineStylesTest(),
+            key: hwKey,
+          ));
       expect(e, equals('[RichText:(#FFFF0000:Foo)]'));
     });
   });
@@ -22,15 +28,25 @@ void main() {
   group('priority', () {
     final html = '<span>Foo</span>';
 
-    testWidgets('renders A first', (WidgetTester t) async {
-      final e = await explain(t, html,
-          factoryBuilder: () => _PriorityTest(a: 1, b: 2));
+    testWidgets('renders A first', (tester) async {
+      final e = await explain(tester, null,
+          hw: HtmlWidget(
+            html,
+            bodyPadding: const EdgeInsets.all(0),
+            factoryBuilder: () => _PriorityTest(a: 1, b: 2),
+            key: hwKey,
+          ));
       expect(e, equals('[RichText:(:Foo A B)]'));
     });
 
-    testWidgets('renders B first', (WidgetTester t) async {
-      final e = await explain(t, html,
-          factoryBuilder: () => _PriorityTest(a: 2, b: 1));
+    testWidgets('renders B first', (tester) async {
+      final e = await explain(tester, null,
+          hw: HtmlWidget(
+            html,
+            bodyPadding: const EdgeInsets.all(0),
+            factoryBuilder: () => _PriorityTest(a: 2, b: 1),
+            key: hwKey,
+          ));
       expect(e, equals('[RichText:(:Foo B A)]'));
     });
   });

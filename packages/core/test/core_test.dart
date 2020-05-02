@@ -29,7 +29,7 @@ void main() {
     expect(explained, equals('[RichText:(@20.0+b:Hello world)]'));
   });
 
-  testWidgets('renders without erroneous white spaces', (WidgetTester t) async {
+  testWidgets('renders without erroneous white spaces', (tester) async {
     final html = """
 <div>
   <span style="text-decoration: line-through">
@@ -46,7 +46,7 @@ void main() {
 <!-- https://github.com/daohoangson/flutter_widget_from_html/issues/119 -->
 <div>I​Like​Playing​football​​game</div>
 """;
-    final str = await explain(t, html);
+    final str = await explain(tester, html);
     expect(
         str,
         equals('[Column:children='

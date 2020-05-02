@@ -190,15 +190,15 @@ void main() {
       });
     });
 
-    testWidgets('overwrites padding with padding-top', (WidgetTester t) async {
+    testWidgets('overwrites padding with padding-top', (tester) async {
       final html = '<div style="padding: 3px; padding-top: 5px">Foo</div>';
-      final explained = await explain(t, html);
+      final explained = await explain(tester, html);
       expect(explained, equals('[Padding:(5,3,3,3),child=[RichText:(:Foo)]]'));
     });
 
-    testWidgets('reset padding with padding-bottom', (WidgetTester t) async {
+    testWidgets('reset padding with padding-bottom', (tester) async {
       final html = '<div style="padding: 3px; padding-bottom: 0">Foo</div>';
-      final explained = await explain(t, html);
+      final explained = await explain(tester, html);
       expect(explained, equals('[Padding:(3,3,0,3),child=[RichText:(:Foo)]]'));
     });
   });
