@@ -146,7 +146,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     final domNodes = await compute(_parseHtml, widget.html);
 
     Timeline.startSync('Build $widget (async)');
-    final built = _buildBody(_wf, widget.textStyle, domNodes);
+    final built = _buildBody(_wf, widget, domNodes);
     Timeline.finishSync();
 
     return built;
@@ -156,7 +156,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     Timeline.startSync('Build $widget (sync)');
 
     final domNodes = _parseHtml(widget.html);
-    final built = _buildBody(_wf, widget.textStyle, domNodes);
+    final built = _buildBody(_wf, widget, domNodes);
 
     Timeline.finishSync();
 
@@ -173,13 +173,12 @@ Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
             child: CircularProgressIndicator(),
           ));
 
-Widget _buildBody(WidgetFactory wf, TextStyle style, dom.NodeList domNodes) =>
-    wf.buildBody(HtmlBuilder(
-      domNodes: domNodes,
-      parentTsb: TextStyleBuilders()..enqueue(_tsb, style),
-      wf: wf,
-    ).build()) ??
-    widget0;
+Widget _buildBody(WidgetFactory wf, HtmlWidget widget, dom.NodeList domNodes) {
+  wf.reset(widget);
+  final tsb = TextStyleBuilders()..enqueue(_tsb, widget.textStyle);
+  final built = HtmlBuilder(domNodes: domNodes, parentTsb: tsb, wf: wf).build();
+  return wf.buildBody(built) ?? widget0;
+}
 
 dom.NodeList _parseHtml(String html) => parser.parse(html).body.nodes;
 
