@@ -15,6 +15,7 @@ foreach ($imagePaths as $imagePath) {
 }
 
 echo "|   | Tag | Demo |\n| - | --- | ---- |\n";
+ksort($tagImages);
 $tags = array_keys($tagImages);
 for ($i = 0; $i < count($tags); $i++) {
   $no = $i + 1;
