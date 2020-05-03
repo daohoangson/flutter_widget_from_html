@@ -338,8 +338,9 @@ class WidgetFactory {
       color: m.color,
       decoration: decoration,
       decorationStyle: m.decorationStyle,
-      fontFamily: null,
-      fontFamilyFallback: m.fontFamilies?.toList(growable: false),
+      fontFamily:
+          m.fontFamilies?.isNotEmpty == true ? m.fontFamilies.first : null,
+      fontFamilyFallback: m.fontFamilies?.skip(1)?.toList(growable: false),
       fontSize: fontSize,
       fontStyle: fontStyle,
       fontWeight: m.fontWeight,
@@ -747,7 +748,7 @@ class WidgetFactory {
 
       case 'kbd':
       case 'samp':
-        meta.fontFamilies = [_kTagCodeFont1, _kTagCodeFont2, _kTagCodeFont3];
+        meta.fontFamilies = [_kTagCodeFont1, _kTagCodeFont2];
         break;
 
       case _kTagOrderedList:
