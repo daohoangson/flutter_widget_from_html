@@ -393,7 +393,7 @@ void main() {
       expect(
           explained,
           equals('[SingleChildScrollView:child=' +
-              '[RichText:(+font=Courier, Menlo, monospace:(#FF0000BB:<?php phpinfo)' +
+              '[RichText:(+font=Courier+fonts=monospace:(#FF0000BB:<?php phpinfo)' +
               '(#FF007700:(); )(#FF0000BB:?>))]]'));
     });
 
@@ -406,7 +406,7 @@ void main() {
     testWidgets('renders KBD tag', (WidgetTester tester) async {
       final html = '<kbd>ESC</kbd>';
       final e = await explain(tester, html);
-      expect(e, equals('[RichText:(+font=Courier, Menlo, monospace:ESC)]'));
+      expect(e, equals('[RichText:(+font=Courier+fonts=monospace:ESC)]'));
     });
 
     testWidgets('renders PRE tag', (WidgetTester tester) async {
@@ -417,14 +417,14 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(
           explained,
           equals('[SingleChildScrollView:child=[RichText:' +
-              '(+font=Courier, Menlo, monospace:<?php\nhighlight_string(\'' +
+              '(+font=Courier+fonts=monospace:<?php\nhighlight_string(\'' +
               '<?php phpinfo(); ?>\');\n?>)]]'));
     });
 
     testWidgets('renders SAMP tag', (WidgetTester tester) async {
       final html = '<samp>Error</samp>';
       final e = await explain(tester, html);
-      expect(e, equals('[RichText:(+font=Courier, Menlo, monospace:Error)]'));
+      expect(e, equals('[RichText:(+font=Courier+fonts=monospace:Error)]'));
     });
 
     testWidgets('renders TT tag', (WidgetTester tester) async {
@@ -433,7 +433,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(
           explained,
           equals('[SingleChildScrollView:child='
-              '[RichText:(+font=Courier, Menlo, monospace:Teletype)]]'));
+              '[RichText:(+font=Courier+fonts=monospace:Teletype)]]'));
     });
   });
 
@@ -823,8 +823,8 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 
     testWidgets('renders multiple fonts', (WidgetTester tester) async {
       final html = '<span style="font-family: Arial, sans-serif">Foo</span>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(+font=Arial, sans-serif:Foo)]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(+font=Arial+fonts=sans-serif:Foo)]'));
     });
 
     testWidgets('renders font in single quote', (WidgetTester tester) async {
