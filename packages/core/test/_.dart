@@ -254,9 +254,9 @@ class Explainer {
       s += "+font=${style.fontFamily}";
     }
 
-    if (style.fontFamilyFallback != null &&
+    if (style.fontFamilyFallback?.isNotEmpty == true &&
         style.fontFamilyFallback != parent.fontFamilyFallback) {
-      s += "+font=${style.fontFamilyFallback.join(', ')}";
+      s += "+fonts=${style.fontFamilyFallback.join(', ')}";
     }
 
     if (style.fontSize != parent.fontSize) {

@@ -9,4 +9,5 @@ if [ -z "$CIRRUS_CI" ]; then
 fi
 
 cd "$( dirname $( dirname ${BASH_SOURCE[0]}))"/packages/example
-exec flutter test --update-goldens
+flutter pub get
+exec flutter test --update-goldens "$@"
