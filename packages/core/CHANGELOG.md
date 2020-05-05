@@ -1,3 +1,7 @@
+## 0.3.3+3
+
+* Switch to MIT license
+
 ## 0.3.3+2
 
 * Fix bug vertical-align with trailing whitespace (#170)
