@@ -26,7 +26,10 @@ class _TestApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final children = <Widget>[
-      Text(html),
+      Padding(
+        child: Text(html),
+        padding: const EdgeInsets.all(10),
+      ),
       Divider(),
       core.HtmlWidget(html),
     ];
@@ -40,9 +43,16 @@ class _TestApp extends StatelessWidget {
 
     return MaterialApp(
       home: Scaffold(
-        body: Column(
-          children: children,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        body: RepaintBoundary(
+          child: Container(
+            child: Column(
+              children: children,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+            ),
+            decoration: BoxDecoration(color: Colors.white),
+            width: 400,
+          ),
         ),
       ),
       theme: ThemeData.light(),
@@ -56,7 +66,7 @@ void _test(String name, String html) => testGoldens(name, (tester) async {
         withExtended: _withExtendedRegExp.hasMatch(name),
       ));
       await expectLater(
-        find.byType(Scaffold),
+        find.byType(core.HtmlWidget),
         matchesGoldenFile('./images/$name.png'),
       );
     });
@@ -90,18 +100,16 @@ void main() {
         """<code><span style="color: #000000"><span style="color: #0000BB">&lt;?php phpinfo</span><span style="color: #007700">(); </span><span style="color: #0000BB">?&gt;</span></span></code>""",
     'KBD': '<kbd>ESC</kbd> = exit',
     'PRE': """<pre>&lt;?php
-highlight_string('&lt;?php phpinfo(); ?&gt;');
+  highlight_string('&lt;?php phpinfo(); ?&gt;');
 ?&gt;</pre>""",
     'SAMP': '<samp>Disk fault</samp>',
     'TT': '<tt>Teletype</tt>',
-    'H1,H2,H3,H4,H5,H6': """
-<h1>Heading 1</h1>
-<h2>Heading 2</h2>
-<h3>Heading 3</h3>
-<h4>Heading 4</h4>
-<h5>Heading 5</h5>
-<h6>Heading 6</h6>
-""",
+    'H1': '<h1>Heading 1</h1>',
+    'H2': '<h2>Heading 2</h2>',
+    'H3': '<h3>Heading 3</h3>',
+    'H4': '<h4>Heading 4</h4>',
+    'H5': '<h5>Heading 5</h5>',
+    'H6': '<h6>Heading 6</h6>',
     'MARK': '<mark>Foo</mark>',
     'inline/background-color/block':
         '<div style="background-color: #f00"><div>Foo</div></div>',
@@ -131,7 +139,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
         '<div>1 <div style="display: inline-block">2</div></div>',
     'inline/display/none': '<div>1 <div style="display: none">2</div></div>',
     'FONT/color': '<font color="#F00">Foo</font>',
-    'FONT/face': '<font face="Monospace">Foo</font>',
+    'FONT/face': '<font face="Courier">Foo</font>',
     'FONT/size': """
 <font size="7">Size 7</font>
 <font size="6">Size 6</font>
@@ -141,7 +149,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 <font size="2">Size 2</font>
 <font size="1">Size 1</font>
 """,
-    'inline/font-family': '<span style="font-family: Monospace">Foo</span>',
+    'inline/font-family': '<span style="font-family: Courier">Foo</span>',
     'BIG': '<big>Foo</big>',
     'SMALL': '<small>Foo</small>',
     'inline/font-size': """
@@ -180,7 +188,8 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 """,
     'DEL': 'This is some <del>deleted</del> text.',
     'INS': 'This is some <ins>inserted</ins> text.',
-    'S,STRIKE': '<s>Foo</s> <strike>bar</strike>',
+    'S': '<s>Foo</s>',
+    'STRIKE': '<strike>Foo</strike>',
     'U': 'This is an <u>underline</u> text.',
     'inline/text-decoration/line-through':
         '<span style="text-decoration: line-through">line</span>',
@@ -280,10 +289,8 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         'Foo<span style="vertical-align: sub">$redX</span>',
     'inline/vertical-align/super':
         'Foo<span style="vertical-align: super">$redX</span>',
-    'LI/OL': '<ol><li>One</li><li>Two</li><li>Three</li><ol>',
-    'LI/UL': '<ul><li>One</li><li>Two</li><li>Three</li><ul>',
-    'LI/nested': """
-<ul>
+    'LI,OL,UL': """
+<ol>
   <li>One</li>
   <li>
     Two
@@ -300,48 +307,41 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
     </ul>
   </li>
   <li>Three</li>
-</ul>""",
-    'LI/OL/reversed': '<ol reversed><li>One</li><li>Two</li><li>Three</li><ol>',
-    'LI/OL/reversed_start_99':
+</ol>""",
+    'OL/reversed': '<ol reversed><li>One</li><li>Two</li><li>Three</li><ol>',
+    'OL/reversed_start':
         '<ol reversed start="99"><li>One</li><li>Two</li><li>Three</li><ol>',
-    'LI/OL/start_99':
-        '<ol start="99"><li>One</li><li>Two</li><li>Three</li><ol>',
-    'LI/OL/type_lower-alpha':
+    'OL/start': '<ol start="99"><li>One</li><li>Two</li><li>Three</li><ol>',
+    'OL/type/lower-alpha':
         '<ol type="a"><li>One</li><li>Two</li><li>Three</li><ol>',
-    'LI/OL/type_upper-alpha':
+    'OL/type/upper-alpha':
         '<ol type="A"><li>One</li><li>Two</li><li>Three</li><ol>',
-    'LI/OL/type_lower-roman':
+    'OL/type/lower-roman':
         '<ol type="i"><li>One</li><li>Two</li><li>Three</li><ol>',
-    'LI/OL/type_upper-roman':
+    'OL/type/upper-roman':
         '<ol type="I"><li>One</li><li>Two</li><li>Three</li><ol>',
-    'LI/list-style-type/disc':
+    'inline/list-style-type/disc':
         '<ol style="list-style-type: disc"><li>Foo</li></ol>',
-    'LI/list-style-type/circle':
+    'inline/list-style-type/circle':
         '<ul style="list-style-type: circle"><li>Foo</li></ul>',
-    'LI/list-style-type/square':
+    'inline/list-style-type/square':
         '<ul style="list-style-type: square"><li>Foo</li></ul>',
-    'LI/padding-inline-start': """
-<ul style="padding-inline-start: 99px">
-  <li style="padding-inline-start: 199px">199px</li>
-  <li style="padding-inline-start: 299px">299px</li>
-  <li>99px</li>
+    'inline/LI_padding-inline-start': """
+<ul style="padding-inline-start: 9px">
+  <li style="padding-inline-start: 19px">19px</li>
+  <li style="padding-inline-start: 29px">29px</li>
+  <li>9px</li>
 <ul>
 """,
-    'LI/rtl':
+    'OL/rtl':
         '<div dir="rtl"><ol><li>One</li><li>Two</li><li>Three</li><ol></div>',
-    'TABLE/border_0': """
-<table>
-  <caption>Caption</caption>
-  <tr><th>Header 1</th><th>Header 2</th></tr>
-  <tr><td>Value 1</td><td>Value 2</td></tr>
-</table>""",
-    'TABLE/border_1': """
-<table border="1">
-  <caption>Caption</caption>
-  <tr><th>Header 1</th><th>Header 2</th></tr>
-  <tr><td>Value 1</td><td>Value 2</td></tr>
-</table>""",
-    'TABLE/display_table': """
+    'TABLE,CAPTION,TBODY,THEAD,TFOOT,TR,TH,TD': """<table border="1">
+      <caption>Caption</caption>
+      <tfoot><tr><td>Footer 1</td><td>Footer 2</td></tr></tfoot>
+      <tbody><tr><td>Value 1</td><td>Value 2</td></tr></tbody>
+      <thead><tr><th>Header 1</th><th>Header 2</th></tr></thead>
+    </table>""",
+    'inline/display/table': """
 <div style="display: table">
   <div style="display: table-caption; text-align: center">Caption</div>
   <div style="display: table-row; font-weight: bold">

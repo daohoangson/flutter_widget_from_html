@@ -32,13 +32,13 @@ void main() {
     testWidgets('no src', (tester) async {
       final html = '<iframe></iframe>';
       final explained = await explain(tester, html);
-      expect(explained, equals("[Text:$html]"));
+      expect(explained, equals("[widget0]"));
     });
 
     testWidgets('bad src (cannot build full url)', (tester) async {
       final html = '<iframe src="bad"></iframe>';
       final explained = await explain(tester, html);
-      expect(explained, equals("[Text:$html]"));
+      expect(explained, equals("[widget0]"));
     });
   });
 }

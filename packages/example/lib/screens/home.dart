@@ -52,8 +52,6 @@ C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."
     'Code': """PRE tag:
 
 <pre>
-// this may not show up with the correct monspace font on iOS because of a Flutter bug
-// for more information, see https://github.com/flutter/flutter/issues/19280
 &lt;?php
     highlight_string('&lt;?php phpinfo(); ?&gt;');
 ?&gt;

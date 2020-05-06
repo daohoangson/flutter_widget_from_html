@@ -33,8 +33,6 @@ final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
 
 /// A factory to build widget for HTML elements.
 class WidgetFactory {
-  final HtmlConfig _config;
-
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
   BuildOp _stylePadding;
@@ -49,10 +47,9 @@ class WidgetFactory {
   BuildOp _tagLi;
   BuildOp _tagQ;
   BuildOp _tagTable;
+  HtmlWidget _widget;
 
-  WidgetFactory(this._config);
-
-  Color get hyperlinkColor => _config.hyperlinkColor;
+  HtmlWidget get widget => _widget;
 
   Iterable<Widget> buildAligns(
     BuildContext _,
@@ -66,7 +63,7 @@ class WidgetFactory {
       });
 
   Widget buildBody(Iterable<Widget> children) =>
-      buildPadding(buildColumn(children), _config.bodyPadding);
+      buildPadding(buildColumn(children), widget.bodyPadding);
 
   Widget buildColumn(Iterable<Widget> children) => children?.isNotEmpty == true
       ? WidgetPlaceholder(
@@ -151,8 +148,8 @@ class WidgetFactory {
       widgets.map((widget) => GestureDetector(child: widget, onTap: onTap));
 
   GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
-      ? () => _config.onTapUrl != null
-          ? _config.onTapUrl(url)
+      ? () => widget.onTapUrl != null
+          ? widget.onTapUrl(url)
           : print("[flutter_widget_from_html] Tapped url $url")
       : null;
 
@@ -355,7 +352,7 @@ class WidgetFactory {
     if (m.color == null &&
         decoration == null &&
         m.decorationStyle == null &&
-        m.fontFamily == null &&
+        m.fontFamilies == null &&
         fontSize == null &&
         fontStyle == null &&
         m.fontWeight == null) {
@@ -366,7 +363,9 @@ class WidgetFactory {
       color: m.color,
       decoration: decoration,
       decorationStyle: m.decorationStyle,
-      fontFamily: m.fontFamily,
+      fontFamily:
+          m.fontFamilies?.isNotEmpty == true ? m.fontFamilies.first : null,
+      fontFamilyFallback: m.fontFamilies?.skip(1)?.toList(growable: false),
       fontSize: fontSize,
       fontStyle: fontStyle,
       fontWeight: m.fontWeight,
@@ -379,28 +378,28 @@ class WidgetFactory {
     if (p == null) return null;
     if (p.hasScheme) return p.toString();
 
-    final b = _config.baseUrl;
+    final b = widget.baseUrl;
     if (b == null) return null;
 
     return b.resolveUri(p).toString();
   }
 
   void customStyleBuilder(NodeMetadata meta, dom.Element element) {
-    if (_config.customStylesBuilder == null) return;
+    if (widget.customStylesBuilder == null) return;
 
-    final styles = _config.customStylesBuilder(element);
+    final styles = widget.customStylesBuilder(element);
     if (styles == null) return;
 
     meta.styles = styles;
   }
 
   void customWidgetBuilder(NodeMetadata meta, dom.Element element) {
-    if (_config.customWidgetBuilder == null) return;
+    if (widget.customWidgetBuilder == null) return;
 
-    final widget = _config.customWidgetBuilder(element);
-    if (widget == null) return;
+    final built = widget.customWidgetBuilder(element);
+    if (built == null) return;
 
-    meta.op = BuildOp(onWidgets: (_, __) => [widget]);
+    meta.op = BuildOp(onWidgets: (_, __) => [built]);
   }
 
   String getListStyleMarker(String type, int i) {
@@ -465,6 +464,9 @@ class WidgetFactory {
 
   TextDecorationStyle parseCssBorderStyle(String value) =>
       _parseCssBorderStyle(value);
+
+  Iterable<String> parseCssFontFamilies(String value) =>
+      _parseCssFontFamilies(value);
 
   CssLength parseCssLength(String value) => _parseCssLength(value);
 
@@ -538,7 +540,7 @@ class WidgetFactory {
         break;
 
       case _kCssFontFamily:
-        meta.fontFamily = value;
+        meta.fontFamilies = parseCssFontFamilies(value);
         break;
 
       case _kCssFontSize:
@@ -780,7 +782,7 @@ class WidgetFactory {
 
       case 'kbd':
       case 'samp':
-        meta.fontFamily = 'monospace';
+        meta.fontFamilies = [_kTagCodeFont1, _kTagCodeFont2];
         break;
 
       case _kTagOrderedList:
@@ -878,6 +880,9 @@ class WidgetFactory {
       }
     }
   }
+
+  @mustCallSuper
+  void reset(HtmlWidget widget) => _widget = widget;
 
   BuildOp styleBgColor() {
     _styleBgColor ??= _StyleBgColor(this).buildOp;

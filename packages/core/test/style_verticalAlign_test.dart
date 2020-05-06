@@ -144,6 +144,25 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
+
+    testWidgets('#170: renders whitespace contents', (tester) async {
+      final html = 'Foo <sub> </sub>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('#170: renders trailing whitespace contents', (tester) async {
+      final html = 'Foo <sub>bar </sub>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[RichText:(:'
+              'Foo '
+              '[Stack:children='
+              '[Padding:(0,0,3,0),child=[Opacity:child=[RichText:(@8.3:bar)]]],'
+              '[Positioned:(null,null,0.0,null),child=[RichText:(@8.3:bar)]]'
+              ']@top)]'));
+    });
   });
 
   testWidgets('#163: renders non-WidgetPlaceholder text', (tester) async {
@@ -154,7 +173,7 @@ void main() {
       hw: HtmlWidget(
         html,
         bodyPadding: const EdgeInsets.all(0),
-        factoryBuilder: (config) => _Issue163Wf(config),
+        factoryBuilder: () => _Issue163Wf(),
         key: hwKey,
       ),
     );
@@ -168,8 +187,6 @@ void main() {
 }
 
 class _Issue163Wf extends WidgetFactory {
-  _Issue163Wf(HtmlConfig config) : super(config);
-
   Widget buildText(TextBits text) {
     final bits = text.bits.toList(growable: false);
     if (bits.length == 1 && bits[0] is TextData) {

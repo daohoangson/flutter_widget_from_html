@@ -10,4 +10,4 @@ fi
 
 cd "$( dirname $( dirname ${BASH_SOURCE[0]}))"/packages/example
 flutter pub get
-exec flutter test --update-goldens
+exec flutter test --update-goldens "$@"

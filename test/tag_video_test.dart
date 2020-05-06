@@ -54,13 +54,13 @@ void main() {
     testWidgets('no source', (tester) async {
       final html = '<video></video>';
       final explained = await explain(tester, html);
-      expect(explained, equals("[Text:$html]"));
+      expect(explained, equals("[widget0]"));
     });
 
     testWidgets('bad source (cannot build full url)', (tester) async {
       final html = '<video><source src="bad"></video>';
       final explained = await explain(tester, html);
-      expect(explained, equals("[Text:$html]"));
+      expect(explained, equals("[widget0]"));
     });
   });
 }
