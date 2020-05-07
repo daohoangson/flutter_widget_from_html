@@ -64,9 +64,7 @@ class WidgetFactory extends core.WidgetFactory {
     }
 
     final border = table.border != null
-        ? BoxDecoration(
-            border: Border.fromBorderSide(table.border),
-          )
+        ? BoxDecoration(border: Border.fromBorderSide(table.border))
         : null;
 
     final layoutGrid = LayoutGrid(
@@ -94,9 +92,7 @@ class WidgetFactory extends core.WidgetFactory {
       templateRowSizes: templateRowSizes,
     );
 
-    if (border == null) {
-      return layoutGrid;
-    }
+    if (border == null) return layoutGrid;
 
     return Stack(
       children: <Widget>[
