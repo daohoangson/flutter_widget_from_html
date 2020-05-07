@@ -12,10 +12,7 @@ dependencies:
   chewie: ^0.9.10
   flutter:
     sdk: flutter
-  flutter_layout_grid:
-    git:
-      url: https://github.com/daohoangson/flutter_layout_grid.git
-      ref: negative_gap
+  flutter_layout_grid: ^0.9.3
   flutter_svg: ^0.17.1
   flutter_widget_from_html_core:
     path: packages/core

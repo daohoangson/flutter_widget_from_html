@@ -23,6 +23,12 @@ dev_dependencies:
   golden_toolkit: ^0.2.3
   test: any
 
+dependency_overrides:
+  flutter_layout_grid:
+    git:
+      url: https://github.com/daohoangson/flutter_layout_grid.git
+      ref: negative_gap
+
 flutter:
   assets:
     - logos/
