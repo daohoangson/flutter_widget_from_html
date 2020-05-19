@@ -1,3 +1,7 @@
+## 0.3.3+4
+
+* Fix non-breaking space rendering (#185)
+
 ## 0.3.3+3
 
 * Switch to MIT license
