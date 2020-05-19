@@ -13,9 +13,9 @@ const widget0 = const SizedBox.shrink();
 
 // https://ecma-international.org/ecma-262/9.0/#table-32
 // https://unicode.org/cldr/utility/character.jsp?a=200B
-final regExpSpaceLeading = RegExp(r'^[ \n\t\u{200B}]+', unicode: true);
-final regExpSpaceTrailing = RegExp(r'[ \n\t\u{200B}]+$', unicode: true);
-final regExpSpaces = RegExp(r'\s+');
+final regExpSpaceLeading = RegExp(r'^[^\S\u{00A0}]+', unicode: true);
+final regExpSpaceTrailing = RegExp(r'[^\S\u{00A0}]+$', unicode: true);
+final regExpSpaces = RegExp(r'[^\S\u{00A0}]+', unicode: true);
 
 typedef void OnTapUrl(String url);
 

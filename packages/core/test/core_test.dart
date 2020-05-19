@@ -41,17 +41,18 @@ void main() {
     </span>
   </span>
 </div>
-<!-- https://unicode.org/cldr/utility/character.jsp?a=200B -->
-<div>&#8203;</div>
 <!-- https://github.com/daohoangson/flutter_widget_from_html/issues/119 -->
 <div>I​Like​Playing​football​​game</div>
+<!-- https://github.com/daohoangson/flutter_widget_from_html/issues/185 -->
+<div> &nbsp; </div>
 """;
     final str = await explain(t, html);
     expect(
         str,
         equals('[Column:children='
             '[RichText:(:(+l+o+u:All decorations... )(:and none))],'
-            '[RichText:(:I​Like​Playing​football​​game)]'
+            '[RichText:(:I​Like​Playing​football​​game)],'
+            '[RichText:(:\u00A0)]'
             ']'));
   });
 
