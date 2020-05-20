@@ -25,5 +25,6 @@ export default (request: NowRequest, response: NowResponse) => {
 </html>
 `
 
+  response.setHeader('X-XSS-Protection', '0')
   return response.status(200).send(html)
 }
