@@ -1,10 +1,10 @@
 import { NowRequest, NowResponse } from '@now/node'
 
 export default (request: NowRequest, response: NowResponse) => {
-  const { body: body1 } = request.body
-  const { body: body2 } = request.query
-  const body = body1 || body2
-  if (!body) response.status(400).send('POST param `body` or include in query string to render.')
+  const { body } = request.body || request.query
+  if (!body) {
+    return response.status(400).send('POST param `body` or include in query string to render.')
+  }
 
   const html = `
 <!doctype html>
@@ -17,5 +17,5 @@ export default (request: NowRequest, response: NowResponse) => {
 </html>
 `
 
-  response.status(200).send(html)
+  return response.status(200).send(html)
 }
