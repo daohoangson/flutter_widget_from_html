@@ -22,11 +22,11 @@ pipe:
     ZEIT_EMAIL: flutter_widget_from_html@daohoangson.com
     ZEIT_TOKEN: ENCRYPTED[4aaf3c4bb0aedad605db9ac986f9a54a7843cede69c435a94dbacdddc9551616263fc70180e01d3b73ef5c3d72c8d2e0]
   steps:
-    - image: cirrusci/flutter:$FLUTTER_VERSION
-      generate_document_script:
-        - ( cd packages/core && ../../tool/dartdoc.sh )
-        - ( cd packages/example && flutter pub get )
-        - ./tool/dartdoc.sh
+    # - image: cirrusci/flutter:$FLUTTER_VERSION
+    #   generate_document_script:
+    #     - ( cd packages/core && ../../tool/dartdoc.sh )
+    #     - ( cd packages/example && flutter pub get )
+    #     - ./tool/dartdoc.sh
     - image: node:lts
       install_now_cli_script: npm install -g now
       deploy_to_now_script:
