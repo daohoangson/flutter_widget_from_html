@@ -1,5 +1,7 @@
 env:
   FLUTTER_VERSION: v1.12.13-hotfix.5
+  ZEIT_EMAIL: flutter_widget_from_html@daohoangson.com
+  ZEIT_TOKEN: ENCRYPTED[4aaf3c4bb0aedad605db9ac986f9a54a7843cede69c435a94dbacdddc9551616263fc70180e01d3b73ef5c3d72c8d2e0]
 
 analyze_task:
   container:
@@ -13,14 +15,11 @@ analyze_task:
   analyze_script:
     - flutter analyze --no-pub
 
-pipe:
-  name: dartdoc
+document_pipe:
   only_if: $CIRRUS_BRANCH =~ 'document/.*'
   env:
     FLUTTER_ROOT: /home/cirrus/sdks/flutter
     NOW_PROJECT_JSON: ENCRYPTED[e39b933950795b26ccc4f51665601710bdd72da2dd6066d23fd4392e7d9e303153a230c90335ed49743c79f58aedbcbb]
-    ZEIT_EMAIL: flutter_widget_from_html@daohoangson.com
-    ZEIT_TOKEN: ENCRYPTED[4aaf3c4bb0aedad605db9ac986f9a54a7843cede69c435a94dbacdddc9551616263fc70180e01d3b73ef5c3d72c8d2e0]
   steps:
     - image: cirrusci/flutter:$FLUTTER_VERSION
       generate_document_script:
@@ -80,3 +79,19 @@ android_test_task:
     AWS_DEFAULT_REGION: us-west-2
     AWS_SECRET_ACCESS_KEY: ENCRYPTED[fe3999edbfb5c2b0033566f579bb4b51189a925d7d7e507bc6952bb3c6320163e611b391c49425b51e7078900b2a5a74]
   test_script: ./tool/sylph/cmd.sh
+
+example_pipe:
+  env:
+    FLUTTER_ROOT: /home/cirrus/sdks/flutter
+    NOW_PROJECT_JSON: ENCRYPTED[b38285e36f9b348ba52e28957d1aeeb65b9e80c801ef86a88e6eeaceffa21e3a636f2ec0848c496aa1a23b969d296953]
+  steps:
+    - image: cirrusci/flutter:latest-web
+      build_script:
+        - cd packages/example
+        - flutter pub get
+        - flutter build web
+    - image: node:lts
+      install_now_cli_script: npm install -g now
+      deploy_to_now_script:
+        - echo $NOW_PROJECT_JSON > .now/project.json
+        - now --token $ZEIT_TOKEN
