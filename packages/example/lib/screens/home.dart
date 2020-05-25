@@ -5,6 +5,7 @@ import 'hello_world.dart';
 import 'hello_world_core.dart';
 import 'iframe.dart';
 import 'img.dart';
+import 'playground.dart';
 import 'smilie.dart';
 import 'video.dart';
 
@@ -142,6 +143,7 @@ CODE tag:
 </svg>
 """,
     'Video': () => VideoScreen(),
+    'Playground': () => PlaygroundScreen(),
   };
 
   @override
