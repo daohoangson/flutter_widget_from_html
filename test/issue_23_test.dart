@@ -17,7 +17,7 @@ class BlockquoteWebViewScreen extends StatelessWidget {
         body: ListView(children: <Widget>[
           HtmlWidget(
             html,
-            factoryBuilder: (config) => _BlockquoteWebViewWf(config),
+            factoryBuilder: () => _BlockquoteWebViewWf(),
             key: hwKey,
           ),
         ]),
@@ -39,8 +39,6 @@ class _BlockquoteWebViewWf extends WidgetFactory {
     ],
   );
 
-  _BlockquoteWebViewWf(HtmlConfig config) : super(config);
-
   @override
   void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
     if (tag == 'blockquote') {
@@ -60,7 +58,7 @@ void main() {
       hw: HtmlWidget(
         html,
         bodyPadding: const EdgeInsets.all(0),
-        factoryBuilder: (hw) => _BlockquoteWebViewWf(hw),
+        factoryBuilder: () => _BlockquoteWebViewWf(),
         key: hwKey,
       ),
     );

@@ -1,6 +1,8 @@
 part of '../core_widget_factory.dart';
 
 const _kTagCode = 'code';
+const _kTagCodeFont1 = 'Courier';
+const _kTagCodeFont2 = 'monospace';
 const _kTagPre = 'pre';
 const _kTagTt = 'tt';
 
@@ -10,7 +12,8 @@ class _TagCode {
   _TagCode(this.wf);
 
   BuildOp get buildOp => BuildOp(
-      defaultStyles: (_, __) => const [_kCssFontFamily, 'monospace'],
+      defaultStyles: (_, __) =>
+          const [_kCssFontFamily, '$_kTagCodeFont1, $_kTagCodeFont2'],
       onPieces: (meta, pieces) => meta.domElement.localName == _kTagPre
           ? [_resetText(pieces.first, meta)]
           : pieces,

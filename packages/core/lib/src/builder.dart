@@ -5,12 +5,9 @@ import 'core_data.dart';
 import 'core_widget_factory.dart';
 
 final _attrStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
-
-// https://ecma-international.org/ecma-262/9.0/#table-32
-// https://unicode.org/cldr/utility/character.jsp?a=200B
-final _regExpSpaceLeading = RegExp(r'^[ \n\t\u{200B}]+', unicode: true);
-final _regExpSpaceTrailing = RegExp(r'[ \n\t\u{200B}]+$', unicode: true);
-final _regExpSpaces = RegExp(r'\s+');
+final _regExpSpaceLeading = RegExp(r'^[^\S\u{00A0}]+', unicode: true);
+final _regExpSpaceTrailing = RegExp(r'[^\S\u{00A0}]+$', unicode: true);
+final _regExpSpaces = RegExp(r'[^\S\u{00A0}]+', unicode: true);
 
 class HtmlBuilder {
   final List<dom.Node> domNodes;
@@ -207,7 +204,7 @@ class NodeMetadata {
   bool decoStrike;
   bool decoUnder;
   TextDecorationStyle decorationStyle;
-  String fontFamily;
+  Iterable<String> fontFamilies;
   String fontSize;
   bool fontStyleItalic;
   FontWeight fontWeight;

@@ -27,6 +27,9 @@ flutter:
   assets:
     - logos/
   fonts:
+    - family: Courier
+      fonts:
+        - asset: fonts/RobotoMono/RobotoMono-Regular.ttf
     - family: Roboto
       fonts:
         - asset: packages/golden_toolkit/fonts/Roboto-Regular.ttf

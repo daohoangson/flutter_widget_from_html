@@ -218,9 +218,9 @@ void main() {
       });
     });
 
-    testWidgets('overwrites margin with margin-top', (WidgetTester t) async {
+    testWidgets('overwrites margin with margin-top', (tester) async {
       final html = '<div style="margin: 3px; margin-top: 5px">Foo</div>';
-      final explained = await explain(t, html);
+      final explained = await explain(tester, html);
       expect(
           explained,
           equals('[SizedBox:0.0x5.0],'
@@ -228,9 +228,9 @@ void main() {
               '[SizedBox:0.0x3.0]'));
     });
 
-    testWidgets('reset margin with margin-bottom', (WidgetTester t) async {
+    testWidgets('reset margin with margin-bottom', (tester) async {
       final html = '<div style="margin: 3px; margin-bottom: 0">Foo</div>';
-      final explained = await explain(t, html);
+      final explained = await explain(tester, html);
       expect(
           explained,
           equals('[SizedBox:0.0x3.0],'

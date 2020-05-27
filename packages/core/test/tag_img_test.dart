@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import '_.dart' as helper;
 
@@ -37,15 +38,15 @@ void main() {
       expect(explained, equals('[widget0]'));
     });
 
-    testWidgets('renders bad data uri with alt text', (WidgetTester t) async {
+    testWidgets('renders bad data uri with alt text', (tester) async {
       final html = '<img src="data:image/xxx" alt="Foo" />';
-      final explained = await explain(t, html);
+      final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
-    testWidgets('renders bad data uri with title text', (WidgetTester t) async {
+    testWidgets('renders bad data uri with title text', (tester) async {
       final html = '<img src="data:image/xxx" title="Foo" />';
-      final explained = await explain(t, html);
+      final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
@@ -173,15 +174,15 @@ void main() {
       expect(explained, equals('[widget0]'));
     });
 
-    testWidgets('renders bad data uri with alt text', (WidgetTester t) async {
+    testWidgets('renders bad data uri with alt text', (tester) async {
       final html = '<img src="data:image/xxx" alt="Foo" />';
-      final explained = await explain(t, html);
+      final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
-    testWidgets('renders bad data uri with title text', (WidgetTester t) async {
+    testWidgets('renders bad data uri with title text', (tester) async {
       final html = '<img src="data:image/xxx" title="Foo" />';
-      final explained = await explain(t, html);
+      final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
   });
@@ -193,12 +194,14 @@ void main() {
       String fullUrl, {
       Uri baseUrl,
     }) async {
-      final e = await helper.explain(
-        tester,
-        html,
-        baseUrl: baseUrl ?? Uri.parse('http://base.com/path/'),
-      );
-      expect(e, equals('[NetworkImage:url=$fullUrl]'));
+      final explained = await helper.explain(tester, null,
+          hw: HtmlWidget(
+            html,
+            baseUrl: baseUrl ?? Uri.parse('http://base.com/path/'),
+            bodyPadding: const EdgeInsets.all(0),
+            key: helper.hwKey,
+          ));
+      expect(explained, equals('[NetworkImage:url=$fullUrl]'));
     };
 
     testWidgets('renders full url', (WidgetTester tester) async {
