@@ -508,10 +508,22 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     });
 
     testWidgets('renders block', (WidgetTester tester) async {
-      final html = '<div style="background-color: #f00"><div>Foo</div></div>';
+      final html = '<div style="background-color: #f00">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained,
           equals('[DecoratedBox:bg=#FFFF0000,child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('renders with margins and paddings', (tester) async {
+      final html = '<div style="background-color: #f00; '
+          'margin: 1px; padding: 2px">Foo</div>';
+      final explained = await explainMargin(tester, html);
+      expect(
+          explained,
+          equals('[SizedBox:0.0x1.0],'
+              '[Padding:(0,1,0,1),child='
+              '[DecoratedBox:bg=#FFFF0000,child=[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]'
+              '],[SizedBox:0.0x1.0]'));
     });
 
     testWidgets('renders blocks', (WidgetTester tester) async {

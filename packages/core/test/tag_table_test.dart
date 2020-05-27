@@ -246,7 +246,19 @@ void main() {
       expect(
           explained,
           equals('[Table:\n'
-              '[DecoratedBox:bg=#FFFF0000,child=[RichText:(bg=#FFFF0000:Foo)]]\n'
+              '[DecoratedBox:bg=#FFFF0000,child=[RichText:(:Foo)]]\n'
+              ']'));
+    });
+
+    testWidgets('#171: background-color wraps padding', (tester) async {
+      final html = '<table><tr>'
+          '<td style="background-color: #f00; padding: 1px">Foo</td>'
+          '</tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Table:\n'
+              '[DecoratedBox:bg=#FFFF0000,child=[Padding:(1,1,1,1),child=[RichText:(:Foo)]]]\n'
               ']'));
     });
   });
