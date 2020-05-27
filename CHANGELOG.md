@@ -1,3 +1,11 @@
+## 0.4.1-rc.2020052701
+
+* BREAKING: Remove `HtmlConfig` and change `factoryBuilder` method signature (#173)
+* Add support for multiple font families (#172)
+* Fix whitespace regex (#185)
+* Fix `background-color` priority conflict with `padding` (#171)
+* Switch to MIT license
+
 ## 0.4.0-rc.2020043001
 
 * Improve SUB, SUP to avoid overlapping (#164)
