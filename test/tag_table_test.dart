@@ -378,9 +378,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[LayoutGrid:children='
-              '[0,0:${_padding('[DecoratedBox:bg=#FFFF0000,child=[RichText:(bg=#FFFF0000:Foo)]]')}]'
-              ']'));
+          equals('[LayoutGrid:children=[0,0:[SizedBox.expand:child='
+              '[DecoratedBox:bg=#FFFF0000,child=[Padding:(1,1,1,1),child=[RichText:(:Foo)]]]]'
+              ']]'));
     });
   });
 

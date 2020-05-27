@@ -41,17 +41,18 @@ void main() {
     </span>
   </span>
 </div>
-<!-- https://unicode.org/cldr/utility/character.jsp?a=200B -->
-<div>&#8203;</div>
 <!-- https://github.com/daohoangson/flutter_widget_from_html/issues/119 -->
 <div>I​Like​Playing​football​​game</div>
+<!-- https://github.com/daohoangson/flutter_widget_from_html/issues/185 -->
+<div> &nbsp; </div>
 """;
     final str = await explain(tester, html);
     expect(
         str,
         equals('[Column:children='
             '[RichText:(:(+l+o+u:All decorations... )(:and none))],'
-            '[RichText:(:I​Like​Playing​football​​game)]'
+            '[RichText:(:I​Like​Playing​football​​game)],'
+            '[RichText:(:\u00A0)]'
             ']'));
   });
 
@@ -507,10 +508,22 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     });
 
     testWidgets('renders block', (WidgetTester tester) async {
-      final html = '<div style="background-color: #f00"><div>Foo</div></div>';
+      final html = '<div style="background-color: #f00">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained,
           equals('[DecoratedBox:bg=#FFFF0000,child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('renders with margins and paddings', (tester) async {
+      final html = '<div style="background-color: #f00; '
+          'margin: 1px; padding: 2px">Foo</div>';
+      final explained = await explainMargin(tester, html);
+      expect(
+          explained,
+          equals('[SizedBox:0.0x1.0],'
+              '[Padding:(0,1,0,1),child='
+              '[DecoratedBox:bg=#FFFF0000,child=[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]'
+              '],[SizedBox:0.0x1.0]'));
     });
 
     testWidgets('renders blocks', (WidgetTester tester) async {

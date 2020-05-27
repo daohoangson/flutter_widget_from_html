@@ -360,7 +360,7 @@ void main() {
       expect(
           explained,
           equals('[Table:\n'
-              '${_padding('[DecoratedBox:bg=#FFFF0000,child=[RichText:(bg=#FFFF0000:Foo)]]')}\n'
+              '[DecoratedBox:bg=#FFFF0000,child=${_richtext('Foo')}]\n'
               ']'));
     });
   });
