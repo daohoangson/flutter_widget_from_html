@@ -6,3 +6,7 @@ environment:
 dependencies:
   flutter_widget_from_html:
     path: ..
+
+dependency_overrides:
+  flutter_widget_from_html_core:
+    path: ../packages/core
