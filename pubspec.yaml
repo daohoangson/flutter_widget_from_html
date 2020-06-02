@@ -13,12 +13,15 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_svg: ^0.17.1
-  flutter_widget_from_html_core:
-    path: packages/core
+  flutter_widget_from_html_core: ^0.3.2+2
   html: ^0.14.0+3
   url_launcher: ^5.4.2
   video_player: ^0.10.8+1
   webview_flutter: ^0.3.19+9
+
+dependency_overrides:
+  flutter_widget_from_html_core:
+    path: packages/core
 
 dev_dependencies:
   flutter_test:

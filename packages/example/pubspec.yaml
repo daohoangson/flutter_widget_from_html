@@ -9,12 +9,16 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_widget_from_html:
-    path: ../..
   flutter_widget_from_html_core:
-    path: ../../packages/core
   html: any
   provider: ^3.0.0+1
 
+dependency_overrides:
+  flutter_widget_from_html:
+    path: ../..
+  flutter_widget_from_html_core:
+    path: ../../packages/core
+  
 dev_dependencies:
   flutter_driver:
     sdk: flutter
