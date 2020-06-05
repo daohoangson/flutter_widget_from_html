@@ -208,7 +208,7 @@ class NodeMetadata {
   String fontSize;
   bool fontStyleItalic;
   FontWeight fontWeight;
-  double height;
+  CssLineHeight height;
   bool _isBlockElement;
   bool isNotRenderable;
   List<String> _styles;

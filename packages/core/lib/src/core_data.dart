@@ -80,6 +80,20 @@ class CssBorders {
   CssBorderSide top;
 }
 
+class CssLineHeight {
+  final double _value;
+
+  CssLineHeight.normal() : _value = -1;
+
+  CssLineHeight.number(this._value) : assert(_value >= 0);
+
+  CssLineHeight.percentage(double value)
+      : assert(value >= 0),
+        _value = value / 100.0;
+
+  double get value => _value == -1 ? null : _value;
+}
+
 class CssLength {
   final double number;
   final CssLengthUnit unit;

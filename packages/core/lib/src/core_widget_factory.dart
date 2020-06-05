@@ -27,6 +27,7 @@ part 'ops/text.dart';
 part 'parser/border.dart';
 part 'parser/color.dart';
 part 'parser/css.dart';
+part 'parser/line_height.dart';
 part 'parser/length.dart';
 
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
@@ -345,7 +346,7 @@ class WidgetFactory {
       fontSize: fontSize,
       fontStyle: fontStyle,
       fontWeight: m.fontWeight,
-      height: m.height,
+      height: m.height?.value,
     );
   }
 
@@ -444,6 +445,8 @@ class WidgetFactory {
 
   Iterable<String> parseCssFontFamilies(String value) =>
       _parseCssFontFamilies(value);
+
+  CssLineHeight parseCssLineHeight(String value) => _parseLineHeight(value);
 
   CssLength parseCssLength(String value) => _parseCssLength(value);
 
@@ -562,10 +565,9 @@ class WidgetFactory {
         break;
 
       case _kCssLineHeight:
-        final d = double.tryParse(value);
-        if (d != null) {
-          meta.height = d;
-        }
+        final lineHeight = parseCssLineHeight(value);
+        if (lineHeight != null) meta.height = lineHeight;
+
         break;
 
       case _kCssTextAlign:
