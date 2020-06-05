@@ -330,7 +330,8 @@ class WidgetFactory {
         m.fontFamilies == null &&
         fontSize == null &&
         fontStyle == null &&
-        m.fontWeight == null) {
+        m.fontWeight == null &&
+        m.height == null) {
       return p;
     }
 
@@ -344,6 +345,7 @@ class WidgetFactory {
       fontSize: fontSize,
       fontStyle: fontStyle,
       fontWeight: m.fontWeight,
+      height: m.height,
     );
   }
 
@@ -556,6 +558,13 @@ class WidgetFactory {
           case _kCssFontWeight900:
             meta.fontWeight = FontWeight.w900;
             break;
+        }
+        break;
+
+      case _kCssLineHeight:
+        final d = double.tryParse(value);
+        if (d != null) {
+          meta.height = d;
         }
         break;
 
