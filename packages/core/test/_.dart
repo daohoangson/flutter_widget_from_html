@@ -259,6 +259,10 @@ class Explainer {
       s += "+fonts=${style.fontFamilyFallback.join(', ')}";
     }
 
+    if (style.height != null) {
+      s += "+height=${style.height}";
+    }
+
     if (style.fontSize != parent.fontSize) {
       s += "@${style.fontSize.toStringAsFixed(1)}";
     }

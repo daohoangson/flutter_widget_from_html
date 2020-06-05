@@ -1028,6 +1028,20 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     });
   });
 
+  group('line-height', () {
+    testWidgets('renders number', (WidgetTester tester) async {
+      final html = '<span style="line-height: 1">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+height=1.0:Foo)]'));
+    });
+
+    testWidgets('renders decimal', (WidgetTester tester) async {
+      final html = '<span style="line-height: 1.1">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+height=1.1:Foo)]'));
+    });
+  });
+
   group('text-decoration', () {
     testWidgets('renders DEL tag', (WidgetTester tester) async {
       final html = 'This is some <del>deleted</del> text.';
