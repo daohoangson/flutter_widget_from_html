@@ -1,5 +1,5 @@
 env:
-  FLUTTER_VERSION: v1.12.13-hotfix.5
+  FLUTTER_VERSION: '1.17.3'
 
 analyze_task:
   container:
@@ -50,10 +50,10 @@ ios_test_task:
     - analyze
     - unit_test
   osx_instance:
-    image: mojave-xcode-11.3
+    image: catalina-xcode
   install_flutter_script:
     - _stableVersion=$( echo $FLUTTER_VERSION-stable | sed 's/-/+/' )
-    - curl https://storage.googleapis.com/flutter_infra/releases/stable/macos/flutter_macos_$_stableVersion.zip -o flutter.zip
+    - curl https://storage.googleapis.com/flutter_infra/releases/stable/macos/flutter_macos_v$_stableVersion.zip -o flutter.zip
     - unzip -qq flutter.zip
     - mv flutter $HOME/flutter
   create_simulator_script:

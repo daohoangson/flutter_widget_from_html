@@ -18,7 +18,6 @@ if [ ! -f /usr/local/bin/aws ]; then
   sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
 fi
 
-# https://github.com/mmcc007/sylph
 _sylphPath=/tmp/sylph-src
 mkdir $_sylphPath && cd $_sylphPath
 git init && git remote add origin https://github.com/daohoangson/sylph.git

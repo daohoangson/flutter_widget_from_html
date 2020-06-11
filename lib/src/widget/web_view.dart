@@ -35,7 +35,7 @@ class WebView extends StatefulWidget {
   _WebViewState createState() => _WebViewState();
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.debug}) =>
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
       "[WebView:url=$url,"
       "aspectRatio=${aspectRatio.toStringAsFixed(2)},"
       "getDimensions=${getDimensions ? 1 : 0},"
