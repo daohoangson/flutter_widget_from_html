@@ -7,7 +7,12 @@ import '_.dart' as helper;
 void main() {
   group('image.png', () {
     final src = 'http://domain.com/image.png';
-    final explain = (WidgetTester t, String html) => helper.explain(t, html);
+    final explain = (WidgetTester tester, String html) => helper.explain(
+          tester,
+          html,
+          preTest: (context) =>
+              precacheImage(NetworkImage(src), context, onError: (_, __) {}),
+        );
 
     testWidgets('renders src', (WidgetTester tester) async {
       final html = '<img src="$src" />';

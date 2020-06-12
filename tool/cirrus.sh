@@ -37,4 +37,4 @@ exec docker run --rm -it \
   -v "$_pwd/.cirrus/packages/example/build:/project/packages/example/build" \
   -v "$_pwd/.cirrus/packages/example/.packages:/project/packages/example/.packages" \
   -v "$_pwd/.cirrus/pub-cache:/home/cirrus/.pub-cache" \
-  cirrusci/flutter:v1.17.3 /bin/bash
+  cirrusci/flutter:1.17.3 /bin/bash

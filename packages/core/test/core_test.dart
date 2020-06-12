@@ -699,10 +699,17 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
                 ']'));
       });
 
-      testWidgets('renders IMG with dimensions inline',
-          (WidgetTester tester) async {
+      testWidgets('renders IMG with dimensions inline', (tester) async {
         final html = '<img src="$src" width="1" height="1" />';
-        final explained = await explain(tester, html);
+        final explained = await explain(
+          tester,
+          html,
+          preTest: (context) => precacheImage(
+            NetworkImage(src),
+            context,
+            onError: (_, __) {},
+          ),
+        );
         expect(
             explained,
             equals('[ImageLayout:child='
@@ -715,7 +722,15 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       testWidgets('renders IMG with dimensions as block', (tester) async {
         final html = '<img src="$src" width="1" '
             'height="1" style="display: block" />';
-        final explained = await explain(tester, html);
+        final explained = await explain(
+          tester,
+          html,
+          preTest: (context) => precacheImage(
+            NetworkImage(src),
+            context,
+            onError: (_, __) {},
+          ),
+        );
         expect(
             explained,
             equals('[ImageLayout:'
