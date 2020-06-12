@@ -145,7 +145,7 @@ class _TagLi {
 
   _LiPlaceholder _placeholder(Iterable<Widget> children, NodeMetadata meta) {
     final a = meta.domElement.attributes;
-    String listStyleType = a.containsKey(_kAttributeLiType)
+    var listStyleType = a.containsKey(_kAttributeLiType)
         ? _LiInput.listStyleTypeFromAttributeType(a[_kAttributeLiType])
         : null;
     for (final style in meta.styleEntries) {

@@ -26,4 +26,4 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  pedantic: any
+  pedantic: ^1.9.0

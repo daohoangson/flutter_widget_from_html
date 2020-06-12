@@ -50,8 +50,8 @@ class _ImageLayoutState extends State<ImageLayout> {
           // trigger state change only on async update
           if (!isSync) setState(() {});
         },
-        onError: (e, _) => print('[flutter_widget_from_html] '
-            "Error resolving image: $e"),
+        onError: (e, _) =>
+            print('[flutter_widget_from_html] Error resolving image: $e'),
       );
       _stream = widget.image.resolve(ImageConfiguration.empty);
       _stream.addListener(_streamListener);

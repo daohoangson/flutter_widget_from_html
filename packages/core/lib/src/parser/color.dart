@@ -9,7 +9,7 @@ String _convertColorToHex(Color value) {
   final g = value.green.toRadixString(16).padLeft(2, '0');
   final b = value.blue.toRadixString(16).padLeft(2, '0');
   final a = value.alpha.toRadixString(16).padLeft(2, '0');
-  return "#$r$g$b$a";
+  return '#$r$g$b$a';
 }
 
 Color _parseColor(String value) {
@@ -20,17 +20,17 @@ Color _parseColor(String value) {
   final hex = match[1].toUpperCase();
   switch (hex.length) {
     case 3:
-      return Color(int.parse("0xFF${_x2(hex)}"));
+      return Color(int.parse('0xFF${_x2(hex)}'));
     case 4:
       final alpha = hex[3];
       final rgb = hex.substring(0, 3);
-      return Color(int.parse("0x${_x2(alpha)}${_x2(rgb)}"));
+      return Color(int.parse('0x${_x2(alpha)}${_x2(rgb)}'));
     case 6:
-      return Color(int.parse("0xFF$hex"));
+      return Color(int.parse('0xFF$hex'));
     case 8:
       final alpha = hex.substring(6, 8);
       final rgb = hex.substring(0, 6);
-      return Color(int.parse("0x$alpha$rgb"));
+      return Color(int.parse('0x$alpha$rgb'));
   }
 
   return null;

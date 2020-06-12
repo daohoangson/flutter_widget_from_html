@@ -61,9 +61,9 @@ void main() {
       expect(
         explained,
         equals('[RichText:(:'
-            "[NetworkImage:url=$src]"
+            '[NetworkImage:url=$src]'
             '(: )'
-            "[NetworkImage:url=$src]"
+            '[NetworkImage:url=$src]'
             ')]'),
       );
     });
@@ -85,7 +85,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals("[ImageLayout:child=[NetworkImage:url=$src],"
+          equals('[ImageLayout:child=[NetworkImage:url=$src],'
               'height=600.0,width=800.0]'));
     });
 
@@ -94,7 +94,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals("[ImageLayout:child=[NetworkImage:url=$src],"
+          equals('[ImageLayout:child=[NetworkImage:url=$src],'
               'height=600.0,width=800.0]'));
     });
 
@@ -105,7 +105,7 @@ void main() {
           explained,
           equals('[RichText:(:'
               'Before text. '
-              "[NetworkImage:url=$src]"
+              '[NetworkImage:url=$src]'
               '(: After text.)'
               ')]'));
     });
@@ -133,14 +133,14 @@ void main() {
     testWidgets('renders asset', (WidgetTester tester) async {
       final html = '<img src="asset:$assetName" />';
       final e = await explain(tester, html);
-      expect(e, equals("[AssetImage:assetName=$assetName]"));
+      expect(e, equals('[AssetImage:assetName=$assetName]'));
     });
 
     testWidgets('renders asset (specified package)', (tester) async {
       final package = 'package';
       final html = '<img src="asset:$assetName?package=$package" />';
       final e = await explain(tester, html, package: package);
-      expect(e, equals("[AssetImage:assetName=$assetName,package=$package]"));
+      expect(e, equals('[AssetImage:assetName=$assetName,package=$package]'));
     });
 
     testWidgets('renders bad asset', (WidgetTester tester) async {

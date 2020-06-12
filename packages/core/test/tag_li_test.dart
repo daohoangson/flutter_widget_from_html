@@ -46,7 +46,7 @@ void main() {
   });
 
   testWidgets('renders nested list', (WidgetTester tester) async {
-    final html = """
+    final html = '''
 <ul>
   <li>One</li>
   <li>
@@ -64,7 +64,7 @@ void main() {
     </ul>
   </li>
   <li>Three</li>
-</ul>""";
+</ul>''';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -86,11 +86,11 @@ void main() {
 
   testWidgets('renders nested list (single child)',
       (WidgetTester tester) async {
-    final html = """
+    final html = '''
 <ul>
   <li>Foo</li>
   <li><ul><li>Bar</li></ul></li>
-</ul>""";
+</ul>''';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -223,13 +223,13 @@ void main() {
     });
 
     testWidgets('renders LI type', (WidgetTester tester) async {
-      final html = """
+      final html = '''
 <ol type="a">
   <li type="1">decimal</li>
   <li type="i">lower-roman</li>
   <li>lower-alpha</li>
 <ol>
-""";
+''';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -280,13 +280,13 @@ void main() {
       });
 
       testWidgets('renders LI list-style-type', (WidgetTester tester) async {
-        final html = """
+        final html = '''
 <ul style="list-style-type: circle">
   <li style="list-style-type: disc"">disc</li>
   <li style="list-style-type: square">square</li>
   <li>circle</li>
 <ul>
-""";
+''';
         final explained = await explain(tester, html);
         expect(
             explained,
@@ -527,13 +527,13 @@ void main() {
 
       testWidgets('renders LI padding-inline-start', (tester) async {
         // TODO: doesn't match browser output
-        final html = """
+        final html = '''
 <ul style="padding-inline-start: 99px">
   <li style="padding-inline-start: 199px">199px</li>
   <li style="padding-inline-start: 299px">299px</li>
   <li>99px</li>
 <ul>
-""";
+''';
         final explained = await explain(tester, html);
         expect(
             explained,
@@ -567,14 +567,14 @@ void main() {
     });
 
     testWidgets('UL is direct child of UL', (WidgetTester tester) async {
-      final html = """
+      final html = '''
 <ul>
   <li>One</li>
   <ul>
     <li>Two</li>
     <li>Three</li>
   </ul>
-</ul>""";
+</ul>''';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -589,11 +589,11 @@ void main() {
 
     testWidgets('LI has empty A', (WidgetTester tester) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/112#issuecomment-550116179
-      final html = """<ol>
+      final html = '''<ol>
   <li>One</li>
   <li><a href="https://flutter.dev"></a></li>
   <li>Three</li>
-</ol>""";
+</ol>''';
       final explained = await explain(tester, html);
       expect(
           explained,

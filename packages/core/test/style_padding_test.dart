@@ -92,7 +92,7 @@ void main() {
   });
 
   testWidgets('renders padding within another', (WidgetTester tester) async {
-    final html = '<div style="padding: 1px">' +
+    final html = '<div style="padding: 1px">'
         '<div style="padding: 2px">Foo</div></div>';
     final explained = await explain(tester, html);
     expect(

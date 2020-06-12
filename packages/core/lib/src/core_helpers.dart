@@ -14,11 +14,11 @@ typedef CustomStylesBuilder = Iterable<String> Function(dom.Element element);
 
 typedef CustomWidgetBuilder = Widget Function(dom.Element element);
 
-typedef Iterable<Widget> WidgetPlaceholderBuilder<T>(
+typedef WidgetPlaceholderBuilder<T> = Iterable<Widget> Function(
     BuildContext context, Iterable<Widget> children, T input);
 
 class WidgetPlaceholder<T1> extends StatelessWidget {
-  final _builders = List<Function>();
+  final _builders = <Function>[];
   final Iterable<Widget> _firstChildren;
   final _inputs = [];
 
@@ -38,10 +38,10 @@ class WidgetPlaceholder<T1> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Iterable<Widget> output = _firstChildren;
+    var output = _firstChildren;
 
     final l = _builders.length;
-    for (int i = 0; i < l; i++) {
+    for (var i = 0; i < l; i++) {
       output = _builders[i](context, output, _inputs[i]);
     }
 
@@ -70,7 +70,7 @@ class WidgetPlaceholder<T1> extends StatelessWidget {
   ]) {
     final wrapped = List<Widget>(widgets.length);
 
-    int i = 0;
+    var i = 0;
     for (final widget in widgets) {
       if (widget is WidgetPlaceholder) {
         wrapped[i++] = widget..wrapWith(builder, input);
