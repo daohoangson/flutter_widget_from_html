@@ -145,7 +145,7 @@ class Explainer {
   }
 
   String _edgeInsets(EdgeInsets e) =>
-      '(${e.top.truncate()},${e.right.truncate()},' 
+      '(${e.top.truncate()},${e.right.truncate()},'
       '${e.bottom.truncate()},${e.left.truncate()})';
 
   String _image(ImageProvider provider) {
