@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
-import '_.dart';
+import '_2.dart';
 
 void main() {
   enableFlutterDriverExtension();
@@ -80,7 +80,6 @@ class _TestAppState extends State<TestApp> {
             getDimensions: true,
           ),
           key: ValueKey(input),
-          resultKey: ValueKey('output'),
         )
       : widget0;
 }

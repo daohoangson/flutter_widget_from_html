@@ -1,24 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '_0.dart';
+
 class AspectRatioTester extends StatelessWidget {
   final Widget child;
-  final Key resultKey;
 
   final _result = _AspectRatioTestResult();
 
   AspectRatioTester({
     @required this.child,
     Key key,
-    @required this.resultKey,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) =>
-      ListenableProvider<_AspectRatioTestResult>(
+  Widget build(BuildContext _) => ListenableProvider<_AspectRatioTestResult>(
         child: ListView(
           children: <Widget>[
-            _AspectRatioTestResultWidget(resultKey: resultKey),
+            Builder(
+                builder: (context) => Text(
+                      Provider.of<_AspectRatioTestResult>(context)
+                          .value
+                          .toString(),
+                      key: ValueKey(kResultKey),
+                    )),
             CustomSingleChildLayout(
               child: child,
               delegate: _AspectRatioTestDelegate(_result),
@@ -62,19 +67,4 @@ class _AspectRatioTestResult with ChangeNotifier {
   }
 
   double get value => _value;
-}
-
-class _AspectRatioTestResultWidget extends StatelessWidget {
-  final Key resultKey;
-
-  _AspectRatioTestResultWidget({this.resultKey});
-
-  @override
-  Widget build(BuildContext context) => Text(
-        Provider.of<_AspectRatioTestResult>(context)
-            .value
-            .toStringAsFixed(3)
-            .substring(0, 4),
-        key: resultKey,
-      );
 }
