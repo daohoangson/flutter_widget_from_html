@@ -86,7 +86,7 @@ void main() {
   group('image', () {
     final imgSrc = 'http://domain.com/image.png';
     final imgHtml = '<img src="$imgSrc" />';
-    final imgRendered = "[NetworkImage:url=$imgSrc]";
+    final imgRendered = '[NetworkImage:url=$imgSrc]';
     final imgExplain = (WidgetTester t, String html) => explain(t, html);
 
     testWidgets('renders center image', (WidgetTester tester) async {
@@ -121,7 +121,7 @@ void main() {
 
   testWidgets('renders styling from outside', (WidgetTester tester) async {
     // https://github.com/daohoangson/flutter_widget_from_html/issues/10
-    final html = '<em><span style="color: red;">' +
+    final html = '<em><span style="color: red;">'
         '<div style="text-align: right;">right</div></span></em>';
     final explained = await explain(tester, html);
     expect(explained, equals('[RichText,align=right:(+i:right)]'));

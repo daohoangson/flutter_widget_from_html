@@ -87,7 +87,7 @@ Future<String> explain(
   }
 
   var explained = Explainer(hws.context, explainer: explainer).explain(built);
-  if (isFutureBuilder) explained = "[FutureBuilder:$explained]";
+  if (isFutureBuilder) explained = '[FutureBuilder:$explained]';
 
   return explained;
 }
@@ -106,7 +106,7 @@ Future<String> explainMargin(
     hw: Directionality(
       textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
       child: HtmlWidget(
-        "x${html}x",
+        'x${html}x',
         bodyPadding: const EdgeInsets.all(0),
         key: hwKey,
       ),
@@ -126,35 +126,35 @@ class Explainer {
 
   String explain(Widget widget) => _widget(widget);
 
-  String _borderSide(BorderSide s) => "${s.color},w=${s.width}";
+  String _borderSide(BorderSide s) => '${s.color},w=${s.width}';
 
   String _boxDecoration(BoxDecoration d) {
-    String s = '';
+    var s = '';
 
-    if (d.color != null) s += "bg=${_color(d.color)},";
+    if (d.color != null) s += 'bg=${_color(d.color)},';
 
     return s;
   }
 
   String _color(Color c) =>
-      "#${_colorHex(c.alpha)}${_colorHex(c.red)}${_colorHex(c.green)}${_colorHex(c.blue)}";
+      '#${_colorHex(c.alpha)}${_colorHex(c.red)}${_colorHex(c.green)}${_colorHex(c.blue)}';
 
   String _colorHex(int i) {
     final h = i.toRadixString(16).toUpperCase();
-    return h.length == 1 ? "0$h" : h;
+    return h.length == 1 ? '0$h' : h;
   }
 
   String _edgeInsets(EdgeInsets e) =>
-      "(${e.top.truncate()},${e.right.truncate()}," +
-      "${e.bottom.truncate()},${e.left.truncate()})";
+      '(${e.top.truncate()},${e.right.truncate()},'
+      '${e.bottom.truncate()},${e.left.truncate()})';
 
   String _image(ImageProvider provider) {
     final type = provider.runtimeType.toString();
     final description = provider is AssetImage
-        ? "assetName=${provider.assetName}" +
-            (provider.package != null ? ",package=${provider.package}" : '')
-        : provider is NetworkImage ? "url=${provider.url}" : '';
-    return "[$type:$description]";
+        ? 'assetName=${provider.assetName}' +
+            (provider.package != null ? ',package=${provider.package}' : '')
+        : provider is NetworkImage ? 'url=${provider.url}' : '';
+    return '[$type:$description]';
   }
 
   String _imageLayout(ImageLayout widget) {
@@ -162,17 +162,17 @@ class Explainer {
       return _image(widget.image);
     }
 
-    String s = "[ImageLayout:child=${_image(widget.image)}";
-    if (widget.height != null) s += ",height=${widget.height}";
-    if (widget.text != null) s += ",text=${widget.text}";
-    if (widget.width != null) s += ",width=${widget.width}";
+    var s = '[ImageLayout:child=${_image(widget.image)}';
+    if (widget.height != null) s += ',height=${widget.height}';
+    if (widget.text != null) s += ',text=${widget.text}';
+    if (widget.width != null) s += ',width=${widget.width}';
 
-    return "$s]";
+    return '$s]';
   }
 
   String _inlineSpan(InlineSpan inlineSpan, {TextStyle parentStyle}) {
     if (inlineSpan is WidgetSpan) {
-      String s = _widget(inlineSpan.child);
+      var s = _widget(inlineSpan.child);
       if (inlineSpan.alignment != PlaceholderAlignment.baseline) {
         s += inlineSpan.alignment
             .toString()
@@ -189,11 +189,11 @@ class Explainer {
             ?.map((c) => _inlineSpan(c, parentStyle: textSpan.style))
             ?.join('') ??
         '';
-    return "($style$onTap:$text$children)";
+    return '($style$onTap:$text$children)';
   }
 
   String _limitBox(LimitedBox box) {
-    String s = '';
+    var s = '';
     if (box.maxHeight != null) s += 'h=${box.maxHeight},';
     if (box.maxWidth != null) s += 'w=${box.maxWidth},';
     return s;
@@ -208,10 +208,10 @@ class Explainer {
     final left = _borderSide(b.left);
 
     if (top == right && right == bottom && bottom == left) {
-      return "border=($top)";
+      return 'border=($top)';
     }
 
-    return "borders=($top;$right;$bottom;$left)";
+    return 'borders=($top;$right;$bottom;$left)';
   }
 
   String _tableRow(TableRow row) => row.children
@@ -233,13 +233,13 @@ class Explainer {
       textDirection.toString().replaceAll('TextDirection.', '');
 
   String _textStyle(TextStyle style, TextStyle parent) {
-    String s = '';
+    var s = '';
     if (style == null) {
       return s;
     }
 
     if (style.background != null) {
-      s += "bg=${_color(style.background.color)}";
+      s += 'bg=${_color(style.background.color)}';
     }
 
     if (style.color != null) {
@@ -251,7 +251,7 @@ class Explainer {
     s += _textStyleDecoration(style, TextDecoration.underline, 'u');
 
     if (style.fontFamily != null && style.fontFamily != parent.fontFamily) {
-      s += "+font=${style.fontFamily}";
+      s += '+font=${style.fontFamily}';
     }
 
     if (style.fontFamilyFallback?.isNotEmpty == true &&
@@ -260,7 +260,7 @@ class Explainer {
     }
 
     if (style.fontSize != parent.fontSize) {
-      s += "@${style.fontSize.toStringAsFixed(1)}";
+      s += '@${style.fontSize.toStringAsFixed(1)}';
     }
 
     s += _textStyleFontStyle(style);
@@ -279,7 +279,7 @@ class Explainer {
     final decorationStyle = (style.decorationStyle == null ||
             style.decorationStyle == TextDecorationStyle.solid)
         ? ''
-        : "${style.decorationStyle}".replaceFirst(RegExp(r'^.+\.'), '/');
+        : '${style.decorationStyle}'.replaceFirst(RegExp(r'^.+\.'), '/');
 
     return "${styleHasIt ? '+' : '-'}$str$decorationStyle";
   }
@@ -312,7 +312,7 @@ class Explainer {
   }
 
   String _widget(Widget widget) {
-    final explained = this.explainer?.call(widget);
+    final explained = explainer?.call(widget);
     if (explained != null) return explained;
 
     if (widget == widget0) return '[widget0]';
@@ -335,25 +335,25 @@ class Explainer {
     final text = widget is Align
         ? "${widget is Center ? '' : 'alignment=${widget.alignment},'}"
         : widget is AspectRatio
-            ? "aspectRatio=${widget.aspectRatio.toStringAsFixed(2)},"
+            ? 'aspectRatio=${widget.aspectRatio.toStringAsFixed(2)},'
             : widget is DecoratedBox
                 ? _boxDecoration(widget.decoration)
                 : widget is Directionality
-                    ? "${_textDirection(widget.textDirection)},"
+                    ? '${_textDirection(widget.textDirection)},'
                     : widget is GestureDetector
-                        ? "child=${_widget(widget.child)}"
+                        ? 'child=${_widget(widget.child)}'
                         : widget is InkWell
-                            ? "child=${_widget(widget.child)}"
+                            ? 'child=${_widget(widget.child)}'
                             : widget is LimitedBox
                                 ? _limitBox(widget)
                                 : widget is Padding
-                                    ? "${_edgeInsets(widget.padding)},"
+                                    ? '${_edgeInsets(widget.padding)},'
                                     : widget is Positioned
-                                        ? "(${widget.top},${widget.right},${widget.bottom},${widget.left}),"
+                                        ? '(${widget.top},${widget.right},${widget.bottom},${widget.left}),'
                                         : widget is RichText
                                             ? _inlineSpan(widget.text)
                                             : widget is SizedBox
-                                                ? "${widget.width?.toStringAsFixed(1) ?? 0.0}x${widget.height?.toStringAsFixed(1) ?? 0.0}"
+                                                ? '${widget.width?.toStringAsFixed(1) ?? 0.0}x${widget.height?.toStringAsFixed(1) ?? 0.0}'
                                                 : widget is Table
                                                     ? _tableBorder(
                                                         widget.border)
@@ -365,23 +365,23 @@ class Explainer {
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));
-    final textAlignStr = textAlign.isNotEmpty ? ",align=$textAlign" : '';
+    final textAlignStr = textAlign.isNotEmpty ? ',align=$textAlign' : '';
     final children = widget is MultiChildRenderObjectWidget
         ? (widget.children?.isNotEmpty == true && !(widget is RichText))
             ? "children=${widget.children.map(_widget).join(',')}"
             : ''
         : widget is ProxyWidget
-            ? "child=${_widget(widget.child)}"
+            ? 'child=${_widget(widget.child)}'
             : widget is SingleChildRenderObjectWidget
-                ? (widget.child != null ? "child=${_widget(widget.child)}" : '')
+                ? (widget.child != null ? 'child=${_widget(widget.child)}' : '')
                 : widget is SingleChildScrollView
-                    ? "child=${_widget(widget.child)}"
-                    : widget is Table ? "\n${_tableRows(widget)}\n" : '';
-    return "[$type$textAlignStr:$text$children]";
+                    ? 'child=${_widget(widget.child)}'
+                    : widget is Table ? '\n${_tableRows(widget)}\n' : '';
+    return '[$type$textAlignStr:$text$children]';
   }
 
   String _wrap(Wrap wrap) {
-    String s = '';
+    var s = '';
     if (wrap.spacing != 0.0) s += 'spacing=${wrap.spacing},';
     if (wrap.runSpacing != 0.0) s += 'runSpacing=${wrap.runSpacing},';
     return s;

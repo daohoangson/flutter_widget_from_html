@@ -25,7 +25,7 @@ class _StyleTextAlign {
         isBlockElement: true,
         onPieces: (meta, pieces) {
           // handle texts
-          String v = meta.style(_kCssTextAlign);
+          final v = meta.style(_kCssTextAlign);
           meta.tsb.enqueue(_styleTextAlignBuilder, _getTextAlign(v));
 
           // handle widgets

@@ -11,7 +11,7 @@ final buildCurrentState = helper.buildCurrentState;
 
 String _explainer(Widget widget) {
   if (widget is CachedNetworkImage) {
-    return "[CachedNetworkImage:${widget.imageUrl}]";
+    return '[CachedNetworkImage:${widget.imageUrl}]';
   }
 
   if (widget is VideoPlayer) return widget.toString();

@@ -62,7 +62,7 @@ CODE tag:
 <code><span style="color: #000000"><span style="color: #0000BB">&lt;?php phpinfo</span><span style="color: #007700">(); </span><span style="color: #0000BB">?&gt;</span></span></code>""",
     'Iframe': () => IframeScreen(),
     'Images': () => ImgScreen(),
-    'Lists (LI/OL/UL)': """<ol type="I">
+    'Lists (LI/OL/UL)': '''<ol type="I">
   <li>One</li>
   <li>
     Two
@@ -91,13 +91,13 @@ CODE tag:
   <li>Eight</li>
   <li>Nine</li>
   <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nibh quam, sodales in sollicitudin ut, scelerisque non sapien. Nam nec mi malesuada libero euismod tincidunt sit amet mattis ipsum. Etiam dapibus sem ac accumsan elementum. Vivamus mattis at diam ac pellentesque. Sed id eros condimentum, dignissim risus id, semper enim. Etiam tempor mauris id lorem fringilla, dapibus feugiat enim placerat. In hac habitasse platea dictumst. Nam est felis, accumsan et sapien ac, molestie convallis sapien. Vivamus ligula sapien, ultrices quis nisl ac, blandit hendrerit massa. Maecenas eleifend, nisi eget commodo mollis, elit magna pellentesque odio, sit amet auctor quam nibh vel purus. Integer ultricies lacinia ipsum, in tincidunt erat finibus eget.</li>
-</ol>""",
-    'Margin': """<div>No margin</div>
+</ol>''',
+    'Margin': '''<div>No margin</div>
 <div style="margin: 5px 10px">margin: 5px 10px</div>
 <div style="margin: 3px">margin: 3px</div>
 <div style="margin: 1px"><div style="margin: 2px">Margin within another</div></div>
-""",
-    'Table': """
+''',
+    'Table': '''
 <table border="1">
   <caption>Source: <a href="https://www.w3schools.com/html/html_tables.asp">w3schools</a></caption>
   <tr>
@@ -116,8 +116,8 @@ CODE tag:
     <td>94</td>
   </tr>
 </table>
-""",
-    'SVG': """
+''',
+    'SVG': '''
 <a href="https://raw.githubusercontent.com/dnfield/flutter_svg/master/example/assets/flutter_logo.svg">flutter_logo.svg</a>:<br />
 <br />
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 166 202">
@@ -140,7 +140,7 @@ CODE tag:
     </g>
     <path d="M79.5 170.7 120.9 156.4 107.4 142.8" fill="url(#triangleGradient)" />
 </svg>
-""",
+''',
     'Video': () => VideoScreen(),
   };
 

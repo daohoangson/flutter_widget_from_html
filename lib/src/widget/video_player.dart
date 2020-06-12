@@ -11,7 +11,7 @@ class VideoPlayer extends StatefulWidget {
 
   VideoPlayer(
     this.url, {
-    this.aspectRatio,
+    @required this.aspectRatio,
     this.autoResize = true,
     this.autoplay = false,
     this.controls = false,
@@ -25,13 +25,13 @@ class VideoPlayer extends StatefulWidget {
   State<StatefulWidget> createState() => _VideoPlayerState();
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.debug}) =>
-      "[VideoPlayer:url=$url,"
-      "aspectRatio=${aspectRatio.toStringAsFixed(2)},"
-      "autoResize=${autoResize ? 1 : 0},"
-      "autoplay=${autoplay ? 1 : 0},"
-      "controls=${controls ? 1 : 0},"
-      "loop=${loop ? 1 : 0}"
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
+      '[VideoPlayer:url=$url,'
+      'aspectRatio=${aspectRatio.toStringAsFixed(2)},'
+      'autoResize=${autoResize ? 1 : 0},'
+      'autoplay=${autoplay ? 1 : 0},'
+      'controls=${controls ? 1 : 0},'
+      'loop=${loop ? 1 : 0}'
       ']';
 }
 
@@ -90,7 +90,7 @@ class _Controller extends lib.ChewieController {
     listener = () {
       if (_aspectRatio == null) {
         final vpv = videoPlayerController.value;
-        debugPrint("[_Controller]: vpv=$vpv");
+        debugPrint('[_Controller]: vpv=$vpv');
 
         if (!vpv.initialized) return;
         _aspectRatio = vpv.aspectRatio;

@@ -2,13 +2,14 @@ import 'dart:async';
 import 'package:flutter_driver/flutter_driver.dart';
 import 'package:test/test.dart';
 
+import '_1.dart';
+
 void main() {
   group('WebView', () {
     FlutterDriver driver;
     final s1Finder = find.byValueKey('input-1.0');
     final s2Finder = find.byValueKey('input-2.0');
     final s3Finder = find.byValueKey('input-3.0');
-    final rFinder = find.byValueKey('output');
 
     setUpAll(() async {
       driver = await FlutterDriver.connect();
@@ -23,19 +24,19 @@ void main() {
     test('resizes to 1.0', () async {
       await driver.tap(s1Finder);
       await Future.delayed(const Duration(seconds: 10));
-      expect(await driver.getText(rFinder), '1.00');
+      await expectAspectRatio(driver, 1);
     });
 
     test('renders 2.0 without resizing', () async {
       await driver.tap(s2Finder);
       await Future.delayed(const Duration(seconds: 10));
-      expect(await driver.getText(rFinder), '1.77');
+      await expectAspectRatio(driver, 16 / 9);
     });
 
     test('renders 3.0 without resizing', () async {
       await driver.tap(s3Finder);
       await Future.delayed(const Duration(seconds: 10));
-      expect(await driver.getText(rFinder), '1.77');
+      await expectAspectRatio(driver, 16 / 9);
     });
   });
 }
