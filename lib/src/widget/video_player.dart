@@ -8,7 +8,7 @@ class VideoPlayer extends StatefulWidget {
   final bool autoplay;
   final bool controls;
   final bool loop;
-  final String posterUrl;
+  final Widget poster;
 
   VideoPlayer(
     this.url, {
@@ -18,7 +18,7 @@ class VideoPlayer extends StatefulWidget {
     this.controls = false,
     Key key,
     this.loop = false,
-    this.posterUrl,
+    this.poster,
   })  : assert(url != null),
         assert(aspectRatio != null),
         super(key: key);
@@ -68,8 +68,8 @@ class _Controller extends lib.ChewieController {
           autoInitialize: true,
           autoPlay: vps.widget.autoplay == true,
           looping: vps.widget.loop == true,
-          placeholder: vps.widget.posterUrl != null
-              ? CachedNetworkImage(imageUrl: vps.widget.posterUrl)
+          placeholder: vps.widget.poster != null
+              ? Center(child: vps.widget.poster)
               : null,
           showControls: vps.widget.controls == true,
           videoPlayerController:

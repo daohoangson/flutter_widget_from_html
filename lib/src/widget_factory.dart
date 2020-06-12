@@ -65,7 +65,7 @@ class WidgetFactory extends core.WidgetFactory {
       autoplay: autoplay,
       controls: controls,
       loop: loop,
-      posterUrl: posterUrl,
+      poster: posterUrl != null ? buildImage(posterUrl) : null,
     );
   }
 
