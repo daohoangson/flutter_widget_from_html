@@ -13,11 +13,11 @@ dependencies:
   html: any
   provider: ^3.0.0+1
 
-dependency_overrides:
-  flutter_widget_from_html:
-    path: ../..
-  flutter_widget_from_html_core:
-    path: ../../packages/core
+dependency_overrides:            # dep_override
+  flutter_widget_from_html:      # dep_override
+    path: ../..                  # dep_override
+  flutter_widget_from_html_core: # dep_override
+    path: ../../packages/core    # dep_override
 
 dev_dependencies:
   flutter_driver:
