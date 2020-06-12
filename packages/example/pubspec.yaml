@@ -18,7 +18,7 @@ dependency_overrides:
     path: ../..
   flutter_widget_from_html_core:
     path: ../../packages/core
-  
+
 dev_dependencies:
   flutter_driver:
     sdk: flutter

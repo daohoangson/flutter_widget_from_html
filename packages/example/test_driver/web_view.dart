@@ -57,7 +57,7 @@ class _TestAppState extends State<TestApp> {
 
   Widget _buildButton(String value) => RaisedButton(
         child: Text(value),
-        key: ValueKey("input-$value"),
+        key: ValueKey('input-$value'),
         onPressed: () => setState(() => input = value),
       );
 

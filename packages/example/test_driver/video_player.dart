@@ -39,7 +39,7 @@ class _TestAppState extends State<TestApp> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        key: ValueKey("$value"),
+        key: ValueKey(value),
         onPressed: () => setState(() => input = value),
       );
 
