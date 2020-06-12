@@ -16,4 +16,3 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   test: any
-  pedantic: any
