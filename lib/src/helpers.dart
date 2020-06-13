@@ -1,7 +1,6 @@
 export 'package:flutter_widget_from_html_core/src/core_helpers.dart';
 
 import 'dart:async';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart' as lib;

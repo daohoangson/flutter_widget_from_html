@@ -28,13 +28,14 @@ class VideoPlayer extends StatefulWidget {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
-      '[VideoPlayer:url=$url,'
-      'aspectRatio=${aspectRatio.toStringAsFixed(2)},'
-      'autoResize=${autoResize ? 1 : 0},'
-      'autoplay=${autoplay ? 1 : 0},'
-      'controls=${controls ? 1 : 0},'
-      'loop=${loop ? 1 : 0}'
-      ']';
+      'VideoPlayer("$url"'
+      ', aspectRatio: ${aspectRatio.toStringAsFixed(2)}'
+      "${!autoResize ? ', autoResize: $autoResize' : ''}"
+      "${autoplay ? ', autoplay: $autoplay' : ''}"
+      "${controls ? ', controls: $controls' : ''}"
+      "${loop ? ', loop: $loop' : ''}"
+      "${poster != null ? ', poster: $poster' : ''}"
+      ')';
 }
 
 class _VideoPlayerState extends State<VideoPlayer> {

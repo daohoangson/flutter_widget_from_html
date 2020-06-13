@@ -8,10 +8,7 @@ void main() {
   testWidgets('renders video player', (tester) async {
     final html = '<video><source src="$src"></video>';
     final explained = await explain(tester, html);
-    expect(
-        explained,
-        equals('[VideoPlayer:url=$src,aspectRatio=1.78,'
-            'autoResize=1,autoplay=0,controls=0,loop=0]'));
+    expect(explained, equals('[VideoPlayer("$src", aspectRatio: 1.78)]'));
   });
 
   testWidgets('renders video player with specified dimensions', (tester) async {
@@ -19,8 +16,11 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[VideoPlayer:url=$src,aspectRatio=1.33,'
-            'autoResize=0,autoplay=0,controls=0,loop=0]'));
+        equals('[VideoPlayer('
+            '"$src", '
+            'aspectRatio: 1.33, '
+            'autoResize: false'
+            ')]'));
   });
 
   testWidgets('renders video player with autoplay', (tester) async {
@@ -28,8 +28,11 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[VideoPlayer:url=$src,aspectRatio=1.78,'
-            'autoResize=1,autoplay=1,controls=0,loop=0]'));
+        equals('[VideoPlayer('
+            '"$src", '
+            'aspectRatio: 1.78, '
+            'autoplay: true'
+            ')]'));
   });
 
   testWidgets('renders video player with controls', (tester) async {
@@ -37,8 +40,11 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[VideoPlayer:url=$src,aspectRatio=1.78,'
-            'autoResize=1,autoplay=0,controls=1,loop=0]'));
+        equals('[VideoPlayer('
+            '"$src", '
+            'aspectRatio: 1.78, '
+            'controls: true'
+            ')]'));
   });
 
   testWidgets('renders video player with loop', (tester) async {
@@ -46,8 +52,52 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[VideoPlayer:url=$src,aspectRatio=1.78,'
-            'autoResize=1,autoplay=0,controls=0,loop=1]'));
+        equals('[VideoPlayer('
+            '"$src", '
+            'aspectRatio: 1.78, '
+            'loop: true'
+            ')]'));
+  });
+
+  group('poster', () {
+    testWidgets('renders video player with asset', (tester) async {
+      final assetName = 'path/image.png';
+      final h = '<video poster="asset:$assetName"><source src="$src"></video>';
+      final explained = await explain(tester, h);
+      expect(
+          explained,
+          equals('[VideoPlayer('
+              '"$src", '
+              'aspectRatio: 1.78, '
+              'poster: ImageLayout(AssetImage(bundle: null, name: "$assetName"))'
+              ')]'));
+    });
+
+    testWidgets('renders video player with data uri', (tester) async {
+      final h = '<video poster="$kDataUri"><source src="$src"></video>';
+      final explained = await explain(tester, h);
+      final e = explained.replaceAll(RegExp(r'Uint8List#[0-9a-f]+,'), 'bytes,');
+      expect(
+          e,
+          equals('[VideoPlayer('
+              '"$src", '
+              'aspectRatio: 1.78, '
+              'poster: ImageLayout(MemoryImage(bytes, scale: 1.0))'
+              ')]'));
+    });
+
+    testWidgets('renders video player with url', (tester) async {
+      final posterSrc = 'http://domain.com/image.png';
+      final html = '<video poster="$posterSrc"><source src="$src"></video>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[VideoPlayer('
+              '"$src", '
+              'aspectRatio: 1.78, '
+              'poster: ImageLayout(CachedNetworkImageProvider("$posterSrc", scale: 1.0))'
+              ')]'));
+    });
   });
 
   group('errors', () {
