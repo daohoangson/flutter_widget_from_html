@@ -121,8 +121,7 @@ void main() {
     testWidgets('renders asset (specified package)', (tester) async {
       final package = 'package';
       final html = '<img src="asset:$assetName?package=$package" />';
-      final e = await explain(tester, html, package: package);
-      final explained = await explain(tester, html);
+      final explained = await explain(tester, html, package: package);
       expect(
           explained,
           equals('[ImageLayout(AssetImage('
