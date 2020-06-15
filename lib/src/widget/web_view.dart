@@ -36,12 +36,12 @@ class WebView extends StatefulWidget {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
-      '[WebView:url=$url,'
-      'aspectRatio=${aspectRatio.toStringAsFixed(2)},'
-      'getDimensions=${getDimensions ? 1 : 0},'
-      'js=${js ? 1 : 0}'
-      "${unsupportedWorkaroundForIssue37 == true ? ',issue37' : ''}"
-      ']';
+      'WebView("$url"'
+      ', aspectRatio=${aspectRatio.toStringAsFixed(2)}'
+      "${getDimensions ? ', getDimensions: $getDimensions' : ''}"
+      "${!js ? ', js: $js' : ''}"
+      "${unsupportedWorkaroundForIssue37 ? ', unsupportedWorkaroundForIssue37: $unsupportedWorkaroundForIssue37' : ''}"
+      ')';
 }
 
 class _WebViewState extends State<WebView> {

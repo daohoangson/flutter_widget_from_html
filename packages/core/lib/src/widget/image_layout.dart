@@ -12,6 +12,12 @@ class ImageLayout extends StatefulWidget {
 
   @override
   _ImageLayoutState createState() => _ImageLayoutState();
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
+      "ImageLayout($image${height != null ? ', height: $height' : ''}"
+      "${text != null ? ', text: "$text"' : ''}"
+      "${width != null ? ', width: $width' : ''})";
 }
 
 class _ImageLayoutState extends State<ImageLayout> {

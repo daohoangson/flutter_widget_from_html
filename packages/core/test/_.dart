@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
+// https://stackoverflow.com/questions/6018611/smallest-data-uri-image-possible-for-a-transparent-image
+const kDataUri =
+    'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
 final hwKey = GlobalKey<State<HtmlWidget>>();
 
 Widget buildCurrentState() {
@@ -147,28 +151,6 @@ class Explainer {
   String _edgeInsets(EdgeInsets e) =>
       '(${e.top.truncate()},${e.right.truncate()},'
       '${e.bottom.truncate()},${e.left.truncate()})';
-
-  String _image(ImageProvider provider) {
-    final type = provider.runtimeType.toString();
-    final description = provider is AssetImage
-        ? 'assetName=${provider.assetName}' +
-            (provider.package != null ? ',package=${provider.package}' : '')
-        : provider is NetworkImage ? 'url=${provider.url}' : '';
-    return '[$type:$description]';
-  }
-
-  String _imageLayout(ImageLayout widget) {
-    if (widget.height == null && widget.text == null && widget.width == null) {
-      return _image(widget.image);
-    }
-
-    var s = '[ImageLayout:child=${_image(widget.image)}';
-    if (widget.height != null) s += ',height=${widget.height}';
-    if (widget.text != null) s += ',text=${widget.text}';
-    if (widget.width != null) s += ',width=${widget.width}';
-
-    return '$s]';
-  }
 
   String _inlineSpan(InlineSpan inlineSpan, {TextStyle parentStyle}) {
     if (inlineSpan is WidgetSpan) {
@@ -316,8 +298,7 @@ class Explainer {
     if (explained != null) return explained;
 
     if (widget == widget0) return '[widget0]';
-    if (widget is Image) return _image(widget.image);
-    if (widget is ImageLayout) return _imageLayout(widget);
+    if (widget is ImageLayout) return '[$widget]';
 
     // ignore: invalid_use_of_protected_member
     if (widget is WidgetPlaceholder) return _widget(widget.build(context));

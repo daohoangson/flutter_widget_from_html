@@ -10,6 +10,7 @@ class _State extends State<VideoScreen> {
   bool autoplay = false;
   bool controls = false;
   bool loop = false;
+  bool poster = false;
   bool widthHeight = false;
 
   String _html = '';
@@ -40,6 +41,11 @@ class _State extends State<VideoScreen> {
             value: loop,
             onChanged: (v) => _setState(() => loop = v),
             title: const Text('loop'),
+          ),
+          CheckboxListTile(
+            value: poster,
+            onChanged: (v) => _setState(() => poster = v),
+            title: const Text('poster'),
           ),
           CheckboxListTile(
             value: widthHeight,
@@ -74,6 +80,9 @@ class _State extends State<VideoScreen> {
         }
         if (loop) {
           attributes.add('loop');
+        }
+        if (poster) {
+          attributes.add('poster="asset:logos/android.png"');
         }
         if (widthHeight) {
           attributes.add('width="320" height="176"');

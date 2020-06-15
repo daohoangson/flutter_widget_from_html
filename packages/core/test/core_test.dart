@@ -225,7 +225,11 @@ void main() {
       final src = 'http://domain.com/image.png';
       final html = '<q><img src="$src" /></q>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:“[NetworkImage:url=$src](:”))]'));
+      expect(
+          explained,
+          equals('[RichText:(:“'
+              '[ImageLayout(NetworkImage("$src", scale: 1.0))]'
+              '(:”))]'));
     });
 
     testWidgets('renders styling', (WidgetTester tester) async {
@@ -326,7 +330,7 @@ void main() {
       expect(
           explained,
           equals('[SizedBox:0.0x10.0],'
-              '[Padding:(0,40,0,40),child=[NetworkImage:url=$src]],'
+              '[Padding:(0,40,0,40),child=[ImageLayout(NetworkImage("$src", scale: 1.0))]],'
               '[Padding:(0,40,0,40),child=[RichText:(:(+i:fig. 1)(: Foo))]],'
               '[SizedBox:0.0x10.0]'));
     });
@@ -685,7 +689,11 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       testWidgets('renders IMG inline by default', (WidgetTester tester) async {
         final html = 'Foo <img src="$src" />';
         final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:Foo [NetworkImage:url=$src])]'));
+        expect(
+            explained,
+            equals('[RichText:(:Foo '
+                '[ImageLayout(NetworkImage("$src", scale: 1.0))]'
+                ')]'));
       });
 
       testWidgets('renders IMG as block', (WidgetTester tester) async {
@@ -695,7 +703,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
             explained,
             equals('[Column:children='
                 '[RichText:(:Foo)],'
-                '[NetworkImage:url=$src]'
+                '[ImageLayout(NetworkImage("$src", scale: 1.0))]'
                 ']'));
       });
 
@@ -712,11 +720,11 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
         );
         expect(
             explained,
-            equals('[ImageLayout:child='
-                '[NetworkImage:url=$src],'
-                'height=1.0,'
-                'width=1.0'
-                ']'));
+            equals('[ImageLayout('
+                'NetworkImage("$src", scale: 1.0), '
+                'height: 1.0, '
+                'width: 1.0'
+                ')]'));
       });
 
       testWidgets('renders IMG with dimensions as block', (tester) async {
@@ -733,11 +741,11 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
         );
         expect(
             explained,
-            equals('[ImageLayout:'
-                'child=[NetworkImage:url=$src],'
-                'height=1.0,'
-                'width=1.0'
-                ']'));
+            equals('[ImageLayout('
+                'NetworkImage("$src", scale: 1.0), '
+                'height: 1.0, '
+                'width: 1.0'
+                ')]'));
       });
     });
   });

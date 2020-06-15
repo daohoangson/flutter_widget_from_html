@@ -165,10 +165,10 @@ void main() {
       );
       expect(
           explained,
-          equals('[Padding:(10,10,10,10),child=[ImageLayout:'
-              'child=[NetworkImage:url=http://base.com/path/image.png],'
-              'text=image dot png'
-              ']]'));
+          equals('[Padding:(10,10,10,10),child=[ImageLayout('
+              'NetworkImage("http://base.com/path/image.png", scale: 1.0), '
+              'text: "image dot png"'
+              ')]]'));
     });
   });
 

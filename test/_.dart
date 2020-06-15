@@ -5,6 +5,8 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../packages/core/test/_.dart' as helper;
 
+const kDataUri = helper.kDataUri;
+
 final hwKey = helper.hwKey;
 
 final buildCurrentState = helper.buildCurrentState;
@@ -14,8 +16,8 @@ String _explainer(Widget widget) {
     return '[CachedNetworkImage:${widget.imageUrl}]';
   }
 
-  if (widget is VideoPlayer) return widget.toString();
-  if (widget is WebView) return widget.toString();
+  if (widget is VideoPlayer) return '[$widget]';
+  if (widget is WebView) return '[$widget]';
 
   return null;
 }

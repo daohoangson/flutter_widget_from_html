@@ -86,7 +86,7 @@ void main() {
   group('image', () {
     final imgSrc = 'http://domain.com/image.png';
     final imgHtml = '<img src="$imgSrc" />';
-    final imgRendered = '[NetworkImage:url=$imgSrc]';
+    final imgRendered = '[ImageLayout(NetworkImage("$imgSrc", scale: 1.0))]';
     final imgExplain = (WidgetTester t, String html) => explain(t, html);
 
     testWidgets('renders center image', (WidgetTester tester) async {
