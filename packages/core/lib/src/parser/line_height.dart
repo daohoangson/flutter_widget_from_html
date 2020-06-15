@@ -5,7 +5,7 @@ const _kCssLineHeightNormal = 'normal';
 
 final _lineHeightPercentageRegExp = RegExp(r'^(.+)%$');
 
-CssLineHeight _parseLineHeight(String value) {
+CssLineHeight _parseCssLineHeight(String value) {
   if (value == null) return null;
 
   switch (value) {
