@@ -74,7 +74,7 @@ void main() {
 
   group('image', () {
     final imgSrc = 'http://domain.com/image.png';
-    final imgRendered = "[NetworkImage:url=$imgSrc]";
+    final imgRendered = '[ImageLayout(NetworkImage("$imgSrc", scale: 1.0))]';
     final imgExplain = (WidgetTester t, String html) => explain(t, html);
 
     testWidgets('renders top image', (WidgetTester tester) async {
@@ -187,6 +187,7 @@ void main() {
 }
 
 class _Issue163Wf extends WidgetFactory {
+  @override
   Widget buildText(TextBits text) {
     final bits = text.bits.toList(growable: false);
     if (bits.length == 1 && bits[0] is TextData) {

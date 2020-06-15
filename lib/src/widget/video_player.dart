@@ -8,15 +8,17 @@ class VideoPlayer extends StatefulWidget {
   final bool autoplay;
   final bool controls;
   final bool loop;
+  final Widget poster;
 
   VideoPlayer(
     this.url, {
-    this.aspectRatio,
+    @required this.aspectRatio,
     this.autoResize = true,
     this.autoplay = false,
     this.controls = false,
-    this.loop = false,
     Key key,
+    this.loop = false,
+    this.poster,
   })  : assert(url != null),
         assert(aspectRatio != null),
         super(key: key);
@@ -25,14 +27,15 @@ class VideoPlayer extends StatefulWidget {
   State<StatefulWidget> createState() => _VideoPlayerState();
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.debug}) =>
-      "[VideoPlayer:url=$url,"
-      "aspectRatio=${aspectRatio.toStringAsFixed(2)},"
-      "autoResize=${autoResize ? 1 : 0},"
-      "autoplay=${autoplay ? 1 : 0},"
-      "controls=${controls ? 1 : 0},"
-      "loop=${loop ? 1 : 0}"
-      ']';
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
+      'VideoPlayer("$url"'
+      ', aspectRatio: ${aspectRatio.toStringAsFixed(2)}'
+      "${!autoResize ? ', autoResize: $autoResize' : ''}"
+      "${autoplay ? ', autoplay: $autoplay' : ''}"
+      "${controls ? ', controls: $controls' : ''}"
+      "${loop ? ', loop: $loop' : ''}"
+      "${poster != null ? ', poster: $poster' : ''}"
+      ')';
 }
 
 class _VideoPlayerState extends State<VideoPlayer> {
@@ -66,6 +69,9 @@ class _Controller extends lib.ChewieController {
           autoInitialize: true,
           autoPlay: vps.widget.autoplay == true,
           looping: vps.widget.loop == true,
+          placeholder: vps.widget.poster != null
+              ? Center(child: vps.widget.poster)
+              : null,
           showControls: vps.widget.controls == true,
           videoPlayerController:
               lib.VideoPlayerController.network(vps.widget.url),
@@ -90,7 +96,7 @@ class _Controller extends lib.ChewieController {
     listener = () {
       if (_aspectRatio == null) {
         final vpv = videoPlayerController.value;
-        debugPrint("[_Controller]: vpv=$vpv");
+        debugPrint('[_Controller]: vpv=$vpv');
 
         if (!vpv.initialized) return;
         _aspectRatio = vpv.aspectRatio;

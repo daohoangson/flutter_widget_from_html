@@ -46,8 +46,8 @@ abstract class TextBit {
   String toString() {
     final clazz = runtimeType.toString();
     final t = this;
-    final contents = t is TextWidget ? "widget=${t.widget}" : "data=$data";
-    return "[$clazz:$hashCode] $contents";
+    final contents = t is TextWidget ? 'widget=${t.widget}' : 'data=$data';
+    return '[$clazz:$hashCode] $contents';
   }
 
   static TextBit nextOf(TextBit bit) {
@@ -88,7 +88,10 @@ abstract class TextBit {
 }
 
 class TextData extends TextBit {
+  @override
   final String data;
+
+  @override
   final TextStyleBuilders tsb;
 
   TextData(TextBits parent, this.data, this.tsb)
@@ -254,25 +257,25 @@ class TextBits extends TextBit {
   String toString() {
     final clazz = runtimeType.toString();
     final contents = _toStrings().join('\n');
-    return "\n[$clazz:$hashCode]\n$contents\n----";
+    return '\n[$clazz:$hashCode]\n$contents\n----';
   }
 
   Iterable<String> _toStrings() => _children.isNotEmpty
       ? (_children
           .map((child) => child is TextBits
-              ? (List<String>()
-                ..add("[${child.runtimeType}:${child.hashCode}]" +
+              ? (<String>[]
+                ..add('[${child.runtimeType}:${child.hashCode}]' +
                     (child.parent == this
                         ? ''
-                        : " ⚠️ parent=${child.parent.hashCode}"))
+                        : ' ⚠️ parent=${child.parent.hashCode}'))
                 ..addAll(child._toStrings()))
               : [
                   child.toString() +
                       (child.parent == this
                           ? ''
-                          : " ⚠️ parent=${child.parent.hashCode}")
+                          : ' ⚠️ parent=${child.parent.hashCode}')
                 ])
-          .map((lines) => lines.map((line) => "  $line"))
+          .map((lines) => lines.map((line) => '  $line'))
           .reduce((prev, lines) => List.from(prev)..addAll(lines)))
       : [];
 }

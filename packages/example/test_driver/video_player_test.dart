@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter_driver/flutter_driver.dart';
 import 'package:test/test.dart';
 
+import '_1.dart';
+
 void main() {
   group('VideoPlayer', () {
     FlutterDriver driver;
@@ -20,7 +22,7 @@ void main() {
       final src = 'https://www.w3schools.com/html/mov_bbb.mp4';
       await driver.tap(find.byValueKey(src));
       await Future.delayed(const Duration(seconds: 20));
-      expect(await driver.getText(find.byValueKey('output')), '1.81');
+      await expectAspectRatio(driver, 1.81);
     });
   });
 }

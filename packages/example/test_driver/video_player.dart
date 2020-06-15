@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
-import '_.dart';
+import '_2.dart';
 
 void main() {
   enableFlutterDriverExtension();
@@ -39,7 +39,7 @@ class _TestAppState extends State<TestApp> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        key: ValueKey("$value"),
+        key: ValueKey(value),
         onPressed: () => setState(() => input = value),
       );
 
@@ -64,7 +64,6 @@ class _TestAppState extends State<TestApp> {
             autoResize: true,
           ),
           key: ValueKey(input),
-          resultKey: ValueKey('output'),
         )
       : widget0;
 }

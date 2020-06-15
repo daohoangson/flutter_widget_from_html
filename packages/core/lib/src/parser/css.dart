@@ -19,13 +19,13 @@ const _kCssFontSizeXxSmall = 'xx-small';
 const _kCssFontSizeLarger = 'larger';
 const _kCssFontSizeSmaller = 'smaller';
 const _kCssFontSizes = {
-  "1": _kCssFontSizeXxSmall,
-  "2": _kCssFontSizeXSmall,
-  "3": _kCssFontSizeSmall,
-  "4": _kCssFontSizeMedium,
-  "5": _kCssFontSizeLarge,
-  "6": _kCssFontSizeXLarge,
-  "7": _kCssFontSizeXxLarge,
+  '1': _kCssFontSizeXxSmall,
+  '2': _kCssFontSizeXSmall,
+  '3': _kCssFontSizeSmall,
+  '4': _kCssFontSizeMedium,
+  '5': _kCssFontSizeLarge,
+  '6': _kCssFontSizeXLarge,
+  '7': _kCssFontSizeXxLarge,
 };
 
 const _kCssFontStyle = 'font-style';

@@ -109,7 +109,7 @@ class _TagTable {
     rows.addAll(footRows);
     if (rows.isEmpty) return null;
 
-    int cols = 0;
+    var cols = 0;
     for (final row in rows) {
       cols = cols > row.cells.length ? cols : row.cells.length;
     }
@@ -119,7 +119,7 @@ class _TagTable {
     for (final row in rows) {
       final cells = List<Widget>(cols);
 
-      int i = 0;
+      var i = 0;
       for (final cell in row.cells) {
         cells[i++] = wf.buildTableCell(cell);
       }
@@ -146,7 +146,7 @@ class _TagTable {
   }
 
   TableBorder _buildTableBorder(BuildContext context, NodeMetadata meta) {
-    String styleBorder = meta.style(_kCssBorder);
+    final styleBorder = meta.style(_kCssBorder);
     if (styleBorder != null) {
       final borderParsed = wf.parseCssBorderSide(styleBorder);
       if (borderParsed != null) {

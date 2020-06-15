@@ -4,17 +4,17 @@ import '_.dart';
 
 void main() {
   testWidgets('renders basic table', (WidgetTester tester) async {
-    final html = """<table>
+    final html = '''<table>
       <caption>Caption</caption>
       <tr><th>Header 1</th><th>Header 2</th></tr>
       <tr><td>Value 1</td><td>Value 2</td></tr>
-    </table>""";
+    </table>''';
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[Column:children=[RichText,align=center:(:Caption)],[Table:\n' +
-            '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n' +
-            '[RichText:(:Value 1)] | [RichText:(:Value 2)]\n' +
+        equals('[Column:children=[RichText,align=center:(:Caption)],[Table:\n'
+            '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n'
+            '[RichText:(:Value 1)] | [RichText:(:Value 2)]\n'
             ']]'));
   });
 
@@ -31,11 +31,11 @@ void main() {
   });
 
   testWidgets('renders THEAD/TBODY/TFOOT tags', (WidgetTester tester) async {
-    final html = """<table>
+    final html = '''<table>
       <tfoot><tr><td>Footer 1</td><td>Footer 2</td></tr></tfoot>
       <tbody><tr><td>Value 1</td><td>Value 2</td></tr></tbody>
       <thead><tr><th>Header 1</th><th>Header 2</th></tr></thead>
-    </table>""";
+    </table>''';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -129,7 +129,7 @@ void main() {
     testWidgets(
       'renders style="border: 1px solid #f00"',
       (WidgetTester tester) async {
-        final html = '<table style="border: 1px solid #f00">' +
+        final html = '<table style="border: 1px solid #f00">'
             '<tr><td>Foo</td></tr></table>';
         final explained = await explain(tester, html);
         expect(
@@ -154,30 +154,30 @@ void main() {
 
   group('error handling', () {
     testWidgets('missing header', (WidgetTester tester) async {
-      final html = """<table>
+      final html = '''<table>
       <tr><th>Header 1</th></tr>
       <tr><td>Value 1</td><td>Value 2</td></tr>
-    </table>""";
+    </table>''';
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Table:\n' +
-              '[RichText:(+b:Header 1)] | [widget0]\n' +
-              '[RichText:(:Value 1)] | [RichText:(:Value 2)]\n' +
+          equals('[Table:\n'
+              '[RichText:(+b:Header 1)] | [widget0]\n'
+              '[RichText:(:Value 1)] | [RichText:(:Value 2)]\n'
               ']'));
     });
 
     testWidgets('missing cell', (WidgetTester tester) async {
-      final html = """<table>
+      final html = '''<table>
       <tr><th>Header 1</th><th>Header 2</th></tr>
       <tr><td>Value 1</td></tr>
-    </table>""";
+    </table>''';
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Table:\n' +
-              '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n' +
-              '[RichText:(:Value 1)] | [widget0]\n' +
+          equals('[Table:\n'
+              '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n'
+              '[RichText:(:Value 1)] | [widget0]\n'
               ']'));
     });
 
@@ -246,7 +246,19 @@ void main() {
       expect(
           explained,
           equals('[Table:\n'
-              '[DecoratedBox:bg=#FFFF0000,child=[RichText:(bg=#FFFF0000:Foo)]]\n'
+              '[DecoratedBox:bg=#FFFF0000,child=[RichText:(:Foo)]]\n'
+              ']'));
+    });
+
+    testWidgets('#171: background-color wraps padding', (tester) async {
+      final html = '<table><tr>'
+          '<td style="background-color: #f00; padding: 1px">Foo</td>'
+          '</tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Table:\n'
+              '[DecoratedBox:bg=#FFFF0000,child=[Padding:(1,1,1,1),child=[RichText:(:Foo)]]]\n'
               ']'));
     });
   });

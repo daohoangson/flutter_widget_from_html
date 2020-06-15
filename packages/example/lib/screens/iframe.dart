@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
-const html = """
+const html = '''
 <h1>Introducing Flutter</h1>
 <h3>Google Developers</h3>
 <p>Get started at <a href="https://flutter.io">https://flutter.io</a> today.</p>
@@ -16,7 +16,7 @@ const html = """
 <p>Nam velit enim, elementum in egestas ac, faucibus non elit. Curabitur ac ultrices sem. Interdum et malesuada fames ac ante ipsum primis in faucibus. Proin mattis quis felis a maximus. Nulla diam ligula, tincidunt id viverra ut, consectetur eu odio. Quisque id nunc sed dui interdum tristique. Curabitur faucibus, lorem sit amet tempus porttitor, justo felis mollis justo, sit amet tempus massa nulla et mauris. Nulla viverra tortor sed velit malesuada, sed bibendum justo elementum. Quisque id nisl tristique, venenatis eros vitae, fermentum elit. Ut nec faucibus lacus. Proin nisl quam, ullamcorper id tellus at, mattis convallis orci. Maecenas viverra mollis ullamcorper. Donec tincidunt, elit id placerat consequat, nisi purus tincidunt erat, sed aliquet justo leo a felis.</p>
 <p>Quisque sodales dui nec dictum bibendum. Aenean pellentesque efficitur elit, ut tincidunt leo laoreet ut. Aenean ac molestie dui, at fringilla mi. Vivamus mollis, ipsum ut suscipit molestie, augue nisl maximus lectus, id condimentum dui leo ac lectus. Donec arcu velit, pellentesque ut rutrum pharetra, convallis at ligula. Cras vel justo a nulla gravida porta. Sed vestibulum eget ipsum a scelerisque.</p>
 <p>Ut venenatis et mauris at venenatis. Proin vitae lacus sagittis, ultrices lorem non, tincidunt enim. Mauris sit amet odio et sapien tristique sollicitudin vel ut nisl. Nulla mauris diam, commodo quis ex porta, ornare auctor eros. Aliquam egestas felis non libero sodales condimentum ac sed magna. Morbi vitae ante in ligula faucibus aliquam. Vivamus nec gravida odio. Duis pharetra diam a malesuada gravida. Curabitur sit amet tincidunt dui. In sagittis augue at nibh fringilla fringilla. Curabitur volutpat in leo id fringilla.</p>
-""";
+''';
 
 class IframeScreen extends StatefulWidget {
   @override
@@ -50,7 +50,7 @@ class _State extends State<IframeScreen> {
           ),
           HtmlWidget(
             html,
-            key: Key("$webView$webViewJs"),
+            key: Key('$webView$webViewJs'),
             unsupportedWebViewWorkaroundForIssue37: true,
             webView: webView,
             webViewJs: webViewJs,

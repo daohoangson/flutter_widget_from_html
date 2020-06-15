@@ -1,5 +1,5 @@
 env:
-  FLUTTER_VERSION: v1.12.13-hotfix.5
+  FLUTTER_VERSION: '1.17.3'
 
 analyze_task:
   container:
@@ -50,10 +50,9 @@ ios_test_task:
     - analyze
     - unit_test
   osx_instance:
-    image: mojave-xcode-11.3
+    image: catalina-xcode
   install_flutter_script:
-    - _stableVersion=$( echo $FLUTTER_VERSION-stable | sed 's/-/+/' )
-    - curl https://storage.googleapis.com/flutter_infra/releases/stable/macos/flutter_macos_$_stableVersion.zip -o flutter.zip
+    - curl https://storage.googleapis.com/flutter_infra/releases/stable/macos/flutter_macos_$FLUTTER_VERSION-stable.zip -o flutter.zip
     - unzip -qq flutter.zip
     - mv flutter $HOME/flutter
   create_simulator_script:
@@ -76,7 +75,7 @@ android_test_task:
     - analyze
     - unit_test
   env:
-    AWS_ACCESS_KEY_ID: ENCRYPTED[bfad5318e7b922be21065747210e175bff4a016be7b7f32d0e34a5e7c145ac5c685088a16a28488f76259b07bf960e8a]
+    AWS_ACCESS_KEY_ID: AKIAY43IFJQXIX5OS5OM
     AWS_DEFAULT_REGION: us-west-2
-    AWS_SECRET_ACCESS_KEY: ENCRYPTED[c2e879143bcfa89be383584812034fbef751beb2968629aaef34e427dc834a88cbeb953152d660fd243d8b1018c4c771]
+    AWS_SECRET_ACCESS_KEY: ENCRYPTED[fe3999edbfb5c2b0033566f579bb4b51189a925d7d7e507bc6952bb3c6320163e611b391c49425b51e7078900b2a5a74]
   test_script: ./tool/sylph/cmd.sh

@@ -128,6 +128,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     if (_future != null) {
       return FutureBuilder<Widget>(
