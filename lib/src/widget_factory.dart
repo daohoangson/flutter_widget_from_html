@@ -54,6 +54,7 @@ class WidgetFactory extends core.WidgetFactory {
     bool controls,
     double height,
     bool loop,
+    String posterUrl,
     double width,
   }) {
     final dimensOk = height != null && height > 0 && width != null && width > 0;
@@ -64,6 +65,7 @@ class WidgetFactory extends core.WidgetFactory {
       autoplay: autoplay,
       controls: controls,
       loop: loop,
+      poster: posterUrl != null ? buildImage(posterUrl) : null,
     );
   }
 

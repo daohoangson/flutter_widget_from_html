@@ -44,6 +44,8 @@ class _TagVideo {
       controls: a.containsKey('controls'),
       height: a.containsKey('height') ? double.tryParse(a['height']) : null,
       loop: a.containsKey('loop'),
+      posterUrl:
+          a.containsKey('poster') ? wf.constructFullUrl(a['poster']) : null,
       width: a.containsKey('width') ? double.tryParse(a['width']) : null,
     );
   }

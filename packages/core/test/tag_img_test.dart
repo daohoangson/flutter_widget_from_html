@@ -7,47 +7,23 @@ import '_.dart' as helper;
 void main() {
   group('image.png', () {
     final src = 'http://domain.com/image.png';
-    final explain = (WidgetTester t, String html) => helper.explain(t, html);
+    final explain = (WidgetTester tester, String html) => helper.explain(
+          tester,
+          html,
+          preTest: (context) =>
+              precacheImage(NetworkImage(src), context, onError: (_, __) {}),
+        );
 
     testWidgets('renders src', (WidgetTester tester) async {
       final html = '<img src="$src" />';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals('[NetworkImage:url=$src]'),
-      );
+      final e = await explain(tester, html);
+      expect(e, equals('[ImageLayout(NetworkImage("$src", scale: 1.0))]'));
     });
 
     testWidgets('renders data-src', (WidgetTester tester) async {
       final html = '<img data-src="$src" />';
       final e = await explain(tester, html);
-      expect(e, equals('[NetworkImage:url=$src]'));
-    });
-
-    testWidgets('renders data uri', (WidgetTester tester) async {
-      // https://stackoverflow.com/questions/6018611/smallest-data-uri-image-possible-for-a-transparent-image
-      final html = '<img src="data:image/gif;base64,'
-          'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[MemoryImage:]'));
-    });
-
-    testWidgets('renders bad data uri', (WidgetTester tester) async {
-      final html = '<img src="data:image/xxx" />';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[widget0]'));
-    });
-
-    testWidgets('renders bad data uri with alt text', (tester) async {
-      final html = '<img src="data:image/xxx" alt="Foo" />';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
-    });
-
-    testWidgets('renders bad data uri with title text', (tester) async {
-      final html = '<img src="data:image/xxx" title="Foo" />';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(e, equals('[ImageLayout(NetworkImage("$src", scale: 1.0))]'));
     });
 
     testWidgets('renders in one RichText', (WidgetTester tester) async {
@@ -56,9 +32,9 @@ void main() {
       expect(
         explained,
         equals('[RichText:(:'
-            "[NetworkImage:url=$src]"
+            '[ImageLayout(NetworkImage("$src", scale: 1.0))]'
             '(: )'
-            "[NetworkImage:url=$src]"
+            '[ImageLayout(NetworkImage("$src", scale: 1.0))]'
             ')]'),
       );
     });
@@ -80,8 +56,11 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals("[ImageLayout:child=[NetworkImage:url=$src],"
-              'height=600.0,width=800.0]'));
+          equals('[ImageLayout('
+              'NetworkImage("$src", scale: 1.0), '
+              'height: 600.0, '
+              'width: 800.0'
+              ')]'));
     });
 
     testWidgets('renders dimensions in inline style', (tester) async {
@@ -89,8 +68,11 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals("[ImageLayout:child=[NetworkImage:url=$src],"
-              'height=600.0,width=800.0]'));
+          equals('[ImageLayout('
+              'NetworkImage("$src", scale: 1.0), '
+              'height: 600.0, '
+              'width: 800.0'
+              ')]'));
     });
 
     testWidgets('renders between texts', (WidgetTester tester) async {
@@ -100,7 +82,7 @@ void main() {
           explained,
           equals('[RichText:(:'
               'Before text. '
-              "[NetworkImage:url=$src]"
+              '[ImageLayout(NetworkImage("$src", scale: 1.0))]'
               '(: After text.)'
               ')]'));
     });
@@ -127,15 +109,25 @@ void main() {
 
     testWidgets('renders asset', (WidgetTester tester) async {
       final html = '<img src="asset:$assetName" />';
-      final e = await explain(tester, html);
-      expect(e, equals("[AssetImage:assetName=$assetName]"));
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[ImageLayout(AssetImage('
+              'bundle: null, '
+              'name: "$assetName"'
+              '))]'));
     });
 
     testWidgets('renders asset (specified package)', (tester) async {
       final package = 'package';
       final html = '<img src="asset:$assetName?package=$package" />';
-      final e = await explain(tester, html, package: package);
-      expect(e, equals("[AssetImage:assetName=$assetName,package=$package]"));
+      final explained = await explain(tester, html, package: package);
+      expect(
+          explained,
+          equals('[ImageLayout(AssetImage('
+              'bundle: null, '
+              'name: "packages/$package/$assetName"'
+              '))]'));
     });
 
     testWidgets('renders bad asset', (WidgetTester tester) async {
@@ -161,11 +153,10 @@ void main() {
     final explain = helper.explain;
 
     testWidgets('renders data uri', (WidgetTester tester) async {
-      // https://stackoverflow.com/questions/6018611/smallest-data-uri-image-possible-for-a-transparent-image
-      final html = '<img src="data:image/gif;base64,'
-          'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />';
+      final html = '<img src="${helper.kDataUri}" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[MemoryImage:]'));
+      final e = explained.replaceAll(RegExp(r'Uint8List#[0-9a-f]+,'), 'bytes,');
+      expect(e, equals('[ImageLayout(MemoryImage(bytes, scale: 1.0))]'));
     });
 
     testWidgets('renders bad data uri', (WidgetTester tester) async {
@@ -194,14 +185,14 @@ void main() {
       String fullUrl, {
       Uri baseUrl,
     }) async {
-      final explained = await helper.explain(tester, null,
+      final e = await helper.explain(tester, null,
           hw: HtmlWidget(
             html,
             baseUrl: baseUrl ?? Uri.parse('http://base.com/path/'),
             bodyPadding: const EdgeInsets.all(0),
             key: helper.hwKey,
           ));
-      expect(explained, equals('[NetworkImage:url=$fullUrl]'));
+      expect(e, equals('[ImageLayout(NetworkImage("$fullUrl", scale: 1.0))]'));
     };
 
     testWidgets('renders full url', (WidgetTester tester) async {

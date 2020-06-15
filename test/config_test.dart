@@ -163,10 +163,10 @@ void main() {
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              '[ImageLayout:'
-              'child=[CachedNetworkImageProvider:],'
-              'text=image dot png'
-              ']]'));
+              '[ImageLayout('
+              'CachedNetworkImageProvider("http://base.com/path/image.png", scale: 1.0), '
+              'text: "image dot png"'
+              ')]]'));
     });
   });
 
@@ -339,7 +339,7 @@ void main() {
       expect(
           e,
           equals('[Padding:(10,10,10,10),child='
-              "[GestureDetector:child=[Text:$webViewSrc]]"
+              '[GestureDetector:child=[Text:$webViewSrc]]'
               ']'));
     });
 
@@ -354,7 +354,7 @@ void main() {
       expect(
           explained,
           equals('[Padding:(10,10,10,10),child='
-              "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=1,js=1]"
+              '[WebView("$webViewSrc", aspectRatio=1.78, getDimensions: true)]'
               ']'));
     });
 
@@ -399,7 +399,7 @@ void main() {
         expect(
             explained,
             equals('[Padding:(10,10,10,10),child='
-                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=1,js=1,issue37]"
+                '[WebView("$webViewSrc", aspectRatio=1.78, getDimensions: true, unsupportedWorkaroundForIssue37: true)]'
                 ']'));
       });
 
@@ -415,7 +415,7 @@ void main() {
         expect(
             explained,
             equals('[Padding:(10,10,10,10),child='
-                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=1,js=1]"
+                '[WebView("$webViewSrc", aspectRatio=1.78, getDimensions: true)]'
                 ']'));
       });
 
@@ -431,7 +431,7 @@ void main() {
         expect(
             explained,
             equals('[Padding:(10,10,10,10),child='
-                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=1,js=1]"
+                '[WebView("$webViewSrc", aspectRatio=1.78, getDimensions: true)]'
                 ']'));
       });
     });
@@ -449,7 +449,7 @@ void main() {
         expect(
             explained,
             equals('[Padding:(10,10,10,10),child='
-                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=1,js=1]"
+                '[WebView("$webViewSrc", aspectRatio=1.78, getDimensions: true)]'
                 ']'));
       });
 
@@ -465,7 +465,7 @@ void main() {
         expect(
             explained,
             equals('[Padding:(10,10,10,10),child='
-                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=0,js=0]"
+                '[WebView("$webViewSrc", aspectRatio=1.78, js: false)]'
                 ']'));
       });
 
@@ -481,7 +481,7 @@ void main() {
         expect(
             explained,
             equals('[Padding:(10,10,10,10),child='
-                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=0,js=0]"
+                '[WebView("$webViewSrc", aspectRatio=1.78, js: false)]'
                 ']'));
       });
     });
