@@ -45,7 +45,7 @@ unit_test_task:
       path: packages/example/test/golden/failures/*
 
 ios_test_task:
-  skip: "!changesInclude('lib/src/web_view.dart')"
+  skip: "!changesInclude('lib/src/widget/web_view.dart')"
   depends_on:
     - analyze
     - unit_test
@@ -67,7 +67,7 @@ ios_test_task:
     - ./tool/integration.sh
 
 android_test_task:
-  skip: "!changesInclude('lib/src/video_player.dart', 'lib/src/web_view.dart')"
+  skip: "!changesInclude('lib/src/widget/video_player.dart', 'lib/src/widget/web_view.dart')"
   trigger_type: manual
   container:
     image: cirrusci/flutter:$FLUTTER_VERSION
