@@ -8,7 +8,13 @@
   "author": "Dao Hoang Son <daohoangson@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@now/node": "^1.7.0",
     "now": "^19.1.0"
+  },
+  "devDependencies": {
+    "@now/node": "^1.7.0"
+  },
+  "scripts": {
+    "deploy": "now --token=$ZEIT_TOKEN",
+    "dev": "now dev --token=$ZEIT_TOKEN"
   }
 }

@@ -98,4 +98,4 @@ api_task:
   deploy_script:
     - cd api
     - echo $NOW_PROJECT_JSON > .now/project.json
-    - npx now --token $ZEIT_TOKEN
+    - npm run deploy
