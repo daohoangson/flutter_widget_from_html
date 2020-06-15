@@ -4,8 +4,8 @@ description: Flutter plugin for widget tree building from html that supports hyp
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
 environment:
-  flutter: ">=1.10.15-pre.148 <2.0.0"
-  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+  flutter: ">=1.12.13+hotfix.5 <2.0.0"
+  sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
   cached_network_image: ^2.2.0+1
@@ -15,7 +15,7 @@ dependencies:
   flutter_svg: ^0.17.4
   flutter_widget_from_html_core: ^0.4.1-rc.2020052701
   html: ^0.14.0+3
-  url_launcher: ^5.4.2
+  url_launcher: ^5.4.10
   video_player: ^0.10.8+1
   webview_flutter: ^0.3.19+9
 
