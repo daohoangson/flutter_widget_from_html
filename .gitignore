@@ -1,4 +1,5 @@
 .cirrus
+.node
 awscli*
 **/failures/*.png
 
