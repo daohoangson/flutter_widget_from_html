@@ -124,7 +124,7 @@ void main() {
     final html = '<em><span style="color: red;">'
         '<div style="text-align: right;">right</div></span></em>';
     final explained = await explain(tester, html);
-    expect(explained, equals('[RichText,align=right:(+i:right)]'));
+    expect(explained, equals('[RichText,align=right:(#FFFF0000+i:right)]'));
   });
 
   testWidgets('renders margin inside', (WidgetTester tester) async {
