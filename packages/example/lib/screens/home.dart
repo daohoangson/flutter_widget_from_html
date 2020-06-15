@@ -4,6 +4,7 @@ import 'compare.dart';
 import 'hello_world.dart';
 import 'hello_world_core.dart';
 import 'iframe.dart';
+import 'iframe_twitter.dart';
 import 'img.dart';
 import 'smilie.dart';
 import 'video.dart';
@@ -61,6 +62,7 @@ CODE tag:
 
 <code><span style="color: #000000"><span style="color: #0000BB">&lt;?php phpinfo</span><span style="color: #007700">(); </span><span style="color: #0000BB">?&gt;</span></span></code>""",
     'Iframe': () => IframeScreen(),
+    'Iframe/Twitter': () => IframeTwitterScreen(),
     'Images': () => ImgScreen(),
     'Lists (LI/OL/UL)': '''<ol type="I">
   <li>One</li>
