@@ -36,7 +36,9 @@ class _TagQBit extends TextBit {
 
   _TagQBit(TextBits parent, {@required this.isOpening}) : super(parent);
 
+  @override
   String get data => isOpening ? '“' : '”';
 
+  @override
   TextStyleBuilders get tsb => parent.tsb;
 }

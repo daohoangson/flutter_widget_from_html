@@ -57,7 +57,6 @@ void main() {
       null,
       hw: HtmlWidget(
         html,
-        bodyPadding: const EdgeInsets.all(0),
         factoryBuilder: () => _BlockquoteWebViewWf(),
         key: hwKey,
       ),
@@ -65,7 +64,7 @@ void main() {
     expect(
         explained,
         equals('[Column:children=[RichText:(:Above)],'
-            '[WebView:url=data:text/html;charset=utf-8,Foo,aspectRatio=1.78,getDimensions=1,js=1],'
+            '[WebView("data:text/html;charset=utf-8,Foo", aspectRatio=1.78, getDimensions: true)],'
             '[RichText:(:Below)]]'));
   });
 }

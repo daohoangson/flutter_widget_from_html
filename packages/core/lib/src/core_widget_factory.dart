@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'dart:ui' as ui show ParagraphBuilder;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
@@ -63,8 +64,7 @@ class WidgetFactory {
         return Align(alignment: alignment, child: widget);
       });
 
-  Widget buildBody(Iterable<Widget> children) =>
-      buildPadding(buildColumn(children), widget.bodyPadding);
+  Widget buildBody(Iterable<Widget> children) => buildColumn(children);
 
   Widget buildColumn(Iterable<Widget> children) => children?.isNotEmpty == true
       ? WidgetPlaceholder(
@@ -151,7 +151,7 @@ class WidgetFactory {
   GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
       ? () => widget.onTapUrl != null
           ? widget.onTapUrl(url)
-          : print("[flutter_widget_from_html] Tapped url $url")
+          : print('[flutter_widget_from_html] Tapped url $url')
       : null;
 
   InlineSpan buildGestureTapCallbackSpan(
@@ -272,7 +272,7 @@ class WidgetFactory {
     final overline = pd?.contains(TextDecoration.overline) == true;
     final underline = pd?.contains(TextDecoration.underline) == true;
 
-    final List<TextDecoration> list = [];
+    final list = <TextDecoration>[];
     if (meta.decoOver == true || (overline && meta.decoOver != false)) {
       list.add(TextDecoration.overline);
     }
@@ -387,7 +387,7 @@ class WidgetFactory {
         if (i >= 1 && i <= 26) {
           // the specs said it's unspecified after the 26th item
           // TODO: generate something like aa, ab, etc. when needed
-          return "${String.fromCharCode(96 + i)}.";
+          return '${String.fromCharCode(96 + i)}.';
         }
         return '';
       case _kCssListStyleTypeAlphaUpper:
@@ -395,21 +395,21 @@ class WidgetFactory {
         if (i >= 1 && i <= 26) {
           // the specs said it's unspecified after the 26th item
           // TODO: generate something like AA, AB, etc. when needed
-          return "${String.fromCharCode(64 + i)}.";
+          return '${String.fromCharCode(64 + i)}.';
         }
         return '';
       case _kCssListStyleTypeCircle:
         return '-';
       case _kCssListStyleTypeDecimal:
-        return "$i.";
+        return '$i.';
       case _kCssListStyleTypeDisc:
         return '•';
       case _kCssListStyleTypeRomanLower:
         final roman = getListStyleMarkerRoman(i)?.toLowerCase();
-        return roman != null ? "$roman." : '';
+        return roman != null ? '$roman.' : '';
       case _kCssListStyleTypeRomanUpper:
         final roman = getListStyleMarkerRoman(i);
-        return roman != null ? "$roman." : '';
+        return roman != null ? '$roman.' : '';
       case _kCssListStyleTypeSquare:
         return '+';
     }

@@ -25,7 +25,7 @@ class BuildOp {
     _BuildOpOnWidgets onWidgets,
     this.priority = 10,
   })  : _defaultStyles = defaultStyles,
-        this.isBlockElement = isBlockElement ?? onWidgets != null,
+        isBlockElement = isBlockElement ?? onWidgets != null,
         _onChild = onChild,
         _onPieces = onPieces,
         _onWidgets = onWidgets;
@@ -109,7 +109,7 @@ class CssLength {
   double getValue(BuildContext context, TextStyleBuilders tsb) {
     double value;
 
-    switch (this.unit) {
+    switch (unit) {
       case CssLengthUnit.em:
         value = tsb.build(context).fontSize * number / 1;
         break;
@@ -175,6 +175,7 @@ class TextStyleBuilders {
   final TextStyleBuilders parent;
 
   BuildContext _context;
+  TextStyle _default;
   TextStyle _output;
   TextAlign _textAlign;
 
@@ -190,7 +191,7 @@ class TextStyleBuilders {
     TextStyle Function(TextStyleBuilders, TextStyle, T) builder,
     T input,
   ) {
-    assert(_output == null, "Cannot add builder after being built");
+    assert(_output == null, 'Cannot add builder after being built');
     _builders.add(builder);
     _inputs.add(input);
   }
@@ -200,13 +201,13 @@ class TextStyleBuilders {
     if (_output != null) return _output;
 
     if (parent == null) {
-      _output = DefaultTextStyle.of(_context).style;
+      _output = _default;
     } else {
       _output = parent.build(_context);
     }
 
     final l = _builders.length;
-    for (int i = 0; i < l; i++) {
+    for (var i = 0; i < l; i++) {
       _output = _builders[i](this, _output, _inputs[i]);
     }
 
@@ -216,9 +217,11 @@ class TextStyleBuilders {
   TextStyleBuilders sub() => TextStyleBuilders(parent: this);
 
   void _resetContextIfNeeded(BuildContext context) {
-    if (context == _context) return;
+    final contextStyle = DefaultTextStyle.of(context).style;
+    if (context == _context && contextStyle == _default) return;
 
     _context = context;
+    _default = contextStyle;
     _output = null;
     _textAlign = null;
   }

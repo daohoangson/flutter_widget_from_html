@@ -14,7 +14,7 @@ class WebView extends StatefulWidget {
 
   WebView(
     this.url, {
-    this.aspectRatio,
+    @required this.aspectRatio,
     this.getDimensions = false,
     this.getDimensionsDurations = const [
       null,
@@ -35,13 +35,13 @@ class WebView extends StatefulWidget {
   _WebViewState createState() => _WebViewState();
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.debug}) =>
-      "[WebView:url=$url,"
-      "aspectRatio=${aspectRatio.toStringAsFixed(2)},"
-      "getDimensions=${getDimensions ? 1 : 0},"
-      "js=${js ? 1 : 0}"
-      "${unsupportedWorkaroundForIssue37 == true ? ',issue37' : ''}"
-      ']';
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
+      'WebView("$url"'
+      ', aspectRatio=${aspectRatio.toStringAsFixed(2)}'
+      "${getDimensions ? ', getDimensions: $getDimensions' : ''}"
+      "${!js ? ', js: $js' : ''}"
+      "${unsupportedWorkaroundForIssue37 ? ', unsupportedWorkaroundForIssue37: $unsupportedWorkaroundForIssue37' : ''}"
+      ')';
 }
 
 class _WebViewState extends State<WebView> {
@@ -52,7 +52,7 @@ class _WebViewState extends State<WebView> {
   String _firstFinishedUrl;
 
   @override
-  initState() {
+  void initState() {
     super.initState();
     _aspectRatio = widget.aspectRatio;
 
@@ -108,8 +108,8 @@ class _WebViewState extends State<WebView> {
     if (!mounted) return;
 
     final evals = await Future.wait([
-      eval("document.body.scrollWidth"),
-      eval("document.body.scrollHeight"),
+      eval('document.body.scrollWidth'),
+      eval('document.body.scrollHeight'),
     ]);
     final w = double.tryParse(evals[0] ?? '') ?? 0;
     final h = double.tryParse(evals[1] ?? '') ?? 0;
@@ -137,7 +137,7 @@ class _WebViewState extends State<WebView> {
   }
 
   void _onPageFinished(String url) {
-    if (_firstFinishedUrl == null) _firstFinishedUrl = url;
+    _firstFinishedUrl ??= url;
 
     if (widget.getDimensions == true) {
       widget.getDimensionsDurations.forEach((t) => t == null
