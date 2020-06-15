@@ -80,6 +80,20 @@ class CssBorders {
   CssBorderSide top;
 }
 
+class CssLineHeight {
+  final double _value;
+
+  CssLineHeight.normal() : _value = -1;
+
+  CssLineHeight.number(this._value) : assert(_value >= 0);
+
+  CssLineHeight.percentage(double value)
+      : assert(value >= 0),
+        _value = value / 100.0;
+
+  double get value => _value == -1 ? null : _value;
+}
+
 class CssLength {
   final double number;
   final CssLengthUnit unit;
@@ -97,7 +111,7 @@ class CssLength {
 
     switch (unit) {
       case CssLengthUnit.em:
-        value = tsb.build(context).fontSize * number / 1;
+        value = tsb.build(context).style.fontSize * number / 1;
         break;
       case CssLengthUnit.px:
         value = number;
@@ -152,8 +166,39 @@ enum CssLengthUnit {
   px,
 }
 
-typedef NodeMetadataCollector = NodeMetadata Function(
-    NodeMetadata meta, dom.Element e);
+@immutable
+class TextStyleHtml {
+  final CssLineHeight height;
+  final TextStyle style;
+  final TextAlign align;
+
+  TextStyleHtml._({
+    this.height,
+    this.style,
+    this.align,
+  });
+
+  TextStyleHtml.style(this.style)
+      : height = null,
+        align = null;
+
+  TextStyleHtml copyWith({
+    CssLineHeight height,
+    TextStyle style,
+    TextAlign align,
+  }) =>
+      TextStyleHtml._(
+        height: height ?? this.height,
+        style: style ?? this.style,
+        align: align ?? this.align,
+      );
+
+  TextStyle build(BuildContext _) {
+    var built = style;
+    if (height != null) built = built.copyWith(height: height.value);
+    return built;
+  }
+}
 
 class TextStyleBuilders {
   final _builders = <Function>[];
@@ -161,28 +206,23 @@ class TextStyleBuilders {
   final TextStyleBuilders parent;
 
   BuildContext _context;
-  TextStyle _default;
-  TextStyle _output;
-  TextAlign _textAlign;
-
-  BuildContext get context => _context;
-
-  TextAlign get textAlign => _textAlign ?? parent?.textAlign;
-
-  set textAlign(TextAlign v) => _textAlign = v;
+  TextStyleHtml _default;
+  TextStyleHtml _output;
 
   TextStyleBuilders({this.parent});
 
+  BuildContext get context => _context;
+
   void enqueue<T>(
-    TextStyle Function(TextStyleBuilders, TextStyle, T) builder,
+    TextStyleHtml Function(TextStyleBuilders, TextStyleHtml, T) builder, [
     T input,
-  ) {
+  ]) {
     assert(_output == null, 'Cannot add builder after being built');
     _builders.add(builder);
     _inputs.add(input);
   }
 
-  TextStyle build(BuildContext context) {
+  TextStyleHtml build(BuildContext context) {
     _resetContextIfNeeded(context);
     if (_output != null) return _output;
 
@@ -200,15 +240,16 @@ class TextStyleBuilders {
     return _output;
   }
 
+  TextStyle style(BuildContext context) => build(context).build(context);
+
   TextStyleBuilders sub() => TextStyleBuilders(parent: this);
 
   void _resetContextIfNeeded(BuildContext context) {
     final contextStyle = DefaultTextStyle.of(context).style;
-    if (context == _context && contextStyle == _default) return;
+    if (context == _context && contextStyle == _default.style) return;
 
     _context = context;
-    _default = contextStyle;
+    _default = TextStyleHtml.style(contextStyle);
     _output = null;
-    _textAlign = null;
   }
 }

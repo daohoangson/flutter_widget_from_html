@@ -7,15 +7,6 @@ const _kCssTextAlignJustify = 'justify';
 const _kCssTextAlignLeft = 'left';
 const _kCssTextAlignRight = 'right';
 
-TextStyle _styleTextAlignBuilder(
-  TextStyleBuilders tsb,
-  TextStyle parent,
-  TextAlign align,
-) {
-  if (align != null) tsb.textAlign = align;
-  return parent;
-}
-
 class _StyleTextAlign {
   final WidgetFactory wf;
 
@@ -26,7 +17,7 @@ class _StyleTextAlign {
         onPieces: (meta, pieces) {
           // handle texts
           final v = meta.style(_kCssTextAlign);
-          meta.tsb.enqueue(_styleTextAlignBuilder, _getTextAlign(v));
+          meta.tsb.enqueue(tsb, _getTextAlign(v));
 
           // handle widgets
           final alignment = _getAlignment(v);
@@ -44,36 +35,39 @@ class _StyleTextAlign {
           return newPieces;
         },
       );
-}
 
-Alignment _getAlignment(String textAlign) {
-  switch (textAlign) {
-    case _kCssTextAlignCenter:
-      return Alignment.center;
-    case _kCssTextAlignJustify:
-      return Alignment.centerLeft;
-    case _kCssTextAlignLeft:
-      return Alignment.centerLeft;
-    case _kCssTextAlignRight:
-      return Alignment.centerRight;
+  static Alignment _getAlignment(String textAlign) {
+    switch (textAlign) {
+      case _kCssTextAlignCenter:
+        return Alignment.center;
+      case _kCssTextAlignJustify:
+        return Alignment.centerLeft;
+      case _kCssTextAlignLeft:
+        return Alignment.centerLeft;
+      case _kCssTextAlignRight:
+        return Alignment.centerRight;
+    }
+
+    return null;
   }
 
-  return null;
-}
+  static TextAlign _getTextAlign(String textAlign) {
+    switch (textAlign) {
+      case _kCssTextAlignCenter:
+        return TextAlign.center;
+      case _kCssTextAlignJustify:
+        return TextAlign.justify;
+      case _kCssTextAlignLeft:
+        return TextAlign.left;
+      case _kCssTextAlignRight:
+        return TextAlign.right;
+    }
 
-TextAlign _getTextAlign(String textAlign) {
-  switch (textAlign) {
-    case _kCssTextAlignCenter:
-      return TextAlign.center;
-    case _kCssTextAlignJustify:
-      return TextAlign.justify;
-    case _kCssTextAlignLeft:
-      return TextAlign.left;
-    case _kCssTextAlignRight:
-      return TextAlign.right;
+    return null;
   }
 
-  return null;
+  static TextStyleHtml tsb(TextStyleBuilders _, TextStyleHtml p, TextAlign v) =>
+      p.copyWith(align: v);
 }
 
 Widget _childOf(Widget widget) {

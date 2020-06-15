@@ -96,7 +96,7 @@ class HtmlBuilder {
     }
 
     meta.domElement = e;
-    meta.tsb = parentTsb.sub()..enqueue(wf.buildTextStyle, meta);
+    meta.tsb = parentTsb.sub()..enqueue(wf.tsb, meta);
 
     return meta;
   }
@@ -208,6 +208,7 @@ class NodeMetadata {
   String fontSize;
   bool fontStyleItalic;
   FontWeight fontWeight;
+  CssLineHeight height;
   bool _isBlockElement;
   bool isNotRenderable;
   List<String> _styles;

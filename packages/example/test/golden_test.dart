@@ -172,6 +172,13 @@ void main() {
 <span style="font-weight: 800">eight</span>
 <span style="font-weight: 900">nine</span>
 ''',
+    'inline/line-height': '''
+<p>Normal</p>
+<p style="line-height: 1.5">Line height x1.5</p>
+<p>Normal</p>
+<p style="line-height: 300%">Line height x3</p>
+<p>Normal</p>
+''',
     'DEL': 'This is some <del>deleted</del> text.',
     'INS': 'This is some <ins>inserted</ins> text.',
     'S': '<s>Foo</s>',

@@ -1253,6 +1253,52 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     });
   });
 
+  group('line-height', () {
+    testWidgets('renders number', (WidgetTester tester) async {
+      final html = '<span style="line-height: 1">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+height=1.0:Foo)]'));
+    });
+
+    testWidgets('renders decimal', (WidgetTester tester) async {
+      final html = '<span style="line-height: 1.1">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+height=1.1:Foo)]'));
+    });
+
+    testWidgets('renders percentage', (WidgetTester tester) async {
+      final html = '<span style="line-height: 50%">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+height=0.5:Foo)]'));
+    });
+
+    testWidgets('renders invalid', (WidgetTester tester) async {
+      final html = '<span style="line-height: xxx">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('renders child element (same)', (WidgetTester tester) async {
+      final html = '<span style="line-height: 1">Foo <em>bar</em></span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(:(+height=1.0:Foo )(+height=1.0+i:bar))]'));
+    });
+
+    testWidgets('renders child element (override)', (tester) async {
+      final html = '<span style="line-height: 1">Foo '
+          '<em style="line-height: 2">bar</em></span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(:(+height=1.0:Foo )(+height=2.0+i:bar))]'));
+    });
+
+    testWidgets('renders child element (normal)', (WidgetTester tester) async {
+      final html = '<span style="line-height: 1">Foo '
+          '<em style="line-height: normal">bar</em></span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(:(+height=1.0:Foo )(+i:bar))]'));
+    });
+  });
+
   group('text-decoration', () {
     testWidgets('renders DEL tag', (WidgetTester tester) async {
       final html = 'This is some <del>deleted</del> text.';

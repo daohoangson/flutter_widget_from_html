@@ -63,7 +63,7 @@ class _StyleVerticalAlign {
     _VerticalAlignInput input,
   ) {
     final child = wf.buildColumn(widgets);
-    final fontSize = input.tsb.build(context).fontSize;
+    final fontSize = input.tsb.build(context).style.fontSize;
     final padding = input.padding;
     assert(padding != null);
 
