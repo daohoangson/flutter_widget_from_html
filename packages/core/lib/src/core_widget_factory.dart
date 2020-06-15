@@ -241,7 +241,7 @@ class WidgetFactory {
     TextBits text,
   ) {
     final tsb = text.tsb;
-    tsb?.build(context);
+    final tsh = tsb?.build(context);
 
     final textScaleFactor = MediaQuery.of(context).textScaleFactor;
     final widgets = <Widget>[];
@@ -249,7 +249,7 @@ class WidgetFactory {
       if (compiled is InlineSpan) {
         widgets.add(RichText(
           text: compiled,
-          textAlign: tsb?.textAlign ?? TextAlign.start,
+          textAlign: tsh?.align ?? TextAlign.start,
           textScaleFactor: textScaleFactor,
         ));
       } else if (compiled is Widget) {
@@ -319,11 +319,11 @@ class WidgetFactory {
     return null;
   }
 
-  TextStyle buildTextStyle(TextStyleBuilders tsb, TextStyle p, NodeMetadata m) {
+  TextStyleHtml tsb(TextStyleBuilders tsb, TextStyleHtml p, NodeMetadata m) {
     if (m == null) return p;
 
-    final decoration = buildTextDecoration(p, m);
-    final fontSize = buildTextFontSize(tsb, p, m);
+    final decoration = buildTextDecoration(p.style, m);
+    final fontSize = buildTextFontSize(tsb, p.style, m);
     final fontStyle = buildFontStyle(m);
     if (m.color == null &&
         decoration == null &&
@@ -337,16 +337,18 @@ class WidgetFactory {
     }
 
     return p.copyWith(
-      color: m.color,
-      decoration: decoration,
-      decorationStyle: m.decorationStyle,
-      fontFamily:
-          m.fontFamilies?.isNotEmpty == true ? m.fontFamilies.first : null,
-      fontFamilyFallback: m.fontFamilies?.skip(1)?.toList(growable: false),
-      fontSize: fontSize,
-      fontStyle: fontStyle,
-      fontWeight: m.fontWeight,
-      height: m.height?.value,
+      height: m.height,
+      style: p.style.copyWith(
+        color: m.color,
+        decoration: decoration,
+        decorationStyle: m.decorationStyle,
+        fontFamily:
+            m.fontFamilies?.isNotEmpty == true ? m.fontFamilies.first : null,
+        fontFamilyFallback: m.fontFamilies?.skip(1)?.toList(growable: false),
+        fontSize: fontSize,
+        fontStyle: fontStyle,
+        fontWeight: m.fontWeight,
+      ),
     );
   }
 

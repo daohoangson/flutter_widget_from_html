@@ -69,9 +69,9 @@ class _TagRuby {
       TextWidget(
         parent,
         WidgetPlaceholder<_TagRuby>(builder: (context, _, __) {
-          final rtStyle = rtTsb.build(context);
+          final rtTsh = rtTsb.build(context);
           final padding = EdgeInsets.symmetric(
-              vertical: rtStyle.fontSize *
+              vertical: rtTsh.style.fontSize *
                   .75 *
                   MediaQuery.of(context).textScaleFactor);
 

@@ -1291,13 +1291,12 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(e, equals('[RichText:(:(+height=1.0:Foo )(+height=2.0+i:bar))]'));
     });
 
-    // TODO: needs to wait for https://github.com/flutter/flutter/pull/58766
-    // testWidgets('renders child element (normal)', (WidgetTester tester) async {
-    //   final html = '<span style="line-height: 1">Foo '
-    //       '<em style="line-height: normal">bar</em></span>';
-    //   final e = await explain(tester, html);
-    //   expect(e, equals('[RichText:(:(+height=1.0:Foo )(+height=1.0+i:bar))]'));
-    // });
+    testWidgets('renders child element (normal)', (WidgetTester tester) async {
+      final html = '<span style="line-height: 1">Foo '
+          '<em style="line-height: normal">bar</em></span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(:(+height=1.0:Foo )(+i:bar))]'));
+    });
   });
 
   group('text-decoration', () {

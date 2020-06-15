@@ -36,7 +36,7 @@ class _TextCompiler {
     _spans = <InlineSpan>[];
 
     _buffer = StringBuffer();
-    _style = tsb?.build(_context);
+    _style = tsb?.style(_context);
 
     _prevBuffer = _buffer;
     _prevStyle = _style;
@@ -46,7 +46,7 @@ class _TextCompiler {
     final tsb = _getBitTsb(bit);
     if (_spans == null) _resetLoop(tsb);
 
-    final style = tsb?.build(_context) ?? _prevStyle;
+    final style = tsb?.style(_context) ?? _prevStyle;
     if (style != _prevStyle) _saveSpan();
 
     if (bit.canCompile) {
@@ -93,7 +93,8 @@ class _TextCompiler {
 
       if (span is WidgetSpan &&
           span.alignment == PlaceholderAlignment.baseline &&
-          (text.tsb?.textAlign ?? TextAlign.start) == TextAlign.start) {
+          (text.tsb?.build(_context)?.align ?? TextAlign.start) ==
+              TextAlign.start) {
         widget = span.child;
       }
     } else if (_spans.isNotEmpty || _buffer.isNotEmpty) {
