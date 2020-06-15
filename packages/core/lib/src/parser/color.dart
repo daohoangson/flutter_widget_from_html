@@ -4,7 +4,7 @@ const _kCssColor = 'color';
 
 final _colorHexRegExp = RegExp(r'^#([a-f0-9]{3,8})$', caseSensitive: false);
 final _colorRgbRegExp = RegExp(
-    r'^(rgba?)\(([0-9]+)[,\s]+([0-9]+)[,\s]+([0-9]+)([,\s]+([0-9.]+))?\)$');
+    r'^(rgba?)\(([0-9.]+%?)[,\s]+([0-9.]+%?)[,\s]+([0-9.]+%?)([,\s/]+([0-9.]+%?))?\)$');
 
 String _convertColorToHex(Color value) {
   final r = value.red.toRadixString(16).padLeft(2, '0');
@@ -39,29 +39,36 @@ Color _parseColor(String value) {
   final valueLowerCase = value.toLowerCase();
   final rgbMatch = _colorRgbRegExp.firstMatch(valueLowerCase);
   if (rgbMatch != null) {
-    final rgbType = rgbMatch[1];
-    final rgbR = int.tryParse(rgbMatch[2]);
-    final rgbG = int.tryParse(rgbMatch[3]);
-    final rgbB = int.tryParse(rgbMatch[4]);
-    final rgbA =
-        double.tryParse(rgbType == 'rgba' ? (rgbMatch[6] ?? '') : '1.0');
-    if (rgbR != null &&
-        rgbR >= 0 &&
-        rgbR <= 255 &&
-        rgbG != null &&
-        rgbG >= 0 &&
-        rgbG <= 255 &&
-        rgbB != null &&
-        rgbB >= 0 &&
-        rgbB <= 255 &&
-        rgbA != null &&
-        rgbA >= 0 &&
-        rgbA <= 1) {
-      return Color.fromARGB((255 * rgbA).ceil(), rgbR, rgbG, rgbB);
+    final rgbR = _parseColorPart(rgbMatch[2], 0, 255);
+    final rgbG = _parseColorPart(rgbMatch[3], 0, 255);
+    final rgbB = _parseColorPart(rgbMatch[4], 0, 255);
+    final rgbA = _parseColorPart(rgbMatch[6] ?? '1', 0, 1);
+    if (rgbR != null && rgbG != null && rgbB != null && rgbA != null) {
+      return Color.fromARGB(
+        (255 * rgbA).ceil(),
+        rgbR.toInt(),
+        rgbG.toInt(),
+        rgbB.toInt(),
+      );
     }
   }
 
   return null;
+}
+
+double _parseColorPart(String value, double min, double max) {
+  double v;
+
+  if (value.endsWith('%')) {
+    final p = double.tryParse(value.substring(0, value.length - 1));
+    if (p == null || p < 0) return null;
+    v = p / 100.0 * max;
+  }
+
+  v ??= double.tryParse(value);
+
+  if (v < min || v > max) return null;
+  return v;
 }
 
 String _x2(String value) {

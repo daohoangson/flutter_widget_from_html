@@ -670,14 +670,32 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
         expect(explained, equals('[RichText:(#80000000:Foo)]'));
       });
 
-      testWidgets('renders rgb without comma', (WidgetTester tester) async {
-        final html = '<span style="color: rgb(255 0 0)">Foo</span>';
+      testWidgets('renders rgb red in percentage', (tester) async {
+        final html = '<span style="color: rgb(100.0%, 0, 0)">Foo</span>';
         final explained = await explain(tester, html);
         expect(explained, equals('[RichText:(#FFFF0000:Foo)]'));
       });
 
-      testWidgets('renders rgba without comma', (WidgetTester tester) async {
-        final html = '<span style="color: rgba(0 0 0 0.5)">Foo</span>';
+      testWidgets('renders rgb green in percentage', (tester) async {
+        final html = '<span style="color: rgb(0, 100.0%, 0)">Foo</span>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(#FF00FF00:Foo)]'));
+      });
+
+      testWidgets('renders rgb blue in percentage', (tester) async {
+        final html = '<span style="color: rgb(0, 0, 100.0%)">Foo</span>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(#FF0000FF:Foo)]'));
+      });
+
+      testWidgets('renders rgba alpha in percentage', (tester) async {
+        final html = '<span style="color: rgba(0, 0, 0, 50%)">Foo</span>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(#80000000:Foo)]'));
+      });
+
+      testWidgets('renders without comma', (WidgetTester tester) async {
+        final html = '<span style="color: rgba(0 0 0 / 0.5)">Foo</span>';
         final explained = await explain(tester, html);
         expect(explained, equals('[RichText:(#80000000:Foo)]'));
       });
@@ -686,21 +704,24 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
         final htmls = [
           '<span style="color: rgb(-1, 0, 0)">Foo</span>',
           '<span style="color: rgb(999, 0, 0)">Foo</span>',
+          '<span style="color: rgb(1000%, 0, 0)">Foo</span>',
           '<span style="color: rgb(xxx, 0, 0)">Foo</span>',
           '<span style="color: rgb(0, -1, 0)">Foo</span>',
           '<span style="color: rgb(0, 999, 0)">Foo</span>',
+          '<span style="color: rgb(0, 1000%, 0)">Foo</span>',
           '<span style="color: rgb(0, xxx, 0)">Foo</span>',
           '<span style="color: rgb(0, 0, -1)">Foo</span>',
           '<span style="color: rgb(0, 0, 999)">Foo</span>',
+          '<span style="color: rgb(0, 0, 1000%)">Foo</span>',
           '<span style="color: rgb(0, 0, xxx)">Foo</span>',
-          '<span style="color: rgba(0, 0, 0)">Foo</span>',
           '<span style="color: rgba(0, 0, 0, -1)">Foo</span>',
           '<span style="color: rgba(0, 0, 0, 9)">Foo</span>',
+          '<span style="color: rgba(0, 0, 0, 1000%)">Foo</span>',
           '<span style="color: rgba(0, 0, 0, x)">Foo</span>',
         ];
         for (final html in htmls) {
           final explained = await explain(tester, html);
-          expect(explained, equals('[RichText:(:Foo)]'));
+          expect(explained, equals('[RichText:(:Foo)]'), reason: html);
         }
       });
     });
