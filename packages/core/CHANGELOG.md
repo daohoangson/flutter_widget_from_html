@@ -1,6 +1,39 @@
-## 0.3.2+2
+## 0.4.1-rc.2020052701
+
+* BREAKING: Remove `HtmlConfig` and change `factoryBuilder` method signature (#173)
+* Add support for multiple font families (#172)
+* Fix whitespace regex (#185)
+* Fix `background-color` priority conflict with `padding` (#171)
+* Switch to MIT license
+
+## 0.4.0-rc.2020043001
+
+* Improve SUB, SUP to avoid overlapping (#164)
+* Add support for async build (#154)
+* Replace `builderCallback` with `customStylesBuilder` and `customWidgetBuilder` (#169)
+* Remove `TextStyleBuilders.recognizer` (#168)
+* Remove `lazySet` method (#169)
+* Fix conflict between TABLE and background-color (#171)
+
+## 0.4.0-rc.2020041601
+
+* Simplify `WidgetFactory.buildText` (#162)
+* Fix bug vertical-align with block element inside (#159)
+
+## 0.4.0-rc.2020040701
 
 * Use minimum main axis size
+* Improve whitespace handling (#137)
+* Improve support for right-to-left (#141)
+* Add support for async build
+* Add support for tag SUB, SUP and inline style `vertical-align` (#143)
+* Add support for tag RUBY (#144)
+* Add support for attribute `align` (#153) 
+* Fix text bit loop initial state (#156)
+
+## 0.4.0-rc.2020021401
+
+* Disable rendering of tag SVG
 
 ## 0.3.2+1
 
