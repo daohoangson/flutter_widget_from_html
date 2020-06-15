@@ -3,6 +3,8 @@ part of '../core_widget_factory.dart';
 const _kCssColor = 'color';
 
 final _colorHexRegExp = RegExp(r'^#([a-f0-9]{3,8})$', caseSensitive: false);
+final _colorHslRegExp = RegExp(
+    r'^(hsla?)\(([0-9.-]+)(deg|rad|grad|turn)?[,\s]+([0-9.]+%)[,\s]+([0-9.]+%)([,\s/]+([0-9.]+%?))?\)$');
 final _colorRgbRegExp = RegExp(
     r'^(rgba?)\(([0-9.]+%?)[,\s]+([0-9.]+%?)[,\s]+([0-9.]+%?)([,\s/]+([0-9.]+%?))?\)$');
 
@@ -53,7 +55,47 @@ Color _parseColor(String value) {
     }
   }
 
+  final hslMatch = _colorHslRegExp.firstMatch(valueLowerCase);
+  if (hslMatch != null) {
+    final hslH = _parseColorHue(hslMatch[2], hslMatch[3]);
+    final hslS = _parseColorPart(hslMatch[4], 0, 1);
+    final hslL = _parseColorPart(hslMatch[5], 0, 1);
+    final hslA = _parseColorPart(hslMatch[7] ?? '1', 0, 1);
+    if (hslH != null && hslS != null && hslL != null && hslA != null) {
+      return HSLColor.fromAHSL(hslA, hslH, hslS, hslL).toColor();
+    }
+  }
+
   return null;
+}
+
+double _parseColorHue(String number, String unit) {
+  final v = double.tryParse(number);
+  if (v == null) return null;
+
+  double deg;
+  switch (unit) {
+    case 'rad':
+      final rad = v;
+      deg = rad * (180 / pi);
+      break;
+    case 'grad':
+      final grad = v;
+      deg = grad * 0.9;
+      break;
+    case 'turn':
+      final turn = v;
+      deg = turn * 360;
+      break;
+    default:
+      deg = v;
+  }
+
+  while (deg < 0) {
+    deg += 360;
+  }
+
+  return deg % 360;
 }
 
 double _parseColorPart(String value, double min, double max) {
