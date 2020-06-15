@@ -240,7 +240,7 @@ class Explainer {
     }
 
     if (style.height != null) {
-      s += "+height=${style.height}";
+      s += '+height=${style.height}';
     }
 
     if (style.fontSize != parent.fontSize) {
