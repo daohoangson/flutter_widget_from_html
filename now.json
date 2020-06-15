@@ -1,7 +1,6 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/*", "use": "@now/node" },
     { "src": "doc/api/**/*", "use": "@now/static" },
     { "src": "packages/core/doc/api/**/*", "use": "@now/static" },
     { "src": "packages/example/screenshots/*", "use": "@now/static" }

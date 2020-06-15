@@ -1,0 +1,14 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daohoangson/flutter_widget_from_html.git"
+  },
+  "author": "Dao Hoang Son <daohoangson@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@now/node": "^1.7.0",
+    "now": "^19.1.0"
+  }
+}
