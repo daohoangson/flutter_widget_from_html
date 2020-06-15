@@ -208,6 +208,8 @@ Color _parseColor(String value) {
   }
 
   final valueLowerCase = value.toLowerCase();
+  if (valueLowerCase == 'transparent') return Color(0x00000000);
+  // TODO: add support for `currentcolor`
   if (_kCssColors.containsKey(valueLowerCase)) {
     return _parseColor(_kCssColors[valueLowerCase]);
   }

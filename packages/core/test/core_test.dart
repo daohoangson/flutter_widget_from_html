@@ -839,6 +839,12 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
         }
       });
     });
+
+    testWidgets('renders transparent', (WidgetTester tester) async {
+      final html = '<span style="color: transparent">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(#00000000:Foo)]'));
+    });
   });
 
   group('display', () {
