@@ -739,6 +739,26 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       });
     });
 
+    group('named color', () {
+      testWidgets('renders red', (WidgetTester tester) async {
+        final html = '<span style="color: red">Foo</span>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(#FFFF0000:Foo)]'));
+      });
+
+      testWidgets('renders green', (WidgetTester tester) async {
+        final html = '<span style="color: green">Foo</span>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(#FF008000:Foo)]'));
+      });
+
+      testWidgets('renders blue', (WidgetTester tester) async {
+        final html = '<span style="color: blue">Foo</span>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(#FF0000FF:Foo)]'));
+      });
+    });
+
     group('rgb/a', () {
       testWidgets('renders rgb red', (WidgetTester tester) async {
         final html = '<span style="color: rgb(255, 0, 0)">Foo</span>';
