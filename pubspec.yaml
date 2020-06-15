@@ -17,7 +17,7 @@ dependencies:
   html: ^0.14.0+3
   url_launcher: ^5.4.10
   video_player: ^0.10.11+1
-  webview_flutter: ^0.3.19+9
+  webview_flutter: ^0.3.22+1
 
 dependency_overrides:
   flutter_widget_from_html_core:
