@@ -48,12 +48,15 @@ class _State extends State<IframeScreen> {
             title: HtmlWidget('<var>.webViewJs</var>'),
             subtitle: const Text('Allows JavaScript execution, default ✅'),
           ),
-          HtmlWidget(
-            html,
-            key: Key('$webView$webViewJs'),
-            unsupportedWebViewWorkaroundForIssue37: true,
-            webView: webView,
-            webViewJs: webViewJs,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: HtmlWidget(
+              html,
+              key: Key('$webView$webViewJs'),
+              unsupportedWebViewWorkaroundForIssue37: true,
+              webView: webView,
+              webViewJs: webViewJs,
+            ),
           ),
         ]),
       );

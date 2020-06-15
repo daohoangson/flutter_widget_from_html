@@ -14,7 +14,13 @@ class SmilieScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text('SmilieScreen'),
         ),
-        body: HtmlWidget(kHtml, factoryBuilder: () => _SmiliesWidgetFactory()),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(
+            kHtml,
+            factoryBuilder: () => _SmiliesWidgetFactory(),
+          ),
+        ),
       );
 }
 

@@ -57,7 +57,6 @@ void main() {
       null,
       hw: HtmlWidget(
         html,
-        bodyPadding: const EdgeInsets.all(0),
         factoryBuilder: () => _BlockquoteWebViewWf(),
         key: hwKey,
       ),

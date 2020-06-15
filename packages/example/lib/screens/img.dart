@@ -35,8 +35,11 @@ class _State extends State<ImgScreen> {
       );
 
   Widget _buildHtmlWidget(String html) => SingleChildScrollView(
-        child: HtmlWidget(
-          '$html<hr /><pre>${HtmlEscape().convert(html)}</pre>',
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(
+            '$html<hr /><pre>${HtmlEscape().convert(html)}</pre>',
+          ),
         ),
       );
 

@@ -19,7 +19,7 @@ See the [Example app](https://github.com/daohoangson/flutter_widget_from_html/tr
 Note: `HtmlWidget.config` is optional, see dartdoc for all available configuration keys and their default values.
 
 ```dart
-const kHtml = """
+const kHtml = '''
 <h1>Heading</h1>
 <p>A paragraph with <strong>strong</strong> <em>emphasized</em> text.</p>
 <ol>
@@ -35,7 +35,7 @@ const kHtml = """
 </ol>
 <p>And YouTube video!</p>
 <iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="560" height="315"></iframe>
-""";
+''';
 
 class HelloWorldScreen extends StatelessWidget {
   @override
@@ -43,9 +43,12 @@ class HelloWorldScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text('HelloWorldScreen'),
         ),
-        body: HtmlWidget(
-          kHtml,
-          webView: true,
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(
+            kHtml,
+            webView: true,
+          ),
         ),
       );
 }

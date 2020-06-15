@@ -35,21 +35,23 @@ class _State extends State<IframeTwitterScreen> {
             onChanged: (v) => setState(() => useApi = v),
             title: HtmlWidget('Use iframe API'),
           ),
-          HtmlWidget(
-            html,
-            key: ValueKey(useApi),
-            customStylesBuilder: (e) =>
-                (e.localName == 'blockquote') ? ['margin', '0'] : null,
-            customWidgetBuilder: (e) {
-              if (e.localName == 'blockquote' &&
-                  e.attributes['class'] == 'twitter-tweet') {
-                final body = html +
-                    '<script async src="https://platform.twitter.com/widgets.js"></script>';
-                final apiUrl =
-                    'https://document.flutter-widget-from-html.now.sh/api/iframe.ts?body=${Uri.encodeComponent(body)}';
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: HtmlWidget(
+              html,
+              key: ValueKey(useApi),
+              customStylesBuilder: (e) =>
+                  (e.localName == 'blockquote') ? ['margin', '0'] : null,
+              customWidgetBuilder: (e) {
+                if (e.localName == 'blockquote' &&
+                    e.attributes['class'] == 'twitter-tweet') {
+                  final body = html +
+                      '<script async src="https://platform.twitter.com/widgets.js"></script>';
+                  final apiUrl =
+                      'https://document.flutter-widget-from-html.now.sh/api/iframe.ts?body=${Uri.encodeComponent(body)}';
 
-                final dataUrl = Uri.dataFromString(
-                  '''<!doctype html>
+                  final dataUrl = Uri.dataFromString(
+                    '''<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -57,20 +59,21 @@ class _State extends State<IframeTwitterScreen> {
 </head>
 <body>$body</body>
 </html>''',
-                  mimeType: 'text/html',
-                  encoding: Encoding.getByName('utf-8'),
-                ).toString();
+                    mimeType: 'text/html',
+                    encoding: Encoding.getByName('utf-8'),
+                  ).toString();
 
-                return WebView(
-                  useApi ? apiUrl : dataUrl,
-                  aspectRatio: 16 / 9,
-                  getDimensions: true,
-                );
-              }
+                  return WebView(
+                    useApi ? apiUrl : dataUrl,
+                    aspectRatio: 16 / 9,
+                    getDimensions: true,
+                  );
+                }
 
-              return null;
-            },
-            webView: true,
+                return null;
+              },
+              webView: true,
+            ),
           ),
         ]),
       );

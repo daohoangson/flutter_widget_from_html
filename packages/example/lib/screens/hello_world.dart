@@ -25,9 +25,12 @@ class HelloWorldScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text('HelloWorldScreen'),
         ),
-        body: HtmlWidget(
-          kHtml,
-          webView: true,
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(
+            kHtml,
+            webView: true,
+          ),
         ),
       );
 }

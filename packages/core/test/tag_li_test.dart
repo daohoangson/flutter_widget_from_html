@@ -612,11 +612,7 @@ void main() {
       final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';
       final explained = await explain(tester, null,
           hw: Directionality(
-            child: HtmlWidget(
-              html,
-              key: hwKey,
-              bodyPadding: const EdgeInsets.all(0),
-            ),
+            child: HtmlWidget(html, key: hwKey),
             textDirection: TextDirection.rtl,
           ));
       expect(

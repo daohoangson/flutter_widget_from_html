@@ -16,8 +16,9 @@ const redX = '<span style="background-color:#f00;font-size:0.75em;">x</span>';
 
 class _TestApp extends StatelessWidget {
   final String html;
+  final Key targetKey;
 
-  const _TestApp(this.html, {Key key}) : super(key: key);
+  const _TestApp(this.html, {Key key, this.targetKey}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => MaterialApp(
@@ -31,7 +32,10 @@ class _TestApp extends StatelessWidget {
                     padding: const EdgeInsets.all(10),
                   ),
                   Divider(),
-                  HtmlWidget(html),
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: HtmlWidget(html),
+                  ),
                 ],
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
@@ -39,6 +43,7 @@ class _TestApp extends StatelessWidget {
               decoration: BoxDecoration(color: Colors.white),
               width: 400,
             ),
+            key: targetKey,
           ),
         ),
         theme: ThemeData.light(),
@@ -46,9 +51,10 @@ class _TestApp extends StatelessWidget {
 }
 
 void _test(String name, String html) => testGoldens(name, (tester) async {
-      await tester.pumpWidget(_TestApp(html));
+      final key = UniqueKey();
+      await tester.pumpWidget(_TestApp(html, targetKey: key));
       await expectLater(
-        find.byType(HtmlWidget),
+        find.byKey(key),
         matchesGoldenFile('./images/$name.png'),
       );
     });

@@ -189,7 +189,6 @@ void main() {
           hw: HtmlWidget(
             html,
             baseUrl: baseUrl ?? Uri.parse('http://base.com/path/'),
-            bodyPadding: const EdgeInsets.all(0),
             key: helper.hwKey,
           ));
       expect(e, equals('[ImageLayout(NetworkImage("$fullUrl", scale: 1.0))]'));

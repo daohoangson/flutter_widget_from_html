@@ -28,9 +28,6 @@ class HtmlWidget extends StatefulWidget {
   /// the widget tree is ready without error handling.
   final AsyncWidgetBuilder<Widget> buildAsyncBuilder;
 
-  /// The amount of space by which to inset the built widget tree.
-  final EdgeInsets bodyPadding;
-
   /// The callback to specify custom stylings.
   final CustomStylesBuilder customStylesBuilder;
 
@@ -69,7 +66,6 @@ class HtmlWidget extends StatefulWidget {
     this.baseUrl,
     this.buildAsync,
     this.buildAsyncBuilder,
-    this.bodyPadding = const EdgeInsets.all(10),
     this.customStylesBuilder,
     this.customWidgetBuilder,
     this.enableCaching = true,

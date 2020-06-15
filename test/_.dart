@@ -37,7 +37,6 @@ Future<String> explain(
       hw: hw ??
           HtmlWidget(
             html,
-            bodyPadding: const EdgeInsets.all(0),
             key: helper.hwKey,
             webView: webView,
           ),

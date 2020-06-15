@@ -5,28 +5,6 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import '_.dart';
 
 void main() {
-  testWidgets('renders body padding', (WidgetTester tester) async {
-    final html = 'Foo';
-    final e = await explain(tester, null,
-        hw: HtmlWidget(
-          html,
-          bodyPadding: const EdgeInsets.all(10),
-          key: hwKey,
-        ));
-    expect(e, equals('[Padding:(10,10,10,10),child=[RichText:(:Foo)]]'));
-  });
-
-  testWidgets("doesn't render body padding", (tester) async {
-    final html = 'Foo';
-    final explained = await explain(tester, null,
-        hw: HtmlWidget(
-          html,
-          bodyPadding: const EdgeInsets.all(0),
-          key: hwKey,
-        ));
-    expect(explained, equals('[RichText:(:Foo)]'));
-  });
-
   group('trimming', () {
     testWidgets('trims top intances', (WidgetTester tester) async {
       final html = '<div style="margin-top: 1em">Foo</div>';
@@ -58,7 +36,6 @@ void main() {
       final explained = await explain(tester, null,
           hw: HtmlWidget(
             html,
-            bodyPadding: const EdgeInsets.all(0),
             key: hwKey,
             tableCellPadding: const EdgeInsets.all(5),
           ));
@@ -73,7 +50,6 @@ void main() {
       final explained = await explain(tester, null,
           hw: HtmlWidget(
             html,
-            bodyPadding: const EdgeInsets.all(0),
             key: hwKey,
             tableCellPadding: const EdgeInsets.all(0),
           ));

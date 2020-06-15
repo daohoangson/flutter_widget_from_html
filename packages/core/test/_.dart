@@ -43,7 +43,6 @@ Future<String> explain(
   assert((html == null) != (hw == null));
   hw ??= HtmlWidget(
     html,
-    bodyPadding: const EdgeInsets.all(0),
     key: hwKey,
     tableCellPadding: const EdgeInsets.all(0),
     textStyle: textStyle,
@@ -111,7 +110,6 @@ Future<String> explainMargin(
       textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
       child: HtmlWidget(
         'x${html}x',
-        bodyPadding: const EdgeInsets.all(0),
         key: hwKey,
       ),
     ),

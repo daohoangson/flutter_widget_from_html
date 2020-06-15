@@ -62,8 +62,7 @@ class WidgetFactory {
         return Align(alignment: alignment, child: widget);
       });
 
-  Widget buildBody(Iterable<Widget> children) =>
-      buildPadding(buildColumn(children), widget.bodyPadding);
+  Widget buildBody(Iterable<Widget> children) => buildColumn(children);
 
   Widget buildColumn(Iterable<Widget> children) => children?.isNotEmpty == true
       ? WidgetPlaceholder(
