@@ -161,6 +161,7 @@ class TextStyleBuilders {
   final TextStyleBuilders parent;
 
   BuildContext _context;
+  TextStyle _default;
   TextStyle _output;
   TextAlign _textAlign;
 
@@ -186,7 +187,7 @@ class TextStyleBuilders {
     if (_output != null) return _output;
 
     if (parent == null) {
-      _output = DefaultTextStyle.of(_context).style;
+      _output = _default;
     } else {
       _output = parent.build(_context);
     }
@@ -202,9 +203,11 @@ class TextStyleBuilders {
   TextStyleBuilders sub() => TextStyleBuilders(parent: this);
 
   void _resetContextIfNeeded(BuildContext context) {
-    if (context == _context) return;
+    final contextStyle = DefaultTextStyle.of(context).style;
+    if (context == _context && contextStyle == _default) return;
 
     _context = context;
+    _default = contextStyle;
     _output = null;
     _textAlign = null;
   }
