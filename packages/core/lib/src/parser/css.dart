@@ -44,6 +44,10 @@ const _kCssFontWeight700 = '700';
 const _kCssFontWeight800 = '800';
 const _kCssFontWeight900 = '900';
 
+const _kCssTextOverflow = 'text-overflow';
+const _kCssTextOverflowClip = 'clip';
+const _kCssTextOverflowEllipsis = 'ellipsis';
+
 const _kCssTextDecoration = 'text-decoration';
 const _kCssTextDecorationLineThrough = 'line-through';
 const _kCssTextDecorationNone = 'none';

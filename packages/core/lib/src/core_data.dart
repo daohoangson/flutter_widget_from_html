@@ -171,26 +171,31 @@ class TextStyleHtml {
   final TextAlign align;
   final CssLineHeight lineHeight;
   final TextStyle style;
+  final TextOverflow textOverflow;
 
   TextStyleHtml._({
     this.align,
     this.lineHeight,
     this.style,
+    this.textOverflow,
   });
 
   TextStyleHtml.style(this.style)
-      : height = null,
-        align = null;
+      : align = null,
+        lineHeight = null,
+        textOverflow = null;
 
   TextStyleHtml copyWith({
     TextAlign align,
     CssLineHeight lineHeight,
     TextStyle style,
+    TextOverflow textOverflow,
   }) =>
       TextStyleHtml._(
         align: align ?? this.align,
         lineHeight: lineHeight ?? this.lineHeight,
         style: style ?? this.style,
+        textOverflow: textOverflow ?? this.textOverflow,
       );
 
   TextStyle build(BuildContext _) {

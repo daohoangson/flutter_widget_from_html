@@ -251,6 +251,7 @@ class WidgetFactory {
           text: compiled,
           textAlign: tsh?.align ?? TextAlign.start,
           textScaleFactor: textScaleFactor,
+          overflow: tsh?.textOverflow,
         ));
       } else if (compiled is Widget) {
         widgets.add(compiled);
@@ -596,6 +597,17 @@ class WidgetFactory {
         }
         break;
 
+      case _kCssTextOverflow:
+        switch (value) {
+          case _kCssTextOverflowClip:
+            meta.op = styleTextOverflow(TextOverflow.clip);
+            break;
+          case _kCssTextOverflowEllipsis:
+            meta.op = styleTextOverflow(TextOverflow.ellipsis);
+            break;
+        }
+        break;
+
       case _kCssVerticalAlign:
         meta.op = styleVerticalAlign();
         break;
@@ -848,6 +860,13 @@ class WidgetFactory {
     return _styleTextAlign;
   }
 
+  BuildOp styleTextOverflow(TextOverflow v) => BuildOp(
+      isBlockElement: true,
+      onPieces: (meta, pieces) {
+        meta.tsb.enqueue(_styleTextOverflowBuilder, v);
+        return pieces;
+      });
+
   BuildOp styleVerticalAlign() {
     _styleVerticalAlign ??= _StyleVerticalAlign(this).buildOp;
     return _styleVerticalAlign;
@@ -908,3 +927,7 @@ class WidgetFactory {
 }
 
 Iterable<Widget> _listOrNull(Widget x) => x == null ? null : [x];
+
+TextStyleHtml _styleTextOverflowBuilder(TextStyleBuilders tsb,
+        TextStyleHtml parent, TextOverflow textOverflow) =>
+    parent.copyWith(textOverflow: textOverflow);

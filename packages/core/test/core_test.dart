@@ -1369,4 +1369,18 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
       expect(explained, equals('[RichText:(:(+l+o+u:foo )(:bar))]'));
     });
   });
+
+  group('text-overflow', () {
+    testWidgets('renders clip', (WidgetTester tester) async {
+      final html = '<div style="text-overflow: clip">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText,overflow=clip:(:Foo)]'));
+    });
+
+    testWidgets('renders ellipsis', (WidgetTester tester) async {
+      final html = '<div style="text-overflow: ellipsis">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText,overflow=ellipsis:(:Foo)]'));
+    });
+  });
 }
