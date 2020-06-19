@@ -243,16 +243,31 @@ class WidgetFactory {
     final tsb = text.tsb;
     final tsh = tsb?.build(context);
 
+    final overflow = tsh?.textOverflow ?? TextOverflow.clip;
+    final textAlign = tsh?.align ?? TextAlign.start;
     final textScaleFactor = MediaQuery.of(context).textScaleFactor;
     final widgets = <Widget>[];
     for (final compiled in _TextCompiler(text).compile(context)) {
       if (compiled is InlineSpan) {
-        widgets.add(RichText(
-          text: compiled,
-          textAlign: tsh?.align ?? TextAlign.start,
-          textScaleFactor: textScaleFactor,
-          overflow: tsh?.textOverflow ?? TextOverflow.clip,
-        ));
+        widgets.add(overflow == TextOverflow.ellipsis
+            ? LayoutBuilder(
+                builder: (_, bc) => RichText(
+                      text: compiled,
+                      textAlign: textAlign,
+                      textScaleFactor: textScaleFactor,
+                      maxLines:
+                          bc.biggest.height.isFinite && bc.biggest.height > 0
+                              ? (bc.biggest.height / compiled.style.fontSize)
+                                  .floor()
+                              : null,
+                      overflow: overflow,
+                    ))
+            : RichText(
+                text: compiled,
+                textAlign: textAlign,
+                textScaleFactor: textScaleFactor,
+                overflow: overflow,
+              ));
       } else if (compiled is Widget) {
         widgets.add(compiled);
       }
