@@ -12,6 +12,7 @@ import 'core_helpers.dart';
 
 part 'ops/style_bg_color.dart';
 part 'ops/style_direction.dart';
+part 'ops/style_line_height.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_padding.dart';
 part 'ops/style_text_align.dart';
@@ -28,7 +29,6 @@ part 'ops/text.dart';
 part 'parser/border.dart';
 part 'parser/color.dart';
 part 'parser/css.dart';
-part 'parser/line_height.dart';
 part 'parser/length.dart';
 
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
@@ -331,13 +331,11 @@ class WidgetFactory {
         m.fontFamilies == null &&
         fontSize == null &&
         fontStyle == null &&
-        m.fontWeight == null &&
-        m.height == null) {
+        m.fontWeight == null) {
       return p;
     }
 
     return p.copyWith(
-      height: m.height,
       style: p.style.copyWith(
         color: m.color,
         decoration: decoration,
@@ -568,7 +566,7 @@ class WidgetFactory {
 
       case _kCssLineHeight:
         final lineHeight = parseCssLineHeight(value);
-        if (lineHeight != null) meta.height = lineHeight;
+        if (lineHeight != null) meta.op = styleLineHeight(lineHeight);
 
         break;
 
@@ -831,7 +829,9 @@ class WidgetFactory {
     return _styleBgColor;
   }
 
-  BuildOp styleDirection(final String dir) => _styleDirection(this, dir);
+  BuildOp styleDirection(String dir) => _styleDirection(this, dir);
+
+  BuildOp styleLineHeight(CssLineHeight v) => _styleLineHeight(this, v);
 
   BuildOp styleMargin() {
     _styleMargin ??= _StyleMargin(this).buildOp;

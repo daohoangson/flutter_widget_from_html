@@ -28,3 +28,13 @@ CssLineHeight _parseCssLineHeight(String value) {
 
   return null;
 }
+
+BuildOp _styleLineHeight(WidgetFactory wf, CssLineHeight v) =>
+    BuildOp(onPieces: (meta, pieces) {
+      meta.tsb.enqueue(_styleLineHeightBuilder, v);
+      return pieces;
+    });
+
+TextStyleHtml _styleLineHeightBuilder(TextStyleBuilders tsb,
+        TextStyleHtml parent, CssLineHeight lineHeight) =>
+    parent.copyWith(lineHeight: lineHeight);
