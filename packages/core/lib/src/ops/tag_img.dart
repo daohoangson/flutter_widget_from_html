@@ -49,17 +49,8 @@ class _TagImg {
     Map<dynamic, String> map,
     String key,
   ) {
-    final value = meta.style(key);
-    if (value != null) {
-      final match = _dimensionRegExp.matchAsPrefix(value);
-      if (match != null) {
-        final parsed = double.tryParse(match.group(1));
-        if (parsed != null) return parsed;
-      }
-    }
-
-    final value2 = _getAttr(map, key, 'data-$key');
-    return value2 != null ? double.tryParse(value2) : null;
+    final value = _getAttr(map, key, 'data-$key');
+    return value != null ? double.tryParse(value) : null;
   }
 
   static _TagImgMetadata _parseMetadata(NodeMetadata meta, WidgetFactory wf) {
