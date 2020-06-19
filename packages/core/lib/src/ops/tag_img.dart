@@ -1,7 +1,5 @@
 part of '../core_widget_factory.dart';
 
-final _dimensionRegExp = RegExp(r'^(.+)px$');
-
 class _TagImg {
   final WidgetFactory wf;
 
