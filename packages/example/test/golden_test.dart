@@ -205,6 +205,8 @@ void main() {
 <span style="text-decoration: underline">
 foo <span style="text-decoration: none">bar</span></span></span></span>
 ''',
+    'inline/text-overflow/ellipsis':
+        '<div style="max-lines: 2; text-overflow: ellipsis">${"hello world " * 50}</div>',
     'inline/margin/4_values': '''
 ----
 <div style="margin: 1px 2px 3px 4px">all</div>
