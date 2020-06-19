@@ -1374,7 +1374,7 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
     testWidgets('renders clip', (WidgetTester tester) async {
       final html = '<div style="text-overflow: clip">Foo</div>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,overflow=clip:(:Foo)]'));
+      expect(explained, equals('[RichText:(:Foo)]'));
     });
 
     testWidgets('renders ellipsis', (WidgetTester tester) async {

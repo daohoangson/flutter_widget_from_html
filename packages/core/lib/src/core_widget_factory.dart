@@ -251,7 +251,7 @@ class WidgetFactory {
           text: compiled,
           textAlign: tsh?.align ?? TextAlign.start,
           textScaleFactor: textScaleFactor,
-          overflow: tsh?.textOverflow,
+          overflow: tsh?.textOverflow ?? TextOverflow.clip,
         ));
       } else if (compiled is Widget) {
         widgets.add(compiled);

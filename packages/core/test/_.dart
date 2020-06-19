@@ -212,9 +212,10 @@ class Explainer {
   String _textDirection(TextDirection textDirection) =>
       textDirection.toString().replaceAll('TextDirection.', '');
 
-  String _textOverflow(TextOverflow textOverflow) => textOverflow != null
-      ? textOverflow.toString().replaceAll('TextOverflow.', '')
-      : '';
+  String _textOverflow(TextOverflow textOverflow) =>
+      (textOverflow != null && textOverflow != TextOverflow.clip)
+          ? textOverflow.toString().replaceAll('TextOverflow.', '')
+          : '';
 
   String _textStyle(TextStyle style, TextStyle parent) {
     var s = '';
