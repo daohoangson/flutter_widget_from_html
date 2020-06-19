@@ -15,6 +15,7 @@ part 'ops/style_direction.dart';
 part 'ops/style_line_height.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_padding.dart';
+part 'ops/style_sizing.dart';
 part 'ops/style_text_align.dart';
 part 'ops/style_vertical_align.dart';
 part 'ops/tag_a.dart';
@@ -38,6 +39,7 @@ class WidgetFactory {
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
   BuildOp _stylePadding;
+  BuildOp _styleSizing;
   BuildOp _styleTextAlign;
   BuildOp _styleVerticalAlign;
   BuildOp _tagA;
@@ -582,6 +584,15 @@ class WidgetFactory {
         }
         break;
 
+      case _kCssHeight:
+      case _kCssMaxHeight:
+      case _kCssMaxWidth:
+      case _kCssMinHeight:
+      case _kCssMinWidth:
+      case _kCssWidth:
+        meta.op = styleSizing();
+        break;
+
       case _kCssLineHeight:
         final lineHeight = parseCssLineHeight(value);
         if (lineHeight != null) meta.op = styleLineHeight(lineHeight);
@@ -883,6 +894,11 @@ class WidgetFactory {
   BuildOp stylePadding() {
     _stylePadding ??= _StylePadding(this).buildOp;
     return _stylePadding;
+  }
+
+  BuildOp styleSizing() {
+    _styleSizing ??= _StyleSizing(this).buildOp;
+    return _styleSizing;
   }
 
   BuildOp styleTextAlign() {

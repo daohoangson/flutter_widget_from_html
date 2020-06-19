@@ -130,6 +130,9 @@ class Explainer {
 
   String _borderSide(BorderSide s) => '${s.color},w=${s.width}';
 
+  String _boxConstraints(BoxConstraints bc) =>
+      bc.toString().replaceAll('BoxConstraints', '');
+
   String _boxDecoration(BoxDecoration d) {
     var s = '';
 
@@ -324,32 +327,35 @@ class Explainer {
         ? "${widget is Center ? '' : 'alignment=${widget.alignment},'}"
         : widget is AspectRatio
             ? 'aspectRatio=${widget.aspectRatio.toStringAsFixed(2)},'
-            : widget is DecoratedBox
-                ? _boxDecoration(widget.decoration)
-                : widget is Directionality
-                    ? '${_textDirection(widget.textDirection)},'
-                    : widget is GestureDetector
-                        ? 'child=${_widget(widget.child)}'
-                        : widget is InkWell
+            : widget is ConstrainedBox
+                ? 'constraints=${_boxConstraints(widget.constraints)},'
+                : widget is DecoratedBox
+                    ? _boxDecoration(widget.decoration)
+                    : widget is Directionality
+                        ? '${_textDirection(widget.textDirection)},'
+                        : widget is GestureDetector
                             ? 'child=${_widget(widget.child)}'
-                            : widget is LimitedBox
-                                ? _limitBox(widget)
-                                : widget is Padding
-                                    ? '${_edgeInsets(widget.padding)},'
-                                    : widget is Positioned
-                                        ? '(${widget.top},${widget.right},${widget.bottom},${widget.left}),'
-                                        : widget is RichText
-                                            ? _inlineSpan(widget.text)
-                                            : widget is SizedBox
-                                                ? '${widget.width?.toStringAsFixed(1) ?? 0.0}x${widget.height?.toStringAsFixed(1) ?? 0.0}'
-                                                : widget is Table
-                                                    ? _tableBorder(
-                                                        widget.border)
-                                                    : widget is Text
-                                                        ? widget.data
-                                                        : widget is Wrap
-                                                            ? _wrap(widget)
-                                                            : '';
+                            : widget is InkWell
+                                ? 'child=${_widget(widget.child)}'
+                                : widget is LimitedBox
+                                    ? _limitBox(widget)
+                                    : widget is Padding
+                                        ? '${_edgeInsets(widget.padding)},'
+                                        : widget is Positioned
+                                            ? '(${widget.top},${widget.right},${widget.bottom},${widget.left}),'
+                                            : widget is RichText
+                                                ? _inlineSpan(widget.text)
+                                                : widget is SizedBox
+                                                    ? '${widget.width?.toStringAsFixed(1) ?? 0.0}x${widget.height?.toStringAsFixed(1) ?? 0.0}'
+                                                    : widget is Table
+                                                        ? _tableBorder(
+                                                            widget.border)
+                                                        : widget is Text
+                                                            ? widget.data
+                                                            : widget is Wrap
+                                                                ? _wrap(widget)
+                                                                : '';
+
     var attrStr = '';
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign

@@ -172,6 +172,15 @@ void main() {
 <span style="font-weight: 800">eight</span>
 <span style="font-weight: 900">nine</span>
 ''',
+    'inline/sizing/complicated_box': '''
+<div style="background-color: red; color: white; padding: 20px;">
+  <div style="background-color: green;">
+    <div style="background-color: blue; height: 100px; margin: 15px; padding: 5px; width: 100px;">
+      Foo
+    </div>
+  </div>
+</div>
+''',
     'inline/line-height': '''
 <p>Normal</p>
 <p style="line-height: 1.5">Line height x1.5</p>

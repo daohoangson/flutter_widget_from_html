@@ -63,18 +63,6 @@ void main() {
               ')]'));
     });
 
-    testWidgets('renders dimensions in inline style', (tester) async {
-      final html = '<img src="$src" style="height: 600px; width: 800px" />';
-      final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[ImageLayout('
-              'NetworkImage("$src", scale: 1.0), '
-              'height: 600.0, '
-              'width: 800.0'
-              ')]'));
-    });
-
     testWidgets('renders between texts', (WidgetTester tester) async {
       final html = 'Before text. <img src="$src" /> After text.';
       final explained = await explain(tester, html);
