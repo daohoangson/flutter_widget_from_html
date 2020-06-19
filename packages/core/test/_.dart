@@ -355,6 +355,10 @@ class Explainer {
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));
     attrStr += textAlign.isNotEmpty ? ',align=$textAlign' : '';
+    final maxLines = widget is RichText
+        ? widget.maxLines
+        : widget is Text ? widget.maxLines : null;
+    if (maxLines != null) attrStr += ',maxLines=$maxLines';
     final textOverflow = _textOverflow(widget is RichText
         ? widget.overflow
         : widget is Text ? widget.overflow : null);

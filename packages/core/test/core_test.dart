@@ -1379,8 +1379,8 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
 
     testWidgets('renders ellipsis', (WidgetTester tester) async {
       final html = '<div style="text-overflow: ellipsis">Foo</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,overflow=ellipsis:(:Foo)]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText,maxLines=60,overflow=ellipsis:(:Foo)]'));
     });
   });
 }
