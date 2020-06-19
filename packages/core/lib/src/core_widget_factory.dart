@@ -243,13 +243,14 @@ class WidgetFactory {
     final tsb = text.tsb;
     final tsh = tsb?.build(context);
 
+    final maxLines = tsh?.maxLines == -1 ? null : tsh?.maxLines;
     final overflow = tsh?.textOverflow ?? TextOverflow.clip;
     final textAlign = tsh?.align ?? TextAlign.start;
     final textScaleFactor = MediaQuery.of(context).textScaleFactor;
     final widgets = <Widget>[];
     for (final compiled in _TextCompiler(text).compile(context)) {
       if (compiled is InlineSpan) {
-        widgets.add(overflow == TextOverflow.ellipsis
+        widgets.add(overflow == TextOverflow.ellipsis && maxLines == null
             ? LayoutBuilder(
                 builder: (_, bc) => RichText(
                       text: compiled,
@@ -266,6 +267,7 @@ class WidgetFactory {
                 text: compiled,
                 textAlign: textAlign,
                 textScaleFactor: textScaleFactor,
+                maxLines: maxLines,
                 overflow: overflow,
               ));
       } else if (compiled is Widget) {
@@ -586,6 +588,12 @@ class WidgetFactory {
 
         break;
 
+      case _kCssMaxLines:
+      case _kCssMaxLinesWebkitLineClamp:
+        final maxLines = value == _kCssMaxLinesNone ? -1 : int.tryParse(value);
+        if (maxLines != null) meta.op = styleMaxLines(maxLines);
+        break;
+
       case _kCssTextAlign:
         meta.op = styleTextAlign();
         break;
@@ -865,6 +873,13 @@ class WidgetFactory {
     return _styleMargin;
   }
 
+  BuildOp styleMaxLines(int v) => BuildOp(
+      isBlockElement: true,
+      onPieces: (meta, pieces) {
+        meta.tsb.enqueue(_styleMaxLinesBuilder, v);
+        return pieces;
+      });
+
   BuildOp stylePadding() {
     _stylePadding ??= _StylePadding(this).buildOp;
     return _stylePadding;
@@ -942,6 +957,10 @@ class WidgetFactory {
 }
 
 Iterable<Widget> _listOrNull(Widget x) => x == null ? null : [x];
+
+TextStyleHtml _styleMaxLinesBuilder(
+        TextStyleBuilders tsb, TextStyleHtml parent, int maxLines) =>
+    parent.copyWith(maxLines: maxLines);
 
 TextStyleHtml _styleTextOverflowBuilder(TextStyleBuilders tsb,
         TextStyleHtml parent, TextOverflow textOverflow) =>

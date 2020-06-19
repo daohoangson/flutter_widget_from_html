@@ -170,12 +170,14 @@ enum CssLengthUnit {
 class TextStyleHtml {
   final TextAlign align;
   final CssLineHeight lineHeight;
+  final int maxLines;
   final TextStyle style;
   final TextOverflow textOverflow;
 
   TextStyleHtml._({
     this.align,
     this.lineHeight,
+    this.maxLines,
     this.style,
     this.textOverflow,
   });
@@ -183,17 +185,20 @@ class TextStyleHtml {
   TextStyleHtml.style(this.style)
       : align = null,
         lineHeight = null,
+        maxLines = null,
         textOverflow = null;
 
   TextStyleHtml copyWith({
     TextAlign align,
     CssLineHeight lineHeight,
+    int maxLines,
     TextStyle style,
     TextOverflow textOverflow,
   }) =>
       TextStyleHtml._(
         align: align ?? this.align,
         lineHeight: lineHeight ?? this.lineHeight,
+        maxLines: maxLines ?? this.maxLines,
         style: style ?? this.style,
         textOverflow: textOverflow ?? this.textOverflow,
       );

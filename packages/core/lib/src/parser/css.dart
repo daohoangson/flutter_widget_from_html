@@ -44,6 +44,10 @@ const _kCssFontWeight700 = '700';
 const _kCssFontWeight800 = '800';
 const _kCssFontWeight900 = '900';
 
+const _kCssMaxLines = 'max-lines';
+const _kCssMaxLinesNone = 'none';
+const _kCssMaxLinesWebkitLineClamp = '-webkit-line-clamp';
+
 const _kCssTextOverflow = 'text-overflow';
 const _kCssTextOverflowClip = 'clip';
 const _kCssTextOverflowEllipsis = 'ellipsis';
