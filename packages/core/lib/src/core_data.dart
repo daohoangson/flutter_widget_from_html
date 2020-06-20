@@ -168,34 +168,44 @@ enum CssLengthUnit {
 
 @immutable
 class TextStyleHtml {
-  final CssLineHeight height;
-  final TextStyle style;
   final TextAlign align;
+  final CssLineHeight lineHeight;
+  final int maxLines;
+  final TextStyle style;
+  final TextOverflow textOverflow;
 
   TextStyleHtml._({
-    this.height,
-    this.style,
     this.align,
+    this.lineHeight,
+    this.maxLines,
+    this.style,
+    this.textOverflow,
   });
 
   TextStyleHtml.style(this.style)
-      : height = null,
-        align = null;
+      : align = null,
+        lineHeight = null,
+        maxLines = null,
+        textOverflow = null;
 
   TextStyleHtml copyWith({
-    CssLineHeight height,
-    TextStyle style,
     TextAlign align,
+    CssLineHeight lineHeight,
+    int maxLines,
+    TextStyle style,
+    TextOverflow textOverflow,
   }) =>
       TextStyleHtml._(
-        height: height ?? this.height,
-        style: style ?? this.style,
         align: align ?? this.align,
+        lineHeight: lineHeight ?? this.lineHeight,
+        maxLines: maxLines ?? this.maxLines,
+        style: style ?? this.style,
+        textOverflow: textOverflow ?? this.textOverflow,
       );
 
   TextStyle build(BuildContext _) {
     var built = style;
-    if (height != null) built = built.copyWith(height: height.value);
+    if (lineHeight != null) built = built.copyWith(height: lineHeight.value);
     return built;
   }
 }

@@ -12,6 +12,7 @@ import 'core_helpers.dart';
 
 part 'ops/style_bg_color.dart';
 part 'ops/style_direction.dart';
+part 'ops/style_line_height.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_padding.dart';
 part 'ops/style_sizing.dart';
@@ -29,7 +30,6 @@ part 'ops/text.dart';
 part 'parser/border.dart';
 part 'parser/color.dart';
 part 'parser/css.dart';
-part 'parser/line_height.dart';
 part 'parser/length.dart';
 
 final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
@@ -245,15 +245,33 @@ class WidgetFactory {
     final tsb = text.tsb;
     final tsh = tsb?.build(context);
 
+    final maxLines = tsh?.maxLines == -1 ? null : tsh?.maxLines;
+    final overflow = tsh?.textOverflow ?? TextOverflow.clip;
+    final textAlign = tsh?.align ?? TextAlign.start;
     final textScaleFactor = MediaQuery.of(context).textScaleFactor;
     final widgets = <Widget>[];
     for (final compiled in _TextCompiler(text).compile(context)) {
       if (compiled is InlineSpan) {
-        widgets.add(RichText(
-          text: compiled,
-          textAlign: tsh?.align ?? TextAlign.start,
-          textScaleFactor: textScaleFactor,
-        ));
+        widgets.add(overflow == TextOverflow.ellipsis && maxLines == null
+            ? LayoutBuilder(
+                builder: (_, bc) => RichText(
+                      text: compiled,
+                      textAlign: textAlign,
+                      textScaleFactor: textScaleFactor,
+                      maxLines:
+                          bc.biggest.height.isFinite && bc.biggest.height > 0
+                              ? (bc.biggest.height / compiled.style.fontSize)
+                                  .floor()
+                              : null,
+                      overflow: overflow,
+                    ))
+            : RichText(
+                text: compiled,
+                textAlign: textAlign,
+                textScaleFactor: textScaleFactor,
+                maxLines: maxLines,
+                overflow: overflow,
+              ));
       } else if (compiled is Widget) {
         widgets.add(compiled);
       }
@@ -333,13 +351,11 @@ class WidgetFactory {
         m.fontFamilies == null &&
         fontSize == null &&
         fontStyle == null &&
-        m.fontWeight == null &&
-        m.height == null) {
+        m.fontWeight == null) {
       return p;
     }
 
     return p.copyWith(
-      height: m.height,
       style: p.style.copyWith(
         color: m.color,
         decoration: decoration,
@@ -579,8 +595,14 @@ class WidgetFactory {
 
       case _kCssLineHeight:
         final lineHeight = parseCssLineHeight(value);
-        if (lineHeight != null) meta.height = lineHeight;
+        if (lineHeight != null) meta.op = styleLineHeight(lineHeight);
 
+        break;
+
+      case _kCssMaxLines:
+      case _kCssMaxLinesWebkitLineClamp:
+        final maxLines = value == _kCssMaxLinesNone ? -1 : int.tryParse(value);
+        if (maxLines != null) meta.op = styleMaxLines(maxLines);
         break;
 
       case _kCssTextAlign:
@@ -606,6 +628,17 @@ class WidgetFactory {
               meta.decoUnder = true;
               break;
           }
+        }
+        break;
+
+      case _kCssTextOverflow:
+        switch (value) {
+          case _kCssTextOverflowClip:
+            meta.op = styleTextOverflow(TextOverflow.clip);
+            break;
+          case _kCssTextOverflowEllipsis:
+            meta.op = styleTextOverflow(TextOverflow.ellipsis);
+            break;
         }
         break;
 
@@ -842,12 +875,21 @@ class WidgetFactory {
     return _styleBgColor;
   }
 
-  BuildOp styleDirection(final String dir) => _styleDirection(this, dir);
+  BuildOp styleDirection(String dir) => _styleDirection(this, dir);
+
+  BuildOp styleLineHeight(CssLineHeight v) => _styleLineHeight(this, v);
 
   BuildOp styleMargin() {
     _styleMargin ??= _StyleMargin(this).buildOp;
     return _styleMargin;
   }
+
+  BuildOp styleMaxLines(int v) => BuildOp(
+      isBlockElement: true,
+      onPieces: (meta, pieces) {
+        meta.tsb.enqueue(_styleMaxLinesBuilder, v);
+        return pieces;
+      });
 
   BuildOp stylePadding() {
     _stylePadding ??= _StylePadding(this).buildOp;
@@ -863,6 +905,13 @@ class WidgetFactory {
     _styleTextAlign ??= _StyleTextAlign(this).buildOp;
     return _styleTextAlign;
   }
+
+  BuildOp styleTextOverflow(TextOverflow v) => BuildOp(
+      isBlockElement: true,
+      onPieces: (meta, pieces) {
+        meta.tsb.enqueue(_styleTextOverflowBuilder, v);
+        return pieces;
+      });
 
   BuildOp styleVerticalAlign() {
     _styleVerticalAlign ??= _StyleVerticalAlign(this).buildOp;
@@ -924,3 +973,11 @@ class WidgetFactory {
 }
 
 Iterable<Widget> _listOrNull(Widget x) => x == null ? null : [x];
+
+TextStyleHtml _styleMaxLinesBuilder(
+        TextStyleBuilders tsb, TextStyleHtml parent, int maxLines) =>
+    parent.copyWith(maxLines: maxLines);
+
+TextStyleHtml _styleTextOverflowBuilder(TextStyleBuilders tsb,
+        TextStyleHtml parent, TextOverflow textOverflow) =>
+    parent.copyWith(textOverflow: textOverflow);

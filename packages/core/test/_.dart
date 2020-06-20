@@ -215,6 +215,11 @@ class Explainer {
   String _textDirection(TextDirection textDirection) =>
       textDirection.toString().replaceAll('TextDirection.', '');
 
+  String _textOverflow(TextOverflow textOverflow) =>
+      (textOverflow != null && textOverflow != TextOverflow.clip)
+          ? textOverflow.toString().replaceAll('TextOverflow.', '')
+          : '';
+
   String _textStyle(TextStyle style, TextStyle parent) {
     var s = '';
     if (style == null) {
@@ -350,10 +355,21 @@ class Explainer {
                                                             : widget is Wrap
                                                                 ? _wrap(widget)
                                                                 : '';
+
+    var attrStr = '';
     final textAlign = _textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null));
-    final textAlignStr = textAlign.isNotEmpty ? ',align=$textAlign' : '';
+    attrStr += textAlign.isNotEmpty ? ',align=$textAlign' : '';
+    final maxLines = widget is RichText
+        ? widget.maxLines
+        : widget is Text ? widget.maxLines : null;
+    if (maxLines != null) attrStr += ',maxLines=$maxLines';
+    final textOverflow = _textOverflow(widget is RichText
+        ? widget.overflow
+        : widget is Text ? widget.overflow : null);
+    attrStr += textOverflow.isNotEmpty ? ',overflow=$textOverflow' : '';
+
     final children = widget is MultiChildRenderObjectWidget
         ? (widget.children?.isNotEmpty == true && !(widget is RichText))
             ? "children=${widget.children.map(_widget).join(',')}"
@@ -365,7 +381,7 @@ class Explainer {
                 : widget is SingleChildScrollView
                     ? 'child=${_widget(widget.child)}'
                     : widget is Table ? '\n${_tableRows(widget)}\n' : '';
-    return '[$type$textAlignStr:$text$children]';
+    return '[$type$attrStr:$text$children]';
   }
 
   String _wrap(Wrap wrap) {
