@@ -1,5 +1,5 @@
 ## 0.4.2
-* upgrade svg to latest version to support beta+ channels as well as stable channel
+* [PR #207](https://github.com/daohoangson/flutter_widget_from_html/pull/207) upgrade svg to the latest version to support beta+ channels as well as stable channel [@Saifallak](https://github.com/Saifallak)
 
 ## 0.4.1
 
