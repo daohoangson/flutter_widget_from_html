@@ -1,3 +1,6 @@
+## 0.4.2
+* upgrade svg to latest version to support beta+ channels as well as stable channel
+
 ## 0.4.1
 
 * BREAKING: Remove `TextStyleBuilders.recognizer` (#168)
