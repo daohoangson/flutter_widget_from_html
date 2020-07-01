@@ -55,6 +55,8 @@ class HelloWorldCoreScreen extends StatelessWidget {
         ),
       );
 }
+
+void main() => runApp(WidgetsApp(home: HelloWorldCoreScreen()));
 ```
 
 ![](../../packages/example/screenshots/HelloWorldCoreScreen.jpg?raw=true)
