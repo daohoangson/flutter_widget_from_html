@@ -76,6 +76,8 @@ class WidgetFactory {
       : null;
 
   static Iterable<Widget> _buildColumn(BuildContext c, Iterable<Widget> ws, _) {
+    if (ws == null) return null;
+
     final output = <Widget>[];
     final iter = ws.iterator;
     while (iter.moveNext()) {
@@ -148,7 +150,7 @@ class WidgetFactory {
     Iterable<Widget> widgets,
     GestureTapCallback onTap,
   ) =>
-      widgets.map((widget) => GestureDetector(child: widget, onTap: onTap));
+      widgets?.map((widget) => GestureDetector(child: widget, onTap: onTap));
 
   GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
       ? () => widget.onTapUrl != null

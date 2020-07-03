@@ -67,6 +67,8 @@ class _StyleSizing {
   Iterable<Widget> _build(BuildContext context, Iterable<Widget> children,
       _StyleSizingInput input) {
     final child = wf.buildColumn(children);
+    if (child == null) return null;
+
     final tsb = input.meta.tsb;
     final height = input.height?.getValue(context, tsb);
     final maxHeight = input.maxHeight?.getValue(context, tsb);

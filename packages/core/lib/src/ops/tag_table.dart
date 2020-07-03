@@ -83,6 +83,8 @@ class _TagTable {
   }
 
   Widget _buildTable(BuildContext c, Iterable<Widget> ws, _TableInput i) {
+    if (ws == null) return null;
+
     final rows = <_TableRow>[];
     final bodyRows = <_TableRow>[];
     final footRows = <_TableRow>[];
@@ -170,22 +172,20 @@ class _TagTable {
 
   Widget _buildRow(BuildContext c, Iterable<Widget> ws, _TableInput i) {
     final cells = <Widget>[];
-    for (final child in ws) {
-      if (child is _TablePlaceholder && child.tag == _kTagTableCell) {
-        cells.add(child.build(c));
-      }
-    }
+    ws?.forEach((child) =>
+        child is _TablePlaceholder && child.tag == _kTagTableCell
+            ? cells.add(child.build(c))
+            : null);
 
     return _TableRow(cells);
   }
 
   Widget _buildRows(BuildContext c, Iterable<Widget> ws, _TableInput i) {
     final rows = <_TableRow>[];
-    for (final child in ws) {
-      if (child is _TablePlaceholder && child.tag == _kTagTableRow) {
-        rows.add(child.build(c));
-      }
-    }
+    ws?.forEach((child) =>
+        child is _TablePlaceholder && child.tag == _kTagTableRow
+            ? rows.add(child.build(c))
+            : null);
 
     return _TableRows(rows);
   }

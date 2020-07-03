@@ -68,6 +68,12 @@ void main() {
     );
   });
 
+  testWidgets('renders empty background-color inside (#215)', (tester) async {
+    final h = '<a href="$kHref"><div style="background-color: red"></div></a>';
+    final explained = await explain(tester, h);
+    expect(explained, equals('[widget0]'));
+  });
+
   testWidgets('renders margin inside', (WidgetTester tester) async {
     final html = '<a href="$kHref"><div style="margin: 5px">Foo</div></a>';
     final explained = await explainMargin(tester, html);
