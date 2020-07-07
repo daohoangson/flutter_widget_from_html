@@ -127,45 +127,6 @@ abstract class TrackSize {
   String toString() => '$runtimeType';
 }
 
-/// Sizes the track to a specific number of pixels.
-///
-/// This is the cheapest way to size a track.
-class FixedTrackSize extends TrackSize {
-  const FixedTrackSize(this.sizeInPx) : assert(sizeInPx != null);
-
-  /// The size (width for columns, height for rows) the track should occupy
-  /// in logical pixels.
-  final double sizeInPx;
-
-  @override
-  bool isFixedForConstraints(TrackType type, BoxConstraints constraints) {
-    return true;
-  }
-
-  @override
-  double minIntrinsicSize(
-    TrackType type,
-    Iterable<RenderBox> items,
-    double measurementAxisMaxSize, {
-    double Function(RenderBox) crossAxisSizeForItem,
-  }) {
-    return sizeInPx;
-  }
-
-  @override
-  double maxIntrinsicSize(
-    TrackType type,
-    Iterable<RenderBox> items,
-    double measurementAxisMaxSize, {
-    double Function(RenderBox) crossAxisSizeForItem,
-  }) {
-    return sizeInPx;
-  }
-
-  @override
-  String toString() => '$runtimeType(size=${debugFormatDouble(sizeInPx)})';
-}
-
 /// Sizes the track by taking a part of the remaining space once all the other
 /// tracks have been laid out on the same axis.
 ///
