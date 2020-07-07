@@ -3,12 +3,13 @@ part of '../../table_layout.dart';
 /// Parent data for use with [RenderLayoutGrid].
 class GridParentData extends ContainerBoxParentData<RenderBox> {
   GridParentData({
-    this.columnStart,
+    @required this.columnStart,
     this.columnSpan = 1,
-    this.rowStart,
+    @required this.rowStart,
     this.rowSpan = 1,
     this.debugLabel,
-  });
+  })  : assert(columnStart != null),
+        assert(rowStart != null);
 
   /// If `null`, the item is auto-placed.
   int columnStart;
@@ -26,22 +27,12 @@ class GridParentData extends ContainerBoxParentData<RenderBox> {
   int spanForAxis(Axis axis) => //
       axis == Axis.horizontal ? columnSpan : rowSpan;
 
-  GridArea get area {
-    assert(isDefinitelyPlaced);
-    return GridArea(
-      columnStart: columnStart,
-      columnEnd: columnStart + columnSpan,
-      rowStart: rowStart,
-      rowEnd: rowStart + rowSpan,
-    );
-  }
-
-  /// Returns `true` if the item has definite placement in the grid.
-  bool get isDefinitelyPlaced => columnStart != null && rowStart != null;
-
-  /// Returns `true` if the item is definitely placed on the provided axis.
-  bool isDefinitelyPlacedOnAxis(Axis axis) =>
-      axis == Axis.horizontal ? columnStart != null : rowStart != null;
+  GridArea get area => GridArea(
+        columnStart: columnStart,
+        columnEnd: columnStart + columnSpan,
+        rowStart: rowStart,
+        rowEnd: rowStart + rowSpan,
+      );
 
   @override
   String toString() {
@@ -560,29 +551,6 @@ class RenderLayoutGrid extends RenderBox
     }
 
     gridSizing.setFreeSpaceForAxis(0, sizingAxis);
-  }
-
-  @override
-  void adoptChild(RenderObject child) {
-    super.adoptChild(child);
-    markNeedsPlacementIfRequired(child);
-  }
-
-  @override
-  void dropChild(RenderObject child) {
-    super.dropChild(child);
-    markNeedsPlacementIfRequired(child);
-  }
-
-  /// Determines whether [child] may represent a change in grid item
-  /// positioning, and if so, ensures that we will regenerate the placement grid
-  /// on next layout.
-  void markNeedsPlacementIfRequired(RenderObject child) {
-    if (_needsPlacement) return;
-    final parentData = child.parentData as GridParentData;
-    if (parentData != null && !parentData.isDefinitelyPlaced) {
-      markNeedsPlacement();
-    }
   }
 
   void markNeedsPlacement() => _needsPlacement = true;

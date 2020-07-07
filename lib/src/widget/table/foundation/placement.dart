@@ -4,20 +4,14 @@ part of '../../table_layout.dart';
 class GridArea {
   GridArea({
     this.name,
-    this.columnStart,
-    this.columnEnd,
-    this.rowStart,
-    this.rowEnd,
-  });
-
-  GridArea.withSpans({
-    this.name,
-    this.columnStart,
-    int columnSpan,
-    this.rowStart,
-    int rowSpan,
-  })  : columnEnd = columnStart + columnSpan,
-        rowEnd = rowStart + rowSpan;
+    @required this.columnStart,
+    @required this.columnEnd,
+    @required this.rowStart,
+    @required this.rowEnd,
+  })  : assert(columnStart != null),
+        assert(columnEnd != null),
+        assert(rowStart != null),
+        assert(rowEnd != null);
 
   final String name;
   final int columnStart;
