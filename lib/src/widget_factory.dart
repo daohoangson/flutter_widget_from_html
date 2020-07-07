@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
@@ -78,15 +77,15 @@ class WidgetFactory extends core.WidgetFactory {
           );
         }
 
-        return cell.withGridPlacement(
+        return GridPlacement(
           columnStart: slot.col,
           columnSpan: slot.cell.colspan,
           rowStart: slot.row,
           rowSpan: slot.cell.rowspan,
+          child: cell,
         );
       }).toList(growable: false),
       columnGap: -(table.border?.width ?? 0),
-      gridFit: GridFit.passthrough,
       rowGap: -(table.border?.width ?? 0),
       templateColumnSizes: templateColumnSizes,
       templateRowSizes: templateRowSizes,
