@@ -2,17 +2,17 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '_.dart';
 
-String _padding(String child) => "[Padding:(1,1,1,1),child=$child]";
+String _padding(String child) => '[Padding:(1,1,1,1),child=$child]';
 
 String _richtext(String text) => _padding('[RichText:(:$text)]');
 
 void main() {
   testWidgets('renders basic table', (WidgetTester tester) async {
-    final html = """<table>
+    final html = '''<table>
       <caption>Caption</caption>
       <tr><th>Header 1</th><th>Header 2</th></tr>
       <tr><td>Value 1</td><td>Value 2</td></tr>
-    </table>""";
+    </table>''';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -35,11 +35,11 @@ void main() {
   });
 
   testWidgets('renders THEAD/TBODY/TFOOT tags', (WidgetTester tester) async {
-    final html = """<table>
+    final html = '''<table>
       <tfoot><tr><td>Footer 1</td><td>Footer 2</td></tr></tfoot>
       <tbody><tr><td>Value 1</td><td>Value 2</td></tr></tbody>
       <thead><tr><th>Header 1</th><th>Header 2</th></tr></thead>
-    </table>""";
+    </table>''';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -268,10 +268,10 @@ void main() {
 
   group('error handling', () {
     testWidgets('missing header', (WidgetTester tester) async {
-      final html = """<table>
+      final html = '''<table>
       <tr><th>Header 1</th></tr>
       <tr><td>Value 1</td><td>Value 2</td></tr>
-    </table>""";
+    </table>''';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -282,10 +282,10 @@ void main() {
     });
 
     testWidgets('missing cell', (WidgetTester tester) async {
-      final html = """<table>
+      final html = '''<table>
       <tr><th>Header 1</th><th>Header 2</th></tr>
       <tr><td>Value 1</td></tr>
-    </table>""";
+    </table>''';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -367,7 +367,7 @@ void main() {
 
   group('display: table', () {
     testWidgets('renders basic table', (WidgetTester tester) async {
-      final html = """<div style="display: table">
+      final html = '''<div style="display: table">
       <div style="display: table-caption; text-align: center">Caption</div>
       <div style="display: table-row; font-weight: bold">
         <span style="display: table-cell">Header 1</span>
@@ -377,7 +377,7 @@ void main() {
         <span style="display: table-cell">Value 1</span>
         <span style="display: table-cell">Value 2</span>
       </div>
-    </div>""";
+    </div>''';
       final explained = await explain(tester, html);
       expect(
           explained,

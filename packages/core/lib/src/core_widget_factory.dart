@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'dart:ui' as ui show ParagraphBuilder;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
@@ -11,8 +12,10 @@ import 'core_html_widget.dart';
 
 part 'ops/style_bg_color.dart';
 part 'ops/style_direction.dart';
+part 'ops/style_line_height.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_padding.dart';
+part 'ops/style_sizing.dart';
 part 'ops/style_text_align.dart';
 part 'ops/style_vertical_align.dart';
 part 'ops/tag_a.dart';
@@ -36,6 +39,7 @@ class WidgetFactory {
   BuildOp _styleBgColor;
   BuildOp _styleMargin;
   BuildOp _stylePadding;
+  BuildOp _styleSizing;
   BuildOp _styleTextAlign;
   BuildOp _styleVerticalAlign;
   BuildOp _tagA;
@@ -62,8 +66,7 @@ class WidgetFactory {
         return Align(alignment: alignment, child: widget);
       });
 
-  Widget buildBody(Iterable<Widget> children) =>
-      buildPadding(buildColumn(children), widget.bodyPadding);
+  Widget buildBody(Iterable<Widget> children) => buildColumn(children);
 
   Widget buildColumn(Iterable<Widget> children) => children?.isNotEmpty == true
       ? WidgetPlaceholder(
@@ -73,6 +76,8 @@ class WidgetFactory {
       : null;
 
   static Iterable<Widget> _buildColumn(BuildContext c, Iterable<Widget> ws, _) {
+    if (ws == null) return null;
+
     final output = <Widget>[];
     final iter = ws.iterator;
     while (iter.moveNext()) {
@@ -145,12 +150,12 @@ class WidgetFactory {
     Iterable<Widget> widgets,
     GestureTapCallback onTap,
   ) =>
-      widgets.map((widget) => GestureDetector(child: widget, onTap: onTap));
+      widgets?.map((widget) => GestureDetector(child: widget, onTap: onTap));
 
   GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
       ? () => widget.onTapUrl != null
           ? widget.onTapUrl(url)
-          : print("[flutter_widget_from_html] Tapped url $url")
+          : print('[flutter_widget_from_html] Tapped url $url')
       : null;
 
   InlineSpan buildGestureTapCallbackSpan(
@@ -265,17 +270,35 @@ class WidgetFactory {
     TextBits text,
   ) {
     final tsb = text.tsb;
-    tsb?.build(context);
+    final tsh = tsb?.build(context);
 
+    final maxLines = tsh?.maxLines == -1 ? null : tsh?.maxLines;
+    final overflow = tsh?.textOverflow ?? TextOverflow.clip;
+    final textAlign = tsh?.align ?? TextAlign.start;
     final textScaleFactor = MediaQuery.of(context).textScaleFactor;
     final widgets = <Widget>[];
     for (final compiled in _TextCompiler(text).compile(context)) {
       if (compiled is InlineSpan) {
-        widgets.add(RichText(
-          text: compiled,
-          textAlign: tsb?.textAlign ?? TextAlign.start,
-          textScaleFactor: textScaleFactor,
-        ));
+        widgets.add(overflow == TextOverflow.ellipsis && maxLines == null
+            ? LayoutBuilder(
+                builder: (_, bc) => RichText(
+                      text: compiled,
+                      textAlign: textAlign,
+                      textScaleFactor: textScaleFactor,
+                      maxLines:
+                          bc.biggest.height.isFinite && bc.biggest.height > 0
+                              ? (bc.biggest.height / compiled.style.fontSize)
+                                  .floor()
+                              : null,
+                      overflow: overflow,
+                    ))
+            : RichText(
+                text: compiled,
+                textAlign: textAlign,
+                textScaleFactor: textScaleFactor,
+                maxLines: maxLines,
+                overflow: overflow,
+              ));
       } else if (compiled is Widget) {
         widgets.add(compiled);
       }
@@ -296,7 +319,7 @@ class WidgetFactory {
     final overline = pd?.contains(TextDecoration.overline) == true;
     final underline = pd?.contains(TextDecoration.underline) == true;
 
-    final List<TextDecoration> list = [];
+    final list = <TextDecoration>[];
     if (meta.decoOver == true || (overline && meta.decoOver != false)) {
       list.add(TextDecoration.overline);
     }
@@ -343,11 +366,11 @@ class WidgetFactory {
     return null;
   }
 
-  TextStyle buildTextStyle(TextStyleBuilders tsb, TextStyle p, NodeMetadata m) {
+  TextStyleHtml tsb(TextStyleBuilders tsb, TextStyleHtml p, NodeMetadata m) {
     if (m == null) return p;
 
-    final decoration = buildTextDecoration(p, m);
-    final fontSize = buildTextFontSize(tsb, p, m);
+    final decoration = buildTextDecoration(p.style, m);
+    final fontSize = buildTextFontSize(tsb, p.style, m);
     final fontStyle = buildFontStyle(m);
     if (m.color == null &&
         decoration == null &&
@@ -360,15 +383,17 @@ class WidgetFactory {
     }
 
     return p.copyWith(
-      color: m.color,
-      decoration: decoration,
-      decorationStyle: m.decorationStyle,
-      fontFamily:
-          m.fontFamilies?.isNotEmpty == true ? m.fontFamilies.first : null,
-      fontFamilyFallback: m.fontFamilies?.skip(1)?.toList(growable: false),
-      fontSize: fontSize,
-      fontStyle: fontStyle,
-      fontWeight: m.fontWeight,
+      style: p.style.copyWith(
+        color: m.color,
+        decoration: decoration,
+        decorationStyle: m.decorationStyle,
+        fontFamily:
+            m.fontFamilies?.isNotEmpty == true ? m.fontFamilies.first : null,
+        fontFamilyFallback: m.fontFamilies?.skip(1)?.toList(growable: false),
+        fontSize: fontSize,
+        fontStyle: fontStyle,
+        fontWeight: m.fontWeight,
+      ),
     );
   }
 
@@ -409,7 +434,7 @@ class WidgetFactory {
         if (i >= 1 && i <= 26) {
           // the specs said it's unspecified after the 26th item
           // TODO: generate something like aa, ab, etc. when needed
-          return "${String.fromCharCode(96 + i)}.";
+          return '${String.fromCharCode(96 + i)}.';
         }
         return '';
       case _kCssListStyleTypeAlphaUpper:
@@ -417,21 +442,21 @@ class WidgetFactory {
         if (i >= 1 && i <= 26) {
           // the specs said it's unspecified after the 26th item
           // TODO: generate something like AA, AB, etc. when needed
-          return "${String.fromCharCode(64 + i)}.";
+          return '${String.fromCharCode(64 + i)}.';
         }
         return '';
       case _kCssListStyleTypeCircle:
         return '-';
       case _kCssListStyleTypeDecimal:
-        return "$i.";
+        return '$i.';
       case _kCssListStyleTypeDisc:
         return '•';
       case _kCssListStyleTypeRomanLower:
         final roman = getListStyleMarkerRoman(i)?.toLowerCase();
-        return roman != null ? "$roman." : '';
+        return roman != null ? '$roman.' : '';
       case _kCssListStyleTypeRomanUpper:
         final roman = getListStyleMarkerRoman(i);
-        return roman != null ? "$roman." : '';
+        return roman != null ? '$roman.' : '';
       case _kCssListStyleTypeSquare:
         return '+';
     }
@@ -467,6 +492,8 @@ class WidgetFactory {
 
   Iterable<String> parseCssFontFamilies(String value) =>
       _parseCssFontFamilies(value);
+
+  CssLineHeight parseCssLineHeight(String value) => _parseCssLineHeight(value);
 
   CssLength parseCssLength(String value) => _parseCssLength(value);
 
@@ -593,6 +620,27 @@ class WidgetFactory {
         }
         break;
 
+      case _kCssHeight:
+      case _kCssMaxHeight:
+      case _kCssMaxWidth:
+      case _kCssMinHeight:
+      case _kCssMinWidth:
+      case _kCssWidth:
+        meta.op = styleSizing();
+        break;
+
+      case _kCssLineHeight:
+        final lineHeight = parseCssLineHeight(value);
+        if (lineHeight != null) meta.op = styleLineHeight(lineHeight);
+
+        break;
+
+      case _kCssMaxLines:
+      case _kCssMaxLinesWebkitLineClamp:
+        final maxLines = value == _kCssMaxLinesNone ? -1 : int.tryParse(value);
+        if (maxLines != null) meta.op = styleMaxLines(maxLines);
+        break;
+
       case _kCssTextAlign:
         meta.op = styleTextAlign();
         break;
@@ -616,6 +664,17 @@ class WidgetFactory {
               meta.decoUnder = true;
               break;
           }
+        }
+        break;
+
+      case _kCssTextOverflow:
+        switch (value) {
+          case _kCssTextOverflowClip:
+            meta.op = styleTextOverflow(TextOverflow.clip);
+            break;
+          case _kCssTextOverflowEllipsis:
+            meta.op = styleTextOverflow(TextOverflow.ellipsis);
+            break;
         }
         break;
 
@@ -889,22 +948,43 @@ class WidgetFactory {
     return _styleBgColor;
   }
 
-  BuildOp styleDirection(final String dir) => _styleDirection(this, dir);
+  BuildOp styleDirection(String dir) => _styleDirection(this, dir);
+
+  BuildOp styleLineHeight(CssLineHeight v) => _styleLineHeight(this, v);
 
   BuildOp styleMargin() {
     _styleMargin ??= _StyleMargin(this).buildOp;
     return _styleMargin;
   }
 
+  BuildOp styleMaxLines(int v) => BuildOp(
+      isBlockElement: true,
+      onPieces: (meta, pieces) {
+        meta.tsb.enqueue(_styleMaxLinesBuilder, v);
+        return pieces;
+      });
+
   BuildOp stylePadding() {
     _stylePadding ??= _StylePadding(this).buildOp;
     return _stylePadding;
+  }
+
+  BuildOp styleSizing() {
+    _styleSizing ??= _StyleSizing(this).buildOp;
+    return _styleSizing;
   }
 
   BuildOp styleTextAlign() {
     _styleTextAlign ??= _StyleTextAlign(this).buildOp;
     return _styleTextAlign;
   }
+
+  BuildOp styleTextOverflow(TextOverflow v) => BuildOp(
+      isBlockElement: true,
+      onPieces: (meta, pieces) {
+        meta.tsb.enqueue(_styleTextOverflowBuilder, v);
+        return pieces;
+      });
 
   BuildOp styleVerticalAlign() {
     _styleVerticalAlign ??= _StyleVerticalAlign(this).buildOp;
@@ -966,3 +1046,11 @@ class WidgetFactory {
 }
 
 Iterable<Widget> _listOrNull(Widget x) => x == null ? null : [x];
+
+TextStyleHtml _styleMaxLinesBuilder(
+        TextStyleBuilders tsb, TextStyleHtml parent, int maxLines) =>
+    parent.copyWith(maxLines: maxLines);
+
+TextStyleHtml _styleTextOverflowBuilder(TextStyleBuilders tsb,
+        TextStyleHtml parent, TextOverflow textOverflow) =>
+    parent.copyWith(textOverflow: textOverflow);

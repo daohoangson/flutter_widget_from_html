@@ -1,20 +1,16 @@
 part of '../widget_factory.dart';
 
-TextStyle _tagAExtendedAccentColor(
-  TextStyleBuilders tsb,
-  TextStyle parent,
-  _,
-) =>
-    parent.copyWith(color: Theme.of(tsb.context).accentColor);
-
 class _TagAExtended {
   BuildOp get buildOp => BuildOp(
         onPieces: (meta, pieces) {
-          if (meta.style('color') == null) {
-            meta.tsb.enqueue(_tagAExtendedAccentColor, null);
-          }
-
+          if (meta.style('color') == null) meta.tsb.enqueue(_tsb);
           return pieces;
         },
       );
+
+  static Color _color(TextStyleBuilders tsb) =>
+      Theme.of(tsb.context).accentColor;
+
+  static TextStyleHtml _tsb(TextStyleBuilders tsb, TextStyleHtml p, _) =>
+      p.copyWith(style: p.style.copyWith(color: _color(tsb)));
 }

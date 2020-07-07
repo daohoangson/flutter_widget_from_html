@@ -19,13 +19,13 @@ const _kCssFontSizeXxSmall = 'xx-small';
 const _kCssFontSizeLarger = 'larger';
 const _kCssFontSizeSmaller = 'smaller';
 const _kCssFontSizes = {
-  "1": _kCssFontSizeXxSmall,
-  "2": _kCssFontSizeXSmall,
-  "3": _kCssFontSizeSmall,
-  "4": _kCssFontSizeMedium,
-  "5": _kCssFontSizeLarge,
-  "6": _kCssFontSizeXLarge,
-  "7": _kCssFontSizeXxLarge,
+  '1': _kCssFontSizeXxSmall,
+  '2': _kCssFontSizeXSmall,
+  '3': _kCssFontSizeSmall,
+  '4': _kCssFontSizeMedium,
+  '5': _kCssFontSizeLarge,
+  '6': _kCssFontSizeXLarge,
+  '7': _kCssFontSizeXxLarge,
 };
 
 const _kCssFontStyle = 'font-style';
@@ -43,6 +43,14 @@ const _kCssFontWeight600 = '600';
 const _kCssFontWeight700 = '700';
 const _kCssFontWeight800 = '800';
 const _kCssFontWeight900 = '900';
+
+const _kCssMaxLines = 'max-lines';
+const _kCssMaxLinesNone = 'none';
+const _kCssMaxLinesWebkitLineClamp = '-webkit-line-clamp';
+
+const _kCssTextOverflow = 'text-overflow';
+const _kCssTextOverflowClip = 'clip';
+const _kCssTextOverflowEllipsis = 'ellipsis';
 
 const _kCssTextDecoration = 'text-decoration';
 const _kCssTextDecorationLineThrough = 'line-through';

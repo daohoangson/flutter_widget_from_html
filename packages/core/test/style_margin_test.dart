@@ -112,7 +112,7 @@ void main() {
   });
 
   testWidgets('renders margin within another', (WidgetTester tester) async {
-    final html = '<div style="margin: 1px">' +
+    final html = '<div style="margin: 1px">'
         '<div style="margin: 2px">Foo</div></div>';
     final explained = await explain(tester, html);
     expect(

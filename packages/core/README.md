@@ -19,7 +19,7 @@ See the [Example app](https://github.com/daohoangson/flutter_widget_from_html/tr
 ### Example
 
 ```dart
-const kHtml = """<h1>Heading 1</h1>
+const kHtml = '''<h1>Heading 1</h1>
 <h2>Heading 2</h2>
 <h3>Heading 3</h3>
 <h4>Heading 4</h4>
@@ -32,7 +32,7 @@ const kHtml = """<h1>Heading 1</h1>
   <img src="https://media.giphy.com/media/6VoDJzfRjJNbG/giphy-downsized.gif" width="250" height="171" />
   <figcaption>Source: <a href="https://gph.is/QFgPA0">https://gph.is/QFgPA0</a></figcaption>
 </figure>
-""";
+''';
 
 class HelloWorldCoreScreen extends StatelessWidget {
   @override
@@ -40,15 +40,18 @@ class HelloWorldCoreScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text('HelloWorldCoreScreen'),
         ),
-        body: HtmlWidget(
-          kHtml,
-          onTapUrl: (url) => showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                      title: Text('onTapUrl'),
-                      content: Text(url),
-                    ),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(
+            kHtml,
+            onTapUrl: (url) => showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                title: Text('onTapUrl'),
+                content: Text(url),
               ),
+            ),
+          ),
         ),
       );
 }
@@ -90,17 +93,20 @@ However, these tags and their contents will be ignored:
 ### Inline stylings
 
 - border-top, border-bottom: overline/underline with support for dashed/dotted/double/solid style
-- color: hex values only (`#F00`, `#0F08`, `#00FF00` or `#00FF0080`)
+- color: hex values, `rgb()`, `hsl()` or named colors
 - direction (similar to `dir` attribute)
 - font-family
 - font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) and value in em/px
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
+- line-height: number, percentage or `normal`
 - margin and margin-xxx (values in `px`, `em`)
 - padding and padding-xxx (values in `px`, `em`)
 - vertical-align: baseline/top/bottom/middle/sub/super
 - text-align: center/justify/left/right
 - text-decoration: line-through/none/overline/underline
+- text-overflow: clip/ellipsis. Note: `text-overflow: ellipsis` should be used in conjuntion with `max-lines` or `-webkit-line-clamp` for better result.
+- Sizing (width & height, max-xxx, min-xxx) with values in `px`, `em`
 
 ## Extensibility
 

@@ -77,7 +77,7 @@ class _TagLi {
     final listMeta = i.listMeta;
     if (listMeta == null) return ws;
 
-    final style = i.meta.tsb.build(c);
+    final tsh = i.meta.tsb.build(c);
     final listStyleType = i.listStyleType ?? listMeta.listStyleType;
     final markerIndex = listMeta.markerReversed
         ? (listMeta.markerStart ?? listMeta.markerCount) - i.markerIndex
@@ -89,7 +89,7 @@ class _TagLi {
         builder: (_, bc) => Stack(
           children: <Widget>[
             wf.buildColumn(ws) ?? widget0,
-            _buildMarker(c, style, markerText, bc.biggest.width),
+            _buildMarker(c, tsh.style, markerText, bc.biggest.width),
           ],
           overflow: Overflow.visible,
         ),
@@ -145,7 +145,7 @@ class _TagLi {
 
   _LiPlaceholder _placeholder(Iterable<Widget> children, NodeMetadata meta) {
     final a = meta.domElement.attributes;
-    String listStyleType = a.containsKey(_kAttributeLiType)
+    var listStyleType = a.containsKey(_kAttributeLiType)
         ? _LiInput.listStyleTypeFromAttributeType(a[_kAttributeLiType])
         : null;
     for (final style in meta.styleEntries) {

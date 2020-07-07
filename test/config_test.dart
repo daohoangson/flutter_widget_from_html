@@ -13,7 +13,6 @@ void main() {
         tester.runAsync(() => helper.explain(tester, null,
             hw: HtmlWidget(
               html,
-              bodyPadding: const EdgeInsets.all(0),
               buildAsync: buildAsync,
               key: helper.hwKey,
             )));
@@ -48,7 +47,6 @@ void main() {
             buildFutureBuilderWithData: withData,
             hw: HtmlWidget(
               html,
-              bodyPadding: const EdgeInsets.all(0),
               buildAsync: true,
               buildAsyncBuilder: buildAsyncBuilder,
               key: helper.hwKey,
@@ -108,7 +106,6 @@ void main() {
         helper.explain(tester, null,
             hw: HtmlWidget(
               html,
-              bodyPadding: const EdgeInsets.all(0),
               enableCaching: enableCaching,
               key: helper.hwKey,
             ));
@@ -151,8 +148,7 @@ void main() {
 
     testWidgets('renders without value', (WidgetTester tester) async {
       final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(e,
-          equals('[Padding:(10,10,10,10),child=[RichText:(:image dot png)]]'));
+      expect(e, equals('[RichText:(:image dot png)]'));
     });
 
     testWidgets('renders with value', (WidgetTester tester) async {
@@ -162,37 +158,10 @@ void main() {
       );
       expect(
           explained,
-          equals('[Padding:(10,10,10,10),child='
-              '[ImageLayout:'
-              'child=[CachedNetworkImageProvider:],'
-              'text=image dot png'
-              ']]'));
-    });
-  });
-
-  group('bodyPadding', () {
-    final bodyPadding = EdgeInsets.all(5);
-    final html = 'Foo';
-
-    testWidgets('renders default value', (WidgetTester tester) async {
-      final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(e, equals('[Padding:(10,10,10,10),child=[RichText:(:Foo)]]'));
-    });
-
-    testWidgets('renders custom value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        HtmlWidget(html, bodyPadding: bodyPadding, key: helper.hwKey),
-      );
-      expect(explained, equals('[Padding:(5,5,5,5),child=[RichText:(:Foo)]]'));
-    });
-
-    testWidgets('renders null value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        HtmlWidget(html, bodyPadding: null, key: helper.hwKey),
-      );
-      expect(explained, equals('[RichText:(:Foo)]'));
+          equals('[ImageLayout('
+              'CachedNetworkImageProvider("http://base.com/path/image.png", scale: 1.0), '
+              'text: "image dot png"'
+              ')]'));
     });
   });
 
@@ -203,7 +172,7 @@ void main() {
 
     testWidgets('renders without value', (WidgetTester tester) async {
       final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(e, equals('[Padding:(10,10,10,10),child=[RichText:(:Foo)]]'));
+      expect(e, equals('[RichText:(:Foo)]'));
     });
 
     testWidgets('renders with value', (WidgetTester tester) async {
@@ -215,10 +184,7 @@ void main() {
           key: helper.hwKey,
         ),
       );
-      expect(
-        explained,
-        equals('[Padding:(10,10,10,10),child=[RichText:(+i:Foo)]]'),
-      );
+      expect(explained, equals('[RichText:(+i:Foo)]'));
     });
   });
 
@@ -227,12 +193,8 @@ void main() {
     final html = '<span>Foo</span>';
 
     testWidgets('renders without value', (WidgetTester tester) async {
-      final explained =
-          await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(
-        explained,
-        equals('[Padding:(10,10,10,10),child=[RichText:(:Foo)]]'),
-      );
+      final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
+      expect(e, equals('[RichText:(:Foo)]'));
     });
 
     testWidgets('renders with value', (WidgetTester tester) async {
@@ -244,7 +206,7 @@ void main() {
           key: helper.hwKey,
         ),
       );
-      expect(explained, equals('[Padding:(10,10,10,10),child=[Text:Bar]]'));
+      expect(explained, equals('[Text:Bar]'));
     });
   });
 
@@ -254,10 +216,7 @@ void main() {
 
     testWidgets('renders without value', (WidgetTester tester) async {
       final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(
-          e,
-          equals('[Padding:(10,10,10,10),child='
-              '[RichText:(#FF123456+u:Foo)]]'));
+      expect(e, equals('[RichText:(#FF123456+u:Foo)]'));
     });
 
     testWidgets('renders with value', (WidgetTester tester) async {
@@ -265,10 +224,7 @@ void main() {
         tester,
         HtmlWidget(html, hyperlinkColor: hyperlinkColor, key: helper.hwKey),
       );
-      expect(
-          explained,
-          equals('[Padding:(10,10,10,10),child='
-              '[RichText:(#FFFF0000+u:Foo)]]'));
+      expect(explained, equals('[RichText:(#FFFF0000+u:Foo)]'));
     });
   });
 
@@ -279,7 +235,7 @@ void main() {
 
     testWidgets('renders without value', (WidgetTester tester) async {
       final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(e, equals('[Padding:(10,10,10,10),child=[RichText:(:Foo)]]'));
+      expect(e, equals('[RichText:(:Foo)]'));
     });
 
     testWidgets('renders with value', (WidgetTester tester) async {
@@ -291,7 +247,7 @@ void main() {
           textStyle: TextStyle(fontStyle: FontStyle.italic),
         ),
       );
-      expect(e, equals('[Padding:(10,10,10,10),child=[RichText:(+i:Foo)]]'));
+      expect(e, equals('[RichText:(+i:Foo)]'));
     });
   });
 
@@ -301,11 +257,7 @@ void main() {
 
     testWidgets('renders default value', (WidgetTester tester) async {
       final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(
-          e,
-          equals('[Padding:(10,10,10,10),child='
-              "[GestureDetector:child=[Text:$webViewSrc]]"
-              ']'));
+      expect(e, equals('[GestureDetector:child=[Text:$webViewSrc]]'));
     });
 
     testWidgets('renders true value', (WidgetTester tester) async {
@@ -318,37 +270,33 @@ void main() {
           ));
       expect(
           explained,
-          equals('[Padding:(10,10,10,10),child='
-              "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=1,js=1]"
-              ']'));
+          equals('[WebView('
+              '"$webViewSrc", '
+              'aspectRatio=1.78, '
+              'getDimensions: true'
+              ')]'));
     });
 
     testWidgets('renders false value', (WidgetTester tester) async {
-      final explained = await explain(
+      final e = await explain(
           tester,
           HtmlWidget(
             html,
             key: helper.hwKey,
             webView: false,
           ));
-      expect(
-          explained,
-          equals('[Padding:(10,10,10,10),child='
-              '[GestureDetector:child=[Text:http://domain.com]]]'));
+      expect(e, equals('[GestureDetector:child=[Text:http://domain.com]]'));
     });
 
     testWidgets('renders null value', (WidgetTester tester) async {
-      final explained = await explain(
+      final e = await explain(
           tester,
           HtmlWidget(
             html,
             key: helper.hwKey,
             webView: null,
           ));
-      expect(
-          explained,
-          equals('[Padding:(10,10,10,10),child='
-              '[GestureDetector:child=[Text:http://domain.com]]]'));
+      expect(e, equals('[GestureDetector:child=[Text:http://domain.com]]'));
     });
 
     group('unsupportedWebViewWorkaroundForIssue37', () {
@@ -363,9 +311,12 @@ void main() {
             ));
         expect(
             explained,
-            equals('[Padding:(10,10,10,10),child='
-                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=1,js=1,issue37]"
-                ']'));
+            equals('[WebView('
+                '"$webViewSrc", '
+                'aspectRatio=1.78, '
+                'getDimensions: true, '
+                'unsupportedWorkaroundForIssue37: true'
+                ')]'));
       });
 
       testWidgets('renders false value', (WidgetTester tester) async {
@@ -379,9 +330,11 @@ void main() {
             ));
         expect(
             explained,
-            equals('[Padding:(10,10,10,10),child='
-                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=1,js=1]"
-                ']'));
+            equals('[WebView('
+                '"$webViewSrc", '
+                'aspectRatio=1.78, '
+                'getDimensions: true'
+                ')]'));
       });
 
       testWidgets('renders null value', (WidgetTester tester) async {
@@ -395,9 +348,11 @@ void main() {
             ));
         expect(
             explained,
-            equals('[Padding:(10,10,10,10),child='
-                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=1,js=1]"
-                ']'));
+            equals('[WebView('
+                '"$webViewSrc", '
+                'aspectRatio=1.78, '
+                'getDimensions: true'
+                ')]'));
       });
     });
 
@@ -413,9 +368,11 @@ void main() {
             ));
         expect(
             explained,
-            equals('[Padding:(10,10,10,10),child='
-                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=1,js=1]"
-                ']'));
+            equals('[WebView('
+                '"$webViewSrc", '
+                'aspectRatio=1.78, '
+                'getDimensions: true'
+                ')]'));
       });
 
       testWidgets('renders false value', (WidgetTester tester) async {
@@ -429,9 +386,11 @@ void main() {
             ));
         expect(
             explained,
-            equals('[Padding:(10,10,10,10),child='
-                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=0,js=0]"
-                ']'));
+            equals('[WebView('
+                '"$webViewSrc", '
+                'aspectRatio=1.78, '
+                'js: false'
+                ')]'));
       });
 
       testWidgets('renders null value', (WidgetTester tester) async {
@@ -445,9 +404,11 @@ void main() {
             ));
         expect(
             explained,
-            equals('[Padding:(10,10,10,10),child='
-                "[WebView:url=$webViewSrc,aspectRatio=1.78,getDimensions=0,js=0]"
-                ']'));
+            equals('[WebView('
+                '"$webViewSrc", '
+                'aspectRatio=1.78, '
+                'js: false'
+                ')]'));
       });
     });
   });

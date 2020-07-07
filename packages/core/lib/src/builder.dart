@@ -96,7 +96,7 @@ class HtmlBuilder {
     }
 
     meta.domElement = e;
-    meta.tsb = parentTsb.sub()..enqueue(wf.buildTextStyle, meta);
+    meta.tsb = parentTsb.sub()..enqueue(wf.tsb, meta);
 
     return meta;
   }

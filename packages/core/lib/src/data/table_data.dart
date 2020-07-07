@@ -2,7 +2,7 @@ part of '../core_data.dart';
 
 class TableData extends StatelessWidget {
   final BorderSide border;
-  final Map<int, Map<int, int>> _grid = Map();
+  final Map<int, Map<int, int>> _grid = {};
   final List<TableDataSlot> _slots = [];
 
   TableData({
@@ -17,7 +17,7 @@ class TableData extends StatelessWidget {
   int get rows => _grid.keys.length;
 
   int addCell(int row, TableDataCell cell) {
-    _grid[row] ??= Map();
+    _grid[row] ??= {};
     var col = 0;
     while (_grid[row].containsKey(col)) {
       col++;
@@ -29,7 +29,7 @@ class TableData extends StatelessWidget {
     for (var r = 0; r < cell.rowspan; r++) {
       for (var c = 0; c < cell.colspan; c++) {
         var rr = row + r;
-        _grid[rr] ??= Map();
+        _grid[rr] ??= {};
 
         var cc = col + c;
         if (!_grid[rr].containsKey(cc)) {

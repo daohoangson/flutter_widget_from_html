@@ -12,11 +12,11 @@ typedef CustomStylesBuilder = Iterable<String> Function(dom.Element element);
 
 typedef CustomWidgetBuilder = Widget Function(dom.Element element);
 
-typedef Iterable<Widget> WidgetPlaceholderBuilder<T>(
+typedef WidgetPlaceholderBuilder<T> = Iterable<Widget> Function(
     BuildContext context, Iterable<Widget> children, T input);
 
 class WidgetPlaceholder<T1> extends StatelessWidget {
-  final _builders = List<Function>();
+  final _builders = <Function>[];
   final Iterable<Widget> _firstChildren;
   final _inputs = [];
   final WidgetPlaceholderBuilder<T1> _lastBuilder;
@@ -44,9 +44,10 @@ class WidgetPlaceholder<T1> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Iterable<Widget> output = _firstChildren;
+    var output = _firstChildren;
 
-    for (var i = 0; i < _builders.length; i++) {
+    final l = _builders.length;
+    for (var i = 0; i < l; i++) {
       output = _builders[i](context, output, _inputs[i]);
     }
 

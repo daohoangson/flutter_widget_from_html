@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
@@ -16,7 +15,6 @@ void main() {
     final explained = await explain(tester, null,
         hw: HtmlWidget(
           html,
-          bodyPadding: const EdgeInsets.all(0),
           factoryBuilder: () => _IsNotRenderableTest(),
           key: hwKey,
         ));

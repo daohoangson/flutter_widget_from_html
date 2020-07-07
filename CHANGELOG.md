@@ -1,3 +1,44 @@
+## 0.4.1
+
+* BREAKING: Remove `TextStyleBuilders.recognizer` (#168)
+* BREAKING: Remove `lazySet` method (#169)
+* BREAKING: Remove `HtmlConfig` and change `factoryBuilder` method signature (#173)
+* BREAKING: Remove `bodyPadding`
+* BREAKING: Replace `builderCallback` with `customStylesBuilder` and `customWidgetBuilder` (#169)
+* Add support for tag SVG (#133)
+* Add support for tag RUBY (#144)
+* Add support for attribute `align` (#153) 
+* Add support for async build (#154)
+* Add support for inline style `padding` (#160)
+* Add support for multiple font families (#172)
+* Add support for `line-height` (#193)
+* Add support for attribute `VIDEO.poster` (#197)
+* Improve support for right-to-left (#141)
+* Improve inline `color` support (#201)
+* Bug fixes
+
+## 0.3.3+4
+
+* Fix non-breaking space rendering (#185)
+
+## 0.3.3+3
+
+* Switch to MIT license
+
+## 0.3.3+2
+
+* Fix bug vertical-align with trailing whitespace (#170)
+
+## 0.3.3+1
+
+* Fix conflict between TABLE and background-color (#171)
+
+## 0.3.3
+
+* Improve whitespace handling (#137)
+* Add support for tag SUB, SUP and inline style `vertical-align` (#143)
+* Fix text bit loop initial state (#156)
+
 ## 0.3.2+2
 
 * Use minimum main axis size

@@ -19,7 +19,7 @@ See the [Example app](https://github.com/daohoangson/flutter_widget_from_html/tr
 Note: `HtmlWidget.config` is optional, see dartdoc for all available configuration keys and their default values.
 
 ```dart
-const kHtml = """
+const kHtml = '''
 <h1>Heading</h1>
 <p>A paragraph with <strong>strong</strong> <em>emphasized</em> text.</p>
 <ol>
@@ -35,7 +35,7 @@ const kHtml = """
 </ol>
 <p>And YouTube video!</p>
 <iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="560" height="315"></iframe>
-""";
+''';
 
 class HelloWorldScreen extends StatelessWidget {
   @override
@@ -43,9 +43,12 @@ class HelloWorldScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text('HelloWorldScreen'),
         ),
-        body: HtmlWidget(
-          kHtml,
-          webView: true,
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(
+            kHtml,
+            webView: true,
+          ),
         ),
       );
 }
@@ -92,17 +95,20 @@ These tags and their contents will be ignored:
 ### Inline stylings
 
 - border-top, border-bottom: overline/underline with support for dashed/dotted/double/solid style
-- color: hex values only (`#F00`, `#0F08`, `#00FF00` or `#00FF0080`)
+- color: hex values, `rgb()`, `hsl()` or named colors
 - direction (similar to `dir` attribute)
 - font-family
 - font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) and value in em/px
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
+- line-height: number, percentage or `normal`
 - margin and margin-xxx (values in `px`, `em`)
 - padding and padding-xxx (values in `px`, `em`)
 - vertical-align: baseline/top/bottom/middle/sub/super
 - text-align: center/justify/left/right
 - text-decoration: line-through/none/overline/underline
+- text-overflow: clip/ellipsis. Note: `text-overflow: ellipsis` should be used in conjuntion with `max-lines` or `-webkit-line-clamp` for better result.
+- Sizing (width & height, max-xxx, min-xxx) with values in `px`, `em`
 
 ## Extensibility
 

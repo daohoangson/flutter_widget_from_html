@@ -101,7 +101,7 @@ class _TagTable {
   }
 
   BorderSide _parseBorder(BuildContext context, NodeMetadata meta) {
-    String styleBorder = meta.style(_kCssBorder);
+    var styleBorder = meta.style(_kCssBorder);
     if (styleBorder != null) {
       final borderParsed = wf.parseCssBorderSide(styleBorder);
       if (borderParsed != null) {
@@ -125,7 +125,7 @@ class _TagTable {
 
   static BuildOp cellPaddingOp(double px) => BuildOp(
       onChild: (meta, e) => (e.localName == 'td' || e.localName == 'th')
-          ? meta.styles = [_kCssPadding, "${px}px"]
+          ? meta.styles = [_kCssPadding, '${px}px']
           : null);
 }
 

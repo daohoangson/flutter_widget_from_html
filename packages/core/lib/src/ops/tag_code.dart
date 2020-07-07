@@ -18,7 +18,7 @@ class _TagCode {
           ? [_resetText(pieces.first, meta)]
           : pieces,
       onWidgets: (_, widgets) {
-        final body = wf.buildBody(widgets);
+        final body = wf.buildColumn(widgets);
         if (body == null) return widgets;
 
         return [

@@ -17,7 +17,7 @@ class _StyleVerticalAlign {
         onPieces: (meta, pieces) {
           if (meta.isBlockElement) return pieces;
 
-          String v = meta.style(_kCssVerticalAlign);
+          final v = meta.style(_kCssVerticalAlign);
           if (v == null || v == _kCssVerticalAlignBaseline) return pieces;
 
           return pieces.map((piece) => _buildWidgetSpan(piece, v));
@@ -63,7 +63,7 @@ class _StyleVerticalAlign {
     _VerticalAlignInput input,
   ) {
     final child = wf.buildColumn(widgets);
-    final fontSize = input.tsb.build(context).fontSize;
+    final fontSize = input.tsb.build(context).style.fontSize;
     final padding = input.padding;
     assert(padding != null);
 

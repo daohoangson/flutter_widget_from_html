@@ -1,7 +1,5 @@
 part of '../core_widget_factory.dart';
 
-final _dimensionRegExp = RegExp(r'^(.+)px$');
-
 class _TagImg {
   final WidgetFactory wf;
 
@@ -49,16 +47,7 @@ class _TagImg {
     Map<dynamic, String> map,
     String key,
   ) {
-    String value = meta.style(key);
-    if (value != null) {
-      final match = _dimensionRegExp.matchAsPrefix(value);
-      if (match != null) {
-        final parsed = double.tryParse(match.group(1));
-        if (parsed != null) return parsed;
-      }
-    }
-
-    value = _getAttr(map, key, "data-$key");
+    final value = _getAttr(map, key, 'data-$key');
     return value != null ? double.tryParse(value) : null;
   }
 
@@ -120,6 +109,6 @@ class _TagImgMetadata {
 
   _TagImgMetadata({this.height, this.text, this.url, this.width});
 
-  build(WidgetFactory wf) =>
+  Widget build(WidgetFactory wf) =>
       wf.buildImage(url, height: height, text: text, width: width);
 }

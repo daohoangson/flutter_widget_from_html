@@ -12,6 +12,12 @@ class ImageLayout extends StatefulWidget {
 
   @override
   _ImageLayoutState createState() => _ImageLayoutState();
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
+      "ImageLayout($image${height != null ? ', height: $height' : ''}"
+      "${text != null ? ', text: "$text"' : ''}"
+      "${width != null ? ', width: $width' : ''})";
 }
 
 class _ImageLayoutState extends State<ImageLayout> {
@@ -50,8 +56,8 @@ class _ImageLayoutState extends State<ImageLayout> {
           // trigger state change only on async update
           if (!isSync) setState(() {});
         },
-        onError: (e, _) => print('[flutter_widget_from_html] '
-            "Error resolving image: $e"),
+        onError: (e, _) =>
+            print('[flutter_widget_from_html] Error resolving image: $e'),
       );
       _stream = widget.image.resolve(ImageConfiguration.empty);
       _stream.addListener(_streamListener);

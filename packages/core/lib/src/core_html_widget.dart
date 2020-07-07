@@ -28,9 +28,6 @@ class HtmlWidget extends StatefulWidget {
   /// the widget tree is ready without error handling.
   final AsyncWidgetBuilder<Widget> buildAsyncBuilder;
 
-  /// The amount of space by which to inset the built widget tree.
-  final EdgeInsets bodyPadding;
-
   /// The callback to specify custom stylings.
   final CustomStylesBuilder customStylesBuilder;
 
@@ -66,7 +63,6 @@ class HtmlWidget extends StatefulWidget {
     this.baseUrl,
     this.buildAsync,
     this.buildAsyncBuilder,
-    this.bodyPadding = const EdgeInsets.all(10),
     this.customStylesBuilder,
     this.customWidgetBuilder,
     this.enableCaching = true,
@@ -124,6 +120,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     if (_future != null) {
       return FutureBuilder<Widget>(
@@ -178,5 +175,7 @@ Widget _buildBody(WidgetFactory wf, HtmlWidget widget, dom.NodeList domNodes) {
 
 dom.NodeList _parseHtml(String html) => parser.parse(html).body.nodes;
 
-TextStyle _tsb(TextStyleBuilders _, TextStyle parent, TextStyle style) =>
-    style == null ? parent : style.inherit ? parent.merge(style) : style;
+TextStyleHtml _tsb(TextStyleBuilders _, TextStyleHtml p, TextStyle style) =>
+    style == null
+        ? p
+        : TextStyleHtml.style(style.inherit ? p.style.merge(style) : style);

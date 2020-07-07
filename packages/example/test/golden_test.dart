@@ -19,9 +19,15 @@ const redX = '<span style="background-color:#f00;font-size:0.75em;">x</span>';
 
 class _TestApp extends StatelessWidget {
   final String html;
+  final Key targetKey;
   final bool withExtended;
 
-  const _TestApp(this.html, {Key key, this.withExtended}) : super(key: key);
+  const _TestApp(
+    this.html, {
+    Key key,
+    this.targetKey,
+    this.withExtended,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +37,10 @@ class _TestApp extends StatelessWidget {
         padding: const EdgeInsets.all(10),
       ),
       Divider(),
-      core.HtmlWidget(html),
+      Padding(
+        padding: const EdgeInsets.all(10),
+        child: core.HtmlWidget(html),
+      ),
     ];
 
     if (withExtended) {
@@ -53,6 +62,7 @@ class _TestApp extends StatelessWidget {
             decoration: BoxDecoration(color: Colors.white),
             width: 400,
           ),
+          key: targetKey,
         ),
       ),
       theme: ThemeData.light(),
@@ -61,12 +71,14 @@ class _TestApp extends StatelessWidget {
 }
 
 void _test(String name, String html) => testGoldens(name, (tester) async {
+      final key = UniqueKey();
       await tester.pumpWidget(_TestApp(
         html,
+        targetKey: key,
         withExtended: _withExtendedRegExp.hasMatch(name),
       ));
       await expectLater(
-        find.byType(core.HtmlWidget),
+        find.byKey(key),
         matchesGoldenFile('./images/$name.png'),
       );
     });
@@ -97,7 +109,7 @@ void main() {
     'SCRIPT': '<script>foo = bar</script>Bye script.',
     'STYLE': '<style>body { background: #fff; }</style>Bye style.',
     'CODE':
-        """<code><span style="color: #000000"><span style="color: #0000BB">&lt;?php phpinfo</span><span style="color: #007700">(); </span><span style="color: #0000BB">?&gt;</span></span></code>""",
+        '<code><span style="color: #000000"><span style="color: #0000BB">&lt;?php phpinfo</span><span style="color: #007700">(); </span><span style="color: #0000BB">?&gt;</span></span></code>',
     'KBD': '<kbd>ESC</kbd> = exit',
     'PRE': """<pre>&lt;?php
   highlight_string('&lt;?php phpinfo(); ?&gt;');
@@ -123,12 +135,12 @@ void main() {
     'inline/border/double':
         '<span style="border-bottom: 1px double">Foo</span>',
     'inline/border/solid': '<span style="border-bottom: 1px solid">Foo</span>',
-    'inline/color': """
+    'inline/color': '''
 <span style="color: #F00">red</span>
 <span style="color: #0F08">red 53%</span>
 <span style="color: #00FF00">green</span>
 <span style="color: #00FF0080">green 50%</span>
-""",
+''',
     'inline/display/span': '<div>1 <span>2</span></div>',
     'inline/display/block':
         '<div>1 <span style="display: block">2</span></div>',
@@ -140,7 +152,7 @@ void main() {
     'inline/display/none': '<div>1 <div style="display: none">2</div></div>',
     'FONT/color': '<font color="#F00">Foo</font>',
     'FONT/face': '<font face="Courier">Foo</font>',
-    'FONT/size': """
+    'FONT/size': '''
 <font size="7">Size 7</font>
 <font size="6">Size 6</font>
 <font size="5">Size 5</font>
@@ -148,11 +160,11 @@ void main() {
 <font size="3">Size 3</font>
 <font size="2">Size 2</font>
 <font size="1">Size 1</font>
-""",
+''',
     'inline/font-family': '<span style="font-family: Courier">Foo</span>',
     'BIG': '<big>Foo</big>',
     'SMALL': '<small>Foo</small>',
-    'inline/font-size': """
+    'inline/font-size': '''
 <span style="font-size: 100px">100px</span>
 <span style="font-size: xx-large">xx-large</span>
 <span style="font-size: x-large">x-large</span>
@@ -164,7 +176,7 @@ void main() {
 <span style="font-size: larger">larger</span>
 <span style="font-size: smaller">smaller</span>
 <span style="font-size: 2em">2em</span>
-""",
+''',
     'CITE': 'This is a <cite>citation</cite>.',
     'DFN': 'This is a <dfn>definition</dfn>.',
     'I': 'This is an <i>italic</i> text.',
@@ -174,7 +186,7 @@ void main() {
         '<span style="font-style: italic">Italic text</span>',
     'B': 'This is a <b>bold</b> text.',
     'STRONG': 'This is a <strong>strong</strong> text.',
-    'inline/font-weight': """
+    'inline/font-weight': '''
 <span style="font-weight: bold">bold</span>
 <span style="font-weight: 100">one</span>
 <span style="font-weight: 200">two</span>
@@ -185,7 +197,23 @@ void main() {
 <span style="font-weight: 700">seven</span>
 <span style="font-weight: 800">eight</span>
 <span style="font-weight: 900">nine</span>
-""",
+''',
+    'inline/sizing/complicated_box': '''
+<div style="background-color: red; color: white; padding: 20px;">
+  <div style="background-color: green;">
+    <div style="background-color: blue; height: 100px; margin: 15px; padding: 5px; width: 100px;">
+      Foo
+    </div>
+  </div>
+</div>
+''',
+    'inline/line-height': '''
+<p>Normal</p>
+<p style="line-height: 1.5">Line height x1.5</p>
+<p>Normal</p>
+<p style="line-height: 300%">Line height x3</p>
+<p>Normal</p>
+''',
     'DEL': 'This is some <del>deleted</del> text.',
     'INS': 'This is some <ins>inserted</ins> text.',
     'S': '<s>Foo</s>',
@@ -197,13 +225,15 @@ void main() {
         '<span style="text-decoration: overline">over</span>',
     'inline/text-decoration/underline':
         '<span style="text-decoration: underline">under</span>',
-    'inline/text-decoration/none': """
+    'inline/text-decoration/none': '''
 <span style="text-decoration: line-through">
 <span style="text-decoration: overline">
 <span style="text-decoration: underline">
 foo <span style="text-decoration: none">bar</span></span></span></span>
-""",
-    'inline/margin/4_values': """
+''',
+    'inline/text-overflow/ellipsis':
+        '<div style="max-lines: 2; text-overflow: ellipsis">${"hello world " * 50}</div>',
+    'inline/margin/4_values': '''
 ----
 <div style="margin: 1px 2px 3px 4px">all</div>
 ----
@@ -215,8 +245,8 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
 ----
 <div style="margin: 0 0 3px 0">left only</div>
 ---
-""",
-    'inline/margin/2_values': """
+''',
+    'inline/margin/2_values': '''
 ----
 <div style="margin: 5px 10px">both</div>
 ----
@@ -224,7 +254,7 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
 ----
 <div style="margin: 0 10px">horizontal only</div>
 ----
-""",
+''',
     'inline/margin/1_value': '----<div style="margin: 3px">Foo</div>----',
     'inline/margin/margin-top':
         '----<div style="margin-top: 3px">Foo</div>----',
@@ -234,7 +264,7 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         '----<div style="margin-top: 3px">Foo</div>----',
     'inline/margin/margin-left':
         '----<div style="margin-left: 3px">Foo</div>----',
-    'inline/padding/4_values': """
+    'inline/padding/4_values': '''
 ----
 <div style="padding: 1px 2px 3px 4px">all</div>
 ----
@@ -246,8 +276,8 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
 ----
 <div style="padding: 0 0 3px 0">left only</div>
 ---
-""",
-    'inline/padding/2_values': """
+''',
+    'inline/padding/2_values': '''
 ----
 <div style="padding: 5px 10px">both</div>
 ----
@@ -255,7 +285,7 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
 ----
 <div style="padding: 0 10px">horizontal only</div>
 ----
-""",
+''',
     'inline/padding/1_value': '----<div style="padding: 3px">Foo</div>----',
     'inline/padding/padding-top':
         '----<div style="padding-top: 3px">Foo</div>----',
@@ -275,10 +305,10 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
     'SUB': '<p>Almost every developer\'s favorite molecule is '
         'C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."</p>',
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/sup
-    'SUP': """
+    'SUP': '''
 <p>The <b>Pythagorean theorem</b> is often expressed as the following equation:</p>
 <p><var>a<sup>2</sup></var> + <var>b<sup>2</sup></var> = <var>c<sup>2</sup></var></p>
-""",
+''',
     'inline/vertical-align/top':
         'Foo<span style="vertical-align: top">$redX</span>',
     'inline/vertical-align/bottom':
@@ -289,7 +319,7 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         'Foo<span style="vertical-align: sub">$redX</span>',
     'inline/vertical-align/super':
         'Foo<span style="vertical-align: super">$redX</span>',
-    'LI,OL,UL': """
+    'LI,OL,UL': '''
 <ol>
   <li>One</li>
   <li>
@@ -307,7 +337,7 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
     </ul>
   </li>
   <li>Three</li>
-</ol>""",
+</ol>''',
     'OL/reversed': '<ol reversed><li>One</li><li>Two</li><li>Three</li><ol>',
     'OL/reversed_start':
         '<ol reversed start="99"><li>One</li><li>Two</li><li>Three</li><ol>',
@@ -326,22 +356,22 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         '<ul style="list-style-type: circle"><li>Foo</li></ul>',
     'inline/list-style-type/square':
         '<ul style="list-style-type: square"><li>Foo</li></ul>',
-    'inline/LI_padding-inline-start': """
+    'inline/LI_padding-inline-start': '''
 <ul style="padding-inline-start: 9px">
   <li style="padding-inline-start: 19px">19px</li>
   <li style="padding-inline-start: 29px">29px</li>
   <li>9px</li>
 <ul>
-""",
+''',
     'OL/rtl':
         '<div dir="rtl"><ol><li>One</li><li>Two</li><li>Three</li><ol></div>',
-    'TABLE,CAPTION,TBODY,THEAD,TFOOT,TR,TH,TD': """<table border="1">
+    'TABLE,CAPTION,TBODY,THEAD,TFOOT,TR,TH,TD': '''<table border="1">
       <caption>Caption</caption>
       <tfoot><tr><td>Footer 1</td><td>Footer 2</td></tr></tfoot>
       <tbody><tr><td>Value 1</td><td>Value 2</td></tr></tbody>
       <thead><tr><th>Header 1</th><th>Header 2</th></tr></thead>
-    </table>""",
-    'inline/display/table': """
+    </table>''',
+    'inline/display/table': '''
 <div style="display: table">
   <div style="display: table-caption; text-align: center">Caption</div>
   <div style="display: table-row; font-weight: bold">
@@ -352,8 +382,8 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
     <span style="display: table-cell">Value 1</span>
     <span style="display: table-cell">Value 2</span>
   </div>
-</div>""",
-    'TABLE/colspan': """
+</div>''',
+    'TABLE/colspan': '''
 <table border="1">
   <caption>Source: <a href="https://www.w3schools.com/tags/att_td_colspan.asp">w3schools</a></caption>
   <tr>
@@ -371,8 +401,8 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
   <tr>
     <td colspan="2">Sum: \$180</td>
   </tr>
-</table>""",
-    'TABLE/rowspan': """
+</table>''',
+    'TABLE/rowspan': '''
 <table border="1">
   <caption>Source: <a href="https://www.w3schools.com/tags/att_td_colspan.asp">w3schools</a></caption>
   <tr>
@@ -389,6 +419,6 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
     <td>February</td>
     <td>\$80</td>
   </tr>
-</table>""",
+</table>''',
   }).entries.forEach((entry) => _test(entry.key, entry.value));
 }

@@ -18,7 +18,6 @@ if [ ! -f /usr/local/bin/aws ]; then
   sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
 fi
 
-# https://github.com/mmcc007/sylph
 _sylphPath=/tmp/sylph-src
 mkdir $_sylphPath && cd $_sylphPath
 git init && git remote add origin https://github.com/daohoangson/sylph.git
@@ -28,5 +27,23 @@ export "PATH=$PATH:$HOME/.pub-cache/bin"
 pub global activate --source path $_sylphPath
 
 cd "$_pwd/packages/example"
+
+_ref=$( git log -n 1 --pretty=format:%H )
+{ \
+  cat pubspec.yaml | grep -v 'dep_override'; \
+  echo; \
+  echo 'dependency_overrides:'; \
+  echo '  flutter_widget_from_html:'; \
+  echo '    git:'; \
+  echo '      url: git://github.com/daohoangson/flutter_widget_from_html.git'; \
+  echo "      ref: $_ref"; \
+  echo '  flutter_widget_from_html_core:'; \
+  echo '    git:'; \
+  echo '      url: git://github.com/daohoangson/flutter_widget_from_html.git'; \
+  echo "      ref: $_ref"; \
+  echo '      path: packages/core'; \
+} | tee pubspec.yaml.bak \
+  && mv -f pubspec.yaml.bak pubspec.yaml
+
 flutter pub get
 sylph

@@ -17,7 +17,7 @@ void main() {
     expect(
         explained,
         equals('[SizedBox:0.0x10.0],'
-            '[$padding,child=[Stack:children=[RichText:(:Foo)],[$positioned,child=[RichText,align=right:(:$disc)]]]],'
+            '[$padding,child=[Stack:children=[RichText:(:Foo)],[$positioned,child=[RichText,align=right,maxLines=1:(:$disc)]]]],'
             '[SizedBox:0.0x10.0]'));
   });
 
@@ -27,9 +27,9 @@ void main() {
     expect(
         explained,
         equals('[$padding,child=[Column:children='
-            '[Stack:children=[RichText:(:One)],[$positioned,child=[RichText,align=right:(:1.)]]],'
-            '[Stack:children=[RichText:(:Two)],[$positioned,child=[RichText,align=right:(:2.)]]],'
-            '[Stack:children=[RichText:(+b:Three)],[$positioned,child=[RichText,align=right:(:3.)]]]'
+            '[Stack:children=[RichText:(:One)],[$positioned,child=[RichText,align=right,maxLines=1:(:1.)]]],'
+            '[Stack:children=[RichText:(:Two)],[$positioned,child=[RichText,align=right,maxLines=1:(:2.)]]],'
+            '[Stack:children=[RichText:(+b:Three)],[$positioned,child=[RichText,align=right,maxLines=1:(:3.)]]]'
             ']]'));
   });
 
@@ -39,14 +39,14 @@ void main() {
     expect(
         explained,
         equals('[$padding,child=[Column:children='
-            '[Stack:children=[RichText:(:One)],[$positioned,child=[RichText,align=right:(:$disc)]]],'
-            '[Stack:children=[RichText:(:Two)],[$positioned,child=[RichText,align=right:(:$disc)]]],'
-            '[Stack:children=[RichText:(+i:Three)],[$positioned,child=[RichText,align=right:(:$disc)]]]'
+            '[Stack:children=[RichText:(:One)],[$positioned,child=[RichText,align=right,maxLines=1:(:$disc)]]],'
+            '[Stack:children=[RichText:(:Two)],[$positioned,child=[RichText,align=right,maxLines=1:(:$disc)]]],'
+            '[Stack:children=[RichText:(+i:Three)],[$positioned,child=[RichText,align=right,maxLines=1:(:$disc)]]]'
             ']]'));
   });
 
   testWidgets('renders nested list', (WidgetTester tester) async {
-    final html = """
+    final html = '''
 <ul>
   <li>One</li>
   <li>
@@ -64,46 +64,47 @@ void main() {
     </ul>
   </li>
   <li>Three</li>
-</ul>""";
+</ul>''';
     final explained = await explain(tester, html);
     expect(
         explained,
         equals('[$padding,child=[Column:children='
-            '[Stack:children=[RichText:(:One)],[$positioned,child=[RichText,align=right:(:$disc)]]],'
+            '[Stack:children=[RichText:(:One)],[$positioned,child=[RichText,align=right,maxLines=1:(:$disc)]]],'
             '[Stack:children='
             '[Column:children=[RichText:(:Two)],[$padding,child=[Column:children='
-            '[Stack:children=[RichText:(:2.1)],[$positioned,child=[RichText,align=right:(:$circle)]]],'
+            '[Stack:children=[RichText:(:2.1)],[$positioned,child=[RichText,align=right,maxLines=1:(:$circle)]]],'
             '[Stack:children='
             '[Column:children=[RichText:(:2.2)],[$padding,child=[Column:children='
-            '[Stack:children=[RichText:(:2.2.1)],[$positioned,child=[RichText,align=right:(:$square)]]],'
-            '[Stack:children=[RichText:(:2.2.2)],[$positioned,child=[RichText,align=right:(:$square)]]]'
-            ']]],[$positioned,child=[RichText,align=right:(:$circle)]]],'
-            '[Stack:children=[RichText:(:2.3)],[$positioned,child=[RichText,align=right:(:$circle)]]]'
-            ']]],[$positioned,child=[RichText,align=right:(:$disc)]]],'
-            '[Stack:children=[RichText:(:Three)],[$positioned,child=[RichText,align=right:(:$disc)]]]'
+            '[Stack:children=[RichText:(:2.2.1)],[$positioned,child=[RichText,align=right,maxLines=1:(:$square)]]],'
+            '[Stack:children=[RichText:(:2.2.2)],[$positioned,child=[RichText,align=right,maxLines=1:(:$square)]]]'
+            ']]],[$positioned,child=[RichText,align=right,maxLines=1:(:$circle)]]],'
+            '[Stack:children=[RichText:(:2.3)],[$positioned,child=[RichText,align=right,maxLines=1:(:$circle)]]]'
+            ']]],[$positioned,child=[RichText,align=right,maxLines=1:(:$disc)]]],'
+            '[Stack:children=[RichText:(:Three)],[$positioned,child=[RichText,align=right,maxLines=1:(:$disc)]]]'
             ']]'));
   });
 
   testWidgets('renders nested list (single child)',
       (WidgetTester tester) async {
-    final html = """
+    final html = '''
 <ul>
   <li>Foo</li>
   <li><ul><li>Bar</li></ul></li>
-</ul>""";
+</ul>''';
     final explained = await explain(tester, html);
     expect(
         explained,
         equals('[$padding,child=[Column:children='
-            '[Stack:children=[RichText:(:Foo)],[$positioned,child=[RichText,align=right:(:$disc)]]],'
-            '[$padding,child=[Stack:children=[RichText:(:Bar)],[$positioned,child=[RichText,align=right:(:$circle)]]]]'
+            '[Stack:children=[RichText:(:Foo)],[$positioned,child=[RichText,align=right,maxLines=1:(:$disc)]]],'
+            '[$padding,child=[Stack:children=[RichText:(:Bar)],[$positioned,child=[RichText,align=right,maxLines=1:(:$circle)]]]]'
             ']]'));
   });
 
   group('OL reversed', () {
     final olReversedLiHtml = '<li>x</li>';
-    final olReversedLiPrefix =
-        'Stack:children=[RichText:(:x)],[$positioned,child=[RichText,align=right:';
+    final olReversedLiPrefix = 'Stack:children='
+        '[RichText:(:x)],'
+        '[$positioned,child=[RichText,align=right,maxLines=1:';
     final olReversedLiPostfix = ']]';
 
     testWidgets('renders 123 (default)', (WidgetTester tester) async {
@@ -148,8 +149,9 @@ void main() {
 
   group('OL start', () {
     final olStartLiHtml = '<li>x</li>';
-    final olStartLiPrefix =
-        'Stack:children=[RichText:(:x)],[$positioned,child=[RichText,align=right:';
+    final olStartLiPrefix = 'Stack:children='
+        '[RichText:(:x)],'
+        '[$positioned,child=[RichText,align=right,maxLines=1:';
     final olStartLiPostfix = ']]';
 
     testWidgets('renders from 1 (default)', (WidgetTester tester) async {
@@ -182,8 +184,9 @@ void main() {
 
   group('OL type', () {
     final olTypeLiHtml = '<li>x</li>';
-    final olTypeLiPrefix =
-        '$padding,child=[Stack:children=[RichText:(:x)],[$positioned,child=[RichText,align=right:';
+    final olTypeLiPrefix = '$padding,child=[Stack:children='
+        '[RichText:(:x)],'
+        '[$positioned,child=[RichText,align=right,maxLines=1:';
     final olTypeLiPostfix = ']]]';
 
     testWidgets('renders 1 (default)', (WidgetTester tester) async {
@@ -223,20 +226,20 @@ void main() {
     });
 
     testWidgets('renders LI type', (WidgetTester tester) async {
-      final html = """
+      final html = '''
 <ol type="a">
   <li type="1">decimal</li>
   <li type="i">lower-roman</li>
   <li>lower-alpha</li>
 <ol>
-""";
+''';
       final explained = await explain(tester, html);
       expect(
           explained,
           equals('[$padding,child=[Column:children='
-              '[Stack:children=[RichText:(:decimal)],[$positioned,child=[RichText,align=right:(:1.)]]],'
-              '[Stack:children=[RichText:(:lower-roman)],[$positioned,child=[RichText,align=right:(:ii.)]]],'
-              '[Stack:children=[RichText:(:lower-alpha)],[$positioned,child=[RichText,align=right:(:c.)]]]'
+              '[Stack:children=[RichText:(:decimal)],[$positioned,child=[RichText,align=right,maxLines=1:(:1.)]]],'
+              '[Stack:children=[RichText:(:lower-roman)],[$positioned,child=[RichText,align=right,maxLines=1:(:ii.)]]],'
+              '[Stack:children=[RichText:(:lower-alpha)],[$positioned,child=[RichText,align=right,maxLines=1:(:c.)]]]'
               ']]'));
     });
   });
@@ -249,7 +252,7 @@ void main() {
         expect(
             explained,
             equals('[$padding,child=[Stack:children=[RichText:(:Foo)],'
-                '[$positioned,child=[RichText,align=right:(:$disc)]]]]'));
+                '[$positioned,child=[RichText,align=right,maxLines=1:(:$disc)]]]]'));
       });
 
       testWidgets('renders disc (OL)', (WidgetTester tester) async {
@@ -258,7 +261,7 @@ void main() {
         expect(
             explained,
             equals('[$padding,child=[Stack:children=[RichText:(:Foo)],'
-                '[$positioned,child=[RichText,align=right:(:$disc)]]]]'));
+                '[$positioned,child=[RichText,align=right,maxLines=1:(:$disc)]]]]'));
       });
 
       testWidgets('renders circle', (WidgetTester tester) async {
@@ -267,7 +270,7 @@ void main() {
         expect(
             explained,
             equals('[$padding,child=[Stack:children=[RichText:(:Foo)],'
-                '[$positioned,child=[RichText,align=right:(:$circle)]]]]'));
+                '[$positioned,child=[RichText,align=right,maxLines=1:(:$circle)]]]]'));
       });
 
       testWidgets('renders square', (WidgetTester tester) async {
@@ -276,31 +279,32 @@ void main() {
         expect(
             explained,
             equals('[$padding,child=[Stack:children=[RichText:(:Foo)],'
-                '[$positioned,child=[RichText,align=right:(:$square)]]]]'));
+                '[$positioned,child=[RichText,align=right,maxLines=1:(:$square)]]]]'));
       });
 
       testWidgets('renders LI list-style-type', (WidgetTester tester) async {
-        final html = """
+        final html = '''
 <ul style="list-style-type: circle">
   <li style="list-style-type: disc"">disc</li>
   <li style="list-style-type: square">square</li>
   <li>circle</li>
 <ul>
-""";
+''';
         final explained = await explain(tester, html);
         expect(
             explained,
             equals('[$padding,child=[Column:children='
-                '[Stack:children=[RichText:(:disc)],[$positioned,child=[RichText,align=right:(:$disc)]]],'
-                '[Stack:children=[RichText:(:square)],[$positioned,child=[RichText,align=right:(:$square)]]],'
-                '[Stack:children=[RichText:(:circle)],[$positioned,child=[RichText,align=right:(:$circle)]]]'
+                '[Stack:children=[RichText:(:disc)],[$positioned,child=[RichText,align=right,maxLines=1:(:$disc)]]],'
+                '[Stack:children=[RichText:(:square)],[$positioned,child=[RichText,align=right,maxLines=1:(:$square)]]],'
+                '[Stack:children=[RichText:(:circle)],[$positioned,child=[RichText,align=right,maxLines=1:(:$circle)]]]'
                 ']]'));
       });
 
       group('serial', () {
         final serialLiHtml = '<li>x</li>';
-        final serialLiPrefix =
-            'Stack:children=[RichText:(:x)],[$positioned,child=[RichText,align=right:';
+        final serialLiPrefix = 'Stack:children='
+            '[RichText:(:x)],'
+            '[$positioned,child=[RichText,align=right,maxLines=1:';
         final serialLiPostfix = ']]';
 
         testWidgets('renders decimal (default for OL)', (tester) async {
@@ -522,25 +526,25 @@ void main() {
             explained,
             equals(
                 '[Padding:(0,0,0,99),child=[Stack:children=[RichText:(:Foo)],'
-                '[$positioned,child=[RichText,align=right:(:$disc)]]]]'));
+                '[$positioned,child=[RichText,align=right,maxLines=1:(:$disc)]]]]'));
       });
 
       testWidgets('renders LI padding-inline-start', (tester) async {
         // TODO: doesn't match browser output
-        final html = """
+        final html = '''
 <ul style="padding-inline-start: 99px">
   <li style="padding-inline-start: 199px">199px</li>
   <li style="padding-inline-start: 299px">299px</li>
   <li>99px</li>
 <ul>
-""";
+''';
         final explained = await explain(tester, html);
         expect(
             explained,
             equals('[Padding:(0,0,0,99),child=[Column:children='
-                '[Padding:(0,0,0,199),child=[Stack:children=[RichText:(:199px)],[$positioned,child=[RichText,align=right:(:$disc)]]]],'
-                '[Padding:(0,0,0,299),child=[Stack:children=[RichText:(:299px)],[$positioned,child=[RichText,align=right:(:$disc)]]]],'
-                '[Stack:children=[RichText:(:99px)],[$positioned,child=[RichText,align=right:(:$disc)]]]'
+                '[Padding:(0,0,0,199),child=[Stack:children=[RichText:(:199px)],[$positioned,child=[RichText,align=right,maxLines=1:(:$disc)]]]],'
+                '[Padding:(0,0,0,299),child=[Stack:children=[RichText:(:299px)],[$positioned,child=[RichText,align=right,maxLines=1:(:$disc)]]]],'
+                '[Stack:children=[RichText:(:99px)],[$positioned,child=[RichText,align=right,maxLines=1:(:$disc)]]]'
                 ']]'));
       });
     });
@@ -567,40 +571,40 @@ void main() {
     });
 
     testWidgets('UL is direct child of UL', (WidgetTester tester) async {
-      final html = """
+      final html = '''
 <ul>
   <li>One</li>
   <ul>
     <li>Two</li>
     <li>Three</li>
   </ul>
-</ul>""";
+</ul>''';
       final explained = await explain(tester, html);
       expect(
           explained,
           equals('[$padding,child=[Column:children='
-              '[Stack:children=[RichText:(:One)],[$positioned,child=[RichText,align=right:(:$disc)]]],'
+              '[Stack:children=[RichText:(:One)],[$positioned,child=[RichText,align=right,maxLines=1:(:$disc)]]],'
               '[$padding,child=[Column:children='
-              '[Stack:children=[RichText:(:Two)],[$positioned,child=[RichText,align=right:(:$circle)]]],'
-              '[Stack:children=[RichText:(:Three)],[$positioned,child=[RichText,align=right:(:$circle)]]]'
+              '[Stack:children=[RichText:(:Two)],[$positioned,child=[RichText,align=right,maxLines=1:(:$circle)]]],'
+              '[Stack:children=[RichText:(:Three)],[$positioned,child=[RichText,align=right,maxLines=1:(:$circle)]]]'
               ']]'
               ']]'));
     });
 
     testWidgets('LI has empty A', (WidgetTester tester) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/112#issuecomment-550116179
-      final html = """<ol>
+      final html = '''<ol>
   <li>One</li>
   <li><a href="https://flutter.dev"></a></li>
   <li>Three</li>
-</ol>""";
+</ol>''';
       final explained = await explain(tester, html);
       expect(
           explained,
           equals('[$padding,child=[Column:children='
-              '[Stack:children=[RichText:(:One)],[$positioned,child=[RichText,align=right:(:1.)]]],'
-              '[Stack:children=[widget0],[$positioned,child=[RichText,align=right:(:2.)]]],'
-              '[Stack:children=[RichText:(:Three)],[$positioned,child=[RichText,align=right:(:3.)]]]'
+              '[Stack:children=[RichText:(:One)],[$positioned,child=[RichText,align=right,maxLines=1:(:1.)]]],'
+              '[Stack:children=[widget0],[$positioned,child=[RichText,align=right,maxLines=1:(:2.)]]],'
+              '[Stack:children=[RichText:(:Three)],[$positioned,child=[RichText,align=right,maxLines=1:(:3.)]]]'
               ']]'));
     });
   });
@@ -612,19 +616,15 @@ void main() {
       final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';
       final explained = await explain(tester, null,
           hw: Directionality(
-            child: HtmlWidget(
-              html,
-              key: hwKey,
-              bodyPadding: const EdgeInsets.all(0),
-            ),
+            child: HtmlWidget(html, key: hwKey),
             textDirection: TextDirection.rtl,
           ));
       expect(
           explained,
           equals('[$rtlPadding,child=[Column:children='
-              '[Stack:children=[RichText:(:One)],[$rtlPositioned,child=[RichText,align=left:(:1.)]]],'
-              '[Stack:children=[RichText:(:Two)],[$rtlPositioned,child=[RichText,align=left:(:2.)]]],'
-              '[Stack:children=[RichText:(+b:Three)],[$rtlPositioned,child=[RichText,align=left:(:3.)]]]'
+              '[Stack:children=[RichText:(:One)],[$rtlPositioned,child=[RichText,align=left,maxLines=1:(:1.)]]],'
+              '[Stack:children=[RichText:(:Two)],[$rtlPositioned,child=[RichText,align=left,maxLines=1:(:2.)]]],'
+              '[Stack:children=[RichText:(+b:Three)],[$rtlPositioned,child=[RichText,align=left,maxLines=1:(:3.)]]]'
               ']]'));
     });
   });

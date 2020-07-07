@@ -2,13 +2,6 @@ part of '../core_widget_factory.dart';
 
 const _kCssBackgroundColor = 'background-color';
 
-TextStyle _styleBgColorTextStyleBuilder(
-  TextStyleBuilders _,
-  TextStyle parent,
-  Color bgColor,
-) =>
-    parent.copyWith(background: Paint()..color = bgColor);
-
 class _StyleBgColor {
   final WidgetFactory wf;
 
@@ -34,9 +27,11 @@ class _StyleBgColor {
       );
 
   Iterable<Widget> _build(BuildContext _, Iterable<Widget> ws, Color c) =>
-      [wf.buildDecoratedBox(wf.buildBody(ws), color: c)];
+      _listOrNull(wf.buildDecoratedBox(wf.buildColumn(ws), color: c));
 
-  BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) => piece
-    ..text.bits.forEach(
-        (bit) => bit.tsb?.enqueue(_styleBgColorTextStyleBuilder, bgColor));
+  BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) =>
+      piece..text.bits.forEach((bit) => bit.tsb?.enqueue(_tsb, bgColor));
+
+  static TextStyleHtml _tsb(TextStyleBuilders _, TextStyleHtml p, Color c) =>
+      p.copyWith(style: p.style.copyWith(background: Paint()..color = c));
 }
