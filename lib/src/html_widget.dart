@@ -50,6 +50,7 @@ class HtmlWidget extends core.HtmlWidget {
     CustomWidgetBuilder customWidgetBuilder,
     Color hyperlinkColor,
     void Function(String) onTapUrl,
+    void Function(String url) onTapImage,
     EdgeInsets tableCellPadding = const EdgeInsets.all(5),
     TextStyle textStyle = const TextStyle(),
     this.unsupportedWebViewWorkaroundForIssue37 = false,
@@ -58,6 +59,7 @@ class HtmlWidget extends core.HtmlWidget {
   })  : assert(html != null),
         super(
           html,
+          onTapImage: onTapImage,
           baseUrl: baseUrl,
           buildAsync: buildAsync,
           buildAsyncBuilder: buildAsyncBuilder,

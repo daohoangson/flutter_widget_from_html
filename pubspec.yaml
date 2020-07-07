@@ -13,7 +13,9 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_svg: ^0.17.4
-  flutter_widget_from_html_core: ^0.4.1
+  flutter_widget_from_html_core: 
+    git:
+        url: https://github.com/nagygyula21/flutter_widget_from_html_core
   html: ^0.14.0+3
   url_launcher: ^5.4.10
   video_player: ^0.10.11+1
