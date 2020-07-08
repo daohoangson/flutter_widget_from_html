@@ -95,12 +95,14 @@ class CssLineHeight {
   CssLineHeight.length(this._length) : _value = null;
 
   double getValue(BuildContext context, TextStyle style) {
-    if (_value != null) {
-      return _value != -1 ? _value : null;
-    }
+    if (_value != null) return _value != -1 ? _value : null;
+
+    if (_length.unit == CssLengthUnit.percentage) return _length.number / 100;
 
     final v = _length.getValueFromStyle(context, style);
-    return v / style.fontSize;
+    if (v != null) return v / style.fontSize;
+
+    return null;
   }
 }
 
@@ -124,8 +126,10 @@ class CssLength {
 
     switch (unit) {
       case CssLengthUnit.em:
-        value = style.fontSize * number / 1;
+        value = style.fontSize * number;
         break;
+      case CssLengthUnit.percentage:
+        return null;
       case CssLengthUnit.px:
         value = number;
         break;
@@ -176,6 +180,7 @@ class CssLengthBox {
 
 enum CssLengthUnit {
   em,
+  percentage,
   px,
 }
 

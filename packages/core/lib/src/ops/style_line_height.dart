@@ -11,13 +11,6 @@ CssLineHeight _parseCssLineHeight(WidgetFactory wf, String value) {
       return CssLineHeight.normal();
   }
 
-  if (value.endsWith('%')) {
-    final percentage = double.tryParse(value.substring(0, value.length - 1));
-    if (percentage != null && percentage > 0) {
-      return CssLineHeight.number(percentage / 100);
-    }
-  }
-
   final number = double.tryParse(value);
   if (number != null && number > 0) {
     return CssLineHeight.number(number);
