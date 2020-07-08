@@ -227,34 +227,42 @@ class WidgetFactory {
           : child;
 
   Widget buildTable(TableData table) {
-    final rows = <TableRow>[];
-    final slotIndices = <int>[];
-    final tableCols = table.cols;
-    final tableRows = table.rows;
+    final border = table.border != null
+        ? BoxDecoration(border: Border.fromBorderSide(table.border))
+        : null;
 
-    for (var r = 0; r < tableRows; r++) {
-      final cells = List<Widget>(tableCols);
-      for (var c = 0; c < tableCols; c++) {
-        final slot = table.getSlot(row: r, col: c);
-        if (slot == null || slotIndices.contains(slot.index)) {
-          cells[c] = widget0;
-          continue;
+    final layoutGrid = TableLayout(
+      children: table.slots.map((slot) {
+        Widget cell = SizedBox.expand(child: buildColumn(slot.cell.children));
+
+        if (border != null) {
+          cell = Container(
+            child: cell,
+            decoration: border,
+          );
         }
 
-        slotIndices.add(slot.index);
-        cells[c] = TableCell(
-          child: buildColumn(slot.cell.children),
+        return TablePlacement(
+          columnStart: slot.col,
+          columnSpan: slot.cell.colspan,
+          rowStart: slot.row,
+          rowSpan: slot.cell.rowspan,
+          child: cell,
         );
-      }
+      }).toList(growable: false),
+      cols: table.cols,
+      gap: -(table.border?.width ?? 0),
+      rows: table.rows,
+    );
 
-      rows.add(TableRow(children: cells));
-    }
+    if (border == null) return layoutGrid;
 
-    final tableBorder = table.border != null
-        // TODO: support different styling for border sides
-        ? TableBorder.symmetric(inside: table.border, outside: table.border)
-        : null;
-    return Table(border: tableBorder, children: rows);
+    return Stack(
+      children: <Widget>[
+        layoutGrid,
+        Positioned.fill(child: Container(decoration: border))
+      ],
+    );
   }
 
   Widget buildText(TextBits text) => (text..trimRight()).isNotEmpty

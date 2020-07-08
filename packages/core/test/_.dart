@@ -357,6 +357,12 @@ class Explainer {
     if (widget == widget0) return '[widget0]';
     if (widget is ImageLayout) return '[$widget]';
 
+    if (widget is TablePlacement) {
+      return '[${widget.rowStart},${widget.columnStart}'
+          "${widget.rowSpan != 1 || widget.columnSpan != 1 ? ':${widget.rowSpan}x${widget.columnSpan}' : ''}"
+          ':${_widget(widget.child)}]';
+    }
+
     // ignore: invalid_use_of_protected_member
     if (widget is WidgetPlaceholder) return _widget(widget.build(context));
 
