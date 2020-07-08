@@ -69,10 +69,7 @@ class _PlacementArea {
     @required this.columnEnd,
     @required this.rowStart,
     @required this.rowEnd,
-  })  : assert(columnStart != null),
-        assert(columnEnd != null),
-        assert(rowStart != null),
-        assert(rowEnd != null);
+  });
 
   final int columnStart;
   final int rowStart;
@@ -83,19 +80,6 @@ class _PlacementArea {
       axis == Axis.horizontal ? columnStart : rowStart;
   int endForAxis(Axis axis) => axis == Axis.horizontal ? columnEnd : rowEnd;
   int spanForAxis(Axis axis) => endForAxis(axis) - startForAxis(axis);
-
-  @override
-  int get hashCode => hashObjects([columnStart, columnEnd, rowStart, rowEnd]);
-
-  @override
-  bool operator ==(dynamic other) {
-    if (other.runtimeType != runtimeType) return false;
-    final typedOther = other as _PlacementArea;
-    return typedOther.columnStart == columnStart &&
-        typedOther.columnEnd == columnEnd &&
-        typedOther.rowStart == rowStart &&
-        typedOther.rowEnd == rowEnd;
-  }
 }
 
 @immutable

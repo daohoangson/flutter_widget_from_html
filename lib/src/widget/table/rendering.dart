@@ -23,13 +23,10 @@ class _TableRenderBox extends RenderBox
   _TableRenderBox({
     List<RenderBox> children,
     double gap = 0,
-    @required List<_TrackSize> templateColumnSizes,
-    @required List<_TrackSize> templateRowSizes,
+    List<_TrackSize> templateColumnSizes,
+    List<_TrackSize> templateRowSizes,
     TextDirection textDirection = TextDirection.ltr,
-  })  : assert(textDirection != null),
-        assert(templateColumnSizes != null),
-        assert(templateRowSizes != null),
-        _gap = gap,
+  })  : _gap = gap,
         _templateColumnSizes = templateColumnSizes,
         _templateRowSizes = templateRowSizes,
         _textDirection = textDirection {
@@ -515,10 +512,7 @@ class _RenderingSize {
     @required this.gap,
     @required this.rowTracks,
     @required this.textDirection,
-  })  : assert(columnTracks != null),
-        assert(rowTracks != null),
-        assert(gap != null),
-        assert(textDirection != null);
+  });
 
   _RenderingSize.fromTrackSizes({
     @required List<_TrackSize> columnSizeFunctions,
@@ -583,14 +577,6 @@ class _RenderingSize {
       sizeForAreaOnAxis(area, Axis.horizontal),
       sizeForAreaOnAxis(area, Axis.vertical),
     );
-  }
-
-  void markTrackTypeSized(_TrackType type) {
-    if (type == _TrackType.column) {
-      hasColumnSizing = true;
-    } else {
-      hasRowSizing = true;
-    }
   }
 
   double freeSpaceForAxis(Axis sizingAxis) =>

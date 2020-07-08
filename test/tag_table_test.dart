@@ -26,6 +26,17 @@ void main() {
             ']]'));
   });
 
+  testWidgets('renders in RTL', (WidgetTester tester) async {
+    final html = '<div dir="rtl"><table><tr><td>Foo</td></tr></table></div>';
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[Directionality:rtl,child='
+            '[TableLayout:children='
+            '[0,0:${_richtext('Foo')}]'
+            ']]'));
+  });
+
   testWidgets('renders 2 tables', (WidgetTester tester) async {
     final html = '<table><tr><td>Foo</td></tr></table>'
         '<table><tr><td>Bar</td></tr></table>';

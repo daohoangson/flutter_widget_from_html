@@ -46,7 +46,7 @@ abstract class _TrackSize {
 class _TrackSizeFlexible extends _TrackSize {
   final double _flex;
 
-  const _TrackSizeFlexible(this._flex) : assert(_flex != null && _flex > 0);
+  const _TrackSizeFlexible(this._flex);
 
   @override
   double get flex => _flex;
