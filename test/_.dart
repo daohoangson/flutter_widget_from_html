@@ -11,7 +11,7 @@ final hwKey = helper.hwKey;
 
 final buildCurrentState = helper.buildCurrentState;
 
-String _explainer(Widget widget, String Function(Widget) parent) {
+String _explainer(Widget widget) {
   if (widget is CachedNetworkImage) {
     return '[CachedNetworkImage:${widget.imageUrl}]';
   }

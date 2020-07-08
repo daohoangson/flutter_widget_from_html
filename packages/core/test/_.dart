@@ -9,9 +9,6 @@ const kDataUri =
 
 final hwKey = GlobalKey<State<HtmlWidget>>();
 
-typedef ExplainerFunction = String Function(
-    Widget widget, String Function(Widget) parent);
-
 Widget buildCurrentState() {
   final hws = hwKey.currentState;
   if (hws == null) return null;
@@ -38,7 +35,7 @@ Future<String> explain(
   WidgetTester tester,
   String html, {
   bool buildFutureBuilderWithData = true,
-  ExplainerFunction explainer,
+  String Function(Widget) explainer,
   Widget hw,
   void Function(BuildContext) preTest,
   TextStyle textStyle,
@@ -122,7 +119,7 @@ Future<String> explainMargin(
 
 class Explainer {
   final BuildContext context;
-  final ExplainerFunction explainer;
+  final String Function(Widget) explainer;
   final TextStyle _defaultStyle;
 
   Explainer(this.context, {this.explainer})
@@ -351,7 +348,7 @@ class Explainer {
   }
 
   String _widget(Widget widget) {
-    final explained = explainer?.call(widget, _widget);
+    final explained = explainer?.call(widget);
     if (explained != null) return explained;
 
     if (widget == widget0) return '[widget0]';
