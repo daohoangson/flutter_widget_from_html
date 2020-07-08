@@ -468,7 +468,8 @@ class WidgetFactory {
   Iterable<String> parseCssFontFamilies(String value) =>
       _parseCssFontFamilies(value);
 
-  CssLineHeight parseCssLineHeight(String value) => _parseCssLineHeight(value);
+  CssLineHeight parseCssLineHeight(String value) =>
+      _parseCssLineHeight(this, value);
 
   CssLength parseCssLength(String value) => _parseCssLength(value);
 

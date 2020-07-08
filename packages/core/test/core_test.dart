@@ -1272,6 +1272,18 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(explained, equals('[RichText:(+height=0.5:Foo)]'));
     });
 
+    testWidgets('renders em', (WidgetTester tester) async {
+      final html = '<span style="line-height: 5em">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+height=5.0:Foo)]'));
+    });
+
+    testWidgets('renders px', (WidgetTester tester) async {
+      final html = '<span style="line-height: 50px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+height=5.0:Foo)]'));
+    });
+
     testWidgets('renders invalid', (WidgetTester tester) async {
       final html = '<span style="line-height: xxx">Foo</span>';
       final explained = await explain(tester, html);
