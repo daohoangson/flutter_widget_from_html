@@ -123,13 +123,6 @@ class RenderLayoutGrid extends RenderBox
   }
 
   @override
-  void setupParentData(RenderBox child) {
-    if (child.parentData is! GridParentData) {
-      child.parentData = GridParentData();
-    }
-  }
-
-  @override
   double computeMinIntrinsicWidth(double height) =>
       _computeIntrinsicSize(BoxConstraints.tightFor(height: height)).minWidth;
 
