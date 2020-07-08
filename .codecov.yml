@@ -4,6 +4,9 @@ coverage:
       default:
         target: 90%
         threshold: 0.5%
+    patch:
+      default:
+        target: 80%
 
 ignore:
   - ^lib/src/video_player.dart$
