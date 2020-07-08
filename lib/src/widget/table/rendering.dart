@@ -1,13 +1,13 @@
 part of '../table_layout.dart';
 
-class GridParentData extends ContainerBoxParentData<RenderBox> {
+class _RenderingPlacementData extends ContainerBoxParentData<RenderBox> {
   int columnStart;
   int columnSpan = 1;
   int rowStart;
   int rowSpan = 1;
 
-  GridArea get area => columnStart != null && rowStart != null
-      ? GridArea(
+  _PlacementArea get area => columnStart != null && rowStart != null
+      ? _PlacementArea(
           columnStart: columnStart,
           columnEnd: columnStart + columnSpan,
           rowStart: rowStart,
@@ -16,15 +16,15 @@ class GridParentData extends ContainerBoxParentData<RenderBox> {
       : null;
 }
 
-class RenderLayoutGrid extends RenderBox
+class _TableRenderBox extends RenderBox
     with
-        ContainerRenderObjectMixin<RenderBox, GridParentData>,
-        RenderBoxContainerDefaultsMixin<RenderBox, GridParentData> {
-  RenderLayoutGrid({
+        ContainerRenderObjectMixin<RenderBox, _RenderingPlacementData>,
+        RenderBoxContainerDefaultsMixin<RenderBox, _RenderingPlacementData> {
+  _TableRenderBox({
     List<RenderBox> children,
     double gap = 0,
-    @required List<TrackSize> templateColumnSizes,
-    @required List<TrackSize> templateRowSizes,
+    @required List<_TrackSize> templateColumnSizes,
+    @required List<_TrackSize> templateRowSizes,
     TextDirection textDirection = TextDirection.ltr,
   })  : assert(textDirection != null),
         assert(templateColumnSizes != null),
@@ -37,7 +37,7 @@ class RenderLayoutGrid extends RenderBox
   }
 
   bool _needsPlacement = true;
-  PlacementGrid _placementGrid;
+  _PlacementGrid _placementGrid;
 
   double get gap => _gap;
   double _gap;
@@ -47,18 +47,18 @@ class RenderLayoutGrid extends RenderBox
     markNeedsLayout();
   }
 
-  List<TrackSize> get templateColumnSizes => _templateColumnSizes;
-  List<TrackSize> _templateColumnSizes;
-  set templateColumnSizes(List<TrackSize> value) {
+  List<_TrackSize> get templateColumnSizes => _templateColumnSizes;
+  List<_TrackSize> _templateColumnSizes;
+  set templateColumnSizes(List<_TrackSize> value) {
     if (_templateColumnSizes == value) return;
     _templateColumnSizes = value;
     markNeedsPlacement();
     markNeedsLayout();
   }
 
-  List<TrackSize> get templateRowSizes => _templateRowSizes;
-  List<TrackSize> _templateRowSizes;
-  set templateRowSizes(List<TrackSize> value) {
+  List<_TrackSize> get templateRowSizes => _templateRowSizes;
+  List<_TrackSize> _templateRowSizes;
+  set templateRowSizes(List<_TrackSize> value) {
     if (_templateRowSizes == value) return;
     _templateRowSizes = value;
     markNeedsPlacement();
@@ -75,82 +75,82 @@ class RenderLayoutGrid extends RenderBox
 
   @override
   void setupParentData(RenderBox child) {
-    if (child.parentData is! GridParentData) {
-      child.parentData = GridParentData();
+    if (child.parentData is! _RenderingPlacementData) {
+      child.parentData = _RenderingPlacementData();
     }
   }
 
   @override
   double computeMinIntrinsicWidth(double height) =>
-      _computeGridSize(BoxConstraints.tightFor(height: height)).minWidth;
+      _computeRenderingSize(BoxConstraints.tightFor(height: height)).minWidth;
 
   @override
   double computeMaxIntrinsicWidth(double height) =>
-      _computeGridSize(BoxConstraints(minHeight: height)).maxWidth;
+      _computeRenderingSize(BoxConstraints(minHeight: height)).maxWidth;
 
   @override
   double computeMinIntrinsicHeight(double width) =>
-      _computeGridSize(BoxConstraints.tightFor(width: width)).minHeight;
+      _computeRenderingSize(BoxConstraints.tightFor(width: width)).minHeight;
 
   @override
   double computeMaxIntrinsicHeight(double width) =>
-      _computeGridSize(BoxConstraints(minWidth: width)).maxHeight;
+      _computeRenderingSize(BoxConstraints(minWidth: width)).maxHeight;
 
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) =>
       defaultComputeDistanceToHighestActualBaseline(baseline);
 
-  List<RenderBox> getChildrenInTrack(TrackType trackType, int trackIndex) =>
+  List<RenderBox> getChildrenInTrack(_TrackType trackType, int trackIndex) =>
       _placementGrid
           .getCellsInTrack(trackIndex, trackType)
           .expand((cell) => cell.occupants)
-          .where(removeDuplicates())
+          .where(_removeDuplicates())
           .toList(growable: false);
 
   @override
   void performLayout() {
-    final gridSizing = _computeGridSize(constraints);
-    size = gridSizing.gridSize;
+    final renderingSize = _computeRenderingSize(constraints);
+    size = renderingSize.size;
 
     var child = firstChild;
     while (child != null) {
-      final parentData = child.parentData as GridParentData;
+      final placement = child.parentData as _RenderingPlacementData;
       final area = _placementGrid.itemAreas[child];
+      placement.offset = renderingSize.offsetForArea(area);
+      child.layout(BoxConstraints.loose(renderingSize.sizeForArea(area)));
 
-      parentData.offset = gridSizing.offsetForArea(area);
-      child.layout(BoxConstraints.loose(gridSizing.sizeForArea(area)));
-      child = parentData.nextSibling;
+      child = placement.nextSibling;
     }
   }
 
-  GridSizingInfo _computeGridSize(BoxConstraints constraints) {
+  _RenderingSize _computeRenderingSize(BoxConstraints constraints) {
     performItemPlacement();
 
-    final gridSizing = GridSizingInfo.fromTrackSizeFunctions(
+    final renderingSize = _RenderingSize.fromTrackSizes(
       columnSizeFunctions: _templateColumnSizes,
       gap: gap,
       rowSizeFunctions: _templateRowSizes,
       textDirection: textDirection,
     );
 
-    final columnTracks = performTrackSizing(TrackType.column, gridSizing,
+    final columnTracks = performTrackSizing(_TrackType.column, renderingSize,
         constraints: constraints);
-    gridSizing.hasColumnSizing = true;
+    renderingSize.hasColumnSizing = true;
 
-    final rowTracks =
-        performTrackSizing(TrackType.row, gridSizing, constraints: constraints);
-    gridSizing.hasRowSizing = true;
+    final rowTracks = performTrackSizing(_TrackType.row, renderingSize,
+        constraints: constraints);
+    renderingSize.hasRowSizing = true;
 
-    _stretchIntrinsicTracks(TrackType.column, gridSizing);
-    _stretchIntrinsicTracks(TrackType.row, gridSizing);
+    _stretchIntrinsicTracks(_TrackType.column, renderingSize);
+    _stretchIntrinsicTracks(_TrackType.row, renderingSize);
 
-    final gridWidth = sum(columnTracks.map((t) => t.baseSize)) +
+    final gridWidth = _sum(columnTracks.map((t) => t.baseSize)) +
         gap * (columnTracks.length - 1);
     final gridHeight =
-        sum(rowTracks.map((t) => t.baseSize)) + gap * (rowTracks.length - 1);
-    gridSizing.gridSize = constraints.constrain(Size(gridWidth, gridHeight));
+        _sum(rowTracks.map((t) => t.baseSize)) + gap * (rowTracks.length - 1);
+    renderingSize.size = constraints.constrain(Size(gridWidth, gridHeight));
 
-    return gridSizing;
+    return renderingSize;
   }
 
   void performItemPlacement() {
@@ -160,21 +160,21 @@ class RenderLayoutGrid extends RenderBox
     }
   }
 
-  List<GridTrack> performTrackSizing(
-    TrackType typeBeingSized,
-    GridSizingInfo gridSizing, {
+  List<_RenderingTrack> performTrackSizing(
+    _TrackType typeBeingSized,
+    _RenderingSize renderingSize, {
     BoxConstraints constraints,
   }) {
     constraints ??= this.constraints;
 
-    final sizingAxis = measurementAxisForTrackType(typeBeingSized);
-    final intrinsicTracks = <GridTrack>[];
-    final flexibleTracks = <GridTrack>[];
-    final tracks = gridSizing.tracksForType(typeBeingSized);
+    final sizingAxis = _measurementAxisForTrackType(typeBeingSized);
+    final intrinsicTracks = <_RenderingTrack>[];
+    final flexibleTracks = <_RenderingTrack>[];
+    final tracks = renderingSize.tracksForType(typeBeingSized);
     final maxConstraint = maxConstraintForAxis(constraints, sizingAxis);
     final initialFreeSpace = maxConstraint.isFinite
         ? maxConstraintForAxis(constraints, sizingAxis) -
-            gridSizing.gap * (tracks.length - 1)
+            renderingSize.gap * (tracks.length - 1)
         : 0.0;
     final isAxisDefinite = sizingAxis == Axis.vertical
         ? constraints.hasTightHeight
@@ -198,7 +198,7 @@ class RenderLayoutGrid extends RenderBox
 
     // 2. Resolve intrinsic track sizes
     _resolveIntrinsicTrackSizes(typeBeingSized, sizingAxis, tracks,
-        intrinsicTracks, gridSizing, constraints, initialFreeSpace);
+        intrinsicTracks, renderingSize, constraints, initialFreeSpace);
 
     // 3. Grow all tracks from their baseSize up to their growthLimit value
     //    until freeSpace is exhausted.
@@ -211,8 +211,8 @@ class RenderLayoutGrid extends RenderBox
     }
 
     var freeSpace = initialFreeSpace - baseSizesWithoutMaximization;
-    gridSizing.setFreeSpaceForAxis(freeSpace, sizingAxis);
-    gridSizing.setMinMaxForAxis(baseSizesWithoutMaximization,
+    renderingSize.setFreeSpaceForAxis(freeSpace, sizingAxis);
+    renderingSize.setMinMaxForAxis(baseSizesWithoutMaximization,
         growthLimitsWithoutMaximization, sizingAxis);
     if (isAxisDefinite && freeSpace < 0) return tracks;
 
@@ -225,7 +225,7 @@ class RenderLayoutGrid extends RenderBox
         track.baseSize = track.growthLimit;
       }
     }
-    gridSizing.setFreeSpaceForAxis(freeSpace, sizingAxis);
+    renderingSize.setFreeSpaceForAxis(freeSpace, sizingAxis);
 
     // 4. Size flexible tracks to fill remaining space, if any
     if (flexibleTracks.isEmpty) return tracks;
@@ -239,25 +239,25 @@ class RenderLayoutGrid extends RenderBox
       growthLimitsWithoutMaximization += track.baseSize;
     }
 
-    gridSizing.setFreeSpaceForAxis(freeSpace, sizingAxis);
-    gridSizing.setMinMaxForAxis(baseSizesWithoutMaximization,
+    renderingSize.setFreeSpaceForAxis(freeSpace, sizingAxis);
+    renderingSize.setMinMaxForAxis(baseSizesWithoutMaximization,
         growthLimitsWithoutMaximization, sizingAxis);
 
     return tracks;
   }
 
   void _resolveIntrinsicTrackSizes(
-    TrackType type,
+    _TrackType type,
     Axis sizingAxis,
-    List<GridTrack> tracks,
-    List<GridTrack> intrinsicTracks,
-    GridSizingInfo gridSizing,
+    List<_RenderingTrack> tracks,
+    List<_RenderingTrack> intrinsicTracks,
+    _RenderingSize renderingSize,
     BoxConstraints constraints,
     double freeSpace,
   ) {
     final itemsInIntrinsicTracks = intrinsicTracks
         .expand((t) => getChildrenInTrack(type, t.index))
-        .where(removeDuplicates());
+        .where(_removeDuplicates());
 
     final itemsBySpan = groupBy(itemsInIntrinsicTracks,
         (item) => _placementGrid.itemAreas[item].spanForAxis(sizingAxis));
@@ -284,9 +284,9 @@ class RenderLayoutGrid extends RenderBox
         }
 
         final crossAxis = flipAxis(sizingAxis);
-        final crossAxisSizeForItem = gridSizing.isAxisSized(crossAxis)
+        final crossAxisSizeForItem = renderingSize.isAxisSized(crossAxis)
             ? (RenderBox item) {
-                return gridSizing.sizeForAreaOnAxis(
+                return renderingSize.sizeForAreaOnAxis(
                     _placementGrid.itemAreas[item], crossAxis);
               }
             : (RenderBox _) => double.infinity;
@@ -318,8 +318,8 @@ class RenderLayoutGrid extends RenderBox
   /// Distributes free space among [spannedTracks]
   void _distributeCalculatedSpaceToSpannedTracks(
     double calculatedSpace,
-    TrackType type,
-    Iterable<GridTrack> spannedTracks,
+    _TrackType type,
+    Iterable<_RenderingTrack> spannedTracks,
     _IntrinsicDimension dimension,
   ) {
     // Subtract calculated dimensions of the tracks
@@ -354,14 +354,14 @@ class RenderLayoutGrid extends RenderBox
 
   double _distributeFreeSpace(
     double freeSpace,
-    List<GridTrack> tracks,
-    List<GridTrack> growableAboveMaxTracks,
+    List<_RenderingTrack> tracks,
+    List<_RenderingTrack> growableAboveMaxTracks,
     _IntrinsicDimension dimension,
   ) {
     assert(freeSpace >= 0);
 
-    final distribute = (List<GridTrack> tracks,
-        double Function(GridTrack, double) getShareForTrack) {
+    final distribute = (List<_RenderingTrack> tracks,
+        double Function(_RenderingTrack, double) getShareForTrack) {
       final trackCount = tracks.length;
       for (var i = 0; i < trackCount; i++) {
         final track = tracks[i];
@@ -382,7 +382,7 @@ class RenderLayoutGrid extends RenderBox
           : track.isInfinite ? track.baseSize : track.growthLimit;
     }
 
-    tracks.sort(_sortByGrowthPotential);
+    tracks.sort(sortByGrowthPotential);
 
     // Distribute the free space between tracks
     distribute(tracks, (track, availableShare) {
@@ -417,8 +417,8 @@ class RenderLayoutGrid extends RenderBox
   }
 
   double _findFlexFactorUnitSize(
-    List<GridTrack> tracks,
-    List<GridTrack> flexibleTracks,
+    List<_RenderingTrack> tracks,
+    List<_RenderingTrack> flexibleTracks,
     double freeSpace,
   ) {
     var flexSum = 0.0;
@@ -434,12 +434,12 @@ class RenderLayoutGrid extends RenderBox
     return freeSpace / flexSum;
   }
 
-  void _stretchIntrinsicTracks(TrackType type, GridSizingInfo gridSizing) {
-    final sizingAxis = measurementAxisForTrackType(type);
-    final freeSpace = gridSizing.freeSpaceForAxis(sizingAxis);
+  void _stretchIntrinsicTracks(_TrackType type, _RenderingSize renderingSize) {
+    final sizingAxis = _measurementAxisForTrackType(type);
+    final freeSpace = renderingSize.freeSpaceForAxis(sizingAxis);
     if (freeSpace <= 0) return;
 
-    final tracks = gridSizing.tracksForType(type);
+    final tracks = renderingSize.tracksForType(type);
     final intrinsicTracks = tracks.where((t) => t.sizeFunction.isIntrinsic);
     if (intrinsicTracks.isEmpty) return;
 
@@ -448,7 +448,7 @@ class RenderLayoutGrid extends RenderBox
       track.baseSize += shareForTrack;
     }
 
-    gridSizing.setFreeSpaceForAxis(0, sizingAxis);
+    renderingSize.setFreeSpaceForAxis(0, sizingAxis);
   }
 
   void markNeedsPlacement() => _needsPlacement = true;
@@ -460,19 +460,23 @@ class RenderLayoutGrid extends RenderBox
   @override
   void paint(PaintingContext context, Offset offset) =>
       defaultPaint(context, offset);
-}
 
-double maxConstraintForAxis(BoxConstraints constraints, Axis axis) {
-  return axis == Axis.vertical ? constraints.maxHeight : constraints.maxWidth;
+  static double maxConstraintForAxis(BoxConstraints constraints, Axis axis) =>
+      axis == Axis.vertical ? constraints.maxHeight : constraints.maxWidth;
+
+  static int sortByGrowthPotential(_RenderingTrack a, _RenderingTrack b) {
+    if (a.isInfinite != b.isInfinite) return a.isInfinite ? -1 : 1;
+    return (a.growthLimit - a.baseSize).compareTo(b.growthLimit - b.baseSize);
+  }
 }
 
 enum _IntrinsicDimension { min, max }
 
-class GridTrack {
-  GridTrack(this.index, this.sizeFunction);
+class _RenderingTrack {
+  _RenderingTrack(this.index, this.sizeFunction);
 
   final int index;
-  final TrackSize sizeFunction;
+  final _TrackSize sizeFunction;
 
   double _baseSize = 0;
   double _growthLimit = 0;
@@ -505,12 +509,8 @@ class GridTrack {
   }
 }
 
-List<GridTrack> _sizesToTracks(Iterable<TrackSize> sizes) => enumerate(sizes)
-    .map((s) => GridTrack(s.index, s.value))
-    .toList(growable: false);
-
-class GridSizingInfo {
-  GridSizingInfo({
+class _RenderingSize {
+  _RenderingSize({
     @required this.columnTracks,
     @required this.gap,
     @required this.rowTracks,
@@ -520,29 +520,26 @@ class GridSizingInfo {
         assert(gap != null),
         assert(textDirection != null);
 
-  GridSizingInfo.fromTrackSizeFunctions({
-    @required List<TrackSize> columnSizeFunctions,
+  _RenderingSize.fromTrackSizes({
+    @required List<_TrackSize> columnSizeFunctions,
     double gap = 0,
-    @required List<TrackSize> rowSizeFunctions,
+    @required List<_TrackSize> rowSizeFunctions,
     @required TextDirection textDirection,
   }) : this(
-          columnTracks: _sizesToTracks(columnSizeFunctions),
+          columnTracks: sizesToTracks(columnSizeFunctions),
           gap: gap,
-          rowTracks: _sizesToTracks(rowSizeFunctions),
+          rowTracks: sizesToTracks(rowSizeFunctions),
           textDirection: textDirection,
         );
 
-  Size gridSize;
+  final List<_RenderingTrack> columnTracks;
   final double gap;
-
-  final List<GridTrack> columnTracks;
-  final List<GridTrack> rowTracks;
-
+  final List<_RenderingTrack> rowTracks;
   final TextDirection textDirection;
 
   List<double> _columnStarts;
   List<double> get columnStartsWithoutGaps {
-    _columnStarts ??= cumulativeSum(
+    _columnStarts ??= _cumulativeSum(
       columnTracks.map((t) => t.baseSize),
       includeLast: false,
     ).toList(growable: false);
@@ -551,16 +548,16 @@ class GridSizingInfo {
 
   List<double> _rowStarts;
   List<double> get rowStartsWithoutGaps {
-    _rowStarts ??= cumulativeSum(
+    _rowStarts ??= _cumulativeSum(
       rowTracks.map((t) => t.baseSize),
       includeLast: false,
     ).toList(growable: false);
     return _rowStarts;
   }
 
+  Size size;
   double minWidth = 0.0;
   double minHeight = 0.0;
-
   double maxWidth = 0.0;
   double maxHeight = 0.0;
 
@@ -570,26 +567,26 @@ class GridSizingInfo {
   bool hasColumnSizing = false;
   bool hasRowSizing = false;
 
-  Offset offsetForArea(GridArea area) {
+  Offset offsetForArea(_PlacementArea area) {
     return Offset(
         textDirection == TextDirection.ltr
             ? columnStartsWithoutGaps[area.columnStart] + gap * area.columnStart
-            : gridSize.width -
+            : size.width -
                 columnStartsWithoutGaps[area.columnStart] -
                 sizeForAreaOnAxis(area, Axis.horizontal) -
                 gap * area.columnStart,
         rowStartsWithoutGaps[area.rowStart] + gap * area.rowStart);
   }
 
-  Size sizeForArea(GridArea area) {
+  Size sizeForArea(_PlacementArea area) {
     return Size(
       sizeForAreaOnAxis(area, Axis.horizontal),
       sizeForAreaOnAxis(area, Axis.vertical),
     );
   }
 
-  void markTrackTypeSized(TrackType type) {
-    if (type == TrackType.column) {
+  void markTrackTypeSized(_TrackType type) {
+    if (type == _TrackType.column) {
       hasColumnSizing = true;
     } else {
       hasRowSizing = true;
@@ -621,24 +618,24 @@ class GridSizingInfo {
   bool isAxisSized(Axis sizingAxis) =>
       sizingAxis == Axis.horizontal ? hasColumnSizing : hasRowSizing;
 
-  List<GridTrack> tracksForType(TrackType type) =>
-      type == TrackType.column ? columnTracks : rowTracks;
+  List<_RenderingTrack> tracksForType(_TrackType type) =>
+      type == _TrackType.column ? columnTracks : rowTracks;
 
-  List<GridTrack> tracksAlongAxis(Axis sizingAxis) =>
+  List<_RenderingTrack> tracksAlongAxis(Axis sizingAxis) =>
       sizingAxis == Axis.horizontal ? columnTracks : rowTracks;
 
-  double sizeForAreaOnAxis(GridArea area, Axis axis) {
+  double sizeForAreaOnAxis(_PlacementArea area, Axis axis) {
     assert(isAxisSized(axis));
 
     final trackBaseSizes = tracksAlongAxis(axis)
         .getRange(area.startForAxis(axis), area.endForAxis(axis))
         .map((t) => t.baseSize);
     final gapSize = (area.spanForAxis(axis) - 1) * gap;
-    return math.max(0, sum(trackBaseSizes) + gapSize);
+    return math.max(0, _sum(trackBaseSizes) + gapSize);
   }
-}
 
-int _sortByGrowthPotential(GridTrack a, GridTrack b) {
-  if (a.isInfinite != b.isInfinite) return a.isInfinite ? -1 : 1;
-  return (a.growthLimit - a.baseSize).compareTo(b.growthLimit - b.baseSize);
+  static List<_RenderingTrack> sizesToTracks(Iterable<_TrackSize> sizes) =>
+      enumerate(sizes)
+          .map((s) => _RenderingTrack(s.index, s.value))
+          .toList(growable: false);
 }

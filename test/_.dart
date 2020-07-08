@@ -16,7 +16,7 @@ String _explainer(Widget widget, String Function(Widget) parent) {
     return '[CachedNetworkImage:${widget.imageUrl}]';
   }
 
-  if (widget is GridPlacement) {
+  if (widget is TablePlacement) {
     return '[${widget.rowStart},${widget.columnStart}'
         "${widget.rowSpan != 1 || widget.columnSpan != 1 ? ':${widget.rowSpan}x${widget.columnSpan}' : ''}"
         ':${parent(widget.child)}]';

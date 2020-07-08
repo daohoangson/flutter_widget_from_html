@@ -1,16 +1,16 @@
 part of '../table_layout.dart';
 
-bool Function(T) removeDuplicates<T>() => <T>{}.add;
+bool Function(T) _removeDuplicates<T>() => <T>{}.add;
 
-T sum<T extends num>(Iterable<T> numbers) =>
-    numbers.fold(zeroForType<T>(), (acc, number) => (acc + number) as T);
+T _sum<T extends num>(Iterable<T> numbers) =>
+    numbers.fold(_zeroForType<T>(), (acc, number) => (acc + number) as T);
 
-Iterable<T> cumulativeSum<T extends num>(
+Iterable<T> _cumulativeSum<T extends num>(
   Iterable<T> numbers, {
   bool includeLast,
 }) sync* {
   includeLast ??= true;
-  var current = zeroForType<T>();
+  var current = _zeroForType<T>();
   for (final i in numbers) {
     yield current;
     current += i;
@@ -18,4 +18,4 @@ Iterable<T> cumulativeSum<T extends num>(
   if (includeLast) yield current;
 }
 
-T zeroForType<T extends num>() => (T == int ? 0 : 0.0) as T;
+T _zeroForType<T extends num>() => (T == int ? 0 : 0.0) as T;

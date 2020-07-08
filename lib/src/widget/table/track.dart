@@ -1,30 +1,26 @@
 part of '../table_layout.dart';
 
-enum TrackType { column, row }
+enum _TrackType { column, row }
 
-Axis mainAxisForTrackType(TrackType type) =>
-    type == TrackType.column ? Axis.vertical : Axis.horizontal;
+Axis _measurementAxisForTrackType(_TrackType type) =>
+    type == _TrackType.column ? Axis.horizontal : Axis.vertical;
 
-Axis measurementAxisForTrackType(TrackType type) {
-  return type == TrackType.column ? Axis.horizontal : Axis.vertical;
-}
-
-abstract class TrackSize {
-  const TrackSize();
+abstract class _TrackSize {
+  const _TrackSize();
 
   double get flex => null;
   bool get isIntrinsic => false;
   bool get isFlexible => false;
 
   double minIntrinsicSize(
-    TrackType type,
+    _TrackType type,
     Iterable<RenderBox> items,
     double measurementAxisMaxSize, {
     double Function(RenderBox) crossAxisSizeForItem,
   });
 
   double maxIntrinsicSize(
-    TrackType type,
+    _TrackType type,
     Iterable<RenderBox> items,
     double measurementAxisMaxSize, {
     double Function(RenderBox) crossAxisSizeForItem,
@@ -47,10 +43,10 @@ abstract class TrackSize {
   }
 }
 
-class FlexibleTrackSize extends TrackSize {
+class _TrackSizeFlexible extends _TrackSize {
   final double _flex;
 
-  const FlexibleTrackSize(this._flex) : assert(_flex != null && _flex > 0);
+  const _TrackSizeFlexible(this._flex) : assert(_flex != null && _flex > 0);
 
   @override
   double get flex => _flex;
@@ -60,7 +56,7 @@ class FlexibleTrackSize extends TrackSize {
 
   @override
   double minIntrinsicSize(
-    TrackType type,
+    _TrackType type,
     Iterable<RenderBox> items,
     double measurementAxisMaxSize, {
     double Function(RenderBox) crossAxisSizeForItem,
@@ -69,7 +65,7 @@ class FlexibleTrackSize extends TrackSize {
 
   @override
   double maxIntrinsicSize(
-    TrackType type,
+    _TrackType type,
     Iterable<RenderBox> items,
     double measurementAxisMaxSize, {
     double Function(RenderBox) crossAxisSizeForItem,
@@ -77,15 +73,15 @@ class FlexibleTrackSize extends TrackSize {
       0;
 }
 
-class IntrinsicContentTrackSize extends TrackSize {
-  const IntrinsicContentTrackSize();
+class _TrackSizeIntrinsic extends _TrackSize {
+  const _TrackSizeIntrinsic();
 
   @override
   bool get isIntrinsic => true;
 
   @override
   double minIntrinsicSize(
-    TrackType type,
+    _TrackType type,
     Iterable<RenderBox> items,
     double measurementAxisMaxSize, {
     double Function(RenderBox) crossAxisSizeForItem,
@@ -94,7 +90,7 @@ class IntrinsicContentTrackSize extends TrackSize {
     final minContentContributions = items.map(
       (item) => _itemMinIntrinsicSizeOnAxis(
         item,
-        measurementAxisForTrackType(type),
+        _measurementAxisForTrackType(type),
         crossAxisSizeForItem(item),
       ),
     );
@@ -103,7 +99,7 @@ class IntrinsicContentTrackSize extends TrackSize {
 
   @override
   double maxIntrinsicSize(
-    TrackType type,
+    _TrackType type,
     Iterable<RenderBox> items,
     double measurementAxisMaxSize, {
     double Function(RenderBox) crossAxisSizeForItem,
@@ -112,7 +108,7 @@ class IntrinsicContentTrackSize extends TrackSize {
     final maxContentContributions = items.map(
       (item) => _itemMaxIntrinsicSizeOnAxis(
         item,
-        measurementAxisForTrackType(type),
+        _measurementAxisForTrackType(type),
         crossAxisSizeForItem(item),
       ),
     );

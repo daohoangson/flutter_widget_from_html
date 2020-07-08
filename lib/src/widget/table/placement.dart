@@ -1,40 +1,42 @@
 part of '../table_layout.dart';
 
-PlacementGrid computeItemPlacement(RenderLayoutGrid grid) {
-  final occupancy = PlacementGrid(grid: grid);
+_PlacementGrid computeItemPlacement(_TableRenderBox renderBox) {
+  final occupancy = _PlacementGrid(renderBox);
 
-  var child = grid.firstChild;
+  var child = renderBox.firstChild;
   while (child != null) {
-    final childParentData = child.parentData as GridParentData;
-    final area = childParentData.area;
+    final placement = child.parentData as _RenderingPlacementData;
+    final area = placement.area;
     if (area != null) occupancy.addItemToArea(child, area);
-    child = childParentData.nextSibling;
+
+    child = placement.nextSibling;
   }
 
   return occupancy;
 }
 
-class PlacementGrid {
+class _PlacementGrid {
   final int cols;
-  final RenderLayoutGrid grid;
-  final Map<RenderBox, GridArea> itemAreas = {};
+  final _TableRenderBox renderBox;
+  final Map<RenderBox, _PlacementArea> itemAreas = {};
   final int rows;
 
-  List<GridCell> _cells;
+  List<_PlacementCell> _cells;
 
-  PlacementGrid({@required this.grid})
-      : cols = grid.templateColumnSizes.length,
-        rows = grid.templateRowSizes.length {
-    _cells = List.generate(cols * rows, (i) => GridCell(this, i));
+  _PlacementGrid(this.renderBox)
+      : cols = renderBox.templateColumnSizes.length,
+        rows = renderBox.templateRowSizes.length {
+    _cells = List.generate(cols * rows, (i) => _PlacementCell(this, i));
   }
 
-  GridCell getCellAt(int column, int row) => _cells[row * cols + column];
+  _PlacementCell getCellAt(int column, int row) => _cells[row * cols + column];
 
-  Iterable<GridCell> getCellsInTrack(
+  Iterable<_PlacementCell> getCellsInTrack(
     int trackIndex,
-    TrackType trackType,
+    _TrackType trackType,
   ) sync* {
-    final trackMainAxis = mainAxisForTrackType(trackType);
+    final trackMainAxis =
+        trackType == _TrackType.column ? Axis.vertical : Axis.horizontal;
     final firstCellIndex =
         trackMainAxis == Axis.vertical ? trackIndex : trackIndex * cols;
 
@@ -44,7 +46,7 @@ class PlacementGrid {
     }
   }
 
-  Iterable<GridCell> getCellsInArea(GridArea area) sync* {
+  Iterable<_PlacementCell> getCellsInArea(_PlacementArea area) sync* {
     for (var x = area.columnStart; x < area.columnEnd; x++) {
       for (var y = area.rowStart; y < area.rowEnd; y++) {
         yield getCellAt(x, y);
@@ -52,7 +54,7 @@ class PlacementGrid {
     }
   }
 
-  void addItemToArea(RenderBox item, GridArea area) {
+  void addItemToArea(RenderBox item, _PlacementArea area) {
     for (final cell in getCellsInArea(area)) {
       cell.occupants.add(item);
     }
@@ -61,8 +63,8 @@ class PlacementGrid {
 }
 
 @immutable
-class GridArea {
-  GridArea({
+class _PlacementArea {
+  _PlacementArea({
     @required this.columnStart,
     @required this.columnEnd,
     @required this.rowStart,
@@ -88,7 +90,7 @@ class GridArea {
   @override
   bool operator ==(dynamic other) {
     if (other.runtimeType != runtimeType) return false;
-    final typedOther = other as GridArea;
+    final typedOther = other as _PlacementArea;
     return typedOther.columnStart == columnStart &&
         typedOther.columnEnd == columnEnd &&
         typedOther.rowStart == rowStart &&
@@ -97,14 +99,14 @@ class GridArea {
 }
 
 @immutable
-class GridCell {
-  GridCell(this.grid, this.index);
+class _PlacementCell {
+  _PlacementCell(this.grid, this.index);
 
-  final PlacementGrid grid;
+  final _PlacementGrid grid;
   final int index;
   final occupants = <RenderBox>{};
 
-  Iterable<GridCell> nextCellsAlongAxis(Axis axis) sync* {
+  Iterable<_PlacementCell> nextCellsAlongAxis(Axis axis) sync* {
     final next = axis == Axis.horizontal ? nextInRow : nextInColumn;
     if (next != null) {
       yield next;
@@ -112,12 +114,12 @@ class GridCell {
     }
   }
 
-  GridCell get nextInRow {
+  _PlacementCell get nextInRow {
     final column = (index + 1) % grid.cols;
     return column == 0 ? null : grid._cells[index + 1];
   }
 
-  GridCell get nextInColumn {
+  _PlacementCell get nextInColumn {
     final i = index + grid.cols;
     return i >= grid._cells.length ? null : grid._cells[i];
   }

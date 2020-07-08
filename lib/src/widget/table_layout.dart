@@ -11,96 +11,69 @@ import 'package:flutter/widgets.dart';
 part 'table/collections.dart';
 part 'table/placement.dart';
 part 'table/rendering.dart';
-part 'table/track_size.dart';
+part 'table/track.dart';
 
-class LayoutGrid extends MultiChildRenderObjectWidget {
-  LayoutGrid({
-    Key key,
-    @required this.templateColumnSizes,
-    @required this.templateRowSizes,
+class TableLayout extends MultiChildRenderObjectWidget {
+  TableLayout({
+    @required int cols,
     this.gap = 0,
+    Key key,
+    @required int rows,
     this.textDirection,
     List<Widget> children = const [],
-  })  : assert(templateRowSizes != null && templateRowSizes.isNotEmpty),
-        assert(templateColumnSizes != null && templateColumnSizes.isNotEmpty),
+  })  : _templateColumnSizes =
+            List.generate(cols, (_) => const _TrackSizeFlexible(1)),
+        _templateRowSizes =
+            List.generate(rows, (_) => const _TrackSizeIntrinsic()),
         super(key: key, children: children);
 
   final double gap;
 
-  /// Defines the track sizing functions of the grid's columns.
-  final List<TrackSize> templateColumnSizes;
+  final List<_TrackSize> _templateColumnSizes;
 
-  /// Defines the track sizing functions of the grid's rows.
-  final List<TrackSize> templateRowSizes;
+  final List<_TrackSize> _templateRowSizes;
 
-  /// The text direction used to resolve column ordering.
-  ///
-  /// Defaults to the ambient [Directionality].
   final TextDirection textDirection;
 
   @override
-  RenderLayoutGrid createRenderObject(BuildContext context) {
-    return RenderLayoutGrid(
-      gap: gap,
-      templateColumnSizes: templateColumnSizes,
-      templateRowSizes: templateRowSizes,
-      textDirection: textDirection ?? Directionality.of(context),
-    );
-  }
+  RenderBox createRenderObject(BuildContext context) => _TableRenderBox(
+        gap: gap,
+        templateColumnSizes: _templateColumnSizes,
+        templateRowSizes: _templateRowSizes,
+        textDirection: textDirection ?? Directionality.of(context),
+      );
 
   @override
-  void updateRenderObject(BuildContext context, RenderLayoutGrid renderObject) {
+  void updateRenderObject(BuildContext context, _TableRenderBox renderObject) {
     renderObject
       ..gap = gap
-      ..templateColumnSizes = templateColumnSizes
-      ..templateRowSizes = templateRowSizes
+      ..templateColumnSizes = _templateColumnSizes
+      ..templateRowSizes = _templateRowSizes
       ..textDirection = textDirection ?? Directionality.of(context);
   }
 }
 
-class GridPlacement extends ParentDataWidget<GridParentData> {
-  const GridPlacement({
+class TablePlacement extends ParentDataWidget<_RenderingPlacementData> {
+  const TablePlacement({
     Key key,
     @required Widget child,
-    this.columnStart,
-    int columnSpan = 1,
-    this.rowStart,
-    int rowSpan = 1,
-  })  : columnSpan = columnSpan ?? 1,
-        rowSpan = rowSpan ?? 1,
-        name = null,
+    @required this.columnStart,
+    this.columnSpan = 1,
+    @required this.rowStart,
+    this.rowSpan = 1,
+  })  : assert(columnStart != null),
+        assert(rowStart != null),
         super(key: key, child: child);
 
-  const GridPlacement.areaNamed({
-    Key key,
-    @required Widget child,
-    @required this.name,
-  })  : columnStart = null,
-        columnSpan = null,
-        rowStart = null,
-        rowSpan = null,
-        super(key: key, child: child);
-
-  /// The name of the area whose tracks will be used to place this widget's
-  /// child.
-  final String name;
-
-  /// If `null`, the child will be auto-placed.
   final int columnStart;
-
-  /// The number of columns spanned by the child. Defaults to `1`.
   final int columnSpan;
-
-  /// If `null`, the child will be auto-placed.
   final int rowStart;
-
-  /// The number of rows spanned by the child. Defaults to `1`.
   final int rowSpan;
 
   @override
   void applyParentData(RenderObject renderObject) {
-    assert(renderObject.parentData is GridParentData);
-    final parentData = renderObject.parentData as GridParentData;
+    assert(renderObject.parentData is _RenderingPlacementData);
+    final parentData = renderObject.parentData as _RenderingPlacementData;
     var needsLayout = false;
 
     if (parentData.columnStart != columnStart) {
@@ -126,31 +99,10 @@ class GridPlacement extends ParentDataWidget<GridParentData> {
     if (needsLayout) {
       final targetParent = renderObject.parent;
       if (targetParent is RenderObject) targetParent.markNeedsLayout();
-      if (targetParent is RenderLayoutGrid) targetParent.markNeedsPlacement();
+      if (targetParent is _TableRenderBox) targetParent.markNeedsPlacement();
     }
   }
 
   @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    if (columnStart != null) {
-      properties.add(IntProperty('columnStart', columnStart));
-    } else {
-      properties.add(StringProperty('columnStart', 'auto'));
-    }
-    if (columnSpan != null) {
-      properties.add(IntProperty('columnSpan', columnSpan));
-    }
-    if (rowStart != null) {
-      properties.add(IntProperty('rowStart', rowStart));
-    } else {
-      properties.add(StringProperty('rowStart', 'auto'));
-    }
-    if (rowSpan != null) {
-      properties.add(IntProperty('rowSpan', rowSpan));
-    }
-  }
-
-  @override
-  Type get debugTypicalAncestorWidgetClass => LayoutGrid;
+  Type get debugTypicalAncestorWidgetClass => TableLayout;
 }

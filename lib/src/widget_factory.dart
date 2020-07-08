@@ -50,23 +50,11 @@ class WidgetFactory extends core.WidgetFactory {
 
   @override
   Widget buildTable(TableData table) {
-    final cols = table.cols;
-    final templateColumnSizes = List<TrackSize>(cols);
-    for (var c = 0; c < cols; c++) {
-      templateColumnSizes[c] = const FlexibleTrackSize(1);
-    }
-
-    final rows = table.rows;
-    final templateRowSizes = List<TrackSize>(rows);
-    for (var r = 0; r < rows; r++) {
-      templateRowSizes[r] = const IntrinsicContentTrackSize();
-    }
-
     final border = table.border != null
         ? BoxDecoration(border: Border.fromBorderSide(table.border))
         : null;
 
-    final layoutGrid = LayoutGrid(
+    final layoutGrid = TableLayout(
       children: table.slots.map((slot) {
         Widget cell = SizedBox.expand(child: buildColumn(slot.cell.children));
 
@@ -77,7 +65,7 @@ class WidgetFactory extends core.WidgetFactory {
           );
         }
 
-        return GridPlacement(
+        return TablePlacement(
           columnStart: slot.col,
           columnSpan: slot.cell.colspan,
           rowStart: slot.row,
@@ -85,9 +73,9 @@ class WidgetFactory extends core.WidgetFactory {
           child: cell,
         );
       }).toList(growable: false),
+      cols: table.cols,
       gap: -(table.border?.width ?? 0),
-      templateColumnSizes: templateColumnSizes,
-      templateRowSizes: templateRowSizes,
+      rows: table.rows,
     );
 
     if (border == null) return layoutGrid;
