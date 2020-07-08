@@ -14,10 +14,6 @@ dependencies:
   provider: ^3.0.0+1
 
 dependency_overrides:                                             # dep_override
-  flutter_layout_grid:                                            # dep_override
-    git:                                                          # dep_override
-      url: https://github.com/daohoangson/flutter_layout_grid.git # dep_override
-      ref: negative_gap                                           # dep_override
   flutter_widget_from_html:                                       # dep_override
     path: ../..                                                   # dep_override
   flutter_widget_from_html_core:                                  # dep_override

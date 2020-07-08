@@ -1,4 +1,5 @@
 export 'package:flutter_widget_from_html_core/src/core_helpers.dart';
+export 'widget/table_layout.dart';
 
 import 'dart:async';
 import 'package:flutter/foundation.dart';

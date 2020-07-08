@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
@@ -51,23 +50,11 @@ class WidgetFactory extends core.WidgetFactory {
 
   @override
   Widget buildTable(TableData table) {
-    final cols = table.cols;
-    final templateColumnSizes = List<TrackSize>(cols);
-    for (var c = 0; c < cols; c++) {
-      templateColumnSizes[c] = FlexibleTrackSize(1);
-    }
-
-    final rows = table.rows;
-    final templateRowSizes = List<TrackSize>(rows);
-    for (var r = 0; r < rows; r++) {
-      templateRowSizes[r] = IntrinsicContentTrackSize();
-    }
-
     final border = table.border != null
         ? BoxDecoration(border: Border.fromBorderSide(table.border))
         : null;
 
-    final layoutGrid = LayoutGrid(
+    final layoutGrid = TableLayout(
       children: table.slots.map((slot) {
         Widget cell = SizedBox.expand(child: buildColumn(slot.cell.children));
 
@@ -78,18 +65,17 @@ class WidgetFactory extends core.WidgetFactory {
           );
         }
 
-        return cell.withGridPlacement(
+        return TablePlacement(
           columnStart: slot.col,
           columnSpan: slot.cell.colspan,
           rowStart: slot.row,
           rowSpan: slot.cell.rowspan,
+          child: cell,
         );
       }).toList(growable: false),
-      columnGap: -(table.border?.width ?? 0),
-      gridFit: GridFit.passthrough,
-      rowGap: -(table.border?.width ?? 0),
-      templateColumnSizes: templateColumnSizes,
-      templateRowSizes: templateRowSizes,
+      cols: table.cols,
+      gap: -(table.border?.width ?? 0),
+      rows: table.rows,
     );
 
     if (border == null) return layoutGrid;

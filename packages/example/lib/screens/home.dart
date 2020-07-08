@@ -203,6 +203,43 @@ C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."
     <td>94</td>
   </tr>
 </table>
+
+<table border="1">
+  <caption>Source: <a href="https://www.w3schools.com/tags/att_td_colspan.asp">w3schools</a></caption>
+  <tr>
+    <th>Month</th>
+    <th>Savings</th>
+  </tr>
+  <tr>
+    <td>January</td>
+    <td>\$100</td>
+  </tr>
+  <tr>
+    <td>February</td>
+    <td>\$80</td>
+  </tr>
+  <tr>
+    <td colspan="2">Sum: \$180</td>
+  </tr>
+</table>
+
+<table border="1">
+  <caption>Source: <a href="https://www.w3schools.com/tags/att_td_colspan.asp">w3schools</a></caption>
+  <tr>
+    <th>Month</th>
+    <th>Savings</th>
+    <th>Savings for holiday!</th>
+  </tr>
+  <tr>
+    <td>January</td>
+    <td>\$100</td>
+    <td rowspan="2">\$50</td>
+  </tr>
+  <tr>
+    <td>February</td>
+    <td>\$80</td>
+  </tr>
+</table>
 ''',
     'Video': () => VideoScreen(),
   };

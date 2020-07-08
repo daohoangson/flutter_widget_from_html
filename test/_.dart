@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
@@ -17,7 +16,7 @@ String _explainer(Widget widget, String Function(Widget) parent) {
     return '[CachedNetworkImage:${widget.imageUrl}]';
   }
 
-  if (widget is GridPlacement) {
+  if (widget is TablePlacement) {
     return '[${widget.rowStart},${widget.columnStart}'
         "${widget.rowSpan != 1 || widget.columnSpan != 1 ? ':${widget.rowSpan}x${widget.columnSpan}' : ''}"
         ':${parent(widget.child)}]';
