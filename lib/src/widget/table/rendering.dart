@@ -1,19 +1,10 @@
 part of '../table_layout.dart';
 
-/// Parent data for use with [RenderLayoutGrid].
 class GridParentData extends ContainerBoxParentData<RenderBox> {
   int columnStart;
   int columnSpan = 1;
   int rowStart;
   int rowSpan = 1;
-
-  String debugLabel;
-
-  int startForAxis(Axis axis) =>
-      axis == Axis.horizontal ? columnStart : rowStart;
-
-  int spanForAxis(Axis axis) => //
-      axis == Axis.horizontal ? columnSpan : rowSpan;
 
   GridArea get area => columnStart != null && rowStart != null
       ? GridArea(
@@ -23,26 +14,12 @@ class GridParentData extends ContainerBoxParentData<RenderBox> {
           rowEnd: rowStart + rowSpan,
         )
       : null;
-
-  @override
-  String toString() {
-    final values = <String>[
-      if (columnStart != null) 'columnStart=$columnStart',
-      if (columnSpan != null) 'columnSpan=$columnSpan',
-      if (rowStart != null) 'rowStart=$rowStart',
-      if (rowSpan != null) 'rowSpan=$rowSpan',
-      if (debugLabel != null) 'debugLabel=$debugLabel',
-    ];
-    values.add(super.toString());
-    return values.join('; ');
-  }
 }
 
 class RenderLayoutGrid extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, GridParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, GridParentData> {
-  /// Creates a layout grid render object.
   RenderLayoutGrid({
     List<RenderBox> children,
     double gap = 0,
@@ -50,6 +27,8 @@ class RenderLayoutGrid extends RenderBox
     @required List<TrackSize> templateRowSizes,
     TextDirection textDirection = TextDirection.ltr,
   })  : assert(textDirection != null),
+        assert(templateColumnSizes != null),
+        assert(templateRowSizes != null),
         _gap = gap,
         _templateColumnSizes = templateColumnSizes,
         _templateRowSizes = templateRowSizes,
@@ -68,7 +47,6 @@ class RenderLayoutGrid extends RenderBox
     markNeedsLayout();
   }
 
-  /// Defines the sizing functions of the grid's columns.
   List<TrackSize> get templateColumnSizes => _templateColumnSizes;
   List<TrackSize> _templateColumnSizes;
   set templateColumnSizes(List<TrackSize> value) {
@@ -78,7 +56,6 @@ class RenderLayoutGrid extends RenderBox
     markNeedsLayout();
   }
 
-  /// Defines the sizing functions of the grid's rows.
   List<TrackSize> get templateRowSizes => _templateRowSizes;
   List<TrackSize> _templateRowSizes;
   set templateRowSizes(List<TrackSize> value) {
@@ -88,7 +65,6 @@ class RenderLayoutGrid extends RenderBox
     markNeedsLayout();
   }
 
-  /// The text direction with which to resolve column ordering.
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
   set textDirection(TextDirection value) {
@@ -106,43 +82,36 @@ class RenderLayoutGrid extends RenderBox
 
   @override
   double computeMinIntrinsicWidth(double height) =>
-      _computeIntrinsicSize(BoxConstraints.tightFor(height: height)).minWidth;
+      _computeGridSize(BoxConstraints.tightFor(height: height)).minWidth;
 
   @override
   double computeMaxIntrinsicWidth(double height) =>
-      _computeIntrinsicSize(BoxConstraints(minHeight: height)).maxWidth;
+      _computeGridSize(BoxConstraints(minHeight: height)).maxWidth;
 
   @override
   double computeMinIntrinsicHeight(double width) =>
-      _computeIntrinsicSize(BoxConstraints.tightFor(width: width)).minHeight;
+      _computeGridSize(BoxConstraints.tightFor(width: width)).minHeight;
 
   @override
   double computeMaxIntrinsicHeight(double width) =>
-      _computeIntrinsicSize(BoxConstraints(minWidth: width)).maxHeight;
-
-  GridSizingInfo _computeIntrinsicSize(BoxConstraints constraints) =>
-      _computeGridSize(constraints);
+      _computeGridSize(BoxConstraints(minWidth: width)).maxHeight;
 
   @override
-  double computeDistanceToActualBaseline(TextBaseline baseline) {
-    return defaultComputeDistanceToHighestActualBaseline(baseline);
-  }
+  double computeDistanceToActualBaseline(TextBaseline baseline) =>
+      defaultComputeDistanceToHighestActualBaseline(baseline);
 
-  List<RenderBox> getChildrenInTrack(TrackType trackType, int trackIndex) {
-    return _placementGrid
-        .getCellsInTrack(trackIndex, trackType)
-        .expand((cell) => cell.occupants)
-        .where(removeDuplicates())
-        .toList(growable: false);
-  }
+  List<RenderBox> getChildrenInTrack(TrackType trackType, int trackIndex) =>
+      _placementGrid
+          .getCellsInTrack(trackIndex, trackType)
+          .expand((cell) => cell.occupants)
+          .where(removeDuplicates())
+          .toList(growable: false);
 
   @override
   void performLayout() {
-    // Size the grid
     final gridSizing = _computeGridSize(constraints);
     size = gridSizing.gridSize;
 
-    // Position and lay out the grid items
     var child = firstChild;
     while (child != null) {
       final parentData = child.parentData as GridParentData;
@@ -155,10 +124,8 @@ class RenderLayoutGrid extends RenderBox
   }
 
   GridSizingInfo _computeGridSize(BoxConstraints constraints) {
-    // Distribute grid items into cells
     performItemPlacement();
 
-    // Ready an object that contains our sizing information
     final gridSizing = GridSizingInfo.fromTrackSizeFunctions(
       columnSizeFunctions: _templateColumnSizes,
       gap: gap,
@@ -166,17 +133,14 @@ class RenderLayoutGrid extends RenderBox
       textDirection: textDirection,
     );
 
-    // Determine the size of the column tracks
     final columnTracks = performTrackSizing(TrackType.column, gridSizing,
         constraints: constraints);
     gridSizing.hasColumnSizing = true;
 
-    // Determine the size of the row tracks
     final rowTracks =
         performTrackSizing(TrackType.row, gridSizing, constraints: constraints);
     gridSizing.hasRowSizing = true;
 
-    // Stretch intrinsics
     _stretchIntrinsicTracks(TrackType.column, gridSizing);
     _stretchIntrinsicTracks(TrackType.row, gridSizing);
 
@@ -189,8 +153,6 @@ class RenderLayoutGrid extends RenderBox
     return gridSizing;
   }
 
-  /// Determines where each grid item is positioned in the grid, using the
-  /// auto-placement algorithm if necessary.
   void performItemPlacement() {
     if (_needsPlacement) {
       _needsPlacement = false;
@@ -198,13 +160,10 @@ class RenderLayoutGrid extends RenderBox
     }
   }
 
-  /// A rough approximation of
-  /// https://drafts.csswg.org/css-grid/#algo-track-sizing. There are a bunch of
-  /// steps left out because our model is simpler.
   List<GridTrack> performTrackSizing(
     TrackType typeBeingSized,
     GridSizingInfo gridSizing, {
-    @visibleForTesting BoxConstraints constraints,
+    BoxConstraints constraints,
   }) {
     constraints ??= this.constraints;
 
@@ -217,19 +176,18 @@ class RenderLayoutGrid extends RenderBox
         ? maxConstraintForAxis(constraints, sizingAxis) -
             gridSizing.gap * (tracks.length - 1)
         : 0.0;
-    final isAxisDefinite = isTightlyConstrainedForAxis(constraints, sizingAxis);
+    final isAxisDefinite = sizingAxis == Axis.vertical
+        ? constraints.hasTightHeight
+        : constraints.hasTightWidth;
 
     // 1. Initialize track sizes
-
     for (var i = 0; i < tracks.length; i++) {
       final track = tracks[i];
 
       if (track.sizeFunction.isFlexible) {
-        // Flexible sizing
         track.baseSize = track.growthLimit = 0;
         flexibleTracks.add(track);
       } else {
-        // Intrinsic sizing
         track.baseSize = 0;
         track.growthLimit = double.infinity;
         intrinsicTracks.add(track);
@@ -239,13 +197,11 @@ class RenderLayoutGrid extends RenderBox
     }
 
     // 2. Resolve intrinsic track sizes
-
     _resolveIntrinsicTrackSizes(typeBeingSized, sizingAxis, tracks,
         intrinsicTracks, gridSizing, constraints, initialFreeSpace);
 
     // 3. Grow all tracks from their baseSize up to their growthLimit value
     //    until freeSpace is exhausted.
-
     var baseSizesWithoutMaximization = 0.0,
         growthLimitsWithoutMaximization = 0.0;
     for (final track in tracks) {
@@ -258,11 +214,7 @@ class RenderLayoutGrid extends RenderBox
     gridSizing.setFreeSpaceForAxis(freeSpace, sizingAxis);
     gridSizing.setMinMaxForAxis(baseSizesWithoutMaximization,
         growthLimitsWithoutMaximization, sizingAxis);
-
-    // We're already overflowing
-    if (isAxisDefinite && freeSpace < 0) {
-      return tracks;
-    }
+    if (isAxisDefinite && freeSpace < 0) return tracks;
 
     if (isAxisDefinite) {
       freeSpace =
@@ -276,14 +228,9 @@ class RenderLayoutGrid extends RenderBox
     gridSizing.setFreeSpaceForAxis(freeSpace, sizingAxis);
 
     // 4. Size flexible tracks to fill remaining space, if any
-
-    if (flexibleTracks.isEmpty) {
-      return tracks;
-    }
-
+    if (flexibleTracks.isEmpty) return tracks;
     final flexFraction =
         _findFlexFactorUnitSize(tracks, flexibleTracks, initialFreeSpace);
-
     for (final track in flexibleTracks) {
       track.baseSize = flexFraction * track.sizeFunction.flex;
 
@@ -315,8 +262,6 @@ class RenderLayoutGrid extends RenderBox
     final itemsBySpan = groupBy(itemsInIntrinsicTracks,
         (item) => _placementGrid.itemAreas[item].spanForAxis(sizingAxis));
     final sortedSpans = itemsBySpan.keys.toList()..sort();
-
-    // Iterate over the spans we find in our items list, in ascending order.
     for (var span in sortedSpans) {
       final spanItems = itemsBySpan[span];
       final spanItemsByTrack = groupBy<RenderBox, int>(
@@ -509,28 +454,16 @@ class RenderLayoutGrid extends RenderBox
   void markNeedsPlacement() => _needsPlacement = true;
 
   @override
-  bool hitTestChildren(BoxHitTestResult result, {Offset position}) {
-    return defaultHitTestChildren(result, position: position);
-  }
+  bool hitTestChildren(BoxHitTestResult result, {Offset position}) =>
+      defaultHitTestChildren(result, position: position);
 
   @override
-  void paint(PaintingContext context, Offset offset) {
-    defaultPaint(context, offset);
-  }
-}
-
-double minConstraintForAxis(BoxConstraints constraints, Axis axis) {
-  return axis == Axis.vertical ? constraints.minHeight : constraints.minWidth;
+  void paint(PaintingContext context, Offset offset) =>
+      defaultPaint(context, offset);
 }
 
 double maxConstraintForAxis(BoxConstraints constraints, Axis axis) {
   return axis == Axis.vertical ? constraints.maxHeight : constraints.maxWidth;
-}
-
-bool isTightlyConstrainedForAxis(BoxConstraints constraints, Axis axis) {
-  return axis == Axis.vertical
-      ? constraints.hasTightHeight
-      : constraints.hasTightWidth;
 }
 
 enum _IntrinsicDimension { min, max }
