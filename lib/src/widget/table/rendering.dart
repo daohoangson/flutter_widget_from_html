@@ -499,11 +499,6 @@ class _RenderingTrack {
       _growthLimit = _baseSize;
     }
   }
-
-  @override
-  String toString() {
-    return 'GridTrack(baseSize=$baseSize, growthLimit=$growthLimit, sizeFunction=$sizeFunction)';
-  }
 }
 
 class _RenderingSize {
