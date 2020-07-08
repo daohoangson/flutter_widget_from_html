@@ -313,7 +313,16 @@ class WidgetFactory {
     if (value == null) return null;
 
     final parsed = parseCssLength(value);
-    if (parsed != null) return parsed.getValue(tsb.context, m.tsb);
+    if (parsed != null) {
+      final lengthValue = parsed.getValue(tsb.context, m.tsb);
+      if (lengthValue != null) return lengthValue;
+
+      if (parsed.unit == CssLengthUnit.percentage) {
+        return m.tsb.build(tsb.context).style.fontSize * parsed.number / 100;
+      }
+
+      return null;
+    }
 
     final c = tsb.context;
     switch (value) {
