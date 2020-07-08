@@ -1,4 +1,4 @@
-part of '../../table_layout.dart';
+part of '../table_layout.dart';
 
 /// Parent data for use with [RenderLayoutGrid].
 class GridParentData extends ContainerBoxParentData<RenderBox> {
@@ -38,9 +38,6 @@ class GridParentData extends ContainerBoxParentData<RenderBox> {
   }
 }
 
-/// Implements the grid layout algorithm.
-///
-/// TODO(shyndman): Describe algorithm.
 class RenderLayoutGrid extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, GridParentData>,
@@ -123,9 +120,6 @@ class RenderLayoutGrid extends RenderBox
   double computeMaxIntrinsicHeight(double width) =>
       _computeIntrinsicSize(BoxConstraints(minWidth: width)).maxHeight;
 
-  // TODO(https://github.com/madewithfelt/flutter_layout_grid/issues/1):
-  // This implementation is not likely to be correct. Revisit once Flutter's
-  // sizing rules are better understood.
   GridSizingInfo _computeIntrinsicSize(BoxConstraints constraints) =>
       _computeGridSize(constraints);
 
@@ -287,12 +281,6 @@ class RenderLayoutGrid extends RenderBox
       return tracks;
     }
 
-    // TODO(shyndman): This is not to spec. Flexible rows should have a minimum
-    // size of their content's minimum contribution. We may add this as soon
-    // as we have the notion of distinct minimum and maximum track size
-    // functions, but requires some consideration because of the expense to
-    // compute.
-    // https://drafts.csswg.org/css-grid/#valdef-grid-template-columns-flex
     final flexFraction =
         _findFlexFactorUnitSize(tracks, flexibleTracks, initialFreeSpace);
 
@@ -324,16 +312,13 @@ class RenderLayoutGrid extends RenderBox
         .expand((t) => getChildrenInTrack(type, t.index))
         .where(removeDuplicates());
 
-    final itemsBySpan = groupBy(itemsInIntrinsicTracks, (RenderObject item) {
-      return _placementGrid.itemAreas[item].spanForAxis(sizingAxis);
-    });
+    final itemsBySpan = groupBy(itemsInIntrinsicTracks,
+        (item) => _placementGrid.itemAreas[item].spanForAxis(sizingAxis));
     final sortedSpans = itemsBySpan.keys.toList()..sort();
 
     // Iterate over the spans we find in our items list, in ascending order.
     for (var span in sortedSpans) {
       final spanItems = itemsBySpan[span];
-      // TODO(shyndman): This is unnecessary work. We should be able to
-      // construct what we need above.
       final spanItemsByTrack = groupBy<RenderBox, int>(
         spanItems,
         (item) => _placementGrid.itemAreas[item].startForAxis(sizingAxis),
@@ -501,9 +486,6 @@ class RenderLayoutGrid extends RenderBox
     }
 
     assert(flexSum > 0);
-    // TODO(shyndman): This is not to spec. We need to consider track base sizes
-    // (when measuring the content minimum) that are bigger than what the flex
-    // would provide.
     return freeSpace / flexSum;
   }
 
@@ -625,13 +607,13 @@ class GridSizingInfo {
 
   final TextDirection textDirection;
 
-  List<double> _ltrColumnStarts;
+  List<double> _columnStarts;
   List<double> get columnStartsWithoutGaps {
-    _ltrColumnStarts ??= cumulativeSum(
+    _columnStarts ??= cumulativeSum(
       columnTracks.map((t) => t.baseSize),
       includeLast: false,
     ).toList(growable: false);
-    return _ltrColumnStarts;
+    return _columnStarts;
   }
 
   List<double> _rowStarts;

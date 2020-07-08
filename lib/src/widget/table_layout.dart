@@ -8,11 +8,10 @@ import 'package:quiver/core.dart';
 import 'package:quiver/iterables.dart';
 import 'package:flutter/widgets.dart';
 
-part 'table/foundation/collections.dart';
-part 'table/foundation/placement.dart';
-part 'table/rendering/layout_grid.dart';
-part 'table/rendering/placement.dart';
-part 'table/rendering/track_size.dart';
+part 'table/collections.dart';
+part 'table/placement.dart';
+part 'table/rendering.dart';
+part 'table/track_size.dart';
 
 class LayoutGrid extends MultiChildRenderObjectWidget {
   LayoutGrid({

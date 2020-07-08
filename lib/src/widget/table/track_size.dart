@@ -1,4 +1,4 @@
-part of '../../table_layout.dart';
+part of '../table_layout.dart';
 
 enum TrackType { column, row }
 
