@@ -58,22 +58,28 @@ class RenderLayoutGrid extends RenderBox
   /// Creates a layout grid render object.
   RenderLayoutGrid({
     List<RenderBox> children,
-    double columnGap = 0,
-    double rowGap = 0,
+    double gap = 0,
     @required List<TrackSize> templateColumnSizes,
     @required List<TrackSize> templateRowSizes,
     TextDirection textDirection = TextDirection.ltr,
   })  : assert(textDirection != null),
+        _gap = gap,
         _templateColumnSizes = templateColumnSizes,
         _templateRowSizes = templateRowSizes,
-        _columnGap = columnGap,
-        _rowGap = rowGap,
         _textDirection = textDirection {
     addAll(children);
   }
 
   bool _needsPlacement = true;
   PlacementGrid _placementGrid;
+
+  double get gap => _gap;
+  double _gap;
+  set gap(double value) {
+    if (_gap == value) return;
+    _gap = value;
+    markNeedsLayout();
+  }
 
   /// Defines the sizing functions of the grid's columns.
   List<TrackSize> get templateColumnSizes => _templateColumnSizes;
@@ -92,24 +98,6 @@ class RenderLayoutGrid extends RenderBox
     if (_templateRowSizes == value) return;
     _templateRowSizes = value;
     markNeedsPlacement();
-    markNeedsLayout();
-  }
-
-  /// The space between column tracks
-  double get columnGap => _columnGap;
-  double _columnGap;
-  set columnGap(double value) {
-    if (_columnGap == value) return;
-    _columnGap = value;
-    markNeedsLayout();
-  }
-
-  /// The space between row tracks
-  double get rowGap => _rowGap;
-  double _rowGap;
-  set rowGap(double value) {
-    if (_rowGap == value) return;
-    _rowGap = value;
     markNeedsLayout();
   }
 
@@ -182,10 +170,9 @@ class RenderLayoutGrid extends RenderBox
     // Ready an object that contains our sizing information
     final gridSizing = GridSizingInfo.fromTrackSizeFunctions(
       columnSizeFunctions: _templateColumnSizes,
+      gap: gap,
       rowSizeFunctions: _templateRowSizes,
       textDirection: textDirection,
-      columnGap: columnGap,
-      rowGap: rowGap,
     );
 
     // Determine the size of the column tracks
@@ -203,9 +190,9 @@ class RenderLayoutGrid extends RenderBox
     _stretchIntrinsicTracks(TrackType.row, gridSizing);
 
     final gridWidth = sum(columnTracks.map((t) => t.baseSize)) +
-        columnGap * (columnTracks.length - 1);
+        gap * (columnTracks.length - 1);
     final gridHeight =
-        sum(rowTracks.map((t) => t.baseSize)) + rowGap * (rowTracks.length - 1);
+        sum(rowTracks.map((t) => t.baseSize)) + gap * (rowTracks.length - 1);
     gridSizing.gridSize = constraints.constrain(Size(gridWidth, gridHeight));
 
     return gridSizing;
@@ -237,7 +224,7 @@ class RenderLayoutGrid extends RenderBox
     final maxConstraint = maxConstraintForAxis(constraints, sizingAxis);
     final initialFreeSpace = maxConstraint.isFinite
         ? maxConstraintForAxis(constraints, sizingAxis) -
-            gridSizing.unitGapAlongAxis(sizingAxis) * (tracks.length - 1)
+            gridSizing.gap * (tracks.length - 1)
         : 0.0;
     final isAxisDefinite = isTightlyConstrainedForAxis(constraints, sizingAxis);
 
@@ -619,33 +606,28 @@ List<GridTrack> _sizesToTracks(Iterable<TrackSize> sizes) => enumerate(sizes)
 class GridSizingInfo {
   GridSizingInfo({
     @required this.columnTracks,
+    @required this.gap,
     @required this.rowTracks,
-    @required this.columnGap,
-    @required this.rowGap,
     @required this.textDirection,
   })  : assert(columnTracks != null),
         assert(rowTracks != null),
-        assert(columnGap != null),
-        assert(rowGap != null),
+        assert(gap != null),
         assert(textDirection != null);
 
   GridSizingInfo.fromTrackSizeFunctions({
     @required List<TrackSize> columnSizeFunctions,
+    double gap = 0,
     @required List<TrackSize> rowSizeFunctions,
     @required TextDirection textDirection,
-    double columnGap = 0,
-    double rowGap = 0,
   }) : this(
           columnTracks: _sizesToTracks(columnSizeFunctions),
+          gap: gap,
           rowTracks: _sizesToTracks(rowSizeFunctions),
           textDirection: textDirection,
-          columnGap: columnGap,
-          rowGap: rowGap,
         );
 
   Size gridSize;
-  final double columnGap;
-  final double rowGap;
+  final double gap;
 
   final List<GridTrack> columnTracks;
   final List<GridTrack> rowTracks;
@@ -685,13 +667,12 @@ class GridSizingInfo {
   Offset offsetForArea(GridArea area) {
     return Offset(
         textDirection == TextDirection.ltr
-            ? columnStartsWithoutGaps[area.columnStart] +
-                columnGap * area.columnStart
+            ? columnStartsWithoutGaps[area.columnStart] + gap * area.columnStart
             : gridSize.width -
                 columnStartsWithoutGaps[area.columnStart] -
                 sizeForAreaOnAxis(area, Axis.horizontal) -
-                columnGap * area.columnStart,
-        rowStartsWithoutGaps[area.rowStart] + rowGap * area.rowStart);
+                gap * area.columnStart,
+        rowStartsWithoutGaps[area.rowStart] + gap * area.rowStart);
   }
 
   Size sizeForArea(GridArea area) {
@@ -731,9 +712,6 @@ class GridSizingInfo {
     }
   }
 
-  double unitGapAlongAxis(Axis axis) =>
-      axis == Axis.horizontal ? columnGap : rowGap;
-
   bool isAxisSized(Axis sizingAxis) =>
       sizingAxis == Axis.horizontal ? hasColumnSizing : hasRowSizing;
 
@@ -746,12 +724,10 @@ class GridSizingInfo {
   double sizeForAreaOnAxis(GridArea area, Axis axis) {
     assert(isAxisSized(axis));
 
-    // TODO(shyndman): Support row/col gaps
-
     final trackBaseSizes = tracksAlongAxis(axis)
         .getRange(area.startForAxis(axis), area.endForAxis(axis))
         .map((t) => t.baseSize);
-    final gapSize = (area.spanForAxis(axis) - 1) * unitGapAlongAxis(axis);
+    final gapSize = (area.spanForAxis(axis) - 1) * gap;
     return math.max(0, sum(trackBaseSizes) + gapSize);
   }
 }

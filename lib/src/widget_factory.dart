@@ -85,8 +85,7 @@ class WidgetFactory extends core.WidgetFactory {
           child: cell,
         );
       }).toList(growable: false),
-      columnGap: -(table.border?.width ?? 0),
-      rowGap: -(table.border?.width ?? 0),
+      gap: -(table.border?.width ?? 0),
       templateColumnSizes: templateColumnSizes,
       templateRowSizes: templateRowSizes,
     );

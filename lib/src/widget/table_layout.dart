@@ -19,27 +19,20 @@ class LayoutGrid extends MultiChildRenderObjectWidget {
     Key key,
     @required this.templateColumnSizes,
     @required this.templateRowSizes,
-    double rowGap,
-    double columnGap,
+    this.gap = 0,
     this.textDirection,
     List<Widget> children = const [],
   })  : assert(templateRowSizes != null && templateRowSizes.isNotEmpty),
         assert(templateColumnSizes != null && templateColumnSizes.isNotEmpty),
-        rowGap = rowGap ?? 0,
-        columnGap = columnGap ?? 0,
         super(key: key, children: children);
+
+  final double gap;
 
   /// Defines the track sizing functions of the grid's columns.
   final List<TrackSize> templateColumnSizes;
 
   /// Defines the track sizing functions of the grid's rows.
   final List<TrackSize> templateRowSizes;
-
-  /// Space between column tracks
-  final double columnGap;
-
-  /// Space between row tracks
-  final double rowGap;
 
   /// The text direction used to resolve column ordering.
   ///
@@ -49,10 +42,9 @@ class LayoutGrid extends MultiChildRenderObjectWidget {
   @override
   RenderLayoutGrid createRenderObject(BuildContext context) {
     return RenderLayoutGrid(
+      gap: gap,
       templateColumnSizes: templateColumnSizes,
       templateRowSizes: templateRowSizes,
-      columnGap: columnGap,
-      rowGap: rowGap,
       textDirection: textDirection ?? Directionality.of(context),
     );
   }
@@ -60,10 +52,9 @@ class LayoutGrid extends MultiChildRenderObjectWidget {
   @override
   void updateRenderObject(BuildContext context, RenderLayoutGrid renderObject) {
     renderObject
+      ..gap = gap
       ..templateColumnSizes = templateColumnSizes
       ..templateRowSizes = templateRowSizes
-      ..columnGap = columnGap
-      ..rowGap = rowGap
       ..textDirection = textDirection ?? Directionality.of(context);
   }
 }
