@@ -1,8 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'core_widget_factory.dart';
-
 part 'widget/image_layout.dart';
 
 const kShouldBuildAsync = 10000;
@@ -64,8 +62,7 @@ class WidgetPlaceholder<T1> extends StatelessWidget {
 
   static Iterable<Widget> wrap<T2>(
     Iterable<Widget> widgets,
-    WidgetPlaceholderBuilder<T2> builder,
-    WidgetFactory wf, [
+    WidgetPlaceholderBuilder<T2> builder, [
     T2 input,
   ]) {
     final wrapped = List<Widget>(widgets.length);
@@ -92,7 +89,7 @@ class WidgetPlaceholder<T1> extends StatelessWidget {
     T2 input,
   ]) =>
       widgets.length == 1
-          ? wrap(widgets, builder, null, input).first
+          ? wrap(widgets, builder, input).first
           : WidgetPlaceholder(
               builder: builder,
               children: widgets,
