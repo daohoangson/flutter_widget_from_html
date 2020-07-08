@@ -230,13 +230,7 @@ class RenderLayoutGrid extends RenderBox
     for (var i = 0; i < tracks.length; i++) {
       final track = tracks[i];
 
-      if (track.sizeFunction
-          .isFixedForConstraints(typeBeingSized, constraints)) {
-        // Fixed, definite
-        final fixedSize = track.sizeFunction
-            .minIntrinsicSize(typeBeingSized, [], initialFreeSpace);
-        track.baseSize = track.growthLimit = fixedSize;
-      } else if (track.sizeFunction.isFlexible) {
+      if (track.sizeFunction.isFlexible) {
         // Flexible sizing
         track.baseSize = track.growthLimit = 0;
         flexibleTracks.add(track);

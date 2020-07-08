@@ -53,13 +53,13 @@ class WidgetFactory extends core.WidgetFactory {
     final cols = table.cols;
     final templateColumnSizes = List<TrackSize>(cols);
     for (var c = 0; c < cols; c++) {
-      templateColumnSizes[c] = FlexibleTrackSize(1);
+      templateColumnSizes[c] = const FlexibleTrackSize(1);
     }
 
     final rows = table.rows;
     final templateRowSizes = List<TrackSize>(rows);
     for (var r = 0; r < rows; r++) {
-      templateRowSizes[r] = IntrinsicContentTrackSize();
+      templateRowSizes[r] = const IntrinsicContentTrackSize();
     }
 
     final border = table.border != null
