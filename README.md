@@ -101,7 +101,7 @@ These tags and their contents will be ignored:
 - font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) and value in em/px
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
-- line-height: number, percentage or `normal`
+- line-height: number, values (`px`, `em`, percentage) or `normal`
 - margin and margin-xxx (values in `px`, `em`)
 - padding and padding-xxx (values in `px`, `em`)
 - vertical-align: baseline/top/bottom/middle/sub/super
