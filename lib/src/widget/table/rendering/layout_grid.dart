@@ -2,20 +2,8 @@ part of '../../table_layout.dart';
 
 /// Parent data for use with [RenderLayoutGrid].
 class GridParentData extends ContainerBoxParentData<RenderBox> {
-  GridParentData({
-    @required this.columnStart,
-    this.columnSpan = 1,
-    @required this.rowStart,
-    this.rowSpan = 1,
-    this.debugLabel,
-  })  : assert(columnStart != null),
-        assert(rowStart != null);
-
-  /// If `null`, the item is auto-placed.
   int columnStart;
   int columnSpan = 1;
-
-  /// If `null`, the item is auto-placed.
   int rowStart;
   int rowSpan = 1;
 
@@ -27,12 +15,14 @@ class GridParentData extends ContainerBoxParentData<RenderBox> {
   int spanForAxis(Axis axis) => //
       axis == Axis.horizontal ? columnSpan : rowSpan;
 
-  GridArea get area => GridArea(
-        columnStart: columnStart,
-        columnEnd: columnStart + columnSpan,
-        rowStart: rowStart,
-        rowEnd: rowStart + rowSpan,
-      );
+  GridArea get area => columnStart != null && rowStart != null
+      ? GridArea(
+          columnStart: columnStart,
+          columnEnd: columnStart + columnSpan,
+          rowStart: rowStart,
+          rowEnd: rowStart + rowSpan,
+        )
+      : null;
 
   @override
   String toString() {
@@ -108,6 +98,13 @@ class RenderLayoutGrid extends RenderBox
     if (_textDirection == value) return;
     _textDirection = value;
     markNeedsLayout();
+  }
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! GridParentData) {
+      child.parentData = GridParentData();
+    }
   }
 
   @override

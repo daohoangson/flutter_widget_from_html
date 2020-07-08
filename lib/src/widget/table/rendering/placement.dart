@@ -6,7 +6,8 @@ PlacementGrid computeItemPlacement(RenderLayoutGrid grid) {
   var child = grid.firstChild;
   while (child != null) {
     final childParentData = child.parentData as GridParentData;
-    occupancy.addItemToArea(child, childParentData.area);
+    final area = childParentData.area;
+    if (area != null) occupancy.addItemToArea(child, area);
     child = childParentData.nextSibling;
   }
 
