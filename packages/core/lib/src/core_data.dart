@@ -81,32 +81,6 @@ class CssBorders {
   CssBorderSide top;
 }
 
-class CssLineHeight {
-  final CssLength _length;
-  final double _value;
-
-  CssLineHeight.normal()
-      : _length = null,
-        _value = -1;
-
-  CssLineHeight.number(this._value)
-      : assert(_value >= 0),
-        _length = null;
-
-  CssLineHeight.length(this._length) : _value = null;
-
-  double getValue(BuildContext context, TextStyle style) {
-    if (_value != null) return _value != -1 ? _value : null;
-
-    if (_length.unit == CssLengthUnit.percentage) return _length.number / 100;
-
-    final v = _length.getValueFromStyle(context, style);
-    if (v != null) return v / style.fontSize;
-
-    return null;
-  }
-}
-
 class CssLength {
   final double number;
   final CssLengthUnit unit;
@@ -188,14 +162,14 @@ enum CssLengthUnit {
 @immutable
 class TextStyleHtml {
   final TextAlign align;
-  final CssLineHeight lineHeight;
+  final double height;
   final int maxLines;
   final TextStyle style;
   final TextOverflow textOverflow;
 
   TextStyleHtml._({
     this.align,
-    this.lineHeight,
+    this.height,
     this.maxLines,
     this.style,
     this.textOverflow,
@@ -203,20 +177,20 @@ class TextStyleHtml {
 
   TextStyleHtml.style(this.style)
       : align = null,
-        lineHeight = null,
+        height = null,
         maxLines = null,
         textOverflow = null;
 
   TextStyleHtml copyWith({
     TextAlign align,
-    CssLineHeight lineHeight,
+    double height,
     int maxLines,
     TextStyle style,
     TextOverflow textOverflow,
   }) =>
       TextStyleHtml._(
         align: align ?? this.align,
-        lineHeight: lineHeight ?? this.lineHeight,
+        height: height ?? this.height,
         maxLines: maxLines ?? this.maxLines,
         style: style ?? this.style,
         textOverflow: textOverflow ?? this.textOverflow,
@@ -225,8 +199,8 @@ class TextStyleHtml {
   TextStyle build(BuildContext context) {
     var built = style;
 
-    if (lineHeight != null) {
-      built = built.copyWith(height: lineHeight.getValue(context, built));
+    if (height != null && height >= 0) {
+      built = built.copyWith(height: height);
     }
 
     return built;
@@ -247,7 +221,7 @@ class TextStyleBuilders {
   BuildContext get context => _context;
 
   void enqueue<T>(
-    TextStyleHtml Function(TextStyleBuilders, TextStyleHtml, T) builder, [
+    TextStyleHtml Function(BuildContext, TextStyleHtml, T) builder, [
     T input,
   ]) {
     assert(_output == null, 'Cannot add builder after being built');
@@ -267,7 +241,7 @@ class TextStyleBuilders {
 
     final l = _builders.length;
     for (var i = 0; i < l; i++) {
-      _output = _builders[i](this, _output, _inputs[i]);
+      _output = _builders[i](context, _output, _inputs[i]);
     }
 
     return _output;

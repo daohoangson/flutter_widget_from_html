@@ -341,38 +341,38 @@ class WidgetFactory {
     return TextDecoration.combine(list);
   }
 
-  double buildTextFontSize(TextStyleBuilders tsb, TextStyle p, NodeMetadata m) {
+  double buildTextFontSize(BuildContext context, TextStyle p, NodeMetadata m) {
     final value = m.fontSize;
     if (value == null) return null;
 
     final parsed = parseCssLength(value);
     if (parsed != null) {
-      final lengthValue = parsed.getValue(tsb.context, m.tsb);
+      final lengthValue = parsed.getValue(context, m.tsb);
       if (lengthValue != null) return lengthValue;
 
       if (parsed.unit == CssLengthUnit.percentage) {
-        return m.tsb.build(tsb.context).style.fontSize * parsed.number / 100;
+        return m.tsb.build(context).style.fontSize * parsed.number / 100;
       }
 
       return null;
     }
 
-    final c = tsb.context;
+    final defaultFontSize = DefaultTextStyle.of(context).style.fontSize;
     switch (value) {
       case _kCssFontSizeXxLarge:
-        return DefaultTextStyle.of(c).style.fontSize * 2.0;
+        return defaultFontSize * 2.0;
       case _kCssFontSizeXLarge:
-        return DefaultTextStyle.of(c).style.fontSize * 1.5;
+        return defaultFontSize * 1.5;
       case _kCssFontSizeLarge:
-        return DefaultTextStyle.of(c).style.fontSize * 1.125;
+        return defaultFontSize * 1.125;
       case _kCssFontSizeMedium:
-        return DefaultTextStyle.of(c).style.fontSize;
+        return defaultFontSize;
       case _kCssFontSizeSmall:
-        return DefaultTextStyle.of(c).style.fontSize * .8125;
+        return defaultFontSize * .8125;
       case _kCssFontSizeXSmall:
-        return DefaultTextStyle.of(c).style.fontSize * .625;
+        return defaultFontSize * .625;
       case _kCssFontSizeXxSmall:
-        return DefaultTextStyle.of(c).style.fontSize * .5625;
+        return defaultFontSize * .5625;
 
       case _kCssFontSizeLarger:
         return p.fontSize * 1.2;
@@ -383,11 +383,14 @@ class WidgetFactory {
     return null;
   }
 
-  TextStyleHtml tsb(TextStyleBuilders tsb, TextStyleHtml p, NodeMetadata m) {
+  double buildTextStyleHeight(BuildContext c, TextStyleHtml p, String v) =>
+      _buildTextStyleHeight(this, c, p, v);
+
+  TextStyleHtml tsb(BuildContext context, TextStyleHtml p, NodeMetadata m) {
     if (m == null) return p;
 
     final decoration = buildTextDecoration(p.style, m);
-    final fontSize = buildTextFontSize(tsb, p.style, m);
+    final fontSize = buildTextFontSize(context, p.style, m);
     final fontStyle = buildFontStyle(m);
     if (m.color == null &&
         decoration == null &&
@@ -509,9 +512,6 @@ class WidgetFactory {
 
   Iterable<String> parseCssFontFamilies(String value) =>
       _parseCssFontFamilies(value);
-
-  CssLineHeight parseCssLineHeight(String value) =>
-      _parseCssLineHeight(this, value);
 
   CssLength parseCssLength(String value) => _parseCssLength(value);
 
@@ -648,9 +648,7 @@ class WidgetFactory {
         break;
 
       case _kCssLineHeight:
-        final lineHeight = parseCssLineHeight(value);
-        if (lineHeight != null) meta.op = styleLineHeight(lineHeight);
-
+        meta.op = styleLineHeight(value);
         break;
 
       case _kCssMaxLines:
@@ -968,7 +966,7 @@ class WidgetFactory {
 
   BuildOp styleDirection(String dir) => _styleDirection(this, dir);
 
-  BuildOp styleLineHeight(CssLineHeight v) => _styleLineHeight(this, v);
+  BuildOp styleLineHeight(String v) => _styleLineHeight(this, v);
 
   BuildOp styleMargin() {
     _styleMargin ??= _StyleMargin(this).buildOp;
@@ -1066,9 +1064,9 @@ class WidgetFactory {
 Iterable<Widget> _listOrNull(Widget x) => x == null ? null : [x];
 
 TextStyleHtml _styleMaxLinesBuilder(
-        TextStyleBuilders tsb, TextStyleHtml parent, int maxLines) =>
+        BuildContext _, TextStyleHtml parent, int maxLines) =>
     parent.copyWith(maxLines: maxLines);
 
-TextStyleHtml _styleTextOverflowBuilder(TextStyleBuilders tsb,
-        TextStyleHtml parent, TextOverflow textOverflow) =>
+TextStyleHtml _styleTextOverflowBuilder(
+        BuildContext _, TextStyleHtml parent, TextOverflow textOverflow) =>
     parent.copyWith(textOverflow: textOverflow);

@@ -66,7 +66,7 @@ class _StyleTextAlign {
     return null;
   }
 
-  static TextStyleHtml tsb(TextStyleBuilders _, TextStyleHtml p, TextAlign v) =>
+  static TextStyleHtml tsb(BuildContext _, TextStyleHtml p, TextAlign v) =>
       p.copyWith(align: v);
 }
 
