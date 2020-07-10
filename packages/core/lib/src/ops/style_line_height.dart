@@ -3,33 +3,38 @@ part of '../core_widget_factory.dart';
 const _kCssLineHeight = 'line-height';
 const _kCssLineHeightNormal = 'normal';
 
-CssLineHeight _parseCssLineHeight(WidgetFactory wf, String value) {
-  if (value == null) return null;
+double _buildTextStyleHeight(
+    WidgetFactory wf, BuildContext c, TextStyleHtml p, String v) {
+  if (v == null) return null;
+  if (v == _kCssLineHeightNormal) return -1;
 
-  switch (value) {
-    case _kCssLineHeightNormal:
-      return CssLineHeight.normal();
-  }
-
-  final number = double.tryParse(value);
+  final number = double.tryParse(v);
   if (number != null && number > 0) {
-    return CssLineHeight.number(number);
+    return number;
   }
 
-  final length = wf.parseCssLength(value);
+  final length = wf.parseCssLength(v);
   if (length != null) {
-    return CssLineHeight.length(length);
+    if (length.unit == CssLengthUnit.percentage) return length.number / 100;
+    return length.getValueFromStyle(c, p.style) / p.style.fontSize;
   }
 
   return null;
 }
 
-BuildOp _styleLineHeight(WidgetFactory wf, CssLineHeight v) =>
-    BuildOp(onPieces: (meta, pieces) {
-      meta.tsb.enqueue(_styleLineHeightBuilder, v);
-      return pieces;
+BuildOp _styleLineHeight(WidgetFactory wf, String v) =>
+    BuildOp(onPieces: (m, p) {
+      m.tsb.enqueue(_styleLineHeightBuilder, _StyleLineHeightInput(wf, v));
+      return p;
     });
 
-TextStyleHtml _styleLineHeightBuilder(TextStyleBuilders tsb,
-        TextStyleHtml parent, CssLineHeight lineHeight) =>
-    parent.copyWith(lineHeight: lineHeight);
+TextStyleHtml _styleLineHeightBuilder(
+        BuildContext c, TextStyleHtml p, _StyleLineHeightInput i) =>
+    p.copyWith(height: i.wf.buildTextStyleHeight(c, p, i.value));
+
+class _StyleLineHeightInput {
+  final WidgetFactory wf;
+  final String value;
+
+  _StyleLineHeightInput(this.wf, this.value);
+}

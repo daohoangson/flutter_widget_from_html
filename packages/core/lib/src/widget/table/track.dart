@@ -94,7 +94,7 @@ class _TrackSizeIntrinsic extends _TrackSize {
         crossAxisSizeForItem(item),
       ),
     );
-    return max(minContentContributions);
+    return _max(minContentContributions);
   }
 
   @override
@@ -112,6 +112,6 @@ class _TrackSizeIntrinsic extends _TrackSize {
         crossAxisSizeForItem(item),
       ),
     );
-    return max(maxContentContributions);
+    return _max(maxContentContributions);
   }
 }
