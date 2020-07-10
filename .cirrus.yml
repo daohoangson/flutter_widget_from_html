@@ -37,13 +37,13 @@ pipe:
 unit_test_task:
   env:
     matrix:
-      - CONTAINER_IMAGE: cirrusci/flutter:$FLUTTER_VERSION
-      - CONTAINER_IMAGE: cirrusci/flutter:dev
-      - CONTAINER_IMAGE: cirrusci/flutter:beta
-      - CONTAINER_IMAGE: cirrusci/flutter:stable
-  name: unit_test $CONTAINER_IMAGE
+      - UT_VERSION: $FLUTTER_VERSION
+      - UT_VERSION: dev
+      - UT_VERSION: beta
+      - UT_VERSION: stable
+  name: unit_test $UT_VERSION
   container:
-    image: $CONTAINER_IMAGE
+    image: cirrusci/flutter:$UT_VERSION
 
   test_script: COVERAGE=1 ./tool/test.sh
   codecov_script: bash <(curl -s https://codecov.io/bash)
@@ -55,7 +55,7 @@ ios_test_task:
   skip: "!changesInclude('lib/src/widget/web_view.dart')"
   depends_on:
     - analyze
-    - unit_test $CONTAINER_IMAGE
+    - unit_test $FLUTTER_VERSION
   osx_instance:
     image: catalina-xcode
   install_flutter_script:
@@ -80,7 +80,7 @@ android_test_task:
     image: cirrusci/flutter:$FLUTTER_VERSION
   depends_on:
     - analyze
-    - unit_test $CONTAINER_IMAGE
+    - unit_test $FLUTTER_VERSION
   env:
     AWS_ACCESS_KEY_ID: AKIAY43IFJQXIX5OS5OM
     AWS_DEFAULT_REGION: us-west-2
