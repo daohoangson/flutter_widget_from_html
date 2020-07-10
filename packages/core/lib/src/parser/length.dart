@@ -12,7 +12,7 @@ const _kCssLengthBoxSuffixTop = '-top';
 final _cssLengthValues4 =
     RegExp(r'^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)$');
 final _cssLengthValues2 = RegExp(r'^([^\s]+)\s+([^\s]+)$');
-final _cssLengthValue = RegExp(r'^([\d\.]+)(em|px)$');
+final _cssLengthValue = RegExp(r'^([\d\.]+)(em|%|px)$');
 
 CssLength _parseCssLength(String value) {
   if (value == null) return null;
@@ -27,6 +27,8 @@ CssLength _parseCssLength(String value) {
   switch (match[2]) {
     case 'em':
       return CssLength(number, unit: CssLengthUnit.em);
+    case '%':
+      return CssLength(number, unit: CssLengthUnit.percentage);
     case 'px':
       return CssLength(number, unit: CssLengthUnit.px);
   }

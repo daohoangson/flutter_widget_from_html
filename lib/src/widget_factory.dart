@@ -33,7 +33,7 @@ class WidgetFactory extends core.WidgetFactory {
     Iterable<Widget> widgets,
     GestureTapCallback onTap,
   ) =>
-      widgets.map((widget) => InkWell(child: widget, onTap: onTap));
+      widgets?.map((widget) => InkWell(child: widget, onTap: onTap));
 
   @override
   GestureTapCallback buildGestureTapCallbackForUrl(String url) {

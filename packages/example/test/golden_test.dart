@@ -345,5 +345,54 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
       <tbody><tr><td>Value 1</td><td>Value 2</td></tr></tbody>
       <thead><tr><th>Header 1</th><th>Header 2</th></tr></thead>
     </table>''',
+    'inline/display/table': '''
+<div style="display: table">
+  <div style="display: table-caption; text-align: center">Caption</div>
+  <div style="display: table-row; font-weight: bold">
+    <span style="display: table-cell">Header 1</span>
+    <span style="display: table-cell">Header 2</span>
+  </div>
+  <div style="display: table-row">
+    <span style="display: table-cell">Value 1</span>
+    <span style="display: table-cell">Value 2</span>
+  </div>
+</div>''',
+    'TABLE/colspan': '''
+<table border="1">
+  <caption>Source: <a href="https://www.w3schools.com/tags/att_td_colspan.asp">w3schools</a></caption>
+  <tr>
+    <th>Month</th>
+    <th>Savings</th>
+  </tr>
+  <tr>
+    <td>January</td>
+    <td>\$100</td>
+  </tr>
+  <tr>
+    <td>February</td>
+    <td>\$80</td>
+  </tr>
+  <tr>
+    <td colspan="2">Sum: \$180</td>
+  </tr>
+</table>''',
+    'TABLE/rowspan': '''
+<table border="1">
+  <caption>Source: <a href="https://www.w3schools.com/tags/att_td_colspan.asp">w3schools</a></caption>
+  <tr>
+    <th>Month</th>
+    <th>Savings</th>
+    <th>Savings for holiday!</th>
+  </tr>
+  <tr>
+    <td>January</td>
+    <td>\$100</td>
+    <td rowspan="2">\$50</td>
+  </tr>
+  <tr>
+    <td>February</td>
+    <td>\$80</td>
+  </tr>
+</table>''',
   }).entries.forEach((entry) => _test(entry.key, entry.value));
 }

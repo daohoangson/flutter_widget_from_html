@@ -67,7 +67,6 @@ class HtmlWidget extends core.HtmlWidget {
           factoryBuilder: factoryBuilder,
           hyperlinkColor: hyperlinkColor,
           onTapUrl: onTapUrl,
-          tableCellPadding: tableCellPadding,
           textStyle: textStyle,
           key: key,
         );

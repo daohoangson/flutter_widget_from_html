@@ -4,6 +4,7 @@ import 'package:html/dom.dart' as dom;
 import 'builder.dart';
 import 'core_helpers.dart';
 
+part 'data/table_data.dart';
 part 'data/text_bits.dart';
 
 class BuildOp {
@@ -81,17 +82,29 @@ class CssBorders {
 }
 
 class CssLineHeight {
+  final CssLength _length;
   final double _value;
 
-  CssLineHeight.normal() : _value = -1;
+  CssLineHeight.normal()
+      : _length = null,
+        _value = -1;
 
-  CssLineHeight.number(this._value) : assert(_value >= 0);
+  CssLineHeight.number(this._value)
+      : assert(_value >= 0),
+        _length = null;
 
-  CssLineHeight.percentage(double value)
-      : assert(value >= 0),
-        _value = value / 100.0;
+  CssLineHeight.length(this._length) : _value = null;
 
-  double get value => _value == -1 ? null : _value;
+  double getValue(BuildContext context, TextStyle style) {
+    if (_value != null) return _value != -1 ? _value : null;
+
+    if (_length.unit == CssLengthUnit.percentage) return _length.number / 100;
+
+    final v = _length.getValueFromStyle(context, style);
+    if (v != null) return v / style.fontSize;
+
+    return null;
+  }
 }
 
 class CssLength {
@@ -106,13 +119,18 @@ class CssLength {
 
   bool get isNotEmpty => number > 0;
 
-  double getValue(BuildContext context, TextStyleBuilders tsb) {
+  double getValue(BuildContext context, TextStyleBuilders tsb) =>
+      getValueFromStyle(context, tsb.build(context).style);
+
+  double getValueFromStyle(BuildContext context, TextStyle style) {
     double value;
 
     switch (unit) {
       case CssLengthUnit.em:
-        value = tsb.build(context).style.fontSize * number / 1;
+        value = style.fontSize * number;
         break;
+      case CssLengthUnit.percentage:
+        return null;
       case CssLengthUnit.px:
         value = number;
         break;
@@ -163,6 +181,7 @@ class CssLengthBox {
 
 enum CssLengthUnit {
   em,
+  percentage,
   px,
 }
 
@@ -203,9 +222,13 @@ class TextStyleHtml {
         textOverflow: textOverflow ?? this.textOverflow,
       );
 
-  TextStyle build(BuildContext _) {
+  TextStyle build(BuildContext context) {
     var built = style;
-    if (lineHeight != null) built = built.copyWith(height: lineHeight.value);
+
+    if (lineHeight != null) {
+      built = built.copyWith(height: lineHeight.getValue(context, built));
+    }
+
     return built;
   }
 }

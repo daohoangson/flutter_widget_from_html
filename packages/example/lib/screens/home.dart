@@ -66,8 +66,8 @@ CODE tag:
 <div style="margin: 5px 10px">margin: 5px 10px</div>
 <div style="margin: 3px">margin: 3px</div>
 <div style="margin: 1px"><div style="margin: 2px">Margin within another</div></div>
-''',
-    'SVG': '''
+""",
+    'SVG': """
 <a href="https://raw.githubusercontent.com/dnfield/flutter_svg/master/example/assets/flutter_logo.svg">flutter_logo.svg</a>:<br />
 <br />
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 166 202">
@@ -124,7 +124,7 @@ C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."
 </ruby>
 """,
     'Table': '''
-<table border="1">
+<table border="1" cellpadding="4">
   <caption>Source: <a href="https://www.w3schools.com/html/html_tables.asp">w3schools</a></caption>
   <tr>
     <th>Firstname</th>
@@ -140,6 +140,47 @@ C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."
     <td>Eve</td>
     <td>Jackson</td> 
     <td>94</td>
+  </tr>
+</table>
+
+<br />
+
+<table border="1" cellpadding="4">
+  <caption>colspan (<a href="https://www.w3schools.com/tags/att_td_colspan.asp">w3schools</a>)</caption>
+  <tr>
+    <th>Month</th>
+    <th>Savings</th>
+  </tr>
+  <tr>
+    <td>January</td>
+    <td>\$100</td>
+  </tr>
+  <tr>
+    <td>February</td>
+    <td>\$80</td>
+  </tr>
+  <tr>
+    <td colspan="2">Sum: \$180</td>
+  </tr>
+</table>
+
+<br />
+
+<table border="1" cellpadding="4">
+  <caption>rowspan (<a href="https://www.w3schools.com/tags/att_td_colspan.asp">w3schools</a>)</caption>
+  <tr>
+    <th>Month</th>
+    <th>Savings</th>
+    <th>Savings for holiday!</th>
+  </tr>
+  <tr>
+    <td>January</td>
+    <td>\$100</td>
+    <td rowspan="2">\$50</td>
+  </tr>
+  <tr>
+    <td>February</td>
+    <td>\$80</td>
   </tr>
 </table>
 ''',

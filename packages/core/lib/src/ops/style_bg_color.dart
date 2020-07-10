@@ -27,7 +27,7 @@ class _StyleBgColor {
       );
 
   Iterable<Widget> _build(BuildContext _, Iterable<Widget> ws, Color c) =>
-      [wf.buildDecoratedBox(wf.buildColumn(ws), color: c)];
+      _listOrNull(wf.buildDecoratedBox(wf.buildColumn(ws), color: c));
 
   BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) =>
       piece..text.bits.forEach((bit) => bit.tsb?.enqueue(_tsb, bgColor));
