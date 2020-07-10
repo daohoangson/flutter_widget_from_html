@@ -16,8 +16,6 @@ See the [Example app](https://github.com/daohoangson/flutter_widget_from_html/tr
 
 ## Example
 
-Note: `HtmlWidget.config` is optional, see dartdoc for all available configuration keys and their default values.
-
 ```dart
 const kHtml = '''
 <h1>Heading</h1>
