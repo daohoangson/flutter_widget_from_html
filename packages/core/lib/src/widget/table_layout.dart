@@ -4,7 +4,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:meta/meta.dart';
-import 'package:quiver/iterables.dart';
 import 'package:flutter/widgets.dart';
 
 part 'table/collections.dart';

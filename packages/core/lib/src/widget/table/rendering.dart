@@ -615,8 +615,13 @@ class _RenderingSize {
     return math.max(0, _sum(trackBaseSizes) + gapSize);
   }
 
-  static List<_RenderingTrack> sizesToTracks(Iterable<_TrackSize> sizes) =>
-      enumerate(sizes)
-          .map((s) => _RenderingTrack(s.index, s.value))
-          .toList(growable: false);
+  static List<_RenderingTrack> sizesToTracks(Iterable<_TrackSize> sizes) {
+    var i = 0;
+    final list = List<_RenderingTrack>(sizes.length);
+    for (final size in sizes) {
+      list[i] = _RenderingTrack(i, size);
+      i++;
+    }
+    return list;
+  }
 }

@@ -1,5 +1,8 @@
 part of '../table_layout.dart';
 
+T _max<T extends num>(Iterable<T> numbers) => numbers.fold(
+    null, (max, number) => (max == null || number > max) ? number : max);
+
 bool Function(T) _removeDuplicates<T>() => <T>{}.add;
 
 T _sum<T extends num>(Iterable<T> numbers) =>
