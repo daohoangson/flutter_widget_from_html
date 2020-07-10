@@ -37,7 +37,6 @@ pipe:
 unit_test_task:
   container:
     image: cirrusci/flutter:$FLUTTER_VERSION
-  allow_failures: $CONTAINER_IMAGE =~ '.*(dev|beta)'
     
   test_script: COVERAGE=1 ./tool/test.sh
   codecov_script: bash <(curl -s https://codecov.io/bash)
