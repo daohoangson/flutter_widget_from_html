@@ -41,6 +41,7 @@ unit_test_task:
       - CONTAINER_IMAGE: cirrusci/flutter:dev
       - CONTAINER_IMAGE: cirrusci/flutter:beta
       - CONTAINER_IMAGE: cirrusci/flutter:stable
+  name: unit_test $CONTAINER_IMAGE
   container:
     image: $CONTAINER_IMAGE
 
