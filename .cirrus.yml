@@ -41,7 +41,8 @@ unit_test_task:
       - CONTAINER_IMAGE: cirrusci/flutter:dev
       - CONTAINER_IMAGE: cirrusci/flutter:beta
       - CONTAINER_IMAGE: cirrusci/flutter:stable
-  container: $CONTAINER_IMAGE
+  container:
+    image: $CONTAINER_IMAGE
   allow_failures: $CONTAINER_IMAGE =~ '.*(dev|beta)'
     
   test_script: COVERAGE=1 ./tool/test.sh
