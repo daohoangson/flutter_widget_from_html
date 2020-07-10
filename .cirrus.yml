@@ -55,7 +55,7 @@ ios_test_task:
   skip: "!changesInclude('lib/src/widget/web_view.dart')"
   depends_on:
     - analyze
-    - unit_test
+    - unit_test $CONTAINER_IMAGE
   osx_instance:
     image: catalina-xcode
   install_flutter_script:
@@ -80,7 +80,7 @@ android_test_task:
     image: cirrusci/flutter:$FLUTTER_VERSION
   depends_on:
     - analyze
-    - unit_test
+    - unit_test $CONTAINER_IMAGE
   env:
     AWS_ACCESS_KEY_ID: AKIAY43IFJQXIX5OS5OM
     AWS_DEFAULT_REGION: us-west-2
