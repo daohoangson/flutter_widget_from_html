@@ -226,45 +226,6 @@ class WidgetFactory {
           ? Padding(child: child, padding: padding)
           : child;
 
-  Widget buildTable(TableData table) {
-    final border = table.border != null
-        ? BoxDecoration(border: Border.fromBorderSide(table.border))
-        : null;
-
-    final layoutGrid = TableLayout(
-      children: table.slots.map((slot) {
-        Widget cell = SizedBox.expand(child: buildColumn(slot.cell.children));
-
-        if (border != null) {
-          cell = Container(
-            child: cell,
-            decoration: border,
-          );
-        }
-
-        return TablePlacement(
-          columnStart: slot.col,
-          columnSpan: slot.cell.colspan,
-          rowStart: slot.row,
-          rowSpan: slot.cell.rowspan,
-          child: cell,
-        );
-      }).toList(growable: false),
-      cols: table.cols,
-      gap: -(table.border?.width ?? 0),
-      rows: table.rows,
-    );
-
-    if (border == null) return layoutGrid;
-
-    return Stack(
-      children: <Widget>[
-        layoutGrid,
-        Positioned.fill(child: Container(decoration: border))
-      ],
-    );
-  }
-
   Widget buildText(TextBits text) => (text..trimRight()).isNotEmpty
       ? WidgetPlaceholder(
           builder: _buildText,

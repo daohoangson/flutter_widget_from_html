@@ -86,18 +86,71 @@ class _TagTable {
     if (rowsFooter != null) rows.addAll(rowsFooter);
     if (rows.isEmpty) return widgets;
 
-    final table = TableData(
-      border: _parseBorder(c, m),
-    );
-    for (var i = 0; i < rows.length; i++) {
-      for (final cell in rows[i].cells) {
-        table.addCell(i, cell);
+    final borderSide = _parseBorder(c, m);
+    widgets.add(_buildTableLayout(borderSide, rows));
+
+    return [wf.buildColumn(widgets)];
+  }
+
+  Widget _buildTableLayout(BorderSide border, List<_TableDataRow> rows) {
+    final decoration = border != null
+        ? BoxDecoration(border: Border.fromBorderSide(border))
+        : null;
+
+    final children = <Widget>[];
+    // ignore: prefer_collection_literals
+    final grid = Map<int, Map<int, int>>();
+    for (var row = 0; row < rows.length; row++) {
+      for (final cell in rows[row].cells) {
+        grid[row] ??= {};
+        var col = 0;
+        while (grid[row].containsKey(col)) {
+          col++;
+        }
+
+        final index = children.length;
+        for (var r = 0; r < cell.rowspan; r++) {
+          for (var c = 0; c < cell.colspan; c++) {
+            var rr = row + r;
+            grid[rr] ??= {};
+
+            var cc = col + c;
+            if (!grid[rr].containsKey(cc)) {
+              grid[rr][cc] = index;
+            }
+          }
+        }
+
+        Widget child = SizedBox.expand(child: wf.buildColumn(cell.children));
+        if (decoration != null) {
+          child = Container(child: child, decoration: decoration);
+        }
+
+        children.add(TablePlacement(
+          columnStart: col,
+          columnSpan: cell.colspan,
+          rowStart: row,
+          rowSpan: cell.rowspan,
+          child: child,
+        ));
       }
     }
 
-    widgets.add(wf.buildTable(table));
+    final tableLayout = TableLayout(
+      children: children,
+      cols: grid.values.fold(0, _colsCombine),
+      gap: -(border?.width ?? 0),
+      rows: grid.keys.length,
+    );
 
-    return [wf.buildColumn(widgets)];
+    if (decoration == null) return tableLayout;
+
+    return Stack(
+      children: <Widget>[
+        tableLayout,
+        Positioned.fill(child: Container(decoration: decoration))
+      ],
+    );
   }
 
   BorderSide _parseBorder(BuildContext context, NodeMetadata meta) {
@@ -127,6 +180,11 @@ class _TagTable {
       onChild: (meta, e) => (e.localName == 'td' || e.localName == 'th')
           ? meta.styles = [_kCssPadding, '${px}px']
           : null);
+
+  static int _colsCombine(int prev, Map<int, int> row) {
+    final cols = row.keys.length;
+    return prev > cols ? prev : cols;
+  }
 }
 
 class _TagTablePlaceholder<T> extends WidgetPlaceholder<T> {
@@ -150,12 +208,22 @@ class _TagTablePlaceholder<T> extends WidgetPlaceholder<T> {
   }
 }
 
-class _TableDataRow extends StatelessWidget {
-  final Iterable<TableDataCell> cells;
+class _TableDataCell extends StatelessWidget {
+  final Iterable<Widget> children;
+  final int colspan;
+  final int rowspan;
 
-  const _TableDataRow({Key key, @required this.cells})
-      : assert(cells != null),
-        super(key: key);
+  const _TableDataCell({Key key, this.children, this.colspan, this.rowspan})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => widget0;
+}
+
+class _TableDataRow extends StatelessWidget {
+  final Iterable<_TableDataCell> cells;
+
+  const _TableDataRow({Key key, this.cells}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => widget0;
@@ -165,13 +233,7 @@ class _TableDataGroup extends StatelessWidget {
   final Iterable<_TableDataRow> rows;
   final String type;
 
-  const _TableDataGroup({
-    Key key,
-    @required this.rows,
-    @required this.type,
-  })  : assert(rows != null),
-        assert(type != null),
-        super(key: key);
+  const _TableDataGroup({Key key, this.rows, this.type}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => widget0;
@@ -185,7 +247,7 @@ Iterable<Widget> _cell(BuildContext _, Iterable<Widget> ws, NodeMetadata m) {
   final rowspan = a.containsKey('rowspan') ? int.tryParse(a['rowspan']) : null;
 
   return [
-    TableDataCell(
+    _TableDataCell(
       children: ws,
       colspan: colspan ?? 1,
       rowspan: rowspan ?? 1,
@@ -196,7 +258,7 @@ Iterable<Widget> _cell(BuildContext _, Iterable<Widget> ws, NodeMetadata m) {
 Iterable<Widget> _row(BuildContext c, Iterable<Widget> ws, _) {
   if (ws?.isNotEmpty != true) return ws;
 
-  final cells = <TableDataCell>[];
+  final cells = <_TableDataCell>[];
 
   for (var child in ws) {
     if (child is WidgetPlaceholder) {
@@ -204,7 +266,7 @@ Iterable<Widget> _row(BuildContext c, Iterable<Widget> ws, _) {
       child = placeholder.build(c);
     }
 
-    if (child is TableDataCell) {
+    if (child is _TableDataCell) {
       cells.add(child);
     }
   }
