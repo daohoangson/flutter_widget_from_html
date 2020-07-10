@@ -35,16 +35,16 @@ pipe:
 
 unit_test_task:
   env:
-    CODECOV_TOKEN: ENCRYPTED[0bad38cf59a2fda73e72491e18a564995cf3a5c862b5400834bfa9873713e780a2deed3e57b265279bd1e91168ee492a]
-    CONTAINER_IMAGE:
-      matrix:
-        - cirrusci/flutter:$FLUTTER_VERSION
-        - cirrusci/flutter:dev
-        - cirrusci/flutter:beta
-        - cirrusci/flutter:stable
+    matrix:
+      - CONTAINER_IMAGE: cirrusci/flutter:$FLUTTER_VERSION
+      - CONTAINER_IMAGE: cirrusci/flutter:dev
+      - CONTAINER_IMAGE: cirrusci/flutter:beta
+      - CONTAINER_IMAGE: cirrusci/flutter:stable
   container: $CONTAINER_IMAGE
   allow_failures: $CONTAINER_IMAGE =~ '.*(dev|beta)'
 
+  env:
+    CODECOV_TOKEN: ENCRYPTED[0bad38cf59a2fda73e72491e18a564995cf3a5c862b5400834bfa9873713e780a2deed3e57b265279bd1e91168ee492a]
   test_script: COVERAGE=1 ./tool/test.sh
   codecov_script: bash <(curl -s https://codecov.io/bash)
   always:
