@@ -50,6 +50,7 @@ unit_test_task:
   always:
     golden_failures_artifacts:
       path: packages/example/test/golden/failures/*
+  allow_failures: $UT_VERSION =~ 'dev'
 
 ios_test_task:
   skip: "!changesInclude('lib/src/widget/web_view.dart')"
