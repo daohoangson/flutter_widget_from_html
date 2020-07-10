@@ -52,9 +52,6 @@ class HtmlWidget extends StatefulWidget {
   /// The callback when user taps a link.
   final void Function(String) onTapUrl;
 
-  /// The amount of space by which to inset the table cell's contents.
-  final EdgeInsets tableCellPadding;
-
   /// The default styling for text elements.
   final TextStyle textStyle;
 
@@ -73,7 +70,6 @@ class HtmlWidget extends StatefulWidget {
     this.hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
     Key key,
     this.onTapUrl,
-    this.tableCellPadding = const EdgeInsets.all(5),
     this.textStyle = const TextStyle(),
   })  : assert(html != null),
         assert(factoryBuilder != null),

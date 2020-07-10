@@ -1,3 +1,5 @@
+export 'widget/table_layout.dart';
+
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -19,15 +21,23 @@ class WidgetPlaceholder<T1> extends StatelessWidget {
   final _builders = <Function>[];
   final Iterable<Widget> _firstChildren;
   final _inputs = [];
+  final WidgetPlaceholderBuilder<T1> _lastBuilder;
+  final T1 _lastInput;
 
   WidgetPlaceholder({
-    @required WidgetPlaceholderBuilder<T1> builder,
+    WidgetPlaceholderBuilder<T1> builder,
     Iterable<Widget> children,
     T1 input,
-  })  : assert(builder != null),
-        _firstChildren = children {
-    _builders.add(builder);
-    _inputs.add(input);
+    WidgetPlaceholderBuilder<T1> lastBuilder,
+  })  : assert((builder == null) != (lastBuilder == null),
+            'Either builder or lastBuilder must be set'),
+        _firstChildren = children,
+        _lastBuilder = lastBuilder,
+        _lastInput = (lastBuilder != null ? input : null) {
+    if (builder != null) {
+      _builders.add(builder);
+      _inputs.add(input);
+    }
   }
 
   Iterable<Function> get builders => _builders.skip(0);
@@ -41,6 +51,10 @@ class WidgetPlaceholder<T1> extends StatelessWidget {
     final l = _builders.length;
     for (var i = 0; i < l; i++) {
       output = _builders[i](context, output, _inputs[i]);
+    }
+
+    if (_lastBuilder != null) {
+      output = _lastBuilder(context, output, _lastInput);
     }
 
     output = output?.where((widget) => widget != null);

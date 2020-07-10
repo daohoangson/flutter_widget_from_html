@@ -6,9 +6,9 @@ import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'builder.dart';
-import 'core_html_widget.dart';
 import 'core_data.dart';
 import 'core_helpers.dart';
+import 'core_html_widget.dart';
 
 part 'ops/style_bg_color.dart';
 part 'ops/style_direction.dart';
@@ -226,11 +226,44 @@ class WidgetFactory {
           ? Padding(child: child, padding: padding)
           : child;
 
-  Widget buildTable(List<TableRow> rows, {TableBorder border}) =>
-      rows?.isNotEmpty == true ? Table(border: border, children: rows) : null;
+  Widget buildTable(TableData table) {
+    final border = table.border != null
+        ? BoxDecoration(border: Border.fromBorderSide(table.border))
+        : null;
 
-  TableCell buildTableCell(Widget child) =>
-      TableCell(child: buildPadding(child, widget.tableCellPadding) ?? widget0);
+    final layoutGrid = TableLayout(
+      children: table.slots.map((slot) {
+        Widget cell = SizedBox.expand(child: buildColumn(slot.cell.children));
+
+        if (border != null) {
+          cell = Container(
+            child: cell,
+            decoration: border,
+          );
+        }
+
+        return TablePlacement(
+          columnStart: slot.col,
+          columnSpan: slot.cell.colspan,
+          rowStart: slot.row,
+          rowSpan: slot.cell.rowspan,
+          child: cell,
+        );
+      }).toList(growable: false),
+      cols: table.cols,
+      gap: -(table.border?.width ?? 0),
+      rows: table.rows,
+    );
+
+    if (border == null) return layoutGrid;
+
+    return Stack(
+      children: <Widget>[
+        layoutGrid,
+        Positioned.fill(child: Container(decoration: border))
+      ],
+    );
+  }
 
   Widget buildText(TextBits text) => (text..trimRight()).isNotEmpty
       ? WidgetPlaceholder(
@@ -538,6 +571,15 @@ class WidgetFactory {
             break;
           case _kCssDisplayNone:
             meta.isNotRenderable = true;
+            break;
+          case _kCssDisplayTable:
+          case _kCssDisplayTableRow:
+          case _kCssDisplayTableHeaderGroup:
+          case _kCssDisplayTableRowGroup:
+          case _kCssDisplayTableFooterGroup:
+          case _kCssDisplayTableCell:
+          case _kCssDisplayTableCaption:
+            meta.op = tagTable();
             break;
         }
         break;
@@ -862,8 +904,45 @@ class WidgetFactory {
         ];
         break;
 
-      case _kTagTable:
-        meta.op = tagTable();
+      case 'table':
+        meta
+          ..styles = [_kCssDisplay, _kCssDisplayTable]
+          ..op = _TagTable.cellPaddingOp(
+              (attrs.containsKey(_kAttributeCellPadding)
+                      ? double.tryParse(attrs[_kAttributeCellPadding])
+                      : null) ??
+                  1);
+        break;
+      case 'tr':
+        meta.styles = [_kCssDisplay, _kCssDisplayTableRow];
+        break;
+      case 'thead':
+        meta.styles = [_kCssDisplay, _kCssDisplayTableHeaderGroup];
+        break;
+      case 'tbody':
+        meta.styles = [_kCssDisplay, _kCssDisplayTableRowGroup];
+        break;
+      case 'tfoot':
+        meta.styles = [_kCssDisplay, _kCssDisplayTableFooterGroup];
+        break;
+      case 'td':
+        meta.styles = [_kCssDisplay, _kCssDisplayTableCell];
+        break;
+      case 'th':
+        meta.styles = [
+          _kCssDisplay,
+          _kCssDisplayTableCell,
+          _kCssFontWeight,
+          _kCssFontWeightBold,
+        ];
+        break;
+      case 'caption':
+        meta.styles = [
+          _kCssDisplay,
+          _kCssDisplayTableCaption,
+          _kCssTextAlign,
+          _kCssTextAlignCenter,
+        ];
         break;
     }
 

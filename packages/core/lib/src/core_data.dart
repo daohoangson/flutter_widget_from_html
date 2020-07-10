@@ -4,6 +4,7 @@ import 'package:html/dom.dart' as dom;
 import 'builder.dart';
 import 'core_helpers.dart';
 
+part 'data/table_data.dart';
 part 'data/text_bits.dart';
 
 class BuildOp {
