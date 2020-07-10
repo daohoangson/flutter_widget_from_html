@@ -8,9 +8,8 @@ class _TagAExtended {
         },
       );
 
-  static Color _color(TextStyleBuilders tsb) =>
-      Theme.of(tsb.context).accentColor;
+  static Color _color(BuildContext context) => Theme.of(context).accentColor;
 
-  static TextStyleHtml _tsb(TextStyleBuilders tsb, TextStyleHtml p, _) =>
-      p.copyWith(style: p.style.copyWith(color: _color(tsb)));
+  static TextStyleHtml _tsb(BuildContext context, TextStyleHtml p, _) =>
+      p.copyWith(style: p.style.copyWith(color: _color(context)));
 }

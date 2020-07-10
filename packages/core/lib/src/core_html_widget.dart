@@ -175,7 +175,7 @@ Widget _buildBody(WidgetFactory wf, HtmlWidget widget, dom.NodeList domNodes) {
 
 dom.NodeList _parseHtml(String html) => parser.parse(html).body.nodes;
 
-TextStyleHtml _tsb(TextStyleBuilders _, TextStyleHtml p, TextStyle style) =>
+TextStyleHtml _tsb(BuildContext _, TextStyleHtml p, TextStyle style) =>
     style == null
         ? p
         : TextStyleHtml.style(style.inherit ? p.style.merge(style) : style);
