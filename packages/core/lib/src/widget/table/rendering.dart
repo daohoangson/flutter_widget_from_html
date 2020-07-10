@@ -153,7 +153,7 @@ class _TableRenderBox extends RenderBox
   void performItemPlacement() {
     if (_needsPlacement) {
       _needsPlacement = false;
-      _placementGrid = computeItemPlacement(this);
+      _placementGrid = _computeItemPlacement(this);
     }
   }
 

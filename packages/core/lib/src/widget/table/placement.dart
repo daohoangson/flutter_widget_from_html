@@ -1,6 +1,6 @@
 part of '../table_layout.dart';
 
-_PlacementGrid computeItemPlacement(_TableRenderBox renderBox) {
+_PlacementGrid _computeItemPlacement(_TableRenderBox renderBox) {
   final occupancy = _PlacementGrid(renderBox);
 
   var child = renderBox.firstChild;
