@@ -35,14 +35,8 @@ pipe:
         - now --token $ZEIT_TOKEN
 
 unit_test_task:
-  env:
-    matrix:
-      - CONTAINER_IMAGE: cirrusci/flutter:$FLUTTER_VERSION
-      - CONTAINER_IMAGE: cirrusci/flutter:dev
-      - CONTAINER_IMAGE: cirrusci/flutter:beta
-      - CONTAINER_IMAGE: cirrusci/flutter:stable
   container:
-    image: $CONTAINER_IMAGE
+    image: cirrusci/flutter:$FLUTTER_VERSION
   allow_failures: $CONTAINER_IMAGE =~ '.*(dev|beta)'
     
   test_script: COVERAGE=1 ./tool/test.sh
