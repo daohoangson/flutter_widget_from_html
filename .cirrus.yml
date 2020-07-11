@@ -37,17 +37,17 @@ pipe:
 unit_test_task:
   env:
     matrix:
-      - UT_VERSION: dev
-      - UT_VERSION: beta
-      - UT_VERSION: stable
+      - FLUTTER_VERSION: dev
+      - FLUTTER_VERSION: beta
+      - FLUTTER_VERSION: stable
   name: unit_test
   container:
-    image: cirrusci/flutter:$UT_VERSION
+    image: cirrusci/flutter:$FLUTTER_VERSION
 
   test_script: |
     set -e
     
-    if [ "$UT_VERSION" == "stable" ]; then
+    if [ "$FLUTTER_VERSION" == "stable" ]; then
       COVERAGE=1 ./tool/test.sh
       bash <(curl -s https://codecov.io/bash)
     else
@@ -56,7 +56,7 @@ unit_test_task:
   always:
     golden_failures_artifacts:
       path: packages/example/test/golden/failures/*
-  allow_failures: $UT_VERSION == 'dev'
+  allow_failures: $FLUTTER_VERSION != 'stable'
 
 ios_test_task:
   skip: "!changesInclude('lib/src/widget/web_view.dart')"
