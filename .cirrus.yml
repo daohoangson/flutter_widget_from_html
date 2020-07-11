@@ -1,12 +1,11 @@
 env:
   CODECOV_TOKEN: ENCRYPTED[0bad38cf59a2fda73e72491e18a564995cf3a5c862b5400834bfa9873713e780a2deed3e57b265279bd1e91168ee492a]
-  FLUTTER_VERSION: stable
   ZEIT_EMAIL: flutter_widget_from_html@daohoangson.com
   ZEIT_TOKEN: ENCRYPTED[4aaf3c4bb0aedad605db9ac986f9a54a7843cede69c435a94dbacdddc9551616263fc70180e01d3b73ef5c3d72c8d2e0]
 
 analyze_task:
   container:
-    image: cirrusci/flutter:$FLUTTER_VERSION
+    image: cirrusci/flutter:stable
   pub_get_script:
     - flutter pub get
     - ( cd packages/core && flutter pub get )
@@ -23,7 +22,7 @@ pipe:
     FLUTTER_ROOT: /home/cirrus/sdks/flutter
     NOW_PROJECT_JSON: ENCRYPTED[e39b933950795b26ccc4f51665601710bdd72da2dd6066d23fd4392e7d9e303153a230c90335ed49743c79f58aedbcbb]
   steps:
-    - image: cirrusci/flutter:$FLUTTER_VERSION
+    - image: cirrusci/flutter:stable
       generate_document_script:
         - ( cd packages/core && ../../tool/dartdoc.sh )
         - ( cd packages/example && flutter pub get )
@@ -40,7 +39,7 @@ unit_test_task:
       - FLUTTER_VERSION: dev
       - FLUTTER_VERSION: beta
       - FLUTTER_VERSION: stable
-  name: unit_test
+  name: unit_test@$FLUTTER_VERSION
   container:
     image: cirrusci/flutter:$FLUTTER_VERSION
 
@@ -62,15 +61,19 @@ ios_test_task:
   skip: "!changesInclude('lib/src/widget/web_view.dart')"
   depends_on:
     - analyze
-    - unit_test
+    - unit_test@stable
   osx_instance:
     image: catalina-xcode
   install_flutter_script:
-    - curl https://storage.googleapis.com/flutter_infra/releases/stable/macos/flutter_macos_$FLUTTER_VERSION-stable.zip -o flutter.zip
+    - brew install jq
+    - curl https://storage.googleapis.com/flutter_infra/releases/releases_macos.json -Lo releases.json
+    - _baseUrl=$( cat releases.json | jq -r .base_url )
+    - _stableHash=$( cat releases.json | jq -r .current_release.stable )
+    - _stableArchive=$( cat releases.json | jq -r ".releases[] | select(.hash == \"$_stableHash\") | .archive" )
+    - curl $_baseUrl/$_stableArchive -vo flutter.zip
     - unzip -qq flutter.zip
     - mv flutter $HOME/flutter
   create_simulator_script:
-    - brew install jq
     - _deviceType=$( xcrun simctl list devicetypes iphone -j | jq '.devicetypes[-1]' )
     - _deviceTypeName=$( echo $_deviceType | jq .name -r )
     - _deviceTypeId=$( echo $_deviceType | jq .identifier -r )
@@ -84,10 +87,10 @@ android_test_task:
   skip: "!changesInclude('lib/src/widget/video_player.dart', 'lib/src/widget/web_view.dart')"
   trigger_type: manual
   container:
-    image: cirrusci/flutter:$FLUTTER_VERSION
+    image: cirrusci/flutter:stable
   depends_on:
     - analyze
-    - unit_test
+    - unit_test@stable
   env:
     AWS_ACCESS_KEY_ID: AKIAY43IFJQXIX5OS5OM
     AWS_DEFAULT_REGION: us-west-2
