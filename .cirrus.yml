@@ -65,11 +65,15 @@ ios_test_task:
   osx_instance:
     image: catalina-xcode
   install_flutter_script:
-    - curl https://storage.googleapis.com/flutter_infra/releases/stable/macos/flutter_macos_$FLUTTER_VERSION-stable.zip -o flutter.zip
+    - brew install jq
+    - curl https://storage.googleapis.com/flutter_infra/releases/releases_macos.json -Lo releases.json
+    - _baseUrl=$( cat releases.json | jq -r .base_url )
+    - _stableHash=$( cat releases.json | jq -r .current_release.stable )
+    - _stableArchive=$( cat releases.json | jq -r ".releases[] | select(.hash == \"$_stableHash\") | .archive" )
+    - curl $_baseUrl/$_stableArchive -vo flutter.zip
     - unzip -qq flutter.zip
     - mv flutter $HOME/flutter
   create_simulator_script:
-    - brew install jq
     - _deviceType=$( xcrun simctl list devicetypes iphone -j | jq '.devicetypes[-1]' )
     - _deviceTypeName=$( echo $_deviceType | jq .name -r )
     - _deviceTypeId=$( echo $_deviceType | jq .identifier -r )
