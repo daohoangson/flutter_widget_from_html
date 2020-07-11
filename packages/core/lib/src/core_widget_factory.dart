@@ -183,10 +183,18 @@ class WidgetFactory {
   Widget buildImage(ImageProvider image, ImgMetadata img) => Image(
         height: img.height,
         loadingBuilder: buildImageLoadingBuilder(img),
+        errorBuilder: buildImageErrorWidgetBuilder(img),
         image: image,
         semanticLabel: img.alt ?? img.title,
         width: img.width,
       );
+
+  ImageErrorWidgetBuilder buildImageErrorWidgetBuilder(ImgMetadata img) =>
+      (_, error, __) {
+        print('${img.url} error: $error');
+        final text = img.alt ?? img.title ?? '❌';
+        return Text(text);
+      };
 
   ImageLoadingBuilder buildImageLoadingBuilder(ImgMetadata img) =>
       img.width != null && img.height != null && img.height != 0
