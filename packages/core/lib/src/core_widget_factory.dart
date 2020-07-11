@@ -226,6 +226,37 @@ class WidgetFactory {
           ? Padding(child: child, padding: padding)
           : child;
 
+  Widget buildTable(TableData table) {
+    final rows = <TableRow>[];
+    final slotIndices = <int>[];
+    final tableCols = table.cols;
+    final tableRows = table.rows;
+
+    for (var r = 0; r < tableRows; r++) {
+      final cells = List<Widget>(tableCols);
+      for (var c = 0; c < tableCols; c++) {
+        final slot = table.getSlot(row: r, col: c);
+        if (slot == null || slotIndices.contains(slot.index)) {
+          cells[c] = widget0;
+          continue;
+        }
+
+        slotIndices.add(slot.index);
+        cells[c] = TableCell(
+          child: buildColumn(slot.cell.children),
+        );
+      }
+
+      rows.add(TableRow(children: cells));
+    }
+
+    final tableBorder = table.border != null
+        // TODO: support different styling for border sides
+        ? TableBorder.symmetric(inside: table.border, outside: table.border)
+        : null;
+    return Table(border: tableBorder, children: rows);
+  }
+
   Widget buildText(TextBits text) => (text..trimRight()).isNotEmpty
       ? WidgetPlaceholder(
           builder: _buildText,
