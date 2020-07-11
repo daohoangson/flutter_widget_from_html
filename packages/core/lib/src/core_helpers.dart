@@ -1,8 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-part 'widget/image_layout.dart';
-
 const kShouldBuildAsync = 10000;
 
 /// A no op placeholder widget.

@@ -352,7 +352,6 @@ class Explainer {
     if (explained != null) return explained;
 
     if (widget == widget0) return '[widget0]';
-    if (widget is ImageLayout) return '[$widget]';
 
     // ignore: invalid_use_of_protected_member
     if (widget is WidgetPlaceholder) return _widget(widget.build(context));

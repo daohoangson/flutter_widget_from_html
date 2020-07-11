@@ -169,21 +169,56 @@ class WidgetFactory {
         style: style,
       );
 
-  Widget buildImage(String url, {double height, String text, double width}) {
-    ImageProvider image;
-    if (url != null) {
-      if (url.startsWith('asset:')) {
-        image = buildImageFromAsset(url);
-      } else if (url.startsWith('data:')) {
-        image = buildImageFromDataUri(url);
-      } else {
-        image = buildImageFromUrl(url);
-      }
+  Widget buildImg(ImgMetadata img) {
+    final image = buildImageProvider(img.url);
+    if (image == null) {
+      final text = img.alt ?? img.title;
+      if (text == null) return null;
+      return Text(text);
     }
 
-    return image != null
-        ? ImageLayout(image, height: height, text: text, width: width)
-        : text != null ? Text(text) : null;
+    return buildImage(image, img);
+  }
+
+  Widget buildImage(ImageProvider image, ImgMetadata img) => Image(
+        height: img.height,
+        loadingBuilder: buildImageLoadingBuilder(img),
+        image: image,
+        semanticLabel: img.alt ?? img.title,
+        width: img.width,
+      );
+
+  ImageLoadingBuilder buildImageLoadingBuilder(ImgMetadata img) =>
+      img.width != null && img.height != null && img.height != 0
+          ? (_, child, __) => LayoutBuilder(
+                builder: (_, bc) {
+                  var w = img.width < bc.maxWidth ? img.width : bc.maxWidth;
+                  var h = img.height < bc.maxHeight ? img.height : bc.maxHeight;
+                  if (w != img.width || h != img.height) {
+                    final r = w / h;
+                    final ratio = img.width / img.height;
+                    if (r < ratio) {
+                      h = w / ratio;
+                    } else {
+                      w = h * ratio;
+                    }
+                  }
+
+                  return SizedBox(child: child, height: h, width: w);
+                },
+              )
+          : null;
+
+  ImageProvider buildImageProvider(String url) {
+    if (url?.startsWith('asset:') == true) {
+      return buildImageFromAsset(url);
+    }
+
+    if (url?.startsWith('data:') == true) {
+      return buildImageFromDataUri(url);
+    }
+
+    return buildImageFromUrl(url);
   }
 
   List buildImageBytes(String dataUri) {

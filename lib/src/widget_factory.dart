@@ -46,6 +46,17 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
+  Widget buildImage(ImageProvider image, ImgMetadata img) {
+    var built = super.buildImage(image, img);
+
+    if (img.title != null) {
+      built = Tooltip(child: built, message: img.title);
+    }
+
+    return built;
+  }
+
+  @override
   ImageProvider buildImageFromUrl(String url) =>
       url?.isNotEmpty == true ? CachedNetworkImageProvider(url) : null;
 
@@ -119,7 +130,14 @@ class WidgetFactory extends core.WidgetFactory {
       autoplay: autoplay,
       controls: controls,
       loop: loop,
-      poster: posterUrl != null ? buildImage(posterUrl) : null,
+      poster: posterUrl != null
+          ? Image(
+              height: height,
+              image: buildImageProvider(posterUrl),
+              semanticLabel: url,
+              width: width,
+            )
+          : null,
     );
   }
 

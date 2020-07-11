@@ -12,8 +12,11 @@ class _TagImg {
 
           final text = pieces.last?.text;
           final img = _parseMetadata(meta, wf);
-          if (img.url?.isNotEmpty != true && img.text?.isNotEmpty == true) {
-            text.addText(img.text);
+          if (img.url?.isNotEmpty != true) {
+            final imgText = img.alt ?? img.title;
+            if (imgText?.isNotEmpty == true) {
+              text.addText(imgText);
+            }
             return pieces;
           }
 
@@ -24,51 +27,41 @@ class _TagImg {
           if (!meta.isBlockElement) return widgets;
 
           final img = _parseMetadata(meta, wf);
-          if (img.url?.isNotEmpty != true) return widgets;
-
-          return _listOrNull(img.build(wf));
+          return _listOrNull(wf.buildImg(img));
         },
       );
 
-  Iterable<Widget> _buildImage(
-    BuildContext _,
-    Iterable<Widget> __,
-    _TagImgMetadata img,
-  ) =>
-      [img.build(wf)];
-
-  static String _getAttr(Map<dynamic, String> map, String key, String key2) =>
-      map.containsKey(key)
-          ? map[key]
-          : map.containsKey(key2) ? map[key2] : null;
-
   static double _getDimension(
     NodeMetadata meta,
-    Map<dynamic, String> map,
+    Map<dynamic, String> attrs,
     String key,
   ) {
-    final value = _getAttr(map, key, 'data-$key');
+    final value =
+        meta.style(key) ?? (attrs.containsKey(key) ? attrs[key] : null);
     return value != null ? double.tryParse(value) : null;
   }
 
-  static _TagImgMetadata _parseMetadata(NodeMetadata meta, WidgetFactory wf) {
+  static ImgMetadata _parseMetadata(NodeMetadata meta, WidgetFactory wf) {
     final attrs = meta.domElement.attributes;
-    final src = _getAttr(attrs, 'src', 'data-src');
-
-    return _TagImgMetadata(
+    final src = attrs.containsKey('src') ? attrs['src'] : null;
+    return ImgMetadata(
+      alt: attrs.containsKey('alt') ? attrs['alt'] : null,
       height: _getDimension(meta, attrs, 'height'),
-      text: _getAttr(attrs, 'alt', 'title'),
+      title: attrs.containsKey('title') ? attrs['title'] : null,
       url: wf.constructFullUrl(src),
       width: _getDimension(meta, attrs, 'width'),
     );
   }
+
+  Iterable<Widget> _wpb(BuildContext _, Iterable<Widget> __, ImgMetadata img) =>
+      _listOrNull(wf.buildImg(img));
 }
 
-class _ImageBit extends TextWidget<_TagImgMetadata> {
-  _ImageBit(TextBits parent, _TagImg self, _TagImgMetadata img)
+class _ImageBit extends TextWidget<ImgMetadata> {
+  _ImageBit(TextBits parent, _TagImg self, ImgMetadata img)
       : super(
           parent,
-          WidgetPlaceholder(builder: self._buildImage, input: img),
+          WidgetPlaceholder(builder: self._wpb, input: img),
         );
 
   @override
@@ -99,16 +92,4 @@ class _ImageSpan extends WidgetSpan {
       @required List<PlaceholderDimensions> dimensions}) {
     super.build(builder, textScaleFactor: 1.0, dimensions: dimensions);
   }
-}
-
-class _TagImgMetadata {
-  final double height;
-  final String text;
-  final String url;
-  final double width;
-
-  _TagImgMetadata({this.height, this.text, this.url, this.width});
-
-  Widget build(WidgetFactory wf) =>
-      wf.buildImage(url, height: height, text: text, width: width);
 }
