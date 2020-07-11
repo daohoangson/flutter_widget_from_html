@@ -40,7 +40,7 @@ unit_test_task:
       - FLUTTER_VERSION: dev
       - FLUTTER_VERSION: beta
       - FLUTTER_VERSION: stable
-  name: unit_test
+  name: unit_test_$FLUTTER_VERSION
   container:
     image: cirrusci/flutter:$FLUTTER_VERSION
 
@@ -62,7 +62,7 @@ ios_test_task:
   skip: "!changesInclude('lib/src/widget/web_view.dart')"
   depends_on:
     - analyze
-    - unit_test
+    - unit_test_stable
   osx_instance:
     image: catalina-xcode
   install_flutter_script:
@@ -87,7 +87,7 @@ android_test_task:
     image: cirrusci/flutter:$FLUTTER_VERSION
   depends_on:
     - analyze
-    - unit_test
+    - unit_test_stable
   env:
     AWS_ACCESS_KEY_ID: AKIAY43IFJQXIX5OS5OM
     AWS_DEFAULT_REGION: us-west-2
