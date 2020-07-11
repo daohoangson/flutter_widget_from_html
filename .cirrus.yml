@@ -1,6 +1,6 @@
 env:
   CODECOV_TOKEN: ENCRYPTED[0bad38cf59a2fda73e72491e18a564995cf3a5c862b5400834bfa9873713e780a2deed3e57b265279bd1e91168ee492a]
-  FLUTTER_VERSION: '1.17.3'
+  FLUTTER_VERSION: stable
   ZEIT_EMAIL: flutter_widget_from_html@daohoangson.com
   ZEIT_TOKEN: ENCRYPTED[4aaf3c4bb0aedad605db9ac986f9a54a7843cede69c435a94dbacdddc9551616263fc70180e01d3b73ef5c3d72c8d2e0]
 
@@ -37,7 +37,6 @@ pipe:
 unit_test_task:
   env:
     matrix:
-      - UT_VERSION: $FLUTTER_VERSION
       - UT_VERSION: dev
       - UT_VERSION: beta
       - UT_VERSION: stable
@@ -45,12 +44,19 @@ unit_test_task:
   container:
     image: cirrusci/flutter:$UT_VERSION
 
-  test_script: COVERAGE=1 ./tool/test.sh
-  codecov_script: '[[ "$UT_VERSION" == "$FLUTTER_VERSION" ]] && bash <(curl -s https://codecov.io/bash)'
+  test_script: |
+    set -e
+    
+    if [ "$UT_VERSION" == "stable" ]; then
+      COVERAGE=1 ./tool/test.sh
+      bash <(curl -s https://codecov.io/bash)
+    else
+      ./tool/test.sh
+    fi
   always:
     golden_failures_artifacts:
       path: packages/example/test/golden/failures/*
-  allow_failures: $UT_VERSION == 'dev' || $UT_VERSION == 'beta'
+  allow_failures: $UT_VERSION == 'dev'
 
 ios_test_task:
   skip: "!changesInclude('lib/src/widget/web_view.dart')"
