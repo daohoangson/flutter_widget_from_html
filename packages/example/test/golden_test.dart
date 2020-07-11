@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
+    as enhanced;
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
+    as core;
 import 'package:golden_toolkit/golden_toolkit.dart';
 
 // https://lipsum.com/feed/html
@@ -14,45 +17,68 @@ const lipsum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
 
 const redX = '<span style="background-color:#f00;font-size:0.75em;">x</span>';
 
+final _withEnhancedRegExp = RegExp(r'(colspan|rowspan)');
+
 class _TestApp extends StatelessWidget {
   final String html;
   final Key targetKey;
+  final bool withEnhanced;
 
-  const _TestApp(this.html, {Key key, this.targetKey}) : super(key: key);
+  const _TestApp(
+    this.html, {
+    Key key,
+    this.targetKey,
+    this.withEnhanced,
+  }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-        home: Scaffold(
-          body: RepaintBoundary(
-            child: Container(
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    child: Text(html),
-                    padding: const EdgeInsets.all(10),
-                  ),
-                  Divider(),
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: HtmlWidget(html),
-                  ),
-                ],
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-              ),
-              decoration: BoxDecoration(color: Colors.white),
-              width: 400,
+  Widget build(BuildContext context) {
+    final children = <Widget>[
+      Padding(
+        child: Text(html),
+        padding: const EdgeInsets.all(10),
+      ),
+      Divider(),
+      Padding(
+        padding: const EdgeInsets.all(10),
+        child: core.HtmlWidget(html),
+      ),
+    ];
+
+    if (withEnhanced) {
+      children.addAll(<Widget>[
+        Divider(),
+        enhanced.HtmlWidget(html),
+      ]);
+    }
+
+    return MaterialApp(
+      home: Scaffold(
+        body: RepaintBoundary(
+          child: Container(
+            child: Column(
+              children: children,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
             ),
-            key: targetKey,
+            decoration: BoxDecoration(color: Colors.white),
+            width: 400,
           ),
+          key: targetKey,
         ),
-        theme: ThemeData.light(),
-      );
+      ),
+      theme: ThemeData.light(),
+    );
+  }
 }
 
 void _test(String name, String html) => testGoldens(name, (tester) async {
       final key = UniqueKey();
-      await tester.pumpWidget(_TestApp(html, targetKey: key));
+      await tester.pumpWidget(_TestApp(
+        html,
+        targetKey: key,
+        withEnhanced: _withEnhancedRegExp.hasMatch(name),
+      ));
       await expectLater(
         find.byKey(key),
         matchesGoldenFile('./images/$name.png'),
