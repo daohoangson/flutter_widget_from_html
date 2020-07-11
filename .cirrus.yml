@@ -46,7 +46,7 @@ unit_test_task:
     image: cirrusci/flutter:$UT_VERSION
 
   test_script: COVERAGE=1 ./tool/test.sh
-  codecov_script: '[[ "$UT_VERSION" -eq "$FLUTTER_VERSION" ]] && bash <(curl -s https://codecov.io/bash)'
+  codecov_script: '[[ "$UT_VERSION" == "$FLUTTER_VERSION" ]] && bash <(curl -s https://codecov.io/bash)'
   always:
     golden_failures_artifacts:
       path: packages/example/test/golden/failures/*
