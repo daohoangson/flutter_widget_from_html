@@ -35,7 +35,7 @@ Future<String> explain(
   WidgetTester tester,
   String html, {
   bool buildFutureBuilderWithData = true,
-  String Function(Widget) explainer,
+  String Function(Explainer, Widget) explainer,
   Widget hw,
   void Function(BuildContext) preTest,
   TextStyle textStyle,
@@ -119,7 +119,7 @@ Future<String> explainMargin(
 
 class Explainer {
   final BuildContext context;
-  final String Function(Widget) explainer;
+  final String Function(Explainer, Widget) explainer;
   final TextStyle _defaultStyle;
 
   Explainer(this.context, {this.explainer})
@@ -348,17 +348,11 @@ class Explainer {
   }
 
   String _widget(Widget widget) {
-    final explained = explainer?.call(widget);
+    final explained = explainer?.call(this, widget);
     if (explained != null) return explained;
 
     if (widget == widget0) return '[widget0]';
     if (widget is ImageLayout) return '[$widget]';
-
-    if (widget is TablePlacement) {
-      return '[${widget.rowStart},${widget.columnStart}'
-          "${widget.rowSpan != 1 || widget.columnSpan != 1 ? ':${widget.rowSpan}x${widget.columnSpan}' : ''}"
-          ':${_widget(widget.child)}]';
-    }
 
     // ignore: invalid_use_of_protected_member
     if (widget is WidgetPlaceholder) return _widget(widget.build(context));
