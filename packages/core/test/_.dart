@@ -183,6 +183,20 @@ class Explainer {
       '(${e.top.truncate()},${e.right.truncate()},'
       '${e.bottom.truncate()},${e.left.truncate()})';
 
+  String _image(Image image) {
+    final buffer = StringBuffer();
+
+    buffer.write('image=${image.image}');
+
+    if (image.height != null) buffer.write(',height=${image.height}');
+    if (image.semanticLabel != null) {
+      buffer.write(',semanticLabel=${image.semanticLabel}');
+    }
+    if (image.width != null) buffer.write(',width=${image.width}');
+
+    return '[Image:$buffer]';
+  }
+
   String _inlineSpan(InlineSpan inlineSpan, {TextStyle parentStyle}) {
     if (inlineSpan is WidgetSpan) {
       var s = _widget(inlineSpan.child);
@@ -357,6 +371,8 @@ class Explainer {
     if (widget is WidgetPlaceholder) return _widget(widget.build(context));
 
     if (widget is Container) return _container(widget);
+
+    if (widget is Image) return _image(widget);
 
     if (widget is LayoutBuilder) {
       return _widget(widget.builder(

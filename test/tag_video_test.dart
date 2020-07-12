@@ -61,7 +61,7 @@ void main() {
 
   group('poster', () {
     testWidgets('renders video player with asset', (tester) async {
-      final assetName = 'path/image.png';
+      final assetName = 'test/images/logo.png';
       final h = '<video poster="asset:$assetName"><source src="$src"></video>';
       final explained = await explain(tester, h);
       expect(
@@ -69,7 +69,13 @@ void main() {
           equals('[VideoPlayer('
               '"$src", '
               'aspectRatio: 1.78, '
-              'poster: ImageLayout(AssetImage(bundle: null, name: "$assetName"))'
+              'poster: Image(image: AssetImage(bundle: null, name: "$assetName"),'
+              ' frameBuilder: null,'
+              ' loadingBuilder: null,'
+              ' alignment: center,'
+              ' semanticLabel: "$src",'
+              ' this.excludeFromSemantics: false,'
+              ' filterQuality: low)'
               ')]'));
     });
 
@@ -82,7 +88,14 @@ void main() {
           equals('[VideoPlayer('
               '"$src", '
               'aspectRatio: 1.78, '
-              'poster: ImageLayout(MemoryImage(bytes, scale: 1.0))'
+              'poster: Image('
+              'image: MemoryImage(bytes, scale: 1.0),'
+              ' frameBuilder: null,'
+              ' loadingBuilder: null,'
+              ' alignment: center,'
+              ' semanticLabel: "$src",'
+              ' this.excludeFromSemantics: false,'
+              ' filterQuality: low)'
               ')]'));
     });
 
@@ -95,7 +108,13 @@ void main() {
           equals('[VideoPlayer('
               '"$src", '
               'aspectRatio: 1.78, '
-              'poster: ImageLayout(CachedNetworkImageProvider("$posterSrc", scale: 1.0))'
+              'poster: Image(image: CachedNetworkImageProvider("$posterSrc", scale: 1.0),'
+              ' frameBuilder: null,'
+              ' loadingBuilder: null,'
+              ' alignment: center,'
+              ' semanticLabel: "$src",'
+              ' this.excludeFromSemantics: false,'
+              ' filterQuality: low)'
               ')]'));
     });
   });

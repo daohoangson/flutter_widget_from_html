@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 
 import '_.dart' as helper;
 
@@ -151,18 +152,21 @@ void main() {
       expect(e, equals('[RichText:(:image dot png)]'));
     });
 
-    testWidgets('renders with value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        HtmlWidget(html, baseUrl: baseUrl, key: helper.hwKey),
-      );
-      expect(
-          explained,
-          equals('[ImageLayout('
-              'NetworkImage("http://base.com/path/image.png", scale: 1.0), '
-              'text: "image dot png"'
-              ')]'));
-    });
+    testWidgets(
+      'renders with value',
+      (tester) => mockNetworkImagesFor(() async {
+        final explained = await explain(
+          tester,
+          HtmlWidget(html, baseUrl: baseUrl, key: helper.hwKey),
+        );
+        expect(
+            explained,
+            equals(
+                '[Image:image=NetworkImage("http://base.com/path/image.png", scale: 1.0),'
+                'semanticLabel=image dot png'
+                ']'));
+      }),
+    );
   });
 
   group('customStylesBuilder', () {

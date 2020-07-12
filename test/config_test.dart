@@ -158,10 +158,10 @@ void main() {
       );
       expect(
           explained,
-          equals('[ImageLayout('
-              'CachedNetworkImageProvider("http://base.com/path/image.png", scale: 1.0), '
-              'text: "image dot png"'
-              ')]'));
+          equals(
+              '[Image:image=CachedNetworkImageProvider("http://base.com/path/image.png", scale: 1.0),'
+              'semanticLabel=image dot png'
+              ']'));
     });
   });
 
