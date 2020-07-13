@@ -12,7 +12,7 @@ class _State extends State<ImgScreen> {
 
   @override
   Widget build(BuildContext context) => DefaultTabController(
-        length: 3,
+        length: 4,
         child: Scaffold(
           appBar: AppBar(
             bottom: TabBar(
@@ -20,6 +20,7 @@ class _State extends State<ImgScreen> {
                 Tab(text: 'Network'),
                 Tab(text: 'Asset'),
                 Tab(text: 'Data URI'),
+                Tab(text: 'SVG'),
               ],
             ),
             title: Text('ImgScreen'),
@@ -29,6 +30,7 @@ class _State extends State<ImgScreen> {
               _buildHtmlWidget(_htmlNetwork()),
               _buildHtmlWidget(_htmlAsset()),
               _buildHtmlWidget(_htmlDataUri()),
+              _buildHtmlWidget(_htmlSvg()),
             ],
           ),
         ),
@@ -161,6 +163,26 @@ class _State extends State<ImgScreen> {
 <p>
   Images from <a href="https://placeholder.com">placeholder.com</a>,
   filler text from <a href="https://lipsum.com/feed/html">lipsum.com</a>
+</p>
+''';
+
+  String _htmlSvg() => '''
+<p>
+  Network:
+
+  <img src="https://raw.githubusercontent.com/dnfield/flutter_svg/master/example/assets/flutter_logo.svg" />
+</p>
+
+<p>
+  Asset:
+
+  <img src="asset:test/images/logo.svg?package=flutter_widget_from_html" />
+</p>
+
+<p>
+  Data URI:
+
+  <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDE2NiAyMDIiPgogICAgPGRlZnM+CiAgICAgICAgPGxpbmVhckdyYWRpZW50IGlkPSJ0cmlhbmdsZUdyYWRpZW50Ij4KICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSIyMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iLjU1IiAvPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9Ijg1JSIgc3RvcC1jb2xvcj0iIzYxNjE2MSIgc3RvcC1vcGFjaXR5PSIuMDEiIC8+CiAgICAgICAgPC9saW5lYXJHcmFkaWVudD4KICAgICAgICA8bGluZWFyR3JhZGllbnQgaWQ9InJlY3RhbmdsZUdyYWRpZW50IiB4MT0iMCUiIHgyPSIwJSIgeTE9IjAlIiB5Mj0iMTAwJSI+CiAgICAgICAgICAgIDxzdG9wIG9mZnNldD0iMjAlIiBzdG9wLWNvbG9yPSIjMDAwMDAwIiBzdG9wLW9wYWNpdHk9Ii4xNSIgLz4KICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSI4NSUiIHN0b3AtY29sb3I9IiM2MTYxNjEiIHN0b3Atb3BhY2l0eT0iLjAxIiAvPgogICAgICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8L2RlZnM+CiAgICA8cGF0aCBmaWxsPSIjNDJBNUY1IiBmaWxsLW9wYWNpdHk9Ii44IiBkPSJNMzcuNyAxMjguOSA5LjggMTAxIDEwMC40IDEwLjQgMTU2LjIgMTAuNCIvPgogICAgPHBhdGggZmlsbD0iIzQyQTVGNSIgZmlsbC1vcGFjaXR5PSIuOCIgZD0iTTE1Ni4yIDk0IDEwMC40IDk0IDc5LjUgMTE0LjkgMTA3LjQgMTQyLjgiLz4KICAgIDxwYXRoIGZpbGw9IiMwRDQ3QTEiIGQ9Ik03OS41IDE3MC43IDEwMC40IDE5MS42IDE1Ni4yIDE5MS42IDE1Ni4yIDE5MS42IDEwNy40IDE0Mi44Ii8+CiAgICA8ZyB0cmFuc2Zvcm09Im1hdHJpeCgwLjcwNzEsIC0wLjcwNzEsIDAuNzA3MSwgMC43MDcxLCAtNzcuNjY3LCA5OC4wNTcpIj4KICAgICAgICA8cmVjdCB3aWR0aD0iMzkuNCIgaGVpZ2h0PSIzOS40IiB4PSI1OS44IiB5PSIxMjMuMSIgZmlsbD0iIzQyQTVGNSIgLz4KICAgICAgICA8cmVjdCB3aWR0aD0iMzkuNCIgaGVpZ2h0PSI1LjUiIHg9IjU5LjgiIHk9IjE2Mi41IiBmaWxsPSJ1cmwoI3JlY3RhbmdsZUdyYWRpZW50KSIgLz4KICAgIDwvZz4KICAgIDxwYXRoIGQ9Ik03OS41IDE3MC43IDEyMC45IDE1Ni40IDEwNy40IDE0Mi44IiBmaWxsPSJ1cmwoI3RyaWFuZ2xlR3JhZGllbnQpIiAvPgo8L3N2Zz4=" />
 </p>
 ''';
 
