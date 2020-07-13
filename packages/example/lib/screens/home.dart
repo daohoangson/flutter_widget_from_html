@@ -66,8 +66,8 @@ CODE tag:
 <div style="margin: 5px 10px">margin: 5px 10px</div>
 <div style="margin: 3px">margin: 3px</div>
 <div style="margin: 1px"><div style="margin: 2px">Margin within another</div></div>
-""",
-    'SVG': """
+''',
+    'SVG': '''
 <a href="https://raw.githubusercontent.com/dnfield/flutter_svg/master/example/assets/flutter_logo.svg">flutter_logo.svg</a>:<br />
 <br />
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 166 202">
