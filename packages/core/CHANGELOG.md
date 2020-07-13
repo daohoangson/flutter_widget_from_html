@@ -1,3 +1,9 @@
+## 0.4.2
+
+* Add support for inline style sizing (#206): `width`, `height`, `max-width`, `max-height`, `min-width` and `min-height`
+* Add support for inline style `text-overflow` (#204)
+* Bug fixes
+
 ## 0.4.1
 
 * BREAKING: Remove `TextStyleBuilders.recognizer` (#168)
