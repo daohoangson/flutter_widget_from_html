@@ -1,3 +1,18 @@
+## 0.5.0-rc.2020071301
+
+* BREAKING: Remove 3rd param `wf` from `WidgetPlaceholder.wrap`
+* BREAKING: Remove field `HtmlWidget.tableCellPadding`
+* BREAKING: Remove class `CssLineHeight`
+* BREAKING: Remove class `ImageLayout` (#230)
+* BREAKING: Change param `builder` of `TextStyleBuilders.enqueue`
+* BREAKING: Change method `WidgetFactory.buildImage`
+* Add support for colspan / rowspan in table (#157)
+* Add support for inline style `text-overflow` (#204)
+* Add support for inline style sizing (#206): `width`, `height`, `max-width`, `max-height`, `min-width` and `min-height`
+* Add support em/px in `line-height` and % in `font-size` (#220)
+* Add support for svg src in `IMG` (#233)
+* Bug fixes
+
 ## 0.4.1
 
 * BREAKING: Remove `TextStyleBuilders.recognizer` (#168)
