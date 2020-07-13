@@ -72,8 +72,7 @@ void main() {
               'url=$src,'
               'aspectRatio=$defaultAspectRatio,'
               'poster=[Image:'
-              'image=AssetImage(bundle: null, name: "$assetName"),'
-              'semanticLabel=$src'
+              'image=AssetImage(bundle: null, name: "$assetName")'
               ']]'));
     });
 
@@ -87,8 +86,7 @@ void main() {
               'url=$src,'
               'aspectRatio=$defaultAspectRatio,'
               'poster=[Image:'
-              'image=MemoryImage(bytes, scale: 1.0),'
-              'semanticLabel=$src'
+              'image=MemoryImage(bytes, scale: 1.0)'
               ']]'));
     });
 
@@ -102,8 +100,7 @@ void main() {
               'url=$src,'
               'aspectRatio=$defaultAspectRatio,'
               'poster=[Image:'
-              'image=CachedNetworkImageProvider("$posterSrc", scale: 1.0),'
-              'semanticLabel=$src'
+              'image=CachedNetworkImageProvider("$posterSrc", scale: 1.0)'
               ']]'));
     });
   });

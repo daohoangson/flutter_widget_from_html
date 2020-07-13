@@ -131,11 +131,13 @@ class WidgetFactory extends core.WidgetFactory {
       controls: controls,
       loop: loop,
       poster: posterUrl != null
-          ? Image(
-              height: height,
-              image: buildImageProvider(posterUrl),
-              semanticLabel: url,
-              width: width,
+          ? buildImage(
+              buildImageProvider(posterUrl),
+              ImgMetadata(
+                height: height,
+                url: posterUrl,
+                width: width,
+              ),
             )
           : null,
     );
