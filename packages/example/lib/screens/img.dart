@@ -171,12 +171,16 @@ class _State extends State<ImgScreen> {
   Network:
 
   <img src="https://raw.githubusercontent.com/dnfield/flutter_svg/master/example/assets/flutter_logo.svg" />
+  <img src="https://raw.githubusercontent.com/dnfield/flutter_svg/master/example/assets/flutter_logo.svg" width="48" />
+  <img src="https://raw.githubusercontent.com/dnfield/flutter_svg/master/example/assets/flutter_logo.svg" width="12" />
 </p>
 
 <p>
   Asset:
 
   <img src="asset:test/images/logo.svg?package=flutter_widget_from_html" />
+  <img src="asset:test/images/logo.svg?package=flutter_widget_from_html" width="48" />
+  <img src="asset:test/images/logo.svg?package=flutter_widget_from_html" width="12" />
 </p>
 
 <p>
