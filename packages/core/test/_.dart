@@ -443,7 +443,11 @@ class Explainer {
                 ? (widget.child != null ? 'child=${_widget(widget.child)}' : '')
                 : widget is SingleChildScrollView
                     ? 'child=${_widget(widget.child)}'
-                    : widget is Table ? '\n${_tableRows(widget)}\n' : '';
+                    : widget is Table
+                        ? '\n${_tableRows(widget)}\n'
+                        : widget is Tooltip
+                            ? 'child=${_widget(widget.child)},message=${widget.message}'
+                            : '';
     return '[$type$attrStr:$text$children]';
   }
 
