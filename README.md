@@ -70,7 +70,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
   - `.webViewPadding`
   - To render IFRAME as web view: set `webView=true` in config and [setup iOS project manually](https://pub.dev/packages/webview_flutter#ios).
   - If the IFRAME has no `width` and `height` attributes, the web view will be rendered initially in a 16:9 box and automatically resize itself afterwards.
-- IMG with support for asset (`asset://`), data uri and network image via [`CachedNetworkImage`](https://pub.dev/packages/cached_network_image)
+- IMG with support for asset (`asset://`), data uri and network image via [`CachedNetworkImage`](https://pub.dev/packages/cached_network_image). Additional svg filetype support via [flutter_svg](https://pub.dev/packages/flutter_svg).
 - LI/OL/UL with support for:
   - Attributes: `type`, `start`, `reversed`
   - Inline style `list-style-type` values: `lower-alpha`, `upper-alpha`, `lower-latin`, `upper-latin`, `circle`, `decimal`, `disc`, `lower-roman`, `upper-roman`, `square`
