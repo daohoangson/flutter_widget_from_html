@@ -146,13 +146,13 @@ void main() {
     testWidgets('renders bad data uri with alt text', (tester) async {
       final html = '<img src="data:image/xxx" alt="Foo" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(explained, equals('[Text:Foo]'));
     });
 
     testWidgets('renders bad data uri with title text', (tester) async {
       final html = '<img src="data:image/xxx" title="Foo" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(explained, equals('[Text:Foo]'));
     });
   });
 
