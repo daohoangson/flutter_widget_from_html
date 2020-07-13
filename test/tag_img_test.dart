@@ -34,12 +34,14 @@ void main() {
       final html = '<img src="$src" title="Bar" />';
       final explained = await explain(tester, html);
       expect(
-        explained,
-        equals('[Image:'
-            'image=CachedNetworkImageProvider("$src", scale: 1.0),'
-            'semanticLabel=Bar'
-            ']'),
-      );
+          explained,
+          equals('[Tooltip:'
+              'child=[Image:'
+              'image=CachedNetworkImageProvider("http://domain.com/image.png", scale: 1.0),'
+              'semanticLabel=Bar'
+              '],'
+              'message=Bar'
+              ']'));
     });
 
     testWidgets('renders src+alt+title', (WidgetTester tester) async {
