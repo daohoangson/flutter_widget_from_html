@@ -102,11 +102,8 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
-  ImageProvider buildImageFromUrl(String url) => url?.isNotEmpty == true
-      ? (Uri.tryParse(url)?.path?.toLowerCase()?.endsWith('.svg') == true
-          ? NetworkPicture(SvgPicture.svgByteDecoder, url)
-          : CachedNetworkImageProvider(url))
-      : null;
+  ImageProvider buildImageFromUrl(String url) =>
+      url?.isNotEmpty == true ? CachedNetworkImageProvider(url) : null;
 
   @override
   Widget buildTable(TableData table) {
