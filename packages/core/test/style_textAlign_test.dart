@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 
 import '_.dart';
 
@@ -86,8 +87,9 @@ void main() {
   group('image', () {
     final imgSrc = 'http://domain.com/image.png';
     final imgHtml = '<img src="$imgSrc" />';
-    final imgRendered = '[ImageLayout(NetworkImage("$imgSrc", scale: 1.0))]';
-    final imgExplain = (WidgetTester t, String html) => explain(t, html);
+    final imgRendered = '[Image:image=NetworkImage("$imgSrc", scale: 1.0)]';
+    final imgExplain = (WidgetTester t, String html) =>
+        mockNetworkImagesFor(() => explain(t, html));
 
     testWidgets('renders center image', (WidgetTester tester) async {
       final html = '<div style="text-align: center">$imgHtml</div>';

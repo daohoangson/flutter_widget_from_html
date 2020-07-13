@@ -46,6 +46,62 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
+  Widget buildImage(Object provider, ImgMetadata img) {
+    var built = super.buildImage(provider, img);
+
+    if (built == null && provider is PictureProvider) {
+      built = SvgPicture(
+        provider,
+        height: img.height,
+        width: img.width,
+      );
+    }
+
+    if (img.title != null && built != null) {
+      built = Tooltip(child: built, message: img.title);
+    }
+
+    return built;
+  }
+
+  @override
+  Object buildImageProvider(String url) =>
+      url?.startsWith('data:image/svg+xml') == true
+          ? buildSvgMemoryPicture(url)
+          : Uri.tryParse(url)?.path?.toLowerCase()?.endsWith('.svg') == true
+              ? buildSvgPictureProvider(url)
+              : super.buildImageProvider(url);
+
+  PictureProvider buildSvgMemoryPicture(String dataUri) {
+    final bytes = buildImageBytes(dataUri);
+    return bytes != null
+        ? MemoryPicture(SvgPicture.svgByteDecoder, bytes)
+        : null;
+  }
+
+  PictureProvider buildSvgPictureProvider(String url) {
+    if (url?.startsWith('asset:') == true) {
+      final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
+      if (uri?.scheme != 'asset') return null;
+
+      final assetName = uri.path;
+      if (assetName?.isNotEmpty != true) return null;
+
+      final package = uri.queryParameters?.containsKey('package') == true
+          ? uri.queryParameters['package']
+          : null;
+
+      return ExactAssetPicture(
+        SvgPicture.svgStringDecoder,
+        assetName,
+        package: package,
+      );
+    }
+
+    return NetworkPicture(SvgPicture.svgByteDecoder, url);
+  }
+
+  @override
   ImageProvider buildImageFromUrl(String url) =>
       url?.isNotEmpty == true ? CachedNetworkImageProvider(url) : null;
 
@@ -119,7 +175,16 @@ class WidgetFactory extends core.WidgetFactory {
       autoplay: autoplay,
       controls: controls,
       loop: loop,
-      poster: posterUrl != null ? buildImage(posterUrl) : null,
+      poster: posterUrl != null
+          ? buildImage(
+              buildImageProvider(posterUrl),
+              ImgMetadata(
+                height: height,
+                url: posterUrl,
+                width: width,
+              ),
+            )
+          : null,
     );
   }
 

@@ -5,7 +5,11 @@ import '_.dart';
 void main() {
   testWidgets('renders SvgPicture for inline SVG', (tester) async {
     final html = '<svg viewBox="0 0 1 1"></svg>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[SvgPicture:]'));
+    final e = await explain(tester, html);
+    final explained = e.replaceAll(RegExp(r'String#[0-9a-f]+,'), 'String,');
+    expect(
+        explained,
+        equals(
+            '[SvgPicture:pictureProvider=StringPicture(String, colorFilter: null)]'));
   });
 }

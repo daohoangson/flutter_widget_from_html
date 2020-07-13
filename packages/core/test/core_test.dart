@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 
 import '_.dart';
 
@@ -221,16 +222,19 @@ void main() {
       expect(explained, equals('[RichText:(:“”)]'));
     });
 
-    testWidgets('renders quotes around IMG', (WidgetTester tester) async {
-      final src = 'http://domain.com/image.png';
-      final html = '<q><img src="$src" /></q>';
-      final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[RichText:(:“'
-              '[ImageLayout(NetworkImage("$src", scale: 1.0))]'
-              '(:”))]'));
-    });
+    testWidgets(
+      'renders quotes around IMG',
+      (tester) => mockNetworkImagesFor(() async {
+        final src = 'http://domain.com/image.png';
+        final html = '<q><img src="$src" /></q>';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[RichText:(:“'
+                '[Image:image=NetworkImage("$src", scale: 1.0)]'
+                '(:”))]'));
+      }),
+    );
 
     testWidgets('renders styling', (WidgetTester tester) async {
       final html = 'Someone said <q><em>Foo</em></q>.';
@@ -318,22 +322,25 @@ void main() {
       expect(explained, equals(blockOutput));
     });
 
-    testWidgets('renders FIGURE/FIGCAPTION tags', (WidgetTester tester) async {
-      final src = 'http://domain.com/image.png';
-      final html = '''
+    testWidgets(
+      'renders FIGURE/FIGCAPTION tags',
+      (tester) => mockNetworkImagesFor(() async {
+        final src = 'http://domain.com/image.png';
+        final html = '''
 <figure>
   <img src="$src">
   <figcaption><i>fig. 1</i> Foo</figcaption>
 </figure>
 ''';
-      final explained = await explainMargin(tester, html);
-      expect(
-          explained,
-          equals('[SizedBox:0.0x10.0],'
-              '[Padding:(0,40,0,40),child=[ImageLayout(NetworkImage("$src", scale: 1.0))]],'
-              '[Padding:(0,40,0,40),child=[RichText:(:(+i:fig. 1)(: Foo))]],'
-              '[SizedBox:0.0x10.0]'));
-    });
+        final explained = await explainMargin(tester, html);
+        expect(
+            explained,
+            equals('[SizedBox:0.0x10.0],'
+                '[Padding:(0,40,0,40),child=[Image:image=NetworkImage("$src", scale: 1.0)]],'
+                '[Padding:(0,40,0,40),child=[RichText:(:(+i:fig. 1)(: Foo))]],'
+                '[SizedBox:0.0x10.0]'));
+      }),
+    );
 
     testWidgets('renders HEADER/FOOTER tag', (WidgetTester tester) async {
       final html = '<header>First.</header><footer>Second one.</footer>';
@@ -887,67 +894,61 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     group('IMG', () {
       final src = 'http://domain.com/image.png';
 
-      testWidgets('renders IMG inline by default', (WidgetTester tester) async {
-        final html = 'Foo <img src="$src" />';
-        final explained = await explain(tester, html);
-        expect(
-            explained,
-            equals('[RichText:(:Foo '
-                '[ImageLayout(NetworkImage("$src", scale: 1.0))]'
-                ')]'));
-      });
+      testWidgets(
+        'renders IMG inline by default',
+        (tester) => mockNetworkImagesFor(() async {
+          final html = 'Foo <img src="$src" />';
+          final explained = await explain(tester, html);
+          expect(
+              explained,
+              equals('[RichText:(:Foo '
+                  '[Image:image=NetworkImage("$src", scale: 1.0)]'
+                  ')]'));
+        }),
+      );
 
-      testWidgets('renders IMG as block', (WidgetTester tester) async {
-        final html = 'Foo <img src="$src" style="display: block" />';
-        final explained = await explain(tester, html);
-        expect(
-            explained,
-            equals('[Column:children='
-                '[RichText:(:Foo)],'
-                '[ImageLayout(NetworkImage("$src", scale: 1.0))]'
-                ']'));
-      });
+      testWidgets(
+        'renders IMG as block',
+        (tester) => mockNetworkImagesFor(() async {
+          final html = 'Foo <img src="$src" style="display: block" />';
+          final explained = await explain(tester, html);
+          expect(
+              explained,
+              equals('[Column:children='
+                  '[RichText:(:Foo)],'
+                  '[Image:image=NetworkImage("$src", scale: 1.0)]'
+                  ']'));
+        }),
+      );
 
-      testWidgets('renders IMG with dimensions inline', (tester) async {
-        final html = '<img src="$src" width="1" height="1" />';
-        final explained = await explain(
-          tester,
-          html,
-          preTest: (context) => precacheImage(
-            NetworkImage(src),
-            context,
-            onError: (_, __) {},
-          ),
-        );
-        expect(
-            explained,
-            equals('[ImageLayout('
-                'NetworkImage("$src", scale: 1.0), '
-                'height: 1.0, '
-                'width: 1.0'
-                ')]'));
-      });
+      testWidgets(
+        'renders IMG with dimensions inline',
+        (tester) => mockNetworkImagesFor(() async {
+          final html = '<img src="$src" width="1" height="1" />';
+          final explained = await explain(tester, html);
+          expect(
+              explained,
+              equals('[Image:image=NetworkImage("$src", scale: 1.0),'
+                  'height=1.0,'
+                  'width=1.0'
+                  ']'));
+        }),
+      );
 
-      testWidgets('renders IMG with dimensions as block', (tester) async {
-        final html = '<img src="$src" width="1" '
-            'height="1" style="display: block" />';
-        final explained = await explain(
-          tester,
-          html,
-          preTest: (context) => precacheImage(
-            NetworkImage(src),
-            context,
-            onError: (_, __) {},
-          ),
-        );
-        expect(
-            explained,
-            equals('[ImageLayout('
-                'NetworkImage("$src", scale: 1.0), '
-                'height: 1.0, '
-                'width: 1.0'
-                ')]'));
-      });
+      testWidgets(
+        'renders IMG with dimensions as block',
+        (tester) => mockNetworkImagesFor(() async {
+          final html = '<img src="$src" width="1" '
+              'height="1" style="display: block" />';
+          final explained = await explain(tester, html);
+          expect(
+              explained,
+              equals('[Image:image=NetworkImage("$src", scale: 1.0),'
+                  'height=1.0,'
+                  'width=1.0'
+                  ']'));
+        }),
+      );
     });
   });
 

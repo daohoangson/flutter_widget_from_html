@@ -1,29 +1,20 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 
 import '_.dart' as helper;
 
 void main() {
   group('image.png', () {
     final src = 'http://domain.com/image.png';
-    final explain = (WidgetTester tester, String html) => helper.explain(
-          tester,
-          html,
-          preTest: (context) =>
-              precacheImage(NetworkImage(src), context, onError: (_, __) {}),
-        );
+    final explain = (WidgetTester tester, String html) =>
+        mockNetworkImagesFor(() async => helper.explain(tester, html));
 
     testWidgets('renders src', (WidgetTester tester) async {
       final html = '<img src="$src" />';
       final e = await explain(tester, html);
-      expect(e, equals('[ImageLayout(NetworkImage("$src", scale: 1.0))]'));
-    });
-
-    testWidgets('renders data-src', (WidgetTester tester) async {
-      final html = '<img data-src="$src" />';
-      final e = await explain(tester, html);
-      expect(e, equals('[ImageLayout(NetworkImage("$src", scale: 1.0))]'));
+      expect(e, equals('[Image:image=NetworkImage("$src", scale: 1.0)]'));
     });
 
     testWidgets('renders in one RichText', (WidgetTester tester) async {
@@ -32,9 +23,9 @@ void main() {
       expect(
         explained,
         equals('[RichText:(:'
-            '[ImageLayout(NetworkImage("$src", scale: 1.0))]'
+            '[Image:image=NetworkImage("$src", scale: 1.0)]'
             '(: )'
-            '[ImageLayout(NetworkImage("$src", scale: 1.0))]'
+            '[Image:image=NetworkImage("$src", scale: 1.0)]'
             ')]'),
       );
     });
@@ -56,11 +47,10 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[ImageLayout('
-              'NetworkImage("$src", scale: 1.0), '
-              'height: 600.0, '
-              'width: 800.0'
-              ')]'));
+          equals('[Image:image=NetworkImage("$src", scale: 1.0),'
+              'height=600.0,'
+              'width=800.0'
+              ']'));
     });
 
     testWidgets('renders between texts', (WidgetTester tester) async {
@@ -70,7 +60,7 @@ void main() {
           explained,
           equals('[RichText:(:'
               'Before text. '
-              '[ImageLayout(NetworkImage("$src", scale: 1.0))]'
+              '[Image:image=NetworkImage("$src", scale: 1.0)]'
               '(: After text.)'
               ')]'));
     });
@@ -100,10 +90,10 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[ImageLayout(AssetImage('
+          equals('[Image:image=AssetImage('
               'bundle: null, '
               'name: "$assetName"'
-              '))]'));
+              ')]'));
     });
 
     testWidgets('renders asset (specified package)', (tester) async {
@@ -112,10 +102,10 @@ void main() {
       final explained = await explain(tester, html, package: package);
       expect(
           explained,
-          equals('[ImageLayout(AssetImage('
+          equals('[Image:image=AssetImage('
               'bundle: null, '
               'name: "packages/$package/$assetName"'
-              '))]'));
+              ')]'));
     });
 
     testWidgets('renders bad asset', (WidgetTester tester) async {
@@ -144,7 +134,7 @@ void main() {
       final html = '<img src="${helper.kDataUri}" />';
       final explained = await explain(tester, html);
       final e = explained.replaceAll(RegExp(r'Uint8List#[0-9a-f]+,'), 'bytes,');
-      expect(e, equals('[ImageLayout(MemoryImage(bytes, scale: 1.0))]'));
+      expect(e, equals('[Image:image=MemoryImage(bytes, scale: 1.0)]'));
     });
 
     testWidgets('renders bad data uri', (WidgetTester tester) async {
@@ -156,13 +146,13 @@ void main() {
     testWidgets('renders bad data uri with alt text', (tester) async {
       final html = '<img src="data:image/xxx" alt="Foo" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(explained, equals('[Text:Foo]'));
     });
 
     testWidgets('renders bad data uri with title text', (tester) async {
       final html = '<img src="data:image/xxx" title="Foo" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(explained, equals('[Text:Foo]'));
     });
   });
 
@@ -179,7 +169,7 @@ void main() {
             baseUrl: baseUrl ?? Uri.parse('http://base.com/path/'),
             key: helper.hwKey,
           ));
-      expect(e, equals('[ImageLayout(NetworkImage("$fullUrl", scale: 1.0))]'));
+      expect(e, equals('[Image:image=NetworkImage("$fullUrl", scale: 1.0)]'));
     };
 
     testWidgets('renders full url', (WidgetTester tester) async {
