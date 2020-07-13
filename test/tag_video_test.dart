@@ -4,11 +4,13 @@ import '_.dart';
 
 void main() {
   final src = 'http://domain.com/video.mp4';
+  final defaultAspectRatio = '1.78';
 
   testWidgets('renders video player', (tester) async {
     final html = '<video><source src="$src"></video>';
     final explained = await explain(tester, html);
-    expect(explained, equals('[VideoPlayer("$src", aspectRatio: 1.78)]'));
+    expect(explained,
+        equals('[VideoPlayer:url=$src,aspectRatio=$defaultAspectRatio]'));
   });
 
   testWidgets('renders video player with specified dimensions', (tester) async {
@@ -16,11 +18,11 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[VideoPlayer('
-            '"$src", '
-            'aspectRatio: 1.33, '
-            'autoResize: false'
-            ')]'));
+        equals('[VideoPlayer:'
+            'url=$src,'
+            'aspectRatio=1.33,'
+            'autoResize=false'
+            ']'));
   });
 
   testWidgets('renders video player with autoplay', (tester) async {
@@ -28,11 +30,11 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[VideoPlayer('
-            '"$src", '
-            'aspectRatio: 1.78, '
-            'autoplay: true'
-            ')]'));
+        equals('[VideoPlayer:'
+            'url=$src,'
+            'aspectRatio=$defaultAspectRatio,'
+            'autoplay=true'
+            ']'));
   });
 
   testWidgets('renders video player with controls', (tester) async {
@@ -40,11 +42,11 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[VideoPlayer('
-            '"$src", '
-            'aspectRatio: 1.78, '
-            'controls: true'
-            ')]'));
+        equals('[VideoPlayer:'
+            'url=$src,'
+            'aspectRatio=$defaultAspectRatio,'
+            'controls=true'
+            ']'));
   });
 
   testWidgets('renders video player with loop', (tester) async {
@@ -52,11 +54,11 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[VideoPlayer('
-            '"$src", '
-            'aspectRatio: 1.78, '
-            'loop: true'
-            ')]'));
+        equals('[VideoPlayer:'
+            'url=$src,'
+            'aspectRatio=$defaultAspectRatio,'
+            'loop=true'
+            ']'));
   });
 
   group('poster', () {
@@ -66,37 +68,28 @@ void main() {
       final explained = await explain(tester, h);
       expect(
           explained,
-          equals('[VideoPlayer('
-              '"$src", '
-              'aspectRatio: 1.78, '
-              'poster: Image(image: AssetImage(bundle: null, name: "$assetName"),'
-              ' frameBuilder: null,'
-              ' loadingBuilder: null,'
-              ' alignment: center,'
-              ' semanticLabel: "$src",'
-              ' this.excludeFromSemantics: false,'
-              ' filterQuality: low)'
-              ')]'));
+          equals('[VideoPlayer:'
+              'url=$src,'
+              'aspectRatio=$defaultAspectRatio,'
+              'poster=[Image:'
+              'image=AssetImage(bundle: null, name: "$assetName"),'
+              'semanticLabel=$src'
+              ']]'));
     });
 
     testWidgets('renders video player with data uri', (tester) async {
       final h = '<video poster="$kDataUri"><source src="$src"></video>';
-      final explained = await explain(tester, h);
-      final e = explained.replaceAll(RegExp(r'Uint8List#[0-9a-f]+,'), 'bytes,');
+      final e = await explain(tester, h);
+      final explained = e.replaceAll(RegExp(r'Uint8List#[0-9a-f]+,'), 'bytes,');
       expect(
-          e,
-          equals('[VideoPlayer('
-              '"$src", '
-              'aspectRatio: 1.78, '
-              'poster: Image('
-              'image: MemoryImage(bytes, scale: 1.0),'
-              ' frameBuilder: null,'
-              ' loadingBuilder: null,'
-              ' alignment: center,'
-              ' semanticLabel: "$src",'
-              ' this.excludeFromSemantics: false,'
-              ' filterQuality: low)'
-              ')]'));
+          explained,
+          equals('[VideoPlayer:'
+              'url=$src,'
+              'aspectRatio=$defaultAspectRatio,'
+              'poster=[Image:'
+              'image=MemoryImage(bytes, scale: 1.0),'
+              'semanticLabel=$src'
+              ']]'));
     });
 
     testWidgets('renders video player with url', (tester) async {
@@ -105,17 +98,13 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[VideoPlayer('
-              '"$src", '
-              'aspectRatio: 1.78, '
-              'poster: Image(image: CachedNetworkImageProvider("$posterSrc", scale: 1.0),'
-              ' frameBuilder: null,'
-              ' loadingBuilder: null,'
-              ' alignment: center,'
-              ' semanticLabel: "$src",'
-              ' this.excludeFromSemantics: false,'
-              ' filterQuality: low)'
-              ')]'));
+          equals('[VideoPlayer:'
+              'url=$src,'
+              'aspectRatio=$defaultAspectRatio,'
+              'poster=[Image:'
+              'image=CachedNetworkImageProvider("$posterSrc", scale: 1.0),'
+              'semanticLabel=$src'
+              ']]'));
     });
   });
 
