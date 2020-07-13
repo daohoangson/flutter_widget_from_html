@@ -169,17 +169,6 @@ class WidgetFactory {
         style: style,
       );
 
-  Widget buildImg(ImgMetadata img) {
-    final image = buildImageProvider(img.url);
-    if (image == null) {
-      final text = img.alt ?? img.title;
-      if (text == null) return null;
-      return Text(text);
-    }
-
-    return buildImage(image, img);
-  }
-
   Widget buildImage(ImageProvider image, ImgMetadata img) => Image(
         height: img.height,
         loadingBuilder: buildImageLoadingBuilder(img),
