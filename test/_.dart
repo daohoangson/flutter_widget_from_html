@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
@@ -16,6 +17,10 @@ String _explainer(helper.Explainer parent, Widget widget) {
     return '[${widget.rowStart},${widget.columnStart}'
         "${widget.rowSpan != 1 || widget.columnSpan != 1 ? ':${widget.rowSpan}x${widget.columnSpan}' : ''}"
         ':${parent.explain(widget.child)}]';
+  }
+
+  if (widget is SvgPicture) {
+    return '[SvgPicture:pictureProvider=${widget.pictureProvider}]';
   }
 
   if (widget is VideoPlayer) {
