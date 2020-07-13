@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 import 'dart:ui' as ui show ParagraphBuilder;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
@@ -32,7 +33,7 @@ part 'parser/color.dart';
 part 'parser/css.dart';
 part 'parser/length.dart';
 
-final _dataUriRegExp = RegExp(r'^data:image/\w+;base64,');
+final _dataUriRegExp = RegExp(r'^data:image/[^;]+;(base64|utf8),');
 
 /// A factory to build widget for HTML elements.
 class WidgetFactory {
@@ -169,14 +170,17 @@ class WidgetFactory {
         style: style,
       );
 
-  Widget buildImage(ImageProvider image, ImgMetadata img) => Image(
-        height: img.height,
-        loadingBuilder: buildImageLoadingBuilder(img),
-        errorBuilder: buildImageErrorWidgetBuilder(img),
-        image: image,
-        semanticLabel: img.alt ?? img.title,
-        width: img.width,
-      );
+  Widget buildImage(Object provider, ImgMetadata img) =>
+      provider != null && provider is ImageProvider && img != null
+          ? Image(
+              height: img.height,
+              loadingBuilder: buildImageLoadingBuilder(img),
+              errorBuilder: buildImageErrorWidgetBuilder(img),
+              image: provider,
+              semanticLabel: img.alt ?? img.title,
+              width: img.width,
+            )
+          : null;
 
   ImageErrorWidgetBuilder buildImageErrorWidgetBuilder(ImgMetadata img) =>
       (_, error, __) {
@@ -206,7 +210,7 @@ class WidgetFactory {
               )
           : null;
 
-  ImageProvider buildImageProvider(String url) {
+  Object buildImageProvider(String url) {
     if (url?.startsWith('asset:') == true) {
       return buildImageFromAsset(url);
     }
@@ -218,12 +222,17 @@ class WidgetFactory {
     return buildImageFromUrl(url);
   }
 
-  List buildImageBytes(String dataUri) {
+  Uint8List buildImageBytes(String dataUri) {
     final match = _dataUriRegExp.matchAsPrefix(dataUri);
     if (match == null) return null;
 
     final prefix = match[0];
-    final bytes = base64.decode(dataUri.substring(prefix.length));
+    final encoding = match[1];
+    final data = dataUri.substring(prefix.length);
+
+    final bytes = encoding == 'base64'
+        ? base64.decode(data)
+        : encoding == 'utf8' ? Uint8List.fromList(data.codeUnits) : null;
     if (bytes.isEmpty) return null;
 
     return bytes;
@@ -443,6 +452,8 @@ class WidgetFactory {
 
   String constructFullUrl(String url) {
     if (url?.isNotEmpty != true) return null;
+    if (url.startsWith('data:')) return url;
+
     final p = Uri.tryParse(url);
     if (p == null) return null;
     if (p.hasScheme) return p.toString();

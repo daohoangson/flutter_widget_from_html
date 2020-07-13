@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 
@@ -56,6 +58,53 @@ void main() {
               '],'
               'message=Bar'
               ']'));
+    });
+  });
+
+  group('SvgPicture', () {
+    testWidgets('renders asset picture', (WidgetTester tester) async {
+      final assetName = 'test/images/logo.svg';
+      final html = '<img src="asset:$assetName" />';
+      final explained = await helper.explain(tester, html);
+      expect(
+        explained,
+        equals('[SvgPicture:'
+            'pictureProvider=ExactAssetPicture(name: "$assetName", bundle: null, colorFilter: null)'
+            ']'),
+      );
+    });
+
+    group('MemoryPicture', () {
+      final explain = (WidgetTester tester, String html) => helper
+          .explain(tester, html)
+          .then((e) => e.replaceAll(RegExp(r'\(Uint8List#.+\)'), '(bytes)'));
+
+      testWidgets('renders base64', (WidgetTester tester) async {
+        final base64 =
+            base64Encode(utf8.encode('<svg viewBox="0 0 1 1"></svg>'));
+        final html = '<img src="data:image/svg+xml;base64,$base64" />';
+        final e = await explain(tester, html);
+        expect(e, equals('[SvgPicture:pictureProvider=MemoryPicture(bytes)]'));
+      });
+
+      testWidgets('renders utf8', (WidgetTester tester) async {
+        final utf8 = '&lt;svg viewBox=&quot;0 0 1 1&quot;&gt;&lt;/svg&gt;';
+        final html = '<img src="data:image/svg+xml;utf8,$utf8" />';
+        final e = await explain(tester, html);
+        expect(e, equals('[SvgPicture:pictureProvider=MemoryPicture(bytes)]'));
+      });
+    });
+
+    testWidgets('renders network picture', (WidgetTester t) async {
+      final src = 'http://domain.com/image.svg';
+      final h = '<img src="$src" />';
+      final explained = await mockNetworkImagesFor(() => helper.explain(t, h));
+      expect(
+        explained,
+        equals('[SvgPicture:'
+            'pictureProvider=NetworkPicture("$src", headers: null, colorFilter: null)'
+            ']'),
+      );
     });
   });
 }
