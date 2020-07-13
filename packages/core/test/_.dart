@@ -183,6 +183,20 @@ class Explainer {
       '(${e.top.truncate()},${e.right.truncate()},'
       '${e.bottom.truncate()},${e.left.truncate()})';
 
+  String _image(Image image) {
+    final buffer = StringBuffer();
+
+    buffer.write('image=${image.image}');
+
+    if (image.height != null) buffer.write(',height=${image.height}');
+    if (image.semanticLabel != null) {
+      buffer.write(',semanticLabel=${image.semanticLabel}');
+    }
+    if (image.width != null) buffer.write(',width=${image.width}');
+
+    return '[Image:$buffer]';
+  }
+
   String _inlineSpan(InlineSpan inlineSpan, {TextStyle parentStyle}) {
     if (inlineSpan is WidgetSpan) {
       var s = _widget(inlineSpan.child);
@@ -352,12 +366,13 @@ class Explainer {
     if (explained != null) return explained;
 
     if (widget == widget0) return '[widget0]';
-    if (widget is ImageLayout) return '[$widget]';
 
     // ignore: invalid_use_of_protected_member
     if (widget is WidgetPlaceholder) return _widget(widget.build(context));
 
     if (widget is Container) return _container(widget);
+
+    if (widget is Image) return _image(widget);
 
     if (widget is LayoutBuilder) {
       return _widget(widget.builder(
@@ -428,7 +443,11 @@ class Explainer {
                 ? (widget.child != null ? 'child=${_widget(widget.child)}' : '')
                 : widget is SingleChildScrollView
                     ? 'child=${_widget(widget.child)}'
-                    : widget is Table ? '\n${_tableRows(widget)}\n' : '';
+                    : widget is Table
+                        ? '\n${_tableRows(widget)}\n'
+                        : widget is Tooltip
+                            ? 'child=${_widget(widget.child)},message=${widget.message}'
+                            : '';
     return '[$type$attrStr:$text$children]';
   }
 

@@ -160,6 +160,23 @@ enum CssLengthUnit {
 }
 
 @immutable
+class ImgMetadata {
+  final String alt;
+  final double height;
+  final String title;
+  final String url;
+  final double width;
+
+  ImgMetadata({
+    this.alt,
+    this.height,
+    this.title,
+    @required this.url,
+    this.width,
+  });
+}
+
+@immutable
 class TextStyleHtml {
   final TextAlign align;
   final double height;
