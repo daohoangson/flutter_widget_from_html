@@ -4,19 +4,17 @@
 [![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html.svg)](https://pub.dev/packages/flutter_widget_from_html)
 
-A Flutter plugin for building Flutter-widget tree from html.
+A Flutter package for building Flutter widget tree from HTML with support for IFRAME, VIDEO and many other tags.
 
 This package extends the [`flutter_widget_from_html_core`](https://pub.dev/packages/flutter_widget_from_html_core) package with extra functionalities by using external depedencies like `cached_network_image` or `url_launcher`. It should be good enough as a quick starting point but you can always use the `core` directly if you dislike the dependencies.
 
 ## Usage
 
-To use this plugin, add `flutter_widget_from_html` as a [dependency in your pubspec.yaml file](https://flutter.io/using-packages/).
+To use this package, add `flutter_widget_from_html` as a [dependency in your pubspec.yaml file](https://flutter.io/using-packages/).
 
 See the [Example app](https://github.com/daohoangson/flutter_widget_from_html/tree/master/packages/example) for inspiration.
 
 ## Example
-
-Note: `HtmlWidget.config` is optional, see dartdoc for all available configuration keys and their default values.
 
 ```dart
 const kHtml = '''
@@ -52,9 +50,11 @@ class HelloWorldScreen extends StatelessWidget {
         ),
       );
 }
+
+void main() => runApp(MaterialApp(home: HelloWorldScreen()));
 ```
 
-![](packages/example/screenshots/HelloWorldScreen.png?raw=true)
+<img src="packages/example/screenshots/HelloWorldScreen.png?raw=true" width="300" />
 
 ## Features
 
