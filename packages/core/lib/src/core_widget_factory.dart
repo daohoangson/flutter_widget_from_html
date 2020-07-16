@@ -691,7 +691,9 @@ class WidgetFactory {
 
       case 'blockquote':
       case 'figure':
-        meta.styles = [_kCssMargin, '1em 40px'];
+        meta
+          ..isBlockElement = true
+          ..styles = [_kCssMargin, '1em 40px'];
         break;
 
       case 'b':
@@ -726,7 +728,9 @@ class WidgetFactory {
         break;
 
       case 'dd':
-        meta.styles = [_kCssMargin, '0 0 1em 40px'];
+        meta
+          ..isBlockElement = true
+          ..styles = [_kCssMargin, '0 0 1em 40px'];
         break;
       case 'dl':
         meta.isBlockElement = true;
@@ -755,35 +759,41 @@ class WidgetFactory {
         meta
           ..fontSize = '2em'
           ..fontWeight = FontWeight.bold
+          ..isBlockElement = true
           ..styles = [_kCssMargin, '0.67em 0'];
         break;
       case 'h2':
         meta
           ..fontSize = '1.5em'
           ..fontWeight = FontWeight.bold
+          ..isBlockElement = true
           ..styles = [_kCssMargin, '0.83em 0'];
         break;
       case 'h3':
         meta
           ..fontSize = '1.17em'
           ..fontWeight = FontWeight.bold
+          ..isBlockElement = true
           ..styles = [_kCssMargin, '1em 0'];
         break;
       case 'h4':
         meta
           ..fontWeight = FontWeight.bold
+          ..isBlockElement = true
           ..styles = [_kCssMargin, '1.33em 0'];
         break;
       case 'h5':
         meta
           ..fontSize = '0.83em'
           ..fontWeight = FontWeight.bold
+          ..isBlockElement = true
           ..styles = [_kCssMargin, '1.67em 0'];
         break;
       case 'h6':
         meta
           ..fontSize = '0.67em'
           ..fontWeight = FontWeight.bold
+          ..isBlockElement = true
           ..styles = [_kCssMargin, '2.33em 0'];
         break;
 
@@ -820,7 +830,9 @@ class WidgetFactory {
         break;
 
       case 'p':
-        meta.styles = [_kCssMargin, '1em 0'];
+        meta
+          ..isBlockElement = true
+          ..styles = [_kCssMargin, '1em 0'];
         break;
 
       case 'q':

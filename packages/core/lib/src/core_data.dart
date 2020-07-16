@@ -130,18 +130,19 @@ class CssLengthBox {
   final CssLength bottom;
   final CssLength inlineEnd;
   final CssLength inlineStart;
-  final CssLength left;
-  final CssLength right;
+  final CssLength _left;
+  final CssLength _right;
   final CssLength top;
 
   const CssLengthBox({
     this.bottom,
     this.inlineEnd,
     this.inlineStart,
-    this.left,
-    this.right,
+    CssLength left,
+    CssLength right,
     this.top,
-  });
+  })  : _left = left,
+        _right = right;
 
   CssLengthBox copyWith({
     CssLength bottom,
@@ -155,10 +156,22 @@ class CssLengthBox {
         bottom: bottom ?? this.bottom,
         inlineEnd: inlineEnd ?? this.inlineEnd,
         inlineStart: inlineStart ?? this.inlineStart,
-        left: left ?? this.left,
-        right: right ?? this.right,
+        left: left ?? _left,
+        right: right ?? _right,
         top: top ?? this.top,
       );
+
+  bool get hasLeftOrRight =>
+      inlineEnd?.isNotEmpty == true ||
+      inlineStart?.isNotEmpty == true ||
+      _left?.isNotEmpty == true ||
+      _right?.isNotEmpty == true;
+
+  CssLength left(TextDirection dir) =>
+      _left ?? (dir == TextDirection.ltr ? inlineStart : inlineEnd);
+
+  CssLength right(TextDirection dir) =>
+      _right ?? (dir == TextDirection.ltr ? inlineEnd : inlineStart);
 }
 
 enum CssLengthUnit {

@@ -8,19 +8,11 @@ Iterable<Widget> _marginHorizontalBuilder(
   _MarginHorizontalInput input,
 ) {
   final direction = Directionality.of(context);
-  final marginLeft = input.marginLeft ??
-      (direction == TextDirection.ltr
-          ? input.marginInlineStart
-          : input.marginInlineEnd);
-  final marginRight = input.marginRight ??
-      (direction == TextDirection.ltr
-          ? input.marginInlineEnd
-          : input.marginInlineStart);
-
+  final margin = input.margin;
   final tsb = input.meta.tsb;
   final padding = EdgeInsets.only(
-    left: marginLeft?.getValue(context, tsb) ?? 0.0,
-    right: marginRight?.getValue(context, tsb) ?? 0.0,
+    left: margin.left(direction)?.getValue(context, tsb) ?? 0.0,
+    right: margin.right(direction)?.getValue(context, tsb) ?? 0.0,
   );
 
   return children.map((child) {
@@ -45,10 +37,7 @@ class _MarginHorizontal extends Padding {
 }
 
 class _MarginHorizontalInput {
-  CssLength marginInlineEnd;
-  CssLength marginInlineStart;
-  CssLength marginLeft;
-  CssLength marginRight;
+  CssLengthBox margin;
   NodeMetadata meta;
   WidgetFactory wf;
 }
@@ -103,16 +92,26 @@ class _StyleMargin {
   _StyleMargin(this.wf);
 
   BuildOp get buildOp => BuildOp(
+        isBlockElement: false,
+        onPieces: (meta, pieces) {
+          if (meta.isBlockElement) return pieces;
+          final margin = wf.parseCssMargin(meta);
+          if (margin?.hasLeftOrRight != true) return pieces;
+
+          return _wrapTextBits(
+            pieces,
+            appendBuilder: (parent) =>
+                TextWidget(parent, _paddingInlineAfter(parent.tsb, margin)),
+            prependBuilder: (parent) =>
+                TextWidget(parent, _paddingInlineBefore(parent.tsb, margin)),
+          );
+        },
         onWidgets: (meta, widgets) {
           if (widgets?.isNotEmpty != true) return null;
           final m = wf.parseCssMargin(meta);
           if (m == null) return null;
 
           final t = m.top?.isNotEmpty == true;
-          final lr = m.inlineEnd?.isNotEmpty == true ||
-              m.left?.isNotEmpty == true ||
-              m.right?.isNotEmpty == true ||
-              m.inlineStart?.isNotEmpty == true;
           final b = m.bottom?.isNotEmpty == true;
           final ws = List<Widget>((t ? 1 : 0) + widgets.length + (b ? 1 : 0));
           final tsb = meta.tsb;
@@ -120,13 +119,10 @@ class _StyleMargin {
           var i = 0;
           if (t) ws[i++] = _MarginVerticalPlaceholder(tsb, m.top);
 
-          if (lr) {
+          if (m.hasLeftOrRight) {
             for (final widget in widgets) {
               final input = _MarginHorizontalInput()
-                ..marginInlineEnd = m.inlineEnd
-                ..marginInlineStart = m.inlineStart
-                ..marginLeft = m.left
-                ..marginRight = m.right
+                ..margin = m
                 ..meta = meta
                 ..wf = wf;
 
