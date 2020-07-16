@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import '_.dart';
+import '_.dart' as helper;
 
 void main() {
-  final explain = explainMargin;
+  final explain = helper.explainMargin;
 
   testWidgets('renders text without margin', (WidgetTester tester) async {
     final html = '<div>Foo</div>';
@@ -235,6 +235,108 @@ void main() {
           explained,
           equals('[SizedBox:0.0x3.0],'
               '[Padding:(0,3,0,3),child=[RichText:(:Foo)]]'));
+    });
+  });
+
+  group('inline', () {
+    final explain = helper.explain;
+
+    testWidgets('renders left & right', (WidgetTester tester) async {
+      final html = 'a<span style="margin: 5px">b</span>c';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[RichText:(:'
+              'a'
+              '[SizedBox:5.0x0.0]'
+              '(:b)'
+              '[SizedBox:5.0x0.0]'
+              '(:c)'
+              ')]'));
+    });
+
+    testWidgets('renders left', (WidgetTester tester) async {
+      final html = 'a<span style="margin-left: 5px">b</span>c';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[RichText:(:'
+              'a'
+              '[SizedBox:5.0x0.0]'
+              '(:b)'
+              '[widget0]'
+              '(:c)'
+              ')]'));
+    });
+
+    testWidgets('renders right', (WidgetTester tester) async {
+      final html = 'a<span style="margin-right: 5px">b</span>c';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[RichText:(:'
+              'a'
+              '[widget0]'
+              '(:b)'
+              '[SizedBox:5.0x0.0]'
+              '(:c)'
+              ')]'));
+    });
+
+    testWidgets('renders inline-start (ltr)', (WidgetTester tester) async {
+      final html = 'a<span style="margin-inline-start: 5px">b</span>c';
+      final explained = await explain(tester, html, rtl: false);
+      expect(
+          explained,
+          equals('[RichText:(:'
+              'a'
+              '[SizedBox:5.0x0.0]'
+              '(:b)'
+              '[widget0]'
+              '(:c)'
+              ')]'));
+    });
+
+    testWidgets('renders inline-end (ltr)', (WidgetTester tester) async {
+      final html = 'a<span style="margin-inline-end: 5px">b</span>c';
+      final explained = await explain(tester, html, rtl: false);
+      expect(
+          explained,
+          equals('[RichText:(:'
+              'a'
+              '[widget0]'
+              '(:b)'
+              '[SizedBox:5.0x0.0]'
+              '(:c)'
+              ')]'));
+    });
+
+    testWidgets('renders inline-start (rtl)', (WidgetTester tester) async {
+      final html = 'a<span style="margin-inline-start: 5px">b</span>c';
+      final explained = await explain(tester, html, rtl: true);
+      expect(
+          explained,
+          equals('[RichText:(:'
+              'a'
+              '[widget0]'
+              '(:b)'
+              '[SizedBox:5.0x0.0]'
+              '(:c)'
+              ')]'));
+    });
+
+    testWidgets('renders inline-end (rtl)', (WidgetTester tester) async {
+      final html = 'a<span style="margin-inline-end: 5px">b</span>c';
+      final explained = await explain(tester, html, rtl: true);
+      expect(
+          explained,
+          equals('[RichText:(:'
+              'a'
+              '[SizedBox:5.0x0.0]'
+              '(:b)'
+              '[widget0]'
+              '(:c)'
+              ')]'));
     });
   });
 
