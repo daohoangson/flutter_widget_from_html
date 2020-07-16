@@ -85,14 +85,12 @@ class _TagLi {
     final markerText = wf.getListStyleMarker(listStyleType, markerIndex);
 
     return [
-      LayoutBuilder(
-        builder: (_, bc) => Stack(
-          children: <Widget>[
-            wf.buildColumn(ws) ?? widget0,
-            _buildMarker(c, tsh.style, markerText, bc.biggest.width),
-          ],
-          overflow: Overflow.visible,
-        ),
+      Stack(
+        children: <Widget>[
+          wf.buildColumn(ws) ?? widget0,
+          _buildMarker(c, tsh.style, markerText),
+        ],
+        overflow: Overflow.visible,
       ),
     ];
   }
@@ -126,19 +124,24 @@ class _TagLi {
     return children;
   }
 
-  Widget _buildMarker(BuildContext c, TextStyle s, String t, double w) {
-    final isLtr = Directionality.of(c) == TextDirection.ltr;
+  Widget _buildMarker(BuildContext context, TextStyle style, String text) {
+    final isLtr = Directionality.of(context) == TextDirection.ltr;
     final isRtl = !isLtr;
+    final width = style.fontSize * 4;
+    final margin = width + 5;
     return Positioned(
-      left: isRtl ? w + 10 : null,
-      right: isLtr ? w + 10 : null,
+      left: isLtr ? -margin : null,
+      right: isRtl ? -margin : null,
       top: 0.0,
-      child: RichText(
-        maxLines: 1,
-        overflow: TextOverflow.clip,
-        text: TextSpan(style: s, text: t),
-        textAlign: isLtr ? TextAlign.right : TextAlign.left,
-        textScaleFactor: MediaQuery.of(c).textScaleFactor,
+      child: SizedBox(
+        child: RichText(
+          overflow: TextOverflow.clip,
+          softWrap: false,
+          text: TextSpan(style: style, text: text),
+          textAlign: isLtr ? TextAlign.right : TextAlign.left,
+          textScaleFactor: MediaQuery.of(context).textScaleFactor,
+        ),
+        width: width,
       ),
     );
   }

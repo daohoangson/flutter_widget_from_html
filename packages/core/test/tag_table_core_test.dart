@@ -387,4 +387,15 @@ void main() {
               ']]'));
     });
   });
+
+  testWidgets('renders UL inside', (WidgetTester tester) async {
+    final html = '<table><tr><td><ul><li>Foo</li></ul></td></tr></table>';
+    final explained = await explain(tester, html);
+    final expectedList = '[Padding:(0,0,0,25),child='
+        '[Stack:children='
+        '[RichText:(:Foo)],'
+        '[Positioned:(0.0,null,null,-45.0),child=[SizedBox:40.0x0.0,child=[RichText,align=right:(:•)]]]'
+        ']]';
+    expect(explained, equals('[Table:\n${_padding(expectedList)}\n]'));
+  });
 }
