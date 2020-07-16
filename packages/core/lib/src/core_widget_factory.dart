@@ -56,17 +56,6 @@ class WidgetFactory {
 
   HtmlWidget get widget => _widget;
 
-  Iterable<Widget> buildAligns(
-    BuildContext _,
-    Iterable<Widget> widgets,
-    Alignment alignment,
-  ) =>
-      widgets.map((widget) {
-        final x = _childOf(widget);
-        if (x is RichText || x is WidgetPlaceholder<TextBits>) return widget;
-        return Align(alignment: alignment, child: widget);
-      });
-
   Widget buildBody(Iterable<Widget> children) => buildColumn(children);
 
   Widget buildColumn(Iterable<Widget> children) => children?.isNotEmpty == true
