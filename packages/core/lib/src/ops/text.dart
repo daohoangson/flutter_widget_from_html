@@ -156,8 +156,8 @@ Iterable<BuiltPiece> _wrapTextBits(
   final lastText = pieces.last?.text;
   if (firstText == lastText && firstText.isEmpty) {
     final text = firstText;
-    if (appendBuilder != null) text.add(appendBuilder(text));
     if (prependBuilder != null) text.add(prependBuilder(text));
+    if (appendBuilder != null) text.add(appendBuilder(text));
     return pieces;
   }
 
@@ -166,8 +166,8 @@ Iterable<BuiltPiece> _wrapTextBits(
   final lastBit = lastText?.last;
   final lastBp = lastBit?.parent;
   if (firstBp != null && lastBp != null) {
-    if (appendBuilder != null) prependBuilder(firstBp).insertBefore(firstBit);
-    if (prependBuilder != null) prependBuilder(lastBp).insertAfter(lastBit);
+    if (prependBuilder != null) prependBuilder(firstBp).insertBefore(firstBit);
+    if (appendBuilder != null) appendBuilder(lastBp).insertAfter(lastBit);
   }
 
   return pieces;
