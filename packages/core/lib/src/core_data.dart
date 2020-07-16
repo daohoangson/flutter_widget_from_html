@@ -91,7 +91,7 @@ class CssLength {
   })  : assert(!number.isNegative),
         assert(unit != null);
 
-  bool get isNotEmpty => number != 0;
+  bool get isNotEmpty => number > 0;
 
   double getValue(BuildContext context, TextStyleBuilders tsb) =>
       getValueFromStyle(context, tsb.build(context).style);
