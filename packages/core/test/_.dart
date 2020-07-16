@@ -38,6 +38,7 @@ Future<String> explain(
   String Function(Explainer, Widget) explainer,
   Widget hw,
   void Function(BuildContext) preTest,
+  bool rtl = false,
   TextStyle textStyle,
 }) async {
   assert((html == null) != (hw == null));
@@ -67,7 +68,13 @@ Future<String> explain(
               // exclude semantics for faster run but mostly because of this bug
               // https://github.com/flutter/flutter/issues/51936
               // which is failing some of our tests
-              child: DefaultTextStyle(style: style, child: hw),
+              child: DefaultTextStyle(
+                style: style,
+                child: Directionality(
+                  textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
+                  child: hw,
+                ),
+              ),
             ),
           ),
         );
@@ -105,13 +112,8 @@ Future<String> explainMargin(
   final explained = await explain(
     tester,
     null,
-    hw: Directionality(
-      textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
-      child: HtmlWidget(
-        'x${html}x',
-        key: hwKey,
-      ),
-    ),
+    hw: HtmlWidget('x${html}x', key: hwKey),
+    rtl: rtl,
   );
   final match = _explainMarginRegExp.firstMatch(explained);
   return match == null ? explained : match[1];

@@ -146,3 +146,29 @@ class _TextCompiler {
     return bit.parent.tsb;
   }
 }
+
+Iterable<BuiltPiece> _wrapTextBits(
+  Iterable<BuiltPiece> pieces, {
+  TextBit Function(TextBits) appendBuilder,
+  TextBit Function(TextBits) prependBuilder,
+}) {
+  final firstText = pieces.first?.text;
+  final lastText = pieces.last?.text;
+  if (firstText == lastText && firstText.isEmpty) {
+    final text = firstText;
+    if (prependBuilder != null) text.add(prependBuilder(text));
+    if (appendBuilder != null) text.add(appendBuilder(text));
+    return pieces;
+  }
+
+  final firstBit = firstText?.first;
+  final firstBp = firstBit?.parent;
+  final lastBit = lastText?.last;
+  final lastBp = lastBit?.parent;
+  if (firstBp != null && lastBp != null) {
+    if (prependBuilder != null) prependBuilder(firstBp).insertBefore(firstBit);
+    if (appendBuilder != null) appendBuilder(lastBp).insertAfter(lastBit);
+  }
+
+  return pieces;
+}
