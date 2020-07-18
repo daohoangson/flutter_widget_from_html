@@ -6,14 +6,11 @@ env:
 analyze_task:
   container:
     image: cirrusci/flutter:stable
-  pub_get_script:
-    - ( cd packages/core && flutter pub get )
-    - ( cd packages/enhanced && flutter pub get )
-    - ( cd packages/example && flutter pub get )
   format_script:
     - flutter format --dry-run --set-exit-if-changed .
-  analyze_script:
-    - flutter analyze --no-pub
+  analyze_core_script: ( cd packages/core && flutter analyze )
+  analyze_enhanced_script: ( cd packages/enhanced && flutter analyze )
+  analyze_example_script: ( cd packages/example && flutter analyze )
 
 pipe:
   name: dartdoc
