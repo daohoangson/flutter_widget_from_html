@@ -10,7 +10,7 @@ set -e
 
 ( \
   cd ./packages/enhanced \
-  flutter test "$@" \
+  && flutter test "$@" \
   && echo 'packages/enhanced OK' \
 )
 
