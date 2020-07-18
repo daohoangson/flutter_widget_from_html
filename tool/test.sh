@@ -2,28 +2,19 @@
 
 set -e
 
-cd "$( dirname $( dirname ${BASH_SOURCE[0]}))"
-_pwd=$( pwd )
+( \
+  cd ./packages/core \
+  && flutter test "$@" \
+  && echo 'flutter_widget_from_html_core OK' \
+)
 
-if [ -z "$CIRRUS_CI" ]; then
-  echo "CIRRUS_CI env var is missing!" >&2
-  echo "Jump into a Cirrus shell by executing ./tool/cirrus.sh for development." >&2
-  exit 1
-fi
+( \
+  flutter test "$@" \
+  && echo 'flutter_widget_from_html OK' \
+)
 
-_testArgs=''
-if [ ! -z "$COVERAGE" ]; then
-  _testArgs="${_testArgs} --coverage"
-fi
-
-cd "$_pwd/packages/core"
-flutter test $( echo $_testArgs )
-echo 'flutter_widget_from_html_core OK'
-
-cd "$_pwd/packages/example"
-flutter test $( echo $_testArgs )
-echo 'example OK'
-
-cd "$_pwd"
-flutter test $( echo $_testArgs )
-echo 'flutter_widget_from_html OK'
+( \
+  cd ./packages/example \
+  && flutter test "$@" \
+  && echo 'example OK' \
+)
