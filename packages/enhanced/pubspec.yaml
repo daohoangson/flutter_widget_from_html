@@ -23,7 +23,7 @@ dependencies:
 
 dependency_overrides:
   flutter_widget_from_html_core:
-    path: packages/core
+    path: ../core
 
 dev_dependencies:
   flutter_test:

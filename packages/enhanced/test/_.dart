@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
-import '../packages/core/test/_.dart' as helper;
+import '../../core/test/_.dart' as helper;
 
 const kDataUri = helper.kDataUri;
 
