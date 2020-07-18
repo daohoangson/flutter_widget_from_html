@@ -11,10 +11,10 @@ _stableArchive=$( cat /tmp/releases.json | jq -r ".releases[] | select(.hash == 
 curl $_baseUrl/$_stableArchive -vo /tmp/flutter.tar.xz
 tar -xf /tmp/flutter.tar.xz
 mv ./flutter $HOME/flutter
-echo 'PATH=$PATH:$HOME/flutter/bin' >> $HOME/.profile
+echo 'PATH=$PATH:$HOME/flutter/bin' >> $HOME/.profile && source $HOME/.profile
 
 # pub get
-source .
+
 flutter pub get
 ( cd ./packages/core && flutter pub get )
 ( cd ./packages/example && flutter pub get )
