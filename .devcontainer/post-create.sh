@@ -14,6 +14,7 @@ mv ./flutter $HOME/flutter
 echo 'PATH=$PATH:$HOME/flutter/bin' >> $HOME/.profile
 
 # pub get
+source .
 flutter pub get
 ( cd ./packages/core && flutter pub get )
 ( cd ./packages/example && flutter pub get )
