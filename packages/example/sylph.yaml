@@ -11,9 +11,13 @@ device_pools:
   - pool_name: android pool
     pool_type: android
     devices:
-      - name: Samsung Galaxy Note 10
-        model: SM-N970U1
-        os: 9
+      # aws devicefarm list-devices \
+      #   --filters '[{"attribute":"AVAILABILITY","operator":"EQUALS","values":["HIGHLY_AVAILABLE"]},{"attribute":"OS_VERSION","operator":"GREATER_THAN_OR_EQUALS","values":["9"]},{"attribute":"PLATFORM","operator":"EQUALS","values":["ANDROID"]}]' \
+      # | jq -r '.devices[] | "Android " + .os + ": " + .name +  " / " + .modelId' \
+      # | sort
+      - name: Google Pixel 3
+        model: Pixel 3
+        os: 10
 
 test_suites:
 
