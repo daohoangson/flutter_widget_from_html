@@ -47,7 +47,7 @@ unit_test_task:
     set -e
     
     if [ "$FLUTTER_VERSION" == "stable" ]; then
-      COVERAGE=1 ./tool/test.sh
+      ./tool/test.sh --coverage
       bash <(curl -s https://codecov.io/bash)
     else
       ./tool/test.sh

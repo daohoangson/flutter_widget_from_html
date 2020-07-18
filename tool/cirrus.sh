@@ -18,6 +18,9 @@ touch .cirrus/packages/core/example/.packages
 mkdir -p .cirrus/packages/example
 touch .cirrus/packages/example/.packages
 
+_dockerImage=cirrusci/flutter
+docker pull "$_dockerImage"
+
 exec docker run --rm -it \
   -e CIRRUS_CI=true \
   -v "$_pwd:/project" -w /project \
@@ -37,4 +40,4 @@ exec docker run --rm -it \
   -v "$_pwd/.cirrus/packages/example/build:/project/packages/example/build" \
   -v "$_pwd/.cirrus/packages/example/.packages:/project/packages/example/.packages" \
   -v "$_pwd/.cirrus/pub-cache:/home/cirrus/.pub-cache" \
-  cirrusci/flutter:1.17.3 /bin/bash
+  "$_dockerImage" /bin/bash
