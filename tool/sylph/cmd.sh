@@ -37,6 +37,7 @@ _ref=$( git log -n 1 --pretty=format:%H )
   echo '    git:'; \
   echo '      url: git://github.com/daohoangson/flutter_widget_from_html.git'; \
   echo "      ref: $_ref"; \
+  echo '      path: packages/enhanced'; \
   echo '  flutter_widget_from_html_core:'; \
   echo '    git:'; \
   echo '      url: git://github.com/daohoangson/flutter_widget_from_html.git'; \

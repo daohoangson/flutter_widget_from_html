@@ -7,8 +7,8 @@ analyze_task:
   container:
     image: cirrusci/flutter:stable
   pub_get_script:
-    - flutter pub get
     - ( cd packages/core && flutter pub get )
+    - ( cd packages/enhanced && flutter pub get )
     - ( cd packages/example && flutter pub get )
   format_script:
     - flutter format --dry-run --set-exit-if-changed .
@@ -25,8 +25,7 @@ pipe:
     - image: cirrusci/flutter:stable
       generate_document_script:
         - ( cd packages/core && ../../tool/dartdoc.sh )
-        - ( cd packages/example && flutter pub get )
-        - ./tool/dartdoc.sh
+        - ( cd packages/enhanced && ../../tool/dartdoc.sh )
     - image: node:lts
       install_now_cli_script: npm install -g now
       deploy_to_now_script:
@@ -58,7 +57,7 @@ unit_test_task:
   allow_failures: $FLUTTER_VERSION != 'stable'
 
 ios_test_task:
-  skip: "!changesInclude('lib/src/widget/web_view.dart')"
+  skip: "!changesInclude('packages/enhanced/lib/src/widget/web_view.dart')"
   depends_on:
     - analyze
     - unit_test@stable
@@ -84,7 +83,7 @@ ios_test_task:
     - ./tool/integration.sh
 
 android_test_task:
-  skip: "!changesInclude('lib/src/widget/video_player.dart', 'lib/src/widget/web_view.dart')"
+  skip: "!changesInclude('packages/enhanced/lib/src/widget/video_player.dart', 'packages/enhanced/lib/src/widget/web_view.dart')"
   trigger_type: manual
   container:
     image: cirrusci/flutter:stable

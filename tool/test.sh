@@ -5,16 +5,17 @@ set -e
 ( \
   cd ./packages/core \
   && flutter test "$@" \
-  && echo 'flutter_widget_from_html_core OK' \
+  && echo 'packages/core OK' \
 )
 
 ( \
+  cd ./packages/enhanced \
   flutter test "$@" \
-  && echo 'flutter_widget_from_html OK' \
+  && echo 'packages/enhanced OK' \
 )
 
 ( \
   cd ./packages/example \
   && flutter test "$@" \
-  && echo 'example OK' \
+  && echo 'packages/example OK' \
 )
