@@ -48,7 +48,7 @@ class _State extends State<IframeTwitterScreen> {
                   final body = html +
                       '<script async src="https://platform.twitter.com/widgets.js"></script>';
                   final apiUrl =
-                      'https://document.flutter-widget-from-html.now.sh/api/iframe.ts?body=${Uri.encodeComponent(body)}';
+                      'https://api.flutter-widget-from-html.vercel.app/iframe.ts?body=${Uri.encodeComponent(body)}';
 
                   final dataUrl = Uri.dataFromString(
                     '''<!doctype html>
