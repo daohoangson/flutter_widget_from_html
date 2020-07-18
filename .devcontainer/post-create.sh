@@ -8,7 +8,12 @@ curl https://storage.googleapis.com/flutter_infra/releases/releases_linux.json -
 _baseUrl=$( cat /tmp/releases.json | jq -r .base_url )
 _stableHash=$( cat /tmp/releases.json | jq -r .current_release.stable )
 _stableArchive=$( cat /tmp/releases.json | jq -r ".releases[] | select(.hash == \"$_stableHash\") | .archive" )
-curl $_baseUrl/$_stableArchive -vo flutter.tar.xz
-tar xf flutter.tar.xz
-mv flutter $HOME/flutter
+curl $_baseUrl/$_stableArchive -vo /tmp/flutter.tar.xz
+tar xf /tmp/flutter.tar.xz
+mv /tmp/flutter $HOME/flutter
 echo 'PATH=$PATH:$HOME/flutter/bin' >> $HOME/.profile
+
+# pub get
+flutter pub get
+( cd ./packages/core && flutter pub get )
+( cd ./packages/example && flutter pub get )
