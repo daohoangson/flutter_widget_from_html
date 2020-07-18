@@ -2,9 +2,7 @@
 
 set -e
 
-echo HOME=$HOME
-echo PATH=$PATH
-cat $HOME/.profile
+source $HOME/.profile
 
 flutter pub get
 ( cd ./packages/core && flutter pub get )
