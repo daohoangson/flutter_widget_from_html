@@ -54,7 +54,7 @@ class HelloWorldScreen extends StatelessWidget {
 void main() => runApp(MaterialApp(home: HelloWorldScreen()));
 ```
 
-<img src="packages/example/screenshots/HelloWorldScreen.png?raw=true" width="300" />
+<img src="../example/screenshots/HelloWorldScreen.png?raw=true" width="300" />
 
 ## Features
 
