@@ -2,6 +2,7 @@ name: Flutter
 on:
   push:
     paths: 
+      - .github/workflows/flutter.yml
       - 'demo_app/**'
       - 'packages/**'
 
