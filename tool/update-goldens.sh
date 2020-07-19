@@ -12,6 +12,6 @@ if [ -z "$CIRRUS_CI" ]; then
   fi
 fi
  
-cd "$( dirname $( dirname ${BASH_SOURCE[0]}))"/packages/example
+cd "$( dirname $( dirname ${BASH_SOURCE[0]}))"/demo_app
 flutter pub get
 exec flutter test --update-goldens "$@"

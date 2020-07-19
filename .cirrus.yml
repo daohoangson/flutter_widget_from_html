@@ -4,36 +4,37 @@ env:
   ZEIT_TOKEN: ENCRYPTED[4aaf3c4bb0aedad605db9ac986f9a54a7843cede69c435a94dbacdddc9551616263fc70180e01d3b73ef5c3d72c8d2e0]
 
 analyze_task:
+  skip: "!changesInclude('demo_app/**', 'packages/**')"
   container:
     image: cirrusci/flutter:stable
-  pub_get_script:
-    - flutter pub get
-    - ( cd packages/core && flutter pub get )
-    - ( cd packages/example && flutter pub get )
   format_script:
     - flutter format --dry-run --set-exit-if-changed .
-  analyze_script:
-    - flutter analyze --no-pub
+  analyze_core_script: ( cd packages/core && flutter analyze )
+  analyze_enhanced_script: ( cd packages/enhanced && flutter analyze )
+  analyze_demo_app_script: ( cd demo_app && flutter analyze )
 
 pipe:
   name: dartdoc
-  only_if: $CIRRUS_BRANCH =~ 'document/.*'
+  depends_on:
+    - analyze
+    - unit_test@stable
   env:
     FLUTTER_ROOT: /home/cirrus/sdks/flutter
     NOW_PROJECT_JSON: ENCRYPTED[e39b933950795b26ccc4f51665601710bdd72da2dd6066d23fd4392e7d9e303153a230c90335ed49743c79f58aedbcbb]
   steps:
     - image: cirrusci/flutter:stable
       generate_document_script:
-        - ( cd packages/core && ../../tool/dartdoc.sh )
-        - ( cd packages/example && flutter pub get )
-        - ./tool/dartdoc.sh
+        - ( cd packages/core && ../../tool/dartdoc/dartdoc.sh )
+        - ( cd packages/enhanced && ../../tool/dartdoc/dartdoc.sh )
     - image: node:lts
       install_now_cli_script: npm install -g now
       deploy_to_now_script:
-        - echo $NOW_PROJECT_JSON > .now/project.json
+        - mkdir -p .now && echo $NOW_PROJECT_JSON > .now/project.json
+        - cp ./tool/dartdoc/now.json ./now.json
         - now --token $ZEIT_TOKEN
 
 unit_test_task:
+  skip: "!changesInclude('demo_app/**', 'packages/**')"
   env:
     matrix:
       - FLUTTER_VERSION: dev
@@ -54,11 +55,11 @@ unit_test_task:
     fi
   always:
     golden_failures_artifacts:
-      path: packages/example/test/golden/failures/*
+      path: demo_app/test/golden/failures/*
   allow_failures: $FLUTTER_VERSION != 'stable'
 
 ios_test_task:
-  skip: "!changesInclude('lib/src/widget/web_view.dart')"
+  skip: "!changesInclude('packages/enhanced/lib/src/widget/web_view.dart')"
   depends_on:
     - analyze
     - unit_test@stable
@@ -84,7 +85,7 @@ ios_test_task:
     - ./tool/integration.sh
 
 android_test_task:
-  skip: "!changesInclude('lib/src/widget/video_player.dart', 'lib/src/widget/web_view.dart')"
+  skip: "!changesInclude('packages/enhanced/lib/src/widget/video_player.dart', 'packages/enhanced/lib/src/widget/web_view.dart')"
   trigger_type: manual
   container:
     image: cirrusci/flutter:stable
@@ -98,21 +99,26 @@ android_test_task:
   test_script: ./tool/sylph/cmd.sh
 
 api_task:
-  only_if: $CIRRUS_BRANCH =~ 'api/.*'
+  skip: "!changesInclude('api/**')"
   container:
     image: node:lts
   env:
     NOW_PROJECT_JSON: ENCRYPTED[afd6026f9d92bab5e6e3fefd1aaf7e0150d9accfc89cd3c452562a8962c802a2b9b0596a3ad550e1e59d6dbeadb0d78d]
   node_modules_cache:
-    folder: packages/api/node_modules
+    folder: api/node_modules
     reupload_on_changes: false
     fingerprint_script:
       - echo $CIRRUS_OS
       - node --version
-      - cat packages/api/package-lock.json
+      - cat api/package-lock.json
     populate_script:
-      - cd packages/api && npm ci
+      - cd api && npm ci
   deploy_script:
-    - cd packages/api
-    - echo $NOW_PROJECT_JSON > .now/project.json
-    - npm run deploy
+    - cd api
+    - mkdir -p .now && echo $NOW_PROJECT_JSON > .now/project.json
+    - |
+      if [ $CIRRUS_BRANCH == 'master' ]; then
+        npm run deploy --prod
+      else
+        npm run deploy
+      fi

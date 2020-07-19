@@ -26,7 +26,7 @@ git checkout FETCH_HEAD
 export "PATH=$PATH:$HOME/.pub-cache/bin"
 pub global activate --source path $_sylphPath
 
-cd "$_pwd/packages/example"
+cd "$_pwd/demo_app"
 
 _ref=$( git log -n 1 --pretty=format:%H )
 { \
@@ -37,6 +37,7 @@ _ref=$( git log -n 1 --pretty=format:%H )
   echo '    git:'; \
   echo '      url: git://github.com/daohoangson/flutter_widget_from_html.git'; \
   echo "      ref: $_ref"; \
+  echo '      path: packages/enhanced'; \
   echo '  flutter_widget_from_html_core:'; \
   echo '    git:'; \
   echo '      url: git://github.com/daohoangson/flutter_widget_from_html.git'; \

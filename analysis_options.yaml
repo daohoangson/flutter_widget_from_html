@@ -1,9 +1,0 @@
-include: package:pedantic/analysis_options.yaml
-
-analyzer:
-  exclude:
-    # exclude these directories to avoid `include_file_not_found` warning
-    # probably an Analysis Server bug?
-    # TODO: troubleshoot further and file a Flutter bug if applicable
-    - example
-    - packages/core/example
