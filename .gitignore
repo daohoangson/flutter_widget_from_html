@@ -1,3 +1,6 @@
 /.cirrus
 /.node
 project.json
+
+/packages/core/pubspec.lock
+/packages/enhanced/pubspec.lock
