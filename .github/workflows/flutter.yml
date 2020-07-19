@@ -1,0 +1,21 @@
+on: push
+name: Flutter
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          flutter-version: stable
+      - name: Run flutter format
+        run: flutter format --dry-run --set-exit-if-changed .
+      - name: Analyze core
+        run: cd packages/core && flutter analyze
+      - name: Analyze enhanced
+        run: cd packages/enhanced && flutter analyze
+      - name: Analyze demo_app
+        run: cd demo_app && flutter analyze
