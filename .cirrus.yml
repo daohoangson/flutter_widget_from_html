@@ -100,15 +100,15 @@ api_task:
   env:
     NOW_PROJECT_JSON: ENCRYPTED[afd6026f9d92bab5e6e3fefd1aaf7e0150d9accfc89cd3c452562a8962c802a2b9b0596a3ad550e1e59d6dbeadb0d78d]
   node_modules_cache:
-    folder: packages/api/node_modules
+    folder: api/node_modules
     reupload_on_changes: false
     fingerprint_script:
       - echo $CIRRUS_OS
       - node --version
-      - cat packages/api/package-lock.json
+      - cat api/package-lock.json
     populate_script:
-      - cd packages/api && npm ci
+      - cd api && npm ci
   deploy_script:
-    - cd packages/api
+    - cd api
     - echo $NOW_PROJECT_JSON > .now/project.json
     - npm run deploy

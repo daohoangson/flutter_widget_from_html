@@ -47,7 +47,7 @@ Output
 
 ## Development
 
-Use `./tool/node.sh` to setup a `Node.js` container for development, don't forget to change the working directory into `./packages/api`.
+Use `./tool/node.sh` to setup a `Node.js` container for development, don't forget to change the working directory into `./api`.
 
 Execute `npm install` to install the dependencies then `npm run dev`.
 
