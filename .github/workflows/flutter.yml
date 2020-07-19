@@ -45,9 +45,4 @@ jobs:
           else
             ./tool/test.sh
           fi
-      - uses: actions/upload-artifact@v1
-        if: always()
-        with:
-          name: golden-failures
-          path: demo_app/test/golden/failures/*
           
