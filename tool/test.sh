@@ -15,7 +15,7 @@ set -e
 )
 
 ( \
-  cd ./packages/example \
+  cd ./demo_app \
   && flutter test "$@" \
-  && echo 'packages/example OK' \
+  && echo 'demo_app OK' \
 )

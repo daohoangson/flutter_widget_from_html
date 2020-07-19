@@ -10,7 +10,7 @@ analyze_task:
     - flutter format --dry-run --set-exit-if-changed .
   analyze_core_script: ( cd packages/core && flutter analyze )
   analyze_enhanced_script: ( cd packages/enhanced && flutter analyze )
-  analyze_example_script: ( cd packages/example && flutter analyze )
+  analyze_demo_app_script: ( cd demo_app && flutter analyze )
 
 pipe:
   name: dartdoc
@@ -50,7 +50,7 @@ unit_test_task:
     fi
   always:
     golden_failures_artifacts:
-      path: packages/example/test/golden/failures/*
+      path: demo_app/test/golden/failures/*
   allow_failures: $FLUTTER_VERSION != 'stable'
 
 ios_test_task:

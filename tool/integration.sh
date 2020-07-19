@@ -2,7 +2,7 @@
 
 set -e
 
-cd "$( dirname $( dirname ${BASH_SOURCE[0]}))"/packages/example
+cd "$( dirname $( dirname ${BASH_SOURCE[0]}))"/demo_app
 
 if flutter devices | grep ios; then
   echo 'test_driver/video_player.dart SKIPPED (ios device)'

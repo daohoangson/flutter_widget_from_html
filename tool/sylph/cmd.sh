@@ -26,7 +26,7 @@ git checkout FETCH_HEAD
 export "PATH=$PATH:$HOME/.pub-cache/bin"
 pub global activate --source path $_sylphPath
 
-cd "$_pwd/packages/example"
+cd "$_pwd/demo_app"
 
 _ref=$( git log -n 1 --pretty=format:%H )
 { \

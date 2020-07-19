@@ -12,7 +12,7 @@ This package extends the [`flutter_widget_from_html_core`](https://pub.dev/packa
 
 To use this package, add `flutter_widget_from_html` as a [dependency in your pubspec.yaml file](https://flutter.io/using-packages/).
 
-See the [Example app](https://github.com/daohoangson/flutter_widget_from_html/tree/master/packages/example) for inspiration.
+See the [Demo app](https://github.com/daohoangson/flutter_widget_from_html/tree/master/demo_app) for inspiration.
 
 ## Example
 
@@ -54,7 +54,7 @@ class HelloWorldScreen extends StatelessWidget {
 void main() => runApp(MaterialApp(home: HelloWorldScreen()));
 ```
 
-<img src="../example/screenshots/HelloWorldScreen.png?raw=true" width="300" />
+<img src="../../demo_app/screenshots/HelloWorldScreen.png?raw=true" width="300" />
 
 ## Features
 

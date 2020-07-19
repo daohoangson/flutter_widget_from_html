@@ -14,7 +14,7 @@ If this is your first time here, consider using the [`flutter_widget_from_html`]
 
 To use this package, add `flutter_widget_from_html_core` as a [dependency in your pubspec.yaml file](https://flutter.io/using-packages/).
 
-See the [Example app](https://github.com/daohoangson/flutter_widget_from_html/tree/master/packages/example) for inspiration.
+See the [Demo app](https://github.com/daohoangson/flutter_widget_from_html/tree/master/demo_app) for inspiration.
 
 ### Example
 
@@ -59,7 +59,7 @@ class HelloWorldCoreScreen extends StatelessWidget {
 void main() => runApp(WidgetsApp(home: HelloWorldCoreScreen()));
 ```
 
-<img src="../example/screenshots/HelloWorldCoreScreen.gif?raw=true" width="300" />
+<img src="../../demo_app/screenshots/HelloWorldCoreScreen.gif?raw=true" width="300" />
 
 ## Features
 
@@ -153,4 +153,4 @@ class SmilieScreen extends StatelessWidget {
 }
 ```
 
-![](../../packages/example/screenshots/SmilieScreen.png?raw=true)
+![](../../demo_app/screenshots/SmilieScreen.png?raw=true)
