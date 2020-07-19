@@ -117,8 +117,8 @@ api_task:
     - cd api
     - mkdir -p .now && echo $NOW_PROJECT_JSON > .now/project.json
     - |
-      if [ $CIRRUS_BRANCH == 'master' ]; then
-        npm run deploy --prod
+      if [ $BRANCH == 'master' ]; then
+        npm run deploy -- --prod
       else
         npm run deploy
       fi
