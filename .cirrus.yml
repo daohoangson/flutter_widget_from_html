@@ -4,6 +4,7 @@ env:
   ZEIT_TOKEN: ENCRYPTED[4aaf3c4bb0aedad605db9ac986f9a54a7843cede69c435a94dbacdddc9551616263fc70180e01d3b73ef5c3d72c8d2e0]
 
 analyze_task:
+  skip: "!changesInclude('demo_app', 'packages')"
   container:
     image: cirrusci/flutter:stable
   format_script:
@@ -30,6 +31,7 @@ pipe:
         - now --token $ZEIT_TOKEN
 
 unit_test_task:
+  skip: "!changesInclude('demo_app', 'packages')"
   env:
     matrix:
       - FLUTTER_VERSION: dev
