@@ -59,7 +59,7 @@ class HelloWorldCoreScreen extends StatelessWidget {
 void main() => runApp(WidgetsApp(home: HelloWorldCoreScreen()));
 ```
 
-<img src="../../packages/example/screenshots/HelloWorldCoreScreen.gif?raw=true" width="300" />
+<img src="../example/screenshots/HelloWorldCoreScreen.gif?raw=true" width="300" />
 
 ## Features
 
