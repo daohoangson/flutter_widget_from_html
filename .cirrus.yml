@@ -94,7 +94,7 @@ android_test_task:
   test_script: ./tool/sylph/cmd.sh
 
 api_task:
-  only_if: $CIRRUS_BRANCH =~ 'api/.*'
+  skip: "!changesInclude('api')"
   container:
     image: node:lts
   env:
