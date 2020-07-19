@@ -114,4 +114,4 @@ api_task:
   deploy_script:
     - cd api
     - mkdir -p .now && echo $NOW_PROJECT_JSON > .now/project.json
-    - npm run deploy
+    - '[ $CIRRUS_BRANCH == 'master' ] && npm run deploy --prod || npm run deploy'
