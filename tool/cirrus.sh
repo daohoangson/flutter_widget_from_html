@@ -17,10 +17,10 @@ touch .cirrus/packages/enhanced/.packages
 mkdir -p .cirrus/packages/enhanced/example
 touch .cirrus/packages/enhanced/example/.packages
 
-mkdir -p .cirrus/packages/example
-touch .cirrus/packages/example/.packages
+mkdir -p .cirrus/demo_app
+touch .cirrus/demo_app/.packages
 
-_dockerImage=cirrusci/flutter
+_dockerImage=cirrusci/flutter:stable
 docker pull "$_dockerImage"
 
 exec docker run --rm -it \
@@ -38,8 +38,8 @@ exec docker run --rm -it \
   -v "$_pwd/.cirrus/packages/enhanced/example/.dart_tool:/project/packages/enhanced/example/.dart_tool" \
   -v "$_pwd/.cirrus/packages/enhanced/example/build:/project/packages/enhanced/example/build" \
   -v "$_pwd/.cirrus/packages/enhanced/example/.packages:/project/packages/enhanced/example/.packages" \
-  -v "$_pwd/.cirrus/packages/example/.dart_tool:/project/packages/example/.dart_tool" \
-  -v "$_pwd/.cirrus/packages/example/build:/project/packages/example/build" \
-  -v "$_pwd/.cirrus/packages/example/.packages:/project/packages/example/.packages" \
+  -v "$_pwd/.cirrus/demo_app/.dart_tool:/project/demo_app/.dart_tool" \
+  -v "$_pwd/.cirrus/demo_app/build:/project/demo_app/build" \
+  -v "$_pwd/.cirrus/demo_app/.packages:/project/demo_app/.packages" \
   -v "$_pwd/.cirrus/pub-cache:/home/cirrus/.pub-cache" \
   "$_dockerImage" /bin/bash
