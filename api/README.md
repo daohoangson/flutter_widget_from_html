@@ -10,7 +10,7 @@ The iframe api will receive the HTML and render a proper web page to help with t
 #### GET request
 
 ```bash
-curl https://api.flutter-widget-from-html.vercel.app/iframe.ts\?body=hello
+curl https://html-widget-api.now.sh/iframe.ts\?body=hello
 ```
 
 Output:
@@ -29,7 +29,7 @@ Output:
 #### POST request
 
 ```bash
-curl https://api.flutter-widget-from-html.vercel.app/iframe.ts -d body=lorem+lipsum
+curl https://html-widget-api.now.sh/iframe.ts -d body=lorem+lipsum
 ```
 
 Output
@@ -53,4 +53,4 @@ Execute `npm install` to install the dependencies then `npm run dev`.
 
 ## Deployment
 
-The repository has been configured to deploy to `https://api.flutter-widget-from-html.vercel.app` automatically upon changes within `./api`.
+The repository has been configured to deploy to `vercel.app` automatically upon changes within `./api`. If it's merged into `master`, it'll be deployed to https://html-widget-api.now.sh.
