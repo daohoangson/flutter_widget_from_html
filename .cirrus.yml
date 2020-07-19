@@ -22,12 +22,13 @@ pipe:
   steps:
     - image: cirrusci/flutter:stable
       generate_document_script:
-        - ( cd packages/core && ../../tool/dartdoc.sh )
-        - ( cd packages/enhanced && ../../tool/dartdoc.sh )
+        - ( cd packages/core && ../../tool/dartdoc/dartdoc.sh )
+        - ( cd packages/enhanced && ../../tool/dartdoc/dartdoc.sh )
     - image: node:lts
       install_now_cli_script: npm install -g now
       deploy_to_now_script:
-        - echo $NOW_PROJECT_JSON > .now/project.json
+        - mkdir -p .now && echo $NOW_PROJECT_JSON > .now/project.json
+        - cp ./tool/dartdoc/now.json ./now.json
         - now --token $ZEIT_TOKEN
 
 unit_test_task:
@@ -112,5 +113,5 @@ api_task:
       - cd api && npm ci
   deploy_script:
     - cd api
-    - echo $NOW_PROJECT_JSON > .now/project.json
+    - mkdir -p .now && echo $NOW_PROJECT_JSON > .now/project.json
     - npm run deploy

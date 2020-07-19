@@ -2,6 +2,7 @@
 .node
 awscli*
 **/failures/*.png
+project.json
 
 # https://raw.githubusercontent.com/flutter/flutter/master/.gitignore
 
