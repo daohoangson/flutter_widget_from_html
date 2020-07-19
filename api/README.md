@@ -1,6 +1,6 @@
 # HtmlWidget companion api
 
-## Supported features
+## Features
 
 ### iframe
 
@@ -53,4 +53,4 @@ Execute `npm install` to install the dependencies then `npm run dev`.
 
 ## Deployment
 
-The repository has been pre-configured to deploy to `https://api.flutter-widget-from-html.vercel.app`, just do git push to any `api/*` branches.
+The repository has been configured to deploy to `https://api.flutter-widget-from-html.vercel.app` automatically upon changes within `./api`.
