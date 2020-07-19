@@ -69,8 +69,6 @@ jobs:
         run: |
           set -e
           
-          sudo npm install -g now
-
           mkdir -p ./.now && echo '${{ secrets.DOCUMENT_PROJECT_JSON }}' > ./.now/project.json
           cp ./tool/dartdoc/now.json ./now.json
           _result=$( now --token ${{ secrets.ZEIT_TOKEN }} )
