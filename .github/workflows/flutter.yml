@@ -1,5 +1,9 @@
-on: push
 name: Flutter
+on:
+  push:
+    paths: 
+      - 'demo_app/**'
+      - 'packages/**'
 
 jobs:
   analyze:
@@ -17,3 +21,32 @@ jobs:
         run: cd packages/enhanced && flutter analyze
       - name: Analyze demo_app
         run: cd demo_app && flutter analyze
+
+  unit_test:
+    name: Unit test
+    strategy:
+      matrix:
+        channel: [dev, beta, stable]
+    continue-on-error: ${{ matrix.channel != 'stable' }}
+    runs-on: ubuntu-latest
+        
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          channel: ${{ matrix.channel }}
+      - name: Run ./tool/test.sh
+        run: |
+          if [ "${{ matrix.channel }}" == "stable" ]; then
+            ./tool/test.sh --coverage
+            bash <(curl -s https://codecov.io/bash)
+          else
+            ./tool/test.sh
+          fi
+      - uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: golden-failures
+          path: demo_app/test/golden/failures/*
+          
