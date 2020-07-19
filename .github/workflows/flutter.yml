@@ -5,6 +5,7 @@ on:
       - .github/workflows/flutter.yml
       - 'demo_app/**'
       - 'packages/**'
+      - 'tool/dartdoc/**'
 
 jobs:
   analyze:
@@ -45,4 +46,49 @@ jobs:
           else
             ./tool/test.sh
           fi
+
+  dartdoc:
+    name: Document
+    needs:
+      - analyze
+      - unit_test
+    runs-on: ubuntu-latest
+        
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+      - name: Generate document
+        run: |
+          set -e
           
+          ( cd packages/core && ../../tool/dartdoc/dartdoc.sh )
+          ( cd packages/enhanced && ../../tool/dartdoc/dartdoc.sh )
+      - name: Deploy via now.sh
+        id: now
+        run: |
+          set -e
+          
+          sudo npm install -g now
+
+          mkdir -p ./.now && echo '${{ secrets.DOCUMENT_PROJECT_JSON }}' > ./.now/project.json
+          cp ./tool/dartdoc/now.json ./now.json
+          _result=$( now --token ${{ secrets.ZEIT_TOKEN }} )
+
+          _result="${_result//'%'/'%25'}"
+          _result="${_result//$'\n'/'%0A'}"
+          _result="${_result//$'\r'/'%0D'}"
+          echo "::set-output name=RESULT::${_result}"
+      - uses: actions/github-script@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const now = JSON.parse('${{ toJSON(steps.now.outputs) }}')
+            const { RESULT: body } = now
+
+            github.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+              body
+            })    
