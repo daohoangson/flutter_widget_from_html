@@ -7,13 +7,6 @@
   ],
   "routes": [
     {
-      "src": "/",
-      "status": 301,
-      "headers": {
-        "Location": "/packages/enhanced/doc/api/"
-      }
-    },
-    {
       "src": "/packages/core/demo_app/screenshots/(.*)",
       "dest": "/demo_app/screenshots/$1"
     },

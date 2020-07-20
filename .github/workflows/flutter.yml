@@ -88,5 +88,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               commit_sha: context.sha,
-              body: `Deployed to ${url}.`
+              body: `Deployed dartdoc to ${url}.\n\nQuick links:\n- [core](${url}/packages/core/doc/api/)\n- [enhanced](${url}/packages/enhanced/doc/api/)`
             })    
