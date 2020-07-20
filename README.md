@@ -1,6 +1,8 @@
 # HtmlWidget monorepo
 
-[![Build Status](https://api.cirrus-ci.com/github/daohoangson/flutter_widget_from_html.svg)](https://cirrus-ci.com/github/daohoangson/flutter_widget_from_html/master)
+![Flutter](https://github.com/daohoangson/flutter_widget_from_html/workflows/Flutter/badge.svg)
+![Android Test](https://github.com/daohoangson/flutter_widget_from_html/workflows/Android%20Test/badge.svg)
+![API](https://github.com/daohoangson/flutter_widget_from_html/workflows/API/badge.svg)
 
 This repo contains the source code for everything `HtmlWidget`-related.
 

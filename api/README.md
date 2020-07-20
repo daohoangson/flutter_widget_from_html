@@ -1,5 +1,7 @@
 # HtmlWidget companion api
 
+![API](https://github.com/daohoangson/flutter_widget_from_html/workflows/API/badge.svg)
+
 ## Features
 
 ### iframe
