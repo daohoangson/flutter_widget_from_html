@@ -1,0 +1,39 @@
+name: API
+on:
+  push:
+    paths: 
+      - .github/workflows/api.yml
+      - 'api/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+      - name: Deploy via now.sh
+        id: now
+        run: |
+          set -e
+
+          mkdir -p ./.now && echo '${{ secrets.API_PROJECT_JSON }}' > ./.now/project.json
+          _url=$( now --token ${{ secrets.ZEIT_TOKEN }} ${{ github.ref == 'refs/heads/master' ? '--prod' : '' }} )
+
+          _url="${_url//'%'/'%25'}"
+          _url="${_url//$'\n'/'%0A'}"
+          _url="${_url//$'\r'/'%0D'}"
+          echo "::set-output name=url::${_url}"
+      - uses: actions/github-script@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const now = ${{ toJSON(steps.now.outputs) }}
+            const { url } = now
+
+            github.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+              body: `Deployed companion API to ${url}.\n\nQuick links:\n- [iframe](${url}/iframe.ts?body=Foo)`
+            })    
