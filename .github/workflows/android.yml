@@ -1,0 +1,23 @@
+name: Android Test
+on:
+  push:
+    paths: 
+      - .github/workflows/android.yml
+      - packages/enhanced/lib/src/widget/video_player.dart
+      - packages/enhanced/lib/src/widget/web_view.dart
+      - 'tool/sylph/**'
+  workflow_dispatch:
+
+jobs:
+  test:
+    env:
+      AWS_ACCESS_KEY_ID: AKIAY43IFJQXPIU46LXP
+      AWS_DEFAULT_REGION: us-west-2
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.DEVICE_FARM_SECRET_ACCESS_KEY }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+      - run: ./tool/sylph/sylph.sh
