@@ -18,7 +18,12 @@ jobs:
           set -e
 
           mkdir -p ./.now && echo '${{ secrets.API_PROJECT_JSON }}' > ./.now/project.json
-          _url=$( now --token ${{ secrets.ZEIT_TOKEN }} ${{ github.ref == 'refs/heads/master' ? '--prod' : '' }} )
+          
+          if [ $GITHUB_REF == 'refs/heads/master' ]; then
+            _url=$( now  --prod --token ${{ secrets.ZEIT_TOKEN }} )
+          else
+            _url=$( now --token ${{ secrets.ZEIT_TOKEN }} )
+          fi
 
           _url="${_url//'%'/'%25'}"
           _url="${_url//$'\n'/'%0A'}"
