@@ -71,22 +71,22 @@ jobs:
           
           mkdir -p ./.now && echo '${{ secrets.DOCUMENT_PROJECT_JSON }}' > ./.now/project.json
           cp ./tool/dartdoc/now.json ./now.json
-          _result=$( now --token ${{ secrets.ZEIT_TOKEN }} )
+          _url=$( now --token ${{ secrets.ZEIT_TOKEN }} )
 
-          _result="${_result//'%'/'%25'}"
-          _result="${_result//$'\n'/'%0A'}"
-          _result="${_result//$'\r'/'%0D'}"
-          echo "::set-output name=RESULT::${_result}"
+          _url="${_url//'%'/'%25'}"
+          _url="${_url//$'\n'/'%0A'}"
+          _url="${_url//$'\r'/'%0D'}"
+          echo "::set-output name=url::${_url}"
       - uses: actions/github-script@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const now = JSON.parse('${{ toJSON(steps.now.outputs) }}')
-            const { RESULT: body } = now
+            const now = ${{ toJSON(steps.now.outputs) }}
+            const { url } = now
 
             github.repos.createCommitComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               commit_sha: context.sha,
-              body
+              body: `Deployed to ${url}.`
             })    
