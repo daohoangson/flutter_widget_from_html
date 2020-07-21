@@ -3,6 +3,7 @@
 ![Flutter](https://github.com/daohoangson/flutter_widget_from_html/workflows/Flutter/badge.svg)
 ![Android Test](https://github.com/daohoangson/flutter_widget_from_html/workflows/Android%20Test/badge.svg)
 ![API](https://github.com/daohoangson/flutter_widget_from_html/workflows/API/badge.svg)
+![Demo](https://github.com/daohoangson/flutter_widget_from_html/workflows/Demo/badge.svg)
 
 This repo contains the source code for everything `HtmlWidget`-related.
 

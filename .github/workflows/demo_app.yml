@@ -1,4 +1,4 @@
-name: Demo App
+name: Demo
 on:
   push:
     paths: 
