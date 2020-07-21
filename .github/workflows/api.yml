@@ -38,6 +38,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          body: "Deployed ${{ github.sha }} to ${{ steps.now.outputs.url }}.\n\nQuick links:\n- [iframe](${{ steps.now.outputs.url }}/iframe.ts?body=Foo"
+          body: "Deployed ${{ github.sha }} to ${{ steps.now.outputs.url }}.\n\nQuick links:\n- [iframe](${{ steps.now.outputs.url }}/iframe.ts?body=Foo)"
           fingerprint: "## Companion API"
           replace: please
