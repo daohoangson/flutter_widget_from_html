@@ -34,16 +34,10 @@ jobs:
           _url="${_url//$'\r'/'%0D'}"
           echo "::set-output name=url::${_url}"
       - name: Create commit comment
-        uses: actions/github-script@v2
+        uses: daohoangson/comment-on-github@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const now = ${{ toJSON(steps.now.outputs) }}
-            const { url } = now
-
-            github.repos.createCommitComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              commit_sha: context.sha,
-              body: `Deployed companion API to ${url}.\n\nQuick links:\n- [iframe](${url}/iframe.ts?body=Foo)`
-            })    
+          body: "Deployed ${{ github.sha }} to ${{ steps.now.outputs.url }}.\n\nQuick links:\n- [iframe](${{ steps.now.outputs.url }}/iframe.ts?body=Foo)"
+          fingerprint: "## Companion API"
+          replace: please
