@@ -21,7 +21,8 @@ class _StyleBgColor {
           final bgColor = wf.parseColor(meta.style(_kCssBackgroundColor));
           if (bgColor == null) return null;
 
-          return [WidgetPlaceholder.wrapOne(widgets, _build, bgColor)];
+          return _listOrNull(
+              wf.buildColumn(widgets)?.wrapWith(_build, bgColor));
         },
         priority: 15000,
       );

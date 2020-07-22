@@ -20,14 +20,12 @@ class _StyleSizing {
           final input = _parse(meta);
           if (input == null) return pieces;
 
-          Widget widget;
-          var rebuildPieces = false;
+          WidgetPlaceholder widget;
           for (final p in pieces) {
             if (p.hasWidgets) {
               for (final w in p.widgets) {
                 if (widget != null) return pieces;
                 widget = w;
-                rebuildPieces = true;
               }
             } else {
               for (final b in p.text?.bits) {
@@ -41,15 +39,8 @@ class _StyleSizing {
             }
           }
 
-          if (widget == null) return pieces;
-          final wrapped = WidgetPlaceholder.wrapOne([widget], _build, input);
-          if (rebuildPieces) {
-            return [
-              BuiltPiece.widgets([wrapped])
-            ];
-          } else {
-            return pieces;
-          }
+          if (widget != null) widget.wrapWith(_build, input);
+          return pieces;
         },
         onWidgets: (meta, widgets) {
           final input = _parse(meta);

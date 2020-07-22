@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'core_data.dart';
+import 'core_helpers.dart';
 import 'core_widget_factory.dart';
 
 final _attrStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
@@ -34,7 +35,7 @@ class HtmlBuilder {
         parentOps = _prepareParentOps(parentParentOps, parentMeta);
 
   Iterable<Widget> build() {
-    final list = <Widget>[];
+    final list = <WidgetPlaceholder>[];
 
     for (final piece in process()) {
       if (piece.hasWidgets) {
@@ -47,7 +48,7 @@ class HtmlBuilder {
       }
     }
 
-    Iterable<Widget> widgets = list;
+    Iterable<WidgetPlaceholder> widgets = list;
     if (parentMeta?.hasOps == true) {
       for (final op in parentMeta.ops) {
         widgets = op.onWidgets(parentMeta, widgets);

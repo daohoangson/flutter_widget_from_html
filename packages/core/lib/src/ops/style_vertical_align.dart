@@ -41,18 +41,8 @@ class _StyleVerticalAlign {
     final newPiece = BuiltPiece.text(replacement);
     if (built == null) return newPiece;
 
-    replacement.add(TextWidget(
-        text,
-        input.padding != null
-            ? built is WidgetPlaceholder
-                ? (built..wrapWith(_build, input))
-                : WidgetPlaceholder(
-                    builder: _build,
-                    children: [built],
-                    input: input,
-                  )
-            : built,
-        alignment: input.alignment));
+    if (input.padding != null) built.wrapWith(_build, input);
+    replacement.add(TextWidget(text, built, alignment: input.alignment));
 
     return newPiece;
   }

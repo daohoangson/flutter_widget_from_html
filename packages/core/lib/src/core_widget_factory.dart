@@ -6,7 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'builder.dart';
+import 'core_builder.dart';
 import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_html_widget.dart';
@@ -58,12 +58,15 @@ class WidgetFactory {
 
   Widget buildBody(Iterable<Widget> children) => buildColumn(children);
 
-  Widget buildColumn(Iterable<Widget> children) => children?.isNotEmpty == true
-      ? WidgetPlaceholder(
-          builder: _buildColumn,
-          children: children,
-        )
-      : null;
+  WidgetPlaceholder buildColumn(Iterable<Widget> children) =>
+      children?.isNotEmpty == true
+          ? (children.length == 1 && children.first is WidgetPlaceholder
+              ? (children.first as WidgetPlaceholder).wrapWith(_buildColumn)
+              : WidgetPlaceholder(
+                  builder: _buildColumn,
+                  children: children,
+                ))
+          : null;
 
   static Iterable<Widget> _buildColumn(BuildContext c, Iterable<Widget> ws, _) {
     if (ws == null) return null;
@@ -287,12 +290,13 @@ class WidgetFactory {
     return Table(border: tableBorder, children: rows);
   }
 
-  Widget buildText(TextBits text) => (text..trimRight()).isNotEmpty
-      ? WidgetPlaceholder(
-          builder: _buildText,
-          input: text,
-        )
-      : null;
+  WidgetPlaceholder<TextBits> buildText(TextBits text) =>
+      (text..trimRight()).isNotEmpty
+          ? WidgetPlaceholder(
+              builder: _buildText,
+              input: text,
+            )
+          : null;
 
   static Iterable<Widget> _buildText(
     BuildContext context,

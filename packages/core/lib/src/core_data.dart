@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'builder.dart';
+import 'core_builder.dart';
 import 'core_helpers.dart';
 
 part 'data/table_data.dart';
@@ -45,8 +45,12 @@ class BuildOp {
   ) =>
       _onPieces != null ? _onPieces(meta, pieces) : pieces;
 
-  Iterable<Widget> onWidgets(NodeMetadata meta, Iterable<Widget> widgets) =>
-      (_onWidgets != null ? _onWidgets(meta, widgets) : null) ?? widgets;
+  Iterable<WidgetPlaceholder> onWidgets(
+          NodeMetadata meta, Iterable<WidgetPlaceholder> widgets) =>
+      (_onWidgets != null
+          ? _onWidgets(meta, widgets)?.map(_widgetToPlaceholder)
+          : null) ??
+      widgets;
 }
 
 typedef _BuildOpDefaultStyles = Iterable<String> Function(
@@ -55,15 +59,19 @@ typedef _BuildOpOnChild = void Function(NodeMetadata meta, dom.Element e);
 typedef _BuildOpOnPieces = Iterable<BuiltPiece> Function(
     NodeMetadata meta, Iterable<BuiltPiece> pieces);
 typedef _BuildOpOnWidgets = Iterable<Widget> Function(
-    NodeMetadata meta, Iterable<Widget> widgets);
+    NodeMetadata meta, Iterable<WidgetPlaceholder> widgets);
 
 class BuiltPiece {
   final TextBits text;
-  final Iterable<Widget> widgets;
+  final Iterable<WidgetPlaceholder> widgets;
 
   BuiltPiece.text(this.text) : widgets = null;
 
-  BuiltPiece.widgets(this.widgets) : text = null;
+  BuiltPiece.placeholders(this.widgets) : text = null;
+
+  BuiltPiece.widgets(Iterable<Widget> widgets)
+      : text = null,
+        widgets = widgets.map(_widgetToPlaceholder);
 
   bool get hasWidgets => widgets != null;
 }
@@ -290,3 +298,12 @@ class TextStyleBuilders {
     _output = null;
   }
 }
+
+WidgetPlaceholder _widgetToPlaceholder(Widget widget) {
+  if (widget is WidgetPlaceholder) return widget;
+  return WidgetPlaceholder<Widget>(builder: _widgetBuilder, input: widget);
+}
+
+Iterable<Widget> _widgetBuilder(
+        BuildContext _, Iterable<Widget> __, Widget widget) =>
+    [widget];
