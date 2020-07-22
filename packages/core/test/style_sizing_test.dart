@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 
 import '_.dart';
 
@@ -208,5 +209,22 @@ void main() {
             '[DecoratedBox:bg=#FF0000FF,child='
             '[Padding:(5,5,5,5),child='
             '[RichText:(#FFFFFFFF:Foo)]]]]]]]]]'));
+  });
+
+  group('inline', () {
+    testWidgets('renders img with sizing', (WidgetTester tester) async {
+      final src = 'https://domain.com/image.jpg';
+      final html = 'Foo <img src="$src" style="width: 10px; height: 10px;" />';
+      final explained = await mockNetworkImagesFor(() => explain(tester, html));
+
+      final expectedImage = '[Image:image=NetworkImage("$src", scale: 1.0)]';
+      expect(
+          explained,
+          equals('[RichText:(:Foo '
+              '[UnconstrainedBox:child=[ConstrainedBox:'
+              'constraints=(w=10.0, h=10.0),'
+              'child=$expectedImage]]'
+              ')]'));
+    });
   });
 }
