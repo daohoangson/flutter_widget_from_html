@@ -165,12 +165,9 @@ class WidgetFactory {
   Widget buildImage(Object provider, ImgMetadata img) =>
       provider != null && provider is ImageProvider && img != null
           ? Image(
-              height: img.height,
-              loadingBuilder: buildImageLoadingBuilder(img),
               errorBuilder: buildImageErrorWidgetBuilder(img),
               image: provider,
               semanticLabel: img.alt ?? img.title,
-              width: img.width,
             )
           : null;
 
@@ -180,27 +177,6 @@ class WidgetFactory {
         final text = img.alt ?? img.title ?? '❌';
         return Text(text);
       };
-
-  ImageLoadingBuilder buildImageLoadingBuilder(ImgMetadata img) =>
-      img.width != null && img.height != null && img.height != 0
-          ? (_, child, __) => LayoutBuilder(
-                builder: (_, bc) {
-                  var w = img.width < bc.maxWidth ? img.width : bc.maxWidth;
-                  var h = img.height < bc.maxHeight ? img.height : bc.maxHeight;
-                  if (w != img.width || h != img.height) {
-                    final r = w / h;
-                    final ratio = img.width / img.height;
-                    if (r < ratio) {
-                      h = w / ratio;
-                    } else {
-                      w = h * ratio;
-                    }
-                  }
-
-                  return SizedBox(child: child, height: h, width: w);
-                },
-              )
-          : null;
 
   Object buildImageProvider(String url) {
     if (url?.startsWith('asset:') == true) {
@@ -886,6 +862,12 @@ class WidgetFactory {
 
       case 'img':
         meta.op = tagImg();
+        if (attrs.containsKey('height')) {
+          meta.styles = ['height', "${attrs['height']}px"];
+        }
+        if (attrs.containsKey('width')) {
+          meta.styles = ['width', "${attrs['width']}px"];
+        }
         break;
 
       case 'ins':

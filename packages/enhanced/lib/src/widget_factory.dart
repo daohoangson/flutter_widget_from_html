@@ -50,11 +50,7 @@ class WidgetFactory extends core.WidgetFactory {
     var built = super.buildImage(provider, img);
 
     if (built == null && provider is PictureProvider) {
-      built = SvgPicture(
-        provider,
-        height: img.height,
-        width: img.width,
-      );
+      built = SvgPicture(provider);
     }
 
     if (img.title != null && built != null) {
@@ -178,11 +174,7 @@ class WidgetFactory extends core.WidgetFactory {
       poster: posterUrl != null
           ? buildImage(
               buildImageProvider(posterUrl),
-              ImgMetadata(
-                height: height,
-                url: posterUrl,
-                width: width,
-              ),
+              ImgMetadata(url: posterUrl),
             )
           : null,
     );

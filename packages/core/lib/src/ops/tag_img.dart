@@ -47,21 +47,9 @@ class _TagImg {
     final src = attrs.containsKey('src') ? attrs['src'] : null;
     return ImgMetadata(
       alt: attrs.containsKey('alt') ? attrs['alt'] : null,
-      height: _getDimension(meta, attrs, 'height'),
       title: attrs.containsKey('title') ? attrs['title'] : null,
       url: wf.constructFullUrl(src),
-      width: _getDimension(meta, attrs, 'width'),
     );
-  }
-
-  static double _getDimension(
-    NodeMetadata meta,
-    Map<dynamic, String> attrs,
-    String key,
-  ) {
-    final value =
-        meta.style(key) ?? (attrs.containsKey(key) ? attrs[key] : null);
-    return value != null ? double.tryParse(value) : null;
   }
 
   Iterable<Widget> _wpb(BuildContext _, Iterable<Widget> __, ImgMetadata img) =>
