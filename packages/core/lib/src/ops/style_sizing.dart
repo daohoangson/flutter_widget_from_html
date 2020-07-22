@@ -13,51 +13,53 @@ class _StyleSizing {
   _StyleSizing(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onWidgets: (meta, widgets) {
-          CssLength height, maxHeight, maxWidth, minHeight, minWidth, width;
-          for (final x in meta.styleEntries) {
-            switch (x.key) {
-              case _kCssHeight:
-                height = wf.parseCssLength(x.value);
-                break;
-              case _kCssMaxHeight:
-                maxHeight = wf.parseCssLength(x.value);
-                break;
-              case _kCssMaxWidth:
-                maxWidth = wf.parseCssLength(x.value);
-                break;
-              case _kCssMinHeight:
-                minHeight = wf.parseCssLength(x.value);
-                break;
-              case _kCssMinWidth:
-                minWidth = wf.parseCssLength(x.value);
-                break;
-              case _kCssWidth:
-                width = wf.parseCssLength(x.value);
-                break;
+        isBlockElement: false,
+        onPieces: (meta, pieces) {
+          if (meta.isBlockElement) return pieces;
+
+          final input = _parse(meta);
+          if (input == null) return pieces;
+
+          Widget widget;
+          var rebuildPieces = false;
+          for (final p in pieces) {
+            if (p.hasWidgets) {
+              for (final w in p.widgets) {
+                if (widget != null) return pieces;
+                widget = w;
+                rebuildPieces = true;
+              }
+            } else {
+              for (final b in p.text?.bits) {
+                if (b is TextWidget) {
+                  if (widget != null) return pieces;
+                  widget = b.widget;
+                } else {
+                  return pieces;
+                }
+              }
             }
           }
 
-          if (height == null &&
-              maxHeight == null &&
-              maxWidth == null &&
-              minHeight == null &&
-              minWidth == null &&
-              width == null) return widgets;
+          if (widget == null) return pieces;
+          final wrapped = WidgetPlaceholder.wrapOne([widget], _build, input);
+          if (rebuildPieces) {
+            return [
+              BuiltPiece.widgets([wrapped])
+            ];
+          } else {
+            return pieces;
+          }
+        },
+        onWidgets: (meta, widgets) {
+          final input = _parse(meta);
+          if (input == null) return widgets;
 
           return [
             WidgetPlaceholder(
               builder: _build,
               children: widgets,
-              input: _StyleSizingInput(
-                meta,
-                height: height,
-                maxHeight: maxHeight,
-                maxWidth: maxWidth,
-                minHeight: minHeight,
-                minWidth: minWidth,
-                width: width,
-              ),
+              input: input,
             )
           ];
         },
@@ -98,6 +100,49 @@ class _StyleSizing {
               ),
       ),
     ];
+  }
+
+  _StyleSizingInput _parse(NodeMetadata meta) {
+    CssLength height, maxHeight, maxWidth, minHeight, minWidth, width;
+    for (final x in meta.styleEntries) {
+      switch (x.key) {
+        case _kCssHeight:
+          height = wf.parseCssLength(x.value);
+          break;
+        case _kCssMaxHeight:
+          maxHeight = wf.parseCssLength(x.value);
+          break;
+        case _kCssMaxWidth:
+          maxWidth = wf.parseCssLength(x.value);
+          break;
+        case _kCssMinHeight:
+          minHeight = wf.parseCssLength(x.value);
+          break;
+        case _kCssMinWidth:
+          minWidth = wf.parseCssLength(x.value);
+          break;
+        case _kCssWidth:
+          width = wf.parseCssLength(x.value);
+          break;
+      }
+    }
+
+    if (height == null &&
+        maxHeight == null &&
+        maxWidth == null &&
+        minHeight == null &&
+        minWidth == null &&
+        width == null) return null;
+
+    return _StyleSizingInput(
+      meta,
+      height: height,
+      maxHeight: maxHeight,
+      maxWidth: maxWidth,
+      minHeight: minHeight,
+      minWidth: minWidth,
+      width: width,
+    );
   }
 
   static bool _renderAspectRatio(BoxConstraints bc, double h, double w) {
