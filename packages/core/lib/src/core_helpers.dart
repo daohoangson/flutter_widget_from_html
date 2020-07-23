@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+part 'widget/css_element.dart';
+
 const kShouldBuildAsync = 10000;
 
 /// A no op placeholder widget.
@@ -58,7 +60,7 @@ class WidgetPlaceholder<T1> extends StatelessWidget {
     if (output.length == 1) return output.first;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: List.unmodifiable(output),
     );

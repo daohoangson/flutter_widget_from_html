@@ -51,7 +51,7 @@ class HtmlBuilder {
     Iterable<WidgetPlaceholder> widgets = list;
     if (parentMeta?.hasOps == true) {
       for (final op in parentMeta.ops) {
-        widgets = op.onWidgets(parentMeta, widgets);
+        widgets = op.onWidgets(parentMeta, widgets).toList(growable: false);
       }
     }
 
@@ -94,6 +94,10 @@ class HtmlBuilder {
 
     for (final style in meta.styleEntries) {
       wf.parseStyle(meta, style.key, style.value);
+    }
+
+    if (meta.isBlockElement) {
+      meta.op = wf.styleDisplayBlock();
     }
 
     meta.domElement = e;

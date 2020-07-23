@@ -38,6 +38,7 @@ final _dataUriRegExp = RegExp(r'^data:image/[^;]+;(base64|utf8),');
 /// A factory to build widget for HTML elements.
 class WidgetFactory {
   BuildOp _styleBgColor;
+  BuildOp _styleDisplayBlock;
   BuildOp _styleMargin;
   BuildOp _stylePadding;
   BuildOp _styleSizing;
@@ -987,6 +988,22 @@ class WidgetFactory {
   }
 
   BuildOp styleDirection(String dir) => _styleDirection(this, dir);
+
+  BuildOp styleDisplayBlock() {
+    _styleDisplayBlock ??= BuildOp(
+      onWidgets: (_, widgets) {
+        for (final widget in widgets) {
+          widget.wrapWith(_cssBlock);
+        }
+        return widgets;
+      },
+      priority: 9223372036854775807,
+    );
+    return _styleDisplayBlock;
+  }
+
+  static Iterable<Widget> _cssBlock(BuildContext _, Iterable<Widget> ws, __) =>
+      ws.map((w) => w is CssBlock ? w : CssBlock(child: w));
 
   BuildOp styleLineHeight(String v) => _styleLineHeight(this, v);
 
