@@ -13,51 +13,44 @@ class _StyleSizing {
   _StyleSizing(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onWidgets: (meta, widgets) {
-          CssLength height, maxHeight, maxWidth, minHeight, minWidth, width;
-          for (final x in meta.styleEntries) {
-            switch (x.key) {
-              case _kCssHeight:
-                height = wf.parseCssLength(x.value);
-                break;
-              case _kCssMaxHeight:
-                maxHeight = wf.parseCssLength(x.value);
-                break;
-              case _kCssMaxWidth:
-                maxWidth = wf.parseCssLength(x.value);
-                break;
-              case _kCssMinHeight:
-                minHeight = wf.parseCssLength(x.value);
-                break;
-              case _kCssMinWidth:
-                minWidth = wf.parseCssLength(x.value);
-                break;
-              case _kCssWidth:
-                width = wf.parseCssLength(x.value);
-                break;
+        isBlockElement: false,
+        onPieces: (meta, pieces) {
+          if (meta.isBlockElement) return pieces;
+
+          final input = _parse(meta);
+          if (input == null) return pieces;
+
+          WidgetPlaceholder widget;
+          for (final p in pieces) {
+            if (p.hasWidgets) {
+              for (final w in p.widgets) {
+                if (widget != null) return pieces;
+                widget = w;
+              }
+            } else {
+              for (final b in p.text?.bits) {
+                if (b is TextWidget) {
+                  if (widget != null) return pieces;
+                  widget = b.widget;
+                } else {
+                  return pieces;
+                }
+              }
             }
           }
 
-          if (height == null &&
-              maxHeight == null &&
-              maxWidth == null &&
-              minHeight == null &&
-              minWidth == null &&
-              width == null) return widgets;
+          if (widget != null) widget.wrapWith(_build, input);
+          return pieces;
+        },
+        onWidgets: (meta, widgets) {
+          final input = _parse(meta);
+          if (input == null) return widgets;
 
           return [
             WidgetPlaceholder(
               builder: _build,
               children: widgets,
-              input: _StyleSizingInput(
-                meta,
-                height: height,
-                maxHeight: maxHeight,
-                maxWidth: maxWidth,
-                minHeight: minHeight,
-                minWidth: minWidth,
-                width: width,
-              ),
+              input: input,
             )
           ];
         },
@@ -70,49 +63,64 @@ class _StyleSizing {
     if (child == null) return null;
 
     final tsb = input.meta.tsb;
-    final height = input.height?.getValue(context, tsb);
-    final maxHeight = input.maxHeight?.getValue(context, tsb);
-    final maxWidth = input.maxWidth?.getValue(context, tsb);
-    final minHeight = input.minHeight?.getValue(context, tsb);
-    final minWidth = input.minWidth?.getValue(context, tsb);
-    final width = input.width?.getValue(context, tsb);
-
     return [
-      LayoutBuilder(
-        builder: (_, bc) => _renderAspectRatio(bc, height, width)
-            ? AspectRatio(
-                aspectRatio: width / height,
-                child: child,
-              )
-            : UnconstrainedBox(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: height ?? maxHeight ?? double.infinity,
-                    maxWidth: width ?? maxWidth ?? double.infinity,
-                    minHeight: height ?? minHeight ?? 0,
-                    minWidth: width ?? minWidth ?? 0,
-                  ),
-                  child: child,
-                ),
-                alignment: Alignment.topLeft,
-              ),
-      ),
+      CssSizing(
+        child: child,
+        constraints: BoxConstraints(
+          maxHeight: input.maxHeight?.getValue(context, tsb) ?? double.infinity,
+          maxWidth: input.maxWidth?.getValue(context, tsb) ?? double.infinity,
+          minHeight: input.minHeight?.getValue(context, tsb) ?? 0,
+          minWidth: input.minWidth?.getValue(context, tsb) ?? 0,
+        ),
+        size: Size(
+          input.width?.getValue(context, tsb) ?? double.infinity,
+          input.height?.getValue(context, tsb) ?? double.infinity,
+        ),
+      )
     ];
   }
 
-  static bool _renderAspectRatio(BoxConstraints bc, double h, double w) {
-    if (h == null || w == null || h == 0) return false;
-
-    final b = bc.biggest;
-    if (b.height.isFinite && h > b.height) {
-      return true;
+  _StyleSizingInput _parse(NodeMetadata meta) {
+    CssLength height, maxHeight, maxWidth, minHeight, minWidth, width;
+    for (final x in meta.styleEntries) {
+      switch (x.key) {
+        case _kCssHeight:
+          height = wf.parseCssLength(x.value);
+          break;
+        case _kCssMaxHeight:
+          maxHeight = wf.parseCssLength(x.value);
+          break;
+        case _kCssMaxWidth:
+          maxWidth = wf.parseCssLength(x.value);
+          break;
+        case _kCssMinHeight:
+          minHeight = wf.parseCssLength(x.value);
+          break;
+        case _kCssMinWidth:
+          minWidth = wf.parseCssLength(x.value);
+          break;
+        case _kCssWidth:
+          width = wf.parseCssLength(x.value);
+          break;
+      }
     }
 
-    if (b.width.isFinite && w > b.width) {
-      return true;
-    }
+    if (height == null &&
+        maxHeight == null &&
+        maxWidth == null &&
+        minHeight == null &&
+        minWidth == null &&
+        width == null) return null;
 
-    return false;
+    return _StyleSizingInput(
+      meta,
+      height: height,
+      maxHeight: maxHeight,
+      maxWidth: maxWidth,
+      minHeight: minHeight,
+      minWidth: minWidth,
+      width: width,
+    );
   }
 }
 

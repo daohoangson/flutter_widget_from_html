@@ -29,7 +29,7 @@ void main() {
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals('[InkWell:child=[RichText:(#FF123456+u:Foo)]]'),
+      equals('[InkWell:child=[CssBlock:child=[RichText:(#FF123456+u:Foo)]]]'),
     );
   });
 
@@ -40,8 +40,9 @@ void main() {
       explained,
       equals(
         '[Column:children='
-        '[InkWell:child=[RichText:(#FF123456+u:Foo)]],'
-        '[InkWell:child=[RichText:(#FF123456+u:Bar)]]]',
+        '[InkWell:child=[CssBlock:child=[RichText:(#FF123456+u:Foo)]]],'
+        '[InkWell:child=[CssBlock:child=[RichText:(#FF123456+u:Bar)]]]'
+        ']',
       ),
     );
   });

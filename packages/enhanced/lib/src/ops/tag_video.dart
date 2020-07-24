@@ -14,7 +14,8 @@ class _TagVideo {
           final player = build(
             meta,
             widgets
-                .map<String>((w) => w is _TagVideoSource ? w.url : null)
+                .map<String>((w) =>
+                    w is WidgetPlaceholder<String> ? w.inputs.first : null)
                 .where((s) => s != null),
           );
           return player != null ? [player] : null;
@@ -29,7 +30,7 @@ class _TagVideo {
       final url = wf.constructFullUrl(a['src']);
       if (url == null) return null;
 
-      return [_TagVideoSource(url)];
+      return [WidgetPlaceholder(builder: _sourceBuilder, input: url)];
     });
     return _sourceOp;
   }
@@ -49,13 +50,8 @@ class _TagVideo {
       width: a.containsKey('width') ? double.tryParse(a['width']) : null,
     );
   }
-}
 
-class _TagVideoSource extends StatelessWidget {
-  final String url;
-
-  _TagVideoSource(this.url);
-
-  @override
-  Widget build(BuildContext context) => widget0;
+  static Iterable<Widget> _sourceBuilder(
+          BuildContext _, Iterable<Widget> __, String url) =>
+      [Text(url)];
 }

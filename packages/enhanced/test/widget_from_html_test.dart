@@ -6,6 +6,6 @@ void main() {
   testWidgets('renders HR tag', (WidgetTester tester) async {
     final html = '<hr/>';
     final explained = await explain(tester, html);
-    expect(explained, equals('[Divider:]'));
+    expect(explained, equals('[CssBlock:child=[Divider]]'));
   });
 }

@@ -68,7 +68,7 @@ void main() {
             equals('[FutureBuilder:'
                 '[Center:child='
                 '[Padding:(8,8,8,8),child='
-                '[CircularProgressIndicator:]'
+                '[CircularProgressIndicator]'
                 ']]]'));
       });
     });
@@ -210,7 +210,7 @@ void main() {
           key: helper.hwKey,
         ),
       );
-      expect(explained, equals('[Text:Bar]'));
+      expect(explained, equals('[CssBlock:child=[Text:Bar]]'));
     });
   });
 

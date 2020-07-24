@@ -30,7 +30,7 @@ class _TagTable {
               break;
             case _kCssDisplayTableCell:
               return [
-                WidgetPlaceholder(
+                WidgetPlaceholder<NodeMetadata>(
                   children: widgets,
                   input: meta,
                   lastBuilder: _cell,
@@ -139,7 +139,8 @@ class _TagTablePlaceholder<T> extends WidgetPlaceholder<T> {
   }) : super(children: children, input: input, lastBuilder: lastBuilder);
 
   @override
-  void wrapWith<T2>(WidgetPlaceholderBuilder<T2> builder, [T2 input]) {
+  _TagTablePlaceholder<T> wrapWith<T2>(WidgetPlaceholderBuilder<T2> builder,
+      [T2 input]) {
     assert(builder != null);
 
     for (final child in children) {
@@ -147,6 +148,8 @@ class _TagTablePlaceholder<T> extends WidgetPlaceholder<T> {
         child.wrapWith(builder, input);
       }
     }
+
+    return this;
   }
 }
 

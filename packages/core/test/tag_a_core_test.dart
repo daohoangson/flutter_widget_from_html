@@ -52,7 +52,9 @@ void main() {
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals('[GestureDetector:child=[RichText:(#FF0000FF+u:Foo)]]'),
+      equals('[GestureDetector:child='
+          '[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]'
+          ']'),
     );
   });
 
@@ -63,8 +65,9 @@ void main() {
       explained,
       equals(
         '[Column:children='
-        '[GestureDetector:child=[RichText:(#FF0000FF+u:Foo)]],'
-        '[GestureDetector:child=[RichText:(#FF0000FF+u:Bar)]]]',
+        '[GestureDetector:child=[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]],'
+        '[GestureDetector:child=[CssBlock:child=[RichText:(#FF0000FF+u:Bar)]]]'
+        ']',
       ),
     );
   });
@@ -81,7 +84,7 @@ void main() {
     expect(
         explained,
         equals('[SizedBox:0.0x5.0],'
-            '[GestureDetector:child=[Padding:(0,5,0,5),child=[RichText:(#FF0000FF+u:Foo)]]],'
+            '[GestureDetector:child=[CssBlock:child=[Padding:(0,5,0,5),child=[RichText:(#FF0000FF+u:Foo)]]]],'
             '[SizedBox:0.0x5.0]'));
   });
 

@@ -2,7 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '_.dart';
 
-String _padding(String child) => '[Padding:(1,1,1,1),child=$child]';
+String _padding(String child) =>
+    '[CssBlock:child=[Padding:(1,1,1,1),child=$child]]';
 
 String _richtext(String text) => _padding('[RichText:(:$text)]');
 
@@ -16,7 +17,9 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[Column:children=[RichText,align=center:(:Caption)],[Table:\n'
+        equals('[Column:children='
+            '[CssBlock:child=[RichText:align=center,(:Caption)]],'
+            '[Table:\n'
             '${_padding('[RichText:(+b:Header 1)]')} | ${_padding('[RichText:(+b:Header 2)]')}\n'
             '${_richtext('Value 1')} | ${_richtext('Value 2')}\n'
             ']]'));
@@ -60,7 +63,7 @@ void main() {
       expect(
           explained,
           equals('[Table:\n'
-              '${_padding('[RichText:(+b:Header 1)]')} | ${_padding('[RichText,align=center:(+b:Header 2)]')}\n'
+              '${_padding('[RichText:(+b:Header 1)]')} | ${_padding('[RichText:align=center,(+b:Header 2)]')}\n'
               '${_padding('[RichText:(:Value (+i:1))]')} | ${_padding('[RichText:(+b:Value 2)]')}\n'
               ']'));
     });
@@ -74,7 +77,7 @@ void main() {
       expect(
           explained,
           equals('[Table:\n'
-              '${_padding('[RichText,align=center:(+b:Header 1)]')} | ${_padding('[RichText,align=center:(+b:Header 2)]')}\n'
+              '${_padding('[RichText:align=center,(+b:Header 1)]')} | ${_padding('[RichText:align=center,(+b:Header 2)]')}\n'
               '${_padding('[RichText:(+b:Value (+i+b:1))]')} | ${_padding('[RichText:(+b:Value 2)]')}\n'
               ']'));
     });
@@ -90,8 +93,8 @@ void main() {
       expect(
           explained,
           equals('[Table:\n'
-              '${_padding('[RichText,align=right:(+b:Header 1)]')} | ${_padding('[RichText,align=center:(+b:Header 2)]')}\n'
-              '${_padding('[RichText,align=right:(:Value (+i:1))]')} | ${_padding('[RichText,align=right:(+b:Value 2)]')}\n'
+              '${_padding('[RichText:align=right,(+b:Header 1)]')} | ${_padding('[RichText:align=center,(+b:Header 2)]')}\n'
+              '${_padding('[RichText:align=right,(:Value (+i:1))]')} | ${_padding('[RichText:align=right,(+b:Value 2)]')}\n'
               ']'));
     });
   });
@@ -108,7 +111,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Table:border=1.0@solid#FF000000\n'
+        equals('[Table:border=1.0@solid#FF000000,\n'
             '${_richtext('Foo')}\n'
             ']'),
       );
@@ -119,7 +122,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Table:border=1.0@solid#FF000000\n'
+        equals('[Table:border=1.0@solid#FF000000,\n'
             '${_richtext('Foo')}\n'
             ']'),
       );
@@ -130,7 +133,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Table:border=2.0@solid#FF000000\n'
+        equals('[Table:border=2.0@solid#FF000000,\n'
             '${_richtext('Foo')}\n'
             ']'),
       );
@@ -142,7 +145,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Table:border=1.0@solid#FFFF0000\n'
+        equals('[Table:border=1.0@solid#FFFF0000,\n'
             '${_richtext('Foo')}\n'
             ']'),
       );
@@ -154,8 +157,8 @@ void main() {
       final explained = await explain(t, html);
       expect(
         explained,
-        equals('[Table:border=1.0@solid#FF000000\n'
-            '${_padding('[RichText,align=left:(:Foo)]')}\n'
+        equals('[Table:border=1.0@solid#FF000000,\n'
+            '${_padding('[RichText:align=left,(:Foo)]')}\n'
             ']'),
       );
     });
@@ -166,8 +169,8 @@ void main() {
       final explained = await explain(t, html);
       expect(
         explained,
-        equals('[Table:border=1.0@solid#FF000000\n'
-            '${_padding('[RichText,align=left:(:Foo)]')}\n'
+        equals('[Table:border=1.0@solid#FF000000,\n'
+            '${_padding('[RichText:align=left,(:Foo)]')}\n'
             ']'),
       );
     });
@@ -186,7 +189,7 @@ void main() {
       expect(
           explained,
           equals('[Table:\n'
-              '[Padding:(2,2,2,2),child=[RichText:(:Foo)]]\n'
+              '[CssBlock:child=[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]\n'
               ']'));
     });
 
@@ -207,7 +210,7 @@ void main() {
         expect(
             explained,
             equals('[Table:\n'
-                '[Padding:(2,2,2,2),child=[RichText:(:Foo)]]\n'
+                '[CssBlock:child=[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]\n'
                 ']'));
       });
     });
@@ -360,7 +363,7 @@ void main() {
       expect(
           explained,
           equals('[Table:\n'
-              '[DecoratedBox:bg=#FFFF0000,child=${_richtext('Foo')}]\n'
+              '[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child=[Padding:(1,1,1,1),child=[RichText:(:Foo)]]]]\n'
               ']'));
     });
   });
@@ -381,9 +384,11 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children=[RichText,align=center:(:Caption)],[Table:\n'
-              '[RichText:(+b:Header 1)] | [RichText:(+b:Header 2)]\n'
-              '[RichText:(:Value 1)] | [RichText:(:Value 2)]\n'
+          equals('[Column:children='
+              '[CssBlock:child=[RichText:align=center,(:Caption)]],'
+              '[Table:\n'
+              '[CssBlock:child=[RichText:(+b:Header 1)]] | [CssBlock:child=[RichText:(+b:Header 2)]]\n'
+              '[CssBlock:child=[RichText:(:Value 1)]] | [CssBlock:child=[RichText:(:Value 2)]]\n'
               ']]'));
     });
   });
@@ -391,11 +396,11 @@ void main() {
   testWidgets('renders UL inside', (WidgetTester tester) async {
     final html = '<table><tr><td><ul><li>Foo</li></ul></td></tr></table>';
     final explained = await explain(tester, html);
-    final expectedList = '[Padding:(0,0,0,25),child='
-        '[Stack:children='
+    final expectedList = '[CssBlock:child=[Padding:(0,0,0,25),child='
+        '[CssBlock:child=[Stack:children='
         '[RichText:(:Foo)],'
-        '[Positioned:(0.0,null,null,-45.0),child=[SizedBox:40.0x0.0,child=[RichText,align=right:(:•)]]]'
-        ']]';
+        '[Positioned:(0.0,null,null,-45.0),child=[SizedBox:40.0x0.0,child=[RichText:align=right,(:•)]]]'
+        ']]]]';
     expect(explained, equals('[Table:\n${_padding(expectedList)}\n]'));
   });
 }

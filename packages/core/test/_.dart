@@ -129,6 +129,10 @@ class Explainer {
 
   String explain(Widget widget) => _widget(widget);
 
+  String _alignment(Alignment a) => a != null
+      ? 'alignment=${a.toString().replaceFirst('Alignment.', '')}'
+      : null;
+
   String _borderSide(BorderSide s) =>
       "${s.width}@${s.style.toString().replaceFirst('BorderStyle.', '')}${_color(s.color)}";
 
@@ -148,15 +152,15 @@ class Explainer {
   }
 
   String _boxConstraints(BoxConstraints bc) =>
-      bc.toString().replaceAll('BoxConstraints', '');
+      'constraints=${bc.toString().replaceAll('BoxConstraints', '')}';
 
-  String _boxDecoration(BoxDecoration d) {
-    final buffer = StringBuffer();
+  List<String> _boxDecoration(BoxDecoration d) {
+    final attr = <String>[];
 
-    if (d.color != null) buffer.write('bg=${_color(d.color)},');
-    if (d.border != null) buffer.write('border=${_boxBorder(d.border)},');
+    if (d?.color != null) attr.add('bg=${_color(d.color)}');
+    if (d?.border != null) attr.add('border=${_boxBorder(d.border)}');
 
-    return buffer.toString();
+    return attr;
   }
 
   String _color(Color c) =>
@@ -167,18 +171,19 @@ class Explainer {
     return h.length == 1 ? '0$h' : h;
   }
 
-  String _container(Container container) {
-    final buffer = StringBuffer();
+  List<String> _cssSizing(CssSizing w) {
+    final attr = <String>[];
 
-    if (container.decoration != null) {
-      buffer.write(_boxDecoration(container.decoration));
-    }
+    final c = w.constraints;
+    final s = w.size;
+    if (s.height.isFinite) attr.add('height=${s.height}');
+    if (c.maxHeight.isFinite) attr.add('maxHeight=${c.maxHeight}');
+    if (c.maxWidth.isFinite) attr.add('maxWidth=${c.maxWidth}');
+    if (c.minHeight > 0) attr.add('minHeight=${c.minHeight}');
+    if (c.minWidth > 0) attr.add('minWidth=${c.minWidth}');
+    if (s.width.isFinite) attr.add('width=${s.width}');
 
-    if (container.child != null) {
-      buffer.write('child=${_widget(container.child)}');
-    }
-
-    return '[Container:$buffer]';
+    return attr;
   }
 
   String _edgeInsets(EdgeInsets e) =>
@@ -269,16 +274,16 @@ class Explainer {
 
   String _textAlign(TextAlign textAlign) =>
       (textAlign != null && textAlign != TextAlign.start)
-          ? textAlign.toString().replaceAll('TextAlign.', '')
-          : '';
+          ? 'align=${textAlign.toString().replaceAll('TextAlign.', '')}'
+          : null;
 
   String _textDirection(TextDirection textDirection) =>
       textDirection.toString().replaceAll('TextDirection.', '');
 
-  String _textOverflow(TextOverflow textOverflow) =>
-      (textOverflow != null && textOverflow != TextOverflow.clip)
-          ? textOverflow.toString().replaceAll('TextOverflow.', '')
-          : '';
+  String _textOverflow(TextOverflow textOverflow) => (textOverflow != null &&
+          textOverflow != TextOverflow.clip)
+      ? 'overflow=${textOverflow.toString().replaceAll('TextOverflow.', '')}'
+      : null;
 
   String _textStyle(TextStyle style, TextStyle parent) {
     var s = '';
@@ -372,8 +377,6 @@ class Explainer {
     // ignore: invalid_use_of_protected_member
     if (widget is WidgetPlaceholder) return _widget(widget.build(context));
 
-    if (widget is Container) return _container(widget);
-
     if (widget is Image) return _image(widget);
 
     if (widget is LayoutBuilder) {
@@ -388,75 +391,98 @@ class Explainer {
     final type = widget.runtimeType
         .toString()
         .replaceAll('_MarginHorizontal', 'Padding');
-    final text = widget is Align
-        ? "${widget is Center ? '' : 'alignment=${widget.alignment},'}"
-        : widget is AspectRatio
-            ? 'aspectRatio=${widget.aspectRatio.toStringAsFixed(2)},'
-            : widget is ConstrainedBox
-                ? 'constraints=${_boxConstraints(widget.constraints)},'
-                : widget is DecoratedBox
-                    ? _boxDecoration(widget.decoration)
-                    : widget is Directionality
-                        ? '${_textDirection(widget.textDirection)},'
-                        : widget is GestureDetector
-                            ? 'child=${_widget(widget.child)}'
-                            : widget is InkWell
-                                ? 'child=${_widget(widget.child)}'
-                                : widget is LimitedBox
-                                    ? _limitBox(widget)
-                                    : widget is Padding
-                                        ? '${_edgeInsets(widget.padding)},'
-                                        : widget is Positioned
-                                            ? '(${widget.top},${widget.right},${widget.bottom},${widget.left}),'
-                                            : widget is RichText
-                                                ? _inlineSpan(widget.text)
-                                                : widget is SizedBox
-                                                    ? '${widget.width?.toStringAsFixed(1) ?? 0.0}x${widget.height?.toStringAsFixed(1) ?? 0.0}'
-                                                    : widget is Table
-                                                        ? _tableBorder(
-                                                            widget.border)
-                                                        : widget is Text
-                                                            ? widget.data
-                                                            : widget is Wrap
-                                                                ? _wrap(widget)
-                                                                : '';
 
-    var attrStr = '';
-    final textAlign = _textAlign(widget is RichText
+    var attr = <String>[];
+
+    attr.add(_textAlign(widget is RichText
         ? widget.textAlign
-        : (widget is Text ? widget.textAlign : null));
-    attrStr += textAlign.isNotEmpty ? ',align=$textAlign' : '';
+        : (widget is Text ? widget.textAlign : null)));
+
     final maxLines = widget is RichText
         ? widget.maxLines
         : widget is Text ? widget.maxLines : null;
-    if (maxLines != null) attrStr += ',maxLines=$maxLines';
-    final textOverflow = _textOverflow(widget is RichText
+    if (maxLines != null) attr.add('maxLines=$maxLines');
+
+    attr.add(_textOverflow(widget is RichText
         ? widget.overflow
-        : widget is Text ? widget.overflow : null);
-    attrStr += textOverflow.isNotEmpty ? ',overflow=$textOverflow' : '';
+        : widget is Text ? widget.overflow : null));
 
-    final children = widget is MultiChildRenderObjectWidget
-        ? (widget.children?.isNotEmpty == true && !(widget is RichText))
-            ? "children=${widget.children.map(_widget).join(',')}"
-            : ''
-        : widget is ProxyWidget
-            ? 'child=${_widget(widget.child)}'
-            : widget is SingleChildRenderObjectWidget
-                ? (widget.child != null ? 'child=${_widget(widget.child)}' : '')
-                : widget is SingleChildScrollView
-                    ? 'child=${_widget(widget.child)}'
-                    : widget is Table
-                        ? '\n${_tableRows(widget)}\n'
+    if (widget is Align && widget is! Center) {
+      attr.add(_alignment(widget.alignment));
+    }
+
+    if (widget is AspectRatio) attr.add('aspectRatio=${widget.aspectRatio}');
+
+    if (widget is ConstrainedBox) attr.add(_boxConstraints(widget.constraints));
+
+    if (widget is Container) attr.addAll(_boxDecoration(widget.decoration));
+
+    if (widget is CssSizing) attr.addAll(_cssSizing(widget));
+
+    if (widget is DecoratedBox) attr.addAll(_boxDecoration(widget.decoration));
+
+    if (widget is Directionality) {
+      attr.add(_textDirection(widget.textDirection));
+    }
+
+    if (widget is LimitedBox) attr.add(_limitBox(widget));
+
+    if (widget is Padding) attr.add(_edgeInsets(widget.padding));
+
+    if (widget is Positioned) {
+      attr.add('(${widget.top},${widget.right},'
+          '${widget.bottom},${widget.left})');
+    }
+
+    if (widget is SizedBox) {
+      attr.add('${widget.width ?? 0.0}x'
+          '${widget.height ?? 0.0}');
+    }
+
+    if (widget is Table) attr.add(_tableBorder(widget.border));
+
+    if (widget is Tooltip) attr.add('message=${widget.message}');
+
+    // A-F
+    // `RichText` is an exception, it is a `MultiChildRenderObjectWidget` so it has to be processed first
+    attr.add(widget is RichText
+        ? _inlineSpan(widget.text)
+        : widget is Container ? _widgetChild(widget.child) : null);
+    // G-M
+    attr.add(widget is GestureDetector
+        ? _widgetChild(widget.child)
+        : widget is InkWell
+            ? _widgetChild(widget.child)
+            : widget is MultiChildRenderObjectWidget
+                ? (widget is! RichText
+                    ? _widgetChildren(widget.children)
+                    : null)
+                : null);
+    // N-T
+    attr.add(widget is ProxyWidget
+        ? _widgetChild(widget.child)
+        : widget is SingleChildRenderObjectWidget
+            ? _widgetChild(widget.child)
+            : widget is SingleChildScrollView
+                ? _widgetChild(widget.child)
+                : widget is Table
+                    ? '\n${_tableRows(widget)}\n'
+                    : widget is Text
+                        ? widget.data
                         : widget is Tooltip
-                            ? 'child=${_widget(widget.child)},message=${widget.message}'
-                            : '';
-    return '[$type$attrStr:$text$children]';
+                            ? _widgetChild(widget.child)
+                            : null);
+    // U-Z
+
+    final attrStr = attr.where((a) => a?.isNotEmpty == true).join(',');
+    return '[$type${attrStr.isNotEmpty ? ':$attrStr' : ''}]';
   }
 
-  String _wrap(Wrap wrap) {
-    var s = '';
-    if (wrap.spacing != 0.0) s += 'spacing=${wrap.spacing},';
-    if (wrap.runSpacing != 0.0) s += 'runSpacing=${wrap.runSpacing},';
-    return s;
-  }
+  String _widgetChild(Widget widget) =>
+      widget != null ? 'child=${_widget(widget)}' : null;
+
+  String _widgetChildren(Iterable<Widget> widgets) =>
+      widgets?.isNotEmpty == true
+          ? 'children=${widgets.map(_widget).join(',')}'
+          : null;
 }

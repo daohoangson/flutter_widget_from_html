@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 
 import '_.dart';
 
@@ -9,9 +10,10 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[UnconstrainedBox:child=[ConstrainedBox:'
-              'constraints=(0.0<=w<=Infinity, h=20.0),'
-              'child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child='
+              '[CssSizing:height=20.0,child='
+              '[RichText:(:Foo)]'
+              ']]'));
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
@@ -19,15 +21,16 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[UnconstrainedBox:child=[ConstrainedBox:'
-              'constraints=(0.0<=w<=Infinity, h=100.0),'
-              'child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child='
+              '[CssSizing:height=100.0,child='
+              '[RichText:(:Foo)]'
+              ']]'));
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
       final html = '<div style="height: xxx">Foo</div>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
   });
 
@@ -37,9 +40,10 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[UnconstrainedBox:child=[ConstrainedBox:'
-              'constraints=(0.0<=w<=Infinity, 0.0<=h<=20.0),'
-              'child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child='
+              '[CssSizing:maxHeight=20.0,child='
+              '[RichText:(:Foo)]'
+              ']]'));
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
@@ -47,15 +51,16 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[UnconstrainedBox:child=[ConstrainedBox:'
-              'constraints=(0.0<=w<=Infinity, 0.0<=h<=100.0),'
-              'child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child='
+              '[CssSizing:maxHeight=100.0,child='
+              '[RichText:(:Foo)]'
+              ']]'));
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
       final html = '<div style="max-height: xxx">Foo</div>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
   });
 
@@ -65,9 +70,10 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[UnconstrainedBox:child=[ConstrainedBox:'
-              'constraints=(0.0<=w<=20.0, 0.0<=h<=Infinity),'
-              'child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child='
+              '[CssSizing:maxWidth=20.0,child='
+              '[RichText:(:Foo)]'
+              ']]'));
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
@@ -75,15 +81,16 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[UnconstrainedBox:child=[ConstrainedBox:'
-              'constraints=(0.0<=w<=100.0, 0.0<=h<=Infinity),'
-              'child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child='
+              '[CssSizing:maxWidth=100.0,child='
+              '[RichText:(:Foo)]'
+              ']]'));
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
       final html = '<div style="max-width: xxx">Foo</div>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
   });
 
@@ -93,9 +100,10 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[UnconstrainedBox:child=[ConstrainedBox:'
-              'constraints=(0.0<=w<=Infinity, 20.0<=h<=Infinity),'
-              'child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child='
+              '[CssSizing:minHeight=20.0,child='
+              '[RichText:(:Foo)]'
+              ']]'));
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
@@ -103,15 +111,16 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[UnconstrainedBox:child=[ConstrainedBox:'
-              'constraints=(0.0<=w<=Infinity, 100.0<=h<=Infinity),'
-              'child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child='
+              '[CssSizing:minHeight=100.0,child='
+              '[RichText:(:Foo)]'
+              ']]'));
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
       final html = '<div style="min-height: xxx">Foo</div>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
   });
 
@@ -121,9 +130,10 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[UnconstrainedBox:child=[ConstrainedBox:'
-              'constraints=(20.0<=w<=Infinity, 0.0<=h<=Infinity),'
-              'child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child='
+              '[CssSizing:minWidth=20.0,child='
+              '[RichText:(:Foo)]'
+              ']]'));
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
@@ -131,15 +141,16 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[UnconstrainedBox:child=[ConstrainedBox:'
-              'constraints=(100.0<=w<=Infinity, 0.0<=h<=Infinity),'
-              'child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child='
+              '[CssSizing:minWidth=100.0,child='
+              '[RichText:(:Foo)]'
+              ']]'));
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
       final html = '<div style="min-width: xxx">Foo</div>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
   });
 
@@ -149,9 +160,10 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[UnconstrainedBox:child=[ConstrainedBox:'
-              'constraints=(w=20.0, 0.0<=h<=Infinity),'
-              'child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child='
+              '[CssSizing:width=20.0,child='
+              '[RichText:(:Foo)]'
+              ']]'));
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
@@ -159,31 +171,16 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[UnconstrainedBox:child=[ConstrainedBox:'
-              'constraints=(w=100.0, 0.0<=h<=Infinity),'
-              'child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child='
+              '[CssSizing:width=100.0,child='
+              '[RichText:(:Foo)]'
+              ']]'));
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
       final html = '<div style="width: xxx">Foo</div>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
-    });
-  });
-
-  group('AspectRatio', () {
-    testWidgets('renders big height', (WidgetTester tester) async {
-      final html = '<div style="height: 1000px; width: 100px">Foo</div>';
-      final explained = await explain(tester, html);
-      expect(explained,
-          equals('[AspectRatio:aspectRatio=0.10,child=[RichText:(:Foo)]]'));
-    });
-
-    testWidgets('renders big width', (WidgetTester tester) async {
-      final html = '<div style="height: 100px; width: 1000px">Foo</div>';
-      final explained = await explain(tester, html);
-      expect(explained,
-          equals('[AspectRatio:aspectRatio=10.00,child=[RichText:(:Foo)]]'));
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
   });
 
@@ -200,13 +197,29 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[DecoratedBox:bg=#FFFF0000,child='
+        equals('[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child='
             '[Padding:(20,20,20,20),child='
-            '[DecoratedBox:bg=#FF008000,child='
-            '[Padding:(0,15,0,15),child='
-            '[UnconstrainedBox:child=[ConstrainedBox:constraints=(w=100.0, h=100.0),child='
+            '[CssBlock:child=[DecoratedBox:bg=#FF008000,child='
+            '[CssBlock:child=[Padding:(0,15,0,15),child='
+            '[CssSizing:height=100.0,width=100.0,child='
             '[DecoratedBox:bg=#FF0000FF,child='
             '[Padding:(5,5,5,5),child='
-            '[RichText:(#FFFFFFFF:Foo)]]]]]]]]]'));
+            '[RichText:(#FFFFFFFF:Foo)]'
+            ']]]]]]]]]]'));
+  });
+
+  group('inline', () {
+    testWidgets('renders img with sizing', (WidgetTester tester) async {
+      final src = 'https://domain.com/image.jpg';
+      final html = 'Foo <img src="$src" style="width: 10px; height: 10px;" />';
+      final explained = await mockNetworkImagesFor(() => explain(tester, html));
+
+      final expectedImage = '[Image:image=NetworkImage("$src", scale: 1.0)]';
+      expect(
+          explained,
+          equals('[RichText:(:Foo '
+              '[CssSizing:height=10.0,width=10.0,child=$expectedImage]'
+              ')]'));
+    });
   });
 }

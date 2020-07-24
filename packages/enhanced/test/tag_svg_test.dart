@@ -9,7 +9,7 @@ void main() {
     final explained = e.replaceAll(RegExp(r'String#[0-9a-f]+,'), 'String,');
     expect(
         explained,
-        equals(
-            '[SvgPicture:pictureProvider=StringPicture(String, colorFilter: null)]'));
+        equals('[CssBlock:child=[SvgPicture:pictureProvider='
+            'StringPicture(String, colorFilter: null)]]'));
   });
 }

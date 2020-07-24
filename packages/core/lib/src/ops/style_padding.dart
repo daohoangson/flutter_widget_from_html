@@ -55,20 +55,7 @@ class _StylePadding {
             ..meta = meta
             ..padding = padding;
 
-          if (widgets.length == 1) {
-            final widget = widgets.first;
-            if (widget is WidgetPlaceholder) {
-              return [widget..wrapWith(_build, input)];
-            }
-          }
-
-          return [
-            WidgetPlaceholder(
-              builder: _build,
-              children: widgets,
-              input: input,
-            )
-          ];
+          return _listOrNull(wf.buildColumn(widgets)?.wrapWith(_build, input));
         },
         priority: 9999,
       );

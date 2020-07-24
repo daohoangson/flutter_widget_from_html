@@ -1,5 +1,8 @@
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
+
+part 'widget/css_element.dart';
 
 const kShouldBuildAsync = 10000;
 
@@ -58,51 +61,17 @@ class WidgetPlaceholder<T1> extends StatelessWidget {
     if (output.length == 1) return output.first;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: List.unmodifiable(output),
     );
   }
 
-  void wrapWith<T2>(WidgetPlaceholderBuilder<T2> builder, [T2 input]) {
+  WidgetPlaceholder<T1> wrapWith<T2>(WidgetPlaceholderBuilder<T2> builder,
+      [T2 input]) {
     assert(builder != null);
     _builders.add(builder);
     _inputs.add(input);
+    return this;
   }
-
-  static Iterable<Widget> wrap<T2>(
-    Iterable<Widget> widgets,
-    WidgetPlaceholderBuilder<T2> builder, [
-    T2 input,
-  ]) {
-    final wrapped = List<Widget>(widgets.length);
-
-    var i = 0;
-    for (final widget in widgets) {
-      if (widget is WidgetPlaceholder) {
-        wrapped[i++] = widget..wrapWith(builder, input);
-      } else {
-        wrapped[i++] = WidgetPlaceholder(
-          builder: builder,
-          children: [widget],
-          input: input,
-        );
-      }
-    }
-
-    return wrapped;
-  }
-
-  static Widget wrapOne<T2>(
-    Iterable<Widget> widgets,
-    WidgetPlaceholderBuilder<T2> builder, [
-    T2 input,
-  ]) =>
-      widgets.length == 1
-          ? wrap(widgets, builder, input).first
-          : WidgetPlaceholder(
-              builder: builder,
-              children: widgets,
-              input: input,
-            );
 }

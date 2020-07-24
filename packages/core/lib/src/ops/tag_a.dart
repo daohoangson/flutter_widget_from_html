@@ -20,26 +20,25 @@ class _TagA {
           final onTap = _buildGestureTapCallback(meta);
           if (onTap == null) return pieces;
 
-          return pieces.map(
-            (piece) => piece.hasWidgets
-                ? BuiltPiece.widgets(WidgetPlaceholder.wrap(
-                    piece.widgets, wf.buildGestureDetectors, onTap))
-                : _buildBlock(meta, piece, onTap),
-          );
+          for (final piece in pieces) {
+            if (piece.hasWidgets) {
+              for (final placeholder in piece.widgets) {
+                placeholder.wrapWith(wf.buildGestureDetectors, onTap);
+              }
+            } else {
+              for (final bit in piece.text.bits.toList(growable: false)) {
+                if (bit is TextWidget) {
+                  bit.widget.wrapWith(wf.buildGestureDetectors, onTap);
+                } else if (bit is TextData) {
+                  bit.replaceWith(_TagATextData(bit, onTap, wf));
+                }
+              }
+            }
+          }
+
+          return pieces;
         },
       );
-
-  BuiltPiece _buildBlock(
-    NodeMetadata meta,
-    BuiltPiece piece,
-    GestureTapCallback onTap,
-  ) =>
-      piece
-        ..text.bits.toList(growable: false).forEach((bit) => bit is TextWidget
-            ? bit.widget?.wrapWith(wf.buildGestureDetectors, onTap)
-            : bit is TextData
-                ? bit.replaceWith(_TagATextData(bit, onTap, wf))
-                : null);
 
   GestureTapCallback _buildGestureTapCallback(NodeMetadata meta) {
     final attrs = meta.domElement.attributes;

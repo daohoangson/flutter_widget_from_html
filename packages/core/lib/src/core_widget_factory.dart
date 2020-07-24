@@ -3,10 +3,11 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui show ParagraphBuilder;
 import 'package:flutter/gestures.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'builder.dart';
+import 'core_builder.dart';
 import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_html_widget.dart';
@@ -38,6 +39,7 @@ final _dataUriRegExp = RegExp(r'^data:image/[^;]+;(base64|utf8),');
 /// A factory to build widget for HTML elements.
 class WidgetFactory {
   BuildOp _styleBgColor;
+  BuildOp _styleDisplayBlock;
   BuildOp _styleMargin;
   BuildOp _stylePadding;
   BuildOp _styleSizing;
@@ -58,12 +60,15 @@ class WidgetFactory {
 
   Widget buildBody(Iterable<Widget> children) => buildColumn(children);
 
-  Widget buildColumn(Iterable<Widget> children) => children?.isNotEmpty == true
-      ? WidgetPlaceholder(
-          builder: _buildColumn,
-          children: children,
-        )
-      : null;
+  WidgetPlaceholder buildColumn(Iterable<Widget> children) =>
+      children?.isNotEmpty == true
+          ? (children.length == 1 && children.first is WidgetPlaceholder
+              ? (children.first as WidgetPlaceholder).wrapWith(_buildColumn)
+              : WidgetPlaceholder(
+                  builder: _buildColumn,
+                  children: children,
+                ))
+          : null;
 
   static Iterable<Widget> _buildColumn(BuildContext c, Iterable<Widget> ws, _) {
     if (ws == null) return null;
@@ -162,12 +167,9 @@ class WidgetFactory {
   Widget buildImage(Object provider, ImgMetadata img) =>
       provider != null && provider is ImageProvider && img != null
           ? Image(
-              height: img.height,
-              loadingBuilder: buildImageLoadingBuilder(img),
               errorBuilder: buildImageErrorWidgetBuilder(img),
               image: provider,
               semanticLabel: img.alt ?? img.title,
-              width: img.width,
             )
           : null;
 
@@ -177,27 +179,6 @@ class WidgetFactory {
         final text = img.alt ?? img.title ?? '❌';
         return Text(text);
       };
-
-  ImageLoadingBuilder buildImageLoadingBuilder(ImgMetadata img) =>
-      img.width != null && img.height != null && img.height != 0
-          ? (_, child, __) => LayoutBuilder(
-                builder: (_, bc) {
-                  var w = img.width < bc.maxWidth ? img.width : bc.maxWidth;
-                  var h = img.height < bc.maxHeight ? img.height : bc.maxHeight;
-                  if (w != img.width || h != img.height) {
-                    final r = w / h;
-                    final ratio = img.width / img.height;
-                    if (r < ratio) {
-                      h = w / ratio;
-                    } else {
-                      w = h * ratio;
-                    }
-                  }
-
-                  return SizedBox(child: child, height: h, width: w);
-                },
-              )
-          : null;
 
   Object buildImageProvider(String url) {
     if (url?.startsWith('asset:') == true) {
@@ -287,12 +268,13 @@ class WidgetFactory {
     return Table(border: tableBorder, children: rows);
   }
 
-  Widget buildText(TextBits text) => (text..trimRight()).isNotEmpty
-      ? WidgetPlaceholder(
-          builder: _buildText,
-          input: text,
-        )
-      : null;
+  WidgetPlaceholder<TextBits> buildText(TextBits text) =>
+      (text..trimRight()).isNotEmpty
+          ? WidgetPlaceholder(
+              builder: _buildText,
+              input: text,
+            )
+          : null;
 
   static Iterable<Widget> _buildText(
     BuildContext context,
@@ -882,6 +864,12 @@ class WidgetFactory {
 
       case 'img':
         meta.op = tagImg();
+        if (attrs.containsKey('height')) {
+          meta.styles = ['height', "${attrs['height']}px"];
+        }
+        if (attrs.containsKey('width')) {
+          meta.styles = ['width', "${attrs['width']}px"];
+        }
         break;
 
       case 'ins':
@@ -1001,6 +989,22 @@ class WidgetFactory {
   }
 
   BuildOp styleDirection(String dir) => _styleDirection(this, dir);
+
+  BuildOp styleDisplayBlock() {
+    _styleDisplayBlock ??= BuildOp(
+      onWidgets: (_, widgets) {
+        for (final widget in widgets) {
+          widget.wrapWith(_cssBlock);
+        }
+        return widgets;
+      },
+      priority: 9223372036854775807,
+    );
+    return _styleDisplayBlock;
+  }
+
+  static Iterable<Widget> _cssBlock(BuildContext _, Iterable<Widget> ws, __) =>
+      ws?.map((w) => w is CssBlock ? w : CssBlock(child: w));
 
   BuildOp styleLineHeight(String v) => _styleLineHeight(this, v);
 

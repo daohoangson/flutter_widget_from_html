@@ -10,16 +10,17 @@ const square = '+';
 
 const sizedBox = '[SizedBox:0.0x10.0]';
 
-String padding(String child) => '[Padding:(0,0,0,25),child=$child]';
+String padding(String child) =>
+    '[CssBlock:child=[Padding:(0,0,0,25),child=$child]]';
 
 String list(List<String> children) => '[Column:children=${children.join(",")}]';
 
 String item(String markerText, String contents) =>
-    '[Stack:children=[RichText:(:$contents)],${marker(markerText)}]';
+    '[CssBlock:child=[Stack:children=[RichText:(:$contents)],${marker(markerText)}]]';
 
 String marker(String text) => '[Positioned:(0.0,null,null,-45.0),child='
     '[SizedBox:40.0x0.0,child='
-    '[RichText,align=right:(:$text)'
+    '[RichText:align=right,(:$text)'
     ']]]';
 
 void main() {
@@ -38,7 +39,7 @@ void main() {
         equals(padding(list([
           item('1.', 'One'),
           item('2.', 'Two'),
-          '[Stack:children=[RichText:(+b:Three)],${marker("3.")}]'
+          '[CssBlock:child=[Stack:children=[RichText:(+b:Three)],${marker("3.")}]]'
         ]))));
   });
 
@@ -50,7 +51,7 @@ void main() {
         equals(padding(list([
           item(disc, 'One'),
           item(disc, 'Two'),
-          '[Stack:children=[RichText:(+i:Three)],${marker(disc)}]'
+          '[CssBlock:child=[Stack:children=[RichText:(+i:Three)],${marker(disc)}]]'
         ]))));
   });
 
@@ -82,14 +83,14 @@ void main() {
     ]));
     final li21And22And23 = padding(list([
       item(circle, '2.1'),
-      '[Stack:children=[Column:children=[RichText:(:2.2)],$li221And222],${marker(circle)}]',
+      '[CssBlock:child=[Stack:children=[Column:children=[RichText:(:2.2)],$li221And222],${marker(circle)}]]',
       item(circle, '2.3'),
     ]));
     expect(
         explained,
         equals(padding(list([
           item(disc, 'One'),
-          '[Stack:children=[Column:children=[RichText:(:Two)],$li21And22And23],${marker(disc)}]',
+          '[CssBlock:child=[Stack:children=[Column:children=[RichText:(:Two)],$li21And22And23],${marker(disc)}]]',
           item(disc, 'Three'),
         ]))));
   });
@@ -489,8 +490,12 @@ void main() {
     group('padding-inline-start', () {
       testWidgets('renders 99px', (WidgetTester tester) async {
         final html = '<ul style="padding-inline-start: 99px"><li>Foo</li></ul>';
-        final e = await explain(tester, html);
-        expect(e, equals('[Padding:(0,0,0,99),child=${item(disc, "Foo")}]'));
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[CssBlock:child=[Padding:(0,0,0,99),child='
+                '${item(disc, "Foo")}'
+                ']]'));
       });
 
       testWidgets('renders LI padding-inline-start', (tester) async {
@@ -505,11 +510,11 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals('[Padding:(0,0,0,99),child=[Column:children='
-                '[Padding:(0,0,0,199),child=${item(disc, "199px")}],'
-                '[Padding:(0,0,0,299),child=${item(disc, "299px")}],'
+            equals('[CssBlock:child=[Padding:(0,0,0,99),child=[Column:children='
+                '[CssBlock:child=[Padding:(0,0,0,199),child=[Stack:children=[RichText:(:199px)],${marker(disc)}]]],'
+                '[CssBlock:child=[Padding:(0,0,0,299),child=[Stack:children=[RichText:(:299px)],${marker(disc)}]]],'
                 '${item(disc, "99px")}'
-                ']]'));
+                ']]]'));
       });
     });
   });
@@ -518,13 +523,19 @@ void main() {
     testWidgets('standalone UL', (WidgetTester tester) async {
       final html = '<ul>Foo</ul>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Padding:(0,0,0,25),child=[RichText:(:Foo)]]'));
+      expect(
+          explained,
+          equals(
+              '[CssBlock:child=[Padding:(0,0,0,25),child=[RichText:(:Foo)]]]'));
     });
 
     testWidgets('standalone OL', (WidgetTester tester) async {
       final html = '<ol>Foo</ol>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Padding:(0,0,0,25),child=[RichText:(:Foo)]]'));
+      expect(
+          explained,
+          equals(
+              '[CssBlock:child=[Padding:(0,0,0,25),child=[RichText:(:Foo)]]]'));
     });
 
     testWidgets('standalone LI', (WidgetTester tester) async {
@@ -566,7 +577,7 @@ void main() {
           explained,
           equals(padding(list([
             item('1.', 'One'),
-            '[Stack:children=[widget0],${marker("2.")}]',
+            '[CssBlock:child=[Stack:children=[widget0],${marker("2.")}]]',
             item('3.', 'Three'),
           ]))));
     });
@@ -582,11 +593,11 @@ void main() {
           ));
       expect(
           explained,
-          equals('[Padding:(0,25,0,0),child=[Column:children='
-              '[Stack:children=[RichText:(:One)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText,align=left:(:1.)]]]],'
-              '[Stack:children=[RichText:(:Two)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText,align=left:(:2.)]]]],'
-              '[Stack:children=[RichText:(+b:Three)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText,align=left:(:3.)]]]]'
-              ']]'));
+          equals('[CssBlock:child=[Padding:(0,25,0,0),child=[Column:children='
+              '[CssBlock:child=[Stack:children=[RichText:(:One)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,(:1.)]]]]],'
+              '[CssBlock:child=[Stack:children=[RichText:(:Two)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,(:2.)]]]]],'
+              '[CssBlock:child=[Stack:children=[RichText:(+b:Three)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,(:3.)]]]]]'
+              ']]]'));
     });
   });
 }
