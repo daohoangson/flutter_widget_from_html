@@ -163,32 +163,30 @@ class _RenderCssSizing extends RenderProxyBox {
     final a = _additionalConstraints;
     final c = constraints;
 
-    // we have both preferred width & height
-    var cc = _applyPreferredRatio();
+    // enforce additional contraints with parent's (ignoring lower bounds)
+    var cc = a.enforce(c.loosen());
+    final s = _applyPreferredRatio(cc);
 
-    if (cc == null) {
-      // enforce additional contraints with parent's
-      cc = a.enforce(c);
-
-      if (_preferredSize.height.isFinite) {
-        // we have preferred height
-        final height = cc.constrainHeight(_preferredSize.height);
-        cc = cc.copyWith(maxHeight: height, minHeight: height);
-      } else if (_preferredSize.width.isFinite) {
-        // we have preferred width
-        final width = cc.constrainWidth(_preferredSize.width);
-        cc = cc.copyWith(maxWidth: width, minWidth: width);
-      }
+    if (s != null) {
+      // we have both preferred width & height
+      cc = BoxConstraints.tight(s);
+    } else if (_preferredSize.height.isFinite) {
+      // we have preferred height
+      final height = cc.constrainHeight(_preferredSize.height);
+      cc = cc.copyWith(maxHeight: height, minHeight: height);
+    } else if (_preferredSize.width.isFinite) {
+      // we have preferred width
+      final width = cc.constrainWidth(_preferredSize.width);
+      cc = cc.copyWith(maxWidth: width, minWidth: width);
     }
 
     child.layout(cc, parentUsesSize: true);
     size = c.constrain(child.size);
   }
 
-  BoxConstraints _applyPreferredRatio() {
+  Size _applyPreferredRatio(BoxConstraints c) {
     if (_preferredRatio == null) return null;
 
-    final c = constraints;
     var width = _preferredSize.width ?? c.maxWidth;
     double height;
 
@@ -209,7 +207,17 @@ class _RenderCssSizing extends RenderProxyBox {
       width = height * _preferredRatio;
     }
 
-    return BoxConstraints.tight(Size(width, height));
+    if (width < c.minWidth) {
+      width = c.minWidth;
+      height = width / _preferredRatio;
+    }
+
+    if (height < c.minHeight) {
+      height = c.minHeight;
+      width = height * _preferredRatio;
+    }
+
+    return Size(width, height);
   }
 
   static double _calculateRatio(Size size) => size.width.isFinite == true &&
