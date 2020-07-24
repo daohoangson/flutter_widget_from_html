@@ -174,12 +174,14 @@ class Explainer {
   List<String> _cssSizing(CssSizing w) {
     final attr = <String>[];
 
-    if (w.height != null) attr.add('height=${w.height}');
-    if (w.maxHeight != null) attr.add('maxHeight=${w.maxHeight}');
-    if (w.maxWidth != null) attr.add('maxWidth=${w.maxWidth}');
-    if (w.minHeight != null) attr.add('minHeight=${w.minHeight}');
-    if (w.minWidth != null) attr.add('minWidth=${w.minWidth}');
-    if (w.width != null) attr.add('width=${w.width}');
+    final c = w.constraints;
+    final s = w.size;
+    if (s.height.isFinite) attr.add('height=${s.height}');
+    if (c.maxHeight.isFinite) attr.add('maxHeight=${c.maxHeight}');
+    if (c.maxWidth.isFinite) attr.add('maxWidth=${c.maxWidth}');
+    if (c.minHeight > 0) attr.add('minHeight=${c.minHeight}');
+    if (c.minWidth > 0) attr.add('minWidth=${c.minWidth}');
+    if (s.width.isFinite) attr.add('width=${s.width}');
 
     return attr;
   }
@@ -439,45 +441,48 @@ class Explainer {
 
     if (widget is Table) attr.add(_tableBorder(widget.border));
 
+    if (widget is Tooltip) attr.add('message=${widget.message}');
+
     // A-F
     // `RichText` is an exception, it is a `MultiChildRenderObjectWidget` so it has to be processed first
     attr.add(widget is RichText
         ? _inlineSpan(widget.text)
-        : widget is Container
-            ? 'child=${_widget(widget.child)}'
-            : widget is CssBlock
-                ? 'child=${_widget(widget.child)}'
-                : widget is CssSizing
-                    ? 'child=${_widget(widget.child)}'
-                    : null);
+        : widget is Container ? _widgetChild(widget.child) : null);
     // G-M
     attr.add(widget is GestureDetector
-        ? 'child=${_widget(widget.child)}'
+        ? _widgetChild(widget.child)
         : widget is InkWell
-            ? 'child=${_widget(widget.child)}'
+            ? _widgetChild(widget.child)
             : widget is MultiChildRenderObjectWidget
-                ? ((widget.children?.isNotEmpty == true &&
-                        !(widget is RichText))
-                    ? "children=${widget.children.map(_widget).join(',')}"
-                    : '')
+                ? (widget is! RichText
+                    ? _widgetChildren(widget.children)
+                    : null)
                 : null);
     // N-T
     attr.add(widget is ProxyWidget
-        ? 'child=${_widget(widget.child)}'
+        ? _widgetChild(widget.child)
         : widget is SingleChildRenderObjectWidget
-            ? (widget.child != null ? 'child=${_widget(widget.child)}' : '')
+            ? _widgetChild(widget.child)
             : widget is SingleChildScrollView
-                ? 'child=${_widget(widget.child)}'
+                ? _widgetChild(widget.child)
                 : widget is Table
                     ? '\n${_tableRows(widget)}\n'
                     : widget is Text
                         ? widget.data
                         : widget is Tooltip
-                            ? 'child=${_widget(widget.child)},message=${widget.message}'
+                            ? _widgetChild(widget.child)
                             : null);
     // U-Z
 
     final attrStr = attr.where((a) => a?.isNotEmpty == true).join(',');
     return '[$type${attrStr.isNotEmpty ? ':$attrStr' : ''}]';
   }
+
+  String _widgetChild(Widget widget) =>
+      widget != null ? 'child=${_widget(widget)}' : null;
+
+  String _widgetChildren(Iterable<Widget> widgets) =>
+      widgets?.isNotEmpty == true
+          ? 'children=${widgets.map(_widget).join(',')}'
+          : null;
 }

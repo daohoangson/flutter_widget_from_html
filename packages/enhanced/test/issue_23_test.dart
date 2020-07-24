@@ -64,7 +64,7 @@ void main() {
     expect(
         explained,
         equals('[Column:children=[RichText:(:Above)],'
-            '[WebView:url=data:text/html;charset=utf-8,Foo,aspectRatio=1.78,getDimensions=true],'
+            '[CssBlock:child=[WebView:url=data:text/html;charset=utf-8,Foo,aspectRatio=1.78,getDimensions=true]],'
             '[RichText:(:Below)]]'));
   });
 }

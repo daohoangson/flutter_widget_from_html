@@ -67,7 +67,7 @@ void main() {
             equals('[FutureBuilder:'
                 '[Center:child='
                 '[Padding:(8,8,8,8),child='
-                '[CircularProgressIndicator:]'
+                '[CircularProgressIndicator]'
                 ']]]'));
       });
     });
@@ -206,7 +206,7 @@ void main() {
           key: helper.hwKey,
         ),
       );
-      expect(explained, equals('[Text:Bar]'));
+      expect(explained, equals('[CssBlock:child=[Text:Bar]]'));
     });
   });
 
@@ -258,7 +258,10 @@ void main() {
 
     testWidgets('renders default value', (WidgetTester tester) async {
       final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(e, equals('[GestureDetector:child=[Text:$webViewSrc]]'));
+      expect(
+          e,
+          equals(
+              '[CssBlock:child=[GestureDetector:child=[Text:$webViewSrc]]]'));
     });
 
     testWidgets('renders true value', (WidgetTester tester) async {
@@ -271,32 +274,38 @@ void main() {
           ));
       expect(
           explained,
-          equals('[WebView:'
+          equals('[CssBlock:child=[WebView:'
               'url=$webViewSrc,'
               'aspectRatio=$webViewDefaultAspectRatio,'
-              'getDimensions=true]'));
+              'getDimensions=true]]'));
     });
 
     testWidgets('renders false value', (WidgetTester tester) async {
-      final e = await explain(
+      final explained = await explain(
           tester,
           HtmlWidget(
             html,
             key: helper.hwKey,
             webView: false,
           ));
-      expect(e, equals('[GestureDetector:child=[Text:$webViewSrc]]'));
+      expect(
+          explained,
+          equals(
+              '[CssBlock:child=[GestureDetector:child=[Text:$webViewSrc]]]'));
     });
 
     testWidgets('renders null value', (WidgetTester tester) async {
-      final e = await explain(
+      final explained = await explain(
           tester,
           HtmlWidget(
             html,
             key: helper.hwKey,
             webView: null,
           ));
-      expect(e, equals('[GestureDetector:child=[Text:$webViewSrc]]'));
+      expect(
+          explained,
+          equals(
+              '[CssBlock:child=[GestureDetector:child=[Text:$webViewSrc]]]'));
     });
 
     group('unsupportedWebViewWorkaroundForIssue37', () {
@@ -311,12 +320,12 @@ void main() {
             ));
         expect(
             explained,
-            equals('[WebView:'
+            equals('[CssBlock:child=[WebView:'
                 'url=$webViewSrc,'
                 'aspectRatio=$webViewDefaultAspectRatio,'
                 'getDimensions=true,'
                 'unsupportedWorkaroundForIssue37=true'
-                ']'));
+                ']]'));
       });
 
       testWidgets('renders false value', (WidgetTester tester) async {
@@ -330,11 +339,11 @@ void main() {
             ));
         expect(
             explained,
-            equals('[WebView:'
+            equals('[CssBlock:child=[WebView:'
                 'url=$webViewSrc,'
                 'aspectRatio=$webViewDefaultAspectRatio,'
                 'getDimensions=true'
-                ']'));
+                ']]'));
       });
 
       testWidgets('renders null value', (WidgetTester tester) async {
@@ -348,11 +357,11 @@ void main() {
             ));
         expect(
             explained,
-            equals('[WebView:'
+            equals('[CssBlock:child=[WebView:'
                 'url=$webViewSrc,'
                 'aspectRatio=$webViewDefaultAspectRatio,'
                 'getDimensions=true'
-                ']'));
+                ']]'));
       });
     });
 
@@ -368,11 +377,11 @@ void main() {
             ));
         expect(
             explained,
-            equals('[WebView:'
+            equals('[CssBlock:child=[WebView:'
                 'url=$webViewSrc,'
                 'aspectRatio=$webViewDefaultAspectRatio,'
                 'getDimensions=true'
-                ']'));
+                ']]'));
       });
 
       testWidgets('renders false value', (WidgetTester tester) async {
@@ -386,11 +395,11 @@ void main() {
             ));
         expect(
             explained,
-            equals('[WebView:'
+            equals('[CssBlock:child=[WebView:'
                 'url=$webViewSrc,'
                 'aspectRatio=$webViewDefaultAspectRatio,'
                 'js=false'
-                ']'));
+                ']]'));
       });
 
       testWidgets('renders null value', (WidgetTester tester) async {
@@ -404,11 +413,11 @@ void main() {
             ));
         expect(
             explained,
-            equals('[WebView:'
+            equals('[CssBlock:child=[WebView:'
                 'url=$webViewSrc,'
                 'aspectRatio=$webViewDefaultAspectRatio,'
                 'js=false'
-                ']'));
+                ']]'));
       });
     });
   });

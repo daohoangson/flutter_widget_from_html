@@ -38,12 +38,11 @@ void main() {
       expect(
           explained,
           equals('[Tooltip:'
+              'message=Bar,'
               'child=[Image:'
               'image=CachedNetworkImageProvider("http://domain.com/image.png", scale: 1.0),'
               'semanticLabel=Bar'
-              '],'
-              'message=Bar'
-              ']'));
+              ']]'));
     });
 
     testWidgets('renders src+alt+title', (WidgetTester tester) async {
@@ -52,12 +51,11 @@ void main() {
       expect(
           e,
           equals('[Tooltip:'
+              'message=Bar,'
               'child=[Image:'
               'image=CachedNetworkImageProvider("http://domain.com/image.png", scale: 1.0),'
               'semanticLabel=Foo'
-              '],'
-              'message=Bar'
-              ']'));
+              ']]'));
     });
   });
 

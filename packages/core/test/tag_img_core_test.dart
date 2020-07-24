@@ -47,9 +47,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Image:image=NetworkImage("$src", scale: 1.0),'
-              'height=600.0,'
-              'width=800.0'
+          equals('[CssSizing:height=600.0,width=800.0,child='
+              '[Image:image=NetworkImage("$src", scale: 1.0)]'
               ']'));
     });
 
