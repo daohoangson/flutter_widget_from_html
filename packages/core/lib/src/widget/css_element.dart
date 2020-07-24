@@ -14,7 +14,8 @@ class _RenderCssBlock extends RenderProxyBox {
   void performLayout() {
     final c = constraints;
     final cc = c.copyWith(
-      minHeight: c.maxHeight.isFinite ? c.maxHeight : null,
+      // TODO: add support for `writing-mode`, assuming `horizontal-tb` for now
+      // minHeight: c.maxHeight.isFinite ? c.maxHeight : null,
       minWidth: c.maxWidth.isFinite ? c.maxWidth : null,
     );
 
