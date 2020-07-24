@@ -1004,7 +1004,7 @@ class WidgetFactory {
   }
 
   static Iterable<Widget> _cssBlock(BuildContext _, Iterable<Widget> ws, __) =>
-      ws.map((w) => w is CssBlock ? w : CssBlock(child: w));
+      ws?.map((w) => w is CssBlock ? w : CssBlock(child: w));
 
   BuildOp styleLineHeight(String v) => _styleLineHeight(this, v);
 
