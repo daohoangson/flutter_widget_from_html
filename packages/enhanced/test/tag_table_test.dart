@@ -412,15 +412,49 @@ void main() {
     });
   });
 
-  testWidgets('renders UL inside', (WidgetTester tester) async {
-    final html = '<table><tr><td><ul><li>Foo</li></ul></td></tr></table>';
-    final explained = await explain(tester, html);
-    final expectedList = '[CssBlock:child=[Padding:(0,0,0,25),child='
-        '[CssBlock:child=[Stack:children='
-        '[RichText:(:Foo)],'
-        '[Positioned:(0.0,null,null,-45.0),child=[SizedBox:40.0x0.0,child=[RichText:align=right,(:•)]]]'
-        ']]]]';
-    expect(explained,
-        equals('[LayoutGrid:children=[0,0:${_padding(expectedList)}]]'));
+  group('tricky', () {
+    testWidgets('renders UL inside', (WidgetTester tester) async {
+      final html = '<table><tr><td><ul><li>Foo</li></ul></td></tr></table>';
+      final explained = await explain(tester, html);
+      final expectedList = '[CssBlock:child=[Padding:(0,0,0,25),child='
+          '[CssBlock:child=[Stack:children='
+          '[RichText:(:Foo)],'
+          '[Positioned:(0.0,null,null,-45.0),child=[SizedBox:40.0x0.0,child=[RichText:align=right,(:•)]]]'
+          ']]]]';
+      expect(explained,
+          equals('[LayoutGrid:children=[0,0:${_padding(expectedList)}]]'));
+    });
+
+    testWidgets('TBODY height', (WidgetTester tester) async {
+      final html = '<table><tbody style="height: 10px">'
+          '<tr><td>Foo</td></tr>'
+          '</tbody></table>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[LayoutGrid:children='
+              '[0,0:[SizedBox.expand:child=[CssBlock:child=[CssSizing:height=10.0,child=[CssBlock:child=[Padding:(1,1,1,1),child=[RichText:(:Foo)]]]]]]]'
+              ']'));
+    });
+
+    testWidgets('TR height', (WidgetTester tester) async {
+      final html = '<table><tr style="height: 10px"><td>Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[LayoutGrid:children='
+              '[0,0:[SizedBox.expand:child=[CssBlock:child=[CssSizing:height=10.0,child=[CssBlock:child=[Padding:(1,1,1,1),child=[RichText:(:Foo)]]]]]]]'
+              ']'));
+    });
+
+    testWidgets('TD height', (WidgetTester tester) async {
+      final html = '<table><tr><td style="height: 10px">Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[LayoutGrid:children='
+              '[0,0:[SizedBox.expand:child=[CssBlock:child=[CssSizing:height=10.0,child=[Padding:(1,1,1,1),child=[RichText:(:Foo)]]]]]]'
+              ']'));
+    });
   });
 }

@@ -46,13 +46,7 @@ class _StyleSizing {
           final input = _parse(meta);
           if (input == null) return widgets;
 
-          return [
-            WidgetPlaceholder(
-              builder: _build,
-              children: widgets,
-              input: input,
-            )
-          ];
+          return [wf.buildColumn(widgets).wrapWith(_build, input)];
         },
         priority: 50000,
       );
