@@ -63,28 +63,21 @@ class _StyleSizing {
     if (child == null) return null;
 
     final tsb = input.meta.tsb;
-    final height = input.height?.getValue(context, tsb);
-    final maxHeight = input.maxHeight?.getValue(context, tsb);
-    final maxWidth = input.maxWidth?.getValue(context, tsb);
-    final minHeight = input.minHeight?.getValue(context, tsb);
-    final minWidth = input.minWidth?.getValue(context, tsb);
-    final width = input.width?.getValue(context, tsb);
-    final constraints = BoxConstraints(
-      maxHeight: (height != null && maxHeight != null)
-          ? min(height, maxHeight)
-          : height ?? maxHeight ?? double.infinity,
-      maxWidth: (width != null && maxWidth != null)
-          ? min(width, maxWidth)
-          : width ?? maxWidth ?? double.infinity,
-      minHeight: (height != null && minHeight != null)
-          ? max(height, minHeight)
-          : height ?? minHeight ?? 0,
-      minWidth: (width != null && minWidth != null)
-          ? max(width, minWidth)
-          : width ?? minWidth ?? 0,
-    );
-
-    return [CssSizing(child: child, constraints: constraints)];
+    return [
+      CssSizing(
+        child: child,
+        constraints: BoxConstraints(
+          maxHeight: input.maxHeight?.getValue(context, tsb) ?? double.infinity,
+          maxWidth: input.maxWidth?.getValue(context, tsb) ?? double.infinity,
+          minHeight: input.minHeight?.getValue(context, tsb) ?? 0,
+          minWidth: input.minWidth?.getValue(context, tsb) ?? 0,
+        ),
+        size: Size(
+          input.width?.getValue(context, tsb) ?? double.infinity,
+          input.height?.getValue(context, tsb) ?? double.infinity,
+        ),
+      )
+    ];
   }
 
   _StyleSizingInput _parse(NodeMetadata meta) {
