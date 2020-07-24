@@ -15,20 +15,7 @@ Iterable<Widget> _marginHorizontalBuilder(
     right: margin.right(direction)?.getValue(context, tsb) ?? 0.0,
   );
 
-  return children.map((child) {
-    if (child is _MarginHorizontal) {
-      final existing = child.padding as EdgeInsets;
-      return _MarginHorizontal(
-        child.child,
-        existing.copyWith(
-          left: existing.left + padding.left,
-          right: existing.right + padding.right,
-        ),
-      );
-    }
-
-    return _MarginHorizontal(child, padding);
-  }).toList();
+  return children.map((child) => _MarginHorizontal(child, padding));
 }
 
 class _MarginHorizontal extends Padding {
