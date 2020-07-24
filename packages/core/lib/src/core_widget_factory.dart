@@ -586,15 +586,6 @@ class WidgetFactory {
         }
         break;
 
-      case _kCssHeight:
-      case _kCssMaxHeight:
-      case _kCssMaxWidth:
-      case _kCssMinHeight:
-      case _kCssMinWidth:
-      case _kCssWidth:
-        meta.op = styleSizing();
-        break;
-
       case _kCssLineHeight:
         final lineHeight = parseCssLineHeight(value);
         if (lineHeight != null) meta.op = styleLineHeight(lineHeight);
