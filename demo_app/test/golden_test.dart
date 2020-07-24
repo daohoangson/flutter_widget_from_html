@@ -41,14 +41,20 @@ class _TestApp extends StatelessWidget {
       Divider(),
       Padding(
         padding: const EdgeInsets.all(10),
-        child: core.HtmlWidget(html),
+        child: LimitedBox(
+          child: core.HtmlWidget(html),
+          maxHeight: 400,
+        ),
       ),
     ];
 
     if (withEnhanced) {
       children.addAll(<Widget>[
         Divider(),
-        enhanced.HtmlWidget(html),
+        LimitedBox(
+          child: enhanced.HtmlWidget(html),
+          maxHeight: 400,
+        ),
       ]);
     }
 
@@ -198,15 +204,6 @@ void main() {
 <span style="font-weight: 800">eight</span>
 <span style="font-weight: 900">nine</span>
 ''',
-    'inline/sizing/complicated_box': '''
-<div style="background-color: red; color: white; padding: 20px;">
-  <div style="background-color: green;">
-    <div style="background-color: blue; height: 100px; margin: 15px; padding: 5px; width: 100px;">
-      Foo
-    </div>
-  </div>
-</div>
-''',
     'inline/line-height': '''
 <p>Normal</p>
 <p style="line-height: 1.5">Line height x1.5</p>
@@ -295,6 +292,53 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         '----<div style="padding-top: 3px">Foo</div>----',
     'inline/padding/padding-left':
         '----<div style="padding-left: 3px">Foo</div>----',
+    'inline/sizing/height':
+        '<div style="background-color: red; height: 100px">Foo</div>',
+    'inline/sizing/height/huge':
+        '<div style="background-color: red; height: 10000px">Foo</div>',
+    'inline/sizing/height_and_width':
+        '<div style="background-color: red; height: 100px; width: 100px">Foo</div>',
+    'inline/sizing/height_and_width/max-height':
+        '<div style="background-color: red; max-height: 50px; height: 100px; width: 100px">Foo</div>',
+    'inline/sizing/height_and_width/max-width':
+        '<div style="background-color: red; max-width: 50px; height: 100px; width: 100px">Foo</div>',
+    'inline/sizing/height_and_width/min-height':
+        '<div style="background-color: red; min-height: 200px; height: 100px; width: 100px">Foo</div>',
+    'inline/sizing/height_and_width/min-width':
+        '<div style="background-color: red; min-width: 200px; height: 100px; width: 100px">Foo</div>',
+    'inline/sizing/height_and_width/huge_height':
+        '<div style="background-color: red; height: 10000px; width: 1000px">Foo</div>',
+    'inline/sizing/height_and_width/huge_width':
+        '<div style="background-color: red; height: 1000px; width: 10000px">Foo</div>',
+    'inline/sizing/max-height':
+        '<div style="background-color: red; max-height: 10px">Foo</div>',
+    'inline/sizing/max-width':
+        '<div style="background-color: red; max-width: 10px">Foo</div>',
+    'inline/sizing/max-height_and_max-width':
+        '<div style="background-color: red; max-height: 10px; max-width: 10px">Foo</div>',
+    'inline/sizing/min-height':
+        '<div style="background-color: red; min-height: 200px">Foo</div>',
+    'inline/sizing/min-height/huge':
+        '<div style="background-color: red; min-height: 10000px">Foo</div>',
+    'inline/sizing/min-width':
+        '<div style="background-color: red; min-width: 200px">Foo</div>',
+    'inline/sizing/min-width/huge':
+        '<div style="background-color: red; min-width: 10000px">Foo</div>',
+    'inline/sizing/min-height_and_min-width':
+        '<div style="background-color: red; min-height: 200px; min-width: 200px">Foo</div>',
+    'inline/sizing/width':
+        '<div style="background-color: red; width: 100px">Foo</div>',
+    'inline/sizing/width/huge':
+        '<div style="background-color: red; width: 10000px">Foo</div>',
+    'inline/sizing/complicated_box': '''
+<div style="background-color: red; color: white; padding: 20px;">
+  <div style="background-color: green;">
+    <div style="background-color: blue; height: 100px; margin: 15px; padding: 5px; width: 100px;">
+      Foo
+    </div>
+  </div>
+</div>
+''',
     'CENTER': '<center>Foo</center>',
     'inline/text-align/center': '<div style="text-align: center">$lipsum</div>',
     'inline/text-align/justify':
