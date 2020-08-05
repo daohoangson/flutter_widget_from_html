@@ -1,3 +1,9 @@
+## 0.4.3
+
+* Implement proper inline support for `margin` and `padding` (#237)
+* Rollback support for sizing
+* Make NodeMetadata.(op|styles) ignore `null`
+
 ## 0.4.2
 
 * Add support for latest Flutter dev channel (#227)

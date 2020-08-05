@@ -1,3 +1,9 @@
+## 0.4.3
+
+* Implement proper inline support for `margin` and `padding` (#237)
+* Rollback support for sizing
+* Make NodeMetadata.(op|styles) ignore `null`
+
 ## 0.4.2
 
 * Add support for inline style sizing (#206): `width`, `height`, `max-width`, `max-height`, `min-width` and `min-height`
