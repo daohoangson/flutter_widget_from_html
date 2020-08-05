@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'compare.dart';
 import 'custom_styles_builder.dart';
+import 'custom_widget_builder.dart';
 import 'hello_world.dart';
 import 'hello_world_core.dart';
 import 'iframe.dart';
@@ -186,6 +187,7 @@ C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."
     'Hello World (core)': () => HelloWorldCoreScreen(),
     'Hello World': () => HelloWorldScreen(),
     'customStylesBuilder': () => CustomStylesBuilderScreen(),
+    'customWidgetBuilder': () => CustomWidgetBuilderScreen(),
     'Smilie': () => SmilieScreen(),
   };
 

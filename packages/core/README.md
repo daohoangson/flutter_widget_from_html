@@ -158,10 +158,62 @@ class CustomStylesBuilderScreen extends StatelessWidget {
 </tr>
 </table>
 
+For fairly simple widget, use `customWidgetBuilder`. You will need to handle the DOM element and its children manually. The next example renders a carousel:
+
+```dart
+const kHtml = '''
+<p>...</p>
+<div class="carousel">
+  <div class="image">
+    <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba" />
+  </div>
+  ...
+</div>
+<p>...</p>
+''';
+
+class CustomWidgetBuilderScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: Text('CustomStylesBuilderScreen'),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(
+            kHtml,
+            customWidgetBuilder: (e) {
+              if (!e.classes.contains('carousel')) return null;
+
+              final srcs = <String>[];
+              for (final child in e.children) {
+                for (final grandChild in child.children) {
+                  srcs.add(grandChild.attributes['src']);
+                }
+              }
+
+              return CarouselSlider(
+                options: CarouselOptions(),
+                items: srcs.map(_toItem).toList(growable: false),
+              );
+            },
+          ),
+        ),
+      );
+
+  static Widget _toItem(String src) => Container(
+        child: Center(
+          child: Image.network(src, fit: BoxFit.cover, width: 1000),
+        ),
+      );
+}
+```
+
+<img src="../../demo_app/screenshots/CustomWidgetBuilderScreen.gif?raw=true" width="300" />
+
 ### Custom `WidgetFactory`
 
 The HTML string is parsed into DOM elements and each element is visited once to populate a `NodeMetadata` and collect `BuiltPiece`s. See step by step how it works:
-
 
 | Step | | Integration point |
 | --- | --- | --- |
