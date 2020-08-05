@@ -438,10 +438,17 @@ class WidgetFactory {
   void customStyleBuilder(NodeMetadata meta, dom.Element element) {
     if (widget.customStylesBuilder == null) return;
 
-    final styles = widget.customStylesBuilder(element);
-    if (styles == null) return;
+    final map = widget.customStylesBuilder(element);
+    if (map == null) return;
 
-    meta.styles = styles;
+    final list = List<String>(map.length * 2);
+    var i = 0;
+    for (final element in map.entries) {
+      list[i++] = element.key;
+      list[i++] = element.value;
+    }
+
+    meta.styles = list;
   }
 
   void customWidgetBuilder(NodeMetadata meta, dom.Element element) {

@@ -41,7 +41,7 @@ class _State extends State<IframeTwitterScreen> {
               html,
               key: ValueKey(useApi),
               customStylesBuilder: (e) =>
-                  (e.localName == 'blockquote') ? ['margin', '0'] : null,
+                  (e.localName == 'blockquote') ? {'margin': '0'} : null,
               customWidgetBuilder: (e) {
                 if (e.localName == 'blockquote' &&
                     e.attributes['class'] == 'twitter-tweet') {

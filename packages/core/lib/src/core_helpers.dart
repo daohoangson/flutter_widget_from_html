@@ -9,7 +9,7 @@ const kShouldBuildAsync = 10000;
 /// A no op placeholder widget.
 const widget0 = SizedBox.shrink();
 
-typedef CustomStylesBuilder = Iterable<String> Function(dom.Element element);
+typedef CustomStylesBuilder = Map<String, String> Function(dom.Element element);
 
 typedef CustomWidgetBuilder = Widget Function(dom.Element element);
 

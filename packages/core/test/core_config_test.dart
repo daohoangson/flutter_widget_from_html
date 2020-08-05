@@ -170,8 +170,7 @@ void main() {
   });
 
   group('customStylesBuilder', () {
-    final CustomStylesBuilder customStylesBuilder =
-        (_) => ['font-style', 'italic'];
+    final customStylesBuilder = (_) => {'font-style': 'italic'};
     final html = '<span>Foo</span>';
 
     testWidgets('renders without value', (WidgetTester tester) async {
