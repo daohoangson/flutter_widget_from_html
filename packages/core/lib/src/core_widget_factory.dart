@@ -438,10 +438,17 @@ class WidgetFactory {
   void customStyleBuilder(NodeMetadata meta, dom.Element element) {
     if (widget.customStylesBuilder == null) return;
 
-    final styles = widget.customStylesBuilder(element);
-    if (styles == null) return;
+    final map = widget.customStylesBuilder(element);
+    if (map == null) return;
 
-    meta.styles = styles;
+    final list = List<String>(map.length * 2);
+    var i = 0;
+    for (final pair in map.entries) {
+      list[i++] = pair.key;
+      list[i++] = pair.value;
+    }
+
+    meta.styles = list;
   }
 
   void customWidgetBuilder(NodeMetadata meta, dom.Element element) {
@@ -1072,7 +1079,7 @@ class WidgetFactory {
 
   BuildOp tagHr() {
     _tagHr ??= BuildOp(
-      defaultStyles: (_, __) => const ['margin-bottom', '1em'],
+      defaultStyles: (_, __) => const {'margin-bottom': '1em'},
       onWidgets: (_, __) => [buildDivider()],
     );
     return _tagHr;

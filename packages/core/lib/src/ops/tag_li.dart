@@ -36,11 +36,9 @@ class _TagLi {
       defaultStyles: (meta, e) {
         final p = meta.parents?.where((op) => op == _buildOp)?.length ?? 0;
 
-        final styles = [
-          'padding-inline-start',
-          '2.5em',
-          _kCssListStyleType,
-          e.localName == _kTagOrderedList
+        final styles = {
+          'padding-inline-start': '2.5em',
+          _kCssListStyleType: e.localName == _kTagOrderedList
               ? (e.attributes.containsKey(_kAttributeLiType)
                       ? _LiInput.listStyleTypeFromAttributeType(
                           e.attributes[_kAttributeLiType])
@@ -51,9 +49,9 @@ class _TagLi {
                   : p == 1
                       ? _kCssListStyleTypeCircle
                       : _kCssListStyleTypeSquare,
-        ];
+        };
 
-        if (p == 0) styles.addAll([_kCssMargin, '1em 0']);
+        if (p == 0) styles[_kCssMargin] = '1em 0';
 
         return styles;
       },

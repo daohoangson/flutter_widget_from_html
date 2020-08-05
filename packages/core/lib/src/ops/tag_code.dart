@@ -13,7 +13,7 @@ class _TagCode {
 
   BuildOp get buildOp => BuildOp(
       defaultStyles: (_, __) =>
-          const [_kCssFontFamily, '$_kTagCodeFont1, $_kTagCodeFont2'],
+          const {_kCssFontFamily: '$_kTagCodeFont1, $_kTagCodeFont2'},
       onPieces: (meta, pieces) => meta.domElement.localName == _kTagPre
           ? [_resetText(pieces.first, meta)]
           : pieces,

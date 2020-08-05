@@ -33,7 +33,7 @@ class BuildOp {
 
   bool get hasOnChild => _onChild != null;
 
-  List<String> defaultStyles(NodeMetadata meta, dom.Element e) =>
+  Map<String, String> defaultStyles(NodeMetadata meta, dom.Element e) =>
       _defaultStyles != null ? _defaultStyles(meta, e) : null;
 
   void onChild(NodeMetadata meta, dom.Element e) =>
@@ -53,7 +53,7 @@ class BuildOp {
       widgets;
 }
 
-typedef _BuildOpDefaultStyles = Iterable<String> Function(
+typedef _BuildOpDefaultStyles = Map<String, String> Function(
     NodeMetadata meta, dom.Element e);
 typedef _BuildOpOnChild = void Function(NodeMetadata meta, dom.Element e);
 typedef _BuildOpOnPieces = Iterable<BuiltPiece> Function(

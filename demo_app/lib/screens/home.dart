@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'compare.dart';
+import 'custom_styles_builder.dart';
+import 'custom_widget_builder.dart';
 import 'hello_world.dart';
 import 'hello_world_core.dart';
 import 'iframe.dart';
@@ -11,8 +13,6 @@ import 'video.dart';
 
 class HomeScreen extends StatelessWidget {
   final _htmls = {
-    'Hello World (core)': () => HelloWorldCoreScreen(),
-    'Hello World': () => HelloWorldScreen(),
     'Alignments': """<div style="text-align: left">Left</div>
 <div style="text-align: center">Center</div>
 <div style="text-align: right">Right</div>
@@ -91,7 +91,6 @@ CODE tag:
     <path d="M79.5 170.7 120.9 156.4 107.4 142.8" fill="url(#triangleGradient)" />
 </svg>
 ''',
-    'Smilie': () => SmilieScreen(),
     'Styling': """
 <p><abbr>ABBR</abbr>, <acronym>ACRONYM</acronym> or <span style="border-bottom: 1px dotted">inline style</span></p>
 <p><b>B</b>, <strong>STRONG</strong> or <span style="font-weight: bold">inline style</span></p>
@@ -185,6 +184,11 @@ C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."
 </table>
 ''',
     'Video': () => VideoScreen(),
+    'Hello World (core)': () => HelloWorldCoreScreen(),
+    'Hello World': () => HelloWorldScreen(),
+    'customStylesBuilder': () => CustomStylesBuilderScreen(),
+    'customWidgetBuilder': () => CustomWidgetBuilderScreen(),
+    'Smilie': () => SmilieScreen(),
   };
 
   @override

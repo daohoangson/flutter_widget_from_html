@@ -72,12 +72,18 @@ class HtmlBuilder {
     // stylings, step 1: get default styles from tag-based build ops
     if (meta.hasOps) {
       for (final op in meta.ops) {
-        final defaultStyles = op.defaultStyles(meta, e);
-        if (defaultStyles != null) {
-          assert(defaultStyles.length % 2 == 0);
-          meta._styles ??= [];
-          meta._styles.insertAll(0, defaultStyles);
+        final map = op.defaultStyles(meta, e);
+        if (map == null) continue;
+
+        final list = List<String>(map.length * 2);
+        var i = 0;
+        for (final pair in map.entries) {
+          list[i++] = pair.key;
+          list[i++] = pair.value;
         }
+
+        meta._styles ??= [];
+        meta._styles.insertAll(0, list);
       }
     }
 
