@@ -443,9 +443,9 @@ class WidgetFactory {
 
     final list = List<String>(map.length * 2);
     var i = 0;
-    for (final element in map.entries) {
-      list[i++] = element.key;
-      list[i++] = element.value;
+    for (final pair in map.entries) {
+      list[i++] = pair.key;
+      list[i++] = pair.value;
     }
 
     meta.styles = list;
@@ -1079,7 +1079,7 @@ class WidgetFactory {
 
   BuildOp tagHr() {
     _tagHr ??= BuildOp(
-      defaultStyles: (_, __) => const ['margin-bottom', '1em'],
+      defaultStyles: (_, __) => const {'margin-bottom': '1em'},
       onWidgets: (_, __) => [buildDivider()],
     );
     return _tagHr;

@@ -51,8 +51,8 @@ void main() {
 class _GetInlineStylesTest extends WidgetFactory {
   @override
   void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
-    meta.op = BuildOp(defaultStyles: (_, __) => ['color', '#f00']);
-    meta.op = BuildOp(defaultStyles: (_, __) => ['color', '#0f0']);
+    meta.op = BuildOp(defaultStyles: (_, __) => {'color': '#f00'});
+    meta.op = BuildOp(defaultStyles: (_, __) => {'color': '#0f0'});
 
     return super.parseTag(meta, tag, attrs);
   }
