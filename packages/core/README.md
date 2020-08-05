@@ -6,7 +6,7 @@
 
 A Flutter package for building Flutter widget tree from HTML (supports most popular tags and stylings).
 
-This `core` package implements html parsing and widget building logic so it's easy to extend and fit your app's use case. It tries to render an optimal tree: use `RichText` with specific `TextStyle`, merge spans together, show images in `AspectRatio`, etc.
+This `core` package implements html parsing and widget building logic so it's easy to extend and fit your app's use case. It tries to render an optimal tree: use `RichText` with specific `TextStyle`, merge text spans together, show images in sized box, etc.
 
 If this is your first time here, consider using the [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) package as a quick starting point.
 
@@ -219,9 +219,9 @@ The HTML string is parsed into DOM elements and each element is visited once to 
 | --- | --- | --- |
 | 1 | Parse the tag and attributes map | `WidgetFactory.parseTag(NodeMetadata, String, Map)` |
 | 2 | Inform parents if any | `BuildOp.onChild(NodeMetadata, Element)` |
-| 3 | Populate default inline style key+value pairs | `BuildOp.defaultStyles(NodeMetadata, Element)` |
-| 4 | `HtmlWidget.customStyleBuilder` / `HtmlWidget.customWidgetBuilder` will be called if configured | |
-| 5 | Parse inline style key+value pairs | `WidgetFactory.parseStyle(NodeMetadata, String, String)` |
+| 3 | Populate default inline styles | `BuildOp.defaultStyles(NodeMetadata, Element)` |
+| 4 | `customStyleBuilder` / `customWidgetBuilder` will be called if configured | |
+| 5 | Parse inline style key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(NodeMetadata, String, String)` |
 | 6 | Repeat with children elements to collect `BuiltPiece`s | |
 | 7 | Inform build ops | `BuildOp.onPieces(NodeMetadata, Iterable<BuiltPiece>)` |
 | 8 | a. If not a block element, go to 10 | |
