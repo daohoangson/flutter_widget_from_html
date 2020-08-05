@@ -111,15 +111,92 @@ However, these tags and their contents will be ignored:
 
 ## Extensibility
 
-As previously mentioned, this package focuses on the core parsing-building routine with lots of tests to make sure it works correctly. If the [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) package does not suite your need or you don't like any of the dependencies included in that package, it's time to extend `flutter_widget_from_html_core`.
+There are two ways to change the built widget tree.
 
-Here is how it works:
+1. Use callbacks like `customStylesBuilder` or `customWidgetBuilder` for small changes
+2. Use a custom `WidgetFactory` for complete control of the rendering process
 
-1. `HtmlWidget` parses input html into dom nodes
-2. `HtmlBuilder` loops through each node, looking for `NodeMetadata` (text size, styling, hyperlink or image source, etc.)
-3. Use the metadata to build widget via `WidgetFactory`
+### Callbacks
 
-If you want to, you can change the way metadata is collected (in step 2) and build widget however you like (in step 3) by extending the `WidgetFactory` and give it to `HtmlWidget`. The example below replace smilie inline image with an emoji:
+For cosmetic changes like color, italic, etc., use `customStylesBuilder` to specify inline styles (see supported list above) for each DOM element. Some common conditionals:
+
+- If HTML tag is H1 `e.localName == 'h1'`
+- If the element has `foo` CSS class `e.classes.contains('foo')`
+- If an attribute has a specific value `e.attributes['x'] == 'y'`
+
+This example changes the color for a CSS class:
+
+<table><tr><td>
+
+```dart
+const kHtml = 'Hello <span class="name">World</span>!';
+
+class CustomStylesBuilderScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: Text('CustomStylesBuilderScreen'),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(8),
+          child: HtmlWidget(
+            kHtml,
+            customStylesBuilder: (e) =>
+                e.classes.contains('name')
+                  ? {'color': 'red'}
+                  : null,
+          ),
+        ),
+      );
+}
+```
+
+</td>
+<td>
+  <img src="../../demo_app/screenshots/CustomStylesBuilderScreen.png?raw=true" width="200" />
+</td>
+</tr>
+</table>
+
+### Custom `WidgetFactory`
+
+The HTML string is parsed into DOM elements and each element is visited once to populate a `NodeMetadata` and collect `BuiltPiece`s. See step by step how it works:
+
+
+| Step | | Integration point |
+| --- | --- | --- |
+| 1 | Parse the tag and attributes map | `WidgetFactory.parseTag(NodeMetadata, String, Map)` |
+| 2 | Inform parents if any | `BuildOp.onChild(NodeMetadata, Element)` |
+| 3 | Populate default inline style key+value pairs | `BuildOp.defaultStyles(NodeMetadata, Element)` |
+| 4 | `HtmlWidget.customStyleBuilder` / `HtmlWidget.customWidgetBuilder` will be called if configured | |
+| 5 | Parse inline style key+value pairs | `WidgetFactory.parseStyle(NodeMetadata, String, String)` |
+| 6 | Repeat with children elements to collect `BuiltPiece`s | |
+| 7 | Inform build ops | `BuildOp.onPieces(NodeMetadata, Iterable<BuiltPiece>)` |
+| 8 | a. If not a block element, go to 10 | |
+|   | b. Build widgets from pieces | |
+| 9 | Inform build ops | `BuildOp.onWidgets(NodeMetadata, Iterable<Widget>)` |
+| 10 | The end | |
+
+Notes:
+
+- Most of the `TextStyle` properties are available as `NodeMetadata` properties so those should be fast
+- Other complicated styling are supported via `BuildOp`
+
+```dart
+meta.op = BuildOp();
+```
+
+- Each metadata can has multiple build ops. And they are also affected by parent ops (see step 2).
+- There are two types of `BuiltPiece`:
+  - `BuiltPiece.text()` contains a `TextBits`
+  - `BuiltPiece.widgets()` contains widgets
+- `TextBits` is a list of `TextBit`, there are four subclasses of `TextBit`:
+  - `TextBits` is actually a `TextBit`, that means a `TextBits` can contains multiple sub-`TextBits`
+  - `TextData` is a string of text
+  - `TextWhitespace` is a whitespace
+  - `TextWidget` is an inline widget
+
+The example below replaces smilie inline image with an emoji:
 
 ```dart
 const kHtml = """
@@ -130,6 +207,22 @@ const kHtml = """
 const kSmilies = {':)': '🙂'};
 
 class SmilieScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: Text('SmilieScreen'),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(
+            kHtml,
+            factoryBuilder: () => _SmiliesWidgetFactory(),
+          ),
+        ),
+      );
+}
+
+class _SmiliesWidgetFactory extends WidgetFactory {
   final smilieOp = BuildOp(
     onPieces: (meta, pieces) {
       final alt = meta.domElement.attributes['alt'];
@@ -139,18 +232,18 @@ class SmilieScreen extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text('SmilieScreen'),
-        ),
-        body: HtmlWidget(
-          kHtml,
-          builderCallback: (meta, e) => e.classes.contains('smilie')
-              ? lazySet(null, buildOp: smilieOp)
-              : meta,
-        ),
-      );
+  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
+    if (tag == 'img' &&
+        attrs.containsKey('alt') &&
+        attrs.containsKey('class') &&
+        attrs['class'].contains('smilie')) {
+      meta.op = smilieOp;
+      return;
+    }
+
+    return super.parseTag(meta, tag, attrs);
+  }
 }
 ```
 
-![](../../demo_app/screenshots/SmilieScreen.png?raw=true)
+<img src="../../demo_app/screenshots/SmilieScreen.png?raw=true" width="300" />
