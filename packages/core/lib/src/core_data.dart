@@ -10,7 +10,7 @@ part 'data/text_bits.dart';
 class BuildOp {
   final bool isBlockElement;
 
-  /// Build op with lower priority will run first
+  // op with lower priority will run first
   final int priority;
 
   final _BuildOpDefaultStyles _defaultStyles;
@@ -201,8 +201,8 @@ class TextStyleHtml {
   final TextAlign align;
   final double height;
   final int maxLines;
-  final TextOverflow textOverflow;
   final TextStyle style;
+  final TextOverflow textOverflow;
 
   TextStyleHtml._({
     this.align,
@@ -289,9 +289,7 @@ class TextStyleBuilder<T1> {
 
   void _resetContextIfNeeded(BuildContext context) {
     final contextStyle = DefaultTextStyle.of(context).style;
-    if (context == _context && contextStyle == _default.style) {
-      return;
-    }
+    if (context == _context && contextStyle == _default.style) return;
 
     _context = context;
     _default = TextStyleHtml.style(contextStyle);

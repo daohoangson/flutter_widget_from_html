@@ -104,8 +104,8 @@ _VerticalAlignInput _buildInput(String verticalAlign, TextStyleBuilder tsb) {
 @immutable
 class _VerticalAlignInput {
   final PlaceholderAlignment alignment;
-  final TextStyleBuilder tsb;
   final EdgeInsets padding;
+  final TextStyleBuilder tsb;
 
   _VerticalAlignInput(this.alignment, {this.padding, this.tsb})
       : assert((padding == null) == (tsb == null));

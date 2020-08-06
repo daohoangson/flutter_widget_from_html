@@ -127,10 +127,10 @@ class HtmlBuilder {
       final isBlockElement = meta?.isBlockElement == true;
       final __builder = HtmlBuilder(
         domNodes: domNode.nodes,
-        parentTsb: meta?._tsb ?? parentTsb,
         parentMeta: meta,
         parentParentOps: parentOps,
         parentText: isBlockElement ? null : _textPiece.text,
+        parentTsb: meta?._tsb ?? parentTsb,
         wf: wf,
       );
 
