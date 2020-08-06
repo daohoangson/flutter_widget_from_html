@@ -543,7 +543,7 @@ class WidgetFactory {
         break;
 
       case _kCssTextDecoration:
-        final textDeco = _TextStyle._textDecoTryParse(value);
+        final textDeco = _TextDeco.tryParse(value);
         if (textDeco != null) meta.tsb(_TextStyle.textDeco, textDeco);
         break;
 

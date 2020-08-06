@@ -207,27 +207,6 @@ class _TextStyle {
 
     return null;
   }
-
-  static _TextDeco _textDecoTryParse(String value) {
-    for (final v in _splitCss(value)) {
-      switch (v) {
-        case _kCssTextDecorationLineThrough:
-          return _TextDeco(strike: true);
-        case _kCssTextDecorationNone:
-          return _TextDeco(
-            over: false,
-            strike: false,
-            under: false,
-          );
-        case _kCssTextDecorationOverline:
-          return _TextDeco(over: true);
-        case _kCssTextDecorationUnderline:
-          return _TextDeco(under: true);
-      }
-    }
-
-    return null;
-  }
 }
 
 @immutable
@@ -247,4 +226,25 @@ class _TextDeco {
     this.thickness,
     this.under,
   });
+
+  factory _TextDeco.tryParse(String value) {
+    for (final v in _splitCss(value)) {
+      switch (v) {
+        case _kCssTextDecorationLineThrough:
+          return _TextDeco(strike: true);
+        case _kCssTextDecorationNone:
+          return _TextDeco(
+            over: false,
+            strike: false,
+            under: false,
+          );
+        case _kCssTextDecorationOverline:
+          return _TextDeco(over: true);
+        case _kCssTextDecorationUnderline:
+          return _TextDeco(under: true);
+      }
+    }
+
+    return null;
+  }
 }
