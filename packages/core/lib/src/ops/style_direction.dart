@@ -5,7 +5,7 @@ const _kCssDirection = 'direction';
 const _kCssDirectionLtr = 'ltr';
 const _kCssDirectionRtl = 'rtl';
 
-BuildOp _styleDirection(WidgetFactory wf, final String dir) => BuildOp(
+BuildOp _styleDirection(WidgetFactory wf, String dir) => BuildOp(
       onWidgets: (_, ws) {
         final textDirection = (dir == _kCssDirectionRtl)
             ? TextDirection.rtl

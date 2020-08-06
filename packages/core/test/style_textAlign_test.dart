@@ -1,63 +1,64 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 
 import '_.dart';
 
 void main() {
   testWidgets('renders CENTER tag', (WidgetTester tester) async {
     final html = '<center>Foo</center>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[RichText,align=center:(:Foo)]'));
+    final e = await explain(tester, html);
+    expect(e, equals('[CssBlock:child=[RichText:align=center,(:Foo)]]'));
   });
 
   group('attribute', () {
     testWidgets('renders center text', (WidgetTester tester) async {
       final html = '<div align="center">_X_</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=center:(:_X_)]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[CssBlock:child=[RichText:align=center,(:_X_)]]'));
     });
 
     testWidgets('renders justify text', (WidgetTester tester) async {
       final html = '<p align="justify">X_X_X</p>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=justify:(:X_X_X)]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[CssBlock:child=[RichText:align=justify,(:X_X_X)]]'));
     });
 
     testWidgets('renders left text', (WidgetTester tester) async {
       final html = '<span align="left">X__</span>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=left:(:X__)]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[CssBlock:child=[RichText:align=left,(:X__)]]'));
     });
 
     testWidgets('renders right text', (WidgetTester tester) async {
       final html = '<span align="right">__<b>X</b></span>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=right:(:__(+b:X))]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[CssBlock:child=[RichText:align=right,(:__(+b:X))]]'));
     });
   });
 
   group('inline style', () {
     testWidgets('renders center text', (WidgetTester tester) async {
       final html = '<div style="text-align: center">_X_</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=center:(:_X_)]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[CssBlock:child=[RichText:align=center,(:_X_)]]'));
     });
 
     testWidgets('renders justify text', (WidgetTester tester) async {
       final html = '<div style="text-align: justify">X_X_X</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=justify:(:X_X_X)]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[CssBlock:child=[RichText:align=justify,(:X_X_X)]]'));
     });
 
     testWidgets('renders left text', (WidgetTester tester) async {
       final html = '<div style="text-align: left">X__</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=left:(:X__)]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[CssBlock:child=[RichText:align=left,(:X__)]]'));
     });
 
     testWidgets('renders right text', (WidgetTester tester) async {
       final html = '<div style="text-align: right">__<b>X</b></div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=right:(:__(+b:X))]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[CssBlock:child=[RichText:align=right,(:__(+b:X))]]'));
     });
   });
 
@@ -66,45 +67,46 @@ void main() {
 
     testWidgets('renders center block', (WidgetTester tester) async {
       final html = '<div style="text-align: center">$kBlockHtml</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=center:(:Foo)]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[CssBlock:child=[RichText:align=center,(:Foo)]]'));
     });
 
     testWidgets('renders left block', (WidgetTester tester) async {
       final html = '<div style="text-align: left">$kBlockHtml</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=left:(:Foo)]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[CssBlock:child=[RichText:align=left,(:Foo)]]'));
     });
 
     testWidgets('renders right block', (WidgetTester tester) async {
       final html = '<div style="text-align: right">$kBlockHtml</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText,align=right:(:Foo)]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[CssBlock:child=[RichText:align=right,(:Foo)]]'));
     });
   });
 
   group('image', () {
     final imgSrc = 'http://domain.com/image.png';
     final imgHtml = '<img src="$imgSrc" />';
-    final imgRendered = "[NetworkImage:url=$imgSrc]";
-    final imgExplain = (WidgetTester t, String html) => explain(t, html);
+    final img = '[Image:image=NetworkImage("$imgSrc", scale: 1.0)]';
+    final imgExplain = (WidgetTester t, String html) =>
+        mockNetworkImagesFor(() => explain(t, html));
 
     testWidgets('renders center image', (WidgetTester tester) async {
       final html = '<div style="text-align: center">$imgHtml</div>';
-      final explained = await imgExplain(tester, html);
-      expect(explained, equals('[RichText,align=center:$imgRendered]'));
+      final e = await imgExplain(tester, html);
+      expect(e, equals('[CssBlock:child=[RichText:align=center,$img]]'));
     });
 
     testWidgets('renders left image', (WidgetTester tester) async {
       final html = '<div style="text-align: left">$imgHtml</div>';
-      final explained = await imgExplain(tester, html);
-      expect(explained, equals('[RichText,align=left:$imgRendered]'));
+      final e = await imgExplain(tester, html);
+      expect(e, equals('[CssBlock:child=[RichText:align=left,$img]]'));
     });
 
     testWidgets('renders right image', (WidgetTester tester) async {
       final html = '<div style="text-align: right">$imgHtml</div>';
-      final explained = await imgExplain(tester, html);
-      expect(explained, equals('[RichText,align=right:$imgRendered]'));
+      final e = await imgExplain(tester, html);
+      expect(e, equals('[CssBlock:child=[RichText:align=right,$img]]'));
     });
 
     testWidgets('renders after image', (WidgetTester tester) async {
@@ -113,18 +115,19 @@ void main() {
       expect(
           explained,
           equals('[Column:children='
-              '$imgRendered,'
-              '[RichText,align=center:(:Foo)]'
+              '$img,'
+              '[CssBlock:child=[RichText:align=center,(:Foo)]]'
               ']'));
     });
   });
 
   testWidgets('renders styling from outside', (WidgetTester tester) async {
     // https://github.com/daohoangson/flutter_widget_from_html/issues/10
-    final html = '<em><span style="color: red;">' +
+    final html = '<em><span style="color: red;">'
         '<div style="text-align: right;">right</div></span></em>';
     final explained = await explain(tester, html);
-    expect(explained, equals('[RichText,align=right:(+i:right)]'));
+    expect(explained,
+        equals('[CssBlock:child=[RichText:align=right,(#FFFF0000+i:right)]]'));
   });
 
   testWidgets('renders margin inside', (WidgetTester tester) async {
@@ -134,8 +137,7 @@ void main() {
     expect(
         explained,
         equals('[SizedBox:0.0x5.0],'
-            '[Padding:(0,5,0,5),'
-            'child=[RichText,align=center:(:Foo)]],'
+            '[CssBlock:child=[Padding:(0,5,0,5),child=[RichText:align=center,(:Foo)]]],'
             '[SizedBox:0.0x5.0]'));
   });
 }

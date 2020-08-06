@@ -1,9 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'builder.dart';
+import 'core_builder.dart';
 import 'core_helpers.dart';
 
+part 'data/table_data.dart';
 part 'data/text_bits.dart';
 
 class BuildOp {
@@ -25,14 +26,14 @@ class BuildOp {
     _BuildOpOnWidgets onWidgets,
     this.priority = 10,
   })  : _defaultStyles = defaultStyles,
-        this.isBlockElement = isBlockElement ?? onWidgets != null,
+        isBlockElement = isBlockElement ?? onWidgets != null,
         _onChild = onChild,
         _onPieces = onPieces,
         _onWidgets = onWidgets;
 
   bool get hasOnChild => _onChild != null;
 
-  List<String> defaultStyles(NodeMetadata meta, dom.Element e) =>
+  Map<String, String> defaultStyles(NodeMetadata meta, dom.Element e) =>
       _defaultStyles != null ? _defaultStyles(meta, e) : null;
 
   void onChild(NodeMetadata meta, dom.Element e) =>
@@ -44,25 +45,33 @@ class BuildOp {
   ) =>
       _onPieces != null ? _onPieces(meta, pieces) : pieces;
 
-  Iterable<Widget> onWidgets(NodeMetadata meta, Iterable<Widget> widgets) =>
-      (_onWidgets != null ? _onWidgets(meta, widgets) : null) ?? widgets;
+  Iterable<WidgetPlaceholder> onWidgets(
+          NodeMetadata meta, Iterable<WidgetPlaceholder> widgets) =>
+      (_onWidgets != null
+          ? _onWidgets(meta, widgets)?.map(_widgetToPlaceholder)
+          : null) ??
+      widgets;
 }
 
-typedef _BuildOpDefaultStyles = Iterable<String> Function(
+typedef _BuildOpDefaultStyles = Map<String, String> Function(
     NodeMetadata meta, dom.Element e);
 typedef _BuildOpOnChild = void Function(NodeMetadata meta, dom.Element e);
 typedef _BuildOpOnPieces = Iterable<BuiltPiece> Function(
     NodeMetadata meta, Iterable<BuiltPiece> pieces);
 typedef _BuildOpOnWidgets = Iterable<Widget> Function(
-    NodeMetadata meta, Iterable<Widget> widgets);
+    NodeMetadata meta, Iterable<WidgetPlaceholder> widgets);
 
 class BuiltPiece {
   final TextBits text;
-  final Iterable<Widget> widgets;
+  final Iterable<WidgetPlaceholder> widgets;
 
   BuiltPiece.text(this.text) : widgets = null;
 
-  BuiltPiece.widgets(this.widgets) : text = null;
+  BuiltPiece.placeholders(this.widgets) : text = null;
+
+  BuiltPiece.widgets(Iterable<Widget> widgets)
+      : text = null,
+        widgets = widgets.map(_widgetToPlaceholder);
 
   bool get hasWidgets => widgets != null;
 }
@@ -92,13 +101,21 @@ class CssLength {
 
   bool get isNotEmpty => number > 0;
 
-  double getValue(BuildContext context, TextStyleBuilders tsb) {
+  double getValue(BuildContext context, TextStyleBuilder tsb) =>
+      _getValueFromFlutterTextStyle(context, tsb.build(context).style);
+
+  double getValueFromStyle(BuildContext context, TextStyleHtml tsh) =>
+      _getValueFromFlutterTextStyle(context, tsh.style);
+
+  double _getValueFromFlutterTextStyle(BuildContext context, TextStyle style) {
     double value;
 
-    switch (this.unit) {
+    switch (unit) {
       case CssLengthUnit.em:
-        value = tsb.build(context).fontSize * number / 1;
+        value = style.fontSize * number;
         break;
+      case CssLengthUnit.percentage:
+        return null;
       case CssLengthUnit.px:
         value = number;
         break;
@@ -116,18 +133,19 @@ class CssLengthBox {
   final CssLength bottom;
   final CssLength inlineEnd;
   final CssLength inlineStart;
-  final CssLength left;
-  final CssLength right;
+  final CssLength _left;
+  final CssLength _right;
   final CssLength top;
 
   const CssLengthBox({
     this.bottom,
     this.inlineEnd,
     this.inlineStart,
-    this.left,
-    this.right,
+    CssLength left,
+    CssLength right,
     this.top,
-  });
+  })  : _left = left,
+        _right = right;
 
   CssLengthBox copyWith({
     CssLength bottom,
@@ -141,71 +159,149 @@ class CssLengthBox {
         bottom: bottom ?? this.bottom,
         inlineEnd: inlineEnd ?? this.inlineEnd,
         inlineStart: inlineStart ?? this.inlineStart,
-        left: left ?? this.left,
-        right: right ?? this.right,
+        left: left ?? _left,
+        right: right ?? _right,
         top: top ?? this.top,
       );
+
+  bool get hasLeftOrRight =>
+      inlineEnd?.isNotEmpty == true ||
+      inlineStart?.isNotEmpty == true ||
+      _left?.isNotEmpty == true ||
+      _right?.isNotEmpty == true;
+
+  CssLength left(TextDirection dir) =>
+      _left ?? (dir == TextDirection.ltr ? inlineStart : inlineEnd);
+
+  CssLength right(TextDirection dir) =>
+      _right ?? (dir == TextDirection.ltr ? inlineEnd : inlineStart);
 }
 
 enum CssLengthUnit {
   em,
+  percentage,
   px,
 }
 
-typedef NodeMetadataCollector = NodeMetadata Function(
-    NodeMetadata meta, dom.Element e);
+@immutable
+class ImgMetadata {
+  final String alt;
+  final String title;
+  final String url;
 
-class TextStyleBuilders {
+  ImgMetadata({
+    this.alt,
+    this.title,
+    @required this.url,
+  });
+}
+
+@immutable
+class TextStyleHtml {
+  final TextAlign align;
+  final double height;
+  final int maxLines;
+  final TextStyle style;
+  final TextOverflow textOverflow;
+
+  TextStyleHtml._({
+    this.align,
+    this.height,
+    this.maxLines,
+    this.style,
+    this.textOverflow,
+  });
+
+  factory TextStyleHtml.style(TextStyle style) => TextStyleHtml._(style: style);
+
+  TextStyle get styleWithHeight =>
+      height != null && height >= 0 ? style.copyWith(height: height) : style;
+
+  TextStyleHtml copyWith({
+    TextAlign align,
+    double height,
+    int maxLines,
+    TextStyle style,
+    TextOverflow textOverflow,
+  }) =>
+      TextStyleHtml._(
+        align: align ?? this.align,
+        height: height ?? this.height,
+        maxLines: maxLines ?? this.maxLines,
+        style: style ?? this.style,
+        textOverflow: textOverflow ?? this.textOverflow,
+      );
+}
+
+class TextStyleBuilder<T1> {
   final _builders = <Function>[];
   final _inputs = [];
-  final TextStyleBuilders parent;
+  final TextStyleBuilder parent;
 
   BuildContext _context;
-  TextStyle _output;
-  TextAlign _textAlign;
+  TextStyleHtml _default;
+  TextStyleHtml _output;
+
+  TextStyleBuilder(
+    TextStyleHtml Function(BuildContext, TextStyleHtml, T1) builder, {
+    T1 input,
+    this.parent,
+  }) {
+    enqueue(builder, input);
+  }
 
   BuildContext get context => _context;
 
-  TextAlign get textAlign => _textAlign ?? parent?.textAlign;
+  void enqueue<T2>(
+    TextStyleHtml Function(BuildContext, TextStyleHtml, T2) builder, [
+    T2 input,
+  ]) {
+    if (builder == null) return;
 
-  set textAlign(TextAlign v) => _textAlign = v;
-
-  TextStyleBuilders({this.parent});
-
-  void enqueue<T>(
-    TextStyle Function(TextStyleBuilders, TextStyle, T) builder,
-    T input,
-  ) {
-    assert(_output == null, "Cannot add builder after being built");
+    assert(_output == null, 'Cannot add builder after being built');
     _builders.add(builder);
     _inputs.add(input);
   }
 
-  TextStyle build(BuildContext context) {
+  TextStyleHtml build(BuildContext context) {
     _resetContextIfNeeded(context);
     if (_output != null) return _output;
 
     if (parent == null) {
-      _output = DefaultTextStyle.of(_context).style;
+      _output = _default;
     } else {
       _output = parent.build(_context);
     }
 
     final l = _builders.length;
-    for (int i = 0; i < l; i++) {
-      _output = _builders[i](this, _output, _inputs[i]);
+    for (var i = 0; i < l; i++) {
+      _output = _builders[i](context, _output, _inputs[i]);
     }
 
     return _output;
   }
 
-  TextStyleBuilders sub() => TextStyleBuilders(parent: this);
+  TextStyleBuilder<T2> sub<T2>([
+    TextStyleHtml Function(BuildContext, TextStyleHtml, T2) builder,
+    T2 input,
+  ]) =>
+      TextStyleBuilder(builder, input: input, parent: this);
 
   void _resetContextIfNeeded(BuildContext context) {
-    if (context == _context) return;
+    final contextStyle = DefaultTextStyle.of(context).style;
+    if (context == _context && contextStyle == _default.style) return;
 
     _context = context;
+    _default = TextStyleHtml.style(contextStyle);
     _output = null;
-    _textAlign = null;
   }
 }
+
+WidgetPlaceholder _widgetToPlaceholder(Widget widget) {
+  if (widget is WidgetPlaceholder) return widget;
+  return WidgetPlaceholder<Widget>(builder: _widgetBuilder, input: widget);
+}
+
+Iterable<Widget> _widgetBuilder(
+        BuildContext _, Iterable<Widget> __, Widget widget) =>
+    [widget];

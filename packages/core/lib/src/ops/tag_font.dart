@@ -8,17 +8,16 @@ class _TagFont {
   BuildOp get buildOp => BuildOp(
         defaultStyles: (_, e) {
           final a = e.attributes;
-          final styles = <String>[];
-          if (a.containsKey('color')) {
-            styles.addAll([_kCssColor, a['color']]);
-          }
-          if (a.containsKey('face')) {
-            styles.addAll([_kCssFontFamily, a['face']]);
-          }
+          final styles = <String, String>{};
+
+          if (a.containsKey('color')) styles[_kCssColor] = a['color'];
+
+          if (a.containsKey('face')) styles[_kCssFontFamily] = a['face'];
+
           if (a.containsKey('size')) {
             final size = a['size'];
             if (_kCssFontSizes.containsKey(size)) {
-              styles.addAll([_kCssFontSize, _kCssFontSizes[size]]);
+              styles[_kCssFontSize] = _kCssFontSizes[size];
             }
           }
 

@@ -8,35 +8,14 @@ Iterable<Widget> _marginHorizontalBuilder(
   _MarginHorizontalInput input,
 ) {
   final direction = Directionality.of(context);
-  final marginLeft = input.marginLeft ??
-      (direction == TextDirection.ltr
-          ? input.marginInlineStart
-          : input.marginInlineEnd);
-  final marginRight = input.marginRight ??
-      (direction == TextDirection.ltr
-          ? input.marginInlineEnd
-          : input.marginInlineStart);
-
-  final tsb = input.meta.tsb;
+  final margin = input.margin;
+  final tsb = input.tsb;
   final padding = EdgeInsets.only(
-    left: marginLeft?.getValue(context, tsb) ?? 0.0,
-    right: marginRight?.getValue(context, tsb) ?? 0.0,
+    left: margin.left(direction)?.getValue(context, tsb) ?? 0.0,
+    right: margin.right(direction)?.getValue(context, tsb) ?? 0.0,
   );
 
-  return children.map((child) {
-    if (child is _MarginHorizontal) {
-      final existing = child.padding as EdgeInsets;
-      return _MarginHorizontal(
-        child.child,
-        existing.copyWith(
-          left: existing.left + padding.left,
-          right: existing.right + padding.right,
-        ),
-      );
-    }
-
-    return _MarginHorizontal(child, padding);
-  }).toList();
+  return children.map((child) => _MarginHorizontal(child, padding));
 }
 
 class _MarginHorizontal extends Padding {
@@ -45,12 +24,10 @@ class _MarginHorizontal extends Padding {
 }
 
 class _MarginHorizontalInput {
-  CssLength marginInlineEnd;
-  CssLength marginInlineStart;
-  CssLength marginLeft;
-  CssLength marginRight;
-  NodeMetadata meta;
-  WidgetFactory wf;
+  final CssLengthBox margin;
+  final TextStyleBuilder tsb;
+  final WidgetFactory wf;
+  _MarginHorizontalInput(this.margin, this.tsb, this.wf);
 }
 
 Iterable<Widget> _marginVerticalBuilder(
@@ -65,20 +42,20 @@ Iterable<Widget> _marginVerticalBuilder(
   return widgets;
 }
 
+@immutable
 class _MarginVerticalInput {
-  final TextStyleBuilders tsb;
   final CssLength height;
-
-  _MarginVerticalInput(this.tsb, this.height);
+  final TextStyleBuilder tsb;
+  _MarginVerticalInput(this.height, this.tsb);
 }
 
 class _MarginVerticalPlaceholder
     extends WidgetPlaceholder<_MarginVerticalInput> {
-  _MarginVerticalPlaceholder(TextStyleBuilders tsb, CssLength height)
+  _MarginVerticalPlaceholder(TextStyleBuilder tsb, CssLength height)
       : assert(height != null),
         super(
           builder: _marginVerticalBuilder,
-          input: _MarginVerticalInput(tsb, height),
+          input: _MarginVerticalInput(height, tsb),
         );
 
   void mergeWith(_MarginVerticalPlaceholder other) {
@@ -94,7 +71,9 @@ class _MarginVerticalPlaceholder
   }
 
   @override
-  void wrapWith<T>(WidgetPlaceholderBuilder<T> builder, [T input]) => this;
+  _MarginVerticalPlaceholder wrapWith<T>(WidgetPlaceholderBuilder<T> builder,
+          [T input]) =>
+      this;
 }
 
 class _StyleMargin {
@@ -103,45 +82,43 @@ class _StyleMargin {
   _StyleMargin(this.wf);
 
   BuildOp get buildOp => BuildOp(
+        isBlockElement: false,
+        onPieces: (meta, pieces) {
+          if (meta.isBlockElement) return pieces;
+          final m = wf.parseCssLengthBox(meta, _kCssMargin);
+          if (m?.hasLeftOrRight != true) return pieces;
+
+          return _wrapTextBits(
+            pieces,
+            appendBuilder: (parent) =>
+                TextWidget(parent, _paddingInlineAfter(parent.tsb, m)),
+            prependBuilder: (parent) =>
+                TextWidget(parent, _paddingInlineBefore(parent.tsb, m)),
+          );
+        },
         onWidgets: (meta, widgets) {
           if (widgets?.isNotEmpty != true) return null;
-          final m = wf.parseCssMargin(meta);
+          final m = wf.parseCssLengthBox(meta, _kCssMargin);
           if (m == null) return null;
 
           final t = m.top?.isNotEmpty == true;
-          final lr = m.inlineEnd?.isNotEmpty == true ||
-              m.left?.isNotEmpty == true ||
-              m.right?.isNotEmpty == true ||
-              m.inlineStart?.isNotEmpty == true;
           final b = m.bottom?.isNotEmpty == true;
-          final ws = List<Widget>((t ? 1 : 0) + widgets.length + (b ? 1 : 0));
-          final tsb = meta.tsb;
+          final ws = List<WidgetPlaceholder>(
+              (t ? 1 : 0) + widgets.length + (b ? 1 : 0));
+          final tsb = meta.tsb();
 
           var i = 0;
           if (t) ws[i++] = _MarginVerticalPlaceholder(tsb, m.top);
 
-          if (lr) {
-            for (final widget in widgets) {
-              final input = _MarginHorizontalInput()
-                ..marginInlineEnd = m.inlineEnd
-                ..marginInlineStart = m.inlineStart
-                ..marginLeft = m.left
-                ..marginRight = m.right
-                ..meta = meta
-                ..wf = wf;
+          for (final widget in widgets) {
+            if (m.hasLeftOrRight) {
+              widget.wrapWith(
+                _marginHorizontalBuilder,
+                _MarginHorizontalInput(m, tsb, wf),
+              );
+            }
 
-              ws[i++] = widget is WidgetPlaceholder
-                  ? (widget..wrapWith(_marginHorizontalBuilder, input))
-                  : WidgetPlaceholder(
-                      builder: _marginHorizontalBuilder,
-                      children: [widget],
-                      input: input,
-                    );
-            }
-          } else {
-            for (final widget in widgets) {
-              ws[i++] = widget;
-            }
+            ws[i++] = widget;
           }
 
           if (b) ws[i++] = _MarginVerticalPlaceholder(tsb, m.bottom);

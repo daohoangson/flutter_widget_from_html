@@ -8,7 +8,7 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 
-import 'builder.dart';
+import 'core_builder.dart';
 import 'core_data.dart';
 import 'core_widget_factory.dart';
 
@@ -27,9 +27,6 @@ class HtmlWidget extends StatefulWidget {
   /// By default, a [CircularProgressIndicator] will be shown until
   /// the widget tree is ready without error handling.
   final AsyncWidgetBuilder<Widget> buildAsyncBuilder;
-
-  /// The amount of space by which to inset the built widget tree.
-  final EdgeInsets bodyPadding;
 
   /// The callback to specify custom stylings.
   final CustomStylesBuilder customStylesBuilder;
@@ -55,9 +52,6 @@ class HtmlWidget extends StatefulWidget {
   /// The callback when user taps a link.
   final void Function(String) onTapUrl;
 
-  /// The amount of space by which to inset the table cell's contents.
-  final EdgeInsets tableCellPadding;
-
   /// The default styling for text elements.
   final TextStyle textStyle;
 
@@ -69,7 +63,6 @@ class HtmlWidget extends StatefulWidget {
     this.baseUrl,
     this.buildAsync,
     this.buildAsyncBuilder,
-    this.bodyPadding = const EdgeInsets.all(10),
     this.customStylesBuilder,
     this.customWidgetBuilder,
     this.enableCaching = true,
@@ -77,7 +70,6 @@ class HtmlWidget extends StatefulWidget {
     this.hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
     Key key,
     this.onTapUrl,
-    this.tableCellPadding = const EdgeInsets.all(5),
     this.textStyle = const TextStyle(),
   })  : assert(html != null),
         assert(factoryBuilder != null),
@@ -128,6 +120,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     if (_future != null) {
       return FutureBuilder<Widget>(
@@ -175,12 +168,14 @@ Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
 
 Widget _buildBody(WidgetFactory wf, HtmlWidget widget, dom.NodeList domNodes) {
   wf.reset(widget);
-  final tsb = TextStyleBuilders()..enqueue(_tsb, widget.textStyle);
+  final tsb = TextStyleBuilder(_tsb, input: widget.textStyle);
   final built = HtmlBuilder(domNodes: domNodes, parentTsb: tsb, wf: wf).build();
   return wf.buildBody(built) ?? widget0;
 }
 
 dom.NodeList _parseHtml(String html) => parser.parse(html).body.nodes;
 
-TextStyle _tsb(TextStyleBuilders _, TextStyle parent, TextStyle style) =>
-    style == null ? parent : style.inherit ? parent.merge(style) : style;
+TextStyleHtml _tsb(BuildContext _, TextStyleHtml p, TextStyle style) =>
+    style == null
+        ? p
+        : TextStyleHtml.style(style.inherit ? p.style.merge(style) : style);

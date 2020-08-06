@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
@@ -17,7 +16,6 @@ void main() {
       final e = await explain(tester, null,
           hw: HtmlWidget(
             html,
-            bodyPadding: const EdgeInsets.all(0),
             factoryBuilder: () => _GetInlineStylesTest(),
             key: hwKey,
           ));
@@ -32,7 +30,6 @@ void main() {
       final e = await explain(tester, null,
           hw: HtmlWidget(
             html,
-            bodyPadding: const EdgeInsets.all(0),
             factoryBuilder: () => _PriorityTest(a: 1, b: 2),
             key: hwKey,
           ));
@@ -43,7 +40,6 @@ void main() {
       final e = await explain(tester, null,
           hw: HtmlWidget(
             html,
-            bodyPadding: const EdgeInsets.all(0),
             factoryBuilder: () => _PriorityTest(a: 2, b: 1),
             key: hwKey,
           ));
@@ -55,8 +51,8 @@ void main() {
 class _GetInlineStylesTest extends WidgetFactory {
   @override
   void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
-    meta.op = BuildOp(defaultStyles: (_, __) => ['color', '#f00']);
-    meta.op = BuildOp(defaultStyles: (_, __) => ['color', '#0f0']);
+    meta.op = BuildOp(defaultStyles: (_, __) => {'color': '#f00'});
+    meta.op = BuildOp(defaultStyles: (_, __) => {'color': '#0f0'});
 
     return super.parseTag(meta, tag, attrs);
   }

@@ -12,7 +12,7 @@ abstract class TextBit {
   int get index => parent?._children?.indexOf(this) ?? -1;
   bool get isEmpty => false;
   bool get isNotEmpty => !isEmpty;
-  TextStyleBuilders get tsb => null;
+  TextStyleBuilder get tsb => null;
 
   InlineSpan compile(TextStyle style) => throw UnimplementedError();
 
@@ -46,8 +46,8 @@ abstract class TextBit {
   String toString() {
     final clazz = runtimeType.toString();
     final t = this;
-    final contents = t is TextWidget ? "widget=${t.widget}" : "data=$data";
-    return "[$clazz:$hashCode] $contents";
+    final contents = t is TextWidget ? 'widget=${t.widget}' : 'data=$data';
+    return '[$clazz:$hashCode] $contents';
   }
 
   static TextBit nextOf(TextBit bit) {
@@ -88,8 +88,11 @@ abstract class TextBit {
 }
 
 class TextData extends TextBit {
+  @override
   final String data;
-  final TextStyleBuilders tsb;
+
+  @override
+  final TextStyleBuilder tsb;
 
   TextData(TextBits parent, this.data, this.tsb)
       : assert(parent != null),
@@ -222,7 +225,7 @@ class TextBits extends TextBit {
     return bit;
   }
 
-  TextBits sub([TextStyleBuilders tsb]) {
+  TextBits sub([TextStyleBuilder tsb]) {
     final sub = TextBits(tsb ?? this.tsb.sub(), this);
     add(sub);
     return sub;
@@ -254,25 +257,25 @@ class TextBits extends TextBit {
   String toString() {
     final clazz = runtimeType.toString();
     final contents = _toStrings().join('\n');
-    return "\n[$clazz:$hashCode]\n$contents\n----";
+    return '\n[$clazz:$hashCode]\n$contents\n----';
   }
 
   Iterable<String> _toStrings() => _children.isNotEmpty
       ? (_children
           .map((child) => child is TextBits
-              ? (List<String>()
-                ..add("[${child.runtimeType}:${child.hashCode}]" +
+              ? (<String>[]
+                ..add('[${child.runtimeType}:${child.hashCode}]' +
                     (child.parent == this
                         ? ''
-                        : " ⚠️ parent=${child.parent.hashCode}"))
+                        : ' ⚠️ parent=${child.parent.hashCode}'))
                 ..addAll(child._toStrings()))
               : [
                   child.toString() +
                       (child.parent == this
                           ? ''
-                          : " ⚠️ parent=${child.parent.hashCode}")
+                          : ' ⚠️ parent=${child.parent.hashCode}')
                 ])
-          .map((lines) => lines.map((line) => "  $line"))
+          .map((lines) => lines.map((line) => '  $line'))
           .reduce((prev, lines) => List.from(prev)..addAll(lines)))
       : [];
 }

@@ -36,11 +36,9 @@ class _TagLi {
       defaultStyles: (meta, e) {
         final p = meta.parents?.where((op) => op == _buildOp)?.length ?? 0;
 
-        final styles = [
-          'padding-inline-start',
-          '2.5em',
-          _kCssListStyleType,
-          e.localName == _kTagOrderedList
+        final styles = {
+          'padding-inline-start': '2.5em',
+          _kCssListStyleType: e.localName == _kTagOrderedList
               ? (e.attributes.containsKey(_kAttributeLiType)
                       ? _LiInput.listStyleTypeFromAttributeType(
                           e.attributes[_kAttributeLiType])
@@ -51,9 +49,9 @@ class _TagLi {
                   : p == 1
                       ? _kCssListStyleTypeCircle
                       : _kCssListStyleTypeSquare,
-        ];
+        };
 
-        if (p == 0) styles.addAll([_kCssMargin, '1em 0']);
+        if (p == 0) styles[_kCssMargin] = '1em 0';
 
         return styles;
       },
@@ -77,7 +75,7 @@ class _TagLi {
     final listMeta = i.listMeta;
     if (listMeta == null) return ws;
 
-    final style = i.meta.tsb.build(c);
+    final tsh = i.meta.tsb().build(c);
     final listStyleType = i.listStyleType ?? listMeta.listStyleType;
     final markerIndex = listMeta.markerReversed
         ? (listMeta.markerStart ?? listMeta.markerCount) - i.markerIndex
@@ -85,14 +83,12 @@ class _TagLi {
     final markerText = wf.getListStyleMarker(listStyleType, markerIndex);
 
     return [
-      LayoutBuilder(
-        builder: (_, bc) => Stack(
-          children: <Widget>[
-            wf.buildColumn(ws) ?? widget0,
-            _buildMarker(c, style, markerText, bc.biggest.width),
-          ],
-          overflow: Overflow.visible,
-        ),
+      Stack(
+        children: <Widget>[
+          wf.buildColumn(ws) ?? widget0,
+          _buildMarker(c, tsh.styleWithHeight, markerText),
+        ],
+        overflow: Overflow.visible,
       ),
     ];
   }
@@ -126,26 +122,31 @@ class _TagLi {
     return children;
   }
 
-  Widget _buildMarker(BuildContext c, TextStyle s, String t, double w) {
-    final isLtr = Directionality.of(c) == TextDirection.ltr;
+  Widget _buildMarker(BuildContext context, TextStyle style, String text) {
+    final isLtr = Directionality.of(context) == TextDirection.ltr;
     final isRtl = !isLtr;
+    final width = style.fontSize * 4;
+    final margin = width + 5;
     return Positioned(
-      left: isRtl ? w + 10 : null,
-      right: isLtr ? w + 10 : null,
+      left: isLtr ? -margin : null,
+      right: isRtl ? -margin : null,
       top: 0.0,
-      child: RichText(
-        maxLines: 1,
-        overflow: TextOverflow.clip,
-        text: TextSpan(style: s, text: t),
-        textAlign: isLtr ? TextAlign.right : TextAlign.left,
-        textScaleFactor: MediaQuery.of(c).textScaleFactor,
+      child: SizedBox(
+        child: RichText(
+          overflow: TextOverflow.clip,
+          softWrap: false,
+          text: TextSpan(style: style, text: text),
+          textAlign: isLtr ? TextAlign.right : TextAlign.left,
+          textScaleFactor: MediaQuery.of(context).textScaleFactor,
+        ),
+        width: width,
       ),
     );
   }
 
   _LiPlaceholder _placeholder(Iterable<Widget> children, NodeMetadata meta) {
     final a = meta.domElement.attributes;
-    String listStyleType = a.containsKey(_kAttributeLiType)
+    var listStyleType = a.containsKey(_kAttributeLiType)
         ? _LiInput.listStyleTypeFromAttributeType(a[_kAttributeLiType])
         : null;
     for (final style in meta.styleEntries) {

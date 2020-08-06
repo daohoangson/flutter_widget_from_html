@@ -32,11 +32,11 @@ class _TextCompiler {
     return _compiled;
   }
 
-  void _resetLoop(TextStyleBuilders tsb) {
+  void _resetLoop(TextStyleBuilder tsb) {
     _spans = <InlineSpan>[];
 
     _buffer = StringBuffer();
-    _style = tsb?.build(_context);
+    _style = tsb?.build(_context)?.styleWithHeight;
 
     _prevBuffer = _buffer;
     _prevStyle = _style;
@@ -46,7 +46,7 @@ class _TextCompiler {
     final tsb = _getBitTsb(bit);
     if (_spans == null) _resetLoop(tsb);
 
-    final style = tsb?.build(_context) ?? _prevStyle;
+    final style = tsb?.build(_context)?.styleWithHeight ?? _prevStyle;
     if (style != _prevStyle) _saveSpan();
 
     if (bit.canCompile) {
@@ -93,7 +93,8 @@ class _TextCompiler {
 
       if (span is WidgetSpan &&
           span.alignment == PlaceholderAlignment.baseline &&
-          (text.tsb?.textAlign ?? TextAlign.start) == TextAlign.start) {
+          (text.tsb?.build(_context)?.align ?? TextAlign.start) ==
+              TextAlign.start) {
         widget = span.child;
       }
     } else if (_spans.isNotEmpty || _buffer.isNotEmpty) {
@@ -110,7 +111,7 @@ class _TextCompiler {
     _compiled.add(widget ?? span);
   }
 
-  static TextStyleBuilders _getBitTsb(TextBit bit) {
+  static TextStyleBuilder _getBitTsb(TextBit bit) {
     if (bit.tsb != null) return bit.tsb;
 
     // the below code will find the best style for this whitespace bit
@@ -144,4 +145,30 @@ class _TextCompiler {
     // fallback to default (style from parent)
     return bit.parent.tsb;
   }
+}
+
+Iterable<BuiltPiece> _wrapTextBits(
+  Iterable<BuiltPiece> pieces, {
+  TextBit Function(TextBits) appendBuilder,
+  TextBit Function(TextBits) prependBuilder,
+}) {
+  final firstText = pieces.first?.text;
+  final lastText = pieces.last?.text;
+  if (firstText == lastText && firstText.isEmpty) {
+    final text = firstText;
+    if (prependBuilder != null) text.add(prependBuilder(text));
+    if (appendBuilder != null) text.add(appendBuilder(text));
+    return pieces;
+  }
+
+  final firstBit = firstText?.first;
+  final firstBp = firstBit?.parent;
+  final lastBit = lastText?.last;
+  final lastBp = lastBit?.parent;
+  if (firstBp != null && lastBp != null) {
+    if (prependBuilder != null) prependBuilder(firstBp).insertBefore(firstBit);
+    if (appendBuilder != null) appendBuilder(lastBp).insertAfter(lastBit);
+  }
+
+  return pieces;
 }

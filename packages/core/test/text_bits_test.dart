@@ -285,7 +285,7 @@ void main() {
 
     final str = text.toString().replaceAll(RegExp(r':\d+\]'), ']');
 
-    expect(str, equals("""
+    expect(str, equals('''
 
 [TextBits]
   [TextData] data=1
@@ -297,10 +297,10 @@ void main() {
       [TextData] data=(2.2.2)
     [TextData] data=(2.3)
   [TextWidget<String>] widget=WidgetPlaceholder<String>
-----"""));
+----'''));
   });
 }
 
 String _data(TextBits text) => text.bits.map((bit) => bit.data ?? '').join('');
 
-TextBits _text() => TextBits(TextStyleBuilders());
+TextBits _text() => TextBits(TextStyleBuilder(null));
