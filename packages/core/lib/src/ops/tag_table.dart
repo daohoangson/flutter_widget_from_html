@@ -107,7 +107,7 @@ class _TagTable {
       if (borderParsed != null) {
         return BorderSide(
           color: borderParsed.color ?? const Color(0xFF000000),
-          width: borderParsed.width.getValue(context, meta.tsb),
+          width: borderParsed.width.getValue(context, meta.tsb()),
         );
       }
     }

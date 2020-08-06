@@ -75,7 +75,7 @@ class _TagLi {
     final listMeta = i.listMeta;
     if (listMeta == null) return ws;
 
-    final tsh = i.meta.tsb.build(c);
+    final tsh = i.meta.tsb().build(c);
     final listStyleType = i.listStyleType ?? listMeta.listStyleType;
     final markerIndex = listMeta.markerReversed
         ? (listMeta.markerStart ?? listMeta.markerCount) - i.markerIndex
@@ -86,7 +86,7 @@ class _TagLi {
       Stack(
         children: <Widget>[
           wf.buildColumn(ws) ?? widget0,
-          _buildMarker(c, tsh.style, markerText),
+          _buildMarker(c, tsh.styleWithHeight, markerText),
         ],
         overflow: Overflow.visible,
       ),

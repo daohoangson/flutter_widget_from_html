@@ -231,14 +231,39 @@ The HTML string is parsed into DOM elements and each element is visited once to 
 
 Notes:
 
-- Most of the `TextStyle` properties are available as `NodeMetadata` properties so those should be fast
+- Text related styling can be changed with `TextStyleBuilder`, just register your callback and it will be called when the build context is ready.
+  - The second parameter is a `TextStyleHtml` which is immutable and is calculated from the root down to your element, your callback must return a `TextStyleHtml` by calling `copyWith` or simply return the parent itself.
+  - Optionally, pass any object on registration and your callback will receive it as the third parameter.
+
+```dart
+// simple callback: set text color to accent color
+meta.tsb((context, parent, _) =>
+  parent.copyWith(
+    style: parent.style.copyWith(
+      color: Theme.of(context).accentColor,
+    ),
+  ));
+
+// callback using third param: set height to input value
+TextStyleHtml callback(BuildContext _, TextStyleHtml parent, double value) =>
+  parent.copyWith(height: value)
+
+// register with some value
+meta.tsb<bool>(callback, 2);
+```
+
 - Other complicated styling are supported via `BuildOp`
 
 ```dart
-meta.op = BuildOp();
+meta.op = BuildOp(
+  onPieces: (meta, pieces) => pieces,
+  onWidgets: (meta, widgets) => widgets,
+  ...,
+  priority: 9999,
+);
 ```
 
-- Each metadata can has multiple build ops. And they are also affected by parent ops (see step 2).
+- Each metadata can has multiple text style builder callbacks and build ops.
 - There are two types of `BuiltPiece`:
   - `BuiltPiece.text()` contains a `TextBits`
   - `BuiltPiece.widgets()` contains widgets

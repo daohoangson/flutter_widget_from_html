@@ -101,10 +101,13 @@ class CssLength {
 
   bool get isNotEmpty => number > 0;
 
-  double getValue(BuildContext context, TextStyleBuilders tsb) =>
-      getValueFromStyle(context, tsb.build(context).style);
+  double getValue(BuildContext context, TextStyleBuilder tsb) =>
+      _getValueFromFlutterTextStyle(context, tsb.build(context).style);
 
-  double getValueFromStyle(BuildContext context, TextStyle style) {
+  double getValueFromStyle(BuildContext context, TextStyleHtml tsh) =>
+      _getValueFromFlutterTextStyle(context, tsh.style);
+
+  double _getValueFromFlutterTextStyle(BuildContext context, TextStyle style) {
     double value;
 
     switch (unit) {
@@ -209,11 +212,10 @@ class TextStyleHtml {
     this.textOverflow,
   });
 
-  TextStyleHtml.style(this.style)
-      : align = null,
-        height = null,
-        maxLines = null,
-        textOverflow = null;
+  factory TextStyleHtml.style(TextStyle style) => TextStyleHtml._(style: style);
+
+  TextStyle get styleWithHeight =>
+      height != null && height >= 0 ? style.copyWith(height: height) : style;
 
   TextStyleHtml copyWith({
     TextAlign align,
@@ -229,35 +231,33 @@ class TextStyleHtml {
         style: style ?? this.style,
         textOverflow: textOverflow ?? this.textOverflow,
       );
-
-  TextStyle build(BuildContext context) {
-    var built = style;
-
-    if (height != null && height >= 0) {
-      built = built.copyWith(height: height);
-    }
-
-    return built;
-  }
 }
 
-class TextStyleBuilders {
+class TextStyleBuilder<T1> {
   final _builders = <Function>[];
   final _inputs = [];
-  final TextStyleBuilders parent;
+  final TextStyleBuilder parent;
 
   BuildContext _context;
   TextStyleHtml _default;
   TextStyleHtml _output;
 
-  TextStyleBuilders({this.parent});
+  TextStyleBuilder(
+    TextStyleHtml Function(BuildContext, TextStyleHtml, T1) builder, {
+    T1 input,
+    this.parent,
+  }) {
+    enqueue(builder, input);
+  }
 
   BuildContext get context => _context;
 
-  void enqueue<T>(
-    TextStyleHtml Function(BuildContext, TextStyleHtml, T) builder, [
-    T input,
+  void enqueue<T2>(
+    TextStyleHtml Function(BuildContext, TextStyleHtml, T2) builder, [
+    T2 input,
   ]) {
+    if (builder == null) return;
+
     assert(_output == null, 'Cannot add builder after being built');
     _builders.add(builder);
     _inputs.add(input);
@@ -281,9 +281,11 @@ class TextStyleBuilders {
     return _output;
   }
 
-  TextStyle style(BuildContext context) => build(context).build(context);
-
-  TextStyleBuilders sub() => TextStyleBuilders(parent: this);
+  TextStyleBuilder<T2> sub<T2>([
+    TextStyleHtml Function(BuildContext, TextStyleHtml, T2) builder,
+    T2 input,
+  ]) =>
+      TextStyleBuilder(builder, input: input, parent: this);
 
   void _resetContextIfNeeded(BuildContext context) {
     final contextStyle = DefaultTextStyle.of(context).style;

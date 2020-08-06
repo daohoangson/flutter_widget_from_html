@@ -32,11 +32,11 @@ class _TextCompiler {
     return _compiled;
   }
 
-  void _resetLoop(TextStyleBuilders tsb) {
+  void _resetLoop(TextStyleBuilder tsb) {
     _spans = <InlineSpan>[];
 
     _buffer = StringBuffer();
-    _style = tsb?.style(_context);
+    _style = tsb?.build(_context)?.styleWithHeight;
 
     _prevBuffer = _buffer;
     _prevStyle = _style;
@@ -46,7 +46,7 @@ class _TextCompiler {
     final tsb = _getBitTsb(bit);
     if (_spans == null) _resetLoop(tsb);
 
-    final style = tsb?.style(_context) ?? _prevStyle;
+    final style = tsb?.build(_context)?.styleWithHeight ?? _prevStyle;
     if (style != _prevStyle) _saveSpan();
 
     if (bit.canCompile) {
@@ -111,7 +111,7 @@ class _TextCompiler {
     _compiled.add(widget ?? span);
   }
 
-  static TextStyleBuilders _getBitTsb(TextBit bit) {
+  static TextStyleBuilder _getBitTsb(TextBit bit) {
     if (bit.tsb != null) return bit.tsb;
 
     // the below code will find the best style for this whitespace bit

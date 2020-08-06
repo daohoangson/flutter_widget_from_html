@@ -15,7 +15,7 @@ class HtmlBuilder {
   final NodeMetadata parentMeta;
   final Iterable<BuildOp> parentOps;
   final TextBits parentText;
-  final TextStyleBuilders parentTsb;
+  final TextStyleBuilder parentTsb;
   final WidgetFactory wf;
 
   final _pieces = <BuiltPiece>[];
@@ -59,7 +59,7 @@ class HtmlBuilder {
   }
 
   NodeMetadata collectMetadata(dom.Element e) {
-    final meta = NodeMetadata._(parentOps);
+    final meta = NodeMetadata._(parentTsb.sub(), parentOps);
 
     wf.parseTag(meta, e.localName, e.attributes);
 
@@ -107,7 +107,6 @@ class HtmlBuilder {
     }
 
     meta.domElement = e;
-    meta.tsb = parentTsb.sub()..enqueue(wf.tsb, meta);
 
     return meta;
   }
@@ -131,7 +130,7 @@ class HtmlBuilder {
         parentMeta: meta,
         parentParentOps: parentOps,
         parentText: isBlockElement ? null : _textPiece.text,
-        parentTsb: meta?.tsb ?? parentTsb,
+        parentTsb: meta?._tsb ?? parentTsb,
         wf: wf,
       );
 
@@ -208,23 +207,14 @@ class NodeMetadata {
   List<BuildOp> _buildOps;
   dom.Element _domElement;
   final Iterable<BuildOp> _parentOps;
-  TextStyleBuilders _tsb;
+  final TextStyleBuilder _tsb;
 
-  Color color;
-  bool decoOver;
-  bool decoStrike;
-  bool decoUnder;
-  TextDecorationStyle decorationStyle;
-  Iterable<String> fontFamilies;
-  String fontSize;
-  bool fontStyleItalic;
-  FontWeight fontWeight;
   bool _isBlockElement;
   bool isNotRenderable;
   List<String> _styles;
   bool _stylesFrozen = false;
 
-  NodeMetadata._(this._parentOps);
+  NodeMetadata._(this._tsb, this._parentOps);
 
   dom.Element get domElement => _domElement;
 
@@ -253,8 +243,6 @@ class NodeMetadata {
     }
   }
 
-  TextStyleBuilders get tsb => _tsb;
-
   set domElement(dom.Element e) {
     assert(_domElement == null);
     _domElement = e;
@@ -281,10 +269,11 @@ class NodeMetadata {
     _styles.addAll(styles);
   }
 
-  set tsb(TextStyleBuilders tsb) {
-    assert(_tsb == null);
-    _tsb = tsb;
-  }
+  TextStyleBuilder tsb<T>([
+    TextStyleHtml Function(BuildContext, TextStyleHtml, T) builder,
+    T input,
+  ]) =>
+      _tsb..enqueue(builder, input);
 
   String style(String key) {
     String value;

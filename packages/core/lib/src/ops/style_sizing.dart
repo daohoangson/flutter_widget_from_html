@@ -62,7 +62,7 @@ class _StyleSizing {
     final child = wf.buildColumn(children);
     if (child == null) return null;
 
-    final tsb = input.meta.tsb;
+    final tsb = input.meta.tsb();
     return [
       CssSizing(
         child: child,
