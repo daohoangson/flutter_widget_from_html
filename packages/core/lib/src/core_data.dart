@@ -1,3 +1,5 @@
+import 'dart:ui' as ui show Shadow, FontFeature;
+
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -89,6 +91,74 @@ class CssBorders {
   CssBorderSide top;
 }
 
+class CssBuilder<T1> {
+  final _builders = <Function>[];
+  final _inputs = [];
+  final CssBuilder parent;
+
+  BuildContext _context;
+  CssScope _default;
+  CssScope _output;
+
+  CssBuilder(
+    CssScope Function(BuildContext, CssScope, T1) builder, {
+    T1 input,
+    this.parent,
+  }) {
+    if (builder != null) enqueue(builder, input);
+  }
+
+  BuildContext get context => _context;
+
+  void enqueue<T2>(
+    CssScope Function(BuildContext, CssScope, T2) builder, [
+    T2 input,
+  ]) {
+    assert(_output == null, 'Cannot add builder after being built');
+    _builders.add(builder);
+    _inputs.add(input);
+  }
+
+  CssScope build(BuildContext context) {
+    _resetContextIfNeeded(context);
+    if (_output != null) return _output;
+
+    if (parent == null) {
+      _output = _default;
+    } else {
+      _output = parent.build(_context);
+    }
+
+    final l = _builders.length;
+    for (var i = 0; i < l; i++) {
+      _output = _builders[i](context, _output, _inputs[i]);
+    }
+
+    return _output;
+  }
+
+  TextStyle buildTextStyle(BuildContext context) =>
+      build(context).buildTextStyle(context);
+
+  CssBuilder<T2> sub<T2>([
+    CssScope Function(BuildContext, CssScope, T2) builder,
+    T2 input,
+  ]) =>
+      CssBuilder(builder, input: input, parent: this);
+
+  void _resetContextIfNeeded(BuildContext context) {
+    final contextStyle = DefaultTextStyle.of(context).style;
+    if (context == _context &&
+        contextStyle == _default.textStyleWithoutHeight) {
+      return;
+    }
+
+    _context = context;
+    _default = CssScope.style(contextStyle);
+    _output = null;
+  }
+}
+
 class CssLength {
   final double number;
   final CssLengthUnit unit;
@@ -101,8 +171,8 @@ class CssLength {
 
   bool get isNotEmpty => number > 0;
 
-  double getValue(BuildContext context, TextStyleBuilders tsb) =>
-      getValueFromStyle(context, tsb.build(context).style);
+  double getValue(BuildContext context, CssBuilder css) =>
+      getValueFromStyle(context, css.build(context).textStyleWithoutHeight);
 
   double getValueFromStyle(BuildContext context, TextStyle style) {
     double value;
@@ -181,6 +251,96 @@ enum CssLengthUnit {
 }
 
 @immutable
+class CssScope {
+  final TextAlign align;
+  final double height;
+  final int maxLines;
+  final TextStyle textStyleWithoutHeight;
+  final TextOverflow textOverflow;
+
+  CssScope._({
+    this.align,
+    this.height,
+    this.maxLines,
+    TextStyle textStyle,
+    this.textOverflow,
+  }) : textStyleWithoutHeight = textStyle;
+
+  CssScope.style(this.textStyleWithoutHeight)
+      : align = null,
+        height = null,
+        maxLines = null,
+        textOverflow = null;
+
+  CssScope copyWith({
+    TextAlign align,
+    double height,
+    int maxLines,
+    TextStyle textStyle,
+    TextOverflow textOverflow,
+
+    // TextStyle.copyWith parameters
+    Color color,
+    Color backgroundColor,
+    String fontFamily,
+    List<String> fontFamilyFallback,
+    double fontSize,
+    FontWeight fontWeight,
+    FontStyle fontStyle,
+    double letterSpacing,
+    double wordSpacing,
+    TextBaseline textBaseline,
+    Locale locale,
+    Paint foreground,
+    Paint background,
+    List<ui.Shadow> shadows,
+    List<ui.FontFeature> fontFeatures,
+    TextDecoration decoration,
+    Color decorationColor,
+    TextDecorationStyle decorationStyle,
+    double decorationThickness,
+  }) =>
+      CssScope._(
+        align: align ?? this.align,
+        height: height ?? this.height,
+        maxLines: maxLines ?? this.maxLines,
+        textStyle: textStyle ??
+            textStyleWithoutHeight.copyWith(
+              color: color,
+              backgroundColor: backgroundColor,
+              fontFamily: fontFamily,
+              fontFamilyFallback: fontFamilyFallback,
+              fontSize: fontSize,
+              fontWeight: fontWeight,
+              fontStyle: fontStyle,
+              letterSpacing: letterSpacing,
+              wordSpacing: wordSpacing,
+              textBaseline: textBaseline,
+              locale: locale,
+              foreground: foreground,
+              background: background,
+              shadows: shadows,
+              fontFeatures: fontFeatures,
+              decoration: decoration,
+              decorationColor: decorationColor,
+              decorationStyle: decorationStyle,
+              decorationThickness: decorationThickness,
+            ),
+        textOverflow: textOverflow ?? this.textOverflow,
+      );
+
+  TextStyle buildTextStyle(BuildContext context) {
+    var built = textStyleWithoutHeight;
+
+    if (height != null && height >= 0) {
+      built = built.copyWith(height: height);
+    }
+
+    return built;
+  }
+}
+
+@immutable
 class ImgMetadata {
   final String alt;
   final String title;
@@ -191,108 +351,6 @@ class ImgMetadata {
     this.title,
     @required this.url,
   });
-}
-
-@immutable
-class TextStyleHtml {
-  final TextAlign align;
-  final double height;
-  final int maxLines;
-  final TextStyle style;
-  final TextOverflow textOverflow;
-
-  TextStyleHtml._({
-    this.align,
-    this.height,
-    this.maxLines,
-    this.style,
-    this.textOverflow,
-  });
-
-  TextStyleHtml.style(this.style)
-      : align = null,
-        height = null,
-        maxLines = null,
-        textOverflow = null;
-
-  TextStyleHtml copyWith({
-    TextAlign align,
-    double height,
-    int maxLines,
-    TextStyle style,
-    TextOverflow textOverflow,
-  }) =>
-      TextStyleHtml._(
-        align: align ?? this.align,
-        height: height ?? this.height,
-        maxLines: maxLines ?? this.maxLines,
-        style: style ?? this.style,
-        textOverflow: textOverflow ?? this.textOverflow,
-      );
-
-  TextStyle build(BuildContext context) {
-    var built = style;
-
-    if (height != null && height >= 0) {
-      built = built.copyWith(height: height);
-    }
-
-    return built;
-  }
-}
-
-class TextStyleBuilders {
-  final _builders = <Function>[];
-  final _inputs = [];
-  final TextStyleBuilders parent;
-
-  BuildContext _context;
-  TextStyleHtml _default;
-  TextStyleHtml _output;
-
-  TextStyleBuilders({this.parent});
-
-  BuildContext get context => _context;
-
-  void enqueue<T>(
-    TextStyleHtml Function(BuildContext, TextStyleHtml, T) builder, [
-    T input,
-  ]) {
-    assert(_output == null, 'Cannot add builder after being built');
-    _builders.add(builder);
-    _inputs.add(input);
-  }
-
-  TextStyleHtml build(BuildContext context) {
-    _resetContextIfNeeded(context);
-    if (_output != null) return _output;
-
-    if (parent == null) {
-      _output = _default;
-    } else {
-      _output = parent.build(_context);
-    }
-
-    final l = _builders.length;
-    for (var i = 0; i < l; i++) {
-      _output = _builders[i](context, _output, _inputs[i]);
-    }
-
-    return _output;
-  }
-
-  TextStyle style(BuildContext context) => build(context).build(context);
-
-  TextStyleBuilders sub() => TextStyleBuilders(parent: this);
-
-  void _resetContextIfNeeded(BuildContext context) {
-    final contextStyle = DefaultTextStyle.of(context).style;
-    if (context == _context && contextStyle == _default.style) return;
-
-    _context = context;
-    _default = TextStyleHtml.style(contextStyle);
-    _output = null;
-  }
 }
 
 WidgetPlaceholder _widgetToPlaceholder(Widget widget) {
