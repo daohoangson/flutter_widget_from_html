@@ -231,7 +231,6 @@ The HTML string is parsed into DOM elements and each element is visited once to 
 
 Notes:
 
-- Most of the `TextStyle` properties are available as `NodeMetadata` properties so those should be fast
 - Other complicated styling are supported via `BuildOp`
 
 ```dart

@@ -12,10 +12,10 @@ final _regExpSpaces = RegExp(r'[^\S\u{00A0}]+', unicode: true);
 
 class HtmlBuilder {
   final List<dom.Node> domNodes;
+  final CssBuilder parentCss;
   final NodeMetadata parentMeta;
   final Iterable<BuildOp> parentOps;
   final TextBits parentText;
-  final TextStyleBuilders parentTsb;
   final WidgetFactory wf;
 
   final _pieces = <BuiltPiece>[];
@@ -24,13 +24,13 @@ class HtmlBuilder {
 
   HtmlBuilder({
     @required this.domNodes,
+    @required this.parentCss,
     this.parentMeta,
     Iterable<BuildOp> parentParentOps,
     this.parentText,
-    @required this.parentTsb,
     @required this.wf,
   })  : assert(domNodes != null),
-        assert(parentTsb != null),
+        assert(parentCss != null),
         assert(wf != null),
         parentOps = _prepareParentOps(parentParentOps, parentMeta);
 
@@ -59,7 +59,7 @@ class HtmlBuilder {
   }
 
   NodeMetadata collectMetadata(dom.Element e) {
-    final meta = NodeMetadata._(parentOps);
+    final meta = NodeMetadata._(parentCss.sub(), parentOps);
 
     wf.parseTag(meta, e.localName, e.attributes);
 
@@ -107,7 +107,6 @@ class HtmlBuilder {
     }
 
     meta.domElement = e;
-    meta.tsb = parentTsb.sub()..enqueue(wf.tsb, meta);
 
     return meta;
   }
@@ -128,10 +127,10 @@ class HtmlBuilder {
       final isBlockElement = meta?.isBlockElement == true;
       final __builder = HtmlBuilder(
         domNodes: domNode.nodes,
+        parentCss: meta?._css ?? parentCss,
         parentMeta: meta,
         parentParentOps: parentOps,
         parentText: isBlockElement ? null : _textPiece.text,
-        parentTsb: meta?.tsb ?? parentTsb,
         wf: wf,
       );
 
@@ -186,8 +185,8 @@ class HtmlBuilder {
   }
 
   void _newTextPiece() => _textPiece = BuiltPiece.text(
-      (_pieces.isEmpty ? parentText?.sub(parentTsb) : null) ??
-          TextBits(parentTsb));
+      (_pieces.isEmpty ? parentText?.sub(parentCss) : null) ??
+          TextBits(parentCss));
 
   void _saveTextPiece() {
     _pieces.add(_textPiece);
@@ -206,25 +205,18 @@ Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, NodeMetadata meta) {
 
 class NodeMetadata {
   List<BuildOp> _buildOps;
+  final CssBuilder _css;
   dom.Element _domElement;
   final Iterable<BuildOp> _parentOps;
-  TextStyleBuilders _tsb;
 
-  Color color;
-  bool decoOver;
-  bool decoStrike;
-  bool decoUnder;
-  TextDecorationStyle decorationStyle;
-  Iterable<String> fontFamilies;
-  String fontSize;
-  bool fontStyleItalic;
-  FontWeight fontWeight;
   bool _isBlockElement;
   bool isNotRenderable;
   List<String> _styles;
   bool _stylesFrozen = false;
 
-  NodeMetadata._(this._parentOps);
+  NodeMetadata._(this._css, this._parentOps);
+
+  CssBuilder get css => _css;
 
   dom.Element get domElement => _domElement;
 
@@ -253,8 +245,6 @@ class NodeMetadata {
     }
   }
 
-  TextStyleBuilders get tsb => _tsb;
-
   set domElement(dom.Element e) {
     assert(_domElement == null);
     _domElement = e;
@@ -281,10 +271,6 @@ class NodeMetadata {
     _styles.addAll(styles);
   }
 
-  set tsb(TextStyleBuilders tsb) {
-    assert(_tsb == null);
-    _tsb = tsb;
-  }
 
   String style(String key) {
     String value;
