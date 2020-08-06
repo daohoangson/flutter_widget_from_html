@@ -8,7 +8,6 @@ import 'hello_world_core.dart';
 import 'iframe.dart';
 import 'iframe_twitter.dart';
 import 'img.dart';
-import 'playground.dart';
 import 'smilie.dart';
 import 'video.dart';
 
@@ -190,7 +189,6 @@ C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."
     'customStylesBuilder': () => CustomStylesBuilderScreen(),
     'customWidgetBuilder': () => CustomWidgetBuilderScreen(),
     'Smilie': () => SmilieScreen(),
-    'Playground': () => PlaygroundScreen(),
   };
 
   @override
