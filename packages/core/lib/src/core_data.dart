@@ -1,5 +1,3 @@
-import 'dart:ui' as ui show Shadow, FontFeature;
-
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -12,7 +10,7 @@ part 'data/text_bits.dart';
 class BuildOp {
   final bool isBlockElement;
 
-  // op with lower priority will run first
+  /// Build op with lower priority will run first
   final int priority;
 
   final _BuildOpDefaultStyles _defaultStyles;
@@ -137,9 +135,6 @@ class CssBuilder<T1> {
     return _output;
   }
 
-  TextStyle buildTextStyle(BuildContext context) =>
-      build(context).buildTextStyle(context);
-
   CssBuilder<T2> sub<T2>([
     CssScope Function(BuildContext, CssScope, T2) builder,
     T2 input,
@@ -148,8 +143,7 @@ class CssBuilder<T1> {
 
   void _resetContextIfNeeded(BuildContext context) {
     final contextStyle = DefaultTextStyle.of(context).style;
-    if (context == _context &&
-        contextStyle == _default.textStyleWithoutHeight) {
+    if (context == _context && contextStyle == _default.textStyle) {
       return;
     }
 
@@ -172,9 +166,12 @@ class CssLength {
   bool get isNotEmpty => number > 0;
 
   double getValue(BuildContext context, CssBuilder css) =>
-      getValueFromStyle(context, css.build(context).textStyleWithoutHeight);
+      _getValueFromStyle(context, css.build(context).textStyle);
 
-  double getValueFromStyle(BuildContext context, TextStyle style) {
+  double getValueFromScope(BuildContext context, CssScope scope) =>
+      _getValueFromStyle(context, scope.textStyle);
+
+  double _getValueFromStyle(BuildContext context, TextStyle style) {
     double value;
 
     switch (unit) {
@@ -255,22 +252,22 @@ class CssScope {
   final TextAlign align;
   final double height;
   final int maxLines;
-  final TextStyle textStyleWithoutHeight;
   final TextOverflow textOverflow;
+  final TextStyle textStyle;
 
   CssScope._({
     this.align,
     this.height,
     this.maxLines,
-    TextStyle textStyle,
+    this.textStyle,
     this.textOverflow,
-  }) : textStyleWithoutHeight = textStyle;
+  });
 
-  CssScope.style(this.textStyleWithoutHeight)
-      : align = null,
-        height = null,
-        maxLines = null,
-        textOverflow = null;
+  factory CssScope.style(TextStyle style) => CssScope._(textStyle: style);
+
+  TextStyle get textStyleWithHeight => height != null && height >= 0
+      ? textStyle.copyWith(height: height)
+      : textStyle;
 
   CssScope copyWith({
     TextAlign align,
@@ -278,66 +275,14 @@ class CssScope {
     int maxLines,
     TextStyle textStyle,
     TextOverflow textOverflow,
-
-    // TextStyle.copyWith parameters
-    Color color,
-    Color backgroundColor,
-    String fontFamily,
-    List<String> fontFamilyFallback,
-    double fontSize,
-    FontWeight fontWeight,
-    FontStyle fontStyle,
-    double letterSpacing,
-    double wordSpacing,
-    TextBaseline textBaseline,
-    Locale locale,
-    Paint foreground,
-    Paint background,
-    List<ui.Shadow> shadows,
-    List<ui.FontFeature> fontFeatures,
-    TextDecoration decoration,
-    Color decorationColor,
-    TextDecorationStyle decorationStyle,
-    double decorationThickness,
   }) =>
       CssScope._(
         align: align ?? this.align,
         height: height ?? this.height,
         maxLines: maxLines ?? this.maxLines,
-        textStyle: textStyle ??
-            textStyleWithoutHeight.copyWith(
-              color: color,
-              backgroundColor: backgroundColor,
-              fontFamily: fontFamily,
-              fontFamilyFallback: fontFamilyFallback,
-              fontSize: fontSize,
-              fontWeight: fontWeight,
-              fontStyle: fontStyle,
-              letterSpacing: letterSpacing,
-              wordSpacing: wordSpacing,
-              textBaseline: textBaseline,
-              locale: locale,
-              foreground: foreground,
-              background: background,
-              shadows: shadows,
-              fontFeatures: fontFeatures,
-              decoration: decoration,
-              decorationColor: decorationColor,
-              decorationStyle: decorationStyle,
-              decorationThickness: decorationThickness,
-            ),
+        textStyle: textStyle ?? this.textStyle,
         textOverflow: textOverflow ?? this.textOverflow,
       );
-
-  TextStyle buildTextStyle(BuildContext context) {
-    var built = textStyleWithoutHeight;
-
-    if (height != null && height >= 0) {
-      built = built.copyWith(height: height);
-    }
-
-    return built;
-  }
 }
 
 @immutable
