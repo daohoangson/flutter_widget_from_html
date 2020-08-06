@@ -844,7 +844,8 @@ class WidgetFactory {
         }
         return widgets;
       },
-      priority: 9223372036854775807,
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER
+      priority: 9007199254740991,
     );
     return _styleDisplayBlock;
   }
