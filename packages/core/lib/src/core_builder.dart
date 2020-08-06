@@ -243,8 +243,6 @@ class NodeMetadata {
     }
   }
 
-  TextStyleBuilder get tsb => _tsb;
-
   set domElement(dom.Element e) {
     assert(_domElement == null);
     _domElement = e;
@@ -271,6 +269,11 @@ class NodeMetadata {
     _styles.addAll(styles);
   }
 
+  TextStyleBuilder tsb<T>([
+    TextStyleHtml Function(BuildContext, TextStyleHtml, T) builder,
+    T input,
+  ]) =>
+      _tsb..enqueue(builder, input);
 
   String style(String key) {
     String value;

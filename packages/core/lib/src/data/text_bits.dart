@@ -12,7 +12,7 @@ abstract class TextBit {
   int get index => parent?._children?.indexOf(this) ?? -1;
   bool get isEmpty => false;
   bool get isNotEmpty => !isEmpty;
-  TextStyleBuilders get tsb => null;
+  TextStyleBuilder get tsb => null;
 
   InlineSpan compile(TextStyle style) => throw UnimplementedError();
 
@@ -92,7 +92,7 @@ class TextData extends TextBit {
   final String data;
 
   @override
-  final TextStyleBuilders tsb;
+  final TextStyleBuilder tsb;
 
   TextData(TextBits parent, this.data, this.tsb)
       : assert(parent != null),
@@ -225,7 +225,7 @@ class TextBits extends TextBit {
     return bit;
   }
 
-  TextBits sub([TextStyleBuilders tsb]) {
+  TextBits sub([TextStyleBuilder tsb]) {
     final sub = TextBits(tsb ?? this.tsb.sub(), this);
     add(sub);
     return sub;

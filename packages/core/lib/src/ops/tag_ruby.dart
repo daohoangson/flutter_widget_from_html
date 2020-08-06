@@ -64,7 +64,7 @@ class _TagRuby {
     TextBits parent,
     Widget ruby,
     Widget rt,
-    TextStyleBuilders rtTsb,
+    TextStyleBuilder rtTsb,
   ) =>
       TextWidget(
         parent,

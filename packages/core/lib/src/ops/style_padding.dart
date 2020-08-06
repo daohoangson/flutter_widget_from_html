@@ -3,7 +3,7 @@ part of '../core_widget_factory.dart';
 const _kCssPadding = 'padding';
 
 WidgetPlaceholder _paddingInlineAfter(
-  TextStyleBuilders tsb,
+  TextStyleBuilder tsb,
   CssLengthBox box,
 ) =>
     WidgetPlaceholder(builder: (context, children, _) {
@@ -15,7 +15,7 @@ WidgetPlaceholder _paddingInlineAfter(
     });
 
 WidgetPlaceholder _paddingInlineBefore(
-  TextStyleBuilders tsb,
+  TextStyleBuilder tsb,
   CssLengthBox box,
 ) =>
     WidgetPlaceholder(builder: (context, children, _) {
@@ -67,7 +67,7 @@ class _StylePadding {
   ) {
     final direction = Directionality.of(context);
     final padding = input.padding;
-    final tsb = input.meta.tsb;
+    final tsb = input.meta.tsb();
     final top = padding.top?.getValue(context, tsb);
     final right = padding.right(direction)?.getValue(context, tsb);
     final bottom = padding.bottom?.getValue(context, tsb);

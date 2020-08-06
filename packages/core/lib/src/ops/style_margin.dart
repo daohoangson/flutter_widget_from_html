@@ -9,7 +9,7 @@ Iterable<Widget> _marginHorizontalBuilder(
 ) {
   final direction = Directionality.of(context);
   final margin = input.margin;
-  final tsb = input.meta.tsb;
+  final tsb = input.meta.tsb();
   final padding = EdgeInsets.only(
     left: margin.left(direction)?.getValue(context, tsb) ?? 0.0,
     right: margin.right(direction)?.getValue(context, tsb) ?? 0.0,
@@ -42,7 +42,7 @@ Iterable<Widget> _marginVerticalBuilder(
 }
 
 class _MarginVerticalInput {
-  final TextStyleBuilders tsb;
+  final TextStyleBuilder tsb;
   final CssLength height;
 
   _MarginVerticalInput(this.tsb, this.height);
@@ -50,7 +50,7 @@ class _MarginVerticalInput {
 
 class _MarginVerticalPlaceholder
     extends WidgetPlaceholder<_MarginVerticalInput> {
-  _MarginVerticalPlaceholder(TextStyleBuilders tsb, CssLength height)
+  _MarginVerticalPlaceholder(TextStyleBuilder tsb, CssLength height)
       : assert(height != null),
         super(
           builder: _marginVerticalBuilder,
@@ -104,7 +104,7 @@ class _StyleMargin {
           final b = m.bottom?.isNotEmpty == true;
           final ws = List<WidgetPlaceholder>(
               (t ? 1 : 0) + widgets.length + (b ? 1 : 0));
-          final tsb = meta.tsb;
+          final tsb = meta.tsb();
 
           var i = 0;
           if (t) ws[i++] = _MarginVerticalPlaceholder(tsb, m.top);

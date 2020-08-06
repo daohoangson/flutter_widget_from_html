@@ -8,25 +8,8 @@ const _kCssTextAlignLeft = 'left';
 const _kCssTextAlignRight = 'right';
 
 class _StyleTextAlign {
-  final WidgetFactory wf;
-
-  _StyleTextAlign(this.wf);
-
-  BuildOp get buildOp => BuildOp(
-        isBlockElement: true,
-        onPieces: (meta, pieces) {
-          final v = meta.style(_kCssTextAlign);
-          if (v != null) {
-            final textAlign = _getTextAlign(v);
-            if (textAlign != null) meta.tsb.enqueue(tsb, textAlign);
-          }
-
-          return pieces;
-        },
-      );
-
-  static TextAlign _getTextAlign(String v) {
-    switch (v) {
+  static TextAlign tryParse(String value) {
+    switch (value) {
       case _kCssTextAlignCenter:
         return TextAlign.center;
       case _kCssTextAlignJustify:
@@ -40,6 +23,6 @@ class _StyleTextAlign {
     return null;
   }
 
-  static TextStyleHtml tsb(BuildContext _, TextStyleHtml p, TextAlign v) =>
+  static TextStyleHtml _tsb(BuildContext _, TextStyleHtml p, TextAlign v) =>
       p.copyWith(align: v);
 }

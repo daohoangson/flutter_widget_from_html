@@ -76,7 +76,7 @@ class _StyleVerticalAlign {
   }
 }
 
-_VerticalAlignInput _buildInput(String verticalAlign, TextStyleBuilders tsb) {
+_VerticalAlignInput _buildInput(String verticalAlign, TextStyleBuilder tsb) {
   switch (verticalAlign) {
     case _kCssVerticalAlignTop:
       return _VerticalAlignInput(PlaceholderAlignment.top);
@@ -104,8 +104,8 @@ _VerticalAlignInput _buildInput(String verticalAlign, TextStyleBuilders tsb) {
 @immutable
 class _VerticalAlignInput {
   final PlaceholderAlignment alignment;
+  final TextStyleBuilder tsb;
   final EdgeInsets padding;
-  final TextStyleBuilders tsb;
 
   _VerticalAlignInput(this.alignment, {this.padding, this.tsb})
       : assert((padding == null) == (tsb == null));

@@ -247,7 +247,7 @@ class TextStyleBuilder<T1> {
     T1 input,
     this.parent,
   }) {
-    if (builder != null) enqueue(builder, input);
+    enqueue(builder, input);
   }
 
   BuildContext get context => _context;
@@ -256,6 +256,8 @@ class TextStyleBuilder<T1> {
     TextStyleHtml Function(BuildContext, TextStyleHtml, T2) builder, [
     T2 input,
   ]) {
+    if (builder == null) return;
+
     assert(_output == null, 'Cannot add builder after being built');
     _builders.add(builder);
     _inputs.add(input);
