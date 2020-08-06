@@ -250,6 +250,32 @@ void main() {
     });
   });
 
+  group('useWidgetSpan', () {
+    final src = 'http://domain.com/image.png';
+    final html = 'Foo <img src="$src">';
+
+    testWidgets('renders true', (WidgetTester tester) async {
+      final explained = await explain(
+          tester, HtmlWidget(html, key: helper.hwKey, useWidgetSpan: true));
+      expect(
+          explained,
+          equals('[RichText:(:Foo '
+              '[Image:image=CachedNetworkImageProvider("$src", scale: 1.0)]'
+              ')]'));
+    });
+
+    testWidgets('renders false', (WidgetTester tester) async {
+      final explained = await explain(
+          tester, HtmlWidget(html, key: helper.hwKey, useWidgetSpan: false));
+      expect(
+          explained,
+          equals('[Column:children='
+              '[RichText:(:Foo)],'
+              '[CssBlock:child=[Image:image=CachedNetworkImageProvider("$src", scale: 1.0)]]'
+              ']'));
+    });
+  });
+
   group('webView', () {
     final webViewSrc = 'http://domain.com';
     final html = '<iframe src="$webViewSrc"></iframe>';

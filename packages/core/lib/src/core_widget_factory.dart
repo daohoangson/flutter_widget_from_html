@@ -723,6 +723,8 @@ class WidgetFactory {
         if (attrs.containsKey('width')) {
           meta.styles = ['width', "${attrs['width']}px"];
         }
+
+        if (!widget.useWidgetSpan) meta.isBlockElement = true;
         break;
 
       case 'ins':

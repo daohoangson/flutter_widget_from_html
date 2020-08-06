@@ -64,7 +64,9 @@ class WidgetFactory extends core.WidgetFactory {
   Object buildImageProvider(String url) =>
       url?.startsWith('data:image/svg+xml') == true
           ? buildSvgMemoryPicture(url)
-          : Uri.tryParse(url)?.path?.toLowerCase()?.endsWith('.svg') == true
+          : (url?.isNotEmpty == true &&
+                  Uri.tryParse(url)?.path?.toLowerCase()?.endsWith('.svg') ==
+                      true)
               ? buildSvgPictureProvider(url)
               : super.buildImageProvider(url);
 

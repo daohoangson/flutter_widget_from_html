@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
@@ -44,7 +45,6 @@ class HtmlWidget extends core.HtmlWidget {
     AsyncWidgetBuilder<Widget> buildAsyncBuilder,
     bool enableCaching = true,
     WidgetFactory Function() factoryBuilder = _singleton,
-    Key key,
     Uri baseUrl,
     CustomStylesBuilder customStylesBuilder,
     CustomWidgetBuilder customWidgetBuilder,
@@ -53,8 +53,10 @@ class HtmlWidget extends core.HtmlWidget {
     EdgeInsets tableCellPadding = const EdgeInsets.all(5),
     TextStyle textStyle = const TextStyle(),
     this.unsupportedWebViewWorkaroundForIssue37 = false,
+    bool useWidgetSpan = !kIsWeb,
     this.webView = false,
     this.webViewJs = true,
+    Key key,
   })  : assert(html != null),
         super(
           html,
@@ -68,6 +70,7 @@ class HtmlWidget extends core.HtmlWidget {
           hyperlinkColor: hyperlinkColor,
           onTapUrl: onTapUrl,
           textStyle: textStyle,
+          useWidgetSpan: useWidgetSpan,
           key: key,
         );
 
