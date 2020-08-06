@@ -114,7 +114,7 @@ class _StyleMargin {
             if (m.hasLeftOrRight) {
               widget.wrapWith(
                 _marginHorizontalBuilder,
-                _MarginHorizontalInput(m, meta.tsb(), wf),
+                _MarginHorizontalInput(m, tsb, wf),
               );
             }
 
