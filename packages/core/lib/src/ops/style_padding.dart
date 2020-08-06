@@ -34,6 +34,7 @@ class _StylePadding {
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
         onPieces: (meta, pieces) {
+          if (!wf.widget.useWidgetSpan) return pieces;
           if (meta.isBlockElement) return pieces;
           final padding = wf.parseCssLengthBox(meta, _kCssPadding);
           if (padding?.hasLeftOrRight != true) return pieces;

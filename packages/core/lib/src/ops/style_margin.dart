@@ -84,6 +84,7 @@ class _StyleMargin {
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
         onPieces: (meta, pieces) {
+          if (!wf.widget.useWidgetSpan) return pieces;
           if (meta.isBlockElement) return pieces;
           final m = wf.parseCssLengthBox(meta, _kCssMargin);
           if (m?.hasLeftOrRight != true) return pieces;
