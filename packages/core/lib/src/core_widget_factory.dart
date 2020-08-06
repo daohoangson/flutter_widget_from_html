@@ -419,12 +419,6 @@ class WidgetFactory {
   CssLengthBox parseCssLengthBox(NodeMetadata meta, String key) =>
       _parseCssLengthBox(meta, key);
 
-  CssLengthBox parseCssMargin(NodeMetadata meta) =>
-      parseCssLengthBox(meta, _kCssMargin);
-
-  CssLengthBox parseCssPadding(NodeMetadata meta) =>
-      parseCssLengthBox(meta, _kCssPadding);
-
   void parseStyle(NodeMetadata meta, String key, String value) {
     switch (key) {
       case _kCssBackgroundColor:

@@ -35,7 +35,7 @@ class _StylePadding {
         isBlockElement: false,
         onPieces: (meta, pieces) {
           if (meta.isBlockElement) return pieces;
-          final padding = wf.parseCssPadding(meta);
+          final padding = wf.parseCssLengthBox(meta, _kCssPadding);
           if (padding?.hasLeftOrRight != true) return pieces;
 
           return _wrapTextBits(
@@ -48,13 +48,10 @@ class _StylePadding {
         },
         onWidgets: (meta, widgets) {
           if (widgets?.isNotEmpty != true) return null;
-          final padding = wf.parseCssPadding(meta);
+          final padding = wf.parseCssLengthBox(meta, _kCssPadding);
           if (padding == null) return null;
 
-          final input = _PaddingInput()
-            ..meta = meta
-            ..padding = padding;
-
+          final input = _PaddingInput(padding, meta.tsb());
           return _listOrNull(wf.buildColumn(widgets)?.wrapWith(_build, input));
         },
         priority: 9999,
@@ -67,7 +64,7 @@ class _StylePadding {
   ) {
     final direction = Directionality.of(context);
     final padding = input.padding;
-    final tsb = input.meta.tsb();
+    final tsb = input.tsb;
     final top = padding.top?.getValue(context, tsb);
     final right = padding.right(direction)?.getValue(context, tsb);
     final bottom = padding.bottom?.getValue(context, tsb);
@@ -78,7 +75,9 @@ class _StylePadding {
   }
 }
 
+@immutable
 class _PaddingInput {
-  NodeMetadata meta;
-  CssLengthBox padding;
+  final CssLengthBox padding;
+  final TextStyleBuilder tsb;
+  _PaddingInput(this.padding, this.tsb);
 }
