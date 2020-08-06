@@ -50,6 +50,16 @@ jobs:
         run: |
           set -e
 
+          cd ./build/web
+          { \
+            echo '{'; \
+            echo '  "version": 2,'; \
+            echo '  "builds": ['; \
+            echo '  	{ "src": "./**/*", "use": "@now/static" }'; \
+            echo '  ]'; \
+            echo '}'; \
+          } > ./now.json
+
           mkdir -p ./.now && echo '${{ secrets.DEMO_APP_PROJECT_JSON }}' > ./.now/project.json
 
           if [ $GITHUB_REF == 'refs/heads/master' ]; then
@@ -67,7 +77,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          body: "Deployed ${{ github.sha }} to ${{ steps.now.outputs.url }}.\n\nQuick links:\n- [Home](${{ steps.now.outputs.url }}/build/web/)"
+          body: "Deployed ${{ github.sha }} to ${{ steps.now.outputs.url }}.\n\nQuick links:\n- [Home](${{ steps.now.outputs.url }})"
           fingerprint: "## Demo app"
           replace: please
 
