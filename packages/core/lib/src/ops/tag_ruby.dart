@@ -10,6 +10,8 @@ class _TagRuby {
   _TagRuby(this.wf);
 
   BuildOp get buildOp {
+    if (!wf.widget.useWidgetSpan) return null;
+
     TextBits rtText;
 
     return BuildOp(

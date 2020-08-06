@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 
 import '_.dart';
@@ -279,15 +280,26 @@ void main() {
   });
 
   group('RUBY', () {
+    final _html = '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>';
+    final _explain = (WidgetTester tester, {bool useWidgetSpan}) => explain(
+          tester,
+          null,
+          hw: HtmlWidget(_html, key: hwKey, useWidgetSpan: useWidgetSpan),
+        );
+
     testWidgets('renders with RT', (WidgetTester tester) async {
-      final html = '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>';
-      final explained = await explain(tester, html);
+      final explained = await _explain(tester, useWidgetSpan: true);
       expect(
           explained,
           equals('[RichText:[Stack:children='
               '[Padding:(3,0,3,0),child=[RichText:(:明日)]],'
               '[Positioned:(0.0,0.0,null,0.0),child=[Center:child=[RichText:(@5.0:Ashita)]]]'
               ']@middle]'));
+    });
+
+    testWidgets('renders with useWidgetSpan=false', (tester) async {
+      final explained = await _explain(tester, useWidgetSpan: false);
+      expect(explained, equals('[RichText:(:明日 (Ashita))]'));
     });
 
     testWidgets('renders without RT', (WidgetTester tester) async {
