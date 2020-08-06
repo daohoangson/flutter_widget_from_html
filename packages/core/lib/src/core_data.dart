@@ -89,70 +89,6 @@ class CssBorders {
   CssBorderSide top;
 }
 
-class CssBuilder<T1> {
-  final _builders = <Function>[];
-  final _inputs = [];
-  final CssBuilder parent;
-
-  BuildContext _context;
-  CssScope _default;
-  CssScope _output;
-
-  CssBuilder(
-    CssScope Function(BuildContext, CssScope, T1) builder, {
-    T1 input,
-    this.parent,
-  }) {
-    if (builder != null) enqueue(builder, input);
-  }
-
-  BuildContext get context => _context;
-
-  void enqueue<T2>(
-    CssScope Function(BuildContext, CssScope, T2) builder, [
-    T2 input,
-  ]) {
-    assert(_output == null, 'Cannot add builder after being built');
-    _builders.add(builder);
-    _inputs.add(input);
-  }
-
-  CssScope build(BuildContext context) {
-    _resetContextIfNeeded(context);
-    if (_output != null) return _output;
-
-    if (parent == null) {
-      _output = _default;
-    } else {
-      _output = parent.build(_context);
-    }
-
-    final l = _builders.length;
-    for (var i = 0; i < l; i++) {
-      _output = _builders[i](context, _output, _inputs[i]);
-    }
-
-    return _output;
-  }
-
-  CssBuilder<T2> sub<T2>([
-    CssScope Function(BuildContext, CssScope, T2) builder,
-    T2 input,
-  ]) =>
-      CssBuilder(builder, input: input, parent: this);
-
-  void _resetContextIfNeeded(BuildContext context) {
-    final contextStyle = DefaultTextStyle.of(context).style;
-    if (context == _context && contextStyle == _default.textStyle) {
-      return;
-    }
-
-    _context = context;
-    _default = CssScope.style(contextStyle);
-    _output = null;
-  }
-}
-
 class CssLength {
   final double number;
   final CssLengthUnit unit;
@@ -165,13 +101,13 @@ class CssLength {
 
   bool get isNotEmpty => number > 0;
 
-  double getValue(BuildContext context, CssBuilder css) =>
-      _getValueFromStyle(context, css.build(context).textStyle);
+  double getValue(BuildContext context, TextStyleBuilder tsb) =>
+      _getValueFromFlutterTextStyle(context, tsb.build(context).style);
 
-  double getValueFromScope(BuildContext context, CssScope scope) =>
-      _getValueFromStyle(context, scope.textStyle);
+  double getValueFromStyle(BuildContext context, TextStyleHtml tsh) =>
+      _getValueFromFlutterTextStyle(context, tsh.style);
 
-  double _getValueFromStyle(BuildContext context, TextStyle style) {
+  double _getValueFromFlutterTextStyle(BuildContext context, TextStyle style) {
     double value;
 
     switch (unit) {
@@ -248,44 +184,6 @@ enum CssLengthUnit {
 }
 
 @immutable
-class CssScope {
-  final TextAlign align;
-  final double height;
-  final int maxLines;
-  final TextOverflow textOverflow;
-  final TextStyle textStyle;
-
-  CssScope._({
-    this.align,
-    this.height,
-    this.maxLines,
-    this.textStyle,
-    this.textOverflow,
-  });
-
-  factory CssScope.style(TextStyle style) => CssScope._(textStyle: style);
-
-  TextStyle get textStyleWithHeight => height != null && height >= 0
-      ? textStyle.copyWith(height: height)
-      : textStyle;
-
-  CssScope copyWith({
-    TextAlign align,
-    double height,
-    int maxLines,
-    TextStyle textStyle,
-    TextOverflow textOverflow,
-  }) =>
-      CssScope._(
-        align: align ?? this.align,
-        height: height ?? this.height,
-        maxLines: maxLines ?? this.maxLines,
-        textStyle: textStyle ?? this.textStyle,
-        textOverflow: textOverflow ?? this.textOverflow,
-      );
-}
-
-@immutable
 class ImgMetadata {
   final String alt;
   final String title;
@@ -296,6 +194,107 @@ class ImgMetadata {
     this.title,
     @required this.url,
   });
+}
+
+@immutable
+class TextStyleHtml {
+  final TextAlign align;
+  final double height;
+  final int maxLines;
+  final TextOverflow textOverflow;
+  final TextStyle style;
+
+  TextStyleHtml._({
+    this.align,
+    this.height,
+    this.maxLines,
+    this.style,
+    this.textOverflow,
+  });
+
+  factory TextStyleHtml.style(TextStyle style) => TextStyleHtml._(style: style);
+
+  TextStyle get styleWithHeight =>
+      height != null && height >= 0 ? style.copyWith(height: height) : style;
+
+  TextStyleHtml copyWith({
+    TextAlign align,
+    double height,
+    int maxLines,
+    TextStyle style,
+    TextOverflow textOverflow,
+  }) =>
+      TextStyleHtml._(
+        align: align ?? this.align,
+        height: height ?? this.height,
+        maxLines: maxLines ?? this.maxLines,
+        style: style ?? this.style,
+        textOverflow: textOverflow ?? this.textOverflow,
+      );
+}
+
+class TextStyleBuilder<T1> {
+  final _builders = <Function>[];
+  final _inputs = [];
+  final TextStyleBuilder parent;
+
+  BuildContext _context;
+  TextStyleHtml _default;
+  TextStyleHtml _output;
+
+  TextStyleBuilder(
+    TextStyleHtml Function(BuildContext, TextStyleHtml, T1) builder, {
+    T1 input,
+    this.parent,
+  }) {
+    if (builder != null) enqueue(builder, input);
+  }
+
+  BuildContext get context => _context;
+
+  void enqueue<T2>(
+    TextStyleHtml Function(BuildContext, TextStyleHtml, T2) builder, [
+    T2 input,
+  ]) {
+    assert(_output == null, 'Cannot add builder after being built');
+    _builders.add(builder);
+    _inputs.add(input);
+  }
+
+  TextStyleHtml build(BuildContext context) {
+    _resetContextIfNeeded(context);
+    if (_output != null) return _output;
+
+    if (parent == null) {
+      _output = _default;
+    } else {
+      _output = parent.build(_context);
+    }
+
+    final l = _builders.length;
+    for (var i = 0; i < l; i++) {
+      _output = _builders[i](context, _output, _inputs[i]);
+    }
+
+    return _output;
+  }
+
+  TextStyleBuilder<T2> sub<T2>([
+    TextStyleHtml Function(BuildContext, TextStyleHtml, T2) builder,
+    T2 input,
+  ]) =>
+      TextStyleBuilder(builder, input: input, parent: this);
+
+  void _resetContextIfNeeded(BuildContext context) {
+    final contextStyle = DefaultTextStyle.of(context).style;
+    if (context == _context && contextStyle == _default.style) {
+      return;
+    }
+
+    _context = context;
+    _default = TextStyleHtml.style(contextStyle);
+    _output = null;
+  }
 }
 
 WidgetPlaceholder _widgetToPlaceholder(Widget widget) {
