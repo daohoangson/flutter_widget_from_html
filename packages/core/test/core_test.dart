@@ -1106,6 +1106,16 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
                 '[CssBlock:child=[Directionality:rtl,child=[RichText:(:Foo)]]]'));
       });
     });
+
+    testWidgets('renders margin inside', (WidgetTester tester) async {
+      final html = '<div dir="rtl"><div style="margin: 5px">Foo</div></div>';
+      final explained = await explainMargin(tester, html);
+      expect(
+          explained,
+          equals('[SizedBox:0.0x5.0],'
+              '[CssBlock:child=[Directionality:rtl,child=[CssBlock:child=[Padding:(0,5,0,5),child=[RichText:(:Foo)]]]]],'
+              '[SizedBox:0.0x5.0]'));
+    });
   });
 
   group('font-family', () {

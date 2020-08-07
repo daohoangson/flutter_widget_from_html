@@ -7,16 +7,12 @@ const _kCssDirectionRtl = 'rtl';
 
 BuildOp _styleDirection(WidgetFactory wf, String dir) => BuildOp(
       onWidgets: (_, ws) {
-        final textDirection = (dir == _kCssDirectionRtl)
+        final v = (dir == _kCssDirectionRtl)
             ? TextDirection.rtl
             : dir == _kCssDirectionLtr ? TextDirection.ltr : null;
+        if (v == null) return ws;
 
-        if (textDirection == null) return ws;
-        return [
-          Directionality(
-            child: wf.buildColumn(ws),
-            textDirection: textDirection,
-          )
-        ];
+        return _listOrNull(
+            wf.buildColumn(ws)?.wrapWith(wf.buildDirectionality, v));
       },
     );

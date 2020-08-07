@@ -96,6 +96,9 @@ class WidgetFactory {
             )
           : child;
 
+  Widget buildDirectionality(BuildContext _, Widget child, TextDirection v) =>
+      Directionality(child: child, textDirection: v);
+
   Widget buildDivider() => const DecoratedBox(
         decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 1)),
         child: SizedBox(height: 1),
