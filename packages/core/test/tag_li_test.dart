@@ -15,8 +15,8 @@ String padding(String child) =>
 
 String list(List<String> children) => '[Column:children=${children.join(",")}]';
 
-String item(String markerText, String contents) =>
-    '[CssBlock:child=[Stack:children=[RichText:(:$contents)],${marker(markerText)}]]';
+String item(String markerText, String contents, {String child}) =>
+    '[CssBlock:child=[Stack:children=${child ?? '[RichText:(:$contents)]'},${marker(markerText)}]]';
 
 String marker(String text) => '[Positioned:(0.0,null,null,-45.0),child='
     '[SizedBox:40.0x0.0,child='
@@ -95,8 +95,7 @@ void main() {
         ]))));
   });
 
-  testWidgets('renders nested list (single child)',
-      (WidgetTester tester) async {
+  testWidgets('renders nested list (single child)', (tester) async {
     final html = '''
 <ul>
   <li>Foo</li>
@@ -107,7 +106,7 @@ void main() {
         explained,
         equals(padding(list([
           item(disc, 'Foo'),
-          padding(item(circle, 'Bar')),
+          item(disc, null, child: padding(item(circle, 'Bar'))),
         ]))));
   });
 

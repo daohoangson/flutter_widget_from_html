@@ -23,103 +23,84 @@ const _kCssListStyleTypeRomanLower = 'lower-roman';
 const _kCssListStyleTypeRomanUpper = 'upper-roman';
 const _kCssListStyleTypeSquare = 'square';
 
-class _TagLi {
+class _TagLi extends BuildOp {
+  final NodeMetadata listMeta;
   final WidgetFactory wf;
 
-  BuildOp _buildOp;
-  BuildOp _liOp;
+  final _itemMetas = <NodeMetadata>[];
+  final _itemWidgets = <WidgetPlaceholder>[];
 
-  _TagLi(this.wf);
+  _ListConfig _config;
+  BuildOp _itemOp;
 
-  BuildOp get buildOp {
-    _buildOp ??= BuildOp(
-      defaultStyles: (meta, e) {
-        final p = meta.parents?.where((op) => op == _buildOp)?.length ?? 0;
+  _TagLi(this.wf, this.listMeta) : super(isBlockElement: true);
 
-        final styles = {
-          'padding-inline-start': '2.5em',
-          _kCssListStyleType: e.localName == _kTagOrderedList
-              ? (e.attributes.containsKey(_kAttributeLiType)
-                      ? _LiInput.listStyleTypeFromAttributeType(
-                          e.attributes[_kAttributeLiType])
-                      : null) ??
-                  _kCssListStyleTypeDecimal
-              : p == 0
-                  ? _kCssListStyleTypeDisc
-                  : p == 1
-                      ? _kCssListStyleTypeCircle
-                      : _kCssListStyleTypeSquare,
-        };
+  @override
+  bool get hasOnChild => true;
 
-        if (p == 0) styles[_kCssMargin] = '1em 0';
+  _ListConfig get config {
+    _config ??= _ListConfig.fromNodeMetadata(listMeta);
+    return _config;
+  }
 
-        return styles;
+  @override
+  Map<String, String> defaultStyles(NodeMetadata _, dom.Element e) {
+    final p = listMeta.parents?.whereType<_TagLi>()?.length ?? 0;
+
+    final styles = {
+      'padding-inline-start': '2.5em',
+      _kCssListStyleType: e.localName == _kTagOrderedList
+          ? (e.attributes.containsKey(_kAttributeLiType)
+                  ? _ListConfig.listStyleTypeFromAttributeType(
+                      e.attributes[_kAttributeLiType])
+                  : null) ??
+              _kCssListStyleTypeDecimal
+          : p == 0
+              ? _kCssListStyleTypeDisc
+              : p == 1 ? _kCssListStyleTypeCircle : _kCssListStyleTypeSquare,
+    };
+
+    if (p == 0) styles[_kCssMargin] = '1em 0';
+
+    return styles;
+  }
+
+  @override
+  void onChild(NodeMetadata childMeta, dom.Element e) {
+    if (e.localName != _kTagLi) return;
+    if (e.parent != listMeta.domElement) return;
+
+    _itemOp ??= BuildOp(
+      onWidgets: (meta, widgets) {
+        final column = wf.buildColumn(widgets) ?? placeholder0;
+
+        final i = _itemMetas.length;
+        _itemMetas.add(meta);
+        _itemWidgets.add(column);
+        return [column.wrapWith(_buildItem, i)];
       },
-      onChild: (meta, e) => e.localName == _kTagLi ? meta.op = liOp : null,
-      onWidgets: (meta, widgets) => _buildList(meta, widgets),
     );
-    return _buildOp;
+
+    childMeta.op = _itemOp;
   }
 
-  BuildOp get liOp {
-    _liOp ??= BuildOp(
-      onWidgets: (meta, widgets) =>
-          widgets.length == 1 && widgets.first is _LiPlaceholder
-              ? widgets
-              : [_placeholder(widgets, meta)],
-    );
-    return _liOp;
-  }
-
-  Iterable<Widget> _build(BuildContext c, Iterable<Widget> ws, _LiInput i) {
-    final listMeta = i.listMeta;
-    if (listMeta == null) return ws;
-
-    final tsh = i.meta.tsb().build(c);
-    final listStyleType = i.listStyleType ?? listMeta.listStyleType;
-    final markerIndex = listMeta.markerReversed
-        ? (listMeta.markerStart ?? listMeta.markerCount) - i.markerIndex
-        : (listMeta.markerStart ?? 1) + i.markerIndex;
+  Widget _buildItem(BuildContext context, Widget child, int i) {
+    final meta = _itemMetas[i];
+    final tsh = meta.tsb().build(context);
+    final listStyleType =
+        _ListConfig.listStyleTypeFromNodeMetadata(meta) ?? config.listStyleType;
+    final markerIndex = config.markerReversed == true
+        ? (config.markerStart ?? _itemWidgets.length) - i
+        : (config.markerStart ?? 1) + i;
     final markerText = wf.getListStyleMarker(listStyleType, markerIndex);
 
-    return [
-      Stack(
-        children: <Widget>[
-          wf.buildColumn(ws) ?? widget0,
-          _buildMarker(c, tsh.styleWithHeight, markerText),
-        ],
-        overflow: Overflow.visible,
-      ),
-    ];
-  }
-
-  Iterable<Widget> _buildList(NodeMetadata meta, Iterable<Widget> children) {
-    final listMeta = _ListMetadata();
-    for (final style in meta?.styleEntries) {
-      switch (style.key) {
-        case _kCssListStyleType:
-          listMeta.listStyleType = style.value;
-          break;
-      }
-    }
-
-    final a = meta.domElement.attributes;
-    if (a.containsKey(_kAttributeOlReversed)) listMeta.markerReversed = true;
-    if (a.containsKey(_kAttributeOlStart)) {
-      listMeta.markerStart = int.tryParse(a[_kAttributeOlStart]);
-    }
-
-    for (final child in children) {
-      if (child is _LiPlaceholder) {
-        final input = child.input;
-        if (input.listMeta == null) {
-          input.listMeta = listMeta;
-          input.markerIndex = listMeta.markerCount++;
-        }
-      }
-    }
-
-    return children;
+    return Stack(
+      children: <Widget>[
+        child,
+        _buildMarker(context, tsh.styleWithHeight, markerText),
+      ],
+      overflow: Overflow.visible,
+    );
   }
 
   Widget _buildMarker(BuildContext context, TextStyle style, String text) {
@@ -143,11 +124,50 @@ class _TagLi {
       ),
     );
   }
+}
 
-  _LiPlaceholder _placeholder(Iterable<Widget> children, NodeMetadata meta) {
+@immutable
+class _ListConfig {
+  final String listStyleType;
+  final bool markerReversed;
+  final int markerStart;
+
+  _ListConfig({
+    this.listStyleType,
+    this.markerReversed,
+    this.markerStart,
+  });
+
+  factory _ListConfig.fromNodeMetadata(NodeMetadata meta) {
+    var listStyleType = _kCssListStyleTypeDisc;
+    bool markerReversed;
+    int markerStart;
+
+    for (final style in meta?.styleEntries) {
+      switch (style.key) {
+        case _kCssListStyleType:
+          listStyleType = style.value;
+          break;
+      }
+    }
+
+    final a = meta.domElement.attributes;
+    if (a.containsKey(_kAttributeOlReversed)) markerReversed = true;
+    if (a.containsKey(_kAttributeOlStart)) {
+      markerStart = int.tryParse(a[_kAttributeOlStart]);
+    }
+
+    return _ListConfig(
+      listStyleType: listStyleType,
+      markerReversed: markerReversed,
+      markerStart: markerStart,
+    );
+  }
+
+  static String listStyleTypeFromNodeMetadata(NodeMetadata meta) {
     final a = meta.domElement.attributes;
     var listStyleType = a.containsKey(_kAttributeLiType)
-        ? _LiInput.listStyleTypeFromAttributeType(a[_kAttributeLiType])
+        ? listStyleTypeFromAttributeType(a[_kAttributeLiType])
         : null;
     for (final style in meta.styleEntries) {
       switch (style.key) {
@@ -157,34 +177,8 @@ class _TagLi {
       }
     }
 
-    return _LiPlaceholder(
-        this,
-        children,
-        _LiInput()
-          ..listStyleType = listStyleType
-          ..meta = meta);
+    return listStyleType;
   }
-}
-
-class _LiPlaceholder extends WidgetPlaceholder<_LiInput> {
-  final _LiInput input;
-
-  _LiPlaceholder(
-    _TagLi self,
-    Iterable<Widget> children,
-    this.input,
-  ) : super(
-          builder: self._build,
-          children: children,
-          input: input,
-        );
-}
-
-class _LiInput {
-  _ListMetadata listMeta;
-  String listStyleType;
-  int markerIndex;
-  NodeMetadata meta;
 
   static String listStyleTypeFromAttributeType(String type) {
     switch (type) {
@@ -202,11 +196,4 @@ class _LiInput {
 
     return null;
   }
-}
-
-class _ListMetadata {
-  String listStyleType = _kCssListStyleTypeDisc;
-  int markerCount = 0;
-  bool markerReversed = false;
-  int markerStart;
 }

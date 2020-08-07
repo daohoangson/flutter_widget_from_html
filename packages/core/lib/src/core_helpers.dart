@@ -7,6 +7,9 @@ part 'widget/css_element.dart';
 const kShouldBuildAsync = 10000;
 
 /// A no op placeholder widget.
+final placeholder0 = WidgetPlaceholder(builder: (_, __, ___) => widget0);
+
+/// A no op widget.
 const widget0 = SizedBox.shrink();
 
 typedef CustomStylesBuilder = Map<String, String> Function(dom.Element element);

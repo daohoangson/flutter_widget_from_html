@@ -51,7 +51,6 @@ class WidgetFactory {
   BuildOp _tagFont;
   BuildOp _tagHr;
   BuildOp _tagImg;
-  BuildOp _tagLi;
   BuildOp _tagQ;
   BuildOp _tagTable;
   HtmlWidget _widget;
@@ -66,6 +65,19 @@ class WidgetFactory {
     bool trimMarginVertical = false,
   }) {
     if (children?.isNotEmpty != true) return null;
+
+    if (children.length == 1) {
+      final first = children.first;
+      if (first is WidgetPlaceholder) {
+        if (first is! _ColumnPlaceholder) return first;
+
+        final existingPlaceholder = first as _ColumnPlaceholder;
+        if (existingPlaceholder.trimMarginVertical == trimMarginVertical) {
+          return first;
+        }
+      }
+    }
+
     return _ColumnPlaceholder(
       children,
       trimMarginVertical: trimMarginVertical,
@@ -257,6 +269,9 @@ class WidgetFactory {
         widgets.add(compiled);
       }
     }
+
+    if (widgets.isEmpty) return widget0;
+    if (widgets.length == 1) return widgets.first;
 
     return buildColumn(widgets);
   }
@@ -686,7 +701,7 @@ class WidgetFactory {
 
       case _kTagOrderedList:
       case _kTagUnorderedList:
-        meta.op = tagLi();
+        meta.op = tagLi(meta);
         break;
 
       case 'mark':
@@ -787,12 +802,8 @@ class WidgetFactory {
 
   BuildOp styleDisplayBlock() {
     _styleDisplayBlock ??= BuildOp(
-      onWidgets: (_, widgets) => [
-        WidgetPlaceholder(
-          builder: _cssBlock,
-          children: widgets,
-        ),
-      ],
+      onWidgets: (_, widgets) =>
+          _listOrNull(buildColumn(widgets)?.wrapWith(_cssBlock)),
       priority: 9223372036854775807,
     );
     return _styleDisplayBlock;
@@ -857,10 +868,7 @@ class WidgetFactory {
     return _tagImg;
   }
 
-  BuildOp tagLi() {
-    _tagLi ??= _TagLi(this).buildOp;
-    return _tagLi;
-  }
+  BuildOp tagLi(NodeMetadata meta) => _TagLi(this, meta);
 
   BuildOp tagQ() {
     _tagQ ??= _TagQ(this).buildOp;
