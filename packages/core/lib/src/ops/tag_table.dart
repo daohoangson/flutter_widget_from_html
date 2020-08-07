@@ -144,11 +144,9 @@ class _TagTable extends BuildOp {
         break;
       case _kTagTableHeaderCell:
       case _kTagTableCell:
-        value = _kCssDisplayTableCell;
-        break;
+        return _kCssDisplayTableCell;
       case _kTagTableCaption:
-        value = _kCssDisplayTableCaption;
-        break;
+        return _kCssDisplayTableCaption;
     }
 
     if (value != null) {

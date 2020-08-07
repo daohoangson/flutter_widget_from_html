@@ -768,23 +768,15 @@ class WidgetFactory {
 
   BuildOp styleDisplayBlock() {
     _styleDisplayBlock ??= BuildOp(
-      onWidgets: (meta, widgets) {
-        final display = meta.style(_kCssDisplay);
-        if (display != null && display != _kCssDisplayBlock) {
-          // if `display` is specified and it is not `block`
-          // do not wrap it in [CssBlock]
-          return widgets;
-        }
-
-        return _listOrNull(buildColumn(widgets)?.wrapWith(_cssBlock));
-      },
+      onWidgets: (meta, widgets) =>
+          _listOrNull(buildColumn(widgets)?.wrapWith(_cssBlock)),
       priority: 9223372036854775807,
     );
     return _styleDisplayBlock;
   }
 
   Widget _cssBlock(BuildContext _, Widget child, __) =>
-      child is CssBlock ? child : CssBlock(child: child);
+      child == widget0 || child is CssBlock ? child : CssBlock(child: child);
 
   BuildOp styleMargin() {
     _styleMargin ??= _StyleMargin(this).buildOp;
