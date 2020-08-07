@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'core_builder.dart';
 import 'core_helpers.dart';
 
 part 'data/table_data.dart';
