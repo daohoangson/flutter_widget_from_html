@@ -84,15 +84,16 @@ class WidgetFactory {
     while (output.isEmpty || iter.moveNext()) {
       var widget = iter.current;
 
-      if (widget is _MarginVerticalPlaceholder &&
-          prev is _MarginVerticalPlaceholder) {
-        prev.mergeWith(widget);
-        continue;
-      }
-
-      if (widget is WidgetPlaceholder<TextBits>) {
+      if (widget is _MarginVerticalPlaceholder) {
+        if (prev is _MarginVerticalPlaceholder) {
+          prev.mergeWith(widget);
+          continue;
+        }
+      } else if (widget is WidgetPlaceholder) {
         widget = (widget as WidgetPlaceholder).build(c);
       }
+
+      if (widget == widget0) continue;
 
       if (widget is Column) {
         final Column column = widget;
