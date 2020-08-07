@@ -838,19 +838,23 @@ class WidgetFactory {
 
   BuildOp styleDisplayBlock() {
     _styleDisplayBlock ??= BuildOp(
-      onWidgets: (_, widgets) {
-        for (final widget in widgets) {
-          widget.wrapWith(_cssBlock);
-        }
-        return widgets;
-      },
+      onWidgets: (_, widgets) => [
+        WidgetPlaceholder(
+          builder: _cssBlock,
+          children: widgets,
+        ),
+      ],
       priority: 9223372036854775807,
     );
     return _styleDisplayBlock;
   }
 
-  static Iterable<Widget> _cssBlock(BuildContext _, Iterable<Widget> ws, __) =>
-      ws?.map((w) => w is CssBlock ? w : CssBlock(child: w));
+  Iterable<Widget> _cssBlock(BuildContext _, Iterable<Widget> ws, __) {
+    final child = buildColumn(ws);
+    if (child == null) return null;
+
+    return [child is CssBlock ? child : CssBlock(child: child)];
+  }
 
   BuildOp styleMargin() {
     _styleMargin ??= _StyleMargin(this).buildOp;
