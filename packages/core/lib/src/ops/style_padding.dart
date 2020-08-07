@@ -52,7 +52,13 @@ class _StylePadding {
           if (padding == null) return null;
 
           final input = _PaddingInput(padding, meta.tsb());
-          return _listOrNull(wf.buildColumn(widgets)?.wrapWith(_build, input));
+          return [
+            WidgetPlaceholder(
+              builder: _build,
+              children: widgets,
+              input: input,
+            )
+          ];
         },
         priority: 9999,
       );
