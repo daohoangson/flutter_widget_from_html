@@ -13,7 +13,3 @@ const _kCssMaxLinesWebkitLineClamp = '-webkit-line-clamp';
 const _kCssTextOverflow = 'text-overflow';
 const _kCssTextOverflowClip = 'clip';
 const _kCssTextOverflowEllipsis = 'ellipsis';
-
-final _spacingRegExp = RegExp(r'\s+');
-
-Iterable<String> _splitCss(String value) => value.split(_spacingRegExp);

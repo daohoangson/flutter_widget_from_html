@@ -228,7 +228,7 @@ class _TextDeco {
   });
 
   factory _TextDeco.tryParse(String value) {
-    for (final v in _splitCss(value)) {
+    for (final v in splitCssValues(value)) {
       switch (v) {
         case _kCssTextDecorationLineThrough:
           return _TextDeco(strike: true);

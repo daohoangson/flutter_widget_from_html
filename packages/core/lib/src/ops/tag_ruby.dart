@@ -16,7 +16,7 @@ class _TagRuby {
       onChild: (meta, e) {
         switch (e.localName) {
           case _kTagRp:
-            meta.styles = [_kCssDisplay, _kCssDisplayNone];
+            meta.addStyle(_kCssDisplay, _kCssDisplayNone);
             break;
           case _kTagRt:
             meta
@@ -31,7 +31,7 @@ class _TagRuby {
                   return [];
                 },
               )
-              ..styles = [_kCssFontSize, '0.5em'];
+              ..addStyle(_kCssFontSize, '0.5em');
             break;
         }
 

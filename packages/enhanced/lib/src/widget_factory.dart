@@ -6,7 +6,6 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
     as core;
 import 'package:url_launcher/url_launcher.dart';
 
-import 'builder.dart';
 import 'data.dart';
 import 'helpers.dart';
 import 'html_widget.dart';

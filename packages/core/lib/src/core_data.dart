@@ -196,6 +196,91 @@ class ImgMetadata {
   });
 }
 
+class NodeMetadata {
+  List<BuildOp> _buildOps;
+  dom.Element _domElement;
+  final Iterable<BuildOp> _parentOps;
+  final TextStyleBuilder _tsb;
+
+  bool _isBlockElement;
+  bool isNotRenderable;
+  List<String> _styles;
+  bool _stylesFrozen = false;
+
+  NodeMetadata(this._tsb, this._parentOps);
+
+  dom.Element get domElement => _domElement;
+
+  bool get hasOps => _buildOps != null;
+
+  bool get hasParents => _parentOps != null;
+
+  bool get isBlockElement {
+    if (_isBlockElement == true) return true;
+    return _buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
+  }
+
+  Iterable<BuildOp> get ops => _buildOps;
+
+  Iterable<BuildOp> get parents => _parentOps;
+
+  Iterable<MapEntry<String, String>> get styleEntries sync* {
+    _stylesFrozen = true;
+    if (_styles == null) return;
+
+    final iterator = _styles.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current;
+      if (!iterator.moveNext()) return;
+      yield MapEntry(key, iterator.current);
+    }
+  }
+
+  set domElement(dom.Element e) {
+    assert(_domElement == null);
+    _domElement = e;
+
+    if (_buildOps != null) {
+      _buildOps.sort((a, b) => a.priority.compareTo(b.priority));
+      _buildOps = List.unmodifiable(_buildOps);
+    }
+  }
+
+  set isBlockElement(bool v) => _isBlockElement = v;
+
+  set op(BuildOp op) {
+    if (op == null) return;
+    _buildOps ??= [];
+    if (!_buildOps.contains(op)) _buildOps.add(op);
+  }
+
+  void addStyle(String key, String value) {
+    assert(!_stylesFrozen);
+    _styles ??= [];
+    _styles..add(key)..add(value);
+  }
+
+  void insertStyle(String key, String value) {
+    assert(!_stylesFrozen);
+    _styles ??= [];
+    _styles..insertAll(0, [key, value]);
+  }
+
+  String style(String key) {
+    String value;
+    for (final x in styleEntries) {
+      if (x.key == key) value = x.value;
+    }
+    return value;
+  }
+
+  TextStyleBuilder tsb<T>([
+    TextStyleHtml Function(BuildContext, TextStyleHtml, T) builder,
+    T input,
+  ]) =>
+      _tsb..enqueue(builder, input);
+}
+
 @immutable
 class TextStyleHtml {
   final TextAlign align;

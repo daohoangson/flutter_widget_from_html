@@ -1,5 +1,14 @@
 part of '../core_widget_factory.dart';
 
+const _kTagTable = 'table';
+const _kTagTableRow = 'tr';
+const _kTagTableHeaderGroup = 'thead';
+const _kTagTableRowGroup = 'tbody';
+const _kTagTableFooterGroup = 'tfoot';
+const _kTagTableHeaderCell = 'th';
+const _kTagTableCell = 'td';
+const _kTagTableCaption = 'caption';
+
 const _kAttributeBorder = 'border';
 const _kAttributeCellPadding = 'cellpadding';
 const _kCssDisplayTable = 'table';
@@ -10,109 +19,99 @@ const _kCssDisplayTableFooterGroup = 'table-footer-group';
 const _kCssDisplayTableCell = 'table-cell';
 const _kCssDisplayTableCaption = 'table-caption';
 
-class _TagTable {
+class _TagTable extends BuildOp {
+  final NodeMetadata tableMeta;
   final WidgetFactory wf;
 
-  _TagTable(this.wf);
+  final _data = _TableData();
 
-  BuildOp get buildOp => BuildOp(
-        onWidgets: (meta, widgets) {
-          WidgetPlaceholderBuilder<NodeMetadata> lastBuilder;
+  _TagTable(this.wf, this.tableMeta)
+      : super(
+          isBlockElement: true,
+          priority: 999999,
+        );
 
-          switch (meta.style(_kCssDisplay)) {
-            case _kCssDisplayTableRow:
-              lastBuilder = _row;
-              break;
-            case _kCssDisplayTableHeaderGroup:
-            case _kCssDisplayTableRowGroup:
-            case _kCssDisplayTableFooterGroup:
-              lastBuilder = _group;
-              break;
-            case _kCssDisplayTableCell:
-              return [
-                WidgetPlaceholder<NodeMetadata>(
-                  children: widgets,
-                  input: meta,
-                  lastBuilder: _cell,
-                ),
-              ];
-            case _kCssDisplayTableCaption:
-              return widgets;
-            default:
-              lastBuilder = _build;
-          }
+  @override
+  bool get hasOnChild => true;
 
-          return [
-            _TagTablePlaceholder(
-              children: widgets,
-              input: meta,
-              lastBuilder: lastBuilder,
-            ),
-          ];
-        },
-        priority: 999999,
-      );
+  @override
+  void onChild(NodeMetadata childMeta, dom.Element e) {
+    if (e.parent != tableMeta.domElement) return;
 
-  Iterable<Widget> _build(BuildContext c, Iterable<Widget> ws, NodeMetadata m) {
-    if (ws?.isNotEmpty != true) return ws;
-
-    final rows = <_TableDataRow>[];
-    List<_TableDataRow> rowsHeader, rowsFooter;
-    final widgets = <Widget>[];
-
-    for (var child in ws) {
-      if (child is WidgetPlaceholder) {
-        final placeholder = child as WidgetPlaceholder;
-        child = placeholder.build(c);
-      }
-
-      if (child is _TableDataRow) {
-        rows.add(child);
-      } else if (child is _TableDataGroup) {
-        if (child.type == _kCssDisplayTableHeaderGroup && rowsHeader == null) {
-          rowsHeader = child.rows;
-        } else if (child.type == _kCssDisplayTableFooterGroup &&
-            rowsFooter == null) {
-          rowsFooter = child.rows;
-        } else {
-          rows.addAll(child.rows);
-        }
-      } else {
-        widgets.add(child);
-      }
+    final which = _getChildCssDisplayValue(childMeta, e);
+    switch (which) {
+      case _kCssDisplayTableRow:
+        final row = _TableDataRow();
+        _data.rows.add(row);
+        childMeta.op = _TableRowOp(wf, childMeta, row);
+        break;
+      case _kCssDisplayTableHeaderGroup:
+      case _kCssDisplayTableRowGroup:
+      case _kCssDisplayTableFooterGroup:
+        final rows = which == _kCssDisplayTableHeaderGroup
+            ? _data.header.rows
+            : which == _kCssDisplayTableRowGroup
+                ? _data.rows
+                : _data.footer.rows;
+        childMeta.op = _TableGroupOp(wf, childMeta, rows);
+        break;
+      case _kCssDisplayTableCaption:
+        childMeta.op = BuildOp(onWidgets: (_, widgets) {
+          _data.caption = wf.buildColumn(widgets);
+          return [_data.caption];
+        });
+        break;
     }
+  }
 
-    if (rowsHeader != null) rows.insertAll(0, rowsHeader);
-    if (rowsFooter != null) rows.addAll(rowsFooter);
-    if (rows.isEmpty) return widgets;
+  @override
+  Iterable<WidgetPlaceholder> onWidgets(
+          NodeMetadata meta, Iterable<WidgetPlaceholder> _) =>
+      [
+        WidgetPlaceholder<_TableData>(
+          builder: _buildTable,
+          input: _data,
+        )
+      ];
 
+  Widget _buildTable(BuildContext c, Widget _, _TableData data) {
     final table = TableData(
-      border: _parseBorder(c, m),
+      border: _parseBorder(c),
     );
+
+    final rows = <_TableDataRow>[
+      ...data.header.rows,
+      ...data.rows,
+      ...data.footer.rows,
+    ];
+
     for (var i = 0; i < rows.length; i++) {
       for (final cell in rows[i].cells) {
         table.addCell(i, cell);
       }
     }
 
-    widgets.add(wf.buildTable(table));
+    final tableWidget = table.slots.isNotEmpty ? wf.buildTable(table) : widget0;
+    if (data.caption == null) {
+      return tableWidget;
+    }
 
-    return [wf.buildColumn(widgets)];
+    return wf.buildColumn([data.caption, tableWidget]);
   }
 
-  BorderSide _parseBorder(BuildContext context, NodeMetadata meta) {
-    var styleBorder = meta.style(_kCssBorder);
+  BorderSide _parseBorder(BuildContext context) {
+    var styleBorder = tableMeta.style(_kCssBorder);
     if (styleBorder != null) {
       final borderParsed = wf.parseCssBorderSide(styleBorder);
       if (borderParsed != null) {
         return BorderSide(
           color: borderParsed.color ?? const Color(0xFF000000),
-          width: borderParsed.width.getValue(context, meta.tsb()),
+          width: borderParsed.width.getValue(context, tableMeta.tsb()),
         );
       }
     }
 
-    final a = meta.domElement.attributes;
+    final a = tableMeta.domElement.attributes;
     if (a.containsKey(_kAttributeBorder)) {
       final width = double.tryParse(a[_kAttributeBorder]);
       if (width != null && width > 0) {
@@ -125,115 +124,133 @@ class _TagTable {
 
   static BuildOp cellPaddingOp(double px) => BuildOp(
       onChild: (meta, e) => (e.localName == 'td' || e.localName == 'th')
-          ? meta.styles = [_kCssPadding, '${px}px']
+          ? meta.addStyle(_kCssPadding, '${px}px')
           : null);
-}
 
-class _TagTablePlaceholder<T> extends WidgetPlaceholder<T> {
-  final Iterable<Widget> children;
+  static String _getChildCssDisplayValue(NodeMetadata meta, dom.Element e) {
+    String value;
+    switch (e.localName) {
+      case _kTagTableRow:
+        value = _kCssDisplayTableRow;
+        break;
+      case _kTagTableHeaderGroup:
+        value = _kCssDisplayTableHeaderGroup;
+        break;
+      case _kTagTableRowGroup:
+        value = _kCssDisplayTableRowGroup;
+        break;
+      case _kTagTableFooterGroup:
+        value = _kCssDisplayTableFooterGroup;
+        break;
+      case _kTagTableHeaderCell:
+      case _kTagTableCell:
+        value = _kCssDisplayTableCell;
+        break;
+      case _kTagTableCaption:
+        value = _kCssDisplayTableCaption;
+        break;
+    }
 
-  _TagTablePlaceholder({
-    this.children,
-    T input,
-    WidgetPlaceholderBuilder<T> lastBuilder,
-  }) : super(children: children, input: input, lastBuilder: lastBuilder);
+    if (value != null) {
+      meta.addStyle(_kCssDisplay, value);
+      return value;
+    }
 
-  @override
-  _TagTablePlaceholder<T> wrapWith<T2>(WidgetPlaceholderBuilder<T2> builder,
-      [T2 input]) {
-    assert(builder != null);
-
-    for (final child in children) {
-      if (child is WidgetPlaceholder) {
-        child.wrapWith(builder, input);
+    if (e.attributes.containsKey('style')) {
+      for (final pair in splitAttributeStyle(e.attributes['style'])
+          .toList(growable: false)
+          .reversed) {
+        if (pair.key == _kCssDisplay) {
+          return pair.value;
+        }
       }
     }
 
-    return this;
+    return null;
   }
 }
 
-class _TableDataRow extends StatelessWidget {
-  final Iterable<TableDataCell> cells;
+class _TableGroupOp extends BuildOp {
+  final List<_TableDataRow> rows;
+  final NodeMetadata groupMeta;
+  final WidgetFactory wf;
 
-  const _TableDataRow({Key key, @required this.cells})
-      : assert(cells != null),
-        super(key: key);
-
-  @override
-  Widget build(BuildContext context) => widget0;
-}
-
-class _TableDataGroup extends StatelessWidget {
-  final Iterable<_TableDataRow> rows;
-  final String type;
-
-  const _TableDataGroup({
-    Key key,
-    @required this.rows,
-    @required this.type,
-  })  : assert(rows != null),
-        assert(type != null),
-        super(key: key);
+  _TableGroupOp(this.wf, this.groupMeta, this.rows);
 
   @override
-  Widget build(BuildContext context) => widget0;
+  bool get hasOnChild => true;
+
+  @override
+  void onChild(NodeMetadata childMeta, dom.Element e) {
+    if (e.parent != groupMeta.domElement) return;
+    if (_TagTable._getChildCssDisplayValue(childMeta, e) !=
+        _kCssDisplayTableRow) return;
+
+    final row = _TableDataRow();
+    rows.add(row);
+    childMeta.op = _TableRowOp(wf, childMeta, row);
+  }
 }
 
-Iterable<Widget> _cell(BuildContext _, Iterable<Widget> ws, NodeMetadata m) {
-  if (ws?.isNotEmpty != true) return ws;
+class _TableRowOp extends BuildOp {
+  final _TableDataRow row;
+  final NodeMetadata rowMeta;
+  final WidgetFactory wf;
 
-  final a = m.domElement.attributes;
-  final colspan = a.containsKey('colspan') ? int.tryParse(a['colspan']) : null;
-  final rowspan = a.containsKey('rowspan') ? int.tryParse(a['rowspan']) : null;
+  BuildOp _cellOp;
 
-  return [
-    TableDataCell(
-      children: ws,
+  _TableRowOp(this.wf, this.rowMeta, this.row);
+
+  @override
+  bool get hasOnChild => true;
+
+  @override
+  void onChild(NodeMetadata childMeta, dom.Element e) {
+    if (e.parent != rowMeta.domElement) return;
+    if (_TagTable._getChildCssDisplayValue(childMeta, e) !=
+        _kCssDisplayTableCell) return;
+
+    _cellOp ??= BuildOp(
+      onWidgets: (childMeta, widgets) {
+        final column = wf.buildColumn(widgets);
+        if (column == null) return null;
+
+        final cell = _build(childMeta, column);
+        row.cells.add(cell);
+
+        return [column];
+      },
+    );
+
+    childMeta.op = _cellOp;
+  }
+
+  static TableDataCell _build(NodeMetadata cellMeta, Widget child) {
+    final a = cellMeta.domElement.attributes;
+    final colspan =
+        a.containsKey('colspan') ? int.tryParse(a['colspan']) : null;
+    final rowspan =
+        a.containsKey('rowspan') ? int.tryParse(a['rowspan']) : null;
+
+    return TableDataCell(
+      child: child,
       colspan: colspan ?? 1,
       rowspan: rowspan ?? 1,
-    )
-  ];
-}
-
-Iterable<Widget> _row(BuildContext c, Iterable<Widget> ws, _) {
-  if (ws?.isNotEmpty != true) return ws;
-
-  final cells = <TableDataCell>[];
-
-  for (var child in ws) {
-    if (child is WidgetPlaceholder) {
-      final placeholder = child as WidgetPlaceholder;
-      child = placeholder.build(c);
-    }
-
-    if (child is TableDataCell) {
-      cells.add(child);
-    }
+    );
   }
-
-  if (cells.isEmpty) return null;
-
-  return [_TableDataRow(cells: cells)];
 }
 
-Iterable<Widget> _group(BuildContext c, Iterable<Widget> ws, NodeMetadata m) {
-  if (ws?.isNotEmpty != true) return ws;
-
+class _TableData {
+  Widget caption;
+  final footer = _TableDataGroup();
+  final header = _TableDataGroup();
   final rows = <_TableDataRow>[];
+}
 
-  for (var child in ws) {
-    if (child is WidgetPlaceholder) {
-      final placeholder = child as WidgetPlaceholder;
-      child = placeholder.build(c);
-    }
+class _TableDataGroup {
+  final rows = <_TableDataRow>[];
+}
 
-    if (child is _TableDataRow) {
-      rows.add(child);
-    }
-  }
-
-  if (rows.isEmpty) return null;
-
-  return [_TableDataGroup(rows: rows, type: m.style(_kCssDisplay))];
+class _TableDataRow {
+  final cells = <TableDataCell>[];
 }

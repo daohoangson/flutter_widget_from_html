@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '_.dart';
 
 String _padding(String child) =>
-    '[SizedBox.expand:child=[CssBlock:child=[Padding:(1,1,1,1),child=$child]]]';
+    '[SizedBox.expand:child=[Padding:(1,1,1,1),child=$child]]';
 
 String _richtext(String text) => _padding('[RichText:(:$text)]');
 
@@ -18,7 +18,7 @@ void main() {
     expect(
         explained,
         equals('[Column:children='
-            '[CssBlock:child=[RichText:align=center,(:Caption)]],'
+            '[RichText:align=center,(:Caption)],'
             '[LayoutGrid:children='
             '[0,0:${_padding('[RichText:(+b:Header 1)]')}],'
             '[0,1:${_padding('[RichText:(+b:Header 2)]')}],'
@@ -206,7 +206,7 @@ void main() {
       expect(
           explained,
           equals('[LayoutGrid:children='
-              '[0,0:[SizedBox.expand:child=[CssBlock:child=[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]]]'
+              '[0,0:[SizedBox.expand:child=[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]]'
               ']'));
     });
 
@@ -227,7 +227,7 @@ void main() {
         expect(
             explained,
             equals('[LayoutGrid:children='
-                '[0,0:[SizedBox.expand:child=[CssBlock:child=[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]]]'
+                '[0,0:[SizedBox.expand:child=[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]]'
                 ']'));
       });
     });
@@ -324,10 +324,7 @@ void main() {
     testWidgets('standalone TABLE', (WidgetTester tester) async {
       final html = '<table>Foo</table>';
       final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals('[Column:children=[RichText:(:Foo)],[widget0]]'),
-      );
+      expect(explained, equals('[RichText:(:Foo)]'));
     });
 
     testWidgets('standalone TD', (WidgetTester tester) async {
@@ -380,7 +377,7 @@ void main() {
       expect(
           explained,
           equals('[LayoutGrid:children='
-              '[0,0:[SizedBox.expand:child=[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child=[Padding:(1,1,1,1),child=[RichText:(:Foo)]]]]]'
+              '[0,0:[SizedBox.expand:child=[DecoratedBox:bg=#FFFF0000,child=[Padding:(1,1,1,1),child=[RichText:(:Foo)]]]]'
               ']]'));
     });
   });
@@ -402,12 +399,12 @@ void main() {
       expect(
           explained,
           equals('[Column:children='
-              '[CssBlock:child=[RichText:align=center,(:Caption)]],'
+              '[RichText:align=center,(:Caption)],'
               '[LayoutGrid:children='
-              '[0,0:[SizedBox.expand:child=[CssBlock:child=[RichText:(+b:Header 1)]]]],'
-              '[0,1:[SizedBox.expand:child=[CssBlock:child=[RichText:(+b:Header 2)]]]],'
-              '[1,0:[SizedBox.expand:child=[CssBlock:child=[RichText:(:Value 1)]]]],'
-              '[1,1:[SizedBox.expand:child=[CssBlock:child=[RichText:(:Value 2)]]]]'
+              '[0,0:[SizedBox.expand:child=[RichText:(+b:Header 1)]]],'
+              '[0,1:[SizedBox.expand:child=[RichText:(+b:Header 2)]]],'
+              '[1,0:[SizedBox.expand:child=[RichText:(:Value 1)]]],'
+              '[1,1:[SizedBox.expand:child=[RichText:(:Value 2)]]]'
               ']]'));
     });
   });
@@ -420,7 +417,13 @@ void main() {
         '[RichText:(:Foo)],'
         '[Positioned:(0.0,null,null,-45.0),child=[SizedBox:40.0x0.0,child=[RichText:align=right,(:•)]]]'
         ']]]]';
-    expect(explained,
-        equals('[LayoutGrid:children=[0,0:${_padding(expectedList)}]]'));
+    expect(
+        explained,
+        equals('[LayoutGrid:children='
+            '[0,0:[SizedBox.expand:child=[Column:children='
+            '[SizedBox:0.0x10.0],'
+            '[Padding:(1,1,1,1),child=$expectedList],'
+            '[SizedBox:0.0x10.0]'
+            ']]]]'));
   });
 }
