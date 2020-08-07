@@ -2,9 +2,9 @@ part of '../core_widget_factory.dart';
 
 const _kCssMargin = 'margin';
 
-Iterable<Widget> _marginHorizontalBuilder(
+Widget _marginHorizontalBuilder(
   BuildContext context,
-  Iterable<Widget> children,
+  Widget child,
   _MarginHorizontalInput input,
 ) {
   final direction = Directionality.of(context);
@@ -15,7 +15,7 @@ Iterable<Widget> _marginHorizontalBuilder(
     right: margin.right(direction)?.getValue(context, tsb) ?? 0.0,
   );
 
-  return children.map((child) => _MarginHorizontal(child, padding));
+  return _MarginHorizontal(child, padding);
 }
 
 class _MarginHorizontal extends Padding {
@@ -30,16 +30,15 @@ class _MarginHorizontalInput {
   _MarginHorizontalInput(this.margin, this.tsb, this.wf);
 }
 
-Iterable<Widget> _marginVerticalBuilder(
+Widget _marginVerticalBuilder(
   BuildContext context,
-  Iterable<Widget> widgets,
+  Widget child,
   _MarginVerticalInput input,
 ) {
-  final widget = widgets?.isNotEmpty == true ? widgets.first : null;
-  final existingHeight = widget is SizedBox ? widget.height : 0.0;
+  final existingHeight = child is SizedBox ? child.height : 0.0;
   final height = input.height.getValue(context, input.tsb);
-  if (height > existingHeight) return [SizedBox(height: height)];
-  return widgets;
+  if (height > existingHeight) return SizedBox(height: height);
+  return child;
 }
 
 @immutable

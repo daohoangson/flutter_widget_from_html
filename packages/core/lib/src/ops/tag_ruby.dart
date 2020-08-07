@@ -75,20 +75,18 @@ class _TagRuby {
                   .75 *
                   MediaQuery.of(context).textScaleFactor);
 
-          return [
-            Stack(
-              children: <Widget>[
-                wf.buildPadding(ruby, padding),
-                Positioned(
-                  child: Center(child: rt),
-                  left: 0,
-                  right: 0,
-                  top: 0,
-                ),
-              ],
-              overflow: Overflow.visible,
-            )
-          ];
+          return Stack(
+            children: <Widget>[
+              wf.buildPadding(ruby, padding),
+              Positioned(
+                child: Center(child: rt),
+                left: 0,
+                right: 0,
+                top: 0,
+              ),
+            ],
+            overflow: Overflow.visible,
+          );
         }),
         alignment: PlaceholderAlignment.middle,
       );

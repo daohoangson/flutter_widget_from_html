@@ -21,12 +21,12 @@ class _TagA {
           for (final piece in pieces) {
             if (piece.hasWidgets) {
               for (final placeholder in piece.widgets) {
-                placeholder.wrapWith(wf.buildGestureDetectors, onTap);
+                placeholder.wrapWith(wf.buildGestureDetector, onTap);
               }
             } else {
               for (final bit in piece.text.bits.toList(growable: false)) {
                 if (bit is TextWidget) {
-                  bit.widget.wrapWith(wf.buildGestureDetectors, onTap);
+                  bit.widget.wrapWith(wf.buildGestureDetector, onTap);
                 } else if (bit is TextData) {
                   bit.replaceWith(_TagATextData(bit, onTap, wf));
                 }

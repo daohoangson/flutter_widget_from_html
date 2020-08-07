@@ -162,11 +162,15 @@ void main() {
     expect(
         explained,
         equals('[SizedBox:0.0x3.0],'
-            '[CssBlock:child=[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:1a)]]]],'
-            '[CssBlock:child=[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:1b)]]]],'
+            '[CssBlock:child=[Column:children='
+            '[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:1a)]]],'
+            '[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:1b)]]]'
+            ']],'
             '[SizedBox:0.0x3.0],'
-            '[CssBlock:child=[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:2a)]]]],'
-            '[CssBlock:child=[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:2b)]]]],'
+            '[CssBlock:child=[Column:children='
+            '[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:2a)]]],'
+            '[Padding:(0,3,0,3),child=[CssBlock:child=[RichText:(:2b)]]]'
+            ']],'
             '[SizedBox:0.0x3.0]'));
   });
 

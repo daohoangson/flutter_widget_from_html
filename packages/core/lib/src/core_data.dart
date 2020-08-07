@@ -299,9 +299,7 @@ class TextStyleBuilder<T1> {
 
 WidgetPlaceholder _widgetToPlaceholder(Widget widget) {
   if (widget is WidgetPlaceholder) return widget;
-  return WidgetPlaceholder<Widget>(builder: _widgetBuilder, input: widget);
+  return WidgetPlaceholder<Widget>(builder: _widgetToWidget, child: widget);
 }
 
-Iterable<Widget> _widgetBuilder(
-        BuildContext _, Iterable<Widget> __, Widget widget) =>
-    [widget];
+Widget _widgetToWidget(BuildContext _, Widget child, __) => child;

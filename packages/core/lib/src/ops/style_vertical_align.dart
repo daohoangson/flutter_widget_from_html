@@ -57,33 +57,24 @@ class _StyleVerticalAlign {
     return newPiece;
   }
 
-  static Iterable<Widget> _build(
-    BuildContext context,
-    Iterable<Widget> widgets,
-    _VerticalAlignInput input,
-  ) {
-    final child = input.wf.buildColumn(widgets);
-    if (child == null) return null;
-
-    final fontSize = input.tsb.build(context).style.fontSize;
+  static Widget _build(BuildContext c, Widget w, _VerticalAlignInput input) {
+    final fontSize = input.tsb.build(c).style.fontSize;
     final padding = input.padding;
 
-    return [
-      Stack(children: <Widget>[
-        input.wf.buildPadding(
-          Opacity(child: child, opacity: 0),
-          EdgeInsets.only(
-            bottom: fontSize * padding.bottom,
-            top: fontSize * padding.top,
-          ),
+    return Stack(children: <Widget>[
+      input.wf.buildPadding(
+        Opacity(child: w, opacity: 0),
+        EdgeInsets.only(
+          bottom: fontSize * padding.bottom,
+          top: fontSize * padding.top,
         ),
-        Positioned(
-          child: child,
-          bottom: padding.top > 0 ? null : 0,
-          top: padding.bottom > 0 ? null : 0,
-        )
-      ]),
-    ];
+      ),
+      Positioned(
+        child: w,
+        bottom: padding.top > 0 ? null : 0,
+        top: padding.bottom > 0 ? null : 0,
+      )
+    ]);
   }
 
   static PlaceholderAlignment _tryParse(String value) {

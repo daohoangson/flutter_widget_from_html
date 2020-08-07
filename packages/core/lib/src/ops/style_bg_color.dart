@@ -18,17 +18,15 @@ class _StyleBgColor {
           return pieces.map((p) => p.hasWidgets ? p : _buildBlock(p, bgColor));
         },
         onWidgets: (meta, widgets) {
-          final bgColor = wf.parseColor(meta.style(_kCssBackgroundColor));
-          if (bgColor == null) return null;
-
-          return _listOrNull(
-              wf.buildColumn(widgets)?.wrapWith(_build, bgColor));
+          final color = wf.parseColor(meta.style(_kCssBackgroundColor));
+          if (color == null) return null;
+          return _listOrNull(wf.buildColumn(widgets)?.wrapWith(_build, color));
         },
         priority: 15000,
       );
 
-  Iterable<Widget> _build(BuildContext _, Iterable<Widget> ws, Color c) =>
-      _listOrNull(wf.buildDecoratedBox(wf.buildColumn(ws), color: c));
+  Widget _build(BuildContext _, Widget child, Color color) =>
+      wf.buildDecoratedBox(child, color: color);
 
   BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) =>
       piece..text.bits.forEach((bit) => bit.tsb?.enqueue(_tsb, bgColor));

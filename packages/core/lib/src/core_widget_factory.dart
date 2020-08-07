@@ -12,6 +12,7 @@ import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_html_widget.dart';
 
+part 'ops/column.dart';
 part 'ops/style_bg_color.dart';
 part 'ops/style_direction.dart';
 part 'ops/style_margin.dart';
@@ -57,65 +58,18 @@ class WidgetFactory {
 
   HtmlWidget get widget => _widget;
 
-  Widget buildBody(Iterable<Widget> children) => buildColumn(children);
+  Widget buildBody(Iterable<Widget> children) =>
+      buildColumn(children, trimMarginVertical: true);
 
-  WidgetPlaceholder buildColumn(Iterable<Widget> children) =>
-      children?.isNotEmpty == true
-          ? (children.length == 1 && children.first is WidgetPlaceholder
-              ? (children.first as WidgetPlaceholder).wrapWith(_buildColumn)
-              : WidgetPlaceholder(
-                  builder: _buildColumn,
-                  children: children,
-                ))
-          : null;
-
-  static Iterable<Widget> _buildColumn(BuildContext c, Iterable<Widget> ws, _) {
-    if (ws == null) return null;
-
-    final output = <Widget>[];
-    final iter = ws.iterator;
-    while (iter.moveNext()) {
-      if (!(iter.current is _MarginVerticalPlaceholder)) break;
-    }
-
-    if (iter.current == null) return null;
-
-    Widget prev;
-    while (output.isEmpty || iter.moveNext()) {
-      var widget = iter.current;
-
-      if (widget is _MarginVerticalPlaceholder) {
-        if (prev is _MarginVerticalPlaceholder) {
-          prev.mergeWith(widget);
-          continue;
-        }
-      } else if (widget is WidgetPlaceholder) {
-        widget = (widget as WidgetPlaceholder).build(c);
-      }
-
-      if (widget == widget0) continue;
-
-      if (widget is Column) {
-        final Column column = widget;
-        output.addAll(column.children);
-        widget = column.children.last;
-      } else {
-        output.add(widget);
-      }
-
-      prev = widget;
-    }
-
-    while (output.isNotEmpty) {
-      if (output.last is _MarginVerticalPlaceholder) {
-        output.removeLast();
-        continue;
-      }
-
-      break;
-    }
-
-    return output;
+  WidgetPlaceholder buildColumn(
+    Iterable<Widget> children, {
+    bool trimMarginVertical = false,
+  }) {
+    if (children?.isNotEmpty != true) return null;
+    return _ColumnPlaceholder(
+      children,
+      trimMarginVertical: trimMarginVertical,
+    );
   }
 
   Widget buildDecoratedBox(
@@ -136,12 +90,12 @@ class WidgetFactory {
         child: SizedBox(height: 1),
       );
 
-  Iterable<Widget> buildGestureDetectors(
+  Widget buildGestureDetector(
     BuildContext _,
-    Iterable<Widget> widgets,
+    Widget child,
     GestureTapCallback onTap,
   ) =>
-      widgets?.map((widget) => GestureDetector(child: widget, onTap: onTap));
+      GestureDetector(child: child, onTap: onTap);
 
   GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
       ? () => widget.onTapUrl != null
@@ -249,9 +203,7 @@ class WidgetFactory {
         }
 
         slotIndices.add(slot.index);
-        cells[c] = TableCell(
-          child: buildColumn(slot.cell.children),
-        );
+        cells[c] = TableCell(child: slot.cell.child);
       }
 
       rows.add(TableRow(children: cells));
@@ -272,11 +224,7 @@ class WidgetFactory {
             )
           : null;
 
-  static Iterable<Widget> _buildText(
-    BuildContext context,
-    Iterable<Widget> _,
-    TextBits text,
-  ) {
+  Widget _buildText(BuildContext context, Widget _, TextBits text) {
     final tsh = text.tsb?.build(context);
     final maxLines = tsh?.maxLines == -1 ? null : tsh?.maxLines;
     final overflow = tsh?.textOverflow ?? TextOverflow.clip;
@@ -310,7 +258,7 @@ class WidgetFactory {
       }
     }
 
-    return widgets;
+    return buildColumn(widgets);
   }
 
   String constructFullUrl(String url) {
@@ -850,12 +798,8 @@ class WidgetFactory {
     return _styleDisplayBlock;
   }
 
-  Iterable<Widget> _cssBlock(BuildContext _, Iterable<Widget> ws, __) {
-    final child = buildColumn(ws);
-    if (child == null) return null;
-
-    return [child is CssBlock ? child : CssBlock(child: child)];
-  }
+  Widget _cssBlock(BuildContext _, Widget child, __) =>
+      child is CssBlock ? child : CssBlock(child: child);
 
   BuildOp styleMargin() {
     _styleMargin ??= _StyleMargin(this).buildOp;

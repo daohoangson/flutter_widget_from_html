@@ -52,8 +52,7 @@ class _TagImg {
     );
   }
 
-  Iterable<Widget> _wpb(BuildContext _, Iterable<Widget> __, ImgMetadata img) =>
-      _listOrNull(_buildImg(img));
+  Widget _wpb(BuildContext _, Widget __, ImgMetadata img) => _buildImg(img);
 }
 
 class _ImageBit extends TextWidget<ImgMetadata> {

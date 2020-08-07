@@ -45,39 +45,24 @@ class _StyleSizing {
         onWidgets: (meta, widgets) {
           final input = _parse(meta);
           if (input == null) return widgets;
-
-          return [
-            WidgetPlaceholder(
-              builder: _build,
-              children: widgets,
-              input: input,
-            )
-          ];
+          return _listOrNull(wf.buildColumn(widgets)?.wrapWith(_build, input));
         },
         priority: 50000,
       );
 
-  Iterable<Widget> _build(BuildContext context, Iterable<Widget> children,
-      _StyleSizingInput input) {
-    final child = wf.buildColumn(children);
-    if (child == null) return null;
-
+  Widget _build(BuildContext context, Widget child, _StyleSizingInput input) {
     final tsb = input.meta.tsb();
-    return [
-      CssSizing(
-        child: child,
-        constraints: BoxConstraints(
-          maxHeight: input.maxHeight?.getValue(context, tsb) ?? double.infinity,
-          maxWidth: input.maxWidth?.getValue(context, tsb) ?? double.infinity,
-          minHeight: input.minHeight?.getValue(context, tsb) ?? 0,
-          minWidth: input.minWidth?.getValue(context, tsb) ?? 0,
-        ),
-        size: Size(
-          input.width?.getValue(context, tsb) ?? double.infinity,
-          input.height?.getValue(context, tsb) ?? double.infinity,
-        ),
-      )
-    ];
+    final constraints = BoxConstraints(
+      maxHeight: input.maxHeight?.getValue(context, tsb) ?? double.infinity,
+      maxWidth: input.maxWidth?.getValue(context, tsb) ?? double.infinity,
+      minHeight: input.minHeight?.getValue(context, tsb) ?? 0,
+      minWidth: input.minWidth?.getValue(context, tsb) ?? 0,
+    );
+    final size = Size(
+      input.width?.getValue(context, tsb) ?? double.infinity,
+      input.height?.getValue(context, tsb) ?? double.infinity,
+    );
+    return CssSizing(child: child, constraints: constraints, size: size);
   }
 
   _StyleSizingInput _parse(NodeMetadata meta) {

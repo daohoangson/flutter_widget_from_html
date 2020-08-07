@@ -13,24 +13,24 @@ typedef CustomStylesBuilder = Map<String, String> Function(dom.Element element);
 
 typedef CustomWidgetBuilder = Widget Function(dom.Element element);
 
-typedef WidgetPlaceholderBuilder<T> = Iterable<Widget> Function(
-    BuildContext context, Iterable<Widget> children, T input);
+typedef WidgetPlaceholderBuilder<T> = Widget Function(
+    BuildContext context, Widget child, T input);
 
 class WidgetPlaceholder<T1> extends StatelessWidget {
   final _builders = <Function>[];
-  final Iterable<Widget> _firstChildren;
+  final Widget _child;
   final _inputs = [];
   final WidgetPlaceholderBuilder<T1> _lastBuilder;
   final T1 _lastInput;
 
   WidgetPlaceholder({
     WidgetPlaceholderBuilder<T1> builder,
-    Iterable<Widget> children,
+    Widget child,
     T1 input,
     WidgetPlaceholderBuilder<T1> lastBuilder,
   })  : assert((builder == null) != (lastBuilder == null),
             'Either builder or lastBuilder must be set'),
-        _firstChildren = children,
+        _child = child,
         _lastBuilder = lastBuilder,
         _lastInput = (lastBuilder != null ? input : null) {
     if (builder != null) {
@@ -44,27 +44,21 @@ class WidgetPlaceholder<T1> extends StatelessWidget {
   Iterable get inputs => _inputs.skip(0);
 
   @override
-  Widget build(BuildContext context) {
-    var output = _firstChildren;
+  Widget build(BuildContext context) => callBuilders(context, _child);
+
+  Widget callBuilders(BuildContext context, Widget widget) {
+    var built = widget ?? widget0;
 
     final l = _builders.length;
     for (var i = 0; i < l; i++) {
-      output = _builders[i](context, output, _inputs[i]);
+      built = _builders[i](context, built, _inputs[i]) ?? widget0;
     }
 
     if (_lastBuilder != null) {
-      output = _lastBuilder(context, output, _lastInput);
+      built = _lastBuilder(context, built, _lastInput) ?? widget0;
     }
 
-    output = output?.where((widget) => widget != null);
-    if (output?.isNotEmpty != true) return widget0;
-    if (output.length == 1) return output.first;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: List.unmodifiable(output),
-    );
+    return built;
   }
 
   WidgetPlaceholder<T1> wrapWith<T2>(WidgetPlaceholderBuilder<T2> builder,

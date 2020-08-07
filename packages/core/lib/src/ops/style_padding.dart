@@ -11,7 +11,7 @@ WidgetPlaceholder _paddingInlineAfter(
       final width = box.right(direction)?.getValue(context, tsb);
       if (width == null || width <= 0) return null;
 
-      return [SizedBox(width: width)];
+      return SizedBox(width: width);
     });
 
 WidgetPlaceholder _paddingInlineBefore(
@@ -23,7 +23,7 @@ WidgetPlaceholder _paddingInlineBefore(
       final width = box.left(direction)?.getValue(context, tsb);
       if (width == null || width <= 0) return null;
 
-      return [SizedBox(width: width)];
+      return SizedBox(width: width);
     });
 
 class _StylePadding {
@@ -52,32 +52,21 @@ class _StylePadding {
           if (padding == null) return null;
 
           final input = _PaddingInput(padding, meta.tsb());
-          return [
-            WidgetPlaceholder(
-              builder: _build,
-              children: widgets,
-              input: input,
-            )
-          ];
+          return _listOrNull(wf.buildColumn(widgets)?.wrapWith(_build, input));
         },
         priority: 9999,
       );
 
-  Iterable<Widget> _build(
-    BuildContext context,
-    Iterable<Widget> children,
-    _PaddingInput input,
-  ) {
+  Widget _build(BuildContext context, Widget child, _PaddingInput input) {
     final direction = Directionality.of(context);
     final padding = input.padding;
     final tsb = input.tsb;
-    final top = padding.top?.getValue(context, tsb);
-    final right = padding.right(direction)?.getValue(context, tsb);
-    final bottom = padding.bottom?.getValue(context, tsb);
-    final left = padding.left(direction)?.getValue(context, tsb);
-
-    return _listOrNull(wf.buildPadding(wf.buildColumn(children),
-        EdgeInsets.fromLTRB(left ?? 0, top ?? 0, right ?? 0, bottom ?? 0)));
+    final t = padding.top?.getValue(context, tsb);
+    final r = padding.right(direction)?.getValue(context, tsb);
+    final b = padding.bottom?.getValue(context, tsb);
+    final l = padding.left(direction)?.getValue(context, tsb);
+    final edgeInsets = EdgeInsets.fromLTRB(l ?? 0, t ?? 0, r ?? 0, b ?? 0);
+    return wf.buildPadding(child, edgeInsets);
   }
 }
 

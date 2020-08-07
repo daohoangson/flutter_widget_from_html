@@ -29,12 +29,12 @@ class WidgetFactory extends core.WidgetFactory {
   Widget buildDivider() => const Divider(height: 1);
 
   @override
-  Iterable<Widget> buildGestureDetectors(
+  Widget buildGestureDetector(
     BuildContext _,
-    Iterable<Widget> widgets,
+    Widget child,
     GestureTapCallback onTap,
   ) =>
-      widgets?.map((widget) => InkWell(child: widget, onTap: onTap));
+      InkWell(child: child, onTap: onTap);
 
   @override
   GestureTapCallback buildGestureTapCallbackForUrl(String url) {
@@ -121,7 +121,7 @@ class WidgetFactory extends core.WidgetFactory {
 
     final layoutGrid = LayoutGrid(
       children: table.slots.map((slot) {
-        Widget cell = SizedBox.expand(child: buildColumn(slot.cell.children));
+        Widget cell = SizedBox.expand(child: slot.cell.child);
 
         if (border != null) {
           cell = Container(
