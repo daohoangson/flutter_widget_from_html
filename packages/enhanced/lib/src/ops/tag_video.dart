@@ -51,7 +51,6 @@ class _TagVideo {
     );
   }
 
-  static Iterable<Widget> _sourceBuilder(
-          BuildContext _, Iterable<Widget> __, String url) =>
-      [Text(url)];
+  static Widget _sourceBuilder(BuildContext _, Widget __, String url) =>
+      Text(url);
 }
