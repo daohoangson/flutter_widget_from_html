@@ -20,7 +20,10 @@ class _TagImg {
             return pieces;
           }
 
-          text.add(_ImageBit(text, this, img));
+          text.add(_ImageBit(
+            text,
+            WidgetPlaceholder(builder: _wpb, input: img),
+          ));
           return pieces;
         },
         onWidgets: (meta, widgets) {
@@ -56,11 +59,8 @@ class _TagImg {
 }
 
 class _ImageBit extends TextWidget<ImgMetadata> {
-  _ImageBit(TextBits parent, _TagImg self, ImgMetadata img)
-      : super(
-          parent,
-          WidgetPlaceholder(builder: self._wpb, input: img),
-        );
+  _ImageBit(TextBits parent, WidgetPlaceholder<ImgMetadata> widget)
+      : super(parent, widget);
 
   @override
   WidgetSpan compile(TextStyle style) => _ImageSpan(

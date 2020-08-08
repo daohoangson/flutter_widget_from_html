@@ -102,9 +102,8 @@ void main() {
   group('border', () {
     testWidgets('renders border=0', (WidgetTester tester) async {
       final html = '<table border="0"><tr><td>Foo</td></tr></table>';
-      final explained = await explain(tester, html);
-      expect(explained,
-          equals('[CssBlock:child=[Table:\n${_richtext('Foo')}\n]]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[CssBlock:child=[Table:\n${_richtext('Foo')}\n]]'));
     });
 
     testWidgets('renders border=1', (WidgetTester tester) async {
