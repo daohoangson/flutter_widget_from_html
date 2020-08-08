@@ -4,8 +4,8 @@ description: Flutter package for widget tree building from html that supports hy
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
 environment:
-  # flutter_layout_grid@0.10.2
-  flutter: ">=1.14.0 <2.0.0"
+  # flutter_svg@0.18.0
+  flutter: ">=1.18.0-6.0.pre <2.0.0"
   sdk: ">=2.3.0 <3.0.0"
 
 dependencies:
