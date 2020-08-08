@@ -1,46 +1,50 @@
 part of '../widget_factory.dart';
 
-class _TagVideo {
+class _TagVideo extends BuildOp {
+  final NodeMetadata videoMeta;
   final WidgetFactory wf;
 
-  BuildOp _sourceOp;
+  final _sourceUrls = <String>[];
 
-  _TagVideo(this.wf);
+  _TagVideo(this.wf, this.videoMeta) : super(isBlockElement: true);
 
-  BuildOp get buildOp => BuildOp(
-        onChild: (meta, e) =>
-            e.localName == 'source' ? meta.op = sourceOp : null,
-        onWidgets: (meta, widgets) {
-          final player = build(
-            meta,
-            widgets
-                .map<String>((w) =>
-                    w is WidgetPlaceholder<String> ? w.inputs.first : null)
-                .where((s) => s != null),
-          );
-          return player != null ? [player] : null;
-        },
-      );
+  @override
+  bool get hasOnChild => true;
 
-  BuildOp get sourceOp {
-    _sourceOp ??= BuildOp(onWidgets: (meta, _) {
-      final a = meta.domElement.attributes;
-      if (!a.containsKey('src')) return null;
+  @override
+  void onChild(NodeMetadata childMeta, dom.Element e) {
+    if (e.localName != 'source') return;
+    if (e.parent != videoMeta.domElement) return;
 
-      final url = wf.constructFullUrl(a['src']);
-      if (url == null) return null;
+    final a = e.attributes;
+    if (!a.containsKey('src')) return;
 
-      return [WidgetPlaceholder(builder: _sourceBuilder, input: url)];
-    });
-    return _sourceOp;
+    final url = wf.constructFullUrl(a['src']);
+    if (url == null) return;
+
+    _sourceUrls.add(url);
   }
 
-  Widget build(NodeMetadata meta, Iterable<String> urls) {
-    if (urls.isEmpty) return null;
+  @override
+  Iterable<WidgetPlaceholder> onWidgets(
+      NodeMetadata _, Iterable<WidgetPlaceholder> widgets) {
+    final player = build();
+    if (player == null) return widgets;
 
-    final a = meta.domElement.attributes;
+    return [
+      WidgetPlaceholder<Widget>(
+        builder: (_, __, input) => input,
+        input: player,
+      ),
+    ];
+  }
+
+  Widget build() {
+    if (_sourceUrls.isEmpty) return null;
+
+    final a = videoMeta.domElement.attributes;
     return wf.buildVideoPlayer(
-      urls.first,
+      _sourceUrls.first,
       autoplay: a.containsKey('autoplay'),
       controls: a.containsKey('controls'),
       height: a.containsKey('height') ? double.tryParse(a['height']) : null,
@@ -50,7 +54,4 @@ class _TagVideo {
       width: a.containsKey('width') ? double.tryParse(a['width']) : null,
     );
   }
-
-  static Widget _sourceBuilder(BuildContext _, Widget __, String url) =>
-      Text(url);
 }

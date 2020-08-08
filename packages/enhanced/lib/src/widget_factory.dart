@@ -4,6 +4,7 @@ import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
+import 'package:html/dom.dart' as dom;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'data.dart';
@@ -21,7 +22,6 @@ class WidgetFactory extends core.WidgetFactory {
   BuildOp _tagAExtended;
   BuildOp _tagIframe;
   BuildOp _tagSvg;
-  BuildOp _tagVideo;
   HtmlWidget _widget;
 
   @override
@@ -227,7 +227,7 @@ class WidgetFactory extends core.WidgetFactory {
         // return asap to avoid being disabled by core
         return;
       case 'video':
-        meta.op = tagVideo();
+        meta.op = tagVideo(meta);
         break;
     }
 
@@ -255,8 +255,5 @@ class WidgetFactory extends core.WidgetFactory {
     return _tagSvg;
   }
 
-  BuildOp tagVideo() {
-    _tagVideo ??= _TagVideo(this).buildOp;
-    return _tagVideo;
-  }
+  BuildOp tagVideo(NodeMetadata meta) => _TagVideo(this, meta);
 }
