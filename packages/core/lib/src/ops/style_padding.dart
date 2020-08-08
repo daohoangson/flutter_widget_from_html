@@ -57,17 +57,18 @@ class _StylePadding {
         priority: 9999,
       );
 
-  Widget _build(BuildContext context, Widget child, _PaddingInput input) {
-    final direction = Directionality.of(context);
-    final padding = input.padding;
-    final tsb = input.tsb;
-    final t = padding.top?.getValue(context, tsb);
-    final r = padding.right(direction)?.getValue(context, tsb);
-    final b = padding.bottom?.getValue(context, tsb);
-    final l = padding.left(direction)?.getValue(context, tsb);
-    final edgeInsets = EdgeInsets.fromLTRB(l ?? 0, t ?? 0, r ?? 0, b ?? 0);
-    return wf.buildPadding(child, edgeInsets);
-  }
+  Widget _build(BuildContext _, Widget child, _PaddingInput input) =>
+      Builder(builder: (context) {
+        final direction = Directionality.of(context);
+        final padding = input.padding;
+        final tsb = input.tsb;
+        final t = padding.top?.getValue(context, tsb);
+        final r = padding.right(direction)?.getValue(context, tsb);
+        final b = padding.bottom?.getValue(context, tsb);
+        final l = padding.left(direction)?.getValue(context, tsb);
+        final edgeInsets = EdgeInsets.fromLTRB(l ?? 0, t ?? 0, r ?? 0, b ?? 0);
+        return wf.buildPadding(child, edgeInsets);
+      });
 }
 
 @immutable

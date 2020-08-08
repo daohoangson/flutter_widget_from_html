@@ -94,12 +94,14 @@ class _TagLi extends BuildOp {
         : (config.markerStart ?? 1) + i;
     final markerText = wf.getListStyleMarker(listStyleType, markerIndex);
 
-    return Stack(
-      children: <Widget>[
-        child,
-        _buildMarker(context, tsh.styleWithHeight, markerText),
-      ],
-      overflow: Overflow.visible,
+    return Builder(
+      builder: (context) => Stack(
+        children: <Widget>[
+          child,
+          _buildMarker(context, tsh.styleWithHeight, markerText),
+        ],
+        overflow: Overflow.visible,
+      ),
     );
   }
 
