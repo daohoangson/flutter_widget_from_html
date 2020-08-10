@@ -68,36 +68,31 @@ class _TagTable extends BuildOp {
   Iterable<WidgetPlaceholder> onWidgets(
           NodeMetadata meta, Iterable<WidgetPlaceholder> _) =>
       [
-        WidgetPlaceholder<_TableData>(
-          builder: _buildTable,
-          input: _data,
+        WidgetPlaceholder<_TagTable>(
+          child: Builder(builder: (context) {
+            final table = TableData(border: _parseBorder(context));
+
+            final rows = <_TableDataRow>[
+              ..._data.header.rows,
+              ..._data.rows,
+              ..._data.footer.rows,
+            ];
+            for (var i = 0; i < rows.length; i++) {
+              for (final cell in rows[i].cells) {
+                table.addCell(i, cell);
+              }
+            }
+
+            final tableWidget = wf.buildTable(table);
+            return wf.buildColumn([
+                  if (_data.caption != null) _data.caption,
+                  if (tableWidget != null) tableWidget,
+                ]) ??
+                widget0;
+          }),
+          generator: this,
         )
       ];
-
-  Widget _buildTable(BuildContext c, Widget _, _TableData data) {
-    final table = TableData(
-      border: _parseBorder(c),
-    );
-
-    final rows = <_TableDataRow>[
-      ...data.header.rows,
-      ...data.rows,
-      ...data.footer.rows,
-    ];
-
-    for (var i = 0; i < rows.length; i++) {
-      for (final cell in rows[i].cells) {
-        table.addCell(i, cell);
-      }
-    }
-
-    final tableWidget = table.slots.isNotEmpty ? wf.buildTable(table) : widget0;
-    if (data.caption == null) {
-      return tableWidget;
-    }
-
-    return wf.buildColumn([data.caption, tableWidget]);
-  }
 
   BorderSide _parseBorder(BuildContext context) {
     var styleBorder = tableMeta.style(_kCssBorder);
