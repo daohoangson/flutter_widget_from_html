@@ -597,21 +597,24 @@ void main() {
         '    ├CssBlock()\n'
         '    │└Builder()\n'
         '    │ └Stack(alignment: topStart, fit: loose)\n'
-        '    │  ├RichText(text: "One")\n'
+        '    │  ├LayoutBuilder()\n'
+        '    │  │└RichText(text: "One")\n'
         '    │  └Positioned(top: 0.0, right: -45.0)\n'
         '    │   └SizedBox(width: 40.0)\n'
         '    │    └RichText(textAlign: left, text: "1.")\n'
         '    ├CssBlock()\n'
         '    │└Builder()\n'
         '    │ └Stack(alignment: topStart, fit: loose)\n'
-        '    │  ├RichText(text: "Two")\n'
+        '    │  ├LayoutBuilder()\n'
+        '    │  │└RichText(text: "Two")\n'
         '    │  └Positioned(top: 0.0, right: -45.0)\n'
         '    │   └SizedBox(width: 40.0)\n'
         '    │    └RichText(textAlign: left, text: "2.")\n'
         '    └CssBlock()\n'
         '     └Builder()\n'
         '      └Stack(alignment: topStart, fit: loose)\n'
-        '       ├RichText(text: "Three")\n'
+        '       ├LayoutBuilder()\n'
+        '       │└RichText(text: "Three")\n'
         '       └Positioned(top: 0.0, right: -45.0)\n'
         '        └SizedBox(width: 40.0)\n'
         '         └RichText(textAlign: left, text: "3.")';
@@ -638,7 +641,7 @@ void main() {
         useExplainer: false,
       );
       expect(
-          explained, equals('_ColumnPlaceholder()\n$nonExplainerExpected\n\n'));
+          explained, equals('_ColumnPlaceholder\n$nonExplainerExpected\n\n'));
     });
 
     testWidgets('renders within dir attribute', (tester) async {
@@ -648,7 +651,7 @@ void main() {
       final expected = nonExplainerExpected.replaceAll('\n', '\n  ');
       expect(
           explained,
-          equals('_ColumnPlaceholder()\n'
+          equals('_ColumnPlaceholder\n'
               '└CssBlock()\n'
               ' └Directionality(textDirection: rtl)\n'
               '  $expected\n\n'));

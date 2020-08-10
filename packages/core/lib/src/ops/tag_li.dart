@@ -72,38 +72,40 @@ class _TagLi extends BuildOp {
 
     _itemOp ??= BuildOp(
       onWidgets: (meta, widgets) {
-        final column = wf.buildColumn(widgets) ?? placeholder0;
+        final column = wf.buildColumn(widgets) ??
+            WidgetPlaceholder<_TagLi>(
+              child: widget0,
+              generator: this,
+            );
 
         final i = _itemMetas.length;
         _itemMetas.add(meta);
         _itemWidgets.add(column);
-        return [column.wrapWith(_buildItem, i)];
+        return [column.wrapWith((child) => _buildItem(child, i))];
       },
     );
 
     childMeta.op = _itemOp;
   }
 
-  Widget _buildItem(BuildContext context, Widget child, int i) {
-    final meta = _itemMetas[i];
-    final tsh = meta.tsb().build(context);
-    final listStyleType =
-        _ListConfig.listStyleTypeFromNodeMetadata(meta) ?? config.listStyleType;
-    final markerIndex = config.markerReversed == true
-        ? (config.markerStart ?? _itemWidgets.length) - i
-        : (config.markerStart ?? 1) + i;
-    final markerText = wf.getListStyleMarker(listStyleType, markerIndex);
+  Widget _buildItem(Widget child, int i) => Builder(builder: (context) {
+        final meta = _itemMetas[i];
+        final tsh = meta.tsb().build(context);
+        final listStyleType = _ListConfig.listStyleTypeFromNodeMetadata(meta) ??
+            config.listStyleType;
+        final markerIndex = config.markerReversed == true
+            ? (config.markerStart ?? _itemWidgets.length) - i
+            : (config.markerStart ?? 1) + i;
+        final markerText = wf.getListStyleMarker(listStyleType, markerIndex);
 
-    return Builder(
-      builder: (context) => Stack(
-        children: <Widget>[
-          child,
-          _buildMarker(context, tsh.styleWithHeight, markerText),
-        ],
-        overflow: Overflow.visible,
-      ),
-    );
-  }
+        return Stack(
+          children: <Widget>[
+            child,
+            _buildMarker(context, tsh.styleWithHeight, markerText),
+          ],
+          overflow: Overflow.visible,
+        );
+      });
 
   Widget _buildMarker(BuildContext context, TextStyle style, String text) {
     final isLtr = Directionality.of(context) == TextDirection.ltr;
