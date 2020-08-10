@@ -3,18 +3,15 @@ part of '../core_widget_factory.dart';
 class _TextCompiler {
   final TextBits text;
 
-  BuildContext _context;
-  List _compiled;
-
-  List<InlineSpan> _spans;
+  List<TextSpanBuilder> _builders;
+  List<TextSpanBuilder> _merged;
   StringBuffer _buffer, _prevBuffer;
-  TextStyle _style, _prevStyle;
+  TextStyleBuilder _tsb, _prevTsb;
 
   _TextCompiler(this.text) : assert(text != null);
 
-  List compile(BuildContext context) {
-    _context = context;
-    _compiled = [];
+  List<TextSpanBuilder> compile() {
+    _merged = [];
 
     _resetLoop(text.tsb);
     for (final bit in text.bits) {
@@ -22,36 +19,38 @@ class _TextCompiler {
     }
     _completeLoop();
 
-    if (_compiled.isEmpty) {
-      _compiled.add(_MarginVerticalPlaceholder(
-        text.tsb,
-        CssLength(1, unit: CssLengthUnit.em),
+    if (_merged.isEmpty) {
+      _merged.add(TextSpanBuilder.prebuilt(
+        widget: _MarginVerticalPlaceholder(
+          null,
+          CssLength(1, unit: CssLengthUnit.em),
+          text.tsb,
+        ),
       ));
     }
 
-    return _compiled;
+    return _merged;
   }
 
   void _resetLoop(TextStyleBuilder tsb) {
-    _spans = <InlineSpan>[];
-
+    _builders = [];
     _buffer = StringBuffer();
-    _style = tsb?.build(_context)?.styleWithHeight;
+    _tsb = tsb;
 
     _prevBuffer = _buffer;
-    _prevStyle = _style;
+    _prevTsb = _tsb;
   }
 
   void _loop(final TextBit bit) {
     final tsb = _getBitTsb(bit);
-    if (_spans == null) _resetLoop(tsb);
+    if (_builders == null) _resetLoop(tsb);
 
-    final style = tsb?.build(_context)?.styleWithHeight ?? _prevStyle;
-    if (style != _prevStyle) _saveSpan();
+    final thisTsb = tsb ?? _prevTsb;
+    if (!thisTsb.hasSameStyleWith(_prevTsb)) _saveSpan();
 
-    if (bit.canCompile) {
+    if (bit.hasBuilder) {
       _saveSpan();
-      _spans.add(bit.compile(style));
+      _builders.add(bit.prepareBuilder(thisTsb));
       return;
     }
 
@@ -59,24 +58,29 @@ class _TextCompiler {
       _completeLoop();
       final newLines = bit.data.length - 1;
       if (newLines > 0) {
-        _compiled.add(_MarginVerticalPlaceholder(
-          bit.parent.tsb,
-          CssLength(newLines.toDouble(), unit: CssLengthUnit.em),
+        _merged.add(TextSpanBuilder.prebuilt(
+          widget: _MarginVerticalPlaceholder(
+            null,
+            CssLength(newLines.toDouble(), unit: CssLengthUnit.em),
+            bit.parent.tsb,
+          ),
         ));
       }
       return;
     }
 
     _prevBuffer.write(bit.data);
-    _prevStyle = style;
+    _prevTsb = thisTsb;
   }
 
   void _saveSpan() {
     if (_prevBuffer != _buffer && _prevBuffer.length > 0) {
-      _spans.add(TextSpan(
-        style: _prevStyle,
-        text: _prevBuffer.toString(),
-      ));
+      final scopedTsb = _prevTsb;
+      final scopedText = _prevBuffer.toString();
+      _builders.add(TextSpanBuilder.callback((context) => TextSpan(
+            style: scopedTsb.build(context).styleWithHeight,
+            text: scopedText,
+          )));
     }
     _prevBuffer = StringBuffer();
   }
@@ -84,31 +88,35 @@ class _TextCompiler {
   void _completeLoop() {
     _saveSpan();
 
-    InlineSpan span;
-    Widget widget;
-    if (_spans == null) {
+    TextSpanBuilder builder;
+    if (_builders == null) {
       // intentionally left empty
-    } else if (_spans.length == 1 && _buffer.isEmpty) {
-      span = _spans[0];
+    } else if (_builders.length == 1 && _buffer.isEmpty) {
+      builder = _builders[0];
+      final prebuiltSpan = builder.span;
 
-      if (span is WidgetSpan &&
-          span.alignment == PlaceholderAlignment.baseline &&
-          (text.tsb?.build(_context)?.align ?? TextAlign.start) ==
-              TextAlign.start) {
-        widget = span.child;
+      if (prebuiltSpan != null &&
+          prebuiltSpan is WidgetSpan &&
+          prebuiltSpan.alignment == PlaceholderAlignment.baseline &&
+          (text.tsb?.textAlign ?? TextAlign.start) == TextAlign.start) {
+        builder = TextSpanBuilder.prebuilt(widget: prebuiltSpan.child);
       }
-    } else if (_spans.isNotEmpty || _buffer.isNotEmpty) {
-      span = TextSpan(
-        children: _spans,
-        style: _style,
-        text: _buffer.toString(),
-      );
+    } else if (_builders.isNotEmpty || _buffer.isNotEmpty) {
+      final scoped = List<TextSpanBuilder>.from(_builders, growable: false);
+      final scopedTsb = _tsb;
+      final scopedText = _buffer.toString();
+      builder = TextSpanBuilder.callback((context) => TextSpan(
+            children: scoped
+                .map((builder) => builder.build(context))
+                .where((span) => span != null)
+                .toList(growable: false),
+            style: scopedTsb.build(context).styleWithHeight,
+            text: scopedText,
+          ));
     }
 
-    _spans = null;
-
-    if (span == null) return;
-    _compiled.add(widget ?? span);
+    _builders = null;
+    if (builder != null) _merged.add(builder);
   }
 
   static TextStyleBuilder _getBitTsb(TextBit bit) {

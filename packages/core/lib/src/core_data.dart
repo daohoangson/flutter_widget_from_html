@@ -47,9 +47,13 @@ class BuildOp {
   Iterable<WidgetPlaceholder> onWidgets(
           NodeMetadata meta, Iterable<WidgetPlaceholder> widgets) =>
       (_onWidgets != null
-          ? _onWidgets(meta, widgets)?.map(_widgetToPlaceholder)
+          ? _onWidgets(meta, widgets)?.map(_placeholder)
           : null) ??
       widgets;
+
+  WidgetPlaceholder _placeholder(Widget widget) => widget is WidgetPlaceholder
+      ? widget
+      : WidgetPlaceholder<BuildOp>(child: widget, generator: this);
 }
 
 typedef _BuildOpDefaultStyles = Map<String, String> Function(
@@ -70,9 +74,14 @@ class BuiltPiece {
 
   BuiltPiece.widgets(Iterable<Widget> widgets)
       : text = null,
-        widgets = widgets.map(_widgetToPlaceholder);
+        widgets = widgets.map(_placeholder);
 
   bool get hasWidgets => widgets != null;
+
+  static WidgetPlaceholder _placeholder(Widget widget) =>
+      widget is WidgetPlaceholder
+          ? widget
+          : WidgetPlaceholder<BuiltPiece>(child: widget, generator: null);
 }
 
 class CssBorderSide {
@@ -282,18 +291,12 @@ class NodeMetadata {
 
 @immutable
 class TextStyleHtml {
-  final TextAlign align;
   final double height;
-  final int maxLines;
   final TextStyle style;
-  final TextOverflow textOverflow;
 
   TextStyleHtml._({
-    this.align,
     this.height,
-    this.maxLines,
     this.style,
-    this.textOverflow,
   });
 
   factory TextStyleHtml.style(TextStyle style) => TextStyleHtml._(style: style);
@@ -301,29 +304,17 @@ class TextStyleHtml {
   TextStyle get styleWithHeight =>
       height != null && height >= 0 ? style.copyWith(height: height) : style;
 
-  TextStyleHtml copyWith({
-    TextAlign align,
-    double height,
-    int maxLines,
-    TextStyle style,
-    TextOverflow textOverflow,
-  }) =>
-      TextStyleHtml._(
-        align: align ?? this.align,
-        height: height ?? this.height,
-        maxLines: maxLines ?? this.maxLines,
-        style: style ?? this.style,
-        textOverflow: textOverflow ?? this.textOverflow,
-      );
+  TextStyleHtml copyWith({double height, TextStyle style}) => TextStyleHtml._(
+      height: height ?? this.height, style: style ?? this.style);
 }
 
 class TextStyleBuilder<T1> {
-  final _builders = <Function>[];
-  final _inputs = [];
   final TextStyleBuilder parent;
 
+  List<Function> _builders;
   BuildContext _context;
   TextStyleHtml _default;
+  List _inputs;
   TextStyleHtml _output;
 
   TextStyleBuilder(
@@ -334,6 +325,18 @@ class TextStyleBuilder<T1> {
     enqueue(builder, input);
   }
 
+  int _maxLines;
+  int get maxLines => _maxLines ?? parent?.maxLines;
+  set maxLines(int v) => _maxLines = v;
+
+  TextAlign _textAlign;
+  TextAlign get textAlign => _textAlign ?? parent?.textAlign;
+  set textAlign(TextAlign v) => _textAlign = v;
+
+  TextOverflow _textOverflow;
+  TextOverflow get textOverflow => _textOverflow ?? parent?.textOverflow;
+  set textOverflow(TextOverflow v) => _textOverflow = v;
+
   BuildContext get context => _context;
 
   void enqueue<T2>(
@@ -343,7 +346,10 @@ class TextStyleBuilder<T1> {
     if (builder == null) return;
 
     assert(_output == null, 'Cannot add builder after being built');
+    _builders ??= [];
     _builders.add(builder);
+
+    _inputs ??= [];
     _inputs.add(input);
   }
 
@@ -357,12 +363,28 @@ class TextStyleBuilder<T1> {
       _output = parent.build(_context);
     }
 
-    final l = _builders.length;
-    for (var i = 0; i < l; i++) {
-      _output = _builders[i](context, _output, _inputs[i]);
+    if (_builders != null) {
+      final l = _builders.length;
+      for (var i = 0; i < l; i++) {
+        _output = _builders[i](context, _output, _inputs[i]);
+      }
     }
 
     return _output;
+  }
+
+  bool hasSameStyleWith(TextStyleBuilder other) {
+    var thisWithBuilder = this;
+    while (thisWithBuilder._builders == null) {
+      thisWithBuilder = thisWithBuilder.parent;
+    }
+
+    var otherWithBuilder = other;
+    while (otherWithBuilder._builders == null) {
+      otherWithBuilder = otherWithBuilder.parent;
+    }
+
+    return thisWithBuilder == otherWithBuilder;
   }
 
   TextStyleBuilder<T2> sub<T2>([
@@ -380,10 +402,3 @@ class TextStyleBuilder<T1> {
     _output = null;
   }
 }
-
-WidgetPlaceholder _widgetToPlaceholder(Widget widget) {
-  if (widget is WidgetPlaceholder) return widget;
-  return WidgetPlaceholder<Widget>(builder: _widgetToWidget, child: widget);
-}
-
-Widget _widgetToWidget(BuildContext _, Widget child, __) => child;

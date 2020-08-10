@@ -7,7 +7,7 @@ class _ColumnPlaceholder extends WidgetPlaceholder {
   _ColumnPlaceholder(
     this.children, {
     @required this.trimMarginVertical,
-  }) : super(builder: _widgetToWidget);
+  });
 
   @override
   Widget build(BuildContext context) => _column(_process(context));
@@ -17,9 +17,7 @@ class _ColumnPlaceholder extends WidgetPlaceholder {
 
     _loop(context, _ColumnWidgetIterator(context, children.iterator), data);
 
-    if (builders.length == 1) return data.everything;
-
-    final column = callBuilders(context, _column(data.children));
+    final column = callBuilders(_column(data.children));
 
     return [
       ...data.marginTop,
@@ -97,8 +95,6 @@ class _ColumnPlaceholder extends WidgetPlaceholder {
       break;
     }
   }
-
-  static Widget _widgetToWidget(BuildContext _, Widget child, __) => child;
 }
 
 class _ColumnWidgetIterator extends Iterator<Widget> {

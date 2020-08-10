@@ -220,8 +220,11 @@ class WidgetFactory {
         cells[c] = TableCell(child: slot.cell.child);
       }
 
+      if (cells.isEmpty) continue;
       rows.add(TableRow(children: cells));
     }
+
+    if (rows.isEmpty) return null;
 
     final tableBorder = table.border != null
         // TODO: support different styling for border sides
@@ -230,50 +233,40 @@ class WidgetFactory {
     return Table(border: tableBorder, children: rows);
   }
 
-  WidgetPlaceholder<TextBits> buildText(TextBits text) =>
-      (text..trimRight()).isNotEmpty
-          ? WidgetPlaceholder(
-              builder: _buildText,
-              input: text,
-            )
-          : null;
+  WidgetPlaceholder buildText(TextBits text) {
+    text.trimRight();
+    if (text.isEmpty) return null;
 
-  Widget _buildText(BuildContext context, Widget _, TextBits text) {
-    final tsh = text.tsb?.build(context);
-    final maxLines = tsh?.maxLines == -1 ? null : tsh?.maxLines;
-    final overflow = tsh?.textOverflow ?? TextOverflow.clip;
-    final textAlign = tsh?.align ?? TextAlign.start;
-    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    final tsb = text.tsb;
+    final maxLines = tsb?.maxLines == -1 ? null : tsb?.maxLines;
+    final overflow = tsb?.textOverflow ?? TextOverflow.clip;
+    final textAlign = tsb?.textAlign ?? TextAlign.start;
+
     final widgets = <Widget>[];
-    for (final compiled in _TextCompiler(text).compile(context)) {
-      if (compiled is InlineSpan) {
-        widgets.add(overflow == TextOverflow.ellipsis && maxLines == null
-            ? LayoutBuilder(
-                builder: (_, bc) => RichText(
-                      text: compiled,
-                      textAlign: textAlign,
-                      textScaleFactor: textScaleFactor,
-                      maxLines:
-                          bc.biggest.height.isFinite && bc.biggest.height > 0
-                              ? (bc.biggest.height / compiled.style.fontSize)
-                                  .floor()
-                              : null,
-                      overflow: overflow,
-                    ))
-            : RichText(
-                text: compiled,
-                textAlign: textAlign,
-                textScaleFactor: textScaleFactor,
-                maxLines: maxLines,
-                overflow: overflow,
-              ));
-      } else if (compiled is Widget) {
-        widgets.add(compiled);
+    for (final compiled in _TextCompiler(text).compile()) {
+      if (compiled.widget != null) {
+        widgets.add(compiled.widget);
+        continue;
       }
-    }
 
-    if (widgets.isEmpty) return widget0;
-    if (widgets.length == 1) return widgets.first;
+      widgets.add(LayoutBuilder(builder: (context, bc) {
+        final span = compiled.build(context);
+        if (span == null) return widget0;
+
+        return RichText(
+          maxLines: maxLines ??
+              (overflow == TextOverflow.ellipsis
+                  ? bc.biggest.height.isFinite && bc.biggest.height > 0
+                      ? (bc.biggest.height / span.style.fontSize).floor()
+                      : null
+                  : null),
+          overflow: overflow,
+          text: span,
+          textAlign: textAlign,
+          textScaleFactor: MediaQuery.of(context).textScaleFactor,
+        );
+      }));
+    }
 
     return buildColumn(widgets);
   }
@@ -479,7 +472,7 @@ class WidgetFactory {
       case _kCssMaxLines:
       case _kCssMaxLinesWebkitLineClamp:
         final maxLines = value == _kCssMaxLinesNone ? -1 : int.tryParse(value);
-        if (maxLines != null) meta.tsb(_styleMaxLines, maxLines);
+        if (maxLines != null) meta.tsb().maxLines = maxLines;
         break;
 
       case _kCssTextAlign:
@@ -487,7 +480,7 @@ class WidgetFactory {
         if (textAlign != null) {
           meta
             ..isBlockElement = true
-            ..tsb(_StyleTextAlign._tsb, textAlign);
+            ..tsb().textAlign = textAlign;
         }
         break;
 
@@ -499,10 +492,10 @@ class WidgetFactory {
       case _kCssTextOverflow:
         switch (value) {
           case _kCssTextOverflowClip:
-            meta.tsb(_styleTextOverflow, TextOverflow.clip);
+            meta.tsb().textOverflow = TextOverflow.clip;
             break;
           case _kCssTextOverflowEllipsis:
-            meta.tsb(_styleTextOverflow, TextOverflow.ellipsis);
+            meta.tsb().textOverflow = TextOverflow.ellipsis;
             break;
         }
         break;
@@ -778,7 +771,7 @@ class WidgetFactory {
     return _styleDisplayBlock;
   }
 
-  Widget _cssBlock(BuildContext _, Widget child, __) =>
+  Widget _cssBlock(Widget child) =>
       child == widget0 || child is CssBlock ? child : CssBlock(child: child);
 
   BuildOp styleMargin() {
@@ -850,10 +843,3 @@ class WidgetFactory {
 }
 
 Iterable<Widget> _listOrNull(Widget x) => x == null ? null : [x];
-
-TextStyleHtml _styleMaxLines(BuildContext _, TextStyleHtml p, int v) =>
-    p.copyWith(maxLines: v);
-
-TextStyleHtml _styleTextOverflow(
-        BuildContext _, TextStyleHtml p, TextOverflow v) =>
-    p.copyWith(textOverflow: v);
