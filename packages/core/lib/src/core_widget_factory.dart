@@ -237,27 +237,32 @@ class WidgetFactory {
     final overflow = tsb?.textOverflow ?? TextOverflow.clip;
     final textAlign = tsb?.textAlign ?? TextAlign.start;
 
-    final widgets = <Widget>[];
+    final widgets = <WidgetPlaceholder>[];
     for (final compiled in _TextCompiler(text).compile()) {
       if (compiled.widget != null) {
         widgets.add(compiled.widget);
         continue;
       }
 
-      widgets.add(Builder(builder: (context) {
-        final span = compiled.build(context);
-        if (span == null) return widget0;
+      widgets.add(
+        WidgetPlaceholder<TextBits>(
+          child: Builder(builder: (context) {
+            final span = compiled.build(context);
+            if (span == null) return widget0;
 
-        // TODO: calculate max lines automatically for ellipsis if needed
-        // currently it only renders 1 line with ellipsis
-        return RichText(
-          maxLines: maxLines,
-          overflow: overflow,
-          text: span,
-          textAlign: textAlign,
-          textScaleFactor: MediaQuery.of(context).textScaleFactor,
-        );
-      }));
+            // TODO: calculate max lines automatically for ellipsis if needed
+            // currently it only renders 1 line with ellipsis
+            return RichText(
+              maxLines: maxLines,
+              overflow: overflow,
+              text: span,
+              textAlign: textAlign,
+              textScaleFactor: MediaQuery.of(context).textScaleFactor,
+            );
+          }),
+          generator: text,
+        ),
+      );
     }
 
     return buildColumn(widgets);

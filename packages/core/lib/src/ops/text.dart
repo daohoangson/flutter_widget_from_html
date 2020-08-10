@@ -77,7 +77,7 @@ class _TextCompiler {
     if (_prevBuffer != _buffer && _prevBuffer.length > 0) {
       final scopedTsb = _prevTsb;
       final scopedText = _prevBuffer.toString();
-      _builders.add(TextSpanBuilder.callback((context) => TextSpan(
+      _builders.add(TextSpanBuilder((context) => TextSpan(
             style: scopedTsb.build(context).styleWithHeight,
             text: scopedText,
           )));
@@ -105,7 +105,7 @@ class _TextCompiler {
       final scoped = List<TextSpanBuilder>.from(_builders, growable: false);
       final scopedTsb = _tsb;
       final scopedText = _buffer.toString();
-      builder = TextSpanBuilder.callback((context) => TextSpan(
+      builder = TextSpanBuilder((context) => TextSpan(
             children: scoped
                 .map((builder) => builder.build(context))
                 .where((span) => span != null)

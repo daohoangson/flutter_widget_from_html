@@ -286,9 +286,9 @@ class TextBits extends TextBit {
 class TextSpanBuilder {
   final InlineSpan Function(BuildContext) callback;
   final InlineSpan span;
-  final Widget widget;
+  final WidgetPlaceholder widget;
 
-  TextSpanBuilder.callback(this.callback)
+  TextSpanBuilder(this.callback)
       : span = null,
         widget = null;
 
