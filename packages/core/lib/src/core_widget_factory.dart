@@ -705,7 +705,7 @@ class WidgetFactory {
         break;
 
       case _kTagRuby:
-        meta.op = tagRuby();
+        meta.op = tagRuby(meta);
         break;
 
       case 'small':
@@ -837,7 +837,7 @@ class WidgetFactory {
     return _tagQ;
   }
 
-  BuildOp tagRuby() => _TagRuby(this).buildOp;
+  BuildOp tagRuby(NodeMetadata meta) => _TagRuby(this, meta);
 
   BuildOp tagTable(NodeMetadata meta) => _TagTable(this, meta);
 }
