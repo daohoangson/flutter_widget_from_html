@@ -406,10 +406,7 @@ class Explainer {
 
     if (widget is SizedBox) return _sizedBox(widget);
 
-    final type = widget.runtimeType
-        .toString()
-        .replaceAll('_MarginHorizontal', 'Padding');
-
+    final type = '${widget.runtimeType}';
     var attr = <String>[];
 
     attr.add(_textAlign(widget is RichText
