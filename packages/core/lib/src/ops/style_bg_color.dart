@@ -20,13 +20,12 @@ class _StyleBgColor {
         onWidgets: (meta, widgets) {
           final color = wf.parseColor(meta.style(_kCssBackgroundColor));
           if (color == null) return null;
-          return _listOrNull(wf.buildColumn(widgets)?.wrapWith(_build, color));
+          return _listOrNull(wf
+              .buildColumn(widgets)
+              ?.wrapWith((child) => wf.buildDecoratedBox(child, color: color)));
         },
         priority: 15000,
       );
-
-  Widget _build(BuildContext _, Widget child, Color color) =>
-      wf.buildDecoratedBox(child, color: color);
 
   BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) =>
       piece..text.bits.forEach((bit) => bit.tsb?.enqueue(_tsb, bgColor));

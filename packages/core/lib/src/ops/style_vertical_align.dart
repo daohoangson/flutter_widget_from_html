@@ -41,14 +41,13 @@ class _StyleVerticalAlign {
 
     if (value == _kCssVerticalAlignSub || value == _kCssVerticalAlignSuper) {
       built.wrapWith(
-        _build,
-        _VerticalAlignInput(
-          padding: EdgeInsets.only(
+        (child) => _build(
+          child,
+          EdgeInsets.only(
             bottom: value == _kCssVerticalAlignSub ? .4 : 0,
             top: value == _kCssVerticalAlignSuper ? .4 : 0,
           ),
-          tsb: text.tsb,
-          wf: wf,
+          text.tsb,
         ),
       );
     }
@@ -57,25 +56,25 @@ class _StyleVerticalAlign {
     return newPiece;
   }
 
-  static Widget _build(BuildContext c, Widget w, _VerticalAlignInput input) {
-    final fontSize = input.tsb.build(c).style.fontSize;
-    final padding = input.padding;
+  Widget _build(Widget child, EdgeInsets padding, TextStyleBuilder tsb) =>
+      Builder(builder: (context) {
+        final fontSize = tsb.build(context).style.fontSize;
 
-    return Stack(children: <Widget>[
-      input.wf.buildPadding(
-        Opacity(child: w, opacity: 0),
-        EdgeInsets.only(
-          bottom: fontSize * padding.bottom,
-          top: fontSize * padding.top,
-        ),
-      ),
-      Positioned(
-        child: w,
-        bottom: padding.top > 0 ? null : 0,
-        top: padding.bottom > 0 ? null : 0,
-      )
-    ]);
-  }
+        return Stack(children: <Widget>[
+          wf.buildPadding(
+            Opacity(child: child, opacity: 0),
+            EdgeInsets.only(
+              bottom: fontSize * padding.bottom,
+              top: fontSize * padding.top,
+            ),
+          ),
+          Positioned(
+            child: child,
+            bottom: padding.top > 0 ? null : 0,
+            top: padding.bottom > 0 ? null : 0,
+          )
+        ]);
+      });
 
   static PlaceholderAlignment _tryParse(String value) {
     switch (value) {
@@ -91,13 +90,4 @@ class _StyleVerticalAlign {
 
     return null;
   }
-}
-
-@immutable
-class _VerticalAlignInput {
-  final EdgeInsets padding;
-  final TextStyleBuilder tsb;
-  final WidgetFactory wf;
-
-  _VerticalAlignInput({this.padding, this.tsb, this.wf});
 }

@@ -32,10 +32,7 @@ class _TagVideo extends BuildOp {
     if (player == null) return widgets;
 
     return [
-      WidgetPlaceholder<Widget>(
-        builder: (_, __, input) => input,
-        input: player,
-      ),
+      WidgetPlaceholder<_TagVideo>(child: player, generator: this),
     ];
   }
 
