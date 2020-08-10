@@ -95,19 +95,15 @@ class WidgetFactory {
             )
           : child;
 
-  Widget buildDirectionality(BuildContext _, Widget child, TextDirection v) =>
-      Directionality(child: child, textDirection: v);
+  Widget buildDirectionality(Widget child, TextDirection textDirection) =>
+      Directionality(child: child, textDirection: textDirection);
 
   Widget buildDivider() => const DecoratedBox(
         decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 1)),
         child: SizedBox(height: 1),
       );
 
-  Widget buildGestureDetector(
-    BuildContext _,
-    Widget child,
-    GestureTapCallback onTap,
-  ) =>
+  Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
       GestureDetector(child: child, onTap: onTap);
 
   GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
@@ -116,7 +112,7 @@ class WidgetFactory {
           : print('[flutter_widget_from_html] Tapped url $url')
       : null;
 
-  InlineSpan buildGestureTapCallbackSpan(
+  TextSpan buildGestureTapCallbackSpan(
     String text,
     GestureTapCallback onTap,
     TextStyle style,
@@ -763,7 +759,7 @@ class WidgetFactory {
 
   BuildOp styleDisplayBlock() {
     _styleDisplayBlock ??= BuildOp(
-      onWidgets: (meta, widgets) =>
+      onWidgets: (_, widgets) =>
           _listOrNull(buildColumn(widgets)?.wrapWith(_cssBlock)),
       priority: 9223372036854775807,
     );
