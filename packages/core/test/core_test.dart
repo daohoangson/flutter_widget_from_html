@@ -1466,10 +1466,8 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
     testWidgets('renders ellipsis', (WidgetTester tester) async {
       final html = '<div style="text-overflow: ellipsis">Foo</div>';
       final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals(
-              '[CssBlock:child=[RichText:maxLines=60,overflow=ellipsis,(:Foo)]]'));
+      expect(explained,
+          equals('[CssBlock:child=[RichText:overflow=ellipsis,(:Foo)]]'));
     });
 
     group('max-lines', () {

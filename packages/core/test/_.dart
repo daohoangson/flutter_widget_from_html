@@ -397,13 +397,6 @@ class Explainer {
 
     if (widget is Image) return _image(widget);
 
-    if (widget is LayoutBuilder) {
-      return _widget(widget.builder(
-        context,
-        BoxConstraints.tightFor(width: 800, height: 600),
-      ));
-    }
-
     if (widget is SizedBox) return _sizedBox(widget);
 
     final type = '${widget.runtimeType}';

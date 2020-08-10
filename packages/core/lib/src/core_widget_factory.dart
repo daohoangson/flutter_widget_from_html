@@ -244,17 +244,14 @@ class WidgetFactory {
         continue;
       }
 
-      widgets.add(LayoutBuilder(builder: (context, bc) {
+      widgets.add(Builder(builder: (context) {
         final span = compiled.build(context);
         if (span == null) return widget0;
 
+        // TODO: calculate max lines automatically for ellipsis if needed
+        // currently it only renders 1 line with ellipsis
         return RichText(
-          maxLines: maxLines ??
-              (overflow == TextOverflow.ellipsis
-                  ? bc.biggest.height.isFinite && bc.biggest.height > 0
-                      ? (bc.biggest.height / span.style.fontSize).floor()
-                      : null
-                  : null),
+          maxLines: maxLines,
           overflow: overflow,
           text: span,
           textAlign: textAlign,
