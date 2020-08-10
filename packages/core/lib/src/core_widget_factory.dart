@@ -18,7 +18,6 @@ part 'ops/style_direction.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_padding.dart';
 part 'ops/style_sizing.dart';
-part 'ops/style_text_align.dart';
 part 'ops/style_vertical_align.dart';
 part 'ops/tag_a.dart';
 part 'ops/tag_code.dart';
@@ -476,7 +475,7 @@ class WidgetFactory {
         break;
 
       case _kCssTextAlign:
-        final textAlign = _StyleTextAlign.tryParse(value);
+        final textAlign = _tryParseTextAlign(value);
         if (textAlign != null) {
           meta
             ..isBlockElement = true
