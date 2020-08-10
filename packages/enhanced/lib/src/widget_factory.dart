@@ -101,12 +101,14 @@ class WidgetFactory extends core.WidgetFactory {
   @override
   Widget buildTable(TableData table) {
     final cols = table.cols;
+    if (cols == 0) return null;
     final templateColumnSizes = List<TrackSize>(cols);
     for (var c = 0; c < cols; c++) {
       templateColumnSizes[c] = FlexibleTrackSize(1);
     }
 
     final rows = table.rows;
+    if (rows == 0) return null;
     final templateRowSizes = List<TrackSize>(rows);
     for (var r = 0; r < rows; r++) {
       templateRowSizes[r] = IntrinsicContentTrackSize();

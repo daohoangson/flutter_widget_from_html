@@ -350,7 +350,12 @@ void main() {
     testWidgets('standalone TABLE', (WidgetTester tester) async {
       final html = '<table>Foo</table>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      expect(
+          explained,
+          equals('[Column:children='
+              '[RichText:(:Foo)],'
+              '[CssBlock:child=[widget0]]'
+              ']'));
     });
 
     testWidgets('standalone TD', (WidgetTester tester) async {
@@ -374,25 +379,25 @@ void main() {
     testWidgets('#80: empty TD', (WidgetTester tester) async {
       final html = '<table><tr><td></td></tr></table>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[widget0]'));
+      expect(explained, equals('[CssBlock:child=[widget0]]'));
     });
 
     testWidgets('empty TR', (WidgetTester tester) async {
       final html = '<table><tr></tr></table>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[widget0]'));
+      expect(explained, equals('[CssBlock:child=[widget0]]'));
     });
 
     testWidgets('empty TBODY', (WidgetTester tester) async {
       final html = '<table><tbody></tbody></table>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[widget0]'));
+      expect(explained, equals('[CssBlock:child=[widget0]]'));
     });
 
     testWidgets('empty TABLE', (WidgetTester tester) async {
       final html = '<table></table>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[widget0]'));
+      expect(explained, equals('[CssBlock:child=[widget0]]'));
     });
 
     testWidgets('#171: background-color', (WidgetTester tester) async {
