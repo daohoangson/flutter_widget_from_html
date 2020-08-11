@@ -65,22 +65,22 @@ class TableData extends StatelessWidget {
 }
 
 class TableDataCell extends StatelessWidget {
-  final Iterable<Widget> children;
+  final Widget child;
   final int colspan;
   final int rowspan;
 
   const TableDataCell({
     Key key,
-    @required this.children,
+    @required this.child,
     @required this.colspan,
     @required this.rowspan,
-  })  : assert(children != null),
+  })  : assert(child != null),
         assert(colspan != null),
         assert(rowspan != null),
         super(key: key);
 
   @override
-  Widget build(BuildContext context) => widget0;
+  Widget build(BuildContext context) => child;
 }
 
 @immutable

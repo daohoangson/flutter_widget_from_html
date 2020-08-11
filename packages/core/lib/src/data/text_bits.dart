@@ -6,15 +6,13 @@ abstract class TextBit {
 
   TextBit(this.parent);
 
-  bool get canCompile => false;
   String get data => null;
+  bool get hasBuilder => false;
   bool get hasTrailingWhitespace => false;
   int get index => parent?._children?.indexOf(this) ?? -1;
   bool get isEmpty => false;
   bool get isNotEmpty => !isEmpty;
   TextStyleBuilder get tsb => null;
-
-  InlineSpan compile(TextStyle style) => throw UnimplementedError();
 
   bool detach() => parent?._children?.remove(this);
 
@@ -33,6 +31,9 @@ abstract class TextBit {
     another.parent._children.insert(i, this);
     return true;
   }
+
+  TextSpanBuilder prepareBuilder(TextStyleBuilder tsb) =>
+      throw UnimplementedError();
 
   bool replaceWith(TextBit another) {
     final i = index;
@@ -142,14 +143,16 @@ class TextWidget<T> extends TextBit {
         super(parent);
 
   @override
-  bool get canCompile => true;
+  bool get hasBuilder => true;
 
   @override
-  WidgetSpan compile(TextStyle style) => WidgetSpan(
-        alignment: alignment,
-        baseline: baseline,
-        child: widget,
-        style: style,
+  TextSpanBuilder prepareBuilder(TextStyleBuilder _) =>
+      TextSpanBuilder.prebuilt(
+        span: WidgetSpan(
+          alignment: alignment,
+          baseline: baseline,
+          child: widget,
+        ),
       );
 }
 
@@ -278,6 +281,24 @@ class TextBits extends TextBit {
           .map((lines) => lines.map((line) => '  $line'))
           .reduce((prev, lines) => List.from(prev)..addAll(lines)))
       : [];
+}
+
+class TextSpanBuilder {
+  final InlineSpan Function(BuildContext) callback;
+  final InlineSpan span;
+  final WidgetPlaceholder widget;
+
+  TextSpanBuilder(this.callback)
+      : span = null,
+        widget = null;
+
+  TextSpanBuilder.prebuilt({this.span, this.widget})
+      : assert((span == null) != (widget == null),
+            '`span` and `widget` cannot be set together'),
+        callback = null;
+
+  InlineSpan build(BuildContext context) =>
+      span ?? (callback != null ? callback(context) : null);
 }
 
 enum TextWhitespaceType {

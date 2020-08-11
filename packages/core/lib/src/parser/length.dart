@@ -26,13 +26,13 @@ CssLength _parseCssLength(String value) {
 
   switch (match[2]) {
     case 'em':
-      return CssLength(number, unit: CssLengthUnit.em);
+      return CssLength(number, CssLengthUnit.em);
     case '%':
-      return CssLength(number, unit: CssLengthUnit.percentage);
+      return CssLength(number, CssLengthUnit.percentage);
     case 'pt':
-      return CssLength(number, unit: CssLengthUnit.pt);
+      return CssLength(number, CssLengthUnit.pt);
     case 'px':
-      return CssLength(number, unit: CssLengthUnit.px);
+      return CssLength(number, CssLengthUnit.px);
   }
 
   return null;

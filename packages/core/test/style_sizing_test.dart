@@ -274,6 +274,31 @@ void main() {
             ']]]]]]]]]]'));
   });
 
+  group('block', () {
+    testWidgets('renders block within block', (WidgetTester tester) async {
+      final html =
+          '<div style="width: 10px; height: 10px;"><div>Foo</div></div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssBlock:child='
+              '[CssSizing:height=10.0,width=10.0,child='
+              '[CssBlock:child=[RichText:(:Foo)]]'
+              ']]'));
+    });
+
+    testWidgets('renders block within non-block', (tester) async {
+      final html =
+          '<span style="width: 10px; height: 10px;"><div>Foo</div></span>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:height=10.0,width=10.0,child='
+              '[CssBlock:child=[RichText:(:Foo)]]'
+              ']'));
+    });
+  });
+
   group('inline', () {
     testWidgets('renders img with sizing', (WidgetTester tester) async {
       final src = 'https://domain.com/image.jpg';

@@ -40,6 +40,7 @@ Future<String> explain(
   void Function(BuildContext) preTest,
   bool rtl = false,
   TextStyle textStyle,
+  bool useExplainer = true,
 }) async {
   assert((html == null) != (hw == null));
   hw ??= HtmlWidget(
@@ -81,6 +82,21 @@ Future<String> explain(
       },
     ),
   );
+
+  if (!useExplainer) {
+    final sb = StringBuffer();
+    hwKey.currentContext.visitChildElements(
+        (e) => sb.writeln(e.toDiagnosticsNode().toStringDeep()));
+    var str = sb.toString();
+    str = str.replaceAll(RegExp(r': [A-Z][A-Za-z]+\.'), ': '); // enums
+    str = str.replaceAll(RegExp(r'\[GlobalKey#[0-9a-f]+\]'), '');
+    str = str.replaceAll(RegExp(r'(, )?dependencies: \[[^\]]+\]'), '');
+    str = str.replaceAll(
+        RegExp(r'(, )?renderObject: .+ relayoutBoundary=\w+'), '');
+    str = str.replaceAll(RegExp(r'softWrap: [a-z\s]+, '), '');
+    str = str.replaceAll('maxLines: unlimited, ', '');
+    return str;
+  }
 
   final hws = hwKey.currentState;
   expect(hws, isNotNull);
@@ -383,21 +399,13 @@ class Explainer {
     // ignore: invalid_use_of_protected_member
     if (widget is WidgetPlaceholder) return _widget(widget.build(context));
 
-    if (widget is Image) return _image(widget);
+    if (widget is Builder) return _widget(widget.builder(context));
 
-    if (widget is LayoutBuilder) {
-      return _widget(widget.builder(
-        context,
-        BoxConstraints.tightFor(width: 800, height: 600),
-      ));
-    }
+    if (widget is Image) return _image(widget);
 
     if (widget is SizedBox) return _sizedBox(widget);
 
-    final type = widget.runtimeType
-        .toString()
-        .replaceAll('_MarginHorizontal', 'Padding');
-
+    final type = '${widget.runtimeType}';
     var attr = <String>[];
 
     attr.add(_textAlign(widget is RichText

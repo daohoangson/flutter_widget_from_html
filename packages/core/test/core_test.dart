@@ -208,8 +208,10 @@ void main() {
     final explained = await explainMargin(tester, html);
     expect(
         explained,
-        equals('[CssBlock:child=[RichText:(+b:Foo)]],'
-            '[CssBlock:child=[Padding:(0,0,0,40),child=[RichText:(:Bar)]]],'
+        equals('[CssBlock:child=[Column:children='
+            '[CssBlock:child=[RichText:(+b:Foo)]],'
+            '[CssBlock:child=[Padding:(0,0,0,40),child=[RichText:(:Bar)]]]'
+            ']],'
             '[SizedBox:0.0x10.0]'));
   });
 
@@ -358,8 +360,10 @@ void main() {
         expect(
             explained,
             equals('[SizedBox:0.0x10.0],'
-                '[CssBlock:child=[Padding:(0,40,0,40),child=[Image:image=NetworkImage("$src", scale: 1.0)]]],'
-                '[CssBlock:child=[Padding:(0,40,0,40),child=[CssBlock:child=[RichText:(:(+i:fig. 1)(: Foo))]]]],'
+                '[CssBlock:child=[Column:children='
+                '[Padding:(0,40,0,40),child=[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)]],'
+                '[Padding:(0,40,0,40),child=[CssBlock:child=[RichText:(:(+i:fig. 1)(: Foo))]]]'
+                ']],'
                 '[SizedBox:0.0x10.0]'));
       }),
     );
@@ -895,10 +899,11 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children='
-              '[CssBlock:child=[RichText:(:1)]],'
+          equals('[CssBlock:child='
+              '[Column:children='
+              '[RichText:(:1)],'
               '[CssBlock:child=[RichText:(:2)]]'
-              ']'));
+              ']]'));
     });
 
     testWidgets('renders DIV block by default', (WidgetTester tester) async {
@@ -906,10 +911,11 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children='
-              '[CssBlock:child=[RichText:(:1)]],'
+          equals('[CssBlock:child='
+              '[Column:children='
+              '[RichText:(:1)],'
               '[CssBlock:child=[RichText:(:2)]]'
-              ']'));
+              ']]'));
     });
 
     testWidgets('renders display: inline', (WidgetTester tester) async {
@@ -1099,6 +1105,16 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
             equals(
                 '[CssBlock:child=[Directionality:rtl,child=[RichText:(:Foo)]]]'));
       });
+    });
+
+    testWidgets('renders margin inside', (WidgetTester tester) async {
+      final html = '<div dir="rtl"><div style="margin: 5px">Foo</div></div>';
+      final explained = await explainMargin(tester, html);
+      expect(
+          explained,
+          equals('[SizedBox:0.0x5.0],'
+              '[CssBlock:child=[Directionality:rtl,child=[CssBlock:child=[Padding:(0,5,0,5),child=[RichText:(:Foo)]]]]],'
+              '[SizedBox:0.0x5.0]'));
     });
   });
 
@@ -1372,7 +1388,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(
           explained,
           equals(
-              '[RichText:(:(+b:bold)(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: four )'
+              '[RichText:(:(+b:bold)(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: )(:four)(: )'
               '(+w4:five)(: )(+w5:six)(: )(+b:seven)(: )(+w7:eight)(: )(+w8:nine))]'));
     });
   });
@@ -1522,10 +1538,8 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
     testWidgets('renders ellipsis', (WidgetTester tester) async {
       final html = '<div style="text-overflow: ellipsis">Foo</div>';
       final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals(
-              '[CssBlock:child=[RichText:maxLines=60,overflow=ellipsis,(:Foo)]]'));
+      expect(explained,
+          equals('[CssBlock:child=[RichText:overflow=ellipsis,(:Foo)]]'));
     });
 
     group('max-lines', () {
