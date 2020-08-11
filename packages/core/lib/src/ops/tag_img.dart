@@ -64,31 +64,10 @@ class _ImageBit extends TextWidget<ImgMetadata> {
         );
 
   @override
-  WidgetSpan compile(TextStyle style) => _ImageSpan(
+  WidgetSpan compile(TextStyle style) => WidgetSpan(
         alignment: alignment,
         baseline: baseline,
         child: widget,
         style: style,
       );
-}
-
-class _ImageSpan extends WidgetSpan {
-  const _ImageSpan({
-    PlaceholderAlignment alignment,
-    TextBaseline baseline,
-    WidgetPlaceholder child,
-    TextStyle style,
-  }) : super(
-          alignment: alignment,
-          baseline: baseline,
-          child: child,
-          style: style,
-        );
-
-  @override
-  void build(ui.ParagraphBuilder builder,
-      {double textScaleFactor = 1.0,
-      @required List<PlaceholderDimensions> dimensions}) {
-    super.build(builder, textScaleFactor: 1.0, dimensions: dimensions);
-  }
 }
