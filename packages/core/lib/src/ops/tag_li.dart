@@ -39,6 +39,8 @@ class _TagLi extends BuildOp {
   bool get hasOnChild => true;
 
   _ListConfig get config {
+    // cannot build config from constructor because
+    // domElement is not set at that time
     _config ??= _ListConfig.fromNodeMetadata(listMeta);
     return _config;
   }
