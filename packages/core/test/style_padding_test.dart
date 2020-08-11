@@ -118,11 +118,33 @@ void main() {
     });
   });
 
-  testWidgets('parses padding with 1 value', (WidgetTester tester) async {
-    final html = '<div style="padding: 3px">Foo</div>';
-    final explained = await explain(tester, html);
-    expect(explained,
-        equals('[CssBlock:child=[Padding:(3,3,3,3),child=[RichText:(:Foo)]]]'));
+  group('1 value', () {
+    testWidgets('renders em', (WidgetTester tester) async {
+      final html = '<div style="padding: 2em">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssBlock:child=[Padding:(20,20,20,20),'
+              'child=[RichText:(:Foo)]]]'));
+    });
+
+    testWidgets('renders pt', (WidgetTester tester) async {
+      final html = '<div style="padding: 10pt">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssBlock:child=[Padding:(13,13,13,13),'
+              'child=[RichText:(:Foo)]]]'));
+    });
+
+    testWidgets('renders px', (WidgetTester tester) async {
+      final html = '<div style="padding: 10px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssBlock:child=[Padding:(10,10,10,10),'
+              'child=[RichText:(:Foo)]]]'));
+    });
   });
 
   testWidgets('renders padding within another', (WidgetTester tester) async {

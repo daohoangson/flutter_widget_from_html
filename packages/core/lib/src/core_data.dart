@@ -116,6 +116,9 @@ class CssLength {
         break;
       case CssLengthUnit.percentage:
         return null;
+      case CssLengthUnit.pt:
+        value = number * 96 / 72;
+        break;
       case CssLengthUnit.px:
         value = number;
         break;
@@ -180,6 +183,7 @@ class CssLengthBox {
 enum CssLengthUnit {
   em,
   percentage,
+  pt,
   px,
 }
 
