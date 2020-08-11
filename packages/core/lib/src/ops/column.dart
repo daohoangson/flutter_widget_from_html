@@ -1,15 +1,14 @@
 part of '../core_widget_factory.dart';
 
-class _ColumnPlaceholder extends WidgetPlaceholder {
+class _ColumnPlaceholder extends WidgetPlaceholder<WidgetFactory> {
   final Iterable<Widget> _children;
   final bool trimMarginVertical;
-  final WidgetFactory wf;
 
   _ColumnPlaceholder(
-    this.wf,
+    WidgetFactory wf,
     this._children, {
     @required this.trimMarginVertical,
-  });
+  }) : super(generator: wf);
 
   List<Widget> get children {
     final contents = <Widget>[];
@@ -62,6 +61,8 @@ class _ColumnPlaceholder extends WidgetPlaceholder {
       if (marginBottom != null) marginBottom,
     ];
   }
+
+  WidgetFactory get wf => generator;
 
   Iterable<Widget> get _iterable sync* {
     for (var child in _children) {

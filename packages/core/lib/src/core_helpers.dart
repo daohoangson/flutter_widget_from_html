@@ -22,7 +22,8 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   final Widget _firstChild;
 
   WidgetPlaceholder({Widget child, @required this.generator})
-      : _firstChild = child;
+      : assert(generator != null),
+        _firstChild = child;
 
   @override
   Widget build(BuildContext context) => callBuilders(_firstChild);
