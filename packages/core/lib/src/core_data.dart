@@ -118,13 +118,16 @@ class CssLength {
         value = parent.style.fontSize * number;
         scaleFactor = 1;
         break;
-      case CssLengthUnit.px:
-        value = number;
-        break;
       case CssLengthUnit.percentage:
         if (percentageBase == null) return null;
         value = percentageBase * number / 100;
         scaleFactor = 1;
+        break;
+      case CssLengthUnit.pt:
+        value = number * 96 / 72;
+        break;
+      case CssLengthUnit.px:
+        value = number;
         break;
     }
 
@@ -186,6 +189,7 @@ class CssLengthBox {
 enum CssLengthUnit {
   em,
   percentage,
+  pt,
   px,
 }
 
