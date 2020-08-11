@@ -33,10 +33,6 @@ class _MarginVerticalPlaceholder extends WidgetPlaceholder<CssLength> {
   @override
   _MarginVerticalPlaceholder wrapWith(Widget Function(Widget) builder) => this;
 
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
-      '_MarginVerticalPlaceholder(height: ${height.number} ${height.unit})';
-
   static Widget _build(Widget child, CssLength height, TextStyleBuilder tsb) =>
       Builder(builder: (context) {
         if (child is Builder) child = (child as Builder).builder(context);
