@@ -117,8 +117,8 @@ class CssLength {
       case CssLengthUnit.percentage:
         return null;
       case CssLengthUnit.pt:
-        final dpi = 96; // MediaQuery.of(context).devicePixelRatio * 160;
-        return number * dpi / 72;
+        value = number * 96 / 72;
+        break;
       case CssLengthUnit.px:
         value = number;
         break;
