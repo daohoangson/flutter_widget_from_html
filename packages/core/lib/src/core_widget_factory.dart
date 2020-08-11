@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
-import 'dart:ui' as ui show ParagraphBuilder;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -280,7 +279,6 @@ class WidgetFactory {
     final maxLines = tsh?.maxLines == -1 ? null : tsh?.maxLines;
     final overflow = tsh?.textOverflow ?? TextOverflow.clip;
     final textAlign = tsh?.align ?? TextAlign.start;
-    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
     final widgets = <Widget>[];
     for (final compiled in _TextCompiler(text).compile(context)) {
       if (compiled is InlineSpan) {
@@ -289,7 +287,6 @@ class WidgetFactory {
                 builder: (_, bc) => RichText(
                       text: compiled,
                       textAlign: textAlign,
-                      textScaleFactor: textScaleFactor,
                       maxLines:
                           bc.biggest.height.isFinite && bc.biggest.height > 0
                               ? (bc.biggest.height / compiled.style.fontSize)
@@ -300,7 +297,6 @@ class WidgetFactory {
             : RichText(
                 text: compiled,
                 textAlign: textAlign,
-                textScaleFactor: textScaleFactor,
                 maxLines: maxLines,
                 overflow: overflow,
               ));
