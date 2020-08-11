@@ -1211,6 +1211,12 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(explained, equals('[RichText:(@20.0:Foo)]'));
     });
 
+    testWidgets('renders pt', (WidgetTester tester) async {
+      final html = '<span style="font-size: 100pt">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(@133.3:Foo)]'));
+    });
+
     testWidgets('renders px', (WidgetTester tester) async {
       final html = '<span style="font-size: 100px">Foo</span>';
       final explained = await explain(tester, html);
@@ -1334,6 +1340,12 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final html = '<span style="line-height: 50%">Foo</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(+height=0.5:Foo)]'));
+    });
+
+    testWidgets('renders pt', (WidgetTester tester) async {
+      final html = '<span style="line-height: 50pt">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+height=6.7:Foo)]'));
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
