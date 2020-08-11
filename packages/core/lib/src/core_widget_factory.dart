@@ -134,6 +134,9 @@ class WidgetFactory {
         style: style,
       );
 
+  Widget buildHorizontalScrollView(Widget child) =>
+      SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
+
   Widget buildImage(Object provider, ImgMetadata img) =>
       provider != null && provider is ImageProvider && img != null
           ? Image(
