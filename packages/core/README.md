@@ -101,8 +101,8 @@ However, these tags and their contents will be ignored:
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
 - line-height: `normal` number or values in `em`, `%`, `pt` and `px`
-- margin and margin-xxx (values in `px`, `em`)
-- padding and padding-xxx (values in `px`, `em`)
+- margin and margin-xxx: values in `em`, `pt` and `px`
+- padding and padding-xxx: values in `em`, `pt` and `px`
 - vertical-align: baseline/top/bottom/middle/sub/super
 - text-align: center/justify/left/right
 - text-decoration: line-through/none/overline/underline
