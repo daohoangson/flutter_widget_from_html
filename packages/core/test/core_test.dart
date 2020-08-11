@@ -1260,7 +1260,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 
       testWidgets('renders pt', (WidgetTester tester) async {
         final html = '<span style="font-size: 100pt">Foo</span>';
-        final explained = await explain(tester, html);
+        final explained = await explain2x(tester, html);
         expect(explained, equals('[RichText:(@266.7:Foo)]'));
       });
 

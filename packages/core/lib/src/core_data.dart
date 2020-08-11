@@ -107,20 +107,19 @@ class CssLength {
   // ignore: missing_return
   double getValueFromStyle(
     TextStyleHtml tsh, {
-    double percentageBase,
+    double baseValue,
     double scaleFactor,
   }) {
     double value;
     switch (unit) {
       case CssLengthUnit.em:
-        final parent = tsh.parent;
-        if (parent == null) return null;
-        value = parent.style.fontSize * number;
+        baseValue ??= tsh.style.fontSize;
+        value = baseValue * number;
         scaleFactor = 1;
         break;
       case CssLengthUnit.percentage:
-        if (percentageBase == null) return null;
-        value = percentageBase * number / 100;
+        if (baseValue == null) return null;
+        value = baseValue * number / 100;
         scaleFactor = 1;
         break;
       case CssLengthUnit.pt:

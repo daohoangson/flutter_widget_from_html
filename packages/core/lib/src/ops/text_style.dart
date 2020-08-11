@@ -120,7 +120,7 @@ class _TextStyle {
     if (length != null) {
       final lengthValue = length.getValueFromStyle(
         p,
-        percentageBase: p.parent?.style?.fontSize,
+        baseValue: p.parent?.style?.fontSize,
         scaleFactor: MediaQuery.of(c).textScaleFactor,
       );
       if (lengthValue != null) return lengthValue;
@@ -203,7 +203,7 @@ class _TextStyle {
 
     final lengthValue = length.getValueFromStyle(
       p,
-      percentageBase: p.style.fontSize,
+      baseValue: p.style.fontSize,
       scaleFactor: MediaQuery.of(c).textScaleFactor,
     );
     if (lengthValue == null) return null;
