@@ -107,25 +107,16 @@ class CssLength {
   double getValueFromStyle(BuildContext context, TextStyleHtml tsh) =>
       _getValueFromFlutterTextStyle(context, tsh.style);
 
+  // ignore: missing_return
   double _getValueFromFlutterTextStyle(BuildContext context, TextStyle style) {
-    double value;
-
     switch (unit) {
       case CssLengthUnit.em:
-        value = style.fontSize * number;
-        break;
+        return style.fontSize * number;
+      case CssLengthUnit.px:
+        return number;
       case CssLengthUnit.percentage:
         return null;
-      case CssLengthUnit.px:
-        value = number;
-        break;
     }
-
-    if (value != null) {
-      value = value * MediaQuery.of(context).textScaleFactor;
-    }
-
-    return value;
   }
 }
 

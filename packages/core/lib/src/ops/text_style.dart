@@ -118,11 +118,12 @@ class _TextStyle {
   static double _fontSizeTryParse(BuildContext c, TextStyleHtml p, String v) {
     final length = _parseCssLength(v);
     if (length != null) {
-      final lengthValue = length.getValueFromStyle(c, p);
-      if (lengthValue != null) return lengthValue;
-
-      if (length.unit == CssLengthUnit.percentage) {
-        return p.style.fontSize * length.number / 100;
+      final lengthValue = length.getValueFromStyle(c, p) ??
+          (length.unit == CssLengthUnit.percentage
+              ? p.style.fontSize * length.number / 100
+              : null);
+      if (lengthValue != null) {
+        return lengthValue * MediaQuery.of(c).textScaleFactor;
       }
     }
 
