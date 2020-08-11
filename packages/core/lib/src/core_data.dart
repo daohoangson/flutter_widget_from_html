@@ -81,7 +81,7 @@ class BuiltPiece {
   static WidgetPlaceholder _placeholder(Widget widget) =>
       widget is WidgetPlaceholder
           ? widget
-          : WidgetPlaceholder<BuiltPiece>(child: widget, generator: null);
+          : WidgetPlaceholder<Widget>(child: widget, generator: widget);
 }
 
 class CssBorderSide {
