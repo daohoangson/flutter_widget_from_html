@@ -63,6 +63,21 @@ void main() {
               '(: After text.)'
               ')]'));
     });
+
+    testWidgets('renders block', (WidgetTester tester) async {
+      final html = '<img src="$src" style="display: block" />';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssBlock:child='
+              '[Image:image=NetworkImage("$src", scale: 1.0)]]'));
+    });
+
+    testWidgets('renders block without src', (WidgetTester tester) async {
+      final html = '<img style="display: block" />';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[widget0]'));
+    });
   });
 
   group('asset', () {
