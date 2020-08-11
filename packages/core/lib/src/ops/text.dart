@@ -22,10 +22,7 @@ class _TextCompiler {
     if (_merged.isEmpty) {
       _merged.add(TextSpanBuilder.prebuilt(
         widget: _MarginVerticalPlaceholder(
-          null,
-          CssLength(1, unit: CssLengthUnit.em),
-          text.tsb,
-        ),
+            CssLength(1, CssLengthUnit.em), text.tsb),
       ));
     }
 
@@ -60,8 +57,7 @@ class _TextCompiler {
       if (newLines > 0) {
         _merged.add(TextSpanBuilder.prebuilt(
           widget: _MarginVerticalPlaceholder(
-            null,
-            CssLength(newLines.toDouble(), unit: CssLengthUnit.em),
+            CssLength(newLines.toDouble(), CssLengthUnit.em),
             bit.parent.tsb,
           ),
         ));

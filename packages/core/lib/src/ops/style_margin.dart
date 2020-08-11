@@ -19,12 +19,11 @@ Widget _marginHorizontalBuilder(
       );
     });
 
-class _MarginVerticalPlaceholder extends WidgetPlaceholder<_StyleMargin> {
+class _MarginVerticalPlaceholder extends WidgetPlaceholder<CssLength> {
   final CssLength height;
   final TextStyleBuilder tsb;
 
-  _MarginVerticalPlaceholder(_StyleMargin self, this.height, this.tsb)
-      : super(generator: self) {
+  _MarginVerticalPlaceholder(this.height, this.tsb) : super(generator: height) {
     super.wrapWith((child) => _build(child, height, tsb));
   }
 
@@ -80,7 +79,7 @@ class _StyleMargin {
           final tsb = meta.tsb();
 
           var i = 0;
-          if (t) ws[i++] = _MarginVerticalPlaceholder(this, m.top, tsb);
+          if (t) ws[i++] = _MarginVerticalPlaceholder(m.top, tsb);
 
           for (final widget in widgets) {
             if (m.hasLeftOrRight) {
@@ -92,7 +91,7 @@ class _StyleMargin {
             ws[i++] = widget;
           }
 
-          if (b) ws[i++] = _MarginVerticalPlaceholder(this, m.bottom, tsb);
+          if (b) ws[i++] = _MarginVerticalPlaceholder(m.bottom, tsb);
 
           return ws;
         },

@@ -102,9 +102,9 @@ class CssLength {
   final CssLengthUnit unit;
 
   CssLength(
-    this.number, {
+    this.number, [
     this.unit = CssLengthUnit.px,
-  })  : assert(!number.isNegative),
+  ])  : assert(!number.isNegative),
         assert(unit != null);
 
   bool get isNotEmpty => number > 0;
