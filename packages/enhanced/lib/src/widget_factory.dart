@@ -34,10 +34,14 @@ class WidgetFactory extends core.WidgetFactory {
   @override
   GestureTapCallback buildGestureTapCallbackForUrl(String url) {
     if (url == null) return null;
-    if (_widget?.onTapUrl == null) {
-      return () => canLaunch(url).then((ok) => ok ? launch(url) : null);
-    }
-    return () => _widget.onTapUrl(url);
+    final callback = _widget?.onTapUrl ?? _defaultGestureTapCallbackForUrl;
+    return () => callback(url);
+  }
+
+  Future<void> _defaultGestureTapCallbackForUrl(String url) async {
+    final ok = await canLaunch(url);
+    if (ok) return launch(url);
+    print("[flutter_widget_from_html] Tapped url $url (couldn't launch)");
   }
 
   @override

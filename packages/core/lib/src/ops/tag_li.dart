@@ -122,7 +122,6 @@ class _TagLi extends BuildOp {
           softWrap: false,
           text: TextSpan(style: style, text: text),
           textAlign: isLtr ? TextAlign.right : TextAlign.left,
-          textScaleFactor: MediaQuery.of(context).textScaleFactor,
         ),
         width: width,
       ),

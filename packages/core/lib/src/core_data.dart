@@ -110,28 +110,35 @@ class CssLength {
   bool get isNotEmpty => number > 0;
 
   double getValue(BuildContext context, TextStyleBuilder tsb) =>
-      _getValueFromFlutterTextStyle(context, tsb.build(context).style);
+      getValueFromStyle(tsb.build(context));
 
-  double getValueFromStyle(BuildContext context, TextStyleHtml tsh) =>
-      _getValueFromFlutterTextStyle(context, tsh.style);
-
-  double _getValueFromFlutterTextStyle(BuildContext context, TextStyle style) {
+  double getValueFromStyle(
+    TextStyleHtml tsh, {
+    double baseValue,
+    double scaleFactor,
+  }) {
     double value;
-
     switch (unit) {
       case CssLengthUnit.em:
-        value = style.fontSize * number;
+        baseValue ??= tsh.style.fontSize;
+        value = baseValue * number;
+        scaleFactor = 1;
         break;
       case CssLengthUnit.percentage:
-        return null;
+        if (baseValue == null) return null;
+        value = baseValue * number / 100;
+        scaleFactor = 1;
+        break;
+      case CssLengthUnit.pt:
+        value = number * 96 / 72;
+        break;
       case CssLengthUnit.px:
         value = number;
         break;
     }
 
-    if (value != null) {
-      value = value * MediaQuery.of(context).textScaleFactor;
-    }
+    if (value == null) return null;
+    if (scaleFactor != null) value *= scaleFactor;
 
     return value;
   }
@@ -188,6 +195,7 @@ class CssLengthBox {
 enum CssLengthUnit {
   em,
   percentage,
+  pt,
   px,
 }
 
@@ -292,20 +300,32 @@ class NodeMetadata {
 @immutable
 class TextStyleHtml {
   final double height;
+  final TextStyleHtml parent;
   final TextStyle style;
 
   TextStyleHtml._({
     this.height,
+    this.parent,
     this.style,
   });
 
   factory TextStyleHtml.style(TextStyle style) => TextStyleHtml._(style: style);
 
+  TextStyleHtml get root => parent?.root ?? this;
+
   TextStyle get styleWithHeight =>
       height != null && height >= 0 ? style.copyWith(height: height) : style;
 
-  TextStyleHtml copyWith({double height, TextStyle style}) => TextStyleHtml._(
-      height: height ?? this.height, style: style ?? this.style);
+  TextStyleHtml copyWith({
+    double height,
+    TextStyleHtml parent,
+    TextStyle style,
+  }) =>
+      TextStyleHtml._(
+        height: height ?? this.height,
+        parent: parent ?? this.parent,
+        style: style ?? this.style,
+      );
 }
 
 class TextStyleBuilder<T1> {
@@ -357,17 +377,13 @@ class TextStyleBuilder<T1> {
     _resetContextIfNeeded(context);
     if (_output != null) return _output;
 
-    if (parent == null) {
-      _output = _default;
-    } else {
-      _output = parent.build(_context);
-    }
+    final parentTsh = parent == null ? _default : parent.build(_context);
+    if (_builders == null) return parentTsh;
 
-    if (_builders != null) {
-      final l = _builders.length;
-      for (var i = 0; i < l; i++) {
-        _output = _builders[i](context, _output, _inputs[i]);
-      }
+    _output = parentTsh.copyWith(parent: parentTsh);
+    final l = _builders.length;
+    for (var i = 0; i < l; i++) {
+      _output = _builders[i](context, _output, _inputs[i]);
     }
 
     return _output;

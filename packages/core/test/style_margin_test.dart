@@ -118,14 +118,36 @@ void main() {
     });
   });
 
-  testWidgets('parses margin with 1 value', (WidgetTester tester) async {
-    final html = '<div style="margin: 3px">Foo</div>';
-    final explained = await explain(tester, html);
-    expect(
-        explained,
-        equals('[SizedBox:0.0x3.0],'
-            '[CssBlock:child=[Padding:(0,3,0,3),child=[RichText:(:Foo)]]],'
-            '[SizedBox:0.0x3.0]'));
+  group('1 value', () {
+    testWidgets('renders em', (WidgetTester tester) async {
+      final html = '<div style="margin: 2em">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[SizedBox:0.0x20.0],'
+              '[CssBlock:child=[Padding:(0,20,0,20),child=[RichText:(:Foo)]]],'
+              '[SizedBox:0.0x20.0]'));
+    });
+
+    testWidgets('renders pt', (WidgetTester tester) async {
+      final html = '<div style="margin: 10pt">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[SizedBox:0.0x13.3],'
+              '[CssBlock:child=[Padding:(0,13,0,13),child=[RichText:(:Foo)]]],'
+              '[SizedBox:0.0x13.3]'));
+    });
+
+    testWidgets('renders px', (WidgetTester tester) async {
+      final html = '<div style="margin: 10px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[SizedBox:0.0x10.0],'
+              '[CssBlock:child=[Padding:(0,10,0,10),child=[RichText:(:Foo)]]],'
+              '[SizedBox:0.0x10.0]'));
+    });
   });
 
   testWidgets('renders margin within another', (WidgetTester tester) async {

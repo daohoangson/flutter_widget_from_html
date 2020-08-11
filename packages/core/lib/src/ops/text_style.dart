@@ -74,7 +74,7 @@ class _TextStyle {
   static TextStyleHtml lineHeight(BuildContext c, TextStyleHtml p, String v) =>
       p.copyWith(height: _lineHeightTryParse(c, p, v));
 
-  static TextStyleHtml textDeco(BuildContext c, TextStyleHtml p, _TextDeco v) {
+  static TextStyleHtml textDeco(BuildContext _, TextStyleHtml p, _TextDeco v) {
     final pd = p.style.decoration;
     final lineThough = pd?.contains(TextDecoration.lineThrough) == true;
     final overline = pd?.contains(TextDecoration.overline) == true;
@@ -96,7 +96,7 @@ class _TextStyle {
         decoration: TextDecoration.combine(list),
         decorationColor: v.color,
         decorationStyle: v.style,
-        decorationThickness: v.thickness?.getValueFromStyle(c, p),
+        decorationThickness: v.thickness?.getValueFromStyle(p),
       ),
     );
   }
@@ -118,39 +118,41 @@ class _TextStyle {
   static double _fontSizeTryParse(BuildContext c, TextStyleHtml p, String v) {
     final length = _parseCssLength(v);
     if (length != null) {
-      final lengthValue = length.getValueFromStyle(c, p);
+      final lengthValue = length.getValueFromStyle(
+        p,
+        baseValue: p.parent?.style?.fontSize,
+        scaleFactor: MediaQuery.of(c).textScaleFactor,
+      );
       if (lengthValue != null) return lengthValue;
-
-      if (length.unit == CssLengthUnit.percentage) {
-        return p.style.fontSize * length.number / 100;
-      }
     }
 
-    final defaultFontSize = DefaultTextStyle.of(c).style.fontSize;
     switch (v) {
       case _kCssFontSizeXxLarge:
-        return defaultFontSize * 2.0;
+        return _fontSizeMultiplyWith(p.root?.style?.fontSize, 2.0);
       case _kCssFontSizeXLarge:
-        return defaultFontSize * 1.5;
+        return _fontSizeMultiplyWith(p.root?.style?.fontSize, 1.5);
       case _kCssFontSizeLarge:
-        return defaultFontSize * 1.125;
+        return _fontSizeMultiplyWith(p.root?.style?.fontSize, 1.125);
       case _kCssFontSizeMedium:
-        return defaultFontSize;
+        return p.root?.style?.fontSize;
       case _kCssFontSizeSmall:
-        return defaultFontSize * .8125;
+        return _fontSizeMultiplyWith(p.root?.style?.fontSize, .8125);
       case _kCssFontSizeXSmall:
-        return defaultFontSize * .625;
+        return _fontSizeMultiplyWith(p.root?.style?.fontSize, .625);
       case _kCssFontSizeXxSmall:
-        return defaultFontSize * .5625;
+        return _fontSizeMultiplyWith(p.root?.style?.fontSize, .5625);
 
       case _kCssFontSizeLarger:
-        return p.style.fontSize * 1.2;
+        return _fontSizeMultiplyWith(p.parent?.style?.fontSize, 1.2);
       case _kCssFontSizeSmaller:
-        return p.style.fontSize * (15 / 18);
+        return _fontSizeMultiplyWith(p.parent?.style?.fontSize, 15 / 18);
     }
 
     return null;
   }
+
+  static double _fontSizeMultiplyWith(double fontSize, double value) =>
+      fontSize != null ? fontSize * value : null;
 
   static FontStyle _fontStyleTryParse(String value) {
     switch (value) {
@@ -194,18 +196,19 @@ class _TextStyle {
     if (v == _kCssLineHeightNormal) return -1;
 
     final number = double.tryParse(v);
-    if (number != null && number > 0) {
-      return number;
-    }
+    if (number != null && number > 0) return number;
 
     final length = _parseCssLength(v);
-    if (length != null) {
-      if (length.unit == CssLengthUnit.percentage) return length.number / 100;
+    if (length == null) return null;
 
-      return length.getValueFromStyle(c, p) / p.style.fontSize;
-    }
+    final lengthValue = length.getValueFromStyle(
+      p,
+      baseValue: p.style.fontSize,
+      scaleFactor: MediaQuery.of(c).textScaleFactor,
+    );
+    if (lengthValue == null) return null;
 
-    return null;
+    return lengthValue / p.style.fontSize;
   }
 }
 

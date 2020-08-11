@@ -192,12 +192,18 @@ class Explainer {
 
     final c = w.constraints;
     final s = w.size;
-    if (s.height.isFinite) attr.add('height=${s.height}');
-    if (c.maxHeight.isFinite) attr.add('maxHeight=${c.maxHeight}');
-    if (c.maxWidth.isFinite) attr.add('maxWidth=${c.maxWidth}');
-    if (c.minHeight > 0) attr.add('minHeight=${c.minHeight}');
-    if (c.minWidth > 0) attr.add('minWidth=${c.minWidth}');
-    if (s.width.isFinite) attr.add('width=${s.width}');
+    if (s.height.isFinite) attr.add('height=${s.height.toStringAsFixed(1)}');
+    if (c.maxHeight.isFinite) {
+      attr.add('maxHeight=${c.maxHeight.toStringAsFixed(1)}');
+    }
+    if (c.maxWidth.isFinite) {
+      attr.add('maxWidth=${c.maxWidth.toStringAsFixed(1)}');
+    }
+    if (c.minHeight > 0) {
+      attr.add('minHeight=${c.minHeight.toStringAsFixed(1)}');
+    }
+    if (c.minWidth > 0) attr.add('minWidth=${c.minWidth.toStringAsFixed(1)}');
+    if (s.width.isFinite) attr.add('width=${s.width.toStringAsFixed(1)}');
 
     return attr;
   }
@@ -329,7 +335,7 @@ class Explainer {
     }
 
     if (style.height != null) {
-      s += '+height=${style.height}';
+      s += '+height=${style.height.toStringAsFixed(1)}';
     }
 
     if (style.fontSize != parent.fontSize) {
