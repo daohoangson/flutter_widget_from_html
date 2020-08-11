@@ -12,7 +12,7 @@ BuildOp _styleDirection(WidgetFactory wf, String dir) => BuildOp(
             : dir == _kCssDirectionLtr ? TextDirection.ltr : null;
         if (textDirection == null) return ws;
 
-        return _listOrNull(wf.buildColumn(ws)?.wrapWith(
+        return _listOrNull(wf.buildColumnPlaceholder(ws)?.wrapWith(
             (child) => wf.buildDirectionality(child, textDirection)));
       },
     );

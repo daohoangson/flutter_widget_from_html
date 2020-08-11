@@ -57,7 +57,7 @@ class _TagTable extends BuildOp {
         break;
       case _kCssDisplayTableCaption:
         childMeta.op = BuildOp(onWidgets: (_, widgets) {
-          _data.caption = wf.buildColumn(widgets);
+          _data.caption = wf.buildColumnPlaceholder(widgets);
           return [_data.caption];
         });
         break;
@@ -84,7 +84,7 @@ class _TagTable extends BuildOp {
             }
 
             final tableWidget = wf.buildTable(table);
-            return wf.buildColumn([
+            return wf.buildColumnPlaceholder([
                   if (_data.caption != null) _data.caption,
                   if (tableWidget != null) tableWidget,
                 ]) ??
@@ -205,7 +205,7 @@ class _TableRowOp extends BuildOp {
 
     _cellOp ??= BuildOp(
       onWidgets: (childMeta, widgets) {
-        final column = wf.buildColumn(widgets);
+        final column = wf.buildColumnPlaceholder(widgets);
         if (column == null) return null;
 
         final cell = _build(childMeta, column);

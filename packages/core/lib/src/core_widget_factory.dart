@@ -55,10 +55,10 @@ class WidgetFactory {
 
   HtmlWidget get widget => _widget;
 
-  Widget buildBody(Iterable<Widget> children) =>
-      buildColumn(children, trimMarginVertical: true);
+  WidgetPlaceholder buildBody(Iterable<Widget> children) =>
+      buildColumnPlaceholder(children, trimMarginVertical: true);
 
-  WidgetPlaceholder buildColumn(
+  WidgetPlaceholder buildColumnPlaceholder(
     Iterable<Widget> children, {
     bool trimMarginVertical = false,
   }) {
@@ -77,8 +77,20 @@ class WidgetFactory {
     }
 
     return _ColumnPlaceholder(
+      this,
       children,
       trimMarginVertical: trimMarginVertical,
+    );
+  }
+
+  Widget buildColumnWidget(List<Widget> children) {
+    if (children?.isNotEmpty != true) return null;
+    if (children.length == 1) return children.first;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: children,
     );
   }
 
@@ -265,7 +277,7 @@ class WidgetFactory {
       );
     }
 
-    return buildColumn(widgets);
+    return buildColumnPlaceholder(widgets);
   }
 
   String constructFullUrl(String url) {
@@ -762,7 +774,7 @@ class WidgetFactory {
   BuildOp styleDisplayBlock() {
     _styleDisplayBlock ??= BuildOp(
       onWidgets: (_, widgets) =>
-          _listOrNull(buildColumn(widgets)?.wrapWith(_cssBlock)),
+          _listOrNull(buildColumnPlaceholder(widgets)?.wrapWith(_cssBlock)),
       priority: 9223372036854775807,
     );
     return _styleDisplayBlock;

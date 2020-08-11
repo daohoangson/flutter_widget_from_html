@@ -21,7 +21,7 @@ class _StyleBgColor {
           final color = wf.parseColor(meta.style(_kCssBackgroundColor));
           if (color == null) return null;
           return _listOrNull(wf
-              .buildColumn(widgets)
+              .buildColumnPlaceholder(widgets)
               ?.wrapWith((child) => wf.buildDecoratedBox(child, color: color)));
         },
         priority: 15000,

@@ -46,7 +46,7 @@ class _StyleSizing {
           final input = _parse(meta);
           if (input == null) return widgets;
           return _listOrNull(wf
-              .buildColumn(widgets)
+              .buildColumnPlaceholder(widgets)
               ?.wrapWith((child) => _build(child, input, meta.tsb())));
         },
         priority: 50000,

@@ -58,7 +58,7 @@ class _StylePadding {
           if (padding == null) return null;
 
           return _listOrNull(wf
-              .buildColumn(widgets)
+              .buildColumnPlaceholder(widgets)
               ?.wrapWith((child) => _build(child, padding, meta.tsb())));
         },
         priority: 9999,
