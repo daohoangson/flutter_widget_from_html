@@ -104,7 +104,6 @@ class CssLength {
   double getValue(BuildContext context, TextStyleBuilder tsb) =>
       getValueFromStyle(tsb.build(context));
 
-  // ignore: missing_return
   double getValueFromStyle(
     TextStyleHtml tsh, {
     double baseValue,
