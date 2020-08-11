@@ -102,21 +102,36 @@ class CssLength {
   bool get isNotEmpty => number > 0;
 
   double getValue(BuildContext context, TextStyleBuilder tsb) =>
-      _getValueFromFlutterTextStyle(context, tsb.build(context).style);
-
-  double getValueFromStyle(BuildContext context, TextStyleHtml tsh) =>
-      _getValueFromFlutterTextStyle(context, tsh.style);
+      getValueFromStyle(tsb.build(context));
 
   // ignore: missing_return
-  double _getValueFromFlutterTextStyle(BuildContext context, TextStyle style) {
+  double getValueFromStyle(
+    TextStyleHtml tsh, {
+    double percentageBase,
+    double scaleFactor,
+  }) {
+    double value;
     switch (unit) {
       case CssLengthUnit.em:
-        return style.fontSize * number;
+        final parent = tsh.parent;
+        if (parent == null) return null;
+        value = parent.style.fontSize * number;
+        scaleFactor = 1;
+        break;
       case CssLengthUnit.px:
-        return number;
+        value = number;
+        break;
       case CssLengthUnit.percentage:
-        return null;
+        if (percentageBase == null) return null;
+        value = percentageBase * number / 100;
+        scaleFactor = 1;
+        break;
     }
+
+    if (value == null) return null;
+    if (scaleFactor != null) value *= scaleFactor;
+
+    return value;
   }
 }
 
@@ -192,6 +207,7 @@ class TextStyleHtml {
   final TextAlign align;
   final double height;
   final int maxLines;
+  final TextStyleHtml parent;
   final TextStyle style;
   final TextOverflow textOverflow;
 
@@ -199,11 +215,14 @@ class TextStyleHtml {
     this.align,
     this.height,
     this.maxLines,
+    this.parent,
     this.style,
     this.textOverflow,
   });
 
   factory TextStyleHtml.style(TextStyle style) => TextStyleHtml._(style: style);
+
+  TextStyleHtml get root => parent?.root ?? this;
 
   TextStyle get styleWithHeight =>
       height != null && height >= 0 ? style.copyWith(height: height) : style;
@@ -212,6 +231,7 @@ class TextStyleHtml {
     TextAlign align,
     double height,
     int maxLines,
+    TextStyleHtml parent,
     TextStyle style,
     TextOverflow textOverflow,
   }) =>
@@ -219,6 +239,7 @@ class TextStyleHtml {
         align: align ?? this.align,
         height: height ?? this.height,
         maxLines: maxLines ?? this.maxLines,
+        parent: parent ?? this.parent,
         style: style ?? this.style,
         textOverflow: textOverflow ?? this.textOverflow,
       );
@@ -258,13 +279,11 @@ class TextStyleBuilder<T1> {
     _resetContextIfNeeded(context);
     if (_output != null) return _output;
 
-    if (parent == null) {
-      _output = _default;
-    } else {
-      _output = parent.build(_context);
-    }
-
+    final parentTsh = parent == null ? _default : parent.build(_context);
     final l = _builders.length;
+    if (l == 0) return parentTsh;
+
+    _output = parentTsh.copyWith(parent: parentTsh);
     for (var i = 0; i < l; i++) {
       _output = _builders[i](context, _output, _inputs[i]);
     }

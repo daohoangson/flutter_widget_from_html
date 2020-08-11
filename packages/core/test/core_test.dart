@@ -1259,6 +1259,18 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       });
     });
 
+    testWidgets('renders multiple em', (WidgetTester tester) async {
+      final html = '<span style="font-size: 2em; font-size: 2em">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(@20.0:Foo)]'));
+    });
+
+    testWidgets('renders multiple percentage', (WidgetTester tester) async {
+      final html = '<span style="font-size: 200%; font-size: 200%">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(@20.0:Foo)]'));
+    });
+
     testWidgets('renders invalid', (WidgetTester tester) async {
       final html = '<span style="font-size: xxx">Foo</span>';
       final explained = await explain(tester, html);
