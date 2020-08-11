@@ -70,8 +70,6 @@ class BuiltPiece {
 
   BuiltPiece.text(this.text) : widgets = null;
 
-  BuiltPiece.placeholders(this.widgets) : text = null;
-
   BuiltPiece.widgets(Iterable<Widget> widgets)
       : text = null,
         widgets = widgets.map(_placeholder);
