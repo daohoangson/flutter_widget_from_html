@@ -334,13 +334,14 @@ class TextStyleBuilder<T1> {
   List _inputs;
   TextStyleHtml _output;
 
-  TextStyleBuilder(
-    TextStyleHtml Function(BuildContext, TextStyleHtml, T1) builder, {
-    T1 input,
-    this.parent,
-  }) {
-    enqueue(builder, input);
+  TextStyleBuilder.root({
+    TextStyle style,
+  }) : parent = null {
+    if (style != null) enqueue(_rootBuilderStyle, style);
+    enqueue(_rootBuilderTextScaleFactor);
   }
+
+  TextStyleBuilder._(this.parent);
 
   int _maxLines;
   int get maxLines => _maxLines ?? parent?.maxLines;
@@ -408,7 +409,7 @@ class TextStyleBuilder<T1> {
     TextStyleHtml Function(BuildContext, TextStyleHtml, T2) builder,
     T2 input,
   ]) =>
-      TextStyleBuilder(builder, input: input, parent: this);
+      TextStyleBuilder._(this)..enqueue(builder, input);
 
   void _resetOutputIfNeeded(BuildContext context) {
     final contextStyle = DefaultTextStyle.of(context).style;
@@ -416,5 +417,19 @@ class TextStyleBuilder<T1> {
 
     _default = TextStyleHtml.style(contextStyle);
     _output = null;
+  }
+
+  static TextStyleHtml _rootBuilderStyle(
+          BuildContext _, TextStyleHtml parent, TextStyle style) =>
+      parent.copyWith(style: style.inherit ? parent.style.merge(style) : style);
+
+  static TextStyleHtml _rootBuilderTextScaleFactor(
+      BuildContext context, TextStyleHtml parent, _) {
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    if (textScaleFactor == 1) return parent;
+
+    final style = parent.style;
+    final scaled = style.copyWith(fontSize: style.fontSize * textScaleFactor);
+    return parent.copyWith(style: scaled);
   }
 }
