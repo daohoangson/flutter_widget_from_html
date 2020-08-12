@@ -1,5 +1,10 @@
 part of '../core_widget_factory.dart';
 
+const _kCssDirection = 'direction';
+const _kCssDirectionLtr = 'ltr';
+const _kCssDirectionRtl = 'rtl';
+const _kAttributeDir = 'dir';
+
 const _kCssFontFamily = 'font-family';
 
 const _kCssFontSize = 'font-size';
@@ -102,6 +107,15 @@ class _TextStyle {
         decorationThickness: v.thickness?.getValue(p),
       ),
     );
+  }
+
+  static TextStyleHtml textDirection(TextStyleHtml p, String v) {
+    final textDirection = (v == _kCssDirectionRtl)
+        ? TextDirection.rtl
+        : v == _kCssDirectionLtr ? TextDirection.ltr : null;
+    if (textDirection == null) return p;
+
+    return p.copyWith(textDirection: textDirection);
   }
 
   static TextStyleHtml textOverflow(TextStyleHtml p, TextOverflow v) =>

@@ -90,28 +90,29 @@ class _TagLi extends BuildOp {
     childMeta.op = _itemOp;
   }
 
-  Widget _buildItem(Widget child, int i) => Builder(builder: (context) {
-        final meta = _itemMetas[i];
-        final tsh = meta.tsb().build();
-        final listStyleType = _ListConfig.listStyleTypeFromNodeMetadata(meta) ??
-            config.listStyleType;
-        final markerIndex = config.markerReversed == true
-            ? (config.markerStart ?? _itemWidgets.length) - i
-            : (config.markerStart ?? 1) + i;
-        final markerText = wf.getListStyleMarker(listStyleType, markerIndex);
+  Widget _buildItem(Widget child, int i) {
+    final meta = _itemMetas[i];
+    final tsh = meta.tsb().build();
+    final listStyleType =
+        _ListConfig.listStyleTypeFromNodeMetadata(meta) ?? config.listStyleType;
+    final markerIndex = config.markerReversed == true
+        ? (config.markerStart ?? _itemWidgets.length) - i
+        : (config.markerStart ?? 1) + i;
+    final markerText = wf.getListStyleMarker(listStyleType, markerIndex);
 
-        return Stack(
-          children: <Widget>[
-            child,
-            _buildMarker(context, tsh.styleWithHeight, markerText),
-          ],
-          overflow: Overflow.visible,
-        );
-      });
+    return Stack(
+      children: <Widget>[
+        child,
+        _buildMarker(tsh, markerText),
+      ],
+      overflow: Overflow.visible,
+    );
+  }
 
-  Widget _buildMarker(BuildContext context, TextStyle style, String text) {
-    final isLtr = Directionality.of(context) == TextDirection.ltr;
+  Widget _buildMarker(TextStyleHtml tsh, String text) {
+    final isLtr = tsh.textDirection == TextDirection.ltr;
     final isRtl = !isLtr;
+    final style = tsh.styleWithHeight;
     final width = style.fontSize * 4;
     final margin = width + 5;
     return Positioned(
@@ -124,6 +125,7 @@ class _TagLi extends BuildOp {
           softWrap: false,
           text: TextSpan(style: style, text: text),
           textAlign: isLtr ? TextAlign.right : TextAlign.left,
+          textDirection: tsh.textDirection,
         ),
         width: width,
       ),

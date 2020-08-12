@@ -180,11 +180,13 @@ class CssLengthBox {
       _left?.isNotEmpty == true ||
       _right?.isNotEmpty == true;
 
-  CssLength left(TextDirection dir) =>
-      _left ?? (dir == TextDirection.ltr ? inlineStart : inlineEnd);
+  double getValueLeft(TextStyleHtml tsh) => (_left ??
+          (tsh.textDirection == TextDirection.ltr ? inlineStart : inlineEnd))
+      ?.getValue(tsh);
 
-  CssLength right(TextDirection dir) =>
-      _right ?? (dir == TextDirection.ltr ? inlineEnd : inlineStart);
+  double getValueRight(TextStyleHtml tsh) => (_right ??
+          (tsh.textDirection == TextDirection.ltr ? inlineEnd : inlineStart))
+      ?.getValue(tsh);
 }
 
 enum CssLengthUnit {
@@ -316,20 +318,19 @@ class TextStyleHtml {
   final TextStyleHtml parent;
   final TextStyle style;
   final TextAlign textAlign;
+  final TextDirection textDirection;
   final TextOverflow textOverflow;
 
-  TextStyleHtml._({
+  TextStyleHtml({
     this.deps,
     this.height,
     this.maxLines,
     this.parent,
     this.style,
     this.textAlign,
+    this.textDirection,
     this.textOverflow,
   });
-
-  factory TextStyleHtml.style(HtmlWidgetDependencies deps, TextStyle style) =>
-      TextStyleHtml._(deps: deps, style: style);
 
   TextStyleHtml get root => parent?.root ?? this;
 
@@ -342,15 +343,17 @@ class TextStyleHtml {
     TextStyleHtml parent,
     TextStyle style,
     TextAlign textAlign,
+    TextDirection textDirection,
     TextOverflow textOverflow,
   }) =>
-      TextStyleHtml._(
+      TextStyleHtml(
         deps: deps,
         height: height ?? this.height,
         maxLines: maxLines ?? this.maxLines,
         parent: parent ?? this.parent,
         style: style ?? this.style,
         textAlign: textAlign ?? this.textAlign,
+        textDirection: textDirection ?? this.textDirection,
         textOverflow: textOverflow ?? this.textOverflow,
       );
 }

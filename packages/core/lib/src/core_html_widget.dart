@@ -167,7 +167,6 @@ class _HtmlWidgetState extends State<HtmlWidget> {
 class _RootTsb extends TextStyleBuilder {
   final _HtmlWidgetState hws;
 
-  HtmlWidgetDependencies _deps;
   TextStyleHtml _output;
 
   _RootTsb(this.hws);
@@ -176,9 +175,9 @@ class _RootTsb extends TextStyleBuilder {
   TextStyleHtml build() {
     if (_output != null) return _output;
 
-    _deps ??= HtmlWidgetDependencies(hws._wf.getDependencies(hws.context));
+    final deps = HtmlWidgetDependencies(hws._wf.getDependencies(hws.context));
 
-    var textStyle = _deps.getValue<TextStyle>();
+    var textStyle = deps.getValue<TextStyle>();
     final widgetTextStyle = hws.widget.textStyle;
     if (widgetTextStyle != null) {
       textStyle = widgetTextStyle.inherit
@@ -186,13 +185,17 @@ class _RootTsb extends TextStyleBuilder {
           : widgetTextStyle;
     }
 
-    var mqd = _deps.getValue<MediaQueryData>();
+    var mqd = deps.getValue<MediaQueryData>();
     final tsf = mqd.textScaleFactor;
     if (tsf != 1) {
       textStyle = textStyle.copyWith(fontSize: textStyle.fontSize * tsf);
     }
 
-    _output = TextStyleHtml.style(_deps, textStyle);
+    _output = TextStyleHtml(
+      deps: deps,
+      style: textStyle,
+      textDirection: deps.getValue<TextDirection>(),
+    );
     return _output;
   }
 

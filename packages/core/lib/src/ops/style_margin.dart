@@ -2,22 +2,14 @@ part of '../core_widget_factory.dart';
 
 const _kCssMargin = 'margin';
 
-Widget _marginHorizontalBuilder(
-  Widget child,
-  CssLengthBox margin,
-  TextStyleBuilder tsb,
-) =>
-    Builder(builder: (context) {
-      final direction = Directionality.of(context);
-
-      return Padding(
-        child: child,
-        padding: EdgeInsets.only(
-          left: margin.left(direction)?.getValue(tsb.build()) ?? 0.0,
-          right: margin.right(direction)?.getValue(tsb.build()) ?? 0.0,
-        ),
-      );
-    });
+Widget _marginHorizontalBuilder(Widget w, CssLengthBox b, TextStyleHtml tsh) =>
+    Padding(
+      child: w,
+      padding: EdgeInsets.only(
+        left: b.getValueLeft(tsh) ?? 0.0,
+        right: b.getValueRight(tsh) ?? 0.0,
+      ),
+    );
 
 class _MarginVerticalPlaceholder extends WidgetPlaceholder<CssLength> {
   final CssLength height;
@@ -78,7 +70,7 @@ class _StyleMargin {
           for (final widget in widgets) {
             if (m.hasLeftOrRight) {
               widget.wrapWith(
-                (child) => _marginHorizontalBuilder(child, m, tsb),
+                (child) => _marginHorizontalBuilder(child, m, tsb.build()),
               );
             }
 

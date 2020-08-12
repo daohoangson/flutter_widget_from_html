@@ -117,8 +117,11 @@ Future<String> explain(
   return explained;
 }
 
-final _explainMarginRegExp = RegExp(
-    r'^\[Column:children=\[RichText:\(:x\)\],(.+),\[RichText:\(:x\)\]\]$');
+final _explainMarginRegExp = RegExp(r'^\[Column:children='
+    r'\[RichText:(dir=rtl,)?\(:x\)\],'
+    r'(.+),'
+    r'\[RichText:(dir=rtl,)?\(:x\)\]'
+    r'\]$');
 
 Future<String> explainMargin(
   WidgetTester tester,
@@ -132,7 +135,7 @@ Future<String> explainMargin(
     rtl: rtl,
   );
   final match = _explainMarginRegExp.firstMatch(explained);
-  return match == null ? explained : match[1];
+  return match == null ? explained : match[2];
 }
 
 class Explainer {
@@ -300,7 +303,9 @@ class Explainer {
           : null;
 
   String _textDirection(TextDirection textDirection) =>
-      textDirection.toString().replaceAll('TextDirection.', '');
+      (textDirection != null && textDirection != TextDirection.ltr)
+          ? 'dir=${textDirection.toString().replaceAll('TextDirection.', '')}'
+          : null;
 
   String _textOverflow(TextOverflow textOverflow) => (textOverflow != null &&
           textOverflow != TextOverflow.clip)
@@ -399,8 +404,6 @@ class Explainer {
     // ignore: invalid_use_of_protected_member
     if (widget is WidgetPlaceholder) return _widget(widget.build(context));
 
-    if (widget is Builder) return _widget(widget.builder(context));
-
     if (widget is Image) return _image(widget);
 
     if (widget is SizedBox) return _sizedBox(widget);
@@ -408,14 +411,18 @@ class Explainer {
     final type = '${widget.runtimeType}';
     var attr = <String>[];
 
-    attr.add(_textAlign(widget is RichText
-        ? widget.textAlign
-        : (widget is Text ? widget.textAlign : null)));
-
     final maxLines = widget is RichText
         ? widget.maxLines
         : widget is Text ? widget.maxLines : null;
     if (maxLines != null) attr.add('maxLines=$maxLines');
+
+    attr.add(_textAlign(widget is RichText
+        ? widget.textAlign
+        : (widget is Text ? widget.textAlign : null)));
+
+    attr.add(_textDirection(widget is RichText
+        ? widget.textDirection
+        : (widget is Text ? widget.textDirection : null)));
 
     attr.add(_textOverflow(widget is RichText
         ? widget.overflow
@@ -434,10 +441,6 @@ class Explainer {
     if (widget is CssSizing) attr.addAll(_cssSizing(widget));
 
     if (widget is DecoratedBox) attr.addAll(_boxDecoration(widget.decoration));
-
-    if (widget is Directionality) {
-      attr.add(_textDirection(widget.textDirection));
-    }
 
     if (widget is LimitedBox) attr.add(_limitBox(widget));
 

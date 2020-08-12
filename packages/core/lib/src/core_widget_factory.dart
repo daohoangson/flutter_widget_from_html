@@ -13,7 +13,6 @@ import 'core_html_widget.dart';
 
 part 'ops/column.dart';
 part 'ops/style_bg_color.dart';
-part 'ops/style_direction.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_padding.dart';
 part 'ops/style_sizing.dart';
@@ -105,9 +104,6 @@ class WidgetFactory {
               ),
             )
           : child;
-
-  Widget buildDirectionality(Widget child, TextDirection textDirection) =>
-      Directionality(child: child, textDirection: textDirection);
 
   Widget buildDivider() => const DecoratedBox(
         decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 1)),
@@ -250,6 +246,7 @@ class WidgetFactory {
     final maxLines = tsh?.maxLines == -1 ? null : tsh?.maxLines;
     final overflow = tsh?.textOverflow ?? TextOverflow.clip;
     final textAlign = tsh?.textAlign ?? TextAlign.start;
+    final textDirection = tsh?.textDirection ?? TextDirection.ltr;
 
     final widgets = <WidgetPlaceholder>[];
     for (final compiled in _TextCompiler(text).compile()) {
@@ -265,6 +262,7 @@ class WidgetFactory {
             overflow: overflow,
             text: compiled.span,
             textAlign: textAlign,
+            textDirection: textDirection,
 
             // TODO: calculate max lines automatically for ellipsis if needed
             // currently it only renders 1 line with ellipsis
@@ -313,8 +311,9 @@ class WidgetFactory {
   }
 
   List<HtmlWidgetDependency> getDependencies(BuildContext context) => [
-        HtmlWidgetDependency<TextStyle>(DefaultTextStyle.of(context).style),
         HtmlWidgetDependency<MediaQueryData>(MediaQuery.of(context)),
+        HtmlWidgetDependency<TextDirection>(Directionality.of(context)),
+        HtmlWidgetDependency<TextStyle>(DefaultTextStyle.of(context).style),
       ];
 
   String getListStyleMarker(String type, int i) {
@@ -428,7 +427,7 @@ class WidgetFactory {
         break;
 
       case _kCssDirection:
-        meta.op = styleDirection(value);
+        meta.tsb(_TextStyle.textDirection, value);
         break;
 
       case _kCssDisplay:
@@ -771,8 +770,6 @@ class WidgetFactory {
     _styleBgColor ??= _StyleBgColor(this).buildOp;
     return _styleBgColor;
   }
-
-  BuildOp styleDirection(String dir) => _styleDirection(this, dir);
 
   BuildOp styleDisplayBlock() {
     _styleDisplayBlock ??= BuildOp(
