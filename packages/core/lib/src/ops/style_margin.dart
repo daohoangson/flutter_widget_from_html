@@ -33,14 +33,12 @@ class _MarginVerticalPlaceholder extends WidgetPlaceholder<CssLength> {
   @override
   _MarginVerticalPlaceholder wrapWith(Widget Function(Widget) builder) => this;
 
-  static Widget _build(Widget child, CssLength height, TextStyleBuilder tsb) =>
-      Builder(builder: (context) {
-        if (child is Builder) child = (child as Builder).builder(context);
-        final existing = child is SizedBox ? (child as SizedBox).height : 0.0;
-        final value = height.getValue(tsb.build());
-        if (value > existing) return SizedBox(height: value);
-        return child;
-      });
+  static Widget _build(Widget child, CssLength height, TextStyleBuilder tsb) {
+    final existing = child is SizedBox ? child.height : 0.0;
+    final value = height.getValue(tsb.build());
+    if (value > existing) return SizedBox(height: value);
+    return child;
+  }
 }
 
 class _StyleMargin {

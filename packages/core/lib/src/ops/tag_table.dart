@@ -66,35 +66,31 @@ class _TagTable extends BuildOp {
 
   @override
   Iterable<WidgetPlaceholder> onWidgets(
-          NodeMetadata meta, Iterable<WidgetPlaceholder> _) =>
-      [
-        WidgetPlaceholder<_TagTable>(
-          child: Builder(builder: (context) {
-            final table = TableData(border: _parseBorder(context));
+      NodeMetadata _, Iterable<WidgetPlaceholder> __) {
+    final data = TableData(border: _parseBorder());
 
-            final rows = <_TableDataRow>[
-              ..._data.header.rows,
-              ..._data.rows,
-              ..._data.footer.rows,
-            ];
-            for (var i = 0; i < rows.length; i++) {
-              for (final cell in rows[i].cells) {
-                table.addCell(i, cell);
-              }
-            }
+    final rows = <_TableDataRow>[
+      ..._data.header.rows,
+      ..._data.rows,
+      ..._data.footer.rows,
+    ];
+    for (var i = 0; i < rows.length; i++) {
+      for (final cell in rows[i].cells) {
+        data.addCell(i, cell);
+      }
+    }
 
-            final tableWidget = wf.buildTable(table);
-            return wf.buildColumnPlaceholder([
-                  if (_data.caption != null) _data.caption,
-                  if (tableWidget != null) tableWidget,
-                ]) ??
-                widget0;
-          }),
-          generator: this,
-        )
-      ];
+    final table = wf.buildTable(data);
+    final column = wf.buildColumnPlaceholder([
+      if (_data.caption != null) _data.caption,
+      if (table != null) table,
+    ]);
+    if (column == null) return [];
 
-  BorderSide _parseBorder(BuildContext context) {
+    return [WidgetPlaceholder<TableData>(child: column, generator: data)];
+  }
+
+  BorderSide _parseBorder() {
     var styleBorder = tableMeta.style(_kCssBorder);
     if (styleBorder != null) {
       final borderParsed = wf.parseCssBorderSide(styleBorder);
