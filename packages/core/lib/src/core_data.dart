@@ -375,7 +375,7 @@ class TextStyleBuilder<T1> {
 
   TextStyleHtml build(BuildContext context) {
     if (parent == null) {
-      // root tsb
+      // root tsb: verify signature and reset _output if it doesn't match
       final signature = wf?.generateTsbSignature(context) ?? [];
       if (!_checkSignaturesMatch(signature, _signature)) {
         final contextStyle = DefaultTextStyle.of(context).style;
@@ -384,6 +384,7 @@ class TextStyleBuilder<T1> {
         _signature = signature;
       }
     } else {
+      // for others, compare output from parent
       final parentOutput = parent.build(context);
       if (parentOutput != _parentOutput) {
         _parentOutput = parentOutput;
@@ -424,11 +425,7 @@ class TextStyleBuilder<T1> {
     return thisWithBuilder == otherWithBuilder;
   }
 
-  TextStyleBuilder<T2> sub<T2>([
-    TextStyleHtml Function(BuildContext, TextStyleHtml, T2) builder,
-    T2 input,
-  ]) =>
-      TextStyleBuilder._(this)..enqueue(builder, input);
+  TextStyleBuilder sub() => TextStyleBuilder._(this);
 
   static bool _checkSignaturesMatch(List a, List b) {
     if (a?.length != b?.length) return false;
