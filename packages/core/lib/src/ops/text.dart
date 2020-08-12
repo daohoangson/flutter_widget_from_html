@@ -74,7 +74,7 @@ class _TextCompiler {
       final scopedTsb = _prevTsb;
       final scopedText = _prevBuffer.toString();
       _builders.add(TextSpanBuilder((context) => TextSpan(
-            style: scopedTsb.build(context).styleWithHeight,
+            style: scopedTsb.build().styleWithHeight,
             text: scopedText,
           )));
     }
@@ -94,7 +94,8 @@ class _TextCompiler {
       if (prebuiltSpan != null &&
           prebuiltSpan is WidgetSpan &&
           prebuiltSpan.alignment == PlaceholderAlignment.baseline &&
-          (text.tsb?.textAlign ?? TextAlign.start) == TextAlign.start) {
+          (text.tsb?.build()?.textAlign ?? TextAlign.start) ==
+              TextAlign.start) {
         builder = TextSpanBuilder.prebuilt(widget: prebuiltSpan.child);
       }
     } else if (_builders.isNotEmpty || _buffer.isNotEmpty) {
@@ -106,7 +107,7 @@ class _TextCompiler {
                 .map((builder) => builder.build(context))
                 .where((span) => span != null)
                 .toList(growable: false),
-            style: scopedTsb?.build(context)?.styleWithHeight,
+            style: scopedTsb?.build()?.styleWithHeight,
             text: scopedText,
           ));
     }

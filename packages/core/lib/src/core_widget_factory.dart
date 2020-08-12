@@ -315,9 +315,9 @@ class WidgetFactory {
     meta.op = BuildOp(onWidgets: (_, __) => [built]);
   }
 
-  List generateTsbSignature(BuildContext context) => [
-        DefaultTextStyle.of(context).style,
-        MediaQuery.of(context).textScaleFactor,
+  List<HtmlWidgetDependency> getDependencies(BuildContext context) => [
+        HtmlWidgetDependency<TextStyle>(DefaultTextStyle.of(context).style),
+        HtmlWidgetDependency<MediaQueryData>(MediaQuery.of(context)),
       ];
 
   String getListStyleMarker(String type, int i) {

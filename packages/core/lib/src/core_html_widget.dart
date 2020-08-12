@@ -93,6 +93,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
 
   Widget _cache;
   Future<Widget> _future;
+  _RootTsb _rootTsb;
   WidgetFactory _wf;
 
   _HtmlWidgetState({this.buildAsync = false});
@@ -101,13 +102,19 @@ class _HtmlWidgetState extends State<HtmlWidget> {
   void initState() {
     super.initState();
 
+    _rootTsb = _RootTsb(this);
     _wf = widget.factoryBuilder();
 
     if (buildAsync) {
       _future = _buildAsync();
-    } else if (widget.enableCaching) {
-      _cache = _buildSync();
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _rootTsb.reset();
   }
 
   @override
@@ -139,7 +146,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     final domNodes = await compute(_parseHtml, widget.html);
 
     Timeline.startSync('Build $widget (async)');
-    final built = _buildBody(_wf, widget, domNodes);
+    final built = _buildBody(_rootTsb, _wf, widget, domNodes);
     Timeline.finishSync();
 
     return built;
@@ -149,11 +156,48 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     Timeline.startSync('Build $widget (sync)');
 
     final domNodes = _parseHtml(widget.html);
-    final built = _buildBody(_wf, widget, domNodes);
+    final built = _buildBody(_rootTsb, _wf, widget, domNodes);
 
     Timeline.finishSync();
 
     return built;
+  }
+}
+
+class _RootTsb extends TextStyleBuilder {
+  final _HtmlWidgetState hws;
+
+  HtmlWidgetDependencies _deps;
+  TextStyleHtml _output;
+
+  _RootTsb(this.hws);
+
+  @override
+  TextStyleHtml build() {
+    if (_output != null) return _output;
+
+    _deps ??= HtmlWidgetDependencies(hws._wf.getDependencies(hws.context));
+
+    var textStyle = _deps.getValue<TextStyle>();
+    final widgetTextStyle = hws.widget.textStyle;
+    if (widgetTextStyle != null) {
+      textStyle = widgetTextStyle.inherit
+          ? textStyle.merge(widgetTextStyle)
+          : widgetTextStyle;
+    }
+
+    var mqd = _deps.getValue<MediaQueryData>();
+    final tsf = mqd.textScaleFactor;
+    if (tsf != 1) {
+      textStyle = textStyle.copyWith(fontSize: textStyle.fontSize * tsf);
+    }
+
+    _output = TextStyleHtml.style(_deps, textStyle);
+    return _output;
+  }
+
+  void reset() {
+    _output = null;
   }
 }
 
@@ -166,9 +210,10 @@ Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
             child: CircularProgressIndicator(),
           ));
 
-Widget _buildBody(WidgetFactory wf, HtmlWidget widget, dom.NodeList domNodes) {
+Widget _buildBody(_RootTsb rootTsb, WidgetFactory wf, HtmlWidget widget,
+    dom.NodeList domNodes) {
+  rootTsb.reset();
   wf.reset(widget);
-  final rootTsb = TextStyleBuilder.root(style: widget.textStyle, wf: wf);
   final builder = HtmlBuilder(domNodes: domNodes, parentTsb: rootTsb, wf: wf);
   return wf.buildBody(builder.build()) ?? widget0;
 }
