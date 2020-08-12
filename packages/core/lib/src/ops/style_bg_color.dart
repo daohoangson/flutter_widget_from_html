@@ -30,6 +30,6 @@ class _StyleBgColor {
   BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) =>
       piece..text.bits.forEach((bit) => bit.tsb?.enqueue(_tsb, bgColor));
 
-  static TextStyleHtml _tsb(BuildContext _, TextStyleHtml p, Color c) =>
+  static TextStyleHtml _tsb(TextStyleHtml p, Color c) =>
       p.copyWith(style: p.style.copyWith(background: Paint()..color = c));
 }

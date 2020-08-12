@@ -13,8 +13,8 @@ Widget _marginHorizontalBuilder(
       return Padding(
         child: child,
         padding: EdgeInsets.only(
-          left: margin.left(direction)?.getValue(context, tsb) ?? 0.0,
-          right: margin.right(direction)?.getValue(context, tsb) ?? 0.0,
+          left: margin.left(direction)?.getValue(tsb.build()) ?? 0.0,
+          right: margin.right(direction)?.getValue(tsb.build()) ?? 0.0,
         ),
       );
     });
@@ -37,7 +37,7 @@ class _MarginVerticalPlaceholder extends WidgetPlaceholder<CssLength> {
       Builder(builder: (context) {
         if (child is Builder) child = (child as Builder).builder(context);
         final existing = child is SizedBox ? (child as SizedBox).height : 0.0;
-        final value = height.getValue(context, tsb);
+        final value = height.getValue(tsb.build());
         if (value > existing) return SizedBox(height: value);
         return child;
       });

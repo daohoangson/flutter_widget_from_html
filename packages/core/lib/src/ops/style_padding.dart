@@ -9,7 +9,7 @@ WidgetPlaceholder _paddingInlineAfter(
     WidgetPlaceholder<CssLengthBox>(
       child: Builder(builder: (context) {
         final direction = Directionality.of(context);
-        final width = box.right(direction)?.getValue(context, tsb);
+        final width = box.right(direction)?.getValue(tsb.build());
         if (width == null || width <= 0) return widget0;
 
         return SizedBox(width: width);
@@ -24,7 +24,7 @@ WidgetPlaceholder _paddingInlineBefore(
     WidgetPlaceholder<CssLengthBox>(
       child: Builder(builder: (context) {
         final direction = Directionality.of(context);
-        final width = box.left(direction)?.getValue(context, tsb);
+        final width = box.left(direction)?.getValue(tsb.build());
         if (width == null || width <= 0) return widget0;
 
         return SizedBox(width: width);
@@ -67,10 +67,10 @@ class _StylePadding {
   Widget _build(Widget child, CssLengthBox padding, TextStyleBuilder tsb) =>
       Builder(builder: (context) {
         final direction = Directionality.of(context);
-        final t = padding.top?.getValue(context, tsb);
-        final r = padding.right(direction)?.getValue(context, tsb);
-        final b = padding.bottom?.getValue(context, tsb);
-        final l = padding.left(direction)?.getValue(context, tsb);
+        final t = padding.top?.getValue(tsb.build());
+        final r = padding.right(direction)?.getValue(tsb.build());
+        final b = padding.bottom?.getValue(tsb.build());
+        final l = padding.left(direction)?.getValue(tsb.build());
         final edgeInsets = EdgeInsets.fromLTRB(l ?? 0, t ?? 0, r ?? 0, b ?? 0);
         return wf.buildPadding(child, edgeInsets);
       });

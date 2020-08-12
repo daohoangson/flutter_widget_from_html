@@ -11,7 +11,7 @@ import 'data.dart';
 import 'helpers.dart';
 import 'html_widget.dart';
 
-part 'ops/tag_a_extended.dart';
+part 'ops/tag_a_enhanced.dart';
 part 'ops/tag_iframe.dart';
 part 'ops/tag_svg.dart';
 part 'ops/tag_video.dart';
@@ -19,7 +19,6 @@ part 'ops/tag_video.dart';
 /// A factory to build widget for HTML elements
 /// with support for [WebView] and [VideoPlayer] etc.
 class WidgetFactory extends core.WidgetFactory {
-  BuildOp _tagAExtended;
   BuildOp _tagIframe;
   BuildOp _tagSvg;
   HtmlWidget _widget;
@@ -213,6 +212,11 @@ class WidgetFactory extends core.WidgetFactory {
       );
 
   @override
+  List<HtmlWidgetDependency> getDependencies(BuildContext context) =>
+      super.getDependencies(context)
+        ..add(HtmlWidgetDependency<ThemeData>(Theme.of(context)));
+
+  @override
   void parseTag(
     NodeMetadata meta,
     String tag,
@@ -220,7 +224,7 @@ class WidgetFactory extends core.WidgetFactory {
   ) {
     switch (tag) {
       case 'a':
-        meta.op = tagAExtended();
+        meta.tsb(_TagAEnhanced.setAccentColor);
         break;
       case 'iframe':
         meta.op = tagIframe();
@@ -242,11 +246,6 @@ class WidgetFactory extends core.WidgetFactory {
   void reset(core.HtmlWidget widget) {
     if (widget is HtmlWidget) _widget = widget;
     super.reset(widget);
-  }
-
-  BuildOp tagAExtended() {
-    _tagAExtended ??= _TagAExtended().buildOp;
-    return _tagAExtended;
   }
 
   BuildOp tagIframe() {

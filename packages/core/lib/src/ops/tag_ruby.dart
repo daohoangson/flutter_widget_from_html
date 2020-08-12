@@ -76,28 +76,23 @@ class _TagRuby extends BuildOp {
     TextBits parent,
     Widget ruby,
     Widget rt,
-  ) =>
-      TextWidget(
-        parent,
-        WidgetPlaceholder<_TagRuby>(
-          child: Builder(
-            builder: (context) => Stack(
-              children: <Widget>[
-                wf.buildPadding(
-                  ruby,
-                  EdgeInsets.symmetric(
-                    vertical: _rtText.tsb.build(context).style.fontSize *
-                        .75 *
-                        MediaQuery.of(context).textScaleFactor,
-                  ),
-                ),
-                Positioned.fill(bottom: null, child: Center(child: rt)),
-              ],
-              overflow: Overflow.visible,
-            ),
-          ),
-          generator: this,
-        ),
-        alignment: PlaceholderAlignment.middle,
-      );
+  ) {
+    final tsh = _rtText.tsb.build();
+    final padding = tsh.style.fontSize *
+        .75 *
+        tsh.deps.getValue<MediaQueryData>().textScaleFactor;
+
+    final widget = WidgetPlaceholder<_TagRuby>(
+      child: Stack(
+        children: <Widget>[
+          wf.buildPadding(ruby, EdgeInsets.symmetric(vertical: padding)),
+          Positioned.fill(bottom: null, child: Center(child: rt)),
+        ],
+        overflow: Overflow.visible,
+      ),
+      generator: this,
+    );
+
+    return TextWidget(parent, widget, alignment: PlaceholderAlignment.middle);
+  }
 }

@@ -92,7 +92,7 @@ class _TagLi extends BuildOp {
 
   Widget _buildItem(Widget child, int i) => Builder(builder: (context) {
         final meta = _itemMetas[i];
-        final tsh = meta.tsb().build(context);
+        final tsh = meta.tsb().build();
         final listStyleType = _ListConfig.listStyleTypeFromNodeMetadata(meta) ??
             config.listStyleType;
         final markerIndex = config.markerReversed == true

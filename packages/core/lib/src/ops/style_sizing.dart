@@ -95,20 +95,19 @@ class _StyleSizing {
   }
 
   static Widget _build(
-          Widget child, _StyleSizingInput input, TextStyleBuilder tsb) =>
-      Builder(builder: (context) {
-        final constraints = BoxConstraints(
-          maxHeight: input.maxHeight?.getValue(context, tsb) ?? double.infinity,
-          maxWidth: input.maxWidth?.getValue(context, tsb) ?? double.infinity,
-          minHeight: input.minHeight?.getValue(context, tsb) ?? 0,
-          minWidth: input.minWidth?.getValue(context, tsb) ?? 0,
-        );
-        final size = Size(
-          input.width?.getValue(context, tsb) ?? double.infinity,
-          input.height?.getValue(context, tsb) ?? double.infinity,
-        );
-        return CssSizing(child: child, constraints: constraints, size: size);
-      });
+      Widget child, _StyleSizingInput input, TextStyleBuilder tsb) {
+    final constraints = BoxConstraints(
+      maxHeight: input.maxHeight?.getValue(tsb.build()) ?? double.infinity,
+      maxWidth: input.maxWidth?.getValue(tsb.build()) ?? double.infinity,
+      minHeight: input.minHeight?.getValue(tsb.build()) ?? 0,
+      minWidth: input.minWidth?.getValue(tsb.build()) ?? 0,
+    );
+    final size = Size(
+      input.width?.getValue(tsb.build()) ?? double.infinity,
+      input.height?.getValue(tsb.build()) ?? double.infinity,
+    );
+    return CssSizing(child: child, constraints: constraints, size: size);
+  }
 }
 
 @immutable

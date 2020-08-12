@@ -56,25 +56,24 @@ class _StyleVerticalAlign {
     return newPiece;
   }
 
-  Widget _build(Widget child, EdgeInsets padding, TextStyleBuilder tsb) =>
-      Builder(builder: (context) {
-        final fontSize = tsb.build(context).style.fontSize;
+  Widget _build(Widget child, EdgeInsets padding, TextStyleBuilder tsb) {
+    final fontSize = tsb.build().style.fontSize;
 
-        return Stack(children: <Widget>[
-          wf.buildPadding(
-            Opacity(child: child, opacity: 0),
-            EdgeInsets.only(
-              bottom: fontSize * padding.bottom,
-              top: fontSize * padding.top,
-            ),
-          ),
-          Positioned(
-            child: child,
-            bottom: padding.top > 0 ? null : 0,
-            top: padding.bottom > 0 ? null : 0,
-          )
-        ]);
-      });
+    return Stack(children: <Widget>[
+      wf.buildPadding(
+        Opacity(child: child, opacity: 0),
+        EdgeInsets.only(
+          bottom: fontSize * padding.bottom,
+          top: fontSize * padding.top,
+        ),
+      ),
+      Positioned(
+        child: child,
+        bottom: padding.top > 0 ? null : 0,
+        top: padding.bottom > 0 ? null : 0,
+      )
+    ]);
+  }
 
   static PlaceholderAlignment _tryParse(String value) {
     switch (value) {

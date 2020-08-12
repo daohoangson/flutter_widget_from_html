@@ -246,10 +246,10 @@ class WidgetFactory {
     text.trimRight();
     if (text.isEmpty) return null;
 
-    final tsb = text.tsb;
-    final maxLines = tsb?.maxLines == -1 ? null : tsb?.maxLines;
-    final overflow = tsb?.textOverflow ?? TextOverflow.clip;
-    final textAlign = tsb?.textAlign ?? TextAlign.start;
+    final tsh = text.tsb?.build();
+    final maxLines = tsh?.maxLines == -1 ? null : tsh?.maxLines;
+    final overflow = tsh?.textOverflow ?? TextOverflow.clip;
+    final textAlign = tsh?.textAlign ?? TextAlign.start;
 
     final widgets = <WidgetPlaceholder>[];
     for (final compiled in _TextCompiler(text).compile()) {
@@ -487,7 +487,7 @@ class WidgetFactory {
       case _kCssMaxLines:
       case _kCssMaxLinesWebkitLineClamp:
         final maxLines = value == _kCssMaxLinesNone ? -1 : int.tryParse(value);
-        if (maxLines != null) meta.tsb().maxLines = maxLines;
+        if (maxLines != null) meta.tsb(_TextStyle.maxLines, maxLines);
         break;
 
       case _kCssTextAlign:
@@ -495,7 +495,7 @@ class WidgetFactory {
         if (textAlign != null) {
           meta
             ..isBlockElement = true
-            ..tsb().textAlign = textAlign;
+            ..tsb(_TextStyle.textAlign, textAlign);
         }
         break;
 
@@ -507,10 +507,10 @@ class WidgetFactory {
       case _kCssTextOverflow:
         switch (value) {
           case _kCssTextOverflowClip:
-            meta.tsb().textOverflow = TextOverflow.clip;
+            meta.tsb(_TextStyle.textOverflow, TextOverflow.clip);
             break;
           case _kCssTextOverflowEllipsis:
-            meta.tsb().textOverflow = TextOverflow.ellipsis;
+            meta.tsb(_TextStyle.textOverflow, TextOverflow.ellipsis);
             break;
         }
         break;

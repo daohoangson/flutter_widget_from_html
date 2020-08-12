@@ -101,7 +101,7 @@ class _TagTable extends BuildOp {
       if (borderParsed != null) {
         return BorderSide(
           color: borderParsed.color ?? const Color(0xFF000000),
-          width: borderParsed.width.getValue(context, tableMeta.tsb()),
+          width: borderParsed.width.getValue(tableMeta.tsb().build()),
         );
       }
     }

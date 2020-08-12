@@ -303,4 +303,4 @@ void main() {
 
 String _data(TextBits text) => text.bits.map((bit) => bit.data ?? '').join('');
 
-TextBits _text() => TextBits(TextStyleBuilder.root());
+TextBits _text() => TextBits(TextStyleBuilder());
