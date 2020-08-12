@@ -168,7 +168,7 @@ Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
 
 Widget _buildBody(WidgetFactory wf, HtmlWidget widget, dom.NodeList domNodes) {
   wf.reset(widget);
-  final rootTsb = TextStyleBuilder.root(style: widget.textStyle);
+  final rootTsb = TextStyleBuilder.root(style: widget.textStyle, wf: wf);
   final builder = HtmlBuilder(domNodes: domNodes, parentTsb: rootTsb, wf: wf);
   return wf.buildBody(builder.build()) ?? widget0;
 }
