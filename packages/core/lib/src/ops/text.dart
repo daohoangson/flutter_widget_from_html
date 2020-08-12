@@ -3,15 +3,15 @@ part of '../core_widget_factory.dart';
 class _TextCompiler {
   final TextBits text;
 
-  List<TextSpanBuilder> _builders;
-  List<TextSpanBuilder> _merged;
+  List<_TextCompiled> _compiled;
+  List<InlineSpan> _spans;
   StringBuffer _buffer, _prevBuffer;
   TextStyleBuilder _tsb, _prevTsb;
 
   _TextCompiler(this.text) : assert(text != null);
 
-  List<TextSpanBuilder> compile() {
-    _merged = [];
+  List<_TextCompiled> compile() {
+    _compiled = [];
 
     _resetLoop(text.tsb);
     for (final bit in text.bits) {
@@ -19,18 +19,17 @@ class _TextCompiler {
     }
     _completeLoop();
 
-    if (_merged.isEmpty) {
-      _merged.add(TextSpanBuilder.prebuilt(
-        widget: _MarginVerticalPlaceholder(
-            CssLength(1, CssLengthUnit.em), text.tsb),
-      ));
+    if (_compiled.isEmpty) {
+      _compiled.add(_TextCompiled(
+          widget: _MarginVerticalPlaceholder(
+              CssLength(1, CssLengthUnit.em), text.tsb)));
     }
 
-    return _merged;
+    return _compiled;
   }
 
   void _resetLoop(TextStyleBuilder tsb) {
-    _builders = [];
+    _spans = [];
     _buffer = StringBuffer();
     _tsb = tsb;
 
@@ -40,14 +39,14 @@ class _TextCompiler {
 
   void _loop(final TextBit bit) {
     final tsb = _getBitTsb(bit);
-    if (_builders == null) _resetLoop(tsb);
+    if (_spans == null) _resetLoop(tsb);
 
     final thisTsb = tsb ?? _prevTsb;
     if (thisTsb?.hasSameStyleWith(_prevTsb) == false) _saveSpan();
 
-    if (bit.hasBuilder) {
+    if (bit.canCompile) {
       _saveSpan();
-      _builders.add(bit.prepareBuilder(thisTsb));
+      _spans.add(bit.compile(thisTsb));
       return;
     }
 
@@ -55,7 +54,7 @@ class _TextCompiler {
       _completeLoop();
       final newLines = bit.data.length - 1;
       if (newLines > 0) {
-        _merged.add(TextSpanBuilder.prebuilt(
+        _compiled.add(_TextCompiled(
           widget: _MarginVerticalPlaceholder(
             CssLength(newLines.toDouble(), CssLengthUnit.em),
             bit.parent.tsb,
@@ -71,12 +70,10 @@ class _TextCompiler {
 
   void _saveSpan() {
     if (_prevBuffer != _buffer && _prevBuffer.length > 0) {
-      final scopedTsb = _prevTsb;
-      final scopedText = _prevBuffer.toString();
-      _builders.add(TextSpanBuilder((context) => TextSpan(
-            style: scopedTsb.build().styleWithHeight,
-            text: scopedText,
-          )));
+      _spans.add(TextSpan(
+        style: _prevTsb?.build()?.styleWithHeight,
+        text: _prevBuffer.toString(),
+      ));
     }
     _prevBuffer = StringBuffer();
   }
@@ -84,36 +81,30 @@ class _TextCompiler {
   void _completeLoop() {
     _saveSpan();
 
-    TextSpanBuilder builder;
-    if (_builders == null) {
+    InlineSpan span;
+    Widget widget;
+    if (_spans == null) {
       // intentionally left empty
-    } else if (_builders.length == 1 && _buffer.isEmpty) {
-      builder = _builders[0];
-      final prebuiltSpan = builder.span;
+    } else if (_spans.length == 1 && _buffer.isEmpty) {
+      span = _spans[0];
 
-      if (prebuiltSpan != null &&
-          prebuiltSpan is WidgetSpan &&
-          prebuiltSpan.alignment == PlaceholderAlignment.baseline &&
+      if (span is WidgetSpan &&
+          span.alignment == PlaceholderAlignment.baseline &&
           (text.tsb?.build()?.textAlign ?? TextAlign.start) ==
               TextAlign.start) {
-        builder = TextSpanBuilder.prebuilt(widget: prebuiltSpan.child);
+        widget = span.child;
       }
-    } else if (_builders.isNotEmpty || _buffer.isNotEmpty) {
-      final scoped = List<TextSpanBuilder>.from(_builders, growable: false);
-      final scopedTsb = _tsb;
-      final scopedText = _buffer.toString();
-      builder = TextSpanBuilder((context) => TextSpan(
-            children: scoped
-                .map((builder) => builder.build(context))
-                .where((span) => span != null)
-                .toList(growable: false),
-            style: scopedTsb?.build()?.styleWithHeight,
-            text: scopedText,
-          ));
+    } else if (_spans.isNotEmpty || _buffer.isNotEmpty) {
+      span = TextSpan(
+        children: _spans,
+        style: _tsb?.build()?.styleWithHeight,
+        text: _buffer.toString(),
+      );
     }
 
-    _builders = null;
-    if (builder != null) _merged.add(builder);
+    _spans = null;
+    if (span == null) return;
+    _compiled.add(_TextCompiled(span: span, widget: widget));
   }
 
   static TextStyleBuilder _getBitTsb(TextBit bit) {
@@ -150,6 +141,14 @@ class _TextCompiler {
     // fallback to default (style from parent)
     return bit.parent.tsb;
   }
+}
+
+@immutable
+class _TextCompiled {
+  final InlineSpan span;
+  final Widget widget;
+
+  _TextCompiled({this.span, this.widget});
 }
 
 Iterable<BuiltPiece> _wrapTextBits(

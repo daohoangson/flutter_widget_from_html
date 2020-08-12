@@ -60,12 +60,9 @@ class _ImageBit extends TextWidget<ImgMetadata> {
       : super(parent, widget);
 
   @override
-  TextSpanBuilder prepareBuilder(TextStyleBuilder _) =>
-      TextSpanBuilder.prebuilt(
-        span: WidgetSpan(
-          alignment: alignment,
-          baseline: baseline,
-          child: widget,
-        ),
+  InlineSpan compile(TextStyleBuilder _) => WidgetSpan(
+        alignment: alignment,
+        baseline: baseline,
+        child: widget,
       );
 }

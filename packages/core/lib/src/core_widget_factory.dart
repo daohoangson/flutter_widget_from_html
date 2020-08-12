@@ -258,21 +258,18 @@ class WidgetFactory {
         continue;
       }
 
+      if (compiled.span == null) continue;
       widgets.add(
         WidgetPlaceholder<TextBits>(
-          child: Builder(builder: (context) {
-            final span = compiled.build(context);
-            if (span == null) return widget0;
+          child: RichText(
+            overflow: overflow,
+            text: compiled.span,
+            textAlign: textAlign,
 
             // TODO: calculate max lines automatically for ellipsis if needed
             // currently it only renders 1 line with ellipsis
-            return RichText(
-              maxLines: maxLines,
-              overflow: overflow,
-              text: span,
-              textAlign: textAlign,
-            );
-          }),
+            maxLines: maxLines,
+          ),
           generator: text,
         ),
       );

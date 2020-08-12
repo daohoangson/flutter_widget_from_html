@@ -54,10 +54,9 @@ class _TagATextData extends TextData {
       : super(bit.parent, bit.data, bit.tsb);
 
   @override
-  bool get hasBuilder => true;
+  bool get canCompile => true;
 
   @override
-  TextSpanBuilder prepareBuilder(TextStyleBuilder tsb) =>
-      TextSpanBuilder((context) => wf.buildGestureTapCallbackSpan(
-          bit.data, onTap, tsb.build().styleWithHeight));
+  InlineSpan compile(TextStyleBuilder tsb) => wf.buildGestureTapCallbackSpan(
+      bit.data, onTap, tsb.build().styleWithHeight);
 }
