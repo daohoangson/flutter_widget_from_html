@@ -11,6 +11,7 @@ import 'iframe_twitter.dart';
 import 'img.dart';
 import 'smilie.dart';
 import 'video.dart';
+import 'wordpress.dart';
 
 class HomeScreen extends StatelessWidget {
   final _htmls = {
@@ -191,6 +192,7 @@ C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."
     'customWidgetBuilder': () => CustomWidgetBuilderScreen(),
     'font-size': () => FontSizeScreen(),
     'Smilie': () => SmilieScreen(),
+    'Wordpress': () => WordpressScreen(),
   };
 
   @override
