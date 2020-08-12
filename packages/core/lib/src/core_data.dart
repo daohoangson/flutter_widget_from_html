@@ -330,7 +330,6 @@ class TextStyleBuilder<T1> {
   final TextStyleBuilder parent;
 
   List<Function> _builders;
-  BuildContext _context;
   TextStyleHtml _default;
   List _inputs;
   TextStyleHtml _output;
@@ -355,8 +354,6 @@ class TextStyleBuilder<T1> {
   TextOverflow get textOverflow => _textOverflow ?? parent?.textOverflow;
   set textOverflow(TextOverflow v) => _textOverflow = v;
 
-  BuildContext get context => _context;
-
   void enqueue<T2>(
     TextStyleHtml Function(BuildContext, TextStyleHtml, T2) builder, [
     T2 input,
@@ -372,16 +369,22 @@ class TextStyleBuilder<T1> {
   }
 
   TextStyleHtml build(BuildContext context) {
-    _resetContextIfNeeded(context);
+    _resetOutputIfNeeded(context);
     if (_output != null) return _output;
 
-    final parentTsh = parent == null ? _default : parent.build(_context);
-    if (_builders == null) return parentTsh;
+    final parentTsh = parent?.build(context) ?? _default;
+    if (_builders == null) {
+      _output = parentTsh;
+      return _output;
+    }
 
     _output = parentTsh.copyWith(parent: parentTsh);
     final l = _builders.length;
     for (var i = 0; i < l; i++) {
-      _output = _builders[i](context, _output, _inputs[i]);
+      final builder = _builders[i];
+      _output = builder(context, _output, _inputs[i]);
+      assert(_output?.parent == parentTsh,
+          '$builder must return a valid text style');
     }
 
     return _output;
@@ -407,11 +410,10 @@ class TextStyleBuilder<T1> {
   ]) =>
       TextStyleBuilder(builder, input: input, parent: this);
 
-  void _resetContextIfNeeded(BuildContext context) {
+  void _resetOutputIfNeeded(BuildContext context) {
     final contextStyle = DefaultTextStyle.of(context).style;
-    if (context == _context && contextStyle == _default.style) return;
+    if (contextStyle == _default?.style) return;
 
-    _context = context;
     _default = TextStyleHtml.style(contextStyle);
     _output = null;
   }
