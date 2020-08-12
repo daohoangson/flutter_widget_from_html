@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'core_helpers.dart';
+import 'core_widget_factory.dart';
 
 part 'data/table_data.dart';
 part 'data/text_bits.dart';
@@ -328,20 +329,23 @@ class TextStyleHtml {
 
 class TextStyleBuilder<T1> {
   final TextStyleBuilder parent;
+  final WidgetFactory wf;
 
   List<Function> _builders;
-  TextStyleHtml _default;
   List _inputs;
+  TextStyleHtml _parentOutput;
   TextStyleHtml _output;
+  List _signature;
 
   TextStyleBuilder.root({
     TextStyle style,
+    this.wf,
   }) : parent = null {
     if (style != null) enqueue(_rootBuilderStyle, style);
     enqueue(_rootBuilderTextScaleFactor);
   }
 
-  TextStyleBuilder._(this.parent);
+  TextStyleBuilder._(this.parent) : wf = null;
 
   int _maxLines;
   int get maxLines => _maxLines ?? parent?.maxLines;
@@ -370,21 +374,36 @@ class TextStyleBuilder<T1> {
   }
 
   TextStyleHtml build(BuildContext context) {
-    _resetOutputIfNeeded(context);
+    if (parent == null) {
+      // root tsb
+      final signature = wf?.generateTsbSignature(context) ?? [];
+      if (!_checkSignaturesMatch(signature, _signature)) {
+        final contextStyle = DefaultTextStyle.of(context).style;
+        _parentOutput = TextStyleHtml.style(contextStyle);
+        _output = null;
+        _signature = signature;
+      }
+    } else {
+      final parentOutput = parent.build(context);
+      if (parentOutput != _parentOutput) {
+        _parentOutput = parentOutput;
+        _output = null;
+      }
+    }
+
     if (_output != null) return _output;
 
-    final parentTsh = parent?.build(context) ?? _default;
     if (_builders == null) {
-      _output = parentTsh;
+      _output = _parentOutput;
       return _output;
     }
 
-    _output = parentTsh.copyWith(parent: parentTsh);
+    _output = _parentOutput.copyWith(parent: _parentOutput);
     final l = _builders.length;
     for (var i = 0; i < l; i++) {
       final builder = _builders[i];
       _output = builder(context, _output, _inputs[i]);
-      assert(_output?.parent == parentTsh,
+      assert(_output?.parent == _parentOutput,
           '$builder must return a valid text style');
     }
 
@@ -411,12 +430,13 @@ class TextStyleBuilder<T1> {
   ]) =>
       TextStyleBuilder._(this)..enqueue(builder, input);
 
-  void _resetOutputIfNeeded(BuildContext context) {
-    final contextStyle = DefaultTextStyle.of(context).style;
-    if (contextStyle == _default?.style) return;
+  static bool _checkSignaturesMatch(List a, List b) {
+    if (a?.length != b?.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
 
-    _default = TextStyleHtml.style(contextStyle);
-    _output = null;
+    return true;
   }
 
   static TextStyleHtml _rootBuilderStyle(

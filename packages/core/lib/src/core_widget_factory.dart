@@ -315,6 +315,11 @@ class WidgetFactory {
     meta.op = BuildOp(onWidgets: (_, __) => [built]);
   }
 
+  List generateTsbSignature(BuildContext context) => [
+        DefaultTextStyle.of(context).style,
+        MediaQuery.of(context).textScaleFactor,
+      ];
+
   String getListStyleMarker(String type, int i) {
     switch (type) {
       case _kCssListStyleTypeAlphaLower:
