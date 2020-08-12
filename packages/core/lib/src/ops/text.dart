@@ -43,7 +43,7 @@ class _TextCompiler {
     if (_builders == null) _resetLoop(tsb);
 
     final thisTsb = tsb ?? _prevTsb;
-    if (!thisTsb.hasSameStyleWith(_prevTsb)) _saveSpan();
+    if (thisTsb?.hasSameStyleWith(_prevTsb) == false) _saveSpan();
 
     if (bit.hasBuilder) {
       _saveSpan();
@@ -106,7 +106,7 @@ class _TextCompiler {
                 .map((builder) => builder.build(context))
                 .where((span) => span != null)
                 .toList(growable: false),
-            style: scopedTsb.build(context).styleWithHeight,
+            style: scopedTsb?.build(context)?.styleWithHeight,
             text: scopedText,
           ));
     }

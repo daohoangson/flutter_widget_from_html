@@ -412,6 +412,8 @@ class TextStyleBuilder<T1> {
   }
 
   bool hasSameStyleWith(TextStyleBuilder other) {
+    if (other == null) return false;
+
     var thisWithBuilder = this;
     while (thisWithBuilder._builders == null) {
       thisWithBuilder = thisWithBuilder.parent;
