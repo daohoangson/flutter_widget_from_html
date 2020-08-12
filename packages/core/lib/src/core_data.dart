@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'core_helpers.dart';
+import 'core_widget_factory.dart';
 
 part 'data/table_data.dart';
 part 'data/text_bits.dart';
@@ -328,20 +329,23 @@ class TextStyleHtml {
 
 class TextStyleBuilder<T1> {
   final TextStyleBuilder parent;
+  final WidgetFactory wf;
 
   List<Function> _builders;
-  BuildContext _context;
-  TextStyleHtml _default;
   List _inputs;
+  TextStyleHtml _parentOutput;
   TextStyleHtml _output;
+  List _signature;
 
-  TextStyleBuilder(
-    TextStyleHtml Function(BuildContext, TextStyleHtml, T1) builder, {
-    T1 input,
-    this.parent,
-  }) {
-    enqueue(builder, input);
+  TextStyleBuilder.root({
+    TextStyle style,
+    this.wf,
+  }) : parent = null {
+    if (style != null) enqueue(_rootBuilderStyle, style);
+    enqueue(_rootBuilderTextScaleFactor);
   }
+
+  TextStyleBuilder._(this.parent) : wf = null;
 
   int _maxLines;
   int get maxLines => _maxLines ?? parent?.maxLines;
@@ -354,8 +358,6 @@ class TextStyleBuilder<T1> {
   TextOverflow _textOverflow;
   TextOverflow get textOverflow => _textOverflow ?? parent?.textOverflow;
   set textOverflow(TextOverflow v) => _textOverflow = v;
-
-  BuildContext get context => _context;
 
   void enqueue<T2>(
     TextStyleHtml Function(BuildContext, TextStyleHtml, T2) builder, [
@@ -372,16 +374,38 @@ class TextStyleBuilder<T1> {
   }
 
   TextStyleHtml build(BuildContext context) {
-    _resetContextIfNeeded(context);
+    if (parent == null) {
+      // root tsb: verify signature and reset _output if it doesn't match
+      final signature = wf?.generateTsbSignature(context) ?? [];
+      if (!_checkSignaturesMatch(signature, _signature)) {
+        final contextStyle = DefaultTextStyle.of(context).style;
+        _parentOutput = TextStyleHtml.style(contextStyle);
+        _output = null;
+        _signature = signature;
+      }
+    } else {
+      // for others, compare output from parent
+      final parentOutput = parent.build(context);
+      if (parentOutput != _parentOutput) {
+        _parentOutput = parentOutput;
+        _output = null;
+      }
+    }
+
     if (_output != null) return _output;
 
-    final parentTsh = parent == null ? _default : parent.build(_context);
-    if (_builders == null) return parentTsh;
+    if (_builders == null) {
+      _output = _parentOutput;
+      return _output;
+    }
 
-    _output = parentTsh.copyWith(parent: parentTsh);
+    _output = _parentOutput.copyWith(parent: _parentOutput);
     final l = _builders.length;
     for (var i = 0; i < l; i++) {
-      _output = _builders[i](context, _output, _inputs[i]);
+      final builder = _builders[i];
+      _output = builder(context, _output, _inputs[i]);
+      assert(_output?.parent == _parentOutput,
+          '$builder must return a valid text style');
     }
 
     return _output;
@@ -401,18 +425,28 @@ class TextStyleBuilder<T1> {
     return thisWithBuilder == otherWithBuilder;
   }
 
-  TextStyleBuilder<T2> sub<T2>([
-    TextStyleHtml Function(BuildContext, TextStyleHtml, T2) builder,
-    T2 input,
-  ]) =>
-      TextStyleBuilder(builder, input: input, parent: this);
+  TextStyleBuilder sub() => TextStyleBuilder._(this);
 
-  void _resetContextIfNeeded(BuildContext context) {
-    final contextStyle = DefaultTextStyle.of(context).style;
-    if (context == _context && contextStyle == _default.style) return;
+  static bool _checkSignaturesMatch(List a, List b) {
+    if (a?.length != b?.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
 
-    _context = context;
-    _default = TextStyleHtml.style(contextStyle);
-    _output = null;
+    return true;
+  }
+
+  static TextStyleHtml _rootBuilderStyle(
+          BuildContext _, TextStyleHtml parent, TextStyle style) =>
+      parent.copyWith(style: style.inherit ? parent.style.merge(style) : style);
+
+  static TextStyleHtml _rootBuilderTextScaleFactor(
+      BuildContext context, TextStyleHtml parent, _) {
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    if (textScaleFactor == 1) return parent;
+
+    final style = parent.style;
+    final scaled = style.copyWith(fontSize: style.fontSize * textScaleFactor);
+    return parent.copyWith(style: scaled);
   }
 }

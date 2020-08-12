@@ -59,7 +59,6 @@ class HtmlBuilder {
 
   NodeMetadata collectMetadata(dom.Element e) {
     final meta = NodeMetadata(parentTsb.sub(), parentOps);
-
     wf.parseTag(meta, e.localName, e.attributes);
 
     if (meta.hasParents) {

@@ -168,22 +168,9 @@ Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
 
 Widget _buildBody(WidgetFactory wf, HtmlWidget widget, dom.NodeList domNodes) {
   wf.reset(widget);
-  final rootTsb = TextStyleBuilder(_rootTsb, input: widget.textStyle);
+  final rootTsb = TextStyleBuilder.root(style: widget.textStyle, wf: wf);
   final builder = HtmlBuilder(domNodes: domNodes, parentTsb: rootTsb, wf: wf);
   return wf.buildBody(builder.build()) ?? widget0;
 }
 
 dom.NodeList _parseHtml(String html) => parser.parse(html).body.nodes;
-
-TextStyleHtml _rootTsb(BuildContext c, TextStyleHtml parent, TextStyle input) {
-  var style = input == null
-      ? parent.style
-      : input.inherit ? parent.style.merge(input) : input;
-
-  final textScaleFactor = MediaQuery.of(c).textScaleFactor;
-  if (textScaleFactor != 1) {
-    style = style.copyWith(fontSize: style.fontSize * textScaleFactor);
-  }
-
-  return style == parent.style ? parent : parent.copyWith(style: style);
-}
