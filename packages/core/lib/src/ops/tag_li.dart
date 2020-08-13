@@ -75,9 +75,9 @@ class _TagLi extends BuildOp {
     _itemOp ??= BuildOp(
       onWidgets: (meta, widgets) {
         final column = wf.buildColumnPlaceholder(meta, widgets) ??
-            WidgetPlaceholder<_TagLi>(
+            WidgetPlaceholder<NodeMetadata>(
               child: widget0,
-              generator: this,
+              generator: meta,
             );
 
         final i = _itemMetas.length;

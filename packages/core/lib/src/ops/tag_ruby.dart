@@ -78,7 +78,7 @@ class _TagRuby extends BuildOp {
         .75 *
         tsh.deps.getValue<MediaQueryData>().textScaleFactor;
 
-    final widget = WidgetPlaceholder<_TagRuby>(
+    final widget = WidgetPlaceholder<NodeMetadata>(
       child: wf.buildStack(
         rubyMeta,
         <Widget>[
@@ -87,7 +87,7 @@ class _TagRuby extends BuildOp {
           Positioned.fill(bottom: null, child: Center(child: rt)),
         ],
       ),
-      generator: this,
+      generator: rubyMeta,
     );
 
     return TextWidget(parent, widget, alignment: PlaceholderAlignment.middle);
