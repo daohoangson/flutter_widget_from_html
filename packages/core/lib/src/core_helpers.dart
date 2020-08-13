@@ -13,12 +13,10 @@ typedef CustomStylesBuilder = Map<String, String> Function(dom.Element element);
 
 typedef CustomWidgetBuilder = Widget Function(dom.Element element);
 
-typedef _WidgetPlaceholderBuilder = Widget Function(Widget child);
-
 class WidgetPlaceholder<T> extends StatelessWidget {
   final T generator;
 
-  final List<_WidgetPlaceholderBuilder> _builders = [];
+  final List<Widget Function(Widget)> _builders = [];
   final Widget _firstChild;
 
   WidgetPlaceholder({Widget child, @required this.generator})
@@ -38,7 +36,7 @@ class WidgetPlaceholder<T> extends StatelessWidget {
     return built;
   }
 
-  WidgetPlaceholder<T> wrapWith(_WidgetPlaceholderBuilder builder) {
+  WidgetPlaceholder<T> wrapWith(Widget Function(Widget) builder) {
     assert(builder != null);
     _builders.add(builder);
     return this;
