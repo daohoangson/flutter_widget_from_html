@@ -78,7 +78,7 @@ class _TagRuby {
     final tsh = _rtText.tsb.build();
     final padding = tsh.style.fontSize *
         .75 *
-        tsh.deps.getValue<MediaQueryData>().textScaleFactor;
+        tsh.getDependency<MediaQueryData>().textScaleFactor;
 
     final widget = WidgetPlaceholder<NodeMetadata>(
       child: wf.buildStack(

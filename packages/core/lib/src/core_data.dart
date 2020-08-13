@@ -205,19 +205,45 @@ enum CssLengthUnit {
   px,
 }
 
-@immutable
-class HtmlWidgetDependencies {
-  final Iterable<HtmlWidgetDependency> _values;
-
-  HtmlWidgetDependencies(this._values);
-
-  T getValue<T>() => _values.whereType<HtmlWidgetDependency<T>>().first?.value;
-}
-
+/// A dependency value.
+///
+/// The list of dependencies are prepared by [WidgetFactory.getDependencies],
+/// by default it includes:
+///
+/// - [MediaQueryData]
+/// - [TextDirection]
+/// - [TextStyle]
+/// - [ThemeData] (enhanced package only)
+///
+/// If any of these dependencies change, the HTML widget tree will be re-rendered.
+/// Use [TextStyleHtml.getDependency] to get dependency value.
+///
+/// ```dart
+/// // in normal widget building:
+/// final scale = MediaQuery.of(context).textScaleFactor;
+/// final color = Theme.of(context).accentColor;
+///
+/// // in build ops:
+/// final scale = tsh.getDependency<MediaQueryData>().textScaleFactor;
+/// final color = tsh.getDependency<ThemeData>().accentColor;
+/// ```
+///
+/// Note about text direction:
+/// Because text direction can be changed within the HTML widget tree
+/// (by attribute `dir` or inline style `direction`),
+/// getting a [TextDirection] via `getDependency` will return out of date information.
+/// It's recommended to use [TextStyleHtml.textDirection] instead.
+///
+/// ```dart
+/// final widgetValue = Directionality.of(context);
+/// final buildOpValue = tsh.textDirection;
+/// ```
 @immutable
 class HtmlWidgetDependency<T> {
+  /// The actual data.
   final T value;
 
+  /// Creates a dependency.
   HtmlWidgetDependency(this.value);
 }
 
@@ -321,7 +347,7 @@ class NodeMetadata {
 
 @immutable
 class TextStyleHtml {
-  final HtmlWidgetDependencies deps;
+  final Iterable<HtmlWidgetDependency> _deps;
   final double height;
   final int maxLines;
   final TextStyleHtml parent;
@@ -331,7 +357,7 @@ class TextStyleHtml {
   final TextOverflow textOverflow;
 
   TextStyleHtml({
-    this.deps,
+    @required Iterable<HtmlWidgetDependency> deps,
     this.height,
     this.maxLines,
     this.parent,
@@ -339,7 +365,30 @@ class TextStyleHtml {
     this.textAlign,
     this.textDirection,
     this.textOverflow,
-  });
+  }) : _deps = deps;
+
+  factory TextStyleHtml.root(
+      Iterable<HtmlWidgetDependency> deps, TextStyle widgetTextStyle) {
+    var style = _getDependency<TextStyle>(deps);
+    if (widgetTextStyle != null) {
+      style = widgetTextStyle.inherit
+          ? style.merge(widgetTextStyle)
+          : widgetTextStyle;
+    }
+
+    var mqd = _getDependency<MediaQueryData>(deps);
+    final tsf = mqd.textScaleFactor;
+    if (tsf != 1) {
+      style = style.copyWith(fontSize: style.fontSize * tsf);
+    }
+
+    return TextStyleHtml(
+      deps: deps,
+      parent: null,
+      style: style,
+      textDirection: _getDependency<TextDirection>(deps),
+    );
+  }
 
   TextStyleHtml get root => parent?.root ?? this;
 
@@ -356,7 +405,7 @@ class TextStyleHtml {
     TextOverflow textOverflow,
   }) =>
       TextStyleHtml(
-        deps: deps,
+        deps: _deps,
         height: height ?? this.height,
         maxLines: maxLines ?? this.maxLines,
         parent: parent ?? this.parent,
@@ -365,6 +414,16 @@ class TextStyleHtml {
         textDirection: textDirection ?? this.textDirection,
         textOverflow: textOverflow ?? this.textOverflow,
       );
+
+  T getDependency<T>() => _getDependency<T>(_deps);
+
+  static T _getDependency<T>(Iterable<HtmlWidgetDependency> deps) {
+    for (final found in deps.whereType<HtmlWidgetDependency<T>>()) {
+      return found.value;
+    }
+
+    return null;
+  }
 }
 
 class TextStyleBuilder<T1> {

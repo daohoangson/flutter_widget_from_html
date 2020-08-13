@@ -167,43 +167,22 @@ class _HtmlWidgetState extends State<HtmlWidget> {
 }
 
 class _RootTsb extends TextStyleBuilder {
-  final _HtmlWidgetState hws;
+  final _HtmlWidgetState state;
 
   TextStyleHtml _output;
 
-  _RootTsb(this.hws);
+  _RootTsb(this.state);
 
   @override
   TextStyleHtml build() {
     if (_output != null) return _output;
-
-    final deps = HtmlWidgetDependencies(hws._wf.getDependencies(hws.context));
-
-    var textStyle = deps.getValue<TextStyle>();
-    final widgetTextStyle = hws.widget.textStyle;
-    if (widgetTextStyle != null) {
-      textStyle = widgetTextStyle.inherit
-          ? textStyle.merge(widgetTextStyle)
-          : widgetTextStyle;
-    }
-
-    var mqd = deps.getValue<MediaQueryData>();
-    final tsf = mqd.textScaleFactor;
-    if (tsf != 1) {
-      textStyle = textStyle.copyWith(fontSize: textStyle.fontSize * tsf);
-    }
-
-    _output = TextStyleHtml(
-      deps: deps,
-      style: textStyle,
-      textDirection: deps.getValue<TextDirection>(),
+    return _output = TextStyleHtml.root(
+      state._wf.getDependencies(state.context),
+      state.widget.textStyle,
     );
-    return _output;
   }
 
-  void reset() {
-    _output = null;
-  }
+  void reset() => _output = null;
 }
 
 Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
