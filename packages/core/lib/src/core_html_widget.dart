@@ -31,7 +31,7 @@ class HtmlWidget extends StatefulWidget {
   /// The callback to specify custom stylings.
   final CustomStylesBuilder customStylesBuilder;
 
-  /// The callback to specify custom stylings.
+  /// The callback to render a custom widget.
   final CustomWidgetBuilder customWidgetBuilder;
 
   /// Controls whether the built widget tree is cached between rebuild.
