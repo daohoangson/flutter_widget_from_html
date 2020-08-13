@@ -33,7 +33,6 @@ class _TagTable {
     _tableOp = BuildOp(
       onChild: onChild,
       onWidgets: onWidgets,
-      priority: 999999,
     );
     return _tableOp;
   }
