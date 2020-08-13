@@ -148,19 +148,19 @@ class _TextStyle {
 
     switch (v) {
       case _kCssFontSizeXxLarge:
-        return _fontSizeMultiplyWith(p.root?.style?.fontSize, 2.0);
+        return _fontSizeMultiplyRootWith(p, 2.0);
       case _kCssFontSizeXLarge:
-        return _fontSizeMultiplyWith(p.root?.style?.fontSize, 1.5);
+        return _fontSizeMultiplyRootWith(p, 1.5);
       case _kCssFontSizeLarge:
-        return _fontSizeMultiplyWith(p.root?.style?.fontSize, 1.125);
+        return _fontSizeMultiplyRootWith(p, 1.125);
       case _kCssFontSizeMedium:
-        return p.root?.style?.fontSize;
+        return _fontSizeMultiplyRootWith(p, 1);
       case _kCssFontSizeSmall:
-        return _fontSizeMultiplyWith(p.root?.style?.fontSize, .8125);
+        return _fontSizeMultiplyRootWith(p, .8125);
       case _kCssFontSizeXSmall:
-        return _fontSizeMultiplyWith(p.root?.style?.fontSize, .625);
+        return _fontSizeMultiplyRootWith(p, .625);
       case _kCssFontSizeXxSmall:
-        return _fontSizeMultiplyWith(p.root?.style?.fontSize, .5625);
+        return _fontSizeMultiplyRootWith(p, .5625);
 
       case _kCssFontSizeLarger:
         return _fontSizeMultiplyWith(p.parent?.style?.fontSize, 1.2);
@@ -169,6 +169,15 @@ class _TextStyle {
     }
 
     return null;
+  }
+
+  static double _fontSizeMultiplyRootWith(TextStyleHtml tsh, double value) {
+    var root = tsh;
+    while (root.parent != null) {
+      root = root.parent;
+    }
+
+    return _fontSizeMultiplyWith(root.style.fontSize, value);
   }
 
   static double _fontSizeMultiplyWith(double fontSize, double value) =>
