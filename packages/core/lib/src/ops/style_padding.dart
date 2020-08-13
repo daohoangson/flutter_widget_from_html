@@ -42,20 +42,24 @@ class _StylePadding {
           final padding = wf.parseCssLengthBox(meta, _kCssPadding);
           if (padding == null) return null;
 
-          return _listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
-              (child) => _build(child, padding, meta.tsb().build())));
+          return _listOrNull(wf
+              .buildColumnPlaceholder(meta, widgets)
+              ?.wrapWith((child) => _build(meta, child, padding)));
         },
         priority: 9999,
       );
 
-  Widget _build(Widget child, CssLengthBox padding, TextStyleHtml tsh) =>
-      wf.buildPadding(
-        child,
-        EdgeInsets.fromLTRB(
-          padding.getValueLeft(tsh) ?? 0,
-          padding.top?.getValue(tsh) ?? 0,
-          padding.getValueRight(tsh) ?? 0,
-          padding.bottom?.getValue(tsh) ?? 0,
-        ),
-      );
+  Widget _build(NodeMetadata meta, Widget child, CssLengthBox padding) {
+    final tsh = meta.tsb().build();
+    return wf.buildPadding(
+      meta,
+      child,
+      EdgeInsets.fromLTRB(
+        padding.getValueLeft(tsh) ?? 0,
+        padding.top?.getValue(tsh) ?? 0,
+        padding.getValueRight(tsh) ?? 0,
+        padding.bottom?.getValue(tsh) ?? 0,
+      ),
+    );
+  }
 }

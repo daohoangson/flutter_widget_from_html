@@ -82,7 +82,8 @@ class _TagRuby extends BuildOp {
       child: wf.buildStack(
         rubyMeta,
         <Widget>[
-          wf.buildPadding(ruby, EdgeInsets.symmetric(vertical: padding)),
+          wf.buildPadding(
+              rubyMeta, ruby, EdgeInsets.symmetric(vertical: padding)),
           Positioned.fill(bottom: null, child: Center(child: rt)),
         ],
       ),

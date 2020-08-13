@@ -63,6 +63,7 @@ class _StyleVerticalAlign {
       meta,
       <Widget>[
         wf.buildPadding(
+          meta,
           Opacity(child: child, opacity: 0),
           EdgeInsets.only(
             bottom: fontSize * padding.bottom,

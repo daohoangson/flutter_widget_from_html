@@ -20,9 +20,8 @@ class _StyleBgColor {
         onWidgets: (meta, widgets) {
           final color = wf.parseColor(meta.style(_kCssBackgroundColor));
           if (color == null) return null;
-          return _listOrNull(wf
-              .buildColumnPlaceholder(meta, widgets)
-              ?.wrapWith((child) => wf.buildDecoratedBox(child, color: color)));
+          return _listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
+              (child) => wf.buildDecoratedBox(meta, child, color: color)));
         },
         priority: 15000,
       );

@@ -7,12 +7,12 @@ class _TagImg {
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
-        onPieces: (meta, pieces) {
-          if (meta.isBlockElement) return pieces;
+        onPieces: (node, pieces) {
+          if (node.isBlockElement) return pieces;
 
           final text = pieces.last?.text;
-          final img = _parseMetadata(meta);
-          final built = _buildImg(img);
+          final img = _parse(node);
+          final built = _buildImg(node, img);
           if (built == null) {
             final imgText = img.alt ?? img.title;
             if (imgText?.isNotEmpty == true) {
@@ -27,24 +27,24 @@ class _TagImg {
           ));
           return pieces;
         },
-        onWidgets: (meta, _) {
-          if (!meta.isBlockElement) return [];
+        onWidgets: (node, _) {
+          if (!node.isBlockElement) return [];
 
-          final img = _parseMetadata(meta);
-          final built = _buildImg(img);
+          final img = _parse(node);
+          final built = _buildImg(node, img);
           if (built == null) return [];
 
           return [WidgetPlaceholder<ImgMetadata>(child: built, generator: img)];
         },
       );
 
-  Widget _buildImg(ImgMetadata img) {
-    final image = wf.buildImageProvider(img.url);
+  Widget _buildImg(NodeMetadata node, ImgMetadata img) {
+    final image = wf.imageProvider(img.url);
     if (image == null) return null;
-    return wf.buildImage(image, img);
+    return wf.buildImage(node, image, img);
   }
 
-  ImgMetadata _parseMetadata(NodeMetadata meta) {
+  ImgMetadata _parse(NodeMetadata meta) {
     final attrs = meta.domElement.attributes;
     final src = attrs.containsKey('src') ? attrs['src'] : null;
     return ImgMetadata(

@@ -1,8 +1,9 @@
 part of '../core_widget_factory.dart';
 
-class _ColumnPlaceholder extends WidgetPlaceholder<WidgetFactory> {
+class _ColumnPlaceholder extends WidgetPlaceholder<NodeMetadata> {
   final NodeMetadata meta;
   final bool trimMarginVertical;
+  final WidgetFactory wf;
 
   final Iterable<Widget> _children;
 
@@ -10,8 +11,8 @@ class _ColumnPlaceholder extends WidgetPlaceholder<WidgetFactory> {
     this._children, {
     @required this.meta,
     @required this.trimMarginVertical,
-    @required WidgetFactory wf,
-  }) : super(generator: wf);
+    @required this.wf,
+  }) : super(generator: meta);
 
   List<Widget> get children {
     final contents = <Widget>[];
@@ -56,7 +57,7 @@ class _ColumnPlaceholder extends WidgetPlaceholder<WidgetFactory> {
       }
     }
 
-    final column = _buildColumn(contents);
+    final column = wf.buildColumnWidget(meta, contents);
 
     return [
       if (marginTop != null) marginTop,
@@ -64,8 +65,6 @@ class _ColumnPlaceholder extends WidgetPlaceholder<WidgetFactory> {
       if (marginBottom != null) marginBottom,
     ];
   }
-
-  WidgetFactory get wf => generator;
 
   Iterable<Widget> get _iterable sync* {
     for (var child in _children) {
@@ -83,10 +82,6 @@ class _ColumnPlaceholder extends WidgetPlaceholder<WidgetFactory> {
   }
 
   @override
-  Widget build(BuildContext _) => _buildColumn(children) ?? widget0;
-
-  Widget _buildColumn(List<Widget> children) => wf.buildColumnWidget(
-        children,
-        textDirection: meta.tsb().build().textDirection,
-      );
+  Widget build(BuildContext _) =>
+      wf.buildColumnWidget(meta, children) ?? widget0;
 }

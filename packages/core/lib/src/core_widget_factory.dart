@@ -83,8 +83,7 @@ class WidgetFactory {
     );
   }
 
-  Widget buildColumnWidget(List<Widget> children,
-      {TextDirection textDirection}) {
+  Widget buildColumnWidget(NodeMetadata meta, List<Widget> children) {
     if (children?.isNotEmpty != true) return null;
     if (children.length == 1) return children.first;
 
@@ -92,11 +91,12 @@ class WidgetFactory {
       children: children,
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      textDirection: textDirection,
+      textDirection: meta.tsb().build().textDirection,
     );
   }
 
   Widget buildDecoratedBox(
+    NodeMetadata meta,
     Widget child, {
     Color color,
   }) =>
@@ -109,19 +109,14 @@ class WidgetFactory {
             )
           : child;
 
-  Widget buildDivider() => const DecoratedBox(
+  Widget buildDivider(NodeMetadata meta) => const DecoratedBox(
         decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 1)),
         child: SizedBox(height: 1),
       );
 
-  Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
+  Widget buildGestureDetector(
+          NodeMetadata meta, Widget child, GestureTapCallback onTap) =>
       GestureDetector(child: child, onTap: onTap);
-
-  GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
-      ? () => widget.onTapUrl != null
-          ? widget.onTapUrl(url)
-          : print('[flutter_widget_from_html] Tapped url $url')
-      : null;
 
   TextSpan buildGestureTapCallbackSpan(
     String text,
@@ -134,78 +129,27 @@ class WidgetFactory {
         style: style,
       );
 
-  Widget buildHorizontalScrollView(Widget child) =>
+  Widget buildHorizontalScrollView(NodeMetadata meta, Widget child) =>
       SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
 
-  Widget buildImage(Object provider, ImgMetadata img) =>
+  Widget buildImage(NodeMetadata node, Object provider, ImgMetadata img) =>
       provider != null && provider is ImageProvider && img != null
           ? Image(
-              errorBuilder: buildImageErrorWidgetBuilder(img),
+              errorBuilder: buildImageErrorWidgetBuilder(node, img),
               image: provider,
               semanticLabel: img.alt ?? img.title,
             )
           : null;
 
-  ImageErrorWidgetBuilder buildImageErrorWidgetBuilder(ImgMetadata img) =>
+  ImageErrorWidgetBuilder buildImageErrorWidgetBuilder(
+          NodeMetadata meta, ImgMetadata img) =>
       (_, error, __) {
         print('${img.url} error: $error');
         final text = img.alt ?? img.title ?? '❌';
         return Text(text);
       };
 
-  Object buildImageProvider(String url) {
-    if (url?.startsWith('asset:') == true) {
-      return buildImageFromAsset(url);
-    }
-
-    if (url?.startsWith('data:') == true) {
-      return buildImageFromDataUri(url);
-    }
-
-    return buildImageFromUrl(url);
-  }
-
-  Uint8List buildImageBytes(String dataUri) {
-    final match = _dataUriRegExp.matchAsPrefix(dataUri);
-    if (match == null) return null;
-
-    final prefix = match[0];
-    final encoding = match[1];
-    final data = dataUri.substring(prefix.length);
-
-    final bytes = encoding == 'base64'
-        ? base64.decode(data)
-        : encoding == 'utf8' ? Uint8List.fromList(data.codeUnits) : null;
-    if (bytes.isEmpty) return null;
-
-    return bytes;
-  }
-
-  ImageProvider buildImageFromAsset(String url) {
-    final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
-    if (uri?.scheme != 'asset') return null;
-
-    final assetName = uri.path;
-    if (assetName?.isNotEmpty != true) return null;
-
-    final package = uri.queryParameters?.containsKey('package') == true
-        ? uri.queryParameters['package']
-        : null;
-
-    return AssetImage(assetName, package: package);
-  }
-
-  ImageProvider buildImageFromDataUri(String dataUri) {
-    final bytes = buildImageBytes(dataUri);
-    if (bytes == null) return null;
-
-    return MemoryImage(bytes);
-  }
-
-  ImageProvider buildImageFromUrl(String url) =>
-      url?.isNotEmpty == true ? NetworkImage(url) : null;
-
-  Widget buildPadding(Widget child, EdgeInsets padding) =>
+  Widget buildPadding(NodeMetadata meta, Widget child, EdgeInsets padding) =>
       child != null && padding != null && padding != const EdgeInsets.all(0)
           ? Padding(child: child, padding: padding)
           : child;
@@ -320,6 +264,12 @@ class WidgetFactory {
     meta.op = BuildOp(onWidgets: (_, __) => [built]);
   }
 
+  GestureTapCallback gestureTapCallback(String url) => url != null
+      ? () => widget.onTapUrl != null
+          ? widget.onTapUrl(url)
+          : print('[flutter_widget_from_html] Tapped url $url')
+      : null;
+
   List<HtmlWidgetDependency> getDependencies(BuildContext context) => [
         HtmlWidgetDependency<MediaQueryData>(MediaQuery.of(context)),
         HtmlWidgetDependency<TextDirection>(Directionality.of(context)),
@@ -379,6 +329,58 @@ class WidgetFactory {
     };
 
     return map.containsKey(i) ? map[i] : null;
+  }
+
+  Uint8List imageBytes(String dataUri) {
+    final match = _dataUriRegExp.matchAsPrefix(dataUri);
+    if (match == null) return null;
+
+    final prefix = match[0];
+    final encoding = match[1];
+    final data = dataUri.substring(prefix.length);
+
+    final bytes = encoding == 'base64'
+        ? base64.decode(data)
+        : encoding == 'utf8' ? Uint8List.fromList(data.codeUnits) : null;
+    if (bytes.isEmpty) return null;
+
+    return bytes;
+  }
+
+  Object imageFromAsset(String url) {
+    final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
+    if (uri?.scheme != 'asset') return null;
+
+    final assetName = uri.path;
+    if (assetName?.isNotEmpty != true) return null;
+
+    final package = uri.queryParameters?.containsKey('package') == true
+        ? uri.queryParameters['package']
+        : null;
+
+    return AssetImage(assetName, package: package);
+  }
+
+  Object imageFromDataUri(String dataUri) {
+    final bytes = imageBytes(dataUri);
+    if (bytes == null) return null;
+
+    return MemoryImage(bytes);
+  }
+
+  Object imageFromUrl(String url) =>
+      url?.isNotEmpty == true ? NetworkImage(url) : null;
+
+  Object imageProvider(String url) {
+    if (url?.startsWith('asset:') == true) {
+      return imageFromAsset(url);
+    }
+
+    if (url?.startsWith('data:') == true) {
+      return imageFromDataUri(url);
+    }
+
+    return imageFromUrl(url);
   }
 
   Color parseColor(String value) => _parseColor(value);
@@ -839,7 +841,7 @@ class WidgetFactory {
   BuildOp tagHr() {
     _tagHr ??= BuildOp(
       defaultStyles: (_, __) => const {'margin-bottom': '1em'},
-      onWidgets: (_, __) => [buildDivider()],
+      onWidgets: (meta, __) => [buildDivider(meta)],
     );
     return _tagHr;
   }
