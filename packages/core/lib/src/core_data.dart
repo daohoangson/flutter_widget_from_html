@@ -390,8 +390,6 @@ class TextStyleHtml {
     );
   }
 
-  TextStyleHtml get root => parent?.root ?? this;
-
   TextStyle get styleWithHeight =>
       height != null && height >= 0 ? style.copyWith(height: height) : style;
 
