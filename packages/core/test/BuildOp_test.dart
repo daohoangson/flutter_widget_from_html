@@ -100,8 +100,8 @@ void main() {
 class _DefaultStylesTest extends WidgetFactory {
   @override
   void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
-    meta.op = BuildOp(defaultStyles: (_, __) => {'color': '#f00'});
-    meta.op = BuildOp(defaultStyles: (_, __) => {'color': '#0f0'});
+    meta.register(BuildOp(defaultStyles: (_, __) => {'color': '#f00'}));
+    meta.register(BuildOp(defaultStyles: (_, __) => {'color': '#0f0'}));
 
     return super.parseTag(meta, tag, attrs);
   }
@@ -110,14 +110,14 @@ class _DefaultStylesTest extends WidgetFactory {
 class _OnPiecesTestText extends WidgetFactory {
   @override
   void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
-    meta.op = BuildOp(onPieces: (_, pieces) {
+    meta.register(BuildOp(onPieces: (_, pieces) {
       for (final piece in pieces) {
         if (piece.hasWidgets) continue;
         piece.text.addText(' bar');
       }
 
       return pieces;
-    });
+    }));
     return super.parseTag(meta, tag, attrs);
   }
 }
@@ -125,7 +125,7 @@ class _OnPiecesTestText extends WidgetFactory {
 class _OnPiecesTestWidget extends WidgetFactory {
   @override
   void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
-    meta.op = BuildOp(onPieces: (_, pieces) {
+    meta.register(BuildOp(onPieces: (_, pieces) {
       for (final piece in pieces) {
         if (piece.hasWidgets) continue;
         for (final bit in List<TextBit>.unmodifiable(piece.text.bits)) {
@@ -136,7 +136,7 @@ class _OnPiecesTestWidget extends WidgetFactory {
       return [
         BuiltPiece.widgets([Text('Hi')])
       ];
-    });
+    }));
     return super.parseTag(meta, tag, attrs);
   }
 }
@@ -144,7 +144,7 @@ class _OnPiecesTestWidget extends WidgetFactory {
 class _OnWidgetsTest extends WidgetFactory {
   @override
   void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
-    meta.op = BuildOp(onWidgets: (_, __) => [Text('Hi')]);
+    meta.register(BuildOp(onWidgets: (_, __) => [Text('Hi')]));
     return super.parseTag(meta, tag, attrs);
   }
 }
@@ -157,14 +157,15 @@ class _PriorityTest extends WidgetFactory {
 
   @override
   void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
-    meta.op = BuildOp(
-      onPieces: (_, pieces) => pieces.map((p) => p..text?.addText(' A')),
-      priority: a,
-    );
-    meta.op = BuildOp(
-      onPieces: (_, pieces) => pieces.map((p) => p..text?.addText(' B')),
-      priority: b,
-    );
+    meta
+      ..register(BuildOp(
+        onPieces: (_, pieces) => pieces.map((p) => p..text?.addText(' A')),
+        priority: a,
+      ))
+      ..register(BuildOp(
+        onPieces: (_, pieces) => pieces.map((p) => p..text?.addText(' B')),
+        priority: b,
+      ));
 
     return super.parseTag(meta, tag, attrs);
   }

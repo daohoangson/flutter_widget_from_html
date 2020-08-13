@@ -12,13 +12,15 @@ class _StyleBgColor {
         onPieces: (meta, pieces) {
           if (meta.isBlockElement) return pieces;
 
-          final bgColor = wf.parseColor(meta.style(_kCssBackgroundColor));
+          final value = meta.getStyleValue(_kCssBackgroundColor);
+          final bgColor = wf.parseColor(value);
           if (bgColor == null) return pieces;
 
           return pieces.map((p) => p.hasWidgets ? p : _buildBlock(p, bgColor));
         },
         onWidgets: (meta, widgets) {
-          final color = wf.parseColor(meta.style(_kCssBackgroundColor));
+          final value = meta.getStyleValue(_kCssBackgroundColor);
+          final color = wf.parseColor(value);
           if (color == null) return null;
           return _listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
               (child) => wf.buildDecoratedBox(meta, child, color: color)));

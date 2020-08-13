@@ -45,14 +45,14 @@ class HtmlBuilder {
     }
 
     Iterable<WidgetPlaceholder> widgets = list;
-    if (parentMeta?.hasOps == true) {
+    if (parentMeta?.buildOps != null) {
       final _makeSureWidgetIsPlaceholder = (Widget widget) =>
           widget is WidgetPlaceholder
               ? widget
               : WidgetPlaceholder<NodeMetadata>(
                   child: widget, generator: parentMeta);
 
-      for (final op in parentMeta.ops) {
+      for (final op in parentMeta.buildOps) {
         widgets = op.onWidgets
                 ?.call(parentMeta, widgets)
                 ?.map(_makeSureWidgetIsPlaceholder)
@@ -68,15 +68,15 @@ class HtmlBuilder {
     final meta = NodeMetadata(parentMeta.tsb().sub(), parentOps);
     wf.parseTag(meta, e.localName, e.attributes);
 
-    if (meta.hasParents) {
-      for (final op in meta.parents) {
+    if (meta.parentOps != null) {
+      for (final op in meta.parentOps) {
         op.onChild?.call(meta, e);
       }
     }
 
     // stylings, step 1: get default styles from tag-based build ops
-    if (meta.hasOps) {
-      for (final op in meta.ops) {
+    if (meta.buildOps != null) {
+      for (final op in meta.buildOps) {
         final map = op.defaultStyles?.call(meta, e);
         if (map == null) continue;
         for (final pair in map.entries) {
@@ -101,7 +101,7 @@ class HtmlBuilder {
     }
 
     if (meta.isBlockElement) {
-      meta.op = wf.styleDisplayBlock();
+      meta.register(wf.styleDisplayBlock());
     }
 
     meta.domElement = e;
@@ -151,8 +151,8 @@ class HtmlBuilder {
     _saveTextPiece();
 
     Iterable<BuiltPiece> output = _pieces;
-    if (parentMeta?.hasOps == true) {
-      for (final op in parentMeta.ops) {
+    if (parentMeta?.buildOps != null) {
+      for (final op in parentMeta.buildOps) {
         output = op.onPieces?.call(parentMeta, output) ?? output;
       }
     }
@@ -193,8 +193,9 @@ class HtmlBuilder {
 
 Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, NodeMetadata meta) {
   // try to reuse existing list if possible
-  final withOnChild =
-      meta?.ops?.where((op) => op.onChild != null)?.toList(growable: false);
+  final withOnChild = meta?.buildOps
+      ?.where((op) => op.onChild != null)
+      ?.toList(growable: false);
   if (withOnChild?.isNotEmpty != true) return ops;
   return List.unmodifiable([if (ops != null) ...ops, ...withOnChild]);
 }

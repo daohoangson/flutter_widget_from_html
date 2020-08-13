@@ -195,11 +195,11 @@ class ImgMetadata {
 }
 
 class NodeMetadata {
-  List<BuildOp> _buildOps;
-  dom.Element _domElement;
   final Iterable<BuildOp> _parentOps;
   final TextStyleBuilder _tsb;
 
+  List<BuildOp> _buildOps;
+  dom.Element _domElement;
   bool _isBlockElement;
   bool isNotRenderable;
   List<String> _styles;
@@ -207,20 +207,16 @@ class NodeMetadata {
 
   NodeMetadata(this._tsb, [this._parentOps]);
 
+  Iterable<BuildOp> get buildOps => _buildOps;
+
   dom.Element get domElement => _domElement;
-
-  bool get hasOps => _buildOps != null;
-
-  bool get hasParents => _parentOps != null;
 
   bool get isBlockElement {
     if (_isBlockElement == true) return true;
     return _buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
   }
 
-  Iterable<BuildOp> get ops => _buildOps;
-
-  Iterable<BuildOp> get parents => _parentOps;
+  Iterable<BuildOp> get parentOps => _parentOps;
 
   Iterable<MapEntry<String, String>> get styleEntries sync* {
     _stylesFrozen = true;
@@ -246,12 +242,6 @@ class NodeMetadata {
 
   set isBlockElement(bool v) => _isBlockElement = v;
 
-  set op(BuildOp op) {
-    if (op == null) return;
-    _buildOps ??= [];
-    if (!_buildOps.contains(op)) _buildOps.add(op);
-  }
-
   void addStyle(String key, String value) {
     assert(!_stylesFrozen);
     _styles ??= [];
@@ -264,12 +254,18 @@ class NodeMetadata {
     _styles..insertAll(0, [key, value]);
   }
 
-  String style(String key) {
+  String getStyleValue(String key) {
     String value;
     for (final x in styleEntries) {
       if (x.key == key) value = x.value;
     }
     return value;
+  }
+
+  void register(BuildOp op) {
+    if (op == null) return;
+    _buildOps ??= [];
+    if (!buildOps.contains(op)) _buildOps.add(op);
   }
 
   TextStyleBuilder tsb<T>([

@@ -231,15 +231,15 @@ class WidgetFactory extends core.WidgetFactory {
         meta.tsb(_TagAEnhanced.setAccentColor);
         break;
       case 'iframe':
-        meta.op = tagIframe();
+        meta.register(tagIframe());
         // return asap to avoid being disabled by core
         return;
       case 'svg':
-        meta.op = tagSvg();
+        meta.register(tagSvg());
         // return asap to avoid being disabled by core
         return;
       case 'video':
-        meta.op = tagVideo(meta);
+        meta.register(tagVideo(meta));
         break;
     }
 
