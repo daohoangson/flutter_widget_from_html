@@ -261,7 +261,7 @@ class WidgetFactory {
     final built = widget.customWidgetBuilder(element);
     if (built == null) return;
 
-    meta.op = BuildOp(onWidgets: (_, __) => [built]);
+    meta.register(BuildOp(onWidgets: (_, __) => [built]));
   }
 
   GestureTapCallback gestureTapCallback(String url) => url != null
@@ -399,7 +399,7 @@ class WidgetFactory {
   void parseStyle(NodeMetadata meta, String key, String value) {
     switch (key) {
       case _kCssBackgroundColor:
-        meta.op = styleBgColor();
+        meta.register(styleBgColor());
         break;
 
       case _kCssBorderBottom:
@@ -455,7 +455,7 @@ class WidgetFactory {
             meta.isNotRenderable = true;
             break;
           case _kCssDisplayTable:
-            meta.op = tagTable(meta);
+            meta.register(tagTable(meta));
             break;
         }
         break;
@@ -485,7 +485,7 @@ class WidgetFactory {
       case _kCssMinHeight:
       case _kCssMinWidth:
       case _kCssWidth:
-        meta.op = styleSizing();
+        meta.register(styleSizing());
         break;
 
       case _kCssLineHeight:
@@ -524,23 +524,23 @@ class WidgetFactory {
         break;
 
       case _kCssVerticalAlign:
-        meta.op = styleVerticalAlign();
+        meta.register(styleVerticalAlign());
         break;
     }
 
     if (key.startsWith(_kCssMargin)) {
-      meta.op = styleMargin();
+      meta.register(styleMargin());
     }
 
     if (key.startsWith(_kCssPadding)) {
-      meta.op = stylePadding();
+      meta.register(stylePadding());
     }
   }
 
   void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
     switch (tag) {
       case 'a':
-        meta.op = tagA();
+        meta.register(tagA());
         break;
 
       case 'abbr':
@@ -586,7 +586,7 @@ class WidgetFactory {
         break;
 
       case 'br':
-        meta.op = tagBr();
+        meta.register(tagBr());
         break;
 
       case 'center':
@@ -604,7 +604,7 @@ class WidgetFactory {
       case _kTagCode:
       case _kTagPre:
       case _kTagTt:
-        meta.op = tagCode();
+        meta.register(tagCode());
         break;
 
       case 'dd':
@@ -628,11 +628,11 @@ class WidgetFactory {
         break;
 
       case 'font':
-        meta.op = tagFont();
+        meta.register(tagFont());
         break;
 
       case 'hr':
-        meta.op = tagHr();
+        meta.register(tagHr());
         break;
 
       case 'h1':
@@ -687,7 +687,7 @@ class WidgetFactory {
         break;
 
       case 'img':
-        meta.op = tagImg();
+        meta.register(tagImg());
         if (attrs.containsKey('height')) {
           meta.addStyle('height', "${attrs['height']}px");
         }
@@ -708,7 +708,7 @@ class WidgetFactory {
 
       case _kTagOrderedList:
       case _kTagUnorderedList:
-        meta.op = tagLi(meta);
+        meta.register(tagLi(meta));
         break;
 
       case 'mark':
@@ -724,11 +724,11 @@ class WidgetFactory {
         break;
 
       case 'q':
-        meta.op = tagQ();
+        meta.register(tagQ());
         break;
 
       case _kTagRuby:
-        meta.op = tagRuby(meta);
+        meta.register(tagRuby(meta));
         break;
 
       case 'small':
@@ -749,11 +749,11 @@ class WidgetFactory {
       case _kTagTable:
         meta
           ..addStyle(_kCssDisplay, _kCssDisplayTable)
-          ..op = _TagTable.cellPaddingOp(
+          ..register(_TagTable.cellPaddingOp(
               (attrs.containsKey(_kAttributeCellPadding)
                       ? double.tryParse(attrs[_kAttributeCellPadding])
                       : null) ??
-                  1);
+                  1));
         break;
       case _kTagTableHeaderCell:
         meta.tsb(_TextStyle.fontWeight, FontWeight.bold);

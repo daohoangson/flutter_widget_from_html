@@ -42,7 +42,7 @@ class _BlockquoteWebViewWf extends WidgetFactory {
   @override
   void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
     if (tag == 'blockquote') {
-      meta.op = blockquoteOp;
+      meta.register(blockquoteOp);
       return;
     }
 

@@ -33,7 +33,6 @@ class _TagTable {
     _tableOp = BuildOp(
       onChild: onChild,
       onWidgets: onWidgets,
-      priority: 999999,
     );
     return _tableOp;
   }
@@ -46,7 +45,7 @@ class _TagTable {
       case _kCssDisplayTableRow:
         final row = _TableDataRow();
         _data.rows.add(row);
-        childMeta.op = _TableRow(wf, childMeta, row)._rowOp;
+        childMeta.register(_TableRow(wf, childMeta, row)._rowOp);
         break;
       case _kCssDisplayTableHeaderGroup:
       case _kCssDisplayTableRowGroup:
@@ -56,13 +55,13 @@ class _TagTable {
             : which == _kCssDisplayTableRowGroup
                 ? _data.rows
                 : _data.footer.rows;
-        childMeta.op = _TableGroup(wf, childMeta, rows)._groupOp;
+        childMeta.register(_TableGroup(wf, childMeta, rows)._groupOp);
         break;
       case _kCssDisplayTableCaption:
-        childMeta.op = BuildOp(onWidgets: (meta, widgets) {
+        childMeta.register(BuildOp(onWidgets: (meta, widgets) {
           _data.caption = wf.buildColumnPlaceholder(meta, widgets);
           return [_data.caption];
-        });
+        }));
         break;
     }
   }
@@ -93,9 +92,9 @@ class _TagTable {
   }
 
   BorderSide _parseBorder() {
-    var styleBorder = tableMeta.style(_kCssBorder);
-    if (styleBorder != null) {
-      final borderParsed = wf.parseCssBorderSide(styleBorder);
+    final value = tableMeta.getStyleValue(_kCssBorder);
+    if (value != null) {
+      final borderParsed = wf.parseCssBorderSide(value);
       if (borderParsed != null) {
         return BorderSide(
           color: borderParsed.color ?? const Color(0xFF000000),
@@ -179,7 +178,7 @@ class _TableGroup {
 
     final row = _TableDataRow();
     rows.add(row);
-    childMeta.op = _TableRow(wf, childMeta, row)._rowOp;
+    childMeta.register(_TableRow(wf, childMeta, row)._rowOp);
   }
 }
 
@@ -212,7 +211,7 @@ class _TableRow {
       },
     );
 
-    childMeta.op = _cellOp;
+    childMeta.register(_cellOp);
   }
 
   static TableDataCell _build(NodeMetadata cellMeta, Widget child) {

@@ -42,8 +42,8 @@ class _TagRuby {
         );
 
         childMeta
-          ..op = _rtOp
-          ..addStyle(_kCssFontSize, '0.5em');
+          ..addStyle(_kCssFontSize, '0.5em')
+          ..register(_rtOp);
         break;
     }
   }

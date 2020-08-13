@@ -49,7 +49,7 @@ class _TagLi {
   }
 
   Map<String, String> defaultStyles(NodeMetadata _, dom.Element e) {
-    final p = listMeta.parents?.whereType<_TagLiOp>()?.length ?? 0;
+    final p = listMeta.parentOps?.whereType<_TagLiOp>()?.length ?? 0;
 
     final styles = {
       'padding-inline-start': '2.5em',
@@ -88,7 +88,7 @@ class _TagLi {
       },
     );
 
-    childMeta.op = _itemOp;
+    childMeta.register(_itemOp);
   }
 
   Widget _buildItem(Widget child, int i) {

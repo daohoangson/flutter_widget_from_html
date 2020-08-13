@@ -255,12 +255,12 @@ meta.tsb<bool>(callback, 2);
 - Other complicated styling are supported via `BuildOp`
 
 ```dart
-meta.op = BuildOp(
+meta.register(BuildOp(
   onPieces: (meta, pieces) => pieces,
   onWidgets: (meta, widgets) => widgets,
   ...,
   priority: 9999,
-);
+));
 ```
 
 - Each metadata can has multiple text style builder callbacks and build ops.
@@ -314,7 +314,7 @@ class _SmiliesWidgetFactory extends WidgetFactory {
         attrs.containsKey('alt') &&
         attrs.containsKey('class') &&
         attrs['class'].contains('smilie')) {
-      meta.op = smilieOp;
+      meta.register(smilieOp);
       return;
     }
 

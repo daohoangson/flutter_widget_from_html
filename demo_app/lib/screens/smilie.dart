@@ -39,7 +39,7 @@ class _SmiliesWidgetFactory extends WidgetFactory {
         attrs.containsKey('alt') &&
         attrs.containsKey('class') &&
         attrs['class'].contains('smilie')) {
-      meta.op = smilieOp;
+      meta.register(smilieOp);
       return;
     }
 
