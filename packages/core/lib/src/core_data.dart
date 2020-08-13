@@ -236,7 +236,7 @@ class NodeMetadata {
   List<String> _styles;
   bool _stylesFrozen = false;
 
-  NodeMetadata(this._tsb, this._parentOps);
+  NodeMetadata(this._tsb, [this._parentOps]);
 
   dom.Element get domElement => _domElement;
 

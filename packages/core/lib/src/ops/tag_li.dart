@@ -74,7 +74,7 @@ class _TagLi extends BuildOp {
 
     _itemOp ??= BuildOp(
       onWidgets: (meta, widgets) {
-        final column = wf.buildColumnPlaceholder(widgets) ??
+        final column = wf.buildColumnPlaceholder(meta, widgets) ??
             WidgetPlaceholder<_TagLi>(
               child: widget0,
               generator: this,
@@ -92,7 +92,6 @@ class _TagLi extends BuildOp {
 
   Widget _buildItem(Widget child, int i) {
     final meta = _itemMetas[i];
-    final tsh = meta.tsb().build();
     final listStyleType =
         _ListConfig.listStyleTypeFromNodeMetadata(meta) ?? config.listStyleType;
     final markerIndex = config.markerReversed == true
@@ -100,12 +99,12 @@ class _TagLi extends BuildOp {
         : (config.markerStart ?? 1) + i;
     final markerText = wf.getListStyleMarker(listStyleType, markerIndex);
 
-    return Stack(
-      children: <Widget>[
+    return wf.buildStack(
+      meta,
+      <Widget>[
         child,
-        _buildMarker(tsh, markerText),
+        _buildMarker(meta.tsb().build(), markerText),
       ],
-      overflow: Overflow.visible,
     );
   }
 

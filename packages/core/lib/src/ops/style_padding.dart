@@ -42,7 +42,7 @@ class _StylePadding {
           final padding = wf.parseCssLengthBox(meta, _kCssPadding);
           if (padding == null) return null;
 
-          return _listOrNull(wf.buildColumnPlaceholder(widgets)?.wrapWith(
+          return _listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
               (child) => _build(child, padding, meta.tsb().build())));
         },
         priority: 9999,

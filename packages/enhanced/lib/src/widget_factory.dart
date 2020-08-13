@@ -102,7 +102,7 @@ class WidgetFactory extends core.WidgetFactory {
       url?.isNotEmpty == true ? CachedNetworkImageProvider(url) : null;
 
   @override
-  Widget buildTable(TableData table) {
+  Widget buildTable(NodeMetadata meta, TableData table) {
     final cols = table.cols;
     if (cols == 0) return null;
     final templateColumnSizes = List<TrackSize>(cols);
@@ -148,8 +148,9 @@ class WidgetFactory extends core.WidgetFactory {
 
     if (border == null) return layoutGrid;
 
-    return Stack(
-      children: <Widget>[
+    return buildStack(
+      meta,
+      <Widget>[
         layoutGrid,
         Positioned.fill(child: Container(decoration: border))
       ],

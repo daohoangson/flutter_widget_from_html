@@ -14,7 +14,6 @@ class HtmlBuilder {
   final NodeMetadata parentMeta;
   final Iterable<BuildOp> parentOps;
   final TextBits parentText;
-  final TextStyleBuilder parentTsb;
   final WidgetFactory wf;
 
   final _pieces = <BuiltPiece>[];
@@ -23,13 +22,12 @@ class HtmlBuilder {
 
   HtmlBuilder({
     @required this.domNodes,
-    this.parentMeta,
+    @required this.parentMeta,
     Iterable<BuildOp> parentParentOps,
     this.parentText,
-    @required this.parentTsb,
     @required this.wf,
   })  : assert(domNodes != null),
-        assert(parentTsb != null),
+        assert(parentMeta != null),
         assert(wf != null),
         parentOps = _prepareParentOps(parentParentOps, parentMeta);
 
@@ -42,7 +40,7 @@ class HtmlBuilder {
           if (widget != null) list.add(widget);
         }
       } else {
-        final built = wf.buildText(piece.text);
+        final built = wf.buildText(parentMeta, piece.text);
         if (built != null) list.add(built);
       }
     }
@@ -58,7 +56,7 @@ class HtmlBuilder {
   }
 
   NodeMetadata collectMetadata(dom.Element e) {
-    final meta = NodeMetadata(parentTsb.sub(), parentOps);
+    final meta = NodeMetadata(parentMeta.tsb().sub(), parentOps);
     wf.parseTag(meta, e.localName, e.attributes);
 
     if (meta.hasParents) {
@@ -121,7 +119,6 @@ class HtmlBuilder {
         parentMeta: meta,
         parentParentOps: parentOps,
         parentText: isBlockElement ? null : _textPiece.text,
-        parentTsb: meta?.tsb() ?? parentTsb,
         wf: wf,
       );
 
@@ -176,8 +173,8 @@ class HtmlBuilder {
   }
 
   void _newTextPiece() => _textPiece = BuiltPiece.text(
-      (_pieces.isEmpty ? parentText?.sub(parentTsb) : null) ??
-          TextBits(parentTsb));
+      (_pieces.isEmpty ? parentText?.sub(parentMeta.tsb()) : null) ??
+          TextBits(parentMeta.tsb()));
 
   void _saveTextPiece() {
     _pieces.add(_textPiece);

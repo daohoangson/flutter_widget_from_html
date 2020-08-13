@@ -55,11 +55,11 @@ class _TagRuby extends BuildOp {
       if (piece.hasWidgets || processed) return piece;
       processed = true;
 
-      final rtBuilt = wf.buildText(_rtText);
+      final rtBuilt = wf.buildText(meta, _rtText);
       if (rtBuilt == null) return piece;
 
       final text = piece.text;
-      final built = wf.buildText(text);
+      final built = wf.buildText(meta, text);
       if (built == null) return piece;
 
       final parent = text.parent;
@@ -72,23 +72,19 @@ class _TagRuby extends BuildOp {
     }).toList(growable: false);
   }
 
-  TextBit _buildTextBit(
-    TextBits parent,
-    Widget ruby,
-    Widget rt,
-  ) {
+  TextBit _buildTextBit(TextBits parent, Widget ruby, Widget rt) {
     final tsh = _rtText.tsb.build();
     final padding = tsh.style.fontSize *
         .75 *
         tsh.deps.getValue<MediaQueryData>().textScaleFactor;
 
     final widget = WidgetPlaceholder<_TagRuby>(
-      child: Stack(
-        children: <Widget>[
+      child: wf.buildStack(
+        rubyMeta,
+        <Widget>[
           wf.buildPadding(ruby, EdgeInsets.symmetric(vertical: padding)),
           Positioned.fill(bottom: null, child: Center(child: rt)),
         ],
-        overflow: Overflow.visible,
       ),
       generator: this,
     );

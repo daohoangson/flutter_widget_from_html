@@ -53,10 +53,11 @@ class WidgetFactory {
 
   HtmlWidget get widget => _widget;
 
-  WidgetPlaceholder buildBody(Iterable<Widget> children) =>
-      buildColumnPlaceholder(children, trimMarginVertical: true);
+  WidgetPlaceholder buildBody(NodeMetadata meta, Iterable<Widget> children) =>
+      buildColumnPlaceholder(meta, children, trimMarginVertical: true);
 
   WidgetPlaceholder buildColumnPlaceholder(
+    NodeMetadata meta,
     Iterable<Widget> children, {
     bool trimMarginVertical = false,
   }) {
@@ -75,20 +76,23 @@ class WidgetFactory {
     }
 
     return _ColumnPlaceholder(
-      this,
       children,
+      meta: meta,
       trimMarginVertical: trimMarginVertical,
+      wf: this,
     );
   }
 
-  Widget buildColumnWidget(List<Widget> children) {
+  Widget buildColumnWidget(List<Widget> children,
+      {TextDirection textDirection}) {
     if (children?.isNotEmpty != true) return null;
     if (children.length == 1) return children.first;
 
     return Column(
+      children: children,
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      children: children,
+      textDirection: textDirection,
     );
   }
 
@@ -206,7 +210,13 @@ class WidgetFactory {
           ? Padding(child: child, padding: padding)
           : child;
 
-  Widget buildTable(TableData table) {
+  Widget buildStack(NodeMetadata meta, List<Widget> children) => Stack(
+        children: children,
+        overflow: Overflow.visible,
+        textDirection: meta.tsb().build().textDirection,
+      );
+
+  Widget buildTable(NodeMetadata meta, TableData table) {
     final rows = <TableRow>[];
     final slotIndices = <int>[];
     final tableCols = table.cols;
@@ -238,7 +248,7 @@ class WidgetFactory {
     return Table(border: tableBorder, children: rows);
   }
 
-  WidgetPlaceholder buildText(TextBits text) {
+  WidgetPlaceholder buildText(NodeMetadata meta, TextBits text) {
     text.trimRight();
     if (text.isEmpty) return null;
 
@@ -273,7 +283,7 @@ class WidgetFactory {
       );
     }
 
-    return buildColumnPlaceholder(widgets);
+    return buildColumnPlaceholder(meta, widgets);
   }
 
   String constructFullUrl(String url) {
@@ -773,8 +783,8 @@ class WidgetFactory {
 
   BuildOp styleDisplayBlock() {
     _styleDisplayBlock ??= BuildOp(
-      onWidgets: (_, widgets) =>
-          _listOrNull(buildColumnPlaceholder(widgets)?.wrapWith(_cssBlock)),
+      onWidgets: (meta, widgets) => _listOrNull(
+          buildColumnPlaceholder(meta, widgets)?.wrapWith(_cssBlock)),
       priority: 9223372036854775807,
     );
     return _styleDisplayBlock;

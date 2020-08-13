@@ -583,40 +583,41 @@ void main() {
   });
 
   group('rtl', () {
+    final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';
+
     final explainerExpected =
-        '[CssBlock:child=[Padding:(0,25,0,0),child=[Column:children='
-        '[CssBlock:child=[Stack:children=[RichText:dir=rtl,(:One)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:1.)]]]]],'
-        '[CssBlock:child=[Stack:children=[RichText:dir=rtl,(:Two)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:2.)]]]]],'
-        '[CssBlock:child=[Stack:children=[RichText:dir=rtl,(+b:Three)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:3.)]]]]]'
+        '[CssBlock:child=[Padding:(0,25,0,0),child=[Column:dir=rtl,children='
+        '[CssBlock:child=[Stack:dir=rtl,children=[RichText:dir=rtl,(:One)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:1.)]]]]],'
+        '[CssBlock:child=[Stack:dir=rtl,children=[RichText:dir=rtl,(:Two)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:2.)]]]]],'
+        '[CssBlock:child=[Stack:dir=rtl,children=[RichText:dir=rtl,(+b:Three)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:3.)]]]]]'
         ']]]';
 
     final nonExplainerExpected = '└CssBlock()\n'
         ' └Padding(padding: EdgeInsets(0.0, 0.0, 25.0, 0.0))\n'
-        '  └Column(direction: vertical, mainAxisAlignment: start, mainAxisSize: min, crossAxisAlignment: start)\n'
+        '  └Column(direction: vertical, mainAxisAlignment: start, mainAxisSize: min, crossAxisAlignment: start, textDirection: rtl)\n'
         '   ├WidgetPlaceholder<TextBits>\n'
         '   │└CssBlock()\n'
-        '   │ └Stack(alignment: topStart, fit: loose)\n'
+        '   │ └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
         '   │  ├RichText(textDirection: rtl, text: "One")\n'
         '   │  └Positioned(top: 0.0, right: -45.0)\n'
         '   │   └SizedBox(width: 40.0)\n'
         '   │    └RichText(textAlign: left, textDirection: rtl, text: "1.")\n'
         '   ├WidgetPlaceholder<TextBits>\n'
         '   │└CssBlock()\n'
-        '   │ └Stack(alignment: topStart, fit: loose)\n'
+        '   │ └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
         '   │  ├RichText(textDirection: rtl, text: "Two")\n'
         '   │  └Positioned(top: 0.0, right: -45.0)\n'
         '   │   └SizedBox(width: 40.0)\n'
         '   │    └RichText(textAlign: left, textDirection: rtl, text: "2.")\n'
         '   └WidgetPlaceholder<TextBits>\n'
         '    └CssBlock()\n'
-        '     └Stack(alignment: topStart, fit: loose)\n'
+        '     └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
         '      ├RichText(textDirection: rtl, text: "Three")\n'
         '      └Positioned(top: 0.0, right: -45.0)\n'
         '       └SizedBox(width: 40.0)\n'
         '        └RichText(textAlign: left, textDirection: rtl, text: "3.")';
 
     testWidgets('renders ordered list', (WidgetTester tester) async {
-      final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';
       final explained = await explain(tester, null,
           hw: Directionality(
             child: HtmlWidget(html, key: hwKey),
@@ -626,7 +627,6 @@ void main() {
     });
 
     testWidgets('renders ordered list useExplainer=false', (tester) async {
-      final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';
       final explained = await explain(
         tester,
         null,
@@ -641,9 +641,8 @@ void main() {
     });
 
     testWidgets('renders within dir attribute', (tester) async {
-      final html =
-          '<div dir="rtl"><ol><li>One</li><li>Two</li><li><b>Three</b></li><ol></div>';
-      final explained = await explain(tester, html, useExplainer: false);
+      final _dirRtl = '<div dir="rtl">$html</div>';
+      final explained = await explain(tester, _dirRtl, useExplainer: false);
       expect(
           explained, equals('_ColumnPlaceholder\n$nonExplainerExpected\n\n'));
     });

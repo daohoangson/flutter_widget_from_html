@@ -93,6 +93,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
 
   Widget _cache;
   Future<Widget> _future;
+  NodeMetadata _rootMeta;
   _RootTsb _rootTsb;
   WidgetFactory _wf;
 
@@ -103,6 +104,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     super.initState();
 
     _rootTsb = _RootTsb(this);
+    _rootMeta = NodeMetadata(_rootTsb);
     _wf = widget.factoryBuilder();
 
     if (buildAsync) {
@@ -146,7 +148,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     final domNodes = await compute(_parseHtml, widget.html);
 
     Timeline.startSync('Build $widget (async)');
-    final built = _buildBody(_rootTsb, _wf, widget, domNodes);
+    final built = _buildBody(_rootMeta, _wf, widget, domNodes);
     Timeline.finishSync();
 
     return built;
@@ -156,7 +158,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     Timeline.startSync('Build $widget (sync)');
 
     final domNodes = _parseHtml(widget.html);
-    final built = _buildBody(_rootTsb, _wf, widget, domNodes);
+    final built = _buildBody(_rootMeta, _wf, widget, domNodes);
 
     Timeline.finishSync();
 
@@ -213,12 +215,11 @@ Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
             child: CircularProgressIndicator(),
           ));
 
-Widget _buildBody(_RootTsb rootTsb, WidgetFactory wf, HtmlWidget widget,
+Widget _buildBody(NodeMetadata rootMeta, WidgetFactory wf, HtmlWidget widget,
     dom.NodeList domNodes) {
-  rootTsb.reset();
   wf.reset(widget);
-  final builder = HtmlBuilder(domNodes: domNodes, parentTsb: rootTsb, wf: wf);
-  return wf.buildBody(builder.build()) ?? widget0;
+  final builder = HtmlBuilder(domNodes: domNodes, parentMeta: rootMeta, wf: wf);
+  return wf.buildBody(rootMeta, builder.build()) ?? widget0;
 }
 
 dom.NodeList _parseHtml(String html) => parser.parse(html).body.nodes;

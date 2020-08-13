@@ -117,7 +117,7 @@ Future<String> explain(
   return explained;
 }
 
-final _explainMarginRegExp = RegExp(r'^\[Column:children='
+final _explainMarginRegExp = RegExp(r'^\[Column:(dir=rtl,)?children='
     r'\[RichText:(dir=rtl,)?\(:x\)\],'
     r'(.+),'
     r'\[RichText:(dir=rtl,)?\(:x\)\]'
@@ -135,7 +135,7 @@ Future<String> explainMargin(
     rtl: rtl,
   );
   final match = _explainMarginRegExp.firstMatch(explained);
-  return match == null ? explained : match[2];
+  return match == null ? explained : match[3];
 }
 
 class Explainer {
@@ -420,9 +420,13 @@ class Explainer {
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null)));
 
-    attr.add(_textDirection(widget is RichText
+    attr.add(_textDirection(widget is Column
         ? widget.textDirection
-        : (widget is Text ? widget.textDirection : null)));
+        : widget is RichText
+            ? widget.textDirection
+            : widget is Stack
+                ? widget.textDirection
+                : (widget is Text ? widget.textDirection : null)));
 
     attr.add(_textOverflow(widget is RichText
         ? widget.overflow
