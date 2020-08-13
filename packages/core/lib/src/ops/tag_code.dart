@@ -12,26 +12,21 @@ class _TagCode {
   _TagCode(this.wf);
 
   BuildOp get buildOp => BuildOp(
-      defaultStyles: (_, __) =>
-          const {_kCssFontFamily: '$_kTagCodeFont1, $_kTagCodeFont2'},
-      onPieces: (meta, pieces) => meta.domElement.localName == _kTagPre
-          ? [_resetText(pieces.first, meta)]
-          : pieces,
-      onWidgets: (_, widgets) {
-        final body = wf.buildColumn(widgets);
-        if (body == null) return widgets;
-
-        return [
-          SingleChildScrollView(
-            child: body,
-            scrollDirection: Axis.horizontal,
-          )
-        ];
-      });
+        defaultStyles: (_, __) =>
+            const {_kCssFontFamily: '$_kTagCodeFont1, $_kTagCodeFont2'},
+        onPieces: (meta, pieces) => meta.domElement.localName == _kTagPre
+            ? [_resetText(pieces.first, meta)]
+            : pieces,
+        onWidgets: (_, widgets) => _listOrNull(wf
+            .buildColumnPlaceholder(widgets)
+            ?.wrapWith(wf.buildHorizontalScrollView)),
+      );
 
   BuiltPiece _resetText(BuiltPiece piece, NodeMetadata meta) {
     final text = piece.text;
-    List.unmodifiable(text.bits).forEach((bit) => bit.detach());
+    for (final bit in List<TextBit>.unmodifiable(text.bits)) {
+      bit.detach();
+    }
     text.addText(meta.domElement.text);
 
     return piece;

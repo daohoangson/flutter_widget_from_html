@@ -4,9 +4,9 @@ import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
+import 'package:html/dom.dart' as dom;
 import 'package:url_launcher/url_launcher.dart';
 
-import 'builder.dart';
 import 'data.dart';
 import 'helpers.dart';
 import 'html_widget.dart';
@@ -22,27 +22,26 @@ class WidgetFactory extends core.WidgetFactory {
   BuildOp _tagAExtended;
   BuildOp _tagIframe;
   BuildOp _tagSvg;
-  BuildOp _tagVideo;
   HtmlWidget _widget;
 
   @override
   Widget buildDivider() => const Divider(height: 1);
 
   @override
-  Iterable<Widget> buildGestureDetectors(
-    BuildContext _,
-    Iterable<Widget> widgets,
-    GestureTapCallback onTap,
-  ) =>
-      widgets?.map((widget) => InkWell(child: widget, onTap: onTap));
+  Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
+      InkWell(child: child, onTap: onTap);
 
   @override
   GestureTapCallback buildGestureTapCallbackForUrl(String url) {
     if (url == null) return null;
-    if (_widget?.onTapUrl == null) {
-      return () => canLaunch(url).then((ok) => ok ? launch(url) : null);
-    }
-    return () => _widget.onTapUrl(url);
+    final callback = _widget?.onTapUrl ?? _defaultGestureTapCallbackForUrl;
+    return () => callback(url);
+  }
+
+  Future<void> _defaultGestureTapCallbackForUrl(String url) async {
+    final ok = await canLaunch(url);
+    if (ok) return launch(url);
+    print("[flutter_widget_from_html] Tapped url $url (couldn't launch)");
   }
 
   @override
@@ -64,7 +63,9 @@ class WidgetFactory extends core.WidgetFactory {
   Object buildImageProvider(String url) =>
       url?.startsWith('data:image/svg+xml') == true
           ? buildSvgMemoryPicture(url)
-          : Uri.tryParse(url)?.path?.toLowerCase()?.endsWith('.svg') == true
+          : url != null &&
+                  Uri.tryParse(url)?.path?.toLowerCase()?.endsWith('.svg') ==
+                      true
               ? buildSvgPictureProvider(url)
               : super.buildImageProvider(url);
 
@@ -104,12 +105,14 @@ class WidgetFactory extends core.WidgetFactory {
   @override
   Widget buildTable(TableData table) {
     final cols = table.cols;
+    if (cols == 0) return null;
     final templateColumnSizes = List<TrackSize>(cols);
     for (var c = 0; c < cols; c++) {
       templateColumnSizes[c] = FlexibleTrackSize(1);
     }
 
     final rows = table.rows;
+    if (rows == 0) return null;
     final templateRowSizes = List<TrackSize>(rows);
     for (var r = 0; r < rows; r++) {
       templateRowSizes[r] = IntrinsicContentTrackSize();
@@ -121,7 +124,7 @@ class WidgetFactory extends core.WidgetFactory {
 
     final layoutGrid = LayoutGrid(
       children: table.slots.map((slot) {
-        Widget cell = SizedBox.expand(child: buildColumn(slot.cell.children));
+        Widget cell = SizedBox.expand(child: slot.cell.child);
 
         if (border != null) {
           cell = Container(
@@ -228,7 +231,7 @@ class WidgetFactory extends core.WidgetFactory {
         // return asap to avoid being disabled by core
         return;
       case 'video':
-        meta.op = tagVideo();
+        meta.op = tagVideo(meta);
         break;
     }
 
@@ -256,8 +259,5 @@ class WidgetFactory extends core.WidgetFactory {
     return _tagSvg;
   }
 
-  BuildOp tagVideo() {
-    _tagVideo ??= _TagVideo(this).buildOp;
-    return _tagVideo;
-  }
+  BuildOp tagVideo(NodeMetadata meta) => _TagVideo(this, meta);
 }

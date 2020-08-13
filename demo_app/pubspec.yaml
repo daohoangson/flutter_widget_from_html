@@ -12,7 +12,9 @@ dependencies:
   flutter_widget_from_html: any
   flutter_widget_from_html_core: any
   html: any
+  http: any
   provider: ^3.0.0+1
+  url_launcher: any
 
 dependency_overrides:            # dep_override
   flutter_widget_from_html:      # dep_override

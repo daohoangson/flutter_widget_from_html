@@ -4,92 +4,100 @@ const _kTagRuby = 'ruby';
 const _kTagRp = 'rp';
 const _kTagRt = 'rt';
 
-class _TagRuby {
+class _TagRuby extends BuildOp {
+  final NodeMetadata rubyMeta;
   final WidgetFactory wf;
 
-  _TagRuby(this.wf);
+  BuildOp _rtOp;
+  TextBits _rtText;
 
-  BuildOp get buildOp {
-    TextBits rtText;
+  _TagRuby(this.wf, this.rubyMeta);
 
-    return BuildOp(
-      onChild: (meta, e) {
-        switch (e.localName) {
-          case _kTagRp:
-            meta.styles = [_kCssDisplay, _kCssDisplayNone];
-            break;
-          case _kTagRt:
-            meta
-              ..op = BuildOp(
-                onPieces: (_, pieces) {
-                  for (final piece in pieces) {
-                    if (piece.hasWidgets) continue;
-                    rtText = piece.text..detach();
-                    break;
-                  }
+  @override
+  bool get hasOnChild => true;
 
-                  return [];
-                },
-              )
-              ..styles = [_kCssFontSize, '0.5em'];
-            break;
-        }
+  @override
+  void onChild(NodeMetadata childMeta, dom.Element e) {
+    if (e.parent != rubyMeta.domElement) return;
 
-        return meta;
-      },
-      onPieces: (_, pieces) => pieces.map((piece) {
-        if (piece.hasWidgets || rtText == null) return piece;
-        final _rtText = rtText;
-        rtText = null;
+    switch (e.localName) {
+      case _kTagRp:
+        childMeta.addStyle(_kCssDisplay, _kCssDisplayNone);
+        break;
+      case _kTagRt:
+        _rtOp ??= BuildOp(
+          onPieces: (_, pieces) {
+            for (final piece in pieces) {
+              if (piece.hasWidgets) continue;
+              _rtText = piece.text..detach();
+            }
 
-        final rtBuilt = wf.buildText(_rtText);
-        if (rtBuilt == null) return piece;
+            return [];
+          },
+        );
 
-        final text = piece.text;
-        final built = wf.buildText(text);
-        if (built == null) return piece;
+        childMeta
+          ..op = _rtOp
+          ..addStyle(_kCssFontSize, '0.5em');
+        break;
+    }
+  }
 
-        final parent = text.parent;
-        final replacement = parent.sub(text.tsb)..detach();
-        text.replaceWith(replacement);
+  @override
+  Iterable<BuiltPiece> onPieces(
+    NodeMetadata meta,
+    Iterable<BuiltPiece> pieces,
+  ) {
+    if (_rtText == null) return pieces;
+    var processed = false;
 
-        replacement.add(_buildTextBit(parent, built, rtBuilt, _rtText.tsb));
+    return pieces.map((piece) {
+      if (piece.hasWidgets || processed) return piece;
+      processed = true;
 
-        return BuiltPiece.text(replacement);
-      }),
-    );
+      final rtBuilt = wf.buildText(_rtText);
+      if (rtBuilt == null) return piece;
+
+      final text = piece.text;
+      final built = wf.buildText(text);
+      if (built == null) return piece;
+
+      final parent = text.parent;
+      final replacement = parent.sub(text.tsb)..detach();
+      text.replaceWith(replacement);
+
+      replacement.add(_buildTextBit(parent, built, rtBuilt));
+
+      return BuiltPiece.text(replacement);
+    }).toList(growable: false);
   }
 
   TextBit _buildTextBit(
     TextBits parent,
     Widget ruby,
     Widget rt,
-    TextStyleBuilders rtTsb,
   ) =>
       TextWidget(
         parent,
-        WidgetPlaceholder<_TagRuby>(builder: (context, _, __) {
-          final rtTsh = rtTsb.build(context);
-          final padding = EdgeInsets.symmetric(
-              vertical: rtTsh.style.fontSize *
-                  .75 *
-                  MediaQuery.of(context).textScaleFactor);
-
-          return [
-            Stack(
+        WidgetPlaceholder<_TagRuby>(
+          child: Builder(
+            builder: (context) => Stack(
               children: <Widget>[
-                wf.buildPadding(ruby, padding),
-                Positioned(
-                  child: Center(child: rt),
-                  left: 0,
-                  right: 0,
-                  top: 0,
+                wf.buildPadding(
+                  ruby,
+                  EdgeInsets.symmetric(
+                    vertical: _rtText.tsb.build(context).style.fontSize *
+                        .75 *
+                        MediaQuery.of(context).textScaleFactor,
+                  ),
                 ),
+                Positioned.fill(bottom: null, child: Center(child: rt)),
               ],
               overflow: Overflow.visible,
-            )
-          ];
-        }),
+            ),
+          ),
+          generator: this,
+        ),
         alignment: PlaceholderAlignment.middle,
       );
 }

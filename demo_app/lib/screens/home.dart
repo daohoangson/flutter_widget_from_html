@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'compare.dart';
 import 'custom_styles_builder.dart';
 import 'custom_widget_builder.dart';
+import 'font_size.dart';
 import 'hello_world.dart';
 import 'hello_world_core.dart';
 import 'iframe.dart';
@@ -10,6 +11,7 @@ import 'iframe_twitter.dart';
 import 'img.dart';
 import 'smilie.dart';
 import 'video.dart';
+import 'wordpress.dart';
 
 class HomeScreen extends StatelessWidget {
   final _htmls = {
@@ -188,7 +190,9 @@ C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."
     'Hello World': () => HelloWorldScreen(),
     'customStylesBuilder': () => CustomStylesBuilderScreen(),
     'customWidgetBuilder': () => CustomWidgetBuilderScreen(),
+    'font-size': () => FontSizeScreen(),
     'Smilie': () => SmilieScreen(),
+    'Wordpress': () => WordpressScreen(),
   };
 
   @override

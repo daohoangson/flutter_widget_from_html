@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
-import 'dart:ui' as ui show ParagraphBuilder;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -12,13 +11,12 @@ import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_html_widget.dart';
 
+part 'ops/column.dart';
 part 'ops/style_bg_color.dart';
 part 'ops/style_direction.dart';
-part 'ops/style_line_height.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_padding.dart';
 part 'ops/style_sizing.dart';
-part 'ops/style_text_align.dart';
 part 'ops/style_vertical_align.dart';
 part 'ops/tag_a.dart';
 part 'ops/tag_code.dart';
@@ -29,6 +27,7 @@ part 'ops/tag_q.dart';
 part 'ops/tag_ruby.dart';
 part 'ops/tag_table.dart';
 part 'ops/text.dart';
+part 'ops/text_style.dart';
 part 'parser/border.dart';
 part 'parser/color.dart';
 part 'parser/css.dart';
@@ -43,7 +42,6 @@ class WidgetFactory {
   BuildOp _styleMargin;
   BuildOp _stylePadding;
   BuildOp _styleSizing;
-  BuildOp _styleTextAlign;
   BuildOp _styleVerticalAlign;
   BuildOp _tagA;
   BuildOp _tagBr;
@@ -51,71 +49,48 @@ class WidgetFactory {
   BuildOp _tagFont;
   BuildOp _tagHr;
   BuildOp _tagImg;
-  BuildOp _tagLi;
   BuildOp _tagQ;
-  BuildOp _tagTable;
   HtmlWidget _widget;
 
   HtmlWidget get widget => _widget;
 
-  Widget buildBody(Iterable<Widget> children) => buildColumn(children);
+  WidgetPlaceholder buildBody(Iterable<Widget> children) =>
+      buildColumnPlaceholder(children, trimMarginVertical: true);
 
-  WidgetPlaceholder buildColumn(Iterable<Widget> children) =>
-      children?.isNotEmpty == true
-          ? (children.length == 1 && children.first is WidgetPlaceholder
-              ? (children.first as WidgetPlaceholder).wrapWith(_buildColumn)
-              : WidgetPlaceholder(
-                  builder: _buildColumn,
-                  children: children,
-                ))
-          : null;
+  WidgetPlaceholder buildColumnPlaceholder(
+    Iterable<Widget> children, {
+    bool trimMarginVertical = false,
+  }) {
+    if (children?.isNotEmpty != true) return null;
 
-  static Iterable<Widget> _buildColumn(BuildContext c, Iterable<Widget> ws, _) {
-    if (ws == null) return null;
+    if (children.length == 1) {
+      final first = children.first;
+      if (first is WidgetPlaceholder) {
+        if (first is! _ColumnPlaceholder) return first;
 
-    final output = <Widget>[];
-    final iter = ws.iterator;
-    while (iter.moveNext()) {
-      if (!(iter.current is _MarginVerticalPlaceholder)) break;
+        final existingPlaceholder = first as _ColumnPlaceholder;
+        if (existingPlaceholder.trimMarginVertical == trimMarginVertical) {
+          return first;
+        }
+      }
     }
 
-    if (iter.current == null) return null;
+    return _ColumnPlaceholder(
+      this,
+      children,
+      trimMarginVertical: trimMarginVertical,
+    );
+  }
 
-    Widget prev;
-    while (output.isEmpty || iter.moveNext()) {
-      var widget = iter.current;
+  Widget buildColumnWidget(List<Widget> children) {
+    if (children?.isNotEmpty != true) return null;
+    if (children.length == 1) return children.first;
 
-      if (widget is _MarginVerticalPlaceholder &&
-          prev is _MarginVerticalPlaceholder) {
-        prev.mergeWith(widget);
-        continue;
-      }
-
-      if (widget is WidgetPlaceholder<TextBits>) {
-        widget = (widget as WidgetPlaceholder).build(c);
-      }
-
-      if (widget is Column) {
-        final Column column = widget;
-        output.addAll(column.children);
-        widget = column.children.last;
-      } else {
-        output.add(widget);
-      }
-
-      prev = widget;
-    }
-
-    while (output.isNotEmpty) {
-      if (output.last is _MarginVerticalPlaceholder) {
-        output.removeLast();
-        continue;
-      }
-
-      break;
-    }
-
-    return output;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: children,
+    );
   }
 
   Widget buildDecoratedBox(
@@ -131,21 +106,16 @@ class WidgetFactory {
             )
           : child;
 
+  Widget buildDirectionality(Widget child, TextDirection textDirection) =>
+      Directionality(child: child, textDirection: textDirection);
+
   Widget buildDivider() => const DecoratedBox(
         decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 1)),
         child: SizedBox(height: 1),
       );
 
-  FontStyle buildFontStyle(NodeMetadata meta) => meta?.fontStyleItalic != null
-      ? (meta.fontStyleItalic == true ? FontStyle.italic : FontStyle.normal)
-      : null;
-
-  Iterable<Widget> buildGestureDetectors(
-    BuildContext _,
-    Iterable<Widget> widgets,
-    GestureTapCallback onTap,
-  ) =>
-      widgets?.map((widget) => GestureDetector(child: widget, onTap: onTap));
+  Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
+      GestureDetector(child: child, onTap: onTap);
 
   GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
       ? () => widget.onTapUrl != null
@@ -153,7 +123,7 @@ class WidgetFactory {
           : print('[flutter_widget_from_html] Tapped url $url')
       : null;
 
-  InlineSpan buildGestureTapCallbackSpan(
+  TextSpan buildGestureTapCallbackSpan(
     String text,
     GestureTapCallback onTap,
     TextStyle style,
@@ -163,6 +133,9 @@ class WidgetFactory {
         recognizer: TapGestureRecognizer()..onTap = onTap,
         style: style,
       );
+
+  Widget buildHorizontalScrollView(Widget child) =>
+      SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
 
   Widget buildImage(Object provider, ImgMetadata img) =>
       provider != null && provider is ImageProvider && img != null
@@ -253,13 +226,14 @@ class WidgetFactory {
         }
 
         slotIndices.add(slot.index);
-        cells[c] = TableCell(
-          child: buildColumn(slot.cell.children),
-        );
+        cells[c] = TableCell(child: slot.cell.child);
       }
 
+      if (cells.isEmpty) continue;
       rows.add(TableRow(children: cells));
     }
+
+    if (rows.isEmpty) return null;
 
     final tableBorder = table.border != null
         // TODO: support different styling for border sides
@@ -268,157 +242,43 @@ class WidgetFactory {
     return Table(border: tableBorder, children: rows);
   }
 
-  WidgetPlaceholder<TextBits> buildText(TextBits text) =>
-      (text..trimRight()).isNotEmpty
-          ? WidgetPlaceholder(
-              builder: _buildText,
-              input: text,
-            )
-          : null;
+  WidgetPlaceholder buildText(TextBits text) {
+    text.trimRight();
+    if (text.isEmpty) return null;
 
-  static Iterable<Widget> _buildText(
-    BuildContext context,
-    Iterable<Widget> _,
-    TextBits text,
-  ) {
     final tsb = text.tsb;
-    final tsh = tsb?.build(context);
+    final maxLines = tsb?.maxLines == -1 ? null : tsb?.maxLines;
+    final overflow = tsb?.textOverflow ?? TextOverflow.clip;
+    final textAlign = tsb?.textAlign ?? TextAlign.start;
 
-    final maxLines = tsh?.maxLines == -1 ? null : tsh?.maxLines;
-    final overflow = tsh?.textOverflow ?? TextOverflow.clip;
-    final textAlign = tsh?.align ?? TextAlign.start;
-    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
-    final widgets = <Widget>[];
-    for (final compiled in _TextCompiler(text).compile(context)) {
-      if (compiled is InlineSpan) {
-        widgets.add(overflow == TextOverflow.ellipsis && maxLines == null
-            ? LayoutBuilder(
-                builder: (_, bc) => RichText(
-                      text: compiled,
-                      textAlign: textAlign,
-                      textScaleFactor: textScaleFactor,
-                      maxLines:
-                          bc.biggest.height.isFinite && bc.biggest.height > 0
-                              ? (bc.biggest.height / compiled.style.fontSize)
-                                  .floor()
-                              : null,
-                      overflow: overflow,
-                    ))
-            : RichText(
-                text: compiled,
-                textAlign: textAlign,
-                textScaleFactor: textScaleFactor,
-                maxLines: maxLines,
-                overflow: overflow,
-              ));
-      } else if (compiled is Widget) {
-        widgets.add(compiled);
-      }
-    }
-
-    return widgets;
-  }
-
-  TextDecoration buildTextDecoration(TextStyle parent, NodeMetadata meta) {
-    if (meta?.decoOver == null &&
-        meta?.decoStrike == null &&
-        meta?.decoUnder == null) {
-      return null;
-    }
-
-    final pd = parent.decoration;
-    final lineThough = pd?.contains(TextDecoration.lineThrough) == true;
-    final overline = pd?.contains(TextDecoration.overline) == true;
-    final underline = pd?.contains(TextDecoration.underline) == true;
-
-    final list = <TextDecoration>[];
-    if (meta.decoOver == true || (overline && meta.decoOver != false)) {
-      list.add(TextDecoration.overline);
-    }
-    if (meta.decoStrike == true || (lineThough && meta.decoStrike != false)) {
-      list.add(TextDecoration.lineThrough);
-    }
-    if (meta.decoUnder == true || (underline && meta.decoUnder != false)) {
-      list.add(TextDecoration.underline);
-    }
-
-    return TextDecoration.combine(list);
-  }
-
-  double buildTextFontSize(BuildContext context, TextStyle p, NodeMetadata m) {
-    final value = m.fontSize;
-    if (value == null) return null;
-
-    final parsed = parseCssLength(value);
-    if (parsed != null) {
-      final lengthValue = parsed.getValue(context, m.tsb);
-      if (lengthValue != null) return lengthValue;
-
-      if (parsed.unit == CssLengthUnit.percentage) {
-        return m.tsb.build(context).style.fontSize * parsed.number / 100;
+    final widgets = <WidgetPlaceholder>[];
+    for (final compiled in _TextCompiler(text).compile()) {
+      if (compiled.widget != null) {
+        widgets.add(compiled.widget);
+        continue;
       }
 
-      return null;
+      widgets.add(
+        WidgetPlaceholder<TextBits>(
+          child: Builder(builder: (context) {
+            final span = compiled.build(context);
+            if (span == null) return widget0;
+
+            // TODO: calculate max lines automatically for ellipsis if needed
+            // currently it only renders 1 line with ellipsis
+            return RichText(
+              maxLines: maxLines,
+              overflow: overflow,
+              text: span,
+              textAlign: textAlign,
+            );
+          }),
+          generator: text,
+        ),
+      );
     }
 
-    final defaultFontSize = DefaultTextStyle.of(context).style.fontSize;
-    switch (value) {
-      case _kCssFontSizeXxLarge:
-        return defaultFontSize * 2.0;
-      case _kCssFontSizeXLarge:
-        return defaultFontSize * 1.5;
-      case _kCssFontSizeLarge:
-        return defaultFontSize * 1.125;
-      case _kCssFontSizeMedium:
-        return defaultFontSize;
-      case _kCssFontSizeSmall:
-        return defaultFontSize * .8125;
-      case _kCssFontSizeXSmall:
-        return defaultFontSize * .625;
-      case _kCssFontSizeXxSmall:
-        return defaultFontSize * .5625;
-
-      case _kCssFontSizeLarger:
-        return p.fontSize * 1.2;
-      case _kCssFontSizeSmaller:
-        return p.fontSize * (15 / 18);
-    }
-
-    return null;
-  }
-
-  double buildTextStyleHeight(BuildContext c, TextStyleHtml p, String v) =>
-      _buildTextStyleHeight(this, c, p, v);
-
-  TextStyleHtml tsb(BuildContext context, TextStyleHtml p, NodeMetadata m) {
-    if (m == null) return p;
-
-    final decoration = buildTextDecoration(p.style, m);
-    final fontSize = buildTextFontSize(context, p.style, m);
-    final fontStyle = buildFontStyle(m);
-    if (m.color == null &&
-        decoration == null &&
-        m.decorationStyle == null &&
-        m.fontFamilies == null &&
-        fontSize == null &&
-        fontStyle == null &&
-        m.fontWeight == null) {
-      return p;
-    }
-
-    return p.copyWith(
-      style: p.style.copyWith(
-        color: m.color,
-        decoration: decoration,
-        decorationStyle: m.decorationStyle,
-        fontFamily:
-            m.fontFamilies?.isNotEmpty == true ? m.fontFamilies.first : null,
-        fontFamilyFallback: m.fontFamilies?.skip(1)?.toList(growable: false),
-        fontSize: fontSize,
-        fontStyle: fontStyle,
-        fontWeight: m.fontWeight,
-      ),
-    );
+    return buildColumnPlaceholder(widgets);
   }
 
   String constructFullUrl(String url) {
@@ -441,14 +301,9 @@ class WidgetFactory {
     final map = widget.customStylesBuilder(element);
     if (map == null) return;
 
-    final list = List<String>(map.length * 2);
-    var i = 0;
     for (final pair in map.entries) {
-      list[i++] = pair.key;
-      list[i++] = pair.value;
+      meta.addStyle(pair.key, pair.value);
     }
-
-    meta.styles = list;
   }
 
   void customWidgetBuilder(NodeMetadata meta, dom.Element element) {
@@ -459,6 +314,11 @@ class WidgetFactory {
 
     meta.op = BuildOp(onWidgets: (_, __) => [built]);
   }
+
+  List generateTsbSignature(BuildContext context) => [
+        DefaultTextStyle.of(context).style,
+        MediaQuery.of(context).textScaleFactor,
+      ];
 
   String getListStyleMarker(String type, int i) {
     switch (type) {
@@ -523,19 +383,10 @@ class WidgetFactory {
   TextDecorationStyle parseCssBorderStyle(String value) =>
       _parseCssBorderStyle(value);
 
-  Iterable<String> parseCssFontFamilies(String value) =>
-      _parseCssFontFamilies(value);
-
   CssLength parseCssLength(String value) => _parseCssLength(value);
 
   CssLengthBox parseCssLengthBox(NodeMetadata meta, String key) =>
       _parseCssLengthBox(meta, key);
-
-  CssLengthBox parseCssMargin(NodeMetadata meta) =>
-      parseCssLengthBox(meta, _kCssMargin);
-
-  CssLengthBox parseCssPadding(NodeMetadata meta) =>
-      parseCssLengthBox(meta, _kCssPadding);
 
   void parseStyle(NodeMetadata meta, String key, String value) {
     switch (key) {
@@ -546,27 +397,37 @@ class WidgetFactory {
       case _kCssBorderBottom:
         final borderBottom = parseCssBorderSide(value);
         if (borderBottom != null) {
-          meta
-            ..decoUnder = true
-            ..decorationStyle = borderBottom.style;
+          meta.tsb(
+              _TextStyle.textDeco,
+              _TextDeco(
+                color: borderBottom.color,
+                under: true,
+                style: borderBottom.style,
+                thickness: borderBottom.width,
+              ));
         } else {
-          meta.decoUnder = false;
+          meta.tsb(_TextStyle.textDeco, _TextDeco(under: false));
         }
         break;
       case _kCssBorderTop:
         final borderTop = parseCssBorderSide(value);
         if (borderTop != null) {
-          meta
-            ..decoOver = true
-            ..decorationStyle = borderTop.style;
+          meta.tsb(
+              _TextStyle.textDeco,
+              _TextDeco(
+                color: borderTop.color,
+                over: true,
+                style: borderTop.style,
+                thickness: borderTop.width,
+              ));
         } else {
-          meta.decoOver = false;
+          meta.tsb(_TextStyle.textDeco, _TextDeco(over: false));
         }
         break;
 
       case _kCssColor:
         final color = parseColor(value);
-        if (color != null) meta.color = color;
+        if (color != null) meta.tsb(_TextStyle.color, color);
         break;
 
       case _kCssDirection:
@@ -586,69 +447,28 @@ class WidgetFactory {
             meta.isNotRenderable = true;
             break;
           case _kCssDisplayTable:
-          case _kCssDisplayTableRow:
-          case _kCssDisplayTableHeaderGroup:
-          case _kCssDisplayTableRowGroup:
-          case _kCssDisplayTableFooterGroup:
-          case _kCssDisplayTableCell:
-          case _kCssDisplayTableCaption:
-            meta.op = tagTable();
+            meta.op = tagTable(meta);
             break;
         }
         break;
 
       case _kCssFontFamily:
-        meta.fontFamilies = parseCssFontFamilies(value);
+        final list = _TextStyle._fontFamilyTryParse(value);
+        if (list != null) meta.tsb(_TextStyle.fontFamily, list);
         break;
 
       case _kCssFontSize:
-        meta.fontSize = value;
+        meta.tsb(_TextStyle.fontSize, value);
         break;
 
       case _kCssFontStyle:
-        switch (value) {
-          case _kCssFontStyleItalic:
-            meta.fontStyleItalic = true;
-            break;
-          case _kCssFontStyleNormal:
-            meta.fontStyleItalic = false;
-            break;
-        }
+        final fontStyle = _TextStyle._fontStyleTryParse(value);
+        if (fontStyle != null) meta.tsb(_TextStyle.fontStyle, fontStyle);
         break;
 
       case _kCssFontWeight:
-        switch (value) {
-          case _kCssFontWeightBold:
-            meta.fontWeight = FontWeight.bold;
-            break;
-          case _kCssFontWeight100:
-            meta.fontWeight = FontWeight.w100;
-            break;
-          case _kCssFontWeight200:
-            meta.fontWeight = FontWeight.w200;
-            break;
-          case _kCssFontWeight300:
-            meta.fontWeight = FontWeight.w300;
-            break;
-          case _kCssFontWeight400:
-            meta.fontWeight = FontWeight.w400;
-            break;
-          case _kCssFontWeight500:
-            meta.fontWeight = FontWeight.w500;
-            break;
-          case _kCssFontWeight600:
-            meta.fontWeight = FontWeight.w600;
-            break;
-          case _kCssFontWeight700:
-            meta.fontWeight = FontWeight.w700;
-            break;
-          case _kCssFontWeight800:
-            meta.fontWeight = FontWeight.w800;
-            break;
-          case _kCssFontWeight900:
-            meta.fontWeight = FontWeight.w900;
-            break;
-        }
+        final fontWeight = _TextStyle._fontWeightTryParse(value);
+        if (fontWeight != null) meta.tsb(_TextStyle.fontWeight, fontWeight);
         break;
 
       case _kCssHeight:
@@ -661,48 +481,36 @@ class WidgetFactory {
         break;
 
       case _kCssLineHeight:
-        meta.op = styleLineHeight(value);
+        meta.tsb(_TextStyle.lineHeight, value);
         break;
 
       case _kCssMaxLines:
       case _kCssMaxLinesWebkitLineClamp:
         final maxLines = value == _kCssMaxLinesNone ? -1 : int.tryParse(value);
-        if (maxLines != null) meta.op = styleMaxLines(maxLines);
+        if (maxLines != null) meta.tsb().maxLines = maxLines;
         break;
 
       case _kCssTextAlign:
-        meta.op = styleTextAlign();
+        final textAlign = _tryParseTextAlign(value);
+        if (textAlign != null) {
+          meta
+            ..isBlockElement = true
+            ..tsb().textAlign = textAlign;
+        }
         break;
 
       case _kCssTextDecoration:
-        for (final v in _splitCss(value)) {
-          switch (v) {
-            case _kCssTextDecorationLineThrough:
-              meta.decoStrike = true;
-              break;
-            case _kCssTextDecorationNone:
-              meta
-                ..decoStrike = false
-                ..decoOver = false
-                ..decoUnder = false;
-              break;
-            case _kCssTextDecorationOverline:
-              meta.decoOver = true;
-              break;
-            case _kCssTextDecorationUnderline:
-              meta.decoUnder = true;
-              break;
-          }
-        }
+        final textDeco = _TextDeco.tryParse(value);
+        if (textDeco != null) meta.tsb(_TextStyle.textDeco, textDeco);
         break;
 
       case _kCssTextOverflow:
         switch (value) {
           case _kCssTextOverflowClip:
-            meta.op = styleTextOverflow(TextOverflow.clip);
+            meta.tsb().textOverflow = TextOverflow.clip;
             break;
           case _kCssTextOverflowEllipsis:
-            meta.op = styleTextOverflow(TextOverflow.ellipsis);
+            meta.tsb().textOverflow = TextOverflow.ellipsis;
             break;
         }
         break;
@@ -729,15 +537,16 @@ class WidgetFactory {
 
       case 'abbr':
       case 'acronym':
-        meta
-          ..decorationStyle = TextDecorationStyle.dotted
-          ..decoUnder = true;
+        meta.tsb(
+          _TextStyle.textDeco,
+          _TextDeco(style: TextDecorationStyle.dotted, under: true),
+        );
         break;
 
       case 'address':
         meta
           ..isBlockElement = true
-          ..fontStyleItalic = true;
+          ..tsb(_TextStyle.fontStyle, FontStyle.italic);
         break;
 
       case 'article':
@@ -756,16 +565,16 @@ class WidgetFactory {
       case 'figure':
         meta
           ..isBlockElement = true
-          ..styles = [_kCssMargin, '1em 40px'];
+          ..addStyle(_kCssMargin, '1em 40px');
         break;
 
       case 'b':
       case 'strong':
-        meta.fontWeight = FontWeight.bold;
+        meta.tsb(_TextStyle.fontWeight, FontWeight.bold);
         break;
 
       case 'big':
-        meta.fontSize = _kCssFontSizeLarger;
+        meta.tsb(_TextStyle.fontSize, _kCssFontSizeLarger);
         break;
 
       case 'br':
@@ -773,7 +582,7 @@ class WidgetFactory {
         break;
 
       case 'center':
-        meta.styles = [_kCssTextAlign, _kCssTextAlignCenter];
+        meta.addStyle(_kCssTextAlign, _kCssTextAlignCenter);
         break;
 
       case 'cite':
@@ -781,7 +590,7 @@ class WidgetFactory {
       case 'em':
       case 'i':
       case 'var':
-        meta.fontStyleItalic = true;
+        meta.tsb(_TextStyle.fontStyle, FontStyle.italic);
         break;
 
       case _kTagCode:
@@ -793,7 +602,7 @@ class WidgetFactory {
       case 'dd':
         meta
           ..isBlockElement = true
-          ..styles = [_kCssMargin, '0 0 1em 40px'];
+          ..addStyle(_kCssMargin, '0 0 1em 40px');
         break;
       case 'dl':
         meta.isBlockElement = true;
@@ -801,13 +610,13 @@ class WidgetFactory {
       case 'dt':
         meta
           ..isBlockElement = true
-          ..fontWeight = FontWeight.bold;
+          ..tsb(_TextStyle.fontWeight, FontWeight.bold);
         break;
 
       case 'del':
       case 's':
       case 'strike':
-        meta..decoStrike = true;
+        meta.tsb(_TextStyle.textDeco, _TextDeco(strike: true));
         break;
 
       case 'font':
@@ -820,44 +629,44 @@ class WidgetFactory {
 
       case 'h1':
         meta
-          ..fontSize = '2em'
-          ..fontWeight = FontWeight.bold
           ..isBlockElement = true
-          ..styles = [_kCssMargin, '0.67em 0'];
+          ..addStyle(_kCssMargin, '0.67em 0')
+          ..tsb(_TextStyle.fontSize, '2em')
+          ..tsb(_TextStyle.fontWeight, FontWeight.bold);
         break;
       case 'h2':
         meta
-          ..fontSize = '1.5em'
-          ..fontWeight = FontWeight.bold
           ..isBlockElement = true
-          ..styles = [_kCssMargin, '0.83em 0'];
+          ..addStyle(_kCssMargin, '0.83em 0')
+          ..tsb(_TextStyle.fontSize, '1.5em')
+          ..tsb(_TextStyle.fontWeight, FontWeight.bold);
         break;
       case 'h3':
         meta
-          ..fontSize = '1.17em'
-          ..fontWeight = FontWeight.bold
           ..isBlockElement = true
-          ..styles = [_kCssMargin, '1em 0'];
+          ..addStyle(_kCssMargin, '1em 0')
+          ..tsb(_TextStyle.fontSize, '1.17em')
+          ..tsb(_TextStyle.fontWeight, FontWeight.bold);
         break;
       case 'h4':
         meta
-          ..fontWeight = FontWeight.bold
           ..isBlockElement = true
-          ..styles = [_kCssMargin, '1.33em 0'];
+          ..addStyle(_kCssMargin, '1.33em 0')
+          ..tsb(_TextStyle.fontWeight, FontWeight.bold);
         break;
       case 'h5':
         meta
-          ..fontSize = '0.83em'
-          ..fontWeight = FontWeight.bold
           ..isBlockElement = true
-          ..styles = [_kCssMargin, '1.67em 0'];
+          ..addStyle(_kCssMargin, '1.67em 0')
+          ..tsb(_TextStyle.fontSize, '0.83em')
+          ..tsb(_TextStyle.fontWeight, FontWeight.bold);
         break;
       case 'h6':
         meta
-          ..fontSize = '0.67em'
-          ..fontWeight = FontWeight.bold
           ..isBlockElement = true
-          ..styles = [_kCssMargin, '2.33em 0'];
+          ..addStyle(_kCssMargin, '2.33em 0')
+          ..tsb(_TextStyle.fontSize, '0.67em')
+          ..tsb(_TextStyle.fontWeight, FontWeight.bold);
         break;
 
       case 'iframe':
@@ -872,36 +681,38 @@ class WidgetFactory {
       case 'img':
         meta.op = tagImg();
         if (attrs.containsKey('height')) {
-          meta.styles = ['height', "${attrs['height']}px"];
+          meta.addStyle('height', "${attrs['height']}px");
         }
         if (attrs.containsKey('width')) {
-          meta.styles = ['width', "${attrs['width']}px"];
+          meta.addStyle('width', "${attrs['width']}px");
         }
         break;
 
       case 'ins':
       case 'u':
-        meta.decoUnder = true;
+        meta.tsb(_TextStyle.textDeco, _TextDeco(under: true));
         break;
 
       case 'kbd':
       case 'samp':
-        meta.fontFamilies = [_kTagCodeFont1, _kTagCodeFont2];
+        meta.tsb(_TextStyle.fontFamily, [_kTagCodeFont1, _kTagCodeFont2]);
         break;
 
       case _kTagOrderedList:
       case _kTagUnorderedList:
-        meta.op = tagLi();
+        meta.op = tagLi(meta);
         break;
 
       case 'mark':
-        meta.styles = [_kCssBackgroundColor, '#ff0', _kCssColor, '#000'];
+        meta
+          ..addStyle(_kCssBackgroundColor, '#ff0')
+          ..tsb(_TextStyle.color, Color.fromARGB(255, 0, 0, 0));
         break;
 
       case 'p':
         meta
           ..isBlockElement = true
-          ..styles = [_kCssMargin, '1em 0'];
+          ..addStyle(_kCssMargin, '1em 0');
         break;
 
       case 'q':
@@ -909,79 +720,48 @@ class WidgetFactory {
         break;
 
       case _kTagRuby:
-        meta.op = tagRuby();
+        meta.op = tagRuby(meta);
         break;
 
       case 'small':
-        meta.fontSize = _kCssFontSizeSmaller;
+        meta.tsb(_TextStyle.fontSize, _kCssFontSizeSmaller);
         break;
 
       case 'sub':
-        meta.styles = [
-          _kCssFontSize,
-          _kCssFontSizeSmaller,
-          _kCssVerticalAlign,
-          _kCssVerticalAlignSub,
-        ];
+        meta
+          ..addStyle(_kCssVerticalAlign, _kCssVerticalAlignSub)
+          ..tsb(_TextStyle.fontSize, _kCssFontSizeSmaller);
         break;
       case 'sup':
-        meta.styles = [
-          _kCssFontSize,
-          _kCssFontSizeSmaller,
-          _kCssVerticalAlign,
-          _kCssVerticalAlignSuper,
-        ];
+        meta
+          ..addStyle(_kCssVerticalAlign, _kCssVerticalAlignSuper)
+          ..tsb(_TextStyle.fontSize, _kCssFontSizeSmaller);
         break;
 
-      case 'table':
+      case _kTagTable:
         meta
-          ..styles = [_kCssDisplay, _kCssDisplayTable]
+          ..addStyle(_kCssDisplay, _kCssDisplayTable)
           ..op = _TagTable.cellPaddingOp(
               (attrs.containsKey(_kAttributeCellPadding)
                       ? double.tryParse(attrs[_kAttributeCellPadding])
                       : null) ??
                   1);
         break;
-      case 'tr':
-        meta.styles = [_kCssDisplay, _kCssDisplayTableRow];
+      case _kTagTableHeaderCell:
+        meta.tsb(_TextStyle.fontWeight, FontWeight.bold);
         break;
-      case 'thead':
-        meta.styles = [_kCssDisplay, _kCssDisplayTableHeaderGroup];
-        break;
-      case 'tbody':
-        meta.styles = [_kCssDisplay, _kCssDisplayTableRowGroup];
-        break;
-      case 'tfoot':
-        meta.styles = [_kCssDisplay, _kCssDisplayTableFooterGroup];
-        break;
-      case 'td':
-        meta.styles = [_kCssDisplay, _kCssDisplayTableCell];
-        break;
-      case 'th':
-        meta.styles = [
-          _kCssDisplay,
-          _kCssDisplayTableCell,
-          _kCssFontWeight,
-          _kCssFontWeightBold,
-        ];
-        break;
-      case 'caption':
-        meta.styles = [
-          _kCssDisplay,
-          _kCssDisplayTableCaption,
-          _kCssTextAlign,
-          _kCssTextAlignCenter,
-        ];
+      case _kTagTableCaption:
+        meta.addStyle(_kCssTextAlign, _kCssTextAlignCenter);
         break;
     }
 
     for (final attribute in attrs.entries) {
       switch (attribute.key) {
         case _kAttributeAlign:
-          meta.styles = [_kCssTextAlign, attribute.value];
+          meta.addStyle(_kCssTextAlign, attribute.value);
           break;
         case _kAttributeDir:
-          meta.styles = [_kCssDirection, attribute.value];
+          meta.addStyle(_kCssDirection, attribute.value);
           break;
       }
     }
@@ -999,33 +779,20 @@ class WidgetFactory {
 
   BuildOp styleDisplayBlock() {
     _styleDisplayBlock ??= BuildOp(
-      onWidgets: (_, widgets) {
-        for (final widget in widgets) {
-          widget.wrapWith(_cssBlock);
-        }
-        return widgets;
-      },
+      onWidgets: (_, widgets) =>
+          _listOrNull(buildColumnPlaceholder(widgets)?.wrapWith(_cssBlock)),
       priority: 9223372036854775807,
     );
     return _styleDisplayBlock;
   }
 
-  static Iterable<Widget> _cssBlock(BuildContext _, Iterable<Widget> ws, __) =>
-      ws?.map((w) => w is CssBlock ? w : CssBlock(child: w));
-
-  BuildOp styleLineHeight(String v) => _styleLineHeight(this, v);
+  Widget _cssBlock(Widget child) =>
+      child == widget0 || child is CssBlock ? child : CssBlock(child: child);
 
   BuildOp styleMargin() {
     _styleMargin ??= _StyleMargin(this).buildOp;
     return _styleMargin;
   }
-
-  BuildOp styleMaxLines(int v) => BuildOp(
-      isBlockElement: true,
-      onPieces: (meta, pieces) {
-        meta.tsb.enqueue(_styleMaxLinesBuilder, v);
-        return pieces;
-      });
 
   BuildOp stylePadding() {
     _stylePadding ??= _StylePadding(this).buildOp;
@@ -1036,18 +803,6 @@ class WidgetFactory {
     _styleSizing ??= _StyleSizing(this).buildOp;
     return _styleSizing;
   }
-
-  BuildOp styleTextAlign() {
-    _styleTextAlign ??= _StyleTextAlign(this).buildOp;
-    return _styleTextAlign;
-  }
-
-  BuildOp styleTextOverflow(TextOverflow v) => BuildOp(
-      isBlockElement: true,
-      onPieces: (meta, pieces) {
-        meta.tsb.enqueue(_styleTextOverflowBuilder, v);
-        return pieces;
-      });
 
   BuildOp styleVerticalAlign() {
     _styleVerticalAlign ??= _StyleVerticalAlign(this).buildOp;
@@ -1090,30 +845,16 @@ class WidgetFactory {
     return _tagImg;
   }
 
-  BuildOp tagLi() {
-    _tagLi ??= _TagLi(this).buildOp;
-    return _tagLi;
-  }
+  BuildOp tagLi(NodeMetadata meta) => _TagLi(this, meta);
 
   BuildOp tagQ() {
     _tagQ ??= _TagQ(this).buildOp;
     return _tagQ;
   }
 
-  BuildOp tagRuby() => _TagRuby(this).buildOp;
+  BuildOp tagRuby(NodeMetadata meta) => _TagRuby(this, meta);
 
-  BuildOp tagTable() {
-    _tagTable ??= _TagTable(this).buildOp;
-    return _tagTable;
-  }
+  BuildOp tagTable(NodeMetadata meta) => _TagTable(this, meta);
 }
 
 Iterable<Widget> _listOrNull(Widget x) => x == null ? null : [x];
-
-TextStyleHtml _styleMaxLinesBuilder(
-        BuildContext _, TextStyleHtml parent, int maxLines) =>
-    parent.copyWith(maxLines: maxLines);
-
-TextStyleHtml _styleTextOverflowBuilder(
-        BuildContext _, TextStyleHtml parent, TextOverflow textOverflow) =>
-    parent.copyWith(textOverflow: textOverflow);

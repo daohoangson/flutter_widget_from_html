@@ -5,7 +5,6 @@ import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_widget_factory.dart';
 
-final _attrStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
 final _regExpSpaceLeading = RegExp(r'^[^\S\u{00A0}]+', unicode: true);
 final _regExpSpaceTrailing = RegExp(r'[^\S\u{00A0}]+$', unicode: true);
 final _regExpSpaces = RegExp(r'[^\S\u{00A0}]+', unicode: true);
@@ -15,7 +14,7 @@ class HtmlBuilder {
   final NodeMetadata parentMeta;
   final Iterable<BuildOp> parentOps;
   final TextBits parentText;
-  final TextStyleBuilders parentTsb;
+  final TextStyleBuilder parentTsb;
   final WidgetFactory wf;
 
   final _pieces = <BuiltPiece>[];
@@ -59,8 +58,7 @@ class HtmlBuilder {
   }
 
   NodeMetadata collectMetadata(dom.Element e) {
-    final meta = NodeMetadata._(parentOps);
-
+    final meta = NodeMetadata(parentTsb.sub(), parentOps);
     wf.parseTag(meta, e.localName, e.attributes);
 
     if (meta.hasParents) {
@@ -74,16 +72,9 @@ class HtmlBuilder {
       for (final op in meta.ops) {
         final map = op.defaultStyles(meta, e);
         if (map == null) continue;
-
-        final list = List<String>(map.length * 2);
-        var i = 0;
         for (final pair in map.entries) {
-          list[i++] = pair.key;
-          list[i++] = pair.value;
+          meta.insertStyle(pair.key, pair.value);
         }
-
-        meta._styles ??= [];
-        meta._styles.insertAll(0, list);
       }
     }
 
@@ -93,8 +84,8 @@ class HtmlBuilder {
 
     // stylings, step 2: get styles from `style` attribute
     if (e.attributes.containsKey('style')) {
-      for (final m in _attrStyleRegExp.allMatches(e.attributes['style'])) {
-        meta.styles = [m[1].trim(), m[2].trim()];
+      for (final pair in splitAttributeStyle(e.attributes['style'])) {
+        meta.addStyle(pair.key, pair.value);
       }
     }
 
@@ -107,7 +98,6 @@ class HtmlBuilder {
     }
 
     meta.domElement = e;
-    meta.tsb = parentTsb.sub()..enqueue(wf.tsb, meta);
 
     return meta;
   }
@@ -131,7 +121,7 @@ class HtmlBuilder {
         parentMeta: meta,
         parentParentOps: parentOps,
         parentText: isBlockElement ? null : _textPiece.text,
-        parentTsb: meta?.tsb ?? parentTsb,
+        parentTsb: meta?.tsb() ?? parentTsb,
         wf: wf,
       );
 
@@ -204,93 +194,11 @@ Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, NodeMetadata meta) {
   return List.unmodifiable((ops?.toList() ?? <BuildOp>[])..addAll(withOnChild));
 }
 
-class NodeMetadata {
-  List<BuildOp> _buildOps;
-  dom.Element _domElement;
-  final Iterable<BuildOp> _parentOps;
-  TextStyleBuilders _tsb;
+final _spacingRegExp = RegExp(r'\s+');
+Iterable<String> splitCssValues(String value) => value.split(_spacingRegExp);
 
-  Color color;
-  bool decoOver;
-  bool decoStrike;
-  bool decoUnder;
-  TextDecorationStyle decorationStyle;
-  Iterable<String> fontFamilies;
-  String fontSize;
-  bool fontStyleItalic;
-  FontWeight fontWeight;
-  bool _isBlockElement;
-  bool isNotRenderable;
-  List<String> _styles;
-  bool _stylesFrozen = false;
-
-  NodeMetadata._(this._parentOps);
-
-  dom.Element get domElement => _domElement;
-
-  bool get hasOps => _buildOps != null;
-
-  bool get hasParents => _parentOps != null;
-
-  bool get isBlockElement {
-    if (_isBlockElement == true) return true;
-    return _buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
-  }
-
-  Iterable<BuildOp> get ops => _buildOps;
-
-  Iterable<BuildOp> get parents => _parentOps;
-
-  Iterable<MapEntry<String, String>> get styleEntries sync* {
-    _stylesFrozen = true;
-    if (_styles == null) return;
-
-    final iterator = _styles.iterator;
-    while (iterator.moveNext()) {
-      final key = iterator.current;
-      if (!iterator.moveNext()) return;
-      yield MapEntry(key, iterator.current);
-    }
-  }
-
-  TextStyleBuilders get tsb => _tsb;
-
-  set domElement(dom.Element e) {
-    assert(_domElement == null);
-    _domElement = e;
-
-    if (_buildOps != null) {
-      _buildOps.sort((a, b) => a.priority.compareTo(b.priority));
-      _buildOps = List.unmodifiable(_buildOps);
-    }
-  }
-
-  set isBlockElement(bool v) => _isBlockElement = v;
-
-  set op(BuildOp op) {
-    if (op == null) return;
-    _buildOps ??= [];
-    if (!_buildOps.contains(op)) _buildOps.add(op);
-  }
-
-  set styles(Iterable<String> styles) {
-    if (styles == null) return;
-    assert(styles.length % 2 == 0);
-    assert(!_stylesFrozen);
-    _styles ??= [];
-    _styles.addAll(styles);
-  }
-
-  set tsb(TextStyleBuilders tsb) {
-    assert(_tsb == null);
-    _tsb = tsb;
-  }
-
-  String style(String key) {
-    String value;
-    for (final x in styleEntries) {
-      if (x.key == key) value = x.value;
-    }
-    return value;
-  }
-}
+final _attrStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
+Iterable<MapEntry<String, String>> splitAttributeStyle(String value) =>
+    _attrStyleRegExp
+        .allMatches(value)
+        .map((m) => MapEntry(m[1].trim(), m[2].trim()));

@@ -6,15 +6,13 @@ abstract class TextBit {
 
   TextBit(this.parent);
 
-  bool get canCompile => false;
   String get data => null;
+  bool get hasBuilder => false;
   bool get hasTrailingWhitespace => false;
   int get index => parent?._children?.indexOf(this) ?? -1;
   bool get isEmpty => false;
   bool get isNotEmpty => !isEmpty;
-  TextStyleBuilders get tsb => null;
-
-  InlineSpan compile(TextStyle style) => throw UnimplementedError();
+  TextStyleBuilder get tsb => null;
 
   bool detach() => parent?._children?.remove(this);
 
@@ -33,6 +31,9 @@ abstract class TextBit {
     another.parent._children.insert(i, this);
     return true;
   }
+
+  TextSpanBuilder prepareBuilder(TextStyleBuilder tsb) =>
+      throw UnimplementedError();
 
   bool replaceWith(TextBit another) {
     final i = index;
@@ -92,7 +93,7 @@ class TextData extends TextBit {
   final String data;
 
   @override
-  final TextStyleBuilders tsb;
+  final TextStyleBuilder tsb;
 
   TextData(TextBits parent, this.data, this.tsb)
       : assert(parent != null),
@@ -142,14 +143,16 @@ class TextWidget<T> extends TextBit {
         super(parent);
 
   @override
-  bool get canCompile => true;
+  bool get hasBuilder => true;
 
   @override
-  WidgetSpan compile(TextStyle style) => WidgetSpan(
-        alignment: alignment,
-        baseline: baseline,
-        child: widget,
-        style: style,
+  TextSpanBuilder prepareBuilder(TextStyleBuilder _) =>
+      TextSpanBuilder.prebuilt(
+        span: WidgetSpan(
+          alignment: alignment,
+          baseline: baseline,
+          child: widget,
+        ),
       );
 }
 
@@ -225,7 +228,7 @@ class TextBits extends TextBit {
     return bit;
   }
 
-  TextBits sub([TextStyleBuilders tsb]) {
+  TextBits sub([TextStyleBuilder tsb]) {
     final sub = TextBits(tsb ?? this.tsb.sub(), this);
     add(sub);
     return sub;
@@ -278,6 +281,24 @@ class TextBits extends TextBit {
           .map((lines) => lines.map((line) => '  $line'))
           .reduce((prev, lines) => List.from(prev)..addAll(lines)))
       : [];
+}
+
+class TextSpanBuilder {
+  final InlineSpan Function(BuildContext) callback;
+  final InlineSpan span;
+  final WidgetPlaceholder widget;
+
+  TextSpanBuilder(this.callback)
+      : span = null,
+        widget = null;
+
+  TextSpanBuilder.prebuilt({this.span, this.widget})
+      : assert((span == null) != (widget == null),
+            '`span` and `widget` cannot be set together'),
+        callback = null;
+
+  InlineSpan build(BuildContext context) =>
+      span ?? (callback != null ? callback(context) : null);
 }
 
 enum TextWhitespaceType {

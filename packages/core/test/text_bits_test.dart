@@ -136,7 +136,7 @@ void main() {
 
       test('returns false for widget', () {
         final text = _text();
-        final widget = WidgetPlaceholder(builder: (_, ws, __) => ws);
+        final widget = WidgetPlaceholder(generator: text);
         text.add(TextWidget(text, widget));
 
         expect(text.hasTrailingWhitespace, isFalse);
@@ -280,7 +280,7 @@ void main() {
     text22.addText('(2.2.1)');
     text22.addText('(2.2.2)');
     text2.addText('(2.3)');
-    final widget = WidgetPlaceholder<String>(builder: (_, ws, __) => ws);
+    final widget = WidgetPlaceholder(generator: text);
     text.add(TextWidget(text, widget));
 
     final str = text.toString().replaceAll(RegExp(r':\d+\]'), ']');
@@ -296,11 +296,11 @@ void main() {
       [TextData] data=(2.2.1)
       [TextData] data=(2.2.2)
     [TextData] data=(2.3)
-  [TextWidget<String>] widget=WidgetPlaceholder<String>
+  [TextWidget<TextBits>] widget=WidgetPlaceholder<TextBits>
 ----'''));
   });
 }
 
 String _data(TextBits text) => text.bits.map((bit) => bit.data ?? '').join('');
 
-TextBits _text() => TextBits(TextStyleBuilders());
+TextBits _text() => TextBits(TextStyleBuilder.root());

@@ -12,7 +12,8 @@ class _TagImg {
 
           final text = pieces.last?.text;
           final img = _parseMetadata(meta);
-          if (img.url?.isNotEmpty != true) {
+          final built = _buildImg(img);
+          if (built == null) {
             final imgText = img.alt ?? img.title;
             if (imgText?.isNotEmpty == true) {
               text.addText(imgText);
@@ -20,25 +21,26 @@ class _TagImg {
             return pieces;
           }
 
-          text.add(_ImageBit(text, this, img));
+          text.add(_ImageBit(
+            text,
+            WidgetPlaceholder<ImgMetadata>(child: built, generator: img),
+          ));
           return pieces;
         },
-        onWidgets: (meta, widgets) {
-          if (!meta.isBlockElement) return widgets;
+        onWidgets: (meta, _) {
+          if (!meta.isBlockElement) return [];
 
           final img = _parseMetadata(meta);
-          return _listOrNull(_buildImg(img));
+          final built = _buildImg(img);
+          if (built == null) return [];
+
+          return [WidgetPlaceholder<ImgMetadata>(child: built, generator: img)];
         },
       );
 
   Widget _buildImg(ImgMetadata img) {
     final image = wf.buildImageProvider(img.url);
-    if (image == null) {
-      final text = img.alt ?? img.title;
-      if (text == null) return null;
-      return Text(text);
-    }
-
+    if (image == null) return null;
     return wf.buildImage(image, img);
   }
 
@@ -51,44 +53,19 @@ class _TagImg {
       url: wf.constructFullUrl(src),
     );
   }
-
-  Iterable<Widget> _wpb(BuildContext _, Iterable<Widget> __, ImgMetadata img) =>
-      _listOrNull(_buildImg(img));
 }
 
 class _ImageBit extends TextWidget<ImgMetadata> {
-  _ImageBit(TextBits parent, _TagImg self, ImgMetadata img)
-      : super(
-          parent,
-          WidgetPlaceholder(builder: self._wpb, input: img),
-        );
+  _ImageBit(TextBits parent, WidgetPlaceholder<ImgMetadata> widget)
+      : super(parent, widget);
 
   @override
-  WidgetSpan compile(TextStyle style) => _ImageSpan(
-        alignment: alignment,
-        baseline: baseline,
-        child: widget,
-        style: style,
-      );
-}
-
-class _ImageSpan extends WidgetSpan {
-  const _ImageSpan({
-    PlaceholderAlignment alignment,
-    TextBaseline baseline,
-    WidgetPlaceholder child,
-    TextStyle style,
-  }) : super(
+  TextSpanBuilder prepareBuilder(TextStyleBuilder _) =>
+      TextSpanBuilder.prebuilt(
+        span: WidgetSpan(
           alignment: alignment,
           baseline: baseline,
-          child: child,
-          style: style,
-        );
-
-  @override
-  void build(ui.ParagraphBuilder builder,
-      {double textScaleFactor = 1.0,
-      @required List<PlaceholderDimensions> dimensions}) {
-    super.build(builder, textScaleFactor: 1.0, dimensions: dimensions);
-  }
+          child: widget,
+        ),
+      );
 }

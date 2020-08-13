@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'core_builder.dart';
 import 'core_helpers.dart';
+import 'core_widget_factory.dart';
 
 part 'data/table_data.dart';
 part 'data/text_bits.dart';
@@ -48,9 +48,13 @@ class BuildOp {
   Iterable<WidgetPlaceholder> onWidgets(
           NodeMetadata meta, Iterable<WidgetPlaceholder> widgets) =>
       (_onWidgets != null
-          ? _onWidgets(meta, widgets)?.map(_widgetToPlaceholder)
+          ? _onWidgets(meta, widgets)?.map(_placeholder)
           : null) ??
       widgets;
+
+  WidgetPlaceholder _placeholder(Widget widget) => widget is WidgetPlaceholder
+      ? widget
+      : WidgetPlaceholder<BuildOp>(child: widget, generator: this);
 }
 
 typedef _BuildOpDefaultStyles = Map<String, String> Function(
@@ -67,13 +71,16 @@ class BuiltPiece {
 
   BuiltPiece.text(this.text) : widgets = null;
 
-  BuiltPiece.placeholders(this.widgets) : text = null;
-
   BuiltPiece.widgets(Iterable<Widget> widgets)
       : text = null,
-        widgets = widgets.map(_widgetToPlaceholder);
+        widgets = widgets.map(_placeholder);
 
   bool get hasWidgets => widgets != null;
+
+  static WidgetPlaceholder _placeholder(Widget widget) =>
+      widget is WidgetPlaceholder
+          ? widget
+          : WidgetPlaceholder<Widget>(child: widget, generator: widget);
 }
 
 class CssBorderSide {
@@ -94,33 +101,43 @@ class CssLength {
   final CssLengthUnit unit;
 
   CssLength(
-    this.number, {
+    this.number, [
     this.unit = CssLengthUnit.px,
-  })  : assert(!number.isNegative),
+  ])  : assert(!number.isNegative),
         assert(unit != null);
 
   bool get isNotEmpty => number > 0;
 
-  double getValue(BuildContext context, TextStyleBuilders tsb) =>
-      getValueFromStyle(context, tsb.build(context).style);
+  double getValue(BuildContext context, TextStyleBuilder tsb) =>
+      getValueFromStyle(tsb.build(context));
 
-  double getValueFromStyle(BuildContext context, TextStyle style) {
+  double getValueFromStyle(
+    TextStyleHtml tsh, {
+    double baseValue,
+    double scaleFactor,
+  }) {
     double value;
-
     switch (unit) {
       case CssLengthUnit.em:
-        value = style.fontSize * number;
+        baseValue ??= tsh.style.fontSize;
+        value = baseValue * number;
+        scaleFactor = 1;
         break;
       case CssLengthUnit.percentage:
-        return null;
+        if (baseValue == null) return null;
+        value = baseValue * number / 100;
+        scaleFactor = 1;
+        break;
+      case CssLengthUnit.pt:
+        value = number * 96 / 72;
+        break;
       case CssLengthUnit.px:
         value = number;
         break;
     }
 
-    if (value != null) {
-      value = value * MediaQuery.of(context).textScaleFactor;
-    }
+    if (value == null) return null;
+    if (scaleFactor != null) value *= scaleFactor;
 
     return value;
   }
@@ -177,6 +194,7 @@ class CssLengthBox {
 enum CssLengthUnit {
   em,
   percentage,
+  pt,
   px,
 }
 
@@ -193,113 +211,244 @@ class ImgMetadata {
   });
 }
 
-@immutable
-class TextStyleHtml {
-  final TextAlign align;
-  final double height;
-  final int maxLines;
-  final TextStyle style;
-  final TextOverflow textOverflow;
+class NodeMetadata {
+  List<BuildOp> _buildOps;
+  dom.Element _domElement;
+  final Iterable<BuildOp> _parentOps;
+  final TextStyleBuilder _tsb;
 
-  TextStyleHtml._({
-    this.align,
-    this.height,
-    this.maxLines,
-    this.style,
-    this.textOverflow,
-  });
+  bool _isBlockElement;
+  bool isNotRenderable;
+  List<String> _styles;
+  bool _stylesFrozen = false;
 
-  TextStyleHtml.style(this.style)
-      : align = null,
-        height = null,
-        maxLines = null,
-        textOverflow = null;
+  NodeMetadata(this._tsb, this._parentOps);
 
-  TextStyleHtml copyWith({
-    TextAlign align,
-    double height,
-    int maxLines,
-    TextStyle style,
-    TextOverflow textOverflow,
-  }) =>
-      TextStyleHtml._(
-        align: align ?? this.align,
-        height: height ?? this.height,
-        maxLines: maxLines ?? this.maxLines,
-        style: style ?? this.style,
-        textOverflow: textOverflow ?? this.textOverflow,
-      );
+  dom.Element get domElement => _domElement;
 
-  TextStyle build(BuildContext context) {
-    var built = style;
+  bool get hasOps => _buildOps != null;
 
-    if (height != null && height >= 0) {
-      built = built.copyWith(height: height);
-    }
+  bool get hasParents => _parentOps != null;
 
-    return built;
+  bool get isBlockElement {
+    if (_isBlockElement == true) return true;
+    return _buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
   }
+
+  Iterable<BuildOp> get ops => _buildOps;
+
+  Iterable<BuildOp> get parents => _parentOps;
+
+  Iterable<MapEntry<String, String>> get styleEntries sync* {
+    _stylesFrozen = true;
+    if (_styles == null) return;
+
+    final iterator = _styles.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current;
+      if (!iterator.moveNext()) return;
+      yield MapEntry(key, iterator.current);
+    }
+  }
+
+  set domElement(dom.Element e) {
+    assert(_domElement == null);
+    _domElement = e;
+
+    if (_buildOps != null) {
+      _buildOps.sort((a, b) => a.priority.compareTo(b.priority));
+      _buildOps = List.unmodifiable(_buildOps);
+    }
+  }
+
+  set isBlockElement(bool v) => _isBlockElement = v;
+
+  set op(BuildOp op) {
+    if (op == null) return;
+    _buildOps ??= [];
+    if (!_buildOps.contains(op)) _buildOps.add(op);
+  }
+
+  void addStyle(String key, String value) {
+    assert(!_stylesFrozen);
+    _styles ??= [];
+    _styles..add(key)..add(value);
+  }
+
+  void insertStyle(String key, String value) {
+    assert(!_stylesFrozen);
+    _styles ??= [];
+    _styles..insertAll(0, [key, value]);
+  }
+
+  String style(String key) {
+    String value;
+    for (final x in styleEntries) {
+      if (x.key == key) value = x.value;
+    }
+    return value;
+  }
+
+  TextStyleBuilder tsb<T>([
+    TextStyleHtml Function(BuildContext, TextStyleHtml, T) builder,
+    T input,
+  ]) =>
+      _tsb..enqueue(builder, input);
 }
 
-class TextStyleBuilders {
-  final _builders = <Function>[];
-  final _inputs = [];
-  final TextStyleBuilders parent;
+@immutable
+class TextStyleHtml {
+  final double height;
+  final TextStyleHtml parent;
+  final TextStyle style;
 
-  BuildContext _context;
-  TextStyleHtml _default;
+  TextStyleHtml._({
+    this.height,
+    this.parent,
+    this.style,
+  });
+
+  factory TextStyleHtml.style(TextStyle style) => TextStyleHtml._(style: style);
+
+  TextStyleHtml get root => parent?.root ?? this;
+
+  TextStyle get styleWithHeight =>
+      height != null && height >= 0 ? style.copyWith(height: height) : style;
+
+  TextStyleHtml copyWith({
+    double height,
+    TextStyleHtml parent,
+    TextStyle style,
+  }) =>
+      TextStyleHtml._(
+        height: height ?? this.height,
+        parent: parent ?? this.parent,
+        style: style ?? this.style,
+      );
+}
+
+class TextStyleBuilder<T1> {
+  final TextStyleBuilder parent;
+  final WidgetFactory wf;
+
+  List<Function> _builders;
+  List _inputs;
+  TextStyleHtml _parentOutput;
   TextStyleHtml _output;
+  List _signature;
 
-  TextStyleBuilders({this.parent});
+  TextStyleBuilder.root({
+    TextStyle style,
+    this.wf,
+  }) : parent = null {
+    if (style != null) enqueue(_rootBuilderStyle, style);
+    enqueue(_rootBuilderTextScaleFactor);
+  }
 
-  BuildContext get context => _context;
+  TextStyleBuilder._(this.parent) : wf = null;
 
-  void enqueue<T>(
-    TextStyleHtml Function(BuildContext, TextStyleHtml, T) builder, [
-    T input,
+  int _maxLines;
+  int get maxLines => _maxLines ?? parent?.maxLines;
+  set maxLines(int v) => _maxLines = v;
+
+  TextAlign _textAlign;
+  TextAlign get textAlign => _textAlign ?? parent?.textAlign;
+  set textAlign(TextAlign v) => _textAlign = v;
+
+  TextOverflow _textOverflow;
+  TextOverflow get textOverflow => _textOverflow ?? parent?.textOverflow;
+  set textOverflow(TextOverflow v) => _textOverflow = v;
+
+  void enqueue<T2>(
+    TextStyleHtml Function(BuildContext, TextStyleHtml, T2) builder, [
+    T2 input,
   ]) {
+    if (builder == null) return;
+
     assert(_output == null, 'Cannot add builder after being built');
+    _builders ??= [];
     _builders.add(builder);
+
+    _inputs ??= [];
     _inputs.add(input);
   }
 
   TextStyleHtml build(BuildContext context) {
-    _resetContextIfNeeded(context);
-    if (_output != null) return _output;
-
     if (parent == null) {
-      _output = _default;
+      // root tsb: verify signature and reset _output if it doesn't match
+      final signature = wf?.generateTsbSignature(context) ?? [];
+      if (!_checkSignaturesMatch(signature, _signature)) {
+        final contextStyle = DefaultTextStyle.of(context).style;
+        _parentOutput = TextStyleHtml.style(contextStyle);
+        _output = null;
+        _signature = signature;
+      }
     } else {
-      _output = parent.build(_context);
+      // for others, compare output from parent
+      final parentOutput = parent.build(context);
+      if (parentOutput != _parentOutput) {
+        _parentOutput = parentOutput;
+        _output = null;
+      }
     }
 
+    if (_output != null) return _output;
+
+    if (_builders == null) {
+      _output = _parentOutput;
+      return _output;
+    }
+
+    _output = _parentOutput.copyWith(parent: _parentOutput);
     final l = _builders.length;
     for (var i = 0; i < l; i++) {
-      _output = _builders[i](context, _output, _inputs[i]);
+      final builder = _builders[i];
+      _output = builder(context, _output, _inputs[i]);
+      assert(_output?.parent == _parentOutput,
+          '$builder must return a valid text style');
     }
 
     return _output;
   }
 
-  TextStyle style(BuildContext context) => build(context).build(context);
+  bool hasSameStyleWith(TextStyleBuilder other) {
+    if (other == null) return false;
 
-  TextStyleBuilders sub() => TextStyleBuilders(parent: this);
+    var thisWithBuilder = this;
+    while (thisWithBuilder._builders == null) {
+      thisWithBuilder = thisWithBuilder.parent;
+    }
 
-  void _resetContextIfNeeded(BuildContext context) {
-    final contextStyle = DefaultTextStyle.of(context).style;
-    if (context == _context && contextStyle == _default.style) return;
+    var otherWithBuilder = other;
+    while (otherWithBuilder._builders == null) {
+      otherWithBuilder = otherWithBuilder.parent;
+    }
 
-    _context = context;
-    _default = TextStyleHtml.style(contextStyle);
-    _output = null;
+    return thisWithBuilder == otherWithBuilder;
+  }
+
+  TextStyleBuilder sub() => TextStyleBuilder._(this);
+
+  static bool _checkSignaturesMatch(List a, List b) {
+    if (a?.length != b?.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+
+    return true;
+  }
+
+  static TextStyleHtml _rootBuilderStyle(
+          BuildContext _, TextStyleHtml parent, TextStyle style) =>
+      parent.copyWith(style: style.inherit ? parent.style.merge(style) : style);
+
+  static TextStyleHtml _rootBuilderTextScaleFactor(
+      BuildContext context, TextStyleHtml parent, _) {
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    if (textScaleFactor == 1) return parent;
+
+    final style = parent.style;
+    final scaled = style.copyWith(fontSize: style.fontSize * textScaleFactor);
+    return parent.copyWith(style: scaled);
   }
 }
-
-WidgetPlaceholder _widgetToPlaceholder(Widget widget) {
-  if (widget is WidgetPlaceholder) return widget;
-  return WidgetPlaceholder<Widget>(builder: _widgetBuilder, input: widget);
-}
-
-Iterable<Widget> _widgetBuilder(
-        BuildContext _, Iterable<Widget> __, Widget widget) =>
-    [widget];

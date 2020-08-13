@@ -39,46 +39,18 @@ class _StyleSizing {
             }
           }
 
-          if (widget != null) widget.wrapWith(_build, input);
+          widget?.wrapWith((child) => _build(child, input, meta.tsb()));
           return pieces;
         },
         onWidgets: (meta, widgets) {
           final input = _parse(meta);
           if (input == null) return widgets;
-
-          return [
-            WidgetPlaceholder(
-              builder: _build,
-              children: widgets,
-              input: input,
-            )
-          ];
+          return _listOrNull(wf
+              .buildColumnPlaceholder(widgets)
+              ?.wrapWith((child) => _build(child, input, meta.tsb())));
         },
         priority: 50000,
       );
-
-  Iterable<Widget> _build(BuildContext context, Iterable<Widget> children,
-      _StyleSizingInput input) {
-    final child = wf.buildColumn(children);
-    if (child == null) return null;
-
-    final tsb = input.meta.tsb;
-    return [
-      CssSizing(
-        child: child,
-        constraints: BoxConstraints(
-          maxHeight: input.maxHeight?.getValue(context, tsb) ?? double.infinity,
-          maxWidth: input.maxWidth?.getValue(context, tsb) ?? double.infinity,
-          minHeight: input.minHeight?.getValue(context, tsb) ?? 0,
-          minWidth: input.minWidth?.getValue(context, tsb) ?? 0,
-        ),
-        size: Size(
-          input.width?.getValue(context, tsb) ?? double.infinity,
-          input.height?.getValue(context, tsb) ?? double.infinity,
-        ),
-      )
-    ];
-  }
 
   _StyleSizingInput _parse(NodeMetadata meta) {
     CssLength height, maxHeight, maxWidth, minHeight, minWidth, width;
@@ -113,7 +85,6 @@ class _StyleSizing {
         width == null) return null;
 
     return _StyleSizingInput(
-      meta,
       height: height,
       maxHeight: maxHeight,
       maxWidth: maxWidth,
@@ -122,6 +93,22 @@ class _StyleSizing {
       width: width,
     );
   }
+
+  static Widget _build(
+          Widget child, _StyleSizingInput input, TextStyleBuilder tsb) =>
+      Builder(builder: (context) {
+        final constraints = BoxConstraints(
+          maxHeight: input.maxHeight?.getValue(context, tsb) ?? double.infinity,
+          maxWidth: input.maxWidth?.getValue(context, tsb) ?? double.infinity,
+          minHeight: input.minHeight?.getValue(context, tsb) ?? 0,
+          minWidth: input.minWidth?.getValue(context, tsb) ?? 0,
+        );
+        final size = Size(
+          input.width?.getValue(context, tsb) ?? double.infinity,
+          input.height?.getValue(context, tsb) ?? double.infinity,
+        );
+        return CssSizing(child: child, constraints: constraints, size: size);
+      });
 }
 
 @immutable
@@ -129,13 +116,11 @@ class _StyleSizingInput {
   final CssLength height;
   final CssLength maxHeight;
   final CssLength maxWidth;
-  final NodeMetadata meta;
   final CssLength minHeight;
   final CssLength minWidth;
   final CssLength width;
 
-  _StyleSizingInput(
-    this.meta, {
+  _StyleSizingInput({
     this.height,
     this.maxHeight,
     this.maxWidth,

@@ -208,8 +208,10 @@ void main() {
     final explained = await explainMargin(tester, html);
     expect(
         explained,
-        equals('[CssBlock:child=[RichText:(+b:Foo)]],'
-            '[CssBlock:child=[Padding:(0,0,0,40),child=[RichText:(:Bar)]]],'
+        equals('[CssBlock:child=[Column:children='
+            '[CssBlock:child=[RichText:(+b:Foo)]],'
+            '[CssBlock:child=[Padding:(0,0,0,40),child=[RichText:(:Bar)]]]'
+            ']],'
             '[SizedBox:0.0x10.0]'));
   });
 
@@ -358,8 +360,10 @@ void main() {
         expect(
             explained,
             equals('[SizedBox:0.0x10.0],'
-                '[CssBlock:child=[Padding:(0,40,0,40),child=[Image:image=NetworkImage("$src", scale: 1.0)]]],'
-                '[CssBlock:child=[Padding:(0,40,0,40),child=[CssBlock:child=[RichText:(:(+i:fig. 1)(: Foo))]]]],'
+                '[CssBlock:child=[Column:children='
+                '[Padding:(0,40,0,40),child=[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)]],'
+                '[Padding:(0,40,0,40),child=[CssBlock:child=[RichText:(:(+i:fig. 1)(: Foo))]]]'
+                ']],'
                 '[SizedBox:0.0x10.0]'));
       }),
     );
@@ -895,10 +899,11 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children='
-              '[CssBlock:child=[RichText:(:1)]],'
+          equals('[CssBlock:child='
+              '[Column:children='
+              '[RichText:(:1)],'
               '[CssBlock:child=[RichText:(:2)]]'
-              ']'));
+              ']]'));
     });
 
     testWidgets('renders DIV block by default', (WidgetTester tester) async {
@@ -906,10 +911,11 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Column:children='
-              '[CssBlock:child=[RichText:(:1)]],'
+          equals('[CssBlock:child='
+              '[Column:children='
+              '[RichText:(:1)],'
               '[CssBlock:child=[RichText:(:2)]]'
-              ']'));
+              ']]'));
     });
 
     testWidgets('renders display: inline', (WidgetTester tester) async {
@@ -1100,6 +1106,16 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
                 '[CssBlock:child=[Directionality:rtl,child=[RichText:(:Foo)]]]'));
       });
     });
+
+    testWidgets('renders margin inside', (WidgetTester tester) async {
+      final html = '<div dir="rtl"><div style="margin: 5px">Foo</div></div>';
+      final explained = await explainMargin(tester, html);
+      expect(
+          explained,
+          equals('[SizedBox:0.0x5.0],'
+              '[CssBlock:child=[Directionality:rtl,child=[CssBlock:child=[Padding:(0,5,0,5),child=[RichText:(:Foo)]]]]],'
+              '[SizedBox:0.0x5.0]'));
+    });
   });
 
   group('font-family', () {
@@ -1198,23 +1214,89 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(explained, equals('[RichText:(:(@8.3:F)(@6.9:o)(@8.3:o))]'));
     });
 
-    testWidgets('renders em', (WidgetTester tester) async {
-      final html = '<span style="font-size: 2em">F'
-          '<span style="font-size: 2em">o</span>o</span>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:(@20.0:F)(@40.0:o)(@20.0:o))]'));
+    group('renders value', () {
+      testWidgets('control group', (WidgetTester tester) async {
+        final html = '<span>Foo</span>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(:Foo)]'));
+      });
+
+      testWidgets('renders em', (WidgetTester tester) async {
+        final html = '<span style="font-size: 2em">F'
+            '<span style="font-size: 2em">o</span>o</span>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(:(@20.0:F)(@40.0:o)(@20.0:o))]'));
+      });
+
+      testWidgets('renders percentage', (WidgetTester tester) async {
+        final html = '<span style="font-size: 200%">Foo</span>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(@20.0:Foo)]'));
+      });
+
+      testWidgets('renders pt', (WidgetTester tester) async {
+        final html = '<span style="font-size: 100pt">Foo</span>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(@133.3:Foo)]'));
+      });
+
+      testWidgets('renders px', (WidgetTester tester) async {
+        final html = '<span style="font-size: 100px">Foo</span>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(@100.0:Foo)]'));
+      });
     });
 
-    testWidgets('renders percentage', (WidgetTester tester) async {
-      final html = '<span style="font-size: 200%">Foo</span>';
+    group('textScaleFactor=2', () {
+      final explain2x = (WidgetTester tester, String html) async {
+        tester.binding.window.textScaleFactorTestValue = 2;
+        final explained = await explain(tester, html);
+        tester.binding.window.textScaleFactorTestValue = null;
+        return explained;
+      };
+
+      testWidgets('control group', (WidgetTester tester) async {
+        final html = '<span>Foo</span>';
+        final explained = await explain2x(tester, html);
+        expect(explained, equals('[RichText:(@20.0:Foo)]'));
+      });
+
+      testWidgets('renders em', (WidgetTester tester) async {
+        final html = '<span style="font-size: 2em">F'
+            '<span style="font-size: 2em">o</span>o</span>';
+        final e = await explain2x(tester, html);
+        expect(e, equals('[RichText:(@20.0:(@40.0:F)(@80.0:o)(@40.0:o))]'));
+      });
+
+      testWidgets('renders percentage', (WidgetTester tester) async {
+        final html = '<span style="font-size: 200%">Foo</span>';
+        final explained = await explain2x(tester, html);
+        expect(explained, equals('[RichText:(@40.0:Foo)]'));
+      });
+
+      testWidgets('renders pt', (WidgetTester tester) async {
+        final html = '<span style="font-size: 100pt">Foo</span>';
+        final explained = await explain2x(tester, html);
+        expect(explained, equals('[RichText:(@266.7:Foo)]'));
+      });
+
+      testWidgets('renders px', (WidgetTester tester) async {
+        final html = '<span style="font-size: 100px">Foo</span>';
+        final explained = await explain2x(tester, html);
+        expect(explained, equals('[RichText:(@200.0:Foo)]'));
+      });
+    });
+
+    testWidgets('renders multiple em', (WidgetTester tester) async {
+      final html = '<span style="font-size: 2em; font-size: 2em">Foo</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(@20.0:Foo)]'));
     });
 
-    testWidgets('renders px', (WidgetTester tester) async {
-      final html = '<span style="font-size: 100px">Foo</span>';
+    testWidgets('renders multiple percentage', (WidgetTester tester) async {
+      final html = '<span style="font-size: 200%; font-size: 200%">Foo</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(@100.0:Foo)]'));
+      expect(explained, equals('[RichText:(@20.0:Foo)]'));
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
@@ -1306,7 +1388,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(
           explained,
           equals(
-              '[RichText:(:(+b:bold)(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: four )'
+              '[RichText:(:(+b:bold)(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: )(:four)(: )'
               '(+w4:five)(: )(+w5:six)(: )(+b:seven)(: )(+w7:eight)(: )(+w8:nine))]'));
     });
   });
@@ -1334,6 +1416,12 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final html = '<span style="line-height: 50%">Foo</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(+height=0.5:Foo)]'));
+    });
+
+    testWidgets('renders pt', (WidgetTester tester) async {
+      final html = '<span style="line-height: 50pt">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+height=6.7:Foo)]'));
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
@@ -1450,10 +1538,8 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
     testWidgets('renders ellipsis', (WidgetTester tester) async {
       final html = '<div style="text-overflow: ellipsis">Foo</div>';
       final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals(
-              '[CssBlock:child=[RichText:maxLines=60,overflow=ellipsis,(:Foo)]]'));
+      expect(explained,
+          equals('[CssBlock:child=[RichText:overflow=ellipsis,(:Foo)]]'));
     });
 
     group('max-lines', () {
