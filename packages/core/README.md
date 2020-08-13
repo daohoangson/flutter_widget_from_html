@@ -232,24 +232,24 @@ The HTML string is parsed into DOM elements and each element is visited once to 
 Notes:
 
 - Text related styling can be changed with `TextStyleBuilder`, just register your callback and it will be called when the build context is ready.
-  - The second parameter is a `TextStyleHtml` which is immutable and is calculated from the root down to your element, your callback must return a `TextStyleHtml` by calling `copyWith` or simply return the parent itself.
-  - Optionally, pass any object on registration and your callback will receive it as the third parameter.
+  - The first parameter is a `TextStyleHtml` which is immutable and is calculated from the root down to your element, your callback must return a `TextStyleHtml` by calling `copyWith` or simply return the parent itself.
+  - Optionally, pass any object on registration and your callback will receive it as the second parameter.
 
 ```dart
 // simple callback: set text color to accent color
-meta.tsb((context, parent, _) =>
+meta.tsb((parent, _) =>
   parent.copyWith(
     style: parent.style.copyWith(
-      color: Theme.of(context).accentColor,
+      color: parent.getDependency<ThemeData>().accentColor,
     ),
   ));
 
-// callback using third param: set height to input value
-TextStyleHtml callback(BuildContext _, TextStyleHtml parent, double value) =>
+// callback using second param: set height to input value
+TextStyleHtml callback(TextStyleHtml parent, double value) =>
   parent.copyWith(height: value)
 
 // register with some value
-meta.tsb<bool>(callback, 2);
+meta.tsb<int>(callback, 2);
 ```
 
 - Other complicated styling are supported via `BuildOp`
