@@ -46,8 +46,18 @@ class HtmlBuilder {
 
     Iterable<WidgetPlaceholder> widgets = list;
     if (parentMeta?.hasOps == true) {
+      final _makeSureWidgetIsPlaceholder = (Widget widget) =>
+          widget is WidgetPlaceholder
+              ? widget
+              : WidgetPlaceholder<NodeMetadata>(
+                  child: widget, generator: parentMeta);
+
       for (final op in parentMeta.ops) {
-        widgets = op.onWidgets(parentMeta, widgets).toList(growable: false);
+        widgets = op.onWidgets
+                ?.call(parentMeta, widgets)
+                ?.map(_makeSureWidgetIsPlaceholder)
+                ?.toList(growable: false) ??
+            widgets;
       }
     }
 
@@ -60,14 +70,14 @@ class HtmlBuilder {
 
     if (meta.hasParents) {
       for (final op in meta.parents) {
-        op.onChild(meta, e);
+        op.onChild?.call(meta, e);
       }
     }
 
     // stylings, step 1: get default styles from tag-based build ops
     if (meta.hasOps) {
       for (final op in meta.ops) {
-        final map = op.defaultStyles(meta, e);
+        final map = op.defaultStyles?.call(meta, e);
         if (map == null) continue;
         for (final pair in map.entries) {
           meta.insertStyle(pair.key, pair.value);
@@ -143,7 +153,7 @@ class HtmlBuilder {
     Iterable<BuiltPiece> output = _pieces;
     if (parentMeta?.hasOps == true) {
       for (final op in parentMeta.ops) {
-        output = op.onPieces(parentMeta, output);
+        output = op.onPieces?.call(parentMeta, output) ?? output;
       }
     }
 
@@ -184,7 +194,7 @@ class HtmlBuilder {
 Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, NodeMetadata meta) {
   // try to reuse existing list if possible
   final withOnChild =
-      meta?.ops?.where((op) => op.hasOnChild)?.toList(growable: false);
+      meta?.ops?.where((op) => op.onChild != null)?.toList(growable: false);
   if (withOnChild?.isNotEmpty != true) return ops;
   return List.unmodifiable([if (ops != null) ...ops, ...withOnChild]);
 }

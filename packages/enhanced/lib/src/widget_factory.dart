@@ -262,5 +262,5 @@ class WidgetFactory extends core.WidgetFactory {
     return _tagSvg;
   }
 
-  BuildOp tagVideo(NodeMetadata meta) => _TagVideo(this, meta);
+  BuildOp tagVideo(NodeMetadata meta) => _TagVideo(this, meta).op;
 }
