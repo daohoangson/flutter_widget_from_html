@@ -23,13 +23,12 @@ class HtmlBuilder {
   HtmlBuilder({
     @required this.domNodes,
     @required this.parentMeta,
-    Iterable<BuildOp> parentParentOps,
+    this.parentOps,
     this.parentText,
     @required this.wf,
   })  : assert(domNodes != null),
         assert(parentMeta != null),
-        assert(wf != null),
-        parentOps = _prepareParentOps(parentParentOps, parentMeta);
+        assert(wf != null);
 
   Iterable<Widget> build() {
     final list = <WidgetPlaceholder>[];
@@ -117,7 +116,7 @@ class HtmlBuilder {
       final __builder = HtmlBuilder(
         domNodes: domNode.nodes,
         parentMeta: meta,
-        parentParentOps: parentOps,
+        parentOps: _prepareParentOps(parentOps, meta),
         parentText: isBlockElement ? null : _textPiece.text,
         wf: wf,
       );
@@ -187,8 +186,7 @@ Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, NodeMetadata meta) {
   final withOnChild =
       meta?.ops?.where((op) => op.hasOnChild)?.toList(growable: false);
   if (withOnChild?.isNotEmpty != true) return ops;
-
-  return List.unmodifiable((ops?.toList() ?? <BuildOp>[])..addAll(withOnChild));
+  return List.unmodifiable([if (ops != null) ...ops, ...withOnChild]);
 }
 
 final _spacingRegExp = RegExp(r'\s+');
