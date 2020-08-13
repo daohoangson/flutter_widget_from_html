@@ -851,16 +851,16 @@ class WidgetFactory {
     return _tagImg;
   }
 
-  BuildOp tagLi(NodeMetadata meta) => _TagLi(this, meta);
+  BuildOp tagLi(NodeMetadata meta) => _TagLi(this, meta).op;
 
   BuildOp tagQ() {
     _tagQ ??= _TagQ(this).buildOp;
     return _tagQ;
   }
 
-  BuildOp tagRuby(NodeMetadata meta) => _TagRuby(this, meta);
+  BuildOp tagRuby(NodeMetadata meta) => _TagRuby(this, meta).op;
 
-  BuildOp tagTable(NodeMetadata meta) => _TagTable(this, meta);
+  BuildOp tagTable(NodeMetadata meta) => _TagTable(this, meta).op;
 }
 
 Iterable<Widget> _listOrNull(Widget x) => x == null ? null : [x];

@@ -65,7 +65,7 @@ void main() {
           useExplainer: false);
       expect(
           explained,
-          equals('WidgetPlaceholder<BuildOp>\n'
+          equals('WidgetPlaceholder<NodeMetadata>\n'
               '└CssBlock()\n'
               ' └Text("Hi")\n'
               '  └RichText(text: "Hi")\n\n'));

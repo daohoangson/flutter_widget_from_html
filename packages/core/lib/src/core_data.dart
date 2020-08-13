@@ -2,67 +2,76 @@ import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'core_helpers.dart';
+import 'core_widget_factory.dart';
 
 part 'data/table_data.dart';
 part 'data/text_bits.dart';
 
+/// A building operation to customize how a DOM element is rendered.
+@immutable
 class BuildOp {
+  /// Whether the element should be rendered with [CssBlock].
+  ///
+  /// Default: `true` if [onWidgets] callback is set, `false` otherwise.
   final bool isBlockElement;
 
-  // op with lower priority will run first
+  /// The execution priority, op with lower priority will run first.
+  ///
+  /// Default: 10.
   final int priority;
 
-  final _BuildOpDefaultStyles _defaultStyles;
-  final _BuildOpOnChild _onChild;
-  final _BuildOpOnPieces _onPieces;
-  final _BuildOpOnWidgets _onWidgets;
+  /// The callback that should return default styling map.
+  ///
+  /// See list of all supported inline stylings in README.md, the sample op
+  /// below just changes the color:
+  ///
+  /// ```dart
+  /// BuildOp(
+  ///   defaultStyles: (_, __) => {'color': 'red'},
+  /// )
+  /// ```
+  ///
+  /// Note: op must be registered early for this to work e.g.
+  /// in [WidgetFactory.parseTag] or [onChild].
+  final Map<String, String> Function(NodeMetadata meta, dom.Element element)
+      defaultStyles;
 
+  /// The callback that will be called whenver a child element is found.
+  ///
+  /// Please note that all children and grandchildren etc. will trigger this method,
+  /// it's easy to check whether an element is direct child:
+  ///
+  /// ```dart
+  /// BuildOp(
+  ///   onChild: (childMeta, childElement) {
+  ///     if (!childElement.parent != parentMeta.domElement) return;
+  ///     childMeta.doSomethingHere;
+  ///   },
+  /// );
+  ///
+  /// ```
+  final void Function(NodeMetadata childMeta, dom.Element childElement) onChild;
+
+  /// The callback that will be called when child elements have been processed.
+  final Iterable<BuiltPiece> Function(
+      NodeMetadata meta, Iterable<BuiltPiece> pieces) onPieces;
+
+  /// The callback that will be called when child elements have been built.
+  ///
+  /// Note: only works if it's a block element.
+  final Iterable<Widget> Function(
+      NodeMetadata meta, Iterable<WidgetPlaceholder> widgets) onWidgets;
+
+  /// Creates a build op.
   BuildOp({
-    _BuildOpDefaultStyles defaultStyles,
+    this.defaultStyles,
     bool isBlockElement,
-    _BuildOpOnChild onChild,
-    _BuildOpOnPieces onPieces,
-    _BuildOpOnWidgets onWidgets,
+    this.onChild,
+    this.onPieces,
+    this.onWidgets,
     this.priority = 10,
-  })  : _defaultStyles = defaultStyles,
-        isBlockElement = isBlockElement ?? onWidgets != null,
-        _onChild = onChild,
-        _onPieces = onPieces,
-        _onWidgets = onWidgets;
-
-  bool get hasOnChild => _onChild != null;
-
-  Map<String, String> defaultStyles(NodeMetadata meta, dom.Element e) =>
-      _defaultStyles != null ? _defaultStyles(meta, e) : null;
-
-  void onChild(NodeMetadata meta, dom.Element e) =>
-      _onChild != null ? _onChild(meta, e) : meta;
-
-  Iterable<BuiltPiece> onPieces(
-    NodeMetadata meta,
-    Iterable<BuiltPiece> pieces,
-  ) =>
-      _onPieces != null ? _onPieces(meta, pieces) : pieces;
-
-  Iterable<WidgetPlaceholder> onWidgets(
-          NodeMetadata meta, Iterable<WidgetPlaceholder> widgets) =>
-      (_onWidgets != null
-          ? _onWidgets(meta, widgets)?.map(_placeholder)
-          : null) ??
-      widgets;
-
-  WidgetPlaceholder _placeholder(Widget widget) => widget is WidgetPlaceholder
-      ? widget
-      : WidgetPlaceholder<BuildOp>(child: widget, generator: this);
+  }) : isBlockElement = isBlockElement ?? onWidgets != null;
 }
-
-typedef _BuildOpDefaultStyles = Map<String, String> Function(
-    NodeMetadata meta, dom.Element e);
-typedef _BuildOpOnChild = void Function(NodeMetadata meta, dom.Element e);
-typedef _BuildOpOnPieces = Iterable<BuiltPiece> Function(
-    NodeMetadata meta, Iterable<BuiltPiece> pieces);
-typedef _BuildOpOnWidgets = Iterable<Widget> Function(
-    NodeMetadata meta, Iterable<WidgetPlaceholder> widgets);
 
 class BuiltPiece {
   final TextBits text;

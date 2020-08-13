@@ -19,22 +19,25 @@ const _kCssDisplayTableFooterGroup = 'table-footer-group';
 const _kCssDisplayTableCell = 'table-cell';
 const _kCssDisplayTableCaption = 'table-caption';
 
-class _TagTable extends BuildOp {
+class _TagTable {
   final NodeMetadata tableMeta;
   final WidgetFactory wf;
 
   final _data = _TableData();
 
-  _TagTable(this.wf, this.tableMeta)
-      : super(
-          isBlockElement: true,
-          priority: 999999,
-        );
+  BuildOp _tableOp;
 
-  @override
-  bool get hasOnChild => true;
+  _TagTable(this.wf, this.tableMeta);
 
-  @override
+  BuildOp get op {
+    _tableOp = BuildOp(
+      onChild: onChild,
+      onWidgets: onWidgets,
+      priority: 999999,
+    );
+    return _tableOp;
+  }
+
   void onChild(NodeMetadata childMeta, dom.Element e) {
     if (e.parent != tableMeta.domElement) return;
 
@@ -43,7 +46,7 @@ class _TagTable extends BuildOp {
       case _kCssDisplayTableRow:
         final row = _TableDataRow();
         _data.rows.add(row);
-        childMeta.op = _TableRowOp(wf, childMeta, row);
+        childMeta.op = _TableRow(wf, childMeta, row)._rowOp;
         break;
       case _kCssDisplayTableHeaderGroup:
       case _kCssDisplayTableRowGroup:
@@ -53,7 +56,7 @@ class _TagTable extends BuildOp {
             : which == _kCssDisplayTableRowGroup
                 ? _data.rows
                 : _data.footer.rows;
-        childMeta.op = _TableGroupOp(wf, childMeta, rows);
+        childMeta.op = _TableGroup(wf, childMeta, rows)._groupOp;
         break;
       case _kCssDisplayTableCaption:
         childMeta.op = BuildOp(onWidgets: (meta, widgets) {
@@ -64,7 +67,6 @@ class _TagTable extends BuildOp {
     }
   }
 
-  @override
   Iterable<WidgetPlaceholder> onWidgets(
       NodeMetadata _, Iterable<WidgetPlaceholder> __) {
     final data = TableData(border: _parseBorder());
@@ -159,17 +161,17 @@ class _TagTable extends BuildOp {
   }
 }
 
-class _TableGroupOp extends BuildOp {
+class _TableGroup {
   final List<_TableDataRow> rows;
   final NodeMetadata groupMeta;
   final WidgetFactory wf;
 
-  _TableGroupOp(this.wf, this.groupMeta, this.rows);
+  BuildOp _groupOp;
 
-  @override
-  bool get hasOnChild => true;
+  _TableGroup(this.wf, this.groupMeta, this.rows) {
+    _groupOp = BuildOp(onChild: onChild);
+  }
 
-  @override
   void onChild(NodeMetadata childMeta, dom.Element e) {
     if (e.parent != groupMeta.domElement) return;
     if (_TagTable._getChildCssDisplayValue(childMeta, e) !=
@@ -177,23 +179,22 @@ class _TableGroupOp extends BuildOp {
 
     final row = _TableDataRow();
     rows.add(row);
-    childMeta.op = _TableRowOp(wf, childMeta, row);
+    childMeta.op = _TableRow(wf, childMeta, row)._rowOp;
   }
 }
 
-class _TableRowOp extends BuildOp {
+class _TableRow {
   final _TableDataRow row;
   final NodeMetadata rowMeta;
   final WidgetFactory wf;
 
   BuildOp _cellOp;
+  BuildOp _rowOp;
 
-  _TableRowOp(this.wf, this.rowMeta, this.row);
+  _TableRow(this.wf, this.rowMeta, this.row) {
+    _rowOp = BuildOp(onChild: onChild);
+  }
 
-  @override
-  bool get hasOnChild => true;
-
-  @override
   void onChild(NodeMetadata childMeta, dom.Element e) {
     if (e.parent != rowMeta.domElement) return;
     if (_TagTable._getChildCssDisplayValue(childMeta, e) !=

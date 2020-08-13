@@ -4,19 +4,24 @@ const _kTagRuby = 'ruby';
 const _kTagRp = 'rp';
 const _kTagRt = 'rt';
 
-class _TagRuby extends BuildOp {
+class _TagRuby {
   final NodeMetadata rubyMeta;
   final WidgetFactory wf;
 
+  BuildOp _rubyOp;
   BuildOp _rtOp;
   TextBits _rtText;
 
   _TagRuby(this.wf, this.rubyMeta);
 
-  @override
-  bool get hasOnChild => true;
+  BuildOp get op {
+    _rubyOp ??= BuildOp(
+      onChild: onChild,
+      onPieces: onPieces,
+    );
+    return _rubyOp;
+  }
 
-  @override
   void onChild(NodeMetadata childMeta, dom.Element e) {
     if (e.parent != rubyMeta.domElement) return;
 
@@ -43,11 +48,8 @@ class _TagRuby extends BuildOp {
     }
   }
 
-  @override
   Iterable<BuiltPiece> onPieces(
-    NodeMetadata meta,
-    Iterable<BuiltPiece> pieces,
-  ) {
+      NodeMetadata meta, Iterable<BuiltPiece> pieces) {
     if (_rtText == null) return pieces;
     var processed = false;
 

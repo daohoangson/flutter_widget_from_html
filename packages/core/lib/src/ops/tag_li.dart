@@ -23,7 +23,7 @@ const _kCssListStyleTypeRomanLower = 'lower-roman';
 const _kCssListStyleTypeRomanUpper = 'upper-roman';
 const _kCssListStyleTypeSquare = 'square';
 
-class _TagLi extends BuildOp {
+class _TagLi {
   final NodeMetadata listMeta;
   final WidgetFactory wf;
 
@@ -32,11 +32,9 @@ class _TagLi extends BuildOp {
 
   _ListConfig _config;
   BuildOp _itemOp;
+  BuildOp _listOp;
 
-  _TagLi(this.wf, this.listMeta) : super(isBlockElement: true);
-
-  @override
-  bool get hasOnChild => true;
+  _TagLi(this.wf, this.listMeta);
 
   _ListConfig get config {
     // cannot build config from constructor because
@@ -45,9 +43,13 @@ class _TagLi extends BuildOp {
     return _config;
   }
 
-  @override
+  BuildOp get op {
+    _listOp ??= _TagLiOp(this);
+    return _listOp;
+  }
+
   Map<String, String> defaultStyles(NodeMetadata _, dom.Element e) {
-    final p = listMeta.parents?.whereType<_TagLi>()?.length ?? 0;
+    final p = listMeta.parents?.whereType<_TagLiOp>()?.length ?? 0;
 
     final styles = {
       'padding-inline-start': '2.5em',
@@ -67,7 +69,6 @@ class _TagLi extends BuildOp {
     return styles;
   }
 
-  @override
   void onChild(NodeMetadata childMeta, dom.Element e) {
     if (e.localName != _kTagLi) return;
     if (e.parent != listMeta.domElement) return;
@@ -202,4 +203,13 @@ class _ListConfig {
 
     return null;
   }
+}
+
+class _TagLiOp extends BuildOp {
+  _TagLiOp(_TagLi _)
+      : super(
+          defaultStyles: _.defaultStyles,
+          isBlockElement: true,
+          onChild: _.onChild,
+        );
 }

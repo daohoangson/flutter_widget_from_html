@@ -1,17 +1,23 @@
 part of '../widget_factory.dart';
 
-class _TagVideo extends BuildOp {
+class _TagVideo {
   final NodeMetadata videoMeta;
   final WidgetFactory wf;
 
   final _sourceUrls = <String>[];
 
-  _TagVideo(this.wf, this.videoMeta) : super(isBlockElement: true);
+  BuildOp _videoOp;
 
-  @override
-  bool get hasOnChild => true;
+  _TagVideo(this.wf, this.videoMeta);
 
-  @override
+  BuildOp get op {
+    _videoOp = BuildOp(
+      onChild: onChild,
+      onWidgets: onWidgets,
+    );
+    return _videoOp;
+  }
+
   void onChild(NodeMetadata childMeta, dom.Element e) {
     if (e.localName != 'source') return;
     if (e.parent != videoMeta.domElement) return;
@@ -25,7 +31,6 @@ class _TagVideo extends BuildOp {
     _sourceUrls.add(url);
   }
 
-  @override
   Iterable<WidgetPlaceholder> onWidgets(
       NodeMetadata _, Iterable<WidgetPlaceholder> widgets) {
     final player = build();
