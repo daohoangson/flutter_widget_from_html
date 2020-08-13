@@ -56,8 +56,8 @@ class _TagTable extends BuildOp {
         childMeta.op = _TableGroupOp(wf, childMeta, rows);
         break;
       case _kCssDisplayTableCaption:
-        childMeta.op = BuildOp(onWidgets: (_, widgets) {
-          _data.caption = wf.buildColumnPlaceholder(widgets);
+        childMeta.op = BuildOp(onWidgets: (meta, widgets) {
+          _data.caption = wf.buildColumnPlaceholder(meta, widgets);
           return [_data.caption];
         });
         break;
@@ -66,42 +66,38 @@ class _TagTable extends BuildOp {
 
   @override
   Iterable<WidgetPlaceholder> onWidgets(
-          NodeMetadata meta, Iterable<WidgetPlaceholder> _) =>
-      [
-        WidgetPlaceholder<_TagTable>(
-          child: Builder(builder: (context) {
-            final table = TableData(border: _parseBorder(context));
+      NodeMetadata _, Iterable<WidgetPlaceholder> __) {
+    final data = TableData(border: _parseBorder());
 
-            final rows = <_TableDataRow>[
-              ..._data.header.rows,
-              ..._data.rows,
-              ..._data.footer.rows,
-            ];
-            for (var i = 0; i < rows.length; i++) {
-              for (final cell in rows[i].cells) {
-                table.addCell(i, cell);
-              }
-            }
+    final rows = <_TableDataRow>[
+      ..._data.header.rows,
+      ..._data.rows,
+      ..._data.footer.rows,
+    ];
+    for (var i = 0; i < rows.length; i++) {
+      for (final cell in rows[i].cells) {
+        data.addCell(i, cell);
+      }
+    }
 
-            final tableWidget = wf.buildTable(table);
-            return wf.buildColumnPlaceholder([
-                  if (_data.caption != null) _data.caption,
-                  if (tableWidget != null) tableWidget,
-                ]) ??
-                widget0;
-          }),
-          generator: this,
-        )
-      ];
+    final table = wf.buildTable(tableMeta, data);
+    final column = wf.buildColumnPlaceholder(tableMeta, [
+      if (_data.caption != null) _data.caption,
+      if (table != null) table,
+    ]);
+    if (column == null) return [];
 
-  BorderSide _parseBorder(BuildContext context) {
+    return [WidgetPlaceholder<TableData>(child: column, generator: data)];
+  }
+
+  BorderSide _parseBorder() {
     var styleBorder = tableMeta.style(_kCssBorder);
     if (styleBorder != null) {
       final borderParsed = wf.parseCssBorderSide(styleBorder);
       if (borderParsed != null) {
         return BorderSide(
           color: borderParsed.color ?? const Color(0xFF000000),
-          width: borderParsed.width.getValue(context, tableMeta.tsb()),
+          width: borderParsed.width.getValue(tableMeta.tsb().build()),
         );
       }
     }
@@ -205,7 +201,7 @@ class _TableRowOp extends BuildOp {
 
     _cellOp ??= BuildOp(
       onWidgets: (childMeta, widgets) {
-        final column = wf.buildColumnPlaceholder(widgets);
+        final column = wf.buildColumnPlaceholder(childMeta, widgets);
         if (column == null) return null;
 
         final cell = _build(childMeta, column);

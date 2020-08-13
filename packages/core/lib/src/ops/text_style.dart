@@ -1,5 +1,10 @@
 part of '../core_widget_factory.dart';
 
+const _kCssDirection = 'direction';
+const _kCssDirectionLtr = 'ltr';
+const _kCssDirectionRtl = 'rtl';
+const _kAttributeDir = 'dir';
+
 const _kCssFontFamily = 'font-family';
 
 const _kCssFontSize = 'font-size';
@@ -48,11 +53,10 @@ const _kCssTextDecorationOverline = 'overline';
 const _kCssTextDecorationUnderline = 'underline';
 
 class _TextStyle {
-  static TextStyleHtml color(BuildContext _, TextStyleHtml p, Color color) =>
+  static TextStyleHtml color(TextStyleHtml p, Color color) =>
       p.copyWith(style: p.style.copyWith(color: color));
 
-  static TextStyleHtml fontFamily(
-          BuildContext _, TextStyleHtml p, List<String> list) =>
+  static TextStyleHtml fontFamily(TextStyleHtml p, List<String> list) =>
       p.copyWith(
         style: p.style.copyWith(
           fontFamily: list.isNotEmpty ? list.first : null,
@@ -60,21 +64,25 @@ class _TextStyle {
         ),
       );
 
-  static TextStyleHtml fontSize(BuildContext c, TextStyleHtml p, String v) =>
-      p.copyWith(style: p.style.copyWith(fontSize: _fontSizeTryParse(c, p, v)));
+  static TextStyleHtml fontSize(TextStyleHtml p, String v) =>
+      p.copyWith(style: p.style.copyWith(fontSize: _fontSizeTryParse(p, v)));
 
-  static TextStyleHtml fontStyle(
-          BuildContext _, TextStyleHtml p, FontStyle fontStyle) =>
+  static TextStyleHtml fontStyle(TextStyleHtml p, FontStyle fontStyle) =>
       p.copyWith(style: p.style.copyWith(fontStyle: fontStyle));
 
-  static TextStyleHtml fontWeight(
-          BuildContext _, TextStyleHtml p, FontWeight v) =>
+  static TextStyleHtml fontWeight(TextStyleHtml p, FontWeight v) =>
       p.copyWith(style: p.style.copyWith(fontWeight: v));
 
-  static TextStyleHtml lineHeight(BuildContext c, TextStyleHtml p, String v) =>
-      p.copyWith(height: _lineHeightTryParse(c, p, v));
+  static TextStyleHtml lineHeight(TextStyleHtml p, String v) =>
+      p.copyWith(height: _lineHeightTryParse(p, v));
 
-  static TextStyleHtml textDeco(BuildContext _, TextStyleHtml p, _TextDeco v) {
+  static TextStyleHtml maxLines(TextStyleHtml p, int v) =>
+      p.copyWith(maxLines: v);
+
+  static TextStyleHtml textAlign(TextStyleHtml p, TextAlign v) =>
+      p.copyWith(textAlign: v);
+
+  static TextStyleHtml textDeco(TextStyleHtml p, _TextDeco v) {
     final pd = p.style.decoration;
     final lineThough = pd?.contains(TextDecoration.lineThrough) == true;
     final overline = pd?.contains(TextDecoration.overline) == true;
@@ -96,10 +104,22 @@ class _TextStyle {
         decoration: TextDecoration.combine(list),
         decorationColor: v.color,
         decorationStyle: v.style,
-        decorationThickness: v.thickness?.getValueFromStyle(p),
+        decorationThickness: v.thickness?.getValue(p),
       ),
     );
   }
+
+  static TextStyleHtml textDirection(TextStyleHtml p, String v) {
+    final textDirection = (v == _kCssDirectionRtl)
+        ? TextDirection.rtl
+        : v == _kCssDirectionLtr ? TextDirection.ltr : null;
+    if (textDirection == null) return p;
+
+    return p.copyWith(textDirection: textDirection);
+  }
+
+  static TextStyleHtml textOverflow(TextStyleHtml p, TextOverflow v) =>
+      p.copyWith(textOverflow: v);
 
   static List<String> _fontFamilyTryParse(String value) {
     final parts = value.split(',');
@@ -115,13 +135,13 @@ class _TextStyle {
     return list;
   }
 
-  static double _fontSizeTryParse(BuildContext c, TextStyleHtml p, String v) {
+  static double _fontSizeTryParse(TextStyleHtml p, String v) {
     final length = _parseCssLength(v);
     if (length != null) {
-      final lengthValue = length.getValueFromStyle(
+      final lengthValue = length.getValue(
         p,
         baseValue: p.parent?.style?.fontSize,
-        scaleFactor: MediaQuery.of(c).textScaleFactor,
+        scaleFactor: p.deps.getValue<MediaQueryData>().textScaleFactor,
       );
       if (lengthValue != null) return lengthValue;
     }
@@ -192,7 +212,7 @@ class _TextStyle {
     return null;
   }
 
-  static double _lineHeightTryParse(BuildContext c, TextStyleHtml p, String v) {
+  static double _lineHeightTryParse(TextStyleHtml p, String v) {
     if (v == _kCssLineHeightNormal) return -1;
 
     final number = double.tryParse(v);
@@ -201,10 +221,10 @@ class _TextStyle {
     final length = _parseCssLength(v);
     if (length == null) return null;
 
-    final lengthValue = length.getValueFromStyle(
+    final lengthValue = length.getValue(
       p,
       baseValue: p.style.fontSize,
-      scaleFactor: MediaQuery.of(c).textScaleFactor,
+      scaleFactor: p.deps.getValue<MediaQueryData>().textScaleFactor,
     );
     if (lengthValue == null) return null;
 

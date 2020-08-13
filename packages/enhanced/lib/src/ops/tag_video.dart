@@ -32,7 +32,7 @@ class _TagVideo extends BuildOp {
     if (player == null) return widgets;
 
     return [
-      WidgetPlaceholder<_TagVideo>(child: player, generator: this),
+      WidgetPlaceholder<NodeMetadata>(child: player, generator: videoMeta),
     ];
   }
 
@@ -41,6 +41,7 @@ class _TagVideo extends BuildOp {
 
     final a = videoMeta.domElement.attributes;
     return wf.buildVideoPlayer(
+      videoMeta,
       _sourceUrls.first,
       autoplay: a.containsKey('autoplay'),
       controls: a.containsKey('controls'),

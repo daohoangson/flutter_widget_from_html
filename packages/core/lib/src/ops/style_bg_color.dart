@@ -20,9 +20,8 @@ class _StyleBgColor {
         onWidgets: (meta, widgets) {
           final color = wf.parseColor(meta.style(_kCssBackgroundColor));
           if (color == null) return null;
-          return _listOrNull(wf
-              .buildColumnPlaceholder(widgets)
-              ?.wrapWith((child) => wf.buildDecoratedBox(child, color: color)));
+          return _listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
+              (child) => wf.buildDecoratedBox(meta, child, color: color)));
         },
         priority: 15000,
       );
@@ -30,6 +29,6 @@ class _StyleBgColor {
   BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) =>
       piece..text.bits.forEach((bit) => bit.tsb?.enqueue(_tsb, bgColor));
 
-  static TextStyleHtml _tsb(BuildContext _, TextStyleHtml p, Color c) =>
+  static TextStyleHtml _tsb(TextStyleHtml p, Color c) =>
       p.copyWith(style: p.style.copyWith(background: Paint()..color = c));
 }

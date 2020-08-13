@@ -13,7 +13,6 @@ import 'core_html_widget.dart';
 
 part 'ops/column.dart';
 part 'ops/style_bg_color.dart';
-part 'ops/style_direction.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_padding.dart';
 part 'ops/style_sizing.dart';
@@ -54,10 +53,11 @@ class WidgetFactory {
 
   HtmlWidget get widget => _widget;
 
-  WidgetPlaceholder buildBody(Iterable<Widget> children) =>
-      buildColumnPlaceholder(children, trimMarginVertical: true);
+  WidgetPlaceholder buildBody(NodeMetadata meta, Iterable<Widget> children) =>
+      buildColumnPlaceholder(meta, children, trimMarginVertical: true);
 
   WidgetPlaceholder buildColumnPlaceholder(
+    NodeMetadata meta,
     Iterable<Widget> children, {
     bool trimMarginVertical = false,
   }) {
@@ -76,24 +76,27 @@ class WidgetFactory {
     }
 
     return _ColumnPlaceholder(
-      this,
       children,
+      meta: meta,
       trimMarginVertical: trimMarginVertical,
+      wf: this,
     );
   }
 
-  Widget buildColumnWidget(List<Widget> children) {
+  Widget buildColumnWidget(NodeMetadata meta, List<Widget> children) {
     if (children?.isNotEmpty != true) return null;
     if (children.length == 1) return children.first;
 
     return Column(
+      children: children,
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      children: children,
+      textDirection: meta.tsb().build().textDirection,
     );
   }
 
   Widget buildDecoratedBox(
+    NodeMetadata meta,
     Widget child, {
     Color color,
   }) =>
@@ -106,22 +109,14 @@ class WidgetFactory {
             )
           : child;
 
-  Widget buildDirectionality(Widget child, TextDirection textDirection) =>
-      Directionality(child: child, textDirection: textDirection);
-
-  Widget buildDivider() => const DecoratedBox(
+  Widget buildDivider(NodeMetadata meta) => const DecoratedBox(
         decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 1)),
         child: SizedBox(height: 1),
       );
 
-  Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
+  Widget buildGestureDetector(
+          NodeMetadata meta, Widget child, GestureTapCallback onTap) =>
       GestureDetector(child: child, onTap: onTap);
-
-  GestureTapCallback buildGestureTapCallbackForUrl(String url) => url != null
-      ? () => widget.onTapUrl != null
-          ? widget.onTapUrl(url)
-          : print('[flutter_widget_from_html] Tapped url $url')
-      : null;
 
   TextSpan buildGestureTapCallbackSpan(
     String text,
@@ -134,83 +129,38 @@ class WidgetFactory {
         style: style,
       );
 
-  Widget buildHorizontalScrollView(Widget child) =>
+  Widget buildHorizontalScrollView(NodeMetadata meta, Widget child) =>
       SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
 
-  Widget buildImage(Object provider, ImgMetadata img) =>
+  Widget buildImage(NodeMetadata node, Object provider, ImgMetadata img) =>
       provider != null && provider is ImageProvider && img != null
           ? Image(
-              errorBuilder: buildImageErrorWidgetBuilder(img),
+              errorBuilder: buildImageErrorWidgetBuilder(node, img),
               image: provider,
               semanticLabel: img.alt ?? img.title,
             )
           : null;
 
-  ImageErrorWidgetBuilder buildImageErrorWidgetBuilder(ImgMetadata img) =>
+  ImageErrorWidgetBuilder buildImageErrorWidgetBuilder(
+          NodeMetadata meta, ImgMetadata img) =>
       (_, error, __) {
         print('${img.url} error: $error');
         final text = img.alt ?? img.title ?? '❌';
         return Text(text);
       };
 
-  Object buildImageProvider(String url) {
-    if (url?.startsWith('asset:') == true) {
-      return buildImageFromAsset(url);
-    }
-
-    if (url?.startsWith('data:') == true) {
-      return buildImageFromDataUri(url);
-    }
-
-    return buildImageFromUrl(url);
-  }
-
-  Uint8List buildImageBytes(String dataUri) {
-    final match = _dataUriRegExp.matchAsPrefix(dataUri);
-    if (match == null) return null;
-
-    final prefix = match[0];
-    final encoding = match[1];
-    final data = dataUri.substring(prefix.length);
-
-    final bytes = encoding == 'base64'
-        ? base64.decode(data)
-        : encoding == 'utf8' ? Uint8List.fromList(data.codeUnits) : null;
-    if (bytes.isEmpty) return null;
-
-    return bytes;
-  }
-
-  ImageProvider buildImageFromAsset(String url) {
-    final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
-    if (uri?.scheme != 'asset') return null;
-
-    final assetName = uri.path;
-    if (assetName?.isNotEmpty != true) return null;
-
-    final package = uri.queryParameters?.containsKey('package') == true
-        ? uri.queryParameters['package']
-        : null;
-
-    return AssetImage(assetName, package: package);
-  }
-
-  ImageProvider buildImageFromDataUri(String dataUri) {
-    final bytes = buildImageBytes(dataUri);
-    if (bytes == null) return null;
-
-    return MemoryImage(bytes);
-  }
-
-  ImageProvider buildImageFromUrl(String url) =>
-      url?.isNotEmpty == true ? NetworkImage(url) : null;
-
-  Widget buildPadding(Widget child, EdgeInsets padding) =>
+  Widget buildPadding(NodeMetadata meta, Widget child, EdgeInsets padding) =>
       child != null && padding != null && padding != const EdgeInsets.all(0)
           ? Padding(child: child, padding: padding)
           : child;
 
-  Widget buildTable(TableData table) {
+  Widget buildStack(NodeMetadata meta, List<Widget> children) => Stack(
+        children: children,
+        overflow: Overflow.visible,
+        textDirection: meta.tsb().build().textDirection,
+      );
+
+  Widget buildTable(NodeMetadata meta, TableData table) {
     final rows = <TableRow>[];
     final slotIndices = <int>[];
     final tableCols = table.cols;
@@ -242,14 +192,15 @@ class WidgetFactory {
     return Table(border: tableBorder, children: rows);
   }
 
-  WidgetPlaceholder buildText(TextBits text) {
+  WidgetPlaceholder buildText(NodeMetadata meta, TextBits text) {
     text.trimRight();
     if (text.isEmpty) return null;
 
-    final tsb = text.tsb;
-    final maxLines = tsb?.maxLines == -1 ? null : tsb?.maxLines;
-    final overflow = tsb?.textOverflow ?? TextOverflow.clip;
-    final textAlign = tsb?.textAlign ?? TextAlign.start;
+    final tsh = text.tsb?.build();
+    final maxLines = tsh?.maxLines == -1 ? null : tsh?.maxLines;
+    final overflow = tsh?.textOverflow ?? TextOverflow.clip;
+    final textAlign = tsh?.textAlign ?? TextAlign.start;
+    final textDirection = tsh?.textDirection ?? TextDirection.ltr;
 
     final widgets = <WidgetPlaceholder>[];
     for (final compiled in _TextCompiler(text).compile()) {
@@ -258,27 +209,25 @@ class WidgetFactory {
         continue;
       }
 
+      if (compiled.span == null) continue;
       widgets.add(
         WidgetPlaceholder<TextBits>(
-          child: Builder(builder: (context) {
-            final span = compiled.build(context);
-            if (span == null) return widget0;
+          child: RichText(
+            overflow: overflow,
+            text: compiled.span,
+            textAlign: textAlign,
+            textDirection: textDirection,
 
             // TODO: calculate max lines automatically for ellipsis if needed
             // currently it only renders 1 line with ellipsis
-            return RichText(
-              maxLines: maxLines,
-              overflow: overflow,
-              text: span,
-              textAlign: textAlign,
-            );
-          }),
+            maxLines: maxLines,
+          ),
           generator: text,
         ),
       );
     }
 
-    return buildColumnPlaceholder(widgets);
+    return buildColumnPlaceholder(meta, widgets);
   }
 
   String constructFullUrl(String url) {
@@ -315,9 +264,16 @@ class WidgetFactory {
     meta.op = BuildOp(onWidgets: (_, __) => [built]);
   }
 
-  List generateTsbSignature(BuildContext context) => [
-        DefaultTextStyle.of(context).style,
-        MediaQuery.of(context).textScaleFactor,
+  GestureTapCallback gestureTapCallback(String url) => url != null
+      ? () => widget.onTapUrl != null
+          ? widget.onTapUrl(url)
+          : print('[flutter_widget_from_html] Tapped url $url')
+      : null;
+
+  List<HtmlWidgetDependency> getDependencies(BuildContext context) => [
+        HtmlWidgetDependency<MediaQueryData>(MediaQuery.of(context)),
+        HtmlWidgetDependency<TextDirection>(Directionality.of(context)),
+        HtmlWidgetDependency<TextStyle>(DefaultTextStyle.of(context).style),
       ];
 
   String getListStyleMarker(String type, int i) {
@@ -373,6 +329,58 @@ class WidgetFactory {
     };
 
     return map.containsKey(i) ? map[i] : null;
+  }
+
+  Uint8List imageBytes(String dataUri) {
+    final match = _dataUriRegExp.matchAsPrefix(dataUri);
+    if (match == null) return null;
+
+    final prefix = match[0];
+    final encoding = match[1];
+    final data = dataUri.substring(prefix.length);
+
+    final bytes = encoding == 'base64'
+        ? base64.decode(data)
+        : encoding == 'utf8' ? Uint8List.fromList(data.codeUnits) : null;
+    if (bytes.isEmpty) return null;
+
+    return bytes;
+  }
+
+  Object imageFromAsset(String url) {
+    final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
+    if (uri?.scheme != 'asset') return null;
+
+    final assetName = uri.path;
+    if (assetName?.isNotEmpty != true) return null;
+
+    final package = uri.queryParameters?.containsKey('package') == true
+        ? uri.queryParameters['package']
+        : null;
+
+    return AssetImage(assetName, package: package);
+  }
+
+  Object imageFromDataUri(String dataUri) {
+    final bytes = imageBytes(dataUri);
+    if (bytes == null) return null;
+
+    return MemoryImage(bytes);
+  }
+
+  Object imageFromUrl(String url) =>
+      url?.isNotEmpty == true ? NetworkImage(url) : null;
+
+  Object imageProvider(String url) {
+    if (url?.startsWith('asset:') == true) {
+      return imageFromAsset(url);
+    }
+
+    if (url?.startsWith('data:') == true) {
+      return imageFromDataUri(url);
+    }
+
+    return imageFromUrl(url);
   }
 
   Color parseColor(String value) => _parseColor(value);
@@ -431,7 +439,7 @@ class WidgetFactory {
         break;
 
       case _kCssDirection:
-        meta.op = styleDirection(value);
+        meta.tsb(_TextStyle.textDirection, value);
         break;
 
       case _kCssDisplay:
@@ -487,7 +495,7 @@ class WidgetFactory {
       case _kCssMaxLines:
       case _kCssMaxLinesWebkitLineClamp:
         final maxLines = value == _kCssMaxLinesNone ? -1 : int.tryParse(value);
-        if (maxLines != null) meta.tsb().maxLines = maxLines;
+        if (maxLines != null) meta.tsb(_TextStyle.maxLines, maxLines);
         break;
 
       case _kCssTextAlign:
@@ -495,7 +503,7 @@ class WidgetFactory {
         if (textAlign != null) {
           meta
             ..isBlockElement = true
-            ..tsb().textAlign = textAlign;
+            ..tsb(_TextStyle.textAlign, textAlign);
         }
         break;
 
@@ -507,10 +515,10 @@ class WidgetFactory {
       case _kCssTextOverflow:
         switch (value) {
           case _kCssTextOverflowClip:
-            meta.tsb().textOverflow = TextOverflow.clip;
+            meta.tsb(_TextStyle.textOverflow, TextOverflow.clip);
             break;
           case _kCssTextOverflowEllipsis:
-            meta.tsb().textOverflow = TextOverflow.ellipsis;
+            meta.tsb(_TextStyle.textOverflow, TextOverflow.ellipsis);
             break;
         }
         break;
@@ -775,12 +783,10 @@ class WidgetFactory {
     return _styleBgColor;
   }
 
-  BuildOp styleDirection(String dir) => _styleDirection(this, dir);
-
   BuildOp styleDisplayBlock() {
     _styleDisplayBlock ??= BuildOp(
-      onWidgets: (_, widgets) =>
-          _listOrNull(buildColumnPlaceholder(widgets)?.wrapWith(_cssBlock)),
+      onWidgets: (meta, widgets) => _listOrNull(
+          buildColumnPlaceholder(meta, widgets)?.wrapWith(_cssBlock)),
       priority: 9223372036854775807,
     );
     return _styleDisplayBlock;
@@ -835,7 +841,7 @@ class WidgetFactory {
   BuildOp tagHr() {
     _tagHr ??= BuildOp(
       defaultStyles: (_, __) => const {'margin-bottom': '1em'},
-      onWidgets: (_, __) => [buildDivider()],
+      onWidgets: (meta, __) => [buildDivider(meta)],
     );
     return _tagHr;
   }

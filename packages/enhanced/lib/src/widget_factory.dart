@@ -11,7 +11,7 @@ import 'data.dart';
 import 'helpers.dart';
 import 'html_widget.dart';
 
-part 'ops/tag_a_extended.dart';
+part 'ops/tag_a_enhanced.dart';
 part 'ops/tag_iframe.dart';
 part 'ops/tag_svg.dart';
 part 'ops/tag_video.dart';
@@ -19,34 +19,21 @@ part 'ops/tag_video.dart';
 /// A factory to build widget for HTML elements
 /// with support for [WebView] and [VideoPlayer] etc.
 class WidgetFactory extends core.WidgetFactory {
-  BuildOp _tagAExtended;
   BuildOp _tagIframe;
   BuildOp _tagSvg;
   HtmlWidget _widget;
 
   @override
-  Widget buildDivider() => const Divider(height: 1);
+  Widget buildDivider(NodeMetadata meta) => const Divider(height: 1);
 
   @override
-  Widget buildGestureDetector(Widget child, GestureTapCallback onTap) =>
+  Widget buildGestureDetector(
+          NodeMetadata meta, Widget child, GestureTapCallback onTap) =>
       InkWell(child: child, onTap: onTap);
 
   @override
-  GestureTapCallback buildGestureTapCallbackForUrl(String url) {
-    if (url == null) return null;
-    final callback = _widget?.onTapUrl ?? _defaultGestureTapCallbackForUrl;
-    return () => callback(url);
-  }
-
-  Future<void> _defaultGestureTapCallbackForUrl(String url) async {
-    final ok = await canLaunch(url);
-    if (ok) return launch(url);
-    print("[flutter_widget_from_html] Tapped url $url (couldn't launch)");
-  }
-
-  @override
-  Widget buildImage(Object provider, ImgMetadata img) {
-    var built = super.buildImage(provider, img);
+  Widget buildImage(NodeMetadata meta, Object provider, ImgMetadata img) {
+    var built = super.buildImage(meta, provider, img);
 
     if (built == null && provider is PictureProvider) {
       built = SvgPicture(provider);
@@ -60,50 +47,7 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
-  Object buildImageProvider(String url) =>
-      url?.startsWith('data:image/svg+xml') == true
-          ? buildSvgMemoryPicture(url)
-          : url != null &&
-                  Uri.tryParse(url)?.path?.toLowerCase()?.endsWith('.svg') ==
-                      true
-              ? buildSvgPictureProvider(url)
-              : super.buildImageProvider(url);
-
-  PictureProvider buildSvgMemoryPicture(String dataUri) {
-    final bytes = buildImageBytes(dataUri);
-    return bytes != null
-        ? MemoryPicture(SvgPicture.svgByteDecoder, bytes)
-        : null;
-  }
-
-  PictureProvider buildSvgPictureProvider(String url) {
-    if (url?.startsWith('asset:') == true) {
-      final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
-      if (uri?.scheme != 'asset') return null;
-
-      final assetName = uri.path;
-      if (assetName?.isNotEmpty != true) return null;
-
-      final package = uri.queryParameters?.containsKey('package') == true
-          ? uri.queryParameters['package']
-          : null;
-
-      return ExactAssetPicture(
-        SvgPicture.svgStringDecoder,
-        assetName,
-        package: package,
-      );
-    }
-
-    return NetworkPicture(SvgPicture.svgByteDecoder, url);
-  }
-
-  @override
-  ImageProvider buildImageFromUrl(String url) =>
-      url?.isNotEmpty == true ? CachedNetworkImageProvider(url) : null;
-
-  @override
-  Widget buildTable(TableData table) {
+  Widget buildTable(NodeMetadata meta, TableData table) {
     final cols = table.cols;
     if (cols == 0) return null;
     final templateColumnSizes = List<TrackSize>(cols);
@@ -149,8 +93,9 @@ class WidgetFactory extends core.WidgetFactory {
 
     if (border == null) return layoutGrid;
 
-    return Stack(
-      children: <Widget>[
+    return buildStack(
+      meta,
+      <Widget>[
         layoutGrid,
         Positioned.fill(child: Container(decoration: border))
       ],
@@ -158,6 +103,7 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   Widget buildVideoPlayer(
+    NodeMetadata meta,
     String url, {
     bool autoplay,
     bool controls,
@@ -176,7 +122,8 @@ class WidgetFactory extends core.WidgetFactory {
       loop: loop,
       poster: posterUrl != null
           ? buildImage(
-              buildImageProvider(posterUrl),
+              meta,
+              imageProvider(posterUrl),
               ImgMetadata(url: posterUrl),
             )
           : null,
@@ -184,11 +131,12 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   Widget buildWebView(
+    NodeMetadata meta,
     String url, {
     double height,
     double width,
   }) {
-    if (_widget?.webView != true) return buildWebViewLinkOnly(url);
+    if (_widget?.webView != true) return buildWebViewLinkOnly(meta, url);
 
     final dimensOk = height != null && height > 0 && width != null && width > 0;
     return WebView(
@@ -198,7 +146,7 @@ class WidgetFactory extends core.WidgetFactory {
       interceptNavigationRequest: (newUrl) {
         if (newUrl == url) return false;
 
-        buildGestureTapCallbackForUrl(newUrl)();
+        gestureTapCallback(newUrl)();
         return true;
       },
       js: _widget.webViewJs == true,
@@ -207,10 +155,70 @@ class WidgetFactory extends core.WidgetFactory {
     );
   }
 
-  Widget buildWebViewLinkOnly(String url) => GestureDetector(
+  Widget buildWebViewLinkOnly(NodeMetadata meta, String url) => GestureDetector(
         child: Text(url),
-        onTap: buildGestureTapCallbackForUrl(url),
+        onTap: gestureTapCallback(url),
       );
+
+  @override
+  GestureTapCallback gestureTapCallback(String url) {
+    if (url == null) return null;
+    final callback = _widget?.onTapUrl ?? _gestureTapCallbackDefault;
+    return () => callback(url);
+  }
+
+  Future<void> _gestureTapCallbackDefault(String url) async {
+    final ok = await canLaunch(url);
+    if (ok) return launch(url);
+    print("[flutter_widget_from_html] Tapped url $url (couldn't launch)");
+  }
+
+  @override
+  List<HtmlWidgetDependency> getDependencies(BuildContext context) =>
+      super.getDependencies(context)
+        ..add(HtmlWidgetDependency<ThemeData>(Theme.of(context)));
+
+  @override
+  Object imageFromUrl(String url) =>
+      url?.isNotEmpty == true ? CachedNetworkImageProvider(url) : null;
+
+  @override
+  Object imageProvider(String url) => url?.startsWith('data:image/svg+xml') ==
+          true
+      ? imageSvgMemoryPicture(url)
+      : url != null &&
+              Uri.tryParse(url)?.path?.toLowerCase()?.endsWith('.svg') == true
+          ? imageSvgPictureProvider(url)
+          : super.imageProvider(url);
+
+  Object imageSvgMemoryPicture(String dataUri) {
+    final bytes = imageBytes(dataUri);
+    return bytes != null
+        ? MemoryPicture(SvgPicture.svgByteDecoder, bytes)
+        : null;
+  }
+
+  Object imageSvgPictureProvider(String url) {
+    if (url?.startsWith('asset:') == true) {
+      final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
+      if (uri?.scheme != 'asset') return null;
+
+      final assetName = uri.path;
+      if (assetName?.isNotEmpty != true) return null;
+
+      final package = uri.queryParameters?.containsKey('package') == true
+          ? uri.queryParameters['package']
+          : null;
+
+      return ExactAssetPicture(
+        SvgPicture.svgStringDecoder,
+        assetName,
+        package: package,
+      );
+    }
+
+    return NetworkPicture(SvgPicture.svgByteDecoder, url);
+  }
 
   @override
   void parseTag(
@@ -220,7 +228,7 @@ class WidgetFactory extends core.WidgetFactory {
   ) {
     switch (tag) {
       case 'a':
-        meta.op = tagAExtended();
+        meta.tsb(_TagAEnhanced.setAccentColor);
         break;
       case 'iframe':
         meta.op = tagIframe();
@@ -242,11 +250,6 @@ class WidgetFactory extends core.WidgetFactory {
   void reset(core.HtmlWidget widget) {
     if (widget is HtmlWidget) _widget = widget;
     super.reset(widget);
-  }
-
-  BuildOp tagAExtended() {
-    _tagAExtended ??= _TagAExtended().buildOp;
-    return _tagAExtended;
   }
 
   BuildOp tagIframe() {

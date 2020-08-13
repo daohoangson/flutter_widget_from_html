@@ -20,14 +20,14 @@ class _StyleVerticalAlign {
           final v = meta.style(_kCssVerticalAlign);
           if (v == null || v == _kCssVerticalAlignBaseline) return pieces;
 
-          return pieces.map((piece) => _buildWidgetSpan(piece, v));
+          return pieces.map((piece) => _buildWidgetSpan(meta, piece, v));
         },
       );
 
-  BuiltPiece _buildWidgetSpan(BuiltPiece piece, String value) {
+  BuiltPiece _buildWidgetSpan(NodeMetadata meta, BuiltPiece piece, String v) {
     if (piece.hasWidgets) return piece;
 
-    final alignment = _tryParse(value);
+    final alignment = _tryParse(v);
     if (alignment == null) return piece;
 
     final text = piece.text;
@@ -35,19 +35,19 @@ class _StyleVerticalAlign {
       ..detach();
     text.replaceWith(replacement);
 
-    final built = wf.buildText(text);
+    final built = wf.buildText(meta, text);
     final newPiece = BuiltPiece.text(replacement);
     if (built == null) return newPiece;
 
-    if (value == _kCssVerticalAlignSub || value == _kCssVerticalAlignSuper) {
+    if (v == _kCssVerticalAlignSub || v == _kCssVerticalAlignSuper) {
       built.wrapWith(
         (child) => _build(
+          meta,
           child,
           EdgeInsets.only(
-            bottom: value == _kCssVerticalAlignSub ? .4 : 0,
-            top: value == _kCssVerticalAlignSuper ? .4 : 0,
+            bottom: v == _kCssVerticalAlignSub ? .4 : 0,
+            top: v == _kCssVerticalAlignSuper ? .4 : 0,
           ),
-          text.tsb,
         ),
       );
     }
@@ -56,25 +56,28 @@ class _StyleVerticalAlign {
     return newPiece;
   }
 
-  Widget _build(Widget child, EdgeInsets padding, TextStyleBuilder tsb) =>
-      Builder(builder: (context) {
-        final fontSize = tsb.build(context).style.fontSize;
+  Widget _build(NodeMetadata meta, Widget child, EdgeInsets padding) {
+    final fontSize = meta.tsb().build().style.fontSize;
 
-        return Stack(children: <Widget>[
-          wf.buildPadding(
-            Opacity(child: child, opacity: 0),
-            EdgeInsets.only(
-              bottom: fontSize * padding.bottom,
-              top: fontSize * padding.top,
-            ),
+    return wf.buildStack(
+      meta,
+      <Widget>[
+        wf.buildPadding(
+          meta,
+          Opacity(child: child, opacity: 0),
+          EdgeInsets.only(
+            bottom: fontSize * padding.bottom,
+            top: fontSize * padding.top,
           ),
-          Positioned(
-            child: child,
-            bottom: padding.top > 0 ? null : 0,
-            top: padding.bottom > 0 ? null : 0,
-          )
-        ]);
-      });
+        ),
+        Positioned(
+          child: child,
+          bottom: padding.top > 0 ? null : 0,
+          top: padding.bottom > 0 ? null : 0,
+        )
+      ],
+    );
+  }
 
   static PlaceholderAlignment _tryParse(String value) {
     switch (value) {
