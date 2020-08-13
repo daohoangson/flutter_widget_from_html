@@ -11,9 +11,26 @@ const kShouldBuildAsync = 10000;
 const widget0 = SizedBox.shrink();
 
 /// A callback to specify custom styling.
+///
+/// The returned `Map` will be applied as inline styles.
+/// See list of all supported inline stylings in README.md, the sample callback
+/// below changes the color for all elements that have CSS class `name`:
+///
+/// ```dart
+/// HtmlWidget(
+///   'Hello <span class="name">World</span>!',
+///   customStylesBuilder: (element) =>
+///     element.classes.contains('name') ? {'color': 'red'} : null,
+/// )
+/// ```
 typedef CustomStylesBuilder = Map<String, String> Function(dom.Element element);
 
 /// A callback to render custom widget for a DOM element.
+///
+/// This is suitable for fairly simple widget. Please note that
+/// you have to handle the DOM element and its children manually,
+/// if the children have HTML styling etc., they won't be processed at all.
+/// For those needs, a custom [WidgetFactory] is the way to go.
 typedef CustomWidgetBuilder = Widget Function(dom.Element element);
 
 /// A widget builder that supports builder callbacks.
