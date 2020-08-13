@@ -55,11 +55,11 @@ class _TagRuby extends BuildOp {
       if (piece.hasWidgets || processed) return piece;
       processed = true;
 
-      final rtBuilt = wf.buildText(_rtText);
+      final rtBuilt = wf.buildText(meta, _rtText);
       if (rtBuilt == null) return piece;
 
       final text = piece.text;
-      final built = wf.buildText(text);
+      final built = wf.buildText(meta, text);
       if (built == null) return piece;
 
       final parent = text.parent;
@@ -72,32 +72,24 @@ class _TagRuby extends BuildOp {
     }).toList(growable: false);
   }
 
-  TextBit _buildTextBit(
-    TextBits parent,
-    Widget ruby,
-    Widget rt,
-  ) =>
-      TextWidget(
-        parent,
-        WidgetPlaceholder<_TagRuby>(
-          child: Builder(
-            builder: (context) => Stack(
-              children: <Widget>[
-                wf.buildPadding(
-                  ruby,
-                  EdgeInsets.symmetric(
-                    vertical: _rtText.tsb.build(context).style.fontSize *
-                        .75 *
-                        MediaQuery.of(context).textScaleFactor,
-                  ),
-                ),
-                Positioned.fill(bottom: null, child: Center(child: rt)),
-              ],
-              overflow: Overflow.visible,
-            ),
-          ),
-          generator: this,
-        ),
-        alignment: PlaceholderAlignment.middle,
-      );
+  TextBit _buildTextBit(TextBits parent, Widget ruby, Widget rt) {
+    final tsh = _rtText.tsb.build();
+    final padding = tsh.style.fontSize *
+        .75 *
+        tsh.deps.getValue<MediaQueryData>().textScaleFactor;
+
+    final widget = WidgetPlaceholder<NodeMetadata>(
+      child: wf.buildStack(
+        rubyMeta,
+        <Widget>[
+          wf.buildPadding(
+              rubyMeta, ruby, EdgeInsets.symmetric(vertical: padding)),
+          Positioned.fill(bottom: null, child: Center(child: rt)),
+        ],
+      ),
+      generator: rubyMeta,
+    );
+
+    return TextWidget(parent, widget, alignment: PlaceholderAlignment.middle);
+  }
 }

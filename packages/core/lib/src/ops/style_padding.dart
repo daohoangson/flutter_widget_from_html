@@ -2,35 +2,20 @@ part of '../core_widget_factory.dart';
 
 const _kCssPadding = 'padding';
 
-WidgetPlaceholder _paddingInlineAfter(
-  TextStyleBuilder tsb,
-  CssLengthBox box,
-) =>
+WidgetPlaceholder _paddingInlineAfter(TextStyleBuilder tsb, CssLengthBox box) =>
     WidgetPlaceholder<CssLengthBox>(
-      child: Builder(builder: (context) {
-        final direction = Directionality.of(context);
-        final width = box.right(direction)?.getValue(context, tsb);
-        if (width == null || width <= 0) return widget0;
-
-        return SizedBox(width: width);
-      }),
+      child: _paddingInlineSizedBox(box.getValueRight(tsb.build())),
       generator: box,
     );
 
-WidgetPlaceholder _paddingInlineBefore(
-  TextStyleBuilder tsb,
-  CssLengthBox box,
-) =>
+WidgetPlaceholder _paddingInlineBefore(TextStyleBuilder tsb, CssLengthBox b) =>
     WidgetPlaceholder<CssLengthBox>(
-      child: Builder(builder: (context) {
-        final direction = Directionality.of(context);
-        final width = box.left(direction)?.getValue(context, tsb);
-        if (width == null || width <= 0) return widget0;
-
-        return SizedBox(width: width);
-      }),
-      generator: box,
+      child: _paddingInlineSizedBox(b.getValueLeft(tsb.build())),
+      generator: b,
     );
+
+Widget _paddingInlineSizedBox(double width) =>
+    width != null && width > 0 ? SizedBox(width: width) : widget0;
 
 class _StylePadding {
   final WidgetFactory wf;
@@ -58,20 +43,23 @@ class _StylePadding {
           if (padding == null) return null;
 
           return _listOrNull(wf
-              .buildColumnPlaceholder(widgets)
-              ?.wrapWith((child) => _build(child, padding, meta.tsb())));
+              .buildColumnPlaceholder(meta, widgets)
+              ?.wrapWith((child) => _build(meta, child, padding)));
         },
         priority: 9999,
       );
 
-  Widget _build(Widget child, CssLengthBox padding, TextStyleBuilder tsb) =>
-      Builder(builder: (context) {
-        final direction = Directionality.of(context);
-        final t = padding.top?.getValue(context, tsb);
-        final r = padding.right(direction)?.getValue(context, tsb);
-        final b = padding.bottom?.getValue(context, tsb);
-        final l = padding.left(direction)?.getValue(context, tsb);
-        final edgeInsets = EdgeInsets.fromLTRB(l ?? 0, t ?? 0, r ?? 0, b ?? 0);
-        return wf.buildPadding(child, edgeInsets);
-      });
+  Widget _build(NodeMetadata meta, Widget child, CssLengthBox padding) {
+    final tsh = meta.tsb().build();
+    return wf.buildPadding(
+      meta,
+      child,
+      EdgeInsets.fromLTRB(
+        padding.getValueLeft(tsh) ?? 0,
+        padding.top?.getValue(tsh) ?? 0,
+        padding.getValueRight(tsh) ?? 0,
+        padding.bottom?.getValue(tsh) ?? 0,
+      ),
+    );
+  }
 }

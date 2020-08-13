@@ -1,14 +1,18 @@
 part of '../core_widget_factory.dart';
 
-class _ColumnPlaceholder extends WidgetPlaceholder<WidgetFactory> {
-  final Iterable<Widget> _children;
+class _ColumnPlaceholder extends WidgetPlaceholder<NodeMetadata> {
+  final NodeMetadata meta;
   final bool trimMarginVertical;
+  final WidgetFactory wf;
+
+  final Iterable<Widget> _children;
 
   _ColumnPlaceholder(
-    WidgetFactory wf,
     this._children, {
+    @required this.meta,
     @required this.trimMarginVertical,
-  }) : super(generator: wf);
+    @required this.wf,
+  }) : super(generator: meta);
 
   List<Widget> get children {
     final contents = <Widget>[];
@@ -53,7 +57,7 @@ class _ColumnPlaceholder extends WidgetPlaceholder<WidgetFactory> {
       }
     }
 
-    final column = wf.buildColumnWidget(contents);
+    final column = wf.buildColumnWidget(meta, contents);
 
     return [
       if (marginTop != null) marginTop,
@@ -61,8 +65,6 @@ class _ColumnPlaceholder extends WidgetPlaceholder<WidgetFactory> {
       if (marginBottom != null) marginBottom,
     ];
   }
-
-  WidgetFactory get wf => generator;
 
   Iterable<Widget> get _iterable sync* {
     for (var child in _children) {
@@ -80,5 +82,6 @@ class _ColumnPlaceholder extends WidgetPlaceholder<WidgetFactory> {
   }
 
   @override
-  Widget build(BuildContext _) => wf.buildColumnWidget(children) ?? widget0;
+  Widget build(BuildContext _) =>
+      wf.buildColumnWidget(meta, children) ?? widget0;
 }

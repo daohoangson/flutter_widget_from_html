@@ -18,6 +18,7 @@ class _TagIframe {
     if (src == null) return null;
 
     return wf.buildWebView(
+      meta,
       src,
       height: a.containsKey('height') ? double.tryParse(a['height']) : null,
       width: a.containsKey('width') ? double.tryParse(a['width']) : null,

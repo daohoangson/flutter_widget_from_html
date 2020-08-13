@@ -1071,19 +1071,13 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       testWidgets('renders ltr', (WidgetTester tester) async {
         final html = '<div dir="ltr">Foo</div>';
         final explained = await explain(tester, html);
-        expect(
-            explained,
-            equals(
-                '[CssBlock:child=[Directionality:ltr,child=[RichText:(:Foo)]]]'));
+        expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
       });
 
       testWidgets('renders rtl', (WidgetTester tester) async {
         final html = '<div dir="rtl">Foo</div>';
         final explained = await explain(tester, html);
-        expect(
-            explained,
-            equals(
-                '[CssBlock:child=[Directionality:rtl,child=[RichText:(:Foo)]]]'));
+        expect(explained, equals('[CssBlock:child=[RichText:dir=rtl,(:Foo)]]'));
       });
     });
 
@@ -1091,30 +1085,14 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       testWidgets('renders ltr', (WidgetTester tester) async {
         final html = '<div style="direction: ltr">Foo</div>';
         final explained = await explain(tester, html);
-        expect(
-            explained,
-            equals(
-                '[CssBlock:child=[Directionality:ltr,child=[RichText:(:Foo)]]]'));
+        expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
       });
 
       testWidgets('renders rtl', (WidgetTester tester) async {
         final html = '<div style="direction: rtl">Foo</div>';
         final explained = await explain(tester, html);
-        expect(
-            explained,
-            equals(
-                '[CssBlock:child=[Directionality:rtl,child=[RichText:(:Foo)]]]'));
+        expect(explained, equals('[CssBlock:child=[RichText:dir=rtl,(:Foo)]]'));
       });
-    });
-
-    testWidgets('renders margin inside', (WidgetTester tester) async {
-      final html = '<div dir="rtl"><div style="margin: 5px">Foo</div></div>';
-      final explained = await explainMargin(tester, html);
-      expect(
-          explained,
-          equals('[SizedBox:0.0x5.0],'
-              '[CssBlock:child=[Directionality:rtl,child=[CssBlock:child=[Padding:(0,5,0,5),child=[RichText:(:Foo)]]]]],'
-              '[SizedBox:0.0x5.0]'));
     });
   });
 

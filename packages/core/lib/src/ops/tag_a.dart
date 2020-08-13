@@ -15,18 +15,20 @@ class _TagA {
           return styles;
         },
         onPieces: (meta, pieces) {
-          final onTap = _buildGestureTapCallback(meta);
+          final onTap = _gestureTapCallback(meta);
           if (onTap == null) return pieces;
 
           for (final piece in pieces) {
             if (piece.hasWidgets) {
-              for (final placeholder in piece.widgets) {
-                placeholder.wrapWith((w) => wf.buildGestureDetector(w, onTap));
+              for (final widget in piece.widgets) {
+                widget.wrapWith(
+                    (child) => wf.buildGestureDetector(meta, child, onTap));
               }
             } else {
               for (final bit in piece.text.bits.toList(growable: false)) {
                 if (bit is TextWidget) {
-                  bit.widget.wrapWith((w) => wf.buildGestureDetector(w, onTap));
+                  bit.widget.wrapWith(
+                      (child) => wf.buildGestureDetector(meta, child, onTap));
                 } else if (bit is TextData) {
                   bit.replaceWith(_TagATextData(bit, onTap, wf));
                 }
@@ -38,10 +40,10 @@ class _TagA {
         },
       );
 
-  GestureTapCallback _buildGestureTapCallback(NodeMetadata meta) {
+  GestureTapCallback _gestureTapCallback(NodeMetadata meta) {
     final attrs = meta.domElement.attributes;
     final href = attrs.containsKey('href') ? attrs['href'] : null;
-    return wf.buildGestureTapCallbackForUrl(wf.constructFullUrl(href) ?? href);
+    return wf.gestureTapCallback(wf.constructFullUrl(href) ?? href);
   }
 }
 
@@ -54,10 +56,9 @@ class _TagATextData extends TextData {
       : super(bit.parent, bit.data, bit.tsb);
 
   @override
-  bool get hasBuilder => true;
+  bool get canCompile => true;
 
   @override
-  TextSpanBuilder prepareBuilder(TextStyleBuilder tsb) =>
-      TextSpanBuilder((context) => wf.buildGestureTapCallbackSpan(
-          bit.data, onTap, tsb.build(context).styleWithHeight));
+  InlineSpan compile(TextStyleBuilder tsb) => wf.buildGestureTapCallbackSpan(
+      bit.data, onTap, tsb.build().styleWithHeight);
 }

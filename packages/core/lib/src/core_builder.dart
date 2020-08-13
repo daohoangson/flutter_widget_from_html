@@ -14,7 +14,6 @@ class HtmlBuilder {
   final NodeMetadata parentMeta;
   final Iterable<BuildOp> parentOps;
   final TextBits parentText;
-  final TextStyleBuilder parentTsb;
   final WidgetFactory wf;
 
   final _pieces = <BuiltPiece>[];
@@ -23,15 +22,13 @@ class HtmlBuilder {
 
   HtmlBuilder({
     @required this.domNodes,
-    this.parentMeta,
-    Iterable<BuildOp> parentParentOps,
+    @required this.parentMeta,
+    this.parentOps,
     this.parentText,
-    @required this.parentTsb,
     @required this.wf,
   })  : assert(domNodes != null),
-        assert(parentTsb != null),
-        assert(wf != null),
-        parentOps = _prepareParentOps(parentParentOps, parentMeta);
+        assert(parentMeta != null),
+        assert(wf != null);
 
   Iterable<Widget> build() {
     final list = <WidgetPlaceholder>[];
@@ -42,7 +39,7 @@ class HtmlBuilder {
           if (widget != null) list.add(widget);
         }
       } else {
-        final built = wf.buildText(piece.text);
+        final built = wf.buildText(parentMeta, piece.text);
         if (built != null) list.add(built);
       }
     }
@@ -58,7 +55,7 @@ class HtmlBuilder {
   }
 
   NodeMetadata collectMetadata(dom.Element e) {
-    final meta = NodeMetadata(parentTsb.sub(), parentOps);
+    final meta = NodeMetadata(parentMeta.tsb().sub(), parentOps);
     wf.parseTag(meta, e.localName, e.attributes);
 
     if (meta.hasParents) {
@@ -119,9 +116,8 @@ class HtmlBuilder {
       final __builder = HtmlBuilder(
         domNodes: domNode.nodes,
         parentMeta: meta,
-        parentParentOps: parentOps,
+        parentOps: _prepareParentOps(parentOps, meta),
         parentText: isBlockElement ? null : _textPiece.text,
-        parentTsb: meta?.tsb() ?? parentTsb,
         wf: wf,
       );
 
@@ -176,8 +172,8 @@ class HtmlBuilder {
   }
 
   void _newTextPiece() => _textPiece = BuiltPiece.text(
-      (_pieces.isEmpty ? parentText?.sub(parentTsb) : null) ??
-          TextBits(parentTsb));
+      (_pieces.isEmpty ? parentText?.sub(parentMeta.tsb()) : null) ??
+          TextBits(parentMeta.tsb()));
 
   void _saveTextPiece() {
     _pieces.add(_textPiece);
@@ -190,8 +186,7 @@ Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, NodeMetadata meta) {
   final withOnChild =
       meta?.ops?.where((op) => op.hasOnChild)?.toList(growable: false);
   if (withOnChild?.isNotEmpty != true) return ops;
-
-  return List.unmodifiable((ops?.toList() ?? <BuildOp>[])..addAll(withOnChild));
+  return List.unmodifiable([if (ops != null) ...ops, ...withOnChild]);
 }
 
 final _spacingRegExp = RegExp(r'\s+');

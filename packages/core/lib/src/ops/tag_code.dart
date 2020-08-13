@@ -17,9 +17,9 @@ class _TagCode {
         onPieces: (meta, pieces) => meta.domElement.localName == _kTagPre
             ? [_resetText(pieces.first, meta)]
             : pieces,
-        onWidgets: (_, widgets) => _listOrNull(wf
-            .buildColumnPlaceholder(widgets)
-            ?.wrapWith(wf.buildHorizontalScrollView)),
+        onWidgets: (meta, widgets) => _listOrNull(wf
+            .buildColumnPlaceholder(meta, widgets)
+            ?.wrapWith((child) => wf.buildHorizontalScrollView(meta, child))),
       );
 
   BuiltPiece _resetText(BuiltPiece piece, NodeMetadata meta) {

@@ -2,22 +2,14 @@ part of '../core_widget_factory.dart';
 
 const _kCssMargin = 'margin';
 
-Widget _marginHorizontalBuilder(
-  Widget child,
-  CssLengthBox margin,
-  TextStyleBuilder tsb,
-) =>
-    Builder(builder: (context) {
-      final direction = Directionality.of(context);
-
-      return Padding(
-        child: child,
-        padding: EdgeInsets.only(
-          left: margin.left(direction)?.getValue(context, tsb) ?? 0.0,
-          right: margin.right(direction)?.getValue(context, tsb) ?? 0.0,
-        ),
-      );
-    });
+Widget _marginHorizontalBuilder(Widget w, CssLengthBox b, TextStyleHtml tsh) =>
+    Padding(
+      child: w,
+      padding: EdgeInsets.only(
+        left: b.getValueLeft(tsh) ?? 0.0,
+        right: b.getValueRight(tsh) ?? 0.0,
+      ),
+    );
 
 class _MarginVerticalPlaceholder extends WidgetPlaceholder<CssLength> {
   final CssLength height;
@@ -33,14 +25,12 @@ class _MarginVerticalPlaceholder extends WidgetPlaceholder<CssLength> {
   @override
   _MarginVerticalPlaceholder wrapWith(Widget Function(Widget) builder) => this;
 
-  static Widget _build(Widget child, CssLength height, TextStyleBuilder tsb) =>
-      Builder(builder: (context) {
-        if (child is Builder) child = (child as Builder).builder(context);
-        final existing = child is SizedBox ? (child as SizedBox).height : 0.0;
-        final value = height.getValue(context, tsb);
-        if (value > existing) return SizedBox(height: value);
-        return child;
-      });
+  static Widget _build(Widget child, CssLength height, TextStyleBuilder tsb) {
+    final existing = child is SizedBox ? child.height : 0.0;
+    final value = height.getValue(tsb.build());
+    if (value > existing) return SizedBox(height: value);
+    return child;
+  }
 }
 
 class _StyleMargin {
@@ -80,7 +70,7 @@ class _StyleMargin {
           for (final widget in widgets) {
             if (m.hasLeftOrRight) {
               widget.wrapWith(
-                (child) => _marginHorizontalBuilder(child, m, tsb),
+                (child) => _marginHorizontalBuilder(child, m, tsb.build()),
               );
             }
 
