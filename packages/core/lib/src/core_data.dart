@@ -6,63 +6,32 @@ import 'core_helpers.dart';
 part 'data/table_data.dart';
 part 'data/text_bits.dart';
 
+@immutable
 class BuildOp {
   final bool isBlockElement;
 
-  // op with lower priority will run first
   final int priority;
 
-  final _BuildOpDefaultStyles _defaultStyles;
-  final _BuildOpOnChild _onChild;
-  final _BuildOpOnPieces _onPieces;
-  final _BuildOpOnWidgets _onWidgets;
+  final Map<String, String> Function(NodeMetadata meta, dom.Element element)
+      defaultStyles;
+
+  final void Function(NodeMetadata childMeta, dom.Element childElement) onChild;
+
+  final Iterable<BuiltPiece> Function(
+      NodeMetadata meta, Iterable<BuiltPiece> pieces) onPieces;
+
+  final Iterable<Widget> Function(
+      NodeMetadata meta, Iterable<WidgetPlaceholder> widgets) onWidgets;
 
   BuildOp({
-    _BuildOpDefaultStyles defaultStyles,
+    this.defaultStyles,
     bool isBlockElement,
-    _BuildOpOnChild onChild,
-    _BuildOpOnPieces onPieces,
-    _BuildOpOnWidgets onWidgets,
+    this.onChild,
+    this.onPieces,
+    this.onWidgets,
     this.priority = 10,
-  })  : _defaultStyles = defaultStyles,
-        isBlockElement = isBlockElement ?? onWidgets != null,
-        _onChild = onChild,
-        _onPieces = onPieces,
-        _onWidgets = onWidgets;
-
-  bool get hasOnChild => _onChild != null;
-
-  Map<String, String> defaultStyles(NodeMetadata meta, dom.Element e) =>
-      _defaultStyles != null ? _defaultStyles(meta, e) : null;
-
-  void onChild(NodeMetadata meta, dom.Element e) =>
-      _onChild != null ? _onChild(meta, e) : meta;
-
-  Iterable<BuiltPiece> onPieces(
-    NodeMetadata meta,
-    Iterable<BuiltPiece> pieces,
-  ) =>
-      _onPieces != null ? _onPieces(meta, pieces) : pieces;
-
-  Iterable<WidgetPlaceholder> onWidgets(
-          NodeMetadata meta, Iterable<WidgetPlaceholder> widgets) =>
-      (_onWidgets != null
-          ? _onWidgets(meta, widgets)?.map(_placeholder)
-          : null) ??
-      widgets;
-
-  WidgetPlaceholder _placeholder(Widget widget) => widget is WidgetPlaceholder
-      ? widget
-      : WidgetPlaceholder<BuildOp>(child: widget, generator: this);
+  }) : isBlockElement = isBlockElement ?? onWidgets != null;
 }
-
-typedef _BuildOpDefaultStyles = Map<String, String> Function(
-    NodeMetadata meta, dom.Element e);
-typedef _BuildOpOnChild = void Function(NodeMetadata meta, dom.Element e);
-typedef _BuildOpOnPieces = Iterable<BuiltPiece> Function(
-    NodeMetadata meta, Iterable<BuiltPiece> pieces);
-typedef _BuildOpOnWidgets = Iterable<Widget> Function(
-    NodeMetadata meta, Iterable<WidgetPlaceholder> widgets);
 
 class BuiltPiece {
   final TextBits text;
