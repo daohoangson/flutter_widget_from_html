@@ -369,7 +369,7 @@ void main() {
       expect(
           explained,
           equals('[CssBlock:child=[Table:\n'
-              '[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child=[Padding:(1,1,1,1),child=[RichText:(:Foo)]]]]\n'
+              '[DecoratedBox:bg=#FFFF0000,child=[CssBlock:child=[Padding:(1,1,1,1),child=[RichText:(:Foo)]]]]\n'
               ']]'));
     });
   });

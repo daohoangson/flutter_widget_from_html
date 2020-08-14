@@ -210,7 +210,7 @@ void main() {
         explained,
         equals('[CssBlock:child=[Column:children='
             '[CssBlock:child=[RichText:(+b:Foo)]],'
-            '[CssBlock:child=[Padding:(0,0,0,40),child=[RichText:(:Bar)]]]'
+            '[Padding:(0,0,0,40),child=[CssBlock:child=[RichText:(:Bar)]]]'
             ']],'
             '[SizedBox:0.0x10.0]'));
   });
@@ -335,7 +335,7 @@ void main() {
       expect(
         explained,
         equals('[SizedBox:0.0x10.0],'
-            '[CssBlock:child=[Padding:(0,40,0,40),child=[RichText:(:Foo)]]],'
+            '[Padding:(0,40,0,40),child=[CssBlock:child=[RichText:(:Foo)]]],'
             '[SizedBox:0.0x10.0]'),
       );
     });
@@ -360,10 +360,10 @@ void main() {
         expect(
             explained,
             equals('[SizedBox:0.0x10.0],'
-                '[CssBlock:child=[Column:children='
-                '[Padding:(0,40,0,40),child=[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)]],'
-                '[Padding:(0,40,0,40),child=[CssBlock:child=[RichText:(:(+i:fig. 1)(: Foo))]]]'
-                ']],'
+                '[Padding:(0,40,0,40),child=[CssBlock:child=[Column:children='
+                '[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)],'
+                '[CssBlock:child=[RichText:(:(+i:fig. 1)(: Foo))]]'
+                ']]],'
                 '[SizedBox:0.0x10.0]'));
       }),
     );
@@ -552,8 +552,8 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              '[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child=[RichText:(:Foo)]]]'));
+          equals('[DecoratedBox:bg=#FFFF0000,child='
+              '[CssBlock:child=[RichText:(:Foo)]]]'));
     });
 
     testWidgets('renders with margins and paddings', (tester) async {
@@ -563,8 +563,9 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(
           explained,
           equals('[SizedBox:0.0x1.0],'
-              '[CssBlock:child=[Padding:(0,1,0,1),child='
-              '[DecoratedBox:bg=#FFFF0000,child=[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]'
+              '[Padding:(0,1,0,1),child='
+              '[DecoratedBox:bg=#FFFF0000,child='
+              '[CssBlock:child=[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]'
               ']],[SizedBox:0.0x1.0]'));
     });
 
@@ -574,7 +575,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(
           explained,
           equals(
-              '[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child=[Column:children='
+              '[DecoratedBox:bg=#FFFF0000,child=[CssBlock:child=[Column:children='
               '[CssBlock:child=[RichText:(:A)]],'
               '[SizedBox:0.0x10.0],'
               '[CssBlock:child=[RichText:(:B)]]'
@@ -987,8 +988,8 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           final explained = await explain(tester, html);
           expect(
               explained,
-              equals('[CssBlock:child='
-                  '[CssSizing:height=1.0,width=1.0,child='
+              equals('[CssSizing:height=1.0,width=1.0,child='
+                  '[CssBlock:child='
                   '[Image:image=NetworkImage("$src", scale: 1.0)]'
                   ']]'));
         }),

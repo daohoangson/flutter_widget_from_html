@@ -84,7 +84,7 @@ void main() {
     expect(
         explained,
         equals('[SizedBox:0.0x5.0],'
-            '[GestureDetector:child=[CssBlock:child=[Padding:(0,5,0,5),child=[RichText:(#FF0000FF+u:Foo)]]]],'
+            '[GestureDetector:child=[Padding:(0,5,0,5),child=[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]]],'
             '[SizedBox:0.0x5.0]'));
   });
 

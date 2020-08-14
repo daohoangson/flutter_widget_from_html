@@ -10,8 +10,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:height=20.0,child='
+          equals('[CssSizing:height=20.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -21,8 +21,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:height=133.3,child='
+          equals('[CssSizing:height=133.3,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -32,8 +32,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:height=100.0,child='
+          equals('[CssSizing:height=100.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -51,8 +51,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:maxHeight=20.0,child='
+          equals('[CssSizing:maxHeight=20.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -62,8 +62,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:maxHeight=133.3,child='
+          equals('[CssSizing:maxHeight=133.3,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -73,8 +73,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:maxHeight=100.0,child='
+          equals('[CssSizing:maxHeight=100.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -92,8 +92,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:maxWidth=20.0,child='
+          equals('[CssSizing:maxWidth=20.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -103,8 +103,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:maxWidth=133.3,child='
+          equals('[CssSizing:maxWidth=133.3,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -114,8 +114,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:maxWidth=100.0,child='
+          equals('[CssSizing:maxWidth=100.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -133,8 +133,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:minHeight=20.0,child='
+          equals('[CssSizing:minHeight=20.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -144,8 +144,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:minHeight=133.3,child='
+          equals('[CssSizing:minHeight=133.3,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -155,8 +155,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:minHeight=100.0,child='
+          equals('[CssSizing:minHeight=100.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -174,8 +174,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:minWidth=20.0,child='
+          equals('[CssSizing:minWidth=20.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -185,8 +185,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:minWidth=133.3,child='
+          equals('[CssSizing:minWidth=133.3,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -196,8 +196,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:minWidth=100.0,child='
+          equals('[CssSizing:minWidth=100.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -215,8 +215,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:width=20.0,child='
+          equals('[CssSizing:width=20.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -226,8 +226,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:width=133.3,child='
+          equals('[CssSizing:width=133.3,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -237,8 +237,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:width=100.0,child='
+          equals('[CssSizing:width=100.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -263,12 +263,13 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child='
+        equals('[DecoratedBox:bg=#FFFF0000,child=[CssBlock:child='
             '[Padding:(20,20,20,20),child='
-            '[CssBlock:child=[DecoratedBox:bg=#FF008000,child='
-            '[CssBlock:child=[Padding:(0,15,0,15),child='
+            '[DecoratedBox:bg=#FF008000,child=[CssBlock:child='
+            '[Padding:(0,15,0,15),child='
             '[CssSizing:height=100.0,width=100.0,child='
             '[DecoratedBox:bg=#FF0000FF,child='
+            '[CssBlock:child='
             '[Padding:(5,5,5,5),child='
             '[RichText:(#FFFFFFFF:Foo)]'
             ']]]]]]]]]]'));
@@ -281,10 +282,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:height=10.0,width=10.0,child='
+          equals('[CssSizing:height=10.0,width=10.0,child='
               '[CssBlock:child=[RichText:(:Foo)]]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders block within non-block', (tester) async {

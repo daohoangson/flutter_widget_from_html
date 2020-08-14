@@ -137,7 +137,9 @@ void main() {
     expect(
         explained,
         equals('[SizedBox:0.0x5.0],'
-            '[CssBlock:child=[Padding:(0,5,0,5),child=[RichText:align=center,(:Foo)]]],'
+            '[CssBlock:child=[Padding:(0,5,0,5),child='
+            '[CssBlock:child=[RichText:align=center,(:Foo)]]'
+            ']],'
             '[SizedBox:0.0x5.0]'));
   });
 }
