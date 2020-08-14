@@ -1,20 +1,43 @@
 part of '../core_data.dart';
 
 @immutable
-abstract class TextBit {
+abstract class TextBit<T> {
   final TextBits parent;
 
   TextBit(this.parent);
 
   bool get canCompile => false;
   String get data => null;
-  bool get hasTrailingWhitespace => false;
   int get index => parent?._children?.indexOf(this) ?? -1;
   bool get isEmpty => false;
   bool get isNotEmpty => !isEmpty;
   TextStyleBuilder get tsb => null;
 
-  InlineSpan compile(TextStyleBuilder tsb) => throw UnimplementedError();
+  TextBit get next {
+    TextBit x = this;
+
+    while (x != null) {
+      final i = x.index;
+      if (i != -1) {
+        final siblings = x.parent._children;
+        for (var j = i + 1; j < siblings.length; j++) {
+          final candidate = siblings[j];
+          if (candidate is TextBits) {
+            final first = candidate.first;
+            if (first != null) return first;
+          } else {
+            return candidate;
+          }
+        }
+      }
+
+      x = x.parent;
+    }
+
+    return null;
+  }
+
+  T compile(TextStyleBuilder tsb) => throw UnimplementedError();
 
   bool detach() => parent?._children?.remove(this);
 
@@ -45,33 +68,10 @@ abstract class TextBit {
   @override
   String toString() {
     final clazz = runtimeType.toString();
-    final t = this;
-    final contents = t is TextWidget ? 'widget=${t.widget}' : 'data=$data';
+    final contents = this is TextWidget
+        ? 'widget=${(this as TextWidget).widget}'
+        : 'data=$data';
     return '[$clazz:$hashCode] $contents';
-  }
-
-  static TextBit nextOf(TextBit bit) {
-    var x = bit;
-
-    while (x != null) {
-      final i = x.index;
-      if (i != -1) {
-        final siblings = x.parent._children;
-        for (var j = i + 1; j < siblings.length; j++) {
-          final candidate = siblings[j];
-          if (candidate is TextBits) {
-            final first = candidate.first;
-            if (first != null) return first;
-          } else {
-            return candidate;
-          }
-        }
-      }
-
-      x = x.parent;
-    }
-
-    return null;
   }
 
   static TextBit tailOf(TextBits bits) {
@@ -87,7 +87,7 @@ abstract class TextBit {
   }
 }
 
-class TextData extends TextBit {
+class TextData extends TextBit<void> {
   @override
   final String data;
 
@@ -101,31 +101,7 @@ class TextData extends TextBit {
         super(parent);
 }
 
-class TextWhitespace extends TextBit {
-  final _buffer = StringBuffer();
-
-  TextWhitespace(TextBit parent, TextWhitespaceType type)
-      : assert(parent != null),
-        super(parent) {
-    if (type != null) append(type);
-  }
-
-  @override
-  String get data => _buffer.isEmpty ? ' ' : _buffer.toString();
-
-  @override
-  bool get hasTrailingWhitespace => _buffer.isEmpty;
-
-  void append(TextWhitespaceType type) {
-    switch (type) {
-      case TextWhitespaceType.newLine:
-        _buffer.write('\n');
-        break;
-    }
-  }
-}
-
-class TextWidget<T> extends TextBit {
+class TextWidget<T> extends TextBit<InlineSpan> {
   final PlaceholderAlignment alignment;
   final TextBaseline baseline;
   final WidgetPlaceholder<T> widget;
@@ -152,7 +128,7 @@ class TextWidget<T> extends TextBit {
       );
 }
 
-class TextBits extends TextBit {
+class TextBits extends TextBit<void> {
   final _children = <TextBit>[];
 
   @override
@@ -181,9 +157,11 @@ class TextBits extends TextBit {
     return null;
   }
 
-  @override
-  bool get hasTrailingWhitespace =>
-      TextBit.tailOf(this)?.hasTrailingWhitespace ?? true;
+  bool get hasTrailingWhitespace {
+    final tail = TextBit.tailOf(this);
+    if (tail == null) return true;
+    return tail is _TextWhitespace;
+  }
 
   @override
   bool get isEmpty {
@@ -205,15 +183,21 @@ class TextBits extends TextBit {
 
   void add(TextBit bit) => _children.add(bit);
 
-  TextWhitespace addWhitespace([TextWhitespaceType type]) {
+  TextBit addNewLine() {
     final tail = TextBit.tailOf(this);
-    if (tail == null) {
-      if (type == null) return null;
-    } else if (tail is TextWhitespace) {
-      return tail..append(type);
-    }
+    if (tail is _TextNewLine) return tail..newLine();
 
-    final bit = TextWhitespace(this, type);
+    final bit = _TextNewLine(this);
+    add(bit);
+    return bit;
+  }
+
+  TextBit addWhitespace() {
+    final tail = TextBit.tailOf(this);
+    if (tail == null) return null;
+    if (tail is _TextNewLine || tail is _TextWhitespace) return tail;
+
+    final bit = _TextWhitespace(this);
     add(bit);
     return bit;
   }
@@ -279,6 +263,38 @@ class TextBits extends TextBit {
       : [];
 }
 
-enum TextWhitespaceType {
-  newLine,
+class _TextNewLine extends TextBit<Widget> {
+  static const _kNewLine = '\n';
+
+  final _sb = StringBuffer(_kNewLine);
+
+  _TextNewLine(TextBits parent)
+      : assert(parent != null),
+        super(parent);
+
+  @override
+  bool get canCompile => true;
+
+  @override
+  String get data => _sb.toString();
+
+  @override
+  Widget compile(TextStyleBuilder tsb) {
+    final lines = _sb.length - 1;
+    if (lines < 1) return null;
+
+    return HeightPlaceholder(
+        CssLength(lines.toDouble(), CssLengthUnit.em), tsb);
+  }
+
+  void newLine() => _sb.write(_kNewLine);
+}
+
+class _TextWhitespace extends TextBit<void> {
+  _TextWhitespace(TextBit parent)
+      : assert(parent != null),
+        super(parent);
+
+  @override
+  String get data => ' ';
 }

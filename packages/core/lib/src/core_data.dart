@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'internal/margin_vertical.dart';
 import 'core_helpers.dart';
 
 part 'data/table_data.dart';
