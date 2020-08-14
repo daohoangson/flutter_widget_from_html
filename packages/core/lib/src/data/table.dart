@@ -20,12 +20,12 @@ class TableMetadata {
   int get length => _slots.length;
 
   /// The number of rows.
-  int get rows => _grid.keys.length;
+  int get rows => _grid.keys.fold(0, _rowsCombine);
 
   /// Adds cell at the specified [row] taking [colspan] and [rowspan] into account.
   ///
   /// The column number will be determined automatically.
-  int addCell(int row, Widget child, {int colspan, int rowspan}) {
+  int addCell(int row, Widget child, {int colspan = 1, int rowspan = 1}) {
     _grid[row] ??= {};
     var col = 0;
     while (_grid[row].containsKey(col)) {
@@ -52,7 +52,7 @@ class TableMetadata {
   }
 
   /// Gets the cell index by [column] and [row].
-  int getIndexAt(int column, int row) {
+  int getIndexAt({int column, int row}) {
     if (!_grid.containsKey(row)) return -1;
     final map = _grid[row];
     if (!map.containsKey(column)) return -1;
@@ -72,10 +72,10 @@ class TableMetadata {
     }
   }
 
-  static int _colsCombine(int prev, Map<int, int> row) {
-    final cols = row.keys.length;
-    return prev > cols ? prev : cols;
-  }
+  static int _colsCombine(int prev, Map<int, int> row) =>
+      max(prev, row.keys.length);
+
+  static int _rowsCombine(int prev, int rowId) => max(prev, rowId + 1);
 }
 
 @immutable

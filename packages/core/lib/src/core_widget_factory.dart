@@ -172,7 +172,7 @@ class WidgetFactory {
     for (var r = 0; r < tableRows; r++) {
       final cells = List<Widget>(tableCols);
       for (var c = 0; c < tableCols; c++) {
-        final index = table.getIndexAt(c, r);
+        final index = table.getIndexAt(row: r, column: c);
         if (index == -1 || slotIndices.contains(index)) {
           cells[c] = widget0;
           continue;
