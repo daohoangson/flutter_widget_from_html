@@ -123,7 +123,22 @@ class _HtmlWidgetState extends State<HtmlWidget> {
   void didUpdateWidget(HtmlWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.html != oldWidget.html) {
+    var needsRebuild = false;
+
+    if (widget.baseUrl != oldWidget.baseUrl ||
+        widget.buildAsync != oldWidget.buildAsync ||
+        widget.html != oldWidget.html ||
+        widget.enableCaching != oldWidget.enableCaching ||
+        widget.hyperlinkColor != oldWidget.hyperlinkColor) {
+      needsRebuild = true;
+    }
+
+    if (widget.textStyle != oldWidget.textStyle) {
+      _rootTsb.reset();
+      needsRebuild = true;
+    }
+
+    if (needsRebuild) {
       _cache = null;
       _future = buildAsync ? _buildAsync() : null;
     }
