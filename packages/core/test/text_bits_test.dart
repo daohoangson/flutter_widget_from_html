@@ -223,7 +223,6 @@ void main() {
         final space2 = text.addWhitespace();
 
         expect(space2, equals(space1));
-        expect(space2.hasTrailingWhitespace, isTrue);
       });
     });
 

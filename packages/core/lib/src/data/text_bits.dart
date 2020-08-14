@@ -8,7 +8,6 @@ abstract class TextBit<T> {
 
   bool get canCompile => false;
   String get data => null;
-  bool get hasTrailingWhitespace => false;
   int get index => parent?._children?.indexOf(this) ?? -1;
   bool get isEmpty => false;
   bool get isNotEmpty => !isEmpty;
@@ -158,9 +157,11 @@ class TextBits extends TextBit<void> {
     return null;
   }
 
-  @override
-  bool get hasTrailingWhitespace =>
-      TextBit.tailOf(this)?.hasTrailingWhitespace ?? true;
+  bool get hasTrailingWhitespace {
+    final tail = TextBit.tailOf(this);
+    if (tail == null) return true;
+    return tail is _TextWhitespace;
+  }
 
   @override
   bool get isEmpty {
@@ -194,7 +195,7 @@ class TextBits extends TextBit<void> {
   TextBit addWhitespace() {
     final tail = TextBit.tailOf(this);
     if (tail == null) return null;
-    if (tail.hasTrailingWhitespace) return tail;
+    if (tail is _TextNewLine || tail is _TextWhitespace) return tail;
 
     final bit = _TextWhitespace(this);
     add(bit);
@@ -278,9 +279,6 @@ class _TextNewLine extends TextBit<Widget> {
   String get data => _sb.toString();
 
   @override
-  bool get hasTrailingWhitespace => true;
-
-  @override
   Widget compile(TextStyleBuilder tsb) {
     final lines = _sb.length - 1;
     if (lines < 1) return null;
@@ -299,7 +297,4 @@ class _TextWhitespace extends TextBit<void> {
 
   @override
   String get data => ' ';
-
-  @override
-  bool get hasTrailingWhitespace => true;
 }
