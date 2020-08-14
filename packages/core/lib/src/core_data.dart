@@ -5,7 +5,7 @@ import 'internal/margin_vertical.dart';
 import 'core_helpers.dart';
 import 'core_widget_factory.dart';
 
-part 'data/table_data.dart';
+part 'data/table.dart';
 part 'data/text_bits.dart';
 
 /// A building operation to customize how a DOM element is rendered.
