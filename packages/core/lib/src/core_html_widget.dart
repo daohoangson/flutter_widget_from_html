@@ -19,13 +19,17 @@ class HtmlWidget extends StatefulWidget {
   final Uri baseUrl;
 
   /// Controls whether the widget tree is built asynchronously.
-  /// If not set, async build will be automatically enabled if the
-  /// input HTML is longer than [kShouldBuildAsync].
+  ///
+  /// If not set, async build will be enabled automatically if the
+  /// [html] has at least [kShouldBuildAsync] characters.
   final bool buildAsync;
 
   /// The callback to handle async build snapshot.
+  ///
   /// By default, a [CircularProgressIndicator] will be shown until
-  /// the widget tree is ready without error handling.
+  /// the widget tree is ready.
+  /// This default builder doesn't do any error handling
+  /// (it will just ignore any errors).
   final AsyncWidgetBuilder<Widget> buildAsyncBuilder;
 
   /// The callback to specify custom stylings.
@@ -34,7 +38,9 @@ class HtmlWidget extends StatefulWidget {
   /// The callback to render a custom widget.
   final CustomWidgetBuilder customWidgetBuilder;
 
-  /// Controls whether the built widget tree is cached between rebuild.
+  /// Controls whether the built widget tree is cached between rebuilds.
+  ///
+  /// Default: `true` if [buildAsync] is off, `false` otherwise.
   final bool enableCaching;
 
   /// The input string.
@@ -44,9 +50,13 @@ class HtmlWidget extends StatefulWidget {
   final String html;
 
   /// The text color for link elements.
+  ///
+  /// Default: blue (#0000FF).
   final Color hyperlinkColor;
 
   /// The custom [WidgetFactory] builder.
+  ///
+  /// By default, a singleton instance of [WidgetFactory] will be used.
   final WidgetFactory Function() factoryBuilder;
 
   /// The callback when user taps a link.
@@ -65,39 +75,30 @@ class HtmlWidget extends StatefulWidget {
     this.buildAsyncBuilder,
     this.customStylesBuilder,
     this.customWidgetBuilder,
-    this.enableCaching = true,
-    this.factoryBuilder = _singleton,
+    this.enableCaching,
+    this.factoryBuilder,
     this.hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
     Key key,
     this.onTapUrl,
     this.textStyle = const TextStyle(),
   })  : assert(html != null),
-        assert(factoryBuilder != null),
         super(key: key);
 
   @override
-  State<HtmlWidget> createState() => _HtmlWidgetState(
-        buildAsync: buildAsync ?? html.length > kShouldBuildAsync,
-      );
-
-  static WidgetFactory _wf;
-
-  static WidgetFactory _singleton() {
-    _wf ??= WidgetFactory();
-    return _wf;
-  }
+  State<HtmlWidget> createState() => _HtmlWidgetState();
 }
 
 class _HtmlWidgetState extends State<HtmlWidget> {
-  final bool buildAsync;
-
   Widget _cache;
   Future<Widget> _future;
   NodeMetadata _rootMeta;
   _RootTsb _rootTsb;
   WidgetFactory _wf;
 
-  _HtmlWidgetState({this.buildAsync = false});
+  bool get buildAsync =>
+      widget.buildAsync ?? widget.html.length > kShouldBuildAsync;
+
+  bool get enableCaching => widget.enableCaching ?? !buildAsync;
 
   @override
   void initState() {
@@ -105,7 +106,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
 
     _rootTsb = _RootTsb(this);
     _rootMeta = NodeMetadata(_rootTsb);
-    _wf = widget.factoryBuilder();
+    _wf = (widget.factoryBuilder ?? _getCoreWf).call();
 
     if (buildAsync) {
       _future = _buildAsync();
@@ -138,7 +139,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
       );
     }
 
-    if (!widget.enableCaching) return _buildSync();
+    if (!enableCaching) return _buildSync();
 
     _cache ??= _buildSync();
     return _cache;
@@ -163,6 +164,12 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     Timeline.finishSync();
 
     return built;
+  }
+
+  static WidgetFactory _coreWf;
+  static WidgetFactory _getCoreWf() {
+    _coreWf ??= WidgetFactory();
+    return _coreWf;
   }
 }
 

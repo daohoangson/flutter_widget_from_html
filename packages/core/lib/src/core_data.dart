@@ -10,7 +10,7 @@ part 'data/text_bits.dart';
 /// A building operation to customize how a DOM element is rendered.
 @immutable
 class BuildOp {
-  /// Whether the element should be rendered with [CssBlock].
+  /// Controls whether the element should be rendered with [CssBlock].
   ///
   /// Default: `true` if [onWidgets] callback is set, `false` otherwise.
   final bool isBlockElement;

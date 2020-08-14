@@ -2,9 +2,13 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'core_html_widget.dart';
+
 part 'widget/css_element.dart';
 
 /// The default character threshold to build widget tree asynchronously.
+///
+/// Related: [HtmlWidget.buildAsync]
 const kShouldBuildAsync = 10000;
 
 /// A no op widget.
