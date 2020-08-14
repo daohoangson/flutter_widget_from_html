@@ -176,6 +176,28 @@ void main() {
       });
     });
 
+    group('addNewLine', () {
+      test('adds new bit', () {
+        final text = _text();
+        text.addText('data');
+        expect(text.bits.length, equals(1));
+
+        final newLine = text.addNewLine();
+        expect(newLine, isNotNull);
+        expect(text.bits.length, equals(2));
+      });
+
+      test('skips adding to existing new line', () {
+        final text = _text();
+        text.addText('data');
+        final newLine1 = text.addNewLine();
+        final newLine2 = text.addNewLine();
+
+        expect(newLine2, equals(newLine1));
+        expect(newLine2.data.length, equals(2));
+      });
+    });
+
     group('addWhitespace', () {
       test('adds new bit', () {
         final text = _text();
@@ -202,16 +224,6 @@ void main() {
 
         expect(space2, equals(space1));
         expect(space2.hasTrailingWhitespace, isTrue);
-      });
-
-      test('adds new line to trailing space', () {
-        final text = _text();
-        text.addText('data');
-        final space1 = text.addWhitespace();
-        final space2 = text.addWhitespace(TextWhitespaceType.newLine);
-
-        expect(space2, equals(space1));
-        expect(space2.data, equals('\n'));
       });
     });
 
@@ -289,7 +301,7 @@ void main() {
 
 [TextBits]
   [TextData] data=1
-  [TextWhitespace] data= 
+  [_TextWhitespace] data= 
   [TextBits]
     [TextData] data=(2.1)
     [TextBits]

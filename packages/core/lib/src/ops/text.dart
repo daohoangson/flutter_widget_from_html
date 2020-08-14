@@ -21,8 +21,7 @@ class _TextCompiler {
 
     if (_compiled.isEmpty) {
       _compiled.add(_TextCompiled(
-          widget: _MarginVerticalPlaceholder(
-              CssLength(1, CssLengthUnit.em), text.tsb)));
+          widget: HeightPlaceholder(CssLength(1, CssLengthUnit.em), text.tsb)));
     }
 
     return _compiled;
@@ -45,21 +44,14 @@ class _TextCompiler {
     if (thisTsb?.hasSameStyleWith(_prevTsb) == false) _saveSpan();
 
     if (bit.canCompile) {
-      _saveSpan();
-      _spans.add(bit.compile(thisTsb));
-      return;
-    }
-
-    if (bit is TextWhitespace && !bit.hasTrailingWhitespace) {
-      _completeLoop();
-      final newLines = bit.data.length - 1;
-      if (newLines > 0) {
-        _compiled.add(_TextCompiled(
-          widget: _MarginVerticalPlaceholder(
-            CssLength(newLines.toDouble(), CssLengthUnit.em),
-            bit.parent.tsb,
-          ),
-        ));
+      if (bit is TextBit<InlineSpan>) {
+        _saveSpan();
+        final span = bit.compile(thisTsb);
+        if (span != null) _spans.add(span);
+      } else if (bit is TextBit<Widget>) {
+        _completeLoop();
+        final widget = bit.compile(thisTsb);
+        if (widget != null) _compiled.add(_TextCompiled(widget: widget));
       }
       return;
     }

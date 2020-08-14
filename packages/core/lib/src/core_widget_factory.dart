@@ -8,6 +8,7 @@ import 'package:html/dom.dart' as dom;
 
 import 'internal/builder.dart';
 import 'internal/css_sizing.dart';
+import 'internal/margin_vertical.dart';
 import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_html_widget.dart';
@@ -824,8 +825,7 @@ class WidgetFactory {
 
   BuildOp tagBr() {
     _tagBr ??= BuildOp(
-      onPieces: (_, pieces) =>
-          pieces..last.text.addWhitespace(TextWhitespaceType.newLine),
+      onPieces: (_, pieces) => pieces..last.text.addNewLine(),
     );
     return _tagBr;
   }
