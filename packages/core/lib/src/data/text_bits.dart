@@ -13,6 +13,30 @@ abstract class TextBit<T> {
   bool get isNotEmpty => !isEmpty;
   TextStyleBuilder get tsb => null;
 
+  TextBit get next {
+    TextBit x = this;
+
+    while (x != null) {
+      final i = x.index;
+      if (i != -1) {
+        final siblings = x.parent._children;
+        for (var j = i + 1; j < siblings.length; j++) {
+          final candidate = siblings[j];
+          if (candidate is TextBits) {
+            final first = candidate.first;
+            if (first != null) return first;
+          } else {
+            return candidate;
+          }
+        }
+      }
+
+      x = x.parent;
+    }
+
+    return null;
+  }
+
   T compile(TextStyleBuilder tsb) => throw UnimplementedError();
 
   bool detach() => parent?._children?.remove(this);
@@ -48,30 +72,6 @@ abstract class TextBit<T> {
         ? 'widget=${(this as TextWidget).widget}'
         : 'data=$data';
     return '[$clazz:$hashCode] $contents';
-  }
-
-  static TextBit nextOf(TextBit bit) {
-    var x = bit;
-
-    while (x != null) {
-      final i = x.index;
-      if (i != -1) {
-        final siblings = x.parent._children;
-        for (var j = i + 1; j < siblings.length; j++) {
-          final candidate = siblings[j];
-          if (candidate is TextBits) {
-            final first = candidate.first;
-            if (first != null) return first;
-          } else {
-            return candidate;
-          }
-        }
-      }
-
-      x = x.parent;
-    }
-
-    return null;
   }
 
   static TextBit tailOf(TextBits bits) {

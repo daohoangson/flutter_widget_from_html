@@ -110,7 +110,7 @@ class _TextCompiler {
     // complicated: whitespace at the end of a tag, try to merge with the next
     // unless it has unrelated style (e.g. next bit is a sibling)
     if (bit == TextBit.tailOf(parent)) {
-      final next = TextBit.nextOf(bit);
+      final next = bit.next;
       if (next?.tsb != null) {
         // get the outer-most text having this as the last bit
         var bp = bit.parent;

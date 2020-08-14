@@ -10,6 +10,25 @@ void main() {
       expect(bit.index, equals(0));
     });
 
+    group('next', () {
+      final text = _text();
+      final bit1 = text.addText('1');
+      final text2 = text.sub();
+      final bit21 = text2.addText('(2.1)');
+      final bit22 = text2.addText('(2.2)');
+      final bit3 = text.addText('3');
+
+      test('test data', () => expect(_data(text), equals('1(2.1)(2.2)3')));
+
+      test('returns sibling', () => expect(bit21.next, equals(bit22)));
+
+      test('returns first of next sub', () => expect(bit1.next, equals(bit21)));
+
+      test('returns from parent', () => expect(bit22.next, equals(bit3)));
+
+      test('returns null', () => expect(bit3.next, isNull));
+    });
+
     test('detaches', () {
       final text = _text();
       final bit = text.addText('data');
@@ -48,28 +67,6 @@ void main() {
 
       bitX.replaceWith(TextData(text, '2', text.tsb));
       expect(_data(text), equals('123'));
-    });
-
-    group('nextOf', () {
-      final text = _text();
-      final bit1 = text.addText('1');
-      final text2 = text.sub();
-      final bit21 = text2.addText('(2.1)');
-      final bit22 = text2.addText('(2.2)');
-      final bit3 = text.addText('3');
-
-      test('test data', () => expect(_data(text), equals('1(2.1)(2.2)3')));
-
-      test('returns sibling',
-          () => expect(TextBit.nextOf(bit21), equals(bit22)));
-
-      test('returns first of next sub',
-          () => expect(TextBit.nextOf(bit1), equals(bit21)));
-
-      test('returns from parent',
-          () => expect(TextBit.nextOf(bit22), equals(bit3)));
-
-      test('returns null', () => expect(TextBit.nextOf(bit3), isNull));
     });
 
     group('tailOf', () {
