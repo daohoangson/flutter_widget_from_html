@@ -11,28 +11,6 @@ Widget _marginHorizontalBuilder(Widget w, CssLengthBox b, TextStyleHtml tsh) =>
       ),
     );
 
-class _MarginVerticalPlaceholder extends WidgetPlaceholder<CssLength> {
-  final CssLength height;
-  final TextStyleBuilder tsb;
-
-  _MarginVerticalPlaceholder(this.height, this.tsb) : super(generator: height) {
-    super.wrapWith((child) => _build(child, height, tsb));
-  }
-
-  void mergeWith(_MarginVerticalPlaceholder other) =>
-      super.wrapWith((child) => _build(child, other.height, other.tsb));
-
-  @override
-  _MarginVerticalPlaceholder wrapWith(Widget Function(Widget) builder) => this;
-
-  static Widget _build(Widget child, CssLength height, TextStyleBuilder tsb) {
-    final existing = child is SizedBox ? child.height : 0.0;
-    final value = height.getValue(tsb.build());
-    if (value > existing) return SizedBox(height: value);
-    return child;
-  }
-}
-
 class _StyleMargin {
   final WidgetFactory wf;
 
@@ -65,7 +43,7 @@ class _StyleMargin {
           final tsb = meta.tsb();
 
           var i = 0;
-          if (t) ws[i++] = _MarginVerticalPlaceholder(m.top, tsb);
+          if (t) ws[i++] = HeightPlaceholder(m.top, tsb);
 
           for (final widget in widgets) {
             if (m.hasLeftOrRight) {
@@ -77,7 +55,7 @@ class _StyleMargin {
             ws[i++] = widget;
           }
 
-          if (b) ws[i++] = _MarginVerticalPlaceholder(m.bottom, tsb);
+          if (b) ws[i++] = HeightPlaceholder(m.bottom, tsb);
 
           return ws;
         },

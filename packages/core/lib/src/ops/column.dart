@@ -17,13 +17,13 @@ class _ColumnPlaceholder extends WidgetPlaceholder<NodeMetadata> {
   List<Widget> get children {
     final contents = <Widget>[];
 
-    _MarginVerticalPlaceholder marginBottom, marginTop;
+    HeightPlaceholder marginBottom, marginTop;
     Widget prev;
     var state = 0;
 
     for (final child in _iterable) {
       if (state == 0) {
-        if (child is _MarginVerticalPlaceholder) {
+        if (child is HeightPlaceholder) {
           if (!trimMarginVertical) {
             if (marginTop != null) {
               marginTop.mergeWith(child);
@@ -37,8 +37,7 @@ class _ColumnPlaceholder extends WidgetPlaceholder<NodeMetadata> {
       }
 
       if (state == 1) {
-        if (child is _MarginVerticalPlaceholder &&
-            prev is _MarginVerticalPlaceholder) {
+        if (child is HeightPlaceholder && prev is HeightPlaceholder) {
           prev.mergeWith(child);
           continue;
         }
@@ -50,7 +49,7 @@ class _ColumnPlaceholder extends WidgetPlaceholder<NodeMetadata> {
 
     if (contents.isNotEmpty) {
       final lastWidget = contents.last;
-      if (lastWidget is _MarginVerticalPlaceholder) {
+      if (lastWidget is HeightPlaceholder) {
         contents.removeLast();
 
         if (!trimMarginVertical) marginBottom = lastWidget;

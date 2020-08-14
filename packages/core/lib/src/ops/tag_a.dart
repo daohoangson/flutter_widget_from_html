@@ -47,18 +47,26 @@ class _TagA {
   }
 }
 
-class _TagATextData extends TextData {
-  final TextData bit;
+class _TagATextData extends TextBit<InlineSpan> {
+  @override
+  final String data;
+
   final GestureTapCallback onTap;
+
+  @override
+  final TextStyleBuilder tsb;
+
   final WidgetFactory wf;
 
-  _TagATextData(this.bit, this.onTap, this.wf)
-      : super(bit.parent, bit.data, bit.tsb);
+  _TagATextData(TextBit bit, this.onTap, this.wf)
+      : data = bit.data,
+        tsb = bit.tsb,
+        super(bit.parent);
 
   @override
   bool get canCompile => true;
 
   @override
-  InlineSpan compile(TextStyleBuilder tsb) => wf.buildGestureTapCallbackSpan(
-      bit.data, onTap, tsb.build().styleWithHeight);
+  InlineSpan compile(TextStyleBuilder tsb) =>
+      wf.buildGestureTapCallbackSpan(data, onTap, tsb.build().styleWithHeight);
 }

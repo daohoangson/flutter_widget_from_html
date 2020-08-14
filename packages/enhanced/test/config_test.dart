@@ -102,25 +102,38 @@ void main() {
   });
 
   group('enableCaching', () {
-    final explain = (WidgetTester tester, String html, bool enableCaching) =>
+    final explain = (
+      WidgetTester tester,
+      String html,
+      bool enableCaching, {
+      Uri baseUrl,
+      bool buildAsync,
+      Color hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
+      TextStyle textStyle,
+    }) =>
         helper.explain(tester, null,
             hw: HtmlWidget(
               html,
+              baseUrl: baseUrl,
+              buildAsync: buildAsync,
               enableCaching: enableCaching,
+              hyperlinkColor: hyperlinkColor,
               key: helper.hwKey,
+              textStyle: textStyle,
             ));
 
     testWidgets('caches built widget tree', (WidgetTester tester) async {
       final html = 'Foo';
       final explained = await explain(tester, html, true);
       expect(explained, equals('[RichText:(:Foo)]'));
-
       final built1 = helper.buildCurrentState();
+
+      await explain(tester, html, true);
       final built2 = helper.buildCurrentState();
       expect(built1 == built2, isTrue);
     });
 
-    testWidgets('invalidates cache on new html', (WidgetTester tester) async {
+    testWidgets('rebuild new html', (WidgetTester tester) async {
       final html1 = 'Foo';
       final html2 = 'Bar';
 
@@ -131,12 +144,72 @@ void main() {
       expect(explained2, equals('[RichText:(:Bar)]'));
     });
 
+    testWidgets('rebuild new baseUrl', (tester) async {
+      final html = 'Foo';
+
+      final explained1 = await explain(tester, html, true);
+      expect(explained1, equals('[RichText:(:Foo)]'));
+      final built1 = helper.buildCurrentState();
+
+      await explain(tester, html, true, baseUrl: Uri.http('domain.com', ''));
+      final built2 = helper.buildCurrentState();
+      expect(built1 == built2, isFalse);
+    });
+
+    testWidgets('rebuild new buildAsync', (tester) async {
+      final html = 'Foo';
+
+      final explained1 = await explain(tester, html, true);
+      expect(explained1, equals('[RichText:(:Foo)]'));
+      final built1 = helper.buildCurrentState();
+
+      await explain(tester, html, true, buildAsync: false);
+      final built2 = helper.buildCurrentState();
+      expect(built1 == built2, isFalse);
+    });
+
+    testWidgets('rebuild new enableCaching', (tester) async {
+      final html = 'Foo';
+
+      final explained1 = await explain(tester, html, true);
+      expect(explained1, equals('[RichText:(:Foo)]'));
+      final built1 = helper.buildCurrentState();
+
+      await explain(tester, html, false);
+      final built2 = helper.buildCurrentState();
+      expect(built1 == built2, isFalse);
+    });
+
+    testWidgets('rebuild new hyperlinkColor', (tester) async {
+      final html = 'Foo';
+
+      final explained1 = await explain(tester, html, true);
+      expect(explained1, equals('[RichText:(:Foo)]'));
+      final built1 = helper.buildCurrentState();
+
+      await explain(tester, html, true, hyperlinkColor: Colors.red);
+      final built2 = helper.buildCurrentState();
+      expect(built1 == built2, isFalse);
+    });
+
+    testWidgets('rebuild new textStyle', (tester) async {
+      final html = 'Foo';
+
+      final explained1 = await explain(tester, html, true);
+      expect(explained1, equals('[RichText:(:Foo)]'));
+
+      final explained2 =
+          await explain(tester, html, true, textStyle: TextStyle(fontSize: 20));
+      expect(explained2, equals('[RichText:(@20.0:Foo)]'));
+    });
+
     testWidgets('skips caching', (WidgetTester tester) async {
       final html = 'Foo';
       final explained = await explain(tester, html, false);
       expect(explained, equals('[RichText:(:Foo)]'));
-
       final built1 = helper.buildCurrentState();
+
+      await explain(tester, html, false);
       final built2 = helper.buildCurrentState();
       expect(built1 == built2, isFalse);
     });

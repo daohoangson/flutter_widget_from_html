@@ -8,7 +8,7 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 
-import 'core_builder.dart';
+import 'internal/builder.dart';
 import 'core_data.dart';
 import 'core_widget_factory.dart';
 
@@ -124,7 +124,22 @@ class _HtmlWidgetState extends State<HtmlWidget> {
   void didUpdateWidget(HtmlWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.html != oldWidget.html) {
+    var needsRebuild = false;
+
+    if (widget.baseUrl != oldWidget.baseUrl ||
+        widget.buildAsync != oldWidget.buildAsync ||
+        widget.html != oldWidget.html ||
+        widget.enableCaching != oldWidget.enableCaching ||
+        widget.hyperlinkColor != oldWidget.hyperlinkColor) {
+      needsRebuild = true;
+    }
+
+    if (widget.textStyle != oldWidget.textStyle) {
+      _rootTsb.reset();
+      needsRebuild = true;
+    }
+
+    if (needsRebuild) {
       _cache = null;
       _future = buildAsync ? _buildAsync() : null;
     }
