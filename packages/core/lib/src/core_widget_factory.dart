@@ -6,10 +6,12 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'core_builder.dart';
+import 'internal/builder.dart';
+import 'internal/css_sizing.dart';
 import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_html_widget.dart';
+import 'internal/css_block.dart';
 
 part 'ops/column.dart';
 part 'ops/style_bg_color.dart';

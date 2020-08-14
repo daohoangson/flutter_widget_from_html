@@ -1,8 +1,5 @@
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
-
-part 'widget/css_element.dart';
 
 const kShouldBuildAsync = 10000;
 

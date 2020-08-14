@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'core_data.dart';
-import 'core_helpers.dart';
-import 'core_widget_factory.dart';
+import '../core_data.dart';
+import '../core_helpers.dart';
+import '../core_widget_factory.dart';
 
 final _regExpSpaceLeading = RegExp(r'^[^\S\u{00A0}]+', unicode: true);
 final _regExpSpaceTrailing = RegExp(r'[^\S\u{00A0}]+$', unicode: true);
