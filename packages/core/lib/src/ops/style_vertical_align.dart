@@ -51,7 +51,7 @@ class _StyleVerticalAlign {
         ),
       );
     }
-    replacement.add(TextWidget(text, built, alignment: alignment));
+    replacement.add(TextWidget(replacement, built, alignment: alignment));
 
     return newPiece;
   }

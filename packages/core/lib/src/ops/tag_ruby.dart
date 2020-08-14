@@ -64,11 +64,9 @@ class _TagRuby {
       final built = wf.buildText(meta, text);
       if (built == null) return piece;
 
-      final parent = text.parent;
-      final replacement = parent.sub(text.tsb)..detach();
+      final replacement = text.parent.sub(text.tsb)..detach();
       text.replaceWith(replacement);
-
-      replacement.add(_buildTextBit(parent, built, rtBuilt));
+      replacement.add(_buildTextBit(replacement, built, rtBuilt));
 
       return BuiltPiece.text(replacement);
     }).toList(growable: false);
