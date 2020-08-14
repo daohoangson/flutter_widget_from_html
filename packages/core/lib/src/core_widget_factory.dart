@@ -789,7 +789,7 @@ class WidgetFactory {
     _styleDisplayBlock ??= BuildOp(
       onWidgets: (meta, widgets) => _listOrNull(
           buildColumnPlaceholder(meta, widgets)?.wrapWith(_cssBlock)),
-      priority: 9223372036854775807,
+      priority: 10000,
     );
     return _styleDisplayBlock;
   }
