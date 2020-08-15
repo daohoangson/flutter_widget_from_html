@@ -185,16 +185,25 @@ class HtmlWidgetDependency<T> {
 }
 
 @immutable
-class ImgMetadata {
+class ImageMetadata {
   final String alt;
+
+  final Iterable<ImageSource> sources;
+
   final String title;
+
+  ImageMetadata({this.alt, this.sources, this.title});
+}
+
+@immutable
+class ImageSource {
+  final double height;
+
   final String url;
 
-  ImgMetadata({
-    this.alt,
-    this.title,
-    @required this.url,
-  });
+  final double width;
+
+  ImageSource(this.url, {this.height, this.width}) : assert(url != null);
 }
 
 class NodeMetadata {
