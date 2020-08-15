@@ -98,7 +98,8 @@ class HtmlBuilder {
       }
     }
 
-    for (final style in _NodeMetadata._getStylesFromStrings(meta._styles)) {
+    meta._stylesIsLocked = true;
+    for (final style in meta.styles) {
       wf.parseStyle(meta, style.key, style.value);
     }
 
@@ -106,7 +107,7 @@ class HtmlBuilder {
       meta.register(wf.styleDisplayBlock());
     }
 
-    meta.lock();
+    meta._sortBuildOps();
 
     return meta;
   }
@@ -200,9 +201,10 @@ class _NodeMetadata extends NodeMetadata {
   final Iterable<BuildOp> _parentOps;
 
   List<BuildOp> _buildOps;
+  var _buildOpsIsLocked = false;
   bool _isBlockElement;
-  var _isLocked = false;
   List<String> _styles;
+  var _stylesIsLocked = false;
 
   _NodeMetadata(dom.Element domElement, TextStyleBuilder tsb, [this._parentOps])
       : super(domElement, tsb);
@@ -218,8 +220,14 @@ class _NodeMetadata extends NodeMetadata {
 
   @override
   Iterable<MapEntry<String, String>> get styles sync* {
-    assert(_isLocked);
-    yield* _getStylesFromStrings(_styles);
+    assert(_stylesIsLocked);
+
+    final iterator = _styles?.iterator;
+    while (iterator?.moveNext() == true) {
+      final key = iterator.current;
+      if (!iterator.moveNext()) return;
+      yield MapEntry(key, iterator.current);
+    }
   }
 
   @override
@@ -227,13 +235,22 @@ class _NodeMetadata extends NodeMetadata {
 
   @override
   operator []=(String key, String value) {
-    assert(!_isLocked);
+    assert(!_stylesIsLocked);
     _styles ??= [];
     _styles..add(key)..add(value);
   }
 
-  void lock() {
-    assert(!_isLocked);
+  @override
+  void register(BuildOp op) {
+    if (op == null) return;
+
+    assert(!_buildOpsIsLocked);
+    _buildOps ??= [];
+    if (!buildOps.contains(op)) _buildOps.add(op);
+  }
+
+  void _sortBuildOps() {
+    assert(!_buildOpsIsLocked);
 
     if (_buildOps != null) {
       _buildOps.sort((a, b) => a.priority.compareTo(b.priority));
@@ -244,26 +261,7 @@ class _NodeMetadata extends NodeMetadata {
       _isBlockElement ??= false;
     }
 
-    _isLocked = true;
-  }
-
-  @override
-  void register(BuildOp op) {
-    if (op == null) return;
-
-    assert(!_isLocked);
-    _buildOps ??= [];
-    if (!buildOps.contains(op)) _buildOps.add(op);
-  }
-
-  static Iterable<MapEntry<String, String>> _getStylesFromStrings(
-      Iterable<String> strings) sync* {
-    final iterator = strings?.iterator;
-    while (iterator?.moveNext() == true) {
-      final key = iterator.current;
-      if (!iterator.moveNext()) return;
-      yield MapEntry(key, iterator.current);
-    }
+    _buildOpsIsLocked = true;
   }
 
   static bool _isBlockElementFrom(Iterable<BuildOp> ops) =>
