@@ -281,7 +281,7 @@ class TextBits extends TextBit<void> {
     return bit;
   }
 
-  /// Creates a new sub-container.
+  /// Creates a sub-container.
   TextBits sub([TextStyleBuilder subTsb]) {
     final sub = TextBits(subTsb ?? tsb.sub(), this);
     add(sub);

@@ -378,17 +378,33 @@ abstract class NodeMetadata {
       _tsb..enqueue(builder, input);
 }
 
+/// A text style.
 @immutable
 class TextStyleHtml {
   final Iterable<HtmlWidgetDependency> _deps;
+
+  /// The line height.
   final double height;
+
+  /// The number of max lines that should be rendered.
   final int maxLines;
+
+  /// The parent style.
   final TextStyleHtml parent;
+
+  /// The input [TextStyle].
   final TextStyle style;
+
+  /// The text alignment.
   final TextAlign textAlign;
+
+  /// The text direction.
   final TextDirection textDirection;
+
+  /// The overflow behavior.
   final TextOverflow textOverflow;
 
+  /// Creates a text style.
   TextStyleHtml({
     @required Iterable<HtmlWidgetDependency> deps,
     this.height,
@@ -400,6 +416,7 @@ class TextStyleHtml {
     this.textOverflow,
   }) : _deps = deps;
 
+  /// Creates the root text style.
   factory TextStyleHtml.root(
       Iterable<HtmlWidgetDependency> deps, TextStyle widgetTextStyle) {
     var style = _getDependency<TextStyle>(deps);
@@ -423,9 +440,15 @@ class TextStyleHtml {
     );
   }
 
+  /// Returns a [TextStyle] merged from [style] and [height].
+  ///
+  /// This needs to be done because
+  /// `TextStyle` with existing height cannot be copied with `height=null`.
+  /// See [flutter/flutter#58765](https://github.com/flutter/flutter/issues/58765).
   TextStyle get styleWithHeight =>
       height != null && height >= 0 ? style.copyWith(height: height) : style;
 
+  /// Creates a copy with the given fields replaced with the new values.
   TextStyleHtml copyWith({
     double height,
     int maxLines,
@@ -446,6 +469,9 @@ class TextStyleHtml {
         textOverflow: textOverflow ?? this.textOverflow,
       );
 
+  /// Gets dependency value by type.
+  ///
+  /// See [HtmlWidgetDependency].
   T getDependency<T>() => _getDependency<T>(_deps);
 
   static T _getDependency<T>(Iterable<HtmlWidgetDependency> deps) {
@@ -457,7 +483,9 @@ class TextStyleHtml {
   }
 }
 
+/// A text styling builder.
 class TextStyleBuilder<T1> {
+  /// The parent builder.
   final TextStyleBuilder parent;
 
   List<Function> _builders;
@@ -465,8 +493,10 @@ class TextStyleBuilder<T1> {
   TextStyleHtml _parentOutput;
   TextStyleHtml _output;
 
+  /// Create a builder.
   TextStyleBuilder({this.parent});
 
+  /// Enqueues a callback.
   void enqueue<T2>(
     TextStyleHtml Function(TextStyleHtml, T2) builder, [
     T2 input,
@@ -481,6 +511,7 @@ class TextStyleBuilder<T1> {
     _inputs.add(input);
   }
 
+  /// Builds a [TextStyleHtml] by calling queued callbacks.
   TextStyleHtml build() {
     assert(parent != null);
     final parentOutput = parent.build();
@@ -503,6 +534,7 @@ class TextStyleBuilder<T1> {
     return _output;
   }
 
+  /// Returns `true` if this shares same styling with [other].
   bool hasSameStyleWith(TextStyleBuilder other) {
     if (other == null) return false;
 
@@ -521,5 +553,6 @@ class TextStyleBuilder<T1> {
     return thisWithBuilder == otherWithBuilder;
   }
 
+  /// Creates a sub-builder.
   TextStyleBuilder sub() => TextStyleBuilder(parent: this);
 }
