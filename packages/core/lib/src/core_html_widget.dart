@@ -105,7 +105,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     super.initState();
 
     _rootTsb = _RootTsb(this);
-    _rootMeta = NodeMetadata(_rootTsb);
+    _rootMeta = HtmlBuilder.rootMeta(_rootTsb);
     _wf = (widget.factoryBuilder ?? _getCoreWf).call();
 
     if (buildAsync) {

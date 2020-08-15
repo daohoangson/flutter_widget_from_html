@@ -27,7 +27,7 @@ class _TagRuby {
 
     switch (e.localName) {
       case _kTagRp:
-        childMeta.addStyle(_kCssDisplay, _kCssDisplayNone);
+        childMeta[_kCssDisplay] = _kCssDisplayNone;
         break;
       case _kTagRt:
         _rtOp ??= BuildOp(
@@ -42,7 +42,7 @@ class _TagRuby {
         );
 
         childMeta
-          ..addStyle(_kCssFontSize, '0.5em')
+          ..[_kCssFontSize] = '0.5em'
           ..register(_rtOp);
         break;
     }

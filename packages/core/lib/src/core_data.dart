@@ -319,79 +319,36 @@ class ImageSource {
   ImageSource(this.url, {this.height, this.width}) : assert(url != null);
 }
 
-class NodeMetadata {
-  final Iterable<BuildOp> _parentOps;
+abstract class NodeMetadata {
+  final dom.Element domElement;
+
   final TextStyleBuilder _tsb;
 
-  List<BuildOp> _buildOps;
-  dom.Element _domElement;
-  bool _isBlockElement;
   bool isNotRenderable;
-  List<String> _styles;
-  bool _stylesFrozen = false;
 
-  NodeMetadata(this._tsb, [this._parentOps]);
+  NodeMetadata(this.domElement, this._tsb);
 
-  Iterable<BuildOp> get buildOps => _buildOps;
+  Iterable<BuildOp> get buildOps;
 
-  dom.Element get domElement => _domElement;
+  bool get isBlockElement;
 
-  bool get isBlockElement {
-    if (_isBlockElement == true) return true;
-    return _buildOps?.where((o) => o.isBlockElement)?.length?.compareTo(0) == 1;
-  }
+  Iterable<BuildOp> get parentOps;
 
-  Iterable<BuildOp> get parentOps => _parentOps;
+  Iterable<MapEntry<String, String>> get styles;
 
-  Iterable<MapEntry<String, String>> get styleEntries sync* {
-    _stylesFrozen = true;
-    if (_styles == null) return;
+  set isBlockElement(bool value);
 
-    final iterator = _styles.iterator;
-    while (iterator.moveNext()) {
-      final key = iterator.current;
-      if (!iterator.moveNext()) return;
-      yield MapEntry(key, iterator.current);
-    }
-  }
+  operator []=(String key, String value);
 
-  set domElement(dom.Element e) {
-    assert(_domElement == null);
-    _domElement = e;
-
-    if (_buildOps != null) {
-      _buildOps.sort((a, b) => a.priority.compareTo(b.priority));
-      _buildOps = List.unmodifiable(_buildOps);
-    }
-  }
-
-  set isBlockElement(bool v) => _isBlockElement = v;
-
-  void addStyle(String key, String value) {
-    assert(!_stylesFrozen);
-    _styles ??= [];
-    _styles..add(key)..add(value);
-  }
-
-  void insertStyle(String key, String value) {
-    assert(!_stylesFrozen);
-    _styles ??= [];
-    _styles..insertAll(0, [key, value]);
-  }
-
-  String getStyleValue(String key) {
+  String operator [](String key) {
     String value;
-    for (final x in styleEntries) {
+    for (final x in styles) {
       if (x.key == key) value = x.value;
     }
     return value;
   }
 
-  void register(BuildOp op) {
-    if (op == null) return;
-    _buildOps ??= [];
-    if (!buildOps.contains(op)) _buildOps.add(op);
-  }
+  void register(BuildOp op);
 
   TextStyleBuilder tsb<T>([
     TextStyleHtml Function(TextStyleHtml, T) builder,
