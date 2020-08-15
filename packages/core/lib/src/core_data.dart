@@ -319,27 +319,44 @@ class ImageSource {
   ImageSource(this.url, {this.height, this.width}) : assert(url != null);
 }
 
+/// A DOM node.
 abstract class NodeMetadata {
+  /// The associatd DOM element.
   final dom.Element domElement;
 
   final TextStyleBuilder _tsb;
 
+  /// Controls whether the node is renderable.
   bool isNotRenderable;
 
+  /// Creates a node.
   NodeMetadata(this.domElement, this._tsb);
 
+  /// The registered build ops.
   Iterable<BuildOp> get buildOps;
 
+  /// Returns `true` if node should be rendered as block.
   bool get isBlockElement;
 
+  /// The parents' build ops that have [BuildOp.onChild].
   Iterable<BuildOp> get parentOps;
 
+  /// The inline styles.
+  ///
+  /// These are usually collected from:
+  ///
+  /// - [WidgetFactory.parseTag] or [BuildOp.onChild] by calling `meta[key] = value`
+  /// - [BuildOp.defaultStyles] returning a map
+  /// - Attribute `style` of [domElement]
   Iterable<MapEntry<String, String>> get styles;
 
+  /// Sets whether node should be rendered as block.
   set isBlockElement(bool value);
 
+  /// Adds an inline style.
   operator []=(String key, String value);
 
+  /// Gets an inline style value by key.
   String operator [](String key) {
     String value;
     for (final x in styles) {
@@ -348,8 +365,12 @@ abstract class NodeMetadata {
     return value;
   }
 
+  /// Registers a build op.
   void register(BuildOp op);
 
+  /// Enqueues a text style builder callback.
+  ///
+  /// Returns the associated [TextStyleBuilder].
   TextStyleBuilder tsb<T>([
     TextStyleHtml Function(TextStyleHtml, T) builder,
     T input,
