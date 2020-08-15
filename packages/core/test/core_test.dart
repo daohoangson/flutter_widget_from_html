@@ -587,6 +587,12 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(explained, equals('[RichText:(:Foo (bg=#FFFF0000:bar))]'));
     });
 
+    testWidgets('renders background', (WidgetTester tester) async {
+      final html = 'Foo <span style="background: #f00">bar</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo (bg=#FFFF0000:bar))]'));
+    });
+
     group('renders without erroneous white spaces', () {
       testWidgets('before', (WidgetTester tester) async {
         final html = 'Foo<span style="background-color: #f00"> bar</span>';
