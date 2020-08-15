@@ -109,6 +109,13 @@ class _TextStyle {
     );
   }
 
+  static BuildOp textDecoOp(_TextDeco v) => BuildOp(
+        onPieces: (meta, pieces) {
+          if (!meta.isBlockElement) meta.tsb<_TextDeco>(textDeco, v);
+          return pieces;
+        },
+      );
+
   static TextStyleHtml textDirection(TextStyleHtml p, String v) {
     final textDirection = (v == _kCssDirectionRtl)
         ? TextDirection.rtl
