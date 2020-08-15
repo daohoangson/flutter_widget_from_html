@@ -409,31 +409,27 @@ class WidgetFactory {
       case _kCssBorderBottom:
         final borderBottom = parseCssBorderSide(value);
         if (borderBottom != null) {
-          meta.tsb(
-              _TextStyle.textDeco,
-              _TextDeco(
-                color: borderBottom.color,
-                under: true,
-                style: borderBottom.style,
-                thickness: borderBottom.width,
-              ));
+          meta.register(_TextStyle.textDecoOp(_TextDeco(
+            color: borderBottom.color,
+            under: true,
+            style: borderBottom.style,
+            thickness: borderBottom.width,
+          )));
         } else {
-          meta.tsb(_TextStyle.textDeco, _TextDeco(under: false));
+          meta.register(_TextStyle.textDecoOp(_TextDeco(under: false)));
         }
         break;
       case _kCssBorderTop:
         final borderTop = parseCssBorderSide(value);
         if (borderTop != null) {
-          meta.tsb(
-              _TextStyle.textDeco,
-              _TextDeco(
-                color: borderTop.color,
-                over: true,
-                style: borderTop.style,
-                thickness: borderTop.width,
-              ));
+          meta.register(_TextStyle.textDecoOp(_TextDeco(
+            color: borderTop.color,
+            over: true,
+            style: borderTop.style,
+            thickness: borderTop.width,
+          )));
         } else {
-          meta.tsb(_TextStyle.textDeco, _TextDeco(over: false));
+          meta.register(_TextStyle.textDecoOp(_TextDeco(over: false)));
         }
         break;
 
