@@ -1,9 +1,9 @@
 part of '../core_data.dart';
 
-/// A table being processed.
+/// A table
 @immutable
 class TableMetadata {
-  /// The table's border.
+  /// The table border.
   final BorderSide border;
 
   final Map<int, Map<int, int>> _grid = {};

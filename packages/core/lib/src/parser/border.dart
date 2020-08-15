@@ -12,26 +12,29 @@ CssBorderSide _parseCssBorderSide(WidgetFactory wf, String value) {
   if (valuesThree != null) {
     final width = wf.parseCssLength(valuesThree[1]);
     if (width == null || width.number <= 0) return null;
-    return CssBorderSide()
-      ..color = wf.parseColor(valuesThree[3])
-      ..style = wf.parseCssBorderStyle(valuesThree[2])
-      ..width = width;
+    return CssBorderSide(
+      color: wf.parseColor(valuesThree[3]),
+      style: wf.parseCssBorderStyle(valuesThree[2]),
+      width: width,
+    );
   }
 
   final valuesTwo = _borderValuesTwoRegExp.firstMatch(value);
   if (valuesTwo != null) {
     final width = wf.parseCssLength(valuesTwo[1]);
     if (width == null || width.number <= 0) return null;
-    return CssBorderSide()
-      ..style = wf.parseCssBorderStyle(valuesTwo[2])
-      ..width = width;
+    return CssBorderSide(
+      style: wf.parseCssBorderStyle(valuesTwo[2]),
+      width: width,
+    );
   }
 
   final width = wf.parseCssLength(value);
   if (width == null || width.number <= 0) return null;
-  return CssBorderSide()
-    ..style = TextDecorationStyle.solid
-    ..width = width;
+  return CssBorderSide(
+    style: TextDecorationStyle.solid,
+    width: width,
+  );
 }
 
 TextDecorationStyle _parseCssBorderStyle(String value) {

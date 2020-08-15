@@ -1,6 +1,6 @@
 part of '../core_data.dart';
 
-/// A bit of text being processed.
+/// A bit of text.
 @immutable
 abstract class TextBit<T> {
   /// The container [TextBits].
