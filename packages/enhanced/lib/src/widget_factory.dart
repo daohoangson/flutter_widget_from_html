@@ -47,7 +47,7 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
-  Widget buildTable(NodeMetadata meta, TableData table) {
+  Widget buildTable(NodeMetadata node, TableMetadata table) {
     final cols = table.cols;
     if (cols == 0) return null;
     final templateColumnSizes = List<TrackSize>(cols);
@@ -66,24 +66,29 @@ class WidgetFactory extends core.WidgetFactory {
         ? BoxDecoration(border: Border.fromBorderSide(table.border))
         : null;
 
-    final layoutGrid = LayoutGrid(
-      children: table.slots.map((slot) {
-        Widget cell = SizedBox.expand(child: slot.cell.child);
+    final children = <Widget>[];
+    table.visitCells((col, row, widget, colspan, rowspan) {
+      Widget child = SizedBox.expand(child: widget);
 
-        if (border != null) {
-          cell = Container(
-            child: cell,
-            decoration: border,
-          );
-        }
-
-        return cell.withGridPlacement(
-          columnStart: slot.col,
-          columnSpan: slot.cell.colspan,
-          rowStart: slot.row,
-          rowSpan: slot.cell.rowspan,
+      if (border != null) {
+        child = Container(
+          child: child,
+          decoration: border,
         );
-      }).toList(growable: false),
+      }
+
+      child = child.withGridPlacement(
+        columnStart: col,
+        columnSpan: colspan,
+        rowStart: row,
+        rowSpan: rowspan,
+      );
+
+      children.add(child);
+    });
+
+    final layoutGrid = LayoutGrid(
+      children: children,
       columnGap: -(table.border?.width ?? 0),
       gridFit: GridFit.passthrough,
       rowGap: -(table.border?.width ?? 0),
@@ -94,7 +99,7 @@ class WidgetFactory extends core.WidgetFactory {
     if (border == null) return layoutGrid;
 
     return buildStack(
-      meta,
+      node,
       <Widget>[
         layoutGrid,
         Positioned.fill(child: Container(decoration: border))

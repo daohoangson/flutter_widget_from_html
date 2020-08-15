@@ -163,7 +163,7 @@ class WidgetFactory {
         textDirection: meta.tsb().build().textDirection,
       );
 
-  Widget buildTable(NodeMetadata meta, TableData table) {
+  Widget buildTable(NodeMetadata node, TableMetadata table) {
     final rows = <TableRow>[];
     final slotIndices = <int>[];
     final tableCols = table.cols;
@@ -172,14 +172,14 @@ class WidgetFactory {
     for (var r = 0; r < tableRows; r++) {
       final cells = List<Widget>(tableCols);
       for (var c = 0; c < tableCols; c++) {
-        final slot = table.getSlot(row: r, col: c);
-        if (slot == null || slotIndices.contains(slot.index)) {
+        final index = table.getIndexAt(row: r, column: c);
+        if (index == -1 || slotIndices.contains(index)) {
           cells[c] = widget0;
           continue;
         }
+        slotIndices.add(index);
 
-        slotIndices.add(slot.index);
-        cells[c] = TableCell(child: slot.cell.child);
+        cells[c] = TableCell(child: table.getWidgetAt(index));
       }
 
       if (cells.isEmpty) continue;
