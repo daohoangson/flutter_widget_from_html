@@ -400,6 +400,7 @@ class WidgetFactory {
 
   void parseStyle(NodeMetadata meta, String key, String value) {
     switch (key) {
+      case _kCssBackground:
       case _kCssBackgroundColor:
         meta.register(styleBgColor());
         break;
