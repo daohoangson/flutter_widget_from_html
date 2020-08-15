@@ -667,6 +667,20 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(+u:Foo)]'));
     });
+
+    group('isBlockElement', () {
+      testWidgets('skips border-top', (WidgetTester tester) async {
+        final html = '<div style="border-top: 1px">Foo</div>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+      });
+
+      testWidgets('skips border-bottom', (WidgetTester tester) async {
+        final html = '<div style="border-bottom: 1px">Foo</div>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+      });
+    });
   });
 
   group('color (inline style)', () {
