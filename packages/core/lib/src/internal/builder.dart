@@ -65,7 +65,7 @@ class HtmlBuilder {
   }
 
   NodeMetadata collectMetadata(dom.Element e) {
-    final meta = NodeMetadata(parentMeta.tsb().sub(), parentOps);
+    final meta = _NodeMetadata(e, parentMeta.tsb().sub(), parentOps);
     wf.parseTag(meta, e.localName, e.attributes);
 
     if (meta.parentOps != null) {
@@ -79,8 +79,10 @@ class HtmlBuilder {
       for (final op in meta.buildOps) {
         final map = op.defaultStyles?.call(meta, e);
         if (map == null) continue;
+
+        meta._styles ??= [];
         for (final pair in map.entries) {
-          meta.insertStyle(pair.key, pair.value);
+          meta._styles.insertAll(0, [pair.key, pair.value]);
         }
       }
     }
@@ -92,11 +94,11 @@ class HtmlBuilder {
     // stylings, step 2: get styles from `style` attribute
     if (e.attributes.containsKey('style')) {
       for (final pair in splitAttributeStyle(e.attributes['style'])) {
-        meta.addStyle(pair.key, pair.value);
+        meta[pair.key] = pair.value;
       }
     }
 
-    for (final style in meta.styleEntries) {
+    for (final style in _NodeMetadata._getStylesFromStrings(meta._styles)) {
       wf.parseStyle(meta, style.key, style.value);
     }
 
@@ -104,7 +106,7 @@ class HtmlBuilder {
       meta.register(wf.styleDisplayBlock());
     }
 
-    meta.domElement = e;
+    meta.lock();
 
     return meta;
   }
@@ -189,6 +191,83 @@ class HtmlBuilder {
     _pieces.add(_textPiece);
     _newTextPiece();
   }
+
+  static NodeMetadata rootMeta(TextStyleBuilder tsb) =>
+      _NodeMetadata(null, tsb);
+}
+
+class _NodeMetadata extends NodeMetadata {
+  final Iterable<BuildOp> _parentOps;
+
+  List<BuildOp> _buildOps;
+  bool _isBlockElement;
+  var _isLocked = false;
+  List<String> _styles;
+
+  _NodeMetadata(dom.Element domElement, TextStyleBuilder tsb, [this._parentOps])
+      : super(domElement, tsb);
+
+  @override
+  Iterable<BuildOp> get buildOps => _buildOps;
+
+  @override
+  bool get isBlockElement => _isBlockElement ?? _isBlockElementFrom(_buildOps);
+
+  @override
+  Iterable<BuildOp> get parentOps => _parentOps;
+
+  @override
+  Iterable<MapEntry<String, String>> get styles sync* {
+    assert(_isLocked);
+    yield* _getStylesFromStrings(_styles);
+  }
+
+  @override
+  set isBlockElement(bool value) => _isBlockElement = value;
+
+  @override
+  operator []=(String key, String value) {
+    assert(!_isLocked);
+    _styles ??= [];
+    _styles..add(key)..add(value);
+  }
+
+  void lock() {
+    assert(!_isLocked);
+
+    if (_buildOps != null) {
+      _buildOps.sort((a, b) => a.priority.compareTo(b.priority));
+
+      // pre-calculate `isBlockElement` for faster access later
+      _isBlockElement ??= _isBlockElementFrom(_buildOps);
+    } else {
+      _isBlockElement ??= false;
+    }
+
+    _isLocked = true;
+  }
+
+  @override
+  void register(BuildOp op) {
+    if (op == null) return;
+
+    assert(!_isLocked);
+    _buildOps ??= [];
+    if (!buildOps.contains(op)) _buildOps.add(op);
+  }
+
+  static Iterable<MapEntry<String, String>> _getStylesFromStrings(
+      Iterable<String> strings) sync* {
+    final iterator = strings?.iterator;
+    while (iterator?.moveNext() == true) {
+      final key = iterator.current;
+      if (!iterator.moveNext()) return;
+      yield MapEntry(key, iterator.current);
+    }
+  }
+
+  static bool _isBlockElementFrom(Iterable<BuildOp> ops) =>
+      ops?.where((op) => op.isBlockElement)?.length?.compareTo(0) == 1;
 }
 
 Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, NodeMetadata meta) {
