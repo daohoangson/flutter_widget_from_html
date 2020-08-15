@@ -95,6 +95,7 @@ These tags and their contents will be ignored:
 
 ### Inline stylings
 
+- background (color only), background-color: hex values, `rgb()`, `hsl()` or named colors
 - border-top, border-bottom: overline/underline with support for dashed/dotted/double/solid style
 - color: hex values, `rgb()`, `hsl()` or named colors
 - direction (similar to `dir` attribute)

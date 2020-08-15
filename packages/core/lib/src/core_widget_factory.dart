@@ -401,6 +401,7 @@ class WidgetFactory {
 
   void parseStyle(NodeMetadata meta, String key, String value) {
     switch (key) {
+      case _kCssBackground:
       case _kCssBackgroundColor:
         meta.register(styleBgColor());
         break;
@@ -790,7 +791,7 @@ class WidgetFactory {
     _styleDisplayBlock ??= BuildOp(
       onWidgets: (meta, widgets) => _listOrNull(
           buildColumnPlaceholder(meta, widgets)?.wrapWith(_cssBlock)),
-      priority: 9223372036854775807,
+      priority: 10000,
     );
     return _styleDisplayBlock;
   }
