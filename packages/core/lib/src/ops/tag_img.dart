@@ -11,10 +11,10 @@ class _TagImg {
           if (node.isBlockElement) return pieces;
 
           final text = pieces.last?.text;
-          final img = _parse(node);
-          final built = _buildImg(node, img);
+          final image = _parse(node);
+          final built = _build(node, image);
           if (built == null) {
-            final imgText = img.alt ?? img.title;
+            final imgText = image.alt ?? image.title;
             if (imgText?.isNotEmpty == true) {
               text.addText(imgText);
             }
@@ -23,40 +23,55 @@ class _TagImg {
 
           text.add(_ImageBit(
             text,
-            WidgetPlaceholder<ImgMetadata>(child: built, generator: img),
+            WidgetPlaceholder<ImageMetadata>(child: built, generator: image),
           ));
           return pieces;
         },
         onWidgets: (node, _) {
           if (!node.isBlockElement) return [];
 
-          final img = _parse(node);
-          final built = _buildImg(node, img);
+          final image = _parse(node);
+          final built = _build(node, image);
           if (built == null) return [];
 
-          return [WidgetPlaceholder<ImgMetadata>(child: built, generator: img)];
+          return [
+            WidgetPlaceholder<ImageMetadata>(child: built, generator: image)
+          ];
         },
       );
 
-  Widget _buildImg(NodeMetadata node, ImgMetadata img) {
-    final image = wf.imageProvider(img.url);
-    if (image == null) return null;
-    return wf.buildImage(node, image, img);
+  Widget _build(NodeMetadata node, ImageMetadata image) {
+    final provider = wf.imageProvider(image.sources?.first);
+    if (provider == null) return null;
+    return wf.buildImage(node, provider, image);
   }
 
-  ImgMetadata _parse(NodeMetadata meta) {
+  ImageMetadata _parse(NodeMetadata meta) {
     final attrs = meta.domElement.attributes;
     final src = attrs.containsKey('src') ? attrs['src'] : null;
-    return ImgMetadata(
+    final url = wf.constructFullUrl(src);
+    return ImageMetadata(
       alt: attrs.containsKey('alt') ? attrs['alt'] : null,
+      sources: (url != null)
+          ? [
+              ImageSource(
+                url,
+                height: attrs.containsKey('height')
+                    ? double.tryParse(attrs['height'])
+                    : null,
+                width: attrs.containsKey('width')
+                    ? double.tryParse(attrs['width'])
+                    : null,
+              ),
+            ]
+          : null,
       title: attrs.containsKey('title') ? attrs['title'] : null,
-      url: wf.constructFullUrl(src),
     );
   }
 }
 
-class _ImageBit extends TextWidget<ImgMetadata> {
-  _ImageBit(TextBits parent, WidgetPlaceholder<ImgMetadata> widget)
+class _ImageBit extends TextWidget<ImageMetadata> {
+  _ImageBit(TextBits parent, WidgetPlaceholder<ImageMetadata> widget)
       : super(parent, widget);
 
   @override
