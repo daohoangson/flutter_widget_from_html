@@ -1,6 +1,6 @@
 part of '../core_data.dart';
 
-/// A table
+/// A table.
 @immutable
 class TableMetadata {
   /// The table border.
