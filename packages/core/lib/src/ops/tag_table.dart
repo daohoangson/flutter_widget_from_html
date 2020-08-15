@@ -23,7 +23,7 @@ class _TagTable {
   final NodeMetadata tableMeta;
   final WidgetFactory wf;
 
-  final _data = _TableData();
+  final _data = _TagTableData();
 
   BuildOp _tableOp;
 
@@ -43,9 +43,9 @@ class _TagTable {
     final which = _getChildCssDisplayValue(childMeta, e);
     switch (which) {
       case _kCssDisplayTableRow:
-        final row = _TableDataRow();
+        final row = _TagTableDataRow();
         _data.rows.add(row);
-        childMeta.register(_TableRow(wf, childMeta, row)._rowOp);
+        childMeta.register(_TagTableRow(wf, childMeta, row).op);
         break;
       case _kCssDisplayTableHeaderGroup:
       case _kCssDisplayTableRowGroup:
@@ -55,12 +55,15 @@ class _TagTable {
             : which == _kCssDisplayTableRowGroup
                 ? _data.rows
                 : _data.footer.rows;
-        childMeta.register(_TableGroup(wf, childMeta, rows)._groupOp);
+        childMeta.register(_TagTableGroup(wf, childMeta, rows).op);
         break;
       case _kCssDisplayTableCaption:
         childMeta.register(BuildOp(onWidgets: (meta, widgets) {
-          _data.caption = wf.buildColumnPlaceholder(meta, widgets);
-          return [_data.caption];
+          final caption = wf.buildColumnPlaceholder(meta, widgets);
+          if (caption == null) return [];
+
+          _data.captions.add(caption);
+          return [caption];
         }));
         break;
     }
@@ -68,27 +71,37 @@ class _TagTable {
 
   Iterable<WidgetPlaceholder> onWidgets(
       NodeMetadata _, Iterable<WidgetPlaceholder> __) {
-    final data = TableData(border: _parseBorder());
+    final metadata = TableMetadata(border: _parseBorder());
 
-    final rows = <_TableDataRow>[
+    final rows = <_TagTableDataRow>[
       ..._data.header.rows,
       ..._data.rows,
       ..._data.footer.rows,
     ];
     for (var i = 0; i < rows.length; i++) {
       for (final cell in rows[i].cells) {
-        data.addCell(i, cell);
+        metadata.addCell(
+          i,
+          cell.child,
+          colspan: cell.colspan,
+          rowspan: cell.rowspan,
+        );
       }
     }
 
-    final table = wf.buildTable(tableMeta, data);
+    final table = wf.buildTable(tableMeta, metadata);
     final column = wf.buildColumnPlaceholder(tableMeta, [
-      if (_data.caption != null) _data.caption,
+      ..._data.captions,
       if (table != null) table,
     ]);
     if (column == null) return [];
 
-    return [WidgetPlaceholder<TableData>(child: column, generator: data)];
+    return [
+      WidgetPlaceholder<TableMetadata>(
+        child: column,
+        generator: metadata,
+      )
+    ];
   }
 
   BorderSide _parseBorder() {
@@ -160,15 +173,15 @@ class _TagTable {
   }
 }
 
-class _TableGroup {
-  final List<_TableDataRow> rows;
+class _TagTableGroup {
+  final List<_TagTableDataRow> rows;
   final NodeMetadata groupMeta;
   final WidgetFactory wf;
 
-  BuildOp _groupOp;
+  BuildOp op;
 
-  _TableGroup(this.wf, this.groupMeta, this.rows) {
-    _groupOp = BuildOp(onChild: onChild);
+  _TagTableGroup(this.wf, this.groupMeta, this.rows) {
+    op = BuildOp(onChild: onChild);
   }
 
   void onChild(NodeMetadata childMeta, dom.Element e) {
@@ -176,22 +189,22 @@ class _TableGroup {
     if (_TagTable._getChildCssDisplayValue(childMeta, e) !=
         _kCssDisplayTableRow) return;
 
-    final row = _TableDataRow();
+    final row = _TagTableDataRow();
     rows.add(row);
-    childMeta.register(_TableRow(wf, childMeta, row)._rowOp);
+    childMeta.register(_TagTableRow(wf, childMeta, row).op);
   }
 }
 
-class _TableRow {
-  final _TableDataRow row;
+class _TagTableRow {
+  final _TagTableDataRow row;
   final NodeMetadata rowMeta;
   final WidgetFactory wf;
 
+  BuildOp op;
   BuildOp _cellOp;
-  BuildOp _rowOp;
 
-  _TableRow(this.wf, this.rowMeta, this.row) {
-    _rowOp = BuildOp(onChild: onChild);
+  _TagTableRow(this.wf, this.rowMeta, this.row) {
+    op = BuildOp(onChild: onChild);
   }
 
   void onChild(NodeMetadata childMeta, dom.Element e) {
@@ -200,12 +213,16 @@ class _TableRow {
         _kCssDisplayTableCell) return;
 
     _cellOp ??= BuildOp(
-      onWidgets: (childMeta, widgets) {
-        final column = wf.buildColumnPlaceholder(childMeta, widgets);
-        if (column == null) return null;
+      onWidgets: (cellMeta, widgets) {
+        final column = wf.buildColumnPlaceholder(cellMeta, widgets);
+        if (column == null) return [];
 
-        final cell = _build(childMeta, column);
-        row.cells.add(cell);
+        final attributes = cellMeta.domElement.attributes;
+        row.cells.add(_TagTableDataCell(
+          child: column,
+          colspan: _tryParseInt(attributes, 'colspan') ?? 1,
+          rowspan: _tryParseInt(attributes, 'rowspan') ?? 1,
+        ));
 
         return [column];
       },
@@ -214,32 +231,33 @@ class _TableRow {
     childMeta.register(_cellOp);
   }
 
-  static TableDataCell _build(NodeMetadata cellMeta, Widget child) {
-    final a = cellMeta.domElement.attributes;
-    final colspan =
-        a.containsKey('colspan') ? int.tryParse(a['colspan']) : null;
-    final rowspan =
-        a.containsKey('rowspan') ? int.tryParse(a['rowspan']) : null;
-
-    return TableDataCell(
-      child: child,
-      colspan: colspan ?? 1,
-      rowspan: rowspan ?? 1,
-    );
-  }
+  static int _tryParseInt(Map<dynamic, String> attributes, String key) =>
+      attributes.containsKey(key) ? int.tryParse(attributes[key]) : null;
 }
 
-class _TableData {
-  Widget caption;
-  final footer = _TableDataGroup();
-  final header = _TableDataGroup();
-  final rows = <_TableDataRow>[];
+@immutable
+class _TagTableData {
+  final captions = <Widget>[];
+  final footer = _TagTableDataGroup();
+  final header = _TagTableDataGroup();
+  final rows = <_TagTableDataRow>[];
 }
 
-class _TableDataGroup {
-  final rows = <_TableDataRow>[];
+@immutable
+class _TagTableDataGroup {
+  final rows = <_TagTableDataRow>[];
 }
 
-class _TableDataRow {
-  final cells = <TableDataCell>[];
+@immutable
+class _TagTableDataRow {
+  final cells = <_TagTableDataCell>[];
+}
+
+@immutable
+class _TagTableDataCell {
+  final Widget child;
+  final int colspan;
+  final int rowspan;
+
+  _TagTableDataCell({this.child, this.colspan, this.rowspan});
 }
