@@ -25,7 +25,7 @@ class _StyleVerticalAlign {
       );
 
   BuiltPiece _buildWidgetSpan(NodeMetadata meta, BuiltPiece piece, String v) {
-    if (piece.hasWidgets) return piece;
+    if (piece.widgets != null) return piece;
 
     final alignment = _tryParse(v);
     if (alignment == null) return piece;

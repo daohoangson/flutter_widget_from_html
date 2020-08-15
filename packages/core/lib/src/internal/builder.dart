@@ -34,7 +34,7 @@ class HtmlBuilder {
     final list = <WidgetPlaceholder>[];
 
     for (final piece in process()) {
-      if (piece.hasWidgets) {
+      if (piece.widgets != null) {
         for (final widget in piece.widgets) {
           if (widget != null) list.add(widget);
         }

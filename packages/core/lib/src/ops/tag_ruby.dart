@@ -33,7 +33,7 @@ class _TagRuby {
         _rtOp ??= BuildOp(
           onPieces: (_, pieces) {
             for (final piece in pieces) {
-              if (piece.hasWidgets) continue;
+              if (piece.text == null) continue;
               _rtText = piece.text..detach();
             }
 
@@ -54,7 +54,7 @@ class _TagRuby {
     var processed = false;
 
     return pieces.map((piece) {
-      if (piece.hasWidgets || processed) return piece;
+      if (piece.text == null || processed) return piece;
       processed = true;
 
       final rtBuilt = wf.buildText(meta, _rtText);

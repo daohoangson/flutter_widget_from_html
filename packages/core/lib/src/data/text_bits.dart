@@ -161,7 +161,7 @@ class TextWidget<T> extends TextBit<InlineSpan> {
   /// The widget to be rendered.
   final WidgetPlaceholder<T> widget;
 
-  /// Creates an inline widget
+  /// Creates an inline widget.
   TextWidget(
     TextBits parent,
     this.widget, {

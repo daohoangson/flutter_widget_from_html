@@ -76,17 +76,21 @@ class BuildOp {
   }) : isBlockElement = isBlockElement ?? onWidgets != null;
 }
 
+/// An intermediate data piece while the widget tree is being built.
 class BuiltPiece {
+  /// The text bits.
   final TextBits text;
+
+  /// The widgets.
   final Iterable<WidgetPlaceholder> widgets;
 
+  /// Creates a text piece.
   BuiltPiece.text(this.text) : widgets = null;
 
+  /// Creates a piece with widgets.
   BuiltPiece.widgets(Iterable<Widget> widgets)
       : text = null,
         widgets = widgets.map(_placeholder);
-
-  bool get hasWidgets => widgets != null;
 
   static WidgetPlaceholder _placeholder(Widget widget) =>
       widget is WidgetPlaceholder

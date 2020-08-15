@@ -16,7 +16,8 @@ class _StyleBgColor {
           final bgColor = _parseColor(wf, meta);
           if (bgColor == null) return pieces;
 
-          return pieces.map((p) => p.hasWidgets ? p : _buildBlock(p, bgColor));
+          return pieces.map((piece) =>
+              piece.widgets != null ? piece : _buildBlock(piece, bgColor));
         },
         onWidgets: (meta, widgets) {
           final color = _parseColor(wf, meta);
