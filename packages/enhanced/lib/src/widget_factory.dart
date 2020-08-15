@@ -32,15 +32,15 @@ class WidgetFactory extends core.WidgetFactory {
       InkWell(child: child, onTap: onTap);
 
   @override
-  Widget buildImage(NodeMetadata meta, Object provider, ImgMetadata img) {
-    var built = super.buildImage(meta, provider, img);
+  Widget buildImage(NodeMetadata meta, Object provider, ImageMetadata image) {
+    var built = super.buildImage(meta, provider, image);
 
     if (built == null && provider is PictureProvider) {
       built = SvgPicture(provider);
     }
 
-    if (img.title != null && built != null) {
-      built = Tooltip(child: built, message: img.title);
+    if (image.title != null && built != null) {
+      built = Tooltip(child: built, message: image.title);
     }
 
     return built;
@@ -118,6 +118,7 @@ class WidgetFactory extends core.WidgetFactory {
     double width,
   }) {
     final dimensOk = height != null && height > 0 && width != null && width > 0;
+    final posterImgSrc = posterUrl != null ? ImageSource(posterUrl) : null;
     return VideoPlayer(
       url,
       aspectRatio: dimensOk ? width / height : 16 / 9,
@@ -125,11 +126,11 @@ class WidgetFactory extends core.WidgetFactory {
       autoplay: autoplay,
       controls: controls,
       loop: loop,
-      poster: posterUrl != null
+      poster: posterImgSrc != null
           ? buildImage(
               meta,
-              imageProvider(posterUrl),
-              ImgMetadata(url: posterUrl),
+              imageProvider(posterImgSrc),
+              ImageMetadata(sources: [posterImgSrc]),
             )
           : null,
     );
@@ -188,13 +189,14 @@ class WidgetFactory extends core.WidgetFactory {
       url?.isNotEmpty == true ? CachedNetworkImageProvider(url) : null;
 
   @override
-  Object imageProvider(String url) => url?.startsWith('data:image/svg+xml') ==
-          true
-      ? imageSvgMemoryPicture(url)
-      : url != null &&
-              Uri.tryParse(url)?.path?.toLowerCase()?.endsWith('.svg') == true
-          ? imageSvgPictureProvider(url)
-          : super.imageProvider(url);
+  Object imageProvider(ImageSource imgSrc) => imgSrc == null
+      ? super.imageProvider(imgSrc)
+      : imgSrc.url.startsWith('data:image/svg+xml') == true
+          ? imageSvgMemoryPicture(imgSrc.url)
+          : Uri.tryParse(imgSrc.url)?.path?.toLowerCase()?.endsWith('.svg') ==
+                  true
+              ? imageSvgPictureProvider(imgSrc.url)
+              : super.imageProvider(imgSrc);
 
   Object imageSvgMemoryPicture(String dataUri) {
     final bytes = imageBytes(dataUri);

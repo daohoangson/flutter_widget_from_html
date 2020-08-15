@@ -135,20 +135,20 @@ class WidgetFactory {
   Widget buildHorizontalScrollView(NodeMetadata meta, Widget child) =>
       SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
 
-  Widget buildImage(NodeMetadata node, Object provider, ImgMetadata img) =>
-      provider != null && provider is ImageProvider && img != null
+  Widget buildImage(NodeMetadata node, Object provider, ImageMetadata image) =>
+      provider != null && provider is ImageProvider && image != null
           ? Image(
-              errorBuilder: buildImageErrorWidgetBuilder(node, img),
+              errorBuilder: buildImageErrorWidgetBuilder(node, provider, image),
               image: provider,
-              semanticLabel: img.alt ?? img.title,
+              semanticLabel: image.alt ?? image.title,
             )
           : null;
 
   ImageErrorWidgetBuilder buildImageErrorWidgetBuilder(
-          NodeMetadata meta, ImgMetadata img) =>
+          NodeMetadata meta, Object provider, ImageMetadata image) =>
       (_, error, __) {
-        print('${img.url} error: $error');
-        final text = img.alt ?? img.title ?? '❌';
+        print('$provider error: $error');
+        final text = image.alt ?? image.title ?? '❌';
         return Text(text);
       };
 
@@ -374,12 +374,15 @@ class WidgetFactory {
   Object imageFromUrl(String url) =>
       url?.isNotEmpty == true ? NetworkImage(url) : null;
 
-  Object imageProvider(String url) {
-    if (url?.startsWith('asset:') == true) {
+  Object imageProvider(ImageSource imgSrc) {
+    if (imgSrc == null) return null;
+    final url = imgSrc.url;
+
+    if (url.startsWith('asset:') == true) {
       return imageFromAsset(url);
     }
 
-    if (url?.startsWith('data:') == true) {
+    if (url.startsWith('data:') == true) {
       return imageFromDataUri(url);
     }
 
