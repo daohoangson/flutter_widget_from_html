@@ -1,7 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:html/dom.dart' as dom;
 
 import 'internal/core_ops.dart';
 import 'internal/core_parser.dart';
@@ -220,26 +219,6 @@ class WidgetFactory {
     if (b == null) return null;
 
     return b.resolveUri(p).toString();
-  }
-
-  void customStyleBuilder(NodeMetadata meta, dom.Element element) {
-    if (widget.customStylesBuilder == null) return;
-
-    final map = widget.customStylesBuilder(element);
-    if (map == null) return;
-
-    for (final pair in map.entries) {
-      meta[pair.key] = pair.value;
-    }
-  }
-
-  void customWidgetBuilder(NodeMetadata meta, dom.Element element) {
-    if (widget.customWidgetBuilder == null) return;
-
-    final built = widget.customWidgetBuilder(element);
-    if (built == null) return;
-
-    meta.register(BuildOp(onWidgets: (_, __) => [built]));
   }
 
   GestureTapCallback gestureTapCallback(String url) => url != null

@@ -88,8 +88,8 @@ class HtmlBuilder {
     }
 
     // integration point: apply custom builders
-    wf.customStyleBuilder(meta, e);
-    wf.customWidgetBuilder(meta, e);
+    _customStyles(wf.widget.customStylesBuilder, meta, e);
+    _customWidget(wf.widget.customWidgetBuilder, meta, e);
 
     // stylings, step 2: get styles from `style` attribute
     if (e.attributes.containsKey('style')) {
@@ -266,6 +266,22 @@ class _NodeMetadata extends NodeMetadata {
 
   static bool _isBlockElementFrom(Iterable<BuildOp> ops) =>
       ops?.where((op) => op.isBlockElement)?.length?.compareTo(0) == 1;
+}
+
+void _customStyles(CustomStylesBuilder f, NodeMetadata m, dom.Element e) {
+  final map = f?.call(e);
+  if (map == null) return;
+
+  for (final pair in map.entries) {
+    m[pair.key] = pair.value;
+  }
+}
+
+void _customWidget(CustomWidgetBuilder f, NodeMetadata m, dom.Element e) {
+  final built = f?.call(e);
+  if (built == null) return;
+
+  m.register(BuildOp(onWidgets: (_, __) => [built]));
 }
 
 Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, NodeMetadata meta) {
