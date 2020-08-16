@@ -4,6 +4,7 @@ import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
+import 'package:flutter_widget_from_html_core/src/internal/core_ops.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'internal/ops.dart';
@@ -181,27 +182,36 @@ class WidgetFactory extends core.WidgetFactory {
         ..add(HtmlWidgetDependency<ThemeData>(Theme.of(context)));
 
   @override
-  Object imageFromUrl(String url) =>
+  Object imageProvider(ImageSource imgSrc) {
+    if (imgSrc == null) return super.imageProvider(imgSrc);
+    final url = imgSrc.url;
+
+    if (Uri.tryParse(url)?.path?.toLowerCase()?.endsWith('.svg') == true) {
+      return _imageSvgPictureProvider(url);
+    }
+
+    if (url.startsWith('data:image/svg+xml')) {
+      return _imageSvgMemoryPicture(url);
+    }
+
+    if (url.startsWith('http')) {
+      return _imageFromUrl(url);
+    }
+
+    return super.imageProvider(imgSrc);
+  }
+
+  Object _imageFromUrl(String url) =>
       url?.isNotEmpty == true ? CachedNetworkImageProvider(url) : null;
 
-  @override
-  Object imageProvider(ImageSource imgSrc) => imgSrc == null
-      ? super.imageProvider(imgSrc)
-      : imgSrc.url.startsWith('data:image/svg+xml') == true
-          ? imageSvgMemoryPicture(imgSrc.url)
-          : Uri.tryParse(imgSrc.url)?.path?.toLowerCase()?.endsWith('.svg') ==
-                  true
-              ? imageSvgPictureProvider(imgSrc.url)
-              : super.imageProvider(imgSrc);
-
-  Object imageSvgMemoryPicture(String dataUri) {
-    final bytes = imageBytes(dataUri);
+  Object _imageSvgMemoryPicture(String dataUri) {
+    final bytes = bytesFromDataUri(dataUri);
     return bytes != null
         ? MemoryPicture(SvgPicture.svgByteDecoder, bytes)
         : null;
   }
 
-  Object imageSvgPictureProvider(String url) {
+  Object _imageSvgPictureProvider(String url) {
     if (url?.startsWith('asset:') == true) {
       final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
       if (uri?.scheme != 'asset') return null;

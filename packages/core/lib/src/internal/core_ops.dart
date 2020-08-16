@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 

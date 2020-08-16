@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:math';
-import 'dart:typed_data';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -16,8 +14,6 @@ part 'parser/border.dart';
 part 'parser/color.dart';
 part 'parser/css.dart';
 part 'parser/length.dart';
-
-final _dataUriRegExp = RegExp(r'^data:image/[^;]+;(base64|utf8),');
 
 /// A factory to build widget for HTML elements.
 class WidgetFactory {
@@ -318,23 +314,22 @@ class WidgetFactory {
     return map.containsKey(i) ? map[i] : null;
   }
 
-  Uint8List imageBytes(String dataUri) {
-    final match = _dataUriRegExp.matchAsPrefix(dataUri);
-    if (match == null) return null;
+  Object imageProvider(ImageSource imgSrc) {
+    if (imgSrc == null) return null;
+    final url = imgSrc.url;
 
-    final prefix = match[0];
-    final encoding = match[1];
-    final data = dataUri.substring(prefix.length);
+    if (url.startsWith('asset:') == true) {
+      return _imageFromAsset(url);
+    }
 
-    final bytes = encoding == 'base64'
-        ? base64.decode(data)
-        : encoding == 'utf8' ? Uint8List.fromList(data.codeUnits) : null;
-    if (bytes.isEmpty) return null;
+    if (url.startsWith('data:') == true) {
+      return _imageFromDataUri(url);
+    }
 
-    return bytes;
+    return _imageFromUrl(url);
   }
 
-  Object imageFromAsset(String url) {
+  Object _imageFromAsset(String url) {
     final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
     if (uri?.scheme != 'asset') return null;
 
@@ -348,30 +343,15 @@ class WidgetFactory {
     return AssetImage(assetName, package: package);
   }
 
-  Object imageFromDataUri(String dataUri) {
-    final bytes = imageBytes(dataUri);
+  Object _imageFromDataUri(String dataUri) {
+    final bytes = bytesFromDataUri(dataUri);
     if (bytes == null) return null;
 
     return MemoryImage(bytes);
   }
 
-  Object imageFromUrl(String url) =>
+  Object _imageFromUrl(String url) =>
       url?.isNotEmpty == true ? NetworkImage(url) : null;
-
-  Object imageProvider(ImageSource imgSrc) {
-    if (imgSrc == null) return null;
-    final url = imgSrc.url;
-
-    if (url.startsWith('asset:') == true) {
-      return imageFromAsset(url);
-    }
-
-    if (url.startsWith('data:') == true) {
-      return imageFromDataUri(url);
-    }
-
-    return imageFromUrl(url);
-  }
 
   Color parseColor(String value) => _parseColor(value);
 

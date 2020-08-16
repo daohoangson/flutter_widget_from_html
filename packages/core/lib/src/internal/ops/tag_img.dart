@@ -92,3 +92,21 @@ class _ImageBit extends TextWidget<ImageMetadata> {
         child: widget,
       );
 }
+
+final _dataUriRegExp = RegExp(r'^data:image/[^;]+;(base64|utf8),');
+
+Uint8List bytesFromDataUri(String dataUri) {
+  final match = _dataUriRegExp.matchAsPrefix(dataUri);
+  if (match == null) return null;
+
+  final prefix = match[0];
+  final encoding = match[1];
+  final data = dataUri.substring(prefix.length);
+
+  final bytes = encoding == 'base64'
+      ? base64.decode(data)
+      : encoding == 'utf8' ? Uint8List.fromList(data.codeUnits) : null;
+  if (bytes.isEmpty) return null;
+
+  return bytes;
+}
