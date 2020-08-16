@@ -4,23 +4,19 @@ import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
-import 'package:html/dom.dart' as dom;
 import 'package:url_launcher/url_launcher.dart';
 
+import 'internal/ops.dart';
 import 'data.dart';
 import 'helpers.dart';
 import 'html_widget.dart';
-
-part 'ops/tag_a_enhanced.dart';
-part 'ops/tag_iframe.dart';
-part 'ops/tag_svg.dart';
-part 'ops/tag_video.dart';
 
 /// A factory to build widget for HTML elements
 /// with support for [WebView] and [VideoPlayer] etc.
 class WidgetFactory extends core.WidgetFactory {
   BuildOp _tagIframe;
   BuildOp _tagSvg;
+  TextStyleHtml Function(TextStyleHtml, dynamic) _tsbTagA;
   HtmlWidget _widget;
 
   @override
@@ -235,18 +231,23 @@ class WidgetFactory extends core.WidgetFactory {
   ) {
     switch (tag) {
       case 'a':
-        meta.tsb(_TagAEnhanced.setAccentColor);
+        _tsbTagA ??= (p, _) => p.copyWith(
+            style: p.style
+                .copyWith(color: p.deps.getValue<ThemeData>().accentColor));
+        meta.tsb(_tsbTagA);
         break;
       case 'iframe':
-        meta.register(tagIframe());
+        _tagIframe ??= TagIframe(this).buildOp;
+        meta.register(_tagIframe);
         // return asap to avoid being disabled by core
         return;
       case 'svg':
-        meta.register(tagSvg());
+        _tagSvg ??= TagSvg(this).buildOp;
+        meta.register(_tagSvg);
         // return asap to avoid being disabled by core
         return;
       case 'video':
-        meta.register(tagVideo(meta));
+        meta.register(TagVideo(this, meta).op);
         break;
     }
 
@@ -258,16 +259,4 @@ class WidgetFactory extends core.WidgetFactory {
     if (widget is HtmlWidget) _widget = widget;
     super.reset(widget);
   }
-
-  BuildOp tagIframe() {
-    _tagIframe ??= _TagIframe(this).buildOp;
-    return _tagIframe;
-  }
-
-  BuildOp tagSvg() {
-    _tagSvg ??= _TagSvg(this).buildOp;
-    return _tagSvg;
-  }
-
-  BuildOp tagVideo(NodeMetadata meta) => _TagVideo(this, meta).op;
 }

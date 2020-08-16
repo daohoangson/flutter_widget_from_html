@@ -1,6 +1,6 @@
-part of '../widget_factory.dart';
+part of '../ops.dart';
 
-class _TagVideo {
+class TagVideo {
   final NodeMetadata videoMeta;
   final WidgetFactory wf;
 
@@ -8,7 +8,7 @@ class _TagVideo {
 
   BuildOp _videoOp;
 
-  _TagVideo(this.wf, this.videoMeta);
+  TagVideo(this.wf, this.videoMeta);
 
   BuildOp get op {
     _videoOp = BuildOp(

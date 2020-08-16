@@ -1,4 +1,4 @@
-part of '../ops.dart';
+part of '../core_ops.dart';
 
 class TextCompiler {
   final TextBits text;

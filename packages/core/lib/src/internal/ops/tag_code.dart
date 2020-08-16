@@ -1,4 +1,4 @@
-part of '../ops.dart';
+part of '../core_ops.dart';
 
 const kTagCode = 'code';
 const kTagCodeFont1 = 'Courier';
