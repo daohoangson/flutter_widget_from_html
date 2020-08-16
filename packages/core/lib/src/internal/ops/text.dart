@@ -1,6 +1,6 @@
-part of '../core_widget_factory.dart';
+part of '../ops.dart';
 
-class _TextCompiler {
+class TextCompiler {
   final TextBits text;
 
   List<_TextCompiled> _compiled;
@@ -8,7 +8,7 @@ class _TextCompiler {
   StringBuffer _buffer, _prevBuffer;
   TextStyleBuilder _tsb, _prevTsb;
 
-  _TextCompiler(this.text) : assert(text != null);
+  TextCompiler(this.text) : assert(text != null);
 
   List<_TextCompiled> compile() {
     _compiled = [];

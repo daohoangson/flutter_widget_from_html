@@ -1,12 +1,12 @@
-part of '../core_widget_factory.dart';
+part of '../ops.dart';
 
-const _kCssBackground = 'background';
-const _kCssBackgroundColor = 'background-color';
+const kCssBackground = 'background';
+const kCssBackgroundColor = 'background-color';
 
-class _StyleBgColor {
+class StyleBgColor {
   final WidgetFactory wf;
 
-  _StyleBgColor(this.wf);
+  StyleBgColor(this.wf);
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
@@ -21,7 +21,7 @@ class _StyleBgColor {
         onWidgets: (meta, widgets) {
           final color = _parseColor(wf, meta);
           if (color == null) return null;
-          return _listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
+          return listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
               (child) => wf.buildDecoratedBox(meta, child, color: color)));
         },
         priority: 15000,
@@ -34,11 +34,11 @@ class _StyleBgColor {
     Color color;
     for (final style in meta.styleEntries) {
       switch (style.key) {
-        case _kCssBackgroundColor:
+        case kCssBackgroundColor:
           final parsed = wf.parseColor(style.value);
           if (parsed != null) color = parsed;
           break;
-        case _kCssBackground:
+        case kCssBackground:
           for (final v in splitCssValues(style.value)) {
             final parsed = wf.parseColor(v);
             if (parsed != null) color = parsed;

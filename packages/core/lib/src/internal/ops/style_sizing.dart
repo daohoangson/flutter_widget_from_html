@@ -1,16 +1,16 @@
-part of '../core_widget_factory.dart';
+part of '../ops.dart';
 
-const _kCssHeight = 'height';
-const _kCssMaxHeight = 'max-height';
-const _kCssMaxWidth = 'max-width';
-const _kCssMinHeight = 'min-height';
-const _kCssMinWidth = 'min-width';
-const _kCssWidth = 'width';
+const kCssHeight = 'height';
+const kCssMaxHeight = 'max-height';
+const kCssMaxWidth = 'max-width';
+const kCssMinHeight = 'min-height';
+const kCssMinWidth = 'min-width';
+const kCssWidth = 'width';
 
-class _StyleSizing {
+class StyleSizing {
   final WidgetFactory wf;
 
-  _StyleSizing(this.wf);
+  StyleSizing(this.wf);
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
@@ -45,7 +45,7 @@ class _StyleSizing {
         onWidgets: (meta, widgets) {
           final input = _parse(meta);
           if (input == null) return widgets;
-          return _listOrNull(wf
+          return listOrNull(wf
               .buildColumnPlaceholder(meta, widgets)
               ?.wrapWith((child) => _build(child, input, meta.tsb())));
         },
@@ -56,22 +56,22 @@ class _StyleSizing {
     CssLength height, maxHeight, maxWidth, minHeight, minWidth, width;
     for (final x in meta.styleEntries) {
       switch (x.key) {
-        case _kCssHeight:
+        case kCssHeight:
           height = wf.parseCssLength(x.value);
           break;
-        case _kCssMaxHeight:
+        case kCssMaxHeight:
           maxHeight = wf.parseCssLength(x.value);
           break;
-        case _kCssMaxWidth:
+        case kCssMaxWidth:
           maxWidth = wf.parseCssLength(x.value);
           break;
-        case _kCssMinHeight:
+        case kCssMinHeight:
           minHeight = wf.parseCssLength(x.value);
           break;
-        case _kCssMinWidth:
+        case kCssMinWidth:
           minWidth = wf.parseCssLength(x.value);
           break;
-        case _kCssWidth:
+        case kCssWidth:
           width = wf.parseCssLength(x.value);
           break;
       }

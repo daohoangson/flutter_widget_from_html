@@ -1,6 +1,6 @@
 part of '../core_widget_factory.dart';
 
-const _kCssColor = 'color';
+const kCssColor = 'color';
 
 // https://drafts.csswg.org/css-color/#named-colors
 /*
@@ -16,11 +16,11 @@ const _kCssColor = 'color';
         colors += `  '${color}': '${hex}',\n`;
         count++;
     });
-    console.log(`const _kCssColors = {\n${colors}};`);
+    console.log(`const kCssColors = {\n${colors}};`);
     return count;
 })();
 */
-const _kCssColors = {
+const kCssColors = {
   'aliceblue': '#f0f8ff',
   'antiquewhite': '#faebd7',
   'aqua': '#00ffff',
@@ -177,14 +177,6 @@ final _colorHslRegExp = RegExp(
 final _colorRgbRegExp = RegExp(
     r'^(rgba?)\(([0-9.]+%?)[,\s]+([0-9.]+%?)[,\s]+([0-9.]+%?)([,\s/]+([0-9.]+%?))?\)$');
 
-String _convertColorToHex(Color value) {
-  final r = value.red.toRadixString(16).padLeft(2, '0');
-  final g = value.green.toRadixString(16).padLeft(2, '0');
-  final b = value.blue.toRadixString(16).padLeft(2, '0');
-  final a = value.alpha.toRadixString(16).padLeft(2, '0');
-  return '#$r$g$b$a';
-}
-
 Color _parseColor(String value) {
   if (value == null) return null;
 
@@ -210,8 +202,8 @@ Color _parseColor(String value) {
   final valueLowerCase = value.toLowerCase();
   if (valueLowerCase == 'transparent') return Color(0x00000000);
   // TODO: add support for `currentcolor`
-  if (_kCssColors.containsKey(valueLowerCase)) {
-    return _parseColor(_kCssColors[valueLowerCase]);
+  if (kCssColors.containsKey(valueLowerCase)) {
+    return _parseColor(kCssColors[valueLowerCase]);
   }
 
   final rgbMatch = _colorRgbRegExp.firstMatch(valueLowerCase);

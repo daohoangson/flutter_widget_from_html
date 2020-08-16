@@ -1,29 +1,29 @@
-part of '../core_widget_factory.dart';
+part of '../ops.dart';
 
-const _kTagLi = 'li';
-const _kTagOrderedList = 'ol';
-const _kTagUnorderedList = 'ul';
-const _kAttributeLiType = 'type';
-const _kAttributeLiTypeAlphaLower = 'a';
-const _kAttributeLiTypeAlphaUpper = 'A';
-const _kAttributeLiTypeDecimal = '1';
-const _kAttributeLiTypeRomanLower = 'i';
-const _kAttributeLiTypeRomanUpper = 'I';
-const _kAttributeOlReversed = 'reversed';
-const _kAttributeOlStart = 'start';
-const _kCssListStyleType = 'list-style-type';
-const _kCssListStyleTypeAlphaLower = 'lower-alpha';
-const _kCssListStyleTypeAlphaUpper = 'upper-alpha';
-const _kCssListStyleTypeAlphaLatinLower = 'lower-latin';
-const _kCssListStyleTypeAlphaLatinUpper = 'upper-latin';
-const _kCssListStyleTypeCircle = 'circle';
-const _kCssListStyleTypeDecimal = 'decimal';
-const _kCssListStyleTypeDisc = 'disc';
-const _kCssListStyleTypeRomanLower = 'lower-roman';
-const _kCssListStyleTypeRomanUpper = 'upper-roman';
-const _kCssListStyleTypeSquare = 'square';
+const kTagLi = 'li';
+const kTagOrderedList = 'ol';
+const kTagUnorderedList = 'ul';
+const kAttributeLiType = 'type';
+const kAttributeLiTypeAlphaLower = 'a';
+const kAttributeLiTypeAlphaUpper = 'A';
+const kAttributeLiTypeDecimal = '1';
+const kAttributeLiTypeRomanLower = 'i';
+const kAttributeLiTypeRomanUpper = 'I';
+const kAttributeOlReversed = 'reversed';
+const kAttributeOlStart = 'start';
+const kCssListStyleType = 'list-style-type';
+const kCssListStyleTypeAlphaLower = 'lower-alpha';
+const kCssListStyleTypeAlphaUpper = 'upper-alpha';
+const kCssListStyleTypeAlphaLatinLower = 'lower-latin';
+const kCssListStyleTypeAlphaLatinUpper = 'upper-latin';
+const kCssListStyleTypeCircle = 'circle';
+const kCssListStyleTypeDecimal = 'decimal';
+const kCssListStyleTypeDisc = 'disc';
+const kCssListStyleTypeRomanLower = 'lower-roman';
+const kCssListStyleTypeRomanUpper = 'upper-roman';
+const kCssListStyleTypeSquare = 'square';
 
-class _TagLi {
+class TagLi {
   final NodeMetadata listMeta;
   final WidgetFactory wf;
 
@@ -34,7 +34,7 @@ class _TagLi {
   BuildOp _itemOp;
   BuildOp _listOp;
 
-  _TagLi(this.wf, this.listMeta);
+  TagLi(this.wf, this.listMeta);
 
   _ListConfig get config {
     // cannot build config from constructor because
@@ -53,24 +53,24 @@ class _TagLi {
 
     final styles = {
       'padding-inline-start': '2.5em',
-      _kCssListStyleType: e.localName == _kTagOrderedList
-          ? (e.attributes.containsKey(_kAttributeLiType)
+      kCssListStyleType: e.localName == kTagOrderedList
+          ? (e.attributes.containsKey(kAttributeLiType)
                   ? _ListConfig.listStyleTypeFromAttributeType(
-                      e.attributes[_kAttributeLiType])
+                      e.attributes[kAttributeLiType])
                   : null) ??
-              _kCssListStyleTypeDecimal
+              kCssListStyleTypeDecimal
           : p == 0
-              ? _kCssListStyleTypeDisc
-              : p == 1 ? _kCssListStyleTypeCircle : _kCssListStyleTypeSquare,
+              ? kCssListStyleTypeDisc
+              : p == 1 ? kCssListStyleTypeCircle : kCssListStyleTypeSquare,
     };
 
-    if (p == 0) styles[_kCssMargin] = '1em 0';
+    if (p == 0) styles[kCssMargin] = '1em 0';
 
     return styles;
   }
 
   void onChild(NodeMetadata childMeta, dom.Element e) {
-    if (e.localName != _kTagLi) return;
+    if (e.localName != kTagLi) return;
     if (e.parent != listMeta.domElement) return;
 
     _itemOp ??= BuildOp(
@@ -146,22 +146,22 @@ class _ListConfig {
   });
 
   factory _ListConfig.fromNodeMetadata(NodeMetadata meta) {
-    var listStyleType = _kCssListStyleTypeDisc;
+    var listStyleType = kCssListStyleTypeDisc;
     bool markerReversed;
     int markerStart;
 
     for (final style in meta?.styleEntries) {
       switch (style.key) {
-        case _kCssListStyleType:
+        case kCssListStyleType:
           listStyleType = style.value;
           break;
       }
     }
 
     final a = meta.domElement.attributes;
-    if (a.containsKey(_kAttributeOlReversed)) markerReversed = true;
-    if (a.containsKey(_kAttributeOlStart)) {
-      markerStart = int.tryParse(a[_kAttributeOlStart]);
+    if (a.containsKey(kAttributeOlReversed)) markerReversed = true;
+    if (a.containsKey(kAttributeOlStart)) {
+      markerStart = int.tryParse(a[kAttributeOlStart]);
     }
 
     return _ListConfig(
@@ -173,12 +173,12 @@ class _ListConfig {
 
   static String listStyleTypeFromNodeMetadata(NodeMetadata meta) {
     final a = meta.domElement.attributes;
-    var listStyleType = a.containsKey(_kAttributeLiType)
-        ? listStyleTypeFromAttributeType(a[_kAttributeLiType])
+    var listStyleType = a.containsKey(kAttributeLiType)
+        ? listStyleTypeFromAttributeType(a[kAttributeLiType])
         : null;
     for (final style in meta.styleEntries) {
       switch (style.key) {
-        case _kCssListStyleType:
+        case kCssListStyleType:
           listStyleType = style.value;
           break;
       }
@@ -189,16 +189,16 @@ class _ListConfig {
 
   static String listStyleTypeFromAttributeType(String type) {
     switch (type) {
-      case _kAttributeLiTypeAlphaLower:
-        return _kCssListStyleTypeAlphaLower;
-      case _kAttributeLiTypeAlphaUpper:
-        return _kCssListStyleTypeAlphaUpper;
-      case _kAttributeLiTypeDecimal:
-        return _kCssListStyleTypeDecimal;
-      case _kAttributeLiTypeRomanLower:
-        return _kCssListStyleTypeRomanLower;
-      case _kAttributeLiTypeRomanUpper:
-        return _kCssListStyleTypeRomanUpper;
+      case kAttributeLiTypeAlphaLower:
+        return kCssListStyleTypeAlphaLower;
+      case kAttributeLiTypeAlphaUpper:
+        return kCssListStyleTypeAlphaUpper;
+      case kAttributeLiTypeDecimal:
+        return kCssListStyleTypeDecimal;
+      case kAttributeLiTypeRomanLower:
+        return kCssListStyleTypeRomanLower;
+      case kAttributeLiTypeRomanUpper:
+        return kCssListStyleTypeRomanUpper;
     }
 
     return null;
@@ -206,10 +206,10 @@ class _ListConfig {
 }
 
 class _TagLiOp extends BuildOp {
-  _TagLiOp(_TagLi _)
+  _TagLiOp(TagLi tagLi)
       : super(
-          defaultStyles: _.defaultStyles,
+          defaultStyles: tagLi.defaultStyles,
           isBlockElement: true,
-          onChild: _.onChild,
+          onChild: tagLi.onChild,
         );
 }

@@ -1,13 +1,13 @@
 part of '../core_widget_factory.dart';
 
-const _kCssLengthBoxSuffixBlockEnd = '-block-end';
-const _kCssLengthBoxSuffixBlockStart = '-block-start';
-const _kCssLengthBoxSuffixBottom = '-bottom';
-const _kCssLengthBoxSuffixInlineEnd = '-inline-end';
-const _kCssLengthBoxSuffixInlineStart = '-inline-start';
-const _kCssLengthBoxSuffixLeft = '-left';
-const _kCssLengthBoxSuffixRight = '-right';
-const _kCssLengthBoxSuffixTop = '-top';
+const kCssLengthBoxSuffixBlockEnd = '-block-end';
+const kCssLengthBoxSuffixBlockStart = '-block-start';
+const kCssLengthBoxSuffixBottom = '-bottom';
+const kCssLengthBoxSuffixInlineEnd = '-inline-end';
+const kCssLengthBoxSuffixInlineStart = '-inline-start';
+const kCssLengthBoxSuffixLeft = '-left';
+const kCssLengthBoxSuffixRight = '-right';
+const kCssLengthBoxSuffixTop = '-top';
 
 final _cssLengthValues4 =
     RegExp(r'^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)$');
@@ -50,14 +50,14 @@ CssLengthBox _parseCssLengthBox(NodeMetadata meta, String key) {
         output = _parseCssLengthBoxAll(style.value);
         break;
 
-      case _kCssLengthBoxSuffixBlockEnd:
-      case _kCssLengthBoxSuffixBlockStart:
-      case _kCssLengthBoxSuffixBottom:
-      case _kCssLengthBoxSuffixInlineEnd:
-      case _kCssLengthBoxSuffixInlineStart:
-      case _kCssLengthBoxSuffixLeft:
-      case _kCssLengthBoxSuffixRight:
-      case _kCssLengthBoxSuffixTop:
+      case kCssLengthBoxSuffixBlockEnd:
+      case kCssLengthBoxSuffixBlockStart:
+      case kCssLengthBoxSuffixBottom:
+      case kCssLengthBoxSuffixInlineEnd:
+      case kCssLengthBoxSuffixInlineStart:
+      case kCssLengthBoxSuffixLeft:
+      case kCssLengthBoxSuffixRight:
+      case kCssLengthBoxSuffixTop:
         output = _parseCssLengthBoxOne(output, suffix, style.value);
         break;
     }
@@ -104,19 +104,19 @@ CssLengthBox _parseCssLengthBoxOne(
   existing ??= CssLengthBox();
 
   switch (suffix) {
-    case _kCssLengthBoxSuffixBottom:
-    case _kCssLengthBoxSuffixBlockEnd:
+    case kCssLengthBoxSuffixBottom:
+    case kCssLengthBoxSuffixBlockEnd:
       return existing.copyWith(bottom: parsed);
-    case _kCssLengthBoxSuffixInlineEnd:
+    case kCssLengthBoxSuffixInlineEnd:
       return existing.copyWith(inlineEnd: parsed);
-    case _kCssLengthBoxSuffixInlineStart:
+    case kCssLengthBoxSuffixInlineStart:
       return existing.copyWith(inlineStart: parsed);
-    case _kCssLengthBoxSuffixLeft:
+    case kCssLengthBoxSuffixLeft:
       return existing.copyWith(left: parsed);
-    case _kCssLengthBoxSuffixRight:
+    case kCssLengthBoxSuffixRight:
       return existing.copyWith(right: parsed);
-    case _kCssLengthBoxSuffixTop:
-    case _kCssLengthBoxSuffixBlockStart:
+    case kCssLengthBoxSuffixTop:
+    case kCssLengthBoxSuffixBlockStart:
       return existing.copyWith(top: parsed);
   }
 

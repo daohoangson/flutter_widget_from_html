@@ -1,10 +1,10 @@
-part of '../core_widget_factory.dart';
+part of '../ops.dart';
 
-const _kTagRuby = 'ruby';
-const _kTagRp = 'rp';
-const _kTagRt = 'rt';
+const kTagRuby = 'ruby';
+const kTagRp = 'rp';
+const kTagRt = 'rt';
 
-class _TagRuby {
+class TagRuby {
   final NodeMetadata rubyMeta;
   final WidgetFactory wf;
 
@@ -12,7 +12,7 @@ class _TagRuby {
   BuildOp _rtOp;
   TextBits _rtText;
 
-  _TagRuby(this.wf, this.rubyMeta);
+  TagRuby(this.wf, this.rubyMeta);
 
   BuildOp get op {
     _rubyOp ??= BuildOp(
@@ -26,10 +26,10 @@ class _TagRuby {
     if (e.parent != rubyMeta.domElement) return;
 
     switch (e.localName) {
-      case _kTagRp:
-        childMeta.addStyle(_kCssDisplay, _kCssDisplayNone);
+      case kTagRp:
+        childMeta.addStyle(kCssDisplay, kCssDisplayNone);
         break;
-      case _kTagRt:
+      case kTagRt:
         _rtOp ??= BuildOp(
           onPieces: (_, pieces) {
             for (final piece in pieces) {
@@ -42,7 +42,7 @@ class _TagRuby {
         );
 
         childMeta
-          ..addStyle(_kCssFontSize, '0.5em')
+          ..addStyle(kCssFontSize, '0.5em')
           ..register(_rtOp);
         break;
     }

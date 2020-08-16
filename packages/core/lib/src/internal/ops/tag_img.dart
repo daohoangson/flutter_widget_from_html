@@ -1,9 +1,17 @@
-part of '../core_widget_factory.dart';
+part of '../ops.dart';
 
-class _TagImg {
+const kAttributeImgAlt = 'alt';
+const kAttributeImgHeight = 'height';
+const kAttributeImgSrc = 'src';
+const kAttributeImgTitle = 'title';
+const kAttributeImgWidth = 'width';
+
+const kTagImg = 'img';
+
+class TagImg {
   final WidgetFactory wf;
 
-  _TagImg(this.wf);
+  TagImg(this.wf);
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
@@ -48,24 +56,27 @@ class _TagImg {
 
   ImageMetadata _parse(NodeMetadata meta) {
     final attrs = meta.domElement.attributes;
-    final src = attrs.containsKey('src') ? attrs['src'] : null;
+    final src =
+        attrs.containsKey(kAttributeImgSrc) ? attrs[kAttributeImgSrc] : null;
     final url = wf.constructFullUrl(src);
     return ImageMetadata(
-      alt: attrs.containsKey('alt') ? attrs['alt'] : null,
+      alt: attrs.containsKey(kAttributeImgAlt) ? attrs[kAttributeImgAlt] : null,
       sources: (url != null)
           ? [
               ImageSource(
                 url,
-                height: attrs.containsKey('height')
-                    ? double.tryParse(attrs['height'])
+                height: attrs.containsKey(kAttributeImgHeight)
+                    ? double.tryParse(attrs[kAttributeImgHeight])
                     : null,
-                width: attrs.containsKey('width')
-                    ? double.tryParse(attrs['width'])
+                width: attrs.containsKey(kAttributeImgWidth)
+                    ? double.tryParse(attrs[kAttributeImgWidth])
                     : null,
               ),
             ]
           : null,
-      title: attrs.containsKey('title') ? attrs['title'] : null,
+      title: attrs.containsKey(kAttributeImgTitle)
+          ? attrs[kAttributeImgTitle]
+          : null,
     );
   }
 }

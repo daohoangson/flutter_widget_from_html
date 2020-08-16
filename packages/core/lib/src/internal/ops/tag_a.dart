@@ -1,16 +1,19 @@
-part of '../core_widget_factory.dart';
+part of '../ops.dart';
 
-class _TagA {
+const kAttributeAHref = 'href';
+const kTagA = 'a';
+
+class TagA {
   final WidgetFactory wf;
 
-  _TagA(this.wf);
+  TagA(this.wf);
 
   BuildOp get buildOp => BuildOp(
         defaultStyles: (meta, __) {
-          final styles = {_kCssTextDecoration: _kCssTextDecorationUnderline};
+          final styles = {kCssTextDecoration: kCssTextDecorationUnderline};
 
           final color = wf.widget?.hyperlinkColor;
-          if (color != null) styles[_kCssColor] = _convertColorToHex(color);
+          if (color != null) styles[kCssColor] = convertColorToHex(color);
 
           return styles;
         },
@@ -42,7 +45,8 @@ class _TagA {
 
   GestureTapCallback _gestureTapCallback(NodeMetadata meta) {
     final attrs = meta.domElement.attributes;
-    final href = attrs.containsKey('href') ? attrs['href'] : null;
+    final href =
+        attrs.containsKey(kAttributeAHref) ? attrs[kAttributeAHref] : null;
     return wf.gestureTapCallback(wf.constructFullUrl(href) ?? href);
   }
 }
