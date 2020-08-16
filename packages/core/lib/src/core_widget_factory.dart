@@ -238,7 +238,7 @@ class WidgetFactory {
     if (map == null) return;
 
     for (final pair in map.entries) {
-      meta.addStyle(pair.key, pair.value);
+      meta[pair.key] = pair.value;
     }
   }
 
@@ -567,7 +567,7 @@ class WidgetFactory {
       case 'figure':
         meta
           ..isBlockElement = true
-          ..addStyle(kCssMargin, '1em 40px');
+          ..[kCssMargin] = '1em 40px';
         break;
 
       case 'b':
@@ -585,7 +585,7 @@ class WidgetFactory {
         break;
 
       case 'center':
-        meta.addStyle(kCssTextAlign, kCssTextAlignCenter);
+        meta[kCssTextAlign] = kCssTextAlignCenter;
         break;
 
       case 'cite':
@@ -606,7 +606,7 @@ class WidgetFactory {
       case 'dd':
         meta
           ..isBlockElement = true
-          ..addStyle(kCssMargin, '0 0 1em 40px');
+          ..[kCssMargin] = '0 0 1em 40px';
         break;
       case 'dl':
         meta.isBlockElement = true;
@@ -639,41 +639,41 @@ class WidgetFactory {
       case 'h1':
         meta
           ..isBlockElement = true
-          ..addStyle(kCssMargin, '0.67em 0')
+          ..[kCssMargin] = '0.67em 0'
           ..tsb(_tsbFontSize, '2em')
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h2':
         meta
           ..isBlockElement = true
-          ..addStyle(kCssMargin, '0.83em 0')
+          ..[kCssMargin] = '0.83em 0'
           ..tsb(_tsbFontSize, '1.5em')
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h3':
         meta
           ..isBlockElement = true
-          ..addStyle(kCssMargin, '1em 0')
+          ..[kCssMargin] = '1em 0'
           ..tsb(_tsbFontSize, '1.17em')
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h4':
         meta
           ..isBlockElement = true
-          ..addStyle(kCssMargin, '1.33em 0')
+          ..[kCssMargin] = '1.33em 0'
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h5':
         meta
           ..isBlockElement = true
-          ..addStyle(kCssMargin, '1.67em 0')
+          ..[kCssMargin] = '1.67em 0'
           ..tsb(_tsbFontSize, '0.83em')
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h6':
         meta
           ..isBlockElement = true
-          ..addStyle(kCssMargin, '2.33em 0')
+          ..[kCssMargin] = '2.33em 0'
           ..tsb(_tsbFontSize, '0.67em')
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
@@ -692,10 +692,10 @@ class WidgetFactory {
         meta.register(_tagImg);
 
         if (attrs.containsKey(kAttributeImgHeight)) {
-          meta.addStyle(kCssHeight, '${attrs[kAttributeImgHeight]}px');
+          meta[kCssHeight] = '${attrs[kAttributeImgHeight]}px';
         }
         if (attrs.containsKey(kAttributeImgWidth)) {
-          meta.addStyle(kCssWidth, '${attrs[kAttributeImgWidth]}px');
+          meta[kCssWidth] = '${attrs[kAttributeImgWidth]}px';
         }
         break;
 
@@ -716,14 +716,14 @@ class WidgetFactory {
 
       case 'mark':
         meta
-          ..addStyle(kCssBackgroundColor, '#ff0')
+          ..[kCssBackgroundColor] = '#ff0'
           ..tsb(TextStyleOps.color, Color.fromARGB(255, 0, 0, 0));
         break;
 
       case 'p':
         meta
           ..isBlockElement = true
-          ..addStyle(kCssMargin, '1em 0');
+          ..[kCssMargin] = '1em 0';
         break;
 
       case kTagQ:
@@ -741,18 +741,18 @@ class WidgetFactory {
 
       case 'sub':
         meta
-          ..addStyle(kCssVerticalAlign, kCssVerticalAlignSub)
+          ..[kCssVerticalAlign] = kCssVerticalAlignSub
           ..tsb(_tsbFontSize, kCssFontSizeSmaller);
         break;
       case 'sup':
         meta
-          ..addStyle(kCssVerticalAlign, kCssVerticalAlignSuper)
+          ..[kCssVerticalAlign] = kCssVerticalAlignSuper
           ..tsb(_tsbFontSize, kCssFontSizeSmaller);
         break;
 
       case kTagTable:
         meta
-          ..addStyle(kCssDisplay, kCssDisplayTable)
+          ..[kCssDisplay] = kCssDisplayTable
           ..register(TagTable.cellPaddingOp(
               (attrs.containsKey(kAttributeCellPadding)
                       ? double.tryParse(attrs[kAttributeCellPadding])
@@ -763,17 +763,17 @@ class WidgetFactory {
         meta.tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case kTagTableCaption:
-        meta.addStyle(kCssTextAlign, kCssTextAlignCenter);
+        meta[kCssTextAlign] = kCssTextAlignCenter;
         break;
     }
 
     for (final attribute in attrs.entries) {
       switch (attribute.key) {
         case kAttributeAlign:
-          meta.addStyle(kCssTextAlign, attribute.value);
+          meta[kCssTextAlign] = attribute.value;
           break;
         case kAttributeDir:
-          meta.addStyle(kCssDirection, attribute.value);
+          meta[kCssDirection] = attribute.value;
           break;
       }
     }

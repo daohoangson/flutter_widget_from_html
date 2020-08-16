@@ -54,25 +54,26 @@ class StyleSizing {
 
   _StyleSizingInput _parse(NodeMetadata meta) {
     CssLength height, maxHeight, maxWidth, minHeight, minWidth, width;
-    for (final x in meta.styleEntries) {
-      switch (x.key) {
+
+    for (final style in meta.styles) {
+      switch (style.key) {
         case kCssHeight:
-          height = wf.parseCssLength(x.value);
+          height = wf.parseCssLength(style.value);
           break;
         case kCssMaxHeight:
-          maxHeight = wf.parseCssLength(x.value);
+          maxHeight = wf.parseCssLength(style.value);
           break;
         case kCssMaxWidth:
-          maxWidth = wf.parseCssLength(x.value);
+          maxWidth = wf.parseCssLength(style.value);
           break;
         case kCssMinHeight:
-          minHeight = wf.parseCssLength(x.value);
+          minHeight = wf.parseCssLength(style.value);
           break;
         case kCssMinWidth:
-          minWidth = wf.parseCssLength(x.value);
+          minWidth = wf.parseCssLength(style.value);
           break;
         case kCssWidth:
-          width = wf.parseCssLength(x.value);
+          width = wf.parseCssLength(style.value);
           break;
       }
     }

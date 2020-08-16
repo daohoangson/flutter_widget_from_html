@@ -146,45 +146,25 @@ class _ListConfig {
   });
 
   factory _ListConfig.fromNodeMetadata(NodeMetadata meta) {
-    var listStyleType = kCssListStyleTypeDisc;
-    bool markerReversed;
-    int markerStart;
-
-    for (final style in meta?.styleEntries) {
-      switch (style.key) {
-        case kCssListStyleType:
-          listStyleType = style.value;
-          break;
-      }
-    }
-
-    final a = meta.domElement.attributes;
-    if (a.containsKey(kAttributeOlReversed)) markerReversed = true;
-    if (a.containsKey(kAttributeOlStart)) {
-      markerStart = int.tryParse(a[kAttributeOlStart]);
-    }
+    final attrs = meta.domElement.attributes;
 
     return _ListConfig(
-      listStyleType: listStyleType,
-      markerReversed: markerReversed,
-      markerStart: markerStart,
+      listStyleType: meta[kCssListStyleType] ?? kCssListStyleTypeDisc,
+      markerReversed: attrs.containsKey(kAttributeOlReversed),
+      markerStart: attrs.containsKey(kAttributeOlStart)
+          ? int.tryParse(attrs[kAttributeOlStart])
+          : null,
     );
   }
 
   static String listStyleTypeFromNodeMetadata(NodeMetadata meta) {
-    final a = meta.domElement.attributes;
-    var listStyleType = a.containsKey(kAttributeLiType)
-        ? listStyleTypeFromAttributeType(a[kAttributeLiType])
-        : null;
-    for (final style in meta.styleEntries) {
-      switch (style.key) {
-        case kCssListStyleType:
-          listStyleType = style.value;
-          break;
-      }
-    }
+    final listStyleType = meta[kCssListStyleType];
+    if (listStyleType != null) return listStyleType;
 
-    return listStyleType;
+    final attrs = meta.domElement.attributes;
+    return attrs.containsKey(kAttributeLiType)
+        ? listStyleTypeFromAttributeType(attrs[kAttributeLiType])
+        : null;
   }
 
   static String listStyleTypeFromAttributeType(String type) {

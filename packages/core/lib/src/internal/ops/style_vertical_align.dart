@@ -17,7 +17,7 @@ class StyleVerticalAlign {
         onPieces: (meta, pieces) {
           if (meta.isBlockElement) return pieces;
 
-          final v = meta.getStyleValue(kCssVerticalAlign);
+          final v = meta[kCssVerticalAlign];
           if (v == null || v == kCssVerticalAlignBaseline) return pieces;
 
           return pieces.map((piece) => _buildWidgetSpan(meta, piece, v));

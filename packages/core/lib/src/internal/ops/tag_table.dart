@@ -105,7 +105,7 @@ class TagTable {
   }
 
   BorderSide _parseBorder() {
-    final value = tableMeta.getStyleValue(kCssBorder);
+    final value = tableMeta[kCssBorder];
     if (value != null) {
       final borderParsed = wf.parseCssBorderSide(value);
       if (borderParsed != null) {
@@ -129,7 +129,7 @@ class TagTable {
 
   static BuildOp cellPaddingOp(double px) => BuildOp(
       onChild: (meta, e) => (e.localName == 'td' || e.localName == 'th')
-          ? meta.addStyle(kCssPadding, '${px}px')
+          ? meta[kCssPadding] = '${px}px'
           : null);
 
   static String _getChildCssDisplayValue(NodeMetadata meta, dom.Element e) {
@@ -155,7 +155,7 @@ class TagTable {
     }
 
     if (value != null) {
-      meta.addStyle(kCssDisplay, value);
+      meta[kCssDisplay] = value;
       return value;
     }
 

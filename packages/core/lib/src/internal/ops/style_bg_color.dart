@@ -32,7 +32,7 @@ class StyleBgColor {
 
   Color _parseColor(WidgetFactory wf, NodeMetadata meta) {
     Color color;
-    for (final style in meta.styleEntries) {
+    for (final style in meta.styles) {
       switch (style.key) {
         case kCssBackgroundColor:
           final parsed = wf.parseColor(style.value);
