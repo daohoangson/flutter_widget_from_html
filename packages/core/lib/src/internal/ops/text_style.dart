@@ -184,7 +184,7 @@ class TextStyleOps {
   }
 
   static double _fontSizeTryParse(WidgetFactory wf, TextStyleHtml p, String v) {
-    final length = wf.parseCssLength(v);
+    final length = tryParseCssLength(v);
     if (length != null) {
       final lengthValue = length.getValue(
         p,
@@ -238,7 +238,7 @@ class TextStyleOps {
     final number = double.tryParse(v);
     if (number != null && number > 0) return number;
 
-    final length = wf.parseCssLength(v);
+    final length = tryParseCssLength(v);
     if (length == null) return null;
 
     final lengthValue = length.getValue(

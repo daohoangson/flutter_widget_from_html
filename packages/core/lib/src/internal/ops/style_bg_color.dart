@@ -35,12 +35,12 @@ class StyleBgColor {
     for (final style in meta.styles) {
       switch (style.key) {
         case kCssBackgroundColor:
-          final parsed = wf.parseColor(style.value);
+          final parsed = tryParseColor(style.value);
           if (parsed != null) color = parsed;
           break;
         case kCssBackground:
           for (final v in splitCssValues(style.value)) {
-            final parsed = wf.parseColor(v);
+            final parsed = tryParseColor(v);
             if (parsed != null) color = parsed;
           }
           break;

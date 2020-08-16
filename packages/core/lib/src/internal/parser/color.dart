@@ -1,4 +1,4 @@
-part of '../core_widget_factory.dart';
+part of '../core_parser.dart';
 
 const kCssColor = 'color';
 
@@ -177,7 +177,7 @@ final _colorHslRegExp = RegExp(
 final _colorRgbRegExp = RegExp(
     r'^(rgba?)\(([0-9.]+%?)[,\s]+([0-9.]+%?)[,\s]+([0-9.]+%?)([,\s/]+([0-9.]+%?))?\)$');
 
-Color _parseColor(String value) {
+Color tryParseColor(String value) {
   if (value == null) return null;
 
   final hexMatch = _colorHexRegExp.firstMatch(value);
@@ -203,7 +203,7 @@ Color _parseColor(String value) {
   if (valueLowerCase == 'transparent') return Color(0x00000000);
   // TODO: add support for `currentcolor`
   if (kCssColors.containsKey(valueLowerCase)) {
-    return _parseColor(kCssColors[valueLowerCase]);
+    return tryParseColor(kCssColors[valueLowerCase]);
   }
 
   final rgbMatch = _colorRgbRegExp.firstMatch(valueLowerCase);

@@ -20,7 +20,7 @@ class StyleMargin {
         isBlockElement: false,
         onPieces: (meta, pieces) {
           if (meta.isBlockElement) return pieces;
-          final m = wf.parseCssLengthBox(meta, kCssMargin);
+          final m = tryParseCssLengthBox(meta, kCssMargin);
           if (m?.hasLeftOrRight != true) return pieces;
 
           return _wrapTextBits(
@@ -33,7 +33,7 @@ class StyleMargin {
         },
         onWidgets: (meta, widgets) {
           if (widgets?.isNotEmpty != true) return null;
-          final m = wf.parseCssLengthBox(meta, kCssMargin);
+          final m = tryParseCssLengthBox(meta, kCssMargin);
           if (m == null) return null;
 
           final t = m.top?.isNotEmpty == true;

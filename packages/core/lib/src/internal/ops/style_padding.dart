@@ -26,7 +26,7 @@ class StylePadding {
         isBlockElement: false,
         onPieces: (meta, pieces) {
           if (meta.isBlockElement) return pieces;
-          final padding = wf.parseCssLengthBox(meta, kCssPadding);
+          final padding = tryParseCssLengthBox(meta, kCssPadding);
           if (padding?.hasLeftOrRight != true) return pieces;
 
           return _wrapTextBits(
@@ -39,7 +39,7 @@ class StylePadding {
         },
         onWidgets: (meta, widgets) {
           if (widgets?.isNotEmpty != true) return null;
-          final padding = wf.parseCssLengthBox(meta, kCssPadding);
+          final padding = tryParseCssLengthBox(meta, kCssPadding);
           if (padding == null) return null;
 
           return listOrNull(wf

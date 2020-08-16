@@ -107,7 +107,7 @@ class TagTable {
   BorderSide _parseBorder() {
     final value = tableMeta[kCssBorder];
     if (value != null) {
-      final borderParsed = wf.parseCssBorderSide(value);
+      final borderParsed = tryParseCssBorderSide(value);
       if (borderParsed != null) {
         return BorderSide(
           color: borderParsed.color ?? const Color(0xFF000000),

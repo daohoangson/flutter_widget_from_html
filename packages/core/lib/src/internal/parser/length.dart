@@ -1,4 +1,4 @@
-part of '../core_widget_factory.dart';
+part of '../core_parser.dart';
 
 const kCssLengthBoxSuffixBlockEnd = '-block-end';
 const kCssLengthBoxSuffixBlockStart = '-block-start';
@@ -14,7 +14,7 @@ final _cssLengthValues4 =
 final _cssLengthValues2 = RegExp(r'^([^\s]+)\s+([^\s]+)$');
 final _cssLengthValue = RegExp(r'^([\d\.]+)(em|%|pt|px)$');
 
-CssLength _parseCssLength(String value) {
+CssLength tryParseCssLength(String value) {
   if (value == null) return null;
   if (value == '0') return CssLength(0);
 
@@ -38,7 +38,7 @@ CssLength _parseCssLength(String value) {
   return null;
 }
 
-CssLengthBox _parseCssLengthBox(NodeMetadata meta, String key) {
+CssLengthBox tryParseCssLengthBox(NodeMetadata meta, String key) {
   CssLengthBox output;
 
   for (final style in meta.styles) {
@@ -70,17 +70,17 @@ CssLengthBox _parseCssLengthBoxAll(String value) {
   final valuesFour = _cssLengthValues4.firstMatch(value);
   if (valuesFour != null) {
     return CssLengthBox(
-      top: _parseCssLength(valuesFour[1]),
-      inlineEnd: _parseCssLength(valuesFour[2]),
-      bottom: _parseCssLength(valuesFour[3]),
-      inlineStart: _parseCssLength(valuesFour[4]),
+      top: tryParseCssLength(valuesFour[1]),
+      inlineEnd: tryParseCssLength(valuesFour[2]),
+      bottom: tryParseCssLength(valuesFour[3]),
+      inlineStart: tryParseCssLength(valuesFour[4]),
     );
   }
 
   final valuesTwo = _cssLengthValues2.firstMatch(value);
   if (valuesTwo != null) {
-    final topBottom = _parseCssLength(valuesTwo[1]);
-    final leftRight = _parseCssLength(valuesTwo[2]);
+    final topBottom = tryParseCssLength(valuesTwo[1]);
+    final leftRight = tryParseCssLength(valuesTwo[2]);
     return CssLengthBox(
       top: topBottom,
       inlineEnd: leftRight,
@@ -89,7 +89,7 @@ CssLengthBox _parseCssLengthBoxAll(String value) {
     );
   }
 
-  final all = _parseCssLength(value);
+  final all = tryParseCssLength(value);
   return CssLengthBox(top: all, inlineEnd: all, bottom: all, inlineStart: all);
 }
 
@@ -98,7 +98,7 @@ CssLengthBox _parseCssLengthBoxOne(
   String suffix,
   String value,
 ) {
-  final parsed = _parseCssLength(value);
+  final parsed = tryParseCssLength(value);
   if (parsed == null) return existing;
 
   existing ??= CssLengthBox();

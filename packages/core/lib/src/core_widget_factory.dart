@@ -1,19 +1,14 @@
-import 'dart:math';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'internal/core_ops.dart';
+import 'internal/core_parser.dart';
 import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_html_widget.dart';
 import 'internal/css_block.dart';
-
-part 'parser/border.dart';
-part 'parser/color.dart';
-part 'parser/css.dart';
-part 'parser/length.dart';
 
 /// A factory to build widget for HTML elements.
 class WidgetFactory {
@@ -353,19 +348,6 @@ class WidgetFactory {
   Object _imageFromUrl(String url) =>
       url?.isNotEmpty == true ? NetworkImage(url) : null;
 
-  Color parseColor(String value) => _parseColor(value);
-
-  CssBorderSide parseCssBorderSide(String value) =>
-      _parseCssBorderSide(this, value);
-
-  TextDecorationStyle parseCssBorderStyle(String value) =>
-      _parseCssBorderStyle(value);
-
-  CssLength parseCssLength(String value) => _parseCssLength(value);
-
-  CssLengthBox parseCssLengthBox(NodeMetadata meta, String key) =>
-      _parseCssLengthBox(meta, key);
-
   void parseStyle(NodeMetadata meta, String key, String value) {
     switch (key) {
       case kCssBackground:
@@ -375,7 +357,7 @@ class WidgetFactory {
         break;
 
       case kCssBorderBottom:
-        final borderBottom = parseCssBorderSide(value);
+        final borderBottom = tryParseCssBorderSide(value);
         if (borderBottom != null) {
           meta.register(TextStyleOps.textDecoOp(TextDeco(
             color: borderBottom.color,
@@ -388,7 +370,7 @@ class WidgetFactory {
         }
         break;
       case kCssBorderTop:
-        final borderTop = parseCssBorderSide(value);
+        final borderTop = tryParseCssBorderSide(value);
         if (borderTop != null) {
           meta.register(TextStyleOps.textDecoOp(TextDeco(
             color: borderTop.color,
@@ -402,7 +384,7 @@ class WidgetFactory {
         break;
 
       case kCssColor:
-        final color = parseColor(value);
+        final color = tryParseColor(value);
         if (color != null) meta.tsb(TextStyleOps.color, color);
         break;
 
@@ -469,7 +451,7 @@ class WidgetFactory {
         break;
 
       case kCssTextAlign:
-        final textAlign = _tryParseTextAlign(value);
+        final textAlign = tryParseTextAlign(value);
         if (textAlign != null) {
           meta
             ..isBlockElement = true
@@ -771,11 +753,11 @@ class WidgetFactory {
     return _styleDisplayBlock;
   }
 
-  Widget _cssBlock(Widget child) =>
-      child == widget0 || child is CssBlock ? child : CssBlock(child: child);
-
   TextStyleHtml Function(TextStyleHtml, String) get _tsbFontSize {
     __tsbFontSize ??= TextStyleOps.fontSize(this);
     return __tsbFontSize;
   }
 }
+
+Widget _cssBlock(Widget child) =>
+    child == widget0 || child is CssBlock ? child : CssBlock(child: child);
