@@ -10,6 +10,8 @@ final _regExpSpaceTrailing = RegExp(r'[^\S\u{00A0}]+$', unicode: true);
 final _regExpSpaces = RegExp(r'[^\S\u{00A0}]+', unicode: true);
 
 class HtmlBuilder {
+  final CustomStylesBuilder customStylesBuilder;
+  final CustomWidgetBuilder customWidgetBuilder;
   final List<dom.Node> domNodes;
   final NodeMetadata parentMeta;
   final Iterable<BuildOp> parentOps;
@@ -21,6 +23,8 @@ class HtmlBuilder {
   BuiltPiece _textPiece;
 
   HtmlBuilder({
+    this.customStylesBuilder,
+    this.customWidgetBuilder,
     @required this.domNodes,
     @required this.parentMeta,
     this.parentOps,
@@ -88,8 +92,8 @@ class HtmlBuilder {
     }
 
     // integration point: apply custom builders
-    _customStyles(wf.widget.customStylesBuilder, meta, e);
-    _customWidget(wf.widget.customWidgetBuilder, meta, e);
+    _customStylesBuilder(meta, e);
+    _customWidgetBuilder(meta, e);
 
     // stylings, step 2: get styles from `style` attribute
     if (e.attributes.containsKey('style')) {
@@ -127,6 +131,8 @@ class HtmlBuilder {
 
       final isBlockElement = meta?.isBlockElement == true;
       final __builder = HtmlBuilder(
+        customStylesBuilder: customStylesBuilder,
+        customWidgetBuilder: customWidgetBuilder,
         domNodes: domNode.nodes,
         parentMeta: meta,
         parentOps: _prepareParentOps(parentOps, meta),
@@ -182,6 +188,22 @@ class HtmlBuilder {
     text.addText(dedup);
 
     if (end < data.length) text.addWhitespace();
+  }
+
+  void _customStylesBuilder(NodeMetadata meta, dom.Element element) {
+    final map = customStylesBuilder?.call(element);
+    if (map == null) return;
+
+    for (final pair in map.entries) {
+      meta[pair.key] = pair.value;
+    }
+  }
+
+  void _customWidgetBuilder(NodeMetadata meta, dom.Element element) {
+    final built = customWidgetBuilder?.call(element);
+    if (built == null) return;
+
+    meta.register(BuildOp(onWidgets: (_, __) => [built]));
   }
 
   void _newTextPiece() => _textPiece = BuiltPiece.text(
@@ -266,22 +288,6 @@ class _NodeMetadata extends NodeMetadata {
 
   static bool _isBlockElementFrom(Iterable<BuildOp> ops) =>
       ops?.where((op) => op.isBlockElement)?.length?.compareTo(0) == 1;
-}
-
-void _customStyles(CustomStylesBuilder f, NodeMetadata m, dom.Element e) {
-  final map = f?.call(e);
-  if (map == null) return;
-
-  for (final pair in map.entries) {
-    m[pair.key] = pair.value;
-  }
-}
-
-void _customWidget(CustomWidgetBuilder f, NodeMetadata m, dom.Element e) {
-  final built = f?.call(e);
-  if (built == null) return;
-
-  m.register(BuildOp(onWidgets: (_, __) => [built]));
 }
 
 Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, NodeMetadata meta) {

@@ -5,14 +5,15 @@ const kTagA = 'a';
 
 class TagA {
   final WidgetFactory wf;
+  final Color Function() colorCallback;
 
-  TagA(this.wf);
+  TagA(this.wf, this.colorCallback);
 
   BuildOp get buildOp => BuildOp(
         defaultStyles: (meta, __) {
           final styles = {kCssTextDecoration: kCssTextDecorationUnderline};
 
-          final color = wf.widget?.hyperlinkColor;
+          final color = colorCallback?.call();
           if (color != null) styles[kCssColor] = convertColorToHex(color);
 
           return styles;

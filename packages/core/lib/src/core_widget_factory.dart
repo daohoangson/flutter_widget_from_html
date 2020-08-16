@@ -26,9 +26,9 @@ class WidgetFactory {
   BuildOp _tagQ;
   TextStyleHtml Function(TextStyleHtml, String) __tsbFontSize;
   TextStyleHtml Function(TextStyleHtml, String) _tsbLineHeight;
-  HtmlWidget _widget;
+  State<HtmlWidget> _state;
 
-  HtmlWidget get widget => _widget;
+  HtmlWidget get _widget => _state.widget;
 
   WidgetPlaceholder buildBody(NodeMetadata meta, Iterable<Widget> children) =>
       buildColumnPlaceholder(meta, children, trimMarginVertical: true);
@@ -215,15 +215,15 @@ class WidgetFactory {
     if (p == null) return null;
     if (p.hasScheme) return p.toString();
 
-    final b = widget.baseUrl;
+    final b = _widget.baseUrl;
     if (b == null) return null;
 
     return b.resolveUri(p).toString();
   }
 
   GestureTapCallback gestureTapCallback(String url) => url != null
-      ? () => widget.onTapUrl != null
-          ? widget.onTapUrl(url)
+      ? () => _widget.onTapUrl != null
+          ? _widget.onTapUrl(url)
           : print('[flutter_widget_from_html] Tapped url $url')
       : null;
 
@@ -474,7 +474,7 @@ class WidgetFactory {
   void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
     switch (tag) {
       case kTagA:
-        _tagA ??= TagA(this).buildOp;
+        _tagA ??= TagA(this, () => _widget.hyperlinkColor).buildOp;
         meta.register(_tagA);
         break;
 
@@ -721,7 +721,7 @@ class WidgetFactory {
   }
 
   @mustCallSuper
-  void reset(HtmlWidget widget) => _widget = widget;
+  void reset(State<HtmlWidget> state) => _state = state;
 
   BuildOp styleDisplayBlock() {
     _styleDisplayBlock ??= BuildOp(
