@@ -1,16 +1,16 @@
-part of '../core_widget_factory.dart';
+part of '../core_ops.dart';
 
-const _kCssHeight = 'height';
-const _kCssMaxHeight = 'max-height';
-const _kCssMaxWidth = 'max-width';
-const _kCssMinHeight = 'min-height';
-const _kCssMinWidth = 'min-width';
-const _kCssWidth = 'width';
+const kCssHeight = 'height';
+const kCssMaxHeight = 'max-height';
+const kCssMaxWidth = 'max-width';
+const kCssMinHeight = 'min-height';
+const kCssMinWidth = 'min-width';
+const kCssWidth = 'width';
 
-class _StyleSizing {
+class StyleSizing {
   final WidgetFactory wf;
 
-  _StyleSizing(this.wf);
+  StyleSizing(this.wf);
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
@@ -45,7 +45,7 @@ class _StyleSizing {
         onWidgets: (meta, widgets) {
           final input = _parse(meta);
           if (input == null) return widgets;
-          return _listOrNull(wf
+          return listOrNull(wf
               .buildColumnPlaceholder(meta, widgets)
               ?.wrapWith((child) => _build(child, input, meta.tsb())));
         },
@@ -54,25 +54,26 @@ class _StyleSizing {
 
   _StyleSizingInput _parse(NodeMetadata meta) {
     CssLength height, maxHeight, maxWidth, minHeight, minWidth, width;
+
     for (final style in meta.styles) {
       switch (style.key) {
-        case _kCssHeight:
-          height = wf.parseCssLength(style.value);
+        case kCssHeight:
+          height = tryParseCssLength(style.value);
           break;
-        case _kCssMaxHeight:
-          maxHeight = wf.parseCssLength(style.value);
+        case kCssMaxHeight:
+          maxHeight = tryParseCssLength(style.value);
           break;
-        case _kCssMaxWidth:
-          maxWidth = wf.parseCssLength(style.value);
+        case kCssMaxWidth:
+          maxWidth = tryParseCssLength(style.value);
           break;
-        case _kCssMinHeight:
-          minHeight = wf.parseCssLength(style.value);
+        case kCssMinHeight:
+          minHeight = tryParseCssLength(style.value);
           break;
-        case _kCssMinWidth:
-          minWidth = wf.parseCssLength(style.value);
+        case kCssMinWidth:
+          minWidth = tryParseCssLength(style.value);
           break;
-        case _kCssWidth:
-          width = wf.parseCssLength(style.value);
+        case kCssWidth:
+          width = tryParseCssLength(style.value);
           break;
       }
     }

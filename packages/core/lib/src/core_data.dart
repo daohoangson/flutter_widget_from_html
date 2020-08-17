@@ -30,14 +30,13 @@ class BuildOp {
   ///
   /// ```dart
   /// BuildOp(
-  ///   defaultStyles: (_, __) => {'color': 'red'},
+  ///   defaultStyles: (_) => {'color': 'red'},
   /// )
   /// ```
   ///
   /// Note: op must be registered early for this to work e.g.
   /// in [WidgetFactory.parseTag] or [onChild].
-  final Map<String, String> Function(NodeMetadata meta, dom.Element element)
-      defaultStyles;
+  final Map<String, String> Function(NodeMetadata meta) defaultStyles;
 
   /// The callback that will be called whenver a child element is found.
   ///
@@ -46,14 +45,14 @@ class BuildOp {
   ///
   /// ```dart
   /// BuildOp(
-  ///   onChild: (childMeta, childElement) {
-  ///     if (!childElement.parent != parentMeta.domElement) return;
+  ///   onChild: (childMeta) {
+  ///     if (!childElement.domElement.parent != parentMeta.domElement) return;
   ///     childMeta.doSomethingHere;
   ///   },
   /// );
   ///
   /// ```
-  final void Function(NodeMetadata childMeta, dom.Element childElement) onChild;
+  final void Function(NodeMetadata childMeta) onChild;
 
   /// The callback that will be called when child elements have been processed.
   final Iterable<BuiltPiece> Function(

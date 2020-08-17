@@ -24,11 +24,11 @@ void main() {
 
 class _IsNotRenderableTest extends WidgetFactory {
   @override
-  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
-    if (attrs.containsKey('class') && attrs['class'] == 'skipMe') {
+  void parse(NodeMetadata meta) {
+    if (meta.domElement.classes.contains('skipMe')) {
       meta.isNotRenderable = true;
     }
 
-    return super.parseTag(meta, tag, attrs);
+    return super.parse(meta);
   }
 }

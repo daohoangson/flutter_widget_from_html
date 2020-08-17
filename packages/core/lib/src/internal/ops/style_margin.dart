@@ -1,6 +1,6 @@
-part of '../core_widget_factory.dart';
+part of '../core_ops.dart';
 
-const _kCssMargin = 'margin';
+const kCssMargin = 'margin';
 
 Widget _marginHorizontalBuilder(Widget w, CssLengthBox b, TextStyleHtml tsh) =>
     Padding(
@@ -11,16 +11,16 @@ Widget _marginHorizontalBuilder(Widget w, CssLengthBox b, TextStyleHtml tsh) =>
       ),
     );
 
-class _StyleMargin {
+class StyleMargin {
   final WidgetFactory wf;
 
-  _StyleMargin(this.wf);
+  StyleMargin(this.wf);
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
         onPieces: (meta, pieces) {
           if (meta.isBlockElement) return pieces;
-          final m = wf.parseCssLengthBox(meta, _kCssMargin);
+          final m = tryParseCssLengthBox(meta, kCssMargin);
           if (m?.hasLeftOrRight != true) return pieces;
 
           return _wrapTextBits(
@@ -33,7 +33,7 @@ class _StyleMargin {
         },
         onWidgets: (meta, widgets) {
           if (widgets?.isNotEmpty != true) return null;
-          final m = wf.parseCssLengthBox(meta, _kCssMargin);
+          final m = tryParseCssLengthBox(meta, kCssMargin);
           if (m == null) return null;
 
           final t = m.top?.isNotEmpty == true;

@@ -1,9 +1,11 @@
-part of '../core_widget_factory.dart';
+part of '../core_ops.dart';
 
-class _TagQ {
+const kTagQ = 'q';
+
+class TagQ {
   final WidgetFactory wf;
 
-  _TagQ(this.wf);
+  TagQ(this.wf);
 
   BuildOp get buildOp => BuildOp(
         onPieces: (_, pieces) => _wrapTextBits(

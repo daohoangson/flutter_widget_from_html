@@ -1,35 +1,35 @@
-part of '../core_widget_factory.dart';
+part of '../core_parser.dart';
 
-const _kCssBorder = 'border';
-const _kCssBorderBottom = 'border-bottom';
-const _kCssBorderTop = 'border-top';
+const kCssBorder = 'border';
+const kCssBorderBottom = 'border-bottom';
+const kCssBorderTop = 'border-top';
 
 final _borderValuesThreeRegExp = RegExp(r'^(.+)\s+(.+)\s+(.+)$');
 final _borderValuesTwoRegExp = RegExp(r'^(.+)\s+(.+)$');
 
-CssBorderSide _parseCssBorderSide(WidgetFactory wf, String value) {
+CssBorderSide tryParseCssBorderSide(String value) {
   final valuesThree = _borderValuesThreeRegExp.firstMatch(value);
   if (valuesThree != null) {
-    final width = wf.parseCssLength(valuesThree[1]);
+    final width = tryParseCssLength(valuesThree[1]);
     if (width == null || width.number <= 0) return null;
     return CssBorderSide(
-      color: wf.parseColor(valuesThree[3]),
-      style: wf.parseCssBorderStyle(valuesThree[2]),
+      color: tryParseColor(valuesThree[3]),
+      style: tryParseCssBorderStyle(valuesThree[2]),
       width: width,
     );
   }
 
   final valuesTwo = _borderValuesTwoRegExp.firstMatch(value);
   if (valuesTwo != null) {
-    final width = wf.parseCssLength(valuesTwo[1]);
+    final width = tryParseCssLength(valuesTwo[1]);
     if (width == null || width.number <= 0) return null;
     return CssBorderSide(
-      style: wf.parseCssBorderStyle(valuesTwo[2]),
+      style: tryParseCssBorderStyle(valuesTwo[2]),
       width: width,
     );
   }
 
-  final width = wf.parseCssLength(value);
+  final width = tryParseCssLength(value);
   if (width == null || width.number <= 0) return null;
   return CssBorderSide(
     style: TextDecorationStyle.solid,
@@ -37,7 +37,7 @@ CssBorderSide _parseCssBorderSide(WidgetFactory wf, String value) {
   );
 }
 
-TextDecorationStyle _parseCssBorderStyle(String value) {
+TextDecorationStyle tryParseCssBorderStyle(String value) {
   switch (value) {
     case 'dotted':
       return TextDecorationStyle.dotted;

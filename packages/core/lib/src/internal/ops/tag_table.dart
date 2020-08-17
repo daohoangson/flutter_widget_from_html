@@ -1,25 +1,25 @@
-part of '../core_widget_factory.dart';
+part of '../core_ops.dart';
 
-const _kTagTable = 'table';
-const _kTagTableRow = 'tr';
-const _kTagTableHeaderGroup = 'thead';
-const _kTagTableRowGroup = 'tbody';
-const _kTagTableFooterGroup = 'tfoot';
-const _kTagTableHeaderCell = 'th';
-const _kTagTableCell = 'td';
-const _kTagTableCaption = 'caption';
+const kTagTable = 'table';
+const kTagTableRow = 'tr';
+const kTagTableHeaderGroup = 'thead';
+const kTagTableRowGroup = 'tbody';
+const kTagTableFooterGroup = 'tfoot';
+const kTagTableHeaderCell = 'th';
+const kTagTableCell = 'td';
+const kTagTableCaption = 'caption';
 
-const _kAttributeBorder = 'border';
-const _kAttributeCellPadding = 'cellpadding';
-const _kCssDisplayTable = 'table';
-const _kCssDisplayTableRow = 'table-row';
-const _kCssDisplayTableHeaderGroup = 'table-header-group';
-const _kCssDisplayTableRowGroup = 'table-row-group';
-const _kCssDisplayTableFooterGroup = 'table-footer-group';
-const _kCssDisplayTableCell = 'table-cell';
-const _kCssDisplayTableCaption = 'table-caption';
+const kAttributeBorder = 'border';
+const kAttributeCellPadding = 'cellpadding';
+const kCssDisplayTable = 'table';
+const kCssDisplayTableRow = 'table-row';
+const kCssDisplayTableHeaderGroup = 'table-header-group';
+const kCssDisplayTableRowGroup = 'table-row-group';
+const kCssDisplayTableFooterGroup = 'table-footer-group';
+const kCssDisplayTableCell = 'table-cell';
+const kCssDisplayTableCaption = 'table-caption';
 
-class _TagTable {
+class TagTable {
   final NodeMetadata tableMeta;
   final WidgetFactory wf;
 
@@ -27,7 +27,7 @@ class _TagTable {
 
   BuildOp _tableOp;
 
-  _TagTable(this.wf, this.tableMeta);
+  TagTable(this.wf, this.tableMeta);
 
   BuildOp get op {
     _tableOp = BuildOp(
@@ -37,27 +37,27 @@ class _TagTable {
     return _tableOp;
   }
 
-  void onChild(NodeMetadata childMeta, dom.Element e) {
-    if (e.parent != tableMeta.domElement) return;
+  void onChild(NodeMetadata childMeta) {
+    if (childMeta.domElement.parent != tableMeta.domElement) return;
 
-    final which = _getChildCssDisplayValue(childMeta, e);
+    final which = _getCssDisplayValue(childMeta);
     switch (which) {
-      case _kCssDisplayTableRow:
+      case kCssDisplayTableRow:
         final row = _TagTableDataRow();
         _data.rows.add(row);
         childMeta.register(_TagTableRow(wf, childMeta, row).op);
         break;
-      case _kCssDisplayTableHeaderGroup:
-      case _kCssDisplayTableRowGroup:
-      case _kCssDisplayTableFooterGroup:
-        final rows = which == _kCssDisplayTableHeaderGroup
+      case kCssDisplayTableHeaderGroup:
+      case kCssDisplayTableRowGroup:
+      case kCssDisplayTableFooterGroup:
+        final rows = which == kCssDisplayTableHeaderGroup
             ? _data.header.rows
-            : which == _kCssDisplayTableRowGroup
+            : which == kCssDisplayTableRowGroup
                 ? _data.rows
                 : _data.footer.rows;
         childMeta.register(_TagTableGroup(wf, childMeta, rows).op);
         break;
-      case _kCssDisplayTableCaption:
+      case kCssDisplayTableCaption:
         childMeta.register(BuildOp(onWidgets: (meta, widgets) {
           final caption = wf.buildColumnPlaceholder(meta, widgets);
           if (caption == null) return [];
@@ -105,9 +105,9 @@ class _TagTable {
   }
 
   BorderSide _parseBorder() {
-    final value = tableMeta[_kCssBorder];
+    final value = tableMeta[kCssBorder];
     if (value != null) {
-      final borderParsed = wf.parseCssBorderSide(value);
+      final borderParsed = tryParseCssBorderSide(value);
       if (borderParsed != null) {
         return BorderSide(
           color: borderParsed.color ?? const Color(0xFF000000),
@@ -116,54 +116,52 @@ class _TagTable {
       }
     }
 
-    final a = tableMeta.domElement.attributes;
-    if (a.containsKey(_kAttributeBorder)) {
-      final width = double.tryParse(a[_kAttributeBorder]);
-      if (width != null && width > 0) {
-        return BorderSide(width: width);
-      }
-    }
+    final width = tryParseDoubleFromMap(
+        tableMeta.domElement.attributes, kAttributeBorder);
+    if (width != null && width > 0) return BorderSide(width: width);
 
     return null;
   }
 
   static BuildOp cellPaddingOp(double px) => BuildOp(
-      onChild: (meta, e) => (e.localName == 'td' || e.localName == 'th')
-          ? meta[_kCssPadding] = '${px}px'
+      onChild: (meta) => (meta.domElement.localName == 'td' ||
+              meta.domElement.localName == 'th')
+          ? meta[kCssPadding] = '${px}px'
           : null);
 
-  static String _getChildCssDisplayValue(NodeMetadata meta, dom.Element e) {
+  static String _getCssDisplayValue(NodeMetadata meta) {
     String value;
-    switch (e.localName) {
-      case _kTagTableRow:
-        value = _kCssDisplayTableRow;
+    switch (meta.domElement.localName) {
+      case kTagTableRow:
+        value = kCssDisplayTableRow;
         break;
-      case _kTagTableHeaderGroup:
-        value = _kCssDisplayTableHeaderGroup;
+      case kTagTableHeaderGroup:
+        value = kCssDisplayTableHeaderGroup;
         break;
-      case _kTagTableRowGroup:
-        value = _kCssDisplayTableRowGroup;
+      case kTagTableRowGroup:
+        value = kCssDisplayTableRowGroup;
         break;
-      case _kTagTableFooterGroup:
-        value = _kCssDisplayTableFooterGroup;
+      case kTagTableFooterGroup:
+        value = kCssDisplayTableFooterGroup;
         break;
-      case _kTagTableHeaderCell:
-      case _kTagTableCell:
-        return _kCssDisplayTableCell;
-      case _kTagTableCaption:
-        return _kCssDisplayTableCaption;
+      case kTagTableHeaderCell:
+      case kTagTableCell:
+        return kCssDisplayTableCell;
+      case kTagTableCaption:
+        return kCssDisplayTableCaption;
     }
 
     if (value != null) {
-      meta[_kCssDisplay] = value;
+      meta[kCssDisplay] = value;
       return value;
     }
 
-    if (e.attributes.containsKey('style')) {
-      for (final pair in splitAttributeStyle(e.attributes['style'])
+    final attrs = meta.domElement.attributes;
+    if (attrs.containsKey('style')) {
+      for (final pair in splitAttributeStyle(attrs['style'])
           .toList(growable: false)
           .reversed) {
-        if (pair.key == _kCssDisplay) {
+        if (pair.key == kCssDisplay) {
           return pair.value;
         }
       }
@@ -184,10 +182,11 @@ class _TagTableGroup {
     op = BuildOp(onChild: onChild);
   }
 
-  void onChild(NodeMetadata childMeta, dom.Element e) {
-    if (e.parent != groupMeta.domElement) return;
-    if (_TagTable._getChildCssDisplayValue(childMeta, e) !=
-        _kCssDisplayTableRow) return;
+  void onChild(NodeMetadata childMeta) {
+    if (childMeta.domElement.parent != groupMeta.domElement) return;
+    if (TagTable._getCssDisplayValue(childMeta) != kCssDisplayTableRow) {
+      return;
+    }
 
     final row = _TagTableDataRow();
     rows.add(row);
@@ -207,10 +206,11 @@ class _TagTableRow {
     op = BuildOp(onChild: onChild);
   }
 
-  void onChild(NodeMetadata childMeta, dom.Element e) {
-    if (e.parent != rowMeta.domElement) return;
-    if (_TagTable._getChildCssDisplayValue(childMeta, e) !=
-        _kCssDisplayTableCell) return;
+  void onChild(NodeMetadata childMeta) {
+    if (childMeta.domElement.parent != rowMeta.domElement) return;
+    if (TagTable._getCssDisplayValue(childMeta) != kCssDisplayTableCell) {
+      return;
+    }
 
     _cellOp ??= BuildOp(
       onWidgets: (cellMeta, widgets) {

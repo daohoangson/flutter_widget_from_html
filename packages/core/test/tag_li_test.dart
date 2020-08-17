@@ -636,15 +636,13 @@ void main() {
         ),
         useExplainer: false,
       );
-      expect(
-          explained, equals('_ColumnPlaceholder\n$nonExplainerExpected\n\n'));
+      expect(explained, equals('ColumnPlaceholder\n$nonExplainerExpected\n\n'));
     });
 
     testWidgets('renders within dir attribute', (tester) async {
       final _dirRtl = '<div dir="rtl">$html</div>';
       final explained = await explain(tester, _dirRtl, useExplainer: false);
-      expect(
-          explained, equals('_ColumnPlaceholder\n$nonExplainerExpected\n\n'));
+      expect(explained, equals('ColumnPlaceholder\n$nonExplainerExpected\n\n'));
     });
   });
 }

@@ -10,6 +10,8 @@ final _regExpSpaceTrailing = RegExp(r'[^\S\u{00A0}]+$', unicode: true);
 final _regExpSpaces = RegExp(r'[^\S\u{00A0}]+', unicode: true);
 
 class HtmlBuilder {
+  final CustomStylesBuilder customStylesBuilder;
+  final CustomWidgetBuilder customWidgetBuilder;
   final List<dom.Node> domNodes;
   final NodeMetadata parentMeta;
   final Iterable<BuildOp> parentOps;
@@ -21,6 +23,8 @@ class HtmlBuilder {
   BuiltPiece _textPiece;
 
   HtmlBuilder({
+    this.customStylesBuilder,
+    this.customWidgetBuilder,
     @required this.domNodes,
     @required this.parentMeta,
     this.parentOps,
@@ -66,18 +70,18 @@ class HtmlBuilder {
 
   NodeMetadata collectMetadata(dom.Element e) {
     final meta = _NodeMetadata(e, parentMeta.tsb().sub(), parentOps);
-    wf.parseTag(meta, e.localName, e.attributes);
+    wf.parse(meta);
 
     if (meta.parentOps != null) {
       for (final op in meta.parentOps) {
-        op.onChild?.call(meta, e);
+        op.onChild?.call(meta);
       }
     }
 
     // stylings, step 1: get default styles from tag-based build ops
     if (meta.buildOps != null) {
       for (final op in meta.buildOps) {
-        final map = op.defaultStyles?.call(meta, e);
+        final map = op.defaultStyles?.call(meta);
         if (map == null) continue;
 
         meta._styles ??= [];
@@ -88,8 +92,8 @@ class HtmlBuilder {
     }
 
     // integration point: apply custom builders
-    wf.customStyleBuilder(meta, e);
-    wf.customWidgetBuilder(meta, e);
+    _customStylesBuilder(meta, e);
+    _customWidgetBuilder(meta, e);
 
     // stylings, step 2: get styles from `style` attribute
     if (e.attributes.containsKey('style')) {
@@ -127,6 +131,8 @@ class HtmlBuilder {
 
       final isBlockElement = meta?.isBlockElement == true;
       final __builder = HtmlBuilder(
+        customStylesBuilder: customStylesBuilder,
+        customWidgetBuilder: customWidgetBuilder,
         domNodes: domNode.nodes,
         parentMeta: meta,
         parentOps: _prepareParentOps(parentOps, meta),
@@ -182,6 +188,22 @@ class HtmlBuilder {
     text.addText(dedup);
 
     if (end < data.length) text.addWhitespace();
+  }
+
+  void _customStylesBuilder(NodeMetadata meta, dom.Element element) {
+    final map = customStylesBuilder?.call(element);
+    if (map == null) return;
+
+    for (final pair in map.entries) {
+      meta[pair.key] = pair.value;
+    }
+  }
+
+  void _customWidgetBuilder(NodeMetadata meta, dom.Element element) {
+    final built = customWidgetBuilder?.call(element);
+    if (built == null) return;
+
+    meta.register(BuildOp(onWidgets: (_, __) => [built]));
   }
 
   void _newTextPiece() => _textPiece = BuiltPiece.text(

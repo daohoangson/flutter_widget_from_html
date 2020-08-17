@@ -1,13 +1,13 @@
-part of '../core_widget_factory.dart';
+part of '../core_ops.dart';
 
-class _ColumnPlaceholder extends WidgetPlaceholder<NodeMetadata> {
+class ColumnPlaceholder extends WidgetPlaceholder<NodeMetadata> {
   final NodeMetadata meta;
   final bool trimMarginVertical;
   final WidgetFactory wf;
 
   final Iterable<Widget> _children;
 
-  _ColumnPlaceholder(
+  ColumnPlaceholder(
     this._children, {
     @required this.meta,
     @required this.trimMarginVertical,
@@ -69,7 +69,7 @@ class _ColumnPlaceholder extends WidgetPlaceholder<NodeMetadata> {
     for (var child in _children) {
       if (child == widget0) continue;
 
-      if (child is _ColumnPlaceholder) {
+      if (child is ColumnPlaceholder) {
         for (final grandChild in child.children) {
           yield grandChild;
         }

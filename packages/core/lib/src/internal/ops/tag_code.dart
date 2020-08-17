@@ -1,23 +1,23 @@
-part of '../core_widget_factory.dart';
+part of '../core_ops.dart';
 
-const _kTagCode = 'code';
-const _kTagCodeFont1 = 'Courier';
-const _kTagCodeFont2 = 'monospace';
-const _kTagPre = 'pre';
-const _kTagTt = 'tt';
+const kTagCode = 'code';
+const kTagCodeFont1 = 'Courier';
+const kTagCodeFont2 = 'monospace';
+const kTagPre = 'pre';
+const kTagTt = 'tt';
 
-class _TagCode {
+class TagCode {
   final WidgetFactory wf;
 
-  _TagCode(this.wf);
+  TagCode(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        defaultStyles: (_, __) =>
-            const {_kCssFontFamily: '$_kTagCodeFont1, $_kTagCodeFont2'},
-        onPieces: (meta, pieces) => meta.domElement.localName == _kTagPre
+        defaultStyles: (_) =>
+            const {kCssFontFamily: '$kTagCodeFont1, $kTagCodeFont2'},
+        onPieces: (meta, pieces) => meta.domElement.localName == kTagPre
             ? [_resetText(pieces.first, meta)]
             : pieces,
-        onWidgets: (meta, widgets) => _listOrNull(wf
+        onWidgets: (meta, widgets) => listOrNull(wf
             .buildColumnPlaceholder(meta, widgets)
             ?.wrapWith((child) => wf.buildHorizontalScrollView(meta, child))),
       );

@@ -4,24 +4,26 @@ import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
-import 'package:html/dom.dart' as dom;
+import 'package:flutter_widget_from_html_core/src/internal/core_ops.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'internal/ops.dart';
 import 'data.dart';
 import 'helpers.dart';
 import 'html_widget.dart';
 
-part 'ops/tag_a_enhanced.dart';
-part 'ops/tag_iframe.dart';
-part 'ops/tag_svg.dart';
-part 'ops/tag_video.dart';
-
 /// A factory to build widget for HTML elements
 /// with support for [WebView] and [VideoPlayer] etc.
 class WidgetFactory extends core.WidgetFactory {
+  State<core.HtmlWidget> _state;
   BuildOp _tagIframe;
   BuildOp _tagSvg;
-  HtmlWidget _widget;
+  TextStyleHtml Function(TextStyleHtml, dynamic) _tsbTagA;
+
+  HtmlWidget get _widget {
+    final candidate = _state.widget;
+    return candidate is HtmlWidget ? candidate : null;
+  }
 
   @override
   Widget buildDivider(NodeMetadata meta) => const Divider(height: 1);
@@ -142,22 +144,23 @@ class WidgetFactory extends core.WidgetFactory {
     double height,
     double width,
   }) {
-    if (_widget?.webView != true) return buildWebViewLinkOnly(meta, url);
+    final widget = _widget;
+    if (widget?.webView != true) return buildWebViewLinkOnly(meta, url);
 
     final dimensOk = height != null && height > 0 && width != null && width > 0;
     return WebView(
       url,
       aspectRatio: dimensOk ? width / height : 16 / 9,
-      getDimensions: !dimensOk && _widget.webViewJs == true,
+      getDimensions: !dimensOk && widget.webViewJs == true,
       interceptNavigationRequest: (newUrl) {
         if (newUrl == url) return false;
 
         gestureTapCallback(newUrl)();
         return true;
       },
-      js: _widget.webViewJs == true,
+      js: widget.webViewJs == true,
       unsupportedWorkaroundForIssue37:
-          _widget.unsupportedWebViewWorkaroundForIssue37 == true,
+          widget.unsupportedWebViewWorkaroundForIssue37 == true,
     );
   }
 
@@ -185,27 +188,36 @@ class WidgetFactory extends core.WidgetFactory {
         ..add(HtmlWidgetDependency<ThemeData>(Theme.of(context)));
 
   @override
-  Object imageFromUrl(String url) =>
+  Object imageProvider(ImageSource imgSrc) {
+    if (imgSrc == null) return super.imageProvider(imgSrc);
+    final url = imgSrc.url;
+
+    if (Uri.tryParse(url)?.path?.toLowerCase()?.endsWith('.svg') == true) {
+      return _imageSvgPictureProvider(url);
+    }
+
+    if (url.startsWith('data:image/svg+xml')) {
+      return _imageSvgMemoryPicture(url);
+    }
+
+    if (url.startsWith('http')) {
+      return _imageFromUrl(url);
+    }
+
+    return super.imageProvider(imgSrc);
+  }
+
+  Object _imageFromUrl(String url) =>
       url?.isNotEmpty == true ? CachedNetworkImageProvider(url) : null;
 
-  @override
-  Object imageProvider(ImageSource imgSrc) => imgSrc == null
-      ? super.imageProvider(imgSrc)
-      : imgSrc.url.startsWith('data:image/svg+xml') == true
-          ? imageSvgMemoryPicture(imgSrc.url)
-          : Uri.tryParse(imgSrc.url)?.path?.toLowerCase()?.endsWith('.svg') ==
-                  true
-              ? imageSvgPictureProvider(imgSrc.url)
-              : super.imageProvider(imgSrc);
-
-  Object imageSvgMemoryPicture(String dataUri) {
-    final bytes = imageBytes(dataUri);
+  Object _imageSvgMemoryPicture(String dataUri) {
+    final bytes = bytesFromDataUri(dataUri);
     return bytes != null
         ? MemoryPicture(SvgPicture.svgByteDecoder, bytes)
         : null;
   }
 
-  Object imageSvgPictureProvider(String url) {
+  Object _imageSvgPictureProvider(String url) {
     if (url?.startsWith('asset:') == true) {
       final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
       if (uri?.scheme != 'asset') return null;
@@ -228,46 +240,35 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
-  void parseTag(
-    NodeMetadata meta,
-    String tag,
-    Map<dynamic, String> attributes,
-  ) {
-    switch (tag) {
+  void parse(NodeMetadata meta) {
+    switch (meta.domElement.localName) {
       case 'a':
-        meta.tsb(_TagAEnhanced.setAccentColor);
+        _tsbTagA ??= (p, _) => p.copyWith(
+            style: p.style
+                .copyWith(color: p.getDependency<ThemeData>().accentColor));
+        meta.tsb(_tsbTagA);
         break;
-      case 'iframe':
-        meta.register(tagIframe());
+      case kTagIframe:
+        _tagIframe ??= TagIframe(this).buildOp;
+        meta.register(_tagIframe);
         // return asap to avoid being disabled by core
         return;
-      case 'svg':
-        meta.register(tagSvg());
+      case kTagSvg:
+        _tagSvg ??= TagSvg(this).buildOp;
+        meta.register(_tagSvg);
         // return asap to avoid being disabled by core
         return;
-      case 'video':
-        meta.register(tagVideo(meta));
+      case kTagVideo:
+        meta.register(TagVideo(this, meta).op);
         break;
     }
 
-    return super.parseTag(meta, tag, attributes);
+    return super.parse(meta);
   }
 
   @override
-  void reset(core.HtmlWidget widget) {
-    if (widget is HtmlWidget) _widget = widget;
-    super.reset(widget);
+  void reset(State<core.HtmlWidget> state) {
+    _state = state;
+    super.reset(state);
   }
-
-  BuildOp tagIframe() {
-    _tagIframe ??= _TagIframe(this).buildOp;
-    return _tagIframe;
-  }
-
-  BuildOp tagSvg() {
-    _tagSvg ??= _TagSvg(this).buildOp;
-    return _tagSvg;
-  }
-
-  BuildOp tagVideo(NodeMetadata meta) => _TagVideo(this, meta).op;
 }
