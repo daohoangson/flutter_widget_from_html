@@ -192,23 +192,23 @@ class WidgetFactory {
         continue;
       }
 
-      if (compiled.span == null) continue;
+      if (compiled.spanBuilder == null) continue;
       widgets.add(
         WidgetPlaceholder<TextBits>(generator: text)
           ..wrapWith((context, _) {
-            final compiledText = compiled.span(context);
+            final span = compiled.spanBuilder(context);
             final tsh = text.tsb?.build(context);
             final textAlign = tsh?.textAlign ?? TextAlign.start;
 
-            if (compiledText is WidgetSpan &&
-                compiledText.alignment == PlaceholderAlignment.baseline &&
+            if (span is WidgetSpan &&
+                span.alignment == PlaceholderAlignment.baseline &&
                 textAlign == TextAlign.start) {
-              return compiledText.child;
+              return span.child;
             }
 
             return RichText(
               overflow: tsh?.textOverflow ?? TextOverflow.clip,
-              text: compiledText,
+              text: span,
               textAlign: textAlign,
               textDirection: tsh?.textDirection ?? TextDirection.ltr,
 
