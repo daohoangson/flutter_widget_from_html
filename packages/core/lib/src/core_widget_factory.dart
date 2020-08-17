@@ -63,7 +63,8 @@ class WidgetFactory {
   }
 
   /// Builds [Column].
-  Widget buildColumnWidget(NodeMetadata meta, List<Widget> children) {
+  Widget buildColumnWidget(
+      NodeMetadata meta, TextStyleHtml tsh, List<Widget> children) {
     if (children?.isNotEmpty != true) return null;
     if (children.length == 1) return children.first;
 
@@ -71,7 +72,7 @@ class WidgetFactory {
       children: children,
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      textDirection: meta.tsb().build().textDirection,
+      textDirection: tsh.textDirection,
     );
   }
 
@@ -138,14 +139,16 @@ class WidgetFactory {
           : child;
 
   /// Builds [Stack].
-  Widget buildStack(NodeMetadata meta, List<Widget> children) => Stack(
+  Widget buildStack(
+          NodeMetadata meta, TextStyleHtml tsh, List<Widget> children) =>
+      Stack(
         children: children,
         overflow: Overflow.visible,
-        textDirection: meta.tsb().build().textDirection,
+        textDirection: tsh.textDirection,
       );
 
   /// Builds [Table].
-  Widget buildTable(NodeMetadata node, TableMetadata table) {
+  Widget buildTable(NodeMetadata node, TextStyleHtml tsh, TableMetadata table) {
     final rows = <TableRow>[];
     final slotIndices = <int>[];
     final tableCols = table.cols;
@@ -182,12 +185,6 @@ class WidgetFactory {
     text.trimRight();
     if (text.isEmpty) return null;
 
-    final tsh = text.tsb?.build();
-    final maxLines = tsh?.maxLines == -1 ? null : tsh?.maxLines;
-    final overflow = tsh?.textOverflow ?? TextOverflow.clip;
-    final textAlign = tsh?.textAlign ?? TextAlign.start;
-    final textDirection = tsh?.textDirection ?? TextDirection.ltr;
-
     final widgets = <WidgetPlaceholder>[];
     for (final compiled in TextCompiler(text).compile()) {
       if (compiled.widget != null) {
@@ -197,19 +194,29 @@ class WidgetFactory {
 
       if (compiled.span == null) continue;
       widgets.add(
-        WidgetPlaceholder<TextBits>(
-          child: RichText(
-            overflow: overflow,
-            text: compiled.span,
-            textAlign: textAlign,
-            textDirection: textDirection,
+        WidgetPlaceholder<TextBits>(generator: text)
+          ..wrapWith((context, _) {
+            final compiledText = compiled.span(context);
+            final tsh = text.tsb?.build(context);
+            final textAlign = tsh?.textAlign ?? TextAlign.start;
 
-            // TODO: calculate max lines automatically for ellipsis if needed
-            // currently it only renders 1 line with ellipsis
-            maxLines: maxLines,
-          ),
-          generator: text,
-        ),
+            if (compiledText is WidgetSpan &&
+                compiledText.alignment == PlaceholderAlignment.baseline &&
+                textAlign == TextAlign.start) {
+              return compiledText.child;
+            }
+
+            return RichText(
+              overflow: tsh?.textOverflow ?? TextOverflow.clip,
+              text: compiledText,
+              textAlign: textAlign,
+              textDirection: tsh?.textDirection ?? TextDirection.ltr,
+
+              // TODO: calculate max lines automatically for ellipsis if needed
+              // currently it only renders 1 line with ellipsis
+              maxLines: tsh?.maxLines == -1 ? null : tsh?.maxLines,
+            );
+          }),
       );
     }
 
@@ -755,5 +762,5 @@ class WidgetFactory {
   }
 }
 
-Widget _cssBlock(Widget child) =>
+Widget _cssBlock(BuildContext _, Widget child) =>
     child == widget0 || child is CssBlock ? child : CssBlock(child: child);

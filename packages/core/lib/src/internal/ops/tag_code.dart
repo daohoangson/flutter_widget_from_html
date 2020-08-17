@@ -19,7 +19,7 @@ class TagCode {
             : pieces,
         onWidgets: (meta, widgets) => listOrNull(wf
             .buildColumnPlaceholder(meta, widgets)
-            ?.wrapWith((child) => wf.buildHorizontalScrollView(meta, child))),
+            ?.wrapWith((_, w) => wf.buildHorizontalScrollView(meta, w))),
       );
 
   BuiltPiece _resetText(BuiltPiece piece, NodeMetadata meta) {

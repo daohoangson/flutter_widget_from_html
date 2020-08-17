@@ -53,7 +53,7 @@ class WidgetFactory extends core.WidgetFactory {
 
   /// Builds [LayoutGrid].
   @override
-  Widget buildTable(NodeMetadata node, TableMetadata table) {
+  Widget buildTable(NodeMetadata node, TextStyleHtml tsh, TableMetadata table) {
     final cols = table.cols;
     if (cols == 0) return null;
     final templateColumnSizes = List<TrackSize>(cols);
@@ -106,6 +106,7 @@ class WidgetFactory extends core.WidgetFactory {
 
     return buildStack(
       node,
+      tsh,
       <Widget>[
         layoutGrid,
         Positioned.fill(child: Container(decoration: border))

@@ -592,30 +592,33 @@ void main() {
         '[CssBlock:child=[Stack:dir=rtl,children=[RichText:dir=rtl,(+b:Three)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:3.)]]]]]'
         ']]]';
 
-    final nonExplainerExpected = '└CssBlock()\n'
-        ' └Padding(padding: EdgeInsets(0.0, 0.0, 25.0, 0.0))\n'
-        '  └Column(direction: vertical, mainAxisAlignment: start, mainAxisSize: min, crossAxisAlignment: start, textDirection: rtl)\n'
-        '   ├WidgetPlaceholder<TextBits>\n'
-        '   │└CssBlock()\n'
-        '   │ └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
-        '   │  ├RichText(textDirection: rtl, text: "One")\n'
-        '   │  └Positioned(top: 0.0, right: -45.0)\n'
-        '   │   └SizedBox(width: 40.0)\n'
-        '   │    └RichText(textAlign: left, textDirection: rtl, text: "1.")\n'
-        '   ├WidgetPlaceholder<TextBits>\n'
-        '   │└CssBlock()\n'
-        '   │ └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
-        '   │  ├RichText(textDirection: rtl, text: "Two")\n'
-        '   │  └Positioned(top: 0.0, right: -45.0)\n'
-        '   │   └SizedBox(width: 40.0)\n'
-        '   │    └RichText(textAlign: left, textDirection: rtl, text: "2.")\n'
-        '   └WidgetPlaceholder<TextBits>\n'
-        '    └CssBlock()\n'
-        '     └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
-        '      ├RichText(textDirection: rtl, text: "Three")\n'
-        '      └Positioned(top: 0.0, right: -45.0)\n'
-        '       └SizedBox(width: 40.0)\n'
-        '        └RichText(textAlign: left, textDirection: rtl, text: "3.")';
+    final nonExplainerExpected = 'TshWidget\n'
+        '└ColumnPlaceholder()\n'
+        ' └CssBlock()\n'
+        '  └Padding(padding: EdgeInsets(0.0, 0.0, 25.0, 0.0))\n'
+        '   └Column(direction: vertical, mainAxisAlignment: start, mainAxisSize: min, crossAxisAlignment: start, textDirection: rtl)\n'
+        '    ├WidgetPlaceholder<TextBits>()\n'
+        '    │└CssBlock()\n'
+        '    │ └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
+        '    │  ├RichText(textDirection: rtl, text: "One")\n'
+        '    │  └Positioned(top: 0.0, right: -45.0)\n'
+        '    │   └SizedBox(width: 40.0)\n'
+        '    │    └RichText(textAlign: left, textDirection: rtl, text: "1.")\n'
+        '    ├WidgetPlaceholder<TextBits>()\n'
+        '    │└CssBlock()\n'
+        '    │ └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
+        '    │  ├RichText(textDirection: rtl, text: "Two")\n'
+        '    │  └Positioned(top: 0.0, right: -45.0)\n'
+        '    │   └SizedBox(width: 40.0)\n'
+        '    │    └RichText(textAlign: left, textDirection: rtl, text: "2.")\n'
+        '    └WidgetPlaceholder<TextBits>()\n'
+        '     └CssBlock()\n'
+        '      └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
+        '       ├RichText(textDirection: rtl, text: "Three")\n'
+        '       └Positioned(top: 0.0, right: -45.0)\n'
+        '        └SizedBox(width: 40.0)\n'
+        '         └RichText(textAlign: left, textDirection: rtl, text: "3.")\n'
+        '\n';
 
     testWidgets('renders ordered list', (WidgetTester tester) async {
       final explained = await explain(tester, null,
@@ -636,13 +639,13 @@ void main() {
         ),
         useExplainer: false,
       );
-      expect(explained, equals('ColumnPlaceholder\n$nonExplainerExpected\n\n'));
+      expect(explained, equals(nonExplainerExpected));
     });
 
     testWidgets('renders within dir attribute', (tester) async {
       final _dirRtl = '<div dir="rtl">$html</div>';
       final explained = await explain(tester, _dirRtl, useExplainer: false);
-      expect(explained, equals('ColumnPlaceholder\n$nonExplainerExpected\n\n'));
+      expect(explained, equals(nonExplainerExpected));
     });
   });
 }

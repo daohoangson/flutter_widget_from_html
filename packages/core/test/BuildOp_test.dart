@@ -47,9 +47,10 @@ void main() {
           useExplainer: false);
       expect(
           explained,
-          equals('WidgetPlaceholder<Widget>\n'
-              '└Text("Hi")\n'
-              ' └RichText(text: "Hi")\n\n'));
+          equals('TshWidget\n'
+              '└WidgetPlaceholder<Widget>\n'
+              ' └Text("Hi")\n'
+              '  └RichText(text: "Hi")\n\n'));
     });
   });
 
@@ -65,10 +66,11 @@ void main() {
           useExplainer: false);
       expect(
           explained,
-          equals('WidgetPlaceholder<NodeMetadata>\n'
-              '└CssBlock()\n'
-              ' └Text("Hi")\n'
-              '  └RichText(text: "Hi")\n\n'));
+          equals('TshWidget\n'
+              '└WidgetPlaceholder<NodeMetadata>\n'
+              ' └CssBlock()\n'
+              '  └Text("Hi")\n'
+              '   └RichText(text: "Hi")\n\n'));
     });
   });
 

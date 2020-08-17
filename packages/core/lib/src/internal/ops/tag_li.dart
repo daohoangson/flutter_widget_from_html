@@ -86,14 +86,14 @@ class TagLi {
         final i = _itemMetas.length;
         _itemMetas.add(itemMeta);
         _itemWidgets.add(column);
-        return [column.wrapWith((child) => _buildItem(child, i))];
+        return [column.wrapWith((c, w) => _buildItem(c, w, i))];
       },
     );
 
     childMeta.register(_itemOp);
   }
 
-  Widget _buildItem(Widget child, int i) {
+  Widget _buildItem(BuildContext context, Widget child, int i) {
     final meta = _itemMetas[i];
     final listStyleType =
         _ListConfig.listStyleTypeFromNodeMetadata(meta) ?? config.listStyleType;
@@ -101,12 +101,14 @@ class TagLi {
         ? (config.markerStart ?? _itemWidgets.length) - i
         : (config.markerStart ?? 1) + i;
     final markerText = wf.getListStyleMarker(listStyleType, markerIndex);
+    final tsh = meta.tsb().build(context);
 
     return wf.buildStack(
       meta,
+      tsh,
       <Widget>[
         child,
-        _buildMarker(meta.tsb().build(), markerText),
+        _buildMarker(tsh, markerText),
       ],
     );
   }

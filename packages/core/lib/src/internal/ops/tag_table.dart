@@ -71,47 +71,48 @@ class TagTable {
 
   Iterable<WidgetPlaceholder> onWidgets(
       NodeMetadata _, Iterable<WidgetPlaceholder> __) {
-    final metadata = TableMetadata(border: _parseBorder());
-
     final rows = <_TagTableDataRow>[
       ..._data.header.rows,
       ..._data.rows,
       ..._data.footer.rows,
     ];
-    for (var i = 0; i < rows.length; i++) {
-      for (final cell in rows[i].cells) {
-        metadata.addCell(
-          i,
-          cell.child,
-          colspan: cell.colspan,
-          rowspan: cell.rowspan,
-        );
-      }
-    }
 
-    final table = wf.buildTable(tableMeta, metadata);
-    final column = wf.buildColumnPlaceholder(tableMeta, [
-      ..._data.captions,
-      if (table != null) table,
-    ]);
-    if (column == null) return [];
+    if (_data.captions.isEmpty && rows.isEmpty) return [];
 
     return [
-      WidgetPlaceholder<TableMetadata>(
-        child: column,
-        generator: metadata,
-      )
+      WidgetPlaceholder<NodeMetadata>(generator: tableMeta)
+        ..wrapWith((context, _) {
+          final metadata = TableMetadata(border: _parseBorder(context));
+
+          for (var i = 0; i < rows.length; i++) {
+            for (final cell in rows[i].cells) {
+              metadata.addCell(
+                i,
+                cell.child,
+                colspan: cell.colspan,
+                rowspan: cell.rowspan,
+              );
+            }
+          }
+
+          final tsh = tableMeta.tsb().build(context);
+          final table = wf.buildTable(tableMeta, tsh, metadata);
+          return wf.buildColumnWidget(tableMeta, tsh, [
+            ..._data.captions,
+            if (table != null) table,
+          ]);
+        }),
     ];
   }
 
-  BorderSide _parseBorder() {
+  BorderSide _parseBorder(BuildContext context) {
     final value = tableMeta[kCssBorder];
     if (value != null) {
       final borderParsed = tryParseCssBorderSide(value);
       if (borderParsed != null) {
         return BorderSide(
           color: borderParsed.color ?? const Color(0xFF000000),
-          width: borderParsed.width.getValue(tableMeta.tsb().build()),
+          width: borderParsed.width.getValue(tableMeta.tsb().build(context)),
         );
       }
     }

@@ -41,7 +41,8 @@ class StyleVerticalAlign {
 
     if (v == kCssVerticalAlignSub || v == kCssVerticalAlignSuper) {
       built.wrapWith(
-        (child) => _build(
+        (context, child) => _build(
+          context,
           meta,
           child,
           EdgeInsets.only(
@@ -56,11 +57,14 @@ class StyleVerticalAlign {
     return newPiece;
   }
 
-  Widget _build(NodeMetadata meta, Widget child, EdgeInsets padding) {
-    final fontSize = meta.tsb().build().style.fontSize;
+  Widget _build(BuildContext context, NodeMetadata meta, Widget child,
+      EdgeInsets padding) {
+    final tsh = meta.tsb().build(context);
+    final fontSize = tsh.style.fontSize;
 
     return wf.buildStack(
       meta,
+      tsh,
       <Widget>[
         wf.buildPadding(
           meta,

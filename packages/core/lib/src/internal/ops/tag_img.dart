@@ -82,7 +82,7 @@ class _ImageBit extends TextWidget<ImageMetadata> {
       : super(parent, widget);
 
   @override
-  InlineSpan compile(TextStyleBuilder _) => WidgetSpan(
+  InlineSpan compile(TextStyleHtml _) => WidgetSpan(
         alignment: alignment,
         baseline: baseline,
         child: widget,
