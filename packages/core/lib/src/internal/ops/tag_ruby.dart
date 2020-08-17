@@ -22,7 +22,8 @@ class TagRuby {
     return _rubyOp;
   }
 
-  void onChild(NodeMetadata childMeta, dom.Element e) {
+  void onChild(NodeMetadata childMeta) {
+    final e = childMeta.domElement;
     if (e.parent != rubyMeta.domElement) return;
 
     switch (e.localName) {

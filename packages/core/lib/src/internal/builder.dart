@@ -74,14 +74,14 @@ class HtmlBuilder {
 
     if (meta.parentOps != null) {
       for (final op in meta.parentOps) {
-        op.onChild?.call(meta, e);
+        op.onChild?.call(meta);
       }
     }
 
     // stylings, step 1: get default styles from tag-based build ops
     if (meta.buildOps != null) {
       for (final op in meta.buildOps) {
-        final map = op.defaultStyles?.call(meta, e);
+        final map = op.defaultStyles?.call(meta);
         if (map == null) continue;
 
         meta._styles ??= [];

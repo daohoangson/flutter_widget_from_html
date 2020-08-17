@@ -100,8 +100,8 @@ void main() {
 class _DefaultStylesTest extends WidgetFactory {
   @override
   void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
-    meta.register(BuildOp(defaultStyles: (_, __) => {'color': '#f00'}));
-    meta.register(BuildOp(defaultStyles: (_, __) => {'color': '#0f0'}));
+    meta.register(BuildOp(defaultStyles: (_) => {'color': '#f00'}));
+    meta.register(BuildOp(defaultStyles: (_) => {'color': '#0f0'}));
 
     return super.parseTag(meta, tag, attrs);
   }

@@ -37,10 +37,10 @@ class TagTable {
     return _tableOp;
   }
 
-  void onChild(NodeMetadata childMeta, dom.Element e) {
-    if (e.parent != tableMeta.domElement) return;
+  void onChild(NodeMetadata childMeta) {
+    if (childMeta.domElement.parent != tableMeta.domElement) return;
 
-    final which = _getChildCssDisplayValue(childMeta, e);
+    final which = _getCssDisplayValue(childMeta);
     switch (which) {
       case kCssDisplayTableRow:
         final row = _TagTableDataRow();
@@ -124,13 +124,14 @@ class TagTable {
   }
 
   static BuildOp cellPaddingOp(double px) => BuildOp(
-      onChild: (meta, e) => (e.localName == 'td' || e.localName == 'th')
+      onChild: (meta) => (meta.domElement.localName == 'td' ||
+              meta.domElement.localName == 'th')
           ? meta[kCssPadding] = '${px}px'
           : null);
 
-  static String _getChildCssDisplayValue(NodeMetadata meta, dom.Element e) {
+  static String _getCssDisplayValue(NodeMetadata meta) {
     String value;
-    switch (e.localName) {
+    switch (meta.domElement.localName) {
       case kTagTableRow:
         value = kCssDisplayTableRow;
         break;
@@ -155,8 +156,9 @@ class TagTable {
       return value;
     }
 
-    if (e.attributes.containsKey('style')) {
-      for (final pair in splitAttributeStyle(e.attributes['style'])
+    final attrs = meta.domElement.attributes;
+    if (attrs.containsKey('style')) {
+      for (final pair in splitAttributeStyle(attrs['style'])
           .toList(growable: false)
           .reversed) {
         if (pair.key == kCssDisplay) {
@@ -180,10 +182,9 @@ class _TagTableGroup {
     op = BuildOp(onChild: onChild);
   }
 
-  void onChild(NodeMetadata childMeta, dom.Element e) {
-    if (e.parent != groupMeta.domElement) return;
-    if (TagTable._getChildCssDisplayValue(childMeta, e) !=
-        kCssDisplayTableRow) {
+  void onChild(NodeMetadata childMeta) {
+    if (childMeta.domElement.parent != groupMeta.domElement) return;
+    if (TagTable._getCssDisplayValue(childMeta) != kCssDisplayTableRow) {
       return;
     }
 
@@ -205,10 +206,9 @@ class _TagTableRow {
     op = BuildOp(onChild: onChild);
   }
 
-  void onChild(NodeMetadata childMeta, dom.Element e) {
-    if (e.parent != rowMeta.domElement) return;
-    if (TagTable._getChildCssDisplayValue(childMeta, e) !=
-        kCssDisplayTableCell) {
+  void onChild(NodeMetadata childMeta) {
+    if (childMeta.domElement.parent != rowMeta.domElement) return;
+    if (TagTable._getCssDisplayValue(childMeta) != kCssDisplayTableCell) {
       return;
     }
 

@@ -12,20 +12,20 @@ class TagFont {
   TagFont(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        defaultStyles: (_, e) {
-          final a = e.attributes;
+        defaultStyles: (meta) {
+          final attrs = meta.domElement.attributes;
           final styles = <String, String>{};
 
-          if (a.containsKey(kAttributeFontColor)) {
-            styles[kCssColor] = a[kAttributeFontColor];
+          if (attrs.containsKey(kAttributeFontColor)) {
+            styles[kCssColor] = attrs[kAttributeFontColor];
           }
 
-          if (a.containsKey(kAttributeFontFace)) {
-            styles[kCssFontFamily] = a[kAttributeFontFace];
+          if (attrs.containsKey(kAttributeFontFace)) {
+            styles[kCssFontFamily] = attrs[kAttributeFontFace];
           }
 
-          if (a.containsKey(kAttributeFontSize)) {
-            final size = a[kAttributeFontSize];
+          if (attrs.containsKey(kAttributeFontSize)) {
+            final size = attrs[kAttributeFontSize];
             if (kCssFontSizes.containsKey(size)) {
               styles[kCssFontSize] = kCssFontSizes[size];
             }

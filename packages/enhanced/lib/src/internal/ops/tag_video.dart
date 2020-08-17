@@ -29,14 +29,15 @@ class TagVideo {
     return _videoOp;
   }
 
-  void onChild(NodeMetadata childMeta, dom.Element e) {
+  void onChild(NodeMetadata childMeta) {
+    final e = childMeta.domElement;
     if (e.localName != kTagVideoSource) return;
     if (e.parent != videoMeta.domElement) return;
 
-    final a = e.attributes;
-    if (!a.containsKey(kAttributeVideoSrc)) return;
-
-    final url = wf.urlFull(a[kAttributeVideoSrc]);
+    final attrs = e.attributes;
+    final url = attrs.containsKey(kAttributeVideoSrc)
+        ? wf.urlFull(attrs[kAttributeVideoSrc])
+        : null;
     if (url == null) return;
 
     _sourceUrls.add(url);

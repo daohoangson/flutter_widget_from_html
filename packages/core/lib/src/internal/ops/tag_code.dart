@@ -12,7 +12,7 @@ class TagCode {
   TagCode(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        defaultStyles: (_, __) =>
+        defaultStyles: (_) =>
             const {kCssFontFamily: '$kTagCodeFont1, $kTagCodeFont2'},
         onPieces: (meta, pieces) => meta.domElement.localName == kTagPre
             ? [_resetText(pieces.first, meta)]

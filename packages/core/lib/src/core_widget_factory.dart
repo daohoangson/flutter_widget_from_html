@@ -557,8 +557,8 @@ class WidgetFactory {
 
       case 'hr':
         _tagHr ??= BuildOp(
-          defaultStyles: (_, __) => const {'margin-bottom': '1em'},
-          onWidgets: (meta, __) => [buildDivider(meta)],
+          defaultStyles: (_) => const {'margin-bottom': '1em'},
+          onWidgets: (meta, _) => [buildDivider(meta)],
         );
         meta.register(_tagHr);
         break;

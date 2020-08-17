@@ -48,15 +48,16 @@ class TagLi {
     return _listOp;
   }
 
-  Map<String, String> defaultStyles(NodeMetadata _, dom.Element e) {
+  Map<String, String> defaultStyles(NodeMetadata meta) {
+    final attrs = meta.domElement.attributes;
     final p = listMeta.parentOps?.whereType<_TagLiOp>()?.length ?? 0;
 
     final styles = {
       'padding-inline-start': '2.5em',
-      kCssListStyleType: e.localName == kTagOrderedList
-          ? (e.attributes.containsKey(kAttributeLiType)
+      kCssListStyleType: meta.domElement.localName == kTagOrderedList
+          ? (attrs.containsKey(kAttributeLiType)
                   ? _ListConfig.listStyleTypeFromAttributeType(
-                      e.attributes[kAttributeLiType])
+                      attrs[kAttributeLiType])
                   : null) ??
               kCssListStyleTypeDecimal
           : p == 0
@@ -69,20 +70,21 @@ class TagLi {
     return styles;
   }
 
-  void onChild(NodeMetadata childMeta, dom.Element e) {
+  void onChild(NodeMetadata childMeta) {
+    final e = childMeta.domElement;
     if (e.localName != kTagLi) return;
     if (e.parent != listMeta.domElement) return;
 
     _itemOp ??= BuildOp(
-      onWidgets: (meta, widgets) {
-        final column = wf.buildColumnPlaceholder(meta, widgets) ??
+      onWidgets: (itemMeta, widgets) {
+        final column = wf.buildColumnPlaceholder(itemMeta, widgets) ??
             WidgetPlaceholder<NodeMetadata>(
               child: widget0,
-              generator: meta,
+              generator: itemMeta,
             );
 
         final i = _itemMetas.length;
-        _itemMetas.add(meta);
+        _itemMetas.add(itemMeta);
         _itemWidgets.add(column);
         return [column.wrapWith((child) => _buildItem(child, i))];
       },

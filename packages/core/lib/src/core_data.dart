@@ -15,10 +15,9 @@ class BuildOp {
 
   final int priority;
 
-  final Map<String, String> Function(NodeMetadata meta, dom.Element element)
-      defaultStyles;
+  final Map<String, String> Function(NodeMetadata meta) defaultStyles;
 
-  final void Function(NodeMetadata childMeta, dom.Element childElement) onChild;
+  final void Function(NodeMetadata childMeta) onChild;
 
   final Iterable<BuiltPiece> Function(
       NodeMetadata meta, Iterable<BuiltPiece> pieces) onPieces;
