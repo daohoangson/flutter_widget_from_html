@@ -39,7 +39,7 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   /// The origin of this widget.
   final T generator;
 
-  final List<Widget Function(Widget)> _builders = [];
+  final List<Widget Function(BuildContext, Widget)> _builders = [];
   final Widget _firstChild;
 
   /// Creates a widget builder.
@@ -48,21 +48,22 @@ class WidgetPlaceholder<T> extends StatelessWidget {
         _firstChild = child;
 
   @override
-  Widget build(BuildContext context) => callBuilders(_firstChild);
+  Widget build(BuildContext context) => callBuilders(context, _firstChild);
 
   /// Calls builder callbacks on the specified [child] widget.
-  Widget callBuilders(Widget child) {
+  Widget callBuilders(BuildContext context, Widget child) {
     var built = child ?? widget0;
 
     for (final builder in _builders) {
-      built = builder(built) ?? widget0;
+      built = builder(context, built) ?? widget0;
     }
 
     return built;
   }
 
   /// Enqueues [builder] to be built later.
-  WidgetPlaceholder<T> wrapWith(Widget Function(Widget child) builder) {
+  WidgetPlaceholder<T> wrapWith(
+      Widget Function(BuildContext context, Widget child) builder) {
     assert(builder != null);
     _builders.add(builder);
     return this;

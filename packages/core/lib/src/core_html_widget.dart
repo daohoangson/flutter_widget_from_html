@@ -10,6 +10,7 @@ import 'package:html/parser.dart' as parser;
 import 'internal/builder.dart';
 import 'core_data.dart';
 import 'core_widget_factory.dart';
+import 'internal/tsh_widget.dart';
 
 /// A widget that builds Flutter widget tree from HTML
 /// (supports most popular tags and stylings).
@@ -149,14 +150,13 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     if (_future != null) {
       return FutureBuilder<Widget>(
         builder: widget.buildAsyncBuilder ?? _buildAsyncBuilder,
-        future: _future,
+        future: _future.then(_tshWidget),
       );
     }
 
-    if (!enableCaching) return _buildSync();
+    if (!enableCaching || _cache == null) _cache = _buildSync();
 
-    _cache ??= _buildSync();
-    return _cache;
+    return _tshWidget(_cache);
   }
 
   Future<Widget> _buildAsync() async {
@@ -180,6 +180,9 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     return built;
   }
 
+  Widget _tshWidget(Widget child) =>
+      TshWidget(child: child, tsh: _rootTsb._output);
+
   static WidgetFactory _coreWf;
   static WidgetFactory _getCoreWf() {
     _coreWf ??= WidgetFactory();
@@ -195,7 +198,7 @@ class _RootTsb extends TextStyleBuilder {
   _RootTsb(this.state);
 
   @override
-  TextStyleHtml build() {
+  TextStyleHtml build(BuildContext _) {
     if (_output != null) return _output;
     return _output = TextStyleHtml.root(
       state._wf.getDependencies(state.context),

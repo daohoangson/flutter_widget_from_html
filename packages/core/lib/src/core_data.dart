@@ -6,6 +6,7 @@ import 'package:html/dom.dart' as dom;
 import 'internal/margin_vertical.dart';
 import 'core_helpers.dart';
 import 'core_widget_factory.dart';
+import 'internal/tsh_widget.dart';
 
 part 'data/table.dart';
 part 'data/text_bits.dart';
@@ -511,9 +512,11 @@ class TextStyleBuilder<T1> {
   }
 
   /// Builds a [TextStyleHtml] by calling queued callbacks.
-  TextStyleHtml build() {
+  TextStyleHtml build(BuildContext context) {
+    context.dependOnInheritedWidgetOfExactType<TshWidget>();
+
     assert(parent != null);
-    final parentOutput = parent.build();
+    final parentOutput = parent.build(context);
     if (parentOutput != _parentOutput) {
       _parentOutput = parentOutput;
       _output = null;

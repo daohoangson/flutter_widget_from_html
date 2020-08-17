@@ -2,7 +2,7 @@ part of '../core_data.dart';
 
 /// A bit of text.
 @immutable
-abstract class TextBit<T> {
+abstract class TextBit<CompileFrom, CompileTo> {
   /// The container [TextBits].
   final TextBits parent;
 
@@ -80,7 +80,7 @@ abstract class TextBit<T> {
   /// Compiles into a [InlineSpan] or [Widget].
   ///
   /// Note: this method won't be called unless [canCompile] is `true`.
-  T compile(TextStyleBuilder tsb) => throw UnimplementedError();
+  CompileTo compile(CompileFrom tsb) => throw UnimplementedError();
 
   /// Removes self from the parent.
   bool detach() => parent?._children?.remove(this);
@@ -135,7 +135,7 @@ abstract class TextBit<T> {
 }
 
 /// A simple data bit.
-class TextData extends TextBit<void> {
+class TextData extends TextBit<void, void> {
   @override
   final String data;
 
@@ -151,7 +151,7 @@ class TextData extends TextBit<void> {
 }
 
 /// An inline widget to be rendered within text paragraph.
-class TextWidget<T> extends TextBit<InlineSpan> {
+class TextWidget<T> extends TextBit<TextStyleHtml, InlineSpan> {
   /// See [PlaceholderSpan.alignment].
   final PlaceholderAlignment alignment;
 
@@ -177,7 +177,7 @@ class TextWidget<T> extends TextBit<InlineSpan> {
   bool get canCompile => true;
 
   @override
-  InlineSpan compile(TextStyleBuilder _) => WidgetSpan(
+  InlineSpan compile(TextStyleHtml _) => WidgetSpan(
         alignment: alignment,
         baseline: baseline,
         child: widget,
@@ -185,7 +185,7 @@ class TextWidget<T> extends TextBit<InlineSpan> {
 }
 
 /// A container of bits.
-class TextBits extends TextBit<void> {
+class TextBits extends TextBit<void, void> {
   final _children = <TextBit>[];
 
   @override
@@ -340,7 +340,7 @@ class TextBits extends TextBit<void> {
       : [];
 }
 
-class _TextNewLine extends TextBit<Widget> {
+class _TextNewLine extends TextBit<TextStyleBuilder, Widget> {
   static const _kNewLine = '\n';
 
   final _sb = StringBuffer(_kNewLine);
@@ -367,7 +367,7 @@ class _TextNewLine extends TextBit<Widget> {
   void extend() => _sb.write(_kNewLine);
 }
 
-class _TextWhitespace extends TextBit<void> {
+class _TextWhitespace extends TextBit<void, void> {
   _TextWhitespace(TextBit parent)
       : assert(parent != null),
         super(parent);
