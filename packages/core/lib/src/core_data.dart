@@ -6,7 +6,6 @@ import 'package:html/dom.dart' as dom;
 import 'internal/margin_vertical.dart';
 import 'core_helpers.dart';
 import 'core_widget_factory.dart';
-import 'internal/tsh_widget.dart';
 
 part 'data/table.dart';
 part 'data/text_bits.dart';
