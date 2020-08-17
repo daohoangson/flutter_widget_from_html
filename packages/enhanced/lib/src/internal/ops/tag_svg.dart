@@ -1,5 +1,7 @@
 part of '../ops.dart';
 
+const kTagSvg = 'svg';
+
 class TagSvg {
   final WidgetFactory wf;
 

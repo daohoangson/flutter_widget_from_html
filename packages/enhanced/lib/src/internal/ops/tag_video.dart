@@ -1,5 +1,16 @@
 part of '../ops.dart';
 
+const kAttributeVideoAutoplay = 'autoplay';
+const kAttributeVideoControls = 'controls';
+const kAttributeVideoHeight = 'height';
+const kAttributeVideoLoop = 'loop';
+const kAttributeVideoPoster = 'poster';
+const kAttributeVideoSrc = 'src';
+const kAttributeVideoWidth = 'width';
+
+const kTagVideo = 'video';
+const kTagVideoSource = 'source';
+
 class TagVideo {
   final NodeMetadata videoMeta;
   final WidgetFactory wf;
@@ -19,13 +30,13 @@ class TagVideo {
   }
 
   void onChild(NodeMetadata childMeta, dom.Element e) {
-    if (e.localName != 'source') return;
+    if (e.localName != kTagVideoSource) return;
     if (e.parent != videoMeta.domElement) return;
 
     final a = e.attributes;
-    if (!a.containsKey('src')) return;
+    if (!a.containsKey(kAttributeVideoSrc)) return;
 
-    final url = wf.urlFull(a['src']);
+    final url = wf.urlFull(a[kAttributeVideoSrc]);
     if (url == null) return;
 
     _sourceUrls.add(url);
@@ -48,12 +59,18 @@ class TagVideo {
     return wf.buildVideoPlayer(
       videoMeta,
       _sourceUrls.first,
-      autoplay: a.containsKey('autoplay'),
-      controls: a.containsKey('controls'),
-      height: a.containsKey('height') ? double.tryParse(a['height']) : null,
-      loop: a.containsKey('loop'),
-      posterUrl: a.containsKey('poster') ? wf.urlFull(a['poster']) : null,
-      width: a.containsKey('width') ? double.tryParse(a['width']) : null,
+      autoplay: a.containsKey(kAttributeVideoAutoplay),
+      controls: a.containsKey(kAttributeVideoControls),
+      height: a.containsKey(kAttributeVideoHeight)
+          ? double.tryParse(a[kAttributeVideoHeight])
+          : null,
+      loop: a.containsKey(kAttributeVideoLoop),
+      posterUrl: a.containsKey(kAttributeVideoPoster)
+          ? wf.urlFull(a[kAttributeVideoPoster])
+          : null,
+      width: a.containsKey(kAttributeVideoWidth)
+          ? double.tryParse(a[kAttributeVideoWidth])
+          : null,
     );
   }
 }

@@ -1,5 +1,11 @@
 part of '../ops.dart';
 
+const kAttributeIframeHeight = 'height';
+const kAttributeIframeSrc = 'src';
+const kAttributeIframeWidth = 'width';
+
+const kTagIframe = 'iframe';
+
 class TagIframe {
   final WidgetFactory wf;
 
@@ -12,16 +18,20 @@ class TagIframe {
 
   Widget build(NodeMetadata meta) {
     final a = meta.domElement.attributes;
-    if (!a.containsKey('src')) return null;
+    if (!a.containsKey(kAttributeIframeSrc)) return null;
 
-    final src = wf.urlFull(a['src']);
+    final src = wf.urlFull(a[kAttributeIframeSrc]);
     if (src == null) return null;
 
     return wf.buildWebView(
       meta,
       src,
-      height: a.containsKey('height') ? double.tryParse(a['height']) : null,
-      width: a.containsKey('width') ? double.tryParse(a['width']) : null,
+      height: a.containsKey(kAttributeIframeHeight)
+          ? double.tryParse(a[kAttributeIframeHeight])
+          : null,
+      width: a.containsKey(kAttributeIframeWidth)
+          ? double.tryParse(a[kAttributeIframeWidth])
+          : null,
     );
   }
 }

@@ -252,17 +252,17 @@ class WidgetFactory extends core.WidgetFactory {
                 .copyWith(color: p.deps.getValue<ThemeData>().accentColor));
         meta.tsb(_tsbTagA);
         break;
-      case 'iframe':
+      case kTagIframe:
         _tagIframe ??= TagIframe(this).buildOp;
         meta.register(_tagIframe);
         // return asap to avoid being disabled by core
         return;
-      case 'svg':
+      case kTagSvg:
         _tagSvg ??= TagSvg(this).buildOp;
         meta.register(_tagSvg);
         // return asap to avoid being disabled by core
         return;
-      case 'video':
+      case kTagVideo:
         meta.register(TagVideo(this, meta).op);
         break;
     }
