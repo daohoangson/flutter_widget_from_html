@@ -12,16 +12,22 @@ class ColumnPlaceholder extends WidgetPlaceholder<NodeMetadata> {
     @required this.meta,
     @required this.trimMarginVertical,
     @required this.wf,
-  }) : super(generator: meta);
+  }) : super(meta);
 
-  List<Widget> get children {
+  @override
+  Widget build(BuildContext context) {
+    final tsh = meta.tsb().build(context);
+    return wf.buildColumnWidget(meta, tsh, getChildren(context)) ?? widget0;
+  }
+
+  List<Widget> getChildren(BuildContext context) {
     final contents = <Widget>[];
 
     HeightPlaceholder marginBottom, marginTop;
     Widget prev;
     var state = 0;
 
-    for (final child in _iterable) {
+    for (final child in _getIterable(context)) {
       if (state == 0) {
         if (child is HeightPlaceholder) {
           if (!trimMarginVertical) {
@@ -56,21 +62,22 @@ class ColumnPlaceholder extends WidgetPlaceholder<NodeMetadata> {
       }
     }
 
-    final column = wf.buildColumnWidget(meta, contents);
+    final tsh = meta.tsb().build(context);
+    final column = wf.buildColumnWidget(meta, tsh, contents);
 
     return [
       if (marginTop != null) marginTop,
-      if (column != null) callBuilders(column),
+      if (column != null) callBuilders(context, column),
       if (marginBottom != null) marginBottom,
     ];
   }
 
-  Iterable<Widget> get _iterable sync* {
+  Iterable<Widget> _getIterable(BuildContext context) sync* {
     for (var child in _children) {
       if (child == widget0) continue;
 
       if (child is ColumnPlaceholder) {
-        for (final grandChild in child.children) {
+        for (final grandChild in child.getChildren(context)) {
           yield grandChild;
         }
         continue;
@@ -79,8 +86,4 @@ class ColumnPlaceholder extends WidgetPlaceholder<NodeMetadata> {
       yield child;
     }
   }
-
-  @override
-  Widget build(BuildContext _) =>
-      wf.buildColumnWidget(meta, children) ?? widget0;
 }

@@ -3,16 +3,14 @@ part of '../core_ops.dart';
 const kCssPadding = 'padding';
 
 WidgetPlaceholder _paddingInlineAfter(TextStyleBuilder tsb, CssLengthBox box) =>
-    WidgetPlaceholder<CssLengthBox>(
-      child: _paddingInlineSizedBox(box.getValueRight(tsb.build())),
-      generator: box,
-    );
+    WidgetPlaceholder<CssLengthBox>(box)
+      ..wrapWith((context, _) =>
+          _paddingInlineSizedBox(box.getValueRight(tsb.build(context))));
 
 WidgetPlaceholder _paddingInlineBefore(TextStyleBuilder tsb, CssLengthBox b) =>
-    WidgetPlaceholder<CssLengthBox>(
-      child: _paddingInlineSizedBox(b.getValueLeft(tsb.build())),
-      generator: b,
-    );
+    WidgetPlaceholder<CssLengthBox>(b)
+      ..wrapWith((context, _) =>
+          _paddingInlineSizedBox(b.getValueLeft(tsb.build(context))));
 
 Widget _paddingInlineSizedBox(double width) =>
     width != null && width > 0 ? SizedBox(width: width) : widget0;
@@ -44,13 +42,14 @@ class StylePadding {
 
           return listOrNull(wf
               .buildColumnPlaceholder(meta, widgets)
-              ?.wrapWith((child) => _build(meta, child, padding)));
+              ?.wrapWith((c, w) => _build(c, meta, w, padding)));
         },
         priority: 9999,
       );
 
-  Widget _build(NodeMetadata meta, Widget child, CssLengthBox padding) {
-    final tsh = meta.tsb().build();
+  Widget _build(BuildContext context, NodeMetadata meta, Widget child,
+      CssLengthBox padding) {
+    final tsh = meta.tsb().build(context);
     return wf.buildPadding(
       meta,
       child,

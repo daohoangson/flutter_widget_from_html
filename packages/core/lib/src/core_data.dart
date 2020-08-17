@@ -94,7 +94,7 @@ class BuiltPiece {
   static WidgetPlaceholder _placeholder(Widget widget) =>
       widget is WidgetPlaceholder
           ? widget
-          : WidgetPlaceholder<Widget>(child: widget, generator: widget);
+          : WidgetPlaceholder<Widget>(widget, child: widget);
 }
 
 /// A border.
@@ -511,9 +511,9 @@ class TextStyleBuilder<T1> {
   }
 
   /// Builds a [TextStyleHtml] by calling queued callbacks.
-  TextStyleHtml build() {
+  TextStyleHtml build(BuildContext context) {
     assert(parent != null);
-    final parentOutput = parent.build();
+    final parentOutput = parent.build(context);
     if (parentOutput != _parentOutput) {
       _parentOutput = parentOutput;
       _output = null;

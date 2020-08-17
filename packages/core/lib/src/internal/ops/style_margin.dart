@@ -48,8 +48,7 @@ class StyleMargin {
           for (final widget in widgets) {
             if (m.hasLeftOrRight) {
               widget.wrapWith(
-                (child) => _marginHorizontalBuilder(child, m, tsb.build()),
-              );
+                  (c, w) => _marginHorizontalBuilder(w, m, tsb.build(c)));
             }
 
             ws[i++] = widget;

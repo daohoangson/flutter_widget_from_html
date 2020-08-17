@@ -3,14 +3,14 @@ part of '../core_ops.dart';
 class TextCompiler {
   final TextBits text;
 
-  List<_TextCompiled> _compiled;
-  List<InlineSpan> _spans;
+  List<TextCompiled> _compiled;
+  List<TextSpanBuilder> _spanBuilders;
   StringBuffer _buffer, _prevBuffer;
   TextStyleBuilder _tsb, _prevTsb;
 
   TextCompiler(this.text) : assert(text != null);
 
-  List<_TextCompiled> compile() {
+  List<TextCompiled> compile() {
     _compiled = [];
 
     _resetLoop(text.tsb);
@@ -20,7 +20,7 @@ class TextCompiler {
     _completeLoop();
 
     if (_compiled.isEmpty) {
-      _compiled.add(_TextCompiled(
+      _compiled.add(TextCompiled(
           widget: HeightPlaceholder(CssLength(1, CssLengthUnit.em), text.tsb)));
     }
 
@@ -28,7 +28,7 @@ class TextCompiler {
   }
 
   void _resetLoop(TextStyleBuilder tsb) {
-    _spans = [];
+    _spanBuilders = [];
     _buffer = StringBuffer();
     _tsb = tsb;
 
@@ -38,34 +38,32 @@ class TextCompiler {
 
   void _loop(final TextBit bit) {
     final tsb = _getBitTsb(bit);
-    if (_spans == null) _resetLoop(tsb);
+    if (_spanBuilders == null) _resetLoop(tsb);
 
     final thisTsb = tsb ?? _prevTsb;
     if (thisTsb?.hasSameStyleWith(_prevTsb) == false) _saveSpan();
 
-    if (bit.canCompile) {
-      if (bit is TextBit<InlineSpan>) {
-        _saveSpan();
-        final span = bit.compile(thisTsb);
-        if (span != null) _spans.add(span);
-      } else if (bit is TextBit<Widget>) {
-        _completeLoop();
-        final widget = bit.compile(thisTsb);
-        if (widget != null) _compiled.add(_TextCompiled(widget: widget));
-      }
-      return;
+    if (bit is TextBit<void, String>) {
+      _prevBuffer.write(bit.compile(null));
+      _prevTsb = thisTsb;
+    } else if (bit is TextBit<TextStyleHtml, InlineSpan>) {
+      _saveSpan();
+      _spanBuilders.add((context) => bit.compile(thisTsb?.build(context)));
+    } else if (bit is TextBit<TextStyleBuilder, Widget>) {
+      _completeLoop();
+      final widget = bit.compile(thisTsb);
+      if (widget != null) _compiled.add(TextCompiled(widget: widget));
     }
-
-    _prevBuffer.write(bit.data);
-    _prevTsb = thisTsb;
   }
 
   void _saveSpan() {
     if (_prevBuffer != _buffer && _prevBuffer.length > 0) {
-      _spans.add(TextSpan(
-        style: _prevTsb?.build()?.styleWithHeight,
-        text: _prevBuffer.toString(),
-      ));
+      final scopedTsb = _prevTsb;
+      final scopedText = _prevBuffer.toString();
+      _spanBuilders.add((context) => TextSpan(
+            style: scopedTsb?.build(context)?.styleWithHeight,
+            text: scopedText,
+          ));
     }
     _prevBuffer = StringBuffer();
   }
@@ -73,30 +71,31 @@ class TextCompiler {
   void _completeLoop() {
     _saveSpan();
 
-    InlineSpan span;
+    TextSpanBuilder spanBuilder;
     Widget widget;
-    if (_spans == null) {
+    if (_spanBuilders == null) {
       // intentionally left empty
-    } else if (_spans.length == 1 && _buffer.isEmpty) {
-      span = _spans[0];
+    } else if (_spanBuilders.isNotEmpty || _buffer.isNotEmpty) {
+      final scopedBuilders = _spanBuilders;
+      final scopedTsb = _tsb;
+      final scopedText = _buffer.toString();
+      spanBuilder = (context) {
+        final children = scopedBuilders
+            .map((spanBuilder) => spanBuilder(context))
+            .toList(growable: false);
+        if (scopedText.isEmpty && children.length == 1) return children.first;
 
-      if (span is WidgetSpan &&
-          span.alignment == PlaceholderAlignment.baseline &&
-          (text.tsb?.build()?.textAlign ?? TextAlign.start) ==
-              TextAlign.start) {
-        widget = span.child;
-      }
-    } else if (_spans.isNotEmpty || _buffer.isNotEmpty) {
-      span = TextSpan(
-        children: _spans,
-        style: _tsb?.build()?.styleWithHeight,
-        text: _buffer.toString(),
-      );
+        return TextSpan(
+          children: children,
+          style: scopedTsb?.build(context)?.styleWithHeight,
+          text: scopedText,
+        );
+      };
     }
 
-    _spans = null;
-    if (span == null) return;
-    _compiled.add(_TextCompiled(span: span, widget: widget));
+    _spanBuilders = null;
+    if (spanBuilder == null) return;
+    _compiled.add(TextCompiled(spanBuilder: spanBuilder, widget: widget));
   }
 
   static TextStyleBuilder _getBitTsb(TextBit bit) {
@@ -134,12 +133,14 @@ class TextCompiler {
 }
 
 @immutable
-class _TextCompiled {
-  final InlineSpan span;
+class TextCompiled {
+  final TextSpanBuilder spanBuilder;
   final Widget widget;
 
-  _TextCompiled({this.span, this.widget});
+  TextCompiled({this.spanBuilder, this.widget});
 }
+
+typedef TextSpanBuilder = InlineSpan Function(BuildContext);
 
 Iterable<BuiltPiece> _wrapTextBits(
   Iterable<BuiltPiece> pieces, {

@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 
 import '_.dart' as helper;
@@ -123,6 +124,12 @@ void main() {
               textStyle: textStyle,
             ));
 
+    final _expect = (Widget built1, Widget built2, Matcher matcher) {
+      final widget1 = (built1 as TshWidget).child;
+      final widget2 = (built2 as TshWidget).child;
+      expect(widget1 == widget2, matcher);
+    };
+
     testWidgets('caches built widget tree', (WidgetTester tester) async {
       final html = 'Foo';
       final explained = await explain(tester, html, true);
@@ -131,7 +138,7 @@ void main() {
 
       await explain(tester, html, true);
       final built2 = helper.buildCurrentState();
-      expect(built1 == built2, isTrue);
+      _expect(built1, built2, isTrue);
     });
 
     testWidgets('rebuild new html', (WidgetTester tester) async {
@@ -154,7 +161,7 @@ void main() {
 
       await explain(tester, html, true, baseUrl: Uri.http('domain.com', ''));
       final built2 = helper.buildCurrentState();
-      expect(built1 == built2, isFalse);
+      _expect(built1, built2, isFalse);
     });
 
     testWidgets('rebuild new buildAsync', (tester) async {
@@ -166,7 +173,7 @@ void main() {
 
       await explain(tester, html, true, buildAsync: false);
       final built2 = helper.buildCurrentState();
-      expect(built1 == built2, isFalse);
+      _expect(built1, built2, isFalse);
     });
 
     testWidgets('rebuild new enableCaching', (tester) async {
@@ -178,7 +185,7 @@ void main() {
 
       await explain(tester, html, false);
       final built2 = helper.buildCurrentState();
-      expect(built1 == built2, isFalse);
+      _expect(built1, built2, isFalse);
     });
 
     testWidgets('rebuild new hyperlinkColor', (tester) async {
@@ -191,7 +198,7 @@ void main() {
       await explain(tester, html, true,
           hyperlinkColor: Color.fromRGBO(255, 0, 0, 1));
       final built2 = helper.buildCurrentState();
-      expect(built1 == built2, isFalse);
+      _expect(built1, built2, isFalse);
     });
 
     testWidgets('rebuild new textStyle', (tester) async {
@@ -213,7 +220,7 @@ void main() {
 
       await explain(tester, html, false);
       final built2 = helper.buildCurrentState();
-      expect(built1 == built2, isFalse);
+      _expect(built1, built2, isFalse);
     });
   });
 

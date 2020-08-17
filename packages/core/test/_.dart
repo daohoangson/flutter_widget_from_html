@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter_widget_from_html_core/src/internal/css_sizing.dart';
+import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
 
 // https://stackoverflow.com/questions/6018611/smallest-data-uri-image-possible-for-a-transparent-image
 const kDataUri =
@@ -401,6 +402,8 @@ class Explainer {
     if (explained != null) return explained;
 
     if (widget == widget0) return '[widget0]';
+
+    if (widget is TshWidget) return _widget(widget.child);
 
     // ignore: invalid_use_of_protected_member
     if (widget is WidgetPlaceholder) return _widget(widget.build(context));

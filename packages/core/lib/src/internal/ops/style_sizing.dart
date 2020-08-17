@@ -31,7 +31,7 @@ class StyleSizing {
               for (final b in p.text?.bits) {
                 if (b is TextWidget) {
                   if (widget != null) return pieces;
-                  widget = b.widget;
+                  widget = b.child;
                 } else {
                   return pieces;
                 }
@@ -39,7 +39,7 @@ class StyleSizing {
             }
           }
 
-          widget?.wrapWith((child) => _build(child, input, meta.tsb()));
+          widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb()));
           return pieces;
         },
         onWidgets: (meta, widgets) {
@@ -47,7 +47,7 @@ class StyleSizing {
           if (input == null) return widgets;
           return listOrNull(wf
               .buildColumnPlaceholder(meta, widgets)
-              ?.wrapWith((child) => _build(child, input, meta.tsb())));
+              ?.wrapWith((c, w) => _build(c, w, input, meta.tsb())));
         },
         priority: 50000,
       );
@@ -95,17 +95,18 @@ class StyleSizing {
     );
   }
 
-  static Widget _build(
-      Widget child, _StyleSizingInput input, TextStyleBuilder tsb) {
+  static Widget _build(BuildContext context, Widget child,
+      _StyleSizingInput input, TextStyleBuilder tsb) {
+    final tsh = tsb.build(context);
     final constraints = BoxConstraints(
-      maxHeight: input.maxHeight?.getValue(tsb.build()) ?? double.infinity,
-      maxWidth: input.maxWidth?.getValue(tsb.build()) ?? double.infinity,
-      minHeight: input.minHeight?.getValue(tsb.build()) ?? 0,
-      minWidth: input.minWidth?.getValue(tsb.build()) ?? 0,
+      maxHeight: input.maxHeight?.getValue(tsh) ?? double.infinity,
+      maxWidth: input.maxWidth?.getValue(tsh) ?? double.infinity,
+      minHeight: input.minHeight?.getValue(tsh) ?? 0,
+      minWidth: input.minWidth?.getValue(tsh) ?? 0,
     );
     final size = Size(
-      input.width?.getValue(tsb.build()) ?? double.infinity,
-      input.height?.getValue(tsb.build()) ?? double.infinity,
+      input.width?.getValue(tsh) ?? double.infinity,
+      input.height?.getValue(tsh) ?? double.infinity,
     );
     return CssSizing(child: child, constraints: constraints, size: size);
   }
