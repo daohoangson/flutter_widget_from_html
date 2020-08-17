@@ -9,7 +9,7 @@ import 'core_helpers.dart';
 import 'core_html_widget.dart';
 import 'internal/css_block.dart';
 
-/// A factory to build widget for HTML elements.
+/// A factory to build widgets.
 class WidgetFactory {
   BuildOp _styleBgColor;
   BuildOp _styleDisplayBlock;
@@ -30,9 +30,11 @@ class WidgetFactory {
 
   HtmlWidget get _widget => _state.widget;
 
+  /// Builds primary column (body).
   WidgetPlaceholder buildBody(NodeMetadata meta, Iterable<Widget> children) =>
       buildColumnPlaceholder(meta, children, trimMarginVertical: true);
 
+  /// Builds column placeholder.
   WidgetPlaceholder buildColumnPlaceholder(
     NodeMetadata meta,
     Iterable<Widget> children, {
@@ -60,6 +62,7 @@ class WidgetFactory {
     );
   }
 
+  /// Builds [Column].
   Widget buildColumnWidget(NodeMetadata meta, List<Widget> children) {
     if (children?.isNotEmpty != true) return null;
     if (children.length == 1) return children.first;
@@ -72,6 +75,7 @@ class WidgetFactory {
     );
   }
 
+  /// Builds [DecoratedBox].
   Widget buildDecoratedBox(
     NodeMetadata meta,
     Widget child, {
@@ -86,16 +90,19 @@ class WidgetFactory {
             )
           : child;
 
+  /// Builds 1-pixel-height divider.
   Widget buildDivider(NodeMetadata meta) => const DecoratedBox(
         decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 1)),
         child: SizedBox(height: 1),
       );
 
+  /// Builds [GestureDetector].
   Widget buildGestureDetector(
           NodeMetadata meta, Widget child, GestureTapCallback onTap) =>
       GestureDetector(child: child, onTap: onTap);
 
-  TextSpan buildGestureTapCallbackSpan(
+  /// Builds [TextSpan] with [TapGestureRecognizer].
+  InlineSpan buildGestureTapCallbackSpan(
     String text,
     GestureTapCallback onTap,
     TextStyle style,
@@ -106,37 +113,38 @@ class WidgetFactory {
         style: style,
       );
 
+  /// Builds horizontal scroll view.
   Widget buildHorizontalScrollView(NodeMetadata meta, Widget child) =>
       SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
 
+  /// Builds [Image] from [provider].
   Widget buildImage(NodeMetadata node, Object provider, ImageMetadata image) =>
       provider != null && provider is ImageProvider && image != null
           ? Image(
-              errorBuilder: buildImageErrorWidgetBuilder(node, provider, image),
+              errorBuilder: (_, error, __) {
+                print('$provider error: $error');
+                final text = image.alt ?? image.title ?? '❌';
+                return Text(text);
+              },
               image: provider,
               semanticLabel: image.alt ?? image.title,
             )
           : null;
 
-  ImageErrorWidgetBuilder buildImageErrorWidgetBuilder(
-          NodeMetadata meta, Object provider, ImageMetadata image) =>
-      (_, error, __) {
-        print('$provider error: $error');
-        final text = image.alt ?? image.title ?? '❌';
-        return Text(text);
-      };
-
+  /// Builds [Padding].
   Widget buildPadding(NodeMetadata meta, Widget child, EdgeInsets padding) =>
       child != null && padding != null && padding != const EdgeInsets.all(0)
           ? Padding(child: child, padding: padding)
           : child;
 
+  /// Builds [Stack].
   Widget buildStack(NodeMetadata meta, List<Widget> children) => Stack(
         children: children,
         overflow: Overflow.visible,
         textDirection: meta.tsb().build().textDirection,
       );
 
+  /// Builds [Table].
   Widget buildTable(NodeMetadata node, TableMetadata table) {
     final rows = <TableRow>[];
     final slotIndices = <int>[];
@@ -169,6 +177,7 @@ class WidgetFactory {
     return Table(border: tableBorder, children: rows);
   }
 
+  /// Builds [RichText].
   WidgetPlaceholder buildText(NodeMetadata meta, TextBits text) {
     text.trimRight();
     if (text.isEmpty) return null;
@@ -207,18 +216,21 @@ class WidgetFactory {
     return buildColumnPlaceholder(meta, widgets);
   }
 
+  /// Prepares [GestureTapCallback].
   GestureTapCallback gestureTapCallback(String url) => url != null
       ? () => _widget.onTapUrl != null
           ? _widget.onTapUrl(url)
           : print('[flutter_widget_from_html] Tapped url $url')
       : null;
 
+  /// Returns [HtmlWidgetDependency]s from the provided [context].
   List<HtmlWidgetDependency> getDependencies(BuildContext context) => [
         HtmlWidgetDependency<MediaQueryData>(MediaQuery.of(context)),
         HtmlWidgetDependency<TextDirection>(Directionality.of(context)),
         HtmlWidgetDependency<TextStyle>(DefaultTextStyle.of(context).style),
       ];
 
+  /// Returns marker for the specified [type] at index [i].
   String getListStyleMarker(String type, int i) {
     switch (type) {
       case kCssListStyleTypeAlphaLower:
@@ -244,10 +256,10 @@ class WidgetFactory {
       case kCssListStyleTypeDisc:
         return '•';
       case kCssListStyleTypeRomanLower:
-        final roman = getListStyleMarkerRoman(i)?.toLowerCase();
+        final roman = _getListStyleMarkerRoman(i)?.toLowerCase();
         return roman != null ? '$roman.' : '';
       case kCssListStyleTypeRomanUpper:
-        final roman = getListStyleMarkerRoman(i);
+        final roman = _getListStyleMarkerRoman(i);
         return roman != null ? '$roman.' : '';
       case kCssListStyleTypeSquare:
         return '+';
@@ -256,7 +268,7 @@ class WidgetFactory {
     return '';
   }
 
-  String getListStyleMarkerRoman(int i) {
+  String _getListStyleMarkerRoman(int i) {
     // TODO: find some lib to generate programatically
     const map = <int, String>{
       1: 'I',
@@ -274,6 +286,7 @@ class WidgetFactory {
     return map.containsKey(i) ? map[i] : null;
   }
 
+  /// Returns [ImageProvider].
   Object imageProvider(ImageSource imgSrc) {
     if (imgSrc == null) return null;
     final url = imgSrc.url;
@@ -313,6 +326,7 @@ class WidgetFactory {
   Object _imageFromUrl(String url) =>
       url?.isNotEmpty == true ? NetworkImage(url) : null;
 
+  /// Parses [meta] for build ops and text styles.
   void parse(NodeMetadata meta) {
     final attrs = meta.domElement.attributes;
 
@@ -561,6 +575,7 @@ class WidgetFactory {
     }
   }
 
+  /// Parses inline style [key] and [value] pair.
   void parseStyle(NodeMetadata meta, String key, String value) {
     switch (key) {
       case kCssBackground:
@@ -705,9 +720,11 @@ class WidgetFactory {
     }
   }
 
+  /// Resets for new build.
   @mustCallSuper
   void reset(State<HtmlWidget> state) => _state = state;
 
+  /// Returns build op for block element.
   BuildOp styleDisplayBlock() {
     _styleDisplayBlock ??= BuildOp(
       onWidgets: (meta, widgets) => listOrNull(
@@ -717,6 +734,7 @@ class WidgetFactory {
     return _styleDisplayBlock;
   }
 
+  /// Resolves full URL with [HtmlWidget.baseUrl] if available.
   String urlFull(String url) {
     if (url?.isNotEmpty != true) return null;
     if (url.startsWith('data:')) return url;
