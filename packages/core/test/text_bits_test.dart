@@ -179,7 +179,6 @@ void main() {
         final newLine2 = text.addNewLine();
 
         expect(newLine2, equals(newLine1));
-        expect(newLine2.data.length, equals(2));
       });
     });
 
@@ -263,18 +262,21 @@ void main() {
 
 [TextBits]
   [TextData] data=1
-  [_TextWhitespace] data= 
+  [_TextWhitespace]
   [TextBits]
     [TextData] data=(2.1)
     [TextBits]
       [TextData] data=(2.2.1)
       [TextData] data=(2.2.2)
     [TextData] data=(2.3)
-  [TextWidget<TextBits>] widget=WidgetPlaceholder<TextBits>
+  [TextWidget] child=WidgetPlaceholder<TextBits>
 ----'''));
   });
 }
 
-String _data(TextBits text) => text.bits.map((bit) => bit.data ?? '').join('');
+String _data(TextBits text) => text.bits
+    .map((bit) =>
+        (bit is TextBit<void, String>) ? bit.compile(null) : bit.toString())
+    .join('');
 
 TextBits _text() => TextBits(TextStyleBuilder());

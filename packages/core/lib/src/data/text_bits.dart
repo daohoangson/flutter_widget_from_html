@@ -9,15 +9,6 @@ abstract class TextBit<CompileFrom, CompileTo> {
   /// Create a text bit.
   TextBit(this.parent);
 
-  /// Controls whether this bit can compile itself.
-  ///
-  /// If this is `true`, [compile] must be implemented.
-  /// If this is `false`, [data] will be appended into a buffer for rendering.
-  bool get canCompile => false;
-
-  /// The data string.
-  String get data => null;
-
   /// The associated [TextStyleBuilder].
   TextStyleBuilder get tsb => null;
 
@@ -77,10 +68,8 @@ abstract class TextBit<CompileFrom, CompileTo> {
     return null;
   }
 
-  /// Compiles into a [InlineSpan] or [Widget].
-  ///
-  /// Note: this method won't be called unless [canCompile] is `true`.
-  CompileTo compile(CompileFrom tsb) => throw UnimplementedError();
+  /// Compiles input into output.
+  CompileTo compile(CompileFrom input) => throw UnimplementedError();
 
   /// Removes self from the parent.
   bool detach() => parent?._children?.remove(this);
@@ -125,18 +114,11 @@ abstract class TextBit<CompileFrom, CompileTo> {
   }
 
   @override
-  String toString() {
-    final clazz = runtimeType.toString();
-    final contents = this is TextWidget
-        ? 'widget=${(this as TextWidget).widget}'
-        : 'data=$data';
-    return '[$clazz:$hashCode] $contents';
-  }
+  String toString() => '[${runtimeType}]';
 }
 
 /// A simple data bit.
-class TextData extends TextBit<void, void> {
-  @override
+class TextData extends TextBit<void, String> {
   final String data;
 
   @override
@@ -148,6 +130,12 @@ class TextData extends TextBit<void, void> {
         assert(data != null),
         assert(tsb != null),
         super(parent);
+
+  @override
+  String compile(void _) => data;
+
+  @override
+  String toString() => '[TextData] data=$data';
 }
 
 /// An inline widget to be rendered within text paragraph.
@@ -159,29 +147,29 @@ class TextWidget<T> extends TextBit<TextStyleHtml, InlineSpan> {
   final TextBaseline baseline;
 
   /// The widget to be rendered.
-  final WidgetPlaceholder<T> widget;
+  final WidgetPlaceholder<T> child;
 
   /// Creates an inline widget.
   TextWidget(
     TextBits parent,
-    this.widget, {
+    this.child, {
     this.alignment = PlaceholderAlignment.baseline,
     this.baseline = TextBaseline.alphabetic,
   })  : assert(parent != null),
-        assert(widget != null),
+        assert(child != null),
         assert(alignment != null),
         assert(baseline != null),
         super(parent);
 
   @override
-  bool get canCompile => true;
-
-  @override
   InlineSpan compile(TextStyleHtml _) => WidgetSpan(
         alignment: alignment,
         baseline: baseline,
-        child: widget,
+        child: child,
       );
+
+  @override
+  String toString() => '[TextWidget] child=$child';
 }
 
 /// A container of bits.
@@ -350,12 +338,6 @@ class _TextNewLine extends TextBit<TextStyleBuilder, Widget> {
         super(parent);
 
   @override
-  bool get canCompile => true;
-
-  @override
-  String get data => _sb.toString();
-
-  @override
   Widget compile(TextStyleBuilder tsb) {
     final lines = _sb.length - 1;
     if (lines < 1) return null;
@@ -367,11 +349,11 @@ class _TextNewLine extends TextBit<TextStyleBuilder, Widget> {
   void extend() => _sb.write(_kNewLine);
 }
 
-class _TextWhitespace extends TextBit<void, void> {
+class _TextWhitespace extends TextBit<void, String> {
   _TextWhitespace(TextBit parent)
       : assert(parent != null),
         super(parent);
 
   @override
-  String get data => ' ';
+  String compile(void _) => ' ';
 }

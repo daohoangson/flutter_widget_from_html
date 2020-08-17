@@ -31,7 +31,7 @@ class TagA {
             } else {
               for (final bit in piece.text.bits.toList(growable: false)) {
                 if (bit is TextWidget) {
-                  bit.widget.wrapWith((_, child) =>
+                  bit.child.wrapWith((_, child) =>
                       wf.buildGestureDetector(meta, child, onTap));
                 } else if (bit is TextData) {
                   bit.replaceWith(_TagATextData(bit, onTap, wf));
@@ -53,7 +53,6 @@ class TagA {
 }
 
 class _TagATextData extends TextBit<TextStyleHtml, InlineSpan> {
-  @override
   final String data;
 
   final GestureTapCallback onTap;
@@ -63,13 +62,10 @@ class _TagATextData extends TextBit<TextStyleHtml, InlineSpan> {
 
   final WidgetFactory wf;
 
-  _TagATextData(TextBit bit, this.onTap, this.wf)
+  _TagATextData(TextData bit, this.onTap, this.wf)
       : data = bit.data,
         tsb = bit.tsb,
         super(bit.parent);
-
-  @override
-  bool get canCompile => true;
 
   @override
   InlineSpan compile(TextStyleHtml tsh) =>

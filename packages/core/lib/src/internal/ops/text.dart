@@ -43,20 +43,17 @@ class TextCompiler {
     final thisTsb = tsb ?? _prevTsb;
     if (thisTsb?.hasSameStyleWith(_prevTsb) == false) _saveSpan();
 
-    if (bit.canCompile) {
-      if (bit is TextBit<TextStyleHtml, InlineSpan>) {
-        _saveSpan();
-        _spanBuilders.add((context) => bit.compile(thisTsb?.build(context)));
-      } else if (bit is TextBit<TextStyleBuilder, Widget>) {
-        _completeLoop();
-        final widget = bit.compile(thisTsb);
-        if (widget != null) _compiled.add(TextCompiled(widget: widget));
-      }
-      return;
+    if (bit is TextBit<void, String>) {
+      _prevBuffer.write(bit.compile(null));
+      _prevTsb = thisTsb;
+    } else if (bit is TextBit<TextStyleHtml, InlineSpan>) {
+      _saveSpan();
+      _spanBuilders.add((context) => bit.compile(thisTsb?.build(context)));
+    } else if (bit is TextBit<TextStyleBuilder, Widget>) {
+      _completeLoop();
+      final widget = bit.compile(thisTsb);
+      if (widget != null) _compiled.add(TextCompiled(widget: widget));
     }
-
-    _prevBuffer.write(bit.data);
-    _prevTsb = thisTsb;
   }
 
   void _saveSpan() {

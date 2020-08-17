@@ -16,14 +16,14 @@ class TagQ {
       );
 }
 
-class _TagQBit extends TextBit {
+class _TagQBit extends TextBit<void, String> {
   final bool isOpening;
 
   _TagQBit(TextBits parent, {@required this.isOpening}) : super(parent);
 
   @override
-  String get data => isOpening ? '“' : '”';
+  TextStyleBuilder get tsb => parent.tsb;
 
   @override
-  TextStyleBuilder get tsb => parent.tsb;
+  String compile(void _) => isOpening ? '“' : '”';
 }

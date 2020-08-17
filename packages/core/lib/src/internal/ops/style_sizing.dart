@@ -31,7 +31,7 @@ class StyleSizing {
               for (final b in p.text?.bits) {
                 if (b is TextWidget) {
                   if (widget != null) return pieces;
-                  widget = b.widget;
+                  widget = b.child;
                 } else {
                   return pieces;
                 }
