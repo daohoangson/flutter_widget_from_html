@@ -12,7 +12,7 @@ class ColumnPlaceholder extends WidgetPlaceholder<NodeMetadata> {
     @required this.meta,
     @required this.trimMarginVertical,
     @required this.wf,
-  }) : super(generator: meta);
+  }) : super(meta);
 
   @override
   Widget build(BuildContext context) {

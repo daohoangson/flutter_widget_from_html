@@ -31,7 +31,7 @@ class TagImg {
 
           text.add(_ImageBit(
             text,
-            WidgetPlaceholder<ImageMetadata>(child: built, generator: image),
+            WidgetPlaceholder<ImageMetadata>(image, child: built),
           ));
           return pieces;
         },
@@ -42,9 +42,7 @@ class TagImg {
           final built = _build(node, image);
           if (built == null) return [];
 
-          return [
-            WidgetPlaceholder<ImageMetadata>(child: built, generator: image)
-          ];
+          return [WidgetPlaceholder<ImageMetadata>(image, child: built)];
         },
       );
 

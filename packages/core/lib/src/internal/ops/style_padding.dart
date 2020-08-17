@@ -3,12 +3,12 @@ part of '../core_ops.dart';
 const kCssPadding = 'padding';
 
 WidgetPlaceholder _paddingInlineAfter(TextStyleBuilder tsb, CssLengthBox box) =>
-    WidgetPlaceholder<CssLengthBox>(generator: box)
+    WidgetPlaceholder<CssLengthBox>(box)
       ..wrapWith((context, _) =>
           _paddingInlineSizedBox(box.getValueRight(tsb.build(context))));
 
 WidgetPlaceholder _paddingInlineBefore(TextStyleBuilder tsb, CssLengthBox b) =>
-    WidgetPlaceholder<CssLengthBox>(generator: b)
+    WidgetPlaceholder<CssLengthBox>(b)
       ..wrapWith((context, _) =>
           _paddingInlineSizedBox(b.getValueLeft(tsb.build(context))));
 

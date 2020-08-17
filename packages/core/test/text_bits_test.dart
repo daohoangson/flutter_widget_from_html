@@ -121,7 +121,7 @@ void main() {
 
       test('returns false for widget', () {
         final text = _text();
-        final widget = WidgetPlaceholder(generator: text);
+        final widget = WidgetPlaceholder<TextBits>(text);
         text.add(TextWidget(text, widget));
 
         expect(text.hasTrailingWhitespace, isFalse);
@@ -253,7 +253,7 @@ void main() {
     text22.addText('(2.2.1)');
     text22.addText('(2.2.2)');
     text2.addText('(2.3)');
-    final widget = WidgetPlaceholder(generator: text);
+    final widget = WidgetPlaceholder<TextBits>(text);
     text.add(TextWidget(text, widget));
 
     final str = text.toString().replaceAll(RegExp(r':\d+\]'), ']');

@@ -49,7 +49,7 @@ class TagVideo {
     if (player == null) return widgets;
 
     return [
-      WidgetPlaceholder<NodeMetadata>(child: player, generator: videoMeta),
+      WidgetPlaceholder<NodeMetadata>(videoMeta, child: player),
     ];
   }
 

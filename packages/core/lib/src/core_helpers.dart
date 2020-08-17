@@ -43,9 +43,7 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   final Widget _firstChild;
 
   /// Creates a widget builder.
-  WidgetPlaceholder({Widget child, @required this.generator})
-      : assert(generator != null),
-        _firstChild = child;
+  WidgetPlaceholder(this.generator, {Widget child}) : _firstChild = child;
 
   @override
   Widget build(BuildContext context) => callBuilders(context, _firstChild);

@@ -194,7 +194,7 @@ class WidgetFactory {
 
       if (compiled.spanBuilder == null) continue;
       widgets.add(
-        WidgetPlaceholder<TextBits>(generator: text)
+        WidgetPlaceholder<TextBits>(text)
           ..wrapWith((context, _) {
             final span = compiled.spanBuilder(context);
             final tsh = text.tsb?.build(context);

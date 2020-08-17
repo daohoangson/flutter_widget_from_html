@@ -80,7 +80,7 @@ class TagTable {
     if (_data.captions.isEmpty && rows.isEmpty) return [];
 
     return [
-      WidgetPlaceholder<NodeMetadata>(generator: tableMeta)
+      WidgetPlaceholder<NodeMetadata>(tableMeta)
         ..wrapWith((context, _) {
           final metadata = TableMetadata(border: _parseBorder(context));
 

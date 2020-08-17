@@ -94,7 +94,7 @@ class BuiltPiece {
   static WidgetPlaceholder _placeholder(Widget widget) =>
       widget is WidgetPlaceholder
           ? widget
-          : WidgetPlaceholder<Widget>(child: widget, generator: widget);
+          : WidgetPlaceholder<Widget>(widget, child: widget);
 }
 
 /// A border.

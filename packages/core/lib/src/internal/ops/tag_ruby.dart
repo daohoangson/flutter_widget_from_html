@@ -74,7 +74,7 @@ class TagRuby {
   }
 
   TextBit _buildTextBit(TextBits parent, Widget ruby, Widget rt) {
-    final widget = WidgetPlaceholder<NodeMetadata>(generator: rubyMeta)
+    final widget = WidgetPlaceholder<NodeMetadata>(rubyMeta)
       ..wrapWith((context, _) {
         final tsh = _rtText.tsb.build(context);
         final paddingValue = tsh.style.fontSize *

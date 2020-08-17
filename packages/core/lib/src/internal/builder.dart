@@ -53,8 +53,7 @@ class HtmlBuilder {
       final _makeSureWidgetIsPlaceholder = (Widget widget) =>
           widget is WidgetPlaceholder
               ? widget
-              : WidgetPlaceholder<NodeMetadata>(
-                  child: widget, generator: parentMeta);
+              : WidgetPlaceholder<NodeMetadata>(parentMeta, child: widget);
 
       for (final op in parentMeta.buildOps) {
         widgets = op.onWidgets
