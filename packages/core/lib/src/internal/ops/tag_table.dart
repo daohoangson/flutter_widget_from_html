@@ -116,13 +116,9 @@ class TagTable {
       }
     }
 
-    final a = tableMeta.domElement.attributes;
-    if (a.containsKey(kAttributeBorder)) {
-      final width = double.tryParse(a[kAttributeBorder]);
-      if (width != null && width > 0) {
-        return BorderSide(width: width);
-      }
-    }
+    final width = tryParseDoubleFromMap(
+        tableMeta.domElement.attributes, kAttributeBorder);
+    if (width != null && width > 0) return BorderSide(width: width);
 
     return null;
   }

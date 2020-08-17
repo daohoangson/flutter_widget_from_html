@@ -681,10 +681,7 @@ class WidgetFactory {
         meta
           ..[kCssDisplay] = kCssDisplayTable
           ..register(TagTable.cellPaddingOp(
-              (attrs.containsKey(kAttributeCellPadding)
-                      ? double.tryParse(attrs[kAttributeCellPadding])
-                      : null) ??
-                  1));
+              tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1));
         break;
       case kTagTableHeaderCell:
         meta.tsb(TextStyleOps.fontWeight, FontWeight.bold);

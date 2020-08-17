@@ -55,22 +55,18 @@ class TagVideo {
   Widget build() {
     if (_sourceUrls.isEmpty) return null;
 
-    final a = videoMeta.domElement.attributes;
+    final attrs = videoMeta.domElement.attributes;
     return wf.buildVideoPlayer(
       videoMeta,
       _sourceUrls.first,
-      autoplay: a.containsKey(kAttributeVideoAutoplay),
-      controls: a.containsKey(kAttributeVideoControls),
-      height: a.containsKey(kAttributeVideoHeight)
-          ? double.tryParse(a[kAttributeVideoHeight])
+      autoplay: attrs.containsKey(kAttributeVideoAutoplay),
+      controls: attrs.containsKey(kAttributeVideoControls),
+      height: tryParseDoubleFromMap(attrs, kAttributeVideoHeight),
+      loop: attrs.containsKey(kAttributeVideoLoop),
+      posterUrl: attrs.containsKey(kAttributeVideoPoster)
+          ? wf.urlFull(attrs[kAttributeVideoPoster])
           : null,
-      loop: a.containsKey(kAttributeVideoLoop),
-      posterUrl: a.containsKey(kAttributeVideoPoster)
-          ? wf.urlFull(a[kAttributeVideoPoster])
-          : null,
-      width: a.containsKey(kAttributeVideoWidth)
-          ? double.tryParse(a[kAttributeVideoWidth])
-          : null,
+      width: tryParseDoubleFromMap(attrs, kAttributeVideoWidth),
     );
   }
 }

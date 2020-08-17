@@ -17,21 +17,17 @@ class TagIframe {
       });
 
   Widget build(NodeMetadata meta) {
-    final a = meta.domElement.attributes;
-    if (!a.containsKey(kAttributeIframeSrc)) return null;
+    final attrs = meta.domElement.attributes;
+    if (!attrs.containsKey(kAttributeIframeSrc)) return null;
 
-    final src = wf.urlFull(a[kAttributeIframeSrc]);
+    final src = wf.urlFull(attrs[kAttributeIframeSrc]);
     if (src == null) return null;
 
     return wf.buildWebView(
       meta,
       src,
-      height: a.containsKey(kAttributeIframeHeight)
-          ? double.tryParse(a[kAttributeIframeHeight])
-          : null,
-      width: a.containsKey(kAttributeIframeWidth)
-          ? double.tryParse(a[kAttributeIframeWidth])
-          : null,
+      height: tryParseDoubleFromMap(attrs, kAttributeIframeHeight),
+      width: tryParseDoubleFromMap(attrs, kAttributeIframeWidth),
     );
   }
 }

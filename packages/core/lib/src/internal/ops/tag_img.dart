@@ -65,12 +65,8 @@ class TagImg {
           ? [
               ImageSource(
                 url,
-                height: attrs.containsKey(kAttributeImgHeight)
-                    ? double.tryParse(attrs[kAttributeImgHeight])
-                    : null,
-                width: attrs.containsKey(kAttributeImgWidth)
-                    ? double.tryParse(attrs[kAttributeImgWidth])
-                    : null,
+                height: tryParseDoubleFromMap(attrs, kAttributeImgHeight),
+                width: tryParseDoubleFromMap(attrs, kAttributeImgWidth),
               ),
             ]
           : null,
