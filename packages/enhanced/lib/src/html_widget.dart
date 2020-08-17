@@ -43,7 +43,7 @@ class HtmlWidget extends core.HtmlWidget {
     bool buildAsync,
     AsyncWidgetBuilder<Widget> buildAsyncBuilder,
     bool enableCaching = true,
-    WidgetFactory Function() factoryBuilder = _singleton,
+    WidgetFactory Function() factoryBuilder,
     Key key,
     Uri baseUrl,
     CustomStylesBuilder customStylesBuilder,
@@ -60,21 +60,30 @@ class HtmlWidget extends core.HtmlWidget {
           html,
           baseUrl: baseUrl,
           buildAsync: buildAsync,
-          buildAsyncBuilder: buildAsyncBuilder,
+          buildAsyncBuilder: buildAsyncBuilder ?? _buildAsyncBuilder,
           customStylesBuilder: customStylesBuilder,
           customWidgetBuilder: customWidgetBuilder,
           enableCaching: enableCaching,
-          factoryBuilder: factoryBuilder,
+          factoryBuilder: factoryBuilder ?? _getEnhancedWf,
           hyperlinkColor: hyperlinkColor,
           onTapUrl: onTapUrl,
           textStyle: textStyle,
           key: key,
         );
 
-  static WidgetFactory _wf;
-
-  static WidgetFactory _singleton() {
-    _wf ??= WidgetFactory();
-    return _wf;
+  static WidgetFactory _enhancedWf;
+  static WidgetFactory _getEnhancedWf() {
+    _enhancedWf ??= WidgetFactory();
+    return _enhancedWf;
   }
 }
+
+Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
+    snapshot.hasData
+        ? snapshot.data
+        : const Center(
+            child: Padding(
+              child: CircularProgressIndicator(),
+              padding: EdgeInsets.all(8),
+            ),
+          );

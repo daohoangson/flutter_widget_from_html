@@ -22,7 +22,7 @@ class StyleSizing {
 
           WidgetPlaceholder widget;
           for (final p in pieces) {
-            if (p.hasWidgets) {
+            if (p.widgets != null) {
               for (final w in p.widgets) {
                 if (widget != null) return pieces;
                 widget = w;

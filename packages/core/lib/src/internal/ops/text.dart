@@ -105,24 +105,22 @@ class TextCompiler {
     // the below code will find the best style for this whitespace bit
     // easy case: whitespace at the beginning of a tag, use the previous style
     final parent = bit.parent;
-    if (bit == parent.first) return null;
+    if (parent == null || bit == parent.first) return null;
 
     // complicated: whitespace at the end of a tag, try to merge with the next
     // unless it has unrelated style (e.g. next bit is a sibling)
-    if (bit == TextBit.tailOf(parent)) {
+    if (bit == parent.last) {
       final next = bit.next;
       if (next?.tsb != null) {
-        // get the outer-most text having this as the last bit
-        var bp = bit.parent;
-        var bpTail = TextBit.tailOf(bp);
+        // get the outer-most bits having this as the last bit
+        var bits = parent;
         while (true) {
-          final parentTail = TextBit.tailOf(bp.parent);
-          if (bpTail != parentTail) break;
-          bp = bp.parent;
-          bpTail = parentTail;
+          final bitsParentLast = bits.parent?.last;
+          if (bitsParentLast != bit) break;
+          bits = bits.parent;
         }
 
-        if (bp.parent == next.parent) {
+        if (bits.parent == next.parent) {
           return next.tsb;
         } else {
           return null;
@@ -131,7 +129,7 @@ class TextCompiler {
     }
 
     // fallback to default (style from parent)
-    return bit.parent.tsb;
+    return parent.tsb;
   }
 }
 

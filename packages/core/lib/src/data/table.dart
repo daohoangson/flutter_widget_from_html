@@ -1,21 +1,30 @@
 part of '../core_data.dart';
 
+/// A table.
 @immutable
 class TableMetadata {
+  /// The table border.
   final BorderSide border;
 
   final Map<int, Map<int, int>> _grid = {};
 
   final List<_TableMetadataSlot> _slots = [];
 
+  /// Creates a table.
   TableMetadata({this.border});
 
+  /// The number of columns.
   int get cols => _grid.values.fold(0, _colsCombine);
 
+  /// The number of cells.
   int get length => _slots.length;
 
+  /// The number of rows.
   int get rows => _grid.keys.fold(0, _rowsCombine);
 
+  /// Adds cell at the specified [row] taking [colspan] and [rowspan] into account.
+  ///
+  /// The column number will be determined automatically.
   int addCell(int row, Widget child, {int colspan = 1, int rowspan = 1}) {
     _grid[row] ??= {};
     var col = 0;
@@ -42,6 +51,7 @@ class TableMetadata {
     return index;
   }
 
+  /// Gets the cell index by [column] and [row].
   int getIndexAt({int column, int row}) {
     if (!_grid.containsKey(row)) return -1;
     final map = _grid[row];
@@ -49,8 +59,10 @@ class TableMetadata {
     return map[column];
   }
 
+  /// Gets the cell widget by [index].
   Widget getWidgetAt(int index) => _slots[index].child;
 
+  /// Applies the function [callback] to each cell.
   void visitCells(
     void Function(int col, int row, Widget widget, int colspan, int rowspan)
         callback,

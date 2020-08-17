@@ -112,8 +112,7 @@ class _OnPiecesTestText extends WidgetFactory {
   void parse(NodeMetadata meta) {
     meta.register(BuildOp(onPieces: (_, pieces) {
       for (final piece in pieces) {
-        if (piece.hasWidgets) continue;
-        piece.text.addText(' bar');
+        piece.text?.addText(' bar');
       }
 
       return pieces;
@@ -127,7 +126,7 @@ class _OnPiecesTestWidget extends WidgetFactory {
   void parse(NodeMetadata meta) {
     meta.register(BuildOp(onPieces: (_, pieces) {
       for (final piece in pieces) {
-        if (piece.hasWidgets) continue;
+        if (piece.text == null) continue;
         for (final bit in List<TextBit>.unmodifiable(piece.text.bits)) {
           bit.detach();
         }

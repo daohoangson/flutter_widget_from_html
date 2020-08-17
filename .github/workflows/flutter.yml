@@ -83,7 +83,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          body: "Deployed ${{ github.sha }} to ${{ steps.now.outputs.url }}.\n\nQuick links:\n- [core](${{ steps.now.outputs.url }}/packages/core/doc/api/)\n- [enhanced](${{ steps.now.outputs.url }}/packages/enhanced/doc/api/)" 
+          body: "Deployed ${{ github.sha }} to ${{ steps.now.outputs.url }}.\n\nQuick links:\n- [core README](${{ steps.now.outputs.url }}/packages/core/doc/api/)\n- [flutter_widget_from_html_core library](${{ steps.now.outputs.url }}/packages/core/doc/api/flutter_widget_from_html_core/flutter_widget_from_html_core-library.html)\n- [enhanced README](${{ steps.now.outputs.url }}/packages/enhanced/doc/api/)\n- [flutter_widget_from_html library](${{ steps.now.outputs.url }}/packages/enhanced/doc/api/flutter_widget_from_html/flutter_widget_from_html-library.html)\n" 
           fingerprint: "## Dartdoc"
           replace: please
 

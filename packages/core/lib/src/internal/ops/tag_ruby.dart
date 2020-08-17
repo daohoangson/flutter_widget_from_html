@@ -34,7 +34,7 @@ class TagRuby {
         _rtOp ??= BuildOp(
           onPieces: (_, pieces) {
             for (final piece in pieces) {
-              if (piece.hasWidgets) continue;
+              if (piece.text == null) continue;
               _rtText = piece.text..detach();
             }
 
@@ -55,7 +55,7 @@ class TagRuby {
     var processed = false;
 
     return pieces.map((piece) {
-      if (piece.hasWidgets || processed) return piece;
+      if (piece.text == null || processed) return piece;
       processed = true;
 
       final rtBuilt = wf.buildText(meta, _rtText);
@@ -65,11 +65,9 @@ class TagRuby {
       final built = wf.buildText(meta, text);
       if (built == null) return piece;
 
-      final parent = text.parent;
-      final replacement = parent.sub(text.tsb)..detach();
+      final replacement = text.parent.sub(text.tsb)..detach();
       text.replaceWith(replacement);
-
-      replacement.add(_buildTextBit(parent, built, rtBuilt));
+      replacement.add(_buildTextBit(replacement, built, rtBuilt));
 
       return BuiltPiece.text(replacement);
     }).toList(growable: false);
@@ -79,7 +77,7 @@ class TagRuby {
     final tsh = _rtText.tsb.build();
     final padding = tsh.style.fontSize *
         .75 *
-        tsh.deps.getValue<MediaQueryData>().textScaleFactor;
+        tsh.getDependency<MediaQueryData>().textScaleFactor;
 
     final widget = WidgetPlaceholder<NodeMetadata>(
       child: wf.buildStack(

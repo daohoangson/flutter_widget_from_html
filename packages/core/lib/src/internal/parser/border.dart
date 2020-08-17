@@ -12,26 +12,29 @@ CssBorderSide tryParseCssBorderSide(String value) {
   if (valuesThree != null) {
     final width = tryParseCssLength(valuesThree[1]);
     if (width == null || width.number <= 0) return null;
-    return CssBorderSide()
-      ..color = tryParseColor(valuesThree[3])
-      ..style = tryParseCssBorderStyle(valuesThree[2])
-      ..width = width;
+    return CssBorderSide(
+      color: tryParseColor(valuesThree[3]),
+      style: tryParseCssBorderStyle(valuesThree[2]),
+      width: width,
+    );
   }
 
   final valuesTwo = _borderValuesTwoRegExp.firstMatch(value);
   if (valuesTwo != null) {
     final width = tryParseCssLength(valuesTwo[1]);
     if (width == null || width.number <= 0) return null;
-    return CssBorderSide()
-      ..style = tryParseCssBorderStyle(valuesTwo[2])
-      ..width = width;
+    return CssBorderSide(
+      style: tryParseCssBorderStyle(valuesTwo[2]),
+      width: width,
+    );
   }
 
   final width = tryParseCssLength(value);
   if (width == null || width.number <= 0) return null;
-  return CssBorderSide()
-    ..style = TextDecorationStyle.solid
-    ..width = width;
+  return CssBorderSide(
+    style: TextDecorationStyle.solid,
+    width: width,
+  );
 }
 
 TextDecorationStyle tryParseCssBorderStyle(String value) {

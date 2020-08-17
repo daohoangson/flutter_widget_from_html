@@ -9,11 +9,11 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'internal/ops.dart';
 import 'data.dart';
-import 'helpers.dart';
 import 'html_widget.dart';
+import 'internal/video_player.dart';
+import 'internal/web_view.dart';
 
-/// A factory to build widget for HTML elements
-/// with support for [WebView] and [VideoPlayer] etc.
+/// A factory to build widgets with [WebView], [VideoPlayer], etc.
 class WidgetFactory extends core.WidgetFactory {
   State<core.HtmlWidget> _state;
   BuildOp _tagIframe;
@@ -25,14 +25,17 @@ class WidgetFactory extends core.WidgetFactory {
     return candidate is HtmlWidget ? candidate : null;
   }
 
+  /// Builds [Divider].
   @override
   Widget buildDivider(NodeMetadata meta) => const Divider(height: 1);
 
+  /// Builds [InkWell].
   @override
   Widget buildGestureDetector(
           NodeMetadata meta, Widget child, GestureTapCallback onTap) =>
       InkWell(child: child, onTap: onTap);
 
+  /// Builds [SvgPicture] or [Image].
   @override
   Widget buildImage(NodeMetadata meta, Object provider, ImageMetadata image) {
     var built = super.buildImage(meta, provider, image);
@@ -48,6 +51,7 @@ class WidgetFactory extends core.WidgetFactory {
     return built;
   }
 
+  /// Builds [LayoutGrid].
   @override
   Widget buildTable(NodeMetadata node, TableMetadata table) {
     final cols = table.cols;
@@ -109,6 +113,7 @@ class WidgetFactory extends core.WidgetFactory {
     );
   }
 
+  /// Builds [VideoPlayer].
   Widget buildVideoPlayer(
     NodeMetadata meta,
     String url, {
@@ -138,6 +143,7 @@ class WidgetFactory extends core.WidgetFactory {
     );
   }
 
+  /// Builds [WebView].
   Widget buildWebView(
     NodeMetadata meta,
     String url, {
@@ -164,6 +170,7 @@ class WidgetFactory extends core.WidgetFactory {
     );
   }
 
+  /// Builds fallback link when [HtmlWidget.webView] is disabled.
   Widget buildWebViewLinkOnly(NodeMetadata meta, String url) => GestureDetector(
         child: Text(url),
         onTap: gestureTapCallback(url),
@@ -187,6 +194,7 @@ class WidgetFactory extends core.WidgetFactory {
       super.getDependencies(context)
         ..add(HtmlWidgetDependency<ThemeData>(Theme.of(context)));
 
+  /// Returns flutter_svg.[PictureProvider] or [ImageProvider].
   @override
   Object imageProvider(ImageSource imgSrc) {
     if (imgSrc == null) return super.imageProvider(imgSrc);
@@ -245,7 +253,7 @@ class WidgetFactory extends core.WidgetFactory {
       case 'a':
         _tsbTagA ??= (p, _) => p.copyWith(
             style: p.style
-                .copyWith(color: p.deps.getValue<ThemeData>().accentColor));
+                .copyWith(color: p.getDependency<ThemeData>().accentColor));
         meta.tsb(_tsbTagA);
         break;
       case kTagIframe:

@@ -3,14 +3,7 @@ import 'package:test/test.dart';
 
 void main() {
   group('TextBit', () {
-    test('returns index', () {
-      final text = _text();
-      final bit = text.addText('data');
-
-      expect(bit.index, equals(0));
-    });
-
-    group('next', () {
+    group('prev+next', () {
       final text = _text();
       final bit1 = text.addText('1');
       final text2 = text.sub();
@@ -20,19 +13,33 @@ void main() {
 
       test('test data', () => expect(_data(text), equals('1(2.1)(2.2)3')));
 
-      test('returns sibling', () => expect(bit21.next, equals(bit22)));
+      group('prev', () {
+        test('returns sibling', () => expect(bit22.prev, equals(bit21)));
 
-      test('returns first of next sub', () => expect(bit1.next, equals(bit21)));
+        test('returns last of previous sub',
+            () => expect(bit21.prev, equals(bit1)));
 
-      test('returns from parent', () => expect(bit22.next, equals(bit3)));
+        test('returns from parent', () => expect(bit3.prev, equals(bit22)));
 
-      test('returns null', () => expect(bit3.next, isNull));
+        test('returns null', () => expect(bit1.prev, isNull));
+      });
+
+      group('next', () {
+        test('returns sibling', () => expect(bit21.next, equals(bit22)));
+
+        test('returns first of next sub',
+            () => expect(bit1.next, equals(bit21)));
+
+        test('returns from parent', () => expect(bit22.next, equals(bit3)));
+
+        test('returns null', () => expect(bit3.next, isNull));
+      });
     });
 
     test('detaches', () {
       final text = _text();
       final bit = text.addText('data');
-      expect(text.isNotEmpty, isTrue);
+      expect(text.isEmpty, isFalse);
 
       bit.detach();
       expect(text.isEmpty, isTrue);
@@ -67,25 +74,6 @@ void main() {
 
       bitX.replaceWith(TextData(text, '2', text.tsb));
       expect(_data(text), equals('123'));
-    });
-
-    group('tailOf', () {
-      final text = _text();
-      final text1 = text.sub();
-      final text11 = text1.sub();
-      final bit111 = text11.addText('(1.1.1)');
-      final text2 = text.sub();
-      final bit3 = text.addText('3');
-
-      test('test data', () => expect(_data(text), equals('(1.1.1)3')));
-
-      test('returns', () => expect(TextBit.tailOf(text), equals(bit3)));
-
-      test('returns from sub',
-          () => expect(TextBit.tailOf(text1), equals(bit111)));
-
-      test('returns from parent',
-          () => expect(TextBit.tailOf(text2), equals(bit3)));
     });
   });
 
@@ -149,7 +137,7 @@ void main() {
       final text = _text();
       text.addText('data');
 
-      expect(text.isNotEmpty, isTrue);
+      expect(text.isEmpty, isFalse);
     });
 
     group('last', () {
@@ -252,28 +240,6 @@ void main() {
 
         text.trimRight();
         expect(text1.bits.length, equals(1));
-      });
-
-      test('trims empty sub', () {
-        final text = _text();
-        final sub = text.sub();
-        expect(sub.index, equals(0));
-
-        text.trimRight();
-        expect(sub.index, equals(-1));
-      });
-
-      test('trims bits from sub and the sub itself', () {
-        final text = _text();
-        text.addText('data');
-        final sub = text.sub();
-        sub.addWhitespace();
-        expect(text.bits.length, equals(2));
-        expect(sub.index, equals(1));
-
-        text.trimRight();
-        expect(text.bits.length, equals(1));
-        expect(sub.index, equals(-1));
       });
     });
   });

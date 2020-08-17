@@ -23,7 +23,7 @@ class TagA {
           if (onTap == null) return pieces;
 
           for (final piece in pieces) {
-            if (piece.hasWidgets) {
+            if (piece.widgets != null) {
               for (final widget in piece.widgets) {
                 widget.wrapWith(
                     (child) => wf.buildGestureDetector(meta, child, onTap));

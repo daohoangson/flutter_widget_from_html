@@ -1,28 +1,12 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html/src/internal/web_view.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '_.dart';
 
 const html = 'Above\n<blockquote>Foo</blockquote>\nBelow';
-
-class BlockquoteWebViewScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text('BlockquoteWebViewScreen'),
-        ),
-        body: ListView(children: <Widget>[
-          HtmlWidget(
-            html,
-            factoryBuilder: () => _BlockquoteWebViewWf(),
-            key: hwKey,
-          ),
-        ]),
-      );
-}
 
 class _BlockquoteWebViewWf extends WidgetFactory {
   final blockquoteOp = BuildOp(

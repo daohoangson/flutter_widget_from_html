@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html/src/internal/video_player.dart';
+import 'package:flutter_widget_from_html/src/internal/web_view.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../../core/test/_.dart' as helper;
