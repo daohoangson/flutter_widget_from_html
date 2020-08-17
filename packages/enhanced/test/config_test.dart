@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
@@ -187,7 +187,8 @@ void main() {
       expect(explained1, equals('[RichText:(:Foo)]'));
       final built1 = helper.buildCurrentState();
 
-      await explain(tester, html, true, hyperlinkColor: Colors.red);
+      await explain(tester, html, true,
+          hyperlinkColor: Color.fromRGBO(255, 0, 0, 1));
       final built2 = helper.buildCurrentState();
       expect(built1 == built2, isFalse);
     });

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:html/dom.dart' as dom;
@@ -212,9 +211,10 @@ Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
         ? snapshot.data
         : const Center(
             child: Padding(
-            padding: EdgeInsets.all(8),
-            child: CircularProgressIndicator(),
-          ));
+              child: Text('Loading...'),
+              padding: EdgeInsets.all(8),
+            ),
+          );
 
 Widget _buildBody(_HtmlWidgetState state, dom.NodeList domNodes) {
   final rootMeta = state._rootMeta;

@@ -60,7 +60,7 @@ class HtmlWidget extends core.HtmlWidget {
           html,
           baseUrl: baseUrl,
           buildAsync: buildAsync,
-          buildAsyncBuilder: buildAsyncBuilder,
+          buildAsyncBuilder: buildAsyncBuilder ?? _buildAsyncBuilder,
           customStylesBuilder: customStylesBuilder,
           customWidgetBuilder: customWidgetBuilder,
           enableCaching: enableCaching,
@@ -77,3 +77,13 @@ class HtmlWidget extends core.HtmlWidget {
     return _enhancedWf;
   }
 }
+
+Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
+    snapshot.hasData
+        ? snapshot.data
+        : const Center(
+            child: Padding(
+              child: CircularProgressIndicator(),
+              padding: EdgeInsets.all(8),
+            ),
+          );
