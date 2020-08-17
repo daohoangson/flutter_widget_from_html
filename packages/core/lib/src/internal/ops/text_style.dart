@@ -1,58 +1,58 @@
-part of '../core_widget_factory.dart';
+part of '../core_ops.dart';
 
-const _kCssDirection = 'direction';
-const _kCssDirectionLtr = 'ltr';
-const _kCssDirectionRtl = 'rtl';
-const _kAttributeDir = 'dir';
+const kCssDirection = 'direction';
+const kCssDirectionLtr = 'ltr';
+const kCssDirectionRtl = 'rtl';
+const kAttributeDir = 'dir';
 
-const _kCssFontFamily = 'font-family';
+const kCssFontFamily = 'font-family';
 
-const _kCssFontSize = 'font-size';
-const _kCssFontSizeXxLarge = 'xx-large';
-const _kCssFontSizeXLarge = 'x-large';
-const _kCssFontSizeLarge = 'large';
-const _kCssFontSizeMedium = 'medium';
-const _kCssFontSizeSmall = 'small';
-const _kCssFontSizeXSmall = 'x-small';
-const _kCssFontSizeXxSmall = 'xx-small';
-const _kCssFontSizeLarger = 'larger';
-const _kCssFontSizeSmaller = 'smaller';
-const _kCssFontSizes = {
-  '1': _kCssFontSizeXxSmall,
-  '2': _kCssFontSizeXSmall,
-  '3': _kCssFontSizeSmall,
-  '4': _kCssFontSizeMedium,
-  '5': _kCssFontSizeLarge,
-  '6': _kCssFontSizeXLarge,
-  '7': _kCssFontSizeXxLarge,
+const kCssFontSize = 'font-size';
+const kCssFontSizeXxLarge = 'xx-large';
+const kCssFontSizeXLarge = 'x-large';
+const kCssFontSizeLarge = 'large';
+const kCssFontSizeMedium = 'medium';
+const kCssFontSizeSmall = 'small';
+const kCssFontSizeXSmall = 'x-small';
+const kCssFontSizeXxSmall = 'xx-small';
+const kCssFontSizeLarger = 'larger';
+const kCssFontSizeSmaller = 'smaller';
+const kCssFontSizes = {
+  '1': kCssFontSizeXxSmall,
+  '2': kCssFontSizeXSmall,
+  '3': kCssFontSizeSmall,
+  '4': kCssFontSizeMedium,
+  '5': kCssFontSizeLarge,
+  '6': kCssFontSizeXLarge,
+  '7': kCssFontSizeXxLarge,
 };
 
-const _kCssFontStyle = 'font-style';
-const _kCssFontStyleItalic = 'italic';
-const _kCssFontStyleNormal = 'normal';
+const kCssFontStyle = 'font-style';
+const kCssFontStyleItalic = 'italic';
+const kCssFontStyleNormal = 'normal';
 
-const _kCssFontWeight = 'font-weight';
-const _kCssFontWeightBold = 'bold';
-const _kCssFontWeight100 = '100';
-const _kCssFontWeight200 = '200';
-const _kCssFontWeight300 = '300';
-const _kCssFontWeight400 = '400';
-const _kCssFontWeight500 = '500';
-const _kCssFontWeight600 = '600';
-const _kCssFontWeight700 = '700';
-const _kCssFontWeight800 = '800';
-const _kCssFontWeight900 = '900';
+const kCssFontWeight = 'font-weight';
+const kCssFontWeightBold = 'bold';
+const kCssFontWeight100 = '100';
+const kCssFontWeight200 = '200';
+const kCssFontWeight300 = '300';
+const kCssFontWeight400 = '400';
+const kCssFontWeight500 = '500';
+const kCssFontWeight600 = '600';
+const kCssFontWeight700 = '700';
+const kCssFontWeight800 = '800';
+const kCssFontWeight900 = '900';
 
-const _kCssLineHeight = 'line-height';
-const _kCssLineHeightNormal = 'normal';
+const kCssLineHeight = 'line-height';
+const kCssLineHeightNormal = 'normal';
 
-const _kCssTextDecoration = 'text-decoration';
-const _kCssTextDecorationLineThrough = 'line-through';
-const _kCssTextDecorationNone = 'none';
-const _kCssTextDecorationOverline = 'overline';
-const _kCssTextDecorationUnderline = 'underline';
+const kCssTextDecoration = 'text-decoration';
+const kCssTextDecorationLineThrough = 'line-through';
+const kCssTextDecorationNone = 'none';
+const kCssTextDecorationOverline = 'overline';
+const kCssTextDecorationUnderline = 'underline';
 
-class _TextStyle {
+class TextStyleOps {
   static TextStyleHtml color(TextStyleHtml p, Color color) =>
       p.copyWith(style: p.style.copyWith(color: color));
 
@@ -64,8 +64,10 @@ class _TextStyle {
         ),
       );
 
-  static TextStyleHtml fontSize(TextStyleHtml p, String v) =>
-      p.copyWith(style: p.style.copyWith(fontSize: _fontSizeTryParse(p, v)));
+  static TextStyleHtml Function(TextStyleHtml, String) fontSize(
+          WidgetFactory wf) =>
+      (p, v) => p.copyWith(
+          style: p.style.copyWith(fontSize: _fontSizeTryParse(wf, p, v)));
 
   static TextStyleHtml fontStyle(TextStyleHtml p, FontStyle fontStyle) =>
       p.copyWith(style: p.style.copyWith(fontStyle: fontStyle));
@@ -73,8 +75,9 @@ class _TextStyle {
   static TextStyleHtml fontWeight(TextStyleHtml p, FontWeight v) =>
       p.copyWith(style: p.style.copyWith(fontWeight: v));
 
-  static TextStyleHtml lineHeight(TextStyleHtml p, String v) =>
-      p.copyWith(height: _lineHeightTryParse(p, v));
+  static TextStyleHtml Function(TextStyleHtml, String) lineHeight(
+          WidgetFactory wf) =>
+      (p, v) => p.copyWith(height: _lineHeightTryParse(wf, p, v));
 
   static TextStyleHtml maxLines(TextStyleHtml p, int v) =>
       p.copyWith(maxLines: v);
@@ -82,7 +85,7 @@ class _TextStyle {
   static TextStyleHtml textAlign(TextStyleHtml p, TextAlign v) =>
       p.copyWith(textAlign: v);
 
-  static TextStyleHtml textDeco(TextStyleHtml p, _TextDeco v) {
+  static TextStyleHtml textDeco(TextStyleHtml p, TextDeco v) {
     final pd = p.style.decoration;
     final lineThough = pd?.contains(TextDecoration.lineThrough) == true;
     final overline = pd?.contains(TextDecoration.overline) == true;
@@ -109,17 +112,17 @@ class _TextStyle {
     );
   }
 
-  static BuildOp textDecoOp(_TextDeco v) => BuildOp(
+  static BuildOp textDecoOp(TextDeco v) => BuildOp(
         onPieces: (meta, pieces) {
-          if (!meta.isBlockElement) meta.tsb<_TextDeco>(textDeco, v);
+          if (!meta.isBlockElement) meta.tsb<TextDeco>(textDeco, v);
           return pieces;
         },
       );
 
   static TextStyleHtml textDirection(TextStyleHtml p, String v) {
-    final textDirection = (v == _kCssDirectionRtl)
+    final textDirection = (v == kCssDirectionRtl)
         ? TextDirection.rtl
-        : v == _kCssDirectionLtr ? TextDirection.ltr : null;
+        : v == kCssDirectionLtr ? TextDirection.ltr : null;
     if (textDirection == null) return p;
 
     return p.copyWith(textDirection: textDirection);
@@ -128,7 +131,7 @@ class _TextStyle {
   static TextStyleHtml textOverflow(TextStyleHtml p, TextOverflow v) =>
       p.copyWith(textOverflow: v);
 
-  static List<String> _fontFamilyTryParse(String value) {
+  static List<String> fontFamilyTryParse(String value) {
     final parts = value.split(',');
     final list = <String>[];
 
@@ -142,8 +145,46 @@ class _TextStyle {
     return list;
   }
 
-  static double _fontSizeTryParse(TextStyleHtml p, String v) {
-    final length = _parseCssLength(v);
+  static FontStyle fontStyleTryParse(String value) {
+    switch (value) {
+      case kCssFontStyleItalic:
+        return FontStyle.italic;
+      case kCssFontStyleNormal:
+        return FontStyle.normal;
+    }
+
+    return null;
+  }
+
+  static FontWeight fontWeightTryParse(String value) {
+    switch (value) {
+      case kCssFontWeightBold:
+        return FontWeight.bold;
+      case kCssFontWeight100:
+        return FontWeight.w100;
+      case kCssFontWeight200:
+        return FontWeight.w200;
+      case kCssFontWeight300:
+        return FontWeight.w300;
+      case kCssFontWeight400:
+        return FontWeight.w400;
+      case kCssFontWeight500:
+        return FontWeight.w500;
+      case kCssFontWeight600:
+        return FontWeight.w600;
+      case kCssFontWeight700:
+        return FontWeight.w700;
+      case kCssFontWeight800:
+        return FontWeight.w800;
+      case kCssFontWeight900:
+        return FontWeight.w900;
+    }
+
+    return null;
+  }
+
+  static double _fontSizeTryParse(WidgetFactory wf, TextStyleHtml p, String v) {
+    final length = tryParseCssLength(v);
     if (length != null) {
       final lengthValue = length.getValue(
         p,
@@ -154,24 +195,24 @@ class _TextStyle {
     }
 
     switch (v) {
-      case _kCssFontSizeXxLarge:
+      case kCssFontSizeXxLarge:
         return _fontSizeMultiplyRootWith(p, 2.0);
-      case _kCssFontSizeXLarge:
+      case kCssFontSizeXLarge:
         return _fontSizeMultiplyRootWith(p, 1.5);
-      case _kCssFontSizeLarge:
+      case kCssFontSizeLarge:
         return _fontSizeMultiplyRootWith(p, 1.125);
-      case _kCssFontSizeMedium:
+      case kCssFontSizeMedium:
         return _fontSizeMultiplyRootWith(p, 1);
-      case _kCssFontSizeSmall:
+      case kCssFontSizeSmall:
         return _fontSizeMultiplyRootWith(p, .8125);
-      case _kCssFontSizeXSmall:
+      case kCssFontSizeXSmall:
         return _fontSizeMultiplyRootWith(p, .625);
-      case _kCssFontSizeXxSmall:
+      case kCssFontSizeXxSmall:
         return _fontSizeMultiplyRootWith(p, .5625);
 
-      case _kCssFontSizeLarger:
+      case kCssFontSizeLarger:
         return _fontSizeMultiplyWith(p.parent?.style?.fontSize, 1.2);
-      case _kCssFontSizeSmaller:
+      case kCssFontSizeSmaller:
         return _fontSizeMultiplyWith(p.parent?.style?.fontSize, 15 / 18);
     }
 
@@ -190,51 +231,14 @@ class _TextStyle {
   static double _fontSizeMultiplyWith(double fontSize, double value) =>
       fontSize != null ? fontSize * value : null;
 
-  static FontStyle _fontStyleTryParse(String value) {
-    switch (value) {
-      case _kCssFontStyleItalic:
-        return FontStyle.italic;
-      case _kCssFontStyleNormal:
-        return FontStyle.normal;
-    }
-
-    return null;
-  }
-
-  static FontWeight _fontWeightTryParse(String value) {
-    switch (value) {
-      case _kCssFontWeightBold:
-        return FontWeight.bold;
-      case _kCssFontWeight100:
-        return FontWeight.w100;
-      case _kCssFontWeight200:
-        return FontWeight.w200;
-      case _kCssFontWeight300:
-        return FontWeight.w300;
-      case _kCssFontWeight400:
-        return FontWeight.w400;
-      case _kCssFontWeight500:
-        return FontWeight.w500;
-      case _kCssFontWeight600:
-        return FontWeight.w600;
-      case _kCssFontWeight700:
-        return FontWeight.w700;
-      case _kCssFontWeight800:
-        return FontWeight.w800;
-      case _kCssFontWeight900:
-        return FontWeight.w900;
-    }
-
-    return null;
-  }
-
-  static double _lineHeightTryParse(TextStyleHtml p, String v) {
-    if (v == _kCssLineHeightNormal) return -1;
+  static double _lineHeightTryParse(
+      WidgetFactory wf, TextStyleHtml p, String v) {
+    if (v == kCssLineHeightNormal) return -1;
 
     final number = double.tryParse(v);
     if (number != null && number > 0) return number;
 
-    final length = _parseCssLength(v);
+    final length = tryParseCssLength(v);
     if (length == null) return null;
 
     final lengthValue = length.getValue(
@@ -249,7 +253,7 @@ class _TextStyle {
 }
 
 @immutable
-class _TextDeco {
+class TextDeco {
   final Color color;
   final bool over;
   final bool strike;
@@ -257,7 +261,7 @@ class _TextDeco {
   final CssLength thickness;
   final bool under;
 
-  _TextDeco({
+  TextDeco({
     this.color,
     this.over,
     this.strike,
@@ -266,21 +270,21 @@ class _TextDeco {
     this.under,
   });
 
-  factory _TextDeco.tryParse(String value) {
+  factory TextDeco.tryParse(String value) {
     for (final v in splitCssValues(value)) {
       switch (v) {
-        case _kCssTextDecorationLineThrough:
-          return _TextDeco(strike: true);
-        case _kCssTextDecorationNone:
-          return _TextDeco(
+        case kCssTextDecorationLineThrough:
+          return TextDeco(strike: true);
+        case kCssTextDecorationNone:
+          return TextDeco(
             over: false,
             strike: false,
             under: false,
           );
-        case _kCssTextDecorationOverline:
-          return _TextDeco(over: true);
-        case _kCssTextDecorationUnderline:
-          return _TextDeco(under: true);
+        case kCssTextDecorationOverline:
+          return TextDeco(over: true);
+        case kCssTextDecorationUnderline:
+          return TextDeco(under: true);
       }
     }
 

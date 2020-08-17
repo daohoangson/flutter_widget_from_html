@@ -1,24 +1,24 @@
-part of '../core_widget_factory.dart';
+part of '../core_ops.dart';
 
-const _kCssVerticalAlign = 'vertical-align';
-const _kCssVerticalAlignBaseline = 'baseline';
-const _kCssVerticalAlignTop = 'top';
-const _kCssVerticalAlignBottom = 'bottom';
-const _kCssVerticalAlignMiddle = 'middle';
-const _kCssVerticalAlignSub = 'sub';
-const _kCssVerticalAlignSuper = 'super';
+const kCssVerticalAlign = 'vertical-align';
+const kCssVerticalAlignBaseline = 'baseline';
+const kCssVerticalAlignTop = 'top';
+const kCssVerticalAlignBottom = 'bottom';
+const kCssVerticalAlignMiddle = 'middle';
+const kCssVerticalAlignSub = 'sub';
+const kCssVerticalAlignSuper = 'super';
 
-class _StyleVerticalAlign {
+class StyleVerticalAlign {
   final WidgetFactory wf;
 
-  _StyleVerticalAlign(this.wf);
+  StyleVerticalAlign(this.wf);
 
   BuildOp get buildOp => BuildOp(
         onPieces: (meta, pieces) {
           if (meta.isBlockElement) return pieces;
 
-          final v = meta[_kCssVerticalAlign];
-          if (v == null || v == _kCssVerticalAlignBaseline) return pieces;
+          final v = meta[kCssVerticalAlign];
+          if (v == null || v == kCssVerticalAlignBaseline) return pieces;
 
           return pieces.map((piece) => _buildWidgetSpan(meta, piece, v));
         },
@@ -39,14 +39,14 @@ class _StyleVerticalAlign {
     final newPiece = BuiltPiece.text(replacement);
     if (built == null) return newPiece;
 
-    if (v == _kCssVerticalAlignSub || v == _kCssVerticalAlignSuper) {
+    if (v == kCssVerticalAlignSub || v == kCssVerticalAlignSuper) {
       built.wrapWith(
         (child) => _build(
           meta,
           child,
           EdgeInsets.only(
-            bottom: v == _kCssVerticalAlignSub ? .4 : 0,
-            top: v == _kCssVerticalAlignSuper ? .4 : 0,
+            bottom: v == kCssVerticalAlignSub ? .4 : 0,
+            top: v == kCssVerticalAlignSuper ? .4 : 0,
           ),
         ),
       );
@@ -81,13 +81,13 @@ class _StyleVerticalAlign {
 
   static PlaceholderAlignment _tryParse(String value) {
     switch (value) {
-      case _kCssVerticalAlignTop:
-      case _kCssVerticalAlignSub:
+      case kCssVerticalAlignTop:
+      case kCssVerticalAlignSub:
         return PlaceholderAlignment.top;
-      case _kCssVerticalAlignSuper:
-      case _kCssVerticalAlignBottom:
+      case kCssVerticalAlignSuper:
+      case kCssVerticalAlignBottom:
         return PlaceholderAlignment.bottom;
-      case _kCssVerticalAlignMiddle:
+      case kCssVerticalAlignMiddle:
         return PlaceholderAlignment.middle;
     }
 

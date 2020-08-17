@@ -1,9 +1,11 @@
-part of '../widget_factory.dart';
+part of '../ops.dart';
 
-class _TagSvg {
+const kTagSvg = 'svg';
+
+class TagSvg {
   final WidgetFactory wf;
 
-  _TagSvg(this.wf);
+  TagSvg(this.wf);
 
   BuildOp get buildOp => BuildOp(
         onWidgets: (meta, _) => [SvgPicture.string(meta.domElement.outerHtml)],

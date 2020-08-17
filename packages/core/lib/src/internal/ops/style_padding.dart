@@ -1,6 +1,6 @@
-part of '../core_widget_factory.dart';
+part of '../core_ops.dart';
 
-const _kCssPadding = 'padding';
+const kCssPadding = 'padding';
 
 WidgetPlaceholder _paddingInlineAfter(TextStyleBuilder tsb, CssLengthBox box) =>
     WidgetPlaceholder<CssLengthBox>(
@@ -17,16 +17,16 @@ WidgetPlaceholder _paddingInlineBefore(TextStyleBuilder tsb, CssLengthBox b) =>
 Widget _paddingInlineSizedBox(double width) =>
     width != null && width > 0 ? SizedBox(width: width) : widget0;
 
-class _StylePadding {
+class StylePadding {
   final WidgetFactory wf;
 
-  _StylePadding(this.wf);
+  StylePadding(this.wf);
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
         onPieces: (meta, pieces) {
           if (meta.isBlockElement) return pieces;
-          final padding = wf.parseCssLengthBox(meta, _kCssPadding);
+          final padding = tryParseCssLengthBox(meta, kCssPadding);
           if (padding?.hasLeftOrRight != true) return pieces;
 
           return _wrapTextBits(
@@ -39,10 +39,10 @@ class _StylePadding {
         },
         onWidgets: (meta, widgets) {
           if (widgets?.isNotEmpty != true) return null;
-          final padding = wf.parseCssLengthBox(meta, _kCssPadding);
+          final padding = tryParseCssLengthBox(meta, kCssPadding);
           if (padding == null) return null;
 
-          return _listOrNull(wf
+          return listOrNull(wf
               .buildColumnPlaceholder(meta, widgets)
               ?.wrapWith((child) => _build(meta, child, padding)));
         },

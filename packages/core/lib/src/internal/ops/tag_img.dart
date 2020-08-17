@@ -1,9 +1,17 @@
-part of '../core_widget_factory.dart';
+part of '../core_ops.dart';
 
-class _TagImg {
+const kAttributeImgAlt = 'alt';
+const kAttributeImgHeight = 'height';
+const kAttributeImgSrc = 'src';
+const kAttributeImgTitle = 'title';
+const kAttributeImgWidth = 'width';
+
+const kTagImg = 'img';
+
+class TagImg {
   final WidgetFactory wf;
 
-  _TagImg(this.wf);
+  TagImg(this.wf);
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
@@ -48,24 +56,23 @@ class _TagImg {
 
   ImageMetadata _parse(NodeMetadata meta) {
     final attrs = meta.domElement.attributes;
-    final src = attrs.containsKey('src') ? attrs['src'] : null;
-    final url = wf.constructFullUrl(src);
+    final src =
+        attrs.containsKey(kAttributeImgSrc) ? attrs[kAttributeImgSrc] : null;
+    final url = wf.urlFull(src);
     return ImageMetadata(
-      alt: attrs.containsKey('alt') ? attrs['alt'] : null,
+      alt: attrs.containsKey(kAttributeImgAlt) ? attrs[kAttributeImgAlt] : null,
       sources: (url != null)
           ? [
               ImageSource(
                 url,
-                height: attrs.containsKey('height')
-                    ? double.tryParse(attrs['height'])
-                    : null,
-                width: attrs.containsKey('width')
-                    ? double.tryParse(attrs['width'])
-                    : null,
+                height: tryParseDoubleFromMap(attrs, kAttributeImgHeight),
+                width: tryParseDoubleFromMap(attrs, kAttributeImgWidth),
               ),
             ]
           : null,
-      title: attrs.containsKey('title') ? attrs['title'] : null,
+      title: attrs.containsKey(kAttributeImgTitle)
+          ? attrs[kAttributeImgTitle]
+          : null,
     );
   }
 }
@@ -80,4 +87,22 @@ class _ImageBit extends TextWidget<ImageMetadata> {
         baseline: baseline,
         child: widget,
       );
+}
+
+final _dataUriRegExp = RegExp(r'^data:image/[^;]+;(base64|utf8),');
+
+Uint8List bytesFromDataUri(String dataUri) {
+  final match = _dataUriRegExp.matchAsPrefix(dataUri);
+  if (match == null) return null;
+
+  final prefix = match[0];
+  final encoding = match[1];
+  final data = dataUri.substring(prefix.length);
+
+  final bytes = encoding == 'base64'
+      ? base64.decode(data)
+      : encoding == 'utf8' ? Uint8List.fromList(data.codeUnits) : null;
+  if (bytes.isEmpty) return null;
+
+  return bytes;
 }
