@@ -9,8 +9,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'internal/ops.dart';
 import 'data.dart';
-import 'helpers.dart';
 import 'html_widget.dart';
+import 'internal/video_player.dart';
+import 'internal/web_view.dart';
 
 /// A factory to build widgets with [WebView], [VideoPlayer], etc.
 class WidgetFactory extends core.WidgetFactory {

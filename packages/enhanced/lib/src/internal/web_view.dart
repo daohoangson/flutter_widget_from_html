@@ -1,4 +1,5 @@
-part of '../helpers.dart';
+import 'package:flutter/widgets.dart';
+import 'package:webview_flutter/webview_flutter.dart' as lib;
 
 class WebView extends StatefulWidget {
   final String url;
