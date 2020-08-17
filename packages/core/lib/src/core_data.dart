@@ -513,8 +513,6 @@ class TextStyleBuilder<T1> {
 
   /// Builds a [TextStyleHtml] by calling queued callbacks.
   TextStyleHtml build(BuildContext context) {
-    context.dependOnInheritedWidgetOfExactType<TshWidget>();
-
     assert(parent != null);
     final parentOutput = parent.build(context);
     if (parentOutput != _parentOutput) {
