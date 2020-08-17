@@ -25,7 +25,7 @@ class TagVideo {
     final a = e.attributes;
     if (!a.containsKey('src')) return;
 
-    final url = wf.constructFullUrl(a['src']);
+    final url = wf.urlFull(a['src']);
     if (url == null) return;
 
     _sourceUrls.add(url);
@@ -52,8 +52,7 @@ class TagVideo {
       controls: a.containsKey('controls'),
       height: a.containsKey('height') ? double.tryParse(a['height']) : null,
       loop: a.containsKey('loop'),
-      posterUrl:
-          a.containsKey('poster') ? wf.constructFullUrl(a['poster']) : null,
+      posterUrl: a.containsKey('poster') ? wf.urlFull(a['poster']) : null,
       width: a.containsKey('width') ? double.tryParse(a['width']) : null,
     );
   }

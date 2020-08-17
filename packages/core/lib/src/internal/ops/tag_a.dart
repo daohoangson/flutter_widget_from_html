@@ -48,7 +48,7 @@ class TagA {
     final attrs = meta.domElement.attributes;
     final href =
         attrs.containsKey(kAttributeAHref) ? attrs[kAttributeAHref] : null;
-    return wf.gestureTapCallback(wf.constructFullUrl(href) ?? href);
+    return wf.gestureTapCallback(wf.urlFull(href) ?? href);
   }
 }
 

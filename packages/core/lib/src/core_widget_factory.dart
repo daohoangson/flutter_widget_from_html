@@ -207,20 +207,6 @@ class WidgetFactory {
     return buildColumnPlaceholder(meta, widgets);
   }
 
-  String constructFullUrl(String url) {
-    if (url?.isNotEmpty != true) return null;
-    if (url.startsWith('data:')) return url;
-
-    final p = Uri.tryParse(url);
-    if (p == null) return null;
-    if (p.hasScheme) return p.toString();
-
-    final b = _widget.baseUrl;
-    if (b == null) return null;
-
-    return b.resolveUri(p).toString();
-  }
-
   GestureTapCallback gestureTapCallback(String url) => url != null
       ? () => _widget.onTapUrl != null
           ? _widget.onTapUrl(url)
@@ -730,6 +716,20 @@ class WidgetFactory {
       priority: 10000,
     );
     return _styleDisplayBlock;
+  }
+
+  String urlFull(String url) {
+    if (url?.isNotEmpty != true) return null;
+    if (url.startsWith('data:')) return url;
+
+    final p = Uri.tryParse(url);
+    if (p == null) return null;
+    if (p.hasScheme) return p.toString();
+
+    final b = _widget.baseUrl;
+    if (b == null) return null;
+
+    return b.resolveUri(p).toString();
   }
 
   TextStyleHtml Function(TextStyleHtml, String) get _tsbFontSize {

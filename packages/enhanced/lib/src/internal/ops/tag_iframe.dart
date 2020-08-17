@@ -14,7 +14,7 @@ class TagIframe {
     final a = meta.domElement.attributes;
     if (!a.containsKey('src')) return null;
 
-    final src = wf.constructFullUrl(a['src']);
+    final src = wf.urlFull(a['src']);
     if (src == null) return null;
 
     return wf.buildWebView(

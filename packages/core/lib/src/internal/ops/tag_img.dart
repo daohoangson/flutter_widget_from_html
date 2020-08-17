@@ -58,7 +58,7 @@ class TagImg {
     final attrs = meta.domElement.attributes;
     final src =
         attrs.containsKey(kAttributeImgSrc) ? attrs[kAttributeImgSrc] : null;
-    final url = wf.constructFullUrl(src);
+    final url = wf.urlFull(src);
     return ImageMetadata(
       alt: attrs.containsKey(kAttributeImgAlt) ? attrs[kAttributeImgAlt] : null,
       sources: (url != null)
