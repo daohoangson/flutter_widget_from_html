@@ -63,7 +63,7 @@ class _TagATextData extends TextBit<TextStyleHtml, InlineSpan> {
   final WidgetFactory wf;
 
   _TagATextData(TextData bit, this.onTap, this.wf)
-      : data = bit.data,
+      : data = bit.compile(null),
         tsb = bit.tsb,
         super(bit.parent);
 

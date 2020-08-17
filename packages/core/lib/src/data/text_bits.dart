@@ -119,23 +119,23 @@ abstract class TextBit<CompileFrom, CompileTo> {
 
 /// A simple data bit.
 class TextData extends TextBit<void, String> {
-  final String data;
+  final String _data;
 
   @override
   final TextStyleBuilder tsb;
 
   /// Creates with data string
-  TextData(TextBits parent, this.data, this.tsb)
+  TextData(TextBits parent, this._data, this.tsb)
       : assert(parent != null),
-        assert(data != null),
+        assert(_data != null),
         assert(tsb != null),
         super(parent);
 
   @override
-  String compile(void _) => data;
+  String compile(void _) => _data;
 
   @override
-  String toString() => '[TextData] data=$data';
+  String toString() => '[TextData] data=$_data';
 }
 
 /// An inline widget to be rendered within text paragraph.
