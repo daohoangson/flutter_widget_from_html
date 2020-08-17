@@ -313,152 +313,10 @@ class WidgetFactory {
   Object _imageFromUrl(String url) =>
       url?.isNotEmpty == true ? NetworkImage(url) : null;
 
-  void parseStyle(NodeMetadata meta, String key, String value) {
-    switch (key) {
-      case kCssBackground:
-      case kCssBackgroundColor:
-        _styleBgColor ??= StyleBgColor(this).buildOp;
-        meta.register(_styleBgColor);
-        break;
+  void parse(NodeMetadata meta) {
+    final attrs = meta.domElement.attributes;
 
-      case kCssBorderBottom:
-        final borderBottom = tryParseCssBorderSide(value);
-        if (borderBottom != null) {
-          meta.register(TextStyleOps.textDecoOp(TextDeco(
-            color: borderBottom.color,
-            under: true,
-            style: borderBottom.style,
-            thickness: borderBottom.width,
-          )));
-        } else {
-          meta.register(TextStyleOps.textDecoOp(TextDeco(under: false)));
-        }
-        break;
-      case kCssBorderTop:
-        final borderTop = tryParseCssBorderSide(value);
-        if (borderTop != null) {
-          meta.register(TextStyleOps.textDecoOp(TextDeco(
-            color: borderTop.color,
-            over: true,
-            style: borderTop.style,
-            thickness: borderTop.width,
-          )));
-        } else {
-          meta.register(TextStyleOps.textDecoOp(TextDeco(over: false)));
-        }
-        break;
-
-      case kCssColor:
-        final color = tryParseColor(value);
-        if (color != null) meta.tsb(TextStyleOps.color, color);
-        break;
-
-      case kCssDirection:
-        meta.tsb(TextStyleOps.textDirection, value);
-        break;
-
-      case kCssDisplay:
-        switch (value) {
-          case kCssDisplayBlock:
-            meta.isBlockElement = true;
-            break;
-          case kCssDisplayInline:
-          case kCssDisplayInlineBlock:
-            meta.isBlockElement = false;
-            break;
-          case kCssDisplayNone:
-            meta.isNotRenderable = true;
-            break;
-          case kCssDisplayTable:
-            meta.register(TagTable(this, meta).op);
-            break;
-        }
-        break;
-
-      case kCssFontFamily:
-        final list = TextStyleOps.fontFamilyTryParse(value);
-        if (list != null) meta.tsb(TextStyleOps.fontFamily, list);
-        break;
-
-      case kCssFontSize:
-        meta.tsb(_tsbFontSize, value);
-        break;
-
-      case kCssFontStyle:
-        final fontStyle = TextStyleOps.fontStyleTryParse(value);
-        if (fontStyle != null) meta.tsb(TextStyleOps.fontStyle, fontStyle);
-        break;
-
-      case kCssFontWeight:
-        final fontWeight = TextStyleOps.fontWeightTryParse(value);
-        if (fontWeight != null) meta.tsb(TextStyleOps.fontWeight, fontWeight);
-        break;
-
-      case kCssHeight:
-      case kCssMaxHeight:
-      case kCssMaxWidth:
-      case kCssMinHeight:
-      case kCssMinWidth:
-      case kCssWidth:
-        _styleSizing ??= StyleSizing(this).buildOp;
-        meta.register(_styleSizing);
-        break;
-
-      case kCssLineHeight:
-        _tsbLineHeight ??= TextStyleOps.lineHeight(this);
-        meta.tsb(_tsbLineHeight, value);
-        break;
-
-      case kCssMaxLines:
-      case kCssMaxLinesWebkitLineClamp:
-        final maxLines = value == kCssMaxLinesNone ? -1 : int.tryParse(value);
-        if (maxLines != null) meta.tsb(TextStyleOps.maxLines, maxLines);
-        break;
-
-      case kCssTextAlign:
-        final textAlign = tryParseTextAlign(value);
-        if (textAlign != null) {
-          meta
-            ..isBlockElement = true
-            ..tsb(TextStyleOps.textAlign, textAlign);
-        }
-        break;
-
-      case kCssTextDecoration:
-        final textDeco = TextDeco.tryParse(value);
-        if (textDeco != null) meta.tsb(TextStyleOps.textDeco, textDeco);
-        break;
-
-      case kCssTextOverflow:
-        switch (value) {
-          case kCssTextOverflowClip:
-            meta.tsb(TextStyleOps.textOverflow, TextOverflow.clip);
-            break;
-          case kCssTextOverflowEllipsis:
-            meta.tsb(TextStyleOps.textOverflow, TextOverflow.ellipsis);
-            break;
-        }
-        break;
-
-      case kCssVerticalAlign:
-        _styleVerticalAlign ??= StyleVerticalAlign(this).buildOp;
-        meta.register(_styleVerticalAlign);
-        break;
-    }
-
-    if (key.startsWith(kCssMargin)) {
-      _styleMargin ??= StyleMargin(this).buildOp;
-      meta.register(_styleMargin);
-    }
-
-    if (key.startsWith(kCssPadding)) {
-      _stylePadding ??= StylePadding(this).buildOp;
-      meta.register(_stylePadding);
-    }
-  }
-
-  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
-    switch (tag) {
+    switch (meta.domElement.localName) {
       case kTagA:
         _tagA ??= TagA(this, () => _widget.hyperlinkColor).buildOp;
         meta.register(_tagA);
@@ -700,6 +558,150 @@ class WidgetFactory {
           meta[kCssDirection] = attribute.value;
           break;
       }
+    }
+  }
+
+  void parseStyle(NodeMetadata meta, String key, String value) {
+    switch (key) {
+      case kCssBackground:
+      case kCssBackgroundColor:
+        _styleBgColor ??= StyleBgColor(this).buildOp;
+        meta.register(_styleBgColor);
+        break;
+
+      case kCssBorderBottom:
+        final borderBottom = tryParseCssBorderSide(value);
+        if (borderBottom != null) {
+          meta.register(TextStyleOps.textDecoOp(TextDeco(
+            color: borderBottom.color,
+            under: true,
+            style: borderBottom.style,
+            thickness: borderBottom.width,
+          )));
+        } else {
+          meta.register(TextStyleOps.textDecoOp(TextDeco(under: false)));
+        }
+        break;
+      case kCssBorderTop:
+        final borderTop = tryParseCssBorderSide(value);
+        if (borderTop != null) {
+          meta.register(TextStyleOps.textDecoOp(TextDeco(
+            color: borderTop.color,
+            over: true,
+            style: borderTop.style,
+            thickness: borderTop.width,
+          )));
+        } else {
+          meta.register(TextStyleOps.textDecoOp(TextDeco(over: false)));
+        }
+        break;
+
+      case kCssColor:
+        final color = tryParseColor(value);
+        if (color != null) meta.tsb(TextStyleOps.color, color);
+        break;
+
+      case kCssDirection:
+        meta.tsb(TextStyleOps.textDirection, value);
+        break;
+
+      case kCssDisplay:
+        switch (value) {
+          case kCssDisplayBlock:
+            meta.isBlockElement = true;
+            break;
+          case kCssDisplayInline:
+          case kCssDisplayInlineBlock:
+            meta.isBlockElement = false;
+            break;
+          case kCssDisplayNone:
+            meta.isNotRenderable = true;
+            break;
+          case kCssDisplayTable:
+            meta.register(TagTable(this, meta).op);
+            break;
+        }
+        break;
+
+      case kCssFontFamily:
+        final list = TextStyleOps.fontFamilyTryParse(value);
+        if (list != null) meta.tsb(TextStyleOps.fontFamily, list);
+        break;
+
+      case kCssFontSize:
+        meta.tsb(_tsbFontSize, value);
+        break;
+
+      case kCssFontStyle:
+        final fontStyle = TextStyleOps.fontStyleTryParse(value);
+        if (fontStyle != null) meta.tsb(TextStyleOps.fontStyle, fontStyle);
+        break;
+
+      case kCssFontWeight:
+        final fontWeight = TextStyleOps.fontWeightTryParse(value);
+        if (fontWeight != null) meta.tsb(TextStyleOps.fontWeight, fontWeight);
+        break;
+
+      case kCssHeight:
+      case kCssMaxHeight:
+      case kCssMaxWidth:
+      case kCssMinHeight:
+      case kCssMinWidth:
+      case kCssWidth:
+        _styleSizing ??= StyleSizing(this).buildOp;
+        meta.register(_styleSizing);
+        break;
+
+      case kCssLineHeight:
+        _tsbLineHeight ??= TextStyleOps.lineHeight(this);
+        meta.tsb(_tsbLineHeight, value);
+        break;
+
+      case kCssMaxLines:
+      case kCssMaxLinesWebkitLineClamp:
+        final maxLines = value == kCssMaxLinesNone ? -1 : int.tryParse(value);
+        if (maxLines != null) meta.tsb(TextStyleOps.maxLines, maxLines);
+        break;
+
+      case kCssTextAlign:
+        final textAlign = tryParseTextAlign(value);
+        if (textAlign != null) {
+          meta
+            ..isBlockElement = true
+            ..tsb(TextStyleOps.textAlign, textAlign);
+        }
+        break;
+
+      case kCssTextDecoration:
+        final textDeco = TextDeco.tryParse(value);
+        if (textDeco != null) meta.tsb(TextStyleOps.textDeco, textDeco);
+        break;
+
+      case kCssTextOverflow:
+        switch (value) {
+          case kCssTextOverflowClip:
+            meta.tsb(TextStyleOps.textOverflow, TextOverflow.clip);
+            break;
+          case kCssTextOverflowEllipsis:
+            meta.tsb(TextStyleOps.textOverflow, TextOverflow.ellipsis);
+            break;
+        }
+        break;
+
+      case kCssVerticalAlign:
+        _styleVerticalAlign ??= StyleVerticalAlign(this).buildOp;
+        meta.register(_styleVerticalAlign);
+        break;
+    }
+
+    if (key.startsWith(kCssMargin)) {
+      _styleMargin ??= StyleMargin(this).buildOp;
+      meta.register(_styleMargin);
+    }
+
+    if (key.startsWith(kCssPadding)) {
+      _stylePadding ??= StylePadding(this).buildOp;
+      meta.register(_stylePadding);
     }
   }
 

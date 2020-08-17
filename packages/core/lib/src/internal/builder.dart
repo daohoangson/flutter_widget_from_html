@@ -70,7 +70,7 @@ class HtmlBuilder {
 
   NodeMetadata collectMetadata(dom.Element e) {
     final meta = _NodeMetadata(e, parentMeta.tsb().sub(), parentOps);
-    wf.parseTag(meta, e.localName, e.attributes);
+    wf.parse(meta);
 
     if (meta.parentOps != null) {
       for (final op in meta.parentOps) {

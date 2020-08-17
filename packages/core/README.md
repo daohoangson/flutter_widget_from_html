@@ -310,16 +310,16 @@ class _SmiliesWidgetFactory extends WidgetFactory {
   );
 
   @override
-  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
-    if (tag == 'img' &&
-        attrs.containsKey('alt') &&
-        attrs.containsKey('class') &&
-        attrs['class'].contains('smilie')) {
+  void parse(NodeMetadata meta) {
+    final e = meta.domElement;
+    if (e.localName == 'img' &&
+        e.classes.contains('smilie') &&
+        e.attributes.containsKey('alt')) {
       meta.register(smilieOp);
       return;
     }
 
-    return super.parseTag(meta, tag, attrs);
+    return super.parse(meta);
   }
 }
 ```

@@ -240,12 +240,8 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
-  void parseTag(
-    NodeMetadata meta,
-    String tag,
-    Map<dynamic, String> attributes,
-  ) {
-    switch (tag) {
+  void parse(NodeMetadata meta) {
+    switch (meta.domElement.localName) {
       case 'a':
         _tsbTagA ??= (p, _) => p.copyWith(
             style: p.style
@@ -267,7 +263,7 @@ class WidgetFactory extends core.WidgetFactory {
         break;
     }
 
-    return super.parseTag(meta, tag, attributes);
+    return super.parse(meta);
   }
 
   @override

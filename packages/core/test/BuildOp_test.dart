@@ -99,17 +99,17 @@ void main() {
 
 class _DefaultStylesTest extends WidgetFactory {
   @override
-  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
+  void parse(NodeMetadata meta) {
     meta.register(BuildOp(defaultStyles: (_) => {'color': '#f00'}));
     meta.register(BuildOp(defaultStyles: (_) => {'color': '#0f0'}));
 
-    return super.parseTag(meta, tag, attrs);
+    return super.parse(meta);
   }
 }
 
 class _OnPiecesTestText extends WidgetFactory {
   @override
-  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
+  void parse(NodeMetadata meta) {
     meta.register(BuildOp(onPieces: (_, pieces) {
       for (final piece in pieces) {
         if (piece.hasWidgets) continue;
@@ -118,13 +118,13 @@ class _OnPiecesTestText extends WidgetFactory {
 
       return pieces;
     }));
-    return super.parseTag(meta, tag, attrs);
+    return super.parse(meta);
   }
 }
 
 class _OnPiecesTestWidget extends WidgetFactory {
   @override
-  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
+  void parse(NodeMetadata meta) {
     meta.register(BuildOp(onPieces: (_, pieces) {
       for (final piece in pieces) {
         if (piece.hasWidgets) continue;
@@ -137,15 +137,15 @@ class _OnPiecesTestWidget extends WidgetFactory {
         BuiltPiece.widgets([Text('Hi')])
       ];
     }));
-    return super.parseTag(meta, tag, attrs);
+    return super.parse(meta);
   }
 }
 
 class _OnWidgetsTest extends WidgetFactory {
   @override
-  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
+  void parse(NodeMetadata meta) {
     meta.register(BuildOp(onWidgets: (_, __) => [Text('Hi')]));
-    return super.parseTag(meta, tag, attrs);
+    return super.parse(meta);
   }
 }
 
@@ -156,7 +156,7 @@ class _PriorityTest extends WidgetFactory {
   _PriorityTest({this.a, this.b});
 
   @override
-  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
+  void parse(NodeMetadata meta) {
     meta
       ..register(BuildOp(
         onPieces: (_, pieces) => pieces.map((p) => p..text?.addText(' A')),
@@ -167,6 +167,6 @@ class _PriorityTest extends WidgetFactory {
         priority: b,
       ));
 
-    return super.parseTag(meta, tag, attrs);
+    return super.parse(meta);
   }
 }
