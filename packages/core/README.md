@@ -218,9 +218,9 @@ The HTML string is parsed into DOM elements and each element is visited once to 
 
 | Step | | Integration point |
 | --- | --- | --- |
-| 1 | Parse the tag and attributes map | `WidgetFactory.parseTag(NodeMetadata, String, Map)` |
-| 2 | Inform parents if any | `BuildOp.onChild(NodeMetadata, Element)` |
-| 3 | Populate default inline styles | `BuildOp.defaultStyles(NodeMetadata, Element)` |
+| 1 | Parse the tag and attributes map | `WidgetFactory.parseTag(NodeMetadata)` |
+| 2 | Inform parents if any | `BuildOp.onChild(NodeMetadata)` |
+| 3 | Populate default inline styles | `BuildOp.defaultStyles(NodeMetadata)` |
 | 4 | `customStyleBuilder` / `customWidgetBuilder` will be called if configured | |
 | 5 | Parse inline style key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(NodeMetadata, String, String)` |
 | 6 | Repeat with children elements to collect `BuiltPiece`s | |
@@ -268,11 +268,6 @@ meta.register(BuildOp(
 - There are two types of `BuiltPiece`:
   - `BuiltPiece.text()` contains a `TextBits`
   - `BuiltPiece.widgets()` contains widgets
-- `TextBits` is a list of `TextBit`, there are four subclasses of `TextBit`:
-  - `TextBits` is actually a `TextBit`, that means a `TextBits` can contains multiple sub-`TextBits`
-  - `TextData` is a string of text
-  - `TextWhitespace` is a whitespace
-  - `TextWidget` is an inline widget
 
 The example below replaces smilie inline image with an emoji:
 
