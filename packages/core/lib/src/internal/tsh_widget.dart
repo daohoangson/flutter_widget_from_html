@@ -12,5 +12,6 @@ class TshWidget extends InheritedWidget {
   }) : super(key: key, child: child);
 
   @override
-  bool updateShouldNotify(TshWidget oldWidget) => tsh != oldWidget.tsh;
+  bool updateShouldNotify(TshWidget oldWidget) =>
+      tsh == null || tsh != oldWidget.tsh;
 }
