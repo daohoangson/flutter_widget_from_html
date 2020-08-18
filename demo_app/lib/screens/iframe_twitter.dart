@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/src/internal/web_view.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 // https://publish.twitter.com/oembed?url=https%3A%2F%2Ftwitter.com%2FFlutterDev%2Fstatus%2F1271535349664108544
@@ -67,7 +66,7 @@ class _State extends State<IframeTwitterScreen> {
                   return WebView(
                     useApi ? apiUrl : dataUrl,
                     aspectRatio: 16 / 9,
-                    getDimensions: true,
+                    autoResize: true,
                   );
                 }
 

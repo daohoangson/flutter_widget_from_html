@@ -1,23 +1,51 @@
 import 'package:flutter/widgets.dart';
 import 'package:webview_flutter/webview_flutter.dart' as lib;
 
+/// An embedded web view.
 class WebView extends StatefulWidget {
+  /// The website URL.
   final String url;
 
+  /// The initial aspect ratio.
   final double aspectRatio;
-  final bool getDimensions;
-  final List<Duration> getDimensionsDurations;
+
+  /// Controls whether to resize automatically.
+  ///
+  /// JavaScript must be enabled for this to work.
+  /// Default: `true` if [js] is enabled, `false` otherwise.
+  final bool autoResize;
+
+  /// The auto resize intevals.
+  ///
+  /// By default, resizing will be attempted three times
+  /// - On page load
+  /// - After 1s
+  /// - After another 2s
+  final List<Duration> autoResizeIntervals;
+
+  /// The callback to handle navigation request.
+  ///
+  /// This callback will be triggered on generated navigation within the web view.
+  /// Returning `true` will stop web view from navigating.
   final bool Function(String) interceptNavigationRequest;
+
+  /// Controls whether to enable JavaScript.
+  ///
+  /// Default: `true`.
   final bool js;
 
-  // https://github.com/daohoangson/flutter_widget_from_html/issues/37
+  /// Controls whether or not to apply workaround for
+  /// [issue 37](https://github.com/daohoangson/flutter_widget_from_html/issues/37)
+  ///
+  /// Default: `false`.
   final bool unsupportedWorkaroundForIssue37;
 
+  /// Creates a web view.
   WebView(
     this.url, {
     @required this.aspectRatio,
-    this.getDimensions = false,
-    this.getDimensionsDurations = const [
+    bool autoResize,
+    this.autoResizeIntervals = const [
       null,
       Duration(seconds: 1),
       Duration(seconds: 2),
@@ -28,8 +56,7 @@ class WebView extends StatefulWidget {
     Key key,
   })  : assert(url != null),
         assert(aspectRatio != null),
-        // `js` must be true for `getDimensions` to work
-        assert(getDimensions == false || js == true),
+        autoResize = !js ? false : autoResize ?? js,
         super(key: key);
 
   @override
@@ -81,20 +108,7 @@ class _WebViewState extends State<WebView> {
   Future<String> eval(String js) =>
       _wvc?.evaluateJavascript(js)?.catchError((_) => '');
 
-  Widget _buildWebView() => lib.WebView(
-        initialUrl: widget.url,
-        javascriptMode: widget.js == true
-            ? lib.JavascriptMode.unrestricted
-            : lib.JavascriptMode.disabled,
-        key: Key(widget.url),
-        navigationDelegate: widget.interceptNavigationRequest != null
-            ? (req) => _interceptNavigationRequest(req)
-            : null,
-        onPageFinished: _onPageFinished,
-        onWebViewCreated: (c) => _wvc = c,
-      );
-
-  void _getDimensions() async {
+  void _autoResize() async {
     // TODO: enable codecov when `flutter drive --coverage` is available
     // https://github.com/flutter/flutter/issues/7474
     if (!mounted) return;
@@ -110,6 +124,19 @@ class _WebViewState extends State<WebView> {
     final changed = (r - _aspectRatio).abs() > 0.0001;
     if (changed && mounted) setState(() => _aspectRatio = r);
   }
+
+  Widget _buildWebView() => lib.WebView(
+        initialUrl: widget.url,
+        javascriptMode: widget.js == true
+            ? lib.JavascriptMode.unrestricted
+            : lib.JavascriptMode.disabled,
+        key: Key(widget.url),
+        navigationDelegate: widget.interceptNavigationRequest != null
+            ? (req) => _interceptNavigationRequest(req)
+            : null,
+        onPageFinished: _onPageFinished,
+        onWebViewCreated: (c) => _wvc = c,
+      );
 
   lib.NavigationDecision _interceptNavigationRequest(
       lib.NavigationRequest req) {
@@ -131,12 +158,12 @@ class _WebViewState extends State<WebView> {
   void _onPageFinished(String url) {
     _firstFinishedUrl ??= url;
 
-    if (widget.getDimensions == true) {
-      widget.getDimensionsDurations.forEach((t) => t == null
+    if (widget.autoResize == true) {
+      widget.autoResizeIntervals.forEach((t) => t == null
           // get dimensions immediately
-          ? _getDimensions()
+          ? _autoResize()
           // or wait for the specified duration
-          : Future.delayed(t).then((_) => _getDimensions()));
+          : Future.delayed(t).then((_) => _autoResize()));
     }
   }
 }

@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html/src/internal/web_view.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '_.dart';
@@ -18,7 +17,7 @@ class _BlockquoteWebViewWf extends WidgetFactory {
           encoding: Encoding.getByName('utf-8'),
         ).toString(),
         aspectRatio: 16 / 9,
-        getDimensions: true,
+        autoResize: true,
       )
     ],
   );
@@ -48,7 +47,7 @@ void main() {
     expect(
         explained,
         equals('[Column:children=[RichText:(:Above)],'
-            '[CssBlock:child=[WebView:url=data:text/html;charset=utf-8,Foo,aspectRatio=1.78,getDimensions=true]],'
+            '[CssBlock:child=[WebView:url=data:text/html;charset=utf-8,Foo,aspectRatio=1.78,autoResize=true]],'
             '[RichText:(:Below)]]'));
   });
 }

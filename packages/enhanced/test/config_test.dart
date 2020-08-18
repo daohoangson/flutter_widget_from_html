@@ -357,7 +357,7 @@ void main() {
           equals('[CssBlock:child=[WebView:'
               'url=$webViewSrc,'
               'aspectRatio=$webViewDefaultAspectRatio,'
-              'getDimensions=true]]'));
+              'autoResize=true]]'));
     });
 
     testWidgets('renders false value', (WidgetTester tester) async {
@@ -403,7 +403,7 @@ void main() {
             equals('[CssBlock:child=[WebView:'
                 'url=$webViewSrc,'
                 'aspectRatio=$webViewDefaultAspectRatio,'
-                'getDimensions=true,'
+                'autoResize=true,'
                 'unsupportedWorkaroundForIssue37=true'
                 ']]'));
       });
@@ -422,7 +422,7 @@ void main() {
             equals('[CssBlock:child=[WebView:'
                 'url=$webViewSrc,'
                 'aspectRatio=$webViewDefaultAspectRatio,'
-                'getDimensions=true'
+                'autoResize=true'
                 ']]'));
       });
 
@@ -440,7 +440,7 @@ void main() {
             equals('[CssBlock:child=[WebView:'
                 'url=$webViewSrc,'
                 'aspectRatio=$webViewDefaultAspectRatio,'
-                'getDimensions=true'
+                'autoResize=true'
                 ']]'));
       });
     });
@@ -460,7 +460,7 @@ void main() {
             equals('[CssBlock:child=[WebView:'
                 'url=$webViewSrc,'
                 'aspectRatio=$webViewDefaultAspectRatio,'
-                'getDimensions=true'
+                'autoResize=true'
                 ']]'));
       });
 

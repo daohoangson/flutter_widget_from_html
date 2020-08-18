@@ -2,8 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html/src/internal/video_player.dart';
-import 'package:flutter_widget_from_html/src/internal/web_view.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../../core/test/_.dart' as helper;
@@ -39,7 +37,7 @@ String _explainer(helper.Explainer parent, Widget widget) {
   if (widget is WebView) {
     return '[WebView:url=${widget.url}'
         ',aspectRatio=${widget.aspectRatio.toStringAsFixed(2)}'
-        "${widget.getDimensions ? ',getDimensions=${widget.getDimensions}' : ''}"
+        "${widget.autoResize ? ',autoResize=${widget.autoResize}' : ''}"
         "${!widget.js ? ',js=${widget.js}' : ''}"
         "${widget.unsupportedWorkaroundForIssue37 ? ',unsupportedWorkaroundForIssue37=${widget.unsupportedWorkaroundForIssue37}' : ''}"
         ']';

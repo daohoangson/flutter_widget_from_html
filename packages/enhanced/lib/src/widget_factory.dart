@@ -3,15 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    as core;
+    as core show WidgetFactory;
 import 'package:flutter_widget_from_html_core/src/internal/core_ops.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'internal/ops.dart';
 import 'data.dart';
+import 'helpers.dart';
 import 'html_widget.dart';
-import 'internal/video_player.dart';
-import 'internal/web_view.dart';
 
 /// A factory to build widgets with [WebView], [VideoPlayer], etc.
 class WidgetFactory extends core.WidgetFactory {
@@ -154,7 +153,7 @@ class WidgetFactory extends core.WidgetFactory {
     return WebView(
       url,
       aspectRatio: dimensOk ? width / height : 16 / 9,
-      getDimensions: !dimensOk && _widget.webViewJs == true,
+      autoResize: !dimensOk && _widget.webViewJs == true,
       interceptNavigationRequest: (newUrl) {
         if (newUrl == url) return false;
 
