@@ -18,7 +18,10 @@ class TagA {
 
           return styles;
         },
+        isBlockElement: false,
         onPieces: (meta, pieces) {
+          if (meta.isBlockElement) return pieces;
+
           final onTap = _gestureTapCallback(meta);
           if (onTap == null) return pieces;
 
@@ -41,6 +44,16 @@ class TagA {
           }
 
           return pieces;
+        },
+        onWidgets: (meta, widgets) {
+          final onTap = _gestureTapCallback(meta);
+          if (onTap == null) return widgets;
+
+          return [
+            wf.buildColumnPlaceholder(meta, widgets)
+              ..wrapWith(
+                  (_, child) => wf.buildGestureDetector(meta, child, onTap)),
+          ];
         },
       );
 
