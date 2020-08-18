@@ -49,11 +49,8 @@ class TagA {
           final onTap = _gestureTapCallback(meta);
           if (onTap == null) return widgets;
 
-          return [
-            wf.buildColumnPlaceholder(meta, widgets)
-              ..wrapWith(
-                  (_, child) => wf.buildGestureDetector(meta, child, onTap)),
-          ];
+          return listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
+              (_, child) => wf.buildGestureDetector(meta, child, onTap)));
         },
       );
 

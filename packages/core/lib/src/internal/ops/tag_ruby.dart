@@ -74,23 +74,23 @@ class TagRuby {
   }
 
   TextBit _buildTextBit(TextBits parent, Widget ruby, Widget rt) {
-    final widget = WidgetPlaceholder<NodeMetadata>(rubyMeta)
-      ..wrapWith((context, _) {
-        final tsh = _rtText.tsb.build(context);
-        final paddingValue = tsh.style.fontSize *
-            .75 *
-            tsh.getDependency<MediaQueryData>().textScaleFactor;
-        final padding = EdgeInsets.symmetric(vertical: paddingValue);
+    final widget =
+        WidgetPlaceholder<NodeMetadata>(rubyMeta).wrapWith((context, _) {
+      final tsh = _rtText.tsb.build(context);
+      final paddingValue = tsh.style.fontSize *
+          .75 *
+          tsh.getDependency<MediaQueryData>().textScaleFactor;
+      final padding = EdgeInsets.symmetric(vertical: paddingValue);
 
-        return wf.buildStack(
-          rubyMeta,
-          tsh,
-          <Widget>[
-            wf.buildPadding(rubyMeta, ruby, padding),
-            Positioned.fill(bottom: null, child: Center(child: rt)),
-          ],
-        );
-      });
+      return wf.buildStack(
+        rubyMeta,
+        tsh,
+        <Widget>[
+          wf.buildPadding(rubyMeta, ruby, padding),
+          Positioned.fill(bottom: null, child: Center(child: rt)),
+        ],
+      );
+    });
 
     return TextWidget(parent, widget, alignment: PlaceholderAlignment.middle);
   }

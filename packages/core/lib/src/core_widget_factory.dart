@@ -194,29 +194,28 @@ class WidgetFactory {
 
       if (compiled.spanBuilder == null) continue;
       widgets.add(
-        WidgetPlaceholder<TextBits>(text)
-          ..wrapWith((context, _) {
-            final span = compiled.spanBuilder(context);
-            final tsh = text.tsb?.build(context);
-            final textAlign = tsh?.textAlign ?? TextAlign.start;
+        WidgetPlaceholder<TextBits>(text).wrapWith((context, _) {
+          final span = compiled.spanBuilder(context);
+          final tsh = text.tsb?.build(context);
+          final textAlign = tsh?.textAlign ?? TextAlign.start;
 
-            if (span is WidgetSpan &&
-                span.alignment == PlaceholderAlignment.baseline &&
-                textAlign == TextAlign.start) {
-              return span.child;
-            }
+          if (span is WidgetSpan &&
+              span.alignment == PlaceholderAlignment.baseline &&
+              textAlign == TextAlign.start) {
+            return span.child;
+          }
 
-            return RichText(
-              overflow: tsh?.textOverflow ?? TextOverflow.clip,
-              text: span,
-              textAlign: textAlign,
-              textDirection: tsh?.textDirection ?? TextDirection.ltr,
+          return RichText(
+            overflow: tsh?.textOverflow ?? TextOverflow.clip,
+            text: span,
+            textAlign: textAlign,
+            textDirection: tsh?.textDirection ?? TextDirection.ltr,
 
-              // TODO: calculate max lines automatically for ellipsis if needed
-              // currently it only renders 1 line with ellipsis
-              maxLines: tsh?.maxLines == -1 ? null : tsh?.maxLines,
-            );
-          }),
+            // TODO: calculate max lines automatically for ellipsis if needed
+            // currently it only renders 1 line with ellipsis
+            maxLines: tsh?.maxLines == -1 ? null : tsh?.maxLines,
+          );
+        }),
       );
     }
 

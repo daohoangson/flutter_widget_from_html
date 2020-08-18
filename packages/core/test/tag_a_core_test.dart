@@ -72,6 +72,12 @@ void main() {
     );
   });
 
+  testWidgets('renders empty inside', (tester) async {
+    final html = '<a href="$kHref""></a>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[widget0]'));
+  });
+
   testWidgets('renders DIV tag inside (display: block)', (tester) async {
     final html = '<a href="$kHref" style="display: block"><div>Foo</div></a>';
     final explained = await explain(tester, html);
@@ -96,6 +102,12 @@ void main() {
         ']]]',
       ),
     );
+  });
+
+  testWidgets('renders empty inside (display: block)', (tester) async {
+    final html = '<a href="$kHref" style="display: block"></a>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[widget0]'));
   });
 
   testWidgets('renders empty background-color inside (#215)', (tester) async {

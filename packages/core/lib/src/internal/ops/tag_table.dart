@@ -80,28 +80,27 @@ class TagTable {
     if (_data.captions.isEmpty && rows.isEmpty) return [];
 
     return [
-      WidgetPlaceholder<NodeMetadata>(tableMeta)
-        ..wrapWith((context, _) {
-          final metadata = TableMetadata(border: _parseBorder(context));
+      WidgetPlaceholder<NodeMetadata>(tableMeta).wrapWith((context, _) {
+        final metadata = TableMetadata(border: _parseBorder(context));
 
-          for (var i = 0; i < rows.length; i++) {
-            for (final cell in rows[i].cells) {
-              metadata.addCell(
-                i,
-                cell.child,
-                colspan: cell.colspan,
-                rowspan: cell.rowspan,
-              );
-            }
+        for (var i = 0; i < rows.length; i++) {
+          for (final cell in rows[i].cells) {
+            metadata.addCell(
+              i,
+              cell.child,
+              colspan: cell.colspan,
+              rowspan: cell.rowspan,
+            );
           }
+        }
 
-          final tsh = tableMeta.tsb().build(context);
-          final table = wf.buildTable(tableMeta, tsh, metadata);
-          return wf.buildColumnWidget(tableMeta, tsh, [
-            ..._data.captions,
-            if (table != null) table,
-          ]);
-        }),
+        final tsh = tableMeta.tsb().build(context);
+        final table = wf.buildTable(tableMeta, tsh, metadata);
+        return wf.buildColumnWidget(tableMeta, tsh, [
+          ..._data.captions,
+          if (table != null) table,
+        ]);
+      }),
     ];
   }
 
