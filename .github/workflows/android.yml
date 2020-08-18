@@ -3,8 +3,8 @@ on:
   push:
     paths: 
       - .github/workflows/android.yml
-      - packages/enhanced/lib/src/widget/video_player.dart
-      - packages/enhanced/lib/src/widget/web_view.dart
+      - packages/enhanced/lib/src/widgets/video_player.dart
+      - packages/enhanced/lib/src/widgets/web_view.dart
       - 'tool/sylph/**'
   workflow_dispatch:
 
