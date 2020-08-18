@@ -2,16 +2,38 @@ import 'package:chewie/chewie.dart' as lib;
 import 'package:flutter/widgets.dart';
 import 'package:video_player/video_player.dart' as lib;
 
+/// A video player.
 class VideoPlayer extends StatefulWidget {
+  /// The source URL.
   final String url;
 
+  /// The initial aspect ratio.
   final double aspectRatio;
+
+  /// Controls whether to resize automatically.
+  ///
+  /// Default: `true`.
   final bool autoResize;
+
+  /// Controls whether to play video automatically.
+  ///
+  /// Default: `false`.
   final bool autoplay;
+
+  /// Controls whether to show video controls.
+  ///
+  /// Default: `false`.
   final bool controls;
+
+  /// Controls whether to play video in loops.
+  ///
+  /// Default: `false`.
   final bool loop;
+
+  /// The widget to be shown before video is loaded.
   final Widget poster;
 
+  /// Creates a player.
   VideoPlayer(
     this.url, {
     @required this.aspectRatio,
@@ -30,7 +52,7 @@ class VideoPlayer extends StatefulWidget {
 }
 
 class _VideoPlayerState extends State<VideoPlayer> {
-  _Controller _controller;
+  lib.ChewieController _controller;
 
   @override
   void initState() {
