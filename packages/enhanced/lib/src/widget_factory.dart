@@ -15,15 +15,12 @@ import 'internal/web_view.dart';
 
 /// A factory to build widgets with [WebView], [VideoPlayer], etc.
 class WidgetFactory extends core.WidgetFactory {
-  State<core.HtmlWidget> _state;
+  State _state;
   BuildOp _tagIframe;
   BuildOp _tagSvg;
   TextStyleHtml Function(TextStyleHtml, dynamic) _tsbTagA;
 
-  HtmlWidget get _widget {
-    final candidate = _state.widget;
-    return candidate is HtmlWidget ? candidate : null;
-  }
+  HtmlWidget get _widget => _state.widget;
 
   /// Builds [Divider].
   @override
@@ -151,23 +148,22 @@ class WidgetFactory extends core.WidgetFactory {
     double height,
     double width,
   }) {
-    final widget = _widget;
-    if (widget?.webView != true) return buildWebViewLinkOnly(meta, url);
+    if (_widget?.webView != true) return buildWebViewLinkOnly(meta, url);
 
     final dimensOk = height != null && height > 0 && width != null && width > 0;
     return WebView(
       url,
       aspectRatio: dimensOk ? width / height : 16 / 9,
-      getDimensions: !dimensOk && widget.webViewJs == true,
+      getDimensions: !dimensOk && _widget.webViewJs == true,
       interceptNavigationRequest: (newUrl) {
         if (newUrl == url) return false;
 
         gestureTapCallback(newUrl)();
         return true;
       },
-      js: widget.webViewJs == true,
+      js: _widget.webViewJs == true,
       unsupportedWorkaroundForIssue37:
-          widget.unsupportedWebViewWorkaroundForIssue37 == true,
+          _widget.unsupportedWebViewWorkaroundForIssue37 == true,
     );
   }
 
@@ -276,8 +272,12 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
-  void reset(State<core.HtmlWidget> state) {
-    _state = state;
+  void reset(State state) {
+    final widget = state.widget;
+    if (widget is HtmlWidget) {
+      _state = state;
+    }
+
     super.reset(state);
   }
 }

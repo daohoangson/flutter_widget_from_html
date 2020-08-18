@@ -26,9 +26,9 @@ class WidgetFactory {
   BuildOp _tagQ;
   TextStyleHtml Function(TextStyleHtml, String) __tsbFontSize;
   TextStyleHtml Function(TextStyleHtml, String) _tsbLineHeight;
-  State<HtmlWidget> _state;
+  State _state;
 
-  HtmlWidget get _widget => _state.widget;
+  HtmlWidget get _widget => _state?.widget;
 
   /// Builds primary column (body).
   WidgetPlaceholder buildBody(NodeMetadata meta, Iterable<Widget> children) =>
@@ -339,7 +339,7 @@ class WidgetFactory {
 
     switch (meta.domElement.localName) {
       case kTagA:
-        _tagA ??= TagA(this, () => _widget.hyperlinkColor).buildOp;
+        _tagA ??= TagA(this, () => _widget?.hyperlinkColor).buildOp;
         meta.register(_tagA);
         break;
 
@@ -727,9 +727,14 @@ class WidgetFactory {
     }
   }
 
-  /// Resets for new build.
+  /// Resets for a new build.
   @mustCallSuper
-  void reset(State<HtmlWidget> state) => _state = state;
+  void reset(State state) {
+    final widget = state?.widget;
+    if (widget is HtmlWidget) {
+      _state = state;
+    }
+  }
 
   /// Returns build op for block element.
   BuildOp styleDisplayBlock() {
@@ -746,14 +751,14 @@ class WidgetFactory {
     if (url?.isNotEmpty != true) return null;
     if (url.startsWith('data:')) return url;
 
-    final p = Uri.tryParse(url);
-    if (p == null) return null;
-    if (p.hasScheme) return p.toString();
+    final uri = Uri.tryParse(url);
+    if (uri == null) return null;
+    if (uri.hasScheme) return url;
 
-    final b = _widget.baseUrl;
-    if (b == null) return null;
+    final baseUrl = _widget?.baseUrl;
+    if (baseUrl == null) return null;
 
-    return b.resolveUri(p).toString();
+    return baseUrl.resolveUri(uri).toString();
   }
 
   TextStyleHtml Function(TextStyleHtml, String) get _tsbFontSize {
