@@ -43,14 +43,11 @@ class TagVideo {
     _sourceUrls.add(url);
   }
 
-  Iterable<WidgetPlaceholder> onWidgets(
-      NodeMetadata _, Iterable<WidgetPlaceholder> widgets) {
+  Iterable<Widget> onWidgets(NodeMetadata _, Iterable<WidgetPlaceholder> ws) {
     final player = build();
-    if (player == null) return widgets;
+    if (player == null) return ws;
 
-    return [
-      WidgetPlaceholder<NodeMetadata>(videoMeta, child: player),
-    ];
+    return [WidgetPlaceholder<NodeMetadata>(videoMeta, child: player)];
   }
 
   Widget build() {

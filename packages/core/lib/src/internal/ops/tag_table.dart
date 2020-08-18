@@ -69,8 +69,7 @@ class TagTable {
     }
   }
 
-  Iterable<WidgetPlaceholder> onWidgets(
-      NodeMetadata _, Iterable<WidgetPlaceholder> __) {
+  Iterable<Widget> onWidgets(NodeMetadata _, Iterable<WidgetPlaceholder> __) {
     final rows = <_TagTableDataRow>[
       ..._data.header.rows,
       ..._data.rows,
