@@ -504,7 +504,7 @@ void main() {
   <li style="padding-inline-start: 199px">199px</li>
   <li style="padding-inline-start: 299px">299px</li>
   <li>99px</li>
-<ul>
+</ul>
 ''';
         final explained = await explain(tester, html);
         expect(
