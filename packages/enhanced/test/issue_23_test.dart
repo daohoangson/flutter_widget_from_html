@@ -12,7 +12,7 @@ class _BlockquoteWebViewWf extends WidgetFactory {
     onWidgets: (meta, _) => [
       WebView(
         Uri.dataFromString(
-          meta.domElement.innerHtml,
+          meta.element.innerHtml,
           mimeType: 'text/html',
           encoding: Encoding.getByName('utf-8'),
         ).toString(),
@@ -23,8 +23,8 @@ class _BlockquoteWebViewWf extends WidgetFactory {
   );
 
   @override
-  void parse(NodeMetadata meta) {
-    if (meta.domElement.localName == 'blockquote') {
+  void parse(BuildMetadata meta) {
+    if (meta.element.localName == 'blockquote') {
       meta.register(blockquoteOp);
       return;
     }

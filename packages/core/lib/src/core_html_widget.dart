@@ -91,7 +91,7 @@ class HtmlWidget extends StatefulWidget {
 class _HtmlWidgetState extends State<HtmlWidget> {
   Widget _cache;
   Future<Widget> _future;
-  NodeMetadata _rootMeta;
+  BuildMetadata _rootMeta;
   _RootTsb _rootTsb;
   WidgetFactory _wf;
 

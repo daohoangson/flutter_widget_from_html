@@ -45,7 +45,7 @@ class StylePadding {
         priority: 9999,
       );
 
-  Widget _build(BuildContext context, NodeMetadata meta, Widget child,
+  Widget _build(BuildContext context, BuildMetadata meta, Widget child,
       CssLengthBox padding) {
     final tsh = meta.tsb().build(context);
     return wf.buildPadding(

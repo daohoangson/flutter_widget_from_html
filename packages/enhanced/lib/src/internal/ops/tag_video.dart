@@ -12,7 +12,7 @@ const kTagVideo = 'video';
 const kTagVideoSource = 'source';
 
 class TagVideo {
-  final NodeMetadata videoMeta;
+  final BuildMetadata videoMeta;
   final WidgetFactory wf;
 
   final _sourceUrls = <String>[];
@@ -29,10 +29,10 @@ class TagVideo {
     return _videoOp;
   }
 
-  void onChild(NodeMetadata childMeta) {
-    final e = childMeta.domElement;
+  void onChild(BuildMetadata childMeta) {
+    final e = childMeta.element;
     if (e.localName != kTagVideoSource) return;
-    if (e.parent != videoMeta.domElement) return;
+    if (e.parent != videoMeta.element) return;
 
     final attrs = e.attributes;
     final url = attrs.containsKey(kAttributeVideoSrc)
@@ -43,17 +43,17 @@ class TagVideo {
     _sourceUrls.add(url);
   }
 
-  Iterable<Widget> onWidgets(NodeMetadata _, Iterable<WidgetPlaceholder> ws) {
+  Iterable<Widget> onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> ws) {
     final player = build();
     if (player == null) return ws;
 
-    return [WidgetPlaceholder<NodeMetadata>(videoMeta, child: player)];
+    return [WidgetPlaceholder<BuildMetadata>(videoMeta, child: player)];
   }
 
   Widget build() {
     if (_sourceUrls.isEmpty) return null;
 
-    final attrs = videoMeta.domElement.attributes;
+    final attrs = videoMeta.element.attributes;
     return wf.buildVideoPlayer(
       videoMeta,
       _sourceUrls.first,

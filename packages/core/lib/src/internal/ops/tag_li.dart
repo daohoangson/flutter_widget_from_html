@@ -24,10 +24,10 @@ const kCssListStyleTypeRomanUpper = 'upper-roman';
 const kCssListStyleTypeSquare = 'square';
 
 class TagLi {
-  final NodeMetadata listMeta;
+  final BuildMetadata listMeta;
   final WidgetFactory wf;
 
-  final _itemMetas = <NodeMetadata>[];
+  final _itemMetas = <BuildMetadata>[];
   final _itemWidgets = <WidgetPlaceholder>[];
 
   _ListConfig _config;
@@ -39,7 +39,7 @@ class TagLi {
   _ListConfig get config {
     // cannot build config from constructor because
     // domElement is not set at that time
-    _config ??= _ListConfig.fromNodeMetadata(listMeta);
+    _config ??= _ListConfig.fromBuildMetadata(listMeta);
     return _config;
   }
 
@@ -48,13 +48,13 @@ class TagLi {
     return _listOp;
   }
 
-  Map<String, String> defaultStyles(NodeMetadata meta) {
-    final attrs = meta.domElement.attributes;
+  Map<String, String> defaultStyles(BuildMetadata meta) {
+    final attrs = meta.element.attributes;
     final p = listMeta.parentOps?.whereType<_TagLiOp>()?.length ?? 0;
 
     final styles = {
       'padding-inline-start': '2.5em',
-      kCssListStyleType: meta.domElement.localName == kTagOrderedList
+      kCssListStyleType: meta.element.localName == kTagOrderedList
           ? (attrs.containsKey(kAttributeLiType)
                   ? _ListConfig.listStyleTypeFromAttributeType(
                       attrs[kAttributeLiType])
@@ -70,15 +70,15 @@ class TagLi {
     return styles;
   }
 
-  void onChild(NodeMetadata childMeta) {
-    final e = childMeta.domElement;
+  void onChild(BuildMetadata childMeta) {
+    final e = childMeta.element;
     if (e.localName != kTagLi) return;
-    if (e.parent != listMeta.domElement) return;
+    if (e.parent != listMeta.element) return;
 
     _itemOp ??= BuildOp(
       onWidgets: (itemMeta, widgets) {
         final column = wf.buildColumnPlaceholder(itemMeta, widgets) ??
-            WidgetPlaceholder<NodeMetadata>(itemMeta);
+            WidgetPlaceholder<BuildMetadata>(itemMeta);
 
         final i = _itemMetas.length;
         _itemMetas.add(itemMeta);
@@ -92,8 +92,8 @@ class TagLi {
 
   Widget _buildItem(BuildContext context, Widget child, int i) {
     final meta = _itemMetas[i];
-    final listStyleType =
-        _ListConfig.listStyleTypeFromNodeMetadata(meta) ?? config.listStyleType;
+    final listStyleType = _ListConfig.listStyleTypeFromBuildMetadata(meta) ??
+        config.listStyleType;
     final markerIndex = config.markerReversed == true
         ? (config.markerStart ?? _itemWidgets.length) - i
         : (config.markerStart ?? 1) + i;
@@ -146,8 +146,8 @@ class _ListConfig {
     this.markerStart,
   });
 
-  factory _ListConfig.fromNodeMetadata(NodeMetadata meta) {
-    final attrs = meta.domElement.attributes;
+  factory _ListConfig.fromBuildMetadata(BuildMetadata meta) {
+    final attrs = meta.element.attributes;
 
     return _ListConfig(
       listStyleType: meta[kCssListStyleType] ?? kCssListStyleTypeDisc,
@@ -158,11 +158,11 @@ class _ListConfig {
     );
   }
 
-  static String listStyleTypeFromNodeMetadata(NodeMetadata meta) {
+  static String listStyleTypeFromBuildMetadata(BuildMetadata meta) {
     final listStyleType = meta[kCssListStyleType];
     if (listStyleType != null) return listStyleType;
 
-    final attrs = meta.domElement.attributes;
+    final attrs = meta.element.attributes;
     return attrs.containsKey(kAttributeLiType)
         ? listStyleTypeFromAttributeType(attrs[kAttributeLiType])
         : null;

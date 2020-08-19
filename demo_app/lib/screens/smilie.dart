@@ -27,15 +27,15 @@ class SmilieScreen extends StatelessWidget {
 class _SmiliesWidgetFactory extends WidgetFactory {
   final smilieOp = BuildOp(
     onPieces: (meta, pieces) {
-      final alt = meta.domElement.attributes['alt'];
+      final alt = meta.element.attributes['alt'];
       final text = kSmilies.containsKey(alt) ? kSmilies[alt] : alt;
       return pieces..first?.text?.addText(text);
     },
   );
 
   @override
-  void parse(NodeMetadata meta) {
-    final e = meta.domElement;
+  void parse(BuildMetadata meta) {
+    final e = meta.element;
     if (e.localName == 'img' &&
         e.classes.contains('smilie') &&
         e.attributes.containsKey('alt')) {

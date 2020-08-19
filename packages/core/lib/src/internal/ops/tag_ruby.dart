@@ -5,7 +5,7 @@ const kTagRp = 'rp';
 const kTagRt = 'rt';
 
 class TagRuby {
-  final NodeMetadata rubyMeta;
+  final BuildMetadata rubyMeta;
   final WidgetFactory wf;
 
   BuildOp _rubyOp;
@@ -22,9 +22,9 @@ class TagRuby {
     return _rubyOp;
   }
 
-  void onChild(NodeMetadata childMeta) {
-    final e = childMeta.domElement;
-    if (e.parent != rubyMeta.domElement) return;
+  void onChild(BuildMetadata childMeta) {
+    final e = childMeta.element;
+    if (e.parent != rubyMeta.element) return;
 
     switch (e.localName) {
       case kTagRp:
@@ -50,7 +50,7 @@ class TagRuby {
   }
 
   Iterable<BuiltPiece> onPieces(
-      NodeMetadata meta, Iterable<BuiltPiece> pieces) {
+      BuildMetadata meta, Iterable<BuiltPiece> pieces) {
     if (_rtText == null) return pieces;
     var processed = false;
 
@@ -75,7 +75,7 @@ class TagRuby {
 
   TextBit _buildTextBit(TextBits parent, Widget ruby, Widget rt) {
     final widget =
-        WidgetPlaceholder<NodeMetadata>(rubyMeta).wrapWith((context, _) {
+        WidgetPlaceholder<BuildMetadata>(rubyMeta).wrapWith((context, _) {
       final tsh = _rtText.tsb.build(context);
       final paddingValue = tsh.style.fontSize *
           .75 *

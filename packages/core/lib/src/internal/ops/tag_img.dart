@@ -46,14 +46,14 @@ class TagImg {
         },
       );
 
-  Widget _build(NodeMetadata node, ImageMetadata image) {
+  Widget _build(BuildMetadata node, ImageMetadata image) {
     final provider = wf.imageProvider(image.sources?.first);
     if (provider == null) return null;
     return wf.buildImage(node, provider, image);
   }
 
-  ImageMetadata _parse(NodeMetadata meta) {
-    final attrs = meta.domElement.attributes;
+  ImageMetadata _parse(BuildMetadata meta) {
+    final attrs = meta.element.attributes;
     final src =
         attrs.containsKey(kAttributeImgSrc) ? attrs[kAttributeImgSrc] : null;
     final url = wf.urlFull(src);

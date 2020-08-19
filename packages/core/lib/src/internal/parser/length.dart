@@ -38,7 +38,7 @@ CssLength tryParseCssLength(String value) {
   return null;
 }
 
-CssLengthBox tryParseCssLengthBox(NodeMetadata meta, String key) {
+CssLengthBox tryParseCssLengthBox(BuildMetadata meta, String key) {
   CssLengthBox output;
 
   for (final style in meta.styles) {
