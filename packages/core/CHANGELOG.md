@@ -1,3 +1,52 @@
+## 0.5.0-rc.2020081901
+
+This is a big release with lots of improvements under the hood, probably the last pre-release before `v0.5.0` stable is out. If you don't extends `WidgetFactory` yourself then there are only two BREAKING changes that may affect your app:
+
+* BREAKING: `customStylesBuilder` returns `Map` instead of `List`
+* BREAKING: `onTapUrl` is called for incomplete URL
+
+Other changes:
+
+* Add support for `pt` unit (#266)
+* Add support for inline style `background` (color only) (#275)
+* Implement inline support for `margin`, `padding` (#237)
+* Fix sizing (width, heigh, etc. #248)
+* Fix bug `textScaleFactor` being considered twice during rendering (#267)
+* Fix widget tree not being updated on dependency changes (#284)
+
+Finally, BREAKING changes if you have a custom `WidgetFactory`:
+
+* `BuildOp`: callback params changed
+* `ImgMetadata` -> `ImageMetadata`:
+  * Add `ImageSource`
+* `NodeMetadata` -> `BuildMetadata`:
+  * Text style properties moved into `TextStyleHtml`
+  * Remove `hasOps`
+  * Remove `hasParents`
+  * `ops` -> `buildOps`
+  * `parents` -> `parentOps`
+  * `op=` -> `register(BuildOp)`
+  * `style` -> `operator [](String)`
+  * `styles=` -> `operator []=(String, String)`
+* `TableData` -> `TableMetadata`
+* `TextBit`
+  * Remove `TextWhitespace`, `TextWhitespaceType`
+  * Remove `data`
+  * Remove `canCompile`
+  * Remove `hasTrailingWhitespace` (`TextBits` still has it)
+  * `InlineSpan compile(TextStyle)` -> `CompileTo compile(CompileFrom)`
+  * `static TextBit TextBit.nextOf(TextBit)` -> instance `TextBit next()`
+* `TextStyleBuilders` -> `TextStyleBuilder`:
+  * Builder signature `TextStyleHtml Function(BuildContext, TextStyleHtml, T)` -> `TextStyleHtml Function(TextStyleHtml, T)`
+* `WidgetFactory`
+  * `buildXxx` methods have `BuildMetadata` as first parameter
+  * `buildImageXxx` -> `imageXxx`
+  * `buildGestureTapCallbackForUrl` -> `gestureTapCallback`
+  * `parseTag(NodeMetadata, String, String)` -> `parse(BuildMetadata)`
+* `WidgetPlaceholder`
+  * Constructor changed
+  * Builder signature `Iterable<Widget> Function(BuildContext, Iterable<Widget>, T)` -> `Widget Function(BuildContext, Widget)`
+
 ## 0.5.0-rc.2020071301
 
 * BREAKING: Remove 3rd param `wf` from `WidgetPlaceholder.wrap`
