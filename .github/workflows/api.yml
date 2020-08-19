@@ -22,7 +22,7 @@ jobs:
           set -e
 
           mkdir -p ./.now && echo '${{ secrets.API_PROJECT_JSON }}' > ./.now/project.json
-          
+
           if [ $GITHUB_REF == 'refs/heads/master' ]; then
             _url=$( now  --prod --token ${{ secrets.ZEIT_TOKEN }} )
           else

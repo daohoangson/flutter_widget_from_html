@@ -62,14 +62,14 @@ jobs:
       - name: Generate document
         run: |
           set -e
-          
+
           ( cd packages/core && ../../tool/dartdoc/dartdoc.sh )
           ( cd packages/enhanced && ../../tool/dartdoc/dartdoc.sh )
       - name: Deploy via now.sh
         id: now
         run: |
           set -e
-          
+
           mkdir -p ./.now && echo '${{ secrets.DOCUMENT_PROJECT_JSON }}' > ./.now/project.json
           cp ./tool/dartdoc/now.json ./now.json
           _url=$( now --token ${{ secrets.ZEIT_TOKEN }} )
@@ -101,7 +101,7 @@ jobs:
       - name: Create simulator
         run: |
           set -e
-          
+
           _deviceType=$( xcrun simctl list devicetypes iphone -j | jq '.devicetypes[-1]' )
           _deviceTypeName=$( echo $_deviceType | jq .name -r )
           _deviceTypeId=$( echo $_deviceType | jq .identifier -r )

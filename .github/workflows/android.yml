@@ -9,7 +9,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  sylph:
+    if: startsWith(github.ref, 'refs/head/wip')
     env:
       AWS_ACCESS_KEY_ID: AKIAY43IFJQXPIU46LXP
       AWS_DEFAULT_REGION: us-west-2
