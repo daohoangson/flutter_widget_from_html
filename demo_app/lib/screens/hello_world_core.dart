@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
-const kHtml = '''<h1>Heading 1</h1>
+const kHtml = '''
+<h1>Heading 1</h1>
 <h2>Heading 2</h2>
 <h3>Heading 3</h3>
 <h4>Heading 4</h4>
@@ -19,9 +20,7 @@ const kHtml = '''<h1>Heading 1</h1>
 class HelloWorldCoreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text('HelloWorldCoreScreen'),
-        ),
+        appBar: AppBar(title: Text('HelloWorldCoreScreen')),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
