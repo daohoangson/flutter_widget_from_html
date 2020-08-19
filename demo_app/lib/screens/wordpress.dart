@@ -39,9 +39,7 @@ class PostsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext _) => Scaffold(
-        appBar: AppBar(
-          title: Text(title ?? domain),
-        ),
+        appBar: AppBar(title: Text(title ?? domain)),
         body: _PostsList('https://$domain/wp-json/wp/v2/posts?_embed'),
       );
 
@@ -58,7 +56,7 @@ class _PostScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text(post.title),
+          title: HtmlWidget(post.title),
           actions: [
             IconButton(
               icon: Icon(Icons.open_in_browser),
