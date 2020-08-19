@@ -23,17 +23,17 @@ class WidgetFactory extends core.WidgetFactory {
 
   /// Builds [Divider].
   @override
-  Widget buildDivider(NodeMetadata meta) => const Divider(height: 1);
+  Widget buildDivider(BuildMetadata meta) => const Divider(height: 1);
 
   /// Builds [InkWell].
   @override
   Widget buildGestureDetector(
-          NodeMetadata meta, Widget child, GestureTapCallback onTap) =>
+          BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
       InkWell(child: child, onTap: onTap);
 
   /// Builds [SvgPicture] or [Image].
   @override
-  Widget buildImage(NodeMetadata meta, Object provider, ImageMetadata image) {
+  Widget buildImage(BuildMetadata meta, Object provider, ImageMetadata image) {
     var built = super.buildImage(meta, provider, image);
 
     if (built == null && provider is PictureProvider) {
@@ -49,7 +49,8 @@ class WidgetFactory extends core.WidgetFactory {
 
   /// Builds [LayoutGrid].
   @override
-  Widget buildTable(NodeMetadata node, TextStyleHtml tsh, TableMetadata table) {
+  Widget buildTable(
+      BuildMetadata node, TextStyleHtml tsh, TableMetadata table) {
     final cols = table.cols;
     if (cols == 0) return null;
     final templateColumnSizes = List<TrackSize>(cols);
@@ -112,7 +113,7 @@ class WidgetFactory extends core.WidgetFactory {
 
   /// Builds [VideoPlayer].
   Widget buildVideoPlayer(
-    NodeMetadata meta,
+    BuildMetadata meta,
     String url, {
     bool autoplay,
     bool controls,
@@ -142,7 +143,7 @@ class WidgetFactory extends core.WidgetFactory {
 
   /// Builds [WebView].
   Widget buildWebView(
-    NodeMetadata meta,
+    BuildMetadata meta,
     String url, {
     double height,
     double width,
@@ -167,7 +168,8 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   /// Builds fallback link when [HtmlWidget.webView] is disabled.
-  Widget buildWebViewLinkOnly(NodeMetadata meta, String url) => GestureDetector(
+  Widget buildWebViewLinkOnly(BuildMetadata meta, String url) =>
+      GestureDetector(
         child: Text(url),
         onTap: gestureTapCallback(url),
       );
@@ -186,9 +188,8 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
-  List<HtmlWidgetDependency> getDependencies(BuildContext context) =>
-      super.getDependencies(context)
-        ..add(HtmlWidgetDependency<ThemeData>(Theme.of(context)));
+  Iterable<dynamic> getDependencies(BuildContext context) =>
+      [...super.getDependencies(context), Theme.of(context)];
 
   /// Returns flutter_svg.[PictureProvider] or [ImageProvider].
   @override
@@ -244,8 +245,8 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
-  void parse(NodeMetadata meta) {
-    switch (meta.domElement.localName) {
+  void parse(BuildMetadata meta) {
+    switch (meta.element.localName) {
       case 'a':
         _tsbTagA ??= (p, _) => p.copyWith(
             style: p.style

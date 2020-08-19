@@ -31,12 +31,12 @@ class WidgetFactory {
   HtmlWidget get _widget => _state?.widget;
 
   /// Builds primary column (body).
-  WidgetPlaceholder buildBody(NodeMetadata meta, Iterable<Widget> children) =>
+  WidgetPlaceholder buildBody(BuildMetadata meta, Iterable<Widget> children) =>
       buildColumnPlaceholder(meta, children, trimMarginVertical: true);
 
   /// Builds column placeholder.
   WidgetPlaceholder buildColumnPlaceholder(
-    NodeMetadata meta,
+    BuildMetadata meta,
     Iterable<Widget> children, {
     bool trimMarginVertical = false,
   }) {
@@ -64,7 +64,7 @@ class WidgetFactory {
 
   /// Builds [Column].
   Widget buildColumnWidget(
-      NodeMetadata meta, TextStyleHtml tsh, List<Widget> children) {
+      BuildMetadata meta, TextStyleHtml tsh, List<Widget> children) {
     if (children?.isNotEmpty != true) return null;
     if (children.length == 1) return children.first;
 
@@ -78,7 +78,7 @@ class WidgetFactory {
 
   /// Builds [DecoratedBox].
   Widget buildDecoratedBox(
-    NodeMetadata meta,
+    BuildMetadata meta,
     Widget child, {
     Color color,
   }) =>
@@ -92,14 +92,14 @@ class WidgetFactory {
           : child;
 
   /// Builds 1-pixel-height divider.
-  Widget buildDivider(NodeMetadata meta) => const DecoratedBox(
+  Widget buildDivider(BuildMetadata meta) => const DecoratedBox(
         decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 1)),
         child: SizedBox(height: 1),
       );
 
   /// Builds [GestureDetector].
   Widget buildGestureDetector(
-          NodeMetadata meta, Widget child, GestureTapCallback onTap) =>
+          BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
       GestureDetector(child: child, onTap: onTap);
 
   /// Builds [TextSpan] with [TapGestureRecognizer].
@@ -115,11 +115,11 @@ class WidgetFactory {
       );
 
   /// Builds horizontal scroll view.
-  Widget buildHorizontalScrollView(NodeMetadata meta, Widget child) =>
+  Widget buildHorizontalScrollView(BuildMetadata meta, Widget child) =>
       SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
 
   /// Builds [Image] from [provider].
-  Widget buildImage(NodeMetadata node, Object provider, ImageMetadata image) =>
+  Widget buildImage(BuildMetadata node, Object provider, ImageMetadata image) =>
       provider != null && provider is ImageProvider && image != null
           ? Image(
               errorBuilder: (_, error, __) {
@@ -133,14 +133,14 @@ class WidgetFactory {
           : null;
 
   /// Builds [Padding].
-  Widget buildPadding(NodeMetadata meta, Widget child, EdgeInsets padding) =>
+  Widget buildPadding(BuildMetadata meta, Widget child, EdgeInsets padding) =>
       child != null && padding != null && padding != const EdgeInsets.all(0)
           ? Padding(child: child, padding: padding)
           : child;
 
   /// Builds [Stack].
   Widget buildStack(
-          NodeMetadata meta, TextStyleHtml tsh, List<Widget> children) =>
+          BuildMetadata meta, TextStyleHtml tsh, List<Widget> children) =>
       Stack(
         children: children,
         overflow: Overflow.visible,
@@ -148,7 +148,8 @@ class WidgetFactory {
       );
 
   /// Builds [Table].
-  Widget buildTable(NodeMetadata node, TextStyleHtml tsh, TableMetadata table) {
+  Widget buildTable(
+      BuildMetadata node, TextStyleHtml tsh, TableMetadata table) {
     final rows = <TableRow>[];
     final slotIndices = <int>[];
     final tableCols = table.cols;
@@ -181,7 +182,7 @@ class WidgetFactory {
   }
 
   /// Builds [RichText].
-  WidgetPlaceholder buildText(NodeMetadata meta, TextBits text) {
+  WidgetPlaceholder buildText(BuildMetadata meta, TextBits text) {
     text.trimRight();
     if (text.isEmpty) return null;
 
@@ -229,11 +230,41 @@ class WidgetFactory {
           : print('[flutter_widget_from_html] Tapped url $url')
       : null;
 
-  /// Returns [HtmlWidgetDependency]s from the provided [context].
-  List<HtmlWidgetDependency> getDependencies(BuildContext context) => [
-        HtmlWidgetDependency<MediaQueryData>(MediaQuery.of(context)),
-        HtmlWidgetDependency<TextDirection>(Directionality.of(context)),
-        HtmlWidgetDependency<TextStyle>(DefaultTextStyle.of(context).style),
+  /// Returns [context]-based dependencies.
+  ///
+  /// Includes these by default:
+  ///
+  /// - [MediaQueryData] via [MediaQuery.of]
+  /// - [TextDirection] via [Directionality.of]
+  /// - [TextStyle] via [DefaultTextStyle.of]
+  /// - [ThemeData] via [Theme.of] (enhanced package only)
+  ///
+  /// Use [TextStyleHtml.getDependency] to get value by type.
+  ///
+  /// ```dart
+  /// // in normal widget building:
+  /// final scale = MediaQuery.of(context).textScaleFactor;
+  /// final color = Theme.of(context).accentColor;
+  ///
+  /// // in build ops:
+  /// final scale = tsh.getDependency<MediaQueryData>().textScaleFactor;
+  /// final color = tsh.getDependency<ThemeData>().accentColor;
+  /// ```
+  ///
+  /// It's recommended to use values from [TextStyleHtml] instead of
+  /// obtaining from [BuildContext] for performance reason.
+  ///
+  /// ```dart
+  /// // avoid doing this:
+  /// final widgetValue = Directionality.of(context);
+  ///
+  /// // do this:
+  /// final buildOpValue = tsh.textDirection;
+  /// ```
+  Iterable<dynamic> getDependencies(BuildContext context) => [
+        MediaQuery.of(context),
+        Directionality.of(context),
+        DefaultTextStyle.of(context).style,
       ];
 
   /// Returns marker for the specified [type] at index [i].
@@ -333,10 +364,10 @@ class WidgetFactory {
       url?.isNotEmpty == true ? NetworkImage(url) : null;
 
   /// Parses [meta] for build ops and text styles.
-  void parse(NodeMetadata meta) {
-    final attrs = meta.domElement.attributes;
+  void parse(BuildMetadata meta) {
+    final attrs = meta.element.attributes;
 
-    switch (meta.domElement.localName) {
+    switch (meta.element.localName) {
       case kTagA:
         _tagA ??= TagA(this, () => _widget?.hyperlinkColor).buildOp;
         meta.register(_tagA);
@@ -582,7 +613,7 @@ class WidgetFactory {
   }
 
   /// Parses inline style [key] and [value] pair.
-  void parseStyle(NodeMetadata meta, String key, String value) {
+  void parseStyle(BuildMetadata meta, String key, String value) {
     switch (key) {
       case kCssBackground:
       case kCssBackgroundColor:

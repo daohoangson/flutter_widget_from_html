@@ -24,8 +24,8 @@ void main() {
 
 class _IsNotRenderableTest extends WidgetFactory {
   @override
-  void parse(NodeMetadata meta) {
-    if (meta.domElement.classes.contains('skipMe')) {
+  void parse(BuildMetadata meta) {
+    if (meta.element.classes.contains('skipMe')) {
       meta.isNotRenderable = true;
     }
 

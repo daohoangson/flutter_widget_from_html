@@ -20,7 +20,7 @@ const kCssDisplayTableCell = 'table-cell';
 const kCssDisplayTableCaption = 'table-caption';
 
 class TagTable {
-  final NodeMetadata tableMeta;
+  final BuildMetadata tableMeta;
   final WidgetFactory wf;
 
   final _data = _TagTableData();
@@ -37,8 +37,8 @@ class TagTable {
     return _tableOp;
   }
 
-  void onChild(NodeMetadata childMeta) {
-    if (childMeta.domElement.parent != tableMeta.domElement) return;
+  void onChild(BuildMetadata childMeta) {
+    if (childMeta.element.parent != tableMeta.element) return;
 
     final which = _getCssDisplayValue(childMeta);
     switch (which) {
@@ -69,7 +69,7 @@ class TagTable {
     }
   }
 
-  Iterable<Widget> onWidgets(NodeMetadata _, Iterable<WidgetPlaceholder> __) {
+  Iterable<Widget> onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> __) {
     final rows = <_TagTableDataRow>[
       ..._data.header.rows,
       ..._data.rows,
@@ -79,7 +79,7 @@ class TagTable {
     if (_data.captions.isEmpty && rows.isEmpty) return [];
 
     return [
-      WidgetPlaceholder<NodeMetadata>(tableMeta).wrapWith((context, _) {
+      WidgetPlaceholder<BuildMetadata>(tableMeta).wrapWith((context, _) {
         final metadata = TableMetadata(border: _parseBorder(context));
 
         for (var i = 0; i < rows.length; i++) {
@@ -115,22 +115,22 @@ class TagTable {
       }
     }
 
-    final width = tryParseDoubleFromMap(
-        tableMeta.domElement.attributes, kAttributeBorder);
+    final width =
+        tryParseDoubleFromMap(tableMeta.element.attributes, kAttributeBorder);
     if (width != null && width > 0) return BorderSide(width: width);
 
     return null;
   }
 
   static BuildOp cellPaddingOp(double px) => BuildOp(
-      onChild: (meta) => (meta.domElement.localName == 'td' ||
-              meta.domElement.localName == 'th')
-          ? meta[kCssPadding] = '${px}px'
-          : null);
+      onChild: (meta) =>
+          (meta.element.localName == 'td' || meta.element.localName == 'th')
+              ? meta[kCssPadding] = '${px}px'
+              : null);
 
-  static String _getCssDisplayValue(NodeMetadata meta) {
+  static String _getCssDisplayValue(BuildMetadata meta) {
     String value;
-    switch (meta.domElement.localName) {
+    switch (meta.element.localName) {
       case kTagTableRow:
         value = kCssDisplayTableRow;
         break;
@@ -155,7 +155,7 @@ class TagTable {
       return value;
     }
 
-    final attrs = meta.domElement.attributes;
+    final attrs = meta.element.attributes;
     if (attrs.containsKey('style')) {
       for (final pair in splitAttributeStyle(attrs['style'])
           .toList(growable: false)
@@ -172,7 +172,7 @@ class TagTable {
 
 class _TagTableGroup {
   final List<_TagTableDataRow> rows;
-  final NodeMetadata groupMeta;
+  final BuildMetadata groupMeta;
   final WidgetFactory wf;
 
   BuildOp op;
@@ -181,8 +181,8 @@ class _TagTableGroup {
     op = BuildOp(onChild: onChild);
   }
 
-  void onChild(NodeMetadata childMeta) {
-    if (childMeta.domElement.parent != groupMeta.domElement) return;
+  void onChild(BuildMetadata childMeta) {
+    if (childMeta.element.parent != groupMeta.element) return;
     if (TagTable._getCssDisplayValue(childMeta) != kCssDisplayTableRow) {
       return;
     }
@@ -195,7 +195,7 @@ class _TagTableGroup {
 
 class _TagTableRow {
   final _TagTableDataRow row;
-  final NodeMetadata rowMeta;
+  final BuildMetadata rowMeta;
   final WidgetFactory wf;
 
   BuildOp op;
@@ -205,8 +205,8 @@ class _TagTableRow {
     op = BuildOp(onChild: onChild);
   }
 
-  void onChild(NodeMetadata childMeta) {
-    if (childMeta.domElement.parent != rowMeta.domElement) return;
+  void onChild(BuildMetadata childMeta) {
+    if (childMeta.element.parent != rowMeta.element) return;
     if (TagTable._getCssDisplayValue(childMeta) != kCssDisplayTableCell) {
       return;
     }
@@ -216,7 +216,7 @@ class _TagTableRow {
         final column = wf.buildColumnPlaceholder(cellMeta, widgets);
         if (column == null) return [];
 
-        final attributes = cellMeta.domElement.attributes;
+        final attributes = cellMeta.element.attributes;
         row.cells.add(_TagTableDataCell(
           child: column,
           colspan: _tryParseInt(attributes, 'colspan') ?? 1,

@@ -13,7 +13,7 @@ class TagFont {
 
   BuildOp get buildOp => BuildOp(
         defaultStyles: (meta) {
-          final attrs = meta.domElement.attributes;
+          final attrs = meta.element.attributes;
           final styles = <String, String>{};
 
           if (attrs.containsKey(kAttributeFontColor)) {

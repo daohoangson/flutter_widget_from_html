@@ -13,7 +13,7 @@ class HtmlBuilder {
   final CustomStylesBuilder customStylesBuilder;
   final CustomWidgetBuilder customWidgetBuilder;
   final List<dom.Node> domNodes;
-  final NodeMetadata parentMeta;
+  final BuildMetadata parentMeta;
   final Iterable<BuildOp> parentOps;
   final TextBits parentText;
   final WidgetFactory wf;
@@ -53,7 +53,7 @@ class HtmlBuilder {
       final _makeSureWidgetIsPlaceholder = (Widget widget) =>
           widget is WidgetPlaceholder
               ? widget
-              : WidgetPlaceholder<NodeMetadata>(parentMeta, child: widget);
+              : WidgetPlaceholder<BuildMetadata>(parentMeta, child: widget);
 
       for (final op in parentMeta.buildOps) {
         widgets = op.onWidgets
@@ -67,8 +67,8 @@ class HtmlBuilder {
     return widgets;
   }
 
-  NodeMetadata collectMetadata(dom.Element e) {
-    final meta = _NodeMetadata(e, parentMeta.tsb().sub(), parentOps);
+  BuildMetadata collectMetadata(dom.Element e) {
+    final meta = _BuildMetadata(e, parentMeta.tsb().sub(), parentOps);
     wf.parse(meta);
 
     if (meta.parentOps != null) {
@@ -189,7 +189,7 @@ class HtmlBuilder {
     if (end < data.length) text.addWhitespace();
   }
 
-  void _customStylesBuilder(NodeMetadata meta, dom.Element element) {
+  void _customStylesBuilder(BuildMetadata meta, dom.Element element) {
     final map = customStylesBuilder?.call(element);
     if (map == null) return;
 
@@ -198,7 +198,7 @@ class HtmlBuilder {
     }
   }
 
-  void _customWidgetBuilder(NodeMetadata meta, dom.Element element) {
+  void _customWidgetBuilder(BuildMetadata meta, dom.Element element) {
     final built = customWidgetBuilder?.call(element);
     if (built == null) return;
 
@@ -214,11 +214,11 @@ class HtmlBuilder {
     _newTextPiece();
   }
 
-  static NodeMetadata rootMeta(TextStyleBuilder tsb) =>
-      _NodeMetadata(null, tsb);
+  static BuildMetadata rootMeta(TextStyleBuilder tsb) =>
+      _BuildMetadata(null, tsb);
 }
 
-class _NodeMetadata extends NodeMetadata {
+class _BuildMetadata extends BuildMetadata {
   final Iterable<BuildOp> _parentOps;
 
   List<BuildOp> _buildOps;
@@ -227,7 +227,8 @@ class _NodeMetadata extends NodeMetadata {
   List<String> _styles;
   var _stylesIsLocked = false;
 
-  _NodeMetadata(dom.Element domElement, TextStyleBuilder tsb, [this._parentOps])
+  _BuildMetadata(dom.Element domElement, TextStyleBuilder tsb,
+      [this._parentOps])
       : super(domElement, tsb);
 
   @override
@@ -289,7 +290,7 @@ class _NodeMetadata extends NodeMetadata {
       ops?.where((op) => op.isBlockElement)?.length?.compareTo(0) == 1;
 }
 
-Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, NodeMetadata meta) {
+Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, BuildMetadata meta) {
   // try to reuse existing list if possible
   final withOnChild = meta?.buildOps
       ?.where((op) => op.onChild != null)

@@ -24,7 +24,7 @@ class StyleVerticalAlign {
         },
       );
 
-  BuiltPiece _buildWidgetSpan(NodeMetadata meta, BuiltPiece piece, String v) {
+  BuiltPiece _buildWidgetSpan(BuildMetadata meta, BuiltPiece piece, String v) {
     if (piece.widgets != null) return piece;
 
     final alignment = _tryParse(v);
@@ -57,7 +57,7 @@ class StyleVerticalAlign {
     return newPiece;
   }
 
-  Widget _build(BuildContext context, NodeMetadata meta, Widget child,
+  Widget _build(BuildContext context, BuildMetadata meta, Widget child,
       EdgeInsets padding) {
     final tsh = meta.tsb().build(context);
     final fontSize = tsh.style.fontSize;

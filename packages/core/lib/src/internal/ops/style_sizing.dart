@@ -52,7 +52,7 @@ class StyleSizing {
         priority: 50000,
       );
 
-  _StyleSizingInput _parse(NodeMetadata meta) {
+  _StyleSizingInput _parse(BuildMetadata meta) {
     CssLength height, maxHeight, maxWidth, minHeight, minWidth, width;
 
     for (final style in meta.styles) {

@@ -16,8 +16,8 @@ class TagIframe {
         return webView != null ? [webView] : null;
       });
 
-  Widget build(NodeMetadata meta) {
-    final attrs = meta.domElement.attributes;
+  Widget build(BuildMetadata meta) {
+    final attrs = meta.element.attributes;
     if (!attrs.containsKey(kAttributeIframeSrc)) return null;
 
     final src = wf.urlFull(attrs[kAttributeIframeSrc]);

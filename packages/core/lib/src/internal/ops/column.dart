@@ -1,7 +1,7 @@
 part of '../core_ops.dart';
 
-class ColumnPlaceholder extends WidgetPlaceholder<NodeMetadata> {
-  final NodeMetadata meta;
+class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
+  final BuildMetadata meta;
   final bool trimMarginVertical;
   final WidgetFactory wf;
 

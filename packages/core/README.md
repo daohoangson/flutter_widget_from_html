@@ -223,20 +223,20 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
 
 ### Custom `WidgetFactory`
 
-The HTML string is parsed into DOM elements and each element is visited once to populate a `NodeMetadata` and collect `BuiltPiece`s. See step by step how it works:
+The HTML string is parsed into DOM elements and each element is visited once to populate a `BuildMetadata` and collect `BuiltPiece`s. See step by step how it works:
 
 | Step | | Integration point |
 | --- | --- | --- |
-| 1 | Parse the tag and attributes map | `WidgetFactory.parseTag(NodeMetadata)` |
-| 2 | Inform parents if any | `BuildOp.onChild(NodeMetadata)` |
-| 3 | Populate default inline styles | `BuildOp.defaultStyles(NodeMetadata)` |
+| 1 | Parse the tag and attributes map | `WidgetFactory.parseTag(BuildMetadata)` |
+| 2 | Inform parents if any | `BuildOp.onChild(BuildMetadata)` |
+| 3 | Populate default inline styles | `BuildOp.defaultStyles(BuildMetadata)` |
 | 4 | `customStyleBuilder` / `customWidgetBuilder` will be called if configured | |
-| 5 | Parse inline style key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(NodeMetadata, String, String)` |
+| 5 | Parse inline style key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(BuildMetadata, String, String)` |
 | 6 | Repeat with children elements to collect `BuiltPiece`s | |
-| 7 | Inform build ops | `BuildOp.onPieces(NodeMetadata, Iterable<BuiltPiece>)` |
+| 7 | Inform build ops | `BuildOp.onPieces(BuildMetadata, Iterable<BuiltPiece>)` |
 | 8 | a. If not a block element, go to 10 | |
 |   | b. Build widgets from pieces | |
-| 9 | Inform build ops | `BuildOp.onWidgets(NodeMetadata, Iterable<Widget>)` |
+| 9 | Inform build ops | `BuildOp.onWidgets(BuildMetadata, Iterable<Widget>)` |
 | 10 | The end | |
 
 Notes:
@@ -307,15 +307,15 @@ class SmilieScreen extends StatelessWidget {
 class _SmiliesWidgetFactory extends WidgetFactory {
   final smilieOp = BuildOp(
     onPieces: (meta, pieces) {
-      final alt = meta.domElement.attributes['alt'];
+      final alt = meta.element.attributes['alt'];
       final text = kSmilies.containsKey(alt) ? kSmilies[alt] : alt;
       return pieces..first?.text?.addText(text);
     },
   );
 
   @override
-  void parse(NodeMetadata meta) {
-    final e = meta.domElement;
+  void parse(BuildMetadata meta) {
+    final e = meta.element;
     if (e.localName == 'img' &&
         e.classes.contains('smilie') &&
         e.attributes.containsKey('alt')) {

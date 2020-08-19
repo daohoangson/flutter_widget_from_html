@@ -31,7 +31,7 @@ class StyleBgColor {
   BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) =>
       piece..text.bits.forEach((bit) => bit.tsb?.enqueue(_tsb, bgColor));
 
-  Color _parseColor(WidgetFactory wf, NodeMetadata meta) {
+  Color _parseColor(WidgetFactory wf, BuildMetadata meta) {
     Color color;
     for (final style in meta.styles) {
       switch (style.key) {
