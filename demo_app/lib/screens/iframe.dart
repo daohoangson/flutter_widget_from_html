@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
@@ -32,32 +33,39 @@ class _State extends State<IframeScreen> {
         appBar: AppBar(
           title: Text('IframeScreen'),
         ),
-        body: ListView(children: <Widget>[
-          CheckboxListTile(
-            value: webView,
-            onChanged: (v) => setState(() => webView = v),
-            title: HtmlWidget('<var>.webView</var>'),
-            subtitle: const Text('Renders web view, default ❌'),
+        body: kIsWeb ? _buildSorryForWeb() : _buildBody(),
+      );
+
+  Widget _buildBody() => ListView(children: <Widget>[
+        CheckboxListTile(
+          value: webView,
+          onChanged: (v) => setState(() => webView = v),
+          title: HtmlWidget('<var>.webView</var>'),
+          subtitle: const Text('Renders web view, default ❌'),
+        ),
+        CheckboxListTile(
+          value: webViewJs,
+          onChanged: (v) => setState(() {
+            if (v) webView = true;
+            webViewJs = v;
+          }),
+          title: HtmlWidget('<var>.webViewJs</var>'),
+          subtitle: const Text('Allows JavaScript execution, default ✅'),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(
+            html,
+            key: Key('$webView$webViewJs'),
+            unsupportedWebViewWorkaroundForIssue37: true,
+            webView: webView,
+            webViewJs: webViewJs,
           ),
-          CheckboxListTile(
-            value: webViewJs,
-            onChanged: (v) => setState(() {
-              if (v) webView = true;
-              webViewJs = v;
-            }),
-            title: HtmlWidget('<var>.webViewJs</var>'),
-            subtitle: const Text('Allows JavaScript execution, default ✅'),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: HtmlWidget(
-              html,
-              key: Key('$webView$webViewJs'),
-              unsupportedWebViewWorkaroundForIssue37: true,
-              webView: webView,
-              webViewJs: webViewJs,
-            ),
-          ),
-        ]),
+        ),
+      ]);
+
+  Widget _buildSorryForWeb() => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text('Sorry, IFRAME is currently not supported in Flutter Web.'),
       );
 }

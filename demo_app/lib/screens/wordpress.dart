@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
+
+import '../html_widget.dart';
 
 class WordpressScreen extends StatelessWidget {
   final sites = {
@@ -37,9 +39,7 @@ class PostsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext _) => Scaffold(
-        appBar: AppBar(
-          title: Text(title ?? domain),
-        ),
+        appBar: AppBar(title: Text(title ?? domain)),
         body: _PostsList('https://$domain/wp-json/wp/v2/posts?_embed'),
       );
 
@@ -56,7 +56,7 @@ class _PostScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text(post.title),
+          title: HtmlWidget(post.title),
           actions: [
             IconButton(
               icon: Icon(Icons.open_in_browser),
@@ -76,7 +76,7 @@ class _PostScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                HtmlWidget(post.content, webView: true),
+                HtmlWidget(post.content),
               ],
             ),
           ),

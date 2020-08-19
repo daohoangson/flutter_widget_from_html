@@ -28,3 +28,60 @@ jobs:
         with:
           name: x86_64.apk
           path: demo_app/build/app/outputs/apk/release/app-x86_64-release.apk
+
+  web:
+    name: Deploy Web
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: demo_app
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          # TODO: switch back to beta / stable as soon as possible.
+          # https://github.com/flutter/engine/pull/20276 is required for `WidgetSpan`s
+          # so we need dev channel for now.
+          channel: dev
+
+      - run: flutter config --enable-web
+      - run: flutter build web
+
+      - name: Deploy via now.sh
+        id: now
+        run: |
+          set -e
+
+          cd ./build/web
+          { \
+            echo '{'; \
+            echo '  "version": 2,'; \
+            echo '  "builds": ['; \
+            echo '  	{ "src": "./**/*", "use": "@now/static" }'; \
+            echo '  ]'; \
+            echo '}'; \
+          } > ./now.json
+
+          mkdir -p ./.now && echo '${{ secrets.DEMO_APP_PROJECT_JSON }}' > ./.now/project.json
+
+          if [ $GITHUB_REF == 'refs/heads/master' ]; then
+            _url=$( now  --prod --token ${{ secrets.ZEIT_TOKEN }} )
+          else
+            _url=$( now --token ${{ secrets.ZEIT_TOKEN }} )
+          fi
+
+          _url="${_url//'%'/'%25'}"
+          _url="${_url//$'\n'/'%0A'}"
+          _url="${_url//$'\r'/'%0D'}"
+          echo "::set-output name=url::${_url}"
+      - name: Create commit comment
+        uses: daohoangson/comment-on-github@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          body: "Deployed ${{ github.sha }} to ${{ steps.now.outputs.url }}.\n\nQuick links:\n- [Home](${{ steps.now.outputs.url }})\n- [Hello World](${{ steps.now.outputs.url }}/#/helloworld)\n- [Hello World (core)](${{ steps.now.outputs.url }}/#/helloworldcore)\n- [Styling](${{ steps.now.outputs.url }}/#/styling)\n- [Wordpress](${{ steps.now.outputs.url }}/#/wordpress)"
+          fingerprint: "## Demo app"
+          replace: please

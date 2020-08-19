@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
+
+import '../html_widget.dart';
 
 class CompareScreen extends StatelessWidget {
   final String html;
@@ -25,24 +26,24 @@ class CompareScreen extends StatelessWidget {
           ),
           body: TabBarView(
             children: <Widget>[
-              ListView(children: <Widget>[
-                Padding(
+              SingleChildScrollView(
+                child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(html),
-                )
-              ]),
-              ListView(children: <Widget>[
-                Padding(
+                ),
+              ),
+              SingleChildScrollView(
+                child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: core.HtmlWidget(html),
-                )
-              ]),
-              ListView(children: <Widget>[
-                Padding(
+                ),
+              ),
+              SingleChildScrollView(
+                child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: HtmlWidget(html),
-                )
-              ]),
+                ),
+              ),
             ],
           ),
         ),

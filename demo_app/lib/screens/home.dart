@@ -14,7 +14,9 @@ import 'video.dart';
 import 'wordpress.dart';
 
 class HomeScreen extends StatelessWidget {
-  final _htmls = {
+  static final _htmls = {
+    'Hello World': () => HelloWorldScreen(),
+    'Hello World (core)': () => HelloWorldCoreScreen(),
     'Alignments': """<div style="text-align: left">Left</div>
 <div style="text-align: center">Center</div>
 <div style="text-align: right">Right</div>
@@ -34,7 +36,7 @@ CODE tag:
     'Iframe': () => IframeScreen(),
     'Iframe/Twitter': () => IframeTwitterScreen(),
     'Images': () => ImgScreen(),
-    'Lists (LI/OL/UL)': '''<ol type="I">
+    'Lists': '''<ol type="I">
   <li>One</li>
   <li>
     Two
@@ -186,8 +188,6 @@ C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."
 </table>
 ''',
     'Video': () => VideoScreen(),
-    'Hello World (core)': () => HelloWorldCoreScreen(),
-    'Hello World': () => HelloWorldScreen(),
     'customStylesBuilder': () => CustomStylesBuilderScreen(),
     'customWidgetBuilder': () => CustomWidgetBuilderScreen(),
     'font-size': () => FontSizeScreen(),
@@ -197,26 +197,42 @@ C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text('Examples'),
-        ),
-        body: ListView.builder(
-          itemBuilder: (context, i) {
-            final key = _htmls.keys.toList()[i];
-            final html = _htmls[key];
-            return ListTile(
-              title: Text(key),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => html is String
-                      ? CompareScreen(html: html, title: key)
-                      : (html as Function)(),
-                ),
-              ),
-            );
-          },
-          itemCount: _htmls.length,
+        appBar: AppBar(title: Text('Demo app')),
+        body: ListView(
+          children: _htmls.keys
+              .map((title) => ListTile(
+                    title: Text(title),
+                    onTap: () => Navigator.pushNamed(
+                        context, _routeNameFromTitle(title)),
+                  ))
+              .toList(growable: false),
         ),
       );
+
+  static Route onGenerateRoute(RouteSettings route) {
+    for (final title in _htmls.keys) {
+      if (_routeNameFromTitle(title) != route.name) continue;
+
+      final value = _htmls[title];
+      if (value is String) {
+        return MaterialPageRoute(
+          builder: (_) => CompareScreen(html: value, title: title),
+          settings: RouteSettings(name: route.name),
+        );
+      } else if (value is Function) {
+        return MaterialPageRoute(
+          builder: (_) => value(),
+          settings: RouteSettings(name: route.name),
+        );
+      }
+    }
+
+    return PageRouteBuilder(
+      pageBuilder: (_, __, ___) => HomeScreen(),
+      settings: RouteSettings(name: '/'),
+    );
+  }
+
+  static String _routeNameFromTitle(String title) =>
+      '/' + title.toLowerCase().replaceAll(RegExp(r'[^a-z]'), '');
 }

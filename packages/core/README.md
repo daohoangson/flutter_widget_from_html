@@ -179,25 +179,34 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text('CustomStylesBuilderScreen'),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: HtmlWidget(
-            kHtml,
-            customWidgetBuilder: (e) {
-              if (!e.classes.contains('carousel')) return null;
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: HtmlWidget(
+              kHtml,
+              customWidgetBuilder: (e) {
+                if (!e.classes.contains('carousel')) return null;
 
-              final srcs = <String>[];
-              for (final child in e.children) {
-                for (final grandChild in child.children) {
-                  srcs.add(grandChild.attributes['src']);
+                final srcs = <String>[];
+                for (final child in e.children) {
+                  for (final grandChild in child.children) {
+                    srcs.add(grandChild.attributes['src']);
+                  }
                 }
-              }
 
-              return CarouselSlider(
-                options: CarouselOptions(),
-                items: srcs.map(_toItem).toList(growable: false),
-              );
-            },
+                return CarouselSlider(
+                  options: CarouselOptions(
+                    autoPlay: true,
+                    autoPlayAnimationDuration:
+                        const Duration(milliseconds: 250),
+                    autoPlayInterval: const Duration(milliseconds: 1000),
+                    enlargeCenterPage: true,
+                    enlargeStrategy: CenterPageEnlargeStrategy.scale,
+                  ),
+                  items: srcs.map(_toItem).toList(growable: false),
+                );
+              },
+            ),
           ),
         ),
       );
