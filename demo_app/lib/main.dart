@@ -9,9 +9,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Widget from HTML',
-      home: HomeScreen(),
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
+
+      // let's HomeScreen handle all the routings
+      initialRoute: '/',
+      onGenerateRoute: HomeScreen.onGenerateRoute,
     );
   }
 }

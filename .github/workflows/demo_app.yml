@@ -82,7 +82,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          body: "Deployed ${{ github.sha }} to ${{ steps.now.outputs.url }}.\n\nQuick links:\n- [Home](${{ steps.now.outputs.url }})"
+          body: "Deployed ${{ github.sha }} to ${{ steps.now.outputs.url }}.\n\nQuick links:\n- [Home](${{ steps.now.outputs.url }})\n- [Hello World](${{ steps.now.outputs.url }}/#/helloworld)\n- [Hello World (core)](${{ steps.now.outputs.url }}/#/helloworldcore)\n- [Styling](${{ steps.now.outputs.url }}/#/styling)\n- [Wordpress](${{ steps.now.outputs.url }}/#/wordpress)"
           fingerprint: "## Demo app"
           replace: please
-
