@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core show HtmlWidget;
@@ -47,16 +46,17 @@ class HtmlWidget extends core.HtmlWidget {
   /// The [html] argument must not be null.
   HtmlWidget(
     String html, {
-    Uri baseUrl,
     bool buildAsync,
     AsyncWidgetBuilder<Widget> buildAsyncBuilder,
-    CustomStylesBuilder customStylesBuilder,
-    CustomWidgetBuilder customWidgetBuilder,
     bool enableCaching = true,
     WidgetFactory Function() factoryBuilder,
-    Color hyperlinkColor,
     Key key,
+    Uri baseUrl,
+    CustomStylesBuilder customStylesBuilder,
+    CustomWidgetBuilder customWidgetBuilder,
+    Color hyperlinkColor,
     void Function(String) onTapUrl,
+    EdgeInsets tableCellPadding = const EdgeInsets.all(5),
     TextStyle textStyle = const TextStyle(),
     this.unsupportedWebViewWorkaroundForIssue37 = false,
     this.webView = false,
