@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:flutter_widget_from_html_core/src/internal/css_sizing.dart';
+import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
 
 // https://stackoverflow.com/questions/6018611/smallest-data-uri-image-possible-for-a-transparent-image
 const kDataUri =
@@ -40,6 +42,7 @@ Future<String> explain(
   void Function(BuildContext) preTest,
   bool rtl = false,
   TextStyle textStyle,
+  bool useExplainer = true,
 }) async {
   assert((html == null) != (hw == null));
   hw ??= HtmlWidget(
@@ -82,6 +85,21 @@ Future<String> explain(
     ),
   );
 
+  if (!useExplainer) {
+    final sb = StringBuffer();
+    hwKey.currentContext.visitChildElements(
+        (e) => sb.writeln(e.toDiagnosticsNode().toStringDeep()));
+    var str = sb.toString();
+    str = str.replaceAll(RegExp(r': [A-Z][A-Za-z]+\.'), ': '); // enums
+    str = str.replaceAll(RegExp(r'\[GlobalKey#[0-9a-f]+\]'), '');
+    str = str.replaceAll(RegExp(r'(, )?dependencies: \[[^\]]+\]'), '');
+    str = str.replaceAll(
+        RegExp(r'(, )?renderObject: .+ relayoutBoundary=\w+'), '');
+    str = str.replaceAll(RegExp(r'softWrap: [a-z\s]+, '), '');
+    str = str.replaceAll('maxLines: unlimited, ', '');
+    return str;
+  }
+
   final hws = hwKey.currentState;
   expect(hws, isNotNull);
 
@@ -101,8 +119,11 @@ Future<String> explain(
   return explained;
 }
 
-final _explainMarginRegExp = RegExp(
-    r'^\[Column:children=\[RichText:\(:x\)\],(.+),\[RichText:\(:x\)\]\]$');
+final _explainMarginRegExp = RegExp(r'^\[Column:(dir=rtl,)?children='
+    r'\[RichText:(dir=rtl,)?\(:x\)\],'
+    r'(.+),'
+    r'\[RichText:(dir=rtl,)?\(:x\)\]'
+    r'\]$');
 
 Future<String> explainMargin(
   WidgetTester tester,
@@ -116,7 +137,7 @@ Future<String> explainMargin(
     rtl: rtl,
   );
   final match = _explainMarginRegExp.firstMatch(explained);
-  return match == null ? explained : match[1];
+  return match == null ? explained : match[3];
 }
 
 class Explainer {
@@ -176,12 +197,18 @@ class Explainer {
 
     final c = w.constraints;
     final s = w.size;
-    if (s.height.isFinite) attr.add('height=${s.height}');
-    if (c.maxHeight.isFinite) attr.add('maxHeight=${c.maxHeight}');
-    if (c.maxWidth.isFinite) attr.add('maxWidth=${c.maxWidth}');
-    if (c.minHeight > 0) attr.add('minHeight=${c.minHeight}');
-    if (c.minWidth > 0) attr.add('minWidth=${c.minWidth}');
-    if (s.width.isFinite) attr.add('width=${s.width}');
+    if (s.height.isFinite) attr.add('height=${s.height.toStringAsFixed(1)}');
+    if (c.maxHeight.isFinite) {
+      attr.add('maxHeight=${c.maxHeight.toStringAsFixed(1)}');
+    }
+    if (c.maxWidth.isFinite) {
+      attr.add('maxWidth=${c.maxWidth.toStringAsFixed(1)}');
+    }
+    if (c.minHeight > 0) {
+      attr.add('minHeight=${c.minHeight.toStringAsFixed(1)}');
+    }
+    if (c.minWidth > 0) attr.add('minWidth=${c.minWidth.toStringAsFixed(1)}');
+    if (s.width.isFinite) attr.add('width=${s.width.toStringAsFixed(1)}');
 
     return attr;
   }
@@ -278,7 +305,9 @@ class Explainer {
           : null;
 
   String _textDirection(TextDirection textDirection) =>
-      textDirection.toString().replaceAll('TextDirection.', '');
+      (textDirection != null && textDirection != TextDirection.ltr)
+          ? 'dir=${textDirection.toString().replaceAll('TextDirection.', '')}'
+          : null;
 
   String _textOverflow(TextOverflow textOverflow) => (textOverflow != null &&
           textOverflow != TextOverflow.clip)
@@ -313,7 +342,7 @@ class Explainer {
     }
 
     if (style.height != null) {
-      s += '+height=${style.height}';
+      s += '+height=${style.height.toStringAsFixed(1)}';
     }
 
     if (style.fontSize != parent.fontSize) {
@@ -374,34 +403,34 @@ class Explainer {
 
     if (widget == widget0) return '[widget0]';
 
+    if (widget is TshWidget) return _widget(widget.child);
+
     // ignore: invalid_use_of_protected_member
     if (widget is WidgetPlaceholder) return _widget(widget.build(context));
 
     if (widget is Image) return _image(widget);
 
-    if (widget is LayoutBuilder) {
-      return _widget(widget.builder(
-        context,
-        BoxConstraints.tightFor(width: 800, height: 600),
-      ));
-    }
-
     if (widget is SizedBox) return _sizedBox(widget);
 
-    final type = widget.runtimeType
-        .toString()
-        .replaceAll('_MarginHorizontal', 'Padding');
-
+    final type = '${widget.runtimeType}';
     var attr = <String>[];
-
-    attr.add(_textAlign(widget is RichText
-        ? widget.textAlign
-        : (widget is Text ? widget.textAlign : null)));
 
     final maxLines = widget is RichText
         ? widget.maxLines
         : widget is Text ? widget.maxLines : null;
     if (maxLines != null) attr.add('maxLines=$maxLines');
+
+    attr.add(_textAlign(widget is RichText
+        ? widget.textAlign
+        : (widget is Text ? widget.textAlign : null)));
+
+    attr.add(_textDirection(widget is Column
+        ? widget.textDirection
+        : widget is RichText
+            ? widget.textDirection
+            : widget is Stack
+                ? widget.textDirection
+                : (widget is Text ? widget.textDirection : null)));
 
     attr.add(_textOverflow(widget is RichText
         ? widget.overflow
@@ -420,10 +449,6 @@ class Explainer {
     if (widget is CssSizing) attr.addAll(_cssSizing(widget));
 
     if (widget is DecoratedBox) attr.addAll(_boxDecoration(widget.decoration));
-
-    if (widget is Directionality) {
-      attr.add(_textDirection(widget.textDirection));
-    }
 
     if (widget is LimitedBox) attr.add(_limitBox(widget));
 

@@ -10,8 +10,19 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:height=20.0,child='
+          equals('[CssSizing:height=20.0,child='
+              '[CssBlock:child='
+              '[RichText:(:Foo)]'
+              ']]'));
+    });
+
+    testWidgets('renders pt', (WidgetTester tester) async {
+      final html = '<div style="height: 100pt">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:height=133.3,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -21,8 +32,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:height=100.0,child='
+          equals('[CssSizing:height=100.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -40,8 +51,19 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:maxHeight=20.0,child='
+          equals('[CssSizing:maxHeight=20.0,child='
+              '[CssBlock:child='
+              '[RichText:(:Foo)]'
+              ']]'));
+    });
+
+    testWidgets('renders pt', (WidgetTester tester) async {
+      final html = '<div style="max-height: 100pt">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:maxHeight=133.3,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -51,8 +73,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:maxHeight=100.0,child='
+          equals('[CssSizing:maxHeight=100.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -70,8 +92,19 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:maxWidth=20.0,child='
+          equals('[CssSizing:maxWidth=20.0,child='
+              '[CssBlock:child='
+              '[RichText:(:Foo)]'
+              ']]'));
+    });
+
+    testWidgets('renders pt', (WidgetTester tester) async {
+      final html = '<div style="max-width: 100pt">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:maxWidth=133.3,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -81,8 +114,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:maxWidth=100.0,child='
+          equals('[CssSizing:maxWidth=100.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -100,8 +133,19 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:minHeight=20.0,child='
+          equals('[CssSizing:minHeight=20.0,child='
+              '[CssBlock:child='
+              '[RichText:(:Foo)]'
+              ']]'));
+    });
+
+    testWidgets('renders pt', (WidgetTester tester) async {
+      final html = '<div style="min-height: 100pt">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:minHeight=133.3,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -111,8 +155,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:minHeight=100.0,child='
+          equals('[CssSizing:minHeight=100.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -130,8 +174,19 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:minWidth=20.0,child='
+          equals('[CssSizing:minWidth=20.0,child='
+              '[CssBlock:child='
+              '[RichText:(:Foo)]'
+              ']]'));
+    });
+
+    testWidgets('renders pt', (WidgetTester tester) async {
+      final html = '<div style="min-width: 100pt">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:minWidth=133.3,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -141,8 +196,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:minWidth=100.0,child='
+          equals('[CssSizing:minWidth=100.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -160,8 +215,19 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:width=20.0,child='
+          equals('[CssSizing:width=20.0,child='
+              '[CssBlock:child='
+              '[RichText:(:Foo)]'
+              ']]'));
+    });
+
+    testWidgets('renders pt', (WidgetTester tester) async {
+      final html = '<div style="width: 100pt">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:width=133.3,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -171,8 +237,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[CssSizing:width=100.0,child='
+          equals('[CssSizing:width=100.0,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]'
               ']]'));
     });
@@ -197,15 +263,40 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child='
+        equals('[DecoratedBox:bg=#FFFF0000,child=[CssBlock:child='
             '[Padding:(20,20,20,20),child='
-            '[CssBlock:child=[DecoratedBox:bg=#FF008000,child='
-            '[CssBlock:child=[Padding:(0,15,0,15),child='
+            '[DecoratedBox:bg=#FF008000,child=[CssBlock:child='
+            '[Padding:(0,15,0,15),child='
             '[CssSizing:height=100.0,width=100.0,child='
             '[DecoratedBox:bg=#FF0000FF,child='
+            '[CssBlock:child='
             '[Padding:(5,5,5,5),child='
             '[RichText:(#FFFFFFFF:Foo)]'
             ']]]]]]]]]]'));
+  });
+
+  group('block', () {
+    testWidgets('renders block within block', (WidgetTester tester) async {
+      final html =
+          '<div style="width: 10px; height: 10px;"><div>Foo</div></div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:height=10.0,width=10.0,child='
+              '[CssBlock:child=[RichText:(:Foo)]]'
+              ']'));
+    });
+
+    testWidgets('renders block within non-block', (tester) async {
+      final html =
+          '<span style="width: 10px; height: 10px;"><div>Foo</div></span>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:height=10.0,width=10.0,child='
+              '[CssBlock:child=[RichText:(:Foo)]]'
+              ']'));
+    });
   });
 
   group('inline', () {

@@ -37,7 +37,7 @@ String _explainer(helper.Explainer parent, Widget widget) {
   if (widget is WebView) {
     return '[WebView:url=${widget.url}'
         ',aspectRatio=${widget.aspectRatio.toStringAsFixed(2)}'
-        "${widget.getDimensions ? ',getDimensions=${widget.getDimensions}' : ''}"
+        "${widget.autoResize ? ',autoResize=${widget.autoResize}' : ''}"
         "${!widget.js ? ',js=${widget.js}' : ''}"
         "${widget.unsupportedWorkaroundForIssue37 ? ',unsupportedWorkaroundForIssue37=${widget.unsupportedWorkaroundForIssue37}' : ''}"
         ']';

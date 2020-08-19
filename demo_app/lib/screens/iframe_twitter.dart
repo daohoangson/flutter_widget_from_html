@@ -66,7 +66,7 @@ class _State extends State<IframeTwitterScreen> {
                   return WebView(
                     useApi ? apiUrl : dataUrl,
                     aspectRatio: 16 / 9,
-                    getDimensions: true,
+                    autoResize: true,
                   );
                 }
 

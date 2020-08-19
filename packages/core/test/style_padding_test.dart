@@ -18,8 +18,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              '[CssBlock:child=[Padding:(1,2,3,4),child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child=[Padding:(1,2,3,4),child='
+              '[RichText:(:Foo)]]]'));
     });
 
     testWidgets('parses all (rtl)', (WidgetTester tester) async {
@@ -27,8 +27,8 @@ void main() {
       final explained = await explain(tester, html, rtl: true);
       expect(
           explained,
-          equals(
-              '[CssBlock:child=[Padding:(1,4,3,2),child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child=[Padding:(1,4,3,2),child='
+              '[RichText:dir=rtl,(:Foo)]]]'));
     });
 
     testWidgets('parses top only', (WidgetTester tester) async {
@@ -36,8 +36,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              '[CssBlock:child=[Padding:(1,0,0,0),child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child=[Padding:(1,0,0,0),child='
+              '[RichText:(:Foo)]]]'));
     });
 
     group('parses end only', () {
@@ -47,16 +47,16 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals(
-                '[CssBlock:child=[Padding:(0,2,0,0),child=[RichText:(:Foo)]]]'));
+            equals('[CssBlock:child=[Padding:(0,2,0,0),child='
+                '[RichText:(:Foo)]]]'));
       });
 
       testWidgets('rtl', (WidgetTester tester) async {
         final explained = await explain(tester, html, rtl: true);
         expect(
             explained,
-            equals(
-                '[CssBlock:child=[Padding:(0,0,0,2),child=[RichText:(:Foo)]]]'));
+            equals('[CssBlock:child=[Padding:(0,0,0,2),child='
+                '[RichText:dir=rtl,(:Foo)]]]'));
       });
     });
 
@@ -65,8 +65,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              '[CssBlock:child=[Padding:(0,0,3,0),child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child=[Padding:(0,0,3,0),child='
+              '[RichText:(:Foo)]]]'));
     });
 
     group('parses start only', () {
@@ -76,16 +76,16 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals(
-                '[CssBlock:child=[Padding:(0,0,0,4),child=[RichText:(:Foo)]]]'));
+            equals('[CssBlock:child=[Padding:(0,0,0,4),child='
+                '[RichText:(:Foo)]]]'));
       });
 
       testWidgets('rtl', (WidgetTester tester) async {
         final explained = await explain(tester, html, rtl: true);
         expect(
             explained,
-            equals(
-                '[CssBlock:child=[Padding:(0,4,0,0),child=[RichText:(:Foo)]]]'));
+            equals('[CssBlock:child=[Padding:(0,4,0,0),child='
+                '[RichText:dir=rtl,(:Foo)]]]'));
       });
     });
   });
@@ -96,8 +96,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              '[CssBlock:child=[Padding:(5,10,5,10),child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child=[Padding:(5,10,5,10),child='
+              '[RichText:(:Foo)]]]'));
     });
 
     testWidgets('parses vertical only', (WidgetTester tester) async {
@@ -105,8 +105,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              '[CssBlock:child=[Padding:(5,0,5,0),child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child=[Padding:(5,0,5,0),child='
+              '[RichText:(:Foo)]]]'));
     });
 
     testWidgets('parses horizontal only', (WidgetTester tester) async {
@@ -114,16 +114,38 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              '[CssBlock:child=[Padding:(0,10,0,10),child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child=[Padding:(0,10,0,10),child='
+              '[RichText:(:Foo)]]]'));
     });
   });
 
-  testWidgets('parses padding with 1 value', (WidgetTester tester) async {
-    final html = '<div style="padding: 3px">Foo</div>';
-    final explained = await explain(tester, html);
-    expect(explained,
-        equals('[CssBlock:child=[Padding:(3,3,3,3),child=[RichText:(:Foo)]]]'));
+  group('1 value', () {
+    testWidgets('renders em', (WidgetTester tester) async {
+      final html = '<div style="padding: 2em">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssBlock:child=[Padding:(20,20,20,20),child='
+              '[RichText:(:Foo)]]]'));
+    });
+
+    testWidgets('renders pt', (WidgetTester tester) async {
+      final html = '<div style="padding: 10pt">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssBlock:child=[Padding:(13,13,13,13),child='
+              '[RichText:(:Foo)]]]'));
+    });
+
+    testWidgets('renders px', (WidgetTester tester) async {
+      final html = '<div style="padding: 10px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssBlock:child=[Padding:(10,10,10,10),child='
+              '[RichText:(:Foo)]]]'));
+    });
   });
 
   testWidgets('renders padding within another', (WidgetTester tester) async {
@@ -172,8 +194,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              '[CssBlock:child=[Padding:(3,0,0,0),child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child=[Padding:(3,0,0,0),child='
+              '[RichText:(:Foo)]]]'));
     });
 
     testWidgets('parses padding-block-start', (WidgetTester tester) async {
@@ -181,8 +203,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              '[CssBlock:child=[Padding:(3,0,0,0),child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child=[Padding:(3,0,0,0),child='
+              '[RichText:(:Foo)]]]'));
     });
 
     testWidgets('parses padding-right', (WidgetTester tester) async {
@@ -190,8 +212,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              '[CssBlock:child=[Padding:(0,3,0,0),child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child=[Padding:(0,3,0,0),child='
+              '[RichText:(:Foo)]]]'));
     });
 
     group('parses padding-inline-end', () {
@@ -201,16 +223,16 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals(
-                '[CssBlock:child=[Padding:(0,3,0,0),child=[RichText:(:Foo)]]]'));
+            equals('[CssBlock:child=[Padding:(0,3,0,0),child='
+                '[RichText:(:Foo)]]]'));
       });
 
       testWidgets('rtl', (WidgetTester tester) async {
         final explained = await explain(tester, html, rtl: true);
         expect(
             explained,
-            equals(
-                '[CssBlock:child=[Padding:(0,0,0,3),child=[RichText:(:Foo)]]]'));
+            equals('[CssBlock:child=[Padding:(0,0,0,3),child='
+                '[RichText:dir=rtl,(:Foo)]]]'));
       });
     });
 
@@ -219,8 +241,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              '[CssBlock:child=[Padding:(0,0,3,0),child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child=[Padding:(0,0,3,0),child='
+              '[RichText:(:Foo)]]]'));
     });
 
     testWidgets('parses padding-block-end', (WidgetTester tester) async {
@@ -228,8 +250,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              '[CssBlock:child=[Padding:(0,0,3,0),child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child=[Padding:(0,0,3,0),child='
+              '[RichText:(:Foo)]]]'));
     });
 
     testWidgets('parses padding-left', (WidgetTester tester) async {
@@ -237,8 +259,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              '[CssBlock:child=[Padding:(0,0,0,3),child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child=[Padding:(0,0,0,3),child='
+              '[RichText:(:Foo)]]]'));
     });
 
     group('parses padding-inline-start', () {
@@ -248,16 +270,16 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals(
-                '[CssBlock:child=[Padding:(0,0,0,3),child=[RichText:(:Foo)]]]'));
+            equals('[CssBlock:child=[Padding:(0,0,0,3),child='
+                '[RichText:(:Foo)]]]'));
       });
 
       testWidgets('rtl', (WidgetTester tester) async {
         final explained = await explain(tester, html, rtl: true);
         expect(
             explained,
-            equals(
-                '[CssBlock:child=[Padding:(0,3,0,0),child=[RichText:(:Foo)]]]'));
+            equals('[CssBlock:child=[Padding:(0,3,0,0),child='
+                '[RichText:dir=rtl,(:Foo)]]]'));
       });
     });
 
@@ -266,8 +288,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              '[CssBlock:child=[Padding:(5,3,3,3),child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child=[Padding:(5,3,3,3),child='
+              '[RichText:(:Foo)]]]'));
     });
 
     testWidgets('reset padding with padding-bottom', (tester) async {
@@ -275,8 +297,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              '[CssBlock:child=[Padding:(3,3,0,3),child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child=[Padding:(3,3,0,3),child='
+              '[RichText:(:Foo)]]]'));
     });
   });
 
@@ -358,7 +380,7 @@ void main() {
       final explained = await explain(tester, html, rtl: true);
       expect(
           explained,
-          equals('[RichText:(:'
+          equals('[RichText:dir=rtl,(:'
               'a'
               '[widget0]'
               '(:b)'
@@ -372,7 +394,7 @@ void main() {
       final explained = await explain(tester, html, rtl: true);
       expect(
           explained,
-          equals('[RichText:(:'
+          equals('[RichText:dir=rtl,(:'
               'a'
               '[SizedBox:5.0x0.0]'
               '(:b)'

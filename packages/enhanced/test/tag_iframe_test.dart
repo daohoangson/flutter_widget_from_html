@@ -24,7 +24,7 @@ void main() {
         equals('[CssBlock:child=[WebView:'
             'url=$src,'
             'aspectRatio=$defaultAspectRatio,'
-            'getDimensions=true'
+            'autoResize=true'
             ']]'));
   });
 

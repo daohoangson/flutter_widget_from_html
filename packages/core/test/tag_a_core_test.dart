@@ -72,6 +72,44 @@ void main() {
     );
   });
 
+  testWidgets('renders empty inside', (tester) async {
+    final html = '<a href="$kHref""></a>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[widget0]'));
+  });
+
+  testWidgets('renders DIV tag inside (display: block)', (tester) async {
+    final html = '<a href="$kHref" style="display: block"><div>Foo</div></a>';
+    final explained = await explain(tester, html);
+    expect(
+      explained,
+      equals('[CssBlock:child=[GestureDetector:child='
+          '[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]'
+          ']]'),
+    );
+  });
+
+  testWidgets('renders DIV tags inside (display: block)', (tester) async {
+    final html = '<a href="$kHref" style="display: block">'
+        '<div>Foo</div><div>Bar</div></a>';
+    final explained = await explain(tester, html);
+    expect(
+      explained,
+      equals(
+        '[CssBlock:child=[GestureDetector:child=[Column:children='
+        '[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]],'
+        '[CssBlock:child=[RichText:(#FF0000FF+u:Bar)]]'
+        ']]]',
+      ),
+    );
+  });
+
+  testWidgets('renders empty inside (display: block)', (tester) async {
+    final html = '<a href="$kHref" style="display: block"></a>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[widget0]'));
+  });
+
   testWidgets('renders empty background-color inside (#215)', (tester) async {
     final h = '<a href="$kHref"><div style="background-color: red"></div></a>';
     final explained = await explain(tester, h);
@@ -84,7 +122,7 @@ void main() {
     expect(
         explained,
         equals('[SizedBox:0.0x5.0],'
-            '[GestureDetector:child=[CssBlock:child=[Padding:(0,5,0,5),child=[RichText:(#FF0000FF+u:Foo)]]]],'
+            '[GestureDetector:child=[Padding:(0,5,0,5),child=[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]]],'
             '[SizedBox:0.0x5.0]'));
   });
 

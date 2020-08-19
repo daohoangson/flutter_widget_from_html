@@ -6,7 +6,7 @@
 
 A Flutter package for building Flutter widget tree from HTML (supports most popular tags and stylings).
 
-This `core` package implements html parsing and widget building logic so it's easy to extend and fit your app's use case. It tries to render an optimal tree: use `RichText` with specific `TextStyle`, merge spans together, show images in `AspectRatio`, etc.
+This `core` package implements html parsing and widget building logic so it's easy to extend and fit your app's use case. It tries to render an optimal tree: use `RichText` with specific `TextStyle`, merge text spans together, show images in sized box, etc.
 
 If this is your first time here, consider using the [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) package as a quick starting point.
 
@@ -93,21 +93,22 @@ However, these tags and their contents will be ignored:
 
 ### Inline stylings
 
+- background (color only), background-color: hex values, `rgb()`, `hsl()` or named colors
 - border-top, border-bottom: overline/underline with support for dashed/dotted/double/solid style
 - color: hex values, `rgb()`, `hsl()` or named colors
 - direction (similar to `dir` attribute)
 - font-family
-- font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) and values (in `em`, `%` and `px`)
+- font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) or values in `em`, `%`, `pt` and `px`
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
-- line-height: number, values (in `em`, `%` and `px`) or `normal`
-- margin and margin-xxx (values in `px`, `em`)
-- padding and padding-xxx (values in `px`, `em`)
+- line-height: `normal` number or values in `em`, `%`, `pt` and `px`
+- margin and margin-xxx: values in `em`, `pt` and `px`
+- padding and padding-xxx: values in `em`, `pt` and `px`
 - vertical-align: baseline/top/bottom/middle/sub/super
 - text-align: center/justify/left/right
 - text-decoration: line-through/none/overline/underline
 - text-overflow: clip/ellipsis. Note: `text-overflow: ellipsis` should be used in conjuntion with `max-lines` or `-webkit-line-clamp` for better result.
-- Sizing (width & height, max-xxx, min-xxx) with values in `px`, `em`
+- Sizing (width & height, max-xxx, min-xxx) with values in `em`, `pt` and `px`
 
 ## Extensibility
 
@@ -217,11 +218,11 @@ The HTML string is parsed into DOM elements and each element is visited once to 
 
 | Step | | Integration point |
 | --- | --- | --- |
-| 1 | Parse the tag and attributes map | `WidgetFactory.parseTag(NodeMetadata, String, Map)` |
-| 2 | Inform parents if any | `BuildOp.onChild(NodeMetadata, Element)` |
-| 3 | Populate default inline style key+value pairs | `BuildOp.defaultStyles(NodeMetadata, Element)` |
-| 4 | `HtmlWidget.customStyleBuilder` / `HtmlWidget.customWidgetBuilder` will be called if configured | |
-| 5 | Parse inline style key+value pairs | `WidgetFactory.parseStyle(NodeMetadata, String, String)` |
+| 1 | Parse the tag and attributes map | `WidgetFactory.parseTag(NodeMetadata)` |
+| 2 | Inform parents if any | `BuildOp.onChild(NodeMetadata)` |
+| 3 | Populate default inline styles | `BuildOp.defaultStyles(NodeMetadata)` |
+| 4 | `customStyleBuilder` / `customWidgetBuilder` will be called if configured | |
+| 5 | Parse inline style key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(NodeMetadata, String, String)` |
 | 6 | Repeat with children elements to collect `BuiltPiece`s | |
 | 7 | Inform build ops | `BuildOp.onPieces(NodeMetadata, Iterable<BuiltPiece>)` |
 | 8 | a. If not a block element, go to 10 | |
@@ -232,46 +233,41 @@ The HTML string is parsed into DOM elements and each element is visited once to 
 Notes:
 
 - Text related styling can be changed with `TextStyleBuilder`, just register your callback and it will be called when the build context is ready.
-  - The second parameter is a `TextStyleHtml` which is immutable and is calculated from the root down to your element, your callback must return a `TextStyleHtml` by calling `copyWith` or simply return the parent itself.
-  - Optionally, pass any object on registration and your callback will receive it as the third parameter.
+  - The first parameter is a `TextStyleHtml` which is immutable and is calculated from the root down to your element, your callback must return a `TextStyleHtml` by calling `copyWith` or simply return the parent itself.
+  - Optionally, pass any object on registration and your callback will receive it as the second parameter.
 
 ```dart
 // simple callback: set text color to accent color
-meta.tsb((context, parent, _) =>
+meta.tsb((parent, _) =>
   parent.copyWith(
     style: parent.style.copyWith(
-      color: Theme.of(context).accentColor,
+      color: parent.getDependency<ThemeData>().accentColor,
     ),
   ));
 
-// callback using third param: set height to input value
-TextStyleHtml callback(BuildContext _, TextStyleHtml parent, double value) =>
+// callback using second param: set height to input value
+TextStyleHtml callback(TextStyleHtml parent, double value) =>
   parent.copyWith(height: value)
 
 // register with some value
-meta.tsb<bool>(callback, 2);
+meta.tsb<int>(callback, 2);
 ```
 
 - Other complicated styling are supported via `BuildOp`
 
 ```dart
-meta.op = BuildOp(
+meta.register(BuildOp(
   onPieces: (meta, pieces) => pieces,
   onWidgets: (meta, widgets) => widgets,
   ...,
   priority: 9999,
-);
+));
 ```
 
 - Each metadata can has multiple text style builder callbacks and build ops.
 - There are two types of `BuiltPiece`:
   - `BuiltPiece.text()` contains a `TextBits`
   - `BuiltPiece.widgets()` contains widgets
-- `TextBits` is a list of `TextBit`, there are four subclasses of `TextBit`:
-  - `TextBits` is actually a `TextBit`, that means a `TextBits` can contains multiple sub-`TextBits`
-  - `TextData` is a string of text
-  - `TextWhitespace` is a whitespace
-  - `TextWidget` is an inline widget
 
 The example below replaces smilie inline image with an emoji:
 
@@ -309,16 +305,16 @@ class _SmiliesWidgetFactory extends WidgetFactory {
   );
 
   @override
-  void parseTag(NodeMetadata meta, String tag, Map<dynamic, String> attrs) {
-    if (tag == 'img' &&
-        attrs.containsKey('alt') &&
-        attrs.containsKey('class') &&
-        attrs['class'].contains('smilie')) {
-      meta.op = smilieOp;
+  void parse(NodeMetadata meta) {
+    final e = meta.domElement;
+    if (e.localName == 'img' &&
+        e.classes.contains('smilie') &&
+        e.attributes.containsKey('alt')) {
+      meta.register(smilieOp);
       return;
     }
 
-    return super.parseTag(meta, tag, attrs);
+    return super.parse(meta);
   }
 }
 ```

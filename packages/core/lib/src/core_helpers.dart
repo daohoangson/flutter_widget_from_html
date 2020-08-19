@@ -1,77 +1,69 @@
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-part 'widget/css_element.dart';
+import 'core_html_widget.dart';
 
+/// The default character threshold to build widget tree asynchronously.
+///
+/// Related: [HtmlWidget.buildAsync]
 const kShouldBuildAsync = 10000;
 
-/// A no op placeholder widget.
+/// A no op widget.
 const widget0 = SizedBox.shrink();
 
+/// A callback to specify custom styling.
+///
+/// The returned `Map` will be applied as inline styles.
+/// See list of all supported inline stylings in README.md, the sample callback
+/// below changes the color for all elements that have CSS class `name`:
+///
+/// ```dart
+/// HtmlWidget(
+///   'Hello <span class="name">World</span>!',
+///   customStylesBuilder: (element) =>
+///     element.classes.contains('name') ? {'color': 'red'} : null,
+/// )
+/// ```
 typedef CustomStylesBuilder = Map<String, String> Function(dom.Element element);
 
+/// A callback to render custom widget for a DOM element.
+///
+/// This is suitable for fairly simple widget. Please note that
+/// you have to handle the DOM element and its children manually,
+/// if the children have HTML styling etc., they won't be processed at all.
+/// For those needs, a custom [WidgetFactory] is the way to go.
 typedef CustomWidgetBuilder = Widget Function(dom.Element element);
 
-typedef WidgetPlaceholderBuilder<T> = Iterable<Widget> Function(
-    BuildContext context, Iterable<Widget> children, T input);
+/// A widget builder that supports builder callbacks.
+class WidgetPlaceholder<T> extends StatelessWidget {
+  /// The origin of this widget.
+  final T generator;
 
-class WidgetPlaceholder<T1> extends StatelessWidget {
-  final _builders = <Function>[];
-  final Iterable<Widget> _firstChildren;
-  final _inputs = [];
-  final WidgetPlaceholderBuilder<T1> _lastBuilder;
-  final T1 _lastInput;
+  final List<Widget Function(BuildContext, Widget)> _builders = [];
+  final Widget _firstChild;
 
-  WidgetPlaceholder({
-    WidgetPlaceholderBuilder<T1> builder,
-    Iterable<Widget> children,
-    T1 input,
-    WidgetPlaceholderBuilder<T1> lastBuilder,
-  })  : assert((builder == null) != (lastBuilder == null),
-            'Either builder or lastBuilder must be set'),
-        _firstChildren = children,
-        _lastBuilder = lastBuilder,
-        _lastInput = (lastBuilder != null ? input : null) {
-    if (builder != null) {
-      _builders.add(builder);
-      _inputs.add(input);
-    }
-  }
-
-  Iterable<Function> get builders => _builders.skip(0);
-
-  Iterable get inputs => _inputs.skip(0);
+  /// Creates a widget builder.
+  WidgetPlaceholder(this.generator, {Widget child}) : _firstChild = child;
 
   @override
-  Widget build(BuildContext context) {
-    var output = _firstChildren;
+  Widget build(BuildContext context) => callBuilders(context, _firstChild);
 
-    final l = _builders.length;
-    for (var i = 0; i < l; i++) {
-      output = _builders[i](context, output, _inputs[i]);
+  /// Calls builder callbacks on the specified [child] widget.
+  Widget callBuilders(BuildContext context, Widget child) {
+    var built = child ?? widget0;
+
+    for (final builder in _builders) {
+      built = builder(context, built) ?? widget0;
     }
 
-    if (_lastBuilder != null) {
-      output = _lastBuilder(context, output, _lastInput);
-    }
-
-    output = output?.where((widget) => widget != null);
-    if (output?.isNotEmpty != true) return widget0;
-    if (output.length == 1) return output.first;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: List.unmodifiable(output),
-    );
+    return built;
   }
 
-  WidgetPlaceholder<T1> wrapWith<T2>(WidgetPlaceholderBuilder<T2> builder,
-      [T2 input]) {
+  /// Enqueues [builder] to be built later.
+  WidgetPlaceholder<T> wrapWith(
+      Widget Function(BuildContext context, Widget child) builder) {
     assert(builder != null);
     _builders.add(builder);
-    _inputs.add(input);
     return this;
   }
 }

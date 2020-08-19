@@ -1,62 +1,28 @@
 part of '../core_data.dart';
 
+/// A bit of text.
 @immutable
-abstract class TextBit {
+abstract class TextBit<CompileFrom, CompileTo> {
+  /// The container [TextBits].
   final TextBits parent;
 
+  /// Create a text bit.
   TextBit(this.parent);
 
-  bool get canCompile => false;
-  String get data => null;
-  bool get hasTrailingWhitespace => false;
-  int get index => parent?._children?.indexOf(this) ?? -1;
-  bool get isEmpty => false;
-  bool get isNotEmpty => !isEmpty;
+  /// The associated [TextStyleBuilder].
   TextStyleBuilder get tsb => null;
 
-  InlineSpan compile(TextStyle style) => throw UnimplementedError();
-
-  bool detach() => parent?._children?.remove(this);
-
-  bool insertAfter(TextBit another) {
-    final i = another.index;
-    if (i == -1) return false;
-
-    another.parent._children.insert(i + 1, this);
-    return true;
-  }
-
-  bool insertBefore(TextBit another) {
-    final i = another.index;
-    if (i == -1) return false;
-
-    another.parent._children.insert(i, this);
-    return true;
-  }
-
-  bool replaceWith(TextBit another) {
-    final i = index;
-    if (i == -1) return false;
-
-    parent._children[i] = another;
-    return true;
-  }
-
-  @override
-  String toString() {
-    final clazz = runtimeType.toString();
-    final t = this;
-    final contents = t is TextWidget ? 'widget=${t.widget}' : 'data=$data';
-    return '[$clazz:$hashCode] $contents';
-  }
-
-  static TextBit nextOf(TextBit bit) {
-    var x = bit;
+  /// The next bit in the text tree.
+  ///
+  /// Note: the next bit may not have the same parent or grandparent,
+  /// it's only guaranteed to be within the same tree.
+  TextBit get next {
+    TextBit x = this;
 
     while (x != null) {
-      final i = x.index;
+      final siblings = x.parent?._children;
+      final i = siblings?.indexOf(x) ?? -1;
       if (i != -1) {
-        final siblings = x.parent._children;
         for (var j = i + 1; j < siblings.length; j++) {
           final candidate = siblings[j];
           if (candidate is TextBits) {
@@ -74,95 +40,151 @@ abstract class TextBit {
     return null;
   }
 
-  static TextBit tailOf(TextBits bits) {
-    var x = bits;
+  /// The previous bit in the text tree.
+  ///
+  /// Note: the previous bit may not have the same parent or grandparent,
+  /// it's only guaranteed to be within the same tree.
+  TextBit get prev {
+    TextBit x = this;
 
     while (x != null) {
-      final last = x.last;
-      if (last != null) return last;
+      final siblings = x.parent?._children;
+      final i = siblings?.indexOf(x) ?? -1;
+      if (i != -1) {
+        for (var j = i - 1; j > -1; j--) {
+          final candidate = siblings[j];
+          if (candidate is TextBits) {
+            final last = candidate.last;
+            if (last != null) return last;
+          } else {
+            return candidate;
+          }
+        }
+      }
+
       x = x.parent;
     }
 
     return null;
   }
+
+  /// Compiles input into output.
+  CompileTo compile(CompileFrom input) => throw UnimplementedError();
+
+  /// Removes self from the parent.
+  bool detach() => parent?._children?.remove(this);
+
+  /// Inserts self after [another] in the text tree.
+  bool insertAfter(TextBit another) {
+    if (parent == null) return false;
+
+    assert(parent == another.parent);
+    final siblings = parent._children;
+    final i = siblings.indexOf(another);
+    if (i == -1) return false;
+
+    siblings.insert(i + 1, this);
+    return true;
+  }
+
+  /// Inserts self before [another] in the text tree.
+  bool insertBefore(TextBit another) {
+    if (parent == null) return false;
+
+    assert(parent == another.parent);
+    final siblings = parent._children;
+    final i = siblings.indexOf(another);
+    if (i == -1) return false;
+
+    siblings.insert(i, this);
+    return true;
+  }
+
+  /// Replaces self with [another].
+  bool replaceWith(TextBit another) {
+    if (parent == null) return false;
+
+    assert(parent == another.parent);
+    final siblings = parent._children;
+    final i = siblings.indexOf(this);
+    if (i == -1) return false;
+
+    siblings[i] = another;
+    return true;
+  }
+
+  @override
+  String toString() => '[${runtimeType}]';
 }
 
-class TextData extends TextBit {
-  @override
-  final String data;
+/// A simple data bit.
+class TextData extends TextBit<void, String> {
+  final String _data;
 
   @override
   final TextStyleBuilder tsb;
 
-  TextData(TextBits parent, this.data, this.tsb)
+  /// Creates with data string
+  TextData(TextBits parent, this._data, this.tsb)
       : assert(parent != null),
-        assert(data != null),
+        assert(_data != null),
         assert(tsb != null),
         super(parent);
-}
-
-class TextWhitespace extends TextBit {
-  final _buffer = StringBuffer();
-
-  TextWhitespace(TextBit parent, TextWhitespaceType type)
-      : assert(parent != null),
-        super(parent) {
-    if (type != null) append(type);
-  }
 
   @override
-  String get data => _buffer.isEmpty ? ' ' : _buffer.toString();
+  String compile(void _) => _data;
 
   @override
-  bool get hasTrailingWhitespace => _buffer.isEmpty;
-
-  void append(TextWhitespaceType type) {
-    switch (type) {
-      case TextWhitespaceType.newLine:
-        _buffer.write('\n');
-        break;
-    }
-  }
+  String toString() => '[TextData] data=$_data';
 }
 
-class TextWidget<T> extends TextBit {
+/// An inline widget to be rendered within text paragraph.
+class TextWidget<T> extends TextBit<TextStyleHtml, InlineSpan> {
+  /// See [PlaceholderSpan.alignment].
   final PlaceholderAlignment alignment;
-  final TextBaseline baseline;
-  final WidgetPlaceholder<T> widget;
 
+  /// See [PlaceholderSpan.baseline].
+  final TextBaseline baseline;
+
+  /// The widget to be rendered.
+  final WidgetPlaceholder<T> child;
+
+  /// Creates an inline widget.
   TextWidget(
     TextBits parent,
-    this.widget, {
+    this.child, {
     this.alignment = PlaceholderAlignment.baseline,
     this.baseline = TextBaseline.alphabetic,
   })  : assert(parent != null),
-        assert(widget != null),
+        assert(child != null),
         assert(alignment != null),
         assert(baseline != null),
         super(parent);
 
   @override
-  bool get canCompile => true;
-
-  @override
-  WidgetSpan compile(TextStyle style) => WidgetSpan(
+  InlineSpan compile(TextStyleHtml _) => WidgetSpan(
         alignment: alignment,
         baseline: baseline,
-        child: widget,
-        style: style,
+        child: child,
       );
+
+  @override
+  String toString() => '[TextWidget] child=$child';
 }
 
-class TextBits extends TextBit {
+/// A container of bits.
+class TextBits extends TextBit<void, void> {
   final _children = <TextBit>[];
 
   @override
   final tsb;
 
+  /// Creates a container.
   TextBits(this.tsb, [TextBits parent])
       : assert(tsb != null),
         super(parent);
 
+  /// The list of bits including direct children and their children.
   Iterable<TextBit> get bits sync* {
     for (final child in _children) {
       if (child is TextBits) {
@@ -173,6 +195,7 @@ class TextBits extends TextBit {
     }
   }
 
+  /// The first bit (recursively).
   TextBit get first {
     for (final child in _children) {
       final first = child is TextBits ? child.first : child;
@@ -182,19 +205,27 @@ class TextBits extends TextBit {
     return null;
   }
 
-  @override
-  bool get hasTrailingWhitespace =>
-      TextBit.tailOf(this)?.hasTrailingWhitespace ?? true;
+  /// Returns `true` if the text (up to this container) has trailing whitespace.
+  bool get hasTrailingWhitespace {
+    final tail = last ?? prev;
+    if (tail == null) return true;
+    return tail is _TextWhitespace;
+  }
 
-  @override
+  /// Returns `true` if there are no bits (recursively).
   bool get isEmpty {
     for (final child in _children) {
-      if (child.isNotEmpty) return false;
+      if (child is TextBits) {
+        if (!child.isEmpty) return false;
+      } else {
+        return false;
+      }
     }
 
     return true;
   }
 
+  /// The last bit (recursively).
   TextBit get last {
     for (final child in _children.reversed) {
       final last = child is TextBits ? child.last : child;
@@ -204,33 +235,50 @@ class TextBits extends TextBit {
     return null;
   }
 
-  void add(TextBit bit) => _children.add(bit);
+  /// Adds [bit] to the tail of this container.
+  void add(TextBit bit) {
+    assert(bit.parent == this);
+    _children.add(bit);
+  }
 
-  TextWhitespace addWhitespace([TextWhitespaceType type]) {
-    final tail = TextBit.tailOf(this);
-    if (tail == null) {
-      if (type == null) return null;
-    } else if (tail is TextWhitespace) {
-      return tail..append(type);
-    }
+  /// Adds a new line to the tail of this container.
+  TextBit addNewLine() {
+    final tail = last ?? prev;
+    if (tail is _TextNewLine) return tail..extend();
 
-    final bit = TextWhitespace(this, type);
+    final bit = _TextNewLine(this);
     add(bit);
     return bit;
   }
 
+  /// Adds a new whitespace to the tail of this container.
+  TextBit addWhitespace() {
+    final tail = last ?? prev;
+    if (tail == null) return null;
+    if (tail is _TextNewLine || tail is _TextWhitespace) return tail;
+
+    final bit = _TextWhitespace(this);
+    add(bit);
+    return bit;
+  }
+
+  /// Adds a string to the tail of this container.
   TextData addText(String data) {
     final bit = TextData(this, data, tsb);
     add(bit);
     return bit;
   }
 
-  TextBits sub([TextStyleBuilder tsb]) {
-    final sub = TextBits(tsb ?? this.tsb.sub(), this);
+  /// Creates a sub-container.
+  TextBits sub([TextStyleBuilder subTsb]) {
+    final sub = TextBits(subTsb ?? tsb.sub(), this);
     add(sub);
     return sub;
   }
 
+  /// Trims all trailing whitespaces.
+  ///
+  /// Returns the number of bits that have been detached.
   int trimRight() {
     var trimmed = 0;
 
@@ -280,6 +328,32 @@ class TextBits extends TextBit {
       : [];
 }
 
-enum TextWhitespaceType {
-  newLine,
+class _TextNewLine extends TextBit<TextStyleBuilder, Widget> {
+  static const _kNewLine = '\n';
+
+  final _sb = StringBuffer(_kNewLine);
+
+  _TextNewLine(TextBits parent)
+      : assert(parent != null),
+        super(parent);
+
+  @override
+  Widget compile(TextStyleBuilder tsb) {
+    final lines = _sb.length - 1;
+    if (lines < 1) return null;
+
+    return HeightPlaceholder(
+        CssLength(lines.toDouble(), CssLengthUnit.em), tsb);
+  }
+
+  void extend() => _sb.write(_kNewLine);
+}
+
+class _TextWhitespace extends TextBit<void, String> {
+  _TextWhitespace(TextBit parent)
+      : assert(parent != null),
+        super(parent);
+
+  @override
+  String compile(void _) => ' ';
 }

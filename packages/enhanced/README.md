@@ -95,21 +95,22 @@ These tags and their contents will be ignored:
 
 ### Inline stylings
 
+- background (color only), background-color: hex values, `rgb()`, `hsl()` or named colors
 - border-top, border-bottom: overline/underline with support for dashed/dotted/double/solid style
 - color: hex values, `rgb()`, `hsl()` or named colors
 - direction (similar to `dir` attribute)
 - font-family
-- font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) and values (in `em`, `%` and `px`)
+- font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) or values in `em`, `%`, `pt` and `px`
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
-- line-height: number, values (in `em`, `%` and `px`) or `normal`
-- margin and margin-xxx (values in `px`, `em`)
-- padding and padding-xxx (values in `px`, `em`)
+- line-height: `normal` number or values in `em`, `%`, `pt` and `px`
+- margin and margin-xxx: values in `em`, `pt` and `px`
+- padding and padding-xxx: values in `em`, `pt` and `px`
 - vertical-align: baseline/top/bottom/middle/sub/super
 - text-align: center/justify/left/right
 - text-decoration: line-through/none/overline/underline
 - text-overflow: clip/ellipsis. Note: `text-overflow: ellipsis` should be used in conjuntion with `max-lines` or `-webkit-line-clamp` for better result.
-- Sizing (width & height, max-xxx, min-xxx) with values in `px`, `em`
+- Sizing (width & height, max-xxx, min-xxx) with values in `em`, `pt` and `px`
 
 ## Extensibility
 

@@ -1,4 +1,3 @@
-export 'src/builder.dart';
 export 'src/data.dart';
 export 'src/helpers.dart';
 export 'src/html_widget.dart';

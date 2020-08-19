@@ -63,6 +63,21 @@ void main() {
               '(: After text.)'
               ')]'));
     });
+
+    testWidgets('renders block', (WidgetTester tester) async {
+      final html = '<img src="$src" style="display: block" />';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssBlock:child='
+              '[Image:image=NetworkImage("$src", scale: 1.0)]]'));
+    });
+
+    testWidgets('renders block without src', (WidgetTester tester) async {
+      final html = '<img style="display: block" />';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[widget0]'));
+    });
   });
 
   group('asset', () {
@@ -116,13 +131,13 @@ void main() {
     testWidgets('renders bad asset with alt text', (WidgetTester tester) async {
       final html = '<img src="asset:" alt="Foo" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:Foo]'));
+      expect(explained, equals('[RichText:(:Foo)]'));
     });
 
     testWidgets('renders bad asset with title text', (tester) async {
       final html = '<img src="asset:" title="Foo" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:Foo]'));
+      expect(explained, equals('[RichText:(:Foo)]'));
     });
   });
 
@@ -145,13 +160,13 @@ void main() {
     testWidgets('renders bad data uri with alt text', (tester) async {
       final html = '<img src="data:image/xxx" alt="Foo" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:Foo]'));
+      expect(explained, equals('[RichText:(:Foo)]'));
     });
 
     testWidgets('renders bad data uri with title text', (tester) async {
       final html = '<img src="data:image/xxx" title="Foo" />';
       final explained = await explain(tester, html);
-      expect(explained, equals('[Text:Foo]'));
+      expect(explained, equals('[RichText:(:Foo)]'));
     });
   });
 

@@ -77,7 +77,7 @@ class _TestAppState extends State<TestApp> {
               mimeType: 'text/html',
             ).toString(),
             aspectRatio: 16 / 9,
-            getDimensions: true,
+            autoResize: true,
           ),
           key: ValueKey(input),
         )

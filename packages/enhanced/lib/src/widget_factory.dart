@@ -3,81 +3,225 @@ import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    as core;
+    as core show WidgetFactory;
+import 'package:flutter_widget_from_html_core/src/internal/core_ops.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'builder.dart';
+import 'internal/ops.dart';
 import 'data.dart';
 import 'helpers.dart';
 import 'html_widget.dart';
 
-part 'ops/tag_a_extended.dart';
-part 'ops/tag_iframe.dart';
-part 'ops/tag_svg.dart';
-part 'ops/tag_video.dart';
-
-/// A factory to build widget for HTML elements
-/// with support for [WebView] and [VideoPlayer] etc.
+/// A factory to build widgets with [WebView], [VideoPlayer], etc.
 class WidgetFactory extends core.WidgetFactory {
-  BuildOp _tagAExtended;
+  State _state;
   BuildOp _tagIframe;
   BuildOp _tagSvg;
-  BuildOp _tagVideo;
-  HtmlWidget _widget;
+  TextStyleHtml Function(TextStyleHtml, dynamic) _tsbTagA;
 
-  @override
-  Widget buildDivider() => const Divider(height: 1);
+  HtmlWidget get _widget => _state.widget;
 
+  /// Builds [Divider].
   @override
-  Iterable<Widget> buildGestureDetectors(
-    BuildContext _,
-    Iterable<Widget> widgets,
-    GestureTapCallback onTap,
-  ) =>
-      widgets?.map((widget) => InkWell(child: widget, onTap: onTap));
+  Widget buildDivider(NodeMetadata meta) => const Divider(height: 1);
 
+  /// Builds [InkWell].
   @override
-  GestureTapCallback buildGestureTapCallbackForUrl(String url) {
-    if (url == null) return null;
-    if (_widget?.onTapUrl == null) {
-      return () => canLaunch(url).then((ok) => ok ? launch(url) : null);
-    }
-    return () => _widget.onTapUrl(url);
-  }
+  Widget buildGestureDetector(
+          NodeMetadata meta, Widget child, GestureTapCallback onTap) =>
+      InkWell(child: child, onTap: onTap);
 
+  /// Builds [SvgPicture] or [Image].
   @override
-  Widget buildImage(Object provider, ImgMetadata img) {
-    var built = super.buildImage(provider, img);
+  Widget buildImage(NodeMetadata meta, Object provider, ImageMetadata image) {
+    var built = super.buildImage(meta, provider, image);
 
     if (built == null && provider is PictureProvider) {
       built = SvgPicture(provider);
     }
 
-    if (img.title != null && built != null) {
-      built = Tooltip(child: built, message: img.title);
+    if (image.title != null && built != null) {
+      built = Tooltip(child: built, message: image.title);
     }
 
     return built;
   }
 
+  /// Builds [LayoutGrid].
   @override
-  Object buildImageProvider(String url) =>
-      url?.startsWith('data:image/svg+xml') == true
-          ? buildSvgMemoryPicture(url)
-          : (url?.isNotEmpty == true &&
-                  Uri.tryParse(url)?.path?.toLowerCase()?.endsWith('.svg') ==
-                      true)
-              ? buildSvgPictureProvider(url)
-              : super.buildImageProvider(url);
+  Widget buildTable(NodeMetadata node, TextStyleHtml tsh, TableMetadata table) {
+    final cols = table.cols;
+    if (cols == 0) return null;
+    final templateColumnSizes = List<TrackSize>(cols);
+    for (var c = 0; c < cols; c++) {
+      templateColumnSizes[c] = FlexibleTrackSize(1);
+    }
 
-  PictureProvider buildSvgMemoryPicture(String dataUri) {
-    final bytes = buildImageBytes(dataUri);
+    final rows = table.rows;
+    if (rows == 0) return null;
+    final templateRowSizes = List<TrackSize>(rows);
+    for (var r = 0; r < rows; r++) {
+      templateRowSizes[r] = IntrinsicContentTrackSize();
+    }
+
+    final border = table.border != null
+        ? BoxDecoration(border: Border.fromBorderSide(table.border))
+        : null;
+
+    final children = <Widget>[];
+    table.visitCells((col, row, widget, colspan, rowspan) {
+      Widget child = SizedBox.expand(child: widget);
+
+      if (border != null) {
+        child = Container(
+          child: child,
+          decoration: border,
+        );
+      }
+
+      child = child.withGridPlacement(
+        columnStart: col,
+        columnSpan: colspan,
+        rowStart: row,
+        rowSpan: rowspan,
+      );
+
+      children.add(child);
+    });
+
+    final layoutGrid = LayoutGrid(
+      children: children,
+      columnGap: -(table.border?.width ?? 0),
+      gridFit: GridFit.passthrough,
+      rowGap: -(table.border?.width ?? 0),
+      templateColumnSizes: templateColumnSizes,
+      templateRowSizes: templateRowSizes,
+    );
+
+    if (border == null) return layoutGrid;
+
+    return buildStack(
+      node,
+      tsh,
+      <Widget>[
+        layoutGrid,
+        Positioned.fill(child: Container(decoration: border))
+      ],
+    );
+  }
+
+  /// Builds [VideoPlayer].
+  Widget buildVideoPlayer(
+    NodeMetadata meta,
+    String url, {
+    bool autoplay,
+    bool controls,
+    double height,
+    bool loop,
+    String posterUrl,
+    double width,
+  }) {
+    final dimensOk = height != null && height > 0 && width != null && width > 0;
+    final posterImgSrc = posterUrl != null ? ImageSource(posterUrl) : null;
+    return VideoPlayer(
+      url,
+      aspectRatio: dimensOk ? width / height : 16 / 9,
+      autoResize: !dimensOk,
+      autoplay: autoplay,
+      controls: controls,
+      loop: loop,
+      poster: posterImgSrc != null
+          ? buildImage(
+              meta,
+              imageProvider(posterImgSrc),
+              ImageMetadata(sources: [posterImgSrc]),
+            )
+          : null,
+    );
+  }
+
+  /// Builds [WebView].
+  Widget buildWebView(
+    NodeMetadata meta,
+    String url, {
+    double height,
+    double width,
+  }) {
+    if (_widget?.webView != true) return buildWebViewLinkOnly(meta, url);
+
+    final dimensOk = height != null && height > 0 && width != null && width > 0;
+    return WebView(
+      url,
+      aspectRatio: dimensOk ? width / height : 16 / 9,
+      autoResize: !dimensOk && _widget.webViewJs == true,
+      interceptNavigationRequest: (newUrl) {
+        if (newUrl == url) return false;
+
+        gestureTapCallback(newUrl)();
+        return true;
+      },
+      js: _widget.webViewJs == true,
+      unsupportedWorkaroundForIssue37:
+          _widget.unsupportedWebViewWorkaroundForIssue37 == true,
+    );
+  }
+
+  /// Builds fallback link when [HtmlWidget.webView] is disabled.
+  Widget buildWebViewLinkOnly(NodeMetadata meta, String url) => GestureDetector(
+        child: Text(url),
+        onTap: gestureTapCallback(url),
+      );
+
+  @override
+  GestureTapCallback gestureTapCallback(String url) {
+    if (url == null) return null;
+    final callback = _widget?.onTapUrl ?? _gestureTapCallbackDefault;
+    return () => callback(url);
+  }
+
+  Future<void> _gestureTapCallbackDefault(String url) async {
+    final ok = await canLaunch(url);
+    if (ok) return launch(url);
+    print("[flutter_widget_from_html] Tapped url $url (couldn't launch)");
+  }
+
+  @override
+  List<HtmlWidgetDependency> getDependencies(BuildContext context) =>
+      super.getDependencies(context)
+        ..add(HtmlWidgetDependency<ThemeData>(Theme.of(context)));
+
+  /// Returns flutter_svg.[PictureProvider] or [ImageProvider].
+  @override
+  Object imageProvider(ImageSource imgSrc) {
+    if (imgSrc == null) return super.imageProvider(imgSrc);
+    final url = imgSrc.url;
+
+    if (Uri.tryParse(url)?.path?.toLowerCase()?.endsWith('.svg') == true) {
+      return _imageSvgPictureProvider(url);
+    }
+
+    if (url.startsWith('data:image/svg+xml')) {
+      return _imageSvgMemoryPicture(url);
+    }
+
+    if (url.startsWith('http')) {
+      return _imageFromUrl(url);
+    }
+
+    return super.imageProvider(imgSrc);
+  }
+
+  Object _imageFromUrl(String url) =>
+      url?.isNotEmpty == true ? CachedNetworkImageProvider(url) : null;
+
+  Object _imageSvgMemoryPicture(String dataUri) {
+    final bytes = bytesFromDataUri(dataUri);
     return bytes != null
         ? MemoryPicture(SvgPicture.svgByteDecoder, bytes)
         : null;
   }
 
-  PictureProvider buildSvgPictureProvider(String url) {
+  Object _imageSvgPictureProvider(String url) {
     if (url?.startsWith('asset:') == true) {
       final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
       if (uri?.scheme != 'asset') return null;
@@ -100,166 +244,39 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
-  ImageProvider buildImageFromUrl(String url) =>
-      url?.isNotEmpty == true ? CachedNetworkImageProvider(url) : null;
-
-  @override
-  Widget buildTable(TableData table) {
-    final cols = table.cols;
-    final templateColumnSizes = List<TrackSize>(cols);
-    for (var c = 0; c < cols; c++) {
-      templateColumnSizes[c] = FlexibleTrackSize(1);
-    }
-
-    final rows = table.rows;
-    final templateRowSizes = List<TrackSize>(rows);
-    for (var r = 0; r < rows; r++) {
-      templateRowSizes[r] = IntrinsicContentTrackSize();
-    }
-
-    final border = table.border != null
-        ? BoxDecoration(border: Border.fromBorderSide(table.border))
-        : null;
-
-    final layoutGrid = LayoutGrid(
-      children: table.slots.map((slot) {
-        Widget cell = SizedBox.expand(child: buildColumn(slot.cell.children));
-
-        if (border != null) {
-          cell = Container(
-            child: cell,
-            decoration: border,
-          );
-        }
-
-        return cell.withGridPlacement(
-          columnStart: slot.col,
-          columnSpan: slot.cell.colspan,
-          rowStart: slot.row,
-          rowSpan: slot.cell.rowspan,
-        );
-      }).toList(growable: false),
-      columnGap: -(table.border?.width ?? 0),
-      gridFit: GridFit.passthrough,
-      rowGap: -(table.border?.width ?? 0),
-      templateColumnSizes: templateColumnSizes,
-      templateRowSizes: templateRowSizes,
-    );
-
-    if (border == null) return layoutGrid;
-
-    return Stack(
-      children: <Widget>[
-        layoutGrid,
-        Positioned.fill(child: Container(decoration: border))
-      ],
-    );
-  }
-
-  Widget buildVideoPlayer(
-    String url, {
-    bool autoplay,
-    bool controls,
-    double height,
-    bool loop,
-    String posterUrl,
-    double width,
-  }) {
-    final dimensOk = height != null && height > 0 && width != null && width > 0;
-    return VideoPlayer(
-      url,
-      aspectRatio: dimensOk ? width / height : 16 / 9,
-      autoResize: !dimensOk,
-      autoplay: autoplay,
-      controls: controls,
-      loop: loop,
-      poster: posterUrl != null
-          ? buildImage(
-              buildImageProvider(posterUrl),
-              ImgMetadata(url: posterUrl),
-            )
-          : null,
-    );
-  }
-
-  Widget buildWebView(
-    String url, {
-    double height,
-    double width,
-  }) {
-    if (_widget?.webView != true) return buildWebViewLinkOnly(url);
-
-    final dimensOk = height != null && height > 0 && width != null && width > 0;
-    return WebView(
-      url,
-      aspectRatio: dimensOk ? width / height : 16 / 9,
-      getDimensions: !dimensOk && _widget.webViewJs == true,
-      interceptNavigationRequest: (newUrl) {
-        if (newUrl == url) return false;
-
-        buildGestureTapCallbackForUrl(newUrl)();
-        return true;
-      },
-      js: _widget.webViewJs == true,
-      unsupportedWorkaroundForIssue37:
-          _widget.unsupportedWebViewWorkaroundForIssue37 == true,
-    );
-  }
-
-  Widget buildWebViewLinkOnly(String url) => GestureDetector(
-        child: Text(url),
-        onTap: buildGestureTapCallbackForUrl(url),
-      );
-
-  @override
-  void parseTag(
-    NodeMetadata meta,
-    String tag,
-    Map<dynamic, String> attributes,
-  ) {
-    switch (tag) {
+  void parse(NodeMetadata meta) {
+    switch (meta.domElement.localName) {
       case 'a':
-        meta.op = tagAExtended();
+        _tsbTagA ??= (p, _) => p.copyWith(
+            style: p.style
+                .copyWith(color: p.getDependency<ThemeData>().accentColor));
+        meta.tsb(_tsbTagA);
         break;
-      case 'iframe':
-        meta.op = tagIframe();
+      case kTagIframe:
+        _tagIframe ??= TagIframe(this).buildOp;
+        meta.register(_tagIframe);
         // return asap to avoid being disabled by core
         return;
-      case 'svg':
-        meta.op = tagSvg();
+      case kTagSvg:
+        _tagSvg ??= TagSvg(this).buildOp;
+        meta.register(_tagSvg);
         // return asap to avoid being disabled by core
         return;
-      case 'video':
-        meta.op = tagVideo();
+      case kTagVideo:
+        meta.register(TagVideo(this, meta).op);
         break;
     }
 
-    return super.parseTag(meta, tag, attributes);
+    return super.parse(meta);
   }
 
   @override
-  void reset(core.HtmlWidget widget) {
-    if (widget is HtmlWidget) _widget = widget;
-    super.reset(widget);
-  }
+  void reset(State state) {
+    final widget = state.widget;
+    if (widget is HtmlWidget) {
+      _state = state;
+    }
 
-  BuildOp tagAExtended() {
-    _tagAExtended ??= _TagAExtended().buildOp;
-    return _tagAExtended;
-  }
-
-  BuildOp tagIframe() {
-    _tagIframe ??= _TagIframe(this).buildOp;
-    return _tagIframe;
-  }
-
-  BuildOp tagSvg() {
-    _tagSvg ??= _TagSvg(this).buildOp;
-    return _tagSvg;
-  }
-
-  BuildOp tagVideo() {
-    _tagVideo ??= _TagVideo(this).buildOp;
-    return _tagVideo;
+    super.reset(state);
   }
 }

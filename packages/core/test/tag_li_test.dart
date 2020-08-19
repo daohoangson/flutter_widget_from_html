@@ -15,8 +15,8 @@ String padding(String child) =>
 
 String list(List<String> children) => '[Column:children=${children.join(",")}]';
 
-String item(String markerText, String contents) =>
-    '[CssBlock:child=[Stack:children=[RichText:(:$contents)],${marker(markerText)}]]';
+String item(String markerText, String contents, {String child}) =>
+    '[CssBlock:child=[Stack:children=${child ?? '[RichText:(:$contents)]'},${marker(markerText)}]]';
 
 String marker(String text) => '[Positioned:(0.0,null,null,-45.0),child='
     '[SizedBox:40.0x0.0,child='
@@ -95,8 +95,7 @@ void main() {
         ]))));
   });
 
-  testWidgets('renders nested list (single child)',
-      (WidgetTester tester) async {
+  testWidgets('renders nested list (single child)', (tester) async {
     final html = '''
 <ul>
   <li>Foo</li>
@@ -107,7 +106,7 @@ void main() {
         explained,
         equals(padding(list([
           item(disc, 'Foo'),
-          padding(item(circle, 'Bar')),
+          item(disc, null, child: padding(item(circle, 'Bar'))),
         ]))));
   });
 
@@ -584,20 +583,69 @@ void main() {
   });
 
   group('rtl', () {
+    final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';
+
+    final explainerExpected =
+        '[CssBlock:child=[Padding:(0,25,0,0),child=[Column:dir=rtl,children='
+        '[CssBlock:child=[Stack:dir=rtl,children=[RichText:dir=rtl,(:One)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:1.)]]]]],'
+        '[CssBlock:child=[Stack:dir=rtl,children=[RichText:dir=rtl,(:Two)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:2.)]]]]],'
+        '[CssBlock:child=[Stack:dir=rtl,children=[RichText:dir=rtl,(+b:Three)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:3.)]]]]]'
+        ']]]';
+
+    final nonExplainerExpected = 'TshWidget\n'
+        '└ColumnPlaceholder()\n'
+        ' └CssBlock()\n'
+        '  └Padding(padding: EdgeInsets(0.0, 0.0, 25.0, 0.0))\n'
+        '   └Column(direction: vertical, mainAxisAlignment: start, mainAxisSize: min, crossAxisAlignment: start, textDirection: rtl)\n'
+        '    ├WidgetPlaceholder<TextBits>()\n'
+        '    │└CssBlock()\n'
+        '    │ └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
+        '    │  ├RichText(textDirection: rtl, text: "One")\n'
+        '    │  └Positioned(top: 0.0, right: -45.0)\n'
+        '    │   └SizedBox(width: 40.0)\n'
+        '    │    └RichText(textAlign: left, textDirection: rtl, text: "1.")\n'
+        '    ├WidgetPlaceholder<TextBits>()\n'
+        '    │└CssBlock()\n'
+        '    │ └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
+        '    │  ├RichText(textDirection: rtl, text: "Two")\n'
+        '    │  └Positioned(top: 0.0, right: -45.0)\n'
+        '    │   └SizedBox(width: 40.0)\n'
+        '    │    └RichText(textAlign: left, textDirection: rtl, text: "2.")\n'
+        '    └WidgetPlaceholder<TextBits>()\n'
+        '     └CssBlock()\n'
+        '      └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
+        '       ├RichText(textDirection: rtl, text: "Three")\n'
+        '       └Positioned(top: 0.0, right: -45.0)\n'
+        '        └SizedBox(width: 40.0)\n'
+        '         └RichText(textAlign: left, textDirection: rtl, text: "3.")\n'
+        '\n';
+
     testWidgets('renders ordered list', (WidgetTester tester) async {
-      final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';
       final explained = await explain(tester, null,
           hw: Directionality(
             child: HtmlWidget(html, key: hwKey),
             textDirection: TextDirection.rtl,
           ));
-      expect(
-          explained,
-          equals('[CssBlock:child=[Padding:(0,25,0,0),child=[Column:children='
-              '[CssBlock:child=[Stack:children=[RichText:(:One)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,(:1.)]]]]],'
-              '[CssBlock:child=[Stack:children=[RichText:(:Two)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,(:2.)]]]]],'
-              '[CssBlock:child=[Stack:children=[RichText:(+b:Three)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,(:3.)]]]]]'
-              ']]]'));
+      expect(explained, equals(explainerExpected));
+    });
+
+    testWidgets('renders ordered list useExplainer=false', (tester) async {
+      final explained = await explain(
+        tester,
+        null,
+        hw: Directionality(
+          child: HtmlWidget(html, key: hwKey),
+          textDirection: TextDirection.rtl,
+        ),
+        useExplainer: false,
+      );
+      expect(explained, equals(nonExplainerExpected));
+    });
+
+    testWidgets('renders within dir attribute', (tester) async {
+      final _dirRtl = '<div dir="rtl">$html</div>';
+      final explained = await explain(tester, _dirRtl, useExplainer: false);
+      expect(explained, equals(nonExplainerExpected));
     });
   });
 }
