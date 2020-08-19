@@ -49,8 +49,8 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
                   options: CarouselOptions(
                     autoPlay: true,
                     autoPlayAnimationDuration:
-                        const Duration(milliseconds: 250),
-                    autoPlayInterval: const Duration(milliseconds: 1000),
+                        const Duration(milliseconds: 500),
+                    autoPlayInterval: const Duration(seconds: 2),
                     enlargeCenterPage: true,
                     enlargeStrategy: CenterPageEnlargeStrategy.scale,
                   ),

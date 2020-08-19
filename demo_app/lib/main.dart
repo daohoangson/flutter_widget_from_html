@@ -6,15 +6,13 @@ void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Widget from HTML',
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+  Widget build(BuildContext context) => MaterialApp(
+        title: 'Flutter Widget from HTML',
+        theme: ThemeData.light(),
+        darkTheme: ThemeData.dark(),
 
-      // let's HomeScreen handle all the routings
-      initialRoute: '/',
-      onGenerateRoute: HomeScreen.onGenerateRoute,
-    );
-  }
+        // let HomeScreen handle all the routings
+        initialRoute: '/',
+        onGenerateRoute: HomeScreen.onGenerateRoute,
+      );
 }
