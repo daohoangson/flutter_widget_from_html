@@ -229,11 +229,41 @@ class WidgetFactory {
           : print('[flutter_widget_from_html] Tapped url $url')
       : null;
 
-  /// Returns [HtmlWidgetDependency]s from the provided [context].
-  List<HtmlWidgetDependency> getDependencies(BuildContext context) => [
-        HtmlWidgetDependency<MediaQueryData>(MediaQuery.of(context)),
-        HtmlWidgetDependency<TextDirection>(Directionality.of(context)),
-        HtmlWidgetDependency<TextStyle>(DefaultTextStyle.of(context).style),
+  /// Returns [context]-based dependencies.
+  ///
+  /// Includes these by default:
+  ///
+  /// - [MediaQueryData] via [MediaQuery.of]
+  /// - [TextDirection] via [Directionality.of]
+  /// - [TextStyle] via [DefaultTextStyle.of]
+  /// - [ThemeData] via [Theme.of] (enhanced package only)
+  ///
+  /// Use [TextStyleHtml.getDependency] to get value by type.
+  ///
+  /// ```dart
+  /// // in normal widget building:
+  /// final scale = MediaQuery.of(context).textScaleFactor;
+  /// final color = Theme.of(context).accentColor;
+  ///
+  /// // in build ops:
+  /// final scale = tsh.getDependency<MediaQueryData>().textScaleFactor;
+  /// final color = tsh.getDependency<ThemeData>().accentColor;
+  /// ```
+  ///
+  /// It's recommended to use values from [TextStyleHtml] instead of
+  /// obtaining from [BuildContext] for performance reason.
+  ///
+  /// ```dart
+  /// // avoid doing this:
+  /// final widgetValue = Directionality.of(context);
+  ///
+  /// // do this:
+  /// final buildOpValue = tsh.textDirection;
+  /// ```
+  Iterable<dynamic> getDependencies(BuildContext context) => [
+        MediaQuery.of(context),
+        Directionality.of(context),
+        DefaultTextStyle.of(context).style,
       ];
 
   /// Returns marker for the specified [type] at index [i].

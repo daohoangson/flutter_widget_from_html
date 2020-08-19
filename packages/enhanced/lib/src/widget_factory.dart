@@ -186,9 +186,8 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   @override
-  List<HtmlWidgetDependency> getDependencies(BuildContext context) =>
-      super.getDependencies(context)
-        ..add(HtmlWidgetDependency<ThemeData>(Theme.of(context)));
+  Iterable<dynamic> getDependencies(BuildContext context) =>
+      [...super.getDependencies(context), Theme.of(context)];
 
   /// Returns flutter_svg.[PictureProvider] or [ImageProvider].
   @override

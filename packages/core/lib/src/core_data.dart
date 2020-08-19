@@ -99,48 +99,6 @@ class BuiltPiece {
           : WidgetPlaceholder<Widget>(widget, child: widget);
 }
 
-/// A dependency value.
-///
-/// The list of dependencies are prepared by [WidgetFactory.getDependencies],
-/// by default it includes:
-///
-/// - [MediaQueryData]
-/// - [TextDirection]
-/// - [TextStyle]
-/// - [ThemeData] (enhanced package only)
-///
-/// If any of these dependencies change, the HTML widget tree will be re-rendered.
-/// Use [TextStyleHtml.getDependency] to get dependency value.
-///
-/// ```dart
-/// // in normal widget building:
-/// final scale = MediaQuery.of(context).textScaleFactor;
-/// final color = Theme.of(context).accentColor;
-///
-/// // in build ops:
-/// final scale = tsh.getDependency<MediaQueryData>().textScaleFactor;
-/// final color = tsh.getDependency<ThemeData>().accentColor;
-/// ```
-///
-/// Note about text direction:
-/// Because text direction can be changed within the HTML widget tree
-/// (by attribute `dir` or inline style `direction`),
-/// getting a [TextDirection] via `getDependency` will return out of date information.
-/// It's recommended to use [TextStyleHtml.textDirection] instead.
-///
-/// ```dart
-/// final widgetValue = Directionality.of(context);
-/// final buildOpValue = tsh.textDirection;
-/// ```
-@immutable
-class HtmlWidgetDependency<T> {
-  /// The actual data.
-  final T value;
-
-  /// Creates a dependency.
-  HtmlWidgetDependency(this.value);
-}
-
 /// An image.
 @immutable
 class ImageMetadata {

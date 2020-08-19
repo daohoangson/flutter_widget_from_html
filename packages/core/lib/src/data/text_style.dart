@@ -3,7 +3,7 @@ part of '../core_data.dart';
 /// A text style.
 @immutable
 class TextStyleHtml {
-  final Iterable<HtmlWidgetDependency> _deps;
+  final Iterable<dynamic> _deps;
 
   /// The line height.
   final double height;
@@ -28,7 +28,7 @@ class TextStyleHtml {
 
   /// Creates a text style.
   TextStyleHtml({
-    @required Iterable<HtmlWidgetDependency> deps,
+    @required Iterable deps,
     this.height,
     this.maxLines,
     this.parent,
@@ -40,7 +40,7 @@ class TextStyleHtml {
 
   /// Creates the root text style.
   factory TextStyleHtml.root(
-      Iterable<HtmlWidgetDependency> deps, TextStyle widgetTextStyle) {
+      Iterable<dynamic> deps, TextStyle widgetTextStyle) {
     var style = _getDependency<TextStyle>(deps);
     if (widgetTextStyle != null) {
       style = widgetTextStyle.inherit
@@ -93,12 +93,12 @@ class TextStyleHtml {
 
   /// Gets dependency value by type.
   ///
-  /// See [HtmlWidgetDependency].
+  /// See [WidgetFactory.getDependencies].
   T getDependency<T>() => _getDependency<T>(_deps);
 
-  static T _getDependency<T>(Iterable<HtmlWidgetDependency> deps) {
-    for (final found in deps.whereType<HtmlWidgetDependency<T>>()) {
-      return found.value;
+  static T _getDependency<T>(Iterable<dynamic> deps) {
+    for (final value in deps.whereType<T>()) {
+      return value;
     }
 
     return null;
