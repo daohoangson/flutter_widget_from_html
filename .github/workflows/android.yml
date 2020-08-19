@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  sylph:
     env:
       AWS_ACCESS_KEY_ID: AKIAY43IFJQXPIU46LXP
       AWS_DEFAULT_REGION: us-west-2
