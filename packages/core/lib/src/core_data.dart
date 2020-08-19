@@ -8,6 +8,7 @@ import 'core_helpers.dart';
 import 'core_widget_factory.dart';
 
 part 'data/css.dart';
+part 'data/image.dart';
 part 'data/table.dart';
 part 'data/text_bits.dart';
 part 'data/text_style.dart';
@@ -97,38 +98,6 @@ class BuiltPiece {
       widget is WidgetPlaceholder
           ? widget
           : WidgetPlaceholder<Widget>(widget, child: widget);
-}
-
-/// An image.
-@immutable
-class ImageMetadata {
-  /// The image alternative text.
-  final String alt;
-
-  /// The image sources.
-  final Iterable<ImageSource> sources;
-
-  /// The image title.
-  final String title;
-
-  /// Creates an image.
-  ImageMetadata({this.alt, this.sources, this.title});
-}
-
-/// An image source.
-@immutable
-class ImageSource {
-  /// The image height.
-  final double height;
-
-  /// The image URL.
-  final String url;
-
-  /// The image width.
-  final double width;
-
-  /// Creates a source.
-  ImageSource(this.url, {this.height, this.width}) : assert(url != null);
 }
 
 /// A DOM node.
