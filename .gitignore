@@ -1,3 +1,4 @@
 *.lock
 /.node
+.last_build_id
 project.json
