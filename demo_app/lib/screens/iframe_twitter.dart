@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
@@ -29,29 +30,32 @@ class _State extends State<IframeTwitterScreen> {
         appBar: AppBar(
           title: Text('IframeTwitterScreen'),
         ),
-        body: ListView(children: <Widget>[
-          CheckboxListTile(
-            value: useApi,
-            onChanged: (v) => setState(() => useApi = v),
-            title: Text('Use iframe API'),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: HtmlWidget(
-              html,
-              key: ValueKey(useApi),
-              customStylesBuilder: (e) =>
-                  (e.localName == 'blockquote') ? {'margin': '0'} : null,
-              customWidgetBuilder: (e) {
-                if (e.localName == 'blockquote' &&
-                    e.attributes['class'] == 'twitter-tweet') {
-                  final body = html +
-                      '<script async src="https://platform.twitter.com/widgets.js"></script>';
-                  final apiUrl =
-                      'https://html-widget-api.now.sh/iframe.ts?body=${Uri.encodeComponent(body)}';
+        body: kIsWeb ? _buildSorryForWeb() : _buildBody(),
+      );
 
-                  final dataUrl = Uri.dataFromString(
-                    '''<!doctype html>
+  Widget _buildBody() => ListView(children: <Widget>[
+        CheckboxListTile(
+          value: useApi,
+          onChanged: (v) => setState(() => useApi = v),
+          title: Text('Use iframe API'),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(
+            html,
+            key: ValueKey(useApi),
+            customStylesBuilder: (e) =>
+                (e.localName == 'blockquote') ? {'margin': '0'} : null,
+            customWidgetBuilder: (e) {
+              if (e.localName == 'blockquote' &&
+                  e.attributes['class'] == 'twitter-tweet') {
+                final body = html +
+                    '<script async src="https://platform.twitter.com/widgets.js"></script>';
+                final apiUrl =
+                    'https://html-widget-api.now.sh/iframe.ts?body=${Uri.encodeComponent(body)}';
+
+                final dataUrl = Uri.dataFromString(
+                  '''<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -59,22 +63,26 @@ class _State extends State<IframeTwitterScreen> {
 </head>
 <body>$body</body>
 </html>''',
-                    mimeType: 'text/html',
-                    encoding: Encoding.getByName('utf-8'),
-                  ).toString();
+                  mimeType: 'text/html',
+                  encoding: Encoding.getByName('utf-8'),
+                ).toString();
 
-                  return WebView(
-                    useApi ? apiUrl : dataUrl,
-                    aspectRatio: 16 / 9,
-                    autoResize: true,
-                  );
-                }
+                return WebView(
+                  useApi ? apiUrl : dataUrl,
+                  aspectRatio: 16 / 9,
+                  autoResize: true,
+                );
+              }
 
-                return null;
-              },
-              webView: true,
-            ),
+              return null;
+            },
+            webView: true,
           ),
-        ]),
+        ),
+      ]);
+
+  Widget _buildSorryForWeb() => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text('Sorry, IFRAME is currently not supported in Flutter Web.'),
       );
 }

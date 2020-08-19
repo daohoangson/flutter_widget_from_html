@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
+
+import '../html_widget.dart';
 
 class WordpressScreen extends StatelessWidget {
   final sites = {
@@ -76,7 +78,7 @@ class _PostScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                HtmlWidget(post.content, webView: true),
+                HtmlWidget(post.content),
               ],
             ),
           ),

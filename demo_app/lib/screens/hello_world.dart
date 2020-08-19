@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+
+import '../html_widget.dart';
 
 const kHtml = '''
 <h1>Heading</h1>
@@ -28,10 +29,7 @@ class HelloWorldScreen extends StatelessWidget {
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: HtmlWidget(
-              kHtml,
-              webView: true,
-            ),
+            child: HtmlWidget(kHtml),
           ),
         ),
       );
