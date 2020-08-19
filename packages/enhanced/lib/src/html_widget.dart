@@ -59,7 +59,6 @@ class HtmlWidget extends core.HtmlWidget {
     void Function(String) onTapUrl,
     TextStyle textStyle = const TextStyle(),
     this.unsupportedWebViewWorkaroundForIssue37 = false,
-    bool useWidgetSpan = !kIsWeb,
     this.webView = false,
     this.webViewJs = true,
   })  : assert(html != null),
@@ -75,7 +74,6 @@ class HtmlWidget extends core.HtmlWidget {
           hyperlinkColor: hyperlinkColor,
           onTapUrl: onTapUrl,
           textStyle: textStyle,
-          useWidgetSpan: useWidgetSpan,
           key: key,
         );
 

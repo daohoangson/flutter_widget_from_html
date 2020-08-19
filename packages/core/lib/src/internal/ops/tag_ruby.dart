@@ -15,8 +15,6 @@ class TagRuby {
   TagRuby(this.wf, this.rubyMeta);
 
   BuildOp get op {
-    if (!wf.useWidgetSpan) return null;
-
     _rubyOp ??= BuildOp(
       onChild: onChild,
       onPieces: onPieces,

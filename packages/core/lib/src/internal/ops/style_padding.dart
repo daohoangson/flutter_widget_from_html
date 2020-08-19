@@ -21,7 +21,6 @@ class StylePadding {
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
         onPieces: (meta, pieces) {
-          if (!wf.useWidgetSpan) return pieces;
           if (meta.isBlockElement) return pieces;
           final padding = tryParseCssLengthBox(meta, kCssPadding);
           if (padding?.hasLeftOrRight != true) return pieces;

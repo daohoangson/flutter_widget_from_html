@@ -15,7 +15,6 @@ class StyleVerticalAlign {
 
   BuildOp get buildOp => BuildOp(
         onPieces: (meta, pieces) {
-          if (!wf.useWidgetSpan) return pieces;
           if (meta.isBlockElement) return pieces;
 
           final v = meta[kCssVerticalAlign];

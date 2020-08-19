@@ -65,17 +65,6 @@ class HtmlWidget extends StatefulWidget {
   /// The default styling for text elements.
   final TextStyle textStyle;
 
-  /// Controls whether to use [WidgetSpan] for IMG, SUB, SUP, etc. tags.
-  /// Flutter Web (beta) doesn't support this so this flag
-  /// should be disabled in web builds or you will receive errors like
-  /// > Field '_placeholderCount' has not been initialized.
-  ///
-  /// Default value: ![kIsWeb]
-  ///
-  /// Issues: https://github.com/flutter/flutter/issues/42086
-  /// PRs: https://github.com/flutter/engine/pull/20276
-  final bool useWidgetSpan;
-
   /// Creates a widget that builds Flutter widget tree from html.
   ///
   /// The [html] argument must not be null.
@@ -92,7 +81,6 @@ class HtmlWidget extends StatefulWidget {
     Key key,
     this.onTapUrl,
     this.textStyle = const TextStyle(),
-    this.useWidgetSpan = !kIsWeb,
   })  : assert(html != null),
         super(key: key);
 

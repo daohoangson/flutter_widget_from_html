@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import '_.dart' as helper;
 
@@ -403,38 +402,6 @@ void main() {
               '[widget0]'
               '(:c)'
               ')]'));
-    });
-
-    group('useWidgetSpan', () {
-      final html = 'a<span style="margin: 5px">b</span>c';
-      final explain =
-          (WidgetTester tester, {bool useWidgetSpan}) => helper.explain(
-                tester,
-                null,
-                hw: HtmlWidget(
-                  html,
-                  key: helper.hwKey,
-                  useWidgetSpan: useWidgetSpan,
-                ),
-              );
-
-      testWidgets('renders true', (tester) async {
-        final explained = await explain(tester, useWidgetSpan: true);
-        expect(
-            explained,
-            equals('[RichText:(:'
-                'a'
-                '[SizedBox:5.0x0.0]'
-                '(:b)'
-                '[SizedBox:5.0x0.0]'
-                '(:c)'
-                ')]'));
-      });
-
-      testWidgets('renders false', (tester) async {
-        final explained = await explain(tester, useWidgetSpan: false);
-        expect(explained, equals('[RichText:(:abc)]'));
-      });
     });
   });
 

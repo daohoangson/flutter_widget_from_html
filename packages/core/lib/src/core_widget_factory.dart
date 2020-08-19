@@ -30,8 +30,6 @@ class WidgetFactory {
 
   HtmlWidget get _widget => _state?.widget;
 
-  bool get useWidgetSpan => _widget?.useWidgetSpan == true;
-
   /// Builds primary column (body).
   WidgetPlaceholder buildBody(NodeMetadata meta, Iterable<Widget> children) =>
       buildColumnPlaceholder(meta, children, trimMarginVertical: true);
@@ -504,8 +502,6 @@ class WidgetFactory {
         if (attrs.containsKey(kAttributeImgWidth)) {
           meta[kCssWidth] = '${attrs[kAttributeImgWidth]}px';
         }
-
-        if (!useWidgetSpan) meta.isBlockElement = true;
         break;
 
       case 'ins':

@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 
 import '_.dart';
@@ -119,25 +118,6 @@ void main() {
     final html = '<em><span style="vertical-align: top">Foo</span></em>';
     final explained = await explain(tester, html);
     expect(explained, equals('[RichText:[RichText:(+i:Foo)]@top]'));
-  });
-
-  group('useWidgetSpan', () {
-    final _html = '<span style="vertical-align: top">Foo</span>';
-    final _explain = (WidgetTester tester, {bool useWidgetSpan}) => explain(
-          tester,
-          null,
-          hw: HtmlWidget(_html, key: hwKey, useWidgetSpan: useWidgetSpan),
-        );
-
-    testWidgets('renders true', (tester) async {
-      final explained = await _explain(tester, useWidgetSpan: true);
-      expect(explained, equals('[RichText:[RichText:(:Foo)]@top]'));
-    });
-
-    testWidgets('renders false', (tester) async {
-      final explained = await _explain(tester, useWidgetSpan: false);
-      expect(explained, equals('[RichText:(:Foo)]'));
-    });
   });
 
   group('error handling', () {
