@@ -25,24 +25,24 @@ class CompareScreen extends StatelessWidget {
           ),
           body: TabBarView(
             children: <Widget>[
-              ListView(children: <Widget>[
-                Padding(
+              SingleChildScrollView(
+                child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(html),
-                )
-              ]),
-              ListView(children: <Widget>[
-                Padding(
+                ),
+              ),
+              SingleChildScrollView(
+                child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: core.HtmlWidget(html),
-                )
-              ]),
-              ListView(children: <Widget>[
-                Padding(
+                ),
+              ),
+              SingleChildScrollView(
+                child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: HtmlWidget(html),
-                )
-              ]),
+                ),
+              ),
             ],
           ),
         ),

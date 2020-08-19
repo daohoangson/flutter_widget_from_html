@@ -22,15 +22,17 @@ class HelloWorldCoreScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text('HelloWorldCoreScreen'),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: HtmlWidget(
-            kHtml,
-            onTapUrl: (url) => showDialog(
-              context: context,
-              builder: (_) => AlertDialog(
-                title: Text('onTapUrl'),
-                content: Text(url),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: HtmlWidget(
+              kHtml,
+              onTapUrl: (url) => showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: Text('onTapUrl'),
+                  content: Text(url),
+                ),
               ),
             ),
           ),

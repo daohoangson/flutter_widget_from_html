@@ -33,7 +33,7 @@ class _State extends State<IframeTwitterScreen> {
           CheckboxListTile(
             value: useApi,
             onChanged: (v) => setState(() => useApi = v),
-            title: HtmlWidget('Use iframe API'),
+            title: Text('Use iframe API'),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
