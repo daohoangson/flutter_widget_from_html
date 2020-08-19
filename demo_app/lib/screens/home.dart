@@ -217,12 +217,12 @@ C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."
       if (value is String) {
         return MaterialPageRoute(
           builder: (_) => CompareScreen(html: value, title: title),
-          settings: RouteSettings(name: '/${route.name}'),
+          settings: RouteSettings(name: route.name),
         );
       } else if (value is Function) {
         return MaterialPageRoute(
           builder: (_) => value(),
-          settings: RouteSettings(name: '/${route.name}'),
+          settings: RouteSettings(name: route.name),
         );
       }
     }
@@ -234,5 +234,5 @@ C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."
   }
 
   static String _routeNameFromTitle(String title) =>
-      title.toLowerCase().replaceAll(RegExp(r'[^a-z]'), '');
+      '/' + title.toLowerCase().replaceAll(RegExp(r'[^a-z]'), '');
 }
