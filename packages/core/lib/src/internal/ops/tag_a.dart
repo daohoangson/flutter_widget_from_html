@@ -55,9 +55,7 @@ class TagA {
       );
 
   GestureTapCallback _gestureTapCallback(BuildMetadata meta) {
-    final attrs = meta.element.attributes;
-    final href =
-        attrs.containsKey(kAttributeAHref) ? attrs[kAttributeAHref] : null;
+    final href = meta.element.attributes[kAttributeAHref];
     return wf.gestureTapCallback(wf.urlFull(href) ?? href);
   }
 }
