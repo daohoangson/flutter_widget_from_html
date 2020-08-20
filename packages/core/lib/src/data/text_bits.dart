@@ -6,11 +6,11 @@ abstract class TextBit<CompileFrom, CompileTo> {
   /// The container [TextBits].
   final TextBits parent;
 
-  /// Create a text bit.
-  TextBit(this.parent);
-
   /// The associated [TextStyleBuilder].
-  TextStyleBuilder get tsb => null;
+  final TextStyleBuilder tsb;
+
+  /// Create a text bit.
+  TextBit(this.parent, this.tsb);
 
   /// The next bit in the text tree.
   ///
@@ -114,28 +114,21 @@ abstract class TextBit<CompileFrom, CompileTo> {
   }
 
   @override
-  String toString() => '[${runtimeType}]';
+  String toString() => '$runtimeType#$hashCode $tsb';
 }
 
 /// A simple data bit.
 class TextData extends TextBit<void, String> {
   final String _data;
 
-  @override
-  final TextStyleBuilder tsb;
-
   /// Creates with data string
-  TextData(TextBits parent, this._data, this.tsb)
-      : assert(parent != null),
-        assert(_data != null),
-        assert(tsb != null),
-        super(parent);
+  TextData(TextBits parent, this._data) : super(parent, parent.tsb);
 
   @override
   String compile(void _) => _data;
 
   @override
-  String toString() => '[TextData] data=$_data';
+  String toString() => '"$_data"';
 }
 
 /// An inline widget to be rendered within text paragraph.
@@ -155,11 +148,7 @@ class TextWidget<T> extends TextBit<TextStyleHtml, InlineSpan> {
     this.child, {
     this.alignment = PlaceholderAlignment.baseline,
     this.baseline = TextBaseline.alphabetic,
-  })  : assert(parent != null),
-        assert(child != null),
-        assert(alignment != null),
-        assert(baseline != null),
-        super(parent);
+  }) : super(parent, parent.tsb);
 
   @override
   InlineSpan compile(TextStyleHtml _) => WidgetSpan(
@@ -169,20 +158,15 @@ class TextWidget<T> extends TextBit<TextStyleHtml, InlineSpan> {
       );
 
   @override
-  String toString() => '[TextWidget] child=$child';
+  String toString() => '$child';
 }
 
 /// A container of bits.
 class TextBits extends TextBit<void, void> {
   final _children = <TextBit>[];
 
-  @override
-  final tsb;
-
   /// Creates a container.
-  TextBits(this.tsb, [TextBits parent])
-      : assert(tsb != null),
-        super(parent);
+  TextBits(TextStyleBuilder tsb, [TextBits parent]) : super(parent, tsb);
 
   /// The list of bits including direct children and their children.
   Iterable<TextBit> get bits sync* {
@@ -264,14 +248,14 @@ class TextBits extends TextBit<void, void> {
 
   /// Adds a string to the tail of this container.
   TextData addText(String data) {
-    final bit = TextData(this, data, tsb);
+    final bit = TextData(this, data);
     add(bit);
     return bit;
   }
 
   /// Creates a sub-container.
-  TextBits sub([TextStyleBuilder subTsb]) {
-    final sub = TextBits(subTsb ?? tsb.sub(), this);
+  TextBits sub(TextStyleBuilder tsb) {
+    final sub = TextBits(tsb, this);
     add(sub);
     return sub;
   }
@@ -303,29 +287,15 @@ class TextBits extends TextBit<void, void> {
 
   @override
   String toString() {
-    final clazz = runtimeType.toString();
-    final contents = _toStrings().join('\n');
-    return '\n[$clazz:$hashCode]\n$contents\n----';
-  }
+    final sb = StringBuffer();
 
-  Iterable<String> _toStrings() => _children.isNotEmpty
-      ? (_children
-          .map((child) => child is TextBits
-              ? (<String>[]
-                ..add('[${child.runtimeType}:${child.hashCode}]' +
-                    (child.parent == this
-                        ? ''
-                        : ' ⚠️ parent=${child.parent.hashCode}'))
-                ..addAll(child._toStrings()))
-              : [
-                  child.toString() +
-                      (child.parent == this
-                          ? ''
-                          : ' ⚠️ parent=${child.parent.hashCode}')
-                ])
-          .map((lines) => lines.map((line) => '  $line'))
-          .reduce((prev, lines) => List.from(prev)..addAll(lines)))
-      : [];
+    const _indent = '  ';
+    for (final child in _children) {
+      sb.write('$_indent${child.toString().replaceAll('\n', '\n$_indent')}\n');
+    }
+
+    return 'TextBits#$hashCode $tsb:\n$sb'.trimRight();
+  }
 }
 
 class _TextNewLine extends TextBit<TextStyleBuilder, Widget> {
@@ -333,9 +303,7 @@ class _TextNewLine extends TextBit<TextStyleBuilder, Widget> {
 
   final _sb = StringBuffer(_kNewLine);
 
-  _TextNewLine(TextBits parent)
-      : assert(parent != null),
-        super(parent);
+  _TextNewLine(TextBits parent) : super(parent, parent.tsb);
 
   @override
   Widget compile(TextStyleBuilder tsb) {
@@ -347,13 +315,17 @@ class _TextNewLine extends TextBit<TextStyleBuilder, Widget> {
   }
 
   void extend() => _sb.write(_kNewLine);
+
+  @override
+  String toString() => 'NewLine#$hashCode';
 }
 
 class _TextWhitespace extends TextBit<void, String> {
-  _TextWhitespace(TextBit parent)
-      : assert(parent != null),
-        super(parent);
+  _TextWhitespace(TextBit parent) : super(parent, null);
 
   @override
   String compile(void _) => ' ';
+
+  @override
+  String toString() => 'Whitespace#$hashCode';
 }

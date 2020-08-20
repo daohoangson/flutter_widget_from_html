@@ -177,4 +177,8 @@ class TextStyleBuilder<T1> {
 
   /// Creates a sub-builder.
   TextStyleBuilder sub() => TextStyleBuilder(parent: this);
+
+  @override
+  String toString() =>
+      'tsb#$hashCode' + (parent != null ? '(parent=#${parent.hashCode})' : '');
 }

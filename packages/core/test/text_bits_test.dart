@@ -6,7 +6,7 @@ void main() {
     group('prev+next', () {
       final text = _text();
       final bit1 = text.addText('1');
-      final text2 = text.sub();
+      final text2 = text.sub(text.tsb);
       final bit21 = text2.addText('(2.1)');
       final bit22 = text2.addText('(2.2)');
       final bit3 = text.addText('3');
@@ -51,7 +51,7 @@ void main() {
       text.addText('3');
       expect(_data(text), equals('13'));
 
-      TextData(text, '2', text.tsb).insertAfter(bit1);
+      TextData(text, '2').insertAfter(bit1);
       expect(_data(text), equals('123'));
     });
 
@@ -61,7 +61,7 @@ void main() {
       final bit3 = text.addText('3');
       expect(_data(text), equals('13'));
 
-      TextData(text, '2', text.tsb).insertBefore(bit3);
+      TextData(text, '2').insertBefore(bit3);
       expect(_data(text), equals('123'));
     });
 
@@ -72,7 +72,7 @@ void main() {
       text.addText('3');
       expect(_data(text), equals('1x3'));
 
-      bitX.replaceWith(TextData(text, '2', text.tsb));
+      bitX.replaceWith(TextData(text, '2'));
       expect(_data(text), equals('123'));
     });
   });
@@ -90,7 +90,7 @@ void main() {
 
       test('returns from sub', () {
         final text = _text();
-        final text1 = text.sub();
+        final text1 = text.sub(text.tsb);
         final bit11 = text1.addText('(1.1)');
         text1.addText('(1.2)');
         expect(_data(text), equals('(1.1)(1.2)'));
@@ -152,7 +152,7 @@ void main() {
 
       test('returns from sub', () {
         final text = _text();
-        final text1 = text.sub();
+        final text1 = text.sub(text.tsb);
         text1.addText('(1.1)');
         final bit12 = text1.addText('(1.2)');
         expect(_data(text), equals('(1.1)(1.2)'));
@@ -232,7 +232,7 @@ void main() {
 
       test('trims bit from sub', () {
         final text = _text();
-        final text1 = text.sub();
+        final text1 = text.sub(text.tsb);
         text1.addText('data');
         text1.addWhitespace();
         expect(text1.bits.length, equals(2));
@@ -247,30 +247,41 @@ void main() {
     final text = _text();
     text.addText('1');
     text.addWhitespace();
-    final text2 = text.sub();
+    final text2 = text.sub(text.tsb);
     text2.addText('(2.1)');
-    final text22 = text2.sub();
+    final text22 = text2.sub(text.tsb.sub());
     text22.addText('(2.2.1)');
     text22.addText('(2.2.2)');
+    text22.addNewLine();
     text2.addText('(2.3)');
     final widget = WidgetPlaceholder<TextBits>(text);
     text.add(TextWidget(text, widget));
 
-    final str = text.toString().replaceAll(RegExp(r':\d+\]'), ']');
+    final hashCodes = <String>[];
+    final str = text.toString().replaceAllMapped(RegExp(r'#(\d+)'), (match) {
+      final hashCode = match.group(1);
+      var indexOf = hashCodes.indexOf(hashCode);
+      if (indexOf == -1) {
+        indexOf = hashCodes.length;
+        hashCodes.add(hashCode);
+      }
 
-    expect(str, equals('''
+      return '#$indexOf';
+    });
 
-[TextBits]
-  [TextData] data=1
-  [_TextWhitespace]
-  [TextBits]
-    [TextData] data=(2.1)
-    [TextBits]
-      [TextData] data=(2.2.1)
-      [TextData] data=(2.2.2)
-    [TextData] data=(2.3)
-  [TextWidget] child=WidgetPlaceholder<TextBits>
-----'''));
+    expect(
+        str,
+        equals('TextBits#0 tsb#1:\n'
+            '  "1"\n'
+            '  Whitespace#2\n'
+            '  TextBits#3 tsb#1:\n'
+            '    "(2.1)"\n'
+            '    TextBits#4 tsb#5(parent=#1):\n'
+            '      "(2.2.1)"\n'
+            '      "(2.2.2)"\n'
+            '      NewLine#6\n'
+            '    "(2.3)"\n'
+            '  WidgetPlaceholder<TextBits>'));
   });
 }
 

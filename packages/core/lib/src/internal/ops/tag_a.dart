@@ -67,15 +67,11 @@ class _TagATextData extends TextBit<TextStyleHtml, InlineSpan> {
 
   final GestureTapCallback onTap;
 
-  @override
-  final TextStyleBuilder tsb;
-
   final WidgetFactory wf;
 
   _TagATextData(TextData bit, this.onTap, this.wf)
       : data = bit.compile(null),
-        tsb = bit.tsb,
-        super(bit.parent);
+        super(bit.parent, bit.tsb);
 
   @override
   InlineSpan compile(TextStyleHtml tsh) =>
