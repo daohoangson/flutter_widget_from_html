@@ -66,7 +66,7 @@ abstract class BuildMetadata {
   ///
   /// Returns the associated [TextStyleBuilder].
   TextStyleBuilder tsb<T>([
-    TextStyleHtml Function(TextStyleHtml, T) builder,
+    TextStyleHtml Function(TextStyleHtml tsh, T input) builder,
     T input,
   ]) =>
       _tsb..enqueue(builder, input);
