@@ -110,6 +110,7 @@ void main() {
       Uri baseUrl,
       bool buildAsync,
       Color hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
+      RebuildTriggers rebuildTriggers,
       TextStyle textStyle,
       bool unsupportedWebViewWorkaroundForIssue37 = false,
       bool webView = false,
@@ -123,6 +124,7 @@ void main() {
               enableCaching: enableCaching,
               hyperlinkColor: hyperlinkColor,
               key: helper.hwKey,
+              rebuildTriggers: rebuildTriggers,
               textStyle: textStyle,
               unsupportedWebViewWorkaroundForIssue37:
                   unsupportedWebViewWorkaroundForIssue37,
@@ -203,6 +205,19 @@ void main() {
 
       await explain(tester, html, true,
           hyperlinkColor: Color.fromRGBO(255, 0, 0, 1));
+      final built2 = helper.buildCurrentState();
+      _expect(built1, built2, isFalse);
+    });
+
+    testWidgets('rebuild new rebuildTriggers', (tester) async {
+      final html = 'Foo';
+
+      final explained1 = await explain(tester, html, true,
+          rebuildTriggers: RebuildTriggers([1]));
+      expect(explained1, equals('[RichText:(:Foo)]'));
+      final built1 = helper.buildCurrentState();
+
+      await explain(tester, html, true, rebuildTriggers: RebuildTriggers([2]));
       final built2 = helper.buildCurrentState();
       _expect(built1, built2, isFalse);
     });
