@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../html_widget.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class FontSizeScreen extends StatelessWidget {
   @override

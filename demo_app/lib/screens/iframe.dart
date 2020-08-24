@@ -30,13 +30,10 @@ class _State extends State<IframeScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text('IframeScreen'),
-        ),
-        body: kIsWeb ? _buildSorryForWeb() : _buildBody(),
-      );
-
-  Widget _buildBody() => ListView(children: <Widget>[
+      appBar: AppBar(
+        title: Text('IframeScreen'),
+      ),
+      body: ListView(children: <Widget>[
         CheckboxListTile(
           value: webView,
           onChanged: (v) => setState(() => webView = v),
@@ -62,10 +59,5 @@ class _State extends State<IframeScreen> {
             webViewJs: webViewJs,
           ),
         ),
-      ]);
-
-  Widget _buildSorryForWeb() => Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text('Sorry, IFRAME is currently not supported in Flutter Web.'),
-      );
+      ]));
 }
