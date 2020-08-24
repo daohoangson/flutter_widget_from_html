@@ -18,6 +18,9 @@ const kAttributeAlign = 'align';
 double tryParseDoubleFromMap(Map<dynamic, String> map, String key) =>
     map.containsKey(key) ? double.tryParse(map[key]) : null;
 
+int tryParseIntFromMap(Map<dynamic, String> map, String key) =>
+    map.containsKey(key) ? int.tryParse(map[key]) : null;
+
 TextAlign tryParseTextAlign(String value) {
   switch (value) {
     case kCssTextAlignCenter:

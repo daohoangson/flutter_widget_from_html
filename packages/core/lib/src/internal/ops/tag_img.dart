@@ -54,11 +54,9 @@ class TagImg {
 
   ImageMetadata _parse(BuildMetadata meta) {
     final attrs = meta.element.attributes;
-    final src =
-        attrs.containsKey(kAttributeImgSrc) ? attrs[kAttributeImgSrc] : null;
-    final url = wf.urlFull(src);
+    final url = wf.urlFull(attrs[kAttributeImgSrc]);
     return ImageMetadata(
-      alt: attrs.containsKey(kAttributeImgAlt) ? attrs[kAttributeImgAlt] : null,
+      alt: attrs[kAttributeImgAlt],
       sources: (url != null)
           ? [
               ImageSource(
@@ -68,9 +66,7 @@ class TagImg {
               ),
             ]
           : null,
-      title: attrs.containsKey(kAttributeImgTitle)
-          ? attrs[kAttributeImgTitle]
-          : null,
+      title: attrs[kAttributeImgTitle],
     );
   }
 }

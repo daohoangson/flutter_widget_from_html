@@ -85,6 +85,7 @@ class HtmlBuilder {
 
         meta._styles ??= [];
         for (final pair in map.entries) {
+          if (pair.key == null || pair.value == null) continue;
           meta._styles.insertAll(0, [pair.key, pair.value]);
         }
       }
@@ -257,6 +258,8 @@ class _BuildMetadata extends BuildMetadata {
 
   @override
   operator []=(String key, String value) {
+    if (key == null || value == null) return;
+
     assert(!_stylesIsLocked);
     _styles ??= [];
     _styles..add(key)..add(value);

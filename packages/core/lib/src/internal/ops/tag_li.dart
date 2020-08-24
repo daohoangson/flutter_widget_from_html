@@ -55,10 +55,8 @@ class TagLi {
     final styles = {
       'padding-inline-start': '2.5em',
       kCssListStyleType: meta.element.localName == kTagOrderedList
-          ? (attrs.containsKey(kAttributeLiType)
-                  ? _ListConfig.listStyleTypeFromAttributeType(
-                      attrs[kAttributeLiType])
-                  : null) ??
+          ? _ListConfig.listStyleTypeFromAttributeType(
+                  attrs[kAttributeLiType]) ??
               kCssListStyleTypeDecimal
           : p == 0
               ? kCssListStyleTypeDisc
@@ -152,9 +150,7 @@ class _ListConfig {
     return _ListConfig(
       listStyleType: meta[kCssListStyleType] ?? kCssListStyleTypeDisc,
       markerReversed: attrs.containsKey(kAttributeOlReversed),
-      markerStart: attrs.containsKey(kAttributeOlStart)
-          ? int.tryParse(attrs[kAttributeOlStart])
-          : null,
+      markerStart: tryParseIntFromMap(attrs, kAttributeOlStart),
     );
   }
 
@@ -162,10 +158,8 @@ class _ListConfig {
     final listStyleType = meta[kCssListStyleType];
     if (listStyleType != null) return listStyleType;
 
-    final attrs = meta.element.attributes;
-    return attrs.containsKey(kAttributeLiType)
-        ? listStyleTypeFromAttributeType(attrs[kAttributeLiType])
-        : null;
+    return listStyleTypeFromAttributeType(
+        meta.element.attributes[kAttributeLiType]);
   }
 
   static String listStyleTypeFromAttributeType(String type) {
