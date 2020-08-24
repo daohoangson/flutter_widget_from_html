@@ -39,7 +39,7 @@ abstract class BuildMetadata {
   ///
   /// These are usually collected from:
   ///
-  /// - [WidgetFactory.parseTag] or [BuildOp.onChild] by calling `meta[key] = value`
+  /// - [WidgetFactory.parse] or [BuildOp.onChild] by calling `meta[key] = value`
   /// - [BuildOp.defaultStyles] returning a map
   /// - Attribute `style` of [domElement]
   Iterable<MapEntry<String, String>> get styles;
@@ -97,7 +97,7 @@ class BuildOp {
   /// ```
   ///
   /// Note: op must be registered early for this to work e.g.
-  /// in [WidgetFactory.parseTag] or [onChild].
+  /// in [WidgetFactory.parse] or [onChild].
   final Map<String, String> Function(BuildMetadata meta) defaultStyles;
 
   /// The callback that will be called whenver a child element is found.
