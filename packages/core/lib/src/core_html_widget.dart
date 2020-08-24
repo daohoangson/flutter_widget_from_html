@@ -135,6 +135,8 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     _rootMeta = HtmlBuilder.rootMeta(_rootTsb);
     _wf = (widget.factoryBuilder ?? _getCoreWf).call();
 
+    _wf.onRoot(_rootTsb);
+
     if (buildAsync) {
       _future = _buildAsync();
     }
@@ -214,16 +216,19 @@ class _HtmlWidgetState extends State<HtmlWidget> {
 }
 
 class _RootTsb extends TextStyleBuilder {
-  final _HtmlWidgetState state;
-
   TextStyleHtml _output;
 
-  _RootTsb(this.state);
+  _RootTsb(_HtmlWidgetState state) {
+    enqueue(builder, state);
+  }
 
   @override
-  TextStyleHtml build(BuildContext childContext) {
-    childContext.dependOnInheritedWidgetOfExactType<TshWidget>();
+  TextStyleHtml build(BuildContext context) {
+    context.dependOnInheritedWidgetOfExactType<TshWidget>();
+    return super.build(context);
+  }
 
+  TextStyleHtml builder(TextStyleHtml _, _HtmlWidgetState state) {
     if (_output != null) return _output;
     return _output = TextStyleHtml.root(
       state._wf.getDependencies(state.context),

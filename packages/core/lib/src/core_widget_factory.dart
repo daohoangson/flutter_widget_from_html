@@ -363,6 +363,9 @@ class WidgetFactory {
   Object _imageFromUrl(String url) =>
       url?.isNotEmpty == true ? NetworkImage(url) : null;
 
+  /// Prepares the root [TextStyleBuilder].
+  void onRoot(TextStyleBuilder rootTsb) {}
+
   /// Parses [meta] for build ops and text styles.
   void parse(BuildMetadata meta) {
     final attrs = meta.element.attributes;

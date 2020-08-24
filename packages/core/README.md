@@ -228,7 +228,7 @@ The HTML string is parsed into DOM elements and each element is visited once to 
 
 | Step | | Integration point |
 | --- | --- | --- |
-| 1 | Parse the tag and attributes map | `WidgetFactory.parseTag(BuildMetadata)` |
+| 1 | Parse the tag and attributes map | `WidgetFactory.parse(BuildMetadata)` |
 | 2 | Inform parents if any | `BuildOp.onChild(BuildMetadata)` |
 | 3 | Populate default inline styles | `BuildOp.defaultStyles(BuildMetadata)` |
 | 4 | `customStyleBuilder` / `customWidgetBuilder` will be called if configured | |
@@ -263,6 +263,7 @@ TextStyleHtml callback(TextStyleHtml parent, double value) =>
 meta.tsb<int>(callback, 2);
 ```
 
+- The root text styling can be customized by overriding `WidgetFactory.onRoot(TextStyleBuilder)`
 - Other complicated styling are supported via `BuildOp`
 
 ```dart

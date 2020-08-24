@@ -120,7 +120,7 @@ class TextStyleBuilder<T1> {
 
   /// Enqueues a callback.
   void enqueue<T2>(
-    TextStyleHtml Function(TextStyleHtml, T2) builder, [
+    TextStyleHtml Function(TextStyleHtml tsh, T2 input) builder, [
     T2 input,
   ]) {
     if (builder == null) return;
@@ -135,9 +135,8 @@ class TextStyleBuilder<T1> {
 
   /// Builds a [TextStyleHtml] by calling queued callbacks.
   TextStyleHtml build(BuildContext context) {
-    assert(parent != null);
-    final parentOutput = parent.build(context);
-    if (parentOutput != _parentOutput) {
+    final parentOutput = parent?.build(context);
+    if (parentOutput == null || parentOutput != _parentOutput) {
       _parentOutput = parentOutput;
       _output = null;
     }
@@ -145,7 +144,7 @@ class TextStyleBuilder<T1> {
     if (_output != null) return _output;
     if (_builders == null) return _output = _parentOutput;
 
-    _output = _parentOutput.copyWith(parent: _parentOutput);
+    _output = _parentOutput?.copyWith(parent: _parentOutput);
     final l = _builders.length;
     for (var i = 0; i < l; i++) {
       final builder = _builders[i];
