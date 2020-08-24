@@ -43,11 +43,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
-          # TODO: switch back to beta / stable as soon as possible.
-          # https://github.com/flutter/engine/pull/20276 is required for `WidgetSpan`s
-          # so we need dev channel for now.
-          channel: dev
-
+          channel: beta
       - run: flutter config --enable-web
       - run: flutter build web
 

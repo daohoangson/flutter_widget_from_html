@@ -309,7 +309,7 @@ class _SmiliesWidgetFactory extends WidgetFactory {
   final smilieOp = BuildOp(
     onPieces: (meta, pieces) {
       final alt = meta.element.attributes['alt'];
-      final text = kSmilies.containsKey(alt) ? kSmilies[alt] : alt;
+      final text = kSmilies[alt] ?? alt;
       return pieces..first?.text?.addText(text);
     },
   );

@@ -18,8 +18,6 @@ class TagIframe {
 
   Widget build(BuildMetadata meta) {
     final attrs = meta.element.attributes;
-    if (!attrs.containsKey(kAttributeIframeSrc)) return null;
-
     final src = wf.urlFull(attrs[kAttributeIframeSrc]);
     if (src == null) return null;
 

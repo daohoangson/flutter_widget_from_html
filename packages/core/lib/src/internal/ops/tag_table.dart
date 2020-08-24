@@ -219,8 +219,8 @@ class _TagTableRow {
         final attributes = cellMeta.element.attributes;
         row.cells.add(_TagTableDataCell(
           child: column,
-          colspan: _tryParseInt(attributes, 'colspan') ?? 1,
-          rowspan: _tryParseInt(attributes, 'rowspan') ?? 1,
+          colspan: tryParseIntFromMap(attributes, 'colspan') ?? 1,
+          rowspan: tryParseIntFromMap(attributes, 'rowspan') ?? 1,
         ));
 
         return [column];
@@ -229,9 +229,6 @@ class _TagTableRow {
 
     childMeta.register(_cellOp);
   }
-
-  static int _tryParseInt(Map<dynamic, String> attributes, String key) =>
-      attributes.containsKey(key) ? int.tryParse(attributes[key]) : null;
 }
 
 @immutable

@@ -320,7 +320,7 @@ class WidgetFactory {
       10: 'X',
     };
 
-    return map.containsKey(i) ? map[i] : null;
+    return map[i];
   }
 
   /// Returns [ImageProvider].
