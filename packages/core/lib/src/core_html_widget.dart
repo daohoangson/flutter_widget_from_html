@@ -62,6 +62,31 @@ class HtmlWidget extends StatefulWidget {
   /// The callback when user taps a link.
   final void Function(String) onTapUrl;
 
+  /// The values that should trigger rebuild.
+  ///
+  /// By default, these fields' changes will invalidate cached widget tree:
+  ///
+  /// - [baseUrl]
+  /// - [buildAsync]
+  /// - [enableCaching]
+  /// - [html]
+  /// - [hyperlinkColor]
+  ///
+  /// In `flutter_widget_from_html` package, these are also included:
+  ///
+  /// - `unsupportedWebViewWorkaroundForIssue37`
+  /// - `webView`
+  /// - `webViewJs`
+  RebuildTriggers get rebuildTriggers => RebuildTriggers([
+        html,
+        baseUrl,
+        buildAsync,
+        enableCaching,
+        hyperlinkColor,
+        if (_rebuildTriggers != null) _rebuildTriggers,
+      ]);
+  final RebuildTriggers _rebuildTriggers;
+
   /// The default styling for text elements.
   final TextStyle textStyle;
 
@@ -80,8 +105,10 @@ class HtmlWidget extends StatefulWidget {
     this.hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
     Key key,
     this.onTapUrl,
+    RebuildTriggers rebuildTriggers,
     this.textStyle = const TextStyle(),
   })  : assert(html != null),
+        _rebuildTriggers = rebuildTriggers,
         super(key: key);
 
   @override
@@ -126,11 +153,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
 
     var needsRebuild = false;
 
-    if (widget.baseUrl != oldWidget.baseUrl ||
-        widget.buildAsync != oldWidget.buildAsync ||
-        widget.html != oldWidget.html ||
-        widget.enableCaching != oldWidget.enableCaching ||
-        widget.hyperlinkColor != oldWidget.hyperlinkColor) {
+    if (widget.rebuildTriggers != oldWidget.rebuildTriggers) {
       needsRebuild = true;
     }
 

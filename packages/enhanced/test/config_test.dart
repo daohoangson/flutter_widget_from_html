@@ -110,7 +110,11 @@ void main() {
       Uri baseUrl,
       bool buildAsync,
       Color hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
+      RebuildTriggers rebuildTriggers,
       TextStyle textStyle,
+      bool unsupportedWebViewWorkaroundForIssue37 = false,
+      bool webView = false,
+      bool webViewJs = true,
     }) =>
         helper.explain(tester, null,
             hw: HtmlWidget(
@@ -120,7 +124,12 @@ void main() {
               enableCaching: enableCaching,
               hyperlinkColor: hyperlinkColor,
               key: helper.hwKey,
+              rebuildTriggers: rebuildTriggers,
               textStyle: textStyle,
+              unsupportedWebViewWorkaroundForIssue37:
+                  unsupportedWebViewWorkaroundForIssue37,
+              webView: webView,
+              webViewJs: webViewJs,
             ));
 
     final _expect = (Widget built1, Widget built2, Matcher matcher) {
@@ -200,6 +209,19 @@ void main() {
       _expect(built1, built2, isFalse);
     });
 
+    testWidgets('rebuild new rebuildTriggers', (tester) async {
+      final html = 'Foo';
+
+      final explained1 = await explain(tester, html, true,
+          rebuildTriggers: RebuildTriggers([1]));
+      expect(explained1, equals('[RichText:(:Foo)]'));
+      final built1 = helper.buildCurrentState();
+
+      await explain(tester, html, true, rebuildTriggers: RebuildTriggers([2]));
+      final built2 = helper.buildCurrentState();
+      _expect(built1, built2, isFalse);
+    });
+
     testWidgets('rebuild new textStyle', (tester) async {
       final html = 'Foo';
 
@@ -209,6 +231,43 @@ void main() {
       final explained2 =
           await explain(tester, html, true, textStyle: TextStyle(fontSize: 20));
       expect(explained2, equals('[RichText:(@20.0:Foo)]'));
+    });
+
+    testWidgets('rebuild new workaroundForIssue37', (tester) async {
+      final html = 'Foo';
+
+      final explained1 = await explain(tester, html, true);
+      expect(explained1, equals('[RichText:(:Foo)]'));
+      final built1 = helper.buildCurrentState();
+
+      await explain(tester, html, true,
+          unsupportedWebViewWorkaroundForIssue37: true);
+      final built2 = helper.buildCurrentState();
+      _expect(built1, built2, isFalse);
+    });
+
+    testWidgets('rebuild new webView', (tester) async {
+      final html = 'Foo';
+
+      final explained1 = await explain(tester, html, true);
+      expect(explained1, equals('[RichText:(:Foo)]'));
+      final built1 = helper.buildCurrentState();
+
+      await explain(tester, html, true, webView: true);
+      final built2 = helper.buildCurrentState();
+      _expect(built1, built2, isFalse);
+    });
+
+    testWidgets('rebuild new webViewJs', (tester) async {
+      final html = 'Foo';
+
+      final explained1 = await explain(tester, html, true);
+      expect(explained1, equals('[RichText:(:Foo)]'));
+      final built1 = helper.buildCurrentState();
+
+      await explain(tester, html, true, webViewJs: false);
+      final built2 = helper.buildCurrentState();
+      _expect(built1, built2, isFalse);
     });
 
     testWidgets('skips caching', (WidgetTester tester) async {

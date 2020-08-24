@@ -34,6 +34,30 @@ typedef CustomStylesBuilder = Map<String, String> Function(dom.Element element);
 /// For those needs, a custom [WidgetFactory] is the way to go.
 typedef CustomWidgetBuilder = Widget Function(dom.Element element);
 
+/// A set of values that should trigger rebuild.
+class RebuildTriggers {
+  final List _values;
+
+  /// Creates a set.
+  ///
+  /// The values should have sane equality check to avoid excessive rebuilds.
+  RebuildTriggers(this._values);
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! RebuildTriggers) return false;
+
+    final otherValues = (other as RebuildTriggers)._values;
+    if (otherValues.length != _values.length) return false;
+
+    for (var i = 0; i < _values.length; i++) {
+      if (otherValues[i] != _values[i]) return false;
+    }
+
+    return true;
+  }
+}
+
 /// A widget builder that supports builder callbacks.
 class WidgetPlaceholder<T> extends StatelessWidget {
   /// The origin of this widget.

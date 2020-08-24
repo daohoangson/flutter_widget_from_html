@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    as core show HtmlWidget;
+    as core show HtmlWidget, RebuildTriggers;
 
 import 'helpers.dart';
 import 'widget_factory.dart';
@@ -56,6 +56,7 @@ class HtmlWidget extends core.HtmlWidget {
     CustomWidgetBuilder customWidgetBuilder,
     Color hyperlinkColor,
     void Function(String) onTapUrl,
+    core.RebuildTriggers rebuildTriggers,
     TextStyle textStyle = const TextStyle(),
     this.unsupportedWebViewWorkaroundForIssue37 = false,
     this.webView = false,
@@ -72,6 +73,12 @@ class HtmlWidget extends core.HtmlWidget {
           factoryBuilder: factoryBuilder ?? _getEnhancedWf,
           hyperlinkColor: hyperlinkColor,
           onTapUrl: onTapUrl,
+          rebuildTriggers: core.RebuildTriggers([
+            unsupportedWebViewWorkaroundForIssue37,
+            webView,
+            webViewJs,
+            if (rebuildTriggers != null) rebuildTriggers,
+          ]),
           textStyle: textStyle,
           key: key,
         );
