@@ -31,7 +31,6 @@ jobs:
 
   web:
     name: Deploy Web
-    continue-on-error: true
     runs-on: ubuntu-latest
     defaults:
       run:
