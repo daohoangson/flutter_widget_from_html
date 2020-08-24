@@ -57,7 +57,6 @@ class HtmlWidget extends core.HtmlWidget {
     Color hyperlinkColor,
     void Function(String) onTapUrl,
     core.RebuildTriggers rebuildTriggers,
-    EdgeInsets tableCellPadding = const EdgeInsets.all(5),
     TextStyle textStyle = const TextStyle(),
     this.unsupportedWebViewWorkaroundForIssue37 = false,
     this.webView = false,
