@@ -93,10 +93,22 @@ Future<String> explain(
     str = str.replaceAll(RegExp(r': [A-Z][A-Za-z]+\.'), ': '); // enums
     str = str.replaceAll(RegExp(r'\[GlobalKey#[0-9a-f]+\]'), '');
     str = str.replaceAll(RegExp(r'(, )?dependencies: \[[^\]]+\]'), '');
+
+    // trim boring properties
     str = str.replaceAll(
-        RegExp(r'(, )?renderObject: .+ relayoutBoundary=\w+'), '');
-    str = str.replaceAll(RegExp(r'softWrap: [a-z\s]+, '), '');
-    str = str.replaceAll('maxLines: unlimited, ', '');
+        RegExp(r'(, )?renderObject: \w+#[a-z0-9]+( relayoutBoundary=\w+)?'),
+        '');
+    str = str.replaceAll(RegExp(r'(, )?crossAxisAlignment: start'), '');
+    str = str.replaceAll(RegExp(r'(, )?direction: vertical'), '');
+    str = str.replaceAll(RegExp(r'(, )?mainAxisAlignment: start'), '');
+    str = str.replaceAll(RegExp(r'(, )?mainAxisSize: min'), '');
+    str = str.replaceAll(RegExp(r'(, )?maxLines: unlimited'), '');
+    str = str.replaceAll(RegExp(r'(, )?softWrap: [a-z\s]+'), '');
+    str = str.replaceAll(RegExp(r'(, )?textDirection: ltr+'), '');
+
+    // delete leading comma (because of property trimmings)
+    str = str.replaceAllMapped(RegExp(r'(\w+\(), '), (m) => m.group(1));
+    str = simplifyHashCode(str);
     return str;
   }
 
@@ -138,6 +150,20 @@ Future<String> explainMargin(
   );
   final match = _explainMarginRegExp.firstMatch(explained);
   return match == null ? explained : match[3];
+}
+
+String simplifyHashCode(String str) {
+  final hashCodes = <String>[];
+  return str.replaceAllMapped(RegExp(r'#(\d+)'), (match) {
+    final hashCode = match.group(1);
+    var indexOf = hashCodes.indexOf(hashCode);
+    if (indexOf == -1) {
+      indexOf = hashCodes.length;
+      hashCodes.add(hashCode);
+    }
+
+    return '#$indexOf';
+  });
 }
 
 class Explainer {

@@ -51,6 +51,7 @@ Future<String> explain(
   String html, {
   bool buildFutureBuilderWithData = true,
   HtmlWidget hw,
+  bool useExplainer = true,
   bool webView = false,
 }) async =>
     helper.explain(
@@ -64,4 +65,5 @@ Future<String> explain(
             key: helper.hwKey,
             webView: webView,
           ),
+      useExplainer: useExplainer,
     );

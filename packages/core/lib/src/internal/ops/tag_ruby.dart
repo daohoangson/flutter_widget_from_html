@@ -10,15 +10,11 @@ class TagRuby {
 
   BuildOp _rubyOp;
   BuildOp _rtOp;
-  TextBits _rtText;
 
   TagRuby(this.wf, this.rubyMeta);
 
   BuildOp get op {
-    _rubyOp ??= BuildOp(
-      onChild: onChild,
-      onPieces: onPieces,
-    );
+    _rubyOp ??= BuildOp(onChild: onChild, onPieces: onPieces);
     return _rubyOp;
   }
 
@@ -32,13 +28,21 @@ class TagRuby {
         break;
       case kTagRt:
         _rtOp ??= BuildOp(
-          onPieces: (_, pieces) {
-            for (final piece in pieces) {
-              if (piece.text == null) continue;
-              _rtText = piece.text..detach();
+          onPieces: (rtMeta, pieces) {
+            // assume that the first piece is always a text piece
+            // this is a fairly dangerous assumption
+            final text = pieces.first.text;
+
+            for (final _ in text.bits) {
+              // RT tag contains something!
+              text.replaceWith(_RtBit(rtMeta, text));
+
+              // keep the first piece only for now (TODO?)
+              return [pieces.first];
             }
 
-            return [];
+            // RT tag is empty, do nothing
+            return pieces;
           },
         );
 
@@ -49,49 +53,162 @@ class TagRuby {
     }
   }
 
-  Iterable<BuiltPiece> onPieces(
-      BuildMetadata meta, Iterable<BuiltPiece> pieces) {
-    if (_rtText == null) return pieces;
-    var processed = false;
+  Iterable<BuiltPiece> onPieces(BuildMetadata _, Iterable<BuiltPiece> pieces) {
+    for (final piece in pieces) {
+      if (piece.text == null) continue;
 
-    return pieces.map((piece) {
-      if (piece.text == null || processed) return piece;
-      processed = true;
+      final prev = <TextBit>[];
+      final bits = piece.text.bits.toList(growable: false);
+      for (final bit in bits) {
+        if (prev.isEmpty && bit.tsb == null) {
+          // the first bit is whitespace, just ignore it
+          continue;
+        }
+        if (bit is! _RtBit || prev.isEmpty) {
+          prev.add(bit);
+          continue;
+        }
 
-      final rtBuilt = wf.buildText(meta, _rtText);
-      if (rtBuilt == null) return piece;
+        final rt = bit as _RtBit;
+        final prevFirst = prev.first;
 
-      final text = piece.text;
-      final built = wf.buildText(meta, text);
-      if (built == null) return piece;
+        final rubyBits = TextBits(prevFirst.tsb);
+        final placeholder = WidgetPlaceholder<TextBits>(rubyBits)
+          ..wrapWith((_, __) => _RubyWidget(
+                wf.buildText(rubyMeta, rubyBits) ?? widget0,
+                wf.buildText(rt.rtMeta, rt.bits) ?? widget0,
+              ));
+        final replacement = TextWidget(prevFirst.parent, placeholder,
+            alignment: PlaceholderAlignment.middle);
+        prevFirst.replaceWith(replacement);
 
-      final replacement = text.parent.sub(text.tsb)..detach();
-      text.replaceWith(replacement);
-      replacement.add(_buildTextBit(replacement, built, rtBuilt));
+        for (final prevBit in prev) {
+          rubyBits.add(prevBit.copyWith(parent: rubyBits));
+          prevBit.detach();
+        }
+        bit.detach();
+        prev.clear();
+      }
+    }
 
-      return BuiltPiece.text(replacement);
-    }).toList(growable: false);
+    return pieces;
+  }
+}
+
+class _RubyWidget extends MultiChildRenderObjectWidget {
+  final Widget ruby;
+  final Widget rt;
+
+  _RubyWidget(this.ruby, this.rt, {Key key})
+      : super(children: [ruby, rt], key: key);
+
+  @override
+  RenderObject createRenderObject(BuildContext _) => _RubyRenderObject();
+}
+
+class _RubyParentData extends ContainerBoxParentData<RenderBox> {}
+
+class _RubyRenderObject extends RenderBox
+    with
+        ContainerRenderObjectMixin<RenderBox, _RubyParentData>,
+        RenderBoxContainerDefaultsMixin<RenderBox, _RubyParentData> {
+  @override
+  double computeDistanceToActualBaseline(TextBaseline baseline) =>
+      defaultComputeDistanceToHighestActualBaseline(baseline);
+
+  @override
+  double computeMaxIntrinsicHeight(double width) {
+    final ruby = firstChild;
+    final rubyValue = ruby.computeMaxIntrinsicHeight(width);
+
+    final rt = (ruby.parentData as _RubyParentData).nextSibling;
+    final rtValue = rt.computeMaxIntrinsicHeight(width);
+
+    return rubyValue + 2 * rtValue;
   }
 
-  TextBit _buildTextBit(TextBits parent, Widget ruby, Widget rt) {
-    final widget =
-        WidgetPlaceholder<BuildMetadata>(rubyMeta).wrapWith((context, _) {
-      final tsh = _rtText.tsb.build(context);
-      final paddingValue = tsh.style.fontSize *
-          .75 *
-          tsh.getDependency<MediaQueryData>().textScaleFactor;
-      final padding = EdgeInsets.symmetric(vertical: paddingValue);
+  @override
+  double computeMaxIntrinsicWidth(double height) {
+    final ruby = firstChild;
+    final rubyValue = ruby.computeMaxIntrinsicWidth(height);
 
-      return wf.buildStack(
-        rubyMeta,
-        tsh,
-        <Widget>[
-          wf.buildPadding(rubyMeta, ruby, padding),
-          Positioned.fill(bottom: null, child: Center(child: rt)),
-        ],
-      );
-    });
+    final rt = (ruby.parentData as _RubyParentData).nextSibling;
+    final rtValue = rt.computeMaxIntrinsicWidth(height);
 
-    return TextWidget(parent, widget, alignment: PlaceholderAlignment.middle);
+    return max(rubyValue, rtValue);
   }
+
+  @override
+  double computeMinIntrinsicHeight(double width) {
+    final ruby = firstChild;
+    final rubyValue = ruby.computeMinIntrinsicHeight(width);
+
+    final rt = (ruby.parentData as _RubyParentData).nextSibling;
+    final rtValue = rt.computeMinIntrinsicHeight(width);
+
+    return rubyValue + 2 * rtValue;
+  }
+
+  @override
+  double computeMinIntrinsicWidth(double height) {
+    final ruby = firstChild;
+    final rubyValue = ruby.getMinIntrinsicWidth(height);
+
+    final rt = (ruby.parentData as _RubyParentData).nextSibling;
+    final rtValue = rt.getMinIntrinsicWidth(height);
+
+    return min(rubyValue, rtValue);
+  }
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {Offset position}) =>
+      defaultHitTestChildren(result, position: position);
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    defaultPaint(context, offset);
+  }
+
+  @override
+  void performLayout() {
+    final ruby = firstChild;
+    final rubyData = ruby.parentData as _RubyParentData;
+    ruby.layout(constraints, parentUsesSize: true);
+    final rubySize = ruby.size;
+
+    final rt = rubyData.nextSibling;
+    final rtData = rt.parentData as _RubyParentData;
+    rt.layout(constraints, parentUsesSize: true);
+    final rtSize = rt.size;
+
+    size = Size(
+      max(rubySize.width, rtSize.width),
+      rubySize.height + 2 * rtSize.height,
+    );
+
+    rubyData.offset = Offset((size.width - rubySize.width) / 2, rtSize.height);
+    rtData.offset = Offset((size.width - rtSize.width) / 2, 0);
+  }
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! _RubyParentData) {
+      child.parentData = _RubyParentData();
+    }
+  }
+}
+
+class _RtBit extends TextBit<void, void> {
+  final TextBits bits;
+  final BuildMetadata rtMeta;
+
+  _RtBit(this.rtMeta, this.bits, {TextBits parent, TextStyleBuilder tsb})
+      : super(parent ?? bits.parent, tsb ?? bits.tsb);
+
+  @override
+  void compile(void _) => null;
+
+  @override
+  TextBit copyWith({TextBits parent, TextStyleBuilder tsb}) =>
+      _RtBit(rtMeta, bits, parent: parent ?? this.parent, tsb: tsb ?? this.tsb);
 }

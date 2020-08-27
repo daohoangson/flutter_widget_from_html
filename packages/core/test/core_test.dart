@@ -280,37 +280,6 @@ void main() {
     });
   });
 
-  group('RUBY', () {
-    testWidgets('renders with RT', (WidgetTester tester) async {
-      final html = '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>';
-      final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[RichText:[Stack:children='
-              '[Padding:(3,0,3,0),child=[RichText:(:明日)]],'
-              '[Positioned:(0.0,0.0,null,0.0),child=[Center:child=[RichText:(@5.0:Ashita)]]]'
-              ']@middle]'));
-    });
-
-    testWidgets('renders without RT', (WidgetTester tester) async {
-      final html = '<ruby>明日</ruby>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:明日)]'));
-    });
-
-    testWidgets('renders with empty RT', (WidgetTester tester) async {
-      final html = '<ruby>明日 <rt></rt></ruby>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:明日)]'));
-    });
-
-    testWidgets('renders without contents', (WidgetTester tester) async {
-      final html = 'Foo <ruby></ruby>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
-    });
-  });
-
   group('block elements', () {
     final blockOutput = '[Column:children='
         '[CssBlock:child=[RichText:(:First.)]],'
@@ -430,10 +399,11 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child=[SingleChildScrollView:child='
-              '[RichText:(+font=Courier+fonts=monospace:(#FF0000BB:<?php phpinfo)'
-              '(#FF007700:(); )(#FF0000BB:?>))]'
-              ']]'));
+          equals('[RichText:(:'
+              '(#FF0000BB+font=Courier+fonts=monospace:<?php phpinfo)'
+              '(#FF007700+font=Courier+fonts=monospace:(); )'
+              '(#FF0000BB+font=Courier+fonts=monospace:?>)'
+              ')]'));
     });
 
     testWidgets('renders empty CODE tag', (WidgetTester tester) async {
@@ -470,11 +440,8 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     testWidgets('renders TT tag', (WidgetTester tester) async {
       final html = '<tt>Teletype</tt>';
       final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[CssBlock:child=[SingleChildScrollView:child='
-              '[RichText:(+font=Courier+fonts=monospace:Teletype)]'
-              ']]'));
+      expect(explained,
+          equals('[RichText:(+font=Courier+fonts=monospace:Teletype)]'));
     });
   });
 

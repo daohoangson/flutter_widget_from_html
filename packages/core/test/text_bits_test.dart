@@ -1,5 +1,8 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:test/test.dart';
+
+import '_.dart';
 
 void main() {
   group('TextBit', () {
@@ -243,6 +246,60 @@ void main() {
     });
   });
 
+  group('copyWith', () {
+    test('TextData returns', () {
+      final text = _text();
+      final bit = text.addText('1');
+
+      final text2 = _text();
+      final copied = bit.copyWith(parent: text2);
+      text2.add(copied);
+      expect(_data(text2), equals('1'));
+    });
+
+    test('TextWidget returns', () {
+      final text = _text();
+      final child = WidgetPlaceholder(null);
+      final bit = TextWidget(text, child);
+
+      final text2 = _text();
+      final copied = bit.copyWith(parent: text2);
+      text2.add(copied);
+      expect((copied.compile(null) as WidgetSpan).child, equals(child));
+    });
+
+    test('TextBits throws', () {
+      final text = _text();
+      expect(() => text.copyWith(), throwsUnsupportedError);
+    });
+
+    test('NewLine returns', () {
+      final text = _text();
+      text.addText('1');
+      final newLine = text.addNewLine();
+
+      final text2 = _text();
+      text2.addText('1');
+      final copied = newLine.copyWith(parent: text2);
+      text2.add(copied);
+      text2.addText('2');
+      expect(_data(text2), equals('1[NewLine x1]2'));
+    });
+
+    test('Whitespace returns', () {
+      final text = _text();
+      text.addText('1');
+      final whitespace = text.addWhitespace();
+
+      final text2 = _text();
+      text2.addText('1');
+      final copied = whitespace.copyWith(parent: text2);
+      text2.add(copied);
+      text2.addText('2');
+      expect(_data(text2), equals('1 2'));
+    });
+  });
+
   test('toString', () {
     final text = _text();
     text.addText('1');
@@ -254,23 +311,11 @@ void main() {
     text22.addText('(2.2.2)');
     text22.addNewLine();
     text2.addText('(2.3)');
-    final widget = WidgetPlaceholder<TextBits>(text);
+    final widget = WidgetPlaceholder<TextBits>(null);
     text.add(TextWidget(text, widget));
 
-    final hashCodes = <String>[];
-    final str = text.toString().replaceAllMapped(RegExp(r'#(\d+)'), (match) {
-      final hashCode = match.group(1);
-      var indexOf = hashCodes.indexOf(hashCode);
-      if (indexOf == -1) {
-        indexOf = hashCodes.length;
-        hashCodes.add(hashCode);
-      }
-
-      return '#$indexOf';
-    });
-
     expect(
-        str,
+        simplifyHashCode(text.toString()),
         equals('TextBits#0 tsb#1:\n'
             '  "1"\n'
             '  Whitespace#2\n'
@@ -279,15 +324,16 @@ void main() {
             '    TextBits#4 tsb#5(parent=#1):\n'
             '      "(2.2.1)"\n'
             '      "(2.2.2)"\n'
-            '      NewLine#6\n'
+            '      NewLine#6 x1\n'
             '    "(2.3)"\n'
-            '  WidgetPlaceholder<TextBits>'));
+            '  WidgetPlaceholder<TextBits>(null)'));
   });
 }
 
 String _data(TextBits text) => text.bits
-    .map((bit) =>
-        (bit is TextBit<void, String>) ? bit.compile(null) : bit.toString())
+    .map((bit) => (bit is TextBit<void, String>)
+        ? bit.compile(null)
+        : '[$bit]'.replaceAll(RegExp(r'#\w+'), ''))
     .join('');
 
 TextBits _text() => TextBits(TextStyleBuilder());

@@ -8,23 +8,80 @@ String _padding(String child) =>
 String _richtext(String text) => _padding('[RichText:(:$text)]');
 
 void main() {
-  testWidgets('renders basic table', (WidgetTester tester) async {
+  group('basic table', () {
     final html = '''<table>
       <caption>Caption</caption>
       <tr><th>Header 1</th><th>Header 2</th></tr>
       <tr><td>Value 1</td><td>Value 2</td></tr>
     </table>''';
-    final explained = await explain(tester, html);
-    expect(
-        explained,
-        equals('[CssBlock:child=[Column:children='
-            '[CssBlock:child=[RichText:align=center,(:Caption)]],'
-            '[LayoutGrid:children='
-            '[0,0:${_padding('[RichText:(+b:Header 1)]')}],'
-            '[0,1:${_padding('[RichText:(+b:Header 2)]')}],'
-            '[1,0:${_richtext('Value 1')}],'
-            '[1,1:${_richtext('Value 2')}]'
-            ']]]'));
+
+    testWidgets('renders', (WidgetTester tester) async {
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssBlock:child=[Column:children='
+              '[CssBlock:child=[RichText:align=center,(:Caption)]],'
+              '[LayoutGrid:children='
+              '[0,0:${_padding('[RichText:(+b:Header 1)]')}],'
+              '[0,1:${_padding('[RichText:(+b:Header 2)]')}],'
+              '[1,0:${_richtext('Value 1')}],'
+              '[1,1:${_richtext('Value 2')}]'
+              ']]]'));
+    });
+
+    testWidgets('useExplainer=false', (WidgetTester tester) async {
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+          explained,
+          equals('TshWidget\n'
+              '└WidgetPlaceholder<BuildMetadata>(BuildMetadata(<table>\n'
+              ' │      <caption>Caption</caption>\n'
+              ' │      <tbody><tr><th>Header 1</th><th>Header 2</th></tr>\n'
+              ' │      <tr><td>Value 1</td><td>Value 2</td></tr>\n'
+              ' │    </tbody></table>)\n'
+              ' │)\n'
+              ' └CssBlock()\n'
+              '  └Column()\n'
+              '   ├WidgetPlaceholder<TextBits>(TextBits#0 tsb#1(parent=#2):\n'
+              '   ││  "Caption"\n'
+              '   ││)\n'
+              '   │└CssBlock()\n'
+              '   │ └RichText(textAlign: center, text: "Caption")\n'
+              '   └LayoutGrid()\n'
+              '    ├GridPlacement(columnStart: 0, columnSpan: 1, rowStart: 0, rowSpan: 1)\n'
+              '    │└SizedBox.expand()\n'
+              '    │ └WidgetPlaceholder<TextBits>(TextBits#3 tsb#4(parent=#5):\n'
+              '    │  │  "Header 1"\n'
+              '    │  │)\n'
+              '    │  └CssBlock()\n'
+              '    │   └Padding(padding: all(1.0))\n'
+              '    │    └RichText(text: "Header 1")\n'
+              '    ├GridPlacement(columnStart: 1, columnSpan: 1, rowStart: 0, rowSpan: 1)\n'
+              '    │└SizedBox.expand()\n'
+              '    │ └WidgetPlaceholder<TextBits>(TextBits#6 tsb#7(parent=#5):\n'
+              '    │  │  "Header 2"\n'
+              '    │  │)\n'
+              '    │  └CssBlock()\n'
+              '    │   └Padding(padding: all(1.0))\n'
+              '    │    └RichText(text: "Header 2")\n'
+              '    ├GridPlacement(columnStart: 0, columnSpan: 1, rowStart: 1, rowSpan: 1)\n'
+              '    │└SizedBox.expand()\n'
+              '    │ └WidgetPlaceholder<TextBits>(TextBits#8 tsb#9(parent=#10):\n'
+              '    │  │  "Value 1"\n'
+              '    │  │)\n'
+              '    │  └CssBlock()\n'
+              '    │   └Padding(padding: all(1.0))\n'
+              '    │    └RichText(text: "Value 1")\n'
+              '    └GridPlacement(columnStart: 1, columnSpan: 1, rowStart: 1, rowSpan: 1)\n'
+              '     └SizedBox.expand()\n'
+              '      └WidgetPlaceholder<TextBits>(TextBits#11 tsb#12(parent=#10):\n'
+              '       │  "Value 2"\n'
+              '       │)\n'
+              '       └CssBlock()\n'
+              '        └Padding(padding: all(1.0))\n'
+              '         └RichText(text: "Value 2")\n'
+              '\n'));
+    });
   });
 
   testWidgets('renders 2 tables', (WidgetTester tester) async {

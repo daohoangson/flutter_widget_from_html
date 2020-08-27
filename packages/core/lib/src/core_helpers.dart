@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -83,6 +84,16 @@ class WidgetPlaceholder<T> extends StatelessWidget {
     return built;
   }
 
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<T>(
+      'generator',
+      generator,
+      showName: false,
+    ));
+  }
+
   /// Enqueues [builder] to be built later.
   WidgetPlaceholder<T> wrapWith(
       Widget Function(BuildContext context, Widget child) builder) {
@@ -90,4 +101,8 @@ class WidgetPlaceholder<T> extends StatelessWidget {
     _builders.add(builder);
     return this;
   }
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
+      '$runtimeType($generator)';
 }

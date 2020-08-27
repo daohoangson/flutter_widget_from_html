@@ -62,6 +62,10 @@ abstract class BuildMetadata {
   /// Registers a build op.
   void register(BuildOp op);
 
+  @override
+  String toString() =>
+      'BuildMetadata(${element == null ? "root" : element.outerHtml})';
+
   /// Enqueues a text style builder callback.
   ///
   /// Returns the associated [TextStyleBuilder].
@@ -152,6 +156,10 @@ class BuiltPiece {
   BuiltPiece.widgets(Iterable<Widget> widgets)
       : text = null,
         widgets = widgets.map(_placeholder);
+
+  @override
+  String toString() =>
+      text != null ? 'BuiltPiece.text($text)' : 'BuiltPiece.widgets($widgets)';
 
   static WidgetPlaceholder _placeholder(Widget widget) =>
       widget is WidgetPlaceholder
