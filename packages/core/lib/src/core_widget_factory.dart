@@ -19,10 +19,10 @@ class WidgetFactory {
   BuildOp _styleVerticalAlign;
   BuildOp _tagA;
   BuildOp _tagBr;
-  BuildOp _tagCode;
   BuildOp _tagFont;
   BuildOp _tagHr;
   BuildOp _tagImg;
+  BuildOp _tagPre;
   BuildOp _tagQ;
   TextStyleHtml Function(TextStyleHtml, String) __tsbFontSize;
   TextStyleHtml Function(TextStyleHtml, String) _tsbLineHeight;
@@ -436,10 +436,14 @@ class WidgetFactory {
         break;
 
       case kTagCode:
-      case kTagPre:
+      case kTagKbd:
+      case kTagSamp:
       case kTagTt:
-        _tagCode ??= TagCode(this).buildOp;
-        meta.register(_tagCode);
+        meta.tsb(TextStyleOps.fontFamily, [kTagCodeFont1, kTagCodeFont2]);
+        break;
+      case kTagPre:
+        _tagPre ??= TagCode(this).preOp;
+        meta.register(_tagPre);
         break;
 
       case 'dd':
@@ -541,11 +545,6 @@ class WidgetFactory {
       case 'ins':
       case 'u':
         meta.tsb(TextStyleOps.textDeco, TextDeco(under: true));
-        break;
-
-      case 'kbd':
-      case 'samp':
-        meta.tsb(TextStyleOps.fontFamily, [kTagCodeFont1, kTagCodeFont2]);
         break;
 
       case kTagOrderedList:

@@ -430,10 +430,11 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child=[SingleChildScrollView:child='
-              '[RichText:(+font=Courier+fonts=monospace:(#FF0000BB:<?php phpinfo)'
-              '(#FF007700:(); )(#FF0000BB:?>))]'
-              ']]'));
+          equals('[RichText:(:'
+              '(#FF0000BB+font=Courier+fonts=monospace:<?php phpinfo)'
+              '(#FF007700+font=Courier+fonts=monospace:(); )'
+              '(#FF0000BB+font=Courier+fonts=monospace:?>)'
+              ')]'));
     });
 
     testWidgets('renders empty CODE tag', (WidgetTester tester) async {
@@ -470,11 +471,8 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     testWidgets('renders TT tag', (WidgetTester tester) async {
       final html = '<tt>Teletype</tt>';
       final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[CssBlock:child=[SingleChildScrollView:child='
-              '[RichText:(+font=Courier+fonts=monospace:Teletype)]'
-              ']]'));
+      expect(explained,
+          equals('[RichText:(+font=Courier+fonts=monospace:Teletype)]'));
     });
   });
 
