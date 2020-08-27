@@ -48,7 +48,7 @@ void main() {
       expect(
           explained,
           equals('TshWidget\n'
-              '└WidgetPlaceholder<Widget>\n'
+              '└WidgetPlaceholder<Widget>(Text)\n'
               ' └Text("Hi")\n'
               '  └RichText(text: "Hi")\n\n'));
     });
@@ -67,7 +67,7 @@ void main() {
       expect(
           explained,
           equals('TshWidget\n'
-              '└WidgetPlaceholder<BuildMetadata>\n'
+              '└WidgetPlaceholder<BuildMetadata>(BuildMetadata(<span>Foo</span>))\n'
               ' └CssBlock()\n'
               '  └Text("Hi")\n'
               '   └RichText(text: "Hi")\n\n'));

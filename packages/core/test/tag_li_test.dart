@@ -596,7 +596,7 @@ void main() {
         '└ColumnPlaceholder(BuildMetadata(root))\n'
         ' └CssBlock()\n'
         '  └Padding(padding: EdgeInsets(0.0, 0.0, 25.0, 0.0))\n'
-        '   └Column(direction: vertical, mainAxisAlignment: start, mainAxisSize: min, crossAxisAlignment: start, textDirection: rtl)\n'
+        '   └Column(textDirection: rtl)\n'
         '    ├WidgetPlaceholder<TextBits>(TextBits#0 tsb#1(parent=#2):\n'
         '    ││  "One"\n'
         '    ││)\n'

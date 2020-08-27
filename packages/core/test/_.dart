@@ -104,6 +104,7 @@ Future<String> explain(
     str = str.replaceAll(RegExp(r'(, )?mainAxisSize: min'), '');
     str = str.replaceAll(RegExp(r'(, )?maxLines: unlimited'), '');
     str = str.replaceAll(RegExp(r'(, )?softWrap: [a-z\s]+'), '');
+    str = str.replaceAll(RegExp(r'(, )?textDirection: ltr+'), '');
 
     // delete leading comma (because of property trimmings)
     str = str.replaceAllMapped(RegExp(r'(\w+\(), '), (m) => m.group(1));
