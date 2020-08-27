@@ -90,4 +90,8 @@ class WidgetPlaceholder<T> extends StatelessWidget {
     _builders.add(builder);
     return this;
   }
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
+      '$runtimeType($generator)';
 }

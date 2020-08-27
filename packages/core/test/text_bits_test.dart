@@ -254,7 +254,7 @@ void main() {
     text22.addText('(2.2.2)');
     text22.addNewLine();
     text2.addText('(2.3)');
-    final widget = WidgetPlaceholder<TextBits>(text);
+    final widget = WidgetPlaceholder<TextBits>(null);
     text.add(TextWidget(text, widget));
 
     final hashCodes = <String>[];
@@ -281,7 +281,7 @@ void main() {
             '      "(2.2.2)"\n'
             '      NewLine#6\n'
             '    "(2.3)"\n'
-            '  WidgetPlaceholder<TextBits>'));
+            '  WidgetPlaceholder<TextBits>(null)'));
   });
 }
 
