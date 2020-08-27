@@ -63,7 +63,8 @@ abstract class BuildMetadata {
   void register(BuildOp op);
 
   @override
-  String toString() => 'BuildMetadata(${element.outerHtml})';
+  String toString() =>
+      'BuildMetadata(${element == null ? "root" : element.outerHtml})';
 
   /// Enqueues a text style builder callback.
   ///

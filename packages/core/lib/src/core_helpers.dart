@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -81,6 +82,16 @@ class WidgetPlaceholder<T> extends StatelessWidget {
     }
 
     return built;
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<T>(
+      'generator',
+      generator,
+      showName: false,
+    ));
   }
 
   /// Enqueues [builder] to be built later.

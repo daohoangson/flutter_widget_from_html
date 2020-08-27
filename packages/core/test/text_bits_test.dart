@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:test/test.dart';
 
+import '_.dart';
+
 void main() {
   group('TextBit', () {
     group('prev+next', () {
@@ -312,20 +314,8 @@ void main() {
     final widget = WidgetPlaceholder<TextBits>(null);
     text.add(TextWidget(text, widget));
 
-    final hashCodes = <String>[];
-    final str = text.toString().replaceAllMapped(RegExp(r'#(\d+)'), (match) {
-      final hashCode = match.group(1);
-      var indexOf = hashCodes.indexOf(hashCode);
-      if (indexOf == -1) {
-        indexOf = hashCodes.length;
-        hashCodes.add(hashCode);
-      }
-
-      return '#$indexOf';
-    });
-
     expect(
-        str,
+        simplifyHashCode(text.toString()),
         equals('TextBits#0 tsb#1:\n'
             '  "1"\n'
             '  Whitespace#2\n'
