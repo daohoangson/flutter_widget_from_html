@@ -29,7 +29,7 @@ jobs:
     name: Unit test
     strategy:
       matrix:
-        channel: [dev, beta, stable]
+        channel: [beta, stable]
     continue-on-error: ${{ matrix.channel != 'stable' }}
     runs-on: ubuntu-latest
         
