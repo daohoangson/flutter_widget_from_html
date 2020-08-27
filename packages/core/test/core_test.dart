@@ -286,10 +286,33 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:[Stack:children='
-              '[Padding:(3,0,3,0),child=[RichText:(:明日)]],'
-              '[Positioned:(0.0,0.0,null,0.0),child=[Center:child=[RichText:(@5.0:Ashita)]]]'
+          equals('[RichText:[_RubyWidget:children='
+              '[RichText:(:明日)],'
+              '[RichText:(@5.0:Ashita)]'
               ']@middle]'));
+    });
+
+    testWidgets('renders with multiple RTs', (WidgetTester tester) async {
+      final html = '<ruby>漢<rt>かん</rt>字<rt>じ</rt></ruby>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[RichText:(:'
+              '[_RubyWidget:children=[RichText:(:漢)],[RichText:(@5.0:かん)]]@middle'
+              '[_RubyWidget:children=[RichText:(:字)],[RichText:(@5.0:じ)]]@middle'
+              ')]'));
+    });
+
+    testWidgets('renders without erroneous white spaces', (tester) async {
+      final html = '<ruby>\n漢\n<rt>かん</rt>\n\n字\n<rt>じ</rt></ruby>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[RichText:(:'
+              '[_RubyWidget:children=[RichText:(:漢)],[RichText:(@5.0:かん)]]@middle'
+              '(: )'
+              '[_RubyWidget:children=[RichText:(:字)],[RichText:(@5.0:じ)]]@middle'
+              ')]'));
     });
 
     testWidgets('renders without RT', (WidgetTester tester) async {
@@ -306,6 +329,12 @@ void main() {
 
     testWidgets('renders without contents', (WidgetTester tester) async {
       final html = 'Foo <ruby></ruby>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('renders with only empty RT', (WidgetTester tester) async {
+      final html = 'Foo <ruby><rt></rt></ruby>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
