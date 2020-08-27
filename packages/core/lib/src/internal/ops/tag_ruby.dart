@@ -161,9 +161,8 @@ class _RubyRenderObject extends RenderBox
   }
 
   @override
-  bool hitTestChildren(BoxHitTestResult result, {Offset position}) {
-    return defaultHitTestChildren(result, position: position);
-  }
+  bool hitTestChildren(BoxHitTestResult result, {Offset position}) =>
+      defaultHitTestChildren(result, position: position);
 
   @override
   void paint(PaintingContext context, Offset offset) {
