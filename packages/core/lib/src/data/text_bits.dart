@@ -69,7 +69,10 @@ abstract class TextBit<CompileFrom, CompileTo> {
   }
 
   /// Compiles input into output.
-  CompileTo compile(CompileFrom input) => throw UnimplementedError();
+  CompileTo compile(CompileFrom input);
+
+  /// Creates a copy with the given fields replaced with the new values.
+  TextBit copyWith({TextBits parent, TextStyleBuilder tsb});
 
   /// Removes self from the parent.
   bool detach() => parent?._children?.remove(this);
@@ -122,10 +125,15 @@ class TextData extends TextBit<void, String> {
   final String _data;
 
   /// Creates with data string
-  TextData(TextBits parent, this._data) : super(parent, parent.tsb);
+  TextData(TextBits parent, this._data, {TextStyleBuilder tsb})
+      : super(parent, tsb ?? parent.tsb);
 
   @override
   String compile(void _) => _data;
+
+  @override
+  TextBit copyWith({TextBits parent, TextStyleBuilder tsb}) =>
+      TextData(parent ?? this.parent, _data, tsb: tsb ?? this.tsb);
 
   @override
   String toString() => '"$_data"';
@@ -148,13 +156,23 @@ class TextWidget<T> extends TextBit<TextStyleHtml, InlineSpan> {
     this.child, {
     this.alignment = PlaceholderAlignment.baseline,
     this.baseline = TextBaseline.alphabetic,
-  }) : super(parent, parent.tsb);
+    TextStyleBuilder tsb,
+  }) : super(parent, tsb ?? parent.tsb);
 
   @override
   InlineSpan compile(TextStyleHtml _) => WidgetSpan(
         alignment: alignment,
         baseline: baseline,
         child: child,
+      );
+
+  @override
+  TextBit copyWith({TextBits parent, TextStyleBuilder tsb}) => TextWidget(
+        parent ?? this.parent,
+        child,
+        alignment: alignment,
+        baseline: baseline,
+        tsb: tsb ?? this.tsb,
       );
 
   @override
@@ -253,6 +271,13 @@ class TextBits extends TextBit<void, void> {
     return bit;
   }
 
+  @override
+  void compile(void _) => null;
+
+  @override
+  TextBit copyWith({TextBits parent, TextStyleBuilder tsb}) =>
+      throw UnsupportedError('Copying TextBits is unsupported.');
+
   /// Creates a sub-container.
   TextBits sub(TextStyleBuilder tsb) {
     final sub = TextBits(tsb, this);
@@ -303,7 +328,8 @@ class _TextNewLine extends TextBit<TextStyleBuilder, Widget> {
 
   final _sb = StringBuffer(_kNewLine);
 
-  _TextNewLine(TextBits parent) : super(parent, parent.tsb);
+  _TextNewLine(TextBits parent, {TextStyleBuilder tsb})
+      : super(parent, tsb ?? parent.tsb);
 
   @override
   Widget compile(TextStyleBuilder tsb) {
@@ -313,6 +339,10 @@ class _TextNewLine extends TextBit<TextStyleBuilder, Widget> {
     return HeightPlaceholder(
         CssLength(lines.toDouble(), CssLengthUnit.em), tsb);
   }
+
+  @override
+  TextBit copyWith({TextBits parent, TextStyleBuilder tsb}) =>
+      _TextNewLine(parent ?? this.parent, tsb: tsb ?? this.tsb);
 
   void extend() => _sb.write(_kNewLine);
 
@@ -325,6 +355,10 @@ class _TextWhitespace extends TextBit<void, String> {
 
   @override
   String compile(void _) => ' ';
+
+  @override
+  TextBit copyWith({TextBits parent, TextStyleBuilder tsb}) =>
+      _TextWhitespace(parent ?? this.parent);
 
   @override
   String toString() => 'Whitespace#$hashCode';

@@ -37,7 +37,8 @@ class TagA {
                   bit.child.wrapWith((_, child) =>
                       wf.buildGestureDetector(meta, child, onTap));
                 } else if (bit is TextData) {
-                  bit.replaceWith(_TagATextData(bit, onTap, wf));
+                  bit.replaceWith(_TagATextData(
+                      bit.parent, bit.compile(null), bit.tsb, onTap, wf));
                 }
               }
             }
@@ -61,17 +62,21 @@ class TagA {
 }
 
 class _TagATextData extends TextBit<TextStyleHtml, InlineSpan> {
-  final String data;
+  final String _data;
 
   final GestureTapCallback onTap;
 
   final WidgetFactory wf;
 
-  _TagATextData(TextData bit, this.onTap, this.wf)
-      : data = bit.compile(null),
-        super(bit.parent, bit.tsb);
+  _TagATextData(
+      TextBits parent, this._data, TextStyleBuilder tsb, this.onTap, this.wf)
+      : super(parent, tsb);
 
   @override
   InlineSpan compile(TextStyleHtml tsh) =>
-      wf.buildGestureTapCallbackSpan(data, onTap, tsh.styleWithHeight);
+      wf.buildGestureTapCallbackSpan(_data, onTap, tsh.styleWithHeight);
+
+  @override
+  TextBit copyWith({TextBits parent, TextStyleBuilder tsb}) =>
+      _TagATextData(parent ?? this.parent, _data, tsb ?? this.tsb, onTap, wf);
 }
