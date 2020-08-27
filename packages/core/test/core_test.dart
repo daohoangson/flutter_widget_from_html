@@ -315,28 +315,55 @@ void main() {
               ')]'));
     });
 
-    testWidgets('renders without RT', (WidgetTester tester) async {
-      final html = '<ruby>明日</ruby>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:明日)]'));
+    group('possible conflict', () {
+      testWidgets('renders with A tag', (WidgetTester tester) async {
+        final html = '<ruby><a href="http://domain.com/foo">foo</a> '
+            '<rt><a href="http://domain.com/bar">bar</a></rt></ruby>';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[RichText:[_RubyWidget:children='
+                '[RichText:(#FF0000FF+u+onTap:foo)],'
+                '[RichText:(#FF0000FF+u@5.0+onTap:bar)]'
+                ']@middle]'));
+      });
+
+      testWidgets('renders with Q tag', (WidgetTester tester) async {
+        final html = '<ruby><q>foo</q> <rt><q>bar</q></rt></ruby>';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[RichText:[_RubyWidget:children='
+                '[RichText:(:“foo”)],'
+                '[RichText:(@5.0:“bar”)]'
+                ']@middle]'));
+      });
     });
 
-    testWidgets('renders with empty RT', (WidgetTester tester) async {
-      final html = '<ruby>明日 <rt></rt></ruby>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:明日)]'));
-    });
+    group('error handling', () {
+      testWidgets('renders without RT', (WidgetTester tester) async {
+        final html = '<ruby>明日</ruby>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(:明日)]'));
+      });
 
-    testWidgets('renders without contents', (WidgetTester tester) async {
-      final html = 'Foo <ruby></ruby>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
-    });
+      testWidgets('renders with empty RT', (WidgetTester tester) async {
+        final html = '<ruby>明日 <rt></rt></ruby>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(:明日)]'));
+      });
 
-    testWidgets('renders with only empty RT', (WidgetTester tester) async {
-      final html = 'Foo <ruby><rt></rt></ruby>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      testWidgets('renders without contents', (WidgetTester tester) async {
+        final html = 'Foo <ruby></ruby>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(:Foo)]'));
+      });
+
+      testWidgets('renders with only empty RT', (WidgetTester tester) async {
+        final html = 'Foo <ruby><rt></rt></ruby>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(:Foo)]'));
+      });
     });
   });
 

@@ -347,7 +347,7 @@ class _TextNewLine extends TextBit<TextStyleBuilder, Widget> {
   void extend() => _sb.write(_kNewLine);
 
   @override
-  String toString() => 'NewLine#$hashCode';
+  String toString() => 'NewLine#$hashCode x${_sb.length}';
 }
 
 class _TextWhitespace extends TextBit<void, String> {
