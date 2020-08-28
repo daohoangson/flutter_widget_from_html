@@ -3,14 +3,13 @@ import 'dart:math';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'internal/margin_vertical.dart';
 import 'core_helpers.dart';
 import 'core_widget_factory.dart';
 
+part 'data/build_bits.dart';
 part 'data/css.dart';
 part 'data/image.dart';
 part 'data/table.dart';
-part 'data/text_bits.dart';
 part 'data/text_style.dart';
 
 /// A building element metadata.
@@ -81,7 +80,7 @@ abstract class BuildMetadata {
 class BuildOp {
   /// Controls whether the element should be rendered with [CssBlock].
   ///
-  /// Default: `true` if [onWidgets] callback is set, `false` otherwise.
+  /// Default: `true` if [onBuilt] callback is set, `false` otherwise.
   final bool isBlockElement;
 
   /// The execution priority, op with lower priority will run first.
@@ -121,22 +120,21 @@ class BuildOp {
   final void Function(BuildMetadata childMeta) onChild;
 
   /// The callback that will be called when child elements have been processed.
-  final Iterable<BuiltPiece> Function(
-      BuildMetadata meta, Iterable<BuiltPiece> pieces) onPieces;
+  final void Function(BuildMetadata meta, BuildTree tree) onProcessed;
 
   /// The callback that will be called when child elements have been built.
   ///
   /// Note: only works if it's a block element.
   final Iterable<Widget> Function(
-      BuildMetadata meta, Iterable<WidgetPlaceholder> widgets) onWidgets;
+      BuildMetadata meta, Iterable<WidgetPlaceholder> widgets) onBuilt;
 
   /// Creates a build op.
   BuildOp({
     this.defaultStyles,
     bool isBlockElement,
     this.onChild,
-    this.onPieces,
-    this.onWidgets,
+    this.onProcessed,
+    this.onBuilt,
     this.priority = 10,
-  }) : isBlockElement = isBlockElement ?? onWidgets != null;
+  }) : isBlockElement = isBlockElement ?? onBuilt != null;
 }

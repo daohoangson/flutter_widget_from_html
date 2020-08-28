@@ -182,46 +182,17 @@ class WidgetFactory {
   }
 
   /// Builds [RichText].
-  WidgetPlaceholder buildText(BuildMetadata meta, TextBits text) {
-    text.trimRight();
-    if (text.isEmpty) return null;
+  Widget buildText(BuildMetadata node, TextStyleHtml tsh, InlineSpan text) =>
+      RichText(
+        overflow: tsh?.textOverflow ?? TextOverflow.clip,
+        text: text,
+        textAlign: tsh?.textAlign ?? TextAlign.start,
+        textDirection: tsh?.textDirection ?? TextDirection.ltr,
 
-    final widgets = <WidgetPlaceholder>[];
-    for (final compiled in TextCompiler(text).compile()) {
-      if (compiled.widget != null) {
-        widgets.add(compiled.widget);
-        continue;
-      }
-
-      if (compiled.spanBuilder == null) continue;
-      widgets.add(
-        WidgetPlaceholder<TextBits>(text).wrapWith((context, _) {
-          final span = compiled.spanBuilder(context);
-          final tsh = text.tsb?.build(context);
-          final textAlign = tsh?.textAlign ?? TextAlign.start;
-
-          if (span is WidgetSpan &&
-              span.alignment == PlaceholderAlignment.baseline &&
-              textAlign == TextAlign.start) {
-            return span.child;
-          }
-
-          return RichText(
-            overflow: tsh?.textOverflow ?? TextOverflow.clip,
-            text: span,
-            textAlign: textAlign,
-            textDirection: tsh?.textDirection ?? TextDirection.ltr,
-
-            // TODO: calculate max lines automatically for ellipsis if needed
-            // currently it only renders 1 line with ellipsis
-            maxLines: tsh?.maxLines == -1 ? null : tsh?.maxLines,
-          );
-        }),
+        // TODO: calculate max lines automatically for ellipsis if needed
+        // currently it only renders 1 line with ellipsis
+        maxLines: tsh?.maxLines == -1 ? null : tsh?.maxLines,
       );
-    }
-
-    return buildColumnPlaceholder(meta, widgets);
-  }
 
   /// Prepares [GestureTapCallback].
   GestureTapCallback gestureTapCallback(String url) => url != null
