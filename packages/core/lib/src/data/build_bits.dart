@@ -115,19 +115,6 @@ abstract class BuildBit<T> {
     return true;
   }
 
-  /// Replaces self with [another].
-  bool replaceWith(BuildBit another) {
-    if (parent == null) return false;
-
-    assert(parent == another.parent);
-    final siblings = parent._children;
-    final i = siblings.indexOf(this);
-    if (i == -1) return false;
-
-    siblings[i] = another;
-    return true;
-  }
-
   @override
   String toString() => '$runtimeType#$hashCode $tsb';
 
@@ -288,6 +275,14 @@ abstract class BuildTree extends BuildBit<void> {
 
   @override
   Iterable<Widget> buildBit(void _) => build();
+
+  /// Replaces children bits with [another].
+  void replaceWith(BuildBit another) {
+    assert(another.parent == this);
+    _children
+      ..clear()
+      ..add(another);
+  }
 
   /// Creates a sub tree.
   BuildTree sub(TextStyleBuilder tsb);

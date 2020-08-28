@@ -93,7 +93,6 @@ class BuildTree extends core_data.BuildTree {
   final WidgetFactory wf;
 
   final _built = <WidgetPlaceholder>[];
-  final _replacements = <BuildTree>[];
 
   BuildTree({
     this.customStylesBuilder,
@@ -105,8 +104,8 @@ class BuildTree extends core_data.BuildTree {
     TextStyleBuilder tsb,
     this.wf,
   }) : super(parent, tsb) {
-    parent?.add(this);
     if (domNodes != null) {
+      parent?.add(this);
       _populateBits(domNodes);
     }
   }
@@ -160,26 +159,12 @@ class BuildTree extends core_data.BuildTree {
   }
 
   @override
-  BuildBit copyWith({core_data.BuildTree parent, TextStyleBuilder tsb}) =>
-      throw UnsupportedError('Copying BuildTree is unsupported.');
-
-  @override
-  bool replaceWith(BuildBit another) {
-    if (another is! BuildTree) {
-      // enforce `another` so it's always a `BuildTree`
-      final tree = sub(another.tsb, parent: parent);
-      tree.add(another.copyWith(parent: tree));
-      another = tree;
+  BuildBit copyWith({core_data.BuildTree parent, TextStyleBuilder tsb}) {
+    final copied = sub(tsb, parent: parent);
+    for (final bit in bits) {
+      copied.add(bit.copyWith(parent: copied));
     }
-
-    final replaced = super.replaceWith(another);
-
-    if (replaced) {
-      // keep track of replacements for `onProcessed`s
-      _replacements.add(another);
-    }
-
-    return replaced;
+    return copied;
   }
 
   @override
@@ -346,8 +331,7 @@ class BuildTree extends core_data.BuildTree {
 
     if (parentMeta?.buildOps != null) {
       for (final op in parentMeta.buildOps) {
-        var tree = _replacements.isNotEmpty ? _replacements.last : this;
-        op.onProcessed?.call(parentMeta, tree);
+        op.onProcessed?.call(parentMeta, this);
       }
     }
   }
