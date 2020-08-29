@@ -123,15 +123,10 @@ class BuildTree extends core_data.BuildTree {
     var widgets = _flatten();
 
     if (parentMeta?.buildOps != null) {
-      final _makeSureWidgetIsPlaceholder = (Widget widget) =>
-          widget is WidgetPlaceholder
-              ? widget
-              : WidgetPlaceholder<BuildMetadata>(parentMeta, child: widget);
-
       for (final op in parentMeta.buildOps) {
         widgets = op.onBuilt
                 ?.call(parentMeta, widgets)
-                ?.map(_makeSureWidgetIsPlaceholder)
+                ?.map(WidgetPlaceholder.lazy)
                 ?.toList(growable: false) ??
             widgets;
       }

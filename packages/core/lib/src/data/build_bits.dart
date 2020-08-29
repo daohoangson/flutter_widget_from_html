@@ -131,6 +131,7 @@ abstract class BuildBit<T> {
 /// A tree of [BuildBit]s.
 abstract class BuildTree extends BuildBit<Null> {
   final _children = <BuildBit>[];
+  final _toStringBuffer = StringBuffer();
 
   /// Creates a tree.
   BuildTree(BuildTree parent, TextStyleBuilder tsb) : super(parent, tsb);
@@ -222,14 +223,21 @@ abstract class BuildTree extends BuildBit<Null> {
 
   @override
   String toString() {
-    final sb = StringBuffer();
+    // avoid circular references
+    if (_toStringBuffer.length > 0) return 'BuildTree#$hashCode';
+
+    final sb = _toStringBuffer;
+    sb.writeln('BuildTree#$hashCode $tsb:');
 
     const _indent = '  ';
     for (final child in _children) {
       sb.write('$_indent${child.toString().replaceAll('\n', '\n$_indent')}\n');
     }
 
-    return 'BuildTree#$hashCode $tsb:\n$sb'.trimRight();
+    final str = sb.toString().trimRight();
+    sb.clear();
+
+    return str;
   }
 }
 
@@ -269,28 +277,29 @@ class WidgetBit<T> extends BuildBit<Null> {
   WidgetBit._(
     BuildTree parent,
     TextStyleBuilder tsb,
+    this.child, [
     this.alignment,
     this.baseline,
-    this.child,
-  ) : super(parent, tsb);
+  ]) : super(parent, tsb);
 
   /// Creates an block widget.
   factory WidgetBit.block(
     BuildTree parent,
-    WidgetPlaceholder child, {
+    Widget child, {
     TextStyleBuilder tsb,
   }) =>
-      WidgetBit._(parent, tsb ?? parent.tsb, null, null, child);
+      WidgetBit._(parent, tsb ?? parent.tsb, WidgetPlaceholder.lazy(child));
 
   /// Creates an inline widget.
   factory WidgetBit.inline(
     BuildTree parent,
-    WidgetPlaceholder child, {
+    Widget child, {
     PlaceholderAlignment alignment = PlaceholderAlignment.baseline,
     TextBaseline baseline = TextBaseline.alphabetic,
     TextStyleBuilder tsb,
   }) =>
-      WidgetBit._(parent, tsb ?? parent.tsb, alignment, baseline, child);
+      WidgetBit._(parent, tsb ?? parent.tsb, WidgetPlaceholder.lazy(child),
+          alignment, baseline);
 
   @override
   bool get skipAddingWhitespace => !isInline;
@@ -309,7 +318,7 @@ class WidgetBit<T> extends BuildBit<Null> {
 
   @override
   BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) => WidgetBit._(
-      parent ?? this.parent, tsb ?? this.tsb, alignment, baseline, child);
+      parent ?? this.parent, tsb ?? this.tsb, child, alignment, baseline);
 
   @override
   String toString() =>

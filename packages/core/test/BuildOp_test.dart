@@ -24,13 +24,13 @@ void main() {
     });
   });
 
-  group('onPieces', () {
+  group('onProcessed', () {
     testWidgets('renders additional text', (tester) async {
       final html = '<span>Foo</span>';
       final explained = await explain(tester, null,
           hw: HtmlWidget(
             html,
-            factoryBuilder: () => _OnPiecesTestText(),
+            factoryBuilder: () => _OnProcessedTestText(),
             key: hwKey,
           ));
       expect(explained, equals('[RichText:(:Foo bar)]'));
@@ -41,7 +41,30 @@ void main() {
       final explained = await explain(tester, null,
           hw: HtmlWidget(
             html,
-            factoryBuilder: () => _OnPiecesTestWidget(),
+            factoryBuilder: () => _OnProcessedTestWidget(),
+            key: hwKey,
+          ),
+          useExplainer: false);
+      expect(
+          explained,
+          equals('TshWidget\n'
+              '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
+              ' │  BuildTree#2 tsb#3(parent=#1):\n'
+              ' │    WidgetBit.inline#4 WidgetPlaceholder(Text("hi"))\n'
+              ' │)\n'
+              ' └WidgetPlaceholder<Widget>(Text)\n'
+              '  └Text("hi")\n'
+              '   └RichText(text: "hi")\n\n'));
+    });
+  });
+
+  group('onBuilt', () {
+    testWidgets('renders widget', (tester) async {
+      final html = '<span>Foo</span>';
+      final explained = await explain(tester, null,
+          hw: HtmlWidget(
+            html,
+            factoryBuilder: () => _OnBuiltTest(),
             key: hwKey,
           ),
           useExplainer: false);
@@ -49,25 +72,6 @@ void main() {
           explained,
           equals('TshWidget\n'
               '└WidgetPlaceholder<Widget>(Text)\n'
-              ' └Text("Hi")\n'
-              '  └RichText(text: "Hi")\n\n'));
-    });
-  });
-
-  group('onWidgets', () {
-    testWidgets('renders widget', (tester) async {
-      final html = '<span>Foo</span>';
-      final explained = await explain(tester, null,
-          hw: HtmlWidget(
-            html,
-            factoryBuilder: () => _OnWidgetsTest(),
-            key: hwKey,
-          ),
-          useExplainer: false);
-      expect(
-          explained,
-          equals('TshWidget\n'
-              '└WidgetPlaceholder<BuildMetadata>(BuildMetadata(<span>Foo</span>))\n'
               ' └CssBlock()\n'
               '  └Text("Hi")\n'
               '   └RichText(text: "Hi")\n\n'));
@@ -109,43 +113,28 @@ class _DefaultStylesTest extends WidgetFactory {
   }
 }
 
-class _OnPiecesTestText extends WidgetFactory {
+class _OnProcessedTestText extends WidgetFactory {
   @override
   void parse(BuildMetadata meta) {
-    meta.register(BuildOp(onPieces: (_, pieces) {
-      for (final piece in pieces) {
-        piece.text?.addText(' bar');
-      }
-
-      return pieces;
-    }));
+    meta.register(BuildOp(onProcessed: (_, tree) => tree.addText(' bar')));
     return super.parse(meta);
   }
 }
 
-class _OnPiecesTestWidget extends WidgetFactory {
+class _OnProcessedTestWidget extends WidgetFactory {
   @override
   void parse(BuildMetadata meta) {
-    meta.register(BuildOp(onPieces: (_, pieces) {
-      for (final piece in pieces) {
-        if (piece.text == null) continue;
-        for (final bit in List<TextBit>.unmodifiable(piece.text.bits)) {
-          bit.detach();
-        }
-      }
-
-      return [
-        BuiltPiece.widgets([Text('Hi')])
-      ];
-    }));
+    meta.register(BuildOp(
+        onProcessed: (_, tree) =>
+            tree.replaceWith(WidgetBit.inline(tree, Text('hi')))));
     return super.parse(meta);
   }
 }
 
-class _OnWidgetsTest extends WidgetFactory {
+class _OnBuiltTest extends WidgetFactory {
   @override
   void parse(BuildMetadata meta) {
-    meta.register(BuildOp(onWidgets: (_, __) => [Text('Hi')]));
+    meta.register(BuildOp(onBuilt: (_, __) => [Text('Hi')]));
     return super.parse(meta);
   }
 }
@@ -160,11 +149,11 @@ class _PriorityTest extends WidgetFactory {
   void parse(BuildMetadata meta) {
     meta
       ..register(BuildOp(
-        onPieces: (_, pieces) => pieces.map((p) => p..text?.addText(' A')),
+        onProcessed: (_, tree) => tree.addText(' A'),
         priority: a,
       ))
       ..register(BuildOp(
-        onPieces: (_, pieces) => pieces.map((p) => p..text?.addText(' B')),
+        onProcessed: (_, tree) => tree.addText(' B'),
         priority: b,
       ));
 

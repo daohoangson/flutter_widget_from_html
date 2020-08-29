@@ -104,5 +104,14 @@ class WidgetPlaceholder<T> extends StatelessWidget {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
-      '$runtimeType($generator)';
+      generator != null
+          ? 'WidgetPlaceholder($generator)'
+          : runtimeType.toString();
+
+  /// Creates a placeholder lazily.
+  ///
+  /// Returns [child] if it is already a placeholder.
+  static WidgetPlaceholder lazy(Widget child) => child is WidgetPlaceholder
+      ? child
+      : WidgetPlaceholder<Widget>(child, child: child);
 }
