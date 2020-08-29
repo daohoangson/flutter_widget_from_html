@@ -128,6 +128,7 @@ class Flattener {
       final scopedBuffer = _buffer.toString();
       final scopedText = scopedBuffer.replaceAll(RegExp('\n\$'), '');
       if (scopedBuffer == '\n' && scopedBuilders.isEmpty) {
+        // special handling for paragraph with only one line break
         widget = HeightPlaceholder(CssLength(1, CssLengthUnit.em), scopedTsb);
       } else {
         builder = (context) {
@@ -151,7 +152,7 @@ class Flattener {
     }
 
     _builders = null;
-    if (builder != null) {
+    if (builder != null || widget != null) {
       _flattened.add(Flattened(builder: builder, widget: widget));
     }
   }
