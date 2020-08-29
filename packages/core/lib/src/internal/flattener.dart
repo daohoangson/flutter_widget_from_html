@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
 import '../core_data.dart';
@@ -9,6 +10,7 @@ class Flattener {
   List<Flattened> _flattened;
   List<Function> _builders;
   StringBuffer _buffer, _prevBuffer;
+  _Recognizer _recognizer, _prevRecognizer;
   TextStyleBuilder _tsb, _prevTsb;
 
   Flattener(this.tree);
@@ -28,9 +30,11 @@ class Flattener {
   void _resetLoop(TextStyleBuilder tsb) {
     _builders = [];
     _buffer = StringBuffer();
+    _recognizer = _Recognizer();
     _tsb = tsb;
 
     _prevBuffer = _buffer;
+    _prevRecognizer = _recognizer;
     _prevTsb = _tsb;
   }
 
@@ -44,13 +48,17 @@ class Flattener {
     var built;
     if (bit is BuildBit<Null>) {
       built = bit.buildBit(null);
+    } else if (bit is BuildBit<GestureRecognizer>) {
+      built = bit.buildBit(_prevRecognizer.value);
     } else if (bit is BuildBit<TextStyleHtml>) {
       built = (context) => bit.buildBit(thisTsb?.build(context));
     } else if (bit is BuildBit<TextStyleBuilder>) {
       built = bit.buildBit(thisTsb);
     }
 
-    if (built is InlineSpan) {
+    if (built is GestureRecognizer) {
+      _prevRecognizer.value = built;
+    } else if (built is InlineSpan) {
       _saveSpan();
       _builders.add((_) => built);
     } else if (built is String) {
@@ -93,14 +101,17 @@ class Flattener {
 
   void _saveSpan() {
     if (_prevBuffer != _buffer && _prevBuffer.length > 0) {
+      final scopedRecognizer = _prevRecognizer.value;
       final scopedTsb = _prevTsb;
       final scopedText = _prevBuffer.toString();
       _builders.add((context) => TextSpan(
+            recognizer: scopedRecognizer,
             style: scopedTsb?.build(context)?.styleWithHeight,
             text: scopedText,
           ));
     }
     _prevBuffer = StringBuffer();
+    _prevRecognizer = _Recognizer();
   }
 
   void _completeLoop() {
@@ -112,6 +123,7 @@ class Flattener {
       // intentionally left empty
     } else if (_builders.isNotEmpty || _buffer.isNotEmpty) {
       final scopedBuilders = _builders;
+      final scopedRecognizer = _recognizer.value;
       final scopedTsb = _tsb;
       final scopedBuffer = _buffer.toString();
       final scopedText = scopedBuffer.replaceAll(RegExp('\n\$'), '');
@@ -130,6 +142,7 @@ class Flattener {
 
           return TextSpan(
             children: children,
+            recognizer: scopedRecognizer,
             style: scopedTsb?.build(context)?.styleWithHeight,
             text: scopedText,
           );
@@ -186,4 +199,12 @@ class Flattened {
 
   @override
   String toString() => (widget ?? builder).toString();
+}
+
+/// A mutable recognizer.
+///
+/// This class is needed because [GestureRecognizer] is rebuilt
+/// but we have to keep track of prev / current recognizer for spans
+class _Recognizer {
+  GestureRecognizer value;
 }

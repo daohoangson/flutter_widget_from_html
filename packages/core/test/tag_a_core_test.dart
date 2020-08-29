@@ -42,7 +42,7 @@ void main() {
             '(#FF0000FF+u+onTap:f)'
             '(#FF0000FF+u+b+onTap:o)'
             '(#FF0000FF+u+i+b+onTap:o)'
-            '(#FF0000FF+u: )(#FF0000FF+u+onTap:bar)'
+            '(#FF0000FF+u+onTap: bar)'
             '(:.)'
             ')]'));
   });
@@ -145,7 +145,8 @@ void main() {
       final explained = await explainImg(tester, html);
       expect(
           explained,
-          equals('[RichText:(:(#FF0000FF+u+onTap:Foo)(#FF0000FF+u: )'
+          equals('[RichText:(:'
+              '(#FF0000FF+u+onTap:Foo )'
               '[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
               ')]'));
     });
@@ -167,7 +168,8 @@ void main() {
           explained,
           equals('[RichText:(:'
               '[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-              '(#FF0000FF+u: )(#FF0000FF+u+onTap:foo))]'));
+              '(#FF0000FF+u+onTap: foo)'
+              ')]'));
     });
 
     testWidgets('renders IMG tag inside + text outside', (tester) async {

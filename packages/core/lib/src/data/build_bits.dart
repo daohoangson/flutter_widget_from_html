@@ -1,6 +1,8 @@
 part of '../core_data.dart';
 
 /// A piece of HTML being built.
+///
+/// See [buildBit] for supported input types.
 @immutable
 abstract class BuildBit<T> {
   /// The container tree.
@@ -73,7 +75,14 @@ abstract class BuildBit<T> {
 
   /// Builds input into output.
   ///
+  /// Supported input types:
+  /// - [GestureRecognizer]
+  /// - [Null]
+  /// - [TextStyleHtml]
+  /// - [TextStyleBuilder]
+  ///
   /// Supported output types:
+  /// - [GestureRecognizer]
   /// - [InlineSpan]
   /// - [String]
   /// - [Widget]

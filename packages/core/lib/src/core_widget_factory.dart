@@ -102,18 +102,6 @@ class WidgetFactory {
           BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
       GestureDetector(child: child, onTap: onTap);
 
-  /// Builds [TextSpan] with [TapGestureRecognizer].
-  InlineSpan buildGestureTapCallbackSpan(
-    String text,
-    GestureTapCallback onTap,
-    TextStyle style,
-  ) =>
-      TextSpan(
-        text: text,
-        recognizer: TapGestureRecognizer()..onTap = onTap,
-        style: style,
-      );
-
   /// Builds horizontal scroll view.
   Widget buildHorizontalScrollView(BuildMetadata meta, Widget child) =>
       SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
