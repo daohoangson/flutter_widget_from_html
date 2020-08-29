@@ -1,15 +1,18 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:flutter_widget_from_html_core/src/internal/builder.dart'
+    as builder;
 import 'package:test/test.dart';
 
 import '_.dart';
 
 void main() {
-  group('TextBit', () {
+  group('BuildBit', () {
     group('prev+next', () {
       final text = _text();
       final bit1 = text.addText('1');
       final text2 = text.sub(text.tsb);
+      text.add(text2);
       final bit21 = text2.addText('(2.1)');
       final bit22 = text2.addText('(2.2)');
       final bit3 = text.addText('3');
@@ -54,7 +57,7 @@ void main() {
       text.addText('3');
       expect(_data(text), equals('13'));
 
-      TextData(text, '2').insertAfter(bit1);
+      TextBit(text, '2').insertAfter(bit1);
       expect(_data(text), equals('123'));
     });
 
@@ -64,23 +67,12 @@ void main() {
       final bit3 = text.addText('3');
       expect(_data(text), equals('13'));
 
-      TextData(text, '2').insertBefore(bit3);
-      expect(_data(text), equals('123'));
-    });
-
-    test('replaces', () {
-      final text = _text();
-      text.addText('1');
-      final bitX = text.addText('x');
-      text.addText('3');
-      expect(_data(text), equals('1x3'));
-
-      bitX.replaceWith(TextData(text, '2'));
+      TextBit(text, '2').insertBefore(bit3);
       expect(_data(text), equals('123'));
     });
   });
 
-  group('TextBits', () {
+  group('BuildTree', () {
     group('first', () {
       test('returns child', () {
         final text = _text();
@@ -94,40 +86,12 @@ void main() {
       test('returns from sub', () {
         final text = _text();
         final text1 = text.sub(text.tsb);
+        text.add(text1);
         final bit11 = text1.addText('(1.1)');
         text1.addText('(1.2)');
         expect(_data(text), equals('(1.1)(1.2)'));
 
         expect(text.first, equals(bit11));
-      });
-    });
-
-    group('hasTrailingWhitespace', () {
-      test('returns true by default', () {
-        final text = _text();
-        expect(text.hasTrailingWhitespace, isTrue);
-      });
-
-      test('returns true for trailing whitespace', () {
-        final text = _text();
-        text.addWhitespace();
-
-        expect(text.hasTrailingWhitespace, isTrue);
-      });
-
-      test('returns false for text', () {
-        final text = _text();
-        text.addText('data');
-
-        expect(text.hasTrailingWhitespace, isFalse);
-      });
-
-      test('returns false for widget', () {
-        final text = _text();
-        final widget = WidgetPlaceholder<TextBits>(text);
-        text.add(TextWidget(text, widget));
-
-        expect(text.hasTrailingWhitespace, isFalse);
       });
     });
 
@@ -156,6 +120,7 @@ void main() {
       test('returns from sub', () {
         final text = _text();
         final text1 = text.sub(text.tsb);
+        text.add(text1);
         text1.addText('(1.1)');
         final bit12 = text1.addText('(1.2)');
         expect(_data(text), equals('(1.1)(1.2)'));
@@ -173,15 +138,9 @@ void main() {
         final newLine = text.addNewLine();
         expect(newLine, isNotNull);
         expect(text.bits.length, equals(2));
-      });
 
-      test('skips adding to existing new line', () {
-        final text = _text();
-        text.addText('data');
-        final newLine1 = text.addNewLine();
-        final newLine2 = text.addNewLine();
-
-        expect(newLine2, equals(newLine1));
+        text.addNewLine();
+        expect(text.bits.length, equals(3));
       });
     });
 
@@ -213,41 +172,19 @@ void main() {
       });
     });
 
-    group('trimRight', () {
-      test('trims trailing space', () {
-        final text = _text();
-        text.addText('data');
-        text.addWhitespace();
-        expect(text.bits.length, equals(2));
+    test('replaces', () {
+      final text = _text();
+      text.addText('1');
+      text.addText('3');
+      expect(_data(text), equals('13'));
 
-        text.trimRight();
-        expect(text.bits.length, equals(1));
-      });
-
-      test('skips trimming text', () {
-        final text = _text();
-        text.addText('data');
-        expect(text.bits.length, equals(1));
-
-        text.trimRight();
-        expect(text.bits.length, equals(1));
-      });
-
-      test('trims bit from sub', () {
-        final text = _text();
-        final text1 = text.sub(text.tsb);
-        text1.addText('data');
-        text1.addWhitespace();
-        expect(text1.bits.length, equals(2));
-
-        text.trimRight();
-        expect(text1.bits.length, equals(1));
-      });
+      text.replaceWith(TextBit(text, '2'));
+      expect(_data(text), equals('2'));
     });
   });
 
   group('copyWith', () {
-    test('TextData returns', () {
+    test('TextBit returns', () {
       final text = _text();
       final bit = text.addText('1');
 
@@ -257,20 +194,23 @@ void main() {
       expect(_data(text2), equals('1'));
     });
 
-    test('TextWidget returns', () {
+    test('WidgetBit returns', () {
       final text = _text();
       final child = WidgetPlaceholder(null);
-      final bit = TextWidget(text, child);
+      final bit = WidgetBit.inline(text, child);
 
       final text2 = _text();
       final copied = bit.copyWith(parent: text2);
       text2.add(copied);
-      expect((copied.compile(null) as WidgetSpan).child, equals(child));
+      expect((copied.buildBit(null) as WidgetSpan).child, equals(child));
     });
 
-    test('TextBits throws', () {
+    test('BuildTree returns', () {
       final text = _text();
-      expect(() => text.copyWith(), throwsUnsupportedError);
+      text.addText('1');
+
+      final copied = text.copyWith();
+      expect(_data(copied), equals('1'));
     });
 
     test('NewLine returns', () {
@@ -283,7 +223,7 @@ void main() {
       final copied = newLine.copyWith(parent: text2);
       text2.add(copied);
       text2.addText('2');
-      expect(_data(text2), equals('1[NewLine x1]2'));
+      expect(_data(text2), equals('1\n2'));
     });
 
     test('Whitespace returns', () {
@@ -305,35 +245,36 @@ void main() {
     text.addText('1');
     text.addWhitespace();
     final text2 = text.sub(text.tsb);
+    text.add(text2);
     text2.addText('(2.1)');
     final text22 = text2.sub(text.tsb.sub());
+    text2.add(text22);
     text22.addText('(2.2.1)');
     text22.addText('(2.2.2)');
     text22.addNewLine();
     text2.addText('(2.3)');
-    final widget = WidgetPlaceholder<TextBits>(null);
-    text.add(TextWidget(text, widget));
+    text.add(WidgetBit.inline(text, Text('Hi')));
 
     expect(
         simplifyHashCode(text.toString()),
-        equals('TextBits#0 tsb#1:\n'
+        equals('BuildTree#0 tsb#1:\n'
             '  "1"\n'
             '  Whitespace#2\n'
-            '  TextBits#3 tsb#1:\n'
+            '  BuildTree#3 tsb#1:\n'
             '    "(2.1)"\n'
-            '    TextBits#4 tsb#5(parent=#1):\n'
+            '    BuildTree#4 tsb#5(parent=#1):\n'
             '      "(2.2.1)"\n'
             '      "(2.2.2)"\n'
-            '      NewLine#6 x1\n'
+            '      _TextNewLine#6 tsb#5(parent=#1)\n'
             '    "(2.3)"\n'
-            '  WidgetPlaceholder<TextBits>(null)'));
+            '  WidgetBit.inline#7 WidgetPlaceholder(Text("Hi"))'));
   });
 }
 
-String _data(TextBits text) => text.bits
-    .map((bit) => (bit is TextBit<void, String>)
-        ? bit.compile(null)
+String _data(BuildTree text) => text.bits
+    .map((bit) => (bit is BuildBit<void>)
+        ? bit.buildBit(null).toString()
         : '[$bit]'.replaceAll(RegExp(r'#\w+'), ''))
     .join('');
 
-TextBits _text() => TextBits(TextStyleBuilder());
+BuildTree _text() => builder.BuildTree(tsb: TextStyleBuilder());
