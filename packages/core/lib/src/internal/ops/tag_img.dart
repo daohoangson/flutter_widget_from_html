@@ -15,28 +15,24 @@ class TagImg {
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
-        onPieces: (node, pieces) {
-          if (node.isBlockElement) return pieces;
+        onProcessed: (node, tree) {
+          if (node.isBlockElement) return;
 
-          final text = pieces.last?.text;
           final image = _parse(node);
           final built = _build(node, image);
           if (built == null) {
             final imgText = image.alt ?? image.title;
             if (imgText?.isNotEmpty == true) {
-              text.addText(imgText);
+              tree.addText(imgText);
             }
-            return pieces;
+            return;
           }
 
-          text.add(_ImageBit(
-            text,
-            WidgetPlaceholder<ImageMetadata>(image, child: built),
-          ));
-          return pieces;
+          tree.replaceWith(WidgetBit.inline(
+              tree, WidgetPlaceholder<ImageMetadata>(image, child: built)));
         },
-        onWidgets: (node, _) {
-          if (!node.isBlockElement) return [];
+        onBuilt: (node, widgets) {
+          if (!node.isBlockElement) return widgets;
 
           final image = _parse(node);
           final built = _build(node, image);
@@ -69,18 +65,6 @@ class TagImg {
       title: attrs[kAttributeImgTitle],
     );
   }
-}
-
-class _ImageBit extends TextWidget<ImageMetadata> {
-  _ImageBit(TextBits parent, WidgetPlaceholder<ImageMetadata> widget)
-      : super(parent, widget);
-
-  @override
-  InlineSpan compile(TextStyleHtml _) => WidgetSpan(
-        alignment: alignment,
-        baseline: baseline,
-        child: child,
-      );
 }
 
 final _dataUriRegExp = RegExp(r'^data:image/[^;]+;(base64|utf8),');

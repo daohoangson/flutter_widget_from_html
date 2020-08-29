@@ -11,7 +11,7 @@ class TagIframe {
 
   TagIframe(this.wf);
 
-  BuildOp get buildOp => BuildOp(onWidgets: (meta, _) {
+  BuildOp get buildOp => BuildOp(onBuilt: (meta, _) {
         final webView = build(meta);
         return webView != null ? [webView] : null;
       });

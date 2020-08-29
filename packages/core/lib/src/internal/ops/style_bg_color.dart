@@ -10,16 +10,17 @@ class StyleBgColor {
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
-        onPieces: (meta, pieces) {
-          if (meta.isBlockElement) return pieces;
+        onProcessed: (meta, tree) {
+          if (meta.isBlockElement) return;
 
           final bgColor = _parseColor(wf, meta);
-          if (bgColor == null) return pieces;
+          if (bgColor == null) return;
 
-          return pieces.map((piece) =>
-              piece.widgets != null ? piece : _buildBlock(piece, bgColor));
+          for (final bit in tree.bits) {
+            bit.tsb?.enqueue(_tsb, bgColor);
+          }
         },
-        onWidgets: (meta, widgets) {
+        onBuilt: (meta, widgets) {
           final color = _parseColor(wf, meta);
           if (color == null) return null;
           return listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
@@ -27,9 +28,6 @@ class StyleBgColor {
         },
         priority: 15000,
       );
-
-  BuiltPiece _buildBlock(BuiltPiece piece, Color bgColor) =>
-      piece..text.bits.forEach((bit) => bit.tsb?.enqueue(_tsb, bgColor));
 
   Color _parseColor(WidgetFactory wf, BuildMetadata meta) {
     Color color;

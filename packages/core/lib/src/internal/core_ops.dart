@@ -26,7 +26,6 @@ part 'ops/tag_li.dart';
 part 'ops/tag_q.dart';
 part 'ops/tag_ruby.dart';
 part 'ops/tag_table.dart';
-part 'ops/text.dart';
 part 'ops/text_style.dart';
 
 const kCssDisplay = 'display';
@@ -52,3 +51,31 @@ String convertColorToHex(Color value) {
 }
 
 Iterable<Widget> listOrNull(Widget x) => x == null ? null : [x];
+
+void wrapTree(
+  BuildTree tree, {
+  BuildBit Function(BuildTree parent) append,
+  BuildBit Function(BuildTree parent) prepend,
+}) {
+  if (tree.isEmpty) {
+    if (prepend != null) {
+      final prependBit = prepend(tree);
+      if (prependBit != null) tree.add(prependBit);
+    }
+    if (append != null) {
+      final appendBit = append(tree);
+      if (appendBit != null) tree.add(appendBit);
+    }
+    return;
+  }
+
+  if (prepend != null) {
+    final first = tree.first;
+    prepend(first.parent)?.insertBefore(first);
+  }
+
+  if (append != null) {
+    final last = tree.last;
+    append(last.parent)?.insertAfter(last);
+  }
+}

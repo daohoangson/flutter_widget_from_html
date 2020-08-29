@@ -16,19 +16,10 @@ class TagCode {
   BuildOp get preOp => BuildOp(
         defaultStyles: (_) =>
             const {kCssFontFamily: '$kTagCodeFont1, $kTagCodeFont2'},
-        onPieces: (meta, pieces) => [_resetText(pieces.first, meta)],
-        onWidgets: (meta, widgets) => listOrNull(wf
+        onProcessed: (meta, tree) =>
+            tree.replaceWith(TextBit(tree, meta.element.text, tsb: tree.tsb)),
+        onBuilt: (meta, widgets) => listOrNull(wf
             .buildColumnPlaceholder(meta, widgets)
             ?.wrapWith((_, w) => wf.buildHorizontalScrollView(meta, w))),
       );
-
-  BuiltPiece _resetText(BuiltPiece piece, BuildMetadata meta) {
-    final text = piece.text;
-    for (final bit in List<TextBit>.unmodifiable(text.bits)) {
-      bit.detach();
-    }
-    text.addText(meta.element.text);
-
-    return piece;
-  }
 }

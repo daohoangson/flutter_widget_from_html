@@ -14,7 +14,7 @@ class TagRuby {
   TagRuby(this.wf, this.rubyMeta);
 
   BuildOp get op {
-    _rubyOp ??= BuildOp(onChild: onChild, onPieces: onPieces);
+    _rubyOp ??= BuildOp(onChild: onChild, onProcessed: onProcessed);
     return _rubyOp;
   }
 
@@ -28,21 +28,10 @@ class TagRuby {
         break;
       case kTagRt:
         _rtOp ??= BuildOp(
-          onPieces: (rtMeta, pieces) {
-            // assume that the first piece is always a text piece
-            // this is a fairly dangerous assumption
-            final text = pieces.first.text;
-
-            for (final _ in text.bits) {
-              // RT tag contains something!
-              text.replaceWith(_RtBit(rtMeta, text));
-
-              // keep the first piece only for now (TODO?)
-              return [pieces.first];
-            }
-
-            // RT tag is empty, do nothing
-            return pieces;
+          onProcessed: (rtMeta, rtTree) {
+            if (rtTree.isEmpty) return;
+            final rtBit = _RtBit(rtTree, rtTree.tsb, rtMeta, rtTree.copyWith());
+            rtTree.replaceWith(rtBit);
           },
         );
 
@@ -53,45 +42,45 @@ class TagRuby {
     }
   }
 
-  Iterable<BuiltPiece> onPieces(BuildMetadata _, Iterable<BuiltPiece> pieces) {
-    for (final piece in pieces) {
-      if (piece.text == null) continue;
-
-      final prev = <TextBit>[];
-      final bits = piece.text.bits.toList(growable: false);
-      for (final bit in bits) {
-        if (prev.isEmpty && bit.tsb == null) {
-          // the first bit is whitespace, just ignore it
-          continue;
-        }
-        if (bit is! _RtBit || prev.isEmpty) {
-          prev.add(bit);
-          continue;
-        }
-
-        final rt = bit as _RtBit;
-        final prevFirst = prev.first;
-
-        final rubyBits = TextBits(prevFirst.tsb);
-        final placeholder = WidgetPlaceholder<TextBits>(rubyBits)
-          ..wrapWith((_, __) => _RubyWidget(
-                wf.buildText(rubyMeta, rubyBits) ?? widget0,
-                wf.buildText(rt.rtMeta, rt.bits) ?? widget0,
-              ));
-        final replacement = TextWidget(prevFirst.parent, placeholder,
-            alignment: PlaceholderAlignment.middle);
-        prevFirst.replaceWith(replacement);
-
-        for (final prevBit in prev) {
-          rubyBits.add(prevBit.copyWith(parent: rubyBits));
-          prevBit.detach();
-        }
-        bit.detach();
-        prev.clear();
+  void onProcessed(BuildMetadata _, BuildTree tree) {
+    final rubyBits = <BuildBit>[];
+    for (final bit in tree.bits.toList(growable: false)) {
+      if (rubyBits.isEmpty && bit.tsb == null) {
+        // the first bit is whitespace, just ignore it
+        continue;
       }
-    }
+      if (bit is! _RtBit || rubyBits.isEmpty) {
+        rubyBits.add(bit);
+        continue;
+      }
 
-    return pieces;
+      final rtBit = bit as _RtBit;
+      final rubyTree = tree.sub(tree.tsb);
+      final placeholder =
+          WidgetPlaceholder<List<BuildTree>>([rubyTree, rtBit.tree])
+            ..wrapWith((context, __) {
+              final tsh = rubyTree.tsb.build(context);
+
+              final ruby = wf.buildColumnWidget(
+                  rubyMeta, tsh, rubyTree.build().toList(growable: false));
+              final rt = wf.buildColumnWidget(
+                  rtBit.meta, tsh, rtBit.tree.build().toList(growable: false));
+
+              return _RubyWidget(ruby ?? widget0, rt ?? widget0);
+            });
+
+      final anchorBit = rubyBits.first;
+      WidgetBit.inline(anchorBit.parent, placeholder,
+              alignment: PlaceholderAlignment.middle)
+          .insertBefore(anchorBit);
+
+      for (final rubyBit in rubyBits) {
+        rubyTree.add(rubyBit.copyWith(parent: rubyTree));
+        rubyBit.detach();
+      }
+      rubyBits.clear();
+      rtBit.detach();
+    }
   }
 }
 
@@ -198,17 +187,17 @@ class _RubyRenderObject extends RenderBox
   }
 }
 
-class _RtBit extends TextBit<void, void> {
-  final TextBits bits;
-  final BuildMetadata rtMeta;
+class _RtBit extends BuildBit<Null> {
+  final BuildMetadata meta;
+  final BuildTree tree;
 
-  _RtBit(this.rtMeta, this.bits, {TextBits parent, TextStyleBuilder tsb})
-      : super(parent ?? bits.parent, tsb ?? bits.tsb);
-
-  @override
-  void compile(void _) => null;
+  _RtBit(BuildTree parent, TextStyleBuilder tsb, this.meta, this.tree)
+      : super(parent, tsb);
 
   @override
-  TextBit copyWith({TextBits parent, TextStyleBuilder tsb}) =>
-      _RtBit(rtMeta, bits, parent: parent ?? this.parent, tsb: tsb ?? this.tsb);
+  void buildBit(Null _) => '';
+
+  @override
+  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+      _RtBit(parent ?? this.parent, tsb ?? this.tsb, meta, tree);
 }

@@ -9,7 +9,7 @@ const html = 'Above\n<blockquote>Foo</blockquote>\nBelow';
 
 class _BlockquoteWebViewWf extends WidgetFactory {
   final blockquoteOp = BuildOp(
-    onWidgets: (meta, _) => [
+    onBuilt: (meta, _) => [
       WebView(
         Uri.dataFromString(
           meta.element.innerHtml,

@@ -390,7 +390,7 @@ class WidgetFactory {
         break;
 
       case 'br':
-        _tagBr ??= BuildOp(onPieces: (_, p) => p..last.text.addNewLine());
+        _tagBr ??= BuildOp(onProcessed: (_, tree) => tree.addNewLine());
         meta.register(_tagBr);
         break;
 
@@ -445,7 +445,7 @@ class WidgetFactory {
       case 'hr':
         _tagHr ??= BuildOp(
           defaultStyles: (_) => const {'margin-bottom': '1em'},
-          onWidgets: (meta, _) => [buildDivider(meta)],
+          onBuilt: (meta, _) => [buildDivider(meta)],
         );
         meta.register(_tagHr);
         break;
@@ -597,27 +597,29 @@ class WidgetFactory {
       case kCssBorderBottom:
         final borderBottom = tryParseCssBorderSide(value);
         if (borderBottom != null) {
-          meta.register(TextStyleOps.textDecoOp(TextDeco(
+          meta.register(TextStyleOps.textDecoBorderXxxOp(TextDeco(
             color: borderBottom.color,
             under: true,
             style: borderBottom.style,
             thickness: borderBottom.width,
           )));
         } else {
-          meta.register(TextStyleOps.textDecoOp(TextDeco(under: false)));
+          meta.register(
+              TextStyleOps.textDecoBorderXxxOp(TextDeco(under: false)));
         }
         break;
       case kCssBorderTop:
         final borderTop = tryParseCssBorderSide(value);
         if (borderTop != null) {
-          meta.register(TextStyleOps.textDecoOp(TextDeco(
+          meta.register(TextStyleOps.textDecoBorderXxxOp(TextDeco(
             color: borderTop.color,
             over: true,
             style: borderTop.style,
             thickness: borderTop.width,
           )));
         } else {
-          meta.register(TextStyleOps.textDecoOp(TextDeco(over: false)));
+          meta.register(
+              TextStyleOps.textDecoBorderXxxOp(TextDeco(over: false)));
         }
         break;
 
@@ -742,7 +744,7 @@ class WidgetFactory {
   /// Returns build op for block element.
   BuildOp styleDisplayBlock() {
     _styleDisplayBlock ??= BuildOp(
-      onWidgets: (meta, widgets) => listOrNull(
+      onBuilt: (meta, widgets) => listOrNull(
           buildColumnPlaceholder(meta, widgets)?.wrapWith(_cssBlock)),
       priority: 10000,
     );

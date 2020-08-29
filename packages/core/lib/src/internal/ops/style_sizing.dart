@@ -14,35 +14,25 @@ class StyleSizing {
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
-        onPieces: (meta, pieces) {
-          if (meta.isBlockElement) return pieces;
+        onProcessed: (meta, tree) {
+          if (meta.isBlockElement) return;
 
           final input = _parse(meta);
-          if (input == null) return pieces;
+          if (input == null) return;
 
           WidgetPlaceholder widget;
-          for (final p in pieces) {
-            if (p.widgets != null) {
-              for (final w in p.widgets) {
-                if (widget != null) return pieces;
-                widget = w;
-              }
+          for (final b in tree.bits) {
+            if (b is WidgetBit) {
+              if (widget != null) return;
+              widget = b.child;
             } else {
-              for (final b in p.text?.bits) {
-                if (b is TextWidget) {
-                  if (widget != null) return pieces;
-                  widget = b.child;
-                } else {
-                  return pieces;
-                }
-              }
+              return;
             }
           }
 
           widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb()));
-          return pieces;
         },
-        onWidgets: (meta, widgets) {
+        onBuilt: (meta, widgets) {
           final input = _parse(meta);
           if (input == null) return widgets;
           return listOrNull(wf

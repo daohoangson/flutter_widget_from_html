@@ -8,6 +8,6 @@ class TagSvg {
   TagSvg(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onWidgets: (meta, _) => [SvgPicture.string(meta.element.outerHtml)],
+        onBuilt: (meta, _) => [SvgPicture.string(meta.element.outerHtml)],
       );
 }

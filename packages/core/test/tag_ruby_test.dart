@@ -14,6 +14,17 @@ void main() {
             ']@middle]'));
   });
 
+  testWidgets('renders text after RT', (WidgetTester tester) async {
+    final html = '<ruby>ruby <rt>rt</rt> foo</ruby>';
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[RichText:(:'
+            '[_RubyWidget:children=[RichText:(:ruby)],[RichText:(@5.0:rt)]]@middle'
+            '(: foo)'
+            ')]'));
+  });
+
   testWidgets('renders with multiple RTs', (WidgetTester tester) async {
     final html = '<ruby>漢<rt>かん</rt>字<rt>じ</rt></ruby>';
     final explained = await explain(tester, html);

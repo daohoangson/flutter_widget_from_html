@@ -20,20 +20,20 @@ class StylePadding {
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
-        onPieces: (meta, pieces) {
-          if (meta.isBlockElement) return pieces;
+        onProcessed: (meta, tree) {
+          if (meta.isBlockElement) return;
           final padding = tryParseCssLengthBox(meta, kCssPadding);
-          if (padding?.hasLeftOrRight != true) return pieces;
+          if (padding?.hasLeftOrRight != true) return;
 
-          return _wrapTextBits(
-            pieces,
-            appendBuilder: (parent) =>
-                TextWidget(parent, _paddingInlineAfter(parent.tsb, padding)),
-            prependBuilder: (parent) =>
-                TextWidget(parent, _paddingInlineBefore(parent.tsb, padding)),
+          return wrapTree(
+            tree,
+            append: (p) =>
+                WidgetBit.inline(p, _paddingInlineAfter(p.tsb, padding)),
+            prepend: (p) =>
+                WidgetBit.inline(p, _paddingInlineBefore(p.tsb, padding)),
           );
         },
-        onWidgets: (meta, widgets) {
+        onBuilt: (meta, widgets) {
           if (widgets?.isNotEmpty != true) return null;
           final padding = tryParseCssLengthBox(meta, kCssPadding);
           if (padding == null) return null;
