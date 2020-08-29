@@ -42,7 +42,7 @@ class Flattener {
     if (thisTsb?.hasSameStyleWith(_prevTsb) == false) _saveSpan();
 
     var built;
-    if (bit is BuildBit<void>) {
+    if (bit is BuildBit<Null>) {
       built = bit.buildBit(null);
     } else if (bit is BuildBit<TextStyleHtml>) {
       built = (context) => bit.buildBit(thisTsb?.build(context));
@@ -54,8 +54,9 @@ class Flattener {
       _saveSpan();
       _builders.add((_) => built);
     } else if (built is String) {
-      _prevBuffer.write(built);
-      _prevTsb = thisTsb;
+      if (built != ' ' || !_loopShouldSkipWhitespace(bit)) {
+        _prevBuffer.write(built);
+      }
     } else if (built is Function) {
       _saveSpan();
       _builders.add(built);
@@ -63,6 +64,31 @@ class Flattener {
       _completeLoop();
       _flattened.add(Flattened(widget: built));
     }
+
+    _prevTsb = thisTsb;
+  }
+
+  bool _loopShouldSkipWhitespace(BuildBit bit) {
+    // special handling for whitespaces
+    if (_prevBuffer.isEmpty) {
+      if (_builders.isEmpty && _flattened.isEmpty) {
+        // skip leading whitespace
+        return true;
+      }
+    }
+
+    final nextBit = bit.next;
+    if (nextBit == null) {
+      // skip trailing whitespace
+      return true;
+    } else if (nextBit is WidgetBit) {
+      if (!nextBit.isInline) {
+        // skip whitespace before a new block
+        return true;
+      }
+    }
+
+    return false;
   }
 
   void _saveSpan() {
@@ -131,14 +157,14 @@ class Flattener {
       final next = bit.next;
       if (next?.tsb != null) {
         // get the outer-most bits having this as the last bit
-        var bits = parent;
+        var tree = parent;
         while (true) {
-          final bitsParentLast = bits.parent?.last;
+          final bitsParentLast = tree.parent?.last;
           if (bitsParentLast != bit) break;
-          bits = bits.parent;
+          tree = tree.parent;
         }
 
-        if (bits.parent == next.parent) {
+        if (tree.parent == next.parent) {
           return next.tsb;
         } else {
           return null;

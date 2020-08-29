@@ -117,86 +117,10 @@ abstract class BuildBit<T> {
 
   @override
   String toString() => '$runtimeType#$hashCode $tsb';
-
-  /// Trims leading whitespaces.
-  ///
-  /// Returns `true` if at least one bit has been detached.
-  bool trimLeft() => false;
-
-  /// Trims trailing whitespaces.
-  ///
-  /// Returns `true` if at least one bit has been detached.
-  bool trimRight() => false;
-}
-
-/// A simple data bit.
-class TextData extends BuildBit<void> {
-  final String data;
-
-  TextData._(BuildTree parent, TextStyleBuilder tsb, this.data)
-      : super(parent, tsb);
-
-  /// Creates with data string,
-  factory TextData(BuildTree parent, String data, {TextStyleBuilder tsb}) =>
-      TextData._(parent, tsb ?? parent.tsb, data);
-
-  @override
-  String buildBit(void _) => data;
-
-  @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
-      TextData._(parent ?? this.parent, tsb ?? this.tsb, data);
-
-  @override
-  String toString() => '"$data"';
-}
-
-/// An inline widget to be rendered within text.
-class TextWidget<T> extends BuildBit<void> {
-  /// See [PlaceholderSpan.alignment].
-  final PlaceholderAlignment alignment;
-
-  /// See [PlaceholderSpan.baseline].
-  final TextBaseline baseline;
-
-  /// The widget to be rendered.
-  final WidgetPlaceholder<T> child;
-
-  TextWidget._(
-    BuildTree parent,
-    TextStyleBuilder tsb,
-    this.alignment,
-    this.baseline,
-    this.child,
-  ) : super(parent, tsb);
-
-  /// Creates an inline widget.
-  factory TextWidget(
-    BuildTree parent,
-    WidgetPlaceholder child, {
-    PlaceholderAlignment alignment = PlaceholderAlignment.baseline,
-    TextBaseline baseline = TextBaseline.alphabetic,
-    TextStyleBuilder tsb,
-  }) =>
-      TextWidget._(parent, tsb ?? parent.tsb, alignment, baseline, child);
-
-  @override
-  InlineSpan buildBit(void _) => WidgetSpan(
-        alignment: alignment,
-        baseline: baseline,
-        child: child,
-      );
-
-  @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) => TextWidget._(
-      parent ?? this.parent, tsb ?? this.tsb, alignment, baseline, child);
-
-  @override
-  String toString() => 'TextWidget#$hashCode $child';
 }
 
 /// A tree of [BuildBit]s.
-abstract class BuildTree extends BuildBit<void> {
+abstract class BuildTree extends BuildBit<Null> {
   final _children = <BuildBit>[];
 
   /// Creates a tree.
@@ -268,13 +192,13 @@ abstract class BuildTree extends BuildBit<void> {
   }
 
   /// Adds a string to the tail of this tree.
-  TextData addText(String data) => add(TextData(this, data));
+  TextBit addText(String data) => add(TextBit(this, data));
 
   /// Builds widgets from bits.
-  Iterable<Widget> build();
+  Iterable<WidgetPlaceholder> build();
 
   @override
-  Iterable<Widget> buildBit(void _) => build();
+  Iterable<WidgetPlaceholder> buildBit(Null _) => build();
 
   /// Replaces children bits with [another].
   void replaceWith(BuildBit another) {
@@ -286,46 +210,6 @@ abstract class BuildTree extends BuildBit<void> {
 
   /// Creates a sub tree.
   BuildTree sub(TextStyleBuilder tsb);
-
-  @override
-  bool trimLeft() {
-    var trimmed = false;
-
-    while (_children.isNotEmpty) {
-      if (_children.first.trimLeft()) {
-        trimmed = true;
-      } else {
-        break;
-      }
-    }
-
-    if (_children.isEmpty) {
-      detach();
-      trimmed = true;
-    }
-
-    return trimmed;
-  }
-
-  @override
-  bool trimRight() {
-    var trimmed = false;
-
-    while (_children.isNotEmpty) {
-      if (_children.last.trimRight()) {
-        trimmed = true;
-      } else {
-        break;
-      }
-    }
-
-    if (_children.isEmpty) {
-      detach();
-      trimmed = true;
-    }
-
-    return trimmed;
-  }
 
   @override
   String toString() {
@@ -340,28 +224,111 @@ abstract class BuildTree extends BuildBit<void> {
   }
 }
 
-class _TextNewLine extends BuildBit<void> {
+/// A simple text bit.
+class TextBit extends BuildBit<Null> {
+  final String data;
+
+  TextBit._(BuildTree parent, TextStyleBuilder tsb, this.data)
+      : super(parent, tsb);
+
+  /// Creates with string,
+  factory TextBit(BuildTree parent, String data, {TextStyleBuilder tsb}) =>
+      TextBit._(parent, tsb ?? parent.tsb, data);
+
+  @override
+  String buildBit(Null _) => data;
+
+  @override
+  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+      TextBit._(parent ?? this.parent, tsb ?? this.tsb, data);
+
+  @override
+  String toString() => '"$data"';
+}
+
+/// A widget bit.
+class WidgetBit<T> extends BuildBit<Null> {
+  /// See [PlaceholderSpan.alignment].
+  final PlaceholderAlignment alignment;
+
+  /// See [PlaceholderSpan.baseline].
+  final TextBaseline baseline;
+
+  /// The widget to be rendered.
+  final WidgetPlaceholder<T> child;
+
+  WidgetBit._(
+    BuildTree parent,
+    TextStyleBuilder tsb,
+    this.alignment,
+    this.baseline,
+    this.child,
+  ) : super(parent, tsb);
+
+  /// Creates an block widget.
+  factory WidgetBit.block(
+    BuildTree parent,
+    WidgetPlaceholder child, {
+    TextStyleBuilder tsb,
+  }) =>
+      WidgetBit._(parent, tsb ?? parent.tsb, null, null, child);
+
+  /// Creates an inline widget.
+  factory WidgetBit.inline(
+    BuildTree parent,
+    WidgetPlaceholder child, {
+    PlaceholderAlignment alignment = PlaceholderAlignment.baseline,
+    TextBaseline baseline = TextBaseline.alphabetic,
+    TextStyleBuilder tsb,
+  }) =>
+      WidgetBit._(parent, tsb ?? parent.tsb, alignment, baseline, child);
+
+  @override
+  bool get skipAddingWhitespace => !isInline;
+
+  /// Returns `true` if widget should be rendered inline.
+  bool get isInline => alignment != null && baseline != null;
+
+  @override
+  dynamic buildBit(Null _) => isInline
+      ? WidgetSpan(
+          alignment: alignment,
+          baseline: baseline,
+          child: child,
+        )
+      : child;
+
+  @override
+  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) => WidgetBit._(
+      parent ?? this.parent, tsb ?? this.tsb, alignment, baseline, child);
+
+  @override
+  String toString() =>
+      'WidgetBit.${isInline ? "inline" : "block"}#$hashCode $child';
+}
+
+class _TextNewLine extends BuildBit<Null> {
   _TextNewLine(BuildTree parent, TextStyleBuilder tsb) : super(parent, tsb);
 
   @override
   bool get skipAddingWhitespace => true;
 
   @override
-  String buildBit(void input) => '\n';
+  String buildBit(Null _) => '\n';
 
   @override
   BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
       _TextNewLine(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _TextWhitespace extends BuildBit<void> {
+class _TextWhitespace extends BuildBit<Null> {
   _TextWhitespace(BuildTree parent) : super(parent, null);
 
   @override
   bool get skipAddingWhitespace => true;
 
   @override
-  String buildBit(void _) => ' ';
+  String buildBit(Null _) => ' ';
 
   @override
   BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
@@ -369,10 +336,4 @@ class _TextWhitespace extends BuildBit<void> {
 
   @override
   String toString() => 'Whitespace#$hashCode';
-
-  @override
-  bool trimLeft() => detach();
-
-  @override
-  bool trimRight() => detach();
 }

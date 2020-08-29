@@ -117,27 +117,10 @@ class BuildTree extends core_data.BuildTree {
   }
 
   @override
-  Iterable<Widget> build() {
+  Iterable<WidgetPlaceholder> build() {
     if (_built.isNotEmpty) return _built;
 
-    List<WidgetPlaceholder> trailing;
-    while (true) {
-      final lastBit = last;
-      if (lastBit == null) break;
-      if (lastBit is! _WidgetBit) break;
-
-      trailing ??= [];
-      trailing.insert(0, lastBit.buildBit(null));
-      lastBit.detach();
-    }
-
-    trimLeft();
-    trimRight();
-
-    var widgets = [
-      ..._flatten(),
-      if (trailing != null) ...trailing,
-    ];
+    var widgets = _flatten();
 
     if (parentMeta?.buildOps != null) {
       final _makeSureWidgetIsPlaceholder = (Widget widget) =>
@@ -323,7 +306,7 @@ class BuildTree extends core_data.BuildTree {
 
       if (meta.isBlockElement) {
         for (final widget in subTree.build()) {
-          add(_WidgetBit(this, widget));
+          add(WidgetBit.block(this, widget));
         }
         subTree.detach();
       }
@@ -335,25 +318,6 @@ class BuildTree extends core_data.BuildTree {
       }
     }
   }
-}
-
-class _WidgetBit extends BuildBit<void> {
-  final WidgetPlaceholder child;
-
-  _WidgetBit(BuildTree parent, this.child) : super(parent, null);
-
-  @override
-  bool get skipAddingWhitespace => true;
-
-  @override
-  WidgetPlaceholder buildBit(void _) => child;
-
-  @override
-  BuildBit copyWith({core_data.BuildTree parent, TextStyleBuilder tsb}) =>
-      _WidgetBit(parent ?? this.parent, child);
-
-  @override
-  String toString() => 'WidgetBit#$hashCode $child';
 }
 
 Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, BuildMetadata meta) {
