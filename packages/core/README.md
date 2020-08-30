@@ -230,9 +230,10 @@ The HTML string is parsed into DOM elements and each element is visited once to 
 | 1 | Parse | `WidgetFactory.parse(BuildMetadata)` |
 | 2 | Inform parents if any | `BuildOp.onChild(BuildMetadata)` |
 | 3 | Populate default inline styles | `BuildOp.defaultStyles(BuildMetadata)` |
-| 4 | `customStyleBuilder` / `customWidgetBuilder` will be called if configured | |
+| 4 | `customStylesBuilder` will be called if configured | `HtmlWidget.customStylesBuilder` |
 | 5 | Parse inline style key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(BuildMetadata, String, String)` |
-| 6 | Loop through children elements to prepare `BuildBit`s | |
+| 6 | a. If a custom widget is provided, go to 7 | `HtmlWidget.customWidgetBuilder` |
+|   | b. Loop through children elements to prepare `BuildBit`s | |
 | 7 | Inform build ops | `BuildOp.onProcessed(BuildMetadata, BuildTree)` |
 | 8 | a. If not a block element, go to 10 | |
 |   | b. Build widgets from bits | |

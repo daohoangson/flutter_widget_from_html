@@ -21,8 +21,8 @@ class BuildMetadata extends core_data.BuildMetadata {
   List<String> _styles;
   var _stylesIsLocked = false;
 
-  BuildMetadata(dom.Element domElement, TextStyleBuilder tsb, [this._parentOps])
-      : super(domElement, tsb);
+  BuildMetadata(dom.Element element, TextStyleBuilder tsb, [this._parentOps])
+      : super(element, tsb);
 
   @override
   Iterable<BuildOp> get buildOps => _buildOps;
@@ -97,23 +97,29 @@ class BuildTree extends core_data.BuildTree {
   BuildTree({
     this.customStylesBuilder,
     this.customWidgetBuilder,
-    dom.NodeList domNodes,
     BuildTree parent,
     this.parentMeta,
     this.parentOps,
     TextStyleBuilder tsb,
     this.wf,
-  }) : super(parent, tsb) {
-    if (domNodes != null) {
-      parent?.add(this);
-      _populateBits(domNodes);
-    }
-  }
+  }) : super(parent, tsb);
 
   @override
   BuildBit add(BuildBit bit) {
     assert(_built.isEmpty, "Built tree shouldn't be altered.");
     return super.add(bit);
+  }
+
+  void addBitsFromNodes(dom.NodeList domNodes) {
+    for (final domNode in domNodes) {
+      _addBitsFromNode(domNode);
+    }
+
+    if (parentMeta?.buildOps != null) {
+      for (final op in parentMeta.buildOps) {
+        op.onProcessed?.call(parentMeta, this);
+      }
+    }
   }
 
   @override
@@ -148,7 +154,6 @@ class BuildTree extends core_data.BuildTree {
   @override
   BuildTree sub(
     TextStyleBuilder tsb, {
-    dom.NodeList domNodes,
     BuildTree parent,
     BuildMetadata parentMeta,
     Iterable<BuildOp> parentOps,
@@ -156,13 +161,46 @@ class BuildTree extends core_data.BuildTree {
       BuildTree(
         customStylesBuilder: customStylesBuilder,
         customWidgetBuilder: customWidgetBuilder,
-        domNodes: domNodes,
         parent: parent ?? this,
         parentMeta: parentMeta ?? this.parentMeta,
         parentOps: parentOps,
         tsb: tsb ?? this.tsb.sub(),
         wf: wf,
       );
+
+  void _addBitsFromNode(dom.Node domNode) {
+    if (domNode.nodeType == dom.Node.TEXT_NODE) return _addText(domNode.text);
+    if (domNode.nodeType != dom.Node.ELEMENT_NODE) return;
+
+    final element = domNode as dom.Element;
+    final meta = BuildMetadata(element, parentMeta.tsb().sub(), parentOps);
+    final customWidget = customWidgetBuilder?.call(element);
+    if (customWidget != null) meta.isBlockElement = true;
+
+    _collectMetadata(meta);
+    if (meta.isNotRenderable == true) return;
+
+    final subTree = sub(
+      meta.tsb(),
+      parentMeta: meta,
+      parentOps: _prepareParentOps(parentOps, meta),
+    );
+    add(subTree);
+
+    if (customWidget != null) {
+      // skip sub tree processing if a custom widget found
+      subTree.add(WidgetBit.block(subTree, customWidget));
+    } else {
+      subTree.addBitsFromNodes(element.nodes);
+    }
+
+    if (meta.isBlockElement) {
+      for (final widget in subTree.build()) {
+        add(WidgetBit.block(this, widget));
+      }
+      subTree.detach();
+    }
+  }
 
   void _addText(String data) {
     final leading = _regExpSpaceLeading.firstMatch(data);
@@ -184,8 +222,7 @@ class BuildTree extends core_data.BuildTree {
     if (end < data.length) addWhitespace();
   }
 
-  BuildMetadata _collectMetadata(dom.Element e) {
-    final meta = BuildMetadata(e, parentMeta.tsb().sub(), parentOps);
+  void _collectMetadata(BuildMetadata meta) {
     wf.parse(meta);
 
     if (meta.parentOps != null) {
@@ -209,12 +246,12 @@ class BuildTree extends core_data.BuildTree {
     }
 
     // integration point: apply custom builders
-    _customStylesBuilder(meta, e);
-    _customWidgetBuilder(meta, e);
+    _customStylesBuilder(meta);
 
     // stylings, step 2: get styles from `style` attribute
-    if (e.attributes.containsKey('style')) {
-      for (final pair in splitAttributeStyle(e.attributes['style'])) {
+    final attrs = meta.element.attributes;
+    if (attrs.containsKey('style')) {
+      for (final pair in splitAttributeStyle(attrs['style'])) {
         meta[pair.key] = pair.value;
       }
     }
@@ -229,24 +266,15 @@ class BuildTree extends core_data.BuildTree {
     }
 
     meta._sortBuildOps();
-
-    return meta;
   }
 
-  void _customStylesBuilder(BuildMetadata meta, dom.Element element) {
-    final map = customStylesBuilder?.call(element);
+  void _customStylesBuilder(BuildMetadata meta) {
+    final map = customStylesBuilder?.call(meta.element);
     if (map == null) return;
 
     for (final pair in map.entries) {
       meta[pair.key] = pair.value;
     }
-  }
-
-  void _customWidgetBuilder(BuildMetadata meta, dom.Element element) {
-    final built = customWidgetBuilder?.call(element);
-    if (built == null) return;
-
-    meta.register(BuildOp(onBuilt: (_, __) => [built]));
   }
 
   Iterable<WidgetPlaceholder> _flatten() {
@@ -279,39 +307,6 @@ class BuildTree extends core_data.BuildTree {
     }
 
     return widgets;
-  }
-
-  void _populateBits(dom.NodeList domNodes) {
-    for (final domNode in domNodes) {
-      if (domNode.nodeType == dom.Node.TEXT_NODE) {
-        _addText(domNode.text);
-        continue;
-      }
-      if (domNode.nodeType != dom.Node.ELEMENT_NODE) continue;
-
-      final meta = _collectMetadata(domNode);
-      if (meta.isNotRenderable == true) continue;
-
-      final subTree = sub(
-        meta.tsb(),
-        domNodes: domNode.nodes,
-        parentMeta: meta,
-        parentOps: _prepareParentOps(parentOps, meta),
-      );
-
-      if (meta.isBlockElement) {
-        for (final widget in subTree.build()) {
-          add(WidgetBit.block(this, widget));
-        }
-        subTree.detach();
-      }
-    }
-
-    if (parentMeta?.buildOps != null) {
-      for (final op in parentMeta.buildOps) {
-        op.onProcessed?.call(parentMeta, this);
-      }
-    }
   }
 }
 
