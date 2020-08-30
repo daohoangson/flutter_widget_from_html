@@ -33,8 +33,4 @@ class HeightPlaceholder extends WidgetPlaceholder<CssLength> {
     if (value > existing) return SizedBox(height: value);
     return child;
   }
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
-      'HeightPlaceholder($_heights)';
 }

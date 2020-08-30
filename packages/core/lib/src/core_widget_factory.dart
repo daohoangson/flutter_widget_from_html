@@ -585,29 +585,27 @@ class WidgetFactory {
       case kCssBorderBottom:
         final borderBottom = tryParseCssBorderSide(value);
         if (borderBottom != null) {
-          meta.register(TextStyleOps.textDecoBorderXxxOp(TextDeco(
+          meta.register(TextStyleOps.textDecoOp(TextDeco(
             color: borderBottom.color,
             under: true,
             style: borderBottom.style,
             thickness: borderBottom.width,
           )));
         } else {
-          meta.register(
-              TextStyleOps.textDecoBorderXxxOp(TextDeco(under: false)));
+          meta.register(TextStyleOps.textDecoOp(TextDeco(under: false)));
         }
         break;
       case kCssBorderTop:
         final borderTop = tryParseCssBorderSide(value);
         if (borderTop != null) {
-          meta.register(TextStyleOps.textDecoBorderXxxOp(TextDeco(
+          meta.register(TextStyleOps.textDecoOp(TextDeco(
             color: borderTop.color,
             over: true,
             style: borderTop.style,
             thickness: borderTop.width,
           )));
         } else {
-          meta.register(
-              TextStyleOps.textDecoBorderXxxOp(TextDeco(over: false)));
+          meta.register(TextStyleOps.textDecoOp(TextDeco(over: false)));
         }
         break;
 

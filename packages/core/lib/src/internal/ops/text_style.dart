@@ -112,7 +112,7 @@ class TextStyleOps {
     );
   }
 
-  static BuildOp textDecoBorderXxxOp(TextDeco v) => BuildOp(
+  static BuildOp textDecoOp(TextDeco v) => BuildOp(
         onProcessed: (meta, _) {
           if (!meta.isBlockElement) meta.tsb<TextDeco>(textDeco, v);
         },
