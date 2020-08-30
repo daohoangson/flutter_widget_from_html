@@ -8,9 +8,9 @@ class Flattener {
   final BuildTree tree;
 
   List<Flattened> _flattened;
-  List<Function> _builders;
   StringBuffer _buffer, _prevBuffer;
   _Recognizer _recognizer, _prevRecognizer;
+  List<dynamic> _spans;
   TextStyleBuilder _tsb, _prevTsb;
 
   Flattener(this.tree);
@@ -28,9 +28,9 @@ class Flattener {
   }
 
   void _resetLoop(TextStyleBuilder tsb) {
-    _builders = [];
     _buffer = StringBuffer();
     _recognizer = _Recognizer();
+    _spans = [];
     _tsb = tsb;
 
     _prevBuffer = _buffer;
@@ -40,34 +40,36 @@ class Flattener {
 
   void _loop(final BuildBit bit) {
     final tsb = _getBitTsb(bit);
-    if (_builders == null) _resetLoop(tsb);
+    if (_spans == null) _resetLoop(tsb);
 
     final thisTsb = tsb ?? _prevTsb;
     if (thisTsb?.hasSameStyleWith(_prevTsb) == false) _saveSpan();
 
     var built;
+    var isSpanBuilder = false;
     if (bit is BuildBit<Null>) {
       built = bit.buildBit(null);
     } else if (bit is BuildBit<GestureRecognizer>) {
       built = bit.buildBit(_prevRecognizer.value);
     } else if (bit is BuildBit<TextStyleHtml>) {
-      built = (context) => bit.buildBit(thisTsb?.build(context));
+      // ignore: omit_local_variable_types
+      final InlineSpan Function(BuildContext) spanBuilder =
+          (context) => bit.buildBit(thisTsb.build(context));
+      built = spanBuilder;
+      isSpanBuilder = true;
     } else if (bit is BuildBit<TextStyleBuilder>) {
       built = bit.buildBit(thisTsb);
     }
 
     if (built is GestureRecognizer) {
       _prevRecognizer.value = built;
-    } else if (built is InlineSpan) {
+    } else if (built is InlineSpan || isSpanBuilder) {
       _saveSpan();
-      _builders.add((_) => built);
+      _spans.add(built);
     } else if (built is String) {
       if (built != ' ' || !_loopShouldSkipWhitespace(bit)) {
         _prevBuffer.write(built);
       }
-    } else if (built is Function) {
-      _saveSpan();
-      _builders.add(built);
     } else if (built is Widget) {
       _completeLoop();
       _flattened.add(Flattened(widget: built));
@@ -79,7 +81,7 @@ class Flattener {
   bool _loopShouldSkipWhitespace(BuildBit bit) {
     // special handling for whitespaces
     if (_prevBuffer.isEmpty) {
-      if (_builders.isEmpty && _flattened.isEmpty) {
+      if (_spans.isEmpty && _flattened.isEmpty) {
         // skip leading whitespace
         return true;
       }
@@ -104,7 +106,7 @@ class Flattener {
       final scopedRecognizer = _prevRecognizer.value;
       final scopedTsb = _prevTsb;
       final scopedText = _prevBuffer.toString();
-      _builders.add((context) => TextSpan(
+      _spans.add((context) => TextSpan(
             recognizer: scopedRecognizer,
             style: scopedTsb?.build(context)?.styleWithHeight,
             text: scopedText,
@@ -119,22 +121,21 @@ class Flattener {
 
     Function builder;
     Widget widget;
-    if (_builders == null) {
+    if (_spans == null) {
       // intentionally left empty
-    } else if (_builders.isNotEmpty || _buffer.isNotEmpty) {
-      final scopedBuilders = _builders;
+    } else if (_spans.isNotEmpty || _buffer.isNotEmpty) {
+      final scopedSpans = _spans;
       final scopedRecognizer = _recognizer.value;
       final scopedTsb = _tsb;
       final scopedBuffer = _buffer.toString();
       final scopedText = scopedBuffer.replaceAll(RegExp('\n\$'), '');
-      if (scopedBuffer == '\n' && scopedBuilders.isEmpty) {
+      if (scopedBuffer == '\n' && scopedSpans.isEmpty) {
         // special handling for paragraph with only one line break
         widget = HeightPlaceholder(CssLength(1, CssLengthUnit.em), scopedTsb);
       } else {
         builder = (context) {
-          final children = scopedBuilders
-              .map((spanBuilder) => spanBuilder(context))
-              .whereType<InlineSpan>()
+          final children = scopedSpans
+              .map<InlineSpan>((s) => s is Function ? s.call(context) : s)
               .toList(growable: false);
           if (scopedText.isEmpty) {
             if (children.isEmpty) return null;
@@ -151,7 +152,7 @@ class Flattener {
       }
     }
 
-    _builders = null;
+    _spans = null;
     if (builder != null || widget != null) {
       _flattened.add(Flattened(builder: builder, widget: widget));
     }

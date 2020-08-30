@@ -78,7 +78,7 @@ abstract class BuildBit<T> {
   /// Supported input types:
   /// - [GestureRecognizer]
   /// - [Null]
-  /// - [TextStyleHtml]
+  /// - [TextStyleHtml] (output must be `InlineSpan`)
   /// - [TextStyleBuilder]
   ///
   /// Supported output types:
@@ -86,7 +86,6 @@ abstract class BuildBit<T> {
   /// - [InlineSpan]
   /// - [String]
   /// - [Widget]
-  /// - [InlineSpan] Function([BuildContext] context)
   ///
   /// Returning an unsupported type or `null` will not trigger any error.
   /// The output will be siliently ignored.

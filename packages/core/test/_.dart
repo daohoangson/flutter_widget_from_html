@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -270,13 +271,27 @@ class Explainer {
 
     final style = _textStyle(inlineSpan.style, parentStyle ?? _defaultStyle);
     final textSpan = inlineSpan is TextSpan ? inlineSpan : null;
-    final onTap = textSpan?.recognizer != null ? '+onTap' : '';
     final text = textSpan?.text ?? '';
     final children = textSpan?.children
             ?.map((c) => _inlineSpan(c, parentStyle: textSpan.style))
             ?.join('') ??
         '';
-    return '($style$onTap:$text$children)';
+
+    final recognizerSb = StringBuffer();
+    if (textSpan?.recognizer != null) {
+      final recognizer = textSpan.recognizer;
+      if (recognizer is TapGestureRecognizer) {
+        if (recognizer.onTap != null) recognizerSb.write('+onTap');
+        if (recognizer.onTapCancel != null) recognizerSb.write('+onTapCancel');
+      }
+
+      if (recognizerSb.isEmpty) {
+        recognizerSb
+            .write('+${textSpan.recognizer}'.replaceAll(RegExp(r'#\w+'), ''));
+      }
+    }
+
+    return '($style$recognizerSb:$text$children)';
   }
 
   String _limitBox(LimitedBox box) {
