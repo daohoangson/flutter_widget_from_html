@@ -198,8 +198,7 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
                 return CarouselSlider(
                   options: CarouselOptions(
                     autoPlay: true,
-                    autoPlayAnimationDuration:
-                        const Duration(milliseconds: 250),
+                    autoPlayAnimationDuration: const Duration(milliseconds: 250),
                     autoPlayInterval: const Duration(milliseconds: 1000),
                     enlargeCenterPage: true,
                     enlargeStrategy: CenterPageEnlargeStrategy.scale,
@@ -224,30 +223,30 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
 
 ### Custom `WidgetFactory`
 
-The HTML string is parsed into DOM elements and each element is visited once to populate a `BuildMetadata` and collect `BuiltPiece`s. See step by step how it works:
+The HTML string is parsed into DOM elements and each element is visited once to collect `BuildMetadata` and prepare `BuildBit`s. See step by step how it works:
 
 | Step | | Integration point |
 | --- | --- | --- |
-| 1 | Parse the tag and attributes map | `WidgetFactory.parse(BuildMetadata)` |
+| 1 | Parse | `WidgetFactory.parse(BuildMetadata)` |
 | 2 | Inform parents if any | `BuildOp.onChild(BuildMetadata)` |
 | 3 | Populate default inline styles | `BuildOp.defaultStyles(BuildMetadata)` |
 | 4 | `customStyleBuilder` / `customWidgetBuilder` will be called if configured | |
 | 5 | Parse inline style key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(BuildMetadata, String, String)` |
-| 6 | Repeat with children elements to collect `BuiltPiece`s | |
-| 7 | Inform build ops | `BuildOp.onPieces(BuildMetadata, Iterable<BuiltPiece>)` |
+| 6 | Loop through children elements to prepare `BuildBit`s | |
+| 7 | Inform build ops | `BuildOp.onProcessed(BuildMetadata, BuildTree)` |
 | 8 | a. If not a block element, go to 10 | |
-|   | b. Build widgets from pieces | |
-| 9 | Inform build ops | `BuildOp.onWidgets(BuildMetadata, Iterable<Widget>)` |
+|   | b. Build widgets from bits | |
+| 9 | Inform build ops | `BuildOp.onBuilt(BuildMetadata, Iterable<Widget>)` |
 | 10 | The end | |
 
 Notes:
 
 - Text related styling can be changed with `TextStyleBuilder`, just register your callback and it will be called when the build context is ready.
-  - The first parameter is a `TextStyleHtml` which is immutable and is calculated from the root down to your element, your callback must return a `TextStyleHtml` by calling `copyWith` or simply return the parent itself.
+  - The first parameter is a `TextStyleHtml` which is immutable and is calculated from the root down to each element, the callback must return a new `TextStyleHtml` by calling `copyWith`. It's recommended to return the same object if no change is needed.
   - Optionally, pass any object on registration and your callback will receive it as the second parameter.
 
 ```dart
-// simple callback: set text color to accent color
+// example 1: simple callback setting accent color from theme
 meta.tsb((parent, _) =>
   parent.copyWith(
     style: parent.style.copyWith(
@@ -255,30 +254,29 @@ meta.tsb((parent, _) =>
     ),
   ));
 
-// callback using second param: set height to input value
+// example 2: callback using second param to set height
 TextStyleHtml callback(TextStyleHtml parent, double value) =>
   parent.copyWith(height: value)
 
-// register with some value
-meta.tsb<int>(callback, 2);
+// example 2 (continue): register with some value
+meta.tsb<double>(callback, 2.0);
 ```
 
-- The root text styling can be customized by overriding `WidgetFactory.onRoot(TextStyleBuilder)`
+- The root styling can be customized by overriding `WidgetFactory.onRoot(TextStyleBuilder)`
 - Other complicated styling are supported via `BuildOp`
 
 ```dart
 meta.register(BuildOp(
-  onPieces: (meta, pieces) => pieces,
-  onWidgets: (meta, widgets) => widgets,
+  onProcessed: (meta, tree) {
+    tree.add(...);
+  },
+  onBuilt: (meta, widgets) => widgets.map((widget) => ...),
   ...,
   priority: 9999,
 ));
 ```
 
-- Each metadata can has multiple text style builder callbacks and build ops.
-- There are two types of `BuiltPiece`:
-  - `BuiltPiece.text()` contains a `TextBits`
-  - `BuiltPiece.widgets()` contains widgets
+- Each metadata may have as many tsb callbacks and build ops as needed.
 
 The example below replaces smilie inline image with an emoji:
 
