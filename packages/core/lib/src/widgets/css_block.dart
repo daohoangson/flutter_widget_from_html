@@ -1,7 +1,11 @@
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+/// A CSS block.
+///
+/// [child] widget's width will be stretched to match parent's.
 class CssBlock extends SingleChildRenderObjectWidget {
+  /// Creates a CSS block.
   const CssBlock({@required Widget child, Key key})
       : assert(child != null),
         super(child: child, key: key);

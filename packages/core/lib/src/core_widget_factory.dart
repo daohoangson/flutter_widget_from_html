@@ -7,7 +7,6 @@ import 'internal/core_parser.dart';
 import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_html_widget.dart';
-import 'internal/css_block.dart';
 
 /// A factory to build widgets.
 class WidgetFactory {
