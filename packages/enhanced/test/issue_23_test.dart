@@ -7,7 +7,7 @@ import '_.dart';
 
 const html = 'Above\n<blockquote>Foo</blockquote>\nBelow';
 
-class _BlockquoteWebViewWf extends WidgetFactory {
+class _BlockquoteWebView extends WidgetFactory {
   final blockquoteOp = BuildOp(
     onBuilt: (meta, _) => [
       WebView(
@@ -40,7 +40,7 @@ void main() {
       null,
       hw: HtmlWidget(
         html,
-        factoryBuilder: () => _BlockquoteWebViewWf(),
+        factoryBuilder: () => _BlockquoteWebView(),
         key: hwKey,
       ),
     );

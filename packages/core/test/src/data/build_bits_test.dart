@@ -6,7 +6,7 @@ import 'package:flutter_widget_from_html_core/src/internal/builder.dart'
     as builder;
 import 'package:test/test.dart';
 
-import '_.dart' as helper;
+import '../../_.dart' as helper;
 
 void main() {
   group('BuildBit', () {
