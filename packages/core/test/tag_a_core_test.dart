@@ -34,7 +34,7 @@ void main() {
   });
 
   testWidgets('renders complicated stylings', (WidgetTester tester) async {
-    final html = 'Hello <a href="$kHref">f<b>o<i>o</i></b> bar</a>.';
+    final html = 'Hello <a href="$kHref">f<b>o<i>o</i></b> <br /> bar</a>.';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -42,7 +42,7 @@ void main() {
             '(#FF0000FF+u+onTap:f)'
             '(#FF0000FF+u+b+onTap:o)'
             '(#FF0000FF+u+i+b+onTap:o)'
-            '(#FF0000FF+u+onTap: bar)'
+            '(#FF0000FF+u+onTap: \nbar)'
             '(:.)'
             ')]'));
   });

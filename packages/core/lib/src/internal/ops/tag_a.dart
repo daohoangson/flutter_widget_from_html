@@ -26,11 +26,11 @@ class TagA {
           if (onTap == null) return;
 
           for (final bit in tree.bits.toList(growable: false)) {
-            if (bit is TextBit) {
-              _TagABit(bit.parent, bit.tsb, onTap).insertAfter(bit);
-            } else if (bit is WidgetBit) {
+            if (bit is WidgetBit) {
               bit.child.wrapWith(
                   (_, child) => wf.buildGestureDetector(meta, child, onTap));
+            } else if (bit.tsb != null) {
+              _TagABit(bit.parent, bit.tsb, onTap).insertAfter(bit);
             }
           }
         },
