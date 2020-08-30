@@ -402,7 +402,15 @@ class WidgetFactory {
         meta.tsb(TextStyleOps.fontFamily, [kTagCodeFont1, kTagCodeFont2]);
         break;
       case kTagPre:
-        _tagPre ??= TagCode(this).preOp;
+        _tagPre ??= BuildOp(
+          defaultStyles: (_) =>
+              const {kCssFontFamily: '$kTagCodeFont1, $kTagCodeFont2'},
+          onProcessed: (meta, tree) =>
+              tree.replaceWith(TextBit(tree, meta.element.text, tsb: tree.tsb)),
+          onBuilt: (meta, widgets) => listOrNull(
+              buildColumnPlaceholder(meta, widgets)
+                  ?.wrapWith((_, w) => buildHorizontalScrollView(meta, w))),
+        );
         meta.register(_tagPre);
         break;
 
@@ -427,7 +435,16 @@ class WidgetFactory {
         break;
 
       case kTagFont:
-        _tagFont ??= TagFont(this).buildOp;
+        _tagFont ??= BuildOp(
+          defaultStyles: (meta) {
+            final attrs = meta.element.attributes;
+            return {
+              kCssColor: attrs[kAttributeFontColor],
+              kCssFontFamily: attrs[kAttributeFontFace],
+              kCssFontSize: kCssFontSizes[attrs[kAttributeFontSize]],
+            };
+          },
+        );
         meta.register(_tagFont);
         break;
 
@@ -629,11 +646,14 @@ class WidgetFactory {
             meta.isBlockElement = false;
             break;
           case kCssDisplayNone:
-            _styleDisplayNone ??= BuildOp(onProcessed: (_, tree) {
-              for (final bit in tree.bits.toList(growable: false)) {
-                bit.detach();
-              }
-            });
+            _styleDisplayNone ??= BuildOp(
+              onProcessed: (_, tree) {
+                for (final bit in tree.bits.toList(growable: false)) {
+                  bit.detach();
+                }
+              },
+              priority: 0,
+            );
             meta.register(_styleDisplayNone);
             break;
           case kCssDisplayTable:

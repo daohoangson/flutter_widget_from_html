@@ -4,6 +4,7 @@ import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core show WidgetFactory;
+import 'package:flutter_widget_from_html_core/src/internal/core_parser.dart';
 import 'package:flutter_widget_from_html_core/src/internal/core_ops.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -15,9 +16,9 @@ import 'html_widget.dart';
 /// A factory to build widgets with [WebView], [VideoPlayer], etc.
 class WidgetFactory extends core.WidgetFactory {
   State _state;
+  TextStyleHtml Function(TextStyleHtml, dynamic) _tagA;
   BuildOp _tagIframe;
   BuildOp _tagSvg;
-  TextStyleHtml Function(TextStyleHtml, dynamic) _tsbTagA;
 
   HtmlWidget get _widget => _state.widget;
 
@@ -248,21 +249,32 @@ class WidgetFactory extends core.WidgetFactory {
   void parse(BuildMetadata meta) {
     switch (meta.element.localName) {
       case 'a':
-        _tsbTagA ??= (p, _) => p.copyWith(
-            style: p.style
-                .copyWith(color: p.getDependency<ThemeData>().accentColor));
-        meta.tsb(_tsbTagA);
+        _tagA ??= (tsh, _) => tsh.copyWith(
+            style: tsh.style
+                .copyWith(color: tsh.getDependency<ThemeData>().accentColor));
+        meta.tsb(_tagA);
         break;
       case kTagIframe:
-        _tagIframe ??= TagIframe(this).buildOp;
+        _tagIframe ??= BuildOp(onBuilt: (meta, _) {
+          final attrs = meta.element.attributes;
+          final src = urlFull(attrs[kAttributeIframeSrc]);
+          if (src == null) return null;
+
+          return listOrNull(buildWebView(
+            meta,
+            src,
+            height: tryParseDoubleFromMap(attrs, kAttributeIframeHeight),
+            width: tryParseDoubleFromMap(attrs, kAttributeIframeWidth),
+          ));
+        });
         meta.register(_tagIframe);
-        // return asap to avoid being disabled by core
-        return;
-      case kTagSvg:
-        _tagSvg ??= TagSvg(this).buildOp;
+        break;
+      case 'svg':
+        _tagSvg ??= BuildOp(
+          onBuilt: (meta, _) => [SvgPicture.string(meta.element.outerHtml)],
+        );
         meta.register(_tagSvg);
-        // return asap to avoid being disabled by core
-        return;
+        break;
       case kTagVideo:
         meta.register(TagVideo(this, meta).op);
         break;
