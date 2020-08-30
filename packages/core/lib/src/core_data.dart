@@ -19,9 +19,6 @@ abstract class BuildMetadata {
 
   final TextStyleBuilder _tsb;
 
-  /// Controls whether the node is renderable.
-  bool isNotRenderable;
-
   /// Creates a node.
   BuildMetadata(this.element, this._tsb);
 

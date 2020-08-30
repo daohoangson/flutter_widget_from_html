@@ -13,6 +13,7 @@ import 'internal/css_block.dart';
 class WidgetFactory {
   BuildOp _styleBgColor;
   BuildOp _styleDisplayBlock;
+  BuildOp _styleDisplayNone;
   BuildOp _styleMargin;
   BuildOp _stylePadding;
   BuildOp _styleSizing;
@@ -485,8 +486,8 @@ class WidgetFactory {
       case 'style':
       case 'svg':
         // actually `script` and `style` are not required here
-        // our parser will put those elements into document.head anyway
-        meta.isNotRenderable = true;
+        // the parser will put those elements into document.head anyway
+        meta[kCssDisplay] = kCssDisplayNone;
         break;
 
       case kTagImg:
@@ -628,7 +629,12 @@ class WidgetFactory {
             meta.isBlockElement = false;
             break;
           case kCssDisplayNone:
-            meta.isNotRenderable = true;
+            _styleDisplayNone ??= BuildOp(onProcessed: (_, tree) {
+              for (final bit in tree.bits.toList(growable: false)) {
+                bit.detach();
+              }
+            });
+            meta.register(_styleDisplayNone);
             break;
           case kCssDisplayTable:
             meta.register(TagTable(this, meta).op);

@@ -46,13 +46,16 @@ class BuildMetadata extends core_data.BuildMetadata {
   }
 
   @override
-  set isBlockElement(bool value) => _isBlockElement = value;
+  set isBlockElement(bool value) {
+    assert(!_buildOpsIsLocked, 'Metadata can no longer be changed.');
+    _isBlockElement = value;
+  }
 
   @override
   operator []=(String key, String value) {
     if (key == null || value == null) return;
 
-    assert(!_stylesIsLocked);
+    assert(!_stylesIsLocked, 'Metadata can no longer be changed.');
     _styles ??= [];
     _styles..add(key)..add(value);
   }
@@ -61,7 +64,7 @@ class BuildMetadata extends core_data.BuildMetadata {
   void register(BuildOp op) {
     if (op == null) return;
 
-    assert(!_buildOpsIsLocked);
+    assert(!_buildOpsIsLocked, 'Metadata can no longer be changed.');
     _buildOps ??= [];
     if (!buildOps.contains(op)) _buildOps.add(op);
   }
@@ -178,7 +181,6 @@ class BuildTree extends core_data.BuildTree {
     if (customWidget != null) meta.isBlockElement = true;
 
     _collectMetadata(meta);
-    if (meta.isNotRenderable == true) return;
 
     final subTree = sub(
       meta.tsb(),
