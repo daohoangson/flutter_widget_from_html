@@ -172,6 +172,24 @@ void main() {
       });
     });
 
+    group('build', () {
+      test('builds RichText', () {
+        final text = _text();
+        text.addText('1');
+
+        final widgets = text.build();
+        expect(widgets.length, equals(1));
+      });
+
+      test('builds via buildBit(null)', () {
+        final text = _text();
+        text.addText('1');
+
+        final widgets = text.buildBit(null);
+        expect(widgets.length, equals(1));
+      });
+    });
+
     test('replaces', () {
       final text = _text();
       text.addText('1');

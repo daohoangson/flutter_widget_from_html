@@ -198,9 +198,6 @@ class Flattened {
   final Widget widget;
 
   Flattened({this.builder, this.widget});
-
-  @override
-  String toString() => (widget ?? builder).toString();
 }
 
 /// A mutable recognizer.
