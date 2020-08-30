@@ -26,6 +26,10 @@ class _TagQBit extends BuildBit<Null> {
   BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
       _TagQBit(parent ?? this.parent, tsb ?? this.tsb, isOpening);
 
+  @override
+  String toString() =>
+      'QBit.${isOpening ? "opening" : "closing"}#$hashCode $tsb';
+
   static _TagQBit closing(BuildTree parent) =>
       _TagQBit(parent, parent.tsb, false);
 

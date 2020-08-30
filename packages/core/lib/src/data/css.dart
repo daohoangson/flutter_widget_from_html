@@ -64,6 +64,10 @@ class CssLength {
 
     return value;
   }
+
+  @override
+  String toString() =>
+      number.toString() + unit.toString().replaceAll('CssLengthUnit.', '');
 }
 
 /// A set of length measurements.

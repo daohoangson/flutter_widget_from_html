@@ -153,7 +153,7 @@ void main() {
               ']'));
     });
 
-    testWidgets('renders new line between DIVs, 1 of 2', (tester) async {
+    testWidgets('renders new line between DIVs, 1 of 3', (tester) async {
       final html = '<div>1<br /></div><div>2</div>';
       final explained = await explain(tester, html);
       expect(
@@ -164,7 +164,7 @@ void main() {
               ']'));
     });
 
-    testWidgets('renders new line between DIVs, 2 of 2', (tester) async {
+    testWidgets('renders new line between DIVs, 2 of 3', (tester) async {
       final html = '<div>1</div><br /><div>2</div>';
       final explained = await explain(tester, html);
       expect(
@@ -174,6 +174,28 @@ void main() {
               '[SizedBox:0.0x10.0],'
               '[CssBlock:child=[RichText:(:2)]]'
               ']'));
+    });
+
+    testWidgets('renders new line between DIVs, 3 of 3', (tester) async {
+      final html = '<div>1</div><br /><div>2</div>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+          explained,
+          equals('TshWidget\n'
+              '└ColumnPlaceholder(BuildMetadata(root))\n'
+              ' └Column()\n'
+              '  ├WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+              '  ││  "1"\n'
+              '  ││)\n'
+              '  │└CssBlock()\n'
+              '  │ └RichText(text: "1")\n'
+              '  ├HeightPlaceholder(1.0em)\n'
+              '  │└SizedBox(height: 10.0)\n'
+              '  └WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#2):\n'
+              '   │  "2"\n'
+              '   │)\n'
+              '   └CssBlock()\n'
+              '    └RichText(text: "2")\n\n'));
     });
 
     testWidgets('renders without new line at bottom, 1 of 3', (tester) async {
@@ -215,61 +237,6 @@ void main() {
         equals(
             '[CssBlock:child=[DecoratedBox:bg=#FF000000,child=[SizedBox:0.0x1.0]]],'
             '[SizedBox:0.0x10.0]'));
-  });
-
-  group('Q tag', () {
-    testWidgets('renders quotes', (WidgetTester tester) async {
-      final html = 'Someone said <q>Foo</q>.';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Someone said “Foo”.)]'));
-    });
-
-    testWidgets('renders quotes without contents', (WidgetTester tester) async {
-      final html = 'x<q></q>y';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:x“”y)]'));
-    });
-
-    testWidgets('renders quotes alone', (WidgetTester tester) async {
-      final html = '<q></q>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:“”)]'));
-    });
-
-    testWidgets(
-      'renders quotes around IMG',
-      (tester) => mockNetworkImagesFor(() async {
-        final src = 'http://domain.com/image.png';
-        final html = '<q><img src="$src" /></q>';
-        final explained = await explain(tester, html);
-        expect(
-            explained,
-            equals('[RichText:(:“'
-                '[Image:image=NetworkImage("$src", scale: 1.0)]'
-                '(:”))]'));
-      }),
-    );
-
-    testWidgets('renders styling', (WidgetTester tester) async {
-      final html = 'Someone said <q><em>Foo</em></q>.';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Someone said (+i:“Foo”)(:.))]'));
-    });
-
-    testWidgets('renders complicated styling', (WidgetTester tester) async {
-      final html = 'Someone said <q><u><em>F</em>o<b>o</b></u></q>.';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals('[RichText:(:Someone said (+u+i:“F)(+u:o)(+u+b:o”)(:.))]'),
-      );
-    });
-
-    testWidgets('renders within vertical-align middle', (tester) async {
-      final html = '<span style="vertical-align: middle"><q>Foo</q></span>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:[RichText:(:“Foo”)]@middle]'));
-    });
   });
 
   group('block elements', () {

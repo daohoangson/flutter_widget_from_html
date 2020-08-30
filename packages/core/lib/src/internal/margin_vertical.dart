@@ -4,15 +4,23 @@ import '../core_data.dart';
 import '../core_helpers.dart';
 
 class HeightPlaceholder extends WidgetPlaceholder<CssLength> {
-  final CssLength height;
   final TextStyleBuilder tsb;
 
-  HeightPlaceholder(this.height, this.tsb) : super(height) {
+  final List<CssLength> _heights = [];
+
+  HeightPlaceholder(CssLength height, this.tsb) : super(height) {
     super.wrapWith((c, w) => _build(c, w, height, tsb));
+    _heights.add(height);
   }
 
-  void mergeWith(HeightPlaceholder other) =>
-      super.wrapWith((c, w) => _build(c, w, other.height, other.tsb));
+  CssLength get height => _heights.first;
+
+  void mergeWith(HeightPlaceholder other) {
+    final height = other.height;
+    _heights.add(height);
+
+    super.wrapWith((c, w) => _build(c, w, height, other.tsb));
+  }
 
   @override
   HeightPlaceholder wrapWith(Widget Function(BuildContext, Widget) builder) =>
@@ -25,4 +33,8 @@ class HeightPlaceholder extends WidgetPlaceholder<CssLength> {
     if (value > existing) return SizedBox(height: value);
     return child;
   }
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
+      'HeightPlaceholder($_heights)';
 }
