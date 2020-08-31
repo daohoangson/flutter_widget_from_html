@@ -6,6 +6,8 @@ import 'core_html_widget.dart';
 
 export 'widgets/css_block.dart';
 export 'widgets/css_sizing.dart';
+export 'widgets/html_ruby.dart';
+
 /// The default character threshold to build widget tree asynchronously.
 ///
 /// Related: [HtmlWidget.buildAsync]

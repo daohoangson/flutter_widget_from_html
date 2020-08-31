@@ -8,7 +8,7 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[RichText:[_RubyWidget:children='
+        equals('[RichText:[HtmlRuby:children='
             '[RichText:(:明日)],'
             '[RichText:(@5.0:Ashita)]'
             ']@middle]'));
@@ -20,7 +20,7 @@ void main() {
     expect(
         explained,
         equals('[RichText:(:'
-            '[_RubyWidget:children=[RichText:(:ruby)],[RichText:(@5.0:rt)]]@middle'
+            '[HtmlRuby:children=[RichText:(:ruby)],[RichText:(@5.0:rt)]]@middle'
             '(: foo)'
             ')]'));
   });
@@ -31,8 +31,8 @@ void main() {
     expect(
         explained,
         equals('[RichText:(:'
-            '[_RubyWidget:children=[RichText:(:漢)],[RichText:(@5.0:かん)]]@middle'
-            '[_RubyWidget:children=[RichText:(:字)],[RichText:(@5.0:じ)]]@middle'
+            '[HtmlRuby:children=[RichText:(:漢)],[RichText:(@5.0:かん)]]@middle'
+            '[HtmlRuby:children=[RichText:(:字)],[RichText:(@5.0:じ)]]@middle'
             ')]'));
   });
 
@@ -42,9 +42,9 @@ void main() {
     expect(
         explained,
         equals('[RichText:(:'
-            '[_RubyWidget:children=[RichText:(:漢)],[RichText:(@5.0:かん)]]@middle'
+            '[HtmlRuby:children=[RichText:(:漢)],[RichText:(@5.0:かん)]]@middle'
             '(: )'
-            '[_RubyWidget:children=[RichText:(:字)],[RichText:(@5.0:じ)]]@middle'
+            '[HtmlRuby:children=[RichText:(:字)],[RichText:(@5.0:じ)]]@middle'
             ')]'));
   });
 
@@ -56,9 +56,9 @@ void main() {
       expect(
           explained,
           equals('[RichText:'
-              '[_RubyWidget:children='
-              '[RichText:[_RubyWidget:children=[RichText:(:ruby1)],[RichText:(@5.0:ruby2)]]@middle],'
-              '[RichText:[_RubyWidget:children=[RichText:(@5.0:rt1)],[RichText:(@2.5:rt2)]]@middle]'
+              '[HtmlRuby:children='
+              '[RichText:[HtmlRuby:children=[RichText:(:ruby1)],[RichText:(@5.0:ruby2)]]@middle],'
+              '[RichText:[HtmlRuby:children=[RichText:(@5.0:rt1)],[RichText:(@2.5:rt2)]]@middle]'
               ']@middle'
               ']'));
     });
@@ -69,7 +69,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:[_RubyWidget:children='
+          equals('[RichText:[HtmlRuby:children='
               '[RichText:(#FF0000FF+u+onTap:foo)],'
               '[RichText:(#FF0000FF+u@5.0+onTap:bar)]'
               ']@middle]'));
@@ -80,7 +80,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[RichText:[_RubyWidget:children='
+          equals('[RichText:[HtmlRuby:children='
               '[RichText:(:“foo”)],'
               '[RichText:(@5.0:“bar”)]'
               ']@middle]'));
