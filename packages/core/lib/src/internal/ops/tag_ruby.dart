@@ -55,24 +55,24 @@ class TagRuby {
       }
 
       final rtBit = bit as _RtBit;
+      final rtTree = rtBit.tree;
       final rubyTree = tree.sub();
-      final placeholder =
-          WidgetPlaceholder<List<BuildTree>>([rubyTree, rtBit.tree])
-            ..wrapWith((context, __) {
-              final tsh = rubyTree.tsb.build(context);
+      final placeholder = WidgetPlaceholder<List<BuildTree>>([rubyTree, rtTree])
+        ..wrapWith((context, __) {
+          final tsh = rubyTree.tsb.build(context);
 
-              final ruby = wf.buildColumnWidget(
-                  rubyMeta, tsh, rubyTree.build().toList(growable: false));
-              final rt = wf.buildColumnWidget(
-                  rtBit.meta, tsh, rtBit.tree.build().toList(growable: false));
+          final ruby = wf.buildColumnWidget(
+              rubyMeta, tsh, rubyTree.build().toList(growable: false));
+          final rt = wf.buildColumnWidget(
+              rtBit.meta, tsh, rtTree.build().toList(growable: false));
 
-              return HtmlRuby(ruby ?? widget0, rt ?? widget0);
-            });
+          return HtmlRuby(ruby ?? widget0, rt ?? widget0);
+        });
 
-      final anchorBit = rubyBits.first;
-      WidgetBit.inline(anchorBit.parent, placeholder,
+      final anchor = rubyBits.first;
+      WidgetBit.inline(anchor.parent, placeholder,
               alignment: PlaceholderAlignment.middle)
-          .insertBefore(anchorBit);
+          .insertBefore(anchor);
 
       for (final rubyBit in rubyBits) {
         rubyTree.add(rubyBit.copyWith(parent: rubyTree));

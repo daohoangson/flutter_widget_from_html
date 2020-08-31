@@ -238,7 +238,6 @@ class BuildTree extends core_data.BuildTree {
       }
     }
 
-    // integration point: apply custom builders
     _customStylesBuilder(meta);
 
     // stylings, step 2: get styles from `style` attribute
