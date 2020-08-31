@@ -49,7 +49,7 @@ class TagA {
   }
 }
 
-class _TagABit extends BuildBit<GestureRecognizer> {
+class _TagABit extends BuildBit<GestureRecognizer, GestureRecognizer> {
   final GestureTapCallback onTap;
 
   _TagABit(BuildTree parent, TextStyleBuilder tsb, this.onTap)

@@ -115,7 +115,7 @@ void main() {
       testWidgets('returns InlineSpan', (WidgetTester tester) async {
         final html = '1 <span class="output--InlineSpan">2</span> 3';
         final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:1 2(:foo)(: 3))]'));
+        expect(explained, equals('[RichText:(:1 2[Text:foo]@bottom(: 3))]'));
       });
 
       testWidgets('returns String', (WidgetTester tester) async {
@@ -442,7 +442,7 @@ class _BuildBitWidgetFactory extends WidgetFactory {
   }
 }
 
-class _InputBuildContextBit extends BuildBit<BuildContext> {
+class _InputBuildContextBit extends BuildBit<BuildContext, Widget> {
   _InputBuildContextBit(BuildTree parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
@@ -454,7 +454,7 @@ class _InputBuildContextBit extends BuildBit<BuildContext> {
       _InputBuildContextBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _InputGestureRecognizerBit extends BuildBit<GestureRecognizer> {
+class _InputGestureRecognizerBit extends BuildBit<GestureRecognizer, dynamic> {
   _InputGestureRecognizerBit(BuildTree parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
@@ -473,7 +473,7 @@ class _InputGestureRecognizerBit extends BuildBit<GestureRecognizer> {
       _InputGestureRecognizerBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _InputNullBit extends BuildBit<Null> {
+class _InputNullBit extends BuildBit<Null, dynamic> {
   _InputNullBit(BuildTree parent, TextStyleBuilder tsb) : super(parent, tsb);
 
   @override
@@ -484,7 +484,7 @@ class _InputNullBit extends BuildBit<Null> {
       _InputNullBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml> {
+class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {
   _InputTextStyleHtmlBit(BuildTree parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
@@ -499,7 +499,7 @@ class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml> {
       _InputTextStyleHtmlBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _OutputBuildTreeBit extends BuildBit<Null> {
+class _OutputBuildTreeBit extends BuildBit<Null, BuildTree> {
   final BuildTree tree;
 
   _OutputBuildTreeBit(BuildTree parent, TextStyleBuilder tsb)
@@ -518,7 +518,7 @@ class _OutputBuildTreeBit extends BuildBit<Null> {
       _OutputBuildTreeBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _OutputGestureRecognizerBit extends BuildBit<Null> {
+class _OutputGestureRecognizerBit extends BuildBit<Null, GestureRecognizer> {
   _OutputGestureRecognizerBit(BuildTree parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
@@ -530,22 +530,19 @@ class _OutputGestureRecognizerBit extends BuildBit<Null> {
       _OutputGestureRecognizerBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _OutputInlineSpanBit extends BuildBit<TextStyleHtml> {
+class _OutputInlineSpanBit extends BuildBit<Null, InlineSpan> {
   _OutputInlineSpanBit(BuildTree parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
-  InlineSpan buildBit(TextStyleHtml tsh) => TextSpan(
-        text: 'foo',
-        style: tsh.styleWithHeight,
-      );
+  InlineSpan buildBit(Null _) => WidgetSpan(child: Text('foo'));
 
   @override
   BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
       _OutputInlineSpanBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _OutputStringBit extends BuildBit<Null> {
+class _OutputStringBit extends BuildBit<Null, String> {
   _OutputStringBit(BuildTree parent, TextStyleBuilder tsb) : super(parent, tsb);
 
   @override
@@ -556,7 +553,7 @@ class _OutputStringBit extends BuildBit<Null> {
       _OutputStringBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _OutputWidgetBit extends BuildBit<Null> {
+class _OutputWidgetBit extends BuildBit<Null, Widget> {
   _OutputWidgetBit(BuildTree parent, TextStyleBuilder tsb) : super(parent, tsb);
 
   @override
@@ -568,8 +565,8 @@ class _OutputWidgetBit extends BuildBit<Null> {
 }
 
 String _data(BuildTree text) => text.bits
-    .map((bit) => (bit is BuildBit<void>)
-        ? bit.buildBit(null).toString()
+    .map((bit) => (bit is BuildBit<Null, String>)
+        ? bit.buildBit(null)
         : '[$bit]'.replaceAll(RegExp(r'#\w+'), ''))
     .join('');
 

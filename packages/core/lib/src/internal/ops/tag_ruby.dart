@@ -84,7 +84,7 @@ class TagRuby {
   }
 }
 
-class _RtBit extends BuildBit<Null> {
+class _RtBit extends BuildBit<Null, BuildTree> {
   final BuildMetadata meta;
   final BuildTree tree;
 

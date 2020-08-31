@@ -13,7 +13,7 @@ class TagQ {
       );
 }
 
-class _TagQBit extends BuildBit<Null> {
+class _TagQBit extends BuildBit<Null, String> {
   final bool isOpening;
 
   _TagQBit(BuildTree parent, TextStyleBuilder tsb, this.isOpening)

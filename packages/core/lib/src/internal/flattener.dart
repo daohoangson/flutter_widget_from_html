@@ -48,15 +48,15 @@ class Flattener {
     if (thisTsb?.hasSameStyleWith(_prevTsb) == false) _saveSpan();
 
     var built;
-    if (bit is BuildBit<Null>) {
+    if (bit is BuildBit<Null, dynamic>) {
       built = bit.buildBit(null);
-    } else if (bit is BuildBit<BuildContext>) {
+    } else if (bit is BuildBit<BuildContext, Widget>) {
       // ignore: omit_local_variable_types
       final WidgetBuilder widgetBuilder = (c) => bit.buildBit(c);
       built = widgetBuilder;
-    } else if (bit is BuildBit<GestureRecognizer>) {
+    } else if (bit is BuildBit<GestureRecognizer, dynamic>) {
       built = bit.buildBit(_prevRecognizer.value);
-    } else if (bit is BuildBit<TextStyleHtml>) {
+    } else if (bit is BuildBit<TextStyleHtml, InlineSpan>) {
       // ignore: omit_local_variable_types
       final SpanBuilder spanBuilder = (c) => bit.buildBit(thisTsb.build(c));
       built = spanBuilder;

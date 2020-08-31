@@ -2,9 +2,9 @@ part of '../core_data.dart';
 
 /// A piece of HTML being built.
 ///
-/// See [buildBit] for supported input types.
+/// See [buildBit] for supported input and output types.
 @immutable
-abstract class BuildBit<T> {
+abstract class BuildBit<InputType, OutputType> {
   /// The container tree.
   final BuildTree parent;
 
@@ -98,7 +98,7 @@ abstract class BuildBit<T> {
   ///
   /// Returning an unsupported type or `null` will not trigger any error.
   /// The output will be siliently ignored.
-  dynamic buildBit(T input);
+  OutputType buildBit(InputType input);
 
   /// Creates a copy with the given fields replaced with the new values.
   BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb});
@@ -137,7 +137,7 @@ abstract class BuildBit<T> {
 }
 
 /// A tree of [BuildBit]s.
-abstract class BuildTree extends BuildBit<Null> {
+abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
   final _children = <BuildBit>[];
   final _toStringBuffer = StringBuffer();
 
@@ -253,7 +253,7 @@ abstract class BuildTree extends BuildBit<Null> {
 }
 
 /// A simple text bit.
-class TextBit extends BuildBit<Null> {
+class TextBit extends BuildBit<Null, String> {
   final String data;
 
   TextBit._(BuildTree parent, TextStyleBuilder tsb, this.data)
@@ -275,7 +275,7 @@ class TextBit extends BuildBit<Null> {
 }
 
 /// A widget bit.
-class WidgetBit<T> extends BuildBit<Null> {
+class WidgetBit<T> extends BuildBit<Null, dynamic> {
   /// See [PlaceholderSpan.alignment].
   final PlaceholderAlignment alignment;
 
@@ -336,7 +336,7 @@ class WidgetBit<T> extends BuildBit<Null> {
       'WidgetBit.${isBlock ? "block" : "inline"}#$hashCode $child';
 }
 
-class _TextNewLine extends BuildBit<Null> {
+class _TextNewLine extends BuildBit<Null, String> {
   _TextNewLine(BuildTree parent, TextStyleBuilder tsb) : super(parent, tsb);
 
   @override
@@ -350,7 +350,7 @@ class _TextNewLine extends BuildBit<Null> {
       _TextNewLine(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _TextWhitespace extends BuildBit<Null> {
+class _TextWhitespace extends BuildBit<Null, String> {
   _TextWhitespace(BuildTree parent) : super(parent, null);
 
   @override
