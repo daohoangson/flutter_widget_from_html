@@ -3,15 +3,51 @@ import 'package:flutter_test/flutter_test.dart';
 import '_.dart';
 
 void main() {
-  testWidgets('renders with RT', (WidgetTester tester) async {
+  group('basic usage', () {
     final html = '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>';
-    final explained = await explain(tester, html);
-    expect(
-        explained,
-        equals('[RichText:[HtmlRuby:children='
-            '[RichText:(:明日)],'
-            '[RichText:(@5.0:Ashita)]'
-            ']@middle]'));
+
+    testWidgets('renders', (WidgetTester tester) async {
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[RichText:[HtmlRuby:children='
+              '[RichText:(:明日)],'
+              '[RichText:(@5.0:Ashita)]'
+              ']@middle]'));
+    });
+
+    testWidgets('useExplainer=false', (WidgetTester tester) async {
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+          explained,
+          equals('TshWidget\n'
+              '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
+              ' │  BuildTree#2 tsb#3(parent=#1):\n'
+              ' │    WidgetBit.inline#4 WidgetPlaceholder([BuildTree#5 tsb#6(parent=#3):\n'
+              ' │      "明日"\n'
+              ' │      Whitespace#7, BuildTree#8 tsb#9(parent=#3):\n'
+              ' │      "Ashita"])\n'
+              ' │    BuildTree#10 tsb#11(parent=#3):\n'
+              ' │    BuildTree#12 tsb#9(parent=#3):\n'
+              ' │    BuildTree#13 tsb#14(parent=#3):\n'
+              ' │)\n'
+              ' └RichText(text: "￼")\n'
+              '  └WidgetPlaceholder<List<BuildTree>>([BuildTree#5 tsb#6(parent=#3):\n'
+              '   │  "明日"\n'
+              '   │  Whitespace#7, BuildTree#8 tsb#9(parent=#3):\n'
+              '   │  "Ashita"]\n'
+              '   │)\n'
+              '   └HtmlRuby()\n'
+              '    ├WidgetPlaceholder<BuildTree>(BuildTree#5 tsb#6(parent=#3):\n'
+              '    ││  "明日"\n'
+              '    ││  Whitespace#7\n'
+              '    ││)\n'
+              '    │└RichText(text: "明日")\n'
+              '    └WidgetPlaceholder<BuildTree>(BuildTree#8 tsb#9(parent=#3):\n'
+              '     │  "Ashita"\n'
+              '     │)\n'
+              '     └RichText(text: "Ashita")\n\n'));
+    });
   });
 
   testWidgets('renders text after RT', (WidgetTester tester) async {

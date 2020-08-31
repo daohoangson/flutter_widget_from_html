@@ -7,7 +7,7 @@ const kHref = 'http://domain.com/href';
 const kImgSrc = 'http://domain.com/image.png';
 
 void main() {
-  group('basic link', () {
+  group('basic usage', () {
     final html = '<a href="$kHref">Foo</a>';
 
     testWidgets('renders', (WidgetTester tester) async {

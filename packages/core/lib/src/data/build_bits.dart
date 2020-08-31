@@ -103,7 +103,7 @@ abstract class BuildBit<InputType, OutputType> {
   /// Creates a copy with the given fields replaced with the new values.
   BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb});
 
-  /// Removes self from the parent.
+  /// Removes self from [parent].
   bool detach() => parent?._children?.remove(this);
 
   /// Inserts self after [another] in the tree.
@@ -144,7 +144,7 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
   /// Creates a tree.
   BuildTree(BuildTree parent, TextStyleBuilder tsb) : super(parent, tsb);
 
-  /// The list of bits including direct children and their children.
+  /// The list of bits including direct children and sub-tree's.
   Iterable<BuildBit> get bits sync* {
     for (final child in _children) {
       if (child is BuildTree) {
@@ -188,20 +188,20 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
     return null;
   }
 
-  /// Adds [bit] to the tail of this tree.
+  /// Adds [bit] as the last bit.
   BuildBit add(BuildBit bit) {
     assert(bit.parent == this);
     _children.add(bit);
     return bit;
   }
 
-  /// Adds a new line to the tail of this tree.
+  /// Adds a new line.
   BuildBit addNewLine() => add(_TextNewLine(this, tsb));
 
-  /// Adds a new whitespace to the tail of this tree.
+  /// Adds a whitespace.
   BuildBit addWhitespace() => add(_TextWhitespace(this));
 
-  /// Adds a string to the tail of this tree.
+  /// Adds a string of text.
   TextBit addText(String data) => add(TextBit(this, data));
 
   /// Builds widgets from bits.
@@ -219,7 +219,7 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
     return copied;
   }
 
-  /// Replaces children bits with [another].
+  /// Replaces all children bits with [another].
   void replaceWith(BuildBit another) {
     assert(another.parent == this);
     _children
@@ -293,7 +293,7 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
     this.baseline,
   ]) : super(parent, tsb);
 
-  /// Creates an block widget.
+  /// Creates a block widget.
   factory WidgetBit.block(
     BuildTree parent,
     Widget child, {

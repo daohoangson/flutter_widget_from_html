@@ -4,7 +4,7 @@ import 'package:network_image_mock/network_image_mock.dart';
 import '_.dart';
 
 void main() {
-  group('basic quote', () {
+  group('basic usage', () {
     final html = 'Someone said <q>Foo</q>.';
 
     testWidgets('renders quotes', (WidgetTester tester) async {
