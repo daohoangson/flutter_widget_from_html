@@ -146,20 +146,11 @@ class BuildTree extends core_data.BuildTree {
   }
 
   @override
-  BuildBit copyWith({core_data.BuildTree parent, TextStyleBuilder tsb}) {
-    final copied = sub(tsb, parent: parent);
-    for (final bit in bits) {
-      copied.add(bit.copyWith(parent: copied));
-    }
-    return copied;
-  }
-
-  @override
-  BuildTree sub(
-    TextStyleBuilder tsb, {
-    BuildTree parent,
+  BuildTree sub({
+    core_data.BuildTree parent,
     BuildMetadata parentMeta,
     Iterable<BuildOp> parentOps,
+    TextStyleBuilder tsb,
   }) =>
       BuildTree(
         customStylesBuilder: customStylesBuilder,
@@ -183,9 +174,9 @@ class BuildTree extends core_data.BuildTree {
     _collectMetadata(meta);
 
     final subTree = sub(
-      meta.tsb(),
       parentMeta: meta,
       parentOps: _prepareParentOps(parentOps, meta),
+      tsb: meta.tsb(),
     );
     add(subTree);
 
@@ -284,28 +275,32 @@ class BuildTree extends core_data.BuildTree {
 
     for (final flattened in Flattener(this).flatten()) {
       if (flattened.widget != null) {
-        widgets.add(flattened.widget);
+        widgets.add(WidgetPlaceholder.lazy(flattened.widget));
         continue;
       }
 
-      if (flattened.builder == null) continue;
-      widgets.add(
-        WidgetPlaceholder<BuildTree>(this).wrapWith((context, _) {
-          final span = flattened.builder(context);
-          if (span == null || span is! InlineSpan) return widget0;
+      if (flattened.widgetBuilder != null) {
+        widgets.add(WidgetPlaceholder<BuildTree>(this)
+            .wrapWith((context, _) => flattened.widgetBuilder(context)));
+        continue;
+      }
 
-          final tsh = tsb?.build(context);
-          final textAlign = tsh?.textAlign ?? TextAlign.start;
+      if (flattened.spanBuilder == null) continue;
+      widgets.add(WidgetPlaceholder<BuildTree>(this).wrapWith((context, _) {
+        final span = flattened.spanBuilder(context);
+        if (span == null || span is! InlineSpan) return widget0;
 
-          if (span is WidgetSpan &&
-              span.alignment == PlaceholderAlignment.baseline &&
-              textAlign == TextAlign.start) {
-            return span.child;
-          }
+        final tsh = tsb?.build(context);
+        final textAlign = tsh?.textAlign ?? TextAlign.start;
 
-          return wf.buildText(parentMeta, tsh, span);
-        }),
-      );
+        if (span is WidgetSpan &&
+            span.alignment == PlaceholderAlignment.baseline &&
+            textAlign == TextAlign.start) {
+          return span.child;
+        }
+
+        return wf.buildText(parentMeta, tsh, span);
+      }));
     }
 
     return widgets;

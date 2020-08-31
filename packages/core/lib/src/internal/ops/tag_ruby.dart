@@ -92,7 +92,7 @@ class _RtBit extends BuildBit<Null> {
       : super(parent, tsb);
 
   @override
-  void buildBit(Null _) => '';
+  BuildTree buildBit(Null _) => tree;
 
   @override
   BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>

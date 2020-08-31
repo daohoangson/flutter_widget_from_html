@@ -56,6 +56,9 @@ class _TagABit extends BuildBit<GestureRecognizer> {
       : super(parent, tsb);
 
   @override
+  bool get swallowWhitespace => null;
+
+  @override
   GestureRecognizer buildBit(GestureRecognizer recognizer) {
     if (recognizer is TapGestureRecognizer) {
       recognizer.onTap = onTap;

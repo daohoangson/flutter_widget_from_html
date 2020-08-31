@@ -106,6 +106,12 @@ void main() {
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
+    testWidgets('renders with only RT', (WidgetTester tester) async {
+      final html = 'Foo <ruby><rt>Ashita</rt></ruby>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo (@5.0:Ashita))]'));
+    });
+
     testWidgets('renders with only empty RT', (WidgetTester tester) async {
       final html = 'Foo <ruby><rt></rt></ruby>';
       final explained = await explain(tester, html);
