@@ -16,6 +16,7 @@ class WebView extends StatefulWidget {
   ///
   /// JavaScript must be enabled for this to work.
   /// Default: `true` if [js] is enabled, `false` otherwise.
+  /// Flutter Web: No.
   final bool autoResize;
 
   /// The auto resize intevals.
@@ -30,11 +31,13 @@ class WebView extends StatefulWidget {
   ///
   /// This callback will be triggered on generated navigation within the web view.
   /// Returning `true` will stop web view from navigating.
+  /// Flutter Web: No.
   final bool Function(String) interceptNavigationRequest;
 
   /// Controls whether to enable JavaScript.
   ///
   /// Default: `true`.
+  /// Flutter Web: JavaScript is always enabled (cannot turn off).
   final bool js;
 
   /// Controls whether or not to apply workaround for
