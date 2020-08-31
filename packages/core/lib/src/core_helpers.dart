@@ -1,7 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'core_html_widget.dart';
+
+export 'widgets/css_block.dart';
+export 'widgets/css_sizing.dart';
+export 'widgets/html_ruby.dart';
 
 /// The default character threshold to build widget tree asynchronously.
 ///
@@ -34,6 +39,30 @@ typedef CustomStylesBuilder = Map<String, String> Function(dom.Element element);
 /// For those needs, a custom [WidgetFactory] is the way to go.
 typedef CustomWidgetBuilder = Widget Function(dom.Element element);
 
+/// A set of values that should trigger rebuild.
+class RebuildTriggers {
+  final List _values;
+
+  /// Creates a set.
+  ///
+  /// The values should have sane equality check to avoid excessive rebuilds.
+  RebuildTriggers(this._values);
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! RebuildTriggers) return false;
+
+    final otherValues = (other as RebuildTriggers)._values;
+    if (otherValues.length != _values.length) return false;
+
+    for (var i = 0; i < _values.length; i++) {
+      if (otherValues[i] != _values[i]) return false;
+    }
+
+    return true;
+  }
+}
+
 /// A widget builder that supports builder callbacks.
 class WidgetPlaceholder<T> extends StatelessWidget {
   /// The origin of this widget.
@@ -59,6 +88,16 @@ class WidgetPlaceholder<T> extends StatelessWidget {
     return built;
   }
 
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<T>(
+      'generator',
+      generator,
+      showName: false,
+    ));
+  }
+
   /// Enqueues [builder] to be built later.
   WidgetPlaceholder<T> wrapWith(
       Widget Function(BuildContext context, Widget child) builder) {
@@ -66,4 +105,17 @@ class WidgetPlaceholder<T> extends StatelessWidget {
     _builders.add(builder);
     return this;
   }
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
+      generator != null
+          ? 'WidgetPlaceholder($generator)'
+          : runtimeType.toString();
+
+  /// Creates a placeholder lazily.
+  ///
+  /// Returns [child] if it is already a placeholder.
+  static WidgetPlaceholder lazy(Widget child) => child is WidgetPlaceholder
+      ? child
+      : WidgetPlaceholder<Widget>(child, child: child);
 }

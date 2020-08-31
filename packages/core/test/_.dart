@@ -1,8 +1,8 @@
 import 'dart:async';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:flutter_widget_from_html_core/src/internal/css_sizing.dart';
 import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
 
 // https://stackoverflow.com/questions/6018611/smallest-data-uri-image-possible-for-a-transparent-image
@@ -93,10 +93,22 @@ Future<String> explain(
     str = str.replaceAll(RegExp(r': [A-Z][A-Za-z]+\.'), ': '); // enums
     str = str.replaceAll(RegExp(r'\[GlobalKey#[0-9a-f]+\]'), '');
     str = str.replaceAll(RegExp(r'(, )?dependencies: \[[^\]]+\]'), '');
+
+    // trim boring properties
     str = str.replaceAll(
-        RegExp(r'(, )?renderObject: .+ relayoutBoundary=\w+'), '');
-    str = str.replaceAll(RegExp(r'softWrap: [a-z\s]+, '), '');
-    str = str.replaceAll('maxLines: unlimited, ', '');
+        RegExp(r'(, )?renderObject: \w+#[a-z0-9]+( relayoutBoundary=\w+)?'),
+        '');
+    str = str.replaceAll(RegExp(r'(, )?crossAxisAlignment: start'), '');
+    str = str.replaceAll(RegExp(r'(, )?direction: vertical'), '');
+    str = str.replaceAll(RegExp(r'(, )?mainAxisAlignment: start'), '');
+    str = str.replaceAll(RegExp(r'(, )?mainAxisSize: min'), '');
+    str = str.replaceAll(RegExp(r'(, )?maxLines: unlimited'), '');
+    str = str.replaceAll(RegExp(r'(, )?softWrap: [a-z\s]+'), '');
+    str = str.replaceAll(RegExp(r'(, )?textDirection: ltr+'), '');
+
+    // delete leading comma (because of property trimmings)
+    str = str.replaceAllMapped(RegExp(r'(\w+\(), '), (m) => m.group(1));
+    str = simplifyHashCode(str);
     return str;
   }
 
@@ -138,6 +150,20 @@ Future<String> explainMargin(
   );
   final match = _explainMarginRegExp.firstMatch(explained);
   return match == null ? explained : match[3];
+}
+
+String simplifyHashCode(String str) {
+  final hashCodes = <String>[];
+  return str.replaceAllMapped(RegExp(r'#(\d+)'), (match) {
+    final hashCode = match.group(1);
+    var indexOf = hashCodes.indexOf(hashCode);
+    if (indexOf == -1) {
+      indexOf = hashCodes.length;
+      hashCodes.add(hashCode);
+    }
+
+    return '#$indexOf';
+  });
 }
 
 class Explainer {
@@ -244,13 +270,27 @@ class Explainer {
 
     final style = _textStyle(inlineSpan.style, parentStyle ?? _defaultStyle);
     final textSpan = inlineSpan is TextSpan ? inlineSpan : null;
-    final onTap = textSpan?.recognizer != null ? '+onTap' : '';
     final text = textSpan?.text ?? '';
     final children = textSpan?.children
             ?.map((c) => _inlineSpan(c, parentStyle: textSpan.style))
             ?.join('') ??
         '';
-    return '($style$onTap:$text$children)';
+
+    final recognizerSb = StringBuffer();
+    if (textSpan?.recognizer != null) {
+      final recognizer = textSpan.recognizer;
+      if (recognizer is TapGestureRecognizer) {
+        if (recognizer.onTap != null) recognizerSb.write('+onTap');
+        if (recognizer.onTapCancel != null) recognizerSb.write('+onTapCancel');
+      }
+
+      if (recognizerSb.isEmpty) {
+        recognizerSb
+            .write('+${textSpan.recognizer}'.replaceAll(RegExp(r'#\w+'), ''));
+      }
+    }
+
+    return '($style$recognizerSb:$text$children)';
   }
 
   String _limitBox(LimitedBox box) {

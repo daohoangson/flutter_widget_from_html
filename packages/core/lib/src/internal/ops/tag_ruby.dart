@@ -10,15 +10,11 @@ class TagRuby {
 
   BuildOp _rubyOp;
   BuildOp _rtOp;
-  TextBits _rtText;
 
   TagRuby(this.wf, this.rubyMeta);
 
   BuildOp get op {
-    _rubyOp ??= BuildOp(
-      onChild: onChild,
-      onPieces: onPieces,
-    );
+    _rubyOp ??= BuildOp(onChild: onChild, onTree: onTree);
     return _rubyOp;
   }
 
@@ -32,13 +28,10 @@ class TagRuby {
         break;
       case kTagRt:
         _rtOp ??= BuildOp(
-          onPieces: (_, pieces) {
-            for (final piece in pieces) {
-              if (piece.text == null) continue;
-              _rtText = piece.text..detach();
-            }
-
-            return [];
+          onTree: (rtMeta, rtTree) {
+            if (rtTree.isEmpty) return;
+            final rtBit = _RtBit(rtTree, rtTree.tsb, rtMeta, rtTree.copyWith());
+            rtTree.replaceWith(rtBit);
           },
         );
 
@@ -49,49 +42,59 @@ class TagRuby {
     }
   }
 
-  Iterable<BuiltPiece> onPieces(
-      BuildMetadata meta, Iterable<BuiltPiece> pieces) {
-    if (_rtText == null) return pieces;
-    var processed = false;
+  void onTree(BuildMetadata _, BuildTree tree) {
+    final rubyBits = <BuildBit>[];
+    for (final bit in tree.bits.toList(growable: false)) {
+      if (rubyBits.isEmpty && bit.tsb == null) {
+        // the first bit is whitespace, just ignore it
+        continue;
+      }
+      if (bit is! _RtBit || rubyBits.isEmpty) {
+        rubyBits.add(bit);
+        continue;
+      }
 
-    return pieces.map((piece) {
-      if (piece.text == null || processed) return piece;
-      processed = true;
+      final rtBit = bit as _RtBit;
+      final rtTree = rtBit.tree;
+      final rubyTree = tree.sub();
+      final placeholder = WidgetPlaceholder<List<BuildTree>>([rubyTree, rtTree])
+        ..wrapWith((context, __) {
+          final tsh = rubyTree.tsb.build(context);
 
-      final rtBuilt = wf.buildText(meta, _rtText);
-      if (rtBuilt == null) return piece;
+          final ruby = wf.buildColumnWidget(
+              rubyMeta, tsh, rubyTree.build().toList(growable: false));
+          final rt = wf.buildColumnWidget(
+              rtBit.meta, tsh, rtTree.build().toList(growable: false));
 
-      final text = piece.text;
-      final built = wf.buildText(meta, text);
-      if (built == null) return piece;
+          return HtmlRuby(ruby ?? widget0, rt ?? widget0);
+        });
 
-      final replacement = text.parent.sub(text.tsb)..detach();
-      text.replaceWith(replacement);
-      replacement.add(_buildTextBit(replacement, built, rtBuilt));
+      final anchor = rubyBits.first;
+      WidgetBit.inline(anchor.parent, placeholder,
+              alignment: PlaceholderAlignment.middle)
+          .insertBefore(anchor);
 
-      return BuiltPiece.text(replacement);
-    }).toList(growable: false);
+      for (final rubyBit in rubyBits) {
+        rubyTree.add(rubyBit.copyWith(parent: rubyTree));
+        rubyBit.detach();
+      }
+      rubyBits.clear();
+      rtBit.detach();
+    }
   }
+}
 
-  TextBit _buildTextBit(TextBits parent, Widget ruby, Widget rt) {
-    final widget =
-        WidgetPlaceholder<BuildMetadata>(rubyMeta).wrapWith((context, _) {
-      final tsh = _rtText.tsb.build(context);
-      final paddingValue = tsh.style.fontSize *
-          .75 *
-          tsh.getDependency<MediaQueryData>().textScaleFactor;
-      final padding = EdgeInsets.symmetric(vertical: paddingValue);
+class _RtBit extends BuildBit<Null, BuildTree> {
+  final BuildMetadata meta;
+  final BuildTree tree;
 
-      return wf.buildStack(
-        rubyMeta,
-        tsh,
-        <Widget>[
-          wf.buildPadding(rubyMeta, ruby, padding),
-          Positioned.fill(bottom: null, child: Center(child: rt)),
-        ],
-      );
-    });
+  _RtBit(BuildTree parent, TextStyleBuilder tsb, this.meta, this.tree)
+      : super(parent, tsb);
 
-    return TextWidget(parent, widget, alignment: PlaceholderAlignment.middle);
-  }
+  @override
+  BuildTree buildBit(Null _) => tree;
+
+  @override
+  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+      _RtBit(parent ?? this.parent, tsb ?? this.tsb, meta, tree);
 }

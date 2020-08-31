@@ -1,10 +1,19 @@
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+/// A CSS sizing widget.
+///
+/// [child] will be layouted to match its preferred ratio if [size] is provided.
+/// Additional constraints will be applied loosely in order to
+/// stay as close as possible to the preferred width / height.
 class CssSizing extends SingleChildRenderObjectWidget {
+  /// The additional constraints.
   final BoxConstraints constraints;
+
+  /// The preferred size.
   final Size size;
 
+  /// Creates a CSS sizing.
   CssSizing({
     @required Widget child,
     @required this.constraints,

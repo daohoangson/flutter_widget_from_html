@@ -7,22 +7,22 @@ import 'internal/core_parser.dart';
 import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_html_widget.dart';
-import 'internal/css_block.dart';
 
 /// A factory to build widgets.
 class WidgetFactory {
   BuildOp _styleBgColor;
   BuildOp _styleDisplayBlock;
+  BuildOp _styleDisplayNone;
   BuildOp _styleMargin;
   BuildOp _stylePadding;
   BuildOp _styleSizing;
   BuildOp _styleVerticalAlign;
   BuildOp _tagA;
   BuildOp _tagBr;
-  BuildOp _tagCode;
   BuildOp _tagFont;
   BuildOp _tagHr;
   BuildOp _tagImg;
+  BuildOp _tagPre;
   BuildOp _tagQ;
   TextStyleHtml Function(TextStyleHtml, String) __tsbFontSize;
   TextStyleHtml Function(TextStyleHtml, String) _tsbLineHeight;
@@ -102,18 +102,6 @@ class WidgetFactory {
           BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
       GestureDetector(child: child, onTap: onTap);
 
-  /// Builds [TextSpan] with [TapGestureRecognizer].
-  InlineSpan buildGestureTapCallbackSpan(
-    String text,
-    GestureTapCallback onTap,
-    TextStyle style,
-  ) =>
-      TextSpan(
-        text: text,
-        recognizer: TapGestureRecognizer()..onTap = onTap,
-        style: style,
-      );
-
   /// Builds horizontal scroll view.
   Widget buildHorizontalScrollView(BuildMetadata meta, Widget child) =>
       SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
@@ -182,46 +170,17 @@ class WidgetFactory {
   }
 
   /// Builds [RichText].
-  WidgetPlaceholder buildText(BuildMetadata meta, TextBits text) {
-    text.trimRight();
-    if (text.isEmpty) return null;
+  Widget buildText(BuildMetadata node, TextStyleHtml tsh, InlineSpan text) =>
+      RichText(
+        overflow: tsh?.textOverflow ?? TextOverflow.clip,
+        text: text,
+        textAlign: tsh?.textAlign ?? TextAlign.start,
+        textDirection: tsh?.textDirection ?? TextDirection.ltr,
 
-    final widgets = <WidgetPlaceholder>[];
-    for (final compiled in TextCompiler(text).compile()) {
-      if (compiled.widget != null) {
-        widgets.add(compiled.widget);
-        continue;
-      }
-
-      if (compiled.spanBuilder == null) continue;
-      widgets.add(
-        WidgetPlaceholder<TextBits>(text).wrapWith((context, _) {
-          final span = compiled.spanBuilder(context);
-          final tsh = text.tsb?.build(context);
-          final textAlign = tsh?.textAlign ?? TextAlign.start;
-
-          if (span is WidgetSpan &&
-              span.alignment == PlaceholderAlignment.baseline &&
-              textAlign == TextAlign.start) {
-            return span.child;
-          }
-
-          return RichText(
-            overflow: tsh?.textOverflow ?? TextOverflow.clip,
-            text: span,
-            textAlign: textAlign,
-            textDirection: tsh?.textDirection ?? TextDirection.ltr,
-
-            // TODO: calculate max lines automatically for ellipsis if needed
-            // currently it only renders 1 line with ellipsis
-            maxLines: tsh?.maxLines == -1 ? null : tsh?.maxLines,
-          );
-        }),
+        // TODO: calculate max lines automatically for ellipsis if needed
+        // currently it only renders 1 line with ellipsis
+        maxLines: tsh?.maxLines == -1 ? null : tsh?.maxLines,
       );
-    }
-
-    return buildColumnPlaceholder(meta, widgets);
-  }
 
   /// Prepares [GestureTapCallback].
   GestureTapCallback gestureTapCallback(String url) => url != null
@@ -363,6 +322,9 @@ class WidgetFactory {
   Object _imageFromUrl(String url) =>
       url?.isNotEmpty == true ? NetworkImage(url) : null;
 
+  /// Prepares the root [TextStyleBuilder].
+  void onRoot(TextStyleBuilder rootTsb) {}
+
   /// Parses [meta] for build ops and text styles.
   void parse(BuildMetadata meta) {
     final attrs = meta.element.attributes;
@@ -416,7 +378,7 @@ class WidgetFactory {
         break;
 
       case 'br':
-        _tagBr ??= BuildOp(onPieces: (_, p) => p..last.text.addNewLine());
+        _tagBr ??= BuildOp(onTree: (_, tree) => tree.addNewLine());
         meta.register(_tagBr);
         break;
 
@@ -433,10 +395,22 @@ class WidgetFactory {
         break;
 
       case kTagCode:
-      case kTagPre:
+      case kTagKbd:
+      case kTagSamp:
       case kTagTt:
-        _tagCode ??= TagCode(this).buildOp;
-        meta.register(_tagCode);
+        meta.tsb(TextStyleOps.fontFamily, [kTagCodeFont1, kTagCodeFont2]);
+        break;
+      case kTagPre:
+        _tagPre ??= BuildOp(
+          defaultStyles: (_) =>
+              const {kCssFontFamily: '$kTagCodeFont1, $kTagCodeFont2'},
+          onTree: (meta, tree) =>
+              tree.replaceWith(TextBit(tree, meta.element.text, tsb: tree.tsb)),
+          onWidgets: (meta, widgets) => listOrNull(
+              buildColumnPlaceholder(meta, widgets)
+                  ?.wrapWith((_, w) => buildHorizontalScrollView(meta, w))),
+        );
+        meta.register(_tagPre);
         break;
 
       case 'dd':
@@ -460,7 +434,16 @@ class WidgetFactory {
         break;
 
       case kTagFont:
-        _tagFont ??= TagFont(this).buildOp;
+        _tagFont ??= BuildOp(
+          defaultStyles: (meta) {
+            final attrs = meta.element.attributes;
+            return {
+              kCssColor: attrs[kAttributeFontColor],
+              kCssFontFamily: attrs[kAttributeFontFace],
+              kCssFontSize: kCssFontSizes[attrs[kAttributeFontSize]],
+            };
+          },
+        );
         meta.register(_tagFont);
         break;
 
@@ -519,8 +502,8 @@ class WidgetFactory {
       case 'style':
       case 'svg':
         // actually `script` and `style` are not required here
-        // our parser will put those elements into document.head anyway
-        meta.isNotRenderable = true;
+        // the parser will put those elements into document.head anyway
+        meta[kCssDisplay] = kCssDisplayNone;
         break;
 
       case kTagImg:
@@ -538,11 +521,6 @@ class WidgetFactory {
       case 'ins':
       case 'u':
         meta.tsb(TextStyleOps.textDeco, TextDeco(under: true));
-        break;
-
-      case 'kbd':
-      case 'samp':
-        meta.tsb(TextStyleOps.fontFamily, [kTagCodeFont1, kTagCodeFont2]);
         break;
 
       case kTagOrderedList:
@@ -667,7 +645,15 @@ class WidgetFactory {
             meta.isBlockElement = false;
             break;
           case kCssDisplayNone:
-            meta.isNotRenderable = true;
+            _styleDisplayNone ??= BuildOp(
+              onTree: (_, tree) {
+                for (final bit in tree.bits.toList(growable: false)) {
+                  bit.detach();
+                }
+              },
+              priority: 0,
+            );
+            meta.register(_styleDisplayNone);
             break;
           case kCssDisplayTable:
             meta.register(TagTable(this, meta).op);

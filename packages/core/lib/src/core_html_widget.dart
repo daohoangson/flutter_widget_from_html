@@ -7,7 +7,7 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 
-import 'internal/builder.dart';
+import 'internal/builder.dart' as builder;
 import 'core_data.dart';
 import 'core_widget_factory.dart';
 import 'internal/tsh_widget.dart';
@@ -62,6 +62,31 @@ class HtmlWidget extends StatefulWidget {
   /// The callback when user taps a link.
   final void Function(String) onTapUrl;
 
+  /// The values that should trigger rebuild.
+  ///
+  /// By default, these fields' changes will invalidate cached widget tree:
+  ///
+  /// - [baseUrl]
+  /// - [buildAsync]
+  /// - [enableCaching]
+  /// - [html]
+  /// - [hyperlinkColor]
+  ///
+  /// In `flutter_widget_from_html` package, these are also included:
+  ///
+  /// - `unsupportedWebViewWorkaroundForIssue37`
+  /// - `webView`
+  /// - `webViewJs`
+  RebuildTriggers get rebuildTriggers => RebuildTriggers([
+        html,
+        baseUrl,
+        buildAsync,
+        enableCaching,
+        hyperlinkColor,
+        if (_rebuildTriggers != null) _rebuildTriggers,
+      ]);
+  final RebuildTriggers _rebuildTriggers;
+
   /// The default styling for text elements.
   final TextStyle textStyle;
 
@@ -80,8 +105,10 @@ class HtmlWidget extends StatefulWidget {
     this.hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
     Key key,
     this.onTapUrl,
+    RebuildTriggers rebuildTriggers,
     this.textStyle = const TextStyle(),
   })  : assert(html != null),
+        _rebuildTriggers = rebuildTriggers,
         super(key: key);
 
   @override
@@ -105,8 +132,10 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     super.initState();
 
     _rootTsb = _RootTsb(this);
-    _rootMeta = HtmlBuilder.rootMeta(_rootTsb);
+    _rootMeta = builder.BuildMetadata(null, _rootTsb);
     _wf = (widget.factoryBuilder ?? _getCoreWf).call();
+
+    _wf.onRoot(_rootTsb);
 
     if (buildAsync) {
       _future = _buildAsync();
@@ -126,11 +155,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
 
     var needsRebuild = false;
 
-    if (widget.baseUrl != oldWidget.baseUrl ||
-        widget.buildAsync != oldWidget.buildAsync ||
-        widget.html != oldWidget.html ||
-        widget.enableCaching != oldWidget.enableCaching ||
-        widget.hyperlinkColor != oldWidget.hyperlinkColor) {
+    if (widget.rebuildTriggers != oldWidget.rebuildTriggers) {
       needsRebuild = true;
     }
 
@@ -191,16 +216,19 @@ class _HtmlWidgetState extends State<HtmlWidget> {
 }
 
 class _RootTsb extends TextStyleBuilder {
-  final _HtmlWidgetState state;
-
   TextStyleHtml _output;
 
-  _RootTsb(this.state);
+  _RootTsb(_HtmlWidgetState state) {
+    enqueue(builder, state);
+  }
 
   @override
-  TextStyleHtml build(BuildContext childContext) {
-    childContext.dependOnInheritedWidgetOfExactType<TshWidget>();
+  TextStyleHtml build(BuildContext context) {
+    context.dependOnInheritedWidgetOfExactType<TshWidget>();
+    return super.build(context);
+  }
 
+  TextStyleHtml builder(TextStyleHtml _, _HtmlWidgetState state) {
     if (_output != null) return _output;
     return _output = TextStyleHtml.root(
       state._wf.getDependencies(state.context),
@@ -226,14 +254,14 @@ Widget _buildBody(_HtmlWidgetState state, dom.NodeList domNodes) {
   final wf = state._wf;
   wf.reset(state);
 
-  final builder = HtmlBuilder(
+  final tree = builder.BuildTree(
     customStylesBuilder: state.widget.customStylesBuilder,
     customWidgetBuilder: state.widget.customWidgetBuilder,
-    domNodes: domNodes,
     parentMeta: rootMeta,
+    tsb: rootMeta.tsb(),
     wf: wf,
-  );
-  return wf.buildBody(rootMeta, builder.build()) ?? widget0;
+  )..addBitsFromNodes(domNodes);
+  return wf.buildBody(rootMeta, tree.build()) ?? widget0;
 }
 
 dom.NodeList _parseHtml(String html) => parser.parse(html).body.nodes;

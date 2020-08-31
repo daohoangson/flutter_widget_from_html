@@ -7,10 +7,26 @@ const kHref = 'http://domain.com/href';
 const kImgSrc = 'http://domain.com/image.png';
 
 void main() {
-  testWidgets('renders underline', (WidgetTester tester) async {
+  group('basic usage', () {
     final html = '<a href="$kHref">Foo</a>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[RichText:(#FF0000FF+u+onTap:Foo)]'));
+
+    testWidgets('renders', (WidgetTester tester) async {
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(#FF0000FF+u+onTap:Foo)]'));
+    });
+
+    testWidgets('useExplainer=false', (WidgetTester tester) async {
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+          explained,
+          equals('TshWidget\n'
+              '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
+              ' │  BuildTree#2 tsb#3(parent=#1):\n'
+              ' │    "Foo"\n'
+              ' │    _TagABit#4 tsb#3(parent=#1)\n'
+              ' │)\n'
+              ' └RichText(text: "Foo")\n\n'));
+    });
   });
 
   group('renders without erroneous white spaces', () {
@@ -34,7 +50,7 @@ void main() {
   });
 
   testWidgets('renders complicated stylings', (WidgetTester tester) async {
-    final html = 'Hello <a href="$kHref">f<b>o<i>o</i></b> bar</a>.';
+    final html = 'Hello <a href="$kHref">f<b>o<i>o</i></b> <br /> bar</a>.';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -42,7 +58,7 @@ void main() {
             '(#FF0000FF+u+onTap:f)'
             '(#FF0000FF+u+b+onTap:o)'
             '(#FF0000FF+u+i+b+onTap:o)'
-            '(#FF0000FF+u: )(#FF0000FF+u+onTap:bar)'
+            '(#FF0000FF+u+onTap: \nbar)'
             '(:.)'
             ')]'));
   });
@@ -145,7 +161,8 @@ void main() {
       final explained = await explainImg(tester, html);
       expect(
           explained,
-          equals('[RichText:(:(#FF0000FF+u+onTap:Foo)(#FF0000FF+u: )'
+          equals('[RichText:(:'
+              '(#FF0000FF+u+onTap:Foo )'
               '[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
               ')]'));
     });
@@ -167,7 +184,8 @@ void main() {
           explained,
           equals('[RichText:(:'
               '[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-              '(#FF0000FF+u: )(#FF0000FF+u+onTap:foo))]'));
+              '(#FF0000FF+u+onTap: foo)'
+              ')]'));
     });
 
     testWidgets('renders IMG tag inside + text outside', (tester) async {

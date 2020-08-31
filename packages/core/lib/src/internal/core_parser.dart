@@ -35,3 +35,12 @@ TextAlign tryParseTextAlign(String value) {
 
   return null;
 }
+
+final _spacingRegExp = RegExp(r'\s+');
+Iterable<String> splitCssValues(String value) => value.split(_spacingRegExp);
+
+final _attrStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
+Iterable<MapEntry<String, String>> splitAttributeStyle(String value) =>
+    _attrStyleRegExp
+        .allMatches(value)
+        .map((m) => MapEntry(m[1].trim(), m[2].trim()));

@@ -26,10 +26,9 @@ class SmilieScreen extends StatelessWidget {
 
 class _SmiliesWidgetFactory extends WidgetFactory {
   final smilieOp = BuildOp(
-    onPieces: (meta, pieces) {
+    onTree: (meta, tree) {
       final alt = meta.element.attributes['alt'];
-      final text = kSmilies[alt] ?? alt;
-      return pieces..first?.text?.addText(text);
+      tree.addText(kSmilies[alt] ?? alt);
     },
   );
 

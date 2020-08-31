@@ -8,20 +8,31 @@ class TagQ {
   TagQ(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onPieces: (_, pieces) => _wrapTextBits(
-          pieces,
-          appendBuilder: (parent) => _TagQBit(parent, isOpening: false),
-          prependBuilder: (parent) => _TagQBit(parent, isOpening: true),
-        ),
+        onTree: (_, tree) =>
+            wrapTree(tree, append: _TagQBit.closing, prepend: _TagQBit.opening),
       );
 }
 
-class _TagQBit extends TextBit<void, String> {
+class _TagQBit extends BuildBit<Null, String> {
   final bool isOpening;
 
-  _TagQBit(TextBits parent, {@required this.isOpening})
-      : super(parent, parent.tsb);
+  _TagQBit(BuildTree parent, TextStyleBuilder tsb, this.isOpening)
+      : super(parent, tsb);
 
   @override
-  String compile(void _) => isOpening ? '“' : '”';
+  String buildBit(Null _) => isOpening ? '“' : '”';
+
+  @override
+  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+      _TagQBit(parent ?? this.parent, tsb ?? this.tsb, isOpening);
+
+  @override
+  String toString() =>
+      'QBit.${isOpening ? "opening" : "closing"}#$hashCode $tsb';
+
+  static _TagQBit closing(BuildTree parent) =>
+      _TagQBit(parent, parent.tsb, false);
+
+  static _TagQBit opening(BuildTree parent) =>
+      _TagQBit(parent, parent.tsb, true);
 }

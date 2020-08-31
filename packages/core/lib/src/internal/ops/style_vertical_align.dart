@@ -14,48 +14,36 @@ class StyleVerticalAlign {
   StyleVerticalAlign(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onPieces: (meta, pieces) {
-          if (meta.isBlockElement) return pieces;
+        onTree: (meta, tree) {
+          if (meta.isBlockElement) return;
 
           final v = meta[kCssVerticalAlign];
-          if (v == null || v == kCssVerticalAlignBaseline) return pieces;
+          if (v == null || v == kCssVerticalAlignBaseline) return;
 
-          return pieces.map((piece) => _buildWidgetSpan(meta, piece, v));
+          final alignment = _tryParse(v);
+          if (alignment == null) return;
+
+          final copied = tree.copyWith() as BuildTree;
+          final built = wf.buildColumnPlaceholder(meta, copied.build());
+          if (built == null) return;
+
+          if (v == kCssVerticalAlignSub || v == kCssVerticalAlignSuper) {
+            built.wrapWith(
+              (context, child) => _build(
+                context,
+                meta,
+                child,
+                EdgeInsets.only(
+                  bottom: v == kCssVerticalAlignSub ? .4 : 0,
+                  top: v == kCssVerticalAlignSuper ? .4 : 0,
+                ),
+              ),
+            );
+          }
+
+          tree.replaceWith(WidgetBit.inline(tree, built, alignment: alignment));
         },
       );
-
-  BuiltPiece _buildWidgetSpan(BuildMetadata meta, BuiltPiece piece, String v) {
-    if (piece.widgets != null) return piece;
-
-    final alignment = _tryParse(v);
-    if (alignment == null) return piece;
-
-    final text = piece.text;
-    final replacement = (text.parent?.sub(text.tsb) ?? TextBits(text.tsb))
-      ..detach();
-    text.replaceWith(replacement);
-
-    final built = wf.buildText(meta, text);
-    final newPiece = BuiltPiece.text(replacement);
-    if (built == null) return newPiece;
-
-    if (v == kCssVerticalAlignSub || v == kCssVerticalAlignSuper) {
-      built.wrapWith(
-        (context, child) => _build(
-          context,
-          meta,
-          child,
-          EdgeInsets.only(
-            bottom: v == kCssVerticalAlignSub ? .4 : 0,
-            top: v == kCssVerticalAlignSuper ? .4 : 0,
-          ),
-        ),
-      );
-    }
-    replacement.add(TextWidget(replacement, built, alignment: alignment));
-
-    return newPiece;
-  }
 
   Widget _build(BuildContext context, BuildMetadata meta, Widget child,
       EdgeInsets padding) {

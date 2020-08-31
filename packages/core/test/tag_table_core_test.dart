@@ -8,21 +8,74 @@ String _padding(String child) =>
 String _richtext(String text) => _padding('[RichText:(:$text)]');
 
 void main() {
-  testWidgets('renders basic table', (WidgetTester tester) async {
+  group('basic usage', () {
     final html = '''<table>
       <caption>Caption</caption>
       <tr><th>Header 1</th><th>Header 2</th></tr>
       <tr><td>Value 1</td><td>Value 2</td></tr>
     </table>''';
-    final explained = await explain(tester, html);
-    expect(
-        explained,
-        equals('[CssBlock:child=[Column:children='
-            '[CssBlock:child=[RichText:align=center,(:Caption)]],'
-            '[Table:\n'
-            '${_padding('[RichText:(+b:Header 1)]')} | ${_padding('[RichText:(+b:Header 2)]')}\n'
-            '${_richtext('Value 1')} | ${_richtext('Value 2')}\n'
-            ']]]'));
+
+    testWidgets('renders', (WidgetTester tester) async {
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssBlock:child=[Column:children='
+              '[CssBlock:child=[RichText:align=center,(:Caption)]],'
+              '[Table:\n'
+              '${_padding('[RichText:(+b:Header 1)]')} | ${_padding('[RichText:(+b:Header 2)]')}\n'
+              '${_richtext('Value 1')} | ${_richtext('Value 2')}\n'
+              ']]]'));
+    });
+
+    testWidgets('useExplainer=false', (WidgetTester tester) async {
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+          explained,
+          equals('TshWidget\n'
+              '└WidgetPlaceholder<BuildMetadata>(BuildMetadata(<table>\n'
+              ' │      <caption>Caption</caption>\n'
+              ' │      <tbody><tr><th>Header 1</th><th>Header 2</th></tr>\n'
+              ' │      <tr><td>Value 1</td><td>Value 2</td></tr>\n'
+              ' │    </tbody></table>)\n'
+              ' │)\n'
+              ' └CssBlock()\n'
+              '  └Column()\n'
+              '   ├WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+              '   ││  "Caption"\n'
+              '   ││)\n'
+              '   │└CssBlock()\n'
+              '   │ └RichText(textAlign: center, text: "Caption")\n'
+              '   └Table()\n'
+              '    ├TableCell(verticalAlignment: null)\n'
+              '    │└WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#5):\n'
+              '    │ │  "Header 1"\n'
+              '    │ │)\n'
+              '    │ └CssBlock()\n'
+              '    │  └Padding(padding: all(1.0))\n'
+              '    │   └RichText(text: "Header 1")\n'
+              '    ├TableCell(verticalAlignment: null)\n'
+              '    │└WidgetPlaceholder<BuildTree>(BuildTree#6 tsb#7(parent=#5):\n'
+              '    │ │  "Header 2"\n'
+              '    │ │)\n'
+              '    │ └CssBlock()\n'
+              '    │  └Padding(padding: all(1.0))\n'
+              '    │   └RichText(text: "Header 2")\n'
+              '    ├TableCell(verticalAlignment: null)\n'
+              '    │└WidgetPlaceholder<BuildTree>(BuildTree#8 tsb#9(parent=#10):\n'
+              '    │ │  "Value 1"\n'
+              '    │ │)\n'
+              '    │ └CssBlock()\n'
+              '    │  └Padding(padding: all(1.0))\n'
+              '    │   └RichText(text: "Value 1")\n'
+              '    └TableCell(verticalAlignment: null)\n'
+              '     └WidgetPlaceholder<BuildTree>(BuildTree#11 tsb#12(parent=#10):\n'
+              '      │  "Value 2"\n'
+              '      │)\n'
+              '      └CssBlock()\n'
+              '       └Padding(padding: all(1.0))\n'
+              '        └RichText(text: "Value 2")\n'
+              '\n'));
+    });
   });
 
   testWidgets('renders 2 tables', (WidgetTester tester) async {
@@ -374,9 +427,8 @@ void main() {
     });
   });
 
-  group('display: table', () {
-    testWidgets('renders basic table', (WidgetTester tester) async {
-      final html = '''<div style="display: table">
+  testWidgets('renders display: table', (WidgetTester tester) async {
+    final html = '''<div style="display: table">
       <div style="display: table-caption; text-align: center">Caption</div>
       <div style="display: table-row; font-weight: bold">
         <span style="display: table-cell">Header 1</span>
@@ -387,16 +439,15 @@ void main() {
         <span style="display: table-cell">Value 2</span>
       </div>
     </div>''';
-      final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[CssBlock:child=[Column:children='
-              '[CssBlock:child=[RichText:align=center,(:Caption)]],'
-              '[Table:\n'
-              '[CssBlock:child=[RichText:(+b:Header 1)]] | [CssBlock:child=[RichText:(+b:Header 2)]]\n'
-              '[CssBlock:child=[RichText:(:Value 1)]] | [CssBlock:child=[RichText:(:Value 2)]]\n'
-              ']]]'));
-    });
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[CssBlock:child=[Column:children='
+            '[CssBlock:child=[RichText:align=center,(:Caption)]],'
+            '[Table:\n'
+            '[CssBlock:child=[RichText:(+b:Header 1)]] | [CssBlock:child=[RichText:(+b:Header 2)]]\n'
+            '[CssBlock:child=[RichText:(:Value 1)]] | [CssBlock:child=[RichText:(:Value 2)]]\n'
+            ']]]'));
   });
 
   testWidgets('renders UL inside', (WidgetTester tester) async {

@@ -29,7 +29,7 @@ jobs:
     name: Unit test
     strategy:
       matrix:
-        channel: [dev, beta, stable]
+        channel: [beta, stable]
     continue-on-error: ${{ matrix.channel != 'stable' }}
     runs-on: ubuntu-latest
         
@@ -47,45 +47,6 @@ jobs:
           else
             ./tool/test.sh
           fi
-
-  dartdoc:
-    name: Document
-    needs:
-      - analyze
-      - unit_test
-    runs-on: ubuntu-latest
-        
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v1
-      - name: Generate document
-        run: |
-          set -e
-
-          ( cd packages/core && ../../tool/dartdoc/dartdoc.sh )
-          ( cd packages/enhanced && ../../tool/dartdoc/dartdoc.sh )
-      - name: Deploy via now.sh
-        id: now
-        run: |
-          set -e
-
-          mkdir -p ./.now && echo '${{ secrets.DOCUMENT_PROJECT_JSON }}' > ./.now/project.json
-          cp ./tool/dartdoc/now.json ./now.json
-          _url=$( now --token ${{ secrets.ZEIT_TOKEN }} )
-
-          _url="${_url//'%'/'%25'}"
-          _url="${_url//$'\n'/'%0A'}"
-          _url="${_url//$'\r'/'%0D'}"
-          echo "::set-output name=url::${_url}"
-      - name: Create commit comment
-        uses: daohoangson/comment-on-github@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          body: "Deployed ${{ github.sha }} to ${{ steps.now.outputs.url }}.\n\nQuick links:\n- [core README](${{ steps.now.outputs.url }}/packages/core/doc/api/)\n- [flutter_widget_from_html_core library](${{ steps.now.outputs.url }}/packages/core/doc/api/flutter_widget_from_html_core/flutter_widget_from_html_core-library.html)\n- [enhanced README](${{ steps.now.outputs.url }}/packages/enhanced/doc/api/)\n- [flutter_widget_from_html library](${{ steps.now.outputs.url }}/packages/enhanced/doc/api/flutter_widget_from_html/flutter_widget_from_html-library.html)\n" 
-          fingerprint: "## Dartdoc"
-          replace: please
 
   ios:
     name: iOS Test

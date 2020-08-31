@@ -91,52 +91,44 @@ void main() {
   group('BR', () {
     testWidgets('renders new line', (WidgetTester tester) async {
       final html = '1<br />2';
-      final e = await explain(tester, html);
-      expect(e, equals('[Column:children=[RichText:(:1)],[RichText:(:2)]]'));
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:1\n2)]'));
     });
 
     testWidgets('renders without whitespace on new line', (tester) async {
       final html = '1<br />\n2';
-      final e = await explain(tester, html);
-      expect(e, equals('[Column:children=[RichText:(:1)],[RichText:(:2)]]'));
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:1\n2)]'));
     });
 
     testWidgets('renders without whitespace on next SPAN', (tester) async {
       final html = '1<br />\n<span>\n2</span>';
-      final e = await explain(tester, html);
-      expect(e, equals('[Column:children=[RichText:(:1)],[RichText:(:2)]]'));
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:1\n2)]'));
     });
 
     testWidgets('renders multiple new lines, 1 of 2', (tester) async {
       final html = '1<br /><br />2';
       final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[Column:children=[RichText:(:1)],'
-              '[SizedBox:0.0x10.0],'
-              '[RichText:(:2)]]'));
+      expect(explained, equals('[RichText:(:1\n\n2)]'));
     });
 
     testWidgets('renders multiple new lines, 2 of 2', (tester) async {
       final html = '1<br /><br /><br />2';
       final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[Column:children=[RichText:(:1)],'
-              '[SizedBox:0.0x20.0],'
-              '[RichText:(:2)]]'));
+      expect(explained, equals('[RichText:(:1\n\n\n2)]'));
     });
 
     testWidgets('renders new line between SPANs, 1 of 2', (tester) async {
       final html = '<span>1<br /></span><span>2</span>';
-      final e = await explain(tester, html);
-      expect(e, equals('[Column:children=[RichText:(:1)],[RichText:(:2)]]'));
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:1\n2)]'));
     });
 
     testWidgets('renders new line between SPANs, 2 of 2', (tester) async {
       final html = '<span>1</span><br /><span>2</span>';
-      final e = await explain(tester, html);
-      expect(e, equals('[Column:children=[RichText:(:1)],[RichText:(:2)]]'));
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:1\n2)]'));
     });
 
     testWidgets('skips new line between SPAN and DIV, 1 of 2', (tester) async {
@@ -161,7 +153,7 @@ void main() {
               ']'));
     });
 
-    testWidgets('renders new line between DIVs, 1 of 2', (tester) async {
+    testWidgets('renders new line between DIVs, 1 of 3', (tester) async {
       final html = '<div>1<br /></div><div>2</div>';
       final explained = await explain(tester, html);
       expect(
@@ -172,7 +164,7 @@ void main() {
               ']'));
     });
 
-    testWidgets('renders new line between DIVs, 2 of 2', (tester) async {
+    testWidgets('renders new line between DIVs, 2 of 3', (tester) async {
       final html = '<div>1</div><br /><div>2</div>';
       final explained = await explain(tester, html);
       expect(
@@ -182,6 +174,28 @@ void main() {
               '[SizedBox:0.0x10.0],'
               '[CssBlock:child=[RichText:(:2)]]'
               ']'));
+    });
+
+    testWidgets('renders new line between DIVs, 3 of 3', (tester) async {
+      final html = '<div>1</div><br /><div>2</div>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+          explained,
+          equals('TshWidget\n'
+              '└ColumnPlaceholder(BuildMetadata(root))\n'
+              ' └Column()\n'
+              '  ├WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+              '  ││  "1"\n'
+              '  ││)\n'
+              '  │└CssBlock()\n'
+              '  │ └RichText(text: "1")\n'
+              '  ├HeightPlaceholder(1.0em)\n'
+              '  │└SizedBox(height: 10.0)\n'
+              '  └WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#2):\n'
+              '   │  "2"\n'
+              '   │)\n'
+              '   └CssBlock()\n'
+              '    └RichText(text: "2")\n\n'));
     });
 
     testWidgets('renders without new line at bottom, 1 of 3', (tester) async {
@@ -198,8 +212,8 @@ void main() {
 
     testWidgets('renders without new line at bottom, 3 of 3', (tester) async {
       final html = '<div>Foo</div><br />';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
   });
 
@@ -223,92 +237,6 @@ void main() {
         equals(
             '[CssBlock:child=[DecoratedBox:bg=#FF000000,child=[SizedBox:0.0x1.0]]],'
             '[SizedBox:0.0x10.0]'));
-  });
-
-  group('Q tag', () {
-    testWidgets('renders quotes', (WidgetTester tester) async {
-      final html = 'Someone said <q>Foo</q>.';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Someone said “Foo”.)]'));
-    });
-
-    testWidgets('renders quotes without contents', (WidgetTester tester) async {
-      final html = 'x<q></q>y';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:x“”y)]'));
-    });
-
-    testWidgets('renders quotes alone', (WidgetTester tester) async {
-      final html = '<q></q>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:“”)]'));
-    });
-
-    testWidgets(
-      'renders quotes around IMG',
-      (tester) => mockNetworkImagesFor(() async {
-        final src = 'http://domain.com/image.png';
-        final html = '<q><img src="$src" /></q>';
-        final explained = await explain(tester, html);
-        expect(
-            explained,
-            equals('[RichText:(:“'
-                '[Image:image=NetworkImage("$src", scale: 1.0)]'
-                '(:”))]'));
-      }),
-    );
-
-    testWidgets('renders styling', (WidgetTester tester) async {
-      final html = 'Someone said <q><em>Foo</em></q>.';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Someone said (+i:“Foo”)(:.))]'));
-    });
-
-    testWidgets('renders complicated styling', (WidgetTester tester) async {
-      final html = 'Someone said <q><u><em>F</em>o<b>o</b></u></q>.';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals('[RichText:(:Someone said (+u+i:“F)(+u:o)(+u+b:o”)(:.))]'),
-      );
-    });
-
-    testWidgets('renders within vertical-align middle', (tester) async {
-      final html = '<span style="vertical-align: middle"><q>Foo</q></span>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:[RichText:(:“Foo”)]@middle]'));
-    });
-  });
-
-  group('RUBY', () {
-    testWidgets('renders with RT', (WidgetTester tester) async {
-      final html = '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>';
-      final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[RichText:[Stack:children='
-              '[Padding:(3,0,3,0),child=[RichText:(:明日)]],'
-              '[Positioned:(0.0,0.0,null,0.0),child=[Center:child=[RichText:(@5.0:Ashita)]]]'
-              ']@middle]'));
-    });
-
-    testWidgets('renders without RT', (WidgetTester tester) async {
-      final html = '<ruby>明日</ruby>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:明日)]'));
-    });
-
-    testWidgets('renders with empty RT', (WidgetTester tester) async {
-      final html = '<ruby>明日 <rt></rt></ruby>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:明日)]'));
-    });
-
-    testWidgets('renders without contents', (WidgetTester tester) async {
-      final html = 'Foo <ruby></ruby>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
-    });
   });
 
   group('block elements', () {
@@ -430,10 +358,11 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child=[SingleChildScrollView:child='
-              '[RichText:(+font=Courier+fonts=monospace:(#FF0000BB:<?php phpinfo)'
-              '(#FF007700:(); )(#FF0000BB:?>))]'
-              ']]'));
+          equals('[RichText:(:'
+              '(#FF0000BB+font=Courier+fonts=monospace:<?php phpinfo)'
+              '(#FF007700+font=Courier+fonts=monospace:(); )'
+              '(#FF0000BB+font=Courier+fonts=monospace:?>)'
+              ')]'));
     });
 
     testWidgets('renders empty CODE tag', (WidgetTester tester) async {
@@ -470,11 +399,8 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
     testWidgets('renders TT tag', (WidgetTester tester) async {
       final html = '<tt>Teletype</tt>';
       final explained = await explain(tester, html);
-      expect(
-          explained,
-          equals('[CssBlock:child=[SingleChildScrollView:child='
-              '[RichText:(+font=Courier+fonts=monospace:Teletype)]'
-              ']]'));
+      expect(explained,
+          equals('[RichText:(+font=Courier+fonts=monospace:Teletype)]'));
     });
   });
 
