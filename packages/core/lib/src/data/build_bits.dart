@@ -16,9 +16,6 @@ abstract class BuildBit<InputType, OutputType> {
   /// [tsb] must be non-null unless this is a whitespace.
   BuildBit(this.parent, this.tsb);
 
-  /// Returns `true` if bit should not be rendered inline.
-  bool get isBlock => false;
-
   /// The next bit in the tree.
   ///
   /// Note: the next bit may not have the same parent or grandparent,
@@ -312,20 +309,19 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
       WidgetBit._(parent, tsb ?? parent.tsb, WidgetPlaceholder.lazy(child),
           alignment, baseline);
 
-  @override
-  bool get isBlock => alignment == null || baseline == null;
+  bool get isInline => alignment != null && baseline != null;
 
   @override
-  bool get swallowWhitespace => isBlock;
+  bool get swallowWhitespace => !isInline;
 
   @override
-  dynamic buildBit(Null _) => isBlock
-      ? child
-      : WidgetSpan(
+  dynamic buildBit(Null _) => isInline
+      ? WidgetSpan(
           alignment: alignment,
           baseline: baseline,
           child: child,
-        );
+        )
+      : child;
 
   @override
   BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) => WidgetBit._(
@@ -333,7 +329,7 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
 
   @override
   String toString() =>
-      'WidgetBit.${isBlock ? "block" : "inline"}#$hashCode $child';
+      'WidgetBit.${isInline ? "inline" : "block"}#$hashCode $child';
 }
 
 class _TextNewLine extends BuildBit<Null, String> {
