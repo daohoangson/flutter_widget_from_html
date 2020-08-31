@@ -14,7 +14,7 @@ class TagRuby {
   TagRuby(this.wf, this.rubyMeta);
 
   BuildOp get op {
-    _rubyOp ??= BuildOp(onChild: onChild, onProcessed: onProcessed);
+    _rubyOp ??= BuildOp(onChild: onChild, onTree: onTree);
     return _rubyOp;
   }
 
@@ -28,7 +28,7 @@ class TagRuby {
         break;
       case kTagRt:
         _rtOp ??= BuildOp(
-          onProcessed: (rtMeta, rtTree) {
+          onTree: (rtMeta, rtTree) {
             if (rtTree.isEmpty) return;
             final rtBit = _RtBit(rtTree, rtTree.tsb, rtMeta, rtTree.copyWith());
             rtTree.replaceWith(rtBit);
@@ -42,7 +42,7 @@ class TagRuby {
     }
   }
 
-  void onProcessed(BuildMetadata _, BuildTree tree) {
+  void onTree(BuildMetadata _, BuildTree tree) {
     final rubyBits = <BuildBit>[];
     for (final bit in tree.bits.toList(growable: false)) {
       if (rubyBits.isEmpty && bit.tsb == null) {

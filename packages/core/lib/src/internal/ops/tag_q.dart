@@ -8,7 +8,7 @@ class TagQ {
   TagQ(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onProcessed: (_, tree) =>
+        onTree: (_, tree) =>
             wrapTree(tree, append: _TagQBit.closing, prepend: _TagQBit.opening),
       );
 }

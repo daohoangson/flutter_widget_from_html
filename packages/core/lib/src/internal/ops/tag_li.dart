@@ -74,7 +74,7 @@ class TagLi {
     if (e.parent != listMeta.element) return;
 
     _itemOp ??= BuildOp(
-      onBuilt: (itemMeta, widgets) {
+      onWidgets: (itemMeta, widgets) {
         final column = wf.buildColumnPlaceholder(itemMeta, widgets) ??
             WidgetPlaceholder<BuildMetadata>(itemMeta);
 

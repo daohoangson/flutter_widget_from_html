@@ -10,7 +10,7 @@ class StyleBgColor {
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
-        onProcessed: (meta, tree) {
+        onTree: (meta, tree) {
           if (meta.isBlockElement) return;
 
           final bgColor = _parseColor(wf, meta);
@@ -20,7 +20,7 @@ class StyleBgColor {
             bit.tsb?.enqueue(_tsb, bgColor);
           }
         },
-        onBuilt: (meta, widgets) {
+        onWidgets: (meta, widgets) {
           final color = _parseColor(wf, meta);
           if (color == null) return null;
           return listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(

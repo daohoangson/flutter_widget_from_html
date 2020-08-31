@@ -234,10 +234,10 @@ The HTML string is parsed into DOM elements and each element is visited once to 
 | 5 | Parse styling key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(BuildMetadata, String, String)` |
 | 6 | a. If a custom widget is provided, go to 7 | `HtmlWidget.customWidgetBuilder` |
 |   | b. Loop through children elements to prepare `BuildBit`s | |
-| 7 | Inform build ops | `BuildOp.onProcessed(BuildMetadata, BuildTree)` |
+| 7 | Inform build ops | `BuildOp.onTree(BuildMetadata, BuildTree)` |
 | 8 | a. If not a block element, go to 10 | |
 |   | b. Build widgets from bits using a `Flattener` | Use existing `BuildBit` or extends from it, overriding `.swallowWhitespace` to control whitespace, etc. |
-| 9 | Inform build ops | `BuildOp.onBuilt(BuildMetadata, Iterable<Widget>)` |
+| 9 | Inform build ops | `BuildOp.onWidgets(BuildMetadata, Iterable<Widget>)` |
 | 10 | The end | |
 
 Notes:
@@ -268,10 +268,10 @@ meta.tsb<double>(callback, 2.0);
 
 ```dart
 meta.register(BuildOp(
-  onProcessed: (meta, tree) {
+  onTree: (meta, tree) {
     tree.add(...);
   },
-  onBuilt: (meta, widgets) => widgets.map((widget) => ...),
+  onWidgets: (meta, widgets) => widgets.map((widget) => ...),
   ...,
   priority: 9999,
 ));
@@ -307,7 +307,7 @@ class SmilieScreen extends StatelessWidget {
 
 class _SmiliesWidgetFactory extends WidgetFactory {
   final smilieOp = BuildOp(
-    onProcessed: (meta, tree) {
+    onTree: (meta, tree) {
       final alt = meta.element.attributes['alt'];
       tree.addText(kSmilies[alt] ?? alt);
     },

@@ -14,7 +14,7 @@ class StyleVerticalAlign {
   StyleVerticalAlign(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onProcessed: (meta, tree) {
+        onTree: (meta, tree) {
           if (meta.isBlockElement) return;
 
           final v = meta[kCssVerticalAlign];

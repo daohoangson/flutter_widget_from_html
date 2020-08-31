@@ -255,7 +255,7 @@ class WidgetFactory extends core.WidgetFactory {
         meta.tsb(_tagA);
         break;
       case kTagIframe:
-        _tagIframe ??= BuildOp(onBuilt: (meta, _) {
+        _tagIframe ??= BuildOp(onWidgets: (meta, _) {
           final attrs = meta.element.attributes;
           final src = urlFull(attrs[kAttributeIframeSrc]);
           if (src == null) return null;
@@ -271,7 +271,7 @@ class WidgetFactory extends core.WidgetFactory {
         break;
       case 'svg':
         _tagSvg ??= BuildOp(
-          onBuilt: (meta, _) => [SvgPicture.string(meta.element.outerHtml)],
+          onWidgets: (meta, _) => [SvgPicture.string(meta.element.outerHtml)],
         );
         meta.register(_tagSvg);
         break;

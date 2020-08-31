@@ -407,56 +407,52 @@ class _BuildBitWidgetFactory extends WidgetFactory {
 
     if (classes.contains('input--BuildContext')) {
       meta.register(BuildOp(
-          onProcessed: (_, tree) =>
+          onTree: (_, tree) =>
               tree.add(_InputBuildContextBit(tree, tree.tsb))));
     }
 
     if (classes.contains('input--GestureRecognizer')) {
       meta.register(BuildOp(
-          onProcessed: (_, tree) =>
+          onTree: (_, tree) =>
               tree.add(_InputGestureRecognizerBit(tree, tree.tsb))));
     }
 
     if (classes.contains('input--Null')) {
       meta.register(BuildOp(
-          onProcessed: (_, tree) => tree.add(_InputNullBit(tree, tree.tsb))));
+          onTree: (_, tree) => tree.add(_InputNullBit(tree, tree.tsb))));
     }
 
     if (classes.contains('input--TextStyleHtml')) {
       meta.register(BuildOp(
-          onProcessed: (_, tree) =>
+          onTree: (_, tree) =>
               tree.add(_InputTextStyleHtmlBit(tree, tree.tsb))));
     }
 
     if (classes.contains('output--BuildTree')) {
       meta.register(BuildOp(
-          onProcessed: (_, tree) =>
-              tree.add(_OutputBuildTreeBit(tree, tree.tsb))));
+          onTree: (_, tree) => tree.add(_OutputBuildTreeBit(tree, tree.tsb))));
     }
 
     if (classes.contains('output--GestureRecognizer')) {
       meta.register(BuildOp(
-          onProcessed: (_, tree) =>
+          onTree: (_, tree) =>
               tree.add(_OutputGestureRecognizerBit(tree, tree.tsb)),
           priority: 9999));
     }
 
     if (classes.contains('output--InlineSpan')) {
       meta.register(BuildOp(
-          onProcessed: (_, tree) =>
-              tree.add(_OutputInlineSpanBit(tree, tree.tsb))));
+          onTree: (_, tree) => tree.add(_OutputInlineSpanBit(tree, tree.tsb))));
     }
 
     if (classes.contains('output--String')) {
       meta.register(BuildOp(
-          onProcessed: (_, tree) =>
-              tree.add(_OutputStringBit(tree, tree.tsb))));
+          onTree: (_, tree) => tree.add(_OutputStringBit(tree, tree.tsb))));
     }
 
     if (classes.contains('output--Widget')) {
       meta.register(BuildOp(
-          onProcessed: (_, tree) =>
-              tree.add(_OutputWidgetBit(tree, tree.tsb))));
+          onTree: (_, tree) => tree.add(_OutputWidgetBit(tree, tree.tsb))));
     }
 
     if (classes.contains('custom')) {

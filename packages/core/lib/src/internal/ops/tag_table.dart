@@ -32,7 +32,7 @@ class TagTable {
   BuildOp get op {
     _tableOp = BuildOp(
       onChild: onChild,
-      onBuilt: onBuilt,
+      onWidgets: onWidgets,
     );
     return _tableOp;
   }
@@ -58,7 +58,7 @@ class TagTable {
         childMeta.register(_TagTableGroup(wf, childMeta, rows).op);
         break;
       case kCssDisplayTableCaption:
-        childMeta.register(BuildOp(onBuilt: (meta, widgets) {
+        childMeta.register(BuildOp(onWidgets: (meta, widgets) {
           final caption = wf.buildColumnPlaceholder(meta, widgets);
           if (caption == null) return [];
 
@@ -69,7 +69,7 @@ class TagTable {
     }
   }
 
-  Iterable<Widget> onBuilt(BuildMetadata _, Iterable<WidgetPlaceholder> __) {
+  Iterable<Widget> onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> __) {
     final rows = <_TagTableDataRow>[
       ..._data.header.rows,
       ..._data.rows,
@@ -212,7 +212,7 @@ class _TagTableRow {
     }
 
     _cellOp ??= BuildOp(
-      onBuilt: (cellMeta, widgets) {
+      onWidgets: (cellMeta, widgets) {
         final column = wf.buildColumnPlaceholder(cellMeta, widgets);
         if (column == null) return [];
 

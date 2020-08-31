@@ -18,7 +18,7 @@ class StyleMargin {
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
-        onProcessed: (meta, tree) {
+        onTree: (meta, tree) {
           if (meta.isBlockElement) return;
           final m = tryParseCssLengthBox(meta, kCssMargin);
           if (m?.hasLeftOrRight != true) return;
@@ -29,7 +29,7 @@ class StyleMargin {
             prepend: (p) => WidgetBit.inline(p, _paddingInlineBefore(p.tsb, m)),
           );
         },
-        onBuilt: (meta, widgets) {
+        onWidgets: (meta, widgets) {
           if (widgets?.isNotEmpty != true) return null;
           final m = tryParseCssLengthBox(meta, kCssMargin);
           if (m == null) return null;

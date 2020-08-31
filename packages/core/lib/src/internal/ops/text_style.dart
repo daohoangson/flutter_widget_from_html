@@ -113,7 +113,7 @@ class TextStyleOps {
   }
 
   static BuildOp textDecoOp(TextDeco v) => BuildOp(
-        onProcessed: (meta, _) {
+        onTree: (meta, _) {
           if (!meta.isBlockElement) meta.tsb<TextDeco>(textDeco, v);
         },
       );

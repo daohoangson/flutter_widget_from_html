@@ -14,7 +14,7 @@ class StyleSizing {
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
-        onProcessed: (meta, tree) {
+        onTree: (meta, tree) {
           if (meta.isBlockElement) return;
 
           final input = _parse(meta);
@@ -32,7 +32,7 @@ class StyleSizing {
 
           widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb()));
         },
-        onBuilt: (meta, widgets) {
+        onWidgets: (meta, widgets) {
           final input = _parse(meta);
           if (input == null) return widgets;
           return listOrNull(wf

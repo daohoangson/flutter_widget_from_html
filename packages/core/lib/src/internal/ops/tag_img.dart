@@ -15,7 +15,7 @@ class TagImg {
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
-        onProcessed: (node, tree) {
+        onTree: (node, tree) {
           if (node.isBlockElement) return;
 
           final image = _parse(node);
@@ -31,7 +31,7 @@ class TagImg {
           tree.replaceWith(WidgetBit.inline(
               tree, WidgetPlaceholder<ImageMetadata>(image, child: built)));
         },
-        onBuilt: (node, widgets) {
+        onWidgets: (node, widgets) {
           if (!node.isBlockElement) return widgets;
 
           final image = _parse(node);

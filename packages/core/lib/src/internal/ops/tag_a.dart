@@ -19,7 +19,7 @@ class TagA {
           return styles;
         },
         isBlockElement: false,
-        onProcessed: (meta, tree) {
+        onTree: (meta, tree) {
           if (meta.isBlockElement) return;
 
           final onTap = _gestureTapCallback(meta);
@@ -34,7 +34,7 @@ class TagA {
             }
           }
         },
-        onBuilt: (meta, widgets) {
+        onWidgets: (meta, widgets) {
           final onTap = _gestureTapCallback(meta);
           if (onTap == null) return widgets;
 

@@ -25,13 +25,13 @@ void main() {
       });
     });
 
-    group('onProcessed', () {
+    group('onTree', () {
       testWidgets('renders additional text', (tester) async {
         final html = '<span>Foo</span>';
         final explained = await explain(tester, null,
             hw: HtmlWidget(
               html,
-              factoryBuilder: () => _BuildOpOnProcessedText(),
+              factoryBuilder: () => _BuildOpOnTreeText(),
               key: hwKey,
             ));
         expect(explained, equals('[RichText:(:Foo bar)]'));
@@ -42,7 +42,7 @@ void main() {
         final explained = await explain(tester, null,
             hw: HtmlWidget(
               html,
-              factoryBuilder: () => _BuildOpOnProcessedWidget(),
+              factoryBuilder: () => _BuildOpOnTreeWidget(),
               key: hwKey,
             ),
             useExplainer: false);
@@ -59,13 +59,13 @@ void main() {
       });
     });
 
-    group('onBuilt', () {
+    group('onWidgets', () {
       testWidgets('renders widget', (tester) async {
         final html = '<span>Foo</span>';
         final explained = await explain(tester, null,
             hw: HtmlWidget(
               html,
-              factoryBuilder: () => _BuildOpOnBuilt(),
+              factoryBuilder: () => _BuildOpOnWidgets(),
               key: hwKey,
             ),
             useExplainer: false);
@@ -115,28 +115,28 @@ class _BuildOpDefaultStyles extends WidgetFactory {
   }
 }
 
-class _BuildOpOnProcessedText extends WidgetFactory {
+class _BuildOpOnTreeText extends WidgetFactory {
   @override
   void parse(BuildMetadata meta) {
-    meta.register(BuildOp(onProcessed: (_, tree) => tree.addText(' bar')));
+    meta.register(BuildOp(onTree: (_, tree) => tree.addText(' bar')));
     return super.parse(meta);
   }
 }
 
-class _BuildOpOnProcessedWidget extends WidgetFactory {
+class _BuildOpOnTreeWidget extends WidgetFactory {
   @override
   void parse(BuildMetadata meta) {
     meta.register(BuildOp(
-        onProcessed: (_, tree) =>
+        onTree: (_, tree) =>
             tree.replaceWith(WidgetBit.inline(tree, Text('hi')))));
     return super.parse(meta);
   }
 }
 
-class _BuildOpOnBuilt extends WidgetFactory {
+class _BuildOpOnWidgets extends WidgetFactory {
   @override
   void parse(BuildMetadata meta) {
-    meta.register(BuildOp(onBuilt: (_, __) => [Text('Hi')]));
+    meta.register(BuildOp(onWidgets: (_, __) => [Text('Hi')]));
     return super.parse(meta);
   }
 }
@@ -151,11 +151,11 @@ class _BuildOpPriority extends WidgetFactory {
   void parse(BuildMetadata meta) {
     meta
       ..register(BuildOp(
-        onProcessed: (_, tree) => tree.addText(' A'),
+        onTree: (_, tree) => tree.addText(' A'),
         priority: a,
       ))
       ..register(BuildOp(
-        onProcessed: (_, tree) => tree.addText(' B'),
+        onTree: (_, tree) => tree.addText(' B'),
         priority: b,
       ));
 

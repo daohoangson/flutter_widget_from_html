@@ -24,7 +24,7 @@ class TagVideo {
   BuildOp get op {
     _videoOp = BuildOp(
       onChild: onChild,
-      onBuilt: onBuilt,
+      onWidgets: onWidgets,
     );
     return _videoOp;
   }
@@ -41,7 +41,7 @@ class TagVideo {
     _sourceUrls.add(url);
   }
 
-  Iterable<Widget> onBuilt(BuildMetadata _, Iterable<WidgetPlaceholder> ws) {
+  Iterable<Widget> onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> ws) {
     final player = build();
     if (player == null) return ws;
 

@@ -20,7 +20,7 @@ class StylePadding {
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
-        onProcessed: (meta, tree) {
+        onTree: (meta, tree) {
           if (meta.isBlockElement) return;
           final padding = tryParseCssLengthBox(meta, kCssPadding);
           if (padding?.hasLeftOrRight != true) return;
@@ -33,7 +33,7 @@ class StylePadding {
                 WidgetBit.inline(p, _paddingInlineBefore(p.tsb, padding)),
           );
         },
-        onBuilt: (meta, widgets) {
+        onWidgets: (meta, widgets) {
           if (widgets?.isNotEmpty != true) return null;
           final padding = tryParseCssLengthBox(meta, kCssPadding);
           if (padding == null) return null;

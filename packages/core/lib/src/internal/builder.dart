@@ -120,7 +120,7 @@ class BuildTree extends core_data.BuildTree {
 
     if (parentMeta?.buildOps != null) {
       for (final op in parentMeta.buildOps) {
-        op.onProcessed?.call(parentMeta, this);
+        op.onTree?.call(parentMeta, this);
       }
     }
   }
@@ -133,7 +133,7 @@ class BuildTree extends core_data.BuildTree {
 
     if (parentMeta?.buildOps != null) {
       for (final op in parentMeta.buildOps) {
-        widgets = op.onBuilt
+        widgets = op.onWidgets
                 ?.call(parentMeta, widgets)
                 ?.map(WidgetPlaceholder.lazy)
                 ?.toList(growable: false) ??

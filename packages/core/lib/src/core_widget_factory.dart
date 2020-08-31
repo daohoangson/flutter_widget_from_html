@@ -378,7 +378,7 @@ class WidgetFactory {
         break;
 
       case 'br':
-        _tagBr ??= BuildOp(onProcessed: (_, tree) => tree.addNewLine());
+        _tagBr ??= BuildOp(onTree: (_, tree) => tree.addNewLine());
         meta.register(_tagBr);
         break;
 
@@ -404,9 +404,9 @@ class WidgetFactory {
         _tagPre ??= BuildOp(
           defaultStyles: (_) =>
               const {kCssFontFamily: '$kTagCodeFont1, $kTagCodeFont2'},
-          onProcessed: (meta, tree) =>
+          onTree: (meta, tree) =>
               tree.replaceWith(TextBit(tree, meta.element.text, tsb: tree.tsb)),
-          onBuilt: (meta, widgets) => listOrNull(
+          onWidgets: (meta, widgets) => listOrNull(
               buildColumnPlaceholder(meta, widgets)
                   ?.wrapWith((_, w) => buildHorizontalScrollView(meta, w))),
         );
@@ -450,7 +450,7 @@ class WidgetFactory {
       case 'hr':
         _tagHr ??= BuildOp(
           defaultStyles: (_) => const {'margin-bottom': '1em'},
-          onBuilt: (meta, _) => [buildDivider(meta)],
+          onWidgets: (meta, _) => [buildDivider(meta)],
         );
         meta.register(_tagHr);
         break;
@@ -646,7 +646,7 @@ class WidgetFactory {
             break;
           case kCssDisplayNone:
             _styleDisplayNone ??= BuildOp(
-              onProcessed: (_, tree) {
+              onTree: (_, tree) {
                 for (final bit in tree.bits.toList(growable: false)) {
                   bit.detach();
                 }
@@ -755,7 +755,7 @@ class WidgetFactory {
   /// Returns build op for block element.
   BuildOp styleDisplayBlock() {
     _styleDisplayBlock ??= BuildOp(
-      onBuilt: (meta, widgets) => listOrNull(
+      onWidgets: (meta, widgets) => listOrNull(
           buildColumnPlaceholder(meta, widgets)?.wrapWith(_cssBlock)),
       priority: 10000,
     );

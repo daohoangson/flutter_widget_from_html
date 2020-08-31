@@ -77,7 +77,7 @@ abstract class BuildMetadata {
 class BuildOp {
   /// Controls whether the element should be rendered with [CssBlock].
   ///
-  /// Default: `true` if [onBuilt] callback is set, `false` otherwise.
+  /// Default: `true` if [onWidgets] callback is set, `false` otherwise.
   final bool isBlockElement;
 
   /// The execution priority, op with lower priority will run first.
@@ -117,21 +117,21 @@ class BuildOp {
   final void Function(BuildMetadata childMeta) onChild;
 
   /// The callback that will be called when child elements have been processed.
-  final void Function(BuildMetadata meta, BuildTree tree) onProcessed;
+  final void Function(BuildMetadata meta, BuildTree tree) onTree;
 
   /// The callback that will be called when child elements have been built.
   ///
   /// Note: only works if it's a block element.
   final Iterable<Widget> Function(
-      BuildMetadata meta, Iterable<WidgetPlaceholder> widgets) onBuilt;
+      BuildMetadata meta, Iterable<WidgetPlaceholder> widgets) onWidgets;
 
   /// Creates a build op.
   BuildOp({
     this.defaultStyles,
     bool isBlockElement,
     this.onChild,
-    this.onProcessed,
-    this.onBuilt,
+    this.onTree,
+    this.onWidgets,
     this.priority = 10,
-  }) : isBlockElement = isBlockElement ?? onBuilt != null;
+  }) : isBlockElement = isBlockElement ?? onWidgets != null;
 }
