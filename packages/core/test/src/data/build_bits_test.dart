@@ -310,11 +310,36 @@ void main() {
     });
 
     test('BuildTree returns', () {
-      final text = _text();
+      final root = _text();
+
+      final text = root.sub();
       text.addText('1');
+      final text1 = text.sub();
+      text.add(text1);
+      text1.addText('2');
+      text.addText('3');
+      expect(
+          helper.simplifyHashCode(text.toString()),
+          equals('BuildTree#0 tsb#1(parent=#2):\n'
+              '  "1"\n'
+              '  BuildTree#3 tsb#4(parent=#1):\n'
+              '    "2"\n'
+              '  "3"'));
 
       final copied = text.copyWith();
-      expect(_data(copied), equals('1'));
+      expect(
+          helper.simplifyHashCode('$text\n\n$copied'),
+          equals('BuildTree#0 tsb#1(parent=#2):\n'
+              '  "1"\n'
+              '  BuildTree#3 tsb#4(parent=#1):\n'
+              '    "2"\n'
+              '  "3"\n'
+              '\n'
+              'BuildTree#5 tsb#1(parent=#2):\n'
+              '  "1"\n'
+              '  BuildTree#6 tsb#4(parent=#1):\n'
+              '    "2"\n'
+              '  "3"'));
     });
 
     test('NewLine returns', () {

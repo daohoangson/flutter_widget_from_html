@@ -212,8 +212,8 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
 
   @override
   BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) {
-    final copied = sub(parent: parent, tsb: tsb);
-    for (final bit in bits) {
+    final copied = sub(parent: parent ?? this.parent, tsb: tsb ?? this.tsb);
+    for (final bit in _children) {
       copied.add(bit.copyWith(parent: copied));
     }
     return copied;
