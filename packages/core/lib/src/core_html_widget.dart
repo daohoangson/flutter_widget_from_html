@@ -7,7 +7,7 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 
-import 'internal/builder.dart';
+import 'internal/builder.dart' as builder;
 import 'core_data.dart';
 import 'core_widget_factory.dart';
 import 'internal/tsh_widget.dart';
@@ -132,7 +132,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     super.initState();
 
     _rootTsb = _RootTsb(this);
-    _rootMeta = HtmlBuilder.rootMeta(_rootTsb);
+    _rootMeta = builder.BuildMetadata(null, _rootTsb);
     _wf = (widget.factoryBuilder ?? _getCoreWf).call();
 
     _wf.onRoot(_rootTsb);
@@ -254,14 +254,14 @@ Widget _buildBody(_HtmlWidgetState state, dom.NodeList domNodes) {
   final wf = state._wf;
   wf.reset(state);
 
-  final builder = HtmlBuilder(
+  final tree = builder.BuildTree(
     customStylesBuilder: state.widget.customStylesBuilder,
     customWidgetBuilder: state.widget.customWidgetBuilder,
-    domNodes: domNodes,
     parentMeta: rootMeta,
+    tsb: rootMeta.tsb(),
     wf: wf,
-  );
-  return wf.buildBody(rootMeta, builder.build()) ?? widget0;
+  )..addBitsFromNodes(domNodes);
+  return wf.buildBody(rootMeta, tree.build()) ?? widget0;
 }
 
 dom.NodeList _parseHtml(String html) => parser.parse(html).body.nodes;

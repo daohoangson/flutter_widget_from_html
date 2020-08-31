@@ -4,6 +4,10 @@ import 'package:html/dom.dart' as dom;
 
 import 'core_html_widget.dart';
 
+export 'widgets/css_block.dart';
+export 'widgets/css_sizing.dart';
+export 'widgets/html_ruby.dart';
+
 /// The default character threshold to build widget tree asynchronously.
 ///
 /// Related: [HtmlWidget.buildAsync]
@@ -104,5 +108,14 @@ class WidgetPlaceholder<T> extends StatelessWidget {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
-      '$runtimeType($generator)';
+      generator != null
+          ? 'WidgetPlaceholder($generator)'
+          : runtimeType.toString();
+
+  /// Creates a placeholder lazily.
+  ///
+  /// Returns [child] if it is already a placeholder.
+  static WidgetPlaceholder lazy(Widget child) => child is WidgetPlaceholder
+      ? child
+      : WidgetPlaceholder<Widget>(child, child: child);
 }

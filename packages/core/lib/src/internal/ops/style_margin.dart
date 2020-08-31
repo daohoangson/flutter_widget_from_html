@@ -18,17 +18,15 @@ class StyleMargin {
 
   BuildOp get buildOp => BuildOp(
         isBlockElement: false,
-        onPieces: (meta, pieces) {
-          if (meta.isBlockElement) return pieces;
+        onTree: (meta, tree) {
+          if (meta.isBlockElement) return;
           final m = tryParseCssLengthBox(meta, kCssMargin);
-          if (m?.hasLeftOrRight != true) return pieces;
+          if (m?.hasLeftOrRight != true) return;
 
-          return _wrapTextBits(
-            pieces,
-            appendBuilder: (parent) =>
-                TextWidget(parent, _paddingInlineAfter(parent.tsb, m)),
-            prependBuilder: (parent) =>
-                TextWidget(parent, _paddingInlineBefore(parent.tsb, m)),
+          return wrapTree(
+            tree,
+            append: (p) => WidgetBit.inline(p, _paddingInlineAfter(p.tsb, m)),
+            prepend: (p) => WidgetBit.inline(p, _paddingInlineBefore(p.tsb, m)),
           );
         },
         onWidgets: (meta, widgets) {

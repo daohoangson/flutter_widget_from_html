@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
-import '_.dart';
+import '../_.dart';
 
 void main() {
   group('onRoot', () {
@@ -10,7 +10,7 @@ void main() {
       final explained = await explain(tester, null,
           hw: HtmlWidget(
             html,
-            factoryBuilder: () => _OnRootTest(),
+            factoryBuilder: () => _OnRoot(),
             key: hwKey,
           ));
       expect(explained, equals('[RichText:(+font=Custom:Foo)]'));
@@ -18,14 +18,12 @@ void main() {
   });
 }
 
-class _OnRootTest extends WidgetFactory {
+class _OnRoot extends WidgetFactory {
   @override
   void onRoot(TextStyleBuilder rootTsb) {
     super.onRoot(rootTsb);
 
-    rootTsb.enqueue((tsh, _) => tsh.copyWith(
-            style: tsh.style.copyWith(
-          fontFamily: 'Custom',
-        )));
+    rootTsb.enqueue((tsh, _) =>
+        tsh.copyWith(style: tsh.style.copyWith(fontFamily: 'Custom')));
   }
 }

@@ -19,32 +19,20 @@ class TagA {
           return styles;
         },
         isBlockElement: false,
-        onPieces: (meta, pieces) {
-          if (meta.isBlockElement) return pieces;
+        onTree: (meta, tree) {
+          if (meta.isBlockElement) return;
 
           final onTap = _gestureTapCallback(meta);
-          if (onTap == null) return pieces;
+          if (onTap == null) return;
 
-          for (final piece in pieces) {
-            if (piece.widgets != null) {
-              for (final widget in piece.widgets) {
-                widget.wrapWith(
-                    (_, child) => wf.buildGestureDetector(meta, child, onTap));
-              }
-            } else {
-              for (final bit in piece.text.bits.toList(growable: false)) {
-                if (bit is TextWidget) {
-                  bit.child.wrapWith((_, child) =>
-                      wf.buildGestureDetector(meta, child, onTap));
-                } else if (bit is TextData) {
-                  bit.replaceWith(_TagATextData(
-                      bit.parent, bit.compile(null), bit.tsb, onTap, wf));
-                }
-              }
+          for (final bit in tree.bits.toList(growable: false)) {
+            if (bit is WidgetBit) {
+              bit.child.wrapWith(
+                  (_, child) => wf.buildGestureDetector(meta, child, onTap));
+            } else if (bit.tsb != null) {
+              _TagABit(bit.parent, bit.tsb, onTap).insertAfter(bit);
             }
           }
-
-          return pieces;
         },
         onWidgets: (meta, widgets) {
           final onTap = _gestureTapCallback(meta);
@@ -61,22 +49,26 @@ class TagA {
   }
 }
 
-class _TagATextData extends TextBit<TextStyleHtml, InlineSpan> {
-  final String _data;
-
+class _TagABit extends BuildBit<GestureRecognizer, GestureRecognizer> {
   final GestureTapCallback onTap;
 
-  final WidgetFactory wf;
-
-  _TagATextData(
-      TextBits parent, this._data, TextStyleBuilder tsb, this.onTap, this.wf)
+  _TagABit(BuildTree parent, TextStyleBuilder tsb, this.onTap)
       : super(parent, tsb);
 
   @override
-  InlineSpan compile(TextStyleHtml tsh) =>
-      wf.buildGestureTapCallbackSpan(_data, onTap, tsh.styleWithHeight);
+  bool get swallowWhitespace => null;
 
   @override
-  TextBit copyWith({TextBits parent, TextStyleBuilder tsb}) =>
-      _TagATextData(parent ?? this.parent, _data, tsb ?? this.tsb, onTap, wf);
+  GestureRecognizer buildBit(GestureRecognizer recognizer) {
+    if (recognizer is TapGestureRecognizer) {
+      recognizer.onTap = onTap;
+      return recognizer;
+    }
+
+    return TapGestureRecognizer()..onTap = onTap;
+  }
+
+  @override
+  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+      _TagABit(parent ?? this.parent, tsb ?? this.tsb, onTap);
 }
