@@ -273,7 +273,7 @@ class BuildTree extends core_data.BuildTree {
   Iterable<WidgetPlaceholder> _flatten() {
     final widgets = <WidgetPlaceholder>[];
 
-    for (final flattened in Flattener(this).flatten()) {
+    for (final flattened in flatten(this)) {
       if (flattened.widget != null) {
         widgets.add(WidgetPlaceholder.lazy(flattened.widget));
         continue;

@@ -4,9 +4,22 @@ import 'package:flutter/widgets.dart';
 import '../core_data.dart';
 import 'margin_vertical.dart';
 
-class Flattener {
-  final BuildTree tree;
+List<Flattened> flatten(BuildTree tree) => _instance.flatten(tree);
 
+@immutable
+class Flattened {
+  final SpanBuilder spanBuilder;
+  final Widget widget;
+  final WidgetBuilder widgetBuilder;
+
+  Flattened._({this.spanBuilder, this.widget, this.widgetBuilder});
+}
+
+typedef SpanBuilder = InlineSpan Function(BuildContext);
+
+final _instance = _Flattener();
+
+class _Flattener {
   List<Flattened> _flattened;
   StringBuffer _buffer, _prevBuffer;
   _Recognizer _recognizer, _prevRecognizer;
@@ -14,9 +27,7 @@ class Flattener {
   bool _swallowWhitespace;
   TextStyleBuilder _tsb, _prevTsb;
 
-  Flattener(this.tree);
-
-  List<Flattened> flatten() {
+  List<Flattened> flatten(BuildTree tree) {
     _flattened = [];
 
     _resetLoop(tree.tsb);
@@ -201,17 +212,6 @@ class Flattener {
     return next;
   }
 }
-
-@immutable
-class Flattened {
-  final SpanBuilder spanBuilder;
-  final Widget widget;
-  final WidgetBuilder widgetBuilder;
-
-  Flattened._({this.spanBuilder, this.widget, this.widgetBuilder});
-}
-
-typedef SpanBuilder = InlineSpan Function(BuildContext);
 
 /// A mutable recognizer.
 ///
