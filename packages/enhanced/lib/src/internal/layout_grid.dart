@@ -28,57 +28,10 @@ Widget buildTableWithLayoutGrid(WidgetFactory wf, BuildMetadata meta,
 
   final children = <Widget>[];
   data.visitCells((col, row, widget, colspan, rowspan) {
-    children.add(_LayoutGridCell(
-      border: border,
-      child: widget,
-      col: col,
-      colspan: colspan,
-      row: row,
-      rowspan: rowspan,
-    ));
-  });
-
-  final layoutGrid = LayoutGrid(
-    children: children,
-    columnGap: columnGap,
-    gridFit: GridFit.passthrough,
-    rowGap: rowGap,
-    templateColumnSizes: templateColumnSizes,
-    templateRowSizes: templateRowSizes,
-  );
-
-  if (border == null) return layoutGrid;
-
-  return wf.buildStack(meta, tsh, <Widget>[
-    layoutGrid,
-    Positioned.fill(child: Container(decoration: BoxDecoration(border: border)))
-  ]);
-}
-
-class _LayoutGridCell extends StatelessWidget {
-  final Border border;
-  final Widget child;
-  final int col;
-  final int colspan;
-  final int row;
-  final int rowspan;
-
-  const _LayoutGridCell({
-    Key key,
-    this.border,
-    this.child,
-    this.col,
-    this.colspan,
-    this.row,
-    this.rowspan,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    Widget built = SizedBox.expand(child: child);
+    Widget built = SizedBox.expand(child: widget);
 
     if (border != null) {
-      built = Container(
+      built = DecoratedBox(
         child: built,
         decoration: BoxDecoration(border: border),
       );
@@ -99,14 +52,31 @@ class _LayoutGridCell extends StatelessWidget {
       }
     }
 
-    return GridPlacement(
-      child: built,
+    children.add(built.withGridPlacement(
       columnStart: col,
       columnSpan: colspan,
       rowStart: row,
       rowSpan: rowspan,
-    );
-  }
+    ));
+  });
+
+  final layoutGrid = LayoutGrid(
+    children: children,
+    columnGap: columnGap,
+    gridFit: GridFit.passthrough,
+    rowGap: rowGap,
+    templateColumnSizes: templateColumnSizes,
+    templateRowSizes: templateRowSizes,
+  );
+
+  if (border == null) return layoutGrid;
+
+  return wf.buildStack(meta, tsh, <Widget>[
+    layoutGrid,
+    Positioned.fill(
+      child: DecoratedBox(decoration: BoxDecoration(border: border)),
+    )
+  ]);
 }
 
 class _LayoutGridSizeBuffer extends SingleChildRenderObjectWidget {
@@ -123,6 +93,13 @@ class _LayoutGridSizeBuffer extends SingleChildRenderObjectWidget {
   @override
   _RenderSizeBuffer createRenderObject(BuildContext _) =>
       _RenderSizeBuffer(heightDelta, widthDelta);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DoubleProperty('heightDelta', heightDelta));
+    properties.add(DoubleProperty('widthDelta', widthDelta));
+  }
 
   @override
   void updateRenderObject(BuildContext _, _RenderSizeBuffer renderObject) {
