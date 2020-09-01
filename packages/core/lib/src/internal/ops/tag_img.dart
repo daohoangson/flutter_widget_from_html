@@ -42,10 +42,10 @@ class TagImg {
         },
       );
 
-  Widget _build(BuildMetadata node, ImageMetadata image) {
-    final provider = wf.imageProvider(image.sources?.first);
+  Widget _build(BuildMetadata meta, ImageMetadata data) {
+    final provider = wf.imageProvider(data.sources?.first);
     if (provider == null) return null;
-    return wf.buildImage(node, provider, image);
+    return wf.buildImage(meta, provider, data);
   }
 
   ImageMetadata _parse(BuildMetadata meta) {

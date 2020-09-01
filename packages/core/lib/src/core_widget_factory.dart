@@ -107,16 +107,16 @@ class WidgetFactory {
       SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
 
   /// Builds [Image] from [provider].
-  Widget buildImage(BuildMetadata node, Object provider, ImageMetadata image) =>
-      provider != null && provider is ImageProvider && image != null
+  Widget buildImage(BuildMetadata meta, Object provider, ImageMetadata data) =>
+      provider != null && provider is ImageProvider && data != null
           ? Image(
               errorBuilder: (_, error, __) {
                 print('$provider error: $error');
-                final text = image.alt ?? image.title ?? '❌';
+                final text = data.alt ?? data.title ?? '❌';
                 return Text(text);
               },
               image: provider,
-              semanticLabel: image.alt ?? image.title,
+              semanticLabel: data.alt ?? data.title,
             )
           : null;
 
@@ -136,24 +136,23 @@ class WidgetFactory {
       );
 
   /// Builds [Table].
-  Widget buildTable(
-      BuildMetadata node, TextStyleHtml tsh, TableMetadata table) {
+  Widget buildTable(BuildMetadata meta, TextStyleHtml tsh, TableMetadata data) {
     final rows = <TableRow>[];
     final slotIndices = <int>[];
-    final tableCols = table.cols;
-    final tableRows = table.rows;
+    final tableCols = data.cols;
+    final tableRows = data.rows;
 
     for (var r = 0; r < tableRows; r++) {
       final cells = List<Widget>(tableCols);
       for (var c = 0; c < tableCols; c++) {
-        final index = table.getIndexAt(row: r, column: c);
+        final index = data.getIndexAt(row: r, column: c);
         if (index == -1 || slotIndices.contains(index)) {
           cells[c] = widget0;
           continue;
         }
         slotIndices.add(index);
 
-        cells[c] = TableCell(child: table.getWidgetAt(index));
+        cells[c] = TableCell(child: data.getWidgetAt(index));
       }
 
       if (cells.isEmpty) continue;
@@ -162,15 +161,15 @@ class WidgetFactory {
 
     if (rows.isEmpty) return null;
 
-    final tableBorder = table.border != null
+    final tableBorder = data.border != null
         // TODO: support different styling for border sides
-        ? TableBorder.symmetric(inside: table.border, outside: table.border)
+        ? TableBorder.symmetric(inside: data.border, outside: data.border)
         : null;
     return Table(border: tableBorder, children: rows);
   }
 
   /// Builds [RichText].
-  Widget buildText(BuildMetadata node, TextStyleHtml tsh, InlineSpan text) =>
+  Widget buildText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) =>
       RichText(
         overflow: tsh?.textOverflow ?? TextOverflow.clip,
         text: text,
