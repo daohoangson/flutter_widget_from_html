@@ -346,11 +346,24 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
 </div>
 ''',
     'CENTER': '<center>Foo</center>',
+    'attribute/align/center': '<div align="center">$lipsum</div>',
+    'attribute/align/left': '<div align="left">$lipsum</div>',
+    'attribute/align/right': '<div align="right">$lipsum</div>',
     'inline/text-align/center': '<div style="text-align: center">$lipsum</div>',
+    'inline/text-align/end': '<div style="text-align: end">$lipsum</div>',
+    'inline/text-align/end/rtl':
+        '<div dir="rtl"><div style="text-align: end">$lipsum</div></div>',
     'inline/text-align/justify':
         '<div style="text-align: justify">$lipsum</div>',
     'inline/text-align/left': '<div style="text-align: left">$lipsum</div>',
+    'inline/text-align/-moz-center':
+        '<div style="text-align: -moz-center">$lipsum</div>',
     'inline/text-align/right': '<div style="text-align: right">$lipsum</div>',
+    'inline/text-align/start': '<div style="text-align: start">$lipsum</div>',
+    'inline/text-align/start/rtl':
+        '<div dir="rtl"><div style="text-align: start">$lipsum</div></div>',
+    'inline/text-align/-webkit-center':
+        '<div style="text-align: -webkit-center">$lipsum</div>',
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/sub
     'SUB': '<p>Almost every developer\'s favorite molecule is '
         'C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."</p>',
