@@ -6,7 +6,8 @@ homepage: https://github.com/daohoangson/flutter_widget_from_html
 environment:
   # flutter_svg@0.18.0
   flutter: ">=1.18.0-6.0.pre <2.0.0"
-  sdk: ">=2.3.0 <3.0.0"
+  # flutter_layout_grid
+  sdk: ">=2.6.0 <3.0.0"
 
 dependencies:
   cached_network_image: ^2.2.0+1

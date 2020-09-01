@@ -185,9 +185,87 @@ void main() {
           explained,
           equals('[CssBlock:child=[Stack:children='
               '[LayoutGrid:children='
-              '[0,0:[Container:border=1.0@solid#FF000000,child=${_richtext('Foo')}]]],'
-              '[Positioned:(0.0,0.0,0.0,0.0),child=[Container:border=1.0@solid#FF000000]]'
+              '[0,0:[DecoratedBox:border=1.0@solid#FF000000,child=${_richtext('Foo')}]]],'
+              '[Positioned:(0.0,0.0,0.0,0.0),child=[DecoratedBox:border=1.0@solid#FF000000]]'
               ']]'));
+    });
+
+    group('border=1 colspan=2', () {
+      final html =
+          '<table border="1"><tr><td colspan="2">Foo</td></tr></table>';
+
+      testWidgets('renders', (WidgetTester tester) async {
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[CssBlock:child=[Stack:children='
+                '[LayoutGrid:children='
+                '[0,0:1x2:[_LayoutGridSizeBuffer:child=[DecoratedBox:border=1.0@solid#FF000000,child=${_richtext('Foo')}]]]],'
+                '[Positioned:(0.0,0.0,0.0,0.0),child=[DecoratedBox:border=1.0@solid#FF000000]]'
+                ']]'));
+      });
+
+      testWidgets('useExplainer=false', (WidgetTester tester) async {
+        final explained = await explain(tester, html, useExplainer: false);
+        expect(
+            explained,
+            equals('TshWidget\n'
+                '└WidgetPlaceholder<BuildMetadata>(BuildMetadata(<table border="1"><tbody><tr><td colspan="2">Foo</td></tr></tbody></table>))\n'
+                ' └CssBlock()\n'
+                '  └Stack(alignment: topStart, fit: loose)\n'
+                '   ├LayoutGrid()\n'
+                '   │└GridPlacement(columnStart: 0, columnSpan: 2, rowStart: 0, rowSpan: 1)\n'
+                '   │ └_LayoutGridSizeBuffer(heightDelta: 0.0, widthDelta: 2.0)\n'
+                '   │  └DecoratedBox(bg: BoxDecoration(border: all(BorderSide(Color(0xff000000), 1.0, BorderStyle.solid))))\n'
+                '   │   └SizedBox.expand()\n'
+                '   │    └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+                '   │     │  "Foo"\n'
+                '   │     │)\n'
+                '   │     └CssBlock()\n'
+                '   │      └Padding(padding: all(1.0))\n'
+                '   │       └RichText(text: "Foo")\n'
+                '   └Positioned(left: 0.0, top: 0.0, right: 0.0, bottom: 0.0)\n'
+                '    └DecoratedBox(bg: BoxDecoration(border: all(BorderSide(Color(0xff000000), 1.0, BorderStyle.solid))))\n\n'));
+      });
+    });
+
+    group('border=1 rowspan=2', () {
+      final html =
+          '<table border="1"><tr><td rowspan="2">Foo</td></tr></table>';
+
+      testWidgets('renders', (WidgetTester tester) async {
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[CssBlock:child=[Stack:children='
+                '[LayoutGrid:children='
+                '[0,0:2x1:[_LayoutGridSizeBuffer:child=[DecoratedBox:border=1.0@solid#FF000000,child=${_richtext('Foo')}]]]],'
+                '[Positioned:(0.0,0.0,0.0,0.0),child=[DecoratedBox:border=1.0@solid#FF000000]]'
+                ']]'));
+      });
+
+      testWidgets('useExplainer=false', (WidgetTester tester) async {
+        final explained = await explain(tester, html, useExplainer: false);
+        expect(
+            explained,
+            equals('TshWidget\n'
+                '└WidgetPlaceholder<BuildMetadata>(BuildMetadata(<table border="1"><tbody><tr><td rowspan="2">Foo</td></tr></tbody></table>))\n'
+                ' └CssBlock()\n'
+                '  └Stack(alignment: topStart, fit: loose)\n'
+                '   ├LayoutGrid()\n'
+                '   │└GridPlacement(columnStart: 0, columnSpan: 1, rowStart: 0, rowSpan: 2)\n'
+                '   │ └_LayoutGridSizeBuffer(heightDelta: 2.0, widthDelta: 0.0)\n'
+                '   │  └DecoratedBox(bg: BoxDecoration(border: all(BorderSide(Color(0xff000000), 1.0, BorderStyle.solid))))\n'
+                '   │   └SizedBox.expand()\n'
+                '   │    └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+                '   │     │  "Foo"\n'
+                '   │     │)\n'
+                '   │     └CssBlock()\n'
+                '   │      └Padding(padding: all(1.0))\n'
+                '   │       └RichText(text: "Foo")\n'
+                '   └Positioned(left: 0.0, top: 0.0, right: 0.0, bottom: 0.0)\n'
+                '    └DecoratedBox(bg: BoxDecoration(border: all(BorderSide(Color(0xff000000), 1.0, BorderStyle.solid))))\n\n'));
+      });
     });
 
     testWidgets('renders style="border: 1px"', (WidgetTester tester) async {
@@ -197,8 +275,8 @@ void main() {
           explained,
           equals('[CssBlock:child=[Stack:children='
               '[LayoutGrid:children='
-              '[0,0:[Container:border=1.0@solid#FF000000,child=${_richtext('Foo')}]]],'
-              '[Positioned:(0.0,0.0,0.0,0.0),child=[Container:border=1.0@solid#FF000000]]'
+              '[0,0:[DecoratedBox:border=1.0@solid#FF000000,child=${_richtext('Foo')}]]],'
+              '[Positioned:(0.0,0.0,0.0,0.0),child=[DecoratedBox:border=1.0@solid#FF000000]]'
               ']]'));
     });
 
@@ -209,8 +287,8 @@ void main() {
           explained,
           equals('[CssBlock:child=[Stack:children='
               '[LayoutGrid:children='
-              '[0,0:[Container:border=2.0@solid#FF000000,child=${_richtext('Foo')}]]],'
-              '[Positioned:(0.0,0.0,0.0,0.0),child=[Container:border=2.0@solid#FF000000]]'
+              '[0,0:[DecoratedBox:border=2.0@solid#FF000000,child=${_richtext('Foo')}]]],'
+              '[Positioned:(0.0,0.0,0.0,0.0),child=[DecoratedBox:border=2.0@solid#FF000000]]'
               ']]'));
     });
 
@@ -222,8 +300,8 @@ void main() {
           explained,
           equals('[CssBlock:child=[Stack:children='
               '[LayoutGrid:children='
-              '[0,0:[Container:border=1.0@solid#FFFF0000,child=${_richtext('Foo')}]]],'
-              '[Positioned:(0.0,0.0,0.0,0.0),child=[Container:border=1.0@solid#FFFF0000]]'
+              '[0,0:[DecoratedBox:border=1.0@solid#FFFF0000,child=${_richtext('Foo')}]]],'
+              '[Positioned:(0.0,0.0,0.0,0.0),child=[DecoratedBox:border=1.0@solid#FFFF0000]]'
               ']]'));
     });
 
@@ -235,8 +313,8 @@ void main() {
           explained,
           equals('[CssBlock:child=[Stack:children='
               '[LayoutGrid:children='
-              '[0,0:[Container:border=1.0@solid#FF000000,child=${_padding('[RichText:align=left,(:Foo)]')}]]],'
-              '[Positioned:(0.0,0.0,0.0,0.0),child=[Container:border=1.0@solid#FF000000]]'
+              '[0,0:[DecoratedBox:border=1.0@solid#FF000000,child=${_padding('[RichText:align=left,(:Foo)]')}]]],'
+              '[Positioned:(0.0,0.0,0.0,0.0),child=[DecoratedBox:border=1.0@solid#FF000000]]'
               ']]'));
     });
 
@@ -248,8 +326,8 @@ void main() {
           explained,
           equals('[CssBlock:child=[Stack:children='
               '[LayoutGrid:children='
-              '[0,0:[Container:border=1.0@solid#FF000000,child=${_padding('[RichText:align=left,(:Foo)]')}]]],'
-              '[Positioned:(0.0,0.0,0.0,0.0),child=[Container:border=1.0@solid#FF000000]]'
+              '[0,0:[DecoratedBox:border=1.0@solid#FF000000,child=${_padding('[RichText:align=left,(:Foo)]')}]]],'
+              '[Positioned:(0.0,0.0,0.0,0.0),child=[DecoratedBox:border=1.0@solid#FF000000]]'
               ']]'));
     });
   });
