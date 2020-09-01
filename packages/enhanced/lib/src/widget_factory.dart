@@ -8,6 +8,7 @@ import 'package:flutter_widget_from_html_core/src/internal/core_parser.dart';
 import 'package:flutter_widget_from_html_core/src/internal/core_ops.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'internal/layout_grid.dart';
 import 'internal/ops.dart';
 import 'data.dart';
 import 'helpers.dart';
@@ -50,67 +51,8 @@ class WidgetFactory extends core.WidgetFactory {
 
   /// Builds [LayoutGrid].
   @override
-  Widget buildTable(
-      BuildMetadata node, TextStyleHtml tsh, TableMetadata table) {
-    final cols = table.cols;
-    if (cols == 0) return null;
-    final templateColumnSizes = List<TrackSize>(cols);
-    for (var c = 0; c < cols; c++) {
-      templateColumnSizes[c] = FlexibleTrackSize(1);
-    }
-
-    final rows = table.rows;
-    if (rows == 0) return null;
-    final templateRowSizes = List<TrackSize>(rows);
-    for (var r = 0; r < rows; r++) {
-      templateRowSizes[r] = IntrinsicContentTrackSize();
-    }
-
-    final border = table.border != null
-        ? BoxDecoration(border: Border.fromBorderSide(table.border))
-        : null;
-
-    final children = <Widget>[];
-    table.visitCells((col, row, widget, colspan, rowspan) {
-      Widget child = SizedBox.expand(child: widget);
-
-      if (border != null) {
-        child = Container(
-          child: child,
-          decoration: border,
-        );
-      }
-
-      child = child.withGridPlacement(
-        columnStart: col,
-        columnSpan: colspan,
-        rowStart: row,
-        rowSpan: rowspan,
-      );
-
-      children.add(child);
-    });
-
-    final layoutGrid = LayoutGrid(
-      children: children,
-      columnGap: -(table.border?.width ?? 0),
-      gridFit: GridFit.passthrough,
-      rowGap: -(table.border?.width ?? 0),
-      templateColumnSizes: templateColumnSizes,
-      templateRowSizes: templateRowSizes,
-    );
-
-    if (border == null) return layoutGrid;
-
-    return buildStack(
-      node,
-      tsh,
-      <Widget>[
-        layoutGrid,
-        Positioned.fill(child: Container(decoration: border))
-      ],
-    );
-  }
+  Widget buildTable(BuildMetadata m, TextStyleHtml tsh, TableMetadata data) =>
+      buildTableWithLayoutGrid(this, m, tsh, data);
 
   /// Builds [VideoPlayer].
   Widget buildVideoPlayer(
