@@ -34,6 +34,10 @@ class WidgetFactory {
   WidgetPlaceholder buildBody(BuildMetadata meta, Iterable<Widget> children) =>
       buildColumnPlaceholder(meta, children, trimMarginVertical: true);
 
+  /// Builds [Center].
+  Widget buildCenter(BuildMetadata meta, Widget child) =>
+      Center(child: child, heightFactor: 1);
+
   /// Builds column placeholder.
   WidgetPlaceholder buildColumnPlaceholder(
     BuildMetadata meta,
@@ -381,8 +385,10 @@ class WidgetFactory {
         meta.register(_tagBr);
         break;
 
-      case 'center':
-        meta[kCssTextAlign] = kCssTextAlignCenter;
+      case kTagCenter:
+        meta
+          ..isBlockElement = true
+          ..[kCssTextAlign] = kCssTextAlignWebkitCenter;
         break;
 
       case 'cite':
@@ -701,12 +707,7 @@ class WidgetFactory {
         break;
 
       case kCssTextAlign:
-        final textAlign = tryParseTextAlign(value);
-        if (textAlign != null) {
-          meta
-            ..isBlockElement = true
-            ..tsb(TextStyleOps.textAlign, textAlign);
-        }
+        meta.register(StyleTextAlign(this, value).op);
         break;
 
       case kCssTextDecoration:
