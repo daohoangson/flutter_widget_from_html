@@ -21,6 +21,10 @@ Widget buildTableWithLayoutGrid(WidgetFactory wf, BuildMetadata meta,
 
   final border =
       data.border != null ? Border.fromBorderSide(data.border) : null;
+  final columnGap =
+      ((border?.left?.width ?? 0.0) + (border?.right?.width ?? 0.0)) / -2;
+  final rowGap =
+      ((border?.top?.width ?? 0.0) + (border?.bottom?.width ?? 0.0)) / -2;
 
   final children = <Widget>[];
   data.visitCells((col, row, widget, colspan, rowspan) {
@@ -36,9 +40,9 @@ Widget buildTableWithLayoutGrid(WidgetFactory wf, BuildMetadata meta,
 
   final layoutGrid = LayoutGrid(
     children: children,
-    columnGap: (-border.left.width - border.right.width) / 2,
+    columnGap: columnGap,
     gridFit: GridFit.passthrough,
-    rowGap: (-border.top.width - border.bottom.width) / 2,
+    rowGap: rowGap,
     templateColumnSizes: templateColumnSizes,
     templateRowSizes: templateRowSizes,
   );
@@ -78,6 +82,21 @@ class _LayoutGridCell extends StatelessWidget {
         child: built,
         decoration: BoxDecoration(border: border),
       );
+
+      if (colspan > 1 || rowspan > 1) {
+        // the size buffer is required because
+        // LayoutGrid will calculate extra width/height using negative gap values
+        // making the allocated size not big enough to fit everything
+        built = _LayoutGridSizeBuffer(
+          child: built,
+          heightDelta:
+              ((border.top?.width ?? 0.0) + (border.bottom?.width ?? 0.0)) *
+                  (rowspan - 1),
+          widthDelta:
+              ((border.left?.width ?? 0.0) + (border.right?.width ?? 0.0)) *
+                  (colspan - 1),
+        );
+      }
     }
 
     return GridPlacement(
@@ -87,5 +106,63 @@ class _LayoutGridCell extends StatelessWidget {
       rowStart: row,
       rowSpan: rowspan,
     );
+  }
+}
+
+class _LayoutGridSizeBuffer extends SingleChildRenderObjectWidget {
+  final double heightDelta;
+  final double widthDelta;
+
+  const _LayoutGridSizeBuffer({
+    Widget child,
+    @required this.heightDelta,
+    Key key,
+    @required this.widthDelta,
+  }) : super(child: child, key: key);
+
+  @override
+  _RenderSizeBuffer createRenderObject(BuildContext _) =>
+      _RenderSizeBuffer(heightDelta, widthDelta);
+
+  @override
+  void updateRenderObject(BuildContext _, _RenderSizeBuffer renderObject) {
+    renderObject.heightDelta = heightDelta;
+    renderObject.widthDelta = widthDelta;
+  }
+}
+
+class _RenderSizeBuffer extends RenderProxyBox {
+  _RenderSizeBuffer(this._heightDelta, this._widthDelta);
+
+  double _heightDelta;
+  set heightDelta(double value) {
+    if (value == _heightDelta) return;
+    _heightDelta = value;
+    markNeedsLayout();
+  }
+
+  double _widthDelta;
+  set widthDelta(double value) {
+    if (value == _widthDelta) return;
+    _widthDelta = value;
+    markNeedsLayout();
+  }
+
+  @override
+  double computeMaxIntrinsicHeight(double width) =>
+      (child?.computeMaxIntrinsicHeight(width) ?? 0.0) + _heightDelta;
+
+  @override
+  double computeMaxIntrinsicWidth(double height) =>
+      (child?.computeMaxIntrinsicWidth(height) ?? 0.0) + _widthDelta;
+
+  @override
+  void performLayout() {
+    if (child != null) {
+      child.layout(constraints, parentUsesSize: true);
+      size = child.size;
+    } else {
+      performResize();
+    }
   }
 }
