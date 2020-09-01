@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-
-import '../html_widget.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class ImgScreen extends StatefulWidget {
   @override

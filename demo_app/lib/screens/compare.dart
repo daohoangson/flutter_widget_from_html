@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core;
-
-import '../html_widget.dart';
 
 class CompareScreen extends StatelessWidget {
   final String html;
