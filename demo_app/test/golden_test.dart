@@ -393,6 +393,8 @@ ${_paddingTest('padding: 0 10px', 'horizontal only')}
     'inline/vertical-align/super':
         'Foo<span style="vertical-align: super">$redX</span>',
     'A': '<a href="https://flutter.dev">Flutter</a>',
+    'IMG':
+        'Flutter <img src="asset:logos/android.png" width="12" height="12" /> is awesome.',
     'LI,OL,UL': '''
 <ol>
   <li>One</li>
