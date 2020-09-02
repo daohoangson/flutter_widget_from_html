@@ -365,6 +365,18 @@ ${_paddingTest('padding: 0 10px', 'horizontal only')}
     'inline/text-align/end': '<div style="text-align: end">$lipsum</div>',
     'inline/text-align/end/rtl':
         '<div dir="rtl"><div style="text-align: end">$lipsum</div></div>',
+    'inline/text-align/img/center_inline':
+        '<div style="text-align: center">Foo <img src="asset:images/100x10.png" /> bar</div>',
+    'inline/text-align/img/center_block':
+        '<div style="text-align: center">Foo <img src="asset:images/100x10.png" style="display: block" /> bar</div>',
+    'inline/text-align/img/left_inline':
+        '<div style="text-align: left">Foo <img src="asset:images/100x10.png" /> bar</div>',
+    'inline/text-align/img/left_block':
+        '<div style="text-align: left">Foo <img src="asset:images/100x10.png" style="display: block" /> bar</div>',
+    'inline/text-align/img/right_inline':
+        '<div style="text-align: right">Foo <img src="asset:images/100x10.png" /> bar</div>',
+    'inline/text-align/img/right_block':
+        '<div style="text-align: right">Foo <img src="asset:images/100x10.png" style="display: block" /> bar</div>',
     'inline/text-align/justify':
         '<div style="text-align: justify">$lipsum</div>',
     'inline/text-align/left': '<div style="text-align: left">$lipsum</div>',

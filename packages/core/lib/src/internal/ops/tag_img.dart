@@ -13,34 +13,24 @@ class TagImg {
 
   TagImg(this.wf);
 
-  BuildOp get buildOp => BuildOp(
-        isBlockElement: false,
-        onTree: (node, tree) {
-          if (node.isBlockElement) return;
-
-          final image = _parse(node);
-          final built = _build(node, image);
-          if (built == null) {
-            final imgText = image.alt ?? image.title;
-            if (imgText?.isNotEmpty == true) {
-              tree.addText(imgText);
-            }
-            return;
+  BuildOp get buildOp => BuildOp(onTree: (meta, tree) {
+        final data = _parse(meta);
+        final built = _build(meta, data);
+        if (built == null) {
+          final imgText = data.alt ?? data.title;
+          if (imgText?.isNotEmpty == true) {
+            tree.addText(imgText);
           }
+          return;
+        }
 
-          tree.replaceWith(WidgetBit.inline(
-              tree, WidgetPlaceholder<ImageMetadata>(image, child: built)));
-        },
-        onWidgets: (node, widgets) {
-          if (!node.isBlockElement) return widgets;
+        final placeholder =
+            WidgetPlaceholder<ImageMetadata>(data, child: built);
 
-          final image = _parse(node);
-          final built = _build(node, image);
-          if (built == null) return [];
-
-          return [WidgetPlaceholder<ImageMetadata>(image, child: built)];
-        },
-      );
+        tree.replaceWith(meta.isBlockElement
+            ? WidgetBit.block(tree, placeholder)
+            : WidgetBit.inline(tree, placeholder));
+      });
 
   Widget _build(BuildMetadata meta, ImageMetadata data) {
     final provider = wf.imageProvider(data.sources?.first);

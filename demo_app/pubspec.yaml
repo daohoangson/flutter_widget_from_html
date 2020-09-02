@@ -33,6 +33,7 @@ dev_dependencies:
 
 flutter:
   assets:
+    - images/
     - logos/
   fonts:
     - family: Courier
