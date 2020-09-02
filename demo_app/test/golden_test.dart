@@ -58,37 +58,36 @@ class _TestApp extends StatelessWidget {
       ]);
     }
 
-    return MaterialApp(
-      home: Scaffold(
-        body: RepaintBoundary(
-          child: Container(
-            child: Column(
-              children: children,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-            ),
-            decoration: BoxDecoration(color: Colors.white),
-            width: 400,
+    return SingleChildScrollView(
+      child: RepaintBoundary(
+        child: Container(
+          child: Column(
+            children: children,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
           ),
-          key: targetKey,
+          color: Colors.white,
         ),
+        key: targetKey,
       ),
-      theme: ThemeData.light(),
     );
   }
 }
 
 void _test(String name, String html) => testGoldens(name, (tester) async {
       final key = UniqueKey();
-      await tester.pumpWidget(_TestApp(
-        html,
-        targetKey: key,
-        withEnhanced: _withEnhancedRegExp.hasMatch(name),
-      ));
-      await expectLater(
-        find.byKey(key),
-        matchesGoldenFile('./images/$name.png'),
+
+      await tester.pumpWidgetBuilder(
+        _TestApp(
+          html,
+          targetKey: key,
+          withEnhanced: _withEnhancedRegExp.hasMatch(name),
+        ),
+        wrapper: materialAppWrapper(theme: ThemeData.light()),
+        surfaceSize: Size(400, 1200),
       );
+
+      await screenMatchesGolden(tester, name, finder: find.byKey(key));
     });
 
 void main() {

@@ -13,10 +13,12 @@ class _TestApp extends StatelessWidget {
 
 void main() {
   testGoldens('smilie', (tester) async {
-    await tester.pumpWidget(_TestApp());
-    await expectLater(
-      find.byType(SmilieScreen),
-      matchesGoldenFile('./images/others/smilie.png'),
+    await tester.pumpWidgetBuilder(
+      SmilieScreen(),
+      wrapper: materialAppWrapper(theme: ThemeData.light()),
+      surfaceSize: Size(400, 200),
     );
+
+    await screenMatchesGolden(tester, 'others/smilie');
   });
 }
