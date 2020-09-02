@@ -121,8 +121,10 @@ void main() {
     'ASIDE': '<aside>First.</aside><aside>Second one.</aside>',
     'BLOCKQUOTE': '<blockquote>Foo</blockquote>',
     'DIV': '<div>First.</div><div>Second one.</div>',
-    'FIGURE,FIGCAPTION':
-        '<figure><figcaption><i>fig. 1</i> Foo</figcaption></figure>',
+    'FIGURE,FIGCAPTION': '''<figure>
+  <img src="asset:logos/android.png" width="192" height="192" />
+  <figcaption><i>fig. 1</i> Flutter logo (Android version)</figcaption>
+</figure>''',
     'HEADER,FOOTER': '<header>First.</header><footer>Second one.</footer>',
     'MAIN,NAV': '<main>First.</main><nav>Second one.</nav>',
     'P': '<p>First.</p><p>Second one.</p>',
