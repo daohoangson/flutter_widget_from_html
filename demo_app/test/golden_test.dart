@@ -71,6 +71,11 @@ class _TestApp extends StatelessWidget {
   }
 }
 
+String _paddingTest(String style, String text) =>
+    '<div style="background: red; $style">'
+    '<div style="background: black; color: white">$text</div>'
+    '</div>';
+
 void _test(String name, String html) => testGoldens(name, (tester) async {
       final key = UniqueKey();
 
@@ -265,35 +270,35 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         '----<div style="margin-left: 3px">Foo</div>----',
     'inline/padding/4_values': '''
 ----
-<div style="padding: 1px 2px 3px 4px">all</div>
+${_paddingTest('padding: 5px 10px 15px 20px', 'all')}
 ----
-<div style="padding: 1px 0 0 0">top only</div>
+${_paddingTest('padding: 5px 0 0 0', 'top only')}
 ----
-<div style="padding: 0 2px 0 0">right only</div>
+${_paddingTest('padding: 0 10px 0 0', 'right only')}
 ----
-<div style="padding: 0 0 3px 0">bottom only</div>
+${_paddingTest('padding: 0 0 15px 0', 'bottom only')}
 ----
-<div style="padding: 0 0 3px 0">left only</div>
----
+${_paddingTest('padding: 0 0 0 20px', 'left only')}
+----
 ''',
     'inline/padding/2_values': '''
 ----
-<div style="padding: 5px 10px">both</div>
+${_paddingTest('padding: 5px 10px', 'both')}
 ----
-<div style="padding: 5px 0">vertical only</div>
+${_paddingTest('padding: 5px 0', 'vertical only')}
 ----
-<div style="padding: 0 10px">horizontal only</div>
+${_paddingTest('padding: 0 10px', 'horizontal only')}
 ----
 ''',
-    'inline/padding/1_value': '----<div style="padding: 3px">Foo</div>----',
+    'inline/padding/1_value': '----${_paddingTest('padding: 5px', 'Foo')}----',
     'inline/padding/padding-top':
-        '----<div style="padding-top: 3px">Foo</div>----',
+        '----${_paddingTest('padding-top: 5px', 'Foo')}----',
     'inline/padding/padding-right':
-        '----<div style="padding-right: 3px">Foo</div>----',
+        '----${_paddingTest('padding-right: 5px', 'Foo')}----',
     'inline/padding/padding-bottom':
-        '----<div style="padding-top: 3px">Foo</div>----',
+        '----${_paddingTest('padding-bottom: 5px', 'Foo')}----',
     'inline/padding/padding-left':
-        '----<div style="padding-left: 3px">Foo</div>----',
+        '----${_paddingTest('padding-left: 5px', 'Foo')}----',
     'inline/sizing/height':
         '<div style="background-color: red; height: 100px">Foo</div>',
     'inline/sizing/height/huge':
