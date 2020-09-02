@@ -10,7 +10,7 @@ class TagA {
   TagA(this.wf, this.colorCallback);
 
   BuildOp get buildOp => BuildOp(
-        defaultStyles: (meta) {
+        defaultStyles: (_) {
           final styles = {kCssTextDecoration: kCssTextDecorationUnderline};
 
           final color = colorCallback?.call();

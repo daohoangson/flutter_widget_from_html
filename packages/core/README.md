@@ -122,9 +122,9 @@ There are two ways to change the built widget tree.
 
 For cosmetic changes like color, italic, etc., use `customStylesBuilder` to specify inline styles (see supported list above) for each DOM element. Some common conditionals:
 
-- If HTML tag is H1 `e.localName == 'h1'`
-- If the element has `foo` CSS class `e.classes.contains('foo')`
-- If an attribute has a specific value `e.attributes['x'] == 'y'`
+- If HTML tag is H1 `element.localName == 'h1'`
+- If the element has `foo` CSS class `element.classes.contains('foo')`
+- If an attribute has a specific value `element.attributes['x'] == 'y'`
 
 This example changes the color for a CSS class:
 
@@ -229,7 +229,7 @@ The HTML string is parsed into DOM elements and each element is visited once to 
 | --- | --- | --- |
 | 1 | Parse | `WidgetFactory.parse(BuildMetadata)` |
 | 2 | Inform parents if any | `BuildOp.onChild(BuildMetadata)` |
-| 3 | Populate default styling | `BuildOp.defaultStyles(BuildMetadata)` |
+| 3 | Populate default styling | `BuildOp.defaultStyles(Element)` |
 | 4 | Populate custom styling | `HtmlWidget.customStylesBuilder` |
 | 5 | Parse styling key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(BuildMetadata, String, String)` |
 | 6 | a. If a custom widget is provided, go to 7 | `HtmlWidget.customWidgetBuilder` |

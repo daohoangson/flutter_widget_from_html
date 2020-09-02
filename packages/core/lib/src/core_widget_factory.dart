@@ -440,8 +440,8 @@ class WidgetFactory {
 
       case kTagFont:
         _tagFont ??= BuildOp(
-          defaultStyles: (meta) {
-            final attrs = meta.element.attributes;
+          defaultStyles: (element) {
+            final attrs = element.attributes;
             return {
               kCssColor: attrs[kAttributeFontColor],
               kCssFontFamily: attrs[kAttributeFontFace],
