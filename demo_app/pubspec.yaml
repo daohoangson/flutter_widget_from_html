@@ -3,7 +3,7 @@ description: Flutter Widget from HTML demo app.
 version: 0.0.1
 
 environment:
-  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+  sdk: ">=2.6.0 <3.0.0"
 
 dependencies:
   carousel_slider: ^2.2.1

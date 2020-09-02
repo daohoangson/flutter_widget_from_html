@@ -17,7 +17,7 @@ const lipsum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
 
 const redX = '<span style="background-color:#f00;font-size:0.75em;">x</span>';
 
-final _withEnhancedRegExp = RegExp(r'(colspan|rowspan)');
+final _withEnhancedRegExp = RegExp(r'(^(A|HR)$|colspan|rowspan)');
 
 class _TestApp extends StatelessWidget {
   final String html;
@@ -36,6 +36,11 @@ class _TestApp extends StatelessWidget {
     final children = <Widget>[
       Text(html),
       Divider(),
+      if (withEnhanced)
+        Text(
+          'flutter_widget_from_html_core:\n',
+          style: Theme.of(context).textTheme.caption,
+        ),
       LimitedBox(
         child: core.HtmlWidget(html),
         maxHeight: 400,
@@ -45,6 +50,10 @@ class _TestApp extends StatelessWidget {
     if (withEnhanced) {
       children.addAll(<Widget>[
         Divider(),
+        Text(
+          'flutter_widget_from_html:\n',
+          style: Theme.of(context).textTheme.caption,
+        ),
         LimitedBox(
           child: enhanced.HtmlWidget(html),
           maxHeight: 400,
@@ -383,6 +392,7 @@ ${_paddingTest('padding: 0 10px', 'horizontal only')}
         'Foo<span style="vertical-align: sub">$redX</span>',
     'inline/vertical-align/super':
         'Foo<span style="vertical-align: super">$redX</span>',
+    'A': '<a href="https://flutter.dev">Flutter</a>',
     'LI,OL,UL': '''
 <ol>
   <li>One</li>
