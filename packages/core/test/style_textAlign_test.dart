@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:network_image_mock/network_image_mock.dart';
 
 import '_.dart';
 
@@ -98,32 +97,6 @@ void main() {
       final html = '<div style="text-align: right">$kBlockHtml</div>';
       final e = await explain(tester, html);
       expect(e, equals('[CssBlock:child=[RichText:align=right,(:Foo)]]'));
-    });
-  });
-
-  group('image', () {
-    final imgSrc = 'http://domain.com/image.png';
-    final imgHtml = '<img src="$imgSrc" />';
-    final img = '[Image:image=NetworkImage("$imgSrc", scale: 1.0)]';
-    final imgExplain = (WidgetTester t, String html) =>
-        mockNetworkImagesFor(() => explain(t, html));
-
-    testWidgets('renders center image', (WidgetTester tester) async {
-      final html = '<div style="text-align: center">$imgHtml</div>';
-      final e = await imgExplain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=center,$img]]'));
-    });
-
-    testWidgets('renders left image', (WidgetTester tester) async {
-      final html = '<div style="text-align: left">$imgHtml</div>';
-      final e = await imgExplain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=left,$img]]'));
-    });
-
-    testWidgets('renders right image', (WidgetTester tester) async {
-      final html = '<div style="text-align: right">$imgHtml</div>';
-      final e = await imgExplain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=right,$img]]'));
     });
   });
 

@@ -39,7 +39,12 @@ class TagImg {
           }
 
           final placeholder =
-              WidgetPlaceholder<ImageMetadata>(data, child: built);
+              WidgetPlaceholder<ImageMetadata>(data, child: built)
+                  .wrapWith((context, child) => _LoosenConstraintsWidget(
+                        child: child,
+                        crossAxisAlignment:
+                            meta.tsb().build(context).crossAxisAlignment,
+                      ));
 
           tree.replaceWith(meta.isBlockElement
               ? WidgetBit.block(tree, placeholder)
@@ -50,11 +55,7 @@ class TagImg {
   Widget _build(BuildMetadata meta, ImageMetadata data) {
     final provider = wf.imageProvider(data.sources?.first);
     if (provider == null) return null;
-
-    final built = wf.buildImage(meta, provider, data);
-    if (built == null) return null;
-
-    return _LoosenConstraintsWidget(child: built);
+    return wf.buildImage(meta, provider, data);
   }
 
   ImageMetadata _parse(BuildMetadata meta) {
@@ -95,20 +96,59 @@ Uint8List bytesFromDataUri(String dataUri) {
 }
 
 class _LoosenConstraintsWidget extends SingleChildRenderObjectWidget {
-  _LoosenConstraintsWidget({@required Widget child, Key key})
-      : assert(child != null),
+  final CrossAxisAlignment crossAxisAlignment;
+
+  _LoosenConstraintsWidget({
+    @required Widget child,
+    this.crossAxisAlignment,
+    Key key,
+  })  : assert(child != null),
         super(child: child, key: key);
 
   @override
   _LoosenConstraintsRender createRenderObject(BuildContext _) =>
-      _LoosenConstraintsRender();
+      _LoosenConstraintsRender(crossAxisAlignment: crossAxisAlignment);
 }
 
+class _LoosenConstraintsParentData extends ContainerBoxParentData<RenderBox> {}
+
 class _LoosenConstraintsRender extends RenderProxyBox {
+  _LoosenConstraintsRender({
+    RenderBox child,
+    CrossAxisAlignment crossAxisAlignment,
+  })  : _crossAxisAlignment = crossAxisAlignment,
+        super(child);
+
+  CrossAxisAlignment _crossAxisAlignment;
+  set crossAxisAlignment(CrossAxisAlignment value) {
+    if (value == _crossAxisAlignment) return;
+    _crossAxisAlignment = value;
+    markNeedsLayout();
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    final data = child.parentData as _LoosenConstraintsParentData;
+    context.paintChild(child, data.offset + offset);
+  }
+
   @override
   void performLayout() {
     final c = constraints;
     child.layout(c.loosen(), parentUsesSize: true);
     size = c.constrain(child.size);
+
+    if (_crossAxisAlignment == CrossAxisAlignment.center) {
+      final data = child.parentData as _LoosenConstraintsParentData;
+      data.offset = Offset((size.width - child.size.width) / 2, 0);
+      print('size=$size child.size=${child.size} data.offset=${data.offset}');
+    }
+  }
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! _LoosenConstraintsParentData) {
+      child.parentData = _LoosenConstraintsParentData();
+    }
   }
 }

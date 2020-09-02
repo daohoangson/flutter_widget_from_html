@@ -369,6 +369,10 @@ ${_paddingTest('padding: 0 10px', 'horizontal only')}
         '<div style="text-align: center">Foo <img src="asset:images/100x10.png" /> bar</div>',
     'inline/text-align/img/center_block':
         '<div style="text-align: center">Foo <img src="asset:images/100x10.png" style="display: block" /> bar</div>',
+    'inline/text-align/img/center_tag_inline':
+        '<center>Foo <img src="asset:images/100x10.png" /> bar</center>',
+    'inline/text-align/img/center_tag_block':
+        '<center>Foo <img src="asset:images/100x10.png" style="display: block" /> bar</center>',
     'inline/text-align/img/left_inline':
         '<div style="text-align: left">Foo <img src="asset:images/100x10.png" /> bar</div>',
     'inline/text-align/img/left_block':

@@ -34,6 +34,8 @@ class StyleTextAlign {
         if (value != kCssTextAlignMozCenter &&
             value != kCssTextAlignWebkitCenter) return widgets;
 
+        meta.tsb(_tsbCrossAxisAlignmentCenter);
+
         return listOrNull(wf
             .buildColumnPlaceholder(meta, widgets)
             .wrapWith((_, child) => wf.buildCenter(meta, child)));
@@ -62,4 +64,7 @@ class StyleTextAlign {
 
   static TextStyleHtml _tsb(TextStyleHtml tsb, TextAlign textAlign) =>
       tsb.copyWith(textAlign: textAlign);
+
+  static TextStyleHtml _tsbCrossAxisAlignmentCenter(TextStyleHtml tsb, _) =>
+      tsb.copyWith(crossAxisAlignment: CrossAxisAlignment.center);
 }
