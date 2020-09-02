@@ -514,13 +514,6 @@ class WidgetFactory {
       case kTagImg:
         _tagImg ??= TagImg(this).buildOp;
         meta.register(_tagImg);
-
-        if (attrs.containsKey(kAttributeImgHeight)) {
-          meta[kCssHeight] = '${attrs[kAttributeImgHeight]}px';
-        }
-        if (attrs.containsKey(kAttributeImgWidth)) {
-          meta[kCssWidth] = '${attrs[kAttributeImgWidth]}px';
-        }
         break;
 
       case 'ins':

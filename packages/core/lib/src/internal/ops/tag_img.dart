@@ -13,29 +13,48 @@ class TagImg {
 
   TagImg(this.wf);
 
-  BuildOp get buildOp => BuildOp(onTree: (meta, tree) {
-        final data = _parse(meta);
-        final built = _build(meta, data);
-        if (built == null) {
-          final imgText = data.alt ?? data.title;
-          if (imgText?.isNotEmpty == true) {
-            tree.addText(imgText);
+  BuildOp get buildOp => BuildOp(
+        defaultStyles: (element) {
+          final attrs = element.attributes;
+          final styles = <String, String>{};
+
+          if (attrs.containsKey(kAttributeImgHeight)) {
+            styles[kCssHeight] = '${attrs[kAttributeImgHeight]}px';
           }
-          return;
-        }
+          if (attrs.containsKey(kAttributeImgWidth)) {
+            styles[kCssWidth] = '${attrs[kAttributeImgWidth]}px';
+          }
 
-        final placeholder =
-            WidgetPlaceholder<ImageMetadata>(data, child: built);
+          return styles;
+        },
+        onTree: (meta, tree) {
+          final data = _parse(meta);
+          final built = _build(meta, data);
+          if (built == null) {
+            final imgText = data.alt ?? data.title;
+            if (imgText?.isNotEmpty == true) {
+              tree.addText(imgText);
+            }
+            return;
+          }
 
-        tree.replaceWith(meta.isBlockElement
-            ? WidgetBit.block(tree, placeholder)
-            : WidgetBit.inline(tree, placeholder));
-      });
+          final placeholder =
+              WidgetPlaceholder<ImageMetadata>(data, child: built);
+
+          tree.replaceWith(meta.isBlockElement
+              ? WidgetBit.block(tree, placeholder)
+              : WidgetBit.inline(tree, placeholder));
+        },
+      );
 
   Widget _build(BuildMetadata meta, ImageMetadata data) {
     final provider = wf.imageProvider(data.sources?.first);
     if (provider == null) return null;
-    return wf.buildImage(meta, provider, data);
+
+    final built = wf.buildImage(meta, provider, data);
+    if (built == null) return null;
+
+    return _LoosenConstraintsWidget(child: built);
   }
 
   ImageMetadata _parse(BuildMetadata meta) {
@@ -73,4 +92,23 @@ Uint8List bytesFromDataUri(String dataUri) {
   if (bytes.isEmpty) return null;
 
   return bytes;
+}
+
+class _LoosenConstraintsWidget extends SingleChildRenderObjectWidget {
+  _LoosenConstraintsWidget({@required Widget child, Key key})
+      : assert(child != null),
+        super(child: child, key: key);
+
+  @override
+  _LoosenConstraintsRender createRenderObject(BuildContext _) =>
+      _LoosenConstraintsRender();
+}
+
+class _LoosenConstraintsRender extends RenderProxyBox {
+  @override
+  void performLayout() {
+    final c = constraints;
+    child.layout(c.loosen(), parentUsesSize: true);
+    size = c.constrain(child.size);
+  }
 }

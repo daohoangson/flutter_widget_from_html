@@ -450,6 +450,14 @@ class Explainer {
 
     if (widget is Image) return _image(widget);
 
+    if (widget is SingleChildRenderObjectWidget) {
+      switch (widget.runtimeType.toString()) {
+        case '_LoosenConstraintsWidget':
+          // avoid exposing internal widgets
+          return _widget(widget.child);
+      }
+    }
+
     if (widget is SizedBox) return _sizedBox(widget);
 
     final type = '${widget.runtimeType}';

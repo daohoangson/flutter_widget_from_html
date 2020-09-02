@@ -409,6 +409,20 @@ ${_paddingTest('padding: 0 10px', 'horizontal only')}
     'A': '<a href="https://flutter.dev">Flutter</a>',
     'IMG':
         'Flutter <img src="asset:logos/android.png" width="12" height="12" /> is awesome.',
+    'IMG/inline_big': 'Foo <img src="asset:images/2000x200.png" /> bar.',
+    'IMG/inline_big_dimensions':
+        'Foo <img src="asset:images/2000x200.png" width="2000" height="200" /> bar.',
+    'IMG/inline_small': 'Foo <img src="asset:images/100x10.png" /> bar.',
+    'IMG/inline_small_dimensions':
+        'Foo <img src="asset:images/100x10.png" width="100" height="10" /> bar.',
+    'IMG/block_big':
+        'Foo <img src="asset:images/2000x200.png" style="display: block" /> bar.',
+    'IMG/block_big_dimensions':
+        'Foo <img src="asset:images/2000x200.png" width="2000" height="200" style="display: block" /> bar.',
+    'IMG/block_small':
+        'Foo <img src="asset:images/100x10.png" style="display: block" /> bar.',
+    'IMG/block_small_dimensions':
+        'Foo <img src="asset:images/100x10.png" width="100" height="10" style="display: block" /> bar.',
     'LI,OL,UL': '''
 <ol>
   <li>One</li>
