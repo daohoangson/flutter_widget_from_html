@@ -34,17 +34,11 @@ class _TestApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final children = <Widget>[
-      Padding(
-        child: Text(html),
-        padding: const EdgeInsets.all(10),
-      ),
+      Text(html),
       Divider(),
-      Padding(
-        padding: const EdgeInsets.all(10),
-        child: LimitedBox(
-          child: core.HtmlWidget(html),
-          maxHeight: 400,
-        ),
+      LimitedBox(
+        child: core.HtmlWidget(html),
+        maxHeight: 400,
       ),
     ];
 
@@ -61,10 +55,13 @@ class _TestApp extends StatelessWidget {
     return SingleChildScrollView(
       child: RepaintBoundary(
         child: Container(
-          child: Column(
-            children: children,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
+          child: Padding(
+            child: Column(
+              children: children,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+            ),
+            padding: const EdgeInsets.all(10),
           ),
           color: Colors.white,
         ),
