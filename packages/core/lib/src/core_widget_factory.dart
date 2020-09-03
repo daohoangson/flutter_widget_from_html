@@ -34,10 +34,6 @@ class WidgetFactory {
   WidgetPlaceholder buildBody(BuildMetadata meta, Iterable<Widget> children) =>
       buildColumnPlaceholder(meta, children, trimMarginVertical: true);
 
-  /// Builds [Center].
-  Widget buildCenter(BuildMetadata meta, Widget child) =>
-      Center(child: child, heightFactor: 1);
-
   /// Builds column placeholder.
   WidgetPlaceholder buildColumnPlaceholder(
     BuildMetadata meta,

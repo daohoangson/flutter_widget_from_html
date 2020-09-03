@@ -218,6 +218,11 @@ class Explainer {
     return h.length == 1 ? '0$h' : h;
   }
 
+  String _crossAxisAlignment(CrossAxisAlignment value) => (value != null &&
+          value != CrossAxisAlignment.start)
+      ? 'crossAxisAlignment=${value.toString().replaceAll('CrossAxisAlignment.', '')}'
+      : null;
+
   List<String> _cssSizing(CssSizing w) {
     final attr = <String>[];
 
@@ -467,6 +472,9 @@ class Explainer {
         ? widget.maxLines
         : widget is Text ? widget.maxLines : null;
     if (maxLines != null) attr.add('maxLines=$maxLines');
+
+    attr.add(_crossAxisAlignment(
+        widget is Column ? widget.crossAxisAlignment : null));
 
     attr.add(_textAlign(widget is RichText
         ? widget.textAlign

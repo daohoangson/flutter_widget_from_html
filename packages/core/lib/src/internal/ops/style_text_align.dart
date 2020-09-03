@@ -20,51 +20,48 @@ class StyleTextAlign {
 
   StyleTextAlign(this.wf, this.value);
 
-  BuildOp get op => BuildOp(
-      isBlockElement: false,
-      onTree: (meta, tree) {
-        final textAlign = _tryParse(value);
-        if (textAlign != null) {
-          meta.tsb(_tsb, textAlign);
-        }
-      },
-      onWidgets: (meta, widgets) {
-        if (!meta.isBlockElement) return widgets;
+  BuildOp get op => BuildOp(onTree: (meta, _) => meta.tsb(_tsb, value));
 
-        if (value != kCssTextAlignMozCenter &&
-            value != kCssTextAlignWebkitCenter) return widgets;
+  static TextStyleHtml _tsb(TextStyleHtml tsh, String value) {
+    CrossAxisAlignment crossAxisAlignment;
+    TextAlign textAlign;
 
-        meta.tsb(_tsbCrossAxisAlignmentCenter);
-
-        return listOrNull(wf
-            .buildColumnPlaceholder(meta, widgets)
-            .wrapWith((_, child) => wf.buildCenter(meta, child)));
-      });
-
-  static TextAlign _tryParse(String value) {
     switch (value) {
       case kCssTextAlignCenter:
+        crossAxisAlignment = CrossAxisAlignment.stretch;
+        textAlign = TextAlign.center;
+        break;
       case kCssTextAlignMozCenter:
       case kCssTextAlignWebkitCenter:
-        return TextAlign.center;
+        crossAxisAlignment = CrossAxisAlignment.center;
+        textAlign = TextAlign.center;
+        break;
       case kCssTextAlignEnd:
-        return TextAlign.end;
+        crossAxisAlignment = CrossAxisAlignment.stretch;
+        textAlign = TextAlign.end;
+        break;
       case kCssTextAlignJustify:
-        return TextAlign.justify;
+        crossAxisAlignment = CrossAxisAlignment.stretch;
+        textAlign = TextAlign.justify;
+        break;
       case kCssTextAlignLeft:
-        return TextAlign.left;
+        crossAxisAlignment = CrossAxisAlignment.stretch;
+        textAlign = TextAlign.left;
+        break;
       case kCssTextAlignRight:
-        return TextAlign.right;
+        crossAxisAlignment = CrossAxisAlignment.stretch;
+        textAlign = TextAlign.right;
+        break;
       case kCssTextAlignStart:
-        return TextAlign.start;
+        crossAxisAlignment = CrossAxisAlignment.start;
+        textAlign = TextAlign.start;
+        break;
     }
 
-    return null;
+    if (crossAxisAlignment == null && textAlign == null) return tsh;
+    return tsh.copyWith(
+      crossAxisAlignment: crossAxisAlignment,
+      textAlign: textAlign,
+    );
   }
-
-  static TextStyleHtml _tsb(TextStyleHtml tsb, TextAlign textAlign) =>
-      tsb.copyWith(textAlign: textAlign);
-
-  static TextStyleHtml _tsbCrossAxisAlignmentCenter(TextStyleHtml tsb, _) =>
-      tsb.copyWith(crossAxisAlignment: CrossAxisAlignment.center);
 }

@@ -108,6 +108,13 @@ class _LoosenConstraintsWidget extends SingleChildRenderObjectWidget {
   @override
   _LoosenConstraintsRender createRenderObject(BuildContext _) =>
       _LoosenConstraintsRender(crossAxisAlignment: crossAxisAlignment);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<CrossAxisAlignment>(
+        'crossAxisAlignment', crossAxisAlignment));
+  }
 }
 
 class _LoosenConstraintsParentData extends ContainerBoxParentData<RenderBox> {}
@@ -141,7 +148,6 @@ class _LoosenConstraintsRender extends RenderProxyBox {
     if (_crossAxisAlignment == CrossAxisAlignment.center) {
       final data = child.parentData as _LoosenConstraintsParentData;
       data.offset = Offset((size.width - child.size.width) / 2, 0);
-      print('size=$size child.size=${child.size} data.offset=${data.offset}');
     }
   }
 
