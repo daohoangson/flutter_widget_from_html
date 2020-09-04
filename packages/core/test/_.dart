@@ -91,18 +91,33 @@ Future<String> explain(
         (e) => sb.writeln(e.toDiagnosticsNode().toStringDeep()));
     var str = sb.toString();
     str = str.replaceAll(RegExp(r': [A-Z][A-Za-z]+\.'), ': '); // enums
+
+    // dependencies
     str = str.replaceAll(RegExp(r'\[GlobalKey#[0-9a-f]+\]'), '');
     str = str.replaceAll(RegExp(r'(, )?dependencies: \[[^\]]+\]'), '');
 
-    // trim boring properties
+    // image state
     str = str.replaceAll(
-        RegExp(r'(, )?renderObject: \w+#[a-z0-9]+( relayoutBoundary=\w+)?'),
-        '');
+        RegExp(r'ImageStream#[0-9a-f]+\([^\)]+\)'), 'ImageStream');
+    str = str.replaceAll(
+        RegExp(r'(, )?state: _ImageState#[0-9a-f]+\([^\)]+\)'), '');
+
+    // trim boring properties
+    str =
+        str.replaceAll(RegExp(r'(, )?(this.)?excludeFromSemantics: false'), '');
     str = str.replaceAll(RegExp(r'(, )?crossAxisAlignment: start'), '');
     str = str.replaceAll(RegExp(r'(, )?direction: vertical'), '');
+    str = str.replaceAll(RegExp(r'(, )?filterQuality: low'), '');
+    str = str.replaceAll(RegExp(r'(, )?frameBuilder: null'), '');
+    str = str.replaceAll(RegExp(r'(, )?image: null'), '');
+    str = str.replaceAll(RegExp(r'(, )?invertColors: false'), '');
+    str = str.replaceAll(RegExp(r'(, )?loadingBuilder: null'), '');
     str = str.replaceAll(RegExp(r'(, )?mainAxisAlignment: start'), '');
     str = str.replaceAll(RegExp(r'(, )?mainAxisSize: min'), '');
     str = str.replaceAll(RegExp(r'(, )?maxLines: unlimited'), '');
+    str = str.replaceAll(
+        RegExp(r'(, )?renderObject: \w+#[a-z0-9]+( relayoutBoundary=\w+)?'),
+        '');
     str = str.replaceAll(RegExp(r'(, )?softWrap: [a-z\s]+'), '');
     str = str.replaceAll(RegExp(r'(, )?textDirection: ltr+'), '');
 

@@ -107,18 +107,24 @@ class WidgetFactory {
       SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
 
   /// Builds [Image] from [provider].
-  Widget buildImage(BuildMetadata meta, Object provider, ImageMetadata data) =>
-      provider != null && provider is ImageProvider && data != null
-          ? Image(
-              errorBuilder: (_, error, __) {
-                print('$provider error: $error');
-                final text = data.alt ?? data.title ?? '❌';
-                return Text(text);
-              },
-              image: provider,
-              semanticLabel: data.alt ?? data.title,
-            )
-          : null;
+  Widget buildImage(BuildMetadata meta, Object provider, ImageMetadata data) {
+    if (provider == null) return null;
+    if (provider is ImageProvider) {
+      final semanticLabel = data?.alt ?? data?.title;
+      return Image(
+        errorBuilder: (_, error, __) {
+          print('$provider error: $error');
+          final text = semanticLabel ?? '❌';
+          return Text(text);
+        },
+        excludeFromSemantics: semanticLabel == null,
+        image: provider,
+        semanticLabel: semanticLabel,
+      );
+    }
+
+    return null;
+  }
 
   /// Builds [Padding].
   Widget buildPadding(BuildMetadata meta, Widget child, EdgeInsets padding) =>

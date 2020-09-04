@@ -98,12 +98,9 @@ Uint8List bytesFromDataUri(String dataUri) {
 class _LoosenConstraintsWidget extends SingleChildRenderObjectWidget {
   final CrossAxisAlignment crossAxisAlignment;
 
-  _LoosenConstraintsWidget({
-    @required Widget child,
-    this.crossAxisAlignment,
-    Key key,
-  })  : assert(child != null),
-        super(child: child, key: key);
+  _LoosenConstraintsWidget(
+      {@required Widget child, this.crossAxisAlignment, Key key})
+      : super(child: child, key: key);
 
   @override
   _LoosenConstraintsRender createRenderObject(BuildContext _) =>
