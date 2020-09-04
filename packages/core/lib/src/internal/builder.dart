@@ -227,7 +227,7 @@ class BuildTree extends core_data.BuildTree {
     // stylings, step 1: get default styles from tag-based build ops
     if (meta.buildOps != null) {
       for (final op in meta.buildOps) {
-        final map = op.defaultStyles?.call(meta);
+        final map = op.defaultStyles?.call(meta.element);
         if (map == null) continue;
 
         meta._styles ??= [];

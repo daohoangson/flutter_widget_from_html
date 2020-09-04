@@ -3,7 +3,7 @@ description: Flutter Widget from HTML demo app.
 version: 0.0.1
 
 environment:
-  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+  sdk: ">=2.6.0 <3.0.0"
 
 dependencies:
   carousel_slider: ^2.2.1
@@ -27,12 +27,13 @@ dev_dependencies:
     sdk: flutter
   flutter_test:
     sdk: flutter
-  golden_toolkit: ^0.2.3
+  golden_toolkit: ^0.6.0
   pedantic: any
   test: any
 
 flutter:
   assets:
+    - images/
     - logos/
   fonts:
     - family: Courier

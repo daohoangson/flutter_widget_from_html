@@ -70,7 +70,7 @@ class WidgetFactory {
 
     return Column(
       children: children,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: tsh.crossAxisAlignment ?? CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       textDirection: tsh.textDirection,
     );
@@ -107,18 +107,24 @@ class WidgetFactory {
       SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
 
   /// Builds [Image] from [provider].
-  Widget buildImage(BuildMetadata meta, Object provider, ImageMetadata data) =>
-      provider != null && provider is ImageProvider && data != null
-          ? Image(
-              errorBuilder: (_, error, __) {
-                print('$provider error: $error');
-                final text = data.alt ?? data.title ?? '❌';
-                return Text(text);
-              },
-              image: provider,
-              semanticLabel: data.alt ?? data.title,
-            )
-          : null;
+  Widget buildImage(BuildMetadata meta, Object provider, ImageMetadata data) {
+    if (provider == null) return null;
+    if (provider is ImageProvider) {
+      final semanticLabel = data?.alt ?? data?.title;
+      return Image(
+        errorBuilder: (_, error, __) {
+          print('$provider error: $error');
+          final text = semanticLabel ?? '❌';
+          return Text(text);
+        },
+        excludeFromSemantics: semanticLabel == null,
+        image: provider,
+        semanticLabel: semanticLabel,
+      );
+    }
+
+    return null;
+  }
 
   /// Builds [Padding].
   Widget buildPadding(BuildMetadata meta, Widget child, EdgeInsets padding) =>
@@ -381,8 +387,10 @@ class WidgetFactory {
         meta.register(_tagBr);
         break;
 
-      case 'center':
-        meta[kCssTextAlign] = kCssTextAlignCenter;
+      case kTagCenter:
+        meta
+          ..isBlockElement = true
+          ..[kCssTextAlign] = kCssTextAlignWebkitCenter;
         break;
 
       case 'cite':
@@ -434,8 +442,8 @@ class WidgetFactory {
 
       case kTagFont:
         _tagFont ??= BuildOp(
-          defaultStyles: (meta) {
-            final attrs = meta.element.attributes;
+          defaultStyles: (element) {
+            final attrs = element.attributes;
             return {
               kCssColor: attrs[kAttributeFontColor],
               kCssFontFamily: attrs[kAttributeFontFace],
@@ -508,13 +516,6 @@ class WidgetFactory {
       case kTagImg:
         _tagImg ??= TagImg(this).buildOp;
         meta.register(_tagImg);
-
-        if (attrs.containsKey(kAttributeImgHeight)) {
-          meta[kCssHeight] = '${attrs[kAttributeImgHeight]}px';
-        }
-        if (attrs.containsKey(kAttributeImgWidth)) {
-          meta[kCssWidth] = '${attrs[kAttributeImgWidth]}px';
-        }
         break;
 
       case 'ins':
@@ -701,12 +702,7 @@ class WidgetFactory {
         break;
 
       case kCssTextAlign:
-        final textAlign = tryParseTextAlign(value);
-        if (textAlign != null) {
-          meta
-            ..isBlockElement = true
-            ..tsb(TextStyleOps.textAlign, textAlign);
-        }
+        meta.register(StyleTextAlign(this, value).op);
         break;
 
       case kCssTextDecoration:

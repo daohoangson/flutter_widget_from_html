@@ -82,9 +82,6 @@ class TextStyleOps {
   static TextStyleHtml maxLines(TextStyleHtml p, int v) =>
       p.copyWith(maxLines: v);
 
-  static TextStyleHtml textAlign(TextStyleHtml p, TextAlign v) =>
-      p.copyWith(textAlign: v);
-
   static TextStyleHtml textDeco(TextStyleHtml p, TextDeco v) {
     final pd = p.style.decoration;
     final lineThough = pd?.contains(TextDecoration.lineThrough) == true;

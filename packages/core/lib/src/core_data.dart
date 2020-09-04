@@ -98,7 +98,7 @@ class BuildOp {
   ///
   /// Note: op must be registered early for this to work e.g.
   /// in [WidgetFactory.parse] or [onChild].
-  final Map<String, String> Function(BuildMetadata meta) defaultStyles;
+  final Map<String, String> Function(dom.Element element) defaultStyles;
 
   /// The callback that will be called whenver a child element is found.
   ///

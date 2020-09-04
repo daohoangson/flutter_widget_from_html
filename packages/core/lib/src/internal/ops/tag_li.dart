@@ -48,13 +48,13 @@ class TagLi {
     return _listOp;
   }
 
-  Map<String, String> defaultStyles(BuildMetadata meta) {
-    final attrs = meta.element.attributes;
+  Map<String, String> defaultStyles(dom.Element element) {
+    final attrs = element.attributes;
     final p = listMeta.parentOps?.whereType<_TagLiOp>()?.length ?? 0;
 
     final styles = {
       'padding-inline-start': '2.5em',
-      kCssListStyleType: meta.element.localName == kTagOrderedList
+      kCssListStyleType: element.localName == kTagOrderedList
           ? _ListConfig.listStyleTypeFromAttributeType(
                   attrs[kAttributeLiType]) ??
               kCssListStyleTypeDecimal

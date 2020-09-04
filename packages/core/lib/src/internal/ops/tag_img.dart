@@ -14,31 +14,41 @@ class TagImg {
   TagImg(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        isBlockElement: false,
-        onTree: (node, tree) {
-          if (node.isBlockElement) return;
+        defaultStyles: (element) {
+          final attrs = element.attributes;
+          final styles = <String, String>{};
 
-          final image = _parse(node);
-          final built = _build(node, image);
+          if (attrs.containsKey(kAttributeImgHeight)) {
+            styles[kCssHeight] = '${attrs[kAttributeImgHeight]}px';
+          }
+          if (attrs.containsKey(kAttributeImgWidth)) {
+            styles[kCssWidth] = '${attrs[kAttributeImgWidth]}px';
+          }
+
+          return styles;
+        },
+        onTree: (meta, tree) {
+          final data = _parse(meta);
+          final built = _build(meta, data);
           if (built == null) {
-            final imgText = image.alt ?? image.title;
+            final imgText = data.alt ?? data.title;
             if (imgText?.isNotEmpty == true) {
               tree.addText(imgText);
             }
             return;
           }
 
-          tree.replaceWith(WidgetBit.inline(
-              tree, WidgetPlaceholder<ImageMetadata>(image, child: built)));
-        },
-        onWidgets: (node, widgets) {
-          if (!node.isBlockElement) return widgets;
+          final placeholder =
+              WidgetPlaceholder<ImageMetadata>(data, child: built)
+                  .wrapWith((context, child) => _LoosenConstraintsWidget(
+                        child: child,
+                        crossAxisAlignment:
+                            meta.tsb().build(context).crossAxisAlignment,
+                      ));
 
-          final image = _parse(node);
-          final built = _build(node, image);
-          if (built == null) return [];
-
-          return [WidgetPlaceholder<ImageMetadata>(image, child: built)];
+          tree.replaceWith(meta.isBlockElement
+              ? WidgetBit.block(tree, placeholder)
+              : WidgetBit.inline(tree, placeholder));
         },
       );
 
@@ -83,4 +93,71 @@ Uint8List bytesFromDataUri(String dataUri) {
   if (bytes.isEmpty) return null;
 
   return bytes;
+}
+
+class _LoosenConstraintsWidget extends SingleChildRenderObjectWidget {
+  final CrossAxisAlignment crossAxisAlignment;
+
+  _LoosenConstraintsWidget(
+      {@required Widget child, this.crossAxisAlignment, Key key})
+      : super(child: child, key: key);
+
+  @override
+  _LoosenConstraintsRender createRenderObject(BuildContext _) =>
+      _LoosenConstraintsRender(crossAxisAlignment: crossAxisAlignment);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<CrossAxisAlignment>(
+        'crossAxisAlignment', crossAxisAlignment));
+  }
+
+  @override
+  void updateRenderObject(
+      BuildContext _, _LoosenConstraintsRender renderObject) {
+    renderObject.crossAxisAlignment = crossAxisAlignment;
+  }
+}
+
+class _LoosenConstraintsParentData extends ContainerBoxParentData<RenderBox> {}
+
+class _LoosenConstraintsRender extends RenderProxyBox {
+  _LoosenConstraintsRender({
+    RenderBox child,
+    CrossAxisAlignment crossAxisAlignment,
+  })  : _crossAxisAlignment = crossAxisAlignment,
+        super(child);
+
+  CrossAxisAlignment _crossAxisAlignment;
+  set crossAxisAlignment(CrossAxisAlignment value) {
+    if (value == _crossAxisAlignment) return;
+    _crossAxisAlignment = value;
+    markNeedsLayout();
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    final data = child.parentData as _LoosenConstraintsParentData;
+    context.paintChild(child, data.offset + offset);
+  }
+
+  @override
+  void performLayout() {
+    final c = constraints;
+    child.layout(c.loosen(), parentUsesSize: true);
+    size = c.constrain(child.size);
+
+    if (_crossAxisAlignment == CrossAxisAlignment.center) {
+      final data = child.parentData as _LoosenConstraintsParentData;
+      data.offset = Offset((size.width - child.size.width) / 2, 0);
+    }
+  }
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! _LoosenConstraintsParentData) {
+      child.parentData = _LoosenConstraintsParentData();
+    }
+  }
 }

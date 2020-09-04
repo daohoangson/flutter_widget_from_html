@@ -85,24 +85,51 @@ Future<String> explain(
     ),
   );
 
+  return explainWithoutPumping(
+    buildFutureBuilderWithData: buildFutureBuilderWithData,
+    explainer: explainer,
+    useExplainer: useExplainer,
+  );
+}
+
+Future<String> explainWithoutPumping({
+  bool buildFutureBuilderWithData = true,
+  String Function(Explainer, Widget) explainer,
+  bool useExplainer = true,
+}) async {
   if (!useExplainer) {
     final sb = StringBuffer();
     hwKey.currentContext.visitChildElements(
         (e) => sb.writeln(e.toDiagnosticsNode().toStringDeep()));
     var str = sb.toString();
     str = str.replaceAll(RegExp(r': [A-Z][A-Za-z]+\.'), ': '); // enums
+
+    // dependencies
     str = str.replaceAll(RegExp(r'\[GlobalKey#[0-9a-f]+\]'), '');
     str = str.replaceAll(RegExp(r'(, )?dependencies: \[[^\]]+\]'), '');
 
-    // trim boring properties
+    // image state
     str = str.replaceAll(
-        RegExp(r'(, )?renderObject: \w+#[a-z0-9]+( relayoutBoundary=\w+)?'),
-        '');
+        RegExp(r'ImageStream#[0-9a-f]+\([^\)]+\)'), 'ImageStream');
+    str = str.replaceAll(
+        RegExp(r'(, )?state: _ImageState#[0-9a-f]+\([^\)]+\)'), '');
+
+    // trim boring properties
+    str =
+        str.replaceAll(RegExp(r'(, )?(this.)?excludeFromSemantics: false'), '');
     str = str.replaceAll(RegExp(r'(, )?crossAxisAlignment: start'), '');
     str = str.replaceAll(RegExp(r'(, )?direction: vertical'), '');
+    str = str.replaceAll(RegExp(r'(, )?filterQuality: low'), '');
+    str = str.replaceAll(RegExp(r'(, )?frameBuilder: null'), '');
+    str = str.replaceAll(RegExp(r'(, )?image: null'), '');
+    str = str.replaceAll(RegExp(r'(, )?invertColors: false'), '');
+    str = str.replaceAll(RegExp(r'(, )?loadingBuilder: null'), '');
     str = str.replaceAll(RegExp(r'(, )?mainAxisAlignment: start'), '');
     str = str.replaceAll(RegExp(r'(, )?mainAxisSize: min'), '');
     str = str.replaceAll(RegExp(r'(, )?maxLines: unlimited'), '');
+    str = str.replaceAll(
+        RegExp(r'(, )?renderObject: \w+#[a-z0-9]+( relayoutBoundary=\w+)?'),
+        '');
     str = str.replaceAll(RegExp(r'(, )?softWrap: [a-z\s]+'), '');
     str = str.replaceAll(RegExp(r'(, )?textDirection: ltr+'), '');
 
@@ -111,9 +138,6 @@ Future<String> explain(
     str = simplifyHashCode(str);
     return str;
   }
-
-  final hws = hwKey.currentState;
-  expect(hws, isNotNull);
 
   var built = buildCurrentState();
   var isFutureBuilder = false;
@@ -125,7 +149,10 @@ Future<String> explain(
     isFutureBuilder = true;
   }
 
-  var explained = Explainer(hws.context, explainer: explainer).explain(built);
+  var explained = Explainer(
+    hwKey.currentContext,
+    explainer: explainer,
+  ).explain(built);
   if (isFutureBuilder) explained = '[FutureBuilder:$explained]';
 
   return explained;
@@ -217,6 +244,11 @@ class Explainer {
     final h = i.toRadixString(16).toUpperCase();
     return h.length == 1 ? '0$h' : h;
   }
+
+  String _crossAxisAlignment(CrossAxisAlignment value) => (value != null &&
+          value != CrossAxisAlignment.start)
+      ? 'crossAxisAlignment=${value.toString().replaceAll('CrossAxisAlignment.', '')}'
+      : null;
 
   List<String> _cssSizing(CssSizing w) {
     final attr = <String>[];
@@ -450,6 +482,14 @@ class Explainer {
 
     if (widget is Image) return _image(widget);
 
+    if (widget is SingleChildRenderObjectWidget) {
+      switch (widget.runtimeType.toString()) {
+        case '_LoosenConstraintsWidget':
+          // avoid exposing internal widgets
+          return _widget(widget.child);
+      }
+    }
+
     if (widget is SizedBox) return _sizedBox(widget);
 
     final type = '${widget.runtimeType}';
@@ -459,6 +499,9 @@ class Explainer {
         ? widget.maxLines
         : widget is Text ? widget.maxLines : null;
     if (maxLines != null) attr.add('maxLines=$maxLines');
+
+    attr.add(_crossAxisAlignment(
+        widget is Column ? widget.crossAxisAlignment : null));
 
     attr.add(_textAlign(widget is RichText
         ? widget.textAlign

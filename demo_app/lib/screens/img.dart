@@ -148,13 +148,6 @@ class _State extends State<ImgScreen> {
   <img src="${_src(2000, 200)}" style="display: block" />
 </p>
 
-<div style="text-align: left"><img src="${_src(50, 10)}" /></div>
-<center><img src="${_src(50, 10)}" /></center>
-<div style="text-align: right"><img src="${_src(50, 10)}" /></div>
-<div style="text-align: left"><img src="${_src(50, 10)}" style="display: block" /></div>
-<center><img src="${_src(50, 10)}" style="display: block" /></center>
-<div style="text-align: right"><img src="${_src(50, 10)}" style="display: block" /></div>
-
 <p>
   Link:
   <a href="https://placeholder.com"><img src="${_src(50, 10)}" /></a>

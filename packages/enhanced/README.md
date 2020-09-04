@@ -50,7 +50,7 @@ const kHtml = '''
   </tr>
   <tr><td>&lt;SUP&gt; <var>a<sup>2</sup></var> + <var>b<sup>2</sup></var> = <var>c<sup>2</sup></var></td></tr>
   <tr><td>&lt;RUBY&gt; <ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby></td></tr>
-  
+
 </table>
 
 ''';
@@ -123,7 +123,7 @@ These tags and their contents will be ignored:
 - margin and margin-xxx: values in `em`, `pt` and `px`
 - padding and padding-xxx: values in `em`, `pt` and `px`
 - vertical-align: baseline/top/bottom/middle/sub/super
-- text-align: center/justify/left/right
+- text-align: center/end/justify/left/right/start/-moz-center/-webkit-center
 - text-decoration: line-through/none/overline/underline
 - text-overflow: clip/ellipsis. Note: `text-overflow: ellipsis` should be used in conjuntion with `max-lines` or `-webkit-line-clamp` for better result.
 - Sizing (width & height, max-xxx, min-xxx) with values in `em`, `pt` and `px`

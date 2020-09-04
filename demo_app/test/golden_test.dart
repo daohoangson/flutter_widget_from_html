@@ -17,7 +17,7 @@ const lipsum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
 
 const redX = '<span style="background-color:#f00;font-size:0.75em;">x</span>';
 
-final _withEnhancedRegExp = RegExp(r'(colspan|rowspan)');
+final _withEnhancedRegExp = RegExp(r'(^(A|HR)$|colspan|rowspan)');
 
 class _TestApp extends StatelessWidget {
   final String html;
@@ -34,23 +34,26 @@ class _TestApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final children = <Widget>[
-      Padding(
-        child: Text(html),
-        padding: const EdgeInsets.all(10),
-      ),
+      Text(html),
       Divider(),
-      Padding(
-        padding: const EdgeInsets.all(10),
-        child: LimitedBox(
-          child: core.HtmlWidget(html),
-          maxHeight: 400,
+      if (withEnhanced)
+        Text(
+          'flutter_widget_from_html_core:\n',
+          style: Theme.of(context).textTheme.caption,
         ),
+      LimitedBox(
+        child: core.HtmlWidget(html),
+        maxHeight: 400,
       ),
     ];
 
     if (withEnhanced) {
       children.addAll(<Widget>[
         Divider(),
+        Text(
+          'flutter_widget_from_html:\n',
+          style: Theme.of(context).textTheme.caption,
+        ),
         LimitedBox(
           child: enhanced.HtmlWidget(html),
           maxHeight: 400,
@@ -58,37 +61,44 @@ class _TestApp extends StatelessWidget {
       ]);
     }
 
-    return MaterialApp(
-      home: Scaffold(
-        body: RepaintBoundary(
-          child: Container(
+    return SingleChildScrollView(
+      child: RepaintBoundary(
+        child: Container(
+          child: Padding(
             child: Column(
               children: children,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
             ),
-            decoration: BoxDecoration(color: Colors.white),
-            width: 400,
+            padding: const EdgeInsets.all(10),
           ),
-          key: targetKey,
+          color: Colors.white,
         ),
+        key: targetKey,
       ),
-      theme: ThemeData.light(),
     );
   }
 }
 
+String _paddingTest(String style, String text) =>
+    '<div style="background: red; $style">'
+    '<div style="background: black; color: white">$text</div>'
+    '</div>';
+
 void _test(String name, String html) => testGoldens(name, (tester) async {
       final key = UniqueKey();
-      await tester.pumpWidget(_TestApp(
-        html,
-        targetKey: key,
-        withEnhanced: _withEnhancedRegExp.hasMatch(name),
-      ));
-      await expectLater(
-        find.byKey(key),
-        matchesGoldenFile('./images/$name.png'),
+
+      await tester.pumpWidgetBuilder(
+        _TestApp(
+          html,
+          targetKey: key,
+          withEnhanced: _withEnhancedRegExp.hasMatch(name),
+        ),
+        wrapper: materialAppWrapper(theme: ThemeData.light()),
+        surfaceSize: Size(400, 1200),
       );
+
+      await screenMatchesGolden(tester, name, finder: find.byKey(key));
     });
 
 void main() {
@@ -111,8 +121,10 @@ void main() {
     'ASIDE': '<aside>First.</aside><aside>Second one.</aside>',
     'BLOCKQUOTE': '<blockquote>Foo</blockquote>',
     'DIV': '<div>First.</div><div>Second one.</div>',
-    'FIGURE,FIGCAPTION':
-        '<figure><figcaption><i>fig. 1</i> Foo</figcaption></figure>',
+    'FIGURE,FIGCAPTION': '''<figure>
+  <img src="asset:logos/android.png" width="192" height="192" />
+  <figcaption><i>fig. 1</i> Flutter logo (Android version)</figcaption>
+</figure>''',
     'HEADER,FOOTER': '<header>First.</header><footer>Second one.</footer>',
     'MAIN,NAV': '<main>First.</main><nav>Second one.</nav>',
     'P': '<p>First.</p><p>Second one.</p>',
@@ -269,35 +281,35 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         '----<div style="margin-left: 3px">Foo</div>----',
     'inline/padding/4_values': '''
 ----
-<div style="padding: 1px 2px 3px 4px">all</div>
+${_paddingTest('padding: 5px 10px 15px 20px', 'all')}
 ----
-<div style="padding: 1px 0 0 0">top only</div>
+${_paddingTest('padding: 5px 0 0 0', 'top only')}
 ----
-<div style="padding: 0 2px 0 0">right only</div>
+${_paddingTest('padding: 0 10px 0 0', 'right only')}
 ----
-<div style="padding: 0 0 3px 0">bottom only</div>
+${_paddingTest('padding: 0 0 15px 0', 'bottom only')}
 ----
-<div style="padding: 0 0 3px 0">left only</div>
----
+${_paddingTest('padding: 0 0 0 20px', 'left only')}
+----
 ''',
     'inline/padding/2_values': '''
 ----
-<div style="padding: 5px 10px">both</div>
+${_paddingTest('padding: 5px 10px', 'both')}
 ----
-<div style="padding: 5px 0">vertical only</div>
+${_paddingTest('padding: 5px 0', 'vertical only')}
 ----
-<div style="padding: 0 10px">horizontal only</div>
+${_paddingTest('padding: 0 10px', 'horizontal only')}
 ----
 ''',
-    'inline/padding/1_value': '----<div style="padding: 3px">Foo</div>----',
+    'inline/padding/1_value': '----${_paddingTest('padding: 5px', 'Foo')}----',
     'inline/padding/padding-top':
-        '----<div style="padding-top: 3px">Foo</div>----',
+        '----${_paddingTest('padding-top: 5px', 'Foo')}----',
     'inline/padding/padding-right':
-        '----<div style="padding-right: 3px">Foo</div>----',
+        '----${_paddingTest('padding-right: 5px', 'Foo')}----',
     'inline/padding/padding-bottom':
-        '----<div style="padding-top: 3px">Foo</div>----',
+        '----${_paddingTest('padding-bottom: 5px', 'Foo')}----',
     'inline/padding/padding-left':
-        '----<div style="padding-left: 3px">Foo</div>----',
+        '----${_paddingTest('padding-left: 5px', 'Foo')}----',
     'inline/sizing/height':
         '<div style="background-color: red; height: 100px">Foo</div>',
     'inline/sizing/height/huge':
@@ -346,11 +358,40 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
 </div>
 ''',
     'CENTER': '<center>Foo</center>',
+    'attribute/align/center': '<div align="center">$lipsum</div>',
+    'attribute/align/left': '<div align="left">$lipsum</div>',
+    'attribute/align/right': '<div align="right">$lipsum</div>',
     'inline/text-align/center': '<div style="text-align: center">$lipsum</div>',
+    'inline/text-align/end': '<div style="text-align: end">$lipsum</div>',
+    'inline/text-align/end/rtl':
+        '<div dir="rtl"><div style="text-align: end">$lipsum</div></div>',
+    'inline/text-align/img/center_inline':
+        '<div style="text-align: center">Foo <img src="asset:images/100x10.png" /> bar</div>',
+    'inline/text-align/img/center_block':
+        '<div style="text-align: center">Foo <img src="asset:images/100x10.png" style="display: block" /> bar</div>',
+    'inline/text-align/img/center_tag_inline':
+        '<center>Foo <img src="asset:images/100x10.png" /> bar</center>',
+    'inline/text-align/img/center_tag_block':
+        '<center>Foo <img src="asset:images/100x10.png" style="display: block" /> bar</center>',
+    'inline/text-align/img/left_inline':
+        '<div style="text-align: left">Foo <img src="asset:images/100x10.png" /> bar</div>',
+    'inline/text-align/img/left_block':
+        '<div style="text-align: left">Foo <img src="asset:images/100x10.png" style="display: block" /> bar</div>',
+    'inline/text-align/img/right_inline':
+        '<div style="text-align: right">Foo <img src="asset:images/100x10.png" /> bar</div>',
+    'inline/text-align/img/right_block':
+        '<div style="text-align: right">Foo <img src="asset:images/100x10.png" style="display: block" /> bar</div>',
     'inline/text-align/justify':
         '<div style="text-align: justify">$lipsum</div>',
     'inline/text-align/left': '<div style="text-align: left">$lipsum</div>',
+    'inline/text-align/-moz-center':
+        '<div style="text-align: -moz-center">$lipsum</div>',
     'inline/text-align/right': '<div style="text-align: right">$lipsum</div>',
+    'inline/text-align/start': '<div style="text-align: start">$lipsum</div>',
+    'inline/text-align/start/rtl':
+        '<div dir="rtl"><div style="text-align: start">$lipsum</div></div>',
+    'inline/text-align/-webkit-center':
+        '<div style="text-align: -webkit-center">$lipsum</div>',
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/sub
     'SUB': '<p>Almost every developer\'s favorite molecule is '
         'C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, also known as "caffeine."</p>',
@@ -369,6 +410,31 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         'Foo<span style="vertical-align: sub">$redX</span>',
     'inline/vertical-align/super':
         'Foo<span style="vertical-align: super">$redX</span>',
+    'A': '<a href="https://flutter.dev">Flutter</a>',
+    'IMG':
+        'Flutter <img src="asset:logos/android.png" width="12" height="12" /> is awesome.',
+    'IMG/inline_big': 'Foo <img src="asset:images/2000x200.png" /> bar.',
+    'IMG/inline_big_dimensions':
+        'Foo <img src="asset:images/2000x200.png" width="2000" height="200" /> bar.',
+    'IMG/inline_height_only':
+        'Foo <img src="asset:images/100x10.png" height="5" /> bar.',
+    'IMG/inline_small': 'Foo <img src="asset:images/100x10.png" /> bar.',
+    'IMG/inline_small_dimensions':
+        'Foo <img src="asset:images/100x10.png" width="100" height="10" /> bar.',
+    'IMG/inline_width_only':
+        'Foo <img src="asset:images/100x10.png" width="50" /> bar.',
+    'IMG/block_big':
+        'Foo <img src="asset:images/2000x200.png" style="display: block" /> bar.',
+    'IMG/block_big_dimensions':
+        'Foo <img src="asset:images/2000x200.png" width="2000" height="200" style="display: block" /> bar.',
+    'IMG/block_height_only':
+        'Foo <img src="asset:images/100x10.png" height="5" style="display: block" /> bar.',
+    'IMG/block_small':
+        'Foo <img src="asset:images/100x10.png" style="display: block" /> bar.',
+    'IMG/block_small_dimensions':
+        'Foo <img src="asset:images/100x10.png" width="100" height="10" style="display: block" /> bar.',
+    'IMG/block_width_only':
+        'Foo <img src="asset:images/100x10.png" width="50" style="display: block" /> bar.',
     'LI,OL,UL': '''
 <ol>
   <li>One</li>
