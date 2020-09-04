@@ -85,6 +85,18 @@ Future<String> explain(
     ),
   );
 
+  return explainWithoutPumping(
+    buildFutureBuilderWithData: buildFutureBuilderWithData,
+    explainer: explainer,
+    useExplainer: useExplainer,
+  );
+}
+
+Future<String> explainWithoutPumping({
+  bool buildFutureBuilderWithData = true,
+  String Function(Explainer, Widget) explainer,
+  bool useExplainer = true,
+}) async {
   if (!useExplainer) {
     final sb = StringBuffer();
     hwKey.currentContext.visitChildElements(
@@ -127,9 +139,6 @@ Future<String> explain(
     return str;
   }
 
-  final hws = hwKey.currentState;
-  expect(hws, isNotNull);
-
   var built = buildCurrentState();
   var isFutureBuilder = false;
   if (built is FutureBuilder<Widget>) {
@@ -140,7 +149,10 @@ Future<String> explain(
     isFutureBuilder = true;
   }
 
-  var explained = Explainer(hws.context, explainer: explainer).explain(built);
+  var explained = Explainer(
+    hwKey.currentContext,
+    explainer: explainer,
+  ).explain(built);
   if (isFutureBuilder) explained = '[FutureBuilder:$explained]';
 
   return explained;

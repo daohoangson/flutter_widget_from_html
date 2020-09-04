@@ -255,5 +255,25 @@ void main() {
                 '      └RawImage(alignment: center)\n\n'));
       });
     });
+
+    testWidgets('updates crossAxisAlignment', (WidgetTester tester) async {
+      final src = 'http://domain.com/image.png';
+      final textAlign = ValueNotifier<String>('left');
+      final explainedLeft =
+          await mockNetworkImagesFor(() => helper.explain(tester, null,
+              hw: ValueListenableBuilder(
+                valueListenable: textAlign,
+                builder: (_, value, __) => HtmlWidget(
+                  '<div style="text-align: $value"><img src="$src" /></div>',
+                  key: helper.hwKey,
+                ),
+              )));
+
+      textAlign.value = '-webkit-center';
+      await tester.pumpAndSettle();
+      final explainedRight = await helper.explainWithoutPumping();
+
+      expect(explainedRight, isNot(equals(explainedLeft)));
+    });
   });
 }

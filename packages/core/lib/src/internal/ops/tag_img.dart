@@ -112,6 +112,12 @@ class _LoosenConstraintsWidget extends SingleChildRenderObjectWidget {
     properties.add(DiagnosticsProperty<CrossAxisAlignment>(
         'crossAxisAlignment', crossAxisAlignment));
   }
+
+  @override
+  void updateRenderObject(
+      BuildContext _, _LoosenConstraintsRender renderObject) {
+    renderObject.crossAxisAlignment = crossAxisAlignment;
+  }
 }
 
 class _LoosenConstraintsParentData extends ContainerBoxParentData<RenderBox> {}
