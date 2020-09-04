@@ -1,0 +1,1 @@
+const kResultKey = 'output';

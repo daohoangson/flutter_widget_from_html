@@ -1,0 +1,71 @@
+name: Flutter
+on:
+  push:
+    paths: 
+      - .github/workflows/flutter.yml
+      - 'demo_app/test/**'
+      - 'demo_app/test_driver/**'
+      - 'packages/**'
+      - 'tool/dartdoc/**'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+      - name: Run flutter format
+        run: flutter format --dry-run --set-exit-if-changed .
+      - name: Analyze core
+        run: cd packages/core && flutter analyze
+      - name: Analyze enhanced
+        run: cd packages/enhanced && flutter analyze
+      - name: Analyze demo_app
+        run: cd demo_app && flutter analyze
+
+  unit_test:
+    name: Unit test
+    strategy:
+      matrix:
+        channel: [beta, stable]
+    continue-on-error: ${{ matrix.channel != 'stable' }}
+    runs-on: ubuntu-latest
+        
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          channel: ${{ matrix.channel }}
+      - name: Run ./tool/test.sh
+        run: |
+          if [ "${{ matrix.channel }}" == "stable" ]; then
+            ./tool/test.sh --coverage
+            bash <(curl -s https://codecov.io/bash)
+          else
+            ./tool/test.sh
+          fi
+
+  ios:
+    name: iOS Test
+    needs:
+      - analyze
+      - unit_test
+    runs-on: macos-latest
+        
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+      - name: Create simulator
+        run: |
+          set -e
+
+          _deviceType=$( xcrun simctl list devicetypes iphone -j | jq '.devicetypes[-1]' )
+          _deviceTypeName=$( echo $_deviceType | jq .name -r )
+          _deviceTypeId=$( echo $_deviceType | jq .identifier -r )
+          _runTime=$( xcrun simctl list runtimes ios -j | jq '.runtimes[].identifier' -r | tail -n 1 )
+          xcrun simctl create "$_deviceTypeName" "$_deviceTypeId" "$_runTime" | xargs xcrun simctl boot
+      - run: ./tool/integration.sh

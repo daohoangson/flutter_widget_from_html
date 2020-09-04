@@ -1,3 +1,106 @@
+## 0.5.0-rc.2020081901
+
+This is a big release with lots of improvements under the hood, probably the last pre-release before `v0.5.0` stable is out. If you don't extends `WidgetFactory` yourself then there are only two BREAKING changes that may affect your app:
+
+* BREAKING: `customStylesBuilder` returns `Map` instead of `List`
+* BREAKING: `onTapUrl` is called for incomplete URL
+
+Other changes:
+
+* Add support for `pt` unit (#266)
+* Add support for inline style `background` (color only) (#275)
+* Implement inline support for `margin`, `padding` (#237)
+* Fix sizing (width, heigh, etc. #248)
+* Fix bug `textScaleFactor` being considered twice during rendering (#267)
+* Fix widget tree not being updated on dependency changes (#284)
+
+Finally, BREAKING changes if you have a custom `WidgetFactory`:
+
+* `BuildOp`: callback params changed
+* `ImgMetadata` -> `ImageMetadata`:
+  * Add `ImageSource`
+* `NodeMetadata` -> `BuildMetadata`:
+  * Text style properties moved into `TextStyleHtml`
+  * Remove `hasOps`
+  * Remove `hasParents`
+  * `ops` -> `buildOps`
+  * `parents` -> `parentOps`
+  * `op=` -> `register(BuildOp)`
+  * `style` -> `operator [](String)`
+  * `styles=` -> `operator []=(String, String)`
+* `TableData` -> `TableMetadata`
+* `TextBit`
+  * Remove `TextWhitespace`, `TextWhitespaceType`
+  * Remove `data`
+  * Remove `canCompile`
+  * Remove `hasTrailingWhitespace` (`TextBits` still has it)
+  * `InlineSpan compile(TextStyle)` -> `CompileTo compile(CompileFrom)`
+  * `static TextBit TextBit.nextOf(TextBit)` -> instance `TextBit next()`
+* `TextStyleBuilders` -> `TextStyleBuilder`:
+  * Builder signature `TextStyleHtml Function(BuildContext, TextStyleHtml, T)` -> `TextStyleHtml Function(TextStyleHtml, T)`
+* `WidgetFactory`
+  * `buildXxx` methods have `BuildMetadata` as first parameter
+  * `buildImageXxx` -> `imageXxx`
+  * `buildGestureTapCallbackForUrl` -> `gestureTapCallback`
+  * `parseTag(NodeMetadata, String, String)` -> `parse(BuildMetadata)`
+* `WidgetPlaceholder`
+  * Constructor changed
+  * Builder signature `Iterable<Widget> Function(BuildContext, Iterable<Widget>, T)` -> `Widget Function(BuildContext, Widget)`
+
+## 0.5.0-rc.2020071301
+
+* BREAKING: Remove 3rd param `wf` from `WidgetPlaceholder.wrap`
+* BREAKING: Remove field `HtmlWidget.tableCellPadding`
+* BREAKING: Remove class `CssLineHeight`
+* BREAKING: Remove class `ImageLayout` (#230)
+* BREAKING: Change param `builder` of `TextStyleBuilders.enqueue`
+* BREAKING: Change method `WidgetFactory.buildImage`
+* Add support for colspan / rowspan in table (#157)
+* Add support for inline style `text-overflow` (#204)
+* Add support for inline style sizing (#206): `width`, `height`, `max-width`, `max-height`, `min-width` and `min-height`
+* Add support em/px in `line-height` and % in `font-size` (#220)
+* Add support for svg src in `IMG` (#233)
+* Bug fixes
+
+## 0.4.1
+
+* BREAKING: Remove `TextStyleBuilders.recognizer` (#168)
+* BREAKING: Remove `lazySet` method (#169)
+* BREAKING: Remove `HtmlConfig` and change `factoryBuilder` method signature (#173)
+* BREAKING: Remove `bodyPadding`
+* BREAKING: Replace `builderCallback` with `customStylesBuilder` and `customWidgetBuilder` (#169)
+* Add support for tag RUBY (#144)
+* Add support for attribute `align` (#153) 
+* Add support for async build (#154)
+* Add support for inline style `padding` (#160)
+* Add support for multiple font families (#172)
+* Add support for `line-height` (#193)
+* Improve support for right-to-left (#141)
+* Improve inline `color` support (#201)
+* Bug fixes
+
+## 0.3.3+4
+
+* Fix non-breaking space rendering (#185)
+
+## 0.3.3+3
+
+* Switch to MIT license
+
+## 0.3.3+2
+
+* Fix bug vertical-align with trailing whitespace (#170)
+
+## 0.3.3+1
+
+* Fix conflict between TABLE and background-color (#171)
+
+## 0.3.3
+
+* Improve whitespace handling (#137)
+* Add support for tag SUB, SUP and inline style `vertical-align` (#143)
+* Fix text bit loop initial state (#156)
+
 ## 0.3.2+2
 
 * Use minimum main axis size
