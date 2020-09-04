@@ -119,6 +119,24 @@ void main() {
       expect(explained, equals('[RichText:(:1\n\n\n2)]'));
     });
 
+    testWidgets('renders new line before styled text', (tester) async {
+      final html = '1<br /><strong>2</strong>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:1\n(+b:2))]'));
+    });
+
+    testWidgets('renders new line before IMG', (tester) async {
+      final src = 'http://domain.com/image.png';
+      final html = '1<br /><img src="$src" />';
+      final explained = await mockNetworkImagesFor(() => explain(tester, html));
+      expect(
+          explained,
+          equals('[RichText:(:'
+              '1\n'
+              '[Image:image=NetworkImage("$src", scale: 1.0)]'
+              ')]'));
+    });
+
     testWidgets('renders new line between SPANs, 1 of 2', (tester) async {
       final html = '<span>1<br /></span><span>2</span>';
       final explained = await explain(tester, html);
@@ -280,7 +298,7 @@ void main() {
         final src = 'http://domain.com/image.png';
         final html = '''
 <figure>
-  <img src="$src">
+  <img src="$src" />
   <figcaption><i>fig. 1</i> Foo</figcaption>
 </figure>
 ''';

@@ -142,7 +142,11 @@ class _Flattener {
     final scopedRecognizer = _recognizer.value;
     final scopedTsb = _tsb;
     final scopedBuffer = _buffer.toString();
-    final scopedText = scopedBuffer.replaceAll(RegExp('\n\$'), '');
+
+    // trim the last new line if any
+    final scopedText = scopedSpans.isEmpty
+        ? scopedBuffer.replaceAll(RegExp('\n\$'), '')
+        : scopedBuffer;
 
     if (scopedBuffer == '\n' && scopedSpans.isEmpty) {
       // special handling for paragraph with only one line break
