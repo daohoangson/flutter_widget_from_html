@@ -571,7 +571,7 @@ void main() {
   testWidgets('renders UL inside', (WidgetTester tester) async {
     final html = '<table><tr><td><ul><li>Foo</li></ul></td></tr></table>';
     final explained = await explain(tester, html);
-    final expectedList = '[CssBlock:child=[Padding:(0,0,0,25),child='
+    final expectedList = '[CssBlock:child=[Padding:(0,0,0,40),child='
         '[CssBlock:child=[Stack:children='
         '[RichText:(:Foo)],'
         '[Positioned:(0.0,null,null,-45.0),child=[SizedBox:40.0x0.0,child=[RichText:align=right,[_ListMarkerDisc]@bottom]]]'

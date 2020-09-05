@@ -11,7 +11,7 @@ const square = '[_ListMarkerSquare]@bottom';
 const sizedBox = '[SizedBox:0.0x10.0]';
 
 String padding(String child) =>
-    '[CssBlock:child=[Padding:(0,0,0,25),child=$child]]';
+    '[CssBlock:child=[Padding:(0,0,0,40),child=$child]]';
 
 String list(List<String> children) => '[Column:children=${children.join(",")}]';
 
@@ -525,7 +525,7 @@ void main() {
       expect(
           explained,
           equals(
-              '[CssBlock:child=[Padding:(0,0,0,25),child=[RichText:(:Foo)]]]'));
+              '[CssBlock:child=[Padding:(0,0,0,40),child=[RichText:(:Foo)]]]'));
     });
 
     testWidgets('standalone OL', (WidgetTester tester) async {
@@ -534,7 +534,7 @@ void main() {
       expect(
           explained,
           equals(
-              '[CssBlock:child=[Padding:(0,0,0,25),child=[RichText:(:Foo)]]]'));
+              '[CssBlock:child=[Padding:(0,0,0,40),child=[RichText:(:Foo)]]]'));
     });
 
     testWidgets('standalone LI', (WidgetTester tester) async {
@@ -586,7 +586,7 @@ void main() {
     final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';
 
     final explainerExpected =
-        '[CssBlock:child=[Padding:(0,25,0,0),child=[Column:dir=rtl,children='
+        '[CssBlock:child=[Padding:(0,40,0,0),child=[Column:dir=rtl,children='
         '[CssBlock:child=[Stack:dir=rtl,children=[RichText:dir=rtl,(:One)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:1.)]]]]],'
         '[CssBlock:child=[Stack:dir=rtl,children=[RichText:dir=rtl,(:Two)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:2.)]]]]],'
         '[CssBlock:child=[Stack:dir=rtl,children=[RichText:dir=rtl,(+b:Three)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:3.)]]]]]'
@@ -595,7 +595,7 @@ void main() {
     final nonExplainerExpected = 'TshWidget\n'
         '└ColumnPlaceholder(BuildMetadata(root))\n'
         ' └CssBlock()\n'
-        '  └Padding(padding: EdgeInsets(0.0, 0.0, 25.0, 0.0))\n'
+        '  └Padding(padding: EdgeInsets(0.0, 0.0, 40.0, 0.0))\n'
         '   └Column(textDirection: rtl)\n'
         '    ├WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
         '    ││  "One"\n'

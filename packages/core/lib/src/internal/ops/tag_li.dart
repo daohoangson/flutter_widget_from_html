@@ -53,7 +53,7 @@ class TagLi {
     final p = listMeta.parentOps?.whereType<_TagLiOp>()?.length ?? 0;
 
     final styles = {
-      'padding-inline-start': '2.5em',
+      'padding-inline-start': '40px',
       kCssListStyleType: element.localName == kTagOrderedList
           ? _ListConfig.listStyleTypeFromAttributeType(
                   attrs[kAttributeLiType]) ??
