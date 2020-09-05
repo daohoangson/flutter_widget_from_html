@@ -527,7 +527,7 @@ class WidgetFactory {
       case 'mark':
         meta
           ..[kCssBackgroundColor] = '#ff0'
-          ..tsb(TextStyleOps.color, Color.fromARGB(255, 0, 0, 0));
+          ..[kCssColor] = '#000';
         break;
 
       case 'p':
