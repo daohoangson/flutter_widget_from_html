@@ -232,6 +232,8 @@ class WidgetFactory {
       ];
 
   /// Returns marker for the specified [type] at index [i].
+  ///
+  /// Note: `circle`, `disc` and `square` type won't trigger this method
   String getListStyleMarker(String type, int i) {
     switch (type) {
       case kCssListStyleTypeAlphaLower:
@@ -250,20 +252,14 @@ class WidgetFactory {
           return '${String.fromCharCode(64 + i)}.';
         }
         return '';
-      case kCssListStyleTypeCircle:
-        return '-';
       case kCssListStyleTypeDecimal:
         return '$i.';
-      case kCssListStyleTypeDisc:
-        return '•';
       case kCssListStyleTypeRomanLower:
         final roman = _getListStyleMarkerRoman(i)?.toLowerCase();
         return roman != null ? '$roman.' : '';
       case kCssListStyleTypeRomanUpper:
         final roman = _getListStyleMarkerRoman(i);
         return roman != null ? '$roman.' : '';
-      case kCssListStyleTypeSquare:
-        return '+';
     }
 
     return '';
@@ -531,7 +527,7 @@ class WidgetFactory {
       case 'mark':
         meta
           ..[kCssBackgroundColor] = '#ff0'
-          ..tsb(TextStyleOps.color, Color.fromARGB(255, 0, 0, 0));
+          ..[kCssColor] = '#000';
         break;
 
       case 'p':

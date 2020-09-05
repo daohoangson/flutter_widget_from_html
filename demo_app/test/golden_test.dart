@@ -435,23 +435,10 @@ ${_paddingTest('padding: 0 10px', 'horizontal only')}
         'Foo <img src="asset:images/100x10.png" width="100" height="10" style="display: block" /> bar.',
     'IMG/block_width_only':
         'Foo <img src="asset:images/100x10.png" width="50" style="display: block" /> bar.',
-    'LI,OL,UL': '''
+    'LI,OL': '''
 <ol>
   <li>One</li>
-  <li>
-    Two
-    <ul>
-      <li>2.1</li>
-      <li>
-        2.2
-        <ul>
-          <li>2.2.1</li>
-          <li>2.2.2</li>
-        </ul>
-      </li>
-      <li>2.3</li>
-    </ul>
-  </li>
+  <li>Two</li>
   <li>Three</li>
 </ol>''',
     'OL/reversed': '<ol reversed><li>One</li><li>Two</li><li>Three</li><ol>',
@@ -481,6 +468,26 @@ ${_paddingTest('padding: 0 10px', 'horizontal only')}
 ''',
     'OL/rtl':
         '<div dir="rtl"><ol><li>One</li><li>Two</li><li>Three</li><ol></div>',
+    'UL': '''
+<ul>
+  <li>One</li>
+  <li>
+    Two
+    <ul>
+      <li>2.1</li>
+      <li>
+        2.2
+        <ul>
+          <li>2.2.1</li>
+          <li>2.2.2</li>
+          <li>2.2.3</li>
+        </ul>
+      </li>
+      <li>2.3</li>
+    </ul>
+  </li>
+  <li>Three</li>
+</ul>''',
     'TABLE,CAPTION,TBODY,THEAD,TFOOT,TR,TH,TD': '''<table border="1">
       <caption>Caption</caption>
       <tfoot><tr><td>Footer 1</td><td>Footer 2</td></tr></tfoot>
