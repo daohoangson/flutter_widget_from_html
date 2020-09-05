@@ -5,6 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
 
+const kColor = Color(0xFF001234);
+const kColorAccent = Color(0xFF123456);
+
 // https://stackoverflow.com/questions/6018611/smallest-data-uri-image-possible-for-a-transparent-image
 const kDataUri =
     'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -39,7 +42,6 @@ Future<String> explain(
   bool buildFutureBuilderWithData = true,
   String Function(Explainer, Widget) explainer,
   Widget hw,
-  void Function(BuildContext) preTest,
   bool rtl = false,
   TextStyle textStyle,
   bool useExplainer = true,
@@ -52,36 +54,28 @@ Future<String> explain(
   );
 
   await tester.pumpWidget(
-    StatefulBuilder(
-      builder: (context, _) {
-        if (preTest != null) preTest(context);
-
-        final defaultStyle = DefaultTextStyle.of(context).style;
-        final style = defaultStyle.copyWith(
-          fontSize: 10.0,
-          fontWeight: FontWeight.normal,
-        );
-
-        return MaterialApp(
-          theme: ThemeData(
-            accentColor: const Color(0xFF123456),
-          ),
-          home: Scaffold(
-            body: ExcludeSemantics(
-              // exclude semantics for faster run but mostly because of this bug
-              // https://github.com/flutter/flutter/issues/51936
-              // which is failing some of our tests
-              child: DefaultTextStyle(
-                style: style,
-                child: Directionality(
-                  textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
-                  child: hw,
-                ),
+    MaterialApp(
+      theme: ThemeData(accentColor: kColorAccent),
+      home: Scaffold(
+        body: ExcludeSemantics(
+          // exclude semantics for faster run but mostly because of this bug
+          // https://github.com/flutter/flutter/issues/51936
+          // which is failing some of our tests
+          child: Builder(
+            builder: (context) => DefaultTextStyle(
+              style: DefaultTextStyle.of(context).style.copyWith(
+                    color: kColor,
+                    fontSize: 10.0,
+                    fontWeight: FontWeight.normal,
+                  ),
+              child: Directionality(
+                textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
+                child: hw,
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     ),
   );
 
@@ -396,7 +390,7 @@ class Explainer {
       s += 'bg=${_color(style.background.color)}';
     }
 
-    if (style.color != null) {
+    if (style.color != null && style.color != kColor) {
       s += _color(style.color);
     }
 

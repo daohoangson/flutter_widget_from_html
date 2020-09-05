@@ -4,9 +4,9 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 
 import '_.dart';
 
-const disc = '•';
-const circle = '-';
-const square = '+';
+const disc = '[_ListMarkerDisc]@bottom';
+const circle = '[_ListMarkerCircle]@bottom';
+const square = '[_ListMarkerSquare]@bottom';
 
 const sizedBox = '[SizedBox:0.0x10.0]';
 
@@ -20,7 +20,7 @@ String item(String markerText, String contents, {String child}) =>
 
 String marker(String text) => '[Positioned:(0.0,null,null,-45.0),child='
     '[SizedBox:40.0x0.0,child='
-    '[RichText:align=right,(:$text)'
+    '[RichText:align=right,${text.startsWith('[_ListMarker') ? text : '(:$text)'}'
     ']]]';
 
 void main() {

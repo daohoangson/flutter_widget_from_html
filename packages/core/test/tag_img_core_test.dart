@@ -82,22 +82,8 @@ void main() {
 
   group('asset', () {
     final assetName = 'path/image.png';
-    final explain = (
-      WidgetTester tester,
-      String html, {
-      String package,
-    }) =>
-        helper.explain(
-          tester,
-          html,
-          preTest: (context) {
-            precacheImage(
-              AssetImage(assetName, package: package),
-              context,
-              onError: (_, __) {},
-            );
-          },
-        );
+    final explain = (WidgetTester tester, String html, {String package}) =>
+        helper.explain(tester, html);
 
     testWidgets('renders asset', (WidgetTester tester) async {
       final html = '<img src="asset:$assetName" />';
