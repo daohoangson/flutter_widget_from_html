@@ -1,6 +1,6 @@
 <?php
 
-$dirPath = 'packages/example/test/images';
+$dirPath = 'demo_app/test/goldens';
 $extension = 'png';
 $globPath = realpath(__DIR__ . "/../../$dirPath");
 $imagePaths = glob("$globPath/*.$extension");
