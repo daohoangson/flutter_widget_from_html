@@ -46,6 +46,15 @@ jobs:
       - run: flutter config --enable-web
       - run: flutter build web
 
+      - name: Generate supported/tags.html
+        run: |
+          set -e
+
+          cd demo_app/test/goldens
+          php tags.php >tags.html
+          cd ..
+          cp -R goldens ../../build/web/supported
+
       - name: Deploy via now.sh
         id: now
         run: |
