@@ -440,17 +440,17 @@ ${_paddingTest('padding: 0 10px', 'horizontal only')}
   <li>Two</li>
   <li>Three</li>
 </ol>''',
-    'OL/reversed': '<ol reversed><li>One</li><li>Two</li><li>Three</li><ol>',
-    'OL/reversed_start':
+    'tag/OL/reversed': '<ol reversed><li>One</li><li>Two</li><li>Three</li><ol>',
+    'tag/OL/reversed_start':
         '<ol reversed start="99"><li>One</li><li>Two</li><li>Three</li><ol>',
-    'OL/start': '<ol start="99"><li>One</li><li>Two</li><li>Three</li><ol>',
-    'OL/type/lower-alpha':
+    'tag/OL/start': '<ol start="99"><li>One</li><li>Two</li><li>Three</li><ol>',
+    'tag/OL/type_lower-alpha':
         '<ol type="a"><li>One</li><li>Two</li><li>Three</li><ol>',
-    'OL/type/upper-alpha':
+    'tag/OL/type_upper-alpha':
         '<ol type="A"><li>One</li><li>Two</li><li>Three</li><ol>',
-    'OL/type/lower-roman':
+    'tag/OL/type_lower-roman':
         '<ol type="i"><li>One</li><li>Two</li><li>Three</li><ol>',
-    'OL/type/upper-roman':
+    'tag/OL/type_upper-roman':
         '<ol type="I"><li>One</li><li>Two</li><li>Three</li><ol>',
     'inline/list-style-type/disc':
         '<ol style="list-style-type: disc"><li>Foo</li></ol>',
@@ -465,7 +465,7 @@ ${_paddingTest('padding: 0 10px', 'horizontal only')}
   <li>9px</li>
 <ul>
 ''',
-    'OL/rtl':
+    'rtl/OL':
         '<div dir="rtl"><ol><li>One</li><li>Two</li><li>Three</li><ol></div>',
     'UL': '''
 <ul>
@@ -487,6 +487,8 @@ ${_paddingTest('padding: 0 10px', 'horizontal only')}
   </li>
   <li>Three</li>
 </ul>''',
+    'rtl/UL':
+        '<div dir="rtl"><ul><li>One</li><li>Two</li><li>Three</li><ul></div>',
     'TABLE,CAPTION,TBODY,THEAD,TFOOT,TR,TH,TD': '''<table border="1">
       <caption>Caption</caption>
       <tfoot><tr><td>Footer 1</td><td>Footer 2</td></tr></tfoot>
@@ -505,7 +507,7 @@ ${_paddingTest('padding: 0 10px', 'horizontal only')}
     <span style="display: table-cell">Value 2</span>
   </div>
 </div>''',
-    'TABLE/colspan': '''
+    'tag/TABLE/colspan': '''
 <table border="1">
   <caption>Source: <a href="https://www.w3schools.com/tags/att_td_colspan.asp">w3schools</a></caption>
   <tr>
@@ -524,7 +526,7 @@ ${_paddingTest('padding: 0 10px', 'horizontal only')}
     <td colspan="2">Sum: \$180</td>
   </tr>
 </table>''',
-    'TABLE/rowspan': '''
+    'tag/TABLE/rowspan': '''
 <table border="1">
   <caption>Source: <a href="https://www.w3schools.com/tags/att_td_colspan.asp">w3schools</a></caption>
   <tr>
