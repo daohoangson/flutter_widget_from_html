@@ -9,7 +9,7 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
     as core;
 import 'package:golden_toolkit/golden_toolkit.dart';
 
-final _withEnhancedRegExp = RegExp(r'(^(A|HR)$|colspan|rowspan)');
+final _withEnhancedRegExp = RegExp(r'(^(A|HR|SVG)$|colspan|rowspan)');
 
 class _TestApp extends StatelessWidget {
   final String html;
