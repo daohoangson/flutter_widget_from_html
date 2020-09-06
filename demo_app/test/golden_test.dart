@@ -107,7 +107,7 @@ void main() {
     'ACRONYM': '<acronym>ACRONYM</acronym>',
     'ADDRESS': 'This is an <address>ADDRESS</address>',
     'BR': '1<br />2',
-    'DD,DT,DD': '<dl><dt>Foo</dt><dd>Bar</dd></dt>',
+    'DD,DL,DT': '<dl><dt>Foo</dt><dd>Bar</dd></dt>',
     'HR': '<hr/>',
     'Q': 'Someone said <q>Foo</q>.',
     'RUBY,RP,RT': '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>',
