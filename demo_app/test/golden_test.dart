@@ -174,9 +174,8 @@ void main() {
     'inline/display/inline-block':
         '<div>1 <div style="display: inline-block">2</div></div>',
     'inline/display/none': '<div>1 <div style="display: none">2</div></div>',
-    'FONT/color': '<font color="#F00">Foo</font>',
-    'FONT/face': '<font face="Courier">Foo</font>',
-    'FONT/size': '''
+    'FONT': '''<font color="#F00">Foo</font><br />
+<font face="Courier">Foo</font><br />
 <font size="7">Size 7</font>
 <font size="6">Size 6</font>
 <font size="5">Size 5</font>
