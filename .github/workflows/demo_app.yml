@@ -1,10 +1,10 @@
 name: Demo
 on:
   push:
-    paths: 
+    paths:
       - .github/workflows/demo_app.yml
-      - 'demo_app/**'
-      - 'packages/**'
+      - "demo_app/**"
+      - "packages/**"
 
 jobs:
   apk:
@@ -50,10 +50,10 @@ jobs:
         run: |
           set -e
 
-          cd demo_app/test/goldens
+          cd ./test/goldens
           php tags.php >tags.html
           cd ..
-          cp -R goldens ../../build/web/supported
+          cp -R goldens ../build/web/supported
 
       - name: Deploy via now.sh
         id: now
