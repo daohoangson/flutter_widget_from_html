@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 
 import '_.dart';
 
@@ -6,10 +7,26 @@ const kHref = 'http://domain.com/href';
 const kImgSrc = 'http://domain.com/image.png';
 
 void main() {
-  testWidgets('renders underline', (WidgetTester tester) async {
+  group('basic usage', () {
     final html = '<a href="$kHref">Foo</a>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[RichText:(#FF0000FF+u+onTap:Foo)]'));
+
+    testWidgets('renders', (WidgetTester tester) async {
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(#FF0000FF+u+onTap:Foo)]'));
+    });
+
+    testWidgets('useExplainer=false', (WidgetTester tester) async {
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+          explained,
+          equals('TshWidget\n'
+              '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
+              ' │  BuildTree#2 tsb#3(parent=#1):\n'
+              ' │    "Foo"\n'
+              ' │    _TagABit#4 tsb#3(parent=#1)\n'
+              ' │)\n'
+              ' └RichText(text: "Foo")\n\n'));
+    });
   });
 
   group('renders without erroneous white spaces', () {
@@ -33,7 +50,7 @@ void main() {
   });
 
   testWidgets('renders complicated stylings', (WidgetTester tester) async {
-    final html = 'Hello <a href="$kHref">f<b>o<i>o</i></b> bar</a>.';
+    final html = 'Hello <a href="$kHref">f<b>o<i>o</i></b> <br /> bar</a>.';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -41,7 +58,7 @@ void main() {
             '(#FF0000FF+u+onTap:f)'
             '(#FF0000FF+u+b+onTap:o)'
             '(#FF0000FF+u+i+b+onTap:o)'
-            '(#FF0000FF+u: )(#FF0000FF+u+onTap:bar)'
+            '(#FF0000FF+u+onTap: \nbar)'
             '(:.)'
             ')]'));
   });
@@ -51,7 +68,9 @@ void main() {
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals('[GestureDetector:child=[RichText:(#FF0000FF+u:Foo)]]'),
+      equals('[GestureDetector:child='
+          '[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]'
+          ']'),
     );
   });
 
@@ -62,10 +81,55 @@ void main() {
       explained,
       equals(
         '[Column:children='
-        '[GestureDetector:child=[RichText:(#FF0000FF+u:Foo)]],'
-        '[GestureDetector:child=[RichText:(#FF0000FF+u:Bar)]]]',
+        '[GestureDetector:child=[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]],'
+        '[GestureDetector:child=[CssBlock:child=[RichText:(#FF0000FF+u:Bar)]]]'
+        ']',
       ),
     );
+  });
+
+  testWidgets('renders empty inside', (tester) async {
+    final html = '<a href="$kHref""></a>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[widget0]'));
+  });
+
+  testWidgets('renders DIV tag inside (display: block)', (tester) async {
+    final html = '<a href="$kHref" style="display: block"><div>Foo</div></a>';
+    final explained = await explain(tester, html);
+    expect(
+      explained,
+      equals('[CssBlock:child=[GestureDetector:child='
+          '[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]'
+          ']]'),
+    );
+  });
+
+  testWidgets('renders DIV tags inside (display: block)', (tester) async {
+    final html = '<a href="$kHref" style="display: block">'
+        '<div>Foo</div><div>Bar</div></a>';
+    final explained = await explain(tester, html);
+    expect(
+      explained,
+      equals(
+        '[CssBlock:child=[GestureDetector:child=[Column:children='
+        '[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]],'
+        '[CssBlock:child=[RichText:(#FF0000FF+u:Bar)]]'
+        ']]]',
+      ),
+    );
+  });
+
+  testWidgets('renders empty inside (display: block)', (tester) async {
+    final html = '<a href="$kHref" style="display: block"></a>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[widget0]'));
+  });
+
+  testWidgets('renders empty background-color inside (#215)', (tester) async {
+    final h = '<a href="$kHref"><div style="background-color: red"></div></a>';
+    final explained = await explain(tester, h);
+    expect(explained, equals('[widget0]'));
   });
 
   testWidgets('renders margin inside', (WidgetTester tester) async {
@@ -74,58 +138,63 @@ void main() {
     expect(
         explained,
         equals('[SizedBox:0.0x5.0],'
-            '[GestureDetector:child=[Padding:(0,5,0,5),child=[RichText:(#FF0000FF+u:Foo)]]],'
+            '[GestureDetector:child=[Padding:(0,5,0,5),child=[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]]],'
             '[SizedBox:0.0x5.0]'));
   });
 
   group('IMG', () {
+    final explainImg = (WidgetTester tester, String html) =>
+        mockNetworkImagesFor(() => explain(tester, html));
+
     testWidgets('renders IMG tag inside', (WidgetTester tester) async {
       final html = '<a href="$kHref"><img src="$kImgSrc" /></a>';
-      final explained = await explain(tester, html);
+      final explained = await explainImg(tester, html);
       expect(
           explained,
           equals('[GestureDetector:child='
-              '[ImageLayout(NetworkImage("$kImgSrc", scale: 1.0))]'
+              '[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]'
               ']'));
     });
 
     testWidgets('renders text + IMG tag both inside', (tester) async {
       final html = '<a href="$kHref">Foo <img src="$kImgSrc" /></a>';
-      final explained = await explain(tester, html);
+      final explained = await explainImg(tester, html);
       expect(
           explained,
-          equals('[RichText:(:(#FF0000FF+u+onTap:Foo)(#FF0000FF+u: )'
-              '[GestureDetector:child=[ImageLayout(NetworkImage("$kImgSrc", scale: 1.0))]]'
+          equals('[RichText:(:'
+              '(#FF0000FF+u+onTap:Foo )'
+              '[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
               ')]'));
     });
 
     testWidgets('renders text outside + IMG tag inside', (tester) async {
       final html = 'Foo <a href="$kHref"><img src="$kImgSrc" /></a>';
-      final explained = await explain(tester, html);
+      final explained = await explainImg(tester, html);
       expect(
           explained,
           equals('[RichText:(:Foo '
-              '[GestureDetector:child=[ImageLayout(NetworkImage("$kImgSrc", scale: 1.0))]]'
+              '[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
               ')]'));
     });
 
     testWidgets('renders IMG tag + text both inside', (tester) async {
       final html = '<a href="$kHref"><img src="$kImgSrc" /> foo</a>';
-      final explained = await explain(tester, html);
+      final explained = await explainImg(tester, html);
       expect(
           explained,
           equals('[RichText:(:'
-              '[GestureDetector:child=[ImageLayout(NetworkImage("$kImgSrc", scale: 1.0))]]'
-              '(#FF0000FF+u: )(#FF0000FF+u+onTap:foo))]'));
+              '[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+              '(#FF0000FF+u+onTap: foo)'
+              ')]'));
     });
 
     testWidgets('renders IMG tag inside + text outside', (tester) async {
       final html = '<a href="$kHref"><img src="$kImgSrc" /></a> foo';
-      final explained = await explain(tester, html);
+      final explained = await explainImg(tester, html);
       expect(
           explained,
           equals('[RichText:(:'
-              '[GestureDetector:child=[ImageLayout(NetworkImage("$kImgSrc", scale: 1.0))]]'
+              '[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
               '(: foo))]'));
     });
   });

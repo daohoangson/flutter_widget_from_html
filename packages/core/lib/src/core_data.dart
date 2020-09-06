@@ -1,211 +1,137 @@
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
-import 'builder.dart';
 import 'core_helpers.dart';
+import 'core_widget_factory.dart';
 
-part 'data/text_bits.dart';
+part 'data/build_bits.dart';
+part 'data/css.dart';
+part 'data/image.dart';
+part 'data/table.dart';
+part 'data/text_style.dart';
 
-class BuildOp {
-  final bool isBlockElement;
+/// A building element metadata.
+abstract class BuildMetadata {
+  /// The associatd element.
+  final dom.Element element;
 
-  // op with lower priority will run first
-  final int priority;
+  final TextStyleBuilder _tsb;
 
-  final _BuildOpDefaultStyles _defaultStyles;
-  final _BuildOpOnChild _onChild;
-  final _BuildOpOnPieces _onPieces;
-  final _BuildOpOnWidgets _onWidgets;
+  /// Creates a node.
+  BuildMetadata(this.element, this._tsb);
 
-  BuildOp({
-    _BuildOpDefaultStyles defaultStyles,
-    bool isBlockElement,
-    _BuildOpOnChild onChild,
-    _BuildOpOnPieces onPieces,
-    _BuildOpOnWidgets onWidgets,
-    this.priority = 10,
-  })  : _defaultStyles = defaultStyles,
-        isBlockElement = isBlockElement ?? onWidgets != null,
-        _onChild = onChild,
-        _onPieces = onPieces,
-        _onWidgets = onWidgets;
+  /// The registered build ops.
+  Iterable<BuildOp> get buildOps;
 
-  bool get hasOnChild => _onChild != null;
+  /// Returns `true` if node should be rendered as block.
+  bool get isBlockElement;
 
-  List<String> defaultStyles(NodeMetadata meta, dom.Element e) =>
-      _defaultStyles != null ? _defaultStyles(meta, e) : null;
+  /// The parents' build ops that have [BuildOp.onChild].
+  Iterable<BuildOp> get parentOps;
 
-  void onChild(NodeMetadata meta, dom.Element e) =>
-      _onChild != null ? _onChild(meta, e) : meta;
+  /// The inline styles.
+  ///
+  /// These are usually collected from:
+  ///
+  /// - [WidgetFactory.parse] or [BuildOp.onChild] by calling `meta[key] = value`
+  /// - [BuildOp.defaultStyles] returning a map
+  /// - Attribute `style` of [domElement]
+  Iterable<MapEntry<String, String>> get styles;
 
-  Iterable<BuiltPiece> onPieces(
-    NodeMetadata meta,
-    Iterable<BuiltPiece> pieces,
-  ) =>
-      _onPieces != null ? _onPieces(meta, pieces) : pieces;
+  /// Sets whether node should be rendered as block.
+  set isBlockElement(bool value);
 
-  Iterable<Widget> onWidgets(NodeMetadata meta, Iterable<Widget> widgets) =>
-      (_onWidgets != null ? _onWidgets(meta, widgets) : null) ?? widgets;
-}
+  /// Adds an inline style.
+  operator []=(String key, String value);
 
-typedef _BuildOpDefaultStyles = Iterable<String> Function(
-    NodeMetadata meta, dom.Element e);
-typedef _BuildOpOnChild = void Function(NodeMetadata meta, dom.Element e);
-typedef _BuildOpOnPieces = Iterable<BuiltPiece> Function(
-    NodeMetadata meta, Iterable<BuiltPiece> pieces);
-typedef _BuildOpOnWidgets = Iterable<Widget> Function(
-    NodeMetadata meta, Iterable<Widget> widgets);
-
-class BuiltPiece {
-  final TextBits text;
-  final Iterable<Widget> widgets;
-
-  BuiltPiece.text(this.text) : widgets = null;
-
-  BuiltPiece.widgets(this.widgets) : text = null;
-
-  bool get hasWidgets => widgets != null;
-}
-
-class CssBorderSide {
-  Color color;
-  TextDecorationStyle style;
-  CssLength width;
-}
-
-class CssBorders {
-  CssBorderSide bottom;
-  CssBorderSide left;
-  CssBorderSide right;
-  CssBorderSide top;
-}
-
-class CssLength {
-  final double number;
-  final CssLengthUnit unit;
-
-  CssLength(
-    this.number, {
-    this.unit = CssLengthUnit.px,
-  })  : assert(!number.isNegative),
-        assert(unit != null);
-
-  bool get isNotEmpty => number > 0;
-
-  double getValue(BuildContext context, TextStyleBuilders tsb) {
-    double value;
-
-    switch (unit) {
-      case CssLengthUnit.em:
-        value = tsb.build(context).fontSize * number / 1;
-        break;
-      case CssLengthUnit.px:
-        value = number;
-        break;
+  /// Gets an inline style value by key.
+  String operator [](String key) {
+    String value;
+    for (final x in styles) {
+      if (x.key == key) value = x.value;
     }
-
-    if (value != null) {
-      value = value * MediaQuery.of(context).textScaleFactor;
-    }
-
     return value;
   }
-}
 
-class CssLengthBox {
-  final CssLength bottom;
-  final CssLength inlineEnd;
-  final CssLength inlineStart;
-  final CssLength left;
-  final CssLength right;
-  final CssLength top;
+  /// Registers a build op.
+  void register(BuildOp op);
 
-  const CssLengthBox({
-    this.bottom,
-    this.inlineEnd,
-    this.inlineStart,
-    this.left,
-    this.right,
-    this.top,
-  });
+  @override
+  String toString() =>
+      'BuildMetadata(${element == null ? "root" : element.outerHtml})';
 
-  CssLengthBox copyWith({
-    CssLength bottom,
-    CssLength inlineEnd,
-    CssLength inlineStart,
-    CssLength left,
-    CssLength right,
-    CssLength top,
-  }) =>
-      CssLengthBox(
-        bottom: bottom ?? this.bottom,
-        inlineEnd: inlineEnd ?? this.inlineEnd,
-        inlineStart: inlineStart ?? this.inlineStart,
-        left: left ?? this.left,
-        right: right ?? this.right,
-        top: top ?? this.top,
-      );
-}
-
-enum CssLengthUnit {
-  em,
-  px,
-}
-
-typedef NodeMetadataCollector = NodeMetadata Function(
-    NodeMetadata meta, dom.Element e);
-
-class TextStyleBuilders {
-  final _builders = <Function>[];
-  final _inputs = [];
-  final TextStyleBuilders parent;
-
-  BuildContext _context;
-  TextStyle _output;
-  TextAlign _textAlign;
-
-  BuildContext get context => _context;
-
-  TextAlign get textAlign => _textAlign ?? parent?.textAlign;
-
-  set textAlign(TextAlign v) => _textAlign = v;
-
-  TextStyleBuilders({this.parent});
-
-  void enqueue<T>(
-    TextStyle Function(TextStyleBuilders, TextStyle, T) builder,
+  /// Enqueues a text style builder callback.
+  ///
+  /// Returns the associated [TextStyleBuilder].
+  TextStyleBuilder tsb<T>([
+    TextStyleHtml Function(TextStyleHtml tsh, T input) builder,
     T input,
-  ) {
-    assert(_output == null, 'Cannot add builder after being built');
-    _builders.add(builder);
-    _inputs.add(input);
-  }
+  ]) =>
+      _tsb..enqueue(builder, input);
+}
 
-  TextStyle build(BuildContext context) {
-    _resetContextIfNeeded(context);
-    if (_output != null) return _output;
+/// A building operation to customize how a DOM element is rendered.
+@immutable
+class BuildOp {
+  /// Controls whether the element should be rendered with [CssBlock].
+  ///
+  /// Default: `true` if [onWidgets] callback is set, `false` otherwise.
+  final bool isBlockElement;
 
-    if (parent == null) {
-      _output = DefaultTextStyle.of(_context).style;
-    } else {
-      _output = parent.build(_context);
-    }
+  /// The execution priority, op with lower priority will run first.
+  ///
+  /// Default: 10.
+  final int priority;
 
-    final l = _builders.length;
-    for (var i = 0; i < l; i++) {
-      _output = _builders[i](this, _output, _inputs[i]);
-    }
+  /// The callback that should return default styling map.
+  ///
+  /// See list of all supported inline stylings in README.md, the sample op
+  /// below just changes the color:
+  ///
+  /// ```dart
+  /// BuildOp(
+  ///   defaultStyles: (_) => {'color': 'red'},
+  /// )
+  /// ```
+  ///
+  /// Note: op must be registered early for this to work e.g.
+  /// in [WidgetFactory.parse] or [onChild].
+  final Map<String, String> Function(dom.Element element) defaultStyles;
 
-    return _output;
-  }
+  /// The callback that will be called whenver a child element is found.
+  ///
+  /// Please note that all children and grandchildren etc. will trigger this method,
+  /// it's easy to check whether an element is direct child:
+  ///
+  /// ```dart
+  /// BuildOp(
+  ///   onChild: (childMeta) {
+  ///     if (!childElement.element.parent != parentMeta.element) return;
+  ///     childMeta.doSomethingHere;
+  ///   },
+  /// );
+  ///
+  /// ```
+  final void Function(BuildMetadata childMeta) onChild;
 
-  TextStyleBuilders sub() => TextStyleBuilders(parent: this);
+  /// The callback that will be called when child elements have been processed.
+  final void Function(BuildMetadata meta, BuildTree tree) onTree;
 
-  void _resetContextIfNeeded(BuildContext context) {
-    if (context == _context) return;
+  /// The callback that will be called when child elements have been built.
+  ///
+  /// Note: only works if it's a block element.
+  final Iterable<Widget> Function(
+      BuildMetadata meta, Iterable<WidgetPlaceholder> widgets) onWidgets;
 
-    _context = context;
-    _output = null;
-    _textAlign = null;
-  }
+  /// Creates a build op.
+  BuildOp({
+    this.defaultStyles,
+    bool isBlockElement,
+    this.onChild,
+    this.onTree,
+    this.onWidgets,
+    this.priority = 10,
+  }) : isBlockElement = isBlockElement ?? onWidgets != null;
 }

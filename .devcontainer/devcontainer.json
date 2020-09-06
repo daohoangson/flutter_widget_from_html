@@ -1,0 +1,6 @@
+{
+  "dockerFile": "Dockerfile",
+  "extensions": [
+    "Dart-Code.flutter"
+  ]
+}

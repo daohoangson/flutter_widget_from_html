@@ -2,15 +2,15 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 
-import 'builder.dart';
+import 'internal/builder.dart' as builder;
 import 'core_data.dart';
 import 'core_widget_factory.dart';
+import 'internal/tsh_widget.dart';
 
 /// A widget that builds Flutter widget tree from HTML
 /// (supports most popular tags and stylings).
@@ -19,25 +19,28 @@ class HtmlWidget extends StatefulWidget {
   final Uri baseUrl;
 
   /// Controls whether the widget tree is built asynchronously.
-  /// If not set, async build will be automatically enabled if the
-  /// input HTML is longer than [kShouldBuildAsync].
+  ///
+  /// If not set, async build will be enabled automatically if the
+  /// [html] has at least [kShouldBuildAsync] characters.
   final bool buildAsync;
 
   /// The callback to handle async build snapshot.
+  ///
   /// By default, a [CircularProgressIndicator] will be shown until
-  /// the widget tree is ready without error handling.
+  /// the widget tree is ready.
+  /// This default builder doesn't do any error handling
+  /// (it will just ignore any errors).
   final AsyncWidgetBuilder<Widget> buildAsyncBuilder;
-
-  /// The amount of space by which to inset the built widget tree.
-  final EdgeInsets bodyPadding;
 
   /// The callback to specify custom stylings.
   final CustomStylesBuilder customStylesBuilder;
 
-  /// The callback to specify custom stylings.
+  /// The callback to render a custom widget.
   final CustomWidgetBuilder customWidgetBuilder;
 
-  /// Controls whether the built widget tree is cached between rebuild.
+  /// Controls whether the built widget tree is cached between rebuilds.
+  ///
+  /// Default: `true` if [buildAsync] is off, `false` otherwise.
   final bool enableCaching;
 
   /// The input string.
@@ -47,16 +50,42 @@ class HtmlWidget extends StatefulWidget {
   final String html;
 
   /// The text color for link elements.
+  ///
+  /// Default: blue (#0000FF).
   final Color hyperlinkColor;
 
   /// The custom [WidgetFactory] builder.
+  ///
+  /// By default, a singleton instance of [WidgetFactory] will be used.
   final WidgetFactory Function() factoryBuilder;
 
   /// The callback when user taps a link.
   final void Function(String) onTapUrl;
 
-  /// The amount of space by which to inset the table cell's contents.
-  final EdgeInsets tableCellPadding;
+  /// The values that should trigger rebuild.
+  ///
+  /// By default, these fields' changes will invalidate cached widget tree:
+  ///
+  /// - [baseUrl]
+  /// - [buildAsync]
+  /// - [enableCaching]
+  /// - [html]
+  /// - [hyperlinkColor]
+  ///
+  /// In `flutter_widget_from_html` package, these are also included:
+  ///
+  /// - `unsupportedWebViewWorkaroundForIssue37`
+  /// - `webView`
+  /// - `webViewJs`
+  RebuildTriggers get rebuildTriggers => RebuildTriggers([
+        html,
+        baseUrl,
+        buildAsync,
+        enableCaching,
+        hyperlinkColor,
+        if (_rebuildTriggers != null) _rebuildTriggers,
+      ]);
+  final RebuildTriggers _rebuildTriggers;
 
   /// The default styling for text elements.
   final TextStyle textStyle;
@@ -69,60 +98,73 @@ class HtmlWidget extends StatefulWidget {
     this.baseUrl,
     this.buildAsync,
     this.buildAsyncBuilder,
-    this.bodyPadding = const EdgeInsets.all(10),
     this.customStylesBuilder,
     this.customWidgetBuilder,
-    this.enableCaching = true,
-    this.factoryBuilder = _singleton,
+    this.enableCaching,
+    this.factoryBuilder,
     this.hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
     Key key,
     this.onTapUrl,
-    this.tableCellPadding = const EdgeInsets.all(5),
+    RebuildTriggers rebuildTriggers,
     this.textStyle = const TextStyle(),
   })  : assert(html != null),
-        assert(factoryBuilder != null),
+        _rebuildTriggers = rebuildTriggers,
         super(key: key);
 
   @override
-  State<HtmlWidget> createState() => _HtmlWidgetState(
-        buildAsync: buildAsync ?? html.length > kShouldBuildAsync,
-      );
-
-  static WidgetFactory _wf;
-
-  static WidgetFactory _singleton() {
-    _wf ??= WidgetFactory();
-    return _wf;
-  }
+  State<HtmlWidget> createState() => _HtmlWidgetState();
 }
 
 class _HtmlWidgetState extends State<HtmlWidget> {
-  final bool buildAsync;
-
   Widget _cache;
   Future<Widget> _future;
+  BuildMetadata _rootMeta;
+  _RootTsb _rootTsb;
   WidgetFactory _wf;
 
-  _HtmlWidgetState({this.buildAsync = false});
+  bool get buildAsync =>
+      widget.buildAsync ?? widget.html.length > kShouldBuildAsync;
+
+  bool get enableCaching => widget.enableCaching ?? !buildAsync;
 
   @override
   void initState() {
     super.initState();
 
-    _wf = widget.factoryBuilder();
+    _rootTsb = _RootTsb(this);
+    _rootMeta = builder.BuildMetadata(null, _rootTsb);
+    _wf = (widget.factoryBuilder ?? _getCoreWf).call();
+
+    _wf.onRoot(_rootTsb);
 
     if (buildAsync) {
       _future = _buildAsync();
-    } else if (widget.enableCaching) {
-      _cache = _buildSync();
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _rootTsb.reset();
   }
 
   @override
   void didUpdateWidget(HtmlWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.html != oldWidget.html) {
+    var needsRebuild = false;
+
+    if (widget.rebuildTriggers != oldWidget.rebuildTriggers) {
+      needsRebuild = true;
+    }
+
+    if (widget.textStyle != oldWidget.textStyle) {
+      _rootTsb.reset();
+      needsRebuild = true;
+    }
+
+    if (needsRebuild) {
       _cache = null;
       _future = buildAsync ? _buildAsync() : null;
     }
@@ -133,21 +175,20 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     if (_future != null) {
       return FutureBuilder<Widget>(
         builder: widget.buildAsyncBuilder ?? _buildAsyncBuilder,
-        future: _future,
+        future: _future.then(_tshWidget),
       );
     }
 
-    if (!widget.enableCaching) return _buildSync();
+    if (!enableCaching || _cache == null) _cache = _buildSync();
 
-    _cache ??= _buildSync();
-    return _cache;
+    return _tshWidget(_cache);
   }
 
   Future<Widget> _buildAsync() async {
     final domNodes = await compute(_parseHtml, widget.html);
 
     Timeline.startSync('Build $widget (async)');
-    final built = _buildBody(_wf, widget, domNodes);
+    final built = _buildBody(this, domNodes);
     Timeline.finishSync();
 
     return built;
@@ -157,12 +198,45 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     Timeline.startSync('Build $widget (sync)');
 
     final domNodes = _parseHtml(widget.html);
-    final built = _buildBody(_wf, widget, domNodes);
+    final built = _buildBody(this, domNodes);
 
     Timeline.finishSync();
 
     return built;
   }
+
+  Widget _tshWidget(Widget child) =>
+      TshWidget(child: child, tsh: _rootTsb._output);
+
+  static WidgetFactory _coreWf;
+  static WidgetFactory _getCoreWf() {
+    _coreWf ??= WidgetFactory();
+    return _coreWf;
+  }
+}
+
+class _RootTsb extends TextStyleBuilder {
+  TextStyleHtml _output;
+
+  _RootTsb(_HtmlWidgetState state) {
+    enqueue(builder, state);
+  }
+
+  @override
+  TextStyleHtml build(BuildContext context) {
+    context.dependOnInheritedWidgetOfExactType<TshWidget>();
+    return super.build(context);
+  }
+
+  TextStyleHtml builder(TextStyleHtml _, _HtmlWidgetState state) {
+    if (_output != null) return _output;
+    return _output = TextStyleHtml.root(
+      state._wf.getDependencies(state.context),
+      state.widget.textStyle,
+    );
+  }
+
+  void reset() => _output = null;
 }
 
 Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
@@ -170,18 +244,24 @@ Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
         ? snapshot.data
         : const Center(
             child: Padding(
-            padding: EdgeInsets.all(8),
-            child: CircularProgressIndicator(),
-          ));
+              child: Text('Loading...'),
+              padding: EdgeInsets.all(8),
+            ),
+          );
 
-Widget _buildBody(WidgetFactory wf, HtmlWidget widget, dom.NodeList domNodes) {
-  wf.reset(widget);
-  final tsb = TextStyleBuilders()..enqueue(_tsb, widget.textStyle);
-  final built = HtmlBuilder(domNodes: domNodes, parentTsb: tsb, wf: wf).build();
-  return wf.buildBody(built) ?? widget0;
+Widget _buildBody(_HtmlWidgetState state, dom.NodeList domNodes) {
+  final rootMeta = state._rootMeta;
+  final wf = state._wf;
+  wf.reset(state);
+
+  final tree = builder.BuildTree(
+    customStylesBuilder: state.widget.customStylesBuilder,
+    customWidgetBuilder: state.widget.customWidgetBuilder,
+    parentMeta: rootMeta,
+    tsb: rootMeta.tsb(),
+    wf: wf,
+  )..addBitsFromNodes(domNodes);
+  return wf.buildBody(rootMeta, tree.build()) ?? widget0;
 }
 
 dom.NodeList _parseHtml(String html) => parser.parse(html).body.nodes;
-
-TextStyle _tsb(TextStyleBuilders _, TextStyle parent, TextStyle style) =>
-    style == null ? parent : style.inherit ? parent.merge(style) : style;

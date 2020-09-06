@@ -1,6 +1,5 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 
 import '_.dart';
 
@@ -74,8 +73,9 @@ void main() {
 
   group('image', () {
     final imgSrc = 'http://domain.com/image.png';
-    final imgRendered = '[ImageLayout(NetworkImage("$imgSrc", scale: 1.0))]';
-    final imgExplain = (WidgetTester t, String html) => explain(t, html);
+    final imgRendered = '[Image:image=NetworkImage("$imgSrc", scale: 1.0)]';
+    final imgExplain = (WidgetTester t, String html) =>
+        mockNetworkImagesFor(() => explain(t, html));
 
     testWidgets('renders top image', (WidgetTester tester) async {
       final html = '<img src="$imgSrc" style="vertical-align: top" />';
@@ -164,36 +164,4 @@ void main() {
               ']@top)]'));
     });
   });
-
-  testWidgets('#163: renders non-WidgetPlaceholder text', (tester) async {
-    final html = '<sub>Foo</sub>';
-    final explained = await explain(
-      tester,
-      null,
-      hw: HtmlWidget(
-        html,
-        bodyPadding: const EdgeInsets.all(0),
-        factoryBuilder: () => _Issue163Wf(),
-        key: hwKey,
-      ),
-    );
-    expect(
-        explained,
-        equals('[RichText:[Stack:children='
-            '[Padding:(0,0,3,0),child=[Opacity:child=[Text:Foo]]],'
-            '[Positioned:(null,null,0.0,null),child=[Text:Foo]]'
-            ']@top]'));
-  });
-}
-
-class _Issue163Wf extends WidgetFactory {
-  @override
-  Widget buildText(TextBits text) {
-    final bits = text.bits.toList(growable: false);
-    if (bits.length == 1 && bits[0] is TextData) {
-      return Text(bits[0].data);
-    }
-
-    return super.buildText(text);
-  }
 }

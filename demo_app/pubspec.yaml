@@ -1,0 +1,45 @@
+name: demo_app
+description: Flutter Widget from HTML demo app.
+version: 0.0.1
+
+environment:
+  sdk: ">=2.6.0 <3.0.0"
+
+dependencies:
+  carousel_slider: ^2.2.1
+  flutter:
+    sdk: flutter
+  flutter_widget_from_html: any
+  flutter_widget_from_html_core: any
+  html: any
+  http: any
+  provider: ^3.0.0+1
+  url_launcher: any
+
+dependency_overrides:            # dep_override
+  flutter_widget_from_html:      # dep_override
+    path: ../packages/enhanced   # dep_override
+  flutter_widget_from_html_core: # dep_override
+    path: ../packages/core       # dep_override
+
+dev_dependencies:
+  flutter_driver:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+  golden_toolkit: ^0.6.0
+  pedantic: any
+  test: any
+
+flutter:
+  assets:
+    - images/
+    - logos/
+  fonts:
+    - family: Courier
+      fonts:
+        - asset: fonts/RobotoMono/RobotoMono-Regular.ttf
+    - family: Roboto
+      fonts:
+        - asset: packages/golden_toolkit/fonts/Roboto-Regular.ttf
+  uses-material-design: true
