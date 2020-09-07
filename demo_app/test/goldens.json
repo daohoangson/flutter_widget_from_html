@@ -57,7 +57,7 @@
   "RUBY/long_ruby": "<ruby>loooong <rt>x</rt></ruby>",
   "S": "<s>Foo</s>",
   "SAMP": "<samp>Disk fault</samp>",
-  "SCRIPT": "<script>document.write(\"SCRIPT is working\");</script>\n<noscript>SCRIPT is not working</noscript>",
+  "SCRIPT,NOSCRIPT": "<script>document.write(\"SCRIPT is working\");</script>\n<noscript>SCRIPT is not working</noscript>",
   "SECTION": "<section>First.</section><section>Second one.</section>",
   "SMALL": "<small>Foo</small>",
   "STRIKE": "<strike>Foo</strike>",
