@@ -59,6 +59,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
   DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, INS,
   KBD, MAIN, NAV, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, STRIKE, STRONG, SUB, SUP, TT, U, VAR
+- Everything with screenshot: https://html-widget-demo.now.sh/supported/tags.html
 
 These tags and their contents will be ignored:
 
