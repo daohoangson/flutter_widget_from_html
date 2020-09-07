@@ -35,6 +35,7 @@ flutter:
   assets:
     - images/
     - logos/
+    - test/goldens.json
   fonts:
     - family: Courier
       fonts:

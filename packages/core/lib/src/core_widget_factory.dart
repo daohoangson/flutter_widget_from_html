@@ -500,15 +500,6 @@ class WidgetFactory {
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
 
-      case 'iframe':
-      case 'script':
-      case 'style':
-      case 'svg':
-        // actually `script` and `style` are not required here
-        // the parser will put those elements into document.head anyway
-        meta[kCssDisplay] = kCssDisplayNone;
-        break;
-
       case kTagImg:
         _tagImg ??= TagImg(this).buildOp;
         meta.register(_tagImg);
@@ -543,6 +534,11 @@ class WidgetFactory {
 
       case kTagRuby:
         meta.register(TagRuby(this, meta).op);
+        break;
+
+      case 'script':
+      case 'style':
+        meta[kCssDisplay] = kCssDisplayNone;
         break;
 
       case 'small':

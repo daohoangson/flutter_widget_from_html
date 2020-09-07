@@ -19,45 +19,11 @@ See the [Demo app](https://github.com/daohoangson/flutter_widget_from_html/tree/
 ### Example
 
 ```dart
-const kHtml = '''
-<h1>Heading 1</h1>
-<h2>Heading 2</h2>
-<h3>Heading 3</h3>
-<h4>Heading 4</h4>
-<h5>Heading 5</h5>
-<h6>Heading 6</h6>
-<p>A paragraph with <strong>strong</strong> <em>emphasized</em> text.</p>
-
-<p>And of course, cat image:</p>
-<figure>
-  <img src="https://media.giphy.com/media/6VoDJzfRjJNbG/giphy-downsized.gif" width="250" height="171" />
-  <figcaption>Source: <a href="https://gph.is/QFgPA0">https://gph.is/QFgPA0</a></figcaption>
-</figure>
-''';
-
-class HelloWorldCoreScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text('HelloWorldCoreScreen')),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: HtmlWidget(
-              kHtml,
-              onTapUrl: (url) => showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  title: Text('onTapUrl'),
-                  content: Text(url),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-}
-
-void main() => runApp(WidgetsApp(home: HelloWorldCoreScreen()));
+HtmlWidget(
+  // the first parameter, `html`, is required
+  kHtml,
+  // the rest are optional
+),
 ```
 
 <img src="../../demo_app/screenshots/HelloWorldCoreScreen.gif?raw=true" width="300" />
@@ -67,6 +33,7 @@ void main() => runApp(WidgetsApp(home: HelloWorldCoreScreen()));
 ### HTML tags
 
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
+[Compare between Flutter rendering and browser's.](https://html-widget-demo.now.sh/supported/tags.html)
 
 - A: underline, blue color, no default onTap action (use [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) for that)
 - H1/H2/H3/H4/H5/H6
@@ -80,6 +47,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
   DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, IMG, INS,
   KBD, MAIN, NAV, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, STRIKE, STRONG, SUB, SUP, TT, U, VAR
+- Everything with screenshot: https://html-widget-demo.now.sh/supported/tags.html
 
 However, these tags and their contents will be ignored:
 

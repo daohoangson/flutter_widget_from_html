@@ -1,10 +1,10 @@
 name: Demo
 on:
   push:
-    paths: 
+    paths:
       - .github/workflows/demo_app.yml
-      - 'demo_app/**'
-      - 'packages/**'
+      - "demo_app/**"
+      - "packages/**"
 
 jobs:
   apk:
@@ -46,6 +46,15 @@ jobs:
       - run: flutter config --enable-web
       - run: flutter build web
 
+      - name: Generate supported/tags.html
+        run: |
+          set -e
+
+          cd ./test/goldens
+          php tags.php >tags.html
+          cd ..
+          cp -R goldens ../build/web/supported
+
       - name: Deploy via now.sh
         id: now
         run: |
@@ -78,6 +87,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          body: "Deployed ${{ github.sha }} to ${{ steps.now.outputs.url }}.\n\nQuick links:\n- [Home](${{ steps.now.outputs.url }})\n- [Hello World](${{ steps.now.outputs.url }}/#/helloworld)\n- [Hello World (core)](${{ steps.now.outputs.url }}/#/helloworldcore)\n- [Styling](${{ steps.now.outputs.url }}/#/styling)\n- [Wordpress](${{ steps.now.outputs.url }}/#/wordpress)"
+          body: "Deployed ${{ github.sha }} to ${{ steps.now.outputs.url }}.\n\nQuick links:\n- [supported/tags.html](${{ steps.now.outputs.url }}/supported/tags.html)\n- [Hello World](${{ steps.now.outputs.url }}/#/helloworld)\n- [Hello World (core)](${{ steps.now.outputs.url }}/#/helloworldcore)\n- [Wordpress](${{ steps.now.outputs.url }}/#/wordpress)"
           fingerprint: "## Demo app"
           replace: please
