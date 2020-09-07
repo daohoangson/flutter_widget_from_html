@@ -28,7 +28,7 @@
   "HEADER,FOOTER": "<header>First.</header><footer>Second one.</footer>",
   "HR": "<hr/>",
   "I": "This is an <i>italic</i> text.",
-  "IFRAME": "Foo. <iframe src=\"https://www.youtube.com/embed/jNQXAC9IVRw\" width=\"320\" height=\"180\"></iframe> Bar.",
+  "IFRAME": "<iframe src=\"https://www.youtube.com/embed/jNQXAC9IVRw\" width=\"320\" height=\"180\">\n  Your browser does not support IFRAME.\n</iframe>",
   "IMG": "Flutter <img src=\"asset:logos/android.png\" width=\"12\" height=\"12\" /> is awesome.",
   "IMG/block_big": "Foo <img src=\"asset:images/2000x200.png\" style=\"display: block\" /> bar.",
   "IMG/block_big_dimensions": "Foo <img src=\"asset:images/2000x200.png\" width=\"2000\" height=\"200\" style=\"display: block\" /> bar.",

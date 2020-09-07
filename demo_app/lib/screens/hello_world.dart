@@ -10,7 +10,7 @@ const kHtml = '''
 <h6>Heading 6</h6>
 
 <p>
-  A paragraph with <strong>strong</strong>, <em>emphasized</em>
+  A paragraph with <strong>&lt;strong&gt;</strong>, <em>&lt;em&gt;phasized</em>
   and <span style="color: red">colored</span> text.
   With an inline Flutter logo:
   <img src="https://github.com/daohoangson/flutter_widget_from_html/raw/master/demo_app/logos/android.png" style="width: 1em" />.
@@ -21,9 +21,11 @@ const kHtml = '''
 <p>&lt;SUP&gt; <var>a<sup>2</sup></var> + <var>b<sup>2</sup></var> = <var>c<sup>2</sup></var></p>
 
 <h4>&lt;IFRAME&gt; of YouTube:</h4>
-<iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="560" height="315"></iframe>
+<iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="560" height="315">
+  Your browser does not support IFRAME.
+</iframe>
 
-<h4>A cat GIF:</h4>
+<h4>&lt;IMG&gt; of a cat:</h4>
 <figure>
   <img src="https://media.giphy.com/media/6VoDJzfRjJNbG/giphy-downsized.gif" width="250" height="171" />
   <figcaption>Source: <a href="https://gph.is/QFgPA0">https://gph.is/QFgPA0</a></figcaption>
@@ -115,6 +117,7 @@ const kHtml = '''
         <rect width="39.4" height="5.5" x="59.8" y="162.5" fill="url(#rectangleGradient)" />
     </g>
     <path d="M79.5 170.7 120.9 156.4 107.4 142.8" fill="url(#triangleGradient)" />
+    Your browser does not support inline SVG.
 </svg>
 <!-- /enhanced only -->
 
