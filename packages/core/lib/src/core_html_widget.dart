@@ -44,9 +44,6 @@ class HtmlWidget extends StatefulWidget {
   final bool enableCaching;
 
   /// The input string.
-  ///
-  /// It should contains at least HTML and BODY elements (something like
-  /// `<html><body>Contents</body></html>`) to avoid parsing quirks.
   final String html;
 
   /// The text color for link elements.
@@ -264,4 +261,8 @@ Widget _buildBody(_HtmlWidgetState state, dom.NodeList domNodes) {
   return wf.buildBody(rootMeta, tree.build()) ?? widget0;
 }
 
-dom.NodeList _parseHtml(String html) => parser.parse(html).body.nodes;
+dom.NodeList _parseHtml(String html) => parser.HtmlParser(
+      html,
+      generateSpans: false,
+      parseMeta: false,
+    ).parseFragment().nodes;

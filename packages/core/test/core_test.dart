@@ -348,21 +348,46 @@ void main() {
 
   group('non renderable elements', () {
     testWidgets('skips IFRAME tag', (WidgetTester tester) async {
-      final html = '<iframe src="iframe.html">Something</iframe>Bye iframe.';
+      final html = 'Foo. '
+          '<iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="320" height="180"></iframe> '
+          'Bar.';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Bye iframe.)]'));
+      expect(explained, equals('[RichText:(:Foo. Bar.)]'));
     });
 
     testWidgets('skips SCRIPT tag', (WidgetTester tester) async {
-      final html = '<script>foo = bar</script>Bye script.';
+      final html = '<script>document.write("SCRIPT is working");</script>'
+          '<noscript>SCRIPT is not working</noscript>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Bye script.)]'));
+      expect(explained, equals('[RichText:(:SCRIPT is not working)]'));
     });
 
     testWidgets('skips STYLE tag', (WidgetTester tester) async {
-      final html = '<style>body { background: #fff; }</style>Bye style.';
+      final html = '<style>.xxx { color: red; }</style>'
+          '<span class="xxx">Foo</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Bye style.)]'));
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('skips SVG tag', (WidgetTester tester) async {
+      final html = '''<svg height="100" width="100">
+  <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
+  Your browser does not support inline SVG.
+</svg>''';
+      final explained = await explain(tester, html);
+      expect(explained,
+          equals('[RichText:(:Your browser does not support inline SVG.)]'));
+    });
+
+    testWidgets('skips VIDEO tag', (WidgetTester tester) async {
+      final html = '''<video>
+  <source src="mov_bbb.mp4" type="video/mp4">
+  <source src="mov_bbb.ogg" type="video/ogg">
+  Your browser does not support HTML5 video.
+</video>''';
+      final explained = await explain(tester, html);
+      expect(explained,
+          equals('[RichText:(:Your browser does not support HTML5 video.)]'));
     });
   });
 
