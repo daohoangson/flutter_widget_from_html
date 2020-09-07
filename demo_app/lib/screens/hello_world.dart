@@ -12,8 +12,8 @@ const kHtml = '''
 <p>
   A paragraph with <strong>strong</strong>, <em>emphasized</em>
   and <span style="color: red">colored</span> text.
-  With an inline <a href="https://flutter.dev">Flutter</a> logo,
-  like this: <img src="https://github.com/daohoangson/flutter_widget_from_html/raw/master/demo_app/logos/android.png" style="width: 1em" />.
+  With an inline Flutter logo:
+  <img src="https://github.com/daohoangson/flutter_widget_from_html/raw/master/demo_app/logos/android.png" style="width: 1em" />.
 </p>
 
 <p>&lt;RUBY&gt; <ruby style="font-size: 200%">明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby></td></p>
