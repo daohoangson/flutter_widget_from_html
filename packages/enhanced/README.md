@@ -1,32 +1,74 @@
 # Flutter Widget from HTML
 
 ![Flutter](https://github.com/daohoangson/flutter_widget_from_html/workflows/Flutter/badge.svg)
-![Android Test](https://github.com/daohoangson/flutter_widget_from_html/workflows/Android%20Test/badge.svg)
 [![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html.svg)](https://pub.dev/packages/flutter_widget_from_html)
 
-A Flutter package for building Flutter widget tree from HTML with support for IFRAME, VIDEO and many other tags.
+A Flutter package for building Flutter widget tree from HTML with support for IFRAME, VIDEO and 70+ other tags.
 
-This package extends the [`flutter_widget_from_html_core`](https://pub.dev/packages/flutter_widget_from_html_core) package with extra functionalities by using external depedencies like `cached_network_image` or `url_launcher`. It should be good enough as a quick starting point but you can always use the `core` directly if you dislike the dependencies.
+## Getting Started
+
+Add this to your app's `pubspec.yaml` file:
+
+```yaml
+dependencies:
+  flutter_widget_from_html: ^0.4.3
+```
 
 ## Usage
 
-To use this package, add `flutter_widget_from_html` as a [dependency in your pubspec.yaml file](https://flutter.io/using-packages/).
+Then you have to import the package with:
 
-See the [Demo app](https://github.com/daohoangson/flutter_widget_from_html/tree/master/demo_app) for inspiration.
+```dart
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+```
 
-## Example
+And use `HtmlWidget` where appropriate:
 
 ```dart
 HtmlWidget(
-  // the first parameter, `html`, is required
-  kHtml,
+  // the first parameter (`html`) is required
+  '''
+  <h3>Heading</h3>
+  <p>
+    A paragraph with <strong>strong</strong>, <em>emphasized</em>
+    and <span style="color: red">colored</span> text.
+  </p>
+  <!-- anything goes here -->
+  ''',
 
-  // by default, `webView` is turned off because additional configuration must be done
-  // for it to work on iOS. Check API document for more information.
+  // all other parameters are optional, a few notable params:
+
+  // specify custom styling for an element
+  // see supported inline styling below
+  customStylesBuilder: (element) {
+    if (element.classes.contains('foo')) {
+      return {'color': 'red'};
+    }
+
+    return null;
+  },
+
+  // render a custom widget
+  customWidgetBuilder: (element) {
+    if (element.attributes['foo'] == 'bar') {
+      return FooBarWidget();
+    }
+
+    return null;
+  },
+
+  // this callback will be triggered when user taps a link
+  onTapUrl: (url) => print('tapped $url'),
+
+  // set the default styling for text
+  textStyle: TextStyle(fontSize: 14),
+
+  // By default, `webView` is turned off because additional config
+  // must be done for `PlatformView` to work on iOS.
+  // https://pub.dev/packages/webview_flutter#ios
+  // Make sure you have it configured before using.
   webView: true,
-
-  // the rest are optional
 ),
 ```
 
@@ -39,15 +81,10 @@ HtmlWidget(
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
 [Compare between Flutter rendering and browser's.](https://html-widget-demo.now.sh/supported/tags.html)
 
-- A: underline, theme accent color, launch url via [`url_launcher`](https://pub.dev/packages/url_launcher), support base url resolver.
+- A: underline, theme accent color, launch URL via [url_launcher](https://pub.dev/packages/url_launcher), support base URL resolver.
 - H1/H2/H3/H4/H5/H6
-- IFRAME via [`WebView`](https://pub.dev/packages/webview_flutter). Available configurations:
-  - `.webView`, default=false
-  - `.webViewJs`, default=true
-  - `.webViewPadding`
-  - To render IFRAME as web view: set `webView=true` in config and [setup iOS project manually](https://pub.dev/packages/webview_flutter#ios).
-  - If the IFRAME has no `width` and `height` attributes, the web view will be rendered initially in a 16:9 box and automatically resize itself afterwards.
-- IMG with support for asset (`asset://`), data uri and network image via [`CachedNetworkImage`](https://pub.dev/packages/cached_network_image). Additional .svg file support via [flutter_svg](https://pub.dev/packages/flutter_svg).
+- IFRAME via [webview_flutter](https://pub.dev/packages/webview_flutter)
+- IMG with support for asset (`asset://`), data uri and network image via [cached_network_image](https://pub.dev/packages/cached_network_image). Additional .svg file support via [flutter_svg](https://pub.dev/packages/flutter_svg).
 - LI/OL/UL with support for:
   - Attributes: `type`, `start`, `reversed`
   - Inline style `list-style-type` values: `lower-alpha`, `upper-alpha`, `lower-latin`, `upper-latin`, `circle`, `decimal`, `disc`, `lower-roman`, `upper-roman`, `square`
@@ -68,7 +105,8 @@ These tags and their contents will be ignored:
 
 ### Attributes
 
-- dir: `auto`, `ltr` and `rtl`
+- align: center/end/justify/left/right/start/-moz-center/-webkit-center
+- dir: auto/ltr/rtl
 
 ### Inline stylings
 
@@ -80,14 +118,14 @@ These tags and their contents will be ignored:
 - font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) or values in `em`, `%`, `pt` and `px`
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
-- line-height: `normal` number or values in `em`, `%`, `pt` and `px`
+- line-height: `normal`, number or values in `em`, `%`, `pt` and `px`
 - margin and margin-xxx: values in `em`, `pt` and `px`
 - padding and padding-xxx: values in `em`, `pt` and `px`
 - vertical-align: baseline/top/bottom/middle/sub/super
-- text-align: center/end/justify/left/right/start/-moz-center/-webkit-center
+- text-align (similar to `align` attribute)
 - text-decoration: line-through/none/overline/underline
 - text-overflow: clip/ellipsis. Note: `text-overflow: ellipsis` should be used in conjuntion with `max-lines` or `-webkit-line-clamp` for better result.
-- Sizing (width & height, max-xxx, min-xxx) with values in `em`, `pt` and `px`
+- Sizing (width, height, max-xxx, min-xxx) with values in `em`, `pt` and `px`
 
 ## Extensibility
 
