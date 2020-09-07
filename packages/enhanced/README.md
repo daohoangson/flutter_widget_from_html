@@ -58,9 +58,6 @@ HtmlWidget(
     return null;
   },
 
-  // this callback will be triggered when user taps a link
-  onTapUrl: (url) => print('tapped $url'),
-
   // set the default styling for text
   textStyle: TextStyle(fontSize: 14),
 
