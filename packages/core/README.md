@@ -159,7 +159,7 @@ HtmlWidget(
 
 </td>
 <td>
-  <img src="../../demo_app/screenshots/CustomStylesBuilderScreen.png?raw=true" width="200" />
+  <img src="https://github.com/daohoangson/flutter_widget_from_html/raw/master/demo_app/screenshots/CustomStylesBuilderScreen.png?raw=true" width="200" />
 </td>
 </tr>
 </table>
@@ -223,7 +223,7 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
 }
 ```
 
-[<img src="../../demo_app/screenshots/CustomWidgetBuilderScreen.gif?raw=true" width="300" />](https://html-widget-demo.now.sh/#/customwidgetbuilder)
+[<img src="https://github.com/daohoangson/flutter_widget_from_html/raw/master/demo_app/screenshots/CustomWidgetBuilderScreen.gif?raw=true" width="300" />](https://html-widget-demo.now.sh/#/customwidgetbuilder)
 
 ### Custom `WidgetFactory`
 
@@ -330,4 +330,4 @@ class _SmiliesWidgetFactory extends WidgetFactory {
 }
 ```
 
-<img src="../../demo_app/screenshots/SmilieScreen.png?raw=true" width="300" />
+<img src="https://github.com/daohoangson/flutter_widget_from_html/raw/master/demo_app/screenshots/SmilieScreen.png?raw=true" width="300" />
