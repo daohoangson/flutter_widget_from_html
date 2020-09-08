@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
@@ -126,3 +129,38 @@ class WidgetPlaceholder<T> extends StatelessWidget {
       ? child
       : WidgetPlaceholder<Widget>(child, child: child);
 }
+
+final _dataUriRegExp = RegExp(r'^data:image/[^;]+;(base64|utf8),');
+
+/// Returns [Uint8List] by decoding [dataUri].
+///
+/// Supported encoding:
+///
+/// - base64
+/// - utf8
+Uint8List bytesFromDataUri(String dataUri) {
+  final match = _dataUriRegExp.matchAsPrefix(dataUri);
+  if (match == null) return null;
+
+  final prefix = match[0];
+  final encoding = match[1];
+  final data = dataUri.substring(prefix.length);
+
+  final bytes = encoding == 'base64'
+      ? base64.decode(data)
+      : encoding == 'utf8' ? Uint8List.fromList(data.codeUnits) : null;
+  if (bytes.isEmpty) return null;
+
+  return bytes;
+}
+
+/// Returns [List<T>] if [x] is provided or `null` otherwise.
+Iterable<T> listOrNull<T>(T x) => x == null ? null : [x];
+
+/// Parses [key] from [map] as an double literal and return its value.
+double tryParseDoubleFromMap(Map<dynamic, String> map, String key) =>
+    map.containsKey(key) ? double.tryParse(map[key]) : null;
+
+/// Parses [key] from [map] as a, possibly signed, integer literal and return its value.
+int tryParseIntFromMap(Map<dynamic, String> map, String key) =>
+    map.containsKey(key) ? int.tryParse(map[key]) : null;

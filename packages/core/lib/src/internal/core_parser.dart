@@ -8,12 +8,6 @@ part 'parser/border.dart';
 part 'parser/color.dart';
 part 'parser/length.dart';
 
-double tryParseDoubleFromMap(Map<dynamic, String> map, String key) =>
-    map.containsKey(key) ? double.tryParse(map[key]) : null;
-
-int tryParseIntFromMap(Map<dynamic, String> map, String key) =>
-    map.containsKey(key) ? int.tryParse(map[key]) : null;
-
 final _spacingRegExp = RegExp(r'\s+');
 Iterable<String> splitCssValues(String value) => value.split(_spacingRegExp);
 

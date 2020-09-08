@@ -57,14 +57,10 @@ class TagVideo {
       _sourceUrls.first,
       autoplay: attrs.containsKey(kAttributeVideoAutoplay),
       controls: attrs.containsKey(kAttributeVideoControls),
-      height: attrs.containsKey(kAttributeVideoHeight)
-          ? double.tryParse(attrs[kAttributeVideoHeight])
-          : null,
+      height: tryParseDoubleFromMap(attrs, kAttributeVideoHeight),
       loop: attrs.containsKey(kAttributeVideoLoop),
       posterUrl: wf.urlFull(attrs[kAttributeVideoPoster]),
-      width: attrs.containsKey(kAttributeVideoWidth)
-          ? double.tryParse(attrs[kAttributeVideoWidth])
-          : null,
+      width: tryParseDoubleFromMap(attrs, kAttributeVideoWidth),
     );
   }
 }
