@@ -49,17 +49,24 @@ class RebuildTriggers {
   RebuildTriggers(this._values);
 
   @override
+  int get hashCode => _values.length;
+
+  @override
   bool operator ==(Object other) {
-    if (other is! RebuildTriggers) return false;
+    if (identical(this, other)) return true;
 
-    final otherValues = (other as RebuildTriggers)._values;
-    if (otherValues.length != _values.length) return false;
+    if (other is RebuildTriggers) {
+      final otherValues = other._values;
+      if (otherValues.length != _values.length) return false;
 
-    for (var i = 0; i < _values.length; i++) {
-      if (otherValues[i] != _values[i]) return false;
+      for (var i = 0; i < _values.length; i++) {
+        if (otherValues[i] != _values[i]) return false;
+      }
+
+      return true;
     }
 
-    return true;
+    return false;
   }
 }
 
