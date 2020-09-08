@@ -6,6 +6,10 @@
 
 A Flutter package for building Flutter widget tree from HTML with support for IFRAME, VIDEO and 70+ other tags.
 
+|                                                                |                                                                |                                                                |
+| -------------------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
+| ![](../../demo_app/screenshots/HelloWorldScreen1.jpg?raw=true) | ![](../../demo_app/screenshots/HelloWorldScreen2.gif?raw=true) | ![](../../demo_app/screenshots/HelloWorldScreen3.gif?raw=true) |
+
 ## Getting Started
 
 Add this to your app's `pubspec.yaml` file:
@@ -68,8 +72,6 @@ HtmlWidget(
   webView: true,
 ),
 ```
-
-<img src="../../demo_app/screenshots/HelloWorldScreen.png?raw=true" width="300" />
 
 ## Features
 

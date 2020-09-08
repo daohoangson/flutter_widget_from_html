@@ -6,6 +6,10 @@
 
 A Flutter package for building Flutter widget tree from HTML with support for 70+ most popular tags.
 
+|                                                                    |                                                                    |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| ![](../../demo_app/screenshots/HelloWorldCoreScreen1.gif?raw=true) | ![](../../demo_app/screenshots/HelloWorldCoreScreen2.gif?raw=true) |
+
 ## Getting Started
 
 Add this to your app's `pubspec.yaml` file:
@@ -63,8 +67,6 @@ HtmlWidget(
   textStyle: TextStyle(fontSize: 14),
 ),
 ```
-
-<img src="../../demo_app/screenshots/HelloWorldCoreScreen.gif?raw=true" width="300" />
 
 ## Features
 
