@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 
 import 'package:chewie/chewie.dart' as lib;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:video_player/video_player.dart' as lib;
 
@@ -51,7 +52,7 @@ class VideoPlayer extends StatefulWidget {
 
   @override
   State<VideoPlayer> createState() =>
-      Platform.environment.containsKey('FLUTTER_TEST')
+      (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))
           ? _VideoPlayerPlaceholder()
           : _VideoPlayerState();
 }

@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'web_view/fallback.dart'
@@ -69,7 +70,7 @@ class WebView extends StatefulWidget {
 
   @override
   State<WebView> createState() =>
-      Platform.environment.containsKey('FLUTTER_TEST')
+      (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))
           ? _WebViewPlaceholder()
           : WebViewState();
 }
