@@ -12,7 +12,6 @@ Other changes:
 - Update UL bullet for correctness (#306)
 - Add support for colspan / rowspan in table (#157)
 - Add support for inline style `text-overflow` (#204)
-- Add support for inline style sizing (#206): `width`, `height`, `max-width`, `max-height`, `min-width` and `min-height`
 - Add support em/px in `line-height` and % in `font-size` (#220)
 - Add support for svg src in `IMG` (#233)
 - Add support for inline `margin`, `padding` (#237)
