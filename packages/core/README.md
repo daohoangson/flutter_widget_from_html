@@ -4,29 +4,69 @@
 [![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html_core.svg)](https://pub.dev/packages/flutter_widget_from_html_core)
 
-A Flutter package for building Flutter widget tree from HTML (supports most popular tags and stylings).
+A Flutter package for building Flutter widget tree from HTML with support for 70+ most popular tags.
 
-This `core` package implements html parsing and widget building logic so it's easy to extend and fit your app's use case. It tries to render an optimal tree: use `RichText` with specific `TextStyle`, merge text spans together, show images in sized box, etc.
+| [Live demo](https://html-widget-demo.now.sh/#/helloworldcore)      |                                                                    |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| ![](../../demo_app/screenshots/HelloWorldCoreScreen1.gif?raw=true) | ![](../../demo_app/screenshots/HelloWorldCoreScreen2.gif?raw=true) |
 
-If this is your first time here, consider using the [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) package as a quick starting point.
+## Getting Started
+
+Add this to your app's `pubspec.yaml` file:
+
+```yaml
+dependencies:
+  flutter_widget_from_html_core: ^0.4.3
+```
 
 ## Usage
 
-To use this package, add `flutter_widget_from_html_core` as a [dependency in your pubspec.yaml file](https://flutter.io/using-packages/).
+Then you have to import the package with:
 
-See the [Demo app](https://github.com/daohoangson/flutter_widget_from_html/tree/master/demo_app) for inspiration.
+```dart
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+```
 
-### Example
+And use `HtmlWidget` where appropriate:
 
 ```dart
 HtmlWidget(
-  // the first parameter, `html`, is required
-  kHtml,
-  // the rest are optional
+  // the first parameter (`html`) is required
+  '''
+  <h1>Heading 1</h1>
+  <h2>Heading 2</h2>
+  <h3>Heading 3</h3>
+  <!-- anything goes here -->
+  ''',
+
+  // all other parameters are optional, a few notable params:
+
+  // specify custom styling for an element
+  // see supported inline styling below
+  customStylesBuilder: (element) {
+    if (element.classes.contains('foo')) {
+      return {'color': 'red'};
+    }
+
+    return null;
+  },
+
+  // render a custom widget
+  customWidgetBuilder: (element) {
+    if (element.attributes['foo'] == 'bar') {
+      return FooBarWidget();
+    }
+
+    return null;
+  },
+
+  // this callback will be triggered when user taps a link
+  onTapUrl: (url) => print('tapped $url'),
+
+  // set the default styling for text
+  textStyle: TextStyle(fontSize: 14),
 ),
 ```
-
-<img src="../../demo_app/screenshots/HelloWorldCoreScreen.gif?raw=true" width="300" />
 
 ## Features
 
@@ -35,30 +75,35 @@ HtmlWidget(
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
 [Compare between Flutter rendering and browser's.](https://html-widget-demo.now.sh/supported/tags.html)
 
-- A: underline, blue color, no default onTap action (use [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) for that)
+- A: underline, blue color, tapping will trigger `HtmlWidget.onTapUrl` callback
 - H1/H2/H3/H4/H5/H6
-- IMG with support for asset (`asset://`), data uri and network image without caching (use [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) for that)
+- IMG with support for asset (`asset://`), data uri and network image
 - LI/OL/UL with support for:
   - Attributes: `type`, `start`, `reversed`
   - Inline style `list-style-type` values: `lower-alpha`, `upper-alpha`, `lower-latin`, `upper-latin`, `circle`, `decimal`, `disc`, `lower-roman`, `upper-roman`, `square`
 - TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
   - TABLE attributes (`border`, `cellpadding`) and inline style (`border`)
-  - TD/TH attributes `colspan`, `rowspan` are parsed but ignored during rendering, use [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) if you need them
+  - TD/TH attributes `colspan`, `rowspan` are parsed but ignored during rendering, use [flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html) if you need them
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
   DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, IMG, INS,
   KBD, MAIN, NAV, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, STRIKE, STRONG, SUB, SUP, TT, U, VAR
 - Everything with screenshot: https://html-widget-demo.now.sh/supported/tags.html
 
-However, these tags and their contents will be ignored:
+These tags requires [flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html):
 
-- IFRAME (use [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) for web view support)
+- IFRAME
+- SVG
+- VIDEO
+
+These tags and their contents will be ignored:
+
 - SCRIPT
 - STYLE
-- SVG (use [`flutter_widget_from_html`](https://pub.dev/packages/flutter_widget_from_html) for SVG support)
 
 ### Attributes
 
-- dir: `auto`, `ltr` and `rtl`
+- align: center/end/justify/left/right/start/-moz-center/-webkit-center
+- dir: auto/ltr/rtl
 
 ### Inline stylings
 
@@ -70,21 +115,23 @@ However, these tags and their contents will be ignored:
 - font-size: absolute (e.g. `xx-large`), relative (`larger`, `smaller`) or values in `em`, `%`, `pt` and `px`
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
-- line-height: `normal` number or values in `em`, `%`, `pt` and `px`
+- line-height: `normal`, number or values in `em`, `%`, `pt` and `px`
 - margin and margin-xxx: values in `em`, `pt` and `px`
 - padding and padding-xxx: values in `em`, `pt` and `px`
 - vertical-align: baseline/top/bottom/middle/sub/super
-- text-align: center/end/justify/left/right/start/-moz-center/-webkit-center
+- text-align (similar to `align` attribute)
 - text-decoration: line-through/none/overline/underline
 - text-overflow: clip/ellipsis. Note: `text-overflow: ellipsis` should be used in conjuntion with `max-lines` or `-webkit-line-clamp` for better result.
-- Sizing (width & height, max-xxx, min-xxx) with values in `em`, `pt` and `px`
+- Sizing (width, height, max-xxx, min-xxx) with values in `em`, `pt` and `px`
 
 ## Extensibility
 
-There are two ways to change the built widget tree.
+This package implements widget building logic with high testing coverage to ensure correctness. It tries to render an optimal tree by using `RichText` with specific `TextStyle`, merge text spans together, show images in sized box, etc. The idea is to build a solid foundation for apps to customize easily. There are two ways to alter the output widget tree.
 
 1. Use callbacks like `customStylesBuilder` or `customWidgetBuilder` for small changes
 2. Use a custom `WidgetFactory` for complete control of the rendering process
+
+The enhanced package ([flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html)) uses a custom `WidgetFactory` to handle complicated tags like IFRAME, VIDEO, etc.
 
 ### Callbacks
 
@@ -99,26 +146,15 @@ This example changes the color for a CSS class:
 <table><tr><td>
 
 ```dart
-const kHtml = 'Hello <span class="name">World</span>!';
-
-class CustomStylesBuilderScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text('CustomStylesBuilderScreen'),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(8),
-          child: HtmlWidget(
-            kHtml,
-            customStylesBuilder: (e) =>
-                e.classes.contains('name')
-                  ? {'color': 'red'}
-                  : null,
-          ),
-        ),
-      );
-}
+HtmlWidget(
+  'Hello <span class="name">World</span>!',
+  customStylesBuilder: (element) {
+    if (element.classes.contains('name')) {
+      return {'color': 'red'};
+    }
+    return null;
+  },
+),
 ```
 
 </td>
@@ -128,7 +164,7 @@ class CustomStylesBuilderScreen extends StatelessWidget {
 </tr>
 </table>
 
-For fairly simple widget, use `customWidgetBuilder`. You will need to handle the DOM element and its children manually. The next example renders a carousel:
+For fairly simple widget, use `customWidgetBuilder`. You will need to handle the DOM element and its children manually. The next example renders a carousel ([try it live](https://html-widget-demo.now.sh/#/customwidgetbuilder)):
 
 ```dart
 const kHtml = '''
@@ -187,7 +223,7 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
 }
 ```
 
-<img src="../../demo_app/screenshots/CustomWidgetBuilderScreen.gif?raw=true" width="300" />
+[<img src="../../demo_app/screenshots/CustomWidgetBuilderScreen.gif?raw=true" width="300" />](https://html-widget-demo.now.sh/#/customwidgetbuilder)
 
 ### Custom `WidgetFactory`
 
@@ -210,7 +246,7 @@ The HTML string is parsed into DOM elements and each element is visited once to 
 
 Notes:
 
-- Text related styling can be changed with `TextStyleBuilder`, just register your callback and it will be called when the build context is ready.
+- Text related styling can be changed with `TextStyleBuilder`, register your callback to be called when the build context is ready.
   - The first parameter is a `TextStyleHtml` which is immutable and is calculated from the root down to each element, the callback must return a new `TextStyleHtml` by calling `copyWith`. It's recommended to return the same object if no change is needed.
   - Optionally, pass any object on registration and your callback will receive it as the second parameter.
 
@@ -240,8 +276,6 @@ meta.register(BuildOp(
     tree.add(...);
   },
   onWidgets: (meta, widgets) => widgets.map((widget) => ...),
-  ...,
-  priority: 9999,
 ));
 ```
 

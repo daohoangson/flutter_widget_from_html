@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -21,6 +22,8 @@ class WidgetFactory extends core.WidgetFactory {
   BuildOp _tagIframe;
   BuildOp _tagSvg;
 
+  bool get _isFlutterSvgSupported => !kIsWeb;
+
   HtmlWidget get _widget => _state.widget;
 
   /// Builds [Divider].
@@ -38,7 +41,9 @@ class WidgetFactory extends core.WidgetFactory {
   Widget buildImage(BuildMetadata meta, Object provider, ImageMetadata image) {
     var built = super.buildImage(meta, provider, image);
 
-    if (built == null && provider is PictureProvider) {
+    if (_isFlutterSvgSupported &&
+        built == null &&
+        provider is PictureProvider) {
       built = SvgPicture(provider);
     }
 
@@ -212,10 +217,12 @@ class WidgetFactory extends core.WidgetFactory {
         meta.register(_tagIframe);
         break;
       case 'svg':
-        _tagSvg ??= BuildOp(
-          onWidgets: (meta, _) => [SvgPicture.string(meta.element.outerHtml)],
-        );
-        meta.register(_tagSvg);
+        if (_isFlutterSvgSupported) {
+          _tagSvg ??= BuildOp(
+            onWidgets: (meta, _) => [SvgPicture.string(meta.element.outerHtml)],
+          );
+          meta.register(_tagSvg);
+        }
         break;
       case kTagVideo:
         meta.register(TagVideo(this, meta).op);

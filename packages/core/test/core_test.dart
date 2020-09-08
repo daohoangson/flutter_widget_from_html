@@ -348,11 +348,12 @@ void main() {
 
   group('non renderable elements', () {
     testWidgets('skips IFRAME tag', (WidgetTester tester) async {
-      final html = 'Foo. '
-          '<iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="320" height="180"></iframe> '
-          'Bar.';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo. Bar.)]'));
+      final html =
+          '''<iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="320" height="180">
+  Your browser does not support IFRAME.
+</iframe>''';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(:Your browser does not support IFRAME.)]'));
     });
 
     testWidgets('skips SCRIPT tag', (WidgetTester tester) async {
