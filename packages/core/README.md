@@ -6,7 +6,7 @@
 
 A Flutter package for building Flutter widget tree from HTML with support for 70+ most popular tags.
 
-|                                                                    |                                                                    |
+| [Live demo](https://html-widget-demo.now.sh/#/helloworldcore)      |                                                                    |
 | ------------------------------------------------------------------ | ------------------------------------------------------------------ |
 | ![](../../demo_app/screenshots/HelloWorldCoreScreen1.gif?raw=true) | ![](../../demo_app/screenshots/HelloWorldCoreScreen2.gif?raw=true) |
 
@@ -93,6 +93,7 @@ These tags requires [flutter_widget_from_html](https://pub.dev/packages/flutter_
 
 - IFRAME
 - SVG
+- VIDEO
 
 These tags and their contents will be ignored:
 

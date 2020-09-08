@@ -6,7 +6,7 @@
 
 A Flutter package for building Flutter widget tree from HTML with support for IFRAME, VIDEO and 70+ other tags.
 
-|                                                                |                                                                |                                                                |
+| [Live demo](https://html-widget-demo.now.sh/#/helloworld)      |                                                                |                                                                |
 | -------------------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
 | ![](../../demo_app/screenshots/HelloWorldScreen1.jpg?raw=true) | ![](../../demo_app/screenshots/HelloWorldScreen2.gif?raw=true) | ![](../../demo_app/screenshots/HelloWorldScreen3.gif?raw=true) |
 
