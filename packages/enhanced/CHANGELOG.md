@@ -1,4 +1,4 @@
-## 0.5.0+1
+## 0.5.0+2
 
 This is a big release with lots of improvements under the hood. If you don't extends `WidgetFactory` yourself then there are only two changes that may affect your app:
 
