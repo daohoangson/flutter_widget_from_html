@@ -5,8 +5,6 @@ import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core show WidgetFactory;
-import 'package:flutter_widget_from_html_core/src/internal/core_parser.dart';
-import 'package:flutter_widget_from_html_core/src/internal/core_ops.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'internal/layout_grid.dart';

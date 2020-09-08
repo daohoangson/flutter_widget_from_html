@@ -3,9 +3,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
-import 'web_view/fallback.dart'
-    if (dart.library.html) 'web_view/html.dart'
-    if (dart.library.io) 'web_view/io.dart';
+import 'web_view/fallback.dart' if (dart.library.io) 'web_view/io.dart';
 
 /// An embedded web view.
 class WebView extends StatefulWidget {

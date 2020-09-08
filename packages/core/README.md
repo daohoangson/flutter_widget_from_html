@@ -6,9 +6,9 @@
 
 A Flutter package for building Flutter widget tree from HTML with support for 70+ most popular tags.
 
-| [Live demo](https://html-widget-demo.now.sh/#/helloworldcore)      |                                                                    |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------ |
-| ![](../../demo_app/screenshots/HelloWorldCoreScreen1.gif?raw=true) | ![](../../demo_app/screenshots/HelloWorldCoreScreen2.gif?raw=true) |
+| [Live demo](https://html-widget-demo.now.sh/#/helloworldcore)                                                                     |                                                                                                                                   |
+| --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldCoreScreen1.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldCoreScreen2.gif) |
 
 ## Getting Started
 
@@ -16,7 +16,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html_core: ^0.5.0
+  flutter_widget_from_html_core: ^0.5.0+3
 ```
 
 ## Usage
@@ -159,7 +159,7 @@ HtmlWidget(
 
 </td>
 <td>
-  <img src="../../demo_app/screenshots/CustomStylesBuilderScreen.png?raw=true" width="200" />
+  <img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/CustomStylesBuilderScreen.png" width="200" />
 </td>
 </tr>
 </table>
@@ -223,7 +223,7 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
 }
 ```
 
-[<img src="../../demo_app/screenshots/CustomWidgetBuilderScreen.gif?raw=true" width="300" />](https://html-widget-demo.now.sh/#/customwidgetbuilder)
+[<img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/CustomWidgetBuilderScreen.gif" width="300" />](https://html-widget-demo.now.sh/#/customwidgetbuilder)
 
 ### Custom `WidgetFactory`
 
@@ -330,4 +330,4 @@ class _SmiliesWidgetFactory extends WidgetFactory {
 }
 ```
 
-<img src="../../demo_app/screenshots/SmilieScreen.png?raw=true" width="300" />
+<img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/SmilieScreen.png" width="300" />

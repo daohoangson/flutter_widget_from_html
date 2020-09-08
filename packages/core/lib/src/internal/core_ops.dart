@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -61,8 +58,6 @@ String convertColorToHex(Color value) {
   final a = value.alpha.toRadixString(16).padLeft(2, '0');
   return '#$r$g$b$a';
 }
-
-Iterable<Widget> listOrNull(Widget x) => x == null ? null : [x];
 
 void wrapTree(
   BuildTree tree, {
