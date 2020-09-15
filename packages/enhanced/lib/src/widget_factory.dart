@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
@@ -15,6 +16,8 @@ import 'html_widget.dart';
 
 /// A factory to build widgets with [WebView], [VideoPlayer], etc.
 class WidgetFactory extends core.WidgetFactory {
+  final _anchors = <String, GlobalKey>{};
+
   State _state;
   TextStyleHtml Function(TextStyleHtml, dynamic) _tagA;
   BuildOp _tagIframe;
@@ -188,6 +191,8 @@ class WidgetFactory extends core.WidgetFactory {
     final callback = _widget?.onTapUrl;
     if (callback != null) return callback(url);
 
+    if (url.startsWith('#')) return _onTapAnchor(url.substring(1));
+
     canLaunch(url).then(
         (ok) => ok
             ? launch(url)
@@ -195,14 +200,61 @@ class WidgetFactory extends core.WidgetFactory {
         onError: (x) => print('[HtmlWidget] onTapUrl($url) error: $x'));
   }
 
+  /// Ensures anchor is visible.
+  void onTapAnchor(
+    String id, {
+    @required double alignment,
+    @required ScrollPosition position,
+    @required RenderObject renderObject,
+  }) =>
+      position.ensureVisible(
+        renderObject,
+        alignment: alignment,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeIn,
+      );
+
+  void _onTapAnchor(String id) {
+    if (!_anchors.containsKey(id)) return;
+
+    final anchor = _anchors[id];
+    final context = anchor.currentContext;
+    final renderObject = context?.findRenderObject();
+    if (renderObject == null) return;
+
+    final offsetToReveal = RenderAbstractViewport.of(renderObject)
+        ?.getOffsetToReveal(renderObject, 0.0)
+        ?.offset;
+    final position = Scrollable.of(context)?.position;
+    if (offsetToReveal == null || position == null) return;
+
+    final alignment = (position.pixels > offsetToReveal)
+        ? 0.0
+        : (position.pixels < offsetToReveal ? 1.0 : null);
+    if (alignment == null) return;
+
+    onTapAnchor(
+      id,
+      alignment: alignment,
+      position: position,
+      renderObject: renderObject,
+    );
+  }
+
   @override
   void parse(BuildMetadata meta) {
+    final attrs = meta.element.attributes;
+
     switch (meta.element.localName) {
       case 'a':
         _tagA ??= (tsh, _) => tsh.copyWith(
             style: tsh.style
                 .copyWith(color: tsh.getDependency<ThemeData>().accentColor));
         meta.tsb(_tagA);
+
+        if (attrs.containsKey('name')) {
+          meta.register(_anchorOp(attrs['name']));
+        }
         break;
       case kTagIframe:
         _tagIframe ??= BuildOp(onWidgets: (meta, _) {
@@ -232,11 +284,17 @@ class WidgetFactory extends core.WidgetFactory {
         break;
     }
 
+    if (attrs.containsKey('id')) {
+      meta.register(_anchorOp(attrs['id']));
+    }
+
     return super.parse(meta);
   }
 
   @override
   void reset(State state) {
+    _anchors.clear();
+
     final widget = state.widget;
     if (widget is HtmlWidget) {
       _state = state;
@@ -244,4 +302,18 @@ class WidgetFactory extends core.WidgetFactory {
 
     super.reset(state);
   }
+
+  BuildOp _anchorOp(String id) => BuildOp(onTree: (meta, tree) {
+        final anchor = GlobalKey();
+        _anchors[id] = anchor;
+        tree.add(WidgetBit.inline(
+          tree,
+          WidgetPlaceholder('#$id').wrapWith(
+            (context, _) => SizedBox(
+              height: meta.tsb().build(context).style.fontSize,
+              key: anchor,
+            ),
+          ),
+        ));
+      });
 }
