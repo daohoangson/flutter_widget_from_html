@@ -121,17 +121,8 @@ class WidgetFactory extends core.WidgetFactory {
       );
 
   @override
-  GestureTapCallback gestureTapCallback(String url) {
-    if (url == null) return null;
-    final callback = _widget?.onTapUrl ?? _gestureTapCallbackDefault;
-    return () => callback(url);
-  }
-
-  Future<void> _gestureTapCallbackDefault(String url) async {
-    final ok = await canLaunch(url);
-    if (ok) return launch(url);
-    print("[flutter_widget_from_html] Tapped url $url (couldn't launch)");
-  }
+  GestureTapCallback gestureTapCallback(String url) =>
+      url != null ? () => onTapUrl(url) : null;
 
   @override
   Iterable<dynamic> getDependencies(BuildContext context) =>
@@ -188,6 +179,20 @@ class WidgetFactory extends core.WidgetFactory {
     }
 
     return NetworkPicture(SvgPicture.svgByteDecoder, url);
+  }
+
+  /// Handles user tapping a link.
+  void onTapUrl(String url) {
+    if (url == null) return;
+
+    final callback = _widget?.onTapUrl;
+    if (callback != null) return callback(url);
+
+    canLaunch(url).then(
+        (ok) => ok
+            ? launch(url)
+            : print("[HtmlWidget] onTapUrl($url) couldn't launch"),
+        onError: (x) => print('[HtmlWidget] onTapUrl($url) error: $x'));
   }
 
   @override

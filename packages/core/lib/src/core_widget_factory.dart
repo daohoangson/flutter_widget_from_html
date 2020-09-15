@@ -191,7 +191,7 @@ class WidgetFactory {
   GestureTapCallback gestureTapCallback(String url) => url != null
       ? () => _widget.onTapUrl != null
           ? _widget.onTapUrl(url)
-          : print('[flutter_widget_from_html] Tapped url $url')
+          : print('[HtmlWidget] onTapUrl($url)')
       : null;
 
   /// Returns [context]-based dependencies.
