@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
+// ignore: avoid_relative_lib_imports
+import '../../packages/enhanced/lib/flutter_widget_from_html.dart';
 import '../../packages/enhanced/test/_.dart' as helper;
 
 void main() {
