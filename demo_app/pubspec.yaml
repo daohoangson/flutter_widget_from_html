@@ -27,7 +27,7 @@ dev_dependencies:
     sdk: flutter
   flutter_test:
     sdk: flutter
-  golden_toolkit: ^0.6.0
+  golden_toolkit: any
   pedantic: any
   test: any
 

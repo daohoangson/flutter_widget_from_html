@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
 
-// ignore: avoid_relative_lib_imports
-import '../../packages/enhanced/lib/flutter_widget_from_html.dart';
-import '../../packages/enhanced/test/_.dart' as helper;
+import '_.dart' as helper;
 
-void main() {
+void main() async {
+  await loadAppFonts();
+
   group('unit test', () {
     final expectation = 'TshWidget\n'
         '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
@@ -30,6 +32,8 @@ void main() {
   });
 
   group('widget test', () {
+    final goldenFilePrefix = '../../../demo_app/test';
+
     final tapText = (WidgetTester tester, String data) async {
       final candidates = find.byType(RichText).evaluate();
       var tapped = 0;
@@ -52,14 +56,14 @@ void main() {
 
       await expectLater(
         find.byType(MaterialApp),
-        matchesGoldenFile('anchor/down/top.png'),
+        matchesGoldenFile('$goldenFilePrefix/anchor/down/top.png'),
       );
 
       expect(await tapText(tester, 'Scroll down'), equals(1));
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(MaterialApp),
-        matchesGoldenFile('anchor/down/target.png'),
+        matchesGoldenFile('$goldenFilePrefix/anchor/down/target.png'),
       );
     });
 
@@ -71,14 +75,14 @@ void main() {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(MaterialApp),
-        matchesGoldenFile('anchor/up/bottom.png'),
+        matchesGoldenFile('$goldenFilePrefix/anchor/up/bottom.png'),
       );
 
       expect(await tapText(tester, 'Scroll up'), equals(1));
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(MaterialApp),
-        matchesGoldenFile('anchor/up/target.png'),
+        matchesGoldenFile('$goldenFilePrefix/anchor/up/target.png'),
       );
     });
   });
