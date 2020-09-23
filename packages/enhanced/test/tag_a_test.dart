@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '_.dart';
 
@@ -46,4 +48,36 @@ void main() {
       ),
     );
   });
+
+  group('tap test', () {
+    testWidgets('triggers callback', (WidgetTester tester) async {
+      final urls = <String>[];
+      await tester.pumpWidget(_TapTestApp(onTapUrl: (url) => urls.add(url)));
+      expect(await tapText(tester, 'Tap me'), equals(1));
+      await tester.pumpAndSettle();
+      expect(urls, equals(const [kHref]));
+    });
+
+    testWidgets('proceeds to launch url', (WidgetTester tester) async {
+      await tester.pumpWidget(_TapTestApp());
+      expect(await tapText(tester, 'Tap me'), equals(1));
+      await tester.pumpAndSettle();
+    });
+  });
+}
+
+class _TapTestApp extends StatelessWidget {
+  final void Function(String) onTapUrl;
+
+  const _TapTestApp({Key key, this.onTapUrl}) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => MaterialApp(
+        home: Scaffold(
+          body: HtmlWidget(
+            '<a href="$kHref">Tap me</a>',
+            onTapUrl: onTapUrl,
+          ),
+        ),
+      );
 }

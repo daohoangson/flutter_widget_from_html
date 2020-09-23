@@ -10,7 +10,7 @@ const kHtml = '''
 <h6>Heading 6</h6>
 
 <p>
-  A paragraph with <strong>&lt;strong&gt;</strong>, <em>&lt;em&gt;phasized</em>
+  <a name="top"></a>A paragraph with <strong>&lt;strong&gt;</strong>, <em>&lt;em&gt;phasized</em>
   and <span style="color: red">colored</span> text.
   With an inline Flutter logo:
   <img src="https://github.com/daohoangson/flutter_widget_from_html/raw/master/demo_app/logos/android.png" style="width: 1em" />.
@@ -133,6 +133,7 @@ const kHtml = '''
 </figure>
 <!-- /enhanced only -->
 
+<p>Anchor: <a href="#top">Scroll to top</a>.</p>
 <br />
 <br />
 ''';

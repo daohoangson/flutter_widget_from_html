@@ -8,6 +8,8 @@ import '../../core/test/_.dart' as helper;
 
 const kDataUri = helper.kDataUri;
 
+const kGoldenFilePrefix = '../../../demo_app/test';
+
 final hwKey = helper.hwKey;
 
 final buildCurrentState = helper.buildCurrentState;
@@ -67,3 +69,6 @@ Future<String> explain(
           ),
       useExplainer: useExplainer,
     );
+
+Future<int> tapText(WidgetTester tester, String data) =>
+    helper.tapText(tester, data);

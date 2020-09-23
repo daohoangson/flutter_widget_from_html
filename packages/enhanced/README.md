@@ -80,7 +80,9 @@ HtmlWidget(
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
 [Compare between Flutter rendering and browser's.](https://html-widget-demo.now.sh/supported/tags.html)
 
-- A: underline, theme accent color, launch URL via [url_launcher](https://pub.dev/packages/url_launcher), support base URL resolver.
+- A: underline, theme accent color
+  - Scroll to anchor
+  - Launch URL via [url_launcher](https://pub.dev/packages/url_launcher) with base URL resolver
 - H1/H2/H3/H4/H5/H6
 - IFRAME via [webview_flutter](https://pub.dev/packages/webview_flutter)
 - IMG with support for asset (`asset://`), data uri and network image via [cached_network_image](https://pub.dev/packages/cached_network_image). Additional .svg file support via [flutter_svg](https://pub.dev/packages/flutter_svg).

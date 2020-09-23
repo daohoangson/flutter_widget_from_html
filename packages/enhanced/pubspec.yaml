@@ -29,6 +29,7 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  golden_toolkit: ^0.6.0
   network_image_mock: any
   pedantic: any
 
