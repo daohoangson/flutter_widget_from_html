@@ -187,6 +187,23 @@ String simplifyHashCode(String str) {
   });
 }
 
+Future<int> tapText(WidgetTester tester, String data) async {
+  final candidates = find.byType(RichText).evaluate();
+  var tapped = 0;
+  for (final candidate in candidates) {
+    final richText = candidate.widget as RichText;
+    final text = richText.text;
+    if (text is TextSpan) {
+      if (text.text == data) {
+        await tester.tap(find.byWidget(richText));
+        tapped++;
+      }
+    }
+  }
+
+  return tapped;
+}
+
 class Explainer {
   final BuildContext context;
   final String Function(Explainer, Widget) explainer;
