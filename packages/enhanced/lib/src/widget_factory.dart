@@ -6,8 +6,8 @@ import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core show WidgetFactory;
-import 'package:url_launcher/url_launcher.dart';
 
+import 'external/url_launcher.dart';
 import 'internal/layout_grid.dart';
 import 'internal/ops.dart';
 import 'data.dart';
@@ -196,11 +196,7 @@ class WidgetFactory extends core.WidgetFactory {
       return onTapAnchor(id, _anchors[id]?.currentContext);
     }
 
-    canLaunch(url).then(
-        (ok) => ok
-            ? launch(url)
-            : print("[HtmlWidget] onTapUrl($url) couldn't launch"),
-        onError: (x) => print('[HtmlWidget] onTapUrl($url) error: $x'));
+    launchUrl(url);
   }
 
   /// Ensures anchor is visible.
