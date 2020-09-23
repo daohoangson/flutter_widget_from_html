@@ -191,7 +191,10 @@ class WidgetFactory extends core.WidgetFactory {
     final callback = _widget?.onTapUrl;
     if (callback != null) return callback(url);
 
-    if (url.startsWith('#')) return _onTapAnchor(url.substring(1));
+    if (url.startsWith('#')) {
+      final id = url.substring(1);
+      return onTapAnchor(id, _anchors[id]?.currentContext);
+    }
 
     canLaunch(url).then(
         (ok) => ok
@@ -201,31 +204,14 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   /// Ensures anchor is visible.
-  void onTapAnchor(
-    String id, {
-    @required double alignment,
-    @required ScrollPosition position,
-    @required RenderObject renderObject,
-  }) =>
-      position.ensureVisible(
-        renderObject,
-        alignment: alignment,
-        duration: const Duration(milliseconds: 100),
-        curve: Curves.easeIn,
-      );
-
-  void _onTapAnchor(String id) {
-    if (!_anchors.containsKey(id)) return;
-
-    final anchor = _anchors[id];
-    final context = anchor.currentContext;
-    final renderObject = context?.findRenderObject();
+  void onTapAnchor(String id, BuildContext anchorContext) {
+    final renderObject = anchorContext?.findRenderObject();
     if (renderObject == null) return;
 
     final offsetToReveal = RenderAbstractViewport.of(renderObject)
         ?.getOffsetToReveal(renderObject, 0.0)
         ?.offset;
-    final position = Scrollable.of(context)?.position;
+    final position = Scrollable.of(anchorContext)?.position;
     if (offsetToReveal == null || position == null) return;
 
     final alignment = (position.pixels > offsetToReveal)
@@ -233,11 +219,11 @@ class WidgetFactory extends core.WidgetFactory {
         : (position.pixels < offsetToReveal ? 1.0 : null);
     if (alignment == null) return;
 
-    onTapAnchor(
-      id,
+    position.ensureVisible(
+      renderObject,
       alignment: alignment,
-      position: position,
-      renderObject: renderObject,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeIn,
     );
   }
 

@@ -9,7 +9,7 @@ import '_.dart' as helper;
 void main() async {
   await loadAppFonts();
 
-  group('unit test', () {
+  group('build test', () {
     final expectation = 'TshWidget\n'
         '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
         ' │  BuildTree#2 tsb#3(parent=#1):\n'
@@ -31,7 +31,7 @@ void main() async {
     });
   });
 
-  group('widget test', () {
+  group('tap test', () {
     final goldenFilePrefix = '../../../demo_app/test';
 
     final tapText = (WidgetTester tester, String data) async {
