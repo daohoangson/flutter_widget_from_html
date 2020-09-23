@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 
-import '_.dart' as helper;
+import '_.dart';
 
 void main() async {
   await loadAppFonts();
@@ -20,50 +20,31 @@ void main() async {
 
     testWidgets('renders A[name]', (WidgetTester tester) async {
       final html = '<a name="foo"></a>';
-      final explained = await helper.explain(tester, html, useExplainer: false);
+      final explained = await explain(tester, html, useExplainer: false);
       expect(explained, equals(expectation));
     });
 
     testWidgets('renders span[id]', (WidgetTester tester) async {
       final html = '<span id="foo"></span>';
-      final explained = await helper.explain(tester, html, useExplainer: false);
+      final explained = await explain(tester, html, useExplainer: false);
       expect(explained, equals(expectation));
     });
   });
 
   group('tap test', () {
-    final goldenFilePrefix = '../../../demo_app/test';
-
-    final tapText = (WidgetTester tester, String data) async {
-      final candidates = find.byType(RichText).evaluate();
-      var tapped = 0;
-      for (final candidate in candidates) {
-        final richText = candidate.widget as RichText;
-        final text = richText.text;
-        if (text is TextSpan) {
-          if (text.text == data) {
-            await tester.tap(find.byWidget(richText));
-            tapped++;
-          }
-        }
-      }
-
-      return tapped;
-    };
-
     testWidgets('scrolls down', (WidgetTester tester) async {
       await tester.pumpWidget(_AnchorTestApp());
 
       await expectLater(
         find.byType(MaterialApp),
-        matchesGoldenFile('$goldenFilePrefix/anchor/down/top.png'),
+        matchesGoldenFile('$kGoldenFilePrefix/anchor/down/top.png'),
       );
 
       expect(await tapText(tester, 'Scroll down'), equals(1));
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(MaterialApp),
-        matchesGoldenFile('$goldenFilePrefix/anchor/down/target.png'),
+        matchesGoldenFile('$kGoldenFilePrefix/anchor/down/target.png'),
       );
     });
 
@@ -75,14 +56,14 @@ void main() async {
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(MaterialApp),
-        matchesGoldenFile('$goldenFilePrefix/anchor/up/bottom.png'),
+        matchesGoldenFile('$kGoldenFilePrefix/anchor/up/bottom.png'),
       );
 
       expect(await tapText(tester, 'Scroll up'), equals(1));
       await tester.pumpAndSettle();
       await expectLater(
         find.byType(MaterialApp),
-        matchesGoldenFile('$goldenFilePrefix/anchor/up/target.png'),
+        matchesGoldenFile('$kGoldenFilePrefix/anchor/up/target.png'),
       );
     });
   });

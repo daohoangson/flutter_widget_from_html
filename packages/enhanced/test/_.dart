@@ -8,6 +8,8 @@ import '../../core/test/_.dart' as helper;
 
 const kDataUri = helper.kDataUri;
 
+const kGoldenFilePrefix = '../../../demo_app/test';
+
 final hwKey = helper.hwKey;
 
 final buildCurrentState = helper.buildCurrentState;
@@ -67,3 +69,20 @@ Future<String> explain(
           ),
       useExplainer: useExplainer,
     );
+
+Future<int> tapText(WidgetTester tester, String data) async {
+  final candidates = find.byType(RichText).evaluate();
+  var tapped = 0;
+  for (final candidate in candidates) {
+    final richText = candidate.widget as RichText;
+    final text = richText.text;
+    if (text is TextSpan) {
+      if (text.text == data) {
+        await tester.tap(find.byWidget(richText));
+        tapped++;
+      }
+    }
+  }
+
+  return tapped;
+}
