@@ -1,3 +1,8 @@
+## 0.5.0+4
+
+- Add support for flutter_svg@0.19.0 (#315)
+- Add support for anchors (#317)
+
 ## 0.5.0+3
 
 This is a big release with lots of improvements under the hood. If you don't extends `WidgetFactory` yourself then there are only two changes that may affect your app:
