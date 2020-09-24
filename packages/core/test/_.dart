@@ -111,6 +111,7 @@ Future<String> explainWithoutPumping({
     // trim boring properties
     str =
         str.replaceAll(RegExp(r'(, )?(this.)?excludeFromSemantics: false'), '');
+    str = str.replaceAll(RegExp(r'(, )?clipBehavior: none'), '');
     str = str.replaceAll(RegExp(r'(, )?crossAxisAlignment: start'), '');
     str = str.replaceAll(RegExp(r'(, )?direction: vertical'), '');
     str = str.replaceAll(RegExp(r'(, )?filterQuality: low'), '');

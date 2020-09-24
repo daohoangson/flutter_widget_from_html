@@ -137,7 +137,7 @@ class WidgetFactory {
           BuildMetadata meta, TextStyleHtml tsh, List<Widget> children) =>
       Stack(
         children: children,
-        overflow: Overflow.visible,
+        clipBehavior: Clip.none,
         textDirection: tsh.textDirection,
       );
 
