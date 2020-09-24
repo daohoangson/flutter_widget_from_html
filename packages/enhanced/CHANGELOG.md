@@ -1,3 +1,7 @@
+## 0.5.0+5
+
+- Use Stack.clipBehavior instead of .overflow (#321, authored by @bahador)
+
 ## 0.5.0+4
 
 - Add support for flutter_svg@0.19.0 (#315)
