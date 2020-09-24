@@ -573,11 +573,13 @@ class Explainer {
         ? _widgetChild(widget.child)
         : widget is InkWell
             ? _widgetChild(widget.child)
-            : widget is MultiChildRenderObjectWidget
-                ? (widget is! RichText
-                    ? _widgetChildren(widget.children)
-                    : null)
-                : null);
+            : widget is MouseRegion
+                ? _widgetChild(widget.child)
+                : widget is MultiChildRenderObjectWidget
+                    ? (widget is! RichText
+                        ? _widgetChildren(widget.children)
+                        : null)
+                    : null);
     // N-T
     attr.add(widget is ProxyWidget
         ? _widgetChild(widget.child)

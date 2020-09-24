@@ -70,9 +70,9 @@ void main() {
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals('[GestureDetector:child='
+      equals('[MouseRegion:child=[GestureDetector:child='
           '[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]'
-          ']'),
+          ']]'),
     );
   });
 
@@ -83,8 +83,8 @@ void main() {
       explained,
       equals(
         '[Column:children='
-        '[GestureDetector:child=[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]],'
-        '[GestureDetector:child=[CssBlock:child=[RichText:(#FF0000FF+u:Bar)]]]'
+        '[MouseRegion:child=[GestureDetector:child=[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]]],'
+        '[MouseRegion:child=[GestureDetector:child=[CssBlock:child=[RichText:(#FF0000FF+u:Bar)]]]]'
         ']',
       ),
     );
@@ -101,9 +101,9 @@ void main() {
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals('[CssBlock:child=[GestureDetector:child='
+      equals('[CssBlock:child=[MouseRegion:child=[GestureDetector:child='
           '[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]'
-          ']]'),
+          ']]]'),
     );
   });
 
@@ -114,10 +114,10 @@ void main() {
     expect(
       explained,
       equals(
-        '[CssBlock:child=[GestureDetector:child=[Column:children='
+        '[CssBlock:child=[MouseRegion:child=[GestureDetector:child=[Column:children='
         '[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]],'
         '[CssBlock:child=[RichText:(#FF0000FF+u:Bar)]]'
-        ']]]',
+        ']]]]',
       ),
     );
   });
@@ -140,7 +140,9 @@ void main() {
     expect(
         explained,
         equals('[SizedBox:0.0x5.0],'
-            '[GestureDetector:child=[Padding:(0,5,0,5),child=[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]]],'
+            '[MouseRegion:child=[GestureDetector:child=[Padding:(0,5,0,5),child='
+            '[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]'
+            ']]],'
             '[SizedBox:0.0x5.0]'));
   });
 
@@ -153,9 +155,9 @@ void main() {
       final explained = await explainImg(tester, html);
       expect(
           explained,
-          equals('[GestureDetector:child='
+          equals('[MouseRegion:child=[GestureDetector:child='
               '[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]'
-              ']'));
+              ']]'));
     });
 
     testWidgets('renders text + IMG tag both inside', (tester) async {
@@ -165,7 +167,7 @@ void main() {
           explained,
           equals('[RichText:(:'
               '(#FF0000FF+u+onTap:Foo )'
-              '[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+              '[MouseRegion:child=[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]]'
               ')]'));
     });
 
@@ -175,7 +177,7 @@ void main() {
       expect(
           explained,
           equals('[RichText:(:Foo '
-              '[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+              '[MouseRegion:child=[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]]'
               ')]'));
     });
 
@@ -185,7 +187,7 @@ void main() {
       expect(
           explained,
           equals('[RichText:(:'
-              '[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+              '[MouseRegion:child=[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]]'
               '(#FF0000FF+u+onTap: foo)'
               ')]'));
     });
@@ -196,7 +198,7 @@ void main() {
       expect(
           explained,
           equals('[RichText:(:'
-              '[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+              '[MouseRegion:child=[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]]'
               '(: foo))]'));
     });
   });
