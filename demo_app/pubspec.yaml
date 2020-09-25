@@ -6,6 +6,7 @@ environment:
   sdk: ">=2.6.0 <3.0.0"
 
 dependencies:
+  audioplayer: ^0.8.1
   carousel_slider: ^2.2.1
   flutter:
     sdk: flutter

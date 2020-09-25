@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'audio.dart';
 import 'custom_styles_builder.dart';
 import 'custom_widget_builder.dart';
 import 'font_size.dart';
@@ -25,6 +26,7 @@ class HomeScreen extends StatelessWidget {
     'customWidgetBuilder': () => CustomWidgetBuilderScreen(),
     'font-size': () => FontSizeScreen(),
     'Goldens': () => GoldensScreen(),
+    'Audio': () => AudioScreen(),
     'Smilie': () => SmilieScreen(),
     'Wordpress': () => WordpressScreen(),
   };
