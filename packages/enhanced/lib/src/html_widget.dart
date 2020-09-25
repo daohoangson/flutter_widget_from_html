@@ -83,11 +83,7 @@ class HtmlWidget extends core.HtmlWidget {
           key: key,
         );
 
-  static WidgetFactory _enhancedWf;
-  static WidgetFactory _getEnhancedWf() {
-    _enhancedWf ??= WidgetFactory();
-    return _enhancedWf;
-  }
+  static WidgetFactory _getEnhancedWf() => WidgetFactory();
 }
 
 Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>

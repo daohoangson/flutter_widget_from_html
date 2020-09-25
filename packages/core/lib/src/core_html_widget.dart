@@ -130,7 +130,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
 
     _rootTsb = _RootTsb(this);
     _rootMeta = builder.BuildMetadata(null, _rootTsb);
-    _wf = (widget.factoryBuilder ?? _getCoreWf).call();
+    _wf = widget.factoryBuilder?.call() ?? WidgetFactory();
 
     _wf.onRoot(_rootTsb);
 
@@ -204,12 +204,6 @@ class _HtmlWidgetState extends State<HtmlWidget> {
 
   Widget _tshWidget(Widget child) =>
       TshWidget(child: child, tsh: _rootTsb._output);
-
-  static WidgetFactory _coreWf;
-  static WidgetFactory _getCoreWf() {
-    _coreWf ??= WidgetFactory();
-    return _coreWf;
-  }
 }
 
 class _RootTsb extends TextStyleBuilder {
