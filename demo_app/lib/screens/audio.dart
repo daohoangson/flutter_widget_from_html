@@ -1,4 +1,4 @@
-import 'package:audioplayer/audioplayer.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
@@ -102,14 +102,19 @@ class _AudioState extends State<_AudioPlayer> {
         children: [
           StreamBuilder<AudioPlayerState>(
             builder: (_, snapshot) => _buildIconButton(snapshot.data),
-            initialData: player.state,
+            initialData: AudioPlayerState.STOPPED,
             stream: player.onPlayerStateChanged,
           ),
           Expanded(
             child: StreamBuilder<Duration>(
-              builder: (_, snapshot) => _buildProgressBar(snapshot.data),
+              builder: (_, duration) => StreamBuilder<Duration>(
+                builder: (_, position) =>
+                    _buildProgressBar(position.data, duration.data),
+                initialData: Duration.zero,
+                stream: player.onAudioPositionChanged,
+              ),
               initialData: Duration.zero,
-              stream: player.onAudioPositionChanged,
+              stream: player.onDurationChanged,
             ),
           ),
         ],
@@ -140,9 +145,9 @@ class _AudioState extends State<_AudioPlayer> {
     );
   }
 
-  Widget _buildProgressBar(Duration position) => Slider(
-        max: player.duration.inMilliseconds.toDouble(),
-        onChanged: (ms) => _seek(ms / 1000),
+  Widget _buildProgressBar(Duration position, Duration duration) => Slider(
+        max: duration.inMilliseconds.toDouble(),
+        onChanged: (ms) => _seek(Duration(milliseconds: ms.toInt())),
         value: position.inMilliseconds.toDouble(),
       );
 
@@ -152,5 +157,5 @@ class _AudioState extends State<_AudioPlayer> {
 
   void _pause() => player.pause();
 
-  void _seek(double s) => player.seek(s);
+  void _seek(Duration position) => player.seek(position);
 }
