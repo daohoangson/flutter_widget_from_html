@@ -8,7 +8,7 @@ class WebViewState extends State<WebView> {
   _Issue37 _issue37;
   lib.WebViewController _wvc;
 
-  String _firstFinishedUrl;
+  final _knownUrls = <String>[];
 
   @override
   void initState() {
@@ -19,6 +19,8 @@ class WebViewState extends State<WebView> {
       _issue37 = _Issue37(this);
       WidgetsBinding.instance.addObserver(_issue37);
     }
+
+    _knownUrls.add(widget.url);
   }
 
   @override
@@ -83,10 +85,9 @@ class WebViewState extends State<WebView> {
     var intercepted = false;
 
     if (widget.interceptNavigationRequest != null &&
-        _firstFinishedUrl != null &&
+        req.type != lib.NavigationType.other &&
         req.isForMainFrame &&
-        req.url != widget.url &&
-        req.url != _firstFinishedUrl) {
+        !_knownUrls.contains(req.url)) {
       intercepted = widget.interceptNavigationRequest(req.url);
     }
 
@@ -96,7 +97,7 @@ class WebViewState extends State<WebView> {
   }
 
   void _onPageFinished(String url) {
-    _firstFinishedUrl ??= url;
+    if (!_knownUrls.contains(url)) _knownUrls.add(url);
 
     if (widget.autoResize == true) {
       widget.autoResizeIntervals.forEach((t) => t == null
