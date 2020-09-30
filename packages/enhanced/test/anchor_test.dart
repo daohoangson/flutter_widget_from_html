@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -46,7 +48,7 @@ void main() async {
         find.byType(MaterialApp),
         matchesGoldenFile('$kGoldenFilePrefix/anchor/down/target.png'),
       );
-    });
+    }, skip: null);
 
     testWidgets('scrolls up', (WidgetTester tester) async {
       final keyBottom = GlobalKey();
@@ -65,8 +67,8 @@ void main() async {
         find.byType(MaterialApp),
         matchesGoldenFile('$kGoldenFilePrefix/anchor/up/target.png'),
       );
-    });
-  });
+    }, skip: null);
+  }, skip: Platform.isLinux ? null : 'Linux only');
 }
 
 class _AnchorTestApp extends StatelessWidget {
