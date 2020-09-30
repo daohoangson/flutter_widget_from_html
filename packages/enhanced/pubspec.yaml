@@ -9,7 +9,7 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
-  cached_network_image: ^2.2.0+1
+  cached_network_image: ">=1.0.0 <3.0.0"
   chewie: ^0.9.10
   flutter:
     sdk: flutter
