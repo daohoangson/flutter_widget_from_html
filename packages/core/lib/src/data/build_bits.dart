@@ -16,6 +16,9 @@ abstract class BuildBit<InputType, OutputType> {
   /// [tsb] must be non-null unless this is a whitespace.
   BuildBit(this.parent, this.tsb);
 
+  /// Returns true if this bit should be rendered inline.
+  bool get isInline => true;
+
   /// The next bit in the tree.
   ///
   /// Note: the next bit may not have the same parent or grandparent,
@@ -76,7 +79,9 @@ abstract class BuildBit<InputType, OutputType> {
   ///
   /// Returns `true` to swallow, `false` to accept whitespace.
   /// Returns `null` to use configuration from the previous bit.
-  bool get swallowWhitespace => false;
+  ///
+  /// By default, do swallow if not [isInline].
+  bool get swallowWhitespace => !isInline;
 
   /// Builds input into output.
   ///
@@ -309,10 +314,8 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
       WidgetBit._(parent, tsb ?? parent.tsb, WidgetPlaceholder.lazy(child),
           alignment, baseline);
 
-  bool get isInline => alignment != null && baseline != null;
-
   @override
-  bool get swallowWhitespace => !isInline;
+  bool get isInline => alignment != null && baseline != null;
 
   @override
   dynamic buildBit(Null _) => isInline
