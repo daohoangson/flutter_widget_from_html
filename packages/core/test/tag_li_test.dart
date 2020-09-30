@@ -4,9 +4,9 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 
 import '_.dart';
 
-const disc = '[_ListMarkerDisc]@bottom';
-const circle = '[_ListMarkerCircle]@bottom';
-const square = '[_ListMarkerSquare]@bottom';
+const disc = '[_ListMarkerDisc]';
+const circle = '[_ListMarkerCircle]';
+const square = '[_ListMarkerSquare]';
 
 const sizedBox = '[SizedBox:0.0x10.0]';
 
@@ -16,12 +16,10 @@ String padding(String child) =>
 String list(List<String> children) => '[Column:children=${children.join(",")}]';
 
 String item(String markerText, String contents, {String child}) =>
-    '[CssBlock:child=[Stack:children=${child ?? '[RichText:(:$contents)]'},${marker(markerText)}]]';
+    '[CssBlock:child=[_ListItem:children=${child ?? '[RichText:(:$contents)]'},${marker(markerText)}]]';
 
-String marker(String text) => '[Positioned:(0.0,null,null,-45.0),child='
-    '[SizedBox:40.0x0.0,child='
-    '[RichText:align=right,${text.startsWith('[_ListMarker') ? text : '(:$text)'}'
-    ']]]';
+String marker(String text) =>
+    text.startsWith('[_ListMarker') ? text : '[RichText:maxLines=1,(:$text)]';
 
 void main() {
   testWidgets('renders list with padding', (WidgetTester tester) async {
@@ -39,7 +37,7 @@ void main() {
         equals(padding(list([
           item('1.', 'One'),
           item('2.', 'Two'),
-          '[CssBlock:child=[Stack:children=[RichText:(+b:Three)],${marker("3.")}]]'
+          '[CssBlock:child=[_ListItem:children=[RichText:(+b:Three)],${marker("3.")}]]'
         ]))));
   });
 
@@ -51,7 +49,7 @@ void main() {
         equals(padding(list([
           item(disc, 'One'),
           item(disc, 'Two'),
-          '[CssBlock:child=[Stack:children=[RichText:(+i:Three)],${marker(disc)}]]'
+          '[CssBlock:child=[_ListItem:children=[RichText:(+i:Three)],${marker(disc)}]]'
         ]))));
   });
 
@@ -83,14 +81,14 @@ void main() {
     ]));
     final li21And22And23 = padding(list([
       item(circle, '2.1'),
-      '[CssBlock:child=[Stack:children=[Column:children=[RichText:(:2.2)],$li221And222],${marker(circle)}]]',
+      '[CssBlock:child=[_ListItem:children=[Column:children=[RichText:(:2.2)],$li221And222],${marker(circle)}]]',
       item(circle, '2.3'),
     ]));
     expect(
         explained,
         equals(padding(list([
           item(disc, 'One'),
-          '[CssBlock:child=[Stack:children=[Column:children=[RichText:(:Two)],$li21And22And23],${marker(disc)}]]',
+          '[CssBlock:child=[_ListItem:children=[Column:children=[RichText:(:Two)],$li21And22And23],${marker(disc)}]]',
           item(disc, 'Three'),
         ]))));
   });
@@ -510,8 +508,8 @@ void main() {
         expect(
             explained,
             equals('[CssBlock:child=[Padding:(0,0,0,99),child=[Column:children='
-                '[CssBlock:child=[Padding:(0,0,0,199),child=[Stack:children=[RichText:(:199px)],${marker(disc)}]]],'
-                '[CssBlock:child=[Padding:(0,0,0,299),child=[Stack:children=[RichText:(:299px)],${marker(disc)}]]],'
+                '[CssBlock:child=[Padding:(0,0,0,199),child=[_ListItem:children=[RichText:(:199px)],${marker(disc)}]]],'
+                '[CssBlock:child=[Padding:(0,0,0,299),child=[_ListItem:children=[RichText:(:299px)],${marker(disc)}]]],'
                 '${item(disc, "99px")}'
                 ']]]'));
       });
@@ -576,7 +574,7 @@ void main() {
           explained,
           equals(padding(list([
             item('1.', 'One'),
-            '[CssBlock:child=[Stack:children=[widget0],${marker("2.")}]]',
+            '[CssBlock:child=[_ListItem:children=[widget0],${marker("2.")}]]',
             item('3.', 'Three'),
           ]))));
     });
@@ -587,9 +585,9 @@ void main() {
 
     final explainerExpected =
         '[CssBlock:child=[Padding:(0,40,0,0),child=[Column:dir=rtl,children='
-        '[CssBlock:child=[Stack:dir=rtl,children=[RichText:dir=rtl,(:One)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:1.)]]]]],'
-        '[CssBlock:child=[Stack:dir=rtl,children=[RichText:dir=rtl,(:Two)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:2.)]]]]],'
-        '[CssBlock:child=[Stack:dir=rtl,children=[RichText:dir=rtl,(+b:Three)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:3.)]]]]]'
+        '[CssBlock:child=[_ListItem:children=[RichText:dir=rtl,(:One)],[RichText:maxLines=1,dir=rtl,(:1.)]]],'
+        '[CssBlock:child=[_ListItem:children=[RichText:dir=rtl,(:Two)],[RichText:maxLines=1,dir=rtl,(:2.)]]],'
+        '[CssBlock:child=[_ListItem:children=[RichText:dir=rtl,(+b:Three)],[RichText:maxLines=1,dir=rtl,(:3.)]]]'
         ']]]';
 
     final nonExplainerExpected = 'TshWidget\n'
@@ -601,30 +599,24 @@ void main() {
         '    ││  "One"\n'
         '    ││)\n'
         '    │└CssBlock()\n'
-        '    │ └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
+        '    │ └_ListItem(textDirection: rtl)\n'
         '    │  ├RichText(textDirection: rtl, text: "One")\n'
-        '    │  └Positioned(top: 0.0, right: -45.0)\n'
-        '    │   └SizedBox(width: 40.0)\n'
-        '    │    └RichText(textAlign: left, textDirection: rtl, text: "1.")\n'
+        '    │  └RichText(textDirection: rtl, maxLines: 1, text: "1.")\n'
         '    ├WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#2):\n'
         '    ││  "Two"\n'
         '    ││)\n'
         '    │└CssBlock()\n'
-        '    │ └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
+        '    │ └_ListItem(textDirection: rtl)\n'
         '    │  ├RichText(textDirection: rtl, text: "Two")\n'
-        '    │  └Positioned(top: 0.0, right: -45.0)\n'
-        '    │   └SizedBox(width: 40.0)\n'
-        '    │    └RichText(textAlign: left, textDirection: rtl, text: "2.")\n'
+        '    │  └RichText(textDirection: rtl, maxLines: 1, text: "2.")\n'
         '    └WidgetPlaceholder<BuildTree>(BuildTree#5 tsb#6(parent=#2):\n'
         '     │  BuildTree#7 tsb#8(parent=#6):\n'
         '     │    "Three"\n'
         '     │)\n'
         '     └CssBlock()\n'
-        '      └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
+        '      └_ListItem(textDirection: rtl)\n'
         '       ├RichText(textDirection: rtl, text: "Three")\n'
-        '       └Positioned(top: 0.0, right: -45.0)\n'
-        '        └SizedBox(width: 40.0)\n'
-        '         └RichText(textAlign: left, textDirection: rtl, text: "3.")\n'
+        '       └RichText(textDirection: rtl, maxLines: 1, text: "3.")\n'
         '\n';
 
     testWidgets('renders ordered list', (WidgetTester tester) async {

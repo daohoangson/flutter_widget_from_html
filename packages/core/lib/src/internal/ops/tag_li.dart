@@ -98,50 +98,30 @@ class TagLi {
     final tsh = meta.tsb().build(context);
 
     final markerText = wf.getListStyleMarker(listStyleType, markerIndex);
-    final markerSpan = _buildMarkerSpan(tsh, listStyleType, markerText);
+    final marker = _buildMarker(tsh, listStyleType, markerText);
 
-    return wf.buildStack(
-      meta,
-      tsh,
-      <Widget>[child, _buildMarker(tsh, markerSpan)],
+    return _ListItem(
+      child: child,
+      marker: marker,
+      textDirection: tsh.textDirection,
     );
   }
 
-  Widget _buildMarker(TextStyleHtml tsh, InlineSpan text) {
-    final isLtr = tsh.textDirection == TextDirection.ltr;
-    final isRtl = !isLtr;
+  Widget _buildMarker(TextStyleHtml tsh, String type, String text) {
     final style = tsh.styleWithHeight;
-    final width = style.fontSize * 4;
-    final margin = width + 5;
-    return Positioned(
-      left: isLtr ? -margin : null,
-      right: isRtl ? -margin : null,
-      top: 0.0,
-      child: SizedBox(
-        child: RichText(
-          overflow: TextOverflow.clip,
-          softWrap: false,
-          text: text,
-          textAlign: isLtr ? TextAlign.right : TextAlign.left,
-          textDirection: tsh.textDirection,
-        ),
-        width: width,
-      ),
-    );
-  }
-
-  InlineSpan _buildMarkerSpan(TextStyleHtml tsh, String type, String text) {
-    final style = tsh.styleWithHeight;
-    if (text?.isNotEmpty == true) return TextSpan(style: style, text: text);
-
-    // draw `circle`, `disc` and `square` manually
-    // because there are no Unicode equivalent
-    return WidgetSpan(
-        child: type == kCssListStyleTypeCircle
+    return text?.isNotEmpty == true
+        ? RichText(
+            maxLines: 1,
+            overflow: TextOverflow.clip,
+            softWrap: false,
+            text: TextSpan(style: style, text: text),
+            textDirection: tsh.textDirection,
+          )
+        : type == kCssListStyleTypeCircle
             ? _ListMarkerCircle(style)
             : type == kCssListStyleTypeSquare
                 ? _ListMarkerSquare(style)
-                : _ListMarkerDisc(style));
+                : _ListMarkerDisc(style);
   }
 }
 
@@ -190,6 +170,120 @@ class _ListConfig {
     }
 
     return null;
+  }
+}
+
+class _ListItem extends MultiChildRenderObjectWidget {
+  static const kGap = 5.0;
+
+  final TextDirection textDirection;
+
+  _ListItem({
+    Widget child,
+    Key key,
+    Widget marker,
+    this.textDirection,
+  }) : super(children: [child, marker], key: key);
+
+  @override
+  RenderObject createRenderObject(BuildContext _) =>
+      _ListItemRenderObject(textDirection: textDirection);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(
+        DiagnosticsProperty<TextDirection>('textDirection', textDirection));
+  }
+
+  @override
+  void updateRenderObject(BuildContext _, _ListItemRenderObject renderObject) {
+    renderObject.textDirection = textDirection;
+  }
+}
+
+class _ListItemData extends ContainerBoxParentData<RenderBox> {}
+
+class _ListItemRenderObject extends RenderBox
+    with
+        ContainerRenderObjectMixin<RenderBox, _ListItemData>,
+        RenderBoxContainerDefaultsMixin<RenderBox, _ListItemData> {
+  _ListItemRenderObject({
+    TextDirection textDirection,
+  }) : _textDirection = textDirection;
+
+  TextDirection get textDirection => _textDirection;
+  TextDirection _textDirection;
+  set textDirection(TextDirection value) {
+    if (_textDirection == value) return;
+    _textDirection = value;
+    markNeedsLayout();
+  }
+
+  @override
+  double computeDistanceToActualBaseline(TextBaseline baseline) =>
+      defaultComputeDistanceToFirstActualBaseline(baseline);
+
+  @override
+  double computeMaxIntrinsicHeight(double width) =>
+      firstChild.computeMaxIntrinsicHeight(width);
+
+  @override
+  double computeMaxIntrinsicWidth(double height) =>
+      firstChild.computeMaxIntrinsicWidth(height);
+
+  @override
+  double computeMinIntrinsicHeight(double width) =>
+      firstChild.computeMinIntrinsicHeight(width);
+
+  @override
+  double computeMinIntrinsicWidth(double height) =>
+      firstChild.getMinIntrinsicWidth(height);
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {Offset position}) =>
+      defaultHitTestChildren(result, position: position);
+
+  @override
+  void paint(PaintingContext context, Offset offset) =>
+      defaultPaint(context, offset);
+
+  @override
+  void performLayout() {
+    final child = firstChild;
+    final childConstraints = constraints;
+    final childData = child.parentData as _ListItemData;
+    child.layout(childConstraints, parentUsesSize: true);
+    final childSize = child.size;
+
+    final marker = childData.nextSibling;
+    final markerConstraints = childConstraints.loosen();
+    final markerData = marker.parentData as _ListItemData;
+    marker.layout(markerConstraints, parentUsesSize: true);
+    final markerSize = marker.size;
+
+    size = childSize;
+
+    final baseline = TextBaseline.alphabetic;
+    final markerDistance =
+        marker.getDistanceToBaseline(baseline, onlyReal: true) ??
+            markerSize.height;
+    final childDistance =
+        child.getDistanceToBaseline(baseline, onlyReal: true) ?? markerDistance;
+
+    markerData.offset = Offset(
+      textDirection == TextDirection.ltr
+          ? -markerSize.width - _ListItem.kGap
+          : childSize.width + _ListItem.kGap,
+      childDistance - markerDistance,
+    );
+  }
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! _ListItemData) {
+      child.parentData = _ListItemData();
+    }
   }
 }
 
@@ -264,11 +358,18 @@ class _ListMarkerPainter extends CustomPainter {
   @override
   bool shouldRepaint(_ListMarkerPainter old) => old.type != type;
 
-  static Widget buildCustomPaint(TextStyle style, _ListMarkerType type) =>
-      CustomPaint(
-        painter: _ListMarkerPainter(style, type),
-        size: Size(style.fontSize, style.fontSize),
-      );
+  static Widget buildCustomPaint(TextStyle style, _ListMarkerType type) {
+    final tp = TextPainter(
+      text: TextSpan(style: style, text: '1.'),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    final size = tp.computeDistanceToActualBaseline(TextBaseline.alphabetic);
+
+    return CustomPaint(
+      painter: _ListMarkerPainter(style, type),
+      size: Size(size, size),
+    );
+  }
 }
 
 enum _ListMarkerType {
