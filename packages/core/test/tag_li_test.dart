@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -647,4 +648,47 @@ void main() {
       expect(explained, equals(nonExplainerExpected));
     });
   });
+
+  group('_ListItem', () {
+    testWidgets('updates textDirection', (tester) async {
+      final html = '<ul><li>Foo</li></ul>';
+
+      final ltr = await explain(tester, html, rtl: false, useExplainer: false);
+      expect(ltr, contains('_ListItem()'));
+
+      final rtl = await explain(tester, html, rtl: true, useExplainer: false);
+      expect(rtl, contains('_ListItem(textDirection: rtl)'));
+    });
+
+    testWidgets('performs hit test', (tester) async {
+      const kHref = 'href';
+      final urls = <String>[];
+
+      await tester.pumpWidget(_HitTestApp(
+        href: kHref,
+        onTapUrl: (url) => urls.add(url),
+      ));
+      expect(await tapText(tester, 'Tap me'), equals(1));
+
+      await tester.pumpAndSettle();
+      expect(urls, equals(const [kHref]));
+    });
+  });
+}
+
+class _HitTestApp extends StatelessWidget {
+  final String href;
+  final void Function(String) onTapUrl;
+
+  const _HitTestApp({this.href, Key key, this.onTapUrl}) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => MaterialApp(
+        home: Scaffold(
+          body: HtmlWidget(
+            '<ul><li><a href="$href">Tap me</a></li></ul>',
+            onTapUrl: onTapUrl,
+          ),
+        ),
+      );
 }
