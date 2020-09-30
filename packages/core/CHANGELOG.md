@@ -1,3 +1,7 @@
+## 0.5.0+6
+
+- Stop using singleton WidgetFactory by default
+
 ## 0.5.0+5
 
 - Use Stack.clipBehavior instead of .overflow (#321, authored by @bahador)
