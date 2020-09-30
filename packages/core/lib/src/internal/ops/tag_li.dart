@@ -38,7 +38,7 @@ class TagLi {
 
   _ListConfig get config {
     // cannot build config from constructor because
-    // domElement is not set at that time
+    // inline styles are not fully parsed at that time
     _config ??= _ListConfig.fromBuildMetadata(listMeta);
     return _config;
   }
