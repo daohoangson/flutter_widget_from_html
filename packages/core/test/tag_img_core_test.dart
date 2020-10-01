@@ -81,7 +81,7 @@ void main() {
   });
 
   group('asset', () {
-    final assetName = 'path/image.png';
+    final assetName = 'test/images/logo.png';
     final explain = (WidgetTester tester, String html, {String package}) =>
         helper.explain(tester, html);
 
@@ -97,7 +97,7 @@ void main() {
     });
 
     testWidgets('renders asset (specified package)', (tester) async {
-      final package = 'package';
+      final package = 'flutter_widget_from_html_core';
       final html = '<img src="asset:$assetName?package=$package" />';
       final explained = await explain(tester, html, package: package);
       expect(

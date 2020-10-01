@@ -74,9 +74,8 @@ class _RubyRenderObject extends RenderBox
       defaultHitTestChildren(result, position: position);
 
   @override
-  void paint(PaintingContext context, Offset offset) {
-    defaultPaint(context, offset);
-  }
+  void paint(PaintingContext context, Offset offset) =>
+      defaultPaint(context, offset);
 
   @override
   void performLayout() {
