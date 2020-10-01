@@ -262,7 +262,10 @@ class _ListItemRenderObject extends RenderBox
     marker.layout(markerConstraints, parentUsesSize: true);
     final markerSize = marker.size;
 
-    size = childSize;
+    size = Size(
+      childSize.width,
+      childSize.height > 0 ? childSize.height : markerSize.height,
+    );
 
     final baseline = TextBaseline.alphabetic;
     final markerDistance =

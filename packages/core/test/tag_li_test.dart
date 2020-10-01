@@ -548,6 +548,17 @@ void main() async {
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
+    testWidgets('LI within LI', (WidgetTester tester) async {
+      final html = '<ol><li><li>Foo</li></li></ol>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals(padding(list([
+            item('1.', '', child: '[widget0]'),
+            item('2.', 'Foo'),
+          ]))));
+    });
+
     testWidgets('UL is direct child of UL', (WidgetTester tester) async {
       final html = '''
 <ul>
@@ -696,6 +707,9 @@ void main() async {
                 'foo <img src="asset:$assetName" style="height: 30px;" /> bar',
             'img_inline_then_text':
                 '<img src="asset:$assetName" style="height: 30px;" /> foo',
+            'li_within_li': '<li>Foo</li>',
+            'list_within_li': '<ul><li>Foo</li></ul>',
+            'list_of_items_within_li': '<ol><li>Foo</li><li>Bar</li></ol>',
             'multiline':
                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br />\n' *
                     3,
