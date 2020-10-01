@@ -1,3 +1,8 @@
+## 0.5.0+6
+
+- Stop using singleton WidgetFactory by default
+- Update `video_player` version constraint as suggested by publisher (#333, authored by @dgilperez)
+
 ## 0.5.0+5
 
 - Use Stack.clipBehavior instead of .overflow (#321, authored by @bahador)

@@ -108,7 +108,7 @@ class _Flattener {
     if (next == null) {
       // skip trailing whitespace
       return true;
-    } else if (next is WidgetBit && !next.isInline) {
+    } else if (!next.isInline) {
       // skip whitespace before a new block
       return true;
     }
