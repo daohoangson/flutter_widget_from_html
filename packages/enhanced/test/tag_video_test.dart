@@ -65,15 +65,17 @@ void main() {
 
   group('poster', () {
     testWidgets('renders video player with asset', (tester) async {
+      final package = 'flutter_widget_from_html_core';
       final assetName = 'test/images/logo.png';
-      final h = '<video poster="asset:$assetName"><source src="$src"></video>';
+      final h = '<video poster="asset:$assetName?package=$package">'
+          '<source src="$src"></video>';
       final explained = await explain(tester, h);
       expect(
           explained,
           equals('[CssBlock:child=[VideoPlayer:'
               'url=$src,'
               'aspectRatio=$defaultAspectRatio,'
-              'poster=[Image:image=AssetImage(bundle: null, name: "$assetName")]'
+              'poster=[Image:image=AssetImage(bundle: null, name: "packages/$package/$assetName")]'
               ']]'));
     });
 

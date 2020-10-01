@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '_.dart';
 
@@ -22,7 +25,9 @@ String item(String markerText, String contents, {String child}) =>
 String marker(String text) =>
     text.startsWith('[_ListMarker') ? text : '[RichText:maxLines=1,(:$text)]';
 
-void main() {
+void main() async {
+  await loadAppFonts();
+
   testWidgets('renders list with padding', (WidgetTester tester) async {
     final html = '<ul><li>Foo</li></ul>';
     final e = await explainMargin(tester, html);
@@ -673,7 +678,93 @@ void main() {
       await tester.pumpAndSettle();
       expect(urls, equals(const [kHref]));
     });
-  });
+
+    final assetName = 'test/images/logo.png';
+    final testCases = <String, String>{
+      'img_block':
+          '<img src="asset:$assetName" style="display: block; height: 30px;" />',
+      'img_block_between_text':
+          'foo <img src="asset:$assetName" style="display: block; height: 30px;" /> bar',
+      'img_block_then_text':
+          '<img src="asset:$assetName" style="display: block; height: 30px;" /> foo',
+      'img_inline': '<img src="asset:$assetName" style="height: 30px;" />',
+      'img_inline_between_text':
+          'foo <img src="asset:$assetName" style="height: 30px;" /> bar',
+      'img_inline_then_text':
+          '<img src="asset:$assetName" style="height: 30px;" /> foo',
+      'multiline':
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br />\n' *
+              3,
+      'padding': '<div style="padding: 10px">Foo</div>',
+      'ruby': '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>',
+    };
+
+    GoldenToolkit.runWithConfiguration(
+      () {
+        for (final testCase in testCases.entries) {
+          testGoldens(testCase.key, (tester) async {
+            await tester.pumpWidgetBuilder(
+              _Golden(testCase.value),
+              wrapper: materialAppWrapper(theme: ThemeData.light()),
+              surfaceSize: Size(600, 400),
+            );
+
+            await screenMatchesGolden(tester, testCase.key);
+          }, skip: null);
+        }
+      },
+      config: GoldenToolkitConfiguration(
+        fileNameFactory: (name) => '$kGoldenFilePrefix/li/$name.png',
+      ),
+    );
+  }, skip: Platform.isLinux ? null : 'Linux only');
+}
+
+class _Golden extends StatelessWidget {
+  final String contents;
+
+  const _Golden(this.contents, {Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => Scaffold(
+        body: Padding(
+          child: Column(
+            children: [
+              Text(contents),
+              Divider(),
+              Builder(
+                builder: (context) => Text(
+                  'UL:\n',
+                  style: Theme.of(context).textTheme.caption,
+                ),
+              ),
+              HtmlWidget('''
+<ul>
+  <li>Above</li>
+  <li>$contents</li>
+  <li>Below</li>
+</ul>
+'''),
+              Divider(),
+              Builder(
+                builder: (context) => Text(
+                  'OL:\n',
+                  style: Theme.of(context).textTheme.caption,
+                ),
+              ),
+              HtmlWidget('''
+<ol>
+  <li>First</li>
+  <li>$contents</li>
+  <li>Third</li>
+</ol>
+'''),
+            ],
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+          ),
+          padding: const EdgeInsets.all(8.0),
+        ),
+      );
 }
 
 class _HitTestApp extends StatelessWidget {

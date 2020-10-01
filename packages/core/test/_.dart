@@ -14,6 +14,8 @@ const kDataUri =
 
 final hwKey = GlobalKey<State<HtmlWidget>>();
 
+const kGoldenFilePrefix = '../../../demo_app/test';
+
 Widget buildCurrentState() {
   final hws = hwKey.currentState;
   if (hws == null) return null;

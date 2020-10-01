@@ -8,7 +8,7 @@ import '../../core/test/_.dart' as helper;
 
 const kDataUri = helper.kDataUri;
 
-const kGoldenFilePrefix = '../../../demo_app/test';
+const kGoldenFilePrefix = helper.kGoldenFilePrefix;
 
 final hwKey = helper.hwKey;
 
