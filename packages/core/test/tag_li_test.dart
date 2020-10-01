@@ -679,45 +679,48 @@ void main() async {
       expect(urls, equals(const [kHref]));
     });
 
-    final assetName = 'test/images/logo.png';
-    final testCases = <String, String>{
-      'img_block':
-          '<img src="asset:$assetName" style="display: block; height: 30px;" />',
-      'img_block_between_text':
-          'foo <img src="asset:$assetName" style="display: block; height: 30px;" /> bar',
-      'img_block_then_text':
-          '<img src="asset:$assetName" style="display: block; height: 30px;" /> foo',
-      'img_inline': '<img src="asset:$assetName" style="height: 30px;" />',
-      'img_inline_between_text':
-          'foo <img src="asset:$assetName" style="height: 30px;" /> bar',
-      'img_inline_then_text':
-          '<img src="asset:$assetName" style="height: 30px;" /> foo',
-      'multiline':
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br />\n' *
-              3,
-      'padding': '<div style="padding: 10px">Foo</div>',
-      'ruby': '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>',
-    };
-
     GoldenToolkit.runWithConfiguration(
       () {
-        for (final testCase in testCases.entries) {
-          testGoldens(testCase.key, (tester) async {
-            await tester.pumpWidgetBuilder(
-              _Golden(testCase.value),
-              wrapper: materialAppWrapper(theme: ThemeData.light()),
-              surfaceSize: Size(600, 400),
-            );
+        group('baseline calculation', () {
+          final assetName = 'test/images/logo.png';
+          final testCases = <String, String>{
+            'img_block':
+                '<img src="asset:$assetName" style="display: block; height: 30px;" />',
+            'img_block_between_text':
+                'foo <img src="asset:$assetName" style="display: block; height: 30px;" /> bar',
+            'img_block_then_text':
+                '<img src="asset:$assetName" style="display: block; height: 30px;" /> foo',
+            'img_inline':
+                '<img src="asset:$assetName" style="height: 30px;" />',
+            'img_inline_between_text':
+                'foo <img src="asset:$assetName" style="height: 30px;" /> bar',
+            'img_inline_then_text':
+                '<img src="asset:$assetName" style="height: 30px;" /> foo',
+            'multiline':
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br />\n' *
+                    3,
+            'padding': '<div style="padding: 10px">Foo</div>',
+            'ruby': '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>',
+          };
 
-            await screenMatchesGolden(tester, testCase.key);
-          }, skip: null);
-        }
+          for (final testCase in testCases.entries) {
+            testGoldens(testCase.key, (tester) async {
+              await tester.pumpWidgetBuilder(
+                _Golden(testCase.value),
+                wrapper: materialAppWrapper(theme: ThemeData.light()),
+                surfaceSize: Size(600, 400),
+              );
+
+              await screenMatchesGolden(tester, testCase.key);
+            }, skip: null);
+          }
+        }, skip: Platform.isLinux ? null : 'Linux only');
       },
       config: GoldenToolkitConfiguration(
         fileNameFactory: (name) => '$kGoldenFilePrefix/li/$name.png',
       ),
     );
-  }, skip: Platform.isLinux ? null : 'Linux only');
+  });
 }
 
 class _Golden extends StatelessWidget {
