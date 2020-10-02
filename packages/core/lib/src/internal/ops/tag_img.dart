@@ -16,13 +16,16 @@ class TagImg {
   BuildOp get buildOp => BuildOp(
         defaultStyles: (element) {
           final attrs = element.attributes;
-          final styles = <String, String>{};
+          final styles = {
+            kCssMinWidth: '0px',
+            kCssMinHeight: '0px',
+          };
 
           if (attrs.containsKey(kAttributeImgHeight)) {
-            styles[kCssHeight] = '${attrs[kAttributeImgHeight]}px';
+            styles[kCssMaxHeight] = '${attrs[kAttributeImgHeight]}px';
           }
           if (attrs.containsKey(kAttributeImgWidth)) {
-            styles[kCssWidth] = '${attrs[kAttributeImgWidth]}px';
+            styles[kCssMaxWidth] = '${attrs[kAttributeImgWidth]}px';
           }
 
           return styles;
@@ -39,12 +42,7 @@ class TagImg {
           }
 
           final placeholder =
-              WidgetPlaceholder<ImageMetadata>(data, child: built)
-                  .wrapWith((context, child) => _LoosenConstraintsWidget(
-                        child: child,
-                        crossAxisAlignment:
-                            meta.tsb().build(context).crossAxisAlignment,
-                      ));
+              WidgetPlaceholder<ImageMetadata>(data, child: built);
 
           tree.replaceWith(meta.isBlockElement
               ? WidgetBit.block(tree, placeholder)
@@ -53,9 +51,21 @@ class TagImg {
       );
 
   Widget _build(BuildMetadata meta, ImageMetadata data) {
-    final provider = wf.imageProvider(data.sources?.first);
+    final source = data.sources?.first;
+    if (source == null) return null;
+
+    final provider = wf.imageProvider(source);
     if (provider == null) return null;
-    return wf.buildImage(meta, provider, data);
+
+    var built = wf.buildImage(meta, provider, data);
+
+    if (source.height?.isNegative == false &&
+        source.width?.isNegative == false &&
+        source.height != 0) {
+      built = wf.buildAspectRatio(meta, built, source.width / source.height);
+    }
+
+    return built;
   }
 
   ImageMetadata _parse(BuildMetadata meta) {
@@ -74,72 +84,5 @@ class TagImg {
           : null,
       title: attrs[kAttributeImgTitle],
     );
-  }
-}
-
-class _LoosenConstraintsWidget extends SingleChildRenderObjectWidget {
-  final CrossAxisAlignment crossAxisAlignment;
-
-  _LoosenConstraintsWidget(
-      {@required Widget child, this.crossAxisAlignment, Key key})
-      : super(child: child, key: key);
-
-  @override
-  _LoosenConstraintsRender createRenderObject(BuildContext _) =>
-      _LoosenConstraintsRender(crossAxisAlignment: crossAxisAlignment);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<CrossAxisAlignment>(
-        'crossAxisAlignment', crossAxisAlignment));
-  }
-
-  @override
-  void updateRenderObject(
-      BuildContext _, _LoosenConstraintsRender renderObject) {
-    renderObject.crossAxisAlignment = crossAxisAlignment;
-  }
-}
-
-class _LoosenConstraintsParentData extends ContainerBoxParentData<RenderBox> {}
-
-class _LoosenConstraintsRender extends RenderProxyBox {
-  _LoosenConstraintsRender({
-    RenderBox child,
-    CrossAxisAlignment crossAxisAlignment,
-  })  : _crossAxisAlignment = crossAxisAlignment,
-        super(child);
-
-  CrossAxisAlignment _crossAxisAlignment;
-  set crossAxisAlignment(CrossAxisAlignment value) {
-    if (value == _crossAxisAlignment) return;
-    _crossAxisAlignment = value;
-    markNeedsLayout();
-  }
-
-  @override
-  void paint(PaintingContext context, Offset offset) {
-    final data = child.parentData as _LoosenConstraintsParentData;
-    context.paintChild(child, data.offset + offset);
-  }
-
-  @override
-  void performLayout() {
-    final c = constraints;
-    child.layout(c.loosen(), parentUsesSize: true);
-    size = c.constrain(child.size);
-
-    if (_crossAxisAlignment == CrossAxisAlignment.center) {
-      final data = child.parentData as _LoosenConstraintsParentData;
-      data.offset = Offset((size.width - child.size.width) / 2, 0);
-    }
-  }
-
-  @override
-  void setupParentData(RenderBox child) {
-    if (child.parentData is! _LoosenConstraintsParentData) {
-      child.parentData = _LoosenConstraintsParentData();
-    }
   }
 }

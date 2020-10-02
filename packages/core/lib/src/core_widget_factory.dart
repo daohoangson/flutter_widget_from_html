@@ -29,6 +29,13 @@ class WidgetFactory {
 
   HtmlWidget get _widget => _state?.widget;
 
+  /// Builds [AspectRatio].
+  Widget buildAspectRatio(
+          BuildMetadata meta, Widget child, double aspectRatio) =>
+      child != null && aspectRatio != null
+          ? AspectRatio(aspectRatio: aspectRatio, child: child)
+          : null;
+
   /// Builds primary column (body).
   WidgetPlaceholder buildBody(BuildMetadata meta, Iterable<Widget> children) =>
       buildColumnPlaceholder(meta, children, trimMarginVertical: true);
