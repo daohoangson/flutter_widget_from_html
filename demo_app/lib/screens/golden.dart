@@ -121,7 +121,9 @@ class _GoldensState extends State<GoldensScreen> {
         body: FutureBuilder<List<MapEntry<String, String>>>(
           builder: (context, snapshot) => snapshot.hasData
               ? _onData(_filtered ?? snapshot.data)
-              : snapshot.hasError ? _onError(snapshot.error) : _onLoading(),
+              : snapshot.hasError
+                  ? _onError(snapshot.error)
+                  : _onLoading(),
           future: _goldens,
         ),
       );

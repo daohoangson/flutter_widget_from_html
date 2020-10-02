@@ -118,7 +118,9 @@ class TextStyleOps {
   static TextStyleHtml textDirection(TextStyleHtml p, String v) {
     final textDirection = (v == kCssDirectionRtl)
         ? TextDirection.rtl
-        : v == kCssDirectionLtr ? TextDirection.ltr : null;
+        : v == kCssDirectionLtr
+            ? TextDirection.ltr
+            : null;
     if (textDirection == null) return p;
 
     return p.copyWith(textDirection: textDirection);
