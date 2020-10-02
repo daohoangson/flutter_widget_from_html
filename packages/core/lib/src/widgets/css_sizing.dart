@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
@@ -7,208 +9,135 @@ import 'package:flutter/widgets.dart';
 /// Additional constraints will be applied loosely in order to
 /// stay as close as possible to the preferred width / height.
 class CssSizing extends SingleChildRenderObjectWidget {
-  /// The additional constraints.
-  final BoxConstraints constraints;
+  /// The maximum height.
+  final double maxHeight;
 
-  /// The preferred size.
-  final Size size;
+  /// The maximum width.
+  final double maxWidth;
+
+  /// The minimum height.
+  final double minHeight;
+
+  // The minimum width;
+  final double minWidth;
+
+  /// The preferred height.
+  final double preferredHeight;
+
+  /// The preferred width.
+  final double preferredWidth;
 
   /// Creates a CSS sizing.
   CssSizing({
     @required Widget child,
-    @required this.constraints,
     Key key,
-    @required this.size,
+    this.maxHeight,
+    this.maxWidth,
+    this.minHeight,
+    this.minWidth,
+    this.preferredHeight,
+    this.preferredWidth,
   })  : assert(child != null),
-        assert(constraints != null),
-        assert(constraints.debugAssertIsValid()),
-        assert(size != null),
         super(child: child, key: key);
 
   @override
-  _RenderCssSizing createRenderObject(BuildContext _) =>
-      _RenderCssSizing(additionalConstraints: constraints, preferredSize: size);
+  _RenderCssSizing createRenderObject(BuildContext _) => _RenderCssSizing(
+        maxHeight: maxHeight,
+        maxWidth: maxWidth,
+        minHeight: minHeight,
+        minWidth: minWidth,
+        preferredHeight: preferredHeight,
+        preferredWidth: preferredWidth,
+      );
 
   @override
   void updateRenderObject(BuildContext _, _RenderCssSizing renderObject) {
-    renderObject.additionalConstraints = constraints;
-    renderObject.preferredSize = size;
+    renderObject.setConstraints(
+      maxHeight: maxHeight,
+      maxWidth: maxWidth,
+      minHeight: minHeight,
+      minWidth: minWidth,
+    );
+    renderObject.setPreferredSize(preferredWidth, preferredHeight);
   }
 }
 
 class _RenderCssSizing extends RenderProxyBox {
   _RenderCssSizing({
     RenderBox child,
-    @required BoxConstraints additionalConstraints,
-    @required Size preferredSize,
-  })  : assert(additionalConstraints != null),
-        assert(additionalConstraints.debugAssertIsValid()),
-        assert(preferredSize != null),
-        _additionalConstraints = additionalConstraints,
-        _preferredSize = preferredSize,
-        _preferredRatio = _calculateRatio(preferredSize),
+    Key key,
+    double maxHeight,
+    double maxWidth,
+    double minHeight,
+    double minWidth,
+    double preferredHeight,
+    double preferredWidth,
+  })  : _maxHeight = maxHeight,
+        _maxWidth = maxWidth,
+        _minHeight = minHeight,
+        _minWidth = minWidth,
+        _preferredHeight = preferredHeight,
+        _preferredWidth = preferredWidth,
         super(child);
 
-  BoxConstraints _additionalConstraints;
-  set additionalConstraints(BoxConstraints value) {
-    assert(value != null);
-    assert(value.debugAssertIsValid());
-    if (_additionalConstraints == value) return;
-    _additionalConstraints = value;
+  double _maxHeight;
+  double _maxWidth;
+  double _minHeight;
+  double _minWidth;
+  void setConstraints({
+    double maxHeight,
+    double maxWidth,
+    double minHeight,
+    double minWidth,
+  }) {
+    if (maxHeight == _maxHeight &&
+        maxWidth == _maxWidth &&
+        minHeight == _minHeight &&
+        minWidth == _minWidth) {
+      return;
+    }
+    _maxHeight = maxHeight;
+    _maxWidth = maxWidth;
+    _minHeight = minHeight;
+    _minWidth = minWidth;
     markNeedsLayout();
   }
 
-  Size _preferredSize;
-  double _preferredRatio;
-  set preferredSize(Size value) {
-    assert(value != null);
-    if (_preferredSize == value) return;
-    _preferredSize = value;
-    _preferredRatio = _calculateRatio(value);
+  double _preferredHeight;
+  double _preferredWidth;
+  void setPreferredSize(double width, double height) {
+    if (height == _preferredHeight && width == _preferredWidth) return;
+    _preferredHeight = height;
+    _preferredWidth = width;
     markNeedsLayout();
-  }
-
-  @override
-  double computeMinIntrinsicWidth(double height) {
-    if (height.isFinite && _preferredRatio != null) {
-      return height * _preferredRatio;
-    }
-
-    if (_additionalConstraints.hasBoundedWidth &&
-        _additionalConstraints.hasTightWidth) {
-      return _additionalConstraints.minWidth;
-    }
-
-    final width = super.computeMinIntrinsicWidth(height);
-    if (!_additionalConstraints.hasInfiniteWidth) {
-      return _additionalConstraints.constrainWidth(width);
-    }
-
-    return width;
-  }
-
-  @override
-  double computeMaxIntrinsicWidth(double height) {
-    if (height.isFinite && _preferredRatio != null) {
-      return height * _preferredRatio;
-    }
-
-    if (_additionalConstraints.hasBoundedWidth &&
-        _additionalConstraints.hasTightWidth) {
-      return _additionalConstraints.minWidth;
-    }
-
-    final width = super.computeMaxIntrinsicWidth(height);
-    if (!_additionalConstraints.hasInfiniteWidth) {
-      return _additionalConstraints.constrainWidth(width);
-    }
-
-    return width;
-  }
-
-  @override
-  double computeMinIntrinsicHeight(double width) {
-    if (width.isFinite && _preferredRatio != null) {
-      return width / _preferredRatio;
-    }
-
-    if (_additionalConstraints.hasBoundedHeight &&
-        _additionalConstraints.hasTightHeight) {
-      return _additionalConstraints.minHeight;
-    }
-
-    final height = super.computeMinIntrinsicHeight(width);
-    if (!_additionalConstraints.hasInfiniteHeight) {
-      return _additionalConstraints.constrainHeight(height);
-    }
-
-    return height;
-  }
-
-  @override
-  double computeMaxIntrinsicHeight(double width) {
-    if (width.isFinite && _preferredRatio != null) {
-      return width / _preferredRatio;
-    }
-
-    if (_additionalConstraints.hasBoundedHeight &&
-        _additionalConstraints.hasTightHeight) {
-      return _additionalConstraints.minHeight;
-    }
-
-    final height = super.computeMaxIntrinsicHeight(width);
-    if (!_additionalConstraints.hasInfiniteHeight) {
-      return _additionalConstraints.constrainHeight(height);
-    }
-
-    return height;
   }
 
   @override
   void performLayout() {
-    final a = _additionalConstraints;
     final c = constraints;
+    var maxHeight = min(c.maxHeight, _maxHeight ?? c.maxHeight);
+    var maxWidth = min(c.maxWidth, _maxWidth ?? c.maxWidth);
+    var minHeight = min(maxHeight, _minHeight ?? c.minHeight);
+    var minWidth = min(maxWidth, _minWidth ?? c.minWidth);
 
-    // enforce additional contraints with parent's (ignoring lower bounds)
-    var cc = a.enforce(c.loosen());
-    final s = _applyPreferredRatio(cc);
-
-    if (s != null) {
-      // we have both preferred width & height
-      cc = BoxConstraints.tight(s);
-    } else if (_preferredSize.height.isFinite) {
-      // we have preferred height
-      final height = cc.constrainHeight(_preferredSize.height);
-      cc = cc.copyWith(maxHeight: height, minHeight: height);
-    } else if (_preferredSize.width.isFinite) {
-      // we have preferred width
-      final width = cc.constrainWidth(_preferredSize.width);
-      cc = cc.copyWith(maxWidth: width, minWidth: width);
+    if (_preferredHeight != null) {
+      maxHeight = minHeight = _preferredHeight.clamp(minHeight, maxHeight);
     }
+    if (_preferredWidth != null) {
+      // special handling for tight contraints: ignore min in `clamp()`
+      // (usually happen if parent is a block)
+      final effectiveMinWidth = minWidth == maxWidth ? 0 : minWidth;
+      maxWidth = minWidth = _preferredWidth.clamp(effectiveMinWidth, maxWidth);
+    }
+
+    final cc = BoxConstraints(
+      maxHeight: maxHeight,
+      maxWidth: maxWidth,
+      minHeight: minHeight,
+      minWidth: minWidth,
+    );
 
     child.layout(cc, parentUsesSize: true);
-    size = c.constrain(child.size);
+    size = constraints.constrain(child.size);
   }
-
-  Size _applyPreferredRatio(BoxConstraints c) {
-    if (_preferredRatio == null) return null;
-
-    var width = _preferredSize.width ?? c.maxWidth;
-    double height;
-
-    if (width.isFinite) {
-      height = width / _preferredRatio;
-    } else {
-      height = _preferredSize.height ?? c.maxHeight;
-      width = height * _preferredRatio;
-    }
-
-    if (width > c.maxWidth) {
-      width = c.maxWidth;
-      height = width / _preferredRatio;
-    }
-
-    if (height > c.maxHeight) {
-      height = c.maxHeight;
-      width = height * _preferredRatio;
-    }
-
-    if (width < c.minWidth) {
-      width = c.minWidth;
-      height = width / _preferredRatio;
-    }
-
-    if (height < c.minHeight) {
-      height = c.minHeight;
-      width = height * _preferredRatio;
-    }
-
-    return Size(width, height);
-  }
-
-  static double _calculateRatio(Size size) => size.width.isFinite == true &&
-          size.height.isFinite == true &&
-          size.height != 0
-      ? size.width / size.height
-      : null;
 }

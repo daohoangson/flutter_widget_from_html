@@ -75,7 +75,7 @@ abstract class BuildMetadata {
 /// A building operation to customize how a DOM element is rendered.
 @immutable
 class BuildOp {
-  /// Controls whether the element should be rendered with [CssBlock].
+  /// Controls whether the element should be rendered as block.
   ///
   /// Default: `true` if [onWidgets] callback is set, `false` otherwise.
   final bool isBlockElement;

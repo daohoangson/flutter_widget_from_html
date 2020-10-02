@@ -11,7 +11,6 @@ import 'core_html_widget.dart';
 /// A factory to build widgets.
 class WidgetFactory {
   BuildOp _styleBgColor;
-  BuildOp _styleDisplayBlock;
   BuildOp _styleDisplayNone;
   BuildOp _styleMargin;
   BuildOp _stylePadding;
@@ -739,16 +738,6 @@ class WidgetFactory {
     }
   }
 
-  /// Returns build op for block element.
-  BuildOp styleDisplayBlock() {
-    _styleDisplayBlock ??= BuildOp(
-      onWidgets: (meta, widgets) => listOrNull(
-          buildColumnPlaceholder(meta, widgets)?.wrapWith(_cssBlock)),
-      priority: 10000,
-    );
-    return _styleDisplayBlock;
-  }
-
   /// Resolves full URL with [HtmlWidget.baseUrl] if available.
   String urlFull(String url) {
     if (url?.isNotEmpty != true) return null;
@@ -769,6 +758,3 @@ class WidgetFactory {
     return __tsbFontSize;
   }
 }
-
-Widget _cssBlock(BuildContext _, Widget child) =>
-    child == widget0 || child is CssBlock ? child : CssBlock(child: child);

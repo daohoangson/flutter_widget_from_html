@@ -88,17 +88,16 @@ class StyleSizing {
   static Widget _build(BuildContext context, Widget child,
       _StyleSizingInput input, TextStyleBuilder tsb) {
     final tsh = tsb.build(context);
-    final constraints = BoxConstraints(
-      maxHeight: input.maxHeight?.getValue(tsh) ?? double.infinity,
-      maxWidth: input.maxWidth?.getValue(tsh) ?? double.infinity,
-      minHeight: input.minHeight?.getValue(tsh) ?? 0,
-      minWidth: input.minWidth?.getValue(tsh) ?? 0,
+
+    return CssSizing(
+      child: child,
+      maxHeight: input.maxHeight?.getValue(tsh),
+      maxWidth: input.maxWidth?.getValue(tsh),
+      minHeight: input.minHeight?.getValue(tsh),
+      minWidth: input.minWidth?.getValue(tsh),
+      preferredHeight: input.height?.getValue(tsh),
+      preferredWidth: input.width?.getValue(tsh),
     );
-    final size = Size(
-      input.width?.getValue(tsh) ?? double.infinity,
-      input.height?.getValue(tsh) ?? double.infinity,
-    );
-    return CssSizing(child: child, constraints: constraints, size: size);
   }
 }
 

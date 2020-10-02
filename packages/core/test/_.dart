@@ -265,20 +265,24 @@ class Explainer {
   List<String> _cssSizing(CssSizing w) {
     final attr = <String>[];
 
-    final c = w.constraints;
-    final s = w.size;
-    if (s.height.isFinite) attr.add('height=${s.height.toStringAsFixed(1)}');
-    if (c.maxHeight.isFinite) {
-      attr.add('maxHeight=${c.maxHeight.toStringAsFixed(1)}');
+    if (w.height?.isFinite == true) {
+      attr.add('height=${w.height.toStringAsFixed(1)}');
     }
-    if (c.maxWidth.isFinite) {
-      attr.add('maxWidth=${c.maxWidth.toStringAsFixed(1)}');
+    if (w.maxHeight?.isFinite == true) {
+      attr.add('maxHeight=${w.maxHeight.toStringAsFixed(1)}');
     }
-    if (c.minHeight > 0) {
-      attr.add('minHeight=${c.minHeight.toStringAsFixed(1)}');
+    if (w.maxWidth?.isFinite == true) {
+      attr.add('maxWidth=${w.maxWidth.toStringAsFixed(1)}');
     }
-    if (c.minWidth > 0) attr.add('minWidth=${c.minWidth.toStringAsFixed(1)}');
-    if (s.width.isFinite) attr.add('width=${s.width.toStringAsFixed(1)}');
+    if (w.minHeight?.isNegative == false) {
+      attr.add('minHeight=${w.minHeight.toStringAsFixed(1)}');
+    }
+    if (w.minWidth?.isNegative == false) {
+      attr.add('minWidth=${w.minWidth.toStringAsFixed(1)}');
+    }
+    if (w.width?.isFinite == true) {
+      attr.add('width=${w.width.toStringAsFixed(1)}');
+    }
 
     return attr;
   }

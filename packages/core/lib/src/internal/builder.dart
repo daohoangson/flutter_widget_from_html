@@ -5,6 +5,7 @@ import '../core_data.dart';
 import '../core_data.dart' as core_data show BuildMetadata, BuildTree;
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
+import 'core_ops.dart';
 import 'core_parser.dart';
 import 'flattener.dart';
 
@@ -238,6 +239,11 @@ class BuildTree extends core_data.BuildTree {
       }
     }
 
+    if (meta.isBlockElement) {
+      // TODO: use `100%` when percentage is supported
+      meta[kCssWidth] = '999999999px';
+    }
+
     _customStylesBuilder(meta);
 
     // stylings, step 2: get styles from `style` attribute
@@ -251,10 +257,6 @@ class BuildTree extends core_data.BuildTree {
     meta._stylesIsLocked = true;
     for (final style in meta.styles) {
       wf.parseStyle(meta, style.key, style.value);
-    }
-
-    if (meta.isBlockElement) {
-      meta.register(wf.styleDisplayBlock());
     }
 
     meta._sortBuildOps();
