@@ -130,7 +130,7 @@ class WidgetPlaceholder<T> extends StatelessWidget {
       : WidgetPlaceholder<Widget>(child, child: child);
 }
 
-final _dataUriRegExp = RegExp(r'^data:image/[^;]+;(base64|utf8),');
+final _dataUriRegExp = RegExp(r'^data:[^;]+;([^,]+),');
 
 /// Returns [Uint8List] by decoding [dataUri].
 ///
@@ -145,13 +145,13 @@ Uint8List bytesFromDataUri(String dataUri) {
   final prefix = match[0];
   final encoding = match[1];
   final data = dataUri.substring(prefix.length);
-
   final bytes = encoding == 'base64'
       ? base64.decode(data)
-      : encoding == 'utf8' ? Uint8List.fromList(data.codeUnits) : null;
-  if (bytes.isEmpty) return null;
+      : encoding == 'utf8'
+          ? Uint8List.fromList(data.codeUnits)
+          : null;
 
-  return bytes;
+  return bytes?.isNotEmpty == true ? bytes : null;
 }
 
 /// Returns [List<T>] if [x] is provided or `null` otherwise.

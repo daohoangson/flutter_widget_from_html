@@ -60,7 +60,9 @@ class TagLi {
               kCssListStyleTypeDecimal
           : p == 0
               ? kCssListStyleTypeDisc
-              : p == 1 ? kCssListStyleTypeCircle : kCssListStyleTypeSquare,
+              : p == 1
+                  ? kCssListStyleTypeCircle
+                  : kCssListStyleTypeSquare,
     };
 
     if (p == 0) styles[kCssMargin] = '1em 0';
