@@ -511,7 +511,9 @@ class Explainer {
 
     final maxLines = widget is RichText
         ? widget.maxLines
-        : widget is Text ? widget.maxLines : null;
+        : widget is Text
+            ? widget.maxLines
+            : null;
     if (maxLines != null) attr.add('maxLines=$maxLines');
 
     attr.add(_crossAxisAlignment(
@@ -531,7 +533,9 @@ class Explainer {
 
     attr.add(_textOverflow(widget is RichText
         ? widget.overflow
-        : widget is Text ? widget.overflow : null));
+        : widget is Text
+            ? widget.overflow
+            : null));
 
     if (widget is Align && widget is! Center) {
       attr.add(_alignment(widget.alignment));
@@ -569,7 +573,9 @@ class Explainer {
     // `RichText` is an exception, it is a `MultiChildRenderObjectWidget` so it has to be processed first
     attr.add(widget is RichText
         ? _inlineSpan(widget.text)
-        : widget is Container ? _widgetChild(widget.child) : null);
+        : widget is Container
+            ? _widgetChild(widget.child)
+            : null);
     // G-M
     attr.add(widget is GestureDetector
         ? _widgetChild(widget.child)

@@ -148,7 +148,9 @@ Uint8List bytesFromDataUri(String dataUri) {
 
   final bytes = encoding == 'base64'
       ? base64.decode(data)
-      : encoding == 'utf8' ? Uint8List.fromList(data.codeUnits) : null;
+      : encoding == 'utf8'
+          ? Uint8List.fromList(data.codeUnits)
+          : null;
   if (bytes.isEmpty) return null;
 
   return bytes;
