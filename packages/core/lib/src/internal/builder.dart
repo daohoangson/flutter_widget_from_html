@@ -240,8 +240,9 @@ class BuildTree extends core_data.BuildTree {
     }
 
     if (meta.isBlockElement) {
-      // TODO: use `100%` when percentage is supported
-      meta[kCssWidth] = '999999999px';
+      // blocks should be rendered in full width
+      meta._styles ??= [];
+      meta._styles.insertAll(0, [kCssWidth, '100%']);
     }
 
     _customStylesBuilder(meta);

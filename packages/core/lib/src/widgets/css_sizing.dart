@@ -4,28 +4,24 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 /// A CSS sizing widget.
-///
-/// [child] will be layouted to match its preferred ratio if [size] is provided.
-/// Additional constraints will be applied loosely in order to
-/// stay as close as possible to the preferred width / height.
 class CssSizing extends SingleChildRenderObjectWidget {
   /// The maximum height.
-  final double maxHeight;
+  final CssSizingValue maxHeight;
 
   /// The maximum width.
-  final double maxWidth;
+  final CssSizingValue maxWidth;
 
   /// The minimum height.
-  final double minHeight;
+  final CssSizingValue minHeight;
 
   // The minimum width;
-  final double minWidth;
+  final CssSizingValue minWidth;
 
   /// The preferred height.
-  final double preferredHeight;
+  final CssSizingValue preferredHeight;
 
   /// The preferred width.
-  final double preferredWidth;
+  final CssSizingValue preferredWidth;
 
   /// Creates a CSS sizing.
   CssSizing({
@@ -65,13 +61,12 @@ class CssSizing extends SingleChildRenderObjectWidget {
 class _RenderCssSizing extends RenderProxyBox {
   _RenderCssSizing({
     RenderBox child,
-    Key key,
-    double maxHeight,
-    double maxWidth,
-    double minHeight,
-    double minWidth,
-    double preferredHeight,
-    double preferredWidth,
+    CssSizingValue maxHeight,
+    CssSizingValue maxWidth,
+    CssSizingValue minHeight,
+    CssSizingValue minWidth,
+    CssSizingValue preferredHeight,
+    CssSizingValue preferredWidth,
   })  : _maxHeight = maxHeight,
         _maxWidth = maxWidth,
         _minHeight = minHeight,
@@ -80,15 +75,15 @@ class _RenderCssSizing extends RenderProxyBox {
         _preferredWidth = preferredWidth,
         super(child);
 
-  double _maxHeight;
-  double _maxWidth;
-  double _minHeight;
-  double _minWidth;
+  CssSizingValue _maxHeight;
+  CssSizingValue _maxWidth;
+  CssSizingValue _minHeight;
+  CssSizingValue _minWidth;
   void setConstraints({
-    double maxHeight,
-    double maxWidth,
-    double minHeight,
-    double minWidth,
+    CssSizingValue maxHeight,
+    CssSizingValue maxWidth,
+    CssSizingValue minHeight,
+    CssSizingValue minWidth,
   }) {
     if (maxHeight == _maxHeight &&
         maxWidth == _maxWidth &&
@@ -103,9 +98,9 @@ class _RenderCssSizing extends RenderProxyBox {
     markNeedsLayout();
   }
 
-  double _preferredHeight;
-  double _preferredWidth;
-  void setPreferredSize(double width, double height) {
+  CssSizingValue _preferredHeight;
+  CssSizingValue _preferredWidth;
+  void setPreferredSize(CssSizingValue width, CssSizingValue height) {
     if (height == _preferredHeight && width == _preferredWidth) return;
     _preferredHeight = height;
     _preferredWidth = width;
@@ -115,10 +110,14 @@ class _RenderCssSizing extends RenderProxyBox {
   @override
   void performLayout() {
     final c = constraints;
-    var maxHeight = min(c.maxHeight, _maxHeight ?? c.maxHeight);
-    var maxWidth = min(c.maxWidth, _maxWidth ?? c.maxWidth);
-    var minHeight = min(maxHeight, _minHeight ?? c.minHeight);
-    var minWidth = min(maxWidth, _minWidth ?? c.minWidth);
+    var maxHeight =
+        min(c.maxHeight, _maxHeight?.clamp(0.0, c.maxHeight) ?? c.maxHeight);
+    var maxWidth =
+        min(c.maxWidth, _maxWidth?.clamp(0.0, c.maxWidth) ?? c.maxWidth);
+    var minHeight =
+        min(maxHeight, _minHeight?.clamp(0.0, c.maxHeight) ?? c.minHeight);
+    var minWidth =
+        min(maxWidth, _minWidth?.clamp(0.0, c.maxWidth) ?? c.minWidth);
 
     if (_preferredHeight != null) {
       maxHeight = minHeight = _preferredHeight.clamp(minHeight, maxHeight);
@@ -126,7 +125,7 @@ class _RenderCssSizing extends RenderProxyBox {
     if (_preferredWidth != null) {
       // special handling for tight contraints: ignore min in `clamp()`
       // (usually happen if parent is a block)
-      final effectiveMinWidth = minWidth == maxWidth ? 0 : minWidth;
+      final effectiveMinWidth = minWidth == maxWidth ? 0.0 : minWidth;
       maxWidth = minWidth = _preferredWidth.clamp(effectiveMinWidth, maxWidth);
     }
 
@@ -140,4 +139,46 @@ class _RenderCssSizing extends RenderProxyBox {
     child.layout(cc, parentUsesSize: true);
     size = constraints.constrain(child.size);
   }
+}
+
+/// A [CssSizing] value.
+abstract class CssSizingValue {
+  CssSizingValue._();
+  double clamp(double min, double max);
+
+  /// Creates a percentage value.
+  factory CssSizingValue.percentage(double _) = _CssSizingPercentage;
+
+  /// Creates a fixed value.
+  factory CssSizingValue.value(double _) = _CssSizingValue;
+}
+
+class _CssSizingPercentage extends CssSizingValue {
+  final double percentage;
+  _CssSizingPercentage(this.percentage) : super._();
+  @override
+  double clamp(double min, double max) => (max * percentage).clamp(min, max);
+
+  @override
+  int get hashCode => percentage.hashCode;
+  @override
+  bool operator ==(Object other) =>
+      other is _CssSizingPercentage ? other.percentage == percentage : false;
+  @override
+  String toString() => '$percentage%';
+}
+
+class _CssSizingValue extends CssSizingValue {
+  final double value;
+  _CssSizingValue(this.value) : super._();
+  @override
+  double clamp(double min, double max) => value.clamp(min, max);
+
+  @override
+  int get hashCode => value.hashCode;
+  @override
+  bool operator ==(Object other) =>
+      other is _CssSizingValue ? other.value == value : false;
+  @override
+  String toString() => '${value}px';
 }

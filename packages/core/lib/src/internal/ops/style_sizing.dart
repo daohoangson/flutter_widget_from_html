@@ -91,13 +91,23 @@ class StyleSizing {
 
     return CssSizing(
       child: child,
-      maxHeight: input.maxHeight?.getValue(tsh),
-      maxWidth: input.maxWidth?.getValue(tsh),
-      minHeight: input.minHeight?.getValue(tsh),
-      minWidth: input.minWidth?.getValue(tsh),
-      preferredHeight: input.height?.getValue(tsh),
-      preferredWidth: input.width?.getValue(tsh),
+      maxHeight: _getValue(input.maxHeight, tsh),
+      maxWidth: _getValue(input.maxWidth, tsh),
+      minHeight: _getValue(input.minHeight, tsh),
+      minWidth: _getValue(input.minWidth, tsh),
+      preferredHeight: _getValue(input.height, tsh),
+      preferredWidth: _getValue(input.width, tsh),
     );
+  }
+
+  static CssSizingValue _getValue(CssLength length, TextStyleHtml tsh) {
+    if (length == null) return null;
+
+    final value = length.getValue(tsh);
+    if (value != null) return CssSizingValue.value(value);
+
+    if (length.unit != CssLengthUnit.percentage) return null;
+    return CssSizingValue.percentage(length.number);
   }
 }
 
