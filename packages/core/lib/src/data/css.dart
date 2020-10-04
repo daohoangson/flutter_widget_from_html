@@ -41,6 +41,8 @@ class CssLength {
   double getValue(TextStyleHtml tsh, {double baseValue, double scaleFactor}) {
     double value;
     switch (unit) {
+      case CssLengthUnit.auto:
+        return null;
       case CssLengthUnit.em:
         baseValue ??= tsh.style.fontSize;
         value = baseValue * number;
