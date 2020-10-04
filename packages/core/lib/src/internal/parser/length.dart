@@ -16,7 +16,14 @@ final _cssLengthValue = RegExp(r'^([\d\.]+)(em|%|pt|px)$');
 
 CssLength tryParseCssLength(String value) {
   if (value == null) return null;
-  if (value == '0') return CssLength(0);
+
+  value = value.toLowerCase();
+  switch (value) {
+    case '0':
+      return CssLength(0);
+    case 'auto':
+      return CssLength(1, CssLengthUnit.auto);
+  }
 
   final match = _cssLengthValue.firstMatch(value);
   if (match == null) return null;

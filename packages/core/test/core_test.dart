@@ -5,6 +5,8 @@ import 'package:network_image_mock/network_image_mock.dart';
 import '_.dart';
 
 void main() {
+  final imgSizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
+
   testWidgets('renders empty string', (WidgetTester tester) async {
     final html = '';
     final explained = await explain(tester, html);
@@ -133,7 +135,7 @@ void main() {
           explained,
           equals('[RichText:(:'
               '1\n'
-              '[CssSizing:height≥0.0,width≥0.0,child='
+              '[CssSizing:$imgSizingConstraints,child='
               '[Image:image=NetworkImage("$src", scale: 1.0)]'
               '])]'));
     });
@@ -308,7 +310,7 @@ void main() {
             explained,
             equals('[SizedBox:0.0x10.0],'
                 '[Padding:(0,40,0,40),child=[CssBlock:child=[Column:children='
-                '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)]],'
+                '[CssSizing:$imgSizingConstraints,child=[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)]],'
                 '[CssBlock:child=[RichText:(:(+i:fig. 1)(: Foo))]]'
                 ']]],'
                 '[SizedBox:0.0x10.0]'));
@@ -940,7 +942,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           expect(
               explained,
               equals('[RichText:(:Foo '
-                  '[CssSizing:height≥0.0,width≥0.0,child='
+                  '[CssSizing:$imgSizingConstraints,child='
                   '[Image:image=NetworkImage("$src", scale: 1.0)]'
                   '])]'));
         }),
@@ -955,7 +957,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
               explained,
               equals('[Column:children='
                   '[RichText:(:Foo)],'
-                  '[CssSizing:height≥0.0,width≥0.0,width=100.0%,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
+                  '[CssSizing:$imgSizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
                   ']'));
         }),
       );
@@ -968,7 +970,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           expect(
               explained,
               equals(
-                  '[CssSizing:height≥0.0,height≤1.0,width≥0.0,width≤1.0,child='
+                  '[CssSizing:height≥0.0,height≤1.0,height=auto,width≥0.0,width≤1.0,width=auto,child='
                   '[AspectRatio:aspectRatio=1.0,child='
                   '[Image:image=NetworkImage("$src", scale: 1.0)]'
                   ']]'));
@@ -984,7 +986,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           expect(
               explained,
               equals(
-                  '[CssSizing:height≥0.0,height≤1.0,width≥0.0,width≤1.0,width=100.0%,child='
+                  '[CssSizing:height≥0.0,height≤1.0,height=auto,width≥0.0,width≤1.0,width=auto,child='
                   '[AspectRatio:aspectRatio=1.0,child='
                   '[Image:image=NetworkImage("$src", scale: 1.0)]'
                   ']]'));

@@ -6,6 +6,8 @@ import 'package:network_image_mock/network_image_mock.dart';
 import '_.dart' as helper;
 
 void main() {
+  final sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
+
   group('image.png', () {
     final src = 'http://domain.com/image.png';
     final explain = (WidgetTester tester, String html) =>
@@ -16,7 +18,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[CssSizing:height≥0.0,width≥0.0,child='
+        equals('[CssSizing:$sizingConstraints,child='
             '[Image:image=CachedNetworkImageProvider("$src", scale: 1.0)]'
             ']'),
       );
@@ -27,7 +29,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[CssSizing:height≥0.0,width≥0.0,child='
+        equals('[CssSizing:$sizingConstraints,child='
             '[Image:'
             'image=CachedNetworkImageProvider("$src", scale: 1.0),'
             'semanticLabel=Foo'
@@ -40,7 +42,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:height≥0.0,width≥0.0,child='
+          equals('[CssSizing:$sizingConstraints,child='
               '[Tooltip:'
               'message=Bar,'
               'child=[Image:'
@@ -54,7 +56,7 @@ void main() {
       final e = await explain(tester, html);
       expect(
           e,
-          equals('[CssSizing:height≥0.0,width≥0.0,child='
+          equals('[CssSizing:$sizingConstraints,child='
               '[Tooltip:'
               'message=Bar,'
               'child=[Image:'
@@ -71,7 +73,7 @@ void main() {
       final explained = await helper.explain(tester, html);
       expect(
         explained,
-        equals('[CssSizing:height≥0.0,width≥0.0,child='
+        equals('[CssSizing:$sizingConstraints,child='
             '[SvgPicture:'
             'pictureProvider=ExactAssetPicture(name: "$assetName", bundle: null, colorFilter: null)'
             ']]'),
@@ -90,7 +92,7 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals('[CssSizing:height≥0.0,width≥0.0,child='
+            equals('[CssSizing:$sizingConstraints,child='
                 '[SvgPicture:pictureProvider=MemoryPicture(bytes)]'
                 ']'));
       });
@@ -101,7 +103,7 @@ void main() {
         final explained = await explain(tester, html);
         expect(
             explained,
-            equals('[CssSizing:height≥0.0,width≥0.0,child='
+            equals('[CssSizing:$sizingConstraints,child='
                 '[SvgPicture:pictureProvider=MemoryPicture(bytes)]'
                 ']'));
       });
@@ -113,7 +115,7 @@ void main() {
       final explained = await mockNetworkImagesFor(() => helper.explain(t, h));
       expect(
         explained,
-        equals('[CssSizing:height≥0.0,width≥0.0,child='
+        equals('[CssSizing:$sizingConstraints,child='
             '[SvgPicture:'
             'pictureProvider=NetworkPicture("$src", headers: null, colorFilter: null)'
             ']]'),

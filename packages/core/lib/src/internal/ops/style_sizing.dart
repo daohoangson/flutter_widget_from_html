@@ -76,7 +76,7 @@ class StyleSizing {
       }
     }
 
-    if (isBlock == true) width ??= _StyleSizingInput.blockWidth;
+    if (isBlock == true) width ??= _StyleSizingInput.kBlockWidth;
 
     if (height == null &&
         maxHeight == null &&
@@ -104,7 +104,7 @@ class StyleSizing {
         input.minHeight == null &&
         input.minWidth == null &&
         input.height == null &&
-        input.width == _StyleSizingInput.blockWidth) {
+        input.width == _StyleSizingInput.kBlockWidth) {
       if (child is CssBlock) return child;
       return CssBlock(child: child);
     }
@@ -126,21 +126,27 @@ class StyleSizing {
     final value = length.getValue(tsh);
     if (value != null) return CssSizingValue.value(value);
 
-    if (length.unit != CssLengthUnit.percentage) return null;
-    return CssSizingValue.percentage(length.number);
+    switch(length.unit) {
+      case CssLengthUnit.auto:
+        return CssSizingValue.auto();
+      case CssLengthUnit.percentage:
+        return CssSizingValue.percentage(length.number);
+      default:
+        return null;
+    }
   }
 }
 
 @immutable
 class _StyleSizingInput {
+  static const CssLength kBlockWidth = CssLength(100, CssLengthUnit.percentage);
+
   final CssLength height;
   final CssLength maxHeight;
   final CssLength maxWidth;
   final CssLength minHeight;
   final CssLength minWidth;
   final CssLength width;
-
-  static const CssLength blockWidth = CssLength(100, CssLengthUnit.percentage);
 
   _StyleSizingInput({
     this.height,

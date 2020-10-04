@@ -176,12 +176,9 @@ class TagTable {
   }
 }
 
-class _TableCaption extends SingleChildRenderObjectWidget {
+class _TableCaption extends CssBlock {
   _TableCaption({@required Widget child, Key key})
       : super(child: child, key: key);
-
-  @override
-  RenderObject createRenderObject(BuildContext context) => RenderProxyBox();
 }
 
 class _TableCell extends SingleChildRenderObjectWidget {

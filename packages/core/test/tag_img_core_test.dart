@@ -6,6 +6,8 @@ import 'package:network_image_mock/network_image_mock.dart';
 import '_.dart' as helper;
 
 void main() {
+  final sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
+
   group('image.png', () {
     final src = 'http://domain.com/image.png';
     final explain = (WidgetTester tester, String html) =>
@@ -16,7 +18,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:height≥0.0,width≥0.0,child='
+          equals('[CssSizing:$sizingConstraints,child='
               '[Image:image=NetworkImage("$src", scale: 1.0)]'
               ']'));
     });
@@ -27,9 +29,9 @@ void main() {
       expect(
         explained,
         equals('[RichText:(:'
-            '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
+            '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
             '(: )'
-            '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
+            '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
             ')]'),
       );
     });
@@ -52,7 +54,7 @@ void main() {
       expect(
           explained,
           equals(
-              '[CssSizing:height≥0.0,height≤600.0,width≥0.0,width≤800.0,child='
+              '[CssSizing:height≥0.0,height≤600.0,height=auto,width≥0.0,width≤800.0,width=auto,child='
               '[AspectRatio:aspectRatio=1.3,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
               ']'));
     });
@@ -64,7 +66,7 @@ void main() {
           explained,
           equals('[RichText:(:'
               'Before text. '
-              '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
+              '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
               '(: After text.)'
               ')]'));
     });
@@ -74,7 +76,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:height≥0.0,width≥0.0,width=100.0%,child='
+          equals('[CssSizing:$sizingConstraints,child='
               '[Image:image=NetworkImage("$src", scale: 1.0)]]'));
     });
 
@@ -95,7 +97,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:height≥0.0,width≥0.0,child='
+          equals('[CssSizing:$sizingConstraints,child='
               '[Image:image=AssetImage('
               'bundle: null, '
               'name: "$assetName"'
@@ -108,7 +110,7 @@ void main() {
       final explained = await explain(tester, html, package: package);
       expect(
           explained,
-          equals('[CssSizing:height≥0.0,width≥0.0,child='
+          equals('[CssSizing:$sizingConstraints,child='
               '[Image:image=AssetImage('
               'bundle: null, '
               'name: "packages/$package/$assetName"'
@@ -143,7 +145,7 @@ void main() {
           .replaceAll(RegExp(r'Uint8List#[0-9a-f]+,'), 'bytes,');
       expect(
           explained,
-          equals('[CssSizing:height≥0.0,width≥0.0,child='
+          equals('[CssSizing:$sizingConstraints,child='
               '[Image:image=MemoryImage(bytes, scale: 1.0)]'
               ']'));
     });
@@ -182,7 +184,7 @@ void main() {
           ));
       expect(
           explained,
-          equals('[CssSizing:height≥0.0,width≥0.0,child='
+          equals('[CssSizing:$sizingConstraints,child='
               '[Image:image=NetworkImage("$fullUrl", scale: 1.0)]'
               ']'));
     };
@@ -234,7 +236,7 @@ void main() {
         expect(
             explained,
             equals('[CssBlock:child=[RichText:align=center,'
-                '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)]]'
+                '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)]]'
                 ']]'));
       });
 
@@ -251,7 +253,7 @@ void main() {
                 ' └CssBlock()\n'
                 '  └RichText(textAlign: center, text: "￼")\n'
                 '   └WidgetPlaceholder<ImageMetadata>(ImageMetadata(sources: [ImageSource("$src")]))\n'
-                '    └CssSizing(minHeight: 0.0, minWidth: 0.0)\n'
+                '    └CssSizing(minHeight: 0.0, minWidth: 0.0, preferredHeight: auto, preferredWidth: auto)\n'
                 '     └Image(image: NetworkImage("$src", scale: 1.0), alignment: center, this.excludeFromSemantics: true)\n'
                 '      └RawImage(alignment: center)\n\n'));
       });

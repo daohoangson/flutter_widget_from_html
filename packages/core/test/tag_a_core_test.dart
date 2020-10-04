@@ -147,6 +147,7 @@ void main() {
   group('IMG', () {
     final explainImg = (WidgetTester tester, String html) =>
         mockNetworkImagesFor(() => explain(tester, html));
+    final sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
 
     testWidgets('renders IMG tag inside', (WidgetTester tester) async {
       final html = '<a href="$kHref"><img src="$kImgSrc" /></a>';
@@ -154,7 +155,7 @@ void main() {
       expect(
           explained,
           equals('[GestureDetector:child='
-              '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+              '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
               ']'));
     });
 
@@ -166,7 +167,7 @@ void main() {
           equals('[RichText:(:'
               '(#FF0000FF+u+onTap:Foo )'
               '[GestureDetector:child='
-              '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+              '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
               '])]'));
     });
 
@@ -177,7 +178,7 @@ void main() {
           explained,
           equals('[RichText:(:Foo '
               '[GestureDetector:child='
-              '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+              '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
               '])]'));
     });
 
@@ -188,7 +189,7 @@ void main() {
           explained,
           equals('[RichText:(:'
               '[GestureDetector:child='
-              '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+              '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
               ']'
               '(#FF0000FF+u+onTap: foo)'
               ')]'));
@@ -201,7 +202,7 @@ void main() {
           explained,
           equals('[RichText:(:'
               '[GestureDetector:child='
-              '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+              '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
               ']'
               '(: foo))]'));
     });

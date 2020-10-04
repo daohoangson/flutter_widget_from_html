@@ -138,6 +138,9 @@ class CssLengthBox {
 
 /// Length measurement units.
 enum CssLengthUnit {
+  /// Special value: auto.
+  auto,
+
   /// Relative unit: em.
   em,
 

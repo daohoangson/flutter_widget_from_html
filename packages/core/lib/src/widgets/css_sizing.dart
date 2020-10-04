@@ -5,6 +5,9 @@ import 'package:flutter/widgets.dart';
 
 /// A CSS block.
 class CssBlock extends SingleChildRenderObjectWidget {
+  /// The default constraint for block element.
+  static const kBlockWidth = _CssSizingPercentage(100);
+
   /// Creates a CSS block.
   CssBlock({@required Widget child, Key key})
       : assert(child != null),
@@ -12,7 +15,7 @@ class CssBlock extends SingleChildRenderObjectWidget {
 
   @override
   _RenderCssSizing createRenderObject(BuildContext _) =>
-      _RenderCssSizing(preferredWidth: const _CssSizingPercentage(100));
+      _RenderCssSizing(preferredWidth: kBlockWidth);
 }
 
 /// A CSS sizing widget.
@@ -149,13 +152,17 @@ class _RenderCssSizing extends RenderProxyBox {
         min(maxWidth, _minWidth?.clamp(0.0, c.maxWidth) ?? c.minWidth);
 
     if (_preferredHeight != null) {
-      maxHeight = minHeight = _preferredHeight.clamp(minHeight, maxHeight);
+      final preferredHeight = _preferredHeight.clamp(minHeight, maxHeight);
+      maxHeight = preferredHeight ?? maxHeight;
+      minHeight = preferredHeight ?? minHeight;
     }
     if (_preferredWidth != null) {
       // special handling for tight contraints: ignore min in `clamp()`
       // (usually happen if parent is a block)
       final effectiveMinWidth = minWidth == maxWidth ? 0.0 : minWidth;
-      maxWidth = minWidth = _preferredWidth.clamp(effectiveMinWidth, maxWidth);
+      final preferredWidth = _preferredWidth.clamp(effectiveMinWidth, maxWidth);
+      maxWidth = preferredWidth ?? maxWidth;
+      minWidth = preferredWidth ?? minWidth;
     }
 
     final cc = BoxConstraints(
@@ -175,11 +182,27 @@ abstract class CssSizingValue {
   const CssSizingValue._();
   double clamp(double min, double max);
 
+  /// Creates an auto value.
+  factory CssSizingValue.auto() = _CssSizingAuto;
+
   /// Creates a percentage value.
   factory CssSizingValue.percentage(double _) = _CssSizingPercentage;
 
   /// Creates a fixed value.
   factory CssSizingValue.value(double _) = _CssSizingValue;
+}
+
+class _CssSizingAuto extends CssSizingValue {
+  const _CssSizingAuto() : super._();
+  @override
+  double clamp(double _, double __) => null;
+
+  @override
+  int get hashCode => 0;
+  @override
+  bool operator ==(Object other) => other is _CssSizingAuto;
+  @override
+  String toString() => 'auto';
 }
 
 class _CssSizingPercentage extends CssSizingValue {

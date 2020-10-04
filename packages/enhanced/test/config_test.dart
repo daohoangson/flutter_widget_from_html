@@ -298,7 +298,7 @@ void main() {
       );
       expect(
           explained,
-          equals('[CssSizing:height≥0.0,width≥0.0,child='
+          equals('[CssSizing:height≥0.0,height=auto,width≥0.0,width=auto,child='
               '[Image:image=CachedNetworkImageProvider("http://base.com/path/image.png", scale: 1.0),'
               'semanticLabel=image dot png'
               ']]'));

@@ -17,8 +17,10 @@ class TagImg {
         defaultStyles: (element) {
           final attrs = element.attributes;
           final styles = {
+            kCssHeight: 'auto',
             kCssMinWidth: '0px',
             kCssMinHeight: '0px',
+            kCssWidth: 'auto',
           };
 
           if (attrs.containsKey(kAttributeImgHeight)) {
