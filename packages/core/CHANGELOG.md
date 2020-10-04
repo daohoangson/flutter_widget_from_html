@@ -1,3 +1,7 @@
+## 0.5.0+7
+
+- Fix incorrect alignment of list marker (#335)
+
 ## 0.5.0+6
 
 - Stop using singleton WidgetFactory by default
