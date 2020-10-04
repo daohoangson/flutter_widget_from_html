@@ -18,9 +18,8 @@ class TagA {
 
           return styles;
         },
-        isBlockElement: false,
         onTree: (meta, tree) {
-          if (meta.isBlockElement) return;
+          if (meta.willBuildSubtree) return;
 
           final onTap = _gestureTapCallback(meta);
           if (onTap == null) return;
@@ -41,6 +40,7 @@ class TagA {
           return listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
               (_, child) => wf.buildGestureDetector(meta, child, onTap)));
         },
+        onWidgetsIsOptional: true,
       );
 
   GestureTapCallback _gestureTapCallback(BuildMetadata meta) {

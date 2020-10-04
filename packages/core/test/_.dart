@@ -267,24 +267,13 @@ class Explainer {
   List<String> _cssSizing(CssSizing w) {
     final attr = <String>[];
 
-    if (w.height?.isFinite == true) {
-      attr.add('height=${w.height.toStringAsFixed(1)}');
-    }
-    if (w.maxHeight?.isFinite == true) {
-      attr.add('maxHeight=${w.maxHeight.toStringAsFixed(1)}');
-    }
-    if (w.maxWidth?.isFinite == true) {
-      attr.add('maxWidth=${w.maxWidth.toStringAsFixed(1)}');
-    }
-    if (w.minHeight?.isNegative == false) {
-      attr.add('minHeight=${w.minHeight.toStringAsFixed(1)}');
-    }
-    if (w.minWidth?.isNegative == false) {
-      attr.add('minWidth=${w.minWidth.toStringAsFixed(1)}');
-    }
-    if (w.width?.isFinite == true) {
-      attr.add('width=${w.width.toStringAsFixed(1)}');
-    }
+    if (w.minHeight != null) attr.add('height≥${w.minHeight}');
+    if (w.maxHeight != null) attr.add('height≤${w.maxHeight}');
+    if (w.preferredHeight != null) attr.add('height=${w.preferredHeight}');
+
+    if (w.minWidth != null) attr.add('width≥${w.minWidth}');
+    if (w.maxWidth != null) attr.add('width≤${w.maxWidth}');
+    if (w.preferredWidth != null) attr.add('width=${w.preferredWidth}');
 
     return attr;
   }
@@ -545,7 +534,9 @@ class Explainer {
       attr.add(_alignment(widget.alignment));
     }
 
-    if (widget is AspectRatio) attr.add('aspectRatio=${widget.aspectRatio}');
+    if (widget is AspectRatio) {
+      attr.add('aspectRatio=${widget.aspectRatio.toStringAsFixed(1)}');
+    }
 
     if (widget is ConstrainedBox) attr.add(_boxConstraints(widget.constraints));
 

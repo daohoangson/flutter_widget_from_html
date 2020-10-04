@@ -51,7 +51,7 @@ void main() {
       expect(
           explained,
           equals('[RichText:(:“'
-              '[Image:image=NetworkImage("$src", scale: 1.0)]'
+              '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
               '(:”))]'));
     }),
   );

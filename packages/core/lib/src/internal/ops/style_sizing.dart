@@ -8,14 +8,15 @@ const kCssMinWidth = 'min-width';
 const kCssWidth = 'width';
 
 class StyleSizing {
+  static const kPriority = 50000;
+
   final WidgetFactory wf;
 
   StyleSizing(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        isBlockElement: false,
         onTree: (meta, tree) {
-          if (meta.isBlockElement) return;
+          if (meta.willBuildSubtree) return;
 
           final input = _parse(meta);
           if (input == null) return;
@@ -33,20 +34,27 @@ class StyleSizing {
           widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb()));
         },
         onWidgets: (meta, widgets) {
+          if (!meta.willBuildSubtree) return widgets;
+
           final input = _parse(meta);
           if (input == null) return widgets;
           return listOrNull(wf
               .buildColumnPlaceholder(meta, widgets)
               ?.wrapWith((c, w) => _build(c, w, input, meta.tsb())));
         },
-        priority: 50000,
+        onWidgetsIsOptional: true,
+        priority: kPriority,
       );
 
   _StyleSizingInput _parse(BuildMetadata meta) {
     CssLength height, maxHeight, maxWidth, minHeight, minWidth, width;
+    bool isBlock;
 
     for (final style in meta.styles) {
       switch (style.key) {
+        case kCssDisplay:
+          isBlock = style.value == kCssDisplayBlock;
+          break;
         case kCssHeight:
           height = tryParseCssLength(style.value);
           break;
@@ -68,6 +76,8 @@ class StyleSizing {
       }
     }
 
+    if (isBlock == true) width ??= _StyleSizingInput.blockWidth;
+
     if (height == null &&
         maxHeight == null &&
         maxWidth == null &&
@@ -88,6 +98,16 @@ class StyleSizing {
   static Widget _build(BuildContext context, Widget child,
       _StyleSizingInput input, TextStyleBuilder tsb) {
     final tsh = tsb.build(context);
+
+    if (input.maxHeight == null &&
+        input.maxWidth == null &&
+        input.minHeight == null &&
+        input.minWidth == null &&
+        input.height == null &&
+        input.width == _StyleSizingInput.blockWidth) {
+      if (child is CssBlock) return child;
+      return CssBlock(child: child);
+    }
 
     return CssSizing(
       child: child,
@@ -119,6 +139,8 @@ class _StyleSizingInput {
   final CssLength minHeight;
   final CssLength minWidth;
   final CssLength width;
+
+  static const CssLength blockWidth = CssLength(100, CssLengthUnit.percentage);
 
   _StyleSizingInput({
     this.height,

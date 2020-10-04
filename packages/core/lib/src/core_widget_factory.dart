@@ -352,7 +352,7 @@ class WidgetFactory {
 
       case 'address':
         meta
-          ..isBlockElement = true
+          ..[kCssDisplay] = kCssDisplayBlock
           ..tsb(TextStyleOps.fontStyle, FontStyle.italic);
         break;
 
@@ -365,13 +365,13 @@ class WidgetFactory {
       case 'main':
       case 'nav':
       case 'section':
-        meta.isBlockElement = true;
+        meta[kCssDisplay] = kCssDisplayBlock;
         break;
 
       case 'blockquote':
       case 'figure':
         meta
-          ..isBlockElement = true
+          ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '1em 40px';
         break;
 
@@ -391,7 +391,7 @@ class WidgetFactory {
 
       case kTagCenter:
         meta
-          ..isBlockElement = true
+          ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssTextAlign] = kCssTextAlignWebkitCenter;
         break;
 
@@ -419,20 +419,22 @@ class WidgetFactory {
               buildColumnPlaceholder(meta, widgets)
                   ?.wrapWith((_, w) => buildHorizontalScrollView(meta, w))),
         );
-        meta.register(_tagPre);
+        meta
+          ..[kCssDisplay] = kCssDisplayBlock
+          ..register(_tagPre);
         break;
 
       case 'dd':
         meta
-          ..isBlockElement = true
+          ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '0 0 1em 40px';
         break;
       case 'dl':
-        meta.isBlockElement = true;
+        meta[kCssDisplay] = kCssDisplayBlock;
         break;
       case 'dt':
         meta
-          ..isBlockElement = true
+          ..[kCssDisplay] = kCssDisplayBlock
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
 
@@ -461,46 +463,48 @@ class WidgetFactory {
           defaultStyles: (_) => const {'margin-bottom': '1em'},
           onWidgets: (meta, _) => [buildDivider(meta)],
         );
-        meta.register(_tagHr);
+        meta
+          ..[kCssDisplay] = kCssDisplayBlock
+          ..register(_tagHr);
         break;
 
       case 'h1':
         meta
-          ..isBlockElement = true
+          ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '0.67em 0'
           ..tsb(_tsbFontSize, '2em')
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h2':
         meta
-          ..isBlockElement = true
+          ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '0.83em 0'
           ..tsb(_tsbFontSize, '1.5em')
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h3':
         meta
-          ..isBlockElement = true
+          ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '1em 0'
           ..tsb(_tsbFontSize, '1.17em')
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h4':
         meta
-          ..isBlockElement = true
+          ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '1.33em 0'
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h5':
         meta
-          ..isBlockElement = true
+          ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '1.67em 0'
           ..tsb(_tsbFontSize, '0.83em')
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h6':
         meta
-          ..isBlockElement = true
+          ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '2.33em 0'
           ..tsb(_tsbFontSize, '0.67em')
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
@@ -518,7 +522,9 @@ class WidgetFactory {
 
       case kTagOrderedList:
       case kTagUnorderedList:
-        meta.register(TagLi(this, meta).op);
+        meta
+          ..[kCssDisplay] = kCssDisplayBlock
+          ..register(TagLi(this, meta).op);
         break;
 
       case 'mark':
@@ -529,7 +535,7 @@ class WidgetFactory {
 
       case 'p':
         meta
-          ..isBlockElement = true
+          ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '1em 0';
         break;
 
@@ -633,32 +639,6 @@ class WidgetFactory {
         meta.tsb(TextStyleOps.textDirection, value);
         break;
 
-      case kCssDisplay:
-        switch (value) {
-          case kCssDisplayBlock:
-            meta.isBlockElement = true;
-            break;
-          case kCssDisplayInline:
-          case kCssDisplayInlineBlock:
-            meta.isBlockElement = false;
-            break;
-          case kCssDisplayNone:
-            _styleDisplayNone ??= BuildOp(
-              onTree: (_, tree) {
-                for (final bit in tree.bits.toList(growable: false)) {
-                  bit.detach();
-                }
-              },
-              priority: 0,
-            );
-            meta.register(_styleDisplayNone);
-            break;
-          case kCssDisplayTable:
-            meta.register(TagTable(this, meta).op);
-            break;
-        }
-        break;
-
       case kCssFontFamily:
         final list = TextStyleOps.fontFamilyTryParse(value);
         if (list != null) meta.tsb(TextStyleOps.fontFamily, list);
@@ -733,6 +713,30 @@ class WidgetFactory {
     if (key.startsWith(kCssPadding)) {
       _stylePadding ??= StylePadding(this).buildOp;
       meta.register(_stylePadding);
+    }
+  }
+
+  /// Parses display inline style.
+  void parseStyleDisplay(BuildMetadata meta, String value) {
+    switch (value) {
+      case kCssDisplayBlock:
+        _styleSizing ??= StyleSizing(this).buildOp;
+        meta.register(_styleSizing);
+        break;
+      case kCssDisplayNone:
+        _styleDisplayNone ??= BuildOp(
+          onTree: (_, tree) {
+            for (final bit in tree.bits.toList(growable: false)) {
+              bit.detach();
+            }
+          },
+          priority: 0,
+        );
+        meta.register(_styleDisplayNone);
+        break;
+      case kCssDisplayTable:
+        meta.register(TagTable(this, meta).op);
+        break;
     }
   }
 

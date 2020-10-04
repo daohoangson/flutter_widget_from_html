@@ -3,6 +3,18 @@ import 'dart:math';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+/// A CSS block.
+class CssBlock extends SingleChildRenderObjectWidget {
+  /// Creates a CSS block.
+  CssBlock({@required Widget child, Key key})
+      : assert(child != null),
+        super(child: child, key: key);
+
+  @override
+  _RenderCssSizing createRenderObject(BuildContext _) =>
+      _RenderCssSizing(preferredWidth: const _CssSizingPercentage(100));
+}
+
 /// A CSS sizing widget.
 class CssSizing extends SingleChildRenderObjectWidget {
   /// The maximum height.
@@ -45,6 +57,23 @@ class CssSizing extends SingleChildRenderObjectWidget {
         preferredHeight: preferredHeight,
         preferredWidth: preferredWidth,
       );
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    _debugFillProperty(properties, 'maxHeight', maxHeight);
+    _debugFillProperty(properties, 'maxWidth', maxWidth);
+    _debugFillProperty(properties, 'minHeight', minHeight);
+    _debugFillProperty(properties, 'minWidth', minWidth);
+    _debugFillProperty(properties, 'preferredHeight', preferredHeight);
+    _debugFillProperty(properties, 'preferredWidth', preferredWidth);
+  }
+
+  void _debugFillProperty(DiagnosticPropertiesBuilder properties, String name,
+      CssSizingValue value) {
+    if (value == null) return;
+    properties.add(DiagnosticsProperty<CssSizingValue>(name, value));
+  }
 
   @override
   void updateRenderObject(BuildContext _, _RenderCssSizing renderObject) {
@@ -143,7 +172,7 @@ class _RenderCssSizing extends RenderProxyBox {
 
 /// A [CssSizing] value.
 abstract class CssSizingValue {
-  CssSizingValue._();
+  const CssSizingValue._();
   double clamp(double min, double max);
 
   /// Creates a percentage value.
@@ -155,7 +184,7 @@ abstract class CssSizingValue {
 
 class _CssSizingPercentage extends CssSizingValue {
   final double percentage;
-  _CssSizingPercentage(this.percentage) : super._();
+  const _CssSizingPercentage(this.percentage) : super._();
   @override
   double clamp(double min, double max) => (max * percentage).clamp(min, max);
 
@@ -165,12 +194,12 @@ class _CssSizingPercentage extends CssSizingValue {
   bool operator ==(Object other) =>
       other is _CssSizingPercentage ? other.percentage == percentage : false;
   @override
-  String toString() => '$percentage%';
+  String toString() => '${percentage.toStringAsFixed(1)}%';
 }
 
 class _CssSizingValue extends CssSizingValue {
   final double value;
-  _CssSizingValue(this.value) : super._();
+  const _CssSizingValue(this.value) : super._();
   @override
   double clamp(double min, double max) => value.clamp(min, max);
 
@@ -180,5 +209,5 @@ class _CssSizingValue extends CssSizingValue {
   bool operator ==(Object other) =>
       other is _CssSizingValue ? other.value == value : false;
   @override
-  String toString() => '${value}px';
+  String toString() => value.toStringAsFixed(1);
 }

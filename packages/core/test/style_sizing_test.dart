@@ -10,10 +10,8 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:height=20.0,child='
-              '[CssBlock:child='
-              '[RichText:(:Foo)]'
-              ']]'));
+          equals('[CssSizing:height=20.0,width=100.0%,child='
+              '[RichText:(:Foo)]]'));
     });
 
     testWidgets('renders pt', (WidgetTester tester) async {
@@ -21,10 +19,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:height=133.3,child='
-              '[CssBlock:child='
+          equals('[CssSizing:height=133.3,width=100.0%,child='
               '[RichText:(:Foo)]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
@@ -32,10 +29,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:height=100.0,child='
-              '[CssBlock:child='
+          equals('[CssSizing:height=100.0,width=100.0%,child='
               '[RichText:(:Foo)]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
@@ -51,10 +47,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:maxHeight=20.0,child='
-              '[CssBlock:child='
+          equals('[CssSizing:height≤20.0,width=100.0%,child='
               '[RichText:(:Foo)]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders pt', (WidgetTester tester) async {
@@ -62,10 +57,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:maxHeight=133.3,child='
-              '[CssBlock:child='
+          equals('[CssSizing:height≤133.3,width=100.0%,child='
               '[RichText:(:Foo)]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
@@ -73,10 +67,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:maxHeight=100.0,child='
-              '[CssBlock:child='
+          equals('[CssSizing:height≤100.0,width=100.0%,child='
               '[RichText:(:Foo)]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
@@ -92,10 +85,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:maxWidth=20.0,child='
-              '[CssBlock:child='
+          equals('[CssSizing:width≤20.0,width=100.0%,child='
               '[RichText:(:Foo)]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders pt', (WidgetTester tester) async {
@@ -103,10 +95,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:maxWidth=133.3,child='
-              '[CssBlock:child='
+          equals('[CssSizing:width≤133.3,width=100.0%,child='
               '[RichText:(:Foo)]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
@@ -114,10 +105,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:maxWidth=100.0,child='
-              '[CssBlock:child='
+          equals('[CssSizing:width≤100.0,width=100.0%,child='
               '[RichText:(:Foo)]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
@@ -133,10 +123,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:minHeight=20.0,child='
-              '[CssBlock:child='
+          equals('[CssSizing:height≥20.0,width=100.0%,child='
               '[RichText:(:Foo)]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders pt', (WidgetTester tester) async {
@@ -144,10 +133,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:minHeight=133.3,child='
-              '[CssBlock:child='
+          equals('[CssSizing:height≥133.3,width=100.0%,child='
               '[RichText:(:Foo)]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
@@ -155,10 +143,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:minHeight=100.0,child='
-              '[CssBlock:child='
+          equals('[CssSizing:height≥100.0,width=100.0%,child='
               '[RichText:(:Foo)]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
@@ -174,10 +161,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:minWidth=20.0,child='
-              '[CssBlock:child='
+          equals('[CssSizing:width≥20.0,width=100.0%,child='
               '[RichText:(:Foo)]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders pt', (WidgetTester tester) async {
@@ -185,10 +171,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:minWidth=133.3,child='
-              '[CssBlock:child='
+          equals('[CssSizing:width≥133.3,width=100.0%,child='
               '[RichText:(:Foo)]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
@@ -196,10 +181,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:minWidth=100.0,child='
-              '[CssBlock:child='
+          equals('[CssSizing:width≥100.0,width=100.0%,child='
               '[RichText:(:Foo)]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
@@ -216,9 +200,8 @@ void main() {
       expect(
           explained,
           equals('[CssSizing:width=20.0,child='
-              '[CssBlock:child='
               '[RichText:(:Foo)]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders pt', (WidgetTester tester) async {
@@ -227,9 +210,8 @@ void main() {
       expect(
           explained,
           equals('[CssSizing:width=133.3,child='
-              '[CssBlock:child='
               '[RichText:(:Foo)]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
@@ -238,9 +220,8 @@ void main() {
       expect(
           explained,
           equals('[CssSizing:width=100.0,child='
-              '[CssBlock:child='
               '[RichText:(:Foo)]'
-              ']]'));
+              ']'));
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
@@ -263,16 +244,15 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[DecoratedBox:bg=#FFFF0000,child=[CssBlock:child='
+        equals('[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child='
             '[Padding:(20,20,20,20),child='
-            '[DecoratedBox:bg=#FF008000,child=[CssBlock:child='
+            '[CssBlock:child=[DecoratedBox:bg=#FF008000,child='
             '[Padding:(0,15,0,15),child='
             '[CssSizing:height=100.0,width=100.0,child='
             '[DecoratedBox:bg=#FF0000FF,child='
-            '[CssBlock:child='
             '[Padding:(5,5,5,5),child='
             '[RichText:(#FFFFFFFF:Foo)]'
-            ']]]]]]]]]]'));
+            ']]]]]]]]]'));
   });
 
   group('block', () {
@@ -304,12 +284,10 @@ void main() {
       final src = 'https://domain.com/image.jpg';
       final html = 'Foo <img src="$src" style="width: 10px; height: 10px;" />';
       final explained = await mockNetworkImagesFor(() => explain(tester, html));
-
-      final expectedImage = '[Image:image=NetworkImage("$src", scale: 1.0)]';
       expect(
           explained,
           equals('[RichText:(:Foo '
-              '[CssSizing:height=10.0,width=10.0,child=$expectedImage]'
+              '[CssSizing:height≥0.0,height=10.0,width≥0.0,width=10.0,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
               ')]'));
     });
   });

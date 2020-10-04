@@ -13,8 +13,12 @@ void main() {
 
     testWidgets('renders src', (WidgetTester tester) async {
       final html = '<img src="$src" />';
-      final e = await explain(tester, html);
-      expect(e, equals('[Image:image=NetworkImage("$src", scale: 1.0)]'));
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:height≥0.0,width≥0.0,child='
+              '[Image:image=NetworkImage("$src", scale: 1.0)]'
+              ']'));
     });
 
     testWidgets('renders in one RichText', (WidgetTester tester) async {
@@ -23,9 +27,9 @@ void main() {
       expect(
         explained,
         equals('[RichText:(:'
-            '[Image:image=NetworkImage("$src", scale: 1.0)]'
+            '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
             '(: )'
-            '[Image:image=NetworkImage("$src", scale: 1.0)]'
+            '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
             ')]'),
       );
     });
@@ -47,8 +51,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssSizing:height=600.0,width=800.0,child='
-              '[Image:image=NetworkImage("$src", scale: 1.0)]'
+          equals(
+              '[CssSizing:height≥0.0,height≤600.0,width≥0.0,width≤800.0,child='
+              '[AspectRatio:aspectRatio=1.3,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
               ']'));
     });
 
@@ -59,7 +64,7 @@ void main() {
           explained,
           equals('[RichText:(:'
               'Before text. '
-              '[Image:image=NetworkImage("$src", scale: 1.0)]'
+              '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
               '(: After text.)'
               ')]'));
     });
@@ -69,7 +74,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
+          equals('[CssSizing:height≥0.0,width≥0.0,width=100.0%,child='
               '[Image:image=NetworkImage("$src", scale: 1.0)]]'));
     });
 
@@ -90,10 +95,11 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Image:image=AssetImage('
+          equals('[CssSizing:height≥0.0,width≥0.0,child='
+              '[Image:image=AssetImage('
               'bundle: null, '
               'name: "$assetName"'
-              ')]'));
+              ')]]'));
     });
 
     testWidgets('renders asset (specified package)', (tester) async {
@@ -102,10 +108,11 @@ void main() {
       final explained = await explain(tester, html, package: package);
       expect(
           explained,
-          equals('[Image:image=AssetImage('
+          equals('[CssSizing:height≥0.0,width≥0.0,child='
+              '[Image:image=AssetImage('
               'bundle: null, '
               'name: "packages/$package/$assetName"'
-              ')]'));
+              ')]]'));
     });
 
     testWidgets('renders bad asset', (WidgetTester tester) async {
@@ -132,9 +139,13 @@ void main() {
 
     testWidgets('renders data uri', (WidgetTester tester) async {
       final html = '<img src="${helper.kDataUri}" />';
-      final explained = await explain(tester, html);
-      final e = explained.replaceAll(RegExp(r'Uint8List#[0-9a-f]+,'), 'bytes,');
-      expect(e, equals('[Image:image=MemoryImage(bytes, scale: 1.0)]'));
+      final explained = (await explain(tester, html))
+          .replaceAll(RegExp(r'Uint8List#[0-9a-f]+,'), 'bytes,');
+      expect(
+          explained,
+          equals('[CssSizing:height≥0.0,width≥0.0,child='
+              '[Image:image=MemoryImage(bytes, scale: 1.0)]'
+              ']'));
     });
 
     testWidgets('renders bad data uri', (WidgetTester tester) async {
@@ -163,13 +174,17 @@ void main() {
       String fullUrl, {
       Uri baseUrl,
     }) async {
-      final e = await helper.explain(tester, null,
+      final explained = await helper.explain(tester, null,
           hw: HtmlWidget(
             html,
             baseUrl: baseUrl ?? Uri.parse('http://base.com/path/'),
             key: helper.hwKey,
           ));
-      expect(e, equals('[Image:image=NetworkImage("$fullUrl", scale: 1.0)]'));
+      expect(
+          explained,
+          equals('[CssSizing:height≥0.0,width≥0.0,child='
+              '[Image:image=NetworkImage("$fullUrl", scale: 1.0)]'
+              ']'));
     };
 
     testWidgets('renders full url', (WidgetTester tester) async {
@@ -219,7 +234,7 @@ void main() {
         expect(
             explained,
             equals('[CssBlock:child=[RichText:align=center,'
-                '[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)]'
+                '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)]]'
                 ']]'));
       });
 
@@ -236,7 +251,7 @@ void main() {
                 ' └CssBlock()\n'
                 '  └RichText(textAlign: center, text: "￼")\n'
                 '   └WidgetPlaceholder<ImageMetadata>(ImageMetadata(sources: [ImageSource("$src")]))\n'
-                '    └_LoosenConstraintsWidget(crossAxisAlignment: center)\n'
+                '    └CssSizing(minHeight: 0.0, minWidth: 0.0)\n'
                 '     └Image(image: NetworkImage("$src", scale: 1.0), alignment: center, this.excludeFromSemantics: true)\n'
                 '      └RawImage(alignment: center)\n\n'));
       });

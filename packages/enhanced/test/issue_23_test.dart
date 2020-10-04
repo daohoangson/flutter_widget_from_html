@@ -25,7 +25,9 @@ class _BlockquoteWebView extends WidgetFactory {
   @override
   void parse(BuildMetadata meta) {
     if (meta.element.localName == 'blockquote') {
-      meta.register(blockquoteOp);
+      meta
+        ..['display'] = 'block'
+        ..register(blockquoteOp);
       return;
     }
 

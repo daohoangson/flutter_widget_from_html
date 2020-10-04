@@ -154,7 +154,7 @@ void main() {
       expect(
           explained,
           equals('[GestureDetector:child='
-              '[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]'
+              '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
               ']'));
     });
 
@@ -165,8 +165,9 @@ void main() {
           explained,
           equals('[RichText:(:'
               '(#FF0000FF+u+onTap:Foo )'
-              '[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-              ')]'));
+              '[GestureDetector:child='
+              '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+              '])]'));
     });
 
     testWidgets('renders text outside + IMG tag inside', (tester) async {
@@ -175,8 +176,9 @@ void main() {
       expect(
           explained,
           equals('[RichText:(:Foo '
-              '[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-              ')]'));
+              '[GestureDetector:child='
+              '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+              '])]'));
     });
 
     testWidgets('renders IMG tag + text both inside', (tester) async {
@@ -185,7 +187,9 @@ void main() {
       expect(
           explained,
           equals('[RichText:(:'
-              '[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+              '[GestureDetector:child='
+              '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+              ']'
               '(#FF0000FF+u+onTap: foo)'
               ')]'));
     });
@@ -196,7 +200,9 @@ void main() {
       expect(
           explained,
           equals('[RichText:(:'
-              '[GestureDetector:child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+              '[GestureDetector:child='
+              '[CssSizing:height≥0.0,width≥0.0,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+              ']'
               '(: foo))]'));
     });
   });

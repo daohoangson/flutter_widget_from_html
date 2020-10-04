@@ -28,10 +28,10 @@ class CssLength {
   /// Creates a measurement.
   ///
   /// [number] must not be negative.
-  CssLength(
+  const CssLength(
     this.number, [
     this.unit = CssLengthUnit.px,
-  ])  : assert(!number.isNegative),
+  ])  : assert(number >= 0),
         assert(unit != null);
 
   /// Returns `true` if value is non-zero.

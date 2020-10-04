@@ -229,20 +229,20 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
 
 The HTML string is parsed into DOM elements and each element is visited once to collect `BuildMetadata` and prepare `BuildBit`s. See step by step how it works:
 
-| Step |                                                                          | Integration point                                                                                       |
-| ---- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| 1    | Parse                                                                    | `WidgetFactory.parse(BuildMetadata)`                                                                    |
-| 2    | Inform parents if any                                                    | `BuildOp.onChild(BuildMetadata)`                                                                        |
-| 3    | Populate default styling                                                 | `BuildOp.defaultStyles(Element)`                                                                        |
-| 4    | Populate custom styling                                                  | `HtmlWidget.customStylesBuilder`                                                                        |
-| 5    | Parse styling key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(BuildMetadata, String, String)`                                               |
-| 6    | a. If a custom widget is provided, go to 7                               | `HtmlWidget.customWidgetBuilder`                                                                        |
-|      | b. Loop through children elements to prepare `BuildBit`s                 |                                                                                                         |
-| 7    | Inform build ops                                                         | `BuildOp.onTree(BuildMetadata, BuildTree)`                                                              |
-| 8    | a. If not a block element, go to 10                                      |                                                                                                         |
-|      | b. Build widgets from bits using a `Flattener`                           | Use existing `BuildBit` or extends from it, overriding `.swallowWhitespace` to control whitespace, etc. |
-| 9    | Inform build ops                                                         | `BuildOp.onWidgets(BuildMetadata, Iterable<Widget>)`                                                    |
-| 10   | The end                                                                  |                                                                                                         |
+| Step |                                                                          | Integration point                                                                                                   |
+| ---- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| 1    | Parse                                                                    | `WidgetFactory.parse(BuildMetadata)`                                                                                |
+| 2    | Inform parents if any                                                    | `BuildOp.onChild(BuildMetadata)`                                                                                    |
+| 3    | Populate default styling                                                 | `BuildOp.defaultStyles(Element)`                                                                                    |
+| 4    | Populate custom styling                                                  | `HtmlWidget.customStylesBuilder`                                                                                    |
+| 5    | Parse styling key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(BuildMetadata, String, String)`, `WidgetFactory.parseStyleDisplay(BuildMetadata, String)` |
+| 6    | a. If a custom widget is provided, go to 7                               | `HtmlWidget.customWidgetBuilder`                                                                                    |
+|      | b. Loop through children elements to prepare `BuildBit`s                 |                                                                                                                     |
+| 7    | Inform build ops                                                         | `BuildOp.onTree(BuildMetadata, BuildTree)`                                                                          |
+| 8    | a. If not a block element, go to 10                                      |                                                                                                                     |
+|      | b. Build widgets from bits using a `Flattener`                           | Use existing `BuildBit` or extends from it, overriding `.swallowWhitespace` to control whitespace, etc.             |
+| 9    | Inform build ops                                                         | `BuildOp.onWidgets(BuildMetadata, Iterable<Widget>)`                                                                |
+| 10   | The end                                                                  |                                                                                                                     |
 
 Notes:
 

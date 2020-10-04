@@ -18,18 +18,15 @@ class BuildMetadata extends core_data.BuildMetadata {
 
   List<BuildOp> _buildOps;
   var _buildOpsIsLocked = false;
-  bool _isBlockElement;
   List<String> _styles;
   var _stylesIsLocked = false;
+  bool _willBuildSubtree;
 
   BuildMetadata(dom.Element element, TextStyleBuilder tsb, [this._parentOps])
       : super(element, tsb);
 
   @override
   Iterable<BuildOp> get buildOps => _buildOps;
-
-  @override
-  bool get isBlockElement => _isBlockElement ?? _isBlockElementFrom(_buildOps);
 
   @override
   Iterable<BuildOp> get parentOps => _parentOps;
@@ -47,10 +44,7 @@ class BuildMetadata extends core_data.BuildMetadata {
   }
 
   @override
-  set isBlockElement(bool value) {
-    assert(!_buildOpsIsLocked, 'Metadata can no longer be changed.');
-    _isBlockElement = value;
-  }
+  bool get willBuildSubtree => _willBuildSubtree;
 
   @override
   operator []=(String key, String value) {
@@ -58,7 +52,7 @@ class BuildMetadata extends core_data.BuildMetadata {
 
     assert(!_stylesIsLocked, 'Metadata can no longer be changed.');
     _styles ??= [];
-    _styles..add(key)..add(value);
+    _styles..addAll([key, value]);
   }
 
   @override
@@ -75,18 +69,12 @@ class BuildMetadata extends core_data.BuildMetadata {
 
     if (_buildOps != null) {
       _buildOps.sort((a, b) => a.priority.compareTo(b.priority));
-
-      // pre-calculate `isBlockElement` for faster access later
-      _isBlockElement ??= _isBlockElementFrom(_buildOps);
-    } else {
-      _isBlockElement ??= false;
     }
 
+    _willBuildSubtree = this[kCssDisplay] == kCssDisplayBlock ||
+        _buildOps?.where(_opRequiresBuildingSubtree)?.isNotEmpty == true;
     _buildOpsIsLocked = true;
   }
-
-  static bool _isBlockElementFrom(Iterable<BuildOp> ops) =>
-      ops?.where((op) => op.isBlockElement)?.length?.compareTo(0) == 1;
 }
 
 class BuildTree extends core_data.BuildTree {
@@ -170,7 +158,6 @@ class BuildTree extends core_data.BuildTree {
     final element = domNode as dom.Element;
     final meta = BuildMetadata(element, parentMeta.tsb().sub(), parentOps);
     final customWidget = customWidgetBuilder?.call(element);
-    if (customWidget != null) meta.isBlockElement = true;
 
     _collectMetadata(meta);
 
@@ -188,7 +175,7 @@ class BuildTree extends core_data.BuildTree {
       subTree.addBitsFromNodes(element.nodes);
     }
 
-    if (meta.isBlockElement) {
+    if (meta.willBuildSubtree) {
       for (final widget in subTree.build()) {
         add(WidgetBit.block(this, widget));
       }
@@ -239,12 +226,6 @@ class BuildTree extends core_data.BuildTree {
       }
     }
 
-    if (meta.isBlockElement) {
-      // blocks should be rendered in full width
-      meta._styles ??= [];
-      meta._styles.insertAll(0, [kCssWidth, '100%']);
-    }
-
     _customStylesBuilder(meta);
 
     // stylings, step 2: get styles from `style` attribute
@@ -259,6 +240,8 @@ class BuildTree extends core_data.BuildTree {
     for (final style in meta.styles) {
       wf.parseStyle(meta, style.key, style.value);
     }
+
+    wf.parseStyleDisplay(meta, meta[kCssDisplay]);
 
     meta._sortBuildOps();
   }
@@ -308,6 +291,9 @@ class BuildTree extends core_data.BuildTree {
     return widgets;
   }
 }
+
+bool _opRequiresBuildingSubtree(BuildOp op) =>
+    op.onWidgets != null && !op.onWidgetsIsOptional;
 
 Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, BuildMetadata meta) {
   // try to reuse existing list if possible
