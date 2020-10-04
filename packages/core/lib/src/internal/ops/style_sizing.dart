@@ -126,7 +126,7 @@ class StyleSizing {
     final value = length.getValue(tsh);
     if (value != null) return CssSizingValue.value(value);
 
-    switch(length.unit) {
+    switch (length.unit) {
       case CssLengthUnit.auto:
         return CssSizingValue.auto();
       case CssLengthUnit.percentage:
