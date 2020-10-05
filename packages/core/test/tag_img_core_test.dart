@@ -54,7 +54,7 @@ void main() {
       expect(
           explained,
           equals(
-              '[CssSizing:height≥0.0,height≤600.0,height=auto,width≥0.0,width≤800.0,width=auto,child='
+              '[CssSizing:height≥0.0,height=600.0,width≥0.0,width=800.0,child='
               '[AspectRatio:aspectRatio=1.3,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
               ']'));
     });
@@ -254,8 +254,8 @@ void main() {
                 '  └RichText(textAlign: center, text: "￼")\n'
                 '   └WidgetPlaceholder<ImageMetadata>(ImageMetadata(sources: [ImageSource("$src")]))\n'
                 '    └CssSizing(minHeight: 0.0, minWidth: 0.0, preferredHeight: auto, preferredWidth: auto)\n'
-                '     └Image(image: NetworkImage("$src", scale: 1.0), alignment: center, this.excludeFromSemantics: true)\n'
-                '      └RawImage(alignment: center)\n\n'));
+                '     └Image(image: NetworkImage("$src", scale: 1.0), fit: fill, alignment: center, this.excludeFromSemantics: true)\n'
+                '      └RawImage(fit: fill, alignment: center)\n\n'));
       });
     });
 

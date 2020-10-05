@@ -124,6 +124,7 @@ class WidgetFactory {
           return Text(text);
         },
         excludeFromSemantics: semanticLabel == null,
+        fit: BoxFit.fill,
         image: provider,
         semanticLabel: semanticLabel,
       );

@@ -142,38 +142,83 @@ class _RenderCssSizing extends RenderProxyBox {
   @override
   void performLayout() {
     final c = constraints;
-    var maxHeight =
+    final maxHeight =
         min(c.maxHeight, _maxHeight?.clamp(0.0, c.maxHeight) ?? c.maxHeight);
-    var maxWidth =
+    final maxWidth =
         min(c.maxWidth, _maxWidth?.clamp(0.0, c.maxWidth) ?? c.maxWidth);
-    var minHeight =
+    final minHeight =
         min(maxHeight, _minHeight?.clamp(0.0, c.maxHeight) ?? c.minHeight);
-    var minWidth =
+    final minWidth =
         min(maxWidth, _minWidth?.clamp(0.0, c.maxWidth) ?? c.minWidth);
 
-    if (_preferredHeight != null) {
-      final preferredHeight = _preferredHeight.clamp(minHeight, maxHeight);
-      maxHeight = preferredHeight ?? maxHeight;
-      minHeight = preferredHeight ?? minHeight;
-    }
-    if (_preferredWidth != null) {
-      // special handling for tight contraints: ignore min in `clamp()`
-      // (usually happen if parent is a block)
-      final effectiveMinWidth = minWidth == maxWidth ? 0.0 : minWidth;
-      final preferredWidth = _preferredWidth.clamp(effectiveMinWidth, maxWidth);
-      maxWidth = preferredWidth ?? maxWidth;
-      minWidth = preferredWidth ?? minWidth;
-    }
+    final preferredHeight = _preferredHeight?.clamp(minHeight, maxHeight);
+    // special handling for tight contraints: ignore min in `clamp()`
+    // (usually happen if parent is a block)
+    final effectiveMinWidth = minWidth == maxWidth ? 0.0 : minWidth;
+    final preferredWidth = _preferredWidth?.clamp(effectiveMinWidth, maxWidth);
+    final stableChildSize = (preferredHeight != null && preferredWidth != null)
+        ? _guessChildSize(
+            maxHeight: maxHeight,
+            maxWidth: maxWidth,
+            preferredHeight: preferredHeight,
+            preferredWidth: preferredWidth,
+          )
+        : null;
 
     final cc = BoxConstraints(
-      maxHeight: maxHeight,
-      maxWidth: maxWidth,
-      minHeight: minHeight,
-      minWidth: minWidth,
+      maxHeight: stableChildSize?.height ?? preferredHeight ?? maxHeight,
+      maxWidth: stableChildSize?.width ?? preferredWidth ?? maxWidth,
+      minHeight: stableChildSize?.height ?? preferredHeight ?? minHeight,
+      minWidth: stableChildSize?.width ?? preferredWidth ?? minWidth,
     );
 
     child.layout(cc, parentUsesSize: true);
     size = constraints.constrain(child.size);
+  }
+
+  Size _guessChildSize({
+    double maxHeight,
+    double maxWidth,
+    double preferredHeight,
+    double preferredWidth,
+  }) {
+    final childHeightByPreferredWidth =
+        child.getMaxIntrinsicHeight(preferredWidth);
+    if (childHeightByPreferredWidth !=
+            child.getMinIntrinsicHeight(preferredWidth) ||
+        childHeightByPreferredWidth == 0) {
+      return null;
+    }
+
+    final childWidthByPreferredHeight =
+        child.getMaxIntrinsicWidth(preferredHeight);
+    if (childWidthByPreferredHeight !=
+        child.getMinIntrinsicWidth(preferredHeight)) {
+      return null;
+    }
+
+    final childAspectRatio = childWidthByPreferredHeight / preferredHeight;
+    if (childAspectRatio != preferredWidth / childHeightByPreferredWidth) {
+      return null;
+    }
+
+    // child appears to have a stable aspect ratio
+    var childWidth = preferredWidth;
+    var childHeight = childWidth / childAspectRatio;
+    if (childHeight < preferredHeight) {
+      childHeight = preferredHeight;
+      childWidth = childHeight * childAspectRatio;
+    }
+    if (childWidth > maxWidth) {
+      childWidth = maxWidth;
+      childHeight = childWidth / childAspectRatio;
+    }
+    if (childHeight > maxHeight) {
+      childHeight = maxHeight;
+      childWidth = childHeight * childAspectRatio;
+    }
+
+    return Size(childWidth, childHeight);
   }
 }
 

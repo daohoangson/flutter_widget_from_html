@@ -970,7 +970,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           expect(
               explained,
               equals(
-                  '[CssSizing:height≥0.0,height≤1.0,height=auto,width≥0.0,width≤1.0,width=auto,child='
+                  '[CssSizing:height≥0.0,height=1.0,width≥0.0,width=1.0,child='
                   '[AspectRatio:aspectRatio=1.0,child='
                   '[Image:image=NetworkImage("$src", scale: 1.0)]'
                   ']]'));
@@ -986,7 +986,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           expect(
               explained,
               equals(
-                  '[CssSizing:height≥0.0,height≤1.0,height=auto,width≥0.0,width≤1.0,width=auto,child='
+                  '[CssSizing:height≥0.0,height=1.0,width≥0.0,width=1.0,child='
                   '[AspectRatio:aspectRatio=1.0,child='
                   '[Image:image=NetworkImage("$src", scale: 1.0)]'
                   ']]'));

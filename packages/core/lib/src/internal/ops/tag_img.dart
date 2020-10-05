@@ -24,10 +24,10 @@ class TagImg {
           };
 
           if (attrs.containsKey(kAttributeImgHeight)) {
-            styles[kCssMaxHeight] = '${attrs[kAttributeImgHeight]}px';
+            styles[kCssHeight] = '${attrs[kAttributeImgHeight]}px';
           }
           if (attrs.containsKey(kAttributeImgWidth)) {
-            styles[kCssMaxWidth] = '${attrs[kAttributeImgWidth]}px';
+            styles[kCssWidth] = '${attrs[kAttributeImgWidth]}px';
           }
 
           return styles;
