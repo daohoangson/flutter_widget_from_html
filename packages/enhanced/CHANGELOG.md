@@ -1,3 +1,8 @@
+## 0.5.0+7
+
+- Fix incorrect alignment of list marker (#335)
+- Add support for webview_flutter@1.0.0 (#336)
+
 ## 0.5.0+6
 
 - Stop using singleton WidgetFactory by default
