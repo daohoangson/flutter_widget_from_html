@@ -25,9 +25,6 @@ abstract class BuildMetadata {
   /// The registered build ops.
   Iterable<BuildOp> get buildOps;
 
-  /// Returns `true` if node should be rendered as block.
-  bool get isBlockElement;
-
   /// The parents' build ops that have [BuildOp.onChild].
   Iterable<BuildOp> get parentOps;
 
@@ -40,8 +37,15 @@ abstract class BuildMetadata {
   /// - Attribute `style` of [domElement]
   Iterable<MapEntry<String, String>> get styles;
 
-  /// Sets whether node should be rendered as block.
-  set isBlockElement(bool value);
+  /// Returns `true` if subtree will be built.
+  ///
+  /// May returns `null` if metadata is still being collected.
+  /// There are a few things that may trigger subtree building:
+  /// - Some [BuildOp] has a mandatory `onWidgets` callback
+  /// - Inline style `display: block`
+  ///
+  /// See [BuildOp.onWidgetsIsOptional].
+  bool get willBuildSubtree;
 
   /// Adds an inline style.
   operator []=(String key, String value);
@@ -75,11 +79,6 @@ abstract class BuildMetadata {
 /// A building operation to customize how a DOM element is rendered.
 @immutable
 class BuildOp {
-  /// Controls whether the element should be rendered with [CssBlock].
-  ///
-  /// Default: `true` if [onWidgets] callback is set, `false` otherwise.
-  final bool isBlockElement;
-
   /// The execution priority, op with lower priority will run first.
   ///
   /// Default: 10.
@@ -125,13 +124,18 @@ class BuildOp {
   final Iterable<Widget> Function(
       BuildMetadata meta, Iterable<WidgetPlaceholder> widgets) onWidgets;
 
+  /// Controls whether the element should be forced to be rendered as block.
+  ///
+  /// Default: `false`.
+  final bool onWidgetsIsOptional;
+
   /// Creates a build op.
   BuildOp({
     this.defaultStyles,
-    bool isBlockElement,
     this.onChild,
     this.onTree,
     this.onWidgets,
+    this.onWidgetsIsOptional = false,
     this.priority = 10,
-  }) : isBlockElement = isBlockElement ?? onWidgets != null;
+  });
 }

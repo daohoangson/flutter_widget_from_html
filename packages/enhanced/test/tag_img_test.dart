@@ -6,6 +6,8 @@ import 'package:network_image_mock/network_image_mock.dart';
 import '_.dart' as helper;
 
 void main() {
+  final sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
+
   group('image.png', () {
     final src = 'http://domain.com/image.png';
     final explain = (WidgetTester tester, String html) =>
@@ -16,7 +18,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Image:image=CachedNetworkImageProvider("$src", scale: 1.0)]'),
+        equals('[CssSizing:$sizingConstraints,child='
+            '[Image:image=CachedNetworkImageProvider("$src", scale: 1.0)]'
+            ']'),
       );
     });
 
@@ -25,10 +29,11 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[Image:'
+        equals('[CssSizing:$sizingConstraints,child='
+            '[Image:'
             'image=CachedNetworkImageProvider("$src", scale: 1.0),'
             'semanticLabel=Foo'
-            ']'),
+            ']]'),
       );
     });
 
@@ -37,12 +42,13 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[Tooltip:'
+          equals('[CssSizing:$sizingConstraints,child='
+              '[Tooltip:'
               'message=Bar,'
               'child=[Image:'
               'image=CachedNetworkImageProvider("http://domain.com/image.png", scale: 1.0),'
               'semanticLabel=Bar'
-              ']]'));
+              ']]]'));
     });
 
     testWidgets('renders src+alt+title', (WidgetTester tester) async {
@@ -50,12 +56,13 @@ void main() {
       final e = await explain(tester, html);
       expect(
           e,
-          equals('[Tooltip:'
+          equals('[CssSizing:$sizingConstraints,child='
+              '[Tooltip:'
               'message=Bar,'
               'child=[Image:'
               'image=CachedNetworkImageProvider("http://domain.com/image.png", scale: 1.0),'
               'semanticLabel=Foo'
-              ']]'));
+              ']]]'));
     });
   });
 
@@ -66,9 +73,10 @@ void main() {
       final explained = await helper.explain(tester, html);
       expect(
         explained,
-        equals('[SvgPicture:'
+        equals('[CssSizing:$sizingConstraints,child='
+            '[SvgPicture:'
             'pictureProvider=ExactAssetPicture(name: "$assetName", bundle: null, colorFilter: null)'
-            ']'),
+            ']]'),
       );
     });
 
@@ -81,15 +89,23 @@ void main() {
         final base64 =
             base64Encode(utf8.encode('<svg viewBox="0 0 1 1"></svg>'));
         final html = '<img src="data:image/svg+xml;base64,$base64" />';
-        final e = await explain(tester, html);
-        expect(e, equals('[SvgPicture:pictureProvider=MemoryPicture(bytes)]'));
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[CssSizing:$sizingConstraints,child='
+                '[SvgPicture:pictureProvider=MemoryPicture(bytes)]'
+                ']'));
       });
 
       testWidgets('renders utf8', (WidgetTester tester) async {
         final utf8 = '&lt;svg viewBox=&quot;0 0 1 1&quot;&gt;&lt;/svg&gt;';
         final html = '<img src="data:image/svg+xml;utf8,$utf8" />';
-        final e = await explain(tester, html);
-        expect(e, equals('[SvgPicture:pictureProvider=MemoryPicture(bytes)]'));
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[CssSizing:$sizingConstraints,child='
+                '[SvgPicture:pictureProvider=MemoryPicture(bytes)]'
+                ']'));
       });
     });
 
@@ -99,9 +115,10 @@ void main() {
       final explained = await mockNetworkImagesFor(() => helper.explain(t, h));
       expect(
         explained,
-        equals('[SvgPicture:'
+        equals('[CssSizing:$sizingConstraints,child='
+            '[SvgPicture:'
             'pictureProvider=NetworkPicture("$src", headers: null, colorFilter: null)'
-            ']'),
+            ']]'),
       );
     });
   });

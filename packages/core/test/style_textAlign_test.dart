@@ -5,65 +5,74 @@ import '_.dart';
 void main() {
   testWidgets('renders CENTER tag', (WidgetTester tester) async {
     final html = '<center>Foo</center>';
-    final e = await explain(tester, html);
-    expect(e, equals('[CssBlock:child=[RichText:align=center,(:Foo)]]'));
+    final explained = await explain(tester, html);
+    expect(
+        explained,
+        equals('[CssBlock:child=[_TextAlignCenter:child='
+            '[RichText:align=center,(:Foo)]]]'));
   });
 
   group('attribute', () {
     testWidgets('renders center text', (WidgetTester tester) async {
       final html = '<div align="center">_X_</div>';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=center,(:_X_)]]'));
+      final explained = await explain(tester, html);
+      expect(explained,
+          equals('[_TextAlignBlock:child=[RichText:align=center,(:_X_)]]'));
     });
 
     testWidgets('renders justify text', (WidgetTester tester) async {
       final html = '<p align="justify">X_X_X</p>';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=justify,(:X_X_X)]]'));
+      final explained = await explain(tester, html);
+      expect(explained,
+          equals('[_TextAlignBlock:child=[RichText:align=justify,(:X_X_X)]]'));
     });
 
     testWidgets('renders left text', (WidgetTester tester) async {
       final html = '<div align="left">X__</div>';
       final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=left,(:X__)]]'));
+      expect(e, equals('[_TextAlignBlock:child=[RichText:align=left,(:X__)]]'));
     });
 
     testWidgets('renders right text', (WidgetTester tester) async {
       final html = '<div align="right">__X</div>';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=right,(:__X)]]'));
+      final explained = await explain(tester, html);
+      expect(explained,
+          equals('[_TextAlignBlock:child=[RichText:align=right,(:__X)]]'));
     });
   });
 
   group('contents: inline', () {
     testWidgets('renders center', (WidgetTester tester) async {
       final html = '<div style="text-align: center">_X_</div>';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=center,(:_X_)]]'));
+      final explained = await explain(tester, html);
+      expect(explained,
+          equals('[_TextAlignBlock:child=[RichText:align=center,(:_X_)]]'));
     });
 
     testWidgets('renders end', (WidgetTester tester) async {
       final html = '<div style="text-align: end">__X</div>';
       final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=end,(:__X)]]'));
+      expect(e, equals('[_TextAlignBlock:child=[RichText:align=end,(:__X)]]'));
     });
 
     testWidgets('renders justify', (WidgetTester tester) async {
       final html = '<div style="text-align: justify">X_X_X</div>';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=justify,(:X_X_X)]]'));
+      final explained = await explain(tester, html);
+      expect(explained,
+          equals('[_TextAlignBlock:child=[RichText:align=justify,(:X_X_X)]]'));
     });
 
     testWidgets('renders left', (WidgetTester tester) async {
       final html = '<div style="text-align: left">X__</div>';
       final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=left,(:X__)]]'));
+      expect(e, equals('[_TextAlignBlock:child=[RichText:align=left,(:X__)]]'));
     });
 
     testWidgets('renders right', (WidgetTester tester) async {
       final html = '<div style="text-align: right">__X</div>';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=right,(:__X)]]'));
+      final explained = await explain(tester, html);
+      expect(explained,
+          equals('[_TextAlignBlock:child=[RichText:align=right,(:__X)]]'));
     });
 
     testWidgets('renders start', (WidgetTester tester) async {
@@ -76,8 +85,11 @@ void main() {
   group('contents: block', () {
     testWidgets('renders tag CENTER', (WidgetTester tester) async {
       final html = '<center><div>_X_</div></center>';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=center,(:_X_)]]'));
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssBlock:child=[_TextAlignCenter:child='
+              '[CssBlock:child=[RichText:align=center,(:_X_)]]]]'));
     });
 
     testWidgets('renders center', (WidgetTester tester) async {
@@ -123,9 +135,9 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child=[Column:crossAxisAlignment=center,children='
-              '[CssBlock:child=[RichText:align=center,(:Foo)]],'
-              '[CssBlock:child=[RichText:align=center,(:_X_)]]'
+          equals('[CssBlock:child=[Column:children='
+              '[_TextAlignCenter:child=[CssBlock:child=[RichText:align=center,(:Foo)]]],'
+              '[_TextAlignCenter:child=[CssBlock:child=[RichText:align=center,(:_X_)]]]'
               ']]'));
     });
 
@@ -135,7 +147,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child=[Column:crossAxisAlignment=stretch,children='
+          equals('[CssBlock:child=[Column:children='
               '[CssBlock:child=[RichText:align=center,(:Foo)]],'
               '[CssBlock:child=[RichText:align=center,(:_X_)]]'
               ']]'));
@@ -147,7 +159,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child=[Column:crossAxisAlignment=stretch,children='
+          equals('[CssBlock:child=[Column:children='
               '[CssBlock:child=[RichText:align=end,(:Foo)]],'
               '[CssBlock:child=[RichText:align=end,(:__X)]]'
               ']]'));
@@ -159,7 +171,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child=[Column:crossAxisAlignment=stretch,children='
+          equals('[CssBlock:child=[Column:children='
               '[CssBlock:child=[RichText:align=justify,(:Foo)]],'
               '[CssBlock:child=[RichText:align=justify,(:X_X_X)]]'
               ']]'));
@@ -171,7 +183,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child=[Column:crossAxisAlignment=stretch,children='
+          equals('[CssBlock:child=[Column:children='
               '[CssBlock:child=[RichText:align=left,(:Foo)]],'
               '[CssBlock:child=[RichText:align=left,(:X__)]]'
               ']]'));
@@ -183,7 +195,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child=[Column:crossAxisAlignment=stretch,children='
+          equals('[CssBlock:child=[Column:children='
               '[CssBlock:child=[RichText:align=right,(:Foo)]],'
               '[CssBlock:child=[RichText:align=right,(:__X)]]'
               ']]'));
@@ -207,8 +219,10 @@ void main() {
     final html = '<em><span style="color: red;">'
         '<div style="text-align: right;">right</div></span></em>';
     final explained = await explain(tester, html);
-    expect(explained,
-        equals('[CssBlock:child=[RichText:align=right,(#FFFF0000+i:right)]]'));
+    expect(
+        explained,
+        equals('[_TextAlignBlock:child='
+            '[RichText:align=right,(#FFFF0000+i:right)]]'));
   });
 
   testWidgets('renders margin inside', (WidgetTester tester) async {
@@ -218,9 +232,11 @@ void main() {
     expect(
         explained,
         equals('[SizedBox:0.0x5.0],'
-            '[CssBlock:child=[Padding:(0,5,0,5),child='
+            '[CssBlock:child='
+            '[_TextAlignBlock:child='
+            '[Padding:(0,5,0,5),child='
             '[CssBlock:child=[RichText:align=center,(:Foo)]]'
-            ']],'
+            ']]],'
             '[SizedBox:0.0x5.0]'));
   });
 }

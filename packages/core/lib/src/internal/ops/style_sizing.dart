@@ -8,14 +8,15 @@ const kCssMinWidth = 'min-width';
 const kCssWidth = 'width';
 
 class StyleSizing {
+  static const kPriority = 50000;
+
   final WidgetFactory wf;
 
   StyleSizing(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        isBlockElement: false,
         onTree: (meta, tree) {
-          if (meta.isBlockElement) return;
+          if (meta.willBuildSubtree) return;
 
           final input = _parse(meta);
           if (input == null) return;
@@ -33,20 +34,27 @@ class StyleSizing {
           widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb()));
         },
         onWidgets: (meta, widgets) {
+          if (!meta.willBuildSubtree) return widgets;
+
           final input = _parse(meta);
           if (input == null) return widgets;
           return listOrNull(wf
               .buildColumnPlaceholder(meta, widgets)
               ?.wrapWith((c, w) => _build(c, w, input, meta.tsb())));
         },
-        priority: 50000,
+        onWidgetsIsOptional: true,
+        priority: kPriority,
       );
 
   _StyleSizingInput _parse(BuildMetadata meta) {
     CssLength height, maxHeight, maxWidth, minHeight, minWidth, width;
+    bool isBlock;
 
     for (final style in meta.styles) {
       switch (style.key) {
+        case kCssDisplay:
+          isBlock = style.value == kCssDisplayBlock;
+          break;
         case kCssHeight:
           height = tryParseCssLength(style.value);
           break;
@@ -68,6 +76,8 @@ class StyleSizing {
       }
     }
 
+    if (isBlock == true) width ??= _StyleSizingInput.kBlockWidth;
+
     if (height == null &&
         maxHeight == null &&
         maxWidth == null &&
@@ -88,22 +98,49 @@ class StyleSizing {
   static Widget _build(BuildContext context, Widget child,
       _StyleSizingInput input, TextStyleBuilder tsb) {
     final tsh = tsb.build(context);
-    final constraints = BoxConstraints(
-      maxHeight: input.maxHeight?.getValue(tsh) ?? double.infinity,
-      maxWidth: input.maxWidth?.getValue(tsh) ?? double.infinity,
-      minHeight: input.minHeight?.getValue(tsh) ?? 0,
-      minWidth: input.minWidth?.getValue(tsh) ?? 0,
+
+    if (input.maxHeight == null &&
+        input.maxWidth == null &&
+        input.minHeight == null &&
+        input.minWidth == null &&
+        input.height == null &&
+        input.width == _StyleSizingInput.kBlockWidth) {
+      if (child is CssBlock) return child;
+      return CssBlock(child: child);
+    }
+
+    return CssSizing(
+      child: child,
+      maxHeight: _getValue(input.maxHeight, tsh),
+      maxWidth: _getValue(input.maxWidth, tsh),
+      minHeight: _getValue(input.minHeight, tsh),
+      minWidth: _getValue(input.minWidth, tsh),
+      preferredHeight: _getValue(input.height, tsh),
+      preferredWidth: _getValue(input.width, tsh),
     );
-    final size = Size(
-      input.width?.getValue(tsh) ?? double.infinity,
-      input.height?.getValue(tsh) ?? double.infinity,
-    );
-    return CssSizing(child: child, constraints: constraints, size: size);
+  }
+
+  static CssSizingValue _getValue(CssLength length, TextStyleHtml tsh) {
+    if (length == null) return null;
+
+    final value = length.getValue(tsh);
+    if (value != null) return CssSizingValue.value(value);
+
+    switch (length.unit) {
+      case CssLengthUnit.auto:
+        return CssSizingValue.auto();
+      case CssLengthUnit.percentage:
+        return CssSizingValue.percentage(length.number);
+      default:
+        return null;
+    }
   }
 }
 
 @immutable
 class _StyleSizingInput {
+  static const CssLength kBlockWidth = CssLength(100, CssLengthUnit.percentage);
+
   final CssLength height;
   final CssLength maxHeight;
   final CssLength maxWidth;

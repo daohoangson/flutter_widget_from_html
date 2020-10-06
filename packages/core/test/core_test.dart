@@ -5,6 +5,8 @@ import 'package:network_image_mock/network_image_mock.dart';
 import '_.dart';
 
 void main() {
+  final imgSizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
+
   testWidgets('renders empty string', (WidgetTester tester) async {
     final html = '';
     final explained = await explain(tester, html);
@@ -133,8 +135,9 @@ void main() {
           explained,
           equals('[RichText:(:'
               '1\n'
+              '[CssSizing:$imgSizingConstraints,child='
               '[Image:image=NetworkImage("$src", scale: 1.0)]'
-              ')]'));
+              '])]'));
     });
 
     testWidgets('renders new line between SPANs, 1 of 2', (tester) async {
@@ -307,7 +310,7 @@ void main() {
             explained,
             equals('[SizedBox:0.0x10.0],'
                 '[Padding:(0,40,0,40),child=[CssBlock:child=[Column:children='
-                '[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)],'
+                '[CssSizing:$imgSizingConstraints,child=[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)]],'
                 '[CssBlock:child=[RichText:(:(+i:fig. 1)(: Foo))]]'
                 ']]],'
                 '[SizedBox:0.0x10.0]'));
@@ -522,8 +525,9 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[DecoratedBox:bg=#FFFF0000,child='
-              '[CssBlock:child=[RichText:(:Foo)]]]'));
+          equals('[CssBlock:child='
+              '[DecoratedBox:bg=#FFFF0000,child='
+              '[RichText:(:Foo)]]]'));
     });
 
     testWidgets('renders with margins and paddings', (tester) async {
@@ -534,8 +538,8 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           explained,
           equals('[SizedBox:0.0x1.0],'
               '[Padding:(0,1,0,1),child='
-              '[DecoratedBox:bg=#FFFF0000,child='
-              '[CssBlock:child=[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]'
+              '[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child='
+              '[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]'
               ']],[SizedBox:0.0x1.0]'));
     });
 
@@ -545,7 +549,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       expect(
           explained,
           equals(
-              '[DecoratedBox:bg=#FFFF0000,child=[CssBlock:child=[Column:children='
+              '[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child=[Column:children='
               '[CssBlock:child=[RichText:(:A)]],'
               '[SizedBox:0.0x10.0],'
               '[CssBlock:child=[RichText:(:B)]]'
@@ -938,8 +942,9 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           expect(
               explained,
               equals('[RichText:(:Foo '
+                  '[CssSizing:$imgSizingConstraints,child='
                   '[Image:image=NetworkImage("$src", scale: 1.0)]'
-                  ')]'));
+                  '])]'));
         }),
       );
 
@@ -952,7 +957,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
               explained,
               equals('[Column:children='
                   '[RichText:(:Foo)],'
-                  '[CssBlock:child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
+                  '[CssSizing:$imgSizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
                   ']'));
         }),
       );
@@ -964,9 +969,11 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           final explained = await explain(tester, html);
           expect(
               explained,
-              equals('[CssSizing:height=1.0,width=1.0,child='
+              equals(
+                  '[CssSizing:height≥0.0,height=1.0,width≥0.0,width=1.0,child='
+                  '[AspectRatio:aspectRatio=1.0,child='
                   '[Image:image=NetworkImage("$src", scale: 1.0)]'
-                  ']'));
+                  ']]'));
         }),
       );
 
@@ -978,8 +985,9 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
           final explained = await explain(tester, html);
           expect(
               explained,
-              equals('[CssSizing:height=1.0,width=1.0,child='
-                  '[CssBlock:child='
+              equals(
+                  '[CssSizing:height≥0.0,height=1.0,width≥0.0,width=1.0,child='
+                  '[AspectRatio:aspectRatio=1.0,child='
                   '[Image:image=NetworkImage("$src", scale: 1.0)]'
                   ']]'));
         }),

@@ -259,28 +259,16 @@ class Explainer {
     return h.length == 1 ? '0$h' : h;
   }
 
-  String _crossAxisAlignment(CrossAxisAlignment value) => (value != null &&
-          value != CrossAxisAlignment.start)
-      ? 'crossAxisAlignment=${value.toString().replaceAll('CrossAxisAlignment.', '')}'
-      : null;
-
   List<String> _cssSizing(CssSizing w) {
     final attr = <String>[];
 
-    final c = w.constraints;
-    final s = w.size;
-    if (s.height.isFinite) attr.add('height=${s.height.toStringAsFixed(1)}');
-    if (c.maxHeight.isFinite) {
-      attr.add('maxHeight=${c.maxHeight.toStringAsFixed(1)}');
-    }
-    if (c.maxWidth.isFinite) {
-      attr.add('maxWidth=${c.maxWidth.toStringAsFixed(1)}');
-    }
-    if (c.minHeight > 0) {
-      attr.add('minHeight=${c.minHeight.toStringAsFixed(1)}');
-    }
-    if (c.minWidth > 0) attr.add('minWidth=${c.minWidth.toStringAsFixed(1)}');
-    if (s.width.isFinite) attr.add('width=${s.width.toStringAsFixed(1)}');
+    if (w.minHeight != null) attr.add('height≥${w.minHeight}');
+    if (w.maxHeight != null) attr.add('height≤${w.maxHeight}');
+    if (w.preferredHeight != null) attr.add('height=${w.preferredHeight}');
+
+    if (w.minWidth != null) attr.add('width≥${w.minWidth}');
+    if (w.maxWidth != null) attr.add('width≤${w.maxWidth}');
+    if (w.preferredWidth != null) attr.add('width=${w.preferredWidth}');
 
     return attr;
   }
@@ -516,9 +504,6 @@ class Explainer {
             : null;
     if (maxLines != null) attr.add('maxLines=$maxLines');
 
-    attr.add(_crossAxisAlignment(
-        widget is Column ? widget.crossAxisAlignment : null));
-
     attr.add(_textAlign(widget is RichText
         ? widget.textAlign
         : (widget is Text ? widget.textAlign : null)));
@@ -541,7 +526,9 @@ class Explainer {
       attr.add(_alignment(widget.alignment));
     }
 
-    if (widget is AspectRatio) attr.add('aspectRatio=${widget.aspectRatio}');
+    if (widget is AspectRatio) {
+      attr.add('aspectRatio=${widget.aspectRatio.toStringAsFixed(1)}');
+    }
 
     if (widget is ConstrainedBox) attr.add(_boxConstraints(widget.constraints));
 

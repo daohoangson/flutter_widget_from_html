@@ -73,7 +73,10 @@ void main() {
 
   group('image', () {
     final imgSrc = 'http://domain.com/image.png';
-    final imgRendered = '[Image:image=NetworkImage("$imgSrc", scale: 1.0)]';
+    final imgRendered =
+        '[CssSizing:height≥0.0,height=auto,width≥0.0,width=auto,child='
+        '[Image:image=NetworkImage("$imgSrc", scale: 1.0)]'
+        ']';
     final imgExplain = (WidgetTester t, String html) =>
         mockNetworkImagesFor(() => explain(t, html));
 

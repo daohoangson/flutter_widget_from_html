@@ -17,9 +17,8 @@ class StyleMargin {
   StyleMargin(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        isBlockElement: false,
         onTree: (meta, tree) {
-          if (meta.isBlockElement) return;
+          if (meta.willBuildSubtree) return;
           final m = tryParseCssLengthBox(meta, kCssMargin);
           if (m?.hasLeftOrRight != true) return;
 
@@ -56,6 +55,7 @@ class StyleMargin {
 
           return ws;
         },
+        onWidgetsIsOptional: true,
         priority: 99999,
       );
 }

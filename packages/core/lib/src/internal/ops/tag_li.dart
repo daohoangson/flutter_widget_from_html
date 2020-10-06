@@ -44,13 +44,13 @@ class TagLi {
   }
 
   BuildOp get op {
-    _listOp ??= _TagLiOp(this);
+    _listOp ??= _TagLiListOp(this);
     return _listOp;
   }
 
   Map<String, String> defaultStyles(dom.Element element) {
     final attrs = element.attributes;
-    final p = listMeta.parentOps?.whereType<_TagLiOp>()?.length ?? 0;
+    final depth = listMeta.parentOps?.whereType<_TagLiListOp>()?.length ?? 0;
 
     final styles = {
       'padding-inline-start': '40px',
@@ -58,14 +58,14 @@ class TagLi {
           ? _ListConfig.listStyleTypeFromAttributeType(
                   attrs[kAttributeLiType]) ??
               kCssListStyleTypeDecimal
-          : p == 0
+          : depth == 0
               ? kCssListStyleTypeDisc
-              : p == 1
+              : depth == 1
                   ? kCssListStyleTypeCircle
                   : kCssListStyleTypeSquare,
     };
 
-    if (p == 0) styles[kCssMargin] = '1em 0';
+    if (depth == 0) styles[kCssMargin] = '1em 0';
 
     return styles;
   }
@@ -383,11 +383,15 @@ enum _ListMarkerType {
   square,
 }
 
-class _TagLiOp extends BuildOp {
-  _TagLiOp(TagLi tagLi)
+class _TagLiListOp extends BuildOp {
+  _TagLiListOp(TagLi tagLi)
       : super(
           defaultStyles: tagLi.defaultStyles,
-          isBlockElement: true,
           onChild: tagLi.onChild,
+          onWidgets: _onWidgetsPassThrough,
         );
+
+  static Iterable<Widget> _onWidgetsPassThrough(
+          BuildMetadata _, Iterable<Widget> widgets) =>
+      widgets;
 }

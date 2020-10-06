@@ -20,7 +20,7 @@ String padding(String child) =>
 String list(List<String> children) => '[Column:children=${children.join(",")}]';
 
 String item(String markerText, String contents, {String child}) =>
-    '[CssBlock:child=[_ListItem:children=${child ?? '[RichText:(:$contents)]'},${marker(markerText)}]]';
+    '[_ListItem:children=${child ?? '[RichText:(:$contents)]'},${marker(markerText)}]';
 
 String marker(String text) =>
     text.startsWith('[_ListMarker') ? text : '[RichText:maxLines=1,(:$text)]';
@@ -43,7 +43,7 @@ void main() async {
         equals(padding(list([
           item('1.', 'One'),
           item('2.', 'Two'),
-          '[CssBlock:child=[_ListItem:children=[RichText:(+b:Three)],${marker("3.")}]]'
+          item('3.', '', child: '[RichText:(+b:Three)]'),
         ]))));
   });
 
@@ -55,7 +55,7 @@ void main() async {
         equals(padding(list([
           item(disc, 'One'),
           item(disc, 'Two'),
-          '[CssBlock:child=[_ListItem:children=[RichText:(+i:Three)],${marker(disc)}]]'
+          item(disc, '', child: '[RichText:(+i:Three)]'),
         ]))));
   });
 
@@ -87,14 +87,16 @@ void main() async {
     ]));
     final li21And22And23 = padding(list([
       item(circle, '2.1'),
-      '[CssBlock:child=[_ListItem:children=[Column:children=[RichText:(:2.2)],$li221And222],${marker(circle)}]]',
+      item(circle, '',
+          child: '[Column:children=[RichText:(:2.2)],$li221And222]'),
       item(circle, '2.3'),
     ]));
     expect(
         explained,
         equals(padding(list([
           item(disc, 'One'),
-          '[CssBlock:child=[_ListItem:children=[Column:children=[RichText:(:Two)],$li21And22And23],${marker(disc)}]]',
+          item(disc, '',
+              child: '[Column:children=[RichText:(:Two)],$li21And22And23]'),
           item(disc, 'Three'),
         ]))));
   });
@@ -514,8 +516,8 @@ void main() async {
         expect(
             explained,
             equals('[CssBlock:child=[Padding:(0,0,0,99),child=[Column:children='
-                '[CssBlock:child=[Padding:(0,0,0,199),child=[_ListItem:children=[RichText:(:199px)],${marker(disc)}]]],'
-                '[CssBlock:child=[Padding:(0,0,0,299),child=[_ListItem:children=[RichText:(:299px)],${marker(disc)}]]],'
+                '[Padding:(0,0,0,199),child=[_ListItem:children=[RichText:(:199px)],${marker(disc)}]],'
+                '[Padding:(0,0,0,299),child=[_ListItem:children=[RichText:(:299px)],${marker(disc)}]],'
                 '${item(disc, "99px")}'
                 ']]]'));
       });
@@ -591,7 +593,7 @@ void main() async {
           explained,
           equals(padding(list([
             item('1.', 'One'),
-            '[CssBlock:child=[_ListItem:children=[widget0],${marker("2.")}]]',
+            item('2.', '', child: '[widget0]'),
             item('3.', 'Three'),
           ]))));
     });
@@ -602,9 +604,9 @@ void main() async {
 
     final explainerExpected =
         '[CssBlock:child=[Padding:(0,40,0,0),child=[Column:dir=rtl,children='
-        '[CssBlock:child=[_ListItem:children=[RichText:dir=rtl,(:One)],[RichText:maxLines=1,dir=rtl,(:1.)]]],'
-        '[CssBlock:child=[_ListItem:children=[RichText:dir=rtl,(:Two)],[RichText:maxLines=1,dir=rtl,(:2.)]]],'
-        '[CssBlock:child=[_ListItem:children=[RichText:dir=rtl,(+b:Three)],[RichText:maxLines=1,dir=rtl,(:3.)]]]'
+        '[_ListItem:children=[RichText:dir=rtl,(:One)],[RichText:maxLines=1,dir=rtl,(:1.)]],'
+        '[_ListItem:children=[RichText:dir=rtl,(:Two)],[RichText:maxLines=1,dir=rtl,(:2.)]],'
+        '[_ListItem:children=[RichText:dir=rtl,(+b:Three)],[RichText:maxLines=1,dir=rtl,(:3.)]]'
         ']]]';
 
     final nonExplainerExpected = 'TshWidget\n'
@@ -615,25 +617,22 @@ void main() async {
         '    ├WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
         '    ││  "One"\n'
         '    ││)\n'
-        '    │└CssBlock()\n'
-        '    │ └_ListItem(textDirection: rtl)\n'
-        '    │  ├RichText(textDirection: rtl, text: "One")\n'
-        '    │  └RichText(textDirection: rtl, maxLines: 1, text: "1.")\n'
+        '    │└_ListItem(textDirection: rtl)\n'
+        '    │ ├RichText(textDirection: rtl, text: "One")\n'
+        '    │ └RichText(textDirection: rtl, maxLines: 1, text: "1.")\n'
         '    ├WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#2):\n'
         '    ││  "Two"\n'
         '    ││)\n'
-        '    │└CssBlock()\n'
-        '    │ └_ListItem(textDirection: rtl)\n'
-        '    │  ├RichText(textDirection: rtl, text: "Two")\n'
-        '    │  └RichText(textDirection: rtl, maxLines: 1, text: "2.")\n'
+        '    │└_ListItem(textDirection: rtl)\n'
+        '    │ ├RichText(textDirection: rtl, text: "Two")\n'
+        '    │ └RichText(textDirection: rtl, maxLines: 1, text: "2.")\n'
         '    └WidgetPlaceholder<BuildTree>(BuildTree#5 tsb#6(parent=#2):\n'
         '     │  BuildTree#7 tsb#8(parent=#6):\n'
         '     │    "Three"\n'
         '     │)\n'
-        '     └CssBlock()\n'
-        '      └_ListItem(textDirection: rtl)\n'
-        '       ├RichText(textDirection: rtl, text: "Three")\n'
-        '       └RichText(textDirection: rtl, maxLines: 1, text: "3.")\n'
+        '     └_ListItem(textDirection: rtl)\n'
+        '      ├RichText(textDirection: rtl, text: "Three")\n'
+        '      └RichText(textDirection: rtl, maxLines: 1, text: "3.")\n'
         '\n';
 
     testWidgets('renders ordered list', (WidgetTester tester) async {

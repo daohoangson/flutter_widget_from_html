@@ -258,9 +258,10 @@ void main() {
         expect(
             explained,
             equals(
+                '[CssSizing:height≥0.0,height=auto,width≥0.0,width=auto,child='
                 '[Image:image=NetworkImage("http://base.com/path/image.png", scale: 1.0),'
                 'semanticLabel=image dot png'
-                ']'));
+                ']]'));
       }),
     );
   });
@@ -289,15 +290,15 @@ void main() {
 
   group('customWidgetBuilder', () {
     final CustomWidgetBuilder customWidgetBuilder = (_) => Text('Bar');
-    final html = '<span>Foo</span>';
+    final html = 'Foo <span>bar</span>';
 
     testWidgets('renders without value', (WidgetTester tester) async {
       final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(e, equals('[RichText:(:Foo)]'));
+      expect(e, equals('[RichText:(:Foo bar)]'));
     });
 
     testWidgets('renders with value', (WidgetTester tester) async {
-      final explained = await explain(
+      final e = await explain(
         tester,
         HtmlWidget(
           html,
@@ -305,7 +306,7 @@ void main() {
           key: helper.hwKey,
         ),
       );
-      expect(explained, equals('[CssBlock:child=[Text:Bar]]'));
+      expect(e, equals('[Column:children=[RichText:(:Foo)],[Text:Bar]]'));
     });
   });
 

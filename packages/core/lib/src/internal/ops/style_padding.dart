@@ -19,9 +19,8 @@ class StylePadding {
   StylePadding(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        isBlockElement: false,
         onTree: (meta, tree) {
-          if (meta.isBlockElement) return;
+          if (meta.willBuildSubtree) return;
           final padding = tryParseCssLengthBox(meta, kCssPadding);
           if (padding?.hasLeftOrRight != true) return;
 
@@ -42,6 +41,7 @@ class StylePadding {
               .buildColumnPlaceholder(meta, widgets)
               ?.wrapWith((c, w) => _build(c, meta, w, padding)));
         },
+        onWidgetsIsOptional: true,
         priority: 9999,
       );
 

@@ -12,8 +12,7 @@ void main() {
   testWidgets('renders clickable text', (tester) async {
     final html = '<iframe src="$src"></iframe>';
     final explained = await helper.explain(tester, html);
-    expect(explained,
-        equals('[CssBlock:child=[GestureDetector:child=[Text:$src]]]'));
+    expect(explained, equals('[GestureDetector:child=[Text:$src]]'));
   });
 
   testWidgets('renders web view', (tester) async {
@@ -21,18 +20,17 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[CssBlock:child=[WebView:'
+        equals('[WebView:'
             'url=$src,'
             'aspectRatio=$defaultAspectRatio,'
             'autoResize=true'
-            ']]'));
+            ']'));
   });
 
   testWidgets('renders web view with specified dimensions', (tester) async {
     final html = '<iframe src="$src" width="400" height="300"></iframe>';
     final explained = await explain(tester, html);
-    expect(explained,
-        equals('[CssBlock:child=[WebView:url=$src,aspectRatio=1.33]]'));
+    expect(explained, equals('[WebView:url=$src,aspectRatio=1.33]'));
   });
 
   group('errors', () {

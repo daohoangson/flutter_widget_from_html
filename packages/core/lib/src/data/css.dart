@@ -28,10 +28,10 @@ class CssLength {
   /// Creates a measurement.
   ///
   /// [number] must not be negative.
-  CssLength(
+  const CssLength(
     this.number, [
     this.unit = CssLengthUnit.px,
-  ])  : assert(!number.isNegative),
+  ])  : assert(number >= 0),
         assert(unit != null);
 
   /// Returns `true` if value is non-zero.
@@ -41,6 +41,8 @@ class CssLength {
   double getValue(TextStyleHtml tsh, {double baseValue, double scaleFactor}) {
     double value;
     switch (unit) {
+      case CssLengthUnit.auto:
+        return null;
       case CssLengthUnit.em:
         baseValue ??= tsh.style.fontSize;
         value = baseValue * number;
@@ -138,6 +140,9 @@ class CssLengthBox {
 
 /// Length measurement units.
 enum CssLengthUnit {
+  /// Special value: auto.
+  auto,
+
   /// Relative unit: em.
   em,
 

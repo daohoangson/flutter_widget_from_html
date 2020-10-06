@@ -15,7 +15,7 @@ class StyleVerticalAlign {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.isBlockElement) return;
+          if (meta.willBuildSubtree) return;
 
           final v = meta[kCssVerticalAlign];
           if (v == null || v == kCssVerticalAlignBaseline) return;

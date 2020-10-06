@@ -20,48 +20,78 @@ class StyleTextAlign {
 
   StyleTextAlign(this.wf, this.value);
 
-  BuildOp get op => BuildOp(onTree: (meta, _) => meta.tsb(_tsb, value));
+  BuildOp get op => BuildOp(
+        onTree: (meta, _) => meta.tsb(_tsb, value),
+        onWidgets: (_, widgets) => _onWidgets(widgets, value),
+        onWidgetsIsOptional: true,
+      );
+
+  static Iterable<Widget> _onWidgets(Iterable<Widget> widgets, String value) {
+    Widget Function(BuildContext, Widget) builder;
+
+    switch (value) {
+      case kCssTextAlignCenter:
+      case kCssTextAlignEnd:
+      case kCssTextAlignJustify:
+      case kCssTextAlignLeft:
+      case kCssTextAlignRight:
+        builder = _block;
+        break;
+      case kCssTextAlignMozCenter:
+      case kCssTextAlignWebkitCenter:
+        builder = _center;
+        break;
+    }
+
+    if (builder != null) {
+      widgets = widgets
+          .map((child) => WidgetPlaceholder.lazy(child).wrapWith(builder));
+    }
+
+    return widgets;
+  }
+
+  static Widget _block(BuildContext _, Widget child) =>
+      child is CssBlock ? child : _TextAlignBlock(child);
+
+  static Widget _center(BuildContext _, Widget child) =>
+      _TextAlignCenter(child);
 
   static TextStyleHtml _tsb(TextStyleHtml tsh, String value) {
-    CrossAxisAlignment crossAxisAlignment;
     TextAlign textAlign;
 
     switch (value) {
       case kCssTextAlignCenter:
-        crossAxisAlignment = CrossAxisAlignment.stretch;
-        textAlign = TextAlign.center;
-        break;
       case kCssTextAlignMozCenter:
       case kCssTextAlignWebkitCenter:
-        crossAxisAlignment = CrossAxisAlignment.center;
         textAlign = TextAlign.center;
         break;
       case kCssTextAlignEnd:
-        crossAxisAlignment = CrossAxisAlignment.stretch;
         textAlign = TextAlign.end;
         break;
       case kCssTextAlignJustify:
-        crossAxisAlignment = CrossAxisAlignment.stretch;
         textAlign = TextAlign.justify;
         break;
       case kCssTextAlignLeft:
-        crossAxisAlignment = CrossAxisAlignment.stretch;
         textAlign = TextAlign.left;
         break;
       case kCssTextAlignRight:
-        crossAxisAlignment = CrossAxisAlignment.stretch;
         textAlign = TextAlign.right;
         break;
       case kCssTextAlignStart:
-        crossAxisAlignment = CrossAxisAlignment.start;
         textAlign = TextAlign.start;
         break;
     }
 
-    if (crossAxisAlignment == null && textAlign == null) return tsh;
-    return tsh.copyWith(
-      crossAxisAlignment: crossAxisAlignment,
-      textAlign: textAlign,
-    );
+    return textAlign == null ? tsh : tsh.copyWith(textAlign: textAlign);
   }
+}
+
+class _TextAlignBlock extends CssBlock {
+  _TextAlignBlock(Widget child, {Key key}) : super(child: child, key: key);
+}
+
+class _TextAlignCenter extends Center {
+  _TextAlignCenter(Widget child, {Key key})
+      : super(child: child, heightFactor: 1.0, key: key);
 }

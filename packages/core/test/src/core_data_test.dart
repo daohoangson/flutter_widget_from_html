@@ -73,9 +73,8 @@ void main() {
             explained,
             equals('TshWidget\n'
                 '└WidgetPlaceholder<Widget>(Text)\n'
-                ' └CssBlock()\n'
-                '  └Text("Hi")\n'
-                '   └RichText(text: "Hi")\n\n'));
+                ' └Text("Hi")\n'
+                '  └RichText(text: "Hi")\n\n'));
       });
     });
 

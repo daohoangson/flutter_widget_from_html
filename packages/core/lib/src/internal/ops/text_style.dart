@@ -110,9 +110,8 @@ class TextStyleOps {
   }
 
   static BuildOp textDecoOp(TextDeco v) => BuildOp(
-        onTree: (meta, _) {
-          if (!meta.isBlockElement) meta.tsb<TextDeco>(textDeco, v);
-        },
+        onTree: (meta, _) =>
+            meta.willBuildSubtree ? null : meta.tsb<TextDeco>(textDeco, v),
       );
 
   static TextStyleHtml textDirection(TextStyleHtml p, String v) {

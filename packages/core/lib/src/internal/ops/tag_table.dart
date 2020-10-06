@@ -33,6 +33,7 @@ class TagTable {
     _tableOp = BuildOp(
       onChild: onChild,
       onWidgets: onWidgets,
+      priority: StyleSizing.kPriority,
     );
     return _tableOp;
   }
@@ -58,13 +59,18 @@ class TagTable {
         childMeta.register(_TagTableGroup(wf, childMeta, rows).op);
         break;
       case kCssDisplayTableCaption:
-        childMeta.register(BuildOp(onWidgets: (meta, widgets) {
-          final caption = wf.buildColumnPlaceholder(meta, widgets);
-          if (caption == null) return [];
+        childMeta.register(BuildOp(
+          onWidgets: (meta, widgets) {
+            final caption = wf
+                .buildColumnPlaceholder(meta, widgets)
+                ?.wrapWith((_, child) => _TableCaption(child));
+            if (caption == null) return [];
 
-          _data.captions.add(caption);
-          return [caption];
-        }));
+            _data.captions.add(caption);
+            return [caption];
+          },
+          priority: StyleSizing.kPriority,
+        ));
         break;
     }
   }
@@ -170,6 +176,20 @@ class TagTable {
   }
 }
 
+class _TableCaption extends SingleChildRenderObjectWidget {
+  _TableCaption(Widget child, {Key key}) : super(child: child, key: key);
+
+  @override
+  RenderObject createRenderObject(BuildContext context) => RenderProxyBox();
+}
+
+class _TableCell extends SingleChildRenderObjectWidget {
+  _TableCell(Widget child, {Key key}) : super(child: child, key: key);
+
+  @override
+  RenderObject createRenderObject(BuildContext context) => RenderProxyBox();
+}
+
 class _TagTableGroup {
   final List<_TagTableDataRow> rows;
   final BuildMetadata groupMeta;
@@ -213,7 +233,9 @@ class _TagTableRow {
 
     _cellOp ??= BuildOp(
       onWidgets: (cellMeta, widgets) {
-        final column = wf.buildColumnPlaceholder(cellMeta, widgets);
+        final column = wf
+            .buildColumnPlaceholder(cellMeta, widgets)
+            ?.wrapWith((_, child) => _TableCell(child));
         if (column == null) return [];
 
         final attributes = cellMeta.element.attributes;
@@ -225,6 +247,7 @@ class _TagTableRow {
 
         return [column];
       },
+      priority: StyleSizing.kPriority,
     );
 
     childMeta.register(_cellOp);

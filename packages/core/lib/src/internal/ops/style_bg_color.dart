@@ -9,9 +9,8 @@ class StyleBgColor {
   StyleBgColor(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        isBlockElement: false,
         onTree: (meta, tree) {
-          if (meta.isBlockElement) return;
+          if (meta.willBuildSubtree) return;
 
           final bgColor = _parseColor(wf, meta);
           if (bgColor == null) return;
@@ -26,6 +25,7 @@ class StyleBgColor {
           return listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
               (_, child) => wf.buildDecoratedBox(meta, child, color: color)));
         },
+        onWidgetsIsOptional: true,
         priority: 15000,
       );
 
