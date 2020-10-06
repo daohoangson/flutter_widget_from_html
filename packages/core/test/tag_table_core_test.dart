@@ -396,6 +396,12 @@ void main() {
       expect(explained, equals('[widget0]'));
     });
 
+    testWidgets('empty CAPTION', (WidgetTester tester) async {
+      final html = '<table><caption></caption></table>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[widget0]'));
+    });
+
     testWidgets('empty TR', (WidgetTester tester) async {
       final html = '<table><tr></tr></table>';
       final explained = await explain(tester, html);
