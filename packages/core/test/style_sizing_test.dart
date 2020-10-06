@@ -291,4 +291,38 @@ void main() {
               ')]'));
     });
   });
+
+  group('CssSizing', () {
+    testWidgets('updates constraints', (tester) async {
+      final before = await explain(tester,
+          '<div style="max-height: 0px; max-width: auto; min-height: 100px; min-width: 100%;">Foo</div>',
+          useExplainer: false);
+      expect(
+          before,
+          contains('CssSizing(maxHeight: 0.0, maxWidth: auto, '
+              'minHeight: 100.0, minWidth: 100.0%, preferredWidth: 100.0%)'));
+
+      final after = await explain(tester,
+          '<div style="max-height: auto; max-width: 0px; min-height: 10px; min-width: 10%;">Foo</div>',
+          useExplainer: false);
+      expect(
+          after,
+          contains('CssSizing(maxHeight: auto, maxWidth: 0.0, '
+              'minHeight: 10.0, minWidth: 10.0%, preferredWidth: 100.0%)'));
+    });
+
+    testWidgets('updates size', (tester) async {
+      final before = await explain(
+          tester, '<div style="height: 10px; width: 20px;">Foo</div>',
+          useExplainer: false);
+      expect(before,
+          contains('CssSizing(preferredHeight: 10.0, preferredWidth: 20.0)'));
+
+      final after = await explain(
+          tester, '<div style="height: 20px; width: 10px;">Foo</div>',
+          useExplainer: false);
+      expect(after,
+          contains('CssSizing(preferredHeight: 20.0, preferredWidth: 10.0)'));
+    });
+  });
 }
