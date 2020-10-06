@@ -1,3 +1,15 @@
+## 0.5.1
+
+- Add support for auto, percentage sizing (e.g. `width: 50%`)
+- Fix image cannot scale up (#337)
+
+This release includes some changes that may require migration if you have a custom `WidgetFactory`:
+
+- Replace `BuildMetadata.isBlockElement` with .`willBuildSubtree`.
+- Replace `BuildOp.isBlockElement` with `.onWidgetsIsOptional`
+- Split display parsing into `WidgetFactory.parseStyleDisplay`
+- `TextStyleHtml.crossAxisAlignment` has been removed (no replacement)
+
 ## 0.5.0+7
 
 - Fix incorrect alignment of list marker (#335)
