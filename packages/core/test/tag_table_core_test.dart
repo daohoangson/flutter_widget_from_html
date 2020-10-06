@@ -20,7 +20,7 @@ void main() {
       expect(
           explained,
           equals('[Column:children='
-              '[_TableCaption:child=[RichText:align=center,(:Caption)]],'
+              '[_TableCaption:child=[_TextAlignBlock:child=[RichText:align=center,(:Caption)]]],'
               '[Table:\n'
               '${_padding('[RichText:(+b:Header 1)]')} | ${_padding('[RichText:(+b:Header 2)]')}\n'
               '${_richtext('Value 1')} | ${_richtext('Value 2')}\n'
@@ -43,7 +43,8 @@ void main() {
               '  ││  "Caption"\n'
               '  ││)\n'
               '  │└_TableCaption()\n'
-              '  │ └RichText(textAlign: center, text: "Caption")\n'
+              '  │ └_TextAlignBlock()\n'
+              '  │  └RichText(textAlign: center, text: "Caption")\n'
               '  └Table()\n'
               '   ├TableCell(verticalAlignment: null)\n'
               '   │└WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#5):\n'
@@ -115,7 +116,7 @@ void main() {
       expect(
           explained,
           equals('[Table:\n'
-              '${_padding('[RichText:(+b:Header 1)]')} | ${_padding('[RichText:align=center,(+b:Header 2)]')}\n'
+              '${_padding('[RichText:(+b:Header 1)]')} | ${_padding('[_TextAlignBlock:child=[RichText:align=center,(+b:Header 2)]]')}\n'
               '${_padding('[RichText:(:Value (+i:1))]')} | ${_padding('[RichText:(+b:Value 2)]')}\n'
               ']'));
     });
@@ -145,7 +146,7 @@ void main() {
       expect(
           explained,
           equals('[Table:\n'
-              '${_padding('[RichText:align=right,(+b:Header 1)]')} | ${_padding('[RichText:align=center,(+b:Header 2)]')}\n'
+              '${_padding('[RichText:align=right,(+b:Header 1)]')} | ${_padding('[_TextAlignBlock:child=[RichText:align=center,(+b:Header 2)]]')}\n'
               '${_padding('[RichText:align=right,(:Value (+i:1))]')} | ${_padding('[RichText:align=right,(+b:Value 2)]')}\n'
               ']'));
     });
@@ -210,7 +211,7 @@ void main() {
       expect(
         explained,
         equals('[Table:border=1.0@solid#FF000000,\n'
-            '${_padding('[RichText:align=left,(:Foo)]')}\n'
+            '[_TextAlignBlock:child=${_padding('[RichText:align=left,(:Foo)]')}]\n'
             ']'),
       );
     });
@@ -222,7 +223,7 @@ void main() {
       expect(
         explained,
         equals('[Table:border=1.0@solid#FF000000,\n'
-            '${_padding('[RichText:align=left,(:Foo)]')}\n'
+            '${_padding('[_TextAlignBlock:child=[RichText:align=left,(:Foo)]]')}\n'
             ']'),
       );
     });
@@ -442,7 +443,7 @@ void main() {
     expect(
         explained,
         equals('[Column:children='
-            '[_TableCaption:child=[RichText:align=center,(:Caption)]],'
+            '[_TableCaption:child=[_TextAlignBlock:child=[RichText:align=center,(:Caption)]]],'
             '[Table:\n'
             '[_TableCell:child=[RichText:(+b:Header 1)]] | [_TableCell:child=[RichText:(+b:Header 2)]]\n'
             '[_TableCell:child=[RichText:(:Value 1)]] | [_TableCell:child=[RichText:(:Value 2)]]\n'

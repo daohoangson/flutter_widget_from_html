@@ -20,7 +20,7 @@ void main() {
       expect(
           explained,
           equals('[Column:children='
-              '[_TableCaption:child=[RichText:align=center,(:Caption)]],'
+              '[_TableCaption:child=[_TextAlignBlock:child=[RichText:align=center,(:Caption)]]],'
               '[LayoutGrid:children='
               '[0,0:${_padding('[RichText:(+b:Header 1)]')}],'
               '[0,1:${_padding('[RichText:(+b:Header 2)]')}],'
@@ -45,7 +45,8 @@ void main() {
               '  ││  "Caption"\n'
               '  ││)\n'
               '  │└_TableCaption()\n'
-              '  │ └RichText(textAlign: center, text: "Caption")\n'
+              '  │ └_TextAlignBlock()\n'
+              '  │  └RichText(textAlign: center, text: "Caption")\n'
               '  └LayoutGrid()\n'
               '   ├GridPlacement(columnStart: 0, columnSpan: 1, rowStart: 0, rowSpan: 1)\n'
               '   │└SizedBox.expand()\n'
@@ -125,7 +126,7 @@ void main() {
           explained,
           equals('[LayoutGrid:children='
               '[0,0:${_padding('[RichText:(+b:Header 1)]')}],'
-              '[0,1:${_padding('[RichText:align=center,(+b:Header 2)]')}],'
+              '[0,1:${_padding('[_TextAlignBlock:child=[RichText:align=center,(+b:Header 2)]]')}],'
               '[1,0:${_padding('[RichText:(:Value (+i:1))]')}],'
               '[1,1:${_padding('[RichText:(+b:Value 2)]')}]'
               ']'));
@@ -159,7 +160,7 @@ void main() {
           explained,
           equals('[LayoutGrid:children='
               '[0,0:${_padding('[RichText:align=right,(+b:Header 1)]')}],'
-              '[0,1:${_padding('[RichText:align=center,(+b:Header 2)]')}],'
+              '[0,1:${_padding('[_TextAlignBlock:child=[RichText:align=center,(+b:Header 2)]]')}],'
               '[1,0:${_padding('[RichText:align=right,(:Value (+i:1))]')}],'
               '[1,1:${_padding('[RichText:align=right,(+b:Value 2)]')}]'
               ']'));
@@ -306,11 +307,14 @@ void main() {
       final html = '<table border="1" style="text-align: left">'
           '<tr><td>Foo</td></tr></table>';
       final explained = await explain(t, html);
+      final cell = '[SizedBox.expand:child='
+          '[_TextAlignBlock:child='
+          '[_TableCell:child=[Padding:(1,1,1,1),child='
+          '[RichText:align=left,(:Foo)]]]]]';
       expect(
           explained,
           equals('[Stack:children='
-              '[LayoutGrid:children='
-              '[0,0:[DecoratedBox:border=1.0@solid#FF000000,child=${_padding('[RichText:align=left,(:Foo)]')}]]],'
+              '[LayoutGrid:children=[0,0:[DecoratedBox:border=1.0@solid#FF000000,child=$cell]]],'
               '[Positioned:(0.0,0.0,0.0,0.0),child=[DecoratedBox:border=1.0@solid#FF000000]]'
               ']'));
     });
@@ -323,7 +327,7 @@ void main() {
           explained,
           equals('[Stack:children='
               '[LayoutGrid:children='
-              '[0,0:[DecoratedBox:border=1.0@solid#FF000000,child=${_padding('[RichText:align=left,(:Foo)]')}]]],'
+              '[0,0:[DecoratedBox:border=1.0@solid#FF000000,child=${_padding('[_TextAlignBlock:child=[RichText:align=left,(:Foo)]]')}]]],'
               '[Positioned:(0.0,0.0,0.0,0.0),child=[DecoratedBox:border=1.0@solid#FF000000]]'
               ']'));
     });
@@ -539,7 +543,7 @@ void main() {
     expect(
         explained,
         equals('[Column:children='
-            '[_TableCaption:child=[RichText:align=center,(:Caption)]],'
+            '[_TableCaption:child=[_TextAlignBlock:child=[RichText:align=center,(:Caption)]]],'
             '[LayoutGrid:children='
             '[0,0:[SizedBox.expand:child=[_TableCell:child=[RichText:(+b:Header 1)]]]],'
             '[0,1:[SizedBox.expand:child=[_TableCell:child=[RichText:(+b:Header 2)]]]],'

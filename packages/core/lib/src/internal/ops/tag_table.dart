@@ -63,7 +63,7 @@ class TagTable {
           onWidgets: (meta, widgets) {
             final caption = wf
                 .buildColumnPlaceholder(meta, widgets)
-                ?.wrapWith((context, child) => _TableCaption(child: child));
+                ?.wrapWith((_, child) => _TableCaption(child));
             if (caption == null) return [];
 
             _data.captions.add(caption);
@@ -176,13 +176,15 @@ class TagTable {
   }
 }
 
-class _TableCaption extends CssBlock {
-  _TableCaption({@required Widget child, Key key})
-      : super(child: child, key: key);
+class _TableCaption extends SingleChildRenderObjectWidget {
+  _TableCaption(Widget child, {Key key}) : super(child: child, key: key);
+
+  @override
+  RenderObject createRenderObject(BuildContext context) => RenderProxyBox();
 }
 
 class _TableCell extends SingleChildRenderObjectWidget {
-  _TableCell({@required Widget child, Key key}) : super(child: child, key: key);
+  _TableCell(Widget child, {Key key}) : super(child: child, key: key);
 
   @override
   RenderObject createRenderObject(BuildContext context) => RenderProxyBox();
@@ -233,7 +235,7 @@ class _TagTableRow {
       onWidgets: (cellMeta, widgets) {
         final column = wf
             .buildColumnPlaceholder(cellMeta, widgets)
-            ?.wrapWith((_, child) => _TableCell(child: child));
+            ?.wrapWith((_, child) => _TableCell(child));
         if (column == null) return [];
 
         final attributes = cellMeta.element.attributes;

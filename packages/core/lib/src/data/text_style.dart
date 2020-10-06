@@ -5,11 +5,6 @@ part of '../core_data.dart';
 class TextStyleHtml {
   final Iterable<dynamic> _deps;
 
-  /// The cross axis alignment.
-  ///
-  /// Default: [CrossAxisAlignment.start].
-  final CrossAxisAlignment crossAxisAlignment;
-
   /// The line height.
   final double height;
 
@@ -33,7 +28,6 @@ class TextStyleHtml {
 
   /// Creates a text style.
   TextStyleHtml({
-    this.crossAxisAlignment,
     @required Iterable deps,
     this.height,
     this.maxLines,
@@ -78,7 +72,6 @@ class TextStyleHtml {
 
   /// Creates a copy with the given fields replaced with the new values.
   TextStyleHtml copyWith({
-    CrossAxisAlignment crossAxisAlignment,
     double height,
     int maxLines,
     TextStyleHtml parent,
@@ -88,7 +81,6 @@ class TextStyleHtml {
     TextOverflow textOverflow,
   }) =>
       TextStyleHtml(
-        crossAxisAlignment: crossAxisAlignment ?? this.crossAxisAlignment,
         deps: _deps,
         height: height ?? this.height,
         maxLines: maxLines ?? this.maxLines,

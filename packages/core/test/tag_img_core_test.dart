@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:network_image_mock/network_image_mock.dart';
@@ -222,61 +221,6 @@ void main() {
       final html = '<img src="relative" />';
       final fullUrl = 'http://base.com/path/relative';
       await test(tester, html, fullUrl);
-    });
-  });
-
-  group('text-align', () {
-    group('CENTER', () {
-      final src = 'http://domain.com/image.png';
-      final html = '<center><img src="$src" /></center>';
-
-      testWidgets('renders', (WidgetTester tester) async {
-        final explained =
-            await mockNetworkImagesFor(() => helper.explain(tester, html));
-        expect(
-            explained,
-            equals('[CssBlock:child=[RichText:align=center,'
-                '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)]]'
-                ']]'));
-      });
-
-      testWidgets('useExplainer=false', (WidgetTester tester) async {
-        final explained = await mockNetworkImagesFor(
-            () => helper.explain(tester, html, useExplainer: false));
-        expect(
-            explained,
-            equals('TshWidget\n'
-                '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
-                ' │  BuildTree#3 tsb#4(parent=#1):\n'
-                ' │    WidgetBit.inline#5 WidgetPlaceholder(ImageMetadata(sources: [ImageSource("$src")]))\n'
-                ' │)\n'
-                ' └CssBlock()\n'
-                '  └RichText(textAlign: center, text: "￼")\n'
-                '   └WidgetPlaceholder<ImageMetadata>(ImageMetadata(sources: [ImageSource("$src")]))\n'
-                '    └CssSizing(minHeight: 0.0, minWidth: 0.0, preferredHeight: auto, preferredWidth: auto)\n'
-                '     └Image(image: NetworkImage("$src", scale: 1.0), fit: fill, alignment: center, this.excludeFromSemantics: true)\n'
-                '      └RawImage(fit: fill, alignment: center)\n\n'));
-      });
-    });
-
-    testWidgets('updates crossAxisAlignment', (WidgetTester tester) async {
-      final src = 'http://domain.com/image.png';
-      final textAlign = ValueNotifier<String>('left');
-      final explainedLeft =
-          await mockNetworkImagesFor(() => helper.explain(tester, null,
-              hw: ValueListenableBuilder(
-                valueListenable: textAlign,
-                builder: (_, value, __) => HtmlWidget(
-                  '<div style="text-align: $value"><img src="$src" /></div>',
-                  key: helper.hwKey,
-                ),
-              )));
-
-      textAlign.value = '-webkit-center';
-      await tester.pumpAndSettle();
-      final explainedRight = await helper.explainWithoutPumping();
-
-      expect(explainedRight, isNot(equals(explainedLeft)));
     });
   });
 }
