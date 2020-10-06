@@ -1,4 +1,9 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 
 import '_.dart';
@@ -324,5 +329,56 @@ void main() {
       expect(after,
           contains('CssSizing(preferredHeight: 20.0, preferredWidth: 10.0)'));
     });
+
+    GoldenToolkit.runWithConfiguration(
+      () {
+        group('_guessChildSize', () {
+          final assetName = 'test/images/logo.png';
+          final childHeightGtMaxHeight = 'child_height_gt_max_height';
+          final testCases = <String, String>{
+            'native_192x192':
+                '<img src="asset:$assetName" width="192" height="192" />',
+            'child_height_lt_preferred_height':
+                '<img src="asset:$assetName" width="192" height="192" style="width: 96px; height: 100px;" />',
+            'child_width_gt_max_width':
+                '<img src="asset:$assetName" width="192" height="192" style="width: 96px; height: 250px;" />',
+            childHeightGtMaxHeight:
+                '<img src="asset:$assetName" width="192" height="192" style="width: 250px; height: 96px;" />'
+          };
+
+          for (final testCase in testCases.entries) {
+            testGoldens(testCase.key, (tester) async {
+              await tester.pumpWidgetBuilder(
+                _Golden(testCase.value),
+                wrapper: materialAppWrapper(theme: ThemeData.light()),
+                surfaceSize: testCase.key == childHeightGtMaxHeight
+                    ? Size(250, 200)
+                    : Size(200, 250),
+              );
+
+              await screenMatchesGolden(tester, testCase.key);
+            }, skip: null);
+          }
+        }, skip: Platform.isLinux ? null : 'Linux only');
+      },
+      config: GoldenToolkitConfiguration(
+        fileNameFactory: (name) =>
+            '$kGoldenFilePrefix/sizing/_guessChildSize/$name.png',
+      ),
+    );
   });
+}
+
+class _Golden extends StatelessWidget {
+  final String html;
+
+  const _Golden(this.html, {Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => Scaffold(
+        body: Padding(
+          child: HtmlWidget(html),
+          padding: const EdgeInsets.all(8.0),
+        ),
+      );
 }
