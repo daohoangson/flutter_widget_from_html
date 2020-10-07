@@ -330,6 +330,7 @@ void main() {
           contains('CssSizing(preferredHeight: 20.0, preferredWidth: 10.0)'));
     });
 
+    final goldenSkip = Platform.isLinux ? null : 'Linux only';
     GoldenToolkit.runWithConfiguration(
       () {
         group('_guessChildSize', () {
@@ -359,11 +360,56 @@ void main() {
               await screenMatchesGolden(tester, testCase.key);
             }, skip: null);
           }
-        }, skip: Platform.isLinux ? null : 'Linux only');
+        }, skip: goldenSkip);
       },
       config: GoldenToolkitConfiguration(
         fileNameFactory: (name) =>
             '$kGoldenFilePrefix/sizing/_guessChildSize/$name.png',
+      ),
+    );
+
+    GoldenToolkit.runWithConfiguration(
+      () {
+        group('100 percent', () {
+          testGoldens('width', (tester) async {
+            await tester.pumpWidgetBuilder(
+              Scaffold(
+                body: SingleChildScrollView(
+                  child: Padding(
+                    child: HtmlWidget('<div style="width: 100%">Foo</div>'),
+                    padding: const EdgeInsets.all(8.0),
+                  ),
+                  scrollDirection: Axis.horizontal,
+                ),
+              ),
+              wrapper: materialAppWrapper(theme: ThemeData.light()),
+              surfaceSize: Size(200, 200),
+            );
+
+            await screenMatchesGolden(tester, 'width');
+          }, skip: null);
+
+          testGoldens('height', (tester) async {
+            await tester.pumpWidgetBuilder(
+              Scaffold(
+                body: SingleChildScrollView(
+                    child: Padding(
+                      child: HtmlWidget('<div style="height: 100%">Foo</div>'),
+                      padding: const EdgeInsets.all(8.0),
+                    ),
+                    scrollDirection: Axis.vertical),
+              ),
+              wrapper: materialAppWrapper(theme: ThemeData.light()),
+              surfaceSize: Size(200, 200),
+            );
+
+            await screenMatchesGolden(tester, 'height');
+          }, skip: null);
+        }, skip: goldenSkip);
+      },
+      config: GoldenToolkitConfiguration(
+        fileNameFactory: (name) =>
+            '$kGoldenFilePrefix/sizing/100_percent/$name.png',
       ),
     );
   });
