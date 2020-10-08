@@ -29,6 +29,16 @@ class CssSizing extends SingleChildRenderObjectWidget {
   // The minimum width;
   final CssSizingValue minWidth;
 
+  /// The preferred axis.
+  ///
+  /// When both dimensions have preferred value, one will have higher priority.
+  /// If the preferred axis is [Axis.vertical] and child size seems to be stable
+  /// (e.g. has the same aspect ratio regardless of layout constraints)
+  /// the [preferredHeight] will be used for sizing.
+  ///
+  /// By default (`null` preferred axis), [preferredWidth] will be used.
+  final Axis preferredAxis;
+
   /// The preferred height.
   final CssSizingValue preferredHeight;
 
@@ -43,6 +53,7 @@ class CssSizing extends SingleChildRenderObjectWidget {
     this.maxWidth,
     this.minHeight,
     this.minWidth,
+    this.preferredAxis,
     this.preferredHeight,
     this.preferredWidth,
   })  : assert(child != null),
@@ -54,6 +65,7 @@ class CssSizing extends SingleChildRenderObjectWidget {
         maxWidth: maxWidth,
         minHeight: minHeight,
         minWidth: minWidth,
+        preferredAxis: preferredAxis,
         preferredHeight: preferredHeight,
         preferredWidth: preferredWidth,
       );
@@ -65,8 +77,24 @@ class CssSizing extends SingleChildRenderObjectWidget {
     _debugFillProperty(properties, 'maxWidth', maxWidth);
     _debugFillProperty(properties, 'minHeight', minHeight);
     _debugFillProperty(properties, 'minWidth', minWidth);
-    _debugFillProperty(properties, 'preferredHeight', preferredHeight);
-    _debugFillProperty(properties, 'preferredWidth', preferredWidth);
+    _debugFillProperty(
+        properties,
+        'preferredHeight' +
+            (preferredHeight != null &&
+                    preferredWidth != null &&
+                    preferredAxis == Axis.vertical
+                ? '*'
+                : ''),
+        preferredHeight);
+    _debugFillProperty(
+        properties,
+        'preferredWidth' +
+            (preferredHeight != null &&
+                    preferredWidth != null &&
+                    preferredAxis != Axis.vertical
+                ? '*'
+                : ''),
+        preferredWidth);
   }
 
   void _debugFillProperty(DiagnosticPropertiesBuilder properties, String name,
@@ -83,7 +111,8 @@ class CssSizing extends SingleChildRenderObjectWidget {
       minHeight: minHeight,
       minWidth: minWidth,
     );
-    renderObject.setPreferredSize(preferredWidth, preferredHeight);
+    renderObject.setPreferredSize(
+        preferredAxis, preferredWidth, preferredHeight);
   }
 }
 
@@ -94,12 +123,14 @@ class _RenderCssSizing extends RenderProxyBox {
     CssSizingValue maxWidth,
     CssSizingValue minHeight,
     CssSizingValue minWidth,
+    Axis preferredAxis,
     CssSizingValue preferredHeight,
     CssSizingValue preferredWidth,
   })  : _maxHeight = maxHeight,
         _maxWidth = maxWidth,
         _minHeight = minHeight,
         _minWidth = minWidth,
+        _preferredAxis = preferredAxis,
         _preferredHeight = preferredHeight,
         _preferredWidth = preferredWidth,
         super(child);
@@ -127,10 +158,15 @@ class _RenderCssSizing extends RenderProxyBox {
     markNeedsLayout();
   }
 
+  Axis _preferredAxis;
   CssSizingValue _preferredHeight;
   CssSizingValue _preferredWidth;
-  void setPreferredSize(CssSizingValue width, CssSizingValue height) {
-    if (height == _preferredHeight && width == _preferredWidth) return;
+  void setPreferredSize(
+      Axis axis, CssSizingValue width, CssSizingValue height) {
+    if (axis == _preferredAxis &&
+        height == _preferredHeight &&
+        width == _preferredWidth) return;
+    _preferredAxis = axis;
     _preferredHeight = height;
     _preferredWidth = width;
     markNeedsLayout();
@@ -207,12 +243,15 @@ class _RenderCssSizing extends RenderProxyBox {
     }
 
     // child appears to have a stable aspect ratio
-    var childWidth = preferredWidth;
-    var childHeight = childWidth / childAspectRatio;
-    if (childHeight < preferredHeight) {
+    double childWidth, childHeight;
+    if (_preferredAxis == Axis.vertical) {
       childHeight = preferredHeight;
       childWidth = childHeight * childAspectRatio;
+    } else {
+      childWidth = preferredWidth;
+      childHeight = childWidth / childAspectRatio;
     }
+
     if (childWidth > maxWidth) {
       childWidth = maxWidth;
       childHeight = childWidth / childAspectRatio;
