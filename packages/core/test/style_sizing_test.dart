@@ -321,13 +321,13 @@ void main() {
           tester, '<div style="height: 10px; width: 20px;">Foo</div>',
           useExplainer: false);
       expect(before,
-          contains('CssSizing(preferredHeight: 10.0, preferredWidth: 20.0)'));
+          contains('CssSizing(preferredHeight: 10.0, preferredWidth*: 20.0)'));
 
       final after = await explain(
-          tester, '<div style="height: 20px; width: 10px;">Foo</div>',
+          tester, '<div style="width: 10px; height: 20px;">Foo</div>',
           useExplainer: false);
       expect(after,
-          contains('CssSizing(preferredHeight: 20.0, preferredWidth: 10.0)'));
+          contains('CssSizing(preferredHeight*: 20.0, preferredWidth: 10.0)'));
     });
 
     final goldenSkip = Platform.isLinux ? null : 'Linux only';
@@ -339,12 +339,10 @@ void main() {
           final testCases = <String, String>{
             'native_192x192':
                 '<img src="asset:$assetName" width="192" height="192" />',
-            'child_height_lt_preferred_height':
-                '<img src="asset:$assetName" width="192" height="192" style="width: 96px; height: 100px;" />',
             'child_width_gt_max_width':
                 '<img src="asset:$assetName" width="192" height="192" style="width: 96px; height: 250px;" />',
             childHeightGtMaxHeight:
-                '<img src="asset:$assetName" width="192" height="192" style="width: 250px; height: 96px;" />'
+                '<img src="asset:$assetName" width="192" height="192" style="height: 96px; width: 250px;" />'
           };
 
           for (final testCase in testCases.entries) {

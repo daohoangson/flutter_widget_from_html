@@ -57,12 +57,15 @@ class StyleSizing {
       );
 
   _StyleSizingInput _parse(BuildMetadata meta) {
-    CssLength height, maxHeight, maxWidth, minHeight, minWidth, width;
+    CssLength maxHeight, maxWidth, minHeight, minWidth;
+    Axis preferredAxis;
+    CssLength preferredHeight, preferredWidth;
 
     for (final style in meta.styles) {
       switch (style.key) {
         case kCssHeight:
-          height = tryParseCssLength(style.value);
+          preferredAxis = Axis.vertical;
+          preferredHeight = tryParseCssLength(style.value);
           break;
         case kCssMaxHeight:
           maxHeight = tryParseCssLength(style.value);
@@ -77,32 +80,36 @@ class StyleSizing {
           minWidth = tryParseCssLength(style.value);
           break;
         case kCssWidth:
-          width = tryParseCssLength(style.value);
+          preferredAxis = Axis.horizontal;
+          preferredWidth = tryParseCssLength(style.value);
           break;
       }
     }
 
-    if (height == null &&
-        maxHeight == null &&
+    if (maxHeight == null &&
         maxWidth == null &&
         minHeight == null &&
         minWidth == null &&
-        width == null) return null;
+        preferredHeight == null &&
+        preferredWidth == null) return null;
 
-    if (width == null && meta.buildOps.whereType<DisplayBlockOp>().isNotEmpty) {
+    if (preferredWidth == null &&
+        meta.buildOps.whereType<DisplayBlockOp>().isNotEmpty) {
       // `display: block` implies a 100% width
       // but it MUST NOT reset width value if specified
       // we need to keep track of block width to calculate contraints correctly
-      width = const CssLength(100, CssLengthUnit.percentage);
+      preferredWidth = const CssLength(100, CssLengthUnit.percentage);
+      preferredAxis ??= Axis.horizontal;
     }
 
     return _StyleSizingInput(
-      height: height,
       maxHeight: maxHeight,
       maxWidth: maxWidth,
       minHeight: minHeight,
       minWidth: minWidth,
-      width: width,
+      preferredAxis: preferredAxis,
+      preferredHeight: preferredHeight,
+      preferredWidth: preferredWidth,
     );
   }
 
@@ -116,8 +123,9 @@ class StyleSizing {
       maxWidth: _getValue(input.maxWidth, tsh),
       minHeight: _getValue(input.minHeight, tsh),
       minWidth: _getValue(input.minWidth, tsh),
-      preferredHeight: _getValue(input.height, tsh),
-      preferredWidth: _getValue(input.width, tsh),
+      preferredAxis: input.preferredAxis,
+      preferredHeight: _getValue(input.preferredHeight, tsh),
+      preferredWidth: _getValue(input.preferredWidth, tsh),
     );
   }
 
@@ -140,19 +148,21 @@ class StyleSizing {
 
 @immutable
 class _StyleSizingInput {
-  final CssLength height;
   final CssLength maxHeight;
   final CssLength maxWidth;
   final CssLength minHeight;
   final CssLength minWidth;
-  final CssLength width;
+  final Axis preferredAxis;
+  final CssLength preferredHeight;
+  final CssLength preferredWidth;
 
   _StyleSizingInput({
-    this.height,
     this.maxHeight,
     this.maxWidth,
     this.minHeight,
     this.minWidth,
-    this.width,
+    this.preferredAxis,
+    this.preferredHeight,
+    this.preferredWidth,
   });
 }
