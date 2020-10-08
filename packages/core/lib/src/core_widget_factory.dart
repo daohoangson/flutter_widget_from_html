@@ -11,6 +11,7 @@ import 'core_html_widget.dart';
 /// A factory to build widgets.
 class WidgetFactory {
   BuildOp _styleBgColor;
+  BuildOp _styleBlock;
   BuildOp _styleDisplayNone;
   BuildOp _styleMargin;
   BuildOp _stylePadding;
@@ -721,8 +722,8 @@ class WidgetFactory {
   void parseStyleDisplay(BuildMetadata meta, String value) {
     switch (value) {
       case kCssDisplayBlock:
-        _styleSizing ??= StyleSizing(this).buildOp;
-        meta.register(_styleSizing);
+        _styleBlock ??= DisplayBlockOp(this);
+        meta.register(_styleBlock);
         break;
       case kCssDisplayNone:
         _styleDisplayNone ??= BuildOp(

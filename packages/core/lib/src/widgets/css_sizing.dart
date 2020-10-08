@@ -4,10 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 /// A CSS block.
-class CssBlock extends SingleChildRenderObjectWidget {
-  /// The default constraint for block element.
-  static const kBlockWidth = _CssSizingPercentage(100);
-
+class CssBlock extends CssSizing {
   /// Creates a CSS block.
   CssBlock({@required Widget child, Key key})
       : assert(child != null),
@@ -15,7 +12,7 @@ class CssBlock extends SingleChildRenderObjectWidget {
 
   @override
   _RenderCssSizing createRenderObject(BuildContext _) =>
-      _RenderCssSizing(preferredWidth: kBlockWidth);
+      _RenderCssSizing(preferredWidth: const _CssSizingPercentage(100));
 }
 
 /// A CSS sizing widget.
