@@ -1,3 +1,9 @@
+## 0.5.1+1
+
+- Discard preferred width / height on infinity value. (#340)
+- Fix image with dimensions cannot scale down (#341)
+- Use a separated `BuildOp` for `display: block` (#342)
+
 ## 0.5.1
 
 - Add support for auto, percentage sizing (e.g. `width: 50%`)
