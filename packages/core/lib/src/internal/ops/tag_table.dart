@@ -12,6 +12,10 @@ const kTagTableCaption = 'caption';
 const kAttributeBorder = 'border';
 const kAttributeCellPadding = 'cellpadding';
 const kAttributeCellSpacing = 'cellspacing';
+
+const kCssBorderCollapse = 'border-collapse';
+const kCssBorderCollapseCollapse = 'collapse';
+const kCssBorderCollapseSeparate = 'separate';
 const kCssBorderSpacing = 'border-spacing';
 
 const kCssDisplayTable = 'table';
@@ -105,23 +109,36 @@ class TagTable {
     if (children.isEmpty) return [];
 
     CssLength borderSpacing;
+    var collapseBorder = false;
     for (final style in tableMeta.styles) {
       switch (style.key) {
+        case kCssBorderCollapse:
+          switch (style.value) {
+            case kCssBorderCollapseCollapse:
+              collapseBorder = true;
+              break;
+            case kCssBorderCollapseSeparate:
+              collapseBorder = false;
+              break;
+          }
+          break;
         case kCssBorderSpacing:
           final cssLength = tryParseCssLength(style.value);
           if (cssLength != null) borderSpacing = cssLength;
+          break;
       }
     }
 
     return [
       WidgetPlaceholder<BuildMetadata>(tableMeta).wrapWith((context, _) {
         final tsh = tableMeta.tsb().build(context);
-        final gap = borderSpacing?.getValue(tsh) ?? 0.0;
+        final border = StyleBorder.getParsedBorder(tableMeta, context);
+        final spacing = borderSpacing?.getValue(tsh) ?? 0.0;
 
         return HtmlTable(
           children: children,
-          columnGap: gap,
-          rowGap: gap,
+          columnGap: collapseBorder ? (border.left.width * -1.0) : spacing,
+          rowGap: collapseBorder ? (border.top.width * -1.0) : spacing,
         );
       }),
     ];
@@ -136,6 +153,7 @@ class TagTable {
   static BuildOp borderOp(double border, double borderSpacing) => BuildOp(
       defaultStyles: (_) => {
             kCssBorder: '${border}px',
+            kCssBorderCollapse: kCssBorderCollapseSeparate,
             kCssBorderSpacing: '${borderSpacing}px',
           },
       onChild: (meta) =>

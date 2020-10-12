@@ -542,7 +542,7 @@ class WidgetFactory {
         meta
           ..[kCssDisplay] = kCssDisplayTable
           ..register(TagTable.borderOp(
-            tryParseDoubleFromMap(attrs, kAttributeBorder) ?? 1.0,
+            tryParseDoubleFromMap(attrs, kAttributeBorder) ?? 0.0,
             tryParseDoubleFromMap(attrs, kAttributeCellSpacing) ?? 2.0,
           ))
           ..register(TagTable.cellPaddingOp(

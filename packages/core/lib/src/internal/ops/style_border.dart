@@ -38,6 +38,13 @@ class StyleBorder {
         onWidgetsIsOptional: true,
         priority: 88888,
       );
+
+  static final _parsedBorders = Expando<_Border>();
+  static Border getParsedBorder(BuildMetadata meta, BuildContext context) {
+    final border = _parsedBorders[meta.element];
+    if (border == null) return null;
+    return border.getValue(meta.tsb().build(context));
+  }
 }
 
 Widget _buildBorder(
@@ -95,6 +102,8 @@ _Border _tryParseBorder(BuildMetadata meta) {
       }
     }
   }
+
+  StyleBorder._parsedBorders[meta.element] = border;
 
   return border;
 }
