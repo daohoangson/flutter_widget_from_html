@@ -95,11 +95,11 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   Type get debugTypicalAncestorWidgetClass => HtmlTable;
 }
 
-double _combineMaxHeight(double prev, double v) => max(prev, v);
+double _combineMax(double prev, double v) => max(prev, v);
 
-double _combineHeight(double prev, double v) => prev + v;
+double _combineSum(double prev, double v) => prev + v;
 
-Set<double> _heightsGenerator(int _) => {};
+Set<double> _doubleSetGenerator(int _) => {};
 
 class _TableCellData extends ContainerBoxParentData<RenderBox> {
   int columnSpan;
@@ -131,7 +131,7 @@ class _TableCellData extends ContainerBoxParentData<RenderBox> {
     final gap = max(0, rowSpan - 1) * tro._rowGap;
     return heights
             .getRange(rowStart, rowStart + rowSpan)
-            .fold(0.0, _combineHeight) +
+            .fold(0.0, _combineSum) +
         gap;
   }
 
@@ -147,7 +147,7 @@ class _TableCellData extends ContainerBoxParentData<RenderBox> {
 
   double calculateY(_TableRenderObject tro, List<double> heights) {
     final gap = (rowStart + 1) * tro._rowGap;
-    return heights.getRange(0, rowStart).fold(0.0, _combineHeight) + gap;
+    return heights.getRange(0, rowStart).fold(0.0, _combineSum) + gap;
   }
 }
 
@@ -170,8 +170,31 @@ class _TableRenderObject extends RenderBox
   }
 
   @override
-  double computeDistanceToActualBaseline(TextBaseline baseline) =>
-      defaultComputeDistanceToHighestActualBaseline(baseline);
+  double computeDistanceToActualBaseline(TextBaseline baseline) {
+    assert(!debugNeedsLayout);
+    double result;
+
+    var child = firstChild;
+    while (child != null) {
+      final data = child.parentData as _TableCellData;
+      // only compute cells in the first row
+      if (data.rowStart != 0) continue;
+
+      var candidate = child.getDistanceToActualBaseline(baseline);
+      if (candidate != null) {
+        candidate += data.offset.dy;
+        if (result != null) {
+          result = min(result, candidate);
+        } else {
+          result = candidate;
+        }
+      }
+
+      child = data.nextSibling;
+    }
+
+    return result;
+  }
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {Offset position}) =>
@@ -207,27 +230,41 @@ class _TableRenderObject extends RenderBox
     final columnGaps = (columnCount + 1) * _columnGap;
     final rowGaps = (rowCount + 1) * _rowGap;
     final width0 = (c.maxWidth - columnGaps) / columnCount;
+    final childDistances = List<double>.filled(children.length, 0.0);
     final childSizes = List<Size>(children.length);
-    final childHeights =
-        List<Set<double>>.generate(rowCount, _heightsGenerator);
+    final rowDistances =
+        List<Set<double>>.generate(rowCount, _doubleSetGenerator);
     for (var i = 0; i < children.length; i++) {
       final child = children[i];
       final data = cells[i];
       final cc = c.tighten(width: data.calculateWidth(this, width0));
       child.layout(cc, parentUsesSize: true);
+      childSizes[i] = child.size;
 
-      final childSize = childSizes[i] = child.size;
-      final rowHeight = childSize.height / data.rowSpan;
+      final distance = child.getDistanceToBaseline(TextBaseline.alphabetic);
+      childDistances[i] = distance;
+      rowDistances[data.rowStart].add(distance);
+    }
+
+    final distances = rowDistances
+        .map((values) => values.fold(0.0, _combineMax))
+        .toList(growable: false);
+    final rowHeights =
+        List<Set<double>>.generate(rowCount, _doubleSetGenerator);
+    for (var i = 0; i < children.length; i++) {
+      final data = cells[i];
+      final childSize = childSizes[i];
+      final distanceDelta = distances[data.rowStart] - childDistances[i];
+      final rowHeight = (distanceDelta + childSize.height) / data.rowSpan;
+
       for (var r = 0; r < data.rowSpan; r++) {
-        childHeights[data.rowStart + r].add(rowHeight);
+        rowHeights[data.rowStart + r].add(rowHeight);
       }
     }
 
-    final heights = List<double>(rowCount);
-    for (var r = 0; r < rowCount; r++) {
-      heights[r] = childHeights[r].fold(0.0, _combineMaxHeight);
-    }
-
+    final heights = rowHeights
+        .map((values) => values.fold(0.0, _combineMax))
+        .toList(growable: false);
     for (var i = 0; i < children.length; i++) {
       final childSize = childSizes[i];
       final data = cells[i];
@@ -238,15 +275,16 @@ class _TableRenderObject extends RenderBox
         children[i].layout(cc, parentUsesSize: true);
       }
 
+      final distanceDelta = distances[data.rowStart] - childDistances[i];
       data.offset = Offset(
         data.calculateX(this, width0),
-        data.calculateY(this, heights),
+        distanceDelta + data.calculateY(this, heights),
       );
     }
 
     size = Size(
       width0 * columnCount + columnGaps,
-      heights.fold<double>(0.0, _combineHeight) + rowGaps,
+      heights.fold<double>(0.0, _combineSum) + rowGaps,
     );
   }
 
