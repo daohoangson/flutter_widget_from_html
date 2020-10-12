@@ -6,8 +6,11 @@ import 'package:html/dom.dart' as dom;
 import '../core_data.dart';
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
+import 'ops/style_border.dart';
 import 'core_parser.dart';
 import 'margin_vertical.dart';
+
+export 'ops/style_border.dart';
 
 part 'ops/column.dart';
 part 'ops/style_bg_color.dart';

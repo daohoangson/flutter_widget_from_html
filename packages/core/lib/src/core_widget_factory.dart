@@ -12,6 +12,7 @@ import 'core_html_widget.dart';
 class WidgetFactory {
   BuildOp _styleBgColor;
   BuildOp _styleBlock;
+  BuildOp _styleBorder;
   BuildOp _styleDisplayNone;
   BuildOp _styleMargin;
   BuildOp _stylePadding;
@@ -573,6 +574,8 @@ class WidgetFactory {
       case kTagTable:
         meta
           ..[kCssDisplay] = kCssDisplayTable
+          ..register(TagTable.borderOp(
+              tryParseDoubleFromMap(attrs, kAttributeBorder) ?? 1))
           ..register(TagTable.cellPaddingOp(
               tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1));
         break;
@@ -603,33 +606,6 @@ class WidgetFactory {
       case kCssBackgroundColor:
         _styleBgColor ??= StyleBgColor(this).buildOp;
         meta.register(_styleBgColor);
-        break;
-
-      case kCssBorderBottom:
-        final borderBottom = tryParseCssBorderSide(value);
-        if (borderBottom != null) {
-          meta.register(TextStyleOps.textDecoOp(TextDeco(
-            color: borderBottom.color,
-            under: true,
-            style: borderBottom.style,
-            thickness: borderBottom.width,
-          )));
-        } else {
-          meta.register(TextStyleOps.textDecoOp(TextDeco(under: false)));
-        }
-        break;
-      case kCssBorderTop:
-        final borderTop = tryParseCssBorderSide(value);
-        if (borderTop != null) {
-          meta.register(TextStyleOps.textDecoOp(TextDeco(
-            color: borderTop.color,
-            over: true,
-            style: borderTop.style,
-            thickness: borderTop.width,
-          )));
-        } else {
-          meta.register(TextStyleOps.textDecoOp(TextDeco(over: false)));
-        }
         break;
 
       case kCssColor:
@@ -705,6 +681,11 @@ class WidgetFactory {
         _styleVerticalAlign ??= StyleVerticalAlign(this).buildOp;
         meta.register(_styleVerticalAlign);
         break;
+    }
+
+    if (key.startsWith(kCssBorder)) {
+      _styleBorder ??= StyleBorder(this).buildOp;
+      meta.register(_styleBorder);
     }
 
     if (key.startsWith(kCssMargin)) {

@@ -86,7 +86,7 @@ class TagTable {
 
     return [
       WidgetPlaceholder<BuildMetadata>(tableMeta).wrapWith((context, _) {
-        final metadata = TableMetadata(border: _parseBorder(context));
+        final metadata = TableMetadata();
 
         for (var i = 0; i < rows.length; i++) {
           for (final cell in rows[i].cells) {
@@ -109,29 +109,17 @@ class TagTable {
     ];
   }
 
-  BorderSide _parseBorder(BuildContext context) {
-    final value = tableMeta[kCssBorder];
-    if (value != null) {
-      final borderParsed = tryParseCssBorderSide(value);
-      if (borderParsed != null) {
-        return BorderSide(
-          color: borderParsed.color ?? const Color(0xFF000000),
-          width: borderParsed.width.getValue(tableMeta.tsb().build(context)),
-        );
-      }
-    }
-
-    final width =
-        tryParseDoubleFromMap(tableMeta.element.attributes, kAttributeBorder);
-    if (width != null && width > 0) return BorderSide(width: width);
-
-    return null;
-  }
-
   static BuildOp cellPaddingOp(double px) => BuildOp(
       onChild: (meta) =>
           (meta.element.localName == 'td' || meta.element.localName == 'th')
               ? meta[kCssPadding] = '${px}px'
+              : null);
+
+  static BuildOp borderOp(double width) => BuildOp(
+      defaultStyles: (_) => {kCssBorder: '${width}px'},
+      onChild: (meta) =>
+          (meta.element.localName == 'td' || meta.element.localName == 'th')
+              ? meta[kCssBorder] = '${width}px'
               : null);
 
   static String _getCssDisplayValue(BuildMetadata meta) {

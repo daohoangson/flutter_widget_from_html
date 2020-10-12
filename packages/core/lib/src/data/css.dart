@@ -1,21 +1,5 @@
 part of '../core_data.dart';
 
-/// A border.
-@immutable
-class CssBorderSide {
-  /// The border color.
-  final Color color;
-
-  /// The border style.
-  final TextDecorationStyle style;
-
-  /// The border width (thickness).
-  final CssLength width;
-
-  /// Creates a border.
-  CssBorderSide({this.color, this.style, this.width});
-}
-
 /// A length measurement.
 @immutable
 class CssLength {
