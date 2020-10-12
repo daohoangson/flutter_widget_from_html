@@ -11,6 +11,9 @@ const kTagTableCaption = 'caption';
 
 const kAttributeBorder = 'border';
 const kAttributeCellPadding = 'cellpadding';
+const kAttributeCellSpacing = 'cellspacing';
+const kCssBorderSpacing = 'border-spacing';
+
 const kCssDisplayTable = 'table';
 const kCssDisplayTableRow = 'table-row';
 const kCssDisplayTableHeaderGroup = 'table-header-group';
@@ -23,6 +26,7 @@ class TagTable {
   final BuildMetadata tableMeta;
   final WidgetFactory wf;
 
+  final _captions = <BuildTree>[];
   final _data = _TagTableData();
 
   BuildOp _tableOp;
@@ -32,6 +36,7 @@ class TagTable {
   BuildOp get op {
     _tableOp = BuildOp(
       onChild: onChild,
+      onTree: onTree,
       onWidgets: onWidgets,
       priority: StyleSizing.kPriority,
     );
@@ -59,19 +64,21 @@ class TagTable {
         childMeta.register(_TagTableGroup(wf, childMeta, rows).op);
         break;
       case kCssDisplayTableCaption:
-        childMeta.register(BuildOp(
-          onWidgets: (meta, widgets) {
-            final caption = wf
-                .buildColumnPlaceholder(meta, widgets)
-                ?.wrapWith((_, child) => _TableCaption(child));
-            if (caption == null) return [];
-
-            _data.captions.add(caption);
-            return [caption];
-          },
-          priority: StyleSizing.kPriority,
-        ));
+        childMeta.register(BuildOp(onTree: (_, tree) => _captions.add(tree)));
         break;
+    }
+  }
+
+  void onTree(BuildMetadata _, BuildTree tree) {
+    for (final caption in _captions) {
+      final built = wf
+          .buildColumnPlaceholder(tableMeta, caption.build())
+          ?.wrapWith((_, child) => _TableCaption(child));
+      if (built != null) {
+        WidgetBit.block(tree.parent, built).insertBefore(tree);
+      }
+
+      caption.detach();
     }
   }
 
@@ -82,29 +89,40 @@ class TagTable {
       ..._data.footer.rows,
     ];
 
-    if (_data.captions.isEmpty && rows.isEmpty) return [];
+    final children = <HtmlTableCell>[];
+    for (var row = 0; row < rows.length; row++) {
+      for (final cell in rows[row].cells) {
+        children.add(
+          HtmlTableCell(
+            child: cell.child,
+            columnSpan: cell.colspan,
+            rowSpan: cell.rowspan,
+            rowStart: row,
+          ),
+        );
+      }
+    }
+    if (children.isEmpty) return [];
+
+    CssLength borderSpacing;
+    for (final style in tableMeta.styles) {
+      switch (style.key) {
+        case kCssBorderSpacing:
+          final cssLength = tryParseCssLength(style.value);
+          if (cssLength != null) borderSpacing = cssLength;
+      }
+    }
 
     return [
       WidgetPlaceholder<BuildMetadata>(tableMeta).wrapWith((context, _) {
-        final metadata = TableMetadata();
-
-        for (var i = 0; i < rows.length; i++) {
-          for (final cell in rows[i].cells) {
-            metadata.addCell(
-              i,
-              cell.child,
-              colspan: cell.colspan,
-              rowspan: cell.rowspan,
-            );
-          }
-        }
-
         final tsh = tableMeta.tsb().build(context);
-        final table = wf.buildTable(tableMeta, tsh, metadata);
-        return wf.buildColumnWidget(tableMeta, tsh, [
-          ..._data.captions,
-          if (table != null) table,
-        ]);
+        final gap = borderSpacing?.getValue(tsh) ?? 0.0;
+
+        return HtmlTable(
+          children: children,
+          columnGap: gap,
+          rowGap: gap,
+        );
       }),
     ];
   }
@@ -115,11 +133,14 @@ class TagTable {
               ? meta[kCssPadding] = '${px}px'
               : null);
 
-  static BuildOp borderOp(double width) => BuildOp(
-      defaultStyles: (_) => {kCssBorder: '${width}px'},
+  static BuildOp borderOp(double border, double borderSpacing) => BuildOp(
+      defaultStyles: (_) => {
+            kCssBorder: '${border}px',
+            kCssBorderSpacing: '${borderSpacing}px',
+          },
       onChild: (meta) =>
           (meta.element.localName == 'td' || meta.element.localName == 'th')
-              ? meta[kCssBorder] = '${width}px'
+              ? meta[kCssBorder] = '${border}px'
               : null);
 
   static String _getCssDisplayValue(BuildMetadata meta) {
@@ -244,7 +265,6 @@ class _TagTableRow {
 
 @immutable
 class _TagTableData {
-  final captions = <Widget>[];
   final footer = _TagTableDataGroup();
   final header = _TagTableDataGroup();
   final rows = <_TagTableDataRow>[];

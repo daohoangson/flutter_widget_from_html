@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -9,7 +7,6 @@ import 'core_widget_factory.dart';
 part 'data/build_bits.dart';
 part 'data/css.dart';
 part 'data/image.dart';
-part 'data/table.dart';
 part 'data/text_style.dart';
 
 /// A building element metadata.

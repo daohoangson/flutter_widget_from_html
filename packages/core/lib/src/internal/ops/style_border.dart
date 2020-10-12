@@ -44,17 +44,9 @@ Widget _buildBorder(
     BuildMetadata meta, BuildContext context, Widget child, _Border border) {
   final tsh = meta.tsb().build(context);
   final b = border.getValue(tsh);
-  final padding = EdgeInsets.fromLTRB(
-    b.left.width,
-    b.top.width,
-    b.right.width,
-    b.bottom.width,
-  );
-
   return Container(
     child: child,
     decoration: BoxDecoration(border: b),
-    padding: padding,
   );
 }
 

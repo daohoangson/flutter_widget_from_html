@@ -150,39 +150,6 @@ class WidgetFactory {
         textDirection: tsh.textDirection,
       );
 
-  /// Builds [Table].
-  Widget buildTable(BuildMetadata meta, TextStyleHtml tsh, TableMetadata data) {
-    final rows = <TableRow>[];
-    final slotIndices = <int>[];
-    final tableCols = data.cols;
-    final tableRows = data.rows;
-
-    for (var r = 0; r < tableRows; r++) {
-      final cells = List<Widget>(tableCols);
-      for (var c = 0; c < tableCols; c++) {
-        final index = data.getIndexAt(row: r, column: c);
-        if (index == -1 || slotIndices.contains(index)) {
-          cells[c] = widget0;
-          continue;
-        }
-        slotIndices.add(index);
-
-        cells[c] = TableCell(child: data.getWidgetAt(index));
-      }
-
-      if (cells.isEmpty) continue;
-      rows.add(TableRow(children: cells));
-    }
-
-    if (rows.isEmpty) return null;
-
-    final tableBorder = data.border != null
-        // TODO: support different styling for border sides
-        ? TableBorder.symmetric(inside: data.border, outside: data.border)
-        : null;
-    return Table(border: tableBorder, children: rows);
-  }
-
   /// Builds [RichText].
   Widget buildText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) =>
       RichText(
@@ -575,9 +542,11 @@ class WidgetFactory {
         meta
           ..[kCssDisplay] = kCssDisplayTable
           ..register(TagTable.borderOp(
-              tryParseDoubleFromMap(attrs, kAttributeBorder) ?? 1))
+            tryParseDoubleFromMap(attrs, kAttributeBorder) ?? 1.0,
+            tryParseDoubleFromMap(attrs, kAttributeCellSpacing) ?? 2.0,
+          ))
           ..register(TagTable.cellPaddingOp(
-              tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1));
+              tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1.0));
         break;
       case kTagTableHeaderCell:
         meta.tsb(TextStyleOps.fontWeight, FontWeight.bold);
