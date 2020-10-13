@@ -51,10 +51,12 @@ class TagTable {
     if (childMeta.element.parent != tableMeta.element) return;
 
     final which = _getCssDisplayValue(childMeta);
+    _TagTableDataGroup latestGroup;
     switch (which) {
       case kCssDisplayTableRow:
+        latestGroup ??= _data.body;
         final row = _TagTableDataRow();
-        _data.rows.add(row);
+        latestGroup.rows.add(row);
         childMeta.register(_TagTableRow(wf, childMeta, row).op);
         break;
       case kCssDisplayTableHeaderGroup:
@@ -63,9 +65,10 @@ class TagTable {
         final rows = which == kCssDisplayTableHeaderGroup
             ? _data.header.rows
             : which == kCssDisplayTableRowGroup
-                ? _data.rows
+                ? _data.body.rows
                 : _data.footer.rows;
         childMeta.register(_TagTableGroup(wf, childMeta, rows).op);
+        latestGroup = null;
         break;
       case kCssDisplayTableCaption:
         childMeta.register(BuildOp(onTree: (_, tree) => _captions.add(tree)));
@@ -87,25 +90,14 @@ class TagTable {
   }
 
   Iterable<Widget> onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> __) {
-    final rows = <_TagTableDataRow>[
-      ..._data.header.rows,
-      ..._data.rows,
-      ..._data.footer.rows,
-    ];
-
     final children = <HtmlTableCell>[];
-    for (var row = 0; row < rows.length; row++) {
-      for (final cell in rows[row].cells) {
-        children.add(
-          HtmlTableCell(
-            child: cell.child,
-            columnSpan: cell.colspan,
-            rowSpan: cell.rowspan,
-            rowStart: row,
-          ),
-        );
-      }
+    // occupations data: { rowId: { columnId: occupied } }
+    final occupations = <int, Map<int, bool>>{};
+    _buildHtmlTableCells(_data.header, occupations, children);
+    for (final body in _data.bodies) {
+      _buildHtmlTableCells(body, occupations, children);
     }
+    _buildHtmlTableCells(_data.footer, occupations, children);
     if (children.isEmpty) return [];
 
     CssLength borderSpacing;
@@ -160,6 +152,47 @@ class TagTable {
           (meta.element.localName == 'td' || meta.element.localName == 'th')
               ? meta[kCssBorder] = '${border}px'
               : null);
+
+  static void _buildHtmlTableCells(_TagTableDataGroup group,
+      Map<int, Map<int, bool>> occupations, List<HtmlTableCell> cells) {
+    var rowStart = occupations.keys.length - 1;
+    final rowSpanMax = group.rows.length;
+    for (final row in group.rows) {
+      rowStart++;
+      occupations[rowStart] ??= {};
+
+      for (final cell in row.cells) {
+        var columnStart = 0;
+        while (occupations[rowStart].containsKey(columnStart)) {
+          columnStart++;
+        }
+
+        final columnSpan = cell.colspan > 0 ? cell.colspan : 1;
+        final rowSpan = min(
+            rowSpanMax,
+            cell.rowspan > 0
+                ? cell.rowspan
+                : cell.rowspan == 0
+                    ? group.rows.length
+                    : 1);
+        for (var r = 0; r < rowSpan; r++) {
+          final rr = rowStart + r;
+          occupations[rr] ??= {};
+          for (var c = 0; c < columnSpan; c++) {
+            occupations[rr][columnStart + c] = true;
+          }
+        }
+
+        cells.add(HtmlTableCell(
+          child: cell.child,
+          columnSpan: columnSpan,
+          columnStart: columnStart,
+          rowSpan: rowSpan,
+          rowStart: rowStart,
+        ));
+      }
+    }
+  }
 
   static String _getCssDisplayValue(BuildMetadata meta) {
     String value;
@@ -283,9 +316,15 @@ class _TagTableRow {
 
 @immutable
 class _TagTableData {
+  final bodies = <_TagTableDataGroup>[];
   final footer = _TagTableDataGroup();
   final header = _TagTableDataGroup();
-  final rows = <_TagTableDataRow>[];
+
+  _TagTableDataGroup get body {
+    final body = _TagTableDataGroup();
+    bodies.add(body);
+    return body;
+  }
 }
 
 @immutable

@@ -39,6 +39,9 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   /// The number of columns this cell should span.
   final int columnSpan;
 
+  /// The column index this cell should start.
+  final int columnStart;
+
   /// The number of rows this cell should span.
   final int rowSpan;
 
@@ -49,10 +52,12 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   HtmlTableCell({
     @required Widget child,
     this.columnSpan = 1,
+    @required this.columnStart,
     Key key,
     this.rowSpan = 1,
     @required this.rowStart,
   })  : assert(columnSpan >= 1),
+        assert(columnStart >= 0),
         assert(rowSpan >= 1),
         assert(rowStart >= 0),
         super(child: child, key: key);
@@ -64,6 +69,11 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
 
     if (data.columnSpan != columnSpan) {
       data.columnSpan = columnSpan;
+      needsLayout = true;
+    }
+
+    if (data.columnStart != columnStart) {
+      data.columnStart = columnStart;
       needsLayout = true;
     }
 
@@ -87,6 +97,7 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties.add(IntProperty('columnSpan', columnSpan));
+    properties.add(IntProperty('columnStart', columnStart));
     properties.add(IntProperty('rowSpan', rowSpan));
     properties.add(IntProperty('rowStart', rowStart));
   }
@@ -103,29 +114,9 @@ Set<double> _doubleSetGenerator(int _) => {};
 
 class _TableCellData extends ContainerBoxParentData<RenderBox> {
   int columnSpan;
+  int columnStart;
   int rowSpan;
   int rowStart;
-
-  static final _columnStarts = Expando<int>();
-  int get columnStart => _columnStarts[this];
-
-  void calculateColumnStart(Map<int, Map<int, bool>> grid) {
-    grid[rowStart] ??= {};
-    var columnStart = 0;
-    while (grid[rowStart].containsKey(columnStart)) {
-      columnStart++;
-    }
-
-    for (var r = 0; r < rowSpan; r++) {
-      for (var c = 0; c < columnSpan; c++) {
-        final rr = rowStart + r;
-        grid[rr] ??= {};
-        grid[rr][columnStart + c] = true;
-      }
-    }
-
-    _columnStarts[this] = columnStart;
-  }
 
   double calculateHeight(_TableRenderObject tro, List<double> heights) {
     final gap = max(0, rowSpan - 1) * tro._rowGap;
@@ -210,16 +201,13 @@ class _TableRenderObject extends RenderBox
     final children = <RenderBox>[];
     final cells = <_TableCellData>[];
 
-    // Grid data: { rowId: { columnId: occupied } }
-    final grid = <int, Map<int, bool>>{};
-
     var child = firstChild;
     var columnCount = 0;
     var rowCount = 0;
     while (child != null) {
       final data = child.parentData as _TableCellData;
       children.add(child);
-      cells.add(data..calculateColumnStart(grid));
+      cells.add(data);
 
       columnCount = max(columnCount, data.columnStart + data.columnSpan);
       rowCount = max(rowCount, data.rowStart + data.rowSpan);
