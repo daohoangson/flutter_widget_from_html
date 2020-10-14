@@ -1,3 +1,8 @@
+## 0.5.1+2
+
+- Fix bug `null` access (authored by @sweatfryash)
+- Fix bug customWidgetBuilder does not work for TABLE, VIDEO (#353)
+
 ## 0.5.1+1
 
 - Discard preferred width / height on infinity value. (#340)
