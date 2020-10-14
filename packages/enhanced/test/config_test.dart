@@ -349,6 +349,36 @@ void main() {
     });
   });
 
+  group('customWidgetBuilder (VIDEO)', () {
+    final CustomWidgetBuilder customWidgetBuilder =
+        (e) => e.localName == 'video' ? Text('Bar') : null;
+    final src = 'http://domain.com/video.mp4';
+    final html = 'Foo <video><source src="$src"></video>';
+
+    testWidgets('renders without value', (WidgetTester tester) async {
+      final explained =
+          await explain(tester, HtmlWidget(html, key: helper.hwKey));
+      expect(
+          explained,
+          equals('[Column:children='
+              '[RichText:(:Foo)],'
+              '[VideoPlayer:url=http://domain.com/video.mp4,aspectRatio=1.78]'
+              ']'));
+    });
+
+    testWidgets('renders with value', (WidgetTester tester) async {
+      final e = await explain(
+        tester,
+        HtmlWidget(
+          html,
+          customWidgetBuilder: customWidgetBuilder,
+          key: helper.hwKey,
+        ),
+      );
+      expect(e, equals('[Column:children=[RichText:(:Foo)],[Text:Bar]]'));
+    });
+  });
+
   group('hyperlinkColor', () {
     final hyperlinkColor = Color.fromRGBO(255, 0, 0, 1);
     final html = '<a>Foo</a>';
