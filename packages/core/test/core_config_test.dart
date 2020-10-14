@@ -310,6 +310,34 @@ void main() {
     });
   });
 
+  group('customWidgetBuilder (TABLE)', () {
+    final CustomWidgetBuilder customWidgetBuilder =
+        (e) => e.localName == 'table' ? Text('Bar') : null;
+    final html = 'Foo <table><tr><td>bar</td></tr></table>';
+
+    testWidgets('renders without value', (WidgetTester tester) async {
+      final explained =
+          await explain(tester, HtmlWidget(html, key: helper.hwKey));
+      expect(
+          explained,
+          equals('[Column:children=[RichText:(:Foo)],[Table:\n'
+              '[_TableCell:child=[Padding:(1,1,1,1),child=[RichText:(:bar)]]]\n'
+              ']]'));
+    });
+
+    testWidgets('renders with value', (WidgetTester tester) async {
+      final e = await explain(
+        tester,
+        HtmlWidget(
+          html,
+          customWidgetBuilder: customWidgetBuilder,
+          key: helper.hwKey,
+        ),
+      );
+      expect(e, equals('[Column:children=[RichText:(:Foo)],[Text:Bar]]'));
+    });
+  });
+
   group('hyperlinkColor', () {
     final hyperlinkColor = Color.fromRGBO(255, 0, 0, 1);
     final html = '<a>Foo</a>';
