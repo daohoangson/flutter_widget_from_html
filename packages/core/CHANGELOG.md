@@ -1,3 +1,7 @@
+## 0.5.1+3
+
+- Fix LI marker position on non-default line height
+
 ## 0.5.1+2
 
 - Fix bug `null` access (authored by @sweatfryash)
