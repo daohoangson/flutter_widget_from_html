@@ -77,7 +77,7 @@ class WidgetFactory {
 
     return Column(
       children: children,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       textDirection: tsh.textDirection,
     );
