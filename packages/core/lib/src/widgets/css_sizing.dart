@@ -10,9 +10,15 @@ class CssBlock extends CssSizing {
       : assert(child != null),
         super(child: child, key: key);
 
+  CssSizingValue get _100percent => const _CssSizingPercentage(100);
+
   @override
   _RenderCssSizing createRenderObject(BuildContext _) =>
-      _RenderCssSizing(preferredWidth: const _CssSizingPercentage(100));
+      _RenderCssSizing(preferredWidth: _100percent);
+
+  @override
+  void updateRenderObject(BuildContext _, _RenderCssSizing renderObject) =>
+      renderObject.setPreferredSize(null, _100percent, null);
 }
 
 /// A CSS sizing widget.
