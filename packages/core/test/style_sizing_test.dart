@@ -295,6 +295,21 @@ void main() {
               '[CssSizing:height≥0.0,height=10.0,width≥0.0,width=10.0,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
               ')]'));
     });
+
+    testWidgets('renders text-align / vertical-align', (tester) async {
+      final src = 'https://domain.com/image.jpg';
+      final html = '<div style="text-align: center">'
+          '<img src="$src" width="10" height="10" style="vertical-align: middle" /></div>';
+      final explained = await mockNetworkImagesFor(() => explain(tester, html));
+      expect(
+          explained,
+          equals('[_TextAlignBlock:child=[RichText:align=center,'
+              '[CssSizing:height≥0.0,height=10.0,width≥0.0,width=10.0,child='
+              '[AspectRatio:aspectRatio=1.0,child='
+              '[Image:image=NetworkImage("$src", scale: 1.0)]'
+              ']]'
+              '@middle]]'));
+    });
   });
 
   group('CssSizing', () {
