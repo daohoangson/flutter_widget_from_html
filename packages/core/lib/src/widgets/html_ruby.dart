@@ -22,8 +22,13 @@ class _RubyRenderObject extends RenderBox
         ContainerRenderObjectMixin<RenderBox, _RubyParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _RubyParentData> {
   @override
-  double computeDistanceToActualBaseline(TextBaseline baseline) =>
-      defaultComputeDistanceToHighestActualBaseline(baseline);
+  double computeDistanceToActualBaseline(TextBaseline baseline) {
+    final ruby = firstChild;
+    final rubyValue = ruby.getDistanceToActualBaseline(baseline);
+    final offset = (ruby.parentData as _RubyParentData).offset;
+
+    return offset.dy + rubyValue;
+  }
 
   @override
   double computeMaxIntrinsicHeight(double width) {
@@ -33,7 +38,7 @@ class _RubyRenderObject extends RenderBox
     final rt = (ruby.parentData as _RubyParentData).nextSibling;
     final rtValue = rt.computeMaxIntrinsicHeight(width);
 
-    return rubyValue + 2 * rtValue;
+    return rubyValue + rtValue;
   }
 
   @override
@@ -55,7 +60,7 @@ class _RubyRenderObject extends RenderBox
     final rt = (ruby.parentData as _RubyParentData).nextSibling;
     final rtValue = rt.computeMinIntrinsicHeight(width);
 
-    return rubyValue + 2 * rtValue;
+    return rubyValue + rtValue;
   }
 
   @override
@@ -80,22 +85,23 @@ class _RubyRenderObject extends RenderBox
   @override
   void performLayout() {
     final ruby = firstChild;
+    final rubyConstraints = constraints.loosen();
+    ruby.layout(rubyConstraints, parentUsesSize: true);
     final rubyData = ruby.parentData as _RubyParentData;
-    ruby.layout(constraints, parentUsesSize: true);
     final rubySize = ruby.size;
 
     final rt = rubyData.nextSibling;
+    final rtConstraints = rubyConstraints.copyWith(
+        maxHeight: rubyConstraints.maxHeight - rubySize.height);
+    rt.layout(rtConstraints, parentUsesSize: true);
     final rtData = rt.parentData as _RubyParentData;
-    rt.layout(constraints, parentUsesSize: true);
     final rtSize = rt.size;
 
-    size = Size(
-      max(rubySize.width, rtSize.width),
-      rubySize.height + 2 * rtSize.height,
-    );
-
-    rubyData.offset = Offset((size.width - rubySize.width) / 2, rtSize.height);
-    rtData.offset = Offset((size.width - rtSize.width) / 2, 0);
+    final height = rubySize.height + rtSize.height;
+    final width = max(rubySize.width, rtSize.width);
+    rubyData.offset = Offset((width - rubySize.width) / 2, rtSize.height);
+    rtData.offset = Offset((width - rtSize.width) / 2, 0);
+    size = constraints.constrain(Size(width, height));
   }
 
   @override
