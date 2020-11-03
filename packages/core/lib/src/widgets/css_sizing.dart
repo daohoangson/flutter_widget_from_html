@@ -228,23 +228,26 @@ class _RenderCssSizing extends RenderProxyBox {
     double preferredHeight,
     double preferredWidth,
   }) {
-    final childHeightByPreferredWidth =
-        child.getMaxIntrinsicHeight(preferredWidth);
-    if (childHeightByPreferredWidth !=
-            child.getMinIntrinsicHeight(preferredWidth) ||
-        childHeightByPreferredWidth == 0) {
-      return null;
-    }
+    final ccHeight = BoxConstraints(
+      maxWidth: double.infinity,
+      maxHeight: preferredHeight,
+      minWidth: 0,
+      minHeight: preferredHeight,
+    );
+    child.layout(ccHeight, parentUsesSize: true);
+    final sizeHeight = child.size;
 
-    final childWidthByPreferredHeight =
-        child.getMaxIntrinsicWidth(preferredHeight);
-    if (childWidthByPreferredHeight !=
-        child.getMinIntrinsicWidth(preferredHeight)) {
-      return null;
-    }
+    final ccWidth = BoxConstraints(
+      maxWidth: preferredWidth,
+      maxHeight: double.infinity,
+      minWidth: preferredWidth,
+      minHeight: 0,
+    );
+    child.layout(ccWidth, parentUsesSize: true);
+    final sizeWidth = child.size;
 
-    final childAspectRatio = childWidthByPreferredHeight / preferredHeight;
-    if (childAspectRatio != preferredWidth / childHeightByPreferredWidth) {
+    final childAspectRatio = sizeWidth.width / sizeWidth.height;
+    if (childAspectRatio != sizeHeight.width / sizeHeight.height) {
       return null;
     }
 
