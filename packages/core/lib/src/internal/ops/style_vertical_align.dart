@@ -23,13 +23,12 @@ class StyleVerticalAlign {
           final alignment = _tryParse(v);
           if (alignment == null) return;
 
-          final copied = tree.copyWith() as BuildTree;
-          final built = wf.buildColumnPlaceholder(meta, copied.build());
+          final built = _buildTree(meta, tree);
           if (built == null) return;
 
           if (v == kCssVerticalAlignSub || v == kCssVerticalAlignSuper) {
             built.wrapWith(
-              (context, child) => _build(
+              (context, child) => _buildStack(
                 context,
                 meta,
                 child,
@@ -45,7 +44,22 @@ class StyleVerticalAlign {
         },
       );
 
-  Widget _build(BuildContext context, BuildMetadata meta, Widget child,
+  WidgetPlaceholder _buildTree(BuildMetadata meta, BuildTree tree) {
+    final bits = tree.bits.toList(growable: false);
+    if (bits.length == 1) {
+      final firstBit = bits.first;
+      if (firstBit is WidgetBit) {
+        // use the first widget if possible
+        // and avoid creating a redundant `RichText`
+        return firstBit.child;
+      }
+    }
+
+    final copied = tree.copyWith() as BuildTree;
+    return wf.buildColumnPlaceholder(meta, copied.build());
+  }
+
+  Widget _buildStack(BuildContext context, BuildMetadata meta, Widget child,
       EdgeInsets padding) {
     final tsh = meta.tsb().build(context);
     final fontSize = tsh.style.fontSize;

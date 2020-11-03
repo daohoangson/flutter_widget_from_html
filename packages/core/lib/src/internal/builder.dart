@@ -156,9 +156,14 @@ class BuildTree extends core_data.BuildTree {
     if (domNode.nodeType != dom.Node.ELEMENT_NODE) return;
 
     final element = domNode as dom.Element;
-    final meta = BuildMetadata(element, parentMeta.tsb().sub(), parentOps);
     final customWidget = customWidgetBuilder?.call(element);
+    if (customWidget != null) {
+      add(WidgetBit.block(this, customWidget));
+      // skip further processing if a custom widget found
+      return;
+    }
 
+    final meta = BuildMetadata(element, parentMeta.tsb().sub(), parentOps);
     _collectMetadata(meta);
 
     final subTree = sub(
@@ -168,12 +173,7 @@ class BuildTree extends core_data.BuildTree {
     );
     add(subTree);
 
-    if (customWidget != null) {
-      // skip sub tree processing if a custom widget found
-      subTree.add(WidgetBit.block(subTree, customWidget));
-    } else {
-      subTree.addBitsFromNodes(element.nodes);
-    }
+    subTree.addBitsFromNodes(element.nodes);
 
     if (meta.willBuildSubtree) {
       for (final widget in subTree.build()) {

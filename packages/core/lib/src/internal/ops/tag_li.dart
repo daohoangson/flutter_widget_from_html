@@ -292,54 +292,101 @@ class _ListItemRenderObject extends RenderBox
   }
 }
 
-class _ListMarkerCircle extends StatelessWidget {
-  final TextStyle style;
-
-  const _ListMarkerCircle(this.style, {Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) =>
-      _ListMarkerPainter.buildCustomPaint(style, _ListMarkerType.circle);
+class _ListMarkerCircle extends _ListMarker {
+  const _ListMarkerCircle(TextStyle textStyle, {Key key})
+      : super(
+          key: key,
+          markerType: _ListMarkerType.circle,
+          textStyle: textStyle,
+        );
 }
 
-class _ListMarkerDisc extends StatelessWidget {
-  final TextStyle style;
-
-  const _ListMarkerDisc(this.style, {Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) =>
-      _ListMarkerPainter.buildCustomPaint(style, _ListMarkerType.disc);
+class _ListMarkerDisc extends _ListMarker {
+  const _ListMarkerDisc(TextStyle textStyle, {Key key})
+      : super(
+          key: key,
+          markerType: _ListMarkerType.disc,
+          textStyle: textStyle,
+        );
 }
 
-class _ListMarkerSquare extends StatelessWidget {
-  final TextStyle style;
-
-  const _ListMarkerSquare(this.style, {Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) =>
-      _ListMarkerPainter.buildCustomPaint(style, _ListMarkerType.square);
+class _ListMarkerSquare extends _ListMarker {
+  const _ListMarkerSquare(TextStyle textStyle, {Key key})
+      : super(
+          key: key,
+          markerType: _ListMarkerType.square,
+          textStyle: textStyle,
+        );
 }
 
-class _ListMarkerPainter extends CustomPainter {
-  final TextStyle style;
-  final _ListMarkerType type;
+class _ListMarker extends SingleChildRenderObjectWidget {
+  final _ListMarkerType markerType;
+  final TextStyle textStyle;
 
-  _ListMarkerPainter(this.style, this.type);
+  const _ListMarker({Key key, this.markerType, this.textStyle})
+      : super(key: key);
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height * 8 / 13);
-    final radius = style.fontSize * .2;
+  RenderObject createRenderObject(BuildContext _) => _ListMarkerRenderObject()
+    ..markerType = markerType
+    ..textStyle = textStyle;
 
-    switch (type) {
+  @override
+  void updateRenderObject(
+      BuildContext _, _ListMarkerRenderObject renderObject) {
+    renderObject
+      ..markerType = markerType
+      ..textStyle = textStyle;
+  }
+}
+
+class _ListMarkerRenderObject extends RenderBox {
+  _ListMarkerType _markerType;
+  set markerType(_ListMarkerType v) {
+    if (v == _markerType) return;
+    _markerType = v;
+    markNeedsLayout();
+  }
+
+  TextPainter __textPainter;
+  TextPainter get _textPainter {
+    __textPainter ??= TextPainter(
+      text: TextSpan(style: _textStyle, text: '1.'),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    return __textPainter;
+  }
+
+  TextStyle _textStyle;
+  set textStyle(TextStyle v) {
+    if (v == _textStyle) return;
+    __textPainter = null;
+    _textStyle = v;
+    markNeedsLayout();
+  }
+
+  @override
+  double computeDistanceToActualBaseline(TextBaseline baseline) =>
+      _textPainter.computeDistanceToActualBaseline(baseline);
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    final canvas = context.canvas;
+    final m = _textPainter.computeLineMetrics().first;
+    final center = offset +
+        Offset(
+          size.width / 2,
+          size.height - m.descent - m.unscaledAscent + m.unscaledAscent * .7,
+        );
+    final radius = _textStyle.fontSize * .2;
+
+    switch (_markerType) {
       case _ListMarkerType.circle:
         canvas.drawCircle(
           center,
           radius * .9,
           Paint()
-            ..color = style.color
+            ..color = _textStyle.color
             ..strokeWidth = 1
             ..style = PaintingStyle.stroke,
         );
@@ -348,32 +395,21 @@ class _ListMarkerPainter extends CustomPainter {
         canvas.drawCircle(
           center,
           radius,
-          Paint()..color = style.color,
+          Paint()..color = _textStyle.color,
         );
         break;
       case _ListMarkerType.square:
         canvas.drawRect(
           Rect.fromCircle(center: center, radius: radius * .8),
-          Paint()..color = style.color,
+          Paint()..color = _textStyle.color,
         );
         break;
     }
   }
 
   @override
-  bool shouldRepaint(_ListMarkerPainter old) => old.type != type;
-
-  static Widget buildCustomPaint(TextStyle style, _ListMarkerType type) {
-    final tp = TextPainter(
-      text: TextSpan(style: style, text: '1.'),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    final size = tp.computeDistanceToActualBaseline(TextBaseline.alphabetic);
-
-    return CustomPaint(
-      painter: _ListMarkerPainter(style, type),
-      size: Size(size, size),
-    );
+  void performLayout() {
+    size = _textPainter.size;
   }
 }
 
