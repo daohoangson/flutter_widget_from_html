@@ -70,9 +70,7 @@ class TagRuby {
         });
 
       final anchor = rubyBits.first;
-      WidgetBit.inline(anchor.parent, placeholder,
-              alignment: PlaceholderAlignment.middle)
-          .insertBefore(anchor);
+      WidgetBit.inline(anchor.parent, placeholder).insertBefore(anchor);
 
       for (final rubyBit in rubyBits) {
         rubyTree.add(rubyBit.copyWith(parent: rubyTree));
