@@ -10,7 +10,7 @@ environment:
 
 dependencies:
   cached_network_image: ^2.2.0+1
-  chewie: ">=0.9.0 <0.11.0"
+  chewie: ">=0.9.0 <0.13.0"
   flutter:
     sdk: flutter
   flutter_layout_grid: ^0.10.2
