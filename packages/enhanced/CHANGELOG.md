@@ -1,3 +1,7 @@
+## 0.5.1+5
+
+- Add support for chewie 0.12 (#373, authored by @urakozz)
+
 ## 0.5.1+4
 
 - Improve RUBY baseline (#362)
