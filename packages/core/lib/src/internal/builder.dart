@@ -6,7 +6,6 @@ import '../core_data.dart' as core_data show BuildMetadata, BuildTree;
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
 import 'core_ops.dart';
-import 'core_parser.dart';
 import 'flattener.dart';
 
 final _regExpSpaceLeading = RegExp(r'^[^\S\u{00A0}]+', unicode: true);
@@ -18,7 +17,7 @@ class BuildMetadata extends core_data.BuildMetadata {
 
   List<BuildOp> _buildOps;
   var _buildOpsIsLocked = false;
-  List<String> _styles;
+  List<InlineStyle> _styles;
   var _stylesIsLocked = false;
   bool _willBuildSubtree;
 
@@ -32,15 +31,9 @@ class BuildMetadata extends core_data.BuildMetadata {
   Iterable<BuildOp> get parentOps => _parentOps;
 
   @override
-  Iterable<MapEntry<String, String>> get styles sync* {
+  List<InlineStyle> get styles {
     assert(_stylesIsLocked);
-
-    final iterator = _styles?.iterator;
-    while (iterator?.moveNext() == true) {
-      final key = iterator.current;
-      if (!iterator.moveNext()) return;
-      yield MapEntry(key, iterator.current);
-    }
+    return _styles ?? const [];
   }
 
   @override
@@ -52,7 +45,7 @@ class BuildMetadata extends core_data.BuildMetadata {
 
     assert(!_stylesIsLocked, 'Metadata can no longer be changed.');
     _styles ??= [];
-    _styles..addAll([key, value]);
+    _styles.add(InlineStyle(key, value));
   }
 
   @override
@@ -221,7 +214,7 @@ class BuildTree extends core_data.BuildTree {
         meta._styles ??= [];
         for (final pair in map.entries) {
           if (pair.key == null || pair.value == null) continue;
-          meta._styles.insertAll(0, [pair.key, pair.value]);
+          meta._styles.insert(0, InlineStyle(pair.key, pair.value));
         }
       }
     }
@@ -229,11 +222,8 @@ class BuildTree extends core_data.BuildTree {
     _customStylesBuilder(meta);
 
     // stylings, step 2: get styles from `style` attribute
-    final attrs = meta.element.attributes;
-    if (attrs.containsKey('style')) {
-      for (final pair in splitAttributeStyle(attrs['style'])) {
-        meta[pair.key] = pair.value;
-      }
+    for (final pair in meta.element.styles) {
+      meta[pair.key] = pair.value;
     }
 
     meta._stylesIsLocked = true;
