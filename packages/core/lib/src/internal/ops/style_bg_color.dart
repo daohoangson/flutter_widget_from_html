@@ -32,16 +32,14 @@ class StyleBgColor {
   Color _parseColor(WidgetFactory wf, BuildMetadata meta) {
     Color color;
     for (final style in meta.styles) {
-      switch (style.key) {
-        case kCssBackgroundColor:
-          final parsed = tryParseColor(style.value);
-          if (parsed != null) color = parsed;
-          break;
+      switch (style.property) {
         case kCssBackground:
-          for (final v in splitCssValues(style.value)) {
-            final parsed = tryParseColor(v);
-            if (parsed != null) color = parsed;
+          for (final expression in style.values) {
+            color = tryParseColor(expression) ?? color;
           }
+          break;
+        case kCssBackgroundColor:
+          color = tryParseColor(style.value) ?? color;
           break;
       }
     }

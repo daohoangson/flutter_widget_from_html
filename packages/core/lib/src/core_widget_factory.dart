@@ -1,3 +1,5 @@
+import 'package:csslib/parser.dart' as css;
+import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -16,6 +18,7 @@ class WidgetFactory {
   BuildOp _styleMargin;
   BuildOp _stylePadding;
   BuildOp _styleSizing;
+  BuildOp _styleTextDecoration;
   BuildOp _styleVerticalAlign;
   BuildOp _tagA;
   BuildOp _tagBr;
@@ -24,8 +27,7 @@ class WidgetFactory {
   BuildOp _tagImg;
   BuildOp _tagPre;
   BuildOp _tagQ;
-  TextStyleHtml Function(TextStyleHtml, String) __tsbFontSize;
-  TextStyleHtml Function(TextStyleHtml, String) _tsbLineHeight;
+  TextStyleHtml Function(TextStyleHtml, css.Expression) _tsbLineHeight;
   State _state;
 
   HtmlWidget get _widget => _state?.widget;
@@ -383,7 +385,10 @@ class WidgetFactory {
         break;
 
       case 'big':
-        meta.tsb(_tsbFontSize, kCssFontSizeLarger);
+        meta.tsb(TextStyleOps.fontSizeTerm, kCssFontSizeLarger);
+        break;
+      case 'small':
+        meta.tsb(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
         break;
 
       case 'br':
@@ -451,9 +456,12 @@ class WidgetFactory {
           defaultStyles: (element) {
             final attrs = element.attributes;
             return {
-              kCssColor: attrs[kAttributeFontColor],
-              kCssFontFamily: attrs[kAttributeFontFace],
-              kCssFontSize: kCssFontSizes[attrs[kAttributeFontSize]],
+              if (attrs.containsKey(kAttributeFontColor))
+                kCssColor: attrs[kAttributeFontColor],
+              if (attrs.containsKey(kAttributeFontFace))
+                kCssFontFamily: attrs[kAttributeFontFace],
+              if (attrs.containsKey(kAttributeFontSize))
+                kCssFontSize: kCssFontSizes[attrs[kAttributeFontSize]],
             };
           },
         );
@@ -474,21 +482,21 @@ class WidgetFactory {
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '0.67em 0'
-          ..tsb(_tsbFontSize, '2em')
+          ..tsb(TextStyleOps.fontSizeEm, 2.0)
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h2':
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '0.83em 0'
-          ..tsb(_tsbFontSize, '1.5em')
+          ..tsb(TextStyleOps.fontSizeEm, 1.5)
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h3':
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '1em 0'
-          ..tsb(_tsbFontSize, '1.17em')
+          ..tsb(TextStyleOps.fontSizeEm, 1.17)
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h4':
@@ -501,14 +509,14 @@ class WidgetFactory {
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '1.67em 0'
-          ..tsb(_tsbFontSize, '0.83em')
+          ..tsb(TextStyleOps.fontSizeEm, .83)
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h6':
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '2.33em 0'
-          ..tsb(_tsbFontSize, '0.67em')
+          ..tsb(TextStyleOps.fontSizeEm, .67)
           ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
 
@@ -555,19 +563,15 @@ class WidgetFactory {
         meta[kCssDisplay] = kCssDisplayNone;
         break;
 
-      case 'small':
-        meta.tsb(_tsbFontSize, kCssFontSizeSmaller);
-        break;
-
       case 'sub':
         meta
           ..[kCssVerticalAlign] = kCssVerticalAlignSub
-          ..tsb(_tsbFontSize, kCssFontSizeSmaller);
+          ..tsb(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
         break;
       case 'sup':
         meta
           ..[kCssVerticalAlign] = kCssVerticalAlignSuper
-          ..tsb(_tsbFontSize, kCssFontSizeSmaller);
+          ..tsb(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
         break;
 
       case kTagTable:
@@ -597,7 +601,8 @@ class WidgetFactory {
   }
 
   /// Parses inline style [key] and [value] pair.
-  void parseStyle(BuildMetadata meta, String key, String value) {
+  void parseStyle(BuildMetadata meta, css.Declaration style) {
+    final key = style.property;
     switch (key) {
       case kCssBackground:
       case kCssBackgroundColor:
@@ -606,7 +611,7 @@ class WidgetFactory {
         break;
 
       case kCssBorderBottom:
-        final borderBottom = tryParseCssBorderSide(value);
+        final borderBottom = tryParseCssBorderSide(style.values);
         if (borderBottom != null) {
           meta.register(TextStyleOps.textDecoOp(TextDeco(
             color: borderBottom.color,
@@ -619,7 +624,7 @@ class WidgetFactory {
         }
         break;
       case kCssBorderTop:
-        final borderTop = tryParseCssBorderSide(value);
+        final borderTop = tryParseCssBorderSide(style.values);
         if (borderTop != null) {
           meta.register(TextStyleOps.textDecoOp(TextDeco(
             color: borderTop.color,
@@ -633,30 +638,30 @@ class WidgetFactory {
         break;
 
       case kCssColor:
-        final color = tryParseColor(value);
+        final color = tryParseColor(style.value);
         if (color != null) meta.tsb(TextStyleOps.color, color);
         break;
 
       case kCssDirection:
-        meta.tsb(TextStyleOps.textDirection, value);
+        meta.tsb(TextStyleOps.textDirection, style.term);
         break;
 
       case kCssFontFamily:
-        final list = TextStyleOps.fontFamilyTryParse(value);
+        final list = TextStyleOps.fontFamilyTryParse(style.values);
         if (list != null) meta.tsb(TextStyleOps.fontFamily, list);
         break;
 
       case kCssFontSize:
-        meta.tsb(_tsbFontSize, value);
+        meta.tsb(TextStyleOps.fontSize, style.value);
         break;
 
       case kCssFontStyle:
-        final fontStyle = TextStyleOps.fontStyleTryParse(value);
+        final fontStyle = TextStyleOps.fontStyleTryParse(style.term);
         if (fontStyle != null) meta.tsb(TextStyleOps.fontStyle, fontStyle);
         break;
 
       case kCssFontWeight:
-        final fontWeight = TextStyleOps.fontWeightTryParse(value);
+        final fontWeight = TextStyleOps.fontWeightTryParse(style.value);
         if (fontWeight != null) meta.tsb(TextStyleOps.fontWeight, fontWeight);
         break;
 
@@ -672,32 +677,35 @@ class WidgetFactory {
 
       case kCssLineHeight:
         _tsbLineHeight ??= TextStyleOps.lineHeight(this);
-        meta.tsb(_tsbLineHeight, value);
+        meta.tsb(_tsbLineHeight, style.value);
         break;
 
       case kCssMaxLines:
       case kCssMaxLinesWebkitLineClamp:
-        final maxLines = value == kCssMaxLinesNone ? -1 : int.tryParse(value);
+        final maxLines = TextStyleOps.maxLinesTryParse(style.value);
         if (maxLines != null) meta.tsb(TextStyleOps.maxLines, maxLines);
         break;
 
       case kCssTextAlign:
-        meta.register(StyleTextAlign(this, value).op);
+        meta.register(StyleTextAlign(this, style.term).op);
         break;
 
       case kCssTextDecoration:
-        final textDeco = TextDeco.tryParse(value);
-        if (textDeco != null) meta.tsb(TextStyleOps.textDeco, textDeco);
+        _styleTextDecoration ??= BuildOp(onTree: (meta, _) {
+          for (final style in meta.styles) {
+            if (style.property == kCssTextDecoration) {
+              final textDeco = TextDeco.tryParse(style.values);
+              if (textDeco != null) meta.tsb(TextStyleOps.textDeco, textDeco);
+            }
+          }
+        });
+        meta.register(_styleTextDecoration);
         break;
 
       case kCssTextOverflow:
-        switch (value) {
-          case kCssTextOverflowClip:
-            meta.tsb(TextStyleOps.textOverflow, TextOverflow.clip);
-            break;
-          case kCssTextOverflowEllipsis:
-            meta.tsb(TextStyleOps.textOverflow, TextOverflow.ellipsis);
-            break;
+        final textOverflow = TextStyleOps.textOverflowTryParse(style.term);
+        if (textOverflow != null) {
+          meta.tsb(TextStyleOps.textOverflow, textOverflow);
         }
         break;
 
@@ -764,10 +772,5 @@ class WidgetFactory {
     if (baseUrl == null) return null;
 
     return baseUrl.resolveUri(uri).toString();
-  }
-
-  TextStyleHtml Function(TextStyleHtml, String) get _tsbFontSize {
-    __tsbFontSize ??= TextStyleOps.fontSize(this);
-    return __tsbFontSize;
   }
 }

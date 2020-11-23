@@ -62,7 +62,7 @@ class StyleSizing {
     CssLength preferredHeight, preferredWidth;
 
     for (final style in meta.styles) {
-      switch (style.key) {
+      switch (style.property) {
         case kCssHeight:
           preferredAxis = Axis.vertical;
           preferredHeight = tryParseCssLength(style.value);

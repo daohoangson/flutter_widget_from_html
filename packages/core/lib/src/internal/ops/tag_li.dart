@@ -143,14 +143,14 @@ class _ListConfig {
     final attrs = meta.element.attributes;
 
     return _ListConfig(
-      listStyleType: meta[kCssListStyleType] ?? kCssListStyleTypeDisc,
+      listStyleType: meta[kCssListStyleType]?.term ?? kCssListStyleTypeDisc,
       markerReversed: attrs.containsKey(kAttributeOlReversed),
       markerStart: tryParseIntFromMap(attrs, kAttributeOlStart),
     );
   }
 
   static String listStyleTypeFromBuildMetadata(BuildMetadata meta) {
-    final listStyleType = meta[kCssListStyleType];
+    final listStyleType = meta[kCssListStyleType]?.term;
     if (listStyleType != null) return listStyleType;
 
     return listStyleTypeFromAttributeType(

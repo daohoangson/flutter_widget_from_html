@@ -1,3 +1,5 @@
+import 'package:csslib/parser.dart' as css;
+import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -6,7 +8,6 @@ import '../core_data.dart' as core_data show BuildMetadata, BuildTree;
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
 import 'core_ops.dart';
-import 'core_parser.dart';
 import 'flattener.dart';
 
 final _regExpSpaceLeading = RegExp(r'^[^\S\u{00A0}]+', unicode: true);
@@ -18,7 +19,7 @@ class BuildMetadata extends core_data.BuildMetadata {
 
   List<BuildOp> _buildOps;
   var _buildOpsIsLocked = false;
-  List<String> _styles;
+  List<css.Declaration> _styles;
   var _stylesIsLocked = false;
   bool _willBuildSubtree;
 
@@ -32,15 +33,9 @@ class BuildMetadata extends core_data.BuildMetadata {
   Iterable<BuildOp> get parentOps => _parentOps;
 
   @override
-  Iterable<MapEntry<String, String>> get styles sync* {
+  List<css.Declaration> get styles {
     assert(_stylesIsLocked);
-
-    final iterator = _styles?.iterator;
-    while (iterator?.moveNext() == true) {
-      final key = iterator.current;
-      if (!iterator.moveNext()) return;
-      yield MapEntry(key, iterator.current);
-    }
+    return _styles ?? const [];
   }
 
   @override
@@ -51,8 +46,9 @@ class BuildMetadata extends core_data.BuildMetadata {
     if (key == null || value == null) return;
 
     assert(!_stylesIsLocked, 'Metadata can no longer be changed.');
+    final styleSheet = css.parse('*{$key: $value;}');
     _styles ??= [];
-    _styles..addAll([key, value]);
+    _styles.addAll(styleSheet.declarations);
   }
 
   @override
@@ -71,7 +67,7 @@ class BuildMetadata extends core_data.BuildMetadata {
       _buildOps.sort((a, b) => a.priority.compareTo(b.priority));
     }
 
-    _willBuildSubtree = this[kCssDisplay] == kCssDisplayBlock ||
+    _willBuildSubtree = this[kCssDisplay]?.term == kCssDisplayBlock ||
         _buildOps?.where(_opRequiresBuildingSubtree)?.isNotEmpty == true;
     _buildOpsIsLocked = true;
   }
@@ -218,30 +214,28 @@ class BuildTree extends core_data.BuildTree {
         final map = op.defaultStyles?.call(meta.element);
         if (map == null) continue;
 
+        final str = map.entries.map((e) => '${e.key}: ${e.value}').join(';');
+        final styleSheet = css.parse('*{$str}');
+
         meta._styles ??= [];
-        for (final pair in map.entries) {
-          if (pair.key == null || pair.value == null) continue;
-          meta._styles.insertAll(0, [pair.key, pair.value]);
-        }
+        meta._styles.insertAll(0, styleSheet.declarations);
       }
     }
 
     _customStylesBuilder(meta);
 
     // stylings, step 2: get styles from `style` attribute
-    final attrs = meta.element.attributes;
-    if (attrs.containsKey('style')) {
-      for (final pair in splitAttributeStyle(attrs['style'])) {
-        meta[pair.key] = pair.value;
-      }
+    for (final declaration in meta.element.styles) {
+      meta._styles ??= [];
+      meta._styles.add(declaration);
     }
 
     meta._stylesIsLocked = true;
     for (final style in meta.styles) {
-      wf.parseStyle(meta, style.key, style.value);
+      wf.parseStyle(meta, style);
     }
 
-    wf.parseStyleDisplay(meta, meta[kCssDisplay]);
+    wf.parseStyleDisplay(meta, meta[kCssDisplay]?.term);
 
     meta._sortBuildOps();
   }

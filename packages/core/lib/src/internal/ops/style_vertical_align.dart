@@ -17,7 +17,7 @@ class StyleVerticalAlign {
         onTree: (meta, tree) {
           if (meta.willBuildSubtree) return;
 
-          final v = meta[kCssVerticalAlign];
+          final v = meta[kCssVerticalAlign]?.term;
           if (v == null || v == kCssVerticalAlignBaseline) return;
 
           final alignment = _tryParse(v);

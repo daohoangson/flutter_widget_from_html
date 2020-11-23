@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -30,12 +31,12 @@ abstract class BuildMetadata {
 
   /// The inline styles.
   ///
-  /// These are usually collected from:
+  /// These are collected from:
   ///
   /// - [WidgetFactory.parse] or [BuildOp.onChild] by calling `meta[key] = value`
   /// - [BuildOp.defaultStyles] returning a map
   /// - Attribute `style` of [domElement]
-  Iterable<MapEntry<String, String>> get styles;
+  List<css.Declaration> get styles;
 
   /// Returns `true` if subtree will be built.
   ///
@@ -51,12 +52,11 @@ abstract class BuildMetadata {
   operator []=(String key, String value);
 
   /// Gets an inline style value by key.
-  String operator [](String key) {
-    String value;
-    for (final x in styles) {
-      if (x.key == key) value = x.value;
+  css.Declaration operator [](String key) {
+    for (final style in styles.reversed) {
+      if (style.property == key) return style;
     }
-    return value;
+    return null;
   }
 
   /// Registers a build op.

@@ -110,9 +110,9 @@ class TagTable {
   }
 
   BorderSide _parseBorder(BuildContext context) {
-    final value = tableMeta[kCssBorder];
-    if (value != null) {
-      final borderParsed = tryParseCssBorderSide(value);
+    final style = tableMeta[kCssBorder];
+    if (style != null) {
+      final borderParsed = tryParseCssBorderSide(style.values);
       if (borderParsed != null) {
         return BorderSide(
           color: borderParsed.color ?? const Color(0xFF000000),
@@ -161,14 +161,10 @@ class TagTable {
       return value;
     }
 
-    final attrs = meta.element.attributes;
-    if (attrs.containsKey('style')) {
-      for (final pair in splitAttributeStyle(attrs['style'])
-          .toList(growable: false)
-          .reversed) {
-        if (pair.key == kCssDisplay) {
-          return pair.value;
-        }
+    for (final style in meta.element.styles.reversed) {
+      if (style.property == kCssDisplay) {
+        final term = style.term;
+        if (term != null) return term;
       }
     }
 

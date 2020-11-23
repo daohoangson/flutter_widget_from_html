@@ -33,15 +33,15 @@ const kCssFontStyleNormal = 'normal';
 
 const kCssFontWeight = 'font-weight';
 const kCssFontWeightBold = 'bold';
-const kCssFontWeight100 = '100';
-const kCssFontWeight200 = '200';
-const kCssFontWeight300 = '300';
-const kCssFontWeight400 = '400';
-const kCssFontWeight500 = '500';
-const kCssFontWeight600 = '600';
-const kCssFontWeight700 = '700';
-const kCssFontWeight800 = '800';
-const kCssFontWeight900 = '900';
+const kCssFontWeight100 = 100;
+const kCssFontWeight200 = 200;
+const kCssFontWeight300 = 300;
+const kCssFontWeight400 = 400;
+const kCssFontWeight500 = 500;
+const kCssFontWeight600 = 600;
+const kCssFontWeight700 = 700;
+const kCssFontWeight800 = 800;
+const kCssFontWeight900 = 900;
 
 const kCssLineHeight = 'line-height';
 const kCssLineHeightNormal = 'normal';
@@ -64,10 +64,16 @@ class TextStyleOps {
         ),
       );
 
-  static TextStyleHtml Function(TextStyleHtml, String) fontSize(
-          WidgetFactory wf) =>
-      (p, v) => p.copyWith(
-          style: p.style.copyWith(fontSize: _fontSizeTryParse(wf, p, v)));
+  static TextStyleHtml fontSize(TextStyleHtml p, css.Expression v) =>
+      p.copyWith(style: p.style.copyWith(fontSize: _fontSizeTryParse(p, v)));
+
+  static TextStyleHtml fontSizeEm(TextStyleHtml p, double v) => p.copyWith(
+      style: p.style.copyWith(
+          fontSize:
+              _fontSizeTryParseCssLength(p, CssLength(v, CssLengthUnit.em))));
+
+  static TextStyleHtml fontSizeTerm(TextStyleHtml p, String v) => p.copyWith(
+      style: p.style.copyWith(fontSize: _fontSizeTryParseTerm(p, v)));
 
   static TextStyleHtml fontStyle(TextStyleHtml p, FontStyle fontStyle) =>
       p.copyWith(style: p.style.copyWith(fontStyle: fontStyle));
@@ -75,12 +81,27 @@ class TextStyleOps {
   static TextStyleHtml fontWeight(TextStyleHtml p, FontWeight v) =>
       p.copyWith(style: p.style.copyWith(fontWeight: v));
 
-  static TextStyleHtml Function(TextStyleHtml, String) lineHeight(
+  static TextStyleHtml Function(TextStyleHtml, css.Expression) lineHeight(
           WidgetFactory wf) =>
       (p, v) => p.copyWith(height: _lineHeightTryParse(wf, p, v));
 
   static TextStyleHtml maxLines(TextStyleHtml p, int v) =>
       p.copyWith(maxLines: v);
+
+  static int maxLinesTryParse(css.Expression expression) {
+    if (expression is css.LiteralTerm) {
+      if (expression is css.NumberTerm) {
+        return (expression.value as num).ceil();
+      }
+
+      switch (expression.valueAsString) {
+        case kCssMaxLinesNone:
+          return -1;
+      }
+    }
+
+    return null;
+  }
 
   static TextStyleHtml textDeco(TextStyleHtml p, TextDeco v) {
     final pd = p.style.decoration;
@@ -115,28 +136,40 @@ class TextStyleOps {
       );
 
   static TextStyleHtml textDirection(TextStyleHtml p, String v) {
-    final textDirection = (v == kCssDirectionRtl)
-        ? TextDirection.rtl
-        : v == kCssDirectionLtr
-            ? TextDirection.ltr
-            : null;
-    if (textDirection == null) return p;
+    switch (v) {
+      case kCssDirectionLtr:
+        return p.copyWith(textDirection: TextDirection.ltr);
+      case kCssDirectionRtl:
+        return p.copyWith(textDirection: TextDirection.rtl);
+    }
 
-    return p.copyWith(textDirection: textDirection);
+    return p;
   }
 
   static TextStyleHtml textOverflow(TextStyleHtml p, TextOverflow v) =>
       p.copyWith(textOverflow: v);
 
-  static List<String> fontFamilyTryParse(String value) {
-    final parts = value.split(',');
+  static TextOverflow textOverflowTryParse(String value) {
+    switch (value) {
+      case kCssTextOverflowClip:
+        return TextOverflow.clip;
+        break;
+      case kCssTextOverflowEllipsis:
+        return TextOverflow.ellipsis;
+        break;
+    }
+
+    return null;
+  }
+
+  static List<String> fontFamilyTryParse(List<css.Expression> expressions) {
     final list = <String>[];
 
-    for (final part in parts) {
-      final fontFamily = part
-          .trim()
-          .replaceFirstMapped(RegExp(r"""^("|')(.+)\1$"""), (m) => m.group(2));
-      if (fontFamily.isNotEmpty) list.add(fontFamily);
+    for (final expression in expressions) {
+      if (expression is css.LiteralTerm) {
+        final fontFamily = expression.valueAsString;
+        if (fontFamily?.isNotEmpty == true) list.add(fontFamily);
+      }
     }
 
     return list;
@@ -153,44 +186,63 @@ class TextStyleOps {
     return null;
   }
 
-  static FontWeight fontWeightTryParse(String value) {
-    switch (value) {
-      case kCssFontWeightBold:
-        return FontWeight.bold;
-      case kCssFontWeight100:
-        return FontWeight.w100;
-      case kCssFontWeight200:
-        return FontWeight.w200;
-      case kCssFontWeight300:
-        return FontWeight.w300;
-      case kCssFontWeight400:
-        return FontWeight.w400;
-      case kCssFontWeight500:
-        return FontWeight.w500;
-      case kCssFontWeight600:
-        return FontWeight.w600;
-      case kCssFontWeight700:
-        return FontWeight.w700;
-      case kCssFontWeight800:
-        return FontWeight.w800;
-      case kCssFontWeight900:
-        return FontWeight.w900;
+  static FontWeight fontWeightTryParse(css.Expression expression) {
+    if (expression is css.LiteralTerm) {
+      if (expression is css.NumberTerm) {
+        switch (expression.value) {
+          case kCssFontWeight100:
+            return FontWeight.w100;
+          case kCssFontWeight200:
+            return FontWeight.w200;
+          case kCssFontWeight300:
+            return FontWeight.w300;
+          case kCssFontWeight400:
+            return FontWeight.w400;
+          case kCssFontWeight500:
+            return FontWeight.w500;
+          case kCssFontWeight600:
+            return FontWeight.w600;
+          case kCssFontWeight700:
+            return FontWeight.w700;
+          case kCssFontWeight800:
+            return FontWeight.w800;
+          case kCssFontWeight900:
+            return FontWeight.w900;
+        }
+      }
+
+      switch (expression.valueAsString) {
+        case kCssFontWeightBold:
+          return FontWeight.bold;
+      }
     }
 
     return null;
   }
 
-  static double _fontSizeTryParse(WidgetFactory wf, TextStyleHtml p, String v) {
+  static double _fontSizeTryParse(TextStyleHtml p, css.Expression v) {
     final length = tryParseCssLength(v);
+    print('v=$v -> length=$length');
     if (length != null) {
-      final lengthValue = length.getValue(
+      final lengthValue = _fontSizeTryParseCssLength(p, length);
+      if (lengthValue != null) return lengthValue;
+    }
+
+    if (v is css.LiteralTerm) {
+      return _fontSizeTryParseTerm(p, v.valueAsString);
+    }
+
+    return null;
+  }
+
+  static double _fontSizeTryParseCssLength(TextStyleHtml p, CssLength v) =>
+      v.getValue(
         p,
         baseValue: p.parent?.style?.fontSize,
         scaleFactor: p.getDependency<MediaQueryData>().textScaleFactor,
       );
-      if (lengthValue != null) return lengthValue;
-    }
 
+  static double _fontSizeTryParseTerm(TextStyleHtml p, String v) {
     switch (v) {
       case kCssFontSizeXxLarge:
         return _fontSizeMultiplyRootWith(p, 2.0);
@@ -229,11 +281,19 @@ class TextStyleOps {
       fontSize != null ? fontSize * value : null;
 
   static double _lineHeightTryParse(
-      WidgetFactory wf, TextStyleHtml p, String v) {
-    if (v == kCssLineHeightNormal) return -1;
+      WidgetFactory wf, TextStyleHtml p, css.Expression v) {
+    if (v is css.LiteralTerm) {
+      if (v is css.NumberTerm) {
+        if (v.value > 0) {
+          return (v.value as num).toDouble();
+        }
+      }
 
-    final number = double.tryParse(v);
-    if (number != null && number > 0) return number;
+      switch (v.valueAsString) {
+        case kCssLineHeightNormal:
+          return -1;
+      }
+    }
 
     final length = tryParseCssLength(v);
     if (length == null) return null;
@@ -267,21 +327,23 @@ class TextDeco {
     this.under,
   });
 
-  factory TextDeco.tryParse(String value) {
-    for (final v in splitCssValues(value)) {
-      switch (v) {
-        case kCssTextDecorationLineThrough:
-          return TextDeco(strike: true);
-        case kCssTextDecorationNone:
-          return TextDeco(
-            over: false,
-            strike: false,
-            under: false,
-          );
-        case kCssTextDecorationOverline:
-          return TextDeco(over: true);
-        case kCssTextDecorationUnderline:
-          return TextDeco(under: true);
+  factory TextDeco.tryParse(List<css.Expression> expressions) {
+    for (final expression in expressions) {
+      if (expression is css.LiteralTerm) {
+        switch (expression.valueAsString) {
+          case kCssTextDecorationLineThrough:
+            return TextDeco(strike: true);
+          case kCssTextDecorationNone:
+            return TextDeco(
+              over: false,
+              strike: false,
+              under: false,
+            );
+          case kCssTextDecorationOverline:
+            return TextDeco(over: true);
+          case kCssTextDecorationUnderline:
+            return TextDeco(under: true);
+        }
       }
     }
 
