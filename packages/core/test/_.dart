@@ -221,16 +221,17 @@ class Explainer {
       ? 'alignment=${a.toString().replaceFirst('Alignment.', '')}'
       : null;
 
-  String _borderSide(BorderSide s) =>
-      "${s.width}@${s.style.toString().replaceFirst('BorderStyle.', '')}${_color(s.color)}";
+  String _borderSide(BorderSide s) => s != BorderSide.none
+      ? "${s.width}@${s.style.toString().replaceFirst('BorderStyle.', '')}${_color(s.color)}"
+      : 'none';
 
   String _boxBorder(BoxBorder b) {
     if (b == null) return '';
 
     final top = _borderSide(b.top);
-    final right = b is Border ? _borderSide(b.right) : '';
+    final right = b is Border ? _borderSide(b.right) : 'none';
     final bottom = _borderSide(b.bottom);
-    final left = b is Border ? _borderSide(b.left) : '';
+    final left = b is Border ? _borderSide(b.left) : 'none';
 
     if (top == right && right == bottom && bottom == left) {
       return top;

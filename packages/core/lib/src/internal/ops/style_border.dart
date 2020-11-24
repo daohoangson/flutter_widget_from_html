@@ -10,6 +10,8 @@ const kCssBorder = 'border';
 class StyleBorder {
   final WidgetFactory wf;
 
+  final _borderHasBeenBuiltFor = Expando<bool>();
+
   StyleBorder(this.wf);
 
   BuildOp get buildOp => BuildOp(
@@ -18,6 +20,7 @@ class StyleBorder {
           final border = _tryParseBorder(meta);
           if (border == null) return;
 
+          _borderHasBeenBuiltFor[meta] = true;
           final copied = tree.copyWith() as BuildTree;
           final built = wf
               .buildColumnPlaceholder(meta, copied.build())
@@ -28,6 +31,7 @@ class StyleBorder {
           tree.replaceWith(WidgetBit.inline(tree, built));
         },
         onWidgets: (meta, widgets) {
+          if (_borderHasBeenBuiltFor[meta] == true) return widgets;
           if (widgets?.isNotEmpty != true) return null;
           final border = _tryParseBorder(meta);
           if (border == null) return widgets;
@@ -51,6 +55,8 @@ Widget _buildBorder(
     BuildMetadata meta, BuildContext context, Widget child, _Border border) {
   final tsh = meta.tsb().build(context);
   final b = border.getValue(tsh);
+  if (b == null) return child;
+
   return Container(
     child: child,
     decoration: BoxDecoration(border: b),
@@ -61,7 +67,7 @@ final _borderValuesThreeRegExp = RegExp(r'^(.+)\s+(.+)\s+(.+)$');
 final _borderValuesTwoRegExp = RegExp(r'^(.+)\s+(.+)$');
 
 _Border _tryParseBorder(BuildMetadata meta) {
-  _Border border;
+  var border = _Border();
 
   for (final style in meta.styles) {
     if (!style.key.startsWith(kCssBorder)) continue;
@@ -69,15 +75,8 @@ _Border _tryParseBorder(BuildMetadata meta) {
     final borderSide = _tryParseBorderSide(style.value);
     final suffix = style.key.substring(kCssBorder.length);
     if (suffix.isEmpty) {
-      border = _Border(
-        bottom: borderSide,
-        inlineEnd: borderSide,
-        inlineStart: borderSide,
-        top: borderSide,
-      );
+      border = border.copyWith(all: borderSide);
     } else {
-      border ??= _Border();
-
       switch (suffix) {
         case kSuffixBottom:
         case kSuffixBlockEnd:
@@ -109,31 +108,29 @@ _Border _tryParseBorder(BuildMetadata meta) {
 }
 
 _BorderSide _tryParseBorderSide(String value) {
+  String color_, style_, width_;
+
   final valuesThree = _borderValuesThreeRegExp.firstMatch(value);
   if (valuesThree != null) {
-    final width = tryParseCssLength(valuesThree[1]);
-    if (width == null || width.number <= 0) return _BorderSide.none;
-    return _BorderSide(
-      color: tryParseColor(valuesThree[3]),
-      style: _tryParseBorderStyle(valuesThree[2]),
-      width: width,
-    );
+    color_ = valuesThree[3];
+    style_ = valuesThree[2];
+    width_ = valuesThree[1];
+  } else {
+    final valuesTwo = _borderValuesTwoRegExp.firstMatch(value);
+    if (valuesTwo != null) {
+      style_ = valuesTwo[2];
+      width_ = valuesTwo[1];
+    } else {
+      width_ = value;
+    }
   }
 
-  final valuesTwo = _borderValuesTwoRegExp.firstMatch(value);
-  if (valuesTwo != null) {
-    final width = tryParseCssLength(valuesTwo[1]);
-    if (width == null || width.number <= 0) return _BorderSide.none;
-    return _BorderSide(
-      style: _tryParseBorderStyle(valuesTwo[2]),
-      width: width,
-    );
-  }
-
-  final width = tryParseCssLength(value);
+  final width = tryParseCssLength(width_);
   if (width == null || width.number <= 0) return _BorderSide.none;
+
   return _BorderSide(
-    style: BorderStyle.solid,
+    color: tryParseColor(color_),
+    style: _tryParseBorderStyle(style_),
     width: width,
   );
 }
@@ -153,6 +150,7 @@ BorderStyle _tryParseBorderStyle(String value) {
 
 @immutable
 class _Border {
+  final _BorderSide _all;
   final _BorderSide bottom;
   final _BorderSide inlineEnd;
   final _BorderSide inlineStart;
@@ -161,16 +159,19 @@ class _Border {
   final _BorderSide top;
 
   const _Border({
+    _BorderSide all,
     this.bottom,
     this.inlineEnd,
     this.inlineStart,
     _BorderSide left,
     _BorderSide right,
     this.top,
-  })  : _left = left,
+  })  : _all = all,
+        _left = left,
         _right = right;
 
   _Border copyWith({
+    _BorderSide all,
     _BorderSide bottom,
     _BorderSide inlineEnd,
     _BorderSide inlineStart,
@@ -179,27 +180,46 @@ class _Border {
     _BorderSide top,
   }) =>
       _Border(
-        bottom: bottom ?? this.bottom,
-        inlineEnd: inlineEnd ?? this.inlineEnd,
-        inlineStart: inlineStart ?? this.inlineStart,
-        left: left ?? _left,
-        right: right ?? _right,
-        top: top ?? this.top,
+        all: _BorderSide.copyWith(_all, all),
+        bottom: _BorderSide.copyWith(this.bottom, bottom),
+        inlineEnd: _BorderSide.copyWith(this.inlineEnd, inlineEnd),
+        inlineStart: _BorderSide.copyWith(this.inlineStart, inlineStart),
+        left: _BorderSide.copyWith(_left, left),
+        right: _BorderSide.copyWith(_right, right),
+        top: _BorderSide.copyWith(this.top, top),
       );
 
-  Border getValue(TextStyleHtml tsh) => Border(
-        bottom: bottom?.getValue(tsh) ?? BorderSide.none,
-        left: getValueLeft(tsh) ?? BorderSide.none,
-        right: getValueRight(tsh) ?? BorderSide.none,
-        top: top?.getValue(tsh) ?? BorderSide.none,
-      );
+  Border getValue(TextStyleHtml tsh) {
+    final bottom = _BorderSide.copyWith(_all, this.bottom)?.getValue(tsh);
+    final left = getValueLeft(tsh);
+    final right = getValueRight(tsh);
+    final top = _BorderSide.copyWith(_all, this.top)?.getValue(tsh);
+    if (bottom == null && left == null && right == null && top == null) {
+      return null;
+    }
 
-  BorderSide getValueLeft(TextStyleHtml tsh) => (_left ??
-          (tsh.textDirection == TextDirection.ltr ? inlineStart : inlineEnd))
+    return Border(
+      bottom: bottom ?? BorderSide.none,
+      left: left ?? BorderSide.none,
+      right: right ?? BorderSide.none,
+      top: top ?? BorderSide.none,
+    );
+  }
+
+  BorderSide getValueLeft(TextStyleHtml tsh) => _BorderSide.copyWith(
+          _all,
+          _left ??
+              (tsh.textDirection == TextDirection.ltr
+                  ? inlineStart
+                  : inlineEnd))
       ?.getValue(tsh);
 
-  BorderSide getValueRight(TextStyleHtml tsh) => (_right ??
-          (tsh.textDirection == TextDirection.ltr ? inlineEnd : inlineStart))
+  BorderSide getValueRight(TextStyleHtml tsh) => _BorderSide.copyWith(
+          _all,
+          _right ??
+              (tsh.textDirection == TextDirection.ltr
+                  ? inlineEnd
+                  : inlineStart))
       ?.getValue(tsh);
 }
 
@@ -211,13 +231,24 @@ class _BorderSide {
 
   const _BorderSide({this.color, this.style, this.width});
 
-  static const none = _BorderSide(style: BorderStyle.none, width: CssLength(0));
+  static const none = _BorderSide();
 
   BorderSide getValue(TextStyleHtml tsh) => identical(this, none)
-      ? BorderSide.none
+      ? null
       : BorderSide(
-          color: color ?? const Color(0xFF000000),
-          style: style ?? BorderStyle.solid,
-          width: width?.getValue(tsh) ?? 1.0,
+          color: color ?? tsh.style.color,
+          style: style ?? BorderStyle.none,
+          width: width?.getValue(tsh) ?? 0.0,
         );
+
+  static _BorderSide copyWith(_BorderSide base, _BorderSide value) =>
+      base == null || identical(value, none)
+          ? value
+          : value == null
+              ? base
+              : _BorderSide(
+                  color: value.color ?? base.color,
+                  style: value.style ?? base.style,
+                  width: value.width ?? base.width,
+                );
 }
