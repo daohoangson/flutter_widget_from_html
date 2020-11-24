@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import '_.dart';
 
@@ -663,4 +665,49 @@ void main() {
             '[HtmlTableCell:child=[RichText:(:Value 2)]]'
             ']]'));
   });
+
+  group('HtmlTable', () {
+    testWidgets('updates gaps', (WidgetTester tester) async {
+      final before = await explain(
+          tester, '<table cellspacing="10"><tr><td>Foo</td></tr></table>',
+          useExplainer: false);
+      expect(before, contains('└HtmlTable(columnGap: 10.0, rowGap: 10.0)'));
+
+      final after = await explain(
+          tester, '<table cellspacing="20"><tr><td>Foo</td></tr></table>',
+          useExplainer: false);
+      expect(after, contains('└HtmlTable(columnGap: 20.0, rowGap: 20.0)'));
+    });
+
+    testWidgets('performs hit test', (tester) async {
+      const kHref = 'href';
+      final urls = <String>[];
+
+      await tester.pumpWidget(_HitTestApp(
+        href: kHref,
+        onTapUrl: (url) => urls.add(url),
+      ));
+      expect(await tapText(tester, 'Tap me'), equals(1));
+
+      await tester.pumpAndSettle();
+      expect(urls, equals(const [kHref]));
+    });
+  });
+}
+
+class _HitTestApp extends StatelessWidget {
+  final String href;
+  final void Function(String) onTapUrl;
+
+  const _HitTestApp({this.href, Key key, this.onTapUrl}) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => MaterialApp(
+        home: Scaffold(
+          body: HtmlWidget(
+            '<table><tr><td><li><a href="$href">Tap me</a></td></tr></table>',
+            onTapUrl: onTapUrl,
+          ),
+        ),
+      );
 }

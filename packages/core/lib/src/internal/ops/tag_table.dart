@@ -67,7 +67,7 @@ class TagTable {
             : which == kCssDisplayTableRowGroup
                 ? _data.body.rows
                 : _data.footer.rows;
-        childMeta.register(_TagTableGroup(wf, childMeta, rows).op);
+        childMeta.register(_TagTableRowGroup(wf, childMeta, rows).op);
         latestGroup = null;
         break;
       case kCssDisplayTableCaption:
@@ -247,29 +247,6 @@ class _TableCaption extends SingleChildRenderObjectWidget {
   RenderObject createRenderObject(BuildContext context) => RenderProxyBox();
 }
 
-class _TagTableGroup {
-  final List<_TagTableDataRow> rows;
-  final BuildMetadata groupMeta;
-  final WidgetFactory wf;
-
-  BuildOp op;
-
-  _TagTableGroup(this.wf, this.groupMeta, this.rows) {
-    op = BuildOp(onChild: onChild);
-  }
-
-  void onChild(BuildMetadata childMeta) {
-    if (childMeta.element.parent != groupMeta.element) return;
-    if (TagTable._getCssDisplayValue(childMeta) != kCssDisplayTableRow) {
-      return;
-    }
-
-    final row = _TagTableDataRow();
-    rows.add(row);
-    childMeta.register(_TagTableRow(wf, childMeta, row).op);
-  }
-}
-
 class _TagTableRow {
   final _TagTableDataRow row;
   final BuildMetadata rowMeta;
@@ -306,6 +283,29 @@ class _TagTableRow {
     );
 
     childMeta.register(_cellOp);
+  }
+}
+
+class _TagTableRowGroup {
+  final List<_TagTableDataRow> rows;
+  final BuildMetadata groupMeta;
+  final WidgetFactory wf;
+
+  BuildOp op;
+
+  _TagTableRowGroup(this.wf, this.groupMeta, this.rows) {
+    op = BuildOp(onChild: onChild);
+  }
+
+  void onChild(BuildMetadata childMeta) {
+    if (childMeta.element.parent != groupMeta.element) return;
+    if (TagTable._getCssDisplayValue(childMeta) != kCssDisplayTableRow) {
+      return;
+    }
+
+    final row = _TagTableDataRow();
+    rows.add(row);
+    childMeta.register(_TagTableRow(wf, childMeta, row).op);
   }
 }
 
