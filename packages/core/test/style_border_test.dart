@@ -185,6 +185,40 @@ void main() {
     });
   });
 
+  group('box-sizing', () {
+    testWidgets('renders without box-sizing', (tester) async {
+      final html = '<span style="border: 1px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Container:'
+              'border=1.0@none#FF001234,'
+              'child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('parses content-box', (tester) async {
+      final html =
+          '<span style="border: 1px; box-sizing: content-box">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[Container:'
+              'border=1.0@none#FF001234,'
+              'child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('parses border-box', (tester) async {
+      final html =
+          '<span style="border: 1px; box-sizing: border-box">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[DecoratedBox:'
+              'border=1.0@none#FF001234,'
+              'child=[RichText:(:Foo)]]'));
+    });
+  });
+
   group('overwriting', () {
     testWidgets('overwrites border with border-top', (tester) async {
       final html = '<span style="border: 1px; border-top: 2px">Foo</span>';

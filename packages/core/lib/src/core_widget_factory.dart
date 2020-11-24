@@ -42,6 +42,25 @@ class WidgetFactory {
   WidgetPlaceholder buildBody(BuildMetadata meta, Iterable<Widget> children) =>
       buildColumnPlaceholder(meta, children, trimMarginVertical: true);
 
+  /// Builds [border] with [Container] or [DecoratedBox].
+  ///
+  /// See https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
+  /// for more information regarding `content-box` (the default)
+  /// and `border-box` (set [isBorderBox] to use).
+  Widget buildBorder(BuildMetadata meta, Widget child, BoxBorder border,
+          {bool isBorderBox = false}) =>
+      border == null
+          ? child
+          : isBorderBox == true
+              ? DecoratedBox(
+                  child: child,
+                  decoration: BoxDecoration(border: border),
+                )
+              : Container(
+                  child: child,
+                  decoration: BoxDecoration(border: border),
+                );
+
   /// Builds column placeholder.
   WidgetPlaceholder buildColumnPlaceholder(
     BuildMetadata meta,

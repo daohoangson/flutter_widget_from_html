@@ -6,6 +6,9 @@ import '../../core_widget_factory.dart';
 import '../core_parser.dart';
 
 const kCssBorder = 'border';
+const kCssBoxSizing = 'box-sizing';
+const kCssBoxSizingContentBox = 'content-box';
+const kCssBoxSizingBorderBox = 'border-box';
 
 class StyleBorder {
   final WidgetFactory wf;
@@ -43,24 +46,27 @@ class StyleBorder {
         priority: 88888,
       );
 
+  Widget _buildBorder(
+    BuildMetadata meta,
+    BuildContext context,
+    Widget child,
+    _Border border,
+  ) {
+    final tsh = meta.tsb().build(context);
+    return wf.buildBorder(
+      meta,
+      child,
+      border.getValue(tsh),
+      isBorderBox: meta[kCssBoxSizing] == kCssBoxSizingBorderBox,
+    );
+  }
+
   static final _parsedBorders = Expando<_Border>();
   static Border getParsedBorder(BuildMetadata meta, BuildContext context) {
     final border = _parsedBorders[meta.element];
     if (border == null) return null;
     return border.getValue(meta.tsb().build(context));
   }
-}
-
-Widget _buildBorder(
-    BuildMetadata meta, BuildContext context, Widget child, _Border border) {
-  final tsh = meta.tsb().build(context);
-  final b = border.getValue(tsh);
-  if (b == null) return child;
-
-  return Container(
-    child: child,
-    decoration: BoxDecoration(border: b),
-  );
 }
 
 final _borderValuesThreeRegExp = RegExp(r'^(.+)\s+(.+)\s+(.+)$');
