@@ -129,8 +129,12 @@ class TagTable {
 
         return HtmlTable(
           children: children,
-          columnGap: collapseBorder ? (border.left.width * -1.0) : spacing,
-          rowGap: collapseBorder ? (border.top.width * -1.0) : spacing,
+          columnGap: border != null && collapseBorder
+              ? (border.left.width * -1.0)
+              : spacing,
+          rowGap: border != null && collapseBorder
+              ? (border.top.width * -1.0)
+              : spacing,
         );
       }),
     ];
@@ -144,13 +148,13 @@ class TagTable {
 
   static BuildOp borderOp(double border, double borderSpacing) => BuildOp(
       defaultStyles: (_) => {
-            kCssBorder: '${border}px',
+            kCssBorder: '${border}px solid black',
             kCssBorderCollapse: kCssBorderCollapseSeparate,
             kCssBorderSpacing: '${borderSpacing}px',
           },
       onChild: (meta) =>
           (meta.element.localName == 'td' || meta.element.localName == 'th')
-              ? meta[kCssBorder] = '${border}px'
+              ? meta[kCssBorder] = '${border}px solid black'
               : null);
 
   static void _buildHtmlTableCells(_TagTableDataGroup group,
@@ -243,13 +247,6 @@ class _TableCaption extends SingleChildRenderObjectWidget {
   RenderObject createRenderObject(BuildContext context) => RenderProxyBox();
 }
 
-class _TableCell extends SingleChildRenderObjectWidget {
-  _TableCell(Widget child, {Key key}) : super(child: child, key: key);
-
-  @override
-  RenderObject createRenderObject(BuildContext context) => RenderProxyBox();
-}
-
 class _TagTableGroup {
   final List<_TagTableDataRow> rows;
   final BuildMetadata groupMeta;
@@ -293,9 +290,7 @@ class _TagTableRow {
 
     _cellOp ??= BuildOp(
       onWidgets: (cellMeta, widgets) {
-        final column = wf
-            .buildColumnPlaceholder(cellMeta, widgets)
-            ?.wrapWith((_, child) => _TableCell(child));
+        final column = wf.buildColumnPlaceholder(cellMeta, widgets);
         if (column == null) return [];
 
         final attributes = cellMeta.element.attributes;

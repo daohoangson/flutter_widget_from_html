@@ -349,31 +349,6 @@ class Explainer {
     return '[$clazz:$size$comma$child]';
   }
 
-  String _tableBorder(TableBorder b) {
-    if (b == null) return '';
-
-    final top = _borderSide(b.top);
-    final right = _borderSide(b.right);
-    final bottom = _borderSide(b.bottom);
-    final left = _borderSide(b.left);
-
-    if (top == right && right == bottom && bottom == left) {
-      return 'border=$top';
-    }
-
-    return 'borders=($top;$right;$bottom;$left)';
-  }
-
-  String _tableRow(TableRow row) => row.children
-      .map((c) => _widget(c is TableCell ? c.child : c))
-      .toList(growable: false)
-      .join(' | ');
-
-  String _tableRows(Table table) => table.children
-      .map((r) => _tableRow(r))
-      .toList(growable: false)
-      .join('\n');
-
   String _textAlign(TextAlign textAlign) =>
       (textAlign != null && textAlign != TextAlign.start)
           ? 'align=${textAlign.toString().replaceAll('TextAlign.', '')}'
@@ -553,8 +528,6 @@ class Explainer {
           '${widget.height ?? 0.0}');
     }
 
-    if (widget is Table) attr.add(_tableBorder(widget.border));
-
     if (widget is Tooltip) attr.add('message=${widget.message}');
 
     // A-F
@@ -581,13 +554,11 @@ class Explainer {
             ? _widgetChild(widget.child)
             : widget is SingleChildScrollView
                 ? _widgetChild(widget.child)
-                : widget is Table
-                    ? '\n${_tableRows(widget)}\n'
-                    : widget is Text
-                        ? widget.data
-                        : widget is Tooltip
-                            ? _widgetChild(widget.child)
-                            : null);
+                : widget is Text
+                    ? widget.data
+                    : widget is Tooltip
+                        ? _widgetChild(widget.child)
+                        : null);
     // U-Z
 
     final attrStr = attr.where((a) => a?.isNotEmpty == true).join(',');

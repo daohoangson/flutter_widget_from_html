@@ -25,6 +25,13 @@ class HtmlTable extends MultiChildRenderObjectWidget {
     ..rowGap = rowGap;
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DoubleProperty('columnGap', columnGap, defaultValue: 0.0));
+    properties.add(DoubleProperty('rowGap', rowGap, defaultValue: 0.0));
+  }
+
+  @override
   void updateRenderObject(BuildContext _, _TableRenderObject renderObject) {
     super.updateRenderObject(_, renderObject);
 
@@ -96,9 +103,9 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(IntProperty('columnSpan', columnSpan));
+    properties.add(IntProperty('columnSpan', columnSpan, defaultValue: 1));
     properties.add(IntProperty('columnStart', columnStart));
-    properties.add(IntProperty('rowSpan', rowSpan));
+    properties.add(IntProperty('rowSpan', rowSpan, defaultValue: 1));
     properties.add(IntProperty('rowStart', rowStart));
   }
 
