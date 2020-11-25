@@ -11,6 +11,8 @@ const kCssVerticalAlignSuper = 'super';
 class StyleVerticalAlign {
   final WidgetFactory wf;
 
+  static final _skipBuilding = Expando<bool>();
+
   StyleVerticalAlign(this.wf);
 
   BuildOp get buildOp => BuildOp(
@@ -20,9 +22,10 @@ class StyleVerticalAlign {
           final v = meta[kCssVerticalAlign];
           if (v == null || v == kCssVerticalAlignBaseline) return;
 
-          final alignment = _tryParse(v);
+          final alignment = _tryParsePlaceholderAlignment(v);
           if (alignment == null) return;
 
+          _skipBuilding[meta] = true;
           final built = _buildTree(meta, tree);
           if (built == null) return;
 
@@ -42,6 +45,28 @@ class StyleVerticalAlign {
 
           tree.replaceWith(WidgetBit.inline(tree, built, alignment: alignment));
         },
+        onWidgets: (meta, widgets) {
+          if (_skipBuilding[meta] == true) {
+            return widgets;
+          }
+          if (widgets?.isNotEmpty != true) {
+            return widgets;
+          }
+
+          final v = meta[kCssVerticalAlign];
+          if (v == null) return widgets;
+
+          _skipBuilding[meta] = true;
+          return listOrNull(wf
+              .buildColumnPlaceholder(meta, widgets)
+              ?.wrapWith((context, child) {
+            final tsh = meta.tsb().build(context);
+            final alignment = _tryParseAlignmentGeometry(tsh.textDirection, v);
+            return wf.buildAlign(meta, child, alignment);
+          }));
+        },
+        onWidgetsIsOptional: true,
+        priority: 4500,
       );
 
   WidgetPlaceholder _buildTree(BuildMetadata meta, BuildTree tree) {
@@ -84,19 +109,35 @@ class StyleVerticalAlign {
       ],
     );
   }
+}
 
-  static PlaceholderAlignment _tryParse(String value) {
-    switch (value) {
-      case kCssVerticalAlignTop:
-      case kCssVerticalAlignSub:
-        return PlaceholderAlignment.top;
-      case kCssVerticalAlignSuper:
-      case kCssVerticalAlignBottom:
-        return PlaceholderAlignment.bottom;
-      case kCssVerticalAlignMiddle:
-        return PlaceholderAlignment.middle;
-    }
-
-    return null;
+AlignmentGeometry _tryParseAlignmentGeometry(TextDirection dir, String value) {
+  final isLtr = dir != TextDirection.rtl;
+  switch (value) {
+    case kCssVerticalAlignTop:
+    case kCssVerticalAlignSuper:
+      return isLtr ? Alignment.topLeft : Alignment.topRight;
+    case kCssVerticalAlignMiddle:
+      return isLtr ? Alignment.centerLeft : Alignment.centerRight;
+    case kCssVerticalAlignBottom:
+    case kCssVerticalAlignSub:
+      return isLtr ? Alignment.bottomLeft : Alignment.bottomRight;
   }
+
+  return null;
+}
+
+PlaceholderAlignment _tryParsePlaceholderAlignment(String value) {
+  switch (value) {
+    case kCssVerticalAlignTop:
+    case kCssVerticalAlignSub:
+      return PlaceholderAlignment.top;
+    case kCssVerticalAlignSuper:
+    case kCssVerticalAlignBottom:
+      return PlaceholderAlignment.bottom;
+    case kCssVerticalAlignMiddle:
+      return PlaceholderAlignment.middle;
+  }
+
+  return null;
 }

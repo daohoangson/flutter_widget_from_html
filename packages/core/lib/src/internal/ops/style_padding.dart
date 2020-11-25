@@ -14,6 +14,8 @@ Widget _paddingInlineSizedBox(double width) =>
     width != null && width > 0 ? SizedBox(width: width) : widget0;
 
 class StylePadding {
+  static const kPriorityBoxModel3k = 3000;
+
   final WidgetFactory wf;
 
   StylePadding(this.wf);
@@ -42,7 +44,7 @@ class StylePadding {
               ?.wrapWith((c, w) => _build(c, meta, w, padding)));
         },
         onWidgetsIsOptional: true,
-        priority: 9999,
+        priority: kPriorityBoxModel3k,
       );
 
   Widget _build(BuildContext context, BuildMetadata meta, Widget child,

@@ -10,9 +10,11 @@ const kCssBoxSizingContentBox = 'content-box';
 const kCssBoxSizingBorderBox = 'border-box';
 
 class StyleBorder {
+  static const kPriorityBoxModel7k = 7000;
+
   final WidgetFactory wf;
 
-  final _borderHasBeenBuiltFor = Expando<bool>();
+  static final _skipBuilding = Expando<bool>();
 
   StyleBorder(this.wf);
 
@@ -22,7 +24,7 @@ class StyleBorder {
           final border = tryParseBorder(meta);
           if (border == null) return;
 
-          _borderHasBeenBuiltFor[meta] = true;
+          _skipBuilding[meta] = true;
           final copied = tree.copyWith() as BuildTree;
           final built = wf
               .buildColumnPlaceholder(meta, copied.build())
@@ -33,16 +35,18 @@ class StyleBorder {
           tree.replaceWith(WidgetBit.inline(tree, built));
         },
         onWidgets: (meta, widgets) {
-          if (_borderHasBeenBuiltFor[meta] == true) return widgets;
-          if (widgets?.isNotEmpty != true) return null;
+          if (_skipBuilding[meta] == true || widgets?.isNotEmpty != true) {
+            return widgets;
+          }
           final border = tryParseBorder(meta);
           if (border == null) return widgets;
 
+          _skipBuilding[meta] = true;
           return listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
               (context, child) => _buildBorder(meta, context, child, border)));
         },
         onWidgetsIsOptional: true,
-        priority: 88888,
+        priority: kPriorityBoxModel7k,
       );
 
   Widget _buildBorder(
@@ -58,11 +62,5 @@ class StyleBorder {
       border.getValue(tsh),
       isBorderBox: meta[kCssBoxSizing] == kCssBoxSizingBorderBox,
     );
-  }
-
-  static Border getParsedBorder(BuildMetadata meta, BuildContext context) {
-    final border = tryParseBorder(meta);
-    if (border == null) return null;
-    return border.getValue(meta.tsb().build(context));
   }
 }

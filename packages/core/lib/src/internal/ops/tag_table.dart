@@ -12,6 +12,7 @@ const kTagTableCaption = 'caption';
 const kAttributeBorder = 'border';
 const kAttributeCellPadding = 'cellpadding';
 const kAttributeCellSpacing = 'cellspacing';
+const kAttributeValign = 'valign';
 
 const kCssBorderCollapse = 'border-collapse';
 const kCssBorderCollapseCollapse = 'collapse';
@@ -42,7 +43,7 @@ class TagTable {
       onChild: onChild,
       onTree: onTree,
       onWidgets: onWidgets,
-      priority: StyleSizing.kPriority,
+      priority: StyleSizing.kPriority5k,
     );
     return _tableOp;
   }
@@ -121,10 +122,12 @@ class TagTable {
       }
     }
 
+    final tableBorder = tryParseBorder(tableMeta);
+
     return [
       WidgetPlaceholder<BuildMetadata>(tableMeta).wrapWith((context, _) {
         final tsh = tableMeta.tsb().build(context);
-        final border = StyleBorder.getParsedBorder(tableMeta, context);
+        final border = tableBorder?.getValue(tsh);
         final spacing = borderSpacing?.getValue(tsh) ?? 0.0;
 
         return HtmlTable(
@@ -265,6 +268,11 @@ class _TagTableRow {
       return;
     }
 
+    final attrs = childMeta.element.attributes;
+    if (attrs.containsKey(kAttributeValign)) {
+      childMeta[kCssVerticalAlign] = attrs[kAttributeValign];
+    }
+
     _cellOp ??= BuildOp(
       onWidgets: (cellMeta, widgets) {
         final column = wf.buildColumnPlaceholder(cellMeta, widgets);
@@ -279,7 +287,7 @@ class _TagTableRow {
 
         return [column];
       },
-      priority: StyleSizing.kPriority,
+      priority: StyleSizing.kPriority5k,
     );
 
     childMeta.register(_cellOp);

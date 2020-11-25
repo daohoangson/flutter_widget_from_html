@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '_.dart';
 
 String _padding(String child) =>
-    '[HtmlTableCell:child=[Padding:(1,1,1,1),child=$child]]';
+    '[HtmlTableCell:child=[Align:alignment=centerLeft,child='
+    '[Padding:(1,1,1,1),child=$child]]]';
 
 String _richtext(String text) => _padding('[RichText:(:$text)]');
 
-void main() {
+final bg =
+    'BoxDecoration(border: all(BorderSide(Color(0xff000000), 1.0, BorderStyle.solid)))';
+
+void main() async {
+  await loadAppFonts();
+
   group('basic usage', () {
     final html = '<table>'
         '<caption>Caption</caption>'
@@ -52,26 +59,30 @@ void main() {
               '    │└WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#5):\n'
               '    │ │  "Header 1"\n'
               '    │ │)\n'
-              '    │ └Padding(padding: all(1.0))\n'
-              '    │  └RichText(text: "Header 1")\n'
+              '    │ └Align(alignment: centerLeft)\n'
+              '    │  └Padding(padding: all(1.0))\n'
+              '    │   └RichText(text: "Header 1")\n'
               '    ├HtmlTableCell(columnStart: 1, rowStart: 0)\n'
               '    │└WidgetPlaceholder<BuildTree>(BuildTree#6 tsb#7(parent=#5):\n'
               '    │ │  "Header 2"\n'
               '    │ │)\n'
-              '    │ └Padding(padding: all(1.0))\n'
-              '    │  └RichText(text: "Header 2")\n'
+              '    │ └Align(alignment: centerLeft)\n'
+              '    │  └Padding(padding: all(1.0))\n'
+              '    │   └RichText(text: "Header 2")\n'
               '    ├HtmlTableCell(columnStart: 0, rowStart: 1)\n'
               '    │└WidgetPlaceholder<BuildTree>(BuildTree#8 tsb#9(parent=#10):\n'
               '    │ │  "Value 1"\n'
               '    │ │)\n'
-              '    │ └Padding(padding: all(1.0))\n'
-              '    │  └RichText(text: "Value 1")\n'
+              '    │ └Align(alignment: centerLeft)\n'
+              '    │  └Padding(padding: all(1.0))\n'
+              '    │   └RichText(text: "Value 1")\n'
               '    └HtmlTableCell(columnStart: 1, rowStart: 1)\n'
               '     └WidgetPlaceholder<BuildTree>(BuildTree#11 tsb#12(parent=#10):\n'
               '      │  "Value 2"\n'
               '      │)\n'
-              '      └Padding(padding: all(1.0))\n'
-              '       └RichText(text: "Value 2")\n'
+              '      └Align(alignment: centerLeft)\n'
+              '       └Padding(padding: all(1.0))\n'
+              '        └RichText(text: "Value 2")\n'
               '\n'));
     });
   });
@@ -118,7 +129,7 @@ void main() {
           explained,
           equals('[HtmlTable:children='
               '${_padding('[RichText:(+b:Header 1)]')},'
-              '${_padding('[_TextAlignBlock:child=[RichText:align=center,(+b:Header 2)]]')},'
+              '[HtmlTableCell:child=[Align:alignment=centerLeft,child=[_TextAlignBlock:child=[Padding:(1,1,1,1),child=[RichText:align=center,(+b:Header 2)]]]]],'
               '${_padding('[RichText:(:Value (+i:1))]')},'
               '${_padding('[RichText:(+b:Value 2)]')}'
               ']'));
@@ -152,7 +163,7 @@ void main() {
           explained,
           equals('[HtmlTable:children='
               '${_padding('[RichText:align=right,(+b:Header 1)]')},'
-              '${_padding('[_TextAlignBlock:child=[RichText:align=center,(+b:Header 2)]]')},'
+              '[HtmlTableCell:child=[Align:alignment=centerLeft,child=[_TextAlignBlock:child=[Padding:(1,1,1,1),child=[RichText:align=center,(+b:Header 2)]]]]],'
               '${_padding('[RichText:align=right,(:Value (+i:1))]')},'
               '${_padding('[RichText:align=right,(+b:Value 2)]')}'
               ']'));
@@ -161,33 +172,69 @@ void main() {
 
   group('border', () {
     testWidgets('renders border=0', (WidgetTester tester) async {
-      final html = '<table border="0"><tr><td>Foo</td></tr></table>';
-      final e = await explain(tester, html);
-      expect(e, equals('[HtmlTable:children=${_richtext('Foo')}]'));
+      final html =
+          '<table border="0"><tbody><tr><td>Foo</td></tr></tbody></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+          explained,
+          equals('TshWidget\n'
+              '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
+              ' └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              '  └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
+              '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+              '    │  "Foo"\n'
+              '    │)\n'
+              '    └Align(alignment: centerLeft)\n'
+              '     └Padding(padding: all(1.0))\n'
+              '      └RichText(text: "Foo")\n'
+              '\n'));
     });
 
     testWidgets('renders border=1', (WidgetTester tester) async {
-      final html = '<table border="1"><tr><td>Foo</td></tr></table>';
-      final explained = await explain(tester, html);
+      final html =
+          '<table border="1"><tbody><tr><td>Foo</td></tr></tbody></table>';
+      final explained = await explain(tester, html, useExplainer: false);
       expect(
-        explained,
-        equals('[Container:border=1.0@solid#FF000000,child=[HtmlTable:children='
-            '[HtmlTableCell:child=[Container:border=1.0@solid#FF000000,child='
-            '[Padding:(1,1,1,1),child=[RichText:(:Foo)]]'
-            ']]]]'),
-      );
+          explained,
+          equals('TshWidget\n'
+              '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
+              ' └Container(bg: $bg)\n'
+              '  └DecoratedBox(bg: $bg)\n'
+              '   └Padding(padding: all(1.0))\n'
+              '    └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              '     └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
+              '      └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+              '       │  "Foo"\n'
+              '       │)\n'
+              '       └Container(bg: $bg)\n'
+              '        └DecoratedBox(bg: $bg)\n'
+              '         └Padding(padding: all(1.0))\n'
+              '          └Align(alignment: centerLeft)\n'
+              '           └Padding(padding: all(1.0))\n'
+              '            └RichText(text: "Foo")\n'
+              '\n'));
     });
 
     testWidgets('renders style', (WidgetTester tester) async {
-      final html = '<table style="border: 1px solid black">'
-          '<tr><td>Foo</td></tr></table>';
-      final explained = await explain(tester, html);
+      final html = '<table style="border: 1px solid black"><tbody>'
+          '<tr><td>Foo</td></tr></tbody></table>';
+      final explained = await explain(tester, html, useExplainer: false);
       expect(
-        explained,
-        equals('[Container:border=1.0@solid#FF000000,child=[HtmlTable:children='
-            '${_richtext('Foo')}'
-            ']]'),
-      );
+          explained,
+          equals('TshWidget\n'
+              '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
+              ' └Container(bg: $bg)\n'
+              '  └DecoratedBox(bg: $bg)\n'
+              '   └Padding(padding: all(1.0))\n'
+              '    └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              '     └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
+              '      └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+              '       │  "Foo"\n'
+              '       │)\n'
+              '       └Align(alignment: centerLeft)\n'
+              '        └Padding(padding: all(1.0))\n'
+              '         └RichText(text: "Foo")\n'
+              '\n'));
     });
   });
 
@@ -204,8 +251,11 @@ void main() {
       expect(
           explained,
           equals('[HtmlTable:children='
-              '[HtmlTableCell:child=[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]'
-              ']'));
+              '[HtmlTableCell:child='
+              '[Align:alignment=centerLeft,child='
+              '[Padding:(2,2,2,2),child='
+              '[RichText:(:Foo)]'
+              ']]]]'));
     });
 
     group('inline style', () {
@@ -225,8 +275,11 @@ void main() {
         expect(
             explained,
             equals('[HtmlTable:children='
-                '[HtmlTableCell:child=[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]'
-                ']'));
+                '[HtmlTableCell:child='
+                '[Align:alignment=centerLeft,child='
+                '[Padding:(2,2,2,2),child='
+                '[RichText:(:Foo)]'
+                ']]]]'));
       });
     });
   });
@@ -244,8 +297,9 @@ void main() {
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
               '    │)\n'
-              '    └Padding(padding: all(1.0))\n'
-              '     └RichText(text: "Foo")\n'
+              '    └Align(alignment: centerLeft)\n'
+              '     └Padding(padding: all(1.0))\n'
+              '      └RichText(text: "Foo")\n'
               '\n'));
     });
 
@@ -263,8 +317,9 @@ void main() {
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
               '    │)\n'
-              '    └Padding(padding: all(1.0))\n'
-              '     └RichText(text: "Foo")\n'
+              '    └Align(alignment: centerLeft)\n'
+              '     └Padding(padding: all(1.0))\n'
+              '      └RichText(text: "Foo")\n'
               '\n'));
     });
 
@@ -282,8 +337,9 @@ void main() {
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
               '    │)\n'
-              '    └Padding(padding: all(1.0))\n'
-              '     └RichText(text: "Foo")\n'
+              '    └Align(alignment: centerLeft)\n'
+              '     └Padding(padding: all(1.0))\n'
+              '      └RichText(text: "Foo")\n'
               '\n'));
     });
 
@@ -301,8 +357,9 @@ void main() {
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
               '    │)\n'
-              '    └Padding(padding: all(1.0))\n'
-              '     └RichText(text: "Foo")\n'
+              '    └Align(alignment: centerLeft)\n'
+              '     └Padding(padding: all(1.0))\n'
+              '      └RichText(text: "Foo")\n'
               '\n'));
     });
 
@@ -311,8 +368,6 @@ void main() {
           '<tr><td>Foo</td></tr>'
           '</tbody></table>';
       final explained = await explain(tester, html, useExplainer: false);
-      final bg =
-          'BoxDecoration(border: all(BorderSide(Color(0xff000000), 1.0, BorderStyle.solid)))';
       expect(
           explained,
           equals('TshWidget\n'
@@ -328,8 +383,9 @@ void main() {
               '       └Container(bg: $bg)\n'
               '        └DecoratedBox(bg: $bg)\n'
               '         └Padding(padding: all(1.0))\n'
-              '          └Padding(padding: all(1.0))\n'
-              '           └RichText(text: "Foo")\n'
+              '          └Align(alignment: centerLeft)\n'
+              '           └Padding(padding: all(1.0))\n'
+              '            └RichText(text: "Foo")\n'
               '\n'));
     });
   });
@@ -348,8 +404,9 @@ void main() {
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
               '    │)\n'
-              '    └Padding(padding: all(1.0))\n'
-              '     └RichText(text: "Foo")\n'
+              '    └Align(alignment: centerLeft)\n'
+              '     └Padding(padding: all(1.0))\n'
+              '      └RichText(text: "Foo")\n'
               '\n'));
     });
 
@@ -366,8 +423,9 @@ void main() {
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
               '    │)\n'
-              '    └Padding(padding: all(1.0))\n'
-              '     └RichText(text: "Foo")\n'
+              '    └Align(alignment: centerLeft)\n'
+              '     └Padding(padding: all(1.0))\n'
+              '      └RichText(text: "Foo")\n'
               '\n'));
     });
 
@@ -384,8 +442,9 @@ void main() {
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
               '    │)\n'
-              '    └Padding(padding: all(1.0))\n'
-              '     └RichText(text: "Foo")\n'
+              '    └Align(alignment: centerLeft)\n'
+              '     └Padding(padding: all(1.0))\n'
+              '      └RichText(text: "Foo")\n'
               '\n'));
     });
 
@@ -402,8 +461,9 @@ void main() {
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
               '    │)\n'
-              '    └Padding(padding: all(1.0))\n'
-              '     └RichText(text: "Foo")\n'
+              '    └Align(alignment: centerLeft)\n'
+              '     └Padding(padding: all(1.0))\n'
+              '      └RichText(text: "Foo")\n'
               '\n'));
     });
 
@@ -422,20 +482,23 @@ void main() {
               '  │└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '  │ │  "1.1"\n'
               '  │ │)\n'
-              '  │ └Padding(padding: all(1.0))\n'
-              '  │  └RichText(text: "1.1")\n'
+              '  │ └Align(alignment: centerLeft)\n'
+              '  │  └Padding(padding: all(1.0))\n'
+              '  │   └RichText(text: "1.1")\n'
               '  ├HtmlTableCell(columnStart: 1, rowStart: 0)\n'
               '  │└WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#2):\n'
               '  │ │  "1.2"\n'
               '  │ │)\n'
-              '  │ └Padding(padding: all(1.0))\n'
-              '  │  └RichText(text: "1.2")\n'
+              '  │ └Align(alignment: centerLeft)\n'
+              '  │  └Padding(padding: all(1.0))\n'
+              '  │   └RichText(text: "1.2")\n'
               '  └HtmlTableCell(columnStart: 1, rowStart: 1)\n'
               '   └WidgetPlaceholder<BuildTree>(BuildTree#5 tsb#6(parent=#7):\n'
               '    │  "2"\n'
               '    │)\n'
-              '    └Padding(padding: all(1.0))\n'
-              '     └RichText(text: "2")\n'
+              '    └Align(alignment: centerLeft)\n'
+              '     └Padding(padding: all(1.0))\n'
+              '      └RichText(text: "2")\n'
               '\n'));
     });
 
@@ -453,8 +516,9 @@ void main() {
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
               '    │)\n'
-              '    └Padding(padding: all(1.0))\n'
-              '     └RichText(text: "Foo")\n'
+              '    └Align(alignment: centerLeft)\n'
+              '     └Padding(padding: all(1.0))\n'
+              '      └RichText(text: "Foo")\n'
               '\n'));
     });
 
@@ -473,33 +537,85 @@ void main() {
               '  │└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '  │ │  "1.1"\n'
               '  │ │)\n'
-              '  │ └Padding(padding: all(1.0))\n'
-              '  │  └RichText(text: "1.1")\n'
+              '  │ └Align(alignment: centerLeft)\n'
+              '  │  └Padding(padding: all(1.0))\n'
+              '  │   └RichText(text: "1.1")\n'
               '  ├HtmlTableCell(columnStart: 1, rowSpan: 2, rowStart: 0)\n'
               '  │└WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#2):\n'
               '  │ │  "1.2"\n'
               '  │ │)\n'
-              '  │ └Padding(padding: all(1.0))\n'
-              '  │  └RichText(text: "1.2")\n'
+              '  │ └Align(alignment: centerLeft)\n'
+              '  │  └Padding(padding: all(1.0))\n'
+              '  │   └RichText(text: "1.2")\n'
               '  ├HtmlTableCell(columnStart: 2, rowStart: 0)\n'
               '  │└WidgetPlaceholder<BuildTree>(BuildTree#5 tsb#6(parent=#2):\n'
               '  │ │  "1.3"\n'
               '  │ │)\n'
-              '  │ └Padding(padding: all(1.0))\n'
-              '  │  └RichText(text: "1.3")\n'
+              '  │ └Align(alignment: centerLeft)\n'
+              '  │  └Padding(padding: all(1.0))\n'
+              '  │   └RichText(text: "1.3")\n'
               '  ├HtmlTableCell(columnStart: 0, rowStart: 1)\n'
               '  │└WidgetPlaceholder<BuildTree>(BuildTree#7 tsb#8(parent=#9):\n'
               '  │ │  "2.1"\n'
               '  │ │)\n'
-              '  │ └Padding(padding: all(1.0))\n'
-              '  │  └RichText(text: "2.1")\n'
+              '  │ └Align(alignment: centerLeft)\n'
+              '  │  └Padding(padding: all(1.0))\n'
+              '  │   └RichText(text: "2.1")\n'
               '  └HtmlTableCell(columnStart: 2, rowStart: 1)\n'
               '   └WidgetPlaceholder<BuildTree>(BuildTree#10 tsb#11(parent=#9):\n'
               '    │  "2.2"\n'
               '    │)\n'
-              '    └Padding(padding: all(1.0))\n'
-              '     └RichText(text: "2.2")\n'
+              '    └Align(alignment: centerLeft)\n'
+              '     └Padding(padding: all(1.0))\n'
+              '      └RichText(text: "2.2")\n'
               '\n'));
+    });
+  });
+
+  group('valign', () {
+    testWidgets('renders without align', (WidgetTester tester) async {
+      final html = '<table><tr><td>Foo</td></tr></table>';
+      final e = await explain(tester, html);
+      expect(e, equals('[HtmlTable:children=${_richtext('Foo')}]'));
+    });
+
+    testWidgets('renders align=bottom', (WidgetTester tester) async {
+      final html = '<table><tr><td valign="bottom">Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[HtmlTable:children='
+              '[HtmlTableCell:child='
+              '[Align:alignment=bottomLeft,child='
+              '[Padding:(1,1,1,1),child='
+              '[RichText:(:Foo)]'
+              ']]]]'));
+    });
+
+    testWidgets('renders align=middle', (WidgetTester tester) async {
+      final html = '<table><tr><td valign="middle">Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[HtmlTable:children='
+              '[HtmlTableCell:child='
+              '[Align:alignment=centerLeft,child='
+              '[Padding:(1,1,1,1),child='
+              '[RichText:(:Foo)]'
+              ']]]]'));
+    });
+
+    testWidgets('renders align=top', (WidgetTester tester) async {
+      final html = '<table><tr><td valign="top">Foo</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[HtmlTable:children='
+              '[HtmlTableCell:child='
+              '[Align:alignment=topLeft,child='
+              '[Padding:(1,1,1,1),child='
+              '[RichText:(:Foo)]'
+              ']]]]'));
     });
   });
 
@@ -519,20 +635,23 @@ void main() {
               '  │└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '  │ │  "Header 1"\n'
               '  │ │)\n'
-              '  │ └Padding(padding: all(1.0))\n'
-              '  │  └RichText(text: "Header 1")\n'
+              '  │ └Align(alignment: centerLeft)\n'
+              '  │  └Padding(padding: all(1.0))\n'
+              '  │   └RichText(text: "Header 1")\n'
               '  ├HtmlTableCell(columnStart: 0, rowStart: 1)\n'
               '  │└WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#5):\n'
               '  │ │  "Value 1"\n'
               '  │ │)\n'
-              '  │ └Padding(padding: all(1.0))\n'
-              '  │  └RichText(text: "Value 1")\n'
+              '  │ └Align(alignment: centerLeft)\n'
+              '  │  └Padding(padding: all(1.0))\n'
+              '  │   └RichText(text: "Value 1")\n'
               '  └HtmlTableCell(columnStart: 1, rowStart: 1)\n'
               '   └WidgetPlaceholder<BuildTree>(BuildTree#6 tsb#7(parent=#5):\n'
               '    │  "Value 2"\n'
               '    │)\n'
-              '    └Padding(padding: all(1.0))\n'
-              '     └RichText(text: "Value 2")\n'
+              '    └Align(alignment: centerLeft)\n'
+              '     └Padding(padding: all(1.0))\n'
+              '      └RichText(text: "Value 2")\n'
               '\n'));
     });
 
@@ -551,20 +670,23 @@ void main() {
               '  │└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '  │ │  "Header 1"\n'
               '  │ │)\n'
-              '  │ └Padding(padding: all(1.0))\n'
-              '  │  └RichText(text: "Header 1")\n'
+              '  │ └Align(alignment: centerLeft)\n'
+              '  │  └Padding(padding: all(1.0))\n'
+              '  │   └RichText(text: "Header 1")\n'
               '  ├HtmlTableCell(columnStart: 1, rowStart: 0)\n'
               '  │└WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#2):\n'
               '  │ │  "Header 2"\n'
               '  │ │)\n'
-              '  │ └Padding(padding: all(1.0))\n'
-              '  │  └RichText(text: "Header 2")\n'
+              '  │ └Align(alignment: centerLeft)\n'
+              '  │  └Padding(padding: all(1.0))\n'
+              '  │   └RichText(text: "Header 2")\n'
               '  └HtmlTableCell(columnStart: 0, rowStart: 1)\n'
               '   └WidgetPlaceholder<BuildTree>(BuildTree#5 tsb#6(parent=#7):\n'
               '    │  "Value 1"\n'
               '    │)\n'
-              '    └Padding(padding: all(1.0))\n'
-              '     └RichText(text: "Value 1")\n'
+              '    └Align(alignment: centerLeft)\n'
+              '     └Padding(padding: all(1.0))\n'
+              '      └RichText(text: "Value 1")\n'
               '\n'));
     });
 
@@ -636,8 +758,12 @@ void main() {
       expect(
           explained,
           equals('[HtmlTable:children='
-              '[HtmlTableCell:child=[DecoratedBox:bg=#FFFF0000,child=[Padding:(1,1,1,1),child=[RichText:(:Foo)]]]]'
-              ']'));
+              '[HtmlTableCell:child='
+              '[DecoratedBox:bg=#FFFF0000,child='
+              '[Align:alignment=centerLeft,child='
+              '[Padding:(1,1,1,1),child='
+              '[RichText:(:Foo)]'
+              ']]]]]'));
     });
   });
 

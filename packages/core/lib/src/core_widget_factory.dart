@@ -31,12 +31,17 @@ class WidgetFactory {
 
   HtmlWidget get _widget => _state?.widget;
 
+  /// Builds [Align].
+  Widget buildAlign(
+          BuildMetadata meta, Widget child, AlignmentGeometry alignment) =>
+      alignment == null ? child : Align(alignment: alignment, child: child);
+
   /// Builds [AspectRatio].
   Widget buildAspectRatio(
           BuildMetadata meta, Widget child, double aspectRatio) =>
-      child != null && aspectRatio != null
-          ? AspectRatio(aspectRatio: aspectRatio, child: child)
-          : null;
+      aspectRatio == null
+          ? child
+          : AspectRatio(aspectRatio: aspectRatio, child: child);
 
   /// Builds primary column (body).
   WidgetPlaceholder buildBody(BuildMetadata meta, Iterable<Widget> children) =>
@@ -127,7 +132,7 @@ class WidgetFactory {
   /// Builds [GestureDetector].
   Widget buildGestureDetector(
           BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
-      GestureDetector(child: child, onTap: onTap);
+      onTap == null ? child : GestureDetector(child: child, onTap: onTap);
 
   /// Builds horizontal scroll view.
   Widget buildHorizontalScrollView(BuildMetadata meta, Widget child) =>
@@ -156,9 +161,9 @@ class WidgetFactory {
 
   /// Builds [Padding].
   Widget buildPadding(BuildMetadata meta, Widget child, EdgeInsets padding) =>
-      child != null && padding != null && padding != const EdgeInsets.all(0)
-          ? Padding(child: child, padding: padding)
-          : child;
+      padding == null || padding == const EdgeInsets.all(0)
+          ? child
+          : Padding(child: child, padding: padding);
 
   /// Builds [Stack].
   Widget buildStack(
@@ -567,8 +572,13 @@ class WidgetFactory {
           ..register(TagTable.cellPaddingOp(
               tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1.0));
         break;
+      case kTagTableCell:
+        meta[kCssVerticalAlign] = kCssVerticalAlignMiddle;
+        break;
       case kTagTableHeaderCell:
-        meta.tsb(TextStyleOps.fontWeight, FontWeight.bold);
+        meta
+          ..[kCssVerticalAlign] = kCssVerticalAlignMiddle
+          ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case kTagTableCaption:
         meta[kCssTextAlign] = kCssTextAlignCenter;

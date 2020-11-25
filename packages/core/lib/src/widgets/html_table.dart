@@ -225,32 +225,31 @@ class _TableRenderObject extends RenderBox
     final columnGaps = (columnCount + 1) * _columnGap;
     final rowGaps = (rowCount + 1) * _rowGap;
     final width0 = (c.maxWidth - columnGaps) / columnCount;
-    final childDistances = List<double>.filled(children.length, 0.0);
     final childSizes = List<Size>(children.length);
-    final rowDistances =
-        List<Set<double>>.generate(rowCount, _doubleSetGenerator);
     for (var i = 0; i < children.length; i++) {
       final child = children[i];
       final data = cells[i];
-      final cc = c.tighten(width: data.calculateWidth(this, width0));
+      final width = data.calculateWidth(this, width0);
+      final cc = c.copyWith(
+          maxWidth: width, minWidth: width, maxHeight: double.infinity);
       child.layout(cc, parentUsesSize: true);
-      childSizes[i] = child.size;
 
-      final distance = child.getDistanceToBaseline(TextBaseline.alphabetic);
-      childDistances[i] = distance;
-      rowDistances[data.rowStart].add(distance);
+      if (c.hasBoundedHeight && child.size.height > c.maxHeight) {
+        // we use unbounded height for `cc` to get the "real" child height
+        // but for the special case when it exceeds our bound, relayout child
+        final cc2 = cc.copyWith(maxHeight: c.maxHeight);
+        child.layout(cc2, parentUsesSize: true);
+      }
+
+      childSizes[i] = child.size;
     }
 
-    final distances = rowDistances
-        .map((values) => values.fold(0.0, _combineMax))
-        .toList(growable: false);
     final rowHeights =
         List<Set<double>>.generate(rowCount, _doubleSetGenerator);
     for (var i = 0; i < children.length; i++) {
       final data = cells[i];
       final childSize = childSizes[i];
-      final distanceDelta = distances[data.rowStart] - childDistances[i];
-      final rowHeight = (distanceDelta + childSize.height) / data.rowSpan;
+      final rowHeight = childSize.height / data.rowSpan;
 
       for (var r = 0; r < data.rowSpan; r++) {
         rowHeights[data.rowStart + r].add(rowHeight);
@@ -261,26 +260,28 @@ class _TableRenderObject extends RenderBox
         .map((values) => values.fold(0.0, _combineMax))
         .toList(growable: false);
     for (var i = 0; i < children.length; i++) {
-      final childSize = childSizes[i];
       final data = cells[i];
+      final childSize = childSizes[i];
 
-      final height = data.calculateHeight(this, heights);
-      if (childSize.height != height) {
-        final cc = c.tighten(width: childSize.width, height: height);
+      final childHeight = data.calculateHeight(this, heights);
+      if (childSize.height != childHeight) {
+        final cc = BoxConstraints.tightFor(
+          height: childHeight,
+          width: childSize.width,
+        );
         children[i].layout(cc, parentUsesSize: true);
       }
 
-      final distanceDelta = distances[data.rowStart] - childDistances[i];
       data.offset = Offset(
         data.calculateX(this, width0),
-        distanceDelta + data.calculateY(this, heights),
+        data.calculateY(this, heights),
       );
     }
 
-    size = Size(
+    size = c.constrain(Size(
       width0 * columnCount + columnGaps,
       heights.fold<double>(0.0, _combineSum) + rowGaps,
-    );
+    ));
   }
 
   @override

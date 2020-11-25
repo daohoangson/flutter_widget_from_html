@@ -26,7 +26,7 @@ class StyleBgColor {
               (_, child) => wf.buildDecoratedBox(meta, child, color: color)));
         },
         onWidgetsIsOptional: true,
-        priority: 15000,
+        priority: 4900,
       );
 
   Color _parseColor(WidgetFactory wf, BuildMetadata meta) {
