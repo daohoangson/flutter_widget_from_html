@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -818,7 +820,86 @@ void main() async {
       await tester.pumpAndSettle();
       expect(urls, equals(const [kHref]));
     });
+
+    GoldenToolkit.runWithConfiguration(
+      () {
+        group('screenshot testing', () {
+          final multiline =
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br />\n' *
+                  3;
+          final testCases = <String, String>{
+            'collapsed_border':
+                '''<table border="1" style="border-collapse: collapse">
+  <tr>
+    <td>Foo</td>
+    <td style="border: 1px solid red">Foo</td>
+    <td style="border: 5px solid green">Bar</td>
+  </tr>
+</table>''',
+            'colspan': '''<table border="1">
+  <tr><td colspan="2">$multiline</td></tr>
+  <tr><td>Foo</td><td>Bar</td></tr>
+</table>''',
+            'rowspan': '''<table border="1">
+  <tr><td rowspan="2">$multiline</td><td>Foo</td></tr>
+  <tr><td>Bar</td></tr>
+</table>''',
+            'table_in_list': '''<ul>
+  <li>
+    <table border="1"><tr><td>Foo</td></tr></table>
+  </li>
+</ul>''',
+            'table_in_table': '''<table border="1">
+  <tr>
+    <td style="background: red">
+      <table border="1">
+        <tr><td style="background: green">Foo</td></tr>
+      </table>
+    </td>
+    <td>$multiline</td>
+  </tr>
+</table>''',
+          };
+
+          for (final testCase in testCases.entries) {
+            testGoldens(testCase.key, (tester) async {
+              await tester.pumpWidgetBuilder(
+                _Golden(testCase.value),
+                wrapper: materialAppWrapper(theme: ThemeData.light()),
+                surfaceSize: Size(600, 400),
+              );
+
+              await screenMatchesGolden(tester, testCase.key);
+            }, skip: null);
+          }
+        }, skip: Platform.isLinux ? null : 'Linux only');
+      },
+      config: GoldenToolkitConfiguration(
+        fileNameFactory: (name) => '$kGoldenFilePrefix/table/$name.png',
+      ),
+    );
   });
+}
+
+class _Golden extends StatelessWidget {
+  final String contents;
+
+  const _Golden(this.contents, {Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => Scaffold(
+        body: Padding(
+          child: Column(
+            children: [
+              Text(contents),
+              Divider(),
+              HtmlWidget(contents),
+            ],
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+          ),
+          padding: const EdgeInsets.all(8.0),
+        ),
+      );
 }
 
 class _HitTestApp extends StatelessWidget {
