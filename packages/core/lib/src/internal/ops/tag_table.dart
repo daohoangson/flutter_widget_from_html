@@ -11,7 +11,9 @@ const kTagTableCaption = 'caption';
 
 const kAttributeBorder = 'border';
 const kAttributeCellPadding = 'cellpadding';
+const kAttributeColspan = 'colspan';
 const kAttributeCellSpacing = 'cellspacing';
+const kAttributeRowspan = 'rowspan';
 const kAttributeValign = 'valign';
 
 const kCssBorderCollapse = 'border-collapse';
@@ -281,8 +283,8 @@ class _TagTableRow {
         final attributes = cellMeta.element.attributes;
         row.cells.add(_TagTableDataCell(
           child: column,
-          colspan: tryParseIntFromMap(attributes, 'colspan') ?? 1,
-          rowspan: tryParseIntFromMap(attributes, 'rowspan') ?? 1,
+          colspan: tryParseIntFromMap(attributes, kAttributeColspan) ?? 1,
+          rowspan: tryParseIntFromMap(attributes, kAttributeRowspan) ?? 1,
         ));
 
         return [column];

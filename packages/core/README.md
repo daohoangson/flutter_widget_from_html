@@ -82,8 +82,8 @@ Below tags are the ones that have special meaning / styling, all other tags will
   - Attributes: `type`, `start`, `reversed`
   - Inline style `list-style-type` values: `lower-alpha`, `upper-alpha`, `lower-latin`, `upper-latin`, `circle`, `decimal`, `disc`, `lower-roman`, `upper-roman`, `square`
 - TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
-  - TABLE attributes (`border`, `cellpadding`) and inline style (`border`)
-  - TD/TH attributes `colspan`, `rowspan` are parsed but ignored during rendering, use [flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html) if you need them
+  - TABLE attributes `border`, `cellpadding`, `cellspacing`
+  - TD/TH attributes `colspan`, `rowspan`, `valign`
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
   DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, IMG, INS,
   KBD, MAIN, NAV, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, STRIKE, STRONG, SUB, SUP, TT, U, VAR
