@@ -113,39 +113,36 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   Type get debugTypicalAncestorWidgetClass => HtmlTable;
 }
 
-double _combineMax(double prev, double v) => max(prev, v);
+extension _IterableDouble on Iterable<double> {
+  double get sum => isEmpty ? 0.0 : reduce(_sum);
 
-double _combineSum(double prev, double v) => prev + v;
-
-Set<double> _doubleSetGenerator(int _) => {};
+  static double _sum(double value, double element) => value + element;
+}
 
 class _TableCellData extends ContainerBoxParentData<RenderBox> {
-  int columnSpan;
+  int columnSpan = 1;
   int columnStart;
-  int rowSpan;
+  int rowSpan = 1;
   int rowStart;
 
   double calculateHeight(_TableRenderObject tro, List<double> heights) {
-    final gap = max(0, rowSpan - 1) * tro._rowGap;
-    return heights
-            .getRange(rowStart, rowStart + rowSpan)
-            .fold(0.0, _combineSum) +
-        gap;
+    final gap = (rowSpan - 1) * tro._rowGap;
+    return heights.getRange(rowStart, rowStart + rowSpan).sum + gap;
   }
 
-  double calculateWidth(_TableRenderObject tro, double width0) {
-    final gap = max(0, columnSpan - 1) * tro._columnGap;
-    return width0 * columnSpan + gap;
+  double calculateWidth(_TableRenderObject tro, List<double> widths) {
+    final gap = (columnSpan - 1) * tro._columnGap;
+    return widths.getRange(columnStart, columnStart + columnSpan).sum + gap;
   }
 
-  double calculateX(_TableRenderObject tro, double width0) {
+  double calculateX(_TableRenderObject tro, List<double> widths) {
     final gap = (columnStart + 1) * tro._columnGap;
-    return columnStart * width0 + gap;
+    return widths.getRange(0, columnStart).sum + gap;
   }
 
   double calculateY(_TableRenderObject tro, List<double> heights) {
     final gap = (rowStart + 1) * tro._rowGap;
-    return heights.getRange(0, rowStart).fold(0.0, _combineSum) + gap;
+    return heights.getRange(0, rowStart).sum + gap;
   }
 }
 
@@ -226,62 +223,66 @@ class _TableRenderObject extends RenderBox
     final rowGaps = (rowCount + 1) * _rowGap;
     final width0 = (c.maxWidth - columnGaps) / columnCount;
     final childSizes = List<Size>(children.length);
+    final columnWidths = List.filled(columnCount, 0.0);
+    final rowHeights = List.filled(rowCount, 0.0);
     for (var i = 0; i < children.length; i++) {
       final child = children[i];
       final data = cells[i];
-      final width = data.calculateWidth(this, width0);
+
+      // assume even distribution of column widths if width is finite
+      final childColumnGap = (data.columnSpan - 1) * _columnGap;
+      final childWidth =
+          width0.isFinite ? width0 * data.columnSpan + childColumnGap : null;
       final cc = c.copyWith(
-          maxWidth: width, minWidth: width, maxHeight: double.infinity);
+        maxHeight: double.infinity,
+        maxWidth: childWidth ?? double.infinity,
+        minWidth: childWidth,
+      );
       child.layout(cc, parentUsesSize: true);
+      final childSize = childSizes[i] = child.size;
 
-      if (c.hasBoundedHeight && child.size.height > c.maxHeight) {
-        // we use unbounded height for `cc` to get the "real" child height
-        // but for the special case when it exceeds our bound, relayout child
-        final cc2 = cc.copyWith(maxHeight: c.maxHeight);
-        child.layout(cc2, parentUsesSize: true);
+      // distribute cell width across spanned columns
+      final columnWidth = (childSize.width - childColumnGap) / data.columnSpan;
+      for (var c = 0; c < data.columnSpan; c++) {
+        final column = data.columnStart + c;
+        columnWidths[column] = max(columnWidths[column], columnWidth);
       }
 
-      childSizes[i] = child.size;
-    }
-
-    final rowHeights =
-        List<Set<double>>.generate(rowCount, _doubleSetGenerator);
-    for (var i = 0; i < children.length; i++) {
-      final data = cells[i];
-      final childSize = childSizes[i];
-      final rowHeight = childSize.height / data.rowSpan;
-
+      // distribute cell height across spanned rows
+      final childRowGap = (data.rowSpan - 1) * _rowGap;
+      final rowHeight = (childSize.height - childRowGap) / data.rowSpan;
       for (var r = 0; r < data.rowSpan; r++) {
-        rowHeights[data.rowStart + r].add(rowHeight);
+        final row = data.rowStart + r;
+        rowHeights[row] = max(rowHeights[row], rowHeight);
       }
     }
 
-    final heights = rowHeights
-        .map((values) => values.fold(0.0, _combineMax))
-        .toList(growable: false);
+    // we now know all the widths and heights, let's position cells
+    // sometime we have to relayout child, e.g. stretch its height for rowspan
+    final calculatedHeight = rowHeights.sum + rowGaps;
+    final constraintedHeight = c.constrainHeight(calculatedHeight);
+    final deltaHeight = (constraintedHeight - calculatedHeight) / rowCount;
+    final calculatedWidth = columnWidths.sum + columnGaps;
+    final constraintedWidth = c.constrainWidth(calculatedWidth);
+    final deltaWidth = (constraintedWidth - calculatedWidth) / columnCount;
     for (var i = 0; i < children.length; i++) {
       final data = cells[i];
       final childSize = childSizes[i];
 
-      final childHeight = data.calculateHeight(this, heights);
-      if (childSize.height != childHeight) {
-        final cc = BoxConstraints.tightFor(
-          height: childHeight,
-          width: childSize.width,
-        );
-        children[i].layout(cc, parentUsesSize: true);
+      final childHeight = data.calculateHeight(this, rowHeights) + deltaHeight;
+      final childWidth = data.calculateWidth(this, columnWidths) + deltaWidth;
+      if (childSize.height != childHeight || childSize.width != childWidth) {
+        final cc2 = BoxConstraints.tight(Size(childWidth, childHeight));
+        children[i].layout(cc2, parentUsesSize: true);
       }
 
       data.offset = Offset(
-        data.calculateX(this, width0),
-        data.calculateY(this, heights),
+        data.calculateX(this, columnWidths),
+        data.calculateY(this, rowHeights),
       );
     }
 
-    size = c.constrain(Size(
-      width0 * columnCount + columnGaps,
-      heights.fold<double>(0.0, _combineSum) + rowGaps,
-    ));
+    size = Size(constraintedWidth, constraintedHeight);
   }
 
   @override

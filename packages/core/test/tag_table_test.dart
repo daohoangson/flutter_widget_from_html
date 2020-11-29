@@ -827,7 +827,14 @@ void main() async {
           final multiline =
               'Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br />\n' *
                   3;
+          final tableWithImage =
+              '<table border="1"><tr><td><img src="asset:test/images/logo.png" width="50" height="50" /></td></tr></table>';
           final testCases = <String, String>{
+            'aspect_ratio_img': '''<div>$tableWithImage</div><br />
+
+<div style="width: 25px">$tableWithImage</div><br />
+
+<div style="height: 25px">$tableWithImage</div>''',
             'collapsed_border':
                 '''<table border="1" style="border-collapse: collapse">
   <tr>
