@@ -185,10 +185,10 @@ class TagTable {
                     ? group.rows.length
                     : 1);
         for (var r = 0; r < rowSpan; r++) {
-          final rr = rowStart + r;
-          occupations[rr] ??= {};
+          final row = rowStart + r;
+          occupations[row] ??= {};
           for (var c = 0; c < columnSpan; c++) {
-            occupations[rr][columnStart + c] = true;
+            occupations[row][columnStart + c] = true;
           }
         }
 

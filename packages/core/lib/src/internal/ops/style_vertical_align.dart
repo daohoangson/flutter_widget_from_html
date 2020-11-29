@@ -46,10 +46,7 @@ class StyleVerticalAlign {
           tree.replaceWith(WidgetBit.inline(tree, built, alignment: alignment));
         },
         onWidgets: (meta, widgets) {
-          if (_skipBuilding[meta] == true) {
-            return widgets;
-          }
-          if (widgets?.isNotEmpty != true) {
+          if (_skipBuilding[meta] == true || widgets?.isNotEmpty != true) {
             return widgets;
           }
 
