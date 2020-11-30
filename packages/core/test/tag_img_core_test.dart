@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:network_image_mock/network_image_mock.dart';
@@ -221,6 +222,15 @@ void main() {
       final html = '<img src="relative" />';
       final fullUrl = 'http://base.com/path/relative';
       await test(tester, html, fullUrl);
+    });
+  });
+
+  group('error handing', () {
+    testWidgets('executes errorBuilder', (WidgetTester tester) async {
+      final html = 'Foo <img src="data:image/jpg;base64,xxxx" /> bar';
+      await tester.pumpWidget(MaterialApp(home: HtmlWidget(html)));
+      await tester.pumpAndSettle();
+      await expect(find.text('❌'), findsOneWidget);
     });
   });
 }
