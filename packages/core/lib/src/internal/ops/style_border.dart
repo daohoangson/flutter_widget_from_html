@@ -17,7 +17,7 @@ class StyleBorder {
         onTree: (meta, tree) {
           if (meta.willBuildSubtree) return;
           final border = tryParseBorder(meta);
-          if (border == null) return;
+          if (border.isNone) return;
 
           _skipBuilding[meta] = true;
           final copied = tree.copyWith() as BuildTree;
@@ -34,11 +34,17 @@ class StyleBorder {
             return widgets;
           }
           final border = tryParseBorder(meta);
-          if (border == null) return widgets;
+          if (border.isNone) return widgets;
 
           _skipBuilding[meta] = true;
-          return listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
-              (context, child) => _buildBorder(meta, context, child, border)));
+          return [
+            WidgetPlaceholder(
+              border,
+              child: wf.buildColumnPlaceholder(meta, widgets),
+            ).wrapWith(
+              (context, child) => _buildBorder(meta, context, child, border),
+            )
+          ];
         },
         onWidgetsIsOptional: true,
         priority: kPriorityBoxModel7k,

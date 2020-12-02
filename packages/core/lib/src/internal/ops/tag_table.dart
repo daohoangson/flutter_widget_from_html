@@ -45,7 +45,7 @@ class TagTable {
       onChild: onChild,
       onTree: onTree,
       onWidgets: onWidgets,
-      priority: StyleSizing.kPriority5k,
+      priority: 0,
     );
     return _tableOp;
   }
@@ -289,7 +289,7 @@ class _TagTableRow {
 
         return [column];
       },
-      priority: StyleSizing.kPriority5k,
+      priority: BuildOp.kPriorityMax,
     );
 
     childMeta.register(_cellOp);

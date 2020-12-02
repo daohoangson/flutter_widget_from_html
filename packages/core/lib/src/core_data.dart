@@ -76,6 +76,11 @@ abstract class BuildMetadata {
 /// A building operation to customize how a DOM element is rendered.
 @immutable
 class BuildOp {
+  /// The recommended maximum value for [priority].
+  ///
+  /// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER
+  static const kPriorityMax = 9007199254740991;
+
   /// The execution priority, op with lower priority will run first.
   ///
   /// Default: 10.

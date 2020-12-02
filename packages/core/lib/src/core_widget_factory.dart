@@ -75,14 +75,13 @@ class WidgetFactory {
     if (children?.isNotEmpty != true) return null;
 
     if (children.length == 1) {
-      final first = children.first;
-      if (first is WidgetPlaceholder) {
-        if (first is! ColumnPlaceholder) return first;
-
-        final existingPlaceholder = first as ColumnPlaceholder;
-        if (existingPlaceholder.trimMarginVertical == trimMarginVertical) {
-          return first;
+      final child = children.first;
+      if (child is ColumnPlaceholder) {
+        if (child.trimMarginVertical == trimMarginVertical) {
+          return child;
         }
+      } else {
+        return child;
       }
     }
 

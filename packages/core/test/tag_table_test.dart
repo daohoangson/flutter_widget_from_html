@@ -16,6 +16,11 @@ String _richtext(String text) => _padding('[RichText:(:$text)]');
 final bg =
     'BoxDecoration(border: all(BorderSide(Color(0xff000000), 1.0, BorderStyle.solid)))';
 
+final cssBorderSide =
+    'CssBorderSide(color: Color(0xff000000), style: solid, width: 1.0px)';
+final cssBorder =
+    'CssBorder(bottom: $cssBorderSide, left: $cssBorderSide, right: $cssBorderSide, top: $cssBorderSide)';
+
 void main() async {
   await loadAppFonts();
 
@@ -199,21 +204,23 @@ void main() async {
       expect(
           explained,
           equals('TshWidget\n'
-              '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
+              '└WidgetPlaceholder<CssBorder>($cssBorder)\n'
               ' └Container(bg: $bg)\n'
               '  └DecoratedBox(bg: $bg)\n'
               '   └Padding(padding: all(1.0))\n'
-              '    └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
-              '     └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
-              '      └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
-              '       │  "Foo"\n'
-              '       │)\n'
-              '       └Container(bg: $bg)\n'
-              '        └DecoratedBox(bg: $bg)\n'
-              '         └Padding(padding: all(1.0))\n'
-              '          └Align(alignment: centerLeft)\n'
-              '           └Padding(padding: all(1.0))\n'
-              '            └RichText(text: "Foo")\n'
+              '    └WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
+              '     └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              '      └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
+              '       └WidgetPlaceholder<CssBorder>($cssBorder)\n'
+              '        └Container(bg: $bg)\n'
+              '         └DecoratedBox(bg: $bg)\n'
+              '          └Padding(padding: all(1.0))\n'
+              '           └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+              '            │  "Foo"\n'
+              '            │)\n'
+              '            └Align(alignment: centerLeft)\n'
+              '             └Padding(padding: all(1.0))\n'
+              '              └RichText(text: "Foo")\n'
               '\n'));
     });
 
@@ -224,18 +231,19 @@ void main() async {
       expect(
           explained,
           equals('TshWidget\n'
-              '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
+              '└WidgetPlaceholder<CssBorder>($cssBorder)\n'
               ' └Container(bg: $bg)\n'
               '  └DecoratedBox(bg: $bg)\n'
               '   └Padding(padding: all(1.0))\n'
-              '    └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
-              '     └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
-              '      └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
-              '       │  "Foo"\n'
-              '       │)\n'
-              '       └Align(alignment: centerLeft)\n'
-              '        └Padding(padding: all(1.0))\n'
-              '         └RichText(text: "Foo")\n'
+              '    └WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
+              '     └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              '      └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
+              '       └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+              '        │  "Foo"\n'
+              '        │)\n'
+              '        └Align(alignment: centerLeft)\n'
+              '         └Padding(padding: all(1.0))\n'
+              '          └RichText(text: "Foo")\n'
               '\n'));
     });
   });
@@ -373,21 +381,23 @@ void main() async {
       expect(
           explained,
           equals('TshWidget\n'
-              '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
+              '└WidgetPlaceholder<CssBorder>($cssBorder)\n'
               ' └Container(bg: $bg)\n'
               '  └DecoratedBox(bg: $bg)\n'
               '   └Padding(padding: all(1.0))\n'
-              '    └HtmlTable(columnGap: -1.0, rowGap: -1.0)\n'
-              '     └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
-              '      └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
-              '       │  "Foo"\n'
-              '       │)\n'
-              '       └Container(bg: $bg)\n'
-              '        └DecoratedBox(bg: $bg)\n'
-              '         └Padding(padding: all(1.0))\n'
-              '          └Align(alignment: centerLeft)\n'
-              '           └Padding(padding: all(1.0))\n'
-              '            └RichText(text: "Foo")\n'
+              '    └WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
+              '     └HtmlTable(columnGap: -1.0, rowGap: -1.0)\n'
+              '      └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
+              '       └WidgetPlaceholder<CssBorder>($cssBorder)\n'
+              '        └Container(bg: $bg)\n'
+              '         └DecoratedBox(bg: $bg)\n'
+              '          └Padding(padding: all(1.0))\n'
+              '           └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+              '            │  "Foo"\n'
+              '            │)\n'
+              '            └Align(alignment: centerLeft)\n'
+              '             └Padding(padding: all(1.0))\n'
+              '              └RichText(text: "Foo")\n'
               '\n'));
     });
   });

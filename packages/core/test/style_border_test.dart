@@ -79,6 +79,29 @@ void main() {
             'child=[RichText:(:bar)]])]'));
   });
 
+  testWidgets('stays inside margin', (WidgetTester tester) async {
+    final html = '<div style="border: 1px; margin: 1px">Foo</div>';
+    final explained = await explainMargin(tester, html);
+    expect(
+        explained,
+        equals('[SizedBox:0.0x1.0],'
+            '[Padding:(0,1,0,1),child='
+            '[Container:border=1.0@none#FF001234,child=[CssBlock:child=[RichText:(:Foo)]]]'
+            '],'
+            '[SizedBox:0.0x1.0]'));
+  });
+
+  testWidgets('wraps child margin', (WidgetTester tester) async {
+    final html =
+        '<div style="border: 1px"><div style="margin: 1px">Foo</div></div>';
+    final explained = await explainMargin(tester, html);
+    expect(
+        explained,
+        equals('[Container:border=1.0@none#FF001234,child='
+            '[Column:children=[SizedBox:0.0x1.0],[CssBlock:child=[Padding:(0,1,0,1),child=[CssBlock:child=[RichText:(:Foo)]]]],[SizedBox:0.0x1.0]]'
+            ']'));
+  });
+
   group('border-xxx', () {
     testWidgets('parses border-top', (WidgetTester tester) async {
       final html = '<span style="border-top: 1px">Foo</span>';

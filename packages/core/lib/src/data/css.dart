@@ -28,6 +28,16 @@ class CssBorder {
         _right = right,
         _top = top;
 
+  /// Returns `true` if all sides are unset.
+  bool get isNone =>
+      (_all == null || _all == CssBorderSide.none) &&
+      (_bottom == null || _bottom == CssBorderSide.none) &&
+      (_inlineEnd == null || _inlineEnd == CssBorderSide.none) &&
+      (_inlineStart == null || _inlineStart == CssBorderSide.none) &&
+      (_left == null || _left == CssBorderSide.none) &&
+      (_right == null || _right == CssBorderSide.none) &&
+      (_top == null || _top == CssBorderSide.none);
+
   /// Creates a copy of this border but with the given fields replaced with the new values.
   CssBorder copyWith({
     CssBorderSide all,
@@ -77,6 +87,21 @@ class CssBorder {
       top: top ?? BorderSide.none,
     );
   }
+
+  @override
+  String toString() {
+    final bottom = CssBorderSide._copyWith(_all, _bottom);
+    final left = CssBorderSide._copyWith(_all, _left ?? _inlineStart);
+    final right = CssBorderSide._copyWith(_all, _right ?? _inlineEnd);
+    final top = CssBorderSide._copyWith(_all, _top);
+    final params = [
+      if (bottom != null) 'bottom: $bottom',
+      if (left != null) 'left: $left',
+      if (right != null) 'right: $right',
+      if (top != null) 'top: $top',
+    ];
+    return 'CssBorder(${params.join(", ")})';
+  }
 }
 
 /// A side of a border of a box.
@@ -96,6 +121,16 @@ class CssBorderSide {
 
   /// A border that is not rendered.
   static const none = CssBorderSide();
+
+  @override
+  String toString() {
+    final params = [
+      if (color != null) 'color: $color',
+      if (style != null) 'style: $style',
+      if (width != null) 'width: $width',
+    ];
+    return 'CssBorderSide(${params.join(", ")})';
+  }
 
   BorderSide _getValue(TextStyleHtml tsh) => identical(this, none)
       ? null
