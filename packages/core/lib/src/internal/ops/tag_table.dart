@@ -30,6 +30,7 @@ const kCssDisplayTableCell = 'table-cell';
 const kCssDisplayTableCaption = 'table-caption';
 
 class TagTable {
+  final companion = HtmlTableCompanion();
   final BuildMetadata tableMeta;
   final WidgetFactory wf;
 
@@ -60,7 +61,7 @@ class TagTable {
         latestGroup ??= _data.body;
         final row = _TagTableDataRow();
         latestGroup.rows.add(row);
-        childMeta.register(_TagTableRow(wf, childMeta, row).op);
+        childMeta.register(_TagTableRow(this, childMeta, row).op);
         break;
       case kCssDisplayTableHeaderGroup:
       case kCssDisplayTableRowGroup:
@@ -70,7 +71,7 @@ class TagTable {
             : which == kCssDisplayTableRowGroup
                 ? _data.body.rows
                 : _data.footer.rows;
-        childMeta.register(_TagTableRowGroup(wf, childMeta, rows).op);
+        childMeta.register(_TagTableRowGroup(this, childMeta, rows).op);
         latestGroup = null;
         break;
       case kCssDisplayTableCaption:
@@ -133,6 +134,7 @@ class TagTable {
         final spacing = borderSpacing?.getValue(tsh) ?? 0.0;
 
         return HtmlTable(
+          companion: companion,
           children: children,
           columnGap: border != null && collapseBorder
               ? (border.left.width * -1.0)
@@ -192,6 +194,7 @@ class TagTable {
           }
         }
 
+        cell.meta.row = rowStart;
         cells.add(HtmlTableCell(
           child: cell.child,
           columnSpan: columnSpan,
@@ -245,6 +248,13 @@ class TagTable {
   }
 }
 
+extension _BuildMetadataExtension on BuildMetadata {
+  static final _rows = Expando<int>();
+
+  set row(int v) => _rows[this] = v;
+  int get row => _rows[this];
+}
+
 class _TableCaption extends SingleChildRenderObjectWidget {
   _TableCaption(Widget child, {Key key}) : super(child: child, key: key);
 
@@ -253,14 +263,15 @@ class _TableCaption extends SingleChildRenderObjectWidget {
 }
 
 class _TagTableRow {
+  final TagTable parent;
   final _TagTableDataRow row;
   final BuildMetadata rowMeta;
-  final WidgetFactory wf;
 
   BuildOp op;
   BuildOp _cellOp;
+  BuildOp _valignBaselineOp;
 
-  _TagTableRow(this.wf, this.rowMeta, this.row) {
+  _TagTableRow(this.parent, this.rowMeta, this.row) {
     op = BuildOp(onChild: onChild);
   }
 
@@ -277,11 +288,12 @@ class _TagTableRow {
 
     _cellOp ??= BuildOp(
       onWidgets: (cellMeta, widgets) {
-        final column = wf.buildColumnPlaceholder(cellMeta, widgets);
+        final column = parent.wf.buildColumnPlaceholder(cellMeta, widgets);
         if (column == null) return [];
 
         final attributes = cellMeta.element.attributes;
         row.cells.add(_TagTableDataCell(
+          cellMeta,
           child: column,
           colspan: tryParseIntFromMap(attributes, kAttributeColspan) ?? 1,
           rowspan: tryParseIntFromMap(attributes, kAttributeRowspan) ?? 1,
@@ -291,19 +303,40 @@ class _TagTableRow {
       },
       priority: BuildOp.kPriorityMax,
     );
-
     childMeta.register(_cellOp);
+
+    _valignBaselineOp ??= BuildOp(
+      onWidgets: (cellMeta, widgets) {
+        final v = cellMeta[kCssVerticalAlign];
+        if (v != kCssVerticalAlignBaseline) return widgets;
+
+        return listOrNull(parent.wf
+            .buildColumnPlaceholder(cellMeta, widgets)
+            ?.wrapWith((_, child) {
+          final row = cellMeta.row;
+          if (row == null) return child;
+
+          return HtmlTableValignBaseline(
+            child: child,
+            companion: parent.companion,
+            row: row,
+          );
+        }));
+      },
+      priority: StyleVerticalAlign.kPriority4500,
+    );
+    childMeta.register(_valignBaselineOp);
   }
 }
 
 class _TagTableRowGroup {
+  final TagTable parent;
   final List<_TagTableDataRow> rows;
   final BuildMetadata groupMeta;
-  final WidgetFactory wf;
 
   BuildOp op;
 
-  _TagTableRowGroup(this.wf, this.groupMeta, this.rows) {
+  _TagTableRowGroup(this.parent, this.groupMeta, this.rows) {
     op = BuildOp(onChild: onChild);
   }
 
@@ -315,7 +348,7 @@ class _TagTableRowGroup {
 
     final row = _TagTableDataRow();
     rows.add(row);
-    childMeta.register(_TagTableRow(wf, childMeta, row).op);
+    childMeta.register(_TagTableRow(parent, childMeta, row).op);
   }
 }
 
@@ -346,7 +379,8 @@ class _TagTableDataRow {
 class _TagTableDataCell {
   final Widget child;
   final int colspan;
+  final BuildMetadata meta;
   final int rowspan;
 
-  _TagTableDataCell({this.child, this.colspan, this.rowspan});
+  _TagTableDataCell(this.meta, {this.child, this.colspan, this.rowspan});
 }

@@ -861,6 +861,40 @@ void main() async {
   <tr><td rowspan="2">$multiline</td><td>Foo</td></tr>
   <tr><td>Bar</td></tr>
 </table>''',
+            'valign_baseline_1a': '''<table border="1">
+  <tr>
+    <td valign="baseline">$multiline</td>
+    <td valign="baseline"><div style="margin: 10px">Foo</div></td>
+  </tr>
+</table>''',
+            'valign_baseline_1b': '''<table border="1">
+  <tr>
+    <td valign="baseline">Foo</td>
+    <td valign="baseline"><div style="margin: 10px">10px</div></td>
+    <td valign="baseline"><div style="margin: 30px">30px</div></td>
+    <td valign="baseline"><div style="margin: 20px">20px</div></td>
+  </tr>
+</table>''',
+            'valign_baseline_1c': '''<table border="1">
+  <tr>
+    <td valign="baseline"><div style="margin: 10px">10px</div></td>
+    <td valign="baseline">Foo</td>
+    <td valign="baseline"><div style="margin: 30px">30px</div></td>
+    <td valign="baseline"><div style="margin: 20px">20px</div></td>
+  </tr>
+</table>''',
+            'valign_baseline_2': '''<table border="1">
+  <tr>
+    <td valign="baseline"><div style="padding: 10px">Foo</div></td>
+    <td valign="baseline">$multiline</td>
+  </tr>
+</table>''',
+            'valign_baseline_3': '''<table border="1">
+  <tr>
+    <td valign="baseline"><div style="padding: 10px">$multiline</div></td>
+    <td valign="baseline">Foo</td>
+  </tr>
+</table>''',
             'table_in_list': '''<ul>
   <li>
     <table border="1"><tr><td>Foo</td></tr></table>

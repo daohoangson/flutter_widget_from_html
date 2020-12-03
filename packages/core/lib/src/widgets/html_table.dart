@@ -5,6 +5,9 @@ import 'package:flutter/widgets.dart';
 
 /// A TABLE widget.
 class HtmlTable extends MultiChildRenderObjectWidget {
+  /// The companion data for table.
+  final HtmlTableCompanion companion;
+
   /// The gap between columns.
   final double columnGap;
 
@@ -13,7 +16,8 @@ class HtmlTable extends MultiChildRenderObjectWidget {
 
   /// Creates a TABLE widget.
   HtmlTable({
-    List<Widget> children,
+    @required List<Widget> children,
+    @required this.companion,
     this.columnGap = 0.0,
     Key key,
     this.rowGap = 0.0,
@@ -39,6 +43,11 @@ class HtmlTable extends MultiChildRenderObjectWidget {
       ..columnGap = columnGap
       ..rowGap = rowGap;
   }
+}
+
+/// Companion data for table.
+class HtmlTableCompanion {
+  final _baselines = <int, List<_ValignBaselineRenderObject>>{};
 }
 
 /// A TD (table cell) widget.
@@ -113,6 +122,39 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   Type get debugTypicalAncestorWidgetClass => HtmlTable;
 }
 
+/// A `valign=baseline` widget.
+class HtmlTableValignBaseline extends SingleChildRenderObjectWidget {
+  /// The table's companion data.
+  final HtmlTableCompanion companion;
+
+  /// The cell's row index.
+  final int row;
+
+  /// Creates a `valign=baseline` widget.
+  HtmlTableValignBaseline({
+    Widget child,
+    @required this.companion,
+    Key key,
+    @required this.row,
+  }) : super(child: child, key: key);
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _ValignBaselineRenderObject()
+        ..companion = companion
+        ..row = row;
+
+  @override
+  void updateRenderObject(
+      BuildContext context, _ValignBaselineRenderObject renderObject) {
+    super.updateRenderObject(context, renderObject);
+
+    renderObject
+      ..companion = companion
+      ..row = row;
+  }
+}
+
 extension _IterableDouble on Iterable<double> {
   double get sum => isEmpty ? 0.0 : reduce(_sum);
 
@@ -150,6 +192,13 @@ class _TableRenderObject extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, _TableCellData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _TableCellData> {
+  HtmlTableCompanion _companion;
+  set companion(HtmlTableCompanion v) {
+    if (v == _companion) return;
+    _companion = v;
+    markNeedsLayout();
+  }
+
   double _columnGap;
   set columnGap(double v) {
     if (v == _columnGap) return;
@@ -196,8 +245,10 @@ class _TableRenderObject extends RenderBox
       defaultHitTestChildren(result, position: position);
 
   @override
-  void paint(PaintingContext context, Offset offset) =>
-      defaultPaint(context, offset);
+  void paint(PaintingContext context, Offset offset) {
+    _companion?._baselines?.clear();
+    defaultPaint(context, offset);
+  }
 
   @override
   void performLayout() {
@@ -290,5 +341,82 @@ class _TableRenderObject extends RenderBox
     if (child.parentData is! _TableCellData) {
       child.parentData = _TableCellData();
     }
+  }
+}
+
+class _ValignBaselineRenderObject extends RenderProxyBox {
+  HtmlTableCompanion _companion;
+  set companion(HtmlTableCompanion v) {
+    if (v == _companion) return;
+    _companion = v;
+    markNeedsLayout();
+  }
+
+  int _row;
+  set row(int v) {
+    if (v == _row) return;
+    _row = v;
+    markNeedsLayout();
+  }
+
+  double _baselineWithOffset;
+  var _paddingTop = 0.0;
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    offset = offset.translate(0, _paddingTop);
+
+    if (_companion != null && _row != null) {
+      _baselineWithOffset =
+          offset.dy + child.getDistanceToBaseline(TextBaseline.alphabetic);
+
+      final siblings = _companion._baselines;
+      if (siblings.containsKey(_row)) {
+        final rowBaseline = siblings[_row]
+            .map((e) => e._baselineWithOffset)
+            .reduce((v, e) => max(v, e));
+        siblings[_row].add(this);
+
+        if (rowBaseline > _baselineWithOffset) {
+          final offsetY = rowBaseline - _baselineWithOffset;
+          if (size.height - child.size.height >= offsetY) {
+            // paint child with additional offset
+            context.paintChild(child, offset.translate(0, offsetY));
+            return;
+          } else {
+            // skip painting this frame, wait for the correct padding
+            _paddingTop += offsetY;
+            _baselineWithOffset = rowBaseline;
+            WidgetsBinding.instance
+                .addPostFrameCallback((_) => markNeedsLayout());
+            return;
+          }
+        } else if (rowBaseline < _baselineWithOffset) {
+          for (final sibling in siblings[_row]) {
+            if (sibling == this) continue;
+
+            final offsetY = _baselineWithOffset - sibling._baselineWithOffset;
+            if (offsetY != 0.0) {
+              sibling._paddingTop += offsetY;
+              sibling._baselineWithOffset = _baselineWithOffset;
+              WidgetsBinding.instance
+                  .addPostFrameCallback((_) => sibling.markNeedsLayout());
+            }
+          }
+        }
+      } else {
+        siblings[_row] = [this];
+      }
+    }
+
+    context.paintChild(child, offset);
+  }
+
+  @override
+  void performLayout() {
+    final c = constraints;
+    final cc = c.loosen().deflate(EdgeInsets.only(top: _paddingTop));
+    child.layout(cc, parentUsesSize: true);
+    size = c.constrain(child.size + Offset(0, _paddingTop));
   }
 }
