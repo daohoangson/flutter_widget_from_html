@@ -524,6 +524,63 @@ void main() {
                 'autoResize=true'
                 ']'));
       });
+
+      group('unsupportedWebViewWorkaroundForIssue375', () {
+        testWidgets('renders true value', (WidgetTester tester) async {
+          final explained = await explain(
+              tester,
+              HtmlWidget(
+                html,
+                key: helper.hwKey,
+                unsupportedWebViewWorkaroundForIssue375: true,
+                webView: true,
+              ));
+          expect(
+              explained,
+              equals('[WebView:'
+                  'url=$webViewSrc,'
+                  'aspectRatio=$webViewDefaultAspectRatio,'
+                  'autoResize=true,'
+                  'unsupportedWorkaroundForIssue375=true'
+                  ']'));
+        });
+
+        testWidgets('renders false value', (WidgetTester tester) async {
+          final explained = await explain(
+              tester,
+              HtmlWidget(
+                html,
+                key: helper.hwKey,
+                unsupportedWebViewWorkaroundForIssue375: false,
+                webView: true,
+              ));
+          expect(
+              explained,
+              equals('[WebView:'
+                  'url=$webViewSrc,'
+                  'aspectRatio=$webViewDefaultAspectRatio,'
+                  'autoResize=true'
+                  ']'));
+        });
+
+        testWidgets('renders null value', (WidgetTester tester) async {
+          final explained = await explain(
+              tester,
+              HtmlWidget(
+                html,
+                key: helper.hwKey,
+                unsupportedWebViewWorkaroundForIssue375: null,
+                webView: true,
+              ));
+          expect(
+              explained,
+              equals('[WebView:'
+                  'url=$webViewSrc,'
+                  'aspectRatio=$webViewDefaultAspectRatio,'
+                  'autoResize=true'
+                  ']'));
+        });
+      });
     });
 
     group('webViewJs', () {

@@ -8,30 +8,13 @@ import 'widget_factory.dart';
 /// A widget that builds Flutter widget tree from HTML
 /// with support for IFRAME, VIDEO and many other tags.
 class HtmlWidget extends core.HtmlWidget {
-  /// Controls whether or not to apply workaround for
-  /// [issue 37](https://github.com/daohoangson/flutter_widget_from_html/issues/37)
-  ///
-  /// Default: `false`.
+  /// {@macro web_view.unsupportedWorkaroundForIssue37}
   final bool unsupportedWebViewWorkaroundForIssue37;
 
+  /// {@macro web_view.unsupportedWorkaroundForIssue375}
+  final bool unsupportedWebViewWorkaroundForIssue375;
+
   /// Controls whether or not IFRAME is rendered as [WebView].
-  ///
-  /// You must perform additional configuration for this to work.
-  /// ### iOS
-  /// Add this at the end of `ios/Runner/Info.plist` to enable
-  /// Flutter's experimental platform view.
-  /// See more info [here](https://pub.dev/packages/webview_flutter#ios).
-  /// ```plist
-  /// <key>io.flutter.embedded_views_preview</key>
-  /// <string>YES</string>
-  /// ```
-  /// ### Android
-  /// Add this into `android/app/src/main/AndroidManifest.xml`
-  /// to enable internet access. Without this, you will most likely
-  /// see a `net:ERR_CACHE_MISS` error for each iframe being rendered.
-  /// ```xml
-  /// <uses-permission android:name="android.permission.INTERNET" />
-  /// ```
   ///
   /// Default: `false`.
   final bool webView;
@@ -59,6 +42,7 @@ class HtmlWidget extends core.HtmlWidget {
     core.RebuildTriggers rebuildTriggers,
     TextStyle textStyle = const TextStyle(),
     this.unsupportedWebViewWorkaroundForIssue37 = false,
+    this.unsupportedWebViewWorkaroundForIssue375 = false,
     this.webView = false,
     this.webViewJs = true,
   })  : assert(html != null),
