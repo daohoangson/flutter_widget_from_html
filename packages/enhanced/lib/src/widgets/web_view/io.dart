@@ -25,15 +25,27 @@ class WebViewState extends State<WebView> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext _) {
     if (widget.unsupportedWorkaroundForIssue375 == true) {
-      final size = MediaQuery.of(context).size;
-      final width = size.width;
-      final height = width / _aspectRatio;
-      return SizedBox(
-        child: _buildWebView(),
-        height: Platform.isAndroid ? min(height, size.height) : height,
-        width: width,
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.hasBoundedWidth
+              ? constraints.maxWidth
+              : MediaQuery.of(context).size.width;
+          final height = width / _aspectRatio;
+          return SizedBox(
+            child: _buildWebView(),
+            height: Platform.isAndroid
+                ? min(
+                    height,
+                    constraints.hasBoundedHeight
+                        ? constraints.maxHeight
+                        : MediaQuery.of(context).size.height,
+                  )
+                : height,
+            width: width,
+          );
+        },
       );
     }
 
