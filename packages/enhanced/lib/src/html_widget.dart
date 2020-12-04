@@ -11,6 +11,9 @@ class HtmlWidget extends core.HtmlWidget {
   /// {@macro web_view.unsupportedWorkaroundForIssue37}
   final bool unsupportedWebViewWorkaroundForIssue37;
 
+  /// {@macro web_view.unsupportedWorkaroundForIssue375}
+  final bool unsupportedWebViewWorkaroundForIssue375;
+
   /// Controls whether or not IFRAME is rendered as [WebView].
   ///
   /// Default: `false`.
@@ -39,6 +42,7 @@ class HtmlWidget extends core.HtmlWidget {
     core.RebuildTriggers rebuildTriggers,
     TextStyle textStyle = const TextStyle(),
     this.unsupportedWebViewWorkaroundForIssue37 = false,
+    this.unsupportedWebViewWorkaroundForIssue375 = false,
     this.webView = false,
     this.webViewJs = true,
   })  : assert(html != null),

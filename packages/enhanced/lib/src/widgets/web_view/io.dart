@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
 import 'package:webview_flutter/webview_flutter.dart' as lib;
 
@@ -22,10 +25,23 @@ class WebViewState extends State<WebView> {
   }
 
   @override
-  Widget build(BuildContext context) => AspectRatio(
-        aspectRatio: _aspectRatio,
+  Widget build(BuildContext context) {
+    if (widget.unsupportedWorkaroundForIssue375 == true) {
+      final size = MediaQuery.of(context).size;
+      final width = size.width;
+      final height = width / _aspectRatio;
+      return SizedBox(
         child: _buildWebView(),
+        height: Platform.isAndroid ? min(height, size.height) : height,
+        width: width,
       );
+    }
+
+    return AspectRatio(
+      aspectRatio: _aspectRatio,
+      child: _buildWebView(),
+    );
+  }
 
   @override
   void deactivate() {

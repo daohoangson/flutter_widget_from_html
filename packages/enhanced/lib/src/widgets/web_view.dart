@@ -50,6 +50,18 @@ class WebView extends StatefulWidget {
   /// {@endtemplate}
   final bool unsupportedWorkaroundForIssue37;
 
+  /// {@template web_view.unsupportedWorkaroundForIssue375}
+  /// Controls whether or not to apply workaround for
+  /// [crash on Android device](https://github.com/daohoangson/flutter_widget_from_html/issues/375)
+  /// issue.
+  ///
+  /// If your app targets Android 10, it's better to switch to the new webview
+  /// implemention: [hybrid composition](https://pub.dev/packages/webview_flutter#using-hybrid-composition).
+  ///
+  /// Default: `false`.
+  /// {@endtemplate}
+  final bool unsupportedWorkaroundForIssue375;
+
   /// Creates a web view.
   WebView(
     this.url, {
@@ -63,6 +75,7 @@ class WebView extends StatefulWidget {
     this.interceptNavigationRequest,
     this.js = true,
     this.unsupportedWorkaroundForIssue37 = false,
+    this.unsupportedWorkaroundForIssue375 = false,
     Key key,
   })  : assert(url != null),
         assert(aspectRatio != null),

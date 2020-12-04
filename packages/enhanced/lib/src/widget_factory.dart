@@ -113,6 +113,8 @@ class WidgetFactory extends core.WidgetFactory {
       js: _widget.webViewJs == true,
       unsupportedWorkaroundForIssue37:
           _widget.unsupportedWebViewWorkaroundForIssue37 == true,
+      unsupportedWorkaroundForIssue375:
+          _widget.unsupportedWebViewWorkaroundForIssue375 == true,
     );
   }
 
