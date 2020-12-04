@@ -41,10 +41,13 @@ class WebView extends StatefulWidget {
   /// Flutter Web: JavaScript is always enabled (cannot turn off).
   final bool js;
 
+  /// {@template web_view.unsupportedWorkaroundForIssue37}
   /// Controls whether or not to apply workaround for
-  /// [issue 37](https://github.com/daohoangson/flutter_widget_from_html/issues/37)
+  /// [video continue playing after locking the phone or navigate to another screen](https://github.com/daohoangson/flutter_widget_from_html/issues/37)
+  /// issue.
   ///
   /// Default: `false`.
+  /// {@endtemplate}
   final bool unsupportedWorkaroundForIssue37;
 
   /// Creates a web view.
