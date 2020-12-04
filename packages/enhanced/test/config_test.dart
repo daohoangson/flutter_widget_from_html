@@ -541,7 +541,7 @@ void main() {
                   'url=$webViewSrc,'
                   'aspectRatio=$webViewDefaultAspectRatio,'
                   'autoResize=true,'
-                  'unsupportedWebViewWorkaroundForIssue375=true'
+                  'unsupportedWorkaroundForIssue375=true'
                   ']'));
         });
 
