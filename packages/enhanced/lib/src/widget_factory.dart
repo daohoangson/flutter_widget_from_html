@@ -39,17 +39,24 @@ class WidgetFactory extends core.WidgetFactory {
 
   /// Builds [SvgPicture] or [Image].
   @override
-  Widget buildImage(BuildMetadata meta, Object provider, ImageMetadata image) {
-    var built = super.buildImage(meta, provider, image);
+  Widget buildImage(BuildMetadata meta, Object provider, ImageMetadata data) {
+    var built = super.buildImage(meta, provider, data);
 
     if (_isFlutterSvgSupported &&
         built == null &&
         provider is PictureProvider) {
       built = SvgPicture(provider);
+
+      if (_widget?.onTapImage != null) {
+        built = GestureDetector(
+          child: built,
+          onTap: () => _widget?.onTapImage?.call(data),
+        );
+      }
     }
 
-    if (image.title != null && built != null) {
-      built = Tooltip(child: built, message: image.title);
+    if (data.title != null && built != null) {
+      built = Tooltip(child: built, message: data.title);
     }
 
     return built;

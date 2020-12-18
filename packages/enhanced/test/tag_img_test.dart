@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 
 import '_.dart' as helper;
@@ -64,6 +67,15 @@ void main() {
               'semanticLabel=Foo'
               ']]]'));
     });
+
+    testWidgets('onTapImage', (WidgetTester tester) async {
+      final taps = <ImageMetadata>[];
+      await tester
+          .pumpWidget(_TapTestApp('http://domain.com/image.png', taps.add));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(Image));
+      expect(taps.length, equals(1));
+    });
   });
 
   group('SvgPicture', () {
@@ -122,4 +134,30 @@ void main() {
       );
     });
   });
+
+  testWidgets('onTapImage', (WidgetTester tester) async {
+    final taps = <ImageMetadata>[];
+    await tester
+        .pumpWidget(_TapTestApp('asset:test/images/logo.svg', taps.add));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(SvgPicture));
+    expect(taps.length, equals(1));
+  });
+}
+
+class _TapTestApp extends StatelessWidget {
+  final void Function(ImageMetadata) onTapImage;
+  final String src;
+
+  const _TapTestApp(this.src, this.onTapImage, {Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => MaterialApp(
+        home: Scaffold(
+          body: HtmlWidget(
+            '<img src="$src" width="10" height="10" />',
+            onTapImage: onTapImage,
+          ),
+        ),
+      );
 }

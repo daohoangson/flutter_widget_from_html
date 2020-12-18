@@ -679,13 +679,9 @@ void main() async {
       const kHref = 'href';
       final urls = <String>[];
 
-      await tester.pumpWidget(_HitTestApp(
-        href: kHref,
-        onTapUrl: (url) => urls.add(url),
-      ));
-      expect(await tapText(tester, 'Tap me'), equals(1));
-
+      await tester.pumpWidget(_HitTestApp(href: kHref, onTapUrl: urls.add));
       await tester.pumpAndSettle();
+      expect(await tapText(tester, 'Tap me'), equals(1));
       expect(urls, equals(const [kHref]));
     });
 
