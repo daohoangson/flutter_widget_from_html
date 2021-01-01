@@ -16,7 +16,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html: ^0.5.1+1
+  flutter_widget_from_html: ^0.5.1+5
 ```
 
 ## Usage
@@ -65,10 +65,7 @@ HtmlWidget(
   // set the default styling for text
   textStyle: TextStyle(fontSize: 14),
 
-  // By default, `webView` is turned off because additional config
-  // must be done for `PlatformView` to work on iOS.
-  // https://pub.dev/packages/webview_flutter#ios
-  // Make sure you have it configured before using.
+  // turn on `webView` if you need IFRAME support
   webView: true,
 ),
 ```

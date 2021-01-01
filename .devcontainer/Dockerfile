@@ -1,5 +1,7 @@
 FROM mcr.microsoft.com/vscode/devcontainers/universal:linux
 
-ADD build.sh /tmp/build.sh
+ENV FLUTTER_HOME=/home/codespace/flutter
+ENV PATH=${PATH}:${FLUTTER_HOME}/bin
 
+ADD build.sh /tmp/build.sh
 RUN /bin/bash /tmp/build.sh

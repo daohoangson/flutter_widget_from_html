@@ -56,6 +56,9 @@ class HtmlWidget extends StatefulWidget {
   /// By default, a singleton instance of [WidgetFactory] will be used.
   final WidgetFactory Function() factoryBuilder;
 
+  /// The callback when user taps an image.
+  final void Function(ImageMetadata) onTapImage;
+
   /// The callback when user taps a link.
   final void Function(String) onTapUrl;
 
@@ -101,6 +104,7 @@ class HtmlWidget extends StatefulWidget {
     this.factoryBuilder,
     this.hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
     Key key,
+    this.onTapImage,
     this.onTapUrl,
     RebuildTriggers rebuildTriggers,
     this.textStyle = const TextStyle(),

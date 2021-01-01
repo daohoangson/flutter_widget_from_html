@@ -349,6 +349,36 @@ void main() {
     });
   });
 
+  group('customWidgetBuilder (VIDEO)', () {
+    final CustomWidgetBuilder customWidgetBuilder =
+        (e) => e.localName == 'video' ? Text('Bar') : null;
+    final src = 'http://domain.com/video.mp4';
+    final html = 'Foo <video><source src="$src"></video>';
+
+    testWidgets('renders without value', (WidgetTester tester) async {
+      final explained =
+          await explain(tester, HtmlWidget(html, key: helper.hwKey));
+      expect(
+          explained,
+          equals('[Column:children='
+              '[RichText:(:Foo)],'
+              '[VideoPlayer:url=http://domain.com/video.mp4,aspectRatio=1.78]'
+              ']'));
+    });
+
+    testWidgets('renders with value', (WidgetTester tester) async {
+      final e = await explain(
+        tester,
+        HtmlWidget(
+          html,
+          customWidgetBuilder: customWidgetBuilder,
+          key: helper.hwKey,
+        ),
+      );
+      expect(e, equals('[Column:children=[RichText:(:Foo)],[Text:Bar]]'));
+    });
+  });
+
   group('hyperlinkColor', () {
     final hyperlinkColor = Color.fromRGBO(255, 0, 0, 1);
     final html = '<a>Foo</a>';
@@ -367,7 +397,7 @@ void main() {
     });
   });
 
-  // TODO: onTapUrl
+  // onTapUrl -> tag_a_test.dart
 
   group('textStyle', () {
     final html = 'Foo';
@@ -493,6 +523,63 @@ void main() {
                 'aspectRatio=$webViewDefaultAspectRatio,'
                 'autoResize=true'
                 ']'));
+      });
+
+      group('unsupportedWebViewWorkaroundForIssue375', () {
+        testWidgets('renders true value', (WidgetTester tester) async {
+          final explained = await explain(
+              tester,
+              HtmlWidget(
+                html,
+                key: helper.hwKey,
+                unsupportedWebViewWorkaroundForIssue375: true,
+                webView: true,
+              ));
+          expect(
+              explained,
+              equals('[WebView:'
+                  'url=$webViewSrc,'
+                  'aspectRatio=$webViewDefaultAspectRatio,'
+                  'autoResize=true,'
+                  'unsupportedWorkaroundForIssue375=true'
+                  ']'));
+        });
+
+        testWidgets('renders false value', (WidgetTester tester) async {
+          final explained = await explain(
+              tester,
+              HtmlWidget(
+                html,
+                key: helper.hwKey,
+                unsupportedWebViewWorkaroundForIssue375: false,
+                webView: true,
+              ));
+          expect(
+              explained,
+              equals('[WebView:'
+                  'url=$webViewSrc,'
+                  'aspectRatio=$webViewDefaultAspectRatio,'
+                  'autoResize=true'
+                  ']'));
+        });
+
+        testWidgets('renders null value', (WidgetTester tester) async {
+          final explained = await explain(
+              tester,
+              HtmlWidget(
+                html,
+                key: helper.hwKey,
+                unsupportedWebViewWorkaroundForIssue375: null,
+                webView: true,
+              ));
+          expect(
+              explained,
+              equals('[WebView:'
+                  'url=$webViewSrc,'
+                  'aspectRatio=$webViewDefaultAspectRatio,'
+                  'autoResize=true'
+                  ']'));
+        });
       });
     });
 

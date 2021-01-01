@@ -17,6 +17,10 @@ dependencies:
   provider: ^3.0.0+1
   url_launcher: any
 
+  # TODO: remove this temporary workaround for
+  # https://github.com/daohoangson/flutter_widget_from_html/issues/371
+  chewie: ^0.9.0
+
 dependency_overrides:            # dep_override
   flutter_widget_from_html:      # dep_override
     path: ../packages/enhanced   # dep_override

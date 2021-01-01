@@ -211,16 +211,16 @@ void main() {
   group('tap test', () {
     testWidgets('triggers callback', (WidgetTester tester) async {
       final urls = <String>[];
-      await tester.pumpWidget(_TapTestApp(onTapUrl: (url) => urls.add(url)));
-      expect(await tapText(tester, 'Tap me'), equals(1));
+      await tester.pumpWidget(_TapTestApp(onTapUrl: urls.add));
       await tester.pumpAndSettle();
+      expect(await tapText(tester, 'Tap me'), equals(1));
       expect(urls, equals(const [kHref]));
     });
 
     testWidgets('prints log', (WidgetTester tester) async {
       await tester.pumpWidget(_TapTestApp());
-      expect(await tapText(tester, 'Tap me'), equals(1));
       await tester.pumpAndSettle();
+      expect(await tapText(tester, 'Tap me'), equals(1));
     });
   });
 }

@@ -1,3 +1,22 @@
+## 0.5.1+5
+
+- Add support for chewie 0.12 (#373, authored by @urakozz)
+
+## 0.5.1+4
+
+- Improve RUBY baseline (#362)
+- Fix `CssBlock` loosing stretched width on render object updated (#360)
+- Fix nested sizing / text-align / vertical-align (#361)
+
+## 0.5.1+3
+
+- Fix LI marker position on non-default line height
+
+## 0.5.1+2
+
+- Fix bug `null` access (authored by @sweatfryash)
+- Fix bug customWidgetBuilder does not work for TABLE, VIDEO (#353)
+
 ## 0.5.1+1
 
 - Discard preferred width / height on infinity value. (#340)
