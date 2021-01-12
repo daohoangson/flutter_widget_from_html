@@ -1,12 +1,16 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:mockito/mockito.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 
 import '_.dart' as helper;
+
+final svgBytes = utf8.encode('<svg viewBox="0 0 1 1"></svg>');
 
 void main() {
   final sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
@@ -98,8 +102,7 @@ void main() {
           .then((e) => e.replaceAll(RegExp(r'\(Uint8List#.+\)'), '(bytes)'));
 
       testWidgets('renders base64', (WidgetTester tester) async {
-        final base64 =
-            base64Encode(utf8.encode('<svg viewBox="0 0 1 1"></svg>'));
+        final base64 = base64Encode(svgBytes);
         final html = '<img src="data:image/svg+xml;base64,$base64" />';
         final explained = await explain(tester, html);
         expect(
@@ -121,10 +124,13 @@ void main() {
       });
     });
 
-    testWidgets('renders network picture', (WidgetTester t) async {
+    testWidgets('renders network picture', (WidgetTester tester) async {
       final src = 'http://domain.com/image.svg';
-      final h = '<img src="$src" />';
-      final explained = await mockNetworkImagesFor(() => helper.explain(t, h));
+      final html = '<img src="$src" />';
+      final explained = await HttpOverrides.runZoned(
+        () => helper.explain(tester, html),
+        createHttpClient: (_) => _createMockSvgImageHttpClient(),
+      );
       expect(
         explained,
         equals('[CssSizing:$sizingConstraints,child='
@@ -160,4 +166,45 @@ class _TapTestApp extends StatelessWidget {
           ),
         ),
       );
+}
+
+class _MockHttpClient extends Mock implements HttpClient {}
+
+class _MockHttpClientRequest extends Mock implements HttpClientRequest {}
+
+class _MockHttpClientResponse extends Mock implements HttpClientResponse {}
+
+class _MockHttpHeaders extends Mock implements HttpHeaders {}
+
+/// Returns a [MockHttpClient] that responds with demo image to all requests.
+HttpClient _createMockSvgImageHttpClient() {
+  final client = _MockHttpClient();
+  final request = _MockHttpClientRequest();
+  final response = _MockHttpClientResponse();
+  final headers = _MockHttpHeaders();
+
+  when(client.getUrl(any))
+      .thenAnswer((_) => Future<HttpClientRequest>.value(request));
+  when(request.headers).thenReturn(headers);
+  when(request.close())
+      .thenAnswer((_) => Future<HttpClientResponse>.value(response));
+  when(response.compressionState)
+      .thenReturn(HttpClientResponseCompressionState.notCompressed);
+  when(response.contentLength).thenReturn(svgBytes.length);
+  when(response.statusCode).thenReturn(HttpStatus.ok);
+  when(response.listen(
+    any,
+    onError: anyNamed('onError'),
+    onDone: anyNamed('onDone'),
+    cancelOnError: anyNamed('cancelOnError'),
+  )).thenAnswer((invocation) {
+    return Stream.fromIterable(<List<int>>[svgBytes]).listen(
+      invocation.positionalArguments[0],
+      onDone: invocation.namedArguments[#onDone],
+      onError: invocation.namedArguments[#onError],
+      cancelOnError: invocation.namedArguments[#cancelOnError],
+    );
+  });
+
+  return client;
 }
