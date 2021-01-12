@@ -178,9 +178,23 @@ class _RenderCssSizing extends RenderProxyBox {
     markNeedsLayout();
   }
 
+  // TODO: Remove the ignore
+  @override
+  // ignore: override_on_non_overriding_member
+  Size computeDryLayout(BoxConstraints constraints) {
+    final cc = _applyContraints(constraints);
+    final childSize = child.getDryLayout(cc);
+    return constraints.constrain(childSize);
+  }
+
   @override
   void performLayout() {
-    final c = constraints;
+    final cc = _applyContraints(constraints);
+    child.layout(cc, parentUsesSize: true);
+    size = constraints.constrain(child.size);
+  }
+
+  BoxConstraints _applyContraints(BoxConstraints c) {
     final maxHeight =
         min(c.maxHeight, _maxHeight?.clamp(0.0, c.maxHeight) ?? c.maxHeight);
     final maxWidth =
@@ -218,8 +232,7 @@ class _RenderCssSizing extends RenderProxyBox {
       minWidth: stableChildSize?.width ?? preferredWidth ?? minWidth,
     );
 
-    child.layout(cc, parentUsesSize: true);
-    size = constraints.constrain(child.size);
+    return cc;
   }
 
   Size _guessChildSize({
@@ -234,8 +247,7 @@ class _RenderCssSizing extends RenderProxyBox {
       minWidth: 0,
       minHeight: preferredHeight,
     );
-    child.layout(ccHeight, parentUsesSize: true);
-    final sizeHeight = child.size;
+    final sizeHeight = child.getDryLayout(ccHeight);
 
     final ccWidth = BoxConstraints(
       maxWidth: preferredWidth,
@@ -243,8 +255,7 @@ class _RenderCssSizing extends RenderProxyBox {
       minWidth: preferredWidth,
       minHeight: 0,
     );
-    child.layout(ccWidth, parentUsesSize: true);
-    final sizeWidth = child.size;
+    final sizeWidth = child.getDryLayout(ccWidth);
 
     final childAspectRatio = sizeWidth.width / sizeWidth.height;
     if (childAspectRatio != sizeHeight.width / sizeHeight.height) {
