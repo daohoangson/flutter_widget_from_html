@@ -178,9 +178,7 @@ class _RenderCssSizing extends RenderProxyBox {
     markNeedsLayout();
   }
 
-  // TODO: Remove the ignore
   @override
-  // ignore: override_on_non_overriding_member
   Size computeDryLayout(BoxConstraints constraints) {
     final cc = _applyContraints(constraints);
     final childSize = child.getDryLayout(cc);

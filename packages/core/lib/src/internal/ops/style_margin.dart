@@ -35,8 +35,8 @@ class StyleMargin {
 
           final t = m.top?.isNotEmpty == true;
           final b = m.bottom?.isNotEmpty == true;
-          final ws = List<WidgetPlaceholder>(
-              (t ? 1 : 0) + widgets.length + (b ? 1 : 0));
+          final ws = List<WidgetPlaceholder>.filled(
+              (t ? 1 : 0) + widgets.length + (b ? 1 : 0), null);
           final tsb = meta.tsb();
 
           var i = 0;

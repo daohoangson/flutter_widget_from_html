@@ -164,7 +164,7 @@ class WidgetFactory {
     final tableRows = data.rows;
 
     for (var r = 0; r < tableRows; r++) {
-      final cells = List<Widget>(tableCols);
+      final cells = List<Widget>.filled(tableCols, null);
       for (var c = 0; c < tableCols; c++) {
         final index = data.getIndexAt(row: r, column: c);
         if (index == -1 || slotIndices.contains(index)) {

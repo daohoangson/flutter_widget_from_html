@@ -7,14 +7,14 @@ Widget buildTableWithLayoutGrid(WidgetFactory wf, BuildMetadata meta,
     TextStyleHtml tsh, TableMetadata data) {
   final cols = data.cols;
   if (cols == 0) return null;
-  final templateColumnSizes = List<TrackSize>(cols);
+  final templateColumnSizes = List<TrackSize>.filled(cols, null);
   for (var c = 0; c < cols; c++) {
     templateColumnSizes[c] = FlexibleTrackSize(1);
   }
 
   final rows = data.rows;
   if (rows == 0) return null;
-  final templateRowSizes = List<TrackSize>(rows);
+  final templateRowSizes = List<TrackSize>.filled(rows, null);
   for (var r = 0; r < rows; r++) {
     templateRowSizes[r] = IntrinsicContentTrackSize();
   }
