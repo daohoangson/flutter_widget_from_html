@@ -16,6 +16,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
+        with:
+          channel: beta
       - name: Run flutter format
         run: flutter format --dry-run --set-exit-if-changed .
       - name: Analyze core
@@ -29,10 +31,10 @@ jobs:
     name: Unit test
     strategy:
       matrix:
-        channel: [dev, beta, stable]
+        channel: [dev, beta]
     continue-on-error: ${{ matrix.channel != 'stable' }}
     runs-on: ubuntu-latest
-        
+
     steps:
       - uses: actions/checkout@v2
       - name: Setup Flutter
@@ -41,15 +43,12 @@ jobs:
           channel: ${{ matrix.channel }}
       - name: Run ./tool/test.sh
         run: |
-          if [ "${{ matrix.channel }}" == "stable" ]; then
+          if [ "${{ matrix.channel }}" == "beta" ]; then
             ./tool/test.sh --coverage
             bash <(curl -s https://codecov.io/bash)
           else
             ./tool/test.sh
           fi
-      - name: Submit to Codecov
-        if: matrix.channel == 'stable'
-        run: bash <(curl -s https://codecov.io/bash)
 
   ios:
     name: iOS Test
