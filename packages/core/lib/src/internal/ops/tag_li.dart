@@ -376,7 +376,12 @@ class _ListMarkerRenderObject extends RenderBox {
     final center = offset +
         Offset(
           size.width / 2,
-          size.height - m.descent - m.unscaledAscent + m.unscaledAscent * .7,
+          (m.descent.isFinite && m.unscaledAscent.isFinite)
+              ? size.height -
+                  m.descent -
+                  m.unscaledAscent +
+                  m.unscaledAscent * .7
+              : size.height / 2,
         );
     final radius = _textStyle.fontSize * .2;
 
