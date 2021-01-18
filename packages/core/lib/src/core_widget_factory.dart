@@ -17,6 +17,7 @@ class WidgetFactory {
   BuildOp _styleMargin;
   BuildOp _stylePadding;
   BuildOp _styleSizing;
+  BuildOp _styleTextDecoration;
   BuildOp _styleVerticalAlign;
   BuildOp _tagA;
   BuildOp _tagBr;
@@ -666,8 +667,15 @@ class WidgetFactory {
         break;
 
       case kCssTextDecoration:
-        final textDeco = TextDeco.tryParse(value);
-        if (textDeco != null) meta.tsb(TextStyleOps.textDeco, textDeco);
+        _styleTextDecoration ??= BuildOp(onTree: (meta, _) {
+          for (final style in meta.styles) {
+            if (style.key == kCssTextDecoration) {
+              final textDeco = TextDeco.tryParse(style.values);
+              if (textDeco != null) meta.tsb(TextStyleOps.textDeco, textDeco);
+            }
+          }
+        });
+        meta.register(_styleTextDecoration);
         break;
 
       case kCssTextOverflow:

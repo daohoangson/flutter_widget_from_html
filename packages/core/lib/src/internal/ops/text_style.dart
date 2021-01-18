@@ -262,9 +262,9 @@ class TextDeco {
     this.under,
   });
 
-  factory TextDeco.tryParse(String value) {
-    for (final v in splitCssValues(value)) {
-      switch (v) {
+  factory TextDeco.tryParse(List<String> values) {
+    for (final value in values) {
+      switch (value) {
         case kCssTextDecorationLineThrough:
           return TextDeco(strike: true);
         case kCssTextDecorationNone:

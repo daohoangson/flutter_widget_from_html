@@ -38,8 +38,8 @@ class StyleBgColor {
           if (parsed != null) color = parsed;
           break;
         case kCssBackground:
-          for (final v in splitCssValues(style.value)) {
-            final parsed = tryParseColor(v);
+          for (final value in style.values) {
+            final parsed = tryParseColor(value);
             if (parsed != null) color = parsed;
           }
           break;

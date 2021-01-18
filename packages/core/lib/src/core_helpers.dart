@@ -42,6 +42,49 @@ typedef CustomStylesBuilder = Map<String, String> Function(dom.Element element);
 /// For those needs, a custom [WidgetFactory] is the way to go.
 typedef CustomWidgetBuilder = Widget Function(dom.Element element);
 
+final _domElementStyles = Expando<List<InlineStyle>>();
+
+final _domElementStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
+
+extension DomElementExtension on dom.Element {
+  /// Returns parsed [InlineStyle]s from the element's `style` attribute.
+  ///
+  /// This is different from [BuildMetadata.styles] as it doesn't include
+  /// runtime additions from [WidgetFactory] or [BuildOp]s.
+  List<InlineStyle> get styles {
+    final result = _domElementStyles[this];
+    if (result != null) return result;
+
+    if (!attributes.containsKey('style')) {
+      return _domElementStyles[this] = const [];
+    }
+
+    return _domElementStyles[this] = _domElementStyleRegExp
+        .allMatches(attributes['style'])
+        .map((m) => InlineStyle(m[1].trim(), m[2].trim()))
+        .toList(growable: false);
+  }
+}
+
+final _domElementStyleValuesRegExp = RegExp(r'\s+');
+
+/// An inline style key value pair.
+class InlineStyle {
+  /// The key.
+  final String key;
+
+  /// The value.
+  ///
+  /// Use [values] for tokenized strings.
+  final String value;
+
+  /// Creates a key value pair.
+  InlineStyle(this.key, this.value);
+
+  /// The tokenized values.
+  List<String> get values => value.split(_domElementStyleValuesRegExp);
+}
+
 /// A set of values that should trigger rebuild.
 class RebuildTriggers {
   final List _values;

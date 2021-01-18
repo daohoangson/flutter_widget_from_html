@@ -27,12 +27,12 @@ abstract class BuildMetadata {
 
   /// The inline styles.
   ///
-  /// These are usually collected from:
+  /// These are collected from:
   ///
   /// - [WidgetFactory.parse] or [BuildOp.onChild] by calling `meta[key] = value`
   /// - [BuildOp.defaultStyles] returning a map
   /// - Attribute `style` of [domElement]
-  Iterable<MapEntry<String, String>> get styles;
+  List<InlineStyle> get styles;
 
   /// Returns `true` if subtree will be built.
   ///
