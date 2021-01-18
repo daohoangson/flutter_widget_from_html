@@ -13,7 +13,6 @@ dependencies:
   chewie: ">=0.9.0 <0.13.0"
   flutter:
     sdk: flutter
-  flutter_layout_grid: ^0.10.2
   flutter_svg: ">=0.17.0 <0.20.0"
   flutter_widget_from_html_core: ^0.5.1+4
   html: ^0.14.0+3

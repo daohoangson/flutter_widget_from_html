@@ -12,6 +12,7 @@ import 'core_html_widget.dart';
 class WidgetFactory {
   BuildOp _styleBgColor;
   BuildOp _styleBlock;
+  BuildOp _styleBorder;
   BuildOp _styleDisplayNone;
   BuildOp _styleMargin;
   BuildOp _stylePadding;
@@ -31,16 +32,40 @@ class WidgetFactory {
 
   HtmlWidget get _widget => _state?.widget;
 
+  /// Builds [Align].
+  Widget buildAlign(
+          BuildMetadata meta, Widget child, AlignmentGeometry alignment) =>
+      alignment == null ? child : Align(alignment: alignment, child: child);
+
   /// Builds [AspectRatio].
   Widget buildAspectRatio(
           BuildMetadata meta, Widget child, double aspectRatio) =>
-      child != null && aspectRatio != null
-          ? AspectRatio(aspectRatio: aspectRatio, child: child)
-          : null;
+      aspectRatio == null
+          ? child
+          : AspectRatio(aspectRatio: aspectRatio, child: child);
 
   /// Builds primary column (body).
   WidgetPlaceholder buildBody(BuildMetadata meta, Iterable<Widget> children) =>
       buildColumnPlaceholder(meta, children, trimMarginVertical: true);
+
+  /// Builds [border] with [Container] or [DecoratedBox].
+  ///
+  /// See https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
+  /// for more information regarding `content-box` (the default)
+  /// and `border-box` (set [isBorderBox] to use).
+  Widget buildBorder(BuildMetadata meta, Widget child, BoxBorder border,
+          {bool isBorderBox = false}) =>
+      border == null
+          ? child
+          : isBorderBox == true
+              ? DecoratedBox(
+                  child: child,
+                  decoration: BoxDecoration(border: border),
+                )
+              : Container(
+                  child: child,
+                  decoration: BoxDecoration(border: border),
+                );
 
   /// Builds column placeholder.
   WidgetPlaceholder buildColumnPlaceholder(
@@ -51,14 +76,13 @@ class WidgetFactory {
     if (children?.isNotEmpty != true) return null;
 
     if (children.length == 1) {
-      final first = children.first;
-      if (first is WidgetPlaceholder) {
-        if (first is! ColumnPlaceholder) return first;
-
-        final existingPlaceholder = first as ColumnPlaceholder;
-        if (existingPlaceholder.trimMarginVertical == trimMarginVertical) {
-          return first;
+      final child = children.first;
+      if (child is ColumnPlaceholder) {
+        if (child.trimMarginVertical == trimMarginVertical) {
+          return child;
         }
+      } else {
+        return child;
       }
     }
 
@@ -108,7 +132,7 @@ class WidgetFactory {
   /// Builds [GestureDetector].
   Widget buildGestureDetector(
           BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
-      GestureDetector(child: child, onTap: onTap);
+      onTap == null ? child : GestureDetector(child: child, onTap: onTap);
 
   /// Builds horizontal scroll view.
   Widget buildHorizontalScrollView(BuildMetadata meta, Widget child) =>
@@ -144,9 +168,9 @@ class WidgetFactory {
 
   /// Builds [Padding].
   Widget buildPadding(BuildMetadata meta, Widget child, EdgeInsets padding) =>
-      child != null && padding != null && padding != const EdgeInsets.all(0)
-          ? Padding(child: child, padding: padding)
-          : child;
+      padding == null || padding == const EdgeInsets.all(0)
+          ? child
+          : Padding(child: child, padding: padding);
 
   /// Builds [Stack].
   Widget buildStack(
@@ -156,39 +180,6 @@ class WidgetFactory {
         clipBehavior: Clip.none,
         textDirection: tsh.textDirection,
       );
-
-  /// Builds [Table].
-  Widget buildTable(BuildMetadata meta, TextStyleHtml tsh, TableMetadata data) {
-    final rows = <TableRow>[];
-    final slotIndices = <int>[];
-    final tableCols = data.cols;
-    final tableRows = data.rows;
-
-    for (var r = 0; r < tableRows; r++) {
-      final cells = List<Widget>(tableCols);
-      for (var c = 0; c < tableCols; c++) {
-        final index = data.getIndexAt(row: r, column: c);
-        if (index == -1 || slotIndices.contains(index)) {
-          cells[c] = widget0;
-          continue;
-        }
-        slotIndices.add(index);
-
-        cells[c] = TableCell(child: data.getWidgetAt(index));
-      }
-
-      if (cells.isEmpty) continue;
-      rows.add(TableRow(children: cells));
-    }
-
-    if (rows.isEmpty) return null;
-
-    final tableBorder = data.border != null
-        // TODO: support different styling for border sides
-        ? TableBorder.symmetric(inside: data.border, outside: data.border)
-        : null;
-    return Table(border: tableBorder, children: rows);
-  }
 
   /// Builds [RichText].
   Widget buildText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) =>
@@ -581,11 +572,20 @@ class WidgetFactory {
       case kTagTable:
         meta
           ..[kCssDisplay] = kCssDisplayTable
+          ..register(TagTable.borderOp(
+            tryParseDoubleFromMap(attrs, kAttributeBorder) ?? 0.0,
+            tryParseDoubleFromMap(attrs, kAttributeCellSpacing) ?? 2.0,
+          ))
           ..register(TagTable.cellPaddingOp(
-              tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1));
+              tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1.0));
+        break;
+      case kTagTableCell:
+        meta[kCssVerticalAlign] = kCssVerticalAlignMiddle;
         break;
       case kTagTableHeaderCell:
-        meta.tsb(TextStyleOps.fontWeight, FontWeight.bold);
+        meta
+          ..[kCssVerticalAlign] = kCssVerticalAlignMiddle
+          ..tsb(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case kTagTableCaption:
         meta[kCssTextAlign] = kCssTextAlignCenter;
@@ -611,33 +611,6 @@ class WidgetFactory {
       case kCssBackgroundColor:
         _styleBgColor ??= StyleBgColor(this).buildOp;
         meta.register(_styleBgColor);
-        break;
-
-      case kCssBorderBottom:
-        final borderBottom = tryParseCssBorderSide(value);
-        if (borderBottom != null) {
-          meta.register(TextStyleOps.textDecoOp(TextDeco(
-            color: borderBottom.color,
-            under: true,
-            style: borderBottom.style,
-            thickness: borderBottom.width,
-          )));
-        } else {
-          meta.register(TextStyleOps.textDecoOp(TextDeco(under: false)));
-        }
-        break;
-      case kCssBorderTop:
-        final borderTop = tryParseCssBorderSide(value);
-        if (borderTop != null) {
-          meta.register(TextStyleOps.textDecoOp(TextDeco(
-            color: borderTop.color,
-            over: true,
-            style: borderTop.style,
-            thickness: borderTop.width,
-          )));
-        } else {
-          meta.register(TextStyleOps.textDecoOp(TextDeco(over: false)));
-        }
         break;
 
       case kCssColor:
@@ -720,6 +693,11 @@ class WidgetFactory {
         _styleVerticalAlign ??= StyleVerticalAlign(this).buildOp;
         meta.register(_styleVerticalAlign);
         break;
+    }
+
+    if (key.startsWith(kCssBorder)) {
+      _styleBorder ??= StyleBorder(this).buildOp;
+      meta.register(_styleBorder);
     }
 
     if (key.startsWith(kCssMargin)) {

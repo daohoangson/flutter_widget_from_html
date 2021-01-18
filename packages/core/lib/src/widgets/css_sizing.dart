@@ -198,9 +198,9 @@ class _RenderCssSizing extends RenderProxyBox {
         _preferredWidth?.clamp(effectiveMinWidth, maxWidth);
     // ignore preferred value if it's infinite
     final preferredHeight =
-        __preferredHeight == double.infinity ? null : __preferredHeight;
+        __preferredHeight?.isFinite == true ? __preferredHeight : null;
     final preferredWidth =
-        __preferredWidth == double.infinity ? null : __preferredWidth;
+        __preferredWidth?.isFinite == true ? __preferredWidth : null;
 
     final stableChildSize = (preferredHeight != null && preferredWidth != null)
         ? _guessChildSize(

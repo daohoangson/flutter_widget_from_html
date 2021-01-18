@@ -2,13 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core show WidgetFactory;
 
 import 'external/url_launcher.dart';
-import 'internal/layout_grid.dart';
 import 'internal/ops.dart';
 import 'data.dart';
 import 'helpers.dart';
@@ -61,11 +59,6 @@ class WidgetFactory extends core.WidgetFactory {
 
     return built;
   }
-
-  /// Builds [LayoutGrid].
-  @override
-  Widget buildTable(BuildMetadata m, TextStyleHtml tsh, TableMetadata data) =>
-      buildTableWithLayoutGrid(this, m, tsh, data);
 
   /// Builds [VideoPlayer].
   Widget buildVideoPlayer(

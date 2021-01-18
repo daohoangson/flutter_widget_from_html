@@ -12,6 +12,8 @@ Widget _marginHorizontalBuilder(Widget w, CssLengthBox b, TextStyleHtml tsh) =>
     );
 
 class StyleMargin {
+  static const kPriorityBoxModel9k = 9000;
+
   final WidgetFactory wf;
 
   StyleMargin(this.wf);
@@ -56,6 +58,6 @@ class StyleMargin {
           return ws;
         },
         onWidgetsIsOptional: true,
-        priority: 99999,
+        priority: kPriorityBoxModel9k,
       );
 }

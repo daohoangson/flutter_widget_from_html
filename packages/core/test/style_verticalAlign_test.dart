@@ -123,6 +123,68 @@ void main() {
     expect(explained, equals('[RichText:[RichText:(+i:Foo)]@top]'));
   });
 
+  group('isBlockElement', () {
+    group('renders top', () {
+      final html = '<div style="vertical-align: top">Foo</span>';
+
+      testWidgets('ltr', (WidgetTester tester) async {
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[CssBlock:child=[Align:alignment=topLeft,child='
+                '[RichText:(:Foo)]]]'));
+      });
+
+      testWidgets('rtl', (WidgetTester tester) async {
+        final explained = await explain(tester, html, rtl: true);
+        expect(
+            explained,
+            equals('[CssBlock:child=[Align:alignment=topRight,child='
+                '[RichText:dir=rtl,(:Foo)]]]'));
+      });
+    });
+
+    group('renders middle', () {
+      final html = '<div style="vertical-align: middle">Foo</span>';
+
+      testWidgets('ltr', (WidgetTester tester) async {
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[CssBlock:child=[Align:alignment=centerLeft,child='
+                '[RichText:(:Foo)]]]'));
+      });
+
+      testWidgets('rtl', (WidgetTester tester) async {
+        final explained = await explain(tester, html, rtl: true);
+        expect(
+            explained,
+            equals('[CssBlock:child=[Align:alignment=centerRight,child='
+                '[RichText:dir=rtl,(:Foo)]]]'));
+      });
+    });
+
+    group('renders bottom', () {
+      final html = '<div style="vertical-align: bottom">Foo</span>';
+
+      testWidgets('ltr', (WidgetTester tester) async {
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[CssBlock:child=[Align:alignment=bottomLeft,child='
+                '[RichText:(:Foo)]]]'));
+      });
+
+      testWidgets('rtl', (WidgetTester tester) async {
+        final explained = await explain(tester, html, rtl: true);
+        expect(
+            explained,
+            equals('[CssBlock:child=[Align:alignment=bottomRight,child='
+                '[RichText:dir=rtl,(:Foo)]]]'));
+      });
+    });
+  });
+
   group('error handling', () {
     testWidgets('renders empty tag', (WidgetTester tester) async {
       final html = 'Foo <sub></sub>';

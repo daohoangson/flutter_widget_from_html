@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -11,6 +13,7 @@ import 'margin_vertical.dart';
 
 part 'ops/column.dart';
 part 'ops/style_bg_color.dart';
+part 'ops/style_border.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_padding.dart';
 part 'ops/style_sizing.dart';
