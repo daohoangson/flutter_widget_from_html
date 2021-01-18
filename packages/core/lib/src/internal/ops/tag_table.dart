@@ -161,14 +161,9 @@ class TagTable {
       return value;
     }
 
-    final attrs = meta.element.attributes;
-    if (attrs.containsKey('style')) {
-      for (final pair in splitAttributeStyle(attrs['style'])
-          .toList(growable: false)
-          .reversed) {
-        if (pair.key == kCssDisplay) {
-          return pair.value;
-        }
+    for (final pair in meta.element.styles.reversed) {
+      if (pair.key == kCssDisplay) {
+        return pair.value;
       }
     }
 
