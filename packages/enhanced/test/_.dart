@@ -35,6 +35,7 @@ String _explainer(helper.Explainer parent, Widget widget) {
         "${widget.autoResize ? ',autoResize=${widget.autoResize}' : ''}"
         "${!widget.js ? ',js=${widget.js}' : ''}"
         "${widget.unsupportedWorkaroundForIssue37 ? ',unsupportedWorkaroundForIssue37=${widget.unsupportedWorkaroundForIssue37}' : ''}"
+        "${widget.unsupportedWorkaroundForIssue375 ? ',unsupportedWorkaroundForIssue375=${widget.unsupportedWorkaroundForIssue375}' : ''}"
         ']';
   }
 

@@ -65,10 +65,7 @@ HtmlWidget(
   // set the default styling for text
   textStyle: TextStyle(fontSize: 14),
 
-  // By default, `webView` is turned off because additional config
-  // must be done for `PlatformView` to work on iOS.
-  // https://pub.dev/packages/webview_flutter#ios
-  // Make sure you have it configured before using.
+  // turn on `webView` if you need IFRAME support
   webView: true,
 ),
 ```

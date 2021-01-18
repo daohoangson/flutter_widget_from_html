@@ -225,6 +225,13 @@ void main() {
     });
   });
 
+  testWidgets('onTapImage', (WidgetTester tester) async {
+    final taps = <ImageMetadata>[];
+    await tester.pumpWidget(_TapTestApp(onTapImage: taps.add));
+    await tester.tap(find.byType(Image));
+    expect(taps.length, equals(1));
+  });
+
   group('error handing', () {
     testWidgets('executes errorBuilder', (WidgetTester tester) async {
       final html = 'Foo <img src="data:image/jpg;base64,xxxx" /> bar';
@@ -233,4 +240,20 @@ void main() {
       await expect(find.text('❌'), findsOneWidget);
     });
   });
+}
+
+class _TapTestApp extends StatelessWidget {
+  final void Function(ImageMetadata) onTapImage;
+
+  const _TapTestApp({Key key, this.onTapImage}) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => MaterialApp(
+        home: Scaffold(
+          body: HtmlWidget(
+            '<img src="asset:test/images/logo.png" width="10" height="10" />',
+            onTapImage: onTapImage,
+          ),
+        ),
+      );
 }

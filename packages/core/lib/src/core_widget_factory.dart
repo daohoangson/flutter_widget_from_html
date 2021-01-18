@@ -140,9 +140,11 @@ class WidgetFactory {
   /// Builds [Image] from [provider].
   Widget buildImage(BuildMetadata meta, Object provider, ImageMetadata data) {
     if (provider == null) return null;
+
+    Widget built;
     if (provider is ImageProvider) {
       final semanticLabel = data?.alt ?? data?.title;
-      return Image(
+      built = Image(
         errorBuilder: (_, error, __) {
           print('$provider error: $error');
           final text = semanticLabel ?? '❌';
@@ -155,7 +157,12 @@ class WidgetFactory {
       );
     }
 
-    return null;
+    if (_widget?.onTapImage != null && built != null) {
+      built = buildGestureDetector(
+          meta, built, () => _widget?.onTapImage?.call(data));
+    }
+
+    return built;
   }
 
   /// Builds [Padding].

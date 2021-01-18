@@ -28,6 +28,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   golden_toolkit: any
+  mockito: any
   network_image_mock: any
   pedantic: any
 
