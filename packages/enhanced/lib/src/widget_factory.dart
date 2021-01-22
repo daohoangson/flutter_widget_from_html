@@ -91,26 +91,34 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   /// Builds [WebView].
+  ///
+  /// JavaScript is only enabled if [HtmlWidget.webViewJs] is turned on
+  /// AND sandbox restrictions are unset (no `sandbox` attribute)
+  /// or `allow-scripts` is explicitly allowed.
   Widget buildWebView(
     BuildMetadata meta,
     String url, {
     double height,
+    List<String> sandbox,
     double width,
   }) {
     if (_widget?.webView != true) return buildWebViewLinkOnly(meta, url);
 
     final dimensOk = height != null && height > 0 && width != null && width > 0;
+    final js = _widget.webViewJs == true &&
+        (sandbox == null ||
+            sandbox.contains(kAttributeIframeSandboxAllowScripts));
     return WebView(
       url,
       aspectRatio: dimensOk ? width / height : 16 / 9,
-      autoResize: !dimensOk && _widget.webViewJs == true,
+      autoResize: !dimensOk && js,
       interceptNavigationRequest: (newUrl) {
         if (newUrl == url) return false;
 
         gestureTapCallback(newUrl)();
         return true;
       },
-      js: _widget.webViewJs == true,
+      js: js,
       unsupportedWorkaroundForIssue37:
           _widget.unsupportedWebViewWorkaroundForIssue37 == true,
       unsupportedWorkaroundForIssue375:
@@ -250,6 +258,7 @@ class WidgetFactory extends core.WidgetFactory {
             meta,
             src,
             height: tryParseDoubleFromMap(attrs, kAttributeIframeHeight),
+            sandbox: attrs[kAttributeIframeSandbox]?.split(RegExp(r'\s+')),
             width: tryParseDoubleFromMap(attrs, kAttributeIframeWidth),
           ));
         });
