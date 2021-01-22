@@ -33,6 +33,38 @@ void main() {
     expect(explained, equals('[WebView:url=$src,aspectRatio=1.33]'));
   });
 
+  group('sandbox', () {
+    testWidgets('renders with js', (tester) async {
+      final html = '<iframe src="$src"></iframe>';
+      final e = await explain(tester, html);
+      expect(e, equals('[WebView:url=$src,aspectRatio=1.78,autoResize=true]'));
+    });
+
+    testWidgets('renders without js', (tester) async {
+      final html = '<iframe src="$src" sandbox></iframe>';
+      final e = await explain(tester, html);
+      expect(e, equals('[WebView:url=$src,aspectRatio=1.78,js=false]'));
+    });
+
+    testWidgets('renders without js (empty)', (tester) async {
+      final html = '<iframe src="$src" sandbox=""></iframe>';
+      final e = await explain(tester, html);
+      expect(e, equals('[WebView:url=$src,aspectRatio=1.78,js=false]'));
+    });
+
+    testWidgets('renders without js (allow-forms)', (tester) async {
+      final html = '<iframe src="$src" sandbox="allow-forms"></iframe>';
+      final e = await explain(tester, html);
+      expect(e, equals('[WebView:url=$src,aspectRatio=1.78,js=false]'));
+    });
+
+    testWidgets('renders with js (allow-scripts)', (tester) async {
+      final html = '<iframe src="$src" sandbox="allow-scripts"></iframe>';
+      final e = await explain(tester, html);
+      expect(e, equals('[WebView:url=$src,aspectRatio=1.78,autoResize=true]'));
+    });
+  });
+
   group('errors', () {
     testWidgets('no src', (tester) async {
       final html = '<iframe></iframe>';
