@@ -213,6 +213,9 @@ class _TableRenderObject extends RenderBox
     markNeedsLayout();
   }
 
+  ClipRectLayer _clipRectLayer;
+  bool _hasVisualOverflow = false;
+
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) {
     assert(!debugNeedsLayout);
@@ -241,17 +244,36 @@ class _TableRenderObject extends RenderBox
   }
 
   @override
+  Rect describeApproximatePaintClip(RenderObject _) =>
+      _hasVisualOverflow ? Offset.zero & size : null;
+
+  @override
   bool hitTestChildren(BoxHitTestResult result, {Offset position}) =>
       defaultHitTestChildren(result, position: position);
 
   @override
   void paint(PaintingContext context, Offset offset) {
     _companion?._baselines?.clear();
-    defaultPaint(context, offset);
+
+    if (_hasVisualOverflow) {
+      _clipRectLayer = context.pushClipRect(
+        needsCompositing,
+        offset,
+        Offset.zero & size,
+        defaultPaint,
+        clipBehavior: Clip.hardEdge,
+        oldLayer: _clipRectLayer,
+      );
+    } else {
+      _clipRectLayer = null;
+      defaultPaint(context, offset);
+    }
   }
 
   @override
   void performLayout() {
+    _hasVisualOverflow = false;
+
     final c = constraints;
     final children = <RenderBox>[];
     final cells = <_TableCellData>[];
@@ -284,10 +306,9 @@ class _TableRenderObject extends RenderBox
       final childColumnGap = (data.columnSpan - 1) * _columnGap;
       final childWidth =
           width0.isFinite ? width0 * data.columnSpan + childColumnGap : null;
-      final cc = c.copyWith(
-        maxHeight: double.infinity,
+      final cc = BoxConstraints(
         maxWidth: childWidth ?? double.infinity,
-        minWidth: childWidth,
+        minWidth: childWidth ?? 0.0,
       );
       child.layout(cc, parentUsesSize: true);
       final childSize = childSizes[i] = child.size;
@@ -312,7 +333,8 @@ class _TableRenderObject extends RenderBox
     // sometime we have to relayout child, e.g. stretch its height for rowspan
     final calculatedHeight = rowHeights.sum + rowGaps;
     final constraintedHeight = c.constrainHeight(calculatedHeight);
-    final deltaHeight = (constraintedHeight - calculatedHeight) / rowCount;
+    final deltaHeight =
+        max(0, (constraintedHeight - calculatedHeight) / rowCount);
     final calculatedWidth = columnWidths.sum + columnGaps;
     final constraintedWidth = c.constrainWidth(calculatedWidth);
     final deltaWidth = (constraintedWidth - calculatedWidth) / columnCount;
@@ -327,10 +349,16 @@ class _TableRenderObject extends RenderBox
         children[i].layout(cc2, parentUsesSize: true);
       }
 
-      data.offset = Offset(
-        data.calculateX(this, columnWidths),
-        data.calculateY(this, rowHeights),
-      );
+      final x = data.calculateX(this, columnWidths);
+      final y = data.calculateY(this, rowHeights);
+      data.offset = Offset(x, y);
+
+      if (x < 0.0 ||
+          x + childWidth > constraintedWidth ||
+          y < 0.0 ||
+          y + childHeight > constraintedHeight) {
+        _hasVisualOverflow = true;
+      }
     }
 
     size = Size(constraintedWidth, constraintedHeight);
