@@ -213,9 +213,6 @@ class _TableRenderObject extends RenderBox
     markNeedsLayout();
   }
 
-  ClipRectLayer _clipRectLayer;
-  bool _hasVisualOverflow = false;
-
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) {
     assert(!debugNeedsLayout);
@@ -244,36 +241,17 @@ class _TableRenderObject extends RenderBox
   }
 
   @override
-  Rect describeApproximatePaintClip(RenderObject _) =>
-      _hasVisualOverflow ? Offset.zero & size : null;
-
-  @override
   bool hitTestChildren(BoxHitTestResult result, {Offset position}) =>
       defaultHitTestChildren(result, position: position);
 
   @override
   void paint(PaintingContext context, Offset offset) {
     _companion?._baselines?.clear();
-
-    if (_hasVisualOverflow) {
-      _clipRectLayer = context.pushClipRect(
-        needsCompositing,
-        offset,
-        Offset.zero & size,
-        defaultPaint,
-        clipBehavior: Clip.hardEdge,
-        oldLayer: _clipRectLayer,
-      );
-    } else {
-      _clipRectLayer = null;
-      defaultPaint(context, offset);
-    }
+    defaultPaint(context, offset);
   }
 
   @override
   void performLayout() {
-    _hasVisualOverflow = false;
-
     final c = constraints;
     final children = <RenderBox>[];
     final cells = <_TableCellData>[];
@@ -349,16 +327,10 @@ class _TableRenderObject extends RenderBox
         children[i].layout(cc2, parentUsesSize: true);
       }
 
-      final x = data.calculateX(this, columnWidths);
-      final y = data.calculateY(this, rowHeights);
-      data.offset = Offset(x, y);
-
-      if (x < 0.0 ||
-          x + childWidth > constraintedWidth ||
-          y < 0.0 ||
-          y + childHeight > constraintedHeight) {
-        _hasVisualOverflow = true;
-      }
+      data.offset = Offset(
+        data.calculateX(this, columnWidths),
+        data.calculateY(this, rowHeights),
+      );
     }
 
     size = Size(constraintedWidth, constraintedHeight);
