@@ -64,4 +64,12 @@ class StyleBorder {
       isBorderBox: meta[kCssBoxSizing] == kCssBoxSizingBorderBox,
     );
   }
+
+  static void skip(BuildMetadata meta) {
+    assert(
+      _skipBuilding[meta] != true,
+      'Border for ${meta.element.outerHtml} has already been built',
+    );
+    _skipBuilding[meta] = true;
+  }
 }

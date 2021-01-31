@@ -5,34 +5,46 @@ import 'package:flutter/widgets.dart';
 
 /// A TABLE widget.
 class HtmlTable extends MultiChildRenderObjectWidget {
+  /// The table border sides.
+  final Border border;
+
+  /// Controls whether to collapse borders.
+  ///
+  /// Default: `false`.
+  final bool borderCollapse;
+
+  /// The gap between borders.
+  ///
+  /// Default: `0.0`.
+  final double borderSpacing;
+
   /// The companion data for table.
   final HtmlTableCompanion companion;
 
-  /// The gap between columns.
-  final double columnGap;
-
-  /// The gap between rows.
-  final double rowGap;
-
   /// Creates a TABLE widget.
   HtmlTable({
+    this.border,
+    this.borderCollapse = false,
+    this.borderSpacing = 0.0,
     @required List<Widget> children,
     @required this.companion,
-    this.columnGap = 0.0,
     Key key,
-    this.rowGap = 0.0,
   }) : super(children: children, key: key);
 
   @override
   RenderObject createRenderObject(BuildContext _) => _TableRenderObject()
-    ..columnGap = columnGap
-    ..rowGap = rowGap;
+    ..border = border
+    ..borderCollapse = borderCollapse
+    ..borderSpacing = borderSpacing;
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(DoubleProperty('columnGap', columnGap, defaultValue: 0.0));
-    properties.add(DoubleProperty('rowGap', rowGap, defaultValue: 0.0));
+    properties.add(DiagnosticsProperty<Border>('border', border));
+    properties.add(FlagProperty('borderCollapse',
+        value: borderCollapse, defaultValue: false));
+    properties
+        .add(DoubleProperty('borderSpacing', borderSpacing, defaultValue: 0.0));
   }
 
   @override
@@ -40,8 +52,9 @@ class HtmlTable extends MultiChildRenderObjectWidget {
     super.updateRenderObject(_, renderObject);
 
     renderObject
-      ..columnGap = columnGap
-      ..rowGap = rowGap;
+      ..border = border
+      ..borderCollapse = borderCollapse
+      ..borderSpacing = borderSpacing;
   }
 }
 
@@ -52,6 +65,9 @@ class HtmlTableCompanion {
 
 /// A TD (table cell) widget.
 class HtmlTableCell extends ParentDataWidget<_TableCellData> {
+  /// The cell border sides.
+  final Border border;
+
   /// The number of columns this cell should span.
   final int columnSpan;
 
@@ -66,6 +82,7 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
 
   /// Creates a TD (table cell) widget.
   HtmlTableCell({
+    this.border,
     @required Widget child,
     this.columnSpan = 1,
     @required this.columnStart,
@@ -82,6 +99,11 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   void applyParentData(RenderObject renderObject) {
     final data = renderObject.parentData as _TableCellData;
     var needsLayout = false;
+
+    if (data.border != border) {
+      data.border = border;
+      needsLayout = true;
+    }
 
     if (data.columnSpan != columnSpan) {
       data.columnSpan = columnSpan;
@@ -162,6 +184,7 @@ extension _IterableDouble on Iterable<double> {
 }
 
 class _TableCellData extends ContainerBoxParentData<RenderBox> {
+  Border border;
   int columnSpan = 1;
   int columnStart;
   int rowSpan = 1;
@@ -192,6 +215,27 @@ class _TableRenderObject extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, _TableCellData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _TableCellData> {
+  Border _border;
+  set border(Border v) {
+    if (v == _border) return;
+    _border = v;
+    markNeedsLayout();
+  }
+
+  bool _borderCollapse;
+  set borderCollapse(bool v) {
+    if (v == _borderCollapse) return;
+    _borderCollapse = v;
+    markNeedsLayout();
+  }
+
+  double _borderSpacing;
+  set borderSpacing(double v) {
+    if (v == _borderSpacing) return;
+    _borderSpacing = v;
+    markNeedsLayout();
+  }
+
   HtmlTableCompanion _companion;
   set companion(HtmlTableCompanion v) {
     if (v == _companion) return;
@@ -199,19 +243,13 @@ class _TableRenderObject extends RenderBox
     markNeedsLayout();
   }
 
-  double _columnGap;
-  set columnGap(double v) {
-    if (v == _columnGap) return;
-    _columnGap = v;
-    markNeedsLayout();
-  }
+  double get _columnGap => _border != null && _borderCollapse
+      ? (_border.left.width * -1.0)
+      : _borderSpacing;
 
-  double _rowGap;
-  set rowGap(double v) {
-    if (v == _rowGap) return;
-    _rowGap = v;
-    markNeedsLayout();
-  }
+  double get _rowGap => _border != null && _borderCollapse
+      ? (_border.top.width * -1.0)
+      : _borderSpacing;
 
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) {
@@ -247,7 +285,36 @@ class _TableRenderObject extends RenderBox
   @override
   void paint(PaintingContext context, Offset offset) {
     _companion?._baselines?.clear();
-    defaultPaint(context, offset);
+
+    var child = firstChild;
+    var height = 0.0;
+    var width = 0.0;
+    while (child != null) {
+      final data = child.parentData as _TableCellData;
+      final childOffset = data.offset + offset;
+      final childSize = child.size;
+      context.paintChild(child, childOffset);
+
+      data.border?.paint(
+        context.canvas,
+        Rect.fromLTWH(
+          childOffset.dx,
+          childOffset.dy,
+          childSize.width,
+          childSize.height,
+        ),
+      );
+
+      height = max(height, data.offset.dy + childSize.height + _rowGap);
+      width = max(width, data.offset.dx + childSize.width + _columnGap);
+
+      child = data.nextSibling;
+    }
+
+    _border?.paint(
+      context.canvas,
+      Rect.fromLTWH(offset.dx, offset.dy, width, height),
+    );
   }
 
   @override
