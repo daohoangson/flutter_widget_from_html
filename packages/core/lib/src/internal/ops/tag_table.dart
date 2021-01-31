@@ -124,24 +124,7 @@ class TagTable {
     ];
   }
 
-  static BuildOp cellPaddingOp(double px) => BuildOp(
-      onChild: (meta) =>
-          (meta.element.localName == 'td' || meta.element.localName == 'th')
-              ? meta[kCssPadding] = '${px}px'
-              : null);
-
-  static BuildOp borderOp(double border, double borderSpacing) => BuildOp(
-      defaultStyles: (_) => {
-            kCssBorder: '${border}px solid black',
-            kCssBorderCollapse: kCssBorderCollapseSeparate,
-            kCssBorderSpacing: '${borderSpacing}px',
-          },
-      onChild: (meta) =>
-          (meta.element.localName == 'td' || meta.element.localName == 'th')
-              ? meta[kCssBorder] = '${border}px solid black'
-              : null);
-
-  static void _prepareHtmlTableCellBuilders(
+  void _prepareHtmlTableCellBuilders(
       _TagTableDataGroup group,
       Map<int, Map<int, bool>> occupations,
       List<_HtmlTableCellBuilder> builders) {
@@ -173,11 +156,16 @@ class TagTable {
           }
         }
 
-        final meta = cell.meta;
-        meta.row = rowStart;
+        final cellMeta = cell.meta;
+        cellMeta.row = rowStart;
+
+        final cssBorderParsed = tryParseBorder(cellMeta);
+        final cssBorder = cssBorderParsed != null
+            ? tryParseBorder(tableMeta).copyFrom(cssBorderParsed)
+            : null;
 
         builders.add((context) => HtmlTableCell(
-              border: cell.border.getValue(meta.tsb().build(context)),
+              border: cssBorder?.getValue(cellMeta.tsb().build(context)),
               child: cell.child,
               columnSpan: columnSpan,
               columnStart: columnStart,
@@ -187,6 +175,19 @@ class TagTable {
       }
     }
   }
+
+  static BuildOp cellPaddingOp(double px) => BuildOp(
+      onChild: (meta) =>
+          (meta.element.localName == 'td' || meta.element.localName == 'th')
+              ? meta[kCssPadding] = '${px}px'
+              : null);
+
+  static BuildOp borderOp(double border, double borderSpacing) => BuildOp(
+      defaultStyles: (_) => {
+            kCssBorder: '${border}px solid black',
+            kCssBorderCollapse: kCssBorderCollapseSeparate,
+            kCssBorderSpacing: '${borderSpacing}px',
+          });
 
   static String _getCssDisplayValue(BuildMetadata meta) {
     String value;
@@ -273,7 +274,6 @@ class _TagTableRow {
         final attributes = cellMeta.element.attributes;
         row.cells.add(_TagTableDataCell(
           cellMeta,
-          border: tryParseBorder(cellMeta),
           child: column,
           colspan: tryParseIntFromMap(attributes, kAttributeColspan) ?? 1,
           rowspan: tryParseIntFromMap(attributes, kAttributeRowspan) ?? 1,
@@ -358,17 +358,10 @@ class _TagTableDataRow {
 
 @immutable
 class _TagTableDataCell {
-  final CssBorder border;
   final Widget child;
   final int colspan;
   final BuildMetadata meta;
   final int rowspan;
 
-  _TagTableDataCell(
-    this.meta, {
-    this.border,
-    this.child,
-    this.colspan,
-    this.rowspan,
-  });
+  _TagTableDataCell(this.meta, {this.child, this.colspan, this.rowspan});
 }
