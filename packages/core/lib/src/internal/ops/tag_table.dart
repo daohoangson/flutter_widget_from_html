@@ -172,7 +172,7 @@ class TagTable {
             columnSpan: columnSpan,
             columnStart: columnStart,
             rowSpan: rowSpan,
-            rowStart: rowStart,
+            rowStart: cellMeta.row,
           );
         });
       }
