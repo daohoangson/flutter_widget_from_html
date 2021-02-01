@@ -5,6 +5,7 @@ part of '../core_data.dart';
 class CssBorder {
   final CssBorderSide _all;
   final CssBorderSide _bottom;
+  final bool inherit;
   final CssBorderSide _inlineEnd;
   final CssBorderSide _inlineStart;
   final CssBorderSide _left;
@@ -15,6 +16,7 @@ class CssBorder {
   const CssBorder({
     CssBorderSide all,
     CssBorderSide bottom,
+    this.inherit,
     CssBorderSide inlineEnd,
     CssBorderSide inlineStart,
     CssBorderSide left,
@@ -40,7 +42,6 @@ class CssBorder {
 
   /// Creates a copy of this border with the sides from [other].
   CssBorder copyFrom(CssBorder other) => copyWith(
-        all: other._all,
         bottom: other._bottom,
         inlineEnd: other._inlineEnd,
         inlineStart: other._inlineStart,
@@ -51,7 +52,6 @@ class CssBorder {
 
   /// Creates a copy of this border but with the given fields replaced with the new values.
   CssBorder copyWith({
-    CssBorderSide all,
     CssBorderSide bottom,
     CssBorderSide inlineEnd,
     CssBorderSide inlineStart,
@@ -60,8 +60,9 @@ class CssBorder {
     CssBorderSide top,
   }) =>
       CssBorder(
-        all: CssBorderSide._copyWith(_all, all),
+        all: _all,
         bottom: CssBorderSide._copyWith(_bottom, bottom),
+        inherit: inherit,
         inlineEnd: CssBorderSide._copyWith(_inlineEnd, inlineEnd),
         inlineStart: CssBorderSide._copyWith(_inlineStart, inlineStart),
         left: CssBorderSide._copyWith(_left, left),

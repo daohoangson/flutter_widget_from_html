@@ -1,6 +1,7 @@
 part of '../core_parser.dart';
 
 const kCssBorder = 'border';
+const kCssBorderInherit = 'inherit';
 const kCssBorderStyleDotted = 'dotted';
 const kCssBorderStyleDashed = 'dashed';
 const kCssBorderStyleDouble = 'double';
@@ -18,10 +19,15 @@ CssBorder tryParseBorder(BuildMetadata meta) {
   for (final style in meta.styles) {
     if (!style.key.startsWith(kCssBorder)) continue;
 
+    if (style.value == kCssBorderInherit) {
+      border = CssBorder(inherit: true);
+      continue;
+    }
+
     final borderSide = _tryParseBorderSide(style.value);
     final suffix = style.key.substring(kCssBorder.length);
     if (suffix.isEmpty) {
-      border = border.copyWith(all: borderSide);
+      border = CssBorder(all: borderSide);
     } else {
       switch (suffix) {
         case kSuffixBottom:

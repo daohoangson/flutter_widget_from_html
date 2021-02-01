@@ -160,9 +160,9 @@ class TagTable {
         cellMeta.row = rowStart;
 
         final cssBorderParsed = tryParseBorder(cellMeta);
-        final cssBorder = cssBorderParsed != null
+        final cssBorder = cssBorderParsed?.inherit == true
             ? tryParseBorder(tableMeta).copyFrom(cssBorderParsed)
-            : null;
+            : cssBorderParsed;
 
         builders.add((context) {
           final border = cssBorder?.getValue(cellMeta.tsb().build(context));
@@ -186,11 +186,21 @@ class TagTable {
               : null);
 
   static BuildOp borderOp(double border, double borderSpacing) => BuildOp(
-      defaultStyles: (_) => {
-            kCssBorder: '${border}px solid black',
-            kCssBorderCollapse: kCssBorderCollapseSeparate,
-            kCssBorderSpacing: '${borderSpacing}px',
-          });
+        defaultStyles: (_) => {
+          kCssBorder: '${border}px solid black',
+          kCssBorderCollapse: kCssBorderCollapseSeparate,
+          kCssBorderSpacing: '${borderSpacing}px',
+        },
+        onChild: border > 0
+            ? (meta) {
+                switch (meta.element.localName) {
+                  case kTagTableCell:
+                  case kTagTableHeaderCell:
+                    meta[kCssBorder] = kCssBorderInherit;
+                }
+              }
+            : null,
+      );
 
   static String _getCssDisplayValue(BuildMetadata meta) {
     String value;
