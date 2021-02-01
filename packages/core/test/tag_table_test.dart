@@ -823,7 +823,9 @@ void main() async {
 
 <div style="width: 25px">$tableWithImage</div><br />
 
-<div style="height: 25px">$tableWithImage</div>''',
+<div style="height: 25px">$tableWithImage</div>
+
+Foo should float on top of table.''',
             'collapsed_border':
                 '''<table border="1" style="border-collapse: collapse">
   <tr>
