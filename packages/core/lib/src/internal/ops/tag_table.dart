@@ -164,14 +164,17 @@ class TagTable {
             ? tryParseBorder(tableMeta).copyFrom(cssBorderParsed)
             : null;
 
-        builders.add((context) => HtmlTableCell(
-              border: cssBorder?.getValue(cellMeta.tsb().build(context)),
-              child: cell.child,
-              columnSpan: columnSpan,
-              columnStart: columnStart,
-              rowSpan: rowSpan,
-              rowStart: rowStart,
-            ));
+        builders.add((context) {
+          final border = cssBorder?.getValue(cellMeta.tsb().build(context));
+          return HtmlTableCell(
+            border: border,
+            child: wf.buildPadding(cellMeta, cell.child, border?.dimensions),
+            columnSpan: columnSpan,
+            columnStart: columnStart,
+            rowSpan: rowSpan,
+            rowStart: rowStart,
+          );
+        });
       }
     }
   }
