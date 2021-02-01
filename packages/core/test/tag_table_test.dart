@@ -16,10 +16,7 @@ String _richtext(String text) => _padding('[RichText:(:$text)]');
 final bg =
     'BoxDecoration(border: all(BorderSide(Color(0xff000000), 1.0, BorderStyle.solid)))';
 
-final cssBorderSide =
-    'CssBorderSide(color: Color(0xff000000), style: solid, width: 1.0px)';
-final cssBorder =
-    'CssBorder(bottom: $cssBorderSide, left: $cssBorderSide, right: $cssBorderSide, top: $cssBorderSide)';
+final border = 'all(BorderSide(Color(0xff000000), 1.0, BorderStyle.solid))';
 
 void main() async {
   await loadAppFonts();
@@ -61,7 +58,7 @@ void main() async {
               '  │ └_TextAlignBlock()\n'
               '  │  └RichText(textAlign: center, text: "Caption")\n'
               '  └WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              '   └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              '   └HtmlTable(borderSpacing: 2.0)\n'
               '    ├HtmlTableCell(columnStart: 0, rowStart: 0)\n'
               '    │└WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#5):\n'
               '    │ │  "Header 1"\n'
@@ -186,7 +183,7 @@ void main() async {
           explained,
           equals('TshWidget\n'
               '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              ' └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              ' └HtmlTable(borderSpacing: 2.0)\n'
               '  └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
@@ -204,23 +201,16 @@ void main() async {
       expect(
           explained,
           equals('TshWidget\n'
-              '└WidgetPlaceholder<CssBorder>($cssBorder)\n'
-              ' └Container(bg: $bg)\n'
-              '  └DecoratedBox(bg: $bg)\n'
+              '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
+              ' └HtmlTable(border: $border, borderSpacing: 2.0)\n'
+              '  └HtmlTableCell(border: $border, columnStart: 0, rowStart: 0)\n'
               '   └Padding(padding: all(1.0))\n'
-              '    └WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              '     └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
-              '      └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
-              '       └WidgetPlaceholder<CssBorder>($cssBorder)\n'
-              '        └Container(bg: $bg)\n'
-              '         └DecoratedBox(bg: $bg)\n'
-              '          └Padding(padding: all(1.0))\n'
-              '           └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
-              '            │  "Foo"\n'
-              '            │)\n'
-              '            └Align(alignment: centerLeft)\n'
-              '             └Padding(padding: all(1.0))\n'
-              '              └RichText(text: "Foo")\n'
+              '    └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+              '     │  "Foo"\n'
+              '     │)\n'
+              '     └Align(alignment: centerLeft)\n'
+              '      └Padding(padding: all(1.0))\n'
+              '       └RichText(text: "Foo")\n'
               '\n'));
     });
 
@@ -231,19 +221,15 @@ void main() async {
       expect(
           explained,
           equals('TshWidget\n'
-              '└WidgetPlaceholder<CssBorder>($cssBorder)\n'
-              ' └Container(bg: $bg)\n'
-              '  └DecoratedBox(bg: $bg)\n'
-              '   └Padding(padding: all(1.0))\n'
-              '    └WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              '     └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
-              '      └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
-              '       └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
-              '        │  "Foo"\n'
-              '        │)\n'
-              '        └Align(alignment: centerLeft)\n'
-              '         └Padding(padding: all(1.0))\n'
-              '          └RichText(text: "Foo")\n'
+              '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
+              ' └HtmlTable(border: $border, borderSpacing: 2.0)\n'
+              '  └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
+              '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+              '    │  "Foo"\n'
+              '    │)\n'
+              '    └Align(alignment: centerLeft)\n'
+              '     └Padding(padding: all(1.0))\n'
+              '      └RichText(text: "Foo")\n'
               '\n'));
     });
   });
@@ -302,7 +288,7 @@ void main() async {
           explained,
           equals('TshWidget\n'
               '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              ' └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              ' └HtmlTable(borderSpacing: 2.0)\n'
               '  └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
@@ -322,7 +308,7 @@ void main() async {
           explained,
           equals('TshWidget\n'
               '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              ' └HtmlTable(columnGap: 1.0, rowGap: 1.0)\n'
+              ' └HtmlTable(borderSpacing: 1.0)\n'
               '  └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
@@ -342,7 +328,7 @@ void main() async {
           explained,
           equals('TshWidget\n'
               '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              ' └HtmlTable(columnGap: 1.0, rowGap: 1.0)\n'
+              ' └HtmlTable(borderSpacing: 1.0)\n'
               '  └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
@@ -362,7 +348,7 @@ void main() async {
           explained,
           equals('TshWidget\n'
               '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              ' └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              ' └HtmlTable(borderCollapse: true, borderSpacing: 2.0)\n'
               '  └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
@@ -381,23 +367,16 @@ void main() async {
       expect(
           explained,
           equals('TshWidget\n'
-              '└WidgetPlaceholder<CssBorder>($cssBorder)\n'
-              ' └Container(bg: $bg)\n'
-              '  └DecoratedBox(bg: $bg)\n'
+              '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
+              ' └HtmlTable(border: $border, borderCollapse: true, borderSpacing: 2.0)\n'
+              '  └HtmlTableCell(border: $border, columnStart: 0, rowStart: 0)\n'
               '   └Padding(padding: all(1.0))\n'
-              '    └WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              '     └HtmlTable(columnGap: -1.0, rowGap: -1.0)\n'
-              '      └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
-              '       └WidgetPlaceholder<CssBorder>($cssBorder)\n'
-              '        └Container(bg: $bg)\n'
-              '         └DecoratedBox(bg: $bg)\n'
-              '          └Padding(padding: all(1.0))\n'
-              '           └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
-              '            │  "Foo"\n'
-              '            │)\n'
-              '            └Align(alignment: centerLeft)\n'
-              '             └Padding(padding: all(1.0))\n'
-              '              └RichText(text: "Foo")\n'
+              '    └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+              '     │  "Foo"\n'
+              '     │)\n'
+              '     └Align(alignment: centerLeft)\n'
+              '      └Padding(padding: all(1.0))\n'
+              '       └RichText(text: "Foo")\n'
               '\n'));
     });
   });
@@ -411,7 +390,7 @@ void main() async {
           explained,
           equals('TshWidget\n'
               '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              ' └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              ' └HtmlTable(borderSpacing: 2.0)\n'
               '  └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
@@ -430,7 +409,7 @@ void main() async {
           explained,
           equals('TshWidget\n'
               '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              ' └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              ' └HtmlTable(borderSpacing: 2.0)\n'
               '  └HtmlTableCell(columnSpan: 2, columnStart: 0, rowStart: 0)\n'
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
@@ -449,7 +428,7 @@ void main() async {
           explained,
           equals('TshWidget\n'
               '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              ' └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              ' └HtmlTable(borderSpacing: 2.0)\n'
               '  └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
@@ -468,7 +447,7 @@ void main() async {
           explained,
           equals('TshWidget\n'
               '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              ' └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              ' └HtmlTable(borderSpacing: 2.0)\n'
               '  └HtmlTableCell(columnStart: 0, rowStart: 0)\n'
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
@@ -489,7 +468,7 @@ void main() async {
           explained,
           equals('TshWidget\n'
               '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              ' └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              ' └HtmlTable(borderSpacing: 2.0)\n'
               '  ├HtmlTableCell(columnStart: 0, rowSpan: 2, rowStart: 0)\n'
               '  │└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '  │ │  "1.1"\n'
@@ -523,7 +502,7 @@ void main() async {
           explained,
           equals('TshWidget\n'
               '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              ' └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              ' └HtmlTable(borderSpacing: 2.0)\n'
               '  └HtmlTableCell(columnSpan: 2, columnStart: 0, rowStart: 0)\n'
               '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '    │  "Foo"\n'
@@ -544,7 +523,7 @@ void main() async {
           explained,
           equals('TshWidget\n'
               '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              ' └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              ' └HtmlTable(borderSpacing: 2.0)\n'
               '  ├HtmlTableCell(columnStart: 0, rowStart: 0)\n'
               '  │└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '  │ │  "1.1"\n'
@@ -642,7 +621,7 @@ void main() async {
           explained,
           equals('TshWidget\n'
               '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              ' └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              ' └HtmlTable(borderSpacing: 2.0)\n'
               '  ├HtmlTableCell(columnStart: 0, rowStart: 0)\n'
               '  │└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '  │ │  "Header 1"\n'
@@ -677,7 +656,7 @@ void main() async {
           explained,
           equals('TshWidget\n'
               '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-              ' └HtmlTable(columnGap: 2.0, rowGap: 2.0)\n'
+              ' └HtmlTable(borderSpacing: 2.0)\n'
               '  ├HtmlTableCell(columnStart: 0, rowStart: 0)\n'
               '  │└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '  │ │  "Header 1"\n'
@@ -805,16 +784,16 @@ void main() async {
   });
 
   group('HtmlTable', () {
-    testWidgets('updates gaps', (WidgetTester tester) async {
+    testWidgets('updates borderSpacing', (WidgetTester tester) async {
       final before = await explain(
           tester, '<table cellspacing="10"><tr><td>Foo</td></tr></table>',
           useExplainer: false);
-      expect(before, contains('└HtmlTable(columnGap: 10.0, rowGap: 10.0)'));
+      expect(before, contains('└HtmlTable(borderSpacing: 10.0)'));
 
       final after = await explain(
           tester, '<table cellspacing="20"><tr><td>Foo</td></tr></table>',
           useExplainer: false);
-      expect(after, contains('└HtmlTable(columnGap: 20.0, rowGap: 20.0)'));
+      expect(after, contains('└HtmlTable(borderSpacing: 20.0)'));
     });
 
     testWidgets('performs hit test', (tester) async {
