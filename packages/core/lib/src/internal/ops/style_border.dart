@@ -66,10 +66,7 @@ class StyleBorder {
   }
 
   static void skip(BuildMetadata meta) {
-    assert(
-      _skipBuilding[meta] != true,
-      'Border for ${meta.element.outerHtml} has already been built',
-    );
+    assert(_skipBuilding[meta] != true, 'Built ${meta.element} already');
     _skipBuilding[meta] = true;
   }
 }

@@ -99,21 +99,6 @@ class CssBorder {
       top: top ?? BorderSide.none,
     );
   }
-
-  @override
-  String toString() {
-    final bottom = CssBorderSide._copyWith(_all, _bottom);
-    final left = CssBorderSide._copyWith(_all, _left ?? _inlineStart);
-    final right = CssBorderSide._copyWith(_all, _right ?? _inlineEnd);
-    final top = CssBorderSide._copyWith(_all, _top);
-    final params = [
-      if (bottom != null) 'bottom: $bottom',
-      if (left != null) 'left: $left',
-      if (right != null) 'right: $right',
-      if (top != null) 'top: $top',
-    ];
-    return 'CssBorder(${params.join(", ")})';
-  }
 }
 
 /// A side of a border of a box.
@@ -133,16 +118,6 @@ class CssBorderSide {
 
   /// A border that is not rendered.
   static const none = CssBorderSide();
-
-  @override
-  String toString() {
-    final params = [
-      if (color != null) 'color: $color',
-      if (style != null) 'style: $style',
-      if (width != null) 'width: $width',
-    ];
-    return 'CssBorderSide(${params.join(", ")})';
-  }
 
   BorderSide _getValue(TextStyleHtml tsh) => identical(this, none)
       ? null
@@ -180,8 +155,7 @@ class CssLength {
   const CssLength(
     this.number, [
     this.unit = CssLengthUnit.px,
-  ])  : assert(number >= 0),
-        assert(unit != null);
+  ]) : assert(number >= 0);
 
   /// Returns `true` if value is non-zero.
   bool get isNotEmpty => number > 0;
