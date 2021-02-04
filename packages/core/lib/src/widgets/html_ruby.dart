@@ -83,6 +83,23 @@ class _RubyRenderObject extends RenderBox
       defaultPaint(context, offset);
 
   @override
+  Size computeDryLayout(BoxConstraints constraints) {
+    final ruby = firstChild;
+    final rubyConstraints = constraints.loosen();
+    final rubyData = ruby.parentData as _RubyParentData;
+    final rubySize = ruby.computeDryLayout(rubyConstraints);
+
+    final rt = rubyData.nextSibling;
+    final rtConstraints = rubyConstraints.copyWith(
+        maxHeight: rubyConstraints.maxHeight - rubySize.height);
+    final rtSize = rt.computeDryLayout(rtConstraints);
+
+    final height = rubySize.height + rtSize.height;
+    final width = max(rubySize.width, rtSize.width);
+    return constraints.constrain(Size(width, height));
+  }
+
+  @override
   void performLayout() {
     final ruby = firstChild;
     final rubyConstraints = constraints.loosen();

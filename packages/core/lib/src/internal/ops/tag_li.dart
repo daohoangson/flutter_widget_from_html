@@ -285,6 +285,23 @@ class _ListItemRenderObject extends RenderBox
   }
 
   @override
+  Size computeDryLayout(BoxConstraints constraints) {
+    final child = firstChild;
+    final childConstraints = constraints;
+    final childData = child.parentData as _ListItemData;
+    final childSize = child.computeDryLayout(childConstraints);
+
+    final marker = childData.nextSibling;
+    final markerConstraints = childConstraints.loosen();
+    final markerSize = marker.computeDryLayout(markerConstraints);
+
+    return Size(
+      childSize.width,
+      childSize.height > 0 ? childSize.height : markerSize.height,
+    );
+  }
+
+  @override
   void setupParentData(RenderBox child) {
     if (child.parentData is! _ListItemData) {
       child.parentData = _ListItemData();
@@ -415,6 +432,11 @@ class _ListMarkerRenderObject extends RenderBox {
   @override
   void performLayout() {
     size = _textPainter.size;
+  }
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) {
+    return _textPainter.size;
   }
 }
 

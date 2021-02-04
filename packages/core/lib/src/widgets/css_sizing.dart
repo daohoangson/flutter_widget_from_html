@@ -222,6 +222,50 @@ class _RenderCssSizing extends RenderProxyBox {
     size = constraints.constrain(child.size);
   }
 
+  @override
+  Size computeDryLayout(BoxConstraints constraints) {
+    final c = constraints;
+    final maxHeight =
+        min(c.maxHeight, _maxHeight?.clamp(0.0, c.maxHeight) ?? c.maxHeight);
+    final maxWidth =
+        min(c.maxWidth, _maxWidth?.clamp(0.0, c.maxWidth) ?? c.maxWidth);
+    final minHeight =
+        min(maxHeight, _minHeight?.clamp(0.0, c.maxHeight) ?? c.minHeight);
+    final minWidth =
+        min(maxWidth, _minWidth?.clamp(0.0, c.maxWidth) ?? c.minWidth);
+
+    final __preferredHeight = _preferredHeight?.clamp(minHeight, maxHeight);
+    // special handling for tight contraints: ignore min in `clamp()`
+    // (usually happen if parent is a block)
+    final effectiveMinWidth = minWidth == maxWidth ? 0.0 : minWidth;
+    final __preferredWidth =
+        _preferredWidth?.clamp(effectiveMinWidth, maxWidth);
+    // ignore preferred value if it's infinite
+    final preferredHeight =
+        __preferredHeight?.isFinite == true ? __preferredHeight : null;
+    final preferredWidth =
+        __preferredWidth?.isFinite == true ? __preferredWidth : null;
+
+    final stableChildSize = (preferredHeight != null && preferredWidth != null)
+        ? _guessChildSize(
+            maxHeight: maxHeight,
+            maxWidth: maxWidth,
+            preferredHeight: preferredHeight,
+            preferredWidth: preferredWidth,
+          )
+        : null;
+
+    final cc = BoxConstraints(
+      maxHeight: stableChildSize?.height ?? preferredHeight ?? maxHeight,
+      maxWidth: stableChildSize?.width ?? preferredWidth ?? maxWidth,
+      minHeight: stableChildSize?.height ?? preferredHeight ?? minHeight,
+      minWidth: stableChildSize?.width ?? preferredWidth ?? minWidth,
+    );
+
+    final childSize = child.computeDryLayout(cc);
+    return constraints.constrain(childSize);
+  }
+
   Size _guessChildSize({
     double maxHeight,
     double maxWidth,

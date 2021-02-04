@@ -251,6 +251,66 @@ class _TableRenderObject extends RenderBox
   }
 
   @override
+  Size computeDryLayout(BoxConstraints constraints) {
+    final c = constraints;
+    final children = <RenderBox>[];
+    final cells = <_TableCellData>[];
+
+    var child = firstChild;
+    var columnCount = 0;
+    var rowCount = 0;
+    while (child != null) {
+      final data = child.parentData as _TableCellData;
+      children.add(child);
+      cells.add(data);
+
+      columnCount = max(columnCount, data.columnStart + data.columnSpan);
+      rowCount = max(rowCount, data.rowStart + data.rowSpan);
+
+      child = data.nextSibling;
+    }
+
+    final columnGaps = (columnCount + 1) * _columnGap;
+    final rowGaps = (rowCount + 1) * _rowGap;
+    final childSizes = List<Size>(children.length);
+    final columnWidths = List.filled(columnCount, 0.0);
+    final rowHeights = List.filled(rowCount, 0.0);
+    for (var i = 0; i < children.length; i++) {
+      final child = children[i];
+      final data = cells[i];
+
+      // assume even distribution of column widths if width is finite
+      final childColumnGap = (data.columnSpan - 1) * _columnGap;
+
+      final childSize = childSizes[i] = child.computeDryLayout(constraints);
+
+      // distribute cell width across spanned columns
+      final columnWidth = (childSize.width - childColumnGap) / data.columnSpan;
+      for (var c = 0; c < data.columnSpan; c++) {
+        final column = data.columnStart + c;
+        columnWidths[column] = max(columnWidths[column], columnWidth);
+      }
+
+      // distribute cell height across spanned rows
+      final childRowGap = (data.rowSpan - 1) * _rowGap;
+      final rowHeight = (childSize.height - childRowGap) / data.rowSpan;
+      for (var r = 0; r < data.rowSpan; r++) {
+        final row = data.rowStart + r;
+        rowHeights[row] = max(rowHeights[row], rowHeight);
+      }
+    }
+
+    // we now know all the widths and heights, let's position cells
+    // sometime we have to relayout child, e.g. stretch its height for rowspan
+    final calculatedHeight = rowHeights.sum + rowGaps;
+    final constraintedHeight = c.constrainHeight(calculatedHeight);
+    final calculatedWidth = columnWidths.sum + columnGaps;
+    final constraintedWidth = c.constrainWidth(calculatedWidth);
+
+    return Size(constraintedWidth, constraintedHeight);
+  }
+
+  @override
   void performLayout() {
     final c = constraints;
     final children = <RenderBox>[];
