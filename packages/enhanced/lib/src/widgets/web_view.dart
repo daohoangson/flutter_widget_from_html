@@ -28,6 +28,11 @@ class WebView extends StatefulWidget {
   /// - After another 2s
   final List<Duration> autoResizeIntervals;
 
+  /// Controls whether WebView debugging is enabled.
+  ///
+  /// Default: `false`.
+  final bool debuggingEnabled;
+
   /// The callback to handle navigation request.
   ///
   /// This callback will be triggered on generated navigation within the web view.
@@ -40,6 +45,11 @@ class WebView extends StatefulWidget {
   /// Default: `true`.
   /// Flutter Web: JavaScript is always enabled (cannot turn off).
   final bool js;
+
+  /// Controls whether to always allow media playback.
+  ///
+  /// Default: `false`.
+  final bool mediaPlaybackAlwaysAllow;
 
   /// {@template web_view.unsupportedWorkaroundForIssue37}
   /// Controls whether or not to apply workaround for
@@ -62,6 +72,9 @@ class WebView extends StatefulWidget {
   /// {@endtemplate}
   final bool unsupportedWorkaroundForIssue375;
 
+  /// The value used for the HTTP User-Agent: request header.
+  final String userAgent;
+
   /// Creates a web view.
   WebView(
     this.url, {
@@ -72,10 +85,13 @@ class WebView extends StatefulWidget {
       Duration(seconds: 1),
       Duration(seconds: 2),
     ],
+    this.debuggingEnabled = false,
     this.interceptNavigationRequest,
     this.js = true,
+    this.mediaPlaybackAlwaysAllow = false,
     this.unsupportedWorkaroundForIssue37 = false,
     this.unsupportedWorkaroundForIssue375 = false,
+    this.userAgent,
     Key key,
   })  : assert(url != null),
         assert(aspectRatio != null),
