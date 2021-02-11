@@ -48,6 +48,7 @@ jobs:
         run: |
           set -e
 
+          pwd && ls -al
           sed -i '' -e 's/# web only: //' pubspec.yaml
           
           flutter build web
