@@ -9,6 +9,7 @@ dependencies:
   carousel_slider: ^2.2.1
   flutter:
     sdk: flutter
+  # web only: flutter_svg: ^0.20.0-nullsafety.3
   flutter_widget_from_html: any
   flutter_widget_from_html_core: any
   html: any
