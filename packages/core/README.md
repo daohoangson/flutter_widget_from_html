@@ -77,7 +77,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
 
 - A: underline, blue color, tapping will trigger `HtmlWidget.onTapUrl` callback
 - H1/H2/H3/H4/H5/H6
-- IMG with support for asset (`asset://`), data uri and network image
+- IMG with support for asset (`asset://`), data uri, local file (`file://`) and network image
 - LI/OL/UL with support for:
   - Attributes: `type`, `start`, `reversed`
   - Inline style `list-style-type` values: `lower-alpha`, `upper-alpha`, `lower-latin`, `upper-latin`, `circle`, `decimal`, `disc`, `lower-roman`, `upper-roman`, `square`
