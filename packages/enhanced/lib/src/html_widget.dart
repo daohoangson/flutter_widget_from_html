@@ -15,15 +15,28 @@ class HtmlWidget extends core.HtmlWidget {
   /// {@macro web_view.unsupportedWorkaroundForIssue375}
   final bool unsupportedWebViewWorkaroundForIssue375;
 
-  /// Controls whether or not IFRAME is rendered as [WebView].
+  /// Controls whether IFRAME is rendered as [WebView].
   ///
   /// Default: `false`.
   final bool webView;
+
+  /// Controls whether WebView debugging is enabled.
+  ///
+  /// Default: `false`.
+  final bool webViewDebuggingEnabled;
 
   /// Controls whether to enable JavaScript in [WebView].
   ///
   /// Default: `true`.
   final bool webViewJs;
+
+  /// Controls whether to always allow media playback in WebViews.
+  ///
+  /// Default: `false`.
+  final bool webViewMediaPlaybackAlwaysAllow;
+
+  /// The value used for the HTTP User-Agent: request header in WebViews.
+  final String webViewUserAgent;
 
   /// Creates a widget that builds Flutter widget tree from html.
   ///
@@ -46,7 +59,10 @@ class HtmlWidget extends core.HtmlWidget {
     this.unsupportedWebViewWorkaroundForIssue37 = false,
     this.unsupportedWebViewWorkaroundForIssue375 = false,
     this.webView = false,
+    this.webViewDebuggingEnabled = false,
     this.webViewJs = true,
+    this.webViewMediaPlaybackAlwaysAllow = false,
+    this.webViewUserAgent,
   })  : assert(html != null),
         super(
           html,

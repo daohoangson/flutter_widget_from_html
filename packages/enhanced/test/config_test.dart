@@ -583,6 +583,63 @@ void main() {
       });
     });
 
+    group('webViewDebuggingEnabled', () {
+      testWidgets('renders true value', (WidgetTester tester) async {
+        final explained = await explain(
+            tester,
+            HtmlWidget(
+              html,
+              key: helper.hwKey,
+              webView: true,
+              webViewDebuggingEnabled: true,
+            ));
+        expect(
+            explained,
+            equals('[WebView:'
+                'url=$webViewSrc,'
+                'aspectRatio=$webViewDefaultAspectRatio,'
+                'autoResize=true,'
+                'debuggingEnabled=true'
+                ']'));
+      });
+
+      testWidgets('renders false value', (WidgetTester tester) async {
+        final explained = await explain(
+            tester,
+            HtmlWidget(
+              html,
+              key: helper.hwKey,
+              webView: true,
+              webViewDebuggingEnabled: false,
+            ));
+        expect(
+            explained,
+            equals('[WebView:'
+                'url=$webViewSrc,'
+                'aspectRatio=$webViewDefaultAspectRatio,'
+                'autoResize=true'
+                ']'));
+      });
+
+      testWidgets('renders null value', (WidgetTester tester) async {
+        final explained = await explain(
+            tester,
+            HtmlWidget(
+              html,
+              key: helper.hwKey,
+              webView: true,
+              webViewDebuggingEnabled: null,
+            ));
+        expect(
+            explained,
+            equals('[WebView:'
+                'url=$webViewSrc,'
+                'aspectRatio=$webViewDefaultAspectRatio,'
+                'autoResize=true'
+                ']'));
+      });
+    });
+
     group('webViewJs', () {
       testWidgets('renders true value', (WidgetTester tester) async {
         final explained = await explain(
@@ -635,6 +692,102 @@ void main() {
                 'url=$webViewSrc,'
                 'aspectRatio=$webViewDefaultAspectRatio,'
                 'js=false'
+                ']'));
+      });
+    });
+
+    group('webViewMediaPlaybackAlwaysAllow', () {
+      testWidgets('renders true value', (WidgetTester tester) async {
+        final explained = await explain(
+            tester,
+            HtmlWidget(
+              html,
+              key: helper.hwKey,
+              webView: true,
+              webViewMediaPlaybackAlwaysAllow: true,
+            ));
+        expect(
+            explained,
+            equals('[WebView:'
+                'url=$webViewSrc,'
+                'aspectRatio=$webViewDefaultAspectRatio,'
+                'autoResize=true,'
+                'mediaPlaybackAlwaysAllow=true'
+                ']'));
+      });
+
+      testWidgets('renders false value', (WidgetTester tester) async {
+        final explained = await explain(
+            tester,
+            HtmlWidget(
+              html,
+              key: helper.hwKey,
+              webView: true,
+              webViewMediaPlaybackAlwaysAllow: false,
+            ));
+        expect(
+            explained,
+            equals('[WebView:'
+                'url=$webViewSrc,'
+                'aspectRatio=$webViewDefaultAspectRatio,'
+                'autoResize=true'
+                ']'));
+      });
+
+      testWidgets('renders null value', (WidgetTester tester) async {
+        final explained = await explain(
+            tester,
+            HtmlWidget(
+              html,
+              key: helper.hwKey,
+              webView: true,
+              webViewMediaPlaybackAlwaysAllow: null,
+            ));
+        expect(
+            explained,
+            equals('[WebView:'
+                'url=$webViewSrc,'
+                'aspectRatio=$webViewDefaultAspectRatio,'
+                'autoResize=true'
+                ']'));
+      });
+    });
+
+    group('webViewUserAgent', () {
+      testWidgets('renders string', (WidgetTester tester) async {
+        final explained = await explain(
+            tester,
+            HtmlWidget(
+              html,
+              key: helper.hwKey,
+              webView: true,
+              webViewUserAgent: 'Foo',
+            ));
+        expect(
+            explained,
+            equals('[WebView:'
+                'url=$webViewSrc,'
+                'aspectRatio=$webViewDefaultAspectRatio,'
+                'autoResize=true,'
+                'userAgent=Foo'
+                ']'));
+      });
+
+      testWidgets('renders null value', (WidgetTester tester) async {
+        final explained = await explain(
+            tester,
+            HtmlWidget(
+              html,
+              key: helper.hwKey,
+              webView: true,
+              webViewUserAgent: null,
+            ));
+        expect(
+            explained,
+            equals('[WebView:'
+                'url=$webViewSrc,'
+                'aspectRatio=$webViewDefaultAspectRatio,'
+                'autoResize=true'
                 ']'));
       });
     });

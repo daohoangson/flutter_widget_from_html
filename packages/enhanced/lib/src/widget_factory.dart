@@ -112,6 +112,7 @@ class WidgetFactory extends core.WidgetFactory {
       url,
       aspectRatio: dimensOk ? width / height : 16 / 9,
       autoResize: !dimensOk && js,
+      debuggingEnabled: _widget.webViewDebuggingEnabled == true,
       interceptNavigationRequest: (newUrl) {
         if (newUrl == url) return false;
 
@@ -119,10 +120,12 @@ class WidgetFactory extends core.WidgetFactory {
         return true;
       },
       js: js,
+      mediaPlaybackAlwaysAllow: _widget.webViewMediaPlaybackAlwaysAllow == true,
       unsupportedWorkaroundForIssue37:
           _widget.unsupportedWebViewWorkaroundForIssue37 == true,
       unsupportedWorkaroundForIssue375:
           _widget.unsupportedWebViewWorkaroundForIssue375 == true,
+      userAgent: _widget.webViewUserAgent,
     );
   }
 
