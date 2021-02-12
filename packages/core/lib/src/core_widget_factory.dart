@@ -305,7 +305,7 @@ class WidgetFactory {
       return _imageFromDataUri(url);
     }
 
-    if (url.startsWith('file://')) {
+    if (url.startsWith('file:')) {
       return _imageFromFileUri(url);
     }
 
@@ -314,8 +314,6 @@ class WidgetFactory {
 
   Object _imageFromAsset(String url) {
     final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
-    if (uri?.scheme != 'asset') return null;
-
     final assetName = uri.path;
     if (assetName?.isNotEmpty != true) return null;
 
@@ -335,9 +333,10 @@ class WidgetFactory {
 
   Object _imageFromFileUri(String url) {
     final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
-    if (uri?.scheme != 'file') return null;
+    final filePath = uri?.toFilePath();
+    if (filePath?.isNotEmpty != true) return null;
 
-    return FileImage(File(uri.toFilePath()));
+    return FileImage(File(filePath));
   }
 
   Object _imageFromUrl(String url) =>

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -166,6 +168,23 @@ void main() {
       final html = '<img src="data:image/xxx" title="Foo" />';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
+    });
+  });
+
+  group('file uri', () {
+    final explain = helper.explain;
+    final filePath = '${Directory.current.path}/test/images/logo.png';
+    final fileUri = 'file://$filePath';
+
+    testWidgets('renders file uri', (WidgetTester tester) async {
+      final html = '<img src="$fileUri" />';
+      final explained = (await explain(tester, html))
+          .replaceAll(RegExp(r'Uint8List#[0-9a-f]+,'), 'bytes,');
+      expect(
+          explained,
+          equals('[CssSizing:$sizingConstraints,child='
+              '[Image:image=FileImage("$filePath", scale: 1.0)]'
+              ']'));
     });
   });
 
