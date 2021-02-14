@@ -73,7 +73,10 @@ class _VideoPlayerState extends State<VideoPlayer> {
   }
 
   @override
-  Widget build(BuildContext context) => lib.Chewie(controller: _controller);
+  Widget build(BuildContext context) => AspectRatio(
+        aspectRatio: _controller.aspectRatio,
+        child: lib.Chewie(controller: _controller),
+      );
 
   void _onAspectRatioUpdated() => setState(() {});
 }
