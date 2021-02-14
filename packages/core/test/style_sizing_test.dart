@@ -44,6 +44,15 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
+
+    testWidgets('ignores invalid', (WidgetTester tester) async {
+      final html = '<div style="height: 2em; height: xxx">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:height=20.0,width=100.0%,child='
+              '[RichText:(:Foo)]]'));
+    });
   });
 
   group('max-height', () {
@@ -81,6 +90,16 @@ void main() {
       final html = '<div style="max-height: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('ignores invalid', (WidgetTester tester) async {
+      final html = '<div style="max-height: 2em; max-height: xxx">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:height≤20.0,width=100.0%,child='
+              '[RichText:(:Foo)]'
+              ']'));
     });
   });
 
@@ -120,6 +139,16 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
+
+    testWidgets('ignores invalid', (WidgetTester tester) async {
+      final html = '<div style="max-width: 2em">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:width≤20.0,width=100.0%,child='
+              '[RichText:(:Foo)]'
+              ']'));
+    });
   });
 
   group('min-height', () {
@@ -157,6 +186,16 @@ void main() {
       final html = '<div style="min-height: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('ignores invalid', (WidgetTester tester) async {
+      final html = '<div style="min-height: 2em">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:height≥20.0,width=100.0%,child='
+              '[RichText:(:Foo)]'
+              ']'));
     });
   });
 
@@ -196,6 +235,16 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
+
+    testWidgets('ignores invalid', (WidgetTester tester) async {
+      final html = '<div style="min-width: 2em">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:width≥20.0,width=100.0%,child='
+              '[RichText:(:Foo)]'
+              ']'));
+    });
   });
 
   group('width', () {
@@ -233,6 +282,16 @@ void main() {
       final html = '<div style="width: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('ignores invalid', (WidgetTester tester) async {
+      final html = '<div style="width: 2em">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:width=20.0,child='
+              '[RichText:(:Foo)]'
+              ']'));
     });
   });
 

@@ -64,24 +64,30 @@ class StyleSizing {
     for (final style in meta.styles) {
       switch (style.key) {
         case kCssHeight:
-          preferredAxis = Axis.vertical;
-          preferredHeight = tryParseCssLength(style.value);
+          final parsedHeight = tryParseCssLength(style.value);
+          if (parsedHeight != null) {
+            preferredAxis = Axis.vertical;
+            preferredHeight = tryParseCssLength(style.value);
+          }
           break;
         case kCssMaxHeight:
-          maxHeight = tryParseCssLength(style.value);
+          maxHeight = tryParseCssLength(style.value) ?? maxHeight;
           break;
         case kCssMaxWidth:
-          maxWidth = tryParseCssLength(style.value);
+          maxWidth = tryParseCssLength(style.value) ?? maxWidth;
           break;
         case kCssMinHeight:
-          minHeight = tryParseCssLength(style.value);
+          minHeight = tryParseCssLength(style.value) ?? minHeight;
           break;
         case kCssMinWidth:
-          minWidth = tryParseCssLength(style.value);
+          minWidth = tryParseCssLength(style.value) ?? minWidth;
           break;
         case kCssWidth:
-          preferredAxis = Axis.horizontal;
-          preferredWidth = tryParseCssLength(style.value);
+          final parsedWidth = tryParseCssLength(style.value);
+          if (parsedWidth != null) {
+            preferredAxis = Axis.horizontal;
+            preferredWidth = parsedWidth;
+          }
           break;
       }
     }
