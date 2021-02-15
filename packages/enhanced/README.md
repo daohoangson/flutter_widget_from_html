@@ -82,7 +82,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
   - Launch URL via [url_launcher](https://pub.dev/packages/url_launcher) with base URL resolver
 - H1/H2/H3/H4/H5/H6
 - IFRAME via [webview_flutter](https://pub.dev/packages/webview_flutter)
-- IMG with support for asset (`asset://`), data uri and network image via [cached_network_image](https://pub.dev/packages/cached_network_image). Additional .svg file support via [flutter_svg](https://pub.dev/packages/flutter_svg).
+- IMG with support for asset (`asset://`), data uri, local file (`file://`) and network image via [cached_network_image](https://pub.dev/packages/cached_network_image). Additional .svg file support via [flutter_svg](https://pub.dev/packages/flutter_svg).
 - LI/OL/UL with support for:
   - Attributes: `type`, `start`, `reversed`
   - Inline style `list-style-type` values: `lower-alpha`, `upper-alpha`, `lower-latin`, `upper-latin`, `circle`, `decimal`, `disc`, `lower-roman`, `upper-roman`, `square`

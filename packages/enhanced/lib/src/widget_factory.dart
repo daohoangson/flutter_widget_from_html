@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -112,6 +114,7 @@ class WidgetFactory extends core.WidgetFactory {
       url,
       aspectRatio: dimensOk ? width / height : 16 / 9,
       autoResize: !dimensOk && js,
+      debuggingEnabled: _widget.webViewDebuggingEnabled == true,
       interceptNavigationRequest: (newUrl) {
         if (newUrl == url) return false;
 
@@ -119,10 +122,12 @@ class WidgetFactory extends core.WidgetFactory {
         return true;
       },
       js: js,
+      mediaPlaybackAlwaysAllow: _widget.webViewMediaPlaybackAlwaysAllow == true,
       unsupportedWorkaroundForIssue37:
           _widget.unsupportedWebViewWorkaroundForIssue37 == true,
       unsupportedWorkaroundForIssue375:
           _widget.unsupportedWebViewWorkaroundForIssue375 == true,
+      userAgent: _widget.webViewUserAgent,
     );
   }
 
@@ -173,10 +178,8 @@ class WidgetFactory extends core.WidgetFactory {
   }
 
   Object _imageSvgPictureProvider(String url) {
-    if (url?.startsWith('asset:') == true) {
-      final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
-      if (uri?.scheme != 'asset') return null;
-
+    if (url.startsWith('asset:')) {
+      final uri = Uri.tryParse(url);
       final assetName = uri.path;
       if (assetName?.isNotEmpty != true) return null;
 
@@ -189,6 +192,14 @@ class WidgetFactory extends core.WidgetFactory {
         assetName,
         package: package,
       );
+    }
+
+    if (url.startsWith('file:')) {
+      final uri = Uri.tryParse(url);
+      final filePath = uri?.toFilePath();
+      if (filePath?.isNotEmpty != true) return null;
+
+      return FilePicture(SvgPicture.svgByteDecoder, File(uri.toFilePath()));
     }
 
     return NetworkPicture(SvgPicture.svgByteDecoder, url);

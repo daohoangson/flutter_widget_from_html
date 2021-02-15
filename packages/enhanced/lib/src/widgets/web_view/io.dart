@@ -94,7 +94,12 @@ class WebViewState extends State<WebView> {
   }
 
   Widget _buildWebView() => lib.WebView(
+        debuggingEnabled: widget.debuggingEnabled,
         initialUrl: widget.url,
+        initialMediaPlaybackPolicy: widget.mediaPlaybackAlwaysAllow == true
+            ? lib.AutoMediaPlaybackPolicy.always_allow
+            : lib.AutoMediaPlaybackPolicy
+                .require_user_action_for_all_media_types,
         javascriptMode: widget.js == true
             ? lib.JavascriptMode.unrestricted
             : lib.JavascriptMode.disabled,
@@ -104,6 +109,7 @@ class WebViewState extends State<WebView> {
             : null,
         onPageFinished: _onPageFinished,
         onWebViewCreated: (c) => _wvc = c,
+        userAgent: widget.userAgent,
       );
 
   lib.NavigationDecision _interceptNavigationRequest(

@@ -33,9 +33,12 @@ String _explainer(helper.Explainer parent, Widget widget) {
     return '[WebView:url=${widget.url}'
         ',aspectRatio=${widget.aspectRatio.toStringAsFixed(2)}'
         "${widget.autoResize ? ',autoResize=${widget.autoResize}' : ''}"
+        "${widget.debuggingEnabled ? ',debuggingEnabled=${widget.debuggingEnabled}' : ''}"
         "${!widget.js ? ',js=${widget.js}' : ''}"
+        "${widget.mediaPlaybackAlwaysAllow ? ',mediaPlaybackAlwaysAllow=${widget.mediaPlaybackAlwaysAllow}' : ''}"
         "${widget.unsupportedWorkaroundForIssue37 ? ',unsupportedWorkaroundForIssue37=${widget.unsupportedWorkaroundForIssue37}' : ''}"
         "${widget.unsupportedWorkaroundForIssue375 ? ',unsupportedWorkaroundForIssue375=${widget.unsupportedWorkaroundForIssue375}' : ''}"
+        "${widget.userAgent?.isNotEmpty == true ? ',userAgent=${widget.userAgent}' : ''}"
         ']';
   }
 

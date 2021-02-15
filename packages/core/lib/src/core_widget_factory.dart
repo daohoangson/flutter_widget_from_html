@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -295,12 +297,16 @@ class WidgetFactory {
     if (imgSrc == null) return null;
     final url = imgSrc.url;
 
-    if (url.startsWith('asset:') == true) {
+    if (url.startsWith('asset:')) {
       return _imageFromAsset(url);
     }
 
-    if (url.startsWith('data:') == true) {
+    if (url.startsWith('data:')) {
       return _imageFromDataUri(url);
+    }
+
+    if (url.startsWith('file:')) {
+      return _imageFromFileUri(url);
     }
 
     return _imageFromUrl(url);
@@ -308,8 +314,6 @@ class WidgetFactory {
 
   Object _imageFromAsset(String url) {
     final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
-    if (uri?.scheme != 'asset') return null;
-
     final assetName = uri.path;
     if (assetName?.isNotEmpty != true) return null;
 
@@ -325,6 +329,14 @@ class WidgetFactory {
     if (bytes == null) return null;
 
     return MemoryImage(bytes);
+  }
+
+  Object _imageFromFileUri(String url) {
+    final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
+    final filePath = uri?.toFilePath();
+    if (filePath?.isNotEmpty != true) return null;
+
+    return FileImage(File(filePath));
   }
 
   Object _imageFromUrl(String url) =>

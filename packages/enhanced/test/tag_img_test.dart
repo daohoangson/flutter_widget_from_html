@@ -96,6 +96,19 @@ void main() {
       );
     });
 
+    testWidgets('renders file picture', (WidgetTester tester) async {
+      final filePath = '${Directory.current.path}/test/images/logo.svg';
+      final html = '<img src="file://$filePath" />';
+      final explained = await helper.explain(tester, html);
+      expect(
+        explained,
+        equals('[CssSizing:$sizingConstraints,child='
+            '[SvgPicture:'
+            'pictureProvider=FilePicture("$filePath", colorFilter: null)'
+            ']]'),
+      );
+    });
+
     group('MemoryPicture', () {
       final explain = (WidgetTester tester, String html) => helper
           .explain(tester, html)
