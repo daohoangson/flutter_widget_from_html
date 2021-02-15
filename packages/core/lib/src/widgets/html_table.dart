@@ -5,34 +5,49 @@ import 'package:flutter/widgets.dart';
 
 /// A TABLE widget.
 class HtmlTable extends MultiChildRenderObjectWidget {
+  /// The table border sides.
+  final Border border;
+
+  /// Controls whether to collapse borders.
+  ///
+  /// Default: `false`.
+  final bool borderCollapse;
+
+  /// The gap between borders.
+  ///
+  /// Default: `0.0`.
+  final double borderSpacing;
+
   /// The companion data for table.
   final HtmlTableCompanion companion;
 
-  /// The gap between columns.
-  final double columnGap;
-
-  /// The gap between rows.
-  final double rowGap;
-
   /// Creates a TABLE widget.
   HtmlTable({
+    this.border,
+    this.borderCollapse = false,
+    this.borderSpacing = 0.0,
     @required List<Widget> children,
     @required this.companion,
-    this.columnGap = 0.0,
     Key key,
-    this.rowGap = 0.0,
   }) : super(children: children, key: key);
 
   @override
   RenderObject createRenderObject(BuildContext _) => _TableRenderObject()
-    ..columnGap = columnGap
-    ..rowGap = rowGap;
+    ..border = border
+    ..borderCollapse = borderCollapse
+    ..borderSpacing = borderSpacing;
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(DoubleProperty('columnGap', columnGap, defaultValue: 0.0));
-    properties.add(DoubleProperty('rowGap', rowGap, defaultValue: 0.0));
+    properties
+        .add(DiagnosticsProperty<Border>('border', border, defaultValue: null));
+    properties.add(FlagProperty('borderCollapse',
+        value: borderCollapse,
+        defaultValue: false,
+        ifTrue: 'borderCollapse: true'));
+    properties
+        .add(DoubleProperty('borderSpacing', borderSpacing, defaultValue: 0.0));
   }
 
   @override
@@ -40,8 +55,9 @@ class HtmlTable extends MultiChildRenderObjectWidget {
     super.updateRenderObject(_, renderObject);
 
     renderObject
-      ..columnGap = columnGap
-      ..rowGap = rowGap;
+      ..border = border
+      ..borderCollapse = borderCollapse
+      ..borderSpacing = borderSpacing;
   }
 }
 
@@ -52,6 +68,9 @@ class HtmlTableCompanion {
 
 /// A TD (table cell) widget.
 class HtmlTableCell extends ParentDataWidget<_TableCellData> {
+  /// The cell border sides.
+  final Border border;
+
   /// The number of columns this cell should span.
   final int columnSpan;
 
@@ -66,6 +85,7 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
 
   /// Creates a TD (table cell) widget.
   HtmlTableCell({
+    this.border,
     @required Widget child,
     this.columnSpan = 1,
     @required this.columnStart,
@@ -82,6 +102,11 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   void applyParentData(RenderObject renderObject) {
     final data = renderObject.parentData as _TableCellData;
     var needsLayout = false;
+
+    if (data.border != border) {
+      data.border = border;
+      needsLayout = true;
+    }
 
     if (data.columnSpan != columnSpan) {
       data.columnSpan = columnSpan;
@@ -112,6 +137,8 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
+    properties
+        .add(DiagnosticsProperty<Border>('border', border, defaultValue: null));
     properties.add(IntProperty('columnSpan', columnSpan, defaultValue: 1));
     properties.add(IntProperty('columnStart', columnStart));
     properties.add(IntProperty('rowSpan', rowSpan, defaultValue: 1));
@@ -162,29 +189,32 @@ extension _IterableDouble on Iterable<double> {
 }
 
 class _TableCellData extends ContainerBoxParentData<RenderBox> {
+  Border border;
   int columnSpan = 1;
   int columnStart;
   int rowSpan = 1;
   int rowStart;
 
   double calculateHeight(_TableRenderObject tro, List<double> heights) {
-    final gap = (rowSpan - 1) * tro._rowGap;
-    return heights.getRange(rowStart, rowStart + rowSpan).sum + gap;
+    final gaps = (rowSpan - 1) * tro.rowGap;
+    return heights.getRange(rowStart, rowStart + rowSpan).sum + gaps;
   }
 
   double calculateWidth(_TableRenderObject tro, List<double> widths) {
-    final gap = (columnSpan - 1) * tro._columnGap;
-    return widths.getRange(columnStart, columnStart + columnSpan).sum + gap;
+    final gaps = (columnSpan - 1) * tro.columnGap;
+    return widths.getRange(columnStart, columnStart + columnSpan).sum + gaps;
   }
 
   double calculateX(_TableRenderObject tro, List<double> widths) {
-    final gap = (columnStart + 1) * tro._columnGap;
-    return widths.getRange(0, columnStart).sum + gap;
+    final padding = tro._border?.left?.width ?? 0.0;
+    final gaps = (columnStart + 1) * tro.columnGap;
+    return padding + widths.getRange(0, columnStart).sum + gaps;
   }
 
   double calculateY(_TableRenderObject tro, List<double> heights) {
-    final gap = (rowStart + 1) * tro._rowGap;
-    return heights.getRange(0, rowStart).sum + gap;
+    final padding = tro._border?.top?.width ?? 0.0;
+    final gaps = (rowStart + 1) * tro.rowGap;
+    return padding + heights.getRange(0, rowStart).sum + gaps;
   }
 }
 
@@ -192,6 +222,27 @@ class _TableRenderObject extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, _TableCellData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _TableCellData> {
+  Border _border;
+  set border(Border v) {
+    if (v == _border) return;
+    _border = v;
+    markNeedsLayout();
+  }
+
+  bool _borderCollapse;
+  set borderCollapse(bool v) {
+    if (v == _borderCollapse) return;
+    _borderCollapse = v;
+    markNeedsLayout();
+  }
+
+  double _borderSpacing;
+  set borderSpacing(double v) {
+    if (v == _borderSpacing) return;
+    _borderSpacing = v;
+    markNeedsLayout();
+  }
+
   HtmlTableCompanion _companion;
   set companion(HtmlTableCompanion v) {
     if (v == _companion) return;
@@ -199,19 +250,24 @@ class _TableRenderObject extends RenderBox
     markNeedsLayout();
   }
 
-  double _columnGap;
-  set columnGap(double v) {
-    if (v == _columnGap) return;
-    _columnGap = v;
-    markNeedsLayout();
-  }
+  double get columnGap => _border != null && _borderCollapse
+      ? (_border.left.width * -1.0)
+      : _borderSpacing;
 
-  double _rowGap;
-  set rowGap(double v) {
-    if (v == _rowGap) return;
-    _rowGap = v;
-    markNeedsLayout();
-  }
+  double get paddingBottom => _border?.bottom?.width ?? 0.0;
+
+  double get paddingLeft => _border?.left?.width ?? 0.0;
+
+  double get paddingRight => _border?.right?.width ?? 0.0;
+
+  double get paddingTop => _border?.top?.width ?? 0.0;
+
+  double get rowGap => _border != null && _borderCollapse
+      ? (_border.top.width * -1.0)
+      : _borderSpacing;
+
+  double _calculatedHeight;
+  double _calculatedWidth;
 
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) {
@@ -247,11 +303,40 @@ class _TableRenderObject extends RenderBox
   @override
   void paint(PaintingContext context, Offset offset) {
     _companion?._baselines?.clear();
-    defaultPaint(context, offset);
+
+    assert(_calculatedHeight != null);
+    assert(_calculatedWidth != null);
+    _border?.paint(
+        context.canvas,
+        Rect.fromLTWH(
+            offset.dx, offset.dy, _calculatedWidth, _calculatedHeight));
+
+    var child = firstChild;
+    while (child != null) {
+      final data = child.parentData as _TableCellData;
+      final childOffset = data.offset + offset;
+      final childSize = child.size;
+      context.paintChild(child, childOffset);
+
+      data.border?.paint(
+        context.canvas,
+        Rect.fromLTWH(
+          childOffset.dx,
+          childOffset.dy,
+          childSize.width,
+          childSize.height,
+        ),
+      );
+
+      child = data.nextSibling;
+    }
   }
 
   @override
   void performLayout() {
+    _calculatedHeight = null;
+    _calculatedWidth = null;
+
     final c = constraints;
     final children = <RenderBox>[];
     final cells = <_TableCellData>[];
@@ -270,9 +355,10 @@ class _TableRenderObject extends RenderBox
       child = data.nextSibling;
     }
 
-    final columnGaps = (columnCount + 1) * _columnGap;
-    final rowGaps = (rowCount + 1) * _rowGap;
-    final width0 = (c.maxWidth - columnGaps) / columnCount;
+    final columnGaps = (columnCount + 1) * columnGap;
+    final rowGaps = (rowCount + 1) * rowGap;
+    final width0 =
+        (c.maxWidth - paddingLeft - paddingRight - columnGaps) / columnCount;
     final childSizes = List<Size>(children.length);
     final columnWidths = List.filled(columnCount, 0.0);
     final rowHeights = List.filled(rowCount, 0.0);
@@ -281,27 +367,26 @@ class _TableRenderObject extends RenderBox
       final data = cells[i];
 
       // assume even distribution of column widths if width is finite
-      final childColumnGap = (data.columnSpan - 1) * _columnGap;
+      final childColumnGaps = (data.columnSpan - 1) * columnGap;
       final childWidth =
-          width0.isFinite ? width0 * data.columnSpan + childColumnGap : null;
-      final cc = c.copyWith(
-        maxHeight: double.infinity,
+          width0.isFinite ? width0 * data.columnSpan + childColumnGaps : null;
+      final cc = BoxConstraints(
         maxWidth: childWidth ?? double.infinity,
-        minWidth: childWidth,
+        minWidth: childWidth ?? 0.0,
       );
       child.layout(cc, parentUsesSize: true);
       final childSize = childSizes[i] = child.size;
 
       // distribute cell width across spanned columns
-      final columnWidth = (childSize.width - childColumnGap) / data.columnSpan;
+      final columnWidth = (childSize.width - childColumnGaps) / data.columnSpan;
       for (var c = 0; c < data.columnSpan; c++) {
         final column = data.columnStart + c;
         columnWidths[column] = max(columnWidths[column], columnWidth);
       }
 
       // distribute cell height across spanned rows
-      final childRowGap = (data.rowSpan - 1) * _rowGap;
-      final rowHeight = (childSize.height - childRowGap) / data.rowSpan;
+      final childRowGaps = (data.rowSpan - 1) * rowGap;
+      final rowHeight = (childSize.height - childRowGaps) / data.rowSpan;
       for (var r = 0; r < data.rowSpan; r++) {
         final row = data.rowStart + r;
         rowHeights[row] = max(rowHeights[row], rowHeight);
@@ -310,12 +395,14 @@ class _TableRenderObject extends RenderBox
 
     // we now know all the widths and heights, let's position cells
     // sometime we have to relayout child, e.g. stretch its height for rowspan
-    final calculatedHeight = rowHeights.sum + rowGaps;
-    final constraintedHeight = c.constrainHeight(calculatedHeight);
-    final deltaHeight = (constraintedHeight - calculatedHeight) / rowCount;
-    final calculatedWidth = columnWidths.sum + columnGaps;
-    final constraintedWidth = c.constrainWidth(calculatedWidth);
-    final deltaWidth = (constraintedWidth - calculatedWidth) / columnCount;
+    _calculatedHeight = paddingTop + rowHeights.sum + rowGaps + paddingBottom;
+    final constraintedHeight = c.constrainHeight(_calculatedHeight);
+    final deltaHeight =
+        max(0, (constraintedHeight - _calculatedHeight) / rowCount);
+    _calculatedWidth =
+        paddingLeft + columnWidths.sum + columnGaps + paddingRight;
+    final constraintedWidth = c.constrainWidth(_calculatedWidth);
+    final deltaWidth = (constraintedWidth - _calculatedWidth) / columnCount;
     for (var i = 0; i < children.length; i++) {
       final data = cells[i];
       final childSize = childSizes[i];

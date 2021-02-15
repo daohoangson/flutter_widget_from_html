@@ -64,4 +64,9 @@ class StyleBorder {
       isBorderBox: meta[kCssBoxSizing] == kCssBoxSizingBorderBox,
     );
   }
+
+  static void skip(BuildMetadata meta) {
+    assert(_skipBuilding[meta] != true, 'Built ${meta.element} already');
+    _skipBuilding[meta] = true;
+  }
 }

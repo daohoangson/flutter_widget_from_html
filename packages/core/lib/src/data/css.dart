@@ -5,6 +5,7 @@ part of '../core_data.dart';
 class CssBorder {
   final CssBorderSide _all;
   final CssBorderSide _bottom;
+  final bool inherit;
   final CssBorderSide _inlineEnd;
   final CssBorderSide _inlineStart;
   final CssBorderSide _left;
@@ -15,6 +16,7 @@ class CssBorder {
   const CssBorder({
     CssBorderSide all,
     CssBorderSide bottom,
+    this.inherit,
     CssBorderSide inlineEnd,
     CssBorderSide inlineStart,
     CssBorderSide left,
@@ -38,9 +40,18 @@ class CssBorder {
       (_right == null || _right == CssBorderSide.none) &&
       (_top == null || _top == CssBorderSide.none);
 
+  /// Creates a copy of this border with the sides from [other].
+  CssBorder copyFrom(CssBorder other) => copyWith(
+        bottom: other._bottom,
+        inlineEnd: other._inlineEnd,
+        inlineStart: other._inlineStart,
+        left: other._left,
+        right: other._right,
+        top: other._top,
+      );
+
   /// Creates a copy of this border but with the given fields replaced with the new values.
   CssBorder copyWith({
-    CssBorderSide all,
     CssBorderSide bottom,
     CssBorderSide inlineEnd,
     CssBorderSide inlineStart,
@@ -49,8 +60,9 @@ class CssBorder {
     CssBorderSide top,
   }) =>
       CssBorder(
-        all: CssBorderSide._copyWith(_all, all),
+        all: _all,
         bottom: CssBorderSide._copyWith(_bottom, bottom),
+        inherit: inherit,
         inlineEnd: CssBorderSide._copyWith(_inlineEnd, inlineEnd),
         inlineStart: CssBorderSide._copyWith(_inlineStart, inlineStart),
         left: CssBorderSide._copyWith(_left, left),
@@ -87,21 +99,6 @@ class CssBorder {
       top: top ?? BorderSide.none,
     );
   }
-
-  @override
-  String toString() {
-    final bottom = CssBorderSide._copyWith(_all, _bottom);
-    final left = CssBorderSide._copyWith(_all, _left ?? _inlineStart);
-    final right = CssBorderSide._copyWith(_all, _right ?? _inlineEnd);
-    final top = CssBorderSide._copyWith(_all, _top);
-    final params = [
-      if (bottom != null) 'bottom: $bottom',
-      if (left != null) 'left: $left',
-      if (right != null) 'right: $right',
-      if (top != null) 'top: $top',
-    ];
-    return 'CssBorder(${params.join(", ")})';
-  }
 }
 
 /// A side of a border of a box.
@@ -121,16 +118,6 @@ class CssBorderSide {
 
   /// A border that is not rendered.
   static const none = CssBorderSide();
-
-  @override
-  String toString() {
-    final params = [
-      if (color != null) 'color: $color',
-      if (style != null) 'style: $style',
-      if (width != null) 'width: $width',
-    ];
-    return 'CssBorderSide(${params.join(", ")})';
-  }
 
   BorderSide _getValue(TextStyleHtml tsh) => identical(this, none)
       ? null
@@ -168,8 +155,7 @@ class CssLength {
   const CssLength(
     this.number, [
     this.unit = CssLengthUnit.px,
-  ])  : assert(number >= 0),
-        assert(unit != null);
+  ]) : assert(number >= 0);
 
   /// Returns `true` if value is non-zero.
   bool get isNotEmpty => number > 0;

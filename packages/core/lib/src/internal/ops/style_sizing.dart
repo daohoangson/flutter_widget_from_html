@@ -22,6 +22,8 @@ class StyleSizing {
 
   final WidgetFactory wf;
 
+  static final _treatHeightAsMinHeight = Expando<bool>();
+
   StyleSizing(this.wf);
 
   BuildOp get buildOp => BuildOp(
@@ -66,8 +68,12 @@ class StyleSizing {
         case kCssHeight:
           final parsedHeight = tryParseCssLength(style.value);
           if (parsedHeight != null) {
-            preferredAxis = Axis.vertical;
-            preferredHeight = tryParseCssLength(style.value);
+            if (_treatHeightAsMinHeight[meta] == true) {
+              minHeight = parsedHeight;
+            } else {
+              preferredAxis = Axis.vertical;
+              preferredHeight = parsedHeight;
+            }
           }
           break;
         case kCssMaxHeight:
@@ -118,6 +124,9 @@ class StyleSizing {
       preferredWidth: preferredWidth,
     );
   }
+
+  static void treatHeightAsMinHeight(BuildMetadata meta) =>
+      _treatHeightAsMinHeight[meta] = true;
 
   static Widget _build(BuildContext context, Widget child,
       _StyleSizingInput input, TextStyleBuilder tsb) {
