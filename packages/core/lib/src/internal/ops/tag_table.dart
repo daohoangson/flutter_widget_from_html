@@ -81,6 +81,9 @@ class TagTable {
   }
 
   void onTree(BuildMetadata _, BuildTree tree) {
+    StyleBorder.skip(tableMeta);
+    StyleSizing.treatHeightAsMinHeight(tableMeta);
+
     for (final caption in _captions) {
       final built = wf
           .buildColumnPlaceholder(tableMeta, caption.build())
@@ -107,7 +110,6 @@ class TagTable {
     final border = tryParseBorder(tableMeta);
     final borderCollapse = tableMeta[kCssBorderCollapse];
     final borderSpacing = tryParseCssLength(tableMeta[kCssBorderSpacing]);
-    StyleBorder.skip(tableMeta);
 
     return [
       WidgetPlaceholder<BuildMetadata>(tableMeta).wrapWith((context, _) {
@@ -298,6 +300,7 @@ class _TagTableRow {
     );
     childMeta.register(_cellOp);
     StyleBorder.skip(childMeta);
+    StyleSizing.treatHeightAsMinHeight(childMeta);
 
     _valignBaselineOp ??= BuildOp(
       onWidgets: (cellMeta, widgets) {
