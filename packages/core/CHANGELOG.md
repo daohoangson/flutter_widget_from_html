@@ -1,11 +1,13 @@
-## 0.5.2-rc.2021011801
+## 0.5.2
 
-- Add support for `HtmlWidget.onTapImage` callback
 - Add support for TABLE attribute `cellpadding` (#365)
 - Add support for table cell attributes `colspan`, `rowspan`, `valign` (#365)
+- Add support for `HtmlWidget.onTapImage` callback (#398)
+- Add support for file:// images (#432)
 - Allow getting parsed inline styles from `dom.Element` directly (#367)
 - Improve support for inline styles border, border-collapse and box-sizing  (#365)
 - Fix line metrics are unavailable on Flutter web (#383)
+- Fix IMG tag with dimensions being stretched (#429)
 
 ## 0.5.1+4
 
