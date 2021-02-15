@@ -838,6 +838,9 @@ Foo should float on top of table.''',
   <tr><td colspan="2">$multiline</td></tr>
   <tr><td>Foo</td><td>Bar</td></tr>
 </table>''',
+            'height_as_min_height':
+                'Above<table border="1" style="height: 1px">'
+                    '<tr><td style="height: 1px">Foo</td></tr></table>Below',
             'rowspan': '''<table border="1">
   <tr><td rowspan="2">$multiline</td><td>Foo</td></tr>
   <tr><td>Bar</td></tr>
