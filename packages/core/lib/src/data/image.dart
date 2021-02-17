@@ -4,13 +4,13 @@ part of '../core_data.dart';
 @immutable
 class ImageMetadata {
   /// The image alternative text.
-  final String alt;
+  final String? alt;
 
   /// The image sources.
-  final Iterable<ImageSource> sources;
+  final Iterable<ImageSource>? sources;
 
   /// The image title.
-  final String title;
+  final String? title;
 
   /// Creates an image.
   ImageMetadata({this.alt, this.sources, this.title});
@@ -30,16 +30,16 @@ class ImageMetadata {
 @immutable
 class ImageSource {
   /// The image height.
-  final double height;
+  final double? height;
 
   /// The image URL.
   final String url;
 
   /// The image width.
-  final double width;
+  final double? width;
 
   /// Creates a source.
-  ImageSource(this.url, {this.height, this.width}) : assert(url != null);
+  ImageSource(this.url, {this.height, this.width});
 
   @override
   String toString() =>

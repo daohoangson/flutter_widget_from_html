@@ -20,9 +20,9 @@ dependencies:
   video_player: ">=0.10.12 <2.0.0"
   webview_flutter: ">=0.3.22 <2.0.0"
 
-dependency_overrides:
-  flutter_widget_from_html_core:
-    path: ../core
+#dependency_overrides:
+#  flutter_widget_from_html_core:
+#    path: ../core
 
 dev_dependencies:
   flutter_test:

@@ -10,49 +10,49 @@ final _borderValuesThreeRegExp = RegExp(r'^(.+)\s+(.+)\s+(.+)$');
 final _borderValuesTwoRegExp = RegExp(r'^(.+)\s+(.+)$');
 final _elementBorder = Expando<CssBorder>();
 
-CssBorder tryParseBorder(BuildMetadata meta) {
-  var border = _elementBorder[meta.element];
+CssBorder? tryParseBorder(BuildMetadata meta) {
+  var border = _elementBorder[meta.element!];
   if (border != null) return border;
   border = CssBorder();
 
   for (final style in meta.styles) {
     if (!style.key.startsWith(kCssBorder)) continue;
 
-    final borderSide = _tryParseBorderSide(style.value);
+    final borderSide = _tryParseBorderSide(style.value!);
     final suffix = style.key.substring(kCssBorder.length);
     if (suffix.isEmpty) {
-      border = border.copyWith(all: borderSide);
+      border = border!.copyWith(all: borderSide);
     } else {
       switch (suffix) {
         case kSuffixBottom:
         case kSuffixBlockEnd:
-          border = border.copyWith(bottom: borderSide);
+          border = border!.copyWith(bottom: borderSide);
           break;
         case kSuffixInlineEnd:
-          border = border.copyWith(inlineEnd: borderSide);
+          border = border!.copyWith(inlineEnd: borderSide);
           break;
         case kSuffixInlineStart:
-          border = border.copyWith(inlineStart: borderSide);
+          border = border!.copyWith(inlineStart: borderSide);
           break;
         case kSuffixLeft:
-          border = border.copyWith(left: borderSide);
+          border = border!.copyWith(left: borderSide);
           break;
         case kSuffixRight:
-          border = border.copyWith(right: borderSide);
+          border = border!.copyWith(right: borderSide);
           break;
         case kSuffixTop:
         case kSuffixBlockStart:
-          border = border.copyWith(top: borderSide);
+          border = border!.copyWith(top: borderSide);
           break;
       }
     }
   }
 
-  return _elementBorder[meta.element] = border;
+  return _elementBorder[meta.element!] = border;
 }
 
 CssBorderSide _tryParseBorderSide(String value) {
-  String color_, style_, width_;
+  String? color_, style_, width_;
 
   final valuesThree = _borderValuesThreeRegExp.firstMatch(value);
   if (valuesThree != null) {
@@ -79,7 +79,7 @@ CssBorderSide _tryParseBorderSide(String value) {
   );
 }
 
-TextDecorationStyle _tryParseTextDecorationStyle(String value) {
+TextDecorationStyle? _tryParseTextDecorationStyle(String? value) {
   switch (value) {
     case kCssBorderStyleDotted:
       return TextDecorationStyle.dotted;

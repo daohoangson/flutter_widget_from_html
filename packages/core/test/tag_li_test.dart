@@ -19,7 +19,7 @@ String padding(String child) =>
 
 String list(List<String> children) => '[Column:children=${children.join(",")}]';
 
-String item(String markerText, String contents, {String child}) =>
+String item(String markerText, String? contents, {String? child}) =>
     '[_ListItem:children=${child ?? '[RichText:(:$contents)]'},${marker(markerText)}]';
 
 String marker(String text) =>
@@ -721,7 +721,7 @@ void main() async {
               );
 
               await screenMatchesGolden(tester, testCase.key);
-            }, skip: null);
+            }, skip: false);
           }
         }, skip: Platform.isLinux ? null : 'Linux only');
       },
@@ -735,7 +735,7 @@ void main() async {
 class _Golden extends StatelessWidget {
   final String contents;
 
-  const _Golden(this.contents, {Key key}) : super(key: key);
+  const _Golden(this.contents, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => Scaffold(
@@ -780,10 +780,10 @@ class _Golden extends StatelessWidget {
 }
 
 class _HitTestApp extends StatelessWidget {
-  final String href;
-  final void Function(String) onTapUrl;
+  final String? href;
+  final void Function(String)? onTapUrl;
 
-  const _HitTestApp({this.href, Key key, this.onTapUrl}) : super(key: key);
+  const _HitTestApp({this.href, Key? key, this.onTapUrl}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => MaterialApp(

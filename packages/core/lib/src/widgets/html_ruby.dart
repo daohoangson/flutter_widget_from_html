@@ -6,9 +6,8 @@ import 'package:flutter/widgets.dart';
 /// A RUBY widget.
 class HtmlRuby extends MultiChildRenderObjectWidget {
   /// Creates a RUBY widget.
-  HtmlRuby(Widget ruby, Widget rt, {Key key})
-      : assert(ruby != null),
-        assert(rt != null),
+  HtmlRuby(Widget ruby, Widget rt, {Key? key})
+      : 
         super(children: [ruby, rt], key: key);
 
   @override
@@ -23,8 +22,8 @@ class _RubyRenderObject extends RenderBox
         RenderBoxContainerDefaultsMixin<RenderBox, _RubyParentData> {
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) {
-    final ruby = firstChild;
-    final rubyValue = ruby.getDistanceToActualBaseline(baseline);
+    final ruby = firstChild!;
+    final rubyValue = ruby.getDistanceToActualBaseline(baseline)!;
     final offset = (ruby.parentData as _RubyParentData).offset;
 
     return offset.dy + rubyValue;
@@ -32,10 +31,10 @@ class _RubyRenderObject extends RenderBox
 
   @override
   double computeMaxIntrinsicHeight(double width) {
-    final ruby = firstChild;
+    final ruby = firstChild!;
     final rubyValue = ruby.computeMaxIntrinsicHeight(width);
 
-    final rt = (ruby.parentData as _RubyParentData).nextSibling;
+    final rt = (ruby.parentData as _RubyParentData).nextSibling!;
     final rtValue = rt.computeMaxIntrinsicHeight(width);
 
     return rubyValue + rtValue;
@@ -43,10 +42,10 @@ class _RubyRenderObject extends RenderBox
 
   @override
   double computeMaxIntrinsicWidth(double height) {
-    final ruby = firstChild;
+    final ruby = firstChild!;
     final rubyValue = ruby.computeMaxIntrinsicWidth(height);
 
-    final rt = (ruby.parentData as _RubyParentData).nextSibling;
+    final rt = (ruby.parentData as _RubyParentData).nextSibling!;
     final rtValue = rt.computeMaxIntrinsicWidth(height);
 
     return max(rubyValue, rtValue);
@@ -54,10 +53,10 @@ class _RubyRenderObject extends RenderBox
 
   @override
   double computeMinIntrinsicHeight(double width) {
-    final ruby = firstChild;
+    final ruby = firstChild!;
     final rubyValue = ruby.computeMinIntrinsicHeight(width);
 
-    final rt = (ruby.parentData as _RubyParentData).nextSibling;
+    final rt = (ruby.parentData as _RubyParentData).nextSibling!;
     final rtValue = rt.computeMinIntrinsicHeight(width);
 
     return rubyValue + rtValue;
@@ -65,17 +64,17 @@ class _RubyRenderObject extends RenderBox
 
   @override
   double computeMinIntrinsicWidth(double height) {
-    final ruby = firstChild;
+    final ruby = firstChild!;
     final rubyValue = ruby.getMinIntrinsicWidth(height);
 
-    final rt = (ruby.parentData as _RubyParentData).nextSibling;
+    final rt = (ruby.parentData as _RubyParentData).nextSibling!;
     final rtValue = rt.getMinIntrinsicWidth(height);
 
     return min(rubyValue, rtValue);
   }
 
   @override
-  bool hitTestChildren(BoxHitTestResult result, {Offset position}) =>
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
       defaultHitTestChildren(result, position: position);
 
   @override
@@ -84,13 +83,13 @@ class _RubyRenderObject extends RenderBox
 
   @override
   void performLayout() {
-    final ruby = firstChild;
+    final ruby = firstChild!;
     final rubyConstraints = constraints.loosen();
     ruby.layout(rubyConstraints, parentUsesSize: true);
     final rubyData = ruby.parentData as _RubyParentData;
     final rubySize = ruby.size;
 
-    final rt = rubyData.nextSibling;
+    final rt = rubyData.nextSibling!;
     final rtConstraints = rubyConstraints.copyWith(
         maxHeight: rubyConstraints.maxHeight - rubySize.height);
     rt.layout(rtConstraints, parentUsesSize: true);

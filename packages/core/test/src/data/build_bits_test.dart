@@ -403,7 +403,7 @@ void main() {
 class _BuildBitWidgetFactory extends WidgetFactory {
   @override
   void parse(BuildMetadata meta) {
-    final classes = meta.element.classes;
+    final classes = meta.element!.classes;
 
     if (classes.contains('input--BuildContext')) {
       meta.register(BuildOp(
@@ -456,7 +456,7 @@ class _BuildBitWidgetFactory extends WidgetFactory {
     }
 
     if (classes.contains('custom')) {
-      meta.tsb((tsh, _) => tsh.copyWith());
+      meta.tsb((tsh, dynamic _) => tsh!.copyWith());
     }
 
     super.parse(meta);
@@ -464,23 +464,23 @@ class _BuildBitWidgetFactory extends WidgetFactory {
 }
 
 class _InputBuildContextBit extends BuildBit<BuildContext, Widget> {
-  _InputBuildContextBit(BuildTree parent, TextStyleBuilder tsb)
+  _InputBuildContextBit(BuildTree? parent, TextStyleBuilder? tsb)
       : super(parent, tsb);
 
   @override
-  Widget buildBit(BuildContext _) => Text('Foo');
+  Widget buildBit(BuildContext? _) => Text('Foo');
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _InputBuildContextBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _InputGestureRecognizerBit extends BuildBit<GestureRecognizer, dynamic> {
-  _InputGestureRecognizerBit(BuildTree parent, TextStyleBuilder tsb)
+class _InputGestureRecognizerBit extends BuildBit<GestureRecognizer?, dynamic> {
+  _InputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder? tsb)
       : super(parent, tsb);
 
   @override
-  dynamic buildBit(GestureRecognizer recognizer) {
+  dynamic buildBit(GestureRecognizer? recognizer) {
     if (recognizer is TapGestureRecognizer) {
       recognizer.onTapCancel = () {};
       return recognizer;
@@ -490,23 +490,23 @@ class _InputGestureRecognizerBit extends BuildBit<GestureRecognizer, dynamic> {
   }
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _InputGestureRecognizerBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
 class _InputNullBit extends BuildBit<Null, dynamic> {
-  _InputNullBit(BuildTree parent, TextStyleBuilder tsb) : super(parent, tsb);
+  _InputNullBit(BuildTree? parent, TextStyleBuilder? tsb) : super(parent, tsb);
 
   @override
   dynamic buildBit(Null _) => '(null)';
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _InputNullBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
 class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {
-  _InputTextStyleHtmlBit(BuildTree parent, TextStyleBuilder tsb)
+  _InputTextStyleHtmlBit(BuildTree? parent, TextStyleBuilder? tsb)
       : super(parent, tsb);
 
   @override
@@ -516,14 +516,14 @@ class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {
       );
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _InputTextStyleHtmlBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
 class _OutputBuildTreeBit extends BuildBit<Null, BuildTree> {
   final BuildTree tree;
 
-  _OutputBuildTreeBit(BuildTree parent, TextStyleBuilder tsb)
+  _OutputBuildTreeBit(BuildTree parent, TextStyleBuilder? tsb)
       : tree = parent.sub(tsb: tsb)
           ..addWhitespace()
           ..addText('foo')
@@ -535,53 +535,53 @@ class _OutputBuildTreeBit extends BuildBit<Null, BuildTree> {
   BuildTree buildBit(Null _) => tree;
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
-      _OutputBuildTreeBit(parent ?? this.parent, tsb ?? this.tsb);
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+      _OutputBuildTreeBit(parent ?? this.parent!, tsb ?? this.tsb);
 }
 
 class _OutputGestureRecognizerBit extends BuildBit<Null, GestureRecognizer> {
-  _OutputGestureRecognizerBit(BuildTree parent, TextStyleBuilder tsb)
+  _OutputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder? tsb)
       : super(parent, tsb);
 
   @override
   GestureRecognizer buildBit(Null _) => MultiTapGestureRecognizer();
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _OutputGestureRecognizerBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
 class _OutputInlineSpanBit extends BuildBit<Null, InlineSpan> {
-  _OutputInlineSpanBit(BuildTree parent, TextStyleBuilder tsb)
+  _OutputInlineSpanBit(BuildTree? parent, TextStyleBuilder? tsb)
       : super(parent, tsb);
 
   @override
   InlineSpan buildBit(Null _) => WidgetSpan(child: Text('foo'));
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _OutputInlineSpanBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
 class _OutputStringBit extends BuildBit<Null, String> {
-  _OutputStringBit(BuildTree parent, TextStyleBuilder tsb) : super(parent, tsb);
+  _OutputStringBit(BuildTree? parent, TextStyleBuilder? tsb) : super(parent, tsb);
 
   @override
   String buildBit(Null _) => 'foo';
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _OutputStringBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
 class _OutputWidgetBit extends BuildBit<Null, Widget> {
-  _OutputWidgetBit(BuildTree parent, TextStyleBuilder tsb) : super(parent, tsb);
+  _OutputWidgetBit(BuildTree? parent, TextStyleBuilder? tsb) : super(parent, tsb);
 
   @override
   Widget buildBit(Null _) => Text('foo');
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _OutputWidgetBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 

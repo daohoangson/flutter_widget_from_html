@@ -30,27 +30,27 @@ class TagLi {
   final _itemMetas = <BuildMetadata>[];
   final _itemWidgets = <WidgetPlaceholder>[];
 
-  _ListConfig _config;
-  BuildOp _itemOp;
-  BuildOp _listOp;
+  _ListConfig? _config;
+  BuildOp? _itemOp;
+  BuildOp? _listOp;
 
   TagLi(this.wf, this.listMeta);
 
-  _ListConfig get config {
+  _ListConfig? get config {
     // cannot build config from constructor because
     // inline styles are not fully parsed at that time
     _config ??= _ListConfig.fromBuildMetadata(listMeta);
     return _config;
   }
 
-  BuildOp get op {
+  BuildOp? get op {
     _listOp ??= _TagLiListOp(this);
     return _listOp;
   }
 
   Map<String, String> defaultStyles(dom.Element element) {
     final attrs = element.attributes;
-    final depth = listMeta.parentOps?.whereType<_TagLiListOp>()?.length ?? 0;
+    final depth = listMeta.parentOps?.whereType<_TagLiListOp>().length ?? 0;
 
     final styles = {
       'padding-inline-start': '40px',
@@ -71,7 +71,7 @@ class TagLi {
   }
 
   void onChild(BuildMetadata childMeta) {
-    final e = childMeta.element;
+    final e = childMeta.element!;
     if (e.localName != kTagLi) return;
     if (e.parent != listMeta.element) return;
 
@@ -93,11 +93,11 @@ class TagLi {
   Widget _buildItem(BuildContext context, Widget child, int i) {
     final meta = _itemMetas[i];
     final listStyleType = _ListConfig.listStyleTypeFromBuildMetadata(meta) ??
-        config.listStyleType;
-    final markerIndex = config.markerReversed == true
-        ? (config.markerStart ?? _itemWidgets.length) - i
-        : (config.markerStart ?? 1) + i;
-    final tsh = meta.tsb().build(context);
+        config!.listStyleType;
+    final markerIndex = config!.markerReversed == true
+        ? (config!.markerStart ?? _itemWidgets.length) - i
+        : (config!.markerStart ?? 1) + i;
+    final tsh = meta.tsb()!.build(context)!;
 
     final markerText = wf.getListStyleMarker(listStyleType, markerIndex);
     final marker = _buildMarker(tsh, listStyleType, markerText);
@@ -109,9 +109,9 @@ class TagLi {
     );
   }
 
-  Widget _buildMarker(TextStyleHtml tsh, String type, String text) {
+  Widget _buildMarker(TextStyleHtml tsh, String? type, String text) {
     final style = tsh.styleWithHeight;
-    return text?.isNotEmpty == true
+    return text.isNotEmpty
         ? RichText(
             maxLines: 1,
             overflow: TextOverflow.clip,
@@ -120,18 +120,18 @@ class TagLi {
             textDirection: tsh.textDirection,
           )
         : type == kCssListStyleTypeCircle
-            ? _ListMarkerCircle(style)
+            ? _ListMarkerCircle(style!)
             : type == kCssListStyleTypeSquare
-                ? _ListMarkerSquare(style)
-                : _ListMarkerDisc(style);
+                ? _ListMarkerSquare(style!)
+                : _ListMarkerDisc(style!);
   }
 }
 
 @immutable
 class _ListConfig {
-  final String listStyleType;
-  final bool markerReversed;
-  final int markerStart;
+  final String? listStyleType;
+  final bool? markerReversed;
+  final int? markerStart;
 
   _ListConfig({
     this.listStyleType,
@@ -140,7 +140,7 @@ class _ListConfig {
   });
 
   factory _ListConfig.fromBuildMetadata(BuildMetadata meta) {
-    final attrs = meta.element.attributes;
+    final attrs = meta.element!.attributes;
 
     return _ListConfig(
       listStyleType: meta[kCssListStyleType] ?? kCssListStyleTypeDisc,
@@ -149,15 +149,15 @@ class _ListConfig {
     );
   }
 
-  static String listStyleTypeFromBuildMetadata(BuildMetadata meta) {
+  static String? listStyleTypeFromBuildMetadata(BuildMetadata meta) {
     final listStyleType = meta[kCssListStyleType];
     if (listStyleType != null) return listStyleType;
 
     return listStyleTypeFromAttributeType(
-        meta.element.attributes[kAttributeLiType]);
+        meta.element!.attributes[kAttributeLiType]);
   }
 
-  static String listStyleTypeFromAttributeType(String type) {
+  static String? listStyleTypeFromAttributeType(String? type) {
     switch (type) {
       case kAttributeLiTypeAlphaLower:
         return kCssListStyleTypeAlphaLower;
@@ -178,14 +178,14 @@ class _ListConfig {
 class _ListItem extends MultiChildRenderObjectWidget {
   static const kGap = 5.0;
 
-  final TextDirection textDirection;
+  final TextDirection? textDirection;
 
   _ListItem({
-    Widget child,
-    Key key,
-    Widget marker,
+    Widget? child,
+    Key? key,
+    Widget? marker,
     this.textDirection,
-  }) : super(children: [child, marker], key: key);
+  }) : super(children: [child!, marker!], key: key);
 
   @override
   RenderObject createRenderObject(BuildContext _) =>
@@ -211,39 +211,39 @@ class _ListItemRenderObject extends RenderBox
         ContainerRenderObjectMixin<RenderBox, _ListItemData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _ListItemData> {
   _ListItemRenderObject({
-    TextDirection textDirection,
+    TextDirection? textDirection,
   }) : _textDirection = textDirection;
 
-  TextDirection get textDirection => _textDirection;
-  TextDirection _textDirection;
-  set textDirection(TextDirection value) {
+  TextDirection? get textDirection => _textDirection;
+  TextDirection? _textDirection;
+  set textDirection(TextDirection? value) {
     if (_textDirection == value) return;
     _textDirection = value;
     markNeedsLayout();
   }
 
   @override
-  double computeDistanceToActualBaseline(TextBaseline baseline) =>
+  double? computeDistanceToActualBaseline(TextBaseline baseline) =>
       defaultComputeDistanceToFirstActualBaseline(baseline);
 
   @override
   double computeMaxIntrinsicHeight(double width) =>
-      firstChild.computeMaxIntrinsicHeight(width);
+      firstChild!.computeMaxIntrinsicHeight(width);
 
   @override
   double computeMaxIntrinsicWidth(double height) =>
-      firstChild.computeMaxIntrinsicWidth(height);
+      firstChild!.computeMaxIntrinsicWidth(height);
 
   @override
   double computeMinIntrinsicHeight(double width) =>
-      firstChild.computeMinIntrinsicHeight(width);
+      firstChild!.computeMinIntrinsicHeight(width);
 
   @override
   double computeMinIntrinsicWidth(double height) =>
-      firstChild.getMinIntrinsicWidth(height);
+      firstChild!.getMinIntrinsicWidth(height);
 
   @override
-  bool hitTestChildren(BoxHitTestResult result, {Offset position}) =>
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
       defaultHitTestChildren(result, position: position);
 
   @override
@@ -252,13 +252,13 @@ class _ListItemRenderObject extends RenderBox
 
   @override
   void performLayout() {
-    final child = firstChild;
+    final child = firstChild!;
     final childConstraints = constraints;
     final childData = child.parentData as _ListItemData;
     child.layout(childConstraints, parentUsesSize: true);
     final childSize = child.size;
 
-    final marker = childData.nextSibling;
+    final marker = childData.nextSibling!;
     final markerConstraints = childConstraints.loosen();
     final markerData = marker.parentData as _ListItemData;
     marker.layout(markerConstraints, parentUsesSize: true);
@@ -293,7 +293,7 @@ class _ListItemRenderObject extends RenderBox
 }
 
 class _ListMarkerCircle extends _ListMarker {
-  const _ListMarkerCircle(TextStyle textStyle, {Key key})
+  const _ListMarkerCircle(TextStyle textStyle, {Key? key})
       : super(
           key: key,
           markerType: _ListMarkerType.circle,
@@ -302,7 +302,7 @@ class _ListMarkerCircle extends _ListMarker {
 }
 
 class _ListMarkerDisc extends _ListMarker {
-  const _ListMarkerDisc(TextStyle textStyle, {Key key})
+  const _ListMarkerDisc(TextStyle textStyle, {Key? key})
       : super(
           key: key,
           markerType: _ListMarkerType.disc,
@@ -311,7 +311,7 @@ class _ListMarkerDisc extends _ListMarker {
 }
 
 class _ListMarkerSquare extends _ListMarker {
-  const _ListMarkerSquare(TextStyle textStyle, {Key key})
+  const _ListMarkerSquare(TextStyle textStyle, {Key? key})
       : super(
           key: key,
           markerType: _ListMarkerType.square,
@@ -323,13 +323,13 @@ class _ListMarker extends SingleChildRenderObjectWidget {
   final _ListMarkerType markerType;
   final TextStyle textStyle;
 
-  const _ListMarker({Key key, this.markerType, this.textStyle})
+  const _ListMarker(
+      {Key? key, required this.markerType, required this.textStyle})
       : super(key: key);
 
   @override
-  RenderObject createRenderObject(BuildContext _) => _ListMarkerRenderObject()
-    ..markerType = markerType
-    ..textStyle = textStyle;
+  RenderObject createRenderObject(BuildContext _) =>
+      _ListMarkerRenderObject(markerType: markerType, textStyle: textStyle);
 
   @override
   void updateRenderObject(
@@ -341,6 +341,11 @@ class _ListMarker extends SingleChildRenderObjectWidget {
 }
 
 class _ListMarkerRenderObject extends RenderBox {
+  _ListMarkerRenderObject(
+      {required _ListMarkerType markerType, required TextStyle textStyle})
+      : _textStyle = textStyle,
+        _markerType = markerType;
+
   _ListMarkerType _markerType;
   set markerType(_ListMarkerType v) {
     if (v == _markerType) return;
@@ -348,8 +353,8 @@ class _ListMarkerRenderObject extends RenderBox {
     markNeedsLayout();
   }
 
-  TextPainter __textPainter;
-  TextPainter get _textPainter {
+  TextPainter? __textPainter;
+  TextPainter? get _textPainter {
     __textPainter ??= TextPainter(
       text: TextSpan(style: _textStyle, text: '1.'),
       textDirection: TextDirection.ltr,
@@ -367,12 +372,12 @@ class _ListMarkerRenderObject extends RenderBox {
 
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) =>
-      _textPainter.computeDistanceToActualBaseline(baseline);
+      _textPainter!.computeDistanceToActualBaseline(baseline);
 
   @override
   void paint(PaintingContext context, Offset offset) {
     final canvas = context.canvas;
-    final m = _textPainter.computeLineMetrics().first;
+    final m = _textPainter!.computeLineMetrics().first;
     final center = offset +
         Offset(
           size.width / 2,
@@ -383,7 +388,7 @@ class _ListMarkerRenderObject extends RenderBox {
                   m.unscaledAscent * .7
               : size.height / 2,
         );
-    final radius = _textStyle.fontSize * .2;
+    final radius = _textStyle.fontSize! * .2;
 
     switch (_markerType) {
       case _ListMarkerType.circle:
@@ -391,7 +396,7 @@ class _ListMarkerRenderObject extends RenderBox {
           center,
           radius * .9,
           Paint()
-            ..color = _textStyle.color
+            ..color = _textStyle.color!
             ..strokeWidth = 1
             ..style = PaintingStyle.stroke,
         );
@@ -400,13 +405,13 @@ class _ListMarkerRenderObject extends RenderBox {
         canvas.drawCircle(
           center,
           radius,
-          Paint()..color = _textStyle.color,
+          Paint()..color = _textStyle.color!,
         );
         break;
       case _ListMarkerType.square:
         canvas.drawRect(
           Rect.fromCircle(center: center, radius: radius * .8),
-          Paint()..color = _textStyle.color,
+          Paint()..color = _textStyle.color!,
         );
         break;
     }
@@ -414,7 +419,7 @@ class _ListMarkerRenderObject extends RenderBox {
 
   @override
   void performLayout() {
-    size = _textPainter.size;
+    size = _textPainter!.size;
   }
 }
 

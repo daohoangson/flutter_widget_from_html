@@ -5,7 +5,7 @@ const kTagA = 'a';
 
 class TagA {
   final WidgetFactory wf;
-  final Color Function() colorCallback;
+  final Color? Function() colorCallback;
 
   TagA(this.wf, this.colorCallback);
 
@@ -13,13 +13,13 @@ class TagA {
         defaultStyles: (_) {
           final styles = {kCssTextDecoration: kCssTextDecorationUnderline};
 
-          final color = colorCallback?.call();
+          final color = colorCallback.call();
           if (color != null) styles[kCssColor] = convertColorToHex(color);
 
           return styles;
         },
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree) return;
+          if (meta.willBuildSubtree!) return;
 
           final onTap = _gestureTapCallback(meta);
           if (onTap == null) return;
@@ -43,8 +43,8 @@ class TagA {
         onWidgetsIsOptional: true,
       );
 
-  GestureTapCallback _gestureTapCallback(BuildMetadata meta) {
-    final href = meta.element.attributes[kAttributeAHref];
+  GestureTapCallback? _gestureTapCallback(BuildMetadata meta) {
+    final href = meta.element!.attributes[kAttributeAHref];
     return wf.gestureTapCallback(wf.urlFull(href) ?? href);
   }
 }
@@ -52,14 +52,14 @@ class TagA {
 class _TagABit extends BuildBit<GestureRecognizer, GestureRecognizer> {
   final GestureTapCallback onTap;
 
-  _TagABit(BuildTree parent, TextStyleBuilder tsb, this.onTap)
+  _TagABit(BuildTree? parent, TextStyleBuilder? tsb, this.onTap)
       : super(parent, tsb);
 
   @override
-  bool get swallowWhitespace => null;
+  bool? get swallowWhitespace => null;
 
   @override
-  GestureRecognizer buildBit(GestureRecognizer recognizer) {
+  GestureRecognizer buildBit(GestureRecognizer? recognizer) {
     if (recognizer is TapGestureRecognizer) {
       recognizer.onTap = onTap;
       return recognizer;
@@ -69,6 +69,6 @@ class _TagABit extends BuildBit<GestureRecognizer, GestureRecognizer> {
   }
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _TagABit(parent ?? this.parent, tsb ?? this.tsb, onTap);
 }

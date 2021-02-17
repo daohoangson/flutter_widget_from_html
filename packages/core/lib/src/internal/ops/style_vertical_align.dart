@@ -19,7 +19,7 @@ class StyleVerticalAlign {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree) return;
+          if (meta.willBuildSubtree!) return;
 
           final v = meta[kCssVerticalAlign];
           if (v == null || v == kCssVerticalAlignBaseline) return;
@@ -48,7 +48,7 @@ class StyleVerticalAlign {
           tree.replaceWith(WidgetBit.inline(tree, built, alignment: alignment));
         },
         onWidgets: (meta, widgets) {
-          if (_skipBuilding[meta] == true || widgets?.isNotEmpty != true) {
+          if (_skipBuilding[meta] == true || widgets.isNotEmpty != true) {
             return widgets;
           }
 
@@ -59,7 +59,7 @@ class StyleVerticalAlign {
           return listOrNull(wf
               .buildColumnPlaceholder(meta, widgets)
               ?.wrapWith((context, child) {
-            final tsh = meta.tsb().build(context);
+            final tsh = meta.tsb()!.build(context)!;
             final alignment = _tryParseAlignmentGeometry(tsh.textDirection, v);
             return wf.buildAlign(meta, child, alignment);
           }));
@@ -68,7 +68,7 @@ class StyleVerticalAlign {
         priority: kPriority4500,
       );
 
-  WidgetPlaceholder _buildTree(BuildMetadata meta, BuildTree tree) {
+  WidgetPlaceholder? _buildTree(BuildMetadata meta, BuildTree tree) {
     final bits = tree.bits.toList(growable: false);
     if (bits.length == 1) {
       final firstBit = bits.first;
@@ -85,8 +85,8 @@ class StyleVerticalAlign {
 
   Widget _buildStack(BuildContext context, BuildMetadata meta, Widget child,
       EdgeInsets padding) {
-    final tsh = meta.tsb().build(context);
-    final fontSize = tsh.style.fontSize;
+    final tsh = meta.tsb()!.build(context)!;
+    final fontSize = tsh.style!.fontSize!;
 
     return wf.buildStack(
       meta,
@@ -110,7 +110,7 @@ class StyleVerticalAlign {
   }
 }
 
-AlignmentGeometry _tryParseAlignmentGeometry(TextDirection dir, String value) {
+AlignmentGeometry? _tryParseAlignmentGeometry(TextDirection? dir, String value) {
   final isLtr = dir != TextDirection.rtl;
   switch (value) {
     case kCssVerticalAlignTop:
@@ -126,7 +126,7 @@ AlignmentGeometry _tryParseAlignmentGeometry(TextDirection dir, String value) {
   return null;
 }
 
-PlaceholderAlignment _tryParsePlaceholderAlignment(String value) {
+PlaceholderAlignment? _tryParsePlaceholderAlignment(String value) {
   switch (value) {
     case kCssVerticalAlignTop:
     case kCssVerticalAlignSub:

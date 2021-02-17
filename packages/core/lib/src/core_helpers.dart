@@ -32,7 +32,7 @@ const widget0 = SizedBox.shrink();
 ///     element.classes.contains('name') ? {'color': 'red'} : null,
 /// )
 /// ```
-typedef CustomStylesBuilder = Map<String, String> Function(dom.Element element);
+typedef CustomStylesBuilder = Map<String, String>? Function(dom.Element element);
 
 /// A callback to render custom widget for a DOM element.
 ///
@@ -40,7 +40,7 @@ typedef CustomStylesBuilder = Map<String, String> Function(dom.Element element);
 /// you have to handle the DOM element and its children manually,
 /// if the children have HTML styling etc., they won't be processed at all.
 /// For those needs, a custom [WidgetFactory] is the way to go.
-typedef CustomWidgetBuilder = Widget Function(dom.Element element);
+typedef CustomWidgetBuilder = Widget? Function(dom.Element element);
 
 final _domElementStyles = Expando<List<InlineStyle>>();
 
@@ -60,8 +60,8 @@ extension DomElementExtension on dom.Element {
     }
 
     return _domElementStyles[this] = _domElementStyleRegExp
-        .allMatches(attributes['style'])
-        .map((m) => InlineStyle(m[1].trim(), m[2].trim()))
+        .allMatches(attributes['style']!)
+        .map((m) => InlineStyle(m[1]!.trim(), m[2]!.trim()))
         .toList(growable: false);
   }
 }
@@ -76,13 +76,13 @@ class InlineStyle {
   /// The value.
   ///
   /// Use [values] for tokenized strings.
-  final String value;
+  final String? value;
 
   /// Creates a key value pair.
   InlineStyle(this.key, this.value);
 
   /// The tokenized values.
-  List<String> get values => value.split(_domElementStyleValuesRegExp);
+  List<String> get values => value!.split(_domElementStyleValuesRegExp);
 }
 
 /// A set of values that should trigger rebuild.
@@ -121,17 +121,17 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   /// The origin of this widget.
   final T generator;
 
-  final List<Widget Function(BuildContext, Widget)> _builders = [];
-  final Widget _firstChild;
+  final List<Widget? Function(BuildContext, Widget)> _builders = [];
+  final Widget? _firstChild;
 
   /// Creates a widget builder.
-  WidgetPlaceholder(this.generator, {Widget child}) : _firstChild = child;
+  WidgetPlaceholder(this.generator, {Widget? child}) : _firstChild = child;
 
   @override
   Widget build(BuildContext context) => callBuilders(context, _firstChild);
 
   /// Calls builder callbacks on the specified [child] widget.
-  Widget callBuilders(BuildContext context, Widget child) {
+  Widget callBuilders(BuildContext context, Widget? child) {
     var built = child ?? widget0;
 
     for (final builder in _builders) {
@@ -154,7 +154,6 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   /// Enqueues [builder] to be built later.
   WidgetPlaceholder<T> wrapWith(
       Widget Function(BuildContext context, Widget child) builder) {
-    assert(builder != null);
     _builders.add(builder);
     return this;
   }
@@ -168,9 +167,9 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   /// Creates a placeholder lazily.
   ///
   /// Returns [child] if it is already a placeholder.
-  static WidgetPlaceholder lazy(Widget child) => child is WidgetPlaceholder
+  static WidgetPlaceholder lazy(Widget? child) => child is WidgetPlaceholder
       ? child
-      : WidgetPlaceholder<Widget>(child, child: child);
+      : WidgetPlaceholder<Widget?>(child, child: child);
 }
 
 final _dataUriRegExp = RegExp(r'^data:[^;]+;([^,]+),');
@@ -181,11 +180,11 @@ final _dataUriRegExp = RegExp(r'^data:[^;]+;([^,]+),');
 ///
 /// - base64
 /// - utf8
-Uint8List bytesFromDataUri(String dataUri) {
+Uint8List? bytesFromDataUri(String dataUri) {
   final match = _dataUriRegExp.matchAsPrefix(dataUri);
   if (match == null) return null;
 
-  final prefix = match[0];
+  final prefix = match[0]!;
   final encoding = match[1];
   final data = dataUri.substring(prefix.length);
   final bytes = encoding == 'base64'
@@ -198,12 +197,12 @@ Uint8List bytesFromDataUri(String dataUri) {
 }
 
 /// Returns [List<T>] if [x] is provided or `null` otherwise.
-Iterable<T> listOrNull<T>(T x) => x == null ? null : [x];
+Iterable<T>? listOrNull<T>(T x) => x == null ? null : [x];
 
 /// Parses [key] from [map] as an double literal and return its value.
-double tryParseDoubleFromMap(Map<dynamic, String> map, String key) =>
-    map.containsKey(key) ? double.tryParse(map[key]) : null;
+double? tryParseDoubleFromMap(Map<dynamic, String> map, String key) =>
+    map.containsKey(key) ? double.tryParse(map[key]!) : null;
 
 /// Parses [key] from [map] as a, possibly signed, integer literal and return its value.
-int tryParseIntFromMap(Map<dynamic, String> map, String key) =>
-    map.containsKey(key) ? int.tryParse(map[key]) : null;
+int? tryParseIntFromMap(Map<dynamic, String> map, String key) =>
+    map.containsKey(key) ? int.tryParse(map[key]!) : null;

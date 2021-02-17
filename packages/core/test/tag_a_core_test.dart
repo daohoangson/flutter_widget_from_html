@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:network_image_mock/network_image_mock.dart';
+import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
 
@@ -146,7 +146,7 @@ void main() {
 
   group('IMG', () {
     final explainImg = (WidgetTester tester, String html) =>
-        mockNetworkImagesFor(() => explain(tester, html));
+        mockNetworkImages(() => explain(tester, html));
     final sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
 
     testWidgets('renders IMG tag inside', (WidgetTester tester) async {
@@ -226,9 +226,9 @@ void main() {
 }
 
 class _TapTestApp extends StatelessWidget {
-  final void Function(String) onTapUrl;
+  final void Function(String)? onTapUrl;
 
-  const _TapTestApp({Key key, this.onTapUrl}) : super(key: key);
+  const _TapTestApp({Key? key, this.onTapUrl}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => MaterialApp(

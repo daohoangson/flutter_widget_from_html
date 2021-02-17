@@ -12,7 +12,7 @@ part 'data/text_style.dart';
 /// A building element metadata.
 abstract class BuildMetadata {
   /// The associatd element.
-  final dom.Element element;
+  final dom.Element? element;
 
   final TextStyleBuilder _tsb;
 
@@ -20,10 +20,10 @@ abstract class BuildMetadata {
   BuildMetadata(this.element, this._tsb);
 
   /// The registered build ops.
-  Iterable<BuildOp> get buildOps;
+  Iterable<BuildOp>? get buildOps;
 
   /// The parents' build ops that have [BuildOp.onChild].
-  Iterable<BuildOp> get parentOps;
+  Iterable<BuildOp>? get parentOps;
 
   /// The inline styles.
   ///
@@ -42,14 +42,14 @@ abstract class BuildMetadata {
   /// - Inline style `display: block`
   ///
   /// See [BuildOp.onWidgetsIsOptional].
-  bool get willBuildSubtree;
+  bool? get willBuildSubtree;
 
   /// Adds an inline style.
-  operator []=(String key, String value);
+  operator []=(String key, String? value);
 
   /// Gets an inline style value by key.
-  String operator [](String key) {
-    String value;
+  String? operator [](String key) {
+    String? value;
     for (final x in styles) {
       if (x.key == key) value = x.value;
     }
@@ -57,18 +57,18 @@ abstract class BuildMetadata {
   }
 
   /// Registers a build op.
-  void register(BuildOp op);
+  void register(BuildOp? op);
 
   @override
   String toString() =>
-      'BuildMetadata(${element == null ? "root" : element.outerHtml})';
+      'BuildMetadata(${element == null ? "root" : element!.outerHtml})';
 
   /// Enqueues a text style builder callback.
   ///
   /// Returns the associated [TextStyleBuilder].
-  TextStyleBuilder tsb<T>([
-    TextStyleHtml Function(TextStyleHtml tsh, T input) builder,
-    T input,
+  TextStyleBuilder? tsb<T>([
+    TextStyleHtml Function(TextStyleHtml? tsh, T input)? builder,
+    T? input,
   ]) =>
       _tsb..enqueue(builder, input);
 }
@@ -84,7 +84,7 @@ class BuildOp {
   /// The execution priority, op with lower priority will run first.
   ///
   /// Default: 10.
-  final int priority;
+  final int? priority;
 
   /// The callback that should return default styling map.
   ///
@@ -99,7 +99,7 @@ class BuildOp {
   ///
   /// Note: op must be registered early for this to work e.g.
   /// in [WidgetFactory.parse] or [onChild].
-  final Map<String, String> Function(dom.Element element) defaultStyles;
+  final Map<String, String?> Function(dom.Element element)? defaultStyles;
 
   /// The callback that will be called whenver a child element is found.
   ///
@@ -115,16 +115,16 @@ class BuildOp {
   /// );
   ///
   /// ```
-  final void Function(BuildMetadata childMeta) onChild;
+  final void Function(BuildMetadata childMeta)? onChild;
 
   /// The callback that will be called when child elements have been processed.
-  final void Function(BuildMetadata meta, BuildTree tree) onTree;
+  final void Function(BuildMetadata meta, BuildTree tree)? onTree;
 
   /// The callback that will be called when child elements have been built.
   ///
   /// Note: only works if it's a block element.
-  final Iterable<Widget> Function(
-      BuildMetadata meta, Iterable<WidgetPlaceholder> widgets) onWidgets;
+  final Iterable<Widget?>? Function(
+      BuildMetadata meta, Iterable<WidgetPlaceholder> widgets)? onWidgets;
 
   /// Controls whether the element should be forced to be rendered as block.
   ///

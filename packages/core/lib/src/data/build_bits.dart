@@ -6,10 +6,10 @@ part of '../core_data.dart';
 @immutable
 abstract class BuildBit<InputType, OutputType> {
   /// The container tree.
-  final BuildTree parent;
+  final BuildTree? parent;
 
   /// The associated [TextStyleBuilder].
-  final TextStyleBuilder tsb;
+  final TextStyleBuilder? tsb;
 
   /// Creates a build bit.
   ///
@@ -23,15 +23,15 @@ abstract class BuildBit<InputType, OutputType> {
   ///
   /// Note: the next bit may not have the same parent or grandparent,
   /// it's only guaranteed to be within the same tree.
-  BuildBit get next {
-    BuildBit x = this;
+  BuildBit? get next {
+    BuildBit? x = this;
 
     while (x != null) {
       final siblings = x.parent?._children;
       final i = siblings?.indexOf(x) ?? -1;
       if (i == -1) return null;
 
-      for (var j = i + 1; j < siblings.length; j++) {
+      for (var j = i + 1; j < siblings!.length; j++) {
         final candidate = siblings[j];
         if (candidate is BuildTree) {
           final first = candidate.first;
@@ -51,8 +51,8 @@ abstract class BuildBit<InputType, OutputType> {
   ///
   /// Note: the previous bit may not have the same parent or grandparent,
   /// it's only guaranteed to be within the same tree.
-  BuildBit get prev {
-    BuildBit x = this;
+  BuildBit? get prev {
+    BuildBit? x = this;
 
     while (x != null) {
       final siblings = x.parent?._children;
@@ -60,7 +60,7 @@ abstract class BuildBit<InputType, OutputType> {
       if (i == -1) return null;
 
       for (var j = i - 1; j > -1; j--) {
-        final candidate = siblings[j];
+        final candidate = siblings![j];
         if (candidate is BuildTree) {
           final last = candidate.last;
           if (last != null) return last;
@@ -81,7 +81,7 @@ abstract class BuildBit<InputType, OutputType> {
   /// Returns `null` to use configuration from the previous bit.
   ///
   /// By default, do swallow if not [isInline].
-  bool get swallowWhitespace => !isInline;
+  bool? get swallowWhitespace => !isInline;
 
   /// Builds input into output.
   ///
@@ -103,17 +103,17 @@ abstract class BuildBit<InputType, OutputType> {
   OutputType buildBit(InputType input);
 
   /// Creates a copy with the given fields replaced with the new values.
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb});
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb});
 
   /// Removes self from [parent].
-  bool detach() => parent?._children?.remove(this);
+  bool? detach() => parent?._children.remove(this);
 
   /// Inserts self after [another] in the tree.
   bool insertAfter(BuildBit another) {
     if (parent == null) return false;
 
     assert(parent == another.parent);
-    final siblings = parent._children;
+    final siblings = parent!._children;
     final i = siblings.indexOf(another);
     if (i == -1) return false;
 
@@ -126,7 +126,7 @@ abstract class BuildBit<InputType, OutputType> {
     if (parent == null) return false;
 
     assert(parent == another.parent);
-    final siblings = parent._children;
+    final siblings = parent!._children;
     final i = siblings.indexOf(another);
     if (i == -1) return false;
 
@@ -144,7 +144,7 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
   final _toStringBuffer = StringBuffer();
 
   /// Creates a tree.
-  BuildTree(BuildTree parent, TextStyleBuilder tsb) : super(parent, tsb);
+  BuildTree(BuildTree? parent, TextStyleBuilder? tsb) : super(parent, tsb);
 
   /// The list of bits including direct children and sub-tree's.
   Iterable<BuildBit> get bits sync* {
@@ -158,7 +158,7 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
   }
 
   /// The first bit (recursively).
-  BuildBit get first {
+  BuildBit? get first {
     for (final child in _children) {
       final first = child is BuildTree ? child.first : child;
       if (first != null) return first;
@@ -181,7 +181,7 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
   }
 
   /// The last bit (recursively).
-  BuildBit get last {
+  BuildBit? get last {
     for (final child in _children.reversed) {
       final last = child is BuildTree ? child.last : child;
       if (last != null) return last;
@@ -204,7 +204,7 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
   BuildBit addWhitespace() => add(_TextWhitespace(this));
 
   /// Adds a string of text.
-  TextBit addText(String data) => add(TextBit(this, data));
+  TextBit addText(String data) => add(TextBit(this, data)) as TextBit;
 
   /// Builds widgets from bits.
   Iterable<WidgetPlaceholder> build();
@@ -213,7 +213,7 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
   Iterable<WidgetPlaceholder> buildBit(Null _) => build();
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) {
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) {
     final copied = sub(parent: parent ?? this.parent, tsb: tsb ?? this.tsb);
     for (final bit in _children) {
       copied.add(bit.copyWith(parent: copied));
@@ -232,7 +232,7 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
   /// Creates a sub tree.
   ///
   /// Remember to call [add] to connect the new tree to a parent.
-  BuildTree sub({BuildTree parent, TextStyleBuilder tsb});
+  BuildTree sub({BuildTree? parent, TextStyleBuilder? tsb});
 
   @override
   String toString() {
@@ -258,18 +258,18 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
 class TextBit extends BuildBit<Null, String> {
   final String data;
 
-  TextBit._(BuildTree parent, TextStyleBuilder tsb, this.data)
+  TextBit._(BuildTree? parent, TextStyleBuilder? tsb, this.data)
       : super(parent, tsb);
 
   /// Creates with string,
-  factory TextBit(BuildTree parent, String data, {TextStyleBuilder tsb}) =>
+  factory TextBit(BuildTree parent, String data, {TextStyleBuilder? tsb}) =>
       TextBit._(parent, tsb ?? parent.tsb, data);
 
   @override
   String buildBit(Null _) => data;
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       TextBit._(parent ?? this.parent, tsb ?? this.tsb, data);
 
   @override
@@ -279,17 +279,17 @@ class TextBit extends BuildBit<Null, String> {
 /// A widget bit.
 class WidgetBit<T> extends BuildBit<Null, dynamic> {
   /// See [PlaceholderSpan.alignment].
-  final PlaceholderAlignment alignment;
+  final PlaceholderAlignment? alignment;
 
   /// See [PlaceholderSpan.baseline].
-  final TextBaseline baseline;
+  final TextBaseline? baseline;
 
   /// The widget to be rendered.
   final WidgetPlaceholder<T> child;
 
   WidgetBit._(
-    BuildTree parent,
-    TextStyleBuilder tsb,
+    BuildTree? parent,
+    TextStyleBuilder? tsb,
     this.child, [
     this.alignment,
     this.baseline,
@@ -297,21 +297,21 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
 
   /// Creates a block widget.
   factory WidgetBit.block(
-    BuildTree parent,
+    BuildTree? parent,
     Widget child, {
-    TextStyleBuilder tsb,
+    TextStyleBuilder? tsb,
   }) =>
-      WidgetBit._(parent, tsb ?? parent.tsb, WidgetPlaceholder.lazy(child));
+      WidgetBit._(parent, tsb ?? parent!.tsb, WidgetPlaceholder.lazy(child) as WidgetPlaceholder<T>);
 
   /// Creates an inline widget.
   factory WidgetBit.inline(
-    BuildTree parent,
+    BuildTree? parent,
     Widget child, {
     PlaceholderAlignment alignment = PlaceholderAlignment.baseline,
     TextBaseline baseline = TextBaseline.alphabetic,
-    TextStyleBuilder tsb,
+    TextStyleBuilder? tsb,
   }) =>
-      WidgetBit._(parent, tsb ?? parent.tsb, WidgetPlaceholder.lazy(child),
+      WidgetBit._(parent, tsb ?? parent!.tsb, WidgetPlaceholder.lazy(child) as WidgetPlaceholder<T>,
           alignment, baseline);
 
   @override
@@ -320,14 +320,14 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
   @override
   dynamic buildBit(Null _) => isInline
       ? WidgetSpan(
-          alignment: alignment,
+          alignment: alignment!,
           baseline: baseline,
           child: child,
         )
       : child;
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) => WidgetBit._(
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) => WidgetBit._(
       parent ?? this.parent, tsb ?? this.tsb, child, alignment, baseline);
 
   @override
@@ -336,7 +336,7 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
 }
 
 class _TextNewLine extends BuildBit<Null, String> {
-  _TextNewLine(BuildTree parent, TextStyleBuilder tsb) : super(parent, tsb);
+  _TextNewLine(BuildTree? parent, TextStyleBuilder? tsb) : super(parent, tsb);
 
   @override
   bool get swallowWhitespace => true;
@@ -345,12 +345,12 @@ class _TextNewLine extends BuildBit<Null, String> {
   String buildBit(Null _) => '\n';
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _TextNewLine(parent ?? this.parent, tsb ?? this.tsb);
 }
 
 class _TextWhitespace extends BuildBit<Null, String> {
-  _TextWhitespace(BuildTree parent) : super(parent, null);
+  _TextWhitespace(BuildTree? parent) : super(parent, null);
 
   @override
   bool get swallowWhitespace => true;
@@ -359,7 +359,7 @@ class _TextWhitespace extends BuildBit<Null, String> {
   String buildBit(Null _) => ' ';
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _TextWhitespace(parent ?? this.parent);
 
   @override

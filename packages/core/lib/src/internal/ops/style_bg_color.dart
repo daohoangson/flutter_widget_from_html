@@ -10,7 +10,7 @@ class StyleBgColor {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree) return;
+          if (meta.willBuildSubtree!) return;
 
           final bgColor = _parseColor(wf, meta);
           if (bgColor == null) return;
@@ -29,8 +29,8 @@ class StyleBgColor {
         priority: 4900,
       );
 
-  Color _parseColor(WidgetFactory wf, BuildMetadata meta) {
-    Color color;
+  Color? _parseColor(WidgetFactory wf, BuildMetadata meta) {
+    Color? color;
     for (final style in meta.styles) {
       switch (style.key) {
         case kCssBackgroundColor:
@@ -49,6 +49,6 @@ class StyleBgColor {
     return color;
   }
 
-  static TextStyleHtml _tsb(TextStyleHtml p, Color c) =>
-      p.copyWith(style: p.style.copyWith(background: Paint()..color = c));
+  static TextStyleHtml _tsb(TextStyleHtml? p, Color c) =>
+      p!.copyWith(style: p.style!.copyWith(background: Paint()..color = c));
 }

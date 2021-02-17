@@ -16,7 +16,7 @@ final hwKey = GlobalKey<State<HtmlWidget>>();
 
 const kGoldenFilePrefix = '../../../demo_app/test';
 
-Widget buildCurrentState() {
+Widget? buildCurrentState() {
   final hws = hwKey.currentState;
   if (hws == null) return null;
 
@@ -26,13 +26,13 @@ Widget buildCurrentState() {
 
 Future<Widget> buildFutureBuilder(
   FutureBuilder<Widget> fb, {
-  bool withData = true,
+  bool? withData = true,
 }) async {
   final hws = hwKey.currentState;
   if (hws == null) return Future.value(null);
 
-  final data = await fb.future;
-  final snapshot = withData
+  final data = await fb.future!;
+  final snapshot = withData!
       ? AsyncSnapshot.withData(ConnectionState.done, data)
       : AsyncSnapshot<Widget>.nothing();
   return fb.builder(hws.context, snapshot);
@@ -40,17 +40,17 @@ Future<Widget> buildFutureBuilder(
 
 Future<String> explain(
   WidgetTester tester,
-  String html, {
-  bool buildFutureBuilderWithData = true,
-  String Function(Explainer, Widget) explainer,
-  Widget hw,
+  String? html, {
+  bool? buildFutureBuilderWithData = true,
+  String Function(Explainer, Widget?)? explainer,
+  Widget? hw,
   bool rtl = false,
-  TextStyle textStyle,
+  TextStyle? textStyle,
   bool useExplainer = true,
 }) async {
   assert((html == null) != (hw == null));
   hw ??= HtmlWidget(
-    html,
+    html!,
     key: hwKey,
     textStyle: textStyle,
   );
@@ -72,7 +72,7 @@ Future<String> explain(
                   ),
               child: Directionality(
                 textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
-                child: hw,
+                child: hw!,
               ),
             ),
           ),
@@ -89,13 +89,13 @@ Future<String> explain(
 }
 
 Future<String> explainWithoutPumping({
-  bool buildFutureBuilderWithData = true,
-  String Function(Explainer, Widget) explainer,
+  bool? buildFutureBuilderWithData = true,
+  String Function(Explainer, Widget?)? explainer,
   bool useExplainer = true,
 }) async {
   if (!useExplainer) {
     final sb = StringBuffer();
-    hwKey.currentContext.visitChildElements(
+    hwKey.currentContext!.visitChildElements(
         (e) => sb.writeln(e.toDiagnosticsNode().toStringDeep()));
     var str = sb.toString();
     str = str.replaceAll(RegExp(r': [A-Z][A-Za-z]+\.'), ': '); // enums
@@ -131,7 +131,7 @@ Future<String> explainWithoutPumping({
     str = str.replaceAll(RegExp(r'(, )?textDirection: ltr+'), '');
 
     // delete leading comma (because of property trimmings)
-    str = str.replaceAllMapped(RegExp(r'(\w+\(), '), (m) => m.group(1));
+    str = str.replaceAllMapped(RegExp(r'(\w+\(), '), (m) => m.group(1)!);
     str = simplifyHashCode(str);
     return str;
   }
@@ -147,7 +147,7 @@ Future<String> explainWithoutPumping({
   }
 
   var explained = Explainer(
-    hwKey.currentContext,
+    hwKey.currentContext!,
     explainer: explainer,
   ).explain(built);
   if (isFutureBuilder) explained = '[FutureBuilder:$explained]';
@@ -161,7 +161,7 @@ final _explainMarginRegExp = RegExp(r'^\[Column:(dir=rtl,)?children='
     r'\[RichText:(dir=rtl,)?\(:x\)\]'
     r'\]$');
 
-Future<String> explainMargin(
+Future<String?> explainMargin(
   WidgetTester tester,
   String html, {
   bool rtl = false,
@@ -177,7 +177,7 @@ Future<String> explainMargin(
 }
 
 String simplifyHashCode(String str) {
-  final hashCodes = <String>[];
+  final hashCodes = <String?>[];
   return str.replaceAllMapped(RegExp(r'#(\d+)'), (match) {
     final hashCode = match.group(1);
     var indexOf = hashCodes.indexOf(hashCode);
@@ -209,15 +209,15 @@ Future<int> tapText(WidgetTester tester, String data) async {
 
 class Explainer {
   final BuildContext context;
-  final String Function(Explainer, Widget) explainer;
+  final String Function(Explainer, Widget?)? explainer;
   final TextStyle _defaultStyle;
 
   Explainer(this.context, {this.explainer})
       : _defaultStyle = DefaultTextStyle.of(context).style;
 
-  String explain(Widget widget) => _widget(widget);
+  String explain(Widget? widget) => _widget(widget);
 
-  String _alignment(Alignment a) => a != null
+  String? _alignment(Alignment? a) => a != null
       ? 'alignment=${a.toString().replaceFirst('Alignment.', '')}'
       : null;
 
@@ -225,7 +225,7 @@ class Explainer {
       ? "${s.width}@${s.style.toString().replaceFirst('BorderStyle.', '')}${_color(s.color)}"
       : 'none';
 
-  String _boxBorder(BoxBorder b) {
+  String _boxBorder(BoxBorder? b) {
     if (b == null) return '';
 
     final top = _borderSide(b.top);
@@ -243,11 +243,11 @@ class Explainer {
   String _boxConstraints(BoxConstraints bc) =>
       'constraints=${bc.toString().replaceAll('BoxConstraints', '')}';
 
-  List<String> _boxDecoration(BoxDecoration d) {
+  List<String> _boxDecoration(BoxDecoration? d) {
     final attr = <String>[];
 
-    if (d?.color != null) attr.add('bg=${_color(d.color)}');
-    if (d?.border != null) attr.add('border=${_boxBorder(d.border)}');
+    if (d?.color != null) attr.add('bg=${_color(d!.color!)}');
+    if (d?.border != null) attr.add('border=${_boxBorder(d!.border)}');
 
     return attr;
   }
@@ -292,7 +292,7 @@ class Explainer {
     return '[Image:$buffer]';
   }
 
-  String _inlineSpan(InlineSpan inlineSpan, {TextStyle parentStyle}) {
+  String _inlineSpan(InlineSpan inlineSpan, {TextStyle? parentStyle}) {
     if (inlineSpan is WidgetSpan) {
       var s = _widget(inlineSpan.child);
       if (inlineSpan.alignment != PlaceholderAlignment.baseline) {
@@ -308,12 +308,12 @@ class Explainer {
     final text = textSpan?.text ?? '';
     final children = textSpan?.children
             ?.map((c) => _inlineSpan(c, parentStyle: textSpan.style))
-            ?.join('') ??
+            .join('') ??
         '';
 
     final recognizerSb = StringBuffer();
     if (textSpan?.recognizer != null) {
-      final recognizer = textSpan.recognizer;
+      final recognizer = textSpan!.recognizer;
       if (recognizer is TapGestureRecognizer) {
         if (recognizer.onTap != null) recognizerSb.write('+onTap');
         if (recognizer.onTapCancel != null) recognizerSb.write('+onTapCancel');
@@ -329,9 +329,7 @@ class Explainer {
   }
 
   String _limitBox(LimitedBox box) {
-    var s = '';
-    if (box.maxHeight != null) s += 'h=${box.maxHeight},';
-    if (box.maxWidth != null) s += 'w=${box.maxWidth},';
+    var s = 'h=${box.maxHeight},w=${box.maxWidth}';
     return s;
   }
 
@@ -349,33 +347,33 @@ class Explainer {
     return '[$clazz:$size$comma$child]';
   }
 
-  String _textAlign(TextAlign textAlign) =>
+  String? _textAlign(TextAlign? textAlign) =>
       (textAlign != null && textAlign != TextAlign.start)
           ? 'align=${textAlign.toString().replaceAll('TextAlign.', '')}'
           : null;
 
-  String _textDirection(TextDirection textDirection) =>
+  String? _textDirection(TextDirection? textDirection) =>
       (textDirection != null && textDirection != TextDirection.ltr)
           ? 'dir=${textDirection.toString().replaceAll('TextDirection.', '')}'
           : null;
 
-  String _textOverflow(TextOverflow textOverflow) => (textOverflow != null &&
+  String? _textOverflow(TextOverflow? textOverflow) => (textOverflow != null &&
           textOverflow != TextOverflow.clip)
       ? 'overflow=${textOverflow.toString().replaceAll('TextOverflow.', '')}'
       : null;
 
-  String _textStyle(TextStyle style, TextStyle parent) {
+  String _textStyle(TextStyle? style, TextStyle parent) {
     var s = '';
     if (style == null) {
       return s;
     }
 
     if (style.background != null) {
-      s += 'bg=${_color(style.background.color)}';
+      s += 'bg=${_color(style.background!.color)}';
     }
 
     if (style.color != null && style.color != kColor) {
-      s += _color(style.color);
+      s += _color(style.color!);
     }
 
     s += _textStyleDecoration(style, TextDecoration.lineThrough, 'l');
@@ -388,15 +386,15 @@ class Explainer {
 
     if (style.fontFamilyFallback?.isNotEmpty == true &&
         style.fontFamilyFallback != parent.fontFamilyFallback) {
-      s += "+fonts=${style.fontFamilyFallback.join(', ')}";
+      s += "+fonts=${style.fontFamilyFallback!.join(', ')}";
     }
 
     if (style.height != null) {
-      s += '+height=${style.height.toStringAsFixed(1)}';
+      s += '+height=${style.height!.toStringAsFixed(1)}';
     }
 
     if (style.fontSize != parent.fontSize) {
-      s += '@${style.fontSize.toStringAsFixed(1)}';
+      s += '@${style.fontSize!.toStringAsFixed(1)}';
     }
 
     s += _textStyleFontStyle(style);
@@ -430,9 +428,9 @@ class Explainer {
         return '+i';
       case FontStyle.normal:
         return '-i';
+      case null:
+        return '';
     }
-
-    return '';
   }
 
   String _textStyleFontWeight(TextStyle style) {
@@ -444,10 +442,10 @@ class Explainer {
       return '+b';
     }
 
-    return '+w' + FontWeight.values.indexOf(style.fontWeight).toString();
+    return '+w' + FontWeight.values.indexOf(style.fontWeight!).toString();
   }
 
-  String _widget(Widget widget) {
+  String _widget(Widget? widget) {
     final explained = explainer?.call(this, widget);
     if (explained != null) return explained;
 
@@ -471,7 +469,7 @@ class Explainer {
     if (widget is SizedBox) return _sizedBox(widget);
 
     final type = '${widget.runtimeType}';
-    var attr = <String>[];
+    var attr = <String?>[];
 
     final maxLines = widget is RichText
         ? widget.maxLines
@@ -499,7 +497,7 @@ class Explainer {
             : null));
 
     if (widget is Align && widget is! Center) {
-      attr.add(_alignment(widget.alignment));
+      attr.add(_alignment(widget.alignment as Alignment));
     }
 
     if (widget is AspectRatio) {
@@ -508,15 +506,19 @@ class Explainer {
 
     if (widget is ConstrainedBox) attr.add(_boxConstraints(widget.constraints));
 
-    if (widget is Container) attr.addAll(_boxDecoration(widget.decoration));
+    if (widget is Container) {
+      attr.addAll(_boxDecoration(widget.decoration as BoxDecoration?));
+    }
 
     if (widget is CssSizing) attr.addAll(_cssSizing(widget));
 
-    if (widget is DecoratedBox) attr.addAll(_boxDecoration(widget.decoration));
+    if (widget is DecoratedBox) {
+      attr.addAll(_boxDecoration(widget.decoration as BoxDecoration?));
+    }
 
     if (widget is LimitedBox) attr.add(_limitBox(widget));
 
-    if (widget is Padding) attr.add(_edgeInsets(widget.padding));
+    if (widget is Padding) attr.add(_edgeInsets(widget.padding as EdgeInsets));
 
     if (widget is Positioned) {
       attr.add('(${widget.top},${widget.right},'
@@ -565,11 +567,11 @@ class Explainer {
     return '[$type${attrStr.isNotEmpty ? ':$attrStr' : ''}]';
   }
 
-  String _widgetChild(Widget widget) =>
+  String? _widgetChild(Widget? widget) =>
       widget != null ? 'child=${_widget(widget)}' : null;
 
-  String _widgetChildren(Iterable<Widget> widgets) =>
-      widgets?.isNotEmpty == true
+  String? _widgetChildren(Iterable<Widget> widgets) =>
+      widgets.isNotEmpty == true
           ? 'children=${widgets.map(_widget).join(',')}'
           : null;
 }

@@ -8,18 +8,18 @@ class TagRuby {
   final BuildMetadata rubyMeta;
   final WidgetFactory wf;
 
-  BuildOp _rubyOp;
-  BuildOp _rtOp;
+  BuildOp? _rubyOp;
+  BuildOp? _rtOp;
 
   TagRuby(this.wf, this.rubyMeta);
 
-  BuildOp get op {
+  BuildOp? get op {
     _rubyOp ??= BuildOp(onChild: onChild, onTree: onTree);
     return _rubyOp;
   }
 
   void onChild(BuildMetadata childMeta) {
-    final e = childMeta.element;
+    final e = childMeta.element!;
     if (e.parent != rubyMeta.element) return;
 
     switch (e.localName) {
@@ -30,7 +30,7 @@ class TagRuby {
         _rtOp ??= BuildOp(
           onTree: (rtMeta, rtTree) {
             if (rtTree.isEmpty) return;
-            final rtBit = _RtBit(rtTree, rtTree.tsb, rtMeta, rtTree.copyWith());
+            final rtBit = _RtBit(rtTree, rtTree.tsb, rtMeta, rtTree.copyWith() as BuildTree);
             rtTree.replaceWith(rtBit);
           },
         );
@@ -54,12 +54,12 @@ class TagRuby {
         continue;
       }
 
-      final rtBit = bit as _RtBit;
+      final rtBit = bit;
       final rtTree = rtBit.tree;
       final rubyTree = tree.sub();
       final placeholder = WidgetPlaceholder<List<BuildTree>>([rubyTree, rtTree])
         ..wrapWith((context, __) {
-          final tsh = rubyTree.tsb.build(context);
+          final tsh = rubyTree.tsb!.build(context);
 
           final ruby = wf.buildColumnWidget(
               rubyMeta, tsh, rubyTree.build().toList(growable: false));
@@ -86,13 +86,13 @@ class _RtBit extends BuildBit<Null, BuildTree> {
   final BuildMetadata meta;
   final BuildTree tree;
 
-  _RtBit(BuildTree parent, TextStyleBuilder tsb, this.meta, this.tree)
+  _RtBit(BuildTree? parent, TextStyleBuilder? tsb, this.meta, this.tree)
       : super(parent, tsb);
 
   @override
   BuildTree buildBit(Null _) => tree;
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _RtBit(parent ?? this.parent, tsb ?? this.tsb, meta, tree);
 }

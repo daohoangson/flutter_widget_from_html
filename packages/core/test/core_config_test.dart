@@ -2,7 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
-import 'package:network_image_mock/network_image_mock.dart';
+
+import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart' as helper;
 
@@ -11,7 +12,7 @@ Future<String> explain(WidgetTester t, HtmlWidget hw) =>
 
 void main() {
   group('buildAsync', () {
-    final explain = (WidgetTester tester, String html, bool buildAsync) =>
+    final explain = (WidgetTester tester, String html, bool? buildAsync) =>
         tester.runAsync(() => helper.explain(tester, null,
             hw: HtmlWidget(
               html,
@@ -39,11 +40,13 @@ void main() {
   });
 
   group('buildAsyncBuilder', () {
-    final explain = (
+    final Future<String?> Function(WidgetTester, String,
+        {Widget Function(BuildContext, AsyncSnapshot<Widget>) buildAsyncBuilder,
+        bool withData}) explain = (
       WidgetTester tester,
       String html, {
-      AsyncWidgetBuilder<Widget> buildAsyncBuilder,
-      bool withData,
+      AsyncWidgetBuilder<Widget>? buildAsyncBuilder,
+      bool? withData,
     }) =>
         tester.runAsync(() => helper.explain(tester, null,
             buildFutureBuilderWithData: withData,
@@ -77,7 +80,7 @@ void main() {
     group('custom', () {
       final buildAsyncBuilder =
           (BuildContext _, AsyncSnapshot<Widget> snapshot) =>
-              snapshot.hasData ? snapshot.data : Text('No data');
+              snapshot.data ?? Text('No data');
 
       testWidgets('renders data', (WidgetTester tester) async {
         final html = 'Foo';
@@ -104,15 +107,20 @@ void main() {
   });
 
   group('enableCaching', () {
-    final explain = (
+    final Future<String> Function(WidgetTester, String, bool,
+        {Uri baseUrl,
+        bool buildAsync,
+        Color hyperlinkColor,
+        RebuildTriggers rebuildTriggers,
+        TextStyle textStyle}) explain = (
       WidgetTester tester,
       String html,
       bool enableCaching, {
-      Uri baseUrl,
-      bool buildAsync,
+      Uri? baseUrl,
+      bool? buildAsync,
       Color hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
-      RebuildTriggers rebuildTriggers,
-      TextStyle textStyle,
+      RebuildTriggers? rebuildTriggers,
+      TextStyle? textStyle,
     }) =>
         helper.explain(tester, null,
             hw: HtmlWidget(
@@ -126,7 +134,7 @@ void main() {
               textStyle: textStyle,
             ));
 
-    final _expect = (Widget built1, Widget built2, Matcher matcher) {
+    final _expect = (Widget? built1, Widget? built2, Matcher matcher) {
       final widget1 = (built1 as TshWidget).child;
       final widget2 = (built2 as TshWidget).child;
       expect(widget1 == widget2, matcher);
@@ -250,7 +258,7 @@ void main() {
 
     testWidgets(
       'renders with value',
-      (tester) => mockNetworkImagesFor(() async {
+      (tester) => mockNetworkImages(() async {
         final explained = await explain(
           tester,
           HtmlWidget(html, baseUrl: baseUrl, key: helper.hwKey),

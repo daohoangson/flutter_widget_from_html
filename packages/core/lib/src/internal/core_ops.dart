@@ -64,28 +64,28 @@ String convertColorToHex(Color value) {
 
 void wrapTree(
   BuildTree tree, {
-  BuildBit Function(BuildTree parent) append,
-  BuildBit Function(BuildTree parent) prepend,
+  BuildBit Function(BuildTree? parent)? append,
+  BuildBit Function(BuildTree? parent)? prepend,
 }) {
   if (tree.isEmpty) {
     if (prepend != null) {
       final prependBit = prepend(tree);
-      if (prependBit != null) tree.add(prependBit);
+      tree.add(prependBit);
     }
     if (append != null) {
       final appendBit = append(tree);
-      if (appendBit != null) tree.add(appendBit);
+      tree.add(appendBit);
     }
     return;
   }
 
   if (prepend != null) {
-    final first = tree.first;
-    prepend(first.parent)?.insertBefore(first);
+    final first = tree.first!;
+    prepend(first.parent).insertBefore(first);
   }
 
   if (append != null) {
-    final last = tree.last;
-    append(last.parent)?.insertAfter(last);
+    final last = tree.last!;
+    append(last.parent).insertAfter(last);
   }
 }

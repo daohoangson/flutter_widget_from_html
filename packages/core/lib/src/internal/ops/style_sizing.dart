@@ -26,12 +26,12 @@ class StyleSizing {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree) return;
+          if (meta.willBuildSubtree!) return;
 
           final input = _parse(meta);
           if (input == null) return;
 
-          WidgetPlaceholder widget;
+          WidgetPlaceholder? widget;
           for (final b in tree.bits) {
             if (b is WidgetBit) {
               if (widget != null) return;
@@ -41,25 +41,25 @@ class StyleSizing {
             }
           }
 
-          widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb()));
+          widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb()!));
         },
         onWidgets: (meta, widgets) {
-          if (!meta.willBuildSubtree) return widgets;
+          if (!meta.willBuildSubtree!) return widgets;
 
           final input = _parse(meta);
           if (input == null) return widgets;
           return listOrNull(wf
               .buildColumnPlaceholder(meta, widgets)
-              ?.wrapWith((c, w) => _build(c, w, input, meta.tsb())));
+              ?.wrapWith((c, w) => _build(c, w, input, meta.tsb()!)));
         },
         onWidgetsIsOptional: true,
         priority: kPriority5k,
       );
 
-  _StyleSizingInput _parse(BuildMetadata meta) {
-    CssLength maxHeight, maxWidth, minHeight, minWidth;
-    Axis preferredAxis;
-    CssLength preferredHeight, preferredWidth;
+  _StyleSizingInput? _parse(BuildMetadata meta) {
+    CssLength? maxHeight, maxWidth, minHeight, minWidth;
+    Axis? preferredAxis;
+    CssLength? preferredHeight, preferredWidth;
 
     for (final style in meta.styles) {
       switch (style.key) {
@@ -94,7 +94,7 @@ class StyleSizing {
         preferredWidth == null) return null;
 
     if (preferredWidth == null &&
-        meta.buildOps.whereType<DisplayBlockOp>().isNotEmpty) {
+        meta.buildOps!.whereType<DisplayBlockOp>().isNotEmpty) {
       // `display: block` implies a 100% width
       // but it MUST NOT reset width value if specified
       // we need to keep track of block width to calculate contraints correctly
@@ -129,7 +129,7 @@ class StyleSizing {
     );
   }
 
-  static CssSizingValue _getValue(CssLength length, TextStyleHtml tsh) {
+  static CssSizingValue? _getValue(CssLength? length, TextStyleHtml? tsh) {
     if (length == null) return null;
 
     final value = length.getValue(tsh);
@@ -148,13 +148,13 @@ class StyleSizing {
 
 @immutable
 class _StyleSizingInput {
-  final CssLength maxHeight;
-  final CssLength maxWidth;
-  final CssLength minHeight;
-  final CssLength minWidth;
-  final Axis preferredAxis;
-  final CssLength preferredHeight;
-  final CssLength preferredWidth;
+  final CssLength? maxHeight;
+  final CssLength? maxWidth;
+  final CssLength? minHeight;
+  final CssLength? minWidth;
+  final Axis? preferredAxis;
+  final CssLength? preferredHeight;
+  final CssLength? preferredWidth;
 
   _StyleSizingInput({
     this.maxHeight,

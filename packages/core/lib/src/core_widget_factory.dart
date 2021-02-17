@@ -12,42 +12,40 @@ import 'core_html_widget.dart';
 
 /// A factory to build widgets.
 class WidgetFactory {
-  BuildOp _styleBgColor;
-  BuildOp _styleBlock;
-  BuildOp _styleBorder;
-  BuildOp _styleDisplayNone;
-  BuildOp _styleMargin;
-  BuildOp _stylePadding;
-  BuildOp _styleSizing;
-  BuildOp _styleTextDecoration;
-  BuildOp _styleVerticalAlign;
-  BuildOp _tagA;
-  BuildOp _tagBr;
-  BuildOp _tagFont;
-  BuildOp _tagHr;
-  BuildOp _tagImg;
-  BuildOp _tagPre;
-  BuildOp _tagQ;
-  TextStyleHtml Function(TextStyleHtml, String) __tsbFontSize;
-  TextStyleHtml Function(TextStyleHtml, String) _tsbLineHeight;
-  State _state;
+  BuildOp? _styleBgColor;
+  BuildOp? _styleBlock;
+  BuildOp? _styleBorder;
+  BuildOp? _styleDisplayNone;
+  BuildOp? _styleMargin;
+  BuildOp? _stylePadding;
+  BuildOp? _styleSizing;
+  BuildOp? _styleTextDecoration;
+  BuildOp? _styleVerticalAlign;
+  BuildOp? _tagA;
+  BuildOp? _tagBr;
+  BuildOp? _tagFont;
+  BuildOp? _tagHr;
+  BuildOp? _tagImg;
+  BuildOp? _tagPre;
+  BuildOp? _tagQ;
+  TextStyleHtml Function(TextStyleHtml?, String)? __tsbFontSize;
+  TextStyleHtml Function(TextStyleHtml?, String)? _tsbLineHeight;
+  State? _state;
 
-  HtmlWidget get _widget => _state?.widget;
+  HtmlWidget? get _widget => _state?.widget as HtmlWidget?;
 
   /// Builds [Align].
   Widget buildAlign(
-          BuildMetadata meta, Widget child, AlignmentGeometry alignment) =>
+          BuildMetadata meta, Widget child, AlignmentGeometry? alignment) =>
       alignment == null ? child : Align(alignment: alignment, child: child);
 
   /// Builds [AspectRatio].
   Widget buildAspectRatio(
-          BuildMetadata meta, Widget child, double aspectRatio) =>
-      aspectRatio == null
-          ? child
-          : AspectRatio(aspectRatio: aspectRatio, child: child);
+          BuildMetadata meta, Widget? child, double aspectRatio) =>
+      AspectRatio(aspectRatio: aspectRatio, child: child);
 
   /// Builds primary column (body).
-  WidgetPlaceholder buildBody(BuildMetadata meta, Iterable<Widget> children) =>
+  WidgetPlaceholder? buildBody(BuildMetadata meta, Iterable<Widget> children) =>
       buildColumnPlaceholder(meta, children, trimMarginVertical: true);
 
   /// Builds [border] with [Container] or [DecoratedBox].
@@ -55,7 +53,7 @@ class WidgetFactory {
   /// See https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
   /// for more information regarding `content-box` (the default)
   /// and `border-box` (set [isBorderBox] to use).
-  Widget buildBorder(BuildMetadata meta, Widget child, BoxBorder border,
+  Widget buildBorder(BuildMetadata meta, Widget child, BoxBorder? border,
           {bool isBorderBox = false}) =>
       border == null
           ? child
@@ -70,12 +68,12 @@ class WidgetFactory {
                 );
 
   /// Builds column placeholder.
-  WidgetPlaceholder buildColumnPlaceholder(
+  WidgetPlaceholder? buildColumnPlaceholder(
     BuildMetadata meta,
     Iterable<Widget> children, {
     bool trimMarginVertical = false,
   }) {
-    if (children?.isNotEmpty != true) return null;
+    if (children.isEmpty) return null;
 
     if (children.length == 1) {
       final child = children.first;
@@ -84,7 +82,7 @@ class WidgetFactory {
           return child;
         }
       } else {
-        return child;
+        return child as WidgetPlaceholder?;
       }
     }
 
@@ -97,16 +95,16 @@ class WidgetFactory {
   }
 
   /// Builds [Column].
-  Widget buildColumnWidget(
-      BuildMetadata meta, TextStyleHtml tsh, List<Widget> children) {
-    if (children?.isNotEmpty != true) return null;
+  Widget? buildColumnWidget(
+      BuildMetadata meta, TextStyleHtml? tsh, List<Widget> children) {
+    if (children.isEmpty ) return null;
     if (children.length == 1) return children.first;
 
     return Column(
       children: children,
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      textDirection: tsh.textDirection,
+      textDirection: tsh!.textDirection,
     );
   }
 
@@ -114,16 +112,14 @@ class WidgetFactory {
   Widget buildDecoratedBox(
     BuildMetadata meta,
     Widget child, {
-    Color color,
+    Color? color,
   }) =>
-      child != null
-          ? DecoratedBox(
-              child: child,
-              decoration: BoxDecoration(
-                color: color,
-              ),
-            )
-          : child;
+      DecoratedBox(
+        child: child,
+        decoration: BoxDecoration(
+          color: color,
+        ),
+      );
 
   /// Builds 1-pixel-height divider.
   Widget buildDivider(BuildMetadata meta) => const DecoratedBox(
@@ -134,19 +130,17 @@ class WidgetFactory {
   /// Builds [GestureDetector].
   Widget buildGestureDetector(
           BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
-      onTap == null ? child : GestureDetector(child: child, onTap: onTap);
+      GestureDetector(child: child, onTap: onTap);
 
   /// Builds horizontal scroll view.
   Widget buildHorizontalScrollView(BuildMetadata meta, Widget child) =>
       SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
 
   /// Builds [Image] from [provider].
-  Widget buildImage(BuildMetadata meta, Object provider, ImageMetadata data) {
-    if (provider == null) return null;
-
-    Widget built;
+  Widget? buildImage(BuildMetadata meta, Object provider, ImageMetadata data) {
+    Widget? built;
     if (provider is ImageProvider) {
-      final semanticLabel = data?.alt ?? data?.title;
+      final semanticLabel = data.alt ?? data.title;
       built = Image(
         errorBuilder: (_, error, __) {
           print('$provider error: $error');
@@ -170,7 +164,7 @@ class WidgetFactory {
 
   /// Builds [Padding].
   Widget buildPadding(BuildMetadata meta, Widget child, EdgeInsets padding) =>
-      padding == null || padding == const EdgeInsets.all(0)
+     padding == const EdgeInsets.all(0)
           ? child
           : Padding(child: child, padding: padding);
 
@@ -184,7 +178,7 @@ class WidgetFactory {
       );
 
   /// Builds [RichText].
-  Widget buildText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) =>
+  Widget buildText(BuildMetadata? meta, TextStyleHtml? tsh, InlineSpan text) =>
       RichText(
         overflow: tsh?.textOverflow ?? TextOverflow.clip,
         text: text,
@@ -197,9 +191,9 @@ class WidgetFactory {
       );
 
   /// Prepares [GestureTapCallback].
-  GestureTapCallback gestureTapCallback(String url) => url != null
-      ? () => _widget.onTapUrl != null
-          ? _widget.onTapUrl(url)
+  GestureTapCallback? gestureTapCallback(String? url) => url != null
+      ? () => _widget!.onTapUrl != null
+          ? _widget!.onTapUrl!(url)
           : print('[HtmlWidget] onTapUrl($url)')
       : null;
 
@@ -243,7 +237,7 @@ class WidgetFactory {
   /// Returns marker for the specified [type] at index [i].
   ///
   /// Note: `circle`, `disc` and `square` type won't trigger this method
-  String getListStyleMarker(String type, int i) {
+  String getListStyleMarker(String? type, int i) {
     switch (type) {
       case kCssListStyleTypeAlphaLower:
       case kCssListStyleTypeAlphaLatinLower:
@@ -274,7 +268,7 @@ class WidgetFactory {
     return '';
   }
 
-  String _getListStyleMarkerRoman(int i) {
+  String? _getListStyleMarkerRoman(int i) {
     // TODO: find some lib to generate programatically
     const map = <int, String>{
       1: 'I',
@@ -293,8 +287,7 @@ class WidgetFactory {
   }
 
   /// Returns [ImageProvider].
-  Object imageProvider(ImageSource imgSrc) {
-    if (imgSrc == null) return null;
+  Object? imageProvider(ImageSource imgSrc) {
     final url = imgSrc.url;
 
     if (url.startsWith('asset:')) {
@@ -312,44 +305,44 @@ class WidgetFactory {
     return _imageFromUrl(url);
   }
 
-  Object _imageFromAsset(String url) {
-    final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
+  Object? _imageFromAsset(String url) {
+    final uri = Uri.parse(url);
     final assetName = uri.path;
-    if (assetName?.isNotEmpty != true) return null;
+    if (assetName.isNotEmpty != true) return null;
 
-    final package = uri.queryParameters?.containsKey('package') == true
+    final package = uri.queryParameters.containsKey('package') == true
         ? uri.queryParameters['package']
         : null;
 
     return AssetImage(assetName, package: package);
   }
 
-  Object _imageFromDataUri(String dataUri) {
+  Object? _imageFromDataUri(String dataUri) {
     final bytes = bytesFromDataUri(dataUri);
     if (bytes == null) return null;
 
     return MemoryImage(bytes);
   }
 
-  Object _imageFromFileUri(String url) {
-    final uri = url?.isNotEmpty == true ? Uri.tryParse(url) : null;
+  Object? _imageFromFileUri(String url) {
+    final uri = url.isNotEmpty ? Uri.tryParse(url) : null;
     final filePath = uri?.toFilePath();
     if (filePath?.isNotEmpty != true) return null;
 
-    return FileImage(File(filePath));
+    return FileImage(File(filePath!));
   }
 
-  Object _imageFromUrl(String url) =>
-      url?.isNotEmpty == true ? NetworkImage(url) : null;
+  Object? _imageFromUrl(String url) =>
+      url.isNotEmpty ? NetworkImage(url) : null;
 
   /// Prepares the root [TextStyleBuilder].
-  void onRoot(TextStyleBuilder rootTsb) {}
+  void onRoot(TextStyleBuilder? rootTsb) {}
 
   /// Parses [meta] for build ops and text styles.
   void parse(BuildMetadata meta) {
-    final attrs = meta.element.attributes;
+    final attrs = meta.element!.attributes;
 
-    switch (meta.element.localName) {
+    switch (meta.element!.localName) {
       case kTagA:
         _tagA ??= TagA(this, () => _widget?.hyperlinkColor).buildOp;
         meta.register(_tagA);
@@ -426,8 +419,8 @@ class WidgetFactory {
         _tagPre ??= BuildOp(
           defaultStyles: (_) =>
               const {kCssFontFamily: '$kTagCodeFont1, $kTagCodeFont2'},
-          onTree: (meta, tree) =>
-              tree.replaceWith(TextBit(tree, meta.element.text, tsb: tree.tsb)),
+          onTree: (meta, tree) => tree
+              .replaceWith(TextBit(tree, meta.element!.text, tsb: tree.tsb)),
           onWidgets: (meta, widgets) => listOrNull(
               buildColumnPlaceholder(meta, widgets)
                   ?.wrapWith((_, w) => buildHorizontalScrollView(meta, w))),
@@ -617,7 +610,7 @@ class WidgetFactory {
   }
 
   /// Parses inline style [key] and [value] pair.
-  void parseStyle(BuildMetadata meta, String key, String value) {
+  void parseStyle(BuildMetadata meta, String key, String? value) {
     switch (key) {
       case kCssBackground:
       case kCssBackgroundColor:
@@ -635,8 +628,8 @@ class WidgetFactory {
         break;
 
       case kCssFontFamily:
-        final list = TextStyleOps.fontFamilyTryParse(value);
-        if (list != null) meta.tsb(TextStyleOps.fontFamily, list);
+        final list = TextStyleOps.fontFamilyTryParse(value!);
+        meta.tsb(TextStyleOps.fontFamily, list);
         break;
 
       case kCssFontSize:
@@ -670,7 +663,7 @@ class WidgetFactory {
 
       case kCssMaxLines:
       case kCssMaxLinesWebkitLineClamp:
-        final maxLines = value == kCssMaxLinesNone ? -1 : int.tryParse(value);
+        final maxLines = value == kCssMaxLinesNone ? -1 : int.tryParse(value!);
         if (maxLines != null) meta.tsb(TextStyleOps.maxLines, maxLines);
         break;
 
@@ -724,7 +717,7 @@ class WidgetFactory {
   }
 
   /// Parses display inline style.
-  void parseStyleDisplay(BuildMetadata meta, String value) {
+  void parseStyleDisplay(BuildMetadata meta, String? value) {
     switch (value) {
       case kCssDisplayBlock:
         _styleBlock ??= DisplayBlockOp(this);
@@ -750,16 +743,16 @@ class WidgetFactory {
   /// Resets for a new build.
   @mustCallSuper
   void reset(State state) {
-    final widget = state?.widget;
+    final widget = state.widget;
     if (widget is HtmlWidget) {
       _state = state;
     }
   }
 
   /// Resolves full URL with [HtmlWidget.baseUrl] if available.
-  String urlFull(String url) {
+  String? urlFull(String? url) {
     if (url?.isNotEmpty != true) return null;
-    if (url.startsWith('data:')) return url;
+    if (url!.startsWith('data:')) return url;
 
     final uri = Uri.tryParse(url);
     if (uri == null) return null;
@@ -771,7 +764,7 @@ class WidgetFactory {
     return baseUrl.resolveUri(uri).toString();
   }
 
-  TextStyleHtml Function(TextStyleHtml, String) get _tsbFontSize {
+  TextStyleHtml Function(TextStyleHtml?, String)? get _tsbFontSize {
     __tsbFontSize ??= TextStyleOps.fontSize(this);
     return __tsbFontSize;
   }

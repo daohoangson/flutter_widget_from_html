@@ -37,11 +37,11 @@ class TagTable {
   final _captions = <BuildTree>[];
   final _data = _TagTableData();
 
-  BuildOp _tableOp;
+  BuildOp? _tableOp;
 
   TagTable(this.wf, this.tableMeta);
 
-  BuildOp get op {
+  BuildOp? get op {
     _tableOp = BuildOp(
       onChild: onChild,
       onTree: onTree,
@@ -52,10 +52,10 @@ class TagTable {
   }
 
   void onChild(BuildMetadata childMeta) {
-    if (childMeta.element.parent != tableMeta.element) return;
+    if (childMeta.element!.parent != tableMeta.element) return;
 
     final which = _getCssDisplayValue(childMeta);
-    _TagTableDataGroup latestGroup;
+    _TagTableDataGroup? latestGroup;
     switch (which) {
       case kCssDisplayTableRow:
         latestGroup ??= _data.body;
@@ -104,7 +104,7 @@ class TagTable {
     _buildHtmlTableCells(_data.footer, occupations, children);
     if (children.isEmpty) return [];
 
-    CssLength borderSpacing;
+    CssLength? borderSpacing;
     var collapseBorder = false;
     for (final style in tableMeta.styles) {
       switch (style.key) {
@@ -129,7 +129,7 @@ class TagTable {
 
     return [
       WidgetPlaceholder<BuildMetadata>(tableMeta).wrapWith((context, _) {
-        final tsh = tableMeta.tsb().build(context);
+        final tsh = tableMeta.tsb()!.build(context);
         final border = tableBorder?.getValue(tsh);
         final spacing = borderSpacing?.getValue(tsh) ?? 0.0;
 
@@ -149,7 +149,7 @@ class TagTable {
 
   static BuildOp cellPaddingOp(double px) => BuildOp(
       onChild: (meta) =>
-          (meta.element.localName == 'td' || meta.element.localName == 'th')
+          (meta.element!.localName == 'td' || meta.element!.localName == 'th')
               ? meta[kCssPadding] = '${px}px'
               : null);
 
@@ -160,7 +160,7 @@ class TagTable {
             kCssBorderSpacing: '${borderSpacing}px',
           },
       onChild: (meta) =>
-          (meta.element.localName == 'td' || meta.element.localName == 'th')
+          (meta.element!.localName == 'td' || meta.element!.localName == 'th')
               ? meta[kCssBorder] = '${border}px solid black'
               : null);
 
@@ -174,15 +174,15 @@ class TagTable {
 
       for (final cell in row.cells) {
         var columnStart = 0;
-        while (occupations[rowStart].containsKey(columnStart)) {
+        while (occupations[rowStart]!.containsKey(columnStart)) {
           columnStart++;
         }
 
-        final columnSpan = cell.colspan > 0 ? cell.colspan : 1;
+        final columnSpan = cell.colspan! > 0 ? cell.colspan! : 1;
         final rowSpan = min(
             rowSpanMax,
-            cell.rowspan > 0
-                ? cell.rowspan
+            cell.rowspan! > 0
+                ? cell.rowspan!
                 : cell.rowspan == 0
                     ? group.rows.length
                     : 1);
@@ -190,13 +190,13 @@ class TagTable {
           final row = rowStart + r;
           occupations[row] ??= {};
           for (var c = 0; c < columnSpan; c++) {
-            occupations[row][columnStart + c] = true;
+            occupations[row]![columnStart + c] = true;
           }
         }
 
         cell.meta.row = rowStart;
         cells.add(HtmlTableCell(
-          child: cell.child,
+          child: cell.child!,
           columnSpan: columnSpan,
           columnStart: columnStart,
           rowSpan: rowSpan,
@@ -206,9 +206,9 @@ class TagTable {
     }
   }
 
-  static String _getCssDisplayValue(BuildMetadata meta) {
-    String value;
-    switch (meta.element.localName) {
+  static String? _getCssDisplayValue(BuildMetadata meta) {
+    String? value;
+    switch (meta.element!.localName) {
       case kTagTableRow:
         value = kCssDisplayTableRow;
         break;
@@ -233,7 +233,7 @@ class TagTable {
       return value;
     }
 
-    for (final pair in meta.element.styles.reversed) {
+    for (final pair in meta.element!.styles.reversed) {
       if (pair.key == kCssDisplay) {
         return pair.value;
       }
@@ -246,12 +246,12 @@ class TagTable {
 extension _BuildMetadataExtension on BuildMetadata {
   static final _rows = Expando<int>();
 
-  set row(int v) => _rows[this] = v;
-  int get row => _rows[this];
+  set row(int? v) => _rows[this] = v;
+  int? get row => _rows[this];
 }
 
 class _TableCaption extends SingleChildRenderObjectWidget {
-  _TableCaption(Widget child, {Key key}) : super(child: child, key: key);
+  _TableCaption(Widget child, {Key? key}) : super(child: child, key: key);
 
   @override
   RenderObject createRenderObject(BuildContext context) => RenderProxyBox();
@@ -262,21 +262,21 @@ class _TagTableRow {
   final _TagTableDataRow row;
   final BuildMetadata rowMeta;
 
-  BuildOp op;
-  BuildOp _cellOp;
-  BuildOp _valignBaselineOp;
+  BuildOp? op;
+  BuildOp? _cellOp;
+  BuildOp? _valignBaselineOp;
 
   _TagTableRow(this.parent, this.rowMeta, this.row) {
     op = BuildOp(onChild: onChild);
   }
 
   void onChild(BuildMetadata childMeta) {
-    if (childMeta.element.parent != rowMeta.element) return;
+    if (childMeta.element!.parent != rowMeta.element) return;
     if (TagTable._getCssDisplayValue(childMeta) != kCssDisplayTableCell) {
       return;
     }
 
-    final attrs = childMeta.element.attributes;
+    final attrs = childMeta.element!.attributes;
     if (attrs.containsKey(kAttributeValign)) {
       childMeta[kCssVerticalAlign] = attrs[kAttributeValign];
     }
@@ -286,7 +286,7 @@ class _TagTableRow {
         final column = parent.wf.buildColumnPlaceholder(cellMeta, widgets);
         if (column == null) return [];
 
-        final attributes = cellMeta.element.attributes;
+        final attributes = cellMeta.element!.attributes;
         row.cells.add(_TagTableDataCell(
           cellMeta,
           child: column,
@@ -329,14 +329,14 @@ class _TagTableRowGroup {
   final List<_TagTableDataRow> rows;
   final BuildMetadata groupMeta;
 
-  BuildOp op;
+  BuildOp? op;
 
   _TagTableRowGroup(this.parent, this.groupMeta, this.rows) {
     op = BuildOp(onChild: onChild);
   }
 
   void onChild(BuildMetadata childMeta) {
-    if (childMeta.element.parent != groupMeta.element) return;
+    if (childMeta.element!.parent != groupMeta.element) return;
     if (TagTable._getCssDisplayValue(childMeta) != kCssDisplayTableRow) {
       return;
     }
@@ -372,10 +372,10 @@ class _TagTableDataRow {
 
 @immutable
 class _TagTableDataCell {
-  final Widget child;
-  final int colspan;
+  final Widget? child;
+  final int? colspan;
   final BuildMetadata meta;
-  final int rowspan;
+  final int? rowspan;
 
   _TagTableDataCell(this.meta, {this.child, this.colspan, this.rowspan});
 }

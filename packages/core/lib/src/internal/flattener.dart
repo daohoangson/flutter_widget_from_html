@@ -4,30 +4,30 @@ import 'package:flutter/widgets.dart';
 import '../core_data.dart';
 import 'margin_vertical.dart';
 
-List<Flattened> flatten(BuildTree tree) => _instance.flatten(tree);
+List<Flattened>? flatten(BuildTree tree) => _instance.flatten(tree);
 
 @immutable
 class Flattened {
-  final SpanBuilder spanBuilder;
-  final Widget widget;
-  final WidgetBuilder widgetBuilder;
+  final SpanBuilder? spanBuilder;
+  final Widget? widget;
+  final WidgetBuilder? widgetBuilder;
 
   Flattened._({this.spanBuilder, this.widget, this.widgetBuilder});
 }
 
-typedef SpanBuilder = InlineSpan Function(BuildContext);
+typedef SpanBuilder = InlineSpan? Function(BuildContext);
 
 final _instance = _Flattener();
 
 class _Flattener {
-  List<Flattened> _flattened;
-  StringBuffer _buffer, _prevBuffer;
-  _Recognizer _recognizer, _prevRecognizer;
-  List<dynamic> _spans;
-  bool _swallowWhitespace;
-  TextStyleBuilder _tsb, _prevTsb;
+  List<Flattened>? _flattened;
+  StringBuffer? _buffer, _prevBuffer;
+  _Recognizer? _recognizer, _prevRecognizer;
+  List<dynamic>? _spans;
+  bool? _swallowWhitespace;
+  TextStyleBuilder? _tsb, _prevTsb;
 
-  List<Flattened> flatten(BuildTree tree) {
+  List<Flattened>? flatten(BuildTree tree) {
     _flattened = [];
 
     _resetLoop(tree.tsb);
@@ -39,7 +39,7 @@ class _Flattener {
     return _flattened;
   }
 
-  void _resetLoop(TextStyleBuilder tsb) {
+  void _resetLoop(TextStyleBuilder? tsb) {
     _buffer = StringBuffer();
     _recognizer = _Recognizer();
     _spans = [];
@@ -65,29 +65,29 @@ class _Flattener {
       // ignore: omit_local_variable_types
       final WidgetBuilder widgetBuilder = (c) => bit.buildBit(c);
       built = widgetBuilder;
-    } else if (bit is BuildBit<GestureRecognizer, dynamic>) {
-      built = bit.buildBit(_prevRecognizer.value);
-    } else if (bit is BuildBit<TextStyleHtml, InlineSpan>) {
+    } else if (bit is BuildBit<GestureRecognizer?, dynamic>) {
+      built = bit.buildBit(_prevRecognizer!.value);
+    } else if (bit is BuildBit<TextStyleHtml?, InlineSpan>) {
       // ignore: omit_local_variable_types
-      final SpanBuilder spanBuilder = (c) => bit.buildBit(thisTsb.build(c));
+      final SpanBuilder spanBuilder = (c) => bit.buildBit(thisTsb!.build(c));
       built = spanBuilder;
     }
 
     if (built is GestureRecognizer) {
-      _prevRecognizer.value = built;
+      _prevRecognizer!.value = built;
     } else if (built is InlineSpan || built is SpanBuilder) {
       _saveSpan();
-      _spans.add(built);
+      _spans!.add(built);
     } else if (built is String) {
       if (built != ' ' || !_loopShouldSwallowWhitespace(bit)) {
-        _prevBuffer.write(built);
+        _prevBuffer!.write(built);
       }
     } else if (built is Widget) {
       _completeLoop();
-      _flattened.add(Flattened._(widget: built));
+      _flattened!.add(Flattened._(widget: built));
     } else if (built is WidgetBuilder) {
       _completeLoop();
-      _flattened.add(Flattened._(widgetBuilder: built));
+      _flattened!.add(Flattened._(widgetBuilder: built));
     }
 
     _prevTsb = thisTsb;
@@ -102,7 +102,7 @@ class _Flattener {
 
   bool _loopShouldSwallowWhitespace(BuildBit bit) {
     // special handling for whitespaces
-    if (_swallowWhitespace) return true;
+    if (_swallowWhitespace!) return true;
 
     final next = nextWithTsb(bit);
     if (next == null) {
@@ -117,11 +117,11 @@ class _Flattener {
   }
 
   void _saveSpan() {
-    if (_prevBuffer != _buffer && _prevBuffer.length > 0) {
-      final scopedRecognizer = _prevRecognizer.value;
+    if (_prevBuffer != _buffer && _prevBuffer!.length > 0) {
+      final scopedRecognizer = _prevRecognizer!.value;
       final scopedTsb = _prevTsb;
       final scopedText = _prevBuffer.toString();
-      _spans.add((context) => TextSpan(
+      _spans!.add((context) => TextSpan(
             recognizer: scopedRecognizer,
             style: scopedTsb?.build(context)?.styleWithHeight,
             text: scopedText,
@@ -136,10 +136,10 @@ class _Flattener {
 
     if (_spans == null) return;
 
-    final scopedSpans = _spans;
+    final scopedSpans = _spans!;
     _spans = null;
-    if (scopedSpans.isEmpty && _buffer.isEmpty) return;
-    final scopedRecognizer = _recognizer.value;
+    if (scopedSpans.isEmpty && _buffer!.isEmpty) return;
+    final scopedRecognizer = _recognizer!.value;
     final scopedTsb = _tsb;
     final scopedBuffer = _buffer.toString();
 
@@ -150,13 +150,13 @@ class _Flattener {
 
     if (scopedBuffer == '\n' && scopedSpans.isEmpty) {
       // special handling for paragraph with only one line break
-      _flattened.add(Flattened._(
+      _flattened!.add(Flattened._(
         widget: HeightPlaceholder(CssLength(1, CssLengthUnit.em), scopedTsb),
       ));
       return;
     }
 
-    _flattened.add(Flattened._(spanBuilder: (context) {
+    _flattened!.add(Flattened._(spanBuilder: (context) {
       final children = scopedSpans
           .map((s) => s is SpanBuilder ? s.call(context) : s)
           .whereType<InlineSpan>()
@@ -175,7 +175,7 @@ class _Flattener {
     }));
   }
 
-  static TextStyleBuilder _getBitTsb(BuildBit bit) {
+  static TextStyleBuilder? _getBitTsb(BuildBit bit) {
     if (bit.tsb != null) return bit.tsb;
 
     // the below code will find the best style for this whitespace bit
@@ -188,9 +188,9 @@ class _Flattener {
     if (bit == parent.last) {
       final next = nextWithTsb(bit);
       if (next != null) {
-        var tree = parent;
+        BuildTree? tree = parent;
         while (true) {
-          final bitsParentLast = tree.parent?.last;
+          final bitsParentLast = tree!.parent?.last;
           if (bitsParentLast != bit) break;
           tree = tree.parent;
         }
@@ -207,7 +207,7 @@ class _Flattener {
     return parent.tsb;
   }
 
-  static BuildBit nextWithTsb(BuildBit bit) {
+  static BuildBit? nextWithTsb(BuildBit bit) {
     var next = bit.next;
     while (next != null && next.tsb == null) {
       next = next.next;
@@ -222,5 +222,5 @@ class _Flattener {
 /// This class is needed because [GestureRecognizer] is rebuilt
 /// but we have to keep track of prev / current recognizer for spans
 class _Recognizer {
-  GestureRecognizer value;
+  GestureRecognizer? value;
 }

@@ -16,7 +16,7 @@ const kTagCenter = 'center';
 
 class StyleTextAlign {
   final WidgetFactory wf;
-  final String value;
+  final String? value;
 
   StyleTextAlign(this.wf, this.value);
 
@@ -27,8 +27,8 @@ class StyleTextAlign {
         priority: 4100,
       );
 
-  static Iterable<Widget> _onWidgets(Iterable<Widget> widgets, String value) {
-    Widget Function(BuildContext, Widget) builder;
+  static Iterable<Widget> _onWidgets(Iterable<Widget> widgets, String? value) {
+    Widget Function(BuildContext, Widget)? builder;
 
     switch (value) {
       case kCssTextAlignCenter:
@@ -46,7 +46,7 @@ class StyleTextAlign {
 
     if (builder != null) {
       widgets = widgets
-          .map((child) => WidgetPlaceholder.lazy(child).wrapWith(builder));
+          .map((child) => WidgetPlaceholder.lazy(child).wrapWith(builder!));
     }
 
     return widgets;
@@ -58,8 +58,8 @@ class StyleTextAlign {
   static Widget _center(BuildContext _, Widget child) =>
       _TextAlignCenter(child);
 
-  static TextStyleHtml _tsb(TextStyleHtml tsh, String value) {
-    TextAlign textAlign;
+  static TextStyleHtml _tsb(TextStyleHtml? tsh, String value) {
+    TextAlign? textAlign;
 
     switch (value) {
       case kCssTextAlignCenter:
@@ -84,15 +84,15 @@ class StyleTextAlign {
         break;
     }
 
-    return textAlign == null ? tsh : tsh.copyWith(textAlign: textAlign);
+    return textAlign == null ? tsh! : tsh!.copyWith(textAlign: textAlign);
   }
 }
 
 class _TextAlignBlock extends CssBlock {
-  _TextAlignBlock(Widget child, {Key key}) : super(child: child, key: key);
+  _TextAlignBlock(Widget child, {Key? key}) : super(child: child, key: key);
 }
 
 class _TextAlignCenter extends Center {
-  _TextAlignCenter(Widget child, {Key key})
+  _TextAlignCenter(Widget child, {Key? key})
       : super(child: child, heightFactor: 1.0, key: key);
 }

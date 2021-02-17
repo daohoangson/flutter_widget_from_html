@@ -38,7 +38,7 @@ class TagImg {
           if (built == null) {
             final imgText = data.alt ?? data.title;
             if (imgText?.isNotEmpty == true) {
-              tree.addText(imgText);
+              tree.addText(imgText!);
             }
             return;
           }
@@ -46,13 +46,13 @@ class TagImg {
           final placeholder =
               WidgetPlaceholder<ImageMetadata>(data, child: built);
 
-          tree.replaceWith(meta.willBuildSubtree
+          tree.replaceWith(meta.willBuildSubtree!
               ? WidgetBit.block(tree, placeholder)
               : WidgetBit.inline(tree, placeholder));
         },
       );
 
-  Widget _build(BuildMetadata meta, ImageMetadata data) {
+  Widget? _build(BuildMetadata meta, ImageMetadata data) {
     final source = data.sources?.first;
     if (source == null) return null;
 
@@ -64,14 +64,14 @@ class TagImg {
     if (source.height?.isNegative == false &&
         source.width?.isNegative == false &&
         source.height != 0) {
-      built = wf.buildAspectRatio(meta, built, source.width / source.height);
+      built = wf.buildAspectRatio(meta, built, source.width! / source.height!);
     }
 
     return built;
   }
 
   ImageMetadata _parse(BuildMetadata meta) {
-    final attrs = meta.element.attributes;
+    final attrs = meta.element!.attributes;
     final url = wf.urlFull(attrs[kAttributeImgSrc]);
     return ImageMetadata(
       alt: attrs[kAttributeImgAlt],
