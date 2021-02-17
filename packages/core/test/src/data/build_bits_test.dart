@@ -564,7 +564,8 @@ class _OutputInlineSpanBit extends BuildBit<Null, InlineSpan> {
 }
 
 class _OutputStringBit extends BuildBit<Null, String> {
-  _OutputStringBit(BuildTree? parent, TextStyleBuilder? tsb) : super(parent, tsb);
+  _OutputStringBit(BuildTree? parent, TextStyleBuilder? tsb)
+      : super(parent, tsb);
 
   @override
   String buildBit(Null _) => 'foo';
@@ -575,7 +576,8 @@ class _OutputStringBit extends BuildBit<Null, String> {
 }
 
 class _OutputWidgetBit extends BuildBit<Null, Widget> {
-  _OutputWidgetBit(BuildTree? parent, TextStyleBuilder? tsb) : super(parent, tsb);
+  _OutputWidgetBit(BuildTree? parent, TextStyleBuilder? tsb)
+      : super(parent, tsb);
 
   @override
   Widget buildBit(Null _) => Text('foo');

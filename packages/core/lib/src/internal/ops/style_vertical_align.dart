@@ -110,7 +110,8 @@ class StyleVerticalAlign {
   }
 }
 
-AlignmentGeometry? _tryParseAlignmentGeometry(TextDirection? dir, String value) {
+AlignmentGeometry? _tryParseAlignmentGeometry(
+    TextDirection? dir, String value) {
   final isLtr = dir != TextDirection.rtl;
   switch (value) {
     case kCssVerticalAlignTop:

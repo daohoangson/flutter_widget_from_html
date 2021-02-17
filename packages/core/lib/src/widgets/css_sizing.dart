@@ -6,8 +6,7 @@ import 'package:flutter/widgets.dart';
 /// A CSS block.
 class CssBlock extends CssSizing {
   /// Creates a CSS block.
-  CssBlock({required Widget child, Key? key})
-      :        super(child: child, key: key);
+  CssBlock({required Widget child, Key? key}) : super(child: child, key: key);
 
   CssSizingValue get _100percent => const _CssSizingPercentage(100);
 
@@ -61,8 +60,7 @@ class CssSizing extends SingleChildRenderObjectWidget {
     this.preferredAxis,
     this.preferredHeight,
     this.preferredWidth,
-  })  : 
-        super(child: child, key: key);
+  }) : super(child: child, key: key);
 
   @override
   _RenderCssSizing createRenderObject(BuildContext _) => _RenderCssSizing(

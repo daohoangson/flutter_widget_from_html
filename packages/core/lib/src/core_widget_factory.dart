@@ -459,9 +459,9 @@ class WidgetFactory {
               if (attrs[kAttributeFontColor] != null)
                 kCssColor: attrs[kAttributeFontColor]!,
               if (attrs[kAttributeFontFace] != null)
-              kCssFontFamily: attrs[kAttributeFontFace]!,
+                kCssFontFamily: attrs[kAttributeFontFace]!,
               if (kCssFontSizes[attrs[kAttributeFontSize]] != null)
-              kCssFontSize: kCssFontSizes[attrs[kAttributeFontSize]]!,
+                kCssFontSize: kCssFontSizes[attrs[kAttributeFontSize]]!,
             };
           },
         );

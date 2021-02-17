@@ -301,7 +301,8 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
     Widget child, {
     TextStyleBuilder? tsb,
   }) =>
-      WidgetBit._(parent, tsb ?? parent!.tsb, WidgetPlaceholder.lazy(child) as WidgetPlaceholder<T>);
+      WidgetBit._(parent, tsb ?? parent!.tsb,
+          WidgetPlaceholder.lazy(child) as WidgetPlaceholder<T>);
 
   /// Creates an inline widget.
   factory WidgetBit.inline(
@@ -311,8 +312,12 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
     TextBaseline baseline = TextBaseline.alphabetic,
     TextStyleBuilder? tsb,
   }) =>
-      WidgetBit._(parent, tsb ?? parent!.tsb, WidgetPlaceholder.lazy(child) as WidgetPlaceholder<T>,
-          alignment, baseline);
+      WidgetBit._(
+          parent,
+          tsb ?? parent!.tsb,
+          WidgetPlaceholder.lazy(child) as WidgetPlaceholder<T>,
+          alignment,
+          baseline);
 
   @override
   bool get isInline => alignment != null && baseline != null;

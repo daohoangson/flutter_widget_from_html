@@ -32,7 +32,8 @@ const widget0 = SizedBox.shrink();
 ///     element.classes.contains('name') ? {'color': 'red'} : null,
 /// )
 /// ```
-typedef CustomStylesBuilder = Map<String, String>? Function(dom.Element element);
+typedef CustomStylesBuilder = Map<String, String>? Function(
+    dom.Element element);
 
 /// A callback to render custom widget for a DOM element.
 ///

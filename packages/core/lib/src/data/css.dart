@@ -161,7 +161,8 @@ class CssLength {
   bool get isNotEmpty => number > 0;
 
   /// Calculates value in logical pixel.
-  double? getValue(TextStyleHtml? tsh, {double? baseValue, double? scaleFactor}) {
+  double? getValue(TextStyleHtml? tsh,
+      {double? baseValue, double? scaleFactor}) {
     double value;
     switch (unit) {
       case CssLengthUnit.auto:
