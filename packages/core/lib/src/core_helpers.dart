@@ -76,13 +76,13 @@ class InlineStyle {
   /// The value.
   ///
   /// Use [values] for tokenized strings.
-  final String? value;
+  final String value;
 
   /// Creates a key value pair.
   InlineStyle(this.key, this.value);
 
   /// The tokenized values.
-  List<String> get values => value!.split(_domElementStyleValuesRegExp);
+  List<String> get values => value.split(_domElementStyleValuesRegExp);
 }
 
 /// A set of values that should trigger rebuild.
@@ -197,7 +197,7 @@ Uint8List? bytesFromDataUri(String dataUri) {
 }
 
 /// Returns [List<T>] if [x] is provided or `null` otherwise.
-Iterable<T>? listOrNull<T>(T x) => x == null ? null : [x];
+List<T>? listOrNull<T>(T? x) => x == null ? null : [x];
 
 /// Parses [key] from [map] as an double literal and return its value.
 double? tryParseDoubleFromMap(Map<dynamic, String> map, String key) =>

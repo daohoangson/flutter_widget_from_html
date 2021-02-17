@@ -141,10 +141,10 @@ class _BuildOpOnWidgets extends WidgetFactory {
 }
 
 class _BuildOpPriority extends WidgetFactory {
-  final int? a;
-  final int? b;
+  final int a;
+  final int b;
 
-  _BuildOpPriority({this.a, this.b});
+  _BuildOpPriority({required this.a, required this.b});
 
   @override
   void parse(BuildMetadata meta) {

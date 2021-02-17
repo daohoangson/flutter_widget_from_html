@@ -44,7 +44,7 @@ CssLengthBox? tryParseCssLengthBox(BuildMetadata meta, String key) {
 
     final suffix = style.key.substring(key.length);
     if (suffix.isEmpty) {
-      output = _parseCssLengthBoxAll(style.value!);
+      output = _parseCssLengthBoxAll(style.value);
     } else {
       final parsed = tryParseCssLength(style.value);
       output ??= CssLengthBox();

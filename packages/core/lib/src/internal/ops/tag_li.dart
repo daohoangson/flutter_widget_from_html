@@ -36,16 +36,14 @@ class TagLi {
 
   TagLi(this.wf, this.listMeta);
 
-  _ListConfig? get config {
+  _ListConfig get config {
     // cannot build config from constructor because
     // inline styles are not fully parsed at that time
-    _config ??= _ListConfig.fromBuildMetadata(listMeta);
-    return _config;
+    return _config ??= _ListConfig.fromBuildMetadata(listMeta);
   }
 
-  BuildOp? get op {
-    _listOp ??= _TagLiListOp(this);
-    return _listOp;
+  BuildOp get op {
+    return _listOp ??= _TagLiListOp(this);
   }
 
   Map<String, String> defaultStyles(dom.Element element) {
@@ -87,17 +85,17 @@ class TagLi {
       },
     );
 
-    childMeta.register(_itemOp);
+    childMeta.register(_itemOp!);
   }
 
   Widget _buildItem(BuildContext context, Widget child, int i) {
     final meta = _itemMetas[i];
     final listStyleType = _ListConfig.listStyleTypeFromBuildMetadata(meta) ??
-        config!.listStyleType;
-    final markerIndex = config!.markerReversed == true
-        ? (config!.markerStart ?? _itemWidgets.length) - i
-        : (config!.markerStart ?? 1) + i;
-    final tsh = meta.tsb().build(context)!;
+        config.listStyleType;
+    final markerIndex = config.markerReversed == true
+        ? (config.markerStart ?? _itemWidgets.length) - i
+        : (config.markerStart ?? 1) + i;
+    final tsh = meta.tsb().build(context);
 
     final markerText = wf.getListStyleMarker(listStyleType, markerIndex);
     final marker = _buildMarker(tsh, listStyleType, markerText);
@@ -354,12 +352,11 @@ class _ListMarkerRenderObject extends RenderBox {
   }
 
   TextPainter? __textPainter;
-  TextPainter? get _textPainter {
-    __textPainter ??= TextPainter(
+  TextPainter get _textPainter {
+    return __textPainter ??= TextPainter(
       text: TextSpan(style: _textStyle, text: '1.'),
       textDirection: TextDirection.ltr,
     )..layout();
-    return __textPainter;
   }
 
   TextStyle _textStyle;
@@ -372,12 +369,12 @@ class _ListMarkerRenderObject extends RenderBox {
 
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) =>
-      _textPainter!.computeDistanceToActualBaseline(baseline);
+      _textPainter.computeDistanceToActualBaseline(baseline);
 
   @override
   void paint(PaintingContext context, Offset offset) {
     final canvas = context.canvas;
-    final m = _textPainter!.computeLineMetrics().first;
+    final m = _textPainter.computeLineMetrics().first;
     final center = offset +
         Offset(
           size.width / 2,
@@ -419,7 +416,7 @@ class _ListMarkerRenderObject extends RenderBox {
 
   @override
   void performLayout() {
-    size = _textPainter!.size;
+    size = _textPainter.size;
   }
 }
 

@@ -19,7 +19,7 @@ class TagA {
           return styles;
         },
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree!) return;
+          if (meta.willBuildSubtree) return;
 
           final onTap = _gestureTapCallback(meta);
           if (onTap == null) return;

@@ -15,7 +15,7 @@ class StyleBorder {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree!) return;
+          if (meta.willBuildSubtree) return;
           final border = tryParseBorder(meta)!;
           if (border.isNone) return;
 

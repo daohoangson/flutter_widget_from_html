@@ -42,10 +42,10 @@ abstract class BuildMetadata {
   /// - Inline style `display: block`
   ///
   /// See [BuildOp.onWidgetsIsOptional].
-  bool? get willBuildSubtree;
+  bool get willBuildSubtree;
 
   /// Adds an inline style.
-  operator []=(String key, String? value);
+  operator []=(String key, String value);
 
   /// Gets an inline style value by key.
   String? operator [](String key) {
@@ -57,7 +57,7 @@ abstract class BuildMetadata {
   }
 
   /// Registers a build op.
-  void register(BuildOp? op);
+  void register(BuildOp op);
 
   @override
   String toString() =>
@@ -67,10 +67,14 @@ abstract class BuildMetadata {
   ///
   /// Returns the associated [TextStyleBuilder].
   TextStyleBuilder tsb<T>([
-    TextStyleHtml Function(TextStyleHtml? tsh, T input)? builder,
+    TextStyleHtml Function(TextStyleHtml tsh, T input)? builder,
     T? input,
-  ]) =>
-      _tsb..enqueue(builder, input);
+  ]) {
+    if (builder != null) {
+      _tsb.enqueue(builder, input);
+    }
+    return _tsb;
+  }
 }
 
 /// A building operation to customize how a DOM element is rendered.
@@ -84,7 +88,7 @@ class BuildOp {
   /// The execution priority, op with lower priority will run first.
   ///
   /// Default: 10.
-  final int? priority;
+  final int priority;
 
   /// The callback that should return default styling map.
   ///
@@ -99,7 +103,7 @@ class BuildOp {
   ///
   /// Note: op must be registered early for this to work e.g.
   /// in [WidgetFactory.parse] or [onChild].
-  final Map<String, String?> Function(dom.Element element)? defaultStyles;
+  final Map<String, String> Function(dom.Element element)? defaultStyles;
 
   /// The callback that will be called whenver a child element is found.
   ///
@@ -123,7 +127,7 @@ class BuildOp {
   /// The callback that will be called when child elements have been built.
   ///
   /// Note: only works if it's a block element.
-  final Iterable<Widget?>? Function(
+  final Iterable<Widget>? Function(
       BuildMetadata meta, Iterable<WidgetPlaceholder> widgets)? onWidgets;
 
   /// Controls whether the element should be forced to be rendered as block.

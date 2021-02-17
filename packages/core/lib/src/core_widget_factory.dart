@@ -337,7 +337,7 @@ class WidgetFactory {
       url.isNotEmpty ? NetworkImage(url) : null;
 
   /// Prepares the root [TextStyleBuilder].
-  void onRoot(TextStyleBuilder? rootTsb) {}
+  void onRoot(TextStyleBuilder rootTsb) {}
 
   /// Parses [meta] for build ops and text styles.
   void parse(BuildMetadata meta) {
@@ -346,7 +346,7 @@ class WidgetFactory {
     switch (meta.element!.localName) {
       case kTagA:
         _tagA ??= TagA(this, () => _widget?.hyperlinkColor).buildOp;
-        meta.register(_tagA);
+        meta.register(_tagA!);
         break;
 
       case 'abbr':
@@ -393,7 +393,7 @@ class WidgetFactory {
 
       case 'br':
         _tagBr ??= BuildOp(onTree: (_, tree) => tree.addNewLine());
-        meta.register(_tagBr);
+        meta.register(_tagBr!);
         break;
 
       case kTagCenter:
@@ -428,7 +428,7 @@ class WidgetFactory {
         );
         meta
           ..[kCssDisplay] = kCssDisplayBlock
-          ..register(_tagPre);
+          ..register(_tagPre!);
         break;
 
       case 'dd':
@@ -456,13 +456,16 @@ class WidgetFactory {
           defaultStyles: (element) {
             final attrs = element.attributes;
             return {
-              kCssColor: attrs[kAttributeFontColor],
-              kCssFontFamily: attrs[kAttributeFontFace],
-              kCssFontSize: kCssFontSizes[attrs[kAttributeFontSize]],
+              if (attrs[kAttributeFontColor] != null)
+                kCssColor: attrs[kAttributeFontColor]!,
+              if (attrs[kAttributeFontFace] != null)
+              kCssFontFamily: attrs[kAttributeFontFace]!,
+              if (kCssFontSizes[attrs[kAttributeFontSize]] != null)
+              kCssFontSize: kCssFontSizes[attrs[kAttributeFontSize]]!,
             };
           },
         );
-        meta.register(_tagFont);
+        meta.register(_tagFont!);
         break;
 
       case 'hr':
@@ -472,7 +475,7 @@ class WidgetFactory {
         );
         meta
           ..[kCssDisplay] = kCssDisplayBlock
-          ..register(_tagHr);
+          ..register(_tagHr!);
         break;
 
       case 'h1':
@@ -519,7 +522,7 @@ class WidgetFactory {
 
       case kTagImg:
         _tagImg ??= TagImg(this).buildOp;
-        meta.register(_tagImg);
+        meta.register(_tagImg!);
         break;
 
       case 'ins':
@@ -548,7 +551,7 @@ class WidgetFactory {
 
       case kTagQ:
         _tagQ ??= TagQ(this).buildOp;
-        meta.register(_tagQ);
+        meta.register(_tagQ!);
         break;
 
       case kTagRuby:
@@ -616,7 +619,7 @@ class WidgetFactory {
       case kCssBackground:
       case kCssBackgroundColor:
         _styleBgColor ??= StyleBgColor(this).buildOp;
-        meta.register(_styleBgColor);
+        meta.register(_styleBgColor!);
         break;
 
       case kCssColor:
@@ -654,7 +657,7 @@ class WidgetFactory {
       case kCssMinWidth:
       case kCssWidth:
         _styleSizing ??= StyleSizing(this).buildOp;
-        meta.register(_styleSizing);
+        meta.register(_styleSizing!);
         break;
 
       case kCssLineHeight:
@@ -681,7 +684,7 @@ class WidgetFactory {
             }
           }
         });
-        meta.register(_styleTextDecoration);
+        meta.register(_styleTextDecoration!);
         break;
 
       case kCssTextOverflow:
@@ -697,23 +700,23 @@ class WidgetFactory {
 
       case kCssVerticalAlign:
         _styleVerticalAlign ??= StyleVerticalAlign(this).buildOp;
-        meta.register(_styleVerticalAlign);
+        meta.register(_styleVerticalAlign!);
         break;
     }
 
     if (key.startsWith(kCssBorder)) {
       _styleBorder ??= StyleBorder(this).buildOp;
-      meta.register(_styleBorder);
+      meta.register(_styleBorder!);
     }
 
     if (key.startsWith(kCssMargin)) {
       _styleMargin ??= StyleMargin(this).buildOp;
-      meta.register(_styleMargin);
+      meta.register(_styleMargin!);
     }
 
     if (key.startsWith(kCssPadding)) {
       _stylePadding ??= StylePadding(this).buildOp;
-      meta.register(_stylePadding);
+      meta.register(_stylePadding!);
     }
   }
 
@@ -722,7 +725,7 @@ class WidgetFactory {
     switch (value) {
       case kCssDisplayBlock:
         _styleBlock ??= DisplayBlockOp(this);
-        meta.register(_styleBlock);
+        meta.register(_styleBlock!);
         break;
       case kCssDisplayNone:
         _styleDisplayNone ??= BuildOp(
@@ -733,7 +736,7 @@ class WidgetFactory {
           },
           priority: 0,
         );
-        meta.register(_styleDisplayNone);
+        meta.register(_styleDisplayNone!);
         break;
       case kCssDisplayTable:
         meta.register(TagTable(this, meta).op);

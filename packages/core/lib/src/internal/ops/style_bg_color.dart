@@ -10,7 +10,7 @@ class StyleBgColor {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree!) return;
+          if (meta.willBuildSubtree) return;
 
           final bgColor = _parseColor(wf, meta);
           if (bgColor == null) return;

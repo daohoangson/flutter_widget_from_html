@@ -24,7 +24,7 @@ CssBorder? tryParseBorder(BuildMetadata meta) {
       continue;
     }
 
-    final borderSide = _tryParseBorderSide(style.value!);
+    final borderSide = _tryParseBorderSide(style.value);
     final suffix = style.key.substring(kCssBorder.length);
     if (suffix.isEmpty) {
       border = CssBorder(all: borderSide);

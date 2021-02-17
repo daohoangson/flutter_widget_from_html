@@ -19,7 +19,7 @@ class StyleVerticalAlign {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree!) return;
+          if (meta.willBuildSubtree) return;
 
           final v = meta[kCssVerticalAlign];
           if (v == null || v == kCssVerticalAlignBaseline) return;
@@ -59,7 +59,7 @@ class StyleVerticalAlign {
           return listOrNull(wf
               .buildColumnPlaceholder(meta, widgets)
               ?.wrapWith((context, child) {
-            final tsh = meta.tsb().build(context)!;
+            final tsh = meta.tsb().build(context);
             final alignment = _tryParseAlignmentGeometry(tsh.textDirection, v);
             return wf.buildAlign(meta, child, alignment);
           }));
@@ -85,7 +85,7 @@ class StyleVerticalAlign {
 
   Widget _buildStack(BuildContext context, BuildMetadata meta, Widget child,
       EdgeInsets padding) {
-    final tsh = meta.tsb().build(context)!;
+    final tsh = meta.tsb().build(context);
     final fontSize = tsh.style!.fontSize!;
 
     return wf.buildStack(

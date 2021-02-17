@@ -13,9 +13,8 @@ class TagRuby {
 
   TagRuby(this.wf, this.rubyMeta);
 
-  BuildOp? get op {
-    _rubyOp ??= BuildOp(onChild: onChild, onTree: onTree);
-    return _rubyOp;
+  BuildOp get op {
+    return _rubyOp ??= BuildOp(onChild: onChild, onTree: onTree);
   }
 
   void onChild(BuildMetadata childMeta) {
@@ -30,14 +29,15 @@ class TagRuby {
         _rtOp ??= BuildOp(
           onTree: (rtMeta, rtTree) {
             if (rtTree.isEmpty) return;
-            final rtBit = _RtBit(rtTree, rtTree.tsb, rtMeta, rtTree.copyWith() as BuildTree);
+            final rtBit = _RtBit(
+                rtTree, rtTree.tsb, rtMeta, rtTree.copyWith() as BuildTree);
             rtTree.replaceWith(rtBit);
           },
         );
 
         childMeta
           ..[kCssFontSize] = '0.5em'
-          ..register(_rtOp);
+          ..register(_rtOp!);
         break;
     }
   }

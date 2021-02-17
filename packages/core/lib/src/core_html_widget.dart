@@ -217,15 +217,15 @@ class _RootTsb extends TextStyleBuilder {
   }
 
   @override
-  TextStyleHtml? build(BuildContext context) {
+  TextStyleHtml build(BuildContext context) {
     context.dependOnInheritedWidgetOfExactType<TshWidget>();
     return super.build(context);
   }
 
-  TextStyleHtml? builder(TextStyleHtml? _, _HtmlWidgetState state) {
-    if (_output != null) return _output;
+  TextStyleHtml builder(TextStyleHtml? _, _HtmlWidgetState? state) {
+    if (_output != null) return _output!;
     return _output = TextStyleHtml.root(
-      state._wf.getDependencies(state.context),
+      state!._wf.getDependencies(state.context),
       state.widget.textStyle,
     );
   }

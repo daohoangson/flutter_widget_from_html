@@ -20,10 +20,10 @@ void main() {
 
 class _OnRoot extends WidgetFactory {
   @override
-  void onRoot(TextStyleBuilder? rootTsb) {
+  void onRoot(TextStyleBuilder rootTsb) {
     super.onRoot(rootTsb);
 
-    rootTsb!.enqueue((tsh, dynamic _) =>
-        tsh!.copyWith(style: tsh.style!.copyWith(fontFamily: 'Custom')));
+    rootTsb.enqueue((tsh, dynamic _) =>
+        tsh.copyWith(style: tsh.style!.copyWith(fontFamily: 'Custom')));
   }
 }

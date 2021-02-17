@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import '../core_data.dart';
 import 'margin_vertical.dart';
 
-List<Flattened>? flatten(BuildTree tree) => _instance.flatten(tree);
+List<Flattened> flatten(BuildTree tree) => _instance.flatten(tree);
 
 @immutable
 class Flattened {
@@ -20,14 +20,14 @@ typedef SpanBuilder = InlineSpan? Function(BuildContext);
 final _instance = _Flattener();
 
 class _Flattener {
-  List<Flattened>? _flattened;
+  late List<Flattened> _flattened;
   StringBuffer? _buffer, _prevBuffer;
   _Recognizer? _recognizer, _prevRecognizer;
   List<dynamic>? _spans;
   bool? _swallowWhitespace;
   TextStyleBuilder? _tsb, _prevTsb;
 
-  List<Flattened>? flatten(BuildTree tree) {
+  List<Flattened> flatten(BuildTree tree) {
     _flattened = [];
 
     _resetLoop(tree.tsb);
@@ -84,10 +84,10 @@ class _Flattener {
       }
     } else if (built is Widget) {
       _completeLoop();
-      _flattened!.add(Flattened._(widget: built));
+      _flattened.add(Flattened._(widget: built));
     } else if (built is WidgetBuilder) {
       _completeLoop();
-      _flattened!.add(Flattened._(widgetBuilder: built));
+      _flattened.add(Flattened._(widgetBuilder: built));
     }
 
     _prevTsb = thisTsb;
@@ -123,7 +123,7 @@ class _Flattener {
       final scopedText = _prevBuffer.toString();
       _spans!.add((context) => TextSpan(
             recognizer: scopedRecognizer,
-            style: scopedTsb?.build(context)?.styleWithHeight,
+            style: scopedTsb?.build(context).styleWithHeight,
             text: scopedText,
           ));
     }
@@ -150,13 +150,13 @@ class _Flattener {
 
     if (scopedBuffer == '\n' && scopedSpans.isEmpty) {
       // special handling for paragraph with only one line break
-      _flattened!.add(Flattened._(
+      _flattened.add(Flattened._(
         widget: HeightPlaceholder(CssLength(1, CssLengthUnit.em), scopedTsb),
       ));
       return;
     }
 
-    _flattened!.add(Flattened._(spanBuilder: (context) {
+    _flattened.add(Flattened._(spanBuilder: (context) {
       final children = scopedSpans
           .map((s) => s is SpanBuilder ? s.call(context) : s)
           .whereType<InlineSpan>()
@@ -169,7 +169,7 @@ class _Flattener {
       return TextSpan(
         children: children,
         recognizer: scopedRecognizer,
-        style: scopedTsb?.build(context)?.styleWithHeight,
+        style: scopedTsb?.build(context).styleWithHeight,
         text: scopedText,
       );
     }));

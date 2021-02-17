@@ -19,7 +19,7 @@ class BuildMetadata extends core_data.BuildMetadata {
   var _buildOpsIsLocked = false;
   List<InlineStyle>? _styles;
   var _stylesIsLocked = false;
-  bool? _willBuildSubtree;
+  late bool _willBuildSubtree;
 
   BuildMetadata(dom.Element? element, TextStyleBuilder tsb, [this._parentOps])
       : super(element, tsb);
@@ -37,12 +37,10 @@ class BuildMetadata extends core_data.BuildMetadata {
   }
 
   @override
-  bool? get willBuildSubtree => _willBuildSubtree;
+  bool get willBuildSubtree => _willBuildSubtree;
 
   @override
-  operator []=(String key, String? value) {
-    if (value == null) return;
-
+  operator []=(String key, String value) {
     assert(!_stylesIsLocked, 'Metadata can no longer be changed.');
     _styles ??= [];
     _styles!.add(InlineStyle(key, value));
@@ -61,7 +59,7 @@ class BuildMetadata extends core_data.BuildMetadata {
     assert(!_buildOpsIsLocked);
 
     if (_buildOps != null) {
-      _buildOps!.sort((a, b) => a.priority!.compareTo(b.priority!));
+      _buildOps!.sort((a, b) => a.priority.compareTo(b.priority));
     }
 
     _willBuildSubtree = this[kCssDisplay] == kCssDisplayBlock ||
@@ -168,7 +166,7 @@ class BuildTree extends core_data.BuildTree {
 
     subTree.addBitsFromNodes(element.nodes);
 
-    if (meta.willBuildSubtree!) {
+    if (meta.willBuildSubtree) {
       for (final widget in subTree.build()) {
         add(WidgetBit.block(this, widget));
       }
@@ -213,7 +211,6 @@ class BuildTree extends core_data.BuildTree {
 
         meta._styles ??= [];
         for (final pair in map.entries) {
-          if (pair.value == null) continue;
           meta._styles!.insert(0, InlineStyle(pair.key, pair.value));
         }
       }
@@ -248,7 +245,7 @@ class BuildTree extends core_data.BuildTree {
   Iterable<WidgetPlaceholder> _flatten() {
     final widgets = <WidgetPlaceholder>[];
 
-    for (final flattened in flatten(this)!) {
+    for (final flattened in flatten(this)) {
       if (flattened.widget != null) {
         widgets.add(WidgetPlaceholder.lazy(flattened.widget));
         continue;
@@ -285,10 +282,10 @@ class BuildTree extends core_data.BuildTree {
 bool _opRequiresBuildingSubtree(BuildOp op) =>
     op.onWidgets != null && !op.onWidgetsIsOptional;
 
-Iterable<BuildOp>? _prepareParentOps(Iterable<BuildOp>? ops, BuildMetadata meta) {
+Iterable<BuildOp>? _prepareParentOps(
+    Iterable<BuildOp>? ops, BuildMetadata meta) {
   // try to reuse existing list if possible
-  final withOnChild =
-      meta.buildOps?.where((op) => op.onChild != null).toList();
+  final withOnChild = meta.buildOps?.where((op) => op.onChild != null).toList();
   return withOnChild?.isNotEmpty != true
       ? ops
       : List.unmodifiable([if (ops != null) ...ops, ...withOnChild!]);

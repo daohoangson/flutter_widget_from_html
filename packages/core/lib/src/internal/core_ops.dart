@@ -64,8 +64,8 @@ String convertColorToHex(Color value) {
 
 void wrapTree(
   BuildTree tree, {
-  BuildBit Function(BuildTree? parent)? append,
-  BuildBit Function(BuildTree? parent)? prepend,
+  BuildBit Function(BuildTree parent)? append,
+  BuildBit Function(BuildTree parent)? prepend,
 }) {
   if (tree.isEmpty) {
     if (prepend != null) {
@@ -81,11 +81,11 @@ void wrapTree(
 
   if (prepend != null) {
     final first = tree.first!;
-    prepend(first.parent).insertBefore(first);
+    prepend(first.parent!).insertBefore(first);
   }
 
   if (append != null) {
     final last = tree.last!;
-    append(last.parent).insertAfter(last);
+    append(last.parent!).insertAfter(last);
   }
 }

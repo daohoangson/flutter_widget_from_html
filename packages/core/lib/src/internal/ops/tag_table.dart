@@ -41,14 +41,13 @@ class TagTable {
 
   TagTable(this.wf, this.tableMeta);
 
-  BuildOp? get op {
-    _tableOp = BuildOp(
+  BuildOp get op {
+    return _tableOp ??= BuildOp(
       onChild: onChild,
       onTree: onTree,
       onWidgets: onWidgets,
       priority: 0,
     );
-    return _tableOp;
   }
 
   void onChild(BuildMetadata childMeta) {
@@ -262,7 +261,7 @@ class _TagTableRow {
   final _TagTableDataRow row;
   final BuildMetadata rowMeta;
 
-  BuildOp? op;
+  late BuildOp op;
   BuildOp? _cellOp;
   BuildOp? _valignBaselineOp;
 
@@ -278,7 +277,7 @@ class _TagTableRow {
 
     final attrs = childMeta.element!.attributes;
     if (attrs.containsKey(kAttributeValign)) {
-      childMeta[kCssVerticalAlign] = attrs[kAttributeValign];
+      childMeta[kCssVerticalAlign] = attrs[kAttributeValign]!;
     }
 
     _cellOp ??= BuildOp(
@@ -298,7 +297,7 @@ class _TagTableRow {
       },
       priority: BuildOp.kPriorityMax,
     );
-    childMeta.register(_cellOp);
+    childMeta.register(_cellOp!);
     StyleBorder.skip(childMeta);
     StyleSizing.treatHeightAsMinHeight(childMeta);
 
@@ -322,7 +321,7 @@ class _TagTableRow {
       },
       priority: StyleVerticalAlign.kPriority4500,
     );
-    childMeta.register(_valignBaselineOp);
+    childMeta.register(_valignBaselineOp!);
   }
 }
 
@@ -331,7 +330,7 @@ class _TagTableRowGroup {
   final List<_TagTableDataRow> rows;
   final BuildMetadata groupMeta;
 
-  BuildOp? op;
+  late BuildOp op;
 
   _TagTableRowGroup(this.parent, this.groupMeta, this.rows) {
     op = BuildOp(onChild: onChild);

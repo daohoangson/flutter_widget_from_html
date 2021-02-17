@@ -120,11 +120,9 @@ class TextStyleBuilder<T1> {
 
   /// Enqueues a callback.
   void enqueue<T2>(
-    TextStyleHtml? Function(TextStyleHtml? tsh, T2 input)? builder, [
+    TextStyleHtml Function(TextStyleHtml tsh, T2 input) builder, [
     T2? input,
   ]) {
-    if (builder == null) return;
-
     assert(_output == null, 'Cannot add builder after being built');
     _builders ??= [];
     _builders!.add(builder);
@@ -134,15 +132,15 @@ class TextStyleBuilder<T1> {
   }
 
   /// Builds a [TextStyleHtml] by calling queued callbacks.
-  TextStyleHtml? build(BuildContext context) {
+  TextStyleHtml build(BuildContext context) {
     final parentOutput = parent?.build(context);
     if (parentOutput == null || parentOutput != _parentOutput) {
       _parentOutput = parentOutput;
       _output = null;
     }
 
-    if (_output != null) return _output;
-    if (_builders == null) return _output = _parentOutput;
+    if (_output != null) return _output!;
+    if (_builders == null) return _output = _parentOutput!;
 
     _output = _parentOutput?.copyWith(parent: _parentOutput);
     final l = _builders!.length;
@@ -152,13 +150,12 @@ class TextStyleBuilder<T1> {
       assert(_output?.parent == _parentOutput);
     }
 
-    return _output;
+    return _output!;
   }
 
   /// Returns `true` if this shares same styling with [other].
   bool hasSameStyleWith(TextStyleBuilder? other) {
     if (other == null) return false;
-
     TextStyleBuilder thisWithBuilder = this;
     while (thisWithBuilder._builders == null) {
       if (thisWithBuilder.parent == null) break;
