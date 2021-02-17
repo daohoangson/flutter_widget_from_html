@@ -16,7 +16,7 @@ class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
 
   @override
   Widget build(BuildContext context) {
-    final tsh = meta.tsb()!.build(context);
+    final tsh = meta.tsb().build(context);
     return wf.buildColumnWidget(meta, tsh, getChildren(context)) ?? widget0;
   }
 
@@ -62,7 +62,7 @@ class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
       }
     }
 
-    final tsh = meta.tsb()!.build(context);
+    final tsh = meta.tsb().build(context);
     final column = wf.buildColumnWidget(meta, tsh, contents);
 
     return [

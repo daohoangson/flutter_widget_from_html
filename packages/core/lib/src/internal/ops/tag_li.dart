@@ -97,7 +97,7 @@ class TagLi {
     final markerIndex = config!.markerReversed == true
         ? (config!.markerStart ?? _itemWidgets.length) - i
         : (config!.markerStart ?? 1) + i;
-    final tsh = meta.tsb()!.build(context)!;
+    final tsh = meta.tsb().build(context)!;
 
     final markerText = wf.getListStyleMarker(listStyleType, markerIndex);
     final marker = _buildMarker(tsh, listStyleType, markerText);

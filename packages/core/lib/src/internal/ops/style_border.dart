@@ -56,12 +56,17 @@ class StyleBorder {
     Widget child,
     CssBorder border,
   ) {
-    final tsh = meta.tsb()!.build(context);
+    final tsh = meta.tsb().build(context);
     return wf.buildBorder(
       meta,
       child,
       border.getValue(tsh),
       isBorderBox: meta[kCssBoxSizing] == kCssBoxSizingBorderBox,
     );
+  }
+
+  static void skip(BuildMetadata meta) {
+    assert(_skipBuilding[meta] != true, 'Built ${meta.element} already');
+    _skipBuilding[meta] = true;
   }
 }

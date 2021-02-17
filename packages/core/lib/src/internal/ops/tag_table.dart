@@ -81,6 +81,9 @@ class TagTable {
   }
 
   void onTree(BuildMetadata _, BuildTree tree) {
+    StyleBorder.skip(tableMeta);
+    StyleSizing.treatHeightAsMinHeight(tableMeta);
+
     for (final caption in _captions) {
       final built = wf
           .buildColumnPlaceholder(tableMeta, caption.build())
@@ -94,78 +97,39 @@ class TagTable {
   }
 
   Iterable<Widget> onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> __) {
-    final children = <HtmlTableCell>[];
+    final builders = <_HtmlTableCellBuilder>[];
     // occupations data: { rowId: { columnId: occupied } }
     final occupations = <int, Map<int, bool>>{};
-    _buildHtmlTableCells(_data.header, occupations, children);
+    _prepareHtmlTableCellBuilders(_data.header, occupations, builders);
     for (final body in _data.bodies) {
-      _buildHtmlTableCells(body, occupations, children);
+      _prepareHtmlTableCellBuilders(body, occupations, builders);
     }
-    _buildHtmlTableCells(_data.footer, occupations, children);
-    if (children.isEmpty) return [];
+    _prepareHtmlTableCellBuilders(_data.footer, occupations, builders);
+    if (builders.isEmpty) return [];
 
-    CssLength? borderSpacing;
-    var collapseBorder = false;
-    for (final style in tableMeta.styles) {
-      switch (style.key) {
-        case kCssBorderCollapse:
-          switch (style.value) {
-            case kCssBorderCollapseCollapse:
-              collapseBorder = true;
-              break;
-            case kCssBorderCollapseSeparate:
-              collapseBorder = false;
-              break;
-          }
-          break;
-        case kCssBorderSpacing:
-          final cssLength = tryParseCssLength(style.value);
-          if (cssLength != null) borderSpacing = cssLength;
-          break;
-      }
-    }
-
-    final tableBorder = tryParseBorder(tableMeta);
+    final border = tryParseBorder(tableMeta);
+    final borderCollapse = tableMeta[kCssBorderCollapse];
+    final borderSpacing = tryParseCssLength(tableMeta[kCssBorderSpacing]);
 
     return [
       WidgetPlaceholder<BuildMetadata>(tableMeta).wrapWith((context, _) {
-        final tsh = tableMeta.tsb()!.build(context);
-        final border = tableBorder?.getValue(tsh);
-        final spacing = borderSpacing?.getValue(tsh) ?? 0.0;
+        final tsh = tableMeta.tsb().build(context);
 
         return HtmlTable(
+          border: border?.getValue(tsh),
+          borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
+          borderSpacing: borderSpacing?.getValue(tsh) ?? 0.0,
           companion: companion,
-          children: children,
-          columnGap: border != null && collapseBorder
-              ? (border.left.width * -1.0)
-              : spacing,
-          rowGap: border != null && collapseBorder
-              ? (border.top.width * -1.0)
-              : spacing,
+          children: builders.map((f) => f(context)).toList(growable: false),
         );
       }),
     ];
   }
 
-  static BuildOp cellPaddingOp(double px) => BuildOp(
-      onChild: (meta) =>
-          (meta.element!.localName == 'td' || meta.element!.localName == 'th')
-              ? meta[kCssPadding] = '${px}px'
-              : null);
-
-  static BuildOp borderOp(double border, double borderSpacing) => BuildOp(
-      defaultStyles: (_) => {
-            kCssBorder: '${border}px solid black',
-            kCssBorderCollapse: kCssBorderCollapseSeparate,
-            kCssBorderSpacing: '${borderSpacing}px',
-          },
-      onChild: (meta) =>
-          (meta.element!.localName == 'td' || meta.element!.localName == 'th')
-              ? meta[kCssBorder] = '${border}px solid black'
-              : null);
-
-  static void _buildHtmlTableCells(_TagTableDataGroup group,
-      Map<int, Map<int, bool>> occupations, List<HtmlTableCell> cells) {
+  void _prepareHtmlTableCellBuilders(
+      _TagTableDataGroup group,
+      Map<int, Map<int, bool>> occupations,
+      List<_HtmlTableCellBuilder> builders) {
     var rowStart = occupations.keys.length - 1;
     final rowSpanMax = group.rows.length;
     for (final row in group.rows) {
@@ -194,17 +158,51 @@ class TagTable {
           }
         }
 
-        cell.meta.row = rowStart;
-        cells.add(HtmlTableCell(
-          child: cell.child!,
-          columnSpan: columnSpan,
-          columnStart: columnStart,
-          rowSpan: rowSpan,
-          rowStart: rowStart,
-        ));
+        final cellMeta = cell.meta;
+        cellMeta.row = rowStart;
+
+        final cssBorderParsed = tryParseBorder(cellMeta);
+        final cssBorder = cssBorderParsed?.inherit == true
+            ? tryParseBorder(tableMeta)!.copyFrom(cssBorderParsed!)
+            : cssBorderParsed;
+
+        builders.add((context) {
+          final border = cssBorder?.getValue(cellMeta.tsb().build(context));
+          return HtmlTableCell(
+            border: border,
+            child: wf.buildPadding(cellMeta, cell.child!, border?.dimensions),
+            columnSpan: columnSpan,
+            columnStart: columnStart,
+            rowSpan: rowSpan,
+            rowStart: cellMeta.row!,
+          );
+        });
       }
     }
   }
+
+  static BuildOp cellPaddingOp(double px) => BuildOp(
+      onChild: (meta) =>
+          (meta.element!.localName == 'td' || meta.element!.localName == 'th')
+              ? meta[kCssPadding] = '${px}px'
+              : null);
+
+  static BuildOp borderOp(double border, double borderSpacing) => BuildOp(
+        defaultStyles: (_) => {
+          kCssBorder: '${border}px solid black',
+          kCssBorderCollapse: kCssBorderCollapseSeparate,
+          kCssBorderSpacing: '${borderSpacing}px',
+        },
+        onChild: border > 0
+            ? (meta) {
+                switch (meta.element!.localName) {
+                  case kTagTableCell:
+                  case kTagTableHeaderCell:
+                    meta[kCssBorder] = kCssBorderInherit;
+                }
+              }
+            : null,
+      );
 
   static String? _getCssDisplayValue(BuildMetadata meta) {
     String? value;
@@ -249,6 +247,8 @@ extension _BuildMetadataExtension on BuildMetadata {
   set row(int? v) => _rows[this] = v;
   int? get row => _rows[this];
 }
+
+typedef _HtmlTableCellBuilder = HtmlTableCell Function(BuildContext);
 
 class _TableCaption extends SingleChildRenderObjectWidget {
   _TableCaption(Widget child, {Key? key}) : super(child: child, key: key);
@@ -299,6 +299,8 @@ class _TagTableRow {
       priority: BuildOp.kPriorityMax,
     );
     childMeta.register(_cellOp);
+    StyleBorder.skip(childMeta);
+    StyleSizing.treatHeightAsMinHeight(childMeta);
 
     _valignBaselineOp ??= BuildOp(
       onWidgets: (cellMeta, widgets) {

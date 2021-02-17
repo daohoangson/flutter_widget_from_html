@@ -97,7 +97,7 @@ class WidgetFactory {
   /// Builds [Column].
   Widget? buildColumnWidget(
       BuildMetadata meta, TextStyleHtml? tsh, List<Widget> children) {
-    if (children.isEmpty ) return null;
+    if (children.isEmpty) return null;
     if (children.length == 1) return children.first;
 
     return Column(
@@ -163,8 +163,9 @@ class WidgetFactory {
   }
 
   /// Builds [Padding].
-  Widget buildPadding(BuildMetadata meta, Widget child, EdgeInsets padding) =>
-     padding == const EdgeInsets.all(0)
+  Widget buildPadding(
+          BuildMetadata meta, Widget child, EdgeInsetsGeometry? padding) =>
+      padding == null || padding == EdgeInsets.zero
           ? child
           : Padding(child: child, padding: padding);
 

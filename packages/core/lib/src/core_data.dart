@@ -66,7 +66,7 @@ abstract class BuildMetadata {
   /// Enqueues a text style builder callback.
   ///
   /// Returns the associated [TextStyleBuilder].
-  TextStyleBuilder? tsb<T>([
+  TextStyleBuilder tsb<T>([
     TextStyleHtml Function(TextStyleHtml? tsh, T input)? builder,
     T? input,
   ]) =>
