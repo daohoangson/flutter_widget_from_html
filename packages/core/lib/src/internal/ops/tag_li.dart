@@ -48,7 +48,7 @@ class TagLi {
 
   Map<String, String> defaultStyles(dom.Element element) {
     final attrs = element.attributes;
-    final depth = listMeta.parentOps?.whereType<_TagLiListOp>().length ?? 0;
+    final depth = listMeta.parentOps.whereType<_TagLiListOp>().length;
 
     final styles = {
       'padding-inline-start': '40px',
