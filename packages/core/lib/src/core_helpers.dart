@@ -198,7 +198,7 @@ Uint8List? bytesFromDataUri(String dataUri) {
 }
 
 /// Returns [List<T>] if [x] is provided or `null` otherwise.
-List<T>? listOrNull<T>(T? x) => x == null ? null : [x];
+Iterable<T>? listOrNull<T>(T? x) => x == null ? null : [x];
 
 /// Parses [key] from [map] as an double literal and return its value.
 double? tryParseDoubleFromMap(Map<dynamic, String> map, String key) =>
