@@ -15,13 +15,13 @@ class TextStyleHtml {
   final TextStyleHtml? parent;
 
   /// The input [TextStyle].
-  final TextStyle? style;
+  final TextStyle style;
 
   /// The text alignment.
   final TextAlign? textAlign;
 
   /// The text direction.
-  final TextDirection? textDirection;
+  final TextDirection textDirection;
 
   /// The overflow behavior.
   final TextOverflow? textOverflow;
@@ -32,9 +32,9 @@ class TextStyleHtml {
     this.height,
     this.maxLines,
     this.parent,
-    this.style,
+    required this.style,
     this.textAlign,
-    this.textDirection,
+    required this.textDirection,
     this.textOverflow,
   }) : _deps = deps;
 
@@ -58,7 +58,7 @@ class TextStyleHtml {
       deps: deps,
       parent: null,
       style: style,
-      textDirection: _getDependency<TextDirection>(deps),
+      textDirection: _getDependency<TextDirection>(deps)!,
     );
   }
 
@@ -67,8 +67,8 @@ class TextStyleHtml {
   /// This needs to be done because
   /// `TextStyle` with existing height cannot be copied with `height=null`.
   /// See [flutter/flutter#58765](https://github.com/flutter/flutter/issues/58765).
-  TextStyle? get styleWithHeight =>
-      height != null && height! >= 0 ? style!.copyWith(height: height) : style;
+  TextStyle get styleWithHeight =>
+      height != null && height! >= 0 ? style.copyWith(height: height) : style;
 
   /// Creates a copy with the given fields replaced with the new values.
   TextStyleHtml copyWith({

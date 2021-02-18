@@ -54,11 +54,11 @@ const kCssTextDecorationUnderline = 'underline';
 
 class TextStyleOps {
   static TextStyleHtml color(TextStyleHtml p, Color color) =>
-      p.copyWith(style: p.style!.copyWith(color: color));
+      p.copyWith(style: p.style.copyWith(color: color));
 
   static TextStyleHtml fontFamily(TextStyleHtml p, List<String> list) =>
       p.copyWith(
-        style: p.style!.copyWith(
+        style: p.style.copyWith(
           fontFamily: list.isNotEmpty ? list.first : null,
           fontFamilyFallback: list.skip(1).toList(growable: false),
         ),
@@ -67,13 +67,13 @@ class TextStyleOps {
   static TextStyleHtml Function(TextStyleHtml, String?) fontSize(
           WidgetFactory wf) =>
       (p, v) => p.copyWith(
-          style: p.style!.copyWith(fontSize: _fontSizeTryParse(wf, p, v)));
+          style: p.style.copyWith(fontSize: _fontSizeTryParse(wf, p, v)));
 
   static TextStyleHtml fontStyle(TextStyleHtml p, FontStyle fontStyle) =>
-      p.copyWith(style: p.style!.copyWith(fontStyle: fontStyle));
+      p.copyWith(style: p.style.copyWith(fontStyle: fontStyle));
 
   static TextStyleHtml fontWeight(TextStyleHtml p, FontWeight v) =>
-      p.copyWith(style: p.style!.copyWith(fontWeight: v));
+      p.copyWith(style: p.style.copyWith(fontWeight: v));
 
   static TextStyleHtml Function(TextStyleHtml, String?) lineHeight(
           WidgetFactory wf) =>
@@ -83,7 +83,7 @@ class TextStyleOps {
       p.copyWith(maxLines: v);
 
   static TextStyleHtml textDeco(TextStyleHtml p, TextDeco v) {
-    final pd = p.style!.decoration;
+    final pd = p.style.decoration;
     final lineThough = pd?.contains(TextDecoration.lineThrough) == true;
     final overline = pd?.contains(TextDecoration.overline) == true;
     final underline = pd?.contains(TextDecoration.underline) == true;
@@ -100,7 +100,7 @@ class TextStyleOps {
     }
 
     return p.copyWith(
-      style: p.style!.copyWith(
+      style: p.style.copyWith(
         decoration: TextDecoration.combine(list),
         decorationColor: v.color,
         decorationStyle: v.style,
@@ -181,7 +181,7 @@ class TextStyleOps {
     if (length != null) {
       final lengthValue = length.getValue(
         p,
-        baseValue: p.parent?.style?.fontSize,
+        baseValue: p.parent?.style.fontSize,
         scaleFactor: p.getDependency<MediaQueryData>()!.textScaleFactor,
       );
       if (lengthValue != null) return lengthValue;
@@ -204,9 +204,9 @@ class TextStyleOps {
         return _fontSizeMultiplyRootWith(p, .5625);
 
       case kCssFontSizeLarger:
-        return _fontSizeMultiplyWith(p.parent?.style?.fontSize, 1.2);
+        return _fontSizeMultiplyWith(p.parent?.style.fontSize, 1.2);
       case kCssFontSizeSmaller:
-        return _fontSizeMultiplyWith(p.parent?.style?.fontSize, 15 / 18);
+        return _fontSizeMultiplyWith(p.parent?.style.fontSize, 15 / 18);
     }
 
     return null;
@@ -218,7 +218,7 @@ class TextStyleOps {
       root = root.parent!;
     }
 
-    return _fontSizeMultiplyWith(root.style!.fontSize, value);
+    return _fontSizeMultiplyWith(root.style.fontSize, value);
   }
 
   static double? _fontSizeMultiplyWith(double? fontSize, double value) =>
@@ -236,12 +236,12 @@ class TextStyleOps {
 
     final lengthValue = length.getValue(
       p,
-      baseValue: p.style!.fontSize,
+      baseValue: p.style.fontSize,
       scaleFactor: p.getDependency<MediaQueryData>()!.textScaleFactor,
     );
     if (lengthValue == null) return null;
 
-    return lengthValue / p.style!.fontSize!;
+    return lengthValue / p.style.fontSize!;
   }
 }
 

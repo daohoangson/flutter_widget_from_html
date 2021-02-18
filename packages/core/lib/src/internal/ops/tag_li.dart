@@ -118,10 +118,10 @@ class TagLi {
             textDirection: tsh.textDirection,
           )
         : type == kCssListStyleTypeCircle
-            ? _ListMarkerCircle(style!)
+            ? _ListMarkerCircle(style)
             : type == kCssListStyleTypeSquare
-                ? _ListMarkerSquare(style!)
-                : _ListMarkerDisc(style!);
+                ? _ListMarkerSquare(style)
+                : _ListMarkerDisc(style);
   }
 }
 

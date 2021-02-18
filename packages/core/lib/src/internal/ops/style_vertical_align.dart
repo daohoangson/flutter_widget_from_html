@@ -86,7 +86,7 @@ class StyleVerticalAlign {
   Widget _buildStack(BuildContext context, BuildMetadata meta, Widget child,
       EdgeInsets padding) {
     final tsh = meta.tsb.build(context);
-    final fontSize = tsh.style!.fontSize!;
+    final fontSize = tsh.style.fontSize!;
 
     return wf.buildStack(
       meta,

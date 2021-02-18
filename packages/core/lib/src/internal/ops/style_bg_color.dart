@@ -50,5 +50,5 @@ class StyleBgColor {
   }
 
   static TextStyleHtml _tsb(TextStyleHtml p, Color c) =>
-      p.copyWith(style: p.style!.copyWith(background: Paint()..color = c));
+      p.copyWith(style: p.style.copyWith(background: Paint()..color = c));
 }

@@ -25,7 +25,7 @@ class _OnRoot extends WidgetFactory {
 
     rootTsb.enqueue(
         (tsh, Null _) =>
-            tsh.copyWith(style: tsh.style!.copyWith(fontFamily: 'Custom')),
+            tsh.copyWith(style: tsh.style.copyWith(fontFamily: 'Custom')),
         null);
   }
 }
