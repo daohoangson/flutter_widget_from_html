@@ -41,17 +41,17 @@ class TextStyleHtml {
   /// Creates the root text style.
   factory TextStyleHtml.root(
       Iterable<dynamic> deps, TextStyle? widgetTextStyle) {
-    var style = _getDependency<TextStyle>(deps);
+    var style = _getDependency<TextStyle>(deps)!;
     if (widgetTextStyle != null) {
       style = widgetTextStyle.inherit
-          ? style!.merge(widgetTextStyle)
+          ? style.merge(widgetTextStyle)
           : widgetTextStyle;
     }
 
     var mqd = _getDependency<MediaQueryData>(deps)!;
     final tsf = mqd.textScaleFactor;
     if (tsf != 1) {
-      style = style!.copyWith(fontSize: style.fontSize! * tsf);
+      style = style.copyWith(fontSize: style.fontSize! * tsf);
     }
 
     return TextStyleHtml(
