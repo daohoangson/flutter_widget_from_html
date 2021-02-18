@@ -132,7 +132,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     super.initState();
 
     _rootTsb = _RootTsb(this);
-    _rootMeta = builder.BuildMetadata(null, _rootTsb);
+    _rootMeta = builder.BuildMetadata(dom.Element.tag('root'), _rootTsb);
     _wf = widget.factoryBuilder?.call() ?? WidgetFactory();
 
     _wf.onRoot(_rootTsb);

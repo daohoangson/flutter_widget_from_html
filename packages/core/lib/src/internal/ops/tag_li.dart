@@ -69,7 +69,7 @@ class TagLi {
   }
 
   void onChild(BuildMetadata childMeta) {
-    final e = childMeta.element!;
+    final e = childMeta.element;
     if (e.localName != kTagLi) return;
     if (e.parent != listMeta.element) return;
 
@@ -138,7 +138,7 @@ class _ListConfig {
   });
 
   factory _ListConfig.fromBuildMetadata(BuildMetadata meta) {
-    final attrs = meta.element!.attributes;
+    final attrs = meta.element.attributes;
 
     return _ListConfig(
       listStyleType: meta[kCssListStyleType] ?? kCssListStyleTypeDisc,
@@ -152,7 +152,7 @@ class _ListConfig {
     if (listStyleType != null) return listStyleType;
 
     return listStyleTypeFromAttributeType(
-        meta.element!.attributes[kAttributeLiType]);
+        meta.element.attributes[kAttributeLiType]);
   }
 
   static String? listStyleTypeFromAttributeType(String? type) {

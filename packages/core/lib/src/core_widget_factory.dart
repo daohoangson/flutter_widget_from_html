@@ -341,9 +341,9 @@ class WidgetFactory {
 
   /// Parses [meta] for build ops and text styles.
   void parse(BuildMetadata meta) {
-    final attrs = meta.element!.attributes;
+    final attrs = meta.element.attributes;
 
-    switch (meta.element!.localName) {
+    switch (meta.element.localName) {
       case kTagA:
         _tagA ??= TagA(this, () => _widget?.hyperlinkColor).buildOp;
         meta.register(_tagA!);
@@ -422,7 +422,7 @@ class WidgetFactory {
           defaultStyles: (_) =>
               const {kCssFontFamily: '$kTagCodeFont1, $kTagCodeFont2'},
           onTree: (meta, tree) => tree
-              .replaceWith(TextBit(tree, meta.element!.text, tsb: tree.tsb)),
+              .replaceWith(TextBit(tree, meta.element.text, tsb: tree.tsb)),
           onWidgets: (meta, widgets) => listOrNull(
               buildColumnPlaceholder(meta, widgets)
                   ?.wrapWith((_, w) => buildHorizontalScrollView(meta, w))),

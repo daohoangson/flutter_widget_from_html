@@ -51,7 +51,7 @@ class TagTable {
   }
 
   void onChild(BuildMetadata childMeta) {
-    if (childMeta.element!.parent != tableMeta.element) return;
+    if (childMeta.element.parent != tableMeta.element) return;
 
     final which = _getCssDisplayValue(childMeta);
     _TagTableDataGroup? latestGroup;
@@ -182,7 +182,7 @@ class TagTable {
 
   static BuildOp cellPaddingOp(double px) => BuildOp(
       onChild: (meta) =>
-          (meta.element!.localName == 'td' || meta.element!.localName == 'th')
+          (meta.element.localName == 'td' || meta.element.localName == 'th')
               ? meta[kCssPadding] = '${px}px'
               : null);
 
@@ -194,7 +194,7 @@ class TagTable {
         },
         onChild: border > 0
             ? (meta) {
-                switch (meta.element!.localName) {
+                switch (meta.element.localName) {
                   case kTagTableCell:
                   case kTagTableHeaderCell:
                     meta[kCssBorder] = kCssBorderInherit;
@@ -205,7 +205,7 @@ class TagTable {
 
   static String? _getCssDisplayValue(BuildMetadata meta) {
     String? value;
-    switch (meta.element!.localName) {
+    switch (meta.element.localName) {
       case kTagTableRow:
         value = kCssDisplayTableRow;
         break;
@@ -230,7 +230,7 @@ class TagTable {
       return value;
     }
 
-    for (final pair in meta.element!.styles.reversed) {
+    for (final pair in meta.element.styles.reversed) {
       if (pair.key == kCssDisplay) {
         return pair.value;
       }
@@ -270,12 +270,12 @@ class _TagTableRow {
   }
 
   void onChild(BuildMetadata childMeta) {
-    if (childMeta.element!.parent != rowMeta.element) return;
+    if (childMeta.element.parent != rowMeta.element) return;
     if (TagTable._getCssDisplayValue(childMeta) != kCssDisplayTableCell) {
       return;
     }
 
-    final attrs = childMeta.element!.attributes;
+    final attrs = childMeta.element.attributes;
     if (attrs.containsKey(kAttributeValign)) {
       childMeta[kCssVerticalAlign] = attrs[kAttributeValign]!;
     }
@@ -285,7 +285,7 @@ class _TagTableRow {
         final column = parent.wf.buildColumnPlaceholder(cellMeta, widgets);
         if (column == null) return [];
 
-        final attributes = cellMeta.element!.attributes;
+        final attributes = cellMeta.element.attributes;
         row.cells.add(_TagTableDataCell(
           cellMeta,
           child: column,
@@ -337,7 +337,7 @@ class _TagTableRowGroup {
   }
 
   void onChild(BuildMetadata childMeta) {
-    if (childMeta.element!.parent != groupMeta.element) return;
+    if (childMeta.element.parent != groupMeta.element) return;
     if (TagTable._getCssDisplayValue(childMeta) != kCssDisplayTableRow) {
       return;
     }

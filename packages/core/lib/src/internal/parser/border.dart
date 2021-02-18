@@ -12,7 +12,7 @@ final _borderValuesTwoRegExp = RegExp(r'^(.+)\s+(.+)$');
 final _elementBorder = Expando<CssBorder>();
 
 CssBorder? tryParseBorder(BuildMetadata meta) {
-  var border = _elementBorder[meta.element!];
+  var border = _elementBorder[meta.element];
   if (border != null) return border;
   border = CssBorder();
 
@@ -54,7 +54,7 @@ CssBorder? tryParseBorder(BuildMetadata meta) {
     }
   }
 
-  return _elementBorder[meta.element!] = border;
+  return _elementBorder[meta.element] = border;
 }
 
 CssBorderSide _tryParseBorderSide(String value) {

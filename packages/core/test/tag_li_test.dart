@@ -610,7 +610,7 @@ void main() async {
         ']]]';
 
     final nonExplainerExpected = 'TshWidget\n'
-        '└ColumnPlaceholder(BuildMetadata(root))\n'
+        '└ColumnPlaceholder(BuildMetadata(<root></root>))\n'
         ' └CssBlock()\n'
         '  └Padding(padding: EdgeInsets(0.0, 0.0, 40.0, 0.0))\n'
         '   └Column(textDirection: rtl)\n'

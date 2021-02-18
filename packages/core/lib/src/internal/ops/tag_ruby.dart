@@ -18,7 +18,7 @@ class TagRuby {
   }
 
   void onChild(BuildMetadata childMeta) {
-    final e = childMeta.element!;
+    final e = childMeta.element;
     if (e.parent != rubyMeta.element) return;
 
     switch (e.localName) {

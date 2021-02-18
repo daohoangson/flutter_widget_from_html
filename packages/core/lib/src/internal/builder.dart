@@ -21,7 +21,7 @@ class BuildMetadata extends core_data.BuildMetadata {
   var _stylesIsLocked = false;
   late bool _willBuildSubtree;
 
-  BuildMetadata(dom.Element? element, TextStyleBuilder tsb,
+  BuildMetadata(dom.Element element, TextStyleBuilder tsb,
       [this._parentOps = const []])
       : super(element, tsb);
 
@@ -201,7 +201,7 @@ class BuildTree extends core_data.BuildTree {
 
     // stylings, step 1: get default styles from tag-based build ops
     for (final op in meta.buildOps) {
-      final map = op.defaultStyles?.call(meta.element!);
+      final map = op.defaultStyles?.call(meta.element);
       if (map == null) continue;
 
       meta._styles ??= [];
@@ -213,7 +213,7 @@ class BuildTree extends core_data.BuildTree {
     _customStylesBuilder(meta);
 
     // stylings, step 2: get styles from `style` attribute
-    for (final pair in meta.element!.styles) {
+    for (final pair in meta.element.styles) {
       meta[pair.key] = pair.value;
     }
 
@@ -228,7 +228,7 @@ class BuildTree extends core_data.BuildTree {
   }
 
   void _customStylesBuilder(BuildMetadata meta) {
-    final map = customStylesBuilder?.call(meta.element!);
+    final map = customStylesBuilder?.call(meta.element);
     if (map == null) return;
 
     for (final pair in map.entries) {

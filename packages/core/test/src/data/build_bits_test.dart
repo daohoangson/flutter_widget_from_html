@@ -403,7 +403,7 @@ void main() {
 class _BuildBitWidgetFactory extends WidgetFactory {
   @override
   void parse(BuildMetadata meta) {
-    final classes = meta.element!.classes;
+    final classes = meta.element.classes;
 
     if (classes.contains('input--BuildContext')) {
       meta.register(BuildOp(

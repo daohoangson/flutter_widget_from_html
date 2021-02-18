@@ -12,7 +12,7 @@ part 'data/text_style.dart';
 /// A building element metadata.
 abstract class BuildMetadata {
   /// The associatd element.
-  final dom.Element? element;
+  final dom.Element element;
 
   /// The associated [TextStyleBuilder].
   final TextStyleBuilder tsb;
@@ -62,7 +62,7 @@ abstract class BuildMetadata {
 
   @override
   String toString() =>
-      'BuildMetadata(${element == null ? "root" : element!.outerHtml})';
+      'BuildMetadata(${element.outerHtml})';
 }
 
 /// A building operation to customize how a DOM element is rendered.
