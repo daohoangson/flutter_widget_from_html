@@ -106,7 +106,7 @@ abstract class BuildBit<InputType, OutputType> {
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb});
 
   /// Removes self from [parent].
-  bool? detach() => parent?._children.remove(this);
+  bool detach() => parent?._children.remove(this) ?? false;
 
   /// Inserts self after [another] in the tree.
   bool insertAfter(BuildBit another) {
