@@ -86,7 +86,7 @@ class BuildTree extends core_data.BuildTree {
   }) : super(parent, tsb);
 
   @override
-  BuildBit add(BuildBit bit) {
+  T add<T extends BuildBit>(T bit) {
     assert(_built.isEmpty, "Built tree shouldn't be altered.");
     return super.add(bit);
   }

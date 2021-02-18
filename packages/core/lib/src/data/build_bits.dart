@@ -191,7 +191,7 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
   }
 
   /// Adds [bit] as the last bit.
-  BuildBit add(BuildBit bit) {
+  T add<T extends BuildBit>(T bit) {
     assert(bit.parent == this);
     _children.add(bit);
     return bit;
@@ -204,7 +204,7 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
   BuildBit addWhitespace() => add(_TextWhitespace(this));
 
   /// Adds a string of text.
-  TextBit addText(String data) => add(TextBit(this, data)) as TextBit;
+  TextBit addText(String data) => add(TextBit(this, data));
 
   /// Builds widgets from bits.
   Iterable<WidgetPlaceholder> build();
