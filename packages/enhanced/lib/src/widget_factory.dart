@@ -253,7 +253,7 @@ class WidgetFactory extends core.WidgetFactory {
         _tagA ??= (tsh, Null _) => tsh.copyWith(
             style: tsh.style
                 .copyWith(color: tsh.getDependency<ThemeData>().accentColor));
-        meta.enqueueTsb(_tagA, null);
+        meta.tsb.enqueue(_tagA, null);
 
         if (attrs.containsKey('name')) {
           meta.register(_anchorOp(attrs['name']));

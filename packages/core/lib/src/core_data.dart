@@ -63,17 +63,6 @@ abstract class BuildMetadata {
   @override
   String toString() =>
       'BuildMetadata(${element == null ? "root" : element!.outerHtml})';
-
-  /// Enqueues a text style builder callback.
-  ///
-  /// Returns the associated [TextStyleBuilder].
-  TextStyleBuilder enqueueTsb<T>(
-    TextStyleHtml Function(TextStyleHtml tsh, T input) builder,
-    T input,
-  ) {
-    tsb.enqueue(builder, input);
-    return tsb;
-  }
 }
 
 /// A building operation to customize how a DOM element is rendered.

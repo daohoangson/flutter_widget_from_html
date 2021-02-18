@@ -351,7 +351,7 @@ class WidgetFactory {
 
       case 'abbr':
       case 'acronym':
-        meta.enqueueTsb(
+        meta.tsb.enqueue(
           TextStyleOps.textDeco,
           TextDeco(style: TextDecorationStyle.dotted, under: true),
         );
@@ -360,7 +360,7 @@ class WidgetFactory {
       case 'address':
         meta
           ..[kCssDisplay] = kCssDisplayBlock
-          ..enqueueTsb(TextStyleOps.fontStyle, FontStyle.italic);
+          ..tsb.enqueue(TextStyleOps.fontStyle, FontStyle.italic);
         break;
 
       case 'article':
@@ -384,11 +384,11 @@ class WidgetFactory {
 
       case 'b':
       case 'strong':
-        meta.enqueueTsb(TextStyleOps.fontWeight, FontWeight.bold);
+        meta.tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
         break;
 
       case 'big':
-        meta.enqueueTsb(_tsbFontSize, kCssFontSizeLarger);
+        meta.tsb.enqueue(_tsbFontSize, kCssFontSizeLarger);
         break;
 
       case 'br':
@@ -407,15 +407,15 @@ class WidgetFactory {
       case 'em':
       case 'i':
       case 'var':
-        meta.enqueueTsb(TextStyleOps.fontStyle, FontStyle.italic);
+        meta.tsb.enqueue(TextStyleOps.fontStyle, FontStyle.italic);
         break;
 
       case kTagCode:
       case kTagKbd:
       case kTagSamp:
       case kTagTt:
-        meta.enqueueTsb(
-            TextStyleOps.fontFamily, [kTagCodeFont1, kTagCodeFont2]);
+        meta.tsb
+            .enqueue(TextStyleOps.fontFamily, [kTagCodeFont1, kTagCodeFont2]);
         break;
       case kTagPre:
         _tagPre ??= BuildOp(
@@ -443,13 +443,13 @@ class WidgetFactory {
       case 'dt':
         meta
           ..[kCssDisplay] = kCssDisplayBlock
-          ..enqueueTsb(TextStyleOps.fontWeight, FontWeight.bold);
+          ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
         break;
 
       case 'del':
       case 's':
       case 'strike':
-        meta.enqueueTsb(TextStyleOps.textDeco, TextDeco(strike: true));
+        meta.tsb.enqueue(TextStyleOps.textDeco, TextDeco(strike: true));
         break;
 
       case kTagFont:
@@ -483,42 +483,42 @@ class WidgetFactory {
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '0.67em 0'
-          ..enqueueTsb(_tsbFontSize, '2em')
-          ..enqueueTsb(TextStyleOps.fontWeight, FontWeight.bold);
+          ..tsb.enqueue(_tsbFontSize, '2em')
+          ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h2':
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '0.83em 0'
-          ..enqueueTsb(_tsbFontSize, '1.5em')
-          ..enqueueTsb(TextStyleOps.fontWeight, FontWeight.bold);
+          ..tsb.enqueue(_tsbFontSize, '1.5em')
+          ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h3':
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '1em 0'
-          ..enqueueTsb(_tsbFontSize, '1.17em')
-          ..enqueueTsb(TextStyleOps.fontWeight, FontWeight.bold);
+          ..tsb.enqueue(_tsbFontSize, '1.17em')
+          ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h4':
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '1.33em 0'
-          ..enqueueTsb(TextStyleOps.fontWeight, FontWeight.bold);
+          ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h5':
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '1.67em 0'
-          ..enqueueTsb(_tsbFontSize, '0.83em')
-          ..enqueueTsb(TextStyleOps.fontWeight, FontWeight.bold);
+          ..tsb.enqueue(_tsbFontSize, '0.83em')
+          ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h6':
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '2.33em 0'
-          ..enqueueTsb(_tsbFontSize, '0.67em')
-          ..enqueueTsb(TextStyleOps.fontWeight, FontWeight.bold);
+          ..tsb.enqueue(_tsbFontSize, '0.67em')
+          ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
         break;
 
       case kTagImg:
@@ -528,7 +528,7 @@ class WidgetFactory {
 
       case 'ins':
       case 'u':
-        meta.enqueueTsb(TextStyleOps.textDeco, TextDeco(under: true));
+        meta.tsb.enqueue(TextStyleOps.textDeco, TextDeco(under: true));
         break;
 
       case kTagOrderedList:
@@ -565,18 +565,18 @@ class WidgetFactory {
         break;
 
       case 'small':
-        meta.enqueueTsb(_tsbFontSize, kCssFontSizeSmaller);
+        meta.tsb.enqueue(_tsbFontSize, kCssFontSizeSmaller);
         break;
 
       case 'sub':
         meta
           ..[kCssVerticalAlign] = kCssVerticalAlignSub
-          ..enqueueTsb(_tsbFontSize, kCssFontSizeSmaller);
+          ..tsb.enqueue(_tsbFontSize, kCssFontSizeSmaller);
         break;
       case 'sup':
         meta
           ..[kCssVerticalAlign] = kCssVerticalAlignSuper
-          ..enqueueTsb(_tsbFontSize, kCssFontSizeSmaller);
+          ..tsb.enqueue(_tsbFontSize, kCssFontSizeSmaller);
         break;
 
       case kTagTable:
@@ -595,7 +595,7 @@ class WidgetFactory {
       case kTagTableHeaderCell:
         meta
           ..[kCssVerticalAlign] = kCssVerticalAlignMiddle
-          ..enqueueTsb(TextStyleOps.fontWeight, FontWeight.bold);
+          ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case kTagTableCaption:
         meta[kCssTextAlign] = kCssTextAlignCenter;
@@ -625,33 +625,33 @@ class WidgetFactory {
 
       case kCssColor:
         final color = tryParseColor(value);
-        if (color != null) meta.enqueueTsb(TextStyleOps.color, color);
+        if (color != null) meta.tsb.enqueue(TextStyleOps.color, color);
         break;
 
       case kCssDirection:
-        meta.enqueueTsb(TextStyleOps.textDirection, value);
+        meta.tsb.enqueue(TextStyleOps.textDirection, value);
         break;
 
       case kCssFontFamily:
         final list = TextStyleOps.fontFamilyTryParse(value!);
-        meta.enqueueTsb(TextStyleOps.fontFamily, list);
+        meta.tsb.enqueue(TextStyleOps.fontFamily, list);
         break;
 
       case kCssFontSize:
-        meta.enqueueTsb(_tsbFontSize, value);
+        meta.tsb.enqueue(_tsbFontSize, value);
         break;
 
       case kCssFontStyle:
         final fontStyle = TextStyleOps.fontStyleTryParse(value);
         if (fontStyle != null) {
-          meta.enqueueTsb(TextStyleOps.fontStyle, fontStyle);
+          meta.tsb.enqueue(TextStyleOps.fontStyle, fontStyle);
         }
         break;
 
       case kCssFontWeight:
         final fontWeight = TextStyleOps.fontWeightTryParse(value);
         if (fontWeight != null) {
-          meta.enqueueTsb(TextStyleOps.fontWeight, fontWeight);
+          meta.tsb.enqueue(TextStyleOps.fontWeight, fontWeight);
         }
         break;
 
@@ -667,13 +667,13 @@ class WidgetFactory {
 
       case kCssLineHeight:
         _tsbLineHeight ??= TextStyleOps.lineHeight(this);
-        meta.enqueueTsb(_tsbLineHeight!, value);
+        meta.tsb.enqueue(_tsbLineHeight!, value);
         break;
 
       case kCssMaxLines:
       case kCssMaxLinesWebkitLineClamp:
         final maxLines = value == kCssMaxLinesNone ? -1 : int.tryParse(value!);
-        if (maxLines != null) meta.enqueueTsb(TextStyleOps.maxLines, maxLines);
+        if (maxLines != null) meta.tsb.enqueue(TextStyleOps.maxLines, maxLines);
         break;
 
       case kCssTextAlign:
@@ -686,7 +686,7 @@ class WidgetFactory {
             if (style.key == kCssTextDecoration) {
               final textDeco = TextDeco.tryParse(style.values);
               if (textDeco != null) {
-                meta.enqueueTsb(TextStyleOps.textDeco, textDeco);
+                meta.tsb.enqueue(TextStyleOps.textDeco, textDeco);
               }
             }
           }
@@ -697,10 +697,10 @@ class WidgetFactory {
       case kCssTextOverflow:
         switch (value) {
           case kCssTextOverflowClip:
-            meta.enqueueTsb(TextStyleOps.textOverflow, TextOverflow.clip);
+            meta.tsb.enqueue(TextStyleOps.textOverflow, TextOverflow.clip);
             break;
           case kCssTextOverflowEllipsis:
-            meta.enqueueTsb(TextStyleOps.textOverflow, TextOverflow.ellipsis);
+            meta.tsb.enqueue(TextStyleOps.textOverflow, TextOverflow.ellipsis);
             break;
         }
         break;

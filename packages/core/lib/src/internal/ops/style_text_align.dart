@@ -21,7 +21,7 @@ class StyleTextAlign {
   StyleTextAlign(this.wf, this.value);
 
   BuildOp get op => BuildOp(
-        onTree: (meta, _) => meta.enqueueTsb(_tsb, value),
+        onTree: (meta, _) => meta.tsb.enqueue(_tsb, value),
         onWidgets: (_, widgets) => _onWidgets(widgets, value),
         onWidgetsIsOptional: true,
         priority: 4100,

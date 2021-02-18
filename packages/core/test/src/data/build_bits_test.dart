@@ -456,7 +456,7 @@ class _BuildBitWidgetFactory extends WidgetFactory {
     }
 
     if (classes.contains('custom')) {
-      meta.enqueueTsb((tsh, Null _) => tsh.copyWith(), null);
+      meta.tsb.enqueue((tsh, Null _) => tsh.copyWith(), null);
     }
 
     super.parse(meta);
