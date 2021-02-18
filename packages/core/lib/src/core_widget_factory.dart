@@ -421,8 +421,8 @@ class WidgetFactory {
         _tagPre ??= BuildOp(
           defaultStyles: (_) =>
               const {kCssFontFamily: '$kTagCodeFont1, $kTagCodeFont2'},
-          onTree: (meta, tree) => tree
-              .replaceWith(TextBit(tree, meta.element.text, tsb: tree.tsb)),
+          onTree: (meta, tree) =>
+              tree.replaceWith(TextBit(tree, meta.element.text, tsb: tree.tsb)),
           onWidgets: (meta, widgets) => listOrNull(
               buildColumnPlaceholder(meta, widgets)
                   ?.wrapWith((_, w) => buildHorizontalScrollView(meta, w))),

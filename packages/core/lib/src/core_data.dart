@@ -61,8 +61,7 @@ abstract class BuildMetadata {
   void register(BuildOp op);
 
   @override
-  String toString() =>
-      'BuildMetadata(${element.outerHtml})';
+  String toString() => 'BuildMetadata(${element.outerHtml})';
 }
 
 /// A building operation to customize how a DOM element is rendered.
