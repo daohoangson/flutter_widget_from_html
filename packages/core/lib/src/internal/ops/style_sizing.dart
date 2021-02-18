@@ -144,7 +144,7 @@ class StyleSizing {
     );
   }
 
-  static CssSizingValue? _getValue(CssLength? length, TextStyleHtml? tsh) {
+  static CssSizingValue? _getValue(CssLength? length, TextStyleHtml tsh) {
     if (length == null) return null;
 
     final value = length.getValue(tsh);

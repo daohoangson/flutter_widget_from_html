@@ -71,19 +71,19 @@ class CssBorder {
       );
 
   /// Calculates [Border].
-  Border? getValue(TextStyleHtml? tsh) {
+  Border? getValue(TextStyleHtml tsh) {
     final bottom = CssBorderSide._copyWith(_all, _bottom)?._getValue(tsh);
     final left = CssBorderSide._copyWith(
             _all,
             _left ??
-                (tsh!.textDirection == TextDirection.ltr
+                (tsh.textDirection == TextDirection.ltr
                     ? _inlineStart
                     : _inlineEnd))
         ?._getValue(tsh);
     final right = CssBorderSide._copyWith(
             _all,
             _right ??
-                (tsh!.textDirection == TextDirection.ltr
+                (tsh.textDirection == TextDirection.ltr
                     ? _inlineEnd
                     : _inlineStart))
         ?._getValue(tsh);
@@ -119,10 +119,10 @@ class CssBorderSide {
   /// A border that is not rendered.
   static const none = CssBorderSide();
 
-  BorderSide? _getValue(TextStyleHtml? tsh) => identical(this, none)
+  BorderSide? _getValue(TextStyleHtml tsh) => identical(this, none)
       ? null
       : BorderSide(
-          color: color ?? tsh!.style.color!,
+          color: color ?? tsh.style.color!,
           // TODO: add proper support for other border styles
           style: style != null ? BorderStyle.solid : BorderStyle.none,
           width: width?.getValue(tsh) ?? 0.0,
@@ -161,14 +161,14 @@ class CssLength {
   bool get isNotEmpty => number > 0;
 
   /// Calculates value in logical pixel.
-  double? getValue(TextStyleHtml? tsh,
+  double? getValue(TextStyleHtml tsh,
       {double? baseValue, double? scaleFactor}) {
     double value;
     switch (unit) {
       case CssLengthUnit.auto:
         return null;
       case CssLengthUnit.em:
-        baseValue ??= tsh!.style.fontSize;
+        baseValue ??= tsh.style.fontSize;
         value = baseValue! * number;
         scaleFactor = 1;
         break;
@@ -251,13 +251,13 @@ class CssLengthBox {
       _right?.isNotEmpty == true;
 
   /// Calculates the left value taking text direction into account.
-  double? getValueLeft(TextStyleHtml? tsh) => (_left ??
-          (tsh!.textDirection == TextDirection.ltr ? _inlineStart : _inlineEnd))
+  double? getValueLeft(TextStyleHtml tsh) => (_left ??
+          (tsh.textDirection == TextDirection.ltr ? _inlineStart : _inlineEnd))
       ?.getValue(tsh);
 
   /// Calculates the right value taking text direction into account.
-  double? getValueRight(TextStyleHtml? tsh) => (_right ??
-          (tsh!.textDirection == TextDirection.ltr ? _inlineEnd : _inlineStart))
+  double? getValueRight(TextStyleHtml tsh) => (_right ??
+          (tsh.textDirection == TextDirection.ltr ? _inlineEnd : _inlineStart))
       ?.getValue(tsh);
 }
 
