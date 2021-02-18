@@ -152,13 +152,13 @@ class BuildTree extends core_data.BuildTree {
       return;
     }
 
-    final meta = BuildMetadata(element, parentMeta!.tsb().sub(), parentOps);
+    final meta = BuildMetadata(element, parentMeta!.tsb.sub(), parentOps);
     _collectMetadata(meta);
 
     final subTree = sub(
       parentMeta: meta,
       parentOps: _prepareParentOps(parentOps, meta),
-      tsb: meta.tsb(),
+      tsb: meta.tsb,
     );
     add(subTree);
 

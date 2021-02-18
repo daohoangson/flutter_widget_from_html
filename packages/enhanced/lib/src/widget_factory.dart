@@ -19,7 +19,7 @@ class WidgetFactory extends core.WidgetFactory {
   final _anchors = <String, GlobalKey>{};
 
   State _state;
-  TextStyleHtml Function(TextStyleHtml, dynamic) _tagA;
+  TextStyleHtml Function(TextStyleHtml, Null) _tagA;
   BuildOp _tagIframe;
   BuildOp _tagSvg;
 
@@ -250,10 +250,10 @@ class WidgetFactory extends core.WidgetFactory {
 
     switch (meta.element.localName) {
       case 'a':
-        _tagA ??= (tsh, _) => tsh.copyWith(
+        _tagA ??= (tsh, Null _) => tsh.copyWith(
             style: tsh.style
                 .copyWith(color: tsh.getDependency<ThemeData>().accentColor));
-        meta.tsb(_tagA);
+        meta.enqueueTsb(_tagA, null);
 
         if (attrs.containsKey('name')) {
           meta.register(_anchorOp(attrs['name']));
@@ -314,7 +314,7 @@ class WidgetFactory extends core.WidgetFactory {
           tree,
           WidgetPlaceholder('#$id').wrapWith(
             (context, _) => SizedBox(
-              height: meta.tsb().build(context).style.fontSize,
+              height: meta.tsb.build(context).style.fontSize,
               key: anchor,
             ),
           ),

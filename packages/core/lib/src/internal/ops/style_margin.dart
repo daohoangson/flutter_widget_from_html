@@ -34,7 +34,7 @@ class StyleMargin {
           if (widgets.isNotEmpty != true) return null;
           final m = tryParseCssLengthBox(meta, kCssMargin);
           if (m == null) return null;
-          final tsb = meta.tsb();
+          final tsb = meta.tsb;
 
           return [
             if (m.top?.isNotEmpty ?? false) HeightPlaceholder(m.top, tsb),

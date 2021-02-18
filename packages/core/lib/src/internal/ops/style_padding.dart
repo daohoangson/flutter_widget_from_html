@@ -51,7 +51,7 @@ class StylePadding {
 
   Widget _build(BuildContext context, BuildMetadata meta, Widget child,
       CssLengthBox padding) {
-    final tsh = meta.tsb().build(context);
+    final tsh = meta.tsb.build(context);
     return wf.buildPadding(
       meta,
       child,

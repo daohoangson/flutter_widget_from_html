@@ -53,37 +53,37 @@ const kCssTextDecorationOverline = 'overline';
 const kCssTextDecorationUnderline = 'underline';
 
 class TextStyleOps {
-  static TextStyleHtml color(TextStyleHtml? p, Color color) =>
-      p!.copyWith(style: p.style!.copyWith(color: color));
+  static TextStyleHtml color(TextStyleHtml p, Color color) =>
+      p.copyWith(style: p.style!.copyWith(color: color));
 
-  static TextStyleHtml fontFamily(TextStyleHtml? p, List<String> list) =>
-      p!.copyWith(
+  static TextStyleHtml fontFamily(TextStyleHtml p, List<String> list) =>
+      p.copyWith(
         style: p.style!.copyWith(
           fontFamily: list.isNotEmpty ? list.first : null,
           fontFamilyFallback: list.skip(1).toList(growable: false),
         ),
       );
 
-  static TextStyleHtml Function(TextStyleHtml?, String) fontSize(
+  static TextStyleHtml Function(TextStyleHtml, String?) fontSize(
           WidgetFactory wf) =>
-      (p, v) => p!.copyWith(
+      (p, v) => p.copyWith(
           style: p.style!.copyWith(fontSize: _fontSizeTryParse(wf, p, v)));
 
-  static TextStyleHtml fontStyle(TextStyleHtml? p, FontStyle fontStyle) =>
-      p!.copyWith(style: p.style!.copyWith(fontStyle: fontStyle));
+  static TextStyleHtml fontStyle(TextStyleHtml p, FontStyle fontStyle) =>
+      p.copyWith(style: p.style!.copyWith(fontStyle: fontStyle));
 
-  static TextStyleHtml fontWeight(TextStyleHtml? p, FontWeight v) =>
-      p!.copyWith(style: p.style!.copyWith(fontWeight: v));
+  static TextStyleHtml fontWeight(TextStyleHtml p, FontWeight v) =>
+      p.copyWith(style: p.style!.copyWith(fontWeight: v));
 
-  static TextStyleHtml Function(TextStyleHtml?, String) lineHeight(
+  static TextStyleHtml Function(TextStyleHtml, String?) lineHeight(
           WidgetFactory wf) =>
-      (p, v) => p!.copyWith(height: _lineHeightTryParse(wf, p, v));
+      (p, v) => p.copyWith(height: _lineHeightTryParse(wf, p, v!));
 
-  static TextStyleHtml maxLines(TextStyleHtml? p, int v) =>
-      p!.copyWith(maxLines: v);
+  static TextStyleHtml maxLines(TextStyleHtml p, int v) =>
+      p.copyWith(maxLines: v);
 
-  static TextStyleHtml textDeco(TextStyleHtml? p, TextDeco v) {
-    final pd = p!.style!.decoration;
+  static TextStyleHtml textDeco(TextStyleHtml p, TextDeco v) {
+    final pd = p.style!.decoration;
     final lineThough = pd?.contains(TextDecoration.lineThrough) == true;
     final overline = pd?.contains(TextDecoration.overline) == true;
     final underline = pd?.contains(TextDecoration.underline) == true;
@@ -109,19 +109,19 @@ class TextStyleOps {
     );
   }
 
-  static TextStyleHtml textDirection(TextStyleHtml? p, String v) {
+  static TextStyleHtml textDirection(TextStyleHtml p, String? v) {
     final textDirection = (v == kCssDirectionRtl)
         ? TextDirection.rtl
         : v == kCssDirectionLtr
             ? TextDirection.ltr
             : null;
-    if (textDirection == null) return p!;
+    if (textDirection == null) return p;
 
-    return p!.copyWith(textDirection: textDirection);
+    return p.copyWith(textDirection: textDirection);
   }
 
-  static TextStyleHtml textOverflow(TextStyleHtml? p, TextOverflow v) =>
-      p!.copyWith(textOverflow: v);
+  static TextStyleHtml textOverflow(TextStyleHtml p, TextOverflow v) =>
+      p.copyWith(textOverflow: v);
 
   static List<String> fontFamilyTryParse(String value) {
     final parts = value.split(',');
@@ -176,7 +176,7 @@ class TextStyleOps {
   }
 
   static double? _fontSizeTryParse(
-      WidgetFactory wf, TextStyleHtml p, String v) {
+      WidgetFactory wf, TextStyleHtml p, String? v) {
     final length = tryParseCssLength(v);
     if (length != null) {
       final lengthValue = length.getValue(

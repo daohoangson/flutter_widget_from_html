@@ -56,7 +56,7 @@ class StyleBorder {
     Widget child,
     CssBorder border,
   ) {
-    final tsh = meta.tsb().build(context);
+    final tsh = meta.tsb.build(context);
     return wf.buildBorder(
       meta,
       child,

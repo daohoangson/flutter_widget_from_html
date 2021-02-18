@@ -251,7 +251,7 @@ Widget _buildBody(_HtmlWidgetState state, dom.NodeList domNodes) {
     customStylesBuilder: state.widget.customStylesBuilder,
     customWidgetBuilder: state.widget.customWidgetBuilder,
     parentMeta: rootMeta as builder.BuildMetadata?,
-    tsb: rootMeta.tsb(),
+    tsb: rootMeta.tsb,
     wf: wf,
   )..addBitsFromNodes(domNodes);
   return wf.buildBody(rootMeta, tree.build()) ?? widget0;

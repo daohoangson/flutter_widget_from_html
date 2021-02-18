@@ -43,7 +43,7 @@ class StyleSizing {
             }
           }
 
-          widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb()));
+          widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb));
         },
         onWidgets: (meta, widgets) {
           if (!meta.willBuildSubtree) return widgets;
@@ -52,7 +52,7 @@ class StyleSizing {
           if (input == null) return widgets;
           return listOrNull(wf
               .buildColumnPlaceholder(meta, widgets)
-              ?.wrapWith((c, w) => _build(c, w, input, meta.tsb())));
+              ?.wrapWith((c, w) => _build(c, w, input, meta.tsb)));
         },
         onWidgetsIsOptional: true,
         priority: kPriority5k,

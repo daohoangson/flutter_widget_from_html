@@ -14,10 +14,11 @@ abstract class BuildMetadata {
   /// The associatd element.
   final dom.Element? element;
 
-  final TextStyleBuilder _tsb;
+  /// The associated [TextStyleBuilder].
+  final TextStyleBuilder tsb;
 
   /// Creates a node.
-  BuildMetadata(this.element, this._tsb);
+  BuildMetadata(this.element, this.tsb);
 
   /// The registered build ops.
   Iterable<BuildOp> get buildOps;
@@ -66,14 +67,12 @@ abstract class BuildMetadata {
   /// Enqueues a text style builder callback.
   ///
   /// Returns the associated [TextStyleBuilder].
-  TextStyleBuilder tsb<T>([
-    TextStyleHtml Function(TextStyleHtml tsh, T input)? builder,
-    T? input,
-  ]) {
-    if (builder != null) {
-      _tsb.enqueue(builder, input);
-    }
-    return _tsb;
+  TextStyleBuilder enqueueTsb<T>(
+    TextStyleHtml Function(TextStyleHtml tsh, T input) builder,
+    T input,
+  ) {
+    tsb.enqueue(builder, input);
+    return tsb;
   }
 }
 

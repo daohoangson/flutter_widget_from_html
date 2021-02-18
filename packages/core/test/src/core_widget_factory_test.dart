@@ -23,7 +23,9 @@ class _OnRoot extends WidgetFactory {
   void onRoot(TextStyleBuilder rootTsb) {
     super.onRoot(rootTsb);
 
-    rootTsb.enqueue((tsh, dynamic _) =>
-        tsh.copyWith(style: tsh.style!.copyWith(fontFamily: 'Custom')));
+    rootTsb.enqueue(
+        (tsh, Null _) =>
+            tsh.copyWith(style: tsh.style!.copyWith(fontFamily: 'Custom')),
+        null);
   }
 }
