@@ -92,7 +92,7 @@ class TagLi {
     final meta = _itemMetas[i];
     final listStyleType = _ListConfig.listStyleTypeFromBuildMetadata(meta) ??
         config.listStyleType;
-    final markerIndex = config.markerReversed == true
+    final markerIndex = config.markerReversed
         ? (config.markerStart ?? _itemWidgets.length) - i
         : (config.markerStart ?? 1) + i;
     final tsh = meta.tsb.build(context);
@@ -127,13 +127,13 @@ class TagLi {
 
 @immutable
 class _ListConfig {
-  final String? listStyleType;
-  final bool? markerReversed;
+  final String listStyleType;
+  final bool markerReversed;
   final int? markerStart;
 
   _ListConfig({
-    this.listStyleType,
-    this.markerReversed,
+    required this.listStyleType,
+    required this.markerReversed,
     this.markerStart,
   });
 
@@ -209,12 +209,12 @@ class _ListItemRenderObject extends RenderBox
         ContainerRenderObjectMixin<RenderBox, _ListItemData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _ListItemData> {
   _ListItemRenderObject({
-    TextDirection? textDirection,
+    required TextDirection textDirection,
   }) : _textDirection = textDirection;
 
-  TextDirection? get textDirection => _textDirection;
-  TextDirection? _textDirection;
-  set textDirection(TextDirection? value) {
+  TextDirection get textDirection => _textDirection;
+  TextDirection _textDirection;
+  set textDirection(TextDirection value) {
     if (_textDirection == value) return;
     _textDirection = value;
     markNeedsLayout();
@@ -327,7 +327,7 @@ class _ListMarker extends SingleChildRenderObjectWidget {
 
   @override
   RenderObject createRenderObject(BuildContext _) =>
-      _ListMarkerRenderObject(markerType: markerType, textStyle: textStyle);
+      _ListMarkerRenderObject(markerType, textStyle);
 
   @override
   void updateRenderObject(
@@ -339,10 +339,7 @@ class _ListMarker extends SingleChildRenderObjectWidget {
 }
 
 class _ListMarkerRenderObject extends RenderBox {
-  _ListMarkerRenderObject(
-      {required _ListMarkerType markerType, required TextStyle textStyle})
-      : _textStyle = textStyle,
-        _markerType = markerType;
+  _ListMarkerRenderObject(this._markerType, this._textStyle);
 
   _ListMarkerType _markerType;
   set markerType(_ListMarkerType v) {
