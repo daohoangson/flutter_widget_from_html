@@ -250,7 +250,7 @@ Widget _buildBody(_HtmlWidgetState state, dom.NodeList domNodes) {
   final tree = builder.BuildTree(
     customStylesBuilder: state.widget.customStylesBuilder,
     customWidgetBuilder: state.widget.customWidgetBuilder,
-    parentMeta: rootMeta as builder.BuildMetadata?,
+    parentMeta: rootMeta,
     tsb: rootMeta.tsb,
     wf: wf,
   )..addBitsFromNodes(domNodes);
