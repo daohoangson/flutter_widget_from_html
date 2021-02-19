@@ -173,7 +173,7 @@ class TagTable {
             columnSpan: columnSpan,
             columnStart: columnStart,
             rowSpan: rowSpan,
-            rowStart: cellMeta.row!,
+            rowStart: cellMeta.row,
           );
         });
       }
@@ -243,8 +243,8 @@ class TagTable {
 extension _BuildMetadataExtension on BuildMetadata {
   static final _rows = Expando<int>();
 
-  set row(int? v) => _rows[this] = v;
-  int? get row => _rows[this];
+  set row(int v) => _rows[this] = v;
+  int get row => _rows[this]!;
 }
 
 typedef _HtmlTableCellBuilder = HtmlTableCell Function(BuildContext);
@@ -310,7 +310,6 @@ class _TagTableRow {
             .buildColumnPlaceholder(cellMeta, widgets)
             ?.wrapWith((_, child) {
           final row = cellMeta.row;
-          if (row == null) return child;
 
           return HtmlTableValignBaseline(
             child: child,
