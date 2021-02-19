@@ -244,7 +244,7 @@ extension _BuildMetadataExtension on BuildMetadata {
   static final _rows = Expando<int>();
 
   set row(int v) => _rows[this] = v;
-  int get row => _rows[this]!;
+  int get row => _rows[this] ?? -1;
 }
 
 typedef _HtmlTableCellBuilder = HtmlTableCell Function(BuildContext);
