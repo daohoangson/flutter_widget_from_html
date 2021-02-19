@@ -88,7 +88,7 @@ class TagTable {
           .buildColumnPlaceholder(tableMeta, caption.build())
           ?.wrapWith((_, child) => _TableCaption(child));
       if (built != null) {
-        WidgetBit.block(tree.parent, built).insertBefore(tree);
+        WidgetBit.block(tree.parent!, built).insertBefore(tree);
       }
 
       caption.detach();

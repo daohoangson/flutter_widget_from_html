@@ -258,19 +258,19 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
 class TextBit extends BuildBit<Null, String> {
   final String data;
 
-  TextBit._(BuildTree? parent, TextStyleBuilder? tsb, this.data)
+  TextBit._(BuildTree parent, TextStyleBuilder tsb, this.data)
       : super(parent, tsb);
 
   /// Creates with string,
   factory TextBit(BuildTree parent, String data, {TextStyleBuilder? tsb}) =>
-      TextBit._(parent, tsb ?? parent.tsb, data);
+      TextBit._(parent, tsb ?? parent.tsb!, data);
 
   @override
   String buildBit(Null _) => data;
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      TextBit._(parent ?? this.parent, tsb ?? this.tsb, data);
+      TextBit._(parent ?? this.parent!, tsb ?? this.tsb!, data);
 
   @override
   String toString() => '"$data"';
@@ -288,8 +288,8 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
   final WidgetPlaceholder<T> child;
 
   WidgetBit._(
-    BuildTree? parent,
-    TextStyleBuilder? tsb,
+    BuildTree parent,
+    TextStyleBuilder tsb,
     this.child, [
     this.alignment,
     this.baseline,
@@ -297,16 +297,16 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
 
   /// Creates a block widget.
   factory WidgetBit.block(
-    BuildTree? parent,
+    BuildTree parent,
     Widget child, {
     TextStyleBuilder? tsb,
   }) =>
-      WidgetBit._(parent, tsb ?? parent!.tsb,
+      WidgetBit._(parent, tsb ?? parent.tsb!,
           WidgetPlaceholder.lazy(child) as WidgetPlaceholder<T>);
 
   /// Creates an inline widget.
   factory WidgetBit.inline(
-    BuildTree? parent,
+    BuildTree parent,
     Widget child, {
     PlaceholderAlignment alignment = PlaceholderAlignment.baseline,
     TextBaseline baseline = TextBaseline.alphabetic,
@@ -314,7 +314,7 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
   }) =>
       WidgetBit._(
           parent,
-          tsb ?? parent!.tsb,
+          tsb ?? parent.tsb!,
           WidgetPlaceholder.lazy(child) as WidgetPlaceholder<T>,
           alignment,
           baseline);
@@ -333,7 +333,7 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) => WidgetBit._(
-      parent ?? this.parent, tsb ?? this.tsb, child, alignment, baseline);
+      parent ?? this.parent!, tsb ?? this.tsb!, child, alignment, baseline);
 
   @override
   String toString() =>

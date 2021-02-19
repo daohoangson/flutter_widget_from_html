@@ -151,7 +151,7 @@ class _Flattener {
     if (scopedBuffer == '\n' && scopedSpans.isEmpty) {
       // special handling for paragraph with only one line break
       _flattened.add(Flattened._(
-        widget: HeightPlaceholder(CssLength(1, CssLengthUnit.em), scopedTsb),
+        widget: HeightPlaceholder(CssLength(1, CssLengthUnit.em), scopedTsb!),
       ));
       return;
     }

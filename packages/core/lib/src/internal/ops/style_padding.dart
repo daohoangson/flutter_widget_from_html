@@ -3,14 +3,14 @@ part of '../core_ops.dart';
 const kCssPadding = 'padding';
 
 WidgetPlaceholder _paddingInlineAfter(
-        TextStyleBuilder? tsb, CssLengthBox? box) =>
-    WidgetPlaceholder<CssLengthBox?>(box).wrapWith((context, _) =>
-        _paddingInlineSizedBox(box!.getValueRight(tsb!.build(context))));
+        TextStyleBuilder tsb, CssLengthBox box) =>
+    WidgetPlaceholder<CssLengthBox>(box).wrapWith((context, _) =>
+        _paddingInlineSizedBox(box.getValueRight(tsb.build(context))));
 
 WidgetPlaceholder _paddingInlineBefore(
-        TextStyleBuilder? tsb, CssLengthBox? b) =>
-    WidgetPlaceholder<CssLengthBox?>(b).wrapWith((context, _) =>
-        _paddingInlineSizedBox(b!.getValueLeft(tsb!.build(context))));
+        TextStyleBuilder tsb, CssLengthBox b) =>
+    WidgetPlaceholder<CssLengthBox>(b).wrapWith((context, _) =>
+        _paddingInlineSizedBox(b.getValueLeft(tsb.build(context))));
 
 Widget _paddingInlineSizedBox(double? width) =>
     width != null && width > 0 ? SizedBox(width: width) : widget0;
@@ -31,9 +31,9 @@ class StylePadding {
           return wrapTree(
             tree,
             append: (p) =>
-                WidgetBit.inline(p, _paddingInlineAfter(p.tsb, padding)),
+                WidgetBit.inline(p, _paddingInlineAfter(p.tsb!, padding!)),
             prepend: (p) =>
-                WidgetBit.inline(p, _paddingInlineBefore(p.tsb, padding)),
+                WidgetBit.inline(p, _paddingInlineBefore(p.tsb!, padding!)),
           );
         },
         onWidgets: (meta, widgets) {

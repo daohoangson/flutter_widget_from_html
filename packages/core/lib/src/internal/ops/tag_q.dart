@@ -30,9 +30,9 @@ class _TagQBit extends BuildBit<Null, String> {
   String toString() =>
       'QBit.${isOpening ? "opening" : "closing"}#$hashCode $tsb';
 
-  static _TagQBit closing(BuildTree? parent) =>
-      _TagQBit(parent, parent!.tsb, false);
+  static _TagQBit closing(BuildTree parent) =>
+      _TagQBit(parent, parent.tsb, false);
 
-  static _TagQBit opening(BuildTree? parent) =>
-      _TagQBit(parent, parent!.tsb, true);
+  static _TagQBit opening(BuildTree parent) =>
+      _TagQBit(parent, parent.tsb, true);
 }
