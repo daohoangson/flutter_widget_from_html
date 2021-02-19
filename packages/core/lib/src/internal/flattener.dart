@@ -69,7 +69,7 @@ class _Flattener {
       built = bit.buildBit(_prevRecognizer.value);
     } else if (bit is BuildBit<TextStyleHtml?, InlineSpan>) {
       // ignore: omit_local_variable_types
-      final SpanBuilder spanBuilder = (c) => bit.buildBit(thisTsb!.build(c));
+      final SpanBuilder spanBuilder = (c) => bit.buildBit(thisTsb?.build(c));
       built = spanBuilder;
     }
 
