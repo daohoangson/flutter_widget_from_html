@@ -16,7 +16,7 @@ const kTagCenter = 'center';
 
 class StyleTextAlign {
   final WidgetFactory wf;
-  final String? value;
+  final String value;
 
   StyleTextAlign(this.wf, this.value);
 

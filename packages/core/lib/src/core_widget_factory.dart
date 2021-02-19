@@ -677,7 +677,7 @@ class WidgetFactory {
         break;
 
       case kCssTextAlign:
-        meta.register(StyleTextAlign(this, value).op);
+        meta.register(StyleTextAlign(this, value!).op);
         break;
 
       case kCssTextDecoration:
