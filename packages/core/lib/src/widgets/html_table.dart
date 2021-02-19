@@ -32,10 +32,8 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   }) : super(children: children, key: key);
 
   @override
-  RenderObject createRenderObject(BuildContext _) => _TableRenderObject(
-      border: border,
-      borderCollapse: borderCollapse,
-      borderSpacing: borderSpacing);
+  RenderObject createRenderObject(BuildContext _) =>
+      _TableRenderObject(border, borderCollapse, borderSpacing, companion);
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -63,7 +61,7 @@ class HtmlTable extends MultiChildRenderObjectWidget {
 
 /// Companion data for table.
 class HtmlTableCompanion {
-  final _baselines = <int?, List<_ValignBaselineRenderObject>>{};
+  final _baselines = <int, List<_ValignBaselineRenderObject>>{};
 }
 
 /// A TD (table cell) widget.
@@ -167,9 +165,7 @@ class HtmlTableValignBaseline extends SingleChildRenderObjectWidget {
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
-      _ValignBaselineRenderObject()
-        ..companion = companion
-        ..row = row;
+      _ValignBaselineRenderObject(companion, row);
 
   @override
   void updateRenderObject(
@@ -191,30 +187,30 @@ extension _IterableDouble on Iterable<double> {
 class _TableCellData extends ContainerBoxParentData<RenderBox> {
   Border? border;
   int columnSpan = 1;
-  int? columnStart;
+  int columnStart = -1;
   int rowSpan = 1;
-  int? rowStart;
+  int rowStart = -1;
 
   double calculateHeight(_TableRenderObject tro, List<double> heights) {
     final gaps = (rowSpan - 1) * tro.rowGap;
-    return heights.getRange(rowStart!, rowStart! + rowSpan).sum + gaps;
+    return heights.getRange(rowStart, rowStart + rowSpan).sum + gaps;
   }
 
   double calculateWidth(_TableRenderObject tro, List<double> widths) {
     final gaps = (columnSpan - 1) * tro.columnGap;
-    return widths.getRange(columnStart!, columnStart! + columnSpan).sum + gaps;
+    return widths.getRange(columnStart, columnStart + columnSpan).sum + gaps;
   }
 
   double calculateX(_TableRenderObject tro, List<double> widths) {
     final padding = tro._border?.left.width ?? 0.0;
-    final gaps = (columnStart! + 1) * tro.columnGap;
-    return padding + widths.getRange(0, columnStart!).sum + gaps;
+    final gaps = (columnStart + 1) * tro.columnGap;
+    return padding + widths.getRange(0, columnStart).sum + gaps;
   }
 
   double calculateY(_TableRenderObject tro, List<double> heights) {
     final padding = tro._border?.top.width ?? 0.0;
-    final gaps = (rowStart! + 1) * tro.rowGap;
-    return padding + heights.getRange(0, rowStart!).sum + gaps;
+    final gaps = (rowStart + 1) * tro.rowGap;
+    return padding + heights.getRange(0, rowStart).sum + gaps;
   }
 }
 
@@ -223,12 +219,7 @@ class _TableRenderObject extends RenderBox
         ContainerRenderObjectMixin<RenderBox, _TableCellData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _TableCellData> {
   _TableRenderObject(
-      {required Border? border,
-      required bool borderCollapse,
-      required double borderSpacing})
-      : _border = border,
-        _borderCollapse = borderCollapse,
-        _borderSpacing = borderSpacing;
+      this._border, this._borderCollapse, this._borderSpacing, this._companion);
 
   Border? _border;
   set border(Border? v) {
@@ -251,7 +242,7 @@ class _TableRenderObject extends RenderBox
     markNeedsLayout();
   }
 
-  HtmlTableCompanion? _companion;
+  HtmlTableCompanion _companion;
   set companion(HtmlTableCompanion v) {
     if (v == _companion) return;
     _companion = v;
@@ -310,7 +301,7 @@ class _TableRenderObject extends RenderBox
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    _companion?._baselines.clear();
+    _companion._baselines.clear();
 
     assert(_calculatedHeight != null);
     assert(_calculatedWidth != null);
@@ -357,8 +348,8 @@ class _TableRenderObject extends RenderBox
       children.add(child);
       cells.add(data);
 
-      columnCount = max(columnCount, data.columnStart! + data.columnSpan);
-      rowCount = max(rowCount, data.rowStart! + data.rowSpan);
+      columnCount = max(columnCount, data.columnStart + data.columnSpan);
+      rowCount = max(rowCount, data.rowStart + data.rowSpan);
 
       child = data.nextSibling;
     }
@@ -388,7 +379,7 @@ class _TableRenderObject extends RenderBox
       // distribute cell width across spanned columns
       final columnWidth = (childSize.width - childColumnGaps) / data.columnSpan;
       for (var c = 0; c < data.columnSpan; c++) {
-        final column = data.columnStart! + c;
+        final column = data.columnStart + c;
         columnWidths[column] = max(columnWidths[column], columnWidth);
       }
 
@@ -396,7 +387,7 @@ class _TableRenderObject extends RenderBox
       final childRowGaps = (data.rowSpan - 1) * rowGap;
       final rowHeight = (childSize.height - childRowGaps) / data.rowSpan;
       for (var r = 0; r < data.rowSpan; r++) {
-        final row = data.rowStart! + r;
+        final row = data.rowStart + r;
         rowHeights[row] = max(rowHeights[row], rowHeight);
       }
     }
@@ -440,14 +431,16 @@ class _TableRenderObject extends RenderBox
 }
 
 class _ValignBaselineRenderObject extends RenderProxyBox {
-  HtmlTableCompanion? _companion;
+  _ValignBaselineRenderObject(this._companion, this._row);
+
+  HtmlTableCompanion _companion;
   set companion(HtmlTableCompanion v) {
     if (v == _companion) return;
     _companion = v;
     markNeedsLayout();
   }
 
-  int? _row;
+  int _row;
   set row(int v) {
     if (v == _row) return;
     _row = v;
@@ -461,47 +454,45 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
   void paint(PaintingContext context, Offset offset) {
     offset = offset.translate(0, _paddingTop);
 
-    if (_companion != null && _row != null) {
-      _baselineWithOffset =
-          offset.dy + child!.getDistanceToBaseline(TextBaseline.alphabetic)!;
+    _baselineWithOffset =
+        offset.dy + child!.getDistanceToBaseline(TextBaseline.alphabetic)!;
 
-      final siblings = _companion!._baselines;
-      if (siblings.containsKey(_row)) {
-        final rowBaseline = siblings[_row]!
-            .map((e) => e._baselineWithOffset)
-            .reduce((v, e) => max(v!, e!))!;
-        siblings[_row]!.add(this);
+    final siblings = _companion._baselines;
+    if (siblings.containsKey(_row)) {
+      final rowBaseline = siblings[_row]!
+          .map((e) => e._baselineWithOffset!)
+          .reduce((v, e) => max(v, e));
+      siblings[_row]!.add(this);
 
-        if (rowBaseline > _baselineWithOffset!) {
-          final offsetY = rowBaseline - _baselineWithOffset!;
-          if (size.height - child!.size.height >= offsetY) {
-            // paint child with additional offset
-            context.paintChild(child!, offset.translate(0, offsetY));
-            return;
-          } else {
-            // skip painting this frame, wait for the correct padding
-            _paddingTop += offsetY;
-            _baselineWithOffset = rowBaseline;
-            WidgetsBinding.instance!
-                .addPostFrameCallback((_) => markNeedsLayout());
-            return;
-          }
-        } else if (rowBaseline < _baselineWithOffset!) {
-          for (final sibling in siblings[_row]!) {
-            if (sibling == this) continue;
+      if (rowBaseline > _baselineWithOffset!) {
+        final offsetY = rowBaseline - _baselineWithOffset!;
+        if (size.height - child!.size.height >= offsetY) {
+          // paint child with additional offset
+          context.paintChild(child!, offset.translate(0, offsetY));
+          return;
+        } else {
+          // skip painting this frame, wait for the correct padding
+          _paddingTop += offsetY;
+          _baselineWithOffset = rowBaseline;
+          WidgetsBinding.instance
+              ?.addPostFrameCallback((_) => markNeedsLayout());
+          return;
+        }
+      } else if (rowBaseline < _baselineWithOffset!) {
+        for (final sibling in siblings[_row]!) {
+          if (sibling == this) continue;
 
-            final offsetY = _baselineWithOffset! - sibling._baselineWithOffset!;
-            if (offsetY != 0.0) {
-              sibling._paddingTop += offsetY;
-              sibling._baselineWithOffset = _baselineWithOffset;
-              WidgetsBinding.instance!
-                  .addPostFrameCallback((_) => sibling.markNeedsLayout());
-            }
+          final offsetY = _baselineWithOffset! - sibling._baselineWithOffset!;
+          if (offsetY != 0.0) {
+            sibling._paddingTop += offsetY;
+            sibling._baselineWithOffset = _baselineWithOffset;
+            WidgetsBinding.instance
+                ?.addPostFrameCallback((_) => sibling.markNeedsLayout());
           }
         }
-      } else {
-        siblings[_row] = [this];
       }
+    } else {
+      siblings[_row] = [this];
     }
 
     context.paintChild(child!, offset);
