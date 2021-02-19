@@ -176,14 +176,14 @@ class _ListConfig {
 class _ListItem extends MultiChildRenderObjectWidget {
   static const kGap = 5.0;
 
-  final TextDirection? textDirection;
+  final TextDirection textDirection;
 
   _ListItem({
-    Widget? child,
+    required Widget child,
     Key? key,
-    Widget? marker,
-    this.textDirection,
-  }) : super(children: [child!, marker!], key: key);
+    required Widget marker,
+    required this.textDirection,
+  }) : super(children: [child, marker], key: key);
 
   @override
   RenderObject createRenderObject(BuildContext _) =>
