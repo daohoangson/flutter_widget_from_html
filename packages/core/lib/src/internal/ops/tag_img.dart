@@ -46,7 +46,7 @@ class TagImg {
           final placeholder =
               WidgetPlaceholder<ImageMetadata>(data, child: built);
 
-          tree.replaceWith(meta.willBuildSubtree
+          tree.replaceWith(meta.willBuildSubtree!
               ? WidgetBit.block(tree, placeholder)
               : WidgetBit.inline(tree, placeholder));
         },

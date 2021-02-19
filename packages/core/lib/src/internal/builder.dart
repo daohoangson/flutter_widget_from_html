@@ -19,7 +19,7 @@ class BuildMetadata extends core_data.BuildMetadata {
   var _buildOpsIsLocked = false;
   List<InlineStyle>? _styles;
   var _stylesIsLocked = false;
-  late bool _willBuildSubtree;
+  bool? _willBuildSubtree;
 
   BuildMetadata(dom.Element element, TextStyleBuilder tsb,
       [this._parentOps = const []])
@@ -38,7 +38,7 @@ class BuildMetadata extends core_data.BuildMetadata {
   }
 
   @override
-  bool get willBuildSubtree => _willBuildSubtree;
+  bool? get willBuildSubtree => _willBuildSubtree;
 
   @override
   operator []=(String key, String value) {
@@ -160,7 +160,7 @@ class BuildTree extends core_data.BuildTree {
 
     subTree.addBitsFromNodes(element.nodes);
 
-    if (meta.willBuildSubtree) {
+    if (meta.willBuildSubtree!) {
       for (final widget in subTree.build()) {
         add(WidgetBit.block(this, widget));
       }

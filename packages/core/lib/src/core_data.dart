@@ -43,7 +43,7 @@ abstract class BuildMetadata {
   /// - Inline style `display: block`
   ///
   /// See [BuildOp.onWidgetsIsOptional].
-  bool get willBuildSubtree;
+  bool? get willBuildSubtree;
 
   /// Adds an inline style.
   operator []=(String key, String value);

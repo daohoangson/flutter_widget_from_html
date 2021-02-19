@@ -20,7 +20,7 @@ class StyleMargin {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree) return;
+          if (meta.willBuildSubtree!) return;
           final m = tryParseCssLengthBox(meta, kCssMargin);
           if (m?.hasLeftOrRight != true) return;
 
