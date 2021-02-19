@@ -37,7 +37,7 @@ class StylePadding {
           );
         },
         onWidgets: (meta, widgets) {
-          if (widgets.isNotEmpty != true) return null;
+          if (widgets.isEmpty) return null;
           final padding = tryParseCssLengthBox(meta, kCssPadding);
           if (padding == null) return null;
 

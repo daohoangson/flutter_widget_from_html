@@ -31,7 +31,7 @@ class StyleMargin {
           );
         },
         onWidgets: (meta, widgets) {
-          if (widgets.isNotEmpty != true) return null;
+          if (widgets.isEmpty) return null;
           final m = tryParseCssLengthBox(meta, kCssMargin);
           if (m == null) return null;
           final tsb = meta.tsb;

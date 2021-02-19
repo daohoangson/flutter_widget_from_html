@@ -309,7 +309,7 @@ class WidgetFactory {
   Object? _imageFromAsset(String url) {
     final uri = Uri.parse(url);
     final assetName = uri.path;
-    if (assetName.isNotEmpty != true) return null;
+    if (assetName.isEmpty) return null;
 
     final package = uri.queryParameters.containsKey('package') == true
         ? uri.queryParameters['package']

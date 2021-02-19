@@ -571,7 +571,7 @@ class Explainer {
       widget != null ? 'child=${_widget(widget)}' : null;
 
   String? _widgetChildren(Iterable<Widget> widgets) =>
-      widgets.isNotEmpty == true
+      widgets.isNotEmpty
           ? 'children=${widgets.map(_widget).join(',')}'
           : null;
 }
