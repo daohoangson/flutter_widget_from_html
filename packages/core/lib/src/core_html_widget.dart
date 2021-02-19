@@ -52,8 +52,6 @@ class HtmlWidget extends StatefulWidget {
   final Color hyperlinkColor;
 
   /// The custom [WidgetFactory] builder.
-  ///
-  /// By default, a singleton instance of [WidgetFactory] will be used.
   final WidgetFactory Function() factoryBuilder;
 
   /// The callback when user taps an image.
