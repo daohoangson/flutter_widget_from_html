@@ -28,8 +28,8 @@ class WidgetFactory {
   BuildOp? _tagImg;
   BuildOp? _tagPre;
   BuildOp? _tagQ;
-  TextStyleHtml Function(TextStyleHtml, String?)? __tsbFontSize;
-  TextStyleHtml Function(TextStyleHtml, String?)? _tsbLineHeight;
+  TextStyleHtml Function(TextStyleHtml, String)? __tsbFontSize;
+  TextStyleHtml Function(TextStyleHtml, String)? _tsbLineHeight;
   State? _state;
 
   HtmlWidget? get _widget => _state?.widget as HtmlWidget?;
@@ -629,7 +629,7 @@ class WidgetFactory {
         break;
 
       case kCssDirection:
-        meta.tsb.enqueue(TextStyleOps.textDirection, value);
+        meta.tsb.enqueue(TextStyleOps.textDirection, value!);
         break;
 
       case kCssFontFamily:
@@ -638,18 +638,18 @@ class WidgetFactory {
         break;
 
       case kCssFontSize:
-        meta.tsb.enqueue(_tsbFontSize, value);
+        meta.tsb.enqueue(_tsbFontSize, value!);
         break;
 
       case kCssFontStyle:
-        final fontStyle = TextStyleOps.fontStyleTryParse(value);
+        final fontStyle = TextStyleOps.fontStyleTryParse(value!);
         if (fontStyle != null) {
           meta.tsb.enqueue(TextStyleOps.fontStyle, fontStyle);
         }
         break;
 
       case kCssFontWeight:
-        final fontWeight = TextStyleOps.fontWeightTryParse(value);
+        final fontWeight = TextStyleOps.fontWeightTryParse(value!);
         if (fontWeight != null) {
           meta.tsb.enqueue(TextStyleOps.fontWeight, fontWeight);
         }
@@ -667,7 +667,7 @@ class WidgetFactory {
 
       case kCssLineHeight:
         _tsbLineHeight ??= TextStyleOps.lineHeight(this);
-        meta.tsb.enqueue(_tsbLineHeight!, value);
+        meta.tsb.enqueue(_tsbLineHeight!, value!);
         break;
 
       case kCssMaxLines:
@@ -775,7 +775,7 @@ class WidgetFactory {
     return baseUrl.resolveUri(uri).toString();
   }
 
-  TextStyleHtml Function(TextStyleHtml, String?) get _tsbFontSize {
+  TextStyleHtml Function(TextStyleHtml, String) get _tsbFontSize {
     return __tsbFontSize ??= TextStyleOps.fontSize(this);
   }
 }

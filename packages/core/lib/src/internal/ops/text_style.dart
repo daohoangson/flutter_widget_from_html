@@ -64,7 +64,7 @@ class TextStyleOps {
         ),
       );
 
-  static TextStyleHtml Function(TextStyleHtml, String?) fontSize(
+  static TextStyleHtml Function(TextStyleHtml, String) fontSize(
           WidgetFactory wf) =>
       (p, v) => p.copyWith(
           style: p.style.copyWith(fontSize: _fontSizeTryParse(wf, p, v)));
@@ -75,9 +75,9 @@ class TextStyleOps {
   static TextStyleHtml fontWeight(TextStyleHtml p, FontWeight v) =>
       p.copyWith(style: p.style.copyWith(fontWeight: v));
 
-  static TextStyleHtml Function(TextStyleHtml, String?) lineHeight(
+  static TextStyleHtml Function(TextStyleHtml, String) lineHeight(
           WidgetFactory wf) =>
-      (p, v) => p.copyWith(height: _lineHeightTryParse(wf, p, v!));
+      (p, v) => p.copyWith(height: _lineHeightTryParse(wf, p, v));
 
   static TextStyleHtml maxLines(TextStyleHtml p, int v) =>
       p.copyWith(maxLines: v);
@@ -109,7 +109,7 @@ class TextStyleOps {
     );
   }
 
-  static TextStyleHtml textDirection(TextStyleHtml p, String? v) {
+  static TextStyleHtml textDirection(TextStyleHtml p, String v) {
     final textDirection = (v == kCssDirectionRtl)
         ? TextDirection.rtl
         : v == kCssDirectionLtr
@@ -137,7 +137,7 @@ class TextStyleOps {
     return list;
   }
 
-  static FontStyle? fontStyleTryParse(String? value) {
+  static FontStyle? fontStyleTryParse(String value) {
     switch (value) {
       case kCssFontStyleItalic:
         return FontStyle.italic;
@@ -148,7 +148,7 @@ class TextStyleOps {
     return null;
   }
 
-  static FontWeight? fontWeightTryParse(String? value) {
+  static FontWeight? fontWeightTryParse(String value) {
     switch (value) {
       case kCssFontWeightBold:
         return FontWeight.bold;
@@ -176,7 +176,7 @@ class TextStyleOps {
   }
 
   static double? _fontSizeTryParse(
-      WidgetFactory wf, TextStyleHtml p, String? v) {
+      WidgetFactory wf, TextStyleHtml p, String v) {
     final length = tryParseCssLength(v);
     if (length != null) {
       final lengthValue = length.getValue(
