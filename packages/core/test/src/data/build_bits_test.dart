@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart' show WidgetTester, testWidgets;
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter_widget_from_html_core/src/internal/builder.dart'
     as builder;
+import 'package:html/dom.dart' as dom;
 import 'package:test/test.dart';
 
 import '../../_.dart' as helper;
@@ -593,4 +594,10 @@ String _data(BuildTree text) => text.bits
         : '[$bit]'.replaceAll(RegExp(r'#\w+'), ''))
     .join('');
 
-BuildTree _text() => builder.BuildTree(tsb: TextStyleBuilder());
+BuildTree _text() => builder.BuildTree(
+      tsb: TextStyleBuilder(),
+      parentMeta: builder.BuildMetadata(
+        dom.Element.tag('test'),
+        TextStyleBuilder(),
+      ),
+    );

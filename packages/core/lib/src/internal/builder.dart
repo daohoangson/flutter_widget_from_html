@@ -69,7 +69,7 @@ class BuildMetadata extends core_data.BuildMetadata {
 class BuildTree extends core_data.BuildTree {
   final CustomStylesBuilder? customStylesBuilder;
   final CustomWidgetBuilder? customWidgetBuilder;
-  final BuildMetadata? parentMeta;
+  final core_data.BuildMetadata parentMeta;
   final Iterable<BuildOp> parentOps;
   final WidgetFactory? wf;
 
@@ -79,7 +79,7 @@ class BuildTree extends core_data.BuildTree {
     this.customStylesBuilder,
     this.customWidgetBuilder,
     BuildTree? parent,
-    this.parentMeta,
+    required this.parentMeta,
     this.parentOps = const [],
     TextStyleBuilder? tsb,
     this.wf,
@@ -96,10 +96,8 @@ class BuildTree extends core_data.BuildTree {
       _addBitsFromNode(domNode);
     }
 
-    if (parentMeta?.buildOps != null) {
-      for (final op in parentMeta!.buildOps) {
-        op.onTree?.call(parentMeta!, this);
-      }
+    for (final op in parentMeta.buildOps) {
+      op.onTree?.call(parentMeta, this);
     }
   }
 
@@ -109,14 +107,12 @@ class BuildTree extends core_data.BuildTree {
 
     var widgets = _flatten();
 
-    if (parentMeta?.buildOps != null) {
-      for (final op in parentMeta!.buildOps) {
-        widgets = op.onWidgets
-                ?.call(parentMeta!, widgets)
-                ?.map(WidgetPlaceholder.lazy)
-                .toList(growable: false) ??
-            widgets;
-      }
+    for (final op in parentMeta.buildOps) {
+      widgets = op.onWidgets
+              ?.call(parentMeta, widgets)
+              ?.map(WidgetPlaceholder.lazy)
+              .toList(growable: false) ??
+          widgets;
     }
 
     _built.addAll(widgets);
@@ -152,7 +148,7 @@ class BuildTree extends core_data.BuildTree {
       return;
     }
 
-    final meta = BuildMetadata(element, parentMeta!.tsb.sub(), parentOps);
+    final meta = BuildMetadata(element, parentMeta.tsb.sub(), parentOps);
     _collectMetadata(meta);
 
     final subTree = sub(
