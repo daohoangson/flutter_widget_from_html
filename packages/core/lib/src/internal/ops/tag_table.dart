@@ -141,11 +141,11 @@ class TagTable {
           columnStart++;
         }
 
-        final columnSpan = cell.colspan! > 0 ? cell.colspan! : 1;
+        final columnSpan = cell.colspan > 0 ? cell.colspan : 1;
         final rowSpan = min(
             rowSpanMax,
-            cell.rowspan! > 0
-                ? cell.rowspan!
+            cell.rowspan > 0
+                ? cell.rowspan
                 : cell.rowspan == 0
                     ? group.rows.length
                     : 1);
@@ -169,7 +169,7 @@ class TagTable {
           final border = cssBorder?.getValue(cellMeta.tsb.build(context));
           return HtmlTableCell(
             border: border,
-            child: wf.buildPadding(cellMeta, cell.child!, border?.dimensions),
+            child: wf.buildPadding(cellMeta, cell.child, border?.dimensions),
             columnSpan: columnSpan,
             columnStart: columnStart,
             rowSpan: rowSpan,
@@ -372,10 +372,11 @@ class _TagTableDataRow {
 
 @immutable
 class _TagTableDataCell {
-  final Widget? child;
-  final int? colspan;
+  final Widget child;
+  final int colspan;
   final BuildMetadata meta;
-  final int? rowspan;
+  final int rowspan;
 
-  _TagTableDataCell(this.meta, {this.child, this.colspan, this.rowspan});
+  _TagTableDataCell(this.meta,
+      {required this.child, required this.colspan, required this.rowspan});
 }
