@@ -265,7 +265,6 @@ class BuildTree extends core_data.BuildTree {
           return span.child;
         }
 
-
         return wf.buildText(parentMeta, tsh, span);
       }));
     }

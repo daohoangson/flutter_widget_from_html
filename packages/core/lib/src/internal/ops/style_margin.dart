@@ -27,7 +27,8 @@ class StyleMargin {
           return wrapTree(
             tree,
             append: (p) => WidgetBit.inline(p, _paddingInlineAfter(p.tsb!, m!)),
-            prepend: (p) => WidgetBit.inline(p, _paddingInlineBefore(p.tsb!, m!)),
+            prepend: (p) =>
+                WidgetBit.inline(p, _paddingInlineBefore(p.tsb!, m!)),
           );
         },
         onWidgets: (meta, widgets) {
@@ -44,7 +45,8 @@ class StyleMargin {
                     (c, w) => _marginHorizontalBuilder(w, m, tsb.build(c)))
               else
                 widget,
-            if (m.bottom?.isNotEmpty ?? false) HeightPlaceholder(m.bottom!, tsb),
+            if (m.bottom?.isNotEmpty ?? false)
+              HeightPlaceholder(m.bottom!, tsb),
           ];
         },
         onWidgetsIsOptional: true,
