@@ -77,7 +77,7 @@ class BuildTree extends core_data.BuildTree {
   BuildTree({
     this.customStylesBuilder,
     this.customWidgetBuilder,
-    BuildTree? parent,
+    core_data.BuildTree? parent,
     required this.parentMeta,
     this.parentOps = const [],
     TextStyleBuilder? tsb,
@@ -129,7 +129,7 @@ class BuildTree extends core_data.BuildTree {
       BuildTree(
         customStylesBuilder: customStylesBuilder,
         customWidgetBuilder: customWidgetBuilder,
-        parent: parent as BuildTree? ?? this,
+        parent: parent ?? this,
         parentMeta: parentMeta ?? this.parentMeta,
         parentOps: parentOps,
         tsb: tsb ?? this.tsb!.sub(),
