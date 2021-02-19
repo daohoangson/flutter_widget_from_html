@@ -26,9 +26,8 @@ class TextStyleHtml {
   /// The overflow behavior.
   final TextOverflow? textOverflow;
 
-  /// Creates a text style.
-  TextStyleHtml({
-    required Iterable deps,
+  TextStyleHtml._({
+    required Iterable<dynamic> deps,
     this.height,
     this.maxLines,
     this.parent,
@@ -54,9 +53,8 @@ class TextStyleHtml {
       style = style.copyWith(fontSize: style.fontSize! * tsf);
     }
 
-    return TextStyleHtml(
+    return TextStyleHtml._(
       deps: deps,
-      parent: null,
       style: style,
       textDirection: _getDependency<TextDirection>(deps)!,
     );
@@ -80,7 +78,7 @@ class TextStyleHtml {
     TextDirection? textDirection,
     TextOverflow? textOverflow,
   }) =>
-      TextStyleHtml(
+      TextStyleHtml._(
         deps: _deps,
         height: height ?? this.height,
         maxLines: maxLines ?? this.maxLines,
