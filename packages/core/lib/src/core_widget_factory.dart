@@ -35,12 +35,12 @@ class WidgetFactory {
   HtmlWidget? get _widget => _state?.widget;
 
   /// Builds [Align].
-  Widget buildAlign(
-          BuildMetadata meta, Widget child, AlignmentGeometry? alignment) =>
+  Widget? buildAlign(
+          BuildMetadata meta, Widget? child, AlignmentGeometry? alignment) =>
       alignment == null ? child : Align(alignment: alignment, child: child);
 
   /// Builds [AspectRatio].
-  Widget buildAspectRatio(
+  Widget? buildAspectRatio(
           BuildMetadata meta, Widget? child, double aspectRatio) =>
       AspectRatio(aspectRatio: aspectRatio, child: child);
 
@@ -53,7 +53,7 @@ class WidgetFactory {
   /// See https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
   /// for more information regarding `content-box` (the default)
   /// and `border-box` (set [isBorderBox] to use).
-  Widget buildBorder(BuildMetadata meta, Widget child, BoxBorder? border,
+  Widget? buildBorder(BuildMetadata meta, Widget? child, BoxBorder? border,
           {bool isBorderBox = false}) =>
       border == null
           ? child
@@ -109,9 +109,9 @@ class WidgetFactory {
   }
 
   /// Builds [DecoratedBox].
-  Widget buildDecoratedBox(
+  Widget? buildDecoratedBox(
     BuildMetadata meta,
-    Widget child, {
+    Widget? child, {
     Color? color,
   }) =>
       DecoratedBox(
@@ -122,18 +122,18 @@ class WidgetFactory {
       );
 
   /// Builds 1-pixel-height divider.
-  Widget buildDivider(BuildMetadata meta) => const DecoratedBox(
+  Widget? buildDivider(BuildMetadata meta) => const DecoratedBox(
         decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 1)),
         child: SizedBox(height: 1),
       );
 
   /// Builds [GestureDetector].
-  Widget buildGestureDetector(
-          BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
+  Widget? buildGestureDetector(
+          BuildMetadata meta, Widget? child, GestureTapCallback onTap) =>
       GestureDetector(child: child, onTap: onTap);
 
   /// Builds horizontal scroll view.
-  Widget buildHorizontalScrollView(BuildMetadata meta, Widget child) =>
+  Widget? buildHorizontalScrollView(BuildMetadata meta, Widget? child) =>
       SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
 
   /// Builds [Image] from [provider].
@@ -163,14 +163,14 @@ class WidgetFactory {
   }
 
   /// Builds [Padding].
-  Widget buildPadding(
-          BuildMetadata meta, Widget child, EdgeInsetsGeometry? padding) =>
+  Widget? buildPadding(
+          BuildMetadata meta, Widget? child, EdgeInsetsGeometry? padding) =>
       padding == null || padding == EdgeInsets.zero
           ? child
           : Padding(child: child, padding: padding);
 
   /// Builds [Stack].
-  Widget buildStack(
+  Widget? buildStack(
           BuildMetadata meta, TextStyleHtml tsh, List<Widget> children) =>
       Stack(
         children: children,
@@ -179,7 +179,7 @@ class WidgetFactory {
       );
 
   /// Builds [RichText].
-  Widget buildText(BuildMetadata? meta, TextStyleHtml? tsh, InlineSpan text) =>
+  Widget? buildText(BuildMetadata? meta, TextStyleHtml? tsh, InlineSpan text) =>
       RichText(
         overflow: tsh?.textOverflow ?? TextOverflow.clip,
         text: text,
@@ -472,7 +472,7 @@ class WidgetFactory {
       case 'hr':
         _tagHr ??= BuildOp(
           defaultStyles: (_) => const {'margin-bottom': '1em'},
-          onWidgets: (meta, _) => [buildDivider(meta)],
+          onWidgets: (meta, _) => listOrNull(buildDivider(meta)),
         );
         meta
           ..[kCssDisplay] = kCssDisplayBlock

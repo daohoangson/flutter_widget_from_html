@@ -154,7 +154,7 @@ class WidgetPlaceholder<T> extends StatelessWidget {
 
   /// Enqueues [builder] to be built later.
   WidgetPlaceholder<T> wrapWith(
-      Widget Function(BuildContext context, Widget child) builder) {
+      Widget? Function(BuildContext context, Widget child) builder) {
     _builders.add(builder);
     return this;
   }

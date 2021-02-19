@@ -83,23 +83,24 @@ class StyleVerticalAlign {
     return wf.buildColumnPlaceholder(meta, copied.build());
   }
 
-  Widget _buildStack(BuildContext context, BuildMetadata meta, Widget child,
+  Widget? _buildStack(BuildContext context, BuildMetadata meta, Widget child,
       EdgeInsets padding) {
     final tsh = meta.tsb.build(context);
     final fontSize = tsh.style.fontSize!;
+    final builtPadding = wf.buildPadding(
+      meta,
+      Opacity(child: child, opacity: 0),
+      EdgeInsets.only(
+        bottom: fontSize * padding.bottom,
+        top: fontSize * padding.top,
+      ),
+    );
 
     return wf.buildStack(
       meta,
       tsh,
       <Widget>[
-        wf.buildPadding(
-          meta,
-          Opacity(child: child, opacity: 0),
-          EdgeInsets.only(
-            bottom: fontSize * padding.bottom,
-            top: fontSize * padding.top,
-          ),
-        ),
+        if (builtPadding != null) builtPadding,
         Positioned(
           child: child,
           bottom: padding.top > 0 ? null : 0,

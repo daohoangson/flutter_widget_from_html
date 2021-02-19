@@ -119,7 +119,11 @@ class TagTable {
           borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
           borderSpacing: borderSpacing?.getValue(tsh) ?? 0.0,
           companion: companion,
-          children: builders.map((f) => f(context)).toList(growable: false),
+          children: List.from(
+              builders
+                  .map((f) => f(context))
+                  .where((element) => element != null),
+              growable: false),
         );
       }),
     ];
@@ -167,14 +171,20 @@ class TagTable {
 
         builders.add((context) {
           final border = cssBorder.getValue(cellMeta.tsb.build(context));
-          return HtmlTableCell(
-            border: border,
-            child: wf.buildPadding(cellMeta, cell.child, border?.dimensions),
-            columnSpan: columnSpan,
-            columnStart: columnStart,
-            rowSpan: rowSpan,
-            rowStart: cellMeta.row,
-          );
+          final padding =
+              wf.buildPadding(cellMeta, cell.child, border?.dimensions);
+          if (padding != null) {
+            return HtmlTableCell(
+              border: border,
+              child: padding,
+              columnSpan: columnSpan,
+              columnStart: columnStart,
+              rowSpan: rowSpan,
+              rowStart: cellMeta.row,
+            );
+          } else {
+            return null;
+          }
         });
       }
     }
@@ -247,7 +257,7 @@ extension _BuildMetadataExtension on BuildMetadata {
   int get row => _rows[this] ?? -1;
 }
 
-typedef _HtmlTableCellBuilder = HtmlTableCell Function(BuildContext);
+typedef _HtmlTableCellBuilder = HtmlTableCell? Function(BuildContext);
 
 class _TableCaption extends SingleChildRenderObjectWidget {
   _TableCaption(Widget child, {Key? key}) : super(child: child, key: key);

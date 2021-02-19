@@ -50,7 +50,7 @@ class StyleBorder {
         priority: kPriorityBoxModel7k,
       );
 
-  Widget _buildBorder(
+  Widget? _buildBorder(
     BuildMetadata meta,
     BuildContext context,
     Widget child,
