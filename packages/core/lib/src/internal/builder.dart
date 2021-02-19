@@ -15,7 +15,7 @@ final _regExpSpaces = RegExp(r'[^\S\u{00A0}]+', unicode: true);
 class BuildMetadata extends core_data.BuildMetadata {
   final Iterable<BuildOp> _parentOps;
 
-  final List<BuildOp> _buildOps = [];
+  List<BuildOp>? _buildOps;
   var _buildOpsIsLocked = false;
   List<InlineStyle>? _styles;
   var _stylesIsLocked = false;
@@ -26,7 +26,7 @@ class BuildMetadata extends core_data.BuildMetadata {
       : super(element, tsb);
 
   @override
-  Iterable<BuildOp> get buildOps => _buildOps;
+  Iterable<BuildOp>? get buildOps => _buildOps;
 
   @override
   Iterable<BuildOp> get parentOps => _parentOps;
@@ -52,16 +52,17 @@ class BuildMetadata extends core_data.BuildMetadata {
     if (op == null) return;
 
     assert(!_buildOpsIsLocked, 'Metadata can no longer be changed.');
-    if (!buildOps.contains(op)) _buildOps.add(op);
+    _buildOps ??= [];
+    if (!buildOps!.contains(op)) _buildOps!.add(op);
   }
 
   void _sortBuildOps() {
     assert(!_buildOpsIsLocked);
 
-    _buildOps.sort((a, b) => a.priority.compareTo(b.priority));
+    _buildOps?.sort((a, b) => a.priority.compareTo(b.priority));
 
     _willBuildSubtree = this[kCssDisplay] == kCssDisplayBlock ||
-        _buildOps.where(_opRequiresBuildingSubtree).isNotEmpty;
+        _buildOps?.where(_opRequiresBuildingSubtree).isNotEmpty == true;
     _buildOpsIsLocked = true;
   }
 }
@@ -95,9 +96,10 @@ class BuildTree extends core_data.BuildTree {
     for (final domNode in domNodes) {
       _addBitsFromNode(domNode);
     }
-
-    for (final op in parentMeta.buildOps) {
-      op.onTree?.call(parentMeta, this);
+    if (parentMeta.buildOps != null) {
+      for (final op in parentMeta.buildOps!) {
+        op.onTree?.call(parentMeta, this);
+      }
     }
   }
 
@@ -106,15 +108,15 @@ class BuildTree extends core_data.BuildTree {
     if (_built.isNotEmpty) return _built;
 
     var widgets = _flatten();
-
-    for (final op in parentMeta.buildOps) {
-      widgets = op.onWidgets
-              ?.call(parentMeta, widgets)
-              ?.map(WidgetPlaceholder.lazy)
-              .toList(growable: false) ??
-          widgets;
+    if (parentMeta.buildOps != null) {
+      for (final op in parentMeta.buildOps!) {
+        widgets = op.onWidgets
+                ?.call(parentMeta, widgets)
+                ?.map(WidgetPlaceholder.lazy)
+                .toList(growable: false) ??
+            widgets;
+      }
     }
-
     _built.addAll(widgets);
     return _built;
   }
@@ -196,13 +198,15 @@ class BuildTree extends core_data.BuildTree {
     }
 
     // stylings, step 1: get default styles from tag-based build ops
-    for (final op in meta.buildOps) {
-      final map = op.defaultStyles?.call(meta.element);
-      if (map == null) continue;
+    if (meta.buildOps != null) {
+      for (final op in meta.buildOps!) {
+        final map = op.defaultStyles?.call(meta.element);
+        if (map == null) continue;
 
-      meta._styles ??= [];
-      for (final pair in map.entries) {
-        meta._styles!.insert(0, InlineStyle(pair.key, pair.value));
+        meta._styles ??= [];
+        for (final pair in map.entries) {
+          meta._styles!.insert(0, InlineStyle(pair.key, pair.value));
+        }
       }
     }
 
@@ -274,8 +278,8 @@ bool _opRequiresBuildingSubtree(BuildOp op) =>
 
 Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, BuildMetadata meta) {
   // try to reuse existing list if possible
-  final withOnChild = meta.buildOps.where((op) => op.onChild != null).toList();
-  return withOnChild.isNotEmpty != true
+  final withOnChild = meta.buildOps?.where((op) => op.onChild != null).toList();
+  return withOnChild == null || withOnChild.isEmpty
       ? ops
       : List.unmodifiable([...ops, ...withOnChild]);
 }
