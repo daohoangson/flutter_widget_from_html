@@ -16,7 +16,7 @@ class StyleBorder {
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
           if (meta.willBuildSubtree) return;
-          final border = tryParseBorder(meta)!;
+          final border = tryParseBorder(meta);
           if (border.isNone) return;
 
           _skipBuilding[meta] = true;
@@ -33,7 +33,7 @@ class StyleBorder {
           if (_skipBuilding[meta] == true || widgets.isEmpty) {
             return widgets;
           }
-          final border = tryParseBorder(meta)!;
+          final border = tryParseBorder(meta);
           if (border.isNone) return widgets;
 
           _skipBuilding[meta] = true;

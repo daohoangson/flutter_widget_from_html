@@ -11,10 +11,10 @@ final _borderValuesThreeRegExp = RegExp(r'^(.+)\s+(.+)\s+(.+)$');
 final _borderValuesTwoRegExp = RegExp(r'^(.+)\s+(.+)$');
 final _elementBorder = Expando<CssBorder>();
 
-CssBorder? tryParseBorder(BuildMetadata meta) {
-  var border = _elementBorder[meta.element];
-  if (border != null) return border;
-  border = CssBorder();
+CssBorder tryParseBorder(BuildMetadata meta) {
+  final existing = _elementBorder[meta.element];
+  if (existing != null) return existing;
+  var border = CssBorder();
 
   for (final style in meta.styles) {
     if (!style.key.startsWith(kCssBorder)) continue;
@@ -32,23 +32,23 @@ CssBorder? tryParseBorder(BuildMetadata meta) {
       switch (suffix) {
         case kSuffixBottom:
         case kSuffixBlockEnd:
-          border = border!.copyWith(bottom: borderSide);
+          border = border.copyWith(bottom: borderSide);
           break;
         case kSuffixInlineEnd:
-          border = border!.copyWith(inlineEnd: borderSide);
+          border = border.copyWith(inlineEnd: borderSide);
           break;
         case kSuffixInlineStart:
-          border = border!.copyWith(inlineStart: borderSide);
+          border = border.copyWith(inlineStart: borderSide);
           break;
         case kSuffixLeft:
-          border = border!.copyWith(left: borderSide);
+          border = border.copyWith(left: borderSide);
           break;
         case kSuffixRight:
-          border = border!.copyWith(right: borderSide);
+          border = border.copyWith(right: borderSide);
           break;
         case kSuffixTop:
         case kSuffixBlockStart:
-          border = border!.copyWith(top: borderSide);
+          border = border.copyWith(top: borderSide);
           break;
       }
     }

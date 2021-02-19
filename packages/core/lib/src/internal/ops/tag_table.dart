@@ -115,7 +115,7 @@ class TagTable {
         final tsh = tableMeta.tsb.build(context);
 
         return HtmlTable(
-          border: border?.getValue(tsh),
+          border: border.getValue(tsh),
           borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
           borderSpacing: borderSpacing?.getValue(tsh) ?? 0.0,
           companion: companion,
@@ -161,12 +161,12 @@ class TagTable {
         cellMeta.row = rowStart;
 
         final cssBorderParsed = tryParseBorder(cellMeta);
-        final cssBorder = cssBorderParsed?.inherit == true
-            ? tryParseBorder(tableMeta)!.copyFrom(cssBorderParsed!)
+        final cssBorder = cssBorderParsed.inherit
+            ? tryParseBorder(tableMeta).copyFrom(cssBorderParsed)
             : cssBorderParsed;
 
         builders.add((context) {
-          final border = cssBorder?.getValue(cellMeta.tsb.build(context));
+          final border = cssBorder.getValue(cellMeta.tsb.build(context));
           return HtmlTableCell(
             border: border,
             child: wf.buildPadding(cellMeta, cell.child, border?.dimensions),
