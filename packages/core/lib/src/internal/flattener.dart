@@ -21,10 +21,10 @@ final _instance = _Flattener();
 
 class _Flattener {
   late List<Flattened> _flattened;
-  StringBuffer? _buffer, _prevBuffer;
-  _Recognizer? _recognizer, _prevRecognizer;
+  late StringBuffer _buffer, _prevBuffer;
+  late _Recognizer _recognizer, _prevRecognizer;
   List<dynamic>? _spans;
-  bool? _swallowWhitespace;
+  late bool _swallowWhitespace;
   TextStyleBuilder? _tsb, _prevTsb;
 
   List<Flattened> flatten(BuildTree tree) {
@@ -66,7 +66,7 @@ class _Flattener {
       final WidgetBuilder widgetBuilder = (c) => bit.buildBit(c);
       built = widgetBuilder;
     } else if (bit is BuildBit<GestureRecognizer?, dynamic>) {
-      built = bit.buildBit(_prevRecognizer!.value);
+      built = bit.buildBit(_prevRecognizer.value);
     } else if (bit is BuildBit<TextStyleHtml?, InlineSpan>) {
       // ignore: omit_local_variable_types
       final SpanBuilder spanBuilder = (c) => bit.buildBit(thisTsb!.build(c));
@@ -74,13 +74,13 @@ class _Flattener {
     }
 
     if (built is GestureRecognizer) {
-      _prevRecognizer!.value = built;
+      _prevRecognizer.value = built;
     } else if (built is InlineSpan || built is SpanBuilder) {
       _saveSpan();
       _spans!.add(built);
     } else if (built is String) {
       if (built != ' ' || !_loopShouldSwallowWhitespace(bit)) {
-        _prevBuffer!.write(built);
+        _prevBuffer.write(built);
       }
     } else if (built is Widget) {
       _completeLoop();
@@ -102,7 +102,7 @@ class _Flattener {
 
   bool _loopShouldSwallowWhitespace(BuildBit bit) {
     // special handling for whitespaces
-    if (_swallowWhitespace!) return true;
+    if (_swallowWhitespace) return true;
 
     final next = nextWithTsb(bit);
     if (next == null) {
@@ -117,8 +117,8 @@ class _Flattener {
   }
 
   void _saveSpan() {
-    if (_prevBuffer != _buffer && _prevBuffer!.length > 0) {
-      final scopedRecognizer = _prevRecognizer!.value;
+    if (_prevBuffer != _buffer && _prevBuffer.length > 0) {
+      final scopedRecognizer = _prevRecognizer.value;
       final scopedTsb = _prevTsb;
       final scopedText = _prevBuffer.toString();
       _spans!.add((context) => TextSpan(
@@ -138,8 +138,8 @@ class _Flattener {
 
     final scopedSpans = _spans!;
     _spans = null;
-    if (scopedSpans.isEmpty && _buffer!.isEmpty) return;
-    final scopedRecognizer = _recognizer!.value;
+    if (scopedSpans.isEmpty && _buffer.isEmpty) return;
+    final scopedRecognizer = _recognizer.value;
     final scopedTsb = _tsb;
     final scopedBuffer = _buffer.toString();
 
