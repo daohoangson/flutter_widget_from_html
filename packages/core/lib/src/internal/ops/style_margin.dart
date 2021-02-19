@@ -22,13 +22,13 @@ class StyleMargin {
         onTree: (meta, tree) {
           if (meta.willBuildSubtree!) return;
           final m = tryParseCssLengthBox(meta, kCssMargin);
-          if (m?.hasLeftOrRight != true) return;
+          if (m == null || !m.hasLeftOrRight) return;
 
           return wrapTree(
             tree,
-            append: (p) => WidgetBit.inline(p, _paddingInlineAfter(p.tsb!, m!)),
+            append: (p) => WidgetBit.inline(p, _paddingInlineAfter(p.tsb!, m)),
             prepend: (p) =>
-                WidgetBit.inline(p, _paddingInlineBefore(p.tsb!, m!)),
+                WidgetBit.inline(p, _paddingInlineBefore(p.tsb!, m)),
           );
         },
         onWidgets: (meta, widgets) {

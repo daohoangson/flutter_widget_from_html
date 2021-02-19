@@ -24,14 +24,14 @@ class StylePadding {
         onTree: (meta, tree) {
           if (meta.willBuildSubtree!) return;
           final padding = tryParseCssLengthBox(meta, kCssPadding);
-          if (padding?.hasLeftOrRight != true) return;
+          if (padding == null || !padding.hasLeftOrRight) return;
 
           return wrapTree(
             tree,
             append: (p) =>
-                WidgetBit.inline(p, _paddingInlineAfter(p.tsb!, padding!)),
+                WidgetBit.inline(p, _paddingInlineAfter(p.tsb!, padding)),
             prepend: (p) =>
-                WidgetBit.inline(p, _paddingInlineBefore(p.tsb!, padding!)),
+                WidgetBit.inline(p, _paddingInlineBefore(p.tsb!, padding)),
           );
         },
         onWidgets: (meta, widgets) {
