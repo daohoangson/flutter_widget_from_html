@@ -27,7 +27,7 @@ class StyleTextAlign {
         priority: 4100,
       );
 
-  static Iterable<Widget> _onWidgets(Iterable<Widget> widgets, String? value) {
+  static Iterable<Widget> _onWidgets(Iterable<Widget> widgets, String value) {
     Widget Function(BuildContext, Widget)? builder;
 
     switch (value) {
@@ -58,7 +58,7 @@ class StyleTextAlign {
   static Widget _center(BuildContext _, Widget child) =>
       _TextAlignCenter(child);
 
-  static TextStyleHtml _tsb(TextStyleHtml tsh, String? value) {
+  static TextStyleHtml _tsb(TextStyleHtml tsh, String value) {
     TextAlign? textAlign;
 
     switch (value) {
