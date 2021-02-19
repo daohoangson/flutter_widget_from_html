@@ -48,9 +48,7 @@ class BuildMetadata extends core_data.BuildMetadata {
   }
 
   @override
-  void register(BuildOp? op) {
-    if (op == null) return;
-
+  void register(BuildOp op) {
     assert(!_buildOpsIsLocked, 'Metadata can no longer be changed.');
     _buildOps ??= [];
     if (!buildOps!.contains(op)) _buildOps!.add(op);
