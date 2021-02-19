@@ -30,9 +30,9 @@ class WidgetFactory {
   BuildOp? _tagQ;
   TextStyleHtml Function(TextStyleHtml, String)? __tsbFontSize;
   TextStyleHtml Function(TextStyleHtml, String)? _tsbLineHeight;
-  State? _state;
+  State<HtmlWidget>? _state;
 
-  HtmlWidget? get _widget => _state?.widget as HtmlWidget?;
+  HtmlWidget? get _widget => _state?.widget;
 
   /// Builds [Align].
   Widget buildAlign(
@@ -754,8 +754,7 @@ class WidgetFactory {
   /// Resets for a new build.
   @mustCallSuper
   void reset(State state) {
-    final widget = state.widget;
-    if (widget is HtmlWidget) {
+    if (state is State<HtmlWidget>) {
       _state = state;
     }
   }
