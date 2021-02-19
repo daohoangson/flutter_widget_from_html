@@ -72,7 +72,7 @@ class BuildTree extends core_data.BuildTree {
   final CustomWidgetBuilder? customWidgetBuilder;
   final core_data.BuildMetadata parentMeta;
   final Iterable<BuildOp> parentOps;
-  final WidgetFactory? wf;
+  final WidgetFactory wf;
 
   final _built = <WidgetPlaceholder>[];
 
@@ -83,7 +83,7 @@ class BuildTree extends core_data.BuildTree {
     required this.parentMeta,
     this.parentOps = const [],
     TextStyleBuilder? tsb,
-    this.wf,
+    required this.wf,
   }) : super(parent, tsb);
 
   @override
@@ -191,7 +191,7 @@ class BuildTree extends core_data.BuildTree {
   }
 
   void _collectMetadata(BuildMetadata meta) {
-    wf!.parse(meta);
+    wf.parse(meta);
 
     for (final op in meta.parentOps) {
       op.onChild?.call(meta);
@@ -219,10 +219,10 @@ class BuildTree extends core_data.BuildTree {
 
     meta._stylesIsLocked = true;
     for (final style in meta.styles) {
-      wf!.parseStyle(meta, style.key, style.value);
+      wf.parseStyle(meta, style.key, style.value);
     }
 
-    wf!.parseStyleDisplay(meta, meta[kCssDisplay]);
+    wf.parseStyleDisplay(meta, meta[kCssDisplay]);
 
     meta._sortBuildOps();
   }
@@ -265,7 +265,8 @@ class BuildTree extends core_data.BuildTree {
           return span.child;
         }
 
-        return wf!.buildText(parentMeta, tsh, span);
+
+        return wf.buildText(parentMeta, tsh, span);
       }));
     }
 

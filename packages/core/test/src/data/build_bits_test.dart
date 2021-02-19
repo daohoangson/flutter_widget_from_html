@@ -600,4 +600,5 @@ BuildTree _text() => builder.BuildTree(
         dom.Element.tag('test'),
         TextStyleBuilder(),
       ),
+      wf: WidgetFactory(),
     );
