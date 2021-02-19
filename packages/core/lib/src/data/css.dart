@@ -5,7 +5,7 @@ part of '../core_data.dart';
 class CssBorder {
   final CssBorderSide? _all;
   final CssBorderSide? _bottom;
-  final bool? inherit;
+  final bool inherit;
   final CssBorderSide? _inlineEnd;
   final CssBorderSide? _inlineStart;
   final CssBorderSide? _left;
@@ -16,7 +16,7 @@ class CssBorder {
   const CssBorder({
     CssBorderSide? all,
     CssBorderSide? bottom,
-    this.inherit,
+    this.inherit = false,
     CssBorderSide? inlineEnd,
     CssBorderSide? inlineStart,
     CssBorderSide? left,
