@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
@@ -35,39 +36,32 @@ class WidgetFactory {
   HtmlWidget get _widget => _state?.widget;
 
   /// Builds [Align].
-  Widget buildAlign(
-          BuildMetadata meta, Widget child, AlignmentGeometry alignment) =>
+  Widget buildAlign(BuildMetadata meta, Widget child, AlignmentGeometry alignment) =>
       alignment == null ? child : Align(alignment: alignment, child: child);
 
   /// Builds [AspectRatio].
-  Widget buildAspectRatio(
-          BuildMetadata meta, Widget child, double aspectRatio) =>
-      aspectRatio == null
-          ? child
-          : AspectRatio(aspectRatio: aspectRatio, child: child);
+  Widget buildAspectRatio(BuildMetadata meta, Widget child, double aspectRatio) =>
+      aspectRatio == null ? child : AspectRatio(aspectRatio: aspectRatio, child: child);
 
   /// Builds primary column (body).
-  WidgetPlaceholder buildBody(BuildMetadata meta, Iterable<Widget> children) =>
-      buildColumnPlaceholder(meta, children, trimMarginVertical: true);
+  WidgetPlaceholder buildBody(BuildMetadata meta, Iterable<Widget> children) => buildColumnPlaceholder(meta, children, trimMarginVertical: true);
 
   /// Builds [border] with [Container] or [DecoratedBox].
   ///
   /// See https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
   /// for more information regarding `content-box` (the default)
   /// and `border-box` (set [isBorderBox] to use).
-  Widget buildBorder(BuildMetadata meta, Widget child, BoxBorder border,
-          {bool isBorderBox = false}) =>
-      border == null
-          ? child
-          : isBorderBox == true
-              ? DecoratedBox(
-                  child: child,
-                  decoration: BoxDecoration(border: border),
-                )
-              : Container(
-                  child: child,
-                  decoration: BoxDecoration(border: border),
-                );
+  Widget buildBorder(BuildMetadata meta, Widget child, BoxBorder border, {bool isBorderBox = false}) => border == null
+      ? child
+      : isBorderBox == true
+          ? DecoratedBox(
+              child: child,
+              decoration: BoxDecoration(border: border),
+            )
+          : Container(
+              child: child,
+              decoration: BoxDecoration(border: border),
+            );
 
   /// Builds column placeholder.
   WidgetPlaceholder buildColumnPlaceholder(
@@ -97,8 +91,7 @@ class WidgetFactory {
   }
 
   /// Builds [Column].
-  Widget buildColumnWidget(
-      BuildMetadata meta, TextStyleHtml tsh, List<Widget> children) {
+  Widget buildColumnWidget(BuildMetadata meta, TextStyleHtml tsh, List<Widget> children) {
     if (children?.isNotEmpty != true) return null;
     if (children.length == 1) return children.first;
 
@@ -132,13 +125,11 @@ class WidgetFactory {
       );
 
   /// Builds [GestureDetector].
-  Widget buildGestureDetector(
-          BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
+  Widget buildGestureDetector(BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
       onTap == null ? child : GestureDetector(child: child, onTap: onTap);
 
   /// Builds horizontal scroll view.
-  Widget buildHorizontalScrollView(BuildMetadata meta, Widget child) =>
-      SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
+  Widget buildHorizontalScrollView(BuildMetadata meta, Widget child) => SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
 
   /// Builds [Image] from [provider].
   Widget buildImage(BuildMetadata meta, Object provider, ImageMetadata data) {
@@ -161,8 +152,7 @@ class WidgetFactory {
     }
 
     if (_widget?.onTapImage != null && built != null) {
-      built = buildGestureDetector(
-          meta, built, () => _widget?.onTapImage?.call(data));
+      built = buildGestureDetector(meta, built, () => _widget?.onTapImage?.call(data));
     }
 
     return built;
@@ -170,22 +160,17 @@ class WidgetFactory {
 
   /// Builds [Padding].
   Widget buildPadding(BuildMetadata meta, Widget child, EdgeInsets padding) =>
-      padding == null || padding == const EdgeInsets.all(0)
-          ? child
-          : Padding(child: child, padding: padding);
+      padding == null || padding == const EdgeInsets.all(0) ? child : Padding(child: child, padding: padding);
 
   /// Builds [Stack].
-  Widget buildStack(
-          BuildMetadata meta, TextStyleHtml tsh, List<Widget> children) =>
-      Stack(
+  Widget buildStack(BuildMetadata meta, TextStyleHtml tsh, List<Widget> children) => Stack(
         children: children,
         clipBehavior: Clip.none,
         textDirection: tsh.textDirection,
       );
 
   /// Builds [RichText].
-  Widget buildText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) =>
-      RichText(
+  Widget buildText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) => RichText(
         overflow: tsh?.textOverflow ?? TextOverflow.clip,
         text: text,
         textAlign: tsh?.textAlign ?? TextAlign.start,
@@ -196,12 +181,22 @@ class WidgetFactory {
         maxLines: tsh?.maxLines == -1 ? null : tsh?.maxLines,
       );
 
+  /// Builds [RichText].
+  Widget buildSelectableText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) => SelectableText.rich(
+        text,
+        // text: text,
+
+        textAlign: tsh?.textAlign ?? TextAlign.start,
+        textDirection: tsh?.textDirection ?? TextDirection.ltr,
+
+        // TODO: calculate max lines automatically for ellipsis if needed
+        // currently it only renders 1 line with ellipsis
+        maxLines: tsh?.maxLines == -1 ? null : tsh?.maxLines,
+      );
+
   /// Prepares [GestureTapCallback].
-  GestureTapCallback gestureTapCallback(String url) => url != null
-      ? () => _widget.onTapUrl != null
-          ? _widget.onTapUrl(url)
-          : print('[HtmlWidget] onTapUrl($url)')
-      : null;
+  GestureTapCallback gestureTapCallback(String url) =>
+      url != null ? () => _widget.onTapUrl != null ? _widget.onTapUrl(url) : print('[HtmlWidget] onTapUrl($url)') : null;
 
   /// Returns [context]-based dependencies.
   ///
@@ -317,9 +312,7 @@ class WidgetFactory {
     final assetName = uri.path;
     if (assetName?.isNotEmpty != true) return null;
 
-    final package = uri.queryParameters?.containsKey('package') == true
-        ? uri.queryParameters['package']
-        : null;
+    final package = uri.queryParameters?.containsKey('package') == true ? uri.queryParameters['package'] : null;
 
     return AssetImage(assetName, package: package);
   }
@@ -339,8 +332,7 @@ class WidgetFactory {
     return FileImage(File(filePath));
   }
 
-  Object _imageFromUrl(String url) =>
-      url?.isNotEmpty == true ? NetworkImage(url) : null;
+  Object _imageFromUrl(String url) => url?.isNotEmpty == true ? NetworkImage(url) : null;
 
   /// Prepares the root [TextStyleBuilder].
   void onRoot(TextStyleBuilder rootTsb) {}
@@ -424,13 +416,9 @@ class WidgetFactory {
         break;
       case kTagPre:
         _tagPre ??= BuildOp(
-          defaultStyles: (_) =>
-              const {kCssFontFamily: '$kTagCodeFont1, $kTagCodeFont2'},
-          onTree: (meta, tree) =>
-              tree.replaceWith(TextBit(tree, meta.element.text, tsb: tree.tsb)),
-          onWidgets: (meta, widgets) => listOrNull(
-              buildColumnPlaceholder(meta, widgets)
-                  ?.wrapWith((_, w) => buildHorizontalScrollView(meta, w))),
+          defaultStyles: (_) => const {kCssFontFamily: '$kTagCodeFont1, $kTagCodeFont2'},
+          onTree: (meta, tree) => tree.replaceWith(TextBit(tree, meta.element.text, tsb: tree.tsb)),
+          onWidgets: (meta, widgets) => listOrNull(buildColumnPlaceholder(meta, widgets)?.wrapWith((_, w) => buildHorizontalScrollView(meta, w))),
         );
         meta
           ..[kCssDisplay] = kCssDisplayBlock
@@ -588,8 +576,7 @@ class WidgetFactory {
             tryParseDoubleFromMap(attrs, kAttributeBorder) ?? 0.0,
             tryParseDoubleFromMap(attrs, kAttributeCellSpacing) ?? 2.0,
           ))
-          ..register(TagTable.cellPaddingOp(
-              tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1.0));
+          ..register(TagTable.cellPaddingOp(tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1.0));
         break;
       case kTagTableCell:
         meta[kCssVerticalAlign] = kCssVerticalAlignMiddle;

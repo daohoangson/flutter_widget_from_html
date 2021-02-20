@@ -88,6 +88,8 @@ class HtmlWidget extends StatefulWidget {
   /// The default styling for text elements.
   final TextStyle textStyle;
 
+  final bool isSelectableText;
+
   /// Creates a widget that builds Flutter widget tree from html.
   ///
   /// The [html] argument must not be null.
@@ -106,6 +108,7 @@ class HtmlWidget extends StatefulWidget {
     this.onTapUrl,
     RebuildTriggers rebuildTriggers,
     this.textStyle = const TextStyle(),
+    this.isSelectableText,
   })  : assert(html != null),
         _rebuildTriggers = rebuildTriggers,
         super(key: key);
@@ -121,8 +124,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
   _RootTsb _rootTsb;
   WidgetFactory _wf;
 
-  bool get buildAsync =>
-      widget.buildAsync ?? widget.html.length > kShouldBuildAsync;
+  bool get buildAsync => widget.buildAsync ?? widget.html.length > kShouldBuildAsync;
 
   bool get enableCaching => widget.enableCaching ?? !buildAsync;
 
@@ -204,14 +206,14 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     return built;
   }
 
-  Widget _tshWidget(Widget child) =>
-      TshWidget(child: child, tsh: _rootTsb._output);
+  Widget _tshWidget(Widget child) => TshWidget(child: child, tsh: _rootTsb._output);
 }
 
 class _RootTsb extends TextStyleBuilder {
   TextStyleHtml _output;
 
   _RootTsb(_HtmlWidgetState state) {
+    isSelectabletext = state.widget.isSelectableText;
     enqueue(builder, state);
   }
 
@@ -232,15 +234,14 @@ class _RootTsb extends TextStyleBuilder {
   void reset() => _output = null;
 }
 
-Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
-    snapshot.hasData
-        ? snapshot.data
-        : const Center(
-            child: Padding(
-              child: Text('Loading...'),
-              padding: EdgeInsets.all(8),
-            ),
-          );
+Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) => snapshot.hasData
+    ? snapshot.data
+    : const Center(
+        child: Padding(
+          child: Text('Loading...'),
+          padding: EdgeInsets.all(8),
+        ),
+      );
 
 Widget _buildBody(_HtmlWidgetState state, dom.NodeList domNodes) {
   final rootMeta = state._rootMeta;
