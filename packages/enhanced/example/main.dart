@@ -13,7 +13,9 @@ class MyApp extends StatelessWidget {
           title: Text('Flutter Widget from HTML'),
         ),
         body: Center(
-          child: HtmlWidget('Hello World!'),
+          child: HtmlWidget(
+            'Hello World!',
+          ),
         ),
       ),
     );

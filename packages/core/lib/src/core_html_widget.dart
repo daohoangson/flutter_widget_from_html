@@ -213,7 +213,6 @@ class _RootTsb extends TextStyleBuilder {
   TextStyleHtml _output;
 
   _RootTsb(_HtmlWidgetState state) {
-    isSelectabletext = state.widget.isSelectableText;
     enqueue(builder, state);
   }
 

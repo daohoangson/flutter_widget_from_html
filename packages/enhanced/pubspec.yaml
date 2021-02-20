@@ -14,7 +14,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_svg: ">=0.17.0 <0.21.0"
-  flutter_widget_from_html_core: ^0.5.2
+  flutter_widget_from_html_core:
+    path: ../core
   html: ^0.14.0+3
   url_launcher: ^5.5.0
   video_player: ">=0.10.12 <2.0.0"

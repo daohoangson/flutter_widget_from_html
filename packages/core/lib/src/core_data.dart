@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_widget_from_html_core/src/core_html_widget.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'core_helpers.dart';
@@ -60,8 +61,7 @@ abstract class BuildMetadata {
   void register(BuildOp op);
 
   @override
-  String toString() =>
-      'BuildMetadata(${element == null ? "root" : element.outerHtml})';
+  String toString() => 'BuildMetadata(${element == null ? "root" : element.outerHtml})';
 
   /// Enqueues a text style builder callback.
   ///
@@ -123,8 +123,7 @@ class BuildOp {
   /// The callback that will be called when child elements have been built.
   ///
   /// Note: only works if it's a block element.
-  final Iterable<Widget> Function(
-      BuildMetadata meta, Iterable<WidgetPlaceholder> widgets) onWidgets;
+  final Iterable<Widget> Function(BuildMetadata meta, Iterable<WidgetPlaceholder> widgets) onWidgets;
 
   /// Controls whether the element should be forced to be rendered as block.
   ///

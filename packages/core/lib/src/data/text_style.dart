@@ -39,13 +39,10 @@ class TextStyleHtml {
   }) : _deps = deps;
 
   /// Creates the root text style.
-  factory TextStyleHtml.root(
-      Iterable<dynamic> deps, TextStyle widgetTextStyle) {
+  factory TextStyleHtml.root(Iterable<dynamic> deps, TextStyle widgetTextStyle) {
     var style = _getDependency<TextStyle>(deps);
     if (widgetTextStyle != null) {
-      style = widgetTextStyle.inherit
-          ? style.merge(widgetTextStyle)
-          : widgetTextStyle;
+      style = widgetTextStyle.inherit ? style.merge(widgetTextStyle) : widgetTextStyle;
     }
 
     var mqd = _getDependency<MediaQueryData>(deps);
@@ -67,8 +64,7 @@ class TextStyleHtml {
   /// This needs to be done because
   /// `TextStyle` with existing height cannot be copied with `height=null`.
   /// See [flutter/flutter#58765](https://github.com/flutter/flutter/issues/58765).
-  TextStyle get styleWithHeight =>
-      height != null && height >= 0 ? style.copyWith(height: height) : style;
+  TextStyle get styleWithHeight => height != null && height >= 0 ? style.copyWith(height: height) : style;
 
   /// Creates a copy with the given fields replaced with the new values.
   TextStyleHtml copyWith({
@@ -114,6 +110,7 @@ class TextStyleBuilder<T1> {
   List _inputs;
   TextStyleHtml _parentOutput;
   TextStyleHtml _output;
+  bool isSelectableText = false;
 
   /// Create a builder.
   TextStyleBuilder({this.parent});
@@ -128,6 +125,10 @@ class TextStyleBuilder<T1> {
     assert(_output == null, 'Cannot add builder after being built');
     _builders ??= [];
     _builders.add(builder);
+
+    if (input is State<HtmlWidget>) {
+      isSelectableText = input.widget.isSelectableText;
+    }
 
     _inputs ??= [];
     _inputs.add(input);
@@ -178,6 +179,5 @@ class TextStyleBuilder<T1> {
   TextStyleBuilder sub() => TextStyleBuilder(parent: this);
 
   @override
-  String toString() =>
-      'tsb#$hashCode' + (parent != null ? '(parent=#${parent.hashCode})' : '');
+  String toString() => 'tsb#$hashCode' + (parent != null ? '(parent=#${parent.hashCode})' : '');
 }

@@ -264,7 +264,7 @@ class BuildTree extends core_data.BuildTree {
         if (span is WidgetSpan && span.alignment == PlaceholderAlignment.baseline && textAlign == TextAlign.start) {
           return span.child;
         }
-        return tsb.isSelectabletext ? wf.buildSelectableText(parentMeta, tsh, span) : wf.buildText(parentMeta, tsh, span);
+        return tsb.parent.isSelectableText ? wf.buildSelectableText(parentMeta, tsh, span) : wf.buildText(parentMeta, tsh, span);
       }));
     }
 
