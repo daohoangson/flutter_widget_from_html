@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -15,7 +17,7 @@ final _regExpSpaces = RegExp(r'[^\S\u{00A0}]+', unicode: true);
 class BuildMetadata extends core_data.BuildMetadata {
   final Iterable<BuildOp> _parentOps;
 
-  List<BuildOp> _buildOps;
+  Set<BuildOp> _buildOps;
   var _buildOpsIsLocked = false;
   List<InlineStyle> _styles;
   var _stylesIsLocked = false;
@@ -52,19 +54,8 @@ class BuildMetadata extends core_data.BuildMetadata {
     if (op == null) return;
 
     assert(!_buildOpsIsLocked, 'Metadata can no longer be changed.');
-    _buildOps ??= [];
-    if (!buildOps.contains(op)) _buildOps.add(op);
-  }
-
-  void _sortBuildOps() {
-    assert(!_buildOpsIsLocked);
-
-    if (_buildOps != null) {
-      _buildOps.sort((a, b) => a.priority.compareTo(b.priority));
-    }
-
-    _willBuildSubtree = this[kCssDisplay] == kCssDisplayBlock || _buildOps?.where(_opRequiresBuildingSubtree)?.isNotEmpty == true;
-    _buildOpsIsLocked = true;
+    _buildOps ??= SplayTreeSet(_compareBuildOps);
+    _buildOps.add(op);
   }
 }
 
@@ -227,7 +218,9 @@ class BuildTree extends core_data.BuildTree {
 
     wf.parseStyleDisplay(meta, meta[kCssDisplay]);
 
-    meta._sortBuildOps();
+    meta._willBuildSubtree = meta[kCssDisplay] == kCssDisplayBlock ||
+        meta._buildOps?.where(_opRequiresBuildingSubtree)?.isNotEmpty == true;
+    meta._buildOpsIsLocked = true;
   }
 
   void _customStylesBuilder(BuildMetadata meta) {
@@ -272,7 +265,23 @@ class BuildTree extends core_data.BuildTree {
   }
 }
 
-bool _opRequiresBuildingSubtree(BuildOp op) => op.onWidgets != null && !op.onWidgetsIsOptional;
+int _compareBuildOps(BuildOp a, BuildOp b) {
+  if (identical(a, b)) return 0;
+
+  final cmp = a.priority.compareTo(b.priority);
+  if (cmp == 0) {
+    // if two ops have the same priority, they should not be considered equal
+    // fallback to compare hash codes for stable sorting
+    // while still provide pseudo random order across different runs
+    return a.hashCode.compareTo(b.hashCode);
+  } else {
+    return cmp;
+  }
+}
+
+bool _opRequiresBuildingSubtree(BuildOp op) =>
+    op.onWidgets != null && !op.onWidgetsIsOptional;
+
 
 Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, BuildMetadata meta) {
   // try to reuse existing list if possible
