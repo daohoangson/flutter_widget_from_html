@@ -23,7 +23,8 @@ class BuildMetadata extends core_data.BuildMetadata {
   var _stylesIsLocked = false;
   bool _willBuildSubtree;
 
-  BuildMetadata(dom.Element element, TextStyleBuilder tsb, [this._parentOps]) : super(element, tsb);
+  BuildMetadata(dom.Element element, TextStyleBuilder tsb, [this._parentOps])
+      : super(element, tsb);
 
   @override
   Iterable<BuildOp> get buildOps => _buildOps;
@@ -104,7 +105,11 @@ class BuildTree extends core_data.BuildTree {
 
     if (parentMeta?.buildOps != null) {
       for (final op in parentMeta.buildOps) {
-        widgets = op.onWidgets?.call(parentMeta, widgets)?.map(WidgetPlaceholder.lazy)?.toList(growable: false) ?? widgets;
+        widgets = op.onWidgets
+                ?.call(parentMeta, widgets)
+                ?.map(WidgetPlaceholder.lazy)
+                ?.toList(growable: false) ??
+            widgets;
       }
     }
 
@@ -242,7 +247,8 @@ class BuildTree extends core_data.BuildTree {
       }
 
       if (flattened.widgetBuilder != null) {
-        widgets.add(WidgetPlaceholder<BuildTree>(this).wrapWith((context, _) => flattened.widgetBuilder(context)));
+        widgets.add(WidgetPlaceholder<BuildTree>(this)
+            .wrapWith((context, _) => flattened.widgetBuilder(context)));
         continue;
       }
 
@@ -254,10 +260,13 @@ class BuildTree extends core_data.BuildTree {
         final tsh = tsb?.build(context);
         final textAlign = tsh?.textAlign ?? TextAlign.start;
 
-        if (span is WidgetSpan && span.alignment == PlaceholderAlignment.baseline && textAlign == TextAlign.start) {
+        if (span is WidgetSpan &&
+            span.alignment == PlaceholderAlignment.baseline &&
+            textAlign == TextAlign.start) {
           return span.child;
         }
-        return tsb.parent.isSelectableText ? wf.buildSelectableText(parentMeta, tsh, span) : wf.buildText(parentMeta, tsh, span);
+
+        return wf.buildText(parentMeta, tsh, span);
       }));
     }
 
@@ -282,9 +291,11 @@ int _compareBuildOps(BuildOp a, BuildOp b) {
 bool _opRequiresBuildingSubtree(BuildOp op) =>
     op.onWidgets != null && !op.onWidgetsIsOptional;
 
-
 Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, BuildMetadata meta) {
   // try to reuse existing list if possible
-  final withOnChild = meta.buildOps?.where((op) => op.onChild != null)?.toList();
-  return withOnChild?.isNotEmpty != true ? ops : List.unmodifiable([if (ops != null) ...ops, ...withOnChild]);
+  final withOnChild =
+      meta.buildOps?.where((op) => op.onChild != null)?.toList();
+  return withOnChild?.isNotEmpty != true
+      ? ops
+      : List.unmodifiable([if (ops != null) ...ops, ...withOnChild]);
 }

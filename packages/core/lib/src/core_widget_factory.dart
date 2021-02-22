@@ -182,13 +182,8 @@ class WidgetFactory {
   /// Builds [RichText].
   Widget buildSelectableText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) => SelectableText.rich(
         text,
-        // text: text,
-
         textAlign: tsh?.textAlign ?? TextAlign.start,
         textDirection: tsh?.textDirection ?? TextDirection.ltr,
-
-        // TODO: calculate max lines automatically for ellipsis if needed
-        // currently it only renders 1 line with ellipsis
         maxLines: tsh?.maxLines == -1 ? null : tsh?.maxLines,
       );
 
