@@ -51,7 +51,15 @@ jobs:
           pwd && ls -al
           sed -i -e 's/# web only: //' pubspec.yaml
           
-          flutter build web
+          flutter build web --web-renderer canvaskit
+          mv ./build/web ./build/web-canvaskit
+
+          flutter build web --web-renderer html
+          mv ./build/web ./build/web-html
+
+          flutter build web --web-renderer auto
+          mv ./build/web-canvaskit ./build/web/canvaskit
+          mv ./build/web-html ./build/web/html
 
       - name: Generate supported/tags.html
         run: |
