@@ -203,7 +203,7 @@ Color? tryParseColor(String? value) {
   if (valueLowerCase == 'transparent') return Color(0x00000000);
   // TODO: add support for `currentcolor`
   if (kCssColors.containsKey(valueLowerCase)) {
-    return tryParseColor(kCssColors[valueLowerCase]);
+    return tryParseColor(kCssColors[valueLowerCase]!);
   }
 
   final rgbMatch = _colorRgbRegExp.firstMatch(valueLowerCase);

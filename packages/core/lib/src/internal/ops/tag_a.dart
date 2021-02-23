@@ -29,7 +29,7 @@ class TagA {
               bit.child.wrapWith(
                   (_, child) => wf.buildGestureDetector(meta, child, onTap));
             } else if (bit.tsb != null) {
-              _TagABit(bit.parent, bit.tsb, onTap).insertAfter(bit);
+              _TagABit(bit.parent, bit.tsb!, onTap).insertAfter(bit);
             }
           }
         },
@@ -45,7 +45,9 @@ class TagA {
 
   GestureTapCallback? _gestureTapCallback(BuildMetadata meta) {
     final href = meta.element.attributes[kAttributeAHref];
-    return wf.gestureTapCallback(wf.urlFull(href) ?? href);
+    return href != null
+        ? wf.gestureTapCallback(wf.urlFull(href) ?? href)
+        : null;
   }
 }
 

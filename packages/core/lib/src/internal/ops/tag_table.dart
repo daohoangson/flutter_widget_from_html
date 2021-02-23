@@ -170,13 +170,15 @@ class TagTable {
             : cssBorderParsed;
 
         builders.add((context) {
+          Widget? child = cell.child;
           final border = cssBorder.getValue(cellMeta.tsb.build(context));
-          final padding =
-              wf.buildPadding(cellMeta, cell.child, border?.dimensions);
-          if (padding != null) {
+          if (border != null) {
+            child = wf.buildPadding(cellMeta, cell.child, border.dimensions);
+          }
+          if (child != null) {
             return HtmlTableCell(
               border: border,
-              child: padding,
+              child: child,
               columnSpan: columnSpan,
               columnStart: columnStart,
               rowSpan: rowSpan,

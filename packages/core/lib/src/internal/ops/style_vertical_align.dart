@@ -61,7 +61,9 @@ class StyleVerticalAlign {
               ?.wrapWith((context, child) {
             final tsh = meta.tsb.build(context);
             final alignment = _tryParseAlignmentGeometry(tsh.textDirection, v);
-            return wf.buildAlign(meta, child, alignment);
+            return alignment != null
+                ? wf.buildAlign(meta, child, alignment)
+                : child;
           }));
         },
         onWidgetsIsOptional: true,

@@ -107,9 +107,9 @@ class TagLi {
     );
   }
 
-  Widget _buildMarker(TextStyleHtml tsh, String? type, String text) {
+  Widget _buildMarker(TextStyleHtml tsh, String? type, String? text) {
     final style = tsh.styleWithHeight;
-    return text.isNotEmpty
+    return text != null && text.isNotEmpty
         ? RichText(
             maxLines: 1,
             overflow: TextOverflow.clip,

@@ -202,7 +202,7 @@ class WidgetFactory extends core.WidgetFactory {
     return FilePicture(SvgPicture.svgByteDecoder, File(filePath));
   }
 
-  /// Returns a [FilePicture].
+  /// Returns a [NetworkPicture].
   PictureProvider imageSvgFromNetwork(String url) =>
       url.isNotEmpty ? NetworkPicture(SvgPicture.svgByteDecoder, url) : null;
 

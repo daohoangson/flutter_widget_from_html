@@ -36,8 +36,8 @@ class WidgetFactory {
 
   /// Builds [Align].
   Widget? buildAlign(
-          BuildMetadata meta, Widget? child, AlignmentGeometry? alignment) =>
-      alignment == null ? child : Align(alignment: alignment, child: child);
+          BuildMetadata meta, Widget child, AlignmentGeometry alignment) =>
+      Align(alignment: alignment, child: child);
 
   /// Builds [AspectRatio].
   Widget? buildAspectRatio(
@@ -53,19 +53,17 @@ class WidgetFactory {
   /// See https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
   /// for more information regarding `content-box` (the default)
   /// and `border-box` (set [isBorderBox] to use).
-  Widget? buildBorder(BuildMetadata meta, Widget? child, BoxBorder? border,
+  Widget? buildBorder(BuildMetadata meta, Widget child, BoxBorder border,
           {bool isBorderBox = false}) =>
-      border == null
-          ? child
-          : isBorderBox == true
-              ? DecoratedBox(
-                  child: child,
-                  decoration: BoxDecoration(border: border),
-                )
-              : Container(
-                  child: child,
-                  decoration: BoxDecoration(border: border),
-                );
+      isBorderBox == true
+          ? DecoratedBox(
+              child: child,
+              decoration: BoxDecoration(border: border),
+            )
+          : Container(
+              child: child,
+              decoration: BoxDecoration(border: border),
+            );
 
   /// Builds column placeholder.
   WidgetPlaceholder? buildColumnPlaceholder(
@@ -96,7 +94,7 @@ class WidgetFactory {
 
   /// Builds [Column].
   Widget? buildColumnWidget(
-      BuildMetadata meta, TextStyleHtml? tsh, List<Widget> children) {
+      BuildMetadata meta, TextStyleHtml tsh, List<Widget> children) {
     if (children.isEmpty) return null;
     if (children.length == 1) return children.first;
 
@@ -104,14 +102,14 @@ class WidgetFactory {
       children: children,
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      textDirection: tsh!.textDirection,
+      textDirection: tsh.textDirection,
     );
   }
 
   /// Builds [DecoratedBox].
   Widget? buildDecoratedBox(
     BuildMetadata meta,
-    Widget? child, {
+    Widget child, {
     Color? color,
   }) =>
       DecoratedBox(
@@ -133,7 +131,7 @@ class WidgetFactory {
       GestureDetector(child: child, onTap: onTap);
 
   /// Builds horizontal scroll view.
-  Widget? buildHorizontalScrollView(BuildMetadata meta, Widget? child) =>
+  Widget? buildHorizontalScrollView(BuildMetadata meta, Widget child) =>
       SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
 
   /// Builds image widget from an [ImageMetadata].
@@ -195,8 +193,8 @@ class WidgetFactory {
 
   /// Builds [Padding].
   Widget? buildPadding(
-          BuildMetadata meta, Widget? child, EdgeInsetsGeometry? padding) =>
-      padding == null || padding == EdgeInsets.zero
+          BuildMetadata meta, Widget child, EdgeInsetsGeometry padding) =>
+      padding == EdgeInsets.zero
           ? child
           : Padding(child: child, padding: padding);
 
@@ -210,24 +208,23 @@ class WidgetFactory {
       );
 
   /// Builds [RichText].
-  Widget? buildText(BuildMetadata? meta, TextStyleHtml? tsh, InlineSpan text) =>
+  Widget? buildText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) =>
       RichText(
-        overflow: tsh?.textOverflow ?? TextOverflow.clip,
+        overflow: tsh.textOverflow ?? TextOverflow.clip,
         text: text,
-        textAlign: tsh?.textAlign ?? TextAlign.start,
-        textDirection: tsh?.textDirection ?? TextDirection.ltr,
+        textAlign: tsh.textAlign ?? TextAlign.start,
+        textDirection: tsh.textDirection,
 
         // TODO: calculate max lines automatically for ellipsis if needed
         // currently it only renders 1 line with ellipsis
-        maxLines: tsh?.maxLines == -1 ? null : tsh?.maxLines,
+        maxLines: tsh.maxLines == -1 ? null : tsh.maxLines,
       );
 
   /// Prepares [GestureTapCallback].
-  GestureTapCallback? gestureTapCallback(String? url) => url != null
-      ? () => _widget!.onTapUrl != null
+  GestureTapCallback? gestureTapCallback(String url) =>
+      () => _widget!.onTapUrl != null
           ? _widget!.onTapUrl!(url)
-          : print('[HtmlWidget] onTapUrl($url)')
-      : null;
+          : print('[HtmlWidget] onTapUrl($url)');
 
   /// Returns [context]-based dependencies.
   ///
@@ -269,7 +266,7 @@ class WidgetFactory {
   /// Returns marker for the specified [type] at index [i].
   ///
   /// Note: `circle`, `disc` and `square` type won't trigger this method
-  String getListStyleMarker(String? type, int i) {
+  String? getListStyleMarker(String type, int i) {
     switch (type) {
       case kCssListStyleTypeAlphaLower:
       case kCssListStyleTypeAlphaLatinLower:
@@ -630,7 +627,7 @@ class WidgetFactory {
   }
 
   /// Parses inline style [key] and [value] pair.
-  void parseStyle(BuildMetadata meta, String key, String? value) {
+  void parseStyle(BuildMetadata meta, String key, String value) {
     switch (key) {
       case kCssBackground:
       case kCssBackgroundColor:
@@ -644,27 +641,27 @@ class WidgetFactory {
         break;
 
       case kCssDirection:
-        meta.tsb.enqueue(TextStyleOps.textDirection, value!);
+        meta.tsb.enqueue(TextStyleOps.textDirection, value);
         break;
 
       case kCssFontFamily:
-        final list = TextStyleOps.fontFamilyTryParse(value!);
+        final list = TextStyleOps.fontFamilyTryParse(value);
         meta.tsb.enqueue(TextStyleOps.fontFamily, list);
         break;
 
       case kCssFontSize:
-        meta.tsb.enqueue(_tsbFontSize, value!);
+        meta.tsb.enqueue(_tsbFontSize, value);
         break;
 
       case kCssFontStyle:
-        final fontStyle = TextStyleOps.fontStyleTryParse(value!);
+        final fontStyle = TextStyleOps.fontStyleTryParse(value);
         if (fontStyle != null) {
           meta.tsb.enqueue(TextStyleOps.fontStyle, fontStyle);
         }
         break;
 
       case kCssFontWeight:
-        final fontWeight = TextStyleOps.fontWeightTryParse(value!);
+        final fontWeight = TextStyleOps.fontWeightTryParse(value);
         if (fontWeight != null) {
           meta.tsb.enqueue(TextStyleOps.fontWeight, fontWeight);
         }
@@ -682,17 +679,17 @@ class WidgetFactory {
 
       case kCssLineHeight:
         _tsbLineHeight ??= TextStyleOps.lineHeight(this);
-        meta.tsb.enqueue(_tsbLineHeight!, value!);
+        meta.tsb.enqueue(_tsbLineHeight!, value);
         break;
 
       case kCssMaxLines:
       case kCssMaxLinesWebkitLineClamp:
-        final maxLines = value == kCssMaxLinesNone ? -1 : int.tryParse(value!);
+        final maxLines = value == kCssMaxLinesNone ? -1 : int.tryParse(value);
         if (maxLines != null) meta.tsb.enqueue(TextStyleOps.maxLines, maxLines);
         break;
 
       case kCssTextAlign:
-        meta.register(StyleTextAlign(this, value!).op);
+        meta.register(StyleTextAlign(this, value).op);
         break;
 
       case kCssTextDecoration:
@@ -776,8 +773,8 @@ class WidgetFactory {
 
   /// Resolves full URL with [HtmlWidget.baseUrl] if available.
   String? urlFull(String? url) {
-    if (url?.isNotEmpty != true) return null;
-    if (url!.startsWith('data:')) return url;
+    if (url == null || url.isEmpty) return null;
+    if (url.startsWith('data:')) return url;
 
     final uri = Uri.tryParse(url);
     if (uri == null) return null;

@@ -254,8 +254,9 @@ class BuildTree extends core_data.BuildTree {
         final span = flattened.spanBuilder!(context);
         if (span == null || span is! InlineSpan) return widget0;
 
-        final tsh = tsb?.build(context);
-        final textAlign = tsh?.textAlign ?? TextAlign.start;
+        // `tsb` may only be null for whitespace, which this is not.
+        final tsh = tsb!.build(context);
+        final textAlign = tsh.textAlign ?? TextAlign.start;
 
         if (span is WidgetSpan &&
             span.alignment == PlaceholderAlignment.baseline &&
