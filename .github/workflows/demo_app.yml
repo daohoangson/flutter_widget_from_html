@@ -46,14 +46,7 @@ jobs:
         with:
           channel: beta
       - run: flutter config --enable-web
-      - name: Run flutter build web
-        run: |
-          set -e
-
-          pwd && ls -al
-          sed -i -e 's/# web only: //' pubspec.yaml
-          
-          flutter build web
+      - run: flutter build web
 
       - name: Generate supported/tags.html
         run: |
