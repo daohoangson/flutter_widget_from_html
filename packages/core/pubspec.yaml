@@ -11,7 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  html: ^0.15.0
+  html: ">=0.14.0 <0.16.0"
 
 dev_dependencies:
   flutter_test:
