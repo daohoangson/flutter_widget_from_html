@@ -37,29 +37,52 @@ class WidgetFactory extends core.WidgetFactory {
           BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
       InkWell(child: child, onTap: onTap);
 
-  /// Builds [SvgPicture] or [Image].
   @override
-  Widget buildImage(BuildMetadata meta, Object provider, ImageMetadata data) {
-    var built = super.buildImage(meta, provider, data);
+  Widget buildImage(BuildMetadata meta, ImageMetadata data) {
+    var built = super.buildImage(meta, data);
 
-    if (_isFlutterSvgSupported &&
-        built == null &&
-        provider is PictureProvider) {
-      built = SvgPicture(provider);
-
-      if (_widget?.onTapImage != null) {
-        built = GestureDetector(
-          child: built,
-          onTap: () => _widget?.onTapImage?.call(data),
-        );
-      }
-    }
-
-    if (data.title != null && built != null) {
+    if (built != null && data.title != null) {
       built = Tooltip(child: built, message: data.title);
     }
 
     return built;
+  }
+
+  @override
+  Widget buildImageWidget(
+    BuildMetadata meta, {
+    String semanticLabel,
+    @required String url,
+  }) {
+    PictureProvider provider;
+    if (_isFlutterSvgSupported) {
+      if (url.startsWith('data:image/svg+xml')) {
+        provider = imageSvgFromDataUri(url);
+      } else if (Uri.tryParse(url)?.path?.toLowerCase()?.endsWith('.svg') ==
+          true) {
+        if (url.startsWith('asset:')) {
+          provider = imageSvgFromAsset(url);
+        } else if (url.startsWith('file:')) {
+          provider = imageSvgFromFileUri(url);
+        } else {
+          provider = imageSvgFromNetwork(url);
+        }
+      }
+    }
+
+    if (provider == null) {
+      return super.buildImageWidget(
+        meta,
+        semanticLabel: semanticLabel,
+        url: url,
+      );
+    }
+
+    return SvgPicture(
+      provider,
+      excludeFromSemantics: semanticLabel == null,
+      semanticsLabel: semanticLabel,
+    );
   }
 
   /// Builds [VideoPlayer].
@@ -83,11 +106,7 @@ class WidgetFactory extends core.WidgetFactory {
       controls: controls,
       loop: loop,
       poster: posterImgSrc != null
-          ? buildImage(
-              meta,
-              imageProvider(posterImgSrc),
-              ImageMetadata(sources: [posterImgSrc]),
-            )
+          ? buildImage(meta, ImageMetadata(sources: [posterImgSrc]))
           : null,
     );
   }
@@ -146,64 +165,46 @@ class WidgetFactory extends core.WidgetFactory {
   Iterable<dynamic> getDependencies(BuildContext context) =>
       [...super.getDependencies(context), Theme.of(context)];
 
-  /// Returns flutter_svg.[PictureProvider] or [ImageProvider].
   @override
-  Object imageProvider(ImageSource imgSrc) {
-    if (imgSrc == null) return super.imageProvider(imgSrc);
-    final url = imgSrc.url;
-
-    if (Uri.tryParse(url)?.path?.toLowerCase()?.endsWith('.svg') == true) {
-      return _imageSvgPictureProvider(url);
-    }
-
-    if (url.startsWith('data:image/svg+xml')) {
-      return _imageSvgMemoryPicture(url);
-    }
-
-    if (url.startsWith('http')) {
-      return _imageFromUrl(url);
-    }
-
-    return super.imageProvider(imgSrc);
-  }
-
-  Object _imageFromUrl(String url) =>
+  ImageProvider imageProviderFromNetwork(String url) =>
       url?.isNotEmpty == true ? CachedNetworkImageProvider(url) : null;
 
-  Object _imageSvgMemoryPicture(String dataUri) {
-    final bytes = bytesFromDataUri(dataUri);
-    return bytes != null
-        ? MemoryPicture(SvgPicture.svgByteDecoder, bytes)
+  /// Returns an [ExactAssetPicture].
+  PictureProvider imageSvgFromAsset(String url) {
+    final uri = Uri.parse(url);
+    final assetName = uri.path;
+    if (assetName?.isNotEmpty != true) return null;
+
+    final package = uri.queryParameters?.containsKey('package') == true
+        ? uri.queryParameters['package']
         : null;
+
+    return ExactAssetPicture(
+      SvgPicture.svgStringDecoder,
+      assetName,
+      package: package,
+    );
   }
 
-  Object _imageSvgPictureProvider(String url) {
-    if (url.startsWith('asset:')) {
-      final uri = Uri.tryParse(url);
-      final assetName = uri.path;
-      if (assetName?.isNotEmpty != true) return null;
+  /// Returns a [MemoryPicture].
+  PictureProvider imageSvgFromDataUri(String dataUri) {
+    final bytes = bytesFromDataUri(dataUri);
+    if (bytes == null) return null;
 
-      final package = uri.queryParameters?.containsKey('package') == true
-          ? uri.queryParameters['package']
-          : null;
-
-      return ExactAssetPicture(
-        SvgPicture.svgStringDecoder,
-        assetName,
-        package: package,
-      );
-    }
-
-    if (url.startsWith('file:')) {
-      final uri = Uri.tryParse(url);
-      final filePath = uri?.toFilePath();
-      if (filePath?.isNotEmpty != true) return null;
-
-      return FilePicture(SvgPicture.svgByteDecoder, File(uri.toFilePath()));
-    }
-
-    return NetworkPicture(SvgPicture.svgByteDecoder, url);
+    return MemoryPicture(SvgPicture.svgByteDecoder, bytes);
   }
+
+  /// Returns a [FilePicture].
+  PictureProvider imageSvgFromFileUri(String url) {
+    final filePath = Uri.parse(url).toFilePath();
+    if (filePath.isEmpty) return null;
+
+    return FilePicture(SvgPicture.svgByteDecoder, File(filePath));
+  }
+
+  /// Returns a [FilePicture].
+  PictureProvider imageSvgFromNetwork(String url) =>
+      url.isNotEmpty ? NetworkPicture(SvgPicture.svgByteDecoder, url) : null;
 
   /// Handles user tapping a link.
   void onTapUrl(String url) {
