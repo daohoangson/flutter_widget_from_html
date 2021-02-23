@@ -685,6 +685,7 @@ void main() async {
       expect(urls, equals(const [kHref]));
     });
 
+    final goldenSkip = Platform.isLinux ? null : 'Linux only';
     GoldenToolkit.runWithConfiguration(
       () {
         group('baseline calculation', () {
@@ -721,9 +722,9 @@ void main() async {
               );
 
               await screenMatchesGolden(tester, testCase.key);
-            }, skip: false);
+            }, skip: goldenSkip != null);
           }
-        }, skip: Platform.isLinux ? null : 'Linux only');
+        }, skip: goldenSkip);
       },
       config: GoldenToolkitConfiguration(
         fileNameFactory: (name) => '$kGoldenFilePrefix/li/$name.png',

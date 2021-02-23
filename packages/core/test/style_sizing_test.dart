@@ -430,7 +430,7 @@ void main() {
               );
 
               await screenMatchesGolden(tester, testCase.key);
-            }, skip: false);
+            }, skip: goldenSkip != null);
           }
         }, skip: goldenSkip);
       },
@@ -459,7 +459,7 @@ void main() {
             );
 
             await screenMatchesGolden(tester, 'width');
-          }, skip: false);
+          }, skip: goldenSkip != null);
 
           testGoldens('height', (tester) async {
             await tester.pumpWidgetBuilder(
@@ -476,7 +476,7 @@ void main() {
             );
 
             await screenMatchesGolden(tester, 'height');
-          }, skip: false);
+          }, skip: goldenSkip != null);
         }, skip: goldenSkip);
       },
       config: GoldenToolkitConfiguration(
