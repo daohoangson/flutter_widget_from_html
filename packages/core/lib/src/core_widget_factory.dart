@@ -41,7 +41,7 @@ class WidgetFactory {
 
   /// Builds [AspectRatio].
   Widget? buildAspectRatio(
-          BuildMetadata meta, Widget? child, double aspectRatio) =>
+          BuildMetadata meta, Widget child, double aspectRatio) =>
       AspectRatio(aspectRatio: aspectRatio, child: child);
 
   /// Builds primary column (body).
@@ -129,37 +129,68 @@ class WidgetFactory {
 
   /// Builds [GestureDetector].
   Widget? buildGestureDetector(
-          BuildMetadata meta, Widget? child, GestureTapCallback onTap) =>
+          BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
       GestureDetector(child: child, onTap: onTap);
 
   /// Builds horizontal scroll view.
   Widget? buildHorizontalScrollView(BuildMetadata meta, Widget? child) =>
       SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
 
-  /// Builds [Image] from [provider].
-  Widget? buildImage(BuildMetadata meta, Object provider, ImageMetadata data) {
-    Widget? built;
-    if (provider is ImageProvider) {
-      final semanticLabel = data.alt ?? data.title;
-      built = Image(
-        errorBuilder: (_, error, __) {
-          print('$provider error: $error');
-          final text = semanticLabel ?? '❌';
-          return Text(text);
-        },
-        excludeFromSemantics: semanticLabel == null,
-        fit: BoxFit.fill,
-        image: provider,
-        semanticLabel: semanticLabel,
-      );
+  /// Builds image widget from an [ImageMetadata].
+  Widget? buildImage(BuildMetadata meta, ImageMetadata data) {
+    final src = data.sources?.isNotEmpty == true ? data.sources!.first : null;
+    if (src == null) return null;
+
+    var built = buildImageWidget(
+      meta,
+      semanticLabel: data.alt ?? data.title,
+      url: src.url,
+    );
+
+    if (built != null &&
+        src.height?.isNegative == false &&
+        src.width?.isNegative == false &&
+        src.height != 0) {
+      built = buildAspectRatio(meta, built, src.width! / src.height!);
     }
 
-    if (_widget?.onTapImage != null && built != null) {
+    if (built != null && _widget?.onTapImage != null) {
       built = buildGestureDetector(
           meta, built, () => _widget?.onTapImage?.call(data));
     }
 
     return built;
+  }
+
+  /// Builds [Image].
+  Widget? buildImageWidget(
+    BuildMetadata meta, {
+    String? semanticLabel,
+    required String url,
+  }) {
+    late final ImageProvider? provider;
+    if (url.startsWith('asset:')) {
+      provider = imageProviderFromAsset(url);
+    } else if (url.startsWith('data:image/')) {
+      provider = imageProviderFromDataUri(url);
+    } else if (url.startsWith('file:')) {
+      provider = imageProviderFromFileUri(url);
+    } else {
+      provider = imageProviderFromNetwork(url);
+    }
+    if (provider == null) return null;
+
+    return Image(
+      errorBuilder: (_, error, __) {
+        print('$provider error: $error');
+        final text = semanticLabel ?? '❌';
+        return Text(text);
+      },
+      excludeFromSemantics: semanticLabel == null,
+      fit: BoxFit.fill,
+      image: provider,
+      semanticLabel: semanticLabel,
+    );
   }
 
   /// Builds [Padding].
@@ -287,26 +318,8 @@ class WidgetFactory {
     return map[i];
   }
 
-  /// Returns [ImageProvider].
-  Object? imageProvider(ImageSource imgSrc) {
-    final url = imgSrc.url;
-
-    if (url.startsWith('asset:')) {
-      return _imageFromAsset(url);
-    }
-
-    if (url.startsWith('data:')) {
-      return _imageFromDataUri(url);
-    }
-
-    if (url.startsWith('file:')) {
-      return _imageFromFileUri(url);
-    }
-
-    return _imageFromUrl(url);
-  }
-
-  Object? _imageFromAsset(String url) {
+  /// Returns an [AssetImage].
+  ImageProvider? imageProviderFromAsset(String url) {
     final uri = Uri.parse(url);
     final assetName = uri.path;
     if (assetName.isEmpty) return null;
@@ -318,22 +331,24 @@ class WidgetFactory {
     return AssetImage(assetName, package: package);
   }
 
-  Object? _imageFromDataUri(String dataUri) {
+  /// Returns a [MemoryImage].
+  ImageProvider? imageProviderFromDataUri(String dataUri) {
     final bytes = bytesFromDataUri(dataUri);
     if (bytes == null) return null;
 
     return MemoryImage(bytes);
   }
 
-  Object? _imageFromFileUri(String url) {
-    final uri = url.isNotEmpty ? Uri.tryParse(url) : null;
-    final filePath = uri?.toFilePath();
-    if (filePath?.isNotEmpty != true) return null;
+  /// Returns a [FileImage].
+  ImageProvider? imageProviderFromFileUri(String url) {
+    final filePath = Uri.parse(url).toFilePath();
+    if (filePath.isEmpty) return null;
 
-    return FileImage(File(filePath!));
+    return FileImage(File(filePath));
   }
 
-  Object? _imageFromUrl(String url) =>
+  /// Returns a [NetworkImage].
+  ImageProvider? imageProviderFromNetwork(String url) =>
       url.isNotEmpty ? NetworkImage(url) : null;
 
   /// Prepares the root [TextStyleBuilder].
