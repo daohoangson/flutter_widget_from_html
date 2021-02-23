@@ -810,6 +810,7 @@ void main() async {
       expect(urls, equals(const [kHref]));
     });
 
+    final goldenSkip = Platform.isLinux ? null : 'Linux only';
     GoldenToolkit.runWithConfiguration(
       () {
         group('screenshot testing', () {
@@ -905,9 +906,9 @@ Foo should float on top of table.''',
               );
 
               await screenMatchesGolden(tester, testCase.key);
-            }, skip: false);
+            }, skip: goldenSkip != null);
           }
-        }, skip: Platform.isLinux ? null : 'Linux only');
+        }, skip: goldenSkip);
       },
       config: GoldenToolkitConfiguration(
         fileNameFactory: (name) => '$kGoldenFilePrefix/table/$name.png',
