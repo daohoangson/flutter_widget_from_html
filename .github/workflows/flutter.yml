@@ -3,6 +3,7 @@ on:
   push:
     paths: 
       - .github/workflows/flutter.yml
+      - demo_app/pubspec.yaml
       - 'demo_app/test/**'
       - 'demo_app/test_driver/**'
       - 'packages/**'
