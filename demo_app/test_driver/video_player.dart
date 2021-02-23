@@ -33,6 +33,8 @@ class _TestAppState extends State<TestApp> {
         ),
       );
 
+  // TODO: use `ElevatedButton` when v1.25 hits stable
+  // ignore: deprecated_member_use
   Widget _buildButton(String value) => RaisedButton(
         child: Text(
           value,
