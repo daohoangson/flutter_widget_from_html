@@ -34,7 +34,7 @@ class TagImg {
         },
         onTree: (meta, tree) {
           final data = _parse(meta);
-          final built = _build(meta, data);
+          final built = wf.buildImage(meta, data);
           if (built == null) {
             final imgText = data.alt ?? data.title;
             if (imgText?.isNotEmpty == true) {
@@ -51,24 +51,6 @@ class TagImg {
               : WidgetBit.inline(tree, placeholder));
         },
       );
-
-  Widget? _build(BuildMetadata meta, ImageMetadata data) {
-    final source = data.sources?.first;
-    if (source == null) return null;
-
-    final provider = wf.imageProvider(source);
-    if (provider == null) return null;
-
-    var built = wf.buildImage(meta, provider, data);
-
-    if (source.height?.isNegative == false &&
-        source.width?.isNegative == false &&
-        source.height != 0) {
-      built = wf.buildAspectRatio(meta, built, source.width! / source.height!);
-    }
-
-    return built;
-  }
 
   ImageMetadata _parse(BuildMetadata meta) {
     final attrs = meta.element.attributes;
