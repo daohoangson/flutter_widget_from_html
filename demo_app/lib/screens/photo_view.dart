@@ -47,19 +47,15 @@ class PhotoViewScreen extends StatelessWidget {
 
 class _InlinePhotoViewWidgetFactory extends WidgetFactory {
   @override
-  Widget buildImage(BuildMetadata meta, Object provider, ImageMetadata data) {
-    if (provider is ImageProvider) {
-      return AspectRatio(
-        aspectRatio: 16.0 / 9.0,
-        child: ClipRect(
-          child: PhotoView(
-            imageProvider: provider,
-          ),
+  Widget buildImage(BuildMetadata meta, ImageMetadata data) {
+    return AspectRatio(
+      aspectRatio: 16.0 / 9.0,
+      child: ClipRect(
+        child: PhotoView(
+          imageProvider: imageProviderFromNetwork(data.sources.first.url),
         ),
-      );
-    }
-
-    return super.buildImage(meta, provider, data);
+      ),
+    );
   }
 
   @override
@@ -74,25 +70,28 @@ class _InlinePhotoViewWidgetFactory extends WidgetFactory {
 
 class _PopupPhotoViewWidgetFactory extends WidgetFactory {
   @override
-  Widget buildImage(BuildMetadata meta, Object provider, ImageMetadata data) {
-    final built = super.buildImage(meta, provider, data);
+  Widget buildImageWidget(
+    BuildMetadata meta, {
+    String semanticLabel,
+    @required String url,
+  }) {
+    final built = super.buildImageWidget(
+      meta,
+      semanticLabel: semanticLabel,
+      url: url,
+    );
 
-    if (provider is ImageProvider) {
-      final heroTag = data.sources.first.url;
-
+    if (built is Image) {
       return Builder(
         builder: (context) => GestureDetector(
-          child: Hero(
-            child: built,
-            tag: heroTag,
-          ),
+          child: Hero(child: built, tag: url),
           onTap: () => Navigator.of(context).push(MaterialPageRoute(
               builder: (_) => Scaffold(
                     appBar: AppBar(),
                     body: Container(
                       child: PhotoView(
-                        heroAttributes: PhotoViewHeroAttributes(tag: heroTag),
-                        imageProvider: provider,
+                        heroAttributes: PhotoViewHeroAttributes(tag: url),
+                        imageProvider: built.image,
                       ),
                     ),
                   ))),
