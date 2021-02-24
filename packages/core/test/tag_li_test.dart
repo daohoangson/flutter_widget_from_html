@@ -19,7 +19,7 @@ String padding(String child) =>
 
 String list(List<String> children) => '[Column:children=${children.join(",")}]';
 
-String item(String markerText, String? contents, {String? child}) =>
+String item(String markerText, String contents, {String? child}) =>
     '[_ListItem:children=${child ?? '[RichText:(:$contents)]'},${marker(markerText)}]';
 
 String marker(String text) =>
@@ -112,7 +112,7 @@ void main() async {
         explained,
         equals(padding(list([
           item(disc, 'Foo'),
-          item(disc, null, child: padding(item(circle, 'Bar'))),
+          item(disc, '', child: padding(item(circle, 'Bar'))),
         ]))));
   });
 

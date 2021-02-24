@@ -40,13 +40,11 @@ void main() {
   });
 
   group('buildAsyncBuilder', () {
-    final Future<String?> Function(WidgetTester, String,
-        {Widget Function(BuildContext, AsyncSnapshot<Widget>) buildAsyncBuilder,
-        bool withData}) explain = (
+    final explain = (
       WidgetTester tester,
       String html, {
       AsyncWidgetBuilder<Widget>? buildAsyncBuilder,
-      bool? withData,
+      bool withData = true,
     }) =>
         tester.runAsync(() => helper.explain(tester, null,
             buildFutureBuilderWithData: withData,
@@ -107,12 +105,7 @@ void main() {
   });
 
   group('enableCaching', () {
-    final Future<String> Function(WidgetTester, String, bool,
-        {Uri baseUrl,
-        bool buildAsync,
-        Color hyperlinkColor,
-        RebuildTriggers rebuildTriggers,
-        TextStyle textStyle}) explain = (
+    final explain = (
       WidgetTester tester,
       String html,
       bool enableCaching, {

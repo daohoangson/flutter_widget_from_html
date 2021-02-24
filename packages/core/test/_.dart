@@ -26,13 +26,13 @@ Widget? buildCurrentState() {
 
 Future<Widget> buildFutureBuilder(
   FutureBuilder<Widget> fb, {
-  bool? withData = true,
+  bool withData = true,
 }) async {
   final hws = hwKey.currentState;
   if (hws == null) return Future.value(null);
 
   final data = await fb.future!;
-  final snapshot = withData!
+  final snapshot = withData
       ? AsyncSnapshot.withData(ConnectionState.done, data)
       : AsyncSnapshot<Widget>.nothing();
   return fb.builder(hws.context, snapshot);
@@ -41,8 +41,8 @@ Future<Widget> buildFutureBuilder(
 Future<String> explain(
   WidgetTester tester,
   String? html, {
-  bool? buildFutureBuilderWithData = true,
-  String Function(Explainer, Widget?)? explainer,
+  bool buildFutureBuilderWithData = true,
+  String Function(Explainer, Widget)? explainer,
   Widget? hw,
   bool rtl = false,
   TextStyle? textStyle,
@@ -89,13 +89,13 @@ Future<String> explain(
 }
 
 Future<String> explainWithoutPumping({
-  bool? buildFutureBuilderWithData = true,
-  String Function(Explainer, Widget?)? explainer,
+  bool buildFutureBuilderWithData = true,
+  String Function(Explainer, Widget)? explainer,
   bool useExplainer = true,
 }) async {
   if (!useExplainer) {
     final sb = StringBuffer();
-    hwKey.currentContext!.visitChildElements(
+    hwKey.currentContext?.visitChildElements(
         (e) => sb.writeln(e.toDiagnosticsNode().toStringDeep()));
     var str = sb.toString();
     str = str.replaceAll(RegExp(r': [A-Z][A-Za-z]+\.'), ': '); // enums
@@ -131,12 +131,14 @@ Future<String> explainWithoutPumping({
     str = str.replaceAll(RegExp(r'(, )?textDirection: ltr+'), '');
 
     // delete leading comma (because of property trimmings)
-    str = str.replaceAllMapped(RegExp(r'(\w+\(), '), (m) => m.group(1)!);
+    str = str.replaceAllMapped(RegExp(r'(\w+\(), '), (m) => m[1]!);
     str = simplifyHashCode(str);
     return str;
   }
 
   var built = buildCurrentState();
+  if (built == null) return 'null';
+
   var isFutureBuilder = false;
   if (built is FutureBuilder<Widget>) {
     built = await buildFutureBuilder(
@@ -161,7 +163,7 @@ final _explainMarginRegExp = RegExp(r'^\[Column:(dir=rtl,)?children='
     r'\[RichText:(dir=rtl,)?\(:x\)\]'
     r'\]$');
 
-Future<String?> explainMargin(
+Future<String> explainMargin(
   WidgetTester tester,
   String html, {
   bool rtl = false,
@@ -173,13 +175,13 @@ Future<String?> explainMargin(
     rtl: rtl,
   );
   final match = _explainMarginRegExp.firstMatch(explained);
-  return match == null ? explained : match[3];
+  return match == null ? explained : match[3]!;
 }
 
 String simplifyHashCode(String str) {
-  final hashCodes = <String?>[];
+  final hashCodes = <String>[];
   return str.replaceAllMapped(RegExp(r'#(\d+)'), (match) {
-    final hashCode = match.group(1);
+    final hashCode = match[1]!;
     var indexOf = hashCodes.indexOf(hashCode);
     if (indexOf == -1) {
       indexOf = hashCodes.length;
@@ -209,17 +211,17 @@ Future<int> tapText(WidgetTester tester, String data) async {
 
 class Explainer {
   final BuildContext context;
-  final String Function(Explainer, Widget?)? explainer;
+  final String Function(Explainer, Widget)? explainer;
   final TextStyle _defaultStyle;
 
   Explainer(this.context, {this.explainer})
       : _defaultStyle = DefaultTextStyle.of(context).style;
 
-  String explain(Widget? widget) => _widget(widget);
+  String explain(Widget widget) => _widget(widget);
 
-  String? _alignment(Alignment? a) => a != null
+  String _alignment(AlignmentGeometry? a) => a != null
       ? 'alignment=${a.toString().replaceFirst('Alignment.', '')}'
-      : null;
+      : '';
 
   String _borderSide(BorderSide s) => s != BorderSide.none
       ? "${s.width}@${s.style.toString().replaceFirst('BorderStyle.', '')}${_color(s.color)}"
@@ -243,11 +245,16 @@ class Explainer {
   String _boxConstraints(BoxConstraints bc) =>
       'constraints=${bc.toString().replaceAll('BoxConstraints', '')}';
 
-  List<String> _boxDecoration(BoxDecoration? d) {
+  List<String> _boxDecoration(Decoration? d) {
     final attr = <String>[];
 
-    if (d?.color != null) attr.add('bg=${_color(d!.color!)}');
-    if (d?.border != null) attr.add('border=${_boxBorder(d!.border)}');
+    if (d is BoxDecoration) {
+      final color = d.color;
+      if (color != null) attr.add('bg=${_color(color)}');
+
+      final border = d.border;
+      if (border != null) attr.add('border=${_boxBorder(border)}');
+    }
 
     return attr;
   }
@@ -274,9 +281,10 @@ class Explainer {
     return attr;
   }
 
-  String _edgeInsets(EdgeInsets e) =>
-      '(${e.top.truncate()},${e.right.truncate()},'
-      '${e.bottom.truncate()},${e.left.truncate()})';
+  String _edgeInsets(EdgeInsetsGeometry e) => e is EdgeInsets
+      ? '(${e.top.truncate()},${e.right.truncate()},'
+          '${e.bottom.truncate()},${e.left.truncate()})'
+      : e.toString();
 
   String _image(Image image) {
     final buffer = StringBuffer();
@@ -328,10 +336,7 @@ class Explainer {
     return '($style$recognizerSb:$text$children)';
   }
 
-  String _limitBox(LimitedBox box) {
-    var s = 'h=${box.maxHeight},w=${box.maxWidth}';
-    return s;
-  }
+  String _limitBox(LimitedBox box) => 'h=${box.maxHeight},w=${box.maxWidth}';
 
   String _sizedBox(SizedBox box) {
     var clazz = box.runtimeType.toString();
@@ -342,25 +347,25 @@ class Explainer {
       size = '';
     }
 
-    final child = box.child != null ? 'child=${_widget(box.child)}' : '';
+    final child = box.child != null ? 'child=${_widget(box.child!)}' : '';
     final comma = size.isNotEmpty && child.isNotEmpty ? ',' : '';
     return '[$clazz:$size$comma$child]';
   }
 
-  String? _textAlign(TextAlign? textAlign) =>
+  String _textAlign(TextAlign? textAlign) =>
       (textAlign != null && textAlign != TextAlign.start)
           ? 'align=${textAlign.toString().replaceAll('TextAlign.', '')}'
-          : null;
+          : '';
 
-  String? _textDirection(TextDirection? textDirection) =>
+  String _textDirection(TextDirection? textDirection) =>
       (textDirection != null && textDirection != TextDirection.ltr)
           ? 'dir=${textDirection.toString().replaceAll('TextDirection.', '')}'
-          : null;
+          : '';
 
-  String? _textOverflow(TextOverflow? textOverflow) => (textOverflow != null &&
+  String _textOverflow(TextOverflow? textOverflow) => (textOverflow != null &&
           textOverflow != TextOverflow.clip)
       ? 'overflow=${textOverflow.toString().replaceAll('TextOverflow.', '')}'
-      : null;
+      : '';
 
   String _textStyle(TextStyle? style, TextStyle parent) {
     var s = '';
@@ -368,12 +373,12 @@ class Explainer {
       return s;
     }
 
-    if (style.background != null) {
-      s += 'bg=${_color(style.background!.color)}';
-    }
+    final bg = style.background;
+    if (bg != null) s += 'bg=${_color(bg.color)}';
 
-    if (style.color != null && style.color != kColor) {
-      s += _color(style.color!);
+    final color = style.color;
+    if (color != null && color != kColor) {
+      s += _color(color);
     }
 
     s += _textStyleDecoration(style, TextDecoration.lineThrough, 'l');
@@ -384,17 +389,19 @@ class Explainer {
       s += '+font=${style.fontFamily}';
     }
 
-    if (style.fontFamilyFallback?.isNotEmpty == true &&
-        style.fontFamilyFallback != parent.fontFamilyFallback) {
-      s += "+fonts=${style.fontFamilyFallback!.join(', ')}";
+    final fontFamilyFallback = style.fontFamilyFallback;
+    if (fontFamilyFallback != null &&
+        fontFamilyFallback.isNotEmpty &&
+        fontFamilyFallback != parent.fontFamilyFallback) {
+      s += "+fonts=${fontFamilyFallback.join(', ')}";
     }
 
-    if (style.height != null) {
-      s += '+height=${style.height!.toStringAsFixed(1)}';
-    }
+    final height = style.height;
+    if (height != null) s += '+height=${height.toStringAsFixed(1)}';
 
-    if (style.fontSize != parent.fontSize) {
-      s += '@${style.fontSize!.toStringAsFixed(1)}';
+    final fontSize = style.fontSize;
+    if (fontSize != null && fontSize != parent.fontSize) {
+      s += '@${fontSize.toStringAsFixed(1)}';
     }
 
     s += _textStyleFontStyle(style);
@@ -434,18 +441,16 @@ class Explainer {
   }
 
   String _textStyleFontWeight(TextStyle style) {
-    if (style.fontWeight == _defaultStyle.fontWeight) {
+    final fontWeight = style.fontWeight;
+    if (fontWeight == null || style.fontWeight == _defaultStyle.fontWeight) {
       return '';
     }
 
-    if (style.fontWeight == FontWeight.bold) {
-      return '+b';
-    }
-
-    return '+w' + FontWeight.values.indexOf(style.fontWeight!).toString();
+    if (fontWeight == FontWeight.bold) return '+b';
+    return '+w' + FontWeight.values.indexOf(fontWeight).toString();
   }
 
-  String _widget(Widget? widget) {
+  String _widget(Widget widget) {
     final explained = explainer?.call(this, widget);
     if (explained != null) return explained;
 
@@ -458,18 +463,10 @@ class Explainer {
 
     if (widget is Image) return _image(widget);
 
-    if (widget is SingleChildRenderObjectWidget) {
-      switch (widget.runtimeType.toString()) {
-        case '_LoosenConstraintsWidget':
-          // avoid exposing internal widgets
-          return _widget(widget.child);
-      }
-    }
-
     if (widget is SizedBox) return _sizedBox(widget);
 
     final type = '${widget.runtimeType}';
-    var attr = <String?>[];
+    var attr = <String>[];
 
     final maxLines = widget is RichText
         ? widget.maxLines
@@ -497,7 +494,7 @@ class Explainer {
             : null));
 
     if (widget is Align && widget is! Center) {
-      attr.add(_alignment(widget.alignment as Alignment));
+      attr.add(_alignment(widget.alignment));
     }
 
     if (widget is AspectRatio) {
@@ -506,19 +503,15 @@ class Explainer {
 
     if (widget is ConstrainedBox) attr.add(_boxConstraints(widget.constraints));
 
-    if (widget is Container) {
-      attr.addAll(_boxDecoration(widget.decoration as BoxDecoration?));
-    }
+    if (widget is Container) attr.addAll(_boxDecoration(widget.decoration));
 
     if (widget is CssSizing) attr.addAll(_cssSizing(widget));
 
-    if (widget is DecoratedBox) {
-      attr.addAll(_boxDecoration(widget.decoration as BoxDecoration?));
-    }
+    if (widget is DecoratedBox) attr.addAll(_boxDecoration(widget.decoration));
 
     if (widget is LimitedBox) attr.add(_limitBox(widget));
 
-    if (widget is Padding) attr.add(_edgeInsets(widget.padding as EdgeInsets));
+    if (widget is Padding) attr.add(_edgeInsets(widget.padding));
 
     if (widget is Positioned) {
       attr.add('(${widget.top},${widget.right},'
@@ -538,17 +531,15 @@ class Explainer {
         ? _inlineSpan(widget.text)
         : widget is Container
             ? _widgetChild(widget.child)
-            : null);
+            : '');
     // G-M
     attr.add(widget is GestureDetector
         ? _widgetChild(widget.child)
         : widget is InkWell
             ? _widgetChild(widget.child)
             : widget is MultiChildRenderObjectWidget
-                ? (widget is! RichText
-                    ? _widgetChildren(widget.children)
-                    : null)
-                : null);
+                ? (widget is! RichText ? _widgetChildren(widget.children) : '')
+                : '');
     // N-T
     attr.add(widget is ProxyWidget
         ? _widgetChild(widget.child)
@@ -557,19 +548,19 @@ class Explainer {
             : widget is SingleChildScrollView
                 ? _widgetChild(widget.child)
                 : widget is Text
-                    ? widget.data
+                    ? widget.data!
                     : widget is Tooltip
                         ? _widgetChild(widget.child)
-                        : null);
+                        : '');
     // U-Z
 
-    final attrStr = attr.where((a) => a?.isNotEmpty == true).join(',');
+    final attrStr = attr.where((a) => a.isNotEmpty).join(',');
     return '[$type${attrStr.isNotEmpty ? ':$attrStr' : ''}]';
   }
 
-  String? _widgetChild(Widget? widget) =>
-      widget != null ? 'child=${_widget(widget)}' : null;
+  String _widgetChild(Widget? widget) =>
+      widget != null ? 'child=${_widget(widget)}' : '';
 
-  String? _widgetChildren(Iterable<Widget> widgets) =>
-      widgets.isNotEmpty ? 'children=${widgets.map(_widget).join(',')}' : null;
+  String _widgetChildren(Iterable<Widget> widgets) =>
+      widgets.isNotEmpty ? 'children=${widgets.map(_widget).join(',')}' : '';
 }

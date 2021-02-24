@@ -190,8 +190,7 @@ void main() {
   });
 
   group('baseUrl', () {
-    final Future<Null> Function(WidgetTester, String, String, {Uri baseUrl})
-        test = (
+    final test = (
       WidgetTester tester,
       String html,
       String fullUrl, {
