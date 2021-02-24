@@ -168,9 +168,9 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   /// Creates a placeholder lazily.
   ///
   /// Returns [child] if it is already a placeholder.
-  static WidgetPlaceholder lazy(Widget? child) => child is WidgetPlaceholder
+  static WidgetPlaceholder lazy(Widget child) => child is WidgetPlaceholder
       ? child
-      : WidgetPlaceholder<Widget?>(child, child: child);
+      : WidgetPlaceholder<Widget>(child, child: child);
 }
 
 final _dataUriRegExp = RegExp(r'^data:[^;]+;([^,]+),');

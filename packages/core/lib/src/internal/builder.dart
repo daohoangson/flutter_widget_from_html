@@ -228,7 +228,7 @@ class BuildTree extends core_data.BuildTree {
 
     for (final flattened in flatten(this)) {
       if (flattened.widget != null) {
-        widgets.add(WidgetPlaceholder.lazy(flattened.widget));
+        widgets.add(WidgetPlaceholder.lazy(flattened.widget!));
         continue;
       }
 
