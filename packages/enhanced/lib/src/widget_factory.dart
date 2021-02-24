@@ -18,7 +18,7 @@ import 'html_widget.dart';
 class WidgetFactory extends core.WidgetFactory {
   final _anchors = <String, GlobalKey>{};
 
-  TextStyleHtml Function(TextStyleHtml, Null) _tagA;
+  TextStyleHtml Function(TextStyleHtml, dynamic) _tagA;
   BuildOp _tagIframe;
   BuildOp _tagSvg;
   HtmlWidget _widget;
@@ -249,10 +249,10 @@ class WidgetFactory extends core.WidgetFactory {
 
     switch (meta.element.localName) {
       case 'a':
-        _tagA ??= (tsh, Null _) => tsh.copyWith(
+        _tagA ??= (tsh, _) => tsh.copyWith(
             style: tsh.style
                 .copyWith(color: tsh.getDependency<ThemeData>().accentColor));
-        meta.tsb.enqueue(_tagA, null);
+        meta.tsb.enqueue(_tagA);
 
         if (attrs.containsKey('name')) {
           meta.register(_anchorOp(attrs['name']));

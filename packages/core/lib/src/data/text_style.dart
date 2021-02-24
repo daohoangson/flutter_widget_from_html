@@ -115,9 +115,9 @@ class TextStyleBuilder<T1> {
 
   /// Enqueues a callback.
   void enqueue<T2>(
-    TextStyleHtml Function(TextStyleHtml tsh, T2 input) builder,
-    T2 input,
-  ) {
+    TextStyleHtml Function(TextStyleHtml tsh, T2 input) builder, [
+    T2? input,
+  ]) {
     assert(_output == null, 'Cannot add builder after being built');
     _builders ??= [];
     _builders!.add(builder);
