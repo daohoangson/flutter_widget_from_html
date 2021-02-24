@@ -16,7 +16,7 @@ class TagQ {
 class _TagQBit extends BuildBit<Null, String> {
   final bool isOpening;
 
-  _TagQBit(BuildTree? parent, TextStyleBuilder? tsb, this.isOpening)
+  _TagQBit(BuildTree parent, TextStyleBuilder tsb, this.isOpening)
       : super(parent, tsb);
 
   @override
@@ -24,7 +24,7 @@ class _TagQBit extends BuildBit<Null, String> {
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _TagQBit(parent ?? this.parent, tsb ?? this.tsb, isOpening);
+      _TagQBit(parent ?? this.parent!, tsb ?? this.tsb, isOpening);
 
   @override
   String toString() =>

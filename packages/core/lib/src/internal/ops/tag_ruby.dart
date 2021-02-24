@@ -45,7 +45,7 @@ class TagRuby {
   void onTree(BuildMetadata _, BuildTree tree) {
     final rubyBits = <BuildBit>[];
     for (final bit in tree.bits.toList(growable: false)) {
-      if (rubyBits.isEmpty && bit.tsb == null) {
+      if (rubyBits.isEmpty && bit is WhitespaceBit) {
         // the first bit is whitespace, just ignore it
         continue;
       }
@@ -59,7 +59,7 @@ class TagRuby {
       final rubyTree = tree.sub();
       final placeholder = WidgetPlaceholder<List<BuildTree>>([rubyTree, rtTree])
         ..wrapWith((context, __) {
-          final tsh = rubyTree.tsb!.build(context);
+          final tsh = rubyTree.tsb.build(context);
 
           final ruby = wf.buildColumnWidget(
               rubyMeta, tsh, rubyTree.build().toList(growable: false));
@@ -86,7 +86,7 @@ class _RtBit extends BuildBit<Null, BuildTree> {
   final BuildMetadata meta;
   final BuildTree tree;
 
-  _RtBit(BuildTree? parent, TextStyleBuilder? tsb, this.meta, this.tree)
+  _RtBit(BuildTree parent, TextStyleBuilder tsb, this.meta, this.tree)
       : super(parent, tsb);
 
   @override
@@ -94,5 +94,5 @@ class _RtBit extends BuildBit<Null, BuildTree> {
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _RtBit(parent ?? this.parent, tsb ?? this.tsb, meta, tree);
+      _RtBit(parent ?? this.parent!, tsb ?? this.tsb, meta, tree);
 }

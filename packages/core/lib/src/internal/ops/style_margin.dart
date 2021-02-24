@@ -26,9 +26,8 @@ class StyleMargin {
 
           return wrapTree(
             tree,
-            append: (p) => WidgetBit.inline(p, _paddingInlineAfter(p.tsb!, m)),
-            prepend: (p) =>
-                WidgetBit.inline(p, _paddingInlineBefore(p.tsb!, m)),
+            append: (p) => WidgetBit.inline(p, _paddingInlineAfter(p.tsb, m)),
+            prepend: (p) => WidgetBit.inline(p, _paddingInlineBefore(p.tsb, m)),
           );
         },
         onWidgets: (meta, widgets) {

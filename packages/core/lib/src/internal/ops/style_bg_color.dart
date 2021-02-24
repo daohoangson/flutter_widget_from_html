@@ -16,7 +16,7 @@ class StyleBgColor {
           if (bgColor == null) return;
 
           for (final bit in tree.bits) {
-            bit.tsb?.enqueue(_tsb, bgColor);
+            bit.tsb.enqueue(_tsb, bgColor);
           }
         },
         onWidgets: (meta, widgets) {

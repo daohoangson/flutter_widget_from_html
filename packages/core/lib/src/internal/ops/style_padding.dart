@@ -29,9 +29,9 @@ class StylePadding {
           return wrapTree(
             tree,
             append: (p) =>
-                WidgetBit.inline(p, _paddingInlineAfter(p.tsb!, padding)),
+                WidgetBit.inline(p, _paddingInlineAfter(p.tsb, padding)),
             prepend: (p) =>
-                WidgetBit.inline(p, _paddingInlineBefore(p.tsb!, padding)),
+                WidgetBit.inline(p, _paddingInlineBefore(p.tsb, padding)),
           );
         },
         onWidgets: (meta, widgets) {

@@ -395,9 +395,9 @@ void main() {
             '    BuildTree#5 tsb#6(parent=#4):\n'
             '      "(2.2.1)"\n'
             '      "(2.2.2)"\n'
-            '      _TextNewLine#7 tsb#6(parent=#4)\n'
+            '      ASCII-10\n'
             '    "(2.3)"\n'
-            '  WidgetBit.inline#8 WidgetPlaceholder(Text("Hi"))'));
+            '  WidgetBit.inline#7 WidgetPlaceholder(Text("Hi"))'));
   });
 }
 
@@ -465,7 +465,7 @@ class _BuildBitWidgetFactory extends WidgetFactory {
 }
 
 class _InputBuildContextBit extends BuildBit<BuildContext, Widget> {
-  _InputBuildContextBit(BuildTree? parent, TextStyleBuilder? tsb)
+  _InputBuildContextBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
@@ -477,7 +477,7 @@ class _InputBuildContextBit extends BuildBit<BuildContext, Widget> {
 }
 
 class _InputGestureRecognizerBit extends BuildBit<GestureRecognizer?, dynamic> {
-  _InputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder? tsb)
+  _InputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
@@ -496,7 +496,7 @@ class _InputGestureRecognizerBit extends BuildBit<GestureRecognizer?, dynamic> {
 }
 
 class _InputNullBit extends BuildBit<Null, dynamic> {
-  _InputNullBit(BuildTree? parent, TextStyleBuilder? tsb) : super(parent, tsb);
+  _InputNullBit(BuildTree? parent, TextStyleBuilder tsb) : super(parent, tsb);
 
   @override
   dynamic buildBit(Null _) => '(null)';
@@ -507,7 +507,7 @@ class _InputNullBit extends BuildBit<Null, dynamic> {
 }
 
 class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {
-  _InputTextStyleHtmlBit(BuildTree? parent, TextStyleBuilder? tsb)
+  _InputTextStyleHtmlBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
@@ -524,7 +524,7 @@ class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {
 class _OutputBuildTreeBit extends BuildBit<Null, BuildTree> {
   final BuildTree tree;
 
-  _OutputBuildTreeBit(BuildTree parent, TextStyleBuilder? tsb)
+  _OutputBuildTreeBit(BuildTree parent, TextStyleBuilder tsb)
       : tree = parent.sub(tsb: tsb)
           ..addWhitespace()
           ..addText('foo')
@@ -541,7 +541,7 @@ class _OutputBuildTreeBit extends BuildBit<Null, BuildTree> {
 }
 
 class _OutputGestureRecognizerBit extends BuildBit<Null, GestureRecognizer> {
-  _OutputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder? tsb)
+  _OutputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
@@ -553,7 +553,7 @@ class _OutputGestureRecognizerBit extends BuildBit<Null, GestureRecognizer> {
 }
 
 class _OutputInlineSpanBit extends BuildBit<Null, InlineSpan> {
-  _OutputInlineSpanBit(BuildTree? parent, TextStyleBuilder? tsb)
+  _OutputInlineSpanBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
@@ -565,7 +565,7 @@ class _OutputInlineSpanBit extends BuildBit<Null, InlineSpan> {
 }
 
 class _OutputStringBit extends BuildBit<Null, String> {
-  _OutputStringBit(BuildTree? parent, TextStyleBuilder? tsb)
+  _OutputStringBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
@@ -577,7 +577,7 @@ class _OutputStringBit extends BuildBit<Null, String> {
 }
 
 class _OutputWidgetBit extends BuildBit<Null, Widget> {
-  _OutputWidgetBit(BuildTree? parent, TextStyleBuilder? tsb)
+  _OutputWidgetBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override

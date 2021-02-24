@@ -9,11 +9,9 @@ abstract class BuildBit<InputType, OutputType> {
   final BuildTree? parent;
 
   /// The associated [TextStyleBuilder].
-  final TextStyleBuilder? tsb;
+  final TextStyleBuilder tsb;
 
   /// Creates a build bit.
-  ///
-  /// [tsb] must be non-null unless this is a whitespace.
   BuildBit(this.parent, this.tsb);
 
   /// Returns true if this bit should be rendered inline.
@@ -144,7 +142,7 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
   final _toStringBuffer = StringBuffer();
 
   /// Creates a tree.
-  BuildTree(BuildTree? parent, TextStyleBuilder? tsb) : super(parent, tsb);
+  BuildTree(BuildTree? parent, TextStyleBuilder tsb) : super(parent, tsb);
 
   /// The list of bits including direct children and sub-tree's.
   Iterable<BuildBit> get bits sync* {
@@ -198,10 +196,10 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
   }
 
   /// Adds a new line.
-  BuildBit addNewLine() => add(_TextNewLine(this, tsb));
+  BuildBit addNewLine() => add(_SwallowWhitespaceBit(this, 10));
 
   /// Adds a whitespace.
-  BuildBit addWhitespace() => add(_TextWhitespace(this));
+  BuildBit addWhitespace() => add(WhitespaceBit(this));
 
   /// Adds a string of text.
   TextBit addText(String data) => add(TextBit(this, data));
@@ -258,19 +256,16 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
 class TextBit extends BuildBit<Null, String> {
   final String data;
 
-  TextBit._(BuildTree parent, TextStyleBuilder tsb, this.data)
-      : super(parent, tsb);
-
-  /// Creates with string,
-  factory TextBit(BuildTree parent, String data, {TextStyleBuilder? tsb}) =>
-      TextBit._(parent, tsb ?? parent.tsb!, data);
+  /// Creates with string.
+  TextBit(BuildTree parent, this.data, {TextStyleBuilder? tsb})
+      : super(parent, tsb ?? parent.tsb);
 
   @override
   String buildBit(Null _) => data;
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      TextBit._(parent ?? this.parent!, tsb ?? this.tsb!, data);
+      TextBit(parent ?? this.parent!, data, tsb: tsb ?? this.tsb);
 
   @override
   String toString() => '"$data"';
@@ -301,7 +296,7 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
     Widget child, {
     TextStyleBuilder? tsb,
   }) =>
-      WidgetBit._(parent, tsb ?? parent.tsb!,
+      WidgetBit._(parent, tsb ?? parent.tsb,
           WidgetPlaceholder.lazy(child) as WidgetPlaceholder<T>);
 
   /// Creates an inline widget.
@@ -314,7 +309,7 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
   }) =>
       WidgetBit._(
           parent,
-          tsb ?? parent.tsb!,
+          tsb ?? parent.tsb,
           WidgetPlaceholder.lazy(child) as WidgetPlaceholder<T>,
           alignment,
           baseline);
@@ -333,40 +328,45 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) => WidgetBit._(
-      parent ?? this.parent!, tsb ?? this.tsb!, child, alignment, baseline);
+      parent ?? this.parent!, tsb ?? this.tsb, child, alignment, baseline);
 
   @override
   String toString() =>
       'WidgetBit.${isInline ? "inline" : "block"}#$hashCode $child';
 }
 
-class _TextNewLine extends BuildBit<Null, String> {
-  _TextNewLine(BuildTree? parent, TextStyleBuilder? tsb) : super(parent, tsb);
-
-  @override
-  bool get swallowWhitespace => true;
-
-  @override
-  String buildBit(Null _) => '\n';
+/// A whitespace bit.
+class WhitespaceBit extends _SwallowWhitespaceBit {
+  /// Creates a whitespace.
+  WhitespaceBit(BuildTree parent, {TextStyleBuilder? tsb})
+      : super(parent, 32, tsb: tsb ?? parent.tsb);
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _TextNewLine(parent ?? this.parent, tsb ?? this.tsb);
-}
-
-class _TextWhitespace extends BuildBit<Null, String> {
-  _TextWhitespace(BuildTree? parent) : super(parent, null);
-
-  @override
-  bool get swallowWhitespace => true;
-
-  @override
-  String buildBit(Null _) => ' ';
-
-  @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _TextWhitespace(parent ?? this.parent);
+      WhitespaceBit(parent ?? this.parent!, tsb: tsb ?? this.tsb);
 
   @override
   String toString() => 'Whitespace#$hashCode';
+}
+
+class _SwallowWhitespaceBit extends BuildBit<Null, String> {
+  final int charCode;
+
+  _SwallowWhitespaceBit(BuildTree parent, this.charCode,
+      {TextStyleBuilder? tsb})
+      : super(parent, tsb ?? parent.tsb);
+
+  @override
+  bool get swallowWhitespace => true;
+
+  @override
+  String buildBit(Null _) => String.fromCharCode(charCode);
+
+  @override
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+      _SwallowWhitespaceBit(parent ?? this.parent!, charCode,
+          tsb: tsb ?? this.tsb);
+
+  @override
+  String toString() => 'ASCII-$charCode';
 }

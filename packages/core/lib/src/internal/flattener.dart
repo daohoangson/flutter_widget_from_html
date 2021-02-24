@@ -104,7 +104,7 @@ class _Flattener {
     // special handling for whitespaces
     if (_swallowWhitespace) return true;
 
-    final next = nextWithTsb(bit);
+    final next = nextNonWhitespace(bit);
     if (next == null) {
       // skip trailing whitespace
       return true;
@@ -178,7 +178,7 @@ class _Flattener {
   }
 
   static TextStyleBuilder? _getBitTsb(BuildBit bit) {
-    if (bit.tsb != null) return bit.tsb;
+    if (bit is! WhitespaceBit) return bit.tsb;
 
     // the below code will find the best style for this whitespace bit
     // easy case: whitespace at the beginning of a tag, use the previous style
@@ -188,7 +188,7 @@ class _Flattener {
     // complicated: whitespace at the end of a tag, try to merge with the next
     // unless it has unrelated style (e.g. next bit is a sibling)
     if (bit == parent.last) {
-      final next = nextWithTsb(bit);
+      final next = nextNonWhitespace(bit);
       if (next != null) {
         BuildTree? tree = parent;
         while (true) {
@@ -209,9 +209,9 @@ class _Flattener {
     return parent.tsb;
   }
 
-  static BuildBit? nextWithTsb(BuildBit bit) {
+  static BuildBit? nextNonWhitespace(BuildBit bit) {
     var next = bit.next;
-    while (next != null && next.tsb == null) {
+    while (next != null && next is WhitespaceBit) {
       next = next.next;
     }
 

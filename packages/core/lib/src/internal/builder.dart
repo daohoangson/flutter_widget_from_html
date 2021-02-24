@@ -80,7 +80,7 @@ class BuildTree extends core_data.BuildTree {
     core_data.BuildTree? parent,
     required this.parentMeta,
     this.parentOps = const [],
-    TextStyleBuilder? tsb,
+    required TextStyleBuilder tsb,
     required this.wf,
   }) : super(parent, tsb);
 
@@ -132,7 +132,7 @@ class BuildTree extends core_data.BuildTree {
         parent: parent ?? this,
         parentMeta: parentMeta ?? this.parentMeta,
         parentOps: parentOps,
-        tsb: tsb ?? this.tsb!.sub(),
+        tsb: tsb ?? this.tsb.sub(),
         wf: wf,
       );
 
@@ -254,8 +254,7 @@ class BuildTree extends core_data.BuildTree {
         final span = flattened.spanBuilder!(context);
         if (span == null || span is! InlineSpan) return widget0;
 
-        // `tsb` may only be null for whitespace, which this is not.
-        final tsh = tsb!.build(context);
+        final tsh = tsb.build(context);
         final textAlign = tsh.textAlign ?? TextAlign.start;
 
         if (span is WidgetSpan &&
