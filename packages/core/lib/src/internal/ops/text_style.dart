@@ -182,7 +182,7 @@ class TextStyleOps {
       final lengthValue = length.getValue(
         p,
         baseValue: p.parent?.style.fontSize,
-        scaleFactor: p.getDependency<MediaQueryData>()!.textScaleFactor,
+        scaleFactor: p.getDependency<MediaQueryData>().textScaleFactor,
       );
       if (lengthValue != null) return lengthValue;
     }
@@ -237,7 +237,7 @@ class TextStyleOps {
     final lengthValue = length.getValue(
       p,
       baseValue: p.style.fontSize,
-      scaleFactor: p.getDependency<MediaQueryData>()!.textScaleFactor,
+      scaleFactor: p.getDependency<MediaQueryData>().textScaleFactor,
     );
     if (lengthValue == null) return null;
 

@@ -38,16 +38,13 @@ class TextStyleHtml {
   }) : _deps = deps;
 
   /// Creates the root text style.
-  factory TextStyleHtml.root(
-      Iterable<dynamic> deps, TextStyle? widgetTextStyle) {
-    var style = _getDependency<TextStyle>(deps)!;
-    if (widgetTextStyle != null) {
-      style = widgetTextStyle.inherit
-          ? style.merge(widgetTextStyle)
-          : widgetTextStyle;
+  factory TextStyleHtml.root(Iterable<dynamic> deps, TextStyle? widgetStyle) {
+    var style = _getDependency<TextStyle>(deps);
+    if (widgetStyle != null) {
+      style = widgetStyle.inherit ? style.merge(widgetStyle) : widgetStyle;
     }
 
-    var mqd = _getDependency<MediaQueryData>(deps)!;
+    final mqd = _getDependency<MediaQueryData>(deps);
     final tsf = mqd.textScaleFactor;
     if (tsf != 1) {
       style = style.copyWith(fontSize: style.fontSize! * tsf);
@@ -56,7 +53,7 @@ class TextStyleHtml {
     return TextStyleHtml._(
       deps: deps,
       style: style,
-      textDirection: _getDependency<TextDirection>(deps)!,
+      textDirection: _getDependency<TextDirection>(deps),
     );
   }
 
@@ -92,14 +89,14 @@ class TextStyleHtml {
   /// Gets dependency value by type.
   ///
   /// See [WidgetFactory.getDependencies].
-  T? getDependency<T>() => _getDependency<T>(_deps);
+  T getDependency<T>() => _getDependency<T>(_deps);
 
-  static T? _getDependency<T>(Iterable<dynamic> deps) {
+  static T _getDependency<T>(Iterable<dynamic> deps) {
     for (final value in deps.whereType<T>()) {
       return value;
     }
 
-    return null;
+    throw StateError('The $T dependency could not be found');
   }
 }
 
