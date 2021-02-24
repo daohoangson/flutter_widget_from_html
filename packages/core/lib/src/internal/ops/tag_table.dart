@@ -171,22 +171,21 @@ class TagTable {
 
         builders.add((context) {
           Widget? child = cell.child;
+
           final border = cssBorder.getValue(cellMeta.tsb.build(context));
           if (border != null) {
             child = wf.buildPadding(cellMeta, cell.child, border.dimensions);
           }
-          if (child != null) {
-            return HtmlTableCell(
-              border: border,
-              child: child,
-              columnSpan: columnSpan,
-              columnStart: columnStart,
-              rowSpan: rowSpan,
-              rowStart: cellMeta.row,
-            );
-          } else {
-            return null;
-          }
+          if (child == null) return null;
+
+          return HtmlTableCell(
+            border: border,
+            child: child,
+            columnSpan: columnSpan,
+            columnStart: columnStart,
+            rowSpan: rowSpan,
+            rowStart: cellMeta.row,
+          );
         });
       }
     }
