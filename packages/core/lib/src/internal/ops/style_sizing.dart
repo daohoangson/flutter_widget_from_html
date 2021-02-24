@@ -106,7 +106,7 @@ class StyleSizing {
         preferredWidth == null) return null;
 
     if (preferredWidth == null &&
-        (meta.buildOps?.whereType<DisplayBlockOp>().isNotEmpty ?? false)) {
+        (meta.buildOps.whereType<DisplayBlockOp>().isNotEmpty)) {
       // `display: block` implies a 100% width
       // but it MUST NOT reset width value if specified
       // we need to keep track of block width to calculate contraints correctly

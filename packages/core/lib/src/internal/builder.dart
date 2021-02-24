@@ -28,7 +28,7 @@ class BuildMetadata extends core_data.BuildMetadata {
       : super(element, tsb);
 
   @override
-  Iterable<BuildOp>? get buildOps => _buildOps;
+  Iterable<BuildOp> get buildOps => _buildOps ?? const [];
 
   @override
   Iterable<BuildOp> get parentOps => _parentOps;
@@ -86,10 +86,8 @@ class BuildTree extends core_data.BuildTree {
     for (final domNode in domNodes) {
       _addBitsFromNode(domNode);
     }
-    if (parentMeta.buildOps != null) {
-      for (final op in parentMeta.buildOps!) {
-        op.onTree?.call(parentMeta, this);
-      }
+    for (final op in parentMeta.buildOps) {
+      op.onTree?.call(parentMeta, this);
     }
   }
 
@@ -98,15 +96,14 @@ class BuildTree extends core_data.BuildTree {
     if (_built.isNotEmpty) return _built;
 
     var widgets = _flatten();
-    if (parentMeta.buildOps != null) {
-      for (final op in parentMeta.buildOps!) {
-        widgets = op.onWidgets
-                ?.call(parentMeta, widgets)
-                ?.map(WidgetPlaceholder.lazy)
-                .toList(growable: false) ??
-            widgets;
-      }
+    for (final op in parentMeta.buildOps) {
+      widgets = op.onWidgets
+              ?.call(parentMeta, widgets)
+              ?.map(WidgetPlaceholder.lazy)
+              .toList(growable: false) ??
+          widgets;
     }
+
     _built.addAll(widgets);
     return _built;
   }
@@ -188,15 +185,13 @@ class BuildTree extends core_data.BuildTree {
     }
 
     // stylings, step 1: get default styles from tag-based build ops
-    if (meta.buildOps != null) {
-      for (final op in meta.buildOps!) {
-        final map = op.defaultStyles?.call(meta.element);
-        if (map == null) continue;
+    for (final op in meta.buildOps) {
+      final map = op.defaultStyles?.call(meta.element);
+      if (map == null) continue;
 
-        meta._styles ??= [];
-        for (final pair in map.entries) {
-          meta._styles!.insert(0, InlineStyle(pair.key, pair.value));
-        }
+      meta._styles ??= [];
+      for (final pair in map.entries) {
+        meta._styles!.insert(0, InlineStyle(pair.key, pair.value));
       }
     }
 
@@ -284,8 +279,8 @@ bool _opRequiresBuildingSubtree(BuildOp op) =>
 
 Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, BuildMetadata meta) {
   // try to reuse existing list if possible
-  final withOnChild = meta.buildOps?.where((op) => op.onChild != null).toList();
-  return withOnChild == null || withOnChild.isEmpty
+  final withOnChild = meta.buildOps.where((op) => op.onChild != null).toList();
+  return withOnChild.isEmpty
       ? ops
       : List.unmodifiable([...ops, ...withOnChild]);
 }

@@ -21,7 +21,7 @@ abstract class BuildMetadata {
   BuildMetadata(this.element, this.tsb);
 
   /// The registered build ops.
-  Iterable<BuildOp>? get buildOps;
+  Iterable<BuildOp> get buildOps;
 
   /// The parents' build ops that have [BuildOp.onChild].
   Iterable<BuildOp> get parentOps;
