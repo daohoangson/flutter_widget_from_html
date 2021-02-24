@@ -25,7 +25,7 @@ class _Flattener {
   late _Recognizer _recognizer, _prevRecognizer;
   List<dynamic>? _spans;
   late bool _swallowWhitespace;
-  TextStyleBuilder? _tsb, _prevTsb;
+  late TextStyleBuilder _tsb, _prevTsb;
 
   List<Flattened> flatten(BuildTree tree) {
     _flattened = [];
@@ -39,7 +39,7 @@ class _Flattener {
     return _flattened;
   }
 
-  void _resetLoop(TextStyleBuilder? tsb) {
+  void _resetLoop(TextStyleBuilder tsb) {
     _buffer = StringBuffer();
     _recognizer = _Recognizer();
     _spans = [];
@@ -52,11 +52,9 @@ class _Flattener {
   }
 
   void _loop(final BuildBit bit) {
-    final tsb = _getBitTsb(bit);
-    if (_spans == null) _resetLoop(tsb);
-
-    final thisTsb = tsb ?? _prevTsb;
-    if (thisTsb?.hasSameStyleWith(_prevTsb) == false) _saveSpan();
+    final thisTsb = _getBitTsb(bit);
+    if (_spans == null) _resetLoop(thisTsb);
+    if (!thisTsb.hasSameStyleWith(_prevTsb)) _saveSpan();
 
     var built;
     if (bit is BuildBit<Null, dynamic>) {
@@ -67,9 +65,8 @@ class _Flattener {
       built = widgetBuilder;
     } else if (bit is BuildBit<GestureRecognizer?, dynamic>) {
       built = bit.buildBit(_prevRecognizer.value);
-    } else if (bit is BuildBit<TextStyleHtml?, InlineSpan>) {
-      // ignore: omit_local_variable_types
-      final SpanBuilder spanBuilder = (c) => bit.buildBit(thisTsb?.build(c));
+    } else if (bit is BuildBit<TextStyleHtml, InlineSpan>) {
+      final SpanBuilder spanBuilder = (c) => bit.buildBit(thisTsb.build(c));
       built = spanBuilder;
     }
 
@@ -123,7 +120,7 @@ class _Flattener {
       final scopedText = _prevBuffer.toString();
       _spans!.add((context) => TextSpan(
             recognizer: scopedRecognizer,
-            style: scopedTsb?.build(context).styleWithHeight,
+            style: scopedTsb.build(context).styleWithHeight,
             text: scopedText,
           ));
     }
@@ -150,11 +147,9 @@ class _Flattener {
 
     if (scopedBuffer == '\n' && scopedSpans.isEmpty) {
       // special handling for paragraph with only one line break
-      if (scopedTsb != null) {
-        _flattened.add(Flattened._(
-          widget: HeightPlaceholder(CssLength(1, CssLengthUnit.em), scopedTsb),
-        ));
-      }
+      _flattened.add(Flattened._(
+        widget: HeightPlaceholder(CssLength(1, CssLengthUnit.em), scopedTsb),
+      ));
       return;
     }
 
@@ -171,19 +166,19 @@ class _Flattener {
       return TextSpan(
         children: children,
         recognizer: scopedRecognizer,
-        style: scopedTsb?.build(context).styleWithHeight,
+        style: scopedTsb.build(context).styleWithHeight,
         text: scopedText,
       );
     }));
   }
 
-  static TextStyleBuilder? _getBitTsb(BuildBit bit) {
+  TextStyleBuilder _getBitTsb(BuildBit bit) {
     if (bit is! WhitespaceBit) return bit.tsb;
 
     // the below code will find the best style for this whitespace bit
     // easy case: whitespace at the beginning of a tag, use the previous style
     final parent = bit.parent;
-    if (parent == null || bit == parent.first) return null;
+    if (parent == null || bit == parent.first) return _prevTsb;
 
     // complicated: whitespace at the end of a tag, try to merge with the next
     // unless it has unrelated style (e.g. next bit is a sibling)
@@ -200,7 +195,7 @@ class _Flattener {
         if (tree.parent == next.parent) {
           return next.tsb;
         } else {
-          return null;
+          return _prevTsb;
         }
       }
     }
