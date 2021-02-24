@@ -57,17 +57,15 @@ class StyleBorder {
     CssBorder border,
   ) {
     final tsh = meta.tsb.build(context);
-    final borderWidget = border.getValue(tsh);
-    if (borderWidget == null) {
-      return child;
-    } else {
-      return wf.buildBorder(
-        meta,
-        child,
-        borderWidget,
-        isBorderBox: meta[kCssBoxSizing] == kCssBoxSizingBorderBox,
-      );
-    }
+    final borderValue = border.getValue(tsh);
+    if (borderValue == null) return child;
+
+    return wf.buildBorder(
+      meta,
+      child,
+      borderValue,
+      isBorderBox: meta[kCssBoxSizing] == kCssBoxSizingBorderBox,
+    );
   }
 
   static void skip(BuildMetadata meta) {
