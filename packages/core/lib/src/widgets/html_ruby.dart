@@ -20,11 +20,12 @@ class _RubyRenderObject extends RenderBox
         ContainerRenderObjectMixin<RenderBox, _RubyParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _RubyParentData> {
   @override
-  double computeDistanceToActualBaseline(TextBaseline baseline) {
+  double? computeDistanceToActualBaseline(TextBaseline baseline) {
     final ruby = firstChild!;
-    final rubyValue = ruby.getDistanceToActualBaseline(baseline)!;
-    final offset = (ruby.parentData as _RubyParentData).offset;
+    final rubyValue = ruby.getDistanceToActualBaseline(baseline);
+    if (rubyValue == null) return null;
 
+    final offset = (ruby.parentData as _RubyParentData).offset;
     return offset.dy + rubyValue;
   }
 
