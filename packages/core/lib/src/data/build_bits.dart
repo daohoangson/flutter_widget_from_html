@@ -272,7 +272,7 @@ class TextBit extends BuildBit<Null, String> {
 }
 
 /// A widget bit.
-class WidgetBit<T> extends BuildBit<Null, dynamic> {
+class WidgetBit extends BuildBit<Null, dynamic> {
   /// See [PlaceholderSpan.alignment].
   final PlaceholderAlignment? alignment;
 
@@ -280,7 +280,7 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
   final TextBaseline? baseline;
 
   /// The widget to be rendered.
-  final WidgetPlaceholder<T> child;
+  final WidgetPlaceholder child;
 
   WidgetBit._(
     BuildTree parent,
@@ -296,8 +296,7 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
     Widget child, {
     TextStyleBuilder? tsb,
   }) =>
-      WidgetBit._(parent, tsb ?? parent.tsb,
-          WidgetPlaceholder.lazy(child) as WidgetPlaceholder<T>);
+      WidgetBit._(parent, tsb ?? parent.tsb, WidgetPlaceholder.lazy(child));
 
   /// Creates an inline widget.
   factory WidgetBit.inline(
@@ -307,12 +306,8 @@ class WidgetBit<T> extends BuildBit<Null, dynamic> {
     TextBaseline baseline = TextBaseline.alphabetic,
     TextStyleBuilder? tsb,
   }) =>
-      WidgetBit._(
-          parent,
-          tsb ?? parent.tsb,
-          WidgetPlaceholder.lazy(child) as WidgetPlaceholder<T>,
-          alignment,
-          baseline);
+      WidgetBit._(parent, tsb ?? parent.tsb, WidgetPlaceholder.lazy(child),
+          alignment, baseline);
 
   @override
   bool get isInline => alignment != null && baseline != null;

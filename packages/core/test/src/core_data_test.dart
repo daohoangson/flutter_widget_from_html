@@ -53,7 +53,7 @@ void main() {
                 ' │  BuildTree#2 tsb#3(parent=#1):\n'
                 ' │    WidgetBit.inline#4 WidgetPlaceholder(Text("hi"))\n'
                 ' │)\n'
-                ' └WidgetPlaceholder<Widget?>(Text)\n'
+                ' └WidgetPlaceholder<Widget>(Text)\n'
                 '  └Text("hi")\n'
                 '   └RichText(text: "hi")\n\n'));
       });
@@ -72,7 +72,7 @@ void main() {
         expect(
             explained,
             equals('TshWidget\n'
-                '└WidgetPlaceholder<Widget?>(Text)\n'
+                '└WidgetPlaceholder<Widget>(Text)\n'
                 ' └Text("Hi")\n'
                 '  └RichText(text: "Hi")\n\n'));
       });
