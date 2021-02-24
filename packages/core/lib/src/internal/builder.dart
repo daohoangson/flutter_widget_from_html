@@ -160,7 +160,7 @@ class BuildTree extends core_data.BuildTree {
 
     subTree.addBitsFromNodes(element.nodes);
 
-    if (meta.willBuildSubtree!) {
+    if (meta.willBuildSubtree == true) {
       for (final widget in subTree.build()) {
         add(WidgetBit.block(this, widget));
       }

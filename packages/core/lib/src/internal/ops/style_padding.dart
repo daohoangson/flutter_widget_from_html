@@ -22,7 +22,7 @@ class StylePadding {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree!) return;
+          if (meta.willBuildSubtree == true) return;
           final padding = tryParseCssLengthBox(meta, kCssPadding);
           if (padding == null || !padding.hasLeftOrRight) return;
 

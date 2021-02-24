@@ -28,7 +28,7 @@ class StyleSizing {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree!) return;
+          if (meta.willBuildSubtree == true) return;
 
           final input = _parse(meta);
           if (input == null) return;
@@ -46,7 +46,7 @@ class StyleSizing {
           widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb));
         },
         onWidgets: (meta, widgets) {
-          if (!meta.willBuildSubtree!) return widgets;
+          if (meta.willBuildSubtree == false) return widgets;
 
           final input = _parse(meta);
           if (input == null) return widgets;

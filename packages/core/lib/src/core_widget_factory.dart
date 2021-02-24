@@ -222,7 +222,7 @@ class WidgetFactory {
 
   /// Prepares [GestureTapCallback].
   GestureTapCallback? gestureTapCallback(String url) =>
-      () => _widget!.onTapUrl != null
+      () => _widget?.onTapUrl != null
           ? _widget!.onTapUrl!(url)
           : print('[HtmlWidget] onTapUrl($url)');
 
