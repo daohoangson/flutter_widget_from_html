@@ -30,9 +30,7 @@ class WidgetFactory {
   BuildOp? _tagQ;
   TextStyleHtml Function(TextStyleHtml, String)? __tsbFontSize;
   TextStyleHtml Function(TextStyleHtml, String)? _tsbLineHeight;
-  State<HtmlWidget>? _state;
-
-  HtmlWidget? get _widget => _state?.widget;
+  HtmlWidget? _widget;
 
   /// Builds [Align].
   Widget? buildAlign(
@@ -766,9 +764,8 @@ class WidgetFactory {
   /// Resets for a new build.
   @mustCallSuper
   void reset(State state) {
-    if (state is State<HtmlWidget>) {
-      _state = state;
-    }
+    final widget = state.widget;
+    _widget = widget is HtmlWidget ? widget : null;
   }
 
   /// Resolves full URL with [HtmlWidget.baseUrl] if available.

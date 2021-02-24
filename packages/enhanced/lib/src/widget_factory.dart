@@ -18,14 +18,12 @@ import 'html_widget.dart';
 class WidgetFactory extends core.WidgetFactory {
   final _anchors = <String, GlobalKey>{};
 
-  State _state;
   TextStyleHtml Function(TextStyleHtml, Null) _tagA;
   BuildOp _tagIframe;
   BuildOp _tagSvg;
+  HtmlWidget _widget;
 
   bool get _isFlutterSvgSupported => !kIsWeb;
-
-  HtmlWidget get _widget => _state.widget;
 
   /// Builds [Divider].
   @override
@@ -301,9 +299,7 @@ class WidgetFactory extends core.WidgetFactory {
     _anchors.clear();
 
     final widget = state.widget;
-    if (widget is HtmlWidget) {
-      _state = state;
-    }
+    _widget = widget is HtmlWidget ? widget : null;
 
     super.reset(state);
   }

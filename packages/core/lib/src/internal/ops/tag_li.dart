@@ -371,13 +371,19 @@ class _ListMarkerRenderObject extends RenderBox {
   @override
   void paint(PaintingContext context, Offset offset) {
     final canvas = context.canvas;
-    final m = _textPainter.computeLineMetrics().first;
+
+    var lineMetrics = <LineMetrics>[];
+    try {
+      lineMetrics = _textPainter.computeLineMetrics();
+      // ignore: empty_catches
+    } on UnimplementedError {}
+    final m = lineMetrics.isNotEmpty ? lineMetrics.first : null;
     final center = offset +
         Offset(
           size.width / 2,
-          (m.descent.isFinite && m.unscaledAscent.isFinite)
+          (m?.descent.isFinite == true && m?.unscaledAscent.isFinite == true)
               ? size.height -
-                  m.descent -
+                  m!.descent -
                   m.unscaledAscent +
                   m.unscaledAscent * .7
               : size.height / 2,

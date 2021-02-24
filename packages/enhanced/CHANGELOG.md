@@ -1,3 +1,7 @@
+## 0.5.2+1
+
+- [CanvasKit] Add workaround for unimplemented `computeLineMetrics` (#441)
+
 ## 0.5.2
 
 - Add support for TABLE attribute `cellpadding` (#365)
