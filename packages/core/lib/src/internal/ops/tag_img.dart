@@ -67,7 +67,7 @@ class TagImg {
                 width: tryParseDoubleFromMap(attrs, kAttributeImgWidth),
               ),
             ]
-          : null,
+          : const [],
       title: attrs[kAttributeImgTitle],
     );
   }

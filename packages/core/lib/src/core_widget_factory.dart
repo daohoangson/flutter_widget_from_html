@@ -134,7 +134,7 @@ class WidgetFactory {
 
   /// Builds image widget from an [ImageMetadata].
   Widget? buildImage(BuildMetadata meta, ImageMetadata data) {
-    final src = data.sources?.isNotEmpty == true ? data.sources!.first : null;
+    final src = data.sources.isNotEmpty ? data.sources.first : null;
     if (src == null) return null;
 
     var built = buildImageWidget(

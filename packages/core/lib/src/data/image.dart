@@ -7,19 +7,19 @@ class ImageMetadata {
   final String? alt;
 
   /// The image sources.
-  final Iterable<ImageSource>? sources;
+  final Iterable<ImageSource> sources;
 
   /// The image title.
   final String? title;
 
   /// Creates an image.
-  ImageMetadata({this.alt, this.sources, this.title});
+  ImageMetadata({this.alt, required this.sources, this.title});
 
   @override
   String toString() {
     final attrs = <String>[];
     if (alt != null) attrs.add('alt: "$alt"');
-    if (sources != null) attrs.add('sources: $sources');
+    if (sources.isNotEmpty) attrs.add('sources: $sources');
     if (title != null) attrs.add('title: "$title"');
 
     return 'ImageMetadata(${attrs.join(', ')})';
