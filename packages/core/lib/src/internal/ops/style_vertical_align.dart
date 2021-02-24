@@ -61,9 +61,8 @@ class StyleVerticalAlign {
               ?.wrapWith((context, child) {
             final tsh = meta.tsb.build(context);
             final alignment = _tryParseAlignmentGeometry(tsh.textDirection, v);
-            return alignment != null
-                ? wf.buildAlign(meta, child, alignment)
-                : child;
+            if (alignment == null) return child;
+            return wf.buildAlign(meta, child, alignment);
           }));
         },
         onWidgetsIsOptional: true,
@@ -89,7 +88,7 @@ class StyleVerticalAlign {
       EdgeInsets padding) {
     final tsh = meta.tsb.build(context);
     final fontSize = tsh.style.fontSize!;
-    final builtPadding = wf.buildPadding(
+    final withPadding = wf.buildPadding(
       meta,
       Opacity(child: child, opacity: 0),
       EdgeInsets.only(
@@ -97,12 +96,13 @@ class StyleVerticalAlign {
         top: fontSize * padding.top,
       ),
     );
+    if (withPadding == null) return null;
 
     return wf.buildStack(
       meta,
       tsh,
       <Widget>[
-        if (builtPadding != null) builtPadding,
+        withPadding,
         Positioned(
           child: child,
           bottom: padding.top > 0 ? null : 0,
