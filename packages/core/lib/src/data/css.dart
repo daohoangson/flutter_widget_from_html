@@ -3,25 +3,25 @@ part of '../core_data.dart';
 /// A border of a box.
 @immutable
 class CssBorder {
-  final CssBorderSide _all;
-  final CssBorderSide _bottom;
+  final CssBorderSide? _all;
+  final CssBorderSide? _bottom;
   final bool inherit;
-  final CssBorderSide _inlineEnd;
-  final CssBorderSide _inlineStart;
-  final CssBorderSide _left;
-  final CssBorderSide _right;
-  final CssBorderSide _top;
+  final CssBorderSide? _inlineEnd;
+  final CssBorderSide? _inlineStart;
+  final CssBorderSide? _left;
+  final CssBorderSide? _right;
+  final CssBorderSide? _top;
 
   /// Creates a border.
   const CssBorder({
-    CssBorderSide all,
-    CssBorderSide bottom,
-    this.inherit,
-    CssBorderSide inlineEnd,
-    CssBorderSide inlineStart,
-    CssBorderSide left,
-    CssBorderSide right,
-    CssBorderSide top,
+    CssBorderSide? all,
+    CssBorderSide? bottom,
+    this.inherit = false,
+    CssBorderSide? inlineEnd,
+    CssBorderSide? inlineStart,
+    CssBorderSide? left,
+    CssBorderSide? right,
+    CssBorderSide? top,
   })  : _all = all,
         _bottom = bottom,
         _inlineEnd = inlineEnd,
@@ -52,12 +52,12 @@ class CssBorder {
 
   /// Creates a copy of this border but with the given fields replaced with the new values.
   CssBorder copyWith({
-    CssBorderSide bottom,
-    CssBorderSide inlineEnd,
-    CssBorderSide inlineStart,
-    CssBorderSide left,
-    CssBorderSide right,
-    CssBorderSide top,
+    CssBorderSide? bottom,
+    CssBorderSide? inlineEnd,
+    CssBorderSide? inlineStart,
+    CssBorderSide? left,
+    CssBorderSide? right,
+    CssBorderSide? top,
   }) =>
       CssBorder(
         all: _all,
@@ -71,7 +71,7 @@ class CssBorder {
       );
 
   /// Calculates [Border].
-  Border getValue(TextStyleHtml tsh) {
+  Border? getValue(TextStyleHtml tsh) {
     final bottom = CssBorderSide._copyWith(_all, _bottom)?._getValue(tsh);
     final left = CssBorderSide._copyWith(
             _all,
@@ -105,13 +105,13 @@ class CssBorder {
 @immutable
 class CssBorderSide {
   /// The color of this side of the border.
-  final Color color;
+  final Color? color;
 
   /// The style of this side of the border.
-  final TextDecorationStyle style;
+  final TextDecorationStyle? style;
 
   /// The width of this side of the border.
-  final CssLength width;
+  final CssLength? width;
 
   /// Creates the side of a border.
   const CssBorderSide({this.color, this.style, this.width});
@@ -119,16 +119,16 @@ class CssBorderSide {
   /// A border that is not rendered.
   static const none = CssBorderSide();
 
-  BorderSide _getValue(TextStyleHtml tsh) => identical(this, none)
+  BorderSide? _getValue(TextStyleHtml tsh) => identical(this, none)
       ? null
       : BorderSide(
-          color: color ?? tsh.style.color,
+          color: color ?? tsh.style.color!,
           // TODO: add proper support for other border styles
           style: style != null ? BorderStyle.solid : BorderStyle.none,
           width: width?.getValue(tsh) ?? 0.0,
         );
 
-  static CssBorderSide _copyWith(CssBorderSide base, CssBorderSide value) =>
+  static CssBorderSide? _copyWith(CssBorderSide? base, CssBorderSide? value) =>
       base == null || identical(value, none)
           ? value
           : value == null
@@ -161,14 +161,15 @@ class CssLength {
   bool get isNotEmpty => number > 0;
 
   /// Calculates value in logical pixel.
-  double getValue(TextStyleHtml tsh, {double baseValue, double scaleFactor}) {
+  double? getValue(TextStyleHtml tsh,
+      {double? baseValue, double? scaleFactor}) {
     double value;
     switch (unit) {
       case CssLengthUnit.auto:
         return null;
       case CssLengthUnit.em:
         baseValue ??= tsh.style.fontSize;
-        value = baseValue * number;
+        value = baseValue! * number;
         scaleFactor = 1;
         break;
       case CssLengthUnit.percentage:
@@ -184,7 +185,6 @@ class CssLength {
         break;
     }
 
-    if (value == null) return null;
     if (scaleFactor != null) value *= scaleFactor;
 
     return value;
@@ -199,26 +199,26 @@ class CssLength {
 @immutable
 class CssLengthBox {
   /// The bottom measurement.
-  final CssLength bottom;
+  final CssLength? bottom;
 
-  final CssLength _inlineEnd;
+  final CssLength? _inlineEnd;
 
-  final CssLength _inlineStart;
+  final CssLength? _inlineStart;
 
-  final CssLength _left;
+  final CssLength? _left;
 
-  final CssLength _right;
+  final CssLength? _right;
 
   /// The top measurement.
-  final CssLength top;
+  final CssLength? top;
 
   /// Creates a set.
   const CssLengthBox({
     this.bottom,
-    CssLength inlineEnd,
-    CssLength inlineStart,
-    CssLength left,
-    CssLength right,
+    CssLength? inlineEnd,
+    CssLength? inlineStart,
+    CssLength? left,
+    CssLength? right,
     this.top,
   })  : _inlineEnd = inlineEnd,
         _inlineStart = inlineStart,
@@ -227,12 +227,12 @@ class CssLengthBox {
 
   /// Creates a copy with the given measurements replaced with the new values.
   CssLengthBox copyWith({
-    CssLength bottom,
-    CssLength inlineEnd,
-    CssLength inlineStart,
-    CssLength left,
-    CssLength right,
-    CssLength top,
+    CssLength? bottom,
+    CssLength? inlineEnd,
+    CssLength? inlineStart,
+    CssLength? left,
+    CssLength? right,
+    CssLength? top,
   }) =>
       CssLengthBox(
         bottom: bottom ?? this.bottom,
@@ -251,12 +251,12 @@ class CssLengthBox {
       _right?.isNotEmpty == true;
 
   /// Calculates the left value taking text direction into account.
-  double getValueLeft(TextStyleHtml tsh) => (_left ??
+  double? getValueLeft(TextStyleHtml tsh) => (_left ??
           (tsh.textDirection == TextDirection.ltr ? _inlineStart : _inlineEnd))
       ?.getValue(tsh);
 
   /// Calculates the right value taking text direction into account.
-  double getValueRight(TextStyleHtml tsh) => (_right ??
+  double? getValueRight(TextStyleHtml tsh) => (_right ??
           (tsh.textDirection == TextDirection.ltr ? _inlineEnd : _inlineStart))
       ?.getValue(tsh);
 }

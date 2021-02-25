@@ -15,7 +15,7 @@ class StyleBorder {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree) return;
+          if (meta.willBuildSubtree == true) return;
           final border = tryParseBorder(meta);
           if (border.isNone) return;
 
@@ -30,7 +30,7 @@ class StyleBorder {
           tree.replaceWith(WidgetBit.inline(tree, built));
         },
         onWidgets: (meta, widgets) {
-          if (_skipBuilding[meta] == true || widgets?.isNotEmpty != true) {
+          if (_skipBuilding[meta] == true || widgets.isEmpty) {
             return widgets;
           }
           final border = tryParseBorder(meta);
@@ -50,17 +50,20 @@ class StyleBorder {
         priority: kPriorityBoxModel7k,
       );
 
-  Widget _buildBorder(
+  Widget? _buildBorder(
     BuildMetadata meta,
     BuildContext context,
     Widget child,
     CssBorder border,
   ) {
-    final tsh = meta.tsb().build(context);
+    final tsh = meta.tsb.build(context);
+    final borderValue = border.getValue(tsh);
+    if (borderValue == null) return child;
+
     return wf.buildBorder(
       meta,
       child,
-      border.getValue(tsh),
+      borderValue,
       isBorderBox: meta[kCssBoxSizing] == kCssBoxSizingBorderBox,
     );
   }

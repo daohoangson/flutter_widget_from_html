@@ -12,9 +12,9 @@ final _borderValuesTwoRegExp = RegExp(r'^(.+)\s+(.+)$');
 final _elementBorder = Expando<CssBorder>();
 
 CssBorder tryParseBorder(BuildMetadata meta) {
-  var border = _elementBorder[meta.element];
-  if (border != null) return border;
-  border = CssBorder();
+  final existing = _elementBorder[meta.element];
+  if (existing != null) return existing;
+  var border = CssBorder();
 
   for (final style in meta.styles) {
     if (!style.key.startsWith(kCssBorder)) continue;
@@ -58,7 +58,7 @@ CssBorder tryParseBorder(BuildMetadata meta) {
 }
 
 CssBorderSide _tryParseBorderSide(String value) {
-  String color_, style_, width_;
+  String? color_, style_, width_;
 
   final valuesThree = _borderValuesThreeRegExp.firstMatch(value);
   if (valuesThree != null) {
@@ -85,7 +85,7 @@ CssBorderSide _tryParseBorderSide(String value) {
   );
 }
 
-TextDecorationStyle _tryParseTextDecorationStyle(String value) {
+TextDecorationStyle? _tryParseTextDecorationStyle(String? value) {
   switch (value) {
     case kCssBorderStyleDotted:
       return TextDecorationStyle.dotted;

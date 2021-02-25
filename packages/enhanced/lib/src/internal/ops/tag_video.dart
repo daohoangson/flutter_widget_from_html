@@ -35,7 +35,7 @@ class TagVideo {
     if (e.parent != videoMeta.element) return;
 
     final attrs = e.attributes;
-    final url = wf.urlFull(attrs[kAttributeVideoSrc]);
+    final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
     if (url == null) return;
 
     _sourceUrls.add(url);
@@ -59,7 +59,7 @@ class TagVideo {
       controls: attrs.containsKey(kAttributeVideoControls),
       height: tryParseDoubleFromMap(attrs, kAttributeVideoHeight),
       loop: attrs.containsKey(kAttributeVideoLoop),
-      posterUrl: wf.urlFull(attrs[kAttributeVideoPoster]),
+      posterUrl: wf.urlFull(attrs[kAttributeVideoPoster] ?? ''),
       width: tryParseDoubleFromMap(attrs, kAttributeVideoWidth),
     );
   }

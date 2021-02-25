@@ -130,14 +130,14 @@ class TextStyleOps {
     for (final part in parts) {
       final fontFamily = part
           .trim()
-          .replaceFirstMapped(RegExp(r"""^("|')(.+)\1$"""), (m) => m.group(2));
+          .replaceFirstMapped(RegExp(r"""^("|')(.+)\1$"""), (m) => m.group(2)!);
       if (fontFamily.isNotEmpty) list.add(fontFamily);
     }
 
     return list;
   }
 
-  static FontStyle fontStyleTryParse(String value) {
+  static FontStyle? fontStyleTryParse(String value) {
     switch (value) {
       case kCssFontStyleItalic:
         return FontStyle.italic;
@@ -148,7 +148,7 @@ class TextStyleOps {
     return null;
   }
 
-  static FontWeight fontWeightTryParse(String value) {
+  static FontWeight? fontWeightTryParse(String value) {
     switch (value) {
       case kCssFontWeightBold:
         return FontWeight.bold;
@@ -175,12 +175,13 @@ class TextStyleOps {
     return null;
   }
 
-  static double _fontSizeTryParse(WidgetFactory wf, TextStyleHtml p, String v) {
+  static double? _fontSizeTryParse(
+      WidgetFactory wf, TextStyleHtml p, String v) {
     final length = tryParseCssLength(v);
     if (length != null) {
       final lengthValue = length.getValue(
         p,
-        baseValue: p.parent?.style?.fontSize,
+        baseValue: p.parent?.style.fontSize,
         scaleFactor: p.getDependency<MediaQueryData>().textScaleFactor,
       );
       if (lengthValue != null) return lengthValue;
@@ -203,27 +204,27 @@ class TextStyleOps {
         return _fontSizeMultiplyRootWith(p, .5625);
 
       case kCssFontSizeLarger:
-        return _fontSizeMultiplyWith(p.parent?.style?.fontSize, 1.2);
+        return _fontSizeMultiplyWith(p.parent?.style.fontSize, 1.2);
       case kCssFontSizeSmaller:
-        return _fontSizeMultiplyWith(p.parent?.style?.fontSize, 15 / 18);
+        return _fontSizeMultiplyWith(p.parent?.style.fontSize, 15 / 18);
     }
 
     return null;
   }
 
-  static double _fontSizeMultiplyRootWith(TextStyleHtml tsh, double value) {
+  static double? _fontSizeMultiplyRootWith(TextStyleHtml tsh, double value) {
     var root = tsh;
     while (root.parent != null) {
-      root = root.parent;
+      root = root.parent!;
     }
 
     return _fontSizeMultiplyWith(root.style.fontSize, value);
   }
 
-  static double _fontSizeMultiplyWith(double fontSize, double value) =>
+  static double? _fontSizeMultiplyWith(double? fontSize, double value) =>
       fontSize != null ? fontSize * value : null;
 
-  static double _lineHeightTryParse(
+  static double? _lineHeightTryParse(
       WidgetFactory wf, TextStyleHtml p, String v) {
     if (v == kCssLineHeightNormal) return -1;
 
@@ -240,18 +241,18 @@ class TextStyleOps {
     );
     if (lengthValue == null) return null;
 
-    return lengthValue / p.style.fontSize;
+    return lengthValue / p.style.fontSize!;
   }
 }
 
 @immutable
 class TextDeco {
-  final Color color;
-  final bool over;
-  final bool strike;
-  final TextDecorationStyle style;
-  final CssLength thickness;
-  final bool under;
+  final Color? color;
+  final bool? over;
+  final bool? strike;
+  final TextDecorationStyle? style;
+  final CssLength? thickness;
+  final bool? under;
 
   TextDeco({
     this.color,
@@ -262,7 +263,7 @@ class TextDeco {
     this.under,
   });
 
-  factory TextDeco.tryParse(List<String> values) {
+  static TextDeco? tryParse(List<String> values) {
     for (final value in values) {
       switch (value) {
         case kCssTextDecorationLineThrough:

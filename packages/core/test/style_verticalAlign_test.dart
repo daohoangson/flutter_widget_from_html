@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:network_image_mock/network_image_mock.dart';
+import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
 
@@ -78,7 +78,7 @@ void main() {
         '[Image:image=NetworkImage("$imgSrc", scale: 1.0)]'
         ']';
     final imgExplain = (WidgetTester t, String html) =>
-        mockNetworkImagesFor(() => explain(t, html));
+        mockNetworkImages(() => explain(t, html));
 
     testWidgets('renders top image', (WidgetTester tester) async {
       final html = '<img src="$imgSrc" style="vertical-align: top" />';

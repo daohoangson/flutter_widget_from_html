@@ -20,9 +20,9 @@ class StyleMargin {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree) return;
+          if (meta.willBuildSubtree == true) return;
           final m = tryParseCssLengthBox(meta, kCssMargin);
-          if (m?.hasLeftOrRight != true) return;
+          if (m == null || !m.hasLeftOrRight) return;
 
           return wrapTree(
             tree,
@@ -31,31 +31,22 @@ class StyleMargin {
           );
         },
         onWidgets: (meta, widgets) {
-          if (widgets?.isNotEmpty != true) return null;
+          if (widgets.isEmpty) return null;
           final m = tryParseCssLengthBox(meta, kCssMargin);
           if (m == null) return null;
+          final tsb = meta.tsb;
 
-          final t = m.top?.isNotEmpty == true;
-          final b = m.bottom?.isNotEmpty == true;
-          final ws = List<WidgetPlaceholder>(
-              (t ? 1 : 0) + widgets.length + (b ? 1 : 0));
-          final tsb = meta.tsb();
-
-          var i = 0;
-          if (t) ws[i++] = HeightPlaceholder(m.top, tsb);
-
-          for (final widget in widgets) {
-            if (m.hasLeftOrRight) {
-              widget.wrapWith(
-                  (c, w) => _marginHorizontalBuilder(w, m, tsb.build(c)));
-            }
-
-            ws[i++] = widget;
-          }
-
-          if (b) ws[i++] = HeightPlaceholder(m.bottom, tsb);
-
-          return ws;
+          return [
+            if (m.top?.isNotEmpty ?? false) HeightPlaceholder(m.top!, tsb),
+            for (final widget in widgets)
+              if (m.hasLeftOrRight)
+                widget.wrapWith(
+                    (c, w) => _marginHorizontalBuilder(w, m, tsb.build(c)))
+              else
+                widget,
+            if (m.bottom?.isNotEmpty ?? false)
+              HeightPlaceholder(m.bottom!, tsb),
+          ];
         },
         onWidgetsIsOptional: true,
         priority: kPriorityBoxModel9k,

@@ -177,12 +177,12 @@ final _colorHslRegExp = RegExp(
 final _colorRgbRegExp = RegExp(
     r'^(rgba?)\(([0-9.]+%?)[,\s]+([0-9.]+%?)[,\s]+([0-9.]+%?)([,\s/]+([0-9.]+%?))?\)$');
 
-Color tryParseColor(String value) {
+Color? tryParseColor(String? value) {
   if (value == null) return null;
 
   final hexMatch = _colorHexRegExp.firstMatch(value);
   if (hexMatch != null) {
-    final hex = hexMatch[1].toUpperCase();
+    final hex = hexMatch[1]!.toUpperCase();
     switch (hex.length) {
       case 3:
         return Color(int.parse('0xFF${_x2(hex)}'));
@@ -203,14 +203,14 @@ Color tryParseColor(String value) {
   if (valueLowerCase == 'transparent') return Color(0x00000000);
   // TODO: add support for `currentcolor`
   if (kCssColors.containsKey(valueLowerCase)) {
-    return tryParseColor(kCssColors[valueLowerCase]);
+    return tryParseColor(kCssColors[valueLowerCase]!);
   }
 
   final rgbMatch = _colorRgbRegExp.firstMatch(valueLowerCase);
   if (rgbMatch != null) {
-    final rgbR = _parseColorPart(rgbMatch[2], 0, 255);
-    final rgbG = _parseColorPart(rgbMatch[3], 0, 255);
-    final rgbB = _parseColorPart(rgbMatch[4], 0, 255);
+    final rgbR = _parseColorPart(rgbMatch[2]!, 0, 255);
+    final rgbG = _parseColorPart(rgbMatch[3]!, 0, 255);
+    final rgbB = _parseColorPart(rgbMatch[4]!, 0, 255);
     final rgbA = _parseColorPart(rgbMatch[6] ?? '1', 0, 1);
     if (rgbR != null && rgbG != null && rgbB != null && rgbA != null) {
       return Color.fromARGB(
@@ -224,9 +224,9 @@ Color tryParseColor(String value) {
 
   final hslMatch = _colorHslRegExp.firstMatch(valueLowerCase);
   if (hslMatch != null) {
-    final hslH = _parseColorHue(hslMatch[2], hslMatch[3]);
-    final hslS = _parseColorPart(hslMatch[4], 0, 1);
-    final hslL = _parseColorPart(hslMatch[5], 0, 1);
+    final hslH = _parseColorHue(hslMatch[2]!, hslMatch[3]);
+    final hslS = _parseColorPart(hslMatch[4]!, 0, 1);
+    final hslL = _parseColorPart(hslMatch[5]!, 0, 1);
     final hslA = _parseColorPart(hslMatch[7] ?? '1', 0, 1);
     if (hslH != null && hslS != null && hslL != null && hslA != null) {
       return HSLColor.fromAHSL(hslA, hslH, hslS, hslL).toColor();
@@ -236,7 +236,7 @@ Color tryParseColor(String value) {
   return null;
 }
 
-double _parseColorHue(String number, String unit) {
+double? _parseColorHue(String number, String? unit) {
   final v = double.tryParse(number);
   if (v == null) return null;
 
@@ -265,8 +265,8 @@ double _parseColorHue(String number, String unit) {
   return deg % 360;
 }
 
-double _parseColorPart(String value, double min, double max) {
-  double v;
+double? _parseColorPart(String value, double min, double max) {
+  double? v;
 
   if (value.endsWith('%')) {
     final p = double.tryParse(value.substring(0, value.length - 1));
@@ -276,7 +276,7 @@ double _parseColorPart(String value, double min, double max) {
 
   v ??= double.tryParse(value);
 
-  if (v < min || v > max) return null;
+  if (v! < min || v > max) return null;
   return v;
 }
 

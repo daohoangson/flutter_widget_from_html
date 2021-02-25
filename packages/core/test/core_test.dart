@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:network_image_mock/network_image_mock.dart';
+import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
 
@@ -130,7 +130,7 @@ void main() {
     testWidgets('renders new line before IMG', (tester) async {
       final src = 'http://domain.com/image.png';
       final html = '1<br /><img src="$src" />';
-      final explained = await mockNetworkImagesFor(() => explain(tester, html));
+      final explained = await mockNetworkImages(() => explain(tester, html));
       expect(
           explained,
           equals('[RichText:(:'
@@ -203,7 +203,7 @@ void main() {
       expect(
           explained,
           equals('TshWidget\n'
-              '└ColumnPlaceholder(BuildMetadata(root))\n'
+              '└ColumnPlaceholder(BuildMetadata(<root></root>))\n'
               ' └Column()\n'
               '  ├WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '  ││  "1"\n'
@@ -297,7 +297,7 @@ void main() {
 
     testWidgets(
       'renders FIGURE/FIGCAPTION tags',
-      (tester) => mockNetworkImagesFor(() async {
+      (tester) => mockNetworkImages(() async {
         final src = 'http://domain.com/image.png';
         final html = '''
 <figure>
@@ -871,7 +871,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 
       testWidgets(
         'renders IMG inline by default',
-        (tester) => mockNetworkImagesFor(() async {
+        (tester) => mockNetworkImages(() async {
           final html = 'Foo <img src="$src" />';
           final explained = await explain(tester, html);
           expect(
@@ -885,7 +885,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 
       testWidgets(
         'renders IMG as block',
-        (tester) => mockNetworkImagesFor(() async {
+        (tester) => mockNetworkImages(() async {
           final html = 'Foo <img src="$src" style="display: block" />';
           final explained = await explain(tester, html);
           expect(
@@ -899,7 +899,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 
       testWidgets(
         'renders IMG with dimensions inline',
-        (tester) => mockNetworkImagesFor(() async {
+        (tester) => mockNetworkImages(() async {
           final html = '<img src="$src" width="1" height="1" />';
           final explained = await explain(tester, html);
           expect(
@@ -914,7 +914,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 
       testWidgets(
         'renders IMG with dimensions as block',
-        (tester) => mockNetworkImagesFor(() async {
+        (tester) => mockNetworkImages(() async {
           final html = '<img src="$src" width="1" '
               'height="1" style="display: block" />';
           final explained = await explain(tester, html);
@@ -1163,7 +1163,7 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
       final explain2x = (WidgetTester tester, String html) async {
         tester.binding.window.textScaleFactorTestValue = 2;
         final explained = await explain(tester, html);
-        tester.binding.window.textScaleFactorTestValue = null;
+        tester.binding.window.clearTextScaleFactorTestValue();
         return explained;
       };
 

@@ -19,7 +19,7 @@ String padding(String child) =>
 
 String list(List<String> children) => '[Column:children=${children.join(",")}]';
 
-String item(String markerText, String contents, {String child}) =>
+String item(String markerText, String contents, {String? child}) =>
     '[_ListItem:children=${child ?? '[RichText:(:$contents)]'},${marker(markerText)}]';
 
 String marker(String text) =>
@@ -112,7 +112,7 @@ void main() async {
         explained,
         equals(padding(list([
           item(disc, 'Foo'),
-          item(disc, null, child: padding(item(circle, 'Bar'))),
+          item(disc, '', child: padding(item(circle, 'Bar'))),
         ]))));
   });
 
@@ -610,7 +610,7 @@ void main() async {
         ']]]';
 
     final nonExplainerExpected = 'TshWidget\n'
-        '└ColumnPlaceholder(BuildMetadata(root))\n'
+        '└ColumnPlaceholder(BuildMetadata(<root></root>))\n'
         ' └CssBlock()\n'
         '  └Padding(padding: EdgeInsets(0.0, 0.0, 40.0, 0.0))\n'
         '   └Column(textDirection: rtl)\n'
@@ -685,6 +685,7 @@ void main() async {
       expect(urls, equals(const [kHref]));
     });
 
+    final goldenSkip = Platform.isLinux ? null : 'Linux only';
     GoldenToolkit.runWithConfiguration(
       () {
         group('baseline calculation', () {
@@ -721,9 +722,9 @@ void main() async {
               );
 
               await screenMatchesGolden(tester, testCase.key);
-            }, skip: null);
+            }, skip: goldenSkip != null);
           }
-        }, skip: Platform.isLinux ? null : 'Linux only');
+        }, skip: goldenSkip);
       },
       config: GoldenToolkitConfiguration(
         fileNameFactory: (name) => '$kGoldenFilePrefix/li/$name.png',
@@ -735,7 +736,7 @@ void main() async {
 class _Golden extends StatelessWidget {
   final String contents;
 
-  const _Golden(this.contents, {Key key}) : super(key: key);
+  const _Golden(this.contents, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => Scaffold(
@@ -780,10 +781,10 @@ class _Golden extends StatelessWidget {
 }
 
 class _HitTestApp extends StatelessWidget {
-  final String href;
-  final void Function(String) onTapUrl;
+  final String? href;
+  final void Function(String)? onTapUrl;
 
-  const _HitTestApp({this.href, Key key, this.onTapUrl}) : super(key: key);
+  const _HitTestApp({this.href, Key? key, this.onTapUrl}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => MaterialApp(

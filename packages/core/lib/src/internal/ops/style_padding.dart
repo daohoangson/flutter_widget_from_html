@@ -10,7 +10,7 @@ WidgetPlaceholder _paddingInlineBefore(TextStyleBuilder tsb, CssLengthBox b) =>
     WidgetPlaceholder<CssLengthBox>(b).wrapWith((context, _) =>
         _paddingInlineSizedBox(b.getValueLeft(tsb.build(context))));
 
-Widget _paddingInlineSizedBox(double width) =>
+Widget _paddingInlineSizedBox(double? width) =>
     width != null && width > 0 ? SizedBox(width: width) : widget0;
 
 class StylePadding {
@@ -22,9 +22,9 @@ class StylePadding {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree) return;
+          if (meta.willBuildSubtree == true) return;
           final padding = tryParseCssLengthBox(meta, kCssPadding);
-          if (padding?.hasLeftOrRight != true) return;
+          if (padding == null || !padding.hasLeftOrRight) return;
 
           return wrapTree(
             tree,
@@ -35,7 +35,7 @@ class StylePadding {
           );
         },
         onWidgets: (meta, widgets) {
-          if (widgets?.isNotEmpty != true) return null;
+          if (widgets.isEmpty) return null;
           final padding = tryParseCssLengthBox(meta, kCssPadding);
           if (padding == null) return null;
 
@@ -47,9 +47,9 @@ class StylePadding {
         priority: kPriorityBoxModel3k,
       );
 
-  Widget _build(BuildContext context, BuildMetadata meta, Widget child,
+  Widget? _build(BuildContext context, BuildMetadata meta, Widget child,
       CssLengthBox padding) {
-    final tsh = meta.tsb().build(context);
+    final tsh = meta.tsb.build(context);
     return wf.buildPadding(
       meta,
       child,

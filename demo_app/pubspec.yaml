@@ -9,14 +9,14 @@ dependencies:
   carousel_slider: ^2.2.1
   flutter:
     sdk: flutter
-  # web only: flutter_svg: ^0.20.0-nullsafety.3
+  flutter_svg: ^0.20.0-0
   flutter_widget_from_html: any
   flutter_widget_from_html_core: any
   html: any
   http: any
   path_provider: any
   photo_view: ^0.10.2
-  provider: ^3.0.0+1
+  provider: ^5.0.0-0
   url_launcher: any
 
 dependency_overrides:            # dep_override
@@ -24,6 +24,7 @@ dependency_overrides:            # dep_override
     path: ../packages/enhanced   # dep_override
   flutter_widget_from_html_core: # dep_override
     path: ../packages/core       # dep_override
+  wakelock: ^0.4.0               # dep_override
 
 dev_dependencies:
   flutter_driver:

@@ -52,6 +52,8 @@ class TestApp extends StatelessWidget {
         ),
       );
 
+  // TODO: use `ElevatedButton` when v1.25 hits stable
+  // ignore: deprecated_member_use
   Widget _buildButton(String value, {bool issue375 = false}) => RaisedButton(
         child: Text(value + (issue375 ? ' issue375' : '')),
         key: ValueKey('input-$value' + (issue375 ? '-issue375' : '')),

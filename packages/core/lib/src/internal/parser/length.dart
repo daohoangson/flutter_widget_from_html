@@ -5,7 +5,7 @@ final _cssLengthValues4 =
 final _cssLengthValues2 = RegExp(r'^([^\s]+)\s+([^\s]+)$');
 final _cssLengthValue = RegExp(r'^([\d\.]+)(em|%|pt|px)$');
 
-CssLength tryParseCssLength(String value) {
+CssLength? tryParseCssLength(String? value) {
   if (value == null) return null;
 
   value = value.toLowerCase();
@@ -19,7 +19,7 @@ CssLength tryParseCssLength(String value) {
   final match = _cssLengthValue.firstMatch(value);
   if (match == null) return null;
 
-  final number = double.tryParse(match[1]);
+  final number = double.tryParse(match[1]!);
   if (number == null) return null;
 
   switch (match[2]) {
@@ -36,8 +36,8 @@ CssLength tryParseCssLength(String value) {
   return null;
 }
 
-CssLengthBox tryParseCssLengthBox(BuildMetadata meta, String key) {
-  CssLengthBox output;
+CssLengthBox? tryParseCssLengthBox(BuildMetadata meta, String key) {
+  CssLengthBox? output;
 
   for (final style in meta.styles) {
     if (!style.key.startsWith(key)) continue;

@@ -49,7 +49,7 @@ void main() async {
       expect(
           explained,
           equals('TshWidget\n'
-              '└ColumnPlaceholder(BuildMetadata(root))\n'
+              '└ColumnPlaceholder(BuildMetadata(<root></root>))\n'
               ' └Column()\n'
               '  ├WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
               '  ││  "Caption"\n'
@@ -810,6 +810,7 @@ void main() async {
       expect(urls, equals(const [kHref]));
     });
 
+    final goldenSkip = Platform.isLinux ? null : 'Linux only';
     GoldenToolkit.runWithConfiguration(
       () {
         group('screenshot testing', () {
@@ -905,9 +906,9 @@ Foo should float on top of table.''',
               );
 
               await screenMatchesGolden(tester, testCase.key);
-            }, skip: null);
+            }, skip: goldenSkip != null);
           }
-        }, skip: Platform.isLinux ? null : 'Linux only');
+        }, skip: goldenSkip);
       },
       config: GoldenToolkitConfiguration(
         fileNameFactory: (name) => '$kGoldenFilePrefix/table/$name.png',
@@ -919,7 +920,7 @@ Foo should float on top of table.''',
 class _Golden extends StatelessWidget {
   final String contents;
 
-  const _Golden(this.contents, {Key key}) : super(key: key);
+  const _Golden(this.contents, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => Scaffold(
@@ -938,10 +939,10 @@ class _Golden extends StatelessWidget {
 }
 
 class _HitTestApp extends StatelessWidget {
-  final String href;
-  final void Function(String) onTapUrl;
+  final String? href;
+  final void Function(String)? onTapUrl;
 
-  const _HitTestApp({this.href, Key key, this.onTapUrl}) : super(key: key);
+  const _HitTestApp({this.href, Key? key, this.onTapUrl}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => MaterialApp(

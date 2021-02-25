@@ -21,14 +21,14 @@ class StyleTextAlign {
   StyleTextAlign(this.wf, this.value);
 
   BuildOp get op => BuildOp(
-        onTree: (meta, _) => meta.tsb(_tsb, value),
+        onTree: (meta, _) => meta.tsb.enqueue(_tsb, value),
         onWidgets: (_, widgets) => _onWidgets(widgets, value),
         onWidgetsIsOptional: true,
         priority: 4100,
       );
 
   static Iterable<Widget> _onWidgets(Iterable<Widget> widgets, String value) {
-    Widget Function(BuildContext, Widget) builder;
+    Widget Function(BuildContext, Widget)? builder;
 
     switch (value) {
       case kCssTextAlignCenter:
@@ -46,7 +46,7 @@ class StyleTextAlign {
 
     if (builder != null) {
       widgets = widgets
-          .map((child) => WidgetPlaceholder.lazy(child).wrapWith(builder));
+          .map((child) => WidgetPlaceholder.lazy(child).wrapWith(builder!));
     }
 
     return widgets;
@@ -59,7 +59,7 @@ class StyleTextAlign {
       _TextAlignCenter(child);
 
   static TextStyleHtml _tsb(TextStyleHtml tsh, String value) {
-    TextAlign textAlign;
+    TextAlign? textAlign;
 
     switch (value) {
       case kCssTextAlignCenter:
@@ -89,10 +89,10 @@ class StyleTextAlign {
 }
 
 class _TextAlignBlock extends CssBlock {
-  _TextAlignBlock(Widget child, {Key key}) : super(child: child, key: key);
+  _TextAlignBlock(Widget child, {Key? key}) : super(child: child, key: key);
 }
 
 class _TextAlignCenter extends Center {
-  _TextAlignCenter(Widget child, {Key key})
+  _TextAlignCenter(Widget child, {Key? key})
       : super(child: child, heightFactor: 1.0, key: key);
 }

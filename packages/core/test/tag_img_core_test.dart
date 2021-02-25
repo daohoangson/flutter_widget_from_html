@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:network_image_mock/network_image_mock.dart';
+import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart' as helper;
 
@@ -13,7 +13,7 @@ void main() {
   group('image.png', () {
     final src = 'http://domain.com/image.png';
     final explain = (WidgetTester tester, String html) =>
-        mockNetworkImagesFor(() async => helper.explain(tester, html));
+        mockNetworkImages(() async => helper.explain(tester, html));
 
     testWidgets('renders src', (WidgetTester tester) async {
       final html = '<img src="$src" />';
@@ -91,8 +91,9 @@ void main() {
 
   group('asset', () {
     final assetName = 'test/images/logo.png';
-    final explain = (WidgetTester tester, String html, {String package}) =>
-        helper.explain(tester, html);
+    final Future<String> Function(WidgetTester, String, {String package})
+        explain = (WidgetTester tester, String html, {String? package}) =>
+            helper.explain(tester, html);
 
     testWidgets('renders asset', (WidgetTester tester) async {
       final html = '<img src="asset:$assetName" />';
@@ -193,7 +194,7 @@ void main() {
       WidgetTester tester,
       String html,
       String fullUrl, {
-      Uri baseUrl,
+      Uri? baseUrl,
     }) async {
       final explained = await helper.explain(tester, null,
           hw: HtmlWidget(
@@ -256,15 +257,15 @@ void main() {
       final html = 'Foo <img src="data:image/jpg;base64,xxxx" /> bar';
       await tester.pumpWidget(MaterialApp(home: HtmlWidget(html)));
       await tester.pumpAndSettle();
-      await expect(find.text('❌'), findsOneWidget);
+      expect(find.text('❌'), findsOneWidget);
     });
   });
 }
 
 class _TapTestApp extends StatelessWidget {
-  final void Function(ImageMetadata) onTapImage;
+  final void Function(ImageMetadata)? onTapImage;
 
-  const _TapTestApp({Key key, this.onTapImage}) : super(key: key);
+  const _TapTestApp({Key? key, this.onTapImage}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => MaterialApp(

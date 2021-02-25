@@ -9,22 +9,22 @@ class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
 
   ColumnPlaceholder(
     this._children, {
-    @required this.meta,
-    @required this.trimMarginVertical,
-    @required this.wf,
+    required this.meta,
+    required this.trimMarginVertical,
+    required this.wf,
   }) : super(meta);
 
   @override
   Widget build(BuildContext context) {
-    final tsh = meta.tsb().build(context);
+    final tsh = meta.tsb.build(context);
     return wf.buildColumnWidget(meta, tsh, getChildren(context)) ?? widget0;
   }
 
   List<Widget> getChildren(BuildContext context) {
     final contents = <Widget>[];
 
-    HeightPlaceholder marginBottom, marginTop;
-    Widget prev;
+    HeightPlaceholder? marginBottom, marginTop;
+    Widget? prev;
     var state = 0;
 
     for (final child in _getIterable(context)) {
@@ -62,7 +62,7 @@ class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
       }
     }
 
-    final tsh = meta.tsb().build(context);
+    final tsh = meta.tsb.build(context);
     final column = wf.buildColumnWidget(meta, tsh, contents);
 
     return [

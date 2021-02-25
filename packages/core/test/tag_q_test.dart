@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:network_image_mock/network_image_mock.dart';
+import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
 
@@ -44,7 +44,7 @@ void main() {
 
   testWidgets(
     'renders quotes around IMG',
-    (tester) => mockNetworkImagesFor(() async {
+    (tester) => mockNetworkImages(() async {
       final src = 'http://domain.com/image.png';
       final html = '<q><img src="$src" /></q>';
       final explained = await explain(tester, html);

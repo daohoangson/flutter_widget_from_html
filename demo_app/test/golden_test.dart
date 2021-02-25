@@ -16,10 +16,10 @@ void _test(String name, String html) => testGoldens(name, (tester) async {
       );
 
       await screenMatchesGolden(tester, name, finder: find.byKey(key));
-    });
+    }, skip: !Platform.isLinux);
 
 void main() {
-  final json = File('goldens.json').readAsStringSync();
+  final json = File('test/goldens.json').readAsStringSync();
   final map = jsonDecode(json) as Map;
   map.entries.forEach((entry) => _test(entry.key, entry.value));
 }
