@@ -28,6 +28,8 @@ part 'ops/tag_ruby.dart';
 part 'ops/tag_table.dart';
 part 'ops/text_style.dart';
 
+const kAttributeId = 'id';
+
 const kTagCode = 'code';
 const kTagCodeFont1 = 'Courier';
 const kTagCodeFont2 = 'monospace';
