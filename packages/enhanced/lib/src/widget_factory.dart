@@ -261,7 +261,7 @@ class WidgetFactory extends core.WidgetFactory {
       case kTagIframe:
         _tagIframe ??= BuildOp(onWidgets: (meta, _) {
           final attrs = meta.element.attributes;
-          final src = urlFull(attrs[kAttributeIframeSrc]);
+          final src = urlFull(attrs[kAttributeIframeSrc] ?? '');
           if (src == null) return null;
 
           return listOrNull(buildWebView(

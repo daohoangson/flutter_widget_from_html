@@ -43,7 +43,8 @@ class WidgetFactory {
       AspectRatio(aspectRatio: aspectRatio, child: child);
 
   /// Builds primary column (body).
-  WidgetPlaceholder? buildBody(BuildMetadata meta, Iterable<Widget> children) =>
+  WidgetPlaceholder? buildBody(
+          BuildMetadata meta, Iterable<WidgetPlaceholder> children) =>
       buildColumnPlaceholder(meta, children, trimMarginVertical: true);
 
   /// Builds [border] with [Container] or [DecoratedBox].
@@ -53,7 +54,7 @@ class WidgetFactory {
   /// and `border-box` (set [isBorderBox] to use).
   Widget? buildBorder(BuildMetadata meta, Widget child, BoxBorder border,
           {bool isBorderBox = false}) =>
-      isBorderBox == true
+      isBorderBox
           ? DecoratedBox(
               child: child,
               decoration: BoxDecoration(border: border),
@@ -66,7 +67,7 @@ class WidgetFactory {
   /// Builds column placeholder.
   WidgetPlaceholder? buildColumnPlaceholder(
     BuildMetadata meta,
-    Iterable<Widget> children, {
+    Iterable<WidgetPlaceholder> children, {
     bool trimMarginVertical = false,
   }) {
     if (children.isEmpty) return null;
@@ -78,7 +79,7 @@ class WidgetFactory {
           return child;
         }
       } else {
-        return child as WidgetPlaceholder?;
+        return child;
       }
     }
 
@@ -150,7 +151,7 @@ class WidgetFactory {
       built = buildAspectRatio(meta, built, src.width! / src.height!);
     }
 
-    if (built != null && _widget?.onTapImage != null) {
+    if (_widget?.onTapImage != null && built != null) {
       built = buildGestureDetector(
           meta, built, () => _widget?.onTapImage?.call(data));
     }
@@ -264,7 +265,7 @@ class WidgetFactory {
   /// Returns marker for the specified [type] at index [i].
   ///
   /// Note: `circle`, `disc` and `square` type won't trigger this method
-  String? getListStyleMarker(String type, int i) {
+  String getListStyleMarker(String type, int i) {
     switch (type) {
       case kCssListStyleTypeAlphaLower:
       case kCssListStyleTypeAlphaLatinLower:
@@ -466,13 +467,13 @@ class WidgetFactory {
         _tagFont ??= BuildOp(
           defaultStyles: (element) {
             final attrs = element.attributes;
+            final color = attrs[kAttributeFontColor];
+            final fontFace = attrs[kAttributeFontFace];
+            final fontSize = kCssFontSizes[attrs[kAttributeFontSize] ?? ''];
             return {
-              if (attrs[kAttributeFontColor] != null)
-                kCssColor: attrs[kAttributeFontColor]!,
-              if (attrs[kAttributeFontFace] != null)
-                kCssFontFamily: attrs[kAttributeFontFace]!,
-              if (kCssFontSizes[attrs[kAttributeFontSize]] != null)
-                kCssFontSize: kCssFontSizes[attrs[kAttributeFontSize]]!,
+              if (color != null) kCssColor: color,
+              if (fontFace != null) kCssFontFamily: fontFace,
+              if (fontSize != null) kCssFontSize: fontSize,
             };
           },
         );
@@ -769,8 +770,8 @@ class WidgetFactory {
   }
 
   /// Resolves full URL with [HtmlWidget.baseUrl] if available.
-  String? urlFull(String? url) {
-    if (url == null || url.isEmpty) return null;
+  String? urlFull(String url) {
+    if (url.isEmpty) return null;
     if (url.startsWith('data:')) return url;
 
     final uri = Uri.tryParse(url);
