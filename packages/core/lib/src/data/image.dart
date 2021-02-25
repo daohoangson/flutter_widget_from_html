@@ -14,16 +14,6 @@ class ImageMetadata {
 
   /// Creates an image.
   ImageMetadata({this.alt, required this.sources, this.title});
-
-  @override
-  String toString() {
-    final attrs = <String>[];
-    if (alt != null) attrs.add('alt: "$alt"');
-    if (sources.isNotEmpty) attrs.add('sources: $sources');
-    if (title != null) attrs.add('title: "$title"');
-
-    return 'ImageMetadata(${attrs.join(', ')})';
-  }
 }
 
 /// An image source.
@@ -40,11 +30,4 @@ class ImageSource {
 
   /// Creates a source.
   ImageSource(this.url, {this.height, this.width});
-
-  @override
-  String toString() =>
-      'ImageSource("$url"' +
-      (height != null ? 'height: $height' : '') +
-      (width != null ? 'width: $width' : '') +
-      ')';
 }
