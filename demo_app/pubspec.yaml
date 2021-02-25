@@ -24,6 +24,7 @@ dependency_overrides:            # dep_override
     path: ../packages/enhanced   # dep_override
   flutter_widget_from_html_core: # dep_override
     path: ../packages/core       # dep_override
+  wakelock: ^0.4.0               # dep_override
 
 dev_dependencies:
   flutter_driver:
