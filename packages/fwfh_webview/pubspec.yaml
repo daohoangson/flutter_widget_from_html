@@ -1,0 +1,24 @@
+name: fwfh_webview
+version: 0.0.1
+description: WidgetFactory extension to render IFRAME with the official WebView plugin.
+homepage: https://github.com/daohoangson/flutter_widget_from_html
+
+environment:
+  # flutter_widget_from_html_core
+  flutter: ">=1.20.0 <2.0.0"
+  sdk: ">=2.12.0-0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_widget_from_html_core: ^0.6.0-0
+  webview_flutter: ^2.0.0
+
+dependency_overrides:
+  flutter_widget_from_html_core:
+    path: ../core
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  pedantic: any
