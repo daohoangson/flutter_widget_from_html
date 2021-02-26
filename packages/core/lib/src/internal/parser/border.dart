@@ -58,29 +58,29 @@ CssBorder tryParseBorder(BuildMetadata meta) {
 }
 
 CssBorderSide _tryParseBorderSide(String value) {
-  String? color_, style_, width_;
+  String? color, style, widthValue;
 
   final valuesThree = _borderValuesThreeRegExp.firstMatch(value);
   if (valuesThree != null) {
-    color_ = valuesThree[3];
-    style_ = valuesThree[2];
-    width_ = valuesThree[1];
+    color = valuesThree[3];
+    style = valuesThree[2];
+    widthValue = valuesThree[1];
   } else {
     final valuesTwo = _borderValuesTwoRegExp.firstMatch(value);
     if (valuesTwo != null) {
-      style_ = valuesTwo[2];
-      width_ = valuesTwo[1];
+      style = valuesTwo[2];
+      widthValue = valuesTwo[1];
     } else {
-      width_ = value;
+      widthValue = value;
     }
   }
 
-  final width = tryParseCssLength(width_);
+  final width = tryParseCssLength(widthValue);
   if (width == null || width.number <= 0) return CssBorderSide.none;
 
   return CssBorderSide(
-    color: tryParseColor(color_),
-    style: _tryParseTextDecorationStyle(style_),
+    color: tryParseColor(color),
+    style: _tryParseTextDecorationStyle(style),
     width: width,
   );
 }

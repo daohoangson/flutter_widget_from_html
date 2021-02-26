@@ -4,10 +4,11 @@
 [![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html_core.svg)](https://pub.dev/packages/flutter_widget_from_html_core)
 
-A Flutter package for building Flutter widget tree from HTML with support for 70+ most popular tags.
+A Flutter package for building Flutter widget tree from HTML with support for
+[70+ most popular tags](https://html-widget-demo.now.sh/supported/tags.html).
 
 | [Live demo](https://html-widget-demo.now.sh/#/helloworldcore)                                                                     |                                                                                                                                   |
-| --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+|-----------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
 | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldCoreScreen1.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldCoreScreen2.gif) |
 
 ## Getting Started
@@ -16,7 +17,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html_core: ^0.5.2
+  flutter_widget_from_html_core: ^0.6.0
 ```
 
 ## Usage
@@ -75,7 +76,7 @@ HtmlWidget(
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
 [Compare between Flutter rendering and browser's.](https://html-widget-demo.now.sh/supported/tags.html)
 
-- A: underline, blue color, tapping will trigger `HtmlWidget.onTapUrl` callback
+- A: underline, blue color with scroll to anchor support
 - H1/H2/H3/H4/H5/H6
 - IMG with support for asset (`asset://`), data uri, local file (`file://`) and network image
 - LI/OL/UL with support for:
@@ -126,12 +127,14 @@ These tags and their contents will be ignored:
 
 ## Extensibility
 
-This package implements widget building logic with high testing coverage to ensure correctness. It tries to render an optimal tree by using `RichText` with specific `TextStyle`, merge text spans together, show images in sized box, etc. The idea is to build a solid foundation for apps to customize easily. There are two ways to alter the output widget tree.
+This package implements widget building logic with high testing coverage to ensure correctness. It tries to render an optimal tree by using `RichText` with specific `TextStyle`, merging text spans together, showing images in sized box, etc. The idea is to build a solid foundation for apps to customize easily. There are two ways to alter the output widget tree.
 
 1. Use callbacks like `customStylesBuilder` or `customWidgetBuilder` for small changes
 2. Use a custom `WidgetFactory` for complete control of the rendering process
 
-The enhanced package ([flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html)) uses a custom `WidgetFactory` to handle complicated tags like IFRAME, VIDEO, etc.
+The enhanced package ([flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html)) uses a custom `WidgetFactory` with pre-built mixins for easy usage:
+
+- [fwfh_url_launcher](https://pub.dev/packages/fwfh_url_launcher)
 
 ### Callbacks
 
@@ -230,7 +233,7 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
 The HTML string is parsed into DOM elements and each element is visited once to collect `BuildMetadata` and prepare `BuildBit`s. See step by step how it works:
 
 | Step |                                                                          | Integration point                                                                                                   |
-| ---- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+|------|--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
 | 1    | Parse                                                                    | `WidgetFactory.parse(BuildMetadata)`                                                                                |
 | 2    | Inform parents if any                                                    | `BuildOp.onChild(BuildMetadata)`                                                                                    |
 | 3    | Populate default styling                                                 | `BuildOp.defaultStyles(Element)`                                                                                    |

@@ -12,6 +12,7 @@ dependencies:
   flutter_svg: ^0.20.0-0
   flutter_widget_from_html: any
   flutter_widget_from_html_core: any
+  fwfh_url_launcher: any
   fwfh_webview: any
   html: any
   http: any
@@ -20,14 +21,16 @@ dependencies:
   provider: ^5.0.0-0
   url_launcher: any
 
-dependency_overrides:               # dep_override
-  flutter_widget_from_html:         # dep_override
-    path: ../packages/enhanced      # dep_override
-  flutter_widget_from_html_core:    # dep_override
-    path: ../packages/core          # dep_override
-  fwfh_webview:                     # dep_override
-    path: ../packages/fwfh_webview  # dep_override
-  wakelock: ^0.4.0                  # dep_override
+dependency_overrides:                   # dep_override
+  flutter_widget_from_html:             # dep_override
+    path: ../packages/enhanced          # dep_override
+  flutter_widget_from_html_core:        # dep_override
+    path: ../packages/core              # dep_override
+  fwfh_url_launcher:                    # dep_override
+    path: ../packages/fwfh_url_launcher # dep_override
+  fwfh_webview:                         # dep_override
+    path: ../packages/fwfh_webview      # dep_override
+  wakelock: ^0.4.0                      # dep_override
 
 dev_dependencies:
   flutter_driver:

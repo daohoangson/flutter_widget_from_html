@@ -1,6 +1,7 @@
 part of '../core_ops.dart';
 
 const kAttributeAHref = 'href';
+const kAttributeAName = 'name';
 const kTagA = 'a';
 
 class TagA {
