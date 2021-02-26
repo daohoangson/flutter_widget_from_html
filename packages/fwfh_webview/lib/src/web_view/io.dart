@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:flutter/widgets.dart';
 import 'package:webview_flutter/webview_flutter.dart' as lib;
 
-import '../web_view.dart';
+import 'web_view.dart';
 
 class WebViewState extends State<WebView> {
   late double _aspectRatio;

@@ -17,6 +17,13 @@ set -e
 )
 
 ( \
+  cd ./packages/fwfh_webview \
+  && flutter pub get \
+  && flutter test "$@" \
+  && echo 'packages/fwfh_webview OK' \
+)
+
+( \
   cd ./demo_app \
   && flutter pub get \
   && flutter test "$@" \
