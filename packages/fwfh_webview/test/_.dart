@@ -5,7 +5,7 @@ import 'package:fwfh_webview/fwfh_webview.dart';
 
 import '../../core/test/_.dart' as helper;
 
-String? _explainer(helper.Explainer parent, Widget widget) {
+String? webViewExplainer(helper.Explainer parent, Widget widget) {
   if (widget is WebView) {
     return '[WebView:url=${widget.url}'
         ',aspectRatio=${widget.aspectRatio.toStringAsFixed(2)}'
@@ -13,8 +13,8 @@ String? _explainer(helper.Explainer parent, Widget widget) {
         "${widget.debuggingEnabled ? ',debuggingEnabled=${widget.debuggingEnabled}' : ''}"
         "${!widget.js ? ',js=${widget.js}' : ''}"
         "${widget.mediaPlaybackAlwaysAllow ? ',mediaPlaybackAlwaysAllow=${widget.mediaPlaybackAlwaysAllow}' : ''}"
-        "${widget.unsupportedWorkaroundForIssue37 ? ',unsupportedWorkaroundForIssue37=${widget.unsupportedWorkaroundForIssue37}' : ''}"
-        "${widget.unsupportedWorkaroundForIssue375 ? ',unsupportedWorkaroundForIssue375=${widget.unsupportedWorkaroundForIssue375}' : ''}"
+        "${!widget.unsupportedWorkaroundForIssue37 ? ',unsupportedWorkaroundForIssue37=${widget.unsupportedWorkaroundForIssue37}' : ''}"
+        "${!widget.unsupportedWorkaroundForIssue375 ? ',unsupportedWorkaroundForIssue375=${widget.unsupportedWorkaroundForIssue375}' : ''}"
         "${widget.userAgent?.isNotEmpty == true ? ',userAgent=${widget.userAgent}' : ''}"
         ']';
   }
@@ -30,7 +30,7 @@ Future<String> explain(
     helper.explain(
       tester,
       null,
-      explainer: _explainer,
+      explainer: webViewExplainer,
       hw: HtmlWidget(
         html,
         key: helper.hwKey,

@@ -24,17 +24,17 @@ class WidgetFactory extends core.WidgetFactory with WebViewFactory {
   HtmlWidget _widget;
 
   @override
-  bool get webView => _widget?.webView ?? false;
+  bool get webView => _widget?.webView == true;
 
   @override
-  bool get webViewDebuggingEnabled => _widget?.webViewDebuggingEnabled ?? false;
+  bool get webViewDebuggingEnabled => _widget?.webViewDebuggingEnabled == true;
 
   @override
-  bool get webViewJs => _widget?.webViewJs ?? true;
+  bool get webViewJs => _widget?.webViewJs == true;
 
   @override
   bool get webViewMediaPlaybackAlwaysAllow =>
-      _widget?.webViewMediaPlaybackAlwaysAllow ?? false;
+      _widget?.webViewMediaPlaybackAlwaysAllow == true;
 
   @override
   String get webViewUserAgent => _widget?.webViewUserAgent;

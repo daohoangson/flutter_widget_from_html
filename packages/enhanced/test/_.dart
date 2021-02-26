@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../../core/test/_.dart' as helper;
+import '../../fwfh_webview/test/_.dart' as fwfh_webview;
 
 const kDataUri = helper.kDataUri;
 
@@ -29,7 +30,7 @@ String _explainer(helper.Explainer parent, Widget widget) {
         ']';
   }
 
-  return null;
+  return fwfh_webview.webViewExplainer(parent, widget);
 }
 
 Future<String> explain(
