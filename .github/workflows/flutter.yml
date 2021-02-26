@@ -10,7 +10,7 @@ on:
       - 'tool/dartdoc/**'
 
 jobs:
-  analyze:
+  analyze1:
     name: Analyze
     runs-on: ubuntu-latest
     steps:
@@ -23,6 +23,15 @@ jobs:
         run: flutter format --dry-run --set-exit-if-changed .
       - name: Analyze core
         run: cd packages/core && flutter analyze
+  analyze2:
+    name: Analyze (secondary)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          channel: beta
       - name: Analyze enhanced
         run: cd packages/enhanced && flutter analyze
       - name: Analyze demo_app
@@ -54,10 +63,11 @@ jobs:
   ios:
     name: iOS Test
     needs:
-      - analyze
+      - analyze1
+      - analyze2
       - unit_test
     runs-on: macos-latest
-        
+
     steps:
       - uses: actions/checkout@v2
       - name: Setup Flutter
