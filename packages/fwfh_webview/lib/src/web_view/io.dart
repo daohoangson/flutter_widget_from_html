@@ -25,7 +25,7 @@ class WebViewState extends State<WebView> {
 
   @override
   Widget build(BuildContext _) {
-    final webView = _buildWebView();
+    final webView = _buildPlaceholder() ?? _buildWebView();
 
     if (widget.unsupportedWorkaroundForIssue375 && Platform.isAndroid) {
       return LayoutBuilder(
@@ -91,6 +91,14 @@ class WebViewState extends State<WebView> {
     final changed = (r - _aspectRatio).abs() > 0.0001;
     if (changed && mounted) setState(() => _aspectRatio = r);
   }
+
+  Widget? _buildPlaceholder() =>
+      Platform.environment.containsKey('FLUTTER_TEST')
+          ? const DecoratedBox(
+              child: Center(child: Text('WebView')),
+              decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, .5)),
+            )
+          : null;
 
   Widget _buildWebView() => lib.WebView(
         debuggingEnabled: widget.debuggingEnabled,

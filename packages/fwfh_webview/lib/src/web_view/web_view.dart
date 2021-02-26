@@ -1,9 +1,9 @@
-import 'dart:io' show Platform;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
-import 'fallback.dart' if (dart.library.io) 'io.dart';
+import 'fallback.dart'
+    if (dart.library.io) 'io.dart'
+    if (dart.library.html) 'html.dart';
 
 /// An embedded web view.
 class WebView extends StatefulWidget {
@@ -32,6 +32,7 @@ class WebView extends StatefulWidget {
   /// Controls whether debugging is enabled.
   ///
   /// Default: `false`.
+  /// Flutter Web: not supported.
   /// {@endtemplate}
   final bool debuggingEnabled;
 
@@ -40,14 +41,14 @@ class WebView extends StatefulWidget {
   /// This callback will be triggered on generated navigation within the web view.
   /// Returning `true` will stop web view from navigating.
   ///
-  /// Flutter Web: No.
+  /// Flutter Web: not supported.
   final bool Function(String)? interceptNavigationRequest;
 
   /// {@template web_view.js}
   /// Controls whether to enable JavaScript.
   ///
   /// Default: `true`.
-  /// Flutter Web: JavaScript is always enabled (cannot turn off).
+  /// Flutter Web: JavaScript is always enabled (no sandbox setter).
   /// {@endtemplate}
   final bool js;
 
@@ -55,6 +56,7 @@ class WebView extends StatefulWidget {
   /// Controls whether to always allow media playback.
   ///
   /// Default: `false`.
+  /// Flutter Web: not supported.
   /// {@endtemplate}
   final bool mediaPlaybackAlwaysAllow;
 
@@ -77,6 +79,8 @@ class WebView extends StatefulWidget {
 
   /// {@template web_view.userAgent}
   /// The value used for the HTTP `User-Agent` request header.
+  ///
+  /// Flutter Web: not supported.
   /// {@endtemplate}
   final String? userAgent;
 
@@ -102,18 +106,5 @@ class WebView extends StatefulWidget {
         super(key: key);
 
   @override
-  State<WebView> createState() =>
-      (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))
-          ? _WebViewPlaceholder()
-          : WebViewState();
-}
-
-class _WebViewPlaceholder extends State<WebView> {
-  @override
-  Widget build(BuildContext _) => AspectRatio(
-      aspectRatio: widget.aspectRatio,
-      child: Container(
-        child: Center(child: Text('WebView')),
-        color: Color.fromRGBO(0, 0, 0, .5),
-      ));
+  State<WebView> createState() => WebViewState();
 }
