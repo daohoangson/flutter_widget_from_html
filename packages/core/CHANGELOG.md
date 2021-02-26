@@ -1,3 +1,7 @@
+## 0.6.0-rc.2021022601
+
+- Migrate to null safety (#436, authored by @miDeb)
+
 ## 0.5.2+1
 
 - [CanvasKit] Add workaround for unimplemented `computeLineMetrics` (#441)

@@ -7,7 +7,7 @@
 A Flutter package for building Flutter widget tree from HTML with support for IFRAME, VIDEO and 70+ other tags.
 
 | [Live demo](https://html-widget-demo.now.sh/#/helloworld)                                                                     |                                                                                                                               |                                                                                                                               |
-| ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+|-------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
 | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldScreen1.jpg) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldScreen2.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldScreen3.gif) |
 
 ## Getting Started
@@ -16,7 +16,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html: ^0.5.2
+  flutter_widget_from_html: ^0.6.0
 ```
 
 ## Usage
