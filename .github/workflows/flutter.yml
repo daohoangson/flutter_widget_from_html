@@ -61,9 +61,6 @@ jobs:
           else
             ./tool/test.sh
           fi
-      - name: Submit to Codecov
-        if: matrix.channel == 'beta'
-        run: bash <(curl -s https://codecov.io/bash)
 
   ios:
     name: iOS Test
