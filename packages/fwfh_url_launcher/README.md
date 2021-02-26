@@ -1,0 +1,38 @@
+# UrlLauncherFactory
+
+![Flutter](https://github.com/daohoangson/flutter_widget_from_html/workflows/Flutter/badge.svg)
+[![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
+[![Pub](https://img.shields.io/pub/v/fwfh_webview.svg)](https://pub.dev/packages/fwfh_webview)
+
+WidgetFactory extension to launch A tag via url_launcher plugin.
+
+## Getting Started
+
+Add this to your app's `pubspec.yaml` file:
+
+```yaml
+dependencies:
+  flutter_widget_from_html_core: any
+  fwfh_url_launcher: 0.0.1
+```
+
+## Usage
+
+Then you have to configure `HtmlWidget` with a custom factory:
+
+```dart
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:fwfh_url_launcher/fwfh_url_launcher.dart';
+
+// ...
+
+HtmlWidget(
+  html,
+  factoryBuilder: () => MyWidgetFactory(),
+)
+
+// ...
+
+class MyWidgetFactory extends WidgetFactory with UrlLauncherFactory {
+}
+```

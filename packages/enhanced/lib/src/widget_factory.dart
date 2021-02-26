@@ -7,15 +7,15 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core show WidgetFactory;
+import 'package:fwfh_url_launcher/fwfh_url_launcher.dart';
 
-import 'external/url_launcher.dart';
 import 'internal/ops.dart';
 import 'data.dart';
 import 'helpers.dart';
 import 'html_widget.dart';
 
 /// A factory to build widgets with [WebView], [VideoPlayer], etc.
-class WidgetFactory extends core.WidgetFactory {
+class WidgetFactory extends core.WidgetFactory with UrlLauncherFactory {
   final _anchors = <String, GlobalKey>{};
 
   TextStyleHtml Function(TextStyleHtml, dynamic) _tagA;
@@ -215,8 +215,6 @@ class WidgetFactory extends core.WidgetFactory {
       final id = url.substring(1);
       return onTapAnchor(id, _anchors[id]?.currentContext);
     }
-
-    launchUrl(url);
   }
 
   /// Ensures anchor is visible.
