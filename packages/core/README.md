@@ -7,7 +7,7 @@
 A Flutter package for building Flutter widget tree from HTML with support for 70+ most popular tags.
 
 | [Live demo](https://html-widget-demo.now.sh/#/helloworldcore)                                                                     |                                                                                                                                   |
-| --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+|-----------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
 | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldCoreScreen1.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldCoreScreen2.gif) |
 
 ## Getting Started
@@ -16,7 +16,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html_core: ^0.5.2
+  flutter_widget_from_html_core: ^0.6.0
 ```
 
 ## Usage
@@ -230,7 +230,7 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
 The HTML string is parsed into DOM elements and each element is visited once to collect `BuildMetadata` and prepare `BuildBit`s. See step by step how it works:
 
 | Step |                                                                          | Integration point                                                                                                   |
-| ---- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+|------|--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
 | 1    | Parse                                                                    | `WidgetFactory.parse(BuildMetadata)`                                                                                |
 | 2    | Inform parents if any                                                    | `BuildOp.onChild(BuildMetadata)`                                                                                    |
 | 3    | Populate default styling                                                 | `BuildOp.defaultStyles(Element)`                                                                                    |
