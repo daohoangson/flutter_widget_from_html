@@ -42,7 +42,7 @@ Future<String> explain(
   WidgetTester tester,
   String? html, {
   bool buildFutureBuilderWithData = true,
-  String Function(Explainer, Widget)? explainer,
+  String? Function(Explainer, Widget)? explainer,
   Widget? hw,
   bool rtl = false,
   TextStyle? textStyle,
@@ -90,7 +90,7 @@ Future<String> explain(
 
 Future<String> explainWithoutPumping({
   bool buildFutureBuilderWithData = true,
-  String Function(Explainer, Widget)? explainer,
+  String? Function(Explainer, Widget)? explainer,
   bool useExplainer = true,
 }) async {
   if (!useExplainer) {
@@ -211,7 +211,7 @@ Future<int> tapText(WidgetTester tester, String data) async {
 
 class Explainer {
   final BuildContext context;
-  final String Function(Explainer, Widget)? explainer;
+  final String? Function(Explainer, Widget)? explainer;
   final TextStyle _defaultStyle;
 
   Explainer(this.context, {this.explainer})
