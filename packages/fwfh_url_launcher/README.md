@@ -5,6 +5,7 @@
 [![Pub](https://img.shields.io/pub/v/fwfh_webview.svg)](https://pub.dev/packages/fwfh_webview)
 
 WidgetFactory extension to launch A tag via url_launcher plugin.
+This is a companion add-on for [flutter_widget_from_html_core](https://pub.dev/packages/flutter_widget_from_html_core) package.
 
 ## Getting Started
 
@@ -18,7 +19,7 @@ dependencies:
 
 ## Usage
 
-Then you have to configure `HtmlWidget` with a custom factory:
+Then use `HtmlWidget` with a custom factory:
 
 ```dart
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
