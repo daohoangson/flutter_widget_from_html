@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +8,8 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 
 import 'external/url_launcher.dart';
 import 'internal/ops.dart';
+import 'internal/platform_specific/fallback.dart'
+    if (dart.library.io) 'internal/platform_specific/io.dart';
 import 'data.dart';
 import 'helpers.dart';
 import 'html_widget.dart';
@@ -197,7 +197,7 @@ class WidgetFactory extends core.WidgetFactory {
     final filePath = Uri.parse(url).toFilePath();
     if (filePath.isEmpty) return null;
 
-    return FilePicture(SvgPicture.svgByteDecoder, File(filePath));
+    return filePictureProvider(filePath);
   }
 
   /// Returns a [NetworkPicture].

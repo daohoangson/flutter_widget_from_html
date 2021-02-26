@@ -1,11 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import 'internal/core_ops.dart';
 import 'internal/core_parser.dart';
+import 'internal/platform_specific/fallback.dart'
+    if (dart.library.io) 'internal/platform_specific/io.dart';
 import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_html_widget.dart';
@@ -340,7 +340,7 @@ class WidgetFactory {
     final filePath = Uri.parse(url).toFilePath();
     if (filePath.isEmpty) return null;
 
-    return FileImage(File(filePath));
+    return fileImageProvider(filePath);
   }
 
   /// Returns a [NetworkImage].
