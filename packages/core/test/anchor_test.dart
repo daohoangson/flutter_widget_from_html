@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '_.dart';
@@ -33,6 +33,7 @@ void main() async {
     });
   });
 
+  final goldenSkip = Platform.isLinux ? null : 'Linux only';
   GoldenToolkit.runWithConfiguration(
     () {
       group('tap test', () {
@@ -47,7 +48,7 @@ void main() async {
           expect(await tapText(tester, 'Scroll down'), equals(1));
           await tester.pumpAndSettle();
           await screenMatchesGolden(tester, 'down/target');
-        }, skip: null);
+        }, skip: goldenSkip != null);
 
         testGoldens('scrolls up', (WidgetTester tester) async {
           final keyBottom = GlobalKey();
@@ -64,8 +65,8 @@ void main() async {
           expect(await tapText(tester, 'Scroll up'), equals(1));
           await tester.pumpAndSettle();
           await screenMatchesGolden(tester, 'up/target');
-        }, skip: null);
-      }, skip: Platform.isLinux ? null : 'Linux only');
+        }, skip: goldenSkip != null);
+      }, skip: goldenSkip);
     },
     config: GoldenToolkitConfiguration(
       fileNameFactory: (name) => '$kGoldenFilePrefix/anchor/$name.png',
@@ -74,9 +75,9 @@ void main() async {
 }
 
 class _AnchorTestApp extends StatelessWidget {
-  final Key keyBottom;
+  final Key? keyBottom;
 
-  _AnchorTestApp({Key key, this.keyBottom}) : super(key: key);
+  _AnchorTestApp({Key? key, this.keyBottom}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => Scaffold(

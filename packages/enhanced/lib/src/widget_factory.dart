@@ -16,8 +16,6 @@ import 'html_widget.dart';
 
 /// A factory to build widgets with [WebView], [VideoPlayer], etc.
 class WidgetFactory extends core.WidgetFactory {
-  final _anchors = <String, GlobalKey>{};
-
   TextStyleHtml Function(TextStyleHtml, dynamic) _tagA;
   BuildOp _tagIframe;
   BuildOp _tagSvg;
@@ -156,10 +154,6 @@ class WidgetFactory extends core.WidgetFactory {
       );
 
   @override
-  GestureTapCallback gestureTapCallback(String url) =>
-      url != null ? () => onTapUrl(url) : null;
-
-  @override
   Iterable<dynamic> getDependencies(BuildContext context) =>
       [...super.getDependencies(context), Theme.of(context)];
 
@@ -204,59 +198,22 @@ class WidgetFactory extends core.WidgetFactory {
   PictureProvider imageSvgFromNetwork(String url) =>
       url.isNotEmpty ? NetworkPicture(SvgPicture.svgByteDecoder, url) : null;
 
-  /// Handles user tapping a link.
-  void onTapUrl(String url) {
-    if (url == null) return;
+  @override
+  Future<bool> onTapUrl(String url) async {
+    final result = await super.onTapUrl(url);
+    if (result == true) return true;
 
-    final callback = _widget?.onTapUrl;
-    if (callback != null) return callback(url);
-
-    if (url.startsWith('#')) {
-      final id = url.substring(1);
-      return onTapAnchor(id, _anchors[id]?.currentContext);
-    }
-
-    launchUrl(url);
-  }
-
-  /// Ensures anchor is visible.
-  void onTapAnchor(String id, BuildContext anchorContext) {
-    final renderObject = anchorContext?.findRenderObject();
-    if (renderObject == null) return;
-
-    final offsetToReveal = RenderAbstractViewport.of(renderObject)
-        ?.getOffsetToReveal(renderObject, 0.0)
-        ?.offset;
-    final position = Scrollable.of(anchorContext)?.position;
-    if (offsetToReveal == null || position == null) return;
-
-    final alignment = (position.pixels > offsetToReveal)
-        ? 0.0
-        : (position.pixels < offsetToReveal ? 1.0 : null);
-    if (alignment == null) return;
-
-    position.ensureVisible(
-      renderObject,
-      alignment: alignment,
-      duration: const Duration(milliseconds: 100),
-      curve: Curves.easeIn,
-    );
+    return launchUrl(url);
   }
 
   @override
   void parse(BuildMetadata meta) {
-    final attrs = meta.element.attributes;
-
     switch (meta.element.localName) {
       case 'a':
         _tagA ??= (tsh, _) => tsh.copyWith(
             style: tsh.style
                 .copyWith(color: tsh.getDependency<ThemeData>().accentColor));
         meta.tsb.enqueue(_tagA);
-
-        if (attrs.containsKey('name')) {
-          meta.register(_anchorOp(attrs['name']));
-        }
         break;
       case kTagIframe:
         _tagIframe ??= BuildOp(onWidgets: (meta, _) {
@@ -287,34 +244,14 @@ class WidgetFactory extends core.WidgetFactory {
         break;
     }
 
-    if (attrs.containsKey('id')) {
-      meta.register(_anchorOp(attrs['id']));
-    }
-
     return super.parse(meta);
   }
 
   @override
   void reset(State state) {
-    _anchors.clear();
-
     final widget = state.widget;
     _widget = widget is HtmlWidget ? widget : null;
 
     super.reset(state);
   }
-
-  BuildOp _anchorOp(String id) => BuildOp(onTree: (meta, tree) {
-        final anchor = GlobalKey();
-        _anchors[id] = anchor;
-        tree.add(WidgetBit.inline(
-          tree,
-          WidgetPlaceholder('#$id').wrapWith(
-            (context, _) => SizedBox(
-              height: meta.tsb.build(context).style.fontSize,
-              key: anchor,
-            ),
-          ),
-        ));
-      });
 }

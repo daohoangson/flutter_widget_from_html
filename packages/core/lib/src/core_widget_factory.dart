@@ -12,6 +12,8 @@ import 'core_html_widget.dart';
 
 /// A factory to build widgets.
 class WidgetFactory {
+  final _anchors = <String, GlobalKey>{};
+
   BuildOp? _styleBgColor;
   BuildOp? _styleBlock;
   BuildOp? _styleBorder;
@@ -220,10 +222,7 @@ class WidgetFactory {
       );
 
   /// Prepares [GestureTapCallback].
-  GestureTapCallback? gestureTapCallback(String url) =>
-      () => _widget?.onTapUrl != null
-          ? _widget!.onTapUrl!(url)
-          : print('[HtmlWidget] onTapUrl($url)');
+  GestureTapCallback? gestureTapCallback(String url) => () => onTapUrl(url);
 
   /// Returns [context]-based dependencies.
   ///
@@ -350,6 +349,50 @@ class WidgetFactory {
   /// Prepares the root [TextStyleBuilder].
   void onRoot(TextStyleBuilder rootTsb) {}
 
+  /// Ensures anchor is visible.
+  Future<bool> onTapAnchor(String id, BuildContext anchorContext) async {
+    final renderObject = anchorContext.findRenderObject();
+    if (renderObject == null) return false;
+
+    final offsetToReveal = RenderAbstractViewport.of(renderObject)
+        ?.getOffsetToReveal(renderObject, 0.0)
+        .offset;
+    final position = Scrollable.of(anchorContext)?.position;
+    if (offsetToReveal == null || position == null) return false;
+
+    final alignment = (position.pixels > offsetToReveal)
+        ? 0.0
+        : (position.pixels < offsetToReveal ? 1.0 : null);
+    if (alignment == null) return false;
+
+    await position.ensureVisible(
+      renderObject,
+      alignment: alignment,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeIn,
+    );
+    return true;
+  }
+
+  /// Handles user tapping a link.
+  Future<bool> onTapUrl(String url) async {
+    final callback = _widget?.onTapUrl;
+    if (callback != null) {
+      callback(url);
+      return true;
+    }
+
+    if (url.startsWith('#')) {
+      final id = url.substring(1);
+      final anchorContext = _anchors[id]?.currentContext;
+      if (anchorContext != null) {
+        return onTapAnchor(id, anchorContext);
+      }
+    }
+
+    return false;
+  }
+
   /// Parses [meta] for build ops and text styles.
   void parse(BuildMetadata meta) {
     final attrs = meta.element.attributes;
@@ -358,6 +401,9 @@ class WidgetFactory {
       case kTagA:
         _tagA ??= TagA(this, () => _widget?.hyperlinkColor).buildOp;
         meta.register(_tagA!);
+
+        final name = attrs[kAttributeAName];
+        if (name != null) meta.register(_anchorOp(name));
         break;
 
       case 'abbr':
@@ -621,6 +667,9 @@ class WidgetFactory {
         case kAttributeDir:
           meta[kCssDirection] = attribute.value;
           break;
+        case kAttributeId:
+          meta.register(_anchorOp(attribute.value));
+          break;
       }
     }
   }
@@ -765,6 +814,8 @@ class WidgetFactory {
   /// Resets for a new build.
   @mustCallSuper
   void reset(State state) {
+    _anchors.clear();
+
     final widget = state.widget;
     _widget = widget is HtmlWidget ? widget : null;
   }
@@ -787,4 +838,18 @@ class WidgetFactory {
   TextStyleHtml Function(TextStyleHtml, String) get _tsbFontSize {
     return __tsbFontSize ??= TextStyleOps.fontSize(this);
   }
+
+  BuildOp _anchorOp(String id) => BuildOp(onTree: (meta, tree) {
+        final anchor = GlobalKey();
+        _anchors[id] = anchor;
+        tree.add(WidgetBit.inline(
+          tree,
+          WidgetPlaceholder('#$id').wrapWith(
+            (context, _) => SizedBox(
+              height: meta.tsb.build(context).style.fontSize,
+              key: anchor,
+            ),
+          ),
+        ));
+      });
 }
