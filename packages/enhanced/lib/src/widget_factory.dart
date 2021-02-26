@@ -125,13 +125,6 @@ class WidgetFactory extends core.WidgetFactory with WebViewFactory {
     );
   }
 
-  /// Builds fallback link when [HtmlWidget.webView] is disabled.
-  Widget buildWebViewLinkOnly(BuildMetadata meta, String url) =>
-      GestureDetector(
-        child: Text(url),
-        onTap: gestureTapCallback(url),
-      );
-
   @override
   GestureTapCallback gestureTapCallback(String url) =>
       url != null ? () => onTapUrl(url) : null;
