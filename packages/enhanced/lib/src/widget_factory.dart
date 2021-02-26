@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core show WidgetFactory;
+import 'package:fwfh_webview/fwfh_webview.dart';
 
 import 'external/url_launcher.dart';
 import 'internal/ops.dart';
@@ -15,13 +16,28 @@ import 'helpers.dart';
 import 'html_widget.dart';
 
 /// A factory to build widgets with [WebView], [VideoPlayer], etc.
-class WidgetFactory extends core.WidgetFactory {
+class WidgetFactory extends core.WidgetFactory with WebViewFactory {
   final _anchors = <String, GlobalKey>{};
 
   TextStyleHtml Function(TextStyleHtml, dynamic) _tagA;
-  BuildOp _tagIframe;
   BuildOp _tagSvg;
   HtmlWidget _widget;
+
+  @override
+  bool get webView => _widget?.webView ?? false;
+
+  @override
+  bool get webViewDebuggingEnabled => _widget?.webViewDebuggingEnabled ?? false;
+
+  @override
+  bool get webViewJs => _widget?.webViewJs ?? true;
+
+  @override
+  bool get webViewMediaPlaybackAlwaysAllow =>
+      _widget?.webViewMediaPlaybackAlwaysAllow ?? false;
+
+  @override
+  String get webViewUserAgent => _widget?.webViewUserAgent;
 
   bool get _isFlutterSvgSupported => !kIsWeb;
 
@@ -106,45 +122,6 @@ class WidgetFactory extends core.WidgetFactory {
       poster: posterImgSrc != null
           ? buildImage(meta, ImageMetadata(sources: [posterImgSrc]))
           : null,
-    );
-  }
-
-  /// Builds [WebView].
-  ///
-  /// JavaScript is only enabled if [HtmlWidget.webViewJs] is turned on
-  /// AND sandbox restrictions are unset (no `sandbox` attribute)
-  /// or `allow-scripts` is explicitly allowed.
-  Widget buildWebView(
-    BuildMetadata meta,
-    String url, {
-    double height,
-    List<String> sandbox,
-    double width,
-  }) {
-    if (_widget?.webView != true) return buildWebViewLinkOnly(meta, url);
-
-    final dimensOk = height != null && height > 0 && width != null && width > 0;
-    final js = _widget.webViewJs == true &&
-        (sandbox == null ||
-            sandbox.contains(kAttributeIframeSandboxAllowScripts));
-    return WebView(
-      url,
-      aspectRatio: dimensOk ? width / height : 16 / 9,
-      autoResize: !dimensOk && js,
-      debuggingEnabled: _widget.webViewDebuggingEnabled == true,
-      interceptNavigationRequest: (newUrl) {
-        if (newUrl == url) return false;
-
-        gestureTapCallback(newUrl)();
-        return true;
-      },
-      js: js,
-      mediaPlaybackAlwaysAllow: _widget.webViewMediaPlaybackAlwaysAllow == true,
-      unsupportedWorkaroundForIssue37:
-          _widget.unsupportedWebViewWorkaroundForIssue37 == true,
-      unsupportedWorkaroundForIssue375:
-          _widget.unsupportedWebViewWorkaroundForIssue375 == true,
-      userAgent: _widget.webViewUserAgent,
     );
   }
 
@@ -257,22 +234,6 @@ class WidgetFactory extends core.WidgetFactory {
         if (attrs.containsKey('name')) {
           meta.register(_anchorOp(attrs['name']));
         }
-        break;
-      case kTagIframe:
-        _tagIframe ??= BuildOp(onWidgets: (meta, _) {
-          final attrs = meta.element.attributes;
-          final src = urlFull(attrs[kAttributeIframeSrc] ?? '');
-          if (src == null) return null;
-
-          return listOrNull(buildWebView(
-            meta,
-            src,
-            height: tryParseDoubleFromMap(attrs, kAttributeIframeHeight),
-            sandbox: attrs[kAttributeIframeSandbox]?.split(RegExp(r'\s+')),
-            width: tryParseDoubleFromMap(attrs, kAttributeIframeWidth),
-          ));
-        });
-        meta.register(_tagIframe);
         break;
       case 'svg':
         if (_isFlutterSvgSupported) {
