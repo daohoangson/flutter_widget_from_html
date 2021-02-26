@@ -5,8 +5,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core show WidgetFactory;
+import 'package:fwfh_url_launcher/fwfh_url_launcher.dart';
 
-import 'external/url_launcher.dart';
 import 'internal/ops.dart';
 import 'internal/platform_specific/fallback.dart'
     if (dart.library.io) 'internal/platform_specific/io.dart';
@@ -15,7 +15,7 @@ import 'helpers.dart';
 import 'html_widget.dart';
 
 /// A factory to build widgets with [WebView], [VideoPlayer], etc.
-class WidgetFactory extends core.WidgetFactory {
+class WidgetFactory extends core.WidgetFactory with UrlLauncherFactory {
   TextStyleHtml Function(TextStyleHtml, dynamic) _tagA;
   BuildOp _tagIframe;
   BuildOp _tagSvg;
@@ -197,14 +197,6 @@ class WidgetFactory extends core.WidgetFactory {
   /// Returns a [NetworkPicture].
   PictureProvider imageSvgFromNetwork(String url) =>
       url.isNotEmpty ? NetworkPicture(SvgPicture.svgByteDecoder, url) : null;
-
-  @override
-  Future<bool> onTapUrl(String url) async {
-    final result = await super.onTapUrl(url);
-    if (result == true) return true;
-
-    return launchUrl(url);
-  }
 
   @override
   void parse(BuildMetadata meta) {
