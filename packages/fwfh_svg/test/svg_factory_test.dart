@@ -24,74 +24,76 @@ void main() {
     );
   });
 
-  testWidgets('renders asset picture', (WidgetTester tester) async {
-    final assetName = 'test/images/logo.svg';
-    final html = '<img src="asset:$assetName" />';
-    final explained = await helper.explain(tester, html);
-    expect(
-      explained,
-      equals('[CssSizing:$sizingConstraints,child='
-          '[SvgPicture:'
-          'pictureProvider=ExactAssetPicture(name: "$assetName", bundle: null, colorFilter: null)'
-          ']]'),
-    );
-  });
-
-  testWidgets('renders file picture', (WidgetTester tester) async {
-    final filePath = '${Directory.current.path}/test/images/logo.svg';
-    final html = '<img src="file://$filePath" />';
-    final explained = await helper.explain(tester, html);
-    expect(
-      explained,
-      equals('[CssSizing:$sizingConstraints,child='
-          '[SvgPicture:'
-          'pictureProvider=FilePicture("$filePath", colorFilter: null)'
-          ']]'),
-    );
-  });
-
-  group('MemoryPicture', () {
-    final explain = (WidgetTester tester, String html) => helper
-        .explain(tester, html)
-        .then((e) => e.replaceAll(RegExp(r'\(Uint8List#.+\)'), '(bytes)'));
-
-    testWidgets('renders base64', (WidgetTester tester) async {
-      final base64 = base64Encode(svgBytes);
-      final html = '<img src="data:image/svg+xml;base64,$base64" />';
-      final explained = await explain(tester, html);
+  group('IMG', () {
+    testWidgets('renders asset picture', (WidgetTester tester) async {
+      final assetName = 'test/images/logo.svg';
+      final html = '<img src="asset:$assetName" />';
+      final explained = await helper.explain(tester, html);
       expect(
-          explained,
-          equals('[CssSizing:$sizingConstraints,child='
-              '[SvgPicture:pictureProvider=MemoryPicture(bytes)]'
-              ']'));
+        explained,
+        equals('[CssSizing:$sizingConstraints,child='
+            '[SvgPicture:'
+            'pictureProvider=ExactAssetPicture(name: "$assetName", bundle: null, colorFilter: null)'
+            ']]'),
+      );
     });
 
-    testWidgets('renders utf8', (WidgetTester tester) async {
-      final utf8 = '&lt;svg viewBox=&quot;0 0 1 1&quot;&gt;&lt;/svg&gt;';
-      final html = '<img src="data:image/svg+xml;utf8,$utf8" />';
-      final explained = await explain(tester, html);
+    testWidgets('renders file picture', (WidgetTester tester) async {
+      final filePath = '${Directory.current.path}/test/images/logo.svg';
+      final html = '<img src="file://$filePath" />';
+      final explained = await helper.explain(tester, html);
       expect(
-          explained,
-          equals('[CssSizing:$sizingConstraints,child='
-              '[SvgPicture:pictureProvider=MemoryPicture(bytes)]'
-              ']'));
+        explained,
+        equals('[CssSizing:$sizingConstraints,child='
+            '[SvgPicture:'
+            'pictureProvider=FilePicture("$filePath", colorFilter: null)'
+            ']]'),
+      );
     });
-  });
 
-  testWidgets('renders network picture', (WidgetTester tester) async {
-    final src = 'http://domain.com/image.svg';
-    final html = '<img src="$src" />';
-    final explained = await HttpOverrides.runZoned(
-      () => helper.explain(tester, html),
-      createHttpClient: (_) => _createMockSvgImageHttpClient(),
-    );
-    expect(
-      explained,
-      equals('[CssSizing:$sizingConstraints,child='
-          '[SvgPicture:'
-          'pictureProvider=NetworkPicture("$src", headers: null, colorFilter: null)'
-          ']]'),
-    );
+    group('MemoryPicture', () {
+      final explain = (WidgetTester tester, String html) => helper
+          .explain(tester, html)
+          .then((e) => e.replaceAll(RegExp(r'\(Uint8List#.+\)'), '(bytes)'));
+
+      testWidgets('renders base64', (WidgetTester tester) async {
+        final base64 = base64Encode(svgBytes);
+        final html = '<img src="data:image/svg+xml;base64,$base64" />';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[CssSizing:$sizingConstraints,child='
+                '[SvgPicture:pictureProvider=MemoryPicture(bytes)]'
+                ']'));
+      });
+
+      testWidgets('renders utf8', (WidgetTester tester) async {
+        final utf8 = '&lt;svg viewBox=&quot;0 0 1 1&quot;&gt;&lt;/svg&gt;';
+        final html = '<img src="data:image/svg+xml;utf8,$utf8" />';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[CssSizing:$sizingConstraints,child='
+                '[SvgPicture:pictureProvider=MemoryPicture(bytes)]'
+                ']'));
+      });
+    });
+
+    testWidgets('renders network picture', (WidgetTester tester) async {
+      final src = 'http://domain.com/image.svg';
+      final html = '<img src="$src" />';
+      final explained = await HttpOverrides.runZoned(
+        () => helper.explain(tester, html),
+        createHttpClient: (_) => _createMockSvgImageHttpClient(),
+      );
+      expect(
+        explained,
+        equals('[CssSizing:$sizingConstraints,child='
+            '[SvgPicture:'
+            'pictureProvider=NetworkPicture("$src", headers: null, colorFilter: null)'
+            ']]'),
+      );
+    });
   });
 }
 
