@@ -11,6 +11,19 @@ final svgBytes = utf8.encode('<svg viewBox="0 0 1 1"></svg>');
 void main() {
   final sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
 
+  testWidgets('renders SVG tag', (WidgetTester tester) async {
+    final html = '''<svg height="100" width="100">
+  <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
+  Your browser does not support inline SVG.
+</svg>''';
+    final explained = await helper.explain(tester, html);
+    expect(
+      explained.replaceAll(RegExp(r'String#[^,]+,'), 'String,'),
+      equals(
+          '[SvgPicture:pictureProvider=StringPicture(String, colorFilter: null)]'),
+    );
+  });
+
   testWidgets('renders asset picture', (WidgetTester tester) async {
     final assetName = 'test/images/logo.svg';
     final html = '<img src="asset:$assetName" />';
