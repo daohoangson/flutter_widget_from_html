@@ -199,7 +199,7 @@ class WidgetFactory {
   Widget buildSelectableText(
           BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) =>
       SelectableText.rich(
-        text,
+        TextSpan(children: [text]),
         textAlign: tsh?.textAlign ?? TextAlign.start,
         textDirection: tsh?.textDirection ?? TextDirection.ltr,
         maxLines: tsh?.maxLines == -1 ? null : tsh?.maxLines,

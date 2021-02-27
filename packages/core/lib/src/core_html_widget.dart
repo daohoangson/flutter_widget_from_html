@@ -88,6 +88,7 @@ class HtmlWidget extends StatefulWidget {
   /// The default styling for text elements.
   final TextStyle textStyle;
 
+  /// The default selectable text options.
   final bool isSelectableText;
 
   /// Creates a widget that builds Flutter widget tree from html.
