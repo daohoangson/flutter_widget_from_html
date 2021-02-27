@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart' as core show HtmlWidget, RebuildTriggers;
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
+    as core show HtmlWidget, RebuildTriggers;
 
 import 'data.dart';
 import 'helpers.dart';
@@ -93,11 +94,12 @@ class HtmlWidget extends core.HtmlWidget {
   static WidgetFactory _getEnhancedWf() => WidgetFactory();
 }
 
-Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) => snapshot.hasData
-    ? snapshot.data
-    : const Center(
-        child: Padding(
-          child: CircularProgressIndicator(),
-          padding: EdgeInsets.all(8),
-        ),
-      );
+Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
+    snapshot.hasData
+        ? snapshot.data
+        : const Center(
+            child: Padding(
+              child: CircularProgressIndicator(),
+              padding: EdgeInsets.all(8),
+            ),
+          );
