@@ -4,6 +4,8 @@ set -e
 cd $( dirname $( dirname $( dirname ${BASH_SOURCE[0]})))
 _pwd=$( pwd )
 
+flutter --version
+
 _sylphPath=/tmp/sylph-src
 mkdir $_sylphPath && cd $_sylphPath
 git init && git remote add origin https://github.com/daohoangson/sylph.git
@@ -14,22 +16,19 @@ pub global activate --source path $_sylphPath
 cd "$_pwd/demo_app"
 
 _ref=$( git log -n 1 --pretty=format:%H )
-{ \
-  cat pubspec.yaml | grep -v 'dep_override'; \
-  echo; \
-  echo 'dependency_overrides:'; \
-  echo '  flutter_widget_from_html:'; \
-  echo '    git:'; \
-  echo '      url: git://github.com/daohoangson/flutter_widget_from_html.git'; \
-  echo "      ref: $_ref"; \
-  echo '      path: packages/enhanced'; \
-  echo '  flutter_widget_from_html_core:'; \
-  echo '    git:'; \
-  echo '      url: git://github.com/daohoangson/flutter_widget_from_html.git'; \
-  echo "      ref: $_ref"; \
-  echo '      path: packages/core'; \
-} | tee pubspec.yaml.bak \
-  && mv -f pubspec.yaml.bak pubspec.yaml
+_updateDep() {
+  __yaml='pubspec.yaml'
+  __package=$1
+  __path=${2:-"packages/$__package"}
+  yq e ".dependency_overrides.$__package.git.url = \"git://github.com/daohoangson/flutter_widget_from_html.git\"" -i $__yaml
+  yq e ".dependency_overrides.$__package.git.ref = \"$_ref\"" -i $__yaml
+  yq e ".dependency_overrides.$__package.git.path = \"$__path\"" -i $__yaml
+  yq e "del(.dependency_overrides.$__package.path)" -i $__yaml
+}
+_updateDep 'flutter_widget_from_html' 'packages/enhanced'
+_updateDep 'flutter_widget_from_html_core' 'packages/core'
+_updateDep 'fwfh_url_launcher'
+_updateDep 'fwfh_webview'
 
 flutter pub get
 
