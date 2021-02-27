@@ -124,7 +124,8 @@ class _HtmlWidgetState extends State<HtmlWidget> {
   _RootTsb _rootTsb;
   WidgetFactory _wf;
 
-  bool get buildAsync => widget.buildAsync ?? widget.html.length > kShouldBuildAsync;
+  bool get buildAsync =>
+      widget.buildAsync ?? widget.html.length > kShouldBuildAsync;
 
   bool get enableCaching => widget.enableCaching ?? !buildAsync;
 
@@ -206,7 +207,8 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     return built;
   }
 
-  Widget _tshWidget(Widget child) => TshWidget(child: child, tsh: _rootTsb._output);
+  Widget _tshWidget(Widget child) =>
+      TshWidget(child: child, tsh: _rootTsb._output);
 }
 
 class _RootTsb extends TextStyleBuilder {
@@ -233,14 +235,15 @@ class _RootTsb extends TextStyleBuilder {
   void reset() => _output = null;
 }
 
-Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) => snapshot.hasData
-    ? snapshot.data
-    : const Center(
-        child: Padding(
-          child: Text('Loading...'),
-          padding: EdgeInsets.all(8),
-        ),
-      );
+Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
+    snapshot.hasData
+        ? snapshot.data
+        : const Center(
+            child: Padding(
+              child: Text('Loading...'),
+              padding: EdgeInsets.all(8),
+            ),
+          );
 
 Widget _buildBody(_HtmlWidgetState state, dom.NodeList domNodes) {
   final rootMeta = state._rootMeta;
