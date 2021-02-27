@@ -10,6 +10,13 @@ set -e
 )
 
 ( \
+  cd ./packages/fwfh_svg \
+  && flutter pub get \
+  && flutter test "$@" \
+  && echo 'packages/fwfh_svg OK' \
+)
+
+( \
   cd ./packages/enhanced \
   && flutter pub get \
   && flutter test "$@" \

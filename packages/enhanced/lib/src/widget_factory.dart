@@ -1,27 +1,22 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core show WidgetFactory;
+import 'package:fwfh_svg/fwfh_svg.dart';
 import 'package:fwfh_url_launcher/fwfh_url_launcher.dart';
 
 import 'internal/ops.dart';
-import 'internal/platform_specific/fallback.dart'
-    if (dart.library.io) 'internal/platform_specific/io.dart';
 import 'data.dart';
 import 'helpers.dart';
 import 'html_widget.dart';
 
 /// A factory to build widgets with [WebView], [VideoPlayer], etc.
-class WidgetFactory extends core.WidgetFactory with UrlLauncherFactory {
+class WidgetFactory extends core.WidgetFactory
+    with SvgFactory, UrlLauncherFactory {
   TextStyleHtml Function(TextStyleHtml, dynamic) _tagA;
   BuildOp _tagIframe;
-  BuildOp _tagSvg;
   HtmlWidget _widget;
-
-  bool get _isFlutterSvgSupported => !kIsWeb;
 
   /// Builds [Divider].
   @override
@@ -42,43 +37,6 @@ class WidgetFactory extends core.WidgetFactory with UrlLauncherFactory {
     }
 
     return built;
-  }
-
-  @override
-  Widget buildImageWidget(
-    BuildMetadata meta, {
-    String semanticLabel,
-    @required String url,
-  }) {
-    PictureProvider provider;
-    if (_isFlutterSvgSupported) {
-      if (url.startsWith('data:image/svg+xml')) {
-        provider = imageSvgFromDataUri(url);
-      } else if (Uri.tryParse(url)?.path?.toLowerCase()?.endsWith('.svg') ==
-          true) {
-        if (url.startsWith('asset:')) {
-          provider = imageSvgFromAsset(url);
-        } else if (url.startsWith('file:')) {
-          provider = imageSvgFromFileUri(url);
-        } else {
-          provider = imageSvgFromNetwork(url);
-        }
-      }
-    }
-
-    if (provider == null) {
-      return super.buildImageWidget(
-        meta,
-        semanticLabel: semanticLabel,
-        url: url,
-      );
-    }
-
-    return SvgPicture(
-      provider,
-      excludeFromSemantics: semanticLabel == null,
-      semanticsLabel: semanticLabel,
-    );
   }
 
   /// Builds [VideoPlayer].
@@ -161,43 +119,6 @@ class WidgetFactory extends core.WidgetFactory with UrlLauncherFactory {
   ImageProvider imageProviderFromNetwork(String url) =>
       url?.isNotEmpty == true ? CachedNetworkImageProvider(url) : null;
 
-  /// Returns an [ExactAssetPicture].
-  PictureProvider imageSvgFromAsset(String url) {
-    final uri = Uri.parse(url);
-    final assetName = uri.path;
-    if (assetName?.isNotEmpty != true) return null;
-
-    final package = uri.queryParameters?.containsKey('package') == true
-        ? uri.queryParameters['package']
-        : null;
-
-    return ExactAssetPicture(
-      SvgPicture.svgStringDecoder,
-      assetName,
-      package: package,
-    );
-  }
-
-  /// Returns a [MemoryPicture].
-  PictureProvider imageSvgFromDataUri(String dataUri) {
-    final bytes = bytesFromDataUri(dataUri);
-    if (bytes == null) return null;
-
-    return MemoryPicture(SvgPicture.svgByteDecoder, bytes);
-  }
-
-  /// Returns a [FilePicture].
-  PictureProvider imageSvgFromFileUri(String url) {
-    final filePath = Uri.parse(url).toFilePath();
-    if (filePath.isEmpty) return null;
-
-    return filePictureProvider(filePath);
-  }
-
-  /// Returns a [NetworkPicture].
-  PictureProvider imageSvgFromNetwork(String url) =>
-      url.isNotEmpty ? NetworkPicture(SvgPicture.svgByteDecoder, url) : null;
-
   @override
   void parse(BuildMetadata meta) {
     switch (meta.element.localName) {
@@ -222,14 +143,6 @@ class WidgetFactory extends core.WidgetFactory with UrlLauncherFactory {
           ));
         });
         meta.register(_tagIframe);
-        break;
-      case 'svg':
-        if (_isFlutterSvgSupported) {
-          _tagSvg ??= BuildOp(
-            onWidgets: (meta, _) => [SvgPicture.string(meta.element.outerHtml)],
-          );
-          meta.register(_tagSvg);
-        }
         break;
       case kTagVideo:
         meta.register(TagVideo(this, meta).op);

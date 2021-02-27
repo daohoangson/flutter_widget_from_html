@@ -13,8 +13,8 @@ dependencies:
   chewie: ^0.12.2
   flutter:
     sdk: flutter
-  flutter_svg: ^0.20.0-0
   flutter_widget_from_html_core: ^0.6.0-0
+  fwfh_svg: ^0.6.0-0
   fwfh_url_launcher: ^0.6.0-0
   html: ^0.15.0
   video_player: ">=0.10.12 <2.0.0"
@@ -23,6 +23,8 @@ dependencies:
 dependency_overrides:
   flutter_widget_from_html_core:
     path: ../core
+  fwfh_svg:
+    path: ../fwfh_svg
   fwfh_url_launcher:
     path: ../fwfh_url_launcher
   wakelock: ^0.4.0
@@ -31,7 +33,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   golden_toolkit: any
-  mockito: any
   network_image_mock: any
   pedantic: any
 
