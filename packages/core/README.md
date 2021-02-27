@@ -134,6 +134,7 @@ This package implements widget building logic with high testing coverage to ensu
 
 The enhanced package ([flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html)) uses a custom `WidgetFactory` with pre-built mixins for easy usage:
 
+- [fwfh_svg](https://pub.dev/packages/fwfh_svg)
 - [fwfh_url_launcher](https://pub.dev/packages/fwfh_url_launcher)
 
 ### Callbacks

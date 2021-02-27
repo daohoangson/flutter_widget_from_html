@@ -14,6 +14,7 @@ A Flutter package for building Flutter widget tree from HTML with support for
 This package supports most common HTML tags for easy usage.
 If you don't want to include all of its dependencies in your build, it's possible to use [flutter_widget_from_html_core](https://pub.dev/packages/flutter_widget_from_html_core) with a subset of the mixins to control your app size:
 
+- [fwfh_svg](https://pub.dev/packages/fwfh_svg)
 - [fwfh_url_launcher](https://pub.dev/packages/fwfh_url_launcher)
 
 ## Getting Started
