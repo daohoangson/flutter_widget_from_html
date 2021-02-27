@@ -131,7 +131,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
   @override
   void initState() {
     super.initState();
-
+    // TODO: this.widget
     _rootTsb = _RootTsb(this);
     _rootMeta = builder.BuildMetadata(null, _rootTsb);
     _wf = widget.factoryBuilder?.call() ?? WidgetFactory();

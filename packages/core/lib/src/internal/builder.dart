@@ -266,7 +266,7 @@ class BuildTree extends core_data.BuildTree {
           return span.child;
         }
 
-        return wf.buildText(parentMeta, tsh, span);
+         return tsb.parent.isSelectableText ? wf.buildSelectableText(parentMeta, tsh, span) : wf.buildText(parentMeta, tsh, span);
       }));
     }
 
