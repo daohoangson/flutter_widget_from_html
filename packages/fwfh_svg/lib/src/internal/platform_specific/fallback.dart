@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-PictureProvider? exactAssetPictureProvider(String assetName, String? package) =>
+PictureProvider? assetPictureProvider(String assetName, String? package) =>
     null;
 
 PictureProvider? memoryPictureProvider(Uint8List bytes) => null;

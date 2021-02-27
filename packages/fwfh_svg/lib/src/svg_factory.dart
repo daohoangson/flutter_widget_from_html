@@ -49,11 +49,7 @@ mixin SvgFactory on WidgetFactory {
     final assetName = uri.path;
     if (assetName.isEmpty) return null;
 
-    final package = uri.queryParameters.containsKey('package')
-        ? uri.queryParameters['package']
-        : null;
-
-    return exactAssetPictureProvider(assetName, package);
+    return assetPictureProvider(assetName, uri.queryParameters['package']);
   }
 
   /// Returns a [MemoryPicture].
