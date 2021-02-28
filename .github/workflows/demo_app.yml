@@ -1,10 +1,9 @@
 name: Demo
 on:
   push:
-    paths:
-      - .github/workflows/demo_app.yml
-      - "demo_app/**"
-      - "packages/**"
+    branches:
+      - master
+  pull_request:
 
 jobs:
   apk:
