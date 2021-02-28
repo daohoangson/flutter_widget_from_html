@@ -1,10 +1,9 @@
 name: Demo
 on:
   push:
-    paths:
-      - .github/workflows/demo_app.yml
-      - "demo_app/**"
-      - "packages/**"
+    branches:
+      - master
+  pull_request:
 
 jobs:
   apk:
@@ -37,6 +36,8 @@ jobs:
     defaults:
       run:
         working-directory: demo_app
+    environment:
+      name: vercel
 
     steps:
       - uses: actions/checkout@v2
@@ -84,7 +85,7 @@ jobs:
             echo '}'; \
           } > ./now.json
 
-          mkdir -p ./.now && echo '${{ secrets.DEMO_APP_PROJECT_JSON }}' > ./.now/project.json
+          mkdir -p ./.now && echo '${{ secrets.EXAMPLE_PROJECT_JSON }}' > ./.now/project.json
 
           if [ $GITHUB_REF == 'refs/heads/master' ]; then
             _url=$( now  --prod --token ${{ secrets.ZEIT_TOKEN }} )

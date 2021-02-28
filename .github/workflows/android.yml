@@ -7,15 +7,12 @@ on:
       - packages/enhanced/lib/src/widgets/web_view.dart
       - 'packages/enhanced/lib/src/widgets/web_view/**'
       - 'tool/sylph/**'
-  workflow_dispatch:
 
 jobs:
   sylph:
-    env:
-      AWS_ACCESS_KEY_ID: AKIAY43IFJQXPIU46LXP
-      AWS_DEFAULT_REGION: us-west-2
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.DEVICE_FARM_SECRET_ACCESS_KEY }}
     runs-on: ubuntu-latest
+    environment:
+      name: aws
 
     steps:
       - uses: actions/checkout@v2
@@ -24,6 +21,10 @@ jobs:
         with:
           channel: beta
       - name: Run sylph.sh
+        env:
+          AWS_ACCESS_KEY_ID: AKIAY43IFJQXLQIQNSY4
+          AWS_DEFAULT_REGION: us-west-2
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           set -e
 
