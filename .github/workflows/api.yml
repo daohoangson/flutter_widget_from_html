@@ -7,10 +7,12 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: api
+    environment:
+      name: vercel
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
