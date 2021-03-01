@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:demo_app/screens/golden.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
@@ -11,7 +12,10 @@ void _test(String name, String html) => testGoldens(name, (tester) async {
 
       await tester.pumpWidgetBuilder(
         Golden(name, html, targetKey: key),
-        wrapper: materialAppWrapper(theme: ThemeData.light()),
+        wrapper: materialAppWrapper(
+          platform: TargetPlatform.linux,
+          theme: ThemeData.light(),
+        ),
         surfaceSize: Size(400, 1200),
       );
 

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:webview_flutter/webview_flutter.dart' as lib;
 
 import '_.dart';
 
@@ -28,9 +29,9 @@ void main() {
   group('useExplainer: false', () {
     final html = '<iframe src="$src"></iframe>';
     final _explain = (WidgetTester tester) async {
+      lib.WebView.platform = null;
       final explained = await explain(tester, html, useExplainer: false);
-      return explained.replaceAll(
-          RegExp(r'WebView\(state: WebViewState#\w+\)'), 'WebView()');
+      return explained;
     };
 
     testWidgets('renders web view (Android)', (tester) async {
@@ -40,13 +41,18 @@ void main() {
           explained,
           equals('TshWidget\n'
               '└WidgetPlaceholder<Widget>(WebView)\n'
-              ' └WebView()\n'
+              ' └WebView(state: WebViewState)\n'
               '  └LayoutBuilder()\n'
               '   └SizedBox(width: 800.0, height: 450.0)\n'
-              '    └DecoratedBox(bg: BoxDecoration(color: Color(0x7f000000)))\n'
-              '     └Center(alignment: center)\n'
-              '      └Text("FLUTTER_TEST=true")\n'
-              '       └RichText(text: "FLUTTER_TEST=true")\n'
+              "    └WebView-[<'$src'>](state: _WebViewState)\n"
+              '     └GestureDetector(startBehavior: start)\n'
+              '      └RawGestureDetector(...)\n'
+              '       └Listener(...)\n'
+              '        └AndroidView(state: _AndroidViewState)\n'
+              '         └Focus(...)\n'
+              '          └_FocusMarker\n'
+              '           └Semantics(...)\n'
+              '            └_AndroidPlatformView()\n'
               '\n'));
       debugDefaultTargetPlatformOverride = null;
     });
@@ -58,12 +64,28 @@ void main() {
           explained,
           equals('TshWidget\n'
               '└WidgetPlaceholder<Widget>(WebView)\n'
-              ' └WebView()\n'
+              ' └WebView(state: WebViewState)\n'
+              '  └AspectRatio(aspectRatio: 1.8)\n'
+              "   └WebView-[<'$src'>](state: _WebViewState)\n"
+              '    └UiKitView(state: _UiKitViewState)\n'
+              '     └SizedBox.expand()\n'
+              '\n'));
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('renders web view (linux)', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.linux;
+      final explained = await _explain(tester);
+      expect(
+          explained,
+          equals('TshWidget\n'
+              '└WidgetPlaceholder<Widget>(WebView)\n'
+              ' └WebView(state: WebViewState)\n'
               '  └AspectRatio(aspectRatio: 1.8)\n'
               '   └DecoratedBox(bg: BoxDecoration(color: Color(0x7f000000)))\n'
               '    └Center(alignment: center)\n'
-              '     └Text("FLUTTER_TEST=true")\n'
-              '      └RichText(text: "FLUTTER_TEST=true")\n'
+              '     └Text("platform=TargetPlatform.linux")\n'
+              '      └RichText(text: "platform=TargetPlatform.linux")\n'
               '\n'));
       debugDefaultTargetPlatformOverride = null;
     });

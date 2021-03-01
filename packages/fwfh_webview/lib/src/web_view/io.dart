@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -25,10 +24,11 @@ class WebViewState extends State<WebView> {
 
   @override
   Widget build(BuildContext context) {
-    final webView = _buildPlaceholder() ?? _buildWebView();
+    final platform = Theme.of(context).platform;
+    final webView = _buildPlaceholder(platform) ?? _buildWebView();
 
     if (widget.unsupportedWorkaroundForIssue375 &&
-        Theme.of(context).platform == TargetPlatform.android) {
+        platform == TargetPlatform.android) {
       return LayoutBuilder(
         builder: (context, constraints) {
           final width = constraints.hasBoundedWidth
@@ -93,15 +93,13 @@ class WebViewState extends State<WebView> {
     if (changed && mounted) setState(() => _aspectRatio = r);
   }
 
-  Widget? _buildPlaceholder() {
-    final flutterTest = Platform.environment['FLUTTER_TEST'];
-    return flutterTest != null
-        ? DecoratedBox(
-            child: Center(child: Text('FLUTTER_TEST=$flutterTest')),
-            decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, .5)),
-          )
-        : null;
-  }
+  Widget? _buildPlaceholder(TargetPlatform platform) =>
+      platform == TargetPlatform.android || platform == TargetPlatform.iOS
+          ? null
+          : DecoratedBox(
+              child: Center(child: Text('platform=$platform')),
+              decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, .5)),
+            );
 
   Widget _buildWebView() => lib.WebView(
         debuggingEnabled: widget.debuggingEnabled,

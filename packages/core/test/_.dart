@@ -99,6 +99,7 @@ Future<String> explainWithoutPumping({
         (e) => sb.writeln(e.toDiagnosticsNode().toStringDeep()));
     var str = sb.toString();
     str = str.replaceAll(RegExp(r': [A-Z][A-Za-z]+\.'), ': '); // enums
+    str = str.replaceAll(RegExp(r'State#\w+'), 'State'); // states
 
     // dependencies
     str = str.replaceAll(RegExp(r'\[GlobalKey#[0-9a-f]+\]'), '');
@@ -109,6 +110,13 @@ Future<String> explainWithoutPumping({
         RegExp(r'ImageStream#[0-9a-f]+\([^\)]+\)'), 'ImageStream');
     str = str.replaceAll(
         RegExp(r'(, )?state: _ImageState#[0-9a-f]+\([^\)]+\)'), '');
+
+    // simplify complicated widgets
+    str = str.replaceAll(RegExp(r'Focus\(.+\)\n'), 'Focus(...)\n');
+    str = str.replaceAll(RegExp(r'Listener\(.+\)\n'), 'Listener(...)\n');
+    str = str.replaceAll(
+        RegExp(r'RawGestureDetector\(.+\)\n'), 'RawGestureDetector(...)\n');
+    str = str.replaceAll(RegExp(r'Semantics\(.+\)\n'), 'Semantics(...)\n');
 
     // trim boring properties
     str =
