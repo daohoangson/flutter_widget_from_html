@@ -6,20 +6,26 @@ on:
       - packages/enhanced/lib/src/widgets/video_player.dart
       - 'packages/fwfh_webview/lib/src/widget/**'
       - 'tool/sylph/**'
-  workflow_dispatch:
 
 jobs:
   sylph:
-    env:
-      AWS_ACCESS_KEY_ID: AKIAY43IFJQXPIU46LXP
-      AWS_DEFAULT_REGION: us-west-2
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.DEVICE_FARM_SECRET_ACCESS_KEY }}
+    if: ${{ false }}
+    environment:
+      name: aws
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
-        with:
-          channel: beta
-      - run: ./tool/sylph/sylph.sh
+      - name: Run sylph.sh
+        env:
+          AWS_ACCESS_KEY_ID: AKIAY43IFJQXLQIQNSY4
+          AWS_DEFAULT_REGION: us-west-2
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          set -e
+
+          brew install yq
+
+          exec ./tool/sylph/sylph.sh
