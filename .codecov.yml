@@ -10,6 +10,5 @@ coverage:
 
 ignore:
   - "demo_app"
-  - "packages/enhanced/lib/src/external/"
   - "packages/enhanced/lib/src/widgets/video_player.dart"
   - "packages/enhanced/lib/src/widgets/web_view"
