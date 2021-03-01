@@ -12,6 +12,7 @@ import 'core_data.dart';
 import 'core_widget_factory.dart';
 import 'internal/tsh_widget.dart';
 
+
 /// A widget that builds Flutter widget tree from HTML
 /// (supports most popular tags and stylings).
 class HtmlWidget extends StatefulWidget {
