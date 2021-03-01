@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  analyze1:
+  analyze:
     name: Analyze
     runs-on: ubuntu-latest
     steps:
@@ -25,15 +25,6 @@ jobs:
         run: cd packages/fwfh_url_launcher && flutter analyze
       - name: Analyze fwfh_webview
         run: cd packages/fwfh_webview && flutter analyze
-  analyze2:
-    name: Analyze (secondary)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v1
-        with:
-          channel: beta
       - name: Analyze enhanced
         run: cd packages/enhanced && flutter analyze
       - name: Analyze demo_app
@@ -42,7 +33,6 @@ jobs:
   unit_test:
     name: Unit test
     runs-on: ubuntu-latest
-        
     steps:
       - uses: actions/checkout@v2
       - name: Setup Flutter
@@ -54,12 +44,7 @@ jobs:
 
   ios:
     name: iOS Test
-    needs:
-      - analyze1
-      - analyze2
-      - unit_test
     runs-on: macos-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Setup Flutter
