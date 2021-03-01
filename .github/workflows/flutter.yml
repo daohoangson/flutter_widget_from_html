@@ -37,11 +37,11 @@ jobs:
 
   unit_test:
     name: Unit test
+    continue-on-error: ${{ matrix.channel != 'beta' }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         channel: [beta]
-    continue-on-error: ${{ matrix.channel != 'beta' }}
-    runs-on: ubuntu-latest
         
     steps:
       - uses: actions/checkout@v2

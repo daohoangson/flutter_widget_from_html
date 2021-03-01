@@ -10,10 +10,10 @@ on:
 
 jobs:
   sylph:
-    runs-on: ubuntu-latest
     if: ${{ github.repository_owner == 'daohoangson' }}
     environment:
       name: aws
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2

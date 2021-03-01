@@ -32,13 +32,13 @@ jobs:
 
   web:
     name: Deploy Web
-    runs-on: ubuntu-latest
     if: ${{ github.repository_owner == 'daohoangson' }}
     defaults:
       run:
         working-directory: demo_app
     environment:
       name: vercel
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2

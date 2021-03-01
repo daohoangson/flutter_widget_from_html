@@ -7,13 +7,13 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
     if: ${{ github.repository_owner == 'daohoangson' }}
     defaults:
       run:
         working-directory: api
     environment:
       name: vercel
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
