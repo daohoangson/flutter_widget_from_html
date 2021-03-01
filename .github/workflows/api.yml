@@ -7,7 +7,6 @@ on:
 
 jobs:
   deploy:
-    if: ${{ github.repository_owner == 'daohoangson' }}
     defaults:
       run:
         working-directory: api

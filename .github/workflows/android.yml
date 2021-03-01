@@ -10,7 +10,7 @@ on:
 
 jobs:
   sylph:
-    if: ${{ github.repository_owner == 'daohoangson' && false }}
+    if: ${{ false }}
     environment:
       name: aws
     runs-on: ubuntu-latest
