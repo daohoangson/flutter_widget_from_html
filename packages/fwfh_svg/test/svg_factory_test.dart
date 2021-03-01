@@ -56,6 +56,12 @@ void main() {
           .explain(tester, html)
           .then((e) => e.replaceAll(RegExp(r'\(Uint8List#.+\)'), '(bytes)'));
 
+      testWidgets('renders bad data uri', (WidgetTester tester) async {
+        final html = '<img src="data:image/svg+xml;xxx" />';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[widget0]'));
+      });
+
       testWidgets('renders base64', (WidgetTester tester) async {
         final base64 = base64Encode(svgBytes);
         final html = '<img src="data:image/svg+xml;base64,$base64" />';
