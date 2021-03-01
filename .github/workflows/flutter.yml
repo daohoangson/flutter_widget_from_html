@@ -37,26 +37,16 @@ jobs:
 
   unit_test:
     name: Unit test
-    continue-on-error: ${{ matrix.channel != 'beta' }}
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        channel: [beta]
         
     steps:
       - uses: actions/checkout@v2
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
-          channel: ${{ matrix.channel }}
-      - name: Run ./tool/test.sh
-        run: |
-          if [ "${{ matrix.channel }}" == "beta" ]; then
-            ./tool/test.sh --coverage
-            bash <(curl -s https://codecov.io/bash)
-          else
-            ./tool/test.sh
-          fi
+          channel: beta
+      - run: ./tool/test.sh --coverage
+      - run: bash <(curl -s https://codecov.io/bash)
 
   ios:
     name: iOS Test
