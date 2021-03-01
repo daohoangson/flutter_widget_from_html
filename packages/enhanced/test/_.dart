@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../../core/test/_.dart' as helper;
+import '../../fwfh_svg/test/_.dart' as fwfh_svg;
 import '../../fwfh_webview/test/_.dart' as fwfh_webview;
 
 const kDataUri = helper.kDataUri;
@@ -15,10 +15,6 @@ final hwKey = helper.hwKey;
 final buildCurrentState = helper.buildCurrentState;
 
 String _explainer(helper.Explainer parent, Widget widget) {
-  if (widget is SvgPicture) {
-    return '[SvgPicture:pictureProvider=${widget.pictureProvider}]';
-  }
-
   if (widget is VideoPlayer) {
     return '[VideoPlayer:url=${widget.url}'
         ',aspectRatio=${widget.aspectRatio.toStringAsFixed(2)}'
@@ -30,7 +26,8 @@ String _explainer(helper.Explainer parent, Widget widget) {
         ']';
   }
 
-  return fwfh_webview.webViewExplainer(parent, widget);
+  return fwfh_svg.svgExplainer(parent, widget) ??
+      fwfh_webview.webViewExplainer(parent, widget);
 }
 
 Future<String> explain(

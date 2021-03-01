@@ -9,7 +9,6 @@ dependencies:
   carousel_slider: ^2.2.1
   flutter:
     sdk: flutter
-  flutter_svg: ^0.20.0-0
   flutter_widget_from_html: any
   flutter_widget_from_html_core: any
   fwfh_url_launcher: any
@@ -26,6 +25,8 @@ dependency_overrides:
     path: ../packages/enhanced
   flutter_widget_from_html_core:
     path: ../packages/core
+  fwfh_svg:
+    path: ../packages/fwfh_svg
   fwfh_url_launcher:
     path: ../packages/fwfh_url_launcher
   fwfh_webview:
