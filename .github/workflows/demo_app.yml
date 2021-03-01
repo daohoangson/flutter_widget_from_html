@@ -32,7 +32,7 @@ jobs:
 
   web:
     name: Deploy Web
-    if: ${{ github.repository_owner == 'daohoangson' }}
+    if: ${{ github.actor == 'daohoangson' }}
     defaults:
       run:
         working-directory: demo_app
