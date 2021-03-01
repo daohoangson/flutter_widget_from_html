@@ -136,6 +136,7 @@ The enhanced package ([flutter_widget_from_html](https://pub.dev/packages/flutte
 
 - [fwfh_svg](https://pub.dev/packages/fwfh_svg)
 - [fwfh_url_launcher](https://pub.dev/packages/fwfh_url_launcher)
+- [fwfh_webview](https://pub.dev/packages/fwfh_webview)
 
 ### Callbacks
 

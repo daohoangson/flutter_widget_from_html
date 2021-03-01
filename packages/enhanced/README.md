@@ -16,6 +16,7 @@ If you don't want to include all of its dependencies in your build, it's possibl
 
 - [fwfh_svg](https://pub.dev/packages/fwfh_svg)
 - [fwfh_url_launcher](https://pub.dev/packages/fwfh_url_launcher)
+- [fwfh_webview](https://pub.dev/packages/fwfh_webview)
 
 ## Getting Started
 

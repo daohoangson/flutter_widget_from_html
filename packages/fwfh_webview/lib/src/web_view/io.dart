@@ -1,32 +1,34 @@
-import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart' as lib;
 
-import '../web_view.dart';
+import 'web_view.dart';
 
 class WebViewState extends State<WebView> {
-  double _aspectRatio;
-  _Issue37 _issue37;
-  lib.WebViewController _wvc;
-
-  String _firstFinishedUrl;
+  late double _aspectRatio;
+  String? _firstFinishedUrl;
+  _Issue37? _issue37;
+  lib.WebViewController? _wvc;
 
   @override
   void initState() {
     super.initState();
     _aspectRatio = widget.aspectRatio;
 
-    if (widget.unsupportedWorkaroundForIssue37 == true) {
+    if (widget.unsupportedWorkaroundForIssue37) {
       _issue37 = _Issue37(this);
-      WidgetsBinding.instance.addObserver(_issue37);
+      WidgetsBinding.instance?.addObserver(_issue37!);
     }
   }
 
   @override
-  Widget build(BuildContext _) {
-    if (widget.unsupportedWorkaroundForIssue375 == true) {
+  Widget build(BuildContext context) {
+    final platform = Theme.of(context).platform;
+    final webView = _buildPlaceholder(platform) ?? _buildWebView();
+
+    if (widget.unsupportedWorkaroundForIssue375 &&
+        platform == TargetPlatform.android) {
       return LayoutBuilder(
         builder: (context, constraints) {
           final width = constraints.hasBoundedWidth
@@ -34,15 +36,13 @@ class WebViewState extends State<WebView> {
               : MediaQuery.of(context).size.width;
           final height = width / _aspectRatio;
           return SizedBox(
-            child: _buildWebView(),
-            height: Platform.isAndroid
-                ? min(
-                    height,
-                    constraints.hasBoundedHeight
-                        ? constraints.maxHeight
-                        : MediaQuery.of(context).size.height,
-                  )
-                : height,
+            child: webView,
+            height: min(
+              height,
+              constraints.hasBoundedHeight
+                  ? constraints.maxHeight
+                  : MediaQuery.of(context).size.height,
+            ),
             width: width,
           );
         },
@@ -51,7 +51,7 @@ class WebViewState extends State<WebView> {
 
     return AspectRatio(
       aspectRatio: _aspectRatio,
-      child: _buildWebView(),
+      child: webView,
     );
   }
 
@@ -59,7 +59,7 @@ class WebViewState extends State<WebView> {
   void deactivate() {
     super.deactivate();
 
-    if (widget.unsupportedWorkaroundForIssue37 == true) {
+    if (widget.unsupportedWorkaroundForIssue37) {
       _wvc?.reload();
     }
   }
@@ -67,14 +67,14 @@ class WebViewState extends State<WebView> {
   @override
   void dispose() {
     if (_issue37 != null) {
-      WidgetsBinding.instance.removeObserver(_issue37);
+      WidgetsBinding.instance?.removeObserver(_issue37!);
     }
 
     super.dispose();
   }
 
   Future<String> eval(String js) =>
-      _wvc?.evaluateJavascript(js)?.catchError((_) => '');
+      _wvc?.evaluateJavascript(js).catchError((_) => '') ?? Future.value('');
 
   void _autoResize() async {
     // TODO: enable codecov when `flutter drive --coverage` is available
@@ -85,22 +85,30 @@ class WebViewState extends State<WebView> {
       eval('document.body.scrollWidth'),
       eval('document.body.scrollHeight'),
     ]);
-    final w = double.tryParse(evals[0] ?? '') ?? 0;
-    final h = double.tryParse(evals[1] ?? '') ?? 0;
+    final w = double.tryParse(evals[0]) ?? 0;
+    final h = double.tryParse(evals[1]) ?? 0;
 
     final r = (h > 0 && w > 0) ? (w / h) : _aspectRatio;
     final changed = (r - _aspectRatio).abs() > 0.0001;
     if (changed && mounted) setState(() => _aspectRatio = r);
   }
 
+  Widget? _buildPlaceholder(TargetPlatform platform) =>
+      platform == TargetPlatform.android || platform == TargetPlatform.iOS
+          ? null
+          : DecoratedBox(
+              child: Center(child: Text('platform=$platform')),
+              decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, .5)),
+            );
+
   Widget _buildWebView() => lib.WebView(
         debuggingEnabled: widget.debuggingEnabled,
         initialUrl: widget.url,
-        initialMediaPlaybackPolicy: widget.mediaPlaybackAlwaysAllow == true
+        initialMediaPlaybackPolicy: widget.mediaPlaybackAlwaysAllow
             ? lib.AutoMediaPlaybackPolicy.always_allow
             : lib.AutoMediaPlaybackPolicy
                 .require_user_action_for_all_media_types,
-        javascriptMode: widget.js == true
+        javascriptMode: widget.js
             ? lib.JavascriptMode.unrestricted
             : lib.JavascriptMode.disabled,
         key: Key(widget.url),
@@ -121,7 +129,7 @@ class WebViewState extends State<WebView> {
         req.isForMainFrame &&
         req.url != widget.url &&
         req.url != _firstFinishedUrl) {
-      intercepted = widget.interceptNavigationRequest(req.url);
+      intercepted = widget.interceptNavigationRequest!(req.url);
     }
 
     return intercepted
@@ -132,8 +140,8 @@ class WebViewState extends State<WebView> {
   void _onPageFinished(String url) {
     _firstFinishedUrl ??= url;
 
-    if (widget.autoResize == true) {
-      widget.autoResizeIntervals.forEach((t) => t == null
+    if (widget.autoResize) {
+      widget.autoResizeIntervals.forEach((t) => t == Duration.zero
           // get dimensions immediately
           ? _autoResize()
           // or wait for the specified duration

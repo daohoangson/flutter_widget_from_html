@@ -9,23 +9,17 @@ import 'widget_factory.dart';
 /// A widget that builds Flutter widget tree from HTML
 /// with support for IFRAME, VIDEO and many other tags.
 class HtmlWidget extends core.HtmlWidget {
-  /// {@macro web_view.unsupportedWorkaroundForIssue37}
-  final bool unsupportedWebViewWorkaroundForIssue37;
-
-  /// {@macro web_view.unsupportedWorkaroundForIssue375}
-  final bool unsupportedWebViewWorkaroundForIssue375;
-
   /// Controls whether IFRAME is rendered as [WebView].
   ///
   /// Default: `false`.
   final bool webView;
 
-  /// Controls whether WebView debugging is enabled.
+  /// Controls whether debugging is enabled in WebViews.
   ///
   /// Default: `false`.
   final bool webViewDebuggingEnabled;
 
-  /// Controls whether to enable JavaScript in [WebView].
+  /// Controls whether to enable JavaScript in WebViews.
   ///
   /// Default: `true`.
   final bool webViewJs;
@@ -35,7 +29,7 @@ class HtmlWidget extends core.HtmlWidget {
   /// Default: `false`.
   final bool webViewMediaPlaybackAlwaysAllow;
 
-  /// The value used for the HTTP User-Agent: request header in WebViews.
+  /// The value used for the HTTP `User-Agent` request header in WebViews.
   final String webViewUserAgent;
 
   /// Creates a widget that builds Flutter widget tree from html.
@@ -56,8 +50,6 @@ class HtmlWidget extends core.HtmlWidget {
     void Function(String) onTapUrl,
     core.RebuildTriggers rebuildTriggers,
     TextStyle textStyle = const TextStyle(),
-    this.unsupportedWebViewWorkaroundForIssue37 = false,
-    this.unsupportedWebViewWorkaroundForIssue375 = false,
     this.webView = false,
     this.webViewDebuggingEnabled = false,
     this.webViewJs = true,
@@ -77,7 +69,6 @@ class HtmlWidget extends core.HtmlWidget {
           onTapImage: onTapImage,
           onTapUrl: onTapUrl,
           rebuildTriggers: core.RebuildTriggers([
-            unsupportedWebViewWorkaroundForIssue37,
             webView,
             webViewJs,
             if (rebuildTriggers != null) rebuildTriggers,

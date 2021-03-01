@@ -4,6 +4,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../../core/test/_.dart' as helper;
 import '../../fwfh_svg/test/_.dart' as fwfh_svg;
+import '../../fwfh_webview/test/_.dart' as fwfh_webview;
 
 const kDataUri = helper.kDataUri;
 
@@ -25,20 +26,8 @@ String _explainer(helper.Explainer parent, Widget widget) {
         ']';
   }
 
-  if (widget is WebView) {
-    return '[WebView:url=${widget.url}'
-        ',aspectRatio=${widget.aspectRatio.toStringAsFixed(2)}'
-        "${widget.autoResize ? ',autoResize=${widget.autoResize}' : ''}"
-        "${widget.debuggingEnabled ? ',debuggingEnabled=${widget.debuggingEnabled}' : ''}"
-        "${!widget.js ? ',js=${widget.js}' : ''}"
-        "${widget.mediaPlaybackAlwaysAllow ? ',mediaPlaybackAlwaysAllow=${widget.mediaPlaybackAlwaysAllow}' : ''}"
-        "${widget.unsupportedWorkaroundForIssue37 ? ',unsupportedWorkaroundForIssue37=${widget.unsupportedWorkaroundForIssue37}' : ''}"
-        "${widget.unsupportedWorkaroundForIssue375 ? ',unsupportedWorkaroundForIssue375=${widget.unsupportedWorkaroundForIssue375}' : ''}"
-        "${widget.userAgent?.isNotEmpty == true ? ',userAgent=${widget.userAgent}' : ''}"
-        ']';
-  }
-
-  return fwfh_svg.svgExplainer(parent, widget);
+  return fwfh_svg.svgExplainer(parent, widget) ??
+      fwfh_webview.webViewExplainer(parent, widget);
 }
 
 Future<String> explain(

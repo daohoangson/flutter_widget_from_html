@@ -4,8 +4,7 @@ on:
     paths: 
       - .github/workflows/android.yml
       - packages/enhanced/lib/src/widgets/video_player.dart
-      - packages/enhanced/lib/src/widgets/web_view.dart
-      - 'packages/enhanced/lib/src/widgets/web_view/**'
+      - 'packages/fwfh_webview/lib/src/widget/**'
       - 'tool/sylph/**'
 
 jobs:

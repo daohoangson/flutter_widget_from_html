@@ -2,7 +2,7 @@
 
 ![Flutter](https://github.com/daohoangson/flutter_widget_from_html/workflows/Flutter/badge.svg)
 [![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
-[![Pub](https://img.shields.io/pub/v/fwfh_webview.svg)](https://pub.dev/packages/fwfh_webview)
+[![Pub](https://img.shields.io/pub/v/fwfh_url_launcher.svg)](https://pub.dev/packages/fwfh_url_launcher)
 
 WidgetFactory extension to launch A tag via url_launcher plugin.
 This is a companion add-on for [flutter_widget_from_html_core](https://pub.dev/packages/flutter_widget_from_html_core) package.

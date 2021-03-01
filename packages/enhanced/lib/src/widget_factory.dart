@@ -5,6 +5,7 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
     as core show WidgetFactory;
 import 'package:fwfh_svg/fwfh_svg.dart';
 import 'package:fwfh_url_launcher/fwfh_url_launcher.dart';
+import 'package:fwfh_webview/fwfh_webview.dart';
 
 import 'internal/ops.dart';
 import 'data.dart';
@@ -13,10 +14,25 @@ import 'html_widget.dart';
 
 /// A factory to build widgets with [WebView], [VideoPlayer], etc.
 class WidgetFactory extends core.WidgetFactory
-    with SvgFactory, UrlLauncherFactory {
+    with SvgFactory, UrlLauncherFactory, WebViewFactory {
   TextStyleHtml Function(TextStyleHtml, dynamic) _tagA;
-  BuildOp _tagIframe;
   HtmlWidget _widget;
+
+  @override
+  bool get webView => _widget?.webView == true;
+
+  @override
+  bool get webViewDebuggingEnabled => _widget?.webViewDebuggingEnabled == true;
+
+  @override
+  bool get webViewJs => _widget?.webViewJs == true;
+
+  @override
+  bool get webViewMediaPlaybackAlwaysAllow =>
+      _widget?.webViewMediaPlaybackAlwaysAllow == true;
+
+  @override
+  String get webViewUserAgent => _widget?.webViewUserAgent;
 
   /// Builds [Divider].
   @override
@@ -65,52 +81,6 @@ class WidgetFactory extends core.WidgetFactory
     );
   }
 
-  /// Builds [WebView].
-  ///
-  /// JavaScript is only enabled if [HtmlWidget.webViewJs] is turned on
-  /// AND sandbox restrictions are unset (no `sandbox` attribute)
-  /// or `allow-scripts` is explicitly allowed.
-  Widget buildWebView(
-    BuildMetadata meta,
-    String url, {
-    double height,
-    List<String> sandbox,
-    double width,
-  }) {
-    if (_widget?.webView != true) return buildWebViewLinkOnly(meta, url);
-
-    final dimensOk = height != null && height > 0 && width != null && width > 0;
-    final js = _widget.webViewJs == true &&
-        (sandbox == null ||
-            sandbox.contains(kAttributeIframeSandboxAllowScripts));
-    return WebView(
-      url,
-      aspectRatio: dimensOk ? width / height : 16 / 9,
-      autoResize: !dimensOk && js,
-      debuggingEnabled: _widget.webViewDebuggingEnabled == true,
-      interceptNavigationRequest: (newUrl) {
-        if (newUrl == url) return false;
-
-        gestureTapCallback(newUrl)();
-        return true;
-      },
-      js: js,
-      mediaPlaybackAlwaysAllow: _widget.webViewMediaPlaybackAlwaysAllow == true,
-      unsupportedWorkaroundForIssue37:
-          _widget.unsupportedWebViewWorkaroundForIssue37 == true,
-      unsupportedWorkaroundForIssue375:
-          _widget.unsupportedWebViewWorkaroundForIssue375 == true,
-      userAgent: _widget.webViewUserAgent,
-    );
-  }
-
-  /// Builds fallback link when [HtmlWidget.webView] is disabled.
-  Widget buildWebViewLinkOnly(BuildMetadata meta, String url) =>
-      GestureDetector(
-        child: Text(url),
-        onTap: gestureTapCallback(url),
-      );
-
   @override
   Iterable<dynamic> getDependencies(BuildContext context) =>
       [...super.getDependencies(context), Theme.of(context)];
@@ -127,22 +97,6 @@ class WidgetFactory extends core.WidgetFactory
             style: tsh.style
                 .copyWith(color: tsh.getDependency<ThemeData>().accentColor));
         meta.tsb.enqueue(_tagA);
-        break;
-      case kTagIframe:
-        _tagIframe ??= BuildOp(onWidgets: (meta, _) {
-          final attrs = meta.element.attributes;
-          final src = urlFull(attrs[kAttributeIframeSrc] ?? '');
-          if (src == null) return null;
-
-          return listOrNull(buildWebView(
-            meta,
-            src,
-            height: tryParseDoubleFromMap(attrs, kAttributeIframeHeight),
-            sandbox: attrs[kAttributeIframeSandbox]?.split(RegExp(r'\s+')),
-            width: tryParseDoubleFromMap(attrs, kAttributeIframeWidth),
-          ));
-        });
-        meta.register(_tagIframe);
         break;
       case kTagVideo:
         meta.register(TagVideo(this, meta).op);

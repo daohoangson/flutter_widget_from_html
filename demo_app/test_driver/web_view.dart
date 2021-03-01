@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:fwfh_webview/fwfh_webview.dart';
 
 import '_2.dart';
 
@@ -86,6 +86,6 @@ class TestApp extends StatelessWidget {
                 ),
                 key: UniqueKey(),
               )
-            : widget0,
+            : const SizedBox.shrink(),
       );
 }

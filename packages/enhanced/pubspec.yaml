@@ -16,9 +16,9 @@ dependencies:
   flutter_widget_from_html_core: ^0.6.0-0
   fwfh_svg: ^0.6.0-0
   fwfh_url_launcher: ^0.6.0-0
+  fwfh_webview: ^0.6.0-0
   html: ^0.15.0
   video_player: ">=0.10.12 <2.0.0"
-  webview_flutter: ">=0.3.22 <2.0.0"
 
 dependency_overrides:
   flutter_widget_from_html_core:
@@ -27,6 +27,8 @@ dependency_overrides:
     path: ../fwfh_svg
   fwfh_url_launcher:
     path: ../fwfh_url_launcher
+  fwfh_webview:
+    path: ../fwfh_webview
   wakelock: ^0.4.0
 
 dev_dependencies:

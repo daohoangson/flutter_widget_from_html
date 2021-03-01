@@ -18,6 +18,13 @@ if [ -z "$UPDATE_GOLDENS" ]; then
   )
 
   ( \
+    cd ./packages/fwfh_webview \
+    && flutter pub get \
+    && flutter test "$@" \
+    && echo 'packages/fwfh_webview OK' \
+  )
+
+  ( \
     cd ./packages/enhanced \
     && flutter pub get \
     && flutter test "$@" \
