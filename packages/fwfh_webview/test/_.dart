@@ -26,6 +26,7 @@ Future<String> explain(
   WidgetTester tester,
   String html, {
   bool webView = true,
+  bool useExplainer = true,
 }) async =>
     helper.explain(
       tester,
@@ -36,6 +37,7 @@ Future<String> explain(
         key: helper.hwKey,
         factoryBuilder: () => _WidgetFactory(webView),
       ),
+      useExplainer: useExplainer,
     );
 
 class _WidgetFactory extends WidgetFactory with WebViewFactory {

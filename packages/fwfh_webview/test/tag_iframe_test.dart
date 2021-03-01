@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '_.dart';
@@ -22,6 +23,50 @@ void main() {
             'aspectRatio=$defaultAspectRatio,'
             'autoResize=true'
             ']'));
+  });
+
+  group('useExplainer: false', () {
+    final html = '<iframe src="$src"></iframe>';
+    final _explain = (WidgetTester tester) async {
+      final explained = await explain(tester, html, useExplainer: false);
+      return explained.replaceAll(
+          RegExp(r'WebView\(state: WebViewState#\w+\)'), 'WebView()');
+    };
+
+    testWidgets('renders web view (Android)', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      final explained = await _explain(tester);
+      expect(
+          explained,
+          equals('TshWidget\n'
+              '└WidgetPlaceholder<Widget>(WebView)\n'
+              ' └WebView()\n'
+              '  └LayoutBuilder()\n'
+              '   └SizedBox(width: 800.0, height: 450.0)\n'
+              '    └DecoratedBox(bg: BoxDecoration(color: Color(0x7f000000)))\n'
+              '     └Center(alignment: center)\n'
+              '      └Text("FLUTTER_TEST=true")\n'
+              '       └RichText(text: "FLUTTER_TEST=true")\n'
+              '\n'));
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('renders web view (iOS)', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      final explained = await _explain(tester);
+      expect(
+          explained,
+          equals('TshWidget\n'
+              '└WidgetPlaceholder<Widget>(WebView)\n'
+              ' └WebView()\n'
+              '  └AspectRatio(aspectRatio: 1.8)\n'
+              '   └DecoratedBox(bg: BoxDecoration(color: Color(0x7f000000)))\n'
+              '    └Center(alignment: center)\n'
+              '     └Text("FLUTTER_TEST=true")\n'
+              '      └RichText(text: "FLUTTER_TEST=true")\n'
+              '\n'));
+      debugDefaultTargetPlatformOverride = null;
+    });
   });
 
   testWidgets('renders web view with specified dimensions', (tester) async {
