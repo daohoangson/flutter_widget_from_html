@@ -64,7 +64,7 @@ class Golden extends StatelessWidget {
             child: Padding(
               child: Column(
                 children: children,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
               ),
               padding: const EdgeInsets.all(10),
