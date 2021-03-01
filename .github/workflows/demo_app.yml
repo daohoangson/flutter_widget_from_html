@@ -33,6 +33,7 @@ jobs:
   web:
     name: Deploy Web
     runs-on: ubuntu-latest
+    if: ${{ github.repository_owner == 'daohoangson' }}
     defaults:
       run:
         working-directory: demo_app

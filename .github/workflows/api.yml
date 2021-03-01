@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.repository_owner == 'daohoangson' }}
     defaults:
       run:
         working-directory: api
