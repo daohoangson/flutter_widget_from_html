@@ -1,9 +1,10 @@
-## 0.6.0-rc.2021030201
+## 0.6.0-rc.2021030202
 
 - Add support for anchor in core package (#447)
 - Implement new package `fwfh_webview` (#448)
 - Implement new package `fwfh_url_launcher` (#450)
 - Implement new package `fwfh_svg` (#452)
+- Implement new package `fwfh_chewie` (#461)
 
 ## 0.6.0-rc.2021022601
 
