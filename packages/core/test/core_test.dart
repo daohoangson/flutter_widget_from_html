@@ -1542,5 +1542,31 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
 
       tester.binding.window.textScaleFactorTestValue = 1;
     });
+
+    testWidgets('renders SUP (control group)', (tester) async {
+      final explained = await explain(
+        tester,
+        null,
+        hw: HtmlWidget('<sup>Foo</sup>', key: hwKey),
+      );
+      expect(
+          explained,
+          equals('[RichText:[Stack:children='
+              '[Padding:(3,0,0,0),child=[Opacity:child=[RichText:(@8.3:Foo)]]],'
+              '[Positioned:(0.0,null,null,null),child=[RichText:(@8.3:Foo)]]'
+              ']@bottom]'));
+    });
+
+    testWidgets('renders SUP', (tester) async {
+      final explained = await explain(
+        tester,
+        null,
+        hw: DefaultTextStyle(
+          child: HtmlWidget('<sup>Foo</sup>', key: hwKey),
+          style: TextStyle(),
+        ),
+      );
+      expect(explained, equals('[RichText:[RichText:(:Foo)]@bottom]'));
+    });
   });
 }
