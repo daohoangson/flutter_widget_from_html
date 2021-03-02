@@ -12,7 +12,7 @@ abstract class BuildBit<InputType, OutputType> {
   final TextStyleBuilder tsb;
 
   /// Creates a build bit.
-  BuildBit(this.parent, this.tsb);
+  const BuildBit(this.parent, this.tsb);
 
   /// Returns true if this bit should be rendered inline.
   bool get isInline => true;
@@ -282,7 +282,7 @@ class WidgetBit extends BuildBit<Null, dynamic> {
   /// The widget to be rendered.
   final WidgetPlaceholder child;
 
-  WidgetBit._(
+  const WidgetBit._(
     BuildTree parent,
     TextStyleBuilder tsb,
     this.child, [

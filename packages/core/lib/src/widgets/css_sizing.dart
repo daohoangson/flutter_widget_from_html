@@ -8,15 +8,14 @@ class CssBlock extends CssSizing {
   /// Creates a CSS block.
   CssBlock({required Widget child, Key? key}) : super(child: child, key: key);
 
-  CssSizingValue get _100percent => const _CssSizingPercentage(100);
-
   @override
   _RenderCssSizing createRenderObject(BuildContext _) =>
-      _RenderCssSizing(preferredWidth: _100percent);
+      _RenderCssSizing(preferredWidth: const CssSizingValue.percentage(100));
 
   @override
   void updateRenderObject(BuildContext _, _RenderCssSizing renderObject) =>
-      renderObject.setPreferredSize(null, _100percent, null);
+      renderObject.setPreferredSize(
+          null, const CssSizingValue.percentage(100), null);
 }
 
 /// A CSS sizing widget.
@@ -279,13 +278,13 @@ abstract class CssSizingValue {
   double? clamp(double min, double max);
 
   /// Creates an auto value.
-  factory CssSizingValue.auto() = _CssSizingAuto;
+  const factory CssSizingValue.auto() = _CssSizingAuto;
 
   /// Creates a percentage value.
-  factory CssSizingValue.percentage(double _) = _CssSizingPercentage;
+  const factory CssSizingValue.percentage(double _) = _CssSizingPercentage;
 
   /// Creates a fixed value.
-  factory CssSizingValue.value(double _) = _CssSizingValue;
+  const factory CssSizingValue.value(double _) = _CssSizingValue;
 }
 
 class _CssSizingAuto extends CssSizingValue {
