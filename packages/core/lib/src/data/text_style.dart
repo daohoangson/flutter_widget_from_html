@@ -46,8 +46,9 @@ class TextStyleHtml {
 
     final mqd = _getDependency<MediaQueryData>(deps);
     final tsf = mqd.textScaleFactor;
-    if (tsf != 1) {
-      style = style.copyWith(fontSize: style.fontSize! * tsf);
+    final fontSize = style.fontSize;
+    if (tsf != 1 && fontSize != null) {
+      style = style.copyWith(fontSize: fontSize * tsf);
     }
 
     return TextStyleHtml._(

@@ -1492,7 +1492,7 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
     });
   });
 
-  group('#460', () {
+  group('DefaultTextStyle with null properties (#460)', () {
     testWidgets('renders H1 (control group)', (tester) async {
       final e = await explain(
         tester,
@@ -1502,7 +1502,7 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
       expect(e, equals('[CssBlock:child=[RichText:(@20.0+b:Header)]]'));
     });
 
-    testWidgets('renders H1 with DefaultTextStyle', (tester) async {
+    testWidgets('renders H1', (tester) async {
       final explained = await explain(
         tester,
         null,
@@ -1512,6 +1512,35 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         ),
       );
       expect(explained, equals('[CssBlock:child=[RichText:(+b:Header)]]'));
+    });
+
+    testWidgets('renders textScaleFactor > 1 (control group)', (tester) async {
+      tester.binding.window.textScaleFactorTestValue = 2;
+
+      final explained = await explain(
+        tester,
+        null,
+        hw: HtmlWidget('Foo', key: hwKey),
+      );
+      expect(explained, equals('[RichText:(@20.0:Foo)]'));
+
+      tester.binding.window.textScaleFactorTestValue = 1;
+    });
+
+    testWidgets('renders textScaleFactor > 1', (tester) async {
+      tester.binding.window.textScaleFactorTestValue = 2;
+
+      final explained = await explain(
+        tester,
+        null,
+        hw: DefaultTextStyle(
+          child: HtmlWidget('Foo', key: hwKey),
+          style: TextStyle(),
+        ),
+      );
+      expect(explained, equals('[RichText:(:Foo)]'));
+
+      tester.binding.window.textScaleFactorTestValue = 1;
     });
   });
 }
