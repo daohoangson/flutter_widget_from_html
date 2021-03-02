@@ -1493,27 +1493,6 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
   });
 
   group('DefaultTextStyle with null properties (#460)', () {
-    testWidgets('renders H1 (control group)', (tester) async {
-      final e = await explain(
-        tester,
-        null,
-        hw: HtmlWidget('<h1>Header</h1>', key: hwKey),
-      );
-      expect(e, equals('[CssBlock:child=[RichText:(@20.0+b:Header)]]'));
-    });
-
-    testWidgets('renders H1', (tester) async {
-      final explained = await explain(
-        tester,
-        null,
-        hw: DefaultTextStyle(
-          child: HtmlWidget('<h1>Header</h1>', key: hwKey),
-          style: TextStyle(),
-        ),
-      );
-      expect(explained, equals('[CssBlock:child=[RichText:(+b:Header)]]'));
-    });
-
     testWidgets('renders textScaleFactor > 1 (control group)', (tester) async {
       tester.binding.window.textScaleFactorTestValue = 2;
 
@@ -1543,6 +1522,27 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
       tester.binding.window.textScaleFactorTestValue = 1;
     });
 
+    testWidgets('renders H1 (control group)', (tester) async {
+      final e = await explain(
+        tester,
+        null,
+        hw: HtmlWidget('<h1>Header</h1>', key: hwKey),
+      );
+      expect(e, equals('[CssBlock:child=[RichText:(@20.0+b:Header)]]'));
+    });
+
+    testWidgets('renders H1', (tester) async {
+      final explained = await explain(
+        tester,
+        null,
+        hw: DefaultTextStyle(
+          child: HtmlWidget('<h1>Header</h1>', key: hwKey),
+          style: TextStyle(),
+        ),
+      );
+      expect(explained, equals('[CssBlock:child=[RichText:(+b:Header)]]'));
+    });
+
     testWidgets('renders SUP (control group)', (tester) async {
       final explained = await explain(
         tester,
@@ -1567,6 +1567,33 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         ),
       );
       expect(explained, equals('[RichText:[RichText:(:Foo)]@bottom]'));
+    });
+
+    testWidgets('renders line-height (control group)', (tester) async {
+      final explained = await explain(
+        tester,
+        null,
+        hw: HtmlWidget(
+          '<span style="line-height: 20px">Foo</span>',
+          key: hwKey,
+        ),
+      );
+      expect(explained, equals('[RichText:(+height=2.0:Foo)]'));
+    });
+
+    testWidgets('renders line-height', (tester) async {
+      final explained = await explain(
+        tester,
+        null,
+        hw: DefaultTextStyle(
+          child: HtmlWidget(
+            '<span style="line-height: 20px">Foo</span>',
+            key: hwKey,
+          ),
+          style: TextStyle(),
+        ),
+      );
+      expect(explained, equals('[RichText:(:Foo)]'));
     });
   });
 }
