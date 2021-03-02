@@ -377,6 +377,7 @@ class _ListMarkerRenderObject extends RenderBox {
       lineMetrics = _textPainter.computeLineMetrics();
       // ignore: empty_catches
     } on UnimplementedError {}
+
     final m = lineMetrics.isNotEmpty ? lineMetrics.first : null;
     final center = offset +
         Offset(
@@ -388,15 +389,19 @@ class _ListMarkerRenderObject extends RenderBox {
                   m.unscaledAscent * .7
               : size.height / 2,
         );
-    final radius = _textStyle.fontSize! * .2;
 
+    final color = _textStyle.color;
+    final fontSize = _textStyle.fontSize;
+    if (color == null || fontSize == null) return;
+
+    final radius = fontSize * .2;
     switch (_markerType) {
       case _ListMarkerType.circle:
         canvas.drawCircle(
           center,
           radius * .9,
           Paint()
-            ..color = _textStyle.color!
+            ..color = color
             ..strokeWidth = 1
             ..style = PaintingStyle.stroke,
         );
@@ -405,13 +410,13 @@ class _ListMarkerRenderObject extends RenderBox {
         canvas.drawCircle(
           center,
           radius,
-          Paint()..color = _textStyle.color!,
+          Paint()..color = color,
         );
         break;
       case _ListMarkerType.square:
         canvas.drawRect(
           Rect.fromCircle(center: center, radius: radius * .8),
-          Paint()..color = _textStyle.color!,
+          Paint()..color = color,
         );
         break;
     }

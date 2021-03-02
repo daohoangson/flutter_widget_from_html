@@ -1,11 +1,17 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
 
-void main() {
+void main() async {
+  await loadAppFonts();
+
   final imgSizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
 
   testWidgets('renders empty string', (WidgetTester tester) async {
@@ -1595,5 +1601,54 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
       );
       expect(explained, equals('[RichText:(:Foo)]'));
     });
+
+    final goldenSkip = Platform.isLinux ? null : 'Linux only';
+    GoldenToolkit.runWithConfiguration(
+      () {
+        final html = 'Foo <ul><li>One</li><li>Two</li></ul> '
+            'Bar <ol><li>One</li><li>Two</li></ol>';
+
+        testGoldens('renders LI (control group)', (tester) async {
+          await tester.pumpWidgetBuilder(
+            _Issue460(HtmlWidget(html)),
+            wrapper: materialAppWrapper(theme: ThemeData.light()),
+            surfaceSize: Size(200, 200),
+          );
+
+          await screenMatchesGolden(tester, 'control_group');
+        }, skip: goldenSkip != null);
+
+        testGoldens('renders LI', (tester) async {
+          await tester.pumpWidgetBuilder(
+            _Issue460(DefaultTextStyle(
+              child: HtmlWidget(html, key: hwKey),
+              style: TextStyle(),
+            )),
+            wrapper: materialAppWrapper(theme: ThemeData.light()),
+            surfaceSize: Size(200, 200),
+          );
+
+          await screenMatchesGolden(tester, 'default_text_style');
+        }, skip: goldenSkip != null);
+      },
+      config: GoldenToolkitConfiguration(
+        fileNameFactory: (name) => '$kGoldenFilePrefix/li/issue460/$name.png',
+      ),
+    );
   });
+}
+
+class _Issue460 extends StatelessWidget {
+  final Widget child;
+
+  const _Issue460(this.child, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => Scaffold(
+        body: Container(
+          child: child,
+          color: const Color.fromRGBO(255, 0, 0, 1),
+          padding: const EdgeInsets.all(8.0),
+        ),
+      );
 }
