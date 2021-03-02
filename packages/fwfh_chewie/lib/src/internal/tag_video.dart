@@ -1,4 +1,7 @@
-part of '../ops.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+
+import '../chewie_factory.dart';
 
 const kAttributeVideoAutoplay = 'autoplay';
 const kAttributeVideoControls = 'controls';
@@ -13,20 +16,17 @@ const kTagVideoSource = 'source';
 
 class TagVideo {
   final BuildMetadata videoMeta;
-  final WidgetFactory wf;
+  final ChewieFactory wf;
 
   final _sourceUrls = <String>[];
 
-  BuildOp _videoOp;
+  late final BuildOp op;
 
-  TagVideo(this.wf, this.videoMeta);
-
-  BuildOp get op {
-    _videoOp = BuildOp(
+  TagVideo(this.wf, this.videoMeta) {
+    op = BuildOp(
       onChild: onChild,
       onWidgets: onWidgets,
     );
-    return _videoOp;
   }
 
   void onChild(BuildMetadata childMeta) {
@@ -41,14 +41,14 @@ class TagVideo {
     _sourceUrls.add(url);
   }
 
-  Iterable<Widget> onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> ws) {
-    final player = build();
+  Iterable<Widget>? onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> ws) {
+    final player = _buildPlayer();
     if (player == null) return ws;
 
     return [WidgetPlaceholder<BuildMetadata>(videoMeta, child: player)];
   }
 
-  Widget build() {
+  Widget? _buildPlayer() {
     if (_sourceUrls.isEmpty) return null;
 
     final attrs = videoMeta.element.attributes;

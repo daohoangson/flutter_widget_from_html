@@ -3,8 +3,8 @@ on:
   push:
     paths: 
       - .github/workflows/android.yml
-      - packages/enhanced/lib/src/widgets/video_player.dart
-      - 'packages/fwfh_webview/lib/src/widget/**'
+      - 'packages/fwfh_chewie/lib/src/video_player/**'
+      - 'packages/fwfh_webview/lib/src/web_view/**'
       - 'tool/sylph/**'
 
 jobs:

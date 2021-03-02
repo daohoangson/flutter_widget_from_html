@@ -10,4 +10,3 @@ coverage:
 
 ignore:
   - "demo_app"
-  - "packages/enhanced/lib/src/widgets/video_player.dart"

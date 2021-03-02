@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:fwfh_chewie/fwfh_chewie.dart';
 
 import '_2.dart';
 

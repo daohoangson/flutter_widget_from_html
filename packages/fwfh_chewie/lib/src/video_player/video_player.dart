@@ -34,31 +34,30 @@ class VideoPlayer extends StatefulWidget {
   final bool loop;
 
   /// The widget to be shown before video is loaded.
-  final Widget poster;
+  final Widget? poster;
 
   /// Creates a player.
   VideoPlayer(
     this.url, {
-    @required this.aspectRatio,
+    required this.aspectRatio,
     this.autoResize = true,
     this.autoplay = false,
     this.controls = false,
-    Key key,
+    Key? key,
     this.loop = false,
     this.poster,
-  })  : assert(url != null),
-        assert(aspectRatio != null),
-        super(key: key);
+  }) : super(key: key);
 
   @override
   State<VideoPlayer> createState() =>
+      // TODO: refactor this
       (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))
           ? _VideoPlayerPlaceholder()
           : _VideoPlayerState();
 }
 
 class _VideoPlayerState extends State<VideoPlayer> {
-  lib.ChewieController _controller;
+  late lib.ChewieController _controller;
 
   @override
   void initState() {
@@ -74,7 +73,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   @override
   Widget build(BuildContext context) => AspectRatio(
-        aspectRatio: _controller.aspectRatio,
+        aspectRatio: _controller.aspectRatio!,
         child: lib.Chewie(controller: _controller),
       );
 
@@ -84,7 +83,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
 class _Controller extends lib.ChewieController {
   final _VideoPlayerState vps;
 
-  double _aspectRatio;
+  double? _aspectRatio;
 
   _Controller(this.vps)
       : super(
@@ -113,14 +112,14 @@ class _Controller extends lib.ChewieController {
   }
 
   void _setupAspectRatioListener() {
-    VoidCallback listener;
+    late VoidCallback listener;
 
     listener = () {
       if (_aspectRatio == null) {
         final vpv = videoPlayerController.value;
         debugPrint('[_Controller]: vpv=$vpv');
 
-        if (!vpv.initialized) return;
+        if (!vpv.isInitialized) return;
         _aspectRatio = vpv.aspectRatio;
 
         // workaround because we cannot call `vps.setState()` directly

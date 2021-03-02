@@ -11,6 +11,13 @@ set -e
 
 if [ -z "$UPDATE_GOLDENS" ]; then
   ( \
+    cd ./packages/fwfh_chewie \
+    && flutter pub get \
+    && flutter test "$@" \
+    && echo 'packages/fwfh_chewie OK' \
+  )
+
+  ( \
     cd ./packages/fwfh_svg \
     && flutter pub get \
     && flutter test "$@" \

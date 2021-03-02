@@ -30,7 +30,7 @@ mixin WebViewFactory on WidgetFactory {
   /// JavaScript is only enabled if [webViewJs] is turned on
   /// AND sandbox restrictions are unset (no `sandbox` attribute)
   /// or `allow-scripts` is explicitly allowed.
-  Widget buildWebView(
+  Widget? buildWebView(
     BuildMetadata meta,
     String url, {
     double? height,
@@ -61,7 +61,7 @@ mixin WebViewFactory on WidgetFactory {
   }
 
   /// Builds fallback link when [HtmlWidget.webView] is disabled.
-  Widget buildWebViewLinkOnly(BuildMetadata meta, String url) =>
+  Widget? buildWebViewLinkOnly(BuildMetadata meta, String url) =>
       GestureDetector(
         child: Text(url),
         onTap: gestureTapCallback(url),

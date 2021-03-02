@@ -98,7 +98,7 @@ void main() {
           equals('[VideoPlayer:'
               'url=$src,'
               'aspectRatio=$defaultAspectRatio,'
-              'poster=[Image:image=CachedNetworkImageProvider("$posterSrc", scale: 1.0)]'
+              'poster=[Image:image=NetworkImage("$posterSrc", scale: 1.0)]'
               ']'));
     });
   });
