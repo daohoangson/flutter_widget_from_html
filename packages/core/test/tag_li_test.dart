@@ -20,7 +20,7 @@ String padding(String child) =>
 String list(List<String> children) => '[Column:children=${children.join(",")}]';
 
 String item(String markerText, String contents, {String? child}) =>
-    '[_ListItem:children=${child ?? '[RichText:(:$contents)]'},${marker(markerText)}]';
+    '[HtmlListItem:children=${child ?? '[RichText:(:$contents)]'},${marker(markerText)}]';
 
 String marker(String text) =>
     text.startsWith('[_ListMarker') ? text : '[RichText:maxLines=1,(:$text)]';
@@ -516,8 +516,8 @@ void main() async {
         expect(
             explained,
             equals('[CssBlock:child=[Padding:(0,0,0,99),child=[Column:children='
-                '[Padding:(0,0,0,199),child=[_ListItem:children=[RichText:(:199px)],${marker(disc)}]],'
-                '[Padding:(0,0,0,299),child=[_ListItem:children=[RichText:(:299px)],${marker(disc)}]],'
+                '[Padding:(0,0,0,199),child=[HtmlListItem:children=[RichText:(:199px)],${marker(disc)}]],'
+                '[Padding:(0,0,0,299),child=[HtmlListItem:children=[RichText:(:299px)],${marker(disc)}]],'
                 '${item(disc, "99px")}'
                 ']]]'));
       });
@@ -604,9 +604,9 @@ void main() async {
 
     final explainerExpected =
         '[CssBlock:child=[Padding:(0,40,0,0),child=[Column:dir=rtl,children='
-        '[_ListItem:children=[RichText:dir=rtl,(:One)],[RichText:maxLines=1,dir=rtl,(:1.)]],'
-        '[_ListItem:children=[RichText:dir=rtl,(:Two)],[RichText:maxLines=1,dir=rtl,(:2.)]],'
-        '[_ListItem:children=[RichText:dir=rtl,(+b:Three)],[RichText:maxLines=1,dir=rtl,(:3.)]]'
+        '[HtmlListItem:children=[RichText:dir=rtl,(:One)],[RichText:maxLines=1,dir=rtl,(:1.)]],'
+        '[HtmlListItem:children=[RichText:dir=rtl,(:Two)],[RichText:maxLines=1,dir=rtl,(:2.)]],'
+        '[HtmlListItem:children=[RichText:dir=rtl,(+b:Three)],[RichText:maxLines=1,dir=rtl,(:3.)]]'
         ']]]';
 
     final nonExplainerExpected = 'TshWidget\n'
@@ -617,20 +617,20 @@ void main() async {
         '    ├WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
         '    ││  "One"\n'
         '    ││)\n'
-        '    │└_ListItem(textDirection: rtl)\n'
+        '    │└HtmlListItem(textDirection: rtl)\n'
         '    │ ├RichText(textDirection: rtl, text: "One")\n'
         '    │ └RichText(textDirection: rtl, maxLines: 1, text: "1.")\n'
         '    ├WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#2):\n'
         '    ││  "Two"\n'
         '    ││)\n'
-        '    │└_ListItem(textDirection: rtl)\n'
+        '    │└HtmlListItem(textDirection: rtl)\n'
         '    │ ├RichText(textDirection: rtl, text: "Two")\n'
         '    │ └RichText(textDirection: rtl, maxLines: 1, text: "2.")\n'
         '    └WidgetPlaceholder<BuildTree>(BuildTree#5 tsb#6(parent=#2):\n'
         '     │  BuildTree#7 tsb#8(parent=#6):\n'
         '     │    "Three"\n'
         '     │)\n'
-        '     └_ListItem(textDirection: rtl)\n'
+        '     └HtmlListItem(textDirection: rtl)\n'
         '      ├RichText(textDirection: rtl, text: "Three")\n'
         '      └RichText(textDirection: rtl, maxLines: 1, text: "3.")\n'
         '\n';
@@ -664,15 +664,40 @@ void main() async {
     });
   });
 
-  group('_ListItem', () {
+  group('HtmlListItem', () {
     testWidgets('updates textDirection', (tester) async {
       final html = '<ul><li>Foo</li></ul>';
 
       final ltr = await explain(tester, html, rtl: false, useExplainer: false);
-      expect(ltr, contains('_ListItem()'));
+      expect(ltr, contains('HtmlListItem()'));
 
       final rtl = await explain(tester, html, rtl: true, useExplainer: false);
-      expect(rtl, contains('_ListItem(textDirection: rtl)'));
+      expect(rtl, contains('HtmlListItem(textDirection: rtl)'));
+    });
+
+    testWidgets('computeIntrinsic', (tester) async {
+      final child = GlobalKey();
+      final listItem = GlobalKey();
+      await tester.pumpWidget(HtmlListItem(
+        child: SizedBox(key: child, width: 50, height: 5),
+        key: listItem,
+        marker: widget0,
+        textDirection: TextDirection.ltr,
+      ));
+      await tester.pumpAndSettle();
+
+      final childRenderBox =
+          child.currentContext!.findRenderObject() as RenderBox;
+      final listItemRenderBox =
+          listItem.currentContext!.findRenderObject() as RenderBox;
+      expect(listItemRenderBox.getMaxIntrinsicHeight(100),
+          equals(childRenderBox.getMaxIntrinsicHeight(100)));
+      expect(listItemRenderBox.getMaxIntrinsicWidth(100),
+          equals(childRenderBox.getMaxIntrinsicWidth(100)));
+      expect(listItemRenderBox.getMinIntrinsicHeight(100),
+          equals(childRenderBox.getMinIntrinsicHeight(100)));
+      expect(listItemRenderBox.getMinIntrinsicWidth(100),
+          equals(childRenderBox.getMinIntrinsicWidth(100)));
     });
 
     testWidgets('performs hit test', (tester) async {

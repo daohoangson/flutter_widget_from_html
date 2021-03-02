@@ -8,6 +8,7 @@ import 'package:html/dom.dart' as dom;
 import 'core_html_widget.dart';
 
 export 'widgets/css_sizing.dart';
+export 'widgets/html_list_item.dart';
 export 'widgets/html_ruby.dart';
 export 'widgets/html_table.dart';
 
