@@ -25,25 +25,34 @@ const kCssListStyleTypeSquare = 'square';
 
 class TagLi {
   final BuildMetadata listMeta;
+  late final BuildOp op;
   final WidgetFactory wf;
 
   final _itemMetas = <BuildMetadata>[];
+  late final BuildOp _itemOp;
   final _itemWidgets = <WidgetPlaceholder>[];
 
   _ListConfig? _config;
-  BuildOp? _itemOp;
-  BuildOp? _listOp;
 
-  TagLi(this.wf, this.listMeta);
+  TagLi(this.wf, this.listMeta) {
+    op = _TagLiListOp(this);
+    _itemOp = BuildOp(
+      onWidgets: (itemMeta, widgets) {
+        final column = wf.buildColumnPlaceholder(itemMeta, widgets) ??
+            WidgetPlaceholder<BuildMetadata>(itemMeta);
+
+        final i = _itemMetas.length;
+        _itemMetas.add(itemMeta);
+        _itemWidgets.add(column);
+        return [column.wrapWith((c, w) => _buildItem(c, w, i))];
+      },
+    );
+  }
 
   _ListConfig get config {
     // cannot build config from constructor because
     // inline styles are not fully parsed at that time
     return _config ??= _ListConfig.fromBuildMetadata(listMeta);
-  }
-
-  BuildOp get op {
-    return _listOp ??= _TagLiListOp(this);
   }
 
   Map<String, String> defaultStyles(dom.Element element) {
@@ -72,20 +81,7 @@ class TagLi {
     final e = childMeta.element;
     if (e.localName != kTagLi) return;
     if (e.parent != listMeta.element) return;
-
-    _itemOp ??= BuildOp(
-      onWidgets: (itemMeta, widgets) {
-        final column = wf.buildColumnPlaceholder(itemMeta, widgets) ??
-            WidgetPlaceholder<BuildMetadata>(itemMeta);
-
-        final i = _itemMetas.length;
-        _itemMetas.add(itemMeta);
-        _itemWidgets.add(column);
-        return [column.wrapWith((c, w) => _buildItem(c, w, i))];
-      },
-    );
-
-    childMeta.register(_itemOp!);
+    childMeta.register(_itemOp);
   }
 
   Widget _buildItem(BuildContext context, Widget child, int i) {
@@ -226,19 +222,23 @@ class _ListItemRenderObject extends RenderBox
 
   @override
   double computeMaxIntrinsicHeight(double width) =>
-      firstChild!.computeMaxIntrinsicHeight(width);
+      firstChild?.computeMaxIntrinsicHeight(width) ??
+      super.computeMaxIntrinsicHeight(width);
 
   @override
   double computeMaxIntrinsicWidth(double height) =>
-      firstChild!.computeMaxIntrinsicWidth(height);
+      firstChild?.computeMaxIntrinsicWidth(height) ??
+      super.computeMaxIntrinsicWidth(height);
 
   @override
   double computeMinIntrinsicHeight(double width) =>
-      firstChild!.computeMinIntrinsicHeight(width);
+      firstChild?.computeMinIntrinsicHeight(width) ??
+      super.computeMinIntrinsicHeight(width);
 
   @override
   double computeMinIntrinsicWidth(double height) =>
-      firstChild!.getMinIntrinsicWidth(height);
+      firstChild?.getMinIntrinsicWidth(height) ??
+      super.computeMinIntrinsicWidth(height);
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>

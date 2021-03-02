@@ -153,14 +153,22 @@ class TextStyleBuilder<T1> {
     if (other == null) return false;
     TextStyleBuilder thisWithBuilder = this;
     while (thisWithBuilder._builders == null) {
-      if (thisWithBuilder.parent == null) break;
-      thisWithBuilder = thisWithBuilder.parent!;
+      final thisParent = thisWithBuilder.parent;
+      if (thisParent == null) {
+        break;
+      } else {
+        thisWithBuilder = thisParent;
+      }
     }
 
     var otherWithBuilder = other;
     while (otherWithBuilder._builders == null) {
-      if (otherWithBuilder.parent == null) break;
-      otherWithBuilder = otherWithBuilder.parent!;
+      final otherParent = otherWithBuilder.parent;
+      if (otherParent == null) {
+        break;
+      } else {
+        otherWithBuilder = otherParent;
+      }
     }
 
     return thisWithBuilder == otherWithBuilder;

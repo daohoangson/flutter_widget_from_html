@@ -28,25 +28,20 @@ class StyleTextAlign {
       );
 
   static Iterable<Widget> _onWidgets(Iterable<Widget> widgets, String value) {
-    Widget Function(BuildContext, Widget)? builder;
-
     switch (value) {
       case kCssTextAlignCenter:
       case kCssTextAlignEnd:
       case kCssTextAlignJustify:
       case kCssTextAlignLeft:
       case kCssTextAlignRight:
-        builder = _block;
+        widgets = widgets
+            .map((child) => WidgetPlaceholder.lazy(child).wrapWith(_block));
         break;
       case kCssTextAlignMozCenter:
       case kCssTextAlignWebkitCenter:
-        builder = _center;
+        widgets = widgets
+            .map((child) => WidgetPlaceholder.lazy(child).wrapWith(_center));
         break;
-    }
-
-    if (builder != null) {
-      widgets = widgets
-          .map((child) => WidgetPlaceholder.lazy(child).wrapWith(builder!));
     }
 
     return widgets;

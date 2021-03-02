@@ -122,7 +122,7 @@ class CssBorderSide {
   BorderSide? _getValue(TextStyleHtml tsh) => identical(this, none)
       ? null
       : BorderSide(
-          color: color ?? tsh.style.color!,
+          color: color ?? tsh.style.color ?? const BorderSide().color,
           // TODO: add proper support for other border styles
           style: style != null ? BorderStyle.solid : BorderStyle.none,
           width: width?.getValue(tsh) ?? 0.0,

@@ -130,7 +130,7 @@ class TextStyleOps {
     for (final part in parts) {
       final fontFamily = part
           .trim()
-          .replaceFirstMapped(RegExp(r"""^("|')(.+)\1$"""), (m) => m.group(2)!);
+          .replaceFirstMapped(RegExp(r"""^("|')(.+)\1$"""), (m) => m[2]!);
       if (fontFamily.isNotEmpty) list.add(fontFamily);
     }
 

@@ -307,8 +307,8 @@ class _TableRenderObject extends RenderBox
     assert(_calculatedWidth != null);
     _border?.paint(
         context.canvas,
-        Rect.fromLTWH(
-            offset.dx, offset.dy, _calculatedWidth!, _calculatedHeight!));
+        Rect.fromLTWH(offset.dx, offset.dy, _calculatedWidth ?? 0.0,
+            _calculatedHeight ?? 0.0));
 
     var child = firstChild;
     while (child != null) {
@@ -394,14 +394,15 @@ class _TableRenderObject extends RenderBox
 
     // we now know all the widths and heights, let's position cells
     // sometime we have to relayout child, e.g. stretch its height for rowspan
-    _calculatedHeight = paddingTop + rowHeights.sum + rowGaps + paddingBottom;
-    final constraintedHeight = c.constrainHeight(_calculatedHeight!);
+    final calculatedHeight = _calculatedHeight =
+        paddingTop + rowHeights.sum + rowGaps + paddingBottom;
+    final constraintedHeight = c.constrainHeight(calculatedHeight);
     final deltaHeight =
-        max(0, (constraintedHeight - _calculatedHeight!) / rowCount);
-    _calculatedWidth =
+        max(0, (constraintedHeight - calculatedHeight) / rowCount);
+    final calculatedWidth = _calculatedWidth =
         paddingLeft + columnWidths.sum + columnGaps + paddingRight;
-    final constraintedWidth = c.constrainWidth(_calculatedWidth!);
-    final deltaWidth = (constraintedWidth - _calculatedWidth!) / columnCount;
+    final constraintedWidth = c.constrainWidth(calculatedWidth);
+    final deltaWidth = (constraintedWidth - calculatedWidth) / columnCount;
     for (var i = 0; i < children.length; i++) {
       final data = cells[i];
       final childSize = childSizes[i];
@@ -454,8 +455,11 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
   void paint(PaintingContext context, Offset offset) {
     offset = offset.translate(0, _paddingTop);
 
-    _baselineWithOffset =
-        offset.dy + child!.getDistanceToBaseline(TextBaseline.alphabetic)!;
+    final child = this.child;
+    if (child == null) return;
+
+    final baselineWithOffset = _baselineWithOffset = offset.dy +
+        (child.getDistanceToBaseline(TextBaseline.alphabetic) ?? 0.0);
 
     final siblings = _companion._baselines;
     if (siblings.containsKey(_row)) {
@@ -464,11 +468,11 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
           .reduce((v, e) => max(v, e));
       siblings[_row]!.add(this);
 
-      if (rowBaseline > _baselineWithOffset!) {
-        final offsetY = rowBaseline - _baselineWithOffset!;
-        if (size.height - child!.size.height >= offsetY) {
+      if (rowBaseline > baselineWithOffset) {
+        final offsetY = rowBaseline - baselineWithOffset;
+        if (size.height - child.size.height >= offsetY) {
           // paint child with additional offset
-          context.paintChild(child!, offset.translate(0, offsetY));
+          context.paintChild(child, offset.translate(0, offsetY));
           return;
         } else {
           // skip painting this frame, wait for the correct padding
@@ -478,14 +482,14 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
               ?.addPostFrameCallback((_) => markNeedsLayout());
           return;
         }
-      } else if (rowBaseline < _baselineWithOffset!) {
+      } else if (rowBaseline < baselineWithOffset) {
         for (final sibling in siblings[_row]!) {
           if (sibling == this) continue;
 
-          final offsetY = _baselineWithOffset! - sibling._baselineWithOffset!;
+          final offsetY = baselineWithOffset - sibling._baselineWithOffset!;
           if (offsetY != 0.0) {
             sibling._paddingTop += offsetY;
-            sibling._baselineWithOffset = _baselineWithOffset;
+            sibling._baselineWithOffset = baselineWithOffset;
             WidgetsBinding.instance
                 ?.addPostFrameCallback((_) => sibling.markNeedsLayout());
           }
@@ -495,14 +499,16 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
       siblings[_row] = [this];
     }
 
-    context.paintChild(child!, offset);
+    context.paintChild(child, offset);
   }
 
   @override
   void performLayout() {
     final c = constraints;
     final cc = c.loosen().deflate(EdgeInsets.only(top: _paddingTop));
-    child!.layout(cc, parentUsesSize: true);
-    size = c.constrain(child!.size + Offset(0, _paddingTop));
+    child?.layout(cc, parentUsesSize: true);
+
+    final childSize = child?.size ?? Size.zero;
+    size = c.constrain(childSize + Offset(0, _paddingTop));
   }
 }

@@ -268,30 +268,17 @@ class _TableCaption extends SingleChildRenderObjectWidget {
 }
 
 class _TagTableRow {
+  late final BuildOp op;
   final TagTable parent;
   final _TagTableDataRow row;
   final BuildMetadata rowMeta;
 
-  late BuildOp op;
-  BuildOp? _cellOp;
-  BuildOp? _valignBaselineOp;
+  late final BuildOp _cellOp;
+  late final BuildOp _valignBaselineOp;
 
   _TagTableRow(this.parent, this.rowMeta, this.row) {
     op = BuildOp(onChild: onChild);
-  }
-
-  void onChild(BuildMetadata childMeta) {
-    if (childMeta.element.parent != rowMeta.element) return;
-    if (TagTable._getCssDisplayValue(childMeta) != kCssDisplayTableCell) {
-      return;
-    }
-
-    final attrs = childMeta.element.attributes;
-    if (attrs.containsKey(kAttributeValign)) {
-      childMeta[kCssVerticalAlign] = attrs[kAttributeValign]!;
-    }
-
-    _cellOp ??= BuildOp(
+    _cellOp = BuildOp(
       onWidgets: (cellMeta, widgets) {
         final column = parent.wf.buildColumnPlaceholder(cellMeta, widgets);
         if (column == null) return [];
@@ -308,11 +295,7 @@ class _TagTableRow {
       },
       priority: BuildOp.kPriorityMax,
     );
-    childMeta.register(_cellOp!);
-    StyleBorder.skip(childMeta);
-    StyleSizing.treatHeightAsMinHeight(childMeta);
-
-    _valignBaselineOp ??= BuildOp(
+    _valignBaselineOp = BuildOp(
       onWidgets: (cellMeta, widgets) {
         final v = cellMeta[kCssVerticalAlign];
         if (v != kCssVerticalAlignBaseline) return widgets;
@@ -331,7 +314,23 @@ class _TagTableRow {
       },
       priority: StyleVerticalAlign.kPriority4500,
     );
-    childMeta.register(_valignBaselineOp!);
+  }
+
+  void onChild(BuildMetadata childMeta) {
+    if (childMeta.element.parent != rowMeta.element) return;
+    if (TagTable._getCssDisplayValue(childMeta) != kCssDisplayTableCell) {
+      return;
+    }
+
+    final attrs = childMeta.element.attributes;
+    if (attrs.containsKey(kAttributeValign)) {
+      childMeta[kCssVerticalAlign] = attrs[kAttributeValign]!;
+    }
+
+    childMeta.register(_cellOp);
+    StyleBorder.skip(childMeta);
+    StyleSizing.treatHeightAsMinHeight(childMeta);
+    childMeta.register(_valignBaselineOp);
   }
 }
 
