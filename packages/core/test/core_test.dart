@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
@@ -1488,6 +1489,29 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
             equals(
                 '[CssBlock:child=[RichText:maxLines=2,overflow=ellipsis,(:Foo)]]'));
       });
+    });
+  });
+
+  group('#460', () {
+    testWidgets('renders H1 (control group)', (tester) async {
+      final e = await explain(
+        tester,
+        null,
+        hw: HtmlWidget('<h1>Header</h1>', key: hwKey),
+      );
+      expect(e, equals('[CssBlock:child=[RichText:(@20.0+b:Header)]]'));
+    });
+
+    testWidgets('renders H1 with DefaultTextStyle', (tester) async {
+      final explained = await explain(
+        tester,
+        null,
+        hw: DefaultTextStyle(
+          child: HtmlWidget('<h1>Header</h1>', key: hwKey),
+          style: TextStyle(),
+        ),
+      );
+      expect(explained, equals('[CssBlock:child=[RichText:(+b:Header)]]'));
     });
   });
 }

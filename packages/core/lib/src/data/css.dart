@@ -169,7 +169,8 @@ class CssLength {
         return null;
       case CssLengthUnit.em:
         baseValue ??= tsh.style.fontSize;
-        value = baseValue! * number;
+        if (baseValue == null) return null;
+        value = baseValue * number;
         scaleFactor = 1;
         break;
       case CssLengthUnit.percentage:
