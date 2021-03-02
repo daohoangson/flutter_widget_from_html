@@ -1,12 +1,10 @@
-import 'dart:io' show Platform;
-
 import 'package:chewie/chewie.dart' as lib;
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart' as lib;
 
 /// A video player.
-class VideoPlayer extends StatefulWidget {
+class VideoPlayer extends StatelessWidget {
   /// The source URL.
   final String url;
 
@@ -36,6 +34,8 @@ class VideoPlayer extends StatefulWidget {
   /// The widget to be shown before video is loaded.
   final Widget? poster;
 
+  final Key? _key;
+
   /// Creates a player.
   VideoPlayer(
     this.url, {
@@ -46,18 +46,40 @@ class VideoPlayer extends StatefulWidget {
     Key? key,
     this.loop = false,
     this.poster,
+  }) : _key = key;
+
+  @override
+  Widget build(BuildContext context) => _VideoPlayerWidget(
+        config: this,
+        key: _key,
+        platform: Theme.of(context).platform,
+      );
+}
+
+class _VideoPlayerWidget extends StatefulWidget {
+  final VideoPlayer config;
+
+  final TargetPlatform platform;
+
+  const _VideoPlayerWidget({
+    required this.config,
+    Key? key,
+    required this.platform,
   }) : super(key: key);
 
   @override
-  State<VideoPlayer> createState() =>
-      // TODO: refactor this
-      (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))
-          ? _VideoPlayerPlaceholder()
-          : _VideoPlayerState();
+  State<_VideoPlayerWidget> createState() =>
+      platform == TargetPlatform.android ||
+              platform == TargetPlatform.iOS ||
+              kIsWeb
+          ? _VideoPlayerState()
+          : _VideoPlayerPlaceholder();
 }
 
-class _VideoPlayerState extends State<VideoPlayer> {
+class _VideoPlayerState extends State<_VideoPlayerWidget> {
   late lib.ChewieController _controller;
+
+  VideoPlayer get config => widget.config;
 
   @override
   void initState() {
@@ -88,22 +110,22 @@ class _Controller extends lib.ChewieController {
   _Controller(this.vps)
       : super(
           autoInitialize: true,
-          autoPlay: vps.widget.autoplay == true,
-          looping: vps.widget.loop == true,
-          placeholder: vps.widget.poster != null
-              ? Center(child: vps.widget.poster)
+          autoPlay: vps.config.autoplay,
+          looping: vps.config.loop,
+          placeholder: vps.config.poster != null
+              ? Center(child: vps.config.poster)
               : null,
-          showControls: vps.widget.controls == true,
+          showControls: vps.config.controls,
           videoPlayerController:
-              lib.VideoPlayerController.network(vps.widget.url),
+              lib.VideoPlayerController.network(vps.config.url),
         ) {
-    if (vps.widget.autoResize) {
+    if (vps.config.autoResize) {
       _setupAspectRatioListener();
     }
   }
 
   @override
-  double get aspectRatio => _aspectRatio ?? vps.widget.aspectRatio;
+  double get aspectRatio => _aspectRatio ?? vps.config.aspectRatio;
 
   @override
   void dispose() {
@@ -117,12 +139,9 @@ class _Controller extends lib.ChewieController {
     listener = () {
       if (_aspectRatio == null) {
         final vpv = videoPlayerController.value;
-        debugPrint('[_Controller]: vpv=$vpv');
-
         if (!vpv.isInitialized) return;
-        _aspectRatio = vpv.aspectRatio;
 
-        // workaround because we cannot call `vps.setState()` directly
+        _aspectRatio = vpv.aspectRatio;
         vps._onAspectRatioUpdated();
       }
 
@@ -133,12 +152,12 @@ class _Controller extends lib.ChewieController {
   }
 }
 
-class _VideoPlayerPlaceholder extends State<VideoPlayer> {
+class _VideoPlayerPlaceholder extends State<_VideoPlayerWidget> {
   @override
   Widget build(BuildContext _) => AspectRatio(
-      aspectRatio: widget.aspectRatio,
+      aspectRatio: widget.config.aspectRatio,
       child: Container(
-        child: Center(child: Text('VideoPlayer')),
+        child: Center(child: Text('platform=${widget.platform}')),
         color: Color.fromRGBO(0, 0, 0, .5),
       ));
 }
