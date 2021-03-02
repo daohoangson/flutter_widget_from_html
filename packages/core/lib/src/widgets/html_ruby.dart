@@ -21,68 +21,56 @@ class _RubyRenderObject extends RenderBox
         RenderBoxContainerDefaultsMixin<RenderBox, _RubyParentData> {
   @override
   double? computeDistanceToActualBaseline(TextBaseline baseline) {
-    final ruby = firstChild;
-    final rubyValue = ruby?.getDistanceToActualBaseline(baseline);
+    final ruby = firstChild!;
+    final rubyValue = ruby.getDistanceToActualBaseline(baseline);
     if (rubyValue == null) {
       return super.computeDistanceToActualBaseline(baseline);
     }
 
-    final offset = (ruby!.parentData as _RubyParentData).offset;
+    final offset = (ruby.parentData as _RubyParentData).offset;
     return offset.dy + rubyValue;
   }
 
   @override
   double computeMaxIntrinsicHeight(double width) {
-    final ruby = firstChild;
-    final rubyValue = ruby?.computeMaxIntrinsicHeight(width);
-    if (rubyValue == null) {
-      return super.computeMaxIntrinsicHeight(width);
-    }
+    final ruby = firstChild!;
+    final rubyValue = ruby.computeMaxIntrinsicHeight(width);
 
-    final rt = (ruby!.parentData as _RubyParentData).nextSibling;
-    final rtValue = rt?.computeMaxIntrinsicHeight(width) ?? 0.0;
+    final rt = (ruby.parentData as _RubyParentData).nextSibling!;
+    final rtValue = rt.computeMaxIntrinsicHeight(width);
 
     return rubyValue + rtValue;
   }
 
   @override
   double computeMaxIntrinsicWidth(double height) {
-    final ruby = firstChild;
-    final rubyValue = ruby?.computeMaxIntrinsicWidth(height);
-    if (rubyValue == null) {
-      return super.computeMaxIntrinsicWidth(height);
-    }
+    final ruby = firstChild!;
+    final rubyValue = ruby.computeMaxIntrinsicWidth(height);
 
-    final rt = (ruby!.parentData as _RubyParentData).nextSibling;
-    final rtValue = rt?.computeMaxIntrinsicWidth(height) ?? 0.0;
+    final rt = (ruby.parentData as _RubyParentData).nextSibling!;
+    final rtValue = rt.computeMaxIntrinsicWidth(height);
 
     return max(rubyValue, rtValue);
   }
 
   @override
   double computeMinIntrinsicHeight(double width) {
-    final ruby = firstChild;
-    final rubyValue = ruby?.computeMinIntrinsicHeight(width);
-    if (rubyValue == null) {
-      return super.computeMinIntrinsicHeight(width);
-    }
+    final ruby = firstChild!;
+    final rubyValue = ruby.computeMinIntrinsicHeight(width);
 
-    final rt = (ruby!.parentData as _RubyParentData).nextSibling;
-    final rtValue = rt?.computeMinIntrinsicHeight(width) ?? 0.0;
+    final rt = (ruby.parentData as _RubyParentData).nextSibling!;
+    final rtValue = rt.computeMinIntrinsicHeight(width);
 
     return rubyValue + rtValue;
   }
 
   @override
   double computeMinIntrinsicWidth(double height) {
-    final ruby = firstChild;
-    final rubyValue = ruby?.getMinIntrinsicWidth(height);
-    if (rubyValue == null) {
-      return super.computeMinIntrinsicWidth(height);
-    }
+    final ruby = firstChild!;
+    final rubyValue = ruby.getMinIntrinsicWidth(height);
 
-    final rt = (ruby!.parentData as _RubyParentData).nextSibling;
-    final rtValue = rt?.getMinIntrinsicWidth(height) ?? rubyValue;
+    final rt = (ruby.parentData as _RubyParentData).nextSibling!;
+    final rtValue = rt.getMinIntrinsicWidth(height);
 
     return min(rubyValue, rtValue);
   }
