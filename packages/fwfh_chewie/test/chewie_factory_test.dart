@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '_.dart';
@@ -10,6 +11,75 @@ void main() {
     final html = '<video><source src="$src"></video>';
     final e = await explain(tester, html);
     expect(e, equals('[VideoPlayer:url=$src,aspectRatio=$defaultAspectRatio]'));
+  });
+
+  group('useExplainer: false', () {
+    final html = '<video><source src="$src"></video>';
+    final _explain = (WidgetTester tester) async {
+      final explained = await explain(tester, html, useExplainer: false);
+      return explained;
+    };
+
+    final videoPlayer = 'TshWidget\n'
+        '└WidgetPlaceholder<Widget>(VideoPlayer)\n'
+        ' └VideoPlayer()\n'
+        '  └_VideoPlayerWidget(state: _VideoPlayerState)\n'
+        '   └AspectRatio(aspectRatio: 1.8)\n'
+        '    └Chewie(state: ChewieState)\n'
+        '     └_ChewieControllerProvider\n'
+        '      └PlayerWithControls()\n'
+        '       └Center(alignment: center)\n'
+        '        └SizedBox(width: 800.0, height: 600.0)\n'
+        '         └AspectRatio(aspectRatio: 1.3)\n'
+        '          └Stack(alignment: topStart, fit: loose)\n'
+        '           ├Container\n'
+        '           │└LimitedBox(maxWidth: 0.0, maxHeight: 0.0)\n'
+        '           │ └ConstrainedBox(BoxConstraints(biggest))\n'
+        '           ├Center(alignment: center)\n'
+        '           │└AspectRatio(aspectRatio: 1.8)\n'
+        '           │ └VideoPlayer(state: _VideoPlayerState)\n'
+        '           │  └Container\n'
+        '           │   └LimitedBox(maxWidth: 0.0, maxHeight: 0.0)\n'
+        '           │    └ConstrainedBox(BoxConstraints(biggest))\n'
+        '           ├Container\n'
+        '           │└LimitedBox(maxWidth: 0.0, maxHeight: 0.0)\n'
+        '           │ └ConstrainedBox(BoxConstraints(biggest))\n'
+        '           └Container\n'
+        '            └LimitedBox(maxWidth: 0.0, maxHeight: 0.0)\n'
+        '             └ConstrainedBox(BoxConstraints(biggest))\n'
+        '\n';
+
+    testWidgets('renders video player (Android)', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      final explained = await _explain(tester);
+      expect(explained, equals(videoPlayer));
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('renders video player (iOS)', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      final explained = await _explain(tester);
+      expect(explained, equals(videoPlayer));
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('skips video player (linux)', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.linux;
+      final explained = await _explain(tester);
+      expect(
+          explained,
+          equals('TshWidget\n'
+              '└WidgetPlaceholder<Widget>(VideoPlayer)\n'
+              ' └VideoPlayer()\n'
+              '  └_VideoPlayerWidget(state: _PlaceholderState)\n'
+              '   └AspectRatio(aspectRatio: 1.8)\n'
+              '    └DecoratedBox(bg: BoxDecoration(color: Color(0x7f000000)))\n'
+              '     └Center(alignment: center)\n'
+              '      └Text("platform=TargetPlatform.linux")\n'
+              '       └RichText(text: "platform=TargetPlatform.linux")\n'
+              '\n'));
+      debugDefaultTargetPlatformOverride = null;
+    });
   });
 
   testWidgets('renders video player with specified dimensions', (tester) async {
@@ -98,7 +168,7 @@ void main() {
           equals('[VideoPlayer:'
               'url=$src,'
               'aspectRatio=$defaultAspectRatio,'
-              'poster=[Image:image=CachedNetworkImageProvider("$posterSrc", scale: 1.0)]'
+              'poster=[Image:image=NetworkImage("$posterSrc", scale: 1.0)]'
               ']'));
     });
   });

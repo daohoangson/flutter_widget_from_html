@@ -1,6 +1,6 @@
-name: fwfh_webview
+name: fwfh_chewie
 version: 0.6.0-rc.2021030202
-description: WidgetFactory extension to render IFRAME with the official WebView plugin.
+description: WidgetFactory extension to render VIDEO with the chewie plugin.
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
 environment:
@@ -9,10 +9,11 @@ environment:
   sdk: ">=2.12.0-0 <3.0.0"
 
 dependencies:
+  chewie: ^1.0.0
   flutter:
     sdk: flutter
   flutter_widget_from_html_core: ^0.6.0-0
-  webview_flutter: ^2.0.0
+  video_player: ^2.0.0-0
 
 dependency_overrides:
   flutter_widget_from_html_core:

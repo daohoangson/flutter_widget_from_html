@@ -73,7 +73,7 @@ void main() {
       debugDefaultTargetPlatformOverride = null;
     });
 
-    testWidgets('renders web view (linux)', (tester) async {
+    testWidgets('skips web view (linux)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.linux;
       final explained = await _explain(tester);
       expect(

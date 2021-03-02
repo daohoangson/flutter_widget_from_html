@@ -98,7 +98,8 @@ class WebViewState extends State<WebView> {
           ? null
           : DecoratedBox(
               child: Center(child: Text('platform=$platform')),
-              decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, .5)),
+              decoration:
+                  const BoxDecoration(color: Color.fromRGBO(0, 0, 0, .5)),
             );
 
   Widget _buildWebView() => lib.WebView(
