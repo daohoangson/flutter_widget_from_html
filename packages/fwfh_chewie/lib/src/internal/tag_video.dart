@@ -44,8 +44,7 @@ class TagVideo {
   Iterable<Widget>? onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> ws) {
     final player = _buildPlayer();
     if (player == null) return ws;
-
-    return [WidgetPlaceholder<BuildMetadata>(videoMeta, child: player)];
+    return [player];
   }
 
   Widget? _buildPlayer() {

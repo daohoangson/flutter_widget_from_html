@@ -73,7 +73,7 @@ class _VideoPlayerWidget extends StatefulWidget {
               platform == TargetPlatform.iOS ||
               kIsWeb
           ? _VideoPlayerState()
-          : _VideoPlayerPlaceholder();
+          : _PlaceholderState();
 }
 
 class _VideoPlayerState extends State<_VideoPlayerWidget> {
@@ -152,12 +152,12 @@ class _Controller extends lib.ChewieController {
   }
 }
 
-class _VideoPlayerPlaceholder extends State<_VideoPlayerWidget> {
+class _PlaceholderState extends State<_VideoPlayerWidget> {
   @override
   Widget build(BuildContext _) => AspectRatio(
       aspectRatio: widget.config.aspectRatio,
-      child: Container(
+      child: DecoratedBox(
         child: Center(child: Text('platform=${widget.platform}')),
-        color: Color.fromRGBO(0, 0, 0, .5),
+        decoration: const BoxDecoration(color: Color.fromRGBO(0, 0, 0, .5)),
       ));
 }
