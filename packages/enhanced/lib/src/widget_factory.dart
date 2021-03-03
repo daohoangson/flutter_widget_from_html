@@ -37,10 +37,6 @@ class WidgetFactory extends core.WidgetFactory
   @override
   String get webViewUserAgent => _widget?.webViewUserAgent;
 
-  /// Builds [Divider].
-  @override
-  Widget buildDivider(BuildMetadata meta) => const Divider(height: 1);
-
   /// Builds [InkWell].
   @override
   Widget buildGestureDetector(

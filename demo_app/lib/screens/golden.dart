@@ -19,7 +19,7 @@ class Golden extends StatelessWidget {
   Widget build(BuildContext context) {
     final baseUrl = Uri.parse('https://www.w3schools.com/html/');
     final withEnhanced =
-        RegExp(r'(^(A|HR|IFRAME|SVG|VIDEO)$|colspan|rowspan)').hasMatch(name);
+        RegExp(r'(^(A|IFRAME|SVG|VIDEO)$|colspan|rowspan)').hasMatch(name);
 
     final children = <Widget>[
       Text(html),
