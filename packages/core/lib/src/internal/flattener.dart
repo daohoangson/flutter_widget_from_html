@@ -131,9 +131,9 @@ class _Flattener {
   void _completeLoop() {
     _saveSpan();
 
-    if (_spans == null) return;
+    final scopedSpans = _spans;
+    if (scopedSpans == null) return;
 
-    final scopedSpans = _spans!;
     _spans = null;
     if (scopedSpans.isEmpty && _buffer.isEmpty) return;
     final scopedRecognizer = _recognizer.value;
@@ -185,11 +185,11 @@ class _Flattener {
     if (bit == parent.last) {
       final next = nextNonWhitespace(bit);
       if (next != null) {
-        BuildTree? tree = parent;
+        var tree = parent;
         while (true) {
-          final bitsParentLast = tree!.parent?.last;
+          final bitsParentLast = tree.parent?.last;
           if (bitsParentLast != bit) break;
-          tree = tree.parent;
+          tree = tree.parent!;
         }
 
         if (tree.parent == next.parent) {

@@ -122,7 +122,7 @@ class CssBorderSide {
   BorderSide? _getValue(TextStyleHtml tsh) => identical(this, none)
       ? null
       : BorderSide(
-          color: color ?? tsh.style.color!,
+          color: color ?? tsh.style.color ?? const BorderSide().color,
           // TODO: add proper support for other border styles
           style: style != null ? BorderStyle.solid : BorderStyle.none,
           width: width?.getValue(tsh) ?? 0.0,
@@ -169,7 +169,8 @@ class CssLength {
         return null;
       case CssLengthUnit.em:
         baseValue ??= tsh.style.fontSize;
-        value = baseValue! * number;
+        if (baseValue == null) return null;
+        value = baseValue * number;
         scaleFactor = 1;
         break;
       case CssLengthUnit.percentage:

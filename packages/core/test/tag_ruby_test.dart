@@ -1,4 +1,8 @@
+import 'dart:math';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import '_.dart';
 
@@ -151,4 +155,67 @@ void main() {
       expect(explained, equals('[RichText:(:Foo)]'));
     });
   });
+
+  group('HtmlRuby', () {
+    testWidgets('computeIntrinsic', (tester) async {
+      final rt = GlobalKey();
+      final ruby = GlobalKey();
+      final key = GlobalKey();
+      await tester.pumpWidget(HtmlRuby(
+        SizedBox(key: ruby, width: 50, height: 10),
+        SizedBox(key: rt, width: 10, height: 5),
+        key: key,
+      ));
+      await tester.pumpAndSettle();
+
+      final rtRenderBox = rt.currentContext!.findRenderObject() as RenderBox;
+      final rubyRenderBox =
+          ruby.currentContext!.findRenderObject() as RenderBox;
+      final htmlRubyRenderBox =
+          key.currentContext!.findRenderObject() as RenderBox;
+      expect(
+          htmlRubyRenderBox.getMaxIntrinsicHeight(100),
+          equals(rubyRenderBox.getMaxIntrinsicHeight(100) +
+              rtRenderBox.getMaxIntrinsicHeight(100)));
+      expect(
+          htmlRubyRenderBox.getMaxIntrinsicWidth(100),
+          equals(max(rubyRenderBox.getMaxIntrinsicWidth(100),
+              rtRenderBox.getMaxIntrinsicWidth(100))));
+      expect(
+          htmlRubyRenderBox.getMinIntrinsicHeight(100),
+          equals(rubyRenderBox.getMinIntrinsicHeight(100) +
+              rtRenderBox.getMinIntrinsicHeight(100)));
+      expect(
+          htmlRubyRenderBox.getMinIntrinsicWidth(100),
+          equals(min(rubyRenderBox.getMinIntrinsicWidth(100),
+              rtRenderBox.getMinIntrinsicWidth(100))));
+    });
+
+    testWidgets('performs hit test', (tester) async {
+      const kHref = 'href';
+      final urls = <String>[];
+
+      await tester.pumpWidget(_HitTestApp(href: kHref, onTapUrl: urls.add));
+      await tester.pumpAndSettle();
+      expect(await tapText(tester, 'Tap me'), equals(1));
+      expect(urls, equals(const [kHref]));
+    });
+  });
+}
+
+class _HitTestApp extends StatelessWidget {
+  final String? href;
+  final void Function(String)? onTapUrl;
+
+  const _HitTestApp({this.href, Key? key, this.onTapUrl}) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => MaterialApp(
+        home: Scaffold(
+          body: HtmlWidget(
+            '<ruby><a href="$href">Tap me</a></ruby>',
+            onTapUrl: onTapUrl,
+          ),
+        ),
+      );
 }

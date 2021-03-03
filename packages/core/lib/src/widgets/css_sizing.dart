@@ -219,8 +219,8 @@ class _RenderCssSizing extends RenderProxyBox {
   }
 
   Size? _guessChildSize({
-    double? maxHeight,
-    double? maxWidth,
+    required double maxHeight,
+    required double maxWidth,
     required double preferredHeight,
     required double preferredWidth,
   }) {
@@ -259,11 +259,11 @@ class _RenderCssSizing extends RenderProxyBox {
       childHeight = childWidth / childAspectRatio;
     }
 
-    if (childWidth > maxWidth!) {
+    if (childWidth > maxWidth) {
       childWidth = maxWidth;
       childHeight = childWidth / childAspectRatio;
     }
-    if (childHeight > maxHeight!) {
+    if (childHeight > maxHeight) {
       childHeight = maxHeight;
       childWidth = childHeight * childAspectRatio;
     }

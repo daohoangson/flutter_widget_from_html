@@ -46,8 +46,9 @@ class TextStyleHtml {
 
     final mqd = _getDependency<MediaQueryData>(deps);
     final tsf = mqd.textScaleFactor;
-    if (tsf != 1) {
-      style = style.copyWith(fontSize: style.fontSize! * tsf);
+    final fontSize = style.fontSize;
+    if (tsf != 1 && fontSize != null) {
+      style = style.copyWith(fontSize: fontSize * tsf);
     }
 
     return TextStyleHtml._(
@@ -153,14 +154,22 @@ class TextStyleBuilder<T1> {
     if (other == null) return false;
     TextStyleBuilder thisWithBuilder = this;
     while (thisWithBuilder._builders == null) {
-      if (thisWithBuilder.parent == null) break;
-      thisWithBuilder = thisWithBuilder.parent!;
+      final thisParent = thisWithBuilder.parent;
+      if (thisParent == null) {
+        break;
+      } else {
+        thisWithBuilder = thisParent;
+      }
     }
 
     var otherWithBuilder = other;
     while (otherWithBuilder._builders == null) {
-      if (otherWithBuilder.parent == null) break;
-      otherWithBuilder = otherWithBuilder.parent!;
+      final otherParent = otherWithBuilder.parent;
+      if (otherParent == null) {
+        break;
+      } else {
+        otherWithBuilder = otherParent;
+      }
     }
 
     return thisWithBuilder == otherWithBuilder;

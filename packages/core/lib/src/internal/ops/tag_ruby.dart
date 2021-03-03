@@ -5,16 +5,22 @@ const kTagRp = 'rp';
 const kTagRt = 'rt';
 
 class TagRuby {
+  late final BuildOp op;
   final BuildMetadata rubyMeta;
   final WidgetFactory wf;
 
-  BuildOp? _rubyOp;
-  BuildOp? _rtOp;
+  late final BuildOp _rtOp;
 
-  TagRuby(this.wf, this.rubyMeta);
-
-  BuildOp get op {
-    return _rubyOp ??= BuildOp(onChild: onChild, onTree: onTree);
+  TagRuby(this.wf, this.rubyMeta) {
+    op = BuildOp(onChild: onChild, onTree: onTree);
+    _rtOp = BuildOp(
+      onTree: (rtMeta, rtTree) {
+        if (rtTree.isEmpty) return;
+        final rtBit =
+            _RtBit(rtTree, rtTree.tsb, rtMeta, rtTree.copyWith() as BuildTree);
+        rtTree.replaceWith(rtBit);
+      },
+    );
   }
 
   void onChild(BuildMetadata childMeta) {
@@ -26,18 +32,9 @@ class TagRuby {
         childMeta[kCssDisplay] = kCssDisplayNone;
         break;
       case kTagRt:
-        _rtOp ??= BuildOp(
-          onTree: (rtMeta, rtTree) {
-            if (rtTree.isEmpty) return;
-            final rtBit = _RtBit(
-                rtTree, rtTree.tsb, rtMeta, rtTree.copyWith() as BuildTree);
-            rtTree.replaceWith(rtBit);
-          },
-        );
-
         childMeta
           ..[kCssFontSize] = '0.5em'
-          ..register(_rtOp!);
+          ..register(_rtOp);
         break;
     }
   }

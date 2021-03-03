@@ -130,7 +130,7 @@ class TextStyleOps {
     for (final part in parts) {
       final fontFamily = part
           .trim()
-          .replaceFirstMapped(RegExp(r"""^("|')(.+)\1$"""), (m) => m.group(2)!);
+          .replaceFirstMapped(RegExp(r"""^("|')(.+)\1$"""), (m) => m[2]!);
       if (fontFamily.isNotEmpty) list.add(fontFamily);
     }
 
@@ -231,17 +231,20 @@ class TextStyleOps {
     final number = double.tryParse(v);
     if (number != null && number > 0) return number;
 
+    final fontSize = p.style.fontSize;
+    if (fontSize == null) return null;
+
     final length = tryParseCssLength(v);
     if (length == null) return null;
 
     final lengthValue = length.getValue(
       p,
-      baseValue: p.style.fontSize,
+      baseValue: fontSize,
       scaleFactor: p.getDependency<MediaQueryData>().textScaleFactor,
     );
     if (lengthValue == null) return null;
 
-    return lengthValue / p.style.fontSize!;
+    return lengthValue / fontSize;
   }
 }
 

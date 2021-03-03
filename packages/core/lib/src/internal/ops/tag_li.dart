@@ -25,25 +25,34 @@ const kCssListStyleTypeSquare = 'square';
 
 class TagLi {
   final BuildMetadata listMeta;
+  late final BuildOp op;
   final WidgetFactory wf;
 
   final _itemMetas = <BuildMetadata>[];
+  late final BuildOp _itemOp;
   final _itemWidgets = <WidgetPlaceholder>[];
 
   _ListConfig? _config;
-  BuildOp? _itemOp;
-  BuildOp? _listOp;
 
-  TagLi(this.wf, this.listMeta);
+  TagLi(this.wf, this.listMeta) {
+    op = _TagLiListOp(this);
+    _itemOp = BuildOp(
+      onWidgets: (itemMeta, widgets) {
+        final column = wf.buildColumnPlaceholder(itemMeta, widgets) ??
+            WidgetPlaceholder<BuildMetadata>(itemMeta);
+
+        final i = _itemMetas.length;
+        _itemMetas.add(itemMeta);
+        _itemWidgets.add(column);
+        return [column.wrapWith((c, w) => _buildItem(c, w, i))];
+      },
+    );
+  }
 
   _ListConfig get config {
     // cannot build config from constructor because
     // inline styles are not fully parsed at that time
     return _config ??= _ListConfig.fromBuildMetadata(listMeta);
-  }
-
-  BuildOp get op {
-    return _listOp ??= _TagLiListOp(this);
   }
 
   Map<String, String> defaultStyles(dom.Element element) {
@@ -72,20 +81,7 @@ class TagLi {
     final e = childMeta.element;
     if (e.localName != kTagLi) return;
     if (e.parent != listMeta.element) return;
-
-    _itemOp ??= BuildOp(
-      onWidgets: (itemMeta, widgets) {
-        final column = wf.buildColumnPlaceholder(itemMeta, widgets) ??
-            WidgetPlaceholder<BuildMetadata>(itemMeta);
-
-        final i = _itemMetas.length;
-        _itemMetas.add(itemMeta);
-        _itemWidgets.add(column);
-        return [column.wrapWith((c, w) => _buildItem(c, w, i))];
-      },
-    );
-
-    childMeta.register(_itemOp!);
+    childMeta.register(_itemOp);
   }
 
   Widget _buildItem(BuildContext context, Widget child, int i) {
@@ -100,7 +96,7 @@ class TagLi {
     final markerText = wf.getListStyleMarker(listStyleType, markerIndex);
     final marker = _buildMarker(tsh, listStyleType, markerText);
 
-    return _ListItem(
+    return HtmlListItem(
       child: child,
       marker: marker,
       textDirection: tsh.textDirection,
@@ -170,123 +166,6 @@ class _ListConfig {
     }
 
     return null;
-  }
-}
-
-class _ListItem extends MultiChildRenderObjectWidget {
-  static const kGap = 5.0;
-
-  final TextDirection textDirection;
-
-  _ListItem({
-    required Widget child,
-    Key? key,
-    required Widget marker,
-    required this.textDirection,
-  }) : super(children: [child, marker], key: key);
-
-  @override
-  RenderObject createRenderObject(BuildContext _) =>
-      _ListItemRenderObject(textDirection: textDirection);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(
-        DiagnosticsProperty<TextDirection>('textDirection', textDirection));
-  }
-
-  @override
-  void updateRenderObject(BuildContext _, _ListItemRenderObject renderObject) {
-    renderObject.textDirection = textDirection;
-  }
-}
-
-class _ListItemData extends ContainerBoxParentData<RenderBox> {}
-
-class _ListItemRenderObject extends RenderBox
-    with
-        ContainerRenderObjectMixin<RenderBox, _ListItemData>,
-        RenderBoxContainerDefaultsMixin<RenderBox, _ListItemData> {
-  _ListItemRenderObject({
-    required TextDirection textDirection,
-  }) : _textDirection = textDirection;
-
-  TextDirection get textDirection => _textDirection;
-  TextDirection _textDirection;
-  set textDirection(TextDirection value) {
-    if (_textDirection == value) return;
-    _textDirection = value;
-    markNeedsLayout();
-  }
-
-  @override
-  double? computeDistanceToActualBaseline(TextBaseline baseline) =>
-      defaultComputeDistanceToFirstActualBaseline(baseline);
-
-  @override
-  double computeMaxIntrinsicHeight(double width) =>
-      firstChild!.computeMaxIntrinsicHeight(width);
-
-  @override
-  double computeMaxIntrinsicWidth(double height) =>
-      firstChild!.computeMaxIntrinsicWidth(height);
-
-  @override
-  double computeMinIntrinsicHeight(double width) =>
-      firstChild!.computeMinIntrinsicHeight(width);
-
-  @override
-  double computeMinIntrinsicWidth(double height) =>
-      firstChild!.getMinIntrinsicWidth(height);
-
-  @override
-  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
-      defaultHitTestChildren(result, position: position);
-
-  @override
-  void paint(PaintingContext context, Offset offset) =>
-      defaultPaint(context, offset);
-
-  @override
-  void performLayout() {
-    final child = firstChild!;
-    final childConstraints = constraints;
-    final childData = child.parentData as _ListItemData;
-    child.layout(childConstraints, parentUsesSize: true);
-    final childSize = child.size;
-
-    final marker = childData.nextSibling!;
-    final markerConstraints = childConstraints.loosen();
-    final markerData = marker.parentData as _ListItemData;
-    marker.layout(markerConstraints, parentUsesSize: true);
-    final markerSize = marker.size;
-
-    size = Size(
-      childSize.width,
-      childSize.height > 0 ? childSize.height : markerSize.height,
-    );
-
-    final baseline = TextBaseline.alphabetic;
-    final markerDistance =
-        marker.getDistanceToBaseline(baseline, onlyReal: true) ??
-            markerSize.height;
-    final childDistance =
-        child.getDistanceToBaseline(baseline, onlyReal: true) ?? markerDistance;
-
-    markerData.offset = Offset(
-      textDirection == TextDirection.ltr
-          ? -markerSize.width - _ListItem.kGap
-          : childSize.width + _ListItem.kGap,
-      childDistance - markerDistance,
-    );
-  }
-
-  @override
-  void setupParentData(RenderBox child) {
-    if (child.parentData is! _ListItemData) {
-      child.parentData = _ListItemData();
-    }
   }
 }
 
@@ -377,6 +256,7 @@ class _ListMarkerRenderObject extends RenderBox {
       lineMetrics = _textPainter.computeLineMetrics();
       // ignore: empty_catches
     } on UnimplementedError {}
+
     final m = lineMetrics.isNotEmpty ? lineMetrics.first : null;
     final center = offset +
         Offset(
@@ -388,15 +268,19 @@ class _ListMarkerRenderObject extends RenderBox {
                   m.unscaledAscent * .7
               : size.height / 2,
         );
-    final radius = _textStyle.fontSize! * .2;
 
+    final color = _textStyle.color;
+    final fontSize = _textStyle.fontSize;
+    if (color == null || fontSize == null) return;
+
+    final radius = fontSize * .2;
     switch (_markerType) {
       case _ListMarkerType.circle:
         canvas.drawCircle(
           center,
           radius * .9,
           Paint()
-            ..color = _textStyle.color!
+            ..color = color
             ..strokeWidth = 1
             ..style = PaintingStyle.stroke,
         );
@@ -405,13 +289,13 @@ class _ListMarkerRenderObject extends RenderBox {
         canvas.drawCircle(
           center,
           radius,
-          Paint()..color = _textStyle.color!,
+          Paint()..color = color,
         );
         break;
       case _ListMarkerType.square:
         canvas.drawRect(
           Rect.fromCircle(center: center, radius: radius * .8),
-          Paint()..color = _textStyle.color!,
+          Paint()..color = color,
         );
         break;
     }

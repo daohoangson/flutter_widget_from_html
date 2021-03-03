@@ -23,7 +23,9 @@ class _RubyRenderObject extends RenderBox
   double? computeDistanceToActualBaseline(TextBaseline baseline) {
     final ruby = firstChild!;
     final rubyValue = ruby.getDistanceToActualBaseline(baseline);
-    if (rubyValue == null) return null;
+    if (rubyValue == null) {
+      return super.computeDistanceToActualBaseline(baseline);
+    }
 
     final offset = (ruby.parentData as _RubyParentData).offset;
     return offset.dy + rubyValue;
@@ -83,23 +85,23 @@ class _RubyRenderObject extends RenderBox
 
   @override
   void performLayout() {
-    final ruby = firstChild!;
+    final ruby = firstChild;
     final rubyConstraints = constraints.loosen();
-    ruby.layout(rubyConstraints, parentUsesSize: true);
-    final rubyData = ruby.parentData as _RubyParentData;
-    final rubySize = ruby.size;
+    ruby?.layout(rubyConstraints, parentUsesSize: true);
+    final rubyData = ruby?.parentData as _RubyParentData?;
+    final rubySize = ruby?.size ?? Size.zero;
 
-    final rt = rubyData.nextSibling!;
+    final rt = rubyData?.nextSibling;
     final rtConstraints = rubyConstraints.copyWith(
         maxHeight: rubyConstraints.maxHeight - rubySize.height);
-    rt.layout(rtConstraints, parentUsesSize: true);
-    final rtData = rt.parentData as _RubyParentData;
-    final rtSize = rt.size;
+    rt?.layout(rtConstraints, parentUsesSize: true);
+    final rtData = rt?.parentData as _RubyParentData?;
+    final rtSize = rt?.size ?? Size.zero;
 
     final height = rubySize.height + rtSize.height;
     final width = max(rubySize.width, rtSize.width);
-    rubyData.offset = Offset((width - rubySize.width) / 2, rtSize.height);
-    rtData.offset = Offset((width - rtSize.width) / 2, 0);
+    rubyData?.offset = Offset((width - rubySize.width) / 2, rtSize.height);
+    rtData?.offset = Offset((width - rtSize.width) / 2, 0);
     size = constraints.constrain(Size(width, height));
   }
 
