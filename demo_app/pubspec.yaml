@@ -26,6 +26,8 @@ dependency_overrides:
     path: ../packages/enhanced
   flutter_widget_from_html_core:
     path: ../packages/core
+  fwfh_cached_network_image:
+    path: ../packages/fwfh_cached_network_image
   fwfh_chewie:
     path: ../packages/fwfh_chewie
   fwfh_svg:

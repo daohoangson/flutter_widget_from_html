@@ -1,8 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core show WidgetFactory;
+import 'package:fwfh_cached_network_image/fwfh_cached_network_image.dart';
 import 'package:fwfh_chewie/fwfh_chewie.dart';
 import 'package:fwfh_svg/fwfh_svg.dart';
 import 'package:fwfh_url_launcher/fwfh_url_launcher.dart';
@@ -13,7 +12,12 @@ import 'html_widget.dart';
 
 /// A factory to build widgets with [WebView], [VideoPlayer], etc.
 class WidgetFactory extends core.WidgetFactory
-    with ChewieFactory, SvgFactory, UrlLauncherFactory, WebViewFactory {
+    with
+        CachedNetworkImageFactory,
+        ChewieFactory,
+        SvgFactory,
+        UrlLauncherFactory,
+        WebViewFactory {
   TextStyleHtml Function(TextStyleHtml, dynamic) _tagA;
   HtmlWidget _widget;
 
@@ -57,10 +61,6 @@ class WidgetFactory extends core.WidgetFactory
   @override
   Iterable<dynamic> getDependencies(BuildContext context) =>
       [...super.getDependencies(context), Theme.of(context)];
-
-  @override
-  ImageProvider imageProviderFromNetwork(String url) =>
-      url?.isNotEmpty == true ? CachedNetworkImageProvider(url) : null;
 
   @override
   void parse(BuildMetadata meta) {
