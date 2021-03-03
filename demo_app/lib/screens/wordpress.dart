@@ -104,8 +104,9 @@ class _PostsState extends State<_PostsList> {
   void initState() {
     super.initState();
 
-    posts =
-        http.get(widget.url).then((resp) => _parseJson(jsonDecode(resp.body)));
+    posts = http
+        .get(Uri.parse(widget.url))
+        .then((resp) => _parseJson(jsonDecode(resp.body)));
   }
 
   @override
