@@ -58,12 +58,12 @@ class WidgetFactory {
           {bool isBorderBox = false}) =>
       isBorderBox
           ? DecoratedBox(
-              child: child,
               decoration: BoxDecoration(border: border),
+              child: child,
             )
           : Container(
-              child: child,
               decoration: BoxDecoration(border: border),
+              child: child,
             );
 
   /// Builds column placeholder.
@@ -100,10 +100,10 @@ class WidgetFactory {
     if (children.length == 1) return children.first;
 
     return Column(
-      children: children,
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       textDirection: tsh.textDirection,
+      children: children,
     );
   }
 
@@ -114,10 +114,8 @@ class WidgetFactory {
     Color? color,
   }) =>
       DecoratedBox(
+        decoration: BoxDecoration(color: color),
         child: child,
-        decoration: BoxDecoration(
-          color: color,
-        ),
       );
 
   /// Builds 1-pixel-height divider.
@@ -129,11 +127,11 @@ class WidgetFactory {
   /// Builds [GestureDetector].
   Widget? buildGestureDetector(
           BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
-      GestureDetector(child: child, onTap: onTap);
+      GestureDetector(onTap: onTap, child: child);
 
   /// Builds horizontal scroll view.
   Widget? buildHorizontalScrollView(BuildMetadata meta, Widget child) =>
-      SingleChildScrollView(child: child, scrollDirection: Axis.horizontal);
+      SingleChildScrollView(scrollDirection: Axis.horizontal, child: child);
 
   /// Builds image widget from an [ImageMetadata].
   Widget? buildImage(BuildMetadata meta, ImageMetadata data) {
@@ -197,15 +195,15 @@ class WidgetFactory {
           BuildMetadata meta, Widget child, EdgeInsetsGeometry padding) =>
       padding == EdgeInsets.zero
           ? child
-          : Padding(child: child, padding: padding);
+          : Padding(padding: padding, child: child);
 
   /// Builds [Stack].
   Widget? buildStack(
           BuildMetadata meta, TextStyleHtml tsh, List<Widget> children) =>
       Stack(
-        children: children,
         clipBehavior: Clip.none,
         textDirection: tsh.textDirection,
+        children: children,
       );
 
   /// Builds [RichText].

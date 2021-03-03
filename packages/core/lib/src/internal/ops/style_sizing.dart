@@ -133,7 +133,6 @@ class StyleSizing {
     final tsh = tsb.build(context);
 
     return CssSizing(
-      child: child,
       maxHeight: _getValue(input.maxHeight, tsh),
       maxWidth: _getValue(input.maxWidth, tsh),
       minHeight: _getValue(input.minHeight, tsh),
@@ -141,6 +140,7 @@ class StyleSizing {
       preferredAxis: input.preferredAxis,
       preferredHeight: _getValue(input.preferredHeight, tsh),
       preferredWidth: _getValue(input.preferredWidth, tsh),
+      child: child,
     );
   }
 

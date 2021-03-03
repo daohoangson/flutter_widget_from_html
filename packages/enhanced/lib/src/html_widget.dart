@@ -85,7 +85,7 @@ Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
         ? snapshot.data
         : const Center(
             child: Padding(
-              child: CircularProgressIndicator(),
               padding: EdgeInsets.all(8),
+              child: CircularProgressIndicator(),
             ),
           );

@@ -4,11 +4,11 @@ const kCssMargin = 'margin';
 
 Widget _marginHorizontalBuilder(Widget w, CssLengthBox b, TextStyleHtml tsh) =>
     Padding(
-      child: w,
       padding: EdgeInsets.only(
         left: b.getValueLeft(tsh) ?? 0.0,
         right: b.getValueRight(tsh) ?? 0.0,
       ),
+      child: w,
     );
 
 class StyleMargin {

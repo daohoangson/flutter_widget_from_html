@@ -22,7 +22,7 @@ void main() {
       final src = 'https://www.w3schools.com/html/mov_bbb.mp4';
       await driver.tap(find.byValueKey(src));
       await Future.delayed(const Duration(seconds: 20));
-      await expectAspectRatio(driver, 1.81);
+      expectAspectRatio(driver, 1.81);
     });
   });
 }

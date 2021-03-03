@@ -7,6 +7,7 @@ import 'custom_widget_builder.dart' as custom_widget_builder;
 class PhotoViewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DefaultTabController(
+        length: 2,
         child: Scaffold(
           appBar: AppBar(
             bottom: TabBar(
@@ -18,6 +19,7 @@ class PhotoViewScreen extends StatelessWidget {
             title: Text('PhotoViewScreen'),
           ),
           body: TabBarView(
+            physics: NeverScrollableScrollPhysics(),
             children: <Widget>[
               SingleChildScrollView(
                 child: Padding(
@@ -38,10 +40,8 @@ class PhotoViewScreen extends StatelessWidget {
                 ),
               ),
             ],
-            physics: NeverScrollableScrollPhysics(),
           ),
         ),
-        length: 2,
       );
 }
 
@@ -84,7 +84,6 @@ class _PopupPhotoViewWidgetFactory extends WidgetFactory {
     if (built is Image) {
       return Builder(
         builder: (context) => GestureDetector(
-          child: Hero(child: built, tag: url),
           onTap: () => Navigator.of(context).push(MaterialPageRoute(
               builder: (_) => Scaffold(
                     appBar: AppBar(),
@@ -95,6 +94,7 @@ class _PopupPhotoViewWidgetFactory extends WidgetFactory {
                       ),
                     ),
                   ))),
+          child: Hero(tag: url, child: built),
         ),
       );
     }

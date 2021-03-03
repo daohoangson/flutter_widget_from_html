@@ -204,7 +204,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
   }
 
   Widget _tshWidget(Widget child) =>
-      TshWidget(child: child, tsh: _rootTsb._output);
+      TshWidget(tsh: _rootTsb._output, child: child);
 }
 
 class _RootTsb extends TextStyleBuilder {
@@ -235,8 +235,8 @@ Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
     snapshot.data ??
     const Center(
       child: Padding(
-        child: Text('Loading...'),
         padding: EdgeInsets.all(8),
+        child: Text('Loading...'),
       ),
     );
 

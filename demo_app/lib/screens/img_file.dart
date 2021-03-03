@@ -66,6 +66,7 @@ class _ImgFileState extends State<_ImgFileTab> {
           switch (status.value) {
             case _ImgFileStatus.idle:
               return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -78,12 +79,11 @@ class _ImgFileState extends State<_ImgFileTab> {
                   ),
                   Center(
                     child: ElevatedButton(
-                      child: Text('Write file'),
                       onPressed: _writeFile,
+                      child: Text('Write file'),
                     ),
                   ),
                 ],
-                mainAxisAlignment: MainAxisAlignment.center,
               );
             case _ImgFileStatus.writeFileWriting:
               return const Center(child: CircularProgressIndicator());
@@ -100,11 +100,11 @@ class _ImgFileState extends State<_ImgFileTab> {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(html),
                         HtmlWidget(html),
                       ],
-                      mainAxisAlignment: MainAxisAlignment.center,
                     ),
                   );
                 },

@@ -638,8 +638,8 @@ void main() async {
     testWidgets('renders ordered list', (WidgetTester tester) async {
       final explained = await explain(tester, null,
           hw: Directionality(
-            child: HtmlWidget(html, key: hwKey),
             textDirection: TextDirection.rtl,
+            child: HtmlWidget(html, key: hwKey),
           ));
       expect(explained, equals(explainerExpected));
     });
@@ -649,8 +649,8 @@ void main() async {
         tester,
         null,
         hw: Directionality(
-          child: HtmlWidget(html, key: hwKey),
           textDirection: TextDirection.rtl,
+          child: HtmlWidget(html, key: hwKey),
         ),
         useExplainer: false,
       );
@@ -679,10 +679,10 @@ void main() async {
       final child = GlobalKey();
       final listItem = GlobalKey();
       await tester.pumpWidget(HtmlListItem(
-        child: SizedBox(key: child, width: 50, height: 5),
         key: listItem,
         marker: widget0,
         textDirection: TextDirection.ltr,
+        child: SizedBox(key: child, width: 50, height: 5),
       ));
       await tester.pumpAndSettle();
 
@@ -766,7 +766,9 @@ class _Golden extends StatelessWidget {
   @override
   Widget build(BuildContext _) => Scaffold(
         body: Padding(
+          padding: const EdgeInsets.all(8.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(contents),
               Divider(),
@@ -798,9 +800,7 @@ class _Golden extends StatelessWidget {
 </ol>
 '''),
             ],
-            crossAxisAlignment: CrossAxisAlignment.stretch,
           ),
-          padding: const EdgeInsets.all(8.0),
         ),
       );
 }
