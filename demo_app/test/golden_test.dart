@@ -8,18 +8,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 
 void _test(String name, String html) => testGoldens(name, (tester) async {
+      final platform = TargetPlatform.linux;
+      debugDefaultTargetPlatformOverride = platform;
       final key = UniqueKey();
 
       await tester.pumpWidgetBuilder(
         Golden(name, html, targetKey: key),
         wrapper: materialAppWrapper(
-          platform: TargetPlatform.linux,
+          platform: platform,
           theme: ThemeData.light(),
         ),
         surfaceSize: Size(400, 1200),
       );
 
       await screenMatchesGolden(tester, name, finder: find.byKey(key));
+      debugDefaultTargetPlatformOverride = null;
     }, skip: !Platform.isLinux);
 
 void main() {
