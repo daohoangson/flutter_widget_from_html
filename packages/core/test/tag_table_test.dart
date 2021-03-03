@@ -925,15 +925,15 @@ class _Golden extends StatelessWidget {
   @override
   Widget build(BuildContext _) => Scaffold(
         body: Padding(
+          padding: const EdgeInsets.all(8.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(contents),
               Divider(),
               HtmlWidget(contents),
             ],
-            crossAxisAlignment: CrossAxisAlignment.stretch,
           ),
-          padding: const EdgeInsets.all(8.0),
         ),
       );
 }

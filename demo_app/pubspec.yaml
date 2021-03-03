@@ -34,7 +34,6 @@ dependency_overrides:
     path: ../packages/fwfh_url_launcher
   fwfh_webview:
     path: ../packages/fwfh_webview
-  wakelock: ^0.4.0
 
 dev_dependencies:
   flutter_driver:

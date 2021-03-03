@@ -41,14 +41,14 @@ class WidgetFactory extends core.WidgetFactory
   @override
   Widget buildGestureDetector(
           BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
-      InkWell(child: child, onTap: onTap);
+      InkWell(onTap: onTap, child: child);
 
   @override
   Widget buildImage(BuildMetadata meta, ImageMetadata data) {
     var built = super.buildImage(meta, data);
 
     if (built != null && data.title != null) {
-      built = Tooltip(child: built, message: data.title);
+      built = Tooltip(message: data.title, child: built);
     }
 
     return built;

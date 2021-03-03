@@ -447,11 +447,11 @@ void main() {
             await tester.pumpWidgetBuilder(
               Scaffold(
                 body: SingleChildScrollView(
-                  child: Padding(
-                    child: HtmlWidget('<div style="width: 100%">Foo</div>'),
-                    padding: const EdgeInsets.all(8.0),
-                  ),
                   scrollDirection: Axis.horizontal,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: HtmlWidget('<div style="width: 100%">Foo</div>'),
+                  ),
                 ),
               ),
               wrapper: materialAppWrapper(theme: ThemeData.light()),
@@ -465,11 +465,12 @@ void main() {
             await tester.pumpWidgetBuilder(
               Scaffold(
                 body: SingleChildScrollView(
-                    child: Padding(
-                      child: HtmlWidget('<div style="height: 100%">Foo</div>'),
-                      padding: const EdgeInsets.all(8.0),
-                    ),
-                    scrollDirection: Axis.vertical),
+                  scrollDirection: Axis.vertical,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: HtmlWidget('<div style="height: 100%">Foo</div>'),
+                  ),
+                ),
               ),
               wrapper: materialAppWrapper(theme: ThemeData.light()),
               surfaceSize: Size(200, 200),
@@ -495,8 +496,8 @@ class _Golden extends StatelessWidget {
   @override
   Widget build(BuildContext _) => Scaffold(
         body: Padding(
-          child: HtmlWidget(html),
           padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(html),
         ),
       );
 }

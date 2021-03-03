@@ -30,11 +30,11 @@ class Golden extends StatelessWidget {
           style: Theme.of(context).textTheme.caption,
         ),
       LimitedBox(
+        maxHeight: 400,
         child: core.HtmlWidget(
           html,
           baseUrl: baseUrl,
         ),
-        maxHeight: 400,
       ),
     ];
 
@@ -46,12 +46,12 @@ class Golden extends StatelessWidget {
           style: Theme.of(context).textTheme.caption,
         ),
         LimitedBox(
+          maxHeight: 400,
           child: enhanced.HtmlWidget(
             html,
             baseUrl: baseUrl,
             webView: true,
           ),
-          maxHeight: 400,
         ),
       ]);
     }
@@ -60,18 +60,18 @@ class Golden extends StatelessWidget {
       appBar: AppBar(title: Text(name)),
       body: SingleChildScrollView(
         child: RepaintBoundary(
+          key: targetKey,
           child: Container(
+            color: Colors.white,
             child: Padding(
+              padding: const EdgeInsets.all(10),
               child: Column(
-                children: children,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
+                children: children,
               ),
-              padding: const EdgeInsets.all(10),
             ),
-            color: Colors.white,
           ),
-          key: targetKey,
         ),
       ),
     );
@@ -150,8 +150,8 @@ class _GoldensState extends State<GoldensScreen> {
                 hintText: 'Filter',
                 suffixIcon: _filtered != null
                     ? InkWell(
-                        child: Icon(Icons.cancel),
                         onTap: () => _filter.clear(),
+                        child: Icon(Icons.cancel),
                       )
                     : null,
               ),
