@@ -1,5 +1,5 @@
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart' show Theme, ThemeData;
+import 'package:flutter/material.dart' show Theme, ThemeData, Tooltip;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
@@ -146,6 +146,11 @@ class WidgetFactory {
       url: src.url,
     );
 
+    final title = data.title;
+    if (built != null && title != null) {
+      built = buildTooltip(meta, built, title);
+    }
+
     if (built != null &&
         src.height?.isNegative == false &&
         src.width?.isNegative == false &&
@@ -220,6 +225,10 @@ class WidgetFactory {
         // currently it only renders 1 line with ellipsis
         maxLines: tsh.maxLines == -1 ? null : tsh.maxLines,
       );
+
+  /// Builds [Tooltip].
+  Widget? buildTooltip(BuildMetadata meta, Widget child, String message) =>
+      Tooltip(message: message, child: child);
 
   /// Prepares [GestureTapCallback].
   GestureTapCallback? gestureTapCallback(String url) => () => onTapUrl(url);
