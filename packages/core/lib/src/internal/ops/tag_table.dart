@@ -180,11 +180,11 @@ class TagTable {
 
           return HtmlTableCell(
             border: border,
-            child: child,
             columnSpan: columnSpan,
             columnStart: columnStart,
             rowSpan: rowSpan,
             rowStart: cellMeta.row,
+            child: child,
           );
         });
       }
@@ -306,9 +306,9 @@ class _TagTableRow {
           final row = cellMeta.row;
 
           return HtmlTableValignBaseline(
-            child: child,
             companion: parent.companion,
             row: row,
+            child: child,
           );
         }));
       },

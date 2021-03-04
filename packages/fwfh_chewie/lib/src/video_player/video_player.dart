@@ -134,7 +134,7 @@ class _PlaceholderState extends State<VideoPlayer> {
   Widget build(BuildContext _) => AspectRatio(
       aspectRatio: widget.aspectRatio,
       child: DecoratedBox(
-        child: Center(child: Text('platform=$defaultTargetPlatform')),
         decoration: const BoxDecoration(color: Color.fromRGBO(0, 0, 0, .5)),
+        child: Center(child: Text('platform=$defaultTargetPlatform')),
       ));
 }

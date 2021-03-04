@@ -36,7 +36,6 @@ class WebViewState extends State<WebView> {
               : MediaQuery.of(context).size.width;
           final height = width / _aspectRatio;
           return SizedBox(
-            child: webView,
             height: min(
               height,
               constraints.hasBoundedHeight
@@ -44,6 +43,7 @@ class WebViewState extends State<WebView> {
                   : MediaQuery.of(context).size.height,
             ),
             width: width,
+            child: webView,
           );
         },
       );
@@ -98,8 +98,8 @@ class WebViewState extends State<WebView> {
           defaultTargetPlatform == TargetPlatform.iOS
       ? null
       : DecoratedBox(
-          child: Center(child: Text('platform=$defaultTargetPlatform')),
           decoration: const BoxDecoration(color: Color.fromRGBO(0, 0, 0, .5)),
+          child: Center(child: Text('platform=$defaultTargetPlatform')),
         );
 
   Widget _buildWebView() => lib.WebView(

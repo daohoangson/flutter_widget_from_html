@@ -64,6 +64,7 @@ class _PostScreen extends StatelessWidget {
           ],
         ),
         body: Padding(
+          padding: const EdgeInsets.all(8),
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -79,7 +80,6 @@ class _PostScreen extends StatelessWidget {
               ],
             ),
           ),
-          padding: const EdgeInsets.all(8),
         ),
       );
 

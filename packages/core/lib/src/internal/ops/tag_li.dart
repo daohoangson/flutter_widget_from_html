@@ -97,9 +97,9 @@ class TagLi {
     final marker = _buildMarker(tsh, listStyleType, markerText);
 
     return HtmlListItem(
-      child: child,
       marker: marker,
       textDirection: tsh.textDirection,
+      child: child,
     );
   }
 

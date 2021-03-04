@@ -1518,8 +1518,8 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         tester,
         null,
         hw: DefaultTextStyle(
-          child: HtmlWidget('Foo', key: hwKey),
           style: TextStyle(),
+          child: HtmlWidget('Foo', key: hwKey),
         ),
       );
       expect(explained, equals('[RichText:(:Foo)]'));
@@ -1541,8 +1541,8 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         tester,
         null,
         hw: DefaultTextStyle(
-          child: HtmlWidget('<h1>Header</h1>', key: hwKey),
           style: TextStyle(),
+          child: HtmlWidget('<h1>Header</h1>', key: hwKey),
         ),
       );
       expect(explained, equals('[CssBlock:child=[RichText:(+b:Header)]]'));
@@ -1567,8 +1567,8 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         tester,
         null,
         hw: DefaultTextStyle(
-          child: HtmlWidget('<sup>Foo</sup>', key: hwKey),
           style: TextStyle(),
+          child: HtmlWidget('<sup>Foo</sup>', key: hwKey),
         ),
       );
       expect(explained, equals('[RichText:[RichText:(:Foo)]@bottom]'));
@@ -1591,11 +1591,11 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         tester,
         null,
         hw: DefaultTextStyle(
+          style: TextStyle(),
           child: HtmlWidget(
             '<span style="line-height: 20px">Foo</span>',
             key: hwKey,
           ),
-          style: TextStyle(),
         ),
       );
       expect(explained, equals('[RichText:(:Foo)]'));
@@ -1620,8 +1620,8 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
         testGoldens('renders LI', (tester) async {
           await tester.pumpWidgetBuilder(
             _Issue460(DefaultTextStyle(
-              child: HtmlWidget(html, key: hwKey),
               style: TextStyle(),
+              child: HtmlWidget(html, key: hwKey),
             )),
             wrapper: materialAppWrapper(theme: ThemeData.light()),
             surfaceSize: Size(200, 200),
@@ -1645,9 +1645,9 @@ class _Issue460 extends StatelessWidget {
   @override
   Widget build(BuildContext _) => Scaffold(
         body: Container(
-          child: child,
           color: const Color.fromRGBO(255, 0, 0, 1),
           padding: const EdgeInsets.all(8.0),
+          child: child,
         ),
       );
 }
