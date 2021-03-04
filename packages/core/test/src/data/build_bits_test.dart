@@ -51,14 +51,14 @@ void main() {
           final html = '1 <a href="href">2</a> 3';
           final explained = await explain(tester, html);
           expect(
-              explained, equals('[RichText:(:1 (#FF0000FF+u+onTap:2)(: 3))]'));
+              explained, equals('[RichText:(:1 (#FF123456+u+onTap:2)(: 3))]'));
         });
 
         testWidgets('A tag with BuildBit', (WidgetTester tester) async {
           final html = '1 <a href="href" class="$clazz">2</a> 3';
           final explained = await explain(tester, html);
           expect(explained,
-              equals('[RichText:(:1 (#FF0000FF+u+onTap+onTapCancel:2)(: 3))]'));
+              equals('[RichText:(:1 (#FF123456+u+onTap+onTapCancel:2)(: 3))]'));
         });
       });
 
@@ -100,7 +100,7 @@ void main() {
           final html = '1 <a href="href">2</a> 3';
           final explained = await explain(tester, html);
           expect(
-              explained, equals('[RichText:(:1 (#FF0000FF+u+onTap:2)(: 3))]'));
+              explained, equals('[RichText:(:1 (#FF123456+u+onTap:2)(: 3))]'));
         });
 
         testWidgets('A tag with BuildBit', (WidgetTester tester) async {
@@ -109,7 +109,7 @@ void main() {
           expect(
               explained,
               equals(
-                  '[RichText:(:1 (#FF0000FF+u+MultiTapGestureRecognizer:2)(: 3))]'));
+                  '[RichText:(:1 (#FF123456+u+MultiTapGestureRecognizer:2)(: 3))]'));
         });
       });
 

@@ -57,14 +57,6 @@ const kCssTextOverflow = 'text-overflow';
 const kCssTextOverflowClip = 'clip';
 const kCssTextOverflowEllipsis = 'ellipsis';
 
-String convertColorToHex(Color value) {
-  final r = value.red.toRadixString(16).padLeft(2, '0');
-  final g = value.green.toRadixString(16).padLeft(2, '0');
-  final b = value.blue.toRadixString(16).padLeft(2, '0');
-  final a = value.alpha.toRadixString(16).padLeft(2, '0');
-  return '#$r$g$b$a';
-}
-
 void wrapTree(
   BuildTree tree, {
   BuildBit Function(BuildTree parent)? append,

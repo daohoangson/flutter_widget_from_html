@@ -15,7 +15,7 @@ final hwKey = helper.hwKey;
 
 final buildCurrentState = helper.buildCurrentState;
 
-String _explainer(helper.Explainer parent, Widget widget) {
+String? _explainer(helper.Explainer parent, Widget widget) {
   return fwfh_chewie.videoPlayerExplainer(parent, widget) ??
       fwfh_svg.svgExplainer(parent, widget) ??
       fwfh_webview.webViewExplainer(parent, widget);
@@ -23,9 +23,9 @@ String _explainer(helper.Explainer parent, Widget widget) {
 
 Future<String> explain(
   WidgetTester tester,
-  String html, {
+  String? html, {
   bool buildFutureBuilderWithData = true,
-  HtmlWidget hw,
+  HtmlWidget? hw,
   bool useExplainer = true,
   bool webView = false,
 }) async =>
@@ -36,7 +36,7 @@ Future<String> explain(
       explainer: _explainer,
       hw: hw ??
           HtmlWidget(
-            html,
+            html!,
             key: helper.hwKey,
             webView: webView,
           ),

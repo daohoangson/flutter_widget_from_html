@@ -1,3 +1,8 @@
+## 0.6.0-rc.2021030401
+
+- Requires Flutter 2
+- Implement new package `fwfh_cached_network_image` (#463)
+
 ## 0.6.0-rc.2021030202
 
 - Add support for anchor in core package (#447)

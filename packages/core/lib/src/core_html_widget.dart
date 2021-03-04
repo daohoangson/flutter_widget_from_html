@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:flutter/cupertino.dart' show CupertinoActivityIndicator;
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart'
+    show CircularProgressIndicator, Theme, ThemeData;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:html/dom.dart' as dom;
@@ -48,7 +51,7 @@ class HtmlWidget extends StatefulWidget {
 
   /// The text color for link elements.
   ///
-  /// Default: blue (#0000FF).
+  /// Default: [ThemeData.accentColor].
   final Color? hyperlinkColor;
 
   /// The custom [WidgetFactory] builder.
@@ -100,7 +103,7 @@ class HtmlWidget extends StatefulWidget {
     this.customWidgetBuilder,
     this.enableCaching,
     this.factoryBuilder,
-    this.hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
+    this.hyperlinkColor,
     Key? key,
     this.onTapImage,
     this.onTapUrl,
@@ -231,12 +234,15 @@ class _RootTsb extends TextStyleBuilder {
   void reset() => _output = null;
 }
 
-Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
+Widget _buildAsyncBuilder(
+        BuildContext context, AsyncSnapshot<Widget> snapshot) =>
     snapshot.data ??
-    const Center(
+    Center(
       child: Padding(
         padding: EdgeInsets.all(8),
-        child: Text('Loading...'),
+        child: Theme.of(context).platform == TargetPlatform.iOS
+            ? CupertinoActivityIndicator()
+            : CircularProgressIndicator(),
       ),
     );
 

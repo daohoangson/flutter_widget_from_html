@@ -16,6 +16,21 @@ void main() {
             'StringPicture(String, colorFilter: null)]'));
   });
 
+  testWidgets('renders IMG tag with .svg', (WidgetTester tester) async {
+    final sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
+    final assetName = 'test/images/logo.svg';
+    final package = 'fwfh_svg';
+    final html = '<img src="asset:$assetName?package=$package" />';
+    final explained = await explain(tester, html);
+    expect(
+      explained,
+      equals('[CssSizing:$sizingConstraints,child='
+          '[SvgPicture:'
+          'pictureProvider=ExactAssetPicture(name: "packages/$package/$assetName", bundle: null, colorFilter: null)'
+          ']]'),
+    );
+  });
+
   testWidgets('renders VIDEO tag', (tester) async {
     final src = 'http://domain.com/video.mp4';
     final html = '<video><source src="$src"></video>';

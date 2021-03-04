@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -62,7 +63,8 @@ void main() {
         expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
       });
 
-      testWidgets('renders indicator', (WidgetTester tester) async {
+      testWidgets('renders CircularProgressIndicator', (tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
         final html = 'Foo';
         final explained = await explain(tester, html, withData: false);
         expect(
@@ -70,8 +72,23 @@ void main() {
             equals('[FutureBuilder:'
                 '[Center:child='
                 '[Padding:(8,8,8,8),child='
-                '[Text:Loading...]'
+                '[CircularProgressIndicator]'
                 ']]]'));
+        debugDefaultTargetPlatformOverride = null;
+      });
+
+      testWidgets('renders CupertinoActivityIndicator', (tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        final html = 'Foo';
+        final explained = await explain(tester, html, withData: false);
+        expect(
+            explained,
+            equals('[FutureBuilder:'
+                '[Center:child='
+                '[Padding:(8,8,8,8),child='
+                '[CupertinoActivityIndicator]'
+                ']]]'));
+        debugDefaultTargetPlatformOverride = null;
       });
     });
 
@@ -111,7 +128,7 @@ void main() {
       bool enableCaching, {
       Uri? baseUrl,
       bool? buildAsync,
-      Color hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
+      Color? hyperlinkColor,
       RebuildTriggers? rebuildTriggers,
       TextStyle? textStyle,
     }) =>
@@ -341,7 +358,7 @@ void main() {
 
     testWidgets('renders default value', (WidgetTester tester) async {
       final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(e, equals('[RichText:(#FF0000FF+u:Foo)]'));
+      expect(e, equals('[RichText:(#FF123456+u:Foo)]'));
     });
 
     testWidgets('renders custom value', (WidgetTester tester) async {
@@ -357,7 +374,7 @@ void main() {
         tester,
         HtmlWidget(html, hyperlinkColor: null, key: helper.hwKey),
       );
-      expect(explained, equals('[RichText:(+u:Foo)]'));
+      expect(explained, equals('[RichText:(#FF123456+u:Foo)]'));
     });
   });
 

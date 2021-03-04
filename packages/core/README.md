@@ -76,7 +76,7 @@ HtmlWidget(
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
 [Compare between Flutter rendering and browser's.](https://html-widget-demo.now.sh/supported/tags.html)
 
-- A: underline, blue color with scroll to anchor support
+- A: underline, theme accent color with scroll to anchor support
 - H1/H2/H3/H4/H5/H6
 - IMG with support for asset (`asset://`), data uri, local file (`file://`) and network image
 - LI/OL/UL with support for:
@@ -134,6 +134,8 @@ This package implements widget building logic with high testing coverage to ensu
 
 The enhanced package ([flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html)) uses a custom `WidgetFactory` with pre-built mixins for easy usage:
 
+- [fwfh_cached_network_image](https://pub.dev/packages/fwfh_cached_network_image)
+- [fwfh_chewie](https://pub.dev/packages/fwfh_chewie)
 - [fwfh_svg](https://pub.dev/packages/fwfh_svg)
 - [fwfh_url_launcher](https://pub.dev/packages/fwfh_url_launcher)
 - [fwfh_webview](https://pub.dev/packages/fwfh_webview)

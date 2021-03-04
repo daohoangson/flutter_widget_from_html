@@ -543,11 +543,9 @@ class Explainer {
     // G-M
     attr.add(widget is GestureDetector
         ? _widgetChild(widget.child)
-        : widget is InkWell
-            ? _widgetChild(widget.child)
-            : widget is MultiChildRenderObjectWidget
-                ? (widget is! RichText ? _widgetChildren(widget.children) : '')
-                : '');
+        : widget is MultiChildRenderObjectWidget
+            ? (widget is! RichText ? _widgetChildren(widget.children) : '')
+            : '');
     // N-T
     attr.add(widget is ProxyWidget
         ? _widgetChild(widget.child)

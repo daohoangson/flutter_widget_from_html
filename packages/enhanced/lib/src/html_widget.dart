@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core show HtmlWidget, RebuildTriggers;
 
@@ -30,37 +30,36 @@ class HtmlWidget extends core.HtmlWidget {
   final bool webViewMediaPlaybackAlwaysAllow;
 
   /// The value used for the HTTP `User-Agent` request header in WebViews.
-  final String webViewUserAgent;
+  final String? webViewUserAgent;
 
   /// Creates a widget that builds Flutter widget tree from html.
   ///
   /// The [html] argument must not be null.
   HtmlWidget(
     String html, {
-    bool buildAsync,
-    AsyncWidgetBuilder<Widget> buildAsyncBuilder,
+    bool? buildAsync,
+    AsyncWidgetBuilder<Widget>? buildAsyncBuilder,
     bool enableCaching = true,
-    WidgetFactory Function() factoryBuilder,
-    Key key,
-    Uri baseUrl,
-    CustomStylesBuilder customStylesBuilder,
-    CustomWidgetBuilder customWidgetBuilder,
-    Color hyperlinkColor,
-    void Function(ImageMetadata) onTapImage,
-    void Function(String) onTapUrl,
-    core.RebuildTriggers rebuildTriggers,
+    WidgetFactory Function()? factoryBuilder,
+    Key? key,
+    Uri? baseUrl,
+    CustomStylesBuilder? customStylesBuilder,
+    CustomWidgetBuilder? customWidgetBuilder,
+    Color? hyperlinkColor,
+    void Function(ImageMetadata)? onTapImage,
+    void Function(String)? onTapUrl,
+    core.RebuildTriggers? rebuildTriggers,
     TextStyle textStyle = const TextStyle(),
     this.webView = false,
     this.webViewDebuggingEnabled = false,
     this.webViewJs = true,
     this.webViewMediaPlaybackAlwaysAllow = false,
     this.webViewUserAgent,
-  })  : assert(html != null),
-        super(
+  }) : super(
           html,
           baseUrl: baseUrl,
           buildAsync: buildAsync,
-          buildAsyncBuilder: buildAsyncBuilder ?? _buildAsyncBuilder,
+          buildAsyncBuilder: buildAsyncBuilder,
           customStylesBuilder: customStylesBuilder,
           customWidgetBuilder: customWidgetBuilder,
           enableCaching: enableCaching,
@@ -79,13 +78,3 @@ class HtmlWidget extends core.HtmlWidget {
 
   static WidgetFactory _getEnhancedWf() => WidgetFactory();
 }
-
-Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
-    snapshot.hasData
-        ? snapshot.data
-        : const Center(
-            child: Padding(
-              padding: EdgeInsets.all(8),
-              child: CircularProgressIndicator(),
-            ),
-          );
