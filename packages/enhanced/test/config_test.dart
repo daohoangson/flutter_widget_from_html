@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -60,7 +61,8 @@ void main() {
         expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
       });
 
-      testWidgets('renders indicator', (WidgetTester tester) async {
+      testWidgets('renders CircularProgressIndicator', (tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
         final html = 'Foo';
         final explained = await explain(tester, html, withData: false);
         expect(
@@ -70,6 +72,21 @@ void main() {
                 '[Padding:(8,8,8,8),child='
                 '[CircularProgressIndicator]'
                 ']]]'));
+        debugDefaultTargetPlatformOverride = null;
+      });
+
+      testWidgets('renders CupertinoActivityIndicator', (tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        final html = 'Foo';
+        final explained = await explain(tester, html, withData: false);
+        expect(
+            explained,
+            equals('[FutureBuilder:'
+                '[Center:child='
+                '[Padding:(8,8,8,8),child='
+                '[CupertinoActivityIndicator]'
+                ']]]'));
+        debugDefaultTargetPlatformOverride = null;
       });
     });
 

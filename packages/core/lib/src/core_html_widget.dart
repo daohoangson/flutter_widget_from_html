@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:flutter/cupertino.dart' show CupertinoActivityIndicator;
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart' show CircularProgressIndicator, Theme;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:html/dom.dart' as dom;
@@ -231,12 +233,15 @@ class _RootTsb extends TextStyleBuilder {
   void reset() => _output = null;
 }
 
-Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
+Widget _buildAsyncBuilder(
+        BuildContext context, AsyncSnapshot<Widget> snapshot) =>
     snapshot.data ??
-    const Center(
+    Center(
       child: Padding(
         padding: EdgeInsets.all(8),
-        child: Text('Loading...'),
+        child: Theme.of(context).platform == TargetPlatform.iOS
+            ? CupertinoActivityIndicator()
+            : CircularProgressIndicator(),
       ),
     );
 
