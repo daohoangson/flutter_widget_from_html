@@ -36,12 +36,6 @@ class WidgetFactory extends core.WidgetFactory
   @override
   String get webViewUserAgent => _widget?.webViewUserAgent;
 
-  /// Builds [InkWell].
-  @override
-  Widget buildGestureDetector(
-          BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
-      InkWell(onTap: onTap, child: child);
-
   @override
   Widget buildImage(BuildMetadata meta, ImageMetadata data) {
     var built = super.buildImage(meta, data);
