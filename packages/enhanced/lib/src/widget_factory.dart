@@ -18,7 +18,6 @@ class WidgetFactory extends core.WidgetFactory
         SvgFactory,
         UrlLauncherFactory,
         WebViewFactory {
-  TextStyleHtml Function(TextStyleHtml, dynamic) _tagA;
   HtmlWidget _widget;
 
   @override
@@ -52,24 +51,6 @@ class WidgetFactory extends core.WidgetFactory
     }
 
     return built;
-  }
-
-  @override
-  Iterable<dynamic> getDependencies(BuildContext context) =>
-      [...super.getDependencies(context), Theme.of(context)];
-
-  @override
-  void parse(BuildMetadata meta) {
-    switch (meta.element.localName) {
-      case 'a':
-        _tagA ??= (tsh, _) => tsh.copyWith(
-            style: tsh.style
-                .copyWith(color: tsh.getDependency<ThemeData>().accentColor));
-        meta.tsb.enqueue(_tagA);
-        break;
-    }
-
-    return super.parse(meta);
   }
 
   @override

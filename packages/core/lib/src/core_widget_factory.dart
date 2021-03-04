@@ -1,4 +1,5 @@
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart' show Theme, ThemeData;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
@@ -24,6 +25,7 @@ class WidgetFactory {
   BuildOp? _styleTextDecoration;
   BuildOp? _styleVerticalAlign;
   BuildOp? _tagA;
+  TextStyleHtml Function(TextStyleHtml, Null)? _tagAColor;
   BuildOp? _tagBr;
   BuildOp? _tagFont;
   BuildOp? _tagHr;
@@ -229,7 +231,7 @@ class WidgetFactory {
   /// - [MediaQueryData] via [MediaQuery.of]
   /// - [TextDirection] via [Directionality.of]
   /// - [TextStyle] via [DefaultTextStyle.of]
-  /// - [ThemeData] via [Theme.of] (enhanced package only)
+  /// - [ThemeData] via [Theme.of]
   ///
   /// Use [TextStyleHtml.getDependency] to get value by type.
   ///
@@ -257,6 +259,7 @@ class WidgetFactory {
         MediaQuery.of(context),
         Directionality.of(context),
         DefaultTextStyle.of(context).style,
+        Theme.of(context),
       ];
 
   /// Returns marker for the specified [type] at index [i].
@@ -397,8 +400,13 @@ class WidgetFactory {
 
     switch (meta.element.localName) {
       case kTagA:
-        _tagA ??= TagA(this, () => _widget?.hyperlinkColor).buildOp;
+        _tagA ??= TagA(this).buildOp;
         meta.register(_tagA!);
+
+        meta.tsb.enqueue(_tagAColor ??= (tsh, _) => tsh.copyWith(
+            style: tsh.style.copyWith(
+                color: _widget?.hyperlinkColor ??
+                    tsh.getDependency<ThemeData>().accentColor)));
 
         final name = attrs[kAttributeAName];
         if (name != null) meta.register(_anchorOp(name));

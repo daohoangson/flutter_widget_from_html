@@ -107,8 +107,8 @@ void main() {
       expect(
           explained,
           equals('[HtmlRuby:children='
-              '[RichText:(#FF0000FF+u+onTap:foo)],'
-              '[RichText:(#FF0000FF+u@5.0+onTap:bar)]'
+              '[RichText:(#FF123456+u+onTap:foo)],'
+              '[RichText:(#FF123456+u@5.0+onTap:bar)]'
               ']'));
     });
 

@@ -14,7 +14,7 @@ void main() {
 
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(#FF0000FF+u+onTap:Foo)]'));
+      expect(explained, equals('[RichText:(#FF123456+u+onTap:Foo)]'));
     });
 
     testWidgets('useExplainer=false', (WidgetTester tester) async {
@@ -35,13 +35,13 @@ void main() {
     testWidgets('first', (WidgetTester tester) async {
       final html = '<a href="$kHref"> Foo</a>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(#FF0000FF+u+onTap:Foo)]'));
+      expect(explained, equals('[RichText:(#FF123456+u+onTap:Foo)]'));
     });
 
     testWidgets('last', (WidgetTester tester) async {
       final html = '<a href="$kHref">Foo </a>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(#FF0000FF+u+onTap:Foo)]'));
+      expect(explained, equals('[RichText:(#FF123456+u+onTap:Foo)]'));
     });
   });
 
@@ -57,10 +57,10 @@ void main() {
     expect(
         explained,
         equals('[RichText:(:Hello '
-            '(#FF0000FF+u+onTap:f)'
-            '(#FF0000FF+u+b+onTap:o)'
-            '(#FF0000FF+u+i+b+onTap:o)'
-            '(#FF0000FF+u+onTap: \nbar)'
+            '(#FF123456+u+onTap:f)'
+            '(#FF123456+u+b+onTap:o)'
+            '(#FF123456+u+i+b+onTap:o)'
+            '(#FF123456+u+onTap: \nbar)'
             '(:.)'
             ')]'));
   });
@@ -71,7 +71,7 @@ void main() {
     expect(
       explained,
       equals('[GestureDetector:child='
-          '[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]'
+          '[CssBlock:child=[RichText:(#FF123456+u:Foo)]]'
           ']'),
     );
   });
@@ -83,8 +83,8 @@ void main() {
       explained,
       equals(
         '[Column:children='
-        '[GestureDetector:child=[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]],'
-        '[GestureDetector:child=[CssBlock:child=[RichText:(#FF0000FF+u:Bar)]]]'
+        '[GestureDetector:child=[CssBlock:child=[RichText:(#FF123456+u:Foo)]]],'
+        '[GestureDetector:child=[CssBlock:child=[RichText:(#FF123456+u:Bar)]]]'
         ']',
       ),
     );
@@ -102,7 +102,7 @@ void main() {
     expect(
       explained,
       equals('[CssBlock:child=[GestureDetector:child='
-          '[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]'
+          '[CssBlock:child=[RichText:(#FF123456+u:Foo)]]'
           ']]'),
     );
   });
@@ -115,8 +115,8 @@ void main() {
       explained,
       equals(
         '[CssBlock:child=[GestureDetector:child=[Column:children='
-        '[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]],'
-        '[CssBlock:child=[RichText:(#FF0000FF+u:Bar)]]'
+        '[CssBlock:child=[RichText:(#FF123456+u:Foo)]],'
+        '[CssBlock:child=[RichText:(#FF123456+u:Bar)]]'
         ']]]',
       ),
     );
@@ -140,7 +140,7 @@ void main() {
     expect(
         explained,
         equals('[SizedBox:0.0x5.0],'
-            '[GestureDetector:child=[Padding:(0,5,0,5),child=[CssBlock:child=[RichText:(#FF0000FF+u:Foo)]]]],'
+            '[GestureDetector:child=[Padding:(0,5,0,5),child=[CssBlock:child=[RichText:(#FF123456+u:Foo)]]]],'
             '[SizedBox:0.0x5.0]'));
   });
 
@@ -165,7 +165,7 @@ void main() {
       expect(
           explained,
           equals('[RichText:(:'
-              '(#FF0000FF+u+onTap:Foo )'
+              '(#FF123456+u+onTap:Foo )'
               '[GestureDetector:child='
               '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
               '])]'));
@@ -191,7 +191,7 @@ void main() {
               '[GestureDetector:child='
               '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
               ']'
-              '(#FF0000FF+u+onTap: foo)'
+              '(#FF123456+u+onTap: foo)'
               ')]'));
     });
 
@@ -217,7 +217,7 @@ void main() {
       expect(urls, equals(const [kHref]));
     });
 
-    testWidgets('prints log', (WidgetTester tester) async {
+    testWidgets('default handler', (WidgetTester tester) async {
       await tester.pumpWidget(_TapTestApp());
       await tester.pumpAndSettle();
       expect(await tapText(tester, 'Tap me'), equals(1));

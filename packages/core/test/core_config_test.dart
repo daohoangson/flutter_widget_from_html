@@ -128,7 +128,7 @@ void main() {
       bool enableCaching, {
       Uri? baseUrl,
       bool? buildAsync,
-      Color hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
+      Color? hyperlinkColor,
       RebuildTriggers? rebuildTriggers,
       TextStyle? textStyle,
     }) =>
@@ -358,7 +358,7 @@ void main() {
 
     testWidgets('renders default value', (WidgetTester tester) async {
       final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(e, equals('[RichText:(#FF0000FF+u:Foo)]'));
+      expect(e, equals('[RichText:(#FF123456+u:Foo)]'));
     });
 
     testWidgets('renders custom value', (WidgetTester tester) async {
@@ -374,7 +374,7 @@ void main() {
         tester,
         HtmlWidget(html, hyperlinkColor: null, key: helper.hwKey),
       );
-      expect(explained, equals('[RichText:(+u:Foo)]'));
+      expect(explained, equals('[RichText:(#FF123456+u:Foo)]'));
     });
   });
 

@@ -76,7 +76,7 @@ HtmlWidget(
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
 [Compare between Flutter rendering and browser's.](https://html-widget-demo.now.sh/supported/tags.html)
 
-- A: underline, blue color with scroll to anchor support
+- A: underline, theme accent color with scroll to anchor support
 - H1/H2/H3/H4/H5/H6
 - IMG with support for asset (`asset://`), data uri, local file (`file://`) and network image
 - LI/OL/UL with support for:
