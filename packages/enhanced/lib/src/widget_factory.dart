@@ -17,7 +17,7 @@ class WidgetFactory extends core.WidgetFactory
         SvgFactory,
         UrlLauncherFactory,
         WebViewFactory {
-  HtmlWidget _widget;
+  HtmlWidget? _widget;
 
   @override
   bool get webView => _widget?.webView == true;
@@ -33,7 +33,7 @@ class WidgetFactory extends core.WidgetFactory
       _widget?.webViewMediaPlaybackAlwaysAllow == true;
 
   @override
-  String get webViewUserAgent => _widget?.webViewUserAgent;
+  String? get webViewUserAgent => _widget?.webViewUserAgent;
 
   @override
   void reset(State state) {

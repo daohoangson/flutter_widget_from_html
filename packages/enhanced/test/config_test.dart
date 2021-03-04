@@ -11,7 +11,7 @@ Future<String> explain(WidgetTester t, HtmlWidget hw) =>
 
 void main() {
   group('buildAsync', () {
-    final explain = (WidgetTester tester, String html, bool buildAsync) =>
+    final explain = (WidgetTester tester, String html, bool? buildAsync) =>
         tester.runAsync(() => helper.explain(tester, null,
             hw: HtmlWidget(
               html,
@@ -42,8 +42,8 @@ void main() {
     final explain = (
       WidgetTester tester,
       String html, {
-      AsyncWidgetBuilder<Widget> buildAsyncBuilder,
-      bool withData,
+      AsyncWidgetBuilder<Widget>? buildAsyncBuilder,
+      required bool withData,
     }) =>
         tester.runAsync(() => helper.explain(tester, null,
             buildFutureBuilderWithData: withData,
@@ -93,7 +93,7 @@ void main() {
     group('custom', () {
       final buildAsyncBuilder =
           (BuildContext _, AsyncSnapshot<Widget> snapshot) =>
-              snapshot.hasData ? snapshot.data : Text('No data');
+              snapshot.data ?? Text('No data');
 
       testWidgets('renders data', (WidgetTester tester) async {
         final html = 'Foo';
@@ -124,11 +124,11 @@ void main() {
       WidgetTester tester,
       String html,
       bool enableCaching, {
-      Uri baseUrl,
-      bool buildAsync,
+      Uri? baseUrl,
+      bool? buildAsync,
       Color hyperlinkColor = const Color.fromRGBO(0, 0, 255, 1),
-      RebuildTriggers rebuildTriggers,
-      TextStyle textStyle,
+      RebuildTriggers? rebuildTriggers,
+      TextStyle? textStyle,
       bool webView = false,
       bool webViewJs = true,
     }) =>
@@ -141,12 +141,12 @@ void main() {
               hyperlinkColor: hyperlinkColor,
               key: helper.hwKey,
               rebuildTriggers: rebuildTriggers,
-              textStyle: textStyle,
+              textStyle: textStyle ?? const TextStyle(),
               webView: webView,
               webViewJs: webViewJs,
             ));
 
-    final _expect = (Widget built1, Widget built2, Matcher matcher) {
+    final _expect = (Widget? built1, Widget? built2, Matcher matcher) {
       final widget1 = (built1 as TshWidget).child;
       final widget2 = (built2 as TshWidget).child;
       expect(widget1 == widget2, matcher);
@@ -459,17 +459,6 @@ void main() {
       expect(explained, equals('[GestureDetector:child=[Text:$webViewSrc]]'));
     });
 
-    testWidgets('renders null value', (WidgetTester tester) async {
-      final explained = await explain(
-          tester,
-          HtmlWidget(
-            html,
-            key: helper.hwKey,
-            webView: null,
-          ));
-      expect(explained, equals('[GestureDetector:child=[Text:$webViewSrc]]'));
-    });
-
     group('webViewDebuggingEnabled', () {
       testWidgets('renders true value', (WidgetTester tester) async {
         final explained = await explain(
@@ -498,24 +487,6 @@ void main() {
               key: helper.hwKey,
               webView: true,
               webViewDebuggingEnabled: false,
-            ));
-        expect(
-            explained,
-            equals('[WebView:'
-                'url=$webViewSrc,'
-                'aspectRatio=$webViewDefaultAspectRatio,'
-                'autoResize=true'
-                ']'));
-      });
-
-      testWidgets('renders null value', (WidgetTester tester) async {
-        final explained = await explain(
-            tester,
-            HtmlWidget(
-              html,
-              key: helper.hwKey,
-              webView: true,
-              webViewDebuggingEnabled: null,
             ));
         expect(
             explained,
@@ -563,24 +534,6 @@ void main() {
                 'js=false'
                 ']'));
       });
-
-      testWidgets('renders null value', (WidgetTester tester) async {
-        final explained = await explain(
-            tester,
-            HtmlWidget(
-              html,
-              key: helper.hwKey,
-              webView: true,
-              webViewJs: null,
-            ));
-        expect(
-            explained,
-            equals('[WebView:'
-                'url=$webViewSrc,'
-                'aspectRatio=$webViewDefaultAspectRatio,'
-                'js=false'
-                ']'));
-      });
     });
 
     group('webViewMediaPlaybackAlwaysAllow', () {
@@ -611,24 +564,6 @@ void main() {
               key: helper.hwKey,
               webView: true,
               webViewMediaPlaybackAlwaysAllow: false,
-            ));
-        expect(
-            explained,
-            equals('[WebView:'
-                'url=$webViewSrc,'
-                'aspectRatio=$webViewDefaultAspectRatio,'
-                'autoResize=true'
-                ']'));
-      });
-
-      testWidgets('renders null value', (WidgetTester tester) async {
-        final explained = await explain(
-            tester,
-            HtmlWidget(
-              html,
-              key: helper.hwKey,
-              webView: true,
-              webViewMediaPlaybackAlwaysAllow: null,
             ));
         expect(
             explained,
