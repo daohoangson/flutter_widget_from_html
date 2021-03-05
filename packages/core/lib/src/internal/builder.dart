@@ -1,6 +1,5 @@
 import 'dart:collection';
 
-import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import '../core_data.dart';
@@ -8,7 +7,6 @@ import '../core_data.dart' as core_data show BuildMetadata, BuildTree;
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
 import 'core_ops.dart';
-import 'flattener.dart';
 
 final _regExpSpaceLeading = RegExp(r'^[^\S\u{00A0}]+', unicode: true);
 final _regExpSpaceTrailing = RegExp(r'[^\S\u{00A0}]+$', unicode: true);
@@ -95,7 +93,7 @@ class BuildTree extends core_data.BuildTree {
   Iterable<WidgetPlaceholder> build() {
     if (_built.isNotEmpty) return _built;
 
-    var widgets = _flatten();
+    var widgets = wf.flatten(parentMeta, this);
     for (final op in parentMeta.buildOps) {
       widgets = op.onWidgets
               ?.call(parentMeta, widgets)
@@ -221,42 +219,6 @@ class BuildTree extends core_data.BuildTree {
     for (final pair in map.entries) {
       meta[pair.key] = pair.value;
     }
-  }
-
-  Iterable<WidgetPlaceholder> _flatten() {
-    final widgets = <WidgetPlaceholder>[];
-
-    for (final flattened in flatten(this)) {
-      if (flattened.widget != null) {
-        widgets.add(WidgetPlaceholder.lazy(flattened.widget!));
-        continue;
-      }
-
-      if (flattened.widgetBuilder != null) {
-        widgets.add(WidgetPlaceholder<BuildTree>(this)
-            .wrapWith((context, _) => flattened.widgetBuilder!(context)));
-        continue;
-      }
-
-      if (flattened.spanBuilder == null) continue;
-      widgets.add(WidgetPlaceholder<BuildTree>(this).wrapWith((context, _) {
-        final span = flattened.spanBuilder!(context);
-        if (span == null || span is! InlineSpan) return widget0;
-
-        final tsh = tsb.build(context);
-        final textAlign = tsh.textAlign ?? TextAlign.start;
-
-        if (span is WidgetSpan &&
-            span.alignment == PlaceholderAlignment.baseline &&
-            textAlign == TextAlign.start) {
-          return span.child;
-        }
-
-        return wf.buildText(parentMeta, tsh, span);
-      }));
-    }
-
-    return widgets;
   }
 }
 

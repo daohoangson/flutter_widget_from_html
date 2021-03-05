@@ -4,8 +4,6 @@ import 'package:flutter/widgets.dart';
 import '../core_data.dart';
 import 'margin_vertical.dart';
 
-List<Flattened> flatten(BuildTree tree) => _instance.flatten(tree);
-
 @immutable
 class Flattened {
   final SpanBuilder? spanBuilder;
@@ -17,15 +15,19 @@ class Flattened {
 
 typedef SpanBuilder = InlineSpan? Function(BuildContext);
 
-final _instance = _Flattener();
+class Flattener {
+  final List<GestureRecognizer> _recognizers = [];
 
-class _Flattener {
   late List<Flattened> _flattened;
   late StringBuffer _buffer, _prevBuffer;
   late _Recognizer _recognizer, _prevRecognizer;
   List<dynamic>? _spans;
   late bool _swallowWhitespace;
   late TextStyleBuilder _tsb, _prevTsb;
+
+  void dispose() => _reset();
+
+  void reset() => _reset();
 
   List<Flattened> flatten(BuildTree tree) {
     _flattened = [];
@@ -37,6 +39,13 @@ class _Flattener {
     _completeLoop();
 
     return _flattened;
+  }
+
+  void _reset() {
+    for (final r in _recognizers) {
+      r.dispose();
+    }
+    _recognizers.clear();
   }
 
   void _resetLoop(TextStyleBuilder tsb) {
@@ -118,6 +127,9 @@ class _Flattener {
       final scopedRecognizer = _prevRecognizer.value;
       final scopedTsb = _prevTsb;
       final scopedText = _prevBuffer.toString();
+
+      if (scopedRecognizer != null) _recognizers.add(scopedRecognizer);
+
       _spans!.add((context) => TextSpan(
             recognizer: scopedRecognizer,
             style: scopedTsb.build(context).styleWithHeight,
@@ -139,6 +151,8 @@ class _Flattener {
     final scopedRecognizer = _recognizer.value;
     final scopedTsb = _tsb;
     final scopedBuffer = _buffer.toString();
+
+    if (scopedRecognizer != null) _recognizers.add(scopedRecognizer);
 
     // trim the last new line if any
     final scopedText = scopedSpans.isEmpty

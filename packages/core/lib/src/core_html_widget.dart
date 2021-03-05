@@ -144,6 +144,12 @@ class _HtmlWidgetState extends State<HtmlWidget> {
   }
 
   @override
+  void dispose() {
+    _wf.dispose();
+    super.dispose();
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
