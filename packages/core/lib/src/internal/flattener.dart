@@ -4,8 +4,6 @@ import 'package:flutter/widgets.dart';
 import '../core_data.dart';
 import 'margin_vertical.dart';
 
-List<Flattened> flatten(BuildTree tree) => _instance.flatten(tree);
-
 @immutable
 class Flattened {
   final SpanBuilder? spanBuilder;
@@ -17,9 +15,7 @@ class Flattened {
 
 typedef SpanBuilder = InlineSpan? Function(BuildContext);
 
-final _instance = _Flattener();
-
-class _Flattener {
+class Flattener {
   late List<Flattened> _flattened;
   late StringBuffer _buffer, _prevBuffer;
   late _Recognizer _recognizer, _prevRecognizer;

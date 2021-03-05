@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 
 import 'internal/core_ops.dart';
 import 'internal/core_parser.dart';
+import 'internal/flattener.dart';
 import 'internal/platform_specific/fallback.dart'
     if (dart.library.io) 'internal/platform_specific/io.dart';
 import 'core_data.dart';
@@ -14,6 +15,7 @@ import 'core_html_widget.dart';
 /// A factory to build widgets.
 class WidgetFactory {
   final _anchors = <String, GlobalKey>{};
+  final _flattener = Flattener();
 
   BuildOp? _styleBgColor;
   BuildOp? _styleBlock;
@@ -229,6 +231,43 @@ class WidgetFactory {
   /// Builds [Tooltip].
   Widget? buildTooltip(BuildMetadata meta, Widget child, String message) =>
       Tooltip(message: message, child: child);
+
+  /// Flattens a [BuildTree] into widgets.
+  Iterable<WidgetPlaceholder> flatten(BuildMetadata meta, BuildTree tree) {
+    final widgets = <WidgetPlaceholder>[];
+
+    for (final flattened in _flattener.flatten(tree)) {
+      if (flattened.widget != null) {
+        widgets.add(WidgetPlaceholder.lazy(flattened.widget!));
+        continue;
+      }
+
+      if (flattened.widgetBuilder != null) {
+        widgets.add(WidgetPlaceholder<BuildTree>(tree)
+            .wrapWith((context, _) => flattened.widgetBuilder!(context)));
+        continue;
+      }
+
+      if (flattened.spanBuilder == null) continue;
+      widgets.add(WidgetPlaceholder<BuildTree>(tree).wrapWith((context, _) {
+        final span = flattened.spanBuilder!(context);
+        if (span == null || span is! InlineSpan) return widget0;
+
+        final tsh = tree.tsb.build(context);
+        final textAlign = tsh.textAlign ?? TextAlign.start;
+
+        if (span is WidgetSpan &&
+            span.alignment == PlaceholderAlignment.baseline &&
+            textAlign == TextAlign.start) {
+          return span.child;
+        }
+
+        return buildText(meta, tsh, span);
+      }));
+    }
+
+    return widgets;
+  }
 
   /// Prepares [GestureTapCallback].
   GestureTapCallback? gestureTapCallback(String url) => () => onTapUrl(url);
