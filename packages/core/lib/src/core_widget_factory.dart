@@ -232,6 +232,12 @@ class WidgetFactory {
   Widget? buildTooltip(BuildMetadata meta, Widget child, String message) =>
       Tooltip(message: message, child: child);
 
+  /// Called when the [HtmlWidget]'s state is disposed.
+  @mustCallSuper
+  void dispose() {
+    _flattener.dispose();
+  }
+
   /// Flattens a [BuildTree] into widgets.
   Iterable<WidgetPlaceholder> flatten(BuildMetadata meta, BuildTree tree) {
     final widgets = <WidgetPlaceholder>[];
@@ -869,6 +875,7 @@ class WidgetFactory {
   @mustCallSuper
   void reset(State state) {
     _anchors.clear();
+    _flattener.reset();
 
     final widget = state.widget;
     _widget = widget is HtmlWidget ? widget : null;
