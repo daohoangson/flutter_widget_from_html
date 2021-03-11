@@ -16,6 +16,10 @@ class WebViewState extends State<WebView> {
     _iframeElement.src = widget.url;
     _iframeElement.style.border = 'none';
 
+    if (widget.mediaPlaybackAlwaysAllow) {
+      _iframeElement.allow = 'autoplay';
+    }
+
     final viewType = '$this#$hashCode';
 
     // ignore: undefined_prefixed_name
