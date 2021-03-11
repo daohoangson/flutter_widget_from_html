@@ -11,6 +11,10 @@ final svgBytes = utf8.encode('<svg viewBox="0 0 1 1"></svg>');
 void main() {
   final sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
 
+  setUpAll(() {
+    registerFallbackValue<Uri>(Uri());
+  });
+
   testWidgets('renders SVG tag', (WidgetTester tester) async {
     final html = '''<svg height="100" width="100">
   <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
@@ -120,17 +124,19 @@ HttpClient _createMockSvgImageHttpClient() {
   final response = _MockHttpClientResponse();
   final headers = _MockHttpHeaders();
 
-  when(client)
-      .calls(#getUrl)
-      .withArgs(positional: [any]).thenAnswer((_) async => request);
-  when(request).calls(#headers).thenReturn(headers);
-  when(request).calls(#close).thenAnswer((_) async => response);
-  when(response)
-      .calls(#compressionState)
+  when(() => client.getUrl(any())).thenAnswer((_) async => request);
+  when(() => request.headers).thenReturn(headers);
+  when(() => request.close()).thenAnswer((_) async => response);
+  when(() => response.compressionState)
       .thenReturn(HttpClientResponseCompressionState.notCompressed);
-  when(response).calls(#contentLength).thenReturn(svgBytes.length);
-  when(response).calls(#statusCode).thenReturn(HttpStatus.ok);
-  when(response).calls(#listen).thenAnswer((invocation) {
+  when(() => response.contentLength).thenReturn(svgBytes.length);
+  when(() => response.statusCode).thenReturn(HttpStatus.ok);
+  when(() => response.listen(
+        any(),
+        onError: any(named: 'onError'),
+        onDone: any(named: 'onDone'),
+        cancelOnError: any(named: 'cancelOnError'),
+      )).thenAnswer((invocation) {
     final onData =
         invocation.positionalArguments[0] as void Function(List<int>);
     return Stream.fromIterable(<List<int>>[svgBytes]).listen(onData);
