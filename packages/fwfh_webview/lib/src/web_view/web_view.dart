@@ -15,9 +15,10 @@ class WebView extends StatefulWidget {
 
   /// Controls whether to resize automatically.
   ///
-  /// JavaScript must be enabled for this to work.
+  /// [js] must be enabled for this to work.
   /// Default: `true` if [js] is enabled, `false` otherwise.
-  /// Flutter Web: No.
+  ///
+  /// Flutter Web is not supported.
   final bool autoResize;
 
   /// The auto resize intevals.
@@ -32,7 +33,8 @@ class WebView extends StatefulWidget {
   /// Controls whether debugging is enabled.
   ///
   /// Default: `false`.
-  /// Flutter Web: not supported.
+  ///
+  /// Flutter Web is not supported.
   /// {@endtemplate}
   final bool debuggingEnabled;
 
@@ -41,13 +43,14 @@ class WebView extends StatefulWidget {
   /// This callback will be triggered on generated navigation within the web view.
   /// Returning `true` will stop web view from navigating.
   ///
-  /// Flutter Web: not supported.
+  /// Flutter Web is not supported.
   final bool Function(String)? interceptNavigationRequest;
 
   /// {@template web_view.js}
   /// Controls whether to enable JavaScript.
   ///
   /// Default: `true`.
+  ///
   /// Flutter Web: JavaScript is always enabled (no sandbox setter).
   /// {@endtemplate}
   final bool js;
@@ -56,7 +59,6 @@ class WebView extends StatefulWidget {
   /// Controls whether to always allow media playback.
   ///
   /// Default: `false`.
-  /// Flutter Web: not supported.
   /// {@endtemplate}
   final bool mediaPlaybackAlwaysAllow;
 
@@ -80,7 +82,7 @@ class WebView extends StatefulWidget {
   /// {@template web_view.userAgent}
   /// The value used for the HTTP `User-Agent` request header.
   ///
-  /// Flutter Web: not supported.
+  /// Flutter Web is not supported.
   /// {@endtemplate}
   final String? userAgent;
 
