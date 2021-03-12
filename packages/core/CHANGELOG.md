@@ -1,3 +1,7 @@
+## 0.6.0-rc.2021031201
+
+- Dispose recognizer properly (#466)
+
 ## 0.6.0-rc.2021030401
 
 - Requires Flutter 2

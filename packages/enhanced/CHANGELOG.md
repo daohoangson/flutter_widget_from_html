@@ -1,3 +1,9 @@
+## 0.6.0-rc.2021031201
+
+- Dispose recognizer properly (#466)
+- Add Flutter Web support for `webViewMediaPlaybackAlwaysAllow` (#468)
+- Update test for mocktail@0.0.2 (#469)
+
 ## 0.6.0-rc.2021030401
 
 - Requires Flutter 2
