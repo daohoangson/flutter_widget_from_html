@@ -159,7 +159,7 @@ class TextStyleOps {
     return list;
   }
 
-  static FontStyle? fontStyleTryParse(String? value) {
+  static FontStyle? fontStyleTryParse(String value) {
     switch (value) {
       case kCssFontStyleItalic:
         return FontStyle.italic;
@@ -170,7 +170,7 @@ class TextStyleOps {
     return null;
   }
 
-  static FontWeight? fontWeightTryParse(css.Expression? expression) {
+  static FontWeight? fontWeightTryParse(css.Expression expression) {
     if (expression is css.LiteralTerm) {
       if (expression is css.NumberTerm) {
         switch (expression.value) {

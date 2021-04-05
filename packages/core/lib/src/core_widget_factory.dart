@@ -762,14 +762,18 @@ class WidgetFactory {
         break;
 
       case kCssFontStyle:
-        final fontStyle = TextStyleOps.fontStyleTryParse(style.term);
+        final term = style.term;
+        final fontStyle =
+            term != null ? TextStyleOps.fontStyleTryParse(term) : null;
         if (fontStyle != null) {
           meta.tsb.enqueue(TextStyleOps.fontStyle, fontStyle);
         }
         break;
 
       case kCssFontWeight:
-        final fontWeight = TextStyleOps.fontWeightTryParse(style.value);
+        final value = style.value;
+        final fontWeight =
+            value != null ? TextStyleOps.fontWeightTryParse(value) : null;
         if (fontWeight != null) {
           meta.tsb.enqueue(TextStyleOps.fontWeight, fontWeight);
         }
