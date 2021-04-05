@@ -29,24 +29,24 @@ CssBorder tryParseBorder(BuildMetadata meta) {
       border = CssBorder(all: borderSide);
     } else {
       switch (suffix) {
-        case kCssSuffixBottom:
-        case kCssSuffixBlockEnd:
+        case kSuffixBottom:
+        case kSuffixBlockEnd:
           border = border.copyWith(bottom: borderSide);
           break;
-        case kCssSuffixInlineEnd:
+        case kSuffixInlineEnd:
           border = border.copyWith(inlineEnd: borderSide);
           break;
-        case kCssSuffixInlineStart:
+        case kSuffixInlineStart:
           border = border.copyWith(inlineStart: borderSide);
           break;
-        case kCssSuffixLeft:
+        case kSuffixLeft:
           border = border.copyWith(left: borderSide);
           break;
-        case kCssSuffixRight:
+        case kSuffixRight:
           border = border.copyWith(right: borderSide);
           break;
-        case kCssSuffixTop:
-        case kCssSuffixBlockStart:
+        case kSuffixTop:
+        case kSuffixBlockStart:
           border = border.copyWith(top: borderSide);
           break;
       }

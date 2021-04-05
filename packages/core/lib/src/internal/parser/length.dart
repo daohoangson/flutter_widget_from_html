@@ -72,19 +72,19 @@ CssLengthBox? _parseCssLengthBoxOne(
   existing ??= CssLengthBox();
 
   switch (suffix) {
-    case kCssSuffixBottom:
-    case kCssSuffixBlockEnd:
+    case kSuffixBottom:
+    case kSuffixBlockEnd:
       return existing.copyWith(bottom: parsed);
-    case kCssSuffixInlineEnd:
+    case kSuffixInlineEnd:
       return existing.copyWith(inlineEnd: parsed);
-    case kCssSuffixInlineStart:
+    case kSuffixInlineStart:
       return existing.copyWith(inlineStart: parsed);
-    case kCssSuffixLeft:
+    case kSuffixLeft:
       return existing.copyWith(left: parsed);
-    case kCssSuffixRight:
+    case kSuffixRight:
       return existing.copyWith(right: parsed);
-    case kCssSuffixTop:
-    case kCssSuffixBlockStart:
+    case kSuffixTop:
+    case kSuffixBlockStart:
       return existing.copyWith(top: parsed);
   }
 
