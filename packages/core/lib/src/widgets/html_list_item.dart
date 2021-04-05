@@ -72,6 +72,25 @@ class _ListItemRenderObject extends RenderBox
       firstChild!.getMinIntrinsicWidth(height);
 
   @override
+  Size computeDryLayout(BoxConstraints constraints) {
+    final child = firstChild!;
+    final childConstraints = constraints;
+    final childData = child.parentData as _ListItemData;
+    child.getDryLayout(childConstraints);
+    final childSize = child.size;
+
+    final marker = childData.nextSibling!;
+    final markerConstraints = childConstraints.loosen();
+    marker.getDryLayout(markerConstraints);
+    final markerSize = marker.size;
+
+    return constraints.constrain(Size(
+      childSize.width,
+      childSize.height > 0 ? childSize.height : markerSize.height,
+    ));
+  }
+
+  @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
       defaultHitTestChildren(result, position: position);
 
@@ -93,10 +112,10 @@ class _ListItemRenderObject extends RenderBox
     marker.layout(markerConstraints, parentUsesSize: true);
     final markerSize = marker.size;
 
-    size = Size(
+    size = constraints.constrain(Size(
       childSize.width,
       childSize.height > 0 ? childSize.height : markerSize.height,
-    );
+    ));
 
     final baseline = TextBaseline.alphabetic;
     final markerDistance =
