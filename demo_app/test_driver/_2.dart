@@ -15,6 +15,7 @@ class AspectRatioTester extends StatelessWidget {
 
   @override
   Widget build(BuildContext _) => ListenableProvider<_AspectRatioTestResult>(
+        create: (_) => _result,
         child: ListView(
           children: <Widget>[
             Builder(
@@ -25,12 +26,11 @@ class AspectRatioTester extends StatelessWidget {
                       key: ValueKey(kResultKey),
                     )),
             CustomSingleChildLayout(
-              child: child,
               delegate: _AspectRatioTestDelegate(_result),
+              child: child,
             ),
           ],
         ),
-        create: (_) => _result,
       );
 }
 

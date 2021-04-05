@@ -1,10 +1,9 @@
 name: Demo
 on:
   push:
-    paths:
-      - .github/workflows/demo_app.yml
-      - "demo_app/**"
-      - "packages/**"
+    branches:
+      - master
+  pull_request:
 
 jobs:
   apk:
@@ -33,20 +32,33 @@ jobs:
 
   web:
     name: Deploy Web
-    runs-on: ubuntu-latest
+    if: ${{ github.actor == 'daohoangson' }}
     defaults:
       run:
         working-directory: demo_app
+    environment:
+      name: vercel
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
-        with:
-          channel: beta
       - run: flutter config --enable-web
-      - run: flutter build web
+      - name: Run flutter build web
+        run: |
+          set -e
+
+          flutter build web --web-renderer canvaskit
+          mv ./build/web ./build/web-canvaskit
+
+          flutter build web --web-renderer html
+          mv ./build/web ./build/web-html
+
+          flutter build web --web-renderer auto
+          mv ./build/web-canvaskit ./build/web/canvaskit
+          mv ./build/web-html ./build/web/html
 
       - name: Generate supported/tags.html
         run: |
@@ -72,7 +84,7 @@ jobs:
             echo '}'; \
           } > ./now.json
 
-          mkdir -p ./.now && echo '${{ secrets.DEMO_APP_PROJECT_JSON }}' > ./.now/project.json
+          mkdir -p ./.now && echo '${{ secrets.EXAMPLE_PROJECT_JSON }}' > ./.now/project.json
 
           if [ $GITHUB_REF == 'refs/heads/master' ]; then
             _url=$( now  --prod --token ${{ secrets.ZEIT_TOKEN }} )
@@ -89,6 +101,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          body: "Deployed ${{ github.sha }} to ${{ steps.now.outputs.url }}.\n\nQuick links:\n- [supported/tags.html](${{ steps.now.outputs.url }}/supported/tags.html)\n- [Hello World](${{ steps.now.outputs.url }}/#/helloworld)\n- [Hello World (core)](${{ steps.now.outputs.url }}/#/helloworldcore)\n- [Wordpress](${{ steps.now.outputs.url }}/#/wordpress)"
+          body: "Deployed ${{ github.sha }} to ${{ steps.now.outputs.url }}.\n\nQuick links:\n- [supported/tags.html](${{ steps.now.outputs.url }}/supported/tags.html)\n- [Hello World](${{ steps.now.outputs.url }}/#/helloworld)\n- [Hello World (core)](${{ steps.now.outputs.url }}/#/helloworldcore)\n- [Wordpress](${{ steps.now.outputs.url }}/#/wordpress)\n- [--web-renderer canvaskit](${{ steps.now.outputs.url }}/canvaskit/)\n- [--web-renderer html](${{ steps.now.outputs.url }}/html/)"
           fingerprint: "## Demo app"
           replace: please

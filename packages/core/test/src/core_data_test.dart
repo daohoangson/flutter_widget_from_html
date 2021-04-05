@@ -107,8 +107,9 @@ void main() {
 class _BuildOpDefaultStyles extends WidgetFactory {
   @override
   void parse(BuildMetadata meta) {
-    meta.register(BuildOp(defaultStyles: (_) => {'color': '#f00'}));
-    meta.register(BuildOp(defaultStyles: (_) => {'color': '#0f0'}));
+    meta
+      ..register(BuildOp(defaultStyles: (_) => {'color': '#f00'}, priority: 1))
+      ..register(BuildOp(defaultStyles: (_) => {'color': '#0f0'}, priority: 2));
 
     return super.parse(meta);
   }
@@ -144,7 +145,7 @@ class _BuildOpPriority extends WidgetFactory {
   final int a;
   final int b;
 
-  _BuildOpPriority({this.a, this.b});
+  _BuildOpPriority({required this.a, required this.b});
 
   @override
   void parse(BuildMetadata meta) {

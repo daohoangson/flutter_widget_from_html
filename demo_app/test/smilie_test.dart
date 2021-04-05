@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:demo_app/screens/smilie.dart';
 import 'package:flutter/material.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
@@ -11,5 +13,5 @@ void main() {
     );
 
     await screenMatchesGolden(tester, 'others/smilie');
-  });
+  }, skip: !Platform.isLinux);
 }

@@ -1,20 +1,11 @@
 part of '../core_parser.dart';
 
-const kCssLengthBoxSuffixBlockEnd = '-block-end';
-const kCssLengthBoxSuffixBlockStart = '-block-start';
-const kCssLengthBoxSuffixBottom = '-bottom';
-const kCssLengthBoxSuffixInlineEnd = '-inline-end';
-const kCssLengthBoxSuffixInlineStart = '-inline-start';
-const kCssLengthBoxSuffixLeft = '-left';
-const kCssLengthBoxSuffixRight = '-right';
-const kCssLengthBoxSuffixTop = '-top';
-
 final _cssLengthValues4 =
     RegExp(r'^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)$');
 final _cssLengthValues2 = RegExp(r'^([^\s]+)\s+([^\s]+)$');
 final _cssLengthValue = RegExp(r'^([\d\.]+)(em|%|pt|px)$');
 
-CssLength tryParseCssLength(String value) {
+CssLength? tryParseCssLength(String? value) {
   if (value == null) return null;
 
   value = value.toLowerCase();
@@ -28,7 +19,7 @@ CssLength tryParseCssLength(String value) {
   final match = _cssLengthValue.firstMatch(value);
   if (match == null) return null;
 
-  final number = double.tryParse(match[1]);
+  final number = double.tryParse(match[1]!);
   if (number == null) return null;
 
   switch (match[2]) {
@@ -45,28 +36,41 @@ CssLength tryParseCssLength(String value) {
   return null;
 }
 
-CssLengthBox tryParseCssLengthBox(BuildMetadata meta, String key) {
-  CssLengthBox output;
+CssLengthBox? tryParseCssLengthBox(BuildMetadata meta, String key) {
+  CssLengthBox? output;
 
   for (final style in meta.styles) {
     if (!style.key.startsWith(key)) continue;
 
     final suffix = style.key.substring(key.length);
-    switch (suffix) {
-      case '':
-        output = _parseCssLengthBoxAll(style.value);
-        break;
+    if (suffix.isEmpty) {
+      output = _parseCssLengthBoxAll(style.value);
+    } else {
+      final parsed = tryParseCssLength(style.value);
+      output ??= CssLengthBox();
 
-      case kCssLengthBoxSuffixBlockEnd:
-      case kCssLengthBoxSuffixBlockStart:
-      case kCssLengthBoxSuffixBottom:
-      case kCssLengthBoxSuffixInlineEnd:
-      case kCssLengthBoxSuffixInlineStart:
-      case kCssLengthBoxSuffixLeft:
-      case kCssLengthBoxSuffixRight:
-      case kCssLengthBoxSuffixTop:
-        output = _parseCssLengthBoxOne(output, suffix, style.value);
-        break;
+      switch (suffix) {
+        case kSuffixBottom:
+        case kSuffixBlockEnd:
+          output = output.copyWith(bottom: parsed);
+          break;
+        case kSuffixInlineEnd:
+          output = output.copyWith(inlineEnd: parsed);
+          break;
+        case kSuffixInlineStart:
+          output = output.copyWith(inlineStart: parsed);
+          break;
+        case kSuffixLeft:
+          output = output.copyWith(left: parsed);
+          break;
+        case kSuffixRight:
+          output = output.copyWith(right: parsed);
+          break;
+        case kSuffixTop:
+        case kSuffixBlockStart:
+          output = output.copyWith(top: parsed);
+          break;
+      }
     }
   }
 
@@ -98,34 +102,4 @@ CssLengthBox _parseCssLengthBoxAll(String value) {
 
   final all = tryParseCssLength(value);
   return CssLengthBox(top: all, inlineEnd: all, bottom: all, inlineStart: all);
-}
-
-CssLengthBox _parseCssLengthBoxOne(
-  CssLengthBox existing,
-  String suffix,
-  String value,
-) {
-  final parsed = tryParseCssLength(value);
-  if (parsed == null) return existing;
-
-  existing ??= CssLengthBox();
-
-  switch (suffix) {
-    case kCssLengthBoxSuffixBottom:
-    case kCssLengthBoxSuffixBlockEnd:
-      return existing.copyWith(bottom: parsed);
-    case kCssLengthBoxSuffixInlineEnd:
-      return existing.copyWith(inlineEnd: parsed);
-    case kCssLengthBoxSuffixInlineStart:
-      return existing.copyWith(inlineStart: parsed);
-    case kCssLengthBoxSuffixLeft:
-      return existing.copyWith(left: parsed);
-    case kCssLengthBoxSuffixRight:
-      return existing.copyWith(right: parsed);
-    case kCssLengthBoxSuffixTop:
-    case kCssLengthBoxSuffixBlockStart:
-      return existing.copyWith(top: parsed);
-  }
-
-  return existing;
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:fwfh_chewie/fwfh_chewie.dart';
 
 import '_2.dart';
 
@@ -33,14 +34,14 @@ class _TestAppState extends State<TestApp> {
         ),
       );
 
-  Widget _buildButton(String value) => RaisedButton(
+  Widget _buildButton(String value) => ElevatedButton(
+        key: ValueKey(value),
+        onPressed: () => setState(() => input = value),
         child: Text(
           value,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        key: ValueKey(value),
-        onPressed: () => setState(() => input = value),
       );
 
   Widget _buildButtons() => Row(
@@ -58,12 +59,12 @@ class _TestAppState extends State<TestApp> {
 
   Widget _buildAspectRatioTester() => input.isNotEmpty
       ? AspectRatioTester(
+          key: ValueKey(input),
           child: VideoPlayer(
             input,
             aspectRatio: 1,
             autoResize: true,
           ),
-          key: ValueKey(input),
         )
       : widget0;
 }

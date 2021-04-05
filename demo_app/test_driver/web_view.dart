@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:fwfh_webview/fwfh_webview.dart';
 
 import '_2.dart';
 
@@ -52,13 +52,13 @@ class TestApp extends StatelessWidget {
         ),
       );
 
-  Widget _buildButton(String value, {bool issue375 = false}) => RaisedButton(
-        child: Text(value + (issue375 ? ' issue375' : '')),
+  Widget _buildButton(String value, {bool issue375 = false}) => ElevatedButton(
         key: ValueKey('input-$value' + (issue375 ? '-issue375' : '')),
         onPressed: () {
           input.value = value;
           this.issue375.value = issue375;
         },
+        child: Text(value + (issue375 ? ' issue375' : '')),
       );
 
   Widget _buildButtons({bool issue375 = false}) => Row(
@@ -73,6 +73,7 @@ class TestApp extends StatelessWidget {
         animation: Listenable.merge([input, issue375]),
         builder: (_, __) => input.value.isNotEmpty
             ? AspectRatioTester(
+                key: UniqueKey(),
                 child: WebView(
                   Uri.dataFromString(
                     html.replaceAll('{input}', input.value),
@@ -82,8 +83,7 @@ class TestApp extends StatelessWidget {
                   autoResize: true,
                   unsupportedWorkaroundForIssue375: issue375.value,
                 ),
-                key: UniqueKey(),
               )
-            : widget0,
+            : const SizedBox.shrink(),
       );
 }

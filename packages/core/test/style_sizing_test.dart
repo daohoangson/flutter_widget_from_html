@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
-import 'package:network_image_mock/network_image_mock.dart';
+import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
 
@@ -44,6 +44,15 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
+
+    testWidgets('ignores invalid', (WidgetTester tester) async {
+      final html = '<div style="height: 2em; height: xxx">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:height=20.0,width=100.0%,child='
+              '[RichText:(:Foo)]]'));
+    });
   });
 
   group('max-height', () {
@@ -81,6 +90,16 @@ void main() {
       final html = '<div style="max-height: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('ignores invalid', (WidgetTester tester) async {
+      final html = '<div style="max-height: 2em; max-height: xxx">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:height≤20.0,width=100.0%,child='
+              '[RichText:(:Foo)]'
+              ']'));
     });
   });
 
@@ -120,6 +139,16 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
+
+    testWidgets('ignores invalid', (WidgetTester tester) async {
+      final html = '<div style="max-width: 2em">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:width≤20.0,width=100.0%,child='
+              '[RichText:(:Foo)]'
+              ']'));
+    });
   });
 
   group('min-height', () {
@@ -157,6 +186,16 @@ void main() {
       final html = '<div style="min-height: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('ignores invalid', (WidgetTester tester) async {
+      final html = '<div style="min-height: 2em">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:height≥20.0,width=100.0%,child='
+              '[RichText:(:Foo)]'
+              ']'));
     });
   });
 
@@ -196,6 +235,16 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
+
+    testWidgets('ignores invalid', (WidgetTester tester) async {
+      final html = '<div style="min-width: 2em">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:width≥20.0,width=100.0%,child='
+              '[RichText:(:Foo)]'
+              ']'));
+    });
   });
 
   group('width', () {
@@ -233,6 +282,16 @@ void main() {
       final html = '<div style="width: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('ignores invalid', (WidgetTester tester) async {
+      final html = '<div style="width: 2em">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssSizing:width=20.0,child='
+              '[RichText:(:Foo)]'
+              ']'));
     });
   });
 
@@ -288,7 +347,7 @@ void main() {
     testWidgets('renders img with sizing', (WidgetTester tester) async {
       final src = 'https://domain.com/image.jpg';
       final html = 'Foo <img src="$src" style="width: 10px; height: 10px;" />';
-      final explained = await mockNetworkImagesFor(() => explain(tester, html));
+      final explained = await mockNetworkImages(() => explain(tester, html));
       expect(
           explained,
           equals('[RichText:(:Foo '
@@ -300,7 +359,7 @@ void main() {
       final src = 'https://domain.com/image.jpg';
       final html = '<div style="text-align: center">'
           '<img src="$src" width="10" height="10" style="vertical-align: middle" /></div>';
-      final explained = await mockNetworkImagesFor(() => explain(tester, html));
+      final explained = await mockNetworkImages(() => explain(tester, html));
       expect(
           explained,
           equals('[_TextAlignBlock:child=[RichText:align=center,'
@@ -371,7 +430,7 @@ void main() {
               );
 
               await screenMatchesGolden(tester, testCase.key);
-            }, skip: null);
+            }, skip: goldenSkip != null);
           }
         }, skip: goldenSkip);
       },
@@ -388,11 +447,11 @@ void main() {
             await tester.pumpWidgetBuilder(
               Scaffold(
                 body: SingleChildScrollView(
-                  child: Padding(
-                    child: HtmlWidget('<div style="width: 100%">Foo</div>'),
-                    padding: const EdgeInsets.all(8.0),
-                  ),
                   scrollDirection: Axis.horizontal,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: HtmlWidget('<div style="width: 100%">Foo</div>'),
+                  ),
                 ),
               ),
               wrapper: materialAppWrapper(theme: ThemeData.light()),
@@ -400,24 +459,25 @@ void main() {
             );
 
             await screenMatchesGolden(tester, 'width');
-          }, skip: null);
+          }, skip: goldenSkip != null);
 
           testGoldens('height', (tester) async {
             await tester.pumpWidgetBuilder(
               Scaffold(
                 body: SingleChildScrollView(
-                    child: Padding(
-                      child: HtmlWidget('<div style="height: 100%">Foo</div>'),
-                      padding: const EdgeInsets.all(8.0),
-                    ),
-                    scrollDirection: Axis.vertical),
+                  scrollDirection: Axis.vertical,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: HtmlWidget('<div style="height: 100%">Foo</div>'),
+                  ),
+                ),
               ),
               wrapper: materialAppWrapper(theme: ThemeData.light()),
               surfaceSize: Size(200, 200),
             );
 
             await screenMatchesGolden(tester, 'height');
-          }, skip: null);
+          }, skip: goldenSkip != null);
         }, skip: goldenSkip);
       },
       config: GoldenToolkitConfiguration(
@@ -431,13 +491,13 @@ void main() {
 class _Golden extends StatelessWidget {
   final String html;
 
-  const _Golden(this.html, {Key key}) : super(key: key);
+  const _Golden(this.html, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => Scaffold(
         body: Padding(
-          child: HtmlWidget(html),
           padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(html),
         ),
       );
 }

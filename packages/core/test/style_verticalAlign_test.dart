@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:network_image_mock/network_image_mock.dart';
+import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
 
@@ -78,7 +78,7 @@ void main() {
         '[Image:image=NetworkImage("$imgSrc", scale: 1.0)]'
         ']';
     final imgExplain = (WidgetTester t, String html) =>
-        mockNetworkImagesFor(() => explain(t, html));
+        mockNetworkImages(() => explain(t, html));
 
     testWidgets('renders top image', (WidgetTester tester) async {
       final html = '<img src="$imgSrc" style="vertical-align: top" />';
@@ -121,6 +121,68 @@ void main() {
     final html = '<em><span style="vertical-align: top">Foo</span></em>';
     final explained = await explain(tester, html);
     expect(explained, equals('[RichText:[RichText:(+i:Foo)]@top]'));
+  });
+
+  group('isBlockElement', () {
+    group('renders top', () {
+      final html = '<div style="vertical-align: top">Foo</span>';
+
+      testWidgets('ltr', (WidgetTester tester) async {
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[CssBlock:child=[Align:alignment=topLeft,child='
+                '[RichText:(:Foo)]]]'));
+      });
+
+      testWidgets('rtl', (WidgetTester tester) async {
+        final explained = await explain(tester, html, rtl: true);
+        expect(
+            explained,
+            equals('[CssBlock:child=[Align:alignment=topRight,child='
+                '[RichText:dir=rtl,(:Foo)]]]'));
+      });
+    });
+
+    group('renders middle', () {
+      final html = '<div style="vertical-align: middle">Foo</span>';
+
+      testWidgets('ltr', (WidgetTester tester) async {
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[CssBlock:child=[Align:alignment=centerLeft,child='
+                '[RichText:(:Foo)]]]'));
+      });
+
+      testWidgets('rtl', (WidgetTester tester) async {
+        final explained = await explain(tester, html, rtl: true);
+        expect(
+            explained,
+            equals('[CssBlock:child=[Align:alignment=centerRight,child='
+                '[RichText:dir=rtl,(:Foo)]]]'));
+      });
+    });
+
+    group('renders bottom', () {
+      final html = '<div style="vertical-align: bottom">Foo</span>';
+
+      testWidgets('ltr', (WidgetTester tester) async {
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[CssBlock:child=[Align:alignment=bottomLeft,child='
+                '[RichText:(:Foo)]]]'));
+      });
+
+      testWidgets('rtl', (WidgetTester tester) async {
+        final explained = await explain(tester, html, rtl: true);
+        expect(
+            explained,
+            equals('[CssBlock:child=[Align:alignment=bottomRight,child='
+                '[RichText:dir=rtl,(:Foo)]]]'));
+      });
+    });
   });
 
   group('error handling', () {

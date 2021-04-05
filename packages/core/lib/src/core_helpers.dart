@@ -8,7 +8,9 @@ import 'package:html/dom.dart' as dom;
 import 'core_html_widget.dart';
 
 export 'widgets/css_sizing.dart';
+export 'widgets/html_list_item.dart';
 export 'widgets/html_ruby.dart';
+export 'widgets/html_table.dart';
 
 /// The default character threshold to build widget tree asynchronously.
 ///
@@ -31,7 +33,8 @@ const widget0 = SizedBox.shrink();
 ///     element.classes.contains('name') ? {'color': 'red'} : null,
 /// )
 /// ```
-typedef CustomStylesBuilder = Map<String, String> Function(dom.Element element);
+typedef CustomStylesBuilder = Map<String, String>? Function(
+    dom.Element element);
 
 /// A callback to render custom widget for a DOM element.
 ///
@@ -39,7 +42,50 @@ typedef CustomStylesBuilder = Map<String, String> Function(dom.Element element);
 /// you have to handle the DOM element and its children manually,
 /// if the children have HTML styling etc., they won't be processed at all.
 /// For those needs, a custom [WidgetFactory] is the way to go.
-typedef CustomWidgetBuilder = Widget Function(dom.Element element);
+typedef CustomWidgetBuilder = Widget? Function(dom.Element element);
+
+final _domElementStyles = Expando<List<InlineStyle>>();
+
+final _domElementStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
+
+extension DomElementExtension on dom.Element {
+  /// Returns parsed [InlineStyle]s from the element's `style` attribute.
+  ///
+  /// This is different from [BuildMetadata.styles] as it doesn't include
+  /// runtime additions from [WidgetFactory] or [BuildOp]s.
+  List<InlineStyle> get styles {
+    final result = _domElementStyles[this];
+    if (result != null) return result;
+
+    if (!attributes.containsKey('style')) {
+      return _domElementStyles[this] = const [];
+    }
+
+    return _domElementStyles[this] = _domElementStyleRegExp
+        .allMatches(attributes['style']!)
+        .map((m) => InlineStyle(m[1]!.trim(), m[2]!.trim()))
+        .toList(growable: false);
+  }
+}
+
+final _domElementStyleValuesRegExp = RegExp(r'\s+');
+
+/// An inline style key value pair.
+class InlineStyle {
+  /// The key.
+  final String key;
+
+  /// The value.
+  ///
+  /// Use [values] for tokenized strings.
+  final String value;
+
+  /// Creates a key value pair.
+  InlineStyle(this.key, this.value);
+
+  /// The tokenized values.
+  List<String> get values => value.split(_domElementStyleValuesRegExp);
+}
 
 /// A set of values that should trigger rebuild.
 class RebuildTriggers {
@@ -77,17 +123,17 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   /// The origin of this widget.
   final T generator;
 
-  final List<Widget Function(BuildContext, Widget)> _builders = [];
-  final Widget _firstChild;
+  final List<Widget? Function(BuildContext, Widget)> _builders = [];
+  final Widget? _firstChild;
 
   /// Creates a widget builder.
-  WidgetPlaceholder(this.generator, {Widget child}) : _firstChild = child;
+  WidgetPlaceholder(this.generator, {Widget? child}) : _firstChild = child;
 
   @override
   Widget build(BuildContext context) => callBuilders(context, _firstChild);
 
   /// Calls builder callbacks on the specified [child] widget.
-  Widget callBuilders(BuildContext context, Widget child) {
+  Widget callBuilders(BuildContext context, Widget? child) {
     var built = child ?? widget0;
 
     for (final builder in _builders) {
@@ -109,8 +155,7 @@ class WidgetPlaceholder<T> extends StatelessWidget {
 
   /// Enqueues [builder] to be built later.
   WidgetPlaceholder<T> wrapWith(
-      Widget Function(BuildContext context, Widget child) builder) {
-    assert(builder != null);
+      Widget? Function(BuildContext context, Widget child) builder) {
     _builders.add(builder);
     return this;
   }
@@ -137,11 +182,11 @@ final _dataUriRegExp = RegExp(r'^data:[^;]+;([^,]+),');
 ///
 /// - base64
 /// - utf8
-Uint8List bytesFromDataUri(String dataUri) {
+Uint8List? bytesFromDataUri(String dataUri) {
   final match = _dataUriRegExp.matchAsPrefix(dataUri);
   if (match == null) return null;
 
-  final prefix = match[0];
+  final prefix = match[0]!;
   final encoding = match[1];
   final data = dataUri.substring(prefix.length);
   final bytes = encoding == 'base64'
@@ -154,12 +199,12 @@ Uint8List bytesFromDataUri(String dataUri) {
 }
 
 /// Returns [List<T>] if [x] is provided or `null` otherwise.
-Iterable<T> listOrNull<T>(T x) => x == null ? null : [x];
+Iterable<T>? listOrNull<T>(T? x) => x == null ? null : [x];
 
 /// Parses [key] from [map] as an double literal and return its value.
-double tryParseDoubleFromMap(Map<dynamic, String> map, String key) =>
-    map.containsKey(key) ? double.tryParse(map[key]) : null;
+double? tryParseDoubleFromMap(Map<dynamic, String> map, String key) =>
+    map.containsKey(key) ? double.tryParse(map[key]!) : null;
 
 /// Parses [key] from [map] as a, possibly signed, integer literal and return its value.
-int tryParseIntFromMap(Map<dynamic, String> map, String key) =>
-    map.containsKey(key) ? int.tryParse(map[key]) : null;
+int? tryParseIntFromMap(Map<dynamic, String> map, String key) =>
+    map.containsKey(key) ? int.tryParse(map[key]!) : null;
