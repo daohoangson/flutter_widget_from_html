@@ -33,15 +33,6 @@ const kCssFontStyleNormal = 'normal';
 
 const kCssFontWeight = 'font-weight';
 const kCssFontWeightBold = 'bold';
-const kCssFontWeight100 = 100;
-const kCssFontWeight200 = 200;
-const kCssFontWeight300 = 300;
-const kCssFontWeight400 = 400;
-const kCssFontWeight500 = 500;
-const kCssFontWeight600 = 600;
-const kCssFontWeight700 = 700;
-const kCssFontWeight800 = 800;
-const kCssFontWeight900 = 900;
 
 const kCssLineHeight = 'line-height';
 const kCssLineHeightNormal = 'normal';
@@ -183,23 +174,23 @@ class TextStyleOps {
     if (expression is css.LiteralTerm) {
       if (expression is css.NumberTerm) {
         switch (expression.value) {
-          case kCssFontWeight100:
+          case 100:
             return FontWeight.w100;
-          case kCssFontWeight200:
+          case 200:
             return FontWeight.w200;
-          case kCssFontWeight300:
+          case 300:
             return FontWeight.w300;
-          case kCssFontWeight400:
+          case 400:
             return FontWeight.w400;
-          case kCssFontWeight500:
+          case 500:
             return FontWeight.w500;
-          case kCssFontWeight600:
+          case 600:
             return FontWeight.w600;
-          case kCssFontWeight700:
+          case 700:
             return FontWeight.w700;
-          case kCssFontWeight800:
+          case 800:
             return FontWeight.w800;
-          case kCssFontWeight900:
+          case 900:
             return FontWeight.w900;
         }
       }
