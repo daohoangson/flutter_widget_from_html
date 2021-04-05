@@ -91,32 +91,21 @@ CssLengthBox? _parseCssLengthBoxOne(
   return existing;
 }
 
-CssLengthBox? tryParseCssLengthBox(BuildMetadata meta, String key) {
+CssLengthBox? tryParseCssLengthBox(BuildMetadata meta, String prefix) {
   CssLengthBox? output;
 
   for (final style in meta.styles) {
     final key = style.property;
-    if (!key.startsWith(key)) continue;
+    if (!key.startsWith(prefix)) continue;
 
-    final suffix = key.substring(key.length);
-    switch (suffix) {
-      case '':
-        output = _parseCssLengthBoxAll(style.values);
-        break;
-
-      case kCssSuffixBlockEnd:
-      case kCssSuffixBlockStart:
-      case kCssSuffixBottom:
-      case kCssSuffixInlineEnd:
-      case kCssSuffixInlineStart:
-      case kCssSuffixLeft:
-      case kCssSuffixRight:
-      case kCssSuffixTop:
-        final expression = style.value;
-        if (expression != null) {
-          output = _parseCssLengthBoxOne(output, suffix, expression);
-        }
-        break;
+    final suffix = key.substring(prefix.length);
+    if (suffix.isEmpty) {
+      output = _parseCssLengthBoxAll(style.values);
+    } else {
+      final expression = style.value;
+      if (expression != null) {
+        output = _parseCssLengthBoxOne(output, suffix, expression);
+      }
     }
   }
 
