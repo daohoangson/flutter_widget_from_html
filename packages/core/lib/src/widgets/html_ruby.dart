@@ -77,7 +77,7 @@ class _RubyRenderObject extends RenderBox
 
   @override
   Size computeDryLayout(BoxConstraints constraints) =>
-      _performLayout(constraints, _performLayoutDry);
+      _performLayout(firstChild, constraints, _performLayoutDry);
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
@@ -89,7 +89,7 @@ class _RubyRenderObject extends RenderBox
 
   @override
   void performLayout() {
-    size = _performLayout(constraints, _performLayoutLayouter);
+    size = _performLayout(firstChild, constraints, _performLayoutLayouter);
   }
 
   @override
@@ -99,11 +99,11 @@ class _RubyRenderObject extends RenderBox
     }
   }
 
-  Size _performLayout(
-      BoxConstraints constraints,
-      Size? Function(RenderBox? renderBox, BoxConstraints constraints)
+  static Size _performLayout(
+      final RenderBox? ruby,
+      final BoxConstraints constraints,
+      final Size? Function(RenderBox? renderBox, BoxConstraints constraints)
           layouter) {
-    final ruby = firstChild;
     final rubyConstraints = constraints.loosen();
     final rubyData = ruby?.parentData as _RubyParentData?;
     final rubySize = layouter(ruby, rubyConstraints) ?? Size.zero;
