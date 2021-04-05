@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 
 import '_0.dart';
 
-void expectAspectRatio(FlutterDriver driver, double value,
+Future<void> expectAspectRatio(FlutterDriver driver, double value,
     {double epsilon = 0.1}) async {
   final text = await driver.getText(find.byValueKey(kResultKey));
   final parsed = double.tryParse(text);

@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart' show WidgetTester, testWidgets;
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter_widget_from_html_core/src/internal/builder.dart'
     as builder;
+import 'package:html/dom.dart' as dom;
 import 'package:test/test.dart';
 
 import '../../_.dart' as helper;
@@ -50,14 +51,14 @@ void main() {
           final html = '1 <a href="href">2</a> 3';
           final explained = await explain(tester, html);
           expect(
-              explained, equals('[RichText:(:1 (#FF0000FF+u+onTap:2)(: 3))]'));
+              explained, equals('[RichText:(:1 (#FF123456+u+onTap:2)(: 3))]'));
         });
 
         testWidgets('A tag with BuildBit', (WidgetTester tester) async {
           final html = '1 <a href="href" class="$clazz">2</a> 3';
           final explained = await explain(tester, html);
           expect(explained,
-              equals('[RichText:(:1 (#FF0000FF+u+onTap+onTapCancel:2)(: 3))]'));
+              equals('[RichText:(:1 (#FF123456+u+onTap+onTapCancel:2)(: 3))]'));
         });
       });
 
@@ -99,7 +100,7 @@ void main() {
           final html = '1 <a href="href">2</a> 3';
           final explained = await explain(tester, html);
           expect(
-              explained, equals('[RichText:(:1 (#FF0000FF+u+onTap:2)(: 3))]'));
+              explained, equals('[RichText:(:1 (#FF123456+u+onTap:2)(: 3))]'));
         });
 
         testWidgets('A tag with BuildBit', (WidgetTester tester) async {
@@ -108,7 +109,7 @@ void main() {
           expect(
               explained,
               equals(
-                  '[RichText:(:1 (#FF0000FF+u+MultiTapGestureRecognizer:2)(: 3))]'));
+                  '[RichText:(:1 (#FF123456+u+MultiTapGestureRecognizer:2)(: 3))]'));
         });
       });
 
@@ -394,9 +395,9 @@ void main() {
             '    BuildTree#5 tsb#6(parent=#4):\n'
             '      "(2.2.1)"\n'
             '      "(2.2.2)"\n'
-            '      _TextNewLine#7 tsb#6(parent=#4)\n'
+            '      ASCII-10\n'
             '    "(2.3)"\n'
-            '  WidgetBit.inline#8 WidgetPlaceholder(Text("Hi"))'));
+            '  WidgetBit.inline#7 WidgetPlaceholder(Text("Hi"))'));
   });
 }
 
@@ -456,7 +457,7 @@ class _BuildBitWidgetFactory extends WidgetFactory {
     }
 
     if (classes.contains('custom')) {
-      meta.tsb((tsh, _) => tsh.copyWith());
+      meta.tsb.enqueue((tsh, _) => tsh.copyWith());
     }
 
     super.parse(meta);
@@ -464,23 +465,23 @@ class _BuildBitWidgetFactory extends WidgetFactory {
 }
 
 class _InputBuildContextBit extends BuildBit<BuildContext, Widget> {
-  _InputBuildContextBit(BuildTree parent, TextStyleBuilder tsb)
+  _InputBuildContextBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
-  Widget buildBit(BuildContext _) => Text('Foo');
+  Widget buildBit(BuildContext? _) => Text('Foo');
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _InputBuildContextBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _InputGestureRecognizerBit extends BuildBit<GestureRecognizer, dynamic> {
-  _InputGestureRecognizerBit(BuildTree parent, TextStyleBuilder tsb)
+class _InputGestureRecognizerBit extends BuildBit<GestureRecognizer?, dynamic> {
+  _InputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
-  dynamic buildBit(GestureRecognizer recognizer) {
+  dynamic buildBit(GestureRecognizer? recognizer) {
     if (recognizer is TapGestureRecognizer) {
       recognizer.onTapCancel = () {};
       return recognizer;
@@ -490,23 +491,23 @@ class _InputGestureRecognizerBit extends BuildBit<GestureRecognizer, dynamic> {
   }
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _InputGestureRecognizerBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
 class _InputNullBit extends BuildBit<Null, dynamic> {
-  _InputNullBit(BuildTree parent, TextStyleBuilder tsb) : super(parent, tsb);
+  _InputNullBit(BuildTree? parent, TextStyleBuilder tsb) : super(parent, tsb);
 
   @override
   dynamic buildBit(Null _) => '(null)';
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _InputNullBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
 class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {
-  _InputTextStyleHtmlBit(BuildTree parent, TextStyleBuilder tsb)
+  _InputTextStyleHtmlBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
@@ -516,7 +517,7 @@ class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {
       );
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _InputTextStyleHtmlBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
@@ -535,53 +536,55 @@ class _OutputBuildTreeBit extends BuildBit<Null, BuildTree> {
   BuildTree buildBit(Null _) => tree;
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
-      _OutputBuildTreeBit(parent ?? this.parent, tsb ?? this.tsb);
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+      _OutputBuildTreeBit(parent ?? this.parent!, tsb ?? this.tsb);
 }
 
 class _OutputGestureRecognizerBit extends BuildBit<Null, GestureRecognizer> {
-  _OutputGestureRecognizerBit(BuildTree parent, TextStyleBuilder tsb)
+  _OutputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
   GestureRecognizer buildBit(Null _) => MultiTapGestureRecognizer();
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _OutputGestureRecognizerBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
 class _OutputInlineSpanBit extends BuildBit<Null, InlineSpan> {
-  _OutputInlineSpanBit(BuildTree parent, TextStyleBuilder tsb)
+  _OutputInlineSpanBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
   InlineSpan buildBit(Null _) => WidgetSpan(child: Text('foo'));
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _OutputInlineSpanBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
 class _OutputStringBit extends BuildBit<Null, String> {
-  _OutputStringBit(BuildTree parent, TextStyleBuilder tsb) : super(parent, tsb);
+  _OutputStringBit(BuildTree? parent, TextStyleBuilder tsb)
+      : super(parent, tsb);
 
   @override
   String buildBit(Null _) => 'foo';
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _OutputStringBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
 class _OutputWidgetBit extends BuildBit<Null, Widget> {
-  _OutputWidgetBit(BuildTree parent, TextStyleBuilder tsb) : super(parent, tsb);
+  _OutputWidgetBit(BuildTree? parent, TextStyleBuilder tsb)
+      : super(parent, tsb);
 
   @override
   Widget buildBit(Null _) => Text('foo');
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _OutputWidgetBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
@@ -591,4 +594,11 @@ String _data(BuildTree text) => text.bits
         : '[$bit]'.replaceAll(RegExp(r'#\w+'), ''))
     .join('');
 
-BuildTree _text() => builder.BuildTree(tsb: TextStyleBuilder());
+BuildTree _text() => builder.BuildTree(
+      tsb: TextStyleBuilder(),
+      parentMeta: builder.BuildMetadata(
+        dom.Element.tag('test'),
+        TextStyleBuilder(),
+      ),
+      wf: WidgetFactory(),
+    );

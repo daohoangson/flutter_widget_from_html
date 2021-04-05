@@ -10,13 +10,13 @@ class StyleBgColor {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree) return;
+          if (meta.willBuildSubtree == true) return;
 
           final bgColor = _parseColor(wf, meta);
           if (bgColor == null) return;
 
           for (final bit in tree.bits) {
-            bit.tsb?.enqueue(_tsb, bgColor);
+            bit.tsb.enqueue(_tsb, bgColor);
           }
         },
         onWidgets: (meta, widgets) {
@@ -26,11 +26,11 @@ class StyleBgColor {
               (_, child) => wf.buildDecoratedBox(meta, child, color: color)));
         },
         onWidgetsIsOptional: true,
-        priority: 15000,
+        priority: 4900,
       );
 
-  Color _parseColor(WidgetFactory wf, BuildMetadata meta) {
-    Color color;
+  Color? _parseColor(WidgetFactory wf, BuildMetadata meta) {
+    Color? color;
     for (final style in meta.styles) {
       switch (style.property) {
         case kCssBackground:

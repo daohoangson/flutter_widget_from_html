@@ -6,34 +6,31 @@ import 'package:flutter/widgets.dart';
 /// A CSS block.
 class CssBlock extends CssSizing {
   /// Creates a CSS block.
-  CssBlock({@required Widget child, Key key})
-      : assert(child != null),
-        super(child: child, key: key);
-
-  CssSizingValue get _100percent => const _CssSizingPercentage(100);
+  CssBlock({required Widget child, Key? key}) : super(child: child, key: key);
 
   @override
   _RenderCssSizing createRenderObject(BuildContext _) =>
-      _RenderCssSizing(preferredWidth: _100percent);
+      _RenderCssSizing(preferredWidth: const CssSizingValue.percentage(100));
 
   @override
   void updateRenderObject(BuildContext _, _RenderCssSizing renderObject) =>
-      renderObject.setPreferredSize(null, _100percent, null);
+      renderObject.setPreferredSize(
+          null, const CssSizingValue.percentage(100), null);
 }
 
 /// A CSS sizing widget.
 class CssSizing extends SingleChildRenderObjectWidget {
   /// The maximum height.
-  final CssSizingValue maxHeight;
+  final CssSizingValue? maxHeight;
 
   /// The maximum width.
-  final CssSizingValue maxWidth;
+  final CssSizingValue? maxWidth;
 
   /// The minimum height.
-  final CssSizingValue minHeight;
+  final CssSizingValue? minHeight;
 
   // The minimum width;
-  final CssSizingValue minWidth;
+  final CssSizingValue? minWidth;
 
   /// The preferred axis.
   ///
@@ -43,18 +40,18 @@ class CssSizing extends SingleChildRenderObjectWidget {
   /// the [preferredHeight] will be used for sizing.
   ///
   /// By default (`null` preferred axis), [preferredWidth] will be used.
-  final Axis preferredAxis;
+  final Axis? preferredAxis;
 
   /// The preferred height.
-  final CssSizingValue preferredHeight;
+  final CssSizingValue? preferredHeight;
 
   /// The preferred width.
-  final CssSizingValue preferredWidth;
+  final CssSizingValue? preferredWidth;
 
   /// Creates a CSS sizing.
   CssSizing({
-    @required Widget child,
-    Key key,
+    required Widget child,
+    Key? key,
     this.maxHeight,
     this.maxWidth,
     this.minHeight,
@@ -62,8 +59,7 @@ class CssSizing extends SingleChildRenderObjectWidget {
     this.preferredAxis,
     this.preferredHeight,
     this.preferredWidth,
-  })  : assert(child != null),
-        super(child: child, key: key);
+  }) : super(child: child, key: key);
 
   @override
   _RenderCssSizing createRenderObject(BuildContext _) => _RenderCssSizing(
@@ -104,7 +100,7 @@ class CssSizing extends SingleChildRenderObjectWidget {
   }
 
   void _debugFillProperty(DiagnosticPropertiesBuilder properties, String name,
-      CssSizingValue value) {
+      CssSizingValue? value) {
     if (value == null) return;
     properties.add(DiagnosticsProperty<CssSizingValue>(name, value));
   }
@@ -124,14 +120,14 @@ class CssSizing extends SingleChildRenderObjectWidget {
 
 class _RenderCssSizing extends RenderProxyBox {
   _RenderCssSizing({
-    RenderBox child,
-    CssSizingValue maxHeight,
-    CssSizingValue maxWidth,
-    CssSizingValue minHeight,
-    CssSizingValue minWidth,
-    Axis preferredAxis,
-    CssSizingValue preferredHeight,
-    CssSizingValue preferredWidth,
+    RenderBox? child,
+    CssSizingValue? maxHeight,
+    CssSizingValue? maxWidth,
+    CssSizingValue? minHeight,
+    CssSizingValue? minWidth,
+    Axis? preferredAxis,
+    CssSizingValue? preferredHeight,
+    CssSizingValue? preferredWidth,
   })  : _maxHeight = maxHeight,
         _maxWidth = maxWidth,
         _minHeight = minHeight,
@@ -141,15 +137,15 @@ class _RenderCssSizing extends RenderProxyBox {
         _preferredWidth = preferredWidth,
         super(child);
 
-  CssSizingValue _maxHeight;
-  CssSizingValue _maxWidth;
-  CssSizingValue _minHeight;
-  CssSizingValue _minWidth;
+  CssSizingValue? _maxHeight;
+  CssSizingValue? _maxWidth;
+  CssSizingValue? _minHeight;
+  CssSizingValue? _minWidth;
   void setConstraints({
-    CssSizingValue maxHeight,
-    CssSizingValue maxWidth,
-    CssSizingValue minHeight,
-    CssSizingValue minWidth,
+    CssSizingValue? maxHeight,
+    CssSizingValue? maxWidth,
+    CssSizingValue? minHeight,
+    CssSizingValue? minWidth,
   }) {
     if (maxHeight == _maxHeight &&
         maxWidth == _maxWidth &&
@@ -164,11 +160,11 @@ class _RenderCssSizing extends RenderProxyBox {
     markNeedsLayout();
   }
 
-  Axis _preferredAxis;
-  CssSizingValue _preferredHeight;
-  CssSizingValue _preferredWidth;
+  Axis? _preferredAxis;
+  CssSizingValue? _preferredHeight;
+  CssSizingValue? _preferredWidth;
   void setPreferredSize(
-      Axis axis, CssSizingValue width, CssSizingValue height) {
+      Axis? axis, CssSizingValue? width, CssSizingValue? height) {
     if (axis == _preferredAxis &&
         height == _preferredHeight &&
         width == _preferredWidth) return;
@@ -198,9 +194,9 @@ class _RenderCssSizing extends RenderProxyBox {
         _preferredWidth?.clamp(effectiveMinWidth, maxWidth);
     // ignore preferred value if it's infinite
     final preferredHeight =
-        __preferredHeight == double.infinity ? null : __preferredHeight;
+        __preferredHeight?.isFinite == true ? __preferredHeight : null;
     final preferredWidth =
-        __preferredWidth == double.infinity ? null : __preferredWidth;
+        __preferredWidth?.isFinite == true ? __preferredWidth : null;
 
     final stableChildSize = (preferredHeight != null && preferredWidth != null)
         ? _guessChildSize(
@@ -218,15 +214,15 @@ class _RenderCssSizing extends RenderProxyBox {
       minWidth: stableChildSize?.width ?? preferredWidth ?? minWidth,
     );
 
-    child.layout(cc, parentUsesSize: true);
-    size = constraints.constrain(child.size);
+    child!.layout(cc, parentUsesSize: true);
+    size = constraints.constrain(child!.size);
   }
 
-  Size _guessChildSize({
-    double maxHeight,
-    double maxWidth,
-    double preferredHeight,
-    double preferredWidth,
+  Size? _guessChildSize({
+    required double maxHeight,
+    required double maxWidth,
+    required double preferredHeight,
+    required double preferredWidth,
   }) {
     final ccHeight = BoxConstraints(
       maxWidth: double.infinity,
@@ -234,8 +230,8 @@ class _RenderCssSizing extends RenderProxyBox {
       minWidth: 0,
       minHeight: preferredHeight,
     );
-    child.layout(ccHeight, parentUsesSize: true);
-    final sizeHeight = child.size;
+    child!.layout(ccHeight, parentUsesSize: true);
+    final sizeHeight = child!.size;
 
     final ccWidth = BoxConstraints(
       maxWidth: preferredWidth,
@@ -243,16 +239,18 @@ class _RenderCssSizing extends RenderProxyBox {
       minWidth: preferredWidth,
       minHeight: 0,
     );
-    child.layout(ccWidth, parentUsesSize: true);
-    final sizeWidth = child.size;
+    child!.layout(ccWidth, parentUsesSize: true);
+    final sizeWidth = child!.size;
 
     final childAspectRatio = sizeWidth.width / sizeWidth.height;
-    if (childAspectRatio != sizeHeight.width / sizeHeight.height) {
+    const epsilon = 0.01;
+    if ((childAspectRatio - sizeHeight.width / sizeHeight.height).abs() >
+        epsilon) {
       return null;
     }
 
     // child appears to have a stable aspect ratio
-    double childWidth, childHeight;
+    double? childWidth, childHeight;
     if (_preferredAxis == Axis.vertical) {
       childHeight = preferredHeight;
       childWidth = childHeight * childAspectRatio;
@@ -277,22 +275,22 @@ class _RenderCssSizing extends RenderProxyBox {
 /// A [CssSizing] value.
 abstract class CssSizingValue {
   const CssSizingValue._();
-  double clamp(double min, double max);
+  double? clamp(double min, double max);
 
   /// Creates an auto value.
-  factory CssSizingValue.auto() = _CssSizingAuto;
+  const factory CssSizingValue.auto() = _CssSizingAuto;
 
   /// Creates a percentage value.
-  factory CssSizingValue.percentage(double _) = _CssSizingPercentage;
+  const factory CssSizingValue.percentage(double _) = _CssSizingPercentage;
 
   /// Creates a fixed value.
-  factory CssSizingValue.value(double _) = _CssSizingValue;
+  const factory CssSizingValue.value(double _) = _CssSizingValue;
 }
 
 class _CssSizingAuto extends CssSizingValue {
   const _CssSizingAuto() : super._();
   @override
-  double clamp(double _, double __) => null;
+  double? clamp(double _, double __) => null;
 
   @override
   int get hashCode => 0;

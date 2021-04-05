@@ -9,7 +9,7 @@ const kCssLengthBoxSuffixLeft = '-left';
 const kCssLengthBoxSuffixRight = '-right';
 const kCssLengthBoxSuffixTop = '-top';
 
-CssLength tryParseCssLength(css.Expression expression) {
+CssLength? tryParseCssLength(css.Expression expression) {
   if (expression is css.EmTerm) {
     return CssLength((expression.value as num).toDouble(), CssLengthUnit.em);
   } else if (expression is css.LengthTerm) {
@@ -39,35 +39,7 @@ CssLength tryParseCssLength(css.Expression expression) {
   return null;
 }
 
-CssLengthBox tryParseCssLengthBox(BuildMetadata meta, String key) {
-  CssLengthBox output;
-
-  for (final declaration in meta.styles) {
-    if (!declaration.property.startsWith(key)) continue;
-
-    final suffix = declaration.property.substring(key.length);
-    switch (suffix) {
-      case '':
-        output = _parseCssLengthBoxAll(declaration.values);
-        break;
-
-      case kCssLengthBoxSuffixBlockEnd:
-      case kCssLengthBoxSuffixBlockStart:
-      case kCssLengthBoxSuffixBottom:
-      case kCssLengthBoxSuffixInlineEnd:
-      case kCssLengthBoxSuffixInlineStart:
-      case kCssLengthBoxSuffixLeft:
-      case kCssLengthBoxSuffixRight:
-      case kCssLengthBoxSuffixTop:
-        output = _parseCssLengthBoxOne(output, suffix, declaration.value);
-        break;
-    }
-  }
-
-  return output;
-}
-
-CssLengthBox _parseCssLengthBoxAll(List<css.Expression> expressions) {
+CssLengthBox? _parseCssLengthBoxAll(List<css.Expression> expressions) {
   switch (expressions.length) {
     case 4:
       return CssLengthBox(
@@ -98,8 +70,8 @@ CssLengthBox _parseCssLengthBoxAll(List<css.Expression> expressions) {
   return null;
 }
 
-CssLengthBox _parseCssLengthBoxOne(
-  CssLengthBox existing,
+CssLengthBox? _parseCssLengthBoxOne(
+  CssLengthBox? existing,
   String suffix,
   css.Expression expression,
 ) {
@@ -126,4 +98,32 @@ CssLengthBox _parseCssLengthBoxOne(
   }
 
   return existing;
+}
+
+CssLengthBox? tryParseCssLengthBox(BuildMetadata meta, String key) {
+  CssLengthBox? output;
+
+  for (final declaration in meta.styles) {
+    if (!declaration.property.startsWith(key)) continue;
+
+    final suffix = declaration.property.substring(key.length);
+    switch (suffix) {
+      case '':
+        output = _parseCssLengthBoxAll(declaration.values);
+        break;
+
+      case kCssLengthBoxSuffixBlockEnd:
+      case kCssLengthBoxSuffixBlockStart:
+      case kCssLengthBoxSuffixBottom:
+      case kCssLengthBoxSuffixInlineEnd:
+      case kCssLengthBoxSuffixInlineStart:
+      case kCssLengthBoxSuffixLeft:
+      case kCssLengthBoxSuffixRight:
+      case kCssLengthBoxSuffixTop:
+        output = _parseCssLengthBoxOne(output, suffix, declaration.value);
+        break;
+    }
+  }
+
+  return output;
 }

@@ -1,80 +1,75 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core show HtmlWidget, RebuildTriggers;
 
+import 'data.dart';
 import 'helpers.dart';
 import 'widget_factory.dart';
 
 /// A widget that builds Flutter widget tree from HTML
 /// with support for IFRAME, VIDEO and many other tags.
 class HtmlWidget extends core.HtmlWidget {
-  /// Controls whether or not to apply workaround for
-  /// [issue 37](https://github.com/daohoangson/flutter_widget_from_html/issues/37)
+  /// Controls whether IFRAME is rendered as [WebView].
   ///
-  /// Default: `false`.
-  final bool unsupportedWebViewWorkaroundForIssue37;
-
-  /// Controls whether or not IFRAME is rendered as [WebView].
-  ///
-  /// You must perform additional configuration for this to work.
-  /// ### iOS
-  /// Add this at the end of `ios/Runner/Info.plist` to enable
-  /// Flutter's experimental platform view.
-  /// See more info [here](https://pub.dev/packages/webview_flutter#ios).
-  /// ```plist
-  /// <key>io.flutter.embedded_views_preview</key>
-  /// <string>YES</string>
-  /// ```
-  /// ### Android
-  /// Add this into `android/app/src/main/AndroidManifest.xml`
-  /// to enable internet access. Without this, you will most likely
-  /// see a `net:ERR_CACHE_MISS` error for each iframe being rendered.
-  /// ```xml
-  /// <uses-permission android:name="android.permission.INTERNET" />
-  /// ```
-  ///
-  /// Default: `false`.
+  /// See [WidgetFactory.webView].
   final bool webView;
 
-  /// Controls whether to enable JavaScript in [WebView].
+  /// Controls whether debugging is enabled in WebViews.
   ///
-  /// Default: `true`.
+  /// See [WidgetFactory.webViewDebuggingEnabled].
+  final bool webViewDebuggingEnabled;
+
+  /// Controls whether to enable JavaScript in WebViews.
+  ///
+  /// See [WidgetFactory.webViewJs].
   final bool webViewJs;
+
+  /// Controls whether to always allow media playback in WebViews.
+  ///
+  /// See [WidgetFactory.webViewMediaPlaybackAlwaysAllow].
+  final bool webViewMediaPlaybackAlwaysAllow;
+
+  /// The value used for the HTTP `User-Agent` request header in WebViews.
+  ///
+  /// See [WidgetFactory.webViewUserAgent].
+  final String? webViewUserAgent;
 
   /// Creates a widget that builds Flutter widget tree from html.
   ///
   /// The [html] argument must not be null.
   HtmlWidget(
     String html, {
-    bool buildAsync,
-    AsyncWidgetBuilder<Widget> buildAsyncBuilder,
+    bool? buildAsync,
+    AsyncWidgetBuilder<Widget>? buildAsyncBuilder,
     bool enableCaching = true,
-    WidgetFactory Function() factoryBuilder,
-    Key key,
-    Uri baseUrl,
-    CustomStylesBuilder customStylesBuilder,
-    CustomWidgetBuilder customWidgetBuilder,
-    Color hyperlinkColor,
-    void Function(String) onTapUrl,
-    core.RebuildTriggers rebuildTriggers,
+    WidgetFactory Function()? factoryBuilder,
+    Key? key,
+    Uri? baseUrl,
+    CustomStylesBuilder? customStylesBuilder,
+    CustomWidgetBuilder? customWidgetBuilder,
+    Color? hyperlinkColor,
+    void Function(ImageMetadata)? onTapImage,
+    void Function(String)? onTapUrl,
+    core.RebuildTriggers? rebuildTriggers,
     TextStyle textStyle = const TextStyle(),
-    this.unsupportedWebViewWorkaroundForIssue37 = false,
     this.webView = false,
+    this.webViewDebuggingEnabled = false,
     this.webViewJs = true,
-  })  : assert(html != null),
-        super(
+    this.webViewMediaPlaybackAlwaysAllow = false,
+    this.webViewUserAgent,
+  }) : super(
           html,
           baseUrl: baseUrl,
           buildAsync: buildAsync,
-          buildAsyncBuilder: buildAsyncBuilder ?? _buildAsyncBuilder,
+          buildAsyncBuilder: buildAsyncBuilder,
           customStylesBuilder: customStylesBuilder,
           customWidgetBuilder: customWidgetBuilder,
           enableCaching: enableCaching,
           factoryBuilder: factoryBuilder ?? _getEnhancedWf,
           hyperlinkColor: hyperlinkColor,
+          onTapImage: onTapImage,
           onTapUrl: onTapUrl,
           rebuildTriggers: core.RebuildTriggers([
-            unsupportedWebViewWorkaroundForIssue37,
             webView,
             webViewJs,
             if (rebuildTriggers != null) rebuildTriggers,
@@ -85,13 +80,3 @@ class HtmlWidget extends core.HtmlWidget {
 
   static WidgetFactory _getEnhancedWf() => WidgetFactory();
 }
-
-Widget _buildAsyncBuilder(BuildContext _, AsyncSnapshot<Widget> snapshot) =>
-    snapshot.hasData
-        ? snapshot.data
-        : const Center(
-            child: Padding(
-              child: CircularProgressIndicator(),
-              padding: EdgeInsets.all(8),
-            ),
-          );

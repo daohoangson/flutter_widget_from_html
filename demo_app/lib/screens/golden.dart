@@ -18,8 +18,7 @@ class Golden extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final baseUrl = Uri.parse('https://www.w3schools.com/html/');
-    final withEnhanced =
-        RegExp(r'(^(A|HR|IFRAME|SVG|VIDEO)$|colspan|rowspan)').hasMatch(name);
+    final withEnhanced = RegExp(r'^(IFRAME|SVG|VIDEO)$').hasMatch(name);
 
     final children = <Widget>[
       Text(html),
@@ -30,11 +29,11 @@ class Golden extends StatelessWidget {
           style: Theme.of(context).textTheme.caption,
         ),
       LimitedBox(
+        maxHeight: 400,
         child: core.HtmlWidget(
           html,
           baseUrl: baseUrl,
         ),
-        maxHeight: 400,
       ),
     ];
 
@@ -46,12 +45,12 @@ class Golden extends StatelessWidget {
           style: Theme.of(context).textTheme.caption,
         ),
         LimitedBox(
+          maxHeight: 400,
           child: enhanced.HtmlWidget(
             html,
             baseUrl: baseUrl,
             webView: true,
           ),
-          maxHeight: 400,
         ),
       ]);
     }
@@ -60,18 +59,18 @@ class Golden extends StatelessWidget {
       appBar: AppBar(title: Text(name)),
       body: SingleChildScrollView(
         child: RepaintBoundary(
-          child: Container(
-            child: Padding(
-              child: Column(
-                children: children,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-              ),
-              padding: const EdgeInsets.all(10),
-            ),
-            color: Colors.white,
-          ),
           key: targetKey,
+          child: Container(
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: children,
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -150,8 +149,8 @@ class _GoldensState extends State<GoldensScreen> {
                 hintText: 'Filter',
                 suffixIcon: _filtered != null
                     ? InkWell(
-                        child: Icon(Icons.cancel),
                         onTap: () => _filter.clear(),
+                        child: Icon(Icons.cancel),
                       )
                     : null,
               ),

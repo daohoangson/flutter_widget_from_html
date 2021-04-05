@@ -10,16 +10,7 @@ class HelloWorldCoreScreen extends StatelessWidget {
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: HtmlWidget(
-              enhanced.kHtml,
-              onTapUrl: (url) => showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  title: Text('onTapUrl'),
-                  content: Text(url),
-                ),
-              ),
-            ),
+            child: HtmlWidget(enhanced.kHtml),
           ),
         ),
       );

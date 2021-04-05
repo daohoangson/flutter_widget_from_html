@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:fwfh_webview/fwfh_webview.dart';
 
 import '_2.dart';
 
@@ -31,13 +31,9 @@ const html = """
 </body>
 """;
 
-class TestApp extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => _TestAppState();
-}
-
-class _TestAppState extends State<TestApp> {
-  String input = '';
+class TestApp extends StatelessWidget {
+  final input = ValueNotifier('');
+  final issue375 = ValueNotifier(false);
 
   @override
   Widget build(BuildContext context) => MaterialApp(
@@ -48,6 +44,7 @@ class _TestAppState extends State<TestApp> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 _buildButtons(),
+                _buildButtons(issue375: true),
                 Expanded(child: _buildAspectRatioTester()),
               ],
             ),
@@ -55,31 +52,38 @@ class _TestAppState extends State<TestApp> {
         ),
       );
 
-  Widget _buildButton(String value) => RaisedButton(
-        child: Text(value),
-        key: ValueKey('input-$value'),
-        onPressed: () => setState(() => input = value),
+  Widget _buildButton(String value, {bool issue375 = false}) => ElevatedButton(
+        key: ValueKey('input-$value' + (issue375 ? '-issue375' : '')),
+        onPressed: () {
+          input.value = value;
+          this.issue375.value = issue375;
+        },
+        child: Text(value + (issue375 ? ' issue375' : '')),
       );
 
-  Widget _buildButtons() => Row(
+  Widget _buildButtons({bool issue375 = false}) => Row(
         children: <Widget>[
-          Expanded(child: _buildButton('1.0')),
-          Expanded(child: _buildButton('2.0')),
-          Expanded(child: _buildButton('3.0')),
+          Expanded(child: _buildButton('1.0', issue375: issue375)),
+          Expanded(child: _buildButton('2.0', issue375: issue375)),
+          Expanded(child: _buildButton('3.0', issue375: issue375)),
         ],
       );
 
-  Widget _buildAspectRatioTester() => input.isNotEmpty
-      ? AspectRatioTester(
-          child: WebView(
-            Uri.dataFromString(
-              html.replaceAll('{input}', input),
-              mimeType: 'text/html',
-            ).toString(),
-            aspectRatio: 16 / 9,
-            autoResize: true,
-          ),
-          key: ValueKey(input),
-        )
-      : widget0;
+  Widget _buildAspectRatioTester() => AnimatedBuilder(
+        animation: Listenable.merge([input, issue375]),
+        builder: (_, __) => input.value.isNotEmpty
+            ? AspectRatioTester(
+                key: UniqueKey(),
+                child: WebView(
+                  Uri.dataFromString(
+                    html.replaceAll('{input}', input.value),
+                    mimeType: 'text/html',
+                  ).toString(),
+                  aspectRatio: 16 / 9,
+                  autoResize: true,
+                  unsupportedWorkaroundForIssue375: issue375.value,
+                ),
+              )
+            : const SizedBox.shrink(),
+      );
 }

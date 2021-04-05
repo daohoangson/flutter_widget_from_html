@@ -25,38 +25,45 @@ const kCssListStyleTypeSquare = 'square';
 
 class TagLi {
   final BuildMetadata listMeta;
+  late final BuildOp op;
   final WidgetFactory wf;
 
   final _itemMetas = <BuildMetadata>[];
+  late final BuildOp _itemOp;
   final _itemWidgets = <WidgetPlaceholder>[];
 
-  _ListConfig _config;
-  BuildOp _itemOp;
-  BuildOp _listOp;
+  _ListConfig? _config;
 
-  TagLi(this.wf, this.listMeta);
+  TagLi(this.wf, this.listMeta) {
+    op = _TagLiListOp(this);
+    _itemOp = BuildOp(
+      onWidgets: (itemMeta, widgets) {
+        final column = wf.buildColumnPlaceholder(itemMeta, widgets) ??
+            WidgetPlaceholder<BuildMetadata>(itemMeta);
+
+        final i = _itemMetas.length;
+        _itemMetas.add(itemMeta);
+        _itemWidgets.add(column);
+        return [column.wrapWith((c, w) => _buildItem(c, w, i))];
+      },
+    );
+  }
 
   _ListConfig get config {
     // cannot build config from constructor because
     // inline styles are not fully parsed at that time
-    _config ??= _ListConfig.fromBuildMetadata(listMeta);
-    return _config;
-  }
-
-  BuildOp get op {
-    _listOp ??= _TagLiListOp(this);
-    return _listOp;
+    return _config ??= _ListConfig.fromBuildMetadata(listMeta);
   }
 
   Map<String, String> defaultStyles(dom.Element element) {
     final attrs = element.attributes;
-    final depth = listMeta.parentOps?.whereType<_TagLiListOp>()?.length ?? 0;
+    final depth = listMeta.parentOps.whereType<_TagLiListOp>().length;
 
     final styles = {
       'padding-inline-start': '40px',
       kCssListStyleType: element.localName == kTagOrderedList
           ? _ListConfig.listStyleTypeFromAttributeType(
-                  attrs[kAttributeLiType]) ??
+                  attrs[kAttributeLiType] ?? '') ??
               kCssListStyleTypeDecimal
           : depth == 0
               ? kCssListStyleTypeDisc
@@ -74,19 +81,6 @@ class TagLi {
     final e = childMeta.element;
     if (e.localName != kTagLi) return;
     if (e.parent != listMeta.element) return;
-
-    _itemOp ??= BuildOp(
-      onWidgets: (itemMeta, widgets) {
-        final column = wf.buildColumnPlaceholder(itemMeta, widgets) ??
-            WidgetPlaceholder<BuildMetadata>(itemMeta);
-
-        final i = _itemMetas.length;
-        _itemMetas.add(itemMeta);
-        _itemWidgets.add(column);
-        return [column.wrapWith((c, w) => _buildItem(c, w, i))];
-      },
-    );
-
     childMeta.register(_itemOp);
   }
 
@@ -94,24 +88,24 @@ class TagLi {
     final meta = _itemMetas[i];
     final listStyleType = _ListConfig.listStyleTypeFromBuildMetadata(meta) ??
         config.listStyleType;
-    final markerIndex = config.markerReversed == true
+    final markerIndex = config.markerReversed
         ? (config.markerStart ?? _itemWidgets.length) - i
         : (config.markerStart ?? 1) + i;
-    final tsh = meta.tsb().build(context);
+    final tsh = meta.tsb.build(context);
 
     final markerText = wf.getListStyleMarker(listStyleType, markerIndex);
     final marker = _buildMarker(tsh, listStyleType, markerText);
 
-    return _ListItem(
-      child: child,
+    return HtmlListItem(
       marker: marker,
       textDirection: tsh.textDirection,
+      child: child,
     );
   }
 
   Widget _buildMarker(TextStyleHtml tsh, String type, String text) {
     final style = tsh.styleWithHeight;
-    return text?.isNotEmpty == true
+    return text.isNotEmpty
         ? RichText(
             maxLines: 1,
             overflow: TextOverflow.clip,
@@ -131,11 +125,11 @@ class TagLi {
 class _ListConfig {
   final String listStyleType;
   final bool markerReversed;
-  final int markerStart;
+  final int? markerStart;
 
   _ListConfig({
-    this.listStyleType,
-    this.markerReversed,
+    required this.listStyleType,
+    required this.markerReversed,
     this.markerStart,
   });
 
@@ -149,15 +143,15 @@ class _ListConfig {
     );
   }
 
-  static String listStyleTypeFromBuildMetadata(BuildMetadata meta) {
+  static String? listStyleTypeFromBuildMetadata(BuildMetadata meta) {
     final listStyleType = meta[kCssListStyleType]?.term;
     if (listStyleType != null) return listStyleType;
 
     return listStyleTypeFromAttributeType(
-        meta.element.attributes[kAttributeLiType]);
+        meta.element.attributes[kAttributeLiType] ?? '');
   }
 
-  static String listStyleTypeFromAttributeType(String type) {
+  static String? listStyleTypeFromAttributeType(String type) {
     switch (type) {
       case kAttributeLiTypeAlphaLower:
         return kCssListStyleTypeAlphaLower;
@@ -175,125 +169,8 @@ class _ListConfig {
   }
 }
 
-class _ListItem extends MultiChildRenderObjectWidget {
-  static const kGap = 5.0;
-
-  final TextDirection textDirection;
-
-  _ListItem({
-    Widget child,
-    Key key,
-    Widget marker,
-    this.textDirection,
-  }) : super(children: [child, marker], key: key);
-
-  @override
-  RenderObject createRenderObject(BuildContext _) =>
-      _ListItemRenderObject(textDirection: textDirection);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(
-        DiagnosticsProperty<TextDirection>('textDirection', textDirection));
-  }
-
-  @override
-  void updateRenderObject(BuildContext _, _ListItemRenderObject renderObject) {
-    renderObject.textDirection = textDirection;
-  }
-}
-
-class _ListItemData extends ContainerBoxParentData<RenderBox> {}
-
-class _ListItemRenderObject extends RenderBox
-    with
-        ContainerRenderObjectMixin<RenderBox, _ListItemData>,
-        RenderBoxContainerDefaultsMixin<RenderBox, _ListItemData> {
-  _ListItemRenderObject({
-    TextDirection textDirection,
-  }) : _textDirection = textDirection;
-
-  TextDirection get textDirection => _textDirection;
-  TextDirection _textDirection;
-  set textDirection(TextDirection value) {
-    if (_textDirection == value) return;
-    _textDirection = value;
-    markNeedsLayout();
-  }
-
-  @override
-  double computeDistanceToActualBaseline(TextBaseline baseline) =>
-      defaultComputeDistanceToFirstActualBaseline(baseline);
-
-  @override
-  double computeMaxIntrinsicHeight(double width) =>
-      firstChild.computeMaxIntrinsicHeight(width);
-
-  @override
-  double computeMaxIntrinsicWidth(double height) =>
-      firstChild.computeMaxIntrinsicWidth(height);
-
-  @override
-  double computeMinIntrinsicHeight(double width) =>
-      firstChild.computeMinIntrinsicHeight(width);
-
-  @override
-  double computeMinIntrinsicWidth(double height) =>
-      firstChild.getMinIntrinsicWidth(height);
-
-  @override
-  bool hitTestChildren(BoxHitTestResult result, {Offset position}) =>
-      defaultHitTestChildren(result, position: position);
-
-  @override
-  void paint(PaintingContext context, Offset offset) =>
-      defaultPaint(context, offset);
-
-  @override
-  void performLayout() {
-    final child = firstChild;
-    final childConstraints = constraints;
-    final childData = child.parentData as _ListItemData;
-    child.layout(childConstraints, parentUsesSize: true);
-    final childSize = child.size;
-
-    final marker = childData.nextSibling;
-    final markerConstraints = childConstraints.loosen();
-    final markerData = marker.parentData as _ListItemData;
-    marker.layout(markerConstraints, parentUsesSize: true);
-    final markerSize = marker.size;
-
-    size = Size(
-      childSize.width,
-      childSize.height > 0 ? childSize.height : markerSize.height,
-    );
-
-    final baseline = TextBaseline.alphabetic;
-    final markerDistance =
-        marker.getDistanceToBaseline(baseline, onlyReal: true) ??
-            markerSize.height;
-    final childDistance =
-        child.getDistanceToBaseline(baseline, onlyReal: true) ?? markerDistance;
-
-    markerData.offset = Offset(
-      textDirection == TextDirection.ltr
-          ? -markerSize.width - _ListItem.kGap
-          : childSize.width + _ListItem.kGap,
-      childDistance - markerDistance,
-    );
-  }
-
-  @override
-  void setupParentData(RenderBox child) {
-    if (child.parentData is! _ListItemData) {
-      child.parentData = _ListItemData();
-    }
-  }
-}
-
 class _ListMarkerCircle extends _ListMarker {
-  const _ListMarkerCircle(TextStyle textStyle, {Key key})
+  const _ListMarkerCircle(TextStyle textStyle, {Key? key})
       : super(
           key: key,
           markerType: _ListMarkerType.circle,
@@ -302,7 +179,7 @@ class _ListMarkerCircle extends _ListMarker {
 }
 
 class _ListMarkerDisc extends _ListMarker {
-  const _ListMarkerDisc(TextStyle textStyle, {Key key})
+  const _ListMarkerDisc(TextStyle textStyle, {Key? key})
       : super(
           key: key,
           markerType: _ListMarkerType.disc,
@@ -311,7 +188,7 @@ class _ListMarkerDisc extends _ListMarker {
 }
 
 class _ListMarkerSquare extends _ListMarker {
-  const _ListMarkerSquare(TextStyle textStyle, {Key key})
+  const _ListMarkerSquare(TextStyle textStyle, {Key? key})
       : super(
           key: key,
           markerType: _ListMarkerType.square,
@@ -323,13 +200,13 @@ class _ListMarker extends SingleChildRenderObjectWidget {
   final _ListMarkerType markerType;
   final TextStyle textStyle;
 
-  const _ListMarker({Key key, this.markerType, this.textStyle})
+  const _ListMarker(
+      {Key? key, required this.markerType, required this.textStyle})
       : super(key: key);
 
   @override
-  RenderObject createRenderObject(BuildContext _) => _ListMarkerRenderObject()
-    ..markerType = markerType
-    ..textStyle = textStyle;
+  RenderObject createRenderObject(BuildContext _) =>
+      _ListMarkerRenderObject(markerType, textStyle);
 
   @override
   void updateRenderObject(
@@ -341,6 +218,8 @@ class _ListMarker extends SingleChildRenderObjectWidget {
 }
 
 class _ListMarkerRenderObject extends RenderBox {
+  _ListMarkerRenderObject(this._markerType, this._textStyle);
+
   _ListMarkerType _markerType;
   set markerType(_ListMarkerType v) {
     if (v == _markerType) return;
@@ -348,13 +227,12 @@ class _ListMarkerRenderObject extends RenderBox {
     markNeedsLayout();
   }
 
-  TextPainter __textPainter;
+  TextPainter? __textPainter;
   TextPainter get _textPainter {
-    __textPainter ??= TextPainter(
+    return __textPainter ??= TextPainter(
       text: TextSpan(style: _textStyle, text: '1.'),
       textDirection: TextDirection.ltr,
     )..layout();
-    return __textPainter;
   }
 
   TextStyle _textStyle;
@@ -372,21 +250,37 @@ class _ListMarkerRenderObject extends RenderBox {
   @override
   void paint(PaintingContext context, Offset offset) {
     final canvas = context.canvas;
-    final m = _textPainter.computeLineMetrics().first;
+
+    var lineMetrics = <LineMetrics>[];
+    try {
+      lineMetrics = _textPainter.computeLineMetrics();
+      // ignore: empty_catches
+    } on UnimplementedError {}
+
+    final m = lineMetrics.isNotEmpty ? lineMetrics.first : null;
     final center = offset +
         Offset(
           size.width / 2,
-          size.height - m.descent - m.unscaledAscent + m.unscaledAscent * .7,
+          (m?.descent.isFinite == true && m?.unscaledAscent.isFinite == true)
+              ? size.height -
+                  m!.descent -
+                  m.unscaledAscent +
+                  m.unscaledAscent * .7
+              : size.height / 2,
         );
-    final radius = _textStyle.fontSize * .2;
 
+    final color = _textStyle.color;
+    final fontSize = _textStyle.fontSize;
+    if (color == null || fontSize == null) return;
+
+    final radius = fontSize * .2;
     switch (_markerType) {
       case _ListMarkerType.circle:
         canvas.drawCircle(
           center,
           radius * .9,
           Paint()
-            ..color = _textStyle.color
+            ..color = color
             ..strokeWidth = 1
             ..style = PaintingStyle.stroke,
         );
@@ -395,13 +289,13 @@ class _ListMarkerRenderObject extends RenderBox {
         canvas.drawCircle(
           center,
           radius,
-          Paint()..color = _textStyle.color,
+          Paint()..color = color,
         );
         break;
       case _ListMarkerType.square:
         canvas.drawRect(
           Rect.fromCircle(center: center, radius: radius * .8),
-          Paint()..color = _textStyle.color,
+          Paint()..color = color,
         );
         break;
     }

@@ -9,6 +9,8 @@ import 'hello_world_core.dart';
 import 'iframe.dart';
 import 'iframe_twitter.dart';
 import 'img.dart';
+import 'img_file.dart';
+import 'photo_view.dart';
 import 'smilie.dart';
 import 'video.dart';
 import 'wordpress.dart';
@@ -20,11 +22,13 @@ class HomeScreen extends StatelessWidget {
     'Iframe': () => IframeScreen(),
     'Iframe/Twitter': () => IframeTwitterScreen(),
     'Images': () => ImgScreen(),
+    'Image (file://)': () => ImgFileScreen(),
     'Video': () => VideoScreen(),
     'customStylesBuilder': () => CustomStylesBuilderScreen(),
     'customWidgetBuilder': () => CustomWidgetBuilderScreen(),
     'font-size': () => FontSizeScreen(),
     'Goldens': () => GoldensScreen(),
+    'Photo View': () => PhotoViewScreen(),
     'Smilie': () => SmilieScreen(),
     'Wordpress': () => WordpressScreen(),
   };

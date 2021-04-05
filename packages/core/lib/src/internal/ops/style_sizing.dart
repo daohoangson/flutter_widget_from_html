@@ -13,25 +13,27 @@ class DisplayBlockOp extends BuildOp {
           onWidgets: (meta, widgets) => listOrNull(wf
               .buildColumnPlaceholder(meta, widgets)
               ?.wrapWith((_, w) => w is CssSizing ? w : CssBlock(child: w))),
-          priority: StyleSizing.kPriority + 1,
+          priority: StyleSizing.kPriority5k + 1,
         );
 }
 
 class StyleSizing {
-  static const kPriority = 50000;
+  static const kPriority5k = 5000;
 
   final WidgetFactory wf;
+
+  static final _treatHeightAsMinHeight = Expando<bool>();
 
   StyleSizing(this.wf);
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree) return;
+          if (meta.willBuildSubtree == true) return;
 
           final input = _parse(meta);
           if (input == null) return;
 
-          WidgetPlaceholder widget;
+          WidgetPlaceholder? widget;
           for (final b in tree.bits) {
             if (b is WidgetBit) {
               if (widget != null) return;
@@ -41,47 +43,57 @@ class StyleSizing {
             }
           }
 
-          widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb()));
+          widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb));
         },
         onWidgets: (meta, widgets) {
-          if (!meta.willBuildSubtree) return widgets;
+          if (meta.willBuildSubtree == false) return widgets;
 
           final input = _parse(meta);
           if (input == null) return widgets;
           return listOrNull(wf
               .buildColumnPlaceholder(meta, widgets)
-              ?.wrapWith((c, w) => _build(c, w, input, meta.tsb())));
+              ?.wrapWith((c, w) => _build(c, w, input, meta.tsb)));
         },
         onWidgetsIsOptional: true,
-        priority: kPriority,
+        priority: kPriority5k,
       );
 
-  _StyleSizingInput _parse(BuildMetadata meta) {
-    CssLength maxHeight, maxWidth, minHeight, minWidth;
-    Axis preferredAxis;
-    CssLength preferredHeight, preferredWidth;
+  _StyleSizingInput? _parse(BuildMetadata meta) {
+    CssLength? maxHeight, maxWidth, minHeight, minWidth;
+    Axis? preferredAxis;
+    CssLength? preferredHeight, preferredWidth;
 
     for (final style in meta.styles) {
       switch (style.property) {
         case kCssHeight:
-          preferredAxis = Axis.vertical;
-          preferredHeight = tryParseCssLength(style.value);
+          final parsedHeight = tryParseCssLength(style.value);
+          if (parsedHeight != null) {
+            if (_treatHeightAsMinHeight[meta] == true) {
+              minHeight = parsedHeight;
+            } else {
+              preferredAxis = Axis.vertical;
+              preferredHeight = parsedHeight;
+            }
+          }
           break;
         case kCssMaxHeight:
-          maxHeight = tryParseCssLength(style.value);
+          maxHeight = tryParseCssLength(style.value) ?? maxHeight;
           break;
         case kCssMaxWidth:
-          maxWidth = tryParseCssLength(style.value);
+          maxWidth = tryParseCssLength(style.value) ?? maxWidth;
           break;
         case kCssMinHeight:
-          minHeight = tryParseCssLength(style.value);
+          minHeight = tryParseCssLength(style.value) ?? minHeight;
           break;
         case kCssMinWidth:
-          minWidth = tryParseCssLength(style.value);
+          minWidth = tryParseCssLength(style.value) ?? minWidth;
           break;
         case kCssWidth:
-          preferredAxis = Axis.horizontal;
-          preferredWidth = tryParseCssLength(style.value);
+          final parsedWidth = tryParseCssLength(style.value);
+          if (parsedWidth != null) {
+            preferredAxis = Axis.horizontal;
+            preferredWidth = parsedWidth;
+          }
           break;
       }
     }
@@ -113,12 +125,14 @@ class StyleSizing {
     );
   }
 
+  static void treatHeightAsMinHeight(BuildMetadata meta) =>
+      _treatHeightAsMinHeight[meta] = true;
+
   static Widget _build(BuildContext context, Widget child,
       _StyleSizingInput input, TextStyleBuilder tsb) {
     final tsh = tsb.build(context);
 
     return CssSizing(
-      child: child,
       maxHeight: _getValue(input.maxHeight, tsh),
       maxWidth: _getValue(input.maxWidth, tsh),
       minHeight: _getValue(input.minHeight, tsh),
@@ -126,10 +140,11 @@ class StyleSizing {
       preferredAxis: input.preferredAxis,
       preferredHeight: _getValue(input.preferredHeight, tsh),
       preferredWidth: _getValue(input.preferredWidth, tsh),
+      child: child,
     );
   }
 
-  static CssSizingValue _getValue(CssLength length, TextStyleHtml tsh) {
+  static CssSizingValue? _getValue(CssLength? length, TextStyleHtml tsh) {
     if (length == null) return null;
 
     final value = length.getValue(tsh);
@@ -148,13 +163,13 @@ class StyleSizing {
 
 @immutable
 class _StyleSizingInput {
-  final CssLength maxHeight;
-  final CssLength maxWidth;
-  final CssLength minHeight;
-  final CssLength minWidth;
-  final Axis preferredAxis;
-  final CssLength preferredHeight;
-  final CssLength preferredWidth;
+  final CssLength? maxHeight;
+  final CssLength? maxWidth;
+  final CssLength? minHeight;
+  final CssLength? minWidth;
+  final Axis? preferredAxis;
+  final CssLength? preferredHeight;
+  final CssLength? preferredWidth;
 
   _StyleSizingInput({
     this.maxHeight,

@@ -23,8 +23,8 @@ class _TagQBit extends BuildBit<Null, String> {
   String buildBit(Null _) => isOpening ? '“' : '”';
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
-      _TagQBit(parent ?? this.parent, tsb ?? this.tsb, isOpening);
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+      _TagQBit(parent ?? this.parent!, tsb ?? this.tsb, isOpening);
 
   @override
   String toString() =>

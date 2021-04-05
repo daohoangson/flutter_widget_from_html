@@ -171,9 +171,9 @@ class _State extends State<ImgScreen> {
 <p>
   Asset:
 
-  <img src="asset:test/images/logo.svg?package=flutter_widget_from_html" />
-  <img src="asset:test/images/logo.svg?package=flutter_widget_from_html" width="48" />
-  <img src="asset:test/images/logo.svg?package=flutter_widget_from_html" width="12" />
+  <img src="asset:test/images/logo.svg?package=fwfh_svg" />
+  <img src="asset:test/images/logo.svg?package=fwfh_svg" width="48" />
+  <img src="asset:test/images/logo.svg?package=fwfh_svg" width="12" />
 </p>
 
 <p>

@@ -16,7 +16,7 @@ final hwKey = GlobalKey<State<HtmlWidget>>();
 
 const kGoldenFilePrefix = '../../../demo_app/test';
 
-Widget buildCurrentState() {
+Widget? buildCurrentState() {
   final hws = hwKey.currentState;
   if (hws == null) return null;
 
@@ -31,7 +31,7 @@ Future<Widget> buildFutureBuilder(
   final hws = hwKey.currentState;
   if (hws == null) return Future.value(null);
 
-  final data = await fb.future;
+  final data = await fb.future!;
   final snapshot = withData
       ? AsyncSnapshot.withData(ConnectionState.done, data)
       : AsyncSnapshot<Widget>.nothing();
@@ -40,17 +40,17 @@ Future<Widget> buildFutureBuilder(
 
 Future<String> explain(
   WidgetTester tester,
-  String html, {
+  String? html, {
   bool buildFutureBuilderWithData = true,
-  String Function(Explainer, Widget) explainer,
-  Widget hw,
+  String? Function(Explainer, Widget)? explainer,
+  Widget? hw,
   bool rtl = false,
-  TextStyle textStyle,
+  TextStyle? textStyle,
   bool useExplainer = true,
 }) async {
   assert((html == null) != (hw == null));
   hw ??= HtmlWidget(
-    html,
+    html!,
     key: hwKey,
     textStyle: textStyle,
   );
@@ -72,7 +72,7 @@ Future<String> explain(
                   ),
               child: Directionality(
                 textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
-                child: hw,
+                child: hw!,
               ),
             ),
           ),
@@ -90,15 +90,16 @@ Future<String> explain(
 
 Future<String> explainWithoutPumping({
   bool buildFutureBuilderWithData = true,
-  String Function(Explainer, Widget) explainer,
+  String? Function(Explainer, Widget)? explainer,
   bool useExplainer = true,
 }) async {
   if (!useExplainer) {
     final sb = StringBuffer();
-    hwKey.currentContext.visitChildElements(
+    hwKey.currentContext?.visitChildElements(
         (e) => sb.writeln(e.toDiagnosticsNode().toStringDeep()));
     var str = sb.toString();
     str = str.replaceAll(RegExp(r': [A-Z][A-Za-z]+\.'), ': '); // enums
+    str = str.replaceAll(RegExp(r'State#\w+'), 'State'); // states
 
     // dependencies
     str = str.replaceAll(RegExp(r'\[GlobalKey#[0-9a-f]+\]'), '');
@@ -109,6 +110,13 @@ Future<String> explainWithoutPumping({
         RegExp(r'ImageStream#[0-9a-f]+\([^\)]+\)'), 'ImageStream');
     str = str.replaceAll(
         RegExp(r'(, )?state: _ImageState#[0-9a-f]+\([^\)]+\)'), '');
+
+    // simplify complicated widgets
+    str = str.replaceAll(RegExp(r'Focus\(.+\)\n'), 'Focus(...)\n');
+    str = str.replaceAll(RegExp(r'Listener\(.+\)\n'), 'Listener(...)\n');
+    str = str.replaceAll(
+        RegExp(r'RawGestureDetector\(.+\)\n'), 'RawGestureDetector(...)\n');
+    str = str.replaceAll(RegExp(r'Semantics\(.+\)\n'), 'Semantics(...)\n');
 
     // trim boring properties
     str =
@@ -131,12 +139,14 @@ Future<String> explainWithoutPumping({
     str = str.replaceAll(RegExp(r'(, )?textDirection: ltr+'), '');
 
     // delete leading comma (because of property trimmings)
-    str = str.replaceAllMapped(RegExp(r'(\w+\(), '), (m) => m.group(1));
+    str = str.replaceAllMapped(RegExp(r'(\w+\(), '), (m) => m[1]!);
     str = simplifyHashCode(str);
     return str;
   }
 
   var built = buildCurrentState();
+  if (built == null) return 'null';
+
   var isFutureBuilder = false;
   if (built is FutureBuilder<Widget>) {
     built = await buildFutureBuilder(
@@ -147,7 +157,7 @@ Future<String> explainWithoutPumping({
   }
 
   var explained = Explainer(
-    hwKey.currentContext,
+    hwKey.currentContext!,
     explainer: explainer,
   ).explain(built);
   if (isFutureBuilder) explained = '[FutureBuilder:$explained]';
@@ -173,13 +183,13 @@ Future<String> explainMargin(
     rtl: rtl,
   );
   final match = _explainMarginRegExp.firstMatch(explained);
-  return match == null ? explained : match[3];
+  return match == null ? explained : match[3]!;
 }
 
 String simplifyHashCode(String str) {
   final hashCodes = <String>[];
   return str.replaceAllMapped(RegExp(r'#(\d+)'), (match) {
-    final hashCode = match.group(1);
+    final hashCode = match[1]!;
     var indexOf = hashCodes.indexOf(hashCode);
     if (indexOf == -1) {
       indexOf = hashCodes.length;
@@ -209,7 +219,7 @@ Future<int> tapText(WidgetTester tester, String data) async {
 
 class Explainer {
   final BuildContext context;
-  final String Function(Explainer, Widget) explainer;
+  final String? Function(Explainer, Widget)? explainer;
   final TextStyle _defaultStyle;
 
   Explainer(this.context, {this.explainer})
@@ -217,20 +227,21 @@ class Explainer {
 
   String explain(Widget widget) => _widget(widget);
 
-  String _alignment(Alignment a) => a != null
+  String _alignment(AlignmentGeometry? a) => a != null
       ? 'alignment=${a.toString().replaceFirst('Alignment.', '')}'
-      : null;
+      : '';
 
-  String _borderSide(BorderSide s) =>
-      "${s.width}@${s.style.toString().replaceFirst('BorderStyle.', '')}${_color(s.color)}";
+  String _borderSide(BorderSide s) => s != BorderSide.none
+      ? "${s.width}@${s.style.toString().replaceFirst('BorderStyle.', '')}${_color(s.color)}"
+      : 'none';
 
-  String _boxBorder(BoxBorder b) {
+  String _boxBorder(BoxBorder? b) {
     if (b == null) return '';
 
     final top = _borderSide(b.top);
-    final right = b is Border ? _borderSide(b.right) : '';
+    final right = b is Border ? _borderSide(b.right) : 'none';
     final bottom = _borderSide(b.bottom);
-    final left = b is Border ? _borderSide(b.left) : '';
+    final left = b is Border ? _borderSide(b.left) : 'none';
 
     if (top == right && right == bottom && bottom == left) {
       return top;
@@ -242,11 +253,16 @@ class Explainer {
   String _boxConstraints(BoxConstraints bc) =>
       'constraints=${bc.toString().replaceAll('BoxConstraints', '')}';
 
-  List<String> _boxDecoration(BoxDecoration d) {
+  List<String> _boxDecoration(Decoration? d) {
     final attr = <String>[];
 
-    if (d?.color != null) attr.add('bg=${_color(d.color)}');
-    if (d?.border != null) attr.add('border=${_boxBorder(d.border)}');
+    if (d is BoxDecoration) {
+      final color = d.color;
+      if (color != null) attr.add('bg=${_color(color)}');
+
+      final border = d.border;
+      if (border != null) attr.add('border=${_boxBorder(border)}');
+    }
 
     return attr;
   }
@@ -273,9 +289,10 @@ class Explainer {
     return attr;
   }
 
-  String _edgeInsets(EdgeInsets e) =>
-      '(${e.top.truncate()},${e.right.truncate()},'
-      '${e.bottom.truncate()},${e.left.truncate()})';
+  String _edgeInsets(EdgeInsetsGeometry e) => e is EdgeInsets
+      ? '(${e.top.truncate()},${e.right.truncate()},'
+          '${e.bottom.truncate()},${e.left.truncate()})'
+      : e.toString();
 
   String _image(Image image) {
     final buffer = StringBuffer();
@@ -291,7 +308,7 @@ class Explainer {
     return '[Image:$buffer]';
   }
 
-  String _inlineSpan(InlineSpan inlineSpan, {TextStyle parentStyle}) {
+  String _inlineSpan(InlineSpan inlineSpan, {TextStyle? parentStyle}) {
     if (inlineSpan is WidgetSpan) {
       var s = _widget(inlineSpan.child);
       if (inlineSpan.alignment != PlaceholderAlignment.baseline) {
@@ -307,12 +324,12 @@ class Explainer {
     final text = textSpan?.text ?? '';
     final children = textSpan?.children
             ?.map((c) => _inlineSpan(c, parentStyle: textSpan.style))
-            ?.join('') ??
+            .join('') ??
         '';
 
     final recognizerSb = StringBuffer();
     if (textSpan?.recognizer != null) {
-      final recognizer = textSpan.recognizer;
+      final recognizer = textSpan!.recognizer;
       if (recognizer is TapGestureRecognizer) {
         if (recognizer.onTap != null) recognizerSb.write('+onTap');
         if (recognizer.onTapCancel != null) recognizerSb.write('+onTapCancel');
@@ -327,12 +344,7 @@ class Explainer {
     return '($style$recognizerSb:$text$children)';
   }
 
-  String _limitBox(LimitedBox box) {
-    var s = '';
-    if (box.maxHeight != null) s += 'h=${box.maxHeight},';
-    if (box.maxWidth != null) s += 'w=${box.maxWidth},';
-    return s;
-  }
+  String _limitBox(LimitedBox box) => 'h=${box.maxHeight},w=${box.maxWidth}';
 
   String _sizedBox(SizedBox box) {
     var clazz = box.runtimeType.toString();
@@ -343,63 +355,38 @@ class Explainer {
       size = '';
     }
 
-    final child = box.child != null ? 'child=${_widget(box.child)}' : '';
+    final child = box.child != null ? 'child=${_widget(box.child!)}' : '';
     final comma = size.isNotEmpty && child.isNotEmpty ? ',' : '';
     return '[$clazz:$size$comma$child]';
   }
 
-  String _tableBorder(TableBorder b) {
-    if (b == null) return '';
-
-    final top = _borderSide(b.top);
-    final right = _borderSide(b.right);
-    final bottom = _borderSide(b.bottom);
-    final left = _borderSide(b.left);
-
-    if (top == right && right == bottom && bottom == left) {
-      return 'border=$top';
-    }
-
-    return 'borders=($top;$right;$bottom;$left)';
-  }
-
-  String _tableRow(TableRow row) => row.children
-      .map((c) => _widget(c is TableCell ? c.child : c))
-      .toList(growable: false)
-      .join(' | ');
-
-  String _tableRows(Table table) => table.children
-      .map((r) => _tableRow(r))
-      .toList(growable: false)
-      .join('\n');
-
-  String _textAlign(TextAlign textAlign) =>
+  String _textAlign(TextAlign? textAlign) =>
       (textAlign != null && textAlign != TextAlign.start)
           ? 'align=${textAlign.toString().replaceAll('TextAlign.', '')}'
-          : null;
+          : '';
 
-  String _textDirection(TextDirection textDirection) =>
+  String _textDirection(TextDirection? textDirection) =>
       (textDirection != null && textDirection != TextDirection.ltr)
           ? 'dir=${textDirection.toString().replaceAll('TextDirection.', '')}'
-          : null;
+          : '';
 
-  String _textOverflow(TextOverflow textOverflow) => (textOverflow != null &&
+  String _textOverflow(TextOverflow? textOverflow) => (textOverflow != null &&
           textOverflow != TextOverflow.clip)
       ? 'overflow=${textOverflow.toString().replaceAll('TextOverflow.', '')}'
-      : null;
+      : '';
 
-  String _textStyle(TextStyle style, TextStyle parent) {
+  String _textStyle(TextStyle? style, TextStyle parent) {
     var s = '';
     if (style == null) {
       return s;
     }
 
-    if (style.background != null) {
-      s += 'bg=${_color(style.background.color)}';
-    }
+    final bg = style.background;
+    if (bg != null) s += 'bg=${_color(bg.color)}';
 
-    if (style.color != null && style.color != kColor) {
-      s += _color(style.color);
+    final color = style.color;
+    if (color != null && color != kColor) {
+      s += _color(color);
     }
 
     s += _textStyleDecoration(style, TextDecoration.lineThrough, 'l');
@@ -410,17 +397,19 @@ class Explainer {
       s += '+font=${style.fontFamily}';
     }
 
-    if (style.fontFamilyFallback?.isNotEmpty == true &&
-        style.fontFamilyFallback != parent.fontFamilyFallback) {
-      s += "+fonts=${style.fontFamilyFallback.join(', ')}";
+    final fontFamilyFallback = style.fontFamilyFallback;
+    if (fontFamilyFallback != null &&
+        fontFamilyFallback.isNotEmpty &&
+        fontFamilyFallback != parent.fontFamilyFallback) {
+      s += "+fonts=${fontFamilyFallback.join(', ')}";
     }
 
-    if (style.height != null) {
-      s += '+height=${style.height.toStringAsFixed(1)}';
-    }
+    final height = style.height;
+    if (height != null) s += '+height=${height.toStringAsFixed(1)}';
 
-    if (style.fontSize != parent.fontSize) {
-      s += '@${style.fontSize.toStringAsFixed(1)}';
+    final fontSize = style.fontSize;
+    if (fontSize != null && fontSize != parent.fontSize) {
+      s += '@${fontSize.toStringAsFixed(1)}';
     }
 
     s += _textStyleFontStyle(style);
@@ -454,21 +443,19 @@ class Explainer {
         return '+i';
       case FontStyle.normal:
         return '-i';
+      case null:
+        return '';
     }
-
-    return '';
   }
 
   String _textStyleFontWeight(TextStyle style) {
-    if (style.fontWeight == _defaultStyle.fontWeight) {
+    final fontWeight = style.fontWeight;
+    if (fontWeight == null || style.fontWeight == _defaultStyle.fontWeight) {
       return '';
     }
 
-    if (style.fontWeight == FontWeight.bold) {
-      return '+b';
-    }
-
-    return '+w' + FontWeight.values.indexOf(style.fontWeight).toString();
+    if (fontWeight == FontWeight.bold) return '+b';
+    return '+w' + FontWeight.values.indexOf(fontWeight).toString();
   }
 
   String _widget(Widget widget) {
@@ -483,14 +470,6 @@ class Explainer {
     if (widget is WidgetPlaceholder) return _widget(widget.build(context));
 
     if (widget is Image) return _image(widget);
-
-    if (widget is SingleChildRenderObjectWidget) {
-      switch (widget.runtimeType.toString()) {
-        case '_LoosenConstraintsWidget':
-          // avoid exposing internal widgets
-          return _widget(widget.child);
-      }
-    }
 
     if (widget is SizedBox) return _sizedBox(widget);
 
@@ -552,8 +531,6 @@ class Explainer {
           '${widget.height ?? 0.0}');
     }
 
-    if (widget is Table) attr.add(_tableBorder(widget.border));
-
     if (widget is Tooltip) attr.add('message=${widget.message}');
 
     // A-F
@@ -562,17 +539,13 @@ class Explainer {
         ? _inlineSpan(widget.text)
         : widget is Container
             ? _widgetChild(widget.child)
-            : null);
+            : '');
     // G-M
     attr.add(widget is GestureDetector
         ? _widgetChild(widget.child)
-        : widget is InkWell
-            ? _widgetChild(widget.child)
-            : widget is MultiChildRenderObjectWidget
-                ? (widget is! RichText
-                    ? _widgetChildren(widget.children)
-                    : null)
-                : null);
+        : widget is MultiChildRenderObjectWidget
+            ? (widget is! RichText ? _widgetChildren(widget.children) : '')
+            : '');
     // N-T
     attr.add(widget is ProxyWidget
         ? _widgetChild(widget.child)
@@ -580,24 +553,20 @@ class Explainer {
             ? _widgetChild(widget.child)
             : widget is SingleChildScrollView
                 ? _widgetChild(widget.child)
-                : widget is Table
-                    ? '\n${_tableRows(widget)}\n'
-                    : widget is Text
-                        ? widget.data
-                        : widget is Tooltip
-                            ? _widgetChild(widget.child)
-                            : null);
+                : widget is Text
+                    ? widget.data!
+                    : widget is Tooltip
+                        ? _widgetChild(widget.child)
+                        : '');
     // U-Z
 
-    final attrStr = attr.where((a) => a?.isNotEmpty == true).join(',');
+    final attrStr = attr.where((a) => a.isNotEmpty).join(',');
     return '[$type${attrStr.isNotEmpty ? ':$attrStr' : ''}]';
   }
 
-  String _widgetChild(Widget widget) =>
-      widget != null ? 'child=${_widget(widget)}' : null;
+  String _widgetChild(Widget? widget) =>
+      widget != null ? 'child=${_widget(widget)}' : '';
 
   String _widgetChildren(Iterable<Widget> widgets) =>
-      widgets?.isNotEmpty == true
-          ? 'children=${widgets.map(_widget).join(',')}'
-          : null;
+      widgets.isNotEmpty ? 'children=${widgets.map(_widget).join(',')}' : '';
 }

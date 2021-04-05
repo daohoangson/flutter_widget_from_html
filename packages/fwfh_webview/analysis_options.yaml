@@ -1,0 +1,4 @@
+include: package:pedantic/analysis_options.yaml
+analyzer:
+  errors:
+    unsafe_html: ignore

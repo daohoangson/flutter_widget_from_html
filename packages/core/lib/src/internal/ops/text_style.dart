@@ -88,7 +88,7 @@ class TextStyleOps {
   static TextStyleHtml maxLines(TextStyleHtml p, int v) =>
       p.copyWith(maxLines: v);
 
-  static int maxLinesTryParse(css.Expression expression) {
+  static int? maxLinesTryParse(css.Expression expression) {
     if (expression is css.LiteralTerm) {
       if (expression is css.NumberTerm) {
         return (expression.value as num).ceil();
@@ -130,11 +130,6 @@ class TextStyleOps {
     );
   }
 
-  static BuildOp textDecoOp(TextDeco v) => BuildOp(
-        onTree: (meta, _) =>
-            meta.willBuildSubtree ? null : meta.tsb<TextDeco>(textDeco, v),
-      );
-
   static TextStyleHtml textDirection(TextStyleHtml p, String v) {
     switch (v) {
       case kCssDirectionLtr:
@@ -149,7 +144,7 @@ class TextStyleOps {
   static TextStyleHtml textOverflow(TextStyleHtml p, TextOverflow v) =>
       p.copyWith(textOverflow: v);
 
-  static TextOverflow textOverflowTryParse(String value) {
+  static TextOverflow? textOverflowTryParse(String value) {
     switch (value) {
       case kCssTextOverflowClip:
         return TextOverflow.clip;
@@ -168,14 +163,14 @@ class TextStyleOps {
     for (final expression in expressions) {
       if (expression is css.LiteralTerm) {
         final fontFamily = expression.valueAsString;
-        if (fontFamily?.isNotEmpty == true) list.add(fontFamily);
+        if (fontFamily.isNotEmpty) list.add(fontFamily);
       }
     }
 
     return list;
   }
 
-  static FontStyle fontStyleTryParse(String value) {
+  static FontStyle? fontStyleTryParse(String value) {
     switch (value) {
       case kCssFontStyleItalic:
         return FontStyle.italic;
@@ -186,7 +181,7 @@ class TextStyleOps {
     return null;
   }
 
-  static FontWeight fontWeightTryParse(css.Expression expression) {
+  static FontWeight? fontWeightTryParse(css.Expression expression) {
     if (expression is css.LiteralTerm) {
       if (expression is css.NumberTerm) {
         switch (expression.value) {
@@ -220,9 +215,8 @@ class TextStyleOps {
     return null;
   }
 
-  static double _fontSizeTryParse(TextStyleHtml p, css.Expression v) {
+  static double? _fontSizeTryParse(TextStyleHtml p, css.Expression v) {
     final length = tryParseCssLength(v);
-    print('v=$v -> length=$length');
     if (length != null) {
       final lengthValue = _fontSizeTryParseCssLength(p, length);
       if (lengthValue != null) return lengthValue;
@@ -235,14 +229,14 @@ class TextStyleOps {
     return null;
   }
 
-  static double _fontSizeTryParseCssLength(TextStyleHtml p, CssLength v) =>
+  static double? _fontSizeTryParseCssLength(TextStyleHtml p, CssLength v) =>
       v.getValue(
         p,
-        baseValue: p.parent?.style?.fontSize,
+        baseValue: p.parent?.style.fontSize,
         scaleFactor: p.getDependency<MediaQueryData>().textScaleFactor,
       );
 
-  static double _fontSizeTryParseTerm(TextStyleHtml p, String v) {
+  static double? _fontSizeTryParseTerm(TextStyleHtml p, String v) {
     switch (v) {
       case kCssFontSizeXxLarge:
         return _fontSizeMultiplyRootWith(p, 2.0);
@@ -260,27 +254,27 @@ class TextStyleOps {
         return _fontSizeMultiplyRootWith(p, .5625);
 
       case kCssFontSizeLarger:
-        return _fontSizeMultiplyWith(p.parent?.style?.fontSize, 1.2);
+        return _fontSizeMultiplyWith(p.parent?.style.fontSize, 1.2);
       case kCssFontSizeSmaller:
-        return _fontSizeMultiplyWith(p.parent?.style?.fontSize, 15 / 18);
+        return _fontSizeMultiplyWith(p.parent?.style.fontSize, 15 / 18);
     }
 
     return null;
   }
 
-  static double _fontSizeMultiplyRootWith(TextStyleHtml tsh, double value) {
+  static double? _fontSizeMultiplyRootWith(TextStyleHtml tsh, double value) {
     var root = tsh;
     while (root.parent != null) {
-      root = root.parent;
+      root = root.parent!;
     }
 
     return _fontSizeMultiplyWith(root.style.fontSize, value);
   }
 
-  static double _fontSizeMultiplyWith(double fontSize, double value) =>
+  static double? _fontSizeMultiplyWith(double? fontSize, double value) =>
       fontSize != null ? fontSize * value : null;
 
-  static double _lineHeightTryParse(
+  static double? _lineHeightTryParse(
       WidgetFactory wf, TextStyleHtml p, css.Expression v) {
     if (v is css.LiteralTerm) {
       if (v is css.NumberTerm) {
@@ -295,28 +289,31 @@ class TextStyleOps {
       }
     }
 
+    final fontSize = p.style.fontSize;
+    if (fontSize == null) return null;
+
     final length = tryParseCssLength(v);
     if (length == null) return null;
 
     final lengthValue = length.getValue(
       p,
-      baseValue: p.style.fontSize,
+      baseValue: fontSize,
       scaleFactor: p.getDependency<MediaQueryData>().textScaleFactor,
     );
     if (lengthValue == null) return null;
 
-    return lengthValue / p.style.fontSize;
+    return lengthValue / fontSize;
   }
 }
 
 @immutable
 class TextDeco {
-  final Color color;
-  final bool over;
-  final bool strike;
-  final TextDecorationStyle style;
-  final CssLength thickness;
-  final bool under;
+  final Color? color;
+  final bool? over;
+  final bool? strike;
+  final TextDecorationStyle? style;
+  final CssLength? thickness;
+  final bool? under;
 
   TextDeco({
     this.color,
@@ -327,7 +324,7 @@ class TextDeco {
     this.under,
   });
 
-  factory TextDeco.tryParse(List<css.Expression> expressions) {
+  static TextDeco? tryParse(List<css.Expression> expressions) {
     for (final expression in expressions) {
       if (expression is css.LiteralTerm) {
         switch (expression.valueAsString) {
