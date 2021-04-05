@@ -82,7 +82,7 @@ class TextStyleOps {
   static int? maxLinesTryParse(css.Expression? expression) {
     if (expression is css.LiteralTerm) {
       if (expression is css.NumberTerm) {
-        return (expression.value as num).ceil();
+        return expression.number.ceil();
       }
 
       switch (expression.valueAsString) {
@@ -173,7 +173,7 @@ class TextStyleOps {
   static FontWeight? fontWeightTryParse(css.Expression expression) {
     if (expression is css.LiteralTerm) {
       if (expression is css.NumberTerm) {
-        switch (expression.value) {
+        switch (expression.number) {
           case 100:
             return FontWeight.w100;
           case 200:
@@ -267,9 +267,8 @@ class TextStyleOps {
       WidgetFactory wf, TextStyleHtml p, css.Expression v) {
     if (v is css.LiteralTerm) {
       if (v is css.NumberTerm) {
-        if (v.value > 0) {
-          return (v.value as num).toDouble();
-        }
+        final number = v.number.toDouble();
+        if (number > 0) return number;
       }
 
       switch (v.valueAsString) {

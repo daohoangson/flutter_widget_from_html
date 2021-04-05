@@ -80,6 +80,14 @@ extension CssLiteralTermExtension on css.LiteralTerm {
   }
 }
 
+extension CssNumberTermExtension on css.NumberTerm {
+  num get number => value as num;
+}
+
+extension CssPercentageTermExtension on css.PercentageTerm {
+  double get valueAsDouble => (value as num) / 100.0;
+}
+
 extension CssStyleSheetExtension on css.StyleSheet {
   static _DeclarationsCollector? _collector;
 
