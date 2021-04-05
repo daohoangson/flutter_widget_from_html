@@ -139,7 +139,7 @@ Future<String> explainWithoutPumping({
     str = str.replaceAll(RegExp(r'(, )?textDirection: ltr+'), '');
 
     // delete leading comma (because of property trimmings)
-    str = str.replaceAllMapped(RegExp(r'(\w+\(), '), (m) => m[1]!);
+    str = str.replaceAll('(, ', '(');
     str = simplifyHashCode(str);
     return str;
   }
