@@ -696,17 +696,10 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 
       testWidgets('renders invalids', (WidgetTester tester) async {
         final htmls = [
-          '<span style="color: hsl(xxx, 0, 0)">Foo</span>',
-          '<span style="color: hsl(0, -1%, 0)">Foo</span>',
-          '<span style="color: hsl(0, 1000%, 0)">Foo</span>',
-          '<span style="color: hsl(0, xxx, 0)">Foo</span>',
-          '<span style="color: hsl(0, 0, -1%)">Foo</span>',
-          '<span style="color: hsl(0, 0, 1000%)">Foo</span>',
-          '<span style="color: hsl(0, 0, xxx)">Foo</span>',
-          '<span style="color: hsla(0, 0, 0, -1)">Foo</span>',
-          '<span style="color: hsla(0, 0, 0, 9)">Foo</span>',
-          '<span style="color: hsla(0, 0, 0, 1000%)">Foo</span>',
-          '<span style="color: hsla(0, 0, 0, x)">Foo</span>',
+          '<span style="color: hsl(xxx, 0%, 0%)">Foo</span>',
+          '<span style="color: hsl(0, xxx, 0%)">Foo</span>',
+          '<span style="color: hsl(0, 0%, xxx)">Foo</span>',
+          '<span style="color: hsla(0, 0%, 0%, x)">Foo</span>',
         ];
         for (final html in htmls) {
           final explained = await explain(tester, html);
@@ -742,8 +735,20 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
         expect(explained, equals('[RichText:(#FFFF0000:Foo)]'));
       });
 
+      testWidgets('renders rgb red overflow', (WidgetTester tester) async {
+        final html = '<span style="color: rgb(1000, 0, 0)">Foo</span>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(#FFFF0000:Foo)]'));
+      });
+
       testWidgets('renders rgb green', (WidgetTester tester) async {
         final html = '<span style="color: rgb(0, 255, 0)">Foo</span>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(#FF00FF00:Foo)]'));
+      });
+
+      testWidgets('renders rgb green overflow', (WidgetTester tester) async {
+        final html = '<span style="color: rgb(0, 1000, 0)">Foo</span>';
         final explained = await explain(tester, html);
         expect(explained, equals('[RichText:(#FF00FF00:Foo)]'));
       });
@@ -754,10 +759,22 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
         expect(explained, equals('[RichText:(#FF0000FF:Foo)]'));
       });
 
+      testWidgets('renders rgb blue overflow', (WidgetTester tester) async {
+        final html = '<span style="color: rgb(0, 0, 255)">Foo</span>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(#FF0000FF:Foo)]'));
+      });
+
       testWidgets('renders rgba alpha', (WidgetTester tester) async {
         final html = '<span style="color: rgba(0, 0, 0, 0.5)">Foo</span>';
         final explained = await explain(tester, html);
         expect(explained, equals('[RichText:(#80000000:Foo)]'));
+      });
+
+      testWidgets('renders rgba alpha negative', (WidgetTester tester) async {
+        final html = '<span style="color: rgba(0, 0, 0, -1)">Foo</span>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(#00000000:Foo)]'));
       });
 
       testWidgets('renders rgb red in percentage', (tester) async {
@@ -792,21 +809,11 @@ highlight_string('&lt;?php phpinfo(); ?&gt;');
 
       testWidgets('renders invalids', (WidgetTester tester) async {
         final htmls = [
-          '<span style="color: rgb(-1, 0, 0)">Foo</span>',
-          '<span style="color: rgb(999, 0, 0)">Foo</span>',
-          '<span style="color: rgb(1000%, 0, 0)">Foo</span>',
+          '<span style="color: rgb(255)">Foo</span>',
+          '<span style="color: rgb(255, 255)">Foo</span>',
           '<span style="color: rgb(xxx, 0, 0)">Foo</span>',
-          '<span style="color: rgb(0, -1, 0)">Foo</span>',
-          '<span style="color: rgb(0, 999, 0)">Foo</span>',
-          '<span style="color: rgb(0, 1000%, 0)">Foo</span>',
           '<span style="color: rgb(0, xxx, 0)">Foo</span>',
-          '<span style="color: rgb(0, 0, -1)">Foo</span>',
-          '<span style="color: rgb(0, 0, 999)">Foo</span>',
-          '<span style="color: rgb(0, 0, 1000%)">Foo</span>',
           '<span style="color: rgb(0, 0, xxx)">Foo</span>',
-          '<span style="color: rgba(0, 0, 0, -1)">Foo</span>',
-          '<span style="color: rgba(0, 0, 0, 9)">Foo</span>',
-          '<span style="color: rgba(0, 0, 0, 1000%)">Foo</span>',
           '<span style="color: rgba(0, 0, 0, x)">Foo</span>',
         ];
         for (final html in htmls) {

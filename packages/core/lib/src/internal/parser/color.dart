@@ -10,36 +10,38 @@ Color? tryParseColor(css.Expression? expression) {
       case 'hsl':
       case 'hsla':
         final params = expression.params;
-        assert(params.length >= 3);
-
-        final hslH_ = params[0];
-        final hslH = hslH_ is css.NumberTerm
-            ? _parseColorHue(hslH_.value)
-            : hslH_ is css.AngleTerm
-                ? _parseColorHue(hslH_.value, hslH_.unit)
-                : null;
-        final hslS_ = params[1];
-        final hslS =
-            hslS_ is css.PercentageTerm ? ((hslS_.value as num) / 100.0) : null;
-        final hslL_ = params[2];
-        final hslL =
-            hslL_ is css.PercentageTerm ? ((hslL_.value as num) / 100.0) : null;
-        final hslA = params.length >= 4 ? _parseColorAlpha(params[3]) : null;
-        if (hslH != null && hslS != null && hslL != null) {
-          return HSLColor.fromAHSL(hslA ?? 1.0, hslH, hslS, hslL).toColor();
+        if (params.length >= 3) {
+          final hslH_ = params[0];
+          final hslH = hslH_ is css.NumberTerm
+              ? _parseColorHue(hslH_.value)
+              : hslH_ is css.AngleTerm
+                  ? _parseColorHue(hslH_.value, hslH_.unit)
+                  : null;
+          final hslS_ = params[1];
+          final hslS = hslS_ is css.PercentageTerm
+              ? ((hslS_.value as num) / 100.0).clamp(0.0, 1.0)
+              : null;
+          final hslL_ = params[2];
+          final hslL = hslL_ is css.PercentageTerm
+              ? ((hslL_.value as num) / 100.0).clamp(0.0, 1.0)
+              : null;
+          final hslA = params.length >= 4 ? _parseColorAlpha(params[3]) : 1.0;
+          if (hslH != null && hslS != null && hslL != null && hslA != null) {
+            return HSLColor.fromAHSL(hslA, hslH, hslS, hslL).toColor();
+          }
         }
         break;
       case 'rgb':
       case 'rgba':
         final params = expression.params;
-        assert(params.length >= 3);
-
-        final rgbR = _parseColorRgbElement(params[0]);
-        final rgbG = _parseColorRgbElement(params[1]);
-        final rgbB = _parseColorRgbElement(params[2]);
-        final rgbA = params.length >= 4 ? _parseColorAlpha(params[3]) : null;
-        if (rgbR != null && rgbG != null && rgbB != null) {
-          return Color.fromARGB(((rgbA ?? 1.0) * 255).ceil(), rgbR, rgbG, rgbB);
+        if (params.length >= 3) {
+          final rgbR = _parseColorRgbElement(params[0]);
+          final rgbG = _parseColorRgbElement(params[1]);
+          final rgbB = _parseColorRgbElement(params[2]);
+          final rgbA = params.length >= 4 ? _parseColorAlpha(params[3]) : 1.0;
+          if (rgbR != null && rgbG != null && rgbB != null && rgbA != null) {
+            return Color.fromARGB((rgbA * 255).ceil(), rgbR, rgbG, rgbB);
+          }
         }
         break;
     }
@@ -78,8 +80,7 @@ double? _parseColorAlpha(css.Expression expression) {
           ? (expression.value as num) / 100.0
           : null;
   if (value == null) return null;
-  if (value < 0.0 || value > 1.0) return null;
-  return value;
+  return value.clamp(0.0, 1.0);
 }
 
 double _parseColorHue(num number, [int? unit]) {
@@ -117,8 +118,7 @@ int? _parseColorRgbElement(css.Expression expression) {
           ? ((expression.value as num) / 100.0 * 255.0).ceil()
           : null;
   if (value == null) return null;
-  if (value < 0 || value > 255) return null;
-  return value;
+  return value.clamp(0, 255);
 }
 
 String _x2(String value) {
