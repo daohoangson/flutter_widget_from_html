@@ -88,7 +88,7 @@ class TextStyleOps {
   static TextStyleHtml maxLines(TextStyleHtml p, int v) =>
       p.copyWith(maxLines: v);
 
-  static int? maxLinesTryParse(css.Expression expression) {
+  static int? maxLinesTryParse(css.Expression? expression) {
     if (expression is css.LiteralTerm) {
       if (expression is css.NumberTerm) {
         return (expression.value as num).ceil();
@@ -148,10 +148,8 @@ class TextStyleOps {
     switch (value) {
       case kCssTextOverflowClip:
         return TextOverflow.clip;
-        break;
       case kCssTextOverflowEllipsis:
         return TextOverflow.ellipsis;
-        break;
     }
 
     return null;
@@ -170,7 +168,7 @@ class TextStyleOps {
     return list;
   }
 
-  static FontStyle? fontStyleTryParse(String value) {
+  static FontStyle? fontStyleTryParse(String? value) {
     switch (value) {
       case kCssFontStyleItalic:
         return FontStyle.italic;
@@ -181,7 +179,7 @@ class TextStyleOps {
     return null;
   }
 
-  static FontWeight? fontWeightTryParse(css.Expression expression) {
+  static FontWeight? fontWeightTryParse(css.Expression? expression) {
     if (expression is css.LiteralTerm) {
       if (expression is css.NumberTerm) {
         switch (expression.value) {

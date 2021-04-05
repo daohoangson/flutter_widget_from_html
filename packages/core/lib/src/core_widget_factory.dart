@@ -1,4 +1,3 @@
-import 'package:csslib/parser.dart' as css;
 import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' show Theme, ThemeData, Tooltip;
@@ -798,7 +797,10 @@ class WidgetFactory {
         break;
 
       case kCssTextAlign:
-        meta.register(StyleTextAlign(this, style.term).op);
+        final term = style.term;
+        if (term != null) {
+          meta.register(StyleTextAlign(this, term).op);
+        }
         break;
 
       case kCssTextDecoration:
@@ -806,8 +808,9 @@ class WidgetFactory {
           for (final style in meta.styles) {
             if (style.property == kCssTextDecoration) {
               final textDeco = TextDeco.tryParse(style.values);
-              if (textDeco != null)
+              if (textDeco != null) {
                 meta.tsb.enqueue(TextStyleOps.textDeco, textDeco);
+              }
             }
           }
         });
@@ -815,7 +818,9 @@ class WidgetFactory {
         break;
 
       case kCssTextOverflow:
-        final textOverflow = TextStyleOps.textOverflowTryParse(style.term);
+        final term = style.term;
+        final textOverflow =
+            term != null ? TextStyleOps.textOverflowTryParse(term) : null;
         if (textOverflow != null) {
           meta.tsb.enqueue(TextStyleOps.textOverflow, textOverflow);
         }

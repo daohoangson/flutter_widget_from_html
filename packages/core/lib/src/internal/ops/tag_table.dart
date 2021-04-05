@@ -107,8 +107,11 @@ class TagTable {
     if (builders.isEmpty) return [];
 
     final border = tryParseBorder(tableMeta);
-    final borderCollapse = tableMeta[kCssBorderCollapse];
-    final borderSpacing = tryParseCssLength(tableMeta[kCssBorderSpacing]);
+    final borderCollapse = tableMeta[kCssBorderCollapse]?.term;
+    final borderSpacingExpression = tableMeta[kCssBorderSpacing]?.value;
+    final borderSpacing = borderSpacingExpression != null
+        ? tryParseCssLength(borderSpacingExpression)
+        : null;
 
     return [
       WidgetPlaceholder<BuildMetadata>(tableMeta).wrapWith((context, _) {
@@ -298,7 +301,7 @@ class _TagTableRow {
     );
     _valignBaselineOp = BuildOp(
       onWidgets: (cellMeta, widgets) {
-        final v = cellMeta[kCssVerticalAlign];
+        final v = cellMeta[kCssVerticalAlign]?.term;
         if (v != kCssVerticalAlignBaseline) return widgets;
 
         return listOrNull(parent.wf

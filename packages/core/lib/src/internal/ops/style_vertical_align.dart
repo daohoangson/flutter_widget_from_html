@@ -52,7 +52,7 @@ class StyleVerticalAlign {
             return widgets;
           }
 
-          final v = meta[kCssVerticalAlign];
+          final v = meta[kCssVerticalAlign]?.term;
           if (v == null) return widgets;
 
           _skipBuilding[meta] = true;

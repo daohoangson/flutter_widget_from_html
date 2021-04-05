@@ -2,7 +2,9 @@ part of '../core_parser.dart';
 
 const kCssColor = 'color';
 
-Color? tryParseColor(css.Expression expression) {
+Color? tryParseColor(css.Expression? expression) {
+  if (expression == null) return null;
+
   if (expression is css.FunctionTerm) {
     switch (expression.text) {
       case 'hsl':

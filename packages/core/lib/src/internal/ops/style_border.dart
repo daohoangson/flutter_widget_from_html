@@ -64,7 +64,7 @@ class StyleBorder {
       meta,
       child,
       borderValue,
-      isBorderBox: meta[kCssBoxSizing] == kCssBoxSizingBorderBox,
+      isBorderBox: meta[kCssBoxSizing]?.term == kCssBoxSizingBorderBox,
     );
   }
 

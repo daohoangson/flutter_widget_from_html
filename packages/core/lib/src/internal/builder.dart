@@ -2,7 +2,6 @@ import 'dart:collection';
 
 import 'package:csslib/parser.dart' as css;
 import 'package:csslib/visitor.dart' as css;
-import 'package:flutter/widgets.dart';
 
 import 'package:html/dom.dart' as dom;
 
@@ -11,7 +10,6 @@ import '../core_data.dart' as core_data show BuildMetadata, BuildTree;
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
 import 'core_ops.dart';
-import 'flattener.dart';
 
 final _regExpSpaceLeading = RegExp(r'^[^\S\u{00A0}]+', unicode: true);
 final _regExpSpaceTrailing = RegExp(r'[^\S\u{00A0}]+$', unicode: true);
@@ -215,7 +213,7 @@ class BuildTree extends core_data.BuildTree {
 
     wf.parseStyleDisplay(meta, meta[kCssDisplay]?.term);
 
-    meta._willBuildSubtree = meta[kCssDisplay] == kCssDisplayBlock ||
+    meta._willBuildSubtree = meta[kCssDisplay]?.term == kCssDisplayBlock ||
         meta._buildOps?.where(_opRequiresBuildingSubtree).isNotEmpty == true;
     meta._buildOpsIsLocked = true;
   }

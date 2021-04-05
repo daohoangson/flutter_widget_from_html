@@ -1,14 +1,5 @@
 part of '../core_parser.dart';
 
-const kCssLengthBoxSuffixBlockEnd = '-block-end';
-const kCssLengthBoxSuffixBlockStart = '-block-start';
-const kCssLengthBoxSuffixBottom = '-bottom';
-const kCssLengthBoxSuffixInlineEnd = '-inline-end';
-const kCssLengthBoxSuffixInlineStart = '-inline-start';
-const kCssLengthBoxSuffixLeft = '-left';
-const kCssLengthBoxSuffixRight = '-right';
-const kCssLengthBoxSuffixTop = '-top';
-
 CssLength? tryParseCssLength(css.Expression expression) {
   if (expression is css.EmTerm) {
     return CssLength((expression.value as num).toDouble(), CssLengthUnit.em);
@@ -81,19 +72,19 @@ CssLengthBox? _parseCssLengthBoxOne(
   existing ??= CssLengthBox();
 
   switch (suffix) {
-    case kCssLengthBoxSuffixBottom:
-    case kCssLengthBoxSuffixBlockEnd:
+    case kCssSuffixBottom:
+    case kCssSuffixBlockEnd:
       return existing.copyWith(bottom: parsed);
-    case kCssLengthBoxSuffixInlineEnd:
+    case kCssSuffixInlineEnd:
       return existing.copyWith(inlineEnd: parsed);
-    case kCssLengthBoxSuffixInlineStart:
+    case kCssSuffixInlineStart:
       return existing.copyWith(inlineStart: parsed);
-    case kCssLengthBoxSuffixLeft:
+    case kCssSuffixLeft:
       return existing.copyWith(left: parsed);
-    case kCssLengthBoxSuffixRight:
+    case kCssSuffixRight:
       return existing.copyWith(right: parsed);
-    case kCssLengthBoxSuffixTop:
-    case kCssLengthBoxSuffixBlockStart:
+    case kCssSuffixTop:
+    case kCssSuffixBlockStart:
       return existing.copyWith(top: parsed);
   }
 
@@ -103,24 +94,28 @@ CssLengthBox? _parseCssLengthBoxOne(
 CssLengthBox? tryParseCssLengthBox(BuildMetadata meta, String key) {
   CssLengthBox? output;
 
-  for (final declaration in meta.styles) {
-    if (!declaration.property.startsWith(key)) continue;
+  for (final style in meta.styles) {
+    final key = style.property;
+    if (!key.startsWith(key)) continue;
 
-    final suffix = declaration.property.substring(key.length);
+    final suffix = key.substring(key.length);
     switch (suffix) {
       case '':
-        output = _parseCssLengthBoxAll(declaration.values);
+        output = _parseCssLengthBoxAll(style.values);
         break;
 
-      case kCssLengthBoxSuffixBlockEnd:
-      case kCssLengthBoxSuffixBlockStart:
-      case kCssLengthBoxSuffixBottom:
-      case kCssLengthBoxSuffixInlineEnd:
-      case kCssLengthBoxSuffixInlineStart:
-      case kCssLengthBoxSuffixLeft:
-      case kCssLengthBoxSuffixRight:
-      case kCssLengthBoxSuffixTop:
-        output = _parseCssLengthBoxOne(output, suffix, declaration.value);
+      case kCssSuffixBlockEnd:
+      case kCssSuffixBlockStart:
+      case kCssSuffixBottom:
+      case kCssSuffixInlineEnd:
+      case kCssSuffixInlineStart:
+      case kCssSuffixLeft:
+      case kCssSuffixRight:
+      case kCssSuffixTop:
+        final expression = style.value;
+        if (expression != null) {
+          output = _parseCssLengthBoxOne(output, suffix, expression);
+        }
         break;
     }
   }

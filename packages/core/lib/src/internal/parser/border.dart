@@ -15,37 +15,38 @@ CssBorder tryParseBorder(BuildMetadata meta) {
   var border = CssBorder();
 
   for (final style in meta.styles) {
-    if (!style.key.startsWith(kCssBorder)) continue;
+    final key = style.property;
+    if (!key.startsWith(kCssBorder)) continue;
 
-    if (style.value == kCssBorderInherit) {
+    if (style.term == kCssBorderInherit) {
       border = CssBorder(inherit: true);
       continue;
     }
 
-    final borderSide = _tryParseBorderSide(style.value);
-    final suffix = style.key.substring(kCssBorder.length);
+    final borderSide = tryParseCssBorderSide(style.values);
+    final suffix = key.substring(kCssBorder.length);
     if (suffix.isEmpty) {
       border = CssBorder(all: borderSide);
     } else {
       switch (suffix) {
-        case kSuffixBottom:
-        case kSuffixBlockEnd:
+        case kCssSuffixBottom:
+        case kCssSuffixBlockEnd:
           border = border.copyWith(bottom: borderSide);
           break;
-        case kSuffixInlineEnd:
+        case kCssSuffixInlineEnd:
           border = border.copyWith(inlineEnd: borderSide);
           break;
-        case kSuffixInlineStart:
+        case kCssSuffixInlineStart:
           border = border.copyWith(inlineStart: borderSide);
           break;
-        case kSuffixLeft:
+        case kCssSuffixLeft:
           border = border.copyWith(left: borderSide);
           break;
-        case kSuffixRight:
+        case kCssSuffixRight:
           border = border.copyWith(right: borderSide);
           break;
-        case kSuffixTop:
-        case kSuffixBlockStart:
+        case kCssSuffixTop:
+        case kCssSuffixBlockStart:
           border = border.copyWith(top: borderSide);
           break;
       }
