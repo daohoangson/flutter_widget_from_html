@@ -24,7 +24,7 @@ CssBorder tryParseBorder(BuildMetadata meta) {
       continue;
     }
 
-    final borderSide = tryParseCssBorderSide(style.values);
+    final borderSide = _tryParseBorderSide(style.values);
     if (suffix.isEmpty) {
       border = CssBorder(all: borderSide);
     } else {
@@ -56,31 +56,31 @@ CssBorder tryParseBorder(BuildMetadata meta) {
   return _elementBorder[meta.element] = border;
 }
 
-CssBorderSide? tryParseCssBorderSide(List<css.Expression> expressions) {
+CssBorderSide? _tryParseBorderSide(List<css.Expression> expressions) {
   final width =
       expressions.isNotEmpty ? tryParseCssLength(expressions[0]) : null;
   if (width == null || width.number <= 0) return CssBorderSide.none;
 
   return CssBorderSide(
     color: expressions.length >= 3 ? tryParseColor(expressions[2]) : null,
-    style:
-        expressions.length >= 2 ? tryParseCssBorderStyle(expressions[1]) : null,
+    style: expressions.length >= 2
+        ? _tryParseTextDecorationStyle(expressions[1])
+        : null,
     width: width,
   );
 }
 
-TextDecorationStyle? tryParseCssBorderStyle(css.Expression expression) {
-  if (expression is css.LiteralTerm) {
-    switch (expression.valueAsString) {
-      case kCssBorderStyleDotted:
-        return TextDecorationStyle.dotted;
-      case kCssBorderStyleDashed:
-        return TextDecorationStyle.dashed;
-      case kCssBorderStyleDouble:
-        return TextDecorationStyle.double;
-      case kCssBorderStyleSolid:
-        return TextDecorationStyle.solid;
-    }
+TextDecorationStyle? _tryParseTextDecorationStyle(css.Expression expression) {
+  final value = expression is css.LiteralTerm ? expression.valueAsString : null;
+  switch (value) {
+    case kCssBorderStyleDotted:
+      return TextDecorationStyle.dotted;
+    case kCssBorderStyleDashed:
+      return TextDecorationStyle.dashed;
+    case kCssBorderStyleDouble:
+      return TextDecorationStyle.double;
+    case kCssBorderStyleSolid:
+      return TextDecorationStyle.solid;
   }
 
   return null;
