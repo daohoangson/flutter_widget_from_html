@@ -76,6 +76,10 @@ class _RubyRenderObject extends RenderBox
   }
 
   @override
+  Size computeDryLayout(BoxConstraints constraints) =>
+      _performLayout(constraints, _performLayoutDry);
+
+  @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
       defaultHitTestChildren(result, position: position);
 
@@ -85,24 +89,7 @@ class _RubyRenderObject extends RenderBox
 
   @override
   void performLayout() {
-    final ruby = firstChild;
-    final rubyConstraints = constraints.loosen();
-    ruby?.layout(rubyConstraints, parentUsesSize: true);
-    final rubyData = ruby?.parentData as _RubyParentData?;
-    final rubySize = ruby?.size ?? Size.zero;
-
-    final rt = rubyData?.nextSibling;
-    final rtConstraints = rubyConstraints.copyWith(
-        maxHeight: rubyConstraints.maxHeight - rubySize.height);
-    rt?.layout(rtConstraints, parentUsesSize: true);
-    final rtData = rt?.parentData as _RubyParentData?;
-    final rtSize = rt?.size ?? Size.zero;
-
-    final height = rubySize.height + rtSize.height;
-    final width = max(rubySize.width, rtSize.width);
-    rubyData?.offset = Offset((width - rubySize.width) / 2, rtSize.height);
-    rtData?.offset = Offset((width - rtSize.width) / 2, 0);
-    size = constraints.constrain(Size(width, height));
+    size = _performLayout(constraints, _performLayoutLayouter);
   }
 
   @override
@@ -110,5 +97,41 @@ class _RubyRenderObject extends RenderBox
     if (child.parentData is! _RubyParentData) {
       child.parentData = _RubyParentData();
     }
+  }
+
+  Size _performLayout(
+      BoxConstraints constraints,
+      Size? Function(RenderBox? renderBox, BoxConstraints constraints)
+          layouter) {
+    final ruby = firstChild;
+    final rubyConstraints = constraints.loosen();
+    final rubyData = ruby?.parentData as _RubyParentData?;
+    final rubySize = layouter(ruby, rubyConstraints) ?? Size.zero;
+
+    final rt = rubyData?.nextSibling;
+    final rtConstraints = rubyConstraints.copyWith(
+        maxHeight: rubyConstraints.maxHeight - rubySize.height);
+    final rtData = rt?.parentData as _RubyParentData?;
+    final rtSize = layouter(rt, rtConstraints) ?? Size.zero;
+
+    final height = rubySize.height + rtSize.height;
+    final width = max(rubySize.width, rtSize.width);
+
+    if (ruby?.hasSize == true) {
+      rubyData?.offset = Offset((width - rubySize.width) / 2, rtSize.height);
+      rtData?.offset = Offset((width - rtSize.width) / 2, 0);
+    }
+
+    return constraints.constrain(Size(width, height));
+  }
+
+  static Size? _performLayoutDry(
+          RenderBox? renderBox, BoxConstraints constraints) =>
+      renderBox?.getDryLayout(constraints);
+
+  static Size? _performLayoutLayouter(
+      RenderBox? renderBox, BoxConstraints constraints) {
+    renderBox?.layout(constraints, parentUsesSize: true);
+    return renderBox?.size;
   }
 }
