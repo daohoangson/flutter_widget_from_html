@@ -18,13 +18,13 @@ CssBorder tryParseBorder(BuildMetadata meta) {
     final key = style.property;
     if (!key.startsWith(kCssBorder)) continue;
 
-    if (style.term == kCssBorderInherit) {
+    final suffix = key.substring(kCssBorder.length);
+    if (suffix.isEmpty && style.term == kCssBorderInherit) {
       border = CssBorder(inherit: true);
       continue;
     }
 
     final borderSide = tryParseCssBorderSide(style.values);
-    final suffix = key.substring(kCssBorder.length);
     if (suffix.isEmpty) {
       border = CssBorder(all: borderSide);
     } else {
@@ -59,7 +59,7 @@ CssBorder tryParseBorder(BuildMetadata meta) {
 CssBorderSide? tryParseCssBorderSide(List<css.Expression> expressions) {
   final width =
       expressions.isNotEmpty ? tryParseCssLength(expressions[0]) : null;
-  if (width == null || width.number <= 0) return null;
+  if (width == null || width.number <= 0) return CssBorderSide.none;
 
   return CssBorderSide(
     color: expressions.length >= 3 ? tryParseColor(expressions[2]) : null,
@@ -78,6 +78,8 @@ TextDecorationStyle? tryParseCssBorderStyle(css.Expression expression) {
         return TextDecorationStyle.dashed;
       case kCssBorderStyleDouble:
         return TextDecorationStyle.double;
+      case kCssBorderStyleSolid:
+        return TextDecorationStyle.solid;
     }
   }
 
