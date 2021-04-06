@@ -314,21 +314,16 @@ class TextDeco {
 
   static TextDeco? tryParse(List<css.Expression> expressions) {
     for (final expression in expressions) {
-      if (expression is css.LiteralTerm) {
-        switch (expression.valueAsString) {
-          case kCssTextDecorationLineThrough:
-            return TextDeco(strike: true);
-          case kCssTextDecorationNone:
-            return TextDeco(
-              over: false,
-              strike: false,
-              under: false,
-            );
-          case kCssTextDecorationOverline:
-            return TextDeco(over: true);
-          case kCssTextDecorationUnderline:
-            return TextDeco(under: true);
-        }
+      if (expression is! css.LiteralTerm) continue;
+      switch (expression.valueAsString) {
+        case kCssTextDecorationLineThrough:
+          return TextDeco(strike: true);
+        case kCssTextDecorationNone:
+          return TextDeco(over: false, strike: false, under: false);
+        case kCssTextDecorationOverline:
+          return TextDeco(over: true);
+        case kCssTextDecorationUnderline:
+          return TextDeco(under: true);
       }
     }
 
