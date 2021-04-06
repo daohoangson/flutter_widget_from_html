@@ -2,9 +2,19 @@ import 'package:csslib/parser.dart' as css;
 import 'package:csslib/visitor.dart' as css;
 import 'package:html/dom.dart' as dom;
 
+import '../core_data.dart';
+import '../core_widget_factory.dart';
+
 extension DomElementExtension on dom.Element {
   static Expando<List<css.Declaration>>? _expando;
 
+  /// Returns CSS declarations from the element's `style` attribute.
+  ///
+  /// This is different from [BuildMetadata.styles] as it doesn't include
+  /// runtime additions from [WidgetFactory] or [BuildOp]s.
+  ///
+  /// Parsing CSS is a non-trivial task but the result is cached for each element
+  /// so it's safe to call this again and again.
   List<css.Declaration> get styles {
     final expando = _expando ??= Expando();
     final existing = expando[this];
@@ -15,13 +25,17 @@ extension DomElementExtension on dom.Element {
     }
 
     final styleSheet = css.parse('*{${attributes['style']}}');
-    return expando[this] = styleSheet.declarations;
+    return expando[this] = styleSheet.collectDeclarations();
   }
 }
 
 extension CssDeclarationExtension on css.Declaration {
   static Expando<List<css.Expression>>? _expando;
 
+  /// Returns CSS expressions.
+  ///
+  /// Collecting expressions is a non-trivial task but the result is cached
+  /// so it's safe to call this again and again.
   List<css.Expression> get values {
     final expando = _expando ??= Expando();
     final existing = expando[this];
@@ -30,11 +44,15 @@ extension CssDeclarationExtension on css.Declaration {
     return expando[this] = _ExpressionsCollector.collect(this);
   }
 
+  /// Returns the CSS expression.
+  ///
+  /// If there are more than one, `null` will be returned.
   css.Expression? get value {
     final list = values;
-    return list.isEmpty ? null : list.first;
+    return list.length == 1 ? list.first : null;
   }
 
+  /// Returns the CSS term (if available).
   String? get term {
     final v = value;
     return v is css.LiteralTerm ? v.valueAsString : null;
@@ -44,6 +62,10 @@ extension CssDeclarationExtension on css.Declaration {
 extension CssFunctionTermExtension on css.FunctionTerm {
   static Expando<List<css.Expression>>? _expando;
 
+  /// Returns function parameters.
+  ///
+  /// Collecting parameters is a non-trivial task but the result is cached
+  /// so it's safe to call this again and again.
   List<css.Expression> get params {
     final expando = _expando ??= Expando();
     final existing = expando[this];
@@ -56,6 +78,7 @@ extension CssFunctionTermExtension on css.FunctionTerm {
 }
 
 extension CssLiteralTermExtension on css.LiteralTerm {
+  /// Returns [css.Identifier]'s name or unquoted [String] value.
   String get valueAsString {
     final v = value;
     if (v is css.Identifier) {
@@ -81,17 +104,20 @@ extension CssLiteralTermExtension on css.LiteralTerm {
 }
 
 extension CssNumberTermExtension on css.NumberTerm {
+  /// Returns [num] value.
   num get number => value as num;
 }
 
 extension CssPercentageTermExtension on css.PercentageTerm {
+  /// Returns [double] value.
   double get valueAsDouble => (value as num) / 100.0;
 }
 
 extension CssStyleSheetExtension on css.StyleSheet {
   static _DeclarationsCollector? _collector;
 
-  List<css.Declaration> get declarations {
+  /// Returns CSS declaration.
+  List<css.Declaration> collectDeclarations() {
     final collector = _collector ??= _DeclarationsCollector();
     collector._tmp.clear();
     visit(collector);

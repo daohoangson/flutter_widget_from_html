@@ -48,7 +48,7 @@ class BuildMetadata extends core_data.BuildMetadata {
     assert(!_stylesIsLocked, 'Metadata can no longer be changed.');
     final styleSheet = css.parse('*{$key: $value;}');
     _styles ??= [];
-    _styles!.addAll(styleSheet.declarations);
+    _styles!.addAll(styleSheet.collectDeclarations());
   }
 
   @override
@@ -195,7 +195,7 @@ class BuildTree extends core_data.BuildTree {
       final styleSheet = css.parse('*{$str}');
 
       meta._styles ??= [];
-      meta._styles!.insertAll(0, styleSheet.declarations);
+      meta._styles!.insertAll(0, styleSheet.collectDeclarations());
     }
 
     _customStylesBuilder(meta);

@@ -27,7 +27,7 @@ abstract class BuildMetadata {
   /// The parents' build ops that have [BuildOp.onChild].
   Iterable<BuildOp> get parentOps;
 
-  /// The inline styles.
+  /// The styling declarations.
   ///
   /// These are collected from:
   ///
@@ -49,7 +49,7 @@ abstract class BuildMetadata {
   /// Adds an inline style.
   operator []=(String key, String value);
 
-  /// Gets an inline style value by key.
+  /// Gets a styling declaration by `property`.
   css.Declaration? operator [](String key) {
     for (final style in styles.reversed) {
       if (style.property == key) return style;
