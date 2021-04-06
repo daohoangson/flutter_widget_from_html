@@ -21,7 +21,7 @@ class StyleVerticalAlign {
         onTree: (meta, tree) {
           if (meta.willBuildSubtree == true) return;
 
-          final v = meta[kCssVerticalAlign];
+          final v = meta[kCssVerticalAlign]?.term;
           if (v == null || v == kCssVerticalAlignBaseline) return;
 
           final alignment = _tryParsePlaceholderAlignment(v);
@@ -52,7 +52,7 @@ class StyleVerticalAlign {
             return widgets;
           }
 
-          final v = meta[kCssVerticalAlign];
+          final v = meta[kCssVerticalAlign]?.term;
           if (v == null) return widgets;
 
           _skipBuilding[meta] = true;
