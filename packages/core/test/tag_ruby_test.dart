@@ -213,7 +213,7 @@ class _HitTestApp extends StatelessWidget {
   Widget build(BuildContext _) => MaterialApp(
         home: Scaffold(
           body: HtmlWidget(
-            '<ruby><a href="$href">Tap me</a></ruby>',
+            '<ruby><a href="$href">Tap me</a> <rt>Foo</rt></ruby>',
             onTapUrl: onTapUrl,
           ),
         ),
