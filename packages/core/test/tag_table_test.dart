@@ -880,6 +880,15 @@ Foo should float on top of table.''',
     <td valign="baseline">Foo</td>
   </tr>
 </table>''',
+            'valign_baseline_computeDryLayout':
+                '''<div style="width: 100px; height: 100px;">
+  <table border="1">
+    <tr>
+      <td valign="baseline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</td>
+      <td valign="baseline"><div style="margin: 10px">Foo</div></td>
+    </tr>
+  </table>
+</div>''',
             'table_in_list': '''<ul>
   <li>
     <table border="1"><tr><td>Foo</td></tr></table>

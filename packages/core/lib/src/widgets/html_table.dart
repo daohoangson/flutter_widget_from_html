@@ -552,9 +552,7 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
       final Size? Function(RenderBox? renderBox, BoxConstraints constraints)
           layouter) {
     final cc = constraints.loosen().deflate(EdgeInsets.only(top: paddingTop));
-    layouter(child, cc);
-
-    final childSize = child?.size ?? Size.zero;
+    final childSize = layouter(child, cc) ?? Size.zero;
     return constraints.constrain(childSize + Offset(0, paddingTop));
   }
 
