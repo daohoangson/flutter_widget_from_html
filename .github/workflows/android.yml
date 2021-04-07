@@ -9,7 +9,6 @@ on:
 
 jobs:
   sylph:
-    if: ${{ false }}
     environment:
       name: aws
     runs-on: ubuntu-latest
