@@ -1,3 +1,4 @@
+import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' show Theme, ThemeData, Tooltip;
 import 'package:flutter/rendering.dart';
@@ -34,8 +35,7 @@ class WidgetFactory {
   BuildOp? _tagImg;
   BuildOp? _tagPre;
   BuildOp? _tagQ;
-  TextStyleHtml Function(TextStyleHtml, String)? __tsbFontSize;
-  TextStyleHtml Function(TextStyleHtml, String)? _tsbLineHeight;
+  TextStyleHtml Function(TextStyleHtml, css.Expression)? _tsbLineHeight;
   HtmlWidget? _widget;
 
   /// Builds [Align].
@@ -505,7 +505,10 @@ class WidgetFactory {
         break;
 
       case 'big':
-        meta.tsb.enqueue(_tsbFontSize, kCssFontSizeLarger);
+        meta.tsb.enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeLarger);
+        break;
+      case 'small':
+        meta.tsb.enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
         break;
 
       case 'br':
@@ -600,21 +603,21 @@ class WidgetFactory {
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '0.67em 0'
-          ..tsb.enqueue(_tsbFontSize, '2em')
+          ..tsb.enqueue(TextStyleOps.fontSizeEm, 2.0)
           ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h2':
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '0.83em 0'
-          ..tsb.enqueue(_tsbFontSize, '1.5em')
+          ..tsb.enqueue(TextStyleOps.fontSizeEm, 1.5)
           ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h3':
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '1em 0'
-          ..tsb.enqueue(_tsbFontSize, '1.17em')
+          ..tsb.enqueue(TextStyleOps.fontSizeEm, 1.17)
           ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h4':
@@ -627,14 +630,14 @@ class WidgetFactory {
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '1.67em 0'
-          ..tsb.enqueue(_tsbFontSize, '0.83em')
+          ..tsb.enqueue(TextStyleOps.fontSizeEm, .83)
           ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h6':
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '2.33em 0'
-          ..tsb.enqueue(_tsbFontSize, '0.67em')
+          ..tsb.enqueue(TextStyleOps.fontSizeEm, .67)
           ..tsb.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
         break;
 
@@ -681,19 +684,15 @@ class WidgetFactory {
         meta[kCssDisplay] = kCssDisplayNone;
         break;
 
-      case 'small':
-        meta.tsb.enqueue(_tsbFontSize, kCssFontSizeSmaller);
-        break;
-
       case 'sub':
         meta
           ..[kCssVerticalAlign] = kCssVerticalAlignSub
-          ..tsb.enqueue(_tsbFontSize, kCssFontSizeSmaller);
+          ..tsb.enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
         break;
       case 'sup':
         meta
           ..[kCssVerticalAlign] = kCssVerticalAlignSuper
-          ..tsb.enqueue(_tsbFontSize, kCssFontSizeSmaller);
+          ..tsb.enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
         break;
 
       case kTagTable:
@@ -735,7 +734,8 @@ class WidgetFactory {
   }
 
   /// Parses inline style [key] and [value] pair.
-  void parseStyle(BuildMetadata meta, String key, String value) {
+  void parseStyle(BuildMetadata meta, css.Declaration style) {
+    final key = style.property;
     switch (key) {
       case kCssBackground:
       case kCssBackgroundColor:
@@ -744,32 +744,36 @@ class WidgetFactory {
         break;
 
       case kCssColor:
-        final color = tryParseColor(value);
+        final color = tryParseColor(style.value);
         if (color != null) meta.tsb.enqueue(TextStyleOps.color, color);
         break;
 
       case kCssDirection:
-        meta.tsb.enqueue(TextStyleOps.textDirection, value);
+        meta.tsb.enqueue(TextStyleOps.textDirection, style.term);
         break;
 
       case kCssFontFamily:
-        final list = TextStyleOps.fontFamilyTryParse(value);
+        final list = TextStyleOps.fontFamilyTryParse(style.values);
         meta.tsb.enqueue(TextStyleOps.fontFamily, list);
         break;
 
       case kCssFontSize:
-        meta.tsb.enqueue(_tsbFontSize, value);
+        meta.tsb.enqueue(TextStyleOps.fontSize, style.value);
         break;
 
       case kCssFontStyle:
-        final fontStyle = TextStyleOps.fontStyleTryParse(value);
+        final term = style.term;
+        final fontStyle =
+            term != null ? TextStyleOps.fontStyleTryParse(term) : null;
         if (fontStyle != null) {
           meta.tsb.enqueue(TextStyleOps.fontStyle, fontStyle);
         }
         break;
 
       case kCssFontWeight:
-        final fontWeight = TextStyleOps.fontWeightTryParse(value);
+        final value = style.value;
+        final fontWeight =
+            value != null ? TextStyleOps.fontWeightTryParse(value) : null;
         if (fontWeight != null) {
           meta.tsb.enqueue(TextStyleOps.fontWeight, fontWeight);
         }
@@ -787,23 +791,26 @@ class WidgetFactory {
 
       case kCssLineHeight:
         _tsbLineHeight ??= TextStyleOps.lineHeight(this);
-        meta.tsb.enqueue(_tsbLineHeight!, value);
+        meta.tsb.enqueue(_tsbLineHeight!, style.value);
         break;
 
       case kCssMaxLines:
       case kCssMaxLinesWebkitLineClamp:
-        final maxLines = value == kCssMaxLinesNone ? -1 : int.tryParse(value);
+        final maxLines = TextStyleOps.maxLinesTryParse(style.value);
         if (maxLines != null) meta.tsb.enqueue(TextStyleOps.maxLines, maxLines);
         break;
 
       case kCssTextAlign:
-        meta.register(StyleTextAlign(this, value).op);
+        final term = style.term;
+        if (term != null) {
+          meta.register(StyleTextAlign(this, term).op);
+        }
         break;
 
       case kCssTextDecoration:
         _styleTextDecoration ??= BuildOp(onTree: (meta, _) {
           for (final style in meta.styles) {
-            if (style.key == kCssTextDecoration) {
+            if (style.property == kCssTextDecoration) {
               final textDeco = TextDeco.tryParse(style.values);
               if (textDeco != null) {
                 meta.tsb.enqueue(TextStyleOps.textDeco, textDeco);
@@ -815,13 +822,11 @@ class WidgetFactory {
         break;
 
       case kCssTextOverflow:
-        switch (value) {
-          case kCssTextOverflowClip:
-            meta.tsb.enqueue(TextStyleOps.textOverflow, TextOverflow.clip);
-            break;
-          case kCssTextOverflowEllipsis:
-            meta.tsb.enqueue(TextStyleOps.textOverflow, TextOverflow.ellipsis);
-            break;
+        final term = style.term;
+        final textOverflow =
+            term != null ? TextStyleOps.textOverflowTryParse(term) : null;
+        if (textOverflow != null) {
+          meta.tsb.enqueue(TextStyleOps.textOverflow, textOverflow);
         }
         break;
 
@@ -894,10 +899,6 @@ class WidgetFactory {
     if (baseUrl == null) return null;
 
     return baseUrl.resolveUri(uri).toString();
-  }
-
-  TextStyleHtml Function(TextStyleHtml, String) get _tsbFontSize {
-    return __tsbFontSize ??= TextStyleOps.fontSize(this);
   }
 
   BuildOp _anchorOp(String id) => BuildOp(onTree: (meta, tree) {
