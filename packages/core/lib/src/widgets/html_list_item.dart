@@ -76,13 +76,11 @@ class _ListItemRenderObject extends RenderBox
     final child = firstChild!;
     final childConstraints = constraints;
     final childData = child.parentData as _ListItemData;
-    child.getDryLayout(childConstraints);
-    final childSize = child.size;
+    final childSize = child.getDryLayout(childConstraints);
 
     final marker = childData.nextSibling!;
     final markerConstraints = childConstraints.loosen();
-    marker.getDryLayout(markerConstraints);
-    final markerSize = marker.size;
+    final markerSize = marker.getDryLayout(markerConstraints);
 
     return constraints.constrain(Size(
       childSize.width,
