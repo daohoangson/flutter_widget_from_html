@@ -50,8 +50,6 @@ class HtmlTable extends MultiChildRenderObjectWidget {
 
   @override
   void updateRenderObject(BuildContext _, _TableRenderObject renderObject) {
-    super.updateRenderObject(_, renderObject);
-
     renderObject
       ..border = border
       ..borderCollapse = borderCollapse
@@ -169,9 +167,7 @@ class HtmlTableValignBaseline extends SingleChildRenderObjectWidget {
 
   @override
   void updateRenderObject(
-      BuildContext context, _ValignBaselineRenderObject renderObject) {
-    super.updateRenderObject(context, renderObject);
-
+      BuildContext _, _ValignBaselineRenderObject renderObject) {
     renderObject
       ..companion = companion
       ..row = row;
