@@ -53,7 +53,8 @@ class HtmlTable extends MultiChildRenderObjectWidget {
     renderObject
       ..border = border
       ..borderCollapse = borderCollapse
-      ..borderSpacing = borderSpacing;
+      ..borderSpacing = borderSpacing
+      ..companion = companion;
   }
 }
 
