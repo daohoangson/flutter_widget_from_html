@@ -784,16 +784,69 @@ void main() async {
   });
 
   group('HtmlTable', () {
-    testWidgets('updates borderSpacing', (WidgetTester tester) async {
+    group('_TableRenderObject setters', () {
+      testWidgets('updates border', (WidgetTester tester) async {
+        final before = await explain(
+            tester, '<table border="1"><tr><td>Foo</td></tr></table>',
+            useExplainer: false);
+        expect(
+            before,
+            contains(
+                '└HtmlTable(border: all(BorderSide(Color(0xff000000), 1.0, BorderStyle.solid)),'));
+
+        final after = await explain(
+            tester, '<table border="2"><tr><td>Foo</td></tr></table>',
+            useExplainer: false);
+        expect(
+            after,
+            contains(
+                '└HtmlTable(border: all(BorderSide(Color(0xff000000), 2.0, BorderStyle.solid)),'));
+      });
+
+      testWidgets('updates borderCollapse', (WidgetTester tester) async {
+        final str = '└HtmlTable(borderCollapse: true,';
+        final before = await explain(tester,
+            '<table style="border-collapse: separate"><tr><td>Foo</td></tr></table>',
+            useExplainer: false);
+        expect(before, isNot(contains(str)));
+
+        final after = await explain(tester,
+            '<table style="border-collapse: collapse"><tr><td>Foo</td></tr></table>',
+            useExplainer: false);
+        expect(after, contains(str));
+      });
+
+      testWidgets('updates borderSpacing', (WidgetTester tester) async {
+        final before = await explain(
+            tester, '<table cellspacing="10"><tr><td>Foo</td></tr></table>',
+            useExplainer: false);
+        expect(before, contains('└HtmlTable(borderSpacing: 10.0)'));
+
+        final after = await explain(
+            tester, '<table cellspacing="20"><tr><td>Foo</td></tr></table>',
+            useExplainer: false);
+        expect(after, contains('└HtmlTable(borderSpacing: 20.0)'));
+      });
+    });
+
+    testWidgets('_ValignBaselineRenderObject updates row', (tester) async {
       final before = await explain(
-          tester, '<table cellspacing="10"><tr><td>Foo</td></tr></table>',
+          tester,
+          '<table style="border-collapse: separate">'
+          '<tr><td>Foo</td>'
+          '<td valign="baseline">Bar</td></tr>'
+          '</table>',
           useExplainer: false);
-      expect(before, contains('└HtmlTable(borderSpacing: 10.0)'));
+      expect(before, contains('└HtmlTableValignBaseline(row: 0)'));
 
       final after = await explain(
-          tester, '<table cellspacing="20"><tr><td>Foo</td></tr></table>',
+          tester,
+          '<table style="border-collapse: separate">'
+          '<tr><td>Foo</td></tr>'
+          '<tr><td valign="baseline">Bar</td></tr>'
+          '</table>',
           useExplainer: false);
-      expect(after, contains('└HtmlTable(borderSpacing: 20.0)'));
+      expect(after, contains('└HtmlTableValignBaseline(row: 1)'));
     });
 
     testWidgets('performs hit test', (tester) async {
@@ -880,6 +933,15 @@ Foo should float on top of table.''',
     <td valign="baseline">Foo</td>
   </tr>
 </table>''',
+            'valign_baseline_computeDryLayout':
+                '''<div style="width: 100px; height: 100px;">
+  <table border="1">
+    <tr>
+      <td valign="baseline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</td>
+      <td valign="baseline"><div style="margin: 10px">Foo</div></td>
+    </tr>
+  </table>
+</div>''',
             'table_in_list': '''<ul>
   <li>
     <table border="1"><tr><td>Foo</td></tr></table>

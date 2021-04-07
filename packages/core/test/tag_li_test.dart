@@ -750,6 +750,24 @@ void main() async {
             }, skip: goldenSkip != null);
           }
         }, skip: goldenSkip);
+
+        testGoldens('computeDryLayout', (tester) async {
+          await tester.pumpWidgetBuilder(
+            Scaffold(
+              body: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: HtmlWidget(
+                    '<div style="background: black; color: white; width: 200px; height: 200px">'
+                    '<ul><li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li></ul>'
+                    '<div>'),
+              ),
+            ),
+            wrapper: materialAppWrapper(theme: ThemeData.light()),
+            surfaceSize: Size(600, 400),
+          );
+
+          await screenMatchesGolden(tester, 'computeDryLayout');
+        }, skip: goldenSkip != null);
       },
       config: GoldenToolkitConfiguration(
         fileNameFactory: (name) => '$kGoldenFilePrefix/li/$name.png',
