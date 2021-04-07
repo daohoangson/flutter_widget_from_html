@@ -1,5 +1,5 @@
 name: fwfh_url_launcher
-version: 0.6.0-rc.2021022601
+version: 0.6.0
 description: WidgetFactory extension to launch A tag via url_launcher plugin.
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
@@ -10,8 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_widget_from_html_core: ^0.6.0-0
-  url_launcher: ^6.0.1
+  flutter_widget_from_html_core: ^0.6.0
+  url_launcher: ^6.0.3
 
 dependency_overrides:
   flutter_widget_from_html_core:

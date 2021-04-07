@@ -1,23 +1,11 @@
-## 0.6.0-rc.2021031201
+## 0.6.0
 
-- Dispose recognizer properly (#466)
-
-## 0.6.0-rc.2021030401
-
-- Requires Flutter 2
-- Implement new package `fwfh_chewie` (#461)
-- Implement new package `fwfh_cached_network_image` (#463)
-
-## 0.6.0-rc.2021030201
-
-- Add support for anchor in core package (#447)
-- Implement new package `fwfh_webview` (#448)
-- Implement new package `fwfh_url_launcher` (#450)
-- Implement new package `fwfh_svg` (#452)
-
-## 0.6.0-rc.2021022601
-
+- Flutter 2 🚀
+- Use csslib to parse inline style (#379)
+- Implement `computeDryLayout` (#411)
 - Migrate to null safety (#436, authored by @miDeb)
+- Add support for anchor (#447)
+- Dispose recognizer properly (#466)
 
 ## 0.5.2+1
 
