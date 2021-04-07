@@ -1,25 +1,16 @@
-## 0.6.0-rc.2021031201
+## 0.6.0
 
+- Flutter 2 with null safety 🚀
+- Implement new packages:
+  - `fwfh_webview` (#448)
+  - `fwfh_url_launcher` (#450)
+  - `fwfh_svg` (#452)
+  - `fwfh_chewie` (#461)
+  - `fwfh_cached_network_image` (#463)
+- Use csslib to parse inline style (#379)
+- Implement `computeDryLayout` (#411)
 - Dispose recognizer properly (#466)
 - Add Flutter Web support for `webViewMediaPlaybackAlwaysAllow` (#468)
-- Update test for mocktail@0.0.2 (#469)
-
-## 0.6.0-rc.2021030401
-
-- Requires Flutter 2
-- Implement new package `fwfh_cached_network_image` (#463)
-
-## 0.6.0-rc.2021030202
-
-- Add support for anchor in core package (#447)
-- Implement new package `fwfh_webview` (#448)
-- Implement new package `fwfh_url_launcher` (#450)
-- Implement new package `fwfh_svg` (#452)
-- Implement new package `fwfh_chewie` (#461)
-
-## 0.6.0-rc.2021022601
-
-- Migrate to use core@0.6.0
 
 ## 0.5.2+1
 

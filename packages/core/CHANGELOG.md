@@ -4,7 +4,7 @@
 - Use csslib to parse inline style (#379)
 - Implement `computeDryLayout` (#411)
 - Migrate to null safety (#436, authored by @miDeb)
-- Add support for anchor in core package (#447)
+- Add support for anchor (#447)
 - Dispose recognizer properly (#466)
 
 ## 0.5.2+1
