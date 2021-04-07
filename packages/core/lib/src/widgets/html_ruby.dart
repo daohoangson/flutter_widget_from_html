@@ -22,10 +22,7 @@ class _RubyRenderObject extends RenderBox
   @override
   double? computeDistanceToActualBaseline(TextBaseline baseline) {
     final ruby = firstChild!;
-    final rubyValue = ruby.getDistanceToActualBaseline(baseline);
-    if (rubyValue == null) {
-      return super.computeDistanceToActualBaseline(baseline);
-    }
+    final rubyValue = ruby.getDistanceToActualBaseline(baseline) ?? 0.0;
 
     final offset = (ruby.parentData as _RubyParentData).offset;
     return offset.dy + rubyValue;

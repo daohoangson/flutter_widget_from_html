@@ -1,12 +1,16 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '_.dart';
 
-void main() {
+void main() async {
+  await loadAppFonts();
+
   group('basic usage', () {
     final html = '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>';
 
@@ -200,6 +204,32 @@ void main() {
       expect(await tapText(tester, 'Tap me'), equals(1));
       expect(urls, equals(const [kHref]));
     });
+
+    final goldenSkip = Platform.isLinux ? null : 'Linux only';
+    GoldenToolkit.runWithConfiguration(
+      () {
+        testGoldens('computeDryLayout', (tester) async {
+          await tester.pumpWidgetBuilder(
+            Scaffold(
+              body: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: HtmlWidget(
+                    '<div style="background: black; color: white; width: 200px; height: 200px">'
+                    '<ruby>Foo <rt>bar</rt></ruby>'
+                    '<div>'),
+              ),
+            ),
+            wrapper: materialAppWrapper(theme: ThemeData.light()),
+            surfaceSize: Size(600, 400),
+          );
+
+          await screenMatchesGolden(tester, 'computeDryLayout');
+        }, skip: goldenSkip != null);
+      },
+      config: GoldenToolkitConfiguration(
+        fileNameFactory: (name) => '$kGoldenFilePrefix/ruby/$name.png',
+      ),
+    );
   });
 }
 
