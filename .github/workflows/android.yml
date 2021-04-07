@@ -25,6 +25,6 @@ jobs:
         run: |
           set -e
 
-          brew install yq
+          sudo snap install yq
 
           exec ./tool/sylph/sylph.sh
