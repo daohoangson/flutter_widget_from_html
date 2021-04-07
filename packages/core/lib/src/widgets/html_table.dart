@@ -167,6 +167,12 @@ class HtmlTableValignBaseline extends SingleChildRenderObjectWidget {
       _ValignBaselineRenderObject(companion, row);
 
   @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(IntProperty('row', row));
+  }
+
+  @override
   void updateRenderObject(
       BuildContext _, _ValignBaselineRenderObject renderObject) {
     renderObject

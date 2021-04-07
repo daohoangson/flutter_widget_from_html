@@ -829,6 +829,26 @@ void main() async {
       });
     });
 
+    testWidgets('_ValignBaselineRenderObject updates row', (tester) async {
+      final before = await explain(
+          tester,
+          '<table style="border-collapse: separate">'
+          '<tr><td>Foo</td>'
+          '<td valign="baseline">Bar</td></tr>'
+          '</table>',
+          useExplainer: false);
+      expect(before, contains('└HtmlTableValignBaseline(row: 0)'));
+
+      final after = await explain(
+          tester,
+          '<table style="border-collapse: separate">'
+          '<tr><td>Foo</td></tr>'
+          '<tr><td valign="baseline">Bar</td></tr>'
+          '</table>',
+          useExplainer: false);
+      expect(after, contains('└HtmlTableValignBaseline(row: 1)'));
+    });
+
     testWidgets('performs hit test', (tester) async {
       const kHref = 'href';
       final urls = <String>[];
