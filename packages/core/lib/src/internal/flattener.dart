@@ -19,9 +19,9 @@ class Flattener {
   final List<GestureRecognizer> _recognizers = [];
 
   late List<Flattened> _flattened;
-  late StringBuffer _buffer, _prevBuffer;
   late _Recognizer _recognizer, _prevRecognizer;
-  List<dynamic>? _spans;
+  List<SpanBuilder>? _spans;
+  late List<_String> _strings, _prevStrings;
   late bool _swallowWhitespace;
   late TextStyleBuilder _tsb, _prevTsb;
 
@@ -64,14 +64,14 @@ class Flattener {
   }
 
   void _resetLoop(TextStyleBuilder tsb) {
-    _buffer = StringBuffer();
     _recognizer = _Recognizer();
     _spans = [];
+    _strings = [];
     _swallowWhitespace = true;
     _tsb = tsb;
 
-    _prevBuffer = _buffer;
     _prevRecognizer = _recognizer;
+    _prevStrings = _strings;
     _prevTsb = _tsb;
   }
 
@@ -96,16 +96,19 @@ class Flattener {
 
     if (built is GestureRecognizer) {
       _prevRecognizer.value = built;
-    } else if (built is InlineSpan || built is SpanBuilder) {
+    } else if (built is InlineSpan) {
+      _saveSpan();
+      _spans!.add((_) => built);
+    } else if (built is SpanBuilder) {
       _saveSpan();
       _spans!.add(built);
     } else if (built is String) {
       if (bit is WhitespaceBit) {
         if (!_loopShouldSwallowWhitespace(bit)) {
-          _prevBuffer.write(' ');
+          _prevStrings.add(_String(built, isWhitespace: true));
         }
       } else {
-        _prevBuffer.write(built);
+        _prevStrings.add(_String(built));
       }
     } else if (built is Widget) {
       _completeLoop();
@@ -142,20 +145,21 @@ class Flattener {
   }
 
   void _saveSpan() {
-    if (_prevBuffer != _buffer && _prevBuffer.length > 0) {
+    if (_prevStrings != _strings && _prevStrings.isNotEmpty) {
       final scopedRecognizer = _prevRecognizer.value;
       final scopedTsb = _prevTsb;
-      final scopedText = _prevBuffer.toString();
+      final scopedStrings = _prevStrings;
 
       if (scopedRecognizer != null) _recognizers.add(scopedRecognizer);
 
       _spans!.add((context) => TextSpan(
             recognizer: scopedRecognizer,
             style: scopedTsb.build(context).styleWithHeight,
-            text: scopedText,
+            text: scopedStrings.toText(),
           ));
     }
-    _prevBuffer = StringBuffer();
+
+    _prevStrings = [];
     _prevRecognizer = _Recognizer();
   }
 
@@ -166,19 +170,16 @@ class Flattener {
     if (scopedSpans == null) return;
 
     _spans = null;
-    if (scopedSpans.isEmpty && _buffer.isEmpty) return;
+    if (scopedSpans.isEmpty && _strings.isEmpty) return;
     final scopedRecognizer = _recognizer.value;
     final scopedTsb = _tsb;
-    final scopedBuffer = _buffer.toString();
+    final scopedStrings = _strings;
 
     if (scopedRecognizer != null) _recognizers.add(scopedRecognizer);
 
-    // trim the last new line if any
-    final scopedText = scopedSpans.isEmpty
-        ? scopedBuffer.replaceAll(RegExp('\n\$'), '')
-        : scopedBuffer;
-
-    if (scopedBuffer == '\n' && scopedSpans.isEmpty) {
+    if (scopedSpans.isEmpty &&
+        scopedStrings.length == 1 &&
+        scopedStrings[0].isNewLine) {
       // special handling for paragraph with only one line break
       _flattened.add(Flattened._(
         widget: HeightPlaceholder(CssLength(1, CssLengthUnit.em), scopedTsb),
@@ -187,11 +188,13 @@ class Flattener {
     }
 
     _flattened.add(Flattened._(spanBuilder: (context) {
+      final text = scopedStrings.toText(dropNewLine: scopedSpans.isEmpty);
+
       final children = scopedSpans
           .map((s) => s is SpanBuilder ? s.call(context) : s)
           .whereType<InlineSpan>()
           .toList(growable: false);
-      if (scopedText.isEmpty) {
+      if (text.isEmpty) {
         if (children.isEmpty) return null;
         if (children.length == 1) return children.first;
       }
@@ -200,7 +203,7 @@ class Flattener {
         children: children,
         recognizer: scopedRecognizer,
         style: scopedTsb.build(context).styleWithHeight,
-        text: scopedText,
+        text: text,
       );
     }));
   }
@@ -253,4 +256,35 @@ class Flattener {
 /// but we have to keep track of prev / current recognizer for spans
 class _Recognizer {
   GestureRecognizer? value;
+}
+
+class _String {
+  final String data;
+  final bool isWhitespace;
+
+  _String(this.data, {this.isWhitespace = false});
+
+  bool get isNewLine => data == '\n';
+}
+
+extension _StringListToText on List<_String> {
+  String toText({bool dropNewLine = false}) {
+    if (isEmpty) return '';
+
+    if (dropNewLine && last.isNewLine) {
+      removeLast();
+      if (isEmpty) return '';
+    }
+
+    final buffer = StringBuffer();
+    for (final str in this) {
+      if (str.isWhitespace) {
+        buffer.write(' ');
+      } else {
+        buffer.write(str.data);
+      }
+    }
+
+    return buffer.toString();
+  }
 }
