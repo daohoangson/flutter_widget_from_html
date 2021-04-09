@@ -27,6 +27,9 @@ _updateDep() {
 }
 _updateDep 'flutter_widget_from_html' 'packages/enhanced'
 _updateDep 'flutter_widget_from_html_core' 'packages/core'
+_updateDep 'fwfh_cached_network_image'
+_updateDep 'fwfh_chewie'
+_updateDep 'fwfh_svg'
 _updateDep 'fwfh_url_launcher'
 _updateDep 'fwfh_webview'
 

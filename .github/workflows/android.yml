@@ -9,7 +9,6 @@ on:
 
 jobs:
   sylph:
-    if: ${{ false }}
     environment:
       name: aws
     runs-on: ubuntu-latest
@@ -20,12 +19,12 @@ jobs:
         uses: subosito/flutter-action@v1
       - name: Run sylph.sh
         env:
-          AWS_ACCESS_KEY_ID: AKIAY43IFJQXLQIQNSY4
+          AWS_ACCESS_KEY_ID: AKIAY43IFJQXAVHHHXQ6
           AWS_DEFAULT_REGION: us-west-2
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           set -e
 
-          brew install yq
+          sudo snap install yq
 
           exec ./tool/sylph/sylph.sh
