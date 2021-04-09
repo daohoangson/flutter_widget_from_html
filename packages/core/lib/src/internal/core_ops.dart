@@ -58,6 +58,10 @@ const kCssTextOverflow = 'text-overflow';
 const kCssTextOverflowClip = 'clip';
 const kCssTextOverflowEllipsis = 'ellipsis';
 
+const kCssWhitespace = 'white-space';
+const kCssWhitespacePre = 'pre';
+const kCssWhitespaceNormal = 'normal';
+
 void wrapTree(
   BuildTree tree, {
   BuildBit Function(BuildTree parent)? append,

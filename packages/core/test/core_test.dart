@@ -440,9 +440,12 @@ void main() async {
       expect(
           explained,
           equals('[CssBlock:child=[SingleChildScrollView:child=[RichText:'
-              '(+font=Courier+fonts=monospace:<?php\nhighlight_string(\''
-              '<?php phpinfo(); ?>\');\n?>)]'
-              ']]'));
+              '(+font=Courier+fonts=monospace:'
+              '(#FF0000BB:<?php\nphpinfo)'
+              '(#FF007700:();\n)'
+              '(#FF0000BB:?>)'
+              ')'
+              ']]]'));
     });
 
     testWidgets('renders SAMP tag', (WidgetTester tester) async {

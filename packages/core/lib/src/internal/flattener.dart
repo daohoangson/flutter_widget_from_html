@@ -13,7 +13,8 @@ class Flattened {
   Flattened._({this.spanBuilder, this.widget, this.widgetBuilder});
 }
 
-typedef SpanBuilder = InlineSpan? Function(BuildContext);
+typedef SpanBuilder = InlineSpan? Function(
+    BuildContext, CssWhitespace whitespace);
 
 class Flattener {
   final List<GestureRecognizer> _recognizers = [];
@@ -90,7 +91,7 @@ class Flattener {
     } else if (bit is BuildBit<GestureRecognizer?, dynamic>) {
       built = bit.buildBit(_prevRecognizer.value);
     } else if (bit is BuildBit<TextStyleHtml, InlineSpan>) {
-      final SpanBuilder spanBuilder = (c) => bit.buildBit(thisTsb.build(c));
+      final SpanBuilder spanBuilder = (c, _) => bit.buildBit(thisTsb.build(c));
       built = spanBuilder;
     }
 
@@ -98,7 +99,7 @@ class Flattener {
       _prevRecognizer.value = built;
     } else if (built is InlineSpan) {
       _saveSpan();
-      _spans!.add((_) => built);
+      _spans!.add((_, __) => built);
     } else if (built is SpanBuilder) {
       _saveSpan();
       _spans!.add(built);
@@ -152,10 +153,10 @@ class Flattener {
 
       if (scopedRecognizer != null) _recognizers.add(scopedRecognizer);
 
-      _spans!.add((context) => TextSpan(
+      _spans!.add((context, whitespace) => TextSpan(
             recognizer: scopedRecognizer,
             style: scopedTsb.build(context).styleWithHeight,
-            text: scopedStrings.toText(),
+            text: scopedStrings.toText(whitespace: whitespace),
           ));
     }
 
@@ -187,11 +188,14 @@ class Flattener {
       return;
     }
 
-    _flattened.add(Flattened._(spanBuilder: (context) {
-      final text = scopedStrings.toText(dropNewLine: scopedSpans.isEmpty);
+    _flattened.add(Flattened._(spanBuilder: (context, whitespace) {
+      final text = scopedStrings.toText(
+        dropNewLine: scopedSpans.isEmpty,
+        whitespace: whitespace,
+      );
 
       final children = scopedSpans
-          .map((s) => s is SpanBuilder ? s.call(context) : s)
+          .map((s) => s(context, whitespace))
           .whereType<InlineSpan>()
           .toList(growable: false);
       if (text.isEmpty) {
@@ -268,7 +272,10 @@ class _String {
 }
 
 extension _StringListToText on List<_String> {
-  String toText({bool dropNewLine = false}) {
+  String toText({
+    bool dropNewLine = false,
+    required CssWhitespace whitespace,
+  }) {
     if (isEmpty) return '';
 
     if (dropNewLine && last.isNewLine) {
@@ -279,7 +286,11 @@ extension _StringListToText on List<_String> {
     final buffer = StringBuffer();
     for (final str in this) {
       if (str.isWhitespace) {
-        buffer.write(' ');
+        if (whitespace == CssWhitespace.pre) {
+          buffer.write(str.data);
+        } else {
+          buffer.write(' ');
+        }
       } else {
         buffer.write(str.data);
       }

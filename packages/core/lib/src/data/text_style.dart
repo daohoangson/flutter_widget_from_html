@@ -26,6 +26,9 @@ class TextStyleHtml {
   /// The overflow behavior.
   final TextOverflow? textOverflow;
 
+  /// The whitespace behavior.
+  final CssWhitespace whitespace;
+
   TextStyleHtml._({
     required Iterable<dynamic> deps,
     this.height,
@@ -35,6 +38,7 @@ class TextStyleHtml {
     this.textAlign,
     required this.textDirection,
     this.textOverflow,
+    required this.whitespace,
   }) : _deps = deps;
 
   /// Creates the root text style.
@@ -55,6 +59,7 @@ class TextStyleHtml {
       deps: deps,
       style: style,
       textDirection: _getDependency<TextDirection>(deps),
+      whitespace: CssWhitespace.normal,
     );
   }
 
@@ -75,6 +80,7 @@ class TextStyleHtml {
     TextAlign? textAlign,
     TextDirection? textDirection,
     TextOverflow? textOverflow,
+    CssWhitespace? whitespace,
   }) =>
       TextStyleHtml._(
         deps: _deps,
@@ -85,6 +91,7 @@ class TextStyleHtml {
         textAlign: textAlign ?? this.textAlign,
         textDirection: textDirection ?? this.textDirection,
         textOverflow: textOverflow ?? this.textOverflow,
+        whitespace: whitespace ?? this.whitespace,
       );
 
   /// Gets dependency value by type.

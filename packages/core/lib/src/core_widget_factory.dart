@@ -256,10 +256,10 @@ class WidgetFactory {
 
       if (flattened.spanBuilder == null) continue;
       widgets.add(WidgetPlaceholder<BuildTree>(tree).wrapWith((context, _) {
-        final span = flattened.spanBuilder!(context);
+        final tsh = tree.tsb.build(context);
+        final span = flattened.spanBuilder!(context, tsh.whitespace);
         if (span == null || span is! InlineSpan) return widget0;
 
-        final tsh = tree.tsb.build(context);
         final textAlign = tsh.textAlign ?? TextAlign.start;
 
         if (span is WidgetSpan &&
@@ -534,20 +534,19 @@ class WidgetFactory {
       case kTagKbd:
       case kTagSamp:
       case kTagTt:
-        meta.tsb
-            .enqueue(TextStyleOps.fontFamily, [kTagCodeFont1, kTagCodeFont2]);
+        meta.tsb.enqueue(
+            TextStyleOps.fontFamily, const [kTagCodeFont1, kTagCodeFont2]);
         break;
       case kTagPre:
         _tagPre ??= BuildOp(
-          onTree: (meta, tree) =>
-              tree.replaceWith(TextBit(tree, meta.element.text, tsb: tree.tsb)),
-          onWidgets: (meta, widgets) => listOrNull(
-              buildColumnPlaceholder(meta, widgets)
-                  ?.wrapWith((_, w) => buildHorizontalScrollView(meta, w))),
-        );
+            onWidgets: (meta, widgets) => listOrNull(
+                buildColumnPlaceholder(meta, widgets)
+                    ?.wrapWith((_, w) => buildHorizontalScrollView(meta, w))));
         meta
           ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssFontFamily] = '$kTagCodeFont1, $kTagCodeFont2'
+          ..[kCssWhitespace] = kCssWhitespacePre
+          ..tsb.enqueue(
+              TextStyleOps.fontFamily, const [kTagCodeFont1, kTagCodeFont2])
           ..register(_tagPre!);
         break;
 
@@ -831,6 +830,15 @@ class WidgetFactory {
       case kCssVerticalAlign:
         _styleVerticalAlign ??= StyleVerticalAlign(this).buildOp;
         meta.register(_styleVerticalAlign!);
+        break;
+
+      case kCssWhitespace:
+        final term = style.term;
+        final whitespace =
+            term != null ? TextStyleOps.whitespaceTryParse(term) : null;
+        if (whitespace != null) {
+          meta.tsb.enqueue(TextStyleOps.whitespace, whitespace);
+        }
         break;
     }
 
