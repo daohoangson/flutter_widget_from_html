@@ -33,8 +33,23 @@ class Flattener {
     _flattened = [];
 
     _resetLoop(tree.tsb);
-    for (final bit in tree.bits) {
-      _loop(bit);
+
+    final bits = tree.bits.toList(growable: false);
+    var min = 0;
+    var max = bits.length - 1;
+    for (; min <= max; min++) {
+      if (bits[min] is! WhitespaceBit) {
+        break;
+      }
+    }
+    for (; max >= min; max--) {
+      if (bits[max] is! WhitespaceBit) {
+        break;
+      }
+    }
+
+    for (var i = min; i <= max; i++) {
+      _loop(bits[i]);
     }
     _completeLoop();
 
@@ -85,7 +100,11 @@ class Flattener {
       _saveSpan();
       _spans!.add(built);
     } else if (built is String) {
-      if (built != ' ' || !_loopShouldSwallowWhitespace(bit)) {
+      if (bit is WhitespaceBit) {
+        if (!_loopShouldSwallowWhitespace(bit)) {
+          _prevBuffer.write(' ');
+        }
+      } else {
         _prevBuffer.write(built);
       }
     } else if (built is Widget) {

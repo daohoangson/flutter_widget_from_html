@@ -402,12 +402,16 @@ void main() async {
   });
 
   group('code', () {
+    final php = '<span style="color: #000000">'
+        '<span style="color: #0000BB">&lt;?php\n'
+        'phpinfo</span>'
+        '<span style="color: #007700">();\n'
+        '</span>'
+        '<span style="color: #0000BB">?&gt;</span>'
+        '</span>';
+
     testWidgets('renders CODE tag', (WidgetTester tester) async {
-      final html = '<code><span style="color: #000000">'
-          '<span style="color: #0000BB">&lt;?php phpinfo</span>'
-          '<span style="color: #007700">(); </span>'
-          '<span style="color: #0000BB">?&gt;</span>'
-          '</span></code>';
+      final html = '<code>$php</code>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -431,9 +435,7 @@ void main() async {
     });
 
     testWidgets('renders PRE tag', (WidgetTester tester) async {
-      final html = """<pre>&lt;?php
-highlight_string('&lt;?php phpinfo(); ?&gt;');
-?&gt;</pre>""";
+      final html = '<pre>$php</pre>';
       final explained = await explain(tester, html);
       expect(
           explained,

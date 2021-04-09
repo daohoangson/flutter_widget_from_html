@@ -198,8 +198,8 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
   /// Adds a new line.
   BuildBit addNewLine() => add(_SwallowWhitespaceBit(this, 10));
 
-  /// Adds a whitespace.
-  BuildBit addWhitespace() => add(WhitespaceBit(this));
+  /// Adds whitespace.
+  BuildBit addWhitespace(String data) => add(WhitespaceBit(this, data));
 
   /// Adds a string of text.
   TextBit addText(String data) => add(TextBit(this, data));
@@ -331,17 +331,25 @@ class WidgetBit extends BuildBit<Null, dynamic> {
 }
 
 /// A whitespace bit.
-class WhitespaceBit extends _SwallowWhitespaceBit {
+class WhitespaceBit extends BuildBit<Null, String> {
+  final String data;
+
   /// Creates a whitespace.
-  WhitespaceBit(BuildTree parent, {TextStyleBuilder? tsb})
-      : super(parent, 32, tsb: tsb ?? parent.tsb);
+  WhitespaceBit(BuildTree parent, this.data, {TextStyleBuilder? tsb})
+      : super(parent, tsb ?? parent.tsb);
+
+  @override
+  bool get swallowWhitespace => true;
+
+  @override
+  String buildBit(Null _) => data;
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      WhitespaceBit(parent ?? this.parent!, tsb: tsb ?? this.tsb);
+      WhitespaceBit(parent ?? this.parent!, data, tsb: tsb ?? this.tsb);
 
   @override
-  String toString() => 'Whitespace#$hashCode';
+  String toString() => 'Whitespace[' + data.codeUnits.join(' ') + ']#$hashCode';
 }
 
 class _SwallowWhitespaceBit extends BuildBit<Null, String> {
