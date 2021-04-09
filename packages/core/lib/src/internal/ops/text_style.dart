@@ -204,6 +204,20 @@ class TextStyleOps {
     return null;
   }
 
+  static TextStyleHtml whitespace(TextStyleHtml p, CssWhitespace v) =>
+      p.copyWith(whitespace: v);
+
+  static CssWhitespace? whitespaceTryParse(String value) {
+    switch (value) {
+      case kCssWhitespacePre:
+        return CssWhitespace.pre;
+      case kCssWhitespaceNormal:
+        return CssWhitespace.normal;
+    }
+
+    return null;
+  }
+
   static double? _fontSizeTryParse(TextStyleHtml p, css.Expression v) {
     final length = tryParseCssLength(v);
     if (length != null) {

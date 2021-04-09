@@ -359,7 +359,7 @@ void main() {
     test('Whitespace returns', () {
       final text = _text();
       text.addText('1');
-      final whitespace = text.addWhitespace();
+      final whitespace = text.addWhitespace(' ');
 
       final text2 = _text();
       text2.addText('1');
@@ -373,7 +373,7 @@ void main() {
   test('toString', () {
     final text = _text();
     text.addText('1');
-    text.addWhitespace();
+    text.addWhitespace(' ');
     final text2 = text.sub();
     text.add(text2);
     text2.addText('(2.1)');
@@ -389,7 +389,7 @@ void main() {
         helper.simplifyHashCode(text.toString()),
         equals('BuildTree#0 tsb#1:\n'
             '  "1"\n'
-            '  Whitespace#2\n'
+            '  Whitespace[32]#2\n'
             '  BuildTree#3 tsb#4(parent=#1):\n'
             '    "(2.1)"\n'
             '    BuildTree#5 tsb#6(parent=#4):\n'
@@ -526,9 +526,9 @@ class _OutputBuildTreeBit extends BuildBit<Null, BuildTree> {
 
   _OutputBuildTreeBit(BuildTree parent, TextStyleBuilder tsb)
       : tree = parent.sub(tsb: tsb)
-          ..addWhitespace()
+          ..addWhitespace(' ')
           ..addText('foo')
-          ..addWhitespace()
+          ..addWhitespace(' ')
           ..addText('bar'),
         super(parent, tsb);
 

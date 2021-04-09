@@ -19,7 +19,7 @@ void main() {
           equals('TshWidget\n'
               '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
               ' │  "Someone said"\n'
-              ' │  Whitespace#2\n'
+              ' │  Whitespace[32]#2\n'
               ' │  BuildTree#3 tsb#4(parent=#1):\n'
               ' │    QBit.opening#5 tsb#4(parent=#1)\n'
               ' │    "Foo"\n'

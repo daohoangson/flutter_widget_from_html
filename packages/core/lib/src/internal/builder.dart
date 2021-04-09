@@ -128,7 +128,10 @@ class BuildTree extends core_data.BuildTree {
       );
 
   void _addBitsFromNode(dom.Node domNode) {
-    if (domNode.nodeType == dom.Node.TEXT_NODE) return _addText(domNode.text!);
+    if (domNode.nodeType == dom.Node.TEXT_NODE) {
+      final text = domNode as dom.Text;
+      return _addText(text.data);
+    }
     if (domNode.nodeType != dom.Node.ELEMENT_NODE) return;
 
     final element = domNode as dom.Element;
@@ -166,17 +169,40 @@ class BuildTree extends core_data.BuildTree {
     final end = trailing == null ? data.length : trailing.start;
 
     if (end <= start) {
-      addWhitespace();
+      // the string contains all spaces
+      addWhitespace(data);
       return;
     }
 
-    if (start > 0) addWhitespace();
+    if (start > 0) addWhitespace(leading!.group(0)!);
 
-    final substring = data.substring(start, end);
-    final dedup = substring.replaceAll(_regExpSpaces, ' ');
-    addText(dedup);
+    final contents = data.substring(start, end);
+    final spaces = _regExpSpaces.allMatches(contents);
+    var offset = 0;
+    for (final space in [...spaces, null]) {
+      if (space == null) {
+        // reaches end of string
+        final text = contents.substring(offset);
+        if (text.isNotEmpty) {
+          addText(text);
+        }
+        break;
+      } else {
+        final spaceData = space.group(0)!;
+        if (spaceData == ' ') {
+          // micro optimization: ignore single space (ASCII 32)
+          continue;
+        }
 
-    if (end < data.length) addWhitespace();
+        final text = contents.substring(offset, space.start);
+        addText(text);
+
+        addWhitespace(spaceData);
+        offset = space.end;
+      }
+    }
+
+    if (end < data.length) addWhitespace(trailing!.group(0)!);
   }
 
   void _collectMetadata(BuildMetadata meta) {

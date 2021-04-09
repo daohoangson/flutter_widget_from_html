@@ -402,12 +402,16 @@ void main() async {
   });
 
   group('code', () {
+    final php = '<span style="color: #000000">'
+        '<span style="color: #0000BB">&lt;?php\n'
+        'phpinfo</span>'
+        '<span style="color: #007700">();\n'
+        '</span>'
+        '<span style="color: #0000BB">?&gt;</span>'
+        '</span>';
+
     testWidgets('renders CODE tag', (WidgetTester tester) async {
-      final html = '<code><span style="color: #000000">'
-          '<span style="color: #0000BB">&lt;?php phpinfo</span>'
-          '<span style="color: #007700">(); </span>'
-          '<span style="color: #0000BB">?&gt;</span>'
-          '</span></code>';
+      final html = '<code>$php</code>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -431,16 +435,17 @@ void main() async {
     });
 
     testWidgets('renders PRE tag', (WidgetTester tester) async {
-      final html = """<pre>&lt;?php
-highlight_string('&lt;?php phpinfo(); ?&gt;');
-?&gt;</pre>""";
+      final html = '<pre>$php</pre>';
       final explained = await explain(tester, html);
       expect(
           explained,
           equals('[CssBlock:child=[SingleChildScrollView:child=[RichText:'
-              '(+font=Courier+fonts=monospace:<?php\nhighlight_string(\''
-              '<?php phpinfo(); ?>\');\n?>)]'
-              ']]'));
+              '(+font=Courier+fonts=monospace:'
+              '(#FF0000BB:<?php\nphpinfo)'
+              '(#FF007700:();\n)'
+              '(#FF0000BB:?>)'
+              ')'
+              ']]]'));
     });
 
     testWidgets('renders SAMP tag', (WidgetTester tester) async {
@@ -1500,6 +1505,40 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
             explained,
             equals(
                 '[CssBlock:child=[RichText:maxLines=2,overflow=ellipsis,(:Foo)]]'));
+      });
+    });
+  });
+
+  group('white-space', () {
+    testWidgets('renders normal', (tester) async {
+      final html = '<div style="white-space: normal">Foo\nbar</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo bar)]]'));
+    });
+
+    testWidgets('renders pre', (tester) async {
+      final html = '<div style="white-space: pre">Foo\nbar</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo\nbar)]]'));
+    });
+
+    group('PRE tag', () {
+      testWidgets('renders without inline styling', (tester) async {
+        final html = '<pre>Foo\nbar</pre>';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[CssBlock:child=[SingleChildScrollView:child='
+                '[RichText:(+font=Courier+fonts=monospace:Foo\nbar)]]]'));
+      });
+
+      testWidgets('renders normal', (tester) async {
+        final html = '<pre style="white-space: normal">Foo\nbar</pre>';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[CssBlock:child=[SingleChildScrollView:child='
+                '[RichText:(+font=Courier+fonts=monospace:Foo bar)]]]'));
       });
     });
   });
