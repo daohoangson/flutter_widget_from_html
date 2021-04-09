@@ -539,8 +539,6 @@ class WidgetFactory {
         break;
       case kTagPre:
         _tagPre ??= BuildOp(
-          defaultStyles: (_) =>
-              const {kCssFontFamily: '$kTagCodeFont1, $kTagCodeFont2'},
           onTree: (meta, tree) =>
               tree.replaceWith(TextBit(tree, meta.element.text, tsb: tree.tsb)),
           onWidgets: (meta, widgets) => listOrNull(
@@ -549,6 +547,7 @@ class WidgetFactory {
         );
         meta
           ..[kCssDisplay] = kCssDisplayBlock
+          ..[kCssFontFamily] = '$kTagCodeFont1, $kTagCodeFont2'
           ..register(_tagPre!);
         break;
 
@@ -590,12 +589,11 @@ class WidgetFactory {
         break;
 
       case 'hr':
-        _tagHr ??= BuildOp(
-          defaultStyles: (_) => const {'margin-bottom': '1em'},
-          onWidgets: (meta, _) => listOrNull(buildDivider(meta)),
-        );
+        _tagHr ??=
+            BuildOp(onWidgets: (meta, _) => listOrNull(buildDivider(meta)));
         meta
           ..[kCssDisplay] = kCssDisplayBlock
+          ..[kCssMargin + kSuffixBottom] = '1em'
           ..register(_tagHr!);
         break;
 
