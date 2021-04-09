@@ -1509,6 +1509,40 @@ foo <span style="text-decoration: none">bar</span></span></span></span>
     });
   });
 
+  group('white-space', () {
+    testWidgets('renders normal', (tester) async {
+      final html = '<div style="white-space: normal">Foo\nbar</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo bar)]]'));
+    });
+
+    testWidgets('renders pre', (tester) async {
+      final html = '<div style="white-space: pre">Foo\nbar</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo\nbar)]]'));
+    });
+
+    group('PRE tag', () {
+      testWidgets('renders without inline styling', (tester) async {
+        final html = '<pre>Foo\nbar</pre>';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[CssBlock:child=[SingleChildScrollView:child='
+                '[RichText:(+font=Courier+fonts=monospace:Foo\nbar)]]]'));
+      });
+
+      testWidgets('renders normal', (tester) async {
+        final html = '<pre style="white-space: normal">Foo\nbar</pre>';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals('[CssBlock:child=[SingleChildScrollView:child='
+                '[RichText:(+font=Courier+fonts=monospace:Foo bar)]]]'));
+      });
+    });
+  });
+
   group('DefaultTextStyle with null properties (#460)', () {
     testWidgets('renders textScaleFactor > 1 (control group)', (tester) async {
       tester.binding.window.textScaleFactorTestValue = 2;
