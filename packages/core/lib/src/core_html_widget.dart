@@ -88,6 +88,9 @@ class HtmlWidget extends StatefulWidget {
       ]);
   final RebuildTriggers? _rebuildTriggers;
 
+  /// The HTML body render mode.
+  final RenderMode renderMode;
+
   /// The default styling for text elements.
   final TextStyle? textStyle;
 
@@ -108,6 +111,7 @@ class HtmlWidget extends StatefulWidget {
     this.onTapImage,
     this.onTapUrl,
     RebuildTriggers? rebuildTriggers,
+    this.renderMode = RenderMode.Column,
     this.textStyle = const TextStyle(),
   })  : _rebuildTriggers = rebuildTriggers,
         super(key: key);

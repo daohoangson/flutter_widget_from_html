@@ -48,10 +48,28 @@ class WidgetFactory {
           BuildMetadata meta, Widget child, double aspectRatio) =>
       AspectRatio(aspectRatio: aspectRatio, child: child);
 
-  /// Builds primary column (body).
-  WidgetPlaceholder? buildBody(
-          BuildMetadata meta, Iterable<WidgetPlaceholder> children) =>
-      buildColumnPlaceholder(meta, children, trimMarginVertical: true);
+  /// Builds body.
+  Widget? buildBody(BuildMetadata meta, Iterable<WidgetPlaceholder> children) {
+    final renderMode = _widget?.renderMode ?? RenderMode.Column;
+    switch (renderMode) {
+      case RenderMode.Column:
+        return buildColumnPlaceholder(meta, children, trimMarginVertical: true);
+      case RenderMode.LisView:
+        final list = children.toList(growable: false);
+        return ListView.builder(
+          itemBuilder: (_, i) => list[i],
+          itemCount: list.length,
+        );
+      case RenderMode.SliverList:
+        final list = children.toList(growable: false);
+        return SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (_, i) => list[i],
+            childCount: list.length,
+          ),
+        );
+    }
+  }
 
   /// Builds [border] with [Container] or [DecoratedBox].
   ///

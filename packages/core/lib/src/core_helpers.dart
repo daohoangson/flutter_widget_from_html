@@ -76,6 +76,28 @@ class RebuildTriggers {
   }
 }
 
+/// The HTML body render modes.
+enum RenderMode {
+  /// The body will be rendered as a `Column` widget.
+  ///
+  /// This is the default render mode.
+  /// It's good enough for small / medium document and can be used easily.
+  Column,
+
+  /// The body will be rendered as a `ListView` widget.
+  ///
+  /// It's good for medium / large document in a dedicated page layout
+  /// (e.g. the HTML document is the only thing on the screen).
+  LisView,
+
+  /// The body will be rendered as a `SliverList` sliver.
+  ///
+  /// It's good for large / huge document and can be put in the same scrolling
+  /// context with other contents.
+  /// A [CustomScrollView] or similar is required for this to work.
+  SliverList,
+}
+
 /// A widget builder that supports builder callbacks.
 class WidgetPlaceholder<T> extends StatelessWidget {
   /// The origin of this widget.
