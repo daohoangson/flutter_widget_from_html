@@ -201,6 +201,31 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     return built;
   }
 
+  Widget _buildAsyncBuilder(
+      BuildContext context, AsyncSnapshot<Widget> snapshot) {
+    final built = snapshot.data;
+    if (built != null) return built;
+
+    final indicator = Theme.of(context).platform == TargetPlatform.iOS
+        ? const Center(
+            child: Padding(
+                padding: EdgeInsets.all(8),
+                child: CupertinoActivityIndicator()))
+        : const Center(
+            child: Padding(
+                padding: EdgeInsets.all(8),
+                child: CircularProgressIndicator()));
+
+    switch (widget.renderMode) {
+      case RenderMode.Column:
+        return indicator;
+      case RenderMode.ListView:
+        return indicator;
+      case RenderMode.SliverList:
+        return SliverToBoxAdapter(child: indicator);
+    }
+  }
+
   Widget _buildSync() {
     Timeline.startSync('Build $widget (sync)');
 
@@ -239,18 +264,6 @@ class _RootTsb extends TextStyleBuilder {
 
   void reset() => _output = null;
 }
-
-Widget _buildAsyncBuilder(
-        BuildContext context, AsyncSnapshot<Widget> snapshot) =>
-    snapshot.data ??
-    Center(
-      child: Padding(
-        padding: EdgeInsets.all(8),
-        child: Theme.of(context).platform == TargetPlatform.iOS
-            ? CupertinoActivityIndicator()
-            : CircularProgressIndicator(),
-      ),
-    );
 
 Widget _buildBody(_HtmlWidgetState state, dom.NodeList domNodes) {
   final rootMeta = state._rootMeta;
