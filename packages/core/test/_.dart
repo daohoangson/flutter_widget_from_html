@@ -491,9 +491,7 @@ class Explainer {
         ? widget.textDirection
         : widget is RichText
             ? widget.textDirection
-            : widget is Stack
-                ? widget.textDirection
-                : (widget is Text ? widget.textDirection : null)));
+            : (widget is Text ? widget.textDirection : null)));
 
     attr.add(_textOverflow(widget is RichText
         ? widget.overflow

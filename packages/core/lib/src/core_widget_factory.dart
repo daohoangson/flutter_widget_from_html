@@ -40,8 +40,18 @@ class WidgetFactory {
 
   /// Builds [Align].
   Widget? buildAlign(
-          BuildMetadata meta, Widget child, AlignmentGeometry alignment) =>
-      Align(alignment: alignment, child: child);
+    BuildMetadata meta,
+    Widget child,
+    AlignmentGeometry alignment, {
+    double? heightFactor,
+    double? widthFactor,
+  }) =>
+      Align(
+        alignment: alignment,
+        heightFactor: heightFactor,
+        widthFactor: widthFactor,
+        child: child,
+      );
 
   /// Builds [AspectRatio].
   Widget? buildAspectRatio(
@@ -205,15 +215,6 @@ class WidgetFactory {
       padding == EdgeInsets.zero
           ? child
           : Padding(padding: padding, child: child);
-
-  /// Builds [Stack].
-  Widget? buildStack(
-          BuildMetadata meta, TextStyleHtml tsh, List<Widget> children) =>
-      Stack(
-        clipBehavior: Clip.none,
-        textDirection: tsh.textDirection,
-        children: children,
-      );
 
   /// Builds [RichText].
   Widget? buildText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) =>
