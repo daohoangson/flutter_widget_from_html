@@ -88,7 +88,7 @@ enum RenderMode {
   ///
   /// It's good for medium / large document in a dedicated page layout
   /// (e.g. the HTML document is the only thing on the screen).
-  LisView,
+  ListView,
 
   /// The body will be rendered as a `SliverList` sliver.
   ///

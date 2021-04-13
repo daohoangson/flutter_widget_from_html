@@ -54,7 +54,7 @@ class WidgetFactory {
     switch (renderMode) {
       case RenderMode.Column:
         return buildColumnPlaceholder(meta, children, trimMarginVertical: true);
-      case RenderMode.LisView:
+      case RenderMode.ListView:
         final list = children.toList(growable: false);
         return ListView.builder(
           itemBuilder: (_, i) => list[i],
