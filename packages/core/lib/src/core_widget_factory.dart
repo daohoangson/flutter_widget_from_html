@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'internal/core_ops.dart';
 import 'internal/core_parser.dart';
 import 'internal/flattener.dart';
+import 'internal/margin_vertical.dart';
 import 'internal/platform_specific/fallback.dart'
     if (dart.library.io) 'internal/platform_specific/io.dart';
 import 'core_data.dart';
@@ -59,23 +60,61 @@ class WidgetFactory {
       AspectRatio(aspectRatio: aspectRatio, child: child);
 
   /// Builds body.
-  Widget? buildBody(BuildMetadata meta, Iterable<WidgetPlaceholder> children) {
+  WidgetPlaceholder? buildBody(
+          BuildMetadata meta, Iterable<WidgetPlaceholder> children) =>
+      buildColumnPlaceholder(meta, children)?.wrapWith(buildBodyWidget);
+
+  /// Builds body widget.
+  Widget buildBodyWidget(BuildContext context, Widget child) {
+    var children = child is Column ? child.children : [child];
     final renderMode = _widget?.renderMode ?? RenderMode.Column;
+
+    if (children.isNotEmpty && children.first is HeightPlaceholder) {
+      children.removeAt(0);
+    }
+    if (children.isNotEmpty && children.last is HeightPlaceholder) {
+      children.removeLast();
+    }
+
+    while (children.length == 1) {
+      final child = children.first;
+      if (child is Column) {
+        children = child.children;
+        continue;
+      }
+
+      if (renderMode != RenderMode.Column && child is CssBlock) {
+        final grandChild = child.child;
+        if (grandChild is Column) {
+          children = grandChild.children;
+          continue;
+        }
+      }
+
+      break;
+    }
+
     switch (renderMode) {
       case RenderMode.Column:
-        return buildColumnPlaceholder(meta, children, trimMarginVertical: true);
+        if (children.length == 1) {
+          return children.first;
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: children,
+        );
       case RenderMode.ListView:
-        final list = children.toList(growable: false);
         return ListView.builder(
-          itemBuilder: (_, i) => list[i],
-          itemCount: list.length,
+          itemBuilder: (_, i) => children[i],
+          itemCount: children.length,
         );
       case RenderMode.SliverList:
-        final list = children.toList(growable: false);
         return SliverList(
           delegate: SliverChildBuilderDelegate(
-            (_, i) => list[i],
-            childCount: list.length,
+            (_, i) => children[i],
+            childCount: children.length,
           ),
         );
     }
@@ -100,27 +139,13 @@ class WidgetFactory {
 
   /// Builds column placeholder.
   WidgetPlaceholder? buildColumnPlaceholder(
-    BuildMetadata meta,
-    Iterable<WidgetPlaceholder> children, {
-    bool trimMarginVertical = false,
-  }) {
+      BuildMetadata meta, Iterable<WidgetPlaceholder> children) {
     if (children.isEmpty) return null;
-
-    if (children.length == 1) {
-      final child = children.first;
-      if (child is ColumnPlaceholder) {
-        if (child.trimMarginVertical == trimMarginVertical) {
-          return child;
-        }
-      } else {
-        return child;
-      }
-    }
+    if (children.length == 1) return children.first;
 
     return ColumnPlaceholder(
-      children,
+      children: children,
       meta: meta,
-      trimMarginVertical: trimMarginVertical,
       wf: this,
     );
   }

@@ -600,7 +600,7 @@ void main() async {
   });
 
   group('rtl', () {
-    final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';
+    final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li></ol>';
 
     final explainerExpected =
         '[CssBlock:child=[Padding:(0,40,0,0),child=[Column:dir=rtl,children='
@@ -660,7 +660,11 @@ void main() async {
     testWidgets('renders within dir attribute', (tester) async {
       final _dirRtl = '<div dir="rtl">$html</div>';
       final explained = await explain(tester, _dirRtl, useExplainer: false);
-      expect(explained, equals(nonExplainerExpected));
+
+      // we don't care about the actual HTML of the `ColumnPlaceholder`
+      final explained2 = explained.replaceAll(_dirRtl, '<root></root>');
+
+      expect(explained2, equals(nonExplainerExpected));
     });
   });
 

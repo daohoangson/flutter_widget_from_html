@@ -278,6 +278,11 @@ class Explainer {
   List<String> _cssSizing(CssSizing w) {
     final attr = <String>[];
 
+    if (w.runtimeType != CssSizing) {
+      // ignore subclasses
+      return attr;
+    }
+
     if (w.minHeight != null) attr.add('height≥${w.minHeight}');
     if (w.maxHeight != null) attr.add('height≤${w.maxHeight}');
     if (w.preferredHeight != null) attr.add('height=${w.preferredHeight}');
