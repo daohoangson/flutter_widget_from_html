@@ -16,3 +16,5 @@ This repo contains the source code for everything `HtmlWidget`-related.
 | [fwfh_url_launcher](./packages/fwfh_url_launcher/)                 | [![pub package](https://img.shields.io/pub/v/fwfh_url_launcher.svg)](https://pub.dev/packages/fwfh_url_launcher)                         |
 | [fwfh_webview](./packages/fwfh_webview/)                           | [![pub package](https://img.shields.io/pub/v/fwfh_webview.svg)](https://pub.dev/packages/fwfh_webview)                                   |
 | [Demo app](./demo_app/)                                            | https://html-widget-demo.now.sh, [supported/tags.html](https://html-widget-demo.now.sh/supported/tags.html)                              |
+
+<a href="https://www.buymeacoffee.com/daohoangson" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>

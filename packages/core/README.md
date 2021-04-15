@@ -126,6 +126,8 @@ These tags and their contents will be ignored:
 - white-space: normal/pre
 - Sizing (width, height, max-xxx, min-xxx): `auto` or values in `em`, `%`, `pt` and `px`
 
+<a href="https://www.buymeacoffee.com/daohoangson" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
 ## Extensibility
 
 This package implements widget building logic with high testing coverage to ensure correctness. It tries to render an optimal tree by using `RichText` with specific `TextStyle`, merging text spans together, showing images in sized box, etc. The idea is to build a solid foundation for apps to customize easily. There are two ways to alter the output widget tree.
