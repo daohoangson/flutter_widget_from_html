@@ -222,7 +222,6 @@ class _HtmlWidgetState extends State<HtmlWidget> {
 
     switch (widget.renderMode) {
       case RenderMode.Column:
-        return indicator;
       case RenderMode.ListView:
         return indicator;
       case RenderMode.SliverList:
