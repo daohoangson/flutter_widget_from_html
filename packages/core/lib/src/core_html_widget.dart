@@ -29,7 +29,7 @@ class HtmlWidget extends StatefulWidget {
 
   /// The callback to handle async build snapshot.
   ///
-  /// By default, a [CircularProgressIndicator] will be shown until
+  /// By default, a platform-dependent indicator will be shown until
   /// the widget tree is ready.
   /// This default builder doesn't do any error handling
   /// (it will just ignore any errors).
@@ -88,7 +88,11 @@ class HtmlWidget extends StatefulWidget {
       ]);
   final RebuildTriggers? _rebuildTriggers;
 
-  /// The HTML body render mode.
+  /// The render mode.
+  ///
+  /// - [RenderMode.Column] is the default mode, suitable for small / medium document.
+  /// - [RenderMode.ListView] has better performance as it renders contents lazily.
+  /// - [RenderMode.SliverList] has similar performance as `ListView` and can be put inside a `CustomScrollView`.
   final RenderMode renderMode;
 
   /// The default styling for text elements.
