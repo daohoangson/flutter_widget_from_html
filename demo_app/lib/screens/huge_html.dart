@@ -5234,9 +5234,14 @@ class _ListViewScreen extends StatelessWidget {
 class _SliverListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text('renderMode: SliverList')),
         body: CustomScrollView(
           slivers: [
+            SliverAppBar(
+              title: Text('renderMode: SliverList'),
+              floating: true,
+              expandedHeight: 200,
+              flexibleSpace: Placeholder(),
+            ),
             SliverPadding(
               padding: const EdgeInsets.all(8.0),
               sliver: HtmlWidget(kHtml, renderMode: RenderMode.SliverList),
