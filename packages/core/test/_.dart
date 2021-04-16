@@ -344,20 +344,35 @@ class Explainer {
     return '($style$recognizerSb:$text$children)';
   }
 
+  String _key(Key key) {
+    final matches =
+        RegExp(r'^\[GlobalKey#[^ ]+ (.+)\]$').firstMatch(key.toString());
+    if (matches == null) return '';
+
+    return '#${matches.group(1)}';
+  }
+
   String _limitBox(LimitedBox box) => 'h=${box.maxHeight},w=${box.maxWidth}';
 
   String _sizedBox(SizedBox box) {
     var clazz = box.runtimeType.toString();
     var size = '${box.width?.toStringAsFixed(1) ?? 0.0}x'
         '${box.height?.toStringAsFixed(1) ?? 0.0}';
-    if (size == 'InfinityxInfinity') {
-      clazz = 'SizedBox.expand';
-      size = '';
+    switch (size) {
+      case '0.0x0.0':
+        clazz = 'SizedBox.shrink';
+        size = '';
+        break;
+      case 'InfinityxInfinity':
+        clazz = 'SizedBox.expand';
+        size = '';
+        break;
     }
 
+    final key = box.key != null ? _key(box.key!) : '';
     final child = box.child != null ? 'child=${_widget(box.child!)}' : '';
     final comma = size.isNotEmpty && child.isNotEmpty ? ',' : '';
-    return '[$clazz:$size$comma$child]';
+    return '[$clazz$key:$size$comma$child]';
   }
 
   String _textAlign(TextAlign? textAlign) =>
@@ -522,11 +537,6 @@ class Explainer {
     if (widget is Positioned) {
       attr.add('(${widget.top},${widget.right},'
           '${widget.bottom},${widget.left})');
-    }
-
-    if (widget is SizedBox) {
-      attr.add('${widget.width ?? 0.0}x'
-          '${widget.height ?? 0.0}');
     }
 
     if (widget is Tooltip) attr.add('message=${widget.message}');
