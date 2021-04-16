@@ -30,9 +30,15 @@ void main() async {
       expect(
           explained,
           equals('[CssBlock:child='
-              '[SizedBox.shrink#foo:child='
+              '[SizedBox#foo:child='
               '[RichText:(:Foo)]'
               ']]'));
+    });
+
+    testWidgets('renders SUP[id]', (WidgetTester tester) async {
+      final html = '<sup id="foo">Foo</sup>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('[SizedBox#foo'));
     });
   });
 

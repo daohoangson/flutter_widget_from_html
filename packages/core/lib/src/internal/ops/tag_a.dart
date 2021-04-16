@@ -31,6 +31,8 @@ class TagA {
           }
         },
         onWidgets: (meta, widgets) {
+          if (meta.willBuildSubtree == false) return widgets;
+
           final onTap = _gestureTapCallback(meta);
           if (onTap == null) return widgets;
 
