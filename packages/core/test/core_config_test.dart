@@ -385,9 +385,10 @@ void main() {
       WidgetTester tester,
       RenderMode renderMode, {
       bool buildAsync = false,
+      String? html,
     }) {
       final hw = HtmlWidget(
-        '<p>Foo</p><p>Bar</p>',
+        html ?? '<p>Foo</p><p>Bar</p>',
         buildAsync: buildAsync,
         key: helper.hwKey,
         renderMode: renderMode,
@@ -423,6 +424,16 @@ void main() {
     testWidgets('renders SliverList (buildAsync)', (WidgetTester tester) async {
       final e = await explain(tester, RenderMode.SliverList, buildAsync: true);
       expect(e, contains('└SliverToBoxAdapter('));
+    });
+
+    testWidgets('renders SliverList (CssBlock unwrap)', (tester) async {
+      final explained = await explain(
+        tester,
+        RenderMode.SliverList,
+        html: '<div><p>Foo</p><p>Bar</p></div>',
+      );
+      expect(explained.split('└CssBlock(').length, equals(3),
+          reason: '$explained has too many `CssBlock`s');
     });
   });
 
