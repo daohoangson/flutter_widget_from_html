@@ -20,6 +20,8 @@ class StyleBgColor {
           }
         },
         onWidgets: (meta, widgets) {
+          if (meta.willBuildSubtree == false) return widgets;
+
           final color = _parseColor(wf, meta);
           if (color == null) return null;
           return listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(

@@ -12,24 +12,33 @@ void main() async {
   await loadAppFonts();
 
   group('build test', () {
-    final expectation = 'TshWidget\n'
-        '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
-        ' │  BuildTree#2 tsb#3(parent=#1):\n'
-        ' │    WidgetBit.inline#4 WidgetPlaceholder(#foo)\n'
-        ' │)\n'
-        ' └WidgetPlaceholder<String>(#foo)\n'
-        '  └SizedBox-(height: 10.0)\n\n';
-
     testWidgets('renders A[name]', (WidgetTester tester) async {
-      final html = '<a name="foo"></a>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(explained, equals(expectation));
+      final html = '<a name="foo"></a>Foo';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:[SizedBox#foo:0.0x10.0](:Foo))]'));
     });
 
-    testWidgets('renders span[id]', (WidgetTester tester) async {
-      final html = '<span id="foo"></span>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(explained, equals(expectation));
+    testWidgets('renders SPAN[id]', (WidgetTester tester) async {
+      final html = '<span id="foo">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:[SizedBox#foo:0.0x10.0](:Foo))]'));
+    });
+
+    testWidgets('renders DIV[id]', (WidgetTester tester) async {
+      final html = '<div id="foo">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssBlock:child='
+              '[SizedBox#foo:child='
+              '[RichText:(:Foo)]'
+              ']]'));
+    });
+
+    testWidgets('renders SUP[id]', (WidgetTester tester) async {
+      final html = '<sup id="foo">Foo</sup>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('[SizedBox#foo'));
     });
   });
 
