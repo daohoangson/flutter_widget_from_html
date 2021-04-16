@@ -218,37 +218,27 @@ class TagTable {
       );
 
   static String? _getCssDisplayValue(BuildMetadata meta) {
-    String? value;
-    switch (meta.element.localName) {
-      case kTagTableRow:
-        value = kCssDisplayTableRow;
-        break;
-      case kTagTableHeaderGroup:
-        value = kCssDisplayTableHeaderGroup;
-        break;
-      case kTagTableRowGroup:
-        value = kCssDisplayTableRowGroup;
-        break;
-      case kTagTableFooterGroup:
-        value = kCssDisplayTableFooterGroup;
-        break;
-      case kTagTableHeaderCell:
-      case kTagTableCell:
-        return kCssDisplayTableCell;
-      case kTagTableCaption:
-        return kCssDisplayTableCaption;
-    }
-
-    if (value != null) {
-      meta[kCssDisplay] = value;
-      return value;
-    }
-
     for (final style in meta.element.styles.reversed) {
       if (style.property == kCssDisplay) {
         final term = style.term;
         if (term != null) return term;
       }
+    }
+
+    switch (meta.element.localName) {
+      case kTagTableRow:
+        return kCssDisplayTableRow;
+      case kTagTableHeaderGroup:
+        return kCssDisplayTableHeaderGroup;
+      case kTagTableRowGroup:
+        return kCssDisplayTableRowGroup;
+      case kTagTableFooterGroup:
+        return kCssDisplayTableFooterGroup;
+      case kTagTableHeaderCell:
+      case kTagTableCell:
+        return kCssDisplayTableCell;
+      case kTagTableCaption:
+        return kCssDisplayTableCaption;
     }
 
     return null;
