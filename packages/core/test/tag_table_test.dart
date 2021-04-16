@@ -693,6 +693,13 @@ void main() async {
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
+    testWidgets('TABLE display: none', (WidgetTester tester) async {
+      final html =
+          'Foo <table style="display: none"><tr><td>Bar</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
     testWidgets('standalone TD', (WidgetTester tester) async {
       final html = '<td>Foo</td>';
       final explained = await explain(tester, html);
@@ -711,10 +718,24 @@ void main() async {
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
+    testWidgets('TR display:none', (WidgetTester tester) async {
+      final html = '<table><tr style="display: none"><td>Foo</td></tr>'
+          '<tr><td>Bar</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[HtmlTable:children=${_richtext('Bar')}]'));
+    });
+
     testWidgets('#80: empty TD', (WidgetTester tester) async {
       final html = '<table><tr><td></td></tr></table>';
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
+    });
+
+    testWidgets('TD display:none', (WidgetTester tester) async {
+      final html = '<table><tr><td style="display: none">Foo</td>'
+          '<td>Bar</td></tr></table>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[HtmlTable:children=${_richtext('Bar')}]'));
     });
 
     testWidgets('empty CAPTION', (WidgetTester tester) async {
