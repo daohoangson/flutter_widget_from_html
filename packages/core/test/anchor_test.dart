@@ -34,6 +34,12 @@ void main() async {
               '[RichText:(:Foo)]'
               ']]'));
     });
+
+    testWidgets('renders SUP[id]', (WidgetTester tester) async {
+      final html = '<sup id="foo">Foo</sup>';
+      final explained = await explain(tester, html);
+      expect(explained, contains('[SizedBox#foo'));
+    });
   });
 
   final goldenSkip = Platform.isLinux ? null : 'Linux only';

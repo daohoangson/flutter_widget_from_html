@@ -932,14 +932,13 @@ class WidgetFactory {
           WidgetBit.inline(bit.parent!, widget).insertBefore(bit);
         }
       },
-      onWidgets: (meta, widgets) => listOrNull(
-        buildColumnPlaceholder(meta, widgets)?.wrapWith(
-          (context, child) => SizedBox.shrink(
-            key: anchor,
-            child: child,
-          ),
-        ),
-      ),
+      onWidgets: (meta, widgets) {
+        if (meta.willBuildSubtree == false) return widgets;
+
+        return listOrNull(buildColumnPlaceholder(meta, widgets)?.wrapWith(
+          (context, child) => SizedBox.shrink(key: anchor, child: child),
+        ));
+      },
       onWidgetsIsOptional: true,
     );
   }
