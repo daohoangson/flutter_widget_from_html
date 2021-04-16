@@ -30,7 +30,7 @@ void main() async {
       expect(
           explained,
           equals('[CssBlock:child='
-              '[SizedBox.shrink#foo:child='
+              '[SizedBox#foo:child='
               '[RichText:(:Foo)]'
               ']]'));
     });

@@ -936,7 +936,7 @@ class WidgetFactory {
         if (meta.willBuildSubtree == false) return widgets;
 
         return listOrNull(buildColumnPlaceholder(meta, widgets)?.wrapWith(
-          (context, child) => SizedBox.shrink(key: anchor, child: child),
+          (context, child) => SizedBox(key: anchor, child: child),
         ));
       },
       onWidgetsIsOptional: true,

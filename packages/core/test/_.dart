@@ -360,7 +360,9 @@ class Explainer {
         '${box.height?.toStringAsFixed(1) ?? 0.0}';
     switch (size) {
       case '0.0x0.0':
-        clazz = 'SizedBox.shrink';
+        if (box.width == 0.0 && box.height == 0.0) {
+          clazz = 'SizedBox.shrink';
+        }
         size = '';
         break;
       case 'InfinityxInfinity':
