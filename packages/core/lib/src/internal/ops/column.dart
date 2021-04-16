@@ -19,7 +19,11 @@ class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
   Widget build(BuildContext context) {
     final tsh = meta.tsb.build(context);
     final widgets = _buildWidgets(context);
-    final built = wf.buildColumnWidget(meta, tsh, widgets) ?? widget0;
+    final built = wf.buildColumnWidget(
+      context,
+      widgets,
+      dir: tsh.textDirection,
+    );
     return isBody ? wf.buildBodyWidget(context, built) : built;
   }
 
@@ -74,7 +78,9 @@ class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
     }
 
     final tsh = meta.tsb.build(context);
-    final column = wf.buildColumnWidget(meta, tsh, contents);
+    final column = contents.isNotEmpty
+        ? wf.buildColumnWidget(context, contents, dir: tsh.textDirection)
+        : null;
 
     return [
       if (marginTop != null) marginTop,

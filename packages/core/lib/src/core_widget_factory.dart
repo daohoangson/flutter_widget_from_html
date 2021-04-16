@@ -64,7 +64,27 @@ class WidgetFactory {
           BuildMetadata meta, Iterable<WidgetPlaceholder> children) =>
       buildColumnPlaceholder(meta, children)?.wrapWith(buildBodyWidget);
 
-  /// Builds body widget.
+  /// Builds body as [ListView].
+  Widget buildBodyListView(BuildContext context, List<Widget> children) =>
+      ListView.builder(
+        addAutomaticKeepAlives: false,
+        addSemanticIndexes: false,
+        itemBuilder: (_, i) => children[i],
+        itemCount: children.length,
+      );
+
+  /// Builds body as [SliverList].
+  Widget buildBodySliverList(BuildContext context, List<Widget> children) =>
+      SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (_, i) => children[i],
+          addAutomaticKeepAlives: false,
+          addSemanticIndexes: false,
+          childCount: children.length,
+        ),
+      );
+
+  /// Builds body widget (see [HtmlWidget.renderMode]).
   Widget buildBodyWidget(BuildContext context, Widget child) {
     var children = child is Column ? child.children : [child];
     final renderMode = _widget?.renderMode ?? RenderMode.Column;
@@ -96,27 +116,11 @@ class WidgetFactory {
 
     switch (renderMode) {
       case RenderMode.Column:
-        if (children.length == 1) {
-          return children.first;
-        }
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: children,
-        );
+        return buildColumnWidget(context, children);
       case RenderMode.ListView:
-        return ListView.builder(
-          itemBuilder: (_, i) => children[i],
-          itemCount: children.length,
-        );
+        return buildBodyListView(context, children);
       case RenderMode.SliverList:
-        return SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (_, i) => children[i],
-            childCount: children.length,
-          ),
-        );
+        return buildBodySliverList(context, children);
     }
   }
 
@@ -151,15 +155,14 @@ class WidgetFactory {
   }
 
   /// Builds [Column].
-  Widget? buildColumnWidget(
-      BuildMetadata meta, TextStyleHtml tsh, List<Widget> children) {
-    if (children.isEmpty) return null;
+  Widget buildColumnWidget(BuildContext context, List<Widget> children,
+      {TextDirection? dir}) {
     if (children.length == 1) return children.first;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      textDirection: tsh.textDirection,
+      textDirection: dir,
       children: children,
     );
   }

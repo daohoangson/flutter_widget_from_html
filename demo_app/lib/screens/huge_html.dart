@@ -5214,7 +5214,9 @@ class _ColumnScreen extends StatelessWidget {
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: HtmlWidget(kHtml, renderMode: RenderMode.Column),
+            child: RepaintBoundary(
+              child: HtmlWidget(kHtml, renderMode: RenderMode.Column),
+            ),
           ),
         ),
       );
