@@ -908,17 +908,39 @@ class WidgetFactory {
     return baseUrl.resolveUri(uri).toString();
   }
 
-  BuildOp _anchorOp(String id) => BuildOp(onTree: (meta, tree) {
-        final anchor = GlobalKey();
-        _anchors[id] = anchor;
-        tree.add(WidgetBit.inline(
-          tree,
-          WidgetPlaceholder('#$id').wrapWith(
-            (context, _) => SizedBox(
-              height: meta.tsb.build(context).style.fontSize,
-              key: anchor,
-            ),
+  BuildOp _anchorOp(String id) {
+    final anchor = GlobalKey(debugLabel: id);
+    _anchors[id] = anchor;
+
+    return BuildOp(
+      onTree: (meta, tree) {
+        if (meta.willBuildSubtree == true) return;
+
+        final widget = WidgetPlaceholder('#$id').wrapWith(
+          (context, _) => SizedBox(
+            height: meta.tsb.build(context).style.fontSize,
+            key: anchor,
           ),
-        ));
-      });
+        );
+
+        final bit = tree.first;
+        if (bit == null) {
+          // most likely an A[name]
+          tree.add(WidgetBit.inline(tree, widget));
+        } else {
+          // most likely a SPAN[id]
+          WidgetBit.inline(bit.parent!, widget).insertBefore(bit);
+        }
+      },
+      onWidgets: (meta, widgets) => listOrNull(
+        buildColumnPlaceholder(meta, widgets)?.wrapWith(
+          (context, child) => SizedBox.shrink(
+            key: anchor,
+            child: child,
+          ),
+        ),
+      ),
+      onWidgetsIsOptional: true,
+    );
+  }
 }
