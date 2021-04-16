@@ -407,15 +407,17 @@ void main() {
 
   group('trimming', () {
     testWidgets('trims top intances', (WidgetTester tester) async {
-      final html = '<div style="margin-top: 1em">Foo</div>';
+      final html = '<div style="margin-top: 1em">'
+          '<div style="margin-top: 1em">Foo</div></div>';
       final explained = await helper.explain(tester, html);
-      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+      expect(explained, isNot(contains('[SizedBox:')));
     });
 
     testWidgets('trims bottom instances', (WidgetTester tester) async {
-      final html = '<div style="margin-bottom: 1em">Foo</div>';
+      final html = '<div style="margin-bottom: 1em">'
+          '<div style="margin-bottom: 1em">Foo</div></div>';
       final explained = await helper.explain(tester, html);
-      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+      expect(explained, isNot(contains('[SizedBox:')));
     });
 
     testWidgets('trims both ways', (WidgetTester tester) async {
