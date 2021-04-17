@@ -6,17 +6,16 @@ import 'package:flutter/widgets.dart';
 /// A CSS block.
 class CssBlock extends CssSizing {
   /// Creates a CSS block.
-  CssBlock({required Widget child, Key? key})
-      : super(
-            child: child,
-            key: key,
-            preferredWidth: const CssSizingValue.percentage(100));
+  CssBlock({required Widget child, Key? key}) : super(child: child, key: key);
 
   @override
-  // ignore: must_call_super
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    // intentionally left empty
-  }
+  _RenderCssSizing createRenderObject(BuildContext _) =>
+      _RenderCssSizing(preferredWidth: const CssSizingValue.percentage(100));
+
+  @override
+  void updateRenderObject(BuildContext _, _RenderCssSizing renderObject) =>
+      renderObject.setPreferredSize(
+          null, const CssSizingValue.percentage(100), null);
 }
 
 /// A CSS sizing widget.
