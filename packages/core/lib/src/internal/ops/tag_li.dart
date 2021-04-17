@@ -248,7 +248,8 @@ class _ListMarkerRenderObject extends RenderBox {
       _textPainter.computeDistanceToActualBaseline(baseline);
 
   @override
-  Size computeDryLayout(BoxConstraints constraints) => _textPainter.size;
+  Size computeDryLayout(BoxConstraints constraints) =>
+      constraints.constrain(_textPainter.size);
 
   @override
   void paint(PaintingContext context, Offset offset) {
