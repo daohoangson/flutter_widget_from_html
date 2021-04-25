@@ -434,8 +434,8 @@ class WidgetFactory {
   Future<bool> onTapUrl(String url) async {
     final callback = _widget?.onTapUrl;
     if (callback != null) {
-      callback(url);
-      return true;
+      final result = await Future.value(callback(url));
+      if (result != false) return true;
     }
 
     if (url.startsWith('#')) {
