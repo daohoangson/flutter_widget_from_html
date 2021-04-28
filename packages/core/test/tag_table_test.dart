@@ -725,10 +725,24 @@ void main() async {
       expect(explained, equals('[HtmlTable:children=${_richtext('Bar')}]'));
     });
 
-    testWidgets('#80: empty TD', (WidgetTester tester) async {
-      final html = '<table><tr><td></td></tr></table>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[widget0]'));
+    testWidgets('empty TD (#494)', (WidgetTester tester) async {
+      final html =
+          '<table><tbody><tr><td></td><td>Foo</td></tr></tbody></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+          explained,
+          equals('TshWidget\n'
+              '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
+              ' └HtmlTable(borderSpacing: 2.0)\n'
+              '  ├HtmlTableCell(columnStart: 0, rowStart: 0)\n'
+              '  │└SizedBox.shrink()\n'
+              '  └HtmlTableCell(columnStart: 1, rowStart: 0)\n'
+              '   └WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+              '    │  "Foo"\n'
+              '    │)\n'
+              '    └Align(alignment: centerLeft)\n'
+              '     └Padding(padding: all(1.0))\n'
+              '      └RichText(text: "Foo")\n\n'));
     });
 
     testWidgets('TD display:none', (WidgetTester tester) async {
