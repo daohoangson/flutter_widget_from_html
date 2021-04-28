@@ -416,14 +416,8 @@ class WidgetFactory {
     final position = Scrollable.of(anchorContext)?.position;
     if (offsetToReveal == null || position == null) return false;
 
-    final alignment = (position.pixels > offsetToReveal)
-        ? 0.0
-        : (position.pixels < offsetToReveal ? 1.0 : null);
-    if (alignment == null) return false;
-
     await position.ensureVisible(
       renderObject,
-      alignment: alignment,
       duration: const Duration(milliseconds: 100),
       curve: Curves.easeIn,
     );
