@@ -725,7 +725,7 @@ void main() async {
       expect(explained, equals('[HtmlTable:children=${_richtext('Bar')}]'));
     });
 
-    testWidgets('empty TD (#497)', (WidgetTester tester) async {
+    testWidgets('empty TD (#494)', (WidgetTester tester) async {
       final html =
           '<table><tbody><tr><td></td><td>Foo</td></tr></tbody></table>';
       final explained = await explain(tester, html, useExplainer: false);
