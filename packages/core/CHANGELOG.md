@@ -1,3 +1,12 @@
+## 0.6.1
+
+- Add support for white-space inline style (#483)
+- Change onTapUrl signature to accept a returning value (#499)
+- Fix `_ListMarkerRenderObject` invalid size
+- Fix anchor bugs (#485, #491, #493 and #500)
+- Fix TR display: none is still being rendered (#489)
+- Fix empty TD being skipped -> incorrect table layout (#503)
+
 ## 0.6.0
 
 - Flutter 2 🚀
