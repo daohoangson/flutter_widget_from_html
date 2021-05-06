@@ -1,8 +1,8 @@
 import 'dart:html' show IFrameElement;
-import 'dart:ui' as ui;
 
 import 'package:flutter/widgets.dart';
 
+import '../external/dart_ui.dart' as ui;
 import 'web_view.dart';
 
 class WebViewState extends State<WebView> {
@@ -22,7 +22,6 @@ class WebViewState extends State<WebView> {
 
     final viewType = '$this#$hashCode';
 
-    // ignore: undefined_prefixed_name
     ui.platformViewRegistry
         .registerViewFactory(viewType, (_) => _iframeElement);
 
