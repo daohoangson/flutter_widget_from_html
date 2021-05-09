@@ -150,15 +150,10 @@ class CssLength {
   final CssLengthUnit unit;
 
   /// Creates a measurement.
-  ///
-  /// [number] must not be negative.
-  const CssLength(
-    this.number, [
-    this.unit = CssLengthUnit.px,
-  ]) : assert(number >= 0);
+  const CssLength(this.number, [this.unit = CssLengthUnit.px]);
 
-  /// Returns `true` if value is non-zero.
-  bool get isNotEmpty => number > 0;
+  /// Returns `true` if value is larger than zero.
+  bool get isPositive => number > 0.0;
 
   /// Calculates value in logical pixel.
   double? getValue(TextStyleHtml tsh,
@@ -245,11 +240,11 @@ class CssLengthBox {
       );
 
   /// Returns `true` if any of the left, right, inline measurements is set.
-  bool get hasLeftOrRight =>
-      _inlineEnd?.isNotEmpty == true ||
-      _inlineStart?.isNotEmpty == true ||
-      _left?.isNotEmpty == true ||
-      _right?.isNotEmpty == true;
+  bool get hasPositiveLeftOrRight =>
+      _inlineEnd?.isPositive == true ||
+      _inlineStart?.isPositive == true ||
+      _left?.isPositive == true ||
+      _right?.isPositive == true;
 
   /// Calculates the left value taking text direction into account.
   double? getValueLeft(TextStyleHtml tsh) => (_left ??
