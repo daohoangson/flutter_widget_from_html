@@ -24,7 +24,7 @@ class StylePadding {
         onTree: (meta, tree) {
           if (meta.willBuildSubtree == true) return;
           final padding = tryParseCssLengthBox(meta, kCssPadding);
-          if (padding == null || !padding.hasLeftOrRight) return;
+          if (padding == null || !padding.hasPositiveLeftOrRight) return;
 
           return wrapTree(
             tree,
@@ -56,10 +56,10 @@ class StylePadding {
       meta,
       child,
       EdgeInsets.fromLTRB(
-        padding.getValueLeft(tsh) ?? 0,
-        padding.top?.getValue(tsh) ?? 0,
-        padding.getValueRight(tsh) ?? 0,
-        padding.bottom?.getValue(tsh) ?? 0,
+        max(padding.getValueLeft(tsh) ?? 0.0, 0.0),
+        max(padding.top?.getValue(tsh) ?? 0.0, 0.0),
+        max(padding.getValueRight(tsh) ?? 0.0, 0.0),
+        max(padding.bottom?.getValue(tsh) ?? 0.0, 0.0),
       ),
     );
   }
