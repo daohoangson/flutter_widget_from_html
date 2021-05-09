@@ -1,3 +1,7 @@
+## 0.6.1+1
+
+- Fix negative margin/padding throwing exception (#510)
+
 ## 0.6.1
 
 - Add support for white-space inline style (#483)
