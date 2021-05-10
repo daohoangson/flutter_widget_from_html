@@ -10,6 +10,7 @@ import 'core_html_widget.dart';
 export 'external/csslib.dart';
 export 'widgets/css_sizing.dart';
 export 'widgets/html_list_item.dart';
+export 'widgets/html_list_marker.dart';
 export 'widgets/html_ruby.dart';
 export 'widgets/html_table.dart';
 
