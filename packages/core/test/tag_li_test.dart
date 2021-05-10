@@ -8,9 +8,9 @@ import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '_.dart';
 
-const disc = '[_ListMarkerDisc]';
-const circle = '[_ListMarkerCircle]';
-const square = '[_ListMarkerSquare]';
+const disc = '[HtmlListMarker.disc]';
+const circle = '[HtmlListMarker.circle]';
+const square = '[HtmlListMarker.square]';
 
 const sizedBox = '[SizedBox:0.0x10.0]';
 
@@ -22,8 +22,9 @@ String list(List<String> children) => '[Column:children=${children.join(",")}]';
 String item(String markerText, String contents, {String? child}) =>
     '[HtmlListItem:children=${child ?? '[RichText:(:$contents)]'},${marker(markerText)}]';
 
-String marker(String text) =>
-    text.startsWith('[_ListMarker') ? text : '[RichText:maxLines=1,(:$text)]';
+String marker(String text) => text.startsWith('[HtmlListMarker.')
+    ? text
+    : '[RichText:maxLines=1,(:$text)]';
 
 void main() async {
   await loadAppFonts();
