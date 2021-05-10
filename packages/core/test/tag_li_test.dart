@@ -598,6 +598,18 @@ void main() async {
             item('3.', 'Three'),
           ]))));
     });
+
+    testWidgets('null buildListMarker', (WidgetTester tester) async {
+      final html = '<ul><li>Foo</li></ul>';
+      final explained = await explain(tester, null,
+          hw: HtmlWidget(
+            html,
+            key: hwKey,
+            factoryBuilder: () => _NullListMarkerWidgetFactory(),
+          ));
+
+      expect(explained, isNot(contains('[HtmlListItem:')));
+    });
   });
 
   group('rtl', () {
@@ -873,4 +885,12 @@ class _HitTestApp extends StatelessWidget {
           ),
         ),
       );
+}
+
+class _NullListMarkerWidgetFactory extends WidgetFactory {
+  @override
+  Widget? buildListMarker(
+      BuildMetadata meta, TextStyleHtml tsh, String listStyleType, int index) {
+    return null;
+  }
 }
