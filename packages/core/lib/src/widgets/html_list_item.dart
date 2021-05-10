@@ -23,8 +23,7 @@ class HtmlListItem extends MultiChildRenderObjectWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(
-        DiagnosticsProperty<TextDirection>('textDirection', textDirection));
+    properties.add(DiagnosticsProperty('textDirection', textDirection));
   }
 
   @override

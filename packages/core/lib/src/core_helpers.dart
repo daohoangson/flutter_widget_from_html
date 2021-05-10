@@ -105,11 +105,8 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<T>(
-      'generator',
-      generator,
-      showName: false,
-    ));
+    properties
+        .add(DiagnosticsProperty('generator', generator, showName: false));
   }
 
   /// Enqueues [builder] to be built later.

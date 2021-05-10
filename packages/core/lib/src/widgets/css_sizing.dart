@@ -102,7 +102,7 @@ class CssSizing extends SingleChildRenderObjectWidget {
   void _debugFillProperty(DiagnosticPropertiesBuilder properties, String name,
       CssSizingValue? value) {
     if (value == null) return;
-    properties.add(DiagnosticsProperty<CssSizingValue>(name, value));
+    properties.add(DiagnosticsProperty(name, value));
   }
 
   @override
