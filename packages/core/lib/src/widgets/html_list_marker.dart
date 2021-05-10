@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 class HtmlListMarker extends SingleChildRenderObjectWidget {
@@ -21,6 +22,13 @@ class HtmlListMarker extends SingleChildRenderObjectWidget {
   @override
   RenderObject createRenderObject(BuildContext _) =>
       _ListMarkerRenderObject(markerType, textStyle);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty('markerType', markerType));
+    properties.add(DiagnosticsProperty('textStyle', textStyle));
+  }
 
   @override
   void updateRenderObject(

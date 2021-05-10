@@ -775,6 +775,40 @@ void main() async {
       ),
     );
   });
+
+  group('HtmlListMarker', () {
+    testWidgets('updates markerType', (tester) async {
+      final disc = await explain(
+        tester,
+        '<ul><li style="list-style-type: disc">Foo</li></ul>',
+        useExplainer: false,
+      );
+      expect(disc, contains('markerType: disc'));
+
+      final circle = await explain(
+        tester,
+        '<ul><li style="list-style-type: circle">Foo</li></ul>',
+        useExplainer: false,
+      );
+      expect(circle, contains('markerType: circle'));
+    });
+
+    testWidgets('updates textStyle', (tester) async {
+      final disc = await explain(
+        tester,
+        '<ul style="color: #f00"><li>Foo</li></ul>',
+        useExplainer: false,
+      );
+      expect(disc, contains('Color(0xffff0000)'));
+
+      final circle = await explain(
+        tester,
+        '<ul style="color: #0f0"><li>Foo</li></ul>',
+        useExplainer: false,
+      );
+      expect(circle, contains('Color(0xff00ff00)'));
+    });
+  });
 }
 
 class _Golden extends StatelessWidget {
