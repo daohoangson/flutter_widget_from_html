@@ -10,6 +10,7 @@ import 'core_html_widget.dart';
 export 'external/csslib.dart';
 export 'widgets/css_sizing.dart';
 export 'widgets/html_list_item.dart';
+export 'widgets/html_list_marker.dart';
 export 'widgets/html_ruby.dart';
 export 'widgets/html_table.dart';
 
@@ -104,11 +105,8 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<T>(
-      'generator',
-      generator,
-      showName: false,
-    ));
+    properties
+        .add(DiagnosticsProperty('generator', generator, showName: false));
   }
 
   /// Enqueues [builder] to be built later.

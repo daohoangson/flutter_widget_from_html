@@ -209,6 +209,26 @@ class WidgetFactory {
     );
   }
 
+  /// Builds marker widget for a list item.
+  Widget? buildListMarker(
+      BuildMetadata meta, TextStyleHtml tsh, String listStyleType, int index) {
+    final text = getListMarkerText(listStyleType, index);
+    final style = tsh.styleWithHeight;
+    return text.isNotEmpty
+        ? RichText(
+            maxLines: 1,
+            overflow: TextOverflow.clip,
+            softWrap: false,
+            text: TextSpan(style: style, text: text),
+            textDirection: tsh.textDirection,
+          )
+        : listStyleType == kCssListStyleTypeCircle
+            ? HtmlListMarker.circle(style)
+            : listStyleType == kCssListStyleTypeSquare
+                ? HtmlListMarker.square(style)
+                : HtmlListMarker.disc(style);
+  }
+
   /// Builds [Padding].
   Widget? buildPadding(
           BuildMetadata meta, Widget child, EdgeInsetsGeometry padding) =>
@@ -317,10 +337,8 @@ class WidgetFactory {
         Theme.of(context),
       ];
 
-  /// Returns marker for the specified [type] at index [i].
-  ///
-  /// Note: `circle`, `disc` and `square` type won't trigger this method
-  String getListStyleMarker(String type, int i) {
+  /// Returns marker text for the specified list style [type] at index [i].
+  String getListMarkerText(String type, int i) {
     switch (type) {
       case kCssListStyleTypeAlphaLower:
       case kCssListStyleTypeAlphaLatinLower:
@@ -341,17 +359,17 @@ class WidgetFactory {
       case kCssListStyleTypeDecimal:
         return '$i.';
       case kCssListStyleTypeRomanLower:
-        final roman = _getListStyleMarkerRoman(i)?.toLowerCase();
+        final roman = _getListMarkerRoman(i)?.toLowerCase();
         return roman != null ? '$roman.' : '';
       case kCssListStyleTypeRomanUpper:
-        final roman = _getListStyleMarkerRoman(i);
+        final roman = _getListMarkerRoman(i);
         return roman != null ? '$roman.' : '';
     }
 
     return '';
   }
 
-  String? _getListStyleMarkerRoman(int i) {
+  String? _getListMarkerRoman(int i) {
     // TODO: find some lib to generate programatically
     const map = <int, String>{
       1: 'I',
