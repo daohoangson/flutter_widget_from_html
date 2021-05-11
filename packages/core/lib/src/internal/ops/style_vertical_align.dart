@@ -9,7 +9,7 @@ const kCssVerticalAlignSub = 'sub';
 const kCssVerticalAlignSuper = 'super';
 
 class StyleVerticalAlign {
-  static const kPriority4500 = 4500;
+  static const kPriority = 4002;
 
   final WidgetFactory wf;
 
@@ -66,7 +66,7 @@ class StyleVerticalAlign {
           }));
         },
         onWidgetsIsOptional: true,
-        priority: kPriority4500,
+        priority: kPriority,
       );
 
   WidgetPlaceholder? _buildTree(BuildMetadata meta, BuildTree tree) {
