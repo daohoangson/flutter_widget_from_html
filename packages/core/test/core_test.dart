@@ -533,8 +533,8 @@ void main() async {
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals('[CssBlock:child='
-              '[DecoratedBox:bg=#FFFF0000,child='
+          equals('[DecoratedBox:bg=#FFFF0000,child='
+              '[CssBlock:child='
               '[RichText:(:Foo)]]]'));
     });
 
@@ -546,7 +546,7 @@ void main() async {
           explained,
           equals('[SizedBox:0.0x1.0],'
               '[Padding:(0,1,0,1),child='
-              '[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child='
+              '[DecoratedBox:bg=#FFFF0000,child=[CssBlock:child='
               '[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]'
               ']],[SizedBox:0.0x1.0]'));
     });
@@ -557,7 +557,7 @@ void main() async {
       expect(
           explained,
           equals(
-              '[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child=[Column:children='
+              '[DecoratedBox:bg=#FFFF0000,child=[CssBlock:child=[Column:children='
               '[CssBlock:child=[RichText:(:A)]],'
               '[SizedBox:0.0x10.0],'
               '[CssBlock:child=[RichText:(:B)]]'
