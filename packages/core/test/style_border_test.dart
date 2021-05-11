@@ -500,6 +500,19 @@ void main() {
     });
   });
 
+  group('combos', () {
+    testWidgets('renders with background', (WidgetTester tester) async {
+      final html = '<div style="background: red; border: 1px solid">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[DecoratedBox:bg=#FFFF0000,child='
+              '[Container:border=1.0@solid#FF001234,child='
+              '[CssBlock:child=[RichText:(:Foo)]]'
+              ']]'));
+    });
+  });
+
   group('invalid values', () {
     testWidgets('3 values', (WidgetTester tester) async {
       final html = '<span style="border: a b c">Foo</span>';
