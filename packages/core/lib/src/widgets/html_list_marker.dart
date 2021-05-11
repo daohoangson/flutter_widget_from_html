@@ -3,18 +3,25 @@ import 'dart:ui';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+/// A list marker.
 class HtmlListMarker extends SingleChildRenderObjectWidget {
+  /// The marker type.
   final HtmlListMarkerType markerType;
+
+  /// The [TextStyle] to apply to this marker.
   final TextStyle textStyle;
 
+  /// Creates a circle marker.
   const HtmlListMarker.circle(this.textStyle, {Key? key})
       : markerType = HtmlListMarkerType.circle,
         super(key: key);
 
+  /// Creates a disc marker.
   const HtmlListMarker.disc(this.textStyle, {Key? key})
       : markerType = HtmlListMarkerType.disc,
         super(key: key);
 
+  /// Creates a square marker.
   const HtmlListMarker.square(this.textStyle, {Key? key})
       : markerType = HtmlListMarkerType.square,
         super(key: key);
@@ -133,8 +140,14 @@ class _ListMarkerRenderObject extends RenderBox {
   }
 }
 
+/// List marker types.
 enum HtmlListMarkerType {
+  /// The circle marker type.
   circle,
+
+  /// The disc marker type.
   disc,
+
+  /// The square marker type.
   square,
 }
