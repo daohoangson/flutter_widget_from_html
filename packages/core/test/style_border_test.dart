@@ -501,15 +501,19 @@ void main() {
   });
 
   group('combos', () {
-    testWidgets('renders with background', (WidgetTester tester) async {
-      final html = '<div style="background: red; border: 1px solid">Foo</div>';
+    testWidgets('renders with background & h2', (WidgetTester tester) async {
+      final html = '<div style="background: red; border: 1px solid">'
+          '<h2>Foo</h2></div>';
       final explained = await explain(tester, html);
       expect(
           explained,
           equals('[DecoratedBox:bg=#FFFF0000,child='
               '[Container:border=1.0@solid#FF001234,child='
-              '[CssBlock:child=[RichText:(:Foo)]]'
-              ']]'));
+              '[Column:children='
+              '[SizedBox:0.0x12.4],'
+              '[CssBlock:child=[CssBlock:child=[RichText:(@15.0+b:Foo)]]],'
+              '[SizedBox:0.0x12.4]'
+              ']]]'));
     });
   });
 
