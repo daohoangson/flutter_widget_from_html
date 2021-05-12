@@ -306,7 +306,7 @@ class _TagTableRow {
           );
         }));
       },
-      priority: StyleVerticalAlign.kPriority,
+      priority: StyleVerticalAlign.kPriority4k3,
     );
   }
 
