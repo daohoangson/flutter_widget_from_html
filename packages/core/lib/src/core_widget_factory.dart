@@ -202,11 +202,22 @@ class WidgetFactory {
         final text = semanticLabel ?? '❌';
         return Text(text);
       },
+      loadingBuilder: imageLoadingBuilder,
       excludeFromSemantics: semanticLabel == null,
       fit: BoxFit.fill,
       image: provider,
       semanticLabel: semanticLabel,
     );
+  }
+
+  /// Builder for loading widget while image is loading.
+  Widget imageLoadingBuilder(
+    BuildContext context,
+    Widget child,
+    ImageChunkEvent? loadingProgress,
+  ) {
+    if (loadingProgress == null) return child;
+    return const SizedBox.shrink();
   }
 
   /// Builds marker widget for a list item.
