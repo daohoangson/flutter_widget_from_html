@@ -13,12 +13,12 @@ class DisplayBlockOp extends BuildOp {
           onWidgets: (meta, widgets) => listOrNull(wf
               .buildColumnPlaceholder(meta, widgets)
               ?.wrapWith((_, w) => w is CssSizing ? w : CssBlock(child: w))),
-          priority: StyleSizing.kPriority5k + 1,
+          priority: StyleSizing.kPriority7k + 1,
         );
 }
 
 class StyleSizing {
-  static const kPriority5k = 5000;
+  static const kPriority7k = 7000;
 
   final WidgetFactory wf;
 
@@ -55,7 +55,7 @@ class StyleSizing {
               ?.wrapWith((c, w) => _build(c, w, input, meta.tsb)));
         },
         onWidgetsIsOptional: true,
-        priority: kPriority5k,
+        priority: kPriority7k,
       );
 
   _StyleSizingInput? _parse(BuildMetadata meta) {
