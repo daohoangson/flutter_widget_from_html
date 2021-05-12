@@ -308,12 +308,12 @@ void main() {
     final explained = await explain(tester, html);
     expect(
         explained,
-        equals('[DecoratedBox:bg=#FFFF0000,child=[CssBlock:child='
+        equals('[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child='
             '[Padding:(20,20,20,20),child='
-            '[DecoratedBox:bg=#FF008000,child=[CssBlock:child='
+            '[CssBlock:child=[DecoratedBox:bg=#FF008000,child='
             '[Padding:(0,15,0,15),child='
-            '[DecoratedBox:bg=#FF0000FF,child='
             '[CssSizing:height=100.0,width=100.0,child='
+            '[DecoratedBox:bg=#FF0000FF,child='
             '[Padding:(5,5,5,5),child='
             '[RichText:(#FFFFFFFF:Foo)]'
             ']]]]]]]]]'));
