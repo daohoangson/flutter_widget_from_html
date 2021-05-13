@@ -152,11 +152,7 @@ class WidgetFactory {
     final src = data.sources.isNotEmpty ? data.sources.first : null;
     if (src == null) return null;
 
-    var built = buildImageWidget(
-      meta,
-      semanticLabel: data.alt ?? data.title,
-      url: src.url,
-    );
+    var built = buildImageWidget(meta, data, url: src.url);
 
     final title = data.title;
     if (built != null && title != null) {
@@ -180,8 +176,8 @@ class WidgetFactory {
 
   /// Builds [Image].
   Widget? buildImageWidget(
-    BuildMetadata meta, {
-    String? semanticLabel,
+    BuildMetadata meta,
+    ImageMetadata data, {
     required String url,
   }) {
     late final ImageProvider? provider;
@@ -196,6 +192,7 @@ class WidgetFactory {
     }
     if (provider == null) return null;
 
+    final semanticLabel = data.alt ?? data.title;
     return Image(
       errorBuilder: (context, error, stackTrace) {
         print('$provider error: $error');
@@ -203,8 +200,8 @@ class WidgetFactory {
           context,
           error,
           stackTrace,
-          semanticLabel,
           meta,
+          data,
         );
       },
       loadingBuilder: (context, child, loadingProgress) =>
@@ -232,9 +229,10 @@ class WidgetFactory {
     BuildContext context,
     Object error,
     StackTrace? stackTrace,
-    String? semanticLabel,
     BuildMetadata meta,
+    ImageMetadata data,
   ) {
+    final semanticLabel = data.alt ?? data.title;
     final text = semanticLabel ?? '❌';
     return Text(text);
   }

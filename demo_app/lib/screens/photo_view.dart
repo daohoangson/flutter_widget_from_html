@@ -71,13 +71,13 @@ class _InlinePhotoViewWidgetFactory extends WidgetFactory {
 class _PopupPhotoViewWidgetFactory extends WidgetFactory {
   @override
   Widget buildImageWidget(
-    BuildMetadata meta, {
-    String semanticLabel,
+    BuildMetadata meta,
+    ImageMetadata data, {
     @required String url,
   }) {
     final built = super.buildImageWidget(
       meta,
-      semanticLabel: semanticLabel,
+      data,
       url: url,
     );
 

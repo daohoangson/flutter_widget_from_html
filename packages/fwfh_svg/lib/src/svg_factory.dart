@@ -11,8 +11,8 @@ mixin SvgFactory on WidgetFactory {
 
   @override
   Widget? buildImageWidget(
-    BuildMetadata meta, {
-    String? semanticLabel,
+    BuildMetadata meta,
+    ImageMetadata data, {
     required String url,
   }) {
     PictureProvider? provider;
@@ -31,10 +31,11 @@ mixin SvgFactory on WidgetFactory {
     if (provider == null) {
       return super.buildImageWidget(
         meta,
-        semanticLabel: semanticLabel,
+        data,
         url: url,
       );
     }
+    final semanticLabel = data.alt ?? data.title;
 
     return SvgPicture(
       provider,
