@@ -197,12 +197,18 @@ class WidgetFactory {
     if (provider == null) return null;
 
     return Image(
-      errorBuilder: (_, error, __) {
+      errorBuilder: (context, error, stackTrace) {
         print('$provider error: $error');
-        final text = semanticLabel ?? '❌';
-        return Text(text);
+        return imageErrorBuilder(
+          context,
+          error,
+          stackTrace,
+          semanticLabel,
+          meta,
+        );
       },
-      loadingBuilder: imageLoadingBuilder,
+      loadingBuilder: (context, child, loadingProgress) =>
+          imageLoadingBuilder(context, child, loadingProgress, meta),
       excludeFromSemantics: semanticLabel == null,
       fit: BoxFit.fill,
       image: provider,
@@ -215,9 +221,22 @@ class WidgetFactory {
     BuildContext context,
     Widget child,
     ImageChunkEvent? loadingProgress,
+    BuildMetadata meta,
   ) {
     if (loadingProgress == null) return child;
     return const SizedBox.shrink();
+  }
+
+  /// Builder for error widget if an error occurs during image loading.
+  Widget imageErrorBuilder(
+    BuildContext context,
+    Object error,
+    StackTrace? stackTrace,
+    String? semanticLabel,
+    BuildMetadata meta,
+  ) {
+    final text = semanticLabel ?? '❌';
+    return Text(text);
   }
 
   /// Builds marker widget for a list item.
