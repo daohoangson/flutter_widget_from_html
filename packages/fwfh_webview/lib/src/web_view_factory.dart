@@ -25,6 +25,9 @@ mixin WebViewFactory on WidgetFactory {
   /// {@macro web_view.userAgent}
   String? get webViewUserAgent => null;
 
+  /// {@macro web_view.hybridComposition}
+  bool get useHybridCompositionForAndroid => false;
+
   /// Builds [WebView].
   ///
   /// JavaScript is only enabled if [webViewJs] is turned on
@@ -57,6 +60,7 @@ mixin WebViewFactory on WidgetFactory {
       js: js,
       mediaPlaybackAlwaysAllow: webViewMediaPlaybackAlwaysAllow,
       userAgent: webViewUserAgent,
+      useHybridCompositionForAndroid: useHybridCompositionForAndroid,
     );
   }
 

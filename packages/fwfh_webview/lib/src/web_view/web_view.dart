@@ -86,6 +86,16 @@ class WebView extends StatefulWidget {
   /// {@endtemplate}
   final String? userAgent;
 
+  /// {@template web_view.hybridComposition}
+  /// Activates Hybrid Composition for Android WebViews.
+  ///
+  /// On Android versions prior to Android 10 Hybrid Composition
+  /// has some performance drawbacks.
+  ///
+  /// Default: `false`.
+  /// {@endtemplate}
+  final bool useHybridCompositionForAndroid;
+
   /// Creates a web view.
   WebView(
     this.url, {
@@ -103,6 +113,7 @@ class WebView extends StatefulWidget {
     this.unsupportedWorkaroundForIssue37 = true,
     this.unsupportedWorkaroundForIssue375 = true,
     this.userAgent,
+    this.useHybridCompositionForAndroid = false,
     Key? key,
   })  : autoResize = !js ? false : autoResize ?? js,
         super(key: key);
