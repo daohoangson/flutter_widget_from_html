@@ -61,7 +61,11 @@ class HtmlWidget extends StatefulWidget {
   final void Function(ImageMetadata)? onTapImage;
 
   /// The callback when user taps a link.
-  final void Function(String)? onTapUrl;
+  ///
+  /// Returns `false` to fallback to the built-in handler.
+  /// Returns `true` (or anything that is not `false`) to skip default behaviors.
+  /// Returning a `Future` is supported.
+  final dynamic Function(String)? onTapUrl;
 
   /// The values that should trigger rebuild.
   ///

@@ -49,7 +49,7 @@ class HtmlWidget extends core.HtmlWidget {
     CustomWidgetBuilder? customWidgetBuilder,
     Color? hyperlinkColor,
     void Function(ImageMetadata)? onTapImage,
-    void Function(String)? onTapUrl,
+    dynamic Function(String)? onTapUrl,
     core.RebuildTriggers? rebuildTriggers,
     RenderMode renderMode = RenderMode.Column,
     TextStyle textStyle = const TextStyle(),

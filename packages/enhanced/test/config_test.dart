@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
@@ -398,7 +398,98 @@ void main() {
     });
   });
 
-  // onTapUrl -> tag_a_test.dart
+  group('onTapUrl', () {
+    testWidgets('triggers callback (returns void)', (tester) async {
+      const href = 'returns-void';
+      final urls = <String>[];
+      final onTapCallbackResults = [];
+
+      await tester.pumpWidget(_OnTapUrlApp(
+        href: href,
+        onTapCallbackResults: onTapCallbackResults,
+        onTapUrl: urls.add,
+      ));
+      await tester.pumpAndSettle();
+      expect(await helper.tapText(tester, 'Tap me'), equals(1));
+
+      expect(urls, equals(const [href]));
+      expect(onTapCallbackResults, equals(const [href, true]));
+    });
+
+    testWidgets('triggers callback (returns false)', (tester) async {
+      const href = 'returns-false';
+      final onTapCallbackResults = [];
+
+      await tester.pumpWidget(_OnTapUrlApp(
+        href: href,
+        onTapCallbackResults: onTapCallbackResults,
+        onTapUrl: (_) => false,
+      ));
+      await tester.pumpAndSettle();
+      expect(await helper.tapText(tester, 'Tap me'), equals(1));
+
+      expect(onTapCallbackResults, equals(const [href, false]));
+    });
+
+    testWidgets('triggers callback (returns true)', (tester) async {
+      const href = 'returns-true';
+      final onTapCallbackResults = [];
+
+      await tester.pumpWidget(_OnTapUrlApp(
+        href: href,
+        onTapCallbackResults: onTapCallbackResults,
+        onTapUrl: (_) => true,
+      ));
+      await tester.pumpAndSettle();
+      expect(await helper.tapText(tester, 'Tap me'), equals(1));
+
+      expect(onTapCallbackResults, equals(const [href, true]));
+    });
+
+    testWidgets('triggers callback (async false)', (tester) async {
+      const href = 'returns-false';
+      final onTapCallbackResults = [];
+
+      await tester.pumpWidget(_OnTapUrlApp(
+        href: href,
+        onTapCallbackResults: onTapCallbackResults,
+        onTapUrl: (_) async => false,
+      ));
+      await tester.pumpAndSettle();
+      expect(await helper.tapText(tester, 'Tap me'), equals(1));
+
+      expect(onTapCallbackResults, equals(const [href, false]));
+    });
+
+    testWidgets('triggers callback (async true)', (tester) async {
+      const href = 'returns-true';
+      final onTapCallbackResults = [];
+
+      await tester.pumpWidget(_OnTapUrlApp(
+        href: href,
+        onTapCallbackResults: onTapCallbackResults,
+        onTapUrl: (_) async => true,
+      ));
+      await tester.pumpAndSettle();
+      expect(await helper.tapText(tester, 'Tap me'), equals(1));
+
+      expect(onTapCallbackResults, equals(const [href, true]));
+    });
+
+    testWidgets('default handler', (WidgetTester tester) async {
+      const href = 'default';
+      final onTapCallbackResults = [];
+
+      await tester.pumpWidget(_OnTapUrlApp(
+        href: href,
+        onTapCallbackResults: onTapCallbackResults,
+      ));
+      await tester.pumpAndSettle();
+      expect(await helper.tapText(tester, 'Tap me'), equals(1));
+
+      expect(onTapCallbackResults, equals(const [href, false]));
+    });
+  });
 
   group('renderMode', () {
     final explain = (
@@ -655,4 +746,43 @@ void main() {
       });
     });
   });
+}
+
+class _OnTapUrlApp extends StatelessWidget {
+  final String href;
+  final dynamic Function(String)? onTapUrl;
+  final List? onTapCallbackResults;
+
+  const _OnTapUrlApp({
+    Key? key,
+    required this.href,
+    this.onTapCallbackResults,
+    this.onTapUrl,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => MaterialApp(
+        home: Scaffold(
+          body: HtmlWidget(
+            '<a href="$href">Tap me</a>',
+            factoryBuilder: () => _OnTapUrlFactory(
+              onTapCallbackResults: onTapCallbackResults,
+            ),
+            onTapUrl: onTapUrl,
+          ),
+        ),
+      );
+}
+
+class _OnTapUrlFactory extends WidgetFactory {
+  final List? onTapCallbackResults;
+
+  _OnTapUrlFactory({this.onTapCallbackResults});
+
+  @override
+  Future<bool> onTapCallback(String url) async {
+    final result = await super.onTapCallback(url);
+    onTapCallbackResults?.addAll([url, result]);
+    return result;
+  }
 }

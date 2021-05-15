@@ -274,18 +274,18 @@ class _TagTableRow {
     op = BuildOp(onChild: onChild);
     _cellOp = BuildOp(
       onWidgets: (cellMeta, widgets) {
-        final column = parent.wf.buildColumnPlaceholder(cellMeta, widgets);
-        if (column == null) return [];
+        final child =
+            parent.wf.buildColumnPlaceholder(cellMeta, widgets) ?? widget0;
 
         final attributes = cellMeta.element.attributes;
         row.cells.add(_TagTableDataCell(
           cellMeta,
-          child: column,
+          child: child,
           colspan: tryParseIntFromMap(attributes, kAttributeColspan) ?? 1,
           rowspan: tryParseIntFromMap(attributes, kAttributeRowspan) ?? 1,
         ));
 
-        return [column];
+        return [child];
       },
       priority: BuildOp.kPriorityMax,
     );
@@ -306,7 +306,7 @@ class _TagTableRow {
           );
         }));
       },
-      priority: StyleVerticalAlign.kPriority4500,
+      priority: StyleVerticalAlign.kPriority4k3,
     );
   }
 

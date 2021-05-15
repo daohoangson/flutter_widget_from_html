@@ -452,7 +452,12 @@ class WidgetFactory {
   void onRoot(TextStyleBuilder rootTsb) {}
 
   /// Ensures anchor is visible.
-  Future<bool> onTapAnchor(String id, BuildContext anchorContext) async {
+  ///
+  /// Returns `true` if anchor has been found and
+  /// [ScrollPosition.ensureVisible] completes successfully.
+  Future<bool> onTapAnchor(String id, BuildContext? anchorContext) async {
+    if (anchorContext == null) return false;
+
     final renderObject = anchorContext.findRenderObject();
     if (renderObject == null) return false;
 
@@ -462,34 +467,36 @@ class WidgetFactory {
     final position = Scrollable.of(anchorContext)?.position;
     if (offsetToReveal == null || position == null) return false;
 
-    final alignment = (position.pixels > offsetToReveal)
-        ? 0.0
-        : (position.pixels < offsetToReveal ? 1.0 : null);
-    if (alignment == null) return false;
-
     await position.ensureVisible(
       renderObject,
-      alignment: alignment,
       duration: const Duration(milliseconds: 100),
       curve: Curves.easeIn,
     );
     return true;
   }
 
+  /// Calls [HtmlWidget.onTapUrl] with [url].
+  ///
+  /// Returns `true` if there is a callback and
+  /// it finishes with non-`false` value.
+  Future<bool> onTapCallback(String url) async {
+    final callback = _widget?.onTapUrl;
+    if (callback == null) return false;
+
+    final result = await Future.value(callback(url));
+    return result != false;
+  }
+
   /// Handles user tapping a link.
   Future<bool> onTapUrl(String url) async {
-    final callback = _widget?.onTapUrl;
-    if (callback != null) {
-      callback(url);
-      return true;
-    }
+    final handledViaCallback = await onTapCallback(url);
+    if (handledViaCallback) return true;
 
     if (url.startsWith('#')) {
       final id = url.substring(1);
       final anchorContext = _anchors[id]?.currentContext;
-      if (anchorContext != null) {
-        return onTapAnchor(id, anchorContext);
-      }
+      final handledViaAnchor = await onTapAnchor(id, anchorContext);
+      if (handledViaAnchor) return true;
     }
 
     return false;

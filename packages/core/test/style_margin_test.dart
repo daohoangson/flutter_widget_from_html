@@ -436,6 +436,62 @@ void main() {
     });
   });
 
+  group('negative values', () {
+    testWidgets('4 values', (WidgetTester tester) async {
+      final html = '<div style="margin: -1px -2px -3px -4px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('2 values', (WidgetTester tester) async {
+      final html = '<div style="margin: -1px -2px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('1 value', (WidgetTester tester) async {
+      final html = '<div style="margin: -1px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('top', (WidgetTester tester) async {
+      final html = '<div style="margin-top: -1px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('right', (WidgetTester tester) async {
+      final html = '<div style="margin-right: -1px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('end', (WidgetTester tester) async {
+      final html = '<div style="margin-inline-end: -1px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('bottom', (WidgetTester tester) async {
+      final html = '<div style="margin-bottom: -1px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('left', (WidgetTester tester) async {
+      final html = '<div style="margin-left: -1px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('start', (WidgetTester tester) async {
+      final html = '<div style="margin-inline-start: -1px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+  });
+
   group('invalid values', () {
     testWidgets('4 values', (WidgetTester tester) async {
       final html = '<div style="margin: a b c d">Foo</div>';
