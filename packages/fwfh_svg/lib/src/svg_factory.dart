@@ -10,11 +10,9 @@ mixin SvgFactory on WidgetFactory {
   BuildOp? _tagSvg;
 
   @override
-  Widget? buildImageWidget(
-    BuildMetadata meta,
-    ImageMetadata data, {
-    required String url,
-  }) {
+  Widget? buildImageWidget(BuildMetadata meta, ImageSource src) {
+    final url = src.url;
+
     PictureProvider? provider;
     if (url.startsWith('data:image/svg+xml')) {
       provider = imageSvgFromDataUri(url);
@@ -29,13 +27,10 @@ mixin SvgFactory on WidgetFactory {
     }
 
     if (provider == null) {
-      return super.buildImageWidget(
-        meta,
-        data,
-        url: url,
-      );
+      return super.buildImageWidget(meta, src);
     }
-    final semanticLabel = data.alt ?? data.title;
+    final image = src.image;
+    final semanticLabel = image?.alt ?? image?.title;
 
     return SvgPicture(
       provider,

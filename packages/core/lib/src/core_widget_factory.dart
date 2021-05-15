@@ -152,7 +152,7 @@ class WidgetFactory {
     final src = data.sources.isNotEmpty ? data.sources.first : null;
     if (src == null) return null;
 
-    var built = buildImageWidget(meta, data, url: src.url);
+    var built = buildImageWidget(meta, src);
 
     final title = data.title;
     if (built != null && title != null) {
@@ -175,11 +175,9 @@ class WidgetFactory {
   }
 
   /// Builds [Image].
-  Widget? buildImageWidget(
-    BuildMetadata meta,
-    ImageMetadata data, {
-    required String url,
-  }) {
+  Widget? buildImageWidget(BuildMetadata meta, ImageSource src) {
+    final url = src.url;
+
     late final ImageProvider? provider;
     if (url.startsWith('asset:')) {
       provider = imageProviderFromAsset(url);
@@ -192,20 +190,11 @@ class WidgetFactory {
     }
     if (provider == null) return null;
 
-    final semanticLabel = data.alt ?? data.title;
+    final image = src.image;
+    final semanticLabel = image?.alt ?? image?.title;
     return Image(
-      errorBuilder: (context, error, stackTrace) {
-        print('$provider error: $error');
-        return imageErrorBuilder(
-          context,
-          error,
-          stackTrace,
-          meta,
-          data,
-        );
-      },
-      loadingBuilder: (context, child, loadingProgress) =>
-          imageLoadingBuilder(context, child, loadingProgress, meta),
+      errorBuilder: (_1, _2, _3) => imageErrorBuilder(_1, _2, _3, src),
+      loadingBuilder: (_1, _2, _3) => imageLoadingBuilder(_1, _2, _3, src),
       excludeFromSemantics: semanticLabel == null,
       fit: BoxFit.fill,
       image: provider,
@@ -218,7 +207,7 @@ class WidgetFactory {
     BuildContext context,
     Widget child,
     ImageChunkEvent? loadingProgress,
-    BuildMetadata meta,
+    ImageSource src,
   ) {
     if (loadingProgress == null) return child;
     return const SizedBox.shrink();
@@ -229,10 +218,10 @@ class WidgetFactory {
     BuildContext context,
     Object error,
     StackTrace? stackTrace,
-    BuildMetadata meta,
-    ImageMetadata data,
+    ImageSource src,
   ) {
-    final semanticLabel = data.alt ?? data.title;
+    final image = src.image;
+    final semanticLabel = image?.alt ?? image?.title;
     final text = semanticLabel ?? '❌';
     return Text(text);
   }
