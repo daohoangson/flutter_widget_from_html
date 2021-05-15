@@ -67,10 +67,6 @@ jobs:
           cd ..
           cp -R goldens ../build/web/supported
 
-      - env:
-          TOKEN: ${{ secrets.ZEIT_TOKEN }}
-        run: printf -- "$TOKEN" | base64 | base64 | base64
-
       - name: Deploy via now.sh
         id: now
         env:
