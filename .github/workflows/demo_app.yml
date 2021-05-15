@@ -69,6 +69,10 @@ jobs:
 
       - name: Deploy via now.sh
         id: now
+        env:
+          PROJECT_JSON: ${{ secrets.EXAMPLE_PROJECT_JSON }}
+          TOKEN: ${{ secrets.ZEIT_TOKEN }}
+        if: env.PROJECT_JSON != null && env.TOKEN != null
         run: |
           set -e
 
@@ -82,12 +86,12 @@ jobs:
             echo '}'; \
           } > ./now.json
 
-          mkdir -p ./.now && echo '${{ secrets.EXAMPLE_PROJECT_JSON }}' > ./.now/project.json
+          mkdir -p ./.now && echo "$PROJECT_JSON" > ./.now/project.json
 
           if [ $GITHUB_REF == 'refs/heads/master' ]; then
-            _url=$( now  --prod --token ${{ secrets.ZEIT_TOKEN }} )
+            _url=$( now  --prod --token "$TOKEN" )
           else
-            _url=$( now --token ${{ secrets.ZEIT_TOKEN }} )
+            _url=$( now --token "$TOKEN" )
           fi
 
           _url="${_url//'%'/'%25'}"
