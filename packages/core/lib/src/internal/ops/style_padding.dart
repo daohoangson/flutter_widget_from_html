@@ -41,15 +41,20 @@ class StylePadding {
           final padding = tryParseCssLengthBox(meta, kCssPadding);
           if (padding == null) return null;
 
-          return listOrNull(wf
-              .buildColumnPlaceholder(meta, widgets)
-              ?.wrapWith((c, w) => _build(c, meta, w, padding)));
+          return [
+            WidgetPlaceholder(
+              padding,
+              child: wf.buildColumnPlaceholder(meta, widgets),
+            ).wrapWith(
+              (context, child) => _build(meta, context, child, padding),
+            )
+          ];
         },
         onWidgetsIsOptional: true,
         priority: kPriorityBoxModel3k,
       );
 
-  Widget? _build(BuildContext context, BuildMetadata meta, Widget child,
+  Widget? _build(BuildMetadata meta, BuildContext context, Widget child,
       CssLengthBox padding) {
     final tsh = meta.tsb.build(context);
     return wf.buildPadding(
