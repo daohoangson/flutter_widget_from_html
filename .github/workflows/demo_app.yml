@@ -99,6 +99,7 @@ jobs:
           _url="${_url//$'\r'/'%0D'}"
           echo "::set-output name=url::${_url}"
       - name: Create commit comment
+        if: steps.now.conclusion == 'success'
         uses: daohoangson/comment-on-github@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
