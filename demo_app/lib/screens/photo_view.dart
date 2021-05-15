@@ -70,18 +70,11 @@ class _InlinePhotoViewWidgetFactory extends WidgetFactory {
 
 class _PopupPhotoViewWidgetFactory extends WidgetFactory {
   @override
-  Widget buildImageWidget(
-    BuildMetadata meta, {
-    String semanticLabel,
-    @required String url,
-  }) {
-    final built = super.buildImageWidget(
-      meta,
-      semanticLabel: semanticLabel,
-      url: url,
-    );
+  Widget buildImageWidget(BuildMetadata meta, ImageSource src) {
+    final built = super.buildImageWidget(meta, src);
 
     if (built is Image) {
+      final url = src.url;
       return Builder(
         builder: (context) => GestureDetector(
           onTap: () => Navigator.of(context).push(MaterialPageRoute(

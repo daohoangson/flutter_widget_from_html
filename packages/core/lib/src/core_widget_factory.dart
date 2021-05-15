@@ -152,11 +152,7 @@ class WidgetFactory {
     final src = data.sources.isNotEmpty ? data.sources.first : null;
     if (src == null) return null;
 
-    var built = buildImageWidget(
-      meta,
-      semanticLabel: data.alt ?? data.title,
-      url: src.url,
-    );
+    var built = buildImageWidget(meta, src);
 
     final title = data.title;
     if (built != null && title != null) {
@@ -179,11 +175,9 @@ class WidgetFactory {
   }
 
   /// Builds [Image].
-  Widget? buildImageWidget(
-    BuildMetadata meta, {
-    String? semanticLabel,
-    required String url,
-  }) {
+  Widget? buildImageWidget(BuildMetadata meta, ImageSource src) {
+    final url = src.url;
+
     late final ImageProvider? provider;
     if (url.startsWith('asset:')) {
       provider = imageProviderFromAsset(url);
@@ -196,17 +190,40 @@ class WidgetFactory {
     }
     if (provider == null) return null;
 
+    final image = src.image;
+    final semanticLabel = image?.alt ?? image?.title;
     return Image(
-      errorBuilder: (_, error, __) {
-        print('$provider error: $error');
-        final text = semanticLabel ?? '❌';
-        return Text(text);
-      },
+      errorBuilder: (_1, _2, _3) => imageErrorBuilder(_1, _2, _3, src),
+      loadingBuilder: (_1, _2, _3) => imageLoadingBuilder(_1, _2, _3, src),
       excludeFromSemantics: semanticLabel == null,
       fit: BoxFit.fill,
       image: provider,
       semanticLabel: semanticLabel,
     );
+  }
+
+  /// Builder for loading widget while image is loading.
+  Widget imageLoadingBuilder(
+    BuildContext context,
+    Widget child,
+    ImageChunkEvent? loadingProgress,
+    ImageSource src,
+  ) {
+    if (loadingProgress == null) return child;
+    return const SizedBox.shrink();
+  }
+
+  /// Builder for error widget if an error occurs during image loading.
+  Widget imageErrorBuilder(
+    BuildContext context,
+    Object error,
+    StackTrace? stackTrace,
+    ImageSource src,
+  ) {
+    final image = src.image;
+    final semanticLabel = image?.alt ?? image?.title;
+    final text = semanticLabel ?? '❌';
+    return Text(text);
   }
 
   /// Builds marker widget for a list item.
