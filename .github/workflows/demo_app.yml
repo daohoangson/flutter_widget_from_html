@@ -72,7 +72,7 @@ jobs:
         env:
           PROJECT_JSON: ${{ secrets.EXAMPLE_PROJECT_JSON }}
           TOKEN: ${{ secrets.ZEIT_TOKEN }}
-        if: env.PROJECT_JSON != null && env.TOKEN != null
+        if: env.PROJECT_JSON != null && env.TOKEN != null && false
         run: |
           set -e
 
