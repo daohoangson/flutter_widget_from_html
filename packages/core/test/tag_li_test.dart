@@ -637,7 +637,8 @@ void main() async {
         '        │)\n'
         '        └HtmlListItem(textDirection: rtl)\n'
         '         ├RichText(textDirection: rtl, text: "Three")\n'
-        '         └RichText(textDirection: rtl, maxLines: 1, text: "3.")\n\n';
+        '         └RichText(textDirection: rtl, maxLines: 1, text: "3.")\n'
+        '\n';
 
     testWidgets('renders ordered list', (WidgetTester tester) async {
       final explained = await explain(tester, null,
