@@ -36,7 +36,7 @@ void main() async {
 
   testWidgets('renders ordered list', (WidgetTester tester) async {
     final html =
-        '<ol><li>One</li><li>Two</li><li><strong>Three</strong></li><ol>';
+        '<ol><li>One</li><li>Two</li><li><strong>Three</strong></li></ol>';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -48,7 +48,7 @@ void main() async {
   });
 
   testWidgets('renders unordered list', (WidgetTester tester) async {
-    final html = '<ul><li>One</li><li>Two</li><li><em>Three</em></li><ul>';
+    final html = '<ul><li>One</li><li>Two</li><li><em>Three</em></li></ul>';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -118,7 +118,7 @@ void main() async {
 
   group('OL reversed', () {
     testWidgets('renders 123 (default)', (WidgetTester tester) async {
-      final html = '<ol><li>x</li><li>x</li><li>x</li><ol>';
+      final html = '<ol><li>x</li><li>x</li><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -130,7 +130,7 @@ void main() async {
     });
 
     testWidgets('renders 321', (WidgetTester tester) async {
-      final html = '<ol reversed><li>x</li><li>x</li><li>x</li><ol>';
+      final html = '<ol reversed><li>x</li><li>x</li><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -142,7 +142,8 @@ void main() async {
     });
 
     testWidgets('renders from 99', (WidgetTester tester) async {
-      final html = '<ol reversed start="99"><li>x</li><li>x</li><li>x</li><ol>';
+      final html =
+          '<ol reversed start="99"><li>x</li><li>x</li><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -156,19 +157,20 @@ void main() async {
 
   group('OL start', () {
     testWidgets('renders from 1 (default)', (WidgetTester tester) async {
-      final html = '<ol><li>x</li><ol>';
+      final html = '<ol><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('1.', 'x'))));
     });
 
     testWidgets('renders from 99', (WidgetTester tester) async {
-      final html = '<ol start="99"><li>x</li><ol>';
+      final html = '<ol start="99"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('99.', 'x'))));
     });
 
     testWidgets('renders xyz', (WidgetTester tester) async {
-      final html = '<ol start="24" type="a"><li>x</li><li>x</li><li>x</li><ol>';
+      final html =
+          '<ol start="24" type="a"><li>x</li><li>x</li><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -182,37 +184,37 @@ void main() async {
 
   group('OL type', () {
     testWidgets('renders 1 (default)', (WidgetTester tester) async {
-      final html = '<ol><li>x</li><ol>';
+      final html = '<ol><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('1.', 'x'))));
     });
 
     testWidgets('renders a (lower-alpha)', (WidgetTester tester) async {
-      final html = '<ol type="a"><li>x</li><ol>';
+      final html = '<ol type="a"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('a.', 'x'))));
     });
 
     testWidgets('renders A (upper-alpha)', (WidgetTester tester) async {
-      final html = '<ol type="A"><li>x</li><ol>';
+      final html = '<ol type="A"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('A.', 'x'))));
     });
 
     testWidgets('renders i (lower-roman)', (WidgetTester tester) async {
-      final html = '<ol type="i"><li>x</li><ol>';
+      final html = '<ol type="i"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('i.', 'x'))));
     });
 
     testWidgets('renders I (upper-roman)', (WidgetTester tester) async {
-      final html = '<ol type="I"><li>x</li><ol>';
+      final html = '<ol type="I"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('I.', 'x'))));
     });
 
     testWidgets('renders 1 (decimal)', (WidgetTester tester) async {
-      final html = '<ol type="1"><li>x</li><ol>';
+      final html = '<ol type="1"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('1.', 'x'))));
     });
