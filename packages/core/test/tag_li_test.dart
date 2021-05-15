@@ -600,7 +600,7 @@ void main() async {
   });
 
   group('rtl', () {
-    final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';
+    final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li></ol>';
 
     final explainerExpected =
         '[CssBlock:child=[Padding:(0,40,0,0),child=[Column:dir=rtl,children='
@@ -612,28 +612,30 @@ void main() async {
     final nonExplainerExpected = 'TshWidget\n'
         '└ColumnPlaceholder(BuildMetadata(<root></root>))\n'
         ' └CssBlock()\n'
-        '  └Padding(padding: EdgeInsets(0.0, 0.0, 40.0, 0.0))\n'
-        '   └Column(textDirection: rtl)\n'
-        '    ├WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
-        '    ││  "One"\n'
-        '    ││)\n'
-        '    │└HtmlListItem(textDirection: rtl)\n'
-        '    │ ├RichText(textDirection: rtl, text: "One")\n'
-        '    │ └RichText(textDirection: rtl, maxLines: 1, text: "1.")\n'
-        '    ├WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#2):\n'
-        '    ││  "Two"\n'
-        '    ││)\n'
-        '    │└HtmlListItem(textDirection: rtl)\n'
-        '    │ ├RichText(textDirection: rtl, text: "Two")\n'
-        '    │ └RichText(textDirection: rtl, maxLines: 1, text: "2.")\n'
-        '    └WidgetPlaceholder<BuildTree>(BuildTree#5 tsb#6(parent=#2):\n'
-        '     │  BuildTree#7 tsb#8(parent=#6):\n'
-        '     │    "Three"\n'
-        '     │)\n'
-        '     └HtmlListItem(textDirection: rtl)\n'
-        '      ├RichText(textDirection: rtl, text: "Three")\n'
-        '      └RichText(textDirection: rtl, maxLines: 1, text: "3.")\n'
-        '\n';
+        '  └WidgetPlaceholder<CssLengthBox>(CssLengthBox(inline-start=40.0px))\n'
+        '   └CssBlock()\n'
+        '    └Padding(padding: EdgeInsets(0.0, 0.0, 40.0, 0.0))\n'
+        '     └ColumnPlaceholder(BuildMetadata(<ol><li>One</li><li>Two</li><li><b>Three</b></li></ol>))\n'
+        '      └Column(textDirection: rtl)\n'
+        '       ├WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+        '       ││  "One"\n'
+        '       ││)\n'
+        '       │└HtmlListItem(textDirection: rtl)\n'
+        '       │ ├RichText(textDirection: rtl, text: "One")\n'
+        '       │ └RichText(textDirection: rtl, maxLines: 1, text: "1.")\n'
+        '       ├WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#2):\n'
+        '       ││  "Two"\n'
+        '       ││)\n'
+        '       │└HtmlListItem(textDirection: rtl)\n'
+        '       │ ├RichText(textDirection: rtl, text: "Two")\n'
+        '       │ └RichText(textDirection: rtl, maxLines: 1, text: "2.")\n'
+        '       └WidgetPlaceholder<BuildTree>(BuildTree#5 tsb#6(parent=#2):\n'
+        '        │  BuildTree#7 tsb#8(parent=#6):\n'
+        '        │    "Three"\n'
+        '        │)\n'
+        '        └HtmlListItem(textDirection: rtl)\n'
+        '         ├RichText(textDirection: rtl, text: "Three")\n'
+        '         └RichText(textDirection: rtl, maxLines: 1, text: "3.")\n\n';
 
     testWidgets('renders ordered list', (WidgetTester tester) async {
       final explained = await explain(tester, null,
