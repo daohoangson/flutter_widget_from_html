@@ -67,7 +67,7 @@ jobs:
           cd ..
           cp -R goldens ../build/web/supported
 
-      - name: Deploy via now.sh
+      - name: Deploy via now.sh 2021051501
         id: now
         env:
           PROJECT_JSON: ${{ secrets.EXAMPLE_PROJECT_JSON }}
