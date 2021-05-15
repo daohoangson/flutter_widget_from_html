@@ -255,6 +255,40 @@ class CssLengthBox {
   double? getValueRight(TextStyleHtml tsh) => (_right ??
           (tsh.textDirection == TextDirection.ltr ? _inlineEnd : _inlineStart))
       ?.getValue(tsh);
+
+  @override
+  String toString() {
+    const _null = 'null';
+    final left = (_left ?? _inlineStart)?.toString() ?? _null;
+    final top = this.top?.toString() ?? _null;
+    final right = (_right ?? _inlineEnd)?.toString() ?? _null;
+    final bottom = this.bottom?.toString() ?? _null;
+    if (left == right && right == top && top == bottom) {
+      return 'CssLengthBox.all($left)';
+    }
+
+    final values = [left, top, right, bottom];
+    if (values.where((v) => v == _null).length == 3) {
+      if (left != _null) {
+        if (_left != null) {
+          return 'CssLengthBox(left=$_left)';
+        } else {
+          return 'CssLengthBox(inline-start=$_inlineStart)';
+        }
+      }
+      if (top != _null) return 'CssLengthBox(top=$top)';
+      if (right != _null) {
+        if (_right != null) {
+          return 'CssLengthBox(right=$_right)';
+        } else {
+          return 'CssLengthBox(inline-end=$_inlineEnd)';
+        }
+      }
+      if (bottom != _null) return 'CssLengthBox(bottom=$bottom)';
+    }
+
+    return 'CssLengthBox($left, $top, $right, $bottom)';
+  }
 }
 
 /// Length measurement units.
