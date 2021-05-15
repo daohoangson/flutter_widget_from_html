@@ -24,7 +24,7 @@ class StyleTextAlign {
         onTree: (meta, _) => meta.tsb.enqueue(_tsb, value),
         onWidgets: (_, widgets) => _onWidgets(widgets, value),
         onWidgetsIsOptional: true,
-        priority: 4100,
+        priority: 4200,
       );
 
   static Iterable<Widget> _onWidgets(Iterable<Widget> widgets, String value) {
