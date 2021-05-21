@@ -88,7 +88,7 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
     Key? key,
     this.rowSpan = 1,
     required this.rowStart,
-  })   : assert(columnSpan >= 1),
+  })  : assert(columnSpan >= 1),
         assert(columnStart >= 0),
         assert(rowSpan >= 1),
         assert(rowStart >= 0),

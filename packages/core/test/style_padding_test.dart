@@ -459,6 +459,21 @@ void main() {
     });
   });
 
+  group('combos', () {
+    testWidgets('renders with background & h2', (WidgetTester tester) async {
+      final html = '<div style="background: red; padding: 5px">'
+          '<h2>Foo</h2></div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssBlock:child='
+              '[DecoratedBox:bg=#FFFF0000,child='
+              '[Padding:(5,5,5,5),child='
+              '[Column:children=[SizedBox:0.0x12.4],[CssBlock:child=[RichText:(@15.0+b:Foo)]],[SizedBox:0.0x12.4]]'
+              ']]]'));
+    });
+  });
+
   group('invalid values', () {
     testWidgets('4 values', (WidgetTester tester) async {
       final html = '<div style="padding: a b c d">Foo</div>';

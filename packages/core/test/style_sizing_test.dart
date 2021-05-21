@@ -310,13 +310,16 @@ void main() {
         explained,
         equals('[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child='
             '[Padding:(20,20,20,20),child='
+            '[Column:children=[SizedBox:0.0x15.0],'
             '[CssBlock:child=[DecoratedBox:bg=#FF008000,child='
             '[Padding:(0,15,0,15),child='
             '[CssSizing:height=100.0,width=100.0,child='
             '[DecoratedBox:bg=#FF0000FF,child='
             '[Padding:(5,5,5,5),child='
             '[RichText:(#FFFFFFFF:Foo)]'
-            ']]]]]]]]]'));
+            ']]]]]],'
+            '[SizedBox:0.0x15.0]'
+            ']]]]'));
   });
 
   group('block', () {
