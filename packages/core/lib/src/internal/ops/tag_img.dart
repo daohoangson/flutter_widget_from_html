@@ -16,7 +16,12 @@ class TagImg {
   BuildOp get buildOp => BuildOp(
         defaultStyles: (element) {
           final attrs = element.attributes;
-          final styles = <String, String>{};
+          final styles = {
+            kCssHeight: 'auto',
+            kCssMinWidth: '0px',
+            kCssMinHeight: '0px',
+            kCssWidth: 'auto',
+          };
 
           if (attrs.containsKey(kAttributeImgHeight)) {
             styles[kCssHeight] = '${attrs[kAttributeImgHeight]}px';
@@ -29,38 +34,25 @@ class TagImg {
         },
         onTree: (meta, tree) {
           final data = _parse(meta);
-          final built = _build(meta, data);
+          final built = wf.buildImage(meta, data);
           if (built == null) {
-            final imgText = data.alt ?? data.title;
-            if (imgText?.isNotEmpty == true) {
-              tree.addText(imgText);
-            }
+            final imgText = data.alt ?? data.title ?? '';
+            if (imgText.isNotEmpty) tree.addText(imgText);
             return;
           }
 
           final placeholder =
-              WidgetPlaceholder<ImageMetadata>(data, child: built)
-                  .wrapWith((context, child) => _LoosenConstraintsWidget(
-                        child: child,
-                        crossAxisAlignment:
-                            meta.tsb().build(context).crossAxisAlignment,
-                      ));
+              WidgetPlaceholder<ImageMetadata>(data, child: built);
 
-          tree.replaceWith(meta.isBlockElement
+          tree.replaceWith(meta.willBuildSubtree!
               ? WidgetBit.block(tree, placeholder)
               : WidgetBit.inline(tree, placeholder));
         },
       );
 
-  Widget _build(BuildMetadata meta, ImageMetadata data) {
-    final provider = wf.imageProvider(data.sources?.first);
-    if (provider == null) return null;
-    return wf.buildImage(meta, provider, data);
-  }
-
   ImageMetadata _parse(BuildMetadata meta) {
     final attrs = meta.element.attributes;
-    final url = wf.urlFull(attrs[kAttributeImgSrc]);
+    final url = wf.urlFull(attrs[kAttributeImgSrc] ?? '');
     return ImageMetadata(
       alt: attrs[kAttributeImgAlt],
       sources: (url != null)
@@ -71,75 +63,8 @@ class TagImg {
                 width: tryParseDoubleFromMap(attrs, kAttributeImgWidth),
               ),
             ]
-          : null,
+          : const [],
       title: attrs[kAttributeImgTitle],
     );
-  }
-}
-
-class _LoosenConstraintsWidget extends SingleChildRenderObjectWidget {
-  final CrossAxisAlignment crossAxisAlignment;
-
-  _LoosenConstraintsWidget(
-      {@required Widget child, this.crossAxisAlignment, Key key})
-      : super(child: child, key: key);
-
-  @override
-  _LoosenConstraintsRender createRenderObject(BuildContext _) =>
-      _LoosenConstraintsRender(crossAxisAlignment: crossAxisAlignment);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<CrossAxisAlignment>(
-        'crossAxisAlignment', crossAxisAlignment));
-  }
-
-  @override
-  void updateRenderObject(
-      BuildContext _, _LoosenConstraintsRender renderObject) {
-    renderObject.crossAxisAlignment = crossAxisAlignment;
-  }
-}
-
-class _LoosenConstraintsParentData extends ContainerBoxParentData<RenderBox> {}
-
-class _LoosenConstraintsRender extends RenderProxyBox {
-  _LoosenConstraintsRender({
-    RenderBox child,
-    CrossAxisAlignment crossAxisAlignment,
-  })  : _crossAxisAlignment = crossAxisAlignment,
-        super(child);
-
-  CrossAxisAlignment _crossAxisAlignment;
-  set crossAxisAlignment(CrossAxisAlignment value) {
-    if (value == _crossAxisAlignment) return;
-    _crossAxisAlignment = value;
-    markNeedsLayout();
-  }
-
-  @override
-  void paint(PaintingContext context, Offset offset) {
-    final data = child.parentData as _LoosenConstraintsParentData;
-    context.paintChild(child, data.offset + offset);
-  }
-
-  @override
-  void performLayout() {
-    final c = constraints;
-    child.layout(c.loosen(), parentUsesSize: true);
-    size = c.constrain(child.size);
-
-    if (_crossAxisAlignment == CrossAxisAlignment.center) {
-      final data = child.parentData as _LoosenConstraintsParentData;
-      data.offset = Offset((size.width - child.size.width) / 2, 0);
-    }
-  }
-
-  @override
-  void setupParentData(RenderBox child) {
-    if (child.parentData is! _LoosenConstraintsParentData) {
-      child.parentData = _LoosenConstraintsParentData();
-    }
   }
 }

@@ -1,214 +1,340 @@
+import 'dart:math';
+
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-/// A CSS sizing widget.
-///
-/// [child] will be layouted to match its preferred ratio if [size] is provided.
-/// Additional constraints will be applied loosely in order to
-/// stay as close as possible to the preferred width / height.
-class CssSizing extends SingleChildRenderObjectWidget {
-  /// The additional constraints.
-  final BoxConstraints constraints;
-
-  /// The preferred size.
-  final Size size;
-
-  /// Creates a CSS sizing.
-  CssSizing({
-    @required Widget child,
-    @required this.constraints,
-    Key key,
-    @required this.size,
-  })  : assert(child != null),
-        assert(constraints != null),
-        assert(constraints.debugAssertIsValid()),
-        assert(size != null),
-        super(child: child, key: key);
+/// A CSS block.
+class CssBlock extends CssSizing {
+  /// Creates a CSS block.
+  CssBlock({required Widget child, Key? key}) : super(child: child, key: key);
 
   @override
   _RenderCssSizing createRenderObject(BuildContext _) =>
-      _RenderCssSizing(additionalConstraints: constraints, preferredSize: size);
+      _RenderCssSizing(preferredWidth: const CssSizingValue.percentage(100));
+
+  @override
+  void updateRenderObject(BuildContext _, _RenderCssSizing renderObject) =>
+      renderObject.setPreferredSize(
+          null, const CssSizingValue.percentage(100), null);
+}
+
+/// A CSS sizing widget.
+class CssSizing extends SingleChildRenderObjectWidget {
+  /// The maximum height.
+  final CssSizingValue? maxHeight;
+
+  /// The maximum width.
+  final CssSizingValue? maxWidth;
+
+  /// The minimum height.
+  final CssSizingValue? minHeight;
+
+  // The minimum width;
+  final CssSizingValue? minWidth;
+
+  /// The preferred axis.
+  ///
+  /// When both dimensions have preferred value, one will have higher priority.
+  /// If the preferred axis is [Axis.vertical] and child size seems to be stable
+  /// (e.g. has the same aspect ratio regardless of layout constraints)
+  /// the [preferredHeight] will be used for sizing.
+  ///
+  /// By default (`null` preferred axis), [preferredWidth] will be used.
+  final Axis? preferredAxis;
+
+  /// The preferred height.
+  final CssSizingValue? preferredHeight;
+
+  /// The preferred width.
+  final CssSizingValue? preferredWidth;
+
+  /// Creates a CSS sizing.
+  CssSizing({
+    required Widget child,
+    Key? key,
+    this.maxHeight,
+    this.maxWidth,
+    this.minHeight,
+    this.minWidth,
+    this.preferredAxis,
+    this.preferredHeight,
+    this.preferredWidth,
+  }) : super(child: child, key: key);
+
+  @override
+  _RenderCssSizing createRenderObject(BuildContext _) => _RenderCssSizing(
+        maxHeight: maxHeight,
+        maxWidth: maxWidth,
+        minHeight: minHeight,
+        minWidth: minWidth,
+        preferredAxis: preferredAxis,
+        preferredHeight: preferredHeight,
+        preferredWidth: preferredWidth,
+      );
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    _debugFillProperty(properties, 'maxHeight', maxHeight);
+    _debugFillProperty(properties, 'maxWidth', maxWidth);
+    _debugFillProperty(properties, 'minHeight', minHeight);
+    _debugFillProperty(properties, 'minWidth', minWidth);
+    _debugFillProperty(
+        properties,
+        'preferredHeight' +
+            (preferredHeight != null &&
+                    preferredWidth != null &&
+                    preferredAxis == Axis.vertical
+                ? '*'
+                : ''),
+        preferredHeight);
+    _debugFillProperty(
+        properties,
+        'preferredWidth' +
+            (preferredHeight != null &&
+                    preferredWidth != null &&
+                    preferredAxis != Axis.vertical
+                ? '*'
+                : ''),
+        preferredWidth);
+  }
+
+  void _debugFillProperty(DiagnosticPropertiesBuilder properties, String name,
+      CssSizingValue? value) {
+    if (value == null) return;
+    properties.add(DiagnosticsProperty<CssSizingValue>(name, value));
+  }
 
   @override
   void updateRenderObject(BuildContext _, _RenderCssSizing renderObject) {
-    renderObject.additionalConstraints = constraints;
-    renderObject.preferredSize = size;
+    renderObject.setConstraints(
+      maxHeight: maxHeight,
+      maxWidth: maxWidth,
+      minHeight: minHeight,
+      minWidth: minWidth,
+    );
+    renderObject.setPreferredSize(
+        preferredAxis, preferredWidth, preferredHeight);
   }
 }
 
 class _RenderCssSizing extends RenderProxyBox {
   _RenderCssSizing({
-    RenderBox child,
-    @required BoxConstraints additionalConstraints,
-    @required Size preferredSize,
-  })  : assert(additionalConstraints != null),
-        assert(additionalConstraints.debugAssertIsValid()),
-        assert(preferredSize != null),
-        _additionalConstraints = additionalConstraints,
-        _preferredSize = preferredSize,
-        _preferredRatio = _calculateRatio(preferredSize),
+    RenderBox? child,
+    CssSizingValue? maxHeight,
+    CssSizingValue? maxWidth,
+    CssSizingValue? minHeight,
+    CssSizingValue? minWidth,
+    Axis? preferredAxis,
+    CssSizingValue? preferredHeight,
+    CssSizingValue? preferredWidth,
+  })  : _maxHeight = maxHeight,
+        _maxWidth = maxWidth,
+        _minHeight = minHeight,
+        _minWidth = minWidth,
+        _preferredAxis = preferredAxis,
+        _preferredHeight = preferredHeight,
+        _preferredWidth = preferredWidth,
         super(child);
 
-  BoxConstraints _additionalConstraints;
-  set additionalConstraints(BoxConstraints value) {
-    assert(value != null);
-    assert(value.debugAssertIsValid());
-    if (_additionalConstraints == value) return;
-    _additionalConstraints = value;
+  CssSizingValue? _maxHeight;
+  CssSizingValue? _maxWidth;
+  CssSizingValue? _minHeight;
+  CssSizingValue? _minWidth;
+  void setConstraints({
+    CssSizingValue? maxHeight,
+    CssSizingValue? maxWidth,
+    CssSizingValue? minHeight,
+    CssSizingValue? minWidth,
+  }) {
+    if (maxHeight == _maxHeight &&
+        maxWidth == _maxWidth &&
+        minHeight == _minHeight &&
+        minWidth == _minWidth) {
+      return;
+    }
+    _maxHeight = maxHeight;
+    _maxWidth = maxWidth;
+    _minHeight = minHeight;
+    _minWidth = minWidth;
     markNeedsLayout();
   }
 
-  Size _preferredSize;
-  double _preferredRatio;
-  set preferredSize(Size value) {
-    assert(value != null);
-    if (_preferredSize == value) return;
-    _preferredSize = value;
-    _preferredRatio = _calculateRatio(value);
+  Axis? _preferredAxis;
+  CssSizingValue? _preferredHeight;
+  CssSizingValue? _preferredWidth;
+  void setPreferredSize(
+      Axis? axis, CssSizingValue? width, CssSizingValue? height) {
+    if (axis == _preferredAxis &&
+        height == _preferredHeight &&
+        width == _preferredWidth) return;
+    _preferredAxis = axis;
+    _preferredHeight = height;
+    _preferredWidth = width;
     markNeedsLayout();
   }
 
   @override
-  double computeMinIntrinsicWidth(double height) {
-    if (height.isFinite && _preferredRatio != null) {
-      return height * _preferredRatio;
-    }
-
-    if (_additionalConstraints.hasBoundedWidth &&
-        _additionalConstraints.hasTightWidth) {
-      return _additionalConstraints.minWidth;
-    }
-
-    final width = super.computeMinIntrinsicWidth(height);
-    if (!_additionalConstraints.hasInfiniteWidth) {
-      return _additionalConstraints.constrainWidth(width);
-    }
-
-    return width;
-  }
-
-  @override
-  double computeMaxIntrinsicWidth(double height) {
-    if (height.isFinite && _preferredRatio != null) {
-      return height * _preferredRatio;
-    }
-
-    if (_additionalConstraints.hasBoundedWidth &&
-        _additionalConstraints.hasTightWidth) {
-      return _additionalConstraints.minWidth;
-    }
-
-    final width = super.computeMaxIntrinsicWidth(height);
-    if (!_additionalConstraints.hasInfiniteWidth) {
-      return _additionalConstraints.constrainWidth(width);
-    }
-
-    return width;
-  }
-
-  @override
-  double computeMinIntrinsicHeight(double width) {
-    if (width.isFinite && _preferredRatio != null) {
-      return width / _preferredRatio;
-    }
-
-    if (_additionalConstraints.hasBoundedHeight &&
-        _additionalConstraints.hasTightHeight) {
-      return _additionalConstraints.minHeight;
-    }
-
-    final height = super.computeMinIntrinsicHeight(width);
-    if (!_additionalConstraints.hasInfiniteHeight) {
-      return _additionalConstraints.constrainHeight(height);
-    }
-
-    return height;
-  }
-
-  @override
-  double computeMaxIntrinsicHeight(double width) {
-    if (width.isFinite && _preferredRatio != null) {
-      return width / _preferredRatio;
-    }
-
-    if (_additionalConstraints.hasBoundedHeight &&
-        _additionalConstraints.hasTightHeight) {
-      return _additionalConstraints.minHeight;
-    }
-
-    final height = super.computeMaxIntrinsicHeight(width);
-    if (!_additionalConstraints.hasInfiniteHeight) {
-      return _additionalConstraints.constrainHeight(height);
-    }
-
-    return height;
+  Size computeDryLayout(BoxConstraints constraints) {
+    final cc = _applyContraints(constraints);
+    final childSize = child!.getDryLayout(cc);
+    return constraints.constrain(childSize);
   }
 
   @override
   void performLayout() {
-    final a = _additionalConstraints;
-    final c = constraints;
-
-    // enforce additional contraints with parent's (ignoring lower bounds)
-    var cc = a.enforce(c.loosen());
-    final s = _applyPreferredRatio(cc);
-
-    if (s != null) {
-      // we have both preferred width & height
-      cc = BoxConstraints.tight(s);
-    } else if (_preferredSize.height.isFinite) {
-      // we have preferred height
-      final height = cc.constrainHeight(_preferredSize.height);
-      cc = cc.copyWith(maxHeight: height, minHeight: height);
-    } else if (_preferredSize.width.isFinite) {
-      // we have preferred width
-      final width = cc.constrainWidth(_preferredSize.width);
-      cc = cc.copyWith(maxWidth: width, minWidth: width);
-    }
-
-    child.layout(cc, parentUsesSize: true);
-    size = c.constrain(child.size);
+    final cc = _applyContraints(constraints);
+    child!.layout(cc, parentUsesSize: true);
+    size = constraints.constrain(child!.size);
   }
 
-  Size _applyPreferredRatio(BoxConstraints c) {
-    if (_preferredRatio == null) return null;
+  BoxConstraints _applyContraints(BoxConstraints c) {
+    final maxHeight =
+        min(c.maxHeight, _maxHeight?.clamp(0.0, c.maxHeight) ?? c.maxHeight);
+    final maxWidth =
+        min(c.maxWidth, _maxWidth?.clamp(0.0, c.maxWidth) ?? c.maxWidth);
+    final minHeight =
+        min(maxHeight, _minHeight?.clamp(0.0, c.maxHeight) ?? c.minHeight);
+    final minWidth =
+        min(maxWidth, _minWidth?.clamp(0.0, c.maxWidth) ?? c.minWidth);
 
-    var width = _preferredSize.width ?? c.maxWidth;
-    double height;
+    final __preferredHeight = _preferredHeight?.clamp(minHeight, maxHeight);
+    // special handling for tight contraints: ignore min in `clamp()`
+    // (usually happen if parent is a block)
+    final effectiveMinWidth = minWidth == maxWidth ? 0.0 : minWidth;
+    final __preferredWidth =
+        _preferredWidth?.clamp(effectiveMinWidth, maxWidth);
+    // ignore preferred value if it's infinite
+    final preferredHeight =
+        __preferredHeight?.isFinite == true ? __preferredHeight : null;
+    final preferredWidth =
+        __preferredWidth?.isFinite == true ? __preferredWidth : null;
 
-    if (width.isFinite) {
-      height = width / _preferredRatio;
+    final stableChildSize = (preferredHeight != null && preferredWidth != null)
+        ? _guessChildSize(
+            maxHeight: maxHeight,
+            maxWidth: maxWidth,
+            preferredHeight: preferredHeight,
+            preferredWidth: preferredWidth,
+          )
+        : null;
+
+    final cc = BoxConstraints(
+      maxHeight: stableChildSize?.height ?? preferredHeight ?? maxHeight,
+      maxWidth: stableChildSize?.width ?? preferredWidth ?? maxWidth,
+      minHeight: stableChildSize?.height ?? preferredHeight ?? minHeight,
+      minWidth: stableChildSize?.width ?? preferredWidth ?? minWidth,
+    );
+
+    return cc;
+  }
+
+  Size? _guessChildSize({
+    required double maxHeight,
+    required double maxWidth,
+    required double preferredHeight,
+    required double preferredWidth,
+  }) {
+    final ccHeight = BoxConstraints(
+      maxWidth: double.infinity,
+      maxHeight: preferredHeight,
+      minWidth: 0,
+      minHeight: preferredHeight,
+    );
+    final sizeHeight = child!.getDryLayout(ccHeight);
+
+    final ccWidth = BoxConstraints(
+      maxWidth: preferredWidth,
+      maxHeight: double.infinity,
+      minWidth: preferredWidth,
+      minHeight: 0,
+    );
+    final sizeWidth = child!.getDryLayout(ccWidth);
+
+    final childAspectRatio = sizeWidth.width / sizeWidth.height;
+    const epsilon = 0.01;
+    if ((childAspectRatio - sizeHeight.width / sizeHeight.height).abs() >
+        epsilon) {
+      return null;
+    }
+
+    // child appears to have a stable aspect ratio
+    double? childWidth, childHeight;
+    if (_preferredAxis == Axis.vertical) {
+      childHeight = preferredHeight;
+      childWidth = childHeight * childAspectRatio;
     } else {
-      height = _preferredSize.height ?? c.maxHeight;
-      width = height * _preferredRatio;
+      childWidth = preferredWidth;
+      childHeight = childWidth / childAspectRatio;
     }
 
-    if (width > c.maxWidth) {
-      width = c.maxWidth;
-      height = width / _preferredRatio;
+    if (childWidth > maxWidth) {
+      childWidth = maxWidth;
+      childHeight = childWidth / childAspectRatio;
+    }
+    if (childHeight > maxHeight) {
+      childHeight = maxHeight;
+      childWidth = childHeight * childAspectRatio;
     }
 
-    if (height > c.maxHeight) {
-      height = c.maxHeight;
-      width = height * _preferredRatio;
-    }
-
-    if (width < c.minWidth) {
-      width = c.minWidth;
-      height = width / _preferredRatio;
-    }
-
-    if (height < c.minHeight) {
-      height = c.minHeight;
-      width = height * _preferredRatio;
-    }
-
-    return Size(width, height);
+    return Size(childWidth, childHeight);
   }
+}
 
-  static double _calculateRatio(Size size) => size.width.isFinite == true &&
-          size.height.isFinite == true &&
-          size.height != 0
-      ? size.width / size.height
-      : null;
+/// A [CssSizing] value.
+abstract class CssSizingValue {
+  const CssSizingValue._();
+  double? clamp(double min, double max);
+
+  /// Creates an auto value.
+  const factory CssSizingValue.auto() = _CssSizingAuto;
+
+  /// Creates a percentage value.
+  const factory CssSizingValue.percentage(double _) = _CssSizingPercentage;
+
+  /// Creates a fixed value.
+  const factory CssSizingValue.value(double _) = _CssSizingValue;
+}
+
+class _CssSizingAuto extends CssSizingValue {
+  const _CssSizingAuto() : super._();
+  @override
+  double? clamp(double _, double __) => null;
+
+  @override
+  int get hashCode => 0;
+  @override
+  bool operator ==(Object other) => other is _CssSizingAuto;
+  @override
+  String toString() => 'auto';
+}
+
+class _CssSizingPercentage extends CssSizingValue {
+  final double percentage;
+  const _CssSizingPercentage(this.percentage) : super._();
+  @override
+  double clamp(double min, double max) => (max * percentage).clamp(min, max);
+
+  @override
+  int get hashCode => percentage.hashCode;
+  @override
+  bool operator ==(Object other) =>
+      other is _CssSizingPercentage ? other.percentage == percentage : false;
+  @override
+  String toString() => '${percentage.toStringAsFixed(1)}%';
+}
+
+class _CssSizingValue extends CssSizingValue {
+  final double value;
+  const _CssSizingValue(this.value) : super._();
+  @override
+  double clamp(double min, double max) => value.clamp(min, max);
+
+  @override
+  int get hashCode => value.hashCode;
+  @override
+  bool operator ==(Object other) =>
+      other is _CssSizingValue ? other.value == value : false;
+  @override
+  String toString() => value.toStringAsFixed(1);
 }

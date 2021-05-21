@@ -1,51 +1,87 @@
 part of '../core_parser.dart';
 
 const kCssBorder = 'border';
-const kCssBorderBottom = 'border-bottom';
-const kCssBorderTop = 'border-top';
+const kCssBorderInherit = 'inherit';
+const kCssBorderStyleDotted = 'dotted';
+const kCssBorderStyleDashed = 'dashed';
+const kCssBorderStyleDouble = 'double';
+const kCssBorderStyleSolid = 'solid';
 
-final _borderValuesThreeRegExp = RegExp(r'^(.+)\s+(.+)\s+(.+)$');
-final _borderValuesTwoRegExp = RegExp(r'^(.+)\s+(.+)$');
+final _elementBorder = Expando<CssBorder>();
 
-CssBorderSide tryParseCssBorderSide(String value) {
-  final valuesThree = _borderValuesThreeRegExp.firstMatch(value);
-  if (valuesThree != null) {
-    final width = tryParseCssLength(valuesThree[1]);
-    if (width == null || width.number <= 0) return null;
-    return CssBorderSide(
-      color: tryParseColor(valuesThree[3]),
-      style: tryParseCssBorderStyle(valuesThree[2]),
-      width: width,
-    );
+CssBorder tryParseBorder(BuildMetadata meta) {
+  final existing = _elementBorder[meta.element];
+  if (existing != null) return existing;
+  var border = CssBorder();
+
+  for (final style in meta.styles) {
+    final key = style.property;
+    if (!key.startsWith(kCssBorder)) continue;
+
+    final suffix = key.substring(kCssBorder.length);
+    if (suffix.isEmpty && style.term == kCssBorderInherit) {
+      border = CssBorder(inherit: true);
+      continue;
+    }
+
+    final borderSide = _tryParseBorderSide(style.values);
+    if (suffix.isEmpty) {
+      border = CssBorder(all: borderSide);
+    } else {
+      switch (suffix) {
+        case kSuffixBottom:
+        case kSuffixBlockEnd:
+          border = border.copyWith(bottom: borderSide);
+          break;
+        case kSuffixInlineEnd:
+          border = border.copyWith(inlineEnd: borderSide);
+          break;
+        case kSuffixInlineStart:
+          border = border.copyWith(inlineStart: borderSide);
+          break;
+        case kSuffixLeft:
+          border = border.copyWith(left: borderSide);
+          break;
+        case kSuffixRight:
+          border = border.copyWith(right: borderSide);
+          break;
+        case kSuffixTop:
+        case kSuffixBlockStart:
+          border = border.copyWith(top: borderSide);
+          break;
+      }
+    }
   }
 
-  final valuesTwo = _borderValuesTwoRegExp.firstMatch(value);
-  if (valuesTwo != null) {
-    final width = tryParseCssLength(valuesTwo[1]);
-    if (width == null || width.number <= 0) return null;
-    return CssBorderSide(
-      style: tryParseCssBorderStyle(valuesTwo[2]),
-      width: width,
-    );
-  }
+  return _elementBorder[meta.element] = border;
+}
 
-  final width = tryParseCssLength(value);
-  if (width == null || width.number <= 0) return null;
+CssBorderSide? _tryParseBorderSide(List<css.Expression> expressions) {
+  final width =
+      expressions.isNotEmpty ? tryParseCssLength(expressions[0]) : null;
+  if (width == null || width.number <= 0) return CssBorderSide.none;
+
   return CssBorderSide(
-    style: TextDecorationStyle.solid,
+    color: expressions.length >= 3 ? tryParseColor(expressions[2]) : null,
+    style: expressions.length >= 2
+        ? _tryParseTextDecorationStyle(expressions[1])
+        : null,
     width: width,
   );
 }
 
-TextDecorationStyle tryParseCssBorderStyle(String value) {
+TextDecorationStyle? _tryParseTextDecorationStyle(css.Expression expression) {
+  final value = expression is css.LiteralTerm ? expression.valueAsString : null;
   switch (value) {
-    case 'dotted':
+    case kCssBorderStyleDotted:
       return TextDecorationStyle.dotted;
-    case 'dashed':
+    case kCssBorderStyleDashed:
       return TextDecorationStyle.dashed;
-    case 'double':
+    case kCssBorderStyleDouble:
       return TextDecorationStyle.double;
+    case kCssBorderStyleSolid:
+      return TextDecorationStyle.solid;
   }
 
-  return TextDecorationStyle.solid;
+  return null;
 }

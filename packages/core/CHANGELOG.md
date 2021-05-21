@@ -1,3 +1,81 @@
+## 0.6.1+1
+
+- Fix negative margin/padding throwing exception (#510)
+
+## 0.6.1
+
+- Add support for white-space inline style (#483)
+- Change onTapUrl signature to accept a returning value (#499)
+- Fix `_ListMarkerRenderObject` invalid size
+- Fix anchor bugs (#485, #491, #493 and #500)
+- Fix TR display: none is still being rendered (#489)
+- Fix empty TD being skipped -> incorrect table layout (#503)
+
+## 0.6.0
+
+- Flutter 2 🚀
+- Use csslib to parse inline style (#379)
+- Implement `computeDryLayout` (#411)
+- Migrate to null safety (#436, authored by @miDeb)
+- Add support for anchor (#447)
+- Dispose recognizer properly (#466)
+
+## 0.5.2+1
+
+- [CanvasKit] Add workaround for unimplemented `computeLineMetrics` (#441)
+
+## 0.5.2
+
+- Add support for TABLE attribute `cellpadding` (#365)
+- Add support for table cell attributes `colspan`, `rowspan`, `valign` (#365)
+- Add support for `HtmlWidget.onTapImage` callback (#398)
+- Add support for file:// images (#432)
+- Allow getting parsed inline styles from `dom.Element` directly (#367)
+- Improve support for inline styles border, border-collapse and box-sizing  (#365)
+- Fix line metrics are unavailable on Flutter web (#383)
+- Fix IMG tag with dimensions being stretched (#429)
+
+## 0.5.1+4
+
+- Improve RUBY baseline (#362)
+- Fix `CssBlock` loosing stretched width on render object updated (#360)
+- Fix nested sizing / text-align / vertical-align (#361)
+
+## 0.5.1+3
+
+- Fix LI marker position on non-default line height
+
+## 0.5.1+2
+
+- Fix bug `null` access (authored by @sweatfryash)
+- Fix bug customWidgetBuilder does not work for TABLE (#353)
+
+## 0.5.1+1
+
+- Discard preferred width / height on infinity value. (#340)
+- Fix image with dimensions cannot scale down (#341)
+- Use a separated `BuildOp` for `display: block` (#342)
+
+## 0.5.1
+
+- Add support for auto, percentage sizing (e.g. `width: 50%`)
+- Fix image cannot scale up (#337)
+
+This release includes some changes that may require migration if you have a custom `WidgetFactory`:
+
+- Replace `BuildMetadata.isBlockElement` with .`willBuildSubtree`.
+- Replace `BuildOp.isBlockElement` with `.onWidgetsIsOptional`
+- Split display parsing into `WidgetFactory.parseStyleDisplay`
+- `TextStyleHtml.crossAxisAlignment` has been removed (no replacement)
+
+## 0.5.0+7
+
+- Fix incorrect alignment of list marker (#335)
+
+## 0.5.0+6
+
+- Stop using singleton WidgetFactory by default
+
 ## 0.5.0+5
 
 - Use Stack.clipBehavior instead of .overflow (#321, authored by @bahador)

@@ -403,6 +403,77 @@ void main() {
     });
   });
 
+  group('negative values', () {
+    testWidgets('4 values', (WidgetTester tester) async {
+      final html = '<div style="padding: -1px -2px -3px -4px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('2 values', (WidgetTester tester) async {
+      final html = '<div style="padding: -1px -2px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('1 value', (WidgetTester tester) async {
+      final html = '<div style="padding: -1px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('top', (WidgetTester tester) async {
+      final html = '<div style="padding-top: -1px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('right', (WidgetTester tester) async {
+      final html = '<div style="padding-right: -1px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('end', (WidgetTester tester) async {
+      final html = '<div style="padding-inline-end: -1px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('bottom', (WidgetTester tester) async {
+      final html = '<div style="padding-bottom: -1px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('left', (WidgetTester tester) async {
+      final html = '<div style="padding-left: -1px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('start', (WidgetTester tester) async {
+      final html = '<div style="padding-inline-start: -1px">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+  });
+
+  group('combos', () {
+    testWidgets('renders with background & h2', (WidgetTester tester) async {
+      final html = '<div style="background: red; padding: 5px">'
+          '<h2>Foo</h2></div>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals('[CssBlock:child='
+              '[DecoratedBox:bg=#FFFF0000,child='
+              '[Padding:(5,5,5,5),child='
+              '[Column:children=[SizedBox:0.0x12.4],[CssBlock:child=[RichText:(@15.0+b:Foo)]],[SizedBox:0.0x12.4]]'
+              ']]]'));
+    });
+  });
+
   group('invalid values', () {
     testWidgets('4 values', (WidgetTester tester) async {
       final html = '<div style="padding: a b c d">Foo</div>';

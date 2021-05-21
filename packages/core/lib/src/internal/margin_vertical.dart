@@ -23,14 +23,14 @@ class HeightPlaceholder extends WidgetPlaceholder<CssLength> {
   }
 
   @override
-  HeightPlaceholder wrapWith(Widget Function(BuildContext, Widget) builder) =>
+  HeightPlaceholder wrapWith(Widget? Function(BuildContext, Widget) builder) =>
       this;
 
   static Widget _build(BuildContext context, Widget child, CssLength height,
       TextStyleBuilder tsb) {
-    final existing = child is SizedBox ? child.height : 0.0;
+    final existing = (child is SizedBox ? child.height : null) ?? 0.0;
     final value = height.getValue(tsb.build(context));
-    if (value > existing) return SizedBox(height: value);
+    if (value != null && value > existing) return SizedBox(height: value);
     return child;
   }
 }

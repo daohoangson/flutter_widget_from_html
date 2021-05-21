@@ -13,12 +13,12 @@ class FontSizeScreen extends StatelessWidget {
             child: Column(
               children: [
                 Container(
-                  child: _Panel(),
                   color: Colors.blue,
+                  child: _Panel(),
                 ),
                 Container(
-                  child: _Slider(),
                   color: Colors.red,
+                  child: _Slider(),
                 ),
               ],
             ),
@@ -30,7 +30,9 @@ class FontSizeScreen extends StatelessWidget {
 class _Panel extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DefaultTextStyle(
+        style: DefaultTextStyle.of(context).style.copyWith(fontSize: 10),
         child: Padding(
+          padding: const EdgeInsets.all(8),
           child: Column(
             children: [
               _Values(),
@@ -51,9 +53,7 @@ class _Panel extends StatelessWidget {
               ),
             ],
           ),
-          padding: const EdgeInsets.all(8),
         ),
-        style: DefaultTextStyle.of(context).style.copyWith(fontSize: 10),
       );
 
   TableRow _row(String data, double fontSize) => TableRow(children: [
@@ -100,9 +100,9 @@ class _SliderState extends State<_Slider> {
             value: textScaleFactor,
           ),
           MediaQuery(
-            child: _Panel(),
             data: MediaQuery.of(context)
                 .copyWith(textScaleFactor: textScaleFactor),
+            child: _Panel(),
           )
         ],
       );

@@ -5,17 +5,22 @@ const kTagRp = 'rp';
 const kTagRt = 'rt';
 
 class TagRuby {
+  late final BuildOp op;
   final BuildMetadata rubyMeta;
   final WidgetFactory wf;
 
-  BuildOp _rubyOp;
-  BuildOp _rtOp;
+  late final BuildOp _rtOp;
 
-  TagRuby(this.wf, this.rubyMeta);
-
-  BuildOp get op {
-    _rubyOp ??= BuildOp(onChild: onChild, onTree: onTree);
-    return _rubyOp;
+  TagRuby(this.wf, this.rubyMeta) {
+    op = BuildOp(onChild: onChild, onTree: onTree);
+    _rtOp = BuildOp(
+      onTree: (rtMeta, rtTree) {
+        if (rtTree.isEmpty) return;
+        final rtBit =
+            _RtBit(rtTree, rtTree.tsb, rtMeta, rtTree.copyWith() as BuildTree);
+        rtTree.replaceWith(rtBit);
+      },
+    );
   }
 
   void onChild(BuildMetadata childMeta) {
@@ -27,14 +32,6 @@ class TagRuby {
         childMeta[kCssDisplay] = kCssDisplayNone;
         break;
       case kTagRt:
-        _rtOp ??= BuildOp(
-          onTree: (rtMeta, rtTree) {
-            if (rtTree.isEmpty) return;
-            final rtBit = _RtBit(rtTree, rtTree.tsb, rtMeta, rtTree.copyWith());
-            rtTree.replaceWith(rtBit);
-          },
-        );
-
         childMeta
           ..[kCssFontSize] = '0.5em'
           ..register(_rtOp);
@@ -45,7 +42,7 @@ class TagRuby {
   void onTree(BuildMetadata _, BuildTree tree) {
     final rubyBits = <BuildBit>[];
     for (final bit in tree.bits.toList(growable: false)) {
-      if (rubyBits.isEmpty && bit.tsb == null) {
+      if (rubyBits.isEmpty && bit is WhitespaceBit) {
         // the first bit is whitespace, just ignore it
         continue;
       }
@@ -54,7 +51,7 @@ class TagRuby {
         continue;
       }
 
-      final rtBit = bit as _RtBit;
+      final rtBit = bit;
       final rtTree = rtBit.tree;
       final rubyTree = tree.sub();
       final placeholder = WidgetPlaceholder<List<BuildTree>>([rubyTree, rtTree])
@@ -70,9 +67,7 @@ class TagRuby {
         });
 
       final anchor = rubyBits.first;
-      WidgetBit.inline(anchor.parent, placeholder,
-              alignment: PlaceholderAlignment.middle)
-          .insertBefore(anchor);
+      WidgetBit.inline(anchor.parent!, placeholder).insertBefore(anchor);
 
       for (final rubyBit in rubyBits) {
         rubyTree.add(rubyBit.copyWith(parent: rubyTree));
@@ -95,6 +90,6 @@ class _RtBit extends BuildBit<Null, BuildTree> {
   BuildTree buildBit(Null _) => tree;
 
   @override
-  BuildBit copyWith({BuildTree parent, TextStyleBuilder tsb}) =>
-      _RtBit(parent ?? this.parent, tsb ?? this.tsb, meta, tree);
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+      _RtBit(parent ?? this.parent!, tsb ?? this.tsb, meta, tree);
 }

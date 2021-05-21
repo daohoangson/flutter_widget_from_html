@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:network_image_mock/network_image_mock.dart';
+import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
 
@@ -19,7 +19,7 @@ void main() {
           equals('TshWidget\n'
               '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
               ' │  "Someone said"\n'
-              ' │  Whitespace#2\n'
+              ' │  Whitespace[32]#2\n'
               ' │  BuildTree#3 tsb#4(parent=#1):\n'
               ' │    QBit.opening#5 tsb#4(parent=#1)\n'
               ' │    "Foo"\n'
@@ -44,14 +44,14 @@ void main() {
 
   testWidgets(
     'renders quotes around IMG',
-    (tester) => mockNetworkImagesFor(() async {
+    (tester) => mockNetworkImages(() async {
       final src = 'http://domain.com/image.png';
       final html = '<q><img src="$src" /></q>';
       final explained = await explain(tester, html);
       expect(
           explained,
           equals('[RichText:(:“'
-              '[Image:image=NetworkImage("$src", scale: 1.0)]'
+              '[CssSizing:height≥0.0,height=auto,width≥0.0,width=auto,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
               '(:”))]'));
     }),
   );

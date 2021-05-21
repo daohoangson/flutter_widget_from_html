@@ -4,10 +4,11 @@
 [![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html_core.svg)](https://pub.dev/packages/flutter_widget_from_html_core)
 
-A Flutter package for building Flutter widget tree from HTML with support for 70+ most popular tags.
+A Flutter package for building Flutter widget tree from HTML with support for
+[70+ most popular tags](https://html-widget-demo.now.sh/supported/tags.html).
 
 | [Live demo](https://html-widget-demo.now.sh/#/helloworldcore)                                                                     |                                                                                                                                   |
-| --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+|-----------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
 | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldCoreScreen1.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldCoreScreen2.gif) |
 
 ## Getting Started
@@ -16,7 +17,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html_core: ^0.5.0+5
+  flutter_widget_from_html_core: ^0.6.1
 ```
 
 ## Usage
@@ -75,15 +76,15 @@ HtmlWidget(
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
 [Compare between Flutter rendering and browser's.](https://html-widget-demo.now.sh/supported/tags.html)
 
-- A: underline, blue color, tapping will trigger `HtmlWidget.onTapUrl` callback
+- A: underline, theme accent color with scroll to anchor support
 - H1/H2/H3/H4/H5/H6
-- IMG with support for asset (`asset://`), data uri and network image
+- IMG with support for asset (`asset://`), data uri, local file (`file://`) and network image
 - LI/OL/UL with support for:
   - Attributes: `type`, `start`, `reversed`
   - Inline style `list-style-type` values: `lower-alpha`, `upper-alpha`, `lower-latin`, `upper-latin`, `circle`, `decimal`, `disc`, `lower-roman`, `upper-roman`, `square`
 - TABLE/CAPTION/THEAD/TBODY/TFOOT/TR/TD/TH with support for:
-  - TABLE attributes (`border`, `cellpadding`) and inline style (`border`)
-  - TD/TH attributes `colspan`, `rowspan` are parsed but ignored during rendering, use [flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html) if you need them
+  - TABLE attributes `border`, `cellpadding`, `cellspacing`
+  - TD/TH attributes `colspan`, `rowspan`, `valign`
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
   DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, IMG, INS,
   KBD, MAIN, NAV, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, STRIKE, STRONG, SUB, SUP, TT, U, VAR
@@ -108,7 +109,7 @@ These tags and their contents will be ignored:
 ### Inline stylings
 
 - background (color only), background-color: hex values, `rgb()`, `hsl()` or named colors
-- border-top, border-bottom: overline/underline with support for dashed/dotted/double/solid style
+- border, border-xxx and box-sizing
 - color: hex values, `rgb()`, `hsl()` or named colors
 - direction (similar to `dir` attribute)
 - font-family
@@ -122,16 +123,25 @@ These tags and their contents will be ignored:
 - text-align (similar to `align` attribute)
 - text-decoration: line-through/none/overline/underline
 - text-overflow: clip/ellipsis. Note: `text-overflow: ellipsis` should be used in conjuntion with `max-lines` or `-webkit-line-clamp` for better result.
-- Sizing (width, height, max-xxx, min-xxx) with values in `em`, `pt` and `px`
+- white-space: normal/pre
+- Sizing (width, height, max-xxx, min-xxx): `auto` or values in `em`, `%`, `pt` and `px`
+
+<a href="https://www.buymeacoffee.com/daohoangson" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
 ## Extensibility
 
-This package implements widget building logic with high testing coverage to ensure correctness. It tries to render an optimal tree by using `RichText` with specific `TextStyle`, merge text spans together, show images in sized box, etc. The idea is to build a solid foundation for apps to customize easily. There are two ways to alter the output widget tree.
+This package implements widget building logic with high testing coverage to ensure correctness. It tries to render an optimal tree by using `RichText` with specific `TextStyle`, merging text spans together, showing images in sized box, etc. The idea is to build a solid foundation for apps to customize easily. There are two ways to alter the output widget tree.
 
 1. Use callbacks like `customStylesBuilder` or `customWidgetBuilder` for small changes
 2. Use a custom `WidgetFactory` for complete control of the rendering process
 
-The enhanced package ([flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html)) uses a custom `WidgetFactory` to handle complicated tags like IFRAME, VIDEO, etc.
+The enhanced package ([flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html)) uses a custom `WidgetFactory` with pre-built mixins for easy usage:
+
+- [fwfh_cached_network_image](https://pub.dev/packages/fwfh_cached_network_image)
+- [fwfh_chewie](https://pub.dev/packages/fwfh_chewie)
+- [fwfh_svg](https://pub.dev/packages/fwfh_svg)
+- [fwfh_url_launcher](https://pub.dev/packages/fwfh_url_launcher)
+- [fwfh_webview](https://pub.dev/packages/fwfh_webview)
 
 ### Callbacks
 
@@ -229,20 +239,20 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
 
 The HTML string is parsed into DOM elements and each element is visited once to collect `BuildMetadata` and prepare `BuildBit`s. See step by step how it works:
 
-| Step |                                                                          | Integration point                                                                                       |
-| ---- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| 1    | Parse                                                                    | `WidgetFactory.parse(BuildMetadata)`                                                                    |
-| 2    | Inform parents if any                                                    | `BuildOp.onChild(BuildMetadata)`                                                                        |
-| 3    | Populate default styling                                                 | `BuildOp.defaultStyles(Element)`                                                                        |
-| 4    | Populate custom styling                                                  | `HtmlWidget.customStylesBuilder`                                                                        |
-| 5    | Parse styling key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(BuildMetadata, String, String)`                                               |
-| 6    | a. If a custom widget is provided, go to 7                               | `HtmlWidget.customWidgetBuilder`                                                                        |
-|      | b. Loop through children elements to prepare `BuildBit`s                 |                                                                                                         |
-| 7    | Inform build ops                                                         | `BuildOp.onTree(BuildMetadata, BuildTree)`                                                              |
-| 8    | a. If not a block element, go to 10                                      |                                                                                                         |
-|      | b. Build widgets from bits using a `Flattener`                           | Use existing `BuildBit` or extends from it, overriding `.swallowWhitespace` to control whitespace, etc. |
-| 9    | Inform build ops                                                         | `BuildOp.onWidgets(BuildMetadata, Iterable<Widget>)`                                                    |
-| 10   | The end                                                                  |                                                                                                         |
+| Step |                                                                          | Integration point                                                                                                   |
+|------|--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| 1    | Parse                                                                    | `WidgetFactory.parse(BuildMetadata)`                                                                                |
+| 2    | Inform parents if any                                                    | `BuildOp.onChild(BuildMetadata)`                                                                                    |
+| 3    | Populate default styling                                                 | `BuildOp.defaultStyles(Element)`                                                                                    |
+| 4    | Populate custom styling                                                  | `HtmlWidget.customStylesBuilder`                                                                                    |
+| 5    | Parse styling key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(BuildMetadata, String, String)`, `WidgetFactory.parseStyleDisplay(BuildMetadata, String)` |
+| 6    | a. If a custom widget is provided, go to 7                               | `HtmlWidget.customWidgetBuilder`                                                                                    |
+|      | b. Loop through children elements to prepare `BuildBit`s                 |                                                                                                                     |
+| 7    | Inform build ops                                                         | `BuildOp.onTree(BuildMetadata, BuildTree)`                                                                          |
+| 8    | a. If not a block element, go to 10                                      |                                                                                                                     |
+|      | b. Build widgets from bits using a `Flattener`                           | Use existing `BuildBit` or extends from it, overriding `.swallowWhitespace` to control whitespace, etc.             |
+| 9    | Inform build ops                                                         | `BuildOp.onWidgets(BuildMetadata, Iterable<Widget>)`                                                                |
+| 10   | The end                                                                  |                                                                                                                     |
 
 Notes:
 

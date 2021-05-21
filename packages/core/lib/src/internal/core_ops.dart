@@ -1,3 +1,7 @@
+import 'dart:math';
+import 'dart:ui';
+
+import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -11,6 +15,7 @@ import 'margin_vertical.dart';
 
 part 'ops/column.dart';
 part 'ops/style_bg_color.dart';
+part 'ops/style_border.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_padding.dart';
 part 'ops/style_sizing.dart';
@@ -23,6 +28,8 @@ part 'ops/tag_q.dart';
 part 'ops/tag_ruby.dart';
 part 'ops/tag_table.dart';
 part 'ops/text_style.dart';
+
+const kAttributeId = 'id';
 
 const kTagCode = 'code';
 const kTagCodeFont1 = 'Courier';
@@ -51,38 +58,34 @@ const kCssTextOverflow = 'text-overflow';
 const kCssTextOverflowClip = 'clip';
 const kCssTextOverflowEllipsis = 'ellipsis';
 
-String convertColorToHex(Color value) {
-  final r = value.red.toRadixString(16).padLeft(2, '0');
-  final g = value.green.toRadixString(16).padLeft(2, '0');
-  final b = value.blue.toRadixString(16).padLeft(2, '0');
-  final a = value.alpha.toRadixString(16).padLeft(2, '0');
-  return '#$r$g$b$a';
-}
+const kCssWhitespace = 'white-space';
+const kCssWhitespacePre = 'pre';
+const kCssWhitespaceNormal = 'normal';
 
 void wrapTree(
   BuildTree tree, {
-  BuildBit Function(BuildTree parent) append,
-  BuildBit Function(BuildTree parent) prepend,
+  BuildBit Function(BuildTree parent)? append,
+  BuildBit Function(BuildTree parent)? prepend,
 }) {
   if (tree.isEmpty) {
     if (prepend != null) {
       final prependBit = prepend(tree);
-      if (prependBit != null) tree.add(prependBit);
+      tree.add(prependBit);
     }
     if (append != null) {
       final appendBit = append(tree);
-      if (appendBit != null) tree.add(appendBit);
+      tree.add(appendBit);
     }
     return;
   }
 
   if (prepend != null) {
-    final first = tree.first;
-    prepend(first.parent)?.insertBefore(first);
+    final first = tree.first!;
+    prepend(first.parent!).insertBefore(first);
   }
 
   if (append != null) {
-    final last = tree.last;
-    append(last.parent)?.insertAfter(last);
+    final last = tree.last!;
+    append(last.parent!).insertAfter(last);
   }
 }

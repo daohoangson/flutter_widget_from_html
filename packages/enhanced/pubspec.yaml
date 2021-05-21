@@ -1,34 +1,41 @@
 name: flutter_widget_from_html
-version: 0.5.0+5
+version: 0.6.1
 description: Flutter package for widget tree building from html that supports hyperlink, image, nested list, etc.
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
 environment:
-  # flutter_widget_from_html_core
-  flutter: ">=1.20.0 <2.0.0"
-  sdk: ">=2.7.0 <3.0.0"
+  flutter: ">=2.0.0"
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
-  cached_network_image: ^2.2.0+1
-  chewie: ^0.9.10
   flutter:
     sdk: flutter
-  flutter_layout_grid: ^0.10.2
-  flutter_svg: ">=0.17.0 <0.20.0"
-  flutter_widget_from_html_core: ^0.5.0+5
-  html: ^0.14.0+3
-  url_launcher: ^5.5.0
-  video_player: ^0.10.12
-  webview_flutter: ^0.3.22+1
+  flutter_widget_from_html_core: ^0.6.0
+  fwfh_cached_network_image: ^0.6.0
+  fwfh_chewie: ^0.6.0
+  fwfh_svg: ^0.6.0
+  fwfh_url_launcher: ^0.6.0
+  fwfh_webview: ^0.6.0
+  html: ^0.15.0
 
 dependency_overrides:
   flutter_widget_from_html_core:
     path: ../core
+  fwfh_cached_network_image:
+    path: ../fwfh_cached_network_image
+  fwfh_chewie:
+    path: ../fwfh_chewie
+  fwfh_svg:
+    path: ../fwfh_svg
+  fwfh_url_launcher:
+    path: ../fwfh_url_launcher
+  fwfh_webview:
+    path: ../fwfh_webview
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  golden_toolkit: ^0.6.0
+  golden_toolkit: any
   network_image_mock: any
   pedantic: any
 

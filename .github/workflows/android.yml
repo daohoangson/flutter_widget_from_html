@@ -3,23 +3,28 @@ on:
   push:
     paths: 
       - .github/workflows/android.yml
-      - packages/enhanced/lib/src/widgets/video_player.dart
-      - packages/enhanced/lib/src/widgets/web_view.dart
-      - 'packages/enhanced/lib/src/widgets/web_view/**'
+      - 'packages/fwfh_chewie/lib/src/video_player/**'
+      - 'packages/fwfh_webview/lib/src/web_view/**'
       - 'tool/sylph/**'
-  workflow_dispatch:
 
 jobs:
   sylph:
-    if: startsWith(github.ref, 'refs/head/wip')
-    env:
-      AWS_ACCESS_KEY_ID: AKIAY43IFJQXPIU46LXP
-      AWS_DEFAULT_REGION: us-west-2
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.DEVICE_FARM_SECRET_ACCESS_KEY }}
+    environment:
+      name: aws
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
-      - run: ./tool/sylph/sylph.sh
+      - name: Run sylph.sh
+        env:
+          AWS_ACCESS_KEY_ID: AKIAY43IFJQXAVHHHXQ6
+          AWS_DEFAULT_REGION: us-west-2
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          set -e
+
+          sudo snap install yq
+
+          exec ./tool/sylph/sylph.sh

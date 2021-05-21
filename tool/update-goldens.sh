@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
+export UPDATE_GOLDENS=1
 
-cd "$( dirname $( dirname ${BASH_SOURCE[0]}))"/demo_app
-flutter pub get
-exec flutter test --update-goldens "$@"
+exec ./tool/test.sh --plain-name=Golden --update-goldens "$@"

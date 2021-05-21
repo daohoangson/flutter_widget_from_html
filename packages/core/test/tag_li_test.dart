@@ -1,12 +1,16 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '_.dart';
 
-const disc = '[_ListMarkerDisc]@bottom';
-const circle = '[_ListMarkerCircle]@bottom';
-const square = '[_ListMarkerSquare]@bottom';
+const disc = '[_ListMarkerDisc]';
+const circle = '[_ListMarkerCircle]';
+const square = '[_ListMarkerSquare]';
 
 const sizedBox = '[SizedBox:0.0x10.0]';
 
@@ -15,15 +19,15 @@ String padding(String child) =>
 
 String list(List<String> children) => '[Column:children=${children.join(",")}]';
 
-String item(String markerText, String contents, {String child}) =>
-    '[CssBlock:child=[Stack:children=${child ?? '[RichText:(:$contents)]'},${marker(markerText)}]]';
+String item(String markerText, String contents, {String? child}) =>
+    '[HtmlListItem:children=${child ?? '[RichText:(:$contents)]'},${marker(markerText)}]';
 
-String marker(String text) => '[Positioned:(0.0,null,null,-45.0),child='
-    '[SizedBox:40.0x0.0,child='
-    '[RichText:align=right,${text.startsWith('[_ListMarker') ? text : '(:$text)'}'
-    ']]]';
+String marker(String text) =>
+    text.startsWith('[_ListMarker') ? text : '[RichText:maxLines=1,(:$text)]';
 
-void main() {
+void main() async {
+  await loadAppFonts();
+
   testWidgets('renders list with padding', (WidgetTester tester) async {
     final html = '<ul><li>Foo</li></ul>';
     final e = await explainMargin(tester, html);
@@ -32,26 +36,26 @@ void main() {
 
   testWidgets('renders ordered list', (WidgetTester tester) async {
     final html =
-        '<ol><li>One</li><li>Two</li><li><strong>Three</strong></li><ol>';
+        '<ol><li>One</li><li>Two</li><li><strong>Three</strong></li></ol>';
     final explained = await explain(tester, html);
     expect(
         explained,
         equals(padding(list([
           item('1.', 'One'),
           item('2.', 'Two'),
-          '[CssBlock:child=[Stack:children=[RichText:(+b:Three)],${marker("3.")}]]'
+          item('3.', '', child: '[RichText:(+b:Three)]'),
         ]))));
   });
 
   testWidgets('renders unordered list', (WidgetTester tester) async {
-    final html = '<ul><li>One</li><li>Two</li><li><em>Three</em></li><ul>';
+    final html = '<ul><li>One</li><li>Two</li><li><em>Three</em></li></ul>';
     final explained = await explain(tester, html);
     expect(
         explained,
         equals(padding(list([
           item(disc, 'One'),
           item(disc, 'Two'),
-          '[CssBlock:child=[Stack:children=[RichText:(+i:Three)],${marker(disc)}]]'
+          item(disc, '', child: '[RichText:(+i:Three)]'),
         ]))));
   });
 
@@ -83,14 +87,16 @@ void main() {
     ]));
     final li21And22And23 = padding(list([
       item(circle, '2.1'),
-      '[CssBlock:child=[Stack:children=[Column:children=[RichText:(:2.2)],$li221And222],${marker(circle)}]]',
+      item(circle, '',
+          child: '[Column:children=[RichText:(:2.2)],$li221And222]'),
       item(circle, '2.3'),
     ]));
     expect(
         explained,
         equals(padding(list([
           item(disc, 'One'),
-          '[CssBlock:child=[Stack:children=[Column:children=[RichText:(:Two)],$li21And22And23],${marker(disc)}]]',
+          item(disc, '',
+              child: '[Column:children=[RichText:(:Two)],$li21And22And23]'),
           item(disc, 'Three'),
         ]))));
   });
@@ -106,13 +112,13 @@ void main() {
         explained,
         equals(padding(list([
           item(disc, 'Foo'),
-          item(disc, null, child: padding(item(circle, 'Bar'))),
+          item(disc, '', child: padding(item(circle, 'Bar'))),
         ]))));
   });
 
   group('OL reversed', () {
     testWidgets('renders 123 (default)', (WidgetTester tester) async {
-      final html = '<ol><li>x</li><li>x</li><li>x</li><ol>';
+      final html = '<ol><li>x</li><li>x</li><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -124,7 +130,7 @@ void main() {
     });
 
     testWidgets('renders 321', (WidgetTester tester) async {
-      final html = '<ol reversed><li>x</li><li>x</li><li>x</li><ol>';
+      final html = '<ol reversed><li>x</li><li>x</li><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -136,7 +142,8 @@ void main() {
     });
 
     testWidgets('renders from 99', (WidgetTester tester) async {
-      final html = '<ol reversed start="99"><li>x</li><li>x</li><li>x</li><ol>';
+      final html =
+          '<ol reversed start="99"><li>x</li><li>x</li><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -150,19 +157,20 @@ void main() {
 
   group('OL start', () {
     testWidgets('renders from 1 (default)', (WidgetTester tester) async {
-      final html = '<ol><li>x</li><ol>';
+      final html = '<ol><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('1.', 'x'))));
     });
 
     testWidgets('renders from 99', (WidgetTester tester) async {
-      final html = '<ol start="99"><li>x</li><ol>';
+      final html = '<ol start="99"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('99.', 'x'))));
     });
 
     testWidgets('renders xyz', (WidgetTester tester) async {
-      final html = '<ol start="24" type="a"><li>x</li><li>x</li><li>x</li><ol>';
+      final html =
+          '<ol start="24" type="a"><li>x</li><li>x</li><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -176,37 +184,37 @@ void main() {
 
   group('OL type', () {
     testWidgets('renders 1 (default)', (WidgetTester tester) async {
-      final html = '<ol><li>x</li><ol>';
+      final html = '<ol><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('1.', 'x'))));
     });
 
     testWidgets('renders a (lower-alpha)', (WidgetTester tester) async {
-      final html = '<ol type="a"><li>x</li><ol>';
+      final html = '<ol type="a"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('a.', 'x'))));
     });
 
     testWidgets('renders A (upper-alpha)', (WidgetTester tester) async {
-      final html = '<ol type="A"><li>x</li><ol>';
+      final html = '<ol type="A"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('A.', 'x'))));
     });
 
     testWidgets('renders i (lower-roman)', (WidgetTester tester) async {
-      final html = '<ol type="i"><li>x</li><ol>';
+      final html = '<ol type="i"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('i.', 'x'))));
     });
 
     testWidgets('renders I (upper-roman)', (WidgetTester tester) async {
-      final html = '<ol type="I"><li>x</li><ol>';
+      final html = '<ol type="I"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('I.', 'x'))));
     });
 
     testWidgets('renders 1 (decimal)', (WidgetTester tester) async {
-      final html = '<ol type="1"><li>x</li><ol>';
+      final html = '<ol type="1"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('1.', 'x'))));
     });
@@ -510,8 +518,8 @@ void main() {
         expect(
             explained,
             equals('[CssBlock:child=[Padding:(0,0,0,99),child=[Column:children='
-                '[CssBlock:child=[Padding:(0,0,0,199),child=[Stack:children=[RichText:(:199px)],${marker(disc)}]]],'
-                '[CssBlock:child=[Padding:(0,0,0,299),child=[Stack:children=[RichText:(:299px)],${marker(disc)}]]],'
+                '[Padding:(0,0,0,199),child=[HtmlListItem:children=[RichText:(:199px)],${marker(disc)}]],'
+                '[Padding:(0,0,0,299),child=[HtmlListItem:children=[RichText:(:299px)],${marker(disc)}]],'
                 '${item(disc, "99px")}'
                 ']]]'));
       });
@@ -542,6 +550,17 @@ void main() {
       final html = '<li>Foo</li>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('LI within LI', (WidgetTester tester) async {
+      final html = '<ol><li><li>Foo</li></li></ol>';
+      final explained = await explain(tester, html);
+      expect(
+          explained,
+          equals(padding(list([
+            item('1.', '', child: '[widget0]'),
+            item('2.', 'Foo'),
+          ]))));
     });
 
     testWidgets('UL is direct child of UL', (WidgetTester tester) async {
@@ -576,64 +595,29 @@ void main() {
           explained,
           equals(padding(list([
             item('1.', 'One'),
-            '[CssBlock:child=[Stack:children=[widget0],${marker("2.")}]]',
+            item('2.', '', child: '[widget0]'),
             item('3.', 'Three'),
           ]))));
     });
   });
 
   group('rtl', () {
-    final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li><ol>';
-
-    final explainerExpected =
-        '[CssBlock:child=[Padding:(0,40,0,0),child=[Column:dir=rtl,children='
-        '[CssBlock:child=[Stack:dir=rtl,children=[RichText:dir=rtl,(:One)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:1.)]]]]],'
-        '[CssBlock:child=[Stack:dir=rtl,children=[RichText:dir=rtl,(:Two)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:2.)]]]]],'
-        '[CssBlock:child=[Stack:dir=rtl,children=[RichText:dir=rtl,(+b:Three)],[Positioned:(0.0,-45.0,null,null),child=[SizedBox:40.0x0.0,child=[RichText:align=left,dir=rtl,(:3.)]]]]]'
-        ']]]';
-
-    final nonExplainerExpected = 'TshWidget\n'
-        '└ColumnPlaceholder(BuildMetadata(root))\n'
-        ' └CssBlock()\n'
-        '  └Padding(padding: EdgeInsets(0.0, 0.0, 40.0, 0.0))\n'
-        '   └Column(textDirection: rtl)\n'
-        '    ├WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
-        '    ││  "One"\n'
-        '    ││)\n'
-        '    │└CssBlock()\n'
-        '    │ └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
-        '    │  ├RichText(textDirection: rtl, text: "One")\n'
-        '    │  └Positioned(top: 0.0, right: -45.0)\n'
-        '    │   └SizedBox(width: 40.0)\n'
-        '    │    └RichText(textAlign: left, textDirection: rtl, text: "1.")\n'
-        '    ├WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#2):\n'
-        '    ││  "Two"\n'
-        '    ││)\n'
-        '    │└CssBlock()\n'
-        '    │ └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
-        '    │  ├RichText(textDirection: rtl, text: "Two")\n'
-        '    │  └Positioned(top: 0.0, right: -45.0)\n'
-        '    │   └SizedBox(width: 40.0)\n'
-        '    │    └RichText(textAlign: left, textDirection: rtl, text: "2.")\n'
-        '    └WidgetPlaceholder<BuildTree>(BuildTree#5 tsb#6(parent=#2):\n'
-        '     │  BuildTree#7 tsb#8(parent=#6):\n'
-        '     │    "Three"\n'
-        '     │)\n'
-        '     └CssBlock()\n'
-        '      └Stack(alignment: topStart, textDirection: rtl, fit: loose)\n'
-        '       ├RichText(textDirection: rtl, text: "Three")\n'
-        '       └Positioned(top: 0.0, right: -45.0)\n'
-        '        └SizedBox(width: 40.0)\n'
-        '         └RichText(textAlign: left, textDirection: rtl, text: "3.")\n'
-        '\n';
+    final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li></ol>';
 
     testWidgets('renders ordered list', (WidgetTester tester) async {
       final explained = await explain(tester, null,
           hw: Directionality(
-            child: HtmlWidget(html, key: hwKey),
             textDirection: TextDirection.rtl,
+            child: HtmlWidget(html, key: hwKey),
           ));
-      expect(explained, equals(explainerExpected));
+      expect(
+          explained,
+          equals(
+              '[CssBlock:child=[Padding:(0,40,0,0),child=[Column:dir=rtl,children='
+              '[HtmlListItem:children=[RichText:dir=rtl,(:One)],[RichText:maxLines=1,dir=rtl,(:1.)]],'
+              '[HtmlListItem:children=[RichText:dir=rtl,(:Two)],[RichText:maxLines=1,dir=rtl,(:2.)]],'
+              '[HtmlListItem:children=[RichText:dir=rtl,(+b:Three)],[RichText:maxLines=1,dir=rtl,(:3.)]]'
+              ']]]'));
     });
 
     testWidgets('renders ordered list useExplainer=false', (tester) async {
@@ -641,18 +625,193 @@ void main() {
         tester,
         null,
         hw: Directionality(
-          child: HtmlWidget(html, key: hwKey),
           textDirection: TextDirection.rtl,
+          child: HtmlWidget(html, key: hwKey),
         ),
         useExplainer: false,
       );
-      expect(explained, equals(nonExplainerExpected));
+      expect(explained, contains('HtmlListItem(textDirection: rtl)'));
     });
 
     testWidgets('renders within dir attribute', (tester) async {
       final _dirRtl = '<div dir="rtl">$html</div>';
       final explained = await explain(tester, _dirRtl, useExplainer: false);
-      expect(explained, equals(nonExplainerExpected));
+      expect(explained, contains('HtmlListItem(textDirection: rtl)'));
     });
   });
+
+  group('HtmlListItem', () {
+    testWidgets('updates textDirection', (tester) async {
+      final html = '<ul><li>Foo</li></ul>';
+
+      final ltr = await explain(tester, html, rtl: false, useExplainer: false);
+      expect(ltr, contains('HtmlListItem()'));
+
+      final rtl = await explain(tester, html, rtl: true, useExplainer: false);
+      expect(rtl, contains('HtmlListItem(textDirection: rtl)'));
+    });
+
+    testWidgets('computeIntrinsic', (tester) async {
+      final child = GlobalKey();
+      final listItem = GlobalKey();
+      await tester.pumpWidget(HtmlListItem(
+        key: listItem,
+        marker: widget0,
+        textDirection: TextDirection.ltr,
+        child: SizedBox(key: child, width: 50, height: 5),
+      ));
+      await tester.pumpAndSettle();
+
+      final childRenderBox =
+          child.currentContext!.findRenderObject() as RenderBox;
+      final listItemRenderBox =
+          listItem.currentContext!.findRenderObject() as RenderBox;
+      expect(listItemRenderBox.getMaxIntrinsicHeight(100),
+          equals(childRenderBox.getMaxIntrinsicHeight(100)));
+      expect(listItemRenderBox.getMaxIntrinsicWidth(100),
+          equals(childRenderBox.getMaxIntrinsicWidth(100)));
+      expect(listItemRenderBox.getMinIntrinsicHeight(100),
+          equals(childRenderBox.getMinIntrinsicHeight(100)));
+      expect(listItemRenderBox.getMinIntrinsicWidth(100),
+          equals(childRenderBox.getMinIntrinsicWidth(100)));
+    });
+
+    testWidgets('performs hit test', (tester) async {
+      const kHref = 'href';
+      final urls = <String>[];
+
+      await tester.pumpWidget(_HitTestApp(href: kHref, onTapUrl: urls.add));
+      await tester.pumpAndSettle();
+      expect(await tapText(tester, 'Tap me'), equals(1));
+      expect(urls, equals(const [kHref]));
+    });
+
+    final goldenSkip = Platform.isLinux ? null : 'Linux only';
+    GoldenToolkit.runWithConfiguration(
+      () {
+        group('baseline calculation', () {
+          final assetName = 'test/images/logo.png';
+          final testCases = <String, String>{
+            'img_block':
+                '<img src="asset:$assetName" style="display: block; height: 30px;" />',
+            'img_block_between_text':
+                'foo <img src="asset:$assetName" style="display: block; height: 30px;" /> bar',
+            'img_block_then_text':
+                '<img src="asset:$assetName" style="display: block; height: 30px;" /> foo',
+            'img_inline':
+                '<img src="asset:$assetName" style="height: 30px;" />',
+            'img_inline_between_text':
+                'foo <img src="asset:$assetName" style="height: 30px;" /> bar',
+            'img_inline_then_text':
+                '<img src="asset:$assetName" style="height: 30px;" /> foo',
+            'li_within_li': '<li>Foo</li>',
+            'list_within_li': '<ul><li>Foo</li></ul>',
+            'list_of_items_within_li': '<ol><li>Foo</li><li>Bar</li></ol>',
+            'multiline':
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br />\n' *
+                    3,
+            'padding': '<div style="padding: 10px">Foo</div>',
+            'ruby': '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>',
+          };
+
+          for (final testCase in testCases.entries) {
+            testGoldens(testCase.key, (tester) async {
+              await tester.pumpWidgetBuilder(
+                _Golden(testCase.value),
+                wrapper: materialAppWrapper(theme: ThemeData.light()),
+                surfaceSize: Size(600, 400),
+              );
+
+              await screenMatchesGolden(tester, testCase.key);
+            }, skip: goldenSkip != null);
+          }
+        }, skip: goldenSkip);
+
+        testGoldens('computeDryLayout', (tester) async {
+          await tester.pumpWidgetBuilder(
+            Scaffold(
+              body: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: HtmlWidget(
+                    '<div style="background: black; color: white; width: 200px; height: 200px">'
+                    '<ul><li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li></ul>'
+                    '<div>'),
+              ),
+            ),
+            wrapper: materialAppWrapper(theme: ThemeData.light()),
+            surfaceSize: Size(600, 400),
+          );
+
+          await screenMatchesGolden(tester, 'computeDryLayout');
+        }, skip: goldenSkip != null);
+      },
+      config: GoldenToolkitConfiguration(
+        fileNameFactory: (name) => '$kGoldenFilePrefix/li/$name.png',
+      ),
+    );
+  });
+}
+
+class _Golden extends StatelessWidget {
+  final String contents;
+
+  const _Golden(this.contents, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(contents),
+              Divider(),
+              Builder(
+                builder: (context) => Text(
+                  'UL:\n',
+                  style: Theme.of(context).textTheme.caption,
+                ),
+              ),
+              HtmlWidget('''
+<ul>
+  <li>Above</li>
+  <li>$contents</li>
+  <li>Below</li>
+</ul>
+'''),
+              Divider(),
+              Builder(
+                builder: (context) => Text(
+                  'OL:\n',
+                  style: Theme.of(context).textTheme.caption,
+                ),
+              ),
+              HtmlWidget('''
+<ol>
+  <li>First</li>
+  <li>$contents</li>
+  <li>Third</li>
+</ol>
+'''),
+            ],
+          ),
+        ),
+      );
+}
+
+class _HitTestApp extends StatelessWidget {
+  final String? href;
+  final void Function(String)? onTapUrl;
+
+  const _HitTestApp({this.href, Key? key, this.onTapUrl}) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => MaterialApp(
+        home: Scaffold(
+          body: HtmlWidget(
+            '<ul><li><a href="$href">Tap me</a></li></ul>',
+            onTapUrl: onTapUrl,
+          ),
+        ),
+      );
 }
