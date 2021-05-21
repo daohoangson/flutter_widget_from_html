@@ -5,6 +5,7 @@ import 'package:html/dom.dart' as dom;
 import '../core_data.dart';
 import '../core_widget_factory.dart';
 
+/// An extension on [dom.Element].
 extension DomElementExtension on dom.Element {
   static Expando<List<css.Declaration>>? _expando;
 
@@ -29,6 +30,7 @@ extension DomElementExtension on dom.Element {
   }
 }
 
+/// An extension on [css.Declaration].
 extension CssDeclarationExtension on css.Declaration {
   static Expando<List<css.Expression>>? _expando;
 
@@ -59,6 +61,7 @@ extension CssDeclarationExtension on css.Declaration {
   }
 }
 
+/// An extension on [css.FunctionTerm].
 extension CssFunctionTermExtension on css.FunctionTerm {
   static Expando<List<css.Expression>>? _expando;
 
@@ -77,6 +80,7 @@ extension CssFunctionTermExtension on css.FunctionTerm {
   }
 }
 
+/// An extension on [css.LiteralTerm].
 extension CssLiteralTermExtension on css.LiteralTerm {
   /// Returns [css.Identifier]'s name or unquoted [String] value.
   String get valueAsString {
@@ -103,16 +107,19 @@ extension CssLiteralTermExtension on css.LiteralTerm {
   }
 }
 
+/// An extension on [css.NumberTerm].
 extension CssNumberTermExtension on css.NumberTerm {
   /// Returns [num] value.
   num get number => value as num;
 }
 
+/// An extension on [css.PercentageTerm].
 extension CssPercentageTermExtension on css.PercentageTerm {
   /// Returns [double] value.
   double get valueAsDouble => (value as num) / 100.0;
 }
 
+/// An extension on [css.StyleSheet].
 extension CssStyleSheetExtension on css.StyleSheet {
   static _DeclarationsCollector? _collector;
 
