@@ -154,6 +154,8 @@ class Flattener {
       if (scopedRecognizer != null) _recognizers.add(scopedRecognizer);
 
       _spans!.add((context, whitespace) => TextSpan(
+            mouseCursor:
+                scopedRecognizer != null ? SystemMouseCursors.click : null,
             recognizer: scopedRecognizer,
             style: scopedTsb.build(context).styleWithHeight,
             text: scopedStrings.toText(whitespace: whitespace),
