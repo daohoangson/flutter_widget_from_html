@@ -141,7 +141,10 @@ class WidgetFactory {
   /// Builds [GestureDetector].
   Widget? buildGestureDetector(
           BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
-      GestureDetector(onTap: onTap, child: child);
+      MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(onTap: onTap, child: child),
+      );
 
   /// Builds horizontal scroll view.
   Widget? buildHorizontalScrollView(BuildMetadata meta, Widget child) =>
