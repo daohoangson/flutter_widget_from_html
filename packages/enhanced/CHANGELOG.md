@@ -1,3 +1,10 @@
+## 0.7.0-dev.2021052101
+
+- Requires Flutter 2.2
+- Show click cursor for `A` tag (#322)
+- Fix incorrect UL/OL tag closing
+- Fix bug padding+background+h2 (#523)
+
 ## 0.7.0-dev.2021051501
 
 - BREAKING: Change method signature `WidgetFactory.buildImageWidget`
