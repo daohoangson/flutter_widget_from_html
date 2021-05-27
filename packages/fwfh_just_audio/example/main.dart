@@ -1,0 +1,29 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:fwfh_just_audio/fwfh_just_audio.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'fwfh_just_audio',
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('JustAudioFactory Demo'),
+        ),
+        body: Center(
+          child: HtmlWidget(
+            '''<audio src="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3">
+  Your browser does not support the <code>audio</code> element.
+</audio>''',
+            factoryBuilder: () => MyWidgetFactory(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MyWidgetFactory extends WidgetFactory with JustAudioFactory {}
