@@ -12,10 +12,6 @@ dependencies:
     sdk: flutter
   flutter_widget_from_html_core: ">=0.6.0 <0.8.0"
   just_audio: ^0.7.0
-  
-  # rxdart version should be kept in sync with `just_audio`
-  # https://github.com/ryanheise/just_audio/blob/master/just_audio/pubspec.yaml
-  rxdart: ^0.26.0
 
 dependency_overrides:
   flutter_widget_from_html_core:

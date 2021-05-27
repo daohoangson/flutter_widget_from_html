@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:just_audio/just_audio.dart' as lib;
-import 'package:rxdart/rxdart.dart';
 
 /// An audio player.
 class AudioPlayer extends StatefulWidget {
@@ -163,32 +162,24 @@ class _PositionSlider extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext _) => StreamBuilder<_PositionData>(
-        builder: (_, snapshot) {
-          final data = snapshot.data;
-          final max = data?.max?.inMilliseconds.toDouble();
-          if (max == null) return widget0;
+  Widget build(BuildContext _) => StreamBuilder<Duration?>(
+        builder: (_, duration) => StreamBuilder<Duration>(
+          builder: (_, position) {
+            final max = duration.data?.inMilliseconds.toDouble();
+            if (max == null) return widget0;
 
-          final value = data!.value.inMilliseconds.toDouble();
+            final value = position.data?.inMilliseconds.toDouble() ?? 0.0;
 
-          return Slider.adaptive(
-            max: max,
-            onChanged: onChanged,
-            value: value,
-          );
-        },
-        stream: durationStream.withLatestFrom<Duration, _PositionData>(
-          positionStream,
-          (max, value) => _PositionData(value, max),
+            return Slider.adaptive(
+              max: max,
+              onChanged: onChanged,
+              value: value,
+            );
+          },
+          stream: positionStream,
         ),
+        stream: durationStream,
       );
 
   void onChanged(double ms) => seek(Duration(milliseconds: ms.toInt()));
-}
-
-class _PositionData {
-  final Duration value;
-  final Duration? max;
-
-  _PositionData(this.value, this.max);
 }
