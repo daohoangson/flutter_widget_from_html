@@ -65,6 +65,14 @@ class _AudioPlayerState extends State<AudioPlayer> {
     _player
       ..setUrl(widget.url, preload: widget.preload)
       ..setLoopMode(widget.loop ? lib.LoopMode.one : lib.LoopMode.off);
+
+    if (widget.autoplay) {
+      _player.play();
+    }
+
+    if (widget.muted) {
+      _player.setVolume(0);
+    }
   }
 
   @override
@@ -131,7 +139,7 @@ class _DurationText extends StatelessWidget {
           final minutes = duration ~/ 60;
           final seconds = duration % 60;
           return Text(
-            duration >= 0
+            duration < 0
                 ? '--:--'
                 : (minutes.toString().padLeft(2, '0') +
                     ':' +
@@ -161,8 +169,7 @@ class _PositionSlider extends StatelessWidget {
           final max = data?.max?.inMilliseconds.toDouble();
           if (max == null) return widget0;
 
-          final value = data?.value.inMilliseconds.toDouble();
-          if (value == null) return widget0;
+          final value = data!.value.inMilliseconds.toDouble();
 
           return Slider.adaptive(
             max: max,
@@ -170,9 +177,9 @@ class _PositionSlider extends StatelessWidget {
             value: value,
           );
         },
-        stream: positionStream.withLatestFrom<Duration?, _PositionData>(
-          durationStream,
-          (value, max) => _PositionData(value, max),
+        stream: durationStream.withLatestFrom<Duration, _PositionData>(
+          positionStream,
+          (max, value) => _PositionData(value, max),
         ),
       );
 

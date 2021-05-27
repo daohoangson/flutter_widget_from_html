@@ -25,6 +25,8 @@ dependency_overrides:
     path: ../fwfh_cached_network_image
   fwfh_chewie:
     path: ../fwfh_chewie
+  fwfh_just_audio:
+    path: ../fwfh_just_audio
   fwfh_svg:
     path: ../fwfh_svg
   fwfh_url_launcher:
