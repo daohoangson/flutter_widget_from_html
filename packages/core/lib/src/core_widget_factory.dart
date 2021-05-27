@@ -16,7 +16,7 @@ import 'core_html_widget.dart';
 /// A factory to build widgets.
 class WidgetFactory {
   final _anchors = <String, GlobalKey>{};
-  final _flattener = Flattener();
+  late final _flattener;
 
   BuildOp? _styleBgColor;
   BuildOp? _styleBlock;
@@ -37,6 +37,10 @@ class WidgetFactory {
   BuildOp? _tagQ;
   TextStyleHtml Function(TextStyleHtml, css.Expression)? _tsbLineHeight;
   HtmlWidget? _widget;
+
+  WidgetFactory() {
+    _flattener = Flattener(this);
+  }
 
   /// Builds [Align].
   Widget? buildAlign(
@@ -268,6 +272,27 @@ class WidgetFactory {
         // currently it only renders 1 line with ellipsis
         maxLines: tsh.maxLines == -1 ? null : tsh.maxLines,
       );
+
+  /// Builds [TextSpan].
+  InlineSpan? buildTextSpan({
+    List<InlineSpan>? children,
+    GestureRecognizer? recognizer,
+    TextStyle? style,
+    String? text,
+  }) {
+    if (text?.isEmpty == true) {
+      if (children?.isEmpty == true) return null;
+      if (children?.length == 1) return children!.first;
+    }
+
+    return TextSpan(
+      children: children,
+      mouseCursor: recognizer != null ? SystemMouseCursors.click : null,
+      recognizer: recognizer,
+      style: style,
+      text: text,
+    );
+  }
 
   /// Builds [Tooltip].
   Widget? buildTooltip(BuildMetadata meta, Widget child, String message) =>
