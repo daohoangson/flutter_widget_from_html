@@ -65,8 +65,7 @@ void main() {
       await tester.runAsync(() => Future.delayed(Duration.zero));
 
       // force a widget tree disposal
-      await tester
-          .pumpWidget(MaterialApp(home: Scaffold(body: SizedBox.shrink())));
+      await tester.pumpWidget(SizedBox.shrink());
       await tester.pumpAndSettle();
 
       expect(
@@ -93,8 +92,31 @@ void main() {
       expect(find.text('12:34'), findsOneWidget);
 
       // force a widget tree disposal
-      await tester
-          .pumpWidget(MaterialApp(home: Scaffold(body: SizedBox.shrink())));
+      await tester.pumpWidget(SizedBox.shrink());
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('seeks', (tester) async {
+      _duration = Duration(seconds: 100);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: fwfh.AudioPlayer(src, preload: true),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('01:40'), findsOneWidget);
+      expect(_commands, equals(const [Tuple2(_CommandType.load, src)]));
+      _commands.clear();
+
+      await tester.tap(find.byType(Slider));
+      expect(_commands, equals([Tuple2(_CommandType.seek, _duration * .5)]));
+
+      // force a widget tree disposal
+      await tester.pumpWidget(SizedBox.shrink());
       await tester.pumpAndSettle();
     });
   });
