@@ -31,7 +31,7 @@ void main() {
       _playbackEvents.close();
     });
 
-    testWidgets('play then pause on completion', (tester) async {
+    testWidgets('plays then pauses on completion', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -75,6 +75,27 @@ void main() {
             Tuple2(_CommandType.pause, null),
             Tuple2(_CommandType.seek, Duration.zero),
           ]));
+    });
+
+    testWidgets('shows duration', (tester) async {
+      _duration = Duration(minutes: 12, seconds: 34);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: fwfh.AudioPlayer(src, preload: true),
+          ),
+        ),
+      );
+      expect(find.text('--:--'), findsOneWidget);
+
+      await tester.pumpAndSettle();
+      expect(find.text('12:34'), findsOneWidget);
+
+      // force a widget tree disposal
+      await tester
+          .pumpWidget(MaterialApp(home: Scaffold(body: SizedBox.shrink())));
+      await tester.pumpAndSettle();
     });
   });
 }
