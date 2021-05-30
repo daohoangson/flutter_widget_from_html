@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
 
+import '../../fwfh_url_launcher/test/_.dart' as fwfh_url_launcher;
 import '_.dart' as helper;
 
 Future<String> explain(WidgetTester t, HtmlWidget hw) =>
@@ -399,95 +400,106 @@ void main() {
   });
 
   group('onTapUrl', () {
+    setUp(fwfh_url_launcher.mockSetup);
+    tearDown(fwfh_url_launcher.mockTearDown);
+
     testWidgets('triggers callback (returns void)', (tester) async {
       const href = 'returns-void';
       final urls = <String>[];
-      final onTapCallbackResults = [];
 
-      await tester.pumpWidget(_OnTapUrlApp(
-        href: href,
-        onTapCallbackResults: onTapCallbackResults,
-        onTapUrl: urls.add,
-      ));
+      await explain(
+        tester,
+        HtmlWidget('<a href="$href">Tap me</a>', onTapUrl: urls.add),
+      );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
       expect(urls, equals(const [href]));
-      expect(onTapCallbackResults, equals(const [href, true]));
+      expect(fwfh_url_launcher.mockGetLaunchUrls(), equals(const []));
     });
 
     testWidgets('triggers callback (returns false)', (tester) async {
       const href = 'returns-false';
-      final onTapCallbackResults = [];
+      final urls = <String>[];
 
-      await tester.pumpWidget(_OnTapUrlApp(
-        href: href,
-        onTapCallbackResults: onTapCallbackResults,
-        onTapUrl: (_) => false,
-      ));
+      await explain(
+        tester,
+        HtmlWidget('<a href="$href">Tap me</a>', onTapUrl: (url) {
+          urls.add(url);
+          return false;
+        }),
+      );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
-      expect(onTapCallbackResults, equals(const [href, false]));
+      expect(urls, equals(const [href]));
+      expect(fwfh_url_launcher.mockGetLaunchUrls(), equals(const [href]));
     });
 
     testWidgets('triggers callback (returns true)', (tester) async {
       const href = 'returns-true';
-      final onTapCallbackResults = [];
+      final urls = <String>[];
 
-      await tester.pumpWidget(_OnTapUrlApp(
-        href: href,
-        onTapCallbackResults: onTapCallbackResults,
-        onTapUrl: (_) => true,
-      ));
+      await explain(
+        tester,
+        HtmlWidget('<a href="$href">Tap me</a>', onTapUrl: (url) {
+          urls.add(url);
+          return true;
+        }),
+      );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
-      expect(onTapCallbackResults, equals(const [href, true]));
+      expect(urls, equals(const [href]));
+      expect(fwfh_url_launcher.mockGetLaunchUrls(), equals(const []));
     });
 
     testWidgets('triggers callback (async false)', (tester) async {
-      const href = 'returns-false';
-      final onTapCallbackResults = [];
+      const href = 'async-false';
+      final urls = <String>[];
 
-      await tester.pumpWidget(_OnTapUrlApp(
-        href: href,
-        onTapCallbackResults: onTapCallbackResults,
-        onTapUrl: (_) async => false,
-      ));
+      await explain(
+        tester,
+        HtmlWidget('<a href="$href">Tap me</a>', onTapUrl: (url) async {
+          urls.add(url);
+          return false;
+        }),
+      );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
-      expect(onTapCallbackResults, equals(const [href, false]));
+      expect(urls, equals(const [href]));
+      expect(fwfh_url_launcher.mockGetLaunchUrls(), equals(const [href]));
     });
 
     testWidgets('triggers callback (async true)', (tester) async {
-      const href = 'returns-true';
-      final onTapCallbackResults = [];
+      const href = 'async-true';
+      final urls = <String>[];
 
-      await tester.pumpWidget(_OnTapUrlApp(
-        href: href,
-        onTapCallbackResults: onTapCallbackResults,
-        onTapUrl: (_) async => true,
-      ));
+      await explain(
+        tester,
+        HtmlWidget('<a href="$href">Tap me</a>', onTapUrl: (url) async {
+          urls.add(url);
+          return true;
+        }),
+      );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
-      expect(onTapCallbackResults, equals(const [href, true]));
+      expect(urls, equals(const [href]));
+      expect(fwfh_url_launcher.mockGetLaunchUrls(), equals(const []));
     });
 
     testWidgets('default handler', (WidgetTester tester) async {
       const href = 'default';
-      final onTapCallbackResults = [];
-
-      await tester.pumpWidget(_OnTapUrlApp(
-        href: href,
-        onTapCallbackResults: onTapCallbackResults,
-      ));
+      await explain(
+        tester,
+        HtmlWidget('<a href="$href">Tap me</a>'),
+      );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
-      expect(onTapCallbackResults, equals(const [href, false]));
+      expect(fwfh_url_launcher.mockGetLaunchUrls(), equals(const [href]));
     });
   });
 
@@ -705,43 +717,4 @@ void main() {
       });
     });
   });
-}
-
-class _OnTapUrlApp extends StatelessWidget {
-  final String href;
-  final dynamic Function(String)? onTapUrl;
-  final List? onTapCallbackResults;
-
-  const _OnTapUrlApp({
-    Key? key,
-    required this.href,
-    this.onTapCallbackResults,
-    this.onTapUrl,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext _) => MaterialApp(
-        home: Scaffold(
-          body: HtmlWidget(
-            '<a href="$href">Tap me</a>',
-            factoryBuilder: () => _OnTapUrlFactory(
-              onTapCallbackResults: onTapCallbackResults,
-            ),
-            onTapUrl: onTapUrl,
-          ),
-        ),
-      );
-}
-
-class _OnTapUrlFactory extends WidgetFactory {
-  final List? onTapCallbackResults;
-
-  _OnTapUrlFactory({this.onTapCallbackResults});
-
-  @override
-  Future<bool> onTapCallback(String url) async {
-    final result = await super.onTapCallback(url);
-    onTapCallbackResults?.addAll([url, result]);
-    return result;
-  }
 }
