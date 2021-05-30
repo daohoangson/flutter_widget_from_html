@@ -1,0 +1,31 @@
+name: Backward compatibility
+on:
+  push:
+    branches: 
+      - master
+      - next
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        package:
+          - core
+          - enhanced
+          - fwfh_cached_network_image
+          - fwfh_chewie
+          - fwfh_svg
+          - fwfh_url_launcher
+          - fwfh_webview
+
+    name: ${{ matrix.package }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/${{ matrix.package }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+      - run: flutter test
