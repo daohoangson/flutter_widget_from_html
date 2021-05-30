@@ -16,7 +16,6 @@ jobs:
           - fwfh_cached_network_image
           - fwfh_chewie
           - fwfh_svg
-          - fwfh_url_launcher
           - fwfh_webview
 
     name: ${{ matrix.package }}
