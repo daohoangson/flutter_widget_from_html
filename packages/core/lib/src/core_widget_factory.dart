@@ -16,7 +16,7 @@ import 'core_html_widget.dart';
 
 /// A factory to build widgets.
 class WidgetFactory {
-  final _anchors = <String, GlobalKey>{};
+  late AnchorRegistry _anchorRegistry;
   late final _flattener;
 
   BuildOp? _styleBgColor;
@@ -73,7 +73,7 @@ class WidgetFactory {
       ListView.builder(
         addAutomaticKeepAlives: false,
         addSemanticIndexes: false,
-        itemBuilder: (_, i) => children[i],
+        itemBuilder: (c, i) => _anchorRegistry.buildBodyItem(c, i, children[i]),
         itemCount: children.length,
       );
 
@@ -81,7 +81,7 @@ class WidgetFactory {
   Widget buildBodySliverList(BuildContext context, List<Widget> children) =>
       SliverList(
         delegate: SliverChildBuilderDelegate(
-          (_, i) => children[i],
+          (c, i) => _anchorRegistry.buildBodyItem(c, i, children[i]),
           addAutomaticKeepAlives: false,
           addSemanticIndexes: false,
           childCount: children.length,
@@ -122,8 +122,10 @@ class WidgetFactory {
       case RenderMode.Column:
         return buildColumnWidget(context, children);
       case RenderMode.ListView:
+        _anchorRegistry.prepareIndexByAnchor(children);
         return buildBodyListView(context, children);
       case RenderMode.SliverList:
+        _anchorRegistry.prepareIndexByAnchor(children);
         return buildBodySliverList(context, children);
     }
   }
@@ -518,25 +520,7 @@ class WidgetFactory {
   ///
   /// Returns `true` if anchor has been found and
   /// [ScrollPosition.ensureVisible] completes successfully.
-  Future<bool> onTapAnchor(String id, BuildContext? anchorContext) async {
-    if (anchorContext == null) return false;
-
-    final renderObject = anchorContext.findRenderObject();
-    if (renderObject == null) return false;
-
-    final offsetToReveal = RenderAbstractViewport.of(renderObject)
-        ?.getOffsetToReveal(renderObject, 0.0)
-        .offset;
-    final position = Scrollable.of(anchorContext)?.position;
-    if (offsetToReveal == null || position == null) return false;
-
-    await position.ensureVisible(
-      renderObject,
-      duration: const Duration(milliseconds: 100),
-      curve: Curves.easeIn,
-    );
-    return true;
-  }
+  Future<bool> onTapAnchor(String id) => _anchorRegistry.ensureVisible(id);
 
   /// Calls [HtmlWidget.onTapUrl] with [url].
   ///
@@ -557,8 +541,7 @@ class WidgetFactory {
 
     if (url.startsWith('#')) {
       final id = url.substring(1);
-      final anchorContext = _anchors[id]?.currentContext;
-      final handledViaAnchor = await onTapAnchor(id, anchorContext);
+      final handledViaAnchor = await onTapAnchor(id);
       if (handledViaAnchor) return true;
     }
 
@@ -1002,7 +985,7 @@ class WidgetFactory {
   /// Resets for a new build.
   @mustCallSuper
   void reset(State state) {
-    _anchors.clear();
+    _anchorRegistry = AnchorRegistry();
     _flattener.reset();
 
     final widget = state.widget;
@@ -1026,10 +1009,12 @@ class WidgetFactory {
 
   BuildOp _anchorOp(String id) {
     final anchor = GlobalKey(debugLabel: id);
-    _anchors[id] = anchor;
 
     return BuildOp(
       onTree: (meta, tree) {
+        _anchorRegistry.register(id, anchor);
+        tree.registerAnchor(anchor);
+
         if (meta.willBuildSubtree == true) return;
 
         final widget = WidgetPlaceholder('#$id').wrapWith(

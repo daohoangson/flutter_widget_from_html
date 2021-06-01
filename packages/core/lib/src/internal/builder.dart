@@ -106,6 +106,28 @@ class BuildTree extends core_data.BuildTree {
           widgets;
     }
 
+    final thisAnchors = anchors;
+    if (thisAnchors != null) {
+      var needsColumn = false;
+      for (final widget in widgets) {
+        if (widget.anchors == null) {
+          // the current tree has some anchors
+          // but at least one of its widgets doesn't self-announce
+          // we need a column to wrap things and announce up the chain
+          needsColumn = true;
+          break;
+        }
+      }
+
+      if (needsColumn) {
+        widgets = listOrNull(
+              wf.buildColumnPlaceholder(parentMeta, widgets)
+                ?..setAnchorsIfUnset(thisAnchors),
+            ) ??
+            const [];
+      }
+    }
+
     _built.addAll(widgets);
     return _built;
   }

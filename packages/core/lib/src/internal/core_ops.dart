@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:csslib/visitor.dart' as css;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -13,6 +14,7 @@ import '../core_widget_factory.dart';
 import 'core_parser.dart';
 import 'margin_vertical.dart';
 
+part 'ops/anchor.dart';
 part 'ops/column.dart';
 part 'ops/style_bg_color.dart';
 part 'ops/style_border.dart';
