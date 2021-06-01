@@ -12,7 +12,7 @@ part 'data/text_style.dart';
 
 /// A building element metadata.
 abstract class BuildMetadata {
-  /// The associatd element.
+  /// The associated element.
   final dom.Element element;
 
   /// The associated [TextStyleBuilder].
