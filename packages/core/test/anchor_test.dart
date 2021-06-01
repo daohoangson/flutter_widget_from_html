@@ -109,6 +109,21 @@ void main() async {
           await tester.pumpAndSettle();
           await screenMatchesGolden(tester, 'up/target');
         }, skip: goldenSkip != null);
+
+        group('ListView', () {
+          testGoldens('scrolls down', (WidgetTester tester) async {
+            await tester.pumpWidgetBuilder(
+              _ListViewTestApp(),
+              wrapper: materialAppWrapper(theme: ThemeData.light()),
+              surfaceSize: Size(200, 200),
+            );
+            await screenMatchesGolden(tester, 'listview/down/top');
+
+            expect(await tapText(tester, 'Scroll down'), equals(1));
+            await tester.pumpAndSettle();
+            await screenMatchesGolden(tester, 'listview/down/target');
+          }, skip: goldenSkip != null);
+        });
       }, skip: goldenSkip);
     },
     config: GoldenToolkitConfiguration(
@@ -116,6 +131,36 @@ void main() async {
     ),
   );
 }
+
+final _html1 = '''<p>1</p>
+<p>12</p>
+<p>123</p>
+<p>1234</p>
+<p>12345</p>
+<p>123456</p>
+<p>1234567</p>
+<p>12345678</p>
+<p>123456789</p>
+<p>1234567890</p>''';
+
+final _html2 = '''<p>1234567890</p>
+<p>123456789</p>
+<p>12345678</p>
+<p>1234567</p>
+<p>123456</p>
+<p>12345</p>
+<p>1234</p>
+<p>123</p>
+<p>12</p>
+<p>1</p>''';
+
+final html = '''
+<a href="#target">Scroll down</a>
+${_html1 * 3}
+<p><a name="target"></a>--&gt; TARGET &lt--</p>
+${_html2 * 3}
+<a href="#target">Scroll up</a>
+''';
 
 class _AnchorTestApp extends StatelessWidget {
   final Key? keyBottom;
@@ -127,34 +172,19 @@ class _AnchorTestApp extends StatelessWidget {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              HtmlWidget('''
-<a href="#target">Scroll down</a>
-<p>1</p>
-<p>12</p>
-<p>123</p>
-<p>1234</p>
-<p>12345</p>
-<p>123456</p>
-<p>1234567</p>
-<p>12345678</p>
-<p>123456789</p>
-<p>1234567890</p>
-<p><a name="target"></a>--&gt; TARGET &lt--</p>
-<p>1234567890</p>
-<p>123456789</p>
-<p>12345678</p>
-<p>1234567</p>
-<p>123456</p>
-<p>12345</p>
-<p>1234</p>
-<p>123</p>
-<p>12</p>
-<p>1</p>
-<a href="#target">Scroll up</a>
-'''),
+              HtmlWidget(html),
               SizedBox.shrink(key: keyBottom),
             ],
           ),
         ),
+      );
+}
+
+class _ListViewTestApp extends StatelessWidget {
+  _ListViewTestApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => Scaffold(
+        body: HtmlWidget(html, renderMode: RenderMode.ListView),
       );
 }

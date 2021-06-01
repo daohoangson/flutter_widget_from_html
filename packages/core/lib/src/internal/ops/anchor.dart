@@ -148,12 +148,6 @@ class _AnchorBodyItemIndex {
       : isExact = false,
         min = prevMax + 1,
         max = nextMin - 1;
-
-  @override
-  String toString() {
-    if (min == max) return min.toString();
-    return '[$min, $max]';
-  }
 }
 
 class _BodyItemWidget extends ProxyWidget {
