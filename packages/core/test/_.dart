@@ -103,6 +103,8 @@ Future<String> explainWithoutPumping({
 
     // dependencies
     str = str.replaceAll(RegExp(r'\[GlobalKey#[0-9a-f]+\]'), '');
+    str = str.replaceAllMapped(RegExp(r'\[GlobalKey#[0-9a-f]+ (\w+)\]'),
+        (m) => '[GlobalKey ${m.group(1)!}]');
     str = str.replaceAll(RegExp(r'(, )?dependencies: \[[^\]]+\]'), '');
 
     // image state

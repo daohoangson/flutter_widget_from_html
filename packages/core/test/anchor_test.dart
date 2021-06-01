@@ -40,6 +40,40 @@ void main() async {
       final explained = await explain(tester, html);
       expect(explained, contains('[SizedBox#foo'));
     });
+
+    testWidgets('renders in ListView', (WidgetTester tester) async {
+      final html = '<a name="foo"></a>Foo';
+      final explained = await explain(
+        tester,
+        null,
+        hw: HtmlWidget(
+          html,
+          key: hwKey,
+          renderMode: RenderMode.ListView,
+        ),
+        useExplainer: false,
+      );
+      expect(explained, contains('BodyItemWidget-[GlobalKey 0]'));
+      expect(explained, contains('SizedBox-[GlobalKey foo]'));
+    });
+
+    testWidgets('renders in SliverList', (WidgetTester tester) async {
+      final html = '<a name="foo"></a>Foo';
+      final explained = await explain(
+        tester,
+        null,
+        hw: CustomScrollView(slivers: [
+          HtmlWidget(
+            html,
+            key: hwKey,
+            renderMode: RenderMode.SliverList,
+          )
+        ]),
+        useExplainer: false,
+      );
+      expect(explained, contains('BodyItemWidget-[GlobalKey 0]'));
+      expect(explained, contains('SizedBox-[GlobalKey foo]'));
+    });
   });
 
   final goldenSkip = Platform.isLinux ? null : 'Linux only';
