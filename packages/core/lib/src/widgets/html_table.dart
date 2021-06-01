@@ -38,8 +38,7 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties
-        .add(DiagnosticsProperty<Border>('border', border, defaultValue: null));
+    properties.add(DiagnosticsProperty('border', border, defaultValue: null));
     properties.add(FlagProperty('borderCollapse',
         value: borderCollapse,
         defaultValue: false,
@@ -134,8 +133,7 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties
-        .add(DiagnosticsProperty<Border>('border', border, defaultValue: null));
+    properties.add(DiagnosticsProperty('border', border, defaultValue: null));
     properties.add(IntProperty('columnSpan', columnSpan, defaultValue: 1));
     properties.add(IntProperty('columnStart', columnStart));
     properties.add(IntProperty('rowSpan', rowSpan, defaultValue: 1));

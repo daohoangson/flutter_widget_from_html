@@ -17,7 +17,7 @@ import 'core_html_widget.dart';
 /// A factory to build widgets.
 class WidgetFactory {
   final _anchors = <String, GlobalKey>{};
-  final _flattener = Flattener();
+  late final _flattener;
 
   BuildOp? _styleBgColor;
   BuildOp? _styleBlock;
@@ -38,6 +38,10 @@ class WidgetFactory {
   BuildOp? _tagQ;
   TextStyleHtml Function(TextStyleHtml, css.Expression)? _tsbLineHeight;
   HtmlWidget? _widget;
+
+  WidgetFactory() {
+    _flattener = Flattener(this);
+  }
 
   /// Builds [Align].
   Widget? buildAlign(
@@ -187,7 +191,10 @@ class WidgetFactory {
   /// Builds [GestureDetector].
   Widget? buildGestureDetector(
           BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
-      GestureDetector(onTap: onTap, child: child);
+      MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(onTap: onTap, child: child),
+      );
 
   /// Builds horizontal scroll view.
   Widget? buildHorizontalScrollView(BuildMetadata meta, Widget child) =>
@@ -198,11 +205,7 @@ class WidgetFactory {
     final src = data.sources.isNotEmpty ? data.sources.first : null;
     if (src == null) return null;
 
-    var built = buildImageWidget(
-      meta,
-      semanticLabel: data.alt ?? data.title,
-      url: src.url,
-    );
+    var built = buildImageWidget(meta, src);
 
     final title = data.title;
     if (built != null && title != null) {
@@ -225,11 +228,9 @@ class WidgetFactory {
   }
 
   /// Builds [Image].
-  Widget? buildImageWidget(
-    BuildMetadata meta, {
-    String? semanticLabel,
-    required String url,
-  }) {
+  Widget? buildImageWidget(BuildMetadata meta, ImageSource src) {
+    final url = src.url;
+
     late final ImageProvider? provider;
     if (url.startsWith('asset:')) {
       provider = imageProviderFromAsset(url);
@@ -242,17 +243,60 @@ class WidgetFactory {
     }
     if (provider == null) return null;
 
+    final image = src.image;
+    final semanticLabel = image?.alt ?? image?.title;
     return Image(
-      errorBuilder: (_, error, __) {
-        print('$provider error: $error');
-        final text = semanticLabel ?? '❌';
-        return Text(text);
-      },
+      errorBuilder: (_1, _2, _3) => imageErrorBuilder(_1, _2, _3, src),
+      loadingBuilder: (_1, _2, _3) => imageLoadingBuilder(_1, _2, _3, src),
       excludeFromSemantics: semanticLabel == null,
       fit: BoxFit.fill,
       image: provider,
       semanticLabel: semanticLabel,
     );
+  }
+
+  /// Builder for loading widget while image is loading.
+  Widget imageLoadingBuilder(
+    BuildContext context,
+    Widget child,
+    ImageChunkEvent? loadingProgress,
+    ImageSource src,
+  ) {
+    if (loadingProgress == null) return child;
+    return const SizedBox.shrink();
+  }
+
+  /// Builder for error widget if an error occurs during image loading.
+  Widget imageErrorBuilder(
+    BuildContext context,
+    Object error,
+    StackTrace? stackTrace,
+    ImageSource src,
+  ) {
+    final image = src.image;
+    final semanticLabel = image?.alt ?? image?.title;
+    final text = semanticLabel ?? '❌';
+    return Text(text);
+  }
+
+  /// Builds marker widget for a list item.
+  Widget? buildListMarker(
+      BuildMetadata meta, TextStyleHtml tsh, String listStyleType, int index) {
+    final text = getListMarkerText(listStyleType, index);
+    final style = tsh.styleWithHeight;
+    return text.isNotEmpty
+        ? RichText(
+            maxLines: 1,
+            overflow: TextOverflow.clip,
+            softWrap: false,
+            text: TextSpan(style: style, text: text),
+            textDirection: tsh.textDirection,
+          )
+        : listStyleType == kCssListStyleTypeCircle
+            ? HtmlListMarker.circle(style)
+            : listStyleType == kCssListStyleTypeSquare
+                ? HtmlListMarker.square(style)
+                : HtmlListMarker.disc(style);
   }
 
   /// Builds [Padding].
@@ -274,6 +318,27 @@ class WidgetFactory {
         // currently it only renders 1 line with ellipsis
         maxLines: tsh.maxLines == -1 ? null : tsh.maxLines,
       );
+
+  /// Builds [TextSpan].
+  InlineSpan? buildTextSpan({
+    List<InlineSpan>? children,
+    GestureRecognizer? recognizer,
+    TextStyle? style,
+    String? text,
+  }) {
+    if (text?.isEmpty == true) {
+      if (children?.isEmpty == true) return null;
+      if (children?.length == 1) return children!.first;
+    }
+
+    return TextSpan(
+      children: children,
+      mouseCursor: recognizer != null ? SystemMouseCursors.click : null,
+      recognizer: recognizer,
+      style: style,
+      text: text,
+    );
+  }
 
   /// Builds [Tooltip].
   Widget? buildTooltip(BuildMetadata meta, Widget child, String message) =>
@@ -363,10 +428,8 @@ class WidgetFactory {
         Theme.of(context),
       ];
 
-  /// Returns marker for the specified [type] at index [i].
-  ///
-  /// Note: `circle`, `disc` and `square` type won't trigger this method
-  String getListStyleMarker(String type, int i) {
+  /// Returns marker text for the specified list style [type] at index [i].
+  String getListMarkerText(String type, int i) {
     switch (type) {
       case kCssListStyleTypeAlphaLower:
       case kCssListStyleTypeAlphaLatinLower:
@@ -387,17 +450,17 @@ class WidgetFactory {
       case kCssListStyleTypeDecimal:
         return '$i.';
       case kCssListStyleTypeRomanLower:
-        final roman = _getListStyleMarkerRoman(i)?.toLowerCase();
+        final roman = _getListMarkerRoman(i)?.toLowerCase();
         return roman != null ? '$roman.' : '';
       case kCssListStyleTypeRomanUpper:
-        final roman = _getListStyleMarkerRoman(i);
+        final roman = _getListMarkerRoman(i);
         return roman != null ? '$roman.' : '';
     }
 
     return '';
   }
 
-  String? _getListStyleMarkerRoman(int i) {
+  String? _getListMarkerRoman(int i) {
     // TODO: find some lib to generate programatically
     const map = <int, String>{
       1: 'I',

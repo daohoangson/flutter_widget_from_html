@@ -1,3 +1,18 @@
+## 0.7.0-dev.2021052101
+
+- Requires Flutter 2.2
+- Show click cursor for `A` tag (#322)
+- Fix incorrect UL/OL tag closing
+- Fix bug padding+background+h2 (#523)
+
+## 0.7.0-dev.2021051501
+
+- BREAKING: Change method signature `WidgetFactory.buildImageWidget`
+- BREAKING: Replace `WidgetFactory.getListStyleMarker` with `getListMarkerText`
+- Add `WidgetFactory.buildListMarker` (#511)
+- Add image loading builder to core widget factory (#517)
+- Fix bug border+background (#516)
+
 ## 0.6.1+1
 
 - Fix negative margin/padding throwing exception (#510)

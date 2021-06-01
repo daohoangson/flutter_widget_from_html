@@ -68,9 +68,9 @@ void main() {
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals('[GestureDetector:child='
+      equals('[MouseRegion:child=[GestureDetector:child='
           '[CssBlock:child=[RichText:(#FF123456+u:Foo)]]'
-          ']'),
+          ']]'),
     );
   });
 
@@ -81,8 +81,8 @@ void main() {
       explained,
       equals(
         '[Column:children='
-        '[GestureDetector:child=[CssBlock:child=[RichText:(#FF123456+u:Foo)]]],'
-        '[GestureDetector:child=[CssBlock:child=[RichText:(#FF123456+u:Bar)]]]'
+        '[MouseRegion:child=[GestureDetector:child=[CssBlock:child=[RichText:(#FF123456+u:Foo)]]]],'
+        '[MouseRegion:child=[GestureDetector:child=[CssBlock:child=[RichText:(#FF123456+u:Bar)]]]]'
         ']',
       ),
     );
@@ -99,9 +99,9 @@ void main() {
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals('[CssBlock:child=[GestureDetector:child='
+      equals('[CssBlock:child=[MouseRegion:child=[GestureDetector:child='
           '[CssBlock:child=[RichText:(#FF123456+u:Foo)]]'
-          ']]'),
+          ']]]'),
     );
   });
 
@@ -112,10 +112,10 @@ void main() {
     expect(
       explained,
       equals(
-        '[CssBlock:child=[GestureDetector:child=[Column:children='
+        '[CssBlock:child=[MouseRegion:child=[GestureDetector:child=[Column:children='
         '[CssBlock:child=[RichText:(#FF123456+u:Foo)]],'
         '[CssBlock:child=[RichText:(#FF123456+u:Bar)]]'
-        ']]]',
+        ']]]]',
       ),
     );
   });
@@ -138,7 +138,10 @@ void main() {
     expect(
         explained,
         equals('[SizedBox:0.0x5.0],'
-            '[GestureDetector:child=[Padding:(0,5,0,5),child=[CssBlock:child=[RichText:(#FF123456+u:Foo)]]]],'
+            '[MouseRegion:child=[GestureDetector:child='
+            '[Padding:(0,5,0,5),child='
+            '[CssBlock:child=[RichText:(#FF123456+u:Foo)]]'
+            ']]],'
             '[SizedBox:0.0x5.0]'));
   });
 
@@ -152,9 +155,9 @@ void main() {
       final explained = await explainImg(tester, html);
       expect(
           explained,
-          equals('[GestureDetector:child='
+          equals('[MouseRegion:child=[GestureDetector:child='
               '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-              ']'));
+              ']]'));
     });
 
     testWidgets('renders text + IMG tag both inside', (tester) async {
@@ -164,9 +167,9 @@ void main() {
           explained,
           equals('[RichText:(:'
               '(#FF123456+u+onTap:Foo )'
-              '[GestureDetector:child='
+              '[MouseRegion:child=[GestureDetector:child='
               '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-              '])]'));
+              ']])]'));
     });
 
     testWidgets('renders text outside + IMG tag inside', (tester) async {
@@ -175,9 +178,9 @@ void main() {
       expect(
           explained,
           equals('[RichText:(:Foo '
-              '[GestureDetector:child='
+              '[MouseRegion:child=[GestureDetector:child='
               '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-              '])]'));
+              ']])]'));
     });
 
     testWidgets('renders IMG tag + text both inside', (tester) async {
@@ -186,9 +189,9 @@ void main() {
       expect(
           explained,
           equals('[RichText:(:'
-              '[GestureDetector:child='
+              '[MouseRegion:child=[GestureDetector:child='
               '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-              ']'
+              ']]'
               '(#FF123456+u+onTap: foo)'
               ')]'));
     });
@@ -199,9 +202,9 @@ void main() {
       expect(
           explained,
           equals('[RichText:(:'
-              '[GestureDetector:child='
+              '[MouseRegion:child=[GestureDetector:child='
               '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-              ']'
+              ']]'
               '(: foo))]'));
     });
   });

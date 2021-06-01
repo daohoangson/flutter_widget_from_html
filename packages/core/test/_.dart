@@ -294,6 +294,17 @@ class Explainer {
           '${e.bottom.truncate()},${e.left.truncate()})'
       : e.toString();
 
+  String _htmlListMarker(HtmlListMarker marker) {
+    switch (marker.markerType) {
+      case HtmlListMarkerType.circle:
+        return '[HtmlListMarker.circle]';
+      case HtmlListMarkerType.disc:
+        return '[HtmlListMarker.disc]';
+      case HtmlListMarkerType.square:
+        return '[HtmlListMarker.square]';
+    }
+  }
+
   String _image(Image image) {
     final buffer = StringBuffer();
 
@@ -481,6 +492,8 @@ class Explainer {
 
     if (widget == widget0) return '[widget0]';
 
+    if (widget is HtmlListMarker) return _htmlListMarker(widget);
+
     if (widget is TshWidget) return _widget(widget.child);
 
     // ignore: invalid_use_of_protected_member
@@ -553,9 +566,12 @@ class Explainer {
     // G-M
     attr.add(widget is GestureDetector
         ? _widgetChild(widget.child)
-        : widget is MultiChildRenderObjectWidget
-            ? (widget is! RichText ? _widgetChildren(widget.children) : '')
-            : '');
+        : widget is MouseRegion
+            ? _widgetChild(widget.child)
+            : widget is MultiChildRenderObjectWidget
+                ? (widget is! RichText ? _widgetChildren(widget.children) : '')
+                : '');
+
     // N-T
     attr.add(widget is ProxyWidget
         ? _widgetChild(widget.child)

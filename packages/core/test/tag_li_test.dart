@@ -8,9 +8,9 @@ import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '_.dart';
 
-const disc = '[_ListMarkerDisc]';
-const circle = '[_ListMarkerCircle]';
-const square = '[_ListMarkerSquare]';
+const disc = '[HtmlListMarker.disc]';
+const circle = '[HtmlListMarker.circle]';
+const square = '[HtmlListMarker.square]';
 
 const sizedBox = '[SizedBox:0.0x10.0]';
 
@@ -22,8 +22,9 @@ String list(List<String> children) => '[Column:children=${children.join(",")}]';
 String item(String markerText, String contents, {String? child}) =>
     '[HtmlListItem:children=${child ?? '[RichText:(:$contents)]'},${marker(markerText)}]';
 
-String marker(String text) =>
-    text.startsWith('[_ListMarker') ? text : '[RichText:maxLines=1,(:$text)]';
+String marker(String text) => text.startsWith('[HtmlListMarker.')
+    ? text
+    : '[RichText:maxLines=1,(:$text)]';
 
 void main() async {
   await loadAppFonts();
@@ -599,6 +600,18 @@ void main() async {
             item('3.', 'Three'),
           ]))));
     });
+
+    testWidgets('null buildListMarker', (WidgetTester tester) async {
+      final html = '<ul><li>Foo</li></ul>';
+      final explained = await explain(tester, null,
+          hw: HtmlWidget(
+            html,
+            key: hwKey,
+            factoryBuilder: () => _NullListMarkerWidgetFactory(),
+          ));
+
+      expect(explained, isNot(contains('[HtmlListItem:')));
+    });
   });
 
   group('rtl', () {
@@ -750,6 +763,40 @@ void main() async {
       ),
     );
   });
+
+  group('HtmlListMarker', () {
+    testWidgets('updates markerType', (tester) async {
+      final disc = await explain(
+        tester,
+        '<ul><li style="list-style-type: disc">Foo</li></ul>',
+        useExplainer: false,
+      );
+      expect(disc, contains('markerType: disc'));
+
+      final circle = await explain(
+        tester,
+        '<ul><li style="list-style-type: circle">Foo</li></ul>',
+        useExplainer: false,
+      );
+      expect(circle, contains('markerType: circle'));
+    });
+
+    testWidgets('updates textStyle', (tester) async {
+      final disc = await explain(
+        tester,
+        '<ul style="color: #f00"><li>Foo</li></ul>',
+        useExplainer: false,
+      );
+      expect(disc, contains('Color(0xffff0000)'));
+
+      final circle = await explain(
+        tester,
+        '<ul style="color: #0f0"><li>Foo</li></ul>',
+        useExplainer: false,
+      );
+      expect(circle, contains('Color(0xff00ff00)'));
+    });
+  });
 }
 
 class _Golden extends StatelessWidget {
@@ -814,4 +861,12 @@ class _HitTestApp extends StatelessWidget {
           ),
         ),
       );
+}
+
+class _NullListMarkerWidgetFactory extends WidgetFactory {
+  @override
+  Widget? buildListMarker(
+      BuildMetadata meta, TextStyleHtml tsh, String listStyleType, int index) {
+    return null;
+  }
 }

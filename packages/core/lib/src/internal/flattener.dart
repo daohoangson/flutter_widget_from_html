@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
 import '../core_data.dart';
+import '../core_widget_factory.dart';
 import 'margin_vertical.dart';
 
 @immutable
@@ -17,6 +18,8 @@ typedef SpanBuilder = InlineSpan? Function(
     BuildContext, CssWhitespace whitespace);
 
 class Flattener {
+  final WidgetFactory wf;
+
   final List<GestureRecognizer> _recognizers = [];
 
   late List<Flattened> _flattened;
@@ -25,6 +28,8 @@ class Flattener {
   late List<_String> _strings, _prevStrings;
   late bool _swallowWhitespace;
   late TextStyleBuilder _tsb, _prevTsb;
+
+  Flattener(this.wf);
 
   void dispose() => _reset();
 
@@ -153,7 +158,7 @@ class Flattener {
 
       if (scopedRecognizer != null) _recognizers.add(scopedRecognizer);
 
-      _spans!.add((context, whitespace) => TextSpan(
+      _spans!.add((context, whitespace) => wf.buildTextSpan(
             recognizer: scopedRecognizer,
             style: scopedTsb.build(context).styleWithHeight,
             text: scopedStrings.toText(whitespace: whitespace),
@@ -198,12 +203,8 @@ class Flattener {
           .map((s) => s(context, whitespace))
           .whereType<InlineSpan>()
           .toList(growable: false);
-      if (text.isEmpty) {
-        if (children.isEmpty) return null;
-        if (children.length == 1) return children.first;
-      }
 
-      return TextSpan(
+      return wf.buildTextSpan(
         children: children,
         recognizer: scopedRecognizer,
         style: scopedTsb.build(context).styleWithHeight,
