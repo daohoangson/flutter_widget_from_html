@@ -8,10 +8,12 @@ import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '_.dart';
 
+final _onTapAnchorResults = <String, bool>{};
+
 void main() async {
   await loadAppFonts();
 
-  group('build test', () {
+  group('build tests', () {
     testWidgets('renders A[name]', (WidgetTester tester) async {
       final html = '<a name="foo"></a>Foo';
       final explained = await explain(tester, html);
@@ -76,13 +78,178 @@ void main() async {
     });
   });
 
+  group('tap tests', () {
+    setUp(() {
+      _onTapAnchorResults.clear();
+    });
+
+    testWidgets('skips unknown id', (WidgetTester tester) async {
+      await tester.pumpWidgetBuilder(
+        _ColumnTestApp(html: '<a href="#foo">Tap me</a>'),
+      );
+
+      expect(await tapText(tester, 'Tap me'), equals(1));
+      await tester.pumpAndSettle();
+      expect(_onTapAnchorResults, equals({'foo': false}));
+    });
+
+    group('scrolls', () {
+      testWidgets('Column', (WidgetTester tester) async {
+        await tester.pumpWidgetBuilder(
+          _ColumnTestApp(),
+          surfaceSize: Size(200, 200),
+        );
+
+        expect(await tapText(tester, 'Scroll down'), equals(1));
+        await tester.pumpAndSettle();
+        expect(_onTapAnchorResults, equals({'target': true}));
+      });
+
+      testWidgets('ListView', (WidgetTester tester) async {
+        await tester.pumpWidgetBuilder(
+          _ListViewTestApp(),
+          surfaceSize: Size(200, 200),
+        );
+
+        expect(await tapText(tester, 'Scroll down'), equals(1));
+        await tester.pumpAndSettle();
+        expect(_onTapAnchorResults, equals({'target': true}));
+      });
+
+      testWidgets('SliverList', (WidgetTester tester) async {
+        final keyBottom = GlobalKey();
+        await tester.pumpWidgetBuilder(
+          _SliverListTestApp(keyBottom: keyBottom),
+          surfaceSize: Size(200, 200),
+        );
+
+        await tester.scrollUntilVisible(find.byKey(keyBottom), 100);
+
+        expect(await tapText(tester, 'Scroll up'), equals(1));
+        await tester.pumpAndSettle();
+        expect(_onTapAnchorResults, equals({'target': true}));
+      });
+    });
+
+    group('ListView', () {
+      testWidgets('scrolls to DIV', (WidgetTester tester) async {
+        await tester.pumpWidgetBuilder(
+          _ListViewTestApp(
+            html: '<a href="#div">Tap me</a>'
+                '${htmlAsc * 3}'
+                '<div id="div">Foo</div>',
+          ),
+          surfaceSize: Size(200, 200),
+        );
+
+        expect(await tapText(tester, 'Tap me'), equals(1));
+        await tester.pumpAndSettle();
+        expect(_onTapAnchorResults, equals({'div': true}));
+      });
+
+      testWidgets('scrolls to SPAN', (WidgetTester tester) async {
+        await tester.pumpWidgetBuilder(
+          _ListViewTestApp(
+            html: '<a href="#span">Tap me</a>'
+                '${htmlAsc * 10}'
+                '<span id="span">Foo</span>',
+          ),
+          surfaceSize: Size(200, 200),
+        );
+
+        expect(await tapText(tester, 'Tap me'), equals(1));
+        await tester.pumpAndSettle();
+        expect(_onTapAnchorResults, equals({'span': true}));
+      });
+
+      testWidgets('scrolls to SPAN after DIV', (WidgetTester tester) async {
+        await tester.pumpWidgetBuilder(
+          _ListViewTestApp(
+            html: '<a href="#span">Tap me</a>'
+                '${htmlAsc * 3}'
+                '<div id="div">YOLO</div>'
+                '${htmlAsc * 3}'
+                '<span id="span">Foo</span>',
+          ),
+          surfaceSize: Size(200, 200),
+        );
+
+        expect(await tapText(tester, 'Tap me'), equals(1));
+        await tester.pumpAndSettle();
+        expect(_onTapAnchorResults, equals({'span': true}));
+      });
+
+      testWidgets('scrolls to SPAN before DIV', (WidgetTester tester) async {
+        await tester.pumpWidgetBuilder(
+          _ListViewTestApp(
+            html: '<a href="#span">Tap me</a>'
+                '${htmlAsc * 3}'
+                '<span id="span">Foo</span>'
+                '${htmlAsc * 3}'
+                '<div id="div">YOLO</div>'
+                '${htmlAsc * 3}',
+          ),
+          surfaceSize: Size(200, 200),
+        );
+
+        expect(await tapText(tester, 'Tap me'), equals(1));
+        await tester.pumpAndSettle();
+        expect(_onTapAnchorResults, equals({'span': true}));
+      });
+
+      testWidgets('scrolls to SPAN between DIVs', (WidgetTester tester) async {
+        await tester.pumpWidgetBuilder(
+          _ListViewTestApp(
+            html: '<a href="#span">Tap me</a>'
+                '${htmlAsc * 3}'
+                '<div id="div">YOLO</div>'
+                '${htmlAsc * 3}'
+                '<span id="span">Foo</span>'
+                '${htmlAsc * 3}'
+                '<div id="div">YOLO</div>'
+                '${htmlAsc * 3}',
+          ),
+          surfaceSize: Size(200, 200),
+        );
+
+        expect(await tapText(tester, 'Tap me'), equals(1));
+        await tester.pumpAndSettle();
+        expect(_onTapAnchorResults, equals({'span': true}));
+      });
+
+      testWidgets('scrolls up then down', (WidgetTester tester) async {
+        await tester.pumpWidgetBuilder(
+          _ListViewTestApp(
+            html: '<a href="#span1">Tap me 1</a>'
+                '${htmlAsc * 10}'
+                '<div id="div">YOLO</div>'
+                '${htmlAsc * 10}'
+                '<span id="span1">Foo</span>'
+                '<p><a href="#span2">Tap me 2</a></p>'
+                '${htmlAsc * 10}'
+                '<span id="span2">Foo</span>',
+          ),
+          surfaceSize: Size(200, 200),
+        );
+
+        expect(await tapText(tester, 'Tap me 1'), equals(1));
+        await tester.pumpAndSettle();
+        expect(_onTapAnchorResults, equals({'span1': true}));
+
+        expect(await tapText(tester, 'Tap me 2'), equals(1));
+        await tester.pumpAndSettle();
+        expect(_onTapAnchorResults, equals({'span1': true, 'span2': true}));
+      });
+    });
+  });
+
   final goldenSkip = Platform.isLinux ? null : 'Linux only';
   GoldenToolkit.runWithConfiguration(
     () {
       group('tap test', () {
         testGoldens('scrolls down', (WidgetTester tester) async {
           await tester.pumpWidgetBuilder(
-            _AnchorTestApp(),
+            _ColumnTestApp(),
             wrapper: materialAppWrapper(theme: ThemeData.light()),
             surfaceSize: Size(200, 200),
           );
@@ -96,7 +263,7 @@ void main() async {
         testGoldens('scrolls up', (WidgetTester tester) async {
           final keyBottom = GlobalKey();
           await tester.pumpWidgetBuilder(
-            _AnchorTestApp(keyBottom: keyBottom),
+            _ColumnTestApp(keyBottom: keyBottom),
             wrapper: materialAppWrapper(theme: ThemeData.light()),
             surfaceSize: Size(200, 200),
           );
@@ -149,7 +316,7 @@ void main() async {
   );
 }
 
-final _html1 = '''<p>1</p>
+final htmlAsc = '''<p>1</p>
 <p>12</p>
 <p>123</p>
 <p>1234</p>
@@ -160,7 +327,7 @@ final _html1 = '''<p>1</p>
 <p>123456789</p>
 <p>1234567890</p>''';
 
-final _html2 = '''<p>1234567890</p>
+final htmlDesc = '''<p>1234567890</p>
 <p>123456789</p>
 <p>12345678</p>
 <p>1234567</p>
@@ -171,25 +338,29 @@ final _html2 = '''<p>1234567890</p>
 <p>12</p>
 <p>1</p>''';
 
-final html = '''
+final htmlDefault = '''
 <a href="#target">Scroll down</a>
-${_html1 * 3}
+${htmlAsc * 3}
 <p><a name="target"></a>--&gt; TARGET &lt--</p>
-${_html2 * 3}
+${htmlDesc * 3}
 <a href="#target">Scroll up</a>
 ''';
 
-class _AnchorTestApp extends StatelessWidget {
+class _ColumnTestApp extends StatelessWidget {
+  final String? html;
   final Key? keyBottom;
 
-  _AnchorTestApp({Key? key, this.keyBottom}) : super(key: key);
+  _ColumnTestApp({this.html, Key? key, this.keyBottom}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => Scaffold(
         body: SingleChildScrollView(
           child: Column(
             children: [
-              HtmlWidget(html),
+              HtmlWidget(
+                html ?? htmlDefault,
+                factoryBuilder: () => _WidgetFactory(),
+              ),
               SizedBox.shrink(key: keyBottom),
             ],
           ),
@@ -198,26 +369,46 @@ class _AnchorTestApp extends StatelessWidget {
 }
 
 class _ListViewTestApp extends StatelessWidget {
-  _ListViewTestApp({Key? key}) : super(key: key);
+  final String? html;
+
+  _ListViewTestApp({this.html, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => Scaffold(
-        body: HtmlWidget(html, renderMode: RenderMode.ListView),
+        body: HtmlWidget(
+          html ?? htmlDefault,
+          factoryBuilder: () => _WidgetFactory(),
+          renderMode: RenderMode.ListView,
+        ),
       );
 }
 
 class _SliverListTestApp extends StatelessWidget {
-  final Key keyBottom;
+  final String? html;
+  final Key? keyBottom;
 
-  _SliverListTestApp({Key? key, required this.keyBottom}) : super(key: key);
+  _SliverListTestApp({this.html, Key? key, this.keyBottom}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => Scaffold(
         body: CustomScrollView(
           slivers: [
-            HtmlWidget(html, renderMode: RenderMode.SliverList),
+            HtmlWidget(
+              html ?? htmlDefault,
+              factoryBuilder: () => _WidgetFactory(),
+              renderMode: RenderMode.SliverList,
+            ),
             SliverToBoxAdapter(child: Container(height: 1, key: keyBottom)),
           ],
         ),
       );
+}
+
+class _WidgetFactory extends WidgetFactory {
+  @override
+  Future<bool> onTapAnchor(String id, EnsureVisible scrollTo) async {
+    final result = await super.onTapAnchor(id, scrollTo);
+    _onTapAnchorResults[id] = result;
+    return result;
+  }
 }

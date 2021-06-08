@@ -28,24 +28,26 @@ class AnchorRegistry {
     final completer = Completer<bool>();
     _ensureVisible(
       id,
-      bodyItemIndecesFromPreviousRun: const [],
       completer: completer,
       curve: curve,
       duration: duration,
       jumpCurve: jumpCurve,
       jumpDuration: jumpDuration,
+      prevMax: null,
+      prevMin: null,
     );
     return completer.future;
   }
 
   Future<void> _ensureVisible(
     String id, {
-    required List<int> bodyItemIndecesFromPreviousRun,
     required Completer<bool> completer,
     required Curve curve,
     required Duration duration,
     required Curve jumpCurve,
     required Duration jumpDuration,
+    required int? prevMax,
+    required int? prevMin,
   }) async {
     final anchor = _anchorById[id];
     if (anchor == null) return completer.complete(false);
@@ -59,46 +61,48 @@ class AnchorRegistry {
       ));
     }
 
-    final abii = _indexByAnchor[anchor];
-    if (abii == null) return completer.complete(false);
-
     if (_bodyItemIndeces.isEmpty) return completer.complete(false);
     final current = _bodyItemIndeces.toList(growable: false);
-    if (listEquals(current, bodyItemIndecesFromPreviousRun)) {
-      debugPrint('Stopped looking for #$id (possible infinite loop)');
-      return completer.complete(false);
-    }
     final currentMin = current.reduce(min);
     final currentMax = current.reduce(max);
+    if (currentMin == prevMin && currentMax == prevMax) {
+      return completer.complete(false);
+    }
+    final effectiveMin = min(prevMin ?? currentMin, currentMin);
+    final effectiveMax = max(prevMax ?? currentMax, currentMax);
 
-    if (abii.min < currentMin) {
-      debugPrint('Going up to index=$currentMin looking for #$id');
-      final wentUp = await _ensureVisibleContext(
+    final abii = _indexByAnchor[anchor];
+    final anchorMin = abii?.min ?? effectiveMin;
+    final anchorMax = abii?.max ?? effectiveMax;
+
+    var movedOk = false;
+    if (anchorMin < effectiveMin) {
+      movedOk = await _ensureVisibleContext(
         _bodyItemKeys[currentMin].currentContext,
         alignment: 0.0,
         curve: jumpCurve,
         duration: jumpDuration,
       );
-      if (!wentUp) return completer.complete(false);
-    } else if (abii.max > currentMax) {
-      debugPrint('Going down to index=$currentMax looking for #$id');
-      final wentDown = await _ensureVisibleContext(
+    } else if (anchorMax > effectiveMax) {
+      movedOk = await _ensureVisibleContext(
         _bodyItemKeys[currentMax].currentContext,
         alignment: 1.0,
         curve: jumpCurve,
         duration: jumpDuration,
       );
-      if (!wentDown) return completer.complete(false);
     }
+
+    if (!movedOk) return completer.complete(false);
 
     WidgetsBinding.instance?.addPostFrameCallback((_) => _ensureVisible(
           id,
-          bodyItemIndecesFromPreviousRun: current,
           completer: completer,
           curve: curve,
           duration: duration,
           jumpCurve: jumpCurve,
           jumpDuration: jumpDuration,
+          prevMax: effectiveMax,
+          prevMin: effectiveMin,
         ));
   }
 
@@ -142,7 +146,7 @@ class AnchorRegistry {
       if (_indexByAnchor[anchor] != null) continue;
 
       int? prevMax;
-      for (var prevIndex = j - 1; prevIndex > 0; prevIndex--) {
+      for (var prevIndex = j - 1; prevIndex >= 0; prevIndex--) {
         final prevAnchor = _anchors[prevIndex];
         final prevAbii = _indexByAnchor[prevAnchor];
         prevMax = prevAbii?.isExact == true ? prevAbii?.max : null;
