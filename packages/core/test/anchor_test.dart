@@ -110,8 +110,8 @@ void main() async {
           await screenMatchesGolden(tester, 'up/target');
         }, skip: goldenSkip != null);
 
-        group('ListView', () {
-          testGoldens('scrolls down', (WidgetTester tester) async {
+        group('_BodyItemWidget', () {
+          testGoldens('ListView scrolls down', (WidgetTester tester) async {
             await tester.pumpWidgetBuilder(
               _ListViewTestApp(),
               wrapper: materialAppWrapper(theme: ThemeData.light()),
@@ -122,6 +122,23 @@ void main() async {
             expect(await tapText(tester, 'Scroll down'), equals(1));
             await tester.pumpAndSettle();
             await screenMatchesGolden(tester, 'listview/down/target');
+          }, skip: goldenSkip != null);
+
+          testGoldens('SliverList scrolls up', (WidgetTester tester) async {
+            final keyBottom = GlobalKey();
+            await tester.pumpWidgetBuilder(
+              _SliverListTestApp(keyBottom: keyBottom),
+              wrapper: materialAppWrapper(theme: ThemeData.light()),
+              surfaceSize: Size(200, 200),
+            );
+
+            await tester.scrollUntilVisible(find.byKey(keyBottom), 100);
+            await tester.pumpAndSettle();
+            await screenMatchesGolden(tester, 'sliverlist/up/bottom');
+
+            expect(await tapText(tester, 'Scroll up'), equals(1));
+            await tester.pumpAndSettle();
+            await screenMatchesGolden(tester, 'sliverlist/up/target');
           }, skip: goldenSkip != null);
         });
       }, skip: goldenSkip);
@@ -186,5 +203,21 @@ class _ListViewTestApp extends StatelessWidget {
   @override
   Widget build(BuildContext _) => Scaffold(
         body: HtmlWidget(html, renderMode: RenderMode.ListView),
+      );
+}
+
+class _SliverListTestApp extends StatelessWidget {
+  final Key keyBottom;
+
+  _SliverListTestApp({Key? key, required this.keyBottom}) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => Scaffold(
+        body: CustomScrollView(
+          slivers: [
+            HtmlWidget(html, renderMode: RenderMode.SliverList),
+            SliverToBoxAdapter(child: Container(height: 1, key: keyBottom)),
+          ],
+        ),
       );
 }
