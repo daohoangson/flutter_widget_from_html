@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'core_html_widget.dart';
+import 'core_widget_factory.dart';
 
 export 'external/csslib.dart';
 export 'widgets/css_sizing.dart';
@@ -45,6 +46,23 @@ typedef CustomStylesBuilder = Map<String, String>? Function(
 /// if the children have HTML styling etc., they won't be processed at all.
 /// For those needs, a custom [WidgetFactory] is the way to go.
 typedef CustomWidgetBuilder = Widget? Function(dom.Element element);
+
+/// A callback to scroll the anchor identified by [id] into the viewport.
+///
+/// By default, an internal implementation is given to [WidgetFactory.onTapAnchor]
+/// when an anchor is tapped to handle the scrolling.
+/// A wf subclass can use this to change the [curve], the animation [duration]
+/// or even request scrolling to a different anchor.
+///
+/// The future is resolved after scrolling is completed.
+/// It will be `true` if scrolling succeed or `false` otherwise.
+typedef EnsureVisible = Future<bool> Function(
+  String id, {
+  Curve curve,
+  Duration duration,
+  Curve jumpCurve,
+  Duration jumpDuration,
+});
 
 /// A set of values that should trigger rebuild.
 class RebuildTriggers {

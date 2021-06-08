@@ -520,7 +520,7 @@ class WidgetFactory {
   ///
   /// Returns `true` if anchor has been found and
   /// [ScrollPosition.ensureVisible] completes successfully.
-  Future<bool> onTapAnchor(String id) => _anchorRegistry.ensureVisible(id);
+  Future<bool> onTapAnchor(String id, EnsureVisible scrollTo) => scrollTo(id);
 
   /// Calls [HtmlWidget.onTapUrl] with [url].
   ///
@@ -541,7 +541,8 @@ class WidgetFactory {
 
     if (url.startsWith('#')) {
       final id = url.substring(1);
-      final handledViaAnchor = await onTapAnchor(id);
+      final handledViaAnchor =
+          await onTapAnchor(id, _anchorRegistry.ensureVisible);
       if (handledViaAnchor) return true;
     }
 

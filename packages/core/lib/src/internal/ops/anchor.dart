@@ -20,25 +20,53 @@ class AnchorRegistry {
 
   Future<bool> ensureVisible(
     String id, {
-    List<int>? bodyItemIndecesFromPreviousRun,
+    Curve curve = Curves.easeIn,
+    Duration duration = const Duration(milliseconds: 100),
+    Curve jumpCurve = Curves.linear,
+    Duration jumpDuration = Duration.zero,
+  }) {
+    final completer = Completer<bool>();
+    _ensureVisible(
+      id,
+      bodyItemIndecesFromPreviousRun: const [],
+      completer: completer,
+      curve: curve,
+      duration: duration,
+      jumpCurve: jumpCurve,
+      jumpDuration: jumpDuration,
+    );
+    return completer.future;
+  }
+
+  Future<void> _ensureVisible(
+    String id, {
+    required List<int> bodyItemIndecesFromPreviousRun,
+    required Completer<bool> completer,
+    required Curve curve,
+    required Duration duration,
+    required Curve jumpCurve,
+    required Duration jumpDuration,
   }) async {
     final anchor = _anchorById[id];
-    if (anchor == null) return false;
+    if (anchor == null) return completer.complete(false);
 
     final anchorContext = anchor.currentContext;
     if (anchorContext != null) {
-      return _ensureVisibleContext(anchorContext);
+      return completer.complete(_ensureVisibleContext(
+        anchorContext,
+        curve: curve,
+        duration: duration,
+      ));
     }
 
     final abii = _indexByAnchor[anchor];
-    if (abii == null) return false;
+    if (abii == null) return completer.complete(false);
 
-    if (_bodyItemIndeces.isEmpty) return false;
+    if (_bodyItemIndeces.isEmpty) return completer.complete(false);
     final current = _bodyItemIndeces.toList(growable: false);
-    if (bodyItemIndecesFromPreviousRun != null &&
-        listEquals(current, bodyItemIndecesFromPreviousRun)) {
+    if (listEquals(current, bodyItemIndecesFromPreviousRun)) {
       debugPrint('Stopped looking for #$id (possible infinite loop)');
-      return false;
+      return completer.complete(false);
     }
     final currentMin = current.reduce(min);
     final currentMax = current.reduce(max);
@@ -48,29 +76,37 @@ class AnchorRegistry {
       final wentUp = await _ensureVisibleContext(
         _bodyItemKeys[currentMin].currentContext,
         alignment: 0.0,
-        curve: Curves.linear,
+        curve: jumpCurve,
+        duration: jumpDuration,
       );
-      if (!wentUp) return false;
+      if (!wentUp) return completer.complete(false);
     } else if (abii.max > currentMax) {
       debugPrint('Going down to index=$currentMax looking for #$id');
       final wentDown = await _ensureVisibleContext(
         _bodyItemKeys[currentMax].currentContext,
         alignment: 1.0,
-        curve: Curves.linear,
+        curve: jumpCurve,
+        duration: jumpDuration,
       );
-      if (!wentDown) return false;
+      if (!wentDown) return completer.complete(false);
     }
 
-    return ensureVisible(
-      id,
-      bodyItemIndecesFromPreviousRun: current,
-    );
+    WidgetsBinding.instance?.addPostFrameCallback((_) => _ensureVisible(
+          id,
+          bodyItemIndecesFromPreviousRun: current,
+          completer: completer,
+          curve: curve,
+          duration: duration,
+          jumpCurve: jumpCurve,
+          jumpDuration: jumpDuration,
+        ));
   }
 
   Future<bool> _ensureVisibleContext(
     BuildContext? context, {
     double alignment = 0.0,
-    Curve curve = Curves.easeIn,
+    required Curve curve,
+    required Duration duration,
   }) async {
     final renderObject = context?.findRenderObject();
     if (renderObject == null) return false;
@@ -81,7 +117,7 @@ class AnchorRegistry {
     await position.ensureVisible(
       renderObject,
       alignment: alignment,
-      duration: const Duration(milliseconds: 100),
+      duration: duration,
       curve: curve,
     );
     return true;
