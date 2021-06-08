@@ -41,7 +41,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
       - run: ./tool/test.sh --coverage
-      - run: bash <(curl -s https://codecov.io/bash)
+      - uses: codecov/codecov-action@v1
 
   ios:
     name: iOS Test
