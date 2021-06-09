@@ -1,5 +1,4 @@
 *.lock
-/.node
 .last_build_id
 coverage
 project.json
