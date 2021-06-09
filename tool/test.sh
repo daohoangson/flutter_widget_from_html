@@ -25,6 +25,13 @@ if [ -z "$UPDATE_GOLDENS" ]; then
   )
 
   ( \
+    cd ./packages/fwfh_just_audio \
+    && flutter pub get \
+    && flutter test "$@" \
+    && echo 'packages/fwfh_just_audio OK' \
+  )
+
+  ( \
     cd ./packages/fwfh_svg \
     && flutter pub get \
     && flutter test "$@" \
