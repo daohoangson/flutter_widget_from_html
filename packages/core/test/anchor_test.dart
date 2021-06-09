@@ -79,10 +79,6 @@ void main() async {
   });
 
   group('tap tests', () {
-    setUp(() {
-      _onTapAnchorResults.clear();
-    });
-
     testWidgets('skips unknown id', (WidgetTester tester) async {
       await tester.pumpWidgetBuilder(
         _ColumnTestApp(html: '<a href="#foo">Tap me</a>'),
@@ -240,6 +236,21 @@ void main() async {
         await tester.pumpAndSettle();
         expect(_onTapAnchorResults, equals({'span1': true, 'span2': true}));
       });
+
+      testWidgets('scrolls to hidden SPAN', (WidgetTester tester) async {
+        await tester.pumpWidgetBuilder(
+          _ListViewTestApp(
+            html: '<a href="#span">Tap me</a>'
+                '${htmlAsc * 10}'
+                '<p style="display: none">Foo <span id="span">bar</span>.</p>',
+          ),
+          surfaceSize: Size(200, 200),
+        );
+
+        expect(await tapText(tester, 'Tap me'), equals(1));
+        await tester.pumpAndSettle();
+        expect(_onTapAnchorResults, equals({'span': false}));
+      });
     });
   });
 
@@ -277,37 +288,35 @@ void main() async {
           await screenMatchesGolden(tester, 'up/target');
         }, skip: goldenSkip != null);
 
-        group('_BodyItemWidget', () {
-          testGoldens('ListView scrolls down', (WidgetTester tester) async {
-            await tester.pumpWidgetBuilder(
-              _ListViewTestApp(),
-              wrapper: materialAppWrapper(theme: ThemeData.light()),
-              surfaceSize: Size(200, 200),
-            );
-            await screenMatchesGolden(tester, 'listview/down/top');
+        testGoldens('ListView scrolls down', (WidgetTester tester) async {
+          await tester.pumpWidgetBuilder(
+            _ListViewTestApp(),
+            wrapper: materialAppWrapper(theme: ThemeData.light()),
+            surfaceSize: Size(200, 200),
+          );
+          await screenMatchesGolden(tester, 'listview/down/top');
 
-            expect(await tapText(tester, 'Scroll down'), equals(1));
-            await tester.pumpAndSettle();
-            await screenMatchesGolden(tester, 'listview/down/target');
-          }, skip: goldenSkip != null);
+          expect(await tapText(tester, 'Scroll down'), equals(1));
+          await tester.pumpAndSettle();
+          await screenMatchesGolden(tester, 'listview/down/target');
+        }, skip: goldenSkip != null);
 
-          testGoldens('SliverList scrolls up', (WidgetTester tester) async {
-            final keyBottom = GlobalKey();
-            await tester.pumpWidgetBuilder(
-              _SliverListTestApp(keyBottom: keyBottom),
-              wrapper: materialAppWrapper(theme: ThemeData.light()),
-              surfaceSize: Size(200, 200),
-            );
+        testGoldens('SliverList scrolls up', (WidgetTester tester) async {
+          final keyBottom = GlobalKey();
+          await tester.pumpWidgetBuilder(
+            _SliverListTestApp(keyBottom: keyBottom),
+            wrapper: materialAppWrapper(theme: ThemeData.light()),
+            surfaceSize: Size(200, 200),
+          );
 
-            await tester.scrollUntilVisible(find.byKey(keyBottom), 100);
-            await tester.pumpAndSettle();
-            await screenMatchesGolden(tester, 'sliverlist/up/bottom');
+          await tester.scrollUntilVisible(find.byKey(keyBottom), 100);
+          await tester.pumpAndSettle();
+          await screenMatchesGolden(tester, 'sliverlist/up/bottom');
 
-            expect(await tapText(tester, 'Scroll up'), equals(1));
-            await tester.pumpAndSettle();
-            await screenMatchesGolden(tester, 'sliverlist/up/target');
-          }, skip: goldenSkip != null);
-        });
+          expect(await tapText(tester, 'Scroll up'), equals(1));
+          await tester.pumpAndSettle();
+          await screenMatchesGolden(tester, 'sliverlist/up/target');
+        }, skip: goldenSkip != null);
       }, skip: goldenSkip);
     },
     config: GoldenToolkitConfiguration(
@@ -410,5 +419,11 @@ class _WidgetFactory extends WidgetFactory {
     final result = await super.onTapAnchor(id, scrollTo);
     _onTapAnchorResults[id] = result;
     return result;
+  }
+
+  @override
+  void reset(State<StatefulWidget> state) {
+    super.reset(state);
+    _onTapAnchorResults.clear();
   }
 }

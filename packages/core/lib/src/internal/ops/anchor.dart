@@ -65,9 +65,6 @@ class AnchorRegistry {
     final current = _bodyItemIndeces.toList(growable: false);
     final currentMin = current.reduce(min);
     final currentMax = current.reduce(max);
-    if (currentMin == prevMin && currentMax == prevMax) {
-      return completer.complete(false);
-    }
     final effectiveMin = min(prevMin ?? currentMin, currentMin);
     final effectiveMax = max(prevMax ?? currentMax, currentMax);
 
