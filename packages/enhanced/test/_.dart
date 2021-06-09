@@ -25,21 +25,15 @@ Future<String> explain(
   WidgetTester tester,
   String? html, {
   bool buildFutureBuilderWithData = true,
-  HtmlWidget? hw,
+  Widget? hw,
   bool useExplainer = true,
-  bool webView = false,
 }) async =>
     helper.explain(
       tester,
       null,
       buildFutureBuilderWithData: buildFutureBuilderWithData,
       explainer: _explainer,
-      hw: hw ??
-          HtmlWidget(
-            html!,
-            key: helper.hwKey,
-            webView: webView,
-          ),
+      hw: hw ?? HtmlWidget(html!, key: helper.hwKey),
       useExplainer: useExplainer,
     );
 

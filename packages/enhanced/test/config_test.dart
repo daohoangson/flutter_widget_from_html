@@ -491,6 +491,47 @@ void main() {
     });
   });
 
+  group('renderMode', () {
+    final explain = (
+      WidgetTester tester,
+      RenderMode renderMode, {
+      bool buildAsync = false,
+    }) {
+      final hw = HtmlWidget(
+        '<p>Foo</p><p>Bar</p>',
+        buildAsync: buildAsync,
+        key: helper.hwKey,
+        renderMode: renderMode,
+      );
+
+      return helper.explain(
+        tester,
+        null,
+        hw: renderMode == RenderMode.SliverList
+            ? CustomScrollView(slivers: [hw])
+            : hw,
+        useExplainer: false,
+      );
+    };
+
+    testWidgets('renders Column', (WidgetTester tester) async {
+      final explained = await explain(tester, RenderMode.Column);
+      expect(explained, contains('└Column('));
+    });
+
+    testWidgets('renders ListView', (WidgetTester tester) async {
+      final explained = await explain(tester, RenderMode.ListView);
+      expect(explained, contains('└ListView('));
+      expect(explained, isNot(contains('└Column(')));
+    });
+
+    testWidgets('renders SliverList', (WidgetTester tester) async {
+      final explained = await explain(tester, RenderMode.SliverList);
+      expect(explained, contains('└SliverList('));
+      expect(explained, isNot(contains('└Column(')));
+    });
+  });
+
   group('textStyle', () {
     final html = 'Foo';
 

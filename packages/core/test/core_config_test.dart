@@ -471,6 +471,63 @@ void main() {
     });
   });
 
+  group('renderMode', () {
+    final explain = (
+      WidgetTester tester,
+      RenderMode renderMode, {
+      bool buildAsync = false,
+      String? html,
+    }) {
+      final hw = HtmlWidget(
+        html ?? '<p>Foo</p><p>Bar</p>',
+        buildAsync: buildAsync,
+        key: helper.hwKey,
+        renderMode: renderMode,
+      );
+
+      return helper.explain(
+        tester,
+        null,
+        hw: renderMode == RenderMode.SliverList
+            ? CustomScrollView(slivers: [hw])
+            : hw,
+        useExplainer: false,
+      );
+    };
+
+    testWidgets('renders Column', (WidgetTester tester) async {
+      final explained = await explain(tester, RenderMode.Column);
+      expect(explained, contains('└Column('));
+    });
+
+    testWidgets('renders ListView', (WidgetTester tester) async {
+      final explained = await explain(tester, RenderMode.ListView);
+      expect(explained, contains('└ListView('));
+      expect(explained, isNot(contains('└Column(')));
+    });
+
+    testWidgets('renders SliverList', (WidgetTester tester) async {
+      final explained = await explain(tester, RenderMode.SliverList);
+      expect(explained, contains('└SliverList('));
+      expect(explained, isNot(contains('└Column(')));
+    });
+
+    testWidgets('renders SliverList (buildAsync)', (WidgetTester tester) async {
+      final e = await explain(tester, RenderMode.SliverList, buildAsync: true);
+      expect(e, contains('└SliverToBoxAdapter('));
+    });
+
+    testWidgets('renders SliverList (CssBlock unwrap)', (tester) async {
+      final explained = await explain(
+        tester,
+        RenderMode.SliverList,
+        html: '<div><p>Foo</p><p>Bar</p></div>',
+      );
+      expect(explained.split('└CssBlock(').length, equals(3),
+          reason: '$explained has too many `CssBlock`s');
+    });
+  });
+
   group('textStyle', () {
     final html = 'Foo';
 

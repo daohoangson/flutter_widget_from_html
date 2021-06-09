@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'core_html_widget.dart';
+import 'core_widget_factory.dart';
 
 export 'external/csslib.dart';
 export 'widgets/css_sizing.dart';
@@ -46,6 +47,23 @@ typedef CustomStylesBuilder = Map<String, String>? Function(
 /// For those needs, a custom [WidgetFactory] is the way to go.
 typedef CustomWidgetBuilder = Widget? Function(dom.Element element);
 
+/// A callback to scroll the anchor identified by [id] into the viewport.
+///
+/// By default, an internal implementation is given to [WidgetFactory.onTapAnchor]
+/// when an anchor is tapped to handle the scrolling.
+/// A wf subclass can use this to change the [curve], the animation [duration]
+/// or even request scrolling to a different anchor.
+///
+/// The future is resolved after scrolling is completed.
+/// It will be `true` if scrolling succeed or `false` otherwise.
+typedef EnsureVisible = Future<bool> Function(
+  String id, {
+  Curve curve,
+  Duration duration,
+  Curve jumpCurve,
+  Duration jumpDuration,
+});
+
 /// A set of values that should trigger rebuild.
 class RebuildTriggers {
   final List _values;
@@ -77,6 +95,45 @@ class RebuildTriggers {
   }
 }
 
+/// The HTML body render modes.
+enum RenderMode {
+  /// The body will be rendered as a `Column` widget.
+  ///
+  /// This is the default render mode.
+  /// It's good enough for small / medium document and can be used easily.
+  Column,
+
+  /// The body will be rendered as a `ListView` widget.
+  ///
+  /// It's good for medium / large document in a dedicated page layout
+  /// (e.g. the HTML document is the only thing on the screen).
+  ListView,
+
+  /// The body will be rendered as a `SliverList` sliver.
+  ///
+  /// It's good for large / huge document and can be put in the same scrolling
+  /// context with other contents.
+  /// A [CustomScrollView] or similar is required for this to work.
+  SliverList,
+}
+
+/// An extension on [Widget] to keep track of anchors.
+extension WidgetAnchors on Widget {
+  static final _anchors = Expando<Iterable<Key>>();
+
+  /// Anchor keys of this widget and its children.
+  Iterable<Key>? get anchors => _anchors[this];
+
+  /// Set anchor keys.
+  bool setAnchorsIfUnset(Iterable<Key>? anchors) {
+    if (anchors == null) return false;
+    final existing = _anchors[this];
+    if (existing != null) return false;
+    _anchors[this] = anchors;
+    return true;
+  }
+}
+
 /// A widget builder that supports builder callbacks.
 class WidgetPlaceholder<T> extends StatelessWidget {
   /// The origin of this widget.
@@ -98,6 +155,8 @@ class WidgetPlaceholder<T> extends StatelessWidget {
     for (final builder in _builders) {
       built = builder(context, built) ?? widget0;
     }
+
+    built.setAnchorsIfUnset(anchors);
 
     return built;
   }

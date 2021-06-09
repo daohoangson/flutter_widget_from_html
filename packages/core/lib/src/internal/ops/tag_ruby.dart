@@ -59,11 +59,17 @@ class TagRuby {
           final tsh = rubyTree.tsb.build(context);
 
           final ruby = wf.buildColumnWidget(
-              rubyMeta, tsh, rubyTree.build().toList(growable: false));
+            context,
+            rubyTree.build().toList(growable: false),
+            dir: tsh.getDependency(),
+          );
           final rt = wf.buildColumnWidget(
-              rtBit.meta, tsh, rtTree.build().toList(growable: false));
+            context,
+            rtTree.build().toList(growable: false),
+            dir: tsh.getDependency(),
+          );
 
-          return HtmlRuby(ruby ?? widget0, rt ?? widget0);
+          return HtmlRuby(ruby, rt);
         });
 
       final anchor = rubyBits.first;

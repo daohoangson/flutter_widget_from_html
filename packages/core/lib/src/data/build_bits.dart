@@ -138,11 +138,16 @@ abstract class BuildBit<InputType, OutputType> {
 
 /// A tree of [BuildBit]s.
 abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
+  static final _anchors = Expando<List<Key>>();
+
   final _children = <BuildBit>[];
   final _toStringBuffer = StringBuffer();
 
   /// Creates a tree.
   BuildTree(BuildTree? parent, TextStyleBuilder tsb) : super(parent, tsb);
+
+  /// Anchor keys of this tree and its children.
+  Iterable<Key>? get anchors => _anchors[this];
 
   /// The list of bits including direct children and sub-tree's.
   Iterable<BuildBit> get bits sync* {
@@ -217,6 +222,14 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
       copied.add(bit.copyWith(parent: copied));
     }
     return copied;
+  }
+
+  /// Registers anchor [Key].
+  void registerAnchor(Key anchor) {
+    final existing = _anchors[this];
+    final anchors = existing ?? (_anchors[this] = []);
+    anchors.add(anchor);
+    parent?.registerAnchor(anchor);
   }
 
   /// Replaces all children bits with [another].

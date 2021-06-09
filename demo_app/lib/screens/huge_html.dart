@@ -5193,11 +5193,70 @@ class HugeHtmlScreen extends StatelessWidget {
             ShowPerfIconButton(),
           ],
         ),
+        body: ListView(
+          children: [
+            ListTile(
+              title: Text('renderMode: Column'),
+              onTap: () => Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => _ColumnScreen())),
+            ),
+            ListTile(
+              title: Text('renderMode: ListView'),
+              onTap: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => _ListViewScreen())),
+            ),
+            ListTile(
+              title: Text('renderMode: SliverList'),
+              onTap: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => _SliverListScreen())),
+            ),
+          ],
+        ),
+      );
+}
+
+class _ColumnScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: Text('renderMode: Column')),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: HtmlWidget(kHtml),
+            child: RepaintBoundary(
+              child: HtmlWidget(kHtml, renderMode: RenderMode.Column),
+            ),
           ),
+        ),
+      );
+}
+
+class _ListViewScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: Text('renderMode: ListView')),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: HtmlWidget(kHtml, renderMode: RenderMode.ListView),
+        ),
+      );
+}
+
+class _SliverListScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        body: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              title: Text('renderMode: SliverList'),
+              floating: true,
+              expandedHeight: 200,
+              flexibleSpace: Placeholder(),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.all(8.0),
+              sliver: HtmlWidget(kHtml, renderMode: RenderMode.SliverList),
+            ),
+          ],
         ),
       );
 }

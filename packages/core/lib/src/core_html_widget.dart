@@ -29,7 +29,7 @@ class HtmlWidget extends StatefulWidget {
 
   /// The callback to handle async build snapshot.
   ///
-  /// By default, a [CircularProgressIndicator] will be shown until
+  /// By default, a platform-dependent indicator will be shown until
   /// the widget tree is ready.
   /// This default builder doesn't do any error handling
   /// (it will just ignore any errors).
@@ -92,6 +92,13 @@ class HtmlWidget extends StatefulWidget {
       ]);
   final RebuildTriggers? _rebuildTriggers;
 
+  /// The render mode.
+  ///
+  /// - [RenderMode.Column] is the default mode, suitable for small / medium document.
+  /// - [RenderMode.ListView] has better performance as it renders contents lazily.
+  /// - [RenderMode.SliverList] has similar performance as `ListView` and can be put inside a `CustomScrollView`.
+  final RenderMode renderMode;
+
   /// The default styling for text elements.
   final TextStyle? textStyle;
 
@@ -112,6 +119,7 @@ class HtmlWidget extends StatefulWidget {
     this.onTapImage,
     this.onTapUrl,
     RebuildTriggers? rebuildTriggers,
+    this.renderMode = RenderMode.Column,
     this.textStyle = const TextStyle(),
   })  : _rebuildTriggers = rebuildTriggers,
         super(key: key);
@@ -205,6 +213,30 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     return built;
   }
 
+  Widget _buildAsyncBuilder(
+      BuildContext context, AsyncSnapshot<Widget> snapshot) {
+    final built = snapshot.data;
+    if (built != null) return built;
+
+    final indicator = Theme.of(context).platform == TargetPlatform.iOS
+        ? const Center(
+            child: Padding(
+                padding: EdgeInsets.all(8),
+                child: CupertinoActivityIndicator()))
+        : const Center(
+            child: Padding(
+                padding: EdgeInsets.all(8),
+                child: CircularProgressIndicator()));
+
+    switch (widget.renderMode) {
+      case RenderMode.Column:
+      case RenderMode.ListView:
+        return indicator;
+      case RenderMode.SliverList:
+        return SliverToBoxAdapter(child: indicator);
+    }
+  }
+
   Widget _buildSync() {
     Timeline.startSync('Build $widget (sync)');
 
@@ -243,18 +275,6 @@ class _RootTsb extends TextStyleBuilder {
 
   void reset() => _output = null;
 }
-
-Widget _buildAsyncBuilder(
-        BuildContext context, AsyncSnapshot<Widget> snapshot) =>
-    snapshot.data ??
-    Center(
-      child: Padding(
-        padding: EdgeInsets.all(8),
-        child: Theme.of(context).platform == TargetPlatform.iOS
-            ? CupertinoActivityIndicator()
-            : CircularProgressIndicator(),
-      ),
-    );
 
 Widget _buildBody(_HtmlWidgetState state, dom.NodeList domNodes) {
   final rootMeta = state._rootMeta;

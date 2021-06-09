@@ -1,26 +1,44 @@
 part of '../core_ops.dart';
 
+final _isBody = Expando<bool>();
+
 class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
+  final Iterable<WidgetPlaceholder> children;
   final BuildMetadata meta;
-  final bool trimMarginVertical;
   final WidgetFactory wf;
 
-  final Iterable<Widget> _children;
-
-  ColumnPlaceholder(
-    this._children, {
+  ColumnPlaceholder({
+    required this.children,
     required this.meta,
-    required this.trimMarginVertical,
     required this.wf,
   }) : super(meta);
+
+  bool get isBody => _isBody[this] == true;
 
   @override
   Widget build(BuildContext context) {
     final tsh = meta.tsb.build(context);
-    return wf.buildColumnWidget(meta, tsh, getChildren(context)) ?? widget0;
+    final widgets = _buildWidgets(context);
+    final built = wf.buildColumnWidget(
+      context,
+      widgets,
+      dir: tsh.textDirection,
+    );
+    return isBody ? wf.buildBodyWidget(context, built) : built;
   }
 
-  List<Widget> getChildren(BuildContext context) {
+  @override
+  ColumnPlaceholder wrapWith(
+      Widget? Function(BuildContext context, Widget child) builder) {
+    if (builder == wf.buildBodyWidget) {
+      _isBody[this] = true;
+    } else {
+      super.wrapWith(builder);
+    }
+    return this;
+  }
+
+  List<Widget> _buildWidgets(BuildContext context) {
     final contents = <Widget>[];
 
     HeightPlaceholder? marginBottom, marginTop;
@@ -30,12 +48,10 @@ class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
     for (final child in _getIterable(context)) {
       if (state == 0) {
         if (child is HeightPlaceholder) {
-          if (!trimMarginVertical) {
-            if (marginTop != null) {
-              marginTop.mergeWith(child);
-            } else {
-              marginTop = child;
-            }
+          if (marginTop != null) {
+            marginTop.mergeWith(child);
+          } else {
+            marginTop = child;
           }
         } else {
           state++;
@@ -57,13 +73,14 @@ class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
       final lastWidget = contents.last;
       if (lastWidget is HeightPlaceholder) {
         contents.removeLast();
-
-        if (!trimMarginVertical) marginBottom = lastWidget;
+        marginBottom = lastWidget;
       }
     }
 
     final tsh = meta.tsb.build(context);
-    final column = wf.buildColumnWidget(meta, tsh, contents);
+    final column = contents.isNotEmpty
+        ? wf.buildColumnWidget(context, contents, dir: tsh.textDirection)
+        : null;
 
     return [
       if (marginTop != null) marginTop,
@@ -73,11 +90,9 @@ class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
   }
 
   Iterable<Widget> _getIterable(BuildContext context) sync* {
-    for (var child in _children) {
-      if (child == widget0) continue;
-
+    for (var child in children) {
       if (child is ColumnPlaceholder) {
-        for (final grandChild in child.getChildren(context)) {
+        for (final grandChild in child._buildWidgets(context)) {
           yield grandChild;
         }
         continue;

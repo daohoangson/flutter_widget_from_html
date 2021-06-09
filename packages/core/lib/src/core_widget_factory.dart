@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'internal/core_ops.dart';
 import 'internal/core_parser.dart';
 import 'internal/flattener.dart';
+import 'internal/margin_vertical.dart';
 import 'internal/platform_specific/fallback.dart'
     if (dart.library.io) 'internal/platform_specific/io.dart';
 import 'core_data.dart';
@@ -15,7 +16,7 @@ import 'core_html_widget.dart';
 
 /// A factory to build widgets.
 class WidgetFactory {
-  final _anchors = <String, GlobalKey>{};
+  late AnchorRegistry _anchorRegistry;
   late final _flattener;
 
   BuildOp? _styleBgColor;
@@ -62,10 +63,72 @@ class WidgetFactory {
           BuildMetadata meta, Widget child, double aspectRatio) =>
       AspectRatio(aspectRatio: aspectRatio, child: child);
 
-  /// Builds primary column (body).
+  /// Builds body.
   WidgetPlaceholder? buildBody(
           BuildMetadata meta, Iterable<WidgetPlaceholder> children) =>
-      buildColumnPlaceholder(meta, children, trimMarginVertical: true);
+      buildColumnPlaceholder(meta, children)?.wrapWith(buildBodyWidget);
+
+  /// Builds body as [ListView].
+  Widget buildBodyListView(BuildContext context, List<Widget> children) =>
+      ListView.builder(
+        addAutomaticKeepAlives: false,
+        addSemanticIndexes: false,
+        itemBuilder: (c, i) => _anchorRegistry.buildBodyItem(c, i, children[i]),
+        itemCount: children.length,
+      );
+
+  /// Builds body as [SliverList].
+  Widget buildBodySliverList(BuildContext context, List<Widget> children) =>
+      SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (c, i) => _anchorRegistry.buildBodyItem(c, i, children[i]),
+          addAutomaticKeepAlives: false,
+          addSemanticIndexes: false,
+          childCount: children.length,
+        ),
+      );
+
+  /// Builds body widget (see [HtmlWidget.renderMode]).
+  Widget buildBodyWidget(BuildContext context, Widget child) {
+    var children = child is Column ? child.children : [child];
+    final renderMode = _widget?.renderMode ?? RenderMode.Column;
+
+    if (children.isNotEmpty && children.first is HeightPlaceholder) {
+      children.removeAt(0);
+    }
+    if (children.isNotEmpty && children.last is HeightPlaceholder) {
+      children.removeLast();
+    }
+
+    while (children.length == 1) {
+      final child = children.first;
+      if (child is Column) {
+        children = child.children;
+        continue;
+      }
+
+      if (renderMode != RenderMode.Column && child is CssBlock) {
+        final grandChild = child.child;
+        if (grandChild is Column) {
+          children = grandChild.children;
+          continue;
+        }
+      }
+
+      break;
+    }
+
+    switch (renderMode) {
+      case RenderMode.Column:
+        return buildColumnWidget(context, children);
+      case RenderMode.ListView:
+        _anchorRegistry.prepareIndexByAnchor(children);
+        return buildBodyListView(context, children);
+      case RenderMode.SliverList:
+        _anchorRegistry.prepareIndexByAnchor(children);
+        return buildBodySliverList(context, children);
+    }
+  }
 
   /// Builds [border] with [Container] or [DecoratedBox].
   ///
@@ -86,41 +149,26 @@ class WidgetFactory {
 
   /// Builds column placeholder.
   WidgetPlaceholder? buildColumnPlaceholder(
-    BuildMetadata meta,
-    Iterable<WidgetPlaceholder> children, {
-    bool trimMarginVertical = false,
-  }) {
+      BuildMetadata meta, Iterable<WidgetPlaceholder> children) {
     if (children.isEmpty) return null;
-
-    if (children.length == 1) {
-      final child = children.first;
-      if (child is ColumnPlaceholder) {
-        if (child.trimMarginVertical == trimMarginVertical) {
-          return child;
-        }
-      } else {
-        return child;
-      }
-    }
+    if (children.length == 1) return children.first;
 
     return ColumnPlaceholder(
-      children,
+      children: children,
       meta: meta,
-      trimMarginVertical: trimMarginVertical,
       wf: this,
     );
   }
 
   /// Builds [Column].
-  Widget? buildColumnWidget(
-      BuildMetadata meta, TextStyleHtml tsh, List<Widget> children) {
-    if (children.isEmpty) return null;
+  Widget buildColumnWidget(BuildContext context, List<Widget> children,
+      {TextDirection? dir}) {
     if (children.length == 1) return children.first;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      textDirection: tsh.textDirection,
+      textDirection: dir,
       children: children,
     );
   }
@@ -472,25 +520,7 @@ class WidgetFactory {
   ///
   /// Returns `true` if anchor has been found and
   /// [ScrollPosition.ensureVisible] completes successfully.
-  Future<bool> onTapAnchor(String id, BuildContext? anchorContext) async {
-    if (anchorContext == null) return false;
-
-    final renderObject = anchorContext.findRenderObject();
-    if (renderObject == null) return false;
-
-    final offsetToReveal = RenderAbstractViewport.of(renderObject)
-        ?.getOffsetToReveal(renderObject, 0.0)
-        .offset;
-    final position = Scrollable.of(anchorContext)?.position;
-    if (offsetToReveal == null || position == null) return false;
-
-    await position.ensureVisible(
-      renderObject,
-      duration: const Duration(milliseconds: 100),
-      curve: Curves.easeIn,
-    );
-    return true;
-  }
+  Future<bool> onTapAnchor(String id, EnsureVisible scrollTo) => scrollTo(id);
 
   /// Calls [HtmlWidget.onTapUrl] with [url].
   ///
@@ -511,8 +541,8 @@ class WidgetFactory {
 
     if (url.startsWith('#')) {
       final id = url.substring(1);
-      final anchorContext = _anchors[id]?.currentContext;
-      final handledViaAnchor = await onTapAnchor(id, anchorContext);
+      final handledViaAnchor =
+          await onTapAnchor(id, _anchorRegistry.ensureVisible);
       if (handledViaAnchor) return true;
     }
 
@@ -956,7 +986,7 @@ class WidgetFactory {
   /// Resets for a new build.
   @mustCallSuper
   void reset(State state) {
-    _anchors.clear();
+    _anchorRegistry = AnchorRegistry();
     _flattener.reset();
 
     final widget = state.widget;
@@ -980,10 +1010,12 @@ class WidgetFactory {
 
   BuildOp _anchorOp(String id) {
     final anchor = GlobalKey(debugLabel: id);
-    _anchors[id] = anchor;
 
     return BuildOp(
       onTree: (meta, tree) {
+        _anchorRegistry.register(id, anchor);
+        tree.registerAnchor(anchor);
+
         if (meta.willBuildSubtree == true) return;
 
         final widget = WidgetPlaceholder('#$id').wrapWith(
