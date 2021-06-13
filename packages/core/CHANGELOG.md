@@ -1,3 +1,11 @@
+## 0.7.0-dev.2021061301
+
+- BREAKING: `buildColumnPlaceholder` removed `trimMarginVertical` named param
+- BREAKING: `buildColumnWidget` removed `tsh` param
+- BREAKING: `onTapAnchor` replaced `anchorContext` param with `scrollTo`
+- Add support for `WidgetFactory.buildTextSpan`
+- Add support for `HtmlWidget.renderMode` (#484)
+
 ## 0.7.0-dev.2021052101
 
 - Requires Flutter 2.2

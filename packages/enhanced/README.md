@@ -72,6 +72,11 @@ HtmlWidget(
     return null;
   },
 
+  // select the render mode for HTML body
+  // by default, a simple `Column` is rendered
+  // consider using `ListView` or `SliverList` for better performance
+  renderMode: RenderMode.Column,
+
   // set the default styling for text
   textStyle: TextStyle(fontSize: 14),
 
