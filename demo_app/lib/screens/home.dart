@@ -11,6 +11,7 @@ import 'huge_html.dart';
 import 'iframe.dart';
 import 'img.dart';
 import 'img_file.dart';
+import 'math.dart';
 import 'photo_view.dart';
 import 'smilie.dart';
 import 'video.dart';
@@ -23,6 +24,7 @@ class HomeScreen extends StatelessWidget {
     'Iframe': () => IframeScreen(),
     'Images': () => ImgScreen(),
     'Image (file://)': () => ImgFileScreen(),
+    'Math': () => MathScreen(),
     'Video': () => VideoScreen(),
     'customStylesBuilder': () => CustomStylesBuilderScreen(),
     'customWidgetBuilder': () => CustomWidgetBuilderScreen(),

@@ -12,6 +12,7 @@ dependencies:
   flutter_widget_from_html: any
   flutter_widget_from_html_core: any
   fwfh_chewie: any
+  fwfh_math: any
   fwfh_url_launcher: any
   fwfh_webview: any
   html: any
@@ -30,6 +31,8 @@ dependency_overrides:
     path: ../packages/fwfh_cached_network_image
   fwfh_chewie:
     path: ../packages/fwfh_chewie
+  fwfh_math:
+    path: ../packages/fwfh_math
   fwfh_svg:
     path: ../packages/fwfh_svg
   fwfh_url_launcher:

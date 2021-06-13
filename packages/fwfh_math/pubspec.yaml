@@ -1,0 +1,27 @@
+name: fwfh_math
+version: 0.6.0-rc.2021022601
+description: WidgetFactory extension to render math equation with flutter_math package.
+homepage: https://github.com/daohoangson/flutter_widget_from_html
+publish_to: none
+
+environment:
+  flutter: ">=2.0.0"
+  sdk: ">=2.12.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_widget_from_html_core: ^0.6.0-0
+  flutter_math_fork:
+    git:
+      url: https://github.com/simpleclub-extended/flutter_math_fork.git
+      ref: 100a5783ac7aa9dafb70273766dc275dab7f5517
+
+dependency_overrides:
+  flutter_widget_from_html_core:
+    path: ../core
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  pedantic: any
