@@ -141,10 +141,6 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     _wf = widget.factoryBuilder?.call() ?? WidgetFactory();
 
     _wf.onRoot(_rootTsb);
-
-    if (buildAsync) {
-      _future = _buildAsync();
-    }
   }
 
   @override
@@ -177,17 +173,25 @@ class _HtmlWidgetState extends State<HtmlWidget> {
 
     if (needsRebuild) {
       _cache = null;
-      _future = buildAsync ? _buildAsync() : null;
+      _future = null;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_future != null) {
-      return FutureBuilder<Widget>(
-        builder: widget.buildAsyncBuilder ?? _buildAsyncBuilder,
-        future: _future!.then(_tshWidget),
-      );
+    if (buildAsync) {
+      final buildAsyncBuilder = widget.buildAsyncBuilder ?? _buildAsyncBuilder;
+      final future = _future;
+
+      if (future == null) {
+        WidgetsBinding.instance?.scheduleFrameCallback(_buildAsync);
+        return _tshWidget(buildAsyncBuilder(context, AsyncSnapshot.waiting()));
+      } else {
+        return FutureBuilder<Widget>(
+          builder: buildAsyncBuilder,
+          future: future.then(_tshWidget),
+        );
+      }
     }
 
     if (!enableCaching || _cache == null) _cache = _buildSync();
@@ -195,14 +199,21 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     return _tshWidget(_cache!);
   }
 
-  Future<Widget> _buildAsync() async {
+  void _buildAsync(Duration _) async {
+    if (_future != null) return;
+
+    final completer = Completer<Widget>();
+    setState(() {
+      _future = completer.future;
+    });
+
     final domNodes = await compute(_parseHtml, widget.html);
 
     Timeline.startSync('Build $widget (async)');
     final built = _buildBody(this, domNodes);
     Timeline.finishSync();
 
-    return built;
+    completer.complete(built);
   }
 
   Widget _buildSync() {
@@ -250,9 +261,11 @@ Widget _buildAsyncBuilder(
     Center(
       child: Padding(
         padding: EdgeInsets.all(8),
-        child: Theme.of(context).platform == TargetPlatform.iOS
-            ? CupertinoActivityIndicator()
-            : CircularProgressIndicator(),
+        child: kIsWeb
+            ? Text('Loading...', style: Theme.of(context).textTheme.caption)
+            : Theme.of(context).platform == TargetPlatform.iOS
+                ? CupertinoActivityIndicator()
+                : CircularProgressIndicator(),
       ),
     );
 
