@@ -28,7 +28,7 @@ class WidgetFactory {
   BuildOp? _styleTextDecoration;
   BuildOp? _styleVerticalAlign;
   BuildOp? _tagA;
-  TextStyleHtml Function(TextStyleHtml, Null)? _tagAColor;
+  TextStyleHtml Function(TextStyleHtml, void)? _tagAColor;
   BuildOp? _tagBr;
   BuildOp? _tagFont;
   BuildOp? _tagHr;

@@ -13,7 +13,7 @@ class TagQ {
       );
 }
 
-class _TagQBit extends BuildBit<Null, String> {
+class _TagQBit extends BuildBit<void, String> {
   final bool isOpening;
 
   const _TagQBit(
@@ -23,7 +23,7 @@ class _TagQBit extends BuildBit<Null, String> {
   }) : super(parent, tsb);
 
   @override
-  String buildBit(Null _) => isOpening ? '“' : '”';
+  String buildBit(void _) => isOpening ? '“' : '”';
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>

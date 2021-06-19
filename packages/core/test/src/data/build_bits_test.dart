@@ -62,16 +62,16 @@ void main() {
         });
       });
 
-      testWidgets('accepts Null', (WidgetTester tester) async {
-        const html = '1 <span class="input--Null">2</span> 3';
-        final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:1 2(null) 3)]'));
-      });
-
       testWidgets('accepts TextStyleHtml', (WidgetTester tester) async {
         const html = '1 <span class="input--TextStyleHtml">2</span> 3';
         final explained = await explain(tester, html);
         expect(explained, equals('[RichText:(:1 2(:TextStyleHtml)(: 3))]'));
+      });
+
+      testWidgets('accepts void', (WidgetTester tester) async {
+        const html = '1 <span class="input--void">2</span> 3';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[RichText:(:1 2(null) 3)]'));
       });
 
       testWidgets('returns BuildTree', (WidgetTester tester) async {
@@ -418,15 +418,15 @@ class _BuildBitWidgetFactory extends WidgetFactory {
               tree.add(_InputGestureRecognizerBit(tree, tree.tsb))));
     }
 
-    if (classes.contains('input--Null')) {
-      meta.register(BuildOp(
-          onTree: (_, tree) => tree.add(_InputNullBit(tree, tree.tsb))));
-    }
-
     if (classes.contains('input--TextStyleHtml')) {
       meta.register(BuildOp(
           onTree: (_, tree) =>
               tree.add(_InputTextStyleHtmlBit(tree, tree.tsb))));
+    }
+
+    if (classes.contains('input--void')) {
+      meta.register(BuildOp(
+          onTree: (_, tree) => tree.add(_InputVoidBit(tree, tree.tsb))));
     }
 
     if (classes.contains('output--BuildTree')) {
@@ -495,16 +495,16 @@ class _InputGestureRecognizerBit extends BuildBit<GestureRecognizer?, dynamic> {
       _InputGestureRecognizerBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _InputNullBit extends BuildBit<Null, dynamic> {
-  const _InputNullBit(BuildTree? parent, TextStyleBuilder tsb)
+class _InputVoidBit extends BuildBit<void, dynamic> {
+  const _InputVoidBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
-  dynamic buildBit(Null _) => '(null)';
+  dynamic buildBit(void _) => '(null)';
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _InputNullBit(parent ?? this.parent, tsb ?? this.tsb);
+      _InputVoidBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
 class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {
@@ -522,7 +522,7 @@ class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {
       _InputTextStyleHtmlBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _OutputBuildTreeBit extends BuildBit<Null, BuildTree> {
+class _OutputBuildTreeBit extends BuildBit<void, BuildTree> {
   final BuildTree tree;
 
   _OutputBuildTreeBit(BuildTree parent, TextStyleBuilder tsb)
@@ -534,55 +534,55 @@ class _OutputBuildTreeBit extends BuildBit<Null, BuildTree> {
         super(parent, tsb);
 
   @override
-  BuildTree buildBit(Null _) => tree;
+  BuildTree buildBit(void _) => tree;
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _OutputBuildTreeBit(parent ?? this.parent!, tsb ?? this.tsb);
 }
 
-class _OutputGestureRecognizerBit extends BuildBit<Null, GestureRecognizer> {
+class _OutputGestureRecognizerBit extends BuildBit<void, GestureRecognizer> {
   const _OutputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
-  GestureRecognizer buildBit(Null _) => MultiTapGestureRecognizer();
+  GestureRecognizer buildBit(void _) => MultiTapGestureRecognizer();
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _OutputGestureRecognizerBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _OutputInlineSpanBit extends BuildBit<Null, InlineSpan> {
+class _OutputInlineSpanBit extends BuildBit<void, InlineSpan> {
   const _OutputInlineSpanBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
-  InlineSpan buildBit(Null _) => const WidgetSpan(child: Text('foo'));
+  InlineSpan buildBit(void _) => const WidgetSpan(child: Text('foo'));
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _OutputInlineSpanBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _OutputStringBit extends BuildBit<Null, String> {
+class _OutputStringBit extends BuildBit<void, String> {
   const _OutputStringBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
-  String buildBit(Null _) => 'foo';
+  String buildBit(void _) => 'foo';
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _OutputStringBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _OutputWidgetBit extends BuildBit<Null, Widget> {
+class _OutputWidgetBit extends BuildBit<void, Widget> {
   const _OutputWidgetBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
-  Widget buildBit(Null _) => const Text('foo');
+  Widget buildBit(void _) => const Text('foo');
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
@@ -590,7 +590,7 @@ class _OutputWidgetBit extends BuildBit<Null, Widget> {
 }
 
 String _data(BuildTree text) => text.bits
-    .map((bit) => (bit is BuildBit<Null, String>)
+    .map((bit) => (bit is BuildBit<void, String>)
         ? bit.buildBit(null)
         : '[$bit]'.replaceAll(RegExp(r'#\w+'), ''))
     .join();

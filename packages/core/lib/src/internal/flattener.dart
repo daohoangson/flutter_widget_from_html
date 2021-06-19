@@ -81,11 +81,8 @@ class Flattener {
     if (_spans == null) _resetLoop(thisTsb);
     if (!thisTsb.hasSameStyleWith(_prevTsb)) _saveSpan();
 
-    // ignore: prefer_typing_uninitialized_variables
-    var built;
-    if (bit is BuildBit<Null, dynamic>) {
-      built = bit.buildBit(null);
-    } else if (bit is BuildBit<BuildContext, Widget>) {
+    dynamic built;
+    if (bit is BuildBit<BuildContext, Widget>) {
       final WidgetBuilder widgetBuilder = (c) => bit.buildBit(c);
       built = widgetBuilder;
     } else if (bit is BuildBit<GestureRecognizer?, dynamic>) {
@@ -93,6 +90,8 @@ class Flattener {
     } else if (bit is BuildBit<TextStyleHtml, InlineSpan>) {
       final SpanBuilder spanBuilder = (c, _) => bit.buildBit(thisTsb.build(c));
       built = spanBuilder;
+    } else if (bit is BuildBit<void, dynamic>) {
+      built = bit.buildBit(null);
     }
 
     if (built is GestureRecognizer) {
