@@ -4,21 +4,21 @@ import 'package:flutter_test/flutter_test.dart';
 import '_.dart';
 
 void main() {
-  final src = 'http://domain.com/video.mp4';
-  final defaultAspectRatio = '1.78';
+  const src = 'http://domain.com/video.mp4';
+  const defaultAspectRatio = '1.78';
 
   testWidgets('renders video player', (tester) async {
-    final html = '<video><source src="$src"></video>';
+    const html = '<video><source src="$src"></video>';
     final e = await explain(tester, html);
     expect(e, equals('[VideoPlayer:url=$src,aspectRatio=$defaultAspectRatio]'));
   });
 
   group('useExplainer: false', () {
-    final html = '<video><source src="$src"></video>';
-    final _explain = (WidgetTester tester) async {
+    const html = '<video><source src="$src"></video>';
+    Future<String> _explain(WidgetTester tester) async {
       final explained = await explain(tester, html, useExplainer: false);
       return explained;
-    };
+    }
 
     testWidgets('renders video player (Android)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
@@ -43,7 +43,7 @@ void main() {
   });
 
   testWidgets('renders video player with specified dimensions', (tester) async {
-    final html = '<video width="400" height="300"><source src="$src"></video>';
+    const html = '<video width="400" height="300"><source src="$src"></video>';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -55,7 +55,7 @@ void main() {
   });
 
   testWidgets('renders video player with autoplay', (tester) async {
-    final html = '<video autoplay><source src="$src"></video>';
+    const html = '<video autoplay><source src="$src"></video>';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -67,7 +67,7 @@ void main() {
   });
 
   testWidgets('renders video player with controls', (tester) async {
-    final html = '<video controls><source src="$src"></video>';
+    const html = '<video controls><source src="$src"></video>';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -79,7 +79,7 @@ void main() {
   });
 
   testWidgets('renders video player with loop', (tester) async {
-    final html = '<video loop><source src="$src"></video>';
+    const html = '<video loop><source src="$src"></video>';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -92,9 +92,9 @@ void main() {
 
   group('poster', () {
     testWidgets('renders video player with asset', (tester) async {
-      final package = 'flutter_widget_from_html_core';
-      final assetName = 'test/images/logo.png';
-      final h = '<video poster="asset:$assetName?package=$package">'
+      const package = 'flutter_widget_from_html_core';
+      const assetName = 'test/images/logo.png';
+      const h = '<video poster="asset:$assetName?package=$package">'
           '<source src="$src"></video>';
       final explained = await explain(tester, h);
       expect(
@@ -109,7 +109,7 @@ void main() {
     testWidgets('renders video player with data uri', (tester) async {
       final h = '<video poster="$kDataUri"><source src="$src"></video>';
       final e = await explain(tester, h);
-      final explained = e.replaceAll(RegExp(r'Uint8List#[0-9a-f]+,'), 'bytes,');
+      final explained = e.replaceAll(RegExp('Uint8List#[0-9a-f]+,'), 'bytes,');
       expect(
           explained,
           equals('[VideoPlayer:'
@@ -120,8 +120,8 @@ void main() {
     });
 
     testWidgets('renders video player with url', (tester) async {
-      final posterSrc = 'http://domain.com/image.png';
-      final html = '<video poster="$posterSrc"><source src="$src"></video>';
+      const posterSrc = 'http://domain.com/image.png';
+      const html = '<video poster="$posterSrc"><source src="$src"></video>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -135,13 +135,13 @@ void main() {
 
   group('errors', () {
     testWidgets('no source', (tester) async {
-      final html = '<video></video>';
+      const html = '<video></video>';
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
     });
 
     testWidgets('bad source (cannot build full url)', (tester) async {
-      final html = '<video><source src="bad"></video>';
+      const html = '<video><source src="bad"></video>';
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
     });
