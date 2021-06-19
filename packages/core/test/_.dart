@@ -34,7 +34,7 @@ Future<Widget> buildFutureBuilder(
   final data = await fb.future!;
   final snapshot = withData
       ? AsyncSnapshot.withData(ConnectionState.done, data)
-      : AsyncSnapshot<Widget>.nothing();
+      : const AsyncSnapshot<Widget>.nothing();
   return fb.builder(hws.context, snapshot);
 }
 
@@ -120,23 +120,23 @@ Future<String> explainWithoutPumping({
 
     // trim boring properties
     str =
-        str.replaceAll(RegExp(r'(, )?(this.)?excludeFromSemantics: false'), '');
-    str = str.replaceAll(RegExp(r'(, )?clipBehavior: none'), '');
-    str = str.replaceAll(RegExp(r'(, )?crossAxisAlignment: start'), '');
-    str = str.replaceAll(RegExp(r'(, )?direction: vertical'), '');
-    str = str.replaceAll(RegExp(r'(, )?filterQuality: low'), '');
-    str = str.replaceAll(RegExp(r'(, )?frameBuilder: null'), '');
-    str = str.replaceAll(RegExp(r'(, )?image: null'), '');
-    str = str.replaceAll(RegExp(r'(, )?invertColors: false'), '');
-    str = str.replaceAll(RegExp(r'(, )?loadingBuilder: null'), '');
-    str = str.replaceAll(RegExp(r'(, )?mainAxisAlignment: start'), '');
-    str = str.replaceAll(RegExp(r'(, )?mainAxisSize: min'), '');
-    str = str.replaceAll(RegExp(r'(, )?maxLines: unlimited'), '');
+        str.replaceAll(RegExp('(, )?(this.)?excludeFromSemantics: false'), '');
+    str = str.replaceAll(RegExp('(, )?clipBehavior: none'), '');
+    str = str.replaceAll(RegExp('(, )?crossAxisAlignment: start'), '');
+    str = str.replaceAll(RegExp('(, )?direction: vertical'), '');
+    str = str.replaceAll(RegExp('(, )?filterQuality: low'), '');
+    str = str.replaceAll(RegExp('(, )?frameBuilder: null'), '');
+    str = str.replaceAll(RegExp('(, )?image: null'), '');
+    str = str.replaceAll(RegExp('(, )?invertColors: false'), '');
+    str = str.replaceAll(RegExp('(, )?loadingBuilder: null'), '');
+    str = str.replaceAll(RegExp('(, )?mainAxisAlignment: start'), '');
+    str = str.replaceAll(RegExp('(, )?mainAxisSize: min'), '');
+    str = str.replaceAll(RegExp('(, )?maxLines: unlimited'), '');
     str = str.replaceAll(
         RegExp(r'(, )?renderObject: \w+#[a-z0-9]+( relayoutBoundary=\w+)?'),
         '');
     str = str.replaceAll(RegExp(r'(, )?softWrap: [a-z\s]+'), '');
-    str = str.replaceAll(RegExp(r'(, )?textDirection: ltr+'), '');
+    str = str.replaceAll(RegExp('(, )?textDirection: ltr+'), '');
 
     // delete leading comma (because of property trimmings)
     str = str.replaceAll('(, ', '(');
@@ -167,7 +167,7 @@ Future<String> explainWithoutPumping({
 
 final _explainMarginRegExp = RegExp(r'^\[Column:(dir=rtl,)?children='
     r'\[RichText:(dir=rtl,)?\(:x\)\],'
-    r'(.+),'
+    '(.+),'
     r'\[RichText:(dir=rtl,)?\(:x\)\]'
     r'\]$');
 
@@ -324,7 +324,7 @@ class Explainer {
     final text = textSpan?.text ?? '';
     final children = textSpan?.children
             ?.map((c) => _inlineSpan(c, parentStyle: textSpan.style))
-            .join('') ??
+            .join() ??
         '';
 
     final recognizerSb = StringBuffer();
@@ -472,7 +472,7 @@ class Explainer {
     }
 
     if (fontWeight == FontWeight.bold) return '+b';
-    return '+w' + FontWeight.values.indexOf(fontWeight).toString();
+    return '+w${FontWeight.values.indexOf(fontWeight)}';
   }
 
   String _widget(Widget widget) {
@@ -491,7 +491,7 @@ class Explainer {
     if (widget is SizedBox) return _sizedBox(widget);
 
     final type = '${widget.runtimeType}';
-    var attr = <String>[];
+    final attr = <String>[];
 
     final maxLines = widget is RichText
         ? widget.maxLines

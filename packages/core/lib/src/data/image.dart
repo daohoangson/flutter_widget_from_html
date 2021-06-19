@@ -13,7 +13,7 @@ class ImageMetadata {
   final String? title;
 
   /// Creates an image.
-  ImageMetadata({this.alt, required this.sources, this.title});
+  const ImageMetadata({this.alt, required this.sources, this.title});
 }
 
 /// An image source.
@@ -29,5 +29,5 @@ class ImageSource {
   final double? width;
 
   /// Creates a source.
-  ImageSource(this.url, {this.height, this.width});
+  const ImageSource(this.url, {this.height, this.width});
 }

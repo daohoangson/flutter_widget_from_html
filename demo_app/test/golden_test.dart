@@ -18,7 +18,7 @@ void _test(String name, String html) => testGoldens(name, (tester) async {
           platform: platform,
           theme: ThemeData.light(),
         ),
-        surfaceSize: Size(400, 1200),
+        surfaceSize: const Size(400, 1200),
       );
 
       await screenMatchesGolden(tester, name, finder: find.byKey(key));

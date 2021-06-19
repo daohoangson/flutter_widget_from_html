@@ -349,7 +349,7 @@ class WhitespaceBit extends BuildBit<Null, String> {
       WhitespaceBit(parent ?? this.parent!, data, tsb: tsb ?? this.tsb);
 
   @override
-  String toString() => 'Whitespace[' + data.codeUnits.join(' ') + ']#$hashCode';
+  String toString() => 'Whitespace[${data.codeUnits.join(' ')}]#$hashCode';
 }
 
 class _SwallowWhitespaceBit extends BuildBit<Null, String> {

@@ -6,7 +6,7 @@ import '../_.dart';
 void main() {
   group('onRoot', () {
     testWidgets('renders custom font', (tester) async {
-      final html = '<span>Foo</span>';
+      const html = '<span>Foo</span>';
       final explained = await explain(tester, null,
           hw: HtmlWidget(
             html,

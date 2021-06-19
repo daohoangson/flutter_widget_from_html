@@ -47,7 +47,7 @@ abstract class BuildMetadata {
   bool? get willBuildSubtree;
 
   /// Adds an inline style.
-  operator []=(String key, String value);
+  void operator []=(String key, String value);
 
   /// Gets a styling declaration by `property`.
   css.Declaration? operator [](String key) {
@@ -123,7 +123,7 @@ class BuildOp {
   final bool onWidgetsIsOptional;
 
   /// Creates a build op.
-  BuildOp({
+  const BuildOp({
     this.defaultStyles,
     this.onChild,
     this.onTree,

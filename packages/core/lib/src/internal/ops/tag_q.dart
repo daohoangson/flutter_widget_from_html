@@ -16,23 +16,26 @@ class TagQ {
 class _TagQBit extends BuildBit<Null, String> {
   final bool isOpening;
 
-  _TagQBit(BuildTree parent, TextStyleBuilder tsb, this.isOpening)
-      : super(parent, tsb);
+  const _TagQBit(
+    BuildTree parent,
+    TextStyleBuilder tsb, {
+    required this.isOpening,
+  }) : super(parent, tsb);
 
   @override
   String buildBit(Null _) => isOpening ? '“' : '”';
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _TagQBit(parent ?? this.parent!, tsb ?? this.tsb, isOpening);
+      _TagQBit(parent ?? this.parent!, tsb ?? this.tsb, isOpening: isOpening);
 
   @override
   String toString() =>
       'QBit.${isOpening ? "opening" : "closing"}#$hashCode $tsb';
 
-  static _TagQBit closing(BuildTree parent) =>
-      _TagQBit(parent, parent.tsb, false);
+  static BuildBit closing(BuildTree parent) =>
+      _TagQBit(parent, parent.tsb, isOpening: false);
 
-  static _TagQBit opening(BuildTree parent) =>
-      _TagQBit(parent, parent.tsb, true);
+  static BuildBit opening(BuildTree parent) =>
+      _TagQBit(parent, parent.tsb, isOpening: true);
 }

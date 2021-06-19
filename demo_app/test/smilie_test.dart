@@ -9,7 +9,7 @@ void main() {
     await tester.pumpWidgetBuilder(
       SmilieScreen(),
       wrapper: materialAppWrapper(theme: ThemeData.light()),
-      surfaceSize: Size(400, 200),
+      surfaceSize: const Size(400, 200),
     );
 
     await screenMatchesGolden(tester, 'others/smilie');

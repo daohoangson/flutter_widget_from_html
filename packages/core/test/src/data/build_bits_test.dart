@@ -21,7 +21,7 @@ void main() {
               ));
 
       testWidgets('accepts BuildContext', (WidgetTester tester) async {
-        final html = '1 <span class="input--BuildContext">2</span> 3';
+        const html = '1 <span class="input--BuildContext">2</span> 3';
         final explained = await explain(tester, html);
         expect(
             explained,
@@ -33,29 +33,29 @@ void main() {
       });
 
       group('accepts GestureRecognizer', () {
-        final clazz = 'input--GestureRecognizer';
+        const clazz = 'input--GestureRecognizer';
 
         testWidgets('SPAN tag with BuildBit', (WidgetTester tester) async {
-          final html = '1 <span class="$clazz">2</span> 3';
+          const html = '1 <span class="$clazz">2</span> 3';
           final explained = await explain(tester, html);
           expect(explained, equals('[RichText:(:1 2(no recognizer) 3)]'));
         });
 
         testWidgets('SPAN tag with styling + BuildBit', (tester) async {
-          final html = '1 <span class="custom $clazz">2</span> 3';
+          const html = '1 <span class="custom $clazz">2</span> 3';
           final explained = await explain(tester, html);
           expect(explained, equals('[RichText:(:1 (:2(no recognizer))(: 3))]'));
         });
 
         testWidgets('A tag without BuildBit', (WidgetTester tester) async {
-          final html = '1 <a href="href">2</a> 3';
+          const html = '1 <a href="href">2</a> 3';
           final explained = await explain(tester, html);
           expect(
               explained, equals('[RichText:(:1 (#FF123456+u+onTap:2)(: 3))]'));
         });
 
         testWidgets('A tag with BuildBit', (WidgetTester tester) async {
-          final html = '1 <a href="href" class="$clazz">2</a> 3';
+          const html = '1 <a href="href" class="$clazz">2</a> 3';
           final explained = await explain(tester, html);
           expect(explained,
               equals('[RichText:(:1 (#FF123456+u+onTap+onTapCancel:2)(: 3))]'));
@@ -63,48 +63,48 @@ void main() {
       });
 
       testWidgets('accepts Null', (WidgetTester tester) async {
-        final html = '1 <span class="input--Null">2</span> 3';
+        const html = '1 <span class="input--Null">2</span> 3';
         final explained = await explain(tester, html);
         expect(explained, equals('[RichText:(:1 2(null) 3)]'));
       });
 
       testWidgets('accepts TextStyleHtml', (WidgetTester tester) async {
-        final html = '1 <span class="input--TextStyleHtml">2</span> 3';
+        const html = '1 <span class="input--TextStyleHtml">2</span> 3';
         final explained = await explain(tester, html);
         expect(explained, equals('[RichText:(:1 2(:TextStyleHtml)(: 3))]'));
       });
 
       testWidgets('returns BuildTree', (WidgetTester tester) async {
-        final html = '1 <span class="output--BuildTree">2</span> 3';
+        const html = '1 <span class="output--BuildTree">2</span> 3';
         final explained = await explain(tester, html);
         expect(explained, equals('[RichText:(:1 2 foo bar 3)]'));
       });
 
       group('returns GestureRecognizer', () {
-        final clazz = 'output--GestureRecognizer';
+        const clazz = 'output--GestureRecognizer';
 
         testWidgets('SPAN tag with BuildBit', (WidgetTester tester) async {
-          final html = '1 <span class="$clazz">2</span> 3';
+          const html = '1 <span class="$clazz">2</span> 3';
           final e = await explain(tester, html);
           expect(e, equals('[RichText:(+MultiTapGestureRecognizer:1 2 3)]'));
         });
 
         testWidgets('SPAN tag with styling + BuildBit', (tester) async {
-          final html = '1 <span class="custom $clazz">2</span> 3';
+          const html = '1 <span class="custom $clazz">2</span> 3';
           final explained = await explain(tester, html);
           expect(explained,
               equals('[RichText:(:1 (+MultiTapGestureRecognizer:2)(: 3))]'));
         });
 
         testWidgets('A tag without BuildBit', (WidgetTester tester) async {
-          final html = '1 <a href="href">2</a> 3';
+          const html = '1 <a href="href">2</a> 3';
           final explained = await explain(tester, html);
           expect(
               explained, equals('[RichText:(:1 (#FF123456+u+onTap:2)(: 3))]'));
         });
 
         testWidgets('A tag with BuildBit', (WidgetTester tester) async {
-          final html = '1 <a href="href" class="$clazz">2</a> 3';
+          const html = '1 <a href="href" class="$clazz">2</a> 3';
           final explained = await explain(tester, html);
           expect(
               explained,
@@ -114,19 +114,19 @@ void main() {
       });
 
       testWidgets('returns InlineSpan', (WidgetTester tester) async {
-        final html = '1 <span class="output--InlineSpan">2</span> 3';
+        const html = '1 <span class="output--InlineSpan">2</span> 3';
         final explained = await explain(tester, html);
         expect(explained, equals('[RichText:(:1 2[Text:foo]@bottom(: 3))]'));
       });
 
       testWidgets('returns String', (WidgetTester tester) async {
-        final html = '1 <span class="output--String">2</span> 3';
+        const html = '1 <span class="output--String">2</span> 3';
         final explained = await explain(tester, html);
         expect(explained, equals('[RichText:(:1 2foo 3)]'));
       });
 
       testWidgets('returns Widget', (WidgetTester tester) async {
-        final html = '1 <span class="output--Widget">2</span> 3';
+        const html = '1 <span class="output--Widget">2</span> 3';
         final explained = await explain(tester, html);
         expect(
             explained,
@@ -383,7 +383,7 @@ void main() {
     text22.addText('(2.2.2)');
     text22.addNewLine();
     text2.addText('(2.3)');
-    text.add(WidgetBit.inline(text, Text('Hi')));
+    text.add(WidgetBit.inline(text, const Text('Hi')));
 
     expect(
         helper.simplifyHashCode(text.toString()),
@@ -465,11 +465,11 @@ class _BuildBitWidgetFactory extends WidgetFactory {
 }
 
 class _InputBuildContextBit extends BuildBit<BuildContext, Widget> {
-  _InputBuildContextBit(BuildTree? parent, TextStyleBuilder tsb)
+  const _InputBuildContextBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
-  Widget buildBit(BuildContext? _) => Text('Foo');
+  Widget buildBit(BuildContext? _) => const Text('Foo');
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
@@ -477,7 +477,7 @@ class _InputBuildContextBit extends BuildBit<BuildContext, Widget> {
 }
 
 class _InputGestureRecognizerBit extends BuildBit<GestureRecognizer?, dynamic> {
-  _InputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder tsb)
+  const _InputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
@@ -496,7 +496,8 @@ class _InputGestureRecognizerBit extends BuildBit<GestureRecognizer?, dynamic> {
 }
 
 class _InputNullBit extends BuildBit<Null, dynamic> {
-  _InputNullBit(BuildTree? parent, TextStyleBuilder tsb) : super(parent, tsb);
+  const _InputNullBit(BuildTree? parent, TextStyleBuilder tsb)
+      : super(parent, tsb);
 
   @override
   dynamic buildBit(Null _) => '(null)';
@@ -507,7 +508,7 @@ class _InputNullBit extends BuildBit<Null, dynamic> {
 }
 
 class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {
-  _InputTextStyleHtmlBit(BuildTree? parent, TextStyleBuilder tsb)
+  const _InputTextStyleHtmlBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
@@ -541,7 +542,7 @@ class _OutputBuildTreeBit extends BuildBit<Null, BuildTree> {
 }
 
 class _OutputGestureRecognizerBit extends BuildBit<Null, GestureRecognizer> {
-  _OutputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder tsb)
+  const _OutputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
@@ -553,11 +554,11 @@ class _OutputGestureRecognizerBit extends BuildBit<Null, GestureRecognizer> {
 }
 
 class _OutputInlineSpanBit extends BuildBit<Null, InlineSpan> {
-  _OutputInlineSpanBit(BuildTree? parent, TextStyleBuilder tsb)
+  const _OutputInlineSpanBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
-  InlineSpan buildBit(Null _) => WidgetSpan(child: Text('foo'));
+  InlineSpan buildBit(Null _) => const WidgetSpan(child: Text('foo'));
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
@@ -565,7 +566,7 @@ class _OutputInlineSpanBit extends BuildBit<Null, InlineSpan> {
 }
 
 class _OutputStringBit extends BuildBit<Null, String> {
-  _OutputStringBit(BuildTree? parent, TextStyleBuilder tsb)
+  const _OutputStringBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
@@ -577,11 +578,11 @@ class _OutputStringBit extends BuildBit<Null, String> {
 }
 
 class _OutputWidgetBit extends BuildBit<Null, Widget> {
-  _OutputWidgetBit(BuildTree? parent, TextStyleBuilder tsb)
+  const _OutputWidgetBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
-  Widget buildBit(Null _) => Text('foo');
+  Widget buildBit(Null _) => const Text('foo');
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
@@ -592,7 +593,7 @@ String _data(BuildTree text) => text.bits
     .map((bit) => (bit is BuildBit<Null, String>)
         ? bit.buildBit(null)
         : '[$bit]'.replaceAll(RegExp(r'#\w+'), ''))
-    .join('');
+    .join();
 
 BuildTree _text() => builder.BuildTree(
       tsb: TextStyleBuilder(),

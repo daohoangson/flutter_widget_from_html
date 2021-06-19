@@ -44,7 +44,7 @@ class BuildMetadata extends core_data.BuildMetadata {
   bool? get willBuildSubtree => _willBuildSubtree;
 
   @override
-  operator []=(String key, String value) {
+  void operator []=(String key, String value) {
     assert(!_stylesIsLocked, 'Metadata can no longer be changed.');
     final styleSheet = css.parse('*{$key: $value;}');
     _styles ??= [];
