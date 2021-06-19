@@ -83,12 +83,13 @@ class Flattener {
 
     dynamic built;
     if (bit is BuildBit<BuildContext, Widget>) {
-      final WidgetBuilder widgetBuilder = (c) => bit.buildBit(c);
+      Widget widgetBuilder(BuildContext context) => bit.buildBit(context);
       built = widgetBuilder;
     } else if (bit is BuildBit<GestureRecognizer?, dynamic>) {
       built = bit.buildBit(_prevRecognizer.value);
     } else if (bit is BuildBit<TextStyleHtml, InlineSpan>) {
-      final SpanBuilder spanBuilder = (c, _) => bit.buildBit(thisTsb.build(c));
+      InlineSpan? spanBuilder(BuildContext context, CssWhitespace _) =>
+          bit.buildBit(thisTsb.build(context));
       built = spanBuilder;
     } else if (bit is BuildBit<void, dynamic>) {
       built = bit.buildBit(null);

@@ -143,7 +143,7 @@ void main() {
   });
 
   group('IMG', () {
-    final explainImg = (WidgetTester tester, String html) =>
+    Future<String> explainImg(WidgetTester tester, String html) =>
         mockNetworkImages(() => explain(tester, html));
     const sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
 

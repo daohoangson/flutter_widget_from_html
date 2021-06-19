@@ -12,8 +12,8 @@ import '../../_.dart' as helper;
 void main() {
   group('BuildBit', () {
     group('buildBit', () {
-      final explain =
-          (WidgetTester tester, String html) => helper.explain(tester, null,
+      Future<String> explain(WidgetTester tester, String html) =>
+          helper.explain(tester, null,
               hw: HtmlWidget(
                 html,
                 factoryBuilder: () => _BuildBitWidgetFactory(),

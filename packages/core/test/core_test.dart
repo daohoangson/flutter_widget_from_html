@@ -1177,12 +1177,12 @@ Future<void> main() async {
     });
 
     group('textScaleFactor=2', () {
-      final explain2x = (WidgetTester tester, String html) async {
+      Future<String> explain2x(WidgetTester tester, String html) async {
         tester.binding.window.textScaleFactorTestValue = 2;
         final explained = await explain(tester, html);
         tester.binding.window.clearTextScaleFactorTestValue();
         return explained;
-      };
+      }
 
       testWidgets('control group', (WidgetTester tester) async {
         const html = '<span>Foo</span>';

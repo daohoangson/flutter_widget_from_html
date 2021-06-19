@@ -78,7 +78,7 @@ void main() {
         '[CssSizing:height≥0.0,height=auto,width≥0.0,width=auto,child='
         '[Image:image=NetworkImage("$imgSrc", scale: 1.0)]'
         ']';
-    final imgExplain = (WidgetTester t, String html) =>
+    Future<String> imgExplain(WidgetTester t, String html) =>
         mockNetworkImages(() => explain(t, html));
 
     testWidgets('renders top image', (WidgetTester tester) async {

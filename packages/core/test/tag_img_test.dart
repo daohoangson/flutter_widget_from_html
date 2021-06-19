@@ -12,8 +12,8 @@ void main() {
 
   group('image.png', () {
     const src = 'http://domain.com/image.png';
-    final explain = (WidgetTester tester, String html) =>
-        mockNetworkImages(() async => helper.explain(tester, html));
+    Future<String> explain(WidgetTester tester, String html) =>
+        mockNetworkImages(() => helper.explain(tester, html));
 
     testWidgets('renders src', (WidgetTester tester) async {
       const html = '<img src="$src" />';
@@ -132,9 +132,7 @@ void main() {
 
   group('asset', () {
     const assetName = 'test/images/logo.png';
-    final Future<String> Function(WidgetTester, String, {String package})
-        explain = (WidgetTester tester, String html, {String? package}) =>
-            helper.explain(tester, html);
+    const explain = helper.explain;
 
     testWidgets('renders asset', (WidgetTester tester) async {
       const html = '<img src="asset:$assetName" />';
@@ -151,7 +149,7 @@ void main() {
     testWidgets('renders asset (specified package)', (tester) async {
       const package = 'flutter_widget_from_html_core';
       const html = '<img src="asset:$assetName?package=$package" />';
-      final explained = await explain(tester, html, package: package);
+      final explained = await explain(tester, html);
       expect(
           explained,
           equals('[CssSizing:$sizingConstraints,child='
@@ -231,7 +229,7 @@ void main() {
   });
 
   group('baseUrl', () {
-    final test = (
+    Future<void> test(
       WidgetTester tester,
       String html,
       String fullUrl, {
@@ -248,7 +246,7 @@ void main() {
           equals('[CssSizing:$sizingConstraints,child='
               '[Image:image=NetworkImage("$fullUrl", scale: 1.0)]'
               ']'));
-    };
+    }
 
     testWidgets('renders full url', (WidgetTester tester) async {
       const fullUrl = 'http://domain.com/image.png';
