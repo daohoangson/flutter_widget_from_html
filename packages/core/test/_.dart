@@ -483,7 +483,6 @@ class Explainer {
 
     if (widget is TshWidget) return _widget(widget.child);
 
-    // ignore: invalid_use_of_protected_member
     if (widget is WidgetPlaceholder) return _widget(widget.build(context));
 
     if (widget is Image) return _image(widget);

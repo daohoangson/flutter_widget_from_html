@@ -89,6 +89,7 @@ class WidgetPlaceholder<T> extends StatelessWidget {
       : _firstChild = child,
         super(key: key);
 
+  @visibleForTesting
   @override
   Widget build(BuildContext context) => callBuilders(context, _firstChild);
 
