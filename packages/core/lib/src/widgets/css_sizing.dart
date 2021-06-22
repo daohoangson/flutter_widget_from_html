@@ -198,10 +198,12 @@ class _RenderCssSizing extends RenderProxyBox {
     final minWidth =
         min(maxWidth, _minWidth?.clamp(0.0, c.maxWidth) ?? c.minWidth);
 
-    final __preferredHeight = _preferredHeight?.clamp(minHeight, maxHeight);
-    // special handling for tight contraints: ignore min in `clamp()`
-    // (usually happen if parent is a block)
-    final effectiveMinWidth = minWidth == maxWidth ? 0.0 : minWidth;
+    final effectiveMinHeight =
+        c.hasTightHeight && _minHeight == null ? 0.0 : minHeight;
+    final effectiveMinWidth =
+        c.hasTightWidth && _minWidth == null ? 0.0 : minWidth;
+    final __preferredHeight =
+        _preferredHeight?.clamp(effectiveMinHeight, maxHeight);
     final __preferredWidth =
         _preferredWidth?.clamp(effectiveMinWidth, maxWidth);
     // ignore preferred value if it's infinite
