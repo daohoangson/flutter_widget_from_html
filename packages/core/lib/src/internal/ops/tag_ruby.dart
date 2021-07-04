@@ -79,15 +79,15 @@ class TagRuby {
   }
 }
 
-class _RtBit extends BuildBit<Null, BuildTree> {
+class _RtBit extends BuildBit<void, BuildTree> {
   final BuildMetadata meta;
   final BuildTree tree;
 
-  _RtBit(BuildTree parent, TextStyleBuilder tsb, this.meta, this.tree)
+  const _RtBit(BuildTree parent, TextStyleBuilder tsb, this.meta, this.tree)
       : super(parent, tsb);
 
   @override
-  BuildTree buildBit(Null _) => tree;
+  BuildTree buildBit(void _) => tree;
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>

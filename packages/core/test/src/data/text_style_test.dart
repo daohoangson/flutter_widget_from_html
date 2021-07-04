@@ -7,9 +7,9 @@ void main() {
     group('getDependency', () {
       final dep1 = _Dep1();
       final tsh = TextStyleHtml.root([
-        MediaQueryData(),
+        const MediaQueryData(),
         TextDirection.ltr,
-        TextStyle(),
+        const TextStyle(),
         dep1,
       ], null);
 

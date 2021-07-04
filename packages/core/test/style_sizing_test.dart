@@ -11,7 +11,7 @@ import '_.dart';
 void main() {
   group('height', () {
     testWidgets('renders em', (WidgetTester tester) async {
-      final html = '<div style="height: 2em">Foo</div>';
+      const html = '<div style="height: 2em">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -20,7 +20,7 @@ void main() {
     });
 
     testWidgets('renders pt', (WidgetTester tester) async {
-      final html = '<div style="height: 100pt">Foo</div>';
+      const html = '<div style="height: 100pt">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -30,7 +30,7 @@ void main() {
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
-      final html = '<div style="height: 100px">Foo</div>';
+      const html = '<div style="height: 100px">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -40,13 +40,13 @@ void main() {
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
-      final html = '<div style="height: xxx">Foo</div>';
+      const html = '<div style="height: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('ignores invalid', (WidgetTester tester) async {
-      final html = '<div style="height: 2em; height: xxx">Foo</div>';
+      const html = '<div style="height: 2em; height: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -57,7 +57,7 @@ void main() {
 
   group('max-height', () {
     testWidgets('renders em', (WidgetTester tester) async {
-      final html = '<div style="max-height: 2em">Foo</div>';
+      const html = '<div style="max-height: 2em">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -67,7 +67,7 @@ void main() {
     });
 
     testWidgets('renders pt', (WidgetTester tester) async {
-      final html = '<div style="max-height: 100pt">Foo</div>';
+      const html = '<div style="max-height: 100pt">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -77,7 +77,7 @@ void main() {
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
-      final html = '<div style="max-height: 100px">Foo</div>';
+      const html = '<div style="max-height: 100px">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -87,13 +87,13 @@ void main() {
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
-      final html = '<div style="max-height: xxx">Foo</div>';
+      const html = '<div style="max-height: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('ignores invalid', (WidgetTester tester) async {
-      final html = '<div style="max-height: 2em; max-height: xxx">Foo</div>';
+      const html = '<div style="max-height: 2em; max-height: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -105,7 +105,7 @@ void main() {
 
   group('max-width', () {
     testWidgets('renders em', (WidgetTester tester) async {
-      final html = '<div style="max-width: 2em">Foo</div>';
+      const html = '<div style="max-width: 2em">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -115,7 +115,7 @@ void main() {
     });
 
     testWidgets('renders pt', (WidgetTester tester) async {
-      final html = '<div style="max-width: 100pt">Foo</div>';
+      const html = '<div style="max-width: 100pt">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -125,7 +125,7 @@ void main() {
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
-      final html = '<div style="max-width: 100px">Foo</div>';
+      const html = '<div style="max-width: 100px">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -135,13 +135,13 @@ void main() {
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
-      final html = '<div style="max-width: xxx">Foo</div>';
+      const html = '<div style="max-width: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('ignores invalid', (WidgetTester tester) async {
-      final html = '<div style="max-width: 2em">Foo</div>';
+      const html = '<div style="max-width: 2em">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -153,7 +153,7 @@ void main() {
 
   group('min-height', () {
     testWidgets('renders em', (WidgetTester tester) async {
-      final html = '<div style="min-height: 2em">Foo</div>';
+      const html = '<div style="min-height: 2em">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -163,7 +163,7 @@ void main() {
     });
 
     testWidgets('renders pt', (WidgetTester tester) async {
-      final html = '<div style="min-height: 100pt">Foo</div>';
+      const html = '<div style="min-height: 100pt">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -173,7 +173,7 @@ void main() {
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
-      final html = '<div style="min-height: 100px">Foo</div>';
+      const html = '<div style="min-height: 100px">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -183,13 +183,13 @@ void main() {
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
-      final html = '<div style="min-height: xxx">Foo</div>';
+      const html = '<div style="min-height: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('ignores invalid', (WidgetTester tester) async {
-      final html = '<div style="min-height: 2em">Foo</div>';
+      const html = '<div style="min-height: 2em">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -201,7 +201,7 @@ void main() {
 
   group('min-width', () {
     testWidgets('renders em', (WidgetTester tester) async {
-      final html = '<div style="min-width: 2em">Foo</div>';
+      const html = '<div style="min-width: 2em">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -211,7 +211,7 @@ void main() {
     });
 
     testWidgets('renders pt', (WidgetTester tester) async {
-      final html = '<div style="min-width: 100pt">Foo</div>';
+      const html = '<div style="min-width: 100pt">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -221,7 +221,7 @@ void main() {
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
-      final html = '<div style="min-width: 100px">Foo</div>';
+      const html = '<div style="min-width: 100px">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -231,13 +231,13 @@ void main() {
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
-      final html = '<div style="min-width: xxx">Foo</div>';
+      const html = '<div style="min-width: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('ignores invalid', (WidgetTester tester) async {
-      final html = '<div style="min-width: 2em">Foo</div>';
+      const html = '<div style="min-width: 2em">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -249,7 +249,7 @@ void main() {
 
   group('width', () {
     testWidgets('renders em', (WidgetTester tester) async {
-      final html = '<div style="width: 2em">Foo</div>';
+      const html = '<div style="width: 2em">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -259,7 +259,7 @@ void main() {
     });
 
     testWidgets('renders pt', (WidgetTester tester) async {
-      final html = '<div style="width: 100pt">Foo</div>';
+      const html = '<div style="width: 100pt">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -269,7 +269,7 @@ void main() {
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
-      final html = '<div style="width: 100px">Foo</div>';
+      const html = '<div style="width: 100px">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -279,13 +279,13 @@ void main() {
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
-      final html = '<div style="width: xxx">Foo</div>';
+      const html = '<div style="width: xxx">Foo</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('ignores invalid', (WidgetTester tester) async {
-      final html = '<div style="width: 2em">Foo</div>';
+      const html = '<div style="width: 2em">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -296,7 +296,7 @@ void main() {
   });
 
   testWidgets('renders complicated box', (WidgetTester tester) async {
-    final html = '''
+    const html = '''
 <div style="background-color: red; color: white; padding: 20px;">
   <div style="background-color: green;">
     <div style="background-color: blue; height: 100px; margin: 15px; padding: 5px; width: 100px;">
@@ -324,7 +324,7 @@ void main() {
 
   group('block', () {
     testWidgets('renders block within block', (WidgetTester tester) async {
-      final html =
+      const html =
           '<div style="width: 10px; height: 10px;"><div>Foo</div></div>';
       final explained = await explain(tester, html);
       expect(
@@ -335,7 +335,7 @@ void main() {
     });
 
     testWidgets('renders block within non-block', (tester) async {
-      final html =
+      const html =
           '<span style="width: 10px; height: 10px;"><div>Foo</div></span>';
       final explained = await explain(tester, html);
       expect(
@@ -348,8 +348,8 @@ void main() {
 
   group('inline', () {
     testWidgets('renders img with sizing', (WidgetTester tester) async {
-      final src = 'https://domain.com/image.jpg';
-      final html = 'Foo <img src="$src" style="width: 10px; height: 10px;" />';
+      const src = 'https://domain.com/image.jpg';
+      const html = 'Foo <img src="$src" style="width: 10px; height: 10px;" />';
       final explained = await mockNetworkImages(() => explain(tester, html));
       expect(
           explained,
@@ -359,8 +359,8 @@ void main() {
     });
 
     testWidgets('renders text-align / vertical-align', (tester) async {
-      final src = 'https://domain.com/image.jpg';
-      final html = '<div style="text-align: center">'
+      const src = 'https://domain.com/image.jpg';
+      const html = '<div style="text-align: center">'
           '<img src="$src" width="10" height="10" style="vertical-align: middle" /></div>';
       final explained = await mockNetworkImages(() => explain(tester, html));
       expect(
@@ -411,9 +411,9 @@ void main() {
     GoldenToolkit.runWithConfiguration(
       () {
         group('_guessChildSize', () {
-          final assetName = 'test/images/logo.png';
-          final childHeightGtMaxHeight = 'child_height_gt_max_height';
-          final testCases = <String, String>{
+          const assetName = 'test/images/logo.png';
+          const childHeightGtMaxHeight = 'child_height_gt_max_height';
+          const testCases = <String, String>{
             'native_192x192':
                 '<img src="asset:$assetName" width="192" height="192" />',
             'child_width_gt_max_width':
@@ -428,8 +428,8 @@ void main() {
                 _Golden(testCase.value),
                 wrapper: materialAppWrapper(theme: ThemeData.light()),
                 surfaceSize: testCase.key == childHeightGtMaxHeight
-                    ? Size(250, 200)
-                    : Size(200, 250),
+                    ? const Size(250, 200)
+                    : const Size(200, 250),
               );
 
               await screenMatchesGolden(tester, testCase.key);
@@ -448,17 +448,17 @@ void main() {
         group('100 percent', () {
           testGoldens('width', (tester) async {
             await tester.pumpWidgetBuilder(
-              Scaffold(
+              const Scaffold(
                 body: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(8.0),
                     child: HtmlWidget('<div style="width: 100%">Foo</div>'),
                   ),
                 ),
               ),
               wrapper: materialAppWrapper(theme: ThemeData.light()),
-              surfaceSize: Size(200, 200),
+              surfaceSize: const Size(200, 200),
             );
 
             await screenMatchesGolden(tester, 'width');
@@ -466,17 +466,16 @@ void main() {
 
           testGoldens('height', (tester) async {
             await tester.pumpWidgetBuilder(
-              Scaffold(
+              const Scaffold(
                 body: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(8.0),
                     child: HtmlWidget('<div style="height: 100%">Foo</div>'),
                   ),
                 ),
               ),
               wrapper: materialAppWrapper(theme: ThemeData.light()),
-              surfaceSize: Size(200, 200),
+              surfaceSize: const Size(200, 200),
             );
 
             await screenMatchesGolden(tester, 'height');

@@ -317,7 +317,7 @@ class TextDeco {
   final CssLength? thickness;
   final bool? under;
 
-  TextDeco({
+  const TextDeco({
     this.color,
     this.over,
     this.strike,
@@ -331,13 +331,13 @@ class TextDeco {
       if (expression is! css.LiteralTerm) continue;
       switch (expression.valueAsString) {
         case kCssTextDecorationLineThrough:
-          return TextDeco(strike: true);
+          return const TextDeco(strike: true);
         case kCssTextDecorationNone:
-          return TextDeco(over: false, strike: false, under: false);
+          return const TextDeco(over: false, strike: false, under: false);
         case kCssTextDecorationOverline:
-          return TextDeco(over: true);
+          return const TextDeco(over: true);
         case kCssTextDecorationUnderline:
-          return TextDeco(under: true);
+          return const TextDeco(under: true);
       }
     }
 

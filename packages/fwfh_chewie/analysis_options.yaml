@@ -1,1 +1,5 @@
-include: package:pedantic/analysis_options.yaml
+include: package:lint/analysis_options_package.yaml
+
+linter:
+  rules:
+    missing_whitespace_between_adjacent_strings: false

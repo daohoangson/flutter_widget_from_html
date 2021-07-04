@@ -155,7 +155,7 @@ class StyleSizing {
 
     switch (length.unit) {
       case CssLengthUnit.auto:
-        return CssSizingValue.auto();
+        return const CssSizingValue.auto();
       case CssLengthUnit.percentage:
         return CssSizingValue.percentage(length.number);
       default:
@@ -174,7 +174,7 @@ class _StyleSizingInput {
   final CssLength? preferredHeight;
   final CssLength? preferredWidth;
 
-  _StyleSizingInput({
+  const _StyleSizingInput({
     this.maxHeight,
     this.maxWidth,
     this.minHeight,

@@ -35,7 +35,7 @@ class VideoPlayer extends StatefulWidget {
   final Widget? poster;
 
   /// Creates a player.
-  VideoPlayer(
+  const VideoPlayer(
     this.url, {
     required this.aspectRatio,
     this.autoResize = true,
@@ -48,6 +48,7 @@ class VideoPlayer extends StatefulWidget {
 
   @override
   State<VideoPlayer> createState() =>
+      // ignore: no_logic_in_create_state
       defaultTargetPlatform == TargetPlatform.android ||
               defaultTargetPlatform == TargetPlatform.iOS ||
               kIsWeb

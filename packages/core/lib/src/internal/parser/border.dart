@@ -12,7 +12,7 @@ final _elementBorder = Expando<CssBorder>();
 CssBorder tryParseBorder(BuildMetadata meta) {
   final existing = _elementBorder[meta.element];
   if (existing != null) return existing;
-  var border = CssBorder();
+  var border = const CssBorder();
 
   for (final style in meta.styles) {
     final key = style.property;
@@ -20,7 +20,7 @@ CssBorder tryParseBorder(BuildMetadata meta) {
 
     final suffix = key.substring(kCssBorder.length);
     if (suffix.isEmpty && style.term == kCssBorderInherit) {
-      border = CssBorder(inherit: true);
+      border = const CssBorder(inherit: true);
       continue;
     }
 

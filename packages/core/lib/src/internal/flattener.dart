@@ -10,7 +10,7 @@ class Flattened {
   final Widget? widget;
   final WidgetBuilder? widgetBuilder;
 
-  Flattened._({this.spanBuilder, this.widget, this.widgetBuilder});
+  const Flattened._({this.spanBuilder, this.widget, this.widgetBuilder});
 }
 
 typedef SpanBuilder = InlineSpan? Function(
@@ -81,25 +81,27 @@ class Flattener {
     if (_spans == null) _resetLoop(thisTsb);
     if (!thisTsb.hasSameStyleWith(_prevTsb)) _saveSpan();
 
-    var built;
-    if (bit is BuildBit<Null, dynamic>) {
-      built = bit.buildBit(null);
-    } else if (bit is BuildBit<BuildContext, Widget>) {
-      // ignore: omit_local_variable_types
-      final WidgetBuilder widgetBuilder = (c) => bit.buildBit(c);
+    dynamic built;
+    if (bit is BuildBit<BuildContext, Widget>) {
+      Widget widgetBuilder(BuildContext context) => bit.buildBit(context);
       built = widgetBuilder;
     } else if (bit is BuildBit<GestureRecognizer?, dynamic>) {
       built = bit.buildBit(_prevRecognizer.value);
     } else if (bit is BuildBit<TextStyleHtml, InlineSpan>) {
-      final SpanBuilder spanBuilder = (c, _) => bit.buildBit(thisTsb.build(c));
+      InlineSpan? spanBuilder(BuildContext context, CssWhitespace _) =>
+          bit.buildBit(thisTsb.build(context));
       built = spanBuilder;
+    } else if (bit is BuildBit<void, dynamic>) {
+      built = bit.buildBit(null);
     }
 
     if (built is GestureRecognizer) {
       _prevRecognizer.value = built;
     } else if (built is InlineSpan) {
       _saveSpan();
-      _spans!.add((_, __) => built);
+
+      final inlineSpan = built;
+      _spans!.add((_, __) => inlineSpan);
     } else if (built is SpanBuilder) {
       _saveSpan();
       _spans!.add(built);
@@ -183,7 +185,10 @@ class Flattener {
         scopedStrings[0].isNewLine) {
       // special handling for paragraph with only one line break
       _flattened.add(Flattened._(
-        widget: HeightPlaceholder(CssLength(1, CssLengthUnit.em), scopedTsb),
+        widget: HeightPlaceholder(
+          const CssLength(1, CssLengthUnit.em),
+          scopedTsb,
+        ),
       ));
       return;
     }
@@ -226,9 +231,7 @@ class Flattener {
       final next = nextNonWhitespace(bit);
       if (next != null) {
         var tree = parent;
-        while (true) {
-          final bitsParentLast = tree.parent?.last;
-          if (bitsParentLast != bit) break;
+        while (tree.parent?.last == bit) {
           tree = tree.parent!;
         }
 

@@ -47,8 +47,7 @@ void main() {
 
       test('wrong type', () {
         final t1 = RebuildTriggers([]);
-        final t2 = '';
-        expect(t1, isNot(equals(t2)));
+        expect(t1, isNot(equals('')));
       });
     });
   });

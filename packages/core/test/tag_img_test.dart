@@ -8,15 +8,15 @@ import 'package:mocktail_image_network/mocktail_image_network.dart';
 import '_.dart' as helper;
 
 void main() {
-  final sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
+  const sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
 
   group('image.png', () {
-    final src = 'http://domain.com/image.png';
-    final explain = (WidgetTester tester, String html) =>
-        mockNetworkImages(() async => helper.explain(tester, html));
+    const src = 'http://domain.com/image.png';
+    Future<String> explain(WidgetTester tester, String html) =>
+        mockNetworkImages(() => helper.explain(tester, html));
 
     testWidgets('renders src', (WidgetTester tester) async {
-      final html = '<img src="$src" />';
+      const html = '<img src="$src" />';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -26,7 +26,7 @@ void main() {
     });
 
     testWidgets('renders src+alt', (WidgetTester tester) async {
-      final html = '<img src="$src" alt="Foo" />';
+      const html = '<img src="$src" alt="Foo" />';
       final explained = await explain(tester, html);
       expect(
         explained,
@@ -39,7 +39,7 @@ void main() {
     });
 
     testWidgets('renders src+title', (WidgetTester tester) async {
-      final html = '<img src="$src" title="Bar" />';
+      const html = '<img src="$src" title="Bar" />';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -53,7 +53,7 @@ void main() {
     });
 
     testWidgets('renders src+alt+title', (WidgetTester tester) async {
-      final html = '<img src="$src" alt="Foo" title="Bar" />';
+      const html = '<img src="$src" alt="Foo" title="Bar" />';
       final e = await explain(tester, html);
       expect(
           e,
@@ -67,7 +67,7 @@ void main() {
     });
 
     testWidgets('renders in one RichText', (WidgetTester tester) async {
-      final html = '<img src="$src" /> <img src="$src" />';
+      const html = '<img src="$src" /> <img src="$src" />';
       final explained = await explain(tester, html);
       expect(
         explained,
@@ -80,19 +80,19 @@ void main() {
     });
 
     testWidgets('renders alt', (WidgetTester tester) async {
-      final html = '<img alt="Foo" /> bar';
+      const html = '<img alt="Foo" /> bar';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo bar)]'));
     });
 
     testWidgets('renders title', (WidgetTester tester) async {
-      final html = '<img title="Foo" /> bar';
+      const html = '<img title="Foo" /> bar';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo bar)]'));
     });
 
     testWidgets('renders dimensions', (WidgetTester tester) async {
-      final html = '<img src="$src" width="800" height="600" />';
+      const html = '<img src="$src" width="800" height="600" />';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -103,7 +103,7 @@ void main() {
     });
 
     testWidgets('renders between texts', (WidgetTester tester) async {
-      final html = 'Before text. <img src="$src" /> After text.';
+      const html = 'Before text. <img src="$src" /> After text.';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -115,7 +115,7 @@ void main() {
     });
 
     testWidgets('renders block', (WidgetTester tester) async {
-      final html = '<img src="$src" style="display: block" />';
+      const html = '<img src="$src" style="display: block" />';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -124,20 +124,18 @@ void main() {
     });
 
     testWidgets('renders block without src', (WidgetTester tester) async {
-      final html = '<img style="display: block" />';
+      const html = '<img style="display: block" />';
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
     });
   });
 
   group('asset', () {
-    final assetName = 'test/images/logo.png';
-    final Future<String> Function(WidgetTester, String, {String package})
-        explain = (WidgetTester tester, String html, {String? package}) =>
-            helper.explain(tester, html);
+    const assetName = 'test/images/logo.png';
+    const explain = helper.explain;
 
     testWidgets('renders asset', (WidgetTester tester) async {
-      final html = '<img src="asset:$assetName" />';
+      const html = '<img src="asset:$assetName" />';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -149,9 +147,9 @@ void main() {
     });
 
     testWidgets('renders asset (specified package)', (tester) async {
-      final package = 'flutter_widget_from_html_core';
-      final html = '<img src="asset:$assetName?package=$package" />';
-      final explained = await explain(tester, html, package: package);
+      const package = 'flutter_widget_from_html_core';
+      const html = '<img src="asset:$assetName?package=$package" />';
+      final explained = await explain(tester, html);
       expect(
           explained,
           equals('[CssSizing:$sizingConstraints,child='
@@ -162,31 +160,31 @@ void main() {
     });
 
     testWidgets('renders bad asset', (WidgetTester tester) async {
-      final html = '<img src="asset:" />';
+      const html = '<img src="asset:" />';
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
     });
 
     testWidgets('renders bad asset with alt text', (WidgetTester tester) async {
-      final html = '<img src="asset:" alt="Foo" />';
+      const html = '<img src="asset:" alt="Foo" />';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
     testWidgets('renders bad asset with title text', (tester) async {
-      final html = '<img src="asset:" title="Foo" />';
+      const html = '<img src="asset:" title="Foo" />';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
   });
 
   group('data uri', () {
-    final explain = helper.explain;
+    const explain = helper.explain;
 
     testWidgets('renders data uri', (WidgetTester tester) async {
-      final html = '<img src="${helper.kDataUri}" />';
+      const html = '<img src="${helper.kDataUri}" />';
       final explained = (await explain(tester, html))
-          .replaceAll(RegExp(r'Uint8List#[0-9a-f]+,'), 'bytes,');
+          .replaceAll(RegExp('Uint8List#[0-9a-f]+,'), 'bytes,');
       expect(
           explained,
           equals('[CssSizing:$sizingConstraints,child='
@@ -195,33 +193,33 @@ void main() {
     });
 
     testWidgets('renders bad data uri', (WidgetTester tester) async {
-      final html = '<img src="data:image/xxx" />';
+      const html = '<img src="data:image/xxx" />';
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
     });
 
     testWidgets('renders bad data uri with alt text', (tester) async {
-      final html = '<img src="data:image/xxx" alt="Foo" />';
+      const html = '<img src="data:image/xxx" alt="Foo" />';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
     testWidgets('renders bad data uri with title text', (tester) async {
-      final html = '<img src="data:image/xxx" title="Foo" />';
+      const html = '<img src="data:image/xxx" title="Foo" />';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
   });
 
   group('file uri', () {
-    final explain = helper.explain;
+    const explain = helper.explain;
     final filePath = '${Directory.current.path}/test/images/logo.png';
     final fileUri = 'file://$filePath';
 
     testWidgets('renders file uri', (WidgetTester tester) async {
       final html = '<img src="$fileUri" />';
       final explained = (await explain(tester, html))
-          .replaceAll(RegExp(r'Uint8List#[0-9a-f]+,'), 'bytes,');
+          .replaceAll(RegExp('Uint8List#[0-9a-f]+,'), 'bytes,');
       expect(
           explained,
           equals('[CssSizing:$sizingConstraints,child='
@@ -231,7 +229,7 @@ void main() {
   });
 
   group('baseUrl', () {
-    final test = (
+    Future<void> test(
       WidgetTester tester,
       String html,
       String fullUrl, {
@@ -248,23 +246,23 @@ void main() {
           equals('[CssSizing:$sizingConstraints,child='
               '[Image:image=NetworkImage("$fullUrl", scale: 1.0)]'
               ']'));
-    };
+    }
 
     testWidgets('renders full url', (WidgetTester tester) async {
-      final fullUrl = 'http://domain.com/image.png';
-      final html = '<img src="$fullUrl" />';
+      const fullUrl = 'http://domain.com/image.png';
+      const html = '<img src="$fullUrl" />';
       await test(tester, html, fullUrl);
     });
 
     testWidgets('renders protocol relative url', (WidgetTester tester) async {
-      final html = '<img src="//protocol.relative" />';
-      final fullUrl = 'http://protocol.relative';
+      const html = '<img src="//protocol.relative" />';
+      const fullUrl = 'http://protocol.relative';
       await test(tester, html, fullUrl);
     });
 
     testWidgets('renders protocol relative url (https)', (tester) async {
-      final html = '<img src="//protocol.relative/secured" />';
-      final fullUrl = 'https://protocol.relative/secured';
+      const html = '<img src="//protocol.relative/secured" />';
+      const fullUrl = 'https://protocol.relative/secured';
       await test(
         tester,
         html,
@@ -274,14 +272,14 @@ void main() {
     });
 
     testWidgets('renders root relative url', (WidgetTester tester) async {
-      final html = '<img src="/root.relative" />';
-      final fullUrl = 'http://base.com/root.relative';
+      const html = '<img src="/root.relative" />';
+      const fullUrl = 'http://base.com/root.relative';
       await test(tester, html, fullUrl);
     });
 
     testWidgets('renders relative url', (WidgetTester tester) async {
-      final html = '<img src="relative" />';
-      final fullUrl = 'http://base.com/path/relative';
+      const html = '<img src="relative" />';
+      const fullUrl = 'http://base.com/path/relative';
       await test(tester, html, fullUrl);
     });
   });
@@ -295,8 +293,8 @@ void main() {
 
   group('error handing', () {
     testWidgets('executes errorBuilder', (WidgetTester tester) async {
-      final html = 'Foo <img src="data:image/jpg;base64,xxxx" /> bar';
-      await tester.pumpWidget(MaterialApp(home: HtmlWidget(html)));
+      const html = 'Foo <img src="data:image/jpg;base64,xxxx" /> bar';
+      await tester.pumpWidget(const MaterialApp(home: HtmlWidget(html)));
       await tester.pumpAndSettle();
       expect(find.text('❌'), findsOneWidget);
     });
