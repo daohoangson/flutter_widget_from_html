@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chewie/chewie.dart' as lib;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -56,83 +58,58 @@ class VideoPlayer extends StatefulWidget {
 }
 
 class _VideoPlayerState extends State<VideoPlayer> {
-  late lib.ChewieController _controller;
+  lib.ChewieController? _controller;
+  lib.VideoPlayerController? _vpc;
+
+  Widget? get placeholder =>
+      widget.poster != null ? Center(child: widget.poster) : null;
 
   @override
   void initState() {
     super.initState();
-    _controller = _Controller(this);
+    _initControllers();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _vpc?.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final aspectRatio = _controller.aspectRatio!;
+    final aspectRatio = (widget.autoResize ? _vpc?.value.aspectRatio : null) ??
+        widget.aspectRatio;
+
+    final controller = _controller;
+    final child = controller != null
+        ? lib.Chewie(controller: controller)
+        : (placeholder ?? const SizedBox.shrink());
 
     return AspectRatio(
       aspectRatio: aspectRatio,
-      child: lib.Chewie(
-        controller: _controller,
-        key: ValueKey(aspectRatio),
-      ),
+      child: child,
     );
   }
 
-  void _onAspectRatioUpdated() => setState(() {});
-}
-
-class _Controller extends lib.ChewieController {
-  final _VideoPlayerState vps;
-
-  double? _aspectRatio;
-
-  _Controller(this.vps)
-      : super(
-          autoInitialize: true,
-          autoPlay: vps.widget.autoplay,
-          looping: vps.widget.loop,
-          placeholder: vps.widget.poster != null
-              ? Center(child: vps.widget.poster)
-              : null,
-          showControls: vps.widget.controls,
-          videoPlayerController:
-              lib.VideoPlayerController.network(vps.widget.url),
-        ) {
-    if (vps.widget.autoResize) {
-      _setupAspectRatioListener();
+  Future<void> _initControllers() async {
+    final vpc = _vpc = lib.VideoPlayerController.network(widget.url);
+    try {
+      await vpc.initialize();
+    } catch (error) {
+      print('Video initialize error: $error');
+      return;
     }
-  }
 
-  @override
-  double get aspectRatio => _aspectRatio ?? vps.widget.aspectRatio;
-
-  @override
-  void dispose() {
-    super.dispose();
-    videoPlayerController.dispose();
-  }
-
-  void _setupAspectRatioListener() {
-    late VoidCallback listener;
-
-    listener = () {
-      if (_aspectRatio == null) {
-        final vpv = videoPlayerController.value;
-        if (!vpv.isInitialized) return;
-
-        _aspectRatio = vpv.aspectRatio;
-        vps._onAspectRatioUpdated();
-      }
-
-      videoPlayerController.removeListener(listener);
-    };
-
-    videoPlayerController.addListener(listener);
+    _controller = lib.ChewieController(
+      autoPlay: widget.autoplay,
+      looping: widget.loop,
+      placeholder: placeholder,
+      showControls: widget.controls,
+      videoPlayerController: vpc,
+    );
+    setState(() {});
   }
 }
 
