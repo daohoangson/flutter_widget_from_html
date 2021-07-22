@@ -7,6 +7,10 @@ void main() {
   final src = 'http://domain.com/video.mp4';
   final defaultAspectRatio = '1.78';
 
+  setUp(() {
+    mockVideoPlayerPlatform();
+  });
+
   testWidgets('renders video player', (tester) async {
     final html = '<video><source src="$src"></video>';
     final e = await explain(tester, html);
