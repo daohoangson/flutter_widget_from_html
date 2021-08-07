@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:chewie/chewie.dart' as lib;
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart' as lib;
 
 /// A video player.
@@ -61,13 +61,27 @@ class _VideoPlayerState extends State<VideoPlayer> {
   lib.ChewieController? _controller;
   lib.VideoPlayerController? _vpc;
 
-  Widget? get placeholder =>
-      widget.poster != null ? Center(child: widget.poster) : null;
+  var hasError = false;
+  var isInitializing = true;
+
+  Widget get placeholder {
+    if (isInitializing) {
+      return widget.poster != null
+          ? Center(child: widget.poster)
+          : const CircularProgressIndicator.adaptive();
+    }
+
+    if (hasError) {
+      return const Center(child: Text('❌'));
+    }
+
+    return const SizedBox.shrink();
+  }
 
   @override
   void initState() {
     super.initState();
-    _initControllers();
+    _initControllers().then((_) => setState(() => isInitializing = false));
   }
 
   @override
@@ -82,14 +96,11 @@ class _VideoPlayerState extends State<VideoPlayer> {
     final aspectRatio = (widget.autoResize ? _vpc?.value.aspectRatio : null) ??
         widget.aspectRatio;
 
-    final controller = _controller;
-    final child = controller != null
-        ? lib.Chewie(controller: controller)
-        : (placeholder ?? const SizedBox.shrink());
-
     return AspectRatio(
       aspectRatio: aspectRatio,
-      child: child,
+      child: _controller != null
+          ? lib.Chewie(controller: _controller!)
+          : placeholder,
     );
   }
 
@@ -99,6 +110,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
       await vpc.initialize();
     } catch (error) {
       print('Video initialize error: $error');
+      hasError = true;
       return;
     }
 
@@ -109,7 +121,6 @@ class _VideoPlayerState extends State<VideoPlayer> {
       showControls: widget.controls,
       videoPlayerController: vpc,
     );
-    setState(() {});
   }
 }
 

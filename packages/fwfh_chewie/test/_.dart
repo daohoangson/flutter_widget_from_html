@@ -31,8 +31,9 @@ Future<String> explain(
   WidgetTester tester,
   String html, {
   bool useExplainer = true,
+  Duration delay = const Duration(milliseconds: 10),
 }) async {
-  await helper.explain(
+  final explained = await helper.explain(
     tester,
     null,
     explainer: videoPlayerExplainer,
@@ -44,8 +45,12 @@ Future<String> explain(
     useExplainer: useExplainer,
   );
 
+  if (delay == Duration.zero) {
+    return explained;
+  }
+
   await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 10)));
-  await tester.pumpAndSettle();
+  await tester.pump();
 
   return helper.explainWithoutPumping(
     explainer: videoPlayerExplainer,
@@ -64,7 +69,7 @@ class _FakeVideoPlayerPlatform extends TestHostVideoPlayerApi {
 
   @override
   TextureMessage create(CreateMessage arg) {
-    _FakeVideoEventStream(nextTextureId);
+    _FakeVideoEventStream(nextTextureId, arg.uri);
     return TextureMessage()..textureId = nextTextureId++;
   }
 
@@ -101,8 +106,9 @@ class _FakeVideoPlayerPlatform extends TestHostVideoPlayerApi {
 
 class _FakeVideoEventStream {
   final int textureId;
+  final String? uri;
 
-  _FakeVideoEventStream(this.textureId) {
+  _FakeVideoEventStream(this.textureId, this.uri) {
     MethodChannel(name).setMockMethodCallHandler(_handler);
   }
 
@@ -111,13 +117,22 @@ class _FakeVideoEventStream {
   Future<dynamic> _handler(MethodCall call) async {
     switch (call.method) {
       case 'listen':
-        final data = <String, dynamic>{
-          'event': 'initialized',
-          'duration': 1000,
-          'width': 100,
-          'height': 100,
-        };
-        final byteData = StandardMethodCodec().encodeSuccessEnvelope(data);
+        late ByteData byteData;
+
+        if (uri?.endsWith('init/error.mp4') == true) {
+          byteData = StandardMethodCodec().encodeErrorEnvelope(
+            code: 'init_error',
+            message: uri,
+          );
+        } else {
+          final data = <String, dynamic>{
+            'event': 'initialized',
+            'duration': 1000,
+            'width': 100,
+            'height': 100,
+          };
+          byteData = StandardMethodCodec().encodeSuccessEnvelope(data);
+        }
 
         final messenger = ServicesBinding.instance!.defaultBinaryMessenger;
         await messenger.handlePlatformMessage(name, byteData, (_) {});
