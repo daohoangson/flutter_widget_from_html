@@ -87,7 +87,7 @@ class WebView extends StatefulWidget {
   final String? userAgent;
 
   /// Creates a web view.
-  WebView(
+  const WebView(
     this.url, {
     required this.aspectRatio,
     bool? autoResize,
@@ -104,7 +104,9 @@ class WebView extends StatefulWidget {
     this.unsupportedWorkaroundForIssue375 = true,
     this.userAgent,
     Key? key,
-  })  : autoResize = !js ? false : autoResize ?? js,
+  })  :
+        // ignore: avoid_bool_literals_in_conditional_expressions
+        autoResize = js ? (autoResize ?? js) : false,
         super(key: key);
 
   @override
