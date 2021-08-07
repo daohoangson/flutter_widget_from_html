@@ -11,9 +11,11 @@ import '../core_helpers.dart';
 import '../core_widget_factory.dart';
 import 'core_ops.dart';
 
-final _regExpSpaceLeading = RegExp(r'^[^\S\u{00A0}]+', unicode: true);
-final _regExpSpaceTrailing = RegExp(r'[^\S\u{00A0}]+$', unicode: true);
-final _regExpSpaces = RegExp(r'[^\S\u{00A0}]+', unicode: true);
+// https://infra.spec.whatwg.org/#ascii-whitespace
+const _asciiWhitespace = r'[\u{0009}\u{000A}\u{000C}\u{000D}\u{0020}]';
+final _regExpSpaceLeading = RegExp('^$_asciiWhitespace+', unicode: true);
+final _regExpSpaceTrailing = RegExp('$_asciiWhitespace+\$', unicode: true);
+final _regExpSpaces = RegExp('$_asciiWhitespace+', unicode: true);
 
 class BuildMetadata extends core_data.BuildMetadata {
   final Iterable<BuildOp> _parentOps;

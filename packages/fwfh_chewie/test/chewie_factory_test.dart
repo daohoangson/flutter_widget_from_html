@@ -7,10 +7,42 @@ void main() {
   const src = 'http://domain.com/video.mp4';
   const defaultAspectRatio = '1.78';
 
+  setUp(() {
+    mockVideoPlayerPlatform();
+  });
+
   testWidgets('renders video player', (tester) async {
     const html = '<video><source src="$src"></video>';
     final e = await explain(tester, html);
     expect(e, equals('[VideoPlayer:url=$src,aspectRatio=$defaultAspectRatio]'));
+  });
+
+  group('renders progress indicator', () {
+    final html = '<video><source src="$src"></video>';
+    final _explain = (WidgetTester tester) async {
+      final explained = await explain(
+        tester,
+        html,
+        delay: Duration.zero,
+        useExplainer: false,
+      );
+      return explained;
+    };
+
+    testWidgets('renders material style (Android)', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      final explained = await _explain(tester);
+      expect(explained, contains('CircularProgressIndicator'));
+      expect(explained, isNot(contains('CupertinoActivityIndicator')));
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('renders cupertino style (iOS)', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      final explained = await _explain(tester);
+      expect(explained, contains('CupertinoActivityIndicator'));
+      debugDefaultTargetPlatformOverride = null;
+    });
   });
 
   group('useExplainer: false', () {
@@ -144,6 +176,13 @@ void main() {
       const html = '<video><source src="bad"></video>';
       final explained = await explain(tester, html);
       expect(explained, equals('[widget0]'));
+    });
+
+    testWidgets('initialization error', (tester) async {
+      final html =
+          '<video><source src="http://domain.com/init/error.mp4"></video>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(explained, contains('Text("❌")'));
     });
   });
 }
