@@ -17,14 +17,14 @@ mixin CachedNetworkImageFactory on WidgetFactory {
       fit: BoxFit.fill,
       imageUrl: url,
       progressIndicatorBuilder: (context, _, progress) => imageLoadingBuilder(
-          context,
-          const SizedBox.shrink(),
-          ImageChunkEvent(
-            cumulativeBytesLoaded: progress.downloaded,
-            expectedTotalBytes: progress.totalSize,
-          ),
-          src,
+        context,
+        const SizedBox.shrink(),
+        ImageChunkEvent(
+          cumulativeBytesLoaded: progress.downloaded,
+          expectedTotalBytes: progress.totalSize,
         ),
+        src,
+      ),
     );
   }
 }
