@@ -11,6 +11,7 @@ dependencies:
   cached_network_image: ^3.0.0
   flutter:
     sdk: flutter
+  flutter_cache_manager: ^3.0.0
   flutter_widget_from_html_core: ">=0.6.0 <0.8.0"
 
 dependency_overrides:
@@ -18,6 +19,8 @@ dependency_overrides:
     path: ../core
 
 dev_dependencies:
+  file: any
   flutter_test:
     sdk: flutter
+  mocktail: any
   pedantic: any

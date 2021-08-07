@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../../core/test/_.dart' as helper;
+import '../../fwfh_cached_network_image/test/_.dart'
+    as fwfh_cached_network_image;
 import '../../fwfh_chewie/test/_.dart' as fwfh_chewie;
 import '../../fwfh_svg/test/_.dart' as fwfh_svg;
 import '../../fwfh_webview/test/_.dart' as fwfh_webview;
@@ -16,7 +18,9 @@ final hwKey = helper.hwKey;
 final buildCurrentState = helper.buildCurrentState;
 
 String? _explainer(helper.Explainer parent, Widget widget) {
-  return fwfh_chewie.videoPlayerExplainer(parent, widget) ??
+  return fwfh_cached_network_image.cachedNetworkImageExplainer(
+          parent, widget) ??
+      fwfh_chewie.videoPlayerExplainer(parent, widget) ??
       fwfh_svg.svgExplainer(parent, widget) ??
       fwfh_webview.webViewExplainer(parent, widget);
 }

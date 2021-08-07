@@ -9,8 +9,8 @@ const kColor = Color(0xFF001234);
 const kColorAccent = Color(0xFF123456);
 
 // https://stackoverflow.com/questions/6018611/smallest-data-uri-image-possible-for-a-transparent-image
-const kDataUri =
-    'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+const kDataBase64 = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+const kDataUri = 'data:image/gif;base64,$kDataBase64';
 
 final hwKey = GlobalKey<State<HtmlWidget>>();
 
