@@ -1,21 +1,21 @@
 #!/bin/bash
 
 set -e
-cd $( dirname $( dirname $( dirname ${BASH_SOURCE[0]})))
-_pwd=$( pwd )
+cd $(dirname $(dirname $(dirname ${BASH_SOURCE[0]})))
+_pwd=$(pwd)
 
 flutter --version
 
 _sylphPath=/tmp/sylph-src
 mkdir $_sylphPath && cd $_sylphPath
 git init && git remote add origin https://github.com/daohoangson/sylph.git
-git fetch --depth 1 origin $( flutter --version | head -n 1 | sed 's/^Flutter //' | sed 's/[^a-z0-9.-].*$//' )
+git fetch --depth 1 origin $(flutter --version | head -n 1 | sed 's/^Flutter //' | sed 's/[^a-z0-9.-].*$//')
 git checkout FETCH_HEAD
 pub global activate --source path $_sylphPath
 
 cd "$_pwd/demo_app"
 
-_ref=$( git log -n 1 --pretty=format:%H )
+_ref=$(git log -n 1 --pretty=format:%H)
 _updateDep() {
   __yaml='pubspec.yaml'
   __package=$1
@@ -35,4 +35,4 @@ _updateDep 'fwfh_webview'
 
 flutter pub get
 
-exec $HOME/.pub-cache/bin/sylph
+exec sylph

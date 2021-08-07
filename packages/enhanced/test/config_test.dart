@@ -355,7 +355,7 @@ void main() {
     final CustomWidgetBuilder customWidgetBuilder =
         (e) => e.localName == 'video' ? Text('Bar') : null;
     final src = 'http://domain.com/video.mp4';
-    final html = 'Foo <video><source src="$src"></video>';
+    final html = 'Foo <video width="21" height="9"><source src="$src"></video>';
 
     testWidgets('renders without value', (WidgetTester tester) async {
       final explained =
@@ -364,7 +364,7 @@ void main() {
           explained,
           equals('[Column:children='
               '[RichText:(:Foo)],'
-              '[VideoPlayer:url=http://domain.com/video.mp4,aspectRatio=1.78]'
+              '[VideoPlayer:url=http://domain.com/video.mp4,aspectRatio=2.33,autoResize=false]'
               ']'));
     });
 
