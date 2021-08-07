@@ -49,7 +49,7 @@ Future<String> explain(
     return explained;
   }
 
-  await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 10)));
+  await tester.runAsync(() => Future.delayed(delay));
   await tester.pump();
 
   return helper.explainWithoutPumping(
