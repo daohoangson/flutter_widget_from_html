@@ -16,9 +16,9 @@ device_pools:
       #  --region us-west-2 \
       # | jq -r '.devices[] | "Android " + .os + ": " + .name +  " / " + .modelId' \
       # | sort
-      - name: Samsung Galaxy S21
-        model: SM-G991U1
-        os: 11
+      - name: Samsung Galaxy Note 10
+        model: SM-N970U1
+        os: 9
 
 test_suites:
 
