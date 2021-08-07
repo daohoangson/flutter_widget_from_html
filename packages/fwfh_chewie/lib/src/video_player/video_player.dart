@@ -58,30 +58,18 @@ class VideoPlayer extends StatefulWidget {
 }
 
 class _VideoPlayerState extends State<VideoPlayer> {
+  var hasError = false;
+
   lib.ChewieController? _controller;
   lib.VideoPlayerController? _vpc;
 
-  var hasError = false;
-  var isInitializing = true;
-
-  Widget get placeholder {
-    if (isInitializing) {
-      return widget.poster != null
-          ? Center(child: widget.poster)
-          : const CircularProgressIndicator.adaptive();
-    }
-
-    if (hasError) {
-      return const Center(child: Text('❌'));
-    }
-
-    return const SizedBox.shrink();
-  }
+  Widget? get placeholder =>
+      widget.poster != null ? Center(child: widget.poster) : null;
 
   @override
   void initState() {
     super.initState();
-    _initControllers().then((_) => setState(() => isInitializing = false));
+    _initControllers();
   }
 
   @override
@@ -93,14 +81,23 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    final aspectRatio = (widget.autoResize ? _vpc?.value.aspectRatio : null) ??
+    final aspectRatio = ((widget.autoResize && _controller != null)
+            ? _vpc?.value.aspectRatio
+            : null) ??
         widget.aspectRatio;
+
+    late Widget child;
+    if (_controller != null) {
+      child = lib.Chewie(controller: _controller!);
+    } else if (hasError) {
+      child = const Center(child: Text('❌'));
+    } else {
+      child = placeholder ?? const CircularProgressIndicator.adaptive();
+    }
 
     return AspectRatio(
       aspectRatio: aspectRatio,
-      child: _controller != null
-          ? lib.Chewie(controller: _controller!)
-          : placeholder,
+      child: child,
     );
   }
 
@@ -110,16 +107,18 @@ class _VideoPlayerState extends State<VideoPlayer> {
       await vpc.initialize();
     } catch (error) {
       print('Video initialize error: $error');
-      hasError = true;
+      setState(() => hasError = true);
       return;
     }
 
-    _controller = lib.ChewieController(
-      autoPlay: widget.autoplay,
-      looping: widget.loop,
-      placeholder: placeholder,
-      showControls: widget.controls,
-      videoPlayerController: vpc,
+    setState(
+      () => _controller = lib.ChewieController(
+        autoPlay: widget.autoplay,
+        looping: widget.loop,
+        placeholder: placeholder,
+        showControls: widget.controls,
+        videoPlayerController: vpc,
+      ),
     );
   }
 }
