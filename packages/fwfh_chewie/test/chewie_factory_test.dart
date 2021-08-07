@@ -18,8 +18,8 @@ void main() {
   });
 
   group('renders progress indicator', () {
-    final html = '<video><source src="$src"></video>';
-    final _explain = (WidgetTester tester) async {
+    const html = '<video><source src="$src"></video>';
+    Future<String> _explain(WidgetTester tester) async {
       final explained = await explain(
         tester,
         html,
@@ -27,7 +27,7 @@ void main() {
         useExplainer: false,
       );
       return explained;
-    };
+    }
 
     testWidgets('renders material style (Android)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
@@ -179,7 +179,7 @@ void main() {
     });
 
     testWidgets('initialization error', (tester) async {
-      final html =
+      const html =
           '<video><source src="http://domain.com/init/error.mp4"></video>';
       final explained = await explain(tester, html, useExplainer: false);
       expect(explained, contains('Text("❌")'));

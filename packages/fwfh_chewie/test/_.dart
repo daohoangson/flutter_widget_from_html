@@ -61,7 +61,7 @@ Future<String> explain(
 void mockVideoPlayerPlatform() => _FakeVideoPlayerPlatform();
 
 class _FakeVideoPlayerPlatform extends TestHostVideoPlayerApi {
-  var nextTextureId = 0;
+  var _nextTextureId = 0;
 
   _FakeVideoPlayerPlatform() {
     TestHostVideoPlayerApi.setup(this);
@@ -69,8 +69,8 @@ class _FakeVideoPlayerPlatform extends TestHostVideoPlayerApi {
 
   @override
   TextureMessage create(CreateMessage arg) {
-    _FakeVideoEventStream(nextTextureId, arg.uri);
-    return TextureMessage()..textureId = nextTextureId++;
+    _FakeVideoEventStream(_nextTextureId, arg.uri);
+    return TextureMessage()..textureId = _nextTextureId++;
   }
 
   @override
@@ -120,7 +120,7 @@ class _FakeVideoEventStream {
         late ByteData byteData;
 
         if (uri?.endsWith('init/error.mp4') == true) {
-          byteData = StandardMethodCodec().encodeErrorEnvelope(
+          byteData = const StandardMethodCodec().encodeErrorEnvelope(
             code: 'init_error',
             message: uri,
           );
@@ -131,7 +131,7 @@ class _FakeVideoEventStream {
             'width': 100,
             'height': 100,
           };
-          byteData = StandardMethodCodec().encodeSuccessEnvelope(data);
+          byteData = const StandardMethodCodec().encodeSuccessEnvelope(data);
         }
 
         final messenger = ServicesBinding.instance!.defaultBinaryMessenger;
