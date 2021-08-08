@@ -94,9 +94,9 @@ class HtmlWidget extends StatefulWidget {
 
   /// The render mode.
   ///
-  /// - [RenderMode.Column] is the default mode, suitable for small / medium document.
-  /// - [RenderMode.ListView] has better performance as it renders contents lazily.
-  /// - [RenderMode.SliverList] has similar performance as `ListView` and can be put inside a `CustomScrollView`.
+  /// - [RenderMode.column] is the default mode, suitable for small / medium document.
+  /// - [RenderMode.listView] has better performance as it renders contents lazily.
+  /// - [RenderMode.sliverList] has similar performance as `ListView` and can be put inside a `CustomScrollView`.
   final RenderMode renderMode;
 
   /// The default styling for text elements.

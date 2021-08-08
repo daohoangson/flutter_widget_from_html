@@ -1,3 +1,9 @@
+## 0.7.0-dev.2021080801
+
+- BREAKING: `RenderMode.Column` is now `.column` (`ListView` and `SliverList` have the same change)
+- Improve whitespace handling (#551)
+- Fix `min-width` being ignored (#544)
+
 ## 0.7.0-dev.2021061301
 
 - BREAKING: `buildColumnPlaceholder` removed `trimMarginVertical` named param
