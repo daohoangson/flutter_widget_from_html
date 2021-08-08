@@ -60,7 +60,7 @@ class _WidgetFactory extends WidgetFactory with CachedNetworkImageFactory {
           headers: any(named: 'headers'),
           withProgress: any(named: 'withProgress'),
         )).thenAnswer((invocation) async* {
-      final String url = invocation.positionalArguments[0];
+      final url = invocation.positionalArguments[0] as String;
       final uri = Uri.parse(url);
       final fileName = uri.pathSegments.last;
 

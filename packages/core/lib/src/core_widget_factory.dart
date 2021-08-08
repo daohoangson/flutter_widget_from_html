@@ -17,7 +17,7 @@ import 'internal/platform_specific/fallback.dart'
 /// A factory to build widgets.
 class WidgetFactory {
   late AnchorRegistry _anchorRegistry;
-  late final _flattener;
+  late final Flattener _flattener;
 
   BuildOp? _styleBgColor;
   BuildOp? _styleBlock;
@@ -91,7 +91,7 @@ class WidgetFactory {
   /// Builds body widget (see [HtmlWidget.renderMode]).
   Widget buildBodyWidget(BuildContext context, Widget child) {
     var children = child is Column ? child.children : [child];
-    final renderMode = _widget?.renderMode ?? RenderMode.Column;
+    final renderMode = _widget?.renderMode ?? RenderMode.column;
 
     if (children.isNotEmpty && children.first is HeightPlaceholder) {
       children.removeAt(0);
@@ -107,7 +107,7 @@ class WidgetFactory {
         continue;
       }
 
-      if (renderMode != RenderMode.Column && child is CssBlock) {
+      if (renderMode != RenderMode.column && child is CssBlock) {
         final grandChild = child.child;
         if (grandChild is Column) {
           children = grandChild.children;
@@ -119,12 +119,12 @@ class WidgetFactory {
     }
 
     switch (renderMode) {
-      case RenderMode.Column:
+      case RenderMode.column:
         return buildColumnWidget(context, children);
-      case RenderMode.ListView:
+      case RenderMode.listView:
         _anchorRegistry.prepareIndexByAnchor(children);
         return buildBodyListView(context, children);
-      case RenderMode.SliverList:
+      case RenderMode.sliverList:
         _anchorRegistry.prepareIndexByAnchor(children);
         return buildBodySliverList(context, children);
     }
@@ -248,8 +248,10 @@ class WidgetFactory {
     final image = src.image;
     final semanticLabel = image?.alt ?? image?.title;
     return Image(
-      errorBuilder: (_1, _2, _3) => imageErrorBuilder(_1, _2, _3, src),
-      loadingBuilder: (_1, _2, _3) => imageLoadingBuilder(_1, _2, _3, src),
+      errorBuilder: (context, error, stackTrace) =>
+          imageErrorBuilder(context, error, stackTrace, src),
+      loadingBuilder: (context, child, loadingProgress) =>
+          imageLoadingBuilder(context, child, loadingProgress, src),
       excludeFromSemantics: semanticLabel == null,
       fit: BoxFit.fill,
       image: provider,
@@ -271,7 +273,7 @@ class WidgetFactory {
   /// Builder for error widget if an error occurs during image loading.
   Widget imageErrorBuilder(
     BuildContext context,
-    Object error,
+    dynamic error,
     StackTrace? stackTrace,
     ImageSource src,
   ) {
@@ -289,7 +291,6 @@ class WidgetFactory {
     return text.isNotEmpty
         ? RichText(
             maxLines: 1,
-            overflow: TextOverflow.clip,
             softWrap: false,
             text: TextSpan(style: style, text: text),
             textDirection: tsh.textDirection,

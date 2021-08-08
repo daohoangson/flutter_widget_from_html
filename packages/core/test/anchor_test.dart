@@ -51,7 +51,7 @@ Future<void> main() async {
         hw: HtmlWidget(
           html,
           key: hwKey,
-          renderMode: RenderMode.ListView,
+          renderMode: RenderMode.listView,
         ),
         useExplainer: false,
       );
@@ -68,7 +68,7 @@ Future<void> main() async {
           HtmlWidget(
             html,
             key: hwKey,
-            renderMode: RenderMode.SliverList,
+            renderMode: RenderMode.sliverList,
           )
         ]),
         useExplainer: false,
@@ -389,7 +389,7 @@ class _ListViewTestApp extends StatelessWidget {
         body: HtmlWidget(
           html ?? htmlDefault,
           factoryBuilder: () => _WidgetFactory(),
-          renderMode: RenderMode.ListView,
+          renderMode: RenderMode.listView,
         ),
       );
 }
@@ -408,7 +408,7 @@ class _SliverListTestApp extends StatelessWidget {
             HtmlWidget(
               html ?? htmlDefault,
               factoryBuilder: () => _WidgetFactory(),
-              renderMode: RenderMode.SliverList,
+              renderMode: RenderMode.sliverList,
             ),
             SliverToBoxAdapter(child: Container(height: 1, key: keyBottom)),
           ],

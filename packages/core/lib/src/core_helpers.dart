@@ -101,20 +101,20 @@ enum RenderMode {
   ///
   /// This is the default render mode.
   /// It's good enough for small / medium document and can be used easily.
-  Column,
+  column,
 
   /// The body will be rendered as a `ListView` widget.
   ///
   /// It's good for medium / large document in a dedicated page layout
   /// (e.g. the HTML document is the only thing on the screen).
-  ListView,
+  listView,
 
   /// The body will be rendered as a `SliverList` sliver.
   ///
   /// It's good for large / huge document and can be put in the same scrolling
   /// context with other contents.
   /// A [CustomScrollView] or similar is required for this to work.
-  SliverList,
+  sliverList,
 }
 
 /// An extension on [Widget] to keep track of anchors.

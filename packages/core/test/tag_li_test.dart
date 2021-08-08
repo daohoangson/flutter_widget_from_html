@@ -603,7 +603,7 @@ Future<void> main() async {
     });
 
     testWidgets('null buildListMarker', (WidgetTester tester) async {
-      final html = '<ul><li>Foo</li></ul>';
+      const html = '<ul><li>Foo</li></ul>';
       final explained = await explain(tester, null,
           hw: HtmlWidget(
             html,

@@ -119,7 +119,7 @@ class HtmlWidget extends StatefulWidget {
     this.onTapImage,
     this.onTapUrl,
     RebuildTriggers? rebuildTriggers,
-    this.renderMode = RenderMode.Column,
+    this.renderMode = RenderMode.column,
     this.textStyle = const TextStyle(),
   })  : _rebuildTriggers = rebuildTriggers,
         super(key: key);
@@ -229,10 +229,10 @@ class _HtmlWidgetState extends State<HtmlWidget> {
                 child: CircularProgressIndicator()));
 
     switch (widget.renderMode) {
-      case RenderMode.Column:
-      case RenderMode.ListView:
+      case RenderMode.column:
+      case RenderMode.listView:
         return indicator;
-      case RenderMode.SliverList:
+      case RenderMode.sliverList:
         return SliverToBoxAdapter(child: indicator);
     }
   }

@@ -464,7 +464,7 @@ void main() {
   });
 
   group('renderMode', () {
-    final explain = (
+    Future<String> explain(
       WidgetTester tester,
       RenderMode renderMode, {
       bool buildAsync = false,
@@ -480,39 +480,39 @@ void main() {
       return helper.explain(
         tester,
         null,
-        hw: renderMode == RenderMode.SliverList
+        hw: renderMode == RenderMode.sliverList
             ? CustomScrollView(slivers: [hw])
             : hw,
         useExplainer: false,
       );
-    };
+    }
 
     testWidgets('renders Column', (WidgetTester tester) async {
-      final explained = await explain(tester, RenderMode.Column);
+      final explained = await explain(tester, RenderMode.column);
       expect(explained, contains('└Column('));
     });
 
     testWidgets('renders ListView', (WidgetTester tester) async {
-      final explained = await explain(tester, RenderMode.ListView);
+      final explained = await explain(tester, RenderMode.listView);
       expect(explained, contains('└ListView('));
       expect(explained, isNot(contains('└Column(')));
     });
 
     testWidgets('renders SliverList', (WidgetTester tester) async {
-      final explained = await explain(tester, RenderMode.SliverList);
+      final explained = await explain(tester, RenderMode.sliverList);
       expect(explained, contains('└SliverList('));
       expect(explained, isNot(contains('└Column(')));
     });
 
     testWidgets('renders SliverList (buildAsync)', (WidgetTester tester) async {
-      final e = await explain(tester, RenderMode.SliverList, buildAsync: true);
+      final e = await explain(tester, RenderMode.sliverList, buildAsync: true);
       expect(e, contains('└SliverToBoxAdapter('));
     });
 
     testWidgets('renders SliverList (CssBlock unwrap)', (tester) async {
       final explained = await explain(
         tester,
-        RenderMode.SliverList,
+        RenderMode.sliverList,
         html: '<div><p>Foo</p><p>Bar</p></div>',
       );
       expect(explained.split('└CssBlock(').length, equals(3),

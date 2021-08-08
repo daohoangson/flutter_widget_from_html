@@ -50,6 +50,7 @@ class _ListMarkerRenderObject extends RenderBox {
   _ListMarkerRenderObject(this._markerType, this._textStyle);
 
   HtmlListMarkerType _markerType;
+  // ignore: avoid_setters_without_getters
   set markerType(HtmlListMarkerType v) {
     if (v == _markerType) return;
     _markerType = v;
@@ -65,6 +66,7 @@ class _ListMarkerRenderObject extends RenderBox {
   }
 
   TextStyle _textStyle;
+  // ignore: avoid_setters_without_getters
   set textStyle(TextStyle v) {
     if (v == _textStyle) return;
     __textPainter = null;
@@ -87,8 +89,9 @@ class _ListMarkerRenderObject extends RenderBox {
     var lineMetrics = <LineMetrics>[];
     try {
       lineMetrics = _textPainter.computeLineMetrics();
-      // ignore: empty_catches
-    } on UnimplementedError {}
+    } catch (e) {
+      debugPrint('computeLineMetrics error: $e');
+    }
 
     final m = lineMetrics.isNotEmpty ? lineMetrics.first : null;
     final center = offset +

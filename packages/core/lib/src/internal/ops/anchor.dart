@@ -76,7 +76,6 @@ class AnchorRegistry {
     if (anchorMin < effectiveMin) {
       movedOk = await _ensureVisibleContext(
         _bodyItemKeys[currentMin].currentContext,
-        alignment: 0.0,
         curve: jumpCurve,
         duration: jumpDuration,
       );

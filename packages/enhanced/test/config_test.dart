@@ -530,7 +530,7 @@ void main() {
   });
 
   group('renderMode', () {
-    final explain = (
+    Future<String> explain(
       WidgetTester tester,
       RenderMode renderMode, {
       bool buildAsync = false,
@@ -545,26 +545,26 @@ void main() {
       return helper.explain(
         tester,
         null,
-        hw: renderMode == RenderMode.SliverList
+        hw: renderMode == RenderMode.sliverList
             ? CustomScrollView(slivers: [hw])
             : hw,
         useExplainer: false,
       );
-    };
+    }
 
     testWidgets('renders Column', (WidgetTester tester) async {
-      final explained = await explain(tester, RenderMode.Column);
+      final explained = await explain(tester, RenderMode.column);
       expect(explained, contains('└Column('));
     });
 
     testWidgets('renders ListView', (WidgetTester tester) async {
-      final explained = await explain(tester, RenderMode.ListView);
+      final explained = await explain(tester, RenderMode.listView);
       expect(explained, contains('└ListView('));
       expect(explained, isNot(contains('└Column(')));
     });
 
     testWidgets('renders SliverList', (WidgetTester tester) async {
-      final explained = await explain(tester, RenderMode.SliverList);
+      final explained = await explain(tester, RenderMode.sliverList);
       expect(explained, contains('└SliverList('));
       expect(explained, isNot(contains('└Column(')));
     });

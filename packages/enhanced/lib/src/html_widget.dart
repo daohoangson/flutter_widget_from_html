@@ -51,7 +51,7 @@ class HtmlWidget extends core.HtmlWidget {
     void Function(ImageMetadata)? onTapImage,
     dynamic Function(String)? onTapUrl,
     core.RebuildTriggers? rebuildTriggers,
-    RenderMode renderMode = RenderMode.Column,
+    RenderMode renderMode = RenderMode.column,
     TextStyle textStyle = const TextStyle(),
     this.webView = false,
     this.webViewDebuggingEnabled = false,
