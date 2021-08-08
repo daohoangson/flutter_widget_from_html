@@ -41,17 +41,19 @@ jobs:
 
           # replace:
           #   foo: ^1.0.0
+          #   bar: ^2.0.0-0
           # into:
           #   foo: 1.0.0
-          sed -i'' -e 's#^\(  [^:]*\): ^\([0-9.]*\)#\1: \2#' pubspec.yaml
+          #   bar: ^2.0.0-0 (unchanged)
+          sed -i'' -e 's#^\(  [^:]*\): ^\([0-9.]*\)$#\1: \2#' pubspec.yaml
 
           # replace:
           #   foo: ">=1.0.0" 
           #   bar: ">=2.0.0 <4.0.0"
           # into:
-          #   foo: 2.0.0
+          #   foo: 1.0.0
           #   bar: 2.0.0
-          sed -i'' -e 's#^\(  [^:]*\): ">=\([0-9.]*\)\( <.*\)\{0,1\}"#\1: \2#' pubspec.yaml
+          sed -i'' -e 's#^\(  [^:]*\): ">=\([0-9.]*\)\( <.*\)\{0,1\}"$#\1: \2#' pubspec.yaml
 
           # restore SDK constraint
           yq e ".environment.sdk = \"${_sdkVersion}\"" -i pubspec.yaml
