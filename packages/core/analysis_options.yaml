@@ -1,1 +1,10 @@
-include: package:pedantic/analysis_options.yaml
+include: package:lint/analysis_options_package.yaml
+
+analyzer:
+  exclude:
+    # TODO: investigate `include_file_not_found` warning
+    - example
+
+linter:
+  rules:
+    missing_whitespace_between_adjacent_strings: false

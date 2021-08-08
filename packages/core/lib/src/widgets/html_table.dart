@@ -32,8 +32,12 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   }) : super(children: children, key: key);
 
   @override
-  RenderObject createRenderObject(BuildContext _) =>
-      _TableRenderObject(border, borderCollapse, borderSpacing, companion);
+  RenderObject createRenderObject(BuildContext _) => _TableRenderObject(
+        border,
+        borderSpacing,
+        companion,
+        borderCollapse: borderCollapse,
+      );
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -80,7 +84,7 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   final int rowStart;
 
   /// Creates a TD (table cell) widget.
-  HtmlTableCell({
+  const HtmlTableCell({
     this.border,
     required Widget child,
     this.columnSpan = 1,
@@ -96,7 +100,7 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
 
   @override
   void applyParentData(RenderObject renderObject) {
-    final data = renderObject.parentData as _TableCellData;
+    final data = renderObject.parentData! as _TableCellData;
     var needsLayout = false;
 
     if (data.border != border) {
@@ -153,7 +157,7 @@ class HtmlTableValignBaseline extends SingleChildRenderObjectWidget {
   final int row;
 
   /// Creates a `valign=baseline` widget.
-  HtmlTableValignBaseline({
+  const HtmlTableValignBaseline({
     Widget? child,
     required this.companion,
     Key? key,
@@ -220,9 +224,14 @@ class _TableRenderObject extends RenderBox
         ContainerRenderObjectMixin<RenderBox, _TableCellData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _TableCellData> {
   _TableRenderObject(
-      this._border, this._borderCollapse, this._borderSpacing, this._companion);
+    this._border,
+    this._borderSpacing,
+    this._companion, {
+    required bool borderCollapse,
+  }) : _borderCollapse = borderCollapse;
 
   Border? _border;
+  // ignore: avoid_setters_without_getters
   set border(Border? v) {
     if (v == _border) return;
     _border = v;
@@ -230,6 +239,7 @@ class _TableRenderObject extends RenderBox
   }
 
   bool _borderCollapse;
+  // ignore: avoid_setters_without_getters
   set borderCollapse(bool v) {
     if (v == _borderCollapse) return;
     _borderCollapse = v;
@@ -237,6 +247,7 @@ class _TableRenderObject extends RenderBox
   }
 
   double _borderSpacing;
+  // ignore: avoid_setters_without_getters
   set borderSpacing(double v) {
     if (v == _borderSpacing) return;
     _borderSpacing = v;
@@ -244,6 +255,7 @@ class _TableRenderObject extends RenderBox
   }
 
   HtmlTableCompanion _companion;
+  // ignore: avoid_setters_without_getters
   set companion(HtmlTableCompanion v) {
     if (v == _companion) return;
     _companion = v;
@@ -276,7 +288,7 @@ class _TableRenderObject extends RenderBox
 
     var child = firstChild;
     while (child != null) {
-      final data = child.parentData as _TableCellData;
+      final data = child.parentData! as _TableCellData;
       // only compute cells in the first row
       if (data.rowStart != 0) continue;
 
@@ -317,7 +329,7 @@ class _TableRenderObject extends RenderBox
 
     var child = firstChild;
     while (child != null) {
-      final data = child.parentData as _TableCellData;
+      final data = child.parentData! as _TableCellData;
       final childOffset = data.offset + offset;
       final childSize = child.size;
       context.paintChild(child, childOffset);
@@ -366,7 +378,7 @@ class _TableRenderObject extends RenderBox
     var columnCount = 0;
     var rowCount = 0;
     while (child != null) {
-      final data = child.parentData as _TableCellData;
+      final data = child.parentData! as _TableCellData;
       children.add(child);
       cells.add(data);
 
@@ -465,6 +477,7 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
   _ValignBaselineRenderObject(this._companion, this._row);
 
   HtmlTableCompanion _companion;
+  // ignore: avoid_setters_without_getters
   set companion(HtmlTableCompanion v) {
     if (v == _companion) return;
     _companion = v;
@@ -472,6 +485,7 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
   }
 
   int _row;
+  // ignore: avoid_setters_without_getters
   set row(int v) {
     if (v == _row) return;
     _row = v;
@@ -487,12 +501,12 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    offset = offset.translate(0, _paddingTop);
+    final effectiveOffset = offset.translate(0, _paddingTop);
 
     final child = this.child;
     if (child == null) return;
 
-    final baselineWithOffset = _baselineWithOffset = offset.dy +
+    final baselineWithOffset = _baselineWithOffset = effectiveOffset.dy +
         (child.getDistanceToBaseline(TextBaseline.alphabetic) ?? 0.0);
 
     final siblings = _companion._baselines;
@@ -506,7 +520,7 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
         final offsetY = rowBaseline - baselineWithOffset;
         if (size.height - child.size.height >= offsetY) {
           // paint child with additional offset
-          context.paintChild(child, offset.translate(0, offsetY));
+          context.paintChild(child, effectiveOffset.translate(0, offsetY));
           return;
         } else {
           // skip painting this frame, wait for the correct padding
@@ -533,7 +547,7 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
       siblings[_row] = [this];
     }
 
-    context.paintChild(child, offset);
+    context.paintChild(child, effectiveOffset);
   }
 
   @override

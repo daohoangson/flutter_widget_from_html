@@ -8,13 +8,13 @@ void main() {
   group('BuildOp', () {
     group('defaultStyles', () {
       testWidgets('renders inline style normally', (tester) async {
-        final html = '<span style="color: #f00; color: #0f0;">Foo</span>';
+        const html = '<span style="color: #f00; color: #0f0;">Foo</span>';
         final explained = await explain(tester, html);
         expect(explained, equals('[RichText:(#FF00FF00:Foo)]'));
       });
 
       testWidgets('renders defaultStyles in reversed', (tester) async {
-        final html = '<span>Foo</span>';
+        const html = '<span>Foo</span>';
         final explained = await explain(tester, null,
             hw: HtmlWidget(
               html,
@@ -27,7 +27,7 @@ void main() {
 
     group('onTree', () {
       testWidgets('renders additional text', (tester) async {
-        final html = '<span>Foo</span>';
+        const html = '<span>Foo</span>';
         final explained = await explain(tester, null,
             hw: HtmlWidget(
               html,
@@ -38,7 +38,7 @@ void main() {
       });
 
       testWidgets('renders widget', (tester) async {
-        final html = '<span>Foo</span>';
+        const html = '<span>Foo</span>';
         final explained = await explain(tester, null,
             hw: HtmlWidget(
               html,
@@ -61,7 +61,7 @@ void main() {
 
     group('onWidgets', () {
       testWidgets('renders widget', (tester) async {
-        final html = '<span>Foo</span>';
+        const html = '<span>Foo</span>';
         final explained = await explain(tester, null,
             hw: HtmlWidget(
               html,
@@ -79,7 +79,7 @@ void main() {
     });
 
     group('priority', () {
-      final html = '<span>Foo</span>';
+      const html = '<span>Foo</span>';
 
       testWidgets('renders A first', (tester) async {
         final explained = await explain(tester, null,
@@ -128,7 +128,7 @@ class _BuildOpOnTreeWidget extends WidgetFactory {
   void parse(BuildMetadata meta) {
     meta.register(BuildOp(
         onTree: (_, tree) =>
-            tree.replaceWith(WidgetBit.inline(tree, Text('hi')))));
+            tree.replaceWith(WidgetBit.inline(tree, const Text('hi')))));
     return super.parse(meta);
   }
 }
@@ -136,7 +136,7 @@ class _BuildOpOnTreeWidget extends WidgetFactory {
 class _BuildOpOnWidgets extends WidgetFactory {
   @override
   void parse(BuildMetadata meta) {
-    meta.register(BuildOp(onWidgets: (_, __) => [Text('Hi')]));
+    meta.register(BuildOp(onWidgets: (_, __) => const [Text('Hi')]));
     return super.parse(meta);
   }
 }

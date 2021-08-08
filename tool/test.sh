@@ -32,6 +32,13 @@ if [ -z "$UPDATE_GOLDENS" ]; then
   )
 
   ( \
+    cd ./packages/fwfh_url_launcher \
+    && flutter pub get \
+    && flutter test "$@" \
+    && echo 'packages/fwfh_url_launcher OK' \
+  )
+
+  ( \
     cd ./packages/fwfh_webview \
     && flutter pub get \
     && flutter test "$@" \

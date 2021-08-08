@@ -15,7 +15,7 @@ const kGoldenFilePrefix = helper.kGoldenFilePrefix;
 
 final hwKey = helper.hwKey;
 
-final buildCurrentState = helper.buildCurrentState;
+const buildCurrentState = helper.buildCurrentState;
 
 String? _explainer(helper.Explainer parent, Widget widget) {
   return fwfh_cached_network_image.cachedNetworkImageExplainer(

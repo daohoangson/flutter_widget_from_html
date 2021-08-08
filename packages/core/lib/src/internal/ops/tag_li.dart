@@ -110,7 +110,7 @@ class _ListConfig {
   final bool markerReversed;
   final int? markerStart;
 
-  _ListConfig({
+  const _ListConfig({
     required this.listStyleType,
     required this.markerReversed,
     this.markerStart,

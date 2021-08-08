@@ -9,9 +9,10 @@ class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
 
   ColumnPlaceholder({
     required this.children,
+    Key? key,
     required this.meta,
     required this.wf,
-  }) : super(meta);
+  }) : super(meta, key: key);
 
   bool get isBody => _isBody[this] == true;
 
@@ -90,7 +91,7 @@ class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
   }
 
   Iterable<Widget> _getIterable(BuildContext context) sync* {
-    for (var child in children) {
+    for (final child in children) {
       if (child is ColumnPlaceholder) {
         for (final grandChild in child._buildWidgets(context)) {
           yield grandChild;

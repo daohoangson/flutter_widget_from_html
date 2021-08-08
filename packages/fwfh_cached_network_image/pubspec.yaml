@@ -22,5 +22,5 @@ dev_dependencies:
   file: any
   flutter_test:
     sdk: flutter
+  lint: any
   mocktail: any
-  pedantic: any

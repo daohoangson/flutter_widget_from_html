@@ -5185,11 +5185,13 @@ const kHtml = r'''
 ''';
 
 class HugeHtmlScreen extends StatelessWidget {
+  const HugeHtmlScreen({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('HugeHtmlScreen'),
-          actions: [
+          title: const Text('HugeHtmlScreen'),
+          actions: const [
             ShowPerfIconButton(),
           ],
         ),

@@ -30,6 +30,12 @@ extension DomElementExtension on dom.Element {
   }
 }
 
+/// An extension on [css.AngleTerm].
+extension CssAngleTermExtension on css.AngleTerm {
+  /// Returns [num] value.
+  num get angle => value as num;
+}
+
 /// An extension on [css.Declaration].
 extension CssDeclarationExtension on css.Declaration {
   static Expando<List<css.Expression>>? _expando;

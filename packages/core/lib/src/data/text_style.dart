@@ -29,7 +29,7 @@ class TextStyleHtml {
   /// The whitespace behavior.
   final CssWhitespace whitespace;
 
-  TextStyleHtml._({
+  const TextStyleHtml._({
     required Iterable<dynamic> deps,
     this.height,
     this.maxLines,
@@ -143,13 +143,15 @@ class TextStyleBuilder<T1> {
     }
 
     if (_output != null) return _output!;
+
+    // ignore: unnecessary_null_checks
     if (_builders == null) return _output = _parentOutput!;
 
     _output = _parentOutput?.copyWith(parent: _parentOutput);
     final l = _builders!.length;
     for (var i = 0; i < l; i++) {
       final builder = _builders![i];
-      _output = builder(_output, _inputs![i]);
+      _output = builder(_output, _inputs![i]) as TextStyleHtml;
       assert(_output?.parent == _parentOutput);
     }
 
@@ -187,5 +189,5 @@ class TextStyleBuilder<T1> {
 
   @override
   String toString() =>
-      'tsb#$hashCode' + (parent != null ? '(parent=#${parent.hashCode})' : '');
+      'tsb#$hashCode${parent != null ? '(parent=#${parent.hashCode})' : ''}';
 }

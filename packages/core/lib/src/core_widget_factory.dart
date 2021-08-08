@@ -4,15 +4,15 @@ import 'package:flutter/material.dart' show Theme, ThemeData, Tooltip;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+import 'core_data.dart';
+import 'core_helpers.dart';
+import 'core_html_widget.dart';
 import 'internal/core_ops.dart';
 import 'internal/core_parser.dart';
 import 'internal/flattener.dart';
 import 'internal/margin_vertical.dart';
 import 'internal/platform_specific/fallback.dart'
     if (dart.library.io) 'internal/platform_specific/io.dart';
-import 'core_data.dart';
-import 'core_helpers.dart';
-import 'core_html_widget.dart';
 
 /// A factory to build widgets.
 class WidgetFactory {
@@ -29,7 +29,7 @@ class WidgetFactory {
   BuildOp? _styleTextDecoration;
   BuildOp? _styleVerticalAlign;
   BuildOp? _tagA;
-  TextStyleHtml Function(TextStyleHtml, Null)? _tagAColor;
+  TextStyleHtml Function(TextStyleHtml, void)? _tagAColor;
   BuildOp? _tagBr;
   BuildOp? _tagFont;
   BuildOp? _tagHr;
@@ -571,7 +571,7 @@ class WidgetFactory {
       case 'acronym':
         meta.tsb.enqueue(
           TextStyleOps.textDeco,
-          TextDeco(style: TextDecorationStyle.dotted, under: true),
+          const TextDeco(style: TextDecorationStyle.dotted, under: true),
         );
         break;
 
@@ -668,7 +668,7 @@ class WidgetFactory {
       case 'del':
       case 's':
       case 'strike':
-        meta.tsb.enqueue(TextStyleOps.textDeco, TextDeco(strike: true));
+        meta.tsb.enqueue(TextStyleOps.textDeco, const TextDeco(strike: true));
         break;
 
       case kTagFont:
@@ -746,7 +746,7 @@ class WidgetFactory {
 
       case 'ins':
       case 'u':
-        meta.tsb.enqueue(TextStyleOps.textDeco, TextDeco(under: true));
+        meta.tsb.enqueue(TextStyleOps.textDeco, const TextDeco(under: true));
         break;
 
       case kTagOrderedList:

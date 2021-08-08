@@ -20,7 +20,7 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  pedantic: any
+  lint: any
   mocktail: any
 
 flutter:

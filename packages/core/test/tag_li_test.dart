@@ -26,17 +26,17 @@ String marker(String text) => text.startsWith('[HtmlListMarker.')
     ? text
     : '[RichText:maxLines=1,(:$text)]';
 
-void main() async {
+Future<void> main() async {
   await loadAppFonts();
 
   testWidgets('renders list with padding', (WidgetTester tester) async {
-    final html = '<ul><li>Foo</li></ul>';
+    const html = '<ul><li>Foo</li></ul>';
     final e = await explainMargin(tester, html);
     expect(e, equals('$sizedBox,${padding(item(disc, "Foo"))},$sizedBox'));
   });
 
   testWidgets('renders ordered list', (WidgetTester tester) async {
-    final html =
+    const html =
         '<ol><li>One</li><li>Two</li><li><strong>Three</strong></li></ol>';
     final explained = await explain(tester, html);
     expect(
@@ -49,7 +49,7 @@ void main() async {
   });
 
   testWidgets('renders unordered list', (WidgetTester tester) async {
-    final html = '<ul><li>One</li><li>Two</li><li><em>Three</em></li></ul>';
+    const html = '<ul><li>One</li><li>Two</li><li><em>Three</em></li></ul>';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -61,7 +61,7 @@ void main() async {
   });
 
   testWidgets('renders nested list', (WidgetTester tester) async {
-    final html = '''
+    const html = '''
 <ul>
   <li>One</li>
   <li>
@@ -103,7 +103,7 @@ void main() async {
   });
 
   testWidgets('renders nested list (single child)', (tester) async {
-    final html = '''
+    const html = '''
 <ul>
   <li>Foo</li>
   <li><ul><li>Bar</li></ul></li>
@@ -119,7 +119,7 @@ void main() async {
 
   group('OL reversed', () {
     testWidgets('renders 123 (default)', (WidgetTester tester) async {
-      final html = '<ol><li>x</li><li>x</li><li>x</li></ol>';
+      const html = '<ol><li>x</li><li>x</li><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -131,7 +131,7 @@ void main() async {
     });
 
     testWidgets('renders 321', (WidgetTester tester) async {
-      final html = '<ol reversed><li>x</li><li>x</li><li>x</li></ol>';
+      const html = '<ol reversed><li>x</li><li>x</li><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -143,7 +143,7 @@ void main() async {
     });
 
     testWidgets('renders from 99', (WidgetTester tester) async {
-      final html =
+      const html =
           '<ol reversed start="99"><li>x</li><li>x</li><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(
@@ -158,19 +158,19 @@ void main() async {
 
   group('OL start', () {
     testWidgets('renders from 1 (default)', (WidgetTester tester) async {
-      final html = '<ol><li>x</li></ol>';
+      const html = '<ol><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('1.', 'x'))));
     });
 
     testWidgets('renders from 99', (WidgetTester tester) async {
-      final html = '<ol start="99"><li>x</li></ol>';
+      const html = '<ol start="99"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('99.', 'x'))));
     });
 
     testWidgets('renders xyz', (WidgetTester tester) async {
-      final html =
+      const html =
           '<ol start="24" type="a"><li>x</li><li>x</li><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(
@@ -185,43 +185,43 @@ void main() async {
 
   group('OL type', () {
     testWidgets('renders 1 (default)', (WidgetTester tester) async {
-      final html = '<ol><li>x</li></ol>';
+      const html = '<ol><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('1.', 'x'))));
     });
 
     testWidgets('renders a (lower-alpha)', (WidgetTester tester) async {
-      final html = '<ol type="a"><li>x</li></ol>';
+      const html = '<ol type="a"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('a.', 'x'))));
     });
 
     testWidgets('renders A (upper-alpha)', (WidgetTester tester) async {
-      final html = '<ol type="A"><li>x</li></ol>';
+      const html = '<ol type="A"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('A.', 'x'))));
     });
 
     testWidgets('renders i (lower-roman)', (WidgetTester tester) async {
-      final html = '<ol type="i"><li>x</li></ol>';
+      const html = '<ol type="i"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('i.', 'x'))));
     });
 
     testWidgets('renders I (upper-roman)', (WidgetTester tester) async {
-      final html = '<ol type="I"><li>x</li></ol>';
+      const html = '<ol type="I"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('I.', 'x'))));
     });
 
     testWidgets('renders 1 (decimal)', (WidgetTester tester) async {
-      final html = '<ol type="1"><li>x</li></ol>';
+      const html = '<ol type="1"><li>x</li></ol>';
       final explained = await explain(tester, html);
       expect(explained, equals(padding(item('1.', 'x'))));
     });
 
     testWidgets('renders LI type', (WidgetTester tester) async {
-      final html = '''
+      const html = '''
 <ol type="a">
   <li type="1">decimal</li>
   <li type="i">lower-roman</li>
@@ -242,31 +242,31 @@ void main() async {
   group('inline style', () {
     group('list-style-type', () {
       testWidgets('renders disc (default for UL)', (WidgetTester tester) async {
-        final html = '<ul><li>Foo</li></ul>';
+        const html = '<ul><li>Foo</li></ul>';
         final explained = await explain(tester, html);
         expect(explained, equals(padding(item(disc, 'Foo'))));
       });
 
       testWidgets('renders disc (OL)', (WidgetTester tester) async {
-        final html = '<ol style="list-style-type: disc"><li>Foo</li></ol>';
+        const html = '<ol style="list-style-type: disc"><li>Foo</li></ol>';
         final explained = await explain(tester, html);
         expect(explained, equals(padding(item(disc, 'Foo'))));
       });
 
       testWidgets('renders circle', (WidgetTester tester) async {
-        final html = '<ul style="list-style-type: circle"><li>Foo</li></ul>';
+        const html = '<ul style="list-style-type: circle"><li>Foo</li></ul>';
         final explained = await explain(tester, html);
         expect(explained, equals(padding(item(circle, 'Foo'))));
       });
 
       testWidgets('renders square', (WidgetTester tester) async {
-        final html = '<ul style="list-style-type: square"><li>Foo</li></ul>';
+        const html = '<ul style="list-style-type: square"><li>Foo</li></ul>';
         final explained = await explain(tester, html);
         expect(explained, equals(padding(item(square, 'Foo'))));
       });
 
       testWidgets('renders LI list-style-type', (WidgetTester tester) async {
-        final html = '''
+        const html = '''
 <ul style="list-style-type: circle">
   <li style="list-style-type: disc"">disc</li>
   <li style="list-style-type: square">square</li>
@@ -285,7 +285,7 @@ void main() async {
 
       group('serial', () {
         testWidgets('renders decimal (default for OL)', (tester) async {
-          final html = '<ol><li>x</li><li>x</li><li>x</li></ol>';
+          const html = '<ol><li>x</li><li>x</li><li>x</li></ol>';
           final explained = await explain(tester, html);
           expect(
               explained,
@@ -497,7 +497,7 @@ void main() async {
 
     group('padding-inline-start', () {
       testWidgets('renders 99px', (WidgetTester tester) async {
-        final html = '<ul style="padding-inline-start: 99px"><li>Foo</li></ul>';
+        const html = '<ul style="padding-inline-start: 99px"><li>Foo</li></ul>';
         final explained = await explain(tester, html);
         expect(
             explained,
@@ -508,7 +508,7 @@ void main() async {
 
       testWidgets('renders LI padding-inline-start', (tester) async {
         // TODO: doesn't match browser output
-        final html = '''
+        const html = '''
 <ul style="padding-inline-start: 99px">
   <li style="padding-inline-start: 199px">199px</li>
   <li style="padding-inline-start: 299px">299px</li>
@@ -529,7 +529,7 @@ void main() async {
 
   group('error handling', () {
     testWidgets('standalone UL', (WidgetTester tester) async {
-      final html = '<ul>Foo</ul>';
+      const html = '<ul>Foo</ul>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -538,7 +538,7 @@ void main() async {
     });
 
     testWidgets('standalone OL', (WidgetTester tester) async {
-      final html = '<ol>Foo</ol>';
+      const html = '<ol>Foo</ol>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -548,13 +548,13 @@ void main() async {
 
     testWidgets('standalone LI', (WidgetTester tester) async {
       // TODO: doesn't match browser output
-      final html = '<li>Foo</li>';
+      const html = '<li>Foo</li>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
     testWidgets('LI within LI', (WidgetTester tester) async {
-      final html = '<ol><li><li>Foo</li></li></ol>';
+      const html = '<ol><li><li>Foo</li></li></ol>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -565,7 +565,7 @@ void main() async {
     });
 
     testWidgets('UL is direct child of UL', (WidgetTester tester) async {
-      final html = '''
+      const html = '''
 <ul>
   <li>One</li>
   <ul>
@@ -586,7 +586,8 @@ void main() async {
     });
 
     testWidgets('#112: LI has empty A', (WidgetTester tester) async {
-      final html = '''<ol>
+      const html = '''
+<ol>
   <li>One</li>
   <li><a href="https://flutter.dev"></a></li>
   <li>Three</li>
@@ -615,7 +616,7 @@ void main() async {
   });
 
   group('rtl', () {
-    final html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li></ol>';
+    const html = '<ol><li>One</li><li>Two</li><li><b>Three</b></li></ol>';
 
     testWidgets('renders ordered list', (WidgetTester tester) async {
       final explained = await explain(tester, null,
@@ -647,7 +648,7 @@ void main() async {
     });
 
     testWidgets('renders within dir attribute', (tester) async {
-      final _dirRtl = '<div dir="rtl">$html</div>';
+      const _dirRtl = '<div dir="rtl">$html</div>';
       final explained = await explain(tester, _dirRtl, useExplainer: false);
       expect(explained, contains('HtmlListItem(textDirection: rtl)'));
     });
@@ -655,9 +656,9 @@ void main() async {
 
   group('HtmlListItem', () {
     testWidgets('updates textDirection', (tester) async {
-      final html = '<ul><li>Foo</li></ul>';
+      const html = '<ul><li>Foo</li></ul>';
 
-      final ltr = await explain(tester, html, rtl: false, useExplainer: false);
+      final ltr = await explain(tester, html, useExplainer: false);
       expect(ltr, contains('HtmlListItem()'));
 
       final rtl = await explain(tester, html, rtl: true, useExplainer: false);
@@ -676,9 +677,19 @@ void main() async {
       await tester.pumpAndSettle();
 
       final childRenderBox =
-          child.currentContext!.findRenderObject() as RenderBox;
+          child.currentContext!.findRenderObject() as RenderBox?;
       final listItemRenderBox =
-          listItem.currentContext!.findRenderObject() as RenderBox;
+          listItem.currentContext!.findRenderObject() as RenderBox?;
+
+      if (childRenderBox == null) {
+        expect(childRenderBox, isNotNull);
+        return;
+      }
+      if (listItemRenderBox == null) {
+        expect(listItemRenderBox, isNotNull);
+        return;
+      }
+
       expect(listItemRenderBox.getMaxIntrinsicHeight(100),
           equals(childRenderBox.getMaxIntrinsicHeight(100)));
       expect(listItemRenderBox.getMaxIntrinsicWidth(100),
@@ -703,7 +714,7 @@ void main() async {
     GoldenToolkit.runWithConfiguration(
       () {
         group('baseline calculation', () {
-          final assetName = 'test/images/logo.png';
+          const assetName = 'test/images/logo.png';
           final testCases = <String, String>{
             'img_block':
                 '<img src="asset:$assetName" style="display: block; height: 30px;" />',
@@ -732,7 +743,7 @@ void main() async {
               await tester.pumpWidgetBuilder(
                 _Golden(testCase.value),
                 wrapper: materialAppWrapper(theme: ThemeData.light()),
-                surfaceSize: Size(600, 400),
+                surfaceSize: const Size(600, 400),
               );
 
               await screenMatchesGolden(tester, testCase.key);
@@ -742,9 +753,9 @@ void main() async {
 
         testGoldens('computeDryLayout', (tester) async {
           await tester.pumpWidgetBuilder(
-            Scaffold(
+            const Scaffold(
               body: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(8.0),
                 child: HtmlWidget(
                     '<div style="background: black; color: white; width: 200px; height: 200px">'
                     '<ul><li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li></ul>'
@@ -752,7 +763,7 @@ void main() async {
               ),
             ),
             wrapper: materialAppWrapper(theme: ThemeData.light()),
-            surfaceSize: Size(600, 400),
+            surfaceSize: const Size(600, 400),
           );
 
           await screenMatchesGolden(tester, 'computeDryLayout');
@@ -812,7 +823,7 @@ class _Golden extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(contents),
-              Divider(),
+              const Divider(),
               Builder(
                 builder: (context) => Text(
                   'UL:\n',
@@ -826,7 +837,7 @@ class _Golden extends StatelessWidget {
   <li>Below</li>
 </ul>
 '''),
-              Divider(),
+              const Divider(),
               Builder(
                 builder: (context) => Text(
                   'OL:\n',

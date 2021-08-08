@@ -3,11 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import '_.dart';
 
 void main() {
-  final sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
-  final src = 'http://domain.com/transparent.gif';
+  const sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
+  const src = 'http://domain.com/transparent.gif';
 
   testWidgets('renders CachedNetworkImage', (WidgetTester tester) async {
-    final html = '<img src="$src" />';
+    const html = '<img src="$src" />';
     final explained = await explain(tester, html);
     expect(
       explained,
@@ -18,9 +18,9 @@ void main() {
   });
 
   testWidgets('renders Image for data uri', (WidgetTester tester) async {
-    final html = '<img src="$kDataUri" />';
+    const html = '<img src="$kDataUri" />';
     final explained = (await explain(tester, html))
-        .replaceAll(RegExp(r'Uint8List#[0-9a-f]+,'), 'bytes,');
+        .replaceAll(RegExp('Uint8List#[0-9a-f]+,'), 'bytes,');
     expect(
         explained,
         equals('[CssSizing:$sizingConstraints,child='
@@ -29,7 +29,7 @@ void main() {
   });
 
   testWidgets('renders progress indicator', (WidgetTester tester) async {
-    final html = '<img src="${src}yolo" />';
+    const html = '<img src="${src}yolo" />';
     final explained = await explain(
       tester,
       html,
@@ -39,13 +39,13 @@ void main() {
   });
 
   testWidgets('renders raw image', (WidgetTester tester) async {
-    final html = '<img src="$src" />';
+    const html = '<img src="$src" />';
     final explained = await explain(tester, html, useExplainer: false);
     expect(explained, contains('RawImage'));
   });
 
   testWidgets('handles error', (WidgetTester tester) async {
-    final html = '<img src="http://domain.com/error.jpg" />';
+    const html = '<img src="http://domain.com/error.jpg" />';
     final explained = await explain(tester, html, useExplainer: false);
     expect(explained, contains('Text("❌")'));
   });

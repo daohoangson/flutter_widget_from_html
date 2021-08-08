@@ -11,7 +11,7 @@ import 'package:mocktail/mocktail.dart';
 
 import '../../core/test/_.dart' as helper;
 
-final kDataUri = helper.kDataUri;
+const kDataUri = helper.kDataUri;
 
 String? cachedNetworkImageExplainer(helper.Explainer parent, Widget widget) {
   if (widget is CachedNetworkImage) {

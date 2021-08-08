@@ -143,8 +143,11 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   final Widget? _firstChild;
 
   /// Creates a widget builder.
-  WidgetPlaceholder(this.generator, {Widget? child}) : _firstChild = child;
+  WidgetPlaceholder(this.generator, {Widget? child, Key? key})
+      : _firstChild = child,
+        super(key: key);
 
+  @visibleForTesting
   @override
   Widget build(BuildContext context) => callBuilders(context, _firstChild);
 
@@ -179,7 +182,7 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
       generator != null
           ? 'WidgetPlaceholder($generator)'
-          : runtimeType.toString();
+          : objectRuntimeType(this, 'WidgetPlaceholder');
 
   /// Creates a placeholder lazily.
   ///
@@ -189,7 +192,7 @@ class WidgetPlaceholder<T> extends StatelessWidget {
       : WidgetPlaceholder<Widget>(child, child: child);
 }
 
-final _dataUriRegExp = RegExp(r'^data:[^;]+;([^,]+),');
+final _dataUriRegExp = RegExp('^data:[^;]+;([^,]+),');
 
 /// Returns [Uint8List] by decoding [dataUri].
 ///

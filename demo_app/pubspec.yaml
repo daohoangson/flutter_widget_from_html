@@ -22,6 +22,9 @@ dependencies:
   url_launcher: any
 
 dependency_overrides:
+  archive: ^3.0.0
+  crypto: ^3.0.0
+  file: ^6.0.0
   flutter_widget_from_html:
     path: ../packages/enhanced
   flutter_widget_from_html_core:
@@ -36,9 +39,6 @@ dependency_overrides:
     path: ../packages/fwfh_url_launcher
   fwfh_webview:
     path: ../packages/fwfh_webview
-  archive: ^3.0.0
-  crypto: ^3.0.0
-  file: ^6.0.0
   uuid: ^3.0.0
 
 dev_dependencies:
@@ -47,7 +47,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   golden_toolkit: any
-  pedantic: any
+  lint: any
   test: any
 
 flutter:

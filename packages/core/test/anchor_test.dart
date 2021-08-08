@@ -10,24 +10,24 @@ import '_.dart';
 
 final _onTapAnchorResults = <String, bool>{};
 
-void main() async {
+Future<void> main() async {
   await loadAppFonts();
 
   group('build tests', () {
     testWidgets('renders A[name]', (WidgetTester tester) async {
-      final html = '<a name="foo"></a>Foo';
+      const html = '<a name="foo"></a>Foo';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:[SizedBox#foo:0.0x10.0](:Foo))]'));
     });
 
     testWidgets('renders SPAN[id]', (WidgetTester tester) async {
-      final html = '<span id="foo">Foo</span>';
+      const html = '<span id="foo">Foo</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:[SizedBox#foo:0.0x10.0](:Foo))]'));
     });
 
     testWidgets('renders DIV[id]', (WidgetTester tester) async {
-      final html = '<div id="foo">Foo</div>';
+      const html = '<div id="foo">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -38,13 +38,13 @@ void main() async {
     });
 
     testWidgets('renders SUP[id]', (WidgetTester tester) async {
-      final html = '<sup id="foo">Foo</sup>';
+      const html = '<sup id="foo">Foo</sup>';
       final explained = await explain(tester, html);
       expect(explained, contains('[SizedBox#foo'));
     });
 
     testWidgets('renders in ListView', (WidgetTester tester) async {
-      final html = '<a name="foo"></a>Foo';
+      const html = '<a name="foo"></a>Foo';
       final explained = await explain(
         tester,
         null,
@@ -60,7 +60,7 @@ void main() async {
     });
 
     testWidgets('renders in SliverList', (WidgetTester tester) async {
-      final html = '<a name="foo"></a>Foo';
+      const html = '<a name="foo"></a>Foo';
       final explained = await explain(
         tester,
         null,
@@ -81,7 +81,7 @@ void main() async {
   group('tap tests', () {
     testWidgets('skips unknown id', (WidgetTester tester) async {
       await tester.pumpWidgetBuilder(
-        _ColumnTestApp(html: '<a href="#foo">Tap me</a>'),
+        const _ColumnTestApp(html: '<a href="#foo">Tap me</a>'),
       );
 
       expect(await tapText(tester, 'Tap me'), equals(1));
@@ -92,8 +92,8 @@ void main() async {
     group('scrolls', () {
       testWidgets('Column', (WidgetTester tester) async {
         await tester.pumpWidgetBuilder(
-          _ColumnTestApp(),
-          surfaceSize: Size(200, 200),
+          const _ColumnTestApp(),
+          surfaceSize: const Size(200, 200),
         );
 
         expect(await tapText(tester, 'Scroll down'), equals(1));
@@ -103,8 +103,8 @@ void main() async {
 
       testWidgets('ListView', (WidgetTester tester) async {
         await tester.pumpWidgetBuilder(
-          _ListViewTestApp(),
-          surfaceSize: Size(200, 200),
+          const _ListViewTestApp(),
+          surfaceSize: const Size(200, 200),
         );
 
         expect(await tapText(tester, 'Scroll down'), equals(1));
@@ -116,7 +116,7 @@ void main() async {
         final keyBottom = GlobalKey();
         await tester.pumpWidgetBuilder(
           _SliverListTestApp(keyBottom: keyBottom),
-          surfaceSize: Size(200, 200),
+          surfaceSize: const Size(200, 200),
         );
 
         await tester.scrollUntilVisible(find.byKey(keyBottom), 100);
@@ -135,7 +135,7 @@ void main() async {
                 '${htmlAsc * 3}'
                 '<div id="div">Foo</div>',
           ),
-          surfaceSize: Size(200, 200),
+          surfaceSize: const Size(200, 200),
         );
 
         expect(await tapText(tester, 'Tap me'), equals(1));
@@ -150,7 +150,7 @@ void main() async {
                 '${htmlAsc * 10}'
                 '<span id="span">Foo</span>',
           ),
-          surfaceSize: Size(200, 200),
+          surfaceSize: const Size(200, 200),
         );
 
         expect(await tapText(tester, 'Tap me'), equals(1));
@@ -167,7 +167,7 @@ void main() async {
                 '${htmlAsc * 3}'
                 '<span id="span">Foo</span>',
           ),
-          surfaceSize: Size(200, 200),
+          surfaceSize: const Size(200, 200),
         );
 
         expect(await tapText(tester, 'Tap me'), equals(1));
@@ -185,7 +185,7 @@ void main() async {
                 '<div id="div">YOLO</div>'
                 '${htmlAsc * 3}',
           ),
-          surfaceSize: Size(200, 200),
+          surfaceSize: const Size(200, 200),
         );
 
         expect(await tapText(tester, 'Tap me'), equals(1));
@@ -205,7 +205,7 @@ void main() async {
                 '<div id="div">YOLO</div>'
                 '${htmlAsc * 3}',
           ),
-          surfaceSize: Size(200, 200),
+          surfaceSize: const Size(200, 200),
         );
 
         expect(await tapText(tester, 'Tap me'), equals(1));
@@ -225,7 +225,7 @@ void main() async {
                 '${htmlAsc * 10}'
                 '<span id="span2">Foo</span>',
           ),
-          surfaceSize: Size(200, 200),
+          surfaceSize: const Size(200, 200),
         );
 
         expect(await tapText(tester, 'Tap me 1'), equals(1));
@@ -244,7 +244,7 @@ void main() async {
                 '${htmlAsc * 10}'
                 '<p style="display: none">Foo <span id="span">bar</span>.</p>',
           ),
-          surfaceSize: Size(200, 200),
+          surfaceSize: const Size(200, 200),
         );
 
         expect(await tapText(tester, 'Tap me'), equals(1));
@@ -260,9 +260,9 @@ void main() async {
       group('tap test', () {
         testGoldens('scrolls down', (WidgetTester tester) async {
           await tester.pumpWidgetBuilder(
-            _ColumnTestApp(),
+            const _ColumnTestApp(),
             wrapper: materialAppWrapper(theme: ThemeData.light()),
-            surfaceSize: Size(200, 200),
+            surfaceSize: const Size(200, 200),
           );
           await screenMatchesGolden(tester, 'down/top');
 
@@ -276,7 +276,7 @@ void main() async {
           await tester.pumpWidgetBuilder(
             _ColumnTestApp(keyBottom: keyBottom),
             wrapper: materialAppWrapper(theme: ThemeData.light()),
-            surfaceSize: Size(200, 200),
+            surfaceSize: const Size(200, 200),
           );
 
           await tester.ensureVisible(find.byKey(keyBottom));
@@ -290,9 +290,9 @@ void main() async {
 
         testGoldens('ListView scrolls down', (WidgetTester tester) async {
           await tester.pumpWidgetBuilder(
-            _ListViewTestApp(),
+            const _ListViewTestApp(),
             wrapper: materialAppWrapper(theme: ThemeData.light()),
-            surfaceSize: Size(200, 200),
+            surfaceSize: const Size(200, 200),
           );
           await screenMatchesGolden(tester, 'listview/down/top');
 
@@ -306,7 +306,7 @@ void main() async {
           await tester.pumpWidgetBuilder(
             _SliverListTestApp(keyBottom: keyBottom),
             wrapper: materialAppWrapper(theme: ThemeData.light()),
-            surfaceSize: Size(200, 200),
+            surfaceSize: const Size(200, 200),
           );
 
           await tester.scrollUntilVisible(find.byKey(keyBottom), 100);
@@ -325,7 +325,8 @@ void main() async {
   );
 }
 
-final htmlAsc = '''<p>1</p>
+const htmlAsc = '''
+<p>1</p>
 <p>12</p>
 <p>123</p>
 <p>1234</p>
@@ -336,7 +337,8 @@ final htmlAsc = '''<p>1</p>
 <p>123456789</p>
 <p>1234567890</p>''';
 
-final htmlDesc = '''<p>1234567890</p>
+const htmlDesc = '''
+<p>1234567890</p>
 <p>123456789</p>
 <p>12345678</p>
 <p>1234567</p>
@@ -359,7 +361,7 @@ class _ColumnTestApp extends StatelessWidget {
   final String? html;
   final Key? keyBottom;
 
-  _ColumnTestApp({this.html, Key? key, this.keyBottom}) : super(key: key);
+  const _ColumnTestApp({this.html, Key? key, this.keyBottom}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => Scaffold(
@@ -380,7 +382,7 @@ class _ColumnTestApp extends StatelessWidget {
 class _ListViewTestApp extends StatelessWidget {
   final String? html;
 
-  _ListViewTestApp({this.html, Key? key}) : super(key: key);
+  const _ListViewTestApp({this.html, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => Scaffold(
@@ -396,7 +398,8 @@ class _SliverListTestApp extends StatelessWidget {
   final String? html;
   final Key? keyBottom;
 
-  _SliverListTestApp({this.html, Key? key, this.keyBottom}) : super(key: key);
+  const _SliverListTestApp({this.html, Key? key, this.keyBottom})
+      : super(key: key);
 
   @override
   Widget build(BuildContext _) => Scaffold(

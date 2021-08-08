@@ -139,9 +139,11 @@ const kHtml = '''
 ''';
 
 class HelloWorldScreen extends StatelessWidget {
+  const HelloWorldScreen({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text('HelloWorldScreen')),
+        appBar: AppBar(title: const Text('HelloWorldScreen')),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(8.0),

@@ -73,7 +73,7 @@ class _ListItemRenderObject extends RenderBox
   Size computeDryLayout(BoxConstraints constraints) {
     final child = firstChild!;
     final childConstraints = constraints;
-    final childData = child.parentData as _ListItemData;
+    final childData = child.parentData! as _ListItemData;
     final childSize = child.getDryLayout(childConstraints);
 
     final marker = childData.nextSibling!;
@@ -98,13 +98,13 @@ class _ListItemRenderObject extends RenderBox
   void performLayout() {
     final child = firstChild!;
     final childConstraints = constraints;
-    final childData = child.parentData as _ListItemData;
+    final childData = child.parentData! as _ListItemData;
     child.layout(childConstraints, parentUsesSize: true);
     final childSize = child.size;
 
     final marker = childData.nextSibling!;
     final markerConstraints = childConstraints.loosen();
-    final markerData = marker.parentData as _ListItemData;
+    final markerData = marker.parentData! as _ListItemData;
     marker.layout(markerConstraints, parentUsesSize: true);
     final markerSize = marker.size;
 
@@ -113,7 +113,7 @@ class _ListItemRenderObject extends RenderBox
       childSize.height > 0 ? childSize.height : markerSize.height,
     ));
 
-    final baseline = TextBaseline.alphabetic;
+    const baseline = TextBaseline.alphabetic;
     final markerDistance =
         marker.getDistanceToBaseline(baseline, onlyReal: true) ??
             markerSize.height;

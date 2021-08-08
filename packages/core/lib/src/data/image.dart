@@ -33,7 +33,7 @@ class ImageSource {
   final double? width;
 
   /// Creates a source.
-  ImageSource(this.url, {this.height, this.width});
+  const ImageSource(this.url, {this.height, this.width});
 
   /// The parent [ImageMetadata].
   ImageMetadata? get image => _imageMetas[this];
