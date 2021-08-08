@@ -5,7 +5,7 @@ import '../core_data.dart';
 class TshWidget extends InheritedWidget {
   final TextStyleHtml? tsh;
 
-  TshWidget({
+  const TshWidget({
     Key? key,
     required Widget child,
     required this.tsh,

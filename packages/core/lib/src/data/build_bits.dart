@@ -86,8 +86,8 @@ abstract class BuildBit<InputType, OutputType> {
   /// Supported input types:
   /// - [BuildContext] (output must be `Widget`)
   /// - [GestureRecognizer]
-  /// - [Null]
   /// - [TextStyleHtml] (output must be `InlineSpan`)
+  /// - [void]
   ///
   /// Supported output types:
   /// - [BuildTree]
@@ -137,7 +137,7 @@ abstract class BuildBit<InputType, OutputType> {
 }
 
 /// A tree of [BuildBit]s.
-abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
+abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
   final _children = <BuildBit>[];
   final _toStringBuffer = StringBuffer();
 
@@ -208,7 +208,7 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
   Iterable<WidgetPlaceholder> build();
 
   @override
-  Iterable<WidgetPlaceholder> buildBit(Null _) => build();
+  Iterable<WidgetPlaceholder> buildBit(void _) => build();
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) {
@@ -253,7 +253,7 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
 }
 
 /// A simple text bit.
-class TextBit extends BuildBit<Null, String> {
+class TextBit extends BuildBit<void, String> {
   final String data;
 
   /// Creates with string.
@@ -261,7 +261,7 @@ class TextBit extends BuildBit<Null, String> {
       : super(parent, tsb ?? parent.tsb);
 
   @override
-  String buildBit(Null _) => data;
+  String buildBit(void _) => data;
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
@@ -272,7 +272,7 @@ class TextBit extends BuildBit<Null, String> {
 }
 
 /// A widget bit.
-class WidgetBit extends BuildBit<Null, dynamic> {
+class WidgetBit extends BuildBit<void, dynamic> {
   /// See [PlaceholderSpan.alignment].
   final PlaceholderAlignment? alignment;
 
@@ -313,7 +313,7 @@ class WidgetBit extends BuildBit<Null, dynamic> {
   bool get isInline => alignment != null && baseline != null;
 
   @override
-  dynamic buildBit(Null _) => isInline
+  dynamic buildBit(void _) => isInline
       ? WidgetSpan(
           alignment: alignment!,
           baseline: baseline,
@@ -331,7 +331,7 @@ class WidgetBit extends BuildBit<Null, dynamic> {
 }
 
 /// A whitespace bit.
-class WhitespaceBit extends BuildBit<Null, String> {
+class WhitespaceBit extends BuildBit<void, String> {
   final String data;
 
   /// Creates a whitespace.
@@ -342,17 +342,17 @@ class WhitespaceBit extends BuildBit<Null, String> {
   bool get swallowWhitespace => true;
 
   @override
-  String buildBit(Null _) => data;
+  String buildBit(void _) => data;
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       WhitespaceBit(parent ?? this.parent!, data, tsb: tsb ?? this.tsb);
 
   @override
-  String toString() => 'Whitespace[' + data.codeUnits.join(' ') + ']#$hashCode';
+  String toString() => 'Whitespace[${data.codeUnits.join(' ')}]#$hashCode';
 }
 
-class _SwallowWhitespaceBit extends BuildBit<Null, String> {
+class _SwallowWhitespaceBit extends BuildBit<void, String> {
   final int charCode;
 
   _SwallowWhitespaceBit(BuildTree parent, this.charCode,
@@ -363,7 +363,7 @@ class _SwallowWhitespaceBit extends BuildBit<Null, String> {
   bool get swallowWhitespace => true;
 
   @override
-  String buildBit(Null _) => String.fromCharCode(charCode);
+  String buildBit(void _) => String.fromCharCode(charCode);
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>

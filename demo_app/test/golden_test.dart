@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 
 void _test(String name, String html) => testGoldens(name, (tester) async {
-      final platform = TargetPlatform.linux;
+      const platform = TargetPlatform.linux;
       debugDefaultTargetPlatformOverride = platform;
       final key = UniqueKey();
 
@@ -18,7 +18,7 @@ void _test(String name, String html) => testGoldens(name, (tester) async {
           platform: platform,
           theme: ThemeData.light(),
         ),
-        surfaceSize: Size(400, 1200),
+        surfaceSize: const Size(400, 1200),
       );
 
       await screenMatchesGolden(tester, name, finder: find.byKey(key));
@@ -27,6 +27,8 @@ void _test(String name, String html) => testGoldens(name, (tester) async {
 
 void main() {
   final json = File('test/goldens.json').readAsStringSync();
-  final map = jsonDecode(json) as Map;
-  map.entries.forEach((entry) => _test(entry.key, entry.value));
+  final map = jsonDecode(json) as Map<String, dynamic>;
+  for (final entry in map.entries) {
+    _test(entry.key, entry.value as String);
+  }
 }

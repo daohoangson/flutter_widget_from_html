@@ -37,7 +37,7 @@ class VideoPlayer extends StatefulWidget {
   final Widget? poster;
 
   /// Creates a player.
-  VideoPlayer(
+  const VideoPlayer(
     this.url, {
     required this.aspectRatio,
     this.autoResize = true,
@@ -50,6 +50,7 @@ class VideoPlayer extends StatefulWidget {
 
   @override
   State<VideoPlayer> createState() =>
+      // ignore: no_logic_in_create_state
       defaultTargetPlatform == TargetPlatform.android ||
               defaultTargetPlatform == TargetPlatform.iOS ||
               kIsWeb
@@ -58,9 +59,8 @@ class VideoPlayer extends StatefulWidget {
 }
 
 class _VideoPlayerState extends State<VideoPlayer> {
-  var hasError = false;
-
   lib.ChewieController? _controller;
+  var _hasError = false;
   lib.VideoPlayerController? _vpc;
 
   Widget? get placeholder =>
@@ -89,7 +89,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
     late Widget child;
     if (_controller != null) {
       child = lib.Chewie(controller: _controller!);
-    } else if (hasError) {
+    } else if (_hasError) {
       child = const Center(child: Text('❌'));
     } else {
       child = placeholder ?? const CircularProgressIndicator.adaptive();
@@ -105,9 +105,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
     final vpc = _vpc = lib.VideoPlayerController.network(widget.url);
     try {
       await vpc.initialize();
-    } catch (error) {
-      print('Video initialize error: $error');
-      setState(() => hasError = true);
+    } catch (_) {
+      setState(() => _hasError = true);
       return;
     }
 

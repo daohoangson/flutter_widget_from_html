@@ -9,20 +9,21 @@ import '_.dart' as helper;
 final svgBytes = utf8.encode('<svg viewBox="0 0 1 1"></svg>');
 
 void main() {
-  final sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
+  const sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
 
   setUpAll(() {
     registerFallbackValue<Uri>(Uri());
   });
 
   testWidgets('renders SVG tag', (WidgetTester tester) async {
-    final html = '''<svg height="100" width="100">
+    const html = '''
+<svg height="100" width="100">
   <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
   Your browser does not support inline SVG.
 </svg>''';
     final explained = await helper.explain(tester, html);
     expect(
-      explained.replaceAll(RegExp(r'String#[^,]+,'), 'String,'),
+      explained.replaceAll(RegExp('String#[^,]+,'), 'String,'),
       equals(
           '[SvgPicture:pictureProvider=StringPicture(String, colorFilter: null)]'),
     );
@@ -30,8 +31,8 @@ void main() {
 
   group('IMG', () {
     testWidgets('renders asset picture', (WidgetTester tester) async {
-      final assetName = 'test/images/logo.svg';
-      final html = '<img src="asset:$assetName" />';
+      const assetName = 'test/images/logo.svg';
+      const html = '<img src="asset:$assetName" />';
       final explained = await helper.explain(tester, html);
       expect(
         explained,
@@ -56,12 +57,12 @@ void main() {
     });
 
     group('MemoryPicture', () {
-      final explain = (WidgetTester tester, String html) => helper
+      Future<String> explain(WidgetTester tester, String html) => helper
           .explain(tester, html)
           .then((e) => e.replaceAll(RegExp(r'\(Uint8List#.+\)'), '(bytes)'));
 
       testWidgets('renders bad data uri', (WidgetTester tester) async {
-        final html = '<img src="data:image/svg+xml;xxx" />';
+        const html = '<img src="data:image/svg+xml;xxx" />';
         final explained = await explain(tester, html);
         expect(explained, equals('[widget0]'));
       });
@@ -78,8 +79,8 @@ void main() {
       });
 
       testWidgets('renders utf8', (WidgetTester tester) async {
-        final utf8 = '&lt;svg viewBox=&quot;0 0 1 1&quot;&gt;&lt;/svg&gt;';
-        final html = '<img src="data:image/svg+xml;utf8,$utf8" />';
+        const utf8 = '&lt;svg viewBox=&quot;0 0 1 1&quot;&gt;&lt;/svg&gt;';
+        const html = '<img src="data:image/svg+xml;utf8,$utf8" />';
         final explained = await explain(tester, html);
         expect(
             explained,
@@ -90,8 +91,8 @@ void main() {
     });
 
     testWidgets('renders network picture', (WidgetTester tester) async {
-      final src = 'http://domain.com/image.svg';
-      final html = '<img src="$src" />';
+      const src = 'http://domain.com/image.svg';
+      const html = '<img src="$src" />';
       final explained = await HttpOverrides.runZoned(
         () => helper.explain(tester, html),
         createHttpClient: (_) => _createMockSvgImageHttpClient(),
@@ -109,6 +110,7 @@ void main() {
 
 class _MockHttpClient extends Mock implements HttpClient {
   @override
+  // ignore: avoid_setters_without_getters
   set autoUncompress(bool _autoUncompress) {}
 }
 

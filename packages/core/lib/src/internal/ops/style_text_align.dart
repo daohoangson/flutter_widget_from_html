@@ -34,14 +34,12 @@ class StyleTextAlign {
       case kCssTextAlignJustify:
       case kCssTextAlignLeft:
       case kCssTextAlignRight:
-        widgets = widgets
+        return widgets
             .map((child) => WidgetPlaceholder.lazy(child).wrapWith(_block));
-        break;
       case kCssTextAlignMozCenter:
       case kCssTextAlignWebkitCenter:
-        widgets = widgets
+        return widgets
             .map((child) => WidgetPlaceholder.lazy(child).wrapWith(_center));
-        break;
     }
 
     return widgets;
@@ -84,10 +82,11 @@ class StyleTextAlign {
 }
 
 class _TextAlignBlock extends CssBlock {
-  _TextAlignBlock(Widget child, {Key? key}) : super(child: child, key: key);
+  const _TextAlignBlock(Widget child, {Key? key})
+      : super(child: child, key: key);
 }
 
 class _TextAlignCenter extends Center {
-  _TextAlignCenter(Widget child, {Key? key})
+  const _TextAlignCenter(Widget child, {Key? key})
       : super(child: child, heightFactor: 1.0, key: key);
 }

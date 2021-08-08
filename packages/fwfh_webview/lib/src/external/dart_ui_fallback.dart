@@ -1,3 +1,4 @@
+// ignore: camel_case_types
 class platformViewRegistry {
   /// TODO: remove this when it's no longer needed
   /// See https://github.com/flutter/flutter/issues/55000

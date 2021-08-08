@@ -7,14 +7,14 @@ class CompareScreen extends StatelessWidget {
   final String html;
   final String title;
 
-  CompareScreen({this.html, this.title});
+  const CompareScreen({this.html, Key key, this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => DefaultTabController(
         length: 3,
         child: Scaffold(
           appBar: AppBar(
-            bottom: TabBar(
+            bottom: const TabBar(
               tabs: [
                 Tab(text: 'HTML'),
                 Tab(text: 'Core'),

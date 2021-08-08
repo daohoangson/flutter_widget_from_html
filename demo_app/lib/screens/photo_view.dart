@@ -5,21 +5,23 @@ import 'package:photo_view/photo_view.dart';
 import 'custom_widget_builder.dart' as custom_widget_builder;
 
 class PhotoViewScreen extends StatelessWidget {
+  const PhotoViewScreen({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) => DefaultTabController(
         length: 2,
         child: Scaffold(
           appBar: AppBar(
-            bottom: TabBar(
+            bottom: const TabBar(
               tabs: [
                 Tab(text: 'Inline'),
                 Tab(text: 'Popup'),
               ],
             ),
-            title: Text('PhotoViewScreen'),
+            title: const Text('PhotoViewScreen'),
           ),
           body: TabBarView(
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             children: <Widget>[
               SingleChildScrollView(
                 child: Padding(
@@ -87,11 +89,9 @@ class _PopupPhotoViewWidgetFactory extends WidgetFactory {
           onTap: () => Navigator.of(context).push(MaterialPageRoute(
               builder: (_) => Scaffold(
                     appBar: AppBar(),
-                    body: Container(
-                      child: PhotoView(
-                        heroAttributes: PhotoViewHeroAttributes(tag: url),
-                        imageProvider: built.image,
-                      ),
+                    body: PhotoView(
+                      heroAttributes: PhotoViewHeroAttributes(tag: url),
+                      imageProvider: built.image,
                     ),
                   ))),
           child: Hero(tag: url, child: built),

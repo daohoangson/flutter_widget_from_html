@@ -19,6 +19,8 @@ const html = '''
 ''';
 
 class IframeScreen extends StatefulWidget {
+  const IframeScreen({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _State();
 }
@@ -30,7 +32,7 @@ class _State extends State<IframeScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
-        title: Text('IframeScreen'),
+        title: const Text('IframeScreen'),
       ),
       body: ListView(children: <Widget>[
         CheckboxListTile(

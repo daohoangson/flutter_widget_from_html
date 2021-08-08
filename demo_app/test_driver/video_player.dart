@@ -7,10 +7,12 @@ import '_2.dart';
 
 void main() {
   enableFlutterDriverExtension();
-  runApp(TestApp());
+  runApp(const TestApp());
 }
 
 class TestApp extends StatefulWidget {
+  const TestApp({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _TestAppState();
 }
@@ -23,7 +25,6 @@ class _TestAppState extends State<TestApp> {
         home: SafeArea(
           child: Scaffold(
             body: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 _buildButtons(),
@@ -60,11 +61,7 @@ class _TestAppState extends State<TestApp> {
   Widget _buildAspectRatioTester() => input.isNotEmpty
       ? AspectRatioTester(
           key: ValueKey(input),
-          child: VideoPlayer(
-            input,
-            aspectRatio: 1,
-            autoResize: true,
-          ),
+          child: VideoPlayer(input, aspectRatio: 1),
         )
       : widget0;
 }

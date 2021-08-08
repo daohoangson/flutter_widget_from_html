@@ -10,9 +10,9 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 
-import 'internal/builder.dart' as builder;
 import 'core_data.dart';
 import 'core_widget_factory.dart';
+import 'internal/builder.dart' as builder;
 import 'internal/tsh_widget.dart';
 
 /// A widget that builds Flutter widget tree from HTML
@@ -98,7 +98,7 @@ class HtmlWidget extends StatefulWidget {
   /// Creates a widget that builds Flutter widget tree from html.
   ///
   /// The [html] argument must not be null.
-  HtmlWidget(
+  const HtmlWidget(
     this.html, {
     this.baseUrl,
     this.buildAsync,
@@ -249,10 +249,10 @@ Widget _buildAsyncBuilder(
     snapshot.data ??
     Center(
       child: Padding(
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         child: Theme.of(context).platform == TargetPlatform.iOS
-            ? CupertinoActivityIndicator()
-            : CircularProgressIndicator(),
+            ? const CupertinoActivityIndicator()
+            : const CircularProgressIndicator(),
       ),
     );
 
@@ -271,8 +271,5 @@ Widget _buildBody(_HtmlWidgetState state, dom.NodeList domNodes) {
   return wf.buildBody(rootMeta, tree.build()) ?? widget0;
 }
 
-dom.NodeList _parseHtml(String html) => parser.HtmlParser(
-      html,
-      generateSpans: false,
-      parseMeta: false,
-    ).parseFragment().nodes;
+dom.NodeList _parseHtml(String html) =>
+    parser.HtmlParser(html, parseMeta: false).parseFragment().nodes;

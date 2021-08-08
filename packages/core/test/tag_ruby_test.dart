@@ -8,11 +8,11 @@ import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '_.dart';
 
-void main() async {
+Future<void> main() async {
   await loadAppFonts();
 
   group('basic usage', () {
-    final html = '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>';
+    const html = '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>';
 
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
@@ -58,7 +58,7 @@ void main() async {
   });
 
   testWidgets('renders text after RT', (WidgetTester tester) async {
-    final html = '<ruby>ruby <rt>rt</rt> foo</ruby>';
+    const html = '<ruby>ruby <rt>rt</rt> foo</ruby>';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -69,7 +69,7 @@ void main() async {
   });
 
   testWidgets('renders with multiple RTs', (WidgetTester tester) async {
-    final html = '<ruby>漢<rt>かん</rt>字<rt>じ</rt></ruby>';
+    const html = '<ruby>漢<rt>かん</rt>字<rt>じ</rt></ruby>';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -80,7 +80,7 @@ void main() async {
   });
 
   testWidgets('renders without erroneous white spaces', (tester) async {
-    final html = '<ruby>\n漢\n<rt>かん</rt>\n\n字\n<rt>じ</rt></ruby>';
+    const html = '<ruby>\n漢\n<rt>かん</rt>\n\n字\n<rt>じ</rt></ruby>';
     final explained = await explain(tester, html);
     expect(
         explained,
@@ -93,7 +93,7 @@ void main() async {
 
   group('possible conflict', () {
     testWidgets('triple renders', (WidgetTester tester) async {
-      final html = '<ruby><ruby>ruby1 <rt>ruby2</rt></ruby> '
+      const html = '<ruby><ruby>ruby1 <rt>ruby2</rt></ruby> '
           '<rt><ruby>rt1 <rt>rt2</rt></ruby></rt></ruby>';
       final explained = await explain(tester, html);
       expect(
@@ -105,7 +105,7 @@ void main() async {
     });
 
     testWidgets('renders with A tag', (WidgetTester tester) async {
-      final html = '<ruby><a href="http://domain.com/foo">foo</a> '
+      const html = '<ruby><a href="http://domain.com/foo">foo</a> '
           '<rt><a href="http://domain.com/bar">bar</a></rt></ruby>';
       final explained = await explain(tester, html);
       expect(
@@ -117,7 +117,7 @@ void main() async {
     });
 
     testWidgets('renders with Q tag', (WidgetTester tester) async {
-      final html = '<ruby><q>foo</q> <rt><q>bar</q></rt></ruby>';
+      const html = '<ruby><q>foo</q> <rt><q>bar</q></rt></ruby>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -130,31 +130,31 @@ void main() async {
 
   group('error handling', () {
     testWidgets('renders without RT', (WidgetTester tester) async {
-      final html = '<ruby>明日</ruby>';
+      const html = '<ruby>明日</ruby>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:明日)]'));
     });
 
     testWidgets('renders with empty RT', (WidgetTester tester) async {
-      final html = '<ruby>明日 <rt></rt></ruby>';
+      const html = '<ruby>明日 <rt></rt></ruby>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:明日)]'));
     });
 
     testWidgets('renders without contents', (WidgetTester tester) async {
-      final html = 'Foo <ruby></ruby>';
+      const html = 'Foo <ruby></ruby>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
     testWidgets('renders with only RT', (WidgetTester tester) async {
-      final html = 'Foo <ruby><rt>Ashita</rt></ruby>';
+      const html = 'Foo <ruby><rt>Ashita</rt></ruby>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo (@5.0:Ashita))]'));
     });
 
     testWidgets('renders with only empty RT', (WidgetTester tester) async {
-      final html = 'Foo <ruby><rt></rt></ruby>';
+      const html = 'Foo <ruby><rt></rt></ruby>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
@@ -172,11 +172,11 @@ void main() async {
       ));
       await tester.pumpAndSettle();
 
-      final rtRenderBox = rt.currentContext!.findRenderObject() as RenderBox;
+      final rtRenderBox = rt.currentContext!.findRenderObject()! as RenderBox;
       final rubyRenderBox =
-          ruby.currentContext!.findRenderObject() as RenderBox;
+          ruby.currentContext!.findRenderObject()! as RenderBox;
       final htmlRubyRenderBox =
-          key.currentContext!.findRenderObject() as RenderBox;
+          key.currentContext!.findRenderObject()! as RenderBox;
       expect(
           htmlRubyRenderBox.getMaxIntrinsicHeight(100),
           equals(rubyRenderBox.getMaxIntrinsicHeight(100) +
@@ -210,9 +210,9 @@ void main() async {
       () {
         testGoldens('computeDryLayout', (tester) async {
           await tester.pumpWidgetBuilder(
-            Scaffold(
+            const Scaffold(
               body: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(8.0),
                 child: HtmlWidget(
                     '<div style="background: black; color: white; width: 200px; height: 200px">'
                     '<ruby>Foo <rt>bar</rt></ruby>'
@@ -220,7 +220,7 @@ void main() async {
               ),
             ),
             wrapper: materialAppWrapper(theme: ThemeData.light()),
-            surfaceSize: Size(600, 400),
+            surfaceSize: const Size(600, 400),
           );
 
           await screenMatchesGolden(tester, 'computeDryLayout');

@@ -9,10 +9,11 @@ class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
 
   ColumnPlaceholder(
     this._children, {
+    Key? key,
     required this.meta,
     required this.trimMarginVertical,
     required this.wf,
-  }) : super(meta);
+  }) : super(meta, key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +74,7 @@ class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
   }
 
   Iterable<Widget> _getIterable(BuildContext context) sync* {
-    for (var child in _children) {
+    for (final child in _children) {
       if (child == widget0) continue;
 
       if (child is ColumnPlaceholder) {

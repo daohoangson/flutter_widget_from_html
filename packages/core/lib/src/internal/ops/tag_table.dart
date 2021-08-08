@@ -255,7 +255,7 @@ extension _BuildMetadataExtension on BuildMetadata {
 typedef _HtmlTableCellBuilder = HtmlTableCell? Function(BuildContext);
 
 class _TableCaption extends SingleChildRenderObjectWidget {
-  _TableCaption(Widget child, {Key? key}) : super(child: child, key: key);
+  const _TableCaption(Widget child, {Key? key}) : super(child: child, key: key);
 
   @override
   RenderObject createRenderObject(BuildContext context) => RenderProxyBox();
@@ -381,6 +381,6 @@ class _TagTableDataCell {
   final BuildMetadata meta;
   final int rowspan;
 
-  _TagTableDataCell(this.meta,
+  const _TagTableDataCell(this.meta,
       {required this.child, required this.colspan, required this.rowspan});
 }
