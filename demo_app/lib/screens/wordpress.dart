@@ -8,15 +8,17 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 class WordpressScreen extends StatelessWidget {
-  final sites = {
+  static const sites = {
     'TechCrunch': 'techcrunch.com',
     'The Mozilla Blog': 'blog.mozilla.org',
   };
 
+  const WordpressScreen({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('WordPressScreen'),
+          title: const Text('WordPressScreen'),
         ),
         body: ListView(
           children: sites.entries
@@ -58,7 +60,7 @@ class _PostScreen extends StatelessWidget {
           title: HtmlWidget(post.title),
           actions: [
             IconButton(
-              icon: Icon(Icons.open_in_browser),
+              icon: const Icon(Icons.open_in_browser),
               onPressed: () => launch(post.link),
             ),
           ],
@@ -141,11 +143,10 @@ class _PostsState extends State<_PostsList> {
     final posts = <_Post>[];
     if (json is List) {
       for (final postJson in json) {
-        if (postJson is! Map) continue;
-        final post = _Post.fromJson(postJson);
-
-        if (post == null) continue;
-        posts.add(post);
+        if (postJson is Map) {
+          final post = _Post.fromJson(postJson);
+          if (post != null) posts.add(post);
+        }
       }
     }
     return posts;
@@ -161,7 +162,7 @@ class _Post {
   final String link;
   final String title;
 
-  _Post({
+  const _Post({
     this.content,
     this.excerpt,
     this.featuredMedia,
@@ -172,13 +173,13 @@ class _Post {
 
   factory _Post.fromJson(Map json) => _Post(
         // this is unsafe, do not do this in real app
-        content: (json['content'] as Map)['rendered'],
-        excerpt: (json['excerpt'] as Map)['rendered'],
+        content: (json['content'] as Map)['rendered'] as String,
+        excerpt: (json['excerpt'] as Map)['rendered'] as String,
         featuredMedia: _Media.fromJson(
-            ((json['_embedded'] as Map)['wp:featuredmedia'] as List)[0]),
-        id: json['id'],
-        link: json['link'],
-        title: (json['title'] as Map)['rendered'],
+            ((json['_embedded'] as Map)['wp:featuredmedia'] as List)[0] as Map),
+        id: json['id'] as int,
+        link: json['link'] as String,
+        title: (json['title'] as Map)['rendered'] as String,
       );
 }
 
@@ -189,7 +190,7 @@ class _Media {
   final String thumbnail;
   final int width;
 
-  _Media({
+  const _Media({
     this.height,
     this.sourceUrl,
     this.thumbnail,
@@ -197,10 +198,10 @@ class _Media {
   });
 
   factory _Media.fromJson(Map json) => _Media(
-        height: (json['media_details'] as Map)['height'],
-        sourceUrl: json['source_url'],
+        height: (json['media_details'] as Map)['height'] as int,
+        sourceUrl: json['source_url'] as String,
         thumbnail: (((json['media_details'] as Map)['sizes']
-            as Map)['thumbnail'] as Map)['source_url'],
-        width: (json['media_details'] as Map)['width'],
+            as Map)['thumbnail'] as Map)['source_url'] as String,
+        width: (json['media_details'] as Map)['width'] as int,
       );
 }

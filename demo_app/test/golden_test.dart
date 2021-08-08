@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 
 void _test(String name, String html) => testGoldens(name, (tester) async {
-      final platform = TargetPlatform.linux;
+      const platform = TargetPlatform.linux;
       debugDefaultTargetPlatformOverride = platform;
       final key = UniqueKey();
 
@@ -27,6 +27,8 @@ void _test(String name, String html) => testGoldens(name, (tester) async {
 
 void main() {
   final json = File('test/goldens.json').readAsStringSync();
-  final map = jsonDecode(json) as Map;
-  map.entries.forEach((entry) => _test(entry.key, entry.value));
+  final map = jsonDecode(json) as Map<String, String>;
+  for (final entry in map.entries) {
+    _test(entry.key, entry.value);
+  }
 }

@@ -7,7 +7,7 @@ import 'package:golden_toolkit/golden_toolkit.dart';
 void main() {
   testGoldens('smilie', (tester) async {
     await tester.pumpWidgetBuilder(
-      SmilieScreen(),
+      const SmilieScreen(),
       wrapper: materialAppWrapper(theme: ThemeData.light()),
       surfaceSize: const Size(400, 200),
     );
