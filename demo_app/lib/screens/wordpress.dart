@@ -70,13 +70,14 @@ class _PostScreen extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                AspectRatio(
-                  aspectRatio:
-                      post.featuredMedia.width / post.featuredMedia.height,
-                  child: Center(
-                    child: Image.network(post.featuredMedia.sourceUrl),
+                if (post.featuredMedia != null)
+                  AspectRatio(
+                    aspectRatio:
+                        post.featuredMedia.width / post.featuredMedia.height,
+                    child: Center(
+                      child: Image.network(post.featuredMedia.sourceUrl),
+                    ),
                   ),
-                ),
                 const SizedBox(height: 8),
                 HtmlWidget(post.content),
               ],
@@ -127,12 +128,14 @@ class _PostsState extends State<_PostsList> {
       );
 
   Widget _buildItem(_Post post) => ListTile(
-        leading: Image.network(
-          post.featuredMedia.thumbnail,
-          fit: BoxFit.cover,
-          height: 44,
-          width: 44,
-        ),
+        leading: post.featuredMedia != null
+            ? Image.network(
+                post.featuredMedia.thumbnail,
+                fit: BoxFit.cover,
+                height: 44,
+                width: 44,
+              )
+            : const SizedBox(width: 44),
         onTap: () => _PostScreen.pushRoute(context, post),
         subtitle: HtmlWidget(post.excerpt,
             onTapUrl: (_) => _PostScreen.pushRoute(context, post)),
@@ -171,16 +174,23 @@ class _Post {
     this.title,
   });
 
-  factory _Post.fromJson(Map json) => _Post(
-        // this is unsafe, do not do this in real app
-        content: (json['content'] as Map)['rendered'] as String,
-        excerpt: (json['excerpt'] as Map)['rendered'] as String,
-        featuredMedia: _Media.fromJson(
-            ((json['_embedded'] as Map)['wp:featuredmedia'] as List)[0] as Map),
-        id: json['id'] as int,
-        link: json['link'] as String,
-        title: (json['title'] as Map)['rendered'] as String,
-      );
+  factory _Post.fromJson(Map json) {
+    final embedded = json['_embedded'] as Map;
+    final featuredMediaList = embedded['wp:featuredmedia'];
+    final featuredMedia =
+        featuredMediaList is List ? featuredMediaList.first as Map : null;
+
+    return _Post(
+      // this is unsafe, do not do this in real app
+      content: (json['content'] as Map)['rendered'] as String,
+      excerpt: (json['excerpt'] as Map)['rendered'] as String,
+      featuredMedia:
+          featuredMedia != null ? _Media.fromJson(featuredMedia) : null,
+      id: json['id'] as int,
+      link: json['link'] as String,
+      title: (json['title'] as Map)['rendered'] as String,
+    );
+  }
 }
 
 @immutable
