@@ -11,11 +11,11 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_widget_from_html_core: ^0.7.0-dev.2021061301
-  fwfh_cached_network_image: ^0.6.0
-  fwfh_chewie: ^0.6.0
+  fwfh_cached_network_image: ^0.6.1+2
+  fwfh_chewie: ^0.6.1+2
   fwfh_svg: ^0.7.0-0
-  fwfh_url_launcher: ^0.6.0
-  fwfh_webview: ^0.6.0
+  fwfh_url_launcher: ^0.6.1+2
+  fwfh_webview: ^0.6.1+2
   html: ^0.15.0
 
 dependency_overrides:
