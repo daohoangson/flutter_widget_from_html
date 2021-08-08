@@ -38,6 +38,19 @@ class HtmlListMarker extends SingleChildRenderObjectWidget {
   }
 
   @override
+  String toStringShort() {
+    // TODO: bring this into test/_.dart once 0.7.0 reaches stable
+    switch (markerType) {
+      case HtmlListMarkerType.circle:
+        return '[HtmlListMarker.circle]';
+      case HtmlListMarkerType.disc:
+        return '[HtmlListMarker.disc]';
+      case HtmlListMarkerType.square:
+        return '[HtmlListMarker.square]';
+    }
+  }
+
+  @override
   void updateRenderObject(
       BuildContext _, _ListMarkerRenderObject renderObject) {
     renderObject
