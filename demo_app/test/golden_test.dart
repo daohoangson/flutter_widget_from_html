@@ -27,8 +27,8 @@ void _test(String name, String html) => testGoldens(name, (tester) async {
 
 void main() {
   final json = File('test/goldens.json').readAsStringSync();
-  final map = jsonDecode(json) as Map<String, String>;
+  final map = jsonDecode(json) as Map<String, dynamic>;
   for (final entry in map.entries) {
-    _test(entry.key, entry.value);
+    _test(entry.key, entry.value as String);
   }
 }
