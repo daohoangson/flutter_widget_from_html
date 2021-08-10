@@ -82,34 +82,63 @@ class _AudioPlayerState extends State<AudioPlayer> {
   }
 
   @override
-  Widget build(BuildContext context) => Row(
-        children: [
-          _AudioPlayButton(
-            pause: _player.pause,
-            play: _player.play,
-            stream: _player.playingStream,
+  Widget build(BuildContext context) => LayoutBuilder(builder: (_, bc) {
+        final isNarrow = bc.hasBoundedWidth && bc.maxWidth < 320;
+        final theme = Theme.of(context);
+        final iconSize = DefaultTextStyle.of(context).style.fontSize! *
+            MediaQuery.of(context).textScaleFactor;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: theme.brightness == Brightness.light
+                ? const Color.fromRGBO(0, 0, 0, .1)
+                : const Color.fromRGBO(255, 255, 255, .1),
+            borderRadius: BorderRadius.circular(iconSize * 2),
           ),
-          Expanded(
-            child: _PositionSlider(
-              durationStream: _player.durationStream,
-              positionStream: _player.positionStream,
-              seek: _player.seek,
-            ),
+          child: Row(
+            children: [
+              _PlayButton(
+                pause: _player.pause,
+                play: _player.play,
+                size: iconSize,
+                stream: _player.playingStream,
+              ),
+              _PositionText(
+                durationStream: _player.durationStream,
+                isNarrow: isNarrow,
+                positionStream: _player.positionStream,
+                size: iconSize,
+              ),
+              Expanded(
+                child: _PositionSlider(
+                  durationStream: _player.durationStream,
+                  positionStream: _player.positionStream,
+                  seek: _player.seek,
+                  size: iconSize,
+                ),
+              ),
+              _MuteButton(
+                setVolume: _player.setVolume,
+                size: iconSize,
+                stream: _player.volumeStream,
+              ),
+            ],
           ),
-          _DurationText(_player.durationStream),
-        ],
-      );
+        );
+      });
 }
 
-class _AudioPlayButton extends StatelessWidget {
+class _PlayButton extends StatelessWidget {
   final VoidCallback pause;
   final VoidCallback play;
+  final double size;
   final Stream<bool> stream;
 
-  const _AudioPlayButton({
+  const _PlayButton({
     Key? key,
     required this.pause,
     required this.play,
+    required this.size,
     required this.stream,
   }) : super(key: key);
 
@@ -120,47 +149,73 @@ class _AudioPlayButton extends StatelessWidget {
           return IconButton(
             onPressed: isPlaying ? pause : play,
             icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
+            iconSize: size * 2,
           );
         },
         stream: stream,
       );
 }
 
-class _DurationText extends StatelessWidget {
-  final Stream<Duration?> stream;
+class _PositionText extends StatelessWidget {
+  final Stream<Duration?> durationStream;
+  final bool isNarrow;
+  final Stream<Duration> positionStream;
+  final double size;
 
-  const _DurationText(this.stream, {Key? key}) : super(key: key);
+  const _PositionText({
+    Key? key,
+    required this.durationStream,
+    required this.isNarrow,
+    required this.positionStream,
+    required this.size,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext _) => StreamBuilder<Duration?>(
-        builder: (_, snapshot) {
-          final duration = snapshot.data?.inSeconds ?? -1;
-          final minutes = duration ~/ 60;
-          final seconds = duration % 60;
-          return Text(
-            duration < 0
-                ? '--:--'
-                : '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
-          );
-        },
-        stream: stream,
+        builder: (_, duration) => StreamBuilder<Duration>(
+          builder: (_, position) {
+            final max = duration.data?.inSeconds ?? -1;
+            final value = position.data?.inSeconds ?? -1;
+            final remaining = max > value ? max - value : 0;
+            final text = isNarrow
+                ? '-${_secondsToString(remaining)}'
+                : '${_secondsToString(value)} / '
+                    '${_secondsToString(max)}';
+            return Text(
+              text,
+              style: TextStyle(fontSize: size),
+              textScaleFactor: 1,
+            );
+          },
+          stream: positionStream,
+        ),
+        stream: durationStream,
       );
+
+  String _secondsToString(int value) {
+    if (value < 0) return '0:00';
+    final m = value ~/ 60;
+    final s = value % 60;
+    return '$m:${s.toString().padLeft(2, '0')}';
+  }
 }
 
 class _PositionSlider extends StatelessWidget {
   final Stream<Duration?> durationStream;
   final Stream<Duration> positionStream;
   final void Function(Duration) seek;
+  final double size;
 
   const _PositionSlider({
     Key? key,
     required this.durationStream,
     required this.positionStream,
     required this.seek,
+    required this.size,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext _) => StreamBuilder<Duration?>(
+  Widget build(BuildContext context) => StreamBuilder<Duration?>(
         builder: (_, duration) => StreamBuilder<Duration>(
           builder: (_, position) {
             final max = duration.data?.inMilliseconds.toDouble();
@@ -168,10 +223,15 @@ class _PositionSlider extends StatelessWidget {
 
             final value = position.data?.inMilliseconds.toDouble() ?? 0.0;
 
-            return Slider.adaptive(
-              max: max,
-              onChanged: onChanged,
-              value: value,
+            return SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                thumbShape: RoundSliderThumbShape(enabledThumbRadius: size / 2),
+              ),
+              child: Slider.adaptive(
+                max: max,
+                onChanged: onChanged,
+                value: value,
+              ),
             );
           },
           stream: positionStream,
@@ -180,4 +240,34 @@ class _PositionSlider extends StatelessWidget {
       );
 
   void onChanged(double ms) => seek(Duration(milliseconds: ms.toInt()));
+}
+
+class _MuteButton extends StatelessWidget {
+  final Future<void> Function(double) setVolume;
+  final double size;
+  final Stream<double> stream;
+
+  const _MuteButton({
+    Key? key,
+    required this.setVolume,
+    required this.size,
+    required this.stream,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => StreamBuilder<double>(
+        builder: (_, snapshot) {
+          final isMuted = (snapshot.data ?? 1.0) == 0;
+          return IconButton(
+            onPressed: isMuted ? unmute : mute,
+            icon: Icon(isMuted ? Icons.volume_off_outlined : Icons.volume_up),
+            iconSize: size * 2,
+          );
+        },
+        stream: stream,
+      );
+
+  void mute() => setVolume(0);
+
+  void unmute() => setVolume(1);
 }
