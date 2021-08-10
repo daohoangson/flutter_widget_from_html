@@ -9,10 +9,12 @@ const kHtml = '''
 const kSmilies = {':)': '🙂'};
 
 class SmilieScreen extends StatelessWidget {
+  const SmilieScreen({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('SmilieScreen'),
+          title: const Text('SmilieScreen'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),

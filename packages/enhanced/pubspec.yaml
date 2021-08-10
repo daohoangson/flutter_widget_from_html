@@ -39,8 +39,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   golden_toolkit: any
+  lint: any
   network_image_mock: any
-  pedantic: any
 
 flutter:
   assets:

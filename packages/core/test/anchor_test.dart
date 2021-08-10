@@ -8,24 +8,24 @@ import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '_.dart';
 
-void main() async {
+Future<void> main() async {
   await loadAppFonts();
 
   group('build test', () {
     testWidgets('renders A[name]', (WidgetTester tester) async {
-      final html = '<a name="foo"></a>Foo';
+      const html = '<a name="foo"></a>Foo';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:[SizedBox#foo:0.0x10.0](:Foo))]'));
     });
 
     testWidgets('renders SPAN[id]', (WidgetTester tester) async {
-      final html = '<span id="foo">Foo</span>';
+      const html = '<span id="foo">Foo</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:[SizedBox#foo:0.0x10.0](:Foo))]'));
     });
 
     testWidgets('renders DIV[id]', (WidgetTester tester) async {
-      final html = '<div id="foo">Foo</div>';
+      const html = '<div id="foo">Foo</div>';
       final explained = await explain(tester, html);
       expect(
           explained,
@@ -36,7 +36,7 @@ void main() async {
     });
 
     testWidgets('renders SUP[id]', (WidgetTester tester) async {
-      final html = '<sup id="foo">Foo</sup>';
+      const html = '<sup id="foo">Foo</sup>';
       final explained = await explain(tester, html);
       expect(explained, contains('[SizedBox#foo'));
     });
@@ -48,9 +48,9 @@ void main() async {
       group('tap test', () {
         testGoldens('scrolls down', (WidgetTester tester) async {
           await tester.pumpWidgetBuilder(
-            _AnchorTestApp(),
+            const _AnchorTestApp(),
             wrapper: materialAppWrapper(theme: ThemeData.light()),
-            surfaceSize: Size(200, 200),
+            surfaceSize: const Size(200, 200),
           );
           await screenMatchesGolden(tester, 'down/top');
 
@@ -64,7 +64,7 @@ void main() async {
           await tester.pumpWidgetBuilder(
             _AnchorTestApp(keyBottom: keyBottom),
             wrapper: materialAppWrapper(theme: ThemeData.light()),
-            surfaceSize: Size(200, 200),
+            surfaceSize: const Size(200, 200),
           );
 
           await tester.ensureVisible(find.byKey(keyBottom));
@@ -86,14 +86,14 @@ void main() async {
 class _AnchorTestApp extends StatelessWidget {
   final Key? keyBottom;
 
-  _AnchorTestApp({Key? key, this.keyBottom}) : super(key: key);
+  const _AnchorTestApp({Key? key, this.keyBottom}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => Scaffold(
         body: SingleChildScrollView(
           child: Column(
             children: [
-              HtmlWidget('''
+              const HtmlWidget('''
 <a href="#target">Scroll down</a>
 <p>1</p>
 <p>12</p>

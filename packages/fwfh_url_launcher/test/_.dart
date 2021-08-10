@@ -5,7 +5,7 @@ import 'package:fwfh_url_launcher/fwfh_url_launcher.dart';
 
 import '../../core/test/_.dart' as helper;
 
-final tapText = helper.tapText;
+const tapText = helper.tapText;
 
 Future<String> explain(WidgetTester tester, String html) async =>
     helper.explain(
@@ -32,7 +32,9 @@ void mockSetup() {
         return true;
       case 'launch':
         final url = methodCall.arguments['url'];
-        _launchUrls.add(url);
+        if (url is String) {
+          _launchUrls.add(url);
+        }
     }
 
     return null;

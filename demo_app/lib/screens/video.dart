@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class VideoScreen extends StatefulWidget {
+  const VideoScreen({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _State();
 }
@@ -24,7 +26,7 @@ class _State extends State<VideoScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('VideoScreen'),
+          title: const Text('VideoScreen'),
         ),
         body: ListView(children: <Widget>[
           CheckboxListTile(
@@ -53,18 +55,18 @@ class _State extends State<VideoScreen> {
             title: const Text('width & height'),
           ),
           ListTile(
-            title: Text('HTML:'),
+            title: const Text('HTML:'),
             subtitle: Text(_html),
           ),
           ListTile(
-            title: Text('Rendered:'),
+            title: const Text('Rendered:'),
             subtitle: HtmlWidget(
               _html,
               key: Key(_html),
               baseUrl: Uri.parse('https://www.w3schools.com/html/'),
             ),
           ),
-          Center(child: Text('----')),
+          const Center(child: Text('----')),
         ]),
       );
 

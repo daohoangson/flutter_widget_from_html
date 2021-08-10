@@ -1,3 +1,4 @@
+// ignore: avoid_web_libraries_in_flutter
 import 'dart:html' show IFrameElement;
 
 import 'package:flutter/widgets.dart';
@@ -13,6 +14,7 @@ class WebViewState extends State<WebView> {
   void initState() {
     super.initState();
 
+    // ignore: unsafe_html
     _iframeElement.src = widget.url;
     _iframeElement.style.border = 'none';
 

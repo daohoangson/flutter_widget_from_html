@@ -23,7 +23,7 @@ class AspectRatioTester extends StatelessWidget {
                       Provider.of<_AspectRatioTestResult>(context)
                           .value
                           .toString(),
-                      key: ValueKey(kResultKey),
+                      key: const ValueKey(kResultKey),
                     )),
             CustomSingleChildLayout(
               delegate: _AspectRatioTestDelegate(_result),

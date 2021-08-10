@@ -9,11 +9,11 @@ CssLength? tryParseCssLength(css.Expression expression) {
       case css.TokenKind.UNIT_LENGTH_PT:
         return CssLength(number, CssLengthUnit.pt);
       case css.TokenKind.UNIT_LENGTH_PX:
-        return CssLength(number, CssLengthUnit.px);
+        return CssLength(number);
     }
   } else if (expression is css.LiteralTerm) {
     if (expression is css.NumberTerm) {
-      if (expression.number == 0) return CssLength(0);
+      if (expression.number == 0) return const CssLength(0);
     } else if (expression is css.PercentageTerm) {
       return CssLength(
           (expression.value as num).toDouble(), CssLengthUnit.percentage);
@@ -21,7 +21,7 @@ CssLength? tryParseCssLength(css.Expression expression) {
 
     switch (expression.valueAsString) {
       case 'auto':
-        return CssLength(1, CssLengthUnit.auto);
+        return const CssLength(1, CssLengthUnit.auto);
     }
   }
 
@@ -67,26 +67,25 @@ CssLengthBox? _parseCssLengthBoxOne(
   final parsed = tryParseCssLength(expression);
   if (parsed == null) return existing;
 
-  existing ??= CssLengthBox();
-
+  final box = existing ?? const CssLengthBox();
   switch (suffix) {
     case kSuffixBottom:
     case kSuffixBlockEnd:
-      return existing.copyWith(bottom: parsed);
+      return box.copyWith(bottom: parsed);
     case kSuffixInlineEnd:
-      return existing.copyWith(inlineEnd: parsed);
+      return box.copyWith(inlineEnd: parsed);
     case kSuffixInlineStart:
-      return existing.copyWith(inlineStart: parsed);
+      return box.copyWith(inlineStart: parsed);
     case kSuffixLeft:
-      return existing.copyWith(left: parsed);
+      return box.copyWith(left: parsed);
     case kSuffixRight:
-      return existing.copyWith(right: parsed);
+      return box.copyWith(right: parsed);
     case kSuffixTop:
     case kSuffixBlockStart:
-      return existing.copyWith(top: parsed);
+      return box.copyWith(top: parsed);
   }
 
-  return existing;
+  return box;
 }
 
 CssLengthBox? tryParseCssLengthBox(BuildMetadata meta, String prefix) {

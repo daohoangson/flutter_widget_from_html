@@ -8,7 +8,7 @@ void main() {
 
   testWidgets('launches url', (WidgetTester tester) async {
     const href = 'http://flutter.dev';
-    final html = '<a href="$href">Tap me</a>';
+    const html = '<a href="$href">Tap me</a>';
     await explain(tester, html);
 
     await tester.pumpAndSettle();

@@ -19,28 +19,30 @@ import 'wordpress.dart';
 
 class HomeScreen extends StatelessWidget {
   static final _screens = <String, Widget Function()>{
-    'Hello World': () => HelloWorldScreen(),
-    'Hello World (core)': () => HelloWorldCoreScreen(),
-    'Audio': () => AudioScreen(),
-    'Iframe': () => IframeScreen(),
-    'Images': () => ImgScreen(),
-    'Image (file://)': () => ImgFileScreen(),
-    'Video': () => VideoScreen(),
-    'customStylesBuilder': () => CustomStylesBuilderScreen(),
-    'customWidgetBuilder': () => CustomWidgetBuilderScreen(),
-    'font-size': () => FontSizeScreen(),
-    'Goldens': () => GoldensScreen(),
-    'HugeHtml': () => HugeHtmlScreen(),
-    'Photo View': () => PhotoViewScreen(),
-    'Smilie': () => SmilieScreen(),
-    'Wordpress': () => WordpressScreen(),
+    'Hello World': () => const HelloWorldScreen(),
+    'Hello World (core)': () => const HelloWorldCoreScreen(),
+    'Audio': () => const AudioScreen(),
+    'Iframe': () => const IframeScreen(),
+    'Images': () => const ImgScreen(),
+    'Image (file://)': () => const ImgFileScreen(),
+    'Video': () => const VideoScreen(),
+    'customStylesBuilder': () => const CustomStylesBuilderScreen(),
+    'customWidgetBuilder': () => const CustomWidgetBuilderScreen(),
+    'font-size': () => const FontSizeScreen(),
+    'Goldens': () => const GoldensScreen(),
+    'HugeHtml': () => const HugeHtmlScreen(),
+    'Photo View': () => const PhotoViewScreen(),
+    'Smilie': () => const SmilieScreen(),
+    'Wordpress': () => const WordpressScreen(),
   };
+
+  const HomeScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('Demo app'),
-          actions: [
+          title: const Text('Demo app'),
+          actions: const [
             ShowPerfIconButton(),
           ],
         ),
@@ -66,11 +68,11 @@ class HomeScreen extends StatelessWidget {
     }
 
     return PageRouteBuilder(
-      pageBuilder: (_, __, ___) => HomeScreen(),
-      settings: RouteSettings(name: '/'),
+      pageBuilder: (_, __, ___) => const HomeScreen(),
+      settings: const RouteSettings(name: '/'),
     );
   }
 
   static String _routeNameFromTitle(String title) =>
-      '/' + title.toLowerCase().replaceAll(RegExp(r'[^a-z]'), '');
+      '/${title.toLowerCase().replaceAll(RegExp('[^a-z]'), '')}';
 }

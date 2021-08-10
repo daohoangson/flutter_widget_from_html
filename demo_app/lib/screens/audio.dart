@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class AudioScreen extends StatefulWidget {
+  const AudioScreen({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _State();
 }
@@ -23,7 +25,7 @@ class _State extends State<AudioScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('AudioScreen'),
+          title: const Text('AudioScreen'),
         ),
         body: ListView(children: <Widget>[
           CheckboxListTile(
@@ -47,11 +49,11 @@ class _State extends State<AudioScreen> {
             title: const Text('preload'),
           ),
           ListTile(
-            title: Text('HTML:'),
+            title: const Text('HTML:'),
             subtitle: Text(_html),
           ),
           ListTile(
-            title: Text('Rendered:'),
+            title: const Text('Rendered:'),
             subtitle: HtmlWidget(
               _html,
               key: Key(_html),
@@ -59,7 +61,7 @@ class _State extends State<AudioScreen> {
                   'https://interactive-examples.mdn.mozilla.net/pages/tabbed/audio.html'),
             ),
           ),
-          Center(child: Text('----')),
+          const Center(child: Text('----')),
         ]),
       );
 

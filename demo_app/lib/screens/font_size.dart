@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class FontSizeScreen extends StatelessWidget {
+  const FontSizeScreen({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('FontSizeScreen'),
+          title: const Text('FontSizeScreen'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -45,7 +47,7 @@ class _Panel extends StatelessWidget {
                   _row('20px', 20),
                 ],
               ),
-              Divider(),
+              const Divider(),
               HtmlWidget(
                 '<p style="font-size: 1em">Almost every developer\'s favorite molecule is '
                 'C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, '
@@ -87,7 +89,7 @@ class _Slider extends StatefulWidget {
 }
 
 class _SliderState extends State<_Slider> {
-  var textScaleFactor = 1.0;
+  var _textScaleFactor = 1.0;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -96,12 +98,12 @@ class _SliderState extends State<_Slider> {
             divisions: 3,
             max: 2,
             min: 0.5,
-            onChanged: (v) => setState(() => textScaleFactor = v),
-            value: textScaleFactor,
+            onChanged: (v) => setState(() => _textScaleFactor = v),
+            value: _textScaleFactor,
           ),
           MediaQuery(
             data: MediaQuery.of(context)
-                .copyWith(textScaleFactor: textScaleFactor),
+                .copyWith(textScaleFactor: _textScaleFactor),
             child: _Panel(),
           )
         ],

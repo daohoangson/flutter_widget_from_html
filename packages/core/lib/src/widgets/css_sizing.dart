@@ -6,7 +6,8 @@ import 'package:flutter/widgets.dart';
 /// A CSS block.
 class CssBlock extends CssSizing {
   /// Creates a CSS block.
-  CssBlock({required Widget child, Key? key}) : super(child: child, key: key);
+  const CssBlock({required Widget child, Key? key})
+      : super(child: child, key: key);
 
   @override
   _RenderCssSizing createRenderObject(BuildContext _) =>
@@ -49,7 +50,7 @@ class CssSizing extends SingleChildRenderObjectWidget {
   final CssSizingValue? preferredWidth;
 
   /// Creates a CSS sizing.
-  CssSizing({
+  const CssSizing({
     required Widget child,
     Key? key,
     this.maxHeight,
@@ -79,24 +80,21 @@ class CssSizing extends SingleChildRenderObjectWidget {
     _debugFillProperty(properties, 'maxWidth', maxWidth);
     _debugFillProperty(properties, 'minHeight', minHeight);
     _debugFillProperty(properties, 'minWidth', minWidth);
+
+    final preferredBoth = preferredHeight != null && preferredWidth != null;
+    final preferredVertical = preferredBoth && preferredAxis == Axis.vertical;
+    final preferredHorizontal =
+        preferredBoth && preferredAxis == Axis.horizontal;
     _debugFillProperty(
-        properties,
-        'preferredHeight' +
-            (preferredHeight != null &&
-                    preferredWidth != null &&
-                    preferredAxis == Axis.vertical
-                ? '*'
-                : ''),
-        preferredHeight);
+      properties,
+      'preferredHeight${preferredVertical ? '*' : ''}',
+      preferredHeight,
+    );
     _debugFillProperty(
-        properties,
-        'preferredWidth' +
-            (preferredHeight != null &&
-                    preferredWidth != null &&
-                    preferredAxis != Axis.vertical
-                ? '*'
-                : ''),
-        preferredWidth);
+      properties,
+      'preferredWidth${preferredHorizontal ? '*' : ''}',
+      preferredWidth,
+    );
   }
 
   void _debugFillProperty(DiagnosticPropertiesBuilder properties, String name,
@@ -198,10 +196,12 @@ class _RenderCssSizing extends RenderProxyBox {
     final minWidth =
         min(maxWidth, _minWidth?.clamp(0.0, c.maxWidth) ?? c.minWidth);
 
-    final __preferredHeight = _preferredHeight?.clamp(minHeight, maxHeight);
-    // special handling for tight contraints: ignore min in `clamp()`
-    // (usually happen if parent is a block)
-    final effectiveMinWidth = minWidth == maxWidth ? 0.0 : minWidth;
+    final effectiveMinHeight =
+        c.hasTightHeight && _minHeight == null ? 0.0 : minHeight;
+    final effectiveMinWidth =
+        c.hasTightWidth && _minWidth == null ? 0.0 : minWidth;
+    final __preferredHeight =
+        _preferredHeight?.clamp(effectiveMinHeight, maxHeight);
     final __preferredWidth =
         _preferredWidth?.clamp(effectiveMinWidth, maxWidth);
     // ignore preferred value if it's infinite
@@ -236,18 +236,14 @@ class _RenderCssSizing extends RenderProxyBox {
     required double preferredWidth,
   }) {
     final ccHeight = BoxConstraints(
-      maxWidth: double.infinity,
       maxHeight: preferredHeight,
-      minWidth: 0,
       minHeight: preferredHeight,
     );
     final sizeHeight = child!.getDryLayout(ccHeight);
 
     final ccWidth = BoxConstraints(
       maxWidth: preferredWidth,
-      maxHeight: double.infinity,
       minWidth: preferredWidth,
-      minHeight: 0,
     );
     final sizeWidth = child!.getDryLayout(ccWidth);
 
@@ -318,8 +314,8 @@ class _CssSizingPercentage extends CssSizingValue {
   @override
   int get hashCode => percentage.hashCode;
   @override
-  bool operator ==(Object other) =>
-      other is _CssSizingPercentage ? other.percentage == percentage : false;
+  bool operator ==(covariant _CssSizingPercentage other) =>
+      other.percentage == percentage;
   @override
   String toString() => '${percentage.toStringAsFixed(1)}%';
 }
@@ -333,8 +329,7 @@ class _CssSizingValue extends CssSizingValue {
   @override
   int get hashCode => value.hashCode;
   @override
-  bool operator ==(Object other) =>
-      other is _CssSizingValue ? other.value == value : false;
+  bool operator ==(covariant _CssSizingValue other) => other.value == value;
   @override
   String toString() => value.toStringAsFixed(1);
 }

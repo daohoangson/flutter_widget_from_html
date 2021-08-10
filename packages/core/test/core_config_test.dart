@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
-
+import 'package:html/dom.dart' as dom;
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart' as helper;
@@ -13,39 +13,36 @@ Future<String> explain(WidgetTester t, HtmlWidget hw) =>
 
 void main() {
   group('buildAsync', () {
-    final explain = (WidgetTester tester, String html, bool? buildAsync) =>
+    Future<String?> explain(WidgetTester tester, String html,
+            {bool? buildAsync}) =>
         tester.runAsync(() => helper.explain(tester, null,
-            hw: HtmlWidget(
-              html,
-              buildAsync: buildAsync,
-              key: helper.hwKey,
-            )));
+            hw: HtmlWidget(html, buildAsync: buildAsync, key: helper.hwKey)));
 
     testWidgets('uses FutureBuilder', (WidgetTester tester) async {
-      final html = 'Foo';
-      final explained = await explain(tester, html, true);
+      const html = 'Foo';
+      final explained = await explain(tester, html, buildAsync: true);
       expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
     });
 
     testWidgets('skips FutureBuilder', (WidgetTester tester) async {
-      final html = 'Foo';
-      final explained = await explain(tester, html, false);
+      const html = 'Foo';
+      final explained = await explain(tester, html, buildAsync: false);
       expect(explained, equals('[RichText:(:$html)]'));
     });
 
     testWidgets('uses FutureBuilder automatically', (tester) async {
       final html = 'Foo' * kShouldBuildAsync;
-      final explained = await explain(tester, html, null);
+      final explained = await explain(tester, html);
       expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
     });
   });
 
   group('buildAsyncBuilder', () {
-    final explain = (
+    Future<String?> explain(
       WidgetTester tester,
       String html, {
       AsyncWidgetBuilder<Widget>? buildAsyncBuilder,
-      bool withData = true,
+      required bool withData,
     }) =>
         tester.runAsync(() => helper.explain(tester, null,
             buildFutureBuilderWithData: withData,
@@ -58,14 +55,14 @@ void main() {
 
     group('default', () {
       testWidgets('renders data', (WidgetTester tester) async {
-        final html = 'Foo';
+        const html = 'Foo';
         final explained = await explain(tester, html, withData: true);
         expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
       });
 
       testWidgets('renders CircularProgressIndicator', (tester) async {
         debugDefaultTargetPlatformOverride = TargetPlatform.android;
-        final html = 'Foo';
+        const html = 'Foo';
         final explained = await explain(tester, html, withData: false);
         expect(
             explained,
@@ -79,7 +76,7 @@ void main() {
 
       testWidgets('renders CupertinoActivityIndicator', (tester) async {
         debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-        final html = 'Foo';
+        const html = 'Foo';
         final explained = await explain(tester, html, withData: false);
         expect(
             explained,
@@ -93,12 +90,12 @@ void main() {
     });
 
     group('custom', () {
-      final buildAsyncBuilder =
-          (BuildContext _, AsyncSnapshot<Widget> snapshot) =>
-              snapshot.data ?? Text('No data');
+      Widget buildAsyncBuilder(
+              BuildContext _, AsyncSnapshot<Widget> snapshot) =>
+          snapshot.data ?? const Text('No data');
 
       testWidgets('renders data', (WidgetTester tester) async {
-        final html = 'Foo';
+        const html = 'Foo';
         final explained = await explain(
           tester,
           html,
@@ -109,7 +106,7 @@ void main() {
       });
 
       testWidgets('renders indicator', (WidgetTester tester) async {
-        final html = 'Foo';
+        const html = 'Foo';
         final explained = await explain(
           tester,
           html,
@@ -122,12 +119,12 @@ void main() {
   });
 
   group('enableCaching', () {
-    final explain = (
+    Future<String> explain(
       WidgetTester tester,
-      String html,
-      bool enableCaching, {
+      String html, {
       Uri? baseUrl,
       bool? buildAsync,
+      required bool enableCaching,
       Color? hyperlinkColor,
       RebuildTriggers? rebuildTriggers,
       TextStyle? textStyle,
@@ -144,114 +141,117 @@ void main() {
               textStyle: textStyle,
             ));
 
-    final _expect = (Widget? built1, Widget? built2, Matcher matcher) {
-      final widget1 = (built1 as TshWidget).child;
-      final widget2 = (built2 as TshWidget).child;
+    void _expect(Widget? built1, Widget? built2, Matcher matcher) {
+      final widget1 = (built1! as TshWidget).child;
+      final widget2 = (built2! as TshWidget).child;
       expect(widget1 == widget2, matcher);
-    };
+    }
 
     testWidgets('caches built widget tree', (WidgetTester tester) async {
-      final html = 'Foo';
-      final explained = await explain(tester, html, true);
+      const html = 'Foo';
+      final explained = await explain(tester, html, enableCaching: true);
       expect(explained, equals('[RichText:(:Foo)]'));
       final built1 = helper.buildCurrentState();
 
-      await explain(tester, html, true);
+      await explain(tester, html, enableCaching: true);
       final built2 = helper.buildCurrentState();
       _expect(built1, built2, isTrue);
     });
 
     testWidgets('rebuild new html', (WidgetTester tester) async {
-      final html1 = 'Foo';
-      final html2 = 'Bar';
+      const html1 = 'Foo';
+      const html2 = 'Bar';
 
-      final explained1 = await explain(tester, html1, true);
+      final explained1 = await explain(tester, html1, enableCaching: true);
       expect(explained1, equals('[RichText:(:Foo)]'));
 
-      final explained2 = await explain(tester, html2, true);
+      final explained2 = await explain(tester, html2, enableCaching: true);
       expect(explained2, equals('[RichText:(:Bar)]'));
     });
 
     testWidgets('rebuild new baseUrl', (tester) async {
-      final html = 'Foo';
+      const html = 'Foo';
 
-      final explained1 = await explain(tester, html, true);
+      final explained1 = await explain(tester, html, enableCaching: true);
       expect(explained1, equals('[RichText:(:Foo)]'));
       final built1 = helper.buildCurrentState();
 
-      await explain(tester, html, true, baseUrl: Uri.http('domain.com', ''));
+      await explain(tester, html,
+          enableCaching: true, baseUrl: Uri.http('domain.com', ''));
       final built2 = helper.buildCurrentState();
       _expect(built1, built2, isFalse);
     });
 
     testWidgets('rebuild new buildAsync', (tester) async {
-      final html = 'Foo';
+      const html = 'Foo';
 
-      final explained1 = await explain(tester, html, true);
+      final explained1 = await explain(tester, html, enableCaching: true);
       expect(explained1, equals('[RichText:(:Foo)]'));
       final built1 = helper.buildCurrentState();
 
-      await explain(tester, html, true, buildAsync: false);
+      await explain(tester, html, enableCaching: true, buildAsync: false);
       final built2 = helper.buildCurrentState();
       _expect(built1, built2, isFalse);
     });
 
     testWidgets('rebuild new enableCaching', (tester) async {
-      final html = 'Foo';
+      const html = 'Foo';
 
-      final explained1 = await explain(tester, html, true);
+      final explained1 = await explain(tester, html, enableCaching: true);
       expect(explained1, equals('[RichText:(:Foo)]'));
       final built1 = helper.buildCurrentState();
 
-      await explain(tester, html, false);
+      await explain(tester, html, enableCaching: false);
       final built2 = helper.buildCurrentState();
       _expect(built1, built2, isFalse);
     });
 
     testWidgets('rebuild new hyperlinkColor', (tester) async {
-      final html = 'Foo';
+      const html = 'Foo';
 
-      final explained1 = await explain(tester, html, true);
+      final explained1 = await explain(tester, html, enableCaching: true);
       expect(explained1, equals('[RichText:(:Foo)]'));
       final built1 = helper.buildCurrentState();
 
-      await explain(tester, html, true,
-          hyperlinkColor: Color.fromRGBO(255, 0, 0, 1));
+      await explain(tester, html,
+          enableCaching: true,
+          hyperlinkColor: const Color.fromRGBO(255, 0, 0, 1));
       final built2 = helper.buildCurrentState();
       _expect(built1, built2, isFalse);
     });
 
     testWidgets('rebuild new rebuildTriggers', (tester) async {
-      final html = 'Foo';
+      const html = 'Foo';
 
-      final explained1 = await explain(tester, html, true,
-          rebuildTriggers: RebuildTriggers([1]));
+      final explained1 = await explain(tester, html,
+          enableCaching: true, rebuildTriggers: RebuildTriggers([1]));
       expect(explained1, equals('[RichText:(:Foo)]'));
       final built1 = helper.buildCurrentState();
 
-      await explain(tester, html, true, rebuildTriggers: RebuildTriggers([2]));
+      await explain(tester, html,
+          enableCaching: true, rebuildTriggers: RebuildTriggers([2]));
       final built2 = helper.buildCurrentState();
       _expect(built1, built2, isFalse);
     });
 
     testWidgets('rebuild new textStyle', (tester) async {
-      final html = 'Foo';
+      const html = 'Foo';
 
-      final explained1 = await explain(tester, html, true);
+      final explained1 = await explain(tester, html, enableCaching: true);
       expect(explained1, equals('[RichText:(:Foo)]'));
 
-      final explained2 =
-          await explain(tester, html, true, textStyle: TextStyle(fontSize: 20));
+      final explained2 = await explain(tester, html,
+          enableCaching: true, textStyle: const TextStyle(fontSize: 20));
       expect(explained2, equals('[RichText:(@20.0:Foo)]'));
     });
 
     testWidgets('skips caching', (WidgetTester tester) async {
-      final html = 'Foo';
-      final explained = await explain(tester, html, false);
+      const html = 'Foo';
+      final explained = await explain(tester, html, enableCaching: false);
       expect(explained, equals('[RichText:(:Foo)]'));
       final built1 = helper.buildCurrentState();
 
-      await explain(tester, html, false);
+      await explain(tester, html, enableCaching: false);
       final built2 = helper.buildCurrentState();
       _expect(built1, built2, isFalse);
     });
@@ -259,7 +259,7 @@ void main() {
 
   group('baseUrl', () {
     final baseUrl = Uri.parse('http://base.com/path/');
-    final html = '<img src="image.png" alt="image dot png" />';
+    const html = '<img src="image.png" alt="image dot png" />';
 
     testWidgets('renders without value', (WidgetTester tester) async {
       final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
@@ -285,7 +285,7 @@ void main() {
   });
 
   group('customStylesBuilder', () {
-    final html = 'Hello <span class="name">World</span>!';
+    const html = 'Hello <span class="name">World</span>!';
 
     testWidgets('renders without value', (WidgetTester tester) async {
       final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
@@ -307,8 +307,8 @@ void main() {
   });
 
   group('customWidgetBuilder', () {
-    final CustomWidgetBuilder customWidgetBuilder = (_) => Text('Bar');
-    final html = 'Foo <span>bar</span>';
+    Widget? customWidgetBuilder(dom.Element _) => const Text('Bar');
+    const html = 'Foo <span>bar</span>';
 
     testWidgets('renders without value', (WidgetTester tester) async {
       final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
@@ -329,9 +329,9 @@ void main() {
   });
 
   group('customWidgetBuilder (TABLE)', () {
-    final CustomWidgetBuilder customWidgetBuilder =
-        (e) => e.localName == 'table' ? Text('Bar') : null;
-    final html = 'Foo <table><tr><td>bar</td></tr></table>';
+    Widget? customWidgetBuilder(dom.Element e) =>
+        e.localName == 'table' ? const Text('Bar') : null;
+    const html = 'Foo <table><tr><td>bar</td></tr></table>';
 
     testWidgets('renders without value', (WidgetTester tester) async {
       final explained =
@@ -353,8 +353,8 @@ void main() {
   });
 
   group('hyperlinkColor', () {
-    final hyperlinkColor = Color.fromRGBO(255, 0, 0, 1);
-    final html = '<a>Foo</a>';
+    const hyperlinkColor = Color.fromRGBO(255, 0, 0, 1);
+    const html = '<a>Foo</a>';
 
     testWidgets('renders default value', (WidgetTester tester) async {
       final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
@@ -367,14 +367,6 @@ void main() {
         HtmlWidget(html, hyperlinkColor: hyperlinkColor, key: helper.hwKey),
       );
       expect(explained, equals('[RichText:(#FFFF0000+u:Foo)]'));
-    });
-
-    testWidgets('renders null value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        HtmlWidget(html, hyperlinkColor: null, key: helper.hwKey),
-      );
-      expect(explained, equals('[RichText:(#FF123456+u:Foo)]'));
     });
   });
 
@@ -472,7 +464,7 @@ void main() {
   });
 
   group('textStyle', () {
-    final html = 'Foo';
+    const html = 'Foo';
 
     testWidgets('renders without value', (WidgetTester tester) async {
       final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
@@ -485,7 +477,7 @@ void main() {
         HtmlWidget(
           html,
           key: helper.hwKey,
-          textStyle: TextStyle(fontStyle: FontStyle.italic),
+          textStyle: const TextStyle(fontStyle: FontStyle.italic),
         ),
       );
       expect(explained, equals('[RichText:(+i:Foo)]'));

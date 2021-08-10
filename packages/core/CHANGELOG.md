@@ -1,3 +1,12 @@
+## 0.6.1+4
+
+- Improve whitespace handling (#551)
+
+## 0.6.1+3
+
+- Fix bug padding+background+h2 (#523)
+- Fix `min-width` being ignored (#544)
+
 ## 0.6.1+1
 
 - Fix negative margin/padding throwing exception (#510)

@@ -108,7 +108,6 @@ class TagLi {
     return text.isNotEmpty
         ? RichText(
             maxLines: 1,
-            overflow: TextOverflow.clip,
             softWrap: false,
             text: TextSpan(style: style, text: text),
             textDirection: tsh.textDirection,
@@ -127,7 +126,7 @@ class _ListConfig {
   final bool markerReversed;
   final int? markerStart;
 
-  _ListConfig({
+  const _ListConfig({
     required this.listStyleType,
     required this.markerReversed,
     this.markerStart,
@@ -221,6 +220,7 @@ class _ListMarkerRenderObject extends RenderBox {
   _ListMarkerRenderObject(this._markerType, this._textStyle);
 
   _ListMarkerType _markerType;
+  // ignore: avoid_setters_without_getters
   set markerType(_ListMarkerType v) {
     if (v == _markerType) return;
     _markerType = v;
@@ -228,14 +228,25 @@ class _ListMarkerRenderObject extends RenderBox {
   }
 
   TextPainter? __textPainter;
+  final _textMetrics = <LineMetrics>[];
   TextPainter get _textPainter {
-    return __textPainter ??= TextPainter(
+    final existingPainter = __textPainter;
+    if (existingPainter != null) return existingPainter;
+
+    final newPainter = __textPainter = TextPainter(
       text: TextSpan(style: _textStyle, text: '1.'),
       textDirection: TextDirection.ltr,
     )..layout();
+
+    _textMetrics
+      ..clear()
+      ..addAll(newPainter.computeLineMetrics());
+
+    return newPainter;
   }
 
   TextStyle _textStyle;
+  // ignore: avoid_setters_without_getters
   set textStyle(TextStyle v) {
     if (v == _textStyle) return;
     __textPainter = null;
@@ -255,13 +266,7 @@ class _ListMarkerRenderObject extends RenderBox {
   void paint(PaintingContext context, Offset offset) {
     final canvas = context.canvas;
 
-    var lineMetrics = <LineMetrics>[];
-    try {
-      lineMetrics = _textPainter.computeLineMetrics();
-      // ignore: empty_catches
-    } on UnimplementedError {}
-
-    final m = lineMetrics.isNotEmpty ? lineMetrics.first : null;
+    final m = _textMetrics.isNotEmpty ? _textMetrics.first : null;
     final center = offset +
         Offset(
           size.width / 2,
