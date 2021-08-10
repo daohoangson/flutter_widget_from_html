@@ -36,9 +36,8 @@ class TagAudio {
             autoplay: attrs.containsKey(kAttributeAudioAutoplay),
             loop: attrs.containsKey(kAttributeAudioLoop),
             muted: attrs.containsKey(kAttributeAudioMuted),
-            preload: attrs.containsKey(kAttributeAudioPreload)
-                ? attrs[kAttributeAudioPreload] != kAttributeAudioPreloadNone
-                : false,
+            preload: attrs.containsKey(kAttributeAudioPreload) &&
+                attrs[kAttributeAudioPreload] != kAttributeAudioPreloadNone,
           ));
         },
       );

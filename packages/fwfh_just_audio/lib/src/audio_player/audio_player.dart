@@ -30,7 +30,7 @@ class AudioPlayer extends StatefulWidget {
   final bool preload;
 
   /// Creates a player.
-  AudioPlayer(
+  const AudioPlayer(
     this.url, {
     this.autoplay = false,
     Key? key,
@@ -140,9 +140,7 @@ class _DurationText extends StatelessWidget {
           return Text(
             duration < 0
                 ? '--:--'
-                : (minutes.toString().padLeft(2, '0') +
-                    ':' +
-                    seconds.toString().padLeft(2, '0')),
+                : '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
           );
         },
         stream: stream,

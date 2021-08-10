@@ -20,7 +20,7 @@ void main() {
 
     setUp(() {
       _commands.clear();
-      _duration = Duration(milliseconds: 10);
+      _duration = const Duration(milliseconds: 10);
       _playbackEvents = StreamController<PlaybackEventMessage>.broadcast();
 
       audioSessionMc.setMockMethodCallHandler((_) {});
@@ -33,7 +33,7 @@ void main() {
 
     testWidgets('plays then pauses on completion', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: fwfh.AudioPlayer(src),
           ),
@@ -65,7 +65,7 @@ void main() {
       await tester.runAsync(() => Future.delayed(Duration.zero));
 
       // force a widget tree disposal
-      await tester.pumpWidget(SizedBox.shrink());
+      await tester.pumpWidget(const SizedBox.shrink());
       await tester.pumpAndSettle();
 
       expect(
@@ -77,10 +77,10 @@ void main() {
     });
 
     testWidgets('shows duration', (tester) async {
-      _duration = Duration(minutes: 12, seconds: 34);
+      _duration = const Duration(minutes: 12, seconds: 34);
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: fwfh.AudioPlayer(src, preload: true),
           ),
@@ -92,15 +92,15 @@ void main() {
       expect(find.text('12:34'), findsOneWidget);
 
       // force a widget tree disposal
-      await tester.pumpWidget(SizedBox.shrink());
+      await tester.pumpWidget(const SizedBox.shrink());
       await tester.pumpAndSettle();
     });
 
     testWidgets('seeks', (tester) async {
-      _duration = Duration(seconds: 100);
+      _duration = const Duration(seconds: 100);
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: fwfh.AudioPlayer(src, preload: true),
           ),
@@ -116,7 +116,7 @@ void main() {
       expect(_commands, equals([Tuple2(_CommandType.seek, _duration * .5)]));
 
       // force a widget tree disposal
-      await tester.pumpWidget(SizedBox.shrink());
+      await tester.pumpWidget(const SizedBox.shrink());
       await tester.pumpAndSettle();
     });
   });
@@ -149,13 +149,13 @@ class _AudioPlayerPlatform extends AudioPlayerPlatform {
 
   @override
   Future<PlayResponse> play(PlayRequest request) async {
-    _commands.add(Tuple2(_CommandType.play, null));
+    _commands.add(const Tuple2(_CommandType.play, null));
     return PlayResponse();
   }
 
   @override
   Future<PauseResponse> pause(PauseRequest request) async {
-    _commands.add(Tuple2(_CommandType.pause, null));
+    _commands.add(const Tuple2(_CommandType.pause, null));
     return PauseResponse();
   }
 
