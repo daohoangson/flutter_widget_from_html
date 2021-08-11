@@ -46,6 +46,7 @@ void main() {
       expect(
           _commands,
           equals(const [
+            Tuple2(_CommandType.setVolume, 1.0),
             Tuple2(_CommandType.play, null),
             Tuple2(_CommandType.load, src),
           ]));
@@ -133,7 +134,12 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text('0:00 / 1:40'), findsOneWidget);
-      expect(_commands, equals(const [Tuple2(_CommandType.load, src)]));
+      expect(
+          _commands,
+          equals(const [
+            Tuple2(_CommandType.setVolume, 1.0),
+            Tuple2(_CommandType.load, src),
+          ]));
       _commands.clear();
 
       await tester.tap(find.byType(Slider));
@@ -144,6 +150,57 @@ void main() {
       // force a widget tree disposal
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pumpAndSettle();
+    });
+
+    group('mute', () {
+      const iconOn = Icons.volume_up;
+      const iconOff = Icons.volume_off_outlined;
+
+      testWidgets('shows unmuted and mutes', (tester) async {
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: fwfh.AudioPlayer(src, preload: true),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+        _commands.clear();
+
+        await tester.tap(find.byIcon(iconOn));
+        await tester.pumpAndSettle();
+
+        expect(_commands, equals(const [Tuple2(_CommandType.setVolume, 0.0)]));
+        expect(find.byIcon(iconOff), findsOneWidget);
+
+        // force a widget tree disposal
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pumpAndSettle();
+      });
+
+      testWidgets('shows muted and unmutes', (tester) async {
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: fwfh.AudioPlayer(src, muted: true, preload: true),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+        _commands.clear();
+
+        await tester.tap(find.byIcon(iconOff));
+        await tester.pumpAndSettle();
+
+        expect(_commands, equals(const [Tuple2(_CommandType.setVolume, 1.0)]));
+        expect(find.byIcon(iconOn), findsOneWidget);
+
+        // force a widget tree disposal
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pumpAndSettle();
+      });
     });
   });
 }
@@ -186,8 +243,10 @@ class _AudioPlayerPlatform extends AudioPlayerPlatform {
   }
 
   @override
-  Future<SetVolumeResponse> setVolume(SetVolumeRequest request) async =>
-      SetVolumeResponse();
+  Future<SetVolumeResponse> setVolume(SetVolumeRequest request) async {
+    _commands.add(Tuple2(_CommandType.setVolume, request.volume));
+    return SetVolumeResponse();
+  }
 
   @override
   Future<SetSpeedResponse> setSpeed(SetSpeedRequest request) async =>
@@ -223,4 +282,5 @@ enum _CommandType {
   pause,
   play,
   seek,
+  setVolume,
 }
