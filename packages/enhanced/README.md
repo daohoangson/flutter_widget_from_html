@@ -14,11 +14,12 @@ A Flutter package for building Flutter widget tree from HTML with support for
 This package supports most common HTML tags for easy usage.
 If you don't want to include all of its dependencies in your build, it's possible to use [flutter_widget_from_html_core](https://pub.dev/packages/flutter_widget_from_html_core) with a subset of the mixins to control your app size:
 
-- [fwfh_cached_network_image](https://pub.dev/packages/fwfh_cached_network_image)
-- [fwfh_chewie](https://pub.dev/packages/fwfh_chewie)
-- [fwfh_svg](https://pub.dev/packages/fwfh_svg)
-- [fwfh_url_launcher](https://pub.dev/packages/fwfh_url_launcher)
-- [fwfh_webview](https://pub.dev/packages/fwfh_webview)
+- [fwfh_cached_network_image](https://pub.dev/packages/fwfh_cached_network_image) for optimized image rendering
+- [fwfh_chewie](https://pub.dev/packages/fwfh_chewie) for VIDEO support
+- [fwfh_just_audio](https://pub.dev/packages/fwfh_just_audio) for AUDIO support
+- [fwfh_svg](https://pub.dev/packages/fwfh_svg) for SVG support
+- [fwfh_url_launcher](https://pub.dev/packages/fwfh_url_launcher) to launch URLs
+- [fwfh_webview](https://pub.dev/packages/fwfh_webview) for IFRAME support
 
 ## Getting Started
 
@@ -90,6 +91,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
 - A: underline, theme accent color
   - Scroll to anchor
   - Launch URL via [url_launcher](https://pub.dev/packages/url_launcher) with base URL resolver
+- AUDIO via [just_audio](https://pub.dev/packages/just_audio)
 - H1/H2/H3/H4/H5/H6
 - IFRAME via [webview_flutter](https://pub.dev/packages/webview_flutter)
 - IMG with support for asset (`asset://`), data uri, local file (`file://`) and network image via [cached_network_image](https://pub.dev/packages/cached_network_image). Additional .svg file support via [flutter_svg](https://pub.dev/packages/flutter_svg).

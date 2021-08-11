@@ -1,6 +1,6 @@
 name: flutter_widget_from_html
 version: 0.6.1
-description: Flutter package for widget tree building from html that supports hyperlink, image, nested list, etc.
+description: Flutter package to render html as widgets that supports hyperlink, image, audio, video, iframe and many other tags.
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
 environment:
