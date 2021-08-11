@@ -588,3 +588,24 @@ class Explainer {
   String _widgetChildren(Iterable<Widget> widgets) =>
       widgets.isNotEmpty ? 'children=${widgets.map(_widget).join(',')}' : '';
 }
+
+class HitTestApp extends StatelessWidget {
+  final String html;
+  final List<String> list;
+
+  const HitTestApp({required this.html, Key? key, required this.list})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => MaterialApp(
+        home: Scaffold(
+          body: HtmlWidget(
+            html,
+            onTapUrl: (url) {
+              list.add(url);
+              return true;
+            },
+          ),
+        ),
+      );
+}

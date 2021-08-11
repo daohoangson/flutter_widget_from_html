@@ -632,17 +632,17 @@ Future<void> main() async {
     });
 
     testWidgets('performs hit test', (tester) async {
-      const kHref = 'href';
+      const href = 'href';
       final urls = <String>[];
 
-      await tester.pumpWidget(_HitTestApp(
-        href: kHref,
-        onTapUrl: (url) => urls.add(url),
+      await tester.pumpWidget(HitTestApp(
+        html: '<table><tr><td><li><a href="$href">Tap me</a></td></tr></table>',
+        list: urls,
       ));
       expect(await tapText(tester, 'Tap me'), equals(1));
 
       await tester.pumpAndSettle();
-      expect(urls, equals(const [kHref]));
+      expect(urls, equals(const [href]));
     });
 
     final goldenSkip = Platform.isLinux ? null : 'Linux only';
@@ -787,23 +787,6 @@ class _Golden extends StatelessWidget {
               const Divider(),
               HtmlWidget(contents),
             ],
-          ),
-        ),
-      );
-}
-
-class _HitTestApp extends StatelessWidget {
-  final String? href;
-  final void Function(String)? onTapUrl;
-
-  const _HitTestApp({this.href, Key? key, this.onTapUrl}) : super(key: key);
-
-  @override
-  Widget build(BuildContext _) => MaterialApp(
-        home: Scaffold(
-          body: HtmlWidget(
-            '<table><tr><td><li><a href="$href">Tap me</a></td></tr></table>',
-            onTapUrl: onTapUrl,
           ),
         ),
       );

@@ -196,13 +196,17 @@ Future<void> main() async {
     });
 
     testWidgets('performs hit test', (tester) async {
-      const kHref = 'href';
+      const href = 'href';
       final urls = <String>[];
 
-      await tester.pumpWidget(_HitTestApp(href: kHref, onTapUrl: urls.add));
-      await tester.pumpAndSettle();
+      await tester.pumpWidget(HitTestApp(
+        html: '<ruby><a href="$href">Tap me</a> <rt>Foo</rt></ruby>',
+        list: urls,
+      ));
       expect(await tapText(tester, 'Tap me'), equals(1));
-      expect(urls, equals(const [kHref]));
+
+      await tester.pumpAndSettle();
+      expect(urls, equals(const [href]));
     });
 
     final goldenSkip = Platform.isLinux ? null : 'Linux only';
@@ -231,21 +235,4 @@ Future<void> main() async {
       ),
     );
   });
-}
-
-class _HitTestApp extends StatelessWidget {
-  final String? href;
-  final void Function(String)? onTapUrl;
-
-  const _HitTestApp({this.href, Key? key, this.onTapUrl}) : super(key: key);
-
-  @override
-  Widget build(BuildContext _) => MaterialApp(
-        home: Scaffold(
-          body: HtmlWidget(
-            '<ruby><a href="$href">Tap me</a> <rt>Foo</rt></ruby>',
-            onTapUrl: onTapUrl,
-          ),
-        ),
-      );
 }

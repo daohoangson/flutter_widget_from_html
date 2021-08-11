@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core show HtmlWidget, RebuildTriggers;
@@ -49,7 +51,7 @@ class HtmlWidget extends core.HtmlWidget {
     CustomWidgetBuilder? customWidgetBuilder,
     Color? hyperlinkColor,
     void Function(ImageMetadata)? onTapImage,
-    dynamic Function(String)? onTapUrl,
+    FutureOr<bool> Function(String)? onTapUrl,
     core.RebuildTriggers? rebuildTriggers,
     RenderMode renderMode = RenderMode.column,
     TextStyle textStyle = const TextStyle(),

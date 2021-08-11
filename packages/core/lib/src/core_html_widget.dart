@@ -62,10 +62,8 @@ class HtmlWidget extends StatefulWidget {
 
   /// The callback when user taps a link.
   ///
-  /// Returns `false` to fallback to the built-in handler.
-  /// Returns `true` (or anything that is not `false`) to skip default behaviors.
-  /// Returning a `Future` is supported.
-  final dynamic Function(String)? onTapUrl;
+  /// Returns `true` if the url has been handled, the default handler will be skipped.
+  final FutureOr<bool> Function(String)? onTapUrl;
 
   /// The values that should trigger rebuild.
   ///

@@ -525,14 +525,10 @@ class WidgetFactory {
 
   /// Calls [HtmlWidget.onTapUrl] with [url].
   ///
-  /// Returns `true` if there is a callback and
-  /// it finishes with non-`false` value.
+  /// Returns `true` if there is a callback and it has handled the tap.
   Future<bool> onTapCallback(String url) async {
     final callback = _widget?.onTapUrl;
-    if (callback == null) return false;
-
-    final result = await Future.value(callback(url));
-    return result != false;
+    return callback != null ? callback(url) : false;
   }
 
   /// Handles user tapping a link.
