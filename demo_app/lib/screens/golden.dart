@@ -18,7 +18,7 @@ class Golden extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final baseUrl = Uri.parse('https://www.w3schools.com/html/');
-    final withEnhanced = RegExp(r'^(IFRAME|SVG|VIDEO)$').hasMatch(name);
+    final withEnhanced = RegExp(r'^(AUDIO|IFRAME|SVG|VIDEO)$').hasMatch(name);
 
     final children = <Widget>[
       Text(html),
