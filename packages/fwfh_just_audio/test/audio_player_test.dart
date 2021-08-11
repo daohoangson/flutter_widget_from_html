@@ -76,7 +76,12 @@ void main() {
           ]));
     });
 
-    testWidgets('shows duration', (tester) async {
+    testWidgets('shows remaining (narrow)', (tester) async {
+      tester.binding.window.physicalSizeTestValue = const Size(320, 568);
+      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.binding.window.devicePixelRatioTestValue = 1;
+      addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
+
       _duration = const Duration(minutes: 12, seconds: 34);
 
       await tester.pumpWidget(
@@ -86,10 +91,30 @@ void main() {
           ),
         ),
       );
-      expect(find.text('--:--'), findsOneWidget);
+      expect(find.text('-0:00'), findsOneWidget);
 
       await tester.pumpAndSettle();
-      expect(find.text('12:34'), findsOneWidget);
+      expect(find.text('-12:34'), findsOneWidget);
+
+      // force a widget tree disposal
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('shows position & duration (wide)', (tester) async {
+      _duration = const Duration(minutes: 12, seconds: 34);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: fwfh.AudioPlayer(src, preload: true),
+          ),
+        ),
+      );
+      expect(find.text('0:00 / 0:00'), findsOneWidget);
+
+      await tester.pumpAndSettle();
+      expect(find.text('0:00 / 12:34'), findsOneWidget);
 
       // force a widget tree disposal
       await tester.pumpWidget(const SizedBox.shrink());
@@ -107,12 +132,13 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-
-      expect(find.text('01:40'), findsOneWidget);
+      expect(find.text('0:00 / 1:40'), findsOneWidget);
       expect(_commands, equals(const [Tuple2(_CommandType.load, src)]));
       _commands.clear();
 
       await tester.tap(find.byType(Slider));
+      await tester.pumpAndSettle();
+      expect(find.text('0:50 / 1:40'), findsOneWidget);
       expect(_commands, equals([Tuple2(_CommandType.seek, _duration * .5)]));
 
       // force a widget tree disposal

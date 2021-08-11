@@ -83,7 +83,7 @@ class _AudioPlayerState extends State<AudioPlayer> {
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(builder: (_, bc) {
-        final isNarrow = bc.hasBoundedWidth && bc.maxWidth < 320;
+        final isNarrow = bc.hasBoundedWidth && bc.maxWidth <= 320;
         final theme = Theme.of(context);
         final iconSize = DefaultTextStyle.of(context).style.fontSize! *
             MediaQuery.of(context).textScaleFactor;
