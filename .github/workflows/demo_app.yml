@@ -68,7 +68,7 @@ jobs:
           cd ..
           cp -R goldens ../build/web/supported
 
-      - name: Deploy via now.sh
+      - name: Deploy via Vercel
         id: now
         env:
           PROJECT_JSON: ${{ secrets.EXAMPLE_PROJECT_JSON }}

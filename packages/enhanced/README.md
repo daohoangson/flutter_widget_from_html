@@ -5,9 +5,9 @@
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html.svg)](https://pub.dev/packages/flutter_widget_from_html)
 
 A Flutter package for building Flutter widget tree from HTML with support for
-[IFRAME, VIDEO and 70+ other tags](https://html-widget-demo.now.sh/supported/tags.html).
+[IFRAME, VIDEO and 70+ other tags](https://html-widget-demo.vercel.app/supported/tags.html).
 
-| [Live demo](https://html-widget-demo.now.sh/#/helloworld)                                                                     |                                                                                                                               |                                                                                                                               |
+| [Live demo](https://html-widget-demo.vercel.app/#/helloworld)                                                                     |                                                                                                                               |                                                                                                                               |
 |-------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
 | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldScreen1.jpg) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldScreen2.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldScreen3.gif) |
 
@@ -85,7 +85,7 @@ HtmlWidget(
 ### HTML tags
 
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
-[Compare between Flutter rendering and browser's.](https://html-widget-demo.now.sh/supported/tags.html)
+[Compare between Flutter rendering and browser's.](https://html-widget-demo.vercel.app/supported/tags.html)
 
 - A: underline, theme accent color
   - Scroll to anchor
@@ -104,7 +104,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
   DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, INS,
   KBD, MAIN, NAV, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, STRIKE, STRONG, SUB, SUP, TT, U, VAR
-- Everything with screenshot: https://html-widget-demo.now.sh/supported/tags.html
+- Everything with screenshot: https://html-widget-demo.vercel.app/supported/tags.html
 
 These tags and their contents will be ignored:
 

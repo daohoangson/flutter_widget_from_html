@@ -7,6 +7,8 @@
 WidgetFactory extension to render AUDIO with the [just_audio](https://pub.dev/packages/just_audio) plugin.
 This is a companion add-on for [flutter_widget_from_html_core](https://pub.dev/packages/flutter_widget_from_html_core) package.
 
+Live demo: https://html-widget-demo.vercel.app/#/audio
+
 ## Getting Started
 
 Add this to your app's `pubspec.yaml` file:
