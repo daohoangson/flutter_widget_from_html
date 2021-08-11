@@ -21,7 +21,13 @@ class Golden extends StatelessWidget {
     final withEnhanced = RegExp(r'^(AUDIO|IFRAME|SVG|VIDEO)$').hasMatch(name);
 
     final children = <Widget>[
-      Text(html),
+      if (withEnhanced)
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Text(html),
+        )
+      else
+        Text(html),
       const Divider(),
       if (withEnhanced)
         Text(
