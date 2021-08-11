@@ -13,6 +13,7 @@ dependencies:
   flutter_widget_from_html_core: ^0.6.1
   fwfh_cached_network_image: ^0.6.0
   fwfh_chewie: ^0.6.0
+  fwfh_just_audio: ^0.6.2
   fwfh_svg: ^0.6.0
   fwfh_url_launcher: ^0.6.0
   fwfh_webview: ^0.6.0
@@ -25,6 +26,8 @@ dependency_overrides:
     path: ../fwfh_cached_network_image
   fwfh_chewie:
     path: ../fwfh_chewie
+  fwfh_just_audio:
+    path: ../fwfh_just_audio
   fwfh_svg:
     path: ../fwfh_svg
   fwfh_url_launcher:

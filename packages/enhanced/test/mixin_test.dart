@@ -3,6 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '_.dart';
 
 void main() {
+  testWidgets('renders AUDIO tag', (tester) async {
+    const src = 'http://domain.com/audio.mp3';
+    const html = '<audio src="$src"></audio>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[AudioPlayer:url=$src]'));
+  });
+
   testWidgets('renders SVG tag', (tester) async {
     const html = '''
 <svg height="100" width="100">
@@ -36,9 +43,6 @@ void main() {
     const src = 'http://domain.com/video.mp4';
     const html = '<video><source src="$src"></video>';
     final explained = await explain(tester, html);
-    expect(
-      explained,
-      equals('[VideoPlayer:url=http://domain.com/video.mp4,aspectRatio=1.78]'),
-    );
+    expect(explained, equals('[VideoPlayer:url=$src,aspectRatio=1.78]'));
   });
 }

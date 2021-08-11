@@ -4,6 +4,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 import '../../core/test/_.dart' as helper;
 import '../../fwfh_chewie/test/_.dart' as fwfh_chewie;
+import '../../fwfh_just_audio/test/_.dart' as fwfh_just_audio;
 import '../../fwfh_svg/test/_.dart' as fwfh_svg;
 import '../../fwfh_webview/test/_.dart' as fwfh_webview;
 
@@ -17,6 +18,7 @@ const buildCurrentState = helper.buildCurrentState;
 
 String? _explainer(helper.Explainer parent, Widget widget) {
   return fwfh_chewie.videoPlayerExplainer(parent, widget) ??
+      fwfh_just_audio.audioPlayerExplainer(parent, widget) ??
       fwfh_svg.svgExplainer(parent, widget) ??
       fwfh_webview.webViewExplainer(parent, widget);
 }

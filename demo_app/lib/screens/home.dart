@@ -1,6 +1,7 @@
 import 'package:demo_app/model/show_perf_overlay.dart';
 import 'package:flutter/material.dart';
 
+import 'audio.dart';
 import 'custom_styles_builder.dart';
 import 'custom_widget_builder.dart';
 import 'font_size.dart';
@@ -20,6 +21,7 @@ class HomeScreen extends StatelessWidget {
   static final _screens = <String, Widget Function()>{
     'Hello World': () => const HelloWorldScreen(),
     'Hello World (core)': () => const HelloWorldCoreScreen(),
+    'Audio': () => const AudioScreen(),
     'Iframe': () => const IframeScreen(),
     'Images': () => const ImgScreen(),
     'Image (file://)': () => const ImgFileScreen(),
