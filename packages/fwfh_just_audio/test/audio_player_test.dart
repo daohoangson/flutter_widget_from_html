@@ -227,6 +227,18 @@ class _AudioPlayerPlatform extends AudioPlayerPlatform {
   Future<LoadResponse> load(LoadRequest request) async {
     final map = request.audioSourceMessage.toMap();
     _commands.add(Tuple2(_CommandType.load, map['uri'] ?? map));
+
+    _playbackEvents.add(PlaybackEventMessage(
+      processingState: ProcessingStateMessage.ready,
+      updateTime: DateTime.now(),
+      updatePosition: Duration.zero,
+      bufferedPosition: _duration,
+      duration: _duration,
+      icyMetadata: null,
+      currentIndex: 0,
+      androidAudioSessionId: null,
+    ));
+
     return LoadResponse(duration: _duration);
   }
 
