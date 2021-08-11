@@ -1,5 +1,6 @@
 {
   "A": "<a href=\"https://flutter.dev\">Flutter</a>",
+  "AUDIO": "<audio src=\"https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3\">\n  Your browser does not support the <code>audio</code> element.\n</audio>",
   "ABBR": "<abbr>ABBR</abbr>",
   "ACRONYM": "<acronym>ACRONYM</acronym>",
   "ADDRESS": "This is an <address>ADDRESS</address>",
