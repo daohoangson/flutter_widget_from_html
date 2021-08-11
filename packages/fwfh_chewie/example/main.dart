@@ -18,10 +18,9 @@ class MyApp extends StatelessWidget {
         body: Center(
           child: HtmlWidget(
             '''
-<video controls width="320" height="176">
-  <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-  <source src="https://www.w3schools.com/html/mov_bbb.ogg" type="video/ogg">
-  Your browser does not support HTML5 video.
+<video controls width="250">
+  <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+  Sorry, your browser doesn't support embedded videos.
 </video>''',
             factoryBuilder: () => MyWidgetFactory(),
           ),

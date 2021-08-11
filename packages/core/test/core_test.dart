@@ -390,13 +390,14 @@ Future<void> main() async {
     testWidgets('skips VIDEO tag', (WidgetTester tester) async {
       const html = '''
 <video>
-  <source src="mov_bbb.mp4" type="video/mp4">
-  <source src="mov_bbb.ogg" type="video/ogg">
-  Your browser does not support HTML5 video.
+  <source src="http://domain.com/video.mp4" type="video/mp4">
+  Sorry, your browser doesn't support embedded videos.
 </video>''';
       final explained = await explain(tester, html);
-      expect(explained,
-          equals('[RichText:(:Your browser does not support HTML5 video.)]'));
+      expect(
+          explained,
+          equals(
+              "[RichText:(:Sorry, your browser doesn't support embedded videos.)]"));
     });
   });
 
