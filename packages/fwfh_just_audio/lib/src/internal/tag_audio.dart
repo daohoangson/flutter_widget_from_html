@@ -23,6 +23,8 @@ class TagAudio {
               defaultTargetPlatform != TargetPlatform.iOS &&
               defaultTargetPlatform != TargetPlatform.macOS &&
               !kIsWeb) {
+            // these are the just_audio's supported platforms
+            // https://pub.dev/packages/just_audio/versions/0.9.5
             return widgets;
           }
 
@@ -31,14 +33,15 @@ class TagAudio {
           if (url == null) return widgets;
 
           return listOrNull(wf.buildAudioPlayer(
-            meta,
-            url,
-            autoplay: attrs.containsKey(kAttributeAudioAutoplay),
-            loop: attrs.containsKey(kAttributeAudioLoop),
-            muted: attrs.containsKey(kAttributeAudioMuted),
-            preload: attrs.containsKey(kAttributeAudioPreload) &&
-                attrs[kAttributeAudioPreload] != kAttributeAudioPreloadNone,
-          ));
+                meta,
+                url,
+                autoplay: attrs.containsKey(kAttributeAudioAutoplay),
+                loop: attrs.containsKey(kAttributeAudioLoop),
+                muted: attrs.containsKey(kAttributeAudioMuted),
+                preload: attrs.containsKey(kAttributeAudioPreload) &&
+                    attrs[kAttributeAudioPreload] != kAttributeAudioPreloadNone,
+              )) ??
+              widgets;
         },
       );
 }
