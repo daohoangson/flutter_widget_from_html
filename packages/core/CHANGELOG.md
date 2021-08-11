@@ -1,3 +1,7 @@
+## 0.6.2
+
+- Restore `computeLineMetrics` usage in Flutter web. (#561)
+
 ## 0.6.1+4
 
 - Improve whitespace handling (#551)
