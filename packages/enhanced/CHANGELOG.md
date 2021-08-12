@@ -29,6 +29,15 @@
 - Add image loading builder to core widget factory (#517)
 - Fix bug border+background (#516)
 
+## 0.6.2
+
+- Restore `computeLineMetrics` usage in Flutter web. (#561)
+- Improve whitespace handling (#551)
+- Fix negative margin/padding throwing exception (#510)
+- Fix bug padding+background+h2 (#523)
+- Fix `min-width` being ignored (#544)
+- Fix portrait video (#553)
+
 ## 0.6.1
 
 - Add support for white-space inline style (#483)

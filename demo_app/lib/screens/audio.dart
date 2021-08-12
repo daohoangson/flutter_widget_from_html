@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
-class VideoScreen extends StatefulWidget {
-  const VideoScreen({Key key}) : super(key: key);
+class AudioScreen extends StatefulWidget {
+  const AudioScreen({Key key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _State();
 }
 
-class _State extends State<VideoScreen> {
+class _State extends State<AudioScreen> {
   bool autoplay = false;
-  bool controls = false;
   bool loop = false;
-  bool poster = false;
-  bool widthHeight = false;
+  bool muted = false;
+  bool preload = false;
 
   String _html = '';
 
@@ -26,7 +25,7 @@ class _State extends State<VideoScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: const Text('VideoScreen'),
+          title: const Text('AudioScreen'),
         ),
         body: ListView(children: <Widget>[
           CheckboxListTile(
@@ -35,24 +34,19 @@ class _State extends State<VideoScreen> {
             title: const Text('autoplay'),
           ),
           CheckboxListTile(
-            value: controls,
-            onChanged: (v) => _setState(() => controls = v),
-            title: const Text('controls'),
-          ),
-          CheckboxListTile(
             value: loop,
             onChanged: (v) => _setState(() => loop = v),
             title: const Text('loop'),
           ),
           CheckboxListTile(
-            value: poster,
-            onChanged: (v) => _setState(() => poster = v),
-            title: const Text('poster'),
+            value: muted,
+            onChanged: (v) => _setState(() => muted = v),
+            title: const Text('muted'),
           ),
           CheckboxListTile(
-            value: widthHeight,
-            onChanged: (v) => _setState(() => widthHeight = v),
-            title: const Text('width & height'),
+            value: preload,
+            onChanged: (v) => _setState(() => preload = v),
+            title: const Text('preload'),
           ),
           ListTile(
             title: const Text('HTML:'),
@@ -64,7 +58,7 @@ class _State extends State<VideoScreen> {
               _html,
               key: Key(_html),
               baseUrl: Uri.parse(
-                  'https://interactive-examples.mdn.mozilla.net/pages/tabbed/video.html'),
+                  'https://interactive-examples.mdn.mozilla.net/pages/tabbed/audio.html'),
             ),
           ),
           const Center(child: Text('----')),
@@ -78,27 +72,23 @@ class _State extends State<VideoScreen> {
         if (autoplay) {
           attributes.add('autoplay');
         }
-        if (controls) {
-          attributes.add('controls');
-        }
         if (loop) {
           attributes.add('loop');
         }
-        if (poster) {
-          attributes.add('poster="asset:logos/android.png"');
+        if (muted) {
+          attributes.add('muted');
         }
-        if (widthHeight) {
-          attributes.add('width="320" height="180"');
+        if (preload) {
+          attributes.add('preload');
         }
 
-        _html = """
+        _html = '''
 <figure>
-  <video ${attributes.join(' ')}>
-    <source src="/media/cc0-videos/flower.mp4" type="video/mp4">
-    Sorry, your browser doesn't support embedded videos.
-  </video>
-  <figcaption>Source: <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video">developer.mozilla.org</a></figcaption>
+  <audio src="/media/cc0-audio/t-rex-roar.mp3" ${attributes.join(' ')}>
+    Your browser does not support the <code>audio</code> element.
+  </audio>
+  <figcaption>Source: <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio">developer.mozilla.org</a></figcaption>
 </figure>
-""";
+''';
       });
 }

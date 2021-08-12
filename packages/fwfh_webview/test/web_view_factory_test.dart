@@ -79,13 +79,7 @@ void main() {
       expect(
           explained,
           equals('TshWidget\n'
-              '└WidgetPlaceholder<Widget>(WebView)\n'
-              ' └WebView(state: WebViewState)\n'
-              '  └AspectRatio(aspectRatio: 1.8)\n'
-              '   └DecoratedBox(bg: BoxDecoration(color: Color(0x7f000000)))\n'
-              '    └Center(alignment: center)\n'
-              '     └Text("platform=TargetPlatform.linux")\n'
-              '      └RichText(text: "platform=TargetPlatform.linux")\n'
+              '└SizedBox.shrink()\n'
               '\n'));
       debugDefaultTargetPlatformOverride = null;
     });

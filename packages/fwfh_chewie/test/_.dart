@@ -128,8 +128,8 @@ class _FakeVideoEventStream {
           final data = <String, dynamic>{
             'event': 'initialized',
             'duration': 1000,
-            'width': 100,
-            'height': 100,
+            'width': 1600,
+            'height': 900,
           };
           byteData = const StandardMethodCodec().encodeSuccessEnvelope(data);
         }

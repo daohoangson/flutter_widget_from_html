@@ -1,6 +1,6 @@
 name: flutter_widget_from_html
 version: 0.7.0-dev.2021080801
-description: Flutter package for widget tree building from html that supports hyperlink, image, nested list, etc.
+description: Flutter package to render html as widgets that supports hyperlink, image, audio, video, iframe and many other tags.
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
 environment:
@@ -13,6 +13,7 @@ dependencies:
   flutter_widget_from_html_core: ^0.7.0-dev.2021080801
   fwfh_cached_network_image: ">=0.6.1+2 <0.8.0"
   fwfh_chewie: ^0.6.1+2
+  fwfh_just_audio: ^0.6.2
   fwfh_svg: ^0.7.0-0
   fwfh_url_launcher: ^0.6.1+2
   fwfh_webview: ^0.6.1+2
@@ -25,6 +26,8 @@ dependency_overrides:
     path: ../fwfh_cached_network_image
   fwfh_chewie:
     path: ../fwfh_chewie
+  fwfh_just_audio:
+    path: ../fwfh_just_audio
   fwfh_svg:
     path: ../fwfh_svg
   fwfh_url_launcher:

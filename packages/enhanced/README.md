@@ -5,20 +5,21 @@
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html.svg)](https://pub.dev/packages/flutter_widget_from_html)
 
 A Flutter package for building Flutter widget tree from HTML with support for
-[IFRAME, VIDEO and 70+ other tags](https://html-widget-demo.now.sh/supported/tags.html).
+[IFRAME, VIDEO and 70+ other tags](https://html-widget-demo.vercel.app/supported/tags.html).
 
-| [Live demo](https://html-widget-demo.now.sh/#/helloworld)                                                                     |                                                                                                                               |                                                                                                                               |
+| [Live demo](https://html-widget-demo.vercel.app/#/helloworld)                                                                     |                                                                                                                               |                                                                                                                               |
 |-------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
 | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldScreen1.jpg) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldScreen2.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldScreen3.gif) |
 
 This package supports most common HTML tags for easy usage.
 If you don't want to include all of its dependencies in your build, it's possible to use [flutter_widget_from_html_core](https://pub.dev/packages/flutter_widget_from_html_core) with a subset of the mixins to control your app size:
 
-- [fwfh_cached_network_image](https://pub.dev/packages/fwfh_cached_network_image)
-- [fwfh_chewie](https://pub.dev/packages/fwfh_chewie)
-- [fwfh_svg](https://pub.dev/packages/fwfh_svg)
-- [fwfh_url_launcher](https://pub.dev/packages/fwfh_url_launcher)
-- [fwfh_webview](https://pub.dev/packages/fwfh_webview)
+- [fwfh_cached_network_image](https://pub.dev/packages/fwfh_cached_network_image) for optimized image rendering
+- [fwfh_chewie](https://pub.dev/packages/fwfh_chewie) for VIDEO support
+- [fwfh_just_audio](https://pub.dev/packages/fwfh_just_audio) for AUDIO support
+- [fwfh_svg](https://pub.dev/packages/fwfh_svg) for SVG support
+- [fwfh_url_launcher](https://pub.dev/packages/fwfh_url_launcher) to launch URLs
+- [fwfh_webview](https://pub.dev/packages/fwfh_webview) for IFRAME support
 
 ## Getting Started
 
@@ -90,11 +91,12 @@ HtmlWidget(
 ### HTML tags
 
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
-[Compare between Flutter rendering and browser's.](https://html-widget-demo.now.sh/supported/tags.html)
+[Compare between Flutter rendering and browser's.](https://html-widget-demo.vercel.app/supported/tags.html)
 
 - A: underline, theme accent color
   - Scroll to anchor
   - Launch URL via [url_launcher](https://pub.dev/packages/url_launcher) with base URL resolver
+- AUDIO via [just_audio](https://pub.dev/packages/just_audio)
 - H1/H2/H3/H4/H5/H6
 - IFRAME via [webview_flutter](https://pub.dev/packages/webview_flutter)
 - IMG with support for asset (`asset://`), data uri, local file (`file://`) and network image via [cached_network_image](https://pub.dev/packages/cached_network_image). Additional .svg file support via [flutter_svg](https://pub.dev/packages/flutter_svg).
@@ -109,7 +111,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
   DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, INS,
   KBD, MAIN, NAV, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, STRIKE, STRONG, SUB, SUP, TT, U, VAR
-- Everything with screenshot: https://html-widget-demo.now.sh/supported/tags.html
+- Everything with screenshot: https://html-widget-demo.vercel.app/supported/tags.html
 
 These tags and their contents will be ignored:
 

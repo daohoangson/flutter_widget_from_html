@@ -49,13 +49,7 @@ class VideoPlayer extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<VideoPlayer> createState() =>
-      // ignore: no_logic_in_create_state
-      defaultTargetPlatform == TargetPlatform.android ||
-              defaultTargetPlatform == TargetPlatform.iOS ||
-              kIsWeb
-          ? _VideoPlayerState()
-          : _PlaceholderState();
+  State<VideoPlayer> createState() => _VideoPlayerState();
 }
 
 class _VideoPlayerState extends State<VideoPlayer> {
@@ -92,7 +86,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
     } else if (_hasError) {
       child = const Center(child: Text('❌'));
     } else {
-      child = placeholder ?? const CircularProgressIndicator.adaptive();
+      child = placeholder ??
+          const Center(child: CircularProgressIndicator.adaptive());
     }
 
     return AspectRatio(
@@ -120,14 +115,4 @@ class _VideoPlayerState extends State<VideoPlayer> {
       ),
     );
   }
-}
-
-class _PlaceholderState extends State<VideoPlayer> {
-  @override
-  Widget build(BuildContext _) => AspectRatio(
-      aspectRatio: widget.aspectRatio,
-      child: DecoratedBox(
-        decoration: const BoxDecoration(color: Color.fromRGBO(0, 0, 0, .5)),
-        child: Center(child: Text('platform=$defaultTargetPlatform')),
-      ));
 }

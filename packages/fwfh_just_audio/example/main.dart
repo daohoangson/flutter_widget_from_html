@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:fwfh_chewie/fwfh_chewie.dart';
+import 'package:fwfh_just_audio/fwfh_just_audio.dart';
 
 void main() => runApp(const MyApp());
 
@@ -10,18 +10,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'fwfh_chewie',
+      title: 'fwfh_just_audio',
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('ChewieFactory Demo'),
+          title: const Text('JustAudioFactory Demo'),
         ),
         body: Center(
           child: HtmlWidget(
             '''
-<video controls width="250">
-  <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
-  Sorry, your browser doesn't support embedded videos.
-</video>''',
+<audio controls src="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3">
+  Your browser does not support the <code>audio</code> element.
+</audio>''',
             factoryBuilder: () => MyWidgetFactory(),
           ),
         ),
@@ -30,4 +29,4 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyWidgetFactory extends WidgetFactory with ChewieFactory {}
+class MyWidgetFactory extends WidgetFactory with JustAudioFactory {}
