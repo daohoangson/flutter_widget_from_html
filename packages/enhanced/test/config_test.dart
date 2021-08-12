@@ -425,21 +425,6 @@ void main() {
     setUp(fwfh_url_launcher.mockSetup);
     tearDown(fwfh_url_launcher.mockTearDown);
 
-    testWidgets('triggers callback (returns void)', (tester) async {
-      const href = 'returns-void';
-      final urls = <String>[];
-
-      await explain(
-        tester,
-        HtmlWidget('<a href="$href">Tap me</a>', onTapUrl: urls.add),
-      );
-      await tester.pumpAndSettle();
-      expect(await helper.tapText(tester, 'Tap me'), equals(1));
-
-      expect(urls, equals(const [href]));
-      expect(fwfh_url_launcher.mockGetLaunchUrls(), equals(const []));
-    });
-
     testWidgets('triggers callback (returns false)', (tester) async {
       const href = 'returns-false';
       final urls = <String>[];

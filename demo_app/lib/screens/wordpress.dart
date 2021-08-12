@@ -137,8 +137,13 @@ class _PostsState extends State<_PostsList> {
               )
             : const SizedBox(width: 44),
         onTap: () => _PostScreen.pushRoute(context, post),
-        subtitle: HtmlWidget(post.excerpt,
-            onTapUrl: (_) => _PostScreen.pushRoute(context, post)),
+        subtitle: HtmlWidget(
+          post.excerpt,
+          onTapUrl: (_) {
+            _PostScreen.pushRoute(context, post);
+            return true;
+          },
+        ),
         title: HtmlWidget(post.title),
       );
 

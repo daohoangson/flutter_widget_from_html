@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -379,7 +381,10 @@ void main() {
       await tester.pumpWidget(_OnTapUrlApp(
         href: href,
         onTapCallbackResults: onTapCallbackResults,
-        onTapUrl: urls.add,
+        onTapUrl: (url) {
+          urls.add(url);
+          return true;
+        },
       ));
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
@@ -544,7 +549,7 @@ void main() {
 
 class _OnTapUrlApp extends StatelessWidget {
   final String href;
-  final dynamic Function(String)? onTapUrl;
+  final FutureOr<bool> Function(String)? onTapUrl;
   final List? onTapCallbackResults;
 
   const _OnTapUrlApp({
