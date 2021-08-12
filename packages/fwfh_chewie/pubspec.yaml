@@ -11,7 +11,7 @@ dependencies:
   chewie: ^1.0.0
   flutter:
     sdk: flutter
-  flutter_widget_from_html_core: ">=0.6.0 <0.8.0"
+  flutter_widget_from_html_core: ">=0.6.1 <0.8.0"
   video_player: ^2.0.0
 
 dependency_overrides:
