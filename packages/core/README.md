@@ -183,6 +183,10 @@ HtmlWidget(
 
 For fairly simple widget, use `customWidgetBuilder`. You will need to handle the DOM element and its children manually. The next example renders a carousel ([try it live](https://html-widget-demo.vercel.app/#/customwidgetbuilder)):
 
+<details>
+
+<summary>custom_widget_builder.dart</summary>
+
 ```dart
 const kHtml = '''
 <p>...</p>
@@ -199,7 +203,7 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('CustomStylesBuilderScreen'),
+          title: Text('CustomWidgetBuilderScreen'),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -239,6 +243,8 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
       );
 }
 ```
+
+</details>
 
 [<img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/CustomWidgetBuilderScreen.gif" width="300" />](https://html-widget-demo.vercel.app/#/customwidgetbuilder)
 
@@ -300,6 +306,10 @@ meta.register(BuildOp(
 
 The example below replaces smilie inline image with an emoji:
 
+<details>
+
+<summary>smilie.dart</summary>
+
 ```dart
 const kHtml = """
 <p>Hello <img class="smilie smilie-1" alt=":)" src="http://domain.com/sprites.png" />!</p>
@@ -346,5 +356,7 @@ class _SmiliesWidgetFactory extends WidgetFactory {
   }
 }
 ```
+
+</details>
 
 <img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/SmilieScreen.png" width="300" />

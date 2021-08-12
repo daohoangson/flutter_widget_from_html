@@ -30,7 +30,7 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: const Text('CustomStylesBuilderScreen'),
+          title: const Text('CustomWidgetBuilderScreen'),
         ),
         body: SingleChildScrollView(
           child: Padding(
