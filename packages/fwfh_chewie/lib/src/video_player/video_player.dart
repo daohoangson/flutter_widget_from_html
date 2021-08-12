@@ -86,7 +86,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
     } else if (_hasError) {
       child = const Center(child: Text('❌'));
     } else {
-      child = placeholder ?? const CircularProgressIndicator.adaptive();
+      child = placeholder ??
+          const Center(child: CircularProgressIndicator.adaptive());
     }
 
     return AspectRatio(
