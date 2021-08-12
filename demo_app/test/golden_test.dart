@@ -4,11 +4,14 @@ import 'dart:io';
 import 'package:demo_app/screens/golden.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 
+import '../../packages/fwfh_chewie/test/_.dart';
+
 void _test(String name, String html) => testGoldens(name, (tester) async {
-      const platform = TargetPlatform.linux;
+      const platform = TargetPlatform.android;
       debugDefaultTargetPlatformOverride = platform;
       final key = UniqueKey();
 
@@ -26,6 +29,14 @@ void _test(String name, String html) => testGoldens(name, (tester) async {
     }, skip: !Platform.isLinux);
 
 void main() {
+  mockVideoPlayerPlatform();
+
+  const audioSessionMc = MethodChannel('com.ryanheise.audio_session');
+  audioSessionMc.setMockMethodCallHandler((_) async {});
+
+  const platformViewsMc = MethodChannel('flutter/platform_views');
+  platformViewsMc.setMockMethodCallHandler((_) async {});
+
   final json = File('test/goldens.json').readAsStringSync();
   final map = jsonDecode(json) as Map<String, dynamic>;
   for (final entry in map.entries) {

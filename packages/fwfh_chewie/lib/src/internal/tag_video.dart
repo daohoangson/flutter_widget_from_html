@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
@@ -42,9 +43,15 @@ class TagVideo {
   }
 
   Iterable<Widget>? onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> ws) {
-    final player = _buildPlayer();
-    if (player == null) return ws;
-    return [player];
+    if (defaultTargetPlatform != TargetPlatform.android &&
+        defaultTargetPlatform != TargetPlatform.iOS &&
+        !kIsWeb) {
+      // these are the chewie's supported platforms
+      // https://pub.dev/packages/chewie/versions/1.2.2
+      return ws;
+    }
+
+    return listOrNull(_buildPlayer()) ?? ws;
   }
 
   Widget? _buildPlayer() {

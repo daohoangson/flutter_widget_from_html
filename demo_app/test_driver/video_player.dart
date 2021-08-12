@@ -52,7 +52,7 @@ class _TestAppState extends State<TestApp> {
           ),
           Expanded(
             child: _buildButton(
-              'https://www.w3schools.com/html/mov_bbb.mp4',
+              'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
             ),
           ),
         ],

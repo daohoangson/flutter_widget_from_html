@@ -124,12 +124,11 @@ const kHtml = '''
 <!-- enhanced only -->
 <h4>&lt;VIDEO&gt;</h4>
 <figure>
-  <video controls width="320" height="176">
-    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-    <source src="https://www.w3schools.com/html/mov_bbb.ogg" type="video/ogg">
-    Your browser does not support HTML5 video.
+  <video controls width="250">
+    <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+    Sorry, your browser doesn't support embedded videos.
   </video>
-  <figcaption>Source: <a href="https://www.w3schools.com/html/html5_video.asp">w3schools</a></figcaption>
+  <figcaption>Source: <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video">developer.mozilla.org</a></figcaption>
 </figure>
 <!-- /enhanced only -->
 

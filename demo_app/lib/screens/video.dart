@@ -63,7 +63,8 @@ class _State extends State<VideoScreen> {
             subtitle: HtmlWidget(
               _html,
               key: Key(_html),
-              baseUrl: Uri.parse('https://www.w3schools.com/html/'),
+              baseUrl: Uri.parse(
+                  'https://interactive-examples.mdn.mozilla.net/pages/tabbed/video.html'),
             ),
           ),
           const Center(child: Text('----')),
@@ -87,17 +88,16 @@ class _State extends State<VideoScreen> {
           attributes.add('poster="asset:logos/android.png"');
         }
         if (widthHeight) {
-          attributes.add('width="320" height="176"');
+          attributes.add('width="320" height="180"');
         }
 
         _html = """
 <figure>
   <video ${attributes.join(' ')}>
-    <source src="mov_bbb.mp4" type="video/mp4">
-    <source src="mov_bbb.ogg" type="video/ogg">
-    Your browser does not support HTML5 video.
+    <source src="/media/cc0-videos/flower.mp4" type="video/mp4">
+    Sorry, your browser doesn't support embedded videos.
   </video>
-  <figcaption>Source: <a href="https://www.w3schools.com/html/html5_video.asp">w3schools</a></figcaption>
+  <figcaption>Source: <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video">developer.mozilla.org</a></figcaption>
 </figure>
 """;
       });

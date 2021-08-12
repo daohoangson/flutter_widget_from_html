@@ -5,9 +5,9 @@
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html_core.svg)](https://pub.dev/packages/flutter_widget_from_html_core)
 
 A Flutter package for building Flutter widget tree from HTML with support for
-[70+ most popular tags](https://html-widget-demo.now.sh/supported/tags.html).
+[70+ most popular tags](https://html-widget-demo.vercel.app/supported/tags.html).
 
-| [Live demo](https://html-widget-demo.now.sh/#/helloworldcore)                                                                     |                                                                                                                                   |
+| [Live demo](https://html-widget-demo.vercel.app/#/helloworldcore)                                                                     |                                                                                                                                   |
 |-----------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
 | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldCoreScreen1.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldCoreScreen2.gif) |
 
@@ -17,7 +17,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html_core: ^0.6.1
+  flutter_widget_from_html_core: ^0.6.2
 ```
 
 ## Usage
@@ -74,7 +74,7 @@ HtmlWidget(
 ### HTML tags
 
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
-[Compare between Flutter rendering and browser's.](https://html-widget-demo.now.sh/supported/tags.html)
+[Compare between Flutter rendering and browser's.](https://html-widget-demo.vercel.app/supported/tags.html)
 
 - A: underline, theme accent color with scroll to anchor support
 - H1/H2/H3/H4/H5/H6
@@ -88,7 +88,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
   DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, IMG, INS,
   KBD, MAIN, NAV, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, STRIKE, STRONG, SUB, SUP, TT, U, VAR
-- Everything with screenshot: https://html-widget-demo.now.sh/supported/tags.html
+- Everything with screenshot: https://html-widget-demo.vercel.app/supported/tags.html
 
 These tags requires [flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html):
 
@@ -137,11 +137,12 @@ This package implements widget building logic with high testing coverage to ensu
 
 The enhanced package ([flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html)) uses a custom `WidgetFactory` with pre-built mixins for easy usage:
 
-- [fwfh_cached_network_image](https://pub.dev/packages/fwfh_cached_network_image)
-- [fwfh_chewie](https://pub.dev/packages/fwfh_chewie)
-- [fwfh_svg](https://pub.dev/packages/fwfh_svg)
-- [fwfh_url_launcher](https://pub.dev/packages/fwfh_url_launcher)
-- [fwfh_webview](https://pub.dev/packages/fwfh_webview)
+- [fwfh_cached_network_image](https://pub.dev/packages/fwfh_cached_network_image) for optimized image rendering
+- [fwfh_chewie](https://pub.dev/packages/fwfh_chewie) for VIDEO support
+- [fwfh_just_audio](https://pub.dev/packages/fwfh_just_audio) for AUDIO support
+- [fwfh_svg](https://pub.dev/packages/fwfh_svg) for SVG support
+- [fwfh_url_launcher](https://pub.dev/packages/fwfh_url_launcher) to launch URLs
+- [fwfh_webview](https://pub.dev/packages/fwfh_webview) for IFRAME support
 
 ### Callbacks
 
@@ -174,7 +175,7 @@ HtmlWidget(
 </tr>
 </table>
 
-For fairly simple widget, use `customWidgetBuilder`. You will need to handle the DOM element and its children manually. The next example renders a carousel ([try it live](https://html-widget-demo.now.sh/#/customwidgetbuilder)):
+For fairly simple widget, use `customWidgetBuilder`. You will need to handle the DOM element and its children manually. The next example renders a carousel ([try it live](https://html-widget-demo.vercel.app/#/customwidgetbuilder)):
 
 ```dart
 const kHtml = '''
@@ -233,7 +234,7 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
 }
 ```
 
-[<img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/CustomWidgetBuilderScreen.gif" width="300" />](https://html-widget-demo.now.sh/#/customwidgetbuilder)
+[<img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/CustomWidgetBuilderScreen.gif" width="300" />](https://html-widget-demo.vercel.app/#/customwidgetbuilder)
 
 ### Custom `WidgetFactory`
 
