@@ -85,7 +85,7 @@ class _State extends State<AudioScreen> {
         _html = '''
 <figure>
   <audio src="/media/cc0-audio/t-rex-roar.mp3" ${attributes.join(' ')}>
-    Your browser does not support the <code>audio</code> element.
+    Sorry, <code>AUDIO</code> tag is not supported.
   </audio>
   <figcaption>Source: <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio">developer.mozilla.org</a></figcaption>
 </figure>

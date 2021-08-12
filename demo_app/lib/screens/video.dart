@@ -95,7 +95,7 @@ class _State extends State<VideoScreen> {
 <figure>
   <video ${attributes.join(' ')}>
     <source src="/media/cc0-videos/flower.mp4" type="video/mp4">
-    Sorry, your browser doesn't support embedded videos.
+    <code>VIDEO</code> support is not enabled.
   </video>
   <figcaption>Source: <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video">developer.mozilla.org</a></figcaption>
 </figure>

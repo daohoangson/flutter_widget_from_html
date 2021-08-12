@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
           child: HtmlWidget(
             '''
 <audio controls src="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3">
-  Your browser does not support the <code>audio</code> element.
+  <code>AUDIO</code> support is not enabled.
 </audio>''',
             factoryBuilder: () => MyWidgetFactory(),
           ),

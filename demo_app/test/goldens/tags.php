@@ -25,7 +25,7 @@ foreach ($map as $test => $html) {
     }
   }
 
-  // replace asset path with URL for proper browser rendering
+  // replace asset path with real URL
   $html = str_replace('asset:logos/android.png', 'https://github.com/daohoangson/flutter_widget_from_html/raw/master/demo_app/logos/android.png', $html);
 
   foreach ($tags as $tag) {

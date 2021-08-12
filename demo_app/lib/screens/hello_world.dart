@@ -20,11 +20,6 @@ const kHtml = '''
 <p>&lt;SUB&gt; C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub></p>
 <p>&lt;SUP&gt; <var>a<sup>2</sup></var> + <var>b<sup>2</sup></var> = <var>c<sup>2</sup></var></p>
 
-<h4>&lt;IFRAME&gt; of YouTube:</h4>
-<iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="560" height="315">
-  Your browser does not support IFRAME.
-</iframe>
-
 <h4>&lt;IMG&gt; of a cat:</h4>
 <figure>
   <img src="https://media.giphy.com/media/6VoDJzfRjJNbG/giphy-downsized.gif" width="250" height="171" />
@@ -80,7 +75,6 @@ const kHtml = '''
 </table>
 <br />
 
-<!-- enhanced only -->
 <h4>&lt;TABLE&gt; with colspan / rowspan:</h4>
 <table border="1" cellpadding="4">
   <tr>
@@ -94,43 +88,52 @@ const kHtml = '''
     <td>Bar</td>
   </tr>
 </table>
-<!-- /enhanced only -->
 
-<!-- enhanced only -->
+<h4>&lt;AUDIO&gt;</h4>
+<figure>
+  <audio controls src="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3">
+    <code>AUDIO</code> support is not enabled.
+  </audio>
+  <figcaption>Source: <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio">developer.mozilla.org</a></figcaption>
+</figure>
+
+<h4>&lt;IFRAME&gt; of YouTube:</h4>
+<iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="560" height="315">
+  IFRAME support is not enabled.
+</iframe>
+
 <h4>&lt;SVG&gt; of Flutter logo</h4>
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 166 202">
-    <defs>
-        <linearGradient id="triangleGradient">
-            <stop offset="20%" stop-color="#000000" stop-opacity=".55" />
-            <stop offset="85%" stop-color="#616161" stop-opacity=".01" />
-        </linearGradient>
-        <linearGradient id="rectangleGradient" x1="0%" x2="0%" y1="0%" y2="100%">
-            <stop offset="20%" stop-color="#000000" stop-opacity=".15" />
-            <stop offset="85%" stop-color="#616161" stop-opacity=".01" />
-        </linearGradient>
-    </defs>
-    <path fill="#42A5F5" fill-opacity=".8" d="M37.7 128.9 9.8 101 100.4 10.4 156.2 10.4"/>
-    <path fill="#42A5F5" fill-opacity=".8" d="M156.2 94 100.4 94 79.5 114.9 107.4 142.8"/>
-    <path fill="#0D47A1" d="M79.5 170.7 100.4 191.6 156.2 191.6 156.2 191.6 107.4 142.8"/>
-    <g transform="matrix(0.7071, -0.7071, 0.7071, 0.7071, -77.667, 98.057)">
-        <rect width="39.4" height="39.4" x="59.8" y="123.1" fill="#42A5F5" />
-        <rect width="39.4" height="5.5" x="59.8" y="162.5" fill="url(#rectangleGradient)" />
-    </g>
-    <path d="M79.5 170.7 120.9 156.4 107.4 142.8" fill="url(#triangleGradient)" />
-    Your browser does not support inline SVG.
-</svg>
-<!-- /enhanced only -->
+  <defs>
+    <linearGradient id="triangleGradient">
+      <stop offset="20%" stop-color="#000000" stop-opacity=".55" />
+      <stop offset="85%" stop-color="#616161" stop-opacity=".01" />
+    </linearGradient>
+    <linearGradient id="rectangleGradient" x1="0%" x2="0%" y1="0%" y2="100%">
+      <stop offset="20%" stop-color="#000000" stop-opacity=".15" />
+      <stop offset="85%" stop-color="#616161" stop-opacity=".01" />
+    </linearGradient>
+  </defs>
+  <path fill="#42A5F5" fill-opacity=".8" d="M37.7 128.9 9.8 101 100.4 10.4 156.2 10.4"/>
+  <path fill="#42A5F5" fill-opacity=".8" d="M156.2 94 100.4 94 79.5 114.9 107.4 142.8"/>
+  <path fill="#0D47A1" d="M79.5 170.7 100.4 191.6 156.2 191.6 156.2 191.6 107.4 142.8"/>
+  <g transform="matrix(0.7071, -0.7071, 0.7071, 0.7071, -77.667, 98.057)">
+    <rect width="39.4" height="39.4" x="59.8" y="123.1" fill="#42A5F5" />
+    <rect width="39.4" height="5.5" x="59.8" y="162.5" fill="url(#rectangleGradient)" />
+  </g>
+  <path d="M79.5 170.7 120.9 156.4 107.4 142.8" fill="url(#triangleGradient)" />
 
-<!-- enhanced only -->
+  SVG support is not enabled.
+</svg>
+
 <h4>&lt;VIDEO&gt;</h4>
 <figure>
   <video controls width="250">
     <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
-    Sorry, your browser doesn't support embedded videos.
+    <code>VIDEO</code> support is not enabled.
   </video>
   <figcaption>Source: <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video">developer.mozilla.org</a></figcaption>
 </figure>
-<!-- /enhanced only -->
 
 <p>Anchor: <a href="#top">Scroll to top</a>.</p>
 <br />
