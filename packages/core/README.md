@@ -97,6 +97,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
 
 These tags requires [flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html):
 
+- AUDIO
 - IFRAME
 - SVG
 - VIDEO
