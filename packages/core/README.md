@@ -7,9 +7,9 @@
 Flutter package to render html as widgets that focuses on correctness and extensibility.
 Supports [70+ most popular tags](https://html-widget-demo.vercel.app/supported/tags.html).
 
-| [Live demo](https://html-widget-demo.vercel.app/#/helloworldcore) |                                                           |
-|-------------------------------------------------------------------|-----------------------------------------------------------|
-| ![](../../demo_app/screenshots/HelloWorldCoreScreen1.gif)         | ![](../../demo_app/screenshots/HelloWorldCoreScreen2.jpg) |
+| [Live demo](https://html-widget-demo.vercel.app/#/helloworldcore)                                                                                                   |                                                                                                                                                                     |
+|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/HelloWorldCoreScreen1.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/HelloWorldCoreScreen2.jpg) |
 
 ## Getting Started
 
@@ -176,7 +176,7 @@ HtmlWidget(
 
 </td>
 <td>
-  <img src="../../demo_app/screenshots/CustomStylesBuilderScreen.jpg" width="200" />
+  <img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/CustomStylesBuilderScreen.jpg" width="200" />
 </td>
 </tr>
 </table>
@@ -246,7 +246,7 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
 
 </details>
 
-[<img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/CustomWidgetBuilderScreen.gif" width="300" />](https://html-widget-demo.vercel.app/#/customwidgetbuilder)
+[<img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/CustomWidgetBuilderScreen.gif" width="300" />](https://html-widget-demo.vercel.app/#/customwidgetbuilder)
 
 ### Custom `WidgetFactory`
 
@@ -359,4 +359,4 @@ class _SmiliesWidgetFactory extends WidgetFactory {
 
 </details>
 
-<img src="../../demo_app/screenshots/SmilieScreen.jpg" width="300" />
+<img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/SmilieScreen.jpg" width="300" />
