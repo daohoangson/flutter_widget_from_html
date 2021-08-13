@@ -4,8 +4,8 @@
 [![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html_core.svg)](https://pub.dev/packages/flutter_widget_from_html_core)
 
-A Flutter package for building Flutter widget tree from HTML with support for
-[70+ most popular tags](https://html-widget-demo.vercel.app/supported/tags.html).
+Flutter package to render html as widgets that focuses on correctness and extensibility.
+Supports [70+ most popular tags](https://html-widget-demo.vercel.app/supported/tags.html).
 
 | [Live demo](https://html-widget-demo.vercel.app/#/helloworldcore) |                                                           |
 |-------------------------------------------------------------------|-----------------------------------------------------------|

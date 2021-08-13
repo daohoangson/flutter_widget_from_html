@@ -4,8 +4,8 @@
 [![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html.svg)](https://pub.dev/packages/flutter_widget_from_html)
 
-A Flutter package for building Flutter widget tree from HTML with support for
-[IFRAME, VIDEO and 70+ other tags](https://html-widget-demo.vercel.app/supported/tags.html).
+Flutter package to render html as widgets that supports hyperlink, image, audio, video, iframe
+and [70+ other tags](https://html-widget-demo.vercel.app/supported/tags.html).
 
 | [Live demo](https://html-widget-demo.vercel.app/#/helloworld) |                                                       |                                                       |
 |---------------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------|
