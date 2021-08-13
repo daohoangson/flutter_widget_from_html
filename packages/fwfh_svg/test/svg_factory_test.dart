@@ -19,7 +19,7 @@ void main() {
     const html = '''
 <svg height="100" width="100">
   <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
-  Your browser does not support inline SVG.
+  SVG support is not enabled.
 </svg>''';
     final explained = await helper.explain(tester, html);
     expect(

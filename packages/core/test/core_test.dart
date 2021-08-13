@@ -356,10 +356,10 @@ Future<void> main() async {
     testWidgets('skips IFRAME tag', (WidgetTester tester) async {
       const html = '''
 <iframe src="https://www.youtube.com/embed/jNQXAC9IVRw" width="320" height="180">
-  Your browser does not support IFRAME.
+  IFRAME support is not enabled.
 </iframe>''';
       final e = await explain(tester, html);
-      expect(e, equals('[RichText:(:Your browser does not support IFRAME.)]'));
+      expect(e, equals('[RichText:(:IFRAME support is not enabled.)]'));
     });
 
     testWidgets('skips SCRIPT tag', (WidgetTester tester) async {
@@ -380,24 +380,23 @@ Future<void> main() async {
       const html = '''
 <svg height="100" width="100">
   <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
-  Your browser does not support inline SVG.
+  SVG support is not enabled.
 </svg>''';
       final explained = await explain(tester, html);
-      expect(explained,
-          equals('[RichText:(:Your browser does not support inline SVG.)]'));
+      expect(explained, equals('[RichText:(:SVG support is not enabled.)]'));
     });
 
     testWidgets('skips VIDEO tag', (WidgetTester tester) async {
       const html = '''
 <video>
   <source src="http://domain.com/video.mp4" type="video/mp4">
-  Sorry, your browser doesn't support embedded videos.
+  <code>VIDEO</code> support is not enabled.
 </video>''';
       final explained = await explain(tester, html);
       expect(
           explained,
-          equals(
-              "[RichText:(:Sorry, your browser doesn't support embedded videos.)]"));
+          equals('[RichText:(:(+font=Courier+fonts=monospace:VIDEO)'
+              '(: support is not enabled.))]'));
     });
   });
 

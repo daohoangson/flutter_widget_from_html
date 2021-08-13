@@ -1,6 +1,8 @@
 {
   "dockerFile": "Dockerfile",
   "extensions": [
-    "Dart-Code.flutter"
+    "dart-code.flutter",
+    "darkriszty.markdown-table-prettify",
+    "foxundermoon.shell-format"
   ]
 }

@@ -4,12 +4,12 @@
 [![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html_core.svg)](https://pub.dev/packages/flutter_widget_from_html_core)
 
-A Flutter package for building Flutter widget tree from HTML with support for
-[70+ most popular tags](https://html-widget-demo.vercel.app/supported/tags.html).
+Flutter package to render html as widgets that focuses on correctness and extensibility.
+Supports [70+ most popular tags](https://html-widget-demo.vercel.app/supported/tags.html).
 
-| [Live demo](https://html-widget-demo.vercel.app/#/helloworldcore)                                                                     |                                                                                                                                   |
-|-----------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldCoreScreen1.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldCoreScreen2.gif) |
+| [Live demo](https://html-widget-demo.vercel.app/#/helloworldcore) |                                                           |
+|-------------------------------------------------------------------|-----------------------------------------------------------|
+| ![](../../demo_app/screenshots/HelloWorldCoreScreen1.gif)         | ![](../../demo_app/screenshots/HelloWorldCoreScreen2.jpg) |
 
 ## Getting Started
 
@@ -97,6 +97,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
 
 These tags requires [flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html):
 
+- AUDIO
 - IFRAME
 - SVG
 - VIDEO
@@ -175,12 +176,16 @@ HtmlWidget(
 
 </td>
 <td>
-  <img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/CustomStylesBuilderScreen.png" width="200" />
+  <img src="../../demo_app/screenshots/CustomStylesBuilderScreen.jpg" width="200" />
 </td>
 </tr>
 </table>
 
 For fairly simple widget, use `customWidgetBuilder`. You will need to handle the DOM element and its children manually. The next example renders a carousel ([try it live](https://html-widget-demo.vercel.app/#/customwidgetbuilder)):
+
+<details>
+
+<summary>custom_widget_builder.dart</summary>
 
 ```dart
 const kHtml = '''
@@ -198,7 +203,7 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('CustomStylesBuilderScreen'),
+          title: Text('CustomWidgetBuilderScreen'),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -238,6 +243,8 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
       );
 }
 ```
+
+</details>
 
 [<img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/CustomWidgetBuilderScreen.gif" width="300" />](https://html-widget-demo.vercel.app/#/customwidgetbuilder)
 
@@ -299,6 +306,10 @@ meta.register(BuildOp(
 
 The example below replaces smilie inline image with an emoji:
 
+<details>
+
+<summary>smilie.dart</summary>
+
 ```dart
 const kHtml = """
 <p>Hello <img class="smilie smilie-1" alt=":)" src="http://domain.com/sprites.png" />!</p>
@@ -346,4 +357,6 @@ class _SmiliesWidgetFactory extends WidgetFactory {
 }
 ```
 
-<img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/SmilieScreen.png" width="300" />
+</details>
+
+<img src="../../demo_app/screenshots/SmilieScreen.jpg" width="300" />

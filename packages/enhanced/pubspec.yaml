@@ -39,7 +39,7 @@ dev_dependencies:
   file:
   flutter_test:
     sdk: flutter
-  golden_toolkit: any
+  golden_toolkit: ^0.10.0
   lint: any
   mocktail: any
   network_image_mock: any
