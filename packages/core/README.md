@@ -7,9 +7,9 @@
 A Flutter package for building Flutter widget tree from HTML with support for
 [70+ most popular tags](https://html-widget-demo.vercel.app/supported/tags.html).
 
-| [Live demo](https://html-widget-demo.vercel.app/#/helloworldcore)                                                                     |                                                                                                                                   |
-|-----------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldCoreScreen1.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/HelloWorldCoreScreen2.gif) |
+| [Live demo](https://html-widget-demo.vercel.app/#/helloworldcore) |                                                           |
+|-------------------------------------------------------------------|-----------------------------------------------------------|
+| ![](../../demo_app/screenshots/HelloWorldCoreScreen1.gif)         | ![](../../demo_app/screenshots/HelloWorldCoreScreen2.jpg) |
 
 ## Getting Started
 
