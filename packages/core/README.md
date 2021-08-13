@@ -176,7 +176,7 @@ HtmlWidget(
 
 </td>
 <td>
-  <img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/CustomStylesBuilderScreen.png" width="200" />
+  <img src="../../demo_app/screenshots/CustomStylesBuilderScreen.jpg" width="200" />
 </td>
 </tr>
 </table>
@@ -359,4 +359,4 @@ class _SmiliesWidgetFactory extends WidgetFactory {
 
 </details>
 
-<img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/master/demo_app/screenshots/SmilieScreen.png" width="300" />
+<img src="../../demo_app/screenshots/SmilieScreen.jpg" width="300" />
