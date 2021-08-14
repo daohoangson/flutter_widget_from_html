@@ -72,6 +72,19 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(+u/dotted:foo)]'));
     });
+
+    testWidgets('renders line & thickness', (WidgetTester tester) async {
+      const html = '<span style="text-decoration: underline 50%">foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+u/0.5:foo)]'));
+    });
+
+    testWidgets('renders everything', (WidgetTester tester) async {
+      const html =
+          '<span style="text-decoration: red underline dotted 50%">foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+u/#FFFF0000/dotted/0.5:foo)]'));
+    });
   });
 
   group('text-decoration-color', () {
@@ -161,6 +174,22 @@ foo <span style="text-decoration-line: none">bar</span></span></span></span>
           '<span style="text-decoration-style: solid">bar</span></span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:(+l/dotted:foo )(+l:bar))]'));
+    });
+  });
+
+  group('text-decoration-thickness', () {
+    testWidgets('renders percentage', (WidgetTester tester) async {
+      const html = '<span style="text-decoration-line: line-through; '
+          'text-decoration-thickness: 50%">foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+l/0.5:foo)]'));
+    });
+
+    testWidgets('skips px', (WidgetTester tester) async {
+      const html = '<span style="text-decoration-line: line-through; '
+          'text-decoration-thickness: 5px">foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+l:foo)]'));
     });
   });
 }

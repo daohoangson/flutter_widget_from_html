@@ -2,6 +2,8 @@ part of '../core_ops.dart';
 
 const kCssTextDecoration = 'text-decoration';
 const kCssTextDecorationColor = 'text-decoration-color';
+const kCssTextDecorationThickness = 'text-decoration-thickness';
+const kCssTextDecorationWidth = 'text-decoration-width';
 
 const kCssTextDecorationLine = 'text-decoration-line';
 const kCssTextDecorationLineThrough = 'line-through';
@@ -43,6 +45,17 @@ class StyleTextDecoration {
                 continue;
               }
             }
+
+            if (style.property == kCssTextDecoration ||
+                style.property == kCssTextDecorationThickness ||
+                style.property == kCssTextDecorationWidth) {
+              final length = tryParseCssLength(value);
+              if (length != null && length.unit == CssLengthUnit.percentage) {
+                meta.tsb
+                    .enqueue(textDecorationThickness, length.number / 100.0);
+                continue;
+              }
+            }
           }
         }
       });
@@ -74,6 +87,9 @@ TextStyleHtml textDecorationLine(TextStyleHtml p, TextDecorationLine v) {
 
 TextStyleHtml textDecorationStyle(TextStyleHtml p, TextDecorationStyle v) =>
     p.copyWith(style: p.style.copyWith(decorationStyle: v));
+
+TextStyleHtml textDecorationThickness(TextStyleHtml p, double v) =>
+    p.copyWith(style: p.style.copyWith(decorationThickness: v));
 
 @immutable
 class TextDecorationLine {

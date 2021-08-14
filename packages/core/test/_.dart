@@ -454,7 +454,11 @@ class Explainer {
             ? ''
             : '/${_color(style.decorationColor!)}';
 
-    return "${styleHasIt ? '+' : '-'}$str$decorationColor$decorationStyle";
+    final decorationThickness = style.decorationThickness == null
+        ? ''
+        : '/${style.decorationThickness}';
+
+    return "${styleHasIt ? '+' : '-'}$str$decorationColor$decorationStyle$decorationThickness";
   }
 
   String _textStyleFontStyle(TextStyle style) {
