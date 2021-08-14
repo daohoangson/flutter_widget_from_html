@@ -901,6 +901,7 @@ class WidgetFactory {
         break;
 
       case kCssTextDecoration:
+      case kCssTextDecorationColor:
       case kCssTextDecorationLine:
       case kCssTextDecorationStyle:
         _styleTextDecoration ??= StyleTextDecoration(this).op;

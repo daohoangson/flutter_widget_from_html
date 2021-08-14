@@ -61,10 +61,25 @@ void main() {
       expect(explained, equals('[RichText:(+u:under)]'));
     });
 
+    testWidgets('renders line & color', (WidgetTester tester) async {
+      const html = '<span style="text-decoration: red underline">foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+u/#FFFF0000:foo)]'));
+    });
+
     testWidgets('renders line & style', (WidgetTester tester) async {
       const html = '<span style="text-decoration: underline dotted">foo</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(+u/dotted:foo)]'));
+    });
+  });
+
+  group('text-decoration-color', () {
+    testWidgets('renders color', (WidgetTester tester) async {
+      const html = '<span style="text-decoration-line: line-through; '
+          'text-decoration-color: red">foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+l/#FFFF0000:foo)]'));
     });
   });
 

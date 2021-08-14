@@ -1,6 +1,7 @@
 part of '../core_ops.dart';
 
 const kCssTextDecoration = 'text-decoration';
+const kCssTextDecorationColor = 'text-decoration-color';
 
 const kCssTextDecorationLine = 'text-decoration-line';
 const kCssTextDecorationLineThrough = 'line-through';
@@ -33,10 +34,22 @@ class StyleTextDecoration {
                 continue;
               }
             }
+
+            if (style.property == kCssTextDecoration ||
+                style.property == kCssTextDecorationColor) {
+              final color = tryParseColor(value);
+              if (color != null) {
+                meta.tsb.enqueue(textDecorationColor, color);
+                continue;
+              }
+            }
           }
         }
       });
 }
+
+TextStyleHtml textDecorationColor(TextStyleHtml p, Color v) =>
+    p.copyWith(style: p.style.copyWith(decorationColor: v));
 
 TextStyleHtml textDecorationLine(TextStyleHtml p, TextDecorationLine v) {
   final pd = p.style.decoration;
