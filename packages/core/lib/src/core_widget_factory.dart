@@ -566,10 +566,8 @@ class WidgetFactory {
 
       case 'abbr':
       case 'acronym':
-        meta.tsb.enqueue(
-          TextStyleOps.textDeco,
-          const TextDeco(style: TextDecorationStyle.dotted, under: true),
-        );
+        meta[kCssTextDecorationLine] = kCssTextDecorationUnderline;
+        meta[kCssTextDecorationStyle] = kCssTextDecorationStyleDotted;
         break;
 
       case 'address':
@@ -665,7 +663,7 @@ class WidgetFactory {
       case 'del':
       case 's':
       case 'strike':
-        meta.tsb.enqueue(TextStyleOps.textDeco, const TextDeco(strike: true));
+        meta[kCssTextDecorationLine] = kCssTextDecorationLineThrough;
         break;
 
       case kTagFont:
@@ -743,7 +741,7 @@ class WidgetFactory {
 
       case 'ins':
       case 'u':
-        meta.tsb.enqueue(TextStyleOps.textDeco, const TextDeco(under: true));
+        meta[kCssTextDecorationLine] = kCssTextDecorationUnderline;
         break;
 
       case kTagOrderedList:
@@ -903,16 +901,12 @@ class WidgetFactory {
         break;
 
       case kCssTextDecoration:
-        _styleTextDecoration ??= BuildOp(onTree: (meta, _) {
-          for (final style in meta.styles) {
-            if (style.property == kCssTextDecoration) {
-              final textDeco = TextDeco.tryParse(style.values);
-              if (textDeco != null) {
-                meta.tsb.enqueue(TextStyleOps.textDeco, textDeco);
-              }
-            }
-          }
-        });
+      case kCssTextDecorationColor:
+      case kCssTextDecorationLine:
+      case kCssTextDecorationStyle:
+      case kCssTextDecorationThickness:
+      case kCssTextDecorationWidth:
+        _styleTextDecoration ??= StyleTextDecoration(this).op;
         meta.register(_styleTextDecoration!);
         break;
 

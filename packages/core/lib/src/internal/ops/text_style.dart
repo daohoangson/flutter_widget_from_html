@@ -37,12 +37,6 @@ const kCssFontWeightBold = 'bold';
 const kCssLineHeight = 'line-height';
 const kCssLineHeightNormal = 'normal';
 
-const kCssTextDecoration = 'text-decoration';
-const kCssTextDecorationLineThrough = 'line-through';
-const kCssTextDecorationNone = 'none';
-const kCssTextDecorationOverline = 'overline';
-const kCssTextDecorationUnderline = 'underline';
-
 class TextStyleOps {
   static TextStyleHtml color(TextStyleHtml p, Color color) =>
       p.copyWith(style: p.style.copyWith(color: color));
@@ -92,33 +86,6 @@ class TextStyleOps {
     }
 
     return null;
-  }
-
-  static TextStyleHtml textDeco(TextStyleHtml p, TextDeco v) {
-    final pd = p.style.decoration;
-    final lineThough = pd?.contains(TextDecoration.lineThrough) == true;
-    final overline = pd?.contains(TextDecoration.overline) == true;
-    final underline = pd?.contains(TextDecoration.underline) == true;
-
-    final list = <TextDecoration>[];
-    if (v.over == true || (overline && v.over != false)) {
-      list.add(TextDecoration.overline);
-    }
-    if (v.strike == true || (lineThough && v.strike != false)) {
-      list.add(TextDecoration.lineThrough);
-    }
-    if (v.under == true || (underline && v.under != false)) {
-      list.add(TextDecoration.underline);
-    }
-
-    return p.copyWith(
-      style: p.style.copyWith(
-        decoration: TextDecoration.combine(list),
-        decorationColor: v.color,
-        decorationStyle: v.style,
-        decorationThickness: v.thickness?.getValue(p),
-      ),
-    );
   }
 
   static TextStyleHtml textDirection(TextStyleHtml p, String v) {
@@ -305,42 +272,5 @@ class TextStyleOps {
     if (lengthValue == null) return null;
 
     return lengthValue / fontSize;
-  }
-}
-
-@immutable
-class TextDeco {
-  final Color? color;
-  final bool? over;
-  final bool? strike;
-  final TextDecorationStyle? style;
-  final CssLength? thickness;
-  final bool? under;
-
-  const TextDeco({
-    this.color,
-    this.over,
-    this.strike,
-    this.style,
-    this.thickness,
-    this.under,
-  });
-
-  static TextDeco? tryParse(List<css.Expression> expressions) {
-    for (final expression in expressions) {
-      if (expression is! css.LiteralTerm) continue;
-      switch (expression.valueAsString) {
-        case kCssTextDecorationLineThrough:
-          return const TextDeco(strike: true);
-        case kCssTextDecorationNone:
-          return const TextDeco(over: false, strike: false, under: false);
-        case kCssTextDecorationOverline:
-          return const TextDeco(over: true);
-        case kCssTextDecorationUnderline:
-          return const TextDeco(under: true);
-      }
-    }
-
-    return null;
   }
 }

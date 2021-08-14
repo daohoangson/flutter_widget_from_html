@@ -68,20 +68,6 @@ Future<void> main() async {
     expect(explained, equals('[RichText:(:(+b:One )(+u+i+b:two)(+b: three))]'));
   });
 
-  group('ABBR tag', () {
-    testWidgets('renders ABBR', (WidgetTester tester) async {
-      const html = '<abbr>ABBR</abbr>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(+u/dotted:ABBR)]'));
-    });
-
-    testWidgets('renders ACRONYM', (WidgetTester tester) async {
-      const html = '<acronym>ACRONYM</acronym>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(+u/dotted:ACRONYM)]'));
-    });
-  });
-
   testWidgets('renders ADDRESS tag', (WidgetTester tester) async {
     const html = 'This is an <address>ADDRESS</address>';
     final explained = await explain(tester, html);
@@ -1383,77 +1369,6 @@ Future<void> main() async {
           '<em style="line-height: normal">bar</em></span>';
       final e = await explain(tester, html);
       expect(e, equals('[RichText:(:(+height=1.0:Foo )(+i:bar))]'));
-    });
-  });
-
-  group('text-decoration', () {
-    testWidgets('renders DEL tag', (WidgetTester tester) async {
-      const html = 'This is some <del>deleted</del> text.';
-      final explained = await explain(tester, html);
-      expect(explained,
-          equals('[RichText:(:This is some (+l:deleted)(: text.))]'));
-    });
-
-    testWidgets('renders INS tag', (WidgetTester tester) async {
-      const html = 'This is some <ins>inserted</ins> text.';
-      final explained = await explain(tester, html);
-      expect(explained,
-          equals('[RichText:(:This is some (+u:inserted)(: text.))]'));
-    });
-
-    testWidgets('renders S/STRIKE tag', (WidgetTester tester) async {
-      const html = '<s>Foo</s> <strike>bar</strike>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:(+l:Foo)(: )(+l:bar))]'));
-    });
-
-    testWidgets('renders U tag', (WidgetTester tester) async {
-      const html = 'This is an <u>underline</u> text.';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals('[RichText:(:This is an (+u:underline)(: text.))]'),
-      );
-    });
-
-    testWidgets('renders line-through', (WidgetTester tester) async {
-      const html = '<span style="text-decoration: line-through">line</span>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(+l:line)]'));
-    });
-
-    testWidgets('renders overline', (WidgetTester tester) async {
-      const html = '<span style="text-decoration: overline">over</span>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(+o:over)]'));
-    });
-
-    testWidgets('renders underline', (WidgetTester tester) async {
-      const html = '<span style="text-decoration: underline">under</span>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(+u:under)]'));
-    });
-
-    testWidgets('renders all', (WidgetTester tester) async {
-      const html = '''
-<span style="text-decoration: line-through">
-<span style="text-decoration: overline">
-<span style="text-decoration: underline">
-foo bar</span></span></span>
-''';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(+l+o+u:foo bar)]'));
-    });
-
-    testWidgets('skips rendering', (WidgetTester tester) async {
-      const html = '''
-<span style="text-decoration: line-through">
-<span style="text-decoration: overline">
-<span style="text-decoration: underline">
-foo <span style="text-decoration: none">bar</span></span></span></span>
-''';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:(+l+o+u:foo )(:bar))]'));
     });
   });
 

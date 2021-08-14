@@ -11,7 +11,7 @@ rm /tmp/releases.json
 cd $HOME
 curl "${_baseUrl}/${_stableArchive}" -vo /tmp/flutter.tar.xz
 tar -xf /tmp/flutter.tar.xz
-rm 
+rm /tmp/flutter.tar.xz
 
 flutter precache
 flutter doctor -v

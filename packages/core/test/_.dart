@@ -449,7 +449,16 @@ class Explainer {
         ? ''
         : '${style.decorationStyle}'.replaceFirst(RegExp(r'^.+\.'), '/');
 
-    return "${styleHasIt ? '+' : '-'}$str$decorationStyle";
+    final decorationColor =
+        (style.decorationColor == null || style.decorationColor == style.color)
+            ? ''
+            : '/${_color(style.decorationColor!)}';
+
+    final decorationThickness = style.decorationThickness == null
+        ? ''
+        : '/${style.decorationThickness}';
+
+    return "${styleHasIt ? '+' : '-'}$str$decorationColor$decorationStyle$decorationThickness";
   }
 
   String _textStyleFontStyle(TextStyle style) {
