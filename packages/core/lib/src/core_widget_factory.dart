@@ -566,15 +566,8 @@ class WidgetFactory {
 
       case 'abbr':
       case 'acronym':
-        meta.tsb
-          ..enqueue(
-            TextStyleOps.textDecorationLine,
-            const TextDecorationLine(under: true),
-          )
-          ..enqueue(
-            TextStyleOps.textDecorationStyle,
-            TextDecorationStyle.dotted,
-          );
+        meta[kCssTextDecorationLine] = kCssTextDecorationUnderline;
+        meta[kCssTextDecorationStyle] = kCssTextDecorationStyleDotted;
         break;
 
       case 'address':
@@ -670,10 +663,7 @@ class WidgetFactory {
       case 'del':
       case 's':
       case 'strike':
-        meta.tsb.enqueue(
-          TextStyleOps.textDecorationLine,
-          const TextDecorationLine(strike: true),
-        );
+        meta[kCssTextDecorationLine] = kCssTextDecorationLineThrough;
         break;
 
       case kTagFont:
@@ -751,10 +741,7 @@ class WidgetFactory {
 
       case 'ins':
       case 'u':
-        meta.tsb.enqueue(
-          TextStyleOps.textDecorationLine,
-          const TextDecorationLine(under: true),
-        );
+        meta[kCssTextDecorationLine] = kCssTextDecorationUnderline;
         break;
 
       case kTagOrderedList:
@@ -915,16 +902,8 @@ class WidgetFactory {
 
       case kCssTextDecoration:
       case kCssTextDecorationLine:
-        _styleTextDecoration ??= BuildOp(onTree: (meta, _) {
-          for (final style in meta.styles) {
-            if (style.property == kCssTextDecoration) {
-              final line = TextDecorationLine.tryParse(style.values);
-              if (line != null) {
-                meta.tsb.enqueue(TextStyleOps.textDecorationLine, line);
-              }
-            }
-          }
-        });
+      case kCssTextDecorationStyle:
+        _styleTextDecoration ??= StyleTextDecoration(this).op;
         meta.register(_styleTextDecoration!);
         break;
 

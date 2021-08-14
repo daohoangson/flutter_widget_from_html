@@ -2,10 +2,6 @@ part of '../core_parser.dart';
 
 const kCssBorder = 'border';
 const kCssBorderInherit = 'inherit';
-const kCssBorderStyleDotted = 'dotted';
-const kCssBorderStyleDashed = 'dashed';
-const kCssBorderStyleDouble = 'double';
-const kCssBorderStyleSolid = 'solid';
 
 final _elementBorder = Expando<CssBorder>();
 
@@ -64,24 +60,8 @@ CssBorderSide? _tryParseBorderSide(List<css.Expression> expressions) {
   return CssBorderSide(
     color: expressions.length >= 3 ? tryParseColor(expressions[2]) : null,
     style: expressions.length >= 2
-        ? _tryParseTextDecorationStyle(expressions[1])
+        ? tryParseTextDecorationStyle(expressions[1])
         : null,
     width: width,
   );
-}
-
-TextDecorationStyle? _tryParseTextDecorationStyle(css.Expression expression) {
-  final value = expression is css.LiteralTerm ? expression.valueAsString : null;
-  switch (value) {
-    case kCssBorderStyleDotted:
-      return TextDecorationStyle.dotted;
-    case kCssBorderStyleDashed:
-      return TextDecorationStyle.dashed;
-    case kCssBorderStyleDouble:
-      return TextDecorationStyle.double;
-    case kCssBorderStyleSolid:
-      return TextDecorationStyle.solid;
-  }
-
-  return null;
 }

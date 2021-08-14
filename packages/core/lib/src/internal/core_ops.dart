@@ -23,6 +23,7 @@ part 'ops/style_margin.dart';
 part 'ops/style_padding.dart';
 part 'ops/style_sizing.dart';
 part 'ops/style_text_align.dart';
+part 'ops/style_text_decoration.dart';
 part 'ops/style_vertical_align.dart';
 part 'ops/tag_a.dart';
 part 'ops/tag_img.dart';
