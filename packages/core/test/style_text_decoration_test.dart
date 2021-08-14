@@ -94,6 +94,13 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(+l/#FFFF0000:foo)]'));
     });
+
+    testWidgets('changes inherited color', (WidgetTester tester) async {
+      const html = '<span style="text-decoration: red line-through">foo '
+          '<span style="text-decoration-color: #0f0">bar</span></span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(:(+l/#FFFF0000:foo )(+l/#FF00FF00:bar))]'));
+    });
   });
 
   group('text-decoration-line', () {
@@ -134,13 +141,10 @@ foo</span></span></span>
       expect(explained, equals('[RichText:(+l+o+u:foo)]'));
     });
 
-    testWidgets('skips rendering', (WidgetTester tester) async {
-      const html = '''
-<span style="text-decoration-line: line-through">
-<span style="text-decoration-line: overline">
-<span style="text-decoration-line: underline">
-foo <span style="text-decoration-line: none">bar</span></span></span></span>
-''';
+    testWidgets('renders none', (WidgetTester tester) async {
+      const html =
+          '<span style="text-decoration: line-through overline underline">foo '
+          '<span style="text-decoration-line: none">bar</span></span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:(+l+o+u:foo )(:bar))]'));
     });
@@ -169,8 +173,7 @@ foo <span style="text-decoration-line: none">bar</span></span></span></span>
     });
 
     testWidgets('renders solid', (WidgetTester tester) async {
-      const html = '<span style="text-decoration-line: line-through; '
-          'text-decoration-style: dotted">foo '
+      const html = '<span style="text-decoration: line-through dotted">foo '
           '<span style="text-decoration-style: solid">bar</span></span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:(+l/dotted:foo )(+l:bar))]'));
@@ -185,9 +188,39 @@ foo <span style="text-decoration-line: none">bar</span></span></span></span>
       expect(explained, equals('[RichText:(+l/0.5:foo)]'));
     });
 
+    testWidgets('changes inherited thickness', (WidgetTester tester) async {
+      const html = '<span style="text-decoration: line-through 50%">foo '
+          '<span style="text-decoration-thickness: 75%">bar</span></span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:(+l/0.5:foo )(+l/0.75:bar))]'));
+    });
+
     testWidgets('skips px', (WidgetTester tester) async {
       const html = '<span style="text-decoration-line: line-through; '
           'text-decoration-thickness: 5px">foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+l:foo)]'));
+    });
+  });
+
+  group('text-decoration-width', () {
+    testWidgets('renders percentage', (WidgetTester tester) async {
+      const html = '<span style="text-decoration-line: line-through; '
+          'text-decoration-width: 50%">foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(+l/0.5:foo)]'));
+    });
+
+    testWidgets('changes inherited width', (WidgetTester tester) async {
+      const html = '<span style="text-decoration: line-through 50%">foo '
+          '<span style="text-decoration-width: 75%">bar</span></span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:(+l/0.5:foo )(+l/0.75:bar))]'));
+    });
+
+    testWidgets('skips px', (WidgetTester tester) async {
+      const html = '<span style="text-decoration-line: line-through; '
+          'text-decoration-width: 5px">foo</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(+l:foo)]'));
     });
