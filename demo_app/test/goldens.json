@@ -196,7 +196,6 @@
   "inline/text-decoration/thickness/thick": "<span style=\"text-decoration: underline 200%\">foo</span>",
   "inline/text-decoration/thickness/thin": "<span style=\"text-decoration: underline 50%\">foo</span>",
   "inline/text-decoration/underline": "<span style=\"text-decoration: underline\">under</span>",
-  "inline/text-overflow/ellipsis": "<div style=\"max-lines: 2; text-overflow: ellipsis\">hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world hello world </div>",
   "inline/vertical-align/bottom": "Foo<span style=\"vertical-align: bottom\"><span style=\"background-color:#f00;font-size:0.75em;\">x</span></span>",
   "inline/vertical-align/middle": "Foo<span style=\"vertical-align: middle\"><span style=\"background-color:#f00;font-size:0.75em;\">x</span></span>",
   "inline/vertical-align/sub": "Foo<span style=\"vertical-align: sub\"><span style=\"background-color:#f00;font-size:0.75em;\">x</span></span>",

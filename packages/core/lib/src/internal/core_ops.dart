@@ -54,14 +54,6 @@ const kCssDisplayInline = 'inline';
 const kCssDisplayInlineBlock = 'inline-block';
 const kCssDisplayNone = 'none';
 
-const kCssMaxLines = 'max-lines';
-const kCssMaxLinesNone = 'none';
-const kCssMaxLinesWebkitLineClamp = '-webkit-line-clamp';
-
-const kCssTextOverflow = 'text-overflow';
-const kCssTextOverflowClip = 'clip';
-const kCssTextOverflowEllipsis = 'ellipsis';
-
 const kCssWhitespace = 'white-space';
 const kCssWhitespacePre = 'pre';
 const kCssWhitespaceNormal = 'normal';

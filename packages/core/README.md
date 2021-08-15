@@ -128,7 +128,6 @@ These tags and their contents will be ignored:
 - vertical-align: baseline/top/bottom/middle/sub/super
 - text-align (similar to `align` attribute)
 - text-decoration: line-through/none/overline/underline
-- text-overflow: clip/ellipsis. Note: `text-overflow: ellipsis` should be used in conjuntion with `max-lines` or `-webkit-line-clamp` for better result.
 - white-space: normal/pre
 - Sizing (width, height, max-xxx, min-xxx): `auto` or values in `em`, `%`, `pt` and `px`
 

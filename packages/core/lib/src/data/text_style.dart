@@ -8,9 +8,6 @@ class TextStyleHtml {
   /// The line height.
   final double? height;
 
-  /// The number of max lines that should be rendered.
-  final int? maxLines;
-
   /// The parent style.
   final TextStyleHtml? parent;
 
@@ -23,21 +20,16 @@ class TextStyleHtml {
   /// The text direction.
   final TextDirection textDirection;
 
-  /// The overflow behavior.
-  final TextOverflow? textOverflow;
-
   /// The whitespace behavior.
   final CssWhitespace whitespace;
 
   const TextStyleHtml._({
     required Iterable<dynamic> deps,
     this.height,
-    this.maxLines,
     this.parent,
     required this.style,
     this.textAlign,
     required this.textDirection,
-    this.textOverflow,
     required this.whitespace,
   }) : _deps = deps;
 
@@ -74,23 +66,19 @@ class TextStyleHtml {
   /// Creates a copy with the given fields replaced with the new values.
   TextStyleHtml copyWith({
     double? height,
-    int? maxLines,
     TextStyleHtml? parent,
     TextStyle? style,
     TextAlign? textAlign,
     TextDirection? textDirection,
-    TextOverflow? textOverflow,
     CssWhitespace? whitespace,
   }) =>
       TextStyleHtml._(
         deps: _deps,
         height: height ?? this.height,
-        maxLines: maxLines ?? this.maxLines,
         parent: parent ?? this.parent,
         style: style ?? this.style,
         textAlign: textAlign ?? this.textAlign,
         textDirection: textDirection ?? this.textDirection,
-        textOverflow: textOverflow ?? this.textOverflow,
         whitespace: whitespace ?? this.whitespace,
       );
 
