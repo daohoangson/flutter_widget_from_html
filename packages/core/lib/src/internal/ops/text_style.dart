@@ -70,24 +70,6 @@ class TextStyleOps {
           WidgetFactory wf) =>
       (p, v) => p.copyWith(height: _lineHeightTryParse(wf, p, v));
 
-  static TextStyleHtml maxLines(TextStyleHtml p, int v) =>
-      p.copyWith(maxLines: v);
-
-  static int? maxLinesTryParse(css.Expression? expression) {
-    if (expression is css.LiteralTerm) {
-      if (expression is css.NumberTerm) {
-        return expression.number.ceil();
-      }
-
-      switch (expression.valueAsString) {
-        case kCssMaxLinesNone:
-          return -1;
-      }
-    }
-
-    return null;
-  }
-
   static TextStyleHtml textDirection(TextStyleHtml p, String v) {
     switch (v) {
       case kCssDirectionLtr:
@@ -97,20 +79,6 @@ class TextStyleOps {
     }
 
     return p;
-  }
-
-  static TextStyleHtml textOverflow(TextStyleHtml p, TextOverflow v) =>
-      p.copyWith(textOverflow: v);
-
-  static TextOverflow? textOverflowTryParse(String value) {
-    switch (value) {
-      case kCssTextOverflowClip:
-        return TextOverflow.clip;
-      case kCssTextOverflowEllipsis:
-        return TextOverflow.ellipsis;
-    }
-
-    return null;
   }
 
   static List<String> fontFamilyTryParse(List<css.Expression> expressions) {

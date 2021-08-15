@@ -54,14 +54,6 @@ const kCssDisplayInline = 'inline';
 const kCssDisplayInlineBlock = 'inline-block';
 const kCssDisplayNone = 'none';
 
-const kCssMaxLines = 'max-lines';
-const kCssMaxLinesNone = 'none';
-const kCssMaxLinesWebkitLineClamp = '-webkit-line-clamp';
-
-const kCssTextOverflow = 'text-overflow';
-const kCssTextOverflowClip = 'clip';
-const kCssTextOverflowEllipsis = 'ellipsis';
-
 const kCssWhitespace = 'white-space';
 const kCssWhitespacePre = 'pre';
 const kCssWhitespaceNormal = 'normal';
@@ -92,4 +84,15 @@ void wrapTree(
     final last = tree.last!;
     append(last.parent!).insertAfter(last);
   }
+}
+
+extension RichTextMetadata on BuildMetadata {
+  static final _maxLines = Expando<int>();
+  static final _overflow = Expando<TextOverflow>();
+
+  int get maxLines => _maxLines[this] ?? -1;
+  set maxLines(int value) => _maxLines[this] = value;
+
+  TextOverflow get overflow => _overflow[this] ?? TextOverflow.clip;
+  set overflow(TextOverflow value) => _overflow[this] = value;
 }
