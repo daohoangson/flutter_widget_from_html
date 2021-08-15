@@ -1372,6 +1372,57 @@ Future<void> main() async {
     });
   });
 
+  group('text-overflow', () {
+    testWidgets('renders clip', (WidgetTester tester) async {
+      const html = '<div style="text-overflow: clip">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('renders ellipsis', (WidgetTester tester) async {
+      const html = '<div style="text-overflow: ellipsis">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(explained,
+          equals('[CssBlock:child=[RichText:overflow=ellipsis,(:Foo)]]'));
+    });
+
+    group('max-lines', () {
+      testWidgets('renders number', (WidgetTester tester) async {
+        const html = '<div style="max-lines: 2">Foo</div>';
+        final e = await explain(tester, html);
+        expect(e, equals('[CssBlock:child=[RichText:maxLines=2,(:Foo)]]'));
+      });
+
+      testWidgets('renders another number (override)', (tester) async {
+        const html = '<div style="max-lines: 2; max-lines: 3">Foo</div>';
+        final e = await explain(tester, html);
+        expect(e, equals('[CssBlock:child=[RichText:maxLines=3,(:Foo)]]'));
+      });
+
+      testWidgets('renders none (override)', (tester) async {
+        const html = '<div style="max-lines: 2; max-lines: none">Foo</div>';
+        final explained = await explain(tester, html);
+        expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+      });
+
+      testWidgets('renders -webkit-line-clamp', (WidgetTester tester) async {
+        const html = '<div style="-webkit-line-clamp: 2">Foo</div>';
+        final e = await explain(tester, html);
+        expect(e, equals('[CssBlock:child=[RichText:maxLines=2,(:Foo)]]'));
+      });
+
+      testWidgets('renders with ellipsis', (WidgetTester tester) async {
+        const html =
+            '<div style="max-lines: 2; text-overflow: ellipsis">Foo</div>';
+        final explained = await explain(tester, html);
+        expect(
+            explained,
+            equals(
+                '[CssBlock:child=[RichText:maxLines=2,overflow=ellipsis,(:Foo)]]'));
+      });
+    });
+  });
+
   group('white-space', () {
     testWidgets('renders normal', (tester) async {
       const html = '<div style="white-space: normal">Foo\nbar</div>';

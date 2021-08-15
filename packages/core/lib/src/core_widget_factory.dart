@@ -312,14 +312,11 @@ class WidgetFactory {
   /// Builds [RichText].
   Widget? buildText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) =>
       RichText(
-        // overflow: tsh.textOverflow ?? TextOverflow.clip,
+        maxLines: meta.maxLines > 0 ? meta.maxLines : null,
+        overflow: meta.overflow,
         text: text,
         textAlign: tsh.textAlign ?? TextAlign.start,
         textDirection: tsh.textDirection,
-
-        // TODO: calculate max lines automatically for ellipsis if needed
-        // currently it only renders 1 line with ellipsis
-        // maxLines: tsh.maxLines == -1 ? null : tsh.maxLines,
       );
 
   /// Builds [TextSpan].
@@ -887,6 +884,12 @@ class WidgetFactory {
         meta.tsb.enqueue(_tsbLineHeight!, style.value);
         break;
 
+      case kCssMaxLines:
+      case kCssMaxLinesWebkitLineClamp:
+        final maxLines = tryParseMaxLines(style.value);
+        if (maxLines != null) meta.maxLines = maxLines;
+        break;
+
       case kCssTextAlign:
         final term = style.term;
         if (term != null) {
@@ -902,6 +905,11 @@ class WidgetFactory {
       case kCssTextDecorationWidth:
         _styleTextDecoration ??= StyleTextDecoration(this).op;
         meta.register(_styleTextDecoration!);
+        break;
+
+      case kCssTextOverflow:
+        final textOverflow = tryParseTextOverflow(style.value);
+        if (textOverflow != null) meta.overflow = textOverflow;
         break;
 
       case kCssVerticalAlign:
