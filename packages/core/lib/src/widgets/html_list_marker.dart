@@ -71,11 +71,21 @@ class _ListMarkerRenderObject extends RenderBox {
   }
 
   TextPainter? __textPainter;
+  final _textMetrics = <LineMetrics>[];
   TextPainter get _textPainter {
-    return __textPainter ??= TextPainter(
+    final existingPainter = __textPainter;
+    if (existingPainter != null) return existingPainter;
+
+    final newPainter = __textPainter = TextPainter(
       text: TextSpan(style: _textStyle, text: '1.'),
       textDirection: TextDirection.ltr,
     )..layout();
+
+    _textMetrics
+      ..clear()
+      ..addAll(newPainter.computeLineMetrics());
+
+    return newPainter;
   }
 
   TextStyle _textStyle;
@@ -99,14 +109,7 @@ class _ListMarkerRenderObject extends RenderBox {
   void paint(PaintingContext context, Offset offset) {
     final canvas = context.canvas;
 
-    var lineMetrics = <LineMetrics>[];
-    try {
-      lineMetrics = _textPainter.computeLineMetrics();
-    } catch (e) {
-      debugPrint('computeLineMetrics error: $e');
-    }
-
-    final m = lineMetrics.isNotEmpty ? lineMetrics.first : null;
+    final m = _textMetrics.isNotEmpty ? _textMetrics.first : null;
     final center = offset +
         Offset(
           size.width / 2,
