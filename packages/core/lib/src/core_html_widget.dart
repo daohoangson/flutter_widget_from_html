@@ -3,8 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart' show CupertinoActivityIndicator;
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart'
-    show CircularProgressIndicator, Theme, ThemeData;
+import 'package:flutter/material.dart' show CircularProgressIndicator, Theme;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:html/dom.dart' as dom;
@@ -49,11 +48,6 @@ class HtmlWidget extends StatefulWidget {
   /// The input string.
   final String html;
 
-  /// The text color for link elements.
-  ///
-  /// Default: [ThemeData.accentColor].
-  final Color? hyperlinkColor;
-
   /// The custom [WidgetFactory] builder.
   final WidgetFactory Function()? factoryBuilder;
 
@@ -73,7 +67,6 @@ class HtmlWidget extends StatefulWidget {
   /// - [buildAsync]
   /// - [enableCaching]
   /// - [html]
-  /// - [hyperlinkColor]
   ///
   /// In `flutter_widget_from_html` package, these are also included:
   ///
@@ -85,7 +78,6 @@ class HtmlWidget extends StatefulWidget {
         baseUrl,
         buildAsync,
         enableCaching,
-        hyperlinkColor,
         if (_rebuildTriggers != null) _rebuildTriggers,
       ]);
   final RebuildTriggers? _rebuildTriggers;
@@ -112,7 +104,6 @@ class HtmlWidget extends StatefulWidget {
     this.customWidgetBuilder,
     this.enableCaching,
     this.factoryBuilder,
-    this.hyperlinkColor,
     Key? key,
     this.onTapImage,
     this.onTapUrl,

@@ -49,7 +49,6 @@ class HtmlWidget extends core.HtmlWidget {
     Uri? baseUrl,
     CustomStylesBuilder? customStylesBuilder,
     CustomWidgetBuilder? customWidgetBuilder,
-    Color? hyperlinkColor,
     void Function(ImageMetadata)? onTapImage,
     FutureOr<bool> Function(String)? onTapUrl,
     core.RebuildTriggers? rebuildTriggers,
@@ -69,7 +68,6 @@ class HtmlWidget extends core.HtmlWidget {
           customWidgetBuilder: customWidgetBuilder,
           enableCaching: enableCaching,
           factoryBuilder: factoryBuilder ?? _getEnhancedWf,
-          hyperlinkColor: hyperlinkColor,
           onTapImage: onTapImage,
           onTapUrl: onTapUrl,
           rebuildTriggers: core.RebuildTriggers([
