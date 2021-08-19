@@ -59,9 +59,13 @@ class StyleSizing {
       );
 
   _StyleSizingInput? _parse(BuildMetadata meta) {
-    CssLength? maxHeight, maxWidth, minHeight, minWidth;
+    CssLength? maxHeight;
+    CssLength? maxWidth;
+    CssLength? minHeight;
+    CssLength? minWidth;
     Axis? preferredAxis;
-    CssLength? preferredHeight, preferredWidth;
+    CssLength? preferredHeight;
+    CssLength? preferredWidth;
 
     for (final style in meta.styles) {
       final value = style.value;
