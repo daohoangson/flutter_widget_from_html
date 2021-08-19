@@ -255,7 +255,8 @@ class _RenderCssSizing extends RenderProxyBox {
     }
 
     // child appears to have a stable aspect ratio
-    double? childWidth, childHeight;
+    double? childWidth;
+    double? childHeight;
     if (_preferredAxis == Axis.vertical) {
       childHeight = preferredHeight;
       childWidth = childHeight * childAspectRatio;

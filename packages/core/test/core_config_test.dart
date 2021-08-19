@@ -127,7 +127,6 @@ void main() {
       Uri? baseUrl,
       bool? buildAsync,
       required bool enableCaching,
-      Color? hyperlinkColor,
       RebuildTriggers? rebuildTriggers,
       TextStyle? textStyle,
     }) =>
@@ -137,7 +136,6 @@ void main() {
               baseUrl: baseUrl,
               buildAsync: buildAsync,
               enableCaching: enableCaching,
-              hyperlinkColor: hyperlinkColor,
               key: helper.hwKey,
               rebuildTriggers: rebuildTriggers,
               textStyle: textStyle,
@@ -204,20 +202,6 @@ void main() {
       final built1 = helper.buildCurrentState();
 
       await explain(tester, html, enableCaching: false);
-      final built2 = helper.buildCurrentState();
-      _expect(built1, built2, isFalse);
-    });
-
-    testWidgets('rebuild new hyperlinkColor', (tester) async {
-      const html = 'Foo';
-
-      final explained1 = await explain(tester, html, enableCaching: true);
-      expect(explained1, equals('[RichText:(:Foo)]'));
-      final built1 = helper.buildCurrentState();
-
-      await explain(tester, html,
-          enableCaching: true,
-          hyperlinkColor: const Color.fromRGBO(255, 0, 0, 1));
       final built2 = helper.buildCurrentState();
       _expect(built1, built2, isFalse);
     });
@@ -351,24 +335,6 @@ void main() {
         ),
       );
       expect(e, equals('[Column:children=[RichText:(:Foo)],[Text:Bar]]'));
-    });
-  });
-
-  group('hyperlinkColor', () {
-    const hyperlinkColor = Color.fromRGBO(255, 0, 0, 1);
-    const html = '<a>Foo</a>';
-
-    testWidgets('renders default value', (WidgetTester tester) async {
-      final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(e, equals('[RichText:(#FF123456+u:Foo)]'));
-    });
-
-    testWidgets('renders custom value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        HtmlWidget(html, hyperlinkColor: hyperlinkColor, key: helper.hwKey),
-      );
-      expect(explained, equals('[RichText:(#FFFF0000+u:Foo)]'));
     });
   });
 
