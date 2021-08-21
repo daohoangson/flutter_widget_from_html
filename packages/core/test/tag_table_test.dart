@@ -649,6 +649,9 @@ Future<void> main() async {
     GoldenToolkit.runWithConfiguration(
       () {
         group('screenshot testing', () {
+          setUp(() => WidgetFactory.debugDeterministicLoadingWidget = true);
+          tearDown(() => WidgetFactory.debugDeterministicLoadingWidget = false);
+
           final multiline =
               'Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br />\n' *
                   3;

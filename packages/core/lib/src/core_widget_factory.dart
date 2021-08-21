@@ -17,6 +17,12 @@ import 'internal/platform_specific/fallback.dart'
 
 /// A factory to build widgets.
 class WidgetFactory {
+  /// Setting this property to true replaces the default loading widget with a static [Text].
+  /// This property is most useful for testing purposes.
+  ///
+  /// Defaults to `false`, resulting in a [CircularProgressIndicator].
+  static bool debugDeterministicLoadingWidget = false;
+
   late AnchorRegistry _anchorRegistry;
   late final Flattener _flattener;
 
@@ -530,7 +536,9 @@ class WidgetFactory {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(8),
-        child: CircularProgressIndicator.adaptive(value: loadingProgress),
+        child: debugDeterministicLoadingWidget
+            ? const Text('Loading...')
+            : CircularProgressIndicator.adaptive(value: loadingProgress),
       ),
     );
   }

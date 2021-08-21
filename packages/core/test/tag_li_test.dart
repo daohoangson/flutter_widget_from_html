@@ -718,6 +718,9 @@ Future<void> main() async {
     GoldenToolkit.runWithConfiguration(
       () {
         group('baseline calculation', () {
+          setUp(() => WidgetFactory.debugDeterministicLoadingWidget = true);
+          tearDown(() => WidgetFactory.debugDeterministicLoadingWidget = false);
+
           const assetName = 'test/images/logo.png';
           final testCases = <String, String>{
             'img_block':
