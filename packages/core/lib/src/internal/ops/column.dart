@@ -42,7 +42,8 @@ class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
   List<Widget> _buildWidgets(BuildContext context) {
     final contents = <Widget>[];
 
-    HeightPlaceholder? marginBottom, marginTop;
+    HeightPlaceholder? marginBottom;
+    HeightPlaceholder? marginTop;
     Widget? prev;
     var state = 0;
 

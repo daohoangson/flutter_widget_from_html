@@ -255,7 +255,8 @@ class _RenderCssSizing extends RenderProxyBox {
     }
 
     // child appears to have a stable aspect ratio
-    double? childWidth, childHeight;
+    double? childWidth;
+    double? childHeight;
     if (_preferredAxis == Axis.vertical) {
       childHeight = preferredHeight;
       childWidth = childHeight * childAspectRatio;
@@ -314,8 +315,8 @@ class _CssSizingPercentage extends CssSizingValue {
   @override
   int get hashCode => percentage.hashCode;
   @override
-  bool operator ==(covariant _CssSizingPercentage other) =>
-      other.percentage == percentage;
+  bool operator ==(Object other) =>
+      other is _CssSizingPercentage && other.percentage == percentage;
   @override
   String toString() => '${percentage.toStringAsFixed(1)}%';
 }
@@ -329,7 +330,8 @@ class _CssSizingValue extends CssSizingValue {
   @override
   int get hashCode => value.hashCode;
   @override
-  bool operator ==(covariant _CssSizingValue other) => other.value == value;
+  bool operator ==(Object other) =>
+      other is _CssSizingValue && other.value == value;
   @override
   String toString() => value.toStringAsFixed(1);
 }

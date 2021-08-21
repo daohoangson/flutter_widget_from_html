@@ -23,11 +23,14 @@ class Flattener {
   final List<GestureRecognizer> _recognizers = [];
 
   late List<Flattened> _flattened;
-  late _Recognizer _recognizer, _prevRecognizer;
+  late _Recognizer _recognizer;
+  late _Recognizer _prevRecognizer;
   List<SpanBuilder>? _spans;
-  late List<_String> _strings, _prevStrings;
+  late List<_String> _strings;
+  late List<_String> _prevStrings;
   late bool _swallowWhitespace;
-  late TextStyleBuilder _tsb, _prevTsb;
+  late TextStyleBuilder _tsb;
+  late TextStyleBuilder _prevTsb;
 
   Flattener(this.wf);
 
