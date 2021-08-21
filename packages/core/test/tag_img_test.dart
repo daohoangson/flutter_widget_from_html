@@ -286,7 +286,14 @@ void main() {
 
   testWidgets('onTapImage', (WidgetTester tester) async {
     final taps = <ImageMetadata>[];
-    await tester.pumpWidget(_TapTestApp(onTapImage: taps.add));
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: HtmlWidget(
+          '<img src="${helper.kDataUri}" width="20" height="20" />',
+          onTapImage: taps.add,
+        ),
+      ),
+    ));
     await tester.tap(find.byType(Image));
     expect(taps.length, equals(1));
   });
@@ -299,20 +306,4 @@ void main() {
       expect(find.text('❌'), findsOneWidget);
     });
   });
-}
-
-class _TapTestApp extends StatelessWidget {
-  final void Function(ImageMetadata)? onTapImage;
-
-  const _TapTestApp({Key? key, this.onTapImage}) : super(key: key);
-
-  @override
-  Widget build(BuildContext _) => MaterialApp(
-        home: Scaffold(
-          body: HtmlWidget(
-            '<img src="asset:test/images/logo.png" width="10" height="10" />',
-            onTapImage: onTapImage,
-          ),
-        ),
-      );
 }
