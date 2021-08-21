@@ -18,6 +18,8 @@ final hwKey = helper.hwKey;
 
 const buildCurrentState = helper.buildCurrentState;
 
+const explainWithoutPumping = helper.explainWithoutPumping;
+
 String? _explainer(helper.Explainer parent, Widget widget) {
   return fwfh_cached_network_image.cachedNetworkImageExplainer(
           parent, widget) ??

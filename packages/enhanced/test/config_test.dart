@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -297,6 +299,40 @@ void main() {
         ),
       );
       expect(e, equals('[Column:children=[RichText:(:Foo)],[Text:Bar]]'));
+    });
+  });
+
+  group('onErrorBuilder', () {
+    Future<String?> explain(
+      WidgetTester tester, {
+      OnErrorBuilder? onErrorBuilder,
+    }) async {
+      await runZonedGuarded(() async {
+        await helper.explain(tester, null,
+            hw: HtmlWidget(
+              'Foo <span class="throw">bar</span>.',
+              buildAsync: true,
+              factoryBuilder: () => _OnErrorBuilderFactory(),
+              key: helper.hwKey,
+              onErrorBuilder: onErrorBuilder,
+            ));
+
+        await tester.runAsync(() => Future.delayed(const Duration(seconds: 1)));
+        await tester.pump();
+      }, (_, __) {});
+
+      return helper.explainWithoutPumping(useExplainer: false);
+    }
+
+    testWidgets('renders widget0 (default)', (tester) async {
+      final explained = await explain(tester);
+      expect(explained, contains('SizedBox.shrink()'));
+    });
+
+    testWidgets('renders custom', (tester) async {
+      final explained = await explain(tester,
+          onErrorBuilder: (_, __, ___) => const Text('Custom'));
+      expect(explained, contains('RichText(text: "Custom")'));
     });
   });
 
@@ -655,4 +691,15 @@ void main() {
       });
     });
   });
+}
+
+class _OnErrorBuilderFactory extends WidgetFactory {
+  @override
+  void parse(BuildMetadata meta) {
+    if (meta.element.className == 'throw') {
+      throw UnsupportedError(meta.element.outerHtml);
+    }
+
+    super.parse(meta);
+  }
 }
