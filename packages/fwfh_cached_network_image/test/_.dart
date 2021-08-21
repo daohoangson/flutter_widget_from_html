@@ -79,15 +79,4 @@ class _WidgetFactory extends WidgetFactory with CachedNetworkImageFactory {
 
     return manager;
   }
-
-  @override
-  Widget imageLoadingBuilder(
-    BuildContext context,
-    Widget child,
-    ImageChunkEvent? loadingProgress,
-    ImageSource src,
-  ) {
-    if (loadingProgress == null) return child;
-    return const CircularProgressIndicator.adaptive();
-  }
 }

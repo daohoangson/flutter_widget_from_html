@@ -39,87 +39,6 @@ void main() {
     });
   });
 
-  group('buildAsyncBuilder', () {
-    Future<String?> explain(
-      WidgetTester tester,
-      String html, {
-      AsyncWidgetBuilder<Widget>? buildAsyncBuilder,
-      required bool withData,
-    }) =>
-        tester.runAsync(() => helper.explain(tester, null,
-            buildFutureBuilderWithData: withData,
-            hw: HtmlWidget(
-              html,
-              buildAsync: true,
-              buildAsyncBuilder: buildAsyncBuilder,
-              key: helper.hwKey,
-            )));
-
-    group('default', () {
-      testWidgets('renders data', (WidgetTester tester) async {
-        const html = 'Foo';
-        final explained = await explain(tester, html, withData: true);
-        expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
-      });
-
-      testWidgets('renders CircularProgressIndicator', (tester) async {
-        debugDefaultTargetPlatformOverride = TargetPlatform.android;
-        const html = 'Foo';
-        final explained = await explain(tester, html, withData: false);
-        expect(
-            explained,
-            equals('[FutureBuilder:'
-                '[Center:child='
-                '[Padding:(8,8,8,8),child='
-                '[CircularProgressIndicator]'
-                ']]]'));
-        debugDefaultTargetPlatformOverride = null;
-      });
-
-      testWidgets('renders CupertinoActivityIndicator', (tester) async {
-        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-        const html = 'Foo';
-        final explained = await explain(tester, html, withData: false);
-        expect(
-            explained,
-            equals('[FutureBuilder:'
-                '[Center:child='
-                '[Padding:(8,8,8,8),child='
-                '[CupertinoActivityIndicator]'
-                ']]]'));
-        debugDefaultTargetPlatformOverride = null;
-      });
-    });
-
-    group('custom', () {
-      Widget buildAsyncBuilder(
-              BuildContext _, AsyncSnapshot<Widget> snapshot) =>
-          snapshot.data ?? const Text('No data');
-
-      testWidgets('renders data', (WidgetTester tester) async {
-        const html = 'Foo';
-        final explained = await explain(
-          tester,
-          html,
-          buildAsyncBuilder: buildAsyncBuilder,
-          withData: true,
-        );
-        expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
-      });
-
-      testWidgets('renders indicator', (WidgetTester tester) async {
-        const html = 'Foo';
-        final explained = await explain(
-          tester,
-          html,
-          buildAsyncBuilder: buildAsyncBuilder,
-          withData: false,
-        );
-        expect(explained, equals('[FutureBuilder:[Text:No data]]'));
-      });
-    });
-  });
-
   group('enableCaching', () {
     Future<String> explain(
       WidgetTester tester,
@@ -369,6 +288,87 @@ void main() {
         HtmlWidget(html, hyperlinkColor: hyperlinkColor, key: helper.hwKey),
       );
       expect(explained, equals('[RichText:(#FFFF0000+u:Foo)]'));
+    });
+  });
+
+  group('onLoadingBuilder', () {
+    Future<String?> explain(
+      WidgetTester tester,
+      String html, {
+      OnLoadingBuilder? onLoadingBuilder,
+      bool useExplainer = true,
+      required bool withData,
+    }) =>
+        tester.runAsync(() => helper.explain(tester, null,
+            buildFutureBuilderWithData: withData,
+            hw: HtmlWidget(
+              html,
+              buildAsync: true,
+              key: helper.hwKey,
+              onLoadingBuilder: onLoadingBuilder,
+            ),
+            useExplainer: useExplainer));
+
+    group('default', () {
+      testWidgets('renders data', (WidgetTester tester) async {
+        const html = 'Foo';
+        final explained = await explain(tester, html, withData: true);
+        expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
+      });
+
+      testWidgets('renders CircularProgressIndicator', (tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        const html = 'Foo';
+        final explained = await explain(
+          tester,
+          html,
+          useExplainer: false,
+          withData: false,
+        );
+        expect(explained, contains('CircularProgressIndicator'));
+        expect(explained, isNot(contains('CupertinoActivityIndicator')));
+        debugDefaultTargetPlatformOverride = null;
+      });
+
+      testWidgets('renders CupertinoActivityIndicator', (tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        const html = 'Foo';
+        final explained = await explain(
+          tester,
+          html,
+          useExplainer: false,
+          withData: false,
+        );
+        expect(explained, contains('CupertinoActivityIndicator'));
+        debugDefaultTargetPlatformOverride = null;
+      });
+    });
+
+    group('custom', () {
+      Widget? onLoadingBuilder(BuildContext _, dom.Element __, double? ___) =>
+          const Text('No data');
+
+      testWidgets('renders data', (WidgetTester tester) async {
+        const html = 'Foo';
+        final explained = await explain(
+          tester,
+          html,
+          onLoadingBuilder: onLoadingBuilder,
+          withData: true,
+        );
+        expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
+      });
+
+      testWidgets('renders custom', (WidgetTester tester) async {
+        const html = 'Foo';
+        final explained = await explain(
+          tester,
+          html,
+          onLoadingBuilder: onLoadingBuilder,
+          withData: false,
+        );
+        expect(explained, equals('[FutureBuilder:[Text:No data]]'));
+      });
     });
   });
 

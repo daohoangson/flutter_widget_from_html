@@ -42,7 +42,6 @@ class HtmlWidget extends core.HtmlWidget {
   HtmlWidget(
     String html, {
     bool? buildAsync,
-    AsyncWidgetBuilder<Widget>? buildAsyncBuilder,
     bool enableCaching = true,
     WidgetFactory Function()? factoryBuilder,
     Key? key,
@@ -50,6 +49,8 @@ class HtmlWidget extends core.HtmlWidget {
     CustomStylesBuilder? customStylesBuilder,
     CustomWidgetBuilder? customWidgetBuilder,
     Color? hyperlinkColor,
+    OnErrorBuilder? onErrorBuilder,
+    OnLoadingBuilder? onLoadingBuilder,
     void Function(ImageMetadata)? onTapImage,
     FutureOr<bool> Function(String)? onTapUrl,
     core.RebuildTriggers? rebuildTriggers,
@@ -64,12 +65,13 @@ class HtmlWidget extends core.HtmlWidget {
           html,
           baseUrl: baseUrl,
           buildAsync: buildAsync,
-          buildAsyncBuilder: buildAsyncBuilder,
           customStylesBuilder: customStylesBuilder,
           customWidgetBuilder: customWidgetBuilder,
           enableCaching: enableCaching,
           factoryBuilder: factoryBuilder ?? _getEnhancedWf,
           hyperlinkColor: hyperlinkColor,
+          onErrorBuilder: onErrorBuilder,
+          onLoadingBuilder: onLoadingBuilder,
           onTapImage: onTapImage,
           onTapUrl: onTapUrl,
           rebuildTriggers: core.RebuildTriggers([

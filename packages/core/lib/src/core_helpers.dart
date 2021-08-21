@@ -64,6 +64,15 @@ typedef EnsureVisible = Future<bool> Function(
   Duration jumpDuration,
 });
 
+/// A builder function that is called if an error occurs.
+typedef OnErrorBuilder = Widget? Function(
+    BuildContext context, dom.Element element, dynamic error);
+
+/// A builder that specifies the widget to display to the user
+/// while a complicated element is still loading.
+typedef OnLoadingBuilder = Widget? Function(
+    BuildContext context, dom.Element element, double? loadingProgress);
+
 /// A set of values that should trigger rebuild.
 class RebuildTriggers {
   final List _values;
