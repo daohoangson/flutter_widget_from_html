@@ -1,3 +1,7 @@
+## 0.7.0-dev.2021082102
+
+- Fix `onErrorBuilder` doesn't work (#575)
+
 ## 0.7.0-dev.2021082101
 
 - BREAKING: Change `onTapUrl` signature to return a `FutureOr<bool>`. (#563)
