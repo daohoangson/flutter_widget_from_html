@@ -1,3 +1,14 @@
+## 0.7.0-dev.2021082101
+
+- BREAKING: Change `onTapUrl` signature to return a `FutureOr<bool>`. (#563)
+- BREAKING: Remove `TextStyleHtml.maxLines` and `.textOverflow` (#570)
+- BREAKING: Remove `HtmlWidget.hyperlinkColor` (#571)
+- BREAKING: Remove `HtmlWidget.buildAsyncBuilder` (#575)
+- BREAKING: Remove `WidgetFactory.imageLoadingBuilder` and `imageErrorBuilder` (#575)
+- Restore `computeLineMetrics` usage in Flutter web. (#561)
+- Improve `text-decoration` support (#569)
+- Fix `CssSizingValue` equality check
+
 ## 0.7.0-dev.2021080801
 
 - BREAKING: `RenderMode.Column` is now `.column` (`ListView` and `SliverList` have the same change)
