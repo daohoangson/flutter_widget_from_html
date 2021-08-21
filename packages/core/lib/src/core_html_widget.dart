@@ -135,6 +135,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     _wf = widget.factoryBuilder?.call() ?? WidgetFactory();
 
     _wf.onRoot(_rootTsb);
+    _wf.reset(this);
 
     if (buildAsync) {
       _future = _buildAsync();

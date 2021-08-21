@@ -30,14 +30,12 @@ String? _explainer(helper.Explainer parent, Widget widget) {
 Future<String> explain(
   WidgetTester tester,
   String? html, {
-  bool buildFutureBuilderWithData = true,
   Widget? hw,
   bool useExplainer = true,
 }) async =>
     helper.explain(
       tester,
       null,
-      buildFutureBuilderWithData: buildFutureBuilderWithData,
       explainer: _explainer,
       hw: hw ?? HtmlWidget(html!, key: helper.hwKey),
       useExplainer: useExplainer,

@@ -24,24 +24,9 @@ Widget? buildCurrentState() {
   return hws.build(hws.context);
 }
 
-Future<Widget> buildFutureBuilder(
-  FutureBuilder<Widget> fb, {
-  bool withData = true,
-}) async {
-  final hws = hwKey.currentState;
-  if (hws == null) return Future.value(null);
-
-  final data = await fb.future!;
-  final snapshot = withData
-      ? AsyncSnapshot.withData(ConnectionState.done, data)
-      : const AsyncSnapshot<Widget>.nothing();
-  return fb.builder(hws.context, snapshot);
-}
-
 Future<String> explain(
   WidgetTester tester,
   String? html, {
-  bool buildFutureBuilderWithData = true,
   String? Function(Explainer, Widget)? explainer,
   Widget? hw,
   bool rtl = false,
@@ -82,14 +67,12 @@ Future<String> explain(
   );
 
   return explainWithoutPumping(
-    buildFutureBuilderWithData: buildFutureBuilderWithData,
     explainer: explainer,
     useExplainer: useExplainer,
   );
 }
 
 Future<String> explainWithoutPumping({
-  bool buildFutureBuilderWithData = true,
   String? Function(Explainer, Widget)? explainer,
   bool useExplainer = true,
 }) async {
@@ -146,25 +129,13 @@ Future<String> explainWithoutPumping({
     return str;
   }
 
-  var built = buildCurrentState();
+  final built = buildCurrentState();
   if (built == null) return 'null';
 
-  var isFutureBuilder = false;
-  if (built is FutureBuilder<Widget>) {
-    built = await buildFutureBuilder(
-      built,
-      withData: buildFutureBuilderWithData,
-    );
-    isFutureBuilder = true;
-  }
-
-  var explained = Explainer(
+  return Explainer(
     hwKey.currentContext!,
     explainer: explainer,
   ).explain(built);
-  if (isFutureBuilder) explained = '[FutureBuilder:$explained]';
-
-  return explained;
 }
 
 final _explainMarginRegExp = RegExp(r'^\[Column:(dir=rtl,)?children='

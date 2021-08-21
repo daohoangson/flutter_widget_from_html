@@ -13,34 +13,31 @@ Future<String> explain(WidgetTester t, HtmlWidget hw) =>
 
 void main() {
   group('buildAsync', () {
-    Future<String?> explain(
-      WidgetTester tester,
-      String html, {
-      bool? buildAsync,
-    }) =>
-        tester.runAsync(() => helper.explain(tester, null,
-            hw: HtmlWidget(
-              html,
-              buildAsync: buildAsync,
-              key: helper.hwKey,
-            )));
+    Future<String?> explain(WidgetTester tester, String html,
+            {bool? buildAsync}) =>
+        helper.explain(
+          tester,
+          null,
+          hw: HtmlWidget(html, buildAsync: buildAsync, key: helper.hwKey),
+          useExplainer: false,
+        );
 
     testWidgets('uses FutureBuilder', (WidgetTester tester) async {
       const html = 'Foo';
       final explained = await explain(tester, html, buildAsync: true);
-      expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
+      expect(explained, startsWith('FutureBuilder'));
     });
 
     testWidgets('skips FutureBuilder', (WidgetTester tester) async {
       const html = 'Foo';
       final explained = await explain(tester, html, buildAsync: false);
-      expect(explained, equals('[RichText:(:$html)]'));
+      expect(explained, startsWith('TshWidget'));
     });
 
     testWidgets('uses FutureBuilder automatically', (tester) async {
       final html = 'Foo' * kShouldBuildAsync;
       final explained = await explain(tester, html);
-      expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
+      expect(explained, startsWith('FutureBuilder'));
     });
   });
 
@@ -305,82 +302,39 @@ void main() {
 
   group('onLoadingBuilder', () {
     Future<String?> explain(
-      WidgetTester tester,
-      String html, {
+      WidgetTester tester, {
       OnLoadingBuilder? onLoadingBuilder,
-      bool useExplainer = true,
-      required bool withData,
     }) =>
-        tester.runAsync(() => helper.explain(tester, null,
-            buildFutureBuilderWithData: withData,
+        helper.explain(tester, null,
             hw: HtmlWidget(
-              html,
+              'Foo',
               buildAsync: true,
               key: helper.hwKey,
               onLoadingBuilder: onLoadingBuilder,
             ),
-            useExplainer: useExplainer));
+            useExplainer: false);
 
-    group('default', () {
-      testWidgets('renders data', (WidgetTester tester) async {
-        const html = 'Foo';
-        final explained = await explain(tester, html, withData: true);
-        expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
-      });
-
-      testWidgets('renders CircularProgressIndicator', (tester) async {
-        debugDefaultTargetPlatformOverride = TargetPlatform.android;
-        const html = 'Foo';
-        final explained = await explain(
-          tester,
-          html,
-          useExplainer: false,
-          withData: false,
-        );
-        expect(explained, contains('CircularProgressIndicator'));
-        expect(explained, isNot(contains('CupertinoActivityIndicator')));
-        debugDefaultTargetPlatformOverride = null;
-      });
-
-      testWidgets('renders CupertinoActivityIndicator', (tester) async {
-        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-        const html = 'Foo';
-        final explained = await explain(
-          tester,
-          html,
-          useExplainer: false,
-          withData: false,
-        );
-        expect(explained, contains('CupertinoActivityIndicator'));
-        debugDefaultTargetPlatformOverride = null;
-      });
+    testWidgets('renders CircularProgressIndicator', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      final explained = await explain(tester);
+      expect(explained, contains('CircularProgressIndicator'));
+      expect(explained, isNot(contains('CupertinoActivityIndicator')));
+      debugDefaultTargetPlatformOverride = null;
     });
 
-    group('custom', () {
-      Widget? onLoadingBuilder(BuildContext _, dom.Element __, double? ___) =>
-          const Text('No data');
+    testWidgets('renders CupertinoActivityIndicator', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      final explained = await explain(tester);
+      expect(explained, contains('CupertinoActivityIndicator'));
+      debugDefaultTargetPlatformOverride = null;
+    });
 
-      testWidgets('renders data', (WidgetTester tester) async {
-        const html = 'Foo';
-        final explained = await explain(
-          tester,
-          html,
-          onLoadingBuilder: onLoadingBuilder,
-          withData: true,
-        );
-        expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
-      });
-
-      testWidgets('renders custom', (WidgetTester tester) async {
-        const html = 'Foo';
-        final explained = await explain(
-          tester,
-          html,
-          onLoadingBuilder: onLoadingBuilder,
-          withData: false,
-        );
-        expect(explained, equals('[FutureBuilder:[Text:No data]]'));
-      });
+    testWidgets('renders custom', (WidgetTester tester) async {
+      final explained = await explain(
+        tester,
+        onLoadingBuilder: (_, __, ___) => const Text('Custom'),
+      );
+      expect(explained, contains('RichText(text: "Custom")'));
     });
   });
 
