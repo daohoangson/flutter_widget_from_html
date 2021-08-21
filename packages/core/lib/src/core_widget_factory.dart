@@ -258,16 +258,18 @@ class WidgetFactory {
       errorBuilder: (context, error, _) =>
           onErrorBuilder(context, meta, error, src) ?? widget0,
       loadingBuilder: (context, child, loadingProgress) =>
-          onLoadingBuilder(
-              context,
-              meta,
-              loadingProgress?.expectedTotalBytes != null &&
-                      loadingProgress!.expectedTotalBytes! > 0
-                  ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
-                  : null,
-              src) ??
-          child,
+          loadingProgress == null
+              ? child
+              : onLoadingBuilder(
+                      context,
+                      meta,
+                      loadingProgress.expectedTotalBytes != null &&
+                              loadingProgress.expectedTotalBytes! > 0
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                          : null,
+                      src) ??
+                  child,
       excludeFromSemantics: semanticLabel == null,
       fit: BoxFit.fill,
       image: provider,
