@@ -30,6 +30,21 @@ void main() {
       expect(explained, startsWith('FutureBuilder'));
     });
 
+    testWidgets('renders FutureBuilder', (WidgetTester tester) async {
+      const html = 'Foo';
+      const rendered = 'RichText(text: "Foo")';
+      final loading = await explain(tester, html, buildAsync: true);
+      expect(loading, isNot(contains(rendered)));
+
+      await tester.runAsync(() => Future.delayed(const Duration(seconds: 1)));
+      await tester.pump();
+
+      final success = await helper.explainWithoutPumping(useExplainer: false);
+
+      expect(success, startsWith('FutureBuilder'));
+      expect(success, contains(rendered));
+    });
+
     testWidgets('skips FutureBuilder', (WidgetTester tester) async {
       const html = 'Foo';
       final explained = await explain(tester, html, buildAsync: false);
