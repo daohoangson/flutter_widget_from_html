@@ -1,3 +1,7 @@
+## 0.7.0-dev.2021082103
+
+- Update `onErrorBuilder` logic
+
 ## 0.7.0-dev.2021082102
 
 - Fix `onErrorBuilder` doesn't work (#575)
