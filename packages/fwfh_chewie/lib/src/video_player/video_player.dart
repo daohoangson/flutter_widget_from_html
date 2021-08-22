@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:chewie/chewie.dart' as lib;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:video_player/video_player.dart' as lib;
 
 /// A video player.
@@ -28,6 +29,15 @@ class VideoPlayer extends StatefulWidget {
   /// Default: `false`.
   final bool controls;
 
+  /// A builder function that is called if an error occurs during video loading.
+  final Widget Function(BuildContext context, String url, dynamic error)?
+      errorBuilder;
+
+  /// A builder that specifies the widget to display to the user while a video
+  /// is still loading.
+  final Widget Function(BuildContext context, String url, Widget child)?
+      loadingBuilder;
+
   /// Controls whether to play video in loops.
   ///
   /// Default: `false`.
@@ -43,7 +53,9 @@ class VideoPlayer extends StatefulWidget {
     this.autoResize = true,
     this.autoplay = false,
     this.controls = false,
+    this.errorBuilder,
     Key? key,
+    this.loadingBuilder,
     this.loop = false,
     this.poster,
   }) : super(key: key);
@@ -54,7 +66,7 @@ class VideoPlayer extends StatefulWidget {
 
 class _VideoPlayerState extends State<VideoPlayer> {
   lib.ChewieController? _controller;
-  var _hasError = false;
+  dynamic _error;
   lib.VideoPlayerController? _vpc;
 
   Widget? get placeholder =>
@@ -80,14 +92,21 @@ class _VideoPlayerState extends State<VideoPlayer> {
             : null) ??
         widget.aspectRatio;
 
-    late Widget child;
+    Widget? child;
     if (_controller != null) {
       child = lib.Chewie(controller: _controller!);
-    } else if (_hasError) {
-      child = const Center(child: Text('❌'));
+    } else if (_error != null) {
+      final errorBuilder = widget.errorBuilder;
+      if (errorBuilder != null) {
+        child = errorBuilder(context, widget.url, _error);
+      }
     } else {
-      child = placeholder ??
-          const Center(child: CircularProgressIndicator.adaptive());
+      child = placeholder;
+
+      final loadingBuilder = widget.loadingBuilder;
+      if (loadingBuilder != null) {
+        child = loadingBuilder(context, widget.url, child ?? widget0);
+      }
     }
 
     return AspectRatio(
@@ -100,8 +119,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
     final vpc = _vpc = lib.VideoPlayerController.network(widget.url);
     try {
       await vpc.initialize();
-    } catch (_) {
-      setState(() => _hasError = true);
+    } catch (error) {
+      setState(() => _error = error);
       return;
     }
 

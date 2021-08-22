@@ -514,12 +514,10 @@ class WidgetFactory {
       if (result != null) return result;
     }
 
-    if (data is ImageSource) {
-      final image = data.image;
-      final semanticLabel = image?.alt ?? image?.title;
-      final text = semanticLabel ?? '❌';
-      return Text(text);
-    }
+    final image = data is ImageSource ? data.image : null;
+    final semanticLabel = image?.alt ?? image?.title;
+    final text = semanticLabel ?? '❌';
+    return Text(text);
   }
 
   /// Builder for loading widget while a complicated element is loading.

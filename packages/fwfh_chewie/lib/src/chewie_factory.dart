@@ -27,6 +27,10 @@ mixin ChewieFactory on WidgetFactory {
       autoResize: !dimensOk,
       autoplay: autoplay,
       controls: controls,
+      errorBuilder: (context, _, error) =>
+          onErrorBuilder(context, meta, error, url) ?? widget0,
+      loadingBuilder: (context, _, child) =>
+          onLoadingBuilder(context, meta, null, url) ?? widget0,
       loop: loop,
       poster: poster,
     );
