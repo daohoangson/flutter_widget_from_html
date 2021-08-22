@@ -506,6 +506,8 @@ class WidgetFactory {
       url.isNotEmpty ? NetworkImage(url) : null;
 
   /// Builder for error widget if a complicated element failed to render.
+  ///
+  /// See [OnErrorBuilder].
   Widget? onErrorBuilder(BuildContext context, BuildMetadata meta,
       [dynamic error, dynamic data]) {
     final callback = _widget?.onErrorBuilder;
@@ -521,6 +523,8 @@ class WidgetFactory {
   }
 
   /// Builder for loading widget while a complicated element is loading.
+  ///
+  /// See [OnLoadingBuilder].
   Widget? onLoadingBuilder(
     BuildContext context,
     BuildMetadata meta, [

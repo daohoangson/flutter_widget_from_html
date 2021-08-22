@@ -64,12 +64,20 @@ typedef EnsureVisible = Future<bool> Function(
   Duration jumpDuration,
 });
 
-/// A builder function that is called if an error occurs.
+/// A builder function that is called if an error occurs
+/// during a complicated element rendering.
+///
+/// See [OnLoadingBuilder] for the full list.
 typedef OnErrorBuilder = Widget? Function(
     BuildContext context, dom.Element element, dynamic error);
 
 /// A builder that specifies the widget to display to the user
 /// while a complicated element is still loading.
+///
+/// List of widgets that will trigger this method:
+/// - The [HtmlWidget] itself
+/// - Image
+/// - Video
 typedef OnLoadingBuilder = Widget? Function(
     BuildContext context, dom.Element element, double? loadingProgress);
 
