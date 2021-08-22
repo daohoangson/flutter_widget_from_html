@@ -411,6 +411,9 @@ void main() {
     GoldenToolkit.runWithConfiguration(
       () {
         group('_guessChildSize', () {
+          setUp(() => WidgetFactory.debugDeterministicLoadingWidget = true);
+          tearDown(() => WidgetFactory.debugDeterministicLoadingWidget = false);
+
           const assetName = 'test/images/logo.png';
           const childHeightGtMaxHeight = 'child_height_gt_max_height';
           const testCases = <String, String>{

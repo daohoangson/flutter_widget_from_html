@@ -38,6 +38,7 @@ Future<String> explain(
     useExplainer: useExplainer,
   );
 
+  await tester.pump(const Duration(milliseconds: 3));
   await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 10)));
   await tester.pump();
 
@@ -67,6 +68,10 @@ class _WidgetFactory extends WidgetFactory with CachedNetworkImageFactory {
       switch (fileName) {
         case 'transparent.gif':
           final data = base64Decode(helper.kDataBase64);
+
+          await Future.delayed(const Duration(milliseconds: 3));
+          yield DownloadProgress(url, data.length, 0);
+
           final file = MemoryFileSystem().file(fileName)
             ..writeAsBytesSync(data.toList(growable: false));
           yield FileInfo(file, FileSource.Cache, ttl, url);
@@ -78,16 +83,5 @@ class _WidgetFactory extends WidgetFactory with CachedNetworkImageFactory {
     });
 
     return manager;
-  }
-
-  @override
-  Widget imageLoadingBuilder(
-    BuildContext context,
-    Widget child,
-    ImageChunkEvent? loadingProgress,
-    ImageSource src,
-  ) {
-    if (loadingProgress == null) return child;
-    return const CircularProgressIndicator.adaptive();
   }
 }

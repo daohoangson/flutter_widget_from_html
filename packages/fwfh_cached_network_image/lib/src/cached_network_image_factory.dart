@@ -18,18 +18,19 @@ mixin CachedNetworkImageFactory on WidgetFactory {
     return CachedNetworkImage(
       cacheManager: cacheManager,
       errorWidget: (context, _, error) =>
-          imageErrorBuilder(context, error, null, src),
+          onErrorBuilder(context, meta, error, src) ?? widget0,
       fit: BoxFit.fill,
       imageUrl: url,
-      progressIndicatorBuilder: (context, _, progress) => imageLoadingBuilder(
-        context,
-        const SizedBox.shrink(),
-        ImageChunkEvent(
-          cumulativeBytesLoaded: progress.downloaded,
-          expectedTotalBytes: progress.totalSize,
-        ),
-        src,
-      ),
+      progressIndicatorBuilder: (context, _, progress) =>
+          onLoadingBuilder(
+            context,
+            meta,
+            progress.totalSize != null && progress.totalSize! > 0
+                ? progress.downloaded / progress.totalSize!
+                : null,
+            src,
+          ) ??
+          widget0,
     );
   }
 }

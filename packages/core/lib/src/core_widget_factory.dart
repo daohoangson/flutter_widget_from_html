@@ -1,6 +1,7 @@
 import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart' show Theme, ThemeData, Tooltip;
+import 'package:flutter/material.dart'
+    show CircularProgressIndicator, Theme, ThemeData, Tooltip;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
@@ -16,6 +17,12 @@ import 'internal/platform_specific/fallback.dart'
 
 /// A factory to build widgets.
 class WidgetFactory {
+  /// Setting this property to true replaces the default loading widget with a static [Text].
+  /// This property is most useful for testing purposes.
+  ///
+  /// Defaults to `false`, resulting in a [CircularProgressIndicator].
+  static bool debugDeterministicLoadingWidget = false;
+
   late AnchorRegistry _anchorRegistry;
   late final Flattener _flattener;
 
@@ -248,39 +255,26 @@ class WidgetFactory {
     final image = src.image;
     final semanticLabel = image?.alt ?? image?.title;
     return Image(
-      errorBuilder: (context, error, stackTrace) =>
-          imageErrorBuilder(context, error, stackTrace, src),
+      errorBuilder: (context, error, _) =>
+          onErrorBuilder(context, meta, error, src) ?? widget0,
       loadingBuilder: (context, child, loadingProgress) =>
-          imageLoadingBuilder(context, child, loadingProgress, src),
+          loadingProgress == null
+              ? child
+              : onLoadingBuilder(
+                      context,
+                      meta,
+                      loadingProgress.expectedTotalBytes != null &&
+                              loadingProgress.expectedTotalBytes! > 0
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                          : null,
+                      src) ??
+                  child,
       excludeFromSemantics: semanticLabel == null,
       fit: BoxFit.fill,
       image: provider,
       semanticLabel: semanticLabel,
     );
-  }
-
-  /// Builder for loading widget while image is loading.
-  Widget imageLoadingBuilder(
-    BuildContext context,
-    Widget child,
-    ImageChunkEvent? loadingProgress,
-    ImageSource src,
-  ) {
-    if (loadingProgress == null) return child;
-    return const SizedBox.shrink();
-  }
-
-  /// Builder for error widget if an error occurs during image loading.
-  Widget imageErrorBuilder(
-    BuildContext context,
-    dynamic error,
-    StackTrace? stackTrace,
-    ImageSource src,
-  ) {
-    final image = src.image;
-    final semanticLabel = image?.alt ?? image?.title;
-    final text = semanticLabel ?? '❌';
-    return Text(text);
   }
 
   /// Builds marker widget for a list item.
@@ -510,6 +504,48 @@ class WidgetFactory {
   /// Returns a [NetworkImage].
   ImageProvider? imageProviderFromNetwork(String url) =>
       url.isNotEmpty ? NetworkImage(url) : null;
+
+  /// Builder for error widget if a complicated element failed to render.
+  ///
+  /// See [OnErrorBuilder].
+  Widget? onErrorBuilder(BuildContext context, BuildMetadata meta,
+      [dynamic error, dynamic data]) {
+    final callback = _widget?.onErrorBuilder;
+    if (callback != null) {
+      final result = callback(context, meta.element, error);
+      if (result != null) return result;
+    }
+
+    final image = data is ImageSource ? data.image : null;
+    final semanticLabel = image?.alt ?? image?.title;
+    final text = semanticLabel ?? '❌';
+    return Text(text);
+  }
+
+  /// Builder for loading widget while a complicated element is loading.
+  ///
+  /// See [OnLoadingBuilder].
+  Widget? onLoadingBuilder(
+    BuildContext context,
+    BuildMetadata meta, [
+    double? loadingProgress,
+    dynamic data,
+  ]) {
+    final callback = _widget?.onLoadingBuilder;
+    if (callback != null) {
+      final result = callback(context, meta.element, loadingProgress);
+      if (result != null) return result;
+    }
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: debugDeterministicLoadingWidget
+            ? const Text('Loading...')
+            : CircularProgressIndicator.adaptive(value: loadingProgress),
+      ),
+    );
+  }
 
   /// Prepares the root [TextStyleBuilder].
   void onRoot(TextStyleBuilder rootTsb) {}

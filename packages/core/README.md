@@ -61,6 +61,12 @@ HtmlWidget(
     return null;
   },
 
+  // these callbacks are called when a complicated element is loading
+  // or failed to render allowing the app to render progress indicator
+  // and fallback widget
+  onErrorBuilder: (context, element, error) => Text('$element error: $error'),
+  onLoadingBuilder: (context, element, loadingProgress) => CircularProgressIndicator(),
+
   // this callback will be triggered when user taps a link
   onTapUrl: (url) => print('tapped $url'),
 

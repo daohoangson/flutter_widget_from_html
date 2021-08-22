@@ -17,106 +17,44 @@ void main() {
   group('buildAsync', () {
     Future<String?> explain(WidgetTester tester, String html,
             {bool? buildAsync}) =>
-        tester.runAsync(() => helper.explain(tester, null,
-            hw: HtmlWidget(html, buildAsync: buildAsync, key: helper.hwKey)));
+        helper.explain(
+          tester,
+          null,
+          hw: HtmlWidget(html, buildAsync: buildAsync, key: helper.hwKey),
+          useExplainer: false,
+        );
 
     testWidgets('uses FutureBuilder', (WidgetTester tester) async {
       const html = 'Foo';
       final explained = await explain(tester, html, buildAsync: true);
-      expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
+      expect(explained, startsWith('FutureBuilder'));
+    });
+
+    testWidgets('renders FutureBuilder', (WidgetTester tester) async {
+      const html = 'Foo';
+      const rendered = 'RichText(text: "Foo")';
+      final loading = await explain(tester, html, buildAsync: true);
+      expect(loading, isNot(contains(rendered)));
+
+      await tester.runAsync(() => Future.delayed(const Duration(seconds: 1)));
+      await tester.pump();
+
+      final success = await helper.explainWithoutPumping(useExplainer: false);
+
+      expect(success, startsWith('FutureBuilder'));
+      expect(success, contains(rendered));
     });
 
     testWidgets('skips FutureBuilder', (WidgetTester tester) async {
       const html = 'Foo';
       final explained = await explain(tester, html, buildAsync: false);
-      expect(explained, equals('[RichText:(:$html)]'));
+      expect(explained, startsWith('TshWidget'));
     });
 
     testWidgets('uses FutureBuilder automatically', (tester) async {
       final html = 'Foo' * kShouldBuildAsync;
       final explained = await explain(tester, html);
-      expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
-    });
-  });
-
-  group('buildAsyncBuilder', () {
-    Future<String?> explain(
-      WidgetTester tester,
-      String html, {
-      AsyncWidgetBuilder<Widget>? buildAsyncBuilder,
-      required bool withData,
-    }) =>
-        tester.runAsync(() => helper.explain(tester, null,
-            buildFutureBuilderWithData: withData,
-            hw: HtmlWidget(
-              html,
-              buildAsync: true,
-              buildAsyncBuilder: buildAsyncBuilder,
-              key: helper.hwKey,
-            )));
-
-    group('default', () {
-      testWidgets('renders data', (WidgetTester tester) async {
-        const html = 'Foo';
-        final explained = await explain(tester, html, withData: true);
-        expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
-      });
-
-      testWidgets('renders CircularProgressIndicator', (tester) async {
-        debugDefaultTargetPlatformOverride = TargetPlatform.android;
-        const html = 'Foo';
-        final explained = await explain(tester, html, withData: false);
-        expect(
-            explained,
-            equals('[FutureBuilder:'
-                '[Center:child='
-                '[Padding:(8,8,8,8),child='
-                '[CircularProgressIndicator]'
-                ']]]'));
-        debugDefaultTargetPlatformOverride = null;
-      });
-
-      testWidgets('renders CupertinoActivityIndicator', (tester) async {
-        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-        const html = 'Foo';
-        final explained = await explain(tester, html, withData: false);
-        expect(
-            explained,
-            equals('[FutureBuilder:'
-                '[Center:child='
-                '[Padding:(8,8,8,8),child='
-                '[CupertinoActivityIndicator]'
-                ']]]'));
-        debugDefaultTargetPlatformOverride = null;
-      });
-    });
-
-    group('custom', () {
-      Widget buildAsyncBuilder(
-              BuildContext _, AsyncSnapshot<Widget> snapshot) =>
-          snapshot.data ?? const Text('No data');
-
-      testWidgets('renders data', (WidgetTester tester) async {
-        const html = 'Foo';
-        final explained = await explain(
-          tester,
-          html,
-          buildAsyncBuilder: buildAsyncBuilder,
-          withData: true,
-        );
-        expect(explained, equals('[FutureBuilder:[RichText:(:$html)]]'));
-      });
-
-      testWidgets('renders indicator', (WidgetTester tester) async {
-        const html = 'Foo';
-        final explained = await explain(
-          tester,
-          html,
-          buildAsyncBuilder: buildAsyncBuilder,
-          withData: false,
-        );
-        expect(explained, equals('[FutureBuilder:[Text:No data]]'));
-      });
+      expect(explained, startsWith('FutureBuilder'));
     });
   });
 
@@ -338,6 +276,78 @@ void main() {
     });
   });
 
+  group('onErrorBuilder', () {
+    Future<String?> explain(
+      WidgetTester tester, {
+      OnErrorBuilder? onErrorBuilder,
+    }) async {
+      await runZonedGuarded(() async {
+        await helper.explain(tester, null,
+            hw: HtmlWidget(
+              'Foo <span class="throw">bar</span>.',
+              buildAsync: true,
+              factoryBuilder: () => _OnErrorBuilderFactory(),
+              key: helper.hwKey,
+              onErrorBuilder: onErrorBuilder,
+            ));
+
+        await tester.runAsync(() => Future.delayed(const Duration(seconds: 1)));
+        await tester.pump();
+      }, (_, __) {});
+
+      return helper.explainWithoutPumping(useExplainer: false);
+    }
+
+    testWidgets('renders default', (tester) async {
+      final explained = await explain(tester);
+      expect(explained, contains('Text("❌")'));
+    });
+
+    testWidgets('renders custom', (tester) async {
+      final explained = await explain(tester,
+          onErrorBuilder: (_, __, ___) => const Text('Custom'));
+      expect(explained, contains('RichText(text: "Custom")'));
+    });
+  });
+
+  group('onLoadingBuilder', () {
+    Future<String?> explain(
+      WidgetTester tester, {
+      OnLoadingBuilder? onLoadingBuilder,
+    }) =>
+        helper.explain(tester, null,
+            hw: HtmlWidget(
+              'Foo',
+              buildAsync: true,
+              key: helper.hwKey,
+              onLoadingBuilder: onLoadingBuilder,
+            ),
+            useExplainer: false);
+
+    testWidgets('renders CircularProgressIndicator', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      final explained = await explain(tester);
+      expect(explained, contains('CircularProgressIndicator'));
+      expect(explained, isNot(contains('CupertinoActivityIndicator')));
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('renders CupertinoActivityIndicator', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      final explained = await explain(tester);
+      expect(explained, contains('CupertinoActivityIndicator'));
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('renders custom', (WidgetTester tester) async {
+      final explained = await explain(
+        tester,
+        onLoadingBuilder: (_, __, ___) => const Text('Custom'),
+      );
+      expect(explained, contains('RichText(text: "Custom")'));
+    });
+  });
+
   group('onTapUrl', () {
     testWidgets('triggers callback (returns void)', (tester) async {
       const href = 'returns-void';
@@ -511,6 +521,17 @@ void main() {
       expect(explained, equals('[RichText:(+i:Foo)]'));
     });
   });
+}
+
+class _OnErrorBuilderFactory extends WidgetFactory {
+  @override
+  void parse(BuildMetadata meta) {
+    if (meta.element.className == 'throw') {
+      throw UnsupportedError(meta.element.outerHtml);
+    }
+
+    super.parse(meta);
+  }
 }
 
 class _OnTapUrlApp extends StatelessWidget {

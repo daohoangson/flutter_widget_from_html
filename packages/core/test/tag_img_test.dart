@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -284,9 +286,51 @@ void main() {
     });
   });
 
+  group('loadingBuilder', () {
+    testWidgets('calls onLoadingBuilder', (WidgetTester tester) async {
+      const src = 'http://domain.com/image.png';
+      const html = '<img src="$src" />';
+      final streamCompleter = _TestImageStreamCompleter();
+      final values = <double?>[];
+
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+          body: HtmlWidget(
+            html,
+            factoryBuilder: () => _LoadingBuilderFactory(streamCompleter),
+            key: helper.hwKey,
+            onLoadingBuilder: (_, __, loadingProgress) {
+              values.add(loadingProgress);
+              return widget0;
+            },
+          ),
+        ),
+      ));
+
+      expect(values, isEmpty);
+
+      streamCompleter.addChunkEvent(10);
+      await tester.pump();
+      expect(values.length, 1);
+      expect(values.last, isNull);
+
+      streamCompleter.addChunkEvent(50, 100);
+      await tester.pump();
+      expect(values.length, 2);
+      expect(values.last, .5);
+    });
+  });
+
   testWidgets('onTapImage', (WidgetTester tester) async {
     final taps = <ImageMetadata>[];
-    await tester.pumpWidget(_TapTestApp(onTapImage: taps.add));
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: HtmlWidget(
+          '<img src="${helper.kDataUri}" width="20" height="20" />',
+          onTapImage: taps.add,
+        ),
+      ),
+    ));
     await tester.tap(find.byType(Image));
     expect(taps.length, equals(1));
   });
@@ -301,18 +345,51 @@ void main() {
   });
 }
 
-class _TapTestApp extends StatelessWidget {
-  final void Function(ImageMetadata)? onTapImage;
+class _LoadingBuilderFactory extends WidgetFactory {
+  final _TestImageStreamCompleter streamCompleter;
 
-  const _TapTestApp({Key? key, this.onTapImage}) : super(key: key);
+  _LoadingBuilderFactory(this.streamCompleter);
 
   @override
-  Widget build(BuildContext _) => MaterialApp(
-        home: Scaffold(
-          body: HtmlWidget(
-            '<img src="asset:test/images/logo.png" width="10" height="10" />',
-            onTapImage: onTapImage,
-          ),
-        ),
-      );
+  ImageProvider<Object> imageProviderFromNetwork(String url) =>
+      _TestImageProvider(streamCompleter);
+}
+
+class _TestImageProvider extends ImageProvider<Object> {
+  final ImageStreamCompleter streamCompleter;
+
+  _TestImageProvider(this.streamCompleter);
+
+  @override
+  Future<Object> obtainKey(ImageConfiguration configuration) =>
+      SynchronousFuture<_TestImageProvider>(this);
+
+  @override
+  ImageStreamCompleter load(Object key, DecoderCallback decode) =>
+      streamCompleter;
+}
+
+class _TestImageStreamCompleter extends ImageStreamCompleter {
+  final listeners = <ImageStreamListener>{};
+
+  _TestImageStreamCompleter();
+
+  @override
+  void addListener(ImageStreamListener listener) {
+    listeners.add(listener);
+  }
+
+  @override
+  void removeListener(ImageStreamListener listener) {
+    listeners.remove(listener);
+  }
+
+  void addChunkEvent(int cumulativeBytesLoaded, [int expectedTotalBytes = 0]) {
+    for (final listener in listeners) {
+      listener.onChunk?.call(ImageChunkEvent(
+        cumulativeBytesLoaded: cumulativeBytesLoaded,
+        expectedTotalBytes: expectedTotalBytes,
+      ));
+    }
+  }
 }

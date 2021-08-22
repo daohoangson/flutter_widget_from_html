@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter/cupertino.dart' show CupertinoActivityIndicator;
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart' show CircularProgressIndicator, Theme;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:html/dom.dart' as dom;
@@ -26,14 +24,6 @@ class HtmlWidget extends StatefulWidget {
   /// [html] has at least [kShouldBuildAsync] characters.
   final bool? buildAsync;
 
-  /// The callback to handle async build snapshot.
-  ///
-  /// By default, a platform-dependent indicator will be shown until
-  /// the widget tree is ready.
-  /// This default builder doesn't do any error handling
-  /// (it will just ignore any errors).
-  final AsyncWidgetBuilder<Widget>? buildAsyncBuilder;
-
   /// The callback to specify custom stylings.
   final CustomStylesBuilder? customStylesBuilder;
 
@@ -50,6 +40,12 @@ class HtmlWidget extends StatefulWidget {
 
   /// The custom [WidgetFactory] builder.
   final WidgetFactory Function()? factoryBuilder;
+
+  /// The custom error builder.
+  final OnErrorBuilder? onErrorBuilder;
+
+  /// The custom loading builder.
+  final OnLoadingBuilder? onLoadingBuilder;
 
   /// The callback when user taps an image.
   final void Function(ImageMetadata)? onTapImage;
@@ -99,12 +95,13 @@ class HtmlWidget extends StatefulWidget {
     this.html, {
     this.baseUrl,
     this.buildAsync,
-    this.buildAsyncBuilder,
     this.customStylesBuilder,
     this.customWidgetBuilder,
     this.enableCaching,
     this.factoryBuilder,
     Key? key,
+    this.onErrorBuilder,
+    this.onLoadingBuilder,
     this.onTapImage,
     this.onTapUrl,
     RebuildTriggers? rebuildTriggers,
@@ -138,6 +135,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     _wf = widget.factoryBuilder?.call() ?? WidgetFactory();
 
     _wf.onRoot(_rootTsb);
+    _wf.reset(this);
 
     if (buildAsync) {
       _future = _buildAsync();
@@ -182,7 +180,18 @@ class _HtmlWidgetState extends State<HtmlWidget> {
   Widget build(BuildContext context) {
     if (_future != null) {
       return FutureBuilder<Widget>(
-        builder: widget.buildAsyncBuilder ?? _buildAsyncBuilder,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return snapshot.data!;
+          } else if (snapshot.hasError) {
+            return _sliverToBoxAdapterIfNeeded(
+                _wf.onErrorBuilder(context, _rootMeta, snapshot.error) ??
+                    widget0);
+          } else {
+            return _sliverToBoxAdapterIfNeeded(
+                _wf.onLoadingBuilder(context, _rootMeta) ?? widget0);
+          }
+        },
         future: _future!.then(_tshWidget),
       );
     }
@@ -202,30 +211,6 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     return built;
   }
 
-  Widget _buildAsyncBuilder(
-      BuildContext context, AsyncSnapshot<Widget> snapshot) {
-    final built = snapshot.data;
-    if (built != null) return built;
-
-    final indicator = Theme.of(context).platform == TargetPlatform.iOS
-        ? const Center(
-            child: Padding(
-                padding: EdgeInsets.all(8),
-                child: CupertinoActivityIndicator()))
-        : const Center(
-            child: Padding(
-                padding: EdgeInsets.all(8),
-                child: CircularProgressIndicator()));
-
-    switch (widget.renderMode) {
-      case RenderMode.column:
-      case RenderMode.listView:
-        return indicator;
-      case RenderMode.sliverList:
-        return SliverToBoxAdapter(child: indicator);
-    }
-  }
-
   Widget _buildSync() {
     Timeline.startSync('Build $widget (sync)');
 
@@ -236,6 +221,11 @@ class _HtmlWidgetState extends State<HtmlWidget> {
 
     return built;
   }
+
+  Widget _sliverToBoxAdapterIfNeeded(Widget child) =>
+      widget.renderMode == RenderMode.sliverList
+          ? SliverToBoxAdapter(child: child)
+          : child;
 
   Widget _tshWidget(Widget child) =>
       TshWidget(tsh: _rootTsb._output, child: child);
