@@ -339,9 +339,9 @@ void main() {
       return helper.explainWithoutPumping(useExplainer: false);
     }
 
-    testWidgets('renders widget0 (default)', (tester) async {
+    testWidgets('renders default', (tester) async {
       final explained = await explain(tester);
-      expect(explained, contains('SizedBox.shrink()'));
+      expect(explained, contains('Text("❌")'));
     });
 
     testWidgets('renders custom', (tester) async {
