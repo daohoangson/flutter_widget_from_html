@@ -203,6 +203,9 @@ class HtmlWidgetState extends State<HtmlWidget> {
     return _tshWidget(_cache!);
   }
 
+  /// Scrolls to make sure the requested anchor is as visible as possible.
+  Future<bool> scrollToAnchor(String id) => _wf.onTapUrl('#$id');
+
   Future<Widget> _buildAsync() async {
     final domNodes = await compute(_parseHtml, widget.html);
 
