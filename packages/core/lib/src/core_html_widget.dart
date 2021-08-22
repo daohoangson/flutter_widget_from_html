@@ -111,15 +111,17 @@ class HtmlWidget extends StatefulWidget {
         super(key: key);
 
   @override
-  State<HtmlWidget> createState() => _HtmlWidgetState();
+  State<HtmlWidget> createState() => HtmlWidgetState();
 }
 
-class _HtmlWidgetState extends State<HtmlWidget> {
+/// State for a [HtmlWidget].
+class HtmlWidgetState extends State<HtmlWidget> {
+  late final BuildMetadata _rootMeta;
+  late final _RootTsb _rootTsb;
+  late final WidgetFactory _wf;
+
   Widget? _cache;
   Future<Widget>? _future;
-  late BuildMetadata _rootMeta;
-  late _RootTsb _rootTsb;
-  late WidgetFactory _wf;
 
   bool get buildAsync =>
       widget.buildAsync ?? widget.html.length > kShouldBuildAsync;
@@ -234,7 +236,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
 class _RootTsb extends TextStyleBuilder {
   TextStyleHtml? _output;
 
-  _RootTsb(_HtmlWidgetState state) {
+  _RootTsb(HtmlWidgetState state) {
     enqueue(builder, state);
   }
 
@@ -244,7 +246,7 @@ class _RootTsb extends TextStyleBuilder {
     return super.build(context);
   }
 
-  TextStyleHtml builder(TextStyleHtml? _, _HtmlWidgetState state) {
+  TextStyleHtml builder(TextStyleHtml? _, HtmlWidgetState state) {
     if (_output != null) return _output!;
     return _output = TextStyleHtml.root(
       state._wf.getDependencies(state.context),
@@ -255,7 +257,7 @@ class _RootTsb extends TextStyleBuilder {
   void reset() => _output = null;
 }
 
-Widget _buildBody(_HtmlWidgetState state, dom.NodeList domNodes) {
+Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
   final rootMeta = state._rootMeta;
   final wf = state._wf;
   wf.reset(state);
