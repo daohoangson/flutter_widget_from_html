@@ -32,10 +32,9 @@ class StyleMargin {
         },
         onWidgets: (meta, widgets) {
           if (meta.willBuildSubtree == false) return widgets;
-          if (widgets.isEmpty) return widgets;
 
           final m = tryParseCssLengthBox(meta, kCssMargin);
-          if (m == null) return null;
+          if (m == null) return widgets;
           final tsb = meta.tsb;
 
           return [

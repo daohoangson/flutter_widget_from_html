@@ -434,6 +434,18 @@ void main() {
               '[CssBlock:child=[RichText:(:Bar)]]'
               ']'));
     });
+
+    testWidgets('trims around empty block', (WidgetTester tester) async {
+      const html = 'Foo.<p></p>Bar.';
+      final explained = await helper.explain(tester, html);
+      expect(
+          explained,
+          equals('[Column:children='
+              '[RichText:(:Foo.)],'
+              '[SizedBox:0.0x10.0],'
+              '[RichText:(:Bar.)]'
+              ']'));
+    });
   });
 
   group('negative values', () {
