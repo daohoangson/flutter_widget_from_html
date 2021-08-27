@@ -302,9 +302,15 @@ meta.tsb<double>(callback, 2.0);
 ```dart
 meta.register(BuildOp(
   onTree: (meta, tree) {
+    // can be used to change text, inline contents, etc.
     tree.add(...);
   },
-  onWidgets: (meta, widgets) => widgets.map((widget) => ...),
+  onWidgets: (meta, widgets) {
+    // use this to render special widget, wrap children into something else, etc.
+    return widgets.map((widget) => ...);
+  },
+  // depending on the rendering logic, you may need to adjust the execution order to "jump the line"
+  priority: 9999,
 ));
 ```
 
