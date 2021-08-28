@@ -101,6 +101,19 @@ Future<void> main() async {
         expect(_onTapAnchorResults, equals({'target': true}));
       });
 
+      testWidgets('HtmlWidgetState.scrollToAnchor', (tester) async {
+        await tester.pumpWidgetBuilder(
+          const _ColumnTestApp(),
+          surfaceSize: const Size(200, 200),
+        );
+
+        final scrollFuture = globalKey.currentState?.scrollToAnchor('target');
+        await tester.pumpAndSettle();
+
+        expect(await scrollFuture, isTrue);
+        expect(_onTapAnchorResults, equals({'target': true}));
+      });
+
       testWidgets('ListView', (WidgetTester tester) async {
         await tester.pumpWidgetBuilder(
           const _ListViewTestApp(),
@@ -357,6 +370,8 @@ ${htmlDesc * 3}
 <a href="#target">Scroll up</a>
 ''';
 
+final globalKey = GlobalKey<HtmlWidgetState>();
+
 class _ColumnTestApp extends StatelessWidget {
   final String? html;
   final Key? keyBottom;
@@ -371,6 +386,7 @@ class _ColumnTestApp extends StatelessWidget {
               HtmlWidget(
                 html ?? htmlDefault,
                 factoryBuilder: () => _WidgetFactory(),
+                key: globalKey,
               ),
               SizedBox.shrink(key: keyBottom),
             ],

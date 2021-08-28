@@ -8,11 +8,14 @@ class HelloWorldCoreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('HelloWorldCoreScreen')),
-        body: const SingleChildScrollView(
+        appBar: AppBar(
+          title: const Text('HelloWorldCoreScreen'),
+          actions: const [enhanced.PopupMenu()],
+        ),
+        body: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: HtmlWidget(enhanced.kHtml),
+            padding: const EdgeInsets.all(8.0),
+            child: HtmlWidget(enhanced.kHtml, key: enhanced.globalKey),
           ),
         ),
       );

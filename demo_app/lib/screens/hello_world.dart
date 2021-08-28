@@ -140,17 +140,49 @@ const kHtml = '''
 <br />
 ''';
 
+final globalKey = GlobalKey<HtmlWidgetState>();
+
 class HelloWorldScreen extends StatelessWidget {
   const HelloWorldScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('HelloWorldScreen')),
+        appBar: AppBar(
+          title: const Text('HelloWorldScreen'),
+          actions: const [PopupMenu()],
+        ),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: HtmlWidget(kHtml, webView: true),
+            child: HtmlWidget(kHtml, key: globalKey, webView: true),
           ),
         ),
       );
+}
+
+class PopupMenu extends StatelessWidget {
+  const PopupMenu({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<_PopupMenuValue>(
+      onSelected: (value) {
+        switch (value) {
+          case _PopupMenuValue.scrollToTop:
+            globalKey.currentState?.scrollToAnchor('top');
+            break;
+        }
+      },
+      itemBuilder: (_) => const [
+        PopupMenuItem(
+          value: _PopupMenuValue.scrollToTop,
+          child: Text('Scroll to #top'),
+        ),
+      ],
+    );
+  }
+}
+
+enum _PopupMenuValue {
+  scrollToTop,
 }

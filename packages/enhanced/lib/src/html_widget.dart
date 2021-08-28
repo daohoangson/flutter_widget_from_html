@@ -8,6 +8,9 @@ import 'data.dart';
 import 'helpers.dart';
 import 'widget_factory.dart';
 
+export 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
+    show HtmlWidgetState;
+
 /// A widget that builds Flutter widget tree from HTML
 /// with support for IFRAME, VIDEO and many other tags.
 class HtmlWidget extends core.HtmlWidget {
