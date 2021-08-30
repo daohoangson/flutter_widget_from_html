@@ -1,50 +1,27 @@
-## 0.7.0-dev.2021082103
+## 0.7.0
 
-- Update `onErrorBuilder` logic
-
-## 0.7.0-dev.2021082102
-
-- Fix `onErrorBuilder` doesn't work (#575)
-
-## 0.7.0-dev.2021082101
-
-- BREAKING: Change `onTapUrl` signature to return a `FutureOr<bool>`. (#563)
-- BREAKING: Remove `TextStyleHtml.maxLines` and `.textOverflow` (#570)
-- BREAKING: Remove `HtmlWidget.hyperlinkColor` (#571)
+- Flutter 2.2
 - BREAKING: Remove `HtmlWidget.buildAsyncBuilder` (#575)
-- BREAKING: Remove `WidgetFactory.imageLoadingBuilder` and `imageErrorBuilder` (#575)
-- Restore `computeLineMetrics` usage in Flutter web. (#561)
-- Improve `text-decoration` support (#569)
-- Fix `CssSizingValue` equality check
-
-## 0.7.0-dev.2021080801
-
-- BREAKING: `RenderMode.Column` is now `.column` (`ListView` and `SliverList` have the same change)
-- Improve whitespace handling (#551)
-- Fix `min-width` being ignored (#544)
-
-## 0.7.0-dev.2021061301
-
-- BREAKING: `buildColumnPlaceholder` removed `trimMarginVertical` named param
-- BREAKING: `buildColumnWidget` removed `tsh` param
-- BREAKING: `onTapAnchor` replaced `anchorContext` param with `scrollTo`
-- Add support for `WidgetFactory.buildTextSpan`
-- Add support for `HtmlWidget.renderMode` (#484)
-
-## 0.7.0-dev.2021052101
-
-- Requires Flutter 2.2
+- BREAKING: Remove `HtmlWidget.hyperlinkColor` (#571)
+- BREAKING: Change `HtmlWidget.onTapUrl` signature to return a `FutureOr<bool>`. (#563)
 - Show click cursor for `A` tag (#322)
-- Fix incorrect UL/OL tag closing
-- Fix bug padding+background+h2 (#523)
-
-## 0.7.0-dev.2021051501
-
-- BREAKING: Change method signature `WidgetFactory.buildImageWidget`
-- BREAKING: Replace `WidgetFactory.getListStyleMarker` with `getListMarkerText`
-- Add `WidgetFactory.buildListMarker` (#511)
-- Add image loading builder to core widget factory (#517)
+- Add support for `HtmlWidget.renderMode` (#484)
+- Improve `text-decoration` support (#569)
+- Add support for `HtmlWidgetState.scrollToAnchor` (#577)
 - Fix bug border+background (#516)
+- Fix incorrect UL/OL tag closing
+- Fix `CssSizingValue` equality check
+- Fix missing block margins on empty tag (#580)
+
+This release includes some changes that may require migration if you have a custom `WidgetFactory`:
+
+- Remove `TextStyleHtml.maxLines` and `.textOverflow` (#570)
+- Remove `WidgetFactory.buildColumnPlaceholder` param `trimMarginVertical`
+- Remove `WidgetFactory.buildColumnWidget` param `tsh`
+- Change `WidgetFactory.buildImageWidget` params
+- Replace `WidgetFactory.getListStyleMarker` with `getListMarkerText`
+- Remove `WidgetFactory.imageLoadingBuilder` and `imageErrorBuilder` (#575)
+- Replace `WidgetFactory.onTapAnchor` param `anchorContext` with `scrollTo`
 
 ## 0.6.2
 
