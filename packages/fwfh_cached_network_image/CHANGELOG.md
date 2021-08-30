@@ -1,4 +1,4 @@
-## 0.7.0-dev.2021080801
+## 0.7.0
 
 - Add support for error & loading builder (#547, thanks @DFelten)
 
