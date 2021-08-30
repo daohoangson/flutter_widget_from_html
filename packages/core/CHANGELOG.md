@@ -8,6 +8,7 @@
 - Add support for `HtmlWidget.renderMode` (#484)
 - Improve `text-decoration` support (#569)
 - Add support for `HtmlWidgetState.scrollToAnchor` (#577)
+- Implement `HtmlWidget.onErrorBuilder` and `onLoadingBuilder` (#575)
 - Fix bug border+background (#516)
 - Fix incorrect UL/OL tag closing
 - Fix `CssSizingValue` equality check
