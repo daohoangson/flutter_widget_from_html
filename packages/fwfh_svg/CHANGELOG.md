@@ -1,4 +1,4 @@
-## 0.7.0-dev.2021051501
+## 0.7.0
 
 - Add support for flutter_widget_from_html_core@0.7.0
 

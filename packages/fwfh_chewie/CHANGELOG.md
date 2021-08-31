@@ -1,3 +1,8 @@
+## 0.7.0
+
+- Flutter 2.2 and flutter_widget_from_html_core@0.7.0
+- Implement `HtmlWidget.onErrorBuilder` and `onLoadingBuilder` (#575)
+
 ## 0.6.2
 
 - Fix portrait video (#553)

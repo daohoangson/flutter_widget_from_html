@@ -1,36 +1,33 @@
-## 0.7.0-dev.2021080801
+## 0.7.0
 
-- BREAKING: `RenderMode.Column` is now `.column` (`ListView` and `SliverList` have the same change)
-- Add support for error & loading builder (#547, thanks @DFelten)
-- Improve whitespace handling (#551)
-- Fix `min-width` being ignored (#544)
-- Fix portrait video (#553)
-
-## 0.7.0-dev.2021061301
-
-- BREAKING: `buildColumnPlaceholder` removed `trimMarginVertical` named param
-- BREAKING: `buildColumnWidget` removed `tsh` param
-- BREAKING: `onTapAnchor` replaced `anchorContext` param with `scrollTo`
-- Add support for `WidgetFactory.buildTextSpan`
-- Add support for `HtmlWidget.renderMode` (#484)
-
-## 0.7.0-dev.2021052101
-
-- Requires Flutter 2.2
+- Flutter 2.2
+- BREAKING: Remove `HtmlWidget.buildAsyncBuilder` (#575)
+- BREAKING: Remove `HtmlWidget.hyperlinkColor` (#571)
+- BREAKING: Change `HtmlWidget.onTapUrl` signature to return a `FutureOr<bool>`. (#563)
 - Show click cursor for `A` tag (#322)
-- Fix incorrect UL/OL tag closing
-- Fix bug padding+background+h2 (#523)
-
-## 0.7.0-dev.2021051501
-
-- BREAKING: Change method signature `WidgetFactory.buildImageWidget`
-- BREAKING: Replace `WidgetFactory.getListStyleMarker` with `getListMarkerText`
-- Add `WidgetFactory.buildListMarker` (#511)
-- Add image loading builder to core widget factory (#517)
+- Add support for `HtmlWidget.renderMode` (#484)
+- Add support for error & loading builder for network image (#547, thanks @DFelten)
+- Improve `text-decoration` support (#569)
+- Add support for `HtmlWidgetState.scrollToAnchor` (#577)
+- Implement `HtmlWidget.onErrorBuilder` and `onLoadingBuilder` (#575)
 - Fix bug border+background (#516)
+- Fix incorrect UL/OL tag closing
+- Fix `CssSizingValue` equality check
+- Fix missing block margins on empty tag (#580)
+
+This release includes some changes that may require migration if you have a custom `WidgetFactory`:
+
+- Remove `TextStyleHtml.maxLines` and `.textOverflow` (#570)
+- Remove `WidgetFactory.buildColumnPlaceholder` param `trimMarginVertical`
+- Remove `WidgetFactory.buildColumnWidget` param `tsh`
+- Change `WidgetFactory.buildImageWidget` params
+- Replace `WidgetFactory.getListStyleMarker` with `getListMarkerText`
+- Remove `WidgetFactory.imageLoadingBuilder` and `imageErrorBuilder` (#575)
+- Replace `WidgetFactory.onTapAnchor` param `anchorContext` with `scrollTo`
 
 ## 0.6.2
 
+- Add support for `AUDIO` tag (#530)
 - Restore `computeLineMetrics` usage in Flutter web. (#561)
 - Improve whitespace handling (#551)
 - Fix negative margin/padding throwing exception (#510)
