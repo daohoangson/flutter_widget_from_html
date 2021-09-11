@@ -37,6 +37,7 @@ const kCssFontWeightBold = 'bold';
 const kCssLineHeight = 'line-height';
 const kCssLineHeightNormal = 'normal';
 
+// ignore: avoid_classes_with_only_static_members
 class TextStyleOps {
   static TextStyleHtml color(TextStyleHtml p, Color color) =>
       p.copyWith(style: p.style.copyWith(color: color));

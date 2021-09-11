@@ -1,4 +1,4 @@
-// ignore: camel_case_types
+// ignore: camel_case_types, avoid_classes_with_only_static_members
 class platformViewRegistry {
   /// TODO: remove this when it's no longer needed
   /// See https://github.com/flutter/flutter/issues/55000
