@@ -19,9 +19,12 @@ void main() {
     final e = await explain(tester, html);
     final explained = e.replaceAll(RegExp('String#[0-9a-f]+,'), 'String,');
     expect(
-        explained,
-        equals('[SvgPicture:pictureProvider='
-            'StringPicture(String, colorFilter: null)]'));
+      explained,
+      equals(
+        '[SvgPicture:pictureProvider='
+        'StringPicture(String, colorFilter: null)]',
+      ),
+    );
   });
 
   testWidgets('renders IMG tag with .svg', (WidgetTester tester) async {
@@ -32,10 +35,12 @@ void main() {
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals('[CssSizing:$sizingConstraints,child='
-          '[SvgPicture:'
-          'pictureProvider=ExactAssetPicture(name: "packages/$package/$assetName", bundle: null, colorFilter: null)'
-          ']]'),
+      equals(
+        '[CssSizing:$sizingConstraints,child='
+        '[SvgPicture:'
+        'pictureProvider=ExactAssetPicture(name: "packages/$package/$assetName", bundle: null, colorFilter: null)'
+        ']]',
+      ),
     );
   });
 

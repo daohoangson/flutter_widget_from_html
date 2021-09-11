@@ -30,7 +30,8 @@ class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
 
   @override
   ColumnPlaceholder wrapWith(
-      Widget? Function(BuildContext context, Widget child) builder) {
+    Widget? Function(BuildContext context, Widget child) builder,
+  ) {
     if (builder == wf.buildBodyWidget) {
       _isBody[this] = true;
     } else {

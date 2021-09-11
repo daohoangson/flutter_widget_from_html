@@ -54,12 +54,15 @@ class TextStyleOps {
       p.copyWith(style: p.style.copyWith(fontSize: _fontSizeTryParse(p, v)));
 
   static TextStyleHtml fontSizeEm(TextStyleHtml p, double v) => p.copyWith(
-      style: p.style.copyWith(
+        style: p.style.copyWith(
           fontSize:
-              _fontSizeTryParseCssLength(p, CssLength(v, CssLengthUnit.em))));
+              _fontSizeTryParseCssLength(p, CssLength(v, CssLengthUnit.em)),
+        ),
+      );
 
   static TextStyleHtml fontSizeTerm(TextStyleHtml p, String v) => p.copyWith(
-      style: p.style.copyWith(fontSize: _fontSizeTryParseTerm(p, v)));
+        style: p.style.copyWith(fontSize: _fontSizeTryParseTerm(p, v)),
+      );
 
   static TextStyleHtml fontStyle(TextStyleHtml p, FontStyle fontStyle) =>
       p.copyWith(style: p.style.copyWith(fontStyle: fontStyle));
@@ -68,7 +71,8 @@ class TextStyleOps {
       p.copyWith(style: p.style.copyWith(fontWeight: v));
 
   static TextStyleHtml Function(TextStyleHtml, css.Expression) lineHeight(
-          WidgetFactory wf) =>
+    WidgetFactory wf,
+  ) =>
       (p, v) => p.copyWith(height: _lineHeightTryParse(wf, p, v));
 
   static TextStyleHtml textDirection(TextStyleHtml p, String v) {
@@ -214,7 +218,10 @@ class TextStyleOps {
       fontSize != null ? fontSize * value : null;
 
   static double? _lineHeightTryParse(
-      WidgetFactory wf, TextStyleHtml p, css.Expression v) {
+    WidgetFactory wf,
+    TextStyleHtml p,
+    css.Expression v,
+  ) {
     if (v is css.LiteralTerm) {
       if (v is css.NumberTerm) {
         final number = v.number.toDouble();

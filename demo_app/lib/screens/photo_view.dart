@@ -79,14 +79,17 @@ class _PopupPhotoViewWidgetFactory extends WidgetFactory {
       final url = src.url;
       return Builder(
         builder: (context) => GestureDetector(
-          onTap: () => Navigator.of(context).push(MaterialPageRoute(
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
               builder: (_) => Scaffold(
-                    appBar: AppBar(),
-                    body: PhotoView(
-                      heroAttributes: PhotoViewHeroAttributes(tag: url),
-                      imageProvider: built.image,
-                    ),
-                  ))),
+                appBar: AppBar(),
+                body: PhotoView(
+                  heroAttributes: PhotoViewHeroAttributes(tag: url),
+                  imageProvider: built.image,
+                ),
+              ),
+            ),
+          ),
           child: Hero(tag: url, child: built),
         ),
       );

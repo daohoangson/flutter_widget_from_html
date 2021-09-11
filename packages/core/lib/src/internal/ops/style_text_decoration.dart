@@ -16,49 +16,51 @@ class StyleTextDecoration {
 
   StyleTextDecoration(this.wf);
 
-  BuildOp get op => BuildOp(onTree: (meta, _) {
-        for (final style in meta.styles) {
-          for (final value in style.values) {
-            if (style.property == kCssTextDecoration ||
-                style.property == kCssTextDecorationLine) {
-              final line = TextDecorationLine.tryParse(value);
-              if (line != null) {
-                meta.tsb.enqueue(textDecorationLine, line);
-                continue;
+  BuildOp get op => BuildOp(
+        onTree: (meta, _) {
+          for (final style in meta.styles) {
+            for (final value in style.values) {
+              if (style.property == kCssTextDecoration ||
+                  style.property == kCssTextDecorationLine) {
+                final line = TextDecorationLine.tryParse(value);
+                if (line != null) {
+                  meta.tsb.enqueue(textDecorationLine, line);
+                  continue;
+                }
               }
-            }
 
-            if (style.property == kCssTextDecoration ||
-                style.property == kCssTextDecorationStyle) {
-              final tds = tryParseTextDecorationStyle(value);
-              if (tds != null) {
-                meta.tsb.enqueue(textDecorationStyle, tds);
-                continue;
+              if (style.property == kCssTextDecoration ||
+                  style.property == kCssTextDecorationStyle) {
+                final tds = tryParseTextDecorationStyle(value);
+                if (tds != null) {
+                  meta.tsb.enqueue(textDecorationStyle, tds);
+                  continue;
+                }
               }
-            }
 
-            if (style.property == kCssTextDecoration ||
-                style.property == kCssTextDecorationColor) {
-              final color = tryParseColor(value);
-              if (color != null) {
-                meta.tsb.enqueue(textDecorationColor, color);
-                continue;
+              if (style.property == kCssTextDecoration ||
+                  style.property == kCssTextDecorationColor) {
+                final color = tryParseColor(value);
+                if (color != null) {
+                  meta.tsb.enqueue(textDecorationColor, color);
+                  continue;
+                }
               }
-            }
 
-            if (style.property == kCssTextDecoration ||
-                style.property == kCssTextDecorationThickness ||
-                style.property == kCssTextDecorationWidth) {
-              final length = tryParseCssLength(value);
-              if (length != null && length.unit == CssLengthUnit.percentage) {
-                meta.tsb
-                    .enqueue(textDecorationThickness, length.number / 100.0);
-                continue;
+              if (style.property == kCssTextDecoration ||
+                  style.property == kCssTextDecorationThickness ||
+                  style.property == kCssTextDecorationWidth) {
+                final length = tryParseCssLength(value);
+                if (length != null && length.unit == CssLengthUnit.percentage) {
+                  meta.tsb
+                      .enqueue(textDecorationThickness, length.number / 100.0);
+                  continue;
+                }
               }
             }
           }
-        }
-      });
+        },
+      );
 }
 
 TextStyleHtml textDecorationColor(TextStyleHtml p, Color v) =>
@@ -82,7 +84,8 @@ TextStyleHtml textDecorationLine(TextStyleHtml p, TextDecorationLine v) {
   }
 
   return p.copyWith(
-      style: p.style.copyWith(decoration: TextDecoration.combine(list)));
+    style: p.style.copyWith(decoration: TextDecoration.combine(list)),
+  );
 }
 
 TextStyleHtml textDecorationStyle(TextStyleHtml p, TextDecorationStyle v) =>
@@ -110,7 +113,10 @@ class TextDecorationLine {
           return const TextDecorationLine(strike: true);
         case kCssTextDecorationNone:
           return const TextDecorationLine(
-              over: false, strike: false, under: false);
+            over: false,
+            strike: false,
+            under: false,
+          );
         case kCssTextDecorationOverline:
           return const TextDecorationLine(over: true);
         case kCssTextDecorationUnderline:

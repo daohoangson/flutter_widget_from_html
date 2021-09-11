@@ -28,47 +28,50 @@ class _State extends State<VideoScreen> {
         appBar: AppBar(
           title: const Text('VideoScreen'),
         ),
-        body: ListView(children: <Widget>[
-          CheckboxListTile(
-            value: autoplay,
-            onChanged: (v) => _setState(() => autoplay = v),
-            title: const Text('autoplay'),
-          ),
-          CheckboxListTile(
-            value: controls,
-            onChanged: (v) => _setState(() => controls = v),
-            title: const Text('controls'),
-          ),
-          CheckboxListTile(
-            value: loop,
-            onChanged: (v) => _setState(() => loop = v),
-            title: const Text('loop'),
-          ),
-          CheckboxListTile(
-            value: poster,
-            onChanged: (v) => _setState(() => poster = v),
-            title: const Text('poster'),
-          ),
-          CheckboxListTile(
-            value: widthHeight,
-            onChanged: (v) => _setState(() => widthHeight = v),
-            title: const Text('width & height'),
-          ),
-          ListTile(
-            title: const Text('HTML:'),
-            subtitle: Text(_html),
-          ),
-          ListTile(
-            title: const Text('Rendered:'),
-            subtitle: HtmlWidget(
-              _html,
-              key: Key(_html),
-              baseUrl: Uri.parse(
-                  'https://interactive-examples.mdn.mozilla.net/pages/tabbed/video.html'),
+        body: ListView(
+          children: <Widget>[
+            CheckboxListTile(
+              value: autoplay,
+              onChanged: (v) => _setState(() => autoplay = v),
+              title: const Text('autoplay'),
             ),
-          ),
-          const Center(child: Text('----')),
-        ]),
+            CheckboxListTile(
+              value: controls,
+              onChanged: (v) => _setState(() => controls = v),
+              title: const Text('controls'),
+            ),
+            CheckboxListTile(
+              value: loop,
+              onChanged: (v) => _setState(() => loop = v),
+              title: const Text('loop'),
+            ),
+            CheckboxListTile(
+              value: poster,
+              onChanged: (v) => _setState(() => poster = v),
+              title: const Text('poster'),
+            ),
+            CheckboxListTile(
+              value: widthHeight,
+              onChanged: (v) => _setState(() => widthHeight = v),
+              title: const Text('width & height'),
+            ),
+            ListTile(
+              title: const Text('HTML:'),
+              subtitle: Text(_html),
+            ),
+            ListTile(
+              title: const Text('Rendered:'),
+              subtitle: HtmlWidget(
+                _html,
+                key: Key(_html),
+                baseUrl: Uri.parse(
+                  'https://interactive-examples.mdn.mozilla.net/pages/tabbed/video.html',
+                ),
+              ),
+            ),
+            const Center(child: Text('----')),
+          ],
+        ),
       );
 
   void _setState(VoidCallback callback) => setState(() {

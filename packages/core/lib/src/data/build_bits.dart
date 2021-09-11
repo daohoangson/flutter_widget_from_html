@@ -319,8 +319,13 @@ class WidgetBit extends BuildBit<void, dynamic> {
     TextBaseline baseline = TextBaseline.alphabetic,
     TextStyleBuilder? tsb,
   }) =>
-      WidgetBit._(parent, tsb ?? parent.tsb, WidgetPlaceholder.lazy(child),
-          alignment, baseline);
+      WidgetBit._(
+        parent,
+        tsb ?? parent.tsb,
+        WidgetPlaceholder.lazy(child),
+        alignment,
+        baseline,
+      );
 
   @override
   bool get isInline => alignment != null && baseline != null;
@@ -336,7 +341,12 @@ class WidgetBit extends BuildBit<void, dynamic> {
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) => WidgetBit._(
-      parent ?? this.parent!, tsb ?? this.tsb, child, alignment, baseline);
+        parent ?? this.parent!,
+        tsb ?? this.tsb,
+        child,
+        alignment,
+        baseline,
+      );
 
   @override
   String toString() =>
@@ -368,9 +378,11 @@ class WhitespaceBit extends BuildBit<void, String> {
 class _SwallowWhitespaceBit extends BuildBit<void, String> {
   final int charCode;
 
-  _SwallowWhitespaceBit(BuildTree parent, this.charCode,
-      {TextStyleBuilder? tsb})
-      : super(parent, tsb ?? parent.tsb);
+  _SwallowWhitespaceBit(
+    BuildTree parent,
+    this.charCode, {
+    TextStyleBuilder? tsb,
+  }) : super(parent, tsb ?? parent.tsb);
 
   @override
   bool get swallowWhitespace => true;
@@ -380,8 +392,11 @@ class _SwallowWhitespaceBit extends BuildBit<void, String> {
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _SwallowWhitespaceBit(parent ?? this.parent!, charCode,
-          tsb: tsb ?? this.tsb);
+      _SwallowWhitespaceBit(
+        parent ?? this.parent!,
+        charCode,
+        tsb: tsb ?? this.tsb,
+      );
 
   @override
   String toString() => 'ASCII-$charCode';

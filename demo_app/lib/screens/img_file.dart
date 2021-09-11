@@ -57,7 +57,8 @@ class _ImgFileState extends State<_ImgFileTab> {
   Future<File> get file async {
     final directory = await getApplicationSupportDirectory();
     return File(
-        '${directory.path}/img_file--$hashCode.${widget.fileExtension}');
+      '${directory.path}/img_file--$hashCode.${widget.fileExtension}',
+    );
   }
 
   @override

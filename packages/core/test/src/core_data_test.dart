@@ -15,12 +15,15 @@ void main() {
 
       testWidgets('renders defaultStyles in reversed', (tester) async {
         const html = '<span>Foo</span>';
-        final explained = await explain(tester, null,
-            hw: HtmlWidget(
-              html,
-              factoryBuilder: () => _BuildOpDefaultStyles(),
-              key: hwKey,
-            ));
+        final explained = await explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            html,
+            factoryBuilder: () => _BuildOpDefaultStyles(),
+            key: hwKey,
+          ),
+        );
         expect(explained, equals('[RichText:(#FFFF0000:Foo)]'));
       });
     });
@@ -28,53 +31,68 @@ void main() {
     group('onTree', () {
       testWidgets('renders additional text', (tester) async {
         const html = '<span>Foo</span>';
-        final explained = await explain(tester, null,
-            hw: HtmlWidget(
-              html,
-              factoryBuilder: () => _BuildOpOnTreeText(),
-              key: hwKey,
-            ));
+        final explained = await explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            html,
+            factoryBuilder: () => _BuildOpOnTreeText(),
+            key: hwKey,
+          ),
+        );
         expect(explained, equals('[RichText:(:Foo bar)]'));
       });
 
       testWidgets('renders widget', (tester) async {
         const html = '<span>Foo</span>';
-        final explained = await explain(tester, null,
-            hw: HtmlWidget(
-              html,
-              factoryBuilder: () => _BuildOpOnTreeWidget(),
-              key: hwKey,
-            ),
-            useExplainer: false);
+        final explained = await explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            html,
+            factoryBuilder: () => _BuildOpOnTreeWidget(),
+            key: hwKey,
+          ),
+          useExplainer: false,
+        );
         expect(
-            explained,
-            equals('TshWidget\n'
-                '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
-                ' │  BuildTree#2 tsb#3(parent=#1):\n'
-                ' │    WidgetBit.inline#4 WidgetPlaceholder(Text("hi"))\n'
-                ' │)\n'
-                ' └WidgetPlaceholder<Widget>(Text)\n'
-                '  └Text("hi")\n'
-                '   └RichText(text: "hi")\n\n'));
+          explained,
+          equals(
+            'TshWidget\n'
+            '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
+            ' │  BuildTree#2 tsb#3(parent=#1):\n'
+            ' │    WidgetBit.inline#4 WidgetPlaceholder(Text("hi"))\n'
+            ' │)\n'
+            ' └WidgetPlaceholder<Widget>(Text)\n'
+            '  └Text("hi")\n'
+            '   └RichText(text: "hi")\n\n',
+          ),
+        );
       });
     });
 
     group('onWidgets', () {
       testWidgets('renders widget', (tester) async {
         const html = '<span>Foo</span>';
-        final explained = await explain(tester, null,
-            hw: HtmlWidget(
-              html,
-              factoryBuilder: () => _BuildOpOnWidgets(),
-              key: hwKey,
-            ),
-            useExplainer: false);
+        final explained = await explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            html,
+            factoryBuilder: () => _BuildOpOnWidgets(),
+            key: hwKey,
+          ),
+          useExplainer: false,
+        );
         expect(
-            explained,
-            equals('TshWidget\n'
-                '└WidgetPlaceholder<Widget>(Text)\n'
-                ' └Text("Hi")\n'
-                '  └RichText(text: "Hi")\n\n'));
+          explained,
+          equals(
+            'TshWidget\n'
+            '└WidgetPlaceholder<Widget>(Text)\n'
+            ' └Text("Hi")\n'
+            '  └RichText(text: "Hi")\n\n',
+          ),
+        );
       });
     });
 
@@ -82,22 +100,28 @@ void main() {
       const html = '<span>Foo</span>';
 
       testWidgets('renders A first', (tester) async {
-        final explained = await explain(tester, null,
-            hw: HtmlWidget(
-              html,
-              factoryBuilder: () => _BuildOpPriority(a: 1, b: 2),
-              key: hwKey,
-            ));
+        final explained = await explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            html,
+            factoryBuilder: () => _BuildOpPriority(a: 1, b: 2),
+            key: hwKey,
+          ),
+        );
         expect(explained, equals('[RichText:(:Foo A B)]'));
       });
 
       testWidgets('renders B first', (tester) async {
-        final explained = await explain(tester, null,
-            hw: HtmlWidget(
-              html,
-              factoryBuilder: () => _BuildOpPriority(a: 2, b: 1),
-              key: hwKey,
-            ));
+        final explained = await explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            html,
+            factoryBuilder: () => _BuildOpPriority(a: 2, b: 1),
+            key: hwKey,
+          ),
+        );
         expect(explained, equals('[RichText:(:Foo B A)]'));
       });
     });
@@ -126,9 +150,12 @@ class _BuildOpOnTreeText extends WidgetFactory {
 class _BuildOpOnTreeWidget extends WidgetFactory {
   @override
   void parse(BuildMetadata meta) {
-    meta.register(BuildOp(
+    meta.register(
+      BuildOp(
         onTree: (_, tree) =>
-            tree.replaceWith(WidgetBit.inline(tree, const Text('hi')))));
+            tree.replaceWith(WidgetBit.inline(tree, const Text('hi'))),
+      ),
+    );
     return super.parse(meta);
   }
 }
@@ -150,14 +177,18 @@ class _BuildOpPriority extends WidgetFactory {
   @override
   void parse(BuildMetadata meta) {
     meta
-      ..register(BuildOp(
-        onTree: (_, tree) => tree.addText(' A'),
-        priority: a,
-      ))
-      ..register(BuildOp(
-        onTree: (_, tree) => tree.addText(' B'),
-        priority: b,
-      ));
+      ..register(
+        BuildOp(
+          onTree: (_, tree) => tree.addText(' A'),
+          priority: a,
+        ),
+      )
+      ..register(
+        BuildOp(
+          onTree: (_, tree) => tree.addText(' B'),
+          priority: b,
+        ),
+      );
 
     return super.parse(meta);
   }

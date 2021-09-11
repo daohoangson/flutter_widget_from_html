@@ -67,12 +67,17 @@ class WidgetFactory {
 
   /// Builds [AspectRatio].
   Widget? buildAspectRatio(
-          BuildMetadata meta, Widget child, double aspectRatio) =>
+    BuildMetadata meta,
+    Widget child,
+    double aspectRatio,
+  ) =>
       AspectRatio(aspectRatio: aspectRatio, child: child);
 
   /// Builds body.
   WidgetPlaceholder? buildBody(
-          BuildMetadata meta, Iterable<WidgetPlaceholder> children) =>
+    BuildMetadata meta,
+    Iterable<WidgetPlaceholder> children,
+  ) =>
       buildColumnPlaceholder(meta, children)?.wrapWith(buildBodyWidget);
 
   /// Builds body as [ListView].
@@ -142,8 +147,12 @@ class WidgetFactory {
   /// See https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
   /// for more information regarding `content-box` (the default)
   /// and `border-box` (set [isBorderBox] to use).
-  Widget? buildBorder(BuildMetadata meta, Widget child, BoxBorder border,
-          {bool isBorderBox = false}) =>
+  Widget? buildBorder(
+    BuildMetadata meta,
+    Widget child,
+    BoxBorder border, {
+    bool isBorderBox = false,
+  }) =>
       isBorderBox
           ? DecoratedBox(
               decoration: BoxDecoration(border: border),
@@ -156,7 +165,9 @@ class WidgetFactory {
 
   /// Builds column placeholder.
   WidgetPlaceholder? buildColumnPlaceholder(
-      BuildMetadata meta, Iterable<WidgetPlaceholder> children) {
+    BuildMetadata meta,
+    Iterable<WidgetPlaceholder> children,
+  ) {
     if (children.isEmpty) return null;
     if (children.length == 1) return children.first;
 
@@ -168,8 +179,11 @@ class WidgetFactory {
   }
 
   /// Builds [Column].
-  Widget buildColumnWidget(BuildContext context, List<Widget> children,
-      {TextDirection? dir}) {
+  Widget buildColumnWidget(
+    BuildContext context,
+    List<Widget> children, {
+    TextDirection? dir,
+  }) {
     if (children.length == 1) return children.first;
 
     return Column(
@@ -199,7 +213,10 @@ class WidgetFactory {
 
   /// Builds [GestureDetector].
   Widget? buildGestureDetector(
-          BuildMetadata meta, Widget child, GestureTapCallback onTap) =>
+    BuildMetadata meta,
+    Widget child,
+    GestureTapCallback onTap,
+  ) =>
       MouseRegion(
         cursor: SystemMouseCursors.click,
         child: GestureDetector(onTap: onTap, child: child),
@@ -230,7 +247,10 @@ class WidgetFactory {
 
     if (_widget?.onTapImage != null && built != null) {
       built = buildGestureDetector(
-          meta, built, () => _widget?.onTapImage?.call(data));
+        meta,
+        built,
+        () => _widget?.onTapImage?.call(data),
+      );
     }
 
     return built;
@@ -261,14 +281,15 @@ class WidgetFactory {
           loadingProgress == null
               ? child
               : onLoadingBuilder(
-                      context,
-                      meta,
-                      loadingProgress.expectedTotalBytes != null &&
-                              loadingProgress.expectedTotalBytes! > 0
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                          : null,
-                      src) ??
+                    context,
+                    meta,
+                    loadingProgress.expectedTotalBytes != null &&
+                            loadingProgress.expectedTotalBytes! > 0
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                        : null,
+                    src,
+                  ) ??
                   child,
       excludeFromSemantics: semanticLabel == null,
       fit: BoxFit.fill,
@@ -279,7 +300,11 @@ class WidgetFactory {
 
   /// Builds marker widget for a list item.
   Widget? buildListMarker(
-      BuildMetadata meta, TextStyleHtml tsh, String listStyleType, int index) {
+    BuildMetadata meta,
+    TextStyleHtml tsh,
+    String listStyleType,
+    int index,
+  ) {
     final text = getListMarkerText(listStyleType, index);
     final style = tsh.styleWithHeight;
     return text.isNotEmpty
@@ -298,7 +323,10 @@ class WidgetFactory {
 
   /// Builds [Padding].
   Widget? buildPadding(
-          BuildMetadata meta, Widget child, EdgeInsetsGeometry padding) =>
+    BuildMetadata meta,
+    Widget child,
+    EdgeInsetsGeometry padding,
+  ) =>
       padding == EdgeInsets.zero
           ? child
           : Padding(padding: padding, child: child);
@@ -355,27 +383,31 @@ class WidgetFactory {
       }
 
       if (flattened.widgetBuilder != null) {
-        widgets.add(WidgetPlaceholder<BuildTree>(tree)
-            .wrapWith((context, _) => flattened.widgetBuilder!(context)));
+        widgets.add(
+          WidgetPlaceholder<BuildTree>(tree)
+              .wrapWith((context, _) => flattened.widgetBuilder!(context)),
+        );
         continue;
       }
 
       if (flattened.spanBuilder == null) continue;
-      widgets.add(WidgetPlaceholder<BuildTree>(tree).wrapWith((context, _) {
-        final tsh = tree.tsb.build(context);
-        final span = flattened.spanBuilder!(context, tsh.whitespace);
-        if (span == null || span is! InlineSpan) return widget0;
+      widgets.add(
+        WidgetPlaceholder<BuildTree>(tree).wrapWith((context, _) {
+          final tsh = tree.tsb.build(context);
+          final span = flattened.spanBuilder!(context, tsh.whitespace);
+          if (span == null || span is! InlineSpan) return widget0;
 
-        final textAlign = tsh.textAlign ?? TextAlign.start;
+          final textAlign = tsh.textAlign ?? TextAlign.start;
 
-        if (span is WidgetSpan &&
-            span.alignment == PlaceholderAlignment.baseline &&
-            textAlign == TextAlign.start) {
-          return span.child;
-        }
+          if (span is WidgetSpan &&
+              span.alignment == PlaceholderAlignment.baseline &&
+              textAlign == TextAlign.start) {
+            return span.child;
+          }
 
-        return buildText(meta, tsh, span);
-      }));
+          return buildText(meta, tsh, span);
+        }),
+      );
     }
 
     return widgets;
@@ -508,8 +540,12 @@ class WidgetFactory {
   /// Builder for error widget if a complicated element failed to render.
   ///
   /// See [OnErrorBuilder].
-  Widget? onErrorBuilder(BuildContext context, BuildMetadata meta,
-      [dynamic error, dynamic data]) {
+  Widget? onErrorBuilder(
+    BuildContext context,
+    BuildMetadata meta, [
+    dynamic error,
+    dynamic data,
+  ]) {
     final callback = _widget?.onErrorBuilder;
     if (callback != null) {
       final result = callback(context, meta.element, error);
@@ -588,9 +624,13 @@ class WidgetFactory {
         _tagA ??= TagA(this).buildOp;
         meta.register(_tagA!);
 
-        meta.tsb.enqueue(_tagAColor ??= (tsh, _) => tsh.copyWith(
-            style: tsh.style.copyWith(
-                color: tsh.getDependency<ThemeData>().colorScheme.primary)));
+        meta.tsb.enqueue(
+          _tagAColor ??= (tsh, _) => tsh.copyWith(
+                style: tsh.style.copyWith(
+                  color: tsh.getDependency<ThemeData>().colorScheme.primary,
+                ),
+              ),
+        );
 
         final name = attrs[kAttributeAName];
         if (name != null) meta.register(_anchorOp(name));
@@ -663,18 +703,24 @@ class WidgetFactory {
       case kTagSamp:
       case kTagTt:
         meta.tsb.enqueue(
-            TextStyleOps.fontFamily, const [kTagCodeFont1, kTagCodeFont2]);
+          TextStyleOps.fontFamily,
+          const [kTagCodeFont1, kTagCodeFont2],
+        );
         break;
       case kTagPre:
         _tagPre ??= BuildOp(
-            onWidgets: (meta, widgets) => listOrNull(
-                buildColumnPlaceholder(meta, widgets)
-                    ?.wrapWith((_, w) => buildHorizontalScrollView(meta, w))));
+          onWidgets: (meta, widgets) => listOrNull(
+            buildColumnPlaceholder(meta, widgets)
+                ?.wrapWith((_, w) => buildHorizontalScrollView(meta, w)),
+          ),
+        );
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssWhitespace] = kCssWhitespacePre
           ..tsb.enqueue(
-              TextStyleOps.fontFamily, const [kTagCodeFont1, kTagCodeFont2])
+            TextStyleOps.fontFamily,
+            const [kTagCodeFont1, kTagCodeFont2],
+          )
           ..register(_tagPre!);
         break;
 
@@ -823,12 +869,17 @@ class WidgetFactory {
       case kTagTable:
         meta
           ..[kCssDisplay] = kCssDisplayTable
-          ..register(TagTable.borderOp(
-            tryParseDoubleFromMap(attrs, kAttributeBorder) ?? 0.0,
-            tryParseDoubleFromMap(attrs, kAttributeCellSpacing) ?? 2.0,
-          ))
-          ..register(TagTable.cellPaddingOp(
-              tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1.0));
+          ..register(
+            TagTable.borderOp(
+              tryParseDoubleFromMap(attrs, kAttributeBorder) ?? 0.0,
+              tryParseDoubleFromMap(attrs, kAttributeCellSpacing) ?? 2.0,
+            ),
+          )
+          ..register(
+            TagTable.cellPaddingOp(
+              tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1.0,
+            ),
+          );
         break;
       case kTagTableCell:
         meta[kCssVerticalAlign] = kCssVerticalAlignMiddle;
@@ -1056,9 +1107,11 @@ class WidgetFactory {
       onWidgets: (meta, widgets) {
         if (meta.willBuildSubtree == false) return widgets;
 
-        return listOrNull(buildColumnPlaceholder(meta, widgets)?.wrapWith(
-          (context, child) => SizedBox(key: anchor, child: child),
-        ));
+        return listOrNull(
+          buildColumnPlaceholder(meta, widgets)?.wrapWith(
+            (context, child) => SizedBox(key: anchor, child: child),
+          ),
+        );
       },
       onWidgetsIsOptional: true,
     );

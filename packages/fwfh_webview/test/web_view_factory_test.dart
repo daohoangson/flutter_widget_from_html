@@ -18,12 +18,15 @@ void main() {
     const html = '<iframe src="$src"></iframe>';
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[WebView:'
-            'url=$src,'
-            'aspectRatio=$defaultAspectRatio,'
-            'autoResize=true'
-            ']'));
+      explained,
+      equals(
+        '[WebView:'
+        'url=$src,'
+        'aspectRatio=$defaultAspectRatio,'
+        'autoResize=true'
+        ']',
+      ),
+    );
   });
 
   group('useExplainer: false', () {
@@ -38,22 +41,25 @@ void main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
       final explained = await _explain(tester);
       expect(
-          explained,
-          equals('TshWidget\n'
-              '└WidgetPlaceholder<Widget>(WebView)\n'
-              ' └WebView(state: WebViewState)\n'
-              '  └LayoutBuilder()\n'
-              '   └SizedBox(width: 800.0, height: 450.0)\n'
-              "    └WebView-[<'$src'>](state: _WebViewState)\n"
-              '     └GestureDetector(startBehavior: start)\n'
-              '      └RawGestureDetector(...)\n'
-              '       └Listener(...)\n'
-              '        └AndroidView(state: _AndroidViewState)\n'
-              '         └Focus(...)\n'
-              '          └_FocusMarker\n'
-              '           └Semantics(...)\n'
-              '            └_AndroidPlatformView()\n'
-              '\n'));
+        explained,
+        equals(
+          'TshWidget\n'
+          '└WidgetPlaceholder<Widget>(WebView)\n'
+          ' └WebView(state: WebViewState)\n'
+          '  └LayoutBuilder()\n'
+          '   └SizedBox(width: 800.0, height: 450.0)\n'
+          "    └WebView-[<'$src'>](state: _WebViewState)\n"
+          '     └GestureDetector(startBehavior: start)\n'
+          '      └RawGestureDetector(...)\n'
+          '       └Listener(...)\n'
+          '        └AndroidView(state: _AndroidViewState)\n'
+          '         └Focus(...)\n'
+          '          └_FocusMarker\n'
+          '           └Semantics(...)\n'
+          '            └_AndroidPlatformView()\n'
+          '\n',
+        ),
+      );
       debugDefaultTargetPlatformOverride = null;
     });
 
@@ -61,15 +67,18 @@ void main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
       final explained = await _explain(tester);
       expect(
-          explained,
-          equals('TshWidget\n'
-              '└WidgetPlaceholder<Widget>(WebView)\n'
-              ' └WebView(state: WebViewState)\n'
-              '  └AspectRatio(aspectRatio: 1.8)\n'
-              "   └WebView-[<'$src'>](state: _WebViewState)\n"
-              '    └UiKitView(state: _UiKitViewState)\n'
-              '     └SizedBox.expand()\n'
-              '\n'));
+        explained,
+        equals(
+          'TshWidget\n'
+          '└WidgetPlaceholder<Widget>(WebView)\n'
+          ' └WebView(state: WebViewState)\n'
+          '  └AspectRatio(aspectRatio: 1.8)\n'
+          "   └WebView-[<'$src'>](state: _WebViewState)\n"
+          '    └UiKitView(state: _UiKitViewState)\n'
+          '     └SizedBox.expand()\n'
+          '\n',
+        ),
+      );
       debugDefaultTargetPlatformOverride = null;
     });
 
@@ -77,10 +86,13 @@ void main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.linux;
       final explained = await _explain(tester);
       expect(
-          explained,
-          equals('TshWidget\n'
-              '└SizedBox.shrink()\n'
-              '\n'));
+        explained,
+        equals(
+          'TshWidget\n'
+          '└SizedBox.shrink()\n'
+          '\n',
+        ),
+      );
       debugDefaultTargetPlatformOverride = null;
     });
   });

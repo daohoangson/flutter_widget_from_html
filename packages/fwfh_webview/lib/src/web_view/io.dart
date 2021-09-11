@@ -113,7 +113,8 @@ class WebViewState extends State<WebView> {
       );
 
   lib.NavigationDecision _interceptNavigationRequest(
-      lib.NavigationRequest req) {
+    lib.NavigationRequest req,
+  ) {
     var intercepted = false;
 
     if (widget.interceptNavigationRequest != null &&

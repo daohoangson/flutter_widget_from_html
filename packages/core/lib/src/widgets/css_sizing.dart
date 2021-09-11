@@ -16,7 +16,10 @@ class CssBlock extends CssSizing {
   @override
   void updateRenderObject(BuildContext _, _RenderCssSizing renderObject) =>
       renderObject.setPreferredSize(
-          null, const CssSizingValue.percentage(100), null);
+        null,
+        const CssSizingValue.percentage(100),
+        null,
+      );
 }
 
 /// A CSS sizing widget.
@@ -97,8 +100,11 @@ class CssSizing extends SingleChildRenderObjectWidget {
     );
   }
 
-  void _debugFillProperty(DiagnosticPropertiesBuilder properties, String name,
-      CssSizingValue? value) {
+  void _debugFillProperty(
+    DiagnosticPropertiesBuilder properties,
+    String name,
+    CssSizingValue? value,
+  ) {
     if (value == null) return;
     properties.add(DiagnosticsProperty(name, value));
   }
@@ -112,7 +118,10 @@ class CssSizing extends SingleChildRenderObjectWidget {
       minWidth: minWidth,
     );
     renderObject.setPreferredSize(
-        preferredAxis, preferredWidth, preferredHeight);
+      preferredAxis,
+      preferredWidth,
+      preferredHeight,
+    );
   }
 }
 
@@ -162,7 +171,10 @@ class _RenderCssSizing extends RenderProxyBox {
   CssSizingValue? _preferredHeight;
   CssSizingValue? _preferredWidth;
   void setPreferredSize(
-      Axis? axis, CssSizingValue? width, CssSizingValue? height) {
+    Axis? axis,
+    CssSizingValue? width,
+    CssSizingValue? height,
+  ) {
     if (axis == _preferredAxis &&
         height == _preferredHeight &&
         width == _preferredWidth) return;

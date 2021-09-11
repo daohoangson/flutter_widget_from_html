@@ -30,11 +30,14 @@ Future<void> main() async {
       const html = '<div id="foo">Foo</div>';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[CssBlock:child='
-              '[SizedBox#foo:child='
-              '[RichText:(:Foo)]'
-              ']]'));
+        explained,
+        equals(
+          '[CssBlock:child='
+          '[SizedBox#foo:child='
+          '[RichText:(:Foo)]'
+          ']]',
+        ),
+      );
     });
 
     testWidgets('renders SUP[id]', (WidgetTester tester) async {
@@ -64,13 +67,15 @@ Future<void> main() async {
       final explained = await explain(
         tester,
         null,
-        hw: CustomScrollView(slivers: [
-          HtmlWidget(
-            html,
-            key: hwKey,
-            renderMode: RenderMode.sliverList,
-          )
-        ]),
+        hw: CustomScrollView(
+          slivers: [
+            HtmlWidget(
+              html,
+              key: hwKey,
+              renderMode: RenderMode.sliverList,
+            )
+          ],
+        ),
         useExplainer: false,
       );
       expect(explained, contains('BodyItemWidget-[GlobalKey 0]'));
@@ -270,67 +275,87 @@ Future<void> main() async {
   final goldenSkip = Platform.isLinux ? null : 'Linux only';
   GoldenToolkit.runWithConfiguration(
     () {
-      group('tap test', () {
-        testGoldens('scrolls down', (WidgetTester tester) async {
-          await tester.pumpWidgetBuilder(
-            const _ColumnTestApp(),
-            wrapper: materialAppWrapper(theme: ThemeData.light()),
-            surfaceSize: const Size(200, 200),
-          );
-          await screenMatchesGolden(tester, 'down/top');
+      group(
+        'tap test',
+        () {
+          testGoldens(
+            'scrolls down',
+            (WidgetTester tester) async {
+              await tester.pumpWidgetBuilder(
+                const _ColumnTestApp(),
+                wrapper: materialAppWrapper(theme: ThemeData.light()),
+                surfaceSize: const Size(200, 200),
+              );
+              await screenMatchesGolden(tester, 'down/top');
 
-          expect(await tapText(tester, 'Scroll down'), equals(1));
-          await tester.pumpAndSettle();
-          await screenMatchesGolden(tester, 'down/target');
-        }, skip: goldenSkip != null);
-
-        testGoldens('scrolls up', (WidgetTester tester) async {
-          final keyBottom = GlobalKey();
-          await tester.pumpWidgetBuilder(
-            _ColumnTestApp(keyBottom: keyBottom),
-            wrapper: materialAppWrapper(theme: ThemeData.light()),
-            surfaceSize: const Size(200, 200),
+              expect(await tapText(tester, 'Scroll down'), equals(1));
+              await tester.pumpAndSettle();
+              await screenMatchesGolden(tester, 'down/target');
+            },
+            skip: goldenSkip != null,
           );
 
-          await tester.ensureVisible(find.byKey(keyBottom));
-          await tester.pumpAndSettle();
-          await screenMatchesGolden(tester, 'up/bottom');
+          testGoldens(
+            'scrolls up',
+            (WidgetTester tester) async {
+              final keyBottom = GlobalKey();
+              await tester.pumpWidgetBuilder(
+                _ColumnTestApp(keyBottom: keyBottom),
+                wrapper: materialAppWrapper(theme: ThemeData.light()),
+                surfaceSize: const Size(200, 200),
+              );
 
-          expect(await tapText(tester, 'Scroll up'), equals(1));
-          await tester.pumpAndSettle();
-          await screenMatchesGolden(tester, 'up/target');
-        }, skip: goldenSkip != null);
+              await tester.ensureVisible(find.byKey(keyBottom));
+              await tester.pumpAndSettle();
+              await screenMatchesGolden(tester, 'up/bottom');
 
-        testGoldens('ListView scrolls down', (WidgetTester tester) async {
-          await tester.pumpWidgetBuilder(
-            const _ListViewTestApp(),
-            wrapper: materialAppWrapper(theme: ThemeData.light()),
-            surfaceSize: const Size(200, 200),
-          );
-          await screenMatchesGolden(tester, 'listview/down/top');
-
-          expect(await tapText(tester, 'Scroll down'), equals(1));
-          await tester.pumpAndSettle();
-          await screenMatchesGolden(tester, 'listview/down/target');
-        }, skip: goldenSkip != null);
-
-        testGoldens('SliverList scrolls up', (WidgetTester tester) async {
-          final keyBottom = GlobalKey();
-          await tester.pumpWidgetBuilder(
-            _SliverListTestApp(keyBottom: keyBottom),
-            wrapper: materialAppWrapper(theme: ThemeData.light()),
-            surfaceSize: const Size(200, 200),
+              expect(await tapText(tester, 'Scroll up'), equals(1));
+              await tester.pumpAndSettle();
+              await screenMatchesGolden(tester, 'up/target');
+            },
+            skip: goldenSkip != null,
           );
 
-          await tester.scrollUntilVisible(find.byKey(keyBottom), 100);
-          await tester.pumpAndSettle();
-          await screenMatchesGolden(tester, 'sliverlist/up/bottom');
+          testGoldens(
+            'ListView scrolls down',
+            (WidgetTester tester) async {
+              await tester.pumpWidgetBuilder(
+                const _ListViewTestApp(),
+                wrapper: materialAppWrapper(theme: ThemeData.light()),
+                surfaceSize: const Size(200, 200),
+              );
+              await screenMatchesGolden(tester, 'listview/down/top');
 
-          expect(await tapText(tester, 'Scroll up'), equals(1));
-          await tester.pumpAndSettle();
-          await screenMatchesGolden(tester, 'sliverlist/up/target');
-        }, skip: goldenSkip != null);
-      }, skip: goldenSkip);
+              expect(await tapText(tester, 'Scroll down'), equals(1));
+              await tester.pumpAndSettle();
+              await screenMatchesGolden(tester, 'listview/down/target');
+            },
+            skip: goldenSkip != null,
+          );
+
+          testGoldens(
+            'SliverList scrolls up',
+            (WidgetTester tester) async {
+              final keyBottom = GlobalKey();
+              await tester.pumpWidgetBuilder(
+                _SliverListTestApp(keyBottom: keyBottom),
+                wrapper: materialAppWrapper(theme: ThemeData.light()),
+                surfaceSize: const Size(200, 200),
+              );
+
+              await tester.scrollUntilVisible(find.byKey(keyBottom), 100);
+              await tester.pumpAndSettle();
+              await screenMatchesGolden(tester, 'sliverlist/up/bottom');
+
+              expect(await tapText(tester, 'Scroll up'), equals(1));
+              await tester.pumpAndSettle();
+              await screenMatchesGolden(tester, 'sliverlist/up/target');
+            },
+            skip: goldenSkip != null,
+          );
+        },
+        skip: goldenSkip,
+      );
     },
     config: GoldenToolkitConfiguration(
       fileNameFactory: (name) => '$kGoldenFilePrefix/anchor/$name.png',

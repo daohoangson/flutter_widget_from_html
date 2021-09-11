@@ -78,48 +78,60 @@ void main() {
     const html = '<video width="400" height="300"><source src="$src"></video>';
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[VideoPlayer:'
-            'url=$src,'
-            'aspectRatio=1.33,'
-            'autoResize=false'
-            ']'));
+      explained,
+      equals(
+        '[VideoPlayer:'
+        'url=$src,'
+        'aspectRatio=1.33,'
+        'autoResize=false'
+        ']',
+      ),
+    );
   });
 
   testWidgets('renders video player with autoplay', (tester) async {
     const html = '<video autoplay><source src="$src"></video>';
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[VideoPlayer:'
-            'url=$src,'
-            'aspectRatio=$defaultAspectRatio,'
-            'autoplay=true'
-            ']'));
+      explained,
+      equals(
+        '[VideoPlayer:'
+        'url=$src,'
+        'aspectRatio=$defaultAspectRatio,'
+        'autoplay=true'
+        ']',
+      ),
+    );
   });
 
   testWidgets('renders video player with controls', (tester) async {
     const html = '<video controls><source src="$src"></video>';
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[VideoPlayer:'
-            'url=$src,'
-            'aspectRatio=$defaultAspectRatio,'
-            'controls=true'
-            ']'));
+      explained,
+      equals(
+        '[VideoPlayer:'
+        'url=$src,'
+        'aspectRatio=$defaultAspectRatio,'
+        'controls=true'
+        ']',
+      ),
+    );
   });
 
   testWidgets('renders video player with loop', (tester) async {
     const html = '<video loop><source src="$src"></video>';
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[VideoPlayer:'
-            'url=$src,'
-            'aspectRatio=$defaultAspectRatio,'
-            'loop=true'
-            ']'));
+      explained,
+      equals(
+        '[VideoPlayer:'
+        'url=$src,'
+        'aspectRatio=$defaultAspectRatio,'
+        'loop=true'
+        ']',
+      ),
+    );
   });
 
   group('poster', () {
@@ -130,12 +142,15 @@ void main() {
           '<source src="$src"></video>';
       final explained = await explain(tester, h);
       expect(
-          explained,
-          equals('[VideoPlayer:'
-              'url=$src,'
-              'aspectRatio=$defaultAspectRatio,'
-              'poster=[Image:image=AssetImage(bundle: null, name: "packages/$package/$assetName")]'
-              ']'));
+        explained,
+        equals(
+          '[VideoPlayer:'
+          'url=$src,'
+          'aspectRatio=$defaultAspectRatio,'
+          'poster=[Image:image=AssetImage(bundle: null, name: "packages/$package/$assetName")]'
+          ']',
+        ),
+      );
     });
 
     testWidgets('renders video player with data uri', (tester) async {
@@ -143,12 +158,15 @@ void main() {
       final e = await explain(tester, h);
       final explained = e.replaceAll(RegExp('Uint8List#[0-9a-f]+,'), 'bytes,');
       expect(
-          explained,
-          equals('[VideoPlayer:'
-              'url=$src,'
-              'aspectRatio=$defaultAspectRatio,'
-              'poster=[Image:image=MemoryImage(bytes, scale: 1.0)]'
-              ']'));
+        explained,
+        equals(
+          '[VideoPlayer:'
+          'url=$src,'
+          'aspectRatio=$defaultAspectRatio,'
+          'poster=[Image:image=MemoryImage(bytes, scale: 1.0)]'
+          ']',
+        ),
+      );
     });
 
     testWidgets('renders video player with url', (tester) async {
@@ -156,12 +174,15 @@ void main() {
       const html = '<video poster="$posterSrc"><source src="$src"></video>';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[VideoPlayer:'
-              'url=$src,'
-              'aspectRatio=$defaultAspectRatio,'
-              'poster=[Image:image=NetworkImage("$posterSrc", scale: 1.0)]'
-              ']'));
+        explained,
+        equals(
+          '[VideoPlayer:'
+          'url=$src,'
+          'aspectRatio=$defaultAspectRatio,'
+          'poster=[Image:image=NetworkImage("$posterSrc", scale: 1.0)]'
+          ']',
+        ),
+      );
     });
   });
 

@@ -21,10 +21,11 @@ class StyleBorder {
 
           _skipBuilding[meta] = true;
           final copied = tree.copyWith() as BuildTree;
-          final built = wf
-              .buildColumnPlaceholder(meta, copied.build())
-              ?.wrapWith((context, child) =>
-                  _buildBorder(meta, context, child, border));
+          final built =
+              wf.buildColumnPlaceholder(meta, copied.build())?.wrapWith(
+                    (context, child) =>
+                        _buildBorder(meta, context, child, border),
+                  );
           if (built == null) return;
 
           tree.replaceWith(WidgetBit.inline(tree, built));

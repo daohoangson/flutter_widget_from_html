@@ -50,33 +50,42 @@ void main() {
     const html = '<audio src="$src" autoplay></audio>';
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[AudioPlayer:'
-            'url=$src,'
-            'autoplay=true'
-            ']'));
+      explained,
+      equals(
+        '[AudioPlayer:'
+        'url=$src,'
+        'autoplay=true'
+        ']',
+      ),
+    );
   });
 
   testWidgets('renders audio player with loop', (tester) async {
     const html = '<audio src="$src" loop></audio>';
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[AudioPlayer:'
-            'url=$src,'
-            'loop=true'
-            ']'));
+      explained,
+      equals(
+        '[AudioPlayer:'
+        'url=$src,'
+        'loop=true'
+        ']',
+      ),
+    );
   });
 
   testWidgets('renders audio player with muted', (tester) async {
     const html = '<audio src="$src" muted></audio>';
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[AudioPlayer:'
-            'url=$src,'
-            'muted=true'
-            ']'));
+      explained,
+      equals(
+        '[AudioPlayer:'
+        'url=$src,'
+        'muted=true'
+        ']',
+      ),
+    );
   });
 
   group('preload', () {

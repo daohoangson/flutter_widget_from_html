@@ -17,43 +17,49 @@ Future<void> main() async {
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[HtmlRuby:children='
-              '[RichText:(:明日)],'
-              '[RichText:(@5.0:Ashita)]'
-              ']'));
+        explained,
+        equals(
+          '[HtmlRuby:children='
+          '[RichText:(:明日)],'
+          '[RichText:(@5.0:Ashita)]'
+          ']',
+        ),
+      );
     });
 
     testWidgets('useExplainer=false', (WidgetTester tester) async {
       final explained = await explain(tester, html, useExplainer: false);
       expect(
-          explained,
-          equals('TshWidget\n'
-              '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
-              ' │  BuildTree#2 tsb#3(parent=#1):\n'
-              ' │    WidgetBit.inline#4 WidgetPlaceholder([BuildTree#5 tsb#6(parent=#3):\n'
-              ' │      "明日"\n'
-              ' │      Whitespace[32]#7, BuildTree#8 tsb#9(parent=#3):\n'
-              ' │      "Ashita"])\n'
-              ' │    BuildTree#10 tsb#11(parent=#3):\n'
-              ' │    BuildTree#12 tsb#9(parent=#3):\n'
-              ' │    BuildTree#13 tsb#14(parent=#3):\n'
-              ' │)\n'
-              ' └WidgetPlaceholder<List<BuildTree>>([BuildTree#5 tsb#6(parent=#3):\n'
-              '  │  "明日"\n'
-              '  │  Whitespace[32]#7, BuildTree#8 tsb#9(parent=#3):\n'
-              '  │  "Ashita"]\n'
-              '  │)\n'
-              '  └HtmlRuby()\n'
-              '   ├WidgetPlaceholder<BuildTree>(BuildTree#5 tsb#6(parent=#3):\n'
-              '   ││  "明日"\n'
-              '   ││  Whitespace[32]#7\n'
-              '   ││)\n'
-              '   │└RichText(text: "明日")\n'
-              '   └WidgetPlaceholder<BuildTree>(BuildTree#8 tsb#9(parent=#3):\n'
-              '    │  "Ashita"\n'
-              '    │)\n'
-              '    └RichText(text: "Ashita")\n\n'));
+        explained,
+        equals(
+          'TshWidget\n'
+          '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
+          ' │  BuildTree#2 tsb#3(parent=#1):\n'
+          ' │    WidgetBit.inline#4 WidgetPlaceholder([BuildTree#5 tsb#6(parent=#3):\n'
+          ' │      "明日"\n'
+          ' │      Whitespace[32]#7, BuildTree#8 tsb#9(parent=#3):\n'
+          ' │      "Ashita"])\n'
+          ' │    BuildTree#10 tsb#11(parent=#3):\n'
+          ' │    BuildTree#12 tsb#9(parent=#3):\n'
+          ' │    BuildTree#13 tsb#14(parent=#3):\n'
+          ' │)\n'
+          ' └WidgetPlaceholder<List<BuildTree>>([BuildTree#5 tsb#6(parent=#3):\n'
+          '  │  "明日"\n'
+          '  │  Whitespace[32]#7, BuildTree#8 tsb#9(parent=#3):\n'
+          '  │  "Ashita"]\n'
+          '  │)\n'
+          '  └HtmlRuby()\n'
+          '   ├WidgetPlaceholder<BuildTree>(BuildTree#5 tsb#6(parent=#3):\n'
+          '   ││  "明日"\n'
+          '   ││  Whitespace[32]#7\n'
+          '   ││)\n'
+          '   │└RichText(text: "明日")\n'
+          '   └WidgetPlaceholder<BuildTree>(BuildTree#8 tsb#9(parent=#3):\n'
+          '    │  "Ashita"\n'
+          '    │)\n'
+          '    └RichText(text: "Ashita")\n\n',
+        ),
+      );
     });
   });
 
@@ -61,34 +67,43 @@ Future<void> main() async {
     const html = '<ruby>ruby <rt>rt</rt> foo</ruby>';
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[RichText:(:'
-            '[HtmlRuby:children=[RichText:(:ruby)],[RichText:(@5.0:rt)]]'
-            '(: foo)'
-            ')]'));
+      explained,
+      equals(
+        '[RichText:(:'
+        '[HtmlRuby:children=[RichText:(:ruby)],[RichText:(@5.0:rt)]]'
+        '(: foo)'
+        ')]',
+      ),
+    );
   });
 
   testWidgets('renders with multiple RTs', (WidgetTester tester) async {
     const html = '<ruby>漢<rt>かん</rt>字<rt>じ</rt></ruby>';
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[RichText:(:'
-            '[HtmlRuby:children=[RichText:(:漢)],[RichText:(@5.0:かん)]]'
-            '[HtmlRuby:children=[RichText:(:字)],[RichText:(@5.0:じ)]]'
-            ')]'));
+      explained,
+      equals(
+        '[RichText:(:'
+        '[HtmlRuby:children=[RichText:(:漢)],[RichText:(@5.0:かん)]]'
+        '[HtmlRuby:children=[RichText:(:字)],[RichText:(@5.0:じ)]]'
+        ')]',
+      ),
+    );
   });
 
   testWidgets('renders without erroneous white spaces', (tester) async {
     const html = '<ruby>\n漢\n<rt>かん</rt>\n\n字\n<rt>じ</rt></ruby>';
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[RichText:(:'
-            '[HtmlRuby:children=[RichText:(:漢)],[RichText:(@5.0:かん)]]'
-            '(: )'
-            '[HtmlRuby:children=[RichText:(:字)],[RichText:(@5.0:じ)]]'
-            ')]'));
+      explained,
+      equals(
+        '[RichText:(:'
+        '[HtmlRuby:children=[RichText:(:漢)],[RichText:(@5.0:かん)]]'
+        '(: )'
+        '[HtmlRuby:children=[RichText:(:字)],[RichText:(@5.0:じ)]]'
+        ')]',
+      ),
+    );
   });
 
   group('possible conflict', () {
@@ -97,11 +112,14 @@ Future<void> main() async {
           '<rt><ruby>rt1 <rt>rt2</rt></ruby></rt></ruby>';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[HtmlRuby:children='
-              '[HtmlRuby:children=[RichText:(:ruby1)],[RichText:(@5.0:ruby2)]],'
-              '[HtmlRuby:children=[RichText:(@5.0:rt1)],[RichText:(@2.5:rt2)]]'
-              ']'));
+        explained,
+        equals(
+          '[HtmlRuby:children='
+          '[HtmlRuby:children=[RichText:(:ruby1)],[RichText:(@5.0:ruby2)]],'
+          '[HtmlRuby:children=[RichText:(@5.0:rt1)],[RichText:(@2.5:rt2)]]'
+          ']',
+        ),
+      );
     });
 
     testWidgets('renders with A tag', (WidgetTester tester) async {
@@ -109,22 +127,28 @@ Future<void> main() async {
           '<rt><a href="http://domain.com/bar">bar</a></rt></ruby>';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[HtmlRuby:children='
-              '[RichText:(#FF123456+u+onTap:foo)],'
-              '[RichText:(#FF123456+u@5.0+onTap:bar)]'
-              ']'));
+        explained,
+        equals(
+          '[HtmlRuby:children='
+          '[RichText:(#FF123456+u+onTap:foo)],'
+          '[RichText:(#FF123456+u@5.0+onTap:bar)]'
+          ']',
+        ),
+      );
     });
 
     testWidgets('renders with Q tag', (WidgetTester tester) async {
       const html = '<ruby><q>foo</q> <rt><q>bar</q></rt></ruby>';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[HtmlRuby:children='
-              '[RichText:(:“foo”)],'
-              '[RichText:(@5.0:“bar”)]'
-              ']'));
+        explained,
+        equals(
+          '[HtmlRuby:children='
+          '[RichText:(:“foo”)],'
+          '[RichText:(@5.0:“bar”)]'
+          ']',
+        ),
+      );
     });
   });
 
@@ -165,11 +189,13 @@ Future<void> main() async {
       final rt = GlobalKey();
       final ruby = GlobalKey();
       final key = GlobalKey();
-      await tester.pumpWidget(HtmlRuby(
-        SizedBox(key: ruby, width: 50, height: 10),
-        SizedBox(key: rt, width: 10, height: 5),
-        key: key,
-      ));
+      await tester.pumpWidget(
+        HtmlRuby(
+          SizedBox(key: ruby, width: 50, height: 10),
+          SizedBox(key: rt, width: 10, height: 5),
+          key: key,
+        ),
+      );
       await tester.pumpAndSettle();
 
       final rtRenderBox = rt.currentContext!.findRenderObject()! as RenderBox;
@@ -178,31 +204,49 @@ Future<void> main() async {
       final htmlRubyRenderBox =
           key.currentContext!.findRenderObject()! as RenderBox;
       expect(
-          htmlRubyRenderBox.getMaxIntrinsicHeight(100),
-          equals(rubyRenderBox.getMaxIntrinsicHeight(100) +
-              rtRenderBox.getMaxIntrinsicHeight(100)));
+        htmlRubyRenderBox.getMaxIntrinsicHeight(100),
+        equals(
+          rubyRenderBox.getMaxIntrinsicHeight(100) +
+              rtRenderBox.getMaxIntrinsicHeight(100),
+        ),
+      );
       expect(
-          htmlRubyRenderBox.getMaxIntrinsicWidth(100),
-          equals(max(rubyRenderBox.getMaxIntrinsicWidth(100),
-              rtRenderBox.getMaxIntrinsicWidth(100))));
+        htmlRubyRenderBox.getMaxIntrinsicWidth(100),
+        equals(
+          max(
+            rubyRenderBox.getMaxIntrinsicWidth(100),
+            rtRenderBox.getMaxIntrinsicWidth(100),
+          ),
+        ),
+      );
       expect(
-          htmlRubyRenderBox.getMinIntrinsicHeight(100),
-          equals(rubyRenderBox.getMinIntrinsicHeight(100) +
-              rtRenderBox.getMinIntrinsicHeight(100)));
+        htmlRubyRenderBox.getMinIntrinsicHeight(100),
+        equals(
+          rubyRenderBox.getMinIntrinsicHeight(100) +
+              rtRenderBox.getMinIntrinsicHeight(100),
+        ),
+      );
       expect(
-          htmlRubyRenderBox.getMinIntrinsicWidth(100),
-          equals(min(rubyRenderBox.getMinIntrinsicWidth(100),
-              rtRenderBox.getMinIntrinsicWidth(100))));
+        htmlRubyRenderBox.getMinIntrinsicWidth(100),
+        equals(
+          min(
+            rubyRenderBox.getMinIntrinsicWidth(100),
+            rtRenderBox.getMinIntrinsicWidth(100),
+          ),
+        ),
+      );
     });
 
     testWidgets('performs hit test', (tester) async {
       const href = 'href';
       final urls = <String>[];
 
-      await tester.pumpWidget(HitTestApp(
-        html: '<ruby><a href="$href">Tap me</a> <rt>Foo</rt></ruby>',
-        list: urls,
-      ));
+      await tester.pumpWidget(
+        HitTestApp(
+          html: '<ruby><a href="$href">Tap me</a> <rt>Foo</rt></ruby>',
+          list: urls,
+        ),
+      );
       expect(await tapText(tester, 'Tap me'), equals(1));
 
       await tester.pumpAndSettle();
@@ -212,23 +256,28 @@ Future<void> main() async {
     final goldenSkip = Platform.isLinux ? null : 'Linux only';
     GoldenToolkit.runWithConfiguration(
       () {
-        testGoldens('computeDryLayout', (tester) async {
-          await tester.pumpWidgetBuilder(
-            const Scaffold(
-              body: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: HtmlWidget(
+        testGoldens(
+          'computeDryLayout',
+          (tester) async {
+            await tester.pumpWidgetBuilder(
+              const Scaffold(
+                body: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: HtmlWidget(
                     '<div style="background: black; color: white; width: 200px; height: 200px">'
                     '<ruby>Foo <rt>bar</rt></ruby>'
-                    '<div>'),
+                    '<div>',
+                  ),
+                ),
               ),
-            ),
-            wrapper: materialAppWrapper(theme: ThemeData.light()),
-            surfaceSize: const Size(600, 400),
-          );
+              wrapper: materialAppWrapper(theme: ThemeData.light()),
+              surfaceSize: const Size(600, 400),
+            );
 
-          await screenMatchesGolden(tester, 'computeDryLayout');
-        }, skip: goldenSkip != null);
+            await screenMatchesGolden(tester, 'computeDryLayout');
+          },
+          skip: goldenSkip != null,
+        );
       },
       config: GoldenToolkitConfiguration(
         fileNameFactory: (name) => '$kGoldenFilePrefix/ruby/$name.png',

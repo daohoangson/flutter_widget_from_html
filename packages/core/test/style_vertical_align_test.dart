@@ -8,22 +8,28 @@ void main() {
     const html = '<sub>Foo</sub>';
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[RichText:'
-            '[Align:alignment=bottomCenter,child='
-            '[Padding:(3,0,0,0),child=[RichText:(@8.3:Foo)]]'
-            ']@top]'));
+      explained,
+      equals(
+        '[RichText:'
+        '[Align:alignment=bottomCenter,child='
+        '[Padding:(3,0,0,0),child=[RichText:(@8.3:Foo)]]'
+        ']@top]',
+      ),
+    );
   });
 
   testWidgets('renders SUP tag', (WidgetTester tester) async {
     const html = '<sup>Foo</sup>';
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[RichText:'
-            '[Align:alignment=topCenter,child='
-            '[Padding:(0,0,3,0),child=[RichText:(@8.3:Foo)]]'
-            ']@bottom]'));
+      explained,
+      equals(
+        '[RichText:'
+        '[Align:alignment=topCenter,child='
+        '[Padding:(0,0,3,0),child=[RichText:(@8.3:Foo)]]'
+        ']@bottom]',
+      ),
+    );
   });
 
   testWidgets('renders baseline text', (WidgetTester tester) async {
@@ -54,22 +60,28 @@ void main() {
     const html = '<span style="vertical-align: sub">Foo</span>';
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[RichText:'
-            '[Align:alignment=bottomCenter,child='
-            '[Padding:(4,0,0,0),child=[RichText:(:Foo)]]'
-            ']@top]'));
+      explained,
+      equals(
+        '[RichText:'
+        '[Align:alignment=bottomCenter,child='
+        '[Padding:(4,0,0,0),child=[RichText:(:Foo)]]'
+        ']@top]',
+      ),
+    );
   });
 
   testWidgets('renders super text', (WidgetTester tester) async {
     const html = '<span style="vertical-align: super">Foo</span>';
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[RichText:'
-            '[Align:alignment=topCenter,child='
-            '[Padding:(0,0,4,0),child=[RichText:(:Foo)]]'
-            ']@bottom]'));
+      explained,
+      equals(
+        '[RichText:'
+        '[Align:alignment=topCenter,child='
+        '[Padding:(0,0,4,0),child=[RichText:(:Foo)]]'
+        ']@bottom]',
+      ),
+    );
   });
 
   group('image', () {
@@ -103,11 +115,14 @@ void main() {
       const html = '<img src="$imgSrc" /><sup>Foo</sup>';
       final explained = await imgExplain(tester, html);
       expect(
-          explained,
-          equals('[RichText:(:$imgRendered'
-              '[Align:alignment=topCenter,child='
-              '[Padding:(0,0,3,0),child=[RichText:(@8.3:Foo)]]'
-              ']@bottom)]'));
+        explained,
+        equals(
+          '[RichText:(:$imgRendered'
+          '[Align:alignment=topCenter,child='
+          '[Padding:(0,0,3,0),child=[RichText:(@8.3:Foo)]]'
+          ']@bottom)]',
+        ),
+      );
     });
   });
 
@@ -130,17 +145,23 @@ void main() {
       testWidgets('ltr', (WidgetTester tester) async {
         final explained = await explain(tester, html);
         expect(
-            explained,
-            equals('[CssBlock:child=[Align:alignment=topLeft,child='
-                '[RichText:(:Foo)]]]'));
+          explained,
+          equals(
+            '[CssBlock:child=[Align:alignment=topLeft,child='
+            '[RichText:(:Foo)]]]',
+          ),
+        );
       });
 
       testWidgets('rtl', (WidgetTester tester) async {
         final explained = await explain(tester, html, rtl: true);
         expect(
-            explained,
-            equals('[CssBlock:child=[Align:alignment=topRight,child='
-                '[RichText:dir=rtl,(:Foo)]]]'));
+          explained,
+          equals(
+            '[CssBlock:child=[Align:alignment=topRight,child='
+            '[RichText:dir=rtl,(:Foo)]]]',
+          ),
+        );
       });
     });
 
@@ -150,17 +171,23 @@ void main() {
       testWidgets('ltr', (WidgetTester tester) async {
         final explained = await explain(tester, html);
         expect(
-            explained,
-            equals('[CssBlock:child=[Align:alignment=centerLeft,child='
-                '[RichText:(:Foo)]]]'));
+          explained,
+          equals(
+            '[CssBlock:child=[Align:alignment=centerLeft,child='
+            '[RichText:(:Foo)]]]',
+          ),
+        );
       });
 
       testWidgets('rtl', (WidgetTester tester) async {
         final explained = await explain(tester, html, rtl: true);
         expect(
-            explained,
-            equals('[CssBlock:child=[Align:alignment=centerRight,child='
-                '[RichText:dir=rtl,(:Foo)]]]'));
+          explained,
+          equals(
+            '[CssBlock:child=[Align:alignment=centerRight,child='
+            '[RichText:dir=rtl,(:Foo)]]]',
+          ),
+        );
       });
     });
 
@@ -170,17 +197,23 @@ void main() {
       testWidgets('ltr', (WidgetTester tester) async {
         final explained = await explain(tester, html);
         expect(
-            explained,
-            equals('[CssBlock:child=[Align:alignment=bottomLeft,child='
-                '[RichText:(:Foo)]]]'));
+          explained,
+          equals(
+            '[CssBlock:child=[Align:alignment=bottomLeft,child='
+            '[RichText:(:Foo)]]]',
+          ),
+        );
       });
 
       testWidgets('rtl', (WidgetTester tester) async {
         final explained = await explain(tester, html, rtl: true);
         expect(
-            explained,
-            equals('[CssBlock:child=[Align:alignment=bottomRight,child='
-                '[RichText:dir=rtl,(:Foo)]]]'));
+          explained,
+          equals(
+            '[CssBlock:child=[Align:alignment=bottomRight,child='
+            '[RichText:dir=rtl,(:Foo)]]]',
+          ),
+        );
       });
     });
   });

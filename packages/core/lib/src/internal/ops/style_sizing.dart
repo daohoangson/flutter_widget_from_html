@@ -10,9 +10,11 @@ const kCssWidth = 'width';
 class DisplayBlockOp extends BuildOp {
   DisplayBlockOp(WidgetFactory wf)
       : super(
-          onWidgets: (meta, widgets) => listOrNull(wf
-              .buildColumnPlaceholder(meta, widgets)
-              ?.wrapWith((_, w) => w is CssSizing ? w : CssBlock(child: w))),
+          onWidgets: (meta, widgets) => listOrNull(
+            wf
+                .buildColumnPlaceholder(meta, widgets)
+                ?.wrapWith((_, w) => w is CssSizing ? w : CssBlock(child: w)),
+          ),
           priority: StyleSizing.kPriority7k + 1,
         );
 }
@@ -50,9 +52,11 @@ class StyleSizing {
 
           final input = _parse(meta);
           if (input == null) return widgets;
-          return listOrNull(wf
-              .buildColumnPlaceholder(meta, widgets)
-              ?.wrapWith((c, w) => _build(c, w, input, meta.tsb)));
+          return listOrNull(
+            wf
+                .buildColumnPlaceholder(meta, widgets)
+                ?.wrapWith((c, w) => _build(c, w, input, meta.tsb)),
+          );
         },
         onWidgetsIsOptional: true,
         priority: kPriority7k,
@@ -135,8 +139,12 @@ class StyleSizing {
   static void treatHeightAsMinHeight(BuildMetadata meta) =>
       _treatHeightAsMinHeight[meta] = true;
 
-  static Widget _build(BuildContext context, Widget child,
-      _StyleSizingInput input, TextStyleBuilder tsb) {
+  static Widget _build(
+    BuildContext context,
+    Widget child,
+    _StyleSizingInput input,
+    TextStyleBuilder tsb,
+  ) {
     final tsh = tsb.build(context);
 
     return CssSizing(

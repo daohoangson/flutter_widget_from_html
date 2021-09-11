@@ -24,7 +24,8 @@ class TagA {
           for (final bit in tree.bits.toList(growable: false)) {
             if (bit is WidgetBit) {
               bit.child.wrapWith(
-                  (_, child) => wf.buildGestureDetector(meta, child, onTap));
+                (_, child) => wf.buildGestureDetector(meta, child, onTap),
+              );
             } else if (bit is! WhitespaceBit) {
               _TagABit(bit.parent, bit.tsb, onTap).insertAfter(bit);
             }
@@ -36,8 +37,11 @@ class TagA {
           final onTap = _gestureTapCallback(meta);
           if (onTap == null) return widgets;
 
-          return listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
-              (_, child) => wf.buildGestureDetector(meta, child, onTap)));
+          return listOrNull(
+            wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
+                  (_, child) => wf.buildGestureDetector(meta, child, onTap),
+                ),
+          );
         },
         onWidgetsIsOptional: true,
       );

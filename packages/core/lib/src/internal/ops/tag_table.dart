@@ -123,19 +123,19 @@ class TagTable {
           borderSpacing: borderSpacing?.getValue(tsh) ?? 0.0,
           companion: companion,
           children: List.from(
-              builders
-                  .map((f) => f(context))
-                  .where((element) => element != null),
-              growable: false),
+            builders.map((f) => f(context)).where((element) => element != null),
+            growable: false,
+          ),
         );
       }),
     ];
   }
 
   void _prepareHtmlTableCellBuilders(
-      _TagTableDataGroup group,
-      Map<int, Map<int, bool>> occupations,
-      List<_HtmlTableCellBuilder> builders) {
+    _TagTableDataGroup group,
+    Map<int, Map<int, bool>> occupations,
+    List<_HtmlTableCellBuilder> builders,
+  ) {
     var rowStart = occupations.keys.length - 1;
     final rowSpanMax = group.rows.length;
     for (final row in group.rows) {
@@ -150,12 +150,13 @@ class TagTable {
 
         final columnSpan = cell.colspan > 0 ? cell.colspan : 1;
         final rowSpan = min(
-            rowSpanMax,
-            cell.rowspan > 0
-                ? cell.rowspan
-                : cell.rowspan == 0
-                    ? group.rows.length
-                    : 1);
+          rowSpanMax,
+          cell.rowspan > 0
+              ? cell.rowspan
+              : cell.rowspan == 0
+                  ? group.rows.length
+                  : 1,
+        );
         for (var r = 0; r < rowSpan; r++) {
           final row = rowStart + r;
           occupations[row] ??= {};
@@ -195,10 +196,11 @@ class TagTable {
   }
 
   static BuildOp cellPaddingOp(double px) => BuildOp(
-      onChild: (meta) =>
-          (meta.element.localName == 'td' || meta.element.localName == 'th')
-              ? meta[kCssPadding] = '${px}px'
-              : null);
+        onChild: (meta) =>
+            (meta.element.localName == 'td' || meta.element.localName == 'th')
+                ? meta[kCssPadding] = '${px}px'
+                : null,
+      );
 
   static BuildOp borderOp(double border, double borderSpacing) => BuildOp(
         defaultStyles: (_) => {
@@ -278,12 +280,14 @@ class _TagTableRow {
             parent.wf.buildColumnPlaceholder(cellMeta, widgets) ?? widget0;
 
         final attributes = cellMeta.element.attributes;
-        row.cells.add(_TagTableDataCell(
-          cellMeta,
-          child: child,
-          colspan: tryParseIntFromMap(attributes, kAttributeColspan) ?? 1,
-          rowspan: tryParseIntFromMap(attributes, kAttributeRowspan) ?? 1,
-        ));
+        row.cells.add(
+          _TagTableDataCell(
+            cellMeta,
+            child: child,
+            colspan: tryParseIntFromMap(attributes, kAttributeColspan) ?? 1,
+            rowspan: tryParseIntFromMap(attributes, kAttributeRowspan) ?? 1,
+          ),
+        );
 
         return [child];
       },
@@ -294,17 +298,19 @@ class _TagTableRow {
         final v = cellMeta[kCssVerticalAlign]?.term;
         if (v != kCssVerticalAlignBaseline) return widgets;
 
-        return listOrNull(parent.wf
-            .buildColumnPlaceholder(cellMeta, widgets)
-            ?.wrapWith((_, child) {
-          final row = cellMeta.row;
+        return listOrNull(
+          parent.wf
+              .buildColumnPlaceholder(cellMeta, widgets)
+              ?.wrapWith((_, child) {
+            final row = cellMeta.row;
 
-          return HtmlTableValignBaseline(
-            companion: parent.companion,
-            row: row,
-            child: child,
-          );
-        }));
+            return HtmlTableValignBaseline(
+              companion: parent.companion,
+              row: row,
+              child: child,
+            );
+          }),
+        );
       },
       priority: StyleVerticalAlign.kPriority4k3,
     );
@@ -381,6 +387,10 @@ class _TagTableDataCell {
   final BuildMetadata meta;
   final int rowspan;
 
-  const _TagTableDataCell(this.meta,
-      {required this.child, required this.colspan, required this.rowspan});
+  const _TagTableDataCell(
+    this.meta, {
+    required this.child,
+    required this.colspan,
+    required this.rowspan,
+  });
 }

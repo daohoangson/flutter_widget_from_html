@@ -74,19 +74,15 @@ class CssBorder {
   Border? getValue(TextStyleHtml tsh) {
     final bottom = CssBorderSide._copyWith(_all, _bottom)?._getValue(tsh);
     final left = CssBorderSide._copyWith(
-            _all,
-            _left ??
-                (tsh.textDirection == TextDirection.ltr
-                    ? _inlineStart
-                    : _inlineEnd))
-        ?._getValue(tsh);
+      _all,
+      _left ??
+          (tsh.textDirection == TextDirection.ltr ? _inlineStart : _inlineEnd),
+    )?._getValue(tsh);
     final right = CssBorderSide._copyWith(
-            _all,
-            _right ??
-                (tsh.textDirection == TextDirection.ltr
-                    ? _inlineEnd
-                    : _inlineStart))
-        ?._getValue(tsh);
+      _all,
+      _right ??
+          (tsh.textDirection == TextDirection.ltr ? _inlineEnd : _inlineStart),
+    )?._getValue(tsh);
     final top = CssBorderSide._copyWith(_all, _top)?._getValue(tsh);
     if (bottom == null && left == null && right == null && top == null) {
       return null;
@@ -156,8 +152,11 @@ class CssLength {
   bool get isPositive => number > 0.0;
 
   /// Calculates value in logical pixel.
-  double? getValue(TextStyleHtml tsh,
-      {double? baseValue, double? scaleFactor}) {
+  double? getValue(
+    TextStyleHtml tsh, {
+    double? baseValue,
+    double? scaleFactor,
+  }) {
     double value;
     var effectiveScaleFactor = scaleFactor ?? 1.0;
 

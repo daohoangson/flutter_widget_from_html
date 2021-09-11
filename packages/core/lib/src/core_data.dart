@@ -115,7 +115,9 @@ class BuildOp {
   ///
   /// Note: only works if it's a block element.
   final Iterable<Widget>? Function(
-      BuildMetadata meta, Iterable<WidgetPlaceholder> widgets)? onWidgets;
+    BuildMetadata meta,
+    Iterable<WidgetPlaceholder> widgets,
+  )? onWidgets;
 
   /// Controls whether the element should be forced to be rendered as block.
   ///

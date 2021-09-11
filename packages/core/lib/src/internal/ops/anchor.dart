@@ -54,11 +54,13 @@ class AnchorRegistry {
 
     final anchorContext = anchor.currentContext;
     if (anchorContext != null) {
-      return completer.complete(_ensureVisibleContext(
-        anchorContext,
-        curve: curve,
-        duration: duration,
-      ));
+      return completer.complete(
+        _ensureVisibleContext(
+          anchorContext,
+          curve: curve,
+          duration: duration,
+        ),
+      );
     }
 
     if (_bodyItemIndeces.isEmpty) return completer.complete(false);
@@ -90,16 +92,18 @@ class AnchorRegistry {
 
     if (!movedOk) return completer.complete(false);
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) => _ensureVisible(
-          id,
-          completer: completer,
-          curve: curve,
-          duration: duration,
-          jumpCurve: jumpCurve,
-          jumpDuration: jumpDuration,
-          prevMax: effectiveMax,
-          prevMin: effectiveMin,
-        ));
+    WidgetsBinding.instance?.addPostFrameCallback(
+      (_) => _ensureVisible(
+        id,
+        completer: completer,
+        curve: curve,
+        duration: duration,
+        jumpCurve: jumpCurve,
+        jumpDuration: jumpDuration,
+        prevMax: effectiveMax,
+        prevMin: effectiveMin,
+      ),
+    );
   }
 
   Future<bool> _ensureVisibleContext(

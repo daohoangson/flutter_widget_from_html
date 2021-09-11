@@ -24,8 +24,11 @@ class StyleBgColor {
 
           final color = _parseColor(wf, meta);
           if (color == null) return null;
-          return listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
-              (_, child) => wf.buildDecoratedBox(meta, child, color: color)));
+          return listOrNull(
+            wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
+                  (_, child) => wf.buildDecoratedBox(meta, child, color: color),
+                ),
+          );
         },
         onWidgetsIsOptional: true,
         priority: 6100,

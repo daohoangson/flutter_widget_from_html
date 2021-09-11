@@ -54,12 +54,15 @@ Future<void> main() async {
 ''';
     final str = await explain(tester, html);
     expect(
-        str,
-        equals('[Column:children='
-            '[CssBlock:child=[RichText:(:(+l+o+u:All decorations... )(:and none))]],'
-            '[CssBlock:child=[RichText:(:I​Like​Playing​football​​game)]],'
-            '[CssBlock:child=[RichText:(:\u00A0)]]'
-            ']'));
+      str,
+      equals(
+        '[Column:children='
+        '[CssBlock:child=[RichText:(:(+l+o+u:All decorations... )(:and none))]],'
+        '[CssBlock:child=[RichText:(:I​Like​Playing​football​​game)]],'
+        '[CssBlock:child=[RichText:(:\u00A0)]]'
+        ']',
+      ),
+    );
   });
 
   testWidgets('renders white spaces with parent style', (tester) async {
@@ -72,11 +75,14 @@ Future<void> main() async {
     const html = 'This is an <address>ADDRESS</address>';
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[Column:children='
-            '[RichText:(:This is an)],'
-            '[CssBlock:child=[RichText:(+i:ADDRESS)]]'
-            ']'));
+      explained,
+      equals(
+        '[Column:children='
+        '[RichText:(:This is an)],'
+        '[CssBlock:child=[RichText:(+i:ADDRESS)]]'
+        ']',
+      ),
+    );
   });
 
   group('BR', () {
@@ -121,12 +127,15 @@ Future<void> main() async {
       const html = '1<br /><img src="$src" />';
       final explained = await mockNetworkImages(() => explain(tester, html));
       expect(
-          explained,
-          equals('[RichText:(:'
-              '1\n'
-              '[CssSizing:$imgSizingConstraints,child='
-              '[Image:image=NetworkImage("$src", scale: 1.0)]'
-              '])]'));
+        explained,
+        equals(
+          '[RichText:(:'
+          '1\n'
+          '[CssSizing:$imgSizingConstraints,child='
+          '[Image:image=NetworkImage("$src", scale: 1.0)]'
+          '])]',
+        ),
+      );
     });
 
     testWidgets('renders new line between SPANs, 1 of 2', (tester) async {
@@ -145,67 +154,82 @@ Future<void> main() async {
       const html = '<span>1<br /></span><div>2</div>';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[Column:children='
-              '[RichText:(:1)],'
-              '[CssBlock:child=[RichText:(:2)]]'
-              ']'));
+        explained,
+        equals(
+          '[Column:children='
+          '[RichText:(:1)],'
+          '[CssBlock:child=[RichText:(:2)]]'
+          ']',
+        ),
+      );
     });
 
     testWidgets('skips new line between SPAN and DIV, 2 of 2', (tester) async {
       const html = '<span>1</span><br /><div>2</div>';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[Column:children='
-              '[RichText:(:1)],'
-              '[CssBlock:child=[RichText:(:2)]]'
-              ']'));
+        explained,
+        equals(
+          '[Column:children='
+          '[RichText:(:1)],'
+          '[CssBlock:child=[RichText:(:2)]]'
+          ']',
+        ),
+      );
     });
 
     testWidgets('renders new line between DIVs, 1 of 3', (tester) async {
       const html = '<div>1<br /></div><div>2</div>';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[Column:children='
-              '[CssBlock:child=[RichText:(:1)]],'
-              '[CssBlock:child=[RichText:(:2)]]'
-              ']'));
+        explained,
+        equals(
+          '[Column:children='
+          '[CssBlock:child=[RichText:(:1)]],'
+          '[CssBlock:child=[RichText:(:2)]]'
+          ']',
+        ),
+      );
     });
 
     testWidgets('renders new line between DIVs, 2 of 3', (tester) async {
       const html = '<div>1</div><br /><div>2</div>';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[Column:children='
-              '[CssBlock:child=[RichText:(:1)]],'
-              '[SizedBox:0.0x10.0],'
-              '[CssBlock:child=[RichText:(:2)]]'
-              ']'));
+        explained,
+        equals(
+          '[Column:children='
+          '[CssBlock:child=[RichText:(:1)]],'
+          '[SizedBox:0.0x10.0],'
+          '[CssBlock:child=[RichText:(:2)]]'
+          ']',
+        ),
+      );
     });
 
     testWidgets('renders new line between DIVs, 3 of 3', (tester) async {
       const html = '<div>1</div><br /><div>2</div>';
       final explained = await explain(tester, html, useExplainer: false);
       expect(
-          explained,
-          equals('TshWidget\n'
-              '└ColumnPlaceholder(BuildMetadata(<root></root>))\n'
-              ' └Column()\n'
-              '  ├WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
-              '  ││  "1"\n'
-              '  ││)\n'
-              '  │└CssBlock()\n'
-              '  │ └RichText(text: "1")\n'
-              '  ├HeightPlaceholder(1.0em)\n'
-              '  │└SizedBox(height: 10.0)\n'
-              '  └WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#2):\n'
-              '   │  "2"\n'
-              '   │)\n'
-              '   └CssBlock()\n'
-              '    └RichText(text: "2")\n\n'));
+        explained,
+        equals(
+          'TshWidget\n'
+          '└ColumnPlaceholder(BuildMetadata(<root></root>))\n'
+          ' └Column()\n'
+          '  ├WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+          '  ││  "1"\n'
+          '  ││)\n'
+          '  │└CssBlock()\n'
+          '  │ └RichText(text: "1")\n'
+          '  ├HeightPlaceholder(1.0em)\n'
+          '  │└SizedBox(height: 10.0)\n'
+          '  └WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#2):\n'
+          '   │  "2"\n'
+          '   │)\n'
+          '   └CssBlock()\n'
+          '    └RichText(text: "2")\n\n',
+        ),
+      );
     });
 
     testWidgets('renders without new line at bottom, 1 of 3', (tester) async {
@@ -231,22 +255,27 @@ Future<void> main() async {
     const html = '<dl><dt>Foo</dt><dd>Bar</dd></dl>';
     final explained = await explainMargin(tester, html);
     expect(
-        explained,
-        equals('[CssBlock:child=[Column:children='
-            '[CssBlock:child=[RichText:(+b:Foo)]],'
-            '[Padding:(0,0,0,40),child=[CssBlock:child=[RichText:(:Bar)]]]'
-            ']],'
-            '[SizedBox:0.0x10.0]'));
+      explained,
+      equals(
+        '[CssBlock:child=[Column:children='
+        '[CssBlock:child=[RichText:(+b:Foo)]],'
+        '[Padding:(0,0,0,40),child=[CssBlock:child=[RichText:(:Bar)]]]'
+        ']],'
+        '[SizedBox:0.0x10.0]',
+      ),
+    );
   });
 
   testWidgets('renders HR tag', (WidgetTester tester) async {
     const html = '<hr/>';
     final explained = await explainMargin(tester, html);
     expect(
-        explained,
-        equals(
-            '[CssBlock:child=[DecoratedBox:bg=#FF000000,child=[SizedBox:0.0x1.0]]],'
-            '[SizedBox:0.0x10.0]'));
+      explained,
+      equals(
+        '[CssBlock:child=[DecoratedBox:bg=#FF000000,child=[SizedBox:0.0x1.0]]],'
+        '[SizedBox:0.0x10.0]',
+      ),
+    );
   });
 
   group('block elements', () {
@@ -272,9 +301,11 @@ Future<void> main() async {
       final explained = await explainMargin(tester, html);
       expect(
         explained,
-        equals('[SizedBox:0.0x10.0],'
-            '[Padding:(0,40,0,40),child=[CssBlock:child=[RichText:(:Foo)]]],'
-            '[SizedBox:0.0x10.0]'),
+        equals(
+          '[SizedBox:0.0x10.0],'
+          '[Padding:(0,40,0,40),child=[CssBlock:child=[RichText:(:Foo)]]],'
+          '[SizedBox:0.0x10.0]',
+        ),
       );
     });
 
@@ -296,13 +327,16 @@ Future<void> main() async {
 ''';
         final explained = await explainMargin(tester, html);
         expect(
-            explained,
-            equals('[SizedBox:0.0x10.0],'
-                '[Padding:(0,40,0,40),child=[CssBlock:child=[Column:children='
-                '[CssSizing:$imgSizingConstraints,child=[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)]],'
-                '[CssBlock:child=[RichText:(:(+i:fig. 1)(: Foo))]]'
-                ']]],'
-                '[SizedBox:0.0x10.0]'));
+          explained,
+          equals(
+            '[SizedBox:0.0x10.0],'
+            '[Padding:(0,40,0,40),child=[CssBlock:child=[Column:children='
+            '[CssSizing:$imgSizingConstraints,child=[Image:image=NetworkImage("http://domain.com/image.png", scale: 1.0)]],'
+            '[CssBlock:child=[RichText:(:(+i:fig. 1)(: Foo))]]'
+            ']]],'
+            '[SizedBox:0.0x10.0]',
+          ),
+        );
       }),
     );
 
@@ -323,11 +357,13 @@ Future<void> main() async {
       final explained = await explainMargin(tester, html);
       expect(
         explained,
-        equals('[SizedBox:0.0x10.0],'
-            '[CssBlock:child=[RichText:(:First.)]],'
-            '[SizedBox:0.0x10.0],'
-            '[CssBlock:child=[RichText:(:Second one.)]],'
-            '[SizedBox:0.0x10.0]'),
+        equals(
+          '[SizedBox:0.0x10.0],'
+          '[CssBlock:child=[RichText:(:First.)]],'
+          '[SizedBox:0.0x10.0],'
+          '[CssBlock:child=[RichText:(:Second one.)]],'
+          '[SizedBox:0.0x10.0]',
+        ),
       );
     });
 
@@ -380,9 +416,12 @@ Future<void> main() async {
 </video>''';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[RichText:(:(+font=Courier+fonts=monospace:VIDEO)'
-              '(: support is not enabled.))]'));
+        explained,
+        equals(
+          '[RichText:(:(+font=Courier+fonts=monospace:VIDEO)'
+          '(: support is not enabled.))]',
+        ),
+      );
     });
   });
 
@@ -399,12 +438,15 @@ Future<void> main() async {
       const html = '<code>$php</code>';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[RichText:(:'
-              '(#FF0000BB+font=Courier+fonts=monospace:<?php phpinfo)'
-              '(#FF007700+font=Courier+fonts=monospace:(); )'
-              '(#FF0000BB+font=Courier+fonts=monospace:?>)'
-              ')]'));
+        explained,
+        equals(
+          '[RichText:(:'
+          '(#FF0000BB+font=Courier+fonts=monospace:<?php phpinfo)'
+          '(#FF007700+font=Courier+fonts=monospace:(); )'
+          '(#FF0000BB+font=Courier+fonts=monospace:?>)'
+          ')]',
+        ),
+      );
     });
 
     testWidgets('renders empty CODE tag', (WidgetTester tester) async {
@@ -423,14 +465,17 @@ Future<void> main() async {
       const html = '<pre>$php</pre>';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[CssBlock:child=[SingleChildScrollView:child=[RichText:'
-              '(+font=Courier+fonts=monospace:'
-              '(#FF0000BB:<?php\nphpinfo)'
-              '(#FF007700:();\n)'
-              '(#FF0000BB:?>)'
-              ')'
-              ']]]'));
+        explained,
+        equals(
+          '[CssBlock:child=[SingleChildScrollView:child=[RichText:'
+          '(+font=Courier+fonts=monospace:'
+          '(#FF0000BB:<?php\nphpinfo)'
+          '(#FF007700:();\n)'
+          '(#FF0000BB:?>)'
+          ')'
+          ']]]',
+        ),
+      );
     });
 
     testWidgets('renders SAMP tag', (WidgetTester tester) async {
@@ -442,8 +487,12 @@ Future<void> main() async {
     testWidgets('renders TT tag', (WidgetTester tester) async {
       const html = '<tt>Teletype</tt>';
       final explained = await explain(tester, html);
-      expect(explained,
-          equals('[RichText:(+font=Courier+fonts=monospace:Teletype)]'));
+      expect(
+        explained,
+        equals(
+          '[RichText:(+font=Courier+fonts=monospace:Teletype)]',
+        ),
+      );
     });
   });
 
@@ -452,60 +501,78 @@ Future<void> main() async {
       const html = '<h1>X</h1>';
       final explained = await explainMargin(tester, html);
       expect(
-          explained,
-          equals('[SizedBox:0.0x13.4],'
-              '[CssBlock:child=[RichText:(@20.0+b:X)]],'
-              '[SizedBox:0.0x13.4]'));
+        explained,
+        equals(
+          '[SizedBox:0.0x13.4],'
+          '[CssBlock:child=[RichText:(@20.0+b:X)]],'
+          '[SizedBox:0.0x13.4]',
+        ),
+      );
     });
 
     testWidgets('render H2 tag', (WidgetTester tester) async {
       const html = '<h2>X</h2>';
       final explained = await explainMargin(tester, html);
       expect(
-          explained,
-          equals('[SizedBox:0.0x12.4],'
-              '[CssBlock:child=[RichText:(@15.0+b:X)]],'
-              '[SizedBox:0.0x12.4]'));
+        explained,
+        equals(
+          '[SizedBox:0.0x12.4],'
+          '[CssBlock:child=[RichText:(@15.0+b:X)]],'
+          '[SizedBox:0.0x12.4]',
+        ),
+      );
     });
 
     testWidgets('render H3 tag', (WidgetTester tester) async {
       const html = '<h3>X</h3>';
       final explained = await explainMargin(tester, html);
       expect(
-          explained,
-          equals('[SizedBox:0.0x11.7],'
-              '[CssBlock:child=[RichText:(@11.7+b:X)]],'
-              '[SizedBox:0.0x11.7]'));
+        explained,
+        equals(
+          '[SizedBox:0.0x11.7],'
+          '[CssBlock:child=[RichText:(@11.7+b:X)]],'
+          '[SizedBox:0.0x11.7]',
+        ),
+      );
     });
 
     testWidgets('render H4 tag', (WidgetTester tester) async {
       const html = '<h4>X</h4>';
       final explained = await explainMargin(tester, html);
       expect(
-          explained,
-          equals('[SizedBox:0.0x13.3],'
-              '[CssBlock:child=[RichText:(+b:X)]],'
-              '[SizedBox:0.0x13.3]'));
+        explained,
+        equals(
+          '[SizedBox:0.0x13.3],'
+          '[CssBlock:child=[RichText:(+b:X)]],'
+          '[SizedBox:0.0x13.3]',
+        ),
+      );
     });
 
     testWidgets('render H5 tag', (WidgetTester tester) async {
       const html = '<h5>X</h5>';
       final explained = await explainMargin(tester, html);
       expect(
-          explained,
-          equals('[SizedBox:0.0x13.9],'
-              '[CssBlock:child=[RichText:(@8.3+b:X)]],'
-              '[SizedBox:0.0x13.9]'));
+        explained,
+        equals(
+          '[SizedBox:0.0x13.9],'
+          '[CssBlock:child=[RichText:(@8.3+b:X)]],'
+          '[SizedBox:0.0x13.9]',
+        ),
+      );
     });
 
     testWidgets('render H6 tag', (WidgetTester tester) async {
       const html = '<h6>X</h6>';
       final explained = await explainMargin(tester, html);
       expect(
-          explained,
-          equals('[SizedBox:0.0x15.6],'
-              '[CssBlock:child=[RichText:(@6.7+b:X)]],'
-              '[SizedBox:0.0x15.6]'));
+        explained,
+        equals(
+          '[SizedBox:0.0x15.6],'
+          '[CssBlock:child=[RichText:(@6.7+b:X)]],'
+          '[SizedBox:0.0x15.6]',
+        ),
+      );
     });
   });
 
@@ -520,10 +587,13 @@ Future<void> main() async {
       const html = '<div style="background-color: #f00">Foo</div>';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[CssBlock:child='
-              '[DecoratedBox:bg=#FFFF0000,child='
-              '[RichText:(:Foo)]]]'));
+        explained,
+        equals(
+          '[CssBlock:child='
+          '[DecoratedBox:bg=#FFFF0000,child='
+          '[RichText:(:Foo)]]]',
+        ),
+      );
     });
 
     testWidgets('renders with margins and paddings', (tester) async {
@@ -531,25 +601,30 @@ Future<void> main() async {
           'margin: 1px; padding: 2px">Foo</div>';
       final explained = await explainMargin(tester, html);
       expect(
-          explained,
-          equals('[SizedBox:0.0x1.0],'
-              '[Padding:(0,1,0,1),child='
-              '[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child='
-              '[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]'
-              ']],[SizedBox:0.0x1.0]'));
+        explained,
+        equals(
+          '[SizedBox:0.0x1.0],'
+          '[Padding:(0,1,0,1),child='
+          '[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child='
+          '[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]'
+          ']],[SizedBox:0.0x1.0]',
+        ),
+      );
     });
 
     testWidgets('renders blocks', (WidgetTester tester) async {
       const h = '<div style="background-color: #f00"><p>A</p><p>B</p></div>';
       final explained = await explain(tester, h);
       expect(
-          explained,
-          equals(
-              '[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child=[Column:children='
-              '[CssBlock:child=[RichText:(:A)]],'
-              '[SizedBox:0.0x10.0],'
-              '[CssBlock:child=[RichText:(:B)]]'
-              ']]]'));
+        explained,
+        equals(
+          '[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child=[Column:children='
+          '[CssBlock:child=[RichText:(:A)]],'
+          '[SizedBox:0.0x10.0],'
+          '[CssBlock:child=[RichText:(:B)]]'
+          ']]]',
+        ),
+      );
     });
 
     testWidgets('renders inline', (WidgetTester tester) async {
@@ -583,8 +658,12 @@ Future<void> main() async {
           '<span style="color: #ff0; background-color:#00f;">Foo</span>'
           '<span style="color: #f00;">bar</span>';
       final explained = await explain(tester, html);
-      expect(explained,
-          equals('[RichText:(:(bg=#FF0000FF#FFFFFF00:Foo)(#FFFF0000:bar))]'));
+      expect(
+        explained,
+        equals(
+          '[RichText:(:(bg=#FF0000FF#FFFFFF00:Foo)(#FFFF0000:bar))]',
+        ),
+      );
     });
   });
 
@@ -596,9 +675,12 @@ Future<void> main() async {
           '<span style="color: #00FF0080">green 50%</span>';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[RichText:(:(#FFFF0000:red)(#88FF0000:red 53%)'
-              '(#FF00FF00:green)(#8000FF00:green 50%))]'));
+        explained,
+        equals(
+          '[RichText:(:(#FFFF0000:red)(#88FF0000:red 53%)'
+          '(#FF00FF00:green)(#8000FF00:green 50%))]',
+        ),
+      );
     });
 
     testWidgets('renders overlaps', (WidgetTester tester) async {
@@ -606,9 +688,12 @@ Future<void> main() async {
           '<span style="color: #00FF00">green</span> red again</span>';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[RichText:(:(#FFFF0000:red )'
-              '(#FF00FF00:green)(#FFFF0000: red again))]'));
+        explained,
+        equals(
+          '[RichText:(:(#FFFF0000:red )'
+          '(#FF00FF00:green)(#FFFF0000: red again))]',
+        ),
+      );
     });
 
     group('hsl/a', () {
@@ -831,24 +916,30 @@ Future<void> main() async {
       const html = '<div>1 <span style="display: block">2</span></div>';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[CssBlock:child='
-              '[Column:children='
-              '[RichText:(:1)],'
-              '[CssBlock:child=[RichText:(:2)]]'
-              ']]'));
+        explained,
+        equals(
+          '[CssBlock:child='
+          '[Column:children='
+          '[RichText:(:1)],'
+          '[CssBlock:child=[RichText:(:2)]]'
+          ']]',
+        ),
+      );
     });
 
     testWidgets('renders DIV block by default', (WidgetTester tester) async {
       const html = '<div>1 <div>2</div></div>';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[CssBlock:child='
-              '[Column:children='
-              '[RichText:(:1)],'
-              '[CssBlock:child=[RichText:(:2)]]'
-              ']]'));
+        explained,
+        equals(
+          '[CssBlock:child='
+          '[Column:children='
+          '[RichText:(:1)],'
+          '[CssBlock:child=[RichText:(:2)]]'
+          ']]',
+        ),
+      );
     });
 
     testWidgets('renders display: inline', (WidgetTester tester) async {
@@ -878,11 +969,14 @@ Future<void> main() async {
           const html = 'Foo <img src="$src" />';
           final explained = await explain(tester, html);
           expect(
-              explained,
-              equals('[RichText:(:Foo '
-                  '[CssSizing:$imgSizingConstraints,child='
-                  '[Image:image=NetworkImage("$src", scale: 1.0)]'
-                  '])]'));
+            explained,
+            equals(
+              '[RichText:(:Foo '
+              '[CssSizing:$imgSizingConstraints,child='
+              '[Image:image=NetworkImage("$src", scale: 1.0)]'
+              '])]',
+            ),
+          );
         }),
       );
 
@@ -892,11 +986,14 @@ Future<void> main() async {
           const html = 'Foo <img src="$src" style="display: block" />';
           final explained = await explain(tester, html);
           expect(
-              explained,
-              equals('[Column:children='
-                  '[RichText:(:Foo)],'
-                  '[CssSizing:$imgSizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
-                  ']'));
+            explained,
+            equals(
+              '[Column:children='
+              '[RichText:(:Foo)],'
+              '[CssSizing:$imgSizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
+              ']',
+            ),
+          );
         }),
       );
 
@@ -906,12 +1003,14 @@ Future<void> main() async {
           const html = '<img src="$src" width="1" height="1" />';
           final explained = await explain(tester, html);
           expect(
-              explained,
-              equals(
-                  '[CssSizing:height≥0.0,height=1.0,width≥0.0,width=1.0,child='
-                  '[AspectRatio:aspectRatio=1.0,child='
-                  '[Image:image=NetworkImage("$src", scale: 1.0)]'
-                  ']]'));
+            explained,
+            equals(
+              '[CssSizing:height≥0.0,height=1.0,width≥0.0,width=1.0,child='
+              '[AspectRatio:aspectRatio=1.0,child='
+              '[Image:image=NetworkImage("$src", scale: 1.0)]'
+              ']]',
+            ),
+          );
         }),
       );
 
@@ -922,12 +1021,14 @@ Future<void> main() async {
               'height="1" style="display: block" />';
           final explained = await explain(tester, html);
           expect(
-              explained,
-              equals(
-                  '[CssSizing:height≥0.0,height=1.0,width≥0.0,width=1.0,child='
-                  '[AspectRatio:aspectRatio=1.0,child='
-                  '[Image:image=NetworkImage("$src", scale: 1.0)]'
-                  ']]'));
+            explained,
+            equals(
+              '[CssSizing:height≥0.0,height=1.0,width≥0.0,width=1.0,child='
+              '[AspectRatio:aspectRatio=1.0,child='
+              '[Image:image=NetworkImage("$src", scale: 1.0)]'
+              ']]',
+            ),
+          );
         }),
       );
     });
@@ -1301,10 +1402,12 @@ Future<void> main() async {
 ''';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals(
-              '[RichText:(:(+b:bold)(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: )(:four)(: )'
-              '(+w4:five)(: )(+w5:six)(: )(+b:seven)(: )(+w7:eight)(: )(+w8:nine))]'));
+        explained,
+        equals(
+          '[RichText:(:(+b:bold)(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: )(:four)(: )'
+          '(+w4:five)(: )(+w5:six)(: )(+b:seven)(: )(+w7:eight)(: )(+w8:nine))]',
+        ),
+      );
     });
   });
 
@@ -1382,8 +1485,12 @@ Future<void> main() async {
     testWidgets('renders ellipsis', (WidgetTester tester) async {
       const html = '<div style="text-overflow: ellipsis">Foo</div>';
       final explained = await explain(tester, html);
-      expect(explained,
-          equals('[CssBlock:child=[RichText:overflow=ellipsis,(:Foo)]]'));
+      expect(
+        explained,
+        equals(
+          '[CssBlock:child=[RichText:overflow=ellipsis,(:Foo)]]',
+        ),
+      );
     });
 
     group('max-lines', () {
@@ -1416,9 +1523,11 @@ Future<void> main() async {
             '<div style="max-lines: 2; text-overflow: ellipsis">Foo</div>';
         final explained = await explain(tester, html);
         expect(
-            explained,
-            equals(
-                '[CssBlock:child=[RichText:maxLines=2,overflow=ellipsis,(:Foo)]]'));
+          explained,
+          equals(
+            '[CssBlock:child=[RichText:maxLines=2,overflow=ellipsis,(:Foo)]]',
+          ),
+        );
       });
     });
   });
@@ -1441,18 +1550,24 @@ Future<void> main() async {
         const html = '<pre>Foo\nbar</pre>';
         final explained = await explain(tester, html);
         expect(
-            explained,
-            equals('[CssBlock:child=[SingleChildScrollView:child='
-                '[RichText:(+font=Courier+fonts=monospace:Foo\nbar)]]]'));
+          explained,
+          equals(
+            '[CssBlock:child=[SingleChildScrollView:child='
+            '[RichText:(+font=Courier+fonts=monospace:Foo\nbar)]]]',
+          ),
+        );
       });
 
       testWidgets('renders normal', (tester) async {
         const html = '<pre style="white-space: normal">Foo\nbar</pre>';
         final explained = await explain(tester, html);
         expect(
-            explained,
-            equals('[CssBlock:child=[SingleChildScrollView:child='
-                '[RichText:(+font=Courier+fonts=monospace:Foo bar)]]]'));
+          explained,
+          equals(
+            '[CssBlock:child=[SingleChildScrollView:child='
+            '[RichText:(+font=Courier+fonts=monospace:Foo bar)]]]',
+          ),
+        );
       });
     });
   });

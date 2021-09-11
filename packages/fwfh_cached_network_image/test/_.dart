@@ -56,11 +56,13 @@ class _WidgetFactory extends WidgetFactory with CachedNetworkImageFactory {
     final manager = _MockCacheManager();
     final ttl = DateTime.now().add(const Duration(days: 1));
 
-    when(() => manager.getFileStream(
-          any(),
-          headers: any(named: 'headers'),
-          withProgress: any(named: 'withProgress'),
-        )).thenAnswer((invocation) async* {
+    when(
+      () => manager.getFileStream(
+        any(),
+        headers: any(named: 'headers'),
+        withProgress: any(named: 'withProgress'),
+      ),
+    ).thenAnswer((invocation) async* {
       final url = invocation.positionalArguments[0] as String;
       final uri = Uri.parse(url);
       final fileName = uri.pathSegments.last;

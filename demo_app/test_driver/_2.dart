@@ -19,12 +19,11 @@ class AspectRatioTester extends StatelessWidget {
         child: ListView(
           children: <Widget>[
             Builder(
-                builder: (context) => Text(
-                      Provider.of<_AspectRatioTestResult>(context)
-                          .value
-                          .toString(),
-                      key: const ValueKey(kResultKey),
-                    )),
+              builder: (context) => Text(
+                Provider.of<_AspectRatioTestResult>(context).value.toString(),
+                key: const ValueKey(kResultKey),
+              ),
+            ),
             CustomSingleChildLayout(
               delegate: _AspectRatioTestDelegate(_result),
               child: child,

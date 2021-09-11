@@ -145,8 +145,11 @@ class _GoldensState extends State<GoldensScreen> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        onTap: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (_) => Golden(golden.key, golden.value))),
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => Golden(golden.key, golden.value),
+          ),
+        ),
       );
 
   Widget _onData(List<MapEntry<String, String>> goldens) => Column(
@@ -184,9 +187,11 @@ class _GoldensState extends State<GoldensScreen> {
 
     final lowerCased = query.toLowerCase();
     final goldens = await _goldens;
-    setState(() => _filtered = goldens
-        .where((golden) => golden.key.toLowerCase().contains(lowerCased))
-        .toList());
+    setState(
+      () => _filtered = goldens
+          .where((golden) => golden.key.toLowerCase().contains(lowerCased))
+          .toList(),
+    );
   }
 
   Widget _onLoading() => const Center(child: CircularProgressIndicator());

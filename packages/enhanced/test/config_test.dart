@@ -15,8 +15,11 @@ Future<String> explain(WidgetTester t, HtmlWidget hw) =>
 
 void main() {
   group('buildAsync', () {
-    Future<String?> explain(WidgetTester tester, String html,
-            {bool? buildAsync}) =>
+    Future<String?> explain(
+      WidgetTester tester,
+      String html, {
+      bool? buildAsync,
+    }) =>
         helper.explain(
           tester,
           null,
@@ -70,18 +73,21 @@ void main() {
       bool webView = false,
       bool webViewJs = true,
     }) =>
-        helper.explain(tester, null,
-            hw: HtmlWidget(
-              html,
-              baseUrl: baseUrl,
-              buildAsync: buildAsync,
-              enableCaching: enableCaching,
-              key: helper.hwKey,
-              rebuildTriggers: rebuildTriggers,
-              textStyle: textStyle ?? const TextStyle(),
-              webView: webView,
-              webViewJs: webViewJs,
-            ));
+        helper.explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            html,
+            baseUrl: baseUrl,
+            buildAsync: buildAsync,
+            enableCaching: enableCaching,
+            key: helper.hwKey,
+            rebuildTriggers: rebuildTriggers,
+            textStyle: textStyle ?? const TextStyle(),
+            webView: webView,
+            webViewJs: webViewJs,
+          ),
+        );
 
     void _expect(Widget? built1, Widget? built2, Matcher matcher) {
       final widget1 = (built1! as TshWidget).child;
@@ -297,11 +303,14 @@ void main() {
       final explained =
           await explain(tester, HtmlWidget(html, key: helper.hwKey));
       expect(
-          explained,
-          equals('[Column:children='
-              '[RichText:(:Foo)],'
-              '[VideoPlayer:url=http://domain.com/video.mp4,aspectRatio=2.33,autoResize=false]'
-              ']'));
+        explained,
+        equals(
+          '[Column:children='
+          '[RichText:(:Foo)],'
+          '[VideoPlayer:url=http://domain.com/video.mp4,aspectRatio=2.33,autoResize=false]'
+          ']',
+        ),
+      );
     });
 
     testWidgets('renders with value', (WidgetTester tester) async {
@@ -322,19 +331,26 @@ void main() {
       WidgetTester tester, {
       OnErrorBuilder? onErrorBuilder,
     }) async {
-      await runZonedGuarded(() async {
-        await helper.explain(tester, null,
+      await runZonedGuarded(
+        () async {
+          await helper.explain(
+            tester,
+            null,
             hw: HtmlWidget(
               'Foo <span class="throw">bar</span>.',
               buildAsync: true,
               factoryBuilder: () => _OnErrorBuilderFactory(),
               key: helper.hwKey,
               onErrorBuilder: onErrorBuilder,
-            ));
+            ),
+          );
 
-        await tester.runAsync(() => Future.delayed(const Duration(seconds: 1)));
-        await tester.pump();
-      }, (_, __) {});
+          await tester
+              .runAsync(() => Future.delayed(const Duration(seconds: 1)));
+          await tester.pump();
+        },
+        (_, __) {},
+      );
 
       return helper.explainWithoutPumping(useExplainer: false);
     }
@@ -345,8 +361,10 @@ void main() {
     });
 
     testWidgets('renders custom', (tester) async {
-      final explained = await explain(tester,
-          onErrorBuilder: (_, __, ___) => const Text('Custom'));
+      final explained = await explain(
+        tester,
+        onErrorBuilder: (_, __, ___) => const Text('Custom'),
+      );
       expect(explained, contains('RichText(text: "Custom")'));
     });
   });
@@ -356,14 +374,17 @@ void main() {
       WidgetTester tester, {
       OnLoadingBuilder? onLoadingBuilder,
     }) =>
-        helper.explain(tester, null,
-            hw: HtmlWidget(
-              'Foo',
-              buildAsync: true,
-              key: helper.hwKey,
-              onLoadingBuilder: onLoadingBuilder,
-            ),
-            useExplainer: false);
+        helper.explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            'Foo',
+            buildAsync: true,
+            key: helper.hwKey,
+            onLoadingBuilder: onLoadingBuilder,
+          ),
+          useExplainer: false,
+        );
 
     testWidgets('renders CircularProgressIndicator', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
@@ -399,10 +420,13 @@ void main() {
 
       await explain(
         tester,
-        HtmlWidget('<a href="$href">Tap me</a>', onTapUrl: (url) {
-          urls.add(url);
-          return false;
-        }),
+        HtmlWidget(
+          '<a href="$href">Tap me</a>',
+          onTapUrl: (url) {
+            urls.add(url);
+            return false;
+          },
+        ),
       );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
@@ -417,10 +441,13 @@ void main() {
 
       await explain(
         tester,
-        HtmlWidget('<a href="$href">Tap me</a>', onTapUrl: (url) {
-          urls.add(url);
-          return true;
-        }),
+        HtmlWidget(
+          '<a href="$href">Tap me</a>',
+          onTapUrl: (url) {
+            urls.add(url);
+            return true;
+          },
+        ),
       );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
@@ -435,10 +462,13 @@ void main() {
 
       await explain(
         tester,
-        HtmlWidget('<a href="$href">Tap me</a>', onTapUrl: (url) async {
-          urls.add(url);
-          return false;
-        }),
+        HtmlWidget(
+          '<a href="$href">Tap me</a>',
+          onTapUrl: (url) async {
+            urls.add(url);
+            return false;
+          },
+        ),
       );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
@@ -453,10 +483,13 @@ void main() {
 
       await explain(
         tester,
-        HtmlWidget('<a href="$href">Tap me</a>', onTapUrl: (url) async {
-          urls.add(url);
-          return true;
-        }),
+        HtmlWidget(
+          '<a href="$href">Tap me</a>',
+          onTapUrl: (url) async {
+            urls.add(url);
+            return true;
+          },
+        ),
       );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
@@ -552,39 +585,47 @@ void main() {
 
     testWidgets('renders true value', (WidgetTester tester) async {
       final explained = await explain(
-          tester,
-          HtmlWidget(
-            html,
-            key: helper.hwKey,
-            webView: true,
-          ));
+        tester,
+        HtmlWidget(
+          html,
+          key: helper.hwKey,
+          webView: true,
+        ),
+      );
       expect(
-          explained,
-          equals('[WebView:'
-              'url=$webViewSrc,'
-              'aspectRatio=$webViewDefaultAspectRatio,'
-              'autoResize=true'
-              ']'));
+        explained,
+        equals(
+          '[WebView:'
+          'url=$webViewSrc,'
+          'aspectRatio=$webViewDefaultAspectRatio,'
+          'autoResize=true'
+          ']',
+        ),
+      );
     });
 
     group('webViewDebuggingEnabled', () {
       testWidgets('renders true value', (WidgetTester tester) async {
         final explained = await explain(
-            tester,
-            HtmlWidget(
-              html,
-              key: helper.hwKey,
-              webView: true,
-              webViewDebuggingEnabled: true,
-            ));
+          tester,
+          HtmlWidget(
+            html,
+            key: helper.hwKey,
+            webView: true,
+            webViewDebuggingEnabled: true,
+          ),
+        );
         expect(
-            explained,
-            equals('[WebView:'
-                'url=$webViewSrc,'
-                'aspectRatio=$webViewDefaultAspectRatio,'
-                'autoResize=true,'
-                'debuggingEnabled=true'
-                ']'));
+          explained,
+          equals(
+            '[WebView:'
+            'url=$webViewSrc,'
+            'aspectRatio=$webViewDefaultAspectRatio,'
+            'autoResize=true,'
+            'debuggingEnabled=true'
+            ']',
+          ),
+        );
       });
 
       testWidgets('renders false value', (WidgetTester tester) async {
@@ -593,12 +634,15 @@ void main() {
           HtmlWidget(html, key: helper.hwKey, webView: true),
         );
         expect(
-            explained,
-            equals('[WebView:'
-                'url=$webViewSrc,'
-                'aspectRatio=$webViewDefaultAspectRatio,'
-                'autoResize=true'
-                ']'));
+          explained,
+          equals(
+            '[WebView:'
+            'url=$webViewSrc,'
+            'aspectRatio=$webViewDefaultAspectRatio,'
+            'autoResize=true'
+            ']',
+          ),
+        );
       });
     });
 
@@ -609,51 +653,62 @@ void main() {
           HtmlWidget(html, key: helper.hwKey, webView: true),
         );
         expect(
-            explained,
-            equals('[WebView:'
-                'url=$webViewSrc,'
-                'aspectRatio=$webViewDefaultAspectRatio,'
-                'autoResize=true'
-                ']'));
+          explained,
+          equals(
+            '[WebView:'
+            'url=$webViewSrc,'
+            'aspectRatio=$webViewDefaultAspectRatio,'
+            'autoResize=true'
+            ']',
+          ),
+        );
       });
 
       testWidgets('renders false value', (WidgetTester tester) async {
         final explained = await explain(
-            tester,
-            HtmlWidget(
-              html,
-              key: helper.hwKey,
-              webView: true,
-              webViewJs: false,
-            ));
+          tester,
+          HtmlWidget(
+            html,
+            key: helper.hwKey,
+            webView: true,
+            webViewJs: false,
+          ),
+        );
         expect(
-            explained,
-            equals('[WebView:'
-                'url=$webViewSrc,'
-                'aspectRatio=$webViewDefaultAspectRatio,'
-                'js=false'
-                ']'));
+          explained,
+          equals(
+            '[WebView:'
+            'url=$webViewSrc,'
+            'aspectRatio=$webViewDefaultAspectRatio,'
+            'js=false'
+            ']',
+          ),
+        );
       });
     });
 
     group('webViewMediaPlaybackAlwaysAllow', () {
       testWidgets('renders true value', (WidgetTester tester) async {
         final explained = await explain(
-            tester,
-            HtmlWidget(
-              html,
-              key: helper.hwKey,
-              webView: true,
-              webViewMediaPlaybackAlwaysAllow: true,
-            ));
+          tester,
+          HtmlWidget(
+            html,
+            key: helper.hwKey,
+            webView: true,
+            webViewMediaPlaybackAlwaysAllow: true,
+          ),
+        );
         expect(
-            explained,
-            equals('[WebView:'
-                'url=$webViewSrc,'
-                'aspectRatio=$webViewDefaultAspectRatio,'
-                'autoResize=true,'
-                'mediaPlaybackAlwaysAllow=true'
-                ']'));
+          explained,
+          equals(
+            '[WebView:'
+            'url=$webViewSrc,'
+            'aspectRatio=$webViewDefaultAspectRatio,'
+            'autoResize=true,'
+            'mediaPlaybackAlwaysAllow=true'
+            ']',
+          ),
+        );
       });
 
       testWidgets('renders false value', (WidgetTester tester) async {
@@ -662,33 +717,40 @@ void main() {
           HtmlWidget(html, key: helper.hwKey, webView: true),
         );
         expect(
-            explained,
-            equals('[WebView:'
-                'url=$webViewSrc,'
-                'aspectRatio=$webViewDefaultAspectRatio,'
-                'autoResize=true'
-                ']'));
+          explained,
+          equals(
+            '[WebView:'
+            'url=$webViewSrc,'
+            'aspectRatio=$webViewDefaultAspectRatio,'
+            'autoResize=true'
+            ']',
+          ),
+        );
       });
     });
 
     group('webViewUserAgent', () {
       testWidgets('renders string', (WidgetTester tester) async {
         final explained = await explain(
-            tester,
-            HtmlWidget(
-              html,
-              key: helper.hwKey,
-              webView: true,
-              webViewUserAgent: 'Foo',
-            ));
+          tester,
+          HtmlWidget(
+            html,
+            key: helper.hwKey,
+            webView: true,
+            webViewUserAgent: 'Foo',
+          ),
+        );
         expect(
-            explained,
-            equals('[WebView:'
-                'url=$webViewSrc,'
-                'aspectRatio=$webViewDefaultAspectRatio,'
-                'autoResize=true,'
-                'userAgent=Foo'
-                ']'));
+          explained,
+          equals(
+            '[WebView:'
+            'url=$webViewSrc,'
+            'aspectRatio=$webViewDefaultAspectRatio,'
+            'autoResize=true,'
+            'userAgent=Foo'
+            ']',
+          ),
+        );
       });
 
       testWidgets('renders null value', (WidgetTester tester) async {
@@ -697,12 +759,15 @@ void main() {
           HtmlWidget(html, key: helper.hwKey, webView: true),
         );
         expect(
-            explained,
-            equals('[WebView:'
-                'url=$webViewSrc,'
-                'aspectRatio=$webViewDefaultAspectRatio,'
-                'autoResize=true'
-                ']'));
+          explained,
+          equals(
+            '[WebView:'
+            'url=$webViewSrc,'
+            'aspectRatio=$webViewDefaultAspectRatio,'
+            'autoResize=true'
+            ']',
+          ),
+        );
       });
     });
   });

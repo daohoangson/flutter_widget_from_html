@@ -48,11 +48,13 @@ class HomeScreen extends StatelessWidget {
         ),
         body: ListView(
           children: _screens.keys
-              .map((title) => ListTile(
-                    title: Text(title),
-                    onTap: () => Navigator.pushNamed(
-                        context, _routeNameFromTitle(title)),
-                  ))
+              .map(
+                (title) => ListTile(
+                  title: Text(title),
+                  onTap: () =>
+                      Navigator.pushNamed(context, _routeNameFromTitle(title)),
+                ),
+              )
               .toList(growable: false),
         ),
       );

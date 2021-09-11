@@ -16,7 +16,9 @@ CssLength? tryParseCssLength(css.Expression expression) {
       if (expression.number == 0) return const CssLength(0);
     } else if (expression is css.PercentageTerm) {
       return CssLength(
-          (expression.value as num).toDouble(), CssLengthUnit.percentage);
+        (expression.value as num).toDouble(),
+        CssLengthUnit.percentage,
+      );
     }
 
     switch (expression.valueAsString) {
