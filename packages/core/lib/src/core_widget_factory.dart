@@ -589,8 +589,8 @@ class WidgetFactory {
         meta.register(_tagA!);
 
         meta.tsb.enqueue(_tagAColor ??= (tsh, _) => tsh.copyWith(
-            style: tsh.style
-                .copyWith(color: tsh.getDependency<ThemeData>().accentColor)));
+            style: tsh.style.copyWith(
+                color: tsh.getDependency<ThemeData>().colorScheme.primary)));
 
         final name = attrs[kAttributeAName];
         if (name != null) meta.register(_anchorOp(name));

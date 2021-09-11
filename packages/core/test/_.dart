@@ -6,7 +6,7 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
 
 const kColor = Color(0xFF001234);
-const kColorAccent = Color(0xFF123456);
+const kColorPrimary = Color(0xFF123456);
 
 // https://stackoverflow.com/questions/6018611/smallest-data-uri-image-possible-for-a-transparent-image
 const kDataBase64 = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -40,9 +40,13 @@ Future<String> explain(
     textStyle: textStyle,
   );
 
+  final ThemeData theme = ThemeData();
+
   await tester.pumpWidget(
     MaterialApp(
-      theme: ThemeData(accentColor: kColorAccent),
+      theme: theme.copyWith(
+        colorScheme: theme.colorScheme.copyWith(primary: kColorPrimary),
+      ),
       home: Scaffold(
         body: ExcludeSemantics(
           // exclude semantics for faster run but mostly because of this bug
