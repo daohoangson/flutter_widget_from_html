@@ -30,6 +30,17 @@ dependencies:
   flutter_widget_from_html: ^0.7.0
 ```
 
+### Platform specific configuration
+
+#### iOS
+
+This package uses `just_audio` to play audio and this dependency uses a microphone API.
+By default, the App Store requires a usage description which can be skipped by editing your `ios/Podfile`.
+See the detailed instruction on [its pub.dev page](https://pub.dev/packages/just_audio#ios).
+
+If you don't need `AUDIO` tag support (e.g. your HTML never has that tag), it may be better to switch to
+the core package and use it with a subset of the mixins. See [Extensibility](https://pub.dev/packages/flutter_widget_from_html_core#extensibility) for more details.
+
 ## Usage
 
 Then you have to import the package with:
