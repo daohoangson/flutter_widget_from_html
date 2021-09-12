@@ -147,7 +147,11 @@ These tags and their contents will be ignored:
 - padding and padding-xxx: values in `em`, `pt` and `px`
 - vertical-align: baseline/top/bottom/middle/sub/super
 - text-align (similar to `align` attribute)
-- text-decoration: line-through/none/overline/underline
+- text-decoration
+  - text-decoration-color
+  - text-decoration-line: line-through/none/overline/underline
+  - text-decoration-style: dotted/dashed/double/solid
+  - text-decoration-thickness, text-decoration-width: values in `%` only
 - text-overflow: clip/ellipsis. Note: `text-overflow: ellipsis` should be used in conjuntion with `max-lines` or `-webkit-line-clamp` for better result.
 - white-space: normal/pre
 - Sizing (width, height, max-xxx, min-xxx): `auto` or values in `em`, `%`, `pt` and `px`
