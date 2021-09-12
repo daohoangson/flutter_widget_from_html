@@ -148,6 +148,7 @@ void main() {
       _commands.clear();
 
       await tester.tap(find.byType(Slider));
+      await tester.runAsync(() => Future.delayed(Duration.zero));
       await tester.pumpAndSettle();
       expect(find.text('0:50 / 1:40'), findsOneWidget);
       expect(_commands, equals([Tuple2(_CommandType.seek, _duration * .5)]));
@@ -174,6 +175,7 @@ void main() {
         _commands.clear();
 
         await tester.tap(find.byIcon(iconOn));
+        await tester.runAsync(() => Future.delayed(Duration.zero));
         await tester.pumpAndSettle();
 
         expect(_commands, equals(const [Tuple2(_CommandType.setVolume, 0.0)]));
@@ -193,10 +195,12 @@ void main() {
           ),
         );
 
+        await tester.runAsync(() => Future.delayed(Duration.zero));
         await tester.pumpAndSettle();
         _commands.clear();
 
         await tester.tap(find.byIcon(iconOff));
+        await tester.runAsync(() => Future.delayed(Duration.zero));
         await tester.pumpAndSettle();
 
         expect(_commands, equals(const [Tuple2(_CommandType.setVolume, 1.0)]));
