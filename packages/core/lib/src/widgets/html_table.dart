@@ -43,10 +43,14 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties.add(DiagnosticsProperty('border', border, defaultValue: null));
-    properties.add(FlagProperty('borderCollapse',
+    properties.add(
+      FlagProperty(
+        'borderCollapse',
         value: borderCollapse,
         defaultValue: false,
-        ifTrue: 'borderCollapse: true'));
+        ifTrue: 'borderCollapse: true',
+      ),
+    );
     properties
         .add(DoubleProperty('borderSpacing', borderSpacing, defaultValue: 0.0));
   }
@@ -176,7 +180,9 @@ class HtmlTableValignBaseline extends SingleChildRenderObjectWidget {
 
   @override
   void updateRenderObject(
-      BuildContext _, _ValignBaselineRenderObject renderObject) {
+    BuildContext _,
+    _ValignBaselineRenderObject renderObject,
+  ) {
     renderObject
       ..companion = companion
       ..row = row;
@@ -323,9 +329,14 @@ class _TableRenderObject extends RenderBox
     assert(_calculatedHeight != null);
     assert(_calculatedWidth != null);
     _border?.paint(
-        context.canvas,
-        Rect.fromLTWH(offset.dx, offset.dy, _calculatedWidth ?? 0.0,
-            _calculatedHeight ?? 0.0));
+      context.canvas,
+      Rect.fromLTWH(
+        offset.dx,
+        offset.dy,
+        _calculatedWidth ?? 0.0,
+        _calculatedHeight ?? 0.0,
+      ),
+    );
 
     var child = firstChild;
     while (child != null) {
@@ -366,11 +377,12 @@ class _TableRenderObject extends RenderBox
   }
 
   static Size _performLayout(
-      final _TableRenderObject tro,
-      final RenderBox firstChild,
-      final BoxConstraints constraints,
-      final Size Function(RenderBox renderBox, BoxConstraints constraints)
-          layouter) {
+    final _TableRenderObject tro,
+    final RenderBox firstChild,
+    final BoxConstraints constraints,
+    final Size Function(RenderBox renderBox, BoxConstraints constraints)
+        layouter,
+  ) {
     final children = <RenderBox>[];
     final cells = <_TableCellData>[];
 
@@ -463,11 +475,15 @@ class _TableRenderObject extends RenderBox
   }
 
   static Size _performLayoutDry(
-          RenderBox renderBox, BoxConstraints constraints) =>
+    RenderBox renderBox,
+    BoxConstraints constraints,
+  ) =>
       renderBox.getDryLayout(constraints);
 
   static Size _performLayoutLayouter(
-      RenderBox renderBox, BoxConstraints constraints) {
+    RenderBox renderBox,
+    BoxConstraints constraints,
+  ) {
     renderBox.layout(constraints, parentUsesSize: true);
     return renderBox.size;
   }
@@ -561,22 +577,27 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
   }
 
   static Size _performLayout(
-      final RenderBox? child,
-      final double paddingTop,
-      final BoxConstraints constraints,
-      final Size? Function(RenderBox? renderBox, BoxConstraints constraints)
-          layouter) {
+    final RenderBox? child,
+    final double paddingTop,
+    final BoxConstraints constraints,
+    final Size? Function(RenderBox? renderBox, BoxConstraints constraints)
+        layouter,
+  ) {
     final cc = constraints.loosen().deflate(EdgeInsets.only(top: paddingTop));
     final childSize = layouter(child, cc) ?? Size.zero;
     return constraints.constrain(childSize + Offset(0, paddingTop));
   }
 
   static Size? _performLayoutDry(
-          RenderBox? renderBox, BoxConstraints constraints) =>
+    RenderBox? renderBox,
+    BoxConstraints constraints,
+  ) =>
       renderBox?.getDryLayout(constraints);
 
   static Size? _performLayoutLayouter(
-      RenderBox? renderBox, BoxConstraints constraints) {
+    RenderBox? renderBox,
+    BoxConstraints constraints,
+  ) {
     renderBox?.layout(constraints, parentUsesSize: true);
     return renderBox?.size;
   }

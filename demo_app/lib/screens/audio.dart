@@ -27,42 +27,45 @@ class _State extends State<AudioScreen> {
         appBar: AppBar(
           title: const Text('AudioScreen'),
         ),
-        body: ListView(children: <Widget>[
-          CheckboxListTile(
-            value: autoplay,
-            onChanged: (v) => _setState(() => autoplay = v),
-            title: const Text('autoplay'),
-          ),
-          CheckboxListTile(
-            value: loop,
-            onChanged: (v) => _setState(() => loop = v),
-            title: const Text('loop'),
-          ),
-          CheckboxListTile(
-            value: muted,
-            onChanged: (v) => _setState(() => muted = v),
-            title: const Text('muted'),
-          ),
-          CheckboxListTile(
-            value: preload,
-            onChanged: (v) => _setState(() => preload = v),
-            title: const Text('preload'),
-          ),
-          ListTile(
-            title: const Text('HTML:'),
-            subtitle: Text(_html),
-          ),
-          ListTile(
-            title: const Text('Rendered:'),
-            subtitle: HtmlWidget(
-              _html,
-              key: Key(_html),
-              baseUrl: Uri.parse(
-                  'https://interactive-examples.mdn.mozilla.net/pages/tabbed/audio.html'),
+        body: ListView(
+          children: <Widget>[
+            CheckboxListTile(
+              value: autoplay,
+              onChanged: (v) => _setState(() => autoplay = v),
+              title: const Text('autoplay'),
             ),
-          ),
-          const Center(child: Text('----')),
-        ]),
+            CheckboxListTile(
+              value: loop,
+              onChanged: (v) => _setState(() => loop = v),
+              title: const Text('loop'),
+            ),
+            CheckboxListTile(
+              value: muted,
+              onChanged: (v) => _setState(() => muted = v),
+              title: const Text('muted'),
+            ),
+            CheckboxListTile(
+              value: preload,
+              onChanged: (v) => _setState(() => preload = v),
+              title: const Text('preload'),
+            ),
+            ListTile(
+              title: const Text('HTML:'),
+              subtitle: Text(_html),
+            ),
+            ListTile(
+              title: const Text('Rendered:'),
+              subtitle: HtmlWidget(
+                _html,
+                key: Key(_html),
+                baseUrl: Uri.parse(
+                  'https://interactive-examples.mdn.mozilla.net/pages/tabbed/audio.html',
+                ),
+              ),
+            ),
+            const Center(child: Text('----')),
+          ],
+        ),
       );
 
   void _setState(VoidCallback callback) => setState(() {

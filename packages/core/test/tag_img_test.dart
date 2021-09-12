@@ -21,10 +21,13 @@ void main() {
       const html = '<img src="$src" />';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[CssSizing:$sizingConstraints,child='
-              '[Image:image=NetworkImage("$src", scale: 1.0)]'
-              ']'));
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=NetworkImage("$src", scale: 1.0)]'
+          ']',
+        ),
+      );
     });
 
     testWidgets('renders src+alt', (WidgetTester tester) async {
@@ -32,11 +35,13 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[CssSizing:$sizingConstraints,child='
-            '[Image:'
-            'image=NetworkImage("$src", scale: 1.0),'
-            'semanticLabel=Foo'
-            ']]'),
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:'
+          'image=NetworkImage("$src", scale: 1.0),'
+          'semanticLabel=Foo'
+          ']]',
+        ),
       );
     });
 
@@ -44,28 +49,34 @@ void main() {
       const html = '<img src="$src" title="Bar" />';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[CssSizing:$sizingConstraints,child='
-              '[Tooltip:'
-              'message=Bar,'
-              'child=[Image:'
-              'image=NetworkImage("$src", scale: 1.0),'
-              'semanticLabel=Bar'
-              ']]]'));
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[Tooltip:'
+          'message=Bar,'
+          'child=[Image:'
+          'image=NetworkImage("$src", scale: 1.0),'
+          'semanticLabel=Bar'
+          ']]]',
+        ),
+      );
     });
 
     testWidgets('renders src+alt+title', (WidgetTester tester) async {
       const html = '<img src="$src" alt="Foo" title="Bar" />';
-      final e = await explain(tester, html);
+      final explained = await explain(tester, html);
       expect(
-          e,
-          equals('[CssSizing:$sizingConstraints,child='
-              '[Tooltip:'
-              'message=Bar,'
-              'child=[Image:'
-              'image=NetworkImage("$src", scale: 1.0),'
-              'semanticLabel=Foo'
-              ']]]'));
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[Tooltip:'
+          'message=Bar,'
+          'child=[Image:'
+          'image=NetworkImage("$src", scale: 1.0),'
+          'semanticLabel=Foo'
+          ']]]',
+        ),
+      );
     });
 
     testWidgets('renders in one RichText', (WidgetTester tester) async {
@@ -73,11 +84,13 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[RichText:(:'
-            '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
-            '(: )'
-            '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
-            ')]'),
+        equals(
+          '[RichText:(:'
+          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
+          '(: )'
+          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
+          ')]',
+        ),
       );
     });
 
@@ -97,32 +110,40 @@ void main() {
       const html = '<img src="$src" width="800" height="600" />';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals(
-              '[CssSizing:height≥0.0,height=600.0,width≥0.0,width=800.0,child='
-              '[AspectRatio:aspectRatio=1.3,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
-              ']'));
+        explained,
+        equals(
+          '[CssSizing:height≥0.0,height=600.0,width≥0.0,width=800.0,child='
+          '[AspectRatio:aspectRatio=1.3,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
+          ']',
+        ),
+      );
     });
 
     testWidgets('renders between texts', (WidgetTester tester) async {
       const html = 'Before text. <img src="$src" /> After text.';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[RichText:(:'
-              'Before text. '
-              '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
-              '(: After text.)'
-              ')]'));
+        explained,
+        equals(
+          '[RichText:(:'
+          'Before text. '
+          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
+          '(: After text.)'
+          ')]',
+        ),
+      );
     });
 
     testWidgets('renders block', (WidgetTester tester) async {
       const html = '<img src="$src" style="display: block" />';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[CssSizing:$sizingConstraints,child='
-              '[Image:image=NetworkImage("$src", scale: 1.0)]]'));
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=NetworkImage("$src", scale: 1.0)]]',
+        ),
+      );
     });
 
     testWidgets('renders block without src', (WidgetTester tester) async {
@@ -140,12 +161,15 @@ void main() {
       const html = '<img src="asset:$assetName" />';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[CssSizing:$sizingConstraints,child='
-              '[Image:image=AssetImage('
-              'bundle: null, '
-              'name: "$assetName"'
-              ')]]'));
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=AssetImage('
+          'bundle: null, '
+          'name: "$assetName"'
+          ')]]',
+        ),
+      );
     });
 
     testWidgets('renders asset (specified package)', (tester) async {
@@ -153,12 +177,15 @@ void main() {
       const html = '<img src="asset:$assetName?package=$package" />';
       final explained = await explain(tester, html);
       expect(
-          explained,
-          equals('[CssSizing:$sizingConstraints,child='
-              '[Image:image=AssetImage('
-              'bundle: null, '
-              'name: "packages/$package/$assetName"'
-              ')]]'));
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=AssetImage('
+          'bundle: null, '
+          'name: "packages/$package/$assetName"'
+          ')]]',
+        ),
+      );
     });
 
     testWidgets('renders bad asset', (WidgetTester tester) async {
@@ -188,10 +215,13 @@ void main() {
       final explained = (await explain(tester, html))
           .replaceAll(RegExp('Uint8List#[0-9a-f]+,'), 'bytes,');
       expect(
-          explained,
-          equals('[CssSizing:$sizingConstraints,child='
-              '[Image:image=MemoryImage(bytes, scale: 1.0)]'
-              ']'));
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=MemoryImage(bytes, scale: 1.0)]'
+          ']',
+        ),
+      );
     });
 
     testWidgets('renders bad data uri', (WidgetTester tester) async {
@@ -223,10 +253,13 @@ void main() {
       final explained = (await explain(tester, html))
           .replaceAll(RegExp('Uint8List#[0-9a-f]+,'), 'bytes,');
       expect(
-          explained,
-          equals('[CssSizing:$sizingConstraints,child='
-              '[Image:image=FileImage("$filePath", scale: 1.0)]'
-              ']'));
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=FileImage("$filePath", scale: 1.0)]'
+          ']',
+        ),
+      );
     });
   });
 
@@ -237,17 +270,23 @@ void main() {
       String fullUrl, {
       Uri? baseUrl,
     }) async {
-      final explained = await helper.explain(tester, null,
-          hw: HtmlWidget(
-            html,
-            baseUrl: baseUrl ?? Uri.parse('http://base.com/path/'),
-            key: helper.hwKey,
-          ));
+      final explained = await helper.explain(
+        tester,
+        null,
+        hw: HtmlWidget(
+          html,
+          baseUrl: baseUrl ?? Uri.parse('http://base.com/path/'),
+          key: helper.hwKey,
+        ),
+      );
       expect(
-          explained,
-          equals('[CssSizing:$sizingConstraints,child='
-              '[Image:image=NetworkImage("$fullUrl", scale: 1.0)]'
-              ']'));
+        explained,
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=NetworkImage("$fullUrl", scale: 1.0)]'
+          ']',
+        ),
+      );
     }
 
     testWidgets('renders full url', (WidgetTester tester) async {
@@ -293,19 +332,21 @@ void main() {
       final streamCompleter = _TestImageStreamCompleter();
       final values = <double?>[];
 
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: HtmlWidget(
-            html,
-            factoryBuilder: () => _LoadingBuilderFactory(streamCompleter),
-            key: helper.hwKey,
-            onLoadingBuilder: (_, __, loadingProgress) {
-              values.add(loadingProgress);
-              return widget0;
-            },
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: HtmlWidget(
+              html,
+              factoryBuilder: () => _LoadingBuilderFactory(streamCompleter),
+              key: helper.hwKey,
+              onLoadingBuilder: (_, __, loadingProgress) {
+                values.add(loadingProgress);
+                return widget0;
+              },
+            ),
           ),
         ),
-      ));
+      );
 
       expect(values, isEmpty);
 
@@ -323,14 +364,16 @@ void main() {
 
   testWidgets('onTapImage', (WidgetTester tester) async {
     final taps = <ImageMetadata>[];
-    await tester.pumpWidget(MaterialApp(
-      home: Scaffold(
-        body: HtmlWidget(
-          '<img src="${helper.kDataUri}" width="20" height="20" />',
-          onTapImage: taps.add,
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: HtmlWidget(
+            '<img src="${helper.kDataUri}" width="20" height="20" />',
+            onTapImage: taps.add,
+          ),
         ),
       ),
-    ));
+    );
     await tester.tap(find.byType(Image));
     expect(taps.length, equals(1));
   });
@@ -386,10 +429,12 @@ class _TestImageStreamCompleter extends ImageStreamCompleter {
 
   void addChunkEvent(int cumulativeBytesLoaded, [int expectedTotalBytes = 0]) {
     for (final listener in listeners) {
-      listener.onChunk?.call(ImageChunkEvent(
-        cumulativeBytesLoaded: cumulativeBytesLoaded,
-        expectedTotalBytes: expectedTotalBytes,
-      ));
+      listener.onChunk?.call(
+        ImageChunkEvent(
+          cumulativeBytesLoaded: cumulativeBytesLoaded,
+          expectedTotalBytes: expectedTotalBytes,
+        ),
+      );
     }
   }
 }

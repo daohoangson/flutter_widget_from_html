@@ -22,11 +22,13 @@ class WordpressScreen extends StatelessWidget {
         ),
         body: ListView(
           children: sites.entries
-              .map((e) => ListTile(
-                    onTap: () => PostsScreen.pushRoute(context, e.key, e.value),
-                    subtitle: Text(e.value),
-                    title: Text(e.key),
-                  ))
+              .map(
+                (e) => ListTile(
+                  onTap: () => PostsScreen.pushRoute(context, e.key, e.value),
+                  subtitle: Text(e.value),
+                  title: Text(e.key),
+                ),
+              )
               .toList(growable: false),
         ),
       );
@@ -46,7 +48,8 @@ class PostsScreen extends StatelessWidget {
 
   static void pushRoute(BuildContext context, String title, String domain) =>
       Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => PostsScreen(domain, title: title)));
+        MaterialPageRoute(builder: (_) => PostsScreen(domain, title: title)),
+      );
 }
 
 class _PostScreen extends StatelessWidget {

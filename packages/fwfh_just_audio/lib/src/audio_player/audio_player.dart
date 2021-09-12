@@ -82,50 +82,52 @@ class _AudioPlayerState extends State<AudioPlayer> {
   }
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(builder: (_, bc) {
-        final isNarrow = bc.hasBoundedWidth && bc.maxWidth <= 320;
-        final theme = Theme.of(context);
-        final iconSize = DefaultTextStyle.of(context).style.fontSize! *
-            MediaQuery.of(context).textScaleFactor;
+  Widget build(BuildContext context) => LayoutBuilder(
+        builder: (_, bc) {
+          final isNarrow = bc.hasBoundedWidth && bc.maxWidth <= 320;
+          final theme = Theme.of(context);
+          final iconSize = DefaultTextStyle.of(context).style.fontSize! *
+              MediaQuery.of(context).textScaleFactor;
 
-        return Container(
-          decoration: BoxDecoration(
-            color: theme.brightness == Brightness.light
-                ? const Color.fromRGBO(0, 0, 0, .1)
-                : const Color.fromRGBO(255, 255, 255, .1),
-            borderRadius: BorderRadius.circular(iconSize * 2),
-          ),
-          child: Row(
-            children: [
-              _PlayButton(
-                pause: _player.pause,
-                play: _player.play,
-                size: iconSize,
-                stream: _player.playingStream,
-              ),
-              _PositionText(
-                durationStream: _player.durationStream,
-                isNarrow: isNarrow,
-                positionStream: _player.positionStream,
-                size: iconSize,
-              ),
-              Expanded(
-                child: _PositionSlider(
+          return Container(
+            decoration: BoxDecoration(
+              color: theme.brightness == Brightness.light
+                  ? const Color.fromRGBO(0, 0, 0, .1)
+                  : const Color.fromRGBO(255, 255, 255, .1),
+              borderRadius: BorderRadius.circular(iconSize * 2),
+            ),
+            child: Row(
+              children: [
+                _PlayButton(
+                  pause: _player.pause,
+                  play: _player.play,
+                  size: iconSize,
+                  stream: _player.playingStream,
+                ),
+                _PositionText(
                   durationStream: _player.durationStream,
+                  isNarrow: isNarrow,
                   positionStream: _player.positionStream,
-                  seek: _player.seek,
                   size: iconSize,
                 ),
-              ),
-              _MuteButton(
-                setVolume: _player.setVolume,
-                size: iconSize,
-                stream: _player.volumeStream,
-              ),
-            ],
-          ),
-        );
-      });
+                Expanded(
+                  child: _PositionSlider(
+                    durationStream: _player.durationStream,
+                    positionStream: _player.positionStream,
+                    seek: _player.seek,
+                    size: iconSize,
+                  ),
+                ),
+                _MuteButton(
+                  setVolume: _player.setVolume,
+                  size: iconSize,
+                  stream: _player.volumeStream,
+                ),
+              ],
+            ),
+          );
+        },
+      );
 }
 
 class _PlayButton extends StatelessWidget {

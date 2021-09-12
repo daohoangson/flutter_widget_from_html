@@ -18,14 +18,17 @@ void main() {
     testWidgets('useExplainer=false', (WidgetTester tester) async {
       final explained = await explain(tester, html, useExplainer: false);
       expect(
-          explained,
-          equals('TshWidget\n'
-              '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
-              ' │  BuildTree#2 tsb#3(parent=#1):\n'
-              ' │    "Foo"\n'
-              ' │    _TagABit#4 tsb#3(parent=#1)\n'
-              ' │)\n'
-              ' └RichText(text: "Foo")\n\n'));
+        explained,
+        equals(
+          'TshWidget\n'
+          '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
+          ' │  BuildTree#2 tsb#3(parent=#1):\n'
+          ' │    "Foo"\n'
+          ' │    _TagABit#4 tsb#3(parent=#1)\n'
+          ' │)\n'
+          ' └RichText(text: "Foo")\n\n',
+        ),
+      );
     });
   });
 
@@ -53,14 +56,17 @@ void main() {
     const html = 'Hello <a href="$kHref">f<b>o<i>o</i></b> <br /> bar</a>.';
     final explained = await explain(tester, html);
     expect(
-        explained,
-        equals('[RichText:(:Hello '
-            '(#FF123456+u+onTap:f)'
-            '(#FF123456+u+b+onTap:o)'
-            '(#FF123456+u+i+b+onTap:o)'
-            '(#FF123456+u+onTap: \nbar)'
-            '(:.)'
-            ')]'));
+      explained,
+      equals(
+        '[RichText:(:Hello '
+        '(#FF123456+u+onTap:f)'
+        '(#FF123456+u+b+onTap:o)'
+        '(#FF123456+u+i+b+onTap:o)'
+        '(#FF123456+u+onTap: \nbar)'
+        '(:.)'
+        ')]',
+      ),
+    );
   });
 
   testWidgets('renders DIV tag inside', (WidgetTester tester) async {
@@ -68,9 +74,11 @@ void main() {
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals('[MouseRegion:child=[GestureDetector:child='
-          '[CssBlock:child=[RichText:(#FF123456+u:Foo)]]'
-          ']]'),
+      equals(
+        '[MouseRegion:child=[GestureDetector:child='
+        '[CssBlock:child=[RichText:(#FF123456+u:Foo)]]'
+        ']]',
+      ),
     );
   });
 
@@ -99,9 +107,11 @@ void main() {
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals('[CssBlock:child=[MouseRegion:child=[GestureDetector:child='
-          '[CssBlock:child=[RichText:(#FF123456+u:Foo)]]'
-          ']]]'),
+      equals(
+        '[CssBlock:child=[MouseRegion:child=[GestureDetector:child='
+        '[CssBlock:child=[RichText:(#FF123456+u:Foo)]]'
+        ']]]',
+      ),
     );
   });
 
@@ -136,13 +146,16 @@ void main() {
     const html = '<a href="$kHref"><div style="margin: 5px">Foo</div></a>';
     final explained = await explainMargin(tester, html);
     expect(
-        explained,
-        equals('[SizedBox:0.0x5.0],'
-            '[MouseRegion:child=[GestureDetector:child='
-            '[Padding:(0,5,0,5),child='
-            '[CssBlock:child=[RichText:(#FF123456+u:Foo)]]'
-            ']]],'
-            '[SizedBox:0.0x5.0]'));
+      explained,
+      equals(
+        '[SizedBox:0.0x5.0],'
+        '[MouseRegion:child=[GestureDetector:child='
+        '[Padding:(0,5,0,5),child='
+        '[CssBlock:child=[RichText:(#FF123456+u:Foo)]]'
+        ']]],'
+        '[SizedBox:0.0x5.0]',
+      ),
+    );
   });
 
   group('IMG', () {
@@ -154,58 +167,73 @@ void main() {
       const html = '<a href="$kHref"><img src="$kImgSrc" /></a>';
       final explained = await explainImg(tester, html);
       expect(
-          explained,
-          equals('[MouseRegion:child=[GestureDetector:child='
-              '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-              ']]'));
+        explained,
+        equals(
+          '[MouseRegion:child=[GestureDetector:child='
+          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+          ']]',
+        ),
+      );
     });
 
     testWidgets('renders text + IMG tag both inside', (tester) async {
       const html = '<a href="$kHref">Foo <img src="$kImgSrc" /></a>';
       final explained = await explainImg(tester, html);
       expect(
-          explained,
-          equals('[RichText:(:'
-              '(#FF123456+u+onTap:Foo )'
-              '[MouseRegion:child=[GestureDetector:child='
-              '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-              ']])]'));
+        explained,
+        equals(
+          '[RichText:(:'
+          '(#FF123456+u+onTap:Foo )'
+          '[MouseRegion:child=[GestureDetector:child='
+          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+          ']])]',
+        ),
+      );
     });
 
     testWidgets('renders text outside + IMG tag inside', (tester) async {
       const html = 'Foo <a href="$kHref"><img src="$kImgSrc" /></a>';
       final explained = await explainImg(tester, html);
       expect(
-          explained,
-          equals('[RichText:(:Foo '
-              '[MouseRegion:child=[GestureDetector:child='
-              '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-              ']])]'));
+        explained,
+        equals(
+          '[RichText:(:Foo '
+          '[MouseRegion:child=[GestureDetector:child='
+          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+          ']])]',
+        ),
+      );
     });
 
     testWidgets('renders IMG tag + text both inside', (tester) async {
       const html = '<a href="$kHref"><img src="$kImgSrc" /> foo</a>';
       final explained = await explainImg(tester, html);
       expect(
-          explained,
-          equals('[RichText:(:'
-              '[MouseRegion:child=[GestureDetector:child='
-              '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-              ']]'
-              '(#FF123456+u+onTap: foo)'
-              ')]'));
+        explained,
+        equals(
+          '[RichText:(:'
+          '[MouseRegion:child=[GestureDetector:child='
+          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+          ']]'
+          '(#FF123456+u+onTap: foo)'
+          ')]',
+        ),
+      );
     });
 
     testWidgets('renders IMG tag inside + text outside', (tester) async {
       const html = '<a href="$kHref"><img src="$kImgSrc" /></a> foo';
       final explained = await explainImg(tester, html);
       expect(
-          explained,
-          equals('[RichText:(:'
-              '[MouseRegion:child=[GestureDetector:child='
-              '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-              ']]'
-              '(: foo))]'));
+        explained,
+        equals(
+          '[RichText:(:'
+          '[MouseRegion:child=[GestureDetector:child='
+          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
+          ']]'
+          '(: foo))]',
+        ),
+      );
     });
   });
 }

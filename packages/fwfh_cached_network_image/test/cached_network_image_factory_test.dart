@@ -11,9 +11,11 @@ void main() {
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals('[CssSizing:$sizingConstraints,child='
-          '[CachedNetworkImage:imageUrl=$src]'
-          ']'),
+      equals(
+        '[CssSizing:$sizingConstraints,child='
+        '[CachedNetworkImage:imageUrl=$src]'
+        ']',
+      ),
     );
   });
 
@@ -22,10 +24,13 @@ void main() {
     final explained = (await explain(tester, html))
         .replaceAll(RegExp('Uint8List#[0-9a-f]+,'), 'bytes,');
     expect(
-        explained,
-        equals('[CssSizing:$sizingConstraints,child='
-            '[Image:image=MemoryImage(bytes, scale: 1.0)]'
-            ']'));
+      explained,
+      equals(
+        '[CssSizing:$sizingConstraints,child='
+        '[Image:image=MemoryImage(bytes, scale: 1.0)]'
+        ']',
+      ),
+    );
   });
 
   testWidgets('renders progress indicator', (WidgetTester tester) async {

@@ -15,8 +15,11 @@ Future<String> explain(WidgetTester t, HtmlWidget hw) =>
 
 void main() {
   group('buildAsync', () {
-    Future<String?> explain(WidgetTester tester, String html,
-            {bool? buildAsync}) =>
+    Future<String?> explain(
+      WidgetTester tester,
+      String html, {
+      bool? buildAsync,
+    }) =>
         helper.explain(
           tester,
           null,
@@ -68,16 +71,19 @@ void main() {
       RebuildTriggers? rebuildTriggers,
       TextStyle? textStyle,
     }) =>
-        helper.explain(tester, null,
-            hw: HtmlWidget(
-              html,
-              baseUrl: baseUrl,
-              buildAsync: buildAsync,
-              enableCaching: enableCaching,
-              key: helper.hwKey,
-              rebuildTriggers: rebuildTriggers,
-              textStyle: textStyle,
-            ));
+        helper.explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            html,
+            baseUrl: baseUrl,
+            buildAsync: buildAsync,
+            enableCaching: enableCaching,
+            key: helper.hwKey,
+            rebuildTriggers: rebuildTriggers,
+            textStyle: textStyle,
+          ),
+        );
 
     void _expect(Widget? built1, Widget? built2, Matcher matcher) {
       final widget1 = (built1! as TshWidget).child;
@@ -114,8 +120,12 @@ void main() {
       expect(explained1, equals('[RichText:(:Foo)]'));
       final built1 = helper.buildCurrentState();
 
-      await explain(tester, html,
-          enableCaching: true, baseUrl: Uri.http('domain.com', ''));
+      await explain(
+        tester,
+        html,
+        enableCaching: true,
+        baseUrl: Uri.http('domain.com', ''),
+      );
       final built2 = helper.buildCurrentState();
       _expect(built1, built2, isFalse);
     });
@@ -147,13 +157,21 @@ void main() {
     testWidgets('rebuild new rebuildTriggers', (tester) async {
       const html = 'Foo';
 
-      final explained1 = await explain(tester, html,
-          enableCaching: true, rebuildTriggers: RebuildTriggers([1]));
+      final explained1 = await explain(
+        tester,
+        html,
+        enableCaching: true,
+        rebuildTriggers: RebuildTriggers([1]),
+      );
       expect(explained1, equals('[RichText:(:Foo)]'));
       final built1 = helper.buildCurrentState();
 
-      await explain(tester, html,
-          enableCaching: true, rebuildTriggers: RebuildTriggers([2]));
+      await explain(
+        tester,
+        html,
+        enableCaching: true,
+        rebuildTriggers: RebuildTriggers([2]),
+      );
       final built2 = helper.buildCurrentState();
       _expect(built1, built2, isFalse);
     });
@@ -164,8 +182,12 @@ void main() {
       final explained1 = await explain(tester, html, enableCaching: true);
       expect(explained1, equals('[RichText:(:Foo)]'));
 
-      final explained2 = await explain(tester, html,
-          enableCaching: true, textStyle: const TextStyle(fontSize: 20));
+      final explained2 = await explain(
+        tester,
+        html,
+        enableCaching: true,
+        textStyle: const TextStyle(fontSize: 20),
+      );
       expect(explained2, equals('[RichText:(@20.0:Foo)]'));
     });
 
@@ -198,12 +220,14 @@ void main() {
           HtmlWidget(html, baseUrl: baseUrl, key: helper.hwKey),
         );
         expect(
-            explained,
-            equals(
-                '[CssSizing:height≥0.0,height=auto,width≥0.0,width=auto,child='
-                '[Image:image=NetworkImage("http://base.com/path/image.png", scale: 1.0),'
-                'semanticLabel=image dot png'
-                ']]'));
+          explained,
+          equals(
+            '[CssSizing:height≥0.0,height=auto,width≥0.0,width=auto,child='
+            '[Image:image=NetworkImage("http://base.com/path/image.png", scale: 1.0),'
+            'semanticLabel=image dot png'
+            ']]',
+          ),
+        );
       }),
     );
   });
@@ -281,19 +305,26 @@ void main() {
       WidgetTester tester, {
       OnErrorBuilder? onErrorBuilder,
     }) async {
-      await runZonedGuarded(() async {
-        await helper.explain(tester, null,
+      await runZonedGuarded(
+        () async {
+          await helper.explain(
+            tester,
+            null,
             hw: HtmlWidget(
               'Foo <span class="throw">bar</span>.',
               buildAsync: true,
               factoryBuilder: () => _OnErrorBuilderFactory(),
               key: helper.hwKey,
               onErrorBuilder: onErrorBuilder,
-            ));
+            ),
+          );
 
-        await tester.runAsync(() => Future.delayed(const Duration(seconds: 1)));
-        await tester.pump();
-      }, (_, __) {});
+          await tester
+              .runAsync(() => Future.delayed(const Duration(seconds: 1)));
+          await tester.pump();
+        },
+        (_, __) {},
+      );
 
       return helper.explainWithoutPumping(useExplainer: false);
     }
@@ -304,8 +335,10 @@ void main() {
     });
 
     testWidgets('renders custom', (tester) async {
-      final explained = await explain(tester,
-          onErrorBuilder: (_, __, ___) => const Text('Custom'));
+      final explained = await explain(
+        tester,
+        onErrorBuilder: (_, __, ___) => const Text('Custom'),
+      );
       expect(explained, contains('RichText(text: "Custom")'));
     });
   });
@@ -315,14 +348,17 @@ void main() {
       WidgetTester tester, {
       OnLoadingBuilder? onLoadingBuilder,
     }) =>
-        helper.explain(tester, null,
-            hw: HtmlWidget(
-              'Foo',
-              buildAsync: true,
-              key: helper.hwKey,
-              onLoadingBuilder: onLoadingBuilder,
-            ),
-            useExplainer: false);
+        helper.explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            'Foo',
+            buildAsync: true,
+            key: helper.hwKey,
+            onLoadingBuilder: onLoadingBuilder,
+          ),
+          useExplainer: false,
+        );
 
     testWidgets('renders CircularProgressIndicator', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
@@ -354,14 +390,16 @@ void main() {
       final urls = <String>[];
       final onTapCallbackResults = [];
 
-      await tester.pumpWidget(_OnTapUrlApp(
-        href: href,
-        onTapCallbackResults: onTapCallbackResults,
-        onTapUrl: (url) {
-          urls.add(url);
-          return true;
-        },
-      ));
+      await tester.pumpWidget(
+        _OnTapUrlApp(
+          href: href,
+          onTapCallbackResults: onTapCallbackResults,
+          onTapUrl: (url) {
+            urls.add(url);
+            return true;
+          },
+        ),
+      );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
@@ -373,11 +411,13 @@ void main() {
       const href = 'returns-false';
       final onTapCallbackResults = [];
 
-      await tester.pumpWidget(_OnTapUrlApp(
-        href: href,
-        onTapCallbackResults: onTapCallbackResults,
-        onTapUrl: (_) => false,
-      ));
+      await tester.pumpWidget(
+        _OnTapUrlApp(
+          href: href,
+          onTapCallbackResults: onTapCallbackResults,
+          onTapUrl: (_) => false,
+        ),
+      );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
@@ -388,11 +428,13 @@ void main() {
       const href = 'returns-true';
       final onTapCallbackResults = [];
 
-      await tester.pumpWidget(_OnTapUrlApp(
-        href: href,
-        onTapCallbackResults: onTapCallbackResults,
-        onTapUrl: (_) => true,
-      ));
+      await tester.pumpWidget(
+        _OnTapUrlApp(
+          href: href,
+          onTapCallbackResults: onTapCallbackResults,
+          onTapUrl: (_) => true,
+        ),
+      );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
@@ -403,11 +445,13 @@ void main() {
       const href = 'returns-false';
       final onTapCallbackResults = [];
 
-      await tester.pumpWidget(_OnTapUrlApp(
-        href: href,
-        onTapCallbackResults: onTapCallbackResults,
-        onTapUrl: (_) async => false,
-      ));
+      await tester.pumpWidget(
+        _OnTapUrlApp(
+          href: href,
+          onTapCallbackResults: onTapCallbackResults,
+          onTapUrl: (_) async => false,
+        ),
+      );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
@@ -418,11 +462,13 @@ void main() {
       const href = 'returns-true';
       final onTapCallbackResults = [];
 
-      await tester.pumpWidget(_OnTapUrlApp(
-        href: href,
-        onTapCallbackResults: onTapCallbackResults,
-        onTapUrl: (_) async => true,
-      ));
+      await tester.pumpWidget(
+        _OnTapUrlApp(
+          href: href,
+          onTapCallbackResults: onTapCallbackResults,
+          onTapUrl: (_) async => true,
+        ),
+      );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
@@ -433,10 +479,12 @@ void main() {
       const href = 'default';
       final onTapCallbackResults = [];
 
-      await tester.pumpWidget(_OnTapUrlApp(
-        href: href,
-        onTapCallbackResults: onTapCallbackResults,
-      ));
+      await tester.pumpWidget(
+        _OnTapUrlApp(
+          href: href,
+          onTapCallbackResults: onTapCallbackResults,
+        ),
+      );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
@@ -496,8 +544,11 @@ void main() {
         RenderMode.sliverList,
         html: '<div><p>Foo</p><p>Bar</p></div>',
       );
-      expect(explained.split('└CssBlock(').length, equals(3),
-          reason: '$explained has too many `CssBlock`s');
+      expect(
+        explained.split('└CssBlock(').length,
+        equals(3),
+        reason: '$explained has too many `CssBlock`s',
+      );
     });
   });
 

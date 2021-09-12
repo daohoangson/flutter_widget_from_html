@@ -44,25 +44,28 @@ void main() {
       await tester.tap(playArrow);
       await tester.runAsync(() => Future.delayed(Duration.zero));
       expect(
-          _commands,
-          equals(const [
-            Tuple2(_CommandType.setVolume, 1.0),
-            Tuple2(_CommandType.play, null),
-            Tuple2(_CommandType.load, src),
-          ]));
+        _commands,
+        equals(const [
+          Tuple2(_CommandType.setVolume, 1.0),
+          Tuple2(_CommandType.play, null),
+          Tuple2(_CommandType.load, src),
+        ]),
+      );
       _commands.clear();
 
       // simulate a completed event
-      _playbackEvents.add(PlaybackEventMessage(
-        processingState: ProcessingStateMessage.completed,
-        updateTime: DateTime.now(),
-        updatePosition: _duration,
-        bufferedPosition: _duration,
-        duration: _duration,
-        icyMetadata: null,
-        currentIndex: 0,
-        androidAudioSessionId: null,
-      ));
+      _playbackEvents.add(
+        PlaybackEventMessage(
+          processingState: ProcessingStateMessage.completed,
+          updateTime: DateTime.now(),
+          updatePosition: _duration,
+          bufferedPosition: _duration,
+          duration: _duration,
+          icyMetadata: null,
+          currentIndex: 0,
+          androidAudioSessionId: null,
+        ),
+      );
       await tester.runAsync(() => Future.delayed(Duration.zero));
 
       // force a widget tree disposal
@@ -70,11 +73,12 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-          _commands,
-          equals(const [
-            Tuple2(_CommandType.pause, null),
-            Tuple2(_CommandType.seek, Duration.zero),
-          ]));
+        _commands,
+        equals(const [
+          Tuple2(_CommandType.pause, null),
+          Tuple2(_CommandType.seek, Duration.zero),
+        ]),
+      );
     });
 
     testWidgets('shows remaining (narrow)', (tester) async {
@@ -135,14 +139,16 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('0:00 / 1:40'), findsOneWidget);
       expect(
-          _commands,
-          equals(const [
-            Tuple2(_CommandType.setVolume, 1.0),
-            Tuple2(_CommandType.load, src),
-          ]));
+        _commands,
+        equals(const [
+          Tuple2(_CommandType.setVolume, 1.0),
+          Tuple2(_CommandType.load, src),
+        ]),
+      );
       _commands.clear();
 
       await tester.tap(find.byType(Slider));
+      await tester.runAsync(() => Future.delayed(Duration.zero));
       await tester.pumpAndSettle();
       expect(find.text('0:50 / 1:40'), findsOneWidget);
       expect(_commands, equals([Tuple2(_CommandType.seek, _duration * .5)]));
@@ -169,6 +175,7 @@ void main() {
         _commands.clear();
 
         await tester.tap(find.byIcon(iconOn));
+        await tester.runAsync(() => Future.delayed(Duration.zero));
         await tester.pumpAndSettle();
 
         expect(_commands, equals(const [Tuple2(_CommandType.setVolume, 0.0)]));
@@ -188,10 +195,12 @@ void main() {
           ),
         );
 
+        await tester.runAsync(() => Future.delayed(Duration.zero));
         await tester.pumpAndSettle();
         _commands.clear();
 
         await tester.tap(find.byIcon(iconOff));
+        await tester.runAsync(() => Future.delayed(Duration.zero));
         await tester.pumpAndSettle();
 
         expect(_commands, equals(const [Tuple2(_CommandType.setVolume, 1.0)]));
@@ -212,7 +221,8 @@ class _JustAudioPlatform extends JustAudioPlatform {
 
   @override
   Future<DisposePlayerResponse> disposePlayer(
-          DisposePlayerRequest request) async =>
+    DisposePlayerRequest request,
+  ) async =>
       DisposePlayerResponse();
 }
 
@@ -228,16 +238,18 @@ class _AudioPlayerPlatform extends AudioPlayerPlatform {
     final map = request.audioSourceMessage.toMap();
     _commands.add(Tuple2(_CommandType.load, map['uri'] ?? map));
 
-    _playbackEvents.add(PlaybackEventMessage(
-      processingState: ProcessingStateMessage.ready,
-      updateTime: DateTime.now(),
-      updatePosition: Duration.zero,
-      bufferedPosition: _duration,
-      duration: _duration,
-      icyMetadata: null,
-      currentIndex: 0,
-      androidAudioSessionId: null,
-    ));
+    _playbackEvents.add(
+      PlaybackEventMessage(
+        processingState: ProcessingStateMessage.ready,
+        updateTime: DateTime.now(),
+        updatePosition: Duration.zero,
+        bufferedPosition: _duration,
+        duration: _duration,
+        icyMetadata: null,
+        currentIndex: 0,
+        androidAudioSessionId: null,
+      ),
+    );
 
     return LoadResponse(duration: _duration);
   }
@@ -270,7 +282,8 @@ class _AudioPlayerPlatform extends AudioPlayerPlatform {
 
   @override
   Future<SetShuffleModeResponse> setShuffleMode(
-          SetShuffleModeRequest request) async =>
+    SetShuffleModeRequest request,
+  ) async =>
       SetShuffleModeResponse();
 
   @override
@@ -281,7 +294,8 @@ class _AudioPlayerPlatform extends AudioPlayerPlatform {
 
   @override
   Future<SetAndroidAudioAttributesResponse> setAndroidAudioAttributes(
-          SetAndroidAudioAttributesRequest request) async =>
+    SetAndroidAudioAttributesRequest request,
+  ) async =>
       SetAndroidAudioAttributesResponse();
 
   @override

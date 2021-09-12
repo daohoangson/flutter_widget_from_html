@@ -25,7 +25,8 @@ void main() {
     expect(
       explained.replaceAll(RegExp('String#[^,]+,'), 'String,'),
       equals(
-          '[SvgPicture:pictureProvider=StringPicture(String, colorFilter: null)]'),
+        '[SvgPicture:pictureProvider=StringPicture(String, colorFilter: null)]',
+      ),
     );
   });
 
@@ -36,10 +37,12 @@ void main() {
       final explained = await helper.explain(tester, html);
       expect(
         explained,
-        equals('[CssSizing:$sizingConstraints,child='
-            '[SvgPicture:'
-            'pictureProvider=ExactAssetPicture(name: "$assetName", bundle: null, colorFilter: null)'
-            ']]'),
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[SvgPicture:'
+          'pictureProvider=ExactAssetPicture(name: "$assetName", bundle: null, colorFilter: null)'
+          ']]',
+        ),
       );
     });
 
@@ -49,10 +52,12 @@ void main() {
       final explained = await helper.explain(tester, html);
       expect(
         explained,
-        equals('[CssSizing:$sizingConstraints,child='
-            '[SvgPicture:'
-            'pictureProvider=FilePicture("$filePath", colorFilter: null)'
-            ']]'),
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[SvgPicture:'
+          'pictureProvider=FilePicture("$filePath", colorFilter: null)'
+          ']]',
+        ),
       );
     });
 
@@ -72,10 +77,13 @@ void main() {
         final html = '<img src="data:image/svg+xml;base64,$base64" />';
         final explained = await explain(tester, html);
         expect(
-            explained,
-            equals('[CssSizing:$sizingConstraints,child='
-                '[SvgPicture:pictureProvider=MemoryPicture(bytes)]'
-                ']'));
+          explained,
+          equals(
+            '[CssSizing:$sizingConstraints,child='
+            '[SvgPicture:pictureProvider=MemoryPicture(bytes)]'
+            ']',
+          ),
+        );
       });
 
       testWidgets('renders utf8', (WidgetTester tester) async {
@@ -83,10 +91,13 @@ void main() {
         const html = '<img src="data:image/svg+xml;utf8,$utf8" />';
         final explained = await explain(tester, html);
         expect(
-            explained,
-            equals('[CssSizing:$sizingConstraints,child='
-                '[SvgPicture:pictureProvider=MemoryPicture(bytes)]'
-                ']'));
+          explained,
+          equals(
+            '[CssSizing:$sizingConstraints,child='
+            '[SvgPicture:pictureProvider=MemoryPicture(bytes)]'
+            ']',
+          ),
+        );
       });
     });
 
@@ -99,10 +110,12 @@ void main() {
       );
       expect(
         explained,
-        equals('[CssSizing:$sizingConstraints,child='
-            '[SvgPicture:'
-            'pictureProvider=NetworkPicture("$src", headers: null, colorFilter: null)'
-            ']]'),
+        equals(
+          '[CssSizing:$sizingConstraints,child='
+          '[SvgPicture:'
+          'pictureProvider=NetworkPicture("$src", headers: null, colorFilter: null)'
+          ']]',
+        ),
       );
     });
   });
@@ -133,12 +146,14 @@ HttpClient _createMockSvgImageHttpClient() {
       .thenReturn(HttpClientResponseCompressionState.notCompressed);
   when(() => response.contentLength).thenReturn(svgBytes.length);
   when(() => response.statusCode).thenReturn(HttpStatus.ok);
-  when(() => response.listen(
-        any(),
-        onError: any(named: 'onError'),
-        onDone: any(named: 'onDone'),
-        cancelOnError: any(named: 'cancelOnError'),
-      )).thenAnswer((invocation) {
+  when(
+    () => response.listen(
+      any(),
+      onError: any(named: 'onError'),
+      onDone: any(named: 'onDone'),
+      cancelOnError: any(named: 'cancelOnError'),
+    ),
+  ).thenAnswer((invocation) {
     final onData =
         invocation.positionalArguments[0] as void Function(List<int>);
     return Stream.fromIterable(<List<int>>[svgBytes]).listen(onData);

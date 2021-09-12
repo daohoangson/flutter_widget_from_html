@@ -7,12 +7,15 @@ void main() {
   group('onRoot', () {
     testWidgets('renders custom font', (tester) async {
       const html = '<span>Foo</span>';
-      final explained = await explain(tester, null,
-          hw: HtmlWidget(
-            html,
-            factoryBuilder: () => _OnRoot(),
-            key: hwKey,
-          ));
+      final explained = await explain(
+        tester,
+        null,
+        hw: HtmlWidget(
+          html,
+          factoryBuilder: () => _OnRoot(),
+          key: hwKey,
+        ),
+      );
       expect(explained, equals('[RichText:(+font=Custom:Foo)]'));
     });
   });
@@ -23,7 +26,8 @@ class _OnRoot extends WidgetFactory {
   void onRoot(TextStyleBuilder rootTsb) {
     super.onRoot(rootTsb);
 
-    rootTsb.enqueue((tsh, _) =>
-        tsh.copyWith(style: tsh.style.copyWith(fontFamily: 'Custom')));
+    rootTsb.enqueue(
+      (tsh, _) => tsh.copyWith(style: tsh.style.copyWith(fontFamily: 'Custom')),
+    );
   }
 }

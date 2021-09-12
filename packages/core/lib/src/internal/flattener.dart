@@ -15,7 +15,9 @@ class Flattened {
 }
 
 typedef SpanBuilder = InlineSpan? Function(
-    BuildContext, CssWhitespace whitespace);
+  BuildContext,
+  CssWhitespace whitespace,
+);
 
 class Flattener {
   final WidgetFactory wf;
@@ -163,11 +165,13 @@ class Flattener {
 
       if (scopedRecognizer != null) _recognizers.add(scopedRecognizer);
 
-      _spans!.add((context, whitespace) => wf.buildTextSpan(
-            recognizer: scopedRecognizer,
-            style: scopedTsb.build(context).styleWithHeight,
-            text: scopedStrings.toText(whitespace: whitespace),
-          ));
+      _spans!.add(
+        (context, whitespace) => wf.buildTextSpan(
+          recognizer: scopedRecognizer,
+          style: scopedTsb.build(context).styleWithHeight,
+          text: scopedStrings.toText(whitespace: whitespace),
+        ),
+      );
     }
 
     _prevStrings = [];
@@ -192,33 +196,39 @@ class Flattener {
         scopedStrings.length == 1 &&
         scopedStrings[0].isNewLine) {
       // special handling for paragraph with only one line break
-      _flattened.add(Flattened._(
-        widget: HeightPlaceholder(
-          const CssLength(1, CssLengthUnit.em),
-          scopedTsb,
+      _flattened.add(
+        Flattened._(
+          widget: HeightPlaceholder(
+            const CssLength(1, CssLengthUnit.em),
+            scopedTsb,
+          ),
         ),
-      ));
+      );
       return;
     }
 
-    _flattened.add(Flattened._(spanBuilder: (context, whitespace) {
-      final text = scopedStrings.toText(
-        dropNewLine: scopedSpans.isEmpty,
-        whitespace: whitespace,
-      );
+    _flattened.add(
+      Flattened._(
+        spanBuilder: (context, whitespace) {
+          final text = scopedStrings.toText(
+            dropNewLine: scopedSpans.isEmpty,
+            whitespace: whitespace,
+          );
 
-      final children = scopedSpans
-          .map((s) => s(context, whitespace))
-          .whereType<InlineSpan>()
-          .toList(growable: false);
+          final children = scopedSpans
+              .map((s) => s(context, whitespace))
+              .whereType<InlineSpan>()
+              .toList(growable: false);
 
-      return wf.buildTextSpan(
-        children: children,
-        recognizer: scopedRecognizer,
-        style: scopedTsb.build(context).styleWithHeight,
-        text: text,
-      );
-    }));
+          return wf.buildTextSpan(
+            children: children,
+            recognizer: scopedRecognizer,
+            style: scopedTsb.build(context).styleWithHeight,
+            text: text,
+          );
+        },
+      ),
+    );
   }
 
   TextStyleBuilder _getBitTsb(BuildBit bit) {

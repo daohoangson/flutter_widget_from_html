@@ -63,7 +63,8 @@ class TagLi {
       'padding-inline-start': '40px',
       kCssListStyleType: element.localName == kTagOrderedList
           ? _ListConfig.listStyleTypeFromAttributeType(
-                  attrs[kAttributeLiType] ?? '') ??
+                attrs[kAttributeLiType] ?? '',
+              ) ??
               kCssListStyleTypeDecimal
           : depth == 0
               ? kCssListStyleTypeDisc
@@ -131,7 +132,8 @@ class _ListConfig {
     if (listStyleType != null) return listStyleType;
 
     return listStyleTypeFromAttributeType(
-        meta.element.attributes[kAttributeLiType] ?? '');
+      meta.element.attributes[kAttributeLiType] ?? '',
+    );
   }
 
   static String? listStyleTypeFromAttributeType(String type) {
@@ -161,6 +163,8 @@ class _TagLiListOp extends BuildOp {
         );
 
   static Iterable<Widget> _onWidgetsPassThrough(
-          BuildMetadata _, Iterable<Widget> widgets) =>
+    BuildMetadata _,
+    Iterable<Widget> widgets,
+  ) =>
       widgets;
 }

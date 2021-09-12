@@ -6,12 +6,15 @@ void main() {
   group('TextStyleHtml', () {
     group('getDependency', () {
       final dep1 = _Dep1();
-      final tsh = TextStyleHtml.root([
-        const MediaQueryData(),
-        TextDirection.ltr,
-        const TextStyle(),
-        dep1,
-      ], null);
+      final tsh = TextStyleHtml.root(
+        [
+          const MediaQueryData(),
+          TextDirection.ltr,
+          const TextStyle(),
+          dep1,
+        ],
+        null,
+      );
 
       test('returns dependency', () {
         final dep = tsh.getDependency<_Dep1>();

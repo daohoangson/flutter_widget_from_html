@@ -42,7 +42,8 @@ class StyleMargin {
             for (final widget in widgets)
               if (m.hasPositiveLeftOrRight)
                 widget.wrapWith(
-                    (c, w) => _marginHorizontalBuilder(w, m, tsb.build(c)))
+                  (c, w) => _marginHorizontalBuilder(w, m, tsb.build(c)),
+                )
               else
                 widget,
             if (m.bottom?.isPositive ?? false)

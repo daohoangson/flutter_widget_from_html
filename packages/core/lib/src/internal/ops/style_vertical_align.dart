@@ -56,14 +56,17 @@ class StyleVerticalAlign {
           if (v == null) return widgets;
 
           _skipBuilding[meta] = true;
-          return listOrNull(wf
-              .buildColumnPlaceholder(meta, widgets)
-              ?.wrapWith((context, child) {
-            final tsh = meta.tsb.build(context);
-            final alignment = _tryParseAlignmentGeometry(tsh.textDirection, v);
-            if (alignment == null) return child;
-            return wf.buildAlign(meta, child, alignment);
-          }));
+          return listOrNull(
+            wf
+                .buildColumnPlaceholder(meta, widgets)
+                ?.wrapWith((context, child) {
+              final tsh = meta.tsb.build(context);
+              final alignment =
+                  _tryParseAlignmentGeometry(tsh.textDirection, v);
+              if (alignment == null) return child;
+              return wf.buildAlign(meta, child, alignment);
+            }),
+          );
         },
         onWidgetsIsOptional: true,
         priority: kPriority4k3,
@@ -84,8 +87,12 @@ class StyleVerticalAlign {
     return wf.buildColumnPlaceholder(meta, copied.build());
   }
 
-  Widget? _buildPaddedAlign(BuildContext context, BuildMetadata meta,
-      Widget child, EdgeInsets padding) {
+  Widget? _buildPaddedAlign(
+    BuildContext context,
+    BuildMetadata meta,
+    Widget child,
+    EdgeInsets padding,
+  ) {
     final tsh = meta.tsb.build(context);
     final fontSize = tsh.style.fontSize;
     if (fontSize == null) return child;

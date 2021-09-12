@@ -52,7 +52,9 @@ class HtmlListMarker extends SingleChildRenderObjectWidget {
 
   @override
   void updateRenderObject(
-      BuildContext _, _ListMarkerRenderObject renderObject) {
+    BuildContext _,
+    _ListMarkerRenderObject renderObject,
+  ) {
     renderObject
       ..markerType = markerType
       ..textStyle = textStyle;

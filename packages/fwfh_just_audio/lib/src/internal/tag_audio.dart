@@ -32,15 +32,18 @@ class TagAudio {
           final url = wf.urlFull(attrs[kAttributeAudioSrc] ?? '');
           if (url == null) return widgets;
 
-          return listOrNull(wf.buildAudioPlayer(
-                meta,
-                url,
-                autoplay: attrs.containsKey(kAttributeAudioAutoplay),
-                loop: attrs.containsKey(kAttributeAudioLoop),
-                muted: attrs.containsKey(kAttributeAudioMuted),
-                preload: attrs.containsKey(kAttributeAudioPreload) &&
-                    attrs[kAttributeAudioPreload] != kAttributeAudioPreloadNone,
-              )) ??
+          return listOrNull(
+                wf.buildAudioPlayer(
+                  meta,
+                  url,
+                  autoplay: attrs.containsKey(kAttributeAudioAutoplay),
+                  loop: attrs.containsKey(kAttributeAudioLoop),
+                  muted: attrs.containsKey(kAttributeAudioMuted),
+                  preload: attrs.containsKey(kAttributeAudioPreload) &&
+                      attrs[kAttributeAudioPreload] !=
+                          kAttributeAudioPreloadNone,
+                ),
+              ) ??
               widgets;
         },
       );

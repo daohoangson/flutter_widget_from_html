@@ -58,17 +58,19 @@ class _Panel extends StatelessWidget {
         ),
       );
 
-  TableRow _row(String data, double fontSize) => TableRow(children: [
-        Text(
-          data ?? 'Default',
-          style: TextStyle(fontSize: fontSize),
-        ),
-        HtmlWidget(
-          data != null
-              ? '<span style="font-size: $data">$data</span>'
-              : 'No font-size',
-        ),
-      ]);
+  TableRow _row(String data, double fontSize) => TableRow(
+        children: [
+          Text(
+            data ?? 'Default',
+            style: TextStyle(fontSize: fontSize),
+          ),
+          HtmlWidget(
+            data != null
+                ? '<span style="font-size: $data">$data</span>'
+                : 'No font-size',
+          ),
+        ],
+      );
 }
 
 class _Values extends StatelessWidget {

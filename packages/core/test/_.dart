@@ -6,7 +6,7 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
 
 const kColor = Color(0xFF001234);
-const kColorAccent = Color(0xFF123456);
+const kColorPrimary = Color(0xFF123456);
 
 // https://stackoverflow.com/questions/6018611/smallest-data-uri-image-possible-for-a-transparent-image
 const kDataBase64 = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -40,9 +40,13 @@ Future<String> explain(
     textStyle: textStyle,
   );
 
+  final ThemeData theme = ThemeData();
+
   await tester.pumpWidget(
     MaterialApp(
-      theme: ThemeData(accentColor: kColorAccent),
+      theme: theme.copyWith(
+        colorScheme: theme.colorScheme.copyWith(primary: kColorPrimary),
+      ),
       home: Scaffold(
         body: ExcludeSemantics(
           // exclude semantics for faster run but mostly because of this bug
@@ -79,28 +83,37 @@ Future<String> explainWithoutPumping({
   if (!useExplainer) {
     final sb = StringBuffer();
     hwKey.currentContext?.visitChildElements(
-        (e) => sb.writeln(e.toDiagnosticsNode().toStringDeep()));
+      (e) => sb.writeln(e.toDiagnosticsNode().toStringDeep()),
+    );
     var str = sb.toString();
     str = str.replaceAll(RegExp(r': [A-Z][A-Za-z]+\.'), ': '); // enums
     str = str.replaceAll(RegExp(r'State#\w+'), 'State'); // states
 
     // dependencies
     str = str.replaceAll(RegExp(r'\[GlobalKey#[0-9a-f]+\]'), '');
-    str = str.replaceAllMapped(RegExp(r'\[GlobalKey#[0-9a-f]+ (\w+)\]'),
-        (m) => '[GlobalKey ${m.group(1)!}]');
+    str = str.replaceAllMapped(
+      RegExp(r'\[GlobalKey#[0-9a-f]+ (\w+)\]'),
+      (m) => '[GlobalKey ${m.group(1)!}]',
+    );
     str = str.replaceAll(RegExp(r'(, )?dependencies: \[[^\]]+\]'), '');
 
     // image state
     str = str.replaceAll(
-        RegExp(r'ImageStream#[0-9a-f]+\([^\)]+\)'), 'ImageStream');
+      RegExp(r'ImageStream#[0-9a-f]+\([^\)]+\)'),
+      'ImageStream',
+    );
     str = str.replaceAll(
-        RegExp(r'(, )?state: _ImageState#[0-9a-f]+\([^\)]+\)'), '');
+      RegExp(r'(, )?state: _ImageState#[0-9a-f]+\([^\)]+\)'),
+      '',
+    );
 
     // simplify complicated widgets
     str = str.replaceAll(RegExp(r'Focus\(.+\)\n'), 'Focus(...)\n');
     str = str.replaceAll(RegExp(r'Listener\(.+\)\n'), 'Listener(...)\n');
     str = str.replaceAll(
-        RegExp(r'RawGestureDetector\(.+\)\n'), 'RawGestureDetector(...)\n');
+      RegExp(r'RawGestureDetector\(.+\)\n'),
+      'RawGestureDetector(...)\n',
+    );
     str = str.replaceAll(RegExp(r'Semantics\(.+\)\n'), 'Semantics(...)\n');
 
     // trim boring properties
@@ -118,8 +131,9 @@ Future<String> explainWithoutPumping({
     str = str.replaceAll(RegExp('(, )?mainAxisSize: min'), '');
     str = str.replaceAll(RegExp('(, )?maxLines: unlimited'), '');
     str = str.replaceAll(
-        RegExp(r'(, )?renderObject: \w+#[a-z0-9]+( relayoutBoundary=\w+)?'),
-        '');
+      RegExp(r'(, )?renderObject: \w+#[a-z0-9]+( relayoutBoundary=\w+)?'),
+      '',
+    );
     str = str.replaceAll(RegExp(r'(, )?softWrap: [a-z\s]+'), '');
     str = str.replaceAll(RegExp('(, )?textDirection: ltr+'), '');
 
@@ -138,11 +152,13 @@ Future<String> explainWithoutPumping({
   ).explain(built);
 }
 
-final _explainMarginRegExp = RegExp(r'^\[Column:(dir=rtl,)?children='
-    r'\[RichText:(dir=rtl,)?\(:x\)\],'
-    '(.+),'
-    r'\[RichText:(dir=rtl,)?\(:x\)\]'
-    r'\]$');
+final _explainMarginRegExp = RegExp(
+  r'^\[Column:(dir=rtl,)?children='
+  r'\[RichText:(dir=rtl,)?\(:x\)\],'
+  '(.+),'
+  r'\[RichText:(dir=rtl,)?\(:x\)\]'
+  r'\]$',
+);
 
 Future<String> explainMargin(
   WidgetTester tester,
@@ -485,21 +501,33 @@ class Explainer {
             : null;
     if (maxLines != null) attr.add('maxLines=$maxLines');
 
-    attr.add(_textAlign(widget is RichText
-        ? widget.textAlign
-        : (widget is Text ? widget.textAlign : null)));
+    attr.add(
+      _textAlign(
+        widget is RichText
+            ? widget.textAlign
+            : (widget is Text ? widget.textAlign : null),
+      ),
+    );
 
-    attr.add(_textDirection(widget is Column
-        ? widget.textDirection
-        : widget is RichText
+    attr.add(
+      _textDirection(
+        widget is Column
             ? widget.textDirection
-            : (widget is Text ? widget.textDirection : null)));
+            : widget is RichText
+                ? widget.textDirection
+                : (widget is Text ? widget.textDirection : null),
+      ),
+    );
 
-    attr.add(_textOverflow(widget is RichText
-        ? widget.overflow
-        : widget is Text
+    attr.add(
+      _textOverflow(
+        widget is RichText
             ? widget.overflow
-            : null));
+            : widget is Text
+                ? widget.overflow
+                : null,
+      ),
+    );
 
     if (widget is Align && widget is! Center) {
       attr.add(_alignment(widget.alignment));
@@ -522,40 +550,50 @@ class Explainer {
     if (widget is Padding) attr.add(_edgeInsets(widget.padding));
 
     if (widget is Positioned) {
-      attr.add('(${widget.top},${widget.right},'
-          '${widget.bottom},${widget.left})');
+      attr.add(
+        '(${widget.top},${widget.right},'
+        '${widget.bottom},${widget.left})',
+      );
     }
 
     if (widget is Tooltip) attr.add('message=${widget.message}');
 
     // A-F
     // `RichText` is an exception, it is a `MultiChildRenderObjectWidget` so it has to be processed first
-    attr.add(widget is RichText
-        ? _inlineSpan(widget.text)
-        : widget is Container
-            ? _widgetChild(widget.child)
-            : '');
+    attr.add(
+      widget is RichText
+          ? _inlineSpan(widget.text)
+          : widget is Container
+              ? _widgetChild(widget.child)
+              : '',
+    );
     // G-M
-    attr.add(widget is GestureDetector
-        ? _widgetChild(widget.child)
-        : widget is MouseRegion
-            ? _widgetChild(widget.child)
-            : widget is MultiChildRenderObjectWidget
-                ? (widget is! RichText ? _widgetChildren(widget.children) : '')
-                : '');
+    attr.add(
+      widget is GestureDetector
+          ? _widgetChild(widget.child)
+          : widget is MouseRegion
+              ? _widgetChild(widget.child)
+              : widget is MultiChildRenderObjectWidget
+                  ? (widget is! RichText
+                      ? _widgetChildren(widget.children)
+                      : '')
+                  : '',
+    );
 
     // N-T
-    attr.add(widget is ProxyWidget
-        ? _widgetChild(widget.child)
-        : widget is SingleChildRenderObjectWidget
-            ? _widgetChild(widget.child)
-            : widget is SingleChildScrollView
-                ? _widgetChild(widget.child)
-                : widget is Text
-                    ? widget.data!
-                    : widget is Tooltip
-                        ? _widgetChild(widget.child)
-                        : '');
+    attr.add(
+      widget is ProxyWidget
+          ? _widgetChild(widget.child)
+          : widget is SingleChildRenderObjectWidget
+              ? _widgetChild(widget.child)
+              : widget is SingleChildScrollView
+                  ? _widgetChild(widget.child)
+                  : widget is Text
+                      ? widget.data!
+                      : widget is Tooltip
+                          ? _widgetChild(widget.child)
+                          : '',
+    );
     // U-Z
 
     final attrStr = attr.where((a) => a.isNotEmpty).join(',');

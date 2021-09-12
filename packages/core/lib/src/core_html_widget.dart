@@ -187,11 +187,12 @@ class HtmlWidgetState extends State<HtmlWidget> {
             return snapshot.data!;
           } else if (snapshot.hasError) {
             return _sliverToBoxAdapterIfNeeded(
-                _wf.onErrorBuilder(context, _rootMeta, snapshot.error) ??
-                    widget0);
+              _wf.onErrorBuilder(context, _rootMeta, snapshot.error) ?? widget0,
+            );
           } else {
             return _sliverToBoxAdapterIfNeeded(
-                _wf.onLoadingBuilder(context, _rootMeta) ?? widget0);
+              _wf.onLoadingBuilder(context, _rootMeta) ?? widget0,
+            );
           }
         },
         future: _future!.then(_tshWidget),

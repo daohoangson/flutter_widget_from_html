@@ -37,7 +37,8 @@ const widget0 = SizedBox.shrink();
 /// )
 /// ```
 typedef CustomStylesBuilder = Map<String, String>? Function(
-    dom.Element element);
+  dom.Element element,
+);
 
 /// A callback to render custom widget for a DOM element.
 ///
@@ -69,7 +70,10 @@ typedef EnsureVisible = Future<bool> Function(
 ///
 /// See [OnLoadingBuilder] for the full list.
 typedef OnErrorBuilder = Widget? Function(
-    BuildContext context, dom.Element element, dynamic error);
+  BuildContext context,
+  dom.Element element,
+  dynamic error,
+);
 
 /// A builder that specifies the widget to display to the user
 /// while a complicated element is still loading.
@@ -79,7 +83,10 @@ typedef OnErrorBuilder = Widget? Function(
 /// - Image
 /// - Video
 typedef OnLoadingBuilder = Widget? Function(
-    BuildContext context, dom.Element element, double? loadingProgress);
+  BuildContext context,
+  dom.Element element,
+  double? loadingProgress,
+);
 
 /// A set of values that should trigger rebuild.
 class RebuildTriggers {
@@ -190,7 +197,8 @@ class WidgetPlaceholder<T> extends StatelessWidget {
 
   /// Enqueues [builder] to be built later.
   WidgetPlaceholder<T> wrapWith(
-      Widget? Function(BuildContext context, Widget child) builder) {
+    Widget? Function(BuildContext context, Widget child) builder,
+  ) {
     _builders.add(builder);
     return this;
   }

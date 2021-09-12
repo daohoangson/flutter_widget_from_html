@@ -42,6 +42,9 @@ dependency_overrides:
   fwfh_webview:
     path: ../packages/fwfh_webview
   uuid: ^3.0.0
+  # https://github.com/creativecreatorormaybenot/wakelock/issues/140
+  wakelock: 0.5.3+3
+  wakelock_platform_interface: 0.2.1+2
 
 dev_dependencies:
   flutter_driver:

@@ -80,10 +80,12 @@ class _ListItemRenderObject extends RenderBox
     final markerConstraints = childConstraints.loosen();
     final markerSize = marker.getDryLayout(markerConstraints);
 
-    return constraints.constrain(Size(
-      childSize.width,
-      childSize.height > 0 ? childSize.height : markerSize.height,
-    ));
+    return constraints.constrain(
+      Size(
+        childSize.width,
+        childSize.height > 0 ? childSize.height : markerSize.height,
+      ),
+    );
   }
 
   @override
@@ -108,10 +110,12 @@ class _ListItemRenderObject extends RenderBox
     marker.layout(markerConstraints, parentUsesSize: true);
     final markerSize = marker.size;
 
-    size = constraints.constrain(Size(
-      childSize.width,
-      childSize.height > 0 ? childSize.height : markerSize.height,
-    ));
+    size = constraints.constrain(
+      Size(
+        childSize.width,
+        childSize.height > 0 ? childSize.height : markerSize.height,
+      ),
+    );
 
     const baseline = TextBaseline.alphabetic;
     final markerDistance =

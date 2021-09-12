@@ -11,25 +11,29 @@ import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '../../packages/fwfh_chewie/test/_.dart';
 
-void _test(String name, String html) => testGoldens(name, (tester) async {
-      const platform = TargetPlatform.android;
-      debugDefaultTargetPlatformOverride = platform;
-      WidgetFactory.debugDeterministicLoadingWidget = true;
-      final key = UniqueKey();
+void _test(String name, String html) => testGoldens(
+      name,
+      (tester) async {
+        const platform = TargetPlatform.android;
+        debugDefaultTargetPlatformOverride = platform;
+        WidgetFactory.debugDeterministicLoadingWidget = true;
+        final key = UniqueKey();
 
-      await tester.pumpWidgetBuilder(
-        Golden(name, html, targetKey: key),
-        wrapper: materialAppWrapper(
-          platform: platform,
-          theme: ThemeData.light(),
-        ),
-        surfaceSize: const Size(400, 1200),
-      );
+        await tester.pumpWidgetBuilder(
+          Golden(name, html, targetKey: key),
+          wrapper: materialAppWrapper(
+            platform: platform,
+            theme: ThemeData.light(),
+          ),
+          surfaceSize: const Size(400, 1200),
+        );
 
-      await screenMatchesGolden(tester, name, finder: find.byKey(key));
-      debugDefaultTargetPlatformOverride = null;
-      WidgetFactory.debugDeterministicLoadingWidget = false;
-    }, skip: !Platform.isLinux);
+        await screenMatchesGolden(tester, name, finder: find.byKey(key));
+        debugDefaultTargetPlatformOverride = null;
+        WidgetFactory.debugDeterministicLoadingWidget = false;
+      },
+      skip: !Platform.isLinux,
+    );
 
 void main() {
   mockVideoPlayerPlatform();

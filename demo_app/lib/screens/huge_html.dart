@@ -5200,17 +5200,23 @@ class HugeHtmlScreen extends StatelessWidget {
             ListTile(
               title: const Text('renderMode: Column'),
               onTap: () => Navigator.push(
-                  context, MaterialPageRoute(builder: (_) => _ColumnScreen())),
+                context,
+                MaterialPageRoute(builder: (_) => _ColumnScreen()),
+              ),
             ),
             ListTile(
               title: const Text('renderMode: ListView'),
-              onTap: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => _ListViewScreen())),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => _ListViewScreen()),
+              ),
             ),
             ListTile(
               title: const Text('renderMode: SliverList'),
-              onTap: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => _SliverListScreen())),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => _SliverListScreen()),
+              ),
             ),
           ],
         ),
