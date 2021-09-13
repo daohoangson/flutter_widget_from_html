@@ -30,6 +30,17 @@ dependencies:
   flutter_widget_from_html: ^0.7.0
 ```
 
+### Platform specific configuration
+
+#### iOS
+
+This package uses `just_audio` to play audio and this dependency uses a microphone API.
+By default, the App Store requires a usage description which can be skipped by editing your `ios/Podfile`.
+See the detailed instruction on [its pub.dev page](https://pub.dev/packages/just_audio#ios).
+
+If you don't need `AUDIO` tag support (e.g. your HTML never has that tag), it may be better to switch to
+the core package and use it with a subset of the mixins. See [Extensibility](https://pub.dev/packages/flutter_widget_from_html_core#extensibility) for more details.
+
 ## Usage
 
 Then you have to import the package with:
@@ -134,8 +145,13 @@ These tags and their contents will be ignored:
 
 ### Inline stylings
 
-- background (color only), background-color: hex values, `rgb()`, `hsl()` or named colors
-- border, border-xxx and box-sizing
+- background: 1 value (color)
+  - background-color
+- border: 3 values (width style color), 2 values (width style) or 1 value (width)
+  - border-top, border-right, border-bottom, border-left
+  - border-block-start, border-block-end
+  - border-inline-start, border-inline-end
+- box-sizing: border-box/content-box
 - color: hex values, `rgb()`, `hsl()` or named colors
 - direction (similar to `dir` attribute)
 - font-family
@@ -143,14 +159,26 @@ These tags and their contents will be ignored:
 - font-style: italic/normal
 - font-weight: bold/normal/100..900
 - line-height: `normal`, number or values in `em`, `%`, `pt` and `px`
-- margin and margin-xxx: values in `em`, `pt` and `px`
-- padding and padding-xxx: values in `em`, `pt` and `px`
+- margin: 4 values, 2 values or 1 value in `em`, `pt` and `px`
+  - margin-top, margin-right, margin-bottom, margin-left
+  - margin-block-start, margin-block-end
+  - margin-inline-start, margin-inline-end
+- padding: 4 values, 2 values or 1 value in `em`, `pt` and `px`
+  - padding-top, padding-right, padding-bottom, padding-left
+  - padding-block-start, padding-block-end
+  - padding-inline-start, padding-inline-end
 - vertical-align: baseline/top/bottom/middle/sub/super
 - text-align (similar to `align` attribute)
-- text-decoration: line-through/none/overline/underline
+- text-decoration
+  - text-decoration-color
+  - text-decoration-line: line-through/none/overline/underline
+  - text-decoration-style: dotted/dashed/double/solid
+  - text-decoration-thickness, text-decoration-width: values in `%` only
 - text-overflow: clip/ellipsis. Note: `text-overflow: ellipsis` should be used in conjuntion with `max-lines` or `-webkit-line-clamp` for better result.
 - white-space: normal/pre
-- Sizing (width, height, max-xxx, min-xxx): `auto` or values in `em`, `%`, `pt` and `px`
+- Sizing: `auto` or values in `em`, `%`, `pt` and `px`
+  - width, max-width, min-width
+  - height, max-height, min-height
 
 ## Extensibility
 
