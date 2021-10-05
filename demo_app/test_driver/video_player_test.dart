@@ -18,11 +18,12 @@ void main() {
       }
     });
 
-    test('resizes to 1.81', () async {
-      final src = 'https://www.w3schools.com/html/mov_bbb.mp4';
+    test('resizes to 1.78', () async {
+      const src =
+          'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
       await driver.tap(find.byValueKey(src));
       await Future.delayed(const Duration(seconds: 20));
-      await expectAspectRatio(driver, 1.81);
+      await expectAspectRatio(driver, 1.78);
     });
   });
 }

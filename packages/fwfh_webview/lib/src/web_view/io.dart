@@ -25,7 +25,7 @@ class WebViewState extends State<WebView> {
 
   @override
   Widget build(BuildContext context) {
-    final webView = _buildPlaceholder() ?? _buildWebView();
+    final webView = _buildWebView();
 
     if (widget.unsupportedWorkaroundForIssue375 &&
         defaultTargetPlatform == TargetPlatform.android) {
@@ -76,7 +76,7 @@ class WebViewState extends State<WebView> {
   Future<String> eval(String js) =>
       _wvc?.evaluateJavascript(js).catchError((_) => '') ?? Future.value('');
 
-  void _autoResize() async {
+  Future<void> _autoResize() async {
     // TODO: enable codecov when `flutter drive --coverage` is available
     // https://github.com/flutter/flutter/issues/7474
     if (!mounted) return;
@@ -92,15 +92,6 @@ class WebViewState extends State<WebView> {
     final changed = (r - _aspectRatio).abs() > 0.0001;
     if (changed && mounted) setState(() => _aspectRatio = r);
   }
-
-  Widget? _buildPlaceholder() => defaultTargetPlatform ==
-              TargetPlatform.android ||
-          defaultTargetPlatform == TargetPlatform.iOS
-      ? null
-      : DecoratedBox(
-          decoration: const BoxDecoration(color: Color.fromRGBO(0, 0, 0, .5)),
-          child: Center(child: Text('platform=$defaultTargetPlatform')),
-        );
 
   Widget _buildWebView() => lib.WebView(
         debuggingEnabled: widget.debuggingEnabled,
@@ -122,7 +113,8 @@ class WebViewState extends State<WebView> {
       );
 
   lib.NavigationDecision _interceptNavigationRequest(
-      lib.NavigationRequest req) {
+    lib.NavigationRequest req,
+  ) {
     var intercepted = false;
 
     if (widget.interceptNavigationRequest != null &&
@@ -142,11 +134,15 @@ class WebViewState extends State<WebView> {
     _firstFinishedUrl ??= url;
 
     if (widget.autoResize) {
-      widget.autoResizeIntervals.forEach((t) => t == Duration.zero
+      for (final interval in widget.autoResizeIntervals) {
+        if (interval == Duration.zero) {
           // get dimensions immediately
-          ? _autoResize()
+          _autoResize();
+        } else {
           // or wait for the specified duration
-          : Future.delayed(t).then((_) => _autoResize()));
+          Future.delayed(interval).then((_) => _autoResize());
+        }
+      }
     }
   }
 }

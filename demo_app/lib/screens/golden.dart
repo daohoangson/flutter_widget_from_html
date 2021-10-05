@@ -18,11 +18,17 @@ class Golden extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final baseUrl = Uri.parse('https://www.w3schools.com/html/');
-    final withEnhanced = RegExp(r'^(IFRAME|SVG|VIDEO)$').hasMatch(name);
+    final withEnhanced = RegExp(r'^(AUDIO|IFRAME|SVG|VIDEO)$').hasMatch(name);
 
     final children = <Widget>[
-      Text(html),
-      Divider(),
+      if (withEnhanced)
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Text(html),
+        )
+      else
+        Text(html),
+      const Divider(),
       if (withEnhanced)
         Text(
           'flutter_widget_from_html_core:\n',
@@ -39,7 +45,7 @@ class Golden extends StatelessWidget {
 
     if (withEnhanced) {
       children.addAll(<Widget>[
-        Divider(),
+        const Divider(),
         Text(
           'flutter_widget_from_html:\n',
           style: Theme.of(context).textTheme.caption,
@@ -78,6 +84,8 @@ class Golden extends StatelessWidget {
 }
 
 class GoldensScreen extends StatefulWidget {
+  const GoldensScreen({Key key}) : super(key: key);
+
   @override
   _GoldensState createState() => _GoldensState();
 }
@@ -99,8 +107,10 @@ class _GoldensState extends State<GoldensScreen> {
       final map = jsonDecode(value) as Map;
       final typed = <MapEntry<String, String>>[];
       for (final entry in map.entries) {
-        if (entry.key is String && entry.value is String) {
-          typed.add(MapEntry<String, String>(entry.key, entry.value));
+        final key = entry.key;
+        final value = entry.value;
+        if (key is String && value is String) {
+          typed.add(MapEntry(key, value));
         }
       }
 
@@ -116,7 +126,7 @@ class _GoldensState extends State<GoldensScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text('GoldensScreen')),
+        appBar: AppBar(title: const Text('GoldensScreen')),
         body: FutureBuilder<List<MapEntry<String, String>>>(
           builder: (context, snapshot) => snapshot.hasData
               ? _onData(_filtered ?? snapshot.data)
@@ -135,8 +145,11 @@ class _GoldensState extends State<GoldensScreen> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        onTap: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (_) => Golden(golden.key, golden.value))),
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => Golden(golden.key, golden.value),
+          ),
+        ),
       );
 
   Widget _onData(List<MapEntry<String, String>> goldens) => Column(
@@ -150,7 +163,7 @@ class _GoldensState extends State<GoldensScreen> {
                 suffixIcon: _filtered != null
                     ? InkWell(
                         onTap: () => _filter.clear(),
-                        child: Icon(Icons.cancel),
+                        child: const Icon(Icons.cancel),
                       )
                     : null,
               ),
@@ -168,16 +181,18 @@ class _GoldensState extends State<GoldensScreen> {
 
   Widget _onError(Object error) => Center(child: Text('$error'));
 
-  void _onFilter() async {
+  Future<void> _onFilter() async {
     final query = _filter.text;
     if (query.isEmpty) return setState(() => _filtered = null);
 
     final lowerCased = query.toLowerCase();
     final goldens = await _goldens;
-    setState(() => _filtered = goldens
-        .where((golden) => golden.key.toLowerCase().contains(lowerCased))
-        .toList());
+    setState(
+      () => _filtered = goldens
+          .where((golden) => golden.key.toLowerCase().contains(lowerCased))
+          .toList(),
+    );
   }
 
-  Widget _onLoading() => Center(child: CircularProgressIndicator());
+  Widget _onLoading() => const Center(child: CircularProgressIndicator());
 }

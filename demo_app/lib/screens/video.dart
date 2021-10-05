@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class VideoScreen extends StatefulWidget {
+  const VideoScreen({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _State();
 }
@@ -24,48 +26,52 @@ class _State extends State<VideoScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('VideoScreen'),
+          title: const Text('VideoScreen'),
         ),
-        body: ListView(children: <Widget>[
-          CheckboxListTile(
-            value: autoplay,
-            onChanged: (v) => _setState(() => autoplay = v),
-            title: const Text('autoplay'),
-          ),
-          CheckboxListTile(
-            value: controls,
-            onChanged: (v) => _setState(() => controls = v),
-            title: const Text('controls'),
-          ),
-          CheckboxListTile(
-            value: loop,
-            onChanged: (v) => _setState(() => loop = v),
-            title: const Text('loop'),
-          ),
-          CheckboxListTile(
-            value: poster,
-            onChanged: (v) => _setState(() => poster = v),
-            title: const Text('poster'),
-          ),
-          CheckboxListTile(
-            value: widthHeight,
-            onChanged: (v) => _setState(() => widthHeight = v),
-            title: const Text('width & height'),
-          ),
-          ListTile(
-            title: Text('HTML:'),
-            subtitle: Text(_html),
-          ),
-          ListTile(
-            title: Text('Rendered:'),
-            subtitle: HtmlWidget(
-              _html,
-              key: Key(_html),
-              baseUrl: Uri.parse('https://www.w3schools.com/html/'),
+        body: ListView(
+          children: <Widget>[
+            CheckboxListTile(
+              value: autoplay,
+              onChanged: (v) => _setState(() => autoplay = v),
+              title: const Text('autoplay'),
             ),
-          ),
-          Center(child: Text('----')),
-        ]),
+            CheckboxListTile(
+              value: controls,
+              onChanged: (v) => _setState(() => controls = v),
+              title: const Text('controls'),
+            ),
+            CheckboxListTile(
+              value: loop,
+              onChanged: (v) => _setState(() => loop = v),
+              title: const Text('loop'),
+            ),
+            CheckboxListTile(
+              value: poster,
+              onChanged: (v) => _setState(() => poster = v),
+              title: const Text('poster'),
+            ),
+            CheckboxListTile(
+              value: widthHeight,
+              onChanged: (v) => _setState(() => widthHeight = v),
+              title: const Text('width & height'),
+            ),
+            ListTile(
+              title: const Text('HTML:'),
+              subtitle: Text(_html),
+            ),
+            ListTile(
+              title: const Text('Rendered:'),
+              subtitle: HtmlWidget(
+                _html,
+                key: Key(_html),
+                baseUrl: Uri.parse(
+                  'https://interactive-examples.mdn.mozilla.net/pages/tabbed/video.html',
+                ),
+              ),
+            ),
+            const Center(child: Text('----')),
+          ],
+        ),
       );
 
   void _setState(VoidCallback callback) => setState(() {
@@ -85,17 +91,16 @@ class _State extends State<VideoScreen> {
           attributes.add('poster="asset:logos/android.png"');
         }
         if (widthHeight) {
-          attributes.add('width="320" height="176"');
+          attributes.add('width="320" height="180"');
         }
 
         _html = """
 <figure>
   <video ${attributes.join(' ')}>
-    <source src="mov_bbb.mp4" type="video/mp4">
-    <source src="mov_bbb.ogg" type="video/ogg">
-    Your browser does not support HTML5 video.
+    <source src="/media/cc0-videos/flower.mp4" type="video/mp4">
+    <code>VIDEO</code> support is not enabled.
   </video>
-  <figcaption>Source: <a href="https://www.w3schools.com/html/html5_video.asp">w3schools</a></figcaption>
+  <figcaption>Source: <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video">developer.mozilla.org</a></figcaption>
 </figure>
 """;
       });

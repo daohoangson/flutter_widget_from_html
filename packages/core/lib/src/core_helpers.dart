@@ -6,9 +6,12 @@ import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'core_html_widget.dart';
+import 'core_widget_factory.dart';
 
+export 'external/csslib.dart';
 export 'widgets/css_sizing.dart';
 export 'widgets/html_list_item.dart';
+export 'widgets/html_list_marker.dart';
 export 'widgets/html_ruby.dart';
 export 'widgets/html_table.dart';
 
@@ -34,7 +37,8 @@ const widget0 = SizedBox.shrink();
 /// )
 /// ```
 typedef CustomStylesBuilder = Map<String, String>? Function(
-    dom.Element element);
+  dom.Element element,
+);
 
 /// A callback to render custom widget for a DOM element.
 ///
@@ -44,48 +48,45 @@ typedef CustomStylesBuilder = Map<String, String>? Function(
 /// For those needs, a custom [WidgetFactory] is the way to go.
 typedef CustomWidgetBuilder = Widget? Function(dom.Element element);
 
-final _domElementStyles = Expando<List<InlineStyle>>();
+/// A callback to scroll the anchor identified by [id] into the viewport.
+///
+/// By default, an internal implementation is given to [WidgetFactory.onTapAnchor]
+/// when an anchor is tapped to handle the scrolling.
+/// A wf subclass can use this to change the [curve], the animation [duration]
+/// or even request scrolling to a different anchor.
+///
+/// The future is resolved after scrolling is completed.
+/// It will be `true` if scrolling succeed or `false` otherwise.
+typedef EnsureVisible = Future<bool> Function(
+  String id, {
+  Curve curve,
+  Duration duration,
+  Curve jumpCurve,
+  Duration jumpDuration,
+});
 
-final _domElementStyleRegExp = RegExp(r'([a-zA-Z\-]+)\s*:\s*([^;]*)');
+/// A builder function that is called if an error occurs
+/// during a complicated element rendering.
+///
+/// See [OnLoadingBuilder] for the full list.
+typedef OnErrorBuilder = Widget? Function(
+  BuildContext context,
+  dom.Element element,
+  dynamic error,
+);
 
-extension DomElementExtension on dom.Element {
-  /// Returns parsed [InlineStyle]s from the element's `style` attribute.
-  ///
-  /// This is different from [BuildMetadata.styles] as it doesn't include
-  /// runtime additions from [WidgetFactory] or [BuildOp]s.
-  List<InlineStyle> get styles {
-    final result = _domElementStyles[this];
-    if (result != null) return result;
-
-    if (!attributes.containsKey('style')) {
-      return _domElementStyles[this] = const [];
-    }
-
-    return _domElementStyles[this] = _domElementStyleRegExp
-        .allMatches(attributes['style']!)
-        .map((m) => InlineStyle(m[1]!.trim(), m[2]!.trim()))
-        .toList(growable: false);
-  }
-}
-
-final _domElementStyleValuesRegExp = RegExp(r'\s+');
-
-/// An inline style key value pair.
-class InlineStyle {
-  /// The key.
-  final String key;
-
-  /// The value.
-  ///
-  /// Use [values] for tokenized strings.
-  final String value;
-
-  /// Creates a key value pair.
-  InlineStyle(this.key, this.value);
-
-  /// The tokenized values.
-  List<String> get values => value.split(_domElementStyleValuesRegExp);
-}
+/// A builder that specifies the widget to display to the user
+/// while a complicated element is still loading.
+///
+/// List of widgets that will trigger this method:
+/// - The [HtmlWidget] itself
+/// - Image
+/// - Video
+typedef OnLoadingBuilder = Widget? Function(
+  BuildContext context,
+  dom.Element element,
+  double? loadingProgress,
+);
 
 /// A set of values that should trigger rebuild.
 class RebuildTriggers {
@@ -118,6 +119,45 @@ class RebuildTriggers {
   }
 }
 
+/// The HTML body render modes.
+enum RenderMode {
+  /// The body will be rendered as a `Column` widget.
+  ///
+  /// This is the default render mode.
+  /// It's good enough for small / medium document and can be used easily.
+  column,
+
+  /// The body will be rendered as a `ListView` widget.
+  ///
+  /// It's good for medium / large document in a dedicated page layout
+  /// (e.g. the HTML document is the only thing on the screen).
+  listView,
+
+  /// The body will be rendered as a `SliverList` sliver.
+  ///
+  /// It's good for large / huge document and can be put in the same scrolling
+  /// context with other contents.
+  /// A [CustomScrollView] or similar is required for this to work.
+  sliverList,
+}
+
+/// An extension on [Widget] to keep track of anchors.
+extension WidgetAnchors on Widget {
+  static final _anchors = Expando<Iterable<Key>>();
+
+  /// Anchor keys of this widget and its children.
+  Iterable<Key>? get anchors => _anchors[this];
+
+  /// Set anchor keys.
+  bool setAnchorsIfUnset(Iterable<Key>? anchors) {
+    if (anchors == null) return false;
+    final existing = _anchors[this];
+    if (existing != null) return false;
+    _anchors[this] = anchors;
+    return true;
+  }
+}
+
 /// A widget builder that supports builder callbacks.
 class WidgetPlaceholder<T> extends StatelessWidget {
   /// The origin of this widget.
@@ -127,8 +167,11 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   final Widget? _firstChild;
 
   /// Creates a widget builder.
-  WidgetPlaceholder(this.generator, {Widget? child}) : _firstChild = child;
+  WidgetPlaceholder(this.generator, {Widget? child, Key? key})
+      : _firstChild = child,
+        super(key: key);
 
+  @visibleForTesting
   @override
   Widget build(BuildContext context) => callBuilders(context, _firstChild);
 
@@ -140,22 +183,22 @@ class WidgetPlaceholder<T> extends StatelessWidget {
       built = builder(context, built) ?? widget0;
     }
 
+    built.setAnchorsIfUnset(anchors);
+
     return built;
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<T>(
-      'generator',
-      generator,
-      showName: false,
-    ));
+    properties
+        .add(DiagnosticsProperty('generator', generator, showName: false));
   }
 
   /// Enqueues [builder] to be built later.
   WidgetPlaceholder<T> wrapWith(
-      Widget? Function(BuildContext context, Widget child) builder) {
+    Widget? Function(BuildContext context, Widget child) builder,
+  ) {
     _builders.add(builder);
     return this;
   }
@@ -164,7 +207,7 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
       generator != null
           ? 'WidgetPlaceholder($generator)'
-          : runtimeType.toString();
+          : objectRuntimeType(this, 'WidgetPlaceholder');
 
   /// Creates a placeholder lazily.
   ///
@@ -174,7 +217,7 @@ class WidgetPlaceholder<T> extends StatelessWidget {
       : WidgetPlaceholder<Widget>(child, child: child);
 }
 
-final _dataUriRegExp = RegExp(r'^data:[^;]+;([^,]+),');
+final _dataUriRegExp = RegExp('^data:[^;]+;([^,]+),');
 
 /// Returns [Uint8List] by decoding [dataUri].
 ///

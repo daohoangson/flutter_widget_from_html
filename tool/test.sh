@@ -2,53 +2,67 @@
 
 set -e
 
-( \
-  cd ./packages/core \
-  && flutter pub get \
-  && flutter test "$@" \
-  && echo 'packages/core OK' \
+(
+  cd ./packages/core &&
+    flutter pub get &&
+    flutter test "$@" &&
+    echo 'packages/core OK'
 )
 
 if [ -z "$UPDATE_GOLDENS" ]; then
-  ( \
-    cd ./packages/fwfh_cached_network_image \
-    && flutter pub get \
-    && flutter test "$@" \
-    && echo 'packages/fwfh_cached_network_image OK' \
+  (
+    cd ./packages/fwfh_cached_network_image &&
+      flutter pub get &&
+      flutter test "$@" &&
+      echo 'packages/fwfh_cached_network_image OK'
   )
 
-  ( \
-    cd ./packages/fwfh_chewie \
-    && flutter pub get \
-    && flutter test "$@" \
-    && echo 'packages/fwfh_chewie OK' \
+  (
+    cd ./packages/fwfh_chewie &&
+      flutter pub get &&
+      flutter test "$@" &&
+      echo 'packages/fwfh_chewie OK'
   )
 
-  ( \
-    cd ./packages/fwfh_svg \
-    && flutter pub get \
-    && flutter test "$@" \
-    && echo 'packages/fwfh_svg OK' \
+  (
+    cd ./packages/fwfh_just_audio &&
+      flutter pub get &&
+      flutter test "$@" &&
+      echo 'packages/fwfh_just_audio OK'
   )
 
-  ( \
-    cd ./packages/fwfh_webview \
-    && flutter pub get \
-    && flutter test "$@" \
-    && echo 'packages/fwfh_webview OK' \
+  (
+    cd ./packages/fwfh_svg &&
+      flutter pub get &&
+      flutter test "$@" &&
+      echo 'packages/fwfh_svg OK'
   )
 
-  ( \
-    cd ./packages/enhanced \
-    && flutter pub get \
-    && flutter test "$@" \
-    && echo 'packages/enhanced OK' \
+  (
+    cd ./packages/fwfh_url_launcher &&
+      flutter pub get &&
+      flutter test "$@" &&
+      echo 'packages/fwfh_url_launcher OK'
+  )
+
+  (
+    cd ./packages/fwfh_webview &&
+      flutter pub get &&
+      flutter test "$@" &&
+      echo 'packages/fwfh_webview OK'
+  )
+
+  (
+    cd ./packages/enhanced &&
+      flutter pub get &&
+      flutter test "$@" &&
+      echo 'packages/enhanced OK'
   )
 fi
 
-( \
-  cd ./demo_app \
-  && flutter pub get \
-  && flutter test "$@" \
-  && echo 'demo_app OK' \
+(
+  cd ./demo_app &&
+    flutter pub get &&
+    flutter test "$@" &&
+    echo 'demo_app OK'
 )

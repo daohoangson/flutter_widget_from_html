@@ -3,10 +3,12 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:fwfh_math/fwfh_math.dart';
 
 class MathScreen extends StatelessWidget {
+  const MathScreen({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('MathFactory Demo'),
+          title: const Text('MathFactory Demo'),
         ),
         body: Center(
           child: HtmlWidget(

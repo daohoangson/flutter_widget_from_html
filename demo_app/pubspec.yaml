@@ -23,6 +23,9 @@ dependencies:
   url_launcher: any
 
 dependency_overrides:
+  archive: ^3.0.0
+  crypto: ^3.0.0
+  file: ^6.0.0
   flutter_widget_from_html:
     path: ../packages/enhanced
   flutter_widget_from_html_core:
@@ -31,6 +34,8 @@ dependency_overrides:
     path: ../packages/fwfh_cached_network_image
   fwfh_chewie:
     path: ../packages/fwfh_chewie
+  fwfh_just_audio:
+    path: ../packages/fwfh_just_audio
   fwfh_math:
     path: ../packages/fwfh_math
   fwfh_svg:
@@ -39,18 +44,18 @@ dependency_overrides:
     path: ../packages/fwfh_url_launcher
   fwfh_webview:
     path: ../packages/fwfh_webview
-  archive: ^3.0.0
-  crypto: ^3.0.0
-  file: ^6.0.0
   uuid: ^3.0.0
+  # https://github.com/creativecreatorormaybenot/wakelock/issues/140
+  wakelock: 0.5.3+3
+  wakelock_platform_interface: 0.2.1+2
 
 dev_dependencies:
   flutter_driver:
     sdk: flutter
   flutter_test:
     sdk: flutter
-  golden_toolkit: any
-  pedantic: any
+  golden_toolkit: ^0.10.0
+  lint: any
   test: any
 
 flutter:

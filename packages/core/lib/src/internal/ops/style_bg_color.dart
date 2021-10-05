@@ -20,28 +20,31 @@ class StyleBgColor {
           }
         },
         onWidgets: (meta, widgets) {
+          if (meta.willBuildSubtree == false) return widgets;
+
           final color = _parseColor(wf, meta);
           if (color == null) return null;
-          return listOrNull(wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
-              (_, child) => wf.buildDecoratedBox(meta, child, color: color)));
+          return listOrNull(
+            wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
+                  (_, child) => wf.buildDecoratedBox(meta, child, color: color),
+                ),
+          );
         },
         onWidgetsIsOptional: true,
-        priority: 4900,
+        priority: 6100,
       );
 
   Color? _parseColor(WidgetFactory wf, BuildMetadata meta) {
     Color? color;
     for (final style in meta.styles) {
-      switch (style.key) {
-        case kCssBackgroundColor:
-          final parsed = tryParseColor(style.value);
-          if (parsed != null) color = parsed;
-          break;
+      switch (style.property) {
         case kCssBackground:
-          for (final value in style.values) {
-            final parsed = tryParseColor(value);
-            if (parsed != null) color = parsed;
+          for (final expression in style.values) {
+            color = tryParseColor(expression) ?? color;
           }
+          break;
+        case kCssBackgroundColor:
+          color = tryParseColor(style.value) ?? color;
           break;
       }
     }

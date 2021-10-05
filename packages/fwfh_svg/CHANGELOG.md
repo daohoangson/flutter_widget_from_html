@@ -1,7 +1,11 @@
-## 0.6.0-rc.2021031201
+## 0.7.0
 
-- Update test for mocktail@0.0.2 (#469)
+- Add support for flutter_widget_from_html_core@0.7.0
 
-## 0.6.0-rc.2021022601
+## 0.6.0+1
+
+- Add support for flutter_svg@0.22.0 (#498)
+
+## 0.6.0
 
 - First release

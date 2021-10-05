@@ -6,11 +6,11 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
 
 const kColor = Color(0xFF001234);
-const kColorAccent = Color(0xFF123456);
+const kColorPrimary = Color(0xFF123456);
 
 // https://stackoverflow.com/questions/6018611/smallest-data-uri-image-possible-for-a-transparent-image
-const kDataUri =
-    'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+const kDataBase64 = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+const kDataUri = 'data:image/gif;base64,$kDataBase64';
 
 final hwKey = GlobalKey<State<HtmlWidget>>();
 
@@ -24,24 +24,9 @@ Widget? buildCurrentState() {
   return hws.build(hws.context);
 }
 
-Future<Widget> buildFutureBuilder(
-  FutureBuilder<Widget> fb, {
-  bool withData = true,
-}) async {
-  final hws = hwKey.currentState;
-  if (hws == null) return Future.value(null);
-
-  final data = await fb.future!;
-  final snapshot = withData
-      ? AsyncSnapshot.withData(ConnectionState.done, data)
-      : AsyncSnapshot<Widget>.nothing();
-  return fb.builder(hws.context, snapshot);
-}
-
 Future<String> explain(
   WidgetTester tester,
   String? html, {
-  bool buildFutureBuilderWithData = true,
   String? Function(Explainer, Widget)? explainer,
   Widget? hw,
   bool rtl = false,
@@ -55,9 +40,13 @@ Future<String> explain(
     textStyle: textStyle,
   );
 
+  final ThemeData theme = ThemeData();
+
   await tester.pumpWidget(
     MaterialApp(
-      theme: ThemeData(accentColor: kColorAccent),
+      theme: theme.copyWith(
+        colorScheme: theme.colorScheme.copyWith(primary: kColorPrimary),
+      ),
       home: Scaffold(
         body: ExcludeSemantics(
           // exclude semantics for faster run but mostly because of this bug
@@ -82,94 +71,94 @@ Future<String> explain(
   );
 
   return explainWithoutPumping(
-    buildFutureBuilderWithData: buildFutureBuilderWithData,
     explainer: explainer,
     useExplainer: useExplainer,
   );
 }
 
 Future<String> explainWithoutPumping({
-  bool buildFutureBuilderWithData = true,
   String? Function(Explainer, Widget)? explainer,
   bool useExplainer = true,
 }) async {
   if (!useExplainer) {
     final sb = StringBuffer();
     hwKey.currentContext?.visitChildElements(
-        (e) => sb.writeln(e.toDiagnosticsNode().toStringDeep()));
+      (e) => sb.writeln(e.toDiagnosticsNode().toStringDeep()),
+    );
     var str = sb.toString();
     str = str.replaceAll(RegExp(r': [A-Z][A-Za-z]+\.'), ': '); // enums
     str = str.replaceAll(RegExp(r'State#\w+'), 'State'); // states
 
     // dependencies
     str = str.replaceAll(RegExp(r'\[GlobalKey#[0-9a-f]+\]'), '');
+    str = str.replaceAllMapped(
+      RegExp(r'\[GlobalKey#[0-9a-f]+ (\w+)\]'),
+      (m) => '[GlobalKey ${m.group(1)!}]',
+    );
     str = str.replaceAll(RegExp(r'(, )?dependencies: \[[^\]]+\]'), '');
 
     // image state
     str = str.replaceAll(
-        RegExp(r'ImageStream#[0-9a-f]+\([^\)]+\)'), 'ImageStream');
+      RegExp(r'ImageStream#[0-9a-f]+\([^\)]+\)'),
+      'ImageStream',
+    );
     str = str.replaceAll(
-        RegExp(r'(, )?state: _ImageState#[0-9a-f]+\([^\)]+\)'), '');
+      RegExp(r'(, )?state: _ImageState#[0-9a-f]+\([^\)]+\)'),
+      '',
+    );
 
     // simplify complicated widgets
     str = str.replaceAll(RegExp(r'Focus\(.+\)\n'), 'Focus(...)\n');
     str = str.replaceAll(RegExp(r'Listener\(.+\)\n'), 'Listener(...)\n');
     str = str.replaceAll(
-        RegExp(r'RawGestureDetector\(.+\)\n'), 'RawGestureDetector(...)\n');
+      RegExp(r'RawGestureDetector\(.+\)\n'),
+      'RawGestureDetector(...)\n',
+    );
     str = str.replaceAll(RegExp(r'Semantics\(.+\)\n'), 'Semantics(...)\n');
 
     // trim boring properties
     str =
-        str.replaceAll(RegExp(r'(, )?(this.)?excludeFromSemantics: false'), '');
-    str = str.replaceAll(RegExp(r'(, )?clipBehavior: none'), '');
-    str = str.replaceAll(RegExp(r'(, )?crossAxisAlignment: start'), '');
-    str = str.replaceAll(RegExp(r'(, )?direction: vertical'), '');
-    str = str.replaceAll(RegExp(r'(, )?filterQuality: low'), '');
-    str = str.replaceAll(RegExp(r'(, )?frameBuilder: null'), '');
-    str = str.replaceAll(RegExp(r'(, )?image: null'), '');
-    str = str.replaceAll(RegExp(r'(, )?invertColors: false'), '');
-    str = str.replaceAll(RegExp(r'(, )?loadingBuilder: null'), '');
-    str = str.replaceAll(RegExp(r'(, )?mainAxisAlignment: start'), '');
-    str = str.replaceAll(RegExp(r'(, )?mainAxisSize: min'), '');
-    str = str.replaceAll(RegExp(r'(, )?maxLines: unlimited'), '');
+        str.replaceAll(RegExp('(, )?(this.)?excludeFromSemantics: false'), '');
+    str = str.replaceAll(RegExp('(, )?clipBehavior: none'), '');
+    str = str.replaceAll(RegExp('(, )?crossAxisAlignment: start'), '');
+    str = str.replaceAll(RegExp('(, )?direction: vertical'), '');
+    str = str.replaceAll(RegExp('(, )?filterQuality: low'), '');
+    str = str.replaceAll(RegExp('(, )?frameBuilder: null'), '');
+    str = str.replaceAll(RegExp('(, )?image: null'), '');
+    str = str.replaceAll(RegExp('(, )?invertColors: false'), '');
+    str = str.replaceAll(RegExp('(, )?loadingBuilder: null'), '');
+    str = str.replaceAll(RegExp('(, )?mainAxisAlignment: start'), '');
+    str = str.replaceAll(RegExp('(, )?mainAxisSize: min'), '');
+    str = str.replaceAll(RegExp('(, )?maxLines: unlimited'), '');
     str = str.replaceAll(
-        RegExp(r'(, )?renderObject: \w+#[a-z0-9]+( relayoutBoundary=\w+)?'),
-        '');
+      RegExp(r'(, )?renderObject: \w+#[a-z0-9]+( relayoutBoundary=\w+)?'),
+      '',
+    );
     str = str.replaceAll(RegExp(r'(, )?softWrap: [a-z\s]+'), '');
-    str = str.replaceAll(RegExp(r'(, )?textDirection: ltr+'), '');
+    str = str.replaceAll(RegExp('(, )?textDirection: ltr+'), '');
 
     // delete leading comma (because of property trimmings)
-    str = str.replaceAllMapped(RegExp(r'(\w+\(), '), (m) => m[1]!);
+    str = str.replaceAll('(, ', '(');
     str = simplifyHashCode(str);
     return str;
   }
 
-  var built = buildCurrentState();
+  final built = buildCurrentState();
   if (built == null) return 'null';
 
-  var isFutureBuilder = false;
-  if (built is FutureBuilder<Widget>) {
-    built = await buildFutureBuilder(
-      built,
-      withData: buildFutureBuilderWithData,
-    );
-    isFutureBuilder = true;
-  }
-
-  var explained = Explainer(
+  return Explainer(
     hwKey.currentContext!,
     explainer: explainer,
   ).explain(built);
-  if (isFutureBuilder) explained = '[FutureBuilder:$explained]';
-
-  return explained;
 }
 
-final _explainMarginRegExp = RegExp(r'^\[Column:(dir=rtl,)?children='
-    r'\[RichText:(dir=rtl,)?\(:x\)\],'
-    r'(.+),'
-    r'\[RichText:(dir=rtl,)?\(:x\)\]'
-    r'\]$');
+final _explainMarginRegExp = RegExp(
+  r'^\[Column:(dir=rtl,)?children='
+  r'\[RichText:(dir=rtl,)?\(:x\)\],'
+  '(.+),'
+  r'\[RichText:(dir=rtl,)?\(:x\)\]'
+  r'\]$',
+);
 
 Future<String> explainMargin(
   WidgetTester tester,
@@ -324,7 +313,7 @@ class Explainer {
     final text = textSpan?.text ?? '';
     final children = textSpan?.children
             ?.map((c) => _inlineSpan(c, parentStyle: textSpan.style))
-            .join('') ??
+            .join() ??
         '';
 
     final recognizerSb = StringBuffer();
@@ -344,20 +333,37 @@ class Explainer {
     return '($style$recognizerSb:$text$children)';
   }
 
+  String _key(Key key) {
+    final matches =
+        RegExp(r'^\[GlobalKey#[^ ]+ (.+)\]$').firstMatch(key.toString());
+    if (matches == null) return '';
+
+    return '#${matches.group(1)}';
+  }
+
   String _limitBox(LimitedBox box) => 'h=${box.maxHeight},w=${box.maxWidth}';
 
   String _sizedBox(SizedBox box) {
     var clazz = box.runtimeType.toString();
     var size = '${box.width?.toStringAsFixed(1) ?? 0.0}x'
         '${box.height?.toStringAsFixed(1) ?? 0.0}';
-    if (size == 'InfinityxInfinity') {
-      clazz = 'SizedBox.expand';
-      size = '';
+    switch (size) {
+      case '0.0x0.0':
+        if (box.width == 0.0 && box.height == 0.0) {
+          clazz = 'SizedBox.shrink';
+        }
+        size = '';
+        break;
+      case 'InfinityxInfinity':
+        clazz = 'SizedBox.expand';
+        size = '';
+        break;
     }
 
+    final key = box.key != null ? _key(box.key!) : '';
     final child = box.child != null ? 'child=${_widget(box.child!)}' : '';
     final comma = size.isNotEmpty && child.isNotEmpty ? ',' : '';
-    return '[$clazz:$size$comma$child]';
+    return '[$clazz$key:$size$comma$child]';
   }
 
   String _textAlign(TextAlign? textAlign) =>
@@ -430,7 +436,16 @@ class Explainer {
         ? ''
         : '${style.decorationStyle}'.replaceFirst(RegExp(r'^.+\.'), '/');
 
-    return "${styleHasIt ? '+' : '-'}$str$decorationStyle";
+    final decorationColor =
+        (style.decorationColor == null || style.decorationColor == style.color)
+            ? ''
+            : '/${_color(style.decorationColor!)}';
+
+    final decorationThickness = style.decorationThickness == null
+        ? ''
+        : '/${style.decorationThickness}';
+
+    return "${styleHasIt ? '+' : '-'}$str$decorationColor$decorationStyle$decorationThickness";
   }
 
   String _textStyleFontStyle(TextStyle style) {
@@ -455,7 +470,7 @@ class Explainer {
     }
 
     if (fontWeight == FontWeight.bold) return '+b';
-    return '+w' + FontWeight.values.indexOf(fontWeight).toString();
+    return '+w${FontWeight.values.indexOf(fontWeight)}';
   }
 
   String _widget(Widget widget) {
@@ -464,9 +479,12 @@ class Explainer {
 
     if (widget == widget0) return '[widget0]';
 
+    if (widget.runtimeType.toString() == 'HtmlListMarker') {
+      return widget.toStringShort();
+    }
+
     if (widget is TshWidget) return _widget(widget.child);
 
-    // ignore: invalid_use_of_protected_member
     if (widget is WidgetPlaceholder) return _widget(widget.build(context));
 
     if (widget is Image) return _image(widget);
@@ -474,7 +492,7 @@ class Explainer {
     if (widget is SizedBox) return _sizedBox(widget);
 
     final type = '${widget.runtimeType}';
-    var attr = <String>[];
+    final attr = <String>[];
 
     final maxLines = widget is RichText
         ? widget.maxLines
@@ -483,23 +501,33 @@ class Explainer {
             : null;
     if (maxLines != null) attr.add('maxLines=$maxLines');
 
-    attr.add(_textAlign(widget is RichText
-        ? widget.textAlign
-        : (widget is Text ? widget.textAlign : null)));
+    attr.add(
+      _textAlign(
+        widget is RichText
+            ? widget.textAlign
+            : (widget is Text ? widget.textAlign : null),
+      ),
+    );
 
-    attr.add(_textDirection(widget is Column
-        ? widget.textDirection
-        : widget is RichText
+    attr.add(
+      _textDirection(
+        widget is Column
             ? widget.textDirection
-            : widget is Stack
+            : widget is RichText
                 ? widget.textDirection
-                : (widget is Text ? widget.textDirection : null)));
+                : (widget is Text ? widget.textDirection : null),
+      ),
+    );
 
-    attr.add(_textOverflow(widget is RichText
-        ? widget.overflow
-        : widget is Text
+    attr.add(
+      _textOverflow(
+        widget is RichText
             ? widget.overflow
-            : null));
+            : widget is Text
+                ? widget.overflow
+                : null,
+      ),
+    );
 
     if (widget is Align && widget is! Center) {
       attr.add(_alignment(widget.alignment));
@@ -522,42 +550,50 @@ class Explainer {
     if (widget is Padding) attr.add(_edgeInsets(widget.padding));
 
     if (widget is Positioned) {
-      attr.add('(${widget.top},${widget.right},'
-          '${widget.bottom},${widget.left})');
-    }
-
-    if (widget is SizedBox) {
-      attr.add('${widget.width ?? 0.0}x'
-          '${widget.height ?? 0.0}');
+      attr.add(
+        '(${widget.top},${widget.right},'
+        '${widget.bottom},${widget.left})',
+      );
     }
 
     if (widget is Tooltip) attr.add('message=${widget.message}');
 
     // A-F
     // `RichText` is an exception, it is a `MultiChildRenderObjectWidget` so it has to be processed first
-    attr.add(widget is RichText
-        ? _inlineSpan(widget.text)
-        : widget is Container
-            ? _widgetChild(widget.child)
-            : '');
+    attr.add(
+      widget is RichText
+          ? _inlineSpan(widget.text)
+          : widget is Container
+              ? _widgetChild(widget.child)
+              : '',
+    );
     // G-M
-    attr.add(widget is GestureDetector
-        ? _widgetChild(widget.child)
-        : widget is MultiChildRenderObjectWidget
-            ? (widget is! RichText ? _widgetChildren(widget.children) : '')
-            : '');
+    attr.add(
+      widget is GestureDetector
+          ? _widgetChild(widget.child)
+          : widget is MouseRegion
+              ? _widgetChild(widget.child)
+              : widget is MultiChildRenderObjectWidget
+                  ? (widget is! RichText
+                      ? _widgetChildren(widget.children)
+                      : '')
+                  : '',
+    );
+
     // N-T
-    attr.add(widget is ProxyWidget
-        ? _widgetChild(widget.child)
-        : widget is SingleChildRenderObjectWidget
-            ? _widgetChild(widget.child)
-            : widget is SingleChildScrollView
-                ? _widgetChild(widget.child)
-                : widget is Text
-                    ? widget.data!
-                    : widget is Tooltip
-                        ? _widgetChild(widget.child)
-                        : '');
+    attr.add(
+      widget is ProxyWidget
+          ? _widgetChild(widget.child)
+          : widget is SingleChildRenderObjectWidget
+              ? _widgetChild(widget.child)
+              : widget is SingleChildScrollView
+                  ? _widgetChild(widget.child)
+                  : widget is Text
+                      ? widget.data!
+                      : widget is Tooltip
+                          ? _widgetChild(widget.child)
+                          : '',
+    );
     // U-Z
 
     final attrStr = attr.where((a) => a.isNotEmpty).join(',');
@@ -569,4 +605,25 @@ class Explainer {
 
   String _widgetChildren(Iterable<Widget> widgets) =>
       widgets.isNotEmpty ? 'children=${widgets.map(_widget).join(',')}' : '';
+}
+
+class HitTestApp extends StatelessWidget {
+  final String html;
+  final List<String> list;
+
+  const HitTestApp({required this.html, Key? key, required this.list})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => MaterialApp(
+        home: Scaffold(
+          body: HtmlWidget(
+            html,
+            onTapUrl: (url) {
+              list.add(url);
+              return true;
+            },
+          ),
+        ),
+      );
 }

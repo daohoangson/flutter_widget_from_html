@@ -74,19 +74,15 @@ class CssBorder {
   Border? getValue(TextStyleHtml tsh) {
     final bottom = CssBorderSide._copyWith(_all, _bottom)?._getValue(tsh);
     final left = CssBorderSide._copyWith(
-            _all,
-            _left ??
-                (tsh.textDirection == TextDirection.ltr
-                    ? _inlineStart
-                    : _inlineEnd))
-        ?._getValue(tsh);
+      _all,
+      _left ??
+          (tsh.textDirection == TextDirection.ltr ? _inlineStart : _inlineEnd),
+    )?._getValue(tsh);
     final right = CssBorderSide._copyWith(
-            _all,
-            _right ??
-                (tsh.textDirection == TextDirection.ltr
-                    ? _inlineEnd
-                    : _inlineStart))
-        ?._getValue(tsh);
+      _all,
+      _right ??
+          (tsh.textDirection == TextDirection.ltr ? _inlineEnd : _inlineStart),
+    )?._getValue(tsh);
     final top = CssBorderSide._copyWith(_all, _top)?._getValue(tsh);
     if (bottom == null && left == null && right == null && top == null) {
       return null;
@@ -150,20 +146,20 @@ class CssLength {
   final CssLengthUnit unit;
 
   /// Creates a measurement.
-  ///
-  /// [number] must not be negative.
-  const CssLength(
-    this.number, [
-    this.unit = CssLengthUnit.px,
-  ]) : assert(number >= 0);
+  const CssLength(this.number, [this.unit = CssLengthUnit.px]);
 
-  /// Returns `true` if value is non-zero.
-  bool get isNotEmpty => number > 0;
+  /// Returns `true` if value is larger than zero.
+  bool get isPositive => number > 0.0;
 
   /// Calculates value in logical pixel.
-  double? getValue(TextStyleHtml tsh,
-      {double? baseValue, double? scaleFactor}) {
+  double? getValue(
+    TextStyleHtml tsh, {
+    double? baseValue,
+    double? scaleFactor,
+  }) {
     double value;
+    var effectiveScaleFactor = scaleFactor ?? 1.0;
+
     switch (unit) {
       case CssLengthUnit.auto:
         return null;
@@ -171,12 +167,15 @@ class CssLength {
         baseValue ??= tsh.style.fontSize;
         if (baseValue == null) return null;
         value = baseValue * number;
-        scaleFactor = 1;
+        effectiveScaleFactor = 1;
         break;
       case CssLengthUnit.percentage:
+        // TODO: remove ignore https://github.com/passsy/dart-lint/issues/27
+        // ignore: invariant_booleans
         if (baseValue == null) return null;
+
         value = baseValue * number / 100;
-        scaleFactor = 1;
+        effectiveScaleFactor = 1;
         break;
       case CssLengthUnit.pt:
         value = number * 96 / 72;
@@ -186,9 +185,7 @@ class CssLength {
         break;
     }
 
-    if (scaleFactor != null) value *= scaleFactor;
-
-    return value;
+    return value * effectiveScaleFactor;
   }
 
   @override
@@ -245,11 +242,11 @@ class CssLengthBox {
       );
 
   /// Returns `true` if any of the left, right, inline measurements is set.
-  bool get hasLeftOrRight =>
-      _inlineEnd?.isNotEmpty == true ||
-      _inlineStart?.isNotEmpty == true ||
-      _left?.isNotEmpty == true ||
-      _right?.isNotEmpty == true;
+  bool get hasPositiveLeftOrRight =>
+      _inlineEnd?.isPositive == true ||
+      _inlineStart?.isPositive == true ||
+      _left?.isPositive == true ||
+      _right?.isPositive == true;
 
   /// Calculates the left value taking text direction into account.
   double? getValueLeft(TextStyleHtml tsh) => (_left ??
@@ -260,6 +257,40 @@ class CssLengthBox {
   double? getValueRight(TextStyleHtml tsh) => (_right ??
           (tsh.textDirection == TextDirection.ltr ? _inlineEnd : _inlineStart))
       ?.getValue(tsh);
+
+  @override
+  String toString() {
+    const _null = 'null';
+    final left = (_left ?? _inlineStart)?.toString() ?? _null;
+    final top = this.top?.toString() ?? _null;
+    final right = (_right ?? _inlineEnd)?.toString() ?? _null;
+    final bottom = this.bottom?.toString() ?? _null;
+    if (left == right && right == top && top == bottom) {
+      return 'CssLengthBox.all($left)';
+    }
+
+    final values = [left, top, right, bottom];
+    if (values.where((v) => v == _null).length == 3) {
+      if (left != _null) {
+        if (_left != null) {
+          return 'CssLengthBox(left=$_left)';
+        } else {
+          return 'CssLengthBox(inline-start=$_inlineStart)';
+        }
+      }
+      if (top != _null) return 'CssLengthBox(top=$top)';
+      if (right != _null) {
+        if (_right != null) {
+          return 'CssLengthBox(right=$_right)';
+        } else {
+          return 'CssLengthBox(inline-end=$_inlineEnd)';
+        }
+      }
+      if (bottom != _null) return 'CssLengthBox(bottom=$bottom)';
+    }
+
+    return 'CssLengthBox($left, $top, $right, $bottom)';
+  }
 }
 
 /// Length measurement units.
@@ -278,4 +309,16 @@ enum CssLengthUnit {
 
   /// Absolute unit: pixels, 1px = 1/96th of 1in.
   px,
+}
+
+/// The whitespace behavior.
+enum CssWhitespace {
+  /// Sequences of white space are collapsed.
+  /// Newline characters in the source are handled the same as other white space.
+  /// Lines are broken as necessary to fill line boxes.
+  normal,
+
+  /// Sequences of white space are preserved.
+  /// Lines are only broken at newline characters in the source and at <br> elements.
+  pre,
 }

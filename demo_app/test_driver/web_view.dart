@@ -35,12 +35,13 @@ class TestApp extends StatelessWidget {
   final input = ValueNotifier('');
   final issue375 = ValueNotifier(false);
 
+  TestApp({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) => MaterialApp(
         home: SafeArea(
           child: Scaffold(
             body: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 _buildButtons(),
@@ -53,7 +54,7 @@ class TestApp extends StatelessWidget {
       );
 
   Widget _buildButton(String value, {bool issue375 = false}) => ElevatedButton(
-        key: ValueKey('input-$value' + (issue375 ? '-issue375' : '')),
+        key: ValueKey('input-$value${issue375 ? '-issue375' : ''}'),
         onPressed: () {
           input.value = value;
           this.issue375.value = issue375;

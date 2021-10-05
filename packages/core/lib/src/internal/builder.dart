@@ -1,5 +1,8 @@
 import 'dart:collection';
 
+import 'package:csslib/parser.dart' as css;
+import 'package:csslib/visitor.dart' as css;
+
 import 'package:html/dom.dart' as dom;
 
 import '../core_data.dart';
@@ -8,22 +11,26 @@ import '../core_helpers.dart';
 import '../core_widget_factory.dart';
 import 'core_ops.dart';
 
-final _regExpSpaceLeading = RegExp(r'^[^\S\u{00A0}]+', unicode: true);
-final _regExpSpaceTrailing = RegExp(r'[^\S\u{00A0}]+$', unicode: true);
-final _regExpSpaces = RegExp(r'[^\S\u{00A0}]+', unicode: true);
+// https://infra.spec.whatwg.org/#ascii-whitespace
+const _asciiWhitespace = r'[\u{0009}\u{000A}\u{000C}\u{000D}\u{0020}]';
+final _regExpSpaceLeading = RegExp('^$_asciiWhitespace+', unicode: true);
+final _regExpSpaceTrailing = RegExp('$_asciiWhitespace+\$', unicode: true);
+final _regExpSpaces = RegExp('$_asciiWhitespace+', unicode: true);
 
 class BuildMetadata extends core_data.BuildMetadata {
   final Iterable<BuildOp> _parentOps;
 
   Set<BuildOp>? _buildOps;
   var _buildOpsIsLocked = false;
-  List<InlineStyle>? _styles;
+  List<css.Declaration>? _styles;
   var _stylesIsLocked = false;
   bool? _willBuildSubtree;
 
-  BuildMetadata(dom.Element element, TextStyleBuilder tsb,
-      [this._parentOps = const []])
-      : super(element, tsb);
+  BuildMetadata(
+    dom.Element element,
+    TextStyleBuilder tsb, [
+    this._parentOps = const [],
+  ]) : super(element, tsb);
 
   @override
   Iterable<BuildOp> get buildOps => _buildOps ?? const [];
@@ -32,7 +39,7 @@ class BuildMetadata extends core_data.BuildMetadata {
   Iterable<BuildOp> get parentOps => _parentOps;
 
   @override
-  List<InlineStyle> get styles {
+  List<css.Declaration> get styles {
     assert(_stylesIsLocked);
     return _styles ?? const [];
   }
@@ -41,10 +48,11 @@ class BuildMetadata extends core_data.BuildMetadata {
   bool? get willBuildSubtree => _willBuildSubtree;
 
   @override
-  operator []=(String key, String value) {
+  void operator []=(String key, String value) {
     assert(!_stylesIsLocked, 'Metadata can no longer be changed.');
+    final styleSheet = css.parse('*{$key: $value;}');
     _styles ??= [];
-    _styles!.add(InlineStyle(key, value));
+    _styles!.addAll(styleSheet.collectDeclarations());
   }
 
   @override
@@ -102,6 +110,28 @@ class BuildTree extends core_data.BuildTree {
           widgets;
     }
 
+    final thisAnchors = anchors;
+    if (thisAnchors != null) {
+      var needsColumn = false;
+      for (final widget in widgets) {
+        if (widget.anchors == null) {
+          // the current tree has some anchors
+          // but at least one of its widgets doesn't self-announce
+          // we need a column to wrap things and announce up the chain
+          needsColumn = true;
+          break;
+        }
+      }
+
+      if (needsColumn) {
+        widgets = listOrNull(
+              wf.buildColumnPlaceholder(parentMeta, widgets)
+                ?..setAnchorsIfUnset(thisAnchors),
+            ) ??
+            const [];
+      }
+    }
+
     _built.addAll(widgets);
     return _built;
   }
@@ -124,7 +154,10 @@ class BuildTree extends core_data.BuildTree {
       );
 
   void _addBitsFromNode(dom.Node domNode) {
-    if (domNode.nodeType == dom.Node.TEXT_NODE) return _addText(domNode.text!);
+    if (domNode.nodeType == dom.Node.TEXT_NODE) {
+      final text = domNode as dom.Text;
+      return _addText(text.data);
+    }
     if (domNode.nodeType != dom.Node.ELEMENT_NODE) return;
 
     final element = domNode as dom.Element;
@@ -162,17 +195,40 @@ class BuildTree extends core_data.BuildTree {
     final end = trailing == null ? data.length : trailing.start;
 
     if (end <= start) {
-      addWhitespace();
+      // the string contains all spaces
+      addWhitespace(data);
       return;
     }
 
-    if (start > 0) addWhitespace();
+    if (start > 0) addWhitespace(leading!.group(0)!);
 
-    final substring = data.substring(start, end);
-    final dedup = substring.replaceAll(_regExpSpaces, ' ');
-    addText(dedup);
+    final contents = data.substring(start, end);
+    final spaces = _regExpSpaces.allMatches(contents);
+    var offset = 0;
+    for (final space in [...spaces, null]) {
+      if (space == null) {
+        // reaches end of string
+        final text = contents.substring(offset);
+        if (text.isNotEmpty) {
+          addText(text);
+        }
+        break;
+      } else {
+        final spaceData = space.group(0)!;
+        if (spaceData == ' ') {
+          // micro optimization: ignore single space (ASCII 32)
+          continue;
+        }
 
-    if (end < data.length) addWhitespace();
+        final text = contents.substring(offset, space.start);
+        addText(text);
+
+        addWhitespace(spaceData);
+        offset = space.end;
+      }
+    }
+
+    if (end < data.length) addWhitespace(trailing!.group(0)!);
   }
 
   void _collectMetadata(BuildMetadata meta) {
@@ -187,27 +243,29 @@ class BuildTree extends core_data.BuildTree {
       final map = op.defaultStyles?.call(meta.element);
       if (map == null) continue;
 
+      final str = map.entries.map((e) => '${e.key}: ${e.value}').join(';');
+      final styleSheet = css.parse('*{$str}');
+
       meta._styles ??= [];
-      for (final pair in map.entries) {
-        meta._styles!.insert(0, InlineStyle(pair.key, pair.value));
-      }
+      meta._styles!.insertAll(0, styleSheet.collectDeclarations());
     }
 
     _customStylesBuilder(meta);
 
     // stylings, step 2: get styles from `style` attribute
-    for (final pair in meta.element.styles) {
-      meta[pair.key] = pair.value;
+    for (final declaration in meta.element.styles) {
+      meta._styles ??= [];
+      meta._styles!.add(declaration);
     }
 
     meta._stylesIsLocked = true;
     for (final style in meta.styles) {
-      wf.parseStyle(meta, style.key, style.value);
+      wf.parseStyle(meta, style);
     }
 
-    wf.parseStyleDisplay(meta, meta[kCssDisplay]);
+    wf.parseStyleDisplay(meta, meta[kCssDisplay]?.term);
 
-    meta._willBuildSubtree = meta[kCssDisplay] == kCssDisplayBlock ||
+    meta._willBuildSubtree = meta[kCssDisplay]?.term == kCssDisplayBlock ||
         meta._buildOps?.where(_opRequiresBuildingSubtree).isNotEmpty == true;
     meta._buildOpsIsLocked = true;
   }

@@ -5,7 +5,7 @@ const kCssBoxSizingContentBox = 'content-box';
 const kCssBoxSizingBorderBox = 'border-box';
 
 class StyleBorder {
-  static const kPriorityBoxModel7k = 7000;
+  static const kPriorityBoxModel5k = 5000;
 
   final WidgetFactory wf;
 
@@ -21,10 +21,11 @@ class StyleBorder {
 
           _skipBuilding[meta] = true;
           final copied = tree.copyWith() as BuildTree;
-          final built = wf
-              .buildColumnPlaceholder(meta, copied.build())
-              ?.wrapWith((context, child) =>
-                  _buildBorder(meta, context, child, border));
+          final built =
+              wf.buildColumnPlaceholder(meta, copied.build())?.wrapWith(
+                    (context, child) =>
+                        _buildBorder(meta, context, child, border),
+                  );
           if (built == null) return;
 
           tree.replaceWith(WidgetBit.inline(tree, built));
@@ -47,7 +48,7 @@ class StyleBorder {
           ];
         },
         onWidgetsIsOptional: true,
-        priority: kPriorityBoxModel7k,
+        priority: kPriorityBoxModel5k,
       );
 
   Widget? _buildBorder(
@@ -64,7 +65,7 @@ class StyleBorder {
       meta,
       child,
       borderValue,
-      isBorderBox: meta[kCssBoxSizing] == kCssBoxSizingBorderBox,
+      isBorderBox: meta[kCssBoxSizing]?.term == kCssBoxSizingBorderBox,
     );
   }
 

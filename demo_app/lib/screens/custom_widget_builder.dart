@@ -25,10 +25,12 @@ const kHtml = '''
 ''';
 
 class CustomWidgetBuilderScreen extends StatelessWidget {
+  const CustomWidgetBuilderScreen({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('CustomStylesBuilderScreen'),
+          title: const Text('CustomWidgetBuilderScreen'),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -52,7 +54,6 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
                         const Duration(milliseconds: 500),
                     autoPlayInterval: const Duration(seconds: 2),
                     enlargeCenterPage: true,
-                    enlargeStrategy: CenterPageEnlargeStrategy.scale,
                   ),
                   items: srcs.map(_toItem).toList(growable: false),
                 );
@@ -62,9 +63,7 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
         ),
       );
 
-  static Widget _toItem(String src) => Container(
-        child: Center(
-          child: Image.network(src, fit: BoxFit.cover, width: 1000),
-        ),
+  static Widget _toItem(String src) => Center(
+        child: Image.network(src, fit: BoxFit.cover, width: 1000),
       );
 }

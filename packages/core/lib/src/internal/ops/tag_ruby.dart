@@ -59,11 +59,17 @@ class TagRuby {
           final tsh = rubyTree.tsb.build(context);
 
           final ruby = wf.buildColumnWidget(
-              rubyMeta, tsh, rubyTree.build().toList(growable: false));
+            context,
+            rubyTree.build().toList(growable: false),
+            dir: tsh.getDependency(),
+          );
           final rt = wf.buildColumnWidget(
-              rtBit.meta, tsh, rtTree.build().toList(growable: false));
+            context,
+            rtTree.build().toList(growable: false),
+            dir: tsh.getDependency(),
+          );
 
-          return HtmlRuby(ruby ?? widget0, rt ?? widget0);
+          return HtmlRuby(ruby, rt);
         });
 
       final anchor = rubyBits.first;
@@ -79,15 +85,15 @@ class TagRuby {
   }
 }
 
-class _RtBit extends BuildBit<Null, BuildTree> {
+class _RtBit extends BuildBit<void, BuildTree> {
   final BuildMetadata meta;
   final BuildTree tree;
 
-  _RtBit(BuildTree parent, TextStyleBuilder tsb, this.meta, this.tree)
+  const _RtBit(BuildTree parent, TextStyleBuilder tsb, this.meta, this.tree)
       : super(parent, tsb);
 
   @override
-  BuildTree buildBit(Null _) => tree;
+  BuildTree buildBit(void _) => tree;
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>

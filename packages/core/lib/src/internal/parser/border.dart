@@ -2,30 +2,25 @@ part of '../core_parser.dart';
 
 const kCssBorder = 'border';
 const kCssBorderInherit = 'inherit';
-const kCssBorderStyleDotted = 'dotted';
-const kCssBorderStyleDashed = 'dashed';
-const kCssBorderStyleDouble = 'double';
-const kCssBorderStyleSolid = 'solid';
 
-final _borderValuesThreeRegExp = RegExp(r'^(.+)\s+(.+)\s+(.+)$');
-final _borderValuesTwoRegExp = RegExp(r'^(.+)\s+(.+)$');
 final _elementBorder = Expando<CssBorder>();
 
 CssBorder tryParseBorder(BuildMetadata meta) {
   final existing = _elementBorder[meta.element];
   if (existing != null) return existing;
-  var border = CssBorder();
+  var border = const CssBorder();
 
   for (final style in meta.styles) {
-    if (!style.key.startsWith(kCssBorder)) continue;
+    final key = style.property;
+    if (!key.startsWith(kCssBorder)) continue;
 
-    if (style.value == kCssBorderInherit) {
-      border = CssBorder(inherit: true);
+    final suffix = key.substring(kCssBorder.length);
+    if (suffix.isEmpty && style.term == kCssBorderInherit) {
+      border = const CssBorder(inherit: true);
       continue;
     }
 
-    final borderSide = _tryParseBorderSide(style.value);
-    final suffix = style.key.substring(kCssBorder.length);
+    final borderSide = _tryParseBorderSide(style.values);
     if (suffix.isEmpty) {
       border = CssBorder(all: borderSide);
     } else {
@@ -57,45 +52,16 @@ CssBorder tryParseBorder(BuildMetadata meta) {
   return _elementBorder[meta.element] = border;
 }
 
-CssBorderSide _tryParseBorderSide(String value) {
-  String? color, style, widthValue;
-
-  final valuesThree = _borderValuesThreeRegExp.firstMatch(value);
-  if (valuesThree != null) {
-    color = valuesThree[3];
-    style = valuesThree[2];
-    widthValue = valuesThree[1];
-  } else {
-    final valuesTwo = _borderValuesTwoRegExp.firstMatch(value);
-    if (valuesTwo != null) {
-      style = valuesTwo[2];
-      widthValue = valuesTwo[1];
-    } else {
-      widthValue = value;
-    }
-  }
-
-  final width = tryParseCssLength(widthValue);
+CssBorderSide? _tryParseBorderSide(List<css.Expression> expressions) {
+  final width =
+      expressions.isNotEmpty ? tryParseCssLength(expressions[0]) : null;
   if (width == null || width.number <= 0) return CssBorderSide.none;
 
   return CssBorderSide(
-    color: tryParseColor(color),
-    style: _tryParseTextDecorationStyle(style),
+    color: expressions.length >= 3 ? tryParseColor(expressions[2]) : null,
+    style: expressions.length >= 2
+        ? tryParseTextDecorationStyle(expressions[1])
+        : null,
     width: width,
   );
-}
-
-TextDecorationStyle? _tryParseTextDecorationStyle(String? value) {
-  switch (value) {
-    case kCssBorderStyleDotted:
-      return TextDecorationStyle.dotted;
-    case kCssBorderStyleDashed:
-      return TextDecorationStyle.dashed;
-    case kCssBorderStyleDouble:
-      return TextDecorationStyle.double;
-    case kCssBorderStyleSolid:
-      return TextDecorationStyle.solid;
-  }
-
-  return null;
 }

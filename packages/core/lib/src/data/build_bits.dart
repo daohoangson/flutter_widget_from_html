@@ -86,8 +86,8 @@ abstract class BuildBit<InputType, OutputType> {
   /// Supported input types:
   /// - [BuildContext] (output must be `Widget`)
   /// - [GestureRecognizer]
-  /// - [Null]
   /// - [TextStyleHtml] (output must be `InlineSpan`)
+  /// - [void]
   ///
   /// Supported output types:
   /// - [BuildTree]
@@ -137,12 +137,17 @@ abstract class BuildBit<InputType, OutputType> {
 }
 
 /// A tree of [BuildBit]s.
-abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
+abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
+  static final _anchors = Expando<List<Key>>();
+
   final _children = <BuildBit>[];
   final _toStringBuffer = StringBuffer();
 
   /// Creates a tree.
   BuildTree(BuildTree? parent, TextStyleBuilder tsb) : super(parent, tsb);
+
+  /// Anchor keys of this tree and its children.
+  Iterable<Key>? get anchors => _anchors[this];
 
   /// The list of bits including direct children and sub-tree's.
   Iterable<BuildBit> get bits sync* {
@@ -198,8 +203,8 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
   /// Adds a new line.
   BuildBit addNewLine() => add(_SwallowWhitespaceBit(this, 10));
 
-  /// Adds a whitespace.
-  BuildBit addWhitespace() => add(WhitespaceBit(this));
+  /// Adds whitespace.
+  BuildBit addWhitespace(String data) => add(WhitespaceBit(this, data));
 
   /// Adds a string of text.
   TextBit addText(String data) => add(TextBit(this, data));
@@ -208,7 +213,7 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
   Iterable<WidgetPlaceholder> build();
 
   @override
-  Iterable<WidgetPlaceholder> buildBit(Null _) => build();
+  Iterable<WidgetPlaceholder> buildBit(void _) => build();
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) {
@@ -217,6 +222,14 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
       copied.add(bit.copyWith(parent: copied));
     }
     return copied;
+  }
+
+  /// Registers anchor [Key].
+  void registerAnchor(Key anchor) {
+    final existing = _anchors[this];
+    final anchors = existing ?? (_anchors[this] = []);
+    anchors.add(anchor);
+    parent?.registerAnchor(anchor);
   }
 
   /// Replaces all children bits with [another].
@@ -253,7 +266,7 @@ abstract class BuildTree extends BuildBit<Null, Iterable<Widget>> {
 }
 
 /// A simple text bit.
-class TextBit extends BuildBit<Null, String> {
+class TextBit extends BuildBit<void, String> {
   final String data;
 
   /// Creates with string.
@@ -261,7 +274,7 @@ class TextBit extends BuildBit<Null, String> {
       : super(parent, tsb ?? parent.tsb);
 
   @override
-  String buildBit(Null _) => data;
+  String buildBit(void _) => data;
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
@@ -272,7 +285,7 @@ class TextBit extends BuildBit<Null, String> {
 }
 
 /// A widget bit.
-class WidgetBit extends BuildBit<Null, dynamic> {
+class WidgetBit extends BuildBit<void, dynamic> {
   /// See [PlaceholderSpan.alignment].
   final PlaceholderAlignment? alignment;
 
@@ -306,14 +319,19 @@ class WidgetBit extends BuildBit<Null, dynamic> {
     TextBaseline baseline = TextBaseline.alphabetic,
     TextStyleBuilder? tsb,
   }) =>
-      WidgetBit._(parent, tsb ?? parent.tsb, WidgetPlaceholder.lazy(child),
-          alignment, baseline);
+      WidgetBit._(
+        parent,
+        tsb ?? parent.tsb,
+        WidgetPlaceholder.lazy(child),
+        alignment,
+        baseline,
+      );
 
   @override
   bool get isInline => alignment != null && baseline != null;
 
   @override
-  dynamic buildBit(Null _) => isInline
+  dynamic buildBit(void _) => isInline
       ? WidgetSpan(
           alignment: alignment!,
           baseline: baseline,
@@ -323,7 +341,12 @@ class WidgetBit extends BuildBit<Null, dynamic> {
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) => WidgetBit._(
-      parent ?? this.parent!, tsb ?? this.tsb, child, alignment, baseline);
+        parent ?? this.parent!,
+        tsb ?? this.tsb,
+        child,
+        alignment,
+        baseline,
+      );
 
   @override
   String toString() =>
@@ -331,36 +354,49 @@ class WidgetBit extends BuildBit<Null, dynamic> {
 }
 
 /// A whitespace bit.
-class WhitespaceBit extends _SwallowWhitespaceBit {
+class WhitespaceBit extends BuildBit<void, String> {
+  final String data;
+
   /// Creates a whitespace.
-  WhitespaceBit(BuildTree parent, {TextStyleBuilder? tsb})
-      : super(parent, 32, tsb: tsb ?? parent.tsb);
-
-  @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      WhitespaceBit(parent ?? this.parent!, tsb: tsb ?? this.tsb);
-
-  @override
-  String toString() => 'Whitespace#$hashCode';
-}
-
-class _SwallowWhitespaceBit extends BuildBit<Null, String> {
-  final int charCode;
-
-  _SwallowWhitespaceBit(BuildTree parent, this.charCode,
-      {TextStyleBuilder? tsb})
+  WhitespaceBit(BuildTree parent, this.data, {TextStyleBuilder? tsb})
       : super(parent, tsb ?? parent.tsb);
 
   @override
   bool get swallowWhitespace => true;
 
   @override
-  String buildBit(Null _) => String.fromCharCode(charCode);
+  String buildBit(void _) => data;
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _SwallowWhitespaceBit(parent ?? this.parent!, charCode,
-          tsb: tsb ?? this.tsb);
+      WhitespaceBit(parent ?? this.parent!, data, tsb: tsb ?? this.tsb);
+
+  @override
+  String toString() => 'Whitespace[${data.codeUnits.join(' ')}]#$hashCode';
+}
+
+class _SwallowWhitespaceBit extends BuildBit<void, String> {
+  final int charCode;
+
+  _SwallowWhitespaceBit(
+    BuildTree parent,
+    this.charCode, {
+    TextStyleBuilder? tsb,
+  }) : super(parent, tsb ?? parent.tsb);
+
+  @override
+  bool get swallowWhitespace => true;
+
+  @override
+  String buildBit(void _) => String.fromCharCode(charCode);
+
+  @override
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+      _SwallowWhitespaceBit(
+        parent ?? this.parent!,
+        charCode,
+        tsb: tsb ?? this.tsb,
+      );
 
   @override
   String toString() => 'ASCII-$charCode';

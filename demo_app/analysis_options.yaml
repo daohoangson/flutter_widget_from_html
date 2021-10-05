@@ -1,1 +1,6 @@
-include: package:pedantic/analysis_options.yaml
+include: package:lint/analysis_options_package.yaml
+
+analyzer:
+  exclude:
+    # TODO: remove this when it auto ignores `depend_on_referenced_packages`
+    - lib/generated_plugin_registrant.dart

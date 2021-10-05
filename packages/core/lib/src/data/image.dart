@@ -13,7 +13,11 @@ class ImageMetadata {
   final String? title;
 
   /// Creates an image.
-  ImageMetadata({this.alt, required this.sources, this.title});
+  ImageMetadata({this.alt, required this.sources, this.title}) {
+    for (final source in sources) {
+      _imageMetas[source] = this;
+    }
+  }
 }
 
 /// An image source.
@@ -29,5 +33,10 @@ class ImageSource {
   final double? width;
 
   /// Creates a source.
-  ImageSource(this.url, {this.height, this.width});
+  const ImageSource(this.url, {this.height, this.width});
+
+  /// The parent [ImageMetadata].
+  ImageMetadata? get image => _imageMetas[this];
 }
+
+final _imageMetas = Expando<ImageMetadata>();

@@ -19,6 +19,8 @@ const html = '''
 ''';
 
 class IframeScreen extends StatefulWidget {
+  const IframeScreen({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _State();
 }
@@ -29,32 +31,35 @@ class _State extends State<IframeScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(
-        title: Text('IframeScreen'),
-      ),
-      body: ListView(children: <Widget>[
-        CheckboxListTile(
-          value: webView,
-          onChanged: (v) => setState(() => webView = v),
-          title: HtmlWidget('<var>.webView</var>'),
-          subtitle: const Text('Renders web view, default ❌'),
+        appBar: AppBar(
+          title: const Text('IframeScreen'),
         ),
-        CheckboxListTile(
-          value: webViewJs,
-          onChanged: (v) => setState(() {
-            if (v) webView = true;
-            webViewJs = v;
-          }),
-          title: HtmlWidget('<var>.webViewJs</var>'),
-          subtitle: const Text('Allows JavaScript execution, default ✅'),
+        body: ListView(
+          children: <Widget>[
+            CheckboxListTile(
+              value: webView,
+              onChanged: (v) => setState(() => webView = v),
+              title: HtmlWidget('<var>.webView</var>'),
+              subtitle: const Text('Renders web view, default ❌'),
+            ),
+            CheckboxListTile(
+              value: webViewJs,
+              onChanged: (v) => setState(() {
+                if (v) webView = true;
+                webViewJs = v;
+              }),
+              title: HtmlWidget('<var>.webViewJs</var>'),
+              subtitle: const Text('Allows JavaScript execution, default ✅'),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: HtmlWidget(
+                html,
+                webView: webView,
+                webViewJs: webViewJs,
+              ),
+            ),
+          ],
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: HtmlWidget(
-            html,
-            webView: webView,
-            webViewJs: webViewJs,
-          ),
-        ),
-      ]));
+      );
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core show HtmlWidget, RebuildTriggers;
@@ -5,6 +7,9 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'data.dart';
 import 'helpers.dart';
 import 'widget_factory.dart';
+
+export 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
+    show HtmlWidgetState;
 
 /// A widget that builds Flutter widget tree from HTML
 /// with support for IFRAME, VIDEO and many other tags.
@@ -40,17 +45,18 @@ class HtmlWidget extends core.HtmlWidget {
   HtmlWidget(
     String html, {
     bool? buildAsync,
-    AsyncWidgetBuilder<Widget>? buildAsyncBuilder,
     bool enableCaching = true,
     WidgetFactory Function()? factoryBuilder,
     Key? key,
     Uri? baseUrl,
     CustomStylesBuilder? customStylesBuilder,
     CustomWidgetBuilder? customWidgetBuilder,
-    Color? hyperlinkColor,
+    OnErrorBuilder? onErrorBuilder,
+    OnLoadingBuilder? onLoadingBuilder,
     void Function(ImageMetadata)? onTapImage,
-    void Function(String)? onTapUrl,
+    FutureOr<bool> Function(String)? onTapUrl,
     core.RebuildTriggers? rebuildTriggers,
+    RenderMode renderMode = RenderMode.column,
     TextStyle textStyle = const TextStyle(),
     this.webView = false,
     this.webViewDebuggingEnabled = false,
@@ -61,12 +67,12 @@ class HtmlWidget extends core.HtmlWidget {
           html,
           baseUrl: baseUrl,
           buildAsync: buildAsync,
-          buildAsyncBuilder: buildAsyncBuilder,
           customStylesBuilder: customStylesBuilder,
           customWidgetBuilder: customWidgetBuilder,
           enableCaching: enableCaching,
           factoryBuilder: factoryBuilder ?? _getEnhancedWf,
-          hyperlinkColor: hyperlinkColor,
+          onErrorBuilder: onErrorBuilder,
+          onLoadingBuilder: onLoadingBuilder,
           onTapImage: onTapImage,
           onTapUrl: onTapUrl,
           rebuildTriggers: core.RebuildTriggers([
@@ -74,6 +80,7 @@ class HtmlWidget extends core.HtmlWidget {
             webViewJs,
             if (rebuildTriggers != null) rebuildTriggers,
           ]),
+          renderMode: renderMode,
           textStyle: textStyle,
           key: key,
         );

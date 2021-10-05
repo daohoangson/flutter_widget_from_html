@@ -1,37 +1,57 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:fwfh_cached_network_image/fwfh_cached_network_image.dart';
 
-import '../../core/test/_.dart' as helper;
-
-Future<String> explain(
-  WidgetTester tester,
-  String html, {
-  bool webView = true,
-}) async =>
-    helper.explain(
-      tester,
-      null,
-      hw: HtmlWidget(
-        html,
-        key: helper.hwKey,
-        factoryBuilder: () => _WidgetFactory(),
-      ),
-    );
-
-class _WidgetFactory extends WidgetFactory with CachedNetworkImageFactory {}
+import '_.dart';
 
 void main() {
-  testWidgets('renders IMG tag', (WidgetTester tester) async {
-    final sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
-    final src = 'http://domain.com/image.png';
-    final html = '<img src="$src" />';
+  const sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
+  const src = 'http://domain.com/transparent.gif';
+
+  testWidgets('renders CachedNetworkImage', (WidgetTester tester) async {
+    const html = '<img src="$src" />';
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals('[CssSizing:$sizingConstraints,child='
-          '[Image:image=CachedNetworkImageProvider("$src", scale: 1.0)]'
-          ']'),
+      equals(
+        '[CssSizing:$sizingConstraints,child='
+        '[CachedNetworkImage:imageUrl=$src]'
+        ']',
+      ),
     );
+  });
+
+  testWidgets('renders Image for data uri', (WidgetTester tester) async {
+    const html = '<img src="$kDataUri" />';
+    final explained = (await explain(tester, html))
+        .replaceAll(RegExp('Uint8List#[0-9a-f]+,'), 'bytes,');
+    expect(
+      explained,
+      equals(
+        '[CssSizing:$sizingConstraints,child='
+        '[Image:image=MemoryImage(bytes, scale: 1.0)]'
+        ']',
+      ),
+    );
+  });
+
+  testWidgets('renders progress indicator', (WidgetTester tester) async {
+    const html = '<img src="${src}yolo" />';
+    final explained = await explain(
+      tester,
+      html,
+      useExplainer: false,
+    );
+    expect(explained, contains('CircularProgressIndicator'));
+  });
+
+  testWidgets('renders raw image', (WidgetTester tester) async {
+    const html = '<img src="$src" />';
+    final explained = await explain(tester, html, useExplainer: false);
+    expect(explained, contains('RawImage'));
+  });
+
+  testWidgets('handles error', (WidgetTester tester) async {
+    const html = '<img src="http://domain.com/error.jpg" />';
+    final explained = await explain(tester, html, useExplainer: false);
+    expect(explained, contains('Text("❌")'));
   });
 }

@@ -1,5 +1,5 @@
-import 'package:test/test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('RebuildTriggers', () {
@@ -47,8 +47,7 @@ void main() {
 
       test('wrong type', () {
         final t1 = RebuildTriggers([]);
-        final t2 = '';
-        expect(t1, isNot(equals(t2)));
+        expect(t1, isNot(equals('')));
       });
     });
   });

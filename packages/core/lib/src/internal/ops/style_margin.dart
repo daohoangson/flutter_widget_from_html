@@ -5,8 +5,8 @@ const kCssMargin = 'margin';
 Widget _marginHorizontalBuilder(Widget w, CssLengthBox b, TextStyleHtml tsh) =>
     Padding(
       padding: EdgeInsets.only(
-        left: b.getValueLeft(tsh) ?? 0.0,
-        right: b.getValueRight(tsh) ?? 0.0,
+        left: max(b.getValueLeft(tsh) ?? 0.0, 0.0),
+        right: max(b.getValueRight(tsh) ?? 0.0, 0.0),
       ),
       child: w,
     );
@@ -22,7 +22,7 @@ class StyleMargin {
         onTree: (meta, tree) {
           if (meta.willBuildSubtree == true) return;
           final m = tryParseCssLengthBox(meta, kCssMargin);
-          if (m == null || !m.hasLeftOrRight) return;
+          if (m == null || !m.hasPositiveLeftOrRight) return;
 
           return wrapTree(
             tree,
@@ -31,20 +31,22 @@ class StyleMargin {
           );
         },
         onWidgets: (meta, widgets) {
-          if (widgets.isEmpty) return null;
+          if (meta.willBuildSubtree == false) return widgets;
+
           final m = tryParseCssLengthBox(meta, kCssMargin);
-          if (m == null) return null;
+          if (m == null) return widgets;
           final tsb = meta.tsb;
 
           return [
-            if (m.top?.isNotEmpty ?? false) HeightPlaceholder(m.top!, tsb),
+            if (m.top?.isPositive ?? false) HeightPlaceholder(m.top!, tsb),
             for (final widget in widgets)
-              if (m.hasLeftOrRight)
+              if (m.hasPositiveLeftOrRight)
                 widget.wrapWith(
-                    (c, w) => _marginHorizontalBuilder(w, m, tsb.build(c)))
+                  (c, w) => _marginHorizontalBuilder(w, m, tsb.build(c)),
+                )
               else
                 widget,
-            if (m.bottom?.isNotEmpty ?? false)
+            if (m.bottom?.isPositive ?? false)
               HeightPlaceholder(m.bottom!, tsb),
           ];
         },

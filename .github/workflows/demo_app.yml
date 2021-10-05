@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - next
   pull_request:
 
 jobs:
@@ -67,8 +68,12 @@ jobs:
           cd ..
           cp -R goldens ../build/web/supported
 
-      - name: Deploy via now.sh
+      - name: Deploy via Vercel
         id: now
+        env:
+          PROJECT_JSON: ${{ secrets.EXAMPLE_PROJECT_JSON }}
+          TOKEN: ${{ secrets.ZEIT_TOKEN }}
+        if: env.PROJECT_JSON != null && env.TOKEN != null
         run: |
           set -e
 
@@ -82,12 +87,12 @@ jobs:
             echo '}'; \
           } > ./now.json
 
-          mkdir -p ./.now && echo '${{ secrets.EXAMPLE_PROJECT_JSON }}' > ./.now/project.json
+          mkdir -p ./.now && echo "$PROJECT_JSON" > ./.now/project.json
 
           if [ $GITHUB_REF == 'refs/heads/master' ]; then
-            _url=$( now  --prod --token ${{ secrets.ZEIT_TOKEN }} )
+            _url=$( now  --prod --token "$TOKEN" )
           else
-            _url=$( now --token ${{ secrets.ZEIT_TOKEN }} )
+            _url=$( now --token "$TOKEN" )
           fi
 
           _url="${_url//'%'/'%25'}"
@@ -95,6 +100,7 @@ jobs:
           _url="${_url//$'\r'/'%0D'}"
           echo "::set-output name=url::${_url}"
       - name: Create commit comment
+        if: steps.now.conclusion == 'success'
         uses: daohoangson/comment-on-github@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

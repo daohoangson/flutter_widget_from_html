@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:csslib/visitor.dart' as css;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -12,6 +15,7 @@ import '../core_widget_factory.dart';
 import 'core_parser.dart';
 import 'margin_vertical.dart';
 
+part 'ops/anchor.dart';
 part 'ops/column.dart';
 part 'ops/style_bg_color.dart';
 part 'ops/style_border.dart';
@@ -19,6 +23,7 @@ part 'ops/style_margin.dart';
 part 'ops/style_padding.dart';
 part 'ops/style_sizing.dart';
 part 'ops/style_text_align.dart';
+part 'ops/style_text_decoration.dart';
 part 'ops/style_vertical_align.dart';
 part 'ops/tag_a.dart';
 part 'ops/tag_img.dart';
@@ -49,13 +54,9 @@ const kCssDisplayInline = 'inline';
 const kCssDisplayInlineBlock = 'inline-block';
 const kCssDisplayNone = 'none';
 
-const kCssMaxLines = 'max-lines';
-const kCssMaxLinesNone = 'none';
-const kCssMaxLinesWebkitLineClamp = '-webkit-line-clamp';
-
-const kCssTextOverflow = 'text-overflow';
-const kCssTextOverflowClip = 'clip';
-const kCssTextOverflowEllipsis = 'ellipsis';
+const kCssWhitespace = 'white-space';
+const kCssWhitespacePre = 'pre';
+const kCssWhitespaceNormal = 'normal';
 
 void wrapTree(
   BuildTree tree, {
@@ -83,4 +84,15 @@ void wrapTree(
     final last = tree.last!;
     append(last.parent!).insertAfter(last);
   }
+}
+
+extension RichTextMetadata on BuildMetadata {
+  static final _maxLines = Expando<int>();
+  static final _overflow = Expando<TextOverflow>();
+
+  int get maxLines => _maxLines[this] ?? -1;
+  set maxLines(int value) => _maxLines[this] = value;
+
+  TextOverflow get overflow => _overflow[this] ?? TextOverflow.clip;
+  set overflow(TextOverflow value) => _overflow[this] = value;
 }

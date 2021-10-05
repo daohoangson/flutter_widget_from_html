@@ -8,7 +8,8 @@ class HeightPlaceholder extends WidgetPlaceholder<CssLength> {
 
   final List<CssLength> _heights = [];
 
-  HeightPlaceholder(CssLength height, this.tsb) : super(height) {
+  HeightPlaceholder(CssLength height, this.tsb, {Key? key})
+      : super(height, key: key) {
     super.wrapWith((c, w) => _build(c, w, height, tsb));
     _heights.add(height);
   }
@@ -26,8 +27,12 @@ class HeightPlaceholder extends WidgetPlaceholder<CssLength> {
   HeightPlaceholder wrapWith(Widget? Function(BuildContext, Widget) builder) =>
       this;
 
-  static Widget _build(BuildContext context, Widget child, CssLength height,
-      TextStyleBuilder tsb) {
+  static Widget _build(
+    BuildContext context,
+    Widget child,
+    CssLength height,
+    TextStyleBuilder tsb,
+  ) {
     final existing = (child is SizedBox ? child.height : null) ?? 0.0;
     final value = height.getValue(tsb.build(context));
     if (value != null && value > existing) return SizedBox(height: value);

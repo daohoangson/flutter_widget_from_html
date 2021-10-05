@@ -6,28 +6,29 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ImgFileScreen extends StatelessWidget {
+  const ImgFileScreen({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) => DefaultTabController(
         length: 2,
         child: Scaffold(
           appBar: AppBar(
-            bottom: TabBar(
+            bottom: const TabBar(
               tabs: [
                 Tab(text: 'PNG'),
                 Tab(text: 'SVG'),
               ],
             ),
-            title: Text('ImgFileScreen'),
+            title: const Text('ImgFileScreen'),
           ),
-          body: TabBarView(
+          body: const TabBarView(
             children: <Widget>[
               _ImgFileTab(
                 assetKey: 'logos/android.png',
                 fileExtension: 'png',
               ),
               _ImgFileTab(
-                assetKey:
-                    'packages/flutter_widget_from_html/test/images/logo.svg',
+                assetKey: 'packages/fwfh_svg/test/images/logo.svg',
                 fileExtension: 'svg',
               ),
             ],
@@ -56,7 +57,8 @@ class _ImgFileState extends State<_ImgFileTab> {
   Future<File> get file async {
     final directory = await getApplicationSupportDirectory();
     return File(
-        '${directory.path}/img_file--$hashCode.${widget.fileExtension}');
+      '${directory.path}/img_file--$hashCode.${widget.fileExtension}',
+    );
   }
 
   @override
@@ -72,7 +74,7 @@ class _ImgFileState extends State<_ImgFileTab> {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       'This test will write a ${widget.fileExtension} file into '
-                      'the device\'s file system then try to render with an IMG tag. '
+                      "the device's file system then try to render with an IMG tag. "
                       'The actual file path is semi-random and it should be '
                       'unique across tests (switch tab to test again and again).',
                     ),
@@ -80,7 +82,7 @@ class _ImgFileState extends State<_ImgFileTab> {
                   Center(
                     child: ElevatedButton(
                       onPressed: _writeFile,
-                      child: Text('Write file'),
+                      child: const Text('Write file'),
                     ),
                   ),
                 ],
@@ -118,7 +120,7 @@ class _ImgFileState extends State<_ImgFileTab> {
         },
       );
 
-  void _writeFile() async {
+  Future<void> _writeFile() async {
     assert(status.value == _ImgFileStatus.idle);
     status.value = _ImgFileStatus.writeFileWriting;
 
@@ -126,7 +128,7 @@ class _ImgFileState extends State<_ImgFileTab> {
     try {
       data = await rootBundle.load(widget.assetKey);
     } catch (e) {
-      print(e);
+      debugPrint('rootBundle.load error: $e');
       status.value = _ImgFileStatus.writeFileError;
       return;
     }
@@ -138,7 +140,7 @@ class _ImgFileState extends State<_ImgFileTab> {
         flush: true,
       );
     } catch (e) {
-      print(e);
+      debugPrint('writeAsBytes error: $e');
       status.value = _ImgFileStatus.writeFileError;
       return;
     }

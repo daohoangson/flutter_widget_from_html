@@ -10,15 +10,17 @@ const kCssWidth = 'width';
 class DisplayBlockOp extends BuildOp {
   DisplayBlockOp(WidgetFactory wf)
       : super(
-          onWidgets: (meta, widgets) => listOrNull(wf
-              .buildColumnPlaceholder(meta, widgets)
-              ?.wrapWith((_, w) => w is CssSizing ? w : CssBlock(child: w))),
-          priority: StyleSizing.kPriority5k + 1,
+          onWidgets: (meta, widgets) => listOrNull(
+            wf
+                .buildColumnPlaceholder(meta, widgets)
+                ?.wrapWith((_, w) => w is CssSizing ? w : CssBlock(child: w)),
+          ),
+          priority: StyleSizing.kPriority7k + 1,
         );
 }
 
 class StyleSizing {
-  static const kPriority5k = 5000;
+  static const kPriority7k = 7000;
 
   final WidgetFactory wf;
 
@@ -50,23 +52,32 @@ class StyleSizing {
 
           final input = _parse(meta);
           if (input == null) return widgets;
-          return listOrNull(wf
-              .buildColumnPlaceholder(meta, widgets)
-              ?.wrapWith((c, w) => _build(c, w, input, meta.tsb)));
+          return listOrNull(
+            wf
+                .buildColumnPlaceholder(meta, widgets)
+                ?.wrapWith((c, w) => _build(c, w, input, meta.tsb)),
+          );
         },
         onWidgetsIsOptional: true,
-        priority: kPriority5k,
+        priority: kPriority7k,
       );
 
   _StyleSizingInput? _parse(BuildMetadata meta) {
-    CssLength? maxHeight, maxWidth, minHeight, minWidth;
+    CssLength? maxHeight;
+    CssLength? maxWidth;
+    CssLength? minHeight;
+    CssLength? minWidth;
     Axis? preferredAxis;
-    CssLength? preferredHeight, preferredWidth;
+    CssLength? preferredHeight;
+    CssLength? preferredWidth;
 
     for (final style in meta.styles) {
-      switch (style.key) {
+      final value = style.value;
+      if (value == null) continue;
+
+      switch (style.property) {
         case kCssHeight:
-          final parsedHeight = tryParseCssLength(style.value);
+          final parsedHeight = tryParseCssLength(value);
           if (parsedHeight != null) {
             if (_treatHeightAsMinHeight[meta] == true) {
               minHeight = parsedHeight;
@@ -77,19 +88,19 @@ class StyleSizing {
           }
           break;
         case kCssMaxHeight:
-          maxHeight = tryParseCssLength(style.value) ?? maxHeight;
+          maxHeight = tryParseCssLength(value) ?? maxHeight;
           break;
         case kCssMaxWidth:
-          maxWidth = tryParseCssLength(style.value) ?? maxWidth;
+          maxWidth = tryParseCssLength(value) ?? maxWidth;
           break;
         case kCssMinHeight:
-          minHeight = tryParseCssLength(style.value) ?? minHeight;
+          minHeight = tryParseCssLength(value) ?? minHeight;
           break;
         case kCssMinWidth:
-          minWidth = tryParseCssLength(style.value) ?? minWidth;
+          minWidth = tryParseCssLength(value) ?? minWidth;
           break;
         case kCssWidth:
-          final parsedWidth = tryParseCssLength(style.value);
+          final parsedWidth = tryParseCssLength(value);
           if (parsedWidth != null) {
             preferredAxis = Axis.horizontal;
             preferredWidth = parsedWidth;
@@ -128,8 +139,12 @@ class StyleSizing {
   static void treatHeightAsMinHeight(BuildMetadata meta) =>
       _treatHeightAsMinHeight[meta] = true;
 
-  static Widget _build(BuildContext context, Widget child,
-      _StyleSizingInput input, TextStyleBuilder tsb) {
+  static Widget _build(
+    BuildContext context,
+    Widget child,
+    _StyleSizingInput input,
+    TextStyleBuilder tsb,
+  ) {
     final tsh = tsb.build(context);
 
     return CssSizing(
@@ -152,7 +167,7 @@ class StyleSizing {
 
     switch (length.unit) {
       case CssLengthUnit.auto:
-        return CssSizingValue.auto();
+        return const CssSizingValue.auto();
       case CssLengthUnit.percentage:
         return CssSizingValue.percentage(length.number);
       default:
@@ -171,7 +186,7 @@ class _StyleSizingInput {
   final CssLength? preferredHeight;
   final CssLength? preferredWidth;
 
-  _StyleSizingInput({
+  const _StyleSizingInput({
     this.maxHeight,
     this.maxWidth,
     this.minHeight,

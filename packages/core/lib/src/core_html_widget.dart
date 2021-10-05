@@ -1,18 +1,15 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter/cupertino.dart' show CupertinoActivityIndicator;
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart'
-    show CircularProgressIndicator, Theme, ThemeData;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 
-import 'internal/builder.dart' as builder;
 import 'core_data.dart';
 import 'core_widget_factory.dart';
+import 'internal/builder.dart' as builder;
 import 'internal/tsh_widget.dart';
 
 /// A widget that builds Flutter widget tree from HTML
@@ -26,14 +23,6 @@ class HtmlWidget extends StatefulWidget {
   /// If not set, async build will be enabled automatically if the
   /// [html] has at least [kShouldBuildAsync] characters.
   final bool? buildAsync;
-
-  /// The callback to handle async build snapshot.
-  ///
-  /// By default, a [CircularProgressIndicator] will be shown until
-  /// the widget tree is ready.
-  /// This default builder doesn't do any error handling
-  /// (it will just ignore any errors).
-  final AsyncWidgetBuilder<Widget>? buildAsyncBuilder;
 
   /// The callback to specify custom stylings.
   final CustomStylesBuilder? customStylesBuilder;
@@ -49,19 +38,22 @@ class HtmlWidget extends StatefulWidget {
   /// The input string.
   final String html;
 
-  /// The text color for link elements.
-  ///
-  /// Default: [ThemeData.accentColor].
-  final Color? hyperlinkColor;
-
   /// The custom [WidgetFactory] builder.
   final WidgetFactory Function()? factoryBuilder;
+
+  /// The custom error builder.
+  final OnErrorBuilder? onErrorBuilder;
+
+  /// The custom loading builder.
+  final OnLoadingBuilder? onLoadingBuilder;
 
   /// The callback when user taps an image.
   final void Function(ImageMetadata)? onTapImage;
 
   /// The callback when user taps a link.
-  final void Function(String)? onTapUrl;
+  ///
+  /// Returns `true` if the url has been handled, the default handler will be skipped.
+  final FutureOr<bool> Function(String)? onTapUrl;
 
   /// The values that should trigger rebuild.
   ///
@@ -71,7 +63,6 @@ class HtmlWidget extends StatefulWidget {
   /// - [buildAsync]
   /// - [enableCaching]
   /// - [html]
-  /// - [hyperlinkColor]
   ///
   /// In `flutter_widget_from_html` package, these are also included:
   ///
@@ -83,10 +74,16 @@ class HtmlWidget extends StatefulWidget {
         baseUrl,
         buildAsync,
         enableCaching,
-        hyperlinkColor,
         if (_rebuildTriggers != null) _rebuildTriggers,
       ]);
   final RebuildTriggers? _rebuildTriggers;
+
+  /// The render mode.
+  ///
+  /// - [RenderMode.column] is the default mode, suitable for small / medium document.
+  /// - [RenderMode.listView] has better performance as it renders contents lazily.
+  /// - [RenderMode.sliverList] has similar performance as `ListView` and can be put inside a `CustomScrollView`.
+  final RenderMode renderMode;
 
   /// The default styling for text elements.
   final TextStyle? textStyle;
@@ -94,34 +91,37 @@ class HtmlWidget extends StatefulWidget {
   /// Creates a widget that builds Flutter widget tree from html.
   ///
   /// The [html] argument must not be null.
-  HtmlWidget(
+  const HtmlWidget(
     this.html, {
     this.baseUrl,
     this.buildAsync,
-    this.buildAsyncBuilder,
     this.customStylesBuilder,
     this.customWidgetBuilder,
     this.enableCaching,
     this.factoryBuilder,
-    this.hyperlinkColor,
     Key? key,
+    this.onErrorBuilder,
+    this.onLoadingBuilder,
     this.onTapImage,
     this.onTapUrl,
     RebuildTriggers? rebuildTriggers,
+    this.renderMode = RenderMode.column,
     this.textStyle = const TextStyle(),
   })  : _rebuildTriggers = rebuildTriggers,
         super(key: key);
 
   @override
-  State<HtmlWidget> createState() => _HtmlWidgetState();
+  State<HtmlWidget> createState() => HtmlWidgetState();
 }
 
-class _HtmlWidgetState extends State<HtmlWidget> {
+/// State for a [HtmlWidget].
+class HtmlWidgetState extends State<HtmlWidget> {
+  late final BuildMetadata _rootMeta;
+  late final _RootTsb _rootTsb;
+  late final WidgetFactory _wf;
+
   Widget? _cache;
   Future<Widget>? _future;
-  late BuildMetadata _rootMeta;
-  late _RootTsb _rootTsb;
-  late WidgetFactory _wf;
 
   bool get buildAsync =>
       widget.buildAsync ?? widget.html.length > kShouldBuildAsync;
@@ -137,6 +137,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     _wf = widget.factoryBuilder?.call() ?? WidgetFactory();
 
     _wf.onRoot(_rootTsb);
+    _wf.reset(this);
 
     if (buildAsync) {
       _future = _buildAsync();
@@ -181,7 +182,19 @@ class _HtmlWidgetState extends State<HtmlWidget> {
   Widget build(BuildContext context) {
     if (_future != null) {
       return FutureBuilder<Widget>(
-        builder: widget.buildAsyncBuilder ?? _buildAsyncBuilder,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return snapshot.data!;
+          } else if (snapshot.hasError) {
+            return _sliverToBoxAdapterIfNeeded(
+              _wf.onErrorBuilder(context, _rootMeta, snapshot.error) ?? widget0,
+            );
+          } else {
+            return _sliverToBoxAdapterIfNeeded(
+              _wf.onLoadingBuilder(context, _rootMeta) ?? widget0,
+            );
+          }
+        },
         future: _future!.then(_tshWidget),
       );
     }
@@ -190,6 +203,9 @@ class _HtmlWidgetState extends State<HtmlWidget> {
 
     return _tshWidget(_cache!);
   }
+
+  /// Scrolls to make sure the requested anchor is as visible as possible.
+  Future<bool> scrollToAnchor(String id) => _wf.onTapUrl('#$id');
 
   Future<Widget> _buildAsync() async {
     final domNodes = await compute(_parseHtml, widget.html);
@@ -212,6 +228,11 @@ class _HtmlWidgetState extends State<HtmlWidget> {
     return built;
   }
 
+  Widget _sliverToBoxAdapterIfNeeded(Widget child) =>
+      widget.renderMode == RenderMode.sliverList
+          ? SliverToBoxAdapter(child: child)
+          : child;
+
   Widget _tshWidget(Widget child) =>
       TshWidget(tsh: _rootTsb._output, child: child);
 }
@@ -219,7 +240,7 @@ class _HtmlWidgetState extends State<HtmlWidget> {
 class _RootTsb extends TextStyleBuilder {
   TextStyleHtml? _output;
 
-  _RootTsb(_HtmlWidgetState state) {
+  _RootTsb(HtmlWidgetState state) {
     enqueue(builder, state);
   }
 
@@ -229,7 +250,7 @@ class _RootTsb extends TextStyleBuilder {
     return super.build(context);
   }
 
-  TextStyleHtml builder(TextStyleHtml? _, _HtmlWidgetState state) {
+  TextStyleHtml builder(TextStyleHtml? _, HtmlWidgetState state) {
     if (_output != null) return _output!;
     return _output = TextStyleHtml.root(
       state._wf.getDependencies(state.context),
@@ -240,19 +261,7 @@ class _RootTsb extends TextStyleBuilder {
   void reset() => _output = null;
 }
 
-Widget _buildAsyncBuilder(
-        BuildContext context, AsyncSnapshot<Widget> snapshot) =>
-    snapshot.data ??
-    Center(
-      child: Padding(
-        padding: EdgeInsets.all(8),
-        child: Theme.of(context).platform == TargetPlatform.iOS
-            ? CupertinoActivityIndicator()
-            : CircularProgressIndicator(),
-      ),
-    );
-
-Widget _buildBody(_HtmlWidgetState state, dom.NodeList domNodes) {
+Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
   final rootMeta = state._rootMeta;
   final wf = state._wf;
   wf.reset(state);
@@ -267,8 +276,5 @@ Widget _buildBody(_HtmlWidgetState state, dom.NodeList domNodes) {
   return wf.buildBody(rootMeta, tree.build()) ?? widget0;
 }
 
-dom.NodeList _parseHtml(String html) => parser.HtmlParser(
-      html,
-      generateSpans: false,
-      parseMeta: false,
-    ).parseFragment().nodes;
+dom.NodeList _parseHtml(String html) =>
+    parser.HtmlParser(html, parseMeta: false).parseFragment().nodes;

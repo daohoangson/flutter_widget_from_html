@@ -1,25 +1,63 @@
-## 0.6.0-rc.2021031201
+## 0.7.0
 
+- Flutter 2.2
+- BREAKING: Remove `HtmlWidget.buildAsyncBuilder` (#575)
+- BREAKING: Remove `HtmlWidget.hyperlinkColor` (#571)
+- BREAKING: Change `HtmlWidget.onTapUrl` signature to return a `FutureOr<bool>`. (#563)
+- Show click cursor for `A` tag (#322)
+- Add support for `HtmlWidget.renderMode` (#484)
+- Add support for error & loading builder for network image (#547, thanks @DFelten)
+- Improve `text-decoration` support (#569)
+- Add support for `HtmlWidgetState.scrollToAnchor` (#577)
+- Implement `HtmlWidget.onErrorBuilder` and `onLoadingBuilder` (#575)
+- Fix bug border+background (#516)
+- Fix incorrect UL/OL tag closing
+- Fix `CssSizingValue` equality check
+- Fix missing block margins on empty tag (#580)
+
+This release includes some changes that may require migration if you have a custom `WidgetFactory`:
+
+- Remove `TextStyleHtml.maxLines` and `.textOverflow` (#570)
+- Remove `WidgetFactory.buildColumnPlaceholder` param `trimMarginVertical`
+- Remove `WidgetFactory.buildColumnWidget` param `tsh`
+- Change `WidgetFactory.buildImageWidget` params
+- Replace `WidgetFactory.getListStyleMarker` with `getListMarkerText`
+- Remove `WidgetFactory.imageLoadingBuilder` and `imageErrorBuilder` (#575)
+- Replace `WidgetFactory.onTapAnchor` param `anchorContext` with `scrollTo`
+
+## 0.6.2
+
+- Add support for `AUDIO` tag (#530)
+- Restore `computeLineMetrics` usage in Flutter web. (#561)
+- Improve whitespace handling (#551)
+- Fix negative margin/padding throwing exception (#510)
+- Fix bug padding+background+h2 (#523)
+- Fix `min-width` being ignored (#544)
+- Fix portrait video (#553)
+
+## 0.6.1
+
+- Add support for white-space inline style (#483)
+- Add support for `flutter_svg@0.22.0` (#498)
+- Change onTapUrl signature to accept a returning value (#499)
+- Fix `_ListMarkerRenderObject` invalid size
+- Fix anchor bugs (#485, #491, #493 and #500)
+- Fix TR display: none is still being rendered (#489)
+- Fix empty TD being skipped -> incorrect table layout (#503)
+
+## 0.6.0
+
+- Flutter 2 with null safety 🚀
+- Implement new packages:
+  - `fwfh_webview` (#448)
+  - `fwfh_url_launcher` (#450)
+  - `fwfh_svg` (#452)
+  - `fwfh_chewie` (#461)
+  - `fwfh_cached_network_image` (#463)
+- Use csslib to parse inline style (#379)
+- Implement `computeDryLayout` (#411)
 - Dispose recognizer properly (#466)
 - Add Flutter Web support for `webViewMediaPlaybackAlwaysAllow` (#468)
-- Update test for mocktail@0.0.2 (#469)
-
-## 0.6.0-rc.2021030401
-
-- Requires Flutter 2
-- Implement new package `fwfh_cached_network_image` (#463)
-
-## 0.6.0-rc.2021030202
-
-- Add support for anchor in core package (#447)
-- Implement new package `fwfh_webview` (#448)
-- Implement new package `fwfh_url_launcher` (#450)
-- Implement new package `fwfh_svg` (#452)
-- Implement new package `fwfh_chewie` (#461)
-
-## 0.6.0-rc.2021022601
-
-- Migrate to use core@0.6.0
 
 ## 0.5.2+1
 

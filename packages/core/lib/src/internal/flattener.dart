@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
 import '../core_data.dart';
+import '../core_widget_factory.dart';
 import 'margin_vertical.dart';
 
 @immutable
@@ -10,20 +11,30 @@ class Flattened {
   final Widget? widget;
   final WidgetBuilder? widgetBuilder;
 
-  Flattened._({this.spanBuilder, this.widget, this.widgetBuilder});
+  const Flattened._({this.spanBuilder, this.widget, this.widgetBuilder});
 }
 
-typedef SpanBuilder = InlineSpan? Function(BuildContext);
+typedef SpanBuilder = InlineSpan? Function(
+  BuildContext,
+  CssWhitespace whitespace,
+);
 
 class Flattener {
+  final WidgetFactory wf;
+
   final List<GestureRecognizer> _recognizers = [];
 
   late List<Flattened> _flattened;
-  late StringBuffer _buffer, _prevBuffer;
-  late _Recognizer _recognizer, _prevRecognizer;
-  List<dynamic>? _spans;
+  late _Recognizer _recognizer;
+  late _Recognizer _prevRecognizer;
+  List<SpanBuilder>? _spans;
+  late List<_String> _strings;
+  late List<_String> _prevStrings;
   late bool _swallowWhitespace;
-  late TextStyleBuilder _tsb, _prevTsb;
+  late TextStyleBuilder _tsb;
+  late TextStyleBuilder _prevTsb;
+
+  Flattener(this.wf);
 
   void dispose() => _reset();
 
@@ -33,8 +44,23 @@ class Flattener {
     _flattened = [];
 
     _resetLoop(tree.tsb);
-    for (final bit in tree.bits) {
-      _loop(bit);
+
+    final bits = tree.bits.toList(growable: false);
+    var min = 0;
+    var max = bits.length - 1;
+    for (; min <= max; min++) {
+      if (bits[min] is! WhitespaceBit) {
+        break;
+      }
+    }
+    for (; max >= min; max--) {
+      if (bits[max] is! WhitespaceBit) {
+        break;
+      }
+    }
+
+    for (var i = min; i <= max; i++) {
+      _loop(bits[i]);
     }
     _completeLoop();
 
@@ -49,14 +75,14 @@ class Flattener {
   }
 
   void _resetLoop(TextStyleBuilder tsb) {
-    _buffer = StringBuffer();
     _recognizer = _Recognizer();
     _spans = [];
+    _strings = [];
     _swallowWhitespace = true;
     _tsb = tsb;
 
-    _prevBuffer = _buffer;
     _prevRecognizer = _recognizer;
+    _prevStrings = _strings;
     _prevTsb = _tsb;
   }
 
@@ -65,28 +91,37 @@ class Flattener {
     if (_spans == null) _resetLoop(thisTsb);
     if (!thisTsb.hasSameStyleWith(_prevTsb)) _saveSpan();
 
-    var built;
-    if (bit is BuildBit<Null, dynamic>) {
-      built = bit.buildBit(null);
-    } else if (bit is BuildBit<BuildContext, Widget>) {
-      // ignore: omit_local_variable_types
-      final WidgetBuilder widgetBuilder = (c) => bit.buildBit(c);
+    dynamic built;
+    if (bit is BuildBit<BuildContext, Widget>) {
+      Widget widgetBuilder(BuildContext context) => bit.buildBit(context);
       built = widgetBuilder;
     } else if (bit is BuildBit<GestureRecognizer?, dynamic>) {
       built = bit.buildBit(_prevRecognizer.value);
     } else if (bit is BuildBit<TextStyleHtml, InlineSpan>) {
-      final SpanBuilder spanBuilder = (c) => bit.buildBit(thisTsb.build(c));
+      InlineSpan? spanBuilder(BuildContext context, CssWhitespace _) =>
+          bit.buildBit(thisTsb.build(context));
       built = spanBuilder;
+    } else if (bit is BuildBit<void, dynamic>) {
+      built = bit.buildBit(null);
     }
 
     if (built is GestureRecognizer) {
       _prevRecognizer.value = built;
-    } else if (built is InlineSpan || built is SpanBuilder) {
+    } else if (built is InlineSpan) {
+      _saveSpan();
+
+      final inlineSpan = built;
+      _spans!.add((_, __) => inlineSpan);
+    } else if (built is SpanBuilder) {
       _saveSpan();
       _spans!.add(built);
     } else if (built is String) {
-      if (built != ' ' || !_loopShouldSwallowWhitespace(bit)) {
-        _prevBuffer.write(built);
+      if (bit is WhitespaceBit) {
+        if (!_loopShouldSwallowWhitespace(bit)) {
+          _prevStrings.add(_String(built, isWhitespace: true));
+        }
+      } else {
+        _prevStrings.add(_String(built));
       }
     } else if (built is Widget) {
       _completeLoop();
@@ -123,20 +158,23 @@ class Flattener {
   }
 
   void _saveSpan() {
-    if (_prevBuffer != _buffer && _prevBuffer.length > 0) {
+    if (_prevStrings != _strings && _prevStrings.isNotEmpty) {
       final scopedRecognizer = _prevRecognizer.value;
       final scopedTsb = _prevTsb;
-      final scopedText = _prevBuffer.toString();
+      final scopedStrings = _prevStrings;
 
       if (scopedRecognizer != null) _recognizers.add(scopedRecognizer);
 
-      _spans!.add((context) => TextSpan(
-            recognizer: scopedRecognizer,
-            style: scopedTsb.build(context).styleWithHeight,
-            text: scopedText,
-          ));
+      _spans!.add(
+        (context, whitespace) => wf.buildTextSpan(
+          recognizer: scopedRecognizer,
+          style: scopedTsb.build(context).styleWithHeight,
+          text: scopedStrings.toText(whitespace: whitespace),
+        ),
+      );
     }
-    _prevBuffer = StringBuffer();
+
+    _prevStrings = [];
     _prevRecognizer = _Recognizer();
   }
 
@@ -147,43 +185,50 @@ class Flattener {
     if (scopedSpans == null) return;
 
     _spans = null;
-    if (scopedSpans.isEmpty && _buffer.isEmpty) return;
+    if (scopedSpans.isEmpty && _strings.isEmpty) return;
     final scopedRecognizer = _recognizer.value;
     final scopedTsb = _tsb;
-    final scopedBuffer = _buffer.toString();
+    final scopedStrings = _strings;
 
     if (scopedRecognizer != null) _recognizers.add(scopedRecognizer);
 
-    // trim the last new line if any
-    final scopedText = scopedSpans.isEmpty
-        ? scopedBuffer.replaceAll(RegExp('\n\$'), '')
-        : scopedBuffer;
-
-    if (scopedBuffer == '\n' && scopedSpans.isEmpty) {
+    if (scopedSpans.isEmpty &&
+        scopedStrings.length == 1 &&
+        scopedStrings[0].isNewLine) {
       // special handling for paragraph with only one line break
-      _flattened.add(Flattened._(
-        widget: HeightPlaceholder(CssLength(1, CssLengthUnit.em), scopedTsb),
-      ));
+      _flattened.add(
+        Flattened._(
+          widget: HeightPlaceholder(
+            const CssLength(1, CssLengthUnit.em),
+            scopedTsb,
+          ),
+        ),
+      );
       return;
     }
 
-    _flattened.add(Flattened._(spanBuilder: (context) {
-      final children = scopedSpans
-          .map((s) => s is SpanBuilder ? s.call(context) : s)
-          .whereType<InlineSpan>()
-          .toList(growable: false);
-      if (scopedText.isEmpty) {
-        if (children.isEmpty) return null;
-        if (children.length == 1) return children.first;
-      }
+    _flattened.add(
+      Flattened._(
+        spanBuilder: (context, whitespace) {
+          final text = scopedStrings.toText(
+            dropNewLine: scopedSpans.isEmpty,
+            whitespace: whitespace,
+          );
 
-      return TextSpan(
-        children: children,
-        recognizer: scopedRecognizer,
-        style: scopedTsb.build(context).styleWithHeight,
-        text: scopedText,
-      );
-    }));
+          final children = scopedSpans
+              .map((s) => s(context, whitespace))
+              .whereType<InlineSpan>()
+              .toList(growable: false);
+
+          return wf.buildTextSpan(
+            children: children,
+            recognizer: scopedRecognizer,
+            style: scopedTsb.build(context).styleWithHeight,
+            text: text,
+          );
+        },
+      ),
+    );
   }
 
   TextStyleBuilder _getBitTsb(BuildBit bit) {
@@ -200,9 +245,7 @@ class Flattener {
       final next = nextNonWhitespace(bit);
       if (next != null) {
         var tree = parent;
-        while (true) {
-          final bitsParentLast = tree.parent?.last;
-          if (bitsParentLast != bit) break;
+        while (tree.parent?.last == bit) {
           tree = tree.parent!;
         }
 
@@ -234,4 +277,42 @@ class Flattener {
 /// but we have to keep track of prev / current recognizer for spans
 class _Recognizer {
   GestureRecognizer? value;
+}
+
+class _String {
+  final String data;
+  final bool isWhitespace;
+
+  _String(this.data, {this.isWhitespace = false});
+
+  bool get isNewLine => data == '\n';
+}
+
+extension _StringListToText on List<_String> {
+  String toText({
+    bool dropNewLine = false,
+    required CssWhitespace whitespace,
+  }) {
+    if (isEmpty) return '';
+
+    if (dropNewLine && last.isNewLine) {
+      removeLast();
+      if (isEmpty) return '';
+    }
+
+    final buffer = StringBuffer();
+    for (final str in this) {
+      if (str.isWhitespace) {
+        if (whitespace == CssWhitespace.pre) {
+          buffer.write(str.data);
+        } else {
+          buffer.write(' ');
+        }
+      } else {
+        buffer.write(str.data);
+      }
+    }
+
+    return buffer.toString();
+  }
 }

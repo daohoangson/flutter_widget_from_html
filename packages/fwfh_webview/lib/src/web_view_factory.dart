@@ -1,8 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
-import 'web_view/web_view.dart';
 import 'internal.dart';
+import 'web_view/web_view.dart';
 
 /// A mixin that can build [WebView] for IFRAME.
 mixin WebViewFactory on WidgetFactory {
@@ -71,19 +72,35 @@ mixin WebViewFactory on WidgetFactory {
   void parse(BuildMetadata meta) {
     switch (meta.element.localName) {
       case kTagIframe:
-        final op = _tagIframe ??= BuildOp(onWidgets: (meta, _) {
-          final attrs = meta.element.attributes;
-          final src = urlFull(attrs[kAttributeIframeSrc] ?? '');
-          if (src == null) return null;
+        final op = _tagIframe ??= BuildOp(
+          onWidgets: (meta, widgets) {
+            if (defaultTargetPlatform != TargetPlatform.android &&
+                defaultTargetPlatform != TargetPlatform.iOS &&
+                !kIsWeb) {
+              // Android & iOS are the webview_flutter's supported platforms
+              // Flutter web support is implemented by this package
+              // https://pub.dev/packages/webview_flutter/versions/2.0.12
+              return widgets;
+            }
 
-          return listOrNull(buildWebView(
-            meta,
-            src,
-            height: tryParseDoubleFromMap(attrs, kAttributeIframeHeight),
-            sandbox: attrs[kAttributeIframeSandbox]?.split(RegExp(r'\s+')),
-            width: tryParseDoubleFromMap(attrs, kAttributeIframeWidth),
-          ));
-        });
+            final attrs = meta.element.attributes;
+            final src = urlFull(attrs[kAttributeIframeSrc] ?? '');
+            if (src == null) return widgets;
+
+            return listOrNull(
+                  buildWebView(
+                    meta,
+                    src,
+                    height:
+                        tryParseDoubleFromMap(attrs, kAttributeIframeHeight),
+                    sandbox:
+                        attrs[kAttributeIframeSandbox]?.split(RegExp(r'\s+')),
+                    width: tryParseDoubleFromMap(attrs, kAttributeIframeWidth),
+                  ),
+                ) ??
+                widgets;
+          },
+        );
         meta.register(op);
         break;
     }

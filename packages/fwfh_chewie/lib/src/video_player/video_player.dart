@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:chewie/chewie.dart' as lib;
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:video_player/video_player.dart' as lib;
 
 /// A video player.
@@ -26,6 +29,15 @@ class VideoPlayer extends StatefulWidget {
   /// Default: `false`.
   final bool controls;
 
+  /// A builder function that is called if an error occurs during video loading.
+  final Widget Function(BuildContext context, String url, dynamic error)?
+      errorBuilder;
+
+  /// A builder that specifies the widget to display to the user while a video
+  /// is still loading.
+  final Widget Function(BuildContext context, String url, Widget child)?
+      loadingBuilder;
+
   /// Controls whether to play video in loops.
   ///
   /// Default: `false`.
@@ -35,106 +47,91 @@ class VideoPlayer extends StatefulWidget {
   final Widget? poster;
 
   /// Creates a player.
-  VideoPlayer(
+  const VideoPlayer(
     this.url, {
     required this.aspectRatio,
     this.autoResize = true,
     this.autoplay = false,
     this.controls = false,
+    this.errorBuilder,
     Key? key,
+    this.loadingBuilder,
     this.loop = false,
     this.poster,
   }) : super(key: key);
 
   @override
-  State<VideoPlayer> createState() =>
-      defaultTargetPlatform == TargetPlatform.android ||
-              defaultTargetPlatform == TargetPlatform.iOS ||
-              kIsWeb
-          ? _VideoPlayerState()
-          : _PlaceholderState();
+  State<VideoPlayer> createState() => _VideoPlayerState();
 }
 
 class _VideoPlayerState extends State<VideoPlayer> {
-  late lib.ChewieController _controller;
+  lib.ChewieController? _controller;
+  dynamic _error;
+  lib.VideoPlayerController? _vpc;
+
+  Widget? get placeholder =>
+      widget.poster != null ? Center(child: widget.poster) : null;
 
   @override
   void initState() {
     super.initState();
-    _controller = _Controller(this);
+    _initControllers();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _vpc?.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => AspectRatio(
-        aspectRatio: _controller.aspectRatio!,
-        child: lib.Chewie(controller: _controller),
-      );
+  Widget build(BuildContext context) {
+    final aspectRatio = ((widget.autoResize && _controller != null)
+            ? _vpc?.value.aspectRatio
+            : null) ??
+        widget.aspectRatio;
 
-  void _onAspectRatioUpdated() => setState(() {});
-}
-
-class _Controller extends lib.ChewieController {
-  final _VideoPlayerState vps;
-
-  double? _aspectRatio;
-
-  _Controller(this.vps)
-      : super(
-          autoInitialize: true,
-          autoPlay: vps.widget.autoplay,
-          looping: vps.widget.loop,
-          placeholder: vps.widget.poster != null
-              ? Center(child: vps.widget.poster)
-              : null,
-          showControls: vps.widget.controls,
-          videoPlayerController:
-              lib.VideoPlayerController.network(vps.widget.url),
-        ) {
-    if (vps.widget.autoResize) {
-      _setupAspectRatioListener();
-    }
-  }
-
-  @override
-  double get aspectRatio => _aspectRatio ?? vps.widget.aspectRatio;
-
-  @override
-  void dispose() {
-    super.dispose();
-    videoPlayerController.dispose();
-  }
-
-  void _setupAspectRatioListener() {
-    late VoidCallback listener;
-
-    listener = () {
-      if (_aspectRatio == null) {
-        final vpv = videoPlayerController.value;
-        if (!vpv.isInitialized) return;
-
-        _aspectRatio = vpv.aspectRatio;
-        vps._onAspectRatioUpdated();
+    Widget? child;
+    if (_controller != null) {
+      child = lib.Chewie(controller: _controller!);
+    } else if (_error != null) {
+      final errorBuilder = widget.errorBuilder;
+      if (errorBuilder != null) {
+        child = errorBuilder(context, widget.url, _error);
       }
+    } else {
+      child = placeholder;
 
-      videoPlayerController.removeListener(listener);
-    };
+      final loadingBuilder = widget.loadingBuilder;
+      if (loadingBuilder != null) {
+        child = loadingBuilder(context, widget.url, child ?? widget0);
+      }
+    }
 
-    videoPlayerController.addListener(listener);
+    return AspectRatio(
+      aspectRatio: aspectRatio,
+      child: child,
+    );
   }
-}
 
-class _PlaceholderState extends State<VideoPlayer> {
-  @override
-  Widget build(BuildContext _) => AspectRatio(
-      aspectRatio: widget.aspectRatio,
-      child: DecoratedBox(
-        decoration: const BoxDecoration(color: Color.fromRGBO(0, 0, 0, .5)),
-        child: Center(child: Text('platform=$defaultTargetPlatform')),
-      ));
+  Future<void> _initControllers() async {
+    final vpc = _vpc = lib.VideoPlayerController.network(widget.url);
+    try {
+      await vpc.initialize();
+    } catch (error) {
+      setState(() => _error = error);
+      return;
+    }
+
+    setState(
+      () => _controller = lib.ChewieController(
+        autoPlay: widget.autoplay,
+        looping: widget.loop,
+        placeholder: placeholder,
+        showControls: widget.controls,
+        videoPlayerController: vpc,
+      ),
+    );
+  }
 }

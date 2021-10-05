@@ -8,9 +8,6 @@ class TextStyleHtml {
   /// The line height.
   final double? height;
 
-  /// The number of max lines that should be rendered.
-  final int? maxLines;
-
   /// The parent style.
   final TextStyleHtml? parent;
 
@@ -23,18 +20,17 @@ class TextStyleHtml {
   /// The text direction.
   final TextDirection textDirection;
 
-  /// The overflow behavior.
-  final TextOverflow? textOverflow;
+  /// The whitespace behavior.
+  final CssWhitespace whitespace;
 
-  TextStyleHtml._({
+  const TextStyleHtml._({
     required Iterable<dynamic> deps,
     this.height,
-    this.maxLines,
     this.parent,
     required this.style,
     this.textAlign,
     required this.textDirection,
-    this.textOverflow,
+    required this.whitespace,
   }) : _deps = deps;
 
   /// Creates the root text style.
@@ -55,6 +51,7 @@ class TextStyleHtml {
       deps: deps,
       style: style,
       textDirection: _getDependency<TextDirection>(deps),
+      whitespace: CssWhitespace.normal,
     );
   }
 
@@ -69,22 +66,20 @@ class TextStyleHtml {
   /// Creates a copy with the given fields replaced with the new values.
   TextStyleHtml copyWith({
     double? height,
-    int? maxLines,
     TextStyleHtml? parent,
     TextStyle? style,
     TextAlign? textAlign,
     TextDirection? textDirection,
-    TextOverflow? textOverflow,
+    CssWhitespace? whitespace,
   }) =>
       TextStyleHtml._(
         deps: _deps,
         height: height ?? this.height,
-        maxLines: maxLines ?? this.maxLines,
         parent: parent ?? this.parent,
         style: style ?? this.style,
         textAlign: textAlign ?? this.textAlign,
         textDirection: textDirection ?? this.textDirection,
-        textOverflow: textOverflow ?? this.textOverflow,
+        whitespace: whitespace ?? this.whitespace,
       );
 
   /// Gets dependency value by type.
@@ -136,13 +131,15 @@ class TextStyleBuilder<T1> {
     }
 
     if (_output != null) return _output!;
+
+    // ignore: unnecessary_null_checks
     if (_builders == null) return _output = _parentOutput!;
 
     _output = _parentOutput?.copyWith(parent: _parentOutput);
     final l = _builders!.length;
     for (var i = 0; i < l; i++) {
       final builder = _builders![i];
-      _output = builder(_output, _inputs![i]);
+      _output = builder(_output, _inputs![i]) as TextStyleHtml;
       assert(_output?.parent == _parentOutput);
     }
 
@@ -180,5 +177,5 @@ class TextStyleBuilder<T1> {
 
   @override
   String toString() =>
-      'tsb#$hashCode' + (parent != null ? '(parent=#${parent.hashCode})' : '');
+      'tsb#$hashCode${parent != null ? '(parent=#${parent.hashCode})' : ''}';
 }

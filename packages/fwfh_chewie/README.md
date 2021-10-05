@@ -7,6 +7,8 @@
 WidgetFactory extension to render VIDEO with the [chewie](https://pub.dev/packages/chewie) plugin.
 This is a companion add-on for [flutter_widget_from_html_core](https://pub.dev/packages/flutter_widget_from_html_core) package.
 
+Live demo: https://html-widget-demo.vercel.app/#/video
+
 ## Getting Started
 
 Add this to your app's `pubspec.yaml` file:
@@ -14,7 +16,7 @@ Add this to your app's `pubspec.yaml` file:
 ```yaml
 dependencies:
   flutter_widget_from_html_core: any
-  fwfh_chewie: ^0.6.0
+  fwfh_chewie: ^0.7.0
 ```
 
 ## Usage

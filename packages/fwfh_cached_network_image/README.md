@@ -14,7 +14,7 @@ Add this to your app's `pubspec.yaml` file:
 ```yaml
 dependencies:
   flutter_widget_from_html_core: any
-  fwfh_cached_network_image: ^0.6.0
+  fwfh_cached_network_image: ^0.7.0
 ```
 
 ## Usage
