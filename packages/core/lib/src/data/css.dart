@@ -241,11 +241,16 @@ class CssLengthBox {
         top: top ?? this.top,
       );
 
-  /// Returns `true` if any of the left, right, inline measurements is set.
-  bool get hasPositiveLeftOrRight =>
+  /// Returns `true` if left or inline measurements are set.
+  bool get mayHaveLeft =>
       _inlineEnd?.isPositive == true ||
       _inlineStart?.isPositive == true ||
-      _left?.isPositive == true ||
+      _left?.isPositive == true;
+
+  /// Returns `true` if right or inline measurements are set.
+  bool get mayHaveRight =>
+      _inlineEnd?.isPositive == true ||
+      _inlineStart?.isPositive == true ||
       _right?.isPositive == true;
 
   /// Calculates the left value taking text direction into account.
