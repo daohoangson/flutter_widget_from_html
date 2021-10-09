@@ -247,17 +247,23 @@ class _RenderCssSizing extends RenderProxyBox {
     required double preferredHeight,
     required double preferredWidth,
   }) {
-    final ccHeight = BoxConstraints(
-      maxHeight: preferredHeight,
-      minHeight: preferredHeight,
-    );
-    final sizeHeight = child!.getDryLayout(ccHeight);
+    final tightHeight = BoxConstraints.tightFor(height: preferredHeight);
+    late Size sizeHeight;
+    try {
+      sizeHeight = child!.getDryLayout(tightHeight);
+    } catch (error) {
+      debugPrint(
+        'Unable to guess child size '
+        '(preferred size=${preferredWidth}x$preferredHeight) '
+        'on tight height: $error',
+      );
+      return null;
+    }
 
-    final ccWidth = BoxConstraints(
-      maxWidth: preferredWidth,
-      minWidth: preferredWidth,
-    );
-    final sizeWidth = child!.getDryLayout(ccWidth);
+    // it's unlikely that `child.getDryLayout` works for tight height constraints
+    // then fails for tight width so we are not doing error trapping for this:
+    final tightWidth = BoxConstraints.tightFor(width: preferredWidth);
+    final sizeWidth = child!.getDryLayout(tightWidth);
 
     final childAspectRatio = sizeWidth.width / sizeWidth.height;
     const epsilon = 0.01;
