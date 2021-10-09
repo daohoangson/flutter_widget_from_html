@@ -47,7 +47,11 @@ class TagImg {
           tree.replaceWith(
             meta.willBuildSubtree!
                 ? WidgetBit.block(tree, placeholder)
-                : WidgetBit.inline(tree, placeholder),
+                : WidgetBit.inline(
+                    tree,
+                    placeholder,
+                    alignment: PlaceholderAlignment.baseline,
+                  ),
           );
         },
       );
