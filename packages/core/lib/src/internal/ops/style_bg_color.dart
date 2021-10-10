@@ -9,9 +9,7 @@ class StyleBgColor {
   StyleBgColor(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTree: (meta, tree) {
-          if (meta.willBuildSubtree == true) return;
-
+        onTreeFlattening: (meta, tree) {
           final bgColor = _parseColor(wf, meta);
           if (bgColor == null) return;
 
@@ -20,8 +18,6 @@ class StyleBgColor {
           }
         },
         onWidgets: (meta, widgets) {
-          if (meta.willBuildSubtree == false) return widgets;
-
           final color = _parseColor(wf, meta);
           if (color == null) return null;
           return listOrNull(

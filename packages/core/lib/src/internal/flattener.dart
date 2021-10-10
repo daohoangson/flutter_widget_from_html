@@ -22,9 +22,9 @@ typedef SpanBuilder = InlineSpan? Function(
 class Flattener {
   final WidgetFactory wf;
 
-  final List<GestureRecognizer> _recognizers = [];
+  final _flattened = <Flattened>[];
+  final _recognizers = <GestureRecognizer>[];
 
-  late List<Flattened> _flattened;
   late _Recognizer _recognizer;
   late _Recognizer _prevRecognizer;
   List<SpanBuilder>? _spans;
@@ -36,42 +36,49 @@ class Flattener {
 
   Flattener(this.wf);
 
-  void dispose() => _reset();
-
-  void reset() => _reset();
+  @mustCallSuper
+  void dispose() {
+    for (final r in _recognizers) {
+      r.dispose();
+    }
+    _recognizers.clear();
+  }
 
   List<Flattened> flatten(BuildTree tree) {
-    _flattened = [];
-
     _resetLoop(tree.tsb);
 
+    _flatten(tree, trim: true);
+
+    _completeLoop();
+
+    return _flattened;
+  }
+
+  void _flatten(BuildTree tree, {bool trim = false}) {
+    for (final subTree in tree.subTrees.toList(growable: false).reversed) {
+      subTree.onFlattening();
+    }
+
     final bits = tree.bits.toList(growable: false);
+
     var min = 0;
     var max = bits.length - 1;
-    for (; min <= max; min++) {
-      if (bits[min] is! WhitespaceBit) {
-        break;
+    if (trim) {
+      for (; min <= max; min++) {
+        if (bits[min] is! WhitespaceBit) {
+          break;
+        }
       }
-    }
-    for (; max >= min; max--) {
-      if (bits[max] is! WhitespaceBit) {
-        break;
+      for (; max >= min; max--) {
+        if (bits[max] is! WhitespaceBit) {
+          break;
+        }
       }
     }
 
     for (var i = min; i <= max; i++) {
       _loop(bits[i]);
     }
-    _completeLoop();
-
-    return _flattened;
-  }
-
-  void _reset() {
-    for (final r in _recognizers) {
-      r.dispose();
-    }
-    _recognizers.clear();
   }
 
   void _resetLoop(TextStyleBuilder tsb) {
@@ -135,9 +142,7 @@ class Flattener {
     _swallowWhitespace = bit.swallowWhitespace ?? _swallowWhitespace;
 
     if (built is BuildTree) {
-      for (final subBit in built.bits) {
-        _loop(subBit);
-      }
+      _flatten(built);
     }
   }
 

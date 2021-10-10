@@ -63,7 +63,13 @@ void wrapTree(
   BuildBit Function(BuildTree parent)? append,
   BuildBit Function(BuildTree parent)? prepend,
 }) {
-  if (tree.isEmpty) {
+  final children = tree.directChildren;
+  final first0 = children.isEmpty ? null : children.first;
+  final first = (first0 is BuildTree ? first0.first : null) ?? first0;
+  final last0 = children.isEmpty ? null : children.last;
+  final last = (last0 is BuildTree ? last0.last : null) ?? last0;
+
+  if (first == null || last == null) {
     if (prepend != null) {
       final prependBit = prepend(tree);
       tree.add(prependBit);
@@ -76,12 +82,10 @@ void wrapTree(
   }
 
   if (prepend != null) {
-    final first = tree.first!;
     prepend(first.parent!).insertBefore(first);
   }
 
   if (append != null) {
-    final last = tree.last!;
     append(last.parent!).insertAfter(last);
   }
 }

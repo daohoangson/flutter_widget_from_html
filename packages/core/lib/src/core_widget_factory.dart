@@ -23,8 +23,9 @@ class WidgetFactory {
   /// Defaults to `false`, resulting in a [CircularProgressIndicator].
   static bool debugDeterministicLoadingWidget = false;
 
+  final flatteners = <Flattener>[];
+
   late AnchorRegistry _anchorRegistry;
-  late final Flattener _flattener;
 
   BuildOp? _styleBgColor;
   BuildOp? _styleBlock;
@@ -45,10 +46,6 @@ class WidgetFactory {
   BuildOp? _tagQ;
   TextStyleHtml Function(TextStyleHtml, css.Expression)? _tsbLineHeight;
   HtmlWidget? _widget;
-
-  WidgetFactory() {
-    _flattener = Flattener(this);
-  }
 
   /// Builds [Align].
   Widget? buildAlign(
@@ -369,14 +366,23 @@ class WidgetFactory {
   /// Called when the [HtmlWidget]'s state is disposed.
   @mustCallSuper
   void dispose() {
-    _flattener.dispose();
+    _dispose();
+  }
+
+  void _dispose() {
+    for (final f in flatteners) {
+      f.dispose();
+    }
+    flatteners.clear();
   }
 
   /// Flattens a [BuildTree] into widgets.
   Iterable<WidgetPlaceholder> flatten(BuildMetadata meta, BuildTree tree) {
     final widgets = <WidgetPlaceholder>[];
+    final instance = Flattener(this);
+    flatteners.add(instance);
 
-    for (final flattened in _flattener.flatten(tree)) {
+    for (final flattened in instance.flatten(tree)) {
       if (flattened.widget != null) {
         widgets.add(WidgetPlaceholder.lazy(flattened.widget!));
         continue;
@@ -1038,12 +1044,8 @@ class WidgetFactory {
         break;
       case kCssDisplayNone:
         _styleDisplayNone ??= BuildOp(
-          onTree: (_, tree) {
-            for (final bit in tree.bits.toList(growable: false)) {
-              bit.detach();
-            }
-          },
-          priority: 0,
+          onTree: (_, tree) => tree.detach(),
+          priority: BuildOp.kPriorityMax,
         );
         meta.register(_styleDisplayNone!);
         break;
@@ -1056,8 +1058,9 @@ class WidgetFactory {
   /// Resets for a new build.
   @mustCallSuper
   void reset(State state) {
+    _dispose();
+
     _anchorRegistry = AnchorRegistry();
-    _flattener.reset();
 
     final widget = state.widget;
     _widget = widget is HtmlWidget ? widget : null;
@@ -1085,9 +1088,8 @@ class WidgetFactory {
       onTree: (meta, tree) {
         _anchorRegistry.register(id, anchor);
         tree.registerAnchor(anchor);
-
-        if (meta.willBuildSubtree == true) return;
-
+      },
+      onTreeFlattening: (meta, tree) {
         final widget = WidgetPlaceholder('#$id').wrapWith(
           (context, _) => SizedBox(
             height: meta.tsb.build(context).style.fontSize,
@@ -1105,8 +1107,6 @@ class WidgetFactory {
         }
       },
       onWidgets: (meta, widgets) {
-        if (meta.willBuildSubtree == false) return widgets;
-
         return listOrNull(
           buildColumnPlaceholder(meta, widgets)?.wrapWith(
             (context, child) => SizedBox(key: anchor, child: child),

@@ -29,9 +29,7 @@ class StyleSizing {
   StyleSizing(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTree: (meta, tree) {
-          if (meta.willBuildSubtree == true) return;
-
+        onTreeFlattening: (meta, tree) {
           final input = _parse(meta);
           if (input == null) return;
 
@@ -48,10 +46,9 @@ class StyleSizing {
           widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb));
         },
         onWidgets: (meta, widgets) {
-          if (meta.willBuildSubtree == false) return widgets;
-
           final input = _parse(meta);
           if (input == null) return widgets;
+
           return listOrNull(
             wf
                 .buildColumnPlaceholder(meta, widgets)

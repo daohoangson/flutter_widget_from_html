@@ -14,8 +14,9 @@ class StyleBorder {
   StyleBorder(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTree: (meta, tree) {
-          if (meta.willBuildSubtree == true) return;
+        onTreeFlattening: (meta, tree) {
+          if (_skipBuilding[meta] == true) return;
+
           final border = tryParseBorder(meta);
           if (border.isNone) return;
 
@@ -31,13 +32,11 @@ class StyleBorder {
           tree.replaceWith(WidgetBit.inline(tree, built));
         },
         onWidgets: (meta, widgets) {
-          if (_skipBuilding[meta] == true || widgets.isEmpty) {
-            return widgets;
-          }
+          if (_skipBuilding[meta] == true || widgets.isEmpty) return widgets;
+
           final border = tryParseBorder(meta);
           if (border.isNone) return widgets;
 
-          _skipBuilding[meta] = true;
           return [
             WidgetPlaceholder(
               border,

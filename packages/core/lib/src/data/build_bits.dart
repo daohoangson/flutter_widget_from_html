@@ -160,6 +160,9 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
     }
   }
 
+  /// The list of direct children.
+  Iterable<BuildBit> get directChildren => _children;
+
   /// The first bit (recursively).
   BuildBit? get first {
     for (final child in _children) {
@@ -193,6 +196,16 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
     return null;
   }
 
+  /// The list of sub trees including both direct and indirect ones.
+  Iterable<BuildTree> get subTrees sync* {
+    for (final child in _children) {
+      if (child is BuildTree) {
+        yield child;
+        yield* child.subTrees;
+      }
+    }
+  }
+
   /// Adds [bit] as the last bit.
   T add<T extends BuildBit>(T bit) {
     assert(bit.parent == this);
@@ -222,6 +235,11 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
       copied.add(bit.copyWith(parent: copied));
     }
     return copied;
+  }
+
+  /// Prepares the bits before [Flattener] does its job.
+  void onFlattening() {
+    // intentionally left empty
   }
 
   /// Registers anchor [Key].

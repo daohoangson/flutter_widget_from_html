@@ -18,9 +18,7 @@ class StyleVerticalAlign {
   StyleVerticalAlign(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTree: (meta, tree) {
-          if (meta.willBuildSubtree == true) return;
-
+        onTreeFlattening: (meta, tree) {
           final v = meta[kCssVerticalAlign]?.term;
           if (v == null || v == kCssVerticalAlignBaseline) return;
 
@@ -55,7 +53,6 @@ class StyleVerticalAlign {
           final v = meta[kCssVerticalAlign]?.term;
           if (v == null) return widgets;
 
-          _skipBuilding[meta] = true;
           return listOrNull(
             wf
                 .buildColumnPlaceholder(meta, widgets)

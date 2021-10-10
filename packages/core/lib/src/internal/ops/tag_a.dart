@@ -15,9 +15,7 @@ class TagA {
 
           return styles;
         },
-        onTree: (meta, tree) {
-          if (meta.willBuildSubtree == true) return;
-
+        onTreeFlattening: (meta, tree) {
           final onTap = _gestureTapCallback(meta);
           if (onTap == null) return;
 
@@ -32,8 +30,6 @@ class TagA {
           }
         },
         onWidgets: (meta, widgets) {
-          if (meta.willBuildSubtree == false) return widgets;
-
           final onTap = _gestureTapCallback(meta);
           if (onTap == null) return widgets;
 

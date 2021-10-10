@@ -24,7 +24,6 @@ class BuildMetadata extends core_data.BuildMetadata {
   var _buildOpsIsLocked = false;
   List<css.Declaration>? _styles;
   var _stylesIsLocked = false;
-  bool? _willBuildSubtree;
 
   BuildMetadata(
     dom.Element element,
@@ -44,8 +43,13 @@ class BuildMetadata extends core_data.BuildMetadata {
     return _styles ?? const [];
   }
 
-  @override
-  bool? get willBuildSubtree => _willBuildSubtree;
+  bool get _isBlockElement {
+    if (this[kCssDisplay]?.term == kCssDisplayBlock) {
+      return true;
+    }
+
+    return _buildOps?.where(_opRequiresBuildingSubtree).isNotEmpty == true;
+  }
 
   @override
   void operator []=(String key, String value) {
@@ -137,6 +141,13 @@ class BuildTree extends core_data.BuildTree {
   }
 
   @override
+  void onFlattening() {
+    for (final op in parentMeta.buildOps) {
+      op.onTreeFlattening?.call(parentMeta, this);
+    }
+  }
+
+  @override
   BuildTree sub({
     core_data.BuildTree? parent,
     BuildMetadata? parentMeta,
@@ -180,7 +191,7 @@ class BuildTree extends core_data.BuildTree {
 
     subTree.addBitsFromNodes(element.nodes);
 
-    if (meta.willBuildSubtree == true) {
+    if (meta._isBlockElement) {
       for (final widget in subTree.build()) {
         add(WidgetBit.block(this, widget));
       }
@@ -265,8 +276,6 @@ class BuildTree extends core_data.BuildTree {
 
     wf.parseStyleDisplay(meta, meta[kCssDisplay]?.term);
 
-    meta._willBuildSubtree = meta[kCssDisplay]?.term == kCssDisplayBlock ||
-        meta._buildOps?.where(_opRequiresBuildingSubtree).isNotEmpty == true;
     meta._buildOpsIsLocked = true;
   }
 
