@@ -120,9 +120,7 @@ class TagTable {
           borderSpacing: borderSpacing?.getValue(tsh) ?? 0.0,
           companion: companion,
           children: List.from(
-            _data.builders
-                .map((f) => f(context))
-                .where((element) => element != null),
+            _data.builders.map((f) => f(context)).where((e) => e != null),
             growable: false,
           ),
         );
@@ -131,12 +129,12 @@ class TagTable {
   }
 
   void _prepareHtmlTableCellBuilders(_TagTableDataGroup group) {
-    final rowIndexGlobalOffset = _data.rows;
+    final rowStartOffset = _data.rows;
     final rowSpanMax = group.rows.length;
 
-    for (var rowIndex = 0; rowIndex < group.rows.length; rowIndex++) {
-      final rowStart = rowIndexGlobalOffset + rowIndex;
-      final row = group.rows[rowIndex];
+    for (var i = 0; i < group.rows.length; i++) {
+      final row = group.rows[i];
+      final rowStart = rowStartOffset + i;
       final rowCells = _data.cells[rowStart] ??= {};
 
       for (final cell in row.cells) {
