@@ -328,11 +328,29 @@ Future<void> main() async {
       expect(explained, contains('HtmlTableCell(columnStart: 0, rowStart: 0)'));
     });
 
-    testWidgets('renders colspan=2', (WidgetTester tester) async {
+    testWidgets('renders colspan=2 as 1', (WidgetTester tester) async {
       const html =
           '<table><tbody><tr><td colspan="2">Foo</td></tr></tbody></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(explained, contains('HtmlTableCell(columnStart: 0, rowStart: 0)'));
+    });
+
+    testWidgets('renders colspan=2', (WidgetTester tester) async {
+      const html = '<table><tbody>'
+          '<tr><td>1</td><td>2</td></tr>'
+          '<tr><td colspan="2">Foo</td></tr>'
+          '</tbody></table>';
       final e = await explain(tester, html, useExplainer: false);
-      expect(e, contains('(columnSpan: 2, columnStart: 0, rowStart: 0)'));
+      expect(e, contains('(columnSpan: 2, columnStart: 0, rowStart: 1)'));
+    });
+
+    testWidgets('renders colspan=3 as 2', (WidgetTester tester) async {
+      const html = '<table><tbody>'
+          '<tr><td>1</td><td>2</td></tr>'
+          '<tr><td colspan="3">Foo</td></tr>'
+          '</tbody></table>';
+      final e = await explain(tester, html, useExplainer: false);
+      expect(e, contains('(columnSpan: 2, columnStart: 0, rowStart: 1)'));
     });
 
     testWidgets('renders rowspan=1', (WidgetTester tester) async {
@@ -342,11 +360,35 @@ Future<void> main() async {
       expect(explained, contains('HtmlTableCell(columnStart: 0, rowStart: 0)'));
     });
 
-    testWidgets('renders rowspan=2', (WidgetTester tester) async {
+    testWidgets('renders rowspan=2 as 1', (WidgetTester tester) async {
       const html =
           '<table><tbody><tr><td rowspan="2">Foo</td></tr></tbody></table>';
       final explained = await explain(tester, html, useExplainer: false);
       expect(explained, contains('HtmlTableCell(columnStart: 0, rowStart: 0)'));
+    });
+
+    testWidgets('renders rowspan=2', (WidgetTester tester) async {
+      const html = '<table><tbody>'
+          '<tr><td rowspan="2">Foo</td><td>1</td></tr>'
+          '<tr><td>2</td></tr>'
+          '</tbody></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        contains('HtmlTableCell(columnStart: 0, rowSpan: 2, rowStart: 0)'),
+      );
+    });
+
+    testWidgets('renders rowspan=3 as 2', (WidgetTester tester) async {
+      const html = '<table><tbody>'
+          '<tr><td rowspan="3">Foo</td><td>1</td></tr>'
+          '<tr><td>2</td></tr>'
+          '</tbody></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        contains('HtmlTableCell(columnStart: 0, rowSpan: 2, rowStart: 0)'),
+      );
     });
 
     testWidgets('renders rowspan=0', (t) async {
@@ -361,12 +403,26 @@ Future<void> main() async {
       expect(explained, contains('HtmlTableCell(columnStart: 1, rowStart: 1)'));
     });
 
+    testWidgets('renders colspan=2 rowspan=2 as 1', (tester) async {
+      const html =
+          '<table><tbody><tr><td colspan="2" rowspan="2">Foo</td></tr></tbody></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(explained, contains('HtmlTableCell(columnStart: 0, rowStart: 0)'));
+    });
+
     testWidgets('renders colspan=2 rowspan=2', (WidgetTester tester) async {
       const html = '<table><tbody>'
-          '<tr><td colspan="2" rowspan="2">Foo</td></tr>'
+          '<tr><td colspan="2" rowspan="2">Foo</td><td>1</td></tr>'
+          '<tr><td>2</td></td>'
+          '<tr><td>3</td><td>4</td><td>5</td></td>'
           '</tbody></table>';
-      final e = await explain(tester, html, useExplainer: false);
-      expect(e, contains('(columnSpan: 2, columnStart: 0, rowStart: 0)'));
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        contains(
+          'HtmlTableCell(columnSpan: 2, columnStart: 0, rowSpan: 2, rowStart: 0)',
+        ),
+      );
     });
 
     testWidgets('renders cells being split by rowspan from above', (t) async {
@@ -649,29 +705,19 @@ Future<void> main() async {
           '<table cellspacing="10"><tr><td>Foo</td></tr></table>',
           useExplainer: false,
         );
-        expect(
-          before,
-          contains(
-            '└HtmlTable(borderSpacing: 10.0)',
-          ),
-        );
+        expect(before, contains('└HtmlTable(borderSpacing: 10.0)'));
 
         final after = await explain(
           tester,
           '<table cellspacing="20"><tr><td>Foo</td></tr></table>',
           useExplainer: false,
         );
-        expect(
-          after,
-          contains(
-            '└HtmlTable(borderSpacing: 20.0)',
-          ),
-        );
+        expect(after, contains('└HtmlTable(borderSpacing: 20.0)'));
       });
     });
 
     testWidgets('_ValignBaselineRenderObject updates row', (tester) async {
-      final before = await explain(
+      await explain(
         tester,
         '<table style="border-collapse: separate">'
         '<tr><td>Foo</td>'
@@ -679,14 +725,11 @@ Future<void> main() async {
         '</table>',
         useExplainer: false,
       );
-      expect(
-        before,
-        contains(
-          '└HtmlTableValignBaseline(row: 0)',
-        ),
-      );
+      final finder = find.byType(HtmlTableValignBaseline);
+      final before = tester.firstRenderObject(finder);
+      expect(before.toStringShort(), endsWith('(row: 0)'));
 
-      final after = await explain(
+      await explain(
         tester,
         '<table style="border-collapse: separate">'
         '<tr><td>Foo</td></tr>'
@@ -694,12 +737,8 @@ Future<void> main() async {
         '</table>',
         useExplainer: false,
       );
-      expect(
-        after,
-        contains(
-          '└HtmlTableValignBaseline(row: 1)',
-        ),
-      );
+      final after = tester.firstRenderObject(finder);
+      expect(after.toStringShort(), endsWith('(row: 1)'));
     });
 
     testWidgets('performs hit test', (tester) async {

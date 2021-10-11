@@ -154,38 +154,27 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
 
 /// A `valign=baseline` widget.
 class HtmlTableValignBaseline extends SingleChildRenderObjectWidget {
-  /// The table's companion data.
-  final HtmlTableCompanion companion;
-
-  /// The cell's row index.
-  final int row;
-
   /// Creates a `valign=baseline` widget.
-  const HtmlTableValignBaseline({
-    Widget? child,
-    required this.companion,
-    Key? key,
-    required this.row,
-  }) : super(child: child, key: key);
+  const HtmlTableValignBaseline({Widget? child, Key? key})
+      : super(child: child, key: key);
 
   @override
-  RenderObject createRenderObject(BuildContext context) =>
-      _ValignBaselineRenderObject(companion, row);
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(IntProperty('row', row));
+  RenderObject createRenderObject(BuildContext context) {
+    final table = context.findAncestorWidgetOfExactType<HtmlTable>()!;
+    final cell = context.findAncestorWidgetOfExactType<HtmlTableCell>()!;
+    return _ValignBaselineRenderObject(table.companion, cell.rowStart);
   }
 
   @override
   void updateRenderObject(
-    BuildContext _,
+    BuildContext context,
     _ValignBaselineRenderObject renderObject,
   ) {
+    final table = context.findAncestorWidgetOfExactType<HtmlTable>()!;
+    final cell = context.findAncestorWidgetOfExactType<HtmlTableCell>()!;
     renderObject
-      ..companion = companion
-      ..row = row;
+      ..companion = table.companion
+      ..row = cell.rowStart;
   }
 }
 
@@ -575,6 +564,9 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
       _performLayoutLayouter,
     );
   }
+
+  @override
+  String toStringShort() => '_ValignBaselineRenderObject(row: $_row)';
 
   static Size _performLayout(
     final RenderBox? child,
