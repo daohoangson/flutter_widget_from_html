@@ -259,8 +259,6 @@ extension _BuildMetadataExtension on BuildMetadata {
   int get row => _rows[this] ?? -1;
 }
 
-typedef _HtmlTableCellBuilder = HtmlTableCell? Function(BuildContext);
-
 class _TableCaption extends SingleChildRenderObjectWidget {
   const _TableCaption(Widget child, {Key? key}) : super(child: child, key: key);
 
@@ -369,7 +367,7 @@ class _TagTableData {
   final header = _TagTableDataGroup();
 
   final cells = <int, Map<int, _TagTableDataCell>>{};
-  final builders = <_HtmlTableCellBuilder>[];
+  final builders = <HtmlTableCell? Function(BuildContext)>[];
 
   _TagTableDataGroup get body {
     final body = _TagTableDataGroup();
