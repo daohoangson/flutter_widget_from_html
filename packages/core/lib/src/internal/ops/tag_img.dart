@@ -49,7 +49,13 @@ class TagImg {
           final placeholder = _placeholders[meta];
           if (placeholder == null) return;
 
-          tree.replaceWith(WidgetBit.inline(tree, placeholder));
+          tree.replaceWith(
+            WidgetBit.inline(
+              tree,
+              placeholder,
+              alignment: PlaceholderAlignment.baseline,
+            ),
+          );
         },
         onWidgets: (meta, widgets) {
           final placeholder = _placeholders[meta];

@@ -27,14 +27,22 @@ class StylePadding {
   BuildOp get buildOp => BuildOp(
         onTreeFlattening: (meta, tree) {
           final padding = tryParseCssLengthBox(meta, kCssPadding);
-          if (padding == null || !padding.hasPositiveLeftOrRight) return;
+          if (padding == null) return;
+
+          final mayHaveLeft = padding.mayHaveLeft;
+          final mayHaveRight = padding.mayHaveRight;
+          if (!mayHaveLeft && !mayHaveRight) return;
 
           return wrapTree(
             tree,
-            append: (p) =>
-                WidgetBit.inline(p, _paddingInlineAfter(p.tsb, padding)),
-            prepend: (p) =>
-                WidgetBit.inline(p, _paddingInlineBefore(p.tsb, padding)),
+            append: mayHaveRight
+                ? (p) =>
+                    WidgetBit.inline(p, _paddingInlineAfter(p.tsb, padding))
+                : null,
+            prepend: mayHaveLeft
+                ? (p) =>
+                    WidgetBit.inline(p, _paddingInlineBefore(p.tsb, padding))
+                : null,
           );
         },
         onWidgets: (meta, widgets) {

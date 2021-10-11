@@ -29,7 +29,13 @@ class StyleBorder {
                   );
           if (built == null) return;
 
-          tree.replaceWith(WidgetBit.inline(tree, built));
+          tree.replaceWith(
+            WidgetBit.inline(
+              tree,
+              built,
+              alignment: PlaceholderAlignment.baseline,
+            ),
+          );
         },
         onWidgets: (meta, widgets) {
           if (_skipBuilding[meta] == true || widgets.isEmpty) return widgets;

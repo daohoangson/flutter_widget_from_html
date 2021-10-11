@@ -405,9 +405,7 @@ class WidgetFactory {
 
           final textAlign = tsh.textAlign ?? TextAlign.start;
 
-          if (span is WidgetSpan &&
-              span.alignment == PlaceholderAlignment.baseline &&
-              textAlign == TextAlign.start) {
+          if (span is WidgetSpan && textAlign == TextAlign.start) {
             return span.child;
           }
 
@@ -1100,10 +1098,20 @@ class WidgetFactory {
         final bit = tree.first;
         if (bit == null) {
           // most likely an A[name]
-          tree.add(WidgetBit.inline(tree, widget));
+          tree.add(
+            WidgetBit.inline(
+              tree,
+              widget,
+              alignment: PlaceholderAlignment.baseline,
+            ),
+          );
         } else {
           // most likely a SPAN[id]
-          WidgetBit.inline(bit.parent!, widget).insertBefore(bit);
+          WidgetBit.inline(
+            bit.parent!,
+            widget,
+            alignment: PlaceholderAlignment.baseline,
+          ).insertBefore(bit);
         }
       },
       onWidgets: (meta, widgets) {

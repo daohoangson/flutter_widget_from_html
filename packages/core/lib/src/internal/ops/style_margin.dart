@@ -21,12 +21,20 @@ class StyleMargin {
   BuildOp get buildOp => BuildOp(
         onTreeFlattening: (meta, tree) {
           final m = tryParseCssLengthBox(meta, kCssMargin);
-          if (m == null || !m.hasPositiveLeftOrRight) return;
+          if (m == null) return;
+
+          final mayHaveLeft = m.mayHaveLeft;
+          final mayHaveRight = m.mayHaveRight;
+          if (!mayHaveLeft && !mayHaveRight) return;
 
           return wrapTree(
             tree,
-            append: (p) => WidgetBit.inline(p, _paddingInlineAfter(p.tsb, m)),
-            prepend: (p) => WidgetBit.inline(p, _paddingInlineBefore(p.tsb, m)),
+            append: mayHaveRight
+                ? (p) => WidgetBit.inline(p, _paddingInlineAfter(p.tsb, m))
+                : null,
+            prepend: mayHaveLeft
+                ? (p) => WidgetBit.inline(p, _paddingInlineBefore(p.tsb, m))
+                : null,
           );
         },
         onWidgets: (meta, widgets) {
@@ -37,7 +45,7 @@ class StyleMargin {
           return [
             if (m.top?.isPositive ?? false) HeightPlaceholder(m.top!, tsb),
             for (final widget in widgets)
-              if (m.hasPositiveLeftOrRight)
+              if (m.mayHaveLeft || m.mayHaveRight)
                 widget.wrapWith(
                   (c, w) => _marginHorizontalBuilder(w, m, tsb.build(c)),
                 )

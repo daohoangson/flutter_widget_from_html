@@ -333,7 +333,7 @@ class WidgetBit extends BuildBit<void, dynamic> {
   factory WidgetBit.inline(
     BuildTree parent,
     Widget child, {
-    PlaceholderAlignment alignment = PlaceholderAlignment.baseline,
+    PlaceholderAlignment alignment = PlaceholderAlignment.bottom,
     TextBaseline baseline = TextBaseline.alphabetic,
     TextStyleBuilder? tsb,
   }) =>

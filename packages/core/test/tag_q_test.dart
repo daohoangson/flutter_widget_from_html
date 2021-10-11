@@ -78,8 +78,8 @@ void main() {
   });
 
   testWidgets('renders within vertical-align middle', (tester) async {
-    const html = '<span style="vertical-align: middle"><q>Foo</q></span>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[RichText:[RichText:(:“Foo”)]@middle]'));
+    const html = '<span style="vertical-align: middle"><q>Foo</q></span> bar';
+    final e = await explain(tester, html);
+    expect(e, equals('[RichText:(:[RichText:(:“Foo”)]@middle(: bar))]'));
   });
 }

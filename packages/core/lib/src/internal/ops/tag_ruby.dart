@@ -73,7 +73,11 @@ class TagRuby {
           return HtmlRuby(ruby, rt);
         });
 
-      WidgetBit.inline(tree.parent!, placeholder).insertBefore(tree);
+      WidgetBit.inline(
+        tree.parent!,
+        placeholder,
+        alignment: PlaceholderAlignment.baseline,
+      ).insertBefore(tree);
 
       for (final rubyBit in rubyBits) {
         rubyTree.add(rubyBit.copyWith(parent: rubyTree));
