@@ -328,11 +328,29 @@ Future<void> main() async {
       expect(explained, contains('HtmlTableCell(columnStart: 0, rowStart: 0)'));
     });
 
-    testWidgets('renders colspan=2', (WidgetTester tester) async {
+    testWidgets('renders colspan=2 as 1', (WidgetTester tester) async {
       const html =
           '<table><tbody><tr><td colspan="2">Foo</td></tr></tbody></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(explained, contains('HtmlTableCell(columnStart: 0, rowStart: 0)'));
+    });
+
+    testWidgets('renders colspan=2', (WidgetTester tester) async {
+      const html = '<table><tbody>'
+          '<tr><td>1</td><td>2</td></tr>'
+          '<tr><td colspan="2">Foo</td></tr>'
+          '</tbody></table>';
       final e = await explain(tester, html, useExplainer: false);
-      expect(e, contains('(columnSpan: 2, columnStart: 0, rowStart: 0)'));
+      expect(e, contains('(columnSpan: 2, columnStart: 0, rowStart: 1)'));
+    });
+
+    testWidgets('renders colspan=3 as 2', (WidgetTester tester) async {
+      const html = '<table><tbody>'
+          '<tr><td>1</td><td>2</td></tr>'
+          '<tr><td colspan="3">Foo</td></tr>'
+          '</tbody></table>';
+      final e = await explain(tester, html, useExplainer: false);
+      expect(e, contains('(columnSpan: 2, columnStart: 0, rowStart: 1)'));
     });
 
     testWidgets('renders rowspan=1', (WidgetTester tester) async {
@@ -342,11 +360,35 @@ Future<void> main() async {
       expect(explained, contains('HtmlTableCell(columnStart: 0, rowStart: 0)'));
     });
 
-    testWidgets('renders rowspan=2', (WidgetTester tester) async {
+    testWidgets('renders rowspan=2 as 1', (WidgetTester tester) async {
       const html =
           '<table><tbody><tr><td rowspan="2">Foo</td></tr></tbody></table>';
       final explained = await explain(tester, html, useExplainer: false);
       expect(explained, contains('HtmlTableCell(columnStart: 0, rowStart: 0)'));
+    });
+
+    testWidgets('renders rowspan=2', (WidgetTester tester) async {
+      const html = '<table><tbody>'
+          '<tr><td rowspan="2">Foo</td><td>1</td></tr>'
+          '<tr><td>2</td></tr>'
+          '</tbody></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        contains('HtmlTableCell(columnStart: 0, rowSpan: 2, rowStart: 0)'),
+      );
+    });
+
+    testWidgets('renders rowspan=3 as 2', (WidgetTester tester) async {
+      const html = '<table><tbody>'
+          '<tr><td rowspan="3">Foo</td><td>1</td></tr>'
+          '<tr><td>2</td></tr>'
+          '</tbody></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        contains('HtmlTableCell(columnStart: 0, rowSpan: 2, rowStart: 0)'),
+      );
     });
 
     testWidgets('renders rowspan=0', (t) async {
@@ -361,12 +403,26 @@ Future<void> main() async {
       expect(explained, contains('HtmlTableCell(columnStart: 1, rowStart: 1)'));
     });
 
+    testWidgets('renders colspan=2 rowspan=2 as 1', (tester) async {
+      const html =
+          '<table><tbody><tr><td colspan="2" rowspan="2">Foo</td></tr></tbody></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(explained, contains('HtmlTableCell(columnStart: 0, rowStart: 0)'));
+    });
+
     testWidgets('renders colspan=2 rowspan=2', (WidgetTester tester) async {
       const html = '<table><tbody>'
-          '<tr><td colspan="2" rowspan="2">Foo</td></tr>'
+          '<tr><td colspan="2" rowspan="2">Foo</td><td>1</td></tr>'
+          '<tr><td>2</td></td>'
+          '<tr><td>3</td><td>4</td><td>5</td></td>'
           '</tbody></table>';
-      final e = await explain(tester, html, useExplainer: false);
-      expect(e, contains('(columnSpan: 2, columnStart: 0, rowStart: 0)'));
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        contains(
+          'HtmlTableCell(columnSpan: 2, columnStart: 0, rowSpan: 2, rowStart: 0)',
+        ),
+      );
     });
 
     testWidgets('renders cells being split by rowspan from above', (t) async {
