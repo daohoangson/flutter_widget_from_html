@@ -705,29 +705,19 @@ Future<void> main() async {
           '<table cellspacing="10"><tr><td>Foo</td></tr></table>',
           useExplainer: false,
         );
-        expect(
-          before,
-          contains(
-            '└HtmlTable(borderSpacing: 10.0)',
-          ),
-        );
+        expect(before, contains('└HtmlTable(borderSpacing: 10.0)'));
 
         final after = await explain(
           tester,
           '<table cellspacing="20"><tr><td>Foo</td></tr></table>',
           useExplainer: false,
         );
-        expect(
-          after,
-          contains(
-            '└HtmlTable(borderSpacing: 20.0)',
-          ),
-        );
+        expect(after, contains('└HtmlTable(borderSpacing: 20.0)'));
       });
     });
 
     testWidgets('_ValignBaselineRenderObject updates row', (tester) async {
-      final before = await explain(
+      await explain(
         tester,
         '<table style="border-collapse: separate">'
         '<tr><td>Foo</td>'
@@ -735,14 +725,11 @@ Future<void> main() async {
         '</table>',
         useExplainer: false,
       );
-      expect(
-        before,
-        contains(
-          '└HtmlTableValignBaseline(row: 0)',
-        ),
-      );
+      final finder = find.byType(HtmlTableValignBaseline);
+      final before = tester.firstRenderObject(finder);
+      expect(before.toStringShort(), endsWith('(row: 0)'));
 
-      final after = await explain(
+      await explain(
         tester,
         '<table style="border-collapse: separate">'
         '<tr><td>Foo</td></tr>'
@@ -750,12 +737,8 @@ Future<void> main() async {
         '</table>',
         useExplainer: false,
       );
-      expect(
-        after,
-        contains(
-          '└HtmlTableValignBaseline(row: 1)',
-        ),
-      );
+      final after = tester.firstRenderObject(finder);
+      expect(after.toStringShort(), endsWith('(row: 1)'));
     });
 
     testWidgets('performs hit test', (tester) async {

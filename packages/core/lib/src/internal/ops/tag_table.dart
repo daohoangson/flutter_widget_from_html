@@ -169,8 +169,6 @@ class TagTable {
         }
 
         final cellMeta = cell.meta;
-        cellMeta.row = rowStart;
-
         final cssBorderParsed = tryParseBorder(cellMeta);
         final cssBorder = cssBorderParsed.inherit
             ? tryParseBorder(tableMeta).copyFrom(cssBorderParsed)
@@ -250,13 +248,6 @@ class TagTable {
   }
 }
 
-extension _BuildMetadataExtension on BuildMetadata {
-  static final _rows = Expando<int>();
-
-  set row(int v) => _rows[this] = v;
-  int get row => _rows[this] ?? -1;
-}
-
 class _TableCaption extends SingleChildRenderObjectWidget {
   const _TableCaption(Widget child, {Key? key}) : super(child: child, key: key);
 
@@ -303,13 +294,7 @@ class _TagTableRow {
           parent.wf
               .buildColumnPlaceholder(cellMeta, widgets)
               ?.wrapWith((_, child) {
-            final row = cellMeta.row;
-
-            return HtmlTableValignBaseline(
-              companion: parent.companion,
-              row: row,
-              child: child,
-            );
+            return HtmlTableValignBaseline(child: child);
           }),
         );
       },
