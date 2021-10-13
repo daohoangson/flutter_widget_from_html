@@ -67,7 +67,10 @@ class _ListMarkerRenderObject extends RenderBox {
   HtmlListMarkerType _markerType;
   // ignore: avoid_setters_without_getters
   set markerType(HtmlListMarkerType v) {
-    if (v == _markerType) return;
+    if (v == _markerType) {
+      return;
+    }
+
     _markerType = v;
     markNeedsLayout();
   }
@@ -76,7 +79,9 @@ class _ListMarkerRenderObject extends RenderBox {
   final _textMetrics = <LineMetrics>[];
   TextPainter get _textPainter {
     final existingPainter = __textPainter;
-    if (existingPainter != null) return existingPainter;
+    if (existingPainter != null) {
+      return existingPainter;
+    }
 
     final newPainter = __textPainter = TextPainter(
       text: TextSpan(style: _textStyle, text: '1.'),
@@ -93,7 +98,10 @@ class _ListMarkerRenderObject extends RenderBox {
   TextStyle _textStyle;
   // ignore: avoid_setters_without_getters
   set textStyle(TextStyle v) {
-    if (v == _textStyle) return;
+    if (v == _textStyle) {
+      return;
+    }
+
     __textPainter = null;
     _textStyle = v;
     markNeedsLayout();
@@ -125,7 +133,9 @@ class _ListMarkerRenderObject extends RenderBox {
 
     final color = _textStyle.color;
     final fontSize = _textStyle.fontSize;
-    if (color == null || fontSize == null) return;
+    if (color == null || fontSize == null) {
+      return;
+    }
 
     final radius = fontSize * .2;
     switch (_markerType) {

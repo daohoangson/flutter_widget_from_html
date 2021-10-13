@@ -134,7 +134,9 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
 
     if (needsLayout) {
       final parent = renderObject.parent;
-      if (parent is RenderObject) parent.markNeedsLayout();
+      if (parent is RenderObject) {
+        parent.markNeedsLayout();
+      }
     }
   }
 
@@ -228,7 +230,10 @@ class _TableRenderObject extends RenderBox
   Border? _border;
   // ignore: avoid_setters_without_getters
   set border(Border? v) {
-    if (v == _border) return;
+    if (v == _border) {
+      return;
+    }
+
     _border = v;
     markNeedsLayout();
   }
@@ -236,7 +241,10 @@ class _TableRenderObject extends RenderBox
   bool _borderCollapse;
   // ignore: avoid_setters_without_getters
   set borderCollapse(bool v) {
-    if (v == _borderCollapse) return;
+    if (v == _borderCollapse) {
+      return;
+    }
+
     _borderCollapse = v;
     markNeedsLayout();
   }
@@ -244,7 +252,10 @@ class _TableRenderObject extends RenderBox
   double _borderSpacing;
   // ignore: avoid_setters_without_getters
   set borderSpacing(double v) {
-    if (v == _borderSpacing) return;
+    if (v == _borderSpacing) {
+      return;
+    }
+
     _borderSpacing = v;
     markNeedsLayout();
   }
@@ -252,7 +263,10 @@ class _TableRenderObject extends RenderBox
   HtmlTableCompanion _companion;
   // ignore: avoid_setters_without_getters
   set companion(HtmlTableCompanion v) {
-    if (v == _companion) return;
+    if (v == _companion) {
+      return;
+    }
+
     _companion = v;
     markNeedsLayout();
   }
@@ -485,7 +499,9 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
   HtmlTableCompanion _companion;
   // ignore: avoid_setters_without_getters
   set companion(HtmlTableCompanion v) {
-    if (v == _companion) return;
+    if (v == _companion) {
+      return;
+    }
     _companion = v;
     markNeedsLayout();
   }
@@ -493,7 +509,9 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
   int _row;
   // ignore: avoid_setters_without_getters
   set row(int v) {
-    if (v == _row) return;
+    if (v == _row) {
+      return;
+    }
     _row = v;
     markNeedsLayout();
   }
@@ -510,7 +528,9 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
     final effectiveOffset = offset.translate(0, _paddingTop);
 
     final child = this.child;
-    if (child == null) return;
+    if (child == null) {
+      return;
+    }
 
     final baselineWithOffset = _baselineWithOffset = effectiveOffset.dy +
         (child.getDistanceToBaseline(TextBaseline.alphabetic) ?? 0.0);
@@ -538,7 +558,9 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
         }
       } else if (rowBaseline < baselineWithOffset) {
         for (final sibling in siblings[_row]!) {
-          if (sibling == this) continue;
+          if (sibling == this) {
+            continue;
+          }
 
           final offsetY = baselineWithOffset - sibling._baselineWithOffset!;
           if (offsetY != 0.0) {

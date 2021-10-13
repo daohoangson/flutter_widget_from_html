@@ -8,7 +8,9 @@ class AnchorRegistry {
   final _indexByAnchor = <Key, _AnchorBodyItemIndex>{};
 
   Widget buildBodyItem(BuildContext context, int index, Widget widget) {
-    if (index >= _bodyItemKeys.length) return widget;
+    if (index >= _bodyItemKeys.length) {
+      return widget;
+    }
 
     return _BodyItemWidget(
       index: index,
@@ -50,7 +52,9 @@ class AnchorRegistry {
     required int? prevMin,
   }) async {
     final anchor = _anchorById[id];
-    if (anchor == null) return completer.complete(false);
+    if (anchor == null) {
+      return completer.complete(false);
+    }
 
     final anchorContext = anchor.currentContext;
     if (anchorContext != null) {
@@ -63,7 +67,9 @@ class AnchorRegistry {
       );
     }
 
-    if (_bodyItemIndeces.isEmpty) return completer.complete(false);
+    if (_bodyItemIndeces.isEmpty) {
+      return completer.complete(false);
+    }
     final current = _bodyItemIndeces.toList(growable: false);
     final currentMin = current.reduce(min);
     final currentMax = current.reduce(max);
@@ -90,7 +96,9 @@ class AnchorRegistry {
       );
     }
 
-    if (!movedOk) return completer.complete(false);
+    if (!movedOk) {
+      return completer.complete(false);
+    }
 
     WidgetsBinding.instance?.addPostFrameCallback(
       (_) => _ensureVisible(
@@ -113,10 +121,14 @@ class AnchorRegistry {
     required Duration duration,
   }) async {
     final renderObject = context?.findRenderObject();
-    if (renderObject == null) return false;
+    if (renderObject == null) {
+      return false;
+    }
 
     final position = Scrollable.of(context!)?.position;
-    if (position == null) return false;
+    if (position == null) {
+      return false;
+    }
 
     await position.ensureVisible(
       renderObject,
@@ -128,7 +140,9 @@ class AnchorRegistry {
   }
 
   void prepareIndexByAnchor(List<Widget> widgets) {
-    if (_anchors.isEmpty) return;
+    if (_anchors.isEmpty) {
+      return;
+    }
 
     for (var i = 0; i < widgets.length; i++) {
       _bodyItemKeys.add(GlobalKey(debugLabel: i.toString()));
@@ -143,14 +157,18 @@ class AnchorRegistry {
 
     for (var j = 0; j < _anchors.length; j++) {
       final anchor = _anchors[j];
-      if (_indexByAnchor[anchor] != null) continue;
+      if (_indexByAnchor[anchor] != null) {
+        continue;
+      }
 
       int? prevMax;
       for (var prevIndex = j - 1; prevIndex >= 0; prevIndex--) {
         final prevAnchor = _anchors[prevIndex];
         final prevAbii = _indexByAnchor[prevAnchor];
         prevMax = prevAbii?.isExact == true ? prevAbii?.max : null;
-        if (prevMax != null) break;
+        if (prevMax != null) {
+          break;
+        }
       }
 
       int? nextMin;
@@ -158,7 +176,9 @@ class AnchorRegistry {
         final nextAnchor = _anchors[nextIndex];
         final nextAbii = _indexByAnchor[nextAnchor];
         nextMin = nextAbii?.isExact == true ? nextAbii?.min : null;
-        if (nextMin != null) break;
+        if (nextMin != null) {
+          break;
+        }
       }
 
       _indexByAnchor[anchor] = _AnchorBodyItemIndex.guesstimate(

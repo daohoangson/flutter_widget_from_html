@@ -73,15 +73,21 @@ class TagLi {
                   : kCssListStyleTypeSquare,
     };
 
-    if (depth == 0) styles[kCssMargin] = '1em 0';
+    if (depth == 0) {
+      styles[kCssMargin] = '1em 0';
+    }
 
     return styles;
   }
 
   void onChild(BuildMetadata childMeta) {
     final e = childMeta.element;
-    if (e.localName != kTagLi) return;
-    if (e.parent != listMeta.element) return;
+    if (e.localName != kTagLi) {
+      return;
+    }
+    if (e.parent != listMeta.element) {
+      return;
+    }
     childMeta.register(_itemOp);
   }
 
@@ -95,7 +101,9 @@ class TagLi {
     final tsh = meta.tsb.build(context);
 
     final marker = wf.buildListMarker(meta, tsh, listStyleType, markerIndex);
-    if (marker == null) return child;
+    if (marker == null) {
+      return child;
+    }
 
     return HtmlListItem(
       marker: marker,
@@ -129,7 +137,9 @@ class _ListConfig {
 
   static String? listStyleTypeFromBuildMetadata(BuildMetadata meta) {
     final listStyleType = meta[kCssListStyleType]?.term;
-    if (listStyleType != null) return listStyleType;
+    if (listStyleType != null) {
+      return listStyleType;
+    }
 
     return listStyleTypeFromAttributeType(
       meta.element.attributes[kAttributeLiType] ?? '',

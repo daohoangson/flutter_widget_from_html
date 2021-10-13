@@ -26,13 +26,20 @@ class StylePadding {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree == true) return;
+          if (meta.willBuildSubtree == true) {
+            return;
+          }
+
           final padding = tryParseCssLengthBox(meta, kCssPadding);
-          if (padding == null) return;
+          if (padding == null) {
+            return;
+          }
 
           final mayHaveLeft = padding.mayHaveLeft;
           final mayHaveRight = padding.mayHaveRight;
-          if (!mayHaveLeft && !mayHaveRight) return;
+          if (!mayHaveLeft && !mayHaveRight) {
+            return;
+          }
 
           return wrapTree(
             tree,
@@ -47,11 +54,18 @@ class StylePadding {
           );
         },
         onWidgets: (meta, widgets) {
-          if (meta.willBuildSubtree == false) return widgets;
-          if (widgets.isEmpty) return widgets;
+          if (meta.willBuildSubtree == false) {
+            return widgets;
+          }
+
+          if (widgets.isEmpty) {
+            return widgets;
+          }
 
           final padding = tryParseCssLengthBox(meta, kCssPadding);
-          if (padding == null) return null;
+          if (padding == null) {
+            return null;
+          }
 
           return [
             WidgetPlaceholder(

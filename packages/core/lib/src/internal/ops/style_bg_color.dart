@@ -10,20 +10,29 @@ class StyleBgColor {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree == true) return;
+          if (meta.willBuildSubtree == true) {
+            return;
+          }
 
           final bgColor = _parseColor(wf, meta);
-          if (bgColor == null) return;
+          if (bgColor == null) {
+            return;
+          }
 
           for (final bit in tree.bits) {
             bit.tsb.enqueue(_tsb, bgColor);
           }
         },
         onWidgets: (meta, widgets) {
-          if (meta.willBuildSubtree == false) return widgets;
+          if (meta.willBuildSubtree == false) {
+            return widgets;
+          }
 
           final color = _parseColor(wf, meta);
-          if (color == null) return null;
+          if (color == null) {
+            return null;
+          }
+
           return listOrNull(
             wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
                   (_, child) => wf.buildDecoratedBox(meta, child, color: color),

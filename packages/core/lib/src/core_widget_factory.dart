@@ -168,8 +168,12 @@ class WidgetFactory {
     BuildMetadata meta,
     Iterable<WidgetPlaceholder> children,
   ) {
-    if (children.isEmpty) return null;
-    if (children.length == 1) return children.first;
+    if (children.isEmpty) {
+      return null;
+    }
+    if (children.length == 1) {
+      return children.first;
+    }
 
     return ColumnPlaceholder(
       children: children,
@@ -184,7 +188,9 @@ class WidgetFactory {
     List<Widget> children, {
     TextDirection? dir,
   }) {
-    if (children.length == 1) return children.first;
+    if (children.length == 1) {
+      return children.first;
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -229,7 +235,9 @@ class WidgetFactory {
   /// Builds image widget from an [ImageMetadata].
   Widget? buildImage(BuildMetadata meta, ImageMetadata data) {
     final src = data.sources.isNotEmpty ? data.sources.first : null;
-    if (src == null) return null;
+    if (src == null) {
+      return null;
+    }
 
     var built = buildImageWidget(meta, src);
 
@@ -270,7 +278,9 @@ class WidgetFactory {
     } else {
       provider = imageProviderFromNetwork(url);
     }
-    if (provider == null) return null;
+    if (provider == null) {
+      return null;
+    }
 
     final image = src.image;
     final semanticLabel = image?.alt ?? image?.title;
@@ -349,8 +359,12 @@ class WidgetFactory {
     String? text,
   }) {
     if (text?.isEmpty == true) {
-      if (children?.isEmpty == true) return null;
-      if (children?.length == 1) return children!.first;
+      if (children?.isEmpty == true) {
+        return null;
+      }
+      if (children?.length == 1) {
+        return children!.first;
+      }
     }
 
     return TextSpan(
@@ -390,12 +404,16 @@ class WidgetFactory {
         continue;
       }
 
-      if (flattened.spanBuilder == null) continue;
+      if (flattened.spanBuilder == null) {
+        continue;
+      }
       widgets.add(
         WidgetPlaceholder<BuildTree>(tree).wrapWith((context, _) {
           final tsh = tree.tsb.build(context);
           final span = flattened.spanBuilder!(context, tsh.whitespace);
-          if (span == null || span is! InlineSpan) return widget0;
+          if (span == null || span is! InlineSpan) {
+            return widget0;
+          }
 
           final textAlign = tsh.textAlign ?? TextAlign.start;
 
@@ -506,7 +524,9 @@ class WidgetFactory {
   ImageProvider? imageProviderFromAsset(String url) {
     final uri = Uri.parse(url);
     final assetName = uri.path;
-    if (assetName.isEmpty) return null;
+    if (assetName.isEmpty) {
+      return null;
+    }
 
     final package = uri.queryParameters.containsKey('package') == true
         ? uri.queryParameters['package']
@@ -518,7 +538,9 @@ class WidgetFactory {
   /// Returns a [MemoryImage].
   ImageProvider? imageProviderFromDataUri(String dataUri) {
     final bytes = bytesFromDataUri(dataUri);
-    if (bytes == null) return null;
+    if (bytes == null) {
+      return null;
+    }
 
     return MemoryImage(bytes);
   }
@@ -526,7 +548,9 @@ class WidgetFactory {
   /// Returns a [FileImage].
   ImageProvider? imageProviderFromFileUri(String url) {
     final filePath = Uri.parse(url).toFilePath();
-    if (filePath.isEmpty) return null;
+    if (filePath.isEmpty) {
+      return null;
+    }
 
     return fileImageProvider(filePath);
   }
@@ -547,7 +571,9 @@ class WidgetFactory {
     final callback = _widget?.onErrorBuilder;
     if (callback != null) {
       final result = callback(context, meta.element, error);
-      if (result != null) return result;
+      if (result != null) {
+        return result;
+      }
     }
 
     final image = data is ImageSource ? data.image : null;
@@ -568,7 +594,9 @@ class WidgetFactory {
     final callback = _widget?.onLoadingBuilder;
     if (callback != null) {
       final result = callback(context, meta.element, loadingProgress);
-      if (result != null) return result;
+      if (result != null) {
+        return result;
+      }
     }
 
     return Center(
@@ -601,13 +629,17 @@ class WidgetFactory {
   /// Handles user tapping a link.
   Future<bool> onTapUrl(String url) async {
     final handledViaCallback = await onTapCallback(url);
-    if (handledViaCallback) return true;
+    if (handledViaCallback) {
+      return true;
+    }
 
     if (url.startsWith('#')) {
       final id = url.substring(1);
       final handledViaAnchor =
           await onTapAnchor(id, _anchorRegistry.ensureVisible);
-      if (handledViaAnchor) return true;
+      if (handledViaAnchor) {
+        return true;
+      }
     }
 
     return false;
@@ -631,7 +663,9 @@ class WidgetFactory {
         );
 
         final name = attrs[kAttributeAName];
-        if (name != null) meta.register(_anchorOp(name));
+        if (name != null) {
+          meta.register(_anchorOp(name));
+        }
         break;
 
       case 'abbr':
@@ -919,7 +953,9 @@ class WidgetFactory {
 
       case kCssColor:
         final color = tryParseColor(style.value);
-        if (color != null) meta.tsb.enqueue(TextStyleOps.color, color);
+        if (color != null) {
+          meta.tsb.enqueue(TextStyleOps.color, color);
+        }
         break;
 
       case kCssDirection:
@@ -971,7 +1007,9 @@ class WidgetFactory {
       case kCssMaxLines:
       case kCssMaxLinesWebkitLineClamp:
         final maxLines = tryParseMaxLines(style.value);
-        if (maxLines != null) meta.maxLines = maxLines;
+        if (maxLines != null) {
+          meta.maxLines = maxLines;
+        }
         break;
 
       case kCssTextAlign:
@@ -993,7 +1031,9 @@ class WidgetFactory {
 
       case kCssTextOverflow:
         final textOverflow = tryParseTextOverflow(style.value);
-        if (textOverflow != null) meta.overflow = textOverflow;
+        if (textOverflow != null) {
+          meta.overflow = textOverflow;
+        }
         break;
 
       case kCssVerticalAlign:
@@ -1063,15 +1103,25 @@ class WidgetFactory {
 
   /// Resolves full URL with [HtmlWidget.baseUrl] if available.
   String? urlFull(String url) {
-    if (url.isEmpty) return null;
-    if (url.startsWith('data:')) return url;
+    if (url.isEmpty) {
+      return null;
+    }
+    if (url.startsWith('data:')) {
+      return url;
+    }
 
     final uri = Uri.tryParse(url);
-    if (uri == null) return null;
-    if (uri.hasScheme) return url;
+    if (uri == null) {
+      return null;
+    }
+    if (uri.hasScheme) {
+      return url;
+    }
 
     final baseUrl = _widget?.baseUrl;
-    if (baseUrl == null) return null;
+    if (baseUrl == null) {
+      return null;
+    }
 
     return baseUrl.resolveUri(uri).toString();
   }
@@ -1084,7 +1134,9 @@ class WidgetFactory {
         _anchorRegistry.register(id, anchor);
         tree.registerAnchor(anchor);
 
-        if (meta.willBuildSubtree == true) return;
+        if (meta.willBuildSubtree == true) {
+          return;
+        }
 
         final widget = WidgetPlaceholder('#$id').wrapWith(
           (context, _) => SizedBox(
@@ -1113,7 +1165,9 @@ class WidgetFactory {
         }
       },
       onWidgets: (meta, widgets) {
-        if (meta.willBuildSubtree == false) return widgets;
+        if (meta.willBuildSubtree == false) {
+          return widgets;
+        }
 
         return listOrNull(
           buildColumnPlaceholder(meta, widgets)?.wrapWith(

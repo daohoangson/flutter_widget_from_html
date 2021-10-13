@@ -37,7 +37,9 @@ class TagImg {
           final built = wf.buildImage(meta, data);
           if (built == null) {
             final imgText = data.alt ?? data.title ?? '';
-            if (imgText.isNotEmpty) tree.addText(imgText);
+            if (imgText.isNotEmpty) {
+              tree.addText(imgText);
+            }
             return;
           }
 

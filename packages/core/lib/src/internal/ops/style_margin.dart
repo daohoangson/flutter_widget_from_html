@@ -20,13 +20,20 @@ class StyleMargin {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree == true) return;
+          if (meta.willBuildSubtree == true) {
+            return;
+          }
+
           final m = tryParseCssLengthBox(meta, kCssMargin);
-          if (m == null) return;
+          if (m == null) {
+            return;
+          }
 
           final mayHaveLeft = m.mayHaveLeft;
           final mayHaveRight = m.mayHaveRight;
-          if (!mayHaveLeft && !mayHaveRight) return;
+          if (!mayHaveLeft && !mayHaveRight) {
+            return;
+          }
 
           return wrapTree(
             tree,
@@ -39,12 +46,16 @@ class StyleMargin {
           );
         },
         onWidgets: (meta, widgets) {
-          if (meta.willBuildSubtree == false) return widgets;
+          if (meta.willBuildSubtree == false) {
+            return widgets;
+          }
 
           final m = tryParseCssLengthBox(meta, kCssMargin);
-          if (m == null) return widgets;
-          final tsb = meta.tsb;
+          if (m == null) {
+            return widgets;
+          }
 
+          final tsb = meta.tsb;
           return [
             if (m.top?.isPositive ?? false) HeightPlaceholder(m.top!, tsb),
             for (final widget in widgets)

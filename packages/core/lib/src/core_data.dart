@@ -52,7 +52,9 @@ abstract class BuildMetadata {
   /// Gets a styling declaration by `property`.
   css.Declaration? operator [](String key) {
     for (final style in styles.reversed) {
-      if (style.property == key) return style;
+      if (style.property == key) {
+        return style;
+      }
     }
     return null;
   }

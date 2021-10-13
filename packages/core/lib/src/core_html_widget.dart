@@ -199,7 +199,9 @@ class HtmlWidgetState extends State<HtmlWidget> {
       );
     }
 
-    if (!enableCaching || _cache == null) _cache = _buildSync();
+    if (!enableCaching || _cache == null) {
+      _cache = _buildSync();
+    }
 
     return _tshWidget(_cache!);
   }
@@ -251,7 +253,10 @@ class _RootTsb extends TextStyleBuilder {
   }
 
   TextStyleHtml builder(TextStyleHtml? _, HtmlWidgetState state) {
-    if (_output != null) return _output!;
+    if (_output != null) {
+      return _output!;
+    }
+
     return _output = TextStyleHtml.root(
       state._wf.getDependencies(state.context),
       state.widget.textStyle,

@@ -44,7 +44,10 @@ class _ListItemRenderObject extends RenderBox
   TextDirection get textDirection => _textDirection;
   TextDirection _textDirection;
   set textDirection(TextDirection value) {
-    if (_textDirection == value) return;
+    if (_textDirection == value) {
+      return;
+    }
+
     _textDirection = value;
     markNeedsLayout();
   }
