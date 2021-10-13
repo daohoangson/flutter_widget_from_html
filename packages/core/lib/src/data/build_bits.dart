@@ -271,7 +271,7 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
   String toString() {
     // avoid circular references
     if (_toStringBuffer.length > 0) {
-      return '$runtimeType#$hashCode';
+      return '$runtimeType#$hashCode (circular)';
     }
 
     final sb = _toStringBuffer;

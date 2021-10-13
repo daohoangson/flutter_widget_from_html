@@ -413,6 +413,7 @@ void main() {
     text22.addNewLine();
     text2.addText('(2.3)');
     text.add(WidgetBit.inline(text, const Text('Hi')));
+    text.add(_CircularBit(text));
 
     expect(
       helper.simplifyHashCode(text.toString()),
@@ -427,7 +428,8 @@ void main() {
         '      "(2.2.2)"\n'
         '      ASCII-10\n'
         '    "(2.3)"\n'
-        '  WidgetBit.inline#7 WidgetPlaceholder(Text("Hi"))',
+        '  WidgetBit.inline#7 WidgetPlaceholder(Text("Hi"))\n'
+        '  BuildTree#0 (circular)',
       ),
     );
   });
@@ -662,3 +664,17 @@ BuildTree _text() => builder.BuildTree(
       ),
       wf: WidgetFactory(),
     );
+
+class _CircularBit extends BuildTree {
+  _CircularBit(BuildTree parent) : super(parent, parent.tsb);
+
+  @override
+  Iterable<WidgetPlaceholder> build() => throw UnimplementedError();
+
+  @override
+  BuildTree sub({BuildTree? parent, TextStyleBuilder? tsb}) =>
+      throw UnimplementedError();
+
+  @override
+  String toString() => parent.toString();
+}
