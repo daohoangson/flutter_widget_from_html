@@ -284,16 +284,17 @@ class _TableRenderObject extends RenderBox
     var child = firstChild;
     while (child != null) {
       final data = child.parentData! as _TableCellData;
-      // only compute cells in the first row
-      if (data.rowStart != 0) continue;
 
-      var candidate = child.getDistanceToActualBaseline(baseline);
-      if (candidate != null) {
-        candidate += data.offset.dy;
-        if (result != null) {
-          result = min(result, candidate);
-        } else {
-          result = candidate;
+      if (data.rowStart == 0) {
+        // only compute cells in the first row
+        var candidate = child.getDistanceToActualBaseline(baseline);
+        if (candidate != null) {
+          candidate += data.offset.dy;
+          if (result != null) {
+            result = min(result, candidate);
+          } else {
+            result = candidate;
+          }
         }
       }
 
