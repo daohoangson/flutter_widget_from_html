@@ -7,4 +7,5 @@ analyzer:
 
 linter:
   rules:
+    always_put_control_body_on_new_line: true
     missing_whitespace_between_adjacent_strings: false
