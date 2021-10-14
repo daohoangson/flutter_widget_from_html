@@ -268,7 +268,7 @@ class WidgetFactory {
   Widget? buildImageWidget(BuildMetadata meta, ImageSource src) {
     final url = src.url;
 
-    late final ImageProvider? provider;
+    ImageProvider? provider;
     if (url.startsWith('asset:')) {
       provider = imageProviderFromAsset(url);
     } else if (url.startsWith('data:image/')) {
