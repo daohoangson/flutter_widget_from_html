@@ -305,7 +305,9 @@ class _TableRenderObject extends RenderBox
         if (candidate != null) {
           candidate += data.offset.dy;
           if (result != null) {
-            result = min(result, candidate);
+            if (candidate < result) {
+              result = candidate;
+            }
           } else {
             result = candidate;
           }
