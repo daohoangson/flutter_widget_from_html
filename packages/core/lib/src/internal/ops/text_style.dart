@@ -92,7 +92,9 @@ class TextStyleOps {
     for (final expression in expressions) {
       if (expression is css.LiteralTerm) {
         final fontFamily = expression.valueAsString;
-        if (fontFamily.isNotEmpty) list.add(fontFamily);
+        if (fontFamily.isNotEmpty) {
+          list.add(fontFamily);
+        }
       }
     }
 
@@ -162,7 +164,9 @@ class TextStyleOps {
     final length = tryParseCssLength(v);
     if (length != null) {
       final lengthValue = _fontSizeTryParseCssLength(p, length);
-      if (lengthValue != null) return lengthValue;
+      if (lengthValue != null) {
+        return lengthValue;
+      }
     }
 
     if (v is css.LiteralTerm) {
@@ -225,7 +229,9 @@ class TextStyleOps {
     if (v is css.LiteralTerm) {
       if (v is css.NumberTerm) {
         final number = v.number.toDouble();
-        if (number > 0) return number;
+        if (number > 0) {
+          return number;
+        }
       }
 
       switch (v.valueAsString) {
@@ -235,17 +241,23 @@ class TextStyleOps {
     }
 
     final fontSize = p.style.fontSize;
-    if (fontSize == null) return null;
+    if (fontSize == null) {
+      return null;
+    }
 
     final length = tryParseCssLength(v);
-    if (length == null) return null;
+    if (length == null) {
+      return null;
+    }
 
     final lengthValue = length.getValue(
       p,
       baseValue: fontSize,
       scaleFactor: p.getDependency<MediaQueryData>().textScaleFactor,
     );
-    if (lengthValue == null) return null;
+    if (lengthValue == null) {
+      return null;
+    }
 
     return lengthValue / fontSize;
   }

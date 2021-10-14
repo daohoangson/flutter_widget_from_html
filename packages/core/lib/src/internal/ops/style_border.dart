@@ -15,9 +15,14 @@ class StyleBorder {
 
   BuildOp get buildOp => BuildOp(
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree == true) return;
+          if (meta.willBuildSubtree == true) {
+            return;
+          }
+
           final border = tryParseBorder(meta);
-          if (border.isNone) return;
+          if (border.isNone) {
+            return;
+          }
 
           _skipBuilding[meta] = true;
           final copied = tree.copyWith() as BuildTree;
@@ -26,7 +31,9 @@ class StyleBorder {
                     (context, child) =>
                         _buildBorder(meta, context, child, border),
                   );
-          if (built == null) return;
+          if (built == null) {
+            return;
+          }
 
           tree.replaceWith(
             WidgetBit.inline(
@@ -40,8 +47,11 @@ class StyleBorder {
           if (_skipBuilding[meta] == true || widgets.isEmpty) {
             return widgets;
           }
+
           final border = tryParseBorder(meta);
-          if (border.isNone) return widgets;
+          if (border.isNone) {
+            return widgets;
+          }
 
           _skipBuilding[meta] = true;
           return [
@@ -65,7 +75,9 @@ class StyleBorder {
   ) {
     final tsh = meta.tsb.build(context);
     final borderValue = border.getValue(tsh);
-    if (borderValue == null) return child;
+    if (borderValue == null) {
+      return child;
+    }
 
     return wf.buildBorder(
       meta,

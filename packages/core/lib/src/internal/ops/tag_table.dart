@@ -51,7 +51,9 @@ class TagTable {
   }
 
   void onChild(BuildMetadata childMeta) {
-    if (childMeta.element.parent != tableMeta.element) return;
+    if (childMeta.element.parent != tableMeta.element) {
+      return;
+    }
 
     final which = _getCssDisplayValue(childMeta);
     _TagTableDataGroup? latestGroup;
@@ -101,7 +103,9 @@ class TagTable {
       _prepareHtmlTableCellBuilders(body);
     }
     _prepareHtmlTableCellBuilders(_data.footer);
-    if (_data.builders.isEmpty) return [];
+    if (_data.builders.isEmpty) {
+      return [];
+    }
 
     final border = tryParseBorder(tableMeta);
     final borderCollapse = tableMeta[kCssBorderCollapse]?.term;
@@ -181,7 +185,9 @@ class TagTable {
           if (border != null) {
             child = wf.buildPadding(cellMeta, cell.child, border.dimensions);
           }
-          if (child == null) return null;
+          if (child == null) {
+            return null;
+          }
 
           return HtmlTableCell(
             border: border,
@@ -224,7 +230,9 @@ class TagTable {
     for (final style in meta.element.styles.reversed) {
       if (style.property == kCssDisplay) {
         final term = style.term;
-        if (term != null) return term;
+        if (term != null) {
+          return term;
+        }
       }
     }
 
@@ -288,7 +296,9 @@ class _TagTableRow {
     _valignBaselineOp = BuildOp(
       onWidgets: (cellMeta, widgets) {
         final v = cellMeta[kCssVerticalAlign]?.term;
-        if (v != kCssVerticalAlignBaseline) return widgets;
+        if (v != kCssVerticalAlignBaseline) {
+          return widgets;
+        }
 
         return listOrNull(
           parent.wf
@@ -303,7 +313,9 @@ class _TagTableRow {
   }
 
   void onChild(BuildMetadata childMeta) {
-    if (childMeta.element.parent != rowMeta.element) return;
+    if (childMeta.element.parent != rowMeta.element) {
+      return;
+    }
     if (TagTable._getCssDisplayValue(childMeta) != kCssDisplayTableCell) {
       return;
     }
@@ -332,7 +344,9 @@ class _TagTableRowGroup {
   }
 
   void onChild(BuildMetadata childMeta) {
-    if (childMeta.element.parent != groupMeta.element) return;
+    if (childMeta.element.parent != groupMeta.element) {
+      return;
+    }
     if (TagTable._getCssDisplayValue(childMeta) != kCssDisplayTableRow) {
       return;
     }

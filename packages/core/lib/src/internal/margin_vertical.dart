@@ -35,7 +35,9 @@ class HeightPlaceholder extends WidgetPlaceholder<CssLength> {
   ) {
     final existing = (child is SizedBox ? child.height : null) ?? 0.0;
     final value = height.getValue(tsb.build(context));
-    if (value != null && value > existing) return SizedBox(height: value);
+    if (value != null && value > existing) {
+      return SizedBox(height: value);
+    }
     return child;
   }
 }

@@ -105,7 +105,9 @@ class CssSizing extends SingleChildRenderObjectWidget {
     String name,
     CssSizingValue? value,
   ) {
-    if (value == null) return;
+    if (value == null) {
+      return;
+    }
     properties.add(DiagnosticsProperty(name, value));
   }
 
@@ -177,7 +179,10 @@ class _RenderCssSizing extends RenderProxyBox {
   ) {
     if (axis == _preferredAxis &&
         height == _preferredHeight &&
-        width == _preferredWidth) return;
+        width == _preferredWidth) {
+      return;
+    }
+
     _preferredAxis = axis;
     _preferredHeight = height;
     _preferredWidth = width;

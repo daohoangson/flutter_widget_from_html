@@ -156,7 +156,9 @@ class _PostsState extends State<_PostsList> {
       for (final postJson in json) {
         if (postJson is Map) {
           final post = _Post.fromJson(postJson);
-          if (post != null) posts.add(post);
+          if (post != null) {
+            posts.add(post);
+          }
         }
       }
     }

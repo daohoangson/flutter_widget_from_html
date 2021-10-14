@@ -38,7 +38,9 @@ mixin WebViewFactory on WidgetFactory {
     Iterable<String>? sandbox,
     double? width,
   }) {
-    if (!webView) return buildWebViewLinkOnly(meta, url);
+    if (!webView) {
+      return buildWebViewLinkOnly(meta, url);
+    }
 
     final dimensOk = height != null && height > 0 && width != null && width > 0;
     final js = webViewJs &&
@@ -50,7 +52,9 @@ mixin WebViewFactory on WidgetFactory {
       autoResize: !dimensOk && js,
       debuggingEnabled: webViewDebuggingEnabled,
       interceptNavigationRequest: (newUrl) {
-        if (newUrl == url) return false;
+        if (newUrl == url) {
+          return false;
+        }
 
         gestureTapCallback(newUrl)?.call();
         return true;
@@ -85,7 +89,9 @@ mixin WebViewFactory on WidgetFactory {
 
             final attrs = meta.element.attributes;
             final src = urlFull(attrs[kAttributeIframeSrc] ?? '');
-            if (src == null) return widgets;
+            if (src == null) {
+              return widgets;
+            }
 
             return listOrNull(
                   buildWebView(

@@ -32,12 +32,18 @@ class TagVideo {
 
   void onChild(BuildMetadata childMeta) {
     final e = childMeta.element;
-    if (e.localName != kTagVideoSource) return;
-    if (e.parent != videoMeta.element) return;
+    if (e.localName != kTagVideoSource) {
+      return;
+    }
+    if (e.parent != videoMeta.element) {
+      return;
+    }
 
     final attrs = e.attributes;
     final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
-    if (url == null) return;
+    if (url == null) {
+      return;
+    }
 
     _sourceUrls.add(url);
   }
@@ -55,7 +61,9 @@ class TagVideo {
   }
 
   Widget? _buildPlayer() {
-    if (_sourceUrls.isEmpty) return null;
+    if (_sourceUrls.isEmpty) {
+      return null;
+    }
 
     final attrs = videoMeta.element.attributes;
     return wf.buildVideoPlayer(

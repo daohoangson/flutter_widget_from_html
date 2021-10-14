@@ -27,13 +27,17 @@ abstract class BuildBit<InputType, OutputType> {
     while (x != null) {
       final siblings = x.parent?._children;
       final i = siblings?.indexOf(x) ?? -1;
-      if (i == -1) return null;
+      if (i == -1) {
+        return null;
+      }
 
       for (var j = i + 1; j < siblings!.length; j++) {
         final candidate = siblings[j];
         if (candidate is BuildTree) {
           final first = candidate.first;
-          if (first != null) return first;
+          if (first != null) {
+            return first;
+          }
         } else {
           return candidate;
         }
@@ -55,13 +59,17 @@ abstract class BuildBit<InputType, OutputType> {
     while (x != null) {
       final siblings = x.parent?._children;
       final i = siblings?.indexOf(x) ?? -1;
-      if (i == -1) return null;
+      if (i == -1) {
+        return null;
+      }
 
       for (var j = i - 1; j > -1; j--) {
         final candidate = siblings![j];
         if (candidate is BuildTree) {
           final last = candidate.last;
-          if (last != null) return last;
+          if (last != null) {
+            return last;
+          }
         } else {
           return candidate;
         }
@@ -108,12 +116,16 @@ abstract class BuildBit<InputType, OutputType> {
 
   /// Inserts self after [another] in the tree.
   bool insertAfter(BuildBit another) {
-    if (parent == null) return false;
+    if (parent == null) {
+      return false;
+    }
 
     assert(parent == another.parent);
     final siblings = parent!._children;
     final i = siblings.indexOf(another);
-    if (i == -1) return false;
+    if (i == -1) {
+      return false;
+    }
 
     siblings.insert(i + 1, this);
     return true;
@@ -121,12 +133,16 @@ abstract class BuildBit<InputType, OutputType> {
 
   /// Inserts self before [another] in the tree.
   bool insertBefore(BuildBit another) {
-    if (parent == null) return false;
+    if (parent == null) {
+      return false;
+    }
 
     assert(parent == another.parent);
     final siblings = parent!._children;
     final i = siblings.indexOf(another);
-    if (i == -1) return false;
+    if (i == -1) {
+      return false;
+    }
 
     siblings.insert(i, this);
     return true;
@@ -164,7 +180,9 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
   BuildBit? get first {
     for (final child in _children) {
       final first = child is BuildTree ? child.first : child;
-      if (first != null) return first;
+      if (first != null) {
+        return first;
+      }
     }
 
     return null;
@@ -174,7 +192,9 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
   bool get isEmpty {
     for (final child in _children) {
       if (child is BuildTree) {
-        if (!child.isEmpty) return false;
+        if (!child.isEmpty) {
+          return false;
+        }
       } else {
         return false;
       }
@@ -187,7 +207,9 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
   BuildBit? get last {
     for (final child in _children.reversed) {
       final last = child is BuildTree ? child.last : child;
-      if (last != null) return last;
+      if (last != null) {
+        return last;
+      }
     }
 
     return null;
@@ -248,7 +270,9 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
   @override
   String toString() {
     // avoid circular references
-    if (_toStringBuffer.length > 0) return '$runtimeType#$hashCode';
+    if (_toStringBuffer.length > 0) {
+      return '$runtimeType#$hashCode (circular)';
+    }
 
     final sb = _toStringBuffer;
     sb.writeln('$runtimeType#$hashCode $tsb:');

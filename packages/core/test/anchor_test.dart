@@ -83,7 +83,7 @@ Future<void> main() async {
     });
   });
 
-  group('tap tests', () {
+  group('tap test', () {
     testWidgets('skips unknown id', (WidgetTester tester) async {
       await tester.pumpWidgetBuilder(
         const _ColumnTestApp(html: '<a href="#foo">Tap me</a>'),
@@ -106,20 +106,7 @@ Future<void> main() async {
         expect(_onTapAnchorResults, equals({'target': true}));
       });
 
-      testWidgets('HtmlWidgetState.scrollToAnchor', (tester) async {
-        await tester.pumpWidgetBuilder(
-          const _ColumnTestApp(),
-          surfaceSize: const Size(200, 200),
-        );
-
-        final scrollFuture = globalKey.currentState?.scrollToAnchor('target');
-        await tester.pumpAndSettle();
-
-        expect(await scrollFuture, isTrue);
-        expect(_onTapAnchorResults, equals({'target': true}));
-      });
-
-      testWidgets('ListView', (WidgetTester tester) async {
+      testWidgets('ListView down', (WidgetTester tester) async {
         await tester.pumpWidgetBuilder(
           const _ListViewTestApp(),
           surfaceSize: const Size(200, 200),
@@ -130,7 +117,7 @@ Future<void> main() async {
         expect(_onTapAnchorResults, equals({'target': true}));
       });
 
-      testWidgets('SliverList', (WidgetTester tester) async {
+      testWidgets('SliverList up', (WidgetTester tester) async {
         final keyBottom = GlobalKey();
         await tester.pumpWidgetBuilder(
           _SliverListTestApp(keyBottom: keyBottom),
@@ -142,6 +129,50 @@ Future<void> main() async {
         expect(await tapText(tester, 'Scroll up'), equals(1));
         await tester.pumpAndSettle();
         expect(_onTapAnchorResults, equals({'target': true}));
+      });
+
+      group('scrollToAnchor', () {
+        testWidgets('Column', (tester) async {
+          await tester.pumpWidgetBuilder(
+            const _ColumnTestApp(),
+            surfaceSize: const Size(200, 200),
+          );
+
+          final scrollFuture = globalKey.currentState?.scrollToAnchor('target');
+          await tester.pumpAndSettle();
+
+          expect(await scrollFuture, isTrue);
+          expect(_onTapAnchorResults, equals({'target': true}));
+        });
+
+        testWidgets('ListView down', (WidgetTester tester) async {
+          await tester.pumpWidgetBuilder(
+            const _ListViewTestApp(),
+            surfaceSize: const Size(200, 200),
+          );
+
+          final scrollFuture = globalKey.currentState?.scrollToAnchor('target');
+          await tester.pumpAndSettle();
+
+          expect(await scrollFuture, isTrue);
+          expect(_onTapAnchorResults, equals({'target': true}));
+        });
+
+        testGoldens('SliverList up', (WidgetTester tester) async {
+          final keyBottom = GlobalKey();
+          await tester.pumpWidgetBuilder(
+            _SliverListTestApp(keyBottom: keyBottom),
+            surfaceSize: const Size(200, 200),
+          );
+
+          await tester.scrollUntilVisible(find.byKey(keyBottom), 100);
+
+          final scrollFuture = globalKey.currentState?.scrollToAnchor('target');
+          await tester.pumpAndSettle();
+
+          expect(await scrollFuture, isTrue);
+          expect(_onTapAnchorResults, equals({'target': true}));
+        });
       });
     });
 
@@ -272,11 +303,30 @@ Future<void> main() async {
     });
   });
 
+  group('error handling', () {
+    testWidgets('AnchorRegistry empty body items', (WidgetTester tester) async {
+      await tester.pumpWidgetBuilder(
+        Scaffold(
+          body: HtmlWidget(
+            htmlDefault,
+            factoryBuilder: () => _NoBuildBodyItemWidgetFactory(),
+            renderMode: RenderMode.listView,
+          ),
+        ),
+        surfaceSize: const Size(200, 200),
+      );
+
+      expect(await tapText(tester, 'Scroll down'), equals(1));
+      await tester.pumpAndSettle();
+      expect(_onTapAnchorResults, equals({'target': false}));
+    });
+  });
+
   final goldenSkip = Platform.isLinux ? null : 'Linux only';
   GoldenToolkit.runWithConfiguration(
     () {
       group(
-        'tap test',
+        'golden tap test',
         () {
           testGoldens(
             'scrolls down',
@@ -430,6 +480,7 @@ class _ListViewTestApp extends StatelessWidget {
         body: HtmlWidget(
           html ?? htmlDefault,
           factoryBuilder: () => _WidgetFactory(),
+          key: globalKey,
           renderMode: RenderMode.listView,
         ),
       );
@@ -445,10 +496,12 @@ class _SliverListTestApp extends StatelessWidget {
   @override
   Widget build(BuildContext _) => Scaffold(
         body: CustomScrollView(
+          cacheExtent: 0,
           slivers: [
             HtmlWidget(
               html ?? htmlDefault,
               factoryBuilder: () => _WidgetFactory(),
+              key: globalKey,
               renderMode: RenderMode.sliverList,
             ),
             SliverToBoxAdapter(child: Container(height: 1, key: keyBottom)),
@@ -470,4 +523,15 @@ class _WidgetFactory extends WidgetFactory {
     super.reset(state);
     _onTapAnchorResults.clear();
   }
+}
+
+class _NoBuildBodyItemWidgetFactory extends _WidgetFactory {
+  @override
+  Widget buildBodyListView(BuildContext context, List<Widget> children) =>
+      ListView.builder(
+        addAutomaticKeepAlives: false,
+        addSemanticIndexes: false,
+        itemBuilder: (c, i) => children[i],
+        itemCount: children.length,
+      );
 }

@@ -16,10 +16,14 @@ class TagA {
           return styles;
         },
         onTree: (meta, tree) {
-          if (meta.willBuildSubtree == true) return;
+          if (meta.willBuildSubtree == true) {
+            return;
+          }
 
           final onTap = _gestureTapCallback(meta);
-          if (onTap == null) return;
+          if (onTap == null) {
+            return;
+          }
 
           for (final bit in tree.bits.toList(growable: false)) {
             if (bit is WidgetBit) {
@@ -32,10 +36,14 @@ class TagA {
           }
         },
         onWidgets: (meta, widgets) {
-          if (meta.willBuildSubtree == false) return widgets;
+          if (meta.willBuildSubtree == false) {
+            return widgets;
+          }
 
           final onTap = _gestureTapCallback(meta);
-          if (onTap == null) return widgets;
+          if (onTap == null) {
+            return widgets;
+          }
 
           return listOrNull(
             wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(

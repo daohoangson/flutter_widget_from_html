@@ -30,7 +30,9 @@ class TagAudio {
 
           final attrs = meta.element.attributes;
           final url = wf.urlFull(attrs[kAttributeAudioSrc] ?? '');
-          if (url == null) return widgets;
+          if (url == null) {
+            return widgets;
+          }
 
           return listOrNull(
                 wf.buildAudioPlayer(

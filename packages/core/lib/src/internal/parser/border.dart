@@ -7,12 +7,16 @@ final _elementBorder = Expando<CssBorder>();
 
 CssBorder tryParseBorder(BuildMetadata meta) {
   final existing = _elementBorder[meta.element];
-  if (existing != null) return existing;
-  var border = const CssBorder();
+  if (existing != null) {
+    return existing;
+  }
 
+  var border = const CssBorder();
   for (final style in meta.styles) {
     final key = style.property;
-    if (!key.startsWith(kCssBorder)) continue;
+    if (!key.startsWith(kCssBorder)) {
+      continue;
+    }
 
     final suffix = key.substring(kCssBorder.length);
     if (suffix.isEmpty && style.term == kCssBorderInherit) {
@@ -55,7 +59,9 @@ CssBorder tryParseBorder(BuildMetadata meta) {
 CssBorderSide? _tryParseBorderSide(List<css.Expression> expressions) {
   final width =
       expressions.isNotEmpty ? tryParseCssLength(expressions[0]) : null;
-  if (width == null || width.number <= 0) return CssBorderSide.none;
+  if (width == null || width.number <= 0) {
+    return CssBorderSide.none;
+  }
 
   return CssBorderSide(
     color: expressions.length >= 3 ? tryParseColor(expressions[2]) : null,

@@ -747,8 +747,7 @@ Future<void> main() async {
 
       await tester.pumpWidget(
         HitTestApp(
-          html:
-              '<table><tr><td><li><a href="$href">Tap me</a></td></tr></table>',
+          html: '<table><tr><td><a href="$href">Tap me</a></td></tr></table>',
           list: urls,
         ),
       );
@@ -856,6 +855,17 @@ Foo should float on top of table.''',
 <ul>
   <li>
     <table border="1"><tr><td>Foo</td></tr></table>
+  </li>
+</ul>''',
+              'table_with_2_cells_in_list': '''
+<ul>
+  <li>
+    <table border="1">
+      <tr>
+        <td><div style="margin: 5px">Foo</div></td>
+        <td>Bar<br />Bar</td>
+      </tr>
+    </table>
   </li>
 </ul>''',
               'table_in_table': '''

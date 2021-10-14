@@ -38,7 +38,9 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
             child: HtmlWidget(
               kHtml,
               customWidgetBuilder: (e) {
-                if (!e.classes.contains('carousel')) return null;
+                if (!e.classes.contains('carousel')) {
+                  return null;
+                }
 
                 final srcs = <String>[];
                 for (final child in e.children) {

@@ -79,7 +79,9 @@ class WebViewState extends State<WebView> {
   Future<void> _autoResize() async {
     // TODO: enable codecov when `flutter drive --coverage` is available
     // https://github.com/flutter/flutter/issues/7474
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
 
     final evals = await Future.wait([
       eval('document.body.scrollWidth'),
@@ -90,7 +92,9 @@ class WebViewState extends State<WebView> {
 
     final r = (h > 0 && w > 0) ? (w / h) : _aspectRatio;
     final changed = (r - _aspectRatio).abs() > 0.0001;
-    if (changed && mounted) setState(() => _aspectRatio = r);
+    if (changed && mounted) {
+      setState(() => _aspectRatio = r);
+    }
   }
 
   Widget _buildWebView() => lib.WebView(

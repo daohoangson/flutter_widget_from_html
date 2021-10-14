@@ -102,14 +102,20 @@ class RebuildTriggers {
 
   @override
   bool operator ==(Object other) {
-    if (identical(this, other)) return true;
+    if (identical(this, other)) {
+      return true;
+    }
 
     if (other is RebuildTriggers) {
       final otherValues = other._values;
-      if (otherValues.length != _values.length) return false;
+      if (otherValues.length != _values.length) {
+        return false;
+      }
 
       for (var i = 0; i < _values.length; i++) {
-        if (otherValues[i] != _values[i]) return false;
+        if (otherValues[i] != _values[i]) {
+          return false;
+        }
       }
 
       return true;
@@ -150,9 +156,15 @@ extension WidgetAnchors on Widget {
 
   /// Set anchor keys.
   bool setAnchorsIfUnset(Iterable<Key>? anchors) {
-    if (anchors == null) return false;
+    if (anchors == null) {
+      return false;
+    }
+
     final existing = _anchors[this];
-    if (existing != null) return false;
+    if (existing != null) {
+      return false;
+    }
+
     _anchors[this] = anchors;
     return true;
   }
@@ -227,7 +239,9 @@ final _dataUriRegExp = RegExp('^data:[^;]+;([^,]+),');
 /// - utf8
 Uint8List? bytesFromDataUri(String dataUri) {
   final match = _dataUriRegExp.matchAsPrefix(dataUri);
-  if (match == null) return null;
+  if (match == null) {
+    return null;
+  }
 
   final prefix = match[0]!;
   final encoding = match[1];

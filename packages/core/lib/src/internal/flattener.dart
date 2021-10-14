@@ -88,8 +88,12 @@ class Flattener {
 
   void _loop(final BuildBit bit) {
     final thisTsb = _getBitTsb(bit);
-    if (_spans == null) _resetLoop(thisTsb);
-    if (!thisTsb.hasSameStyleWith(_prevTsb)) _saveSpan();
+    if (_spans == null) {
+      _resetLoop(thisTsb);
+    }
+    if (!thisTsb.hasSameStyleWith(_prevTsb)) {
+      _saveSpan();
+    }
 
     dynamic built;
     if (bit is BuildBit<BuildContext, Widget>) {
@@ -143,7 +147,9 @@ class Flattener {
 
   bool _loopShouldSwallowWhitespace(BuildBit bit) {
     // special handling for whitespaces
-    if (_swallowWhitespace) return true;
+    if (_swallowWhitespace) {
+      return true;
+    }
 
     final next = nextNonWhitespace(bit);
     if (next == null) {
@@ -163,7 +169,9 @@ class Flattener {
       final scopedTsb = _prevTsb;
       final scopedStrings = _prevStrings;
 
-      if (scopedRecognizer != null) _recognizers.add(scopedRecognizer);
+      if (scopedRecognizer != null) {
+        _recognizers.add(scopedRecognizer);
+      }
 
       _spans!.add(
         (context, whitespace) => wf.buildTextSpan(
@@ -182,15 +190,21 @@ class Flattener {
     _saveSpan();
 
     final scopedSpans = _spans;
-    if (scopedSpans == null) return;
+    if (scopedSpans == null) {
+      return;
+    }
 
     _spans = null;
-    if (scopedSpans.isEmpty && _strings.isEmpty) return;
+    if (scopedSpans.isEmpty && _strings.isEmpty) {
+      return;
+    }
     final scopedRecognizer = _recognizer.value;
     final scopedTsb = _tsb;
     final scopedStrings = _strings;
 
-    if (scopedRecognizer != null) _recognizers.add(scopedRecognizer);
+    if (scopedRecognizer != null) {
+      _recognizers.add(scopedRecognizer);
+    }
 
     if (scopedSpans.isEmpty &&
         scopedStrings.length == 1 &&
@@ -232,12 +246,16 @@ class Flattener {
   }
 
   TextStyleBuilder _getBitTsb(BuildBit bit) {
-    if (bit is! WhitespaceBit) return bit.tsb;
+    if (bit is! WhitespaceBit) {
+      return bit.tsb;
+    }
 
     // the below code will find the best style for this whitespace bit
     // easy case: whitespace at the beginning of a tag, use the previous style
     final parent = bit.parent;
-    if (parent == null || bit == parent.first) return _prevTsb;
+    if (parent == null || bit == parent.first) {
+      return _prevTsb;
+    }
 
     // complicated: whitespace at the end of a tag, try to merge with the next
     // unless it has unrelated style (e.g. next bit is a sibling)
@@ -293,11 +311,15 @@ extension _StringListToText on List<_String> {
     bool dropNewLine = false,
     required CssWhitespace whitespace,
   }) {
-    if (isEmpty) return '';
+    if (isEmpty) {
+      return '';
+    }
 
     if (dropNewLine && last.isNewLine) {
       removeLast();
-      if (isEmpty) return '';
+      if (isEmpty) {
+        return '';
+      }
     }
 
     final buffer = StringBuffer();

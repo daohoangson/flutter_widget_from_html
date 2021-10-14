@@ -13,7 +13,9 @@ CssLength? tryParseCssLength(css.Expression expression) {
     }
   } else if (expression is css.LiteralTerm) {
     if (expression is css.NumberTerm) {
-      if (expression.number == 0) return const CssLength(0);
+      if (expression.number == 0) {
+        return const CssLength(0);
+      }
     } else if (expression is css.PercentageTerm) {
       return CssLength(
         (expression.value as num).toDouble(),
@@ -67,7 +69,9 @@ CssLengthBox? _parseCssLengthBoxOne(
   css.Expression expression,
 ) {
   final parsed = tryParseCssLength(expression);
-  if (parsed == null) return existing;
+  if (parsed == null) {
+    return existing;
+  }
 
   final box = existing ?? const CssLengthBox();
   switch (suffix) {
@@ -95,7 +99,9 @@ CssLengthBox? tryParseCssLengthBox(BuildMetadata meta, String prefix) {
 
   for (final style in meta.styles) {
     final key = style.property;
-    if (!key.startsWith(prefix)) continue;
+    if (!key.startsWith(prefix)) {
+      continue;
+    }
 
     final suffix = key.substring(prefix.length);
     if (suffix.isEmpty) {

@@ -6,10 +6,14 @@ mixin UrlLauncherFactory on WidgetFactory {
   @override
   Future<bool> onTapUrl(String url) async {
     final result = await super.onTapUrl(url);
-    if (result) return result;
+    if (result) {
+      return result;
+    }
 
     final ok = await canLaunch(url);
-    if (!ok) return false;
+    if (!ok) {
+      return false;
+    }
 
     return launch(url);
   }
