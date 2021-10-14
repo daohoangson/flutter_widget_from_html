@@ -84,13 +84,13 @@ class AnchorRegistry {
     if (anchorMin < effectiveMin) {
       movedOk = await _ensureVisibleContext(
         _bodyItemKeys[currentMin].currentContext,
+        alignment: 1.0,
         curve: jumpCurve,
         duration: jumpDuration,
       );
     } else if (anchorMax > effectiveMax) {
       movedOk = await _ensureVisibleContext(
         _bodyItemKeys[currentMax].currentContext,
-        alignment: 1.0,
         curve: jumpCurve,
         duration: jumpDuration,
       );
