@@ -18,7 +18,9 @@ const kGoldenFilePrefix = '../../../demo_app/test';
 
 Widget? buildCurrentState() {
   final hws = hwKey.currentState;
-  if (hws == null) return null;
+  if (hws == null) {
+    return null;
+  }
 
   // ignore: invalid_use_of_protected_member
   return hws.build(hws.context);
@@ -144,7 +146,9 @@ Future<String> explainWithoutPumping({
   }
 
   final built = buildCurrentState();
-  if (built == null) return 'null';
+  if (built == null) {
+    return 'null';
+  }
 
   return Explainer(
     hwKey.currentContext!,
@@ -225,7 +229,9 @@ class Explainer {
       : 'none';
 
   String _boxBorder(BoxBorder? b) {
-    if (b == null) return '';
+    if (b == null) {
+      return '';
+    }
 
     final top = _borderSide(b.top);
     final right = b is Border ? _borderSide(b.right) : 'none';
@@ -247,10 +253,14 @@ class Explainer {
 
     if (d is BoxDecoration) {
       final color = d.color;
-      if (color != null) attr.add('bg=${_color(color)}');
+      if (color != null) {
+        attr.add('bg=${_color(color)}');
+      }
 
       final border = d.border;
-      if (border != null) attr.add('border=${_boxBorder(border)}');
+      if (border != null) {
+        attr.add('border=${_boxBorder(border)}');
+      }
     }
 
     return attr;
@@ -267,13 +277,25 @@ class Explainer {
   List<String> _cssSizing(CssSizing w) {
     final attr = <String>[];
 
-    if (w.minHeight != null) attr.add('height≥${w.minHeight}');
-    if (w.maxHeight != null) attr.add('height≤${w.maxHeight}');
-    if (w.preferredHeight != null) attr.add('height=${w.preferredHeight}');
+    if (w.minHeight != null) {
+      attr.add('height≥${w.minHeight}');
+    }
+    if (w.maxHeight != null) {
+      attr.add('height≤${w.maxHeight}');
+    }
+    if (w.preferredHeight != null) {
+      attr.add('height=${w.preferredHeight}');
+    }
 
-    if (w.minWidth != null) attr.add('width≥${w.minWidth}');
-    if (w.maxWidth != null) attr.add('width≤${w.maxWidth}');
-    if (w.preferredWidth != null) attr.add('width=${w.preferredWidth}');
+    if (w.minWidth != null) {
+      attr.add('width≥${w.minWidth}');
+    }
+    if (w.maxWidth != null) {
+      attr.add('width≤${w.maxWidth}');
+    }
+    if (w.preferredWidth != null) {
+      attr.add('width=${w.preferredWidth}');
+    }
 
     return attr;
   }
@@ -288,11 +310,15 @@ class Explainer {
 
     buffer.write('image=${image.image}');
 
-    if (image.height != null) buffer.write(',height=${image.height}');
+    if (image.height != null) {
+      buffer.write(',height=${image.height}');
+    }
     if (image.semanticLabel != null) {
       buffer.write(',semanticLabel=${image.semanticLabel}');
     }
-    if (image.width != null) buffer.write(',width=${image.width}');
+    if (image.width != null) {
+      buffer.write(',width=${image.width}');
+    }
 
     return '[Image:$buffer]';
   }
@@ -320,8 +346,12 @@ class Explainer {
     if (textSpan?.recognizer != null) {
       final recognizer = textSpan!.recognizer;
       if (recognizer is TapGestureRecognizer) {
-        if (recognizer.onTap != null) recognizerSb.write('+onTap');
-        if (recognizer.onTapCancel != null) recognizerSb.write('+onTapCancel');
+        if (recognizer.onTap != null) {
+          recognizerSb.write('+onTap');
+        }
+        if (recognizer.onTapCancel != null) {
+          recognizerSb.write('+onTapCancel');
+        }
       }
 
       if (recognizerSb.isEmpty) {
@@ -336,7 +366,9 @@ class Explainer {
   String _key(Key key) {
     final matches =
         RegExp(r'^\[GlobalKey#[^ ]+ (.+)\]$').firstMatch(key.toString());
-    if (matches == null) return '';
+    if (matches == null) {
+      return '';
+    }
 
     return '#${matches.group(1)}';
   }
@@ -388,7 +420,9 @@ class Explainer {
     }
 
     final bg = style.background;
-    if (bg != null) s += 'bg=${_color(bg.color)}';
+    if (bg != null) {
+      s += 'bg=${_color(bg.color)}';
+    }
 
     final color = style.color;
     if (color != null && color != kColor) {
@@ -411,7 +445,9 @@ class Explainer {
     }
 
     final height = style.height;
-    if (height != null) s += '+height=${height.toStringAsFixed(1)}';
+    if (height != null) {
+      s += '+height=${height.toStringAsFixed(1)}';
+    }
 
     final fontSize = style.fontSize;
     if (fontSize != null && fontSize != parent.fontSize) {
@@ -469,27 +505,41 @@ class Explainer {
       return '';
     }
 
-    if (fontWeight == FontWeight.bold) return '+b';
+    if (fontWeight == FontWeight.bold) {
+      return '+b';
+    }
     return '+w${FontWeight.values.indexOf(fontWeight)}';
   }
 
   String _widget(Widget widget) {
     final explained = explainer?.call(this, widget);
-    if (explained != null) return explained;
+    if (explained != null) {
+      return explained;
+    }
 
-    if (widget == widget0) return '[widget0]';
+    if (widget == widget0) {
+      return '[widget0]';
+    }
 
     if (widget.runtimeType.toString() == 'HtmlListMarker') {
       return widget.toStringShort();
     }
 
-    if (widget is TshWidget) return _widget(widget.child);
+    if (widget is TshWidget) {
+      return _widget(widget.child);
+    }
 
-    if (widget is WidgetPlaceholder) return _widget(widget.build(context));
+    if (widget is WidgetPlaceholder) {
+      return _widget(widget.build(context));
+    }
 
-    if (widget is Image) return _image(widget);
+    if (widget is Image) {
+      return _image(widget);
+    }
 
-    if (widget is SizedBox) return _sizedBox(widget);
+    if (widget is SizedBox) {
+      return _sizedBox(widget);
+    }
 
     final type = '${widget.runtimeType}';
     final attr = <String>[];
@@ -499,7 +549,9 @@ class Explainer {
         : widget is Text
             ? widget.maxLines
             : null;
-    if (maxLines != null) attr.add('maxLines=$maxLines');
+    if (maxLines != null) {
+      attr.add('maxLines=$maxLines');
+    }
 
     attr.add(
       _textAlign(
@@ -537,17 +589,29 @@ class Explainer {
       attr.add('aspectRatio=${widget.aspectRatio.toStringAsFixed(1)}');
     }
 
-    if (widget is ConstrainedBox) attr.add(_boxConstraints(widget.constraints));
+    if (widget is ConstrainedBox) {
+      attr.add(_boxConstraints(widget.constraints));
+    }
 
-    if (widget is Container) attr.addAll(_boxDecoration(widget.decoration));
+    if (widget is Container) {
+      attr.addAll(_boxDecoration(widget.decoration));
+    }
 
-    if (widget is CssSizing) attr.addAll(_cssSizing(widget));
+    if (widget is CssSizing) {
+      attr.addAll(_cssSizing(widget));
+    }
 
-    if (widget is DecoratedBox) attr.addAll(_boxDecoration(widget.decoration));
+    if (widget is DecoratedBox) {
+      attr.addAll(_boxDecoration(widget.decoration));
+    }
 
-    if (widget is LimitedBox) attr.add(_limitBox(widget));
+    if (widget is LimitedBox) {
+      attr.add(_limitBox(widget));
+    }
 
-    if (widget is Padding) attr.add(_edgeInsets(widget.padding));
+    if (widget is Padding) {
+      attr.add(_edgeInsets(widget.padding));
+    }
 
     if (widget is Positioned) {
       attr.add(
@@ -556,7 +620,9 @@ class Explainer {
       );
     }
 
-    if (widget is Tooltip) attr.add('message=${widget.message}');
+    if (widget is Tooltip) {
+      attr.add('message=${widget.message}');
+    }
 
     // A-F
     // `RichText` is an exception, it is a `MultiChildRenderObjectWidget` so it has to be processed first

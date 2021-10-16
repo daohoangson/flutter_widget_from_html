@@ -165,14 +165,19 @@ class CssLength {
         return null;
       case CssLengthUnit.em:
         baseValue ??= tsh.style.fontSize;
-        if (baseValue == null) return null;
+        if (baseValue == null) {
+          return null;
+        }
+
         value = baseValue * number;
         effectiveScaleFactor = 1;
         break;
       case CssLengthUnit.percentage:
         // TODO: remove ignore https://github.com/passsy/dart-lint/issues/27
         // ignore: invariant_booleans
-        if (baseValue == null) return null;
+        if (baseValue == null) {
+          return null;
+        }
 
         value = baseValue * number / 100;
         effectiveScaleFactor = 1;
@@ -283,7 +288,9 @@ class CssLengthBox {
           return 'CssLengthBox(inline-start=$_inlineStart)';
         }
       }
-      if (top != _null) return 'CssLengthBox(top=$top)';
+      if (top != _null) {
+        return 'CssLengthBox(top=$top)';
+      }
       if (right != _null) {
         if (_right != null) {
           return 'CssLengthBox(right=$_right)';
@@ -291,7 +298,9 @@ class CssLengthBox {
           return 'CssLengthBox(inline-end=$_inlineEnd)';
         }
       }
-      if (bottom != _null) return 'CssLengthBox(bottom=$bottom)';
+      if (bottom != _null) {
+        return 'CssLengthBox(bottom=$bottom)';
+      }
     }
 
     return 'CssLengthBox($left, $top, $right, $bottom)';

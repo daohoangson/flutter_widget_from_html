@@ -11,7 +11,9 @@ class StyleBgColor {
   BuildOp get buildOp => BuildOp(
         onTreeFlattening: (meta, tree) {
           final bgColor = _parseColor(wf, meta);
-          if (bgColor == null) return;
+          if (bgColor == null) {
+            return;
+          }
 
           for (final bit in tree.bits) {
             bit.tsb.enqueue(_tsb, bgColor);
@@ -19,7 +21,10 @@ class StyleBgColor {
         },
         onWidgets: (meta, widgets) {
           final color = _parseColor(wf, meta);
-          if (color == null) return null;
+          if (color == null) {
+            return null;
+          }
+
           return listOrNull(
             wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
                   (_, child) => wf.buildDecoratedBox(meta, child, color: color),

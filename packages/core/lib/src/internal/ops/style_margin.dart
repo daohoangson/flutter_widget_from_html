@@ -21,11 +21,15 @@ class StyleMargin {
   BuildOp get buildOp => BuildOp(
         onTreeFlattening: (meta, tree) {
           final m = tryParseCssLengthBox(meta, kCssMargin);
-          if (m == null) return;
+          if (m == null) {
+            return;
+          }
 
           final mayHaveLeft = m.mayHaveLeft;
           final mayHaveRight = m.mayHaveRight;
-          if (!mayHaveLeft && !mayHaveRight) return;
+          if (!mayHaveLeft && !mayHaveRight) {
+            return;
+          }
 
           return wrapTree(
             tree,
@@ -39,9 +43,11 @@ class StyleMargin {
         },
         onWidgets: (meta, widgets) {
           final m = tryParseCssLengthBox(meta, kCssMargin);
-          if (m == null) return widgets;
-          final tsb = meta.tsb;
+          if (m == null) {
+            return widgets;
+          }
 
+          final tsb = meta.tsb;
           return [
             if (m.top?.isPositive ?? false) HeightPlaceholder(m.top!, tsb),
             for (final widget in widgets)

@@ -61,7 +61,9 @@ class HomeScreen extends StatelessWidget {
 
   static Route onGenerateRoute(RouteSettings route) {
     for (final title in _screens.keys) {
-      if (_routeNameFromTitle(title) != route.name) continue;
+      if (_routeNameFromTitle(title) != route.name) {
+        continue;
+      }
 
       return MaterialPageRoute(
         builder: (_) => _screens[title].call(),

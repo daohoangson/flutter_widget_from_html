@@ -45,7 +45,9 @@ class _State extends State<IframeScreen> {
             CheckboxListTile(
               value: webViewJs,
               onChanged: (v) => setState(() {
-                if (v) webView = true;
+                if (v) {
+                  webView = true;
+                }
                 webViewJs = v;
               }),
               title: HtmlWidget('<var>.webViewJs</var>'),

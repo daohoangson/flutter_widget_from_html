@@ -15,7 +15,9 @@ class TagRuby {
     op = BuildOp(onChild: onChild, onTree: onTree);
     _rtOp = BuildOp(
       onTree: (rtMeta, rtTree) {
-        if (rtTree.isEmpty) return;
+        if (rtTree.isEmpty) {
+          return;
+        }
         rtTree.isRtBit = true;
       },
     );
@@ -23,7 +25,9 @@ class TagRuby {
 
   void onChild(BuildMetadata childMeta) {
     final e = childMeta.element;
-    if (e.parent != rubyMeta.element) return;
+    if (e.parent != rubyMeta.element) {
+      return;
+    }
 
     switch (e.localName) {
       case kTagRp:

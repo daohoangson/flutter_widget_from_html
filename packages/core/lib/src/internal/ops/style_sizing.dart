@@ -31,12 +31,16 @@ class StyleSizing {
   BuildOp get buildOp => BuildOp(
         onTreeFlattening: (meta, tree) {
           final input = _parse(meta);
-          if (input == null) return;
+          if (input == null) {
+            return;
+          }
 
           WidgetPlaceholder? widget;
           for (final b in tree.bits) {
             if (b is WidgetBit) {
-              if (widget != null) return;
+              if (widget != null) {
+                return;
+              }
               widget = b.child;
             } else {
               return;
@@ -47,7 +51,9 @@ class StyleSizing {
         },
         onWidgets: (meta, widgets) {
           final input = _parse(meta);
-          if (input == null) return widgets;
+          if (input == null) {
+            return widgets;
+          }
 
           return listOrNull(
             wf
@@ -70,7 +76,9 @@ class StyleSizing {
 
     for (final style in meta.styles) {
       final value = style.value;
-      if (value == null) continue;
+      if (value == null) {
+        continue;
+      }
 
       switch (style.property) {
         case kCssHeight:
@@ -111,7 +119,9 @@ class StyleSizing {
         minHeight == null &&
         minWidth == null &&
         preferredHeight == null &&
-        preferredWidth == null) return null;
+        preferredWidth == null) {
+      return null;
+    }
 
     if (preferredWidth == null &&
         meta.buildOps.whereType<DisplayBlockOp>().isNotEmpty) {
@@ -157,10 +167,14 @@ class StyleSizing {
   }
 
   static CssSizingValue? _getValue(CssLength? length, TextStyleHtml tsh) {
-    if (length == null) return null;
+    if (length == null) {
+      return null;
+    }
 
     final value = length.getValue(tsh);
-    if (value != null) return CssSizingValue.value(value);
+    if (value != null) {
+      return CssSizingValue.value(value);
+    }
 
     switch (length.unit) {
       case CssLengthUnit.auto:

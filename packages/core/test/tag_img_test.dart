@@ -385,6 +385,22 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('❌'), findsOneWidget);
     });
+
+    testWidgets('handles null provider', (WidgetTester tester) async {
+      const src = 'http://domain.com/image.png';
+      const html = 'Foo <img src="$src" alt="alt" /> bar';
+      final explained = await helper.explain(
+        tester,
+        // html,
+        null,
+        hw: HtmlWidget(
+          html,
+          factoryBuilder: () => _NullProviderFactory(),
+          key: helper.hwKey,
+        ),
+      );
+      expect(explained, equals('[RichText:(:Foo alt bar)]'));
+    });
   });
 }
 
@@ -437,4 +453,9 @@ class _TestImageStreamCompleter extends ImageStreamCompleter {
       );
     }
   }
+}
+
+class _NullProviderFactory extends WidgetFactory {
+  @override
+  ImageProvider<Object>? imageProviderFromNetwork(String url) => null;
 }

@@ -39,7 +39,9 @@ class TagImg {
           final built = wf.buildImage(meta, data);
           if (built == null) {
             final imgText = data.alt ?? data.title ?? '';
-            if (imgText.isNotEmpty) tree.addText(imgText);
+            if (imgText.isNotEmpty) {
+              tree.addText(imgText);
+            }
             return;
           }
 
@@ -47,7 +49,9 @@ class TagImg {
         },
         onTreeFlattening: (meta, tree) {
           final placeholder = _placeholders[meta];
-          if (placeholder == null) return;
+          if (placeholder == null) {
+            return;
+          }
 
           tree.replaceWith(
             WidgetBit.inline(
@@ -59,7 +63,10 @@ class TagImg {
         },
         onWidgets: (meta, widgets) {
           final placeholder = _placeholders[meta];
-          if (placeholder == null) return widgets;
+          if (placeholder == null) {
+            return widgets;
+          }
+
           return [placeholder];
         },
         onWidgetsIsOptional: true,
