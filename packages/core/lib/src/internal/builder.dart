@@ -43,14 +43,6 @@ class BuildMetadata extends core_data.BuildMetadata {
     return _styles ?? const [];
   }
 
-  bool get _isBlockElement {
-    if (this[kCssDisplay]?.term == kCssDisplayBlock) {
-      return true;
-    }
-
-    return _buildOps?.where(_opRequiresBuildingSubtree).isNotEmpty == true;
-  }
-
   @override
   void operator []=(String key, String value) {
     assert(!_stylesIsLocked, 'Metadata can no longer be changed.');
@@ -145,7 +137,8 @@ class BuildTree extends core_data.BuildTree {
       }
     }
 
-    return widgets;
+    _built.addAll(widgets);
+    return _built;
   }
 
   @override
@@ -194,7 +187,9 @@ class BuildTree extends core_data.BuildTree {
 
     subTree.addBitsFromNodes(element.nodes);
 
-    if (meta._isBlockElement) {
+    if (meta[kCssDisplay]?.term == kCssDisplayBlock ||
+        meta._buildOps?.where(_opRequiresBuildingSubtree).isNotEmpty == true) {
+      // this is a block element
       for (final widget in subTree.build()) {
         add(WidgetBit.block(this, widget));
       }

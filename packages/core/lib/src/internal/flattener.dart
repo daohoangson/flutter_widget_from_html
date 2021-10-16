@@ -65,7 +65,6 @@ class Flattener {
     for (var i = min; i <= max; i++) {
       _loop(bits[i]);
     }
-
     _completeLoop();
 
     return _flattened;
