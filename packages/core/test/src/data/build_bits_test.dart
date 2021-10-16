@@ -435,8 +435,9 @@ class _BuildBitWidgetFactory extends WidgetFactory {
     if (classes.contains('input--GestureRecognizer')) {
       meta.register(
         BuildOp(
-          onTree: (_, tree) =>
+          onTreeFlattening: (_, tree) =>
               tree.add(_InputGestureRecognizerBit(tree, tree.tsb)),
+          priority: BuildOp.kPriorityMax,
         ),
       );
     }
@@ -460,9 +461,9 @@ class _BuildBitWidgetFactory extends WidgetFactory {
     if (classes.contains('output--GestureRecognizer')) {
       meta.register(
         BuildOp(
-          onTree: (_, tree) =>
+          onTreeFlattening: (_, tree) =>
               tree.add(_OutputGestureRecognizerBit(tree, tree.tsb)),
-          priority: 9999,
+          priority: BuildOp.kPriorityMax,
         ),
       );
     }
