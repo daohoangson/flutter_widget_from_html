@@ -286,7 +286,7 @@ The HTML string is parsed into DOM elements and each element is visited once to 
 |      | b. Loop through children elements to prepare `BuildBit`s                 |                                                                                                                     |
 | 7    | Inform build ops                                                         | `BuildOp.onTree(BuildMetadata, BuildTree)`                                                                          |
 | 8    | a. If not a block element, go to 10                                      |                                                                                                                     |
-|      | b. Build widgets from bits using a `Flattener`                           | Use existing `BuildBit` or extends from it, overriding `.swallowWhitespace` to control whitespace, etc.             |
+|      | b. Build widgets from bits using a `Flattener`                           | `BuildOp.onTreeFlattening(BuildMetadata, BuildTree)`                                                                |
 | 9    | Inform build ops                                                         | `BuildOp.onWidgets(BuildMetadata, Iterable<Widget>)`                                                                |
 | 10   | The end                                                                  |                                                                                                                     |
 

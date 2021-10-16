@@ -24,7 +24,6 @@ class BuildMetadata extends core_data.BuildMetadata {
   var _buildOpsIsLocked = false;
   List<css.Declaration>? _styles;
   var _stylesIsLocked = false;
-  bool? _willBuildSubtree;
 
   BuildMetadata(
     dom.Element element,
@@ -43,9 +42,6 @@ class BuildMetadata extends core_data.BuildMetadata {
     assert(_stylesIsLocked);
     return _styles ?? const [];
   }
-
-  @override
-  bool? get willBuildSubtree => _willBuildSubtree;
 
   @override
   void operator []=(String key, String value) {
@@ -82,10 +78,13 @@ class BuildTree extends core_data.BuildTree {
     required this.wf,
   }) : super(parent, tsb);
 
-  @override
-  T add<T extends BuildBit>(T bit) {
-    assert(_built.isEmpty, "Built tree shouldn't be altered.");
-    return super.add(bit);
+  Iterable<BuildTree> get _subTrees sync* {
+    for (final child in directChildren) {
+      if (child is BuildTree) {
+        yield child;
+        yield* child._subTrees;
+      }
+    }
   }
 
   void addBitsFromNodes(dom.NodeList domNodes) {
@@ -101,6 +100,10 @@ class BuildTree extends core_data.BuildTree {
   Iterable<WidgetPlaceholder> build() {
     if (_built.isNotEmpty) {
       return _built;
+    }
+
+    for (final subTree in _subTrees.toList(growable: false).reversed) {
+      subTree._onFlattening();
     }
 
     var widgets = wf.flatten(parentMeta, this);
@@ -184,7 +187,7 @@ class BuildTree extends core_data.BuildTree {
 
     subTree.addBitsFromNodes(element.nodes);
 
-    if (meta.willBuildSubtree == true) {
+    if (meta._buildOps?.where(_opRequiresBuildingSubtree).isNotEmpty == true) {
       for (final widget in subTree.build()) {
         add(WidgetBit.block(this, widget));
       }
@@ -275,8 +278,6 @@ class BuildTree extends core_data.BuildTree {
 
     wf.parseStyleDisplay(meta, meta[kCssDisplay]?.term);
 
-    meta._willBuildSubtree = meta[kCssDisplay]?.term == kCssDisplayBlock ||
-        meta._buildOps?.where(_opRequiresBuildingSubtree).isNotEmpty == true;
     meta._buildOpsIsLocked = true;
   }
 
@@ -288,6 +289,12 @@ class BuildTree extends core_data.BuildTree {
 
     for (final pair in map.entries) {
       meta[pair.key] = pair.value;
+    }
+  }
+
+  void _onFlattening() {
+    for (final op in parentMeta.buildOps) {
+      op.onTreeFlattening?.call(parentMeta, this);
     }
   }
 }

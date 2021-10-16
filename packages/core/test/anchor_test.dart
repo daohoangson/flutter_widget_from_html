@@ -32,8 +32,8 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[CssBlock:child='
           '[SizedBox#foo:child='
+          '[CssBlock:child='
           '[RichText:(:Foo)]'
           ']]',
         ),

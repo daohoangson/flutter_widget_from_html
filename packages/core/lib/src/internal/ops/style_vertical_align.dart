@@ -18,11 +18,7 @@ class StyleVerticalAlign {
   StyleVerticalAlign(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTree: (meta, tree) {
-          if (meta.willBuildSubtree == true) {
-            return;
-          }
-
+        onTreeFlattening: (meta, tree) {
           final v = meta[kCssVerticalAlign]?.term;
           if (v == null || v == kCssVerticalAlignBaseline) {
             return;
@@ -53,7 +49,9 @@ class StyleVerticalAlign {
             );
           }
 
-          tree.replaceWith(WidgetBit.inline(tree, built, alignment: alignment));
+          WidgetBit.inline(tree.parent!, built, alignment: alignment)
+              .insertBefore(tree);
+          tree.detach();
         },
         onWidgets: (meta, widgets) {
           if (_skipBuilding[meta] == true || widgets.isEmpty) {
@@ -65,7 +63,6 @@ class StyleVerticalAlign {
             return widgets;
           }
 
-          _skipBuilding[meta] = true;
           return listOrNull(
             wf
                 .buildColumnPlaceholder(meta, widgets)

@@ -176,6 +176,9 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
     }
   }
 
+  /// The list of direct children.
+  Iterable<BuildBit> get directChildren => _children;
+
   /// The first bit (recursively).
   BuildBit? get first {
     for (final child in _children) {
@@ -252,14 +255,6 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
     final anchors = existing ?? (_anchors[this] = []);
     anchors.add(anchor);
     parent?.registerAnchor(anchor);
-  }
-
-  /// Replaces all children bits with [another].
-  void replaceWith(BuildBit another) {
-    assert(another.parent == this);
-    _children
-      ..clear()
-      ..add(another);
   }
 
   /// Creates a sub tree.

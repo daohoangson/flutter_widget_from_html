@@ -19,11 +19,7 @@ class StyleMargin {
   StyleMargin(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTree: (meta, tree) {
-          if (meta.willBuildSubtree == true) {
-            return;
-          }
-
+        onTreeFlattening: (meta, tree) {
           final m = tryParseCssLengthBox(meta, kCssMargin);
           if (m == null) {
             return;
@@ -46,10 +42,6 @@ class StyleMargin {
           );
         },
         onWidgets: (meta, widgets) {
-          if (meta.willBuildSubtree == false) {
-            return widgets;
-          }
-
           final m = tryParseCssLengthBox(meta, kCssMargin);
           if (m == null) {
             return widgets;

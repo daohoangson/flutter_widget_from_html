@@ -14,8 +14,8 @@ class StyleBorder {
   StyleBorder(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTree: (meta, tree) {
-          if (meta.willBuildSubtree == true) {
+        onTreeFlattening: (meta, tree) {
+          if (_skipBuilding[meta] == true) {
             return;
           }
 
@@ -35,13 +35,12 @@ class StyleBorder {
             return;
           }
 
-          tree.replaceWith(
-            WidgetBit.inline(
-              tree,
-              built,
-              alignment: PlaceholderAlignment.baseline,
-            ),
-          );
+          WidgetBit.inline(
+            tree.parent!,
+            built,
+            alignment: PlaceholderAlignment.baseline,
+          ).insertBefore(tree);
+          tree.detach();
         },
         onWidgets: (meta, widgets) {
           if (_skipBuilding[meta] == true || widgets.isEmpty) {
@@ -53,7 +52,6 @@ class StyleBorder {
             return widgets;
           }
 
-          _skipBuilding[meta] = true;
           return [
             WidgetPlaceholder(
               border,

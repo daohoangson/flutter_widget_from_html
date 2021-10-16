@@ -22,9 +22,9 @@ typedef SpanBuilder = InlineSpan? Function(
 class Flattener {
   final WidgetFactory wf;
 
-  final List<GestureRecognizer> _recognizers = [];
+  final _flattened = <Flattened>[];
+  final _recognizers = <GestureRecognizer>[];
 
-  late List<Flattened> _flattened;
   late _Recognizer _recognizer;
   late _Recognizer _prevRecognizer;
   List<SpanBuilder>? _spans;
@@ -36,16 +36,19 @@ class Flattener {
 
   Flattener(this.wf);
 
-  void dispose() => _reset();
-
-  void reset() => _reset();
+  @mustCallSuper
+  void dispose() {
+    for (final r in _recognizers) {
+      r.dispose();
+    }
+    _recognizers.clear();
+  }
 
   List<Flattened> flatten(BuildTree tree) {
-    _flattened = [];
-
     _resetLoop(tree.tsb);
 
     final bits = tree.bits.toList(growable: false);
+
     var min = 0;
     var max = bits.length - 1;
     for (; min <= max; min++) {
@@ -65,13 +68,6 @@ class Flattener {
     _completeLoop();
 
     return _flattened;
-  }
-
-  void _reset() {
-    for (final r in _recognizers) {
-      r.dispose();
-    }
-    _recognizers.clear();
   }
 
   void _resetLoop(TextStyleBuilder tsb) {
@@ -137,12 +133,6 @@ class Flattener {
 
     _prevTsb = thisTsb;
     _swallowWhitespace = bit.swallowWhitespace ?? _swallowWhitespace;
-
-    if (built is BuildTree) {
-      for (final subBit in built.bits) {
-        _loop(subBit);
-      }
-    }
   }
 
   bool _loopShouldSwallowWhitespace(BuildBit bit) {
