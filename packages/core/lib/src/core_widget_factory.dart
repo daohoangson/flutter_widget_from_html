@@ -1172,6 +1172,7 @@ class WidgetFactory {
         );
       },
       onWidgetsIsOptional: true,
+      priority: BuildOp.kPriorityMax,
     );
   }
 }

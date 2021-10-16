@@ -86,10 +86,13 @@ class BuildTree extends core_data.BuildTree {
     required this.wf,
   }) : super(parent, tsb);
 
-  @override
-  T add<T extends BuildBit>(T bit) {
-    assert(_built.isEmpty, "Built tree shouldn't be altered.");
-    return super.add(bit);
+  Iterable<BuildTree> get _subTrees sync* {
+    for (final child in directChildren) {
+      if (child is BuildTree) {
+        yield child;
+        yield* child._subTrees;
+      }
+    }
   }
 
   void addBitsFromNodes(dom.NodeList domNodes) {
@@ -105,6 +108,10 @@ class BuildTree extends core_data.BuildTree {
   Iterable<WidgetPlaceholder> build() {
     if (_built.isNotEmpty) {
       return _built;
+    }
+
+    for (final subTree in _subTrees.toList(growable: false).reversed) {
+      subTree._onFlattening();
     }
 
     var widgets = wf.flatten(parentMeta, this);
@@ -138,15 +145,7 @@ class BuildTree extends core_data.BuildTree {
       }
     }
 
-    _built.addAll(widgets);
-    return _built;
-  }
-
-  @override
-  void onFlattening() {
-    for (final op in parentMeta.buildOps) {
-      op.onTreeFlattening?.call(parentMeta, this);
-    }
+    return widgets;
   }
 
   @override
@@ -297,6 +296,12 @@ class BuildTree extends core_data.BuildTree {
 
     for (final pair in map.entries) {
       meta[pair.key] = pair.value;
+    }
+  }
+
+  void _onFlattening() {
+    for (final op in parentMeta.buildOps) {
+      op.onTreeFlattening?.call(parentMeta, this);
     }
   }
 }

@@ -53,7 +53,7 @@ class TagImg {
             return;
           }
 
-          tree.replaceWith(
+          tree.add(
             WidgetBit.inline(
               tree,
               placeholder,

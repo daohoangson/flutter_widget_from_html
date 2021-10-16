@@ -84,12 +84,6 @@ void main() {
         expect(explained, equals('[RichText:(:1 2(null) 3)]'));
       });
 
-      testWidgets('returns BuildTree', (WidgetTester tester) async {
-        const html = '1 <span class="output--BuildTree">2</span> 3';
-        final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:1 2 foo bar 3)]'));
-      });
-
       group('returns GestureRecognizer', () {
         const clazz = 'output--GestureRecognizer';
 
@@ -299,16 +293,6 @@ void main() {
         expect(widgets.length, equals(1));
       });
     });
-
-    test('replaces', () {
-      final text = _text();
-      text.addText('1');
-      text.addText('3');
-      expect(_data(text), equals('13'));
-
-      text.replaceWith(TextBit(text, '2'));
-      expect(_data(text), equals('2'));
-    });
   });
 
   group('copyWith', () {
@@ -473,14 +457,6 @@ class _BuildBitWidgetFactory extends WidgetFactory {
       );
     }
 
-    if (classes.contains('output--BuildTree')) {
-      meta.register(
-        BuildOp(
-          onTree: (_, tree) => tree.add(_OutputBuildTreeBit(tree, tree.tsb)),
-        ),
-      );
-    }
-
     if (classes.contains('output--GestureRecognizer')) {
       meta.register(
         BuildOp(
@@ -579,25 +555,6 @@ class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _InputTextStyleHtmlBit(parent ?? this.parent, tsb ?? this.tsb);
-}
-
-class _OutputBuildTreeBit extends BuildBit<void, BuildTree> {
-  final BuildTree tree;
-
-  _OutputBuildTreeBit(BuildTree parent, TextStyleBuilder tsb)
-      : tree = parent.sub(tsb: tsb)
-          ..addWhitespace(' ')
-          ..addText('foo')
-          ..addWhitespace(' ')
-          ..addText('bar'),
-        super(parent, tsb);
-
-  @override
-  BuildTree buildBit(void _) => tree;
-
-  @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _OutputBuildTreeBit(parent ?? this.parent!, tsb ?? this.tsb);
 }
 
 class _OutputGestureRecognizerBit extends BuildBit<void, GestureRecognizer> {

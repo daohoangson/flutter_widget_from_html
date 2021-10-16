@@ -49,7 +49,9 @@ class StyleVerticalAlign {
             );
           }
 
-          tree.replaceWith(WidgetBit.inline(tree, built, alignment: alignment));
+          WidgetBit.inline(tree.parent!, built, alignment: alignment)
+              .insertBefore(tree);
+          tree.detach();
         },
         onWidgets: (meta, widgets) {
           if (_skipBuilding[meta] == true || widgets.isEmpty) {

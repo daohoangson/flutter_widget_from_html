@@ -47,38 +47,28 @@ class Flattener {
   List<Flattened> flatten(BuildTree tree) {
     _resetLoop(tree.tsb);
 
-    _flatten(tree, trim: true);
-
-    _completeLoop();
-
-    return _flattened;
-  }
-
-  void _flatten(BuildTree tree, {bool trim = false}) {
-    for (final subTree in tree.subTrees.toList(growable: false).reversed) {
-      subTree.onFlattening();
-    }
-
     final bits = tree.bits.toList(growable: false);
 
     var min = 0;
     var max = bits.length - 1;
-    if (trim) {
-      for (; min <= max; min++) {
-        if (bits[min] is! WhitespaceBit) {
-          break;
-        }
+    for (; min <= max; min++) {
+      if (bits[min] is! WhitespaceBit) {
+        break;
       }
-      for (; max >= min; max--) {
-        if (bits[max] is! WhitespaceBit) {
-          break;
-        }
+    }
+    for (; max >= min; max--) {
+      if (bits[max] is! WhitespaceBit) {
+        break;
       }
     }
 
     for (var i = min; i <= max; i++) {
       _loop(bits[i]);
     }
+
+    _completeLoop();
+
+    return _flattened;
   }
 
   void _resetLoop(TextStyleBuilder tsb) {
@@ -144,10 +134,6 @@ class Flattener {
 
     _prevTsb = thisTsb;
     _swallowWhitespace = bit.swallowWhitespace ?? _swallowWhitespace;
-
-    if (built is BuildTree) {
-      _flatten(built);
-    }
   }
 
   bool _loopShouldSwallowWhitespace(BuildBit bit) {
