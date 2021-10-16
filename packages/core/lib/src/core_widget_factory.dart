@@ -28,8 +28,9 @@ class WidgetFactory {
   late AnchorRegistry _anchorRegistry;
 
   BuildOp? _styleBgColor;
-  BuildOp? _styleBlock;
   BuildOp? _styleBorder;
+  BuildOp? _styleDisplayBlock;
+  BuildOp? _styleDisplayInlineBlock;
   BuildOp? _styleDisplayNone;
   BuildOp? _styleMargin;
   BuildOp? _stylePadding;
@@ -1077,15 +1078,32 @@ class WidgetFactory {
   void parseStyleDisplay(BuildMetadata meta, String? value) {
     switch (value) {
       case kCssDisplayBlock:
-        _styleBlock ??= DisplayBlockOp(this);
-        meta.register(_styleBlock!);
+        final displayBlock = _styleDisplayBlock ??= DisplayBlockOp(this);
+        meta.register(displayBlock);
+        break;
+      case kCssDisplayInlineBlock:
+        final displayInlineBlock = _styleDisplayInlineBlock ??= BuildOp(
+          onTree: (meta, tree) {
+            final built = buildColumnPlaceholder(meta, tree.build());
+            if (built != null) {
+              WidgetBit.inline(
+                tree.parent!,
+                built,
+                alignment: PlaceholderAlignment.baseline,
+              ).insertBefore(tree);
+            }
+            tree.detach();
+          },
+          priority: BuildOp.kPriorityMax,
+        );
+        meta.register(displayInlineBlock);
         break;
       case kCssDisplayNone:
-        _styleDisplayNone ??= BuildOp(
+        final displayNone = _styleDisplayNone ??= BuildOp(
           onTree: (_, tree) => tree.detach(),
           priority: BuildOp.kPriorityMax,
         );
-        meta.register(_styleDisplayNone!);
+        meta.register(displayNone);
         break;
       case kCssDisplayTable:
         meta.register(TagTable(this, meta).op);

@@ -187,9 +187,7 @@ class BuildTree extends core_data.BuildTree {
 
     subTree.addBitsFromNodes(element.nodes);
 
-    if (meta[kCssDisplay]?.term == kCssDisplayBlock ||
-        meta._buildOps?.where(_opRequiresBuildingSubtree).isNotEmpty == true) {
-      // this is a block element
+    if (meta._buildOps?.where(_opRequiresBuildingSubtree).isNotEmpty == true) {
       for (final widget in subTree.build()) {
         add(WidgetBit.block(this, widget));
       }
