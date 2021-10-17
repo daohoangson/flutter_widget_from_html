@@ -119,7 +119,7 @@ class TagTable {
         final tsh = tableMeta.tsb.build(context);
 
         return HtmlTable(
-          border: border.getValue(tsh),
+          border: border.getBorder(tsh),
           borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
           borderSpacing: borderSpacing?.getValue(tsh) ?? 0.0,
           companion: companion,
@@ -181,7 +181,7 @@ class TagTable {
         _data.builders.add((context) {
           Widget? child = cell.child;
 
-          final border = cssBorder.getValue(cellMeta.tsb.build(context));
+          final border = cssBorder.getBorder(cellMeta.tsb.build(context));
           if (border != null) {
             child = wf.buildPadding(cellMeta, cell.child, border.dimensions);
           }

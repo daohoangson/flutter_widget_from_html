@@ -3,25 +3,35 @@ part of '../core_data.dart';
 /// A border of a box.
 @immutable
 class CssBorder {
+  final bool inherit;
+
   final CssBorderSide? _all;
   final CssBorderSide? _bottom;
-  final bool inherit;
   final CssBorderSide? _inlineEnd;
   final CssBorderSide? _inlineStart;
   final CssBorderSide? _left;
   final CssBorderSide? _right;
   final CssBorderSide? _top;
 
+  final CssRadius radiusBottomLeft;
+  final CssRadius radiusBottomRight;
+  final CssRadius radiusTopLeft;
+  final CssRadius radiusTopRight;
+
   /// Creates a border.
   const CssBorder({
+    this.inherit = false,
     CssBorderSide? all,
     CssBorderSide? bottom,
-    this.inherit = false,
     CssBorderSide? inlineEnd,
     CssBorderSide? inlineStart,
     CssBorderSide? left,
     CssBorderSide? right,
     CssBorderSide? top,
+    this.radiusBottomLeft = CssRadius.zero,
+    this.radiusBottomRight = CssRadius.zero,
+    this.radiusTopLeft = CssRadius.zero,
+    this.radiusTopRight = CssRadius.zero,
   })  : _all = all,
         _bottom = bottom,
         _inlineEnd = inlineEnd,
@@ -30,15 +40,19 @@ class CssBorder {
         _right = right,
         _top = top;
 
-  /// Returns `true` if all sides are unset.
-  bool get isNone =>
+  /// Returns `true` if all sides are unset, all radius are zero.
+  bool get isNoOp =>
       (_all == null || _all == CssBorderSide.none) &&
       (_bottom == null || _bottom == CssBorderSide.none) &&
       (_inlineEnd == null || _inlineEnd == CssBorderSide.none) &&
       (_inlineStart == null || _inlineStart == CssBorderSide.none) &&
       (_left == null || _left == CssBorderSide.none) &&
       (_right == null || _right == CssBorderSide.none) &&
-      (_top == null || _top == CssBorderSide.none);
+      (_top == null || _top == CssBorderSide.none) &&
+      radiusBottomLeft == CssRadius.zero &&
+      radiusBottomRight == CssRadius.zero &&
+      radiusTopLeft == CssRadius.zero &&
+      radiusTopRight == CssRadius.zero;
 
   /// Creates a copy of this border with the sides from [other].
   CssBorder copyFrom(CssBorder other) => copyWith(
@@ -48,6 +62,10 @@ class CssBorder {
         left: other._left,
         right: other._right,
         top: other._top,
+        radiusBottomLeft: other.radiusBottomLeft,
+        radiusBottomRight: other.radiusBottomRight,
+        radiusTopLeft: other.radiusTopLeft,
+        radiusTopRight: other.radiusTopRight,
       );
 
   /// Creates a copy of this border but with the given fields replaced with the new values.
@@ -58,20 +76,28 @@ class CssBorder {
     CssBorderSide? left,
     CssBorderSide? right,
     CssBorderSide? top,
+    CssRadius? radiusBottomLeft,
+    CssRadius? radiusBottomRight,
+    CssRadius? radiusTopLeft,
+    CssRadius? radiusTopRight,
   }) =>
       CssBorder(
+        inherit: inherit,
         all: _all,
         bottom: CssBorderSide._copyWith(_bottom, bottom),
-        inherit: inherit,
         inlineEnd: CssBorderSide._copyWith(_inlineEnd, inlineEnd),
         inlineStart: CssBorderSide._copyWith(_inlineStart, inlineStart),
         left: CssBorderSide._copyWith(_left, left),
         right: CssBorderSide._copyWith(_right, right),
         top: CssBorderSide._copyWith(_top, top),
+        radiusBottomLeft: radiusBottomLeft ?? this.radiusBottomLeft,
+        radiusBottomRight: radiusBottomRight ?? this.radiusBottomRight,
+        radiusTopLeft: radiusTopLeft ?? this.radiusTopLeft,
+        radiusTopRight: radiusTopRight ?? this.radiusTopRight,
       );
 
   /// Calculates [Border].
-  Border? getValue(TextStyleHtml tsh) {
+  Border? getBorder(TextStyleHtml tsh) {
     final bottom = CssBorderSide._copyWith(_all, _bottom)?._getValue(tsh);
     final left = CssBorderSide._copyWith(
       _all,
@@ -95,6 +121,48 @@ class CssBorder {
       top: top ?? BorderSide.none,
     );
   }
+
+  /// Calculates [BorderRadius].
+  BorderRadius? getBorderRadius(TextStyleHtml tsh) {
+    final topLeft = radiusTopLeft._getValue(tsh);
+    final topRight = radiusTopRight._getValue(tsh);
+    final bottomLeft = radiusBottomLeft._getValue(tsh);
+    final bottomRight = radiusBottomRight._getValue(tsh);
+    if (topLeft == null &&
+        topRight == null &&
+        bottomLeft == null &&
+        bottomRight == null) {
+      return null;
+    }
+
+    return BorderRadius.only(
+      topLeft: topLeft ?? Radius.zero,
+      topRight: topRight ?? Radius.zero,
+      bottomLeft: bottomLeft ?? Radius.zero,
+      bottomRight: bottomRight ?? Radius.zero,
+    );
+  }
+}
+
+/// A radius.
+@immutable
+class CssRadius {
+  final CssLength x;
+
+  final CssLength y;
+
+  /// Creates a radius with the given radii.
+  const CssRadius(this.x, this.y);
+
+  /// A radius with [x] and [y] values set to zero.
+  static const zero = CssRadius(CssLength.zero, CssLength.zero);
+
+  Radius? _getValue(TextStyleHtml tsh) => this == zero
+      ? null
+      : Radius.elliptical(
+          x.getValue(tsh) ?? 0.0,
+          y.getValue(tsh) ?? 0.0,
+        );
 }
 
 /// A side of a border of a box.
@@ -115,7 +183,7 @@ class CssBorderSide {
   /// A border that is not rendered.
   static const none = CssBorderSide();
 
-  BorderSide? _getValue(TextStyleHtml tsh) => identical(this, none)
+  BorderSide? _getValue(TextStyleHtml tsh) => this == none
       ? null
       : BorderSide(
           color: color ?? tsh.style.color ?? const BorderSide().color,
@@ -125,7 +193,7 @@ class CssBorderSide {
         );
 
   static CssBorderSide? _copyWith(CssBorderSide? base, CssBorderSide? value) =>
-      base == null || identical(value, none)
+      base == null || value == none
           ? value
           : value == null
               ? base
@@ -147,6 +215,9 @@ class CssLength {
 
   /// Creates a measurement.
   const CssLength(this.number, [this.unit = CssLengthUnit.px]);
+
+  /// A zero length.
+  static const zero = CssLength(0);
 
   /// Returns `true` if value is larger than zero.
   bool get isPositive => number > 0.0;

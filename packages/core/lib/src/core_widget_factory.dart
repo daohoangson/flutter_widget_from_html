@@ -147,19 +147,23 @@ class WidgetFactory {
   /// and `border-box` (set [isBorderBox] to use).
   Widget? buildBorder(
     BuildMetadata meta,
-    Widget child,
-    BoxBorder border, {
+    Widget child, {
+    BoxBorder? border,
+    BorderRadius? borderRadius,
     bool isBorderBox = false,
-  }) =>
-      isBorderBox
-          ? DecoratedBox(
-              decoration: BoxDecoration(border: border),
-              child: child,
-            )
-          : Container(
-              decoration: BoxDecoration(border: border),
-              child: child,
-            );
+  }) {
+    if (border == null && borderRadius == null) {
+      return child;
+    }
+
+    final decoration = BoxDecoration(
+      border: border,
+      borderRadius: borderRadius,
+    );
+    return isBorderBox
+        ? DecoratedBox(decoration: decoration, child: child)
+        : Container(decoration: decoration, child: child);
+  }
 
   /// Builds column placeholder.
   WidgetPlaceholder? buildColumnPlaceholder(

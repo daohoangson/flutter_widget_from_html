@@ -224,6 +224,20 @@ class Explainer {
       ? 'alignment=${a.toString().replaceFirst('Alignment.', '')}'
       : '';
 
+  String _borderRadius(BorderRadius r) {
+    final values = <double>[
+      r.topLeft.x,
+      r.topLeft.y,
+      r.topRight.x,
+      r.topRight.y,
+      r.bottomRight.x,
+      r.bottomRight.y,
+      r.bottomLeft.x,
+      r.bottomLeft.y,
+    ];
+    return '$values';
+  }
+
   String _borderSide(BorderSide s) => s != BorderSide.none
       ? "${s.width}@${s.style.toString().replaceFirst('BorderStyle.', '')}${_color(s.color)}"
       : 'none';
@@ -260,6 +274,11 @@ class Explainer {
       final border = d.border;
       if (border != null) {
         attr.add('border=${_boxBorder(border)}');
+      }
+
+      final borderRadius = d.borderRadius;
+      if (borderRadius != null && borderRadius is BorderRadius) {
+        attr.add('radius=${_borderRadius(borderRadius)}');
       }
     }
 

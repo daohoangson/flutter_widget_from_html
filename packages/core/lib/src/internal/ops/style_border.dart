@@ -20,7 +20,7 @@ class StyleBorder {
           }
 
           final border = tryParseBorder(meta);
-          if (border.isNone) {
+          if (border.isNoOp) {
             return;
           }
 
@@ -48,7 +48,7 @@ class StyleBorder {
           }
 
           final border = tryParseBorder(meta);
-          if (border.isNone) {
+          if (border.isNoOp) {
             return widgets;
           }
 
@@ -69,18 +69,16 @@ class StyleBorder {
     BuildMetadata meta,
     BuildContext context,
     Widget child,
-    CssBorder border,
+    CssBorder cssBorder,
   ) {
     final tsh = meta.tsb.build(context);
-    final borderValue = border.getValue(tsh);
-    if (borderValue == null) {
-      return child;
-    }
-
+    final border = cssBorder.getBorder(tsh);
+    final borderRadius = cssBorder.getBorderRadius(tsh);
     return wf.buildBorder(
       meta,
       child,
-      borderValue,
+      border: border,
+      borderRadius: borderRadius,
       isBorderBox: meta[kCssBoxSizing]?.term == kCssBoxSizingBorderBox,
     );
   }

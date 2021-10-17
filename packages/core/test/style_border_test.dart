@@ -268,6 +268,384 @@ void main() {
     });
   });
 
+  group('radius', () {
+    testWidgets('parses border-radius one value', (WidgetTester tester) async {
+      const html = '<span style="border-radius: 1px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius two values', (WidgetTester tester) async {
+      const html = '<span style="border-radius: 1px 2px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 2.0, 2.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius three values', (tester) async {
+      const html = '<span style="border-radius: 1px 2px 3px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 1.0, 2.0, 2.0, 3.0, 3.0, 2.0, 2.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius four values', (tester) async {
+      const html = '<span style="border-radius: 1px 2px 3px 4px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 1.0, 2.0, 2.0, 3.0, 3.0, 4.0, 4.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius one slash one', (tester) async {
+      const html = '<span style="border-radius: 1px / 2px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 2.0, 1.0, 2.0, 1.0, 2.0, 1.0, 2.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius one slash two', (tester) async {
+      const html = '<span style="border-radius: 1px / 2px 3px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 2.0, 1.0, 3.0, 1.0, 2.0, 1.0, 3.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius one slash three', (tester) async {
+      const html = '<span style="border-radius: 1px / 2px 3px 4px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 2.0, 1.0, 3.0, 1.0, 4.0, 1.0, 3.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius one slash four', (tester) async {
+      const html =
+          '<span style="border-radius: 1px / 2px 3px 4px 5px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 2.0, 1.0, 3.0, 1.0, 4.0, 1.0, 5.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius two slash one', (tester) async {
+      const html = '<span style="border-radius: 1px 3px / 2px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 2.0, 3.0, 2.0, 1.0, 2.0, 3.0, 2.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius two slash two', (tester) async {
+      const html = '<span style="border-radius: 1px 3px / 2px 4px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0, 4.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius two slash three', (tester) async {
+      const html =
+          '<span style="border-radius: 1px 3px / 2px 4px 5px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 2.0, 3.0, 4.0, 1.0, 5.0, 3.0, 4.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius two slash four', (tester) async {
+      const html =
+          '<span style="border-radius: 1px 3px / 2px 4px 5px 6px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 2.0, 3.0, 4.0, 1.0, 5.0, 3.0, 6.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius three slash one', (tester) async {
+      const html = '<span style="border-radius: 1px 3px 4px / 2px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 2.0, 3.0, 2.0, 4.0, 2.0, 3.0, 2.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius three slash two', (tester) async {
+      const html =
+          '<span style="border-radius: 1px 3px 4px / 2px 5px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 2.0, 3.0, 5.0, 4.0, 2.0, 3.0, 5.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius three slash three', (tester) async {
+      const html =
+          '<span style="border-radius: 1px 3px 4px / 2px 5px 6px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 2.0, 3.0, 5.0, 4.0, 6.0, 3.0, 5.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius three slash four', (tester) async {
+      const html =
+          '<span style="border-radius: 1px 3px 4px / 2px 5px 6px 7px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 2.0, 3.0, 5.0, 4.0, 6.0, 3.0, 7.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius four slash one', (tester) async {
+      const html =
+          '<span style="border-radius: 1px 3px 4px 5px / 2px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 2.0, 3.0, 2.0, 4.0, 2.0, 5.0, 2.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius four slash two', (tester) async {
+      const html =
+          '<span style="border-radius: 1px 3px 4px 5px / 2px 6px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 2.0, 3.0, 6.0, 4.0, 2.0, 5.0, 6.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius four slash three', (tester) async {
+      const html =
+          '<span style="border-radius: 1px 3px 4px 5px / 2px 6px 7px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 2.0, 3.0, 6.0, 4.0, 7.0, 5.0, 6.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius four slash four', (tester) async {
+      const html =
+          '<span style="border-radius: 1px 3px 4px 5px / 2px 6px 7px 8px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 2.0, 3.0, 6.0, 4.0, 7.0, 5.0, 8.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-top-left-radius one value', (tester) async {
+      const html = '<span style="border-top-left-radius: 1px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-top-left-radius two value', (tester) async {
+      const html = '<span style="border-top-left-radius: 1px 2px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[1.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-top-right-radius one value', (tester) async {
+      const html = '<span style="border-top-right-radius: 1px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-top-right-radius two value', (tester) async {
+      const html = '<span style="border-top-right-radius: 1px 2px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[0.0, 0.0, 1.0, 2.0, 0.0, 0.0, 0.0, 0.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-bottom-right-radius one value', (tester) async {
+      const html = '<span style="border-bottom-right-radius: 1px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-bottom-right-radius two value', (tester) async {
+      const html =
+          '<span style="border-bottom-right-radius: 1px 2px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 0.0, 0.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-bottom-left-radius one value', (tester) async {
+      const html = '<span style="border-bottom-left-radius: 1px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-bottom-left-radius two value', (tester) async {
+      const html =
+          '<span style="border-bottom-left-radius: 1px 2px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+  });
+
   group('box-sizing', () {
     testWidgets('renders without box-sizing', (tester) async {
       const html = '<span style="border: 1px">Foo</span>';
