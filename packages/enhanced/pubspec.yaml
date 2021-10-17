@@ -43,3 +43,7 @@ dev_dependencies:
   lint: any
   mocktail: any
   network_image_mock: any
+
+flutter:
+  assets:
+    - test/images/
