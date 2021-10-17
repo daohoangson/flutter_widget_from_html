@@ -97,8 +97,9 @@ Below tags are the ones that have special meaning / styling, all other tags will
   - TABLE attributes `border`, `cellpadding`, `cellspacing`
   - TD/TH attributes `colspan`, `rowspan`, `valign`
 - ABBR, ACRONYM, ADDRESS, ARTICLE, ASIDE, B, BIG, BLOCKQUOTE, BR, CENTER, CITE, CODE,
-  DD, DEL, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, IMG, INS,
-  KBD, MAIN, NAV, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, STRIKE, STRONG, SUB, SUP, TT, U, VAR
+  DD, DEL, DETAILS, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, INS,
+  KBD, MAIN, MARK, NAV, NOSCRIPT, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, SMALL,
+  STRIKE, STRONG, STYLE, SUB, SUMMARY, SUP, TT, U, VAR
 - Everything with screenshot: https://html-widget-demo.vercel.app/supported/tags.html
 
 These tags requires [flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html):
