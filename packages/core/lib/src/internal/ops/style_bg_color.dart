@@ -27,12 +27,12 @@ class StyleBgColor {
 
           return listOrNull(
             wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
-                  (_, child) => wf.buildDecoratedBox(meta, child, color: color),
+                  (_, child) => wf.buildDecoration(meta, child, color: color),
                 ),
           );
         },
         onWidgetsIsOptional: true,
-        priority: 6100,
+        priority: StyleBorder.kPriorityBoxModel5k + 1,
       );
 
   Color? _parseColor(WidgetFactory wf, BuildMetadata meta) {

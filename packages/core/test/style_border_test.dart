@@ -1028,13 +1028,12 @@ void main() {
         explained,
         equals(
           '[CssBlock:child='
-          '[DecoratedBox:bg=#FFFF0000,child='
-          '[Container:border=1.0@solid#FF001234,child='
+          '[Container:bg=#FFFF0000,border=1.0@solid#FF001234,child='
           '[Column:children='
           '[SizedBox:0.0x12.4],'
           '[CssBlock:child=[RichText:(@15.0+b:Foo)]],'
           '[SizedBox:0.0x12.4]'
-          ']]]]',
+          ']]]',
         ),
       );
     });

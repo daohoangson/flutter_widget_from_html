@@ -140,31 +140,6 @@ class WidgetFactory {
     }
   }
 
-  /// Builds [border] with [Container] or [DecoratedBox].
-  ///
-  /// See https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
-  /// for more information regarding `content-box` (the default)
-  /// and `border-box` (set [isBorderBox] to use).
-  Widget? buildBorder(
-    BuildMetadata meta,
-    Widget child, {
-    BoxBorder? border,
-    BorderRadius? borderRadius,
-    bool isBorderBox = false,
-  }) {
-    if (border == null && borderRadius == null) {
-      return child;
-    }
-
-    final decoration = BoxDecoration(
-      border: border,
-      borderRadius: borderRadius,
-    );
-    return isBorderBox
-        ? DecoratedBox(decoration: decoration, child: child)
-        : Container(decoration: decoration, child: child);
-  }
-
   /// Builds column placeholder.
   WidgetPlaceholder? buildColumnPlaceholder(
     BuildMetadata meta,
@@ -202,16 +177,46 @@ class WidgetFactory {
     );
   }
 
-  /// Builds [DecoratedBox].
-  Widget? buildDecoratedBox(
+  /// Builds [Decoration].
+  ///
+  /// See https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
+  /// for more information regarding `content-box` (the default)
+  /// and `border-box` (set [isBorderBox] to use).
+  Widget? buildDecoration(
     BuildMetadata meta,
     Widget child, {
+    BoxBorder? border,
+    BorderRadius? borderRadius,
     Color? color,
-  }) =>
-      DecoratedBox(
-        decoration: BoxDecoration(color: color),
-        child: child,
+    bool isBorderBox = true,
+  }) {
+    if (border == null && borderRadius == null && color == null) {
+      return child;
+    }
+
+    final container = child is Container ? child : null;
+    final decoratedBox = child is DecoratedBox ? child : null;
+    final prevDeco = container?.decoration ?? decoratedBox?.decoration;
+    final baseDeco =
+        prevDeco is BoxDecoration ? prevDeco : const BoxDecoration();
+    final decoration = baseDeco.copyWith(
+      border: border,
+      borderRadius: borderRadius,
+      color: color,
+    );
+
+    if (!isBorderBox || container != null) {
+      return Container(
+        decoration: decoration,
+        child: container?.child ?? child,
       );
+    } else {
+      return DecoratedBox(
+        decoration: decoration,
+        child: decoratedBox?.child ?? child,
+      );
+    }
+  }
 
   /// Builds 1-pixel-height divider.
   Widget? buildDivider(BuildMetadata meta) => const DecoratedBox(

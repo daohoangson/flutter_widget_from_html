@@ -74,7 +74,7 @@ class StyleBorder {
     final tsh = meta.tsb.build(context);
     final border = cssBorder.getBorder(tsh);
     final borderRadius = cssBorder.getBorderRadius(tsh);
-    return wf.buildBorder(
+    return wf.buildDecoration(
       meta,
       child,
       border: border,
