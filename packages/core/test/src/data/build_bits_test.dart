@@ -84,12 +84,6 @@ void main() {
         expect(explained, equals('[RichText:(:1 2(null) 3)]'));
       });
 
-      testWidgets('returns BuildTree', (WidgetTester tester) async {
-        const html = '1 <span class="output--BuildTree">2</span> 3';
-        final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:1 2 foo bar 3)]'));
-      });
-
       group('returns GestureRecognizer', () {
         const clazz = 'output--GestureRecognizer';
 
@@ -299,16 +293,6 @@ void main() {
         expect(widgets.length, equals(1));
       });
     });
-
-    test('replaces', () {
-      final text = _text();
-      text.addText('1');
-      text.addText('3');
-      expect(_data(text), equals('13'));
-
-      text.replaceWith(TextBit(text, '2'));
-      expect(_data(text), equals('2'));
-    });
   });
 
   group('copyWith', () {
@@ -413,6 +397,7 @@ void main() {
     text22.addNewLine();
     text2.addText('(2.3)');
     text.add(WidgetBit.inline(text, const Text('Hi')));
+    text.add(_CircularBit(text));
 
     expect(
       helper.simplifyHashCode(text.toString()),
@@ -427,7 +412,8 @@ void main() {
         '      "(2.2.2)"\n'
         '      ASCII-10\n'
         '    "(2.3)"\n'
-        '  WidgetBit.inline#7 WidgetPlaceholder(Text("Hi"))',
+        '  WidgetBit.inline#7 WidgetPlaceholder(Text("Hi"))\n'
+        '  BuildTree#0 (circular)',
       ),
     );
   });
@@ -449,8 +435,9 @@ class _BuildBitWidgetFactory extends WidgetFactory {
     if (classes.contains('input--GestureRecognizer')) {
       meta.register(
         BuildOp(
-          onTree: (_, tree) =>
+          onTreeFlattening: (_, tree) =>
               tree.add(_InputGestureRecognizerBit(tree, tree.tsb)),
+          priority: BuildOp.kPriorityMax,
         ),
       );
     }
@@ -471,20 +458,12 @@ class _BuildBitWidgetFactory extends WidgetFactory {
       );
     }
 
-    if (classes.contains('output--BuildTree')) {
-      meta.register(
-        BuildOp(
-          onTree: (_, tree) => tree.add(_OutputBuildTreeBit(tree, tree.tsb)),
-        ),
-      );
-    }
-
     if (classes.contains('output--GestureRecognizer')) {
       meta.register(
         BuildOp(
-          onTree: (_, tree) =>
+          onTreeFlattening: (_, tree) =>
               tree.add(_OutputGestureRecognizerBit(tree, tree.tsb)),
-          priority: 9999,
+          priority: BuildOp.kPriorityMax,
         ),
       );
     }
@@ -579,25 +558,6 @@ class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {
       _InputTextStyleHtmlBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _OutputBuildTreeBit extends BuildBit<void, BuildTree> {
-  final BuildTree tree;
-
-  _OutputBuildTreeBit(BuildTree parent, TextStyleBuilder tsb)
-      : tree = parent.sub(tsb: tsb)
-          ..addWhitespace(' ')
-          ..addText('foo')
-          ..addWhitespace(' ')
-          ..addText('bar'),
-        super(parent, tsb);
-
-  @override
-  BuildTree buildBit(void _) => tree;
-
-  @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _OutputBuildTreeBit(parent ?? this.parent!, tsb ?? this.tsb);
-}
-
 class _OutputGestureRecognizerBit extends BuildBit<void, GestureRecognizer> {
   const _OutputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
@@ -662,3 +622,17 @@ BuildTree _text() => builder.BuildTree(
       ),
       wf: WidgetFactory(),
     );
+
+class _CircularBit extends BuildTree {
+  _CircularBit(BuildTree parent) : super(parent, parent.tsb);
+
+  @override
+  Iterable<WidgetPlaceholder> build() => throw UnimplementedError();
+
+  @override
+  BuildTree sub({BuildTree? parent, TextStyleBuilder? tsb}) =>
+      throw UnimplementedError();
+
+  @override
+  String toString() => parent.toString();
+}

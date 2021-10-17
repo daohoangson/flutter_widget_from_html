@@ -54,7 +54,10 @@ class _AudioPlayerState extends State<AudioPlayer> {
     _player = lib.AudioPlayer();
     _processingStateStreamSub =
         _player.processingStateStream.listen((processingState) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
+
       if (processingState == lib.ProcessingState.completed) {
         _player.pause();
         _player.seek(Duration.zero);
@@ -195,7 +198,10 @@ class _PositionText extends StatelessWidget {
       );
 
   String _secondsToString(int value) {
-    if (value < 0) return '0:00';
+    if (value < 0) {
+      return '0:00';
+    }
+
     final m = value ~/ 60;
     final s = value % 60;
     return '$m:${s.toString().padLeft(2, '0')}';
@@ -221,7 +227,9 @@ class _PositionSlider extends StatelessWidget {
         builder: (_, duration) => StreamBuilder<Duration>(
           builder: (_, position) {
             final max = duration.data?.inMilliseconds.toDouble();
-            if (max == null) return widget0;
+            if (max == null) {
+              return widget0;
+            }
 
             final value = position.data?.inMilliseconds.toDouble() ?? 0.0;
 

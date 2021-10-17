@@ -183,7 +183,10 @@ class _GoldensState extends State<GoldensScreen> {
 
   Future<void> _onFilter() async {
     final query = _filter.text;
-    if (query.isEmpty) return setState(() => _filtered = null);
+    if (query.isEmpty) {
+      setState(() => _filtered = null);
+      return;
+    }
 
     final lowerCased = query.toLowerCase();
     final goldens = await _goldens;

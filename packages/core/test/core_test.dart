@@ -950,8 +950,8 @@ Future<void> main() async {
 
     testWidgets('renders display: inline-block', (WidgetTester tester) async {
       const html = '<div>1 <div style="display: inline-block">2</div></div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[CssBlock:child=[RichText:(:1 2)]]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[CssBlock:child=[RichText:(:1 [RichText:(:2)])]]'));
     });
 
     testWidgets('renders display: none', (WidgetTester tester) async {

@@ -130,10 +130,15 @@ class TextStyleBuilder<T1> {
       _output = null;
     }
 
-    if (_output != null) return _output!;
+    if (_output != null) {
+      return _output!;
+    }
 
-    // ignore: unnecessary_null_checks
-    if (_builders == null) return _output = _parentOutput!;
+    if (_builders == null) {
+      // TODO: remove lint ignore
+      // ignore: unnecessary_null_checks
+      return _output = _parentOutput!;
+    }
 
     _output = _parentOutput?.copyWith(parent: _parentOutput);
     final l = _builders!.length;
@@ -148,7 +153,9 @@ class TextStyleBuilder<T1> {
 
   /// Returns `true` if this shares same styling with [other].
   bool hasSameStyleWith(TextStyleBuilder? other) {
-    if (other == null) return false;
+    if (other == null) {
+      return false;
+    }
     TextStyleBuilder thisWithBuilder = this;
     while (thisWithBuilder._builders == null) {
       final thisParent = thisWithBuilder.parent;

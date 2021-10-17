@@ -60,8 +60,7 @@ void main() {
           equals(
             'TshWidget\n'
             '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
-            ' │  BuildTree#2 tsb#3(parent=#1):\n'
-            ' │    WidgetBit.inline#4 WidgetPlaceholder(Text("hi"))\n'
+            ' │  WidgetBit.inline#2 WidgetPlaceholder(Text("hi"))\n'
             ' │)\n'
             ' └WidgetPlaceholder<Widget>(Text)\n'
             '  └Text("hi")\n'
@@ -152,8 +151,10 @@ class _BuildOpOnTreeWidget extends WidgetFactory {
   void parse(BuildMetadata meta) {
     meta.register(
       BuildOp(
-        onTree: (_, tree) =>
-            tree.replaceWith(WidgetBit.inline(tree, const Text('hi'))),
+        onTree: (_, tree) {
+          WidgetBit.inline(tree.parent!, const Text('hi')).insertBefore(tree);
+          tree.detach();
+        },
       ),
     );
     return super.parse(meta);

@@ -18,18 +18,22 @@ class StyleVerticalAlign {
   StyleVerticalAlign(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTree: (meta, tree) {
-          if (meta.willBuildSubtree == true) return;
-
+        onTreeFlattening: (meta, tree) {
           final v = meta[kCssVerticalAlign]?.term;
-          if (v == null || v == kCssVerticalAlignBaseline) return;
+          if (v == null || v == kCssVerticalAlignBaseline) {
+            return;
+          }
 
           final alignment = _tryParsePlaceholderAlignment(v);
-          if (alignment == null) return;
+          if (alignment == null) {
+            return;
+          }
 
           _skipBuilding[meta] = true;
           final built = _buildTree(meta, tree);
-          if (built == null) return;
+          if (built == null) {
+            return;
+          }
 
           if (v == kCssVerticalAlignSub || v == kCssVerticalAlignSuper) {
             built.wrapWith(
@@ -45,7 +49,9 @@ class StyleVerticalAlign {
             );
           }
 
-          tree.replaceWith(WidgetBit.inline(tree, built, alignment: alignment));
+          WidgetBit.inline(tree.parent!, built, alignment: alignment)
+              .insertBefore(tree);
+          tree.detach();
         },
         onWidgets: (meta, widgets) {
           if (_skipBuilding[meta] == true || widgets.isEmpty) {
@@ -53,9 +59,10 @@ class StyleVerticalAlign {
           }
 
           final v = meta[kCssVerticalAlign]?.term;
-          if (v == null) return widgets;
+          if (v == null) {
+            return widgets;
+          }
 
-          _skipBuilding[meta] = true;
           return listOrNull(
             wf
                 .buildColumnPlaceholder(meta, widgets)
@@ -63,7 +70,10 @@ class StyleVerticalAlign {
               final tsh = meta.tsb.build(context);
               final alignment =
                   _tryParseAlignmentGeometry(tsh.textDirection, v);
-              if (alignment == null) return child;
+              if (alignment == null) {
+                return child;
+              }
+
               return wf.buildAlign(meta, child, alignment);
             }),
           );
@@ -95,7 +105,9 @@ class StyleVerticalAlign {
   ) {
     final tsh = meta.tsb.build(context);
     final fontSize = tsh.style.fontSize;
-    if (fontSize == null) return child;
+    if (fontSize == null) {
+      return child;
+    }
 
     final withPadding = wf.buildPadding(
       meta,
@@ -105,7 +117,9 @@ class StyleVerticalAlign {
         top: fontSize * padding.top,
       ),
     );
-    if (withPadding == null) return child;
+    if (withPadding == null) {
+      return child;
+    }
 
     return wf.buildAlign(
       meta,

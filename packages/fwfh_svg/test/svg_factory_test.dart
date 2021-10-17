@@ -12,7 +12,7 @@ void main() {
   const sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
 
   setUpAll(() {
-    registerFallbackValue<Uri>(Uri());
+    registerFallbackValue(Uri());
   });
 
   testWidgets('renders SVG tag', (WidgetTester tester) async {

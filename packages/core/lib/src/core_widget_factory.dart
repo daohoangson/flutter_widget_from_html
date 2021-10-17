@@ -23,12 +23,14 @@ class WidgetFactory {
   /// Defaults to `false`, resulting in a [CircularProgressIndicator].
   static bool debugDeterministicLoadingWidget = false;
 
+  final flatteners = <Flattener>[];
+
   late AnchorRegistry _anchorRegistry;
-  late final Flattener _flattener;
 
   BuildOp? _styleBgColor;
-  BuildOp? _styleBlock;
   BuildOp? _styleBorder;
+  BuildOp? _styleDisplayBlock;
+  BuildOp? _styleDisplayInlineBlock;
   BuildOp? _styleDisplayNone;
   BuildOp? _styleMargin;
   BuildOp? _stylePadding;
@@ -45,10 +47,6 @@ class WidgetFactory {
   BuildOp? _tagQ;
   TextStyleHtml Function(TextStyleHtml, css.Expression)? _tsbLineHeight;
   HtmlWidget? _widget;
-
-  WidgetFactory() {
-    _flattener = Flattener(this);
-  }
 
   /// Builds [Align].
   Widget? buildAlign(
@@ -142,34 +140,17 @@ class WidgetFactory {
     }
   }
 
-  /// Builds [border] with [Container] or [DecoratedBox].
-  ///
-  /// See https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
-  /// for more information regarding `content-box` (the default)
-  /// and `border-box` (set [isBorderBox] to use).
-  Widget? buildBorder(
-    BuildMetadata meta,
-    Widget child,
-    BoxBorder border, {
-    bool isBorderBox = false,
-  }) =>
-      isBorderBox
-          ? DecoratedBox(
-              decoration: BoxDecoration(border: border),
-              child: child,
-            )
-          : Container(
-              decoration: BoxDecoration(border: border),
-              child: child,
-            );
-
   /// Builds column placeholder.
   WidgetPlaceholder? buildColumnPlaceholder(
     BuildMetadata meta,
     Iterable<WidgetPlaceholder> children,
   ) {
-    if (children.isEmpty) return null;
-    if (children.length == 1) return children.first;
+    if (children.isEmpty) {
+      return null;
+    }
+    if (children.length == 1) {
+      return children.first;
+    }
 
     return ColumnPlaceholder(
       children: children,
@@ -184,7 +165,9 @@ class WidgetFactory {
     List<Widget> children, {
     TextDirection? dir,
   }) {
-    if (children.length == 1) return children.first;
+    if (children.length == 1) {
+      return children.first;
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,16 +177,46 @@ class WidgetFactory {
     );
   }
 
-  /// Builds [DecoratedBox].
-  Widget? buildDecoratedBox(
+  /// Builds [Decoration].
+  ///
+  /// See https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
+  /// for more information regarding `content-box` (the default)
+  /// and `border-box` (set [isBorderBox] to use).
+  Widget? buildDecoration(
     BuildMetadata meta,
     Widget child, {
+    BoxBorder? border,
+    BorderRadius? borderRadius,
     Color? color,
-  }) =>
-      DecoratedBox(
-        decoration: BoxDecoration(color: color),
-        child: child,
+    bool isBorderBox = true,
+  }) {
+    if (border == null && borderRadius == null && color == null) {
+      return child;
+    }
+
+    final container = child is Container ? child : null;
+    final decoratedBox = child is DecoratedBox ? child : null;
+    final prevDeco = container?.decoration ?? decoratedBox?.decoration;
+    final baseDeco =
+        prevDeco is BoxDecoration ? prevDeco : const BoxDecoration();
+    final decoration = baseDeco.copyWith(
+      border: border,
+      borderRadius: borderRadius,
+      color: color,
+    );
+
+    if (!isBorderBox || container != null) {
+      return Container(
+        decoration: decoration,
+        child: container?.child ?? child,
       );
+    } else {
+      return DecoratedBox(
+        decoration: decoration,
+        child: decoratedBox?.child ?? child,
+      );
+    }
+  }
 
   /// Builds 1-pixel-height divider.
   Widget? buildDivider(BuildMetadata meta) => const DecoratedBox(
@@ -229,7 +242,9 @@ class WidgetFactory {
   /// Builds image widget from an [ImageMetadata].
   Widget? buildImage(BuildMetadata meta, ImageMetadata data) {
     final src = data.sources.isNotEmpty ? data.sources.first : null;
-    if (src == null) return null;
+    if (src == null) {
+      return null;
+    }
 
     var built = buildImageWidget(meta, src);
 
@@ -260,7 +275,7 @@ class WidgetFactory {
   Widget? buildImageWidget(BuildMetadata meta, ImageSource src) {
     final url = src.url;
 
-    late final ImageProvider? provider;
+    ImageProvider? provider;
     if (url.startsWith('asset:')) {
       provider = imageProviderFromAsset(url);
     } else if (url.startsWith('data:image/')) {
@@ -270,7 +285,9 @@ class WidgetFactory {
     } else {
       provider = imageProviderFromNetwork(url);
     }
-    if (provider == null) return null;
+    if (provider == null) {
+      return null;
+    }
 
     final image = src.image;
     final semanticLabel = image?.alt ?? image?.title;
@@ -349,8 +366,12 @@ class WidgetFactory {
     String? text,
   }) {
     if (text?.isEmpty == true) {
-      if (children?.isEmpty == true) return null;
-      if (children?.length == 1) return children!.first;
+      if (children?.isEmpty == true) {
+        return null;
+      }
+      if (children?.length == 1) {
+        return children!.first;
+      }
     }
 
     return TextSpan(
@@ -369,14 +390,23 @@ class WidgetFactory {
   /// Called when the [HtmlWidget]'s state is disposed.
   @mustCallSuper
   void dispose() {
-    _flattener.dispose();
+    _dispose();
+  }
+
+  void _dispose() {
+    for (final f in flatteners) {
+      f.dispose();
+    }
+    flatteners.clear();
   }
 
   /// Flattens a [BuildTree] into widgets.
   Iterable<WidgetPlaceholder> flatten(BuildMetadata meta, BuildTree tree) {
     final widgets = <WidgetPlaceholder>[];
+    final instance = Flattener(this);
+    flatteners.add(instance);
 
-    for (final flattened in _flattener.flatten(tree)) {
+    for (final flattened in instance.flatten(tree)) {
       if (flattened.widget != null) {
         widgets.add(WidgetPlaceholder.lazy(flattened.widget!));
         continue;
@@ -390,18 +420,20 @@ class WidgetFactory {
         continue;
       }
 
-      if (flattened.spanBuilder == null) continue;
+      if (flattened.spanBuilder == null) {
+        continue;
+      }
       widgets.add(
         WidgetPlaceholder<BuildTree>(tree).wrapWith((context, _) {
           final tsh = tree.tsb.build(context);
           final span = flattened.spanBuilder!(context, tsh.whitespace);
-          if (span == null || span is! InlineSpan) return widget0;
+          if (span == null || span is! InlineSpan) {
+            return widget0;
+          }
 
           final textAlign = tsh.textAlign ?? TextAlign.start;
 
-          if (span is WidgetSpan &&
-              span.alignment == PlaceholderAlignment.baseline &&
-              textAlign == TextAlign.start) {
+          if (span is WidgetSpan && textAlign == TextAlign.start) {
             return span.child;
           }
 
@@ -508,7 +540,9 @@ class WidgetFactory {
   ImageProvider? imageProviderFromAsset(String url) {
     final uri = Uri.parse(url);
     final assetName = uri.path;
-    if (assetName.isEmpty) return null;
+    if (assetName.isEmpty) {
+      return null;
+    }
 
     final package = uri.queryParameters.containsKey('package') == true
         ? uri.queryParameters['package']
@@ -520,7 +554,9 @@ class WidgetFactory {
   /// Returns a [MemoryImage].
   ImageProvider? imageProviderFromDataUri(String dataUri) {
     final bytes = bytesFromDataUri(dataUri);
-    if (bytes == null) return null;
+    if (bytes == null) {
+      return null;
+    }
 
     return MemoryImage(bytes);
   }
@@ -528,7 +564,9 @@ class WidgetFactory {
   /// Returns a [FileImage].
   ImageProvider? imageProviderFromFileUri(String url) {
     final filePath = Uri.parse(url).toFilePath();
-    if (filePath.isEmpty) return null;
+    if (filePath.isEmpty) {
+      return null;
+    }
 
     return fileImageProvider(filePath);
   }
@@ -549,7 +587,9 @@ class WidgetFactory {
     final callback = _widget?.onErrorBuilder;
     if (callback != null) {
       final result = callback(context, meta.element, error);
-      if (result != null) return result;
+      if (result != null) {
+        return result;
+      }
     }
 
     final image = data is ImageSource ? data.image : null;
@@ -570,7 +610,9 @@ class WidgetFactory {
     final callback = _widget?.onLoadingBuilder;
     if (callback != null) {
       final result = callback(context, meta.element, loadingProgress);
-      if (result != null) return result;
+      if (result != null) {
+        return result;
+      }
     }
 
     return Center(
@@ -603,13 +645,17 @@ class WidgetFactory {
   /// Handles user tapping a link.
   Future<bool> onTapUrl(String url) async {
     final handledViaCallback = await onTapCallback(url);
-    if (handledViaCallback) return true;
+    if (handledViaCallback) {
+      return true;
+    }
 
     if (url.startsWith('#')) {
       final id = url.substring(1);
       final handledViaAnchor =
           await onTapAnchor(id, _anchorRegistry.ensureVisible);
-      if (handledViaAnchor) return true;
+      if (handledViaAnchor) {
+        return true;
+      }
     }
 
     return false;
@@ -633,7 +679,9 @@ class WidgetFactory {
         );
 
         final name = attrs[kAttributeAName];
-        if (name != null) meta.register(_anchorOp(name));
+        if (name != null) {
+          meta.register(_anchorOp(name));
+        }
         break;
 
       case 'abbr':
@@ -925,7 +973,9 @@ class WidgetFactory {
 
       case kCssColor:
         final color = tryParseColor(style.value);
-        if (color != null) meta.tsb.enqueue(TextStyleOps.color, color);
+        if (color != null) {
+          meta.tsb.enqueue(TextStyleOps.color, color);
+        }
         break;
 
       case kCssDirection:
@@ -977,7 +1027,9 @@ class WidgetFactory {
       case kCssMaxLines:
       case kCssMaxLinesWebkitLineClamp:
         final maxLines = tryParseMaxLines(style.value);
-        if (maxLines != null) meta.maxLines = maxLines;
+        if (maxLines != null) {
+          meta.maxLines = maxLines;
+        }
         break;
 
       case kCssTextAlign:
@@ -999,7 +1051,9 @@ class WidgetFactory {
 
       case kCssTextOverflow:
         final textOverflow = tryParseTextOverflow(style.value);
-        if (textOverflow != null) meta.overflow = textOverflow;
+        if (textOverflow != null) {
+          meta.overflow = textOverflow;
+        }
         break;
 
       case kCssVerticalAlign:
@@ -1037,19 +1091,32 @@ class WidgetFactory {
   void parseStyleDisplay(BuildMetadata meta, String? value) {
     switch (value) {
       case kCssDisplayBlock:
-        _styleBlock ??= DisplayBlockOp(this);
-        meta.register(_styleBlock!);
+        final displayBlock = _styleDisplayBlock ??= DisplayBlockOp(this);
+        meta.register(displayBlock);
+        break;
+      case kCssDisplayInlineBlock:
+        final displayInlineBlock = _styleDisplayInlineBlock ??= BuildOp(
+          onTree: (meta, tree) {
+            final built = buildColumnPlaceholder(meta, tree.build());
+            if (built != null) {
+              WidgetBit.inline(
+                tree.parent!,
+                built,
+                alignment: PlaceholderAlignment.baseline,
+              ).insertBefore(tree);
+            }
+            tree.detach();
+          },
+          priority: BuildOp.kPriorityMax,
+        );
+        meta.register(displayInlineBlock);
         break;
       case kCssDisplayNone:
-        _styleDisplayNone ??= BuildOp(
-          onTree: (_, tree) {
-            for (final bit in tree.bits.toList(growable: false)) {
-              bit.detach();
-            }
-          },
-          priority: 0,
+        final displayNone = _styleDisplayNone ??= BuildOp(
+          onTree: (_, tree) => tree.detach(),
+          priority: BuildOp.kPriorityMax,
         );
-        meta.register(_styleDisplayNone!);
+        meta.register(displayNone);
         break;
       case kCssDisplayTable:
         meta.register(TagTable(this, meta).op);
@@ -1060,8 +1127,9 @@ class WidgetFactory {
   /// Resets for a new build.
   @mustCallSuper
   void reset(State state) {
+    _dispose();
+
     _anchorRegistry = AnchorRegistry();
-    _flattener.reset();
 
     final widget = state.widget;
     _widget = widget is HtmlWidget ? widget : null;
@@ -1069,15 +1137,25 @@ class WidgetFactory {
 
   /// Resolves full URL with [HtmlWidget.baseUrl] if available.
   String? urlFull(String url) {
-    if (url.isEmpty) return null;
-    if (url.startsWith('data:')) return url;
+    if (url.isEmpty) {
+      return null;
+    }
+    if (url.startsWith('data:')) {
+      return url;
+    }
 
     final uri = Uri.tryParse(url);
-    if (uri == null) return null;
-    if (uri.hasScheme) return url;
+    if (uri == null) {
+      return null;
+    }
+    if (uri.hasScheme) {
+      return url;
+    }
 
     final baseUrl = _widget?.baseUrl;
-    if (baseUrl == null) return null;
+    if (baseUrl == null) {
+      return null;
+    }
 
     return baseUrl.resolveUri(uri).toString();
   }
@@ -1089,9 +1167,8 @@ class WidgetFactory {
       onTree: (meta, tree) {
         _anchorRegistry.register(id, anchor);
         tree.registerAnchor(anchor);
-
-        if (meta.willBuildSubtree == true) return;
-
+      },
+      onTreeFlattening: (meta, tree) {
         final widget = WidgetPlaceholder('#$id').wrapWith(
           (context, _) => SizedBox(
             height: meta.tsb.build(context).style.fontSize,
@@ -1102,15 +1179,23 @@ class WidgetFactory {
         final bit = tree.first;
         if (bit == null) {
           // most likely an A[name]
-          tree.add(WidgetBit.inline(tree, widget));
+          tree.add(
+            WidgetBit.inline(
+              tree,
+              widget,
+              alignment: PlaceholderAlignment.baseline,
+            ),
+          );
         } else {
           // most likely a SPAN[id]
-          WidgetBit.inline(bit.parent!, widget).insertBefore(bit);
+          WidgetBit.inline(
+            bit.parent!,
+            widget,
+            alignment: PlaceholderAlignment.baseline,
+          ).insertBefore(bit);
         }
       },
       onWidgets: (meta, widgets) {
-        if (meta.willBuildSubtree == false) return widgets;
-
         return listOrNull(
           buildColumnPlaceholder(meta, widgets)?.wrapWith(
             (context, child) => SizedBox(key: anchor, child: child),
@@ -1118,6 +1203,7 @@ class WidgetFactory {
         );
       },
       onWidgetsIsOptional: true,
+      priority: BuildOp.kPriorityMax,
     );
   }
 }

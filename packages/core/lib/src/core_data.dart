@@ -36,23 +36,15 @@ abstract class BuildMetadata {
   /// - Attribute `style` of [domElement]
   List<css.Declaration> get styles;
 
-  /// Returns `true` if subtree will be built.
-  ///
-  /// May returns `null` if metadata is still being collected.
-  /// There are a few things that may trigger subtree building:
-  /// - Some [BuildOp] has a mandatory `onWidgets` callback
-  /// - Inline style `display: block`
-  ///
-  /// See [BuildOp.onWidgetsIsOptional].
-  bool? get willBuildSubtree;
-
   /// Adds an inline style.
   void operator []=(String key, String value);
 
   /// Gets a styling declaration by `property`.
   css.Declaration? operator [](String key) {
     for (final style in styles.reversed) {
-      if (style.property == key) return style;
+      if (style.property == key) {
+        return style;
+      }
     }
     return null;
   }
@@ -111,6 +103,9 @@ class BuildOp {
   /// The callback that will be called when child elements have been processed.
   final void Function(BuildMetadata meta, BuildTree tree)? onTree;
 
+  /// The callback that will be called before flattening.
+  final void Function(BuildMetadata meta, BuildTree tree)? onTreeFlattening;
+
   /// The callback that will be called when child elements have been built.
   ///
   /// Note: only works if it's a block element.
@@ -129,6 +124,7 @@ class BuildOp {
     this.defaultStyles,
     this.onChild,
     this.onTree,
+    this.onTreeFlattening,
     this.onWidgets,
     this.onWidgetsIsOptional = false,
     this.priority = 10,

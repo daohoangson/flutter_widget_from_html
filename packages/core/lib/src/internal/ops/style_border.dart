@@ -14,10 +14,15 @@ class StyleBorder {
   StyleBorder(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTree: (meta, tree) {
-          if (meta.willBuildSubtree == true) return;
+        onTreeFlattening: (meta, tree) {
+          if (_skipBuilding[meta] == true) {
+            return;
+          }
+
           final border = tryParseBorder(meta);
-          if (border.isNone) return;
+          if (border.isNoOp) {
+            return;
+          }
 
           _skipBuilding[meta] = true;
           final copied = tree.copyWith() as BuildTree;
@@ -26,18 +31,27 @@ class StyleBorder {
                     (context, child) =>
                         _buildBorder(meta, context, child, border),
                   );
-          if (built == null) return;
+          if (built == null) {
+            return;
+          }
 
-          tree.replaceWith(WidgetBit.inline(tree, built));
+          WidgetBit.inline(
+            tree.parent!,
+            built,
+            alignment: PlaceholderAlignment.baseline,
+          ).insertBefore(tree);
+          tree.detach();
         },
         onWidgets: (meta, widgets) {
           if (_skipBuilding[meta] == true || widgets.isEmpty) {
             return widgets;
           }
-          final border = tryParseBorder(meta);
-          if (border.isNone) return widgets;
 
-          _skipBuilding[meta] = true;
+          final border = tryParseBorder(meta);
+          if (border.isNoOp) {
+            return widgets;
+          }
+
           return [
             WidgetPlaceholder(
               border,
@@ -55,16 +69,16 @@ class StyleBorder {
     BuildMetadata meta,
     BuildContext context,
     Widget child,
-    CssBorder border,
+    CssBorder cssBorder,
   ) {
     final tsh = meta.tsb.build(context);
-    final borderValue = border.getValue(tsh);
-    if (borderValue == null) return child;
-
-    return wf.buildBorder(
+    final border = cssBorder.getBorder(tsh);
+    final borderRadius = cssBorder.getBorderRadius(tsh);
+    return wf.buildDecoration(
       meta,
       child,
-      borderValue,
+      border: border,
+      borderRadius: borderRadius,
       isBorderBox: meta[kCssBoxSizing]?.term == kCssBoxSizingBorderBox,
     );
   }

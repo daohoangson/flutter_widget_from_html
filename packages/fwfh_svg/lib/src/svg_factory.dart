@@ -43,7 +43,9 @@ mixin SvgFactory on WidgetFactory {
   PictureProvider? imageSvgFromAsset(String url) {
     final uri = Uri.parse(url);
     final assetName = uri.path;
-    if (assetName.isEmpty) return null;
+    if (assetName.isEmpty) {
+      return null;
+    }
 
     return assetPictureProvider(assetName, uri.queryParameters['package']);
   }
@@ -51,7 +53,9 @@ mixin SvgFactory on WidgetFactory {
   /// Returns a [MemoryPicture].
   PictureProvider? imageSvgFromDataUri(String dataUri) {
     final bytes = bytesFromDataUri(dataUri);
-    if (bytes == null) return null;
+    if (bytes == null) {
+      return null;
+    }
 
     return memoryPictureProvider(bytes);
   }
@@ -59,7 +63,9 @@ mixin SvgFactory on WidgetFactory {
   /// Returns a [FilePicture].
   PictureProvider? imageSvgFromFileUri(String url) {
     final filePath = Uri.parse(url).toFilePath();
-    if (filePath.isEmpty) return null;
+    if (filePath.isEmpty) {
+      return null;
+    }
 
     return filePictureProvider(filePath);
   }

@@ -19,7 +19,9 @@ extension DomElementExtension on dom.Element {
   List<css.Declaration> get styles {
     final expando = _expando ??= Expando();
     final existing = expando[this];
-    if (existing != null) return existing;
+    if (existing != null) {
+      return existing;
+    }
 
     if (!attributes.containsKey('style')) {
       return expando[this] = const [];
@@ -47,7 +49,9 @@ extension CssDeclarationExtension on css.Declaration {
   List<css.Expression> get values {
     final expando = _expando ??= Expando();
     final existing = expando[this];
-    if (existing != null) return existing;
+    if (existing != null) {
+      return existing;
+    }
 
     return expando[this] = _ExpressionsCollector.collect(this);
   }
@@ -78,7 +82,9 @@ extension CssFunctionTermExtension on css.FunctionTerm {
   List<css.Expression> get params {
     final expando = _expando ??= Expando();
     final existing = expando[this];
-    if (existing != null) return existing;
+    if (existing != null) {
+      return existing;
+    }
 
     return expando[this] = _ExpressionsCollector.collect(this)
         .where((e) => (e is! css.OperatorComma) && (e is! css.OperatorSlash))

@@ -151,6 +151,11 @@ These tags and their contents will be ignored:
   - border-top, border-right, border-bottom, border-left
   - border-block-start, border-block-end
   - border-inline-start, border-inline-end
+- border-radius: 4, 3, 2 or 1 values with slash support (e.g. `10px / 20px`)
+  - border-top-left-radius: 2 values or 1 value in `em`, `pt` and `px`
+  - border-top-right-radius: 2 values or 1 value in `em`, `pt` and `px`
+  - border-bottom-right-radius: 2 values or 1 value in `em`, `pt` and `px`
+  - border-bottom-left-radius: 2 values or 1 value in `em`, `pt` and `px`
 - box-sizing: border-box/content-box
 - color: hex values, `rgb()`, `hsl()` or named colors
 - direction (similar to `dir` attribute)

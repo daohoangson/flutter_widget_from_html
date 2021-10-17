@@ -399,9 +399,9 @@ void main() {
         equals(
           '[RichText:(:'
           'a'
-          '[SizedBox:5.0x0.0]'
+          '[SizedBox:5.0x0.0]@bottom'
           '(:b)'
-          '[SizedBox:5.0x0.0]'
+          '[SizedBox:5.0x0.0]@bottom'
           '(:c)'
           ')]',
         ),
@@ -416,10 +416,8 @@ void main() {
         equals(
           '[RichText:(:'
           'a'
-          '[SizedBox:5.0x0.0]'
-          '(:b)'
-          '[widget0]'
-          '(:c)'
+          '[SizedBox:5.0x0.0]@bottom'
+          '(:bc)'
           ')]',
         ),
       );
@@ -432,10 +430,8 @@ void main() {
         explained,
         equals(
           '[RichText:(:'
-          'a'
-          '[widget0]'
-          '(:b)'
-          '[SizedBox:5.0x0.0]'
+          'ab'
+          '[SizedBox:5.0x0.0]@bottom'
           '(:c)'
           ')]',
         ),
@@ -450,9 +446,9 @@ void main() {
         equals(
           '[RichText:(:'
           'a'
-          '[SizedBox:5.0x0.0]'
+          '[SizedBox:5.0x0.0]@bottom'
           '(:b)'
-          '[widget0]'
+          '[widget0]@bottom'
           '(:c)'
           ')]',
         ),
@@ -467,9 +463,9 @@ void main() {
         equals(
           '[RichText:(:'
           'a'
-          '[widget0]'
+          '[widget0]@bottom'
           '(:b)'
-          '[SizedBox:5.0x0.0]'
+          '[SizedBox:5.0x0.0]@bottom'
           '(:c)'
           ')]',
         ),
@@ -484,9 +480,9 @@ void main() {
         equals(
           '[RichText:dir=rtl,(:'
           'a'
-          '[widget0]'
+          '[widget0]@bottom'
           '(:b)'
-          '[SizedBox:5.0x0.0]'
+          '[SizedBox:5.0x0.0]@bottom'
           '(:c)'
           ')]',
         ),
@@ -501,9 +497,9 @@ void main() {
         equals(
           '[RichText:dir=rtl,(:'
           'a'
-          '[SizedBox:5.0x0.0]'
+          '[SizedBox:5.0x0.0]@bottom'
           '(:b)'
-          '[widget0]'
+          '[widget0]@bottom'
           '(:c)'
           ')]',
         ),

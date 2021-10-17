@@ -11,6 +11,8 @@ const kTagImg = 'img';
 class TagImg {
   final WidgetFactory wf;
 
+  static final _placeholders = Expando<WidgetPlaceholder<ImageMetadata>>();
+
   TagImg(this.wf);
 
   BuildOp get buildOp => BuildOp(
@@ -37,19 +39,37 @@ class TagImg {
           final built = wf.buildImage(meta, data);
           if (built == null) {
             final imgText = data.alt ?? data.title ?? '';
-            if (imgText.isNotEmpty) tree.addText(imgText);
+            if (imgText.isNotEmpty) {
+              tree.addText(imgText);
+            }
             return;
           }
 
-          final placeholder =
-              WidgetPlaceholder<ImageMetadata>(data, child: built);
+          _placeholders[meta] = WidgetPlaceholder(data, child: built);
+        },
+        onTreeFlattening: (meta, tree) {
+          final placeholder = _placeholders[meta];
+          if (placeholder == null) {
+            return;
+          }
 
-          tree.replaceWith(
-            meta.willBuildSubtree!
-                ? WidgetBit.block(tree, placeholder)
-                : WidgetBit.inline(tree, placeholder),
+          tree.add(
+            WidgetBit.inline(
+              tree,
+              placeholder,
+              alignment: PlaceholderAlignment.baseline,
+            ),
           );
         },
+        onWidgets: (meta, widgets) {
+          final placeholder = _placeholders[meta];
+          if (placeholder == null) {
+            return widgets;
+          }
+
+          return [placeholder];
+        },
+        onWidgetsIsOptional: true,
       );
 
   ImageMetadata _parse(BuildMetadata meta) {
