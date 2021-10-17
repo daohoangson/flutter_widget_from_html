@@ -15,31 +15,31 @@ class HtmlDetails extends StatefulWidget {
 }
 
 class _HtmlDetailsState extends State<HtmlDetails> {
-  var hasSetOpen = false;
-  late bool isOpen;
+  var _hasSetOpen = false;
+  late bool _isOpen;
 
   @override
   void initState() {
     super.initState();
-    isOpen = widget.open;
+    _isOpen = widget.open;
   }
 
   @override
   void didUpdateWidget(HtmlDetails oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (!hasSetOpen) {
-      isOpen = widget.open;
+    if (!_hasSetOpen) {
+      _isOpen = widget.open;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return _HtmlDetailsInherited(
-      isOpen: isOpen,
+      isOpen: _isOpen,
       setIsOpen: (v) => setState(() {
-        isOpen = v;
-        hasSetOpen = true;
+        _isOpen = v;
+        _hasSetOpen = true;
       }),
       child: widget.child,
     );
