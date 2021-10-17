@@ -1093,7 +1093,7 @@ void main() {
     });
   });
 
-  group('invalid values', () {
+  group('error handling', () {
     testWidgets('3 values', (WidgetTester tester) async {
       const html = '<span style="border: a b c">Foo</span>';
       final explained = await explain(tester, html);
@@ -1108,6 +1108,12 @@ void main() {
 
     testWidgets('1 value', (WidgetTester tester) async {
       const html = '<span style="border: a">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('negative value', (WidgetTester tester) async {
+      const html = '<span style="border: -1px">Foo</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });

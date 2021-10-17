@@ -44,7 +44,8 @@ CssBorder _tryParseBorderSide(CssBorder border, css.Declaration style) {
   final expressions = style.values;
   final width =
       expressions.isNotEmpty ? tryParseCssLength(expressions[0]) : null;
-  late final CssBorderSide borderSide;
+  // TODO: use `late final` when https://github.com/dart-lang/coverage/issues/341 is fixed
+  late CssBorderSide borderSide;
   if (width == null || width.number <= 0) {
     borderSide = CssBorderSide.none;
   } else {
