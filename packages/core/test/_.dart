@@ -193,18 +193,14 @@ String simplifyHashCode(String str) {
   });
 }
 
+Finder findText(String data) => _RichTextFinder(data);
+
 Future<int> tapText(WidgetTester tester, String data) async {
-  final candidates = find.byType(RichText).evaluate();
   var tapped = 0;
-  for (final candidate in candidates) {
-    final richText = candidate.widget as RichText;
-    final text = richText.text;
-    if (text is TextSpan) {
-      if (text.text == data) {
-        await tester.tap(find.byWidget(richText));
-        tapped++;
-      }
-    }
+
+  for (final candidate in findText(data).evaluate()) {
+    await tester.tap(find.byWidget(candidate.widget));
+    tapped++;
   }
 
   return tapped;
@@ -711,4 +707,29 @@ class HitTestApp extends StatelessWidget {
           ),
         ),
       );
+}
+
+class _RichTextFinder extends MatchFinder {
+  final String data;
+
+  _RichTextFinder(this.data) : super(skipOffstage: true);
+
+  @override
+  String get description => 'RichText "$data"';
+
+  @override
+  bool matches(Element candidate) {
+    final Widget widget = candidate.widget;
+
+    if (widget is RichText) {
+      final text = widget.text;
+      if (text is TextSpan) {
+        if (text.toPlainText() == data) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
 }

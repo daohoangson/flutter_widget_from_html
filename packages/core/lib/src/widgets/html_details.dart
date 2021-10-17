@@ -12,23 +12,37 @@ class HtmlDetails extends StatefulWidget {
 
   @override
   _HtmlDetailsState createState() => _HtmlDetailsState();
-
-  static ValueNotifier<bool>? _open(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<_HtmlDetailsInherited>()?.open;
 }
 
 class _HtmlDetailsState extends State<HtmlDetails> {
-  late ValueNotifier<bool> open;
+  var hasSetOpen = false;
+  late bool isOpen;
 
   @override
   void initState() {
     super.initState();
-    open = ValueNotifier(widget.open);
+    isOpen = widget.open;
+  }
+
+  @override
+  void didUpdateWidget(HtmlDetails oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (!hasSetOpen) {
+      isOpen = widget.open;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return _HtmlDetailsInherited(open: open, child: widget.child);
+    return _HtmlDetailsInherited(
+      isOpen: isOpen,
+      setIsOpen: (v) => setState(() {
+        isOpen = v;
+        hasSetOpen = true;
+      }),
+      child: widget.child,
+    );
   }
 }
 
@@ -39,13 +53,8 @@ class HtmlDetailsContents extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final open = HtmlDetails._open(context);
-    if (open == null) return child;
-
-    return AnimatedBuilder(
-      animation: open,
-      builder: (_, __) => open.value ? child : const SizedBox.shrink(),
-    );
+    final isOpen = context.htmlDetails?.isOpen ?? true;
+    return isOpen ? child : const SizedBox.shrink();
   }
 }
 
@@ -56,18 +65,17 @@ class HtmlDetailsMarker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final open = HtmlDetails._open(context);
-    if (open == null) return const SizedBox.shrink();
+    final isOpen = context.htmlDetails?.isOpen;
+    if (isOpen == null) {
+      return const SizedBox.shrink();
+    }
 
-    return AnimatedBuilder(
-      animation: open,
-      builder: (_, __) => Text(_getText(context, open.value), style: style),
-    );
+    return Text(_getText(context, isOpen), style: style);
   }
 
-  String _getText(BuildContext context, bool open) {
+  String _getText(BuildContext context, bool isOpen) {
     // TODO: i18n
-    return open ? '▼ ' : '▶ ';
+    return isOpen ? '▼ ' : '▶ ';
   }
 }
 
@@ -85,8 +93,10 @@ class HtmlSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        final open = HtmlDetails._open(context);
-        open?.value = !open.value;
+        final htmlDetails = context.htmlDetails;
+        if (htmlDetails != null) {
+          htmlDetails.setIsOpen(!htmlDetails.isOpen);
+        }
       },
       child: child ?? _buildDefault(context),
     );
@@ -108,15 +118,22 @@ class HtmlSummary extends StatelessWidget {
 }
 
 class _HtmlDetailsInherited extends InheritedWidget {
-  final ValueNotifier<bool> open;
+  final bool isOpen;
+  final void Function(bool) setIsOpen;
 
   const _HtmlDetailsInherited({
     required Widget child,
     Key? key,
-    required this.open,
+    required this.isOpen,
+    required this.setIsOpen,
   }) : super(key: key, child: child);
 
   @override
   bool updateShouldNotify(_HtmlDetailsInherited oldWidget) =>
-      open != oldWidget.open;
+      isOpen != oldWidget.isOpen;
+}
+
+extension _BuildContext on BuildContext {
+  _HtmlDetailsInherited? get htmlDetails =>
+      dependOnInheritedWidgetOfExactType<_HtmlDetailsInherited>();
 }

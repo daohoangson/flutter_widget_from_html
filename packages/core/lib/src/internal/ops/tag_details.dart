@@ -18,10 +18,12 @@ class TagDetails {
 
     _summaryOp = BuildOp(
       onTree: (meta, tree) {
-        final bits = tree.bits;
-        if (bits.isEmpty) return;
+        final children = tree.directChildren;
+        if (children.isEmpty) {
+          return;
+        }
 
-        final first = bits.first;
+        final first = children.first;
         final marker = WidgetBit.inline(
           first.parent!,
           WidgetPlaceholder(meta).wrapWith((context, child) {
@@ -32,20 +34,29 @@ class TagDetails {
         marker.insertBefore(first);
       },
       onWidgets: (meta, widgets) {
-        if (_summary != null) return widgets;
+        if (_summary != null) {
+          return widgets;
+        }
 
         _summary = wf.buildColumnPlaceholder(meta, widgets);
-        if (_summary == null) return widgets;
+        if (_summary == null) {
+          return widgets;
+        }
 
         return const [];
       },
+      priority: BuildOp.kPriorityMax,
     );
   }
 
   void onChild(BuildMetadata childMeta) {
     final e = childMeta.element;
-    if (e.parent != detailsMeta.element) return;
-    if (e.localName != kTagSummary) return;
+    if (e.parent != detailsMeta.element) {
+      return;
+    }
+    if (e.localName != kTagSummary) {
+      return;
+    }
 
     childMeta.register(_summaryOp);
   }
