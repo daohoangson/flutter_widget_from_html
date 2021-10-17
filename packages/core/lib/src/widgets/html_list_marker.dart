@@ -11,6 +11,13 @@ class HtmlListMarker extends SingleChildRenderObjectWidget {
   /// The [TextStyle] to apply to this marker.
   final TextStyle textStyle;
 
+  /// Creates a marker.
+  const HtmlListMarker({
+    required this.markerType,
+    required this.textStyle,
+    Key? key,
+  }) : super(key: key);
+
   /// Creates a circle marker.
   const HtmlListMarker.circle(this.textStyle, {Key? key})
       : markerType = HtmlListMarkerType.circle,
@@ -45,6 +52,10 @@ class HtmlListMarker extends SingleChildRenderObjectWidget {
         return '[HtmlListMarker.circle]';
       case HtmlListMarkerType.disc:
         return '[HtmlListMarker.disc]';
+      case HtmlListMarkerType.disclosureClosed:
+        return '[HtmlListMarker.disclosureClosed]';
+      case HtmlListMarkerType.disclosureOpen:
+        return '[HtmlListMarker.disclosureOpen]';
       case HtmlListMarkerType.square:
         return '[HtmlListMarker.square]';
     }
@@ -156,6 +167,36 @@ class _ListMarkerRenderObject extends RenderBox {
           Paint()..color = color,
         );
         break;
+      case HtmlListMarkerType.disclosureClosed:
+        final d = radius * 2;
+        canvas
+          ..save()
+          ..translate(center.dx - d / 2, center.dy - d / 2)
+          ..drawPath(
+            Path()
+              ..lineTo(d, d / 2)
+              ..lineTo(0, d),
+            Paint()
+              ..color = color
+              ..style = PaintingStyle.fill,
+          )
+          ..restore();
+        break;
+      case HtmlListMarkerType.disclosureOpen:
+        final d = radius * 2;
+        canvas
+          ..save()
+          ..translate(center.dx - d / 2, center.dy - d / 2)
+          ..drawPath(
+            Path()
+              ..lineTo(d, 0)
+              ..lineTo(d / 2, d),
+            Paint()
+              ..color = color
+              ..style = PaintingStyle.fill,
+          )
+          ..restore();
+        break;
       case HtmlListMarkerType.square:
         canvas.drawRect(
           Rect.fromCircle(center: center, radius: radius * .8),
@@ -178,6 +219,12 @@ enum HtmlListMarkerType {
 
   /// The disc marker type.
   disc,
+
+  /// The disclosure-closed marker type.
+  disclosureClosed,
+
+  /// The disclosure-open marker type.
+  disclosureOpen,
 
   /// The square marker type.
   square,

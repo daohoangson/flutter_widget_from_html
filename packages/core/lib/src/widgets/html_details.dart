@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 
+import 'html_list_marker.dart';
+
 class HtmlDetails extends StatefulWidget {
   final Widget child;
   final bool open;
@@ -70,12 +72,12 @@ class HtmlDetailsMarker extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return Text(_getText(context, isOpen), style: style);
-  }
-
-  String _getText(BuildContext context, bool isOpen) {
-    // TODO: i18n
-    return isOpen ? '▼ ' : '▶ ';
+    return HtmlListMarker(
+      markerType: isOpen
+          ? HtmlListMarkerType.disclosureOpen
+          : HtmlListMarkerType.disclosureClosed,
+      textStyle: style,
+    );
   }
 }
 
