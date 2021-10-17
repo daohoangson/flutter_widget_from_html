@@ -1063,6 +1063,34 @@ void main() {
         ),
       );
     });
+
+    testWidgets('renders border-box with background', (tester) async {
+      const html =
+          '<div style="background: red; border: 1px solid red; box-sizing: border-box">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssBlock:child='
+          '[DecoratedBox:bg=#FFFF0000,border=1.0@solid#FFFF0000,child='
+          '[RichText:(:Foo)]]]',
+        ),
+      );
+    });
+
+    testWidgets('renders content-box with background', (tester) async {
+      const html =
+          '<div style="background: red; border: 1px solid red; box-sizing: content-box">Foo</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssBlock:child='
+          '[Container:bg=#FFFF0000,border=1.0@solid#FFFF0000,child='
+          '[RichText:(:Foo)]]]',
+        ),
+      );
+    });
   });
 
   group('invalid values', () {
