@@ -269,7 +269,33 @@ void main() {
   });
 
   group('radius', () {
-    testWidgets('parses border-radius one value', (WidgetTester tester) async {
+    testWidgets('parses border-radius one value in em', (tester) async {
+      const html = '<span style="border-radius: 1em">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius one value in pt', (tester) async {
+      const html = '<span style="border-radius: 3pt">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'radius=[4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('parses border-radius one value in px', (tester) async {
       const html = '<span style="border-radius: 1px">Foo</span>';
       final explained = await explain(tester, html);
       expect(
