@@ -772,6 +772,10 @@ class WidgetFactory {
           ..register(_tagPre!);
         break;
 
+      case kTagDetails:
+        meta.register(TagDetails(this, meta).op);
+        break;
+
       case 'dd':
         meta
           ..[kCssDisplay] = kCssDisplayBlock
