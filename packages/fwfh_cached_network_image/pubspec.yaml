@@ -23,4 +23,4 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   lint: any
-  mocktail: any
+  mocktail: ^0.2.0
