@@ -1,3 +1,7 @@
+## 0.7.0+1
+
+- Add support for flutter_widget_from_html_core@0.8.0 (#609)
+
 ## 0.7.0
 
 - Add support for error & loading builder (#547, thanks @DFelten)
