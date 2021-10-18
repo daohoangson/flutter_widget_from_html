@@ -1,3 +1,17 @@
+## 0.8.0
+
+- Update for Flutter 2.5 (#587)
+- BREAKING: Change `WidgetBit.inline` default alignment → bottom (#598)
+- BREAKING: Remove `BuildMetadata.willBuildSubtree` (#607)
+- BREAKING: Remove `BuildTree.replaceWith` (#607)
+- BREAKING: Remove `WidgetFactory.buildBorder` (#608)
+- Add support for `DETAILS` tag (#593)
+- Add support for `BuildOp.onTreeFlattening` (#607)
+- Add support for `display: inline-block` (#607)
+- Add support for `border-radius` (#608)
+- Fix bug extra space because of colspan (#600)
+- Fix bug render loop when TABLE's baseline is needed (#604)
+
 ## 0.7.0
 
 - Flutter 2.2
