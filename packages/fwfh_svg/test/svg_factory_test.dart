@@ -1,18 +1,26 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:fwfh_svg/fwfh_svg.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../core/test/_.dart' as core;
 import '_.dart' as helper;
 
-final svgBytes = utf8.encode('<svg viewBox="0 0 1 1"></svg>');
+const redTriangle = '''
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 50 50" width="100" height="100">
+  <path fill="#FF0000" d="M0 100 0 0 100 0"/>
+</svg>''';
+final redTriangleBytes = utf8.encode(redTriangle);
 
-void main() {
+Future<void> main() async {
+  await loadAppFonts();
+
   const sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
 
   setUpAll(() {
@@ -77,7 +85,7 @@ void main() {
       });
 
       testWidgets('renders base64', (WidgetTester tester) async {
-        final base64 = base64Encode(svgBytes);
+        final base64 = base64Encode(redTriangleBytes);
         final html = '<img src="data:image/svg+xml;base64,$base64" />';
         final explained = await explain(tester, html);
         expect(
@@ -184,6 +192,134 @@ void main() {
       });
     });
   });
+
+  final goldenSkip = Platform.isLinux ? null : 'Linux only';
+  GoldenToolkit.runWithConfiguration(
+    () {
+      group(
+        'screenshot testing',
+        () {
+          setUp(() {
+            WidgetFactory.debugDeterministicLoadingWidget = true;
+            PictureProvider.cache.clear();
+          });
+          tearDown(
+            () => WidgetFactory.debugDeterministicLoadingWidget = false,
+          );
+
+          const svg = 'Foo.\n$redTriangle\nBar.';
+          const asset = '''
+Foo.
+<img src="asset:test/images/red_triangle.svg" style="display: block" />
+Bar.''';
+          final file = '''
+Foo.
+<img src="file://${Directory.current.path}/test/images/red_triangle.svg" style="display: block" />
+Bar.''';
+          final memory = '''
+Foo.
+<img src="data:image/svg+xml;base64,${base64Encode(redTriangleBytes)}" style="display: block" />
+Bar.''';
+          const network = '''
+Foo.
+<img src="http://domain.com/red_triangle.svg" style="display: block" />
+Bar.''';
+
+          final testCases = <String, String>{
+            'SVG': svg,
+            'SVG.allow_drawing_outside': svg,
+            'asset': asset,
+            'asset.allow_drawing_outside': asset,
+            'file': file,
+            'file.allow_drawing_outside': file,
+            'memory': memory,
+            'memory.allow_drawing_outside': memory,
+            'network': network,
+            'network.allow_drawing_outside': network,
+          };
+
+          for (final testCase in testCases.entries) {
+            testGoldens(
+              testCase.key,
+              (tester) async {
+                await HttpOverrides.runZoned(
+                  () => tester.runAsync(
+                    () => tester.pumpWidgetBuilder(
+                      _Golden(
+                        testCase.value.trim(),
+                        allowDrawingOutsideViewBox:
+                            testCase.key.contains('allow_drawing_outside'),
+                      ),
+                      wrapper: materialAppWrapper(theme: ThemeData.light()),
+                      surfaceSize: const Size(400, 400),
+                    ),
+                  ),
+                  createHttpClient: (_) => _createMockSvgImageHttpClient(),
+                );
+
+                if (testCase.key.startsWith(RegExp('(file|network)'))) {
+                  await tester.runAsync(
+                      () => Future.delayed(const Duration(milliseconds: 100)));
+                }
+
+                await screenMatchesGolden(tester, testCase.key);
+              },
+              skip: goldenSkip != null,
+            );
+          }
+        },
+        skip: goldenSkip,
+      );
+    },
+    config: GoldenToolkitConfiguration(
+      fileNameFactory: (name) => '${core.kGoldenFilePrefix}/svg/$name.png',
+    ),
+  );
+}
+
+class _Golden extends StatelessWidget {
+  final bool allowDrawingOutsideViewBox;
+
+  final String contents;
+
+  const _Golden(
+    this.contents, {
+    required this.allowDrawingOutsideViewBox,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(contents.replaceAll(
+                RegExp('file://.+/fwfh_svg/'),
+                'file://.../fwfh_svg/',
+              )),
+              const Divider(),
+              HtmlWidget(
+                contents,
+                factoryBuilder: allowDrawingOutsideViewBox
+                    ? () => _GoldenAllowFactory()
+                    : () => _GoldenDisallowFactory(),
+              ),
+            ],
+          ),
+        ),
+      );
+}
+
+class _GoldenAllowFactory extends WidgetFactory with SvgFactory {
+  @override
+  bool get svgAllowDrawingOutsideViewBox => true;
+}
+
+class _GoldenDisallowFactory extends WidgetFactory with SvgFactory {
+  @override
+  bool get svgAllowDrawingOutsideViewBox => false;
 }
 
 class _MockHttpClient extends Mock implements HttpClient {
@@ -209,7 +345,7 @@ HttpClient _createMockSvgImageHttpClient() {
   when(() => request.close()).thenAnswer((_) async => response);
   when(() => response.compressionState)
       .thenReturn(HttpClientResponseCompressionState.notCompressed);
-  when(() => response.contentLength).thenReturn(svgBytes.length);
+  when(() => response.contentLength).thenReturn(redTriangleBytes.length);
   when(() => response.statusCode).thenReturn(HttpStatus.ok);
   when(
     () => response.listen(
@@ -223,7 +359,8 @@ HttpClient _createMockSvgImageHttpClient() {
         invocation.positionalArguments[0] as void Function(List<int>);
     final onDone =
         invocation.namedArguments[const Symbol("onDone")] as Function?;
-    return Stream.fromIterable(<List<int>>[svgBytes]).listen((data) async {
+    return Stream.fromIterable(<List<int>>[redTriangleBytes])
+        .listen((data) async {
       await Future.delayed(const Duration(milliseconds: 10));
       onData(data);
       onDone?.call();
