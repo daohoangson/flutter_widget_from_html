@@ -206,7 +206,7 @@ packages:
       name: flutter_svg
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.21.0+1"
+    version: "0.23.0+1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
