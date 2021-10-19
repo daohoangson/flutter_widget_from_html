@@ -1,9 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-
-import 'internal/platform_specific/fallback.dart'
-    if (dart.library.io) 'internal/platform_specific/io.dart';
 
 /// A mixin that can render SVG with `flutter_svg` plugin.
 mixin SvgFactory on WidgetFactory {
@@ -46,10 +45,12 @@ mixin SvgFactory on WidgetFactory {
       return null;
     }
 
-    return assetPictureProvider(
-      this,
+    return ExactAssetPicture(
+      svgAllowDrawingOutsideViewBox
+          ? SvgPicture.svgStringDecoderOutsideViewBoxBuilder
+          : SvgPicture.svgStringDecoderBuilder,
       assetName,
-      uri.queryParameters['package'],
+      package: uri.queryParameters['package'],
     );
   }
 
@@ -60,7 +61,12 @@ mixin SvgFactory on WidgetFactory {
       return null;
     }
 
-    return memoryPictureProvider(this, bytes);
+    return MemoryPicture(
+      svgAllowDrawingOutsideViewBox
+          ? SvgPicture.svgByteDecoderOutsideViewBoxBuilder
+          : SvgPicture.svgByteDecoderBuilder,
+      bytes,
+    );
   }
 
   /// Returns a [FilePicture].
@@ -70,12 +76,27 @@ mixin SvgFactory on WidgetFactory {
       return null;
     }
 
-    return filePictureProvider(this, filePath);
+    return FilePicture(
+      svgAllowDrawingOutsideViewBox
+          ? SvgPicture.svgByteDecoderOutsideViewBoxBuilder
+          : SvgPicture.svgByteDecoderBuilder,
+      File(filePath),
+    );
   }
 
   /// Returns a [NetworkPicture].
-  PictureProvider? imageSvgFromNetwork(String url) =>
-      url.isNotEmpty ? networkPictureProvider(this, url) : null;
+  PictureProvider? imageSvgFromNetwork(String url) {
+    if (url.isEmpty) {
+      return null;
+    }
+
+    return NetworkPicture(
+      svgAllowDrawingOutsideViewBox
+          ? SvgPicture.svgByteDecoderOutsideViewBoxBuilder
+          : SvgPicture.svgByteDecoderBuilder,
+      url,
+    );
+  }
 
   @override
   void parse(BuildMetadata meta) {
@@ -83,10 +104,12 @@ mixin SvgFactory on WidgetFactory {
       case 'svg':
         _tagSvg ??= BuildOp(
           onWidgets: (meta, widgets) {
-            final provider = stringPicture(this, meta.element.outerHtml);
-            if (provider == null) {
-              return widgets;
-            }
+            final provider = StringPicture(
+              svgAllowDrawingOutsideViewBox
+                  ? SvgPicture.svgStringDecoderOutsideViewBoxBuilder
+                  : SvgPicture.svgStringDecoderBuilder,
+              meta.element.outerHtml,
+            );
             return [_buildSvgPicture(meta, const ImageSource(''), provider)];
           },
         );
