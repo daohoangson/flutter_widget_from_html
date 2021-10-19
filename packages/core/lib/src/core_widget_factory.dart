@@ -23,7 +23,7 @@ class WidgetFactory {
   /// Defaults to `false`, resulting in a [CircularProgressIndicator].
   static bool debugDeterministicLoadingWidget = false;
 
-  final flatteners = <Flattener>[];
+  final _flatteners = <Flattener>[];
 
   late AnchorRegistry _anchorRegistry;
 
@@ -394,17 +394,17 @@ class WidgetFactory {
   }
 
   void _dispose() {
-    for (final f in flatteners) {
+    for (final f in _flatteners) {
       f.dispose();
     }
-    flatteners.clear();
+    _flatteners.clear();
   }
 
   /// Flattens a [BuildTree] into widgets.
   Iterable<WidgetPlaceholder> flatten(BuildMetadata meta, BuildTree tree) {
     final widgets = <WidgetPlaceholder>[];
     final instance = Flattener(this);
-    flatteners.add(instance);
+    _flatteners.add(instance);
 
     for (final flattened in instance.flatten(tree)) {
       if (flattened.widget != null) {
