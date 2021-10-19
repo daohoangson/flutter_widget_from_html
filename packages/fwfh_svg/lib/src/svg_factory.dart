@@ -8,9 +8,11 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 mixin SvgFactory on WidgetFactory {
   BuildOp? _tagSvg;
 
-  /// If true, will allow the SVG to be drawn outside of the clip boundary of its viewBox.
+  /// Controls whether the SVG can be drawn outside
+  /// of the clip boundary of its view box.
+  /// See [SvgPicture.allowDrawingOutsideViewBox] for more information.
   ///
-  /// See [SvgPicture.allowDrawingOutsideViewBox]
+  /// Default: `false`.
   bool get svgAllowDrawingOutsideViewBox => false;
 
   @override
