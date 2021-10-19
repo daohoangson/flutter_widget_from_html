@@ -259,7 +259,8 @@ Bar.''';
 
                 if (testCase.key.startsWith(RegExp('(file|network)'))) {
                   await tester.runAsync(
-                      () => Future.delayed(const Duration(milliseconds: 100)));
+                    () => Future.delayed(const Duration(milliseconds: 100)),
+                  );
                 }
 
                 await screenMatchesGolden(tester, testCase.key);
@@ -295,10 +296,12 @@ class _Golden extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(contents.replaceAll(
-                RegExp('file://.+/fwfh_svg/'),
-                'file://.../fwfh_svg/',
-              )),
+              Text(
+                contents.replaceAll(
+                  RegExp('file://.+/fwfh_svg/'),
+                  'file://.../fwfh_svg/',
+                ),
+              ),
               const Divider(),
               HtmlWidget(
                 contents,
