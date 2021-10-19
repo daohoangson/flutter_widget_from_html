@@ -4,7 +4,7 @@ description: WidgetFactory extension to render SVG with flutter_svg plugin.
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
 environment:
-  flutter: ">=2.2.0"
+  flutter: ">=2.5.0"
   sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
