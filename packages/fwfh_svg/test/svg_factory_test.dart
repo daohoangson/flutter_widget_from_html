@@ -1,14 +1,26 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:fwfh_svg/fwfh_svg.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:mocktail/mocktail.dart';
 
+import '../../core/test/_.dart' as core;
 import '_.dart' as helper;
 
-final svgBytes = utf8.encode('<svg viewBox="0 0 1 1"></svg>');
+const redTriangle = '''
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 50 50" width="100" height="100">
+  <path fill="#FF0000" d="M0 100 0 0 100 0"/>
+</svg>''';
+final redTriangleBytes = utf8.encode(redTriangle);
 
-void main() {
+Future<void> main() async {
+  await loadAppFonts();
+
   const sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
 
   setUpAll(() {
@@ -73,7 +85,7 @@ void main() {
       });
 
       testWidgets('renders base64', (WidgetTester tester) async {
-        final base64 = base64Encode(svgBytes);
+        final base64 = base64Encode(redTriangleBytes);
         final html = '<img src="data:image/svg+xml;base64,$base64" />';
         final explained = await explain(tester, html);
         expect(
@@ -101,24 +113,216 @@ void main() {
       });
     });
 
-    testWidgets('renders network picture', (WidgetTester tester) async {
-      const src = 'http://domain.com/image.svg';
-      const html = '<img src="$src" />';
-      final explained = await HttpOverrides.runZoned(
-        () => helper.explain(tester, html),
-        createHttpClient: (_) => _createMockSvgImageHttpClient(),
-      );
-      expect(
-        explained,
-        equals(
-          '[CssSizing:$sizingConstraints,child='
-          '[SvgPicture:'
-          'pictureProvider=NetworkPicture("$src", headers: null, colorFilter: null)'
-          ']]',
-        ),
-      );
+    group('network picture', () {
+      const expectedPicture = '└RawPicture';
+
+      testWidgets('renders picture', (WidgetTester tester) async {
+        const src = 'http://domain.com/loading.svg';
+        const html = '<img src="$src" />';
+        const expectedLoading = '└CircularProgressIndicator';
+        final loading = await HttpOverrides.runZoned(
+          () => helper.explain(tester, html, useExplainer: false),
+          createHttpClient: (_) => _createMockSvgImageHttpClient(),
+        );
+        expect(loading, contains('└SvgPicture'));
+        expect(loading, contains(expectedLoading));
+        expect(loading, isNot(contains(expectedPicture)));
+
+        await tester.pumpAndSettle();
+
+        final picture = await core.explainWithoutPumping(useExplainer: false);
+        expect(picture, isNot(contains(expectedLoading)));
+        expect(picture, contains(expectedPicture));
+      });
+
+      testWidgets('renders LimitedBox on loading', (WidgetTester tester) async {
+        const src = 'http://domain.com/LimitedBox.svg';
+        const html = '<img src="$src" />';
+        const expectedLimitedBox = '└LimitedBox()';
+        final loading = await HttpOverrides.runZoned(
+          () => core.explain(
+            tester,
+            null,
+            hw: HtmlWidget(
+              html,
+              factoryBuilder: () => _NullLoadingFactory(),
+              key: core.hwKey,
+            ),
+            useExplainer: false,
+          ),
+          createHttpClient: (_) => _createMockSvgImageHttpClient(),
+        );
+        expect(loading, contains('└SvgPicture'));
+        expect(loading, contains(expectedLimitedBox));
+        expect(loading, isNot(contains(expectedPicture)));
+
+        await tester.pumpAndSettle();
+
+        final picture = await core.explainWithoutPumping(useExplainer: false);
+        expect(picture, isNot(contains(expectedLimitedBox)));
+        expect(picture, contains(expectedPicture));
+      });
+
+      testWidgets('renders SizedBox on loading', (WidgetTester tester) async {
+        const src = 'http://domain.com/SizedBox.svg';
+        const html = '<img src="$src" width="100" height="50" />';
+        const expectedSizedBox = '└SizedBox(width: 100.0, height: 50.0)';
+        final loading = await HttpOverrides.runZoned(
+          () => core.explain(
+            tester,
+            null,
+            hw: HtmlWidget(
+              html,
+              factoryBuilder: () => _NullLoadingFactory(),
+              key: core.hwKey,
+            ),
+            useExplainer: false,
+          ),
+          createHttpClient: (_) => _createMockSvgImageHttpClient(),
+        );
+        expect(loading, contains('└SvgPicture'));
+        expect(loading, contains(expectedSizedBox));
+        expect(loading, isNot(contains(expectedPicture)));
+
+        await tester.pumpAndSettle();
+
+        final picture = await core.explainWithoutPumping(useExplainer: false);
+        expect(picture, isNot(contains(expectedSizedBox)));
+        expect(picture, contains(expectedPicture));
+      });
     });
   });
+
+  final goldenSkip = Platform.isLinux ? null : 'Linux only';
+  GoldenToolkit.runWithConfiguration(
+    () {
+      group(
+        'screenshot testing',
+        () {
+          setUp(() {
+            WidgetFactory.debugDeterministicLoadingWidget = true;
+            PictureProvider.cache.clear();
+          });
+          tearDown(
+            () => WidgetFactory.debugDeterministicLoadingWidget = false,
+          );
+
+          const svg = 'Foo.\n$redTriangle\nBar.';
+          const asset = '''
+Foo.
+<img src="asset:test/images/red_triangle.svg" style="display: block" />
+Bar.''';
+          final file = '''
+Foo.
+<img src="file://${Directory.current.path}/test/images/red_triangle.svg" style="display: block" />
+Bar.''';
+          final memory = '''
+Foo.
+<img src="data:image/svg+xml;base64,${base64Encode(redTriangleBytes)}" style="display: block" />
+Bar.''';
+          const network = '''
+Foo.
+<img src="http://domain.com/red_triangle.svg" style="display: block" />
+Bar.''';
+
+          final testCases = <String, String>{
+            'SVG': svg,
+            'SVG.allow_drawing_outside': svg,
+            'asset': asset,
+            'asset.allow_drawing_outside': asset,
+            'file': file,
+            'file.allow_drawing_outside': file,
+            'memory': memory,
+            'memory.allow_drawing_outside': memory,
+            'network': network,
+            'network.allow_drawing_outside': network,
+          };
+
+          for (final testCase in testCases.entries) {
+            testGoldens(
+              testCase.key,
+              (tester) async {
+                await HttpOverrides.runZoned(
+                  () => tester.runAsync(
+                    () => tester.pumpWidgetBuilder(
+                      _Golden(
+                        testCase.value.trim(),
+                        allowDrawingOutsideViewBox:
+                            testCase.key.contains('allow_drawing_outside'),
+                      ),
+                      wrapper: materialAppWrapper(theme: ThemeData.light()),
+                      surfaceSize: const Size(400, 400),
+                    ),
+                  ),
+                  createHttpClient: (_) => _createMockSvgImageHttpClient(),
+                );
+
+                if (testCase.key.startsWith(RegExp('(file|network)'))) {
+                  await tester.runAsync(
+                    () => Future.delayed(const Duration(milliseconds: 100)),
+                  );
+                }
+
+                await screenMatchesGolden(tester, testCase.key);
+              },
+              skip: goldenSkip != null,
+            );
+          }
+        },
+        skip: goldenSkip,
+      );
+    },
+    config: GoldenToolkitConfiguration(
+      fileNameFactory: (name) => '${core.kGoldenFilePrefix}/svg/$name.png',
+    ),
+  );
+}
+
+class _Golden extends StatelessWidget {
+  final bool allowDrawingOutsideViewBox;
+
+  final String contents;
+
+  const _Golden(
+    this.contents, {
+    required this.allowDrawingOutsideViewBox,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext _) => Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                contents.replaceAll(
+                  RegExp('file://.+/fwfh_svg/'),
+                  'file://.../fwfh_svg/',
+                ),
+              ),
+              const Divider(),
+              HtmlWidget(
+                contents,
+                factoryBuilder: allowDrawingOutsideViewBox
+                    ? () => _GoldenAllowFactory()
+                    : () => _GoldenDisallowFactory(),
+              ),
+            ],
+          ),
+        ),
+      );
+}
+
+class _GoldenAllowFactory extends WidgetFactory with SvgFactory {
+  @override
+  bool get svgAllowDrawingOutsideViewBox => true;
+}
+
+class _GoldenDisallowFactory extends WidgetFactory with SvgFactory {
+  @override
+  bool get svgAllowDrawingOutsideViewBox => false;
 }
 
 class _MockHttpClient extends Mock implements HttpClient {
@@ -144,7 +348,7 @@ HttpClient _createMockSvgImageHttpClient() {
   when(() => request.close()).thenAnswer((_) async => response);
   when(() => response.compressionState)
       .thenReturn(HttpClientResponseCompressionState.notCompressed);
-  when(() => response.contentLength).thenReturn(svgBytes.length);
+  when(() => response.contentLength).thenReturn(redTriangleBytes.length);
   when(() => response.statusCode).thenReturn(HttpStatus.ok);
   when(
     () => response.listen(
@@ -156,8 +360,26 @@ HttpClient _createMockSvgImageHttpClient() {
   ).thenAnswer((invocation) {
     final onData =
         invocation.positionalArguments[0] as void Function(List<int>);
-    return Stream.fromIterable(<List<int>>[svgBytes]).listen(onData);
+    final onDone =
+        invocation.namedArguments[const Symbol("onDone")] as Function?;
+    return Stream.fromIterable(<List<int>>[redTriangleBytes])
+        .listen((data) async {
+      await Future.delayed(const Duration(milliseconds: 10));
+      onData(data);
+      onDone?.call();
+    });
   });
 
   return client;
+}
+
+class _NullLoadingFactory extends WidgetFactory with SvgFactory {
+  @override
+  Widget? onLoadingBuilder(
+    BuildContext context,
+    BuildMetadata meta, [
+    double? loadingProgress,
+    dynamic data,
+  ]) =>
+      null;
 }

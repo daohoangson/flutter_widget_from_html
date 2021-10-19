@@ -17,7 +17,7 @@ String? svgExplainer(helper.Explainer parent, Widget widget) {
 Future<String> explain(
   WidgetTester tester,
   String html, {
-  bool webView = true,
+  bool useExplainer = true,
 }) async =>
     helper.explain(
       tester,
@@ -28,6 +28,7 @@ Future<String> explain(
         key: helper.hwKey,
         factoryBuilder: () => _WidgetFactory(),
       ),
+      useExplainer: useExplainer,
     );
 
 class _WidgetFactory extends WidgetFactory with SvgFactory {}

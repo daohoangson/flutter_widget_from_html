@@ -37,3 +37,16 @@ HtmlWidget(
 class MyWidgetFactory extends WidgetFactory with SvgFactory {
 }
 ```
+
+## Configuration
+
+`SvgFactory` has a few getters to change its behavior.
+See the [API reference](https://pub.dev/documentation/fwfh_svg/latest/fwfh_svg/SvgFactory-mixin.html#instance-properties) for the up to date list.
+Override them in your factory like this:
+
+```dart
+class MyWidgetFactory extends WidgetFactory with SvgFactory {
+  @override
+  bool get svgAllowDrawingOutsideViewBox => true;
+}
+```
