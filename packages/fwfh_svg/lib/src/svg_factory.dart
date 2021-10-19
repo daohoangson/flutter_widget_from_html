@@ -9,6 +9,8 @@ import 'internal/platform_specific/fallback.dart'
 mixin SvgFactory on WidgetFactory {
   BuildOp? _tagSvg;
 
+  bool get svgAllowDrawingOutsideViewBox => false;
+
   @override
   Widget? buildImageWidget(BuildMetadata meta, ImageSource src) {
     final url = src.url;
@@ -47,7 +49,11 @@ mixin SvgFactory on WidgetFactory {
       return null;
     }
 
-    return assetPictureProvider(assetName, uri.queryParameters['package']);
+    return assetPictureProvider(
+      this,
+      assetName,
+      uri.queryParameters['package'],
+    );
   }
 
   /// Returns a [MemoryPicture].
@@ -57,7 +63,7 @@ mixin SvgFactory on WidgetFactory {
       return null;
     }
 
-    return memoryPictureProvider(bytes);
+    return memoryPictureProvider(this, bytes);
   }
 
   /// Returns a [FilePicture].
@@ -67,12 +73,12 @@ mixin SvgFactory on WidgetFactory {
       return null;
     }
 
-    return filePictureProvider(filePath);
+    return filePictureProvider(this, filePath);
   }
 
   /// Returns a [NetworkPicture].
   PictureProvider? imageSvgFromNetwork(String url) =>
-      url.isNotEmpty ? networkPictureProvider(url) : null;
+      url.isNotEmpty ? networkPictureProvider(this, url) : null;
 
   @override
   void parse(BuildMetadata meta) {

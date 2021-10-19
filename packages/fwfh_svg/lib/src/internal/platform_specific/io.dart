@@ -4,16 +4,42 @@ import 'dart:typed_data';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-PictureProvider? assetPictureProvider(String assetName, String? package) =>
-    ExactAssetPicture(SvgPicture.svgStringDecoder, assetName, package: package);
+import '../../svg_factory.dart';
 
-PictureProvider? memoryPictureProvider(Uint8List bytes) =>
-    MemoryPicture(SvgPicture.svgByteDecoder, bytes);
+PictureProvider? assetPictureProvider(
+  SvgFactory wf,
+  String assetName,
+  String? package,
+) =>
+    ExactAssetPicture(
+      wf.svgAllowDrawingOutsideViewBox
+          ? SvgPicture.svgStringDecoderOutsideViewBoxBuilder
+          : SvgPicture.svgStringDecoderBuilder,
+      assetName,
+      package: package,
+    );
 
-PictureProvider? networkPictureProvider(String url) =>
-    NetworkPicture(SvgPicture.svgByteDecoder, url);
+PictureProvider? memoryPictureProvider(SvgFactory wf, Uint8List bytes) =>
+    MemoryPicture(
+      wf.svgAllowDrawingOutsideViewBox
+          ? SvgPicture.svgByteDecoderOutsideViewBoxBuilder
+          : SvgPicture.svgByteDecoderBuilder,
+      bytes,
+    );
 
-PictureProvider? filePictureProvider(String path) =>
-    FilePicture(SvgPicture.svgByteDecoder, File(path));
+PictureProvider? networkPictureProvider(SvgFactory wf, String url) =>
+    NetworkPicture(
+      wf.svgAllowDrawingOutsideViewBox
+          ? SvgPicture.svgByteDecoderOutsideViewBoxBuilder
+          : SvgPicture.svgByteDecoderBuilder,
+      url,
+    );
+
+PictureProvider? filePictureProvider(SvgFactory wf, String path) => FilePicture(
+      wf.svgAllowDrawingOutsideViewBox
+          ? SvgPicture.svgByteDecoderOutsideViewBoxBuilder
+          : SvgPicture.svgByteDecoderBuilder,
+      File(path),
+    );
 
 Widget? svgPictureString(String bytes) => SvgPicture.string(bytes);
