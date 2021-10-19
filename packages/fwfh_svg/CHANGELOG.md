@@ -1,3 +1,8 @@
+## 0.7.1
+
+- Add support for flutter_svg@0.23 (#611)
+- Add support for web platform
+
 ## 0.7.0+1
 
 - Update for Flutter 2.5 (#587)
