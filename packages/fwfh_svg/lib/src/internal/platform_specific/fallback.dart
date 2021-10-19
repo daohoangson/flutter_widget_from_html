@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../svg_factory.dart';
@@ -18,4 +17,4 @@ PictureProvider? networkPictureProvider(SvgFactory wf, String url) => null;
 
 PictureProvider? filePictureProvider(SvgFactory wf, String path) => null;
 
-Widget? svgPictureString(String bytes) => null;
+PictureProvider? stringPicture(SvgFactory wf, String string) => null;

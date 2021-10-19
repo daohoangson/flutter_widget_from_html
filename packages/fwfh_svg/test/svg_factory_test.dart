@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:fwfh_svg/fwfh_svg.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '_.dart' as helper;
+import '../../core/test/_.dart' as core;
 
 final svgBytes = utf8.encode('<svg viewBox="0 0 1 1"></svg>');
 
@@ -101,22 +105,83 @@ void main() {
       });
     });
 
-    testWidgets('renders network picture', (WidgetTester tester) async {
-      const src = 'http://domain.com/image.svg';
-      const html = '<img src="$src" />';
-      final explained = await HttpOverrides.runZoned(
-        () => helper.explain(tester, html),
-        createHttpClient: (_) => _createMockSvgImageHttpClient(),
-      );
-      expect(
-        explained,
-        equals(
-          '[CssSizing:$sizingConstraints,child='
-          '[SvgPicture:'
-          'pictureProvider=NetworkPicture("$src", headers: null, colorFilter: null)'
-          ']]',
-        ),
-      );
+    group('network picture', () {
+      const expectedPicture = '└RawPicture';
+
+      testWidgets('renders picture', (WidgetTester tester) async {
+        const src = 'http://domain.com/loading.svg';
+        const html = '<img src="$src" />';
+        const expectedLoading = '└CircularProgressIndicator';
+        final loading = await HttpOverrides.runZoned(
+          () => helper.explain(tester, html, useExplainer: false),
+          createHttpClient: (_) => _createMockSvgImageHttpClient(),
+        );
+        expect(loading, contains('└SvgPicture'));
+        expect(loading, contains(expectedLoading));
+        expect(loading, isNot(contains(expectedPicture)));
+
+        await tester.pumpAndSettle();
+
+        final picture = await core.explainWithoutPumping(useExplainer: false);
+        expect(picture, isNot(contains(expectedLoading)));
+        expect(picture, contains(expectedPicture));
+      });
+
+      testWidgets('renders LimitedBox on loading', (WidgetTester tester) async {
+        const src = 'http://domain.com/LimitedBox.svg';
+        const html = '<img src="$src" />';
+        const expectedLimitedBox = '└LimitedBox()';
+        final loading = await HttpOverrides.runZoned(
+          () => core.explain(
+            tester,
+            null,
+            hw: HtmlWidget(
+              html,
+              factoryBuilder: () => _NullLoadingFactory(),
+              key: core.hwKey,
+            ),
+            useExplainer: false,
+          ),
+          createHttpClient: (_) => _createMockSvgImageHttpClient(),
+        );
+        expect(loading, contains('└SvgPicture'));
+        expect(loading, contains(expectedLimitedBox));
+        expect(loading, isNot(contains(expectedPicture)));
+
+        await tester.pumpAndSettle();
+
+        final picture = await core.explainWithoutPumping(useExplainer: false);
+        expect(picture, isNot(contains(expectedLimitedBox)));
+        expect(picture, contains(expectedPicture));
+      });
+
+      testWidgets('renders SizedBox on loading', (WidgetTester tester) async {
+        const src = 'http://domain.com/SizedBox.svg';
+        const html = '<img src="$src" width="100" height="50" />';
+        const expectedSizedBox = '└SizedBox(width: 100.0, height: 50.0)';
+        final loading = await HttpOverrides.runZoned(
+          () => core.explain(
+            tester,
+            null,
+            hw: HtmlWidget(
+              html,
+              factoryBuilder: () => _NullLoadingFactory(),
+              key: core.hwKey,
+            ),
+            useExplainer: false,
+          ),
+          createHttpClient: (_) => _createMockSvgImageHttpClient(),
+        );
+        expect(loading, contains('└SvgPicture'));
+        expect(loading, contains(expectedSizedBox));
+        expect(loading, isNot(contains(expectedPicture)));
+
+        await tester.pumpAndSettle();
+
+        final picture = await core.explainWithoutPumping(useExplainer: false);
+        expect(picture, isNot(contains(expectedSizedBox)));
+        expect(picture, contains(expectedPicture));
+      });
     });
   });
 }
@@ -156,8 +221,25 @@ HttpClient _createMockSvgImageHttpClient() {
   ).thenAnswer((invocation) {
     final onData =
         invocation.positionalArguments[0] as void Function(List<int>);
-    return Stream.fromIterable(<List<int>>[svgBytes]).listen(onData);
+    final onDone =
+        invocation.namedArguments[const Symbol("onDone")] as Function?;
+    return Stream.fromIterable(<List<int>>[svgBytes]).listen((data) async {
+      await Future.delayed(const Duration(milliseconds: 10));
+      onData(data);
+      onDone?.call();
+    });
   });
 
   return client;
+}
+
+class _NullLoadingFactory extends WidgetFactory with SvgFactory {
+  @override
+  Widget? onLoadingBuilder(
+    BuildContext context,
+    BuildMetadata meta, [
+    double? loadingProgress,
+    dynamic data,
+  ]) =>
+      null;
 }

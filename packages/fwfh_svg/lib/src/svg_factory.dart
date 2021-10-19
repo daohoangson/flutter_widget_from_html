@@ -34,15 +34,8 @@ mixin SvgFactory on WidgetFactory {
     if (provider == null) {
       return super.buildImageWidget(meta, src);
     }
-    final image = src.image;
-    final semanticLabel = image?.alt ?? image?.title;
 
-    return SvgPicture(
-      provider,
-      allowDrawingOutsideViewBox: svgAllowDrawingOutsideViewBox,
-      excludeFromSemantics: semanticLabel == null,
-      semanticsLabel: semanticLabel,
-    );
+    return _buildSvgPicture(meta, src, provider);
   }
 
   /// Returns an [ExactAssetPicture].
@@ -89,13 +82,49 @@ mixin SvgFactory on WidgetFactory {
     switch (meta.element.localName) {
       case 'svg':
         _tagSvg ??= BuildOp(
-          onWidgets: (meta, widgets) =>
-              listOrNull(svgPictureString(meta.element.outerHtml)) ?? widgets,
+          onWidgets: (meta, widgets) {
+            final provider = stringPicture(this, meta.element.outerHtml);
+            if (provider == null) {
+              return widgets;
+            }
+            return [_buildSvgPicture(meta, const ImageSource(''), provider)];
+          },
         );
         meta.register(_tagSvg!);
         break;
     }
 
     return super.parse(meta);
+  }
+
+  Widget _buildSvgPicture(
+    BuildMetadata meta,
+    ImageSource src,
+    PictureProvider provider,
+  ) {
+    final image = src.image;
+    final semanticLabel = image?.alt ?? image?.title;
+
+    return SvgPicture(
+      provider,
+      allowDrawingOutsideViewBox: svgAllowDrawingOutsideViewBox,
+      excludeFromSemantics: semanticLabel == null,
+      fit: BoxFit.fill,
+      height: src.height,
+      placeholderBuilder: (context) {
+        final loading = onLoadingBuilder(context, meta, null, src);
+        if (loading != null) {
+          return loading;
+        }
+
+        if (src.width != null && src.height != null) {
+          return SizedBox(width: src.width, height: src.height);
+        }
+
+        return SvgPicture.defaultPlaceholderBuilder(context);
+      },
+      semanticsLabel: semanticLabel,
+      width: src.width,
+    );
   }
 }

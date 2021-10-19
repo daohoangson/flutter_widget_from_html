@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../svg_factory.dart';
@@ -42,4 +41,9 @@ PictureProvider? filePictureProvider(SvgFactory wf, String path) => FilePicture(
       File(path),
     );
 
-Widget? svgPictureString(String bytes) => SvgPicture.string(bytes);
+PictureProvider? stringPicture(SvgFactory wf, String string) => StringPicture(
+      wf.svgAllowDrawingOutsideViewBox
+          ? SvgPicture.svgStringDecoderOutsideViewBoxBuilder
+          : SvgPicture.svgStringDecoderBuilder,
+      string,
+    );
