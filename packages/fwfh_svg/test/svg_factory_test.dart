@@ -7,8 +7,8 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:fwfh_svg/fwfh_svg.dart';
 import 'package:mocktail/mocktail.dart';
 
-import '_.dart' as helper;
 import '../../core/test/_.dart' as core;
+import '_.dart' as helper;
 
 final svgBytes = utf8.encode('<svg viewBox="0 0 1 1"></svg>');
 
