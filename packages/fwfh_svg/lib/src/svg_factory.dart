@@ -9,6 +9,9 @@ import 'internal/platform_specific/fallback.dart'
 mixin SvgFactory on WidgetFactory {
   BuildOp? _tagSvg;
 
+  /// If true, will allow the SVG to be drawn outside of the clip boundary of its viewBox.
+  ///
+  /// See [SvgPicture.allowDrawingOutsideViewBox]
   bool get svgAllowDrawingOutsideViewBox => false;
 
   @override
@@ -36,6 +39,7 @@ mixin SvgFactory on WidgetFactory {
 
     return SvgPicture(
       provider,
+      allowDrawingOutsideViewBox: svgAllowDrawingOutsideViewBox,
       excludeFromSemantics: semanticLabel == null,
       semanticsLabel: semanticLabel,
     );
