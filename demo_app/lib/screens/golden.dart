@@ -55,6 +55,7 @@ class Golden extends StatelessWidget {
           child: enhanced.HtmlWidget(
             html,
             baseUrl: baseUrl,
+            // ignore: deprecated_member_use
             webView: true,
           ),
         ),
