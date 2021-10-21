@@ -89,43 +89,6 @@ typedef OnLoadingBuilder = Widget? Function(
   double? loadingProgress,
 );
 
-/// A set of values that should trigger rebuild.
-class RebuildTriggers {
-  final List _values;
-
-  /// Creates a set.
-  ///
-  /// The values should have sane equality check to avoid excessive rebuilds.
-  RebuildTriggers(this._values);
-
-  @override
-  int get hashCode => _values.length;
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
-
-    if (other is RebuildTriggers) {
-      final otherValues = other._values;
-      if (otherValues.length != _values.length) {
-        return false;
-      }
-
-      for (var i = 0; i < _values.length; i++) {
-        if (otherValues[i] != _values[i]) {
-          return false;
-        }
-      }
-
-      return true;
-    }
-
-    return false;
-  }
-}
-
 /// The HTML body render modes.
 enum RenderMode {
   /// The body will be rendered as a `Column` widget.

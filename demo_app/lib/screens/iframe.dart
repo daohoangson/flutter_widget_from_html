@@ -57,11 +57,30 @@ class _State extends State<IframeScreen> {
               padding: const EdgeInsets.all(8.0),
               child: HtmlWidget(
                 html,
-                webView: webView,
-                webViewJs: webViewJs,
+                factoryBuilder: () => _WidgetFactory(
+                  webViewOverride: webView,
+                  webViewJsOverride: webViewJs,
+                ),
+                key: ValueKey('$webView$webViewJs'),
               ),
             ),
           ],
         ),
       );
+}
+
+class _WidgetFactory extends WidgetFactory {
+  final bool webViewOverride;
+  final bool webViewJsOverride;
+
+  _WidgetFactory({
+    this.webViewOverride,
+    this.webViewJsOverride,
+  });
+
+  @override
+  bool get webView => webViewOverride ?? super.webView;
+
+  @override
+  bool get webViewJs => webViewJsOverride ?? super.webViewJs;
 }

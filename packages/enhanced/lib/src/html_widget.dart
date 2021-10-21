@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
-    as core show HtmlWidget, RebuildTriggers;
+    as core show HtmlWidget;
 
 import 'data.dart';
 import 'helpers.dart';
@@ -14,31 +14,6 @@ export 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 /// A widget that builds Flutter widget tree from HTML
 /// with support for IFRAME, VIDEO and many other tags.
 class HtmlWidget extends core.HtmlWidget {
-  /// Controls whether IFRAME is rendered as [WebView].
-  ///
-  /// See [WidgetFactory.webView].
-  final bool webView;
-
-  /// Controls whether debugging is enabled in WebViews.
-  ///
-  /// See [WidgetFactory.webViewDebuggingEnabled].
-  final bool webViewDebuggingEnabled;
-
-  /// Controls whether to enable JavaScript in WebViews.
-  ///
-  /// See [WidgetFactory.webViewJs].
-  final bool webViewJs;
-
-  /// Controls whether to always allow media playback in WebViews.
-  ///
-  /// See [WidgetFactory.webViewMediaPlaybackAlwaysAllow].
-  final bool webViewMediaPlaybackAlwaysAllow;
-
-  /// The value used for the HTTP `User-Agent` request header in WebViews.
-  ///
-  /// See [WidgetFactory.webViewUserAgent].
-  final String? webViewUserAgent;
-
   /// Creates a widget that builds Flutter widget tree from html.
   ///
   /// The [html] argument must not be null.
@@ -55,14 +30,8 @@ class HtmlWidget extends core.HtmlWidget {
     OnLoadingBuilder? onLoadingBuilder,
     void Function(ImageMetadata)? onTapImage,
     FutureOr<bool> Function(String)? onTapUrl,
-    core.RebuildTriggers? rebuildTriggers,
     RenderMode renderMode = RenderMode.column,
     TextStyle textStyle = const TextStyle(),
-    this.webView = false,
-    this.webViewDebuggingEnabled = false,
-    this.webViewJs = true,
-    this.webViewMediaPlaybackAlwaysAllow = false,
-    this.webViewUserAgent,
   }) : super(
           html,
           baseUrl: baseUrl,
@@ -75,11 +44,6 @@ class HtmlWidget extends core.HtmlWidget {
           onLoadingBuilder: onLoadingBuilder,
           onTapImage: onTapImage,
           onTapUrl: onTapUrl,
-          rebuildTriggers: core.RebuildTriggers([
-            webView,
-            webViewJs,
-            if (rebuildTriggers != null) rebuildTriggers,
-          ]),
           renderMode: renderMode,
           textStyle: textStyle,
           key: key,

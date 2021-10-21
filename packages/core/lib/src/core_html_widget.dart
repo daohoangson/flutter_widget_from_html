@@ -55,29 +55,6 @@ class HtmlWidget extends StatefulWidget {
   /// Returns `true` if the url has been handled, the default handler will be skipped.
   final FutureOr<bool> Function(String)? onTapUrl;
 
-  /// The values that should trigger rebuild.
-  ///
-  /// By default, these fields' changes will invalidate cached widget tree:
-  ///
-  /// - [baseUrl]
-  /// - [buildAsync]
-  /// - [enableCaching]
-  /// - [html]
-  ///
-  /// In `flutter_widget_from_html` package, these are also included:
-  ///
-  /// - `unsupportedWebViewWorkaroundForIssue37`
-  /// - `webView`
-  /// - `webViewJs`
-  RebuildTriggers get rebuildTriggers => RebuildTriggers([
-        html,
-        baseUrl,
-        buildAsync,
-        enableCaching,
-        if (_rebuildTriggers != null) _rebuildTriggers,
-      ]);
-  final RebuildTriggers? _rebuildTriggers;
-
   /// The render mode.
   ///
   /// - [RenderMode.column] is the default mode, suitable for small / medium document.
@@ -104,11 +81,9 @@ class HtmlWidget extends StatefulWidget {
     this.onLoadingBuilder,
     this.onTapImage,
     this.onTapUrl,
-    RebuildTriggers? rebuildTriggers,
     this.renderMode = RenderMode.column,
     this.textStyle = const TextStyle(),
-  })  : _rebuildTriggers = rebuildTriggers,
-        super(key: key);
+  }) : super(key: key);
 
   @override
   State<HtmlWidget> createState() => HtmlWidgetState();
@@ -163,7 +138,10 @@ class HtmlWidgetState extends State<HtmlWidget> {
 
     var needsRebuild = false;
 
-    if (widget.rebuildTriggers != oldWidget.rebuildTriggers) {
+    if (widget.html != oldWidget.html ||
+        widget.baseUrl != oldWidget.baseUrl ||
+        widget.buildAsync != oldWidget.buildAsync ||
+        widget.enableCaching != oldWidget.enableCaching) {
       needsRebuild = true;
     }
 
