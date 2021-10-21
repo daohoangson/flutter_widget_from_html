@@ -48,7 +48,7 @@ class _Panel extends StatelessWidget {
                 ],
               ),
               const Divider(),
-              HtmlWidget(
+              const HtmlWidget(
                 '<p style="font-size: 1em">Almost every developer\'s favorite molecule is '
                 'C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, '
                 'also known as "caffeine."</p>',

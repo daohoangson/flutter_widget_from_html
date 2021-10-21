@@ -17,7 +17,7 @@ class HtmlWidget extends core.HtmlWidget {
   /// Creates a widget that builds Flutter widget tree from html.
   ///
   /// The [html] argument must not be null.
-  HtmlWidget(
+  const HtmlWidget(
     String html, {
     bool? buildAsync,
     bool enableCaching = true,

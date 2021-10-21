@@ -450,7 +450,7 @@ void main() {
       const href = 'default';
       await explain(
         tester,
-        HtmlWidget('<a href="$href">Tap me</a>'),
+        const HtmlWidget('<a href="$href">Tap me</a>'),
       );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
