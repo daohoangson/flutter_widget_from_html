@@ -57,7 +57,9 @@ class _State extends State<IframeScreen> {
               padding: const EdgeInsets.all(8.0),
               child: HtmlWidget(
                 html,
+                // ignore: deprecated_member_use
                 webView: webView,
+                // ignore: deprecated_member_use
                 webViewJs: webViewJs,
               ),
             ),
