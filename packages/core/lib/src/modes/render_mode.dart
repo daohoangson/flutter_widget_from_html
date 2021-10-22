@@ -36,9 +36,9 @@ abstract class RenderMode {
 
   /// Builds HTML body widget.
   ///
-  /// See [ColumnRenderMode.buildBodyWidget].
-  /// See [ListViewRenderMode.buildBodyWidget].
-  /// See [SliverListRenderMode.buildBodyWidget].
+  /// See [ColumnMode].
+  /// See [ListViewMode].
+  /// See [SliverListMode].
   Widget buildBodyWidget(
     WidgetFactory wf,
     BuildContext context,

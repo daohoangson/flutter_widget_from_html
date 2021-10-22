@@ -1,5 +1,6 @@
 part of 'render_mode.dart';
 
+/// A render mode that builds HTML into a [ListView] widget.
 class ListViewMode extends RenderMode {
   /// See [SliverChildBuilderDelegate.addAutomaticKeepAlives].
   ///
@@ -49,6 +50,7 @@ class ListViewMode extends RenderMode {
   /// See [ScrollView.shrinkWrap].
   final bool shrinkWrap;
 
+  /// Creates a list view render mode.
   const ListViewMode({
     this.addAutomaticKeepAlives = false,
     this.addRepaintBoundaries = true,

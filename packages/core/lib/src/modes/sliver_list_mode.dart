@@ -1,5 +1,6 @@
 part of 'render_mode.dart';
 
+/// A render mode that builds HTML into a [SliverList] widget.
 class SliverListMode extends RenderMode {
   /// See [SliverChildBuilderDelegate.addAutomaticKeepAlives].
   ///
@@ -16,6 +17,7 @@ class SliverListMode extends RenderMode {
   /// Default: `false`.
   final bool addSemanticIndexes;
 
+  /// Creates a sliver list render mode.
   const SliverListMode({
     this.addAutomaticKeepAlives = false,
     this.addRepaintBoundaries = true,
