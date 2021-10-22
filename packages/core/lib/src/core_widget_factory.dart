@@ -23,9 +23,10 @@ class WidgetFactory {
   /// Defaults to `false`, resulting in a [CircularProgressIndicator].
   static bool debugDeterministicLoadingWidget = false;
 
-  final _flatteners = <Flattener>[];
+  @protected
+  late AnchorRegistry anchorRegistry;
 
-  late AnchorRegistry _anchorRegistry;
+  final _flatteners = <Flattener>[];
 
   BuildOp? _styleBgColor;
   BuildOp? _styleBorder;
@@ -71,34 +72,7 @@ class WidgetFactory {
   ) =>
       AspectRatio(aspectRatio: aspectRatio, child: child);
 
-  /// Builds body.
-  WidgetPlaceholder? buildBody(
-    BuildMetadata meta,
-    Iterable<WidgetPlaceholder> children,
-  ) =>
-      buildColumnPlaceholder(meta, children)?.wrapWith(buildBodyWidget);
-
-  /// Builds body as [ListView].
-  Widget buildBodyListView(BuildContext context, List<Widget> children) =>
-      ListView.builder(
-        addAutomaticKeepAlives: false,
-        addSemanticIndexes: false,
-        itemBuilder: (c, i) => _anchorRegistry.buildBodyItem(c, i, children[i]),
-        itemCount: children.length,
-      );
-
-  /// Builds body as [SliverList].
-  Widget buildBodySliverList(BuildContext context, List<Widget> children) =>
-      SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (c, i) => _anchorRegistry.buildBodyItem(c, i, children[i]),
-          addAutomaticKeepAlives: false,
-          addSemanticIndexes: false,
-          childCount: children.length,
-        ),
-      );
-
-  /// Builds body widget (see [HtmlWidget.renderMode]).
+  /// Builds body widget.
   Widget buildBodyWidget(BuildContext context, Widget child) {
     var children = child is Column ? child.children : [child];
     final renderMode = _widget?.renderMode ?? RenderMode.column;
@@ -128,16 +102,7 @@ class WidgetFactory {
       break;
     }
 
-    switch (renderMode) {
-      case RenderMode.column:
-        return buildColumnWidget(context, children);
-      case RenderMode.listView:
-        _anchorRegistry.prepareIndexByAnchor(children);
-        return buildBodyListView(context, children);
-      case RenderMode.sliverList:
-        _anchorRegistry.prepareIndexByAnchor(children);
-        return buildBodySliverList(context, children);
-    }
+    return renderMode.buildBodyWidget(this, context, children);
   }
 
   /// Builds column placeholder.
@@ -652,7 +617,7 @@ class WidgetFactory {
     if (url.startsWith('#')) {
       final id = url.substring(1);
       final handledViaAnchor =
-          await onTapAnchor(id, _anchorRegistry.ensureVisible);
+          await onTapAnchor(id, anchorRegistry.ensureVisible);
       if (handledViaAnchor) {
         return true;
       }
@@ -1129,7 +1094,7 @@ class WidgetFactory {
   void reset(State state) {
     _dispose();
 
-    _anchorRegistry = AnchorRegistry();
+    anchorRegistry = AnchorRegistry();
 
     final widget = state.widget;
     _widget = widget is HtmlWidget ? widget : null;
@@ -1165,7 +1130,7 @@ class WidgetFactory {
 
     return BuildOp(
       onTree: (meta, tree) {
-        _anchorRegistry.register(id, anchor);
+        anchorRegistry.register(id, anchor);
         tree.registerAnchor(anchor);
       },
       onTreeFlattening: (meta, tree) {
