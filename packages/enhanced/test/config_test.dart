@@ -551,22 +551,6 @@ void main() {
       expect(explained, isNot(contains('└Column(')));
     });
 
-    testWidgets('renders ListView with ScrollController', (tester) async {
-      final controller = ScrollController();
-      final renderMode = ListViewMode(controller: controller);
-      final html =
-          '${'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ' * 1000}'
-          '<a name="bottom">Bottom></a>';
-      final key = GlobalKey<HtmlWidgetState>();
-      await explain(tester, renderMode, html: html, key: key);
-      expect(controller.offset, equals(0));
-
-      final htmlWidget = key.currentState!;
-      htmlWidget.scrollToAnchor('bottom');
-      await tester.pumpAndSettle();
-      expect(controller.offset, isNot(equals(0)));
-    });
-
     testWidgets('renders SliverList', (WidgetTester tester) async {
       final explained = await explain(tester, RenderMode.sliverList);
       expect(explained, contains('└SliverList('));
