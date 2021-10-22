@@ -12,7 +12,7 @@ const kColorPrimary = Color(0xFF123456);
 const kDataBase64 = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 const kDataUri = 'data:image/gif;base64,$kDataBase64';
 
-final hwKey = GlobalKey<State<HtmlWidget>>();
+final hwKey = GlobalKey<HtmlWidgetState>();
 
 const kGoldenFilePrefix = '../../../demo_app/test';
 

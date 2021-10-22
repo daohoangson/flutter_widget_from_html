@@ -518,9 +518,10 @@ void main() {
       WidgetTester tester,
       RenderMode renderMode, {
       bool buildAsync = false,
+      String? html,
     }) {
       final hw = HtmlWidget(
-        '<p>Foo</p><p>Bar</p>',
+        html ?? '<p>Foo</p><p>Bar</p>',
         buildAsync: buildAsync,
         key: helper.hwKey,
         renderMode: renderMode,
@@ -545,6 +546,21 @@ void main() {
       final explained = await explain(tester, RenderMode.listView);
       expect(explained, contains('└ListView('));
       expect(explained, isNot(contains('└Column(')));
+    });
+
+    testWidgets('renders ListView with ScrollController', (tester) async {
+      final controller = ScrollController();
+      final renderMode = ListViewMode(controller: controller);
+      final html =
+          '${'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ' * 1000}'
+          '<a name="bottom">Bottom></a>';
+      await explain(tester, renderMode, html: html);
+      expect(controller.offset, equals(0));
+
+      final htmlWidget = helper.hwKey.currentState!;
+      htmlWidget.scrollToAnchor('bottom');
+      await tester.pumpAndSettle();
+      expect(controller.offset, isNot(equals(0)));
     });
 
     testWidgets('renders SliverList', (WidgetTester tester) async {
