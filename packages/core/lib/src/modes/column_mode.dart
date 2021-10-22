@@ -1,7 +1,7 @@
 part of 'render_mode.dart';
 
-class ColumnRenderMode extends RenderMode {
-  const ColumnRenderMode();
+class ColumnMode extends RenderMode {
+  const ColumnMode();
 
   @override
   Widget buildBodyWidget(
