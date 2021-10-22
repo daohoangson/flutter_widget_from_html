@@ -9,6 +9,7 @@ import 'core_html_widget.dart';
 import 'core_widget_factory.dart';
 
 export 'external/csslib.dart';
+export 'modes/render_mode.dart';
 export 'widgets/css_sizing.dart';
 export 'widgets/html_details.dart';
 export 'widgets/html_list_item.dart';
@@ -124,28 +125,6 @@ class RebuildTriggers {
 
     return false;
   }
-}
-
-/// The HTML body render modes.
-enum RenderMode {
-  /// The body will be rendered as a `Column` widget.
-  ///
-  /// This is the default render mode.
-  /// It's good enough for small / medium document and can be used easily.
-  column,
-
-  /// The body will be rendered as a `ListView` widget.
-  ///
-  /// It's good for medium / large document in a dedicated page layout
-  /// (e.g. the HTML document is the only thing on the screen).
-  listView,
-
-  /// The body will be rendered as a `SliverList` sliver.
-  ///
-  /// It's good for large / huge document and can be put in the same scrolling
-  /// context with other contents.
-  /// A [CustomScrollView] or similar is required for this to work.
-  sliverList,
 }
 
 /// An extension on [Widget] to keep track of anchors.

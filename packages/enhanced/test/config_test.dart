@@ -518,11 +518,14 @@ void main() {
       WidgetTester tester,
       RenderMode renderMode, {
       bool buildAsync = false,
+      String? html,
+      GlobalKey? key,
     }) {
+      key ??= helper.hwKey;
       final hw = HtmlWidget(
-        '<p>Foo</p><p>Bar</p>',
+        html ?? '<p>Foo</p><p>Bar</p>',
         buildAsync: buildAsync,
-        key: helper.hwKey,
+        key: key,
         renderMode: renderMode,
       );
 
@@ -532,6 +535,7 @@ void main() {
         hw: renderMode == RenderMode.sliverList
             ? CustomScrollView(slivers: [hw])
             : hw,
+        key: key,
         useExplainer: false,
       );
     }

@@ -48,6 +48,12 @@ class WidgetFactory {
   TextStyleHtml Function(TextStyleHtml, css.Expression)? _tsbLineHeight;
   HtmlWidget? _widget;
 
+  /// Gets the current anchor registry.
+  ///
+  /// This is an implementation detail and may be changed without a major version bump.
+  @protected
+  AnchorRegistry get anchorRegistry => _anchorRegistry;
+
   /// Builds [Align].
   Widget? buildAlign(
     BuildMetadata meta,
@@ -71,34 +77,7 @@ class WidgetFactory {
   ) =>
       AspectRatio(aspectRatio: aspectRatio, child: child);
 
-  /// Builds body.
-  WidgetPlaceholder? buildBody(
-    BuildMetadata meta,
-    Iterable<WidgetPlaceholder> children,
-  ) =>
-      buildColumnPlaceholder(meta, children)?.wrapWith(buildBodyWidget);
-
-  /// Builds body as [ListView].
-  Widget buildBodyListView(BuildContext context, List<Widget> children) =>
-      ListView.builder(
-        addAutomaticKeepAlives: false,
-        addSemanticIndexes: false,
-        itemBuilder: (c, i) => _anchorRegistry.buildBodyItem(c, i, children[i]),
-        itemCount: children.length,
-      );
-
-  /// Builds body as [SliverList].
-  Widget buildBodySliverList(BuildContext context, List<Widget> children) =>
-      SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (c, i) => _anchorRegistry.buildBodyItem(c, i, children[i]),
-          addAutomaticKeepAlives: false,
-          addSemanticIndexes: false,
-          childCount: children.length,
-        ),
-      );
-
-  /// Builds body widget (see [HtmlWidget.renderMode]).
+  /// Builds body widget.
   Widget buildBodyWidget(BuildContext context, Widget child) {
     var children = child is Column ? child.children : [child];
     final renderMode = _widget?.renderMode ?? RenderMode.column;
@@ -128,16 +107,7 @@ class WidgetFactory {
       break;
     }
 
-    switch (renderMode) {
-      case RenderMode.column:
-        return buildColumnWidget(context, children);
-      case RenderMode.listView:
-        _anchorRegistry.prepareIndexByAnchor(children);
-        return buildBodyListView(context, children);
-      case RenderMode.sliverList:
-        _anchorRegistry.prepareIndexByAnchor(children);
-        return buildBodySliverList(context, children);
-    }
+    return renderMode.buildBodyWidget(this, context, children);
   }
 
   /// Builds column placeholder.

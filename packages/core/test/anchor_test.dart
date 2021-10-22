@@ -309,8 +309,8 @@ Future<void> main() async {
         Scaffold(
           body: HtmlWidget(
             htmlDefault,
-            factoryBuilder: () => _NoBuildBodyItemWidgetFactory(),
-            renderMode: RenderMode.listView,
+            factoryBuilder: () => _WidgetFactory(),
+            renderMode: _NoBuildBodyAnchorForItemListViewRenderMode(),
           ),
         ),
         surfaceSize: const Size(200, 200),
@@ -525,9 +525,13 @@ class _WidgetFactory extends WidgetFactory {
   }
 }
 
-class _NoBuildBodyItemWidgetFactory extends _WidgetFactory {
+class _NoBuildBodyAnchorForItemListViewRenderMode extends RenderMode {
   @override
-  Widget buildBodyListView(BuildContext context, List<Widget> children) =>
+  Widget buildBodyWidget(
+    WidgetFactory wf,
+    BuildContext context,
+    List<Widget> children,
+  ) =>
       ListView.builder(
         addAutomaticKeepAlives: false,
         addSemanticIndexes: false,
