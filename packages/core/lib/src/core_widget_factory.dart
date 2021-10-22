@@ -23,10 +23,9 @@ class WidgetFactory {
   /// Defaults to `false`, resulting in a [CircularProgressIndicator].
   static bool debugDeterministicLoadingWidget = false;
 
-  @protected
-  late AnchorRegistry anchorRegistry;
-
   final _flatteners = <Flattener>[];
+
+  late AnchorRegistry _anchorRegistry;
 
   BuildOp? _styleBgColor;
   BuildOp? _styleBorder;
@@ -48,6 +47,12 @@ class WidgetFactory {
   BuildOp? _tagQ;
   TextStyleHtml Function(TextStyleHtml, css.Expression)? _tsbLineHeight;
   HtmlWidget? _widget;
+
+  /// Gets the current anchor registry.
+  ///
+  /// This is an implementation detail and may be changed without a major version bump.
+  @protected
+  AnchorRegistry get anchorRegistry => _anchorRegistry;
 
   /// Builds [Align].
   Widget? buildAlign(
@@ -617,7 +622,7 @@ class WidgetFactory {
     if (url.startsWith('#')) {
       final id = url.substring(1);
       final handledViaAnchor =
-          await onTapAnchor(id, anchorRegistry.ensureVisible);
+          await onTapAnchor(id, _anchorRegistry.ensureVisible);
       if (handledViaAnchor) {
         return true;
       }
@@ -1094,7 +1099,7 @@ class WidgetFactory {
   void reset(State state) {
     _dispose();
 
-    anchorRegistry = AnchorRegistry();
+    _anchorRegistry = AnchorRegistry();
 
     final widget = state.widget;
     _widget = widget is HtmlWidget ? widget : null;
@@ -1130,7 +1135,7 @@ class WidgetFactory {
 
     return BuildOp(
       onTree: (meta, tree) {
-        anchorRegistry.register(id, anchor);
+        _anchorRegistry.register(id, anchor);
         tree.registerAnchor(anchor);
       },
       onTreeFlattening: (meta, tree) {
