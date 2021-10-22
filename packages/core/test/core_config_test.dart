@@ -498,11 +498,13 @@ void main() {
       RenderMode renderMode, {
       bool buildAsync = false,
       String? html,
+      GlobalKey? key,
     }) {
+      key ??= helper.hwKey;
       final hw = HtmlWidget(
         html ?? '<p>Foo</p><p>Bar</p>',
         buildAsync: buildAsync,
-        key: helper.hwKey,
+        key: key,
         renderMode: renderMode,
       );
 
@@ -512,6 +514,7 @@ void main() {
         hw: renderMode == RenderMode.sliverList
             ? CustomScrollView(slivers: [hw])
             : hw,
+        key: key,
         useExplainer: false,
       );
     }
@@ -533,10 +536,11 @@ void main() {
       final html =
           '${'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ' * 1000}'
           '<a name="bottom">Bottom></a>';
-      await explain(tester, renderMode, html: html);
+      final key = GlobalKey<HtmlWidgetState>();
+      await explain(tester, renderMode, html: html, key: key);
       expect(controller.offset, equals(0));
 
-      final htmlWidget = helper.hwKey.currentState!;
+      final htmlWidget = key.currentState!;
       htmlWidget.scrollToAnchor('bottom');
       await tester.pumpAndSettle();
       expect(controller.offset, isNot(equals(0)));

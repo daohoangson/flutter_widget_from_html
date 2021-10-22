@@ -35,15 +35,19 @@ Future<String> explain(
   WidgetTester tester,
   String? html, {
   Widget? hw,
+  GlobalKey? key,
   bool useExplainer = true,
-}) async =>
-    helper.explain(
-      tester,
-      null,
-      explainer: _explainer,
-      hw: hw ?? HtmlWidget(html!, key: helper.hwKey),
-      useExplainer: useExplainer,
-    );
+}) async {
+  key ??= helper.hwKey;
+  return helper.explain(
+    tester,
+    null,
+    explainer: _explainer,
+    hw: hw ?? HtmlWidget(html!, key: key),
+    key: key,
+    useExplainer: useExplainer,
+  );
+}
 
 Future<int> tapText(WidgetTester tester, String data) =>
     helper.tapText(tester, data);
