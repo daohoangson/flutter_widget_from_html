@@ -68,7 +68,6 @@ void main() {
       Uri? baseUrl,
       bool? buildAsync,
       required bool enableCaching,
-      RebuildTriggers? rebuildTriggers,
       TextStyle? textStyle,
     }) =>
         helper.explain(
@@ -80,7 +79,6 @@ void main() {
             buildAsync: buildAsync,
             enableCaching: enableCaching,
             key: helper.hwKey,
-            rebuildTriggers: rebuildTriggers,
             textStyle: textStyle,
           ),
         );
@@ -150,28 +148,6 @@ void main() {
       final built1 = helper.buildCurrentState();
 
       await explain(tester, html, enableCaching: false);
-      final built2 = helper.buildCurrentState();
-      _expect(built1, built2, isFalse);
-    });
-
-    testWidgets('rebuild new rebuildTriggers', (tester) async {
-      const html = 'Foo';
-
-      final explained1 = await explain(
-        tester,
-        html,
-        enableCaching: true,
-        rebuildTriggers: RebuildTriggers([1]),
-      );
-      expect(explained1, equals('[RichText:(:Foo)]'));
-      final built1 = helper.buildCurrentState();
-
-      await explain(
-        tester,
-        html,
-        enableCaching: true,
-        rebuildTriggers: RebuildTriggers([2]),
-      );
       final built2 = helper.buildCurrentState();
       _expect(built1, built2, isFalse);
     });
