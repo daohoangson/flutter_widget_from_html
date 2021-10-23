@@ -151,19 +151,26 @@ extension WidgetAnchors on Widget {
 }
 
 /// A widget builder that supports builder callbacks.
-class WidgetPlaceholder<T> extends StatelessWidget {
-  /// The origin of this widget.
-  final T generator;
-
-  final List<Widget? Function(BuildContext, Widget)> _builders = [];
+class WidgetPlaceholder extends StatelessWidget {
+  final List<Widget? Function(BuildContext, Widget)> _builders;
   final Widget? _firstChild;
 
-  /// Creates a widget builder.
-  WidgetPlaceholder(this.generator, {Widget? child, Key? key})
-      : _firstChild = child,
-        super(key: key);
+  /// Creates a placeholder with an initial child.
+  WidgetPlaceholder({
+    Widget? child,
+    String? localName,
+  })  : _builders = [],
+        _firstChild = child,
+        super(key: _LocalName.orNull(localName));
 
-  @visibleForTesting
+  /// Creates a placeholder with a builder callback.
+  WidgetPlaceholder.builder(
+    Widget? Function(BuildContext, Widget) builder, {
+    String? localName,
+  })  : _builders = [builder],
+        _firstChild = null,
+        super(key: _LocalName.orNull(localName));
+
   @override
   Widget build(BuildContext context) => callBuilders(context, _firstChild);
 
@@ -180,33 +187,18 @@ class WidgetPlaceholder<T> extends StatelessWidget {
     return built;
   }
 
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-        .add(DiagnosticsProperty('generator', generator, showName: false));
-  }
-
   /// Enqueues [builder] to be built later.
-  WidgetPlaceholder<T> wrapWith(
-    Widget? Function(BuildContext context, Widget child) builder,
-  ) {
+  WidgetPlaceholder wrapWith(Widget? Function(BuildContext, Widget) builder) {
     _builders.add(builder);
     return this;
   }
 
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
-      generator != null
-          ? 'WidgetPlaceholder($generator)'
-          : objectRuntimeType(this, 'WidgetPlaceholder');
-
   /// Creates a placeholder lazily.
   ///
   /// Returns [child] if it is already a placeholder.
-  static WidgetPlaceholder lazy(Widget child) => child is WidgetPlaceholder
-      ? child
-      : WidgetPlaceholder<Widget>(child, child: child);
+  // ignore: prefer_constructors_over_static_methods
+  static WidgetPlaceholder lazy(Widget child) =>
+      child is WidgetPlaceholder ? child : WidgetPlaceholder(child: child);
 }
 
 final _dataUriRegExp = RegExp('^data:[^;]+;([^,]+),');
@@ -245,3 +237,18 @@ double? tryParseDoubleFromMap(Map<dynamic, String> map, String key) =>
 /// Parses [key] from [map] as a, possibly signed, integer literal and return its value.
 int? tryParseIntFromMap(Map<dynamic, String> map, String key) =>
     map.containsKey(key) ? int.tryParse(map[key]!) : null;
+
+class _LocalName extends ValueKey<String> {
+  const _LocalName(String value) : super(value);
+
+  @override
+  bool operator ==(Object other) => identical(this, other);
+
+  @override
+  int get hashCode => hashValues(runtimeType, value);
+
+  @override
+  String toString() => value;
+
+  static _LocalName? orNull(String? v) => v != null ? _LocalName(v) : null;
+}

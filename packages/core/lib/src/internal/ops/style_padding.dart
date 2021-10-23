@@ -3,15 +3,15 @@ part of '../core_ops.dart';
 const kCssPadding = 'padding';
 
 WidgetPlaceholder _paddingInlineAfter(TextStyleBuilder tsb, CssLengthBox box) =>
-    WidgetPlaceholder<CssLengthBox>(box).wrapWith(
-      (context, _) =>
-          _paddingInlineSizedBox(box.getValueRight(tsb.build(context))),
+    WidgetPlaceholder.builder(
+      (c, _) => _paddingInlineSizedBox(box.getValueRight(tsb.build(c))),
+      localName: kCssPadding,
     );
 
 WidgetPlaceholder _paddingInlineBefore(TextStyleBuilder tsb, CssLengthBox b) =>
-    WidgetPlaceholder<CssLengthBox>(b).wrapWith(
-      (context, _) =>
-          _paddingInlineSizedBox(b.getValueLeft(tsb.build(context))),
+    WidgetPlaceholder.builder(
+      (c, _) => _paddingInlineSizedBox(b.getValueLeft(tsb.build(c))),
+      localName: kCssPadding,
     );
 
 Widget _paddingInlineSizedBox(double? width) =>
@@ -61,7 +61,7 @@ class StylePadding {
 
           return [
             WidgetPlaceholder(
-              padding,
+              localName: kCssPadding,
               child: wf.buildColumnPlaceholder(meta, widgets),
             ).wrapWith(
               (context, child) => _build(meta, context, child, padding),

@@ -4,33 +4,10 @@ import 'package:mocktail_image_network/mocktail_image_network.dart';
 import '_.dart';
 
 void main() {
-  group('basic usage', () {
+  testWidgets('renders Q tag', (WidgetTester tester) async {
     const html = 'Someone said <q>Foo</q>.';
-
-    testWidgets('renders quotes', (WidgetTester tester) async {
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Someone said “Foo”.)]'));
-    });
-
-    testWidgets('useExplainer=false', (WidgetTester tester) async {
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(
-        explained,
-        equals(
-          'TshWidget\n'
-          '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
-          ' │  "Someone said"\n'
-          ' │  Whitespace[32]#2\n'
-          ' │  BuildTree#3 tsb#4(parent=#1):\n'
-          ' │    QBit.opening#5 tsb#4(parent=#1)\n'
-          ' │    "Foo"\n'
-          ' │    QBit.closing#6 tsb#4(parent=#1)\n'
-          ' │  "."\n'
-          ' │)\n'
-          ' └RichText(text: "Someone said “Foo”.")\n\n',
-        ),
-      );
-    });
+    final explained = await explain(tester, html);
+    expect(explained, equals('[RichText:(:Someone said “Foo”.)]'));
   });
 
   testWidgets('renders quotes without contents', (WidgetTester tester) async {

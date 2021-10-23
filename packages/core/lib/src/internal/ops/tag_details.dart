@@ -26,10 +26,13 @@ class TagDetails {
         final first = children.first;
         final marker = WidgetBit.inline(
           first.parent!,
-          WidgetPlaceholder(meta).wrapWith((context, child) {
-            final tsh = meta.tsb.build(context);
-            return HtmlDetailsMarker(style: tsh.styleWithHeight);
-          }),
+          WidgetPlaceholder.builder(
+            (context, child) {
+              final tsh = meta.tsb.build(context);
+              return HtmlDetailsMarker(style: tsh.styleWithHeight);
+            },
+            localName: kTagDetails,
+          ),
         );
         marker.insertBefore(first);
       },

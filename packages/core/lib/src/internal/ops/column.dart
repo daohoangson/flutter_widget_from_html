@@ -2,17 +2,16 @@ part of '../core_ops.dart';
 
 final _isBody = Expando<bool>();
 
-class ColumnPlaceholder extends WidgetPlaceholder<BuildMetadata> {
+class ColumnPlaceholder extends WidgetPlaceholder {
   final Iterable<WidgetPlaceholder> children;
   final BuildMetadata meta;
   final WidgetFactory wf;
 
   ColumnPlaceholder({
     required this.children,
-    Key? key,
     required this.meta,
     required this.wf,
-  }) : super(meta, key: key);
+  }) : super(localName: meta.element.localName);
 
   bool get isBody => _isBody[this] == true;
 

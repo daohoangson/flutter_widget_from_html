@@ -39,7 +39,7 @@ class TagLi {
     _itemOp = BuildOp(
       onWidgets: (itemMeta, widgets) {
         final column = wf.buildColumnPlaceholder(itemMeta, widgets) ??
-            WidgetPlaceholder<BuildMetadata>(itemMeta);
+            WidgetPlaceholder(localName: kTagLi);
 
         final i = _itemMetas.length;
         _itemMetas.add(itemMeta);

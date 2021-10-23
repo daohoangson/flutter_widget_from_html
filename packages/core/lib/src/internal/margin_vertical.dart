@@ -3,14 +3,16 @@ import 'package:flutter/widgets.dart';
 import '../core_data.dart';
 import '../core_helpers.dart';
 
-class HeightPlaceholder extends WidgetPlaceholder<CssLength> {
+class HeightPlaceholder extends WidgetPlaceholder {
   final TextStyleBuilder tsb;
 
   final List<CssLength> _heights = [];
 
-  HeightPlaceholder(CssLength height, this.tsb, {Key? key})
-      : super(height, key: key) {
-    super.wrapWith((c, w) => _build(c, w, height, tsb));
+  HeightPlaceholder(CssLength height, this.tsb)
+      : super.builder(
+          (context, child) => _build(context, child, height, tsb),
+          localName: 'height',
+        ) {
     _heights.add(height);
   }
 

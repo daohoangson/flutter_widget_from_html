@@ -214,18 +214,14 @@ Future<void> main() async {
         explained,
         equals(
           'TshWidget\n'
-          '└ColumnPlaceholder(BuildMetadata(<root></root>))\n'
+          '└ColumnPlaceholder-root()\n'
           ' └Column()\n'
-          '  ├WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
-          '  ││  "1"\n'
-          '  ││)\n'
+          '  ├WidgetPlaceholder-text()\n'
           '  │└CssBlock()\n'
           '  │ └RichText(text: "1")\n'
-          '  ├HeightPlaceholder(1.0em)\n'
+          '  ├HeightPlaceholder-height()\n'
           '  │└SizedBox(height: 10.0)\n'
-          '  └WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#2):\n'
-          '   │  "2"\n'
-          '   │)\n'
+          '  └WidgetPlaceholder-text()\n'
           '   └CssBlock()\n'
           '    └RichText(text: "2")\n\n',
         ),
