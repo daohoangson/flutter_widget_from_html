@@ -12,12 +12,13 @@ const kColorPrimary = Color(0xFF123456);
 const kDataBase64 = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 const kDataUri = 'data:image/gif;base64,$kDataBase64';
 
+// TODO: switch to GlobalKey<HtmlWidgetState> when backward compatibility allows
 final hwKey = GlobalKey<State<HtmlWidget>>();
 
 const kGoldenFilePrefix = '../../../demo_app/test';
 
-Widget? buildCurrentState() {
-  final hws = hwKey.currentState;
+Widget? buildCurrentState({GlobalKey? key}) {
+  final hws = (key ?? hwKey).currentState;
   if (hws == null) {
     return null;
   }
@@ -31,14 +32,16 @@ Future<String> explain(
   String? html, {
   String? Function(Explainer, Widget)? explainer,
   Widget? hw,
+  GlobalKey? key,
   bool rtl = false,
   TextStyle? textStyle,
   bool useExplainer = true,
 }) async {
   assert((html == null) != (hw == null));
+  key ??= hwKey;
   hw ??= HtmlWidget(
     html!,
-    key: hwKey,
+    key: key,
     textStyle: textStyle,
   );
 
@@ -74,17 +77,20 @@ Future<String> explain(
 
   return explainWithoutPumping(
     explainer: explainer,
+    key: key,
     useExplainer: useExplainer,
   );
 }
 
 Future<String> explainWithoutPumping({
   String? Function(Explainer, Widget)? explainer,
+  GlobalKey? key,
   bool useExplainer = true,
 }) async {
+  key ??= hwKey;
   if (!useExplainer) {
     final sb = StringBuffer();
-    hwKey.currentContext?.visitChildElements(
+    key.currentContext?.visitChildElements(
       (e) => sb.writeln(e.toDiagnosticsNode().toStringDeep()),
     );
     var str = sb.toString();
@@ -145,13 +151,13 @@ Future<String> explainWithoutPumping({
     return str;
   }
 
-  final built = buildCurrentState();
+  final built = buildCurrentState(key: key);
   if (built == null) {
     return 'null';
   }
 
   return Explainer(
-    hwKey.currentContext!,
+    key.currentContext!,
     explainer: explainer,
   ).explain(built);
 }

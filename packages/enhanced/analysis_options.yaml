@@ -1,6 +1,8 @@
 include: package:lint/analysis_options_package.yaml
 
 analyzer:
+  errors:
+    todo: info
   exclude:
     # TODO: investigate `include_file_not_found` warning
     - example

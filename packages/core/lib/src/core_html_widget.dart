@@ -256,7 +256,11 @@ Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
     tsb: rootMeta.tsb,
     wf: wf,
   )..addBitsFromNodes(domNodes);
-  return wf.buildBody(rootMeta, tree.build()) ?? widget0;
+
+  return wf
+          .buildColumnPlaceholder(rootMeta, tree.build())
+          ?.wrapWith(wf.buildBodyWidget) ??
+      widget0;
 }
 
 dom.NodeList _parseHtml(String html) =>

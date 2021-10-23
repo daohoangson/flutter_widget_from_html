@@ -1,3 +1,8 @@
+## 0.8.1
+
+- Mark enhanced `HtmlWidget.webViewXxx` properties as deprecated (#614)
+- Add support for `ListView` and `SliverList` constructor params (#616)
+
 ## 0.8.0
 
 - Update for Flutter 2.5 (#587)

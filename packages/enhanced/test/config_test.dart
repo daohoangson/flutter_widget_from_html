@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -464,11 +466,14 @@ void main() {
       WidgetTester tester,
       RenderMode renderMode, {
       bool buildAsync = false,
+      String? html,
+      GlobalKey? key,
     }) {
+      key ??= helper.hwKey;
       final hw = HtmlWidget(
-        '<p>Foo</p><p>Bar</p>',
+        html ?? '<p>Foo</p><p>Bar</p>',
         buildAsync: buildAsync,
-        key: helper.hwKey,
+        key: key,
         renderMode: renderMode,
       );
 
@@ -478,6 +483,7 @@ void main() {
         hw: renderMode == RenderMode.sliverList
             ? CustomScrollView(slivers: [hw])
             : hw,
+        key: key,
         useExplainer: false,
       );
     }
@@ -491,6 +497,22 @@ void main() {
       final explained = await explain(tester, RenderMode.listView);
       expect(explained, contains('└ListView('));
       expect(explained, isNot(contains('└Column(')));
+    });
+
+    testWidgets('renders ListView with ScrollController', (tester) async {
+      final controller = ScrollController();
+      final renderMode = ListViewMode(controller: controller);
+      final html =
+          '${'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ' * 1000}'
+          '<a name="bottom">Bottom></a>';
+      final key = GlobalKey<HtmlWidgetState>();
+      await explain(tester, renderMode, html: html, key: key);
+      expect(controller.offset, equals(0));
+
+      final htmlWidget = key.currentState!;
+      htmlWidget.scrollToAnchor('bottom');
+      await tester.pumpAndSettle();
+      expect(controller.offset, isNot(equals(0)));
     });
 
     testWidgets('renders SliverList', (WidgetTester tester) async {
