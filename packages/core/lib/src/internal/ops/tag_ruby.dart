@@ -59,8 +59,8 @@ class TagRuby {
       final rtBit = bit;
       final rtTree = rtBit as BuildTree;
       final rubyTree = tree.sub();
-      final placeholder = WidgetPlaceholder.builder(
-        (context, __) {
+      final placeholder = WidgetPlaceholder(
+        builder: (context, __) {
           final tsh = rubyTree.tsb.build(context);
 
           final ruby = wf.buildColumnWidget(

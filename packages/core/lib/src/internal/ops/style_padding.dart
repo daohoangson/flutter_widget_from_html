@@ -2,15 +2,15 @@ part of '../core_ops.dart';
 
 const kCssPadding = 'padding';
 
-WidgetPlaceholder _paddingInlineAfter(TextStyleBuilder tsb, CssLengthBox box) =>
-    WidgetPlaceholder.builder(
-      (c, _) => _paddingInlineSizedBox(box.getValueRight(tsb.build(c))),
+WidgetPlaceholder _paddingInlineAfter(TextStyleBuilder tsb, CssLengthBox b) =>
+    WidgetPlaceholder(
+      builder: (c, _) => _paddingInlineSizedBox(b.getValueRight(tsb.build(c))),
       localName: kCssPadding,
     );
 
 WidgetPlaceholder _paddingInlineBefore(TextStyleBuilder tsb, CssLengthBox b) =>
-    WidgetPlaceholder.builder(
-      (c, _) => _paddingInlineSizedBox(b.getValueLeft(tsb.build(c))),
+    WidgetPlaceholder(
+      builder: (c, _) => _paddingInlineSizedBox(b.getValueLeft(tsb.build(c))),
       localName: kCssPadding,
     );
 

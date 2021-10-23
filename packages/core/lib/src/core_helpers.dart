@@ -150,33 +150,28 @@ extension WidgetAnchors on Widget {
   }
 }
 
-/// A widget builder that supports builder callbacks.
+/// A widget builder that can be extended with callbacks.
 class WidgetPlaceholder extends StatelessWidget {
-  final List<Widget? Function(BuildContext, Widget)> _builders;
+  final List<WidgetPlaceholderBuilder> _builders;
   final Widget? _firstChild;
 
-  /// Creates a placeholder with an initial child.
+  /// Creates a placeholder.
   WidgetPlaceholder({
+    WidgetPlaceholderBuilder? builder,
     Widget? child,
     String? localName,
-  })  : _builders = [],
+  })  : _builders = builder != null ? [builder] : [],
         _firstChild = child,
         super(key: _LocalName.orNull(localName));
 
-  /// Creates a placeholder with a builder callback.
-  WidgetPlaceholder.builder(
-    Widget? Function(BuildContext, Widget) builder, {
-    String? localName,
-  })  : _builders = [builder],
-        _firstChild = null,
-        super(key: _LocalName.orNull(localName));
-
   @override
-  Widget build(BuildContext context) => callBuilders(context, _firstChild);
+  Widget build(BuildContext context) =>
+      callBuilders(context, _firstChild ?? widget0);
 
   /// Calls builder callbacks on the specified [child] widget.
-  Widget callBuilders(BuildContext context, Widget? child) {
-    var built = child ?? widget0;
+  @protected
+  Widget callBuilders(BuildContext context, Widget child) {
+    var built = child;
 
     for (final builder in _builders) {
       built = builder(context, built) ?? widget0;
@@ -188,7 +183,7 @@ class WidgetPlaceholder extends StatelessWidget {
   }
 
   /// Enqueues [builder] to be built later.
-  WidgetPlaceholder wrapWith(Widget? Function(BuildContext, Widget) builder) {
+  WidgetPlaceholder wrapWith(WidgetPlaceholderBuilder builder) {
     _builders.add(builder);
     return this;
   }
@@ -200,6 +195,12 @@ class WidgetPlaceholder extends StatelessWidget {
   static WidgetPlaceholder lazy(Widget child) =>
       child is WidgetPlaceholder ? child : WidgetPlaceholder(child: child);
 }
+
+/// A callback for [WidgetPlaceholder].
+typedef WidgetPlaceholderBuilder = Widget? Function(
+  BuildContext context,
+  Widget child,
+);
 
 final _dataUriRegExp = RegExp('^data:[^;]+;([^,]+),');
 

@@ -385,7 +385,7 @@ class WidgetFactory {
 
       final widgetBuilder = flattened.widgetBuilder;
       if (widgetBuilder != null) {
-        widgets.add(WidgetPlaceholder.builder((c, _) => widgetBuilder(c)));
+        widgets.add(WidgetPlaceholder(builder: (c, _) => widgetBuilder(c)));
         continue;
       }
 
@@ -394,8 +394,8 @@ class WidgetFactory {
         continue;
       }
       widgets.add(
-        WidgetPlaceholder.builder(
-          (context, _) {
+        WidgetPlaceholder(
+          builder: (context, _) {
             final tsh = tree.tsb.build(context);
             final span = spanBuilder(context, tsh.whitespace);
             if (span == null || span is! InlineSpan) {
@@ -1142,8 +1142,8 @@ class WidgetFactory {
         tree.registerAnchor(anchor);
       },
       onTreeFlattening: (meta, tree) {
-        final widget = WidgetPlaceholder.builder(
-          (context, _) => SizedBox(
+        final widget = WidgetPlaceholder(
+          builder: (context, _) => SizedBox(
             height: meta.tsb.build(context).style.fontSize,
             key: anchor,
           ),

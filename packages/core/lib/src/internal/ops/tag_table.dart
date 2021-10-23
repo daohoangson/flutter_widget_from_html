@@ -115,8 +115,8 @@ class TagTable {
         : null;
 
     return [
-      WidgetPlaceholder.builder(
-        (context, _) {
+      WidgetPlaceholder(
+        builder: (context, _) {
           final tsh = tableMeta.tsb.build(context);
 
           return HtmlTable(
