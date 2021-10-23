@@ -296,6 +296,14 @@ void main() {
   });
 
   group('copyWith', () {
+    test('TextBit returns same parent', () {
+      final text = _text();
+      final bit = text.addText('1');
+
+      final copied = bit.copyWith();
+      expect(copied.parent, equals(text));
+    });
+
     test('TextBit returns', () {
       final text = _text();
       final bit = text.addText('1');
@@ -304,6 +312,15 @@ void main() {
       final copied = bit.copyWith(parent: text2);
       text2.add(copied);
       expect(_data(text2), equals('1'));
+    });
+
+    test('WidgetBit returns same parent', () {
+      final text = _text();
+      final child = WidgetPlaceholder();
+      final bit = WidgetBit.inline(text, child);
+
+      final copied = bit.copyWith();
+      expect(copied.parent, equals(text));
     });
 
     test('WidgetBit returns', () {
@@ -356,6 +373,15 @@ void main() {
       );
     });
 
+    test('NewLine returns same parent', () {
+      final text = _text();
+      text.addText('1');
+      final newLine = text.addNewLine();
+
+      final copied = newLine.copyWith();
+      expect(copied.parent, equals(text));
+    });
+
     test('NewLine returns', () {
       final text = _text();
       text.addText('1');
@@ -367,6 +393,15 @@ void main() {
       text2.add(copied);
       text2.addText('2');
       expect(_data(text2), equals('1\n2'));
+    });
+
+    test('Whitespace returns same parent', () {
+      final text = _text();
+      text.addText('1');
+      final whitespace = text.addWhitespace(' ');
+
+      final copied = whitespace.copyWith();
+      expect(copied.parent, equals(text));
     });
 
     test('Whitespace returns', () {
@@ -397,6 +432,7 @@ void main() {
     text22.addNewLine();
     text2.addText('(2.3)');
     text.add(WidgetBit.inline(text, const Text('Hi')));
+    text.add(_CustomBit(text, text.tsb));
     text.add(_CircularBit(text));
 
     expect(
@@ -413,6 +449,7 @@ void main() {
         '      ASCII-10\n'
         '    "(2.3)"\n'
         '  WidgetBit.inline#7 WidgetPlaceholder\n'
+        '  _CustomBit#8 tsb#1\n'
         '  BuildTree#0 (circular)',
       ),
     );
@@ -498,6 +535,32 @@ class _BuildBitWidgetFactory extends WidgetFactory {
 
     super.parse(meta);
   }
+}
+
+class _CircularBit extends BuildTree {
+  _CircularBit(BuildTree parent) : super(parent, parent.tsb);
+
+  @override
+  Iterable<WidgetPlaceholder> build() => throw UnimplementedError();
+
+  @override
+  BuildTree sub({BuildTree? parent, TextStyleBuilder? tsb}) =>
+      throw UnimplementedError();
+
+  @override
+  String toString() => parent.toString();
+}
+
+class _CustomBit extends BuildBit<void, void> {
+  const _CustomBit(BuildTree? parent, TextStyleBuilder tsb)
+      : super(parent, tsb);
+
+  @override
+  void buildBit(void input) {}
+
+  @override
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+      throw UnimplementedError();
 }
 
 class _InputBuildContextBit extends BuildBit<BuildContext, Widget> {
@@ -622,17 +685,3 @@ BuildTree _text() => builder.BuildTree(
       ),
       wf: WidgetFactory(),
     );
-
-class _CircularBit extends BuildTree {
-  _CircularBit(BuildTree parent) : super(parent, parent.tsb);
-
-  @override
-  Iterable<WidgetPlaceholder> build() => throw UnimplementedError();
-
-  @override
-  BuildTree sub({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      throw UnimplementedError();
-
-  @override
-  String toString() => parent.toString();
-}
