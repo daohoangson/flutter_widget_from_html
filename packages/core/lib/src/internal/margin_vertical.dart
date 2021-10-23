@@ -8,9 +8,10 @@ class HeightPlaceholder extends WidgetPlaceholder {
 
   final List<CssLength> _heights = [];
 
-  HeightPlaceholder(CssLength height, this.tsb)
+  HeightPlaceholder(CssLength height, this.tsb, {Key? key})
       : super(
           builder: (context, child) => _build(context, child, height, tsb),
+          key: key,
           localName: 'height',
         ) {
     _heights.add(height);

@@ -9,9 +9,10 @@ class ColumnPlaceholder extends WidgetPlaceholder {
 
   ColumnPlaceholder({
     required this.children,
+    Key? key,
     required this.meta,
     required this.wf,
-  }) : super(localName: meta.element.localName);
+  }) : super(key: key, localName: meta.element.localName);
 
   bool get isBody => _isBody[this] == true;
 
