@@ -152,6 +152,7 @@ extension WidgetAnchors on Widget {
 
 /// A widget builder that can be extended with callbacks.
 class WidgetPlaceholder extends StatelessWidget {
+  final String? localName;
   final List<WidgetPlaceholderBuilder> _builders;
   final Widget? _firstChild;
 
@@ -159,10 +160,11 @@ class WidgetPlaceholder extends StatelessWidget {
   WidgetPlaceholder({
     WidgetPlaceholderBuilder? builder,
     Widget? child,
-    String? localName,
+    Key? key,
+    this.localName,
   })  : _builders = builder != null ? [builder] : [],
         _firstChild = child,
-        super(key: _LocalName.orNull(localName));
+        super(key: key);
 
   @override
   Widget build(BuildContext context) =>
@@ -180,6 +182,21 @@ class WidgetPlaceholder extends StatelessWidget {
     built.setAnchorsIfUnset(anchors);
 
     return built;
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+
+    if (localName != null) {
+      properties.add(
+        DiagnosticsProperty(
+          'localName',
+          localName,
+          showName: false,
+        ),
+      );
+    }
   }
 
   /// Enqueues [builder] to be built later.
@@ -238,18 +255,3 @@ double? tryParseDoubleFromMap(Map<dynamic, String> map, String key) =>
 /// Parses [key] from [map] as a, possibly signed, integer literal and return its value.
 int? tryParseIntFromMap(Map<dynamic, String> map, String key) =>
     map.containsKey(key) ? int.tryParse(map[key]!) : null;
-
-class _LocalName extends ValueKey<String> {
-  const _LocalName(String value) : super(value);
-
-  @override
-  bool operator ==(Object other) => identical(this, other);
-
-  @override
-  int get hashCode => hashValues(runtimeType, value);
-
-  @override
-  String toString() => value;
-
-  static _LocalName? orNull(String? v) => v != null ? _LocalName(v) : null;
-}

@@ -214,14 +214,14 @@ Future<void> main() async {
         explained,
         equals(
           'TshWidget\n'
-          '└ColumnPlaceholder-root()\n'
+          '└ColumnPlaceholder(root)\n'
           ' └Column()\n'
-          '  ├WidgetPlaceholder-text()\n'
+          '  ├WidgetPlaceholder(text)\n'
           '  │└CssBlock()\n'
           '  │ └RichText(text: "1")\n'
-          '  ├HeightPlaceholder-height()\n'
+          '  ├HeightPlaceholder(height)\n'
           '  │└SizedBox(height: 10.0)\n'
-          '  └WidgetPlaceholder-text()\n'
+          '  └WidgetPlaceholder(text)\n'
           '   └CssBlock()\n'
           '    └RichText(text: "2")\n\n',
         ),
