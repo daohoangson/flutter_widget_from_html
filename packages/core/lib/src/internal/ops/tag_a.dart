@@ -54,7 +54,7 @@ class TagA {
   }
 }
 
-class _TagABit extends BuildBit<GestureRecognizer?, GestureRecognizer> {
+class _TagABit extends BuildBit<GestureRecognizer?, GestureRecognizer?> {
   final GestureTapCallback onTap;
 
   const _TagABit(BuildTree? parent, TextStyleBuilder tsb, this.onTap)
@@ -64,7 +64,7 @@ class _TagABit extends BuildBit<GestureRecognizer?, GestureRecognizer> {
   bool? get swallowWhitespace => null;
 
   @override
-  GestureRecognizer buildBit(GestureRecognizer? recognizer) {
+  GestureRecognizer? buildBit(GestureRecognizer? recognizer) {
     if (recognizer is TapGestureRecognizer) {
       recognizer.onTap = onTap;
       return recognizer;

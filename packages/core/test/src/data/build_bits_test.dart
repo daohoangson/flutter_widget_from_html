@@ -23,35 +23,8 @@ void main() {
             ),
           );
 
-      testWidgets('accepts BuildContext', (WidgetTester tester) async {
-        const html = '1 <span class="input--BuildContext">2</span> 3';
-        final explained = await explain(tester, html);
-        expect(
-          explained,
-          equals(
-            '[Column:children='
-            '[RichText:(:1 2)],'
-            '[Text:Foo],'
-            '[RichText:(:3)]'
-            ']',
-          ),
-        );
-      });
-
       group('accepts GestureRecognizer', () {
         const clazz = 'input--GestureRecognizer';
-
-        testWidgets('SPAN tag with BuildBit', (WidgetTester tester) async {
-          const html = '1 <span class="$clazz">2</span> 3';
-          final explained = await explain(tester, html);
-          expect(explained, equals('[RichText:(:1 2(no recognizer) 3)]'));
-        });
-
-        testWidgets('SPAN tag with styling + BuildBit', (tester) async {
-          const html = '1 <span class="custom $clazz">2</span> 3';
-          final explained = await explain(tester, html);
-          expect(explained, equals('[RichText:(:1 (:2(no recognizer))(: 3))]'));
-        });
 
         testWidgets('A tag without BuildBit', (WidgetTester tester) async {
           const html = '1 <a href="href">2</a> 3';
@@ -76,51 +49,6 @@ void main() {
         const html = '1 <span class="input--TextStyleHtml">2</span> 3';
         final explained = await explain(tester, html);
         expect(explained, equals('[RichText:(:1 2(:TextStyleHtml)(: 3))]'));
-      });
-
-      testWidgets('accepts void', (WidgetTester tester) async {
-        const html = '1 <span class="input--void">2</span> 3';
-        final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:1 2(null) 3)]'));
-      });
-
-      group('returns GestureRecognizer', () {
-        const clazz = 'output--GestureRecognizer';
-
-        testWidgets('SPAN tag with BuildBit', (WidgetTester tester) async {
-          const html = '1 <span class="$clazz">2</span> 3';
-          final e = await explain(tester, html);
-          expect(e, equals('[RichText:(+MultiTapGestureRecognizer:1 2 3)]'));
-        });
-
-        testWidgets('SPAN tag with styling + BuildBit', (tester) async {
-          const html = '1 <span class="custom $clazz">2</span> 3';
-          final explained = await explain(tester, html);
-          expect(
-            explained,
-            equals('[RichText:(:1 (+MultiTapGestureRecognizer:2)(: 3))]'),
-          );
-        });
-
-        testWidgets('A tag without BuildBit', (WidgetTester tester) async {
-          const html = '1 <a href="href">2</a> 3';
-          final explained = await explain(tester, html);
-          expect(
-            explained,
-            equals('[RichText:(:1 (#FF123456+u+onTap:2)(: 3))]'),
-          );
-        });
-
-        testWidgets('A tag with BuildBit', (WidgetTester tester) async {
-          const html = '1 <a href="href" class="$clazz">2</a> 3';
-          final explained = await explain(tester, html);
-          expect(
-            explained,
-            equals(
-              '[RichText:(:1 (#FF123456+u+MultiTapGestureRecognizer:2)(: 3))]',
-            ),
-          );
-        });
       });
 
       testWidgets('returns InlineSpan', (WidgetTester tester) async {
@@ -461,14 +389,6 @@ class _BuildBitWidgetFactory extends WidgetFactory {
   void parse(BuildMetadata meta) {
     final classes = meta.element.classes;
 
-    if (classes.contains('input--BuildContext')) {
-      meta.register(
-        BuildOp(
-          onTree: (_, tree) => tree.add(_InputBuildContextBit(tree, tree.tsb)),
-        ),
-      );
-    }
-
     if (classes.contains('input--GestureRecognizer')) {
       meta.register(
         BuildOp(
@@ -483,14 +403,6 @@ class _BuildBitWidgetFactory extends WidgetFactory {
       meta.register(
         BuildOp(
           onTree: (_, tree) => tree.add(_InputTextStyleHtmlBit(tree, tree.tsb)),
-        ),
-      );
-    }
-
-    if (classes.contains('input--void')) {
-      meta.register(
-        BuildOp(
-          onTree: (_, tree) => tree.add(_InputVoidBit(tree, tree.tsb)),
         ),
       );
     }
@@ -563,47 +475,24 @@ class _CustomBit extends BuildBit<void, void> {
       throw UnimplementedError();
 }
 
-class _InputBuildContextBit extends BuildBit<BuildContext, Widget> {
-  const _InputBuildContextBit(BuildTree? parent, TextStyleBuilder tsb)
-      : super(parent, tsb);
-
-  @override
-  Widget buildBit(BuildContext? _) => const Text('Foo');
-
-  @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _InputBuildContextBit(parent ?? this.parent, tsb ?? this.tsb);
-}
-
-class _InputGestureRecognizerBit extends BuildBit<GestureRecognizer?, dynamic> {
+class _InputGestureRecognizerBit
+    extends BuildBit<GestureRecognizer?, GestureRecognizer?> {
   const _InputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
-  dynamic buildBit(GestureRecognizer? recognizer) {
+  GestureRecognizer? buildBit(GestureRecognizer? recognizer) {
     if (recognizer is TapGestureRecognizer) {
       recognizer.onTapCancel = () {};
       return recognizer;
     }
 
-    return '(no recognizer)';
+    return null;
   }
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _InputGestureRecognizerBit(parent ?? this.parent, tsb ?? this.tsb);
-}
-
-class _InputVoidBit extends BuildBit<void, dynamic> {
-  const _InputVoidBit(BuildTree? parent, TextStyleBuilder tsb)
-      : super(parent, tsb);
-
-  @override
-  dynamic buildBit(void _) => '(null)';
-
-  @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _InputVoidBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
 class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {

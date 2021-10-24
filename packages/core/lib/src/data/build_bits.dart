@@ -91,21 +91,14 @@ abstract class BuildBit<InputType, OutputType> {
 
   /// Builds input into output.
   ///
-  /// Supported input types:
-  /// - [BuildContext] (output must be `Widget`)
-  /// - [GestureRecognizer]
-  /// - [TextStyleHtml] (output must be `InlineSpan`)
-  /// - [void]
+  /// Supported input-output mappings
+  /// - [GestureRecognizer]? → [GestureRecognizer]?
+  /// - [TextStyleHtml] → [InlineSpan]
+  /// - void → [InlineSpan]
+  /// - void → [String]
+  /// - void → [Widget]
   ///
-  /// Supported output types:
-  /// - [BuildTree]
-  /// - [GestureRecognizer]
-  /// - [InlineSpan]
-  /// - [String]
-  /// - [Widget]
-  ///
-  /// Returning an unsupported type or `null` will not trigger any error.
-  /// The output will be siliently ignored.
+  /// See [Flattener._loop]
   OutputType buildBit(InputType input);
 
   /// Creates a copy with the given fields replaced with the new values.
@@ -304,62 +297,81 @@ class TextBit extends BuildBit<void, String> {
 }
 
 /// A widget bit.
-class WidgetBit extends BuildBit<void, dynamic> {
-  /// See [PlaceholderSpan.alignment].
-  final PlaceholderAlignment? alignment;
-
-  /// See [PlaceholderSpan.baseline].
-  final TextBaseline? baseline;
-
+abstract class WidgetBit<T> extends BuildBit<void, T> {
   /// The widget to be rendered.
   final WidgetPlaceholder child;
 
-  const WidgetBit._(
-    BuildTree parent,
-    TextStyleBuilder tsb,
-    this.child, [
-    this.alignment,
-    this.baseline,
-  ]) : super(parent, tsb);
+  const WidgetBit._(BuildTree parent, TextStyleBuilder tsb, this.child)
+      : super(parent, tsb);
 
   /// Creates a block widget.
-  factory WidgetBit.block(
+  static WidgetBit<Widget> block(
     BuildTree parent,
     Widget child, {
     TextStyleBuilder? tsb,
   }) =>
-      WidgetBit._(parent, tsb ?? parent.tsb, WidgetPlaceholder.lazy(child));
+      _WidgetBitBlock(parent, tsb ?? parent.tsb, WidgetPlaceholder.lazy(child));
 
   /// Creates an inline widget.
-  factory WidgetBit.inline(
+  static WidgetBit<InlineSpan> inline(
     BuildTree parent,
     Widget child, {
     PlaceholderAlignment alignment = PlaceholderAlignment.bottom,
     TextBaseline baseline = TextBaseline.alphabetic,
     TextStyleBuilder? tsb,
   }) =>
-      WidgetBit._(
+      _WidgetBitInline(
         parent,
         tsb ?? parent.tsb,
         WidgetPlaceholder.lazy(child),
         alignment,
         baseline,
       );
+}
+
+class _WidgetBitBlock extends WidgetBit<Widget> {
+  const _WidgetBitBlock(
+    BuildTree parent,
+    TextStyleBuilder tsb,
+    WidgetPlaceholder child,
+  ) : super._(parent, tsb, child);
 
   @override
-  bool get isInline => alignment != null && baseline != null;
+  bool get isInline => false;
 
   @override
-  dynamic buildBit(void _) => isInline
-      ? WidgetSpan(
-          alignment: alignment!,
-          baseline: baseline,
-          child: child,
-        )
-      : child;
+  Widget buildBit(void _) => child;
 
   @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) => WidgetBit._(
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+      _WidgetBitBlock(parent ?? this.parent!, tsb ?? this.tsb, child);
+
+  @override
+  String toString() => 'WidgetBit.block#$hashCode $child';
+}
+
+class _WidgetBitInline extends WidgetBit<InlineSpan> {
+  final PlaceholderAlignment alignment;
+  final TextBaseline baseline;
+
+  const _WidgetBitInline(
+    BuildTree parent,
+    TextStyleBuilder tsb,
+    WidgetPlaceholder child,
+    this.alignment,
+    this.baseline,
+  ) : super._(parent, tsb, child);
+
+  @override
+  InlineSpan buildBit(void _) => WidgetSpan(
+        alignment: alignment,
+        baseline: baseline,
+        child: child,
+      );
+
+  @override
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+      _WidgetBitInline(
         parent ?? this.parent!,
         tsb ?? this.tsb,
         child,
@@ -368,8 +380,7 @@ class WidgetBit extends BuildBit<void, dynamic> {
       );
 
   @override
-  String toString() =>
-      'WidgetBit.${isInline ? "inline" : "block"}#$hashCode $child';
+  String toString() => 'WidgetBit.inline#$hashCode $child';
 }
 
 /// A whitespace bit.

@@ -9,9 +9,8 @@ import 'margin_vertical.dart';
 class Flattened {
   final SpanBuilder? spanBuilder;
   final Widget? widget;
-  final WidgetBuilder? widgetBuilder;
 
-  const Flattened._({this.spanBuilder, this.widget, this.widgetBuilder});
+  const Flattened._({this.spanBuilder, this.widget});
 }
 
 typedef SpanBuilder = InlineSpan? Function(
@@ -91,44 +90,25 @@ class Flattener {
       _saveSpan();
     }
 
-    dynamic built;
-    if (bit is BuildBit<BuildContext, Widget>) {
-      Widget widgetBuilder(BuildContext context) => bit.buildBit(context);
-      built = widgetBuilder;
-    } else if (bit is BuildBit<GestureRecognizer?, dynamic>) {
-      built = bit.buildBit(_prevRecognizer.value);
+    if (bit is BuildBit<GestureRecognizer?, GestureRecognizer?>) {
+      _prevRecognizer.value = bit.buildBit(_prevRecognizer.value);
     } else if (bit is BuildBit<TextStyleHtml, InlineSpan>) {
-      InlineSpan? spanBuilder(BuildContext context, CssWhitespace _) =>
-          bit.buildBit(thisTsb.build(context));
-      built = spanBuilder;
-    } else if (bit is BuildBit<void, dynamic>) {
-      built = bit.buildBit(null);
-    }
-
-    if (built is GestureRecognizer) {
-      _prevRecognizer.value = built;
-    } else if (built is InlineSpan) {
       _saveSpan();
-
-      final inlineSpan = built;
-      _spans!.add((_, __) => inlineSpan);
-    } else if (built is SpanBuilder) {
+      _spans!.add((context, _) => bit.buildBit(thisTsb.build(context)));
+    } else if (bit is BuildBit<void, InlineSpan>) {
       _saveSpan();
-      _spans!.add(built);
-    } else if (built is String) {
+      _spans!.add((_, __) => bit.buildBit(null));
+    } else if (bit is BuildBit<void, String>) {
       if (bit is WhitespaceBit) {
         if (!_loopShouldSwallowWhitespace(bit)) {
-          _prevStrings.add(_String(built, isWhitespace: true));
+          _prevStrings.add(_String(bit, isWhitespace: true));
         }
       } else {
-        _prevStrings.add(_String(built));
+        _prevStrings.add(_String(bit));
       }
-    } else if (built is Widget) {
+    } else if (bit is BuildBit<void, Widget>) {
       _completeLoop();
-      _flattened.add(Flattened._(widget: built));
-    } else if (built is WidgetBuilder) {
-      _completeLoop();
-      _flattened.add(Flattened._(widgetBuilder: built));
+      _flattened.add(Flattened._(widget: bit.buildBit(null)));
     }
 
     _prevTsb = thisTsb;
@@ -291,7 +271,8 @@ class _String {
   final String data;
   final bool isWhitespace;
 
-  _String(this.data, {this.isWhitespace = false});
+  _String(BuildBit<void, String> bit, {this.isWhitespace = false})
+      : data = bit.buildBit(null);
 
   bool get isNewLine => data == '\n';
 }

@@ -383,12 +383,6 @@ class WidgetFactory {
         continue;
       }
 
-      final widgetBuilder = flattened.widgetBuilder;
-      if (widgetBuilder != null) {
-        widgets.add(WidgetPlaceholder(builder: (c, _) => widgetBuilder(c)));
-        continue;
-      }
-
       final spanBuilder = flattened.spanBuilder;
       if (spanBuilder == null) {
         continue;
