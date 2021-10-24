@@ -13,11 +13,6 @@ class Flattened {
   const Flattened._({this.spanBuilder, this.widget});
 }
 
-typedef SpanBuilder = InlineSpan? Function(
-  BuildContext,
-  CssWhitespace whitespace,
-);
-
 class Flattener {
   final WidgetFactory wf;
 
@@ -26,7 +21,7 @@ class Flattener {
 
   late _Recognizer _recognizer;
   late _Recognizer _prevRecognizer;
-  List<SpanBuilder>? _spans;
+  List<_SpanOrBuilder>? _spans;
   late List<_String> _strings;
   late List<_String> _prevStrings;
   late bool _swallowWhitespace;
@@ -94,10 +89,14 @@ class Flattener {
       _prevRecognizer.value = bit.buildBit(_prevRecognizer.value);
     } else if (bit is BuildBit<TextStyleHtml, InlineSpan>) {
       _saveSpan();
-      _spans!.add((context, _) => bit.buildBit(thisTsb.build(context)));
+      _spans!.add(
+        _SpanOrBuilder.builder(
+          (context, _) => bit.buildBit(thisTsb.build(context)),
+        ),
+      );
     } else if (bit is BuildBit<void, InlineSpan>) {
       _saveSpan();
-      _spans!.add((_, __) => bit.buildBit(null));
+      _spans!.add(_SpanOrBuilder.span(bit.buildBit(null)));
     } else if (bit is BuildBit<void, String>) {
       if (bit is WhitespaceBit) {
         if (!_loopShouldSwallowWhitespace(bit)) {
@@ -144,10 +143,12 @@ class Flattener {
       }
 
       _spans!.add(
-        (context, whitespace) => wf.buildTextSpan(
-          recognizer: scopedRecognizer,
-          style: scopedTsb.build(context).styleWithHeight,
-          text: scopedStrings.toText(whitespace: whitespace),
+        _SpanOrBuilder.builder(
+          (context, whitespace) => wf.buildTextSpan(
+            recognizer: scopedRecognizer,
+            style: scopedTsb.build(context).styleWithHeight,
+            text: scopedStrings.toText(whitespace: whitespace),
+          ),
         ),
       );
     }
@@ -200,7 +201,7 @@ class Flattener {
           );
 
           final children = scopedSpans
-              .map((s) => s(context, whitespace))
+              .map((s) => s.span ?? s.builder?.call(context, whitespace))
               .whereType<InlineSpan>()
               .toList(growable: false);
 
@@ -259,6 +260,11 @@ class Flattener {
   }
 }
 
+typedef SpanBuilder = InlineSpan? Function(
+  BuildContext,
+  CssWhitespace whitespace,
+);
+
 /// A mutable recognizer.
 ///
 /// This class is needed because [GestureRecognizer] is rebuilt
@@ -267,6 +273,17 @@ class _Recognizer {
   GestureRecognizer? value;
 }
 
+@immutable
+class _SpanOrBuilder {
+  final SpanBuilder? builder;
+  final InlineSpan? span;
+
+  const _SpanOrBuilder.builder(this.builder) : span = null;
+
+  const _SpanOrBuilder.span(this.span) : builder = null;
+}
+
+@immutable
 class _String {
   final String data;
   final bool isWhitespace;
