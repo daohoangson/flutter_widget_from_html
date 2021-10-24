@@ -86,36 +86,6 @@ void main() {
     );
   });
 
-  group('image', () {
-    const imgSrc = 'http://domain.com/image.png';
-    const imgRendered =
-        '[CssSizing:height≥0.0,height=auto,width≥0.0,width=auto,child='
-        '[Image:image=NetworkImage("$imgSrc", scale: 1.0)]'
-        ']';
-    Future<String> imgExplain(WidgetTester t, String html) =>
-        mockNetworkImages(() => explain(t, html));
-
-    testWidgets('renders top image', (WidgetTester tester) async {
-      const html = '<img src="$imgSrc" style="vertical-align: top" /> foo';
-      final explained = await imgExplain(tester, html);
-      expect(explained, equals('[RichText:(:$imgRendered@top(: foo))]'));
-    });
-
-    testWidgets('renders after image', (WidgetTester tester) async {
-      const html = '<img src="$imgSrc" /><sup>Foo</sup>';
-      final explained = await imgExplain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[RichText:(:$imgRendered'
-          '[Align:alignment=topCenter,child='
-          '[Padding:(0,0,3,0),child=[RichText:(@8.3:Foo)]]'
-          ']@bottom)]',
-        ),
-      );
-    });
-  });
-
   testWidgets('renders styling', (WidgetTester tester) async {
     const html = '<span style="vertical-align: top">F<em>o</em>o</span> bar';
     final e = await explain(tester, html);
@@ -205,6 +175,51 @@ void main() {
           ),
         );
       });
+    });
+  });
+
+  group('possible conflict', () {
+    group('image', () {
+      const imgSrc = 'http://domain.com/image.png';
+      const imgRendered =
+          '[CssSizing:height≥0.0,height=auto,width≥0.0,width=auto,child='
+          '[Image:image=NetworkImage("$imgSrc", scale: 1.0)]'
+          ']';
+      Future<String> imgExplain(WidgetTester t, String html) =>
+          mockNetworkImages(() => explain(t, html));
+
+      testWidgets('renders top image', (WidgetTester tester) async {
+        const html = '<img src="$imgSrc" style="vertical-align: top" /> foo';
+        final explained = await imgExplain(tester, html);
+        expect(explained, equals('[RichText:(:$imgRendered@top(: foo))]'));
+      });
+
+      testWidgets('renders after image', (WidgetTester tester) async {
+        const html = '<img src="$imgSrc" /><sup>Foo</sup>';
+        final explained = await imgExplain(tester, html);
+        expect(
+          explained,
+          equals(
+            '[RichText:(:$imgRendered'
+            '[Align:alignment=topCenter,child='
+            '[Padding:(0,0,3,0),child=[RichText:(@8.3:Foo)]]'
+            ']@bottom)]',
+          ),
+        );
+      });
+    });
+
+    testWidgets('renders with A tag', (WidgetTester tester) async {
+      const html = '<sup><a href="http://domain.com/foo">foo</a></sup>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Align:alignment=topCenter,child='
+          '[Padding:(0,0,3,0),child=[RichText:(#FF123456+u@8.3+onTap:foo)]]'
+          ']',
+        ),
+      );
     });
   });
 
