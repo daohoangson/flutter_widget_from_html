@@ -242,7 +242,27 @@ void main() {
       expect(_data(text2), equals('1'));
     });
 
-    test('WidgetBit returns same parent', () {
+    test('WidgetBit.block returns same parent', () {
+      final text = _text();
+      final child = WidgetPlaceholder();
+      final bit = WidgetBit.block(text, child);
+
+      final copied = bit.copyWith();
+      expect(copied.parent, equals(text));
+    });
+
+    test('WidgetBit.block returns', () {
+      final text = _text();
+      final child = WidgetPlaceholder();
+      final bit = WidgetBit.block(text, child);
+
+      final text2 = _text();
+      final copied = bit.copyWith(parent: text2);
+      text2.add(copied);
+      expect(copied.buildBit(null), equals(child));
+    });
+
+    test('WidgetBit.inline returns same parent', () {
       final text = _text();
       final child = WidgetPlaceholder();
       final bit = WidgetBit.inline(text, child);
@@ -251,7 +271,7 @@ void main() {
       expect(copied.parent, equals(text));
     });
 
-    test('WidgetBit returns', () {
+    test('WidgetBit.inline returns', () {
       final text = _text();
       final child = WidgetPlaceholder();
       final bit = WidgetBit.inline(text, child);
@@ -359,6 +379,7 @@ void main() {
     text22.addText('(2.2.2)');
     text22.addNewLine();
     text2.addText('(2.3)');
+    text.add(WidgetBit.block(text, const Text('Hi')));
     text.add(WidgetBit.inline(text, const Text('Hi')));
     text.add(_CustomBit(text, text.tsb));
     text.add(_CircularBit(text));
@@ -376,8 +397,9 @@ void main() {
         '      "(2.2.2)"\n'
         '      ASCII-10\n'
         '    "(2.3)"\n'
-        '  WidgetBit.inline#7 WidgetPlaceholder\n'
-        '  _CustomBit#8 tsb#1\n'
+        '  WidgetBit.block#7 WidgetPlaceholder\n'
+        '  WidgetBit.inline#8 WidgetPlaceholder\n'
+        '  _CustomBit#9 tsb#1\n'
         '  BuildTree#0 (circular)',
       ),
     );
