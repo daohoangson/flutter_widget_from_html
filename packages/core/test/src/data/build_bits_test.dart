@@ -26,6 +26,18 @@ void main() {
       group('accepts GestureRecognizer', () {
         const clazz = 'input--GestureRecognizer';
 
+        testWidgets('SPAN tag without BuildBit', (WidgetTester tester) async {
+          const html = '1 <span>2</span> 3';
+          final explained = await explain(tester, html);
+          expect(explained, equals('[RichText:(:1 2 3)]'));
+        });
+
+        testWidgets('SPAN tag with BuildBit', (WidgetTester tester) async {
+          const html = '1 <span class="$clazz">2</span> 3';
+          final e = await explain(tester, html);
+          expect(e, equals('[RichText:(+MultiTapGestureRecognizer:1 2 3)]'));
+        });
+
         testWidgets('A tag without BuildBit', (WidgetTester tester) async {
           const html = '1 <a href="href">2</a> 3';
           final explained = await explain(tester, html);
@@ -429,16 +441,6 @@ class _BuildBitWidgetFactory extends WidgetFactory {
       );
     }
 
-    if (classes.contains('output--GestureRecognizer')) {
-      meta.register(
-        BuildOp(
-          onTreeFlattening: (_, tree) =>
-              tree.add(_OutputGestureRecognizerBit(tree, tree.tsb)),
-          priority: BuildOp.kPriorityMax,
-        ),
-      );
-    }
-
     if (classes.contains('output--InlineSpan')) {
       meta.register(
         BuildOp(
@@ -509,7 +511,7 @@ class _InputGestureRecognizerBit
       return recognizer;
     }
 
-    return null;
+    return MultiTapGestureRecognizer();
   }
 
   @override
@@ -530,18 +532,6 @@ class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _InputTextStyleHtmlBit(parent ?? this.parent, tsb ?? this.tsb);
-}
-
-class _OutputGestureRecognizerBit extends BuildBit<void, GestureRecognizer> {
-  const _OutputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder tsb)
-      : super(parent, tsb);
-
-  @override
-  GestureRecognizer buildBit(void _) => MultiTapGestureRecognizer();
-
-  @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _OutputGestureRecognizerBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
 class _OutputInlineSpanBit extends BuildBit<void, InlineSpan> {
