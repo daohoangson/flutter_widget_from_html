@@ -30,7 +30,7 @@ class Flattener {
   List<SpanBuilder>? _spans;
   late List<_String> _strings;
   late List<_String> _prevStrings;
-  late bool _swallowWhitespace;
+  var _swallowWhitespace = false;
   late TextStyleBuilder _tsb;
   late TextStyleBuilder _prevTsb;
 
@@ -62,8 +62,12 @@ class Flattener {
       }
     }
 
-    for (var i = min; i <= max; i++) {
-      _loop(bits[i]);
+    for (var i = 0; i <= bits.length - 1; i++) {
+      _loop(
+        bits[i],
+        isLeadingWhitespace: i < min,
+        isTrailingWhitespace: i > max,
+      );
     }
     _completeLoop();
 
@@ -74,7 +78,6 @@ class Flattener {
     _recognizer = _Recognizer();
     _spans = [];
     _strings = [];
-    _swallowWhitespace = true;
     _tsb = tsb;
 
     _prevRecognizer = _recognizer;
@@ -82,7 +85,11 @@ class Flattener {
     _prevTsb = _tsb;
   }
 
-  void _loop(final BuildBit bit) {
+  void _loop(
+    final BuildBit bit, {
+    required bool isLeadingWhitespace,
+    required bool isTrailingWhitespace,
+  }) {
     final thisTsb = _getBitTsb(bit);
     if (_spans == null) {
       _resetLoop(thisTsb);
@@ -118,7 +125,14 @@ class Flattener {
     } else if (built is String) {
       if (bit is WhitespaceBit) {
         if (!_loopShouldSwallowWhitespace(bit)) {
-          _prevStrings.add(_String(built, isWhitespace: true));
+          _prevStrings.add(
+            _String(
+              built,
+              isWhitespace: true,
+              isLeadingWhitespace: isLeadingWhitespace,
+              isTrailingWhitespace: isTrailingWhitespace,
+            ),
+          );
         }
       } else {
         _prevStrings.add(_String(built));
@@ -135,17 +149,14 @@ class Flattener {
     _swallowWhitespace = bit.swallowWhitespace ?? _swallowWhitespace;
   }
 
-  bool _loopShouldSwallowWhitespace(BuildBit bit) {
+  bool _loopShouldSwallowWhitespace(WhitespaceBit bit) {
     // special handling for whitespaces
     if (_swallowWhitespace) {
       return true;
     }
 
     final next = nextNonWhitespace(bit);
-    if (next == null) {
-      // skip trailing whitespace
-      return true;
-    } else if (!next.isInline) {
+    if (next != null && !next.isInline) {
       // skip whitespace before a new block
       return true;
     }
@@ -164,11 +175,18 @@ class Flattener {
       }
 
       _spans!.add(
-        (context, whitespace) => wf.buildTextSpan(
-          recognizer: scopedRecognizer,
-          style: scopedTsb.build(context).styleWithHeight,
-          text: scopedStrings.toText(whitespace: whitespace),
-        ),
+        (context, whitespace) {
+          final text = scopedStrings.toText(whitespace);
+          if (text.isEmpty) {
+            return null;
+          }
+
+          return wf.buildTextSpan(
+            recognizer: scopedRecognizer,
+            style: scopedTsb.build(context).styleWithHeight,
+            text: text,
+          );
+        },
       );
     }
 
@@ -196,33 +214,29 @@ class Flattener {
       _recognizers.add(scopedRecognizer);
     }
 
-    if (scopedSpans.isEmpty &&
-        scopedStrings.length == 1 &&
-        scopedStrings[0].isNewLine) {
-      // special handling for paragraph with only one line break
-      _flattened.add(
-        Flattened._(
-          widget: HeightPlaceholder(
-            const CssLength(1, CssLengthUnit.em),
-            scopedTsb,
-          ),
-        ),
-      );
-      return;
-    }
-
     _flattened.add(
       Flattened._(
         spanBuilder: (context, whitespace) {
-          final text = scopedStrings.toText(
-            dropNewLine: scopedSpans.isEmpty,
-            whitespace: whitespace,
-          );
+          final text = scopedStrings.toText(whitespace);
 
           final children = scopedSpans
               .map((s) => s(context, whitespace))
               .whereType<InlineSpan>()
               .toList(growable: false);
+
+          if (text.isEmpty && children.isEmpty) {
+            return null;
+          }
+
+          if (children.isEmpty && text.length == 1 && text == '\n') {
+            // special handling for paragraph with only one line break
+            return WidgetSpan(
+              child: HeightPlaceholder(
+                const CssLength(1, CssLengthUnit.em),
+                scopedTsb,
+              ),
+            );
+          }
 
           return wf.buildTextSpan(
             children: children,
@@ -290,39 +304,56 @@ class _Recognizer {
 class _String {
   final String data;
   final bool isWhitespace;
+  final bool isLeadingWhitespace;
+  final bool isTrailingWhitespace;
 
-  _String(this.data, {this.isWhitespace = false});
+  _String(
+    this.data, {
+    this.isWhitespace = false,
+    this.isLeadingWhitespace = false,
+    this.isTrailingWhitespace = false,
+  });
 
   bool get isNewLine => data == '\n';
 }
 
 extension _StringListToText on List<_String> {
-  String toText({
-    bool dropNewLine = false,
-    required CssWhitespace whitespace,
-  }) {
+  String toText(CssWhitespace whitespace) {
     if (isEmpty) {
       return '';
     }
 
-    if (dropNewLine && last.isNewLine) {
-      removeLast();
-      if (isEmpty) {
-        return '';
+    final buffer = StringBuffer();
+
+    var min = 0;
+    var max = length - 1;
+    if (whitespace != CssWhitespace.pre) {
+      for (; min <= max; min++) {
+        if (!this[min].isLeadingWhitespace) {
+          break;
+        }
+      }
+      for (; max >= min; max--) {
+        if (!this[max].isTrailingWhitespace) {
+          break;
+        }
       }
     }
 
-    final buffer = StringBuffer();
-    for (final str in this) {
+    var prevIsWhitespace = false;
+    for (var i = min; i <= max; i++) {
+      final str = this[i];
       if (str.isWhitespace) {
         if (whitespace == CssWhitespace.pre) {
           buffer.write(str.data);
-        } else {
+        } else if (!prevIsWhitespace) {
           buffer.write(' ');
         }
       } else {
         buffer.write(str.data);
       }
+
+      prevIsWhitespace = str.isWhitespace;
     }
 
     return buffer.toString();

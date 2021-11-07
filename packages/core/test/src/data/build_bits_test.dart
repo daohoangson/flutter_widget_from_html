@@ -505,6 +505,9 @@ class _InputBuildContextBit extends BuildBit<BuildContext, Widget> {
       : super(parent, tsb);
 
   @override
+  bool get isInline => false;
+
+  @override
   Widget buildBit(BuildContext? _) => const Text('Foo');
 
   @override
@@ -597,6 +600,9 @@ class _OutputStringBit extends BuildBit<void, String> {
 class _OutputWidgetBit extends BuildBit<void, Widget> {
   const _OutputWidgetBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
+
+  @override
+  bool get isInline => false;
 
   @override
   Widget buildBit(void _) => const Text('foo');
