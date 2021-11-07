@@ -397,7 +397,7 @@ class WidgetFactory {
         WidgetPlaceholder<BuildTree>(tree).wrapWith((context, _) {
           final tsh = tree.tsb.build(context);
           final span = flattened.spanBuilder!(context, tsh.whitespace);
-          if (span == null || span is! InlineSpan) {
+          if (span == null) {
             return widget0;
           }
 

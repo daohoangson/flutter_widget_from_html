@@ -287,11 +287,10 @@ void main() {
       explained,
       equals(
         '[SizedBox:0.0x5.0],'
-        '[CssBlock:child='
         '[_TextAlignBlock:child='
         '[Padding:(0,5,0,5),child='
         '[CssBlock:child=[RichText:align=center,(:Foo)]]'
-        ']]],'
+        ']],'
         '[SizedBox:0.0x5.0]',
       ),
     );
