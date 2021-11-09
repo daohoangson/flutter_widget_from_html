@@ -1,3 +1,7 @@
+## 0.8.1+1
+
+- Fix missing `test/images` directory
+
 ## 0.8.1
 
 - Mark enhanced `HtmlWidget.webViewXxx` properties as deprecated (#614)
