@@ -225,9 +225,6 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
     return bit;
   }
 
-  /// Adds a new line.
-  BuildBit addNewLine() => add(_SwallowWhitespaceBit(this, 10));
-
   /// Adds whitespace.
   BuildBit addWhitespace(String data) => add(WhitespaceBit(this, data));
 
@@ -392,31 +389,4 @@ class WhitespaceBit extends BuildBit<void, String> {
 
   @override
   String toString() => 'Whitespace[${data.codeUnits.join(' ')}]#$hashCode';
-}
-
-class _SwallowWhitespaceBit extends BuildBit<void, String> {
-  final int charCode;
-
-  _SwallowWhitespaceBit(
-    BuildTree parent,
-    this.charCode, {
-    TextStyleBuilder? tsb,
-  }) : super(parent, tsb ?? parent.tsb);
-
-  @override
-  bool get swallowWhitespace => true;
-
-  @override
-  String buildBit(void _) => String.fromCharCode(charCode);
-
-  @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _SwallowWhitespaceBit(
-        parent ?? this.parent!,
-        charCode,
-        tsb: tsb ?? this.tsb,
-      );
-
-  @override
-  String toString() => 'ASCII-$charCode';
 }

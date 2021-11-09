@@ -697,9 +697,8 @@ class WidgetFactory {
         meta.tsb.enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
         break;
 
-      case 'br':
-        _tagBr ??= BuildOp(onTree: (_, tree) => tree.addNewLine());
-        meta.register(_tagBr!);
+      case kTagBr:
+        meta.register(_tagBr ??= TagBr(this).buildOp);
         break;
 
       case kTagCenter:
