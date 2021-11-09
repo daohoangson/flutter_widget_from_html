@@ -62,9 +62,8 @@ void main() {
             '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
             ' │  WidgetBit.inline#2 WidgetPlaceholder(Text("hi"))\n'
             ' │)\n'
-            ' └WidgetPlaceholder<Widget>(Text)\n'
-            '  └Text("hi")\n'
-            '   └RichText(text: "hi")\n\n',
+            ' └Text("hi")\n'
+            '  └RichText(text: "hi")\n\n',
           ),
         );
       });

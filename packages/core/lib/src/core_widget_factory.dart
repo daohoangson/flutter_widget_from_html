@@ -397,7 +397,7 @@ class WidgetFactory {
         WidgetPlaceholder<BuildTree>(tree).wrapWith((context, _) {
           final tsh = tree.tsb.build(context);
           final span = flattened.spanBuilder!(context, tsh.whitespace);
-          if (span == null || span is! InlineSpan) {
+          if (span == null) {
             return widget0;
           }
 
@@ -697,9 +697,8 @@ class WidgetFactory {
         meta.tsb.enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
         break;
 
-      case 'br':
-        _tagBr ??= BuildOp(onTree: (_, tree) => tree.addNewLine());
-        meta.register(_tagBr!);
+      case kTagBr:
+        meta.register(_tagBr ??= TagBr(this).buildOp);
         break;
 
       case kTagCenter:
