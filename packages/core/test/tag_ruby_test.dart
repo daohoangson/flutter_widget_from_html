@@ -99,6 +99,20 @@ Future<void> main() async {
       );
     });
 
+    testWidgets('renders with BR tag', (WidgetTester tester) async {
+      const html = '<ruby>1<br/>2 <rt>3<br/>4</rt></ruby>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[HtmlRuby:children='
+          '[RichText:(:1\n2)],'
+          '[RichText:(@5.0:3\n4)]'
+          ']',
+        ),
+      );
+    });
+
     testWidgets('renders with Q tag', (WidgetTester tester) async {
       const html = '<ruby><q>foo</q> <rt><q>bar</q></rt></ruby>';
       final explained = await explain(tester, html);

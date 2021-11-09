@@ -520,24 +520,14 @@ void main() {
       const html = '<div style="margin-top: 1em">'
           '<div style="margin-top: 1em">Foo</div></div>';
       final explained = await helper.explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[CssBlock:child=[CssBlock:child=[RichText:(:Foo)]]]',
-        ),
-      );
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('trims bottom instances', (WidgetTester tester) async {
       const html = '<div style="margin-bottom: 1em">'
           '<div style="margin-bottom: 1em">Foo</div></div>';
       final explained = await helper.explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[CssBlock:child=[CssBlock:child=[RichText:(:Foo)]]]',
-        ),
-      );
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('trims both ways', (WidgetTester tester) async {

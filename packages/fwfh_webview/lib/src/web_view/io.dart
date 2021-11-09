@@ -74,7 +74,8 @@ class WebViewState extends State<WebView> {
   }
 
   Future<String> eval(String js) =>
-      _wvc?.evaluateJavascript(js).catchError((_) => '') ?? Future.value('');
+      _wvc?.runJavascriptReturningResult(js).catchError((_) => '') ??
+      Future.value('');
 
   Future<void> _autoResize() async {
     // TODO: enable codecov when `flutter drive --coverage` is available

@@ -356,19 +356,6 @@ void main() {
       );
     });
 
-    test('NewLine returns', () {
-      final text = _text();
-      text.addText('1');
-      final newLine = text.addNewLine();
-
-      final text2 = _text();
-      text2.addText('1');
-      final copied = newLine.copyWith(parent: text2);
-      text2.add(copied);
-      text2.addText('2');
-      expect(_data(text2), equals('1\n2'));
-    });
-
     test('Whitespace returns', () {
       final text = _text();
       text.addText('1');
@@ -394,7 +381,6 @@ void main() {
     text2.add(text22);
     text22.addText('(2.2.1)');
     text22.addText('(2.2.2)');
-    text22.addNewLine();
     text2.addText('(2.3)');
     text.add(WidgetBit.inline(text, const Text('Hi')));
     text.add(_CircularBit(text));
@@ -410,7 +396,6 @@ void main() {
         '    BuildTree#5 tsb#6(parent=#4):\n'
         '      "(2.2.1)"\n'
         '      "(2.2.2)"\n'
-        '      ASCII-10\n'
         '    "(2.3)"\n'
         '  WidgetBit.inline#7 WidgetPlaceholder(Text("Hi"))\n'
         '  BuildTree#0 (circular)',
@@ -505,6 +490,9 @@ class _InputBuildContextBit extends BuildBit<BuildContext, Widget> {
       : super(parent, tsb);
 
   @override
+  bool get isInline => false;
+
+  @override
   Widget buildBit(BuildContext? _) => const Text('Foo');
 
   @override
@@ -597,6 +585,9 @@ class _OutputStringBit extends BuildBit<void, String> {
 class _OutputWidgetBit extends BuildBit<void, Widget> {
   const _OutputWidgetBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
+
+  @override
+  bool get isInline => false;
 
   @override
   Widget buildBit(void _) => const Text('foo');

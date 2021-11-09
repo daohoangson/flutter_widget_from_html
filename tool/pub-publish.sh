@@ -30,10 +30,15 @@ function publish {
     flutter test
   fi
 
+  cat .gitignore >.pubignore
+  echo '/test/' >>.pubignore
+  yq e 'del(.flutter)' -i pubspec.yaml
+
   flutter pub publish
 
   # revert the changes
   git checkout .
+  rm .pubignore
 }
 
 (cd packages/core && publish)
