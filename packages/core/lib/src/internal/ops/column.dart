@@ -48,7 +48,11 @@ class ColumnPlaceholder extends WidgetPlaceholder {
     Widget? prev;
     var state = 0;
 
-    for (final child in _getIterable(context)) {
+    final iterable = _getIterable(context)
+        .map((child) => WidgetPlaceholder.unwrap(context, child))
+        .where((child) => child != widget0);
+
+    for (final child in iterable) {
       if (state == 0) {
         if (child is HeightPlaceholder) {
           if (marginTop != null) {

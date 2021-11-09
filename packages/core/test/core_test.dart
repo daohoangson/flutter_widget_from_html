@@ -216,14 +216,12 @@ Future<void> main() async {
           'TshWidget\n'
           '└ColumnPlaceholder(root)\n'
           ' └Column()\n'
-          '  ├WidgetPlaceholder(text)\n'
-          '  │└CssBlock()\n'
-          '  │ └RichText(text: "1")\n'
+          '  ├CssBlock()\n'
+          '  │└RichText(text: "1")\n'
           '  ├HeightPlaceholder(height)\n'
           '  │└SizedBox(height: 10.0)\n'
-          '  └WidgetPlaceholder(text)\n'
-          '   └CssBlock()\n'
-          '    └RichText(text: "2")\n\n',
+          '  └CssBlock()\n'
+          '   └RichText(text: "2")\n\n',
         ),
       );
     });
@@ -1536,9 +1534,10 @@ Future<void> main() async {
     });
 
     testWidgets('renders pre', (tester) async {
-      const html = '<div style="white-space: pre">Foo\nbar</div>';
+      const code = '\n  Foo\n  bar  \n';
+      const html = '<div style="white-space: pre">$code</div>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[CssBlock:child=[RichText:(:Foo\nbar)]]'));
+      expect(explained, equals('[CssBlock:child=[RichText:(:$code)]]'));
     });
 
     group('PRE tag', () {

@@ -10,6 +10,7 @@ class HeightPlaceholder extends WidgetPlaceholder {
 
   HeightPlaceholder(CssLength height, this.tsb, {Key? key})
       : super(
+          autoUnwrap: false,
           builder: (context, child) => _build(context, child, height, tsb),
           key: key,
           localName: 'height',

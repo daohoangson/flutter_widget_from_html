@@ -4,7 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 /// A list marker.
-class HtmlListMarker extends SingleChildRenderObjectWidget {
+class HtmlListMarker extends LeafRenderObjectWidget {
   /// The marker type.
   final HtmlListMarkerType markerType;
 

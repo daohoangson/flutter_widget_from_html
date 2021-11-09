@@ -90,43 +90,6 @@ typedef OnLoadingBuilder = Widget? Function(
   double? loadingProgress,
 );
 
-/// A set of values that should trigger rebuild.
-class RebuildTriggers {
-  final List _values;
-
-  /// Creates a set.
-  ///
-  /// The values should have sane equality check to avoid excessive rebuilds.
-  RebuildTriggers(this._values);
-
-  @override
-  int get hashCode => _values.length;
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
-
-    if (other is RebuildTriggers) {
-      final otherValues = other._values;
-      if (otherValues.length != _values.length) {
-        return false;
-      }
-
-      for (var i = 0; i < _values.length; i++) {
-        if (otherValues[i] != _values[i]) {
-          return false;
-        }
-      }
-
-      return true;
-    }
-
-    return false;
-  }
-}
-
 /// An extension on [Widget] to keep track of anchors.
 extension WidgetAnchors on Widget {
   static final _anchors = Expando<Iterable<Key>>();
@@ -153,30 +116,41 @@ extension WidgetAnchors on Widget {
 /// A widget builder that can be extended with callbacks.
 class WidgetPlaceholder extends StatelessWidget {
   final String? localName;
+
+  final bool _autoUnwrap;
   final List<WidgetPlaceholderBuilder> _builders;
   final Widget? _firstChild;
 
   /// Creates a placeholder.
   WidgetPlaceholder({
+    bool autoUnwrap = true,
     WidgetPlaceholderBuilder? builder,
     Widget? child,
     Key? key,
     this.localName,
-  })  : _builders = builder != null ? [builder] : [],
+  })  : _autoUnwrap = autoUnwrap,
+        _builders = builder != null ? [builder] : [],
         _firstChild = child,
         super(key: key);
 
   @override
-  Widget build(BuildContext context) =>
-      callBuilders(context, _firstChild ?? widget0);
+  Widget build(BuildContext context) => callBuilders(context, _firstChild);
 
   /// Calls builder callbacks on the specified [child] widget.
   @protected
-  Widget callBuilders(BuildContext context, Widget child) {
-    var built = child;
+  Widget callBuilders(BuildContext context, Widget? child) {
+    var built = unwrap(context, child ?? widget0);
+    if (child != null && built == widget0) {
+      // child has been unwrapped into no op, stop processing further right now
+      return widget0;
+    }
 
     for (final builder in _builders) {
-      built = builder(context, built) ?? widget0;
+      built = unwrap(context, builder(context, built) ?? widget0);
+      if (built == widget0) {
+        // builder returns no op, cancel subsequent callbacks
+        return widget0;
+      }
     }
 
     built.setAnchorsIfUnset(anchors);
@@ -211,6 +185,19 @@ class WidgetPlaceholder extends StatelessWidget {
   // ignore: prefer_constructors_over_static_methods
   static WidgetPlaceholder lazy(Widget child) =>
       child is WidgetPlaceholder ? child : WidgetPlaceholder(child: child);
+
+  /// Unwraps a placeholder if `autoUnwrap` has been set.
+  static Widget unwrap(BuildContext context, Widget widget) {
+    if (widget is WidgetPlaceholder) {
+      if (widget._autoUnwrap) {
+        return widget.build(context);
+      } else {
+        return widget;
+      }
+    } else {
+      return widget;
+    }
+  }
 }
 
 /// A callback for [WidgetPlaceholder].

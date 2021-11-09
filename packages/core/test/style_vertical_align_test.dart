@@ -245,7 +245,8 @@ void main() {
     testWidgets('#170: renders whitespace contents', (tester) async {
       const html = 'Foo <sub> </sub>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:Foo)]'));
+      // TODO: drop widget0 if possible
+      expect(explained, equals('[RichText:(:Foo [widget0]@top)]'));
     });
   });
 }

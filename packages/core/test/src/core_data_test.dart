@@ -60,9 +60,8 @@ void main() {
           equals(
             'TshWidget\n'
             '└WidgetPlaceholder(text)\n'
-            ' └WidgetPlaceholder\n'
-            '  └Text("hi")\n'
-            '   └RichText(text: "hi")\n\n',
+            ' └Text("hi")\n'
+            '  └RichText(text: "hi")\n\n',
           ),
         );
       });

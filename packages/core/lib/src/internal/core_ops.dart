@@ -26,6 +26,7 @@ part 'ops/style_text_align.dart';
 part 'ops/style_text_decoration.dart';
 part 'ops/style_vertical_align.dart';
 part 'ops/tag_a.dart';
+part 'ops/tag_br.dart';
 part 'ops/tag_details.dart';
 part 'ops/tag_img.dart';
 part 'ops/tag_li.dart';
