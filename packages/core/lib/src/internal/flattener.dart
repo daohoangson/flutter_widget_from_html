@@ -231,7 +231,11 @@ class Flattener {
 
           final text = scopedStrings.toText(whitespace, dropNewLine: _isLast);
           if (text.isEmpty && children.isEmpty) {
-            if (scopedStrings.length == 1 && scopedStrings[0].bit is TagBrBit) {
+            final nonWhitespaceStrings = scopedStrings
+                .where((str) => str.bit is! WhitespaceBit)
+                .toList(growable: false);
+            if (nonWhitespaceStrings.length == 1 &&
+                nonWhitespaceStrings[0].bit is TagBrBit) {
               // special handling for paragraph with <BR /> only
               const oneEm = CssLength(1, CssLengthUnit.em);
               return WidgetSpan(child: HeightPlaceholder(oneEm, scopedTsb));
@@ -360,16 +364,16 @@ extension _StringListToText on List<_String> {
       }
     }
 
-    final str = buffer.toString();
+    final result = buffer.toString();
 
     if (whitespace == CssWhitespace.pre) {
-      return str;
+      return result;
     }
 
     if (dropNewLine) {
-      return str.replaceFirst(RegExp(r'\n$'), '');
+      return result.replaceFirst(RegExp(r'\n$'), '');
     }
 
-    return str;
+    return result;
   }
 }
