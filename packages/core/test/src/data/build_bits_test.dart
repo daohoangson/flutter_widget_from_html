@@ -463,7 +463,7 @@ class _OutputInlineSpanBit extends BuildBit {
 
   @override
   void onFlattening(Flattener flattener) =>
-      flattener.addSpan(const WidgetSpan(child: Text('foo')));
+      flattener.span = const WidgetSpan(child: Text('foo'));
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
@@ -475,7 +475,7 @@ class _OutputStringBit extends BuildBit {
       : super(parent, tsb);
 
   @override
-  void onFlattening(Flattener flattener) => flattener.addText('foo');
+  void onFlattening(Flattener flattener) => flattener.text = 'foo';
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
@@ -490,7 +490,7 @@ class _OutputWidgetBit extends BuildBit {
 
   @override
   void onFlattening(Flattener flattener) =>
-      flattener.addWidget(const Text('foo'));
+      flattener.widget = const Text('foo');
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>

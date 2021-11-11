@@ -18,6 +18,7 @@ class Flattener implements core_data.Flattener {
   late List<_String> _firstStrings;
   late TextStyleBuilder _firstTsb;
 
+  late BuildBit _bit;
   var _swallowWhitespace = false;
   late _GestureRecognizer _recognizer;
   late List<_String> _strings;
@@ -40,32 +41,32 @@ class Flattener implements core_data.Flattener {
   set recognizer(GestureRecognizer? value) => _recognizer.value = value;
 
   @override
-  bool get swallowWhitespace => _swallowWhitespace;
-
-  @override
-  void addSpan(InlineSpan value) {
+  // ignore: avoid_setters_without_getters
+  set span(InlineSpan value) {
     _saveSpan();
     _children?.add(_SpanOrBuilder.span(value));
   }
 
   @override
-  void addText(String value) => _strings.add(_String(value));
+  // ignore: avoid_setters_without_getters
+  set text(String value) => _strings.add(_String(value));
 
   @override
-  void addWhitespace(String value, {required bool shouldBeSwallowed}) =>
-      _strings.add(
-        _String(
-          value,
-          isWhitespace: true,
-          shouldBeSwallowed: shouldBeSwallowed,
-        ),
-      );
-
-  @override
-  void addWidget(Widget value) {
+  // ignore: avoid_setters_without_getters
+  set widget(Widget value) {
     _completeLoop();
     _widgets.add(WidgetPlaceholder.lazy(value));
   }
+
+  @override
+  // ignore: avoid_setters_without_getters
+  set whitespace(String value) => _strings.add(
+        _String(
+          value,
+          isWhitespace: true,
+          shouldBeSwallowed: _shouldSwallow(_bit),
+        ),
+      );
 
   void _resetLoop(TextStyleBuilder tsb) {
     _firstRecognizer = _GestureRecognizer();
@@ -79,7 +80,8 @@ class Flattener implements core_data.Flattener {
   }
 
   void _loop(BuildBit bit) {
-    final thisTsb = bit.tsb ?? _tsb;
+    _bit = bit;
+    final thisTsb = bit.effectiveTsb ?? _tsb;
     if (_children == null) {
       _resetLoop(thisTsb);
     }
@@ -91,6 +93,20 @@ class Flattener implements core_data.Flattener {
 
     _tsb = thisTsb;
     _swallowWhitespace = bit.swallowWhitespace ?? _swallowWhitespace;
+  }
+
+  bool _shouldSwallow(BuildBit bit) {
+    if (_swallowWhitespace) {
+      return true;
+    }
+
+    final next = bit.nextNonWhitespace;
+    if (next != null && !next.isInline) {
+      // skip whitespace before a new block
+      return true;
+    }
+
+    return false;
   }
 
   void _saveSpan() {
@@ -196,6 +212,51 @@ class Flattener implements core_data.Flattener {
         localName: 'text',
       ),
     );
+  }
+}
+
+extension _BuildBit on BuildBit {
+  TextStyleBuilder? get effectiveTsb {
+    if (this is! WhitespaceBit) {
+      return tsb;
+    }
+
+    // the below code will find the best style for this whitespace bit
+    // easy case: whitespace at the beginning of a tag, use the previous style
+    final parent = this.parent;
+    if (parent == null || this == parent.first) {
+      return null;
+    }
+
+    // complicated: whitespace at the end of a tag, try to merge with the next
+    // unless it has unrelated style (e.g. next bit is a sibling)
+    if (this == parent.last) {
+      final next = nextNonWhitespace;
+      if (next != null) {
+        var tree = parent;
+        while (tree.parent?.last == this) {
+          tree = tree.parent!;
+        }
+
+        if (tree.parent == next.parent) {
+          return next.tsb;
+        } else {
+          return null;
+        }
+      }
+    }
+
+    // fallback to parent's
+    return parent.tsb;
+  }
+
+  BuildBit? get nextNonWhitespace {
+    var next = this.next;
+    while (next != null && next is WhitespaceBit) {
+      next = next.next;
+    }
+
+    return next;
   }
 }
 
