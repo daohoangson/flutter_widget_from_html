@@ -231,9 +231,6 @@ abstract class BuildTree extends BuildBit {
     return copied;
   }
 
-  @override
-  void onFlatten(FlattenState flattener) {}
-
   /// Registers anchor [Key].
   void registerAnchor(Key anchor) {
     final existing = _anchors[this];
