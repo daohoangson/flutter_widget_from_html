@@ -130,7 +130,7 @@ abstract class BuildBit {
   /// Flattens this bit on demand.
   ///
   /// See [Flattener._loop]
-  void onFlatten(FlattenState flattener);
+  void onFlattening(Flattener flattener);
 
   @override
   String toString() => '$runtimeType#$hashCode $tsb';
@@ -266,7 +266,7 @@ abstract class BuildTree extends BuildBit {
   }
 }
 
-abstract class FlattenState {
+abstract class Flattener {
   GestureRecognizer? get recognizer;
   set recognizer(GestureRecognizer? value);
 
@@ -294,7 +294,7 @@ class TextBit extends BuildBit {
       TextBit(parent ?? this.parent!, data, tsb: tsb ?? this.tsb);
 
   @override
-  void onFlatten(FlattenState flattener) => flattener.addText(data);
+  void onFlattening(Flattener flattener) => flattener.addText(data);
 
   @override
   String toString() => '"$data"';
@@ -348,7 +348,7 @@ class _WidgetBitBlock extends WidgetBit<Widget> {
       _WidgetBitBlock(parent ?? this.parent!, tsb ?? this.tsb, child);
 
   @override
-  void onFlatten(FlattenState flattener) => flattener.addWidget(child);
+  void onFlattening(Flattener flattener) => flattener.addWidget(child);
 
   @override
   String toString() => 'WidgetBit.block#$hashCode $child';
@@ -377,7 +377,7 @@ class _WidgetBitInline extends WidgetBit<InlineSpan> {
       );
 
   @override
-  void onFlatten(FlattenState flattener) => flattener.addSpan(
+  void onFlattening(Flattener flattener) => flattener.addSpan(
         WidgetSpan(
           alignment: alignment,
           baseline: baseline,
@@ -435,7 +435,7 @@ class WhitespaceBit extends BuildBit {
       WhitespaceBit(parent ?? this.parent!, data);
 
   @override
-  void onFlatten(FlattenState flattener) {
+  void onFlattening(Flattener flattener) {
     final shouldBeSwallowed = _shouldBeSwallowed(flattener);
 
     flattener.addWhitespace(
@@ -447,7 +447,7 @@ class WhitespaceBit extends BuildBit {
   @override
   String toString() => 'Whitespace[${data.codeUnits.join(' ')}]#$hashCode';
 
-  bool _shouldBeSwallowed(FlattenState flattener) {
+  bool _shouldBeSwallowed(Flattener flattener) {
     if (flattener.swallowWhitespace) {
       return true;
     }

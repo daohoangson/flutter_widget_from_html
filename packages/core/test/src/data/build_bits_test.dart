@@ -415,7 +415,7 @@ class _CircularBit extends BuildTree {
   Iterable<WidgetPlaceholder> build() => throw UnimplementedError();
 
   @override
-  void onFlatten(FlattenState flattener) {}
+  void onFlattening(Flattener flattener) {}
 
   @override
   BuildTree sub({BuildTree? parent, TextStyleBuilder? tsb}) =>
@@ -429,7 +429,7 @@ class _InputGestureRecognizerBit extends BuildBit {
   const _InputGestureRecognizerBit(BuildTree? parent) : super(parent);
 
   @override
-  void onFlatten(FlattenState flattener) {
+  void onFlattening(Flattener flattener) {
     final existing = flattener.recognizer;
     if (existing is TapGestureRecognizer) {
       existing.onTapCancel = () {};
@@ -448,7 +448,7 @@ class _OutputInlineSpanBit extends BuildBit {
   const _OutputInlineSpanBit(BuildTree? parent) : super(parent);
 
   @override
-  void onFlatten(FlattenState flattener) =>
+  void onFlattening(Flattener flattener) =>
       flattener.addSpan(const WidgetSpan(child: Text('foo')));
 
   @override
@@ -461,7 +461,7 @@ class _OutputStringBit extends BuildBit {
       : super(parent, tsb);
 
   @override
-  void onFlatten(FlattenState flattener) => flattener.addText('foo');
+  void onFlattening(Flattener flattener) => flattener.addText('foo');
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
@@ -475,7 +475,7 @@ class _OutputWidgetBit extends BuildBit {
   bool get isInline => false;
 
   @override
-  void onFlatten(FlattenState flattener) =>
+  void onFlattening(Flattener flattener) =>
       flattener.addWidget(const Text('foo'));
 
   @override

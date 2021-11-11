@@ -5,7 +5,6 @@ import 'package:html/dom.dart' as dom;
 
 import 'core_helpers.dart';
 import 'core_widget_factory.dart';
-import 'internal/flattener.dart';
 
 part 'data/build_bits.dart';
 part 'data/css.dart';

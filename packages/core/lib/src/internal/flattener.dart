@@ -1,12 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
-import '../core_data.dart';
+import '../core_data.dart' hide Flattener;
+import '../core_data.dart' as core_data;
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
 import 'margin_vertical.dart';
 
-class Flattener implements FlattenState {
+class Flattener implements core_data.Flattener {
   final BuildMetadata meta;
   final BuildTree tree;
   final WidgetFactory wf;
@@ -105,7 +106,7 @@ class Flattener implements FlattenState {
       _saveSpan();
     }
 
-    bit.onFlatten(this);
+    bit.onFlattening(this);
 
     _tsb = thisTsb;
     _swallowWhitespace = bit.swallowWhitespace ?? _swallowWhitespace;
