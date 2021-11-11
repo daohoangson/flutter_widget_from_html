@@ -2,7 +2,6 @@ part of '../core_data.dart';
 
 abstract class FlattenState {
   GestureRecognizer? get recognizer;
-  set recognizer(GestureRecognizer? value);
 
   bool get swallowWhitespace;
 
@@ -15,6 +14,8 @@ abstract class FlattenState {
   void addWhitespace(String value, {required bool shouldBeSwallowed});
 
   void addWidget(Widget value);
+
+  void setRecognizer(GestureRecognizer? value, {bool autoDispose = true});
 }
 
 typedef SpanBuilder = InlineSpan? Function(

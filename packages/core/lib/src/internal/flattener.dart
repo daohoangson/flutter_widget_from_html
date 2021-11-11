@@ -12,7 +12,7 @@ class Flattener implements FlattenState {
   final WidgetFactory wf;
 
   final _flattened = <WidgetPlaceholder>[];
-  final _recognizers = <GestureRecognizer>[];
+  final _recognizersNeedDisposing = <GestureRecognizer>[];
 
   late _Recognizer _recognizer;
   late _Recognizer _prevRecognizer;
@@ -28,10 +28,10 @@ class Flattener implements FlattenState {
 
   @mustCallSuper
   void dispose() {
-    for (final r in _recognizers) {
+    for (final r in _recognizersNeedDisposing) {
       r.dispose();
     }
-    _recognizers.clear();
+    _recognizersNeedDisposing.clear();
   }
 
   List<WidgetPlaceholder> flatten() {
@@ -63,9 +63,6 @@ class Flattener implements FlattenState {
 
   @override
   GestureRecognizer? get recognizer => _prevRecognizer.value;
-
-  @override
-  set recognizer(GestureRecognizer? value) => _prevRecognizer.value = value;
 
   @override
   bool get swallowWhitespace => _swallowWhitespace;
@@ -102,6 +99,14 @@ class Flattener implements FlattenState {
     _flattened.add(WidgetPlaceholder.lazy(value));
   }
 
+  @override
+  void setRecognizer(GestureRecognizer? value, {bool autoDispose = true}) {
+    _prevRecognizer.value = value;
+    if (autoDispose && value != null) {
+      _recognizersNeedDisposing.add(value);
+    }
+  }
+
   void _resetLoop(TextStyleBuilder tsb) {
     _recognizer = _Recognizer();
     _spans = [];
@@ -133,10 +138,6 @@ class Flattener implements FlattenState {
       final scopedRecognizer = _prevRecognizer.value;
       final scopedTsb = _prevTsb;
       final scopedStrings = _prevStrings;
-
-      if (scopedRecognizer != null) {
-        _recognizers.add(scopedRecognizer);
-      }
 
       _spans!.add(
         _SpanOrBuilder.builder((context, whitespace, {bool? isLast}) {
@@ -176,10 +177,6 @@ class Flattener implements FlattenState {
     final scopedRecognizer = _recognizer.value;
     final scopedTsb = _tsb;
     final scopedStrings = _strings;
-
-    if (scopedRecognizer != null) {
-      _recognizers.add(scopedRecognizer);
-    }
 
     _flattened.add(
       WidgetPlaceholder(

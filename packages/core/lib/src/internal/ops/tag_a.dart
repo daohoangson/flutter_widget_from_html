@@ -67,11 +67,10 @@ class _TagABit extends BuildBit {
     final recognizer = flattener.recognizer;
     if (recognizer is TapGestureRecognizer) {
       recognizer.onTap = onTap;
-      flattener.recognizer = recognizer;
       return;
     }
 
-    flattener.recognizer = TapGestureRecognizer()..onTap = onTap;
+    flattener.setRecognizer(TapGestureRecognizer()..onTap = onTap);
   }
 
   @override
