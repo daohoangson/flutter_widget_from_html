@@ -13,13 +13,13 @@ class Flattener implements FlattenState {
   final _widgets = <WidgetPlaceholder>[];
 
   List<_SpanOrBuilder>? _children;
-  GestureRecognizer? _firstRecognizer;
+  late _GestureRecognizer _firstRecognizer;
   late List<_String> _firstStrings;
   late TextStyleBuilder _firstTsb;
 
   late bool _shouldBeTrimmed;
   var _swallowWhitespace = false;
-  GestureRecognizer? _recognizer;
+  late _GestureRecognizer _recognizer;
   late List<_String> _strings;
   late TextStyleBuilder _tsb;
 
@@ -51,10 +51,10 @@ class Flattener implements FlattenState {
   Iterable<WidgetPlaceholder> get widgets => _widgets;
 
   @override
-  GestureRecognizer? get recognizer => _recognizer;
+  GestureRecognizer? get recognizer => _recognizer.value;
 
   @override
-  set recognizer(GestureRecognizer? value) => _recognizer = value;
+  set recognizer(GestureRecognizer? value) => _recognizer.value = value;
 
   @override
   bool get swallowWhitespace => _swallowWhitespace;
@@ -86,7 +86,7 @@ class Flattener implements FlattenState {
   }
 
   void _resetLoop(TextStyleBuilder tsb) {
-    _firstRecognizer = null;
+    _firstRecognizer = _GestureRecognizer();
     _children = [];
     _firstStrings = [];
     _firstTsb = tsb;
@@ -113,7 +113,7 @@ class Flattener implements FlattenState {
 
   void _saveSpan() {
     if (_strings != _firstStrings && _strings.isNotEmpty) {
-      final scopedRecognizer = _recognizer;
+      final scopedRecognizer = _recognizer.value;
       final scopedTsb = _tsb;
       final scopedStrings = _strings;
 
@@ -138,7 +138,7 @@ class Flattener implements FlattenState {
     }
 
     _strings = [];
-    _recognizer = null;
+    _recognizer = _GestureRecognizer();
   }
 
   void _completeLoop() {
@@ -153,7 +153,7 @@ class Flattener implements FlattenState {
     if (scopedChildren.isEmpty && _firstStrings.isEmpty) {
       return;
     }
-    final scopedRecognizer = _firstRecognizer;
+    final scopedRecognizer = _firstRecognizer.value;
     final scopedStrings = _firstStrings;
     final scopedTsb = _firstTsb;
 
@@ -211,6 +211,10 @@ class Flattener implements FlattenState {
       ),
     );
   }
+}
+
+class _GestureRecognizer {
+  GestureRecognizer? value;
 }
 
 @immutable
