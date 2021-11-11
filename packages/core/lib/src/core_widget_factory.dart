@@ -10,7 +10,6 @@ import 'core_helpers.dart';
 import 'core_html_widget.dart';
 import 'internal/core_ops.dart';
 import 'internal/core_parser.dart';
-import 'internal/flattener.dart';
 import 'internal/margin_vertical.dart';
 import 'internal/platform_specific/fallback.dart'
     if (dart.library.io) 'internal/platform_specific/io.dart';
@@ -23,7 +22,7 @@ class WidgetFactory {
   /// Defaults to `false`, resulting in a [CircularProgressIndicator].
   static bool debugDeterministicLoadingWidget = false;
 
-  final _flatteners = <Flattener>[];
+  final _recognizersNeedDisposing = <GestureRecognizer>[];
 
   late AnchorRegistry _anchorRegistry;
 
@@ -364,18 +363,17 @@ class WidgetFactory {
   }
 
   void _dispose() {
-    for (final f in _flatteners) {
-      f.dispose();
+    for (final r in _recognizersNeedDisposing) {
+      r.dispose();
     }
-    _flatteners.clear();
+    _recognizersNeedDisposing.clear();
   }
 
-  /// Flattens a [BuildTree] into widgets.
-  Iterable<WidgetPlaceholder> flatten(BuildMetadata meta, BuildTree tree) {
-    final instance = Flattener(this, meta, tree);
-    _flatteners.add(instance);
-
-    return instance.flatten();
+  /// Defers freeing resources till the factory itself is disposed.
+  void deferDispose({GestureRecognizer? recognizer}) {
+    if (recognizer != null) {
+      _recognizersNeedDisposing.add(recognizer);
+    }
   }
 
   /// Prepares [GestureTapCallback].

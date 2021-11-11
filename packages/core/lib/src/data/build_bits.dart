@@ -269,6 +269,21 @@ abstract class BuildTree extends BuildBit {
   }
 }
 
+abstract class FlattenState {
+  GestureRecognizer? get recognizer;
+  set recognizer(GestureRecognizer? value);
+
+  bool get swallowWhitespace;
+
+  void addSpan(InlineSpan value);
+
+  void addText(String value);
+
+  void addWhitespace(String value, {required bool shouldBeSwallowed});
+
+  void addWidget(Widget value);
+}
+
 /// A simple text bit.
 class TextBit extends BuildBit {
   final String data;
@@ -365,7 +380,7 @@ class _WidgetBitInline extends WidgetBit<InlineSpan> {
       );
 
   @override
-  void onFlatten(FlattenState flattener) => flattener.addInlineSpan(
+  void onFlatten(FlattenState flattener) => flattener.addSpan(
         WidgetSpan(
           alignment: alignment,
           baseline: baseline,

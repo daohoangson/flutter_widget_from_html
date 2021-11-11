@@ -10,31 +10,20 @@ class Flattener implements FlattenState {
   final BuildMetadata meta;
   final BuildTree tree;
   final WidgetFactory wf;
+  final _widgets = <WidgetPlaceholder>[];
 
-  final _flattened = <WidgetPlaceholder>[];
-  final _recognizersNeedDisposing = <GestureRecognizer>[];
+  List<_SpanOrBuilder>? _children;
+  GestureRecognizer? _firstRecognizer;
+  late List<_String> _firstStrings;
+  late TextStyleBuilder _firstTsb;
 
-  late _Recognizer _recognizer;
-  late _Recognizer _prevRecognizer;
-  List<_SpanOrBuilder>? _spans;
-  late List<_String> _strings;
-  late List<_String> _prevStrings;
   late bool _shouldBeTrimmed;
   var _swallowWhitespace = false;
+  GestureRecognizer? _recognizer;
+  late List<_String> _strings;
   late TextStyleBuilder _tsb;
-  late TextStyleBuilder _prevTsb;
 
-  Flattener(this.wf, this.meta, this.tree);
-
-  @mustCallSuper
-  void dispose() {
-    for (final r in _recognizersNeedDisposing) {
-      r.dispose();
-    }
-    _recognizersNeedDisposing.clear();
-  }
-
-  List<WidgetPlaceholder> flatten() {
+  Flattener(this.wf, this.meta, this.tree) {
     _resetLoop(tree.tsb);
 
     final bits = tree.bits.toList(growable: false);
@@ -57,34 +46,31 @@ class Flattener implements FlattenState {
       _loop(bits[i]);
     }
     _completeLoop();
-
-    return _flattened;
   }
 
+  Iterable<WidgetPlaceholder> get widgets => _widgets;
+
   @override
-  GestureRecognizer? get recognizer => _prevRecognizer.value;
+  GestureRecognizer? get recognizer => _recognizer;
+
+  @override
+  set recognizer(GestureRecognizer? value) => _recognizer = value;
 
   @override
   bool get swallowWhitespace => _swallowWhitespace;
 
   @override
-  void addInlineSpan(InlineSpan value) {
+  void addSpan(InlineSpan value) {
     _saveSpan();
-    _spans!.add(_SpanOrBuilder.span(value));
+    _children?.add(_SpanOrBuilder.span(value));
   }
 
   @override
-  void addSpanBuilder(SpanBuilder value) {
-    _saveSpan();
-    _spans!.add(_SpanOrBuilder.builder(value));
-  }
-
-  @override
-  void addText(String value) => _prevStrings.add(_String(value));
+  void addText(String value) => _strings.add(_String(value));
 
   @override
   void addWhitespace(String value, {required bool shouldBeSwallowed}) =>
-      _prevStrings.add(
+      _strings.add(
         _String(
           value,
           isWhitespace: true,
@@ -96,53 +82,46 @@ class Flattener implements FlattenState {
   @override
   void addWidget(Widget value) {
     _completeLoop();
-    _flattened.add(WidgetPlaceholder.lazy(value));
-  }
-
-  @override
-  void setRecognizer(GestureRecognizer? value, {bool autoDispose = true}) {
-    _prevRecognizer.value = value;
-    if (autoDispose && value != null) {
-      _recognizersNeedDisposing.add(value);
-    }
+    _widgets.add(WidgetPlaceholder.lazy(value));
   }
 
   void _resetLoop(TextStyleBuilder tsb) {
-    _recognizer = _Recognizer();
-    _spans = [];
-    _strings = [];
-    _tsb = tsb;
+    _firstRecognizer = null;
+    _children = [];
+    _firstStrings = [];
+    _firstTsb = tsb;
 
-    _prevRecognizer = _recognizer;
-    _prevStrings = _strings;
-    _prevTsb = _tsb;
+    _recognizer = _firstRecognizer;
+    _strings = _firstStrings;
+    _tsb = _firstTsb;
   }
 
   void _loop(BuildBit bit) {
-    final thisTsb = bit.tsb ?? _prevTsb;
-    if (_spans == null) {
+    final thisTsb = bit.tsb ?? _tsb;
+    if (_children == null) {
       _resetLoop(thisTsb);
     }
-    if (!thisTsb.hasSameStyleWith(_prevTsb)) {
+    if (!thisTsb.hasSameStyleWith(_tsb)) {
       _saveSpan();
     }
 
     bit.onFlatten(this);
 
-    _prevTsb = thisTsb;
+    _tsb = thisTsb;
     _swallowWhitespace = bit.swallowWhitespace ?? _swallowWhitespace;
   }
 
   void _saveSpan() {
-    if (_prevStrings != _strings && _prevStrings.isNotEmpty) {
-      final scopedRecognizer = _prevRecognizer.value;
-      final scopedTsb = _prevTsb;
-      final scopedStrings = _prevStrings;
+    if (_strings != _firstStrings && _strings.isNotEmpty) {
+      final scopedRecognizer = _recognizer;
+      final scopedTsb = _tsb;
+      final scopedStrings = _strings;
 
-      _spans!.add(
-        _SpanOrBuilder.builder((context, whitespace, {bool? isLast}) {
+      _children?.add(
+        _SpanOrBuilder.builder((context, {bool? isLast}) {
+          final tsh = scopedTsb.build(context);
           final text = scopedStrings.toText(
-            whitespace,
+            tsh.whitespace,
             dropNewLine: isLast != false,
           );
           if (text.isEmpty) {
@@ -151,45 +130,44 @@ class Flattener implements FlattenState {
 
           return wf.buildTextSpan(
             recognizer: scopedRecognizer,
-            style: scopedTsb.build(context).styleWithHeight,
+            style: tsh.styleWithHeight,
             text: text,
           );
         }),
       );
     }
 
-    _prevStrings = [];
-    _prevRecognizer = _Recognizer();
+    _strings = [];
+    _recognizer = null;
   }
 
   void _completeLoop() {
     _saveSpan();
 
-    final scopedSpans = _spans;
-    if (scopedSpans == null) {
+    final scopedChildren = _children;
+    if (scopedChildren == null) {
       return;
     }
 
-    _spans = null;
-    if (scopedSpans.isEmpty && _strings.isEmpty) {
+    _children = null;
+    if (scopedChildren.isEmpty && _firstStrings.isEmpty) {
       return;
     }
-    final scopedRecognizer = _recognizer.value;
-    final scopedTsb = _tsb;
-    final scopedStrings = _strings;
+    final scopedRecognizer = _firstRecognizer;
+    final scopedStrings = _firstStrings;
+    final scopedTsb = _firstTsb;
 
-    _flattened.add(
+    _widgets.add(
       WidgetPlaceholder(
         builder: (context, _) {
           final tsh = scopedTsb.build(context);
-
-          final list = scopedSpans.reversed.toList(growable: false);
+          final list = scopedChildren.reversed.toList(growable: false);
           final children = <InlineSpan>[];
 
           var _isLast = true;
           for (final item in list) {
-            final child = item.span ??
-                item.builder?.call(context, tsh.whitespace, isLast: _isLast);
+            final child =
+                item.span ?? item.builder?.call(context, isLast: _isLast);
             if (child != null) {
               _isLast = false;
               children.insert(0, child);
@@ -223,7 +201,6 @@ class Flattener implements FlattenState {
           }
 
           final textAlign = tsh.textAlign ?? TextAlign.start;
-
           if (span is WidgetSpan && textAlign == TextAlign.start) {
             return span.child;
           }
@@ -236,17 +213,9 @@ class Flattener implements FlattenState {
   }
 }
 
-/// A mutable recognizer.
-///
-/// This class is needed because [GestureRecognizer] is rebuilt
-/// but we have to keep track of prev / current recognizer for spans
-class _Recognizer {
-  GestureRecognizer? value;
-}
-
 @immutable
 class _SpanOrBuilder {
-  final SpanBuilder? builder;
+  final InlineSpan? Function(BuildContext, {bool? isLast})? builder;
   final InlineSpan? span;
 
   const _SpanOrBuilder.builder(this.builder) : span = null;

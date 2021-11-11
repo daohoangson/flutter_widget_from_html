@@ -10,6 +10,7 @@ import '../core_data.dart' as core_data show BuildMetadata, BuildTree;
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
 import 'core_ops.dart';
+import 'flattener.dart';
 
 // https://infra.spec.whatwg.org/#ascii-whitespace
 const _asciiWhitespace = r'[\u{0009}\u{000A}\u{000C}\u{000D}\u{0020}]';
@@ -106,7 +107,7 @@ class BuildTree extends core_data.BuildTree {
       subTree._onFlattening();
     }
 
-    var widgets = wf.flatten(parentMeta, this);
+    var widgets = Flattener(wf, parentMeta, this).widgets;
     for (final op in parentMeta.buildOps) {
       widgets = op.onWidgets
               ?.call(parentMeta, widgets)
