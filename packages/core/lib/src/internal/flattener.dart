@@ -18,7 +18,6 @@ class Flattener implements core_data.Flattener {
   late List<_String> _firstStrings;
   late TextStyleBuilder _firstTsb;
 
-  late bool _shouldBeTrimmed;
   var _swallowWhitespace = false;
   late _GestureRecognizer _recognizer;
   late List<_String> _strings;
@@ -26,25 +25,8 @@ class Flattener implements core_data.Flattener {
 
   Flattener(this.wf, this.meta, this.tree) {
     _resetLoop(tree.tsb);
-
-    final bits = tree.bits.toList(growable: false);
-
-    var min = 0;
-    var max = bits.length - 1;
-    for (; min <= max; min++) {
-      if (bits[min] is! WhitespaceBit) {
-        break;
-      }
-    }
-    for (; max >= min; max--) {
-      if (bits[max] is! WhitespaceBit) {
-        break;
-      }
-    }
-
-    for (var i = 0; i <= bits.length - 1; i++) {
-      _shouldBeTrimmed = i < min || i > max;
-      _loop(bits[i]);
+    for (final bit in tree.bits) {
+      _loop(bit);
     }
     _completeLoop();
   }
@@ -76,7 +58,6 @@ class Flattener implements core_data.Flattener {
           value,
           isWhitespace: true,
           shouldBeSwallowed: shouldBeSwallowed,
-          shouldBeTrimmed: _shouldBeTrimmed,
         ),
       );
 
@@ -123,7 +104,8 @@ class Flattener implements core_data.Flattener {
           final tsh = scopedTsb.build(context);
           final text = scopedStrings.toText(
             tsh.whitespace,
-            dropNewLine: isLast != false,
+            isFirst: false,
+            isLast: isLast != false,
           );
           if (text.isEmpty) {
             return null;
@@ -175,8 +157,11 @@ class Flattener implements core_data.Flattener {
             }
           }
 
-          final text =
-              scopedStrings.toText(tsh.whitespace, dropNewLine: _isLast);
+          final text = scopedStrings.toText(
+            tsh.whitespace,
+            isFirst: true,
+            isLast: _isLast,
+          );
           InlineSpan? span;
           if (text.isEmpty && children.isEmpty) {
             final nonWhitespaceStrings = scopedStrings
@@ -246,7 +231,8 @@ class _String {
 extension _StringListToText on List<_String> {
   String toText(
     CssWhitespace whitespace, {
-    required bool dropNewLine,
+    required bool isFirst,
+    required bool isLast,
   }) {
     if (isEmpty) {
       return '';
@@ -257,14 +243,18 @@ extension _StringListToText on List<_String> {
     var min = 0;
     var max = length - 1;
     if (whitespace != CssWhitespace.pre) {
-      for (; min <= max; min++) {
-        if (!this[min].shouldBeTrimmed) {
-          break;
+      if (isFirst) {
+        for (; min <= max; min++) {
+          if (!this[min].isWhitespace) {
+            break;
+          }
         }
       }
-      for (; max >= min; max--) {
-        if (!this[max].shouldBeTrimmed) {
-          break;
+      if (isLast) {
+        for (; max >= min; max--) {
+          if (!this[max].isWhitespace) {
+            break;
+          }
         }
       }
     }
@@ -292,7 +282,7 @@ extension _StringListToText on List<_String> {
       return result;
     }
 
-    if (dropNewLine) {
+    if (isLast) {
       return result.replaceFirst(RegExp(r'\n$'), '');
     }
 

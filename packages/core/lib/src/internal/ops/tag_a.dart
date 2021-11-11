@@ -26,7 +26,7 @@ class TagA {
               bit.child.wrapWith(
                 (_, child) => wf.buildGestureDetector(meta, child, onTap),
               );
-            } else if (bit is! WhitespaceBit) {
+            } else if (bit is! _TagABit) {
               final recognizer = TapGestureRecognizer()..onTap = onTap;
               wf.deferDispose(recognizer: recognizer);
               _TagABit(bit.parent, recognizer).insertAfter(bit);
