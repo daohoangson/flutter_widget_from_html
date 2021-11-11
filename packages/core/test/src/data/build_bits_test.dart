@@ -343,6 +343,7 @@ void main() {
     text2.addText('(2.3)');
     text.add(WidgetBit.block(text, const Text('Hi')));
     text.add(WidgetBit.inline(text, const Text('Hi')));
+    text.add(_CustomBit(text, text.tsb));
     text.add(_CircularBit(text));
 
     expect(
@@ -359,6 +360,7 @@ void main() {
         '    "(2.3)"\n'
         '  WidgetBit.block#7 WidgetPlaceholder\n'
         '  WidgetBit.inline#8 WidgetPlaceholder\n'
+        '  _CustomBit#9 tsb#1\n'
         '  BuildTree#0 (circular)',
       ),
     );
@@ -423,6 +425,18 @@ class _CircularBit extends BuildTree {
 
   @override
   String toString() => parent.toString();
+}
+
+class _CustomBit extends BuildBit {
+  const _CustomBit(BuildTree? parent, TextStyleBuilder tsb)
+      : super(parent, tsb);
+
+  @override
+  void onFlattening(Flattener flattener) => throw UnimplementedError();
+
+  @override
+  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+      throw UnimplementedError();
 }
 
 class _InputGestureRecognizerBit extends BuildBit {
