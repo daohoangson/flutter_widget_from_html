@@ -1,18 +1,16 @@
 part of '../core_data.dart';
 
 /// A piece of HTML being built.
-///
-/// See [buildBit] for supported input and output types.
 @immutable
-abstract class BuildBit<InputType, OutputType> {
+abstract class BuildBit {
   /// The container tree.
   final BuildTree? parent;
 
   /// The associated [TextStyleBuilder].
-  final TextStyleBuilder tsb;
+  final TextStyleBuilder? tsb;
 
   /// Creates a build bit.
-  const BuildBit(this.parent, this.tsb);
+  const BuildBit(this.parent, [this.tsb]);
 
   /// Returns true if this bit should be rendered inline.
   bool get isInline => true;
@@ -89,18 +87,6 @@ abstract class BuildBit<InputType, OutputType> {
   /// By default, do swallow if not [isInline].
   bool? get swallowWhitespace => !isInline;
 
-  /// Builds input into output.
-  ///
-  /// Supported input-output mappings
-  /// - [GestureRecognizer]? → [GestureRecognizer]?
-  /// - [TextStyleHtml] → [InlineSpan]
-  /// - void → [InlineSpan]
-  /// - void → [String]
-  /// - void → [Widget]
-  ///
-  /// See [Flattener._loop]
-  OutputType buildBit(InputType input);
-
   /// Creates a copy with the given fields replaced with the new values.
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb});
 
@@ -146,14 +132,15 @@ abstract class BuildBit<InputType, OutputType> {
 }
 
 /// A tree of [BuildBit]s.
-abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
+abstract class BuildTree extends BuildBit {
   static final _anchors = Expando<List<Key>>();
 
   final _children = <BuildBit>[];
   final _toStringBuffer = StringBuffer();
+  final TextStyleBuilder _tsb;
 
   /// Creates a tree.
-  BuildTree(BuildTree? parent, TextStyleBuilder tsb) : super(parent, tsb);
+  BuildTree(BuildTree? parent, this._tsb) : super(parent, _tsb);
 
   /// Anchor keys of this tree and its children.
   Iterable<Key>? get anchors => _anchors[this];
@@ -211,6 +198,9 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
     return null;
   }
 
+  @override
+  TextStyleBuilder get tsb => _tsb;
+
   /// Adds [bit] as the last bit.
   T add<T extends BuildBit>(T bit) {
     assert(bit.parent == this);
@@ -226,9 +216,6 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
 
   /// Builds widgets from bits.
   Iterable<WidgetPlaceholder> build();
-
-  @override
-  Iterable<WidgetPlaceholder> buildBit(void _) => build();
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) {
@@ -275,15 +262,12 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
 }
 
 /// A simple text bit.
-class TextBit extends BuildBit<void, String> {
+class TextBit extends BuildBit {
   final String data;
 
   /// Creates with string.
   TextBit(BuildTree parent, this.data, {TextStyleBuilder? tsb})
       : super(parent, tsb ?? parent.tsb);
-
-  @override
-  String buildBit(void _) => data;
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
@@ -294,11 +278,11 @@ class TextBit extends BuildBit<void, String> {
 }
 
 /// A widget bit.
-abstract class WidgetBit<T> extends BuildBit<void, T> {
+abstract class WidgetBit<T> extends BuildBit {
   /// The widget to be rendered.
   final WidgetPlaceholder child;
 
-  const WidgetBit._(BuildTree parent, TextStyleBuilder tsb, this.child)
+  const WidgetBit._(BuildTree parent, TextStyleBuilder? tsb, this.child)
       : super(parent, tsb);
 
   /// Creates a block widget.
@@ -329,15 +313,12 @@ abstract class WidgetBit<T> extends BuildBit<void, T> {
 class _WidgetBitBlock extends WidgetBit<Widget> {
   const _WidgetBitBlock(
     BuildTree parent,
-    TextStyleBuilder tsb,
+    TextStyleBuilder? tsb,
     WidgetPlaceholder child,
   ) : super._(parent, tsb, child);
 
   @override
   bool get isInline => false;
-
-  @override
-  Widget buildBit(void _) => child;
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
@@ -353,18 +334,11 @@ class _WidgetBitInline extends WidgetBit<InlineSpan> {
 
   const _WidgetBitInline(
     BuildTree parent,
-    TextStyleBuilder tsb,
+    TextStyleBuilder? tsb,
     WidgetPlaceholder child,
     this.alignment,
     this.baseline,
   ) : super._(parent, tsb, child);
-
-  @override
-  InlineSpan buildBit(void _) => WidgetSpan(
-        alignment: alignment,
-        baseline: baseline,
-        child: child,
-      );
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
@@ -381,22 +355,20 @@ class _WidgetBitInline extends WidgetBit<InlineSpan> {
 }
 
 /// A whitespace bit.
-class WhitespaceBit extends BuildBit<void, String> {
+class WhitespaceBit extends BuildBit {
   final String data;
 
   /// Creates a whitespace.
-  WhitespaceBit(BuildTree parent, this.data, {TextStyleBuilder? tsb})
-      : super(parent, tsb ?? parent.tsb);
+  const WhitespaceBit(BuildTree parent, this.data) : super(parent);
 
   @override
   bool get swallowWhitespace => true;
 
   @override
-  String buildBit(void _) => data;
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      WhitespaceBit(parent ?? this.parent!, data, tsb: tsb ?? this.tsb);
+      WhitespaceBit(parent ?? this.parent!, data);
 
   @override
   String toString() => 'Whitespace[${data.codeUnits.join(' ')}]#$hashCode';

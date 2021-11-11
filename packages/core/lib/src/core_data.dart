@@ -9,6 +9,7 @@ import 'internal/flattener.dart';
 
 part 'data/build_bits.dart';
 part 'data/css.dart';
+part 'data/flatten.dart';
 part 'data/image.dart';
 part 'data/text_style.dart';
 

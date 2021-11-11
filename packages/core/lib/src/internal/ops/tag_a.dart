@@ -27,7 +27,7 @@ class TagA {
                 (_, child) => wf.buildGestureDetector(meta, child, onTap),
               );
             } else if (bit is! WhitespaceBit) {
-              _TagABit(bit.parent, bit.tsb, onTap).insertAfter(bit);
+              _TagABit(bit.parent, onTap).insertAfter(bit);
             }
           }
         },
@@ -54,26 +54,27 @@ class TagA {
   }
 }
 
-class _TagABit extends BuildBit<GestureRecognizer?, GestureRecognizer?> {
+class _TagABit extends BuildBit {
   final GestureTapCallback onTap;
 
-  const _TagABit(BuildTree? parent, TextStyleBuilder tsb, this.onTap)
-      : super(parent, tsb);
+  const _TagABit(BuildTree? parent, this.onTap) : super(parent);
 
   @override
   bool? get swallowWhitespace => null;
 
   @override
-  GestureRecognizer? buildBit(GestureRecognizer? recognizer) {
+  void onFlatten(FlattenState flattener) {
+    final recognizer = flattener.recognizer;
     if (recognizer is TapGestureRecognizer) {
       recognizer.onTap = onTap;
-      return recognizer;
+      flattener.recognizer = recognizer;
+      return;
     }
 
-    return TapGestureRecognizer()..onTap = onTap;
+    flattener.recognizer = TapGestureRecognizer()..onTap = onTap;
   }
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _TagABit(parent ?? this.parent, tsb ?? this.tsb, onTap);
+      _TagABit(parent ?? this.parent, onTap);
 }
