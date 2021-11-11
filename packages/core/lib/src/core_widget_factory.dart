@@ -372,44 +372,10 @@ class WidgetFactory {
 
   /// Flattens a [BuildTree] into widgets.
   Iterable<WidgetPlaceholder> flatten(BuildMetadata meta, BuildTree tree) {
-    final widgets = <WidgetPlaceholder>[];
-    final instance = Flattener(this);
+    final instance = Flattener(this, meta, tree);
     _flatteners.add(instance);
 
-    for (final flattened in instance.flatten(tree)) {
-      final widget = flattened.widget;
-      if (widget != null) {
-        widgets.add(WidgetPlaceholder.lazy(widget));
-        continue;
-      }
-
-      final spanBuilder = flattened.spanBuilder;
-      if (spanBuilder == null) {
-        continue;
-      }
-      widgets.add(
-        WidgetPlaceholder(
-          builder: (context, _) {
-            final tsh = tree.tsb.build(context);
-            final span = spanBuilder(context, tsh.whitespace);
-            if (span == null) {
-              return widget0;
-            }
-
-            final textAlign = tsh.textAlign ?? TextAlign.start;
-
-            if (span is WidgetSpan && textAlign == TextAlign.start) {
-              return span.child;
-            }
-
-            return buildText(meta, tsh, span);
-          },
-          localName: 'text',
-        ),
-      );
-    }
-
-    return widgets;
+    return instance.flatten();
   }
 
   /// Prepares [GestureTapCallback].

@@ -127,6 +127,11 @@ abstract class BuildBit {
     return true;
   }
 
+  /// Flattens this bit on demand.
+  ///
+  /// See [Flattener._loop]
+  void onFlatten(FlattenState flattener);
+
   @override
   String toString() => '$runtimeType#$hashCode $tsb';
 }
@@ -226,6 +231,9 @@ abstract class BuildTree extends BuildBit {
     return copied;
   }
 
+  @override
+  void onFlatten(FlattenState flattener) {}
+
   /// Registers anchor [Key].
   void registerAnchor(Key anchor) {
     final existing = _anchors[this];
@@ -272,6 +280,9 @@ class TextBit extends BuildBit {
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       TextBit(parent ?? this.parent!, data, tsb: tsb ?? this.tsb);
+
+  @override
+  void onFlatten(FlattenState flattener) => flattener.addText(data);
 
   @override
   String toString() => '"$data"';
@@ -325,6 +336,9 @@ class _WidgetBitBlock extends WidgetBit<Widget> {
       _WidgetBitBlock(parent ?? this.parent!, tsb ?? this.tsb, child);
 
   @override
+  void onFlatten(FlattenState flattener) => flattener.addWidget(child);
+
+  @override
   String toString() => 'WidgetBit.block#$hashCode $child';
 }
 
@@ -351,6 +365,15 @@ class _WidgetBitInline extends WidgetBit<InlineSpan> {
       );
 
   @override
+  void onFlatten(FlattenState flattener) => flattener.addInlineSpan(
+        WidgetSpan(
+          alignment: alignment,
+          baseline: baseline,
+          child: child,
+        ),
+      );
+
+  @override
   String toString() => 'WidgetBit.inline#$hashCode $child';
 }
 
@@ -365,11 +388,75 @@ class WhitespaceBit extends BuildBit {
   bool get swallowWhitespace => true;
 
   @override
+  TextStyleBuilder? get tsb {
+    // the below code will find the best style for this whitespace bit
+    // easy case: whitespace at the beginning of a tag, use the previous style
+    final parent = this.parent;
+    if (parent == null || this == parent.first) {
+      return null;
+    }
+
+    // complicated: whitespace at the end of a tag, try to merge with the next
+    // unless it has unrelated style (e.g. next bit is a sibling)
+    if (this == parent.last) {
+      final next = nextNonWhitespace;
+      if (next != null) {
+        var tree = parent;
+        while (tree.parent?.last == this) {
+          tree = tree.parent!;
+        }
+
+        if (tree.parent == next.parent) {
+          return next.tsb;
+        } else {
+          return null;
+        }
+      }
+    }
+
+    // fallback to parent's
+    return parent.tsb;
+  }
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       WhitespaceBit(parent ?? this.parent!, data);
 
   @override
+  void onFlatten(FlattenState flattener) {
+    final shouldBeSwallowed = _shouldBeSwallowed(flattener);
+
+    flattener.addWhitespace(
+      data,
+      shouldBeSwallowed: shouldBeSwallowed,
+    );
+  }
+
+  @override
   String toString() => 'Whitespace[${data.codeUnits.join(' ')}]#$hashCode';
+
+  bool _shouldBeSwallowed(FlattenState flattener) {
+    if (flattener.swallowWhitespace) {
+      return true;
+    }
+
+    final next = nextNonWhitespace;
+    if (next != null && !next.isInline) {
+      // skip whitespace before a new block
+      return true;
+    }
+
+    return false;
+  }
+}
+
+extension _BuildBit on BuildBit {
+  BuildBit? get nextNonWhitespace {
+    var next = this.next;
+    while (next != null && next is WhitespaceBit) {
+      next = next.next;
+    }
+
+    return next;
+  }
 }
