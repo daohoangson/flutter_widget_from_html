@@ -65,7 +65,7 @@ class _TagABit extends BuildBit {
   bool? get swallowWhitespace => null;
 
   @override
-  void onFlattening(Flattener flattener) {
+  void flatten(Flattener flattener) {
     final existing = flattener.recognizer;
     if (existing is TapGestureRecognizer) {
       existing.onTap = recognizer.onTap;

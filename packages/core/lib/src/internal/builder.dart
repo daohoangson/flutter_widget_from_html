@@ -95,7 +95,7 @@ class BuildTree extends core_data.BuildTree {
     }
 
     for (final subTree in subTrees.toList(growable: false).reversed) {
-      subTree.onFlattening(core_data.Flattener.noOp());
+      subTree.flatten(core_data.Flattener.noOp());
     }
 
     var widgets = Flattener(wf, parentMeta, this).widgets;
@@ -134,7 +134,7 @@ class BuildTree extends core_data.BuildTree {
   }
 
   @override
-  void onFlattening(core_data.Flattener? flattener) {
+  void flatten(core_data.Flattener flattener) {
     for (final op in parentMeta.buildOps) {
       op.onTreeFlattening?.call(parentMeta, this);
     }

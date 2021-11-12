@@ -93,6 +93,9 @@ abstract class BuildBit {
   /// Removes self from [parent].
   bool detach() => parent?._children.remove(this) ?? false;
 
+  /// Flattens this bit.
+  void flatten(Flattener flattener);
+
   /// Inserts self after [another] in the tree.
   bool insertAfter(BuildBit another) {
     if (parent == null) {
@@ -126,11 +129,6 @@ abstract class BuildBit {
     siblings.insert(i, this);
     return true;
   }
-
-  /// Flattens this bit on demand.
-  ///
-  /// See [Flattener._loop]
-  void onFlattening(Flattener flattener);
 
   @override
   String toString() => '$runtimeType#$hashCode $tsb';
@@ -319,7 +317,7 @@ class TextBit extends BuildBit {
       TextBit(parent ?? this.parent!, data, tsb: tsb ?? this.tsb);
 
   @override
-  void onFlattening(Flattener flattener) => flattener.text = data;
+  void flatten(Flattener flattener) => flattener.text = data;
 
   @override
   String toString() => '"$data"';
@@ -363,7 +361,7 @@ class _WidgetBitBlock extends WidgetBit<Widget> {
       _WidgetBitBlock(parent ?? this.parent!, child);
 
   @override
-  void onFlattening(Flattener flattener) => flattener.widget = child;
+  void flatten(Flattener flattener) => flattener.widget = child;
 
   @override
   String toString() => 'WidgetBit.block#$hashCode $child';
@@ -385,7 +383,7 @@ class _WidgetBitInline extends WidgetBit<InlineSpan> {
       _WidgetBitInline(parent ?? this.parent!, child, alignment, baseline);
 
   @override
-  void onFlattening(Flattener flattener) => flattener.span = WidgetSpan(
+  void flatten(Flattener flattener) => flattener.span = WidgetSpan(
         alignment: alignment,
         baseline: baseline,
         child: child,
@@ -410,7 +408,7 @@ class WhitespaceBit extends BuildBit {
       WhitespaceBit(parent ?? this.parent!, data);
 
   @override
-  void onFlattening(Flattener flattener) => flattener.whitespace = data;
+  void flatten(Flattener flattener) => flattener.whitespace = data;
 
   @override
   String toString() => 'Whitespace[${data.codeUnits.join(' ')}]#$hashCode';

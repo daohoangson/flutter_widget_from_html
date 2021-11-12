@@ -89,7 +89,7 @@ class Flattener implements core_data.Flattener {
       _saveSpan();
     }
 
-    bit.onFlattening(this);
+    bit.flatten(this);
 
     _tsb = thisTsb;
     _swallowWhitespace = bit.swallowWhitespace ?? _swallowWhitespace;
