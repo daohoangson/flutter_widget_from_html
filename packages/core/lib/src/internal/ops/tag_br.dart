@@ -22,7 +22,7 @@ class TagBrBit extends BuildBit {
       TagBrBit(parent ?? this.parent!, tsb: tsb ?? this.tsb);
 
   @override
-  void flatten(Flattener flattener) => flattener.text = '\n';
+  void flatten(Flattened f) => f.text = '\n';
 
   @override
   String toString() => '<BR />';

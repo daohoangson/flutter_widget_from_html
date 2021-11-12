@@ -1,13 +1,12 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
-import '../core_data.dart' hide Flattener;
-import '../core_data.dart' as core_data;
+import '../core_data.dart';
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
 import 'margin_vertical.dart';
 
-class Flattener implements core_data.Flattener {
+class Flattener implements Flattened {
   final BuildMetadata meta;
   final BuildTree tree;
   final WidgetFactory wf;

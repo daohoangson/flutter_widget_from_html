@@ -94,7 +94,7 @@ abstract class BuildBit {
   bool detach() => parent?._children.remove(this) ?? false;
 
   /// Flattens this bit.
-  void flatten(Flattener flattener);
+  void flatten(Flattened f);
 
   /// Inserts self after [another] in the tree.
   bool insertAfter(BuildBit another) {
@@ -276,34 +276,6 @@ abstract class BuildTree extends BuildBit {
   }
 }
 
-class Flattener {
-  final List<dynamic>? _values;
-
-  factory Flattener.forTesting(List<dynamic> values) => Flattener._(values);
-
-  /// Disallows extending this class.
-  const Flattener._(this._values);
-
-  factory Flattener.noOp() => const Flattener._(null);
-
-  GestureRecognizer? get recognizer =>
-      _values?.whereType<GestureRecognizer?>().last;
-
-  set recognizer(GestureRecognizer? value) => _values?.add(value);
-
-  // ignore: avoid_setters_without_getters
-  set span(InlineSpan value) => _values?.add(value);
-
-  // ignore: avoid_setters_without_getters
-  set text(String value) => _values?.add(value);
-
-  // ignore: avoid_setters_without_getters
-  set whitespace(String value) => _values?.add(value);
-
-  // ignore: avoid_setters_without_getters
-  set widget(Widget value) => _values?.add(value);
-}
-
 /// A simple text bit.
 class TextBit extends BuildBit {
   final String data;
@@ -317,7 +289,7 @@ class TextBit extends BuildBit {
       TextBit(parent ?? this.parent!, data, tsb: tsb ?? this.tsb);
 
   @override
-  void flatten(Flattener flattener) => flattener.text = data;
+  void flatten(Flattened f) => f.text = data;
 
   @override
   String toString() => '"$data"';
@@ -361,7 +333,7 @@ class _WidgetBitBlock extends WidgetBit<Widget> {
       _WidgetBitBlock(parent ?? this.parent!, child);
 
   @override
-  void flatten(Flattener flattener) => flattener.widget = child;
+  void flatten(Flattened f) => f.widget = child;
 
   @override
   String toString() => 'WidgetBit.block#$hashCode $child';
@@ -383,7 +355,7 @@ class _WidgetBitInline extends WidgetBit<InlineSpan> {
       _WidgetBitInline(parent ?? this.parent!, child, alignment, baseline);
 
   @override
-  void flatten(Flattener flattener) => flattener.span = WidgetSpan(
+  void flatten(Flattened f) => f.span = WidgetSpan(
         alignment: alignment,
         baseline: baseline,
         child: child,
@@ -408,8 +380,45 @@ class WhitespaceBit extends BuildBit {
       WhitespaceBit(parent ?? this.parent!, data);
 
   @override
-  void flatten(Flattener flattener) => flattener.whitespace = data;
+  void flatten(Flattened f) => f.whitespace = data;
 
   @override
   String toString() => 'Whitespace[${data.codeUnits.join(' ')}]#$hashCode';
+}
+
+/// A flattened bit.
+class Flattened {
+  final List<dynamic>? _values;
+
+  @visibleForTesting
+  factory Flattened.forTesting(List<dynamic> values) => Flattened._(values);
+
+  /// Disallows extending this class.
+  const Flattened._(this._values);
+
+  /// A no op constant.
+  factory Flattened.noOp() => const Flattened._(null);
+
+  /// Returns the current [GestureRecognizer].
+  GestureRecognizer? get recognizer =>
+      _values?.whereType<GestureRecognizer?>().last;
+
+  /// Sets the [GestureRecognizer].
+  set recognizer(GestureRecognizer? value) => _values?.add(value);
+
+  /// Sets the [InlineSpan].
+  // ignore: avoid_setters_without_getters
+  set span(InlineSpan value) => _values?.add(value);
+
+  /// Sets the contents [String].
+  // ignore: avoid_setters_without_getters
+  set text(String value) => _values?.add(value);
+
+  /// Sets the whitespace.
+  // ignore: avoid_setters_without_getters
+  set whitespace(String value) => _values?.add(value);
+
+  /// Sets the [Widget].
+  // ignore: avoid_setters_without_getters
+  set widget(WidgetPlaceholder value) => _values?.add(value);
 }

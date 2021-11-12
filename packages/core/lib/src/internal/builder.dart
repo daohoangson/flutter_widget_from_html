@@ -5,7 +5,7 @@ import 'package:csslib/visitor.dart' as css;
 
 import 'package:html/dom.dart' as dom;
 
-import '../core_data.dart' hide Flattener;
+import '../core_data.dart';
 import '../core_data.dart' as core_data;
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
@@ -95,7 +95,7 @@ class BuildTree extends core_data.BuildTree {
     }
 
     for (final subTree in subTrees.toList(growable: false).reversed) {
-      subTree.flatten(core_data.Flattener.noOp());
+      subTree.flatten(Flattened.noOp());
     }
 
     var widgets = Flattener(wf, parentMeta, this).widgets;
@@ -134,7 +134,7 @@ class BuildTree extends core_data.BuildTree {
   }
 
   @override
-  void flatten(core_data.Flattener flattener) {
+  void flatten(Flattened _) {
     for (final op in parentMeta.buildOps) {
       op.onTreeFlattening?.call(parentMeta, this);
     }

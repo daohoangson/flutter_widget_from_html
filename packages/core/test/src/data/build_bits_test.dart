@@ -368,7 +368,7 @@ void main() {
 
   test('Flattener', () {
     final values = [];
-    final flattener = Flattener.forTesting(values);
+    final flattener = Flattened.forTesting(values);
 
     expect(() => flattener.recognizer, throwsStateError);
 
@@ -385,9 +385,10 @@ void main() {
     const space = ' ';
     flattener.whitespace = space;
 
-    flattener.widget = widget0;
+    final widget = WidgetPlaceholder();
+    flattener.widget = widget;
 
-    expect(values, equals([recognizer, span, text, space, widget0]));
+    expect(values, equals([recognizer, span, text, space, widget]));
   });
 }
 
@@ -441,7 +442,7 @@ class _CircularBit extends BuildTree {
   Iterable<WidgetPlaceholder> build() => throw UnimplementedError();
 
   @override
-  void flatten(Flattener flattener) {}
+  void flatten(Flattened _) => throw UnimplementedError();
 
   @override
   BuildTree sub({BuildTree? parent, TextStyleBuilder? tsb}) =>
@@ -456,7 +457,7 @@ class _CustomBit extends BuildBit {
       : super(parent, tsb);
 
   @override
-  void flatten(Flattener flattener) => throw UnimplementedError();
+  void flatten(Flattened _) => throw UnimplementedError();
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
@@ -467,14 +468,14 @@ class _InputGestureRecognizerBit extends BuildBit {
   const _InputGestureRecognizerBit(BuildTree? parent) : super(parent);
 
   @override
-  void flatten(Flattener flattener) {
-    final existing = flattener.recognizer;
+  void flatten(Flattened f) {
+    final existing = f.recognizer;
     if (existing is TapGestureRecognizer) {
       existing.onTapCancel = () {};
       return;
     }
 
-    flattener.recognizer = MultiTapGestureRecognizer();
+    f.recognizer = MultiTapGestureRecognizer();
   }
 
   @override
@@ -486,8 +487,7 @@ class _OutputInlineSpanBit extends BuildBit {
   const _OutputInlineSpanBit(BuildTree? parent) : super(parent);
 
   @override
-  void flatten(Flattener flattener) =>
-      flattener.span = const WidgetSpan(child: Text('foo'));
+  void flatten(Flattened f) => f.span = const WidgetSpan(child: Text('foo'));
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
@@ -499,7 +499,7 @@ class _OutputStringBit extends BuildBit {
       : super(parent, tsb);
 
   @override
-  void flatten(Flattener flattener) => flattener.text = 'foo';
+  void flatten(Flattened f) => f.text = 'foo';
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
@@ -513,7 +513,8 @@ class _OutputWidgetBit extends BuildBit {
   bool get isInline => false;
 
   @override
-  void flatten(Flattener flattener) => flattener.widget = const Text('foo');
+  void flatten(Flattened f) =>
+      f.widget = WidgetPlaceholder(child: const Text('foo'));
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
