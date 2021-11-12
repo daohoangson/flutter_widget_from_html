@@ -79,15 +79,6 @@ class BuildTree extends core_data.BuildTree {
     required this.wf,
   }) : super(parent, tsb);
 
-  Iterable<BuildTree> get _subTrees sync* {
-    for (final child in directChildren) {
-      if (child is BuildTree) {
-        yield child;
-        yield* child._subTrees;
-      }
-    }
-  }
-
   void addBitsFromNodes(dom.NodeList domNodes) {
     for (final domNode in domNodes) {
       _addBitsFromNode(domNode);
@@ -103,8 +94,8 @@ class BuildTree extends core_data.BuildTree {
       return _built;
     }
 
-    for (final subTree in _subTrees.toList(growable: false).reversed) {
-      subTree.onFlattening(null);
+    for (final subTree in subTrees.toList(growable: false).reversed) {
+      subTree.onFlattening(core_data.Flattener.noOp());
     }
 
     var widgets = Flattener(wf, parentMeta, this).widgets;

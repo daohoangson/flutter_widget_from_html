@@ -365,6 +365,30 @@ void main() {
       ),
     );
   });
+
+  test('Flattener', () {
+    final values = [];
+    final flattener = Flattener.forTesting(values);
+
+    expect(() => flattener.recognizer, throwsStateError);
+
+    final recognizer = TapGestureRecognizer();
+    flattener.recognizer = recognizer;
+    expect(flattener.recognizer, equals(recognizer));
+
+    const span = TextSpan();
+    flattener.span = span;
+
+    const text = 'text';
+    flattener.text = text;
+
+    const space = ' ';
+    flattener.whitespace = space;
+
+    flattener.widget = widget0;
+
+    expect(values, equals([recognizer, span, text, space, widget0]));
+  });
 }
 
 class _BuildBitWidgetFactory extends WidgetFactory {

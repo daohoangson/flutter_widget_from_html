@@ -203,6 +203,18 @@ abstract class BuildTree extends BuildBit {
     return null;
   }
 
+  /// The list of sub-trees.
+  Iterable<BuildTree> get subTrees sync* {
+    for (final child in directChildren) {
+      if (child is! BuildTree) {
+        continue;
+      }
+
+      yield child;
+      yield* child.subTrees;
+    }
+  }
+
   @override
   TextStyleBuilder get tsb => _tsb;
 
@@ -266,21 +278,32 @@ abstract class BuildTree extends BuildBit {
   }
 }
 
-abstract class Flattener {
-  GestureRecognizer? get recognizer;
-  set recognizer(GestureRecognizer? value);
+class Flattener {
+  final List<dynamic>? _values;
+
+  factory Flattener.forTesting(List<dynamic> values) => Flattener._(values);
+
+  /// Disallows extending this class.
+  const Flattener._(this._values);
+
+  factory Flattener.noOp() => const Flattener._(null);
+
+  GestureRecognizer? get recognizer =>
+      _values?.whereType<GestureRecognizer?>().last;
+
+  set recognizer(GestureRecognizer? value) => _values?.add(value);
 
   // ignore: avoid_setters_without_getters
-  set span(InlineSpan value);
+  set span(InlineSpan value) => _values?.add(value);
 
   // ignore: avoid_setters_without_getters
-  set text(String value);
+  set text(String value) => _values?.add(value);
 
   // ignore: avoid_setters_without_getters
-  set widget(Widget value);
+  set whitespace(String value) => _values?.add(value);
 
   // ignore: avoid_setters_without_getters
-  set whitespace(String value);
+  set widget(Widget value) => _values?.add(value);
 }
 
 /// A simple text bit.
