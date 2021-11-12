@@ -330,16 +330,11 @@ abstract class WidgetBit<T> extends BuildBit {
   /// The widget to be rendered.
   final WidgetPlaceholder child;
 
-  const WidgetBit._(BuildTree parent, TextStyleBuilder? tsb, this.child)
-      : super(parent, tsb);
+  const WidgetBit._(BuildTree parent, this.child) : super(parent);
 
   /// Creates a block widget.
-  static WidgetBit<Widget> block(
-    BuildTree parent,
-    Widget child, {
-    TextStyleBuilder? tsb,
-  }) =>
-      _WidgetBitBlock(parent, tsb ?? parent.tsb, WidgetPlaceholder.lazy(child));
+  static WidgetBit<Widget> block(BuildTree parent, Widget child) =>
+      _WidgetBitBlock(parent, WidgetPlaceholder.lazy(child));
 
   /// Creates an inline widget.
   static WidgetBit<InlineSpan> inline(
@@ -347,11 +342,9 @@ abstract class WidgetBit<T> extends BuildBit {
     Widget child, {
     PlaceholderAlignment alignment = PlaceholderAlignment.bottom,
     TextBaseline baseline = TextBaseline.alphabetic,
-    TextStyleBuilder? tsb,
   }) =>
       _WidgetBitInline(
         parent,
-        tsb ?? parent.tsb,
         WidgetPlaceholder.lazy(child),
         alignment,
         baseline,
@@ -359,18 +352,15 @@ abstract class WidgetBit<T> extends BuildBit {
 }
 
 class _WidgetBitBlock extends WidgetBit<Widget> {
-  const _WidgetBitBlock(
-    BuildTree parent,
-    TextStyleBuilder? tsb,
-    WidgetPlaceholder child,
-  ) : super._(parent, tsb, child);
+  const _WidgetBitBlock(BuildTree parent, WidgetPlaceholder child)
+      : super._(parent, child);
 
   @override
   bool get isInline => false;
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _WidgetBitBlock(parent ?? this.parent!, tsb ?? this.tsb, child);
+      _WidgetBitBlock(parent ?? this.parent!, child);
 
   @override
   void onFlattening(Flattener flattener) => flattener.widget = child;
@@ -385,21 +375,14 @@ class _WidgetBitInline extends WidgetBit<InlineSpan> {
 
   const _WidgetBitInline(
     BuildTree parent,
-    TextStyleBuilder? tsb,
     WidgetPlaceholder child,
     this.alignment,
     this.baseline,
-  ) : super._(parent, tsb, child);
+  ) : super._(parent, child);
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _WidgetBitInline(
-        parent ?? this.parent!,
-        tsb ?? this.tsb,
-        child,
-        alignment,
-        baseline,
-      );
+      _WidgetBitInline(parent ?? this.parent!, child, alignment, baseline);
 
   @override
   void onFlattening(Flattener flattener) => flattener.span = WidgetSpan(
