@@ -11,7 +11,12 @@ dependencies:
   csslib: ^0.17.0
   flutter:
     sdk: flutter
+  fwfh_text_style: ">=0.0.1"
   html: ^0.15.0
+
+dependency_overrides:
+  fwfh_text_style:
+    path: ../fwfh_text_style
 
 dev_dependencies:
   flutter_test:

@@ -536,10 +536,8 @@ class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {
       : super(parent, tsb);
 
   @override
-  InlineSpan buildBit(TextStyleHtml tsh) => TextSpan(
-        text: tsh.runtimeType.toString(),
-        style: tsh.styleWithHeight,
-      );
+  InlineSpan buildBit(TextStyleHtml tsh) =>
+      TextSpan(text: tsh.runtimeType.toString(), style: tsh.style);
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>

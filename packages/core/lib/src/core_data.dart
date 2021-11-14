@@ -1,5 +1,6 @@
 import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/widgets.dart';
+import 'package:fwfh_text_style/fwfh_text_style.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'core_helpers.dart';
