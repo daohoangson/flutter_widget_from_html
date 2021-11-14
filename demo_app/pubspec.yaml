@@ -37,6 +37,8 @@ dependency_overrides:
     path: ../packages/fwfh_just_audio
   fwfh_svg:
     path: ../packages/fwfh_svg
+  fwfh_text_style:
+    path: ../packages/fwfh_text_style
   fwfh_url_launcher:
     path: ../packages/fwfh_url_launcher
   fwfh_webview:
