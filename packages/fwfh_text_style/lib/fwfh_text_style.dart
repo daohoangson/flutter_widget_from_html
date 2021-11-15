@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
@@ -33,10 +32,10 @@ class FwfhTextStyle extends _TextStyleProxy {
     double heightFactor = 1.0,
     double heightDelta = 0.0,
     TextBaseline? textBaseline,
-    TextLeadingDistribution? leadingDistribution,
+    ui.TextLeadingDistribution? leadingDistribution,
     Locale? locale,
-    List<Shadow>? shadows,
-    List<FontFeature>? fontFeatures,
+    List<ui.Shadow>? shadows,
+    List<ui.FontFeature>? fontFeatures,
     TextOverflow? overflow,
   }) =>
       FwfhTextStyle.from(
@@ -83,12 +82,12 @@ class FwfhTextStyle extends _TextStyleProxy {
     double? wordSpacing,
     TextBaseline? textBaseline,
     dynamic height = _default,
-    TextLeadingDistribution? leadingDistribution,
+    ui.TextLeadingDistribution? leadingDistribution,
     Locale? locale,
     Paint? foreground,
     Paint? background,
-    List<Shadow>? shadows,
-    List<FontFeature>? fontFeatures,
+    List<ui.Shadow>? shadows,
+    List<ui.FontFeature>? fontFeatures,
     TextDecoration? decoration,
     Color? decorationColor,
     TextDecorationStyle? decorationStyle,
@@ -194,7 +193,7 @@ abstract class _TextStyleProxy implements TextStyle {
   List<String>? get fontFamilyFallback => ref.fontFamilyFallback;
 
   @override
-  List<FontFeature>? get fontFeatures => ref.fontFeatures;
+  List<ui.FontFeature>? get fontFeatures => ref.fontFeatures;
 
   @override
   double? get fontSize => ref.fontSize;
@@ -209,7 +208,7 @@ abstract class _TextStyleProxy implements TextStyle {
   Paint? get foreground => ref.foreground;
 
   @override
-  ParagraphStyle getParagraphStyle({
+  ui.ParagraphStyle getParagraphStyle({
     TextAlign? textAlign,
     TextDirection? textDirection,
     double textScaleFactor = 1.0,
