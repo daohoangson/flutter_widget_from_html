@@ -36,6 +36,7 @@ class FwfhTextStyle extends _TextStyleProxy {
     Locale? locale,
     List<ui.Shadow>? shadows,
     List<ui.FontFeature>? fontFeatures,
+    String? package,
     TextOverflow? overflow,
   }) =>
       FwfhTextStyle.from(
@@ -64,6 +65,7 @@ class FwfhTextStyle extends _TextStyleProxy {
           locale: locale,
           shadows: shadows,
           fontFeatures: fontFeatures,
+          package: package,
           overflow: overflow,
         ),
       );
@@ -73,8 +75,6 @@ class FwfhTextStyle extends _TextStyleProxy {
     bool? inherit,
     Color? color,
     Color? backgroundColor,
-    String? fontFamily,
-    List<String>? fontFamilyFallback,
     double? fontSize,
     FontWeight? fontWeight,
     FontStyle? fontStyle,
@@ -93,6 +93,9 @@ class FwfhTextStyle extends _TextStyleProxy {
     TextDecorationStyle? decorationStyle,
     double? decorationThickness,
     String? debugLabel,
+    String? fontFamily,
+    List<String>? fontFamilyFallback,
+    String? package,
     TextOverflow? overflow,
   }) {
     String? newDebugLabel;
@@ -113,8 +116,6 @@ class FwfhTextStyle extends _TextStyleProxy {
         backgroundColor: this.background == null && background == null
             ? backgroundColor ?? this.backgroundColor
             : null,
-        fontFamily: fontFamily ?? this.fontFamily,
-        fontFamilyFallback: fontFamilyFallback ?? this.fontFamilyFallback,
         fontSize: fontSize ?? this.fontSize,
         fontWeight: fontWeight ?? this.fontWeight,
         fontStyle: fontStyle ?? this.fontStyle,
@@ -133,6 +134,9 @@ class FwfhTextStyle extends _TextStyleProxy {
         decorationStyle: decorationStyle ?? this.decorationStyle,
         decorationThickness: decorationThickness ?? this.decorationThickness,
         debugLabel: newDebugLabel,
+        fontFamily: fontFamily ?? this.fontFamily,
+        fontFamilyFallback: fontFamilyFallback ?? this.fontFamilyFallback,
+        package: package,
         overflow: overflow ?? this.overflow,
       ),
     );
