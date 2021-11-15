@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:chewie/chewie.dart' as lib;
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:video_player/video_player.dart' as lib;

@@ -109,7 +109,7 @@ class Flattener {
       final SpanBuilder spanBuilder =
           (context, _, {bool? isLast}) => bit.buildBit(thisTsb.build(context));
       built = spanBuilder;
-    } else if (bit is BuildBit<void, dynamic>) {
+    } else {
       built = bit.buildBit(null);
     }
 
