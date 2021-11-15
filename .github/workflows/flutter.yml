@@ -1,10 +1,13 @@
 name: Flutter
 on:
   push:
-    branches: 
+    branches:
       - master
       - next
   pull_request:
+    branches:
+      - master
+      - next
 
 jobs:
   analyze:
