@@ -6,6 +6,7 @@
 
 A `TextStyle` replacement that allows resetting .height to null.
 This is a companion add-on for [flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html) package.
+
 See [flutter/flutter#58765](https://github.com/flutter/flutter/issues/58765)
 and [flutter/flutter#58766](https://github.com/flutter/flutter/pull/58766) for more information.
 

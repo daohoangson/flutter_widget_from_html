@@ -1,0 +1,20 @@
+name: fwfh_text_style
+on:
+  push:
+
+jobs:
+  test:
+    name: Test on dev channel
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: packages/fwfh_text_style
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Flutter@dev
+        uses: subosito/flutter-action@v1
+        with:
+          channel: dev
+      - run: flutter analyze
+      - run: flutter test
