@@ -37,6 +37,7 @@ class FwfhTextStyle extends _TextStyleProxy {
     Locale? locale,
     List<Shadow>? shadows,
     List<FontFeature>? fontFeatures,
+    TextOverflow? overflow,
   }) =>
       FwfhTextStyle.from(
         ref.apply(
@@ -64,6 +65,7 @@ class FwfhTextStyle extends _TextStyleProxy {
           locale: locale,
           shadows: shadows,
           fontFeatures: fontFeatures,
+          overflow: overflow,
         ),
       );
 
@@ -92,6 +94,7 @@ class FwfhTextStyle extends _TextStyleProxy {
     TextDecorationStyle? decorationStyle,
     double? decorationThickness,
     String? debugLabel,
+    TextOverflow? overflow,
   }) {
     String? newDebugLabel;
     assert(
@@ -131,6 +134,7 @@ class FwfhTextStyle extends _TextStyleProxy {
         decorationStyle: decorationStyle ?? this.decorationStyle,
         decorationThickness: decorationThickness ?? this.decorationThickness,
         debugLabel: newDebugLabel,
+        overflow: overflow ?? this.overflow,
       ),
     );
   }
@@ -254,6 +258,9 @@ abstract class _TextStyleProxy implements TextStyle {
 
   @override
   Locale? get locale => ref.locale;
+
+  @override
+  TextOverflow? get overflow => ref.overflow;
 
   @override
   List<Shadow>? get shadows => ref.shadows;
