@@ -3,11 +3,11 @@ import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 
 import 'core_data.dart';
+import 'core_helpers.dart';
 import 'core_widget_factory.dart';
 import 'internal/builder.dart' as builder;
 import 'internal/tsh_widget.dart';
