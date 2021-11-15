@@ -448,7 +448,7 @@ void main() {
 
     testWidgets('renders inline-start (ltr)', (WidgetTester tester) async {
       const html = 'a<span style="margin-inline-start: 5px">b</span>c';
-      final explained = await explain(tester, html, rtl: false);
+      final explained = await explain(tester, html);
       expect(
         explained,
         equals(
@@ -465,7 +465,7 @@ void main() {
 
     testWidgets('renders inline-end (ltr)', (WidgetTester tester) async {
       const html = 'a<span style="margin-inline-end: 5px">b</span>c';
-      final explained = await explain(tester, html, rtl: false);
+      final explained = await explain(tester, html);
       expect(
         explained,
         equals(
