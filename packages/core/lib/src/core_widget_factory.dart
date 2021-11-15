@@ -292,7 +292,7 @@ class WidgetFactory {
     int index,
   ) {
     final text = getListMarkerText(listStyleType, index);
-    final style = tsh.styleWithHeight;
+    final style = tsh.style;
     return text.isNotEmpty
         ? RichText(
             maxLines: 1,
