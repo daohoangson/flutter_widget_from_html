@@ -73,7 +73,19 @@ class TextStyleOps {
   static TextStyleHtml Function(TextStyleHtml, css.Expression) lineHeight(
     WidgetFactory wf,
   ) =>
-      (p, v) => p.copyWith(height: _lineHeightTryParse(wf, p, v));
+      (p, v) {
+        final height = _lineHeightTryParse(wf, p, v);
+        if (height == null) {
+          return p;
+        }
+
+        if (height == -1) {
+          // ignore: avoid_redundant_argument_values
+          return p.copyWith(style: p.style.copyWith(height: null));
+        }
+
+        return p.copyWith(style: p.style.copyWith(height: height));
+      };
 
   static TextStyleHtml textDirection(TextStyleHtml p, String v) {
     switch (v) {
