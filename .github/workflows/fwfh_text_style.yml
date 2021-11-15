@@ -1,6 +1,6 @@
 name: fwfh_text_style
 on:
-  pull_request:
+  push:
     branches:
       - master
 
@@ -12,8 +12,8 @@ jobs:
           - beta
           - dev
 
-    # Run these tests on PRs against the `master` branch.
-    # In case one of these fails, create a new PR against `beta` or `dev` branch
+    # Run these tests on new commits on the `master` branch.
+    # In case one of these fails, create a new PR against the `release/*` branch
     # and publish a new beta/dev version to make sure there is a compatible version
     # of `fwfh_text_style` for all active Flutter versions.
     name: Test on ${{ matrix.channel }} channel
@@ -24,6 +24,15 @@ jobs:
         working-directory: packages/fwfh_text_style
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Run git fetch
+        run: |
+          git config user.name name
+          git config user.email email@domain.com
+          git fetch
+      - run: git merge -m test origin/release/${{ matrix.channel }}
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
