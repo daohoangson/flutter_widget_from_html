@@ -1,6 +1,6 @@
 name: fwfh_text_style
 version: 2.5.0
-description: A TextStyle replacement for HtmlWidget.
+description: A TextStyle replacement that allows resetting height behavior to normal.
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
 environment:
