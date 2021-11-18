@@ -212,72 +212,10 @@ HtmlWidget(
 </tr>
 </table>
 
-For fairly simple widget, use `customWidgetBuilder`. You will need to handle the DOM element and its children manually. The next example renders a carousel ([try it live](https://html-widget-demo.vercel.app/#/customwidgetbuilder)):
+For fairly simple widget, use `customWidgetBuilder`. You will need to handle the DOM element and its children manually.
+This example renders a carousel ([live demo](https://demo.fwfh.dev/#/customwidgetbuilder), [try with fwfh.dev](https://try.fwfh.dev/?id=657d84b28eb0352657400160c97d0f9d)):
 
-<details>
-
-<summary>custom_widget_builder.dart</summary>
-
-```dart
-const kHtml = '''
-<p>...</p>
-<div class="carousel">
-  <div class="image">
-    <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba" />
-  </div>
-  ...
-</div>
-<p>...</p>
-''';
-
-class CustomWidgetBuilderScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text('CustomWidgetBuilderScreen'),
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: HtmlWidget(
-              kHtml,
-              customWidgetBuilder: (e) {
-                if (!e.classes.contains('carousel')) return null;
-
-                final srcs = <String>[];
-                for (final child in e.children) {
-                  for (final grandChild in child.children) {
-                    srcs.add(grandChild.attributes['src']);
-                  }
-                }
-
-                return CarouselSlider(
-                  options: CarouselOptions(
-                    autoPlay: true,
-                    autoPlayAnimationDuration: const Duration(milliseconds: 250),
-                    autoPlayInterval: const Duration(milliseconds: 1000),
-                    enlargeCenterPage: true,
-                    enlargeStrategy: CenterPageEnlargeStrategy.scale,
-                  ),
-                  items: srcs.map(_toItem).toList(growable: false),
-                );
-              },
-            ),
-          ),
-        ),
-      );
-
-  static Widget _toItem(String src) => Container(
-        child: Center(
-          child: Image.network(src, fit: BoxFit.cover, width: 1000),
-        ),
-      );
-}
-```
-
-</details>
-
-[<img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/CustomWidgetBuilderScreen.gif" width="300" />](https://html-widget-demo.vercel.app/#/customwidgetbuilder)
+<img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/CustomWidgetBuilderScreen.gif" width="300" />
 
 ### Custom `WidgetFactory`
 
