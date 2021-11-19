@@ -101,6 +101,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
   KBD, MAIN, MARK, NAV, NOSCRIPT, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, SMALL,
   STRIKE, STRONG, STYLE, SUB, SUMMARY, SUP, TT, U, VAR
 - Everything with screenshot: https://demo.fwfh.dev/supported/tags.html
+- [Try with fwfh.dev](https://try.fwfh.dev)
 
 These tags requires [flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html):
 
