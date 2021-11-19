@@ -3,11 +3,11 @@
 ![Flutter](https://github.com/daohoangson/flutter_widget_from_html/workflows/Flutter/badge.svg)
 [![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html_core.svg)](https://pub.dev/packages/flutter_widget_from_html_core)
-
+  
 Flutter package to render html as widgets that focuses on correctness and extensibility.
-Supports [70+ most popular tags](https://html-widget-demo.vercel.app/supported/tags.html).
+Supports [70+ most popular tags](https://demo.fwfh.dev/supported/tags.html).
 
-| [Live demo](https://html-widget-demo.vercel.app/#/helloworldcore)                                                                                                   |                                                                                                                                                                     |
+| [Live demo](https://demo.fwfh.dev/#/helloworldcore)                                                                                                                 |                                                                                                                                                                     |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/HelloWorldCoreScreen1.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/HelloWorldCoreScreen2.jpg) |
 
@@ -85,7 +85,7 @@ HtmlWidget(
 ### HTML tags
 
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
-[Compare between Flutter rendering and browser's.](https://html-widget-demo.vercel.app/supported/tags.html)
+[Compare between Flutter rendering and browser's.](https://demo.fwfh.dev/supported/tags.html)
 
 - A: underline, theme accent color with scroll to anchor support
 - H1/H2/H3/H4/H5/H6
@@ -100,7 +100,7 @@ Below tags are the ones that have special meaning / styling, all other tags will
   DD, DEL, DETAILS, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, INS,
   KBD, MAIN, MARK, NAV, NOSCRIPT, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, SMALL,
   STRIKE, STRONG, STYLE, SUB, SUMMARY, SUP, TT, U, VAR
-- Everything with screenshot: https://html-widget-demo.vercel.app/supported/tags.html
+- Everything with screenshot: https://demo.fwfh.dev/supported/tags.html
 
 These tags requires [flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html):
 
