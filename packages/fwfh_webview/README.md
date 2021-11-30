@@ -7,7 +7,7 @@
 WidgetFactory extension to render IFRAME with the official WebView plugin.
 This is a companion add-on for [flutter_widget_from_html_core](https://pub.dev/packages/flutter_widget_from_html_core) package.
 
-Live demo: https://html-widget-demo.vercel.app/#/iframe
+Live demo: https://demo.fwfh.dev/#/iframe
 
 ## Getting Started
 
