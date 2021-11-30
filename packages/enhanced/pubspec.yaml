@@ -1,16 +1,16 @@
 name: flutter_widget_from_html
-version: 0.8.2
+version: 0.8.3-beta.1
 description: Flutter package to render html as widgets that supports hyperlink, image, audio, video, iframe and many other tags.
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
 environment:
-  flutter: ">=2.5.0"
+  flutter: ">=2.8.0-0"
   sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_widget_from_html_core: ^0.8.2
+  flutter_widget_from_html_core: ^0.8.3-0
   fwfh_cached_network_image: ^0.7.0+2
   fwfh_chewie: ^0.7.0+1
   fwfh_just_audio: ^0.6.2+2

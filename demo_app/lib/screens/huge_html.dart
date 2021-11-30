@@ -1,4 +1,4 @@
-import 'package:demo_app/model/show_perf_overlay.dart';
+import 'package:demo_app/widgets/popup_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
@@ -5191,9 +5191,7 @@ class HugeHtmlScreen extends StatelessWidget {
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           title: const Text('HugeHtmlScreen'),
-          actions: const [
-            ShowPerfIconButton(),
-          ],
+          actions: const [PopupMenu()],
         ),
         body: ListView(
           children: [

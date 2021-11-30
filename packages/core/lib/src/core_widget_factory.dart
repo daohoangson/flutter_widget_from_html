@@ -1,7 +1,7 @@
 import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart'
-    show CircularProgressIndicator, Theme, ThemeData, Tooltip;
+    show CircularProgressIndicator, SelectableText, Theme, ThemeData, Tooltip;
 import 'package:flutter/widgets.dart';
 
 import 'core_data.dart';
@@ -317,15 +317,32 @@ class WidgetFactory {
           ? child
           : Padding(padding: padding, child: child);
 
-  /// Builds [RichText].
-  Widget? buildText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) =>
-      RichText(
-        maxLines: meta.maxLines > 0 ? meta.maxLines : null,
-        overflow: meta.overflow,
-        text: text,
-        textAlign: tsh.textAlign ?? TextAlign.start,
-        textDirection: tsh.textDirection,
-      );
+  /// Builds [RichText] or [SelectableText].
+  ///
+  /// See [HtmlWidget.isSelectable].
+  Widget? buildText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) {
+    final maxLines = meta.maxLines > 0 ? meta.maxLines : null;
+    final overflow = meta.overflow;
+    final textAlign = tsh.textAlign ?? TextAlign.start;
+    final textDirection = tsh.textDirection;
+
+    return _widget?.isSelectable == true &&
+            overflow == TextOverflow.clip &&
+            text is TextSpan
+        ? SelectableText.rich(
+            text,
+            maxLines: maxLines,
+            textAlign: textAlign,
+            textDirection: textDirection,
+          )
+        : RichText(
+            maxLines: maxLines,
+            overflow: overflow,
+            text: text,
+            textAlign: textAlign,
+            textDirection: textDirection,
+          );
+  }
 
   /// Builds [TextSpan].
   InlineSpan? buildTextSpan({
