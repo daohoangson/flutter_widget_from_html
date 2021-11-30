@@ -6,7 +6,7 @@ environment:
   sdk: ">=2.6.0 <3.0.0"
 
 dependencies:
-  carousel_slider: ^2.2.1
+  carousel_slider: ^4.0.0
   flutter:
     sdk: flutter
   flutter_widget_from_html: any

@@ -63,7 +63,7 @@ class HtmlWidget extends core.HtmlWidget {
     FutureOr<bool> Function(String)? onTapUrl,
     core.RebuildTriggers? rebuildTriggers,
     RenderMode renderMode = RenderMode.column,
-    TextStyle textStyle = const TextStyle(),
+    TextStyle? textStyle,
     @Deprecated("Override WidgetFactory.webView instead") this.webView = false,
     @Deprecated("Override WidgetFactory.webViewDebuggingEnabled instead")
         this.webViewDebuggingEnabled = false,
