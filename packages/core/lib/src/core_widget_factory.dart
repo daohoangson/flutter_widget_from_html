@@ -2,7 +2,6 @@ import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart'
     show CircularProgressIndicator, Theme, ThemeData, Tooltip;
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import 'core_data.dart';
@@ -292,7 +291,7 @@ class WidgetFactory {
     int index,
   ) {
     final text = getListMarkerText(listStyleType, index);
-    final style = tsh.styleWithHeight;
+    final style = tsh.style;
     return text.isNotEmpty
         ? RichText(
             maxLines: 1,

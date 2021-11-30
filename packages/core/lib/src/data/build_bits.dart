@@ -137,9 +137,9 @@ abstract class BuildBit {
 /// A tree of [BuildBit]s.
 abstract class BuildTree extends BuildBit {
   static final _anchors = Expando<List<Key>>();
+  static final _buffers = Expando<StringBuffer>();
 
   final _children = <BuildBit>[];
-  final _toStringBuffer = StringBuffer();
   final TextStyleBuilder _tsb;
 
   /// Creates a tree.
@@ -257,11 +257,12 @@ abstract class BuildTree extends BuildBit {
   @override
   String toString() {
     // avoid circular references
-    if (_toStringBuffer.length > 0) {
+    final existing = _buffers[this];
+    if (existing != null) {
       return '$runtimeType#$hashCode (circular)';
     }
 
-    final sb = _toStringBuffer;
+    final sb = _buffers[this] = StringBuffer();
     sb.writeln('$runtimeType#$hashCode $tsb:');
 
     const _indent = '  ';
@@ -270,7 +271,7 @@ abstract class BuildTree extends BuildBit {
     }
 
     final str = sb.toString().trimRight();
-    sb.clear();
+    _buffers[this] = null;
 
     return str;
   }

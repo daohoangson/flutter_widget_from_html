@@ -1,3 +1,8 @@
+## 0.8.2
+
+- Optimize `HtmlListMarker` (#623)
+- Fix leading and trailing whitespace within `PRE` being trimmed (#624)
+
 ## 0.8.1
 
 - Mark enhanced `HtmlWidget.webViewXxx` properties as deprecated (#614)

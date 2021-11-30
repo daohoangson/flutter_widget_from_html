@@ -1,10 +1,6 @@
 name: Demo
 on:
   push:
-    branches:
-      - master
-      - next
-  pull_request:
 
 jobs:
   apk:

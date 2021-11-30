@@ -128,7 +128,7 @@ class Flattener implements Flattened {
 
           return wf.buildTextSpan(
             recognizer: scopedRecognizer,
-            style: tsh.styleWithHeight,
+            style: tsh.style,
             text: text,
           );
         }),
@@ -192,7 +192,7 @@ class Flattener implements Flattened {
             span = wf.buildTextSpan(
               children: children,
               recognizer: scopedRecognizer,
-              style: scopedTsb.build(context).styleWithHeight,
+              style: tsh.style,
               text: text,
             );
           }
