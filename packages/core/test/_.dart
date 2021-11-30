@@ -674,11 +674,13 @@ class Explainer {
               ? _widgetChild(widget.child)
               : widget is SingleChildScrollView
                   ? _widgetChild(widget.child)
-                  : widget is Text
-                      ? widget.data!
-                      : widget is Tooltip
-                          ? _widgetChild(widget.child)
-                          : '',
+                  : widget is SelectableText
+                      ? _inlineSpan(widget.textSpan!)
+                      : widget is Text
+                          ? widget.data!
+                          : widget is Tooltip
+                              ? _widgetChild(widget.child)
+                              : '',
     );
     // U-Z
 

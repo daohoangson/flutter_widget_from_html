@@ -1,3 +1,8 @@
+## 0.8.3-beta.1
+
+- Add support for `HtmlWidget.isSelectable` (#631)
+- Remove `BuildTree._toStringBuffer` for better memory usage
+
 ## 0.8.2
 
 - Optimize `HtmlListMarker` (#623)

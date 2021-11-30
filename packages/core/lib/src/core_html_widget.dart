@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 
@@ -40,6 +40,11 @@ class HtmlWidget extends StatefulWidget {
 
   /// The custom [WidgetFactory] builder.
   final WidgetFactory Function()? factoryBuilder;
+
+  /// Controls whether text is rendered with [SelectableText] or [RichText].
+  ///
+  /// Default: `false`, use [RichText].
+  final bool isSelectable;
 
   /// The custom error builder.
   final OnErrorBuilder? onErrorBuilder;
@@ -99,6 +104,7 @@ class HtmlWidget extends StatefulWidget {
     this.customWidgetBuilder,
     this.enableCaching,
     this.factoryBuilder,
+    this.isSelectable = false,
     Key? key,
     this.onErrorBuilder,
     this.onLoadingBuilder,
