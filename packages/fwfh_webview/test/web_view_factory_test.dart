@@ -40,14 +40,14 @@ void main() {
     testWidgets('renders web view (Android)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
       final explained = await _explain(tester);
-      expect(explained, contains('└AndroidView'));
+      expect(explained, contains('└_AndroidPlatformView()'));
       debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets('renders web view (iOS)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
       final explained = await _explain(tester);
-      expect(explained, contains('└UiKitView'));
+      expect(explained, contains('└UiKitView(state: _UiKitViewState)'));
       debugDefaultTargetPlatformOverride = null;
     });
 

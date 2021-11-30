@@ -148,9 +148,9 @@ abstract class BuildBit<InputType, OutputType> {
 /// A tree of [BuildBit]s.
 abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
   static final _anchors = Expando<List<Key>>();
+  static final _buffers = Expando<StringBuffer>();
 
   final _children = <BuildBit>[];
-  final _toStringBuffer = StringBuffer();
 
   /// Creates a tree.
   BuildTree(BuildTree? parent, TextStyleBuilder tsb) : super(parent, tsb);
@@ -255,11 +255,12 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
   @override
   String toString() {
     // avoid circular references
-    if (_toStringBuffer.length > 0) {
+    final existing = _buffers[this];
+    if (existing != null) {
       return '$runtimeType#$hashCode (circular)';
     }
 
-    final sb = _toStringBuffer;
+    final sb = _buffers[this] = StringBuffer();
     sb.writeln('$runtimeType#$hashCode $tsb:');
 
     const _indent = '  ';
@@ -268,7 +269,7 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
     }
 
     final str = sb.toString().trimRight();
-    sb.clear();
+    _buffers[this] = null;
 
     return str;
   }

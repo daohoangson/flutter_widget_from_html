@@ -1,0 +1,11 @@
+include: package:lint/analysis_options_package.yaml
+
+analyzer:
+  exclude:
+    - example/main.dart
+  errors:
+    todo: info
+
+linter:
+  rules:
+    always_put_control_body_on_new_line: true

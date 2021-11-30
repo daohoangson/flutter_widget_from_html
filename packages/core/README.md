@@ -3,11 +3,11 @@
 ![Flutter](https://github.com/daohoangson/flutter_widget_from_html/workflows/Flutter/badge.svg)
 [![codecov](https://codecov.io/gh/daohoangson/flutter_widget_from_html/branch/master/graph/badge.svg)](https://codecov.io/gh/daohoangson/flutter_widget_from_html)
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html_core.svg)](https://pub.dev/packages/flutter_widget_from_html_core)
-
+  
 Flutter package to render html as widgets that focuses on correctness and extensibility.
-Supports [70+ most popular tags](https://html-widget-demo.vercel.app/supported/tags.html).
+Supports [70+ most popular tags](https://demo.fwfh.dev/supported/tags.html).
 
-| [Live demo](https://html-widget-demo.vercel.app/#/helloworldcore)                                                                                                   |                                                                                                                                                                     |
+| [Live demo](https://demo.fwfh.dev/#/helloworldcore)                                                                                                                 |                                                                                                                                                                     |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/HelloWorldCoreScreen1.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/HelloWorldCoreScreen2.jpg) |
 
@@ -17,7 +17,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html_core: ^0.8.1
+  flutter_widget_from_html_core: ^0.8.2
 ```
 
 ## Usage
@@ -85,7 +85,7 @@ HtmlWidget(
 ### HTML tags
 
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
-[Compare between Flutter rendering and browser's.](https://html-widget-demo.vercel.app/supported/tags.html)
+[Compare between Flutter rendering and browser's.](https://demo.fwfh.dev/supported/tags.html)
 
 - A: underline, theme accent color with scroll to anchor support
 - H1/H2/H3/H4/H5/H6
@@ -100,7 +100,8 @@ Below tags are the ones that have special meaning / styling, all other tags will
   DD, DEL, DETAILS, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, INS,
   KBD, MAIN, MARK, NAV, NOSCRIPT, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, SMALL,
   STRIKE, STRONG, STYLE, SUB, SUMMARY, SUP, TT, U, VAR
-- Everything with screenshot: https://html-widget-demo.vercel.app/supported/tags.html
+- Everything with screenshot: https://demo.fwfh.dev/supported/tags.html
+- [Try with fwfh.dev](https://try.fwfh.dev)
 
 These tags requires [flutter_widget_from_html](https://pub.dev/packages/flutter_widget_from_html):
 
@@ -202,6 +203,8 @@ HtmlWidget(
   },
 ),
 ```
+  
+[Try with fwfh.dev](https://try.fwfh.dev/?id=08173c5e5d837293837c383d00f9f792)
 
 </td>
 <td>
@@ -210,72 +213,10 @@ HtmlWidget(
 </tr>
 </table>
 
-For fairly simple widget, use `customWidgetBuilder`. You will need to handle the DOM element and its children manually. The next example renders a carousel ([try it live](https://html-widget-demo.vercel.app/#/customwidgetbuilder)):
+For fairly simple widget, use `customWidgetBuilder`. You will need to handle the DOM element and its children manually.
+This example renders a carousel ([live demo](https://demo.fwfh.dev/#/customwidgetbuilder), [try with fwfh.dev](https://try.fwfh.dev/?id=657d84b28eb0352657400160c97d0f9d)):
 
-<details>
-
-<summary>custom_widget_builder.dart</summary>
-
-```dart
-const kHtml = '''
-<p>...</p>
-<div class="carousel">
-  <div class="image">
-    <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba" />
-  </div>
-  ...
-</div>
-<p>...</p>
-''';
-
-class CustomWidgetBuilderScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text('CustomWidgetBuilderScreen'),
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: HtmlWidget(
-              kHtml,
-              customWidgetBuilder: (e) {
-                if (!e.classes.contains('carousel')) return null;
-
-                final srcs = <String>[];
-                for (final child in e.children) {
-                  for (final grandChild in child.children) {
-                    srcs.add(grandChild.attributes['src']);
-                  }
-                }
-
-                return CarouselSlider(
-                  options: CarouselOptions(
-                    autoPlay: true,
-                    autoPlayAnimationDuration: const Duration(milliseconds: 250),
-                    autoPlayInterval: const Duration(milliseconds: 1000),
-                    enlargeCenterPage: true,
-                    enlargeStrategy: CenterPageEnlargeStrategy.scale,
-                  ),
-                  items: srcs.map(_toItem).toList(growable: false),
-                );
-              },
-            ),
-          ),
-        ),
-      );
-
-  static Widget _toItem(String src) => Container(
-        child: Center(
-          child: Image.network(src, fit: BoxFit.cover, width: 1000),
-        ),
-      );
-}
-```
-
-</details>
-
-[<img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/CustomWidgetBuilderScreen.gif" width="300" />](https://html-widget-demo.vercel.app/#/customwidgetbuilder)
+<img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/CustomWidgetBuilderScreen.gif" width="300" />
 
 ### Custom `WidgetFactory`
 

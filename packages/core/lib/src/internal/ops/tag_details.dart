@@ -29,7 +29,7 @@ class TagDetails {
           WidgetPlaceholder(
             builder: (context, child) {
               final tsh = meta.tsb.build(context);
-              return HtmlDetailsMarker(style: tsh.styleWithHeight);
+              return HtmlDetailsMarker(style: tsh.style);
             },
             localName: kTagDetails,
           ),
@@ -80,7 +80,7 @@ class TagDetails {
             child: wf.buildColumnWidget(
               context,
               [
-                HtmlSummary(style: tsh.styleWithHeight, child: _summary),
+                HtmlSummary(style: tsh.style, child: _summary),
                 HtmlDetailsContents(child: child),
               ],
               dir: tsh.getDependency(),
