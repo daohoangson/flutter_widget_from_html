@@ -1,3 +1,9 @@
+## 0.8.2
+
+- Optimize `HtmlListMarker` (#623)
+- Fix leading and trailing whitespace within `PRE` being trimmed (#624)
+- Replace `evaluateJavascript` with `runJavascriptReturningResult` (#625)
+
 ## 0.8.1+1
 
 - Fix missing `test/images` directory

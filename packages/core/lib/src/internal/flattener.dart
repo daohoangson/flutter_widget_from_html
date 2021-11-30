@@ -109,7 +109,7 @@ class Flattener {
       final SpanBuilder spanBuilder =
           (context, _, {bool? isLast}) => bit.buildBit(thisTsb.build(context));
       built = spanBuilder;
-    } else if (bit is BuildBit<void, dynamic>) {
+    } else {
       built = bit.buildBit(null);
     }
 
@@ -183,7 +183,7 @@ class Flattener {
 
           return wf.buildTextSpan(
             recognizer: scopedRecognizer,
-            style: scopedTsb.build(context).styleWithHeight,
+            style: scopedTsb.build(context).style,
             text: text,
           );
         },
@@ -247,7 +247,7 @@ class Flattener {
           return wf.buildTextSpan(
             children: children,
             recognizer: scopedRecognizer,
-            style: scopedTsb.build(context).styleWithHeight,
+            style: scopedTsb.build(context).style,
             text: text,
           );
         },

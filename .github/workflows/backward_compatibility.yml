@@ -1,10 +1,11 @@
 name: Backward compatibility
 on:
   push:
-    branches: 
+    branches:
       - master
-      - next
   pull_request:
+    branches:
+      - master
 
 jobs:
   test:
@@ -16,6 +17,7 @@ jobs:
           - fwfh_cached_network_image
           - fwfh_chewie
           - fwfh_svg
+          - fwfh_text_style
           - fwfh_url_launcher
           - fwfh_webview
 

@@ -40,45 +40,14 @@ void main() {
     testWidgets('renders web view (Android)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
       final explained = await _explain(tester);
-      expect(
-        explained,
-        equals(
-          'TshWidget\n'
-          '└WidgetPlaceholder<Widget>(WebView)\n'
-          ' └WebView(state: WebViewState)\n'
-          '  └LayoutBuilder()\n'
-          '   └SizedBox(width: 800.0, height: 450.0)\n'
-          "    └WebView-[<'$src'>](state: _WebViewState)\n"
-          '     └GestureDetector(startBehavior: start)\n'
-          '      └RawGestureDetector(...)\n'
-          '       └Listener(...)\n'
-          '        └AndroidView(state: _AndroidViewState)\n'
-          '         └Focus(...)\n'
-          '          └_FocusMarker\n'
-          '           └Semantics(...)\n'
-          '            └_AndroidPlatformView()\n'
-          '\n',
-        ),
-      );
+      expect(explained, contains('└_AndroidPlatformView()'));
       debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets('renders web view (iOS)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
       final explained = await _explain(tester);
-      expect(
-        explained,
-        equals(
-          'TshWidget\n'
-          '└WidgetPlaceholder<Widget>(WebView)\n'
-          ' └WebView(state: WebViewState)\n'
-          '  └AspectRatio(aspectRatio: 1.8)\n'
-          "   └WebView-[<'$src'>](state: _WebViewState)\n"
-          '    └UiKitView(state: _UiKitViewState)\n'
-          '     └SizedBox.expand()\n'
-          '\n',
-        ),
-      );
+      expect(explained, contains('└UiKitView(state: _UiKitViewState)'));
       debugDefaultTargetPlatformOverride = null;
     });
 

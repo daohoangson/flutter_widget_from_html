@@ -31,7 +31,7 @@ class HtmlWidget extends core.HtmlWidget {
     void Function(ImageMetadata)? onTapImage,
     FutureOr<bool> Function(String)? onTapUrl,
     RenderMode renderMode = RenderMode.column,
-    TextStyle textStyle = const TextStyle(),
+    TextStyle? textStyle,
   }) : super(
           html,
           baseUrl: baseUrl,

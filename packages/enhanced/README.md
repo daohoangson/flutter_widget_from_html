@@ -5,9 +5,9 @@
 [![Pub](https://img.shields.io/pub/v/flutter_widget_from_html.svg)](https://pub.dev/packages/flutter_widget_from_html)
 
 Flutter package to render html as widgets that supports hyperlink, image, audio, video, iframe
-and [70+ other tags](https://html-widget-demo.vercel.app/supported/tags.html).
+and [70+ other tags](https://demo.fwfh.dev/supported/tags.html).
 
-| [Live demo](https://html-widget-demo.vercel.app/#/helloworld)                                                                                                   |                                                                                                                                                                 |                                                                                                                                                                 |
+| [Live demo](https://demo.fwfh.dev/#/helloworld)                                                                                                                 |                                                                                                                                                                 |                                                                                                                                                                 |
 |-----------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/HelloWorldScreen1.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/HelloWorldScreen2.gif) | ![](https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/bd80e2fef38f8d7ed69c388e2b325ea09aa7b817/demo_app/screenshots/HelloWorldScreen3.gif) |
 
@@ -27,7 +27,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html: ^0.8.1
+  flutter_widget_from_html: ^0.8.2
 ```
 
 ### Platform specific configuration
@@ -111,7 +111,7 @@ HtmlWidget(
 ### HTML tags
 
 Below tags are the ones that have special meaning / styling, all other tags will be parsed as text.
-[Compare between Flutter rendering and browser's.](https://html-widget-demo.vercel.app/supported/tags.html)
+[Compare between Flutter rendering and browser's.](https://demo.fwfh.dev/supported/tags.html)
 
 - A: underline, theme accent color
   - Scroll to anchor
@@ -132,7 +132,8 @@ Below tags are the ones that have special meaning / styling, all other tags will
   DD, DEL, DETAILS, DFN, DIV, DL, DT, EM, FIGCAPTION, FIGURE, FONT, FOOTER, HEADER, HR, I, INS,
   KBD, MAIN, MARK, NAV, NOSCRIPT, P, PRE, Q, RP, RT, RUBY, S, SAMP, SECTION, SMALL,
   STRIKE, STRONG, STYLE, SUB, SUMMARY, SUP, TT, U, VAR
-- Everything with screenshot: https://html-widget-demo.vercel.app/supported/tags.html
+- Everything with screenshot: https://demo.fwfh.dev/supported/tags.html
+- [Try with fwfh.dev](https://try.fwfh.dev)
 
 These tags and their contents will be ignored:
 

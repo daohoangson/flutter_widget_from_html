@@ -5,9 +5,6 @@ part of '../core_data.dart';
 class TextStyleHtml {
   final Iterable<dynamic> _deps;
 
-  /// The line height.
-  final double? height;
-
   /// The parent style.
   final TextStyleHtml? parent;
 
@@ -25,7 +22,6 @@ class TextStyleHtml {
 
   const TextStyleHtml._({
     required Iterable<dynamic> deps,
-    this.height,
     this.parent,
     required this.style,
     this.textAlign,
@@ -36,6 +32,7 @@ class TextStyleHtml {
   /// Creates the root text style.
   factory TextStyleHtml.root(Iterable<dynamic> deps, TextStyle? widgetStyle) {
     var style = _getDependency<TextStyle>(deps);
+    style = FwfhTextStyle.from(style);
     if (widgetStyle != null) {
       style = widgetStyle.inherit ? style.merge(widgetStyle) : widgetStyle;
     }
@@ -55,32 +52,29 @@ class TextStyleHtml {
     );
   }
 
-  /// Returns a [TextStyle] merged from [style] and [height].
-  ///
-  /// This needs to be done because
-  /// `TextStyle` with existing height cannot be copied with `height=null`.
-  /// See [flutter/flutter#58765](https://github.com/flutter/flutter/issues/58765).
-  TextStyle get styleWithHeight =>
-      height != null && height! >= 0 ? style.copyWith(height: height) : style;
-
   /// Creates a copy with the given fields replaced with the new values.
   TextStyleHtml copyWith({
-    double? height,
     TextStyleHtml? parent,
     TextStyle? style,
     TextAlign? textAlign,
     TextDirection? textDirection,
     CssWhitespace? whitespace,
-  }) =>
-      TextStyleHtml._(
-        deps: _deps,
-        height: height ?? this.height,
-        parent: parent ?? this.parent,
-        style: style ?? this.style,
-        textAlign: textAlign ?? this.textAlign,
-        textDirection: textDirection ?? this.textDirection,
-        whitespace: whitespace ?? this.whitespace,
-      );
+  }) {
+    assert(
+      style is FwfhTextStyle?,
+      'The text style should be modified by calling methods of the existing instance: '
+      'apply(), copyWith() or merge().',
+    );
+
+    return TextStyleHtml._(
+      deps: _deps,
+      parent: parent ?? this.parent,
+      style: style ?? this.style,
+      textAlign: textAlign ?? this.textAlign,
+      textDirection: textDirection ?? this.textDirection,
+      whitespace: whitespace ?? this.whitespace,
+    );
+  }
 
   /// Gets dependency value by type.
   ///
