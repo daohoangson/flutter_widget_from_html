@@ -36,14 +36,14 @@ class WidgetFactory {
   BuildOp? _styleTextDecoration;
   BuildOp? _styleVerticalAlign;
   BuildOp? _tagA;
-  TextStyleHtml Function(TextStyleHtml, void)? _tagAColor;
+  HtmlStyle Function(HtmlStyle, void)? _tagAColor;
   BuildOp? _tagBr;
   BuildOp? _tagFont;
   BuildOp? _tagHr;
   BuildOp? _tagImg;
   BuildOp? _tagPre;
   BuildOp? _tagQ;
-  TextStyleHtml Function(TextStyleHtml, css.Expression)? _tsbLineHeight;
+  HtmlStyle Function(HtmlStyle, css.Expression)? _tsbLineHeight;
   HtmlWidget? _widget;
 
   /// Gets the current anchor registry.
@@ -228,12 +228,9 @@ class WidgetFactory {
       built = buildAspectRatio(meta, built, src.width! / src.height!);
     }
 
-    if (_widget?.onTapImage != null && built != null) {
-      built = buildGestureDetector(
-        meta,
-        built,
-        () => _widget?.onTapImage?.call(data),
-      );
+    final onTapImage = _widget?.onTapImage;
+    if (onTapImage != null && built != null) {
+      built = buildGestureDetector(meta, built, () => onTapImage(data));
     }
 
     return built;
@@ -286,24 +283,24 @@ class WidgetFactory {
   /// Builds marker widget for a list item.
   Widget? buildListMarker(
     BuildMetadata meta,
-    TextStyleHtml tsh,
+    HtmlStyle style,
     String listStyleType,
     int index,
   ) {
     final text = getListMarkerText(listStyleType, index);
-    final style = tsh.style;
+    final textStyle = style.style;
     return text.isNotEmpty
         ? RichText(
             maxLines: 1,
             softWrap: false,
-            text: TextSpan(style: style, text: text),
-            textDirection: tsh.textDirection,
+            text: TextSpan(style: textStyle, text: text),
+            textDirection: style.textDirection,
           )
         : listStyleType == kCssListStyleTypeCircle
-            ? HtmlListMarker.circle(style)
+            ? HtmlListMarker.circle(textStyle)
             : listStyleType == kCssListStyleTypeSquare
-                ? HtmlListMarker.square(style)
-                : HtmlListMarker.disc(style);
+                ? HtmlListMarker.square(textStyle)
+                : HtmlListMarker.disc(textStyle);
   }
 
   /// Builds [Padding].
@@ -317,13 +314,13 @@ class WidgetFactory {
           : Padding(padding: padding, child: child);
 
   /// Builds [RichText].
-  Widget? buildText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) =>
+  Widget? buildText(BuildMetadata meta, HtmlStyle style, InlineSpan text) =>
       RichText(
         maxLines: meta.maxLines > 0 ? meta.maxLines : null,
         overflow: meta.overflow,
         text: text,
-        textAlign: tsh.textAlign ?? TextAlign.start,
-        textDirection: tsh.textDirection,
+        textAlign: style.textAlign ?? TextAlign.start,
+        textDirection: style.textDirection,
       );
 
   /// Builds [TextSpan].
@@ -387,7 +384,7 @@ class WidgetFactory {
   /// - [TextStyle] via [DefaultTextStyle.of]
   /// - [ThemeData] via [Theme.of]
   ///
-  /// Use [TextStyleHtml.getDependency] to get value by type.
+  /// Use [HtmlStyle.getDependency] to get value by type.
   ///
   /// ```dart
   /// // in normal widget building:
@@ -399,7 +396,7 @@ class WidgetFactory {
   /// final color = tsh.getDependency<ThemeData>().accentColor;
   /// ```
   ///
-  /// It's recommended to use values from [TextStyleHtml] instead of
+  /// It's recommended to use values from [HtmlStyle] instead of
   /// obtaining from [BuildContext] for performance reason.
   ///
   /// ```dart
@@ -555,9 +552,6 @@ class WidgetFactory {
     );
   }
 
-  /// Prepares the root [TextStyleBuilder].
-  void onRoot(TextStyleBuilder rootTsb) {}
-
   /// Ensures anchor is visible.
   ///
   /// Returns `true` if anchor has been found and
@@ -601,11 +595,12 @@ class WidgetFactory {
         meta.register(_tagA!);
 
         meta.tsb.enqueue(
-          _tagAColor ??= (tsh, _) => tsh.copyWith(
-                style: tsh.style.copyWith(
-                  color: tsh.getDependency<ThemeData>().colorScheme.primary,
+          _tagAColor ??= (style, _) => style.copyWith(
+                style: style.style.copyWith(
+                  color: style.getDependency<ThemeData>().colorScheme.primary,
                 ),
               ),
+          null,
         );
 
         final name = attrs[kAttributeAName];
@@ -908,7 +903,10 @@ class WidgetFactory {
         break;
 
       case kCssDirection:
-        meta.tsb.enqueue(TextStyleOps.textDirection, style.term);
+        final term = style.term;
+        if (term != null) {
+          meta.tsb.enqueue(TextStyleOps.textDirection, term);
+        }
         break;
 
       case kCssFontFamily:
@@ -917,7 +915,10 @@ class WidgetFactory {
         break;
 
       case kCssFontSize:
-        meta.tsb.enqueue(TextStyleOps.fontSize, style.value);
+        final value = style.value;
+        if (value != null) {
+          meta.tsb.enqueue(TextStyleOps.fontSize, value);
+        }
         break;
 
       case kCssFontStyle:
@@ -949,8 +950,11 @@ class WidgetFactory {
         break;
 
       case kCssLineHeight:
-        _tsbLineHeight ??= TextStyleOps.lineHeight(this);
-        meta.tsb.enqueue(_tsbLineHeight!, style.value);
+        final value = style.value;
+        if (value != null) {
+          final callback = _tsbLineHeight ??= TextStyleOps.lineHeight(this);
+          meta.tsb.enqueue(callback, value);
+        }
         break;
 
       case kCssMaxLines:
@@ -1100,7 +1104,7 @@ class WidgetFactory {
       onTreeFlattening: (meta, tree) {
         final widget = WidgetPlaceholder(
           builder: (context, _) => SizedBox(
-            height: meta.tsb.build(context).style.fontSize,
+            height: tree.tsb.build(context).style.fontSize,
             key: anchor,
           ),
           localName: 'anchor',

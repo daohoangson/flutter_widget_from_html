@@ -4,7 +4,7 @@ import '../core_data.dart';
 import '../core_helpers.dart';
 
 class HeightPlaceholder extends WidgetPlaceholder {
-  final TextStyleBuilder tsb;
+  final HtmlStyleBuilder tsb;
 
   final List<CssLength> _heights = [];
 
@@ -35,7 +35,7 @@ class HeightPlaceholder extends WidgetPlaceholder {
     BuildContext context,
     Widget child,
     CssLength height,
-    TextStyleBuilder tsb,
+    HtmlStyleBuilder tsb,
   ) {
     final existing = (child is SizedBox ? child.height : null) ?? 0.0;
     final value = height.getValue(tsb.build(context));

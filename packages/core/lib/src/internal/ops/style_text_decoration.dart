@@ -63,10 +63,10 @@ class StyleTextDecoration {
       );
 }
 
-TextStyleHtml textDecorationColor(TextStyleHtml p, Color v) =>
+HtmlStyle textDecorationColor(HtmlStyle p, Color v) =>
     p.copyWith(style: p.style.copyWith(decorationColor: v));
 
-TextStyleHtml textDecorationLine(TextStyleHtml p, TextDecorationLine v) {
+HtmlStyle textDecorationLine(HtmlStyle p, TextDecorationLine v) {
   final pd = p.style.decoration;
   final lineThough = pd?.contains(TextDecoration.lineThrough) == true;
   final overline = pd?.contains(TextDecoration.overline) == true;
@@ -88,10 +88,10 @@ TextStyleHtml textDecorationLine(TextStyleHtml p, TextDecorationLine v) {
   );
 }
 
-TextStyleHtml textDecorationStyle(TextStyleHtml p, TextDecorationStyle v) =>
+HtmlStyle textDecorationStyle(HtmlStyle p, TextDecorationStyle v) =>
     p.copyWith(style: p.style.copyWith(decorationStyle: v));
 
-TextStyleHtml textDecorationThickness(TextStyleHtml p, double v) =>
+HtmlStyle textDecorationThickness(HtmlStyle p, double v) =>
     p.copyWith(style: p.style.copyWith(decorationThickness: v));
 
 @immutable

@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
+import 'package:flutter_widget_from_html_core/src/internal/html_style_widget.dart';
 
 const kColor = Color(0xFF001234);
 const kColorPrimary = Color(0xFF123456);
@@ -545,7 +545,7 @@ class Explainer {
       return widget.toStringShort();
     }
 
-    if (widget is TshWidget) {
+    if (widget is HtmlStyleWidget) {
       return _widget(widget.child);
     }
 

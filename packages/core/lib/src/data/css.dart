@@ -97,7 +97,7 @@ class CssBorder {
       );
 
   /// Calculates [Border].
-  Border? getBorder(TextStyleHtml tsh) {
+  Border? getBorder(HtmlStyle tsh) {
     final bottom = CssBorderSide._copyWith(_all, _bottom)?._getValue(tsh);
     final left = CssBorderSide._copyWith(
       _all,
@@ -123,7 +123,7 @@ class CssBorder {
   }
 
   /// Calculates [BorderRadius].
-  BorderRadius? getBorderRadius(TextStyleHtml tsh) {
+  BorderRadius? getBorderRadius(HtmlStyle tsh) {
     final topLeft = radiusTopLeft._getValue(tsh);
     final topRight = radiusTopRight._getValue(tsh);
     final bottomLeft = radiusBottomLeft._getValue(tsh);
@@ -157,7 +157,7 @@ class CssRadius {
   /// A radius with [x] and [y] values set to zero.
   static const zero = CssRadius(CssLength.zero, CssLength.zero);
 
-  Radius? _getValue(TextStyleHtml tsh) => this == zero
+  Radius? _getValue(HtmlStyle tsh) => this == zero
       ? null
       : Radius.elliptical(
           x.getValue(tsh) ?? 0.0,
@@ -183,7 +183,7 @@ class CssBorderSide {
   /// A border that is not rendered.
   static const none = CssBorderSide();
 
-  BorderSide? _getValue(TextStyleHtml tsh) => this == none
+  BorderSide? _getValue(HtmlStyle tsh) => this == none
       ? null
       : BorderSide(
           color: color ?? tsh.style.color ?? const BorderSide().color,
@@ -224,7 +224,7 @@ class CssLength {
 
   /// Calculates value in logical pixel.
   double? getValue(
-    TextStyleHtml tsh, {
+    HtmlStyle tsh, {
     double? baseValue,
     double? scaleFactor,
   }) {
@@ -330,12 +330,12 @@ class CssLengthBox {
       _right?.isPositive == true;
 
   /// Calculates the left value taking text direction into account.
-  double? getValueLeft(TextStyleHtml tsh) => (_left ??
+  double? getValueLeft(HtmlStyle tsh) => (_left ??
           (tsh.textDirection == TextDirection.ltr ? _inlineStart : _inlineEnd))
       ?.getValue(tsh);
 
   /// Calculates the right value taking text direction into account.
-  double? getValueRight(TextStyleHtml tsh) => (_right ??
+  double? getValueRight(HtmlStyle tsh) => (_right ??
           (tsh.textDirection == TextDirection.ltr ? _inlineEnd : _inlineStart))
       ?.getValue(tsh);
 

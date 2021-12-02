@@ -39,38 +39,38 @@ const kCssLineHeightNormal = 'normal';
 
 // ignore: avoid_classes_with_only_static_members
 class TextStyleOps {
-  static TextStyleHtml color(TextStyleHtml p, Color color) =>
+  static HtmlStyle color(HtmlStyle p, Color color) =>
       p.copyWith(style: p.style.copyWith(color: color));
 
-  static TextStyleHtml fontFamily(TextStyleHtml p, List<String> list) =>
-      p.copyWith(
+  static HtmlStyle fontFamily(HtmlStyle p, List<String> list) => p.copyWith(
         style: p.style.copyWith(
           fontFamily: list.isNotEmpty ? list.first : null,
           fontFamilyFallback: list.skip(1).toList(growable: false),
         ),
       );
 
-  static TextStyleHtml fontSize(TextStyleHtml p, css.Expression v) =>
-      p.copyWith(style: p.style.copyWith(fontSize: _fontSizeTryParse(p, v)));
+  static HtmlStyle fontSize(HtmlStyle p, css.Expression v) => p.copyWith(
+        style: p.style.copyWith(fontSize: _fontSizeTryParse(p, v)),
+      );
 
-  static TextStyleHtml fontSizeEm(TextStyleHtml p, double v) => p.copyWith(
+  static HtmlStyle fontSizeEm(HtmlStyle p, double v) => p.copyWith(
         style: p.style.copyWith(
           fontSize:
               _fontSizeTryParseCssLength(p, CssLength(v, CssLengthUnit.em)),
         ),
       );
 
-  static TextStyleHtml fontSizeTerm(TextStyleHtml p, String v) => p.copyWith(
+  static HtmlStyle fontSizeTerm(HtmlStyle p, String v) => p.copyWith(
         style: p.style.copyWith(fontSize: _fontSizeTryParseTerm(p, v)),
       );
 
-  static TextStyleHtml fontStyle(TextStyleHtml p, FontStyle fontStyle) =>
+  static HtmlStyle fontStyle(HtmlStyle p, FontStyle fontStyle) =>
       p.copyWith(style: p.style.copyWith(fontStyle: fontStyle));
 
-  static TextStyleHtml fontWeight(TextStyleHtml p, FontWeight v) =>
+  static HtmlStyle fontWeight(HtmlStyle p, FontWeight v) =>
       p.copyWith(style: p.style.copyWith(fontWeight: v));
 
-  static TextStyleHtml Function(TextStyleHtml, css.Expression) lineHeight(
+  static HtmlStyle Function(HtmlStyle, css.Expression) lineHeight(
     WidgetFactory wf,
   ) =>
       (p, v) {
@@ -87,7 +87,7 @@ class TextStyleOps {
         return p.copyWith(style: p.style.copyWith(height: height));
       };
 
-  static TextStyleHtml textDirection(TextStyleHtml p, String v) {
+  static HtmlStyle textDirection(HtmlStyle p, String v) {
     switch (v) {
       case kCssDirectionLtr:
         return p.copyWith(textDirection: TextDirection.ltr);
@@ -158,7 +158,7 @@ class TextStyleOps {
     return null;
   }
 
-  static TextStyleHtml whitespace(TextStyleHtml p, CssWhitespace v) =>
+  static HtmlStyle whitespace(HtmlStyle p, CssWhitespace v) =>
       p.copyWith(whitespace: v);
 
   static CssWhitespace? whitespaceTryParse(String value) {
@@ -172,7 +172,7 @@ class TextStyleOps {
     return null;
   }
 
-  static double? _fontSizeTryParse(TextStyleHtml p, css.Expression v) {
+  static double? _fontSizeTryParse(HtmlStyle p, css.Expression v) {
     final length = tryParseCssLength(v);
     if (length != null) {
       final lengthValue = _fontSizeTryParseCssLength(p, length);
@@ -188,14 +188,14 @@ class TextStyleOps {
     return null;
   }
 
-  static double? _fontSizeTryParseCssLength(TextStyleHtml p, CssLength v) =>
+  static double? _fontSizeTryParseCssLength(HtmlStyle p, CssLength v) =>
       v.getValue(
         p,
         baseValue: p.parent?.style.fontSize,
         scaleFactor: p.getDependency<MediaQueryData>().textScaleFactor,
       );
 
-  static double? _fontSizeTryParseTerm(TextStyleHtml p, String v) {
+  static double? _fontSizeTryParseTerm(HtmlStyle p, String v) {
     switch (v) {
       case kCssFontSizeXxLarge:
         return _fontSizeMultiplyRootWith(p, 2.0);
@@ -221,10 +221,10 @@ class TextStyleOps {
     return null;
   }
 
-  static double? _fontSizeMultiplyRootWith(TextStyleHtml tsh, double value) {
-    var root = tsh;
-    while (root.parent != null) {
-      root = root.parent!;
+  static double? _fontSizeMultiplyRootWith(HtmlStyle style, double value) {
+    var root = style;
+    for (final up = root.parent; up != null;) {
+      root = up;
     }
 
     return _fontSizeMultiplyWith(root.style.fontSize, value);
@@ -235,7 +235,7 @@ class TextStyleOps {
 
   static double? _lineHeightTryParse(
     WidgetFactory wf,
-    TextStyleHtml p,
+    HtmlStyle p,
     css.Expression v,
   ) {
     if (v is css.LiteralTerm) {

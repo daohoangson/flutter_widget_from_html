@@ -51,7 +51,7 @@ class StyleTextAlign {
   static Widget _center(BuildContext _, Widget child) =>
       _TextAlignCenter(child);
 
-  static TextStyleHtml _tsb(TextStyleHtml tsh, String value) {
+  static HtmlStyle _tsb(HtmlStyle tsh, String value) {
     TextAlign? textAlign;
 
     switch (value) {

@@ -3,10 +3,10 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:test/test.dart';
 
 void main() {
-  group('TextStyleHtml', () {
+  group('HtmlStyle', () {
     group('getDependency', () {
       final dep1 = _Dep1();
-      final tsh = TextStyleHtml.root(
+      final tsh = HtmlStyle.root(
         [
           const MediaQueryData(),
           TextDirection.ltr,

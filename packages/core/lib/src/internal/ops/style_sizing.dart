@@ -150,7 +150,7 @@ class StyleSizing {
     BuildContext context,
     Widget child,
     _StyleSizingInput input,
-    TextStyleBuilder tsb,
+    HtmlStyleBuilder tsb,
   ) {
     final tsh = tsb.build(context);
 
@@ -166,7 +166,7 @@ class StyleSizing {
     );
   }
 
-  static CssSizingValue? _getValue(CssLength? length, TextStyleHtml tsh) {
+  static CssSizingValue? _getValue(CssLength? length, HtmlStyle tsh) {
     if (length == null) {
       return null;
     }

@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
+import 'package:flutter_widget_from_html_core/src/internal/html_style_widget.dart';
 import 'package:html/dom.dart' as dom;
 
 import '../../fwfh_url_launcher/test/_.dart' as fwfh_url_launcher;
@@ -86,8 +86,8 @@ void main() {
         );
 
     void _expect(Widget? built1, Widget? built2, Matcher matcher) {
-      final widget1 = (built1! as TshWidget).child;
-      final widget2 = (built2! as TshWidget).child;
+      final widget1 = (built1! as HtmlStyleWidget).child;
+      final widget2 = (built2! as HtmlStyleWidget).child;
       expect(widget1 == widget2, matcher);
     }
 

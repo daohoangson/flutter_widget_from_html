@@ -76,6 +76,6 @@ class _TagABit extends BuildBit {
   }
 
   @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
       _TagABit(parent ?? this.parent, recognizer);
 }

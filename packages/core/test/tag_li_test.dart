@@ -1033,7 +1033,7 @@ class _NullListMarkerWidgetFactory extends WidgetFactory {
   @override
   Widget? buildListMarker(
     BuildMetadata meta,
-    TextStyleHtml tsh,
+    HtmlStyle tsh,
     String listStyleType,
     int index,
   ) {

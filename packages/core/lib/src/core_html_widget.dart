@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
@@ -10,7 +11,7 @@ import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_widget_factory.dart';
 import 'internal/builder.dart' as builder;
-import 'internal/tsh_widget.dart';
+import 'internal/html_style_widget.dart';
 
 /// A widget that builds Flutter widget tree from HTML
 /// (supports most popular tags and stylings).
@@ -91,12 +92,12 @@ class HtmlWidget extends StatefulWidget {
 
 /// State for a [HtmlWidget].
 class HtmlWidgetState extends State<HtmlWidget> {
-  late final BuildMetadata _rootMeta;
-  late final _RootTsb _rootTsb;
+  late final _RootStyleBuilder _rootStyleBuilder;
   late final WidgetFactory _wf;
 
   Widget? _cache;
   Future<Widget>? _future;
+  HtmlStyle? _rootStyle;
 
   bool get buildAsync =>
       widget.buildAsync ?? widget.html.length > kShouldBuildAsync;
@@ -107,11 +108,9 @@ class HtmlWidgetState extends State<HtmlWidget> {
   void initState() {
     super.initState();
 
-    _rootTsb = _RootTsb(this);
-    _rootMeta = builder.BuildMetadata(dom.Element.tag('root'), _rootTsb);
+    _rootStyleBuilder = _RootStyleBuilder(this);
     _wf = widget.factoryBuilder?.call() ?? WidgetFactory();
 
-    _wf.onRoot(_rootTsb);
     _wf.reset(this);
 
     if (buildAsync) {
@@ -128,8 +127,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    _rootTsb.reset();
+    _rootStyle = null;
   }
 
   @override
@@ -141,13 +139,14 @@ class HtmlWidgetState extends State<HtmlWidget> {
     if (widget.html != oldWidget.html ||
         widget.baseUrl != oldWidget.baseUrl ||
         widget.buildAsync != oldWidget.buildAsync ||
+        widget.customStylesBuilder != oldWidget.customStylesBuilder ||
+        widget.customWidgetBuilder != oldWidget.customWidgetBuilder ||
         widget.enableCaching != oldWidget.enableCaching) {
       needsRebuild = true;
     }
 
     if (widget.textStyle != oldWidget.textStyle) {
-      _rootTsb.reset();
-      needsRebuild = true;
+      _rootStyle = null;
     }
 
     if (needsRebuild) {
@@ -158,7 +157,8 @@ class HtmlWidgetState extends State<HtmlWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (_future != null) {
+    final future = _future;
+    if (future != null) {
       return FutureBuilder<Widget>(
         builder: (context, snapshot) {
           if (snapshot.hasData) {
@@ -173,7 +173,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
             );
           }
         },
-        future: _future!.then(_tshWidget),
+        future: future.then(_wrapper),
       );
     }
 
@@ -181,7 +181,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
       _cache = _buildSync();
     }
 
-    return _tshWidget(_cache!);
+    return _wrapper(_cache!);
   }
 
   /// Scrolls to make sure the requested anchor is as visible as possible.
@@ -213,52 +213,78 @@ class HtmlWidgetState extends State<HtmlWidget> {
           ? SliverToBoxAdapter(child: child)
           : child;
 
-  Widget _tshWidget(Widget child) =>
-      TshWidget(tsh: _rootTsb._output, child: child);
+  Widget _wrapper(Widget child) =>
+      HtmlStyleWidget(style: _rootStyle, child: child);
 }
 
-class _RootTsb extends TextStyleBuilder {
-  TextStyleHtml? _output;
+const _rootMeta = _RootBuildMetadata();
 
-  _RootTsb(HtmlWidgetState state) {
-    enqueue(builder, state);
-  }
+class _RootBuildMetadata extends BuildMetadata {
+  const _RootBuildMetadata();
 
   @override
-  TextStyleHtml build(BuildContext context) {
-    context.dependOnInheritedWidgetOfExactType<TshWidget>();
-    return super.build(context);
-  }
+  Iterable<BuildOp> get buildOps => [];
 
-  TextStyleHtml builder(TextStyleHtml? _, HtmlWidgetState state) {
-    if (_output != null) {
-      return _output!;
+  @override
+  dom.Element get element => dom.Element.tag('root');
+
+  @override
+  Iterable<BuildOp> get parentOps => [];
+
+  @override
+  Iterable<css.Declaration> get styles => [];
+
+  @override
+  BuildTree get tree => throw UnimplementedError();
+
+  @override
+  HtmlStyleBuilder get tsb => throw UnimplementedError();
+
+  @override
+  void operator []=(String key, String value) {}
+
+  @override
+  css.Declaration? operator [](String key) => null;
+
+  @override
+  void register(BuildOp op) {}
+}
+
+class _RootStyleBuilder extends HtmlStyleBuilder {
+  final HtmlWidgetState state;
+
+  const _RootStyleBuilder(this.state);
+
+  @override
+  HtmlStyle build(BuildContext context) {
+    context.dependOnInheritedWidgetOfExactType<HtmlStyleWidget>();
+
+    final built = state._rootStyle;
+    if (built != null) {
+      return built;
     }
 
-    return _output = TextStyleHtml.root(
+    return state._rootStyle = HtmlStyle.root(
       state._wf.getDependencies(state.context),
       state.widget.textStyle,
     );
   }
-
-  void reset() => _output = null;
 }
 
 Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
-  final rootMeta = state._rootMeta;
   final wf = state._wf;
   wf.reset(state);
 
-  final tree = builder.BuildTree(
+  final rootBuilder = builder.Builder(
     customStylesBuilder: state.widget.customStylesBuilder,
     customWidgetBuilder: state.widget.customWidgetBuilder,
-    parentMeta: rootMeta,
-    tsb: rootMeta.tsb,
+    element: _rootMeta.element,
+    styleBuilder: state._rootStyleBuilder,
     wf: wf,
   )..addBitsFromNodes(domNodes);
 
   return wf
-          .buildColumnPlaceholder(rootMeta, tree.build())
+          .buildColumnPlaceholder(rootBuilder, rootBuilder.build())
           ?.wrapWith(wf.buildBodyWidget) ??
       widget0;
 }

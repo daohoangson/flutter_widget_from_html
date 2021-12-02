@@ -6,8 +6,9 @@ abstract class BuildBit {
   /// The container tree.
   final BuildTree? parent;
 
-  /// The associated [TextStyleBuilder].
-  final TextStyleBuilder? tsb;
+  /// The associated [HtmlStyle] builder.
+  /// TODO: rename
+  final HtmlStyleBuilder? tsb;
 
   /// Creates a build bit.
   const BuildBit(this.parent, [this.tsb]);
@@ -88,7 +89,7 @@ abstract class BuildBit {
   bool? get swallowWhitespace => !isInline;
 
   /// Creates a copy with the given fields replaced with the new values.
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb});
+  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb});
 
   /// Removes self from [parent].
   bool detach() => parent?._children.remove(this) ?? false;
@@ -140,10 +141,11 @@ abstract class BuildTree extends BuildBit {
   static final _buffers = Expando<StringBuffer>();
 
   final _children = <BuildBit>[];
-  final TextStyleBuilder _tsb;
+  final HtmlStyleBuilder _styleBuilder;
 
   /// Creates a tree.
-  BuildTree(BuildTree? parent, this._tsb) : super(parent, _tsb);
+  BuildTree(BuildTree? parent, this._styleBuilder)
+      : super(parent, _styleBuilder);
 
   /// Anchor keys of this tree and its children.
   Iterable<Key>? get anchors => _anchors[this];
@@ -201,6 +203,9 @@ abstract class BuildTree extends BuildBit {
     return null;
   }
 
+  @override
+  HtmlStyleBuilder get tsb => _styleBuilder;
+
   /// The list of sub-trees.
   Iterable<BuildTree> get subTrees sync* {
     for (final child in directChildren) {
@@ -212,9 +217,6 @@ abstract class BuildTree extends BuildBit {
       yield* child.subTrees;
     }
   }
-
-  @override
-  TextStyleBuilder get tsb => _tsb;
 
   /// Adds [bit] as the last bit.
   T add<T extends BuildBit>(T bit) {
@@ -232,15 +234,6 @@ abstract class BuildTree extends BuildBit {
   /// Builds widgets from bits.
   Iterable<WidgetPlaceholder> build();
 
-  @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) {
-    final copied = sub(parent: parent ?? this.parent, tsb: tsb ?? this.tsb);
-    for (final bit in _children) {
-      copied.add(bit.copyWith(parent: copied));
-    }
-    return copied;
-  }
-
   /// Registers anchor [Key].
   void registerAnchor(Key anchor) {
     final existing = _anchors[this];
@@ -252,7 +245,7 @@ abstract class BuildTree extends BuildBit {
   /// Creates a sub tree.
   ///
   /// Remember to call [add] to connect the new tree to a parent.
-  BuildTree sub({BuildTree? parent, TextStyleBuilder? tsb});
+  BuildTree sub({BuildTree? parent, HtmlStyleBuilder? tsb});
 
   @override
   String toString() {
@@ -282,12 +275,15 @@ class TextBit extends BuildBit {
   final String data;
 
   /// Creates with string.
-  TextBit(BuildTree parent, this.data, {TextStyleBuilder? tsb})
+  TextBit(BuildTree parent, this.data, {HtmlStyleBuilder? tsb})
       : super(parent, tsb ?? parent.tsb);
 
   @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      TextBit(parent ?? this.parent!, data, tsb: tsb ?? this.tsb);
+  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) => TextBit(
+        parent ?? this.parent!,
+        data,
+        tsb: tsb ?? this.tsb,
+      );
 
   @override
   void flatten(Flattened f) => f.text = data;
@@ -330,7 +326,7 @@ class _WidgetBitBlock extends WidgetBit<Widget> {
   bool get isInline => false;
 
   @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
       _WidgetBitBlock(parent ?? this.parent!, child);
 
   @override
@@ -352,7 +348,7 @@ class _WidgetBitInline extends WidgetBit<InlineSpan> {
   ) : super._(parent, child);
 
   @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
       _WidgetBitInline(parent ?? this.parent!, child, alignment, baseline);
 
   @override
@@ -377,7 +373,7 @@ class WhitespaceBit extends BuildBit {
   bool get swallowWhitespace => true;
 
   @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
       WhitespaceBit(parent ?? this.parent!, data);
 
   @override

@@ -428,7 +428,7 @@ class _BuildBitWidgetFactory extends WidgetFactory {
     }
 
     if (classes.contains('custom')) {
-      meta.tsb.enqueue((tsh, _) => tsh.copyWith());
+      meta.tsb.enqueue((tsh, _) => tsh.copyWith(), null);
     }
 
     super.parse(meta);
@@ -442,10 +442,14 @@ class _CircularBit extends BuildTree {
   Iterable<WidgetPlaceholder> build() => throw UnimplementedError();
 
   @override
+  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
+      throw UnimplementedError();
+
+  @override
   void flatten(Flattened _) => throw UnimplementedError();
 
   @override
-  BuildTree sub({BuildTree? parent, TextStyleBuilder? tsb}) =>
+  BuildTree sub({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
       throw UnimplementedError();
 
   @override
@@ -453,14 +457,14 @@ class _CircularBit extends BuildTree {
 }
 
 class _CustomBit extends BuildBit {
-  const _CustomBit(BuildTree? parent, TextStyleBuilder tsb)
+  const _CustomBit(BuildTree? parent, HtmlStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
   void flatten(Flattened _) => throw UnimplementedError();
 
   @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
       throw UnimplementedError();
 }
 
@@ -479,7 +483,7 @@ class _InputGestureRecognizerBit extends BuildBit {
   }
 
   @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
       _InputGestureRecognizerBit(parent ?? this.parent);
 }
 
@@ -490,19 +494,19 @@ class _OutputInlineSpanBit extends BuildBit {
   void flatten(Flattened f) => f.span = const WidgetSpan(child: Text('foo'));
 
   @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
       _OutputInlineSpanBit(parent ?? this.parent);
 }
 
 class _OutputStringBit extends BuildBit {
-  const _OutputStringBit(BuildTree? parent, TextStyleBuilder? tsb)
+  const _OutputStringBit(BuildTree? parent, HtmlStyleBuilder? tsb)
       : super(parent, tsb);
 
   @override
   void flatten(Flattened f) => f.text = 'foo';
 
   @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
       _OutputStringBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
@@ -517,7 +521,7 @@ class _OutputWidgetBit extends BuildBit {
       f.widget = WidgetPlaceholder(child: const Text('foo'));
 
   @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
+  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
       _OutputWidgetBit(parent ?? this.parent);
 }
 
@@ -531,11 +535,8 @@ String _data(BuildTree text) => text.bits
     )
     .join();
 
-BuildTree _text() => builder.BuildTree(
-      tsb: TextStyleBuilder(),
-      parentMeta: builder.BuildMetadata(
-        dom.Element.tag('test'),
-        TextStyleBuilder(),
-      ),
+BuildTree _text() => builder.Builder(
+      element: dom.Element.tag('root'),
+      styleBuilder: const HtmlStyleBuilder(),
       wf: WidgetFactory(),
     );

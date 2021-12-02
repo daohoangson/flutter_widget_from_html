@@ -9,19 +9,14 @@ import 'core_widget_factory.dart';
 
 part 'data/build_bits.dart';
 part 'data/css.dart';
+part 'data/html_style.dart';
 part 'data/image.dart';
-part 'data/text_style.dart';
 
 /// A building element metadata.
+/// TODO: remove class
+@immutable
 abstract class BuildMetadata {
-  /// The associated element.
-  final dom.Element element;
-
-  /// The associated [TextStyleBuilder].
-  final TextStyleBuilder tsb;
-
-  /// Creates a node.
-  BuildMetadata(this.element, this.tsb);
+  const BuildMetadata();
 
   /// The registered build ops.
   Iterable<BuildOp> get buildOps;
@@ -36,20 +31,23 @@ abstract class BuildMetadata {
   /// - [WidgetFactory.parse] or [BuildOp.onChild] by calling `meta[key] = value`
   /// - [BuildOp.defaultStyles] returning a map
   /// - Attribute `style` of [domElement]
-  List<css.Declaration> get styles;
+  Iterable<css.Declaration> get styles;
+
+  /// The associated DOM element.
+  dom.Element get element;
+
+  /// The associated [HtmlStyle] builder.
+  HtmlStyleBuilder get tsb;
+
+  /// The associated [BuildTree].
+  BuildTree get tree;
 
   /// Adds an inline style.
   void operator []=(String key, String value);
 
   /// Gets a styling declaration by `property`.
-  css.Declaration? operator [](String key) {
-    for (final style in styles.reversed) {
-      if (style.property == key) {
-        return style;
-      }
-    }
-    return null;
-  }
+  /// TODO: remove
+  css.Declaration? operator [](String key);
 
   /// Registers a build op.
   void register(BuildOp op);

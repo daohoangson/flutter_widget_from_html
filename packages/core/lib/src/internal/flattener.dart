@@ -15,13 +15,13 @@ class Flattener implements Flattened {
   List<_SpanOrBuilder>? _children;
   late _GestureRecognizer _firstRecognizer;
   late List<_String> _firstStrings;
-  late TextStyleBuilder _firstTsb;
+  late HtmlStyleBuilder _firstTsb;
 
   late BuildBit _bit;
   var _swallowWhitespace = false;
   late _GestureRecognizer _recognizer;
   late List<_String> _strings;
-  late TextStyleBuilder _tsb;
+  late HtmlStyleBuilder _tsb;
 
   Flattener(this.wf, this.meta, this.tree) {
     _resetLoop(tree.tsb);
@@ -67,7 +67,7 @@ class Flattener implements Flattened {
         ),
       );
 
-  void _resetLoop(TextStyleBuilder tsb) {
+  void _resetLoop(HtmlStyleBuilder tsb) {
     _firstRecognizer = _GestureRecognizer();
     _children = [];
     _firstStrings = [];
@@ -215,7 +215,7 @@ class Flattener implements Flattened {
 }
 
 extension _BuildBit on BuildBit {
-  TextStyleBuilder? get effectiveTsb {
+  HtmlStyleBuilder? get effectiveTsb {
     if (this is! WhitespaceBit) {
       return tsb;
     }

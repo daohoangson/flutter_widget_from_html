@@ -2,7 +2,7 @@ part of '../core_ops.dart';
 
 const kCssMargin = 'margin';
 
-Widget _marginHorizontalBuilder(Widget w, CssLengthBox b, TextStyleHtml tsh) =>
+Widget _marginHorizontalBuilder(Widget w, CssLengthBox b, HtmlStyle tsh) =>
     Padding(
       padding: EdgeInsets.only(
         left: max(b.getValueLeft(tsh) ?? 0.0, 0.0),
