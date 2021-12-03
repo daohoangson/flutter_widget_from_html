@@ -34,9 +34,9 @@ class TagTable {
   final BuildMetadata tableMeta;
   final WidgetFactory wf;
 
-  final _captions = <BuildTree>[];
   final _data = _TagTableData();
 
+  BuildOp? _captionOp;
   BuildOp? _tableOp;
 
   TagTable(this.wf, this.tableMeta);
@@ -76,7 +76,18 @@ class TagTable {
         latestGroup = null;
         break;
       case kCssDisplayTableCaption:
-        childMeta.register(BuildOp(onTree: (_, tree) => _captions.add(tree)));
+        final captionOp = _captionOp ??= BuildOp(
+          onWidgets: (captionMeta, widgets) {
+            final child = wf.buildColumnPlaceholder(captionMeta, widgets);
+            if (child == null) {
+              return widgets;
+            }
+
+            _data.captions.add(child);
+            return [child];
+          },
+        );
+        childMeta.register(captionOp);
         break;
     }
   }
@@ -84,27 +95,19 @@ class TagTable {
   void onTree(BuildMetadata _, BuildTree tree) {
     StyleBorder.skip(tableMeta);
     StyleSizing.treatHeightAsMinHeight(tableMeta);
-
-    for (final caption in _captions) {
-      final built = wf
-          .buildColumnPlaceholder(tableMeta, caption.build())
-          ?.wrapWith((_, child) => _TableCaption(child));
-      if (built != null) {
-        WidgetBit.block(tree.parent!, built).insertBefore(tree);
-      }
-
-      caption.detach();
-    }
   }
 
-  Iterable<Widget> onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> __) {
+  Iterable<Widget> onWidgets(
+    BuildMetadata _,
+    Iterable<WidgetPlaceholder> widgets,
+  ) {
     _prepareHtmlTableCellBuilders(_data.header);
     for (final body in _data.bodies) {
       _prepareHtmlTableCellBuilders(body);
     }
     _prepareHtmlTableCellBuilders(_data.footer);
     if (_data.builders.isEmpty) {
-      return [];
+      return widgets;
     }
 
     final border = tryParseBorder(tableMeta);
@@ -115,6 +118,7 @@ class TagTable {
         : null;
 
     return [
+      ..._data.captions,
       WidgetPlaceholder(
         builder: (context, _) {
           final tsh = tableMeta.tsb.build(context);
@@ -259,13 +263,6 @@ class TagTable {
   }
 }
 
-class _TableCaption extends SingleChildRenderObjectWidget {
-  const _TableCaption(Widget child, {Key? key}) : super(child: child, key: key);
-
-  @override
-  RenderObject createRenderObject(BuildContext context) => RenderProxyBox();
-}
-
 class _TagTableRow {
   late final BuildOp op;
   final TagTable parent;
@@ -363,6 +360,7 @@ class _TagTableRowGroup {
 @immutable
 class _TagTableData {
   final bodies = <_TagTableDataGroup>[];
+  final captions = <Widget>[];
   final footer = _TagTableDataGroup();
   final header = _TagTableDataGroup();
 

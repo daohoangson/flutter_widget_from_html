@@ -36,7 +36,7 @@ Future<void> main() async {
         explained,
         equals(
           '[Column:children='
-          '[_TableCaption:child=[_TextAlignBlock:child=[RichText:align=center,(:Caption)]]],'
+          '[_TextAlignBlock:child=[RichText:align=center,(:Caption)]],'
           '[HtmlTable:children='
           '${_padding('[RichText:(+b:Header 1)]')},'
           '${_padding('[RichText:(+b:Header 2)]')},'
@@ -55,9 +55,8 @@ Future<void> main() async {
           'HtmlStyleWidget\n'
           '└ColumnPlaceholder(root)\n'
           ' └Column()\n'
-          '  ├_TableCaption()\n'
-          '  │└_TextAlignBlock()\n'
-          '  │ └RichText(textAlign: center, text: "Caption")\n'
+          '  ├_TextAlignBlock()\n'
+          '  │└RichText(textAlign: center, text: "Caption")\n'
           '  └HtmlTable(borderSpacing: 2.0)\n'
           '   ├HtmlTableCell(columnStart: 0, rowStart: 0)\n'
           '   │└WidgetPlaceholder(padding)\n'
@@ -627,7 +626,7 @@ Future<void> main() async {
       explained,
       equals(
         '[Column:children='
-        '[_TableCaption:child=[_TextAlignBlock:child=[RichText:align=center,(:Caption)]]],'
+        '[_TextAlignBlock:child=[RichText:align=center,(:Caption)]],'
         '[HtmlTable:children='
         '[HtmlTableCell:child=[RichText:(+b:Header 1)]],'
         '[HtmlTableCell:child=[RichText:(+b:Header 2)]],'

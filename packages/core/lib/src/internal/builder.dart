@@ -27,6 +27,9 @@ class Builder extends BuildTree implements BuildMetadata {
   @override
   final dom.Element element;
 
+  @override
+  final Iterable<BuildOp> parentOps;
+
   final WidgetFactory wf;
 
   final _built = <WidgetPlaceholder>[];
@@ -37,6 +40,7 @@ class Builder extends BuildTree implements BuildMetadata {
     this.customWidgetBuilder,
     required this.element,
     BuildTree? parent,
+    this.parentOps = const [],
     required HtmlStyleBuilder styleBuilder,
     required this.wf,
   })  : _styleBuilder = styleBuilder,
@@ -46,12 +50,6 @@ class Builder extends BuildTree implements BuildMetadata {
   Iterable<BuildOp> get buildOps => _buildOpSet ?? const [];
 
   Set<BuildOp>? get _buildOpSet => _buildOps[this];
-
-  @override
-  Iterable<BuildOp> get parentOps {
-    final scopedParent = parent;
-    return (scopedParent != null ? _buildOps[scopedParent] : null) ?? const [];
-  }
 
   @override
   Iterable<css.Declaration> get styles => _declarationList ?? const [];
@@ -172,6 +170,7 @@ class Builder extends BuildTree implements BuildMetadata {
       customWidgetBuilder: customWidgetBuilder,
       element: element ?? this.element,
       parent: p,
+      parentOps: p is Builder ? _prepareParentOps(p.parentOps, p) : const [],
       styleBuilder: sb,
       wf: wf,
     );
@@ -290,11 +289,8 @@ class Builder extends BuildTree implements BuildMetadata {
   void _collectMetadata() {
     wf.parse(this);
 
-    final scopedParent = parent;
-    if (scopedParent is Builder) {
-      for (final op in scopedParent.buildOps) {
-        op.onChild?.call(this);
-      }
+    for (final op in parentOps) {
+      op.onChild?.call(this);
     }
 
     // stylings, step 1: get default styles from tag-based build ops
@@ -376,3 +372,9 @@ int _compareBuildOps(BuildOp a, BuildOp b) {
 
 bool _opRequiresBuildingSubtree(BuildOp op) =>
     op.onWidgets != null && !op.onWidgetsIsOptional;
+
+Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, BuildMetadata meta) {
+  // try to reuse existing list if possible
+  final newOps = meta.buildOps.where((op) => op.onChild != null).toList();
+  return newOps.isEmpty ? ops : List.unmodifiable([...ops, ...newOps]);
+}
