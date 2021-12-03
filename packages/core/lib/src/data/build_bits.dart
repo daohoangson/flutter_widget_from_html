@@ -230,8 +230,10 @@ abstract class BuildTree extends BuildBit {
   Iterable<WidgetPlaceholder> build();
 
   @override
-  @protected
-  bool detach() => throw UnsupportedError('Detaching a tree is not allowed.');
+  bool detach() {
+    children.clear();
+    return true;
+  }
 
   /// Prepends [bit].
   ///
@@ -240,6 +242,14 @@ abstract class BuildTree extends BuildBit {
     assert(bit.parent == this);
     children.insert(0, bit);
     return bit;
+  }
+
+  /// Replaces all children bits with [another].
+  void replaceWith(BuildBit another) {
+    assert(another.parent == this);
+    children
+      ..clear()
+      ..add(another);
   }
 
   /// Registers anchor [Key].

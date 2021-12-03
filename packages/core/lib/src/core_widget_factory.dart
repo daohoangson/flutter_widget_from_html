@@ -1032,13 +1032,9 @@ class WidgetFactory {
           onTree: (meta, tree) {
             final built = buildColumnPlaceholder(meta, tree.build());
             if (built != null) {
-              WidgetBit.inline(
-                tree.parent!,
-                built,
-                alignment: PlaceholderAlignment.baseline,
-              ).insertBefore(tree);
+              const align = PlaceholderAlignment.baseline;
+              tree.replaceWith(WidgetBit.inline(tree, built, alignment: align));
             }
-            tree.detach();
           },
           priority: BuildOp.kPriorityMax,
         );

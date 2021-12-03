@@ -35,12 +35,8 @@ class StyleBorder {
             return;
           }
 
-          WidgetBit.inline(
-            tree.parent!,
-            built,
-            alignment: PlaceholderAlignment.baseline,
-          ).insertBefore(tree);
-          tree.detach();
+          const baseline = PlaceholderAlignment.baseline;
+          tree.replaceWith(WidgetBit.inline(tree, built, alignment: baseline));
         },
         onWidgets: (meta, widgets) {
           if (_skipBuilding[meta] == true || widgets.isEmpty) {

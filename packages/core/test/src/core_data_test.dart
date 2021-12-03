@@ -149,8 +149,7 @@ class _BuildOpOnTreeWidget extends WidgetFactory {
     meta.register(
       BuildOp(
         onTree: (_, tree) {
-          WidgetBit.inline(tree.parent!, const Text('hi')).insertBefore(tree);
-          tree.detach();
+          tree.replaceWith(WidgetBit.inline(tree, const Text('hi')));
         },
       ),
     );
