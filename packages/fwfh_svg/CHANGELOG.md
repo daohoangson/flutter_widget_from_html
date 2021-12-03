@@ -1,3 +1,7 @@
+## 0.7.1+1
+
+- Add support for flutter_svg@1.0 (#648)
+
 ## 0.7.1
 
 - Add support for flutter_svg@0.23 (#611)
