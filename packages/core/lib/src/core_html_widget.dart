@@ -253,7 +253,7 @@ class _RootBuildMetadata extends BuildMetadata {
 class _RootStyleBuilder extends HtmlStyleBuilder {
   final HtmlWidgetState state;
 
-  const _RootStyleBuilder(this.state);
+  _RootStyleBuilder(this.state);
 
   @override
   HtmlStyle build(BuildContext context) {

@@ -1110,24 +1110,8 @@ class WidgetFactory {
           localName: 'anchor',
         );
 
-        final bit = tree.first;
-        if (bit == null) {
-          // most likely an A[name]
-          tree.add(
-            WidgetBit.inline(
-              tree,
-              widget,
-              alignment: PlaceholderAlignment.baseline,
-            ),
-          );
-        } else {
-          // most likely a SPAN[id]
-          WidgetBit.inline(
-            bit.parent!,
-            widget,
-            alignment: PlaceholderAlignment.baseline,
-          ).insertBefore(bit);
-        }
+        const baseline = PlaceholderAlignment.baseline;
+        tree.prepend(WidgetBit.inline(tree, widget, alignment: baseline));
       },
       onWidgets: (meta, widgets) {
         return listOrNull(

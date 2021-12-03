@@ -18,7 +18,7 @@ class TagDetails {
 
     _summaryOp = BuildOp(
       onTree: (meta, tree) {
-        final children = tree.directChildren;
+        final children = tree.children;
         if (children.isEmpty) {
           return;
         }

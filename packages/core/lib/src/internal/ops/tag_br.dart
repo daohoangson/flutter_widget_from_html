@@ -11,15 +11,13 @@ class TagBr {
 }
 
 class TagBrBit extends BuildBit {
-  TagBrBit(BuildTree parent, {HtmlStyleBuilder? tsb})
-      : super(parent, tsb ?? parent.tsb);
+  const TagBrBit(BuildTree? parent) : super(parent);
 
   @override
   bool get swallowWhitespace => true;
 
   @override
-  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
-      TagBrBit(parent ?? this.parent!, tsb: tsb ?? this.tsb);
+  BuildBit copyWith({BuildTree? parent}) => TagBrBit(parent ?? this.parent);
 
   @override
   void flatten(Flattened f) => f.text = '\n';

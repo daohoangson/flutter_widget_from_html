@@ -8,12 +8,8 @@ class TagQ {
   TagQ(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTree: (_, t) => wrapTree(t, append: _closing, prepend: _opening),
+        onTree: (_, tree) => tree
+          ..prepend(TextBit(tree, '“'))
+          ..append(TextBit(tree, '”')),
       );
-
-  static BuildBit _closing(BuildTree parent) =>
-      TextBit(parent, '”', tsb: parent.tsb);
-
-  static BuildBit _opening(BuildTree parent) =>
-      TextBit(parent, '“', tsb: parent.tsb);
 }

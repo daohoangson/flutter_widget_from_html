@@ -58,38 +58,6 @@ const kCssWhitespace = 'white-space';
 const kCssWhitespacePre = 'pre';
 const kCssWhitespaceNormal = 'normal';
 
-void wrapTree(
-  BuildTree tree, {
-  BuildBit Function(BuildTree parent)? append,
-  BuildBit Function(BuildTree parent)? prepend,
-}) {
-  final children = tree.directChildren;
-  final first0 = children.isEmpty ? null : children.first;
-  final first = (first0 is BuildTree ? first0.first : null) ?? first0;
-  final last0 = children.isEmpty ? null : children.last;
-  final last = (last0 is BuildTree ? last0.last : null) ?? last0;
-
-  if (first == null || last == null) {
-    if (prepend != null) {
-      final prependBit = prepend(tree);
-      tree.add(prependBit);
-    }
-    if (append != null) {
-      final appendBit = append(tree);
-      tree.add(appendBit);
-    }
-    return;
-  }
-
-  if (prepend != null) {
-    prepend(first.parent!).insertBefore(first);
-  }
-
-  if (append != null) {
-    append(last.parent!).insertAfter(last);
-  }
-}
-
 extension RichTextMetadata on BuildMetadata {
   static final _maxLines = Expando<int>();
   static final _overflow = Expando<TextOverflow>();

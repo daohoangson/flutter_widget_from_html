@@ -44,7 +44,7 @@ class TagRuby {
   void onTree(BuildMetadata _, BuildTree tree) {
     final rubyBits = <BuildBit>[];
 
-    for (final bit in tree.directChildren.toList(growable: false)) {
+    for (final bit in tree.children.toList(growable: false)) {
       if (!bit.isRtBit || rubyBits.isEmpty) {
         if (rubyBits.isEmpty && bit is WhitespaceBit) {
           // ruby contents should not start with a whitespace

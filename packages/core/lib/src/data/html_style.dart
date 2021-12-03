@@ -94,42 +94,36 @@ class HtmlStyle {
 }
 
 /// A HTML styling builder.
-@immutable
 class HtmlStyleBuilder {
-  static final _caches = Expando<_HtmlStyleCache>();
-  static final _queues = Expando<List<_HtmlStyleCallback>>();
-
   final HtmlStyleBuilder? parent;
 
-  const HtmlStyleBuilder({this.parent});
+  HtmlStyle? _cachedParent;
+  HtmlStyle? _cachedBuilt;
+  List<_HtmlStyleCallback>? _queue;
+
+  HtmlStyleBuilder([this.parent, this._queue]);
 
   /// Enqueues an HTML styling callback.
   void enqueue<T>(
     HtmlStyle Function(HtmlStyle style, T input) callback,
     T input,
   ) {
-    assert(_caches[this] == null, 'Cannot enqueue builder after being built');
-
     final item = _HtmlStyleCallback(callback, input);
-    final queue = _queues[this];
-    if (queue != null) {
-      queue.add(item);
-    } else {
-      _queues[this] = [item];
-    }
+    final queue = _queue ??= [];
+    queue.add(item);
   }
 
   /// Builds an [HtmlStyle] by calling builders on top of parent styling.
   HtmlStyle build(BuildContext context) {
     final parentBuilt = parent!.build(context);
-    final queue = _queues[this];
+    final queue = _queue;
     if (queue == null) {
       return parentBuilt;
     }
 
-    final cache = _caches[this];
-    if (cache != null && identical(parentBuilt, cache.parentBuilt)) {
-      return cache.built;
+    final cache = _cachedBuilt;
+    if (cache != null && identical(parentBuilt, _cachedParent)) {
+      return cache;
     }
 
     var built = parentBuilt.copyWith(parent: parentBuilt);
@@ -143,50 +137,45 @@ class HtmlStyleBuilder {
       );
     }
 
-    _caches[this] = _HtmlStyleCache(parentBuilt, built);
-
-    return built;
+    _cachedParent = parentBuilt;
+    return _cachedBuilt = built;
   }
+
+  /// Creates a copy with the given fields replaced with the new values.
+  HtmlStyleBuilder copyWith({HtmlStyleBuilder? parent}) =>
+      HtmlStyleBuilder(parent ?? this.parent, _queue?.toList());
 
   /// Returns `true` if this shares same styling with [other].
   bool hasSameStyleWith(HtmlStyleBuilder other) {
-    var thisWithQueue = this;
-    while (_queues[thisWithQueue] == null) {
-      final thisParent = thisWithQueue.parent;
+    var thiz = this;
+    while (thiz._queue == null) {
+      final thisParent = thiz.parent;
       if (thisParent == null) {
         break;
       } else {
-        thisWithQueue = thisParent;
+        thiz = thisParent;
       }
     }
 
-    var otherWithQueue = other;
-    while (_queues[otherWithQueue] == null) {
-      final otherParent = otherWithQueue.parent;
+    var othez = other;
+    while (othez._queue == null) {
+      final otherParent = othez.parent;
       if (otherParent == null) {
         break;
       } else {
-        otherWithQueue = otherParent;
+        othez = otherParent;
       }
     }
 
-    return identical(thisWithQueue, otherWithQueue);
+    return identical(thiz, othez);
   }
 
   /// Creates a sub-builder.
-  HtmlStyleBuilder sub() => HtmlStyleBuilder(parent: this);
+  HtmlStyleBuilder sub() => HtmlStyleBuilder(this);
 
   @override
   String toString() =>
       'tsb#$hashCode${parent != null ? '(parent=#${parent.hashCode})' : ''}';
-}
-
-@immutable
-class _HtmlStyleCache {
-  final HtmlStyle parentBuilt;
-  final HtmlStyle built;
-
-  const _HtmlStyleCache(this.parentBuilt, this.built);
 }
 
 @immutable

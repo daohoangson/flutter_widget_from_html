@@ -20,26 +20,22 @@ class StyleMargin {
 
   BuildOp get buildOp => BuildOp(
         onTreeFlattening: (meta, tree) {
-          final m = tryParseCssLengthBox(meta, kCssMargin);
-          if (m == null) {
+          final margin = tryParseCssLengthBox(meta, kCssMargin);
+          if (margin == null) {
             return;
           }
 
-          final mayHaveLeft = m.mayHaveLeft;
-          final mayHaveRight = m.mayHaveRight;
-          if (!mayHaveLeft && !mayHaveRight) {
-            return;
+          if (margin.mayHaveLeft) {
+            tree.prepend(
+              WidgetBit.inline(tree, _paddingInlineBefore(tree.tsb, margin)),
+            );
           }
 
-          return wrapTree(
-            tree,
-            append: mayHaveRight
-                ? (p) => WidgetBit.inline(p, _paddingInlineAfter(p.tsb, m))
-                : null,
-            prepend: mayHaveLeft
-                ? (p) => WidgetBit.inline(p, _paddingInlineBefore(p.tsb, m))
-                : null,
-          );
+          if (margin.mayHaveRight) {
+            tree.append(
+              WidgetBit.inline(tree, _paddingInlineAfter(tree.tsb, margin)),
+            );
+          }
         },
         onWidgets: (meta, widgets) {
           final m = tryParseCssLengthBox(meta, kCssMargin);

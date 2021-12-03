@@ -31,23 +31,17 @@ class StylePadding {
             return;
           }
 
-          final mayHaveLeft = padding.mayHaveLeft;
-          final mayHaveRight = padding.mayHaveRight;
-          if (!mayHaveLeft && !mayHaveRight) {
-            return;
+          if (padding.mayHaveLeft) {
+            tree.prepend(
+              WidgetBit.inline(tree, _paddingInlineBefore(tree.tsb, padding)),
+            );
           }
 
-          return wrapTree(
-            tree,
-            append: mayHaveRight
-                ? (p) =>
-                    WidgetBit.inline(p, _paddingInlineAfter(p.tsb, padding))
-                : null,
-            prepend: mayHaveLeft
-                ? (p) =>
-                    WidgetBit.inline(p, _paddingInlineBefore(p.tsb, padding))
-                : null,
-          );
+          if (padding.mayHaveRight) {
+            tree.append(
+              WidgetBit.inline(tree, _paddingInlineAfter(tree.tsb, padding)),
+            );
+          }
         },
         onWidgets: (meta, widgets) {
           if (widgets.isEmpty) {

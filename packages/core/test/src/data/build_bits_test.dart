@@ -343,7 +343,7 @@ void main() {
     text2.addText('(2.3)');
     text.add(WidgetBit.block(text, const Text('Hi')));
     text.add(WidgetBit.inline(text, const Text('Hi')));
-    text.add(_CustomBit(text, text.tsb));
+    text.add(_CustomBit(text));
     text.add(_CircularBit(text));
 
     expect(
@@ -416,7 +416,7 @@ class _BuildBitWidgetFactory extends WidgetFactory {
     if (classes.contains('output--String')) {
       meta.register(
         BuildOp(
-          onTree: (_, tree) => tree.add(_OutputStringBit(tree, tree.tsb)),
+          onTree: (_, tree) => tree.add(_OutputStringBit(tree)),
         ),
       );
     }
@@ -436,7 +436,7 @@ class _BuildBitWidgetFactory extends WidgetFactory {
 }
 
 class _CircularBit extends BuildTree {
-  _CircularBit(BuildTree parent) : super(parent, parent.tsb);
+  _CircularBit(BuildTree parent) : super(parent);
 
   @override
   Iterable<WidgetPlaceholder> build() => throw UnimplementedError();
@@ -457,8 +457,7 @@ class _CircularBit extends BuildTree {
 }
 
 class _CustomBit extends BuildBit {
-  const _CustomBit(BuildTree? parent, HtmlStyleBuilder tsb)
-      : super(parent, tsb);
+  const _CustomBit(BuildTree? parent) : super(parent);
 
   @override
   void flatten(Flattened _) => throw UnimplementedError();
@@ -499,15 +498,14 @@ class _OutputInlineSpanBit extends BuildBit {
 }
 
 class _OutputStringBit extends BuildBit {
-  const _OutputStringBit(BuildTree? parent, HtmlStyleBuilder? tsb)
-      : super(parent, tsb);
+  const _OutputStringBit(BuildTree? parent) : super(parent);
 
   @override
   void flatten(Flattened f) => f.text = 'foo';
 
   @override
-  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
-      _OutputStringBit(parent ?? this.parent, tsb ?? this.tsb);
+  BuildBit copyWith({BuildTree? parent}) =>
+      _OutputStringBit(parent ?? this.parent);
 }
 
 class _OutputWidgetBit extends BuildBit {
@@ -537,6 +535,6 @@ String _data(BuildTree text) => text.bits
 
 BuildTree _text() => builder.Builder(
       element: dom.Element.tag('root'),
-      styleBuilder: const HtmlStyleBuilder(),
+      styleBuilder: HtmlStyleBuilder(),
       wf: WidgetFactory(),
     );

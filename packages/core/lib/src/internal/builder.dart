@@ -30,6 +30,7 @@ class Builder extends BuildTree implements BuildMetadata {
   final WidgetFactory wf;
 
   final _built = <WidgetPlaceholder>[];
+  final HtmlStyleBuilder _styleBuilder;
 
   Builder({
     this.customStylesBuilder,
@@ -38,7 +39,8 @@ class Builder extends BuildTree implements BuildMetadata {
     BuildTree? parent,
     required HtmlStyleBuilder styleBuilder,
     required this.wf,
-  }) : super(parent, styleBuilder);
+  })  : _styleBuilder = styleBuilder,
+        super(parent);
 
   @override
   Iterable<BuildOp> get buildOps => _buildOpSet ?? const [];
@@ -56,8 +58,24 @@ class Builder extends BuildTree implements BuildMetadata {
 
   List<css.Declaration>? get _declarationList => _declarations[this];
 
+  Iterable<BuildTree> get subTrees => _getSubTrees(this);
+
+  static Iterable<BuildTree> _getSubTrees(BuildTree tree) sync* {
+    for (final child in tree.children) {
+      if (child is! BuildTree) {
+        continue;
+      }
+
+      yield child;
+      yield* _getSubTrees(child);
+    }
+  }
+
   @override
   BuildTree get tree => this;
+
+  @override
+  HtmlStyleBuilder get tsb => _styleBuilder;
 
   @override
   void operator []=(String key, String value) {
@@ -145,20 +163,22 @@ class Builder extends BuildTree implements BuildMetadata {
     bool copyChildren = true,
     dom.Element? element,
     BuildTree? parent,
-    HtmlStyleBuilder? tsb,
+    HtmlStyleBuilder? styleBuilder,
   }) {
+    final p = parent ?? this.parent;
+    final sb = styleBuilder ?? _styleBuilder.copyWith(parent: p?.tsb);
     final copied = Builder(
       customStylesBuilder: customStylesBuilder,
       customWidgetBuilder: customWidgetBuilder,
       element: element ?? this.element,
-      parent: parent ?? this.parent,
-      styleBuilder: tsb ?? this.tsb,
+      parent: p,
+      styleBuilder: sb,
       wf: wf,
     );
 
     if (copyChildren) {
-      for (final bit in directChildren) {
-        copied.add(bit.copyWith(parent: copied));
+      for (final bit in children) {
+        copied.append(bit.copyWith(parent: copied));
       }
     }
 
@@ -183,16 +203,11 @@ class Builder extends BuildTree implements BuildMetadata {
   }
 
   @override
-  Builder sub({
-    dom.Element? element,
-    BuildTree? parent,
-    HtmlStyleBuilder? tsb,
-  }) =>
-      copyWith(
+  Builder sub({dom.Element? element}) => copyWith(
         copyChildren: false,
         element: element,
-        parent: parent ?? this,
-        tsb: tsb ?? this.tsb.sub(),
+        parent: this,
+        styleBuilder: _styleBuilder.sub(),
       );
 
   void _addBitsFromNode(dom.Node domNode) {
@@ -212,16 +227,16 @@ class Builder extends BuildTree implements BuildMetadata {
       return;
     }
 
-    final subTree = sub(element: element).._collectMetadata();
-    add(subTree);
+    final subTree = sub(element: element)
+      .._collectMetadata()
+      ..addBitsFromNodes(element.nodes);
 
-    subTree.addBitsFromNodes(element.nodes);
-
-    if (subTree.buildOps.where(_opRequiresBuildingSubtree).isNotEmpty == true) {
+    if (subTree.buildOps.where(_opRequiresBuildingSubtree).isNotEmpty) {
       for (final widget in subTree.build()) {
         add(WidgetBit.block(this, widget));
       }
-      subTree.detach();
+    } else {
+      append(subTree);
     }
   }
 
