@@ -252,11 +252,11 @@ abstract class BuildTree extends BuildBit {
     // avoid circular references
     final existing = _buffers[this];
     if (existing != null) {
-      return '$runtimeType#$hashCode (circular)';
+      return 'BuildTree#$hashCode (circular)';
     }
 
     final sb = _buffers[this] = StringBuffer();
-    sb.writeln('$runtimeType#$hashCode $tsb:');
+    sb.writeln('BuildTree#$hashCode $tsb:');
 
     const _indent = '  ';
     for (final child in _children) {

@@ -223,8 +223,8 @@ class TextStyleOps {
 
   static double? _fontSizeMultiplyRootWith(HtmlStyle style, double value) {
     var root = style;
-    for (final up = root.parent; up != null;) {
-      root = up;
+    for (HtmlStyle? x = root; x != null; x = x.parent) {
+      root = x;
     }
 
     return _fontSizeMultiplyWith(root.style.fontSize, value);

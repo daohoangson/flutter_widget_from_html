@@ -217,7 +217,7 @@ class Builder extends BuildTree implements BuildMetadata {
 
     subTree.addBitsFromNodes(element.nodes);
 
-    if (buildOps.where(_opRequiresBuildingSubtree).isNotEmpty == true) {
+    if (subTree.buildOps.where(_opRequiresBuildingSubtree).isNotEmpty == true) {
       for (final widget in subTree.build()) {
         add(WidgetBit.block(this, widget));
       }

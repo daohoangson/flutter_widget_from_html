@@ -57,7 +57,7 @@ void main() {
       expect(
         explained,
         equals(
-          'TshWidget\n'
+          'HtmlStyleWidget\n'
           '└SizedBox.shrink()\n'
           '\n',
         ),

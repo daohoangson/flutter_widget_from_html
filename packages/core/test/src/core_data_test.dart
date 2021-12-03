@@ -58,7 +58,7 @@ void main() {
         expect(
           explained,
           equals(
-            'TshWidget\n'
+            'HtmlStyleWidget\n'
             '└WidgetPlaceholder(text)\n'
             ' └Text("hi")\n'
             '  └RichText(text: "hi")\n\n',
@@ -83,7 +83,7 @@ void main() {
         expect(
           explained,
           equals(
-            'TshWidget\n'
+            'HtmlStyleWidget\n'
             '└WidgetPlaceholder\n'
             ' └Text("Hi")\n'
             '  └RichText(text: "Hi")\n\n',

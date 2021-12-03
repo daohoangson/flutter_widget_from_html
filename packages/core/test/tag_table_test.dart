@@ -52,7 +52,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          'TshWidget\n'
+          'HtmlStyleWidget\n'
           '└ColumnPlaceholder(root)\n'
           ' └Column()\n'
           '  ├_TableCaption()\n'
