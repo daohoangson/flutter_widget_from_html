@@ -9,18 +9,8 @@ class TagRuby {
   final BuildMetadata rubyMeta;
   final WidgetFactory wf;
 
-  late final BuildOp _rtOp;
-
   TagRuby(this.wf, this.rubyMeta) {
     op = BuildOp(onChild: onChild, onTree: onTree);
-    _rtOp = BuildOp(
-      onTree: (rtMeta, rtTree) {
-        if (rtTree.isEmpty) {
-          return;
-        }
-        rtTree.isRtBit = true;
-      },
-    );
   }
 
   void onChild(BuildMetadata childMeta) {
@@ -34,33 +24,35 @@ class TagRuby {
         childMeta[kCssDisplay] = kCssDisplayNone;
         break;
       case kTagRt:
-        childMeta
-          ..[kCssFontSize] = '0.5em'
-          ..register(_rtOp);
+        childMeta[kCssFontSize] = '0.5em';
         break;
     }
   }
 
   void onTree(BuildMetadata _, BuildTree tree) {
     final rubyBits = <BuildBit>[];
+    final list = <BuildBit>[];
 
-    for (final bit in tree.children.toList(growable: false)) {
-      if (!bit.isRtBit || rubyBits.isEmpty) {
+    for (final bit in tree.children) {
+      if (!bit.isRtTree || rubyBits.isEmpty) {
         if (rubyBits.isEmpty && bit is WhitespaceBit) {
           // ruby contents should not start with a whitespace
-          bit.copyWith(parent: tree.parent).insertBefore(tree);
-          bit.detach();
+          list.add(bit);
         } else {
           rubyBits.add(bit);
         }
         continue;
       }
 
-      final rtBit = bit;
-      final rtTree = rtBit as BuildTree;
       final rubyTree = tree.sub();
+      for (final rubyBit in rubyBits) {
+        rubyTree.append(rubyBit.copyWith(parent: rubyTree));
+      }
+      rubyBits.clear();
+
+      final rtTree = bit as BuildTree;
       final placeholder = WidgetPlaceholder(
-        builder: (context, __) {
+        builder: (context, _) {
           final tsh = rubyTree.tsb.build(context);
 
           final ruby = wf.buildColumnWidget(
@@ -79,25 +71,37 @@ class TagRuby {
         localName: kTagRuby,
       );
 
-      WidgetBit.inline(
-        tree.parent!,
-        placeholder,
-        alignment: PlaceholderAlignment.baseline,
-      ).insertBefore(tree);
+      const baseline = PlaceholderAlignment.baseline;
+      list.add(WidgetBit.inline(tree, placeholder, alignment: baseline));
+    }
 
-      for (final rubyBit in rubyBits) {
-        rubyTree.add(rubyBit.copyWith(parent: rubyTree));
-        rubyBit.detach();
-      }
-      rubyBits.clear();
-      rtBit.detach();
+    // preserve orphan bits if any
+    list.addAll(rubyBits);
+
+    tree.detach();
+    for (final bit in list) {
+      tree.append(bit);
     }
   }
 }
 
-extension _RtBit on BuildBit {
-  static final _rtBits = Expando<bool>();
+extension _RtTree on BuildBit {
+  bool get isRtTree {
+    final thiz = this;
 
-  bool get isRtBit => _rtBits[this] == true;
-  set isRtBit(bool v) => _rtBits[this] = v;
+    if (thiz is! BuildTree) {
+      return false;
+    }
+
+    if (thiz.isEmpty) {
+      return false;
+    }
+
+    if (thiz is BuildMetadata) {
+      final meta = thiz as BuildMetadata;
+      return meta.element.localName == kTagRt;
+    } else {
+      return false;
+    }
+  }
 }

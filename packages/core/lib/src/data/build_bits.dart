@@ -95,8 +95,6 @@ abstract class BuildBit {
   BuildBit copyWith({BuildTree? parent});
 
   /// Removes self from [parent].
-  ///
-  /// Note: detaching a [BuildTree] is not allowed.
   bool detach() => parent?.children.remove(this) ?? false;
 
   /// Flattens this bit.
@@ -104,14 +102,12 @@ abstract class BuildBit {
 
   /// Inserts self after [another] in the tree.
   bool insertAfter(BuildBit another) {
-    final scopedParent = parent;
-    if (scopedParent == null) {
-      return false;
-    }
+    final parent = this.parent!;
+    assert(parent == another.parent);
 
-    assert(scopedParent == another.parent);
-    final siblings = scopedParent.children;
+    final siblings = parent.children;
     final i = siblings.indexOf(another);
+    assert(i > -1, 'The reference BuildBit is not registered on tree.');
     if (i == -1) {
       return false;
     }
@@ -122,14 +118,12 @@ abstract class BuildBit {
 
   /// Inserts self before [another] in the tree.
   bool insertBefore(BuildBit another) {
-    final scopedParent = parent;
-    if (scopedParent == null) {
-      return false;
-    }
+    final parent = this.parent!;
+    assert(parent == another.parent);
 
-    assert(scopedParent == another.parent);
-    final siblings = scopedParent.children;
+    final siblings = parent.children;
     final i = siblings.indexOf(another);
+    assert(i > -1, 'The reference BuildBit is not registered on tree.');
     if (i == -1) {
       return false;
     }

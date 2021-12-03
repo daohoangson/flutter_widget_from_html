@@ -158,7 +158,7 @@ class Builder extends BuildTree implements BuildMetadata {
 
   @override
   Builder copyWith({
-    bool copyChildren = true,
+    bool copyContents = true,
     dom.Element? element,
     BuildTree? parent,
     HtmlStyleBuilder? styleBuilder,
@@ -175,7 +175,10 @@ class Builder extends BuildTree implements BuildMetadata {
       wf: wf,
     );
 
-    if (copyChildren) {
+    if (copyContents) {
+      _buildOps[copied] = _buildOps[this];
+      _declarations[copied] = _declarations[this];
+
       for (final bit in children) {
         copied.append(bit.copyWith(parent: copied));
       }
@@ -203,7 +206,7 @@ class Builder extends BuildTree implements BuildMetadata {
 
   @override
   Builder sub({dom.Element? element}) => copyWith(
-        copyChildren: false,
+        copyContents: false,
         element: element,
         parent: this,
         styleBuilder: _styleBuilder.sub(),
