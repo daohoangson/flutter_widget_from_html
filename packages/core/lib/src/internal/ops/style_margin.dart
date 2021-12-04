@@ -22,25 +22,25 @@ class StyleMargin {
         onTreeFlattening: (meta, tree) {
           final margin = tryParseCssLengthBox(meta, kCssMargin);
           if (margin == null) {
-            return;
+            return false;
           }
 
           if (margin.mayHaveLeft) {
-            tree.prepend(
-              WidgetBit.inline(tree, _paddingInlineBefore(tree.tsb, margin)),
-            );
+            final before = _paddingInlineBefore(tree.tsb, margin);
+            tree.prepend(WidgetBit.inline(tree, before));
           }
 
           if (margin.mayHaveRight) {
-            tree.append(
-              WidgetBit.inline(tree, _paddingInlineAfter(tree.tsb, margin)),
-            );
+            final after = _paddingInlineAfter(tree.tsb, margin);
+            tree.append(WidgetBit.inline(tree, after));
           }
+
+          return true;
         },
         onWidgets: (meta, widgets) {
           final m = tryParseCssLengthBox(meta, kCssMargin);
           if (m == null) {
-            return widgets;
+            return null;
           }
 
           final tsb = meta.tsb;

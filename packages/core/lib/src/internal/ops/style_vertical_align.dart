@@ -21,18 +21,18 @@ class StyleVerticalAlign {
         onTreeFlattening: (meta, tree) {
           final v = meta[kCssVerticalAlign]?.term;
           if (v == null || v == kCssVerticalAlignBaseline) {
-            return;
+            return false;
           }
 
           final alignment = _tryParsePlaceholderAlignment(v);
           if (alignment == null) {
-            return;
+            return false;
           }
 
           _skipBuilding[meta] = true;
           final built = _buildTree(meta, tree);
           if (built == null) {
-            return;
+            return false;
           }
 
           if (v == kCssVerticalAlignSub || v == kCssVerticalAlignSuper) {
@@ -50,31 +50,33 @@ class StyleVerticalAlign {
           }
 
           tree.replaceWith(WidgetBit.inline(tree, built, alignment: alignment));
+          return true;
         },
         onWidgets: (meta, widgets) {
           if (_skipBuilding[meta] == true || widgets.isEmpty) {
-            return widgets;
+            return null;
           }
 
           final v = meta[kCssVerticalAlign]?.term;
           if (v == null) {
-            return widgets;
+            return null;
           }
 
           return listOrNull(
-            wf
-                .buildColumnPlaceholder(meta, widgets)
-                ?.wrapWith((context, child) {
-              final tsh = meta.tsb.build(context);
-              final alignment =
-                  _tryParseAlignmentGeometry(tsh.textDirection, v);
-              if (alignment == null) {
-                return child;
-              }
+                wf
+                    .buildColumnPlaceholder(meta, widgets)
+                    ?.wrapWith((context, child) {
+                  final tsh = meta.tsb.build(context);
+                  final alignment =
+                      _tryParseAlignmentGeometry(tsh.textDirection, v);
+                  if (alignment == null) {
+                    return child;
+                  }
 
-              return wf.buildAlign(meta, child, alignment);
-            }),
-          );
+                  return wf.buildAlign(meta, child, alignment);
+                }),
+              ) ??
+              widgets;
         },
         onWidgetsIsOptional: true,
         priority: kPriority4k3,
@@ -91,8 +93,7 @@ class StyleVerticalAlign {
       }
     }
 
-    final copied = tree.copyWith() as BuildTree;
-    return wf.buildColumnPlaceholder(meta, copied.build());
+    return wf.buildColumnPlaceholder(meta, tree.build());
   }
 
   Widget? _buildPaddedAlign(

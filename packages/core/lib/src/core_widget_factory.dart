@@ -1108,13 +1108,16 @@ class WidgetFactory {
 
         const baseline = PlaceholderAlignment.baseline;
         tree.prepend(WidgetBit.inline(tree, widget, alignment: baseline));
+
+        return true;
       },
       onWidgets: (meta, widgets) {
         return listOrNull(
-          buildColumnPlaceholder(meta, widgets)?.wrapWith(
-            (context, child) => SizedBox(key: anchor, child: child),
-          ),
-        );
+              buildColumnPlaceholder(meta, widgets)?.wrapWith(
+                (context, child) => SizedBox(key: anchor, child: child),
+              ),
+            ) ??
+            widgets;
       },
       onWidgetsIsOptional: true,
       priority: BuildOp.kPriorityMax,

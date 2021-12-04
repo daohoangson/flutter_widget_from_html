@@ -400,8 +400,10 @@ class _BuildBitWidgetFactory extends WidgetFactory {
     if (classes.contains('input--GestureRecognizer')) {
       meta.register(
         BuildOp(
-          onTreeFlattening: (_, tree) =>
-              tree.add(_InputGestureRecognizerBit(tree)),
+          onTreeFlattening: (_, tree) {
+            tree.append(_InputGestureRecognizerBit(tree));
+            return true;
+          },
           priority: BuildOp.kPriorityMax,
         ),
       );

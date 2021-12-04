@@ -71,23 +71,24 @@ class TagDetails {
     final attrs = detailsMeta.element.attributes;
     final open = attrs.containsKey(kAttributeDetailsOpen);
     return listOrNull(
-      wf.buildColumnPlaceholder(detailsMeta, widgets)?.wrapWith(
-        (context, child) {
-          final tsh = detailsMeta.tsb.build(context);
+          wf.buildColumnPlaceholder(detailsMeta, widgets)?.wrapWith(
+            (context, child) {
+              final tsh = detailsMeta.tsb.build(context);
 
-          return HtmlDetails(
-            open: open,
-            child: wf.buildColumnWidget(
-              context,
-              [
-                HtmlSummary(style: tsh.style, child: _summary),
-                HtmlDetailsContents(child: child),
-              ],
-              dir: tsh.getDependency(),
-            ),
-          );
-        },
-      ),
-    );
+              return HtmlDetails(
+                open: open,
+                child: wf.buildColumnWidget(
+                  context,
+                  [
+                    HtmlSummary(style: tsh.style, child: _summary),
+                    HtmlDetailsContents(child: child),
+                  ],
+                  dir: tsh.getDependency(),
+                ),
+              );
+            },
+          ),
+        ) ??
+        widgets;
   }
 }

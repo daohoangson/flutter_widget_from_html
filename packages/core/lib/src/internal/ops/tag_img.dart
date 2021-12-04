@@ -53,7 +53,7 @@ class TagImg {
         onTreeFlattening: (meta, tree) {
           final placeholder = _placeholders[meta];
           if (placeholder == null) {
-            return;
+            return false;
           }
 
           tree.add(
@@ -63,6 +63,8 @@ class TagImg {
               alignment: PlaceholderAlignment.baseline,
             ),
           );
+
+          return true;
         },
         onWidgets: (meta, widgets) {
           final placeholder = _placeholders[meta];

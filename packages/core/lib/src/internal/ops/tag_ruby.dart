@@ -46,7 +46,7 @@ class TagRuby {
 
       final rubyTree = tree.sub();
       for (final rubyBit in rubyBits) {
-        rubyTree.append(rubyBit.copyWith(parent: rubyTree));
+        rubyTree.append(rubyBit);
       }
       rubyBits.clear();
 

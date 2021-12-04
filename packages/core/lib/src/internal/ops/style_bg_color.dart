@@ -12,10 +12,11 @@ class StyleBgColor {
         onTreeFlattening: (meta, tree) {
           final bgColor = _parseColor(wf, meta);
           if (bgColor == null) {
-            return;
+            return false;
           }
 
           meta.tsb.enqueue(_tsb, bgColor);
+          return true;
         },
         onWidgets: (meta, widgets) {
           final color = _parseColor(wf, meta);
@@ -24,10 +25,12 @@ class StyleBgColor {
           }
 
           return listOrNull(
-            wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
-                  (_, child) => wf.buildDecoration(meta, child, color: color),
-                ),
-          );
+                wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
+                      (_, child) =>
+                          wf.buildDecoration(meta, child, color: color),
+                    ),
+              ) ??
+              widgets;
         },
         onWidgetsIsOptional: true,
         priority: StyleBorder.kPriorityBoxModel5k + 1,

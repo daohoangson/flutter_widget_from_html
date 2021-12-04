@@ -209,8 +209,8 @@ abstract class BuildTree extends BuildBit {
   ///
   /// See also: [prepend].
   T append<T extends BuildBit>(T bit) {
-    assert(bit.parent == this);
-    children.add(bit);
+    final child = bit.parent == this ? bit : bit.copyWith(parent: this);
+    children.add(child);
     return bit;
   }
 
@@ -233,17 +233,18 @@ abstract class BuildTree extends BuildBit {
   ///
   /// See also: [append].
   T prepend<T extends BuildBit>(T bit) {
-    assert(bit.parent == this);
-    children.insert(0, bit);
+    final child = bit.parent == this ? bit : bit.copyWith(parent: this);
+    children.insert(0, child);
     return bit;
   }
 
   /// Replaces all children bits with [another].
   void replaceWith(BuildBit another) {
-    assert(another.parent == this);
+    final child =
+        another.parent == this ? another : another.copyWith(parent: this);
     children
       ..clear()
-      ..add(another);
+      ..add(child);
   }
 
   /// Registers anchor [Key].

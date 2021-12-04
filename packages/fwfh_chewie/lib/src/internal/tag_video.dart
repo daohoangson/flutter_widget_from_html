@@ -54,7 +54,7 @@ class TagVideo {
         !kIsWeb) {
       // these are the chewie's supported platforms
       // https://pub.dev/packages/chewie/versions/1.2.2
-      return ws;
+      return null;
     }
 
     return listOrNull(_buildPlayer()) ?? ws;

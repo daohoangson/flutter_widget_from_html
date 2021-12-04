@@ -101,7 +101,7 @@ class BuildOp {
   final void Function(BuildMetadata meta, BuildTree tree)? onTree;
 
   /// The callback that will be called before flattening.
-  final void Function(BuildMetadata meta, BuildTree tree)? onTreeFlattening;
+  final bool Function(BuildMetadata meta, BuildTree tree)? onTreeFlattening;
 
   /// The callback that will be called when child elements have been built.
   ///

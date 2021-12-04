@@ -25,13 +25,13 @@ class TagAudio {
               !kIsWeb) {
             // these are the just_audio's supported platforms
             // https://pub.dev/packages/just_audio/versions/0.9.5
-            return widgets;
+            return null;
           }
 
           final attrs = meta.element.attributes;
           final url = wf.urlFull(attrs[kAttributeAudioSrc] ?? '');
           if (url == null) {
-            return widgets;
+            return null;
           }
 
           return listOrNull(

@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:csslib/parser.dart' as css;
 import 'package:csslib/visitor.dart' as css;
+import 'package:flutter/widgets.dart';
 
 import 'package:html/dom.dart' as dom;
 
@@ -18,7 +19,7 @@ final _regExpSpaceTrailing = RegExp('$_asciiWhitespace+\$', unicode: true);
 final _regExpSpaces = RegExp('$_asciiWhitespace+', unicode: true);
 
 class Builder extends BuildTree implements BuildMetadata {
-  static final _buildOps = Expando<Set<BuildOp>>();
+  static final _buildOps = Expando<Set<_BuilderOp>>();
   static final _declarations = Expando<List<css.Declaration>>();
 
   final CustomStylesBuilder? customStylesBuilder;
@@ -32,7 +33,6 @@ class Builder extends BuildTree implements BuildMetadata {
 
   final WidgetFactory wf;
 
-  final _built = <WidgetPlaceholder>[];
   final HtmlStyleBuilder _styleBuilder;
 
   Builder({
@@ -47,9 +47,10 @@ class Builder extends BuildTree implements BuildMetadata {
         super(parent);
 
   @override
-  Iterable<BuildOp> get buildOps => _buildOpSet ?? const [];
+  Iterable<BuildOp> get buildOps =>
+      _buildOpSet?.map(_BuilderOp._unwrap) ?? const [];
 
-  Set<BuildOp>? get _buildOpSet => _buildOps[this];
+  Set<_BuilderOp>? get _buildOpSet => _buildOps[this];
 
   @override
   Iterable<css.Declaration> get styles => _declarationList ?? const [];
@@ -106,28 +107,27 @@ class Builder extends BuildTree implements BuildMetadata {
     for (final domNode in domNodes) {
       _addBitsFromNode(domNode);
     }
-    for (final op in buildOps) {
-      op.onTree?.call(this, this);
+
+    final ops = _buildOpSet;
+    if (ops != null) {
+      for (final op in ops) {
+        op.onTree();
+      }
     }
   }
 
   @override
   Iterable<WidgetPlaceholder> build() {
-    if (_built.isNotEmpty) {
-      return _built;
-    }
-
     for (final subTree in subTrees.toList(growable: false).reversed) {
       subTree.flatten(Flattened.noOp());
     }
 
     var widgets = Flattener(wf, this, this).widgets;
-    for (final op in buildOps) {
-      widgets = op.onWidgets
-              ?.call(this, widgets)
-              ?.map(WidgetPlaceholder.lazy)
-              .toList(growable: false) ??
-          widgets;
+    final ops = _buildOpSet;
+    if (ops != null) {
+      for (final op in ops) {
+        widgets = op.onWidgets(widgets) ?? widgets;
+      }
     }
 
     final thisAnchors = anchors;
@@ -152,8 +152,7 @@ class Builder extends BuildTree implements BuildMetadata {
       }
     }
 
-    _built.addAll(widgets);
-    return _built;
+    return widgets;
   }
 
   @override
@@ -176,7 +175,15 @@ class Builder extends BuildTree implements BuildMetadata {
     );
 
     if (copyContents) {
-      _buildOps[copied] = _buildOps[this];
+      final ops = _buildOpSet;
+      if (ops != null) {
+        final copiedOps = _BuilderOp._newSet();
+        for (final op in ops) {
+          copiedOps.add(_BuilderOp(copied, op.op));
+        }
+        _buildOps[copied] = copiedOps;
+      }
+
       _declarations[copied] = _declarations[this];
 
       for (final bit in children) {
@@ -189,18 +196,22 @@ class Builder extends BuildTree implements BuildMetadata {
 
   @override
   void flatten(Flattened _) {
-    for (final op in buildOps) {
-      op.onTreeFlattening?.call(this, this);
+    final ops = _buildOpSet;
+    if (ops != null) {
+      for (final op in ops) {
+        op.onTreeFlattening();
+      }
     }
   }
 
   @override
   void register(BuildOp op) {
     final existingSet = _buildOpSet;
+    final op0 = _BuilderOp(this, op);
     if (existingSet != null) {
-      existingSet.add(op);
+      existingSet.add(op0);
     } else {
-      _buildOps[this] = SplayTreeSet(_compareBuildOps)..add(op);
+      _buildOps[this] = _BuilderOp._newSet()..add(op0);
     }
   }
 
@@ -297,21 +308,18 @@ class Builder extends BuildTree implements BuildMetadata {
     }
 
     // stylings, step 1: get default styles from tag-based build ops
-    for (final op in buildOps) {
-      final map = op.defaultStyles?.call(element);
-      if (map == null) {
-        continue;
-      }
-
-      final str = map.entries.map((e) => '${e.key}: ${e.value}').join(';');
-      final styleSheet = css.parse('*{$str}');
-
-      final defaultStyles = styleSheet.collectDeclarations();
-      final declarations = _declarationList;
-      if (declarations != null) {
-        declarations.insertAll(0, defaultStyles);
-      } else {
-        _declarations[this] = [...defaultStyles];
+    final ops = _buildOpSet;
+    if (ops != null) {
+      for (final op in ops) {
+        final defaultStyles = op.defaultStyles;
+        if (defaultStyles != null) {
+          final declarations = _declarationList;
+          if (declarations != null) {
+            declarations.insertAll(0, defaultStyles);
+          } else {
+            _declarations[this] = [...defaultStyles];
+          }
+        }
       }
     }
 
@@ -357,20 +365,92 @@ class Builder extends BuildTree implements BuildMetadata {
   }
 }
 
-int _compareBuildOps(BuildOp a, BuildOp b) {
-  if (identical(a, b)) {
-    return 0;
+class _BuilderOp {
+  final BuildOp op;
+  _BuilderType? type;
+  final Builder tree;
+
+  _BuilderOp(this.tree, this.op);
+
+  List<css.Declaration>? get defaultStyles {
+    final map = op.defaultStyles?.call(tree.element);
+    if (map == null) {
+      return null;
+    }
+
+    final str = map.entries.map((e) => '${e.key}: ${e.value}').join(';');
+    final styleSheet = css.parse('*{$str}');
+    return styleSheet.collectDeclarations();
   }
 
-  final cmp = a.priority.compareTo(b.priority);
-  if (cmp == 0) {
-    // if two ops have the same priority, they should not be considered equal
-    // fallback to compare hash codes for stable sorting
-    // while still provide pseudo random order across different runs
-    return a.hashCode.compareTo(b.hashCode);
-  } else {
-    return cmp;
+  void onTree() => op.onTree?.call(tree, tree);
+
+  bool onTreeFlattening() {
+    if (type == _BuilderType.onWidgets) {
+      return false;
+    }
+
+    final prevType = type;
+    type = _BuilderType.onTreeFlattening;
+
+    final result = op.onTreeFlattening?.call(tree, tree) ?? false;
+    if (!result) {
+      type = prevType;
+    }
+
+    return result;
   }
+
+  Iterable<WidgetPlaceholder>? onWidgets(Iterable<WidgetPlaceholder> widgets) {
+    if (type == _BuilderType.onTreeFlattening) {
+      return null;
+    }
+
+    final prevType = type;
+    type = _BuilderType.onWidgets;
+
+    final result = op.onWidgets
+        ?.call(tree, widgets)
+        ?.map(WidgetPlaceholder.lazy)
+        .toList(growable: false);
+    if (result == null) {
+      type = prevType;
+    }
+
+    return result;
+  }
+
+  @override
+  String toString() {
+    return '_BuilderOp#${op.hashCode}';
+  }
+
+  static int _compare(_BuilderOp a0, _BuilderOp b0) {
+    final a = a0.op;
+    final b = b0.op;
+    if (identical(a, b)) {
+      return 0;
+    }
+
+    final cmp = a.priority.compareTo(b.priority);
+    if (cmp == 0) {
+      // if two ops have the same priority, they should not be considered equal
+      // fallback to compare hash codes for stable sorting
+      // while still provide pseudo random order across different runs
+      return a.hashCode.compareTo(b.hashCode);
+    } else {
+      return cmp;
+    }
+  }
+
+  static Set<_BuilderOp> _newSet() => SplayTreeSet<_BuilderOp>(_compare);
+
+  static BuildOp _unwrap(_BuilderOp _) => _.op;
+}
+
+enum _BuilderType {
+  onTreeFlattening,
+  onWidgets,
 }
 
 bool _opRequiresBuildingSubtree(BuildOp op) =>

@@ -297,16 +297,17 @@ class _TagTableRow {
       onWidgets: (cellMeta, widgets) {
         final v = cellMeta[kCssVerticalAlign]?.term;
         if (v != kCssVerticalAlignBaseline) {
-          return widgets;
+          return null;
         }
 
         return listOrNull(
-          parent.wf
-              .buildColumnPlaceholder(cellMeta, widgets)
-              ?.wrapWith((_, child) {
-            return HtmlTableValignBaseline(child: child);
-          }),
-        );
+              parent.wf
+                  .buildColumnPlaceholder(cellMeta, widgets)
+                  ?.wrapWith((_, child) {
+                return HtmlTableValignBaseline(child: child);
+              }),
+            ) ??
+            widgets;
       },
       priority: StyleVerticalAlign.kPriority4k3,
     );

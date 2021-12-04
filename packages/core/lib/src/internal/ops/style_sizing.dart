@@ -32,22 +32,23 @@ class StyleSizing {
         onTreeFlattening: (meta, tree) {
           final input = _parse(meta);
           if (input == null) {
-            return;
+            return false;
           }
 
           WidgetPlaceholder? widget;
           for (final b in tree.bits) {
             if (b is WidgetBit) {
               if (widget != null) {
-                return;
+                return false;
               }
               widget = b.child;
             } else {
-              return;
+              return false;
             }
           }
 
           widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb));
+          return true;
         },
         onWidgets: (meta, widgets) {
           final input = _parse(meta);
@@ -56,10 +57,11 @@ class StyleSizing {
           }
 
           return listOrNull(
-            wf
-                .buildColumnPlaceholder(meta, widgets)
-                ?.wrapWith((c, w) => _build(c, w, input, meta.tsb)),
-          );
+                wf
+                    .buildColumnPlaceholder(meta, widgets)
+                    ?.wrapWith((c, w) => _build(c, w, input, meta.tsb)),
+              ) ??
+              widgets;
         },
         onWidgetsIsOptional: true,
         priority: kPriority7k,

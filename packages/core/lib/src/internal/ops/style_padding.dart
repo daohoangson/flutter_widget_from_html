@@ -28,29 +28,29 @@ class StylePadding {
         onTreeFlattening: (meta, tree) {
           final padding = tryParseCssLengthBox(meta, kCssPadding);
           if (padding == null) {
-            return;
+            return false;
           }
 
           if (padding.mayHaveLeft) {
-            tree.prepend(
-              WidgetBit.inline(tree, _paddingInlineBefore(tree.tsb, padding)),
-            );
+            final before = _paddingInlineBefore(tree.tsb, padding);
+            tree.prepend(WidgetBit.inline(tree, before));
           }
 
           if (padding.mayHaveRight) {
-            tree.append(
-              WidgetBit.inline(tree, _paddingInlineAfter(tree.tsb, padding)),
-            );
-          }
-        },
-        onWidgets: (meta, widgets) {
-          if (widgets.isEmpty) {
-            return widgets;
+            final after = _paddingInlineAfter(tree.tsb, padding);
+            tree.append(WidgetBit.inline(tree, after));
           }
 
+          return true;
+        },
+        onWidgets: (meta, widgets) {
           final padding = tryParseCssLengthBox(meta, kCssPadding);
           if (padding == null) {
             return null;
+          }
+
+          if (widgets.isEmpty) {
+            return widgets;
           }
 
           return [

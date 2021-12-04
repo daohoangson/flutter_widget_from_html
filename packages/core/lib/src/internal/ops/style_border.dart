@@ -16,36 +16,34 @@ class StyleBorder {
   BuildOp get buildOp => BuildOp(
         onTreeFlattening: (meta, tree) {
           if (_skipBuilding[meta] == true) {
-            return;
+            return false;
           }
 
           final border = tryParseBorder(meta);
           if (border.isNoOp) {
-            return;
+            return false;
           }
 
           _skipBuilding[meta] = true;
-          final copied = tree.copyWith() as BuildTree;
-          final built =
-              wf.buildColumnPlaceholder(meta, copied.build())?.wrapWith(
-                    (context, child) =>
-                        _buildBorder(meta, context, child, border),
-                  );
+          final built = wf.buildColumnPlaceholder(meta, tree.build())?.wrapWith(
+                (context, child) => _buildBorder(meta, context, child, border),
+              );
           if (built == null) {
-            return;
+            return false;
           }
 
           const baseline = PlaceholderAlignment.baseline;
           tree.replaceWith(WidgetBit.inline(tree, built, alignment: baseline));
+          return true;
         },
         onWidgets: (meta, widgets) {
           if (_skipBuilding[meta] == true || widgets.isEmpty) {
-            return widgets;
+            return null;
           }
 
           final border = tryParseBorder(meta);
           if (border.isNoOp) {
-            return widgets;
+            return null;
           }
 
           return [

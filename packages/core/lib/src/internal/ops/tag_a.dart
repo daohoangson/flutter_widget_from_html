@@ -18,7 +18,7 @@ class TagA {
         onTreeFlattening: (meta, tree) {
           final onTap = _gestureTapCallback(meta);
           if (onTap == null) {
-            return;
+            return false;
           }
 
           for (final bit in tree.bits.toList(growable: false)) {
@@ -32,18 +32,21 @@ class TagA {
               _TagABit(bit.parent, recognizer).insertAfter(bit);
             }
           }
+
+          return true;
         },
         onWidgets: (meta, widgets) {
           final onTap = _gestureTapCallback(meta);
           if (onTap == null) {
-            return widgets;
+            return null;
           }
 
           return listOrNull(
-            wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
-                  (_, child) => wf.buildGestureDetector(meta, child, onTap),
-                ),
-          );
+                wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
+                      (_, child) => wf.buildGestureDetector(meta, child, onTap),
+                    ),
+              ) ??
+              widgets;
         },
         onWidgetsIsOptional: true,
       );
