@@ -24,7 +24,6 @@ class StyleBorder {
             return false;
           }
 
-          _skipBuilding[meta] = true;
           final built = wf.buildColumnPlaceholder(meta, tree.build())?.wrapWith(
                 (context, child) => _buildBorder(meta, context, child, border),
               );
@@ -75,8 +74,5 @@ class StyleBorder {
     );
   }
 
-  static void skip(BuildMetadata meta) {
-    assert(_skipBuilding[meta] != true, 'Built ${meta.element} already');
-    _skipBuilding[meta] = true;
-  }
+  static void skip(BuildMetadata meta) => _skipBuilding[meta] = true;
 }
