@@ -13,8 +13,6 @@ class StyleVerticalAlign {
 
   final WidgetFactory wf;
 
-  static final _skipBuilding = Expando<bool>();
-
   StyleVerticalAlign(this.wf);
 
   BuildOp get buildOp => BuildOp(
@@ -29,7 +27,6 @@ class StyleVerticalAlign {
             return false;
           }
 
-          _skipBuilding[meta] = true;
           final built = _buildTree(meta, tree);
           if (built == null) {
             return false;
@@ -53,7 +50,7 @@ class StyleVerticalAlign {
           return true;
         },
         onWidgets: (meta, widgets) {
-          if (_skipBuilding[meta] == true || widgets.isEmpty) {
+          if (widgets.isEmpty) {
             return null;
           }
 
