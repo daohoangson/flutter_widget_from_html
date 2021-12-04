@@ -297,9 +297,9 @@ void main() {
           '    "2"\n'
           '  "3"\n'
           '\n'
-          'BuildTree#5 tsb#1(parent=#2):\n'
+          'BuildTree#5 tsb#6(parent=#2):\n'
           '  "1"\n'
-          '  BuildTree#6 tsb#4(parent=#1):\n'
+          '  BuildTree#7 tsb#8(parent=#6):\n'
           '    "2"\n'
           '  "3"',
         ),
