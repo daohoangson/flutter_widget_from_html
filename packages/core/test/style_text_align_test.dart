@@ -265,6 +265,106 @@ void main() {
     });
   });
 
+  group('contents: mixed', () {
+    testWidgets('renders tag CENTER', (WidgetTester tester) async {
+      const html = '<center><div>Foo</div>_X_</center>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssBlock:child=[Column:children='
+          '[_TextAlignCenter:child=[CssBlock:child=[RichText:align=center,(:Foo)]]],'
+          '[_TextAlignCenter:child=[RichText:align=center,(:_X_)]]'
+          ']]',
+        ),
+      );
+    });
+
+    testWidgets('renders center', (WidgetTester tester) async {
+      const html = '<div style="text-align: center"><div>Foo</div>_X_</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[RichText:align=center,(:Foo)]],'
+          '[_TextAlignBlock:child=[RichText:align=center,(:_X_)]]'
+          ']]',
+        ),
+      );
+    });
+
+    testWidgets('renders end', (WidgetTester tester) async {
+      const html = '<div style="text-align: end"><div>Foo</div>__X</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[RichText:align=end,(:Foo)]],'
+          '[_TextAlignBlock:child=[RichText:align=end,(:__X)]]'
+          ']]',
+        ),
+      );
+    });
+
+    testWidgets('renders justify', (WidgetTester tester) async {
+      const html = '<div style="text-align: justify"><div>Foo</div>X_X_X</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[RichText:align=justify,(:Foo)]],'
+          '[_TextAlignBlock:child=[RichText:align=justify,(:X_X_X)]]'
+          ']]',
+        ),
+      );
+    });
+
+    testWidgets('renders left', (WidgetTester tester) async {
+      const html = '<div style="text-align: left"><div>Foo</div>X__</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[RichText:align=left,(:Foo)]],'
+          '[_TextAlignBlock:child=[RichText:align=left,(:X__)]]'
+          ']]',
+        ),
+      );
+    });
+
+    testWidgets('renders right', (WidgetTester tester) async {
+      const html = '<div style="text-align: right"><div>Foo</div>__X</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[RichText:align=right,(:Foo)]],'
+          '[_TextAlignBlock:child=[RichText:align=right,(:__X)]]'
+          ']]',
+        ),
+      );
+    });
+
+    testWidgets('renders start', (WidgetTester tester) async {
+      const html = '<div style="text-align: start"><div>Foo</div>X__</div>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[RichText:(:Foo)]],'
+          '[RichText:(:X__)]'
+          ']]',
+        ),
+      );
+    });
+  });
+
   testWidgets('renders styling from outside', (WidgetTester tester) async {
     // https://github.com/daohoangson/flutter_widget_from_html/issues/10
     const html = '<em><span style="color: red;">'
