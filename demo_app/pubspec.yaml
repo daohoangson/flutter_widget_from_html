@@ -50,7 +50,7 @@ dev_dependencies:
     sdk: flutter
   flutter_test:
     sdk: flutter
-  golden_toolkit: ^0.11.0
+  golden_toolkit: ^0.12.0
   lint: any
   test: any
 
