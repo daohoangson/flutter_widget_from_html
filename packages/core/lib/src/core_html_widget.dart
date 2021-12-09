@@ -112,7 +112,7 @@ class HtmlWidget extends StatefulWidget {
     this.onTapUrl,
     RebuildTriggers? rebuildTriggers,
     this.renderMode = RenderMode.column,
-    this.textStyle = const TextStyle(),
+    this.textStyle,
   })  : _rebuildTriggers = rebuildTriggers,
         super(key: key);
 

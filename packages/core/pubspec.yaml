@@ -11,7 +11,7 @@ dependencies:
   csslib: ^0.17.0
   flutter:
     sdk: flutter
-  fwfh_text_style: ">=2.7.0-0"
+  fwfh_text_style: ^2.2.0-0
   html: ^0.15.0
 
 dependency_overrides:
@@ -21,7 +21,7 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  golden_toolkit: ^0.11.0
+  golden_toolkit: ^0.12.0
   lint: any
   mocktail_image_network: ^0.2.0
   test: any
