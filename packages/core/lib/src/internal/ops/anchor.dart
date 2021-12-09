@@ -101,7 +101,7 @@ class AnchorRegistry {
         duration: jumpDuration,
       );
     } else if (anchorMax > effectiveMax) {
-      // target is above: scroll the footer to the top of viewport
+      // target is below: scroll the footer to the top of viewport
       final footer = _bodyItemKeys[currentMax * 2 + 1];
       movedOk = await _ensureVisibleContext(
         footer.currentContext,
