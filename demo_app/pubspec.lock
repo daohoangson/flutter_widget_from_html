@@ -277,7 +277,7 @@ packages:
       path: "../packages/fwfh_text_style"
       relative: true
     source: path
-    version: "2.7.0-beta.1"
+    version: "2.7.0"
   fwfh_url_launcher:
     dependency: "direct main"
     description:
