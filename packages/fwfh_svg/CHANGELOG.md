@@ -1,3 +1,8 @@
+## 0.7.2
+
+- Add support for flutter_svg@1.0 (#648)
+- Avoid importing `dart:io` in svg_factory.dart (#653)
+
 ## 0.7.1
 
 - Add support for flutter_svg@0.23 (#611)
