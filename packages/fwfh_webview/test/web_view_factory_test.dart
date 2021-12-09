@@ -40,7 +40,7 @@ void main() {
     testWidgets('renders web view (Android)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
       final explained = await _explain(tester);
-      expect(explained, contains('└PlatformViewLink'));
+      expect(explained, contains('└WebViewAndroidWidget'));
       debugDefaultTargetPlatformOverride = null;
     });
 
