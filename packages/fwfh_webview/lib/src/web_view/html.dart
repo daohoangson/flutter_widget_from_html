@@ -27,6 +27,7 @@ class WebViewState extends State<WebView> {
     ui.platformViewRegistry
         .registerViewFactory(viewType, (_) => _iframeElement);
 
+    // TODO: switch to `webview_flutter_web` when it's endorsed
     _iframeWidget = HtmlElementView(viewType: viewType);
   }
 
