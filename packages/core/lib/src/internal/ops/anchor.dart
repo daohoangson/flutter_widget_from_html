@@ -8,15 +8,25 @@ class AnchorRegistry {
   final _indexByAnchor = <Key, _AnchorBodyItemIndex>{};
 
   Widget buildBodyItem(BuildContext context, int index, Widget widget) {
-    if (index >= _bodyItemKeys.length) {
+    final header = index * 2;
+    final footer = index * 2 + 1;
+    if (footer >= _bodyItemKeys.length) {
       return widget;
     }
 
     return _BodyItemWidget(
       index: index,
-      key: _bodyItemKeys[index],
       registry: this,
-      child: widget,
+      child: Stack(
+        children: [
+          widget,
+          SizedBox.shrink(key: _bodyItemKeys[header]),
+          Positioned(
+            bottom: 0,
+            child: SizedBox.shrink(key: _bodyItemKeys[footer]),
+          ),
+        ],
+      ),
     );
   }
 
@@ -82,15 +92,19 @@ class AnchorRegistry {
 
     var movedOk = false;
     if (anchorMin < effectiveMin) {
+      // target is above: scroll the header to the bottom of viewport
+      final header = _bodyItemKeys[currentMin * 2];
       movedOk = await _ensureVisibleContext(
-        _bodyItemKeys[currentMin].currentContext,
+        header.currentContext,
         alignment: 1.0,
         curve: jumpCurve,
         duration: jumpDuration,
       );
     } else if (anchorMax > effectiveMax) {
+      // target is above: scroll the footer to the top of viewport
+      final footer = _bodyItemKeys[currentMax * 2 + 1];
       movedOk = await _ensureVisibleContext(
-        _bodyItemKeys[currentMax].currentContext,
+        footer.currentContext,
         curve: jumpCurve,
         duration: jumpDuration,
       );
@@ -145,7 +159,8 @@ class AnchorRegistry {
     }
 
     for (var i = 0; i < widgets.length; i++) {
-      _bodyItemKeys.add(GlobalKey(debugLabel: i.toString()));
+      _bodyItemKeys.add(GlobalKey(debugLabel: 'anchor-$i--header'));
+      _bodyItemKeys.add(GlobalKey(debugLabel: 'anchor-$i--footer'));
 
       final childAnchors = widgets[i].anchors;
       if (childAnchors != null) {
