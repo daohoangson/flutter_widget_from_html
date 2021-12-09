@@ -151,7 +151,6 @@ class HelloWorldScreen extends StatelessWidget {
           actions: const [
             PopupMenu(
               scrollToTop: true,
-              toggleIsSelectable: true,
             ),
           ],
         ),
@@ -160,7 +159,6 @@ class HelloWorldScreen extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: HtmlWidget(
               kHtml,
-              isSelectable: context.isSelectable,
               key: context.key,
               // ignore: deprecated_member_use
               webView: true,

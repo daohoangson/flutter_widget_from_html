@@ -328,22 +328,6 @@ void main() {
     });
   });
 
-  group('isSelectable', () {
-    const html = 'Foo';
-
-    testWidgets('renders RichText', (WidgetTester tester) async {
-      final hw = HtmlWidget(html, key: helper.hwKey);
-      final explained = await explain(tester, hw);
-      expect(explained, equals('[RichText:(:Foo)]'));
-    });
-
-    testWidgets('renders SelectableText', (WidgetTester tester) async {
-      final hw = HtmlWidget(html, isSelectable: true, key: helper.hwKey);
-      final explained = await explain(tester, hw);
-      expect(explained, equals('[SelectableText:(:Foo)]'));
-    });
-  });
-
   group('onErrorBuilder', () {
     Future<String?> explain(
       WidgetTester tester, {

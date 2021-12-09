@@ -3,8 +3,6 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:provider/provider.dart';
 
 extension PopupBuildContext on BuildContext {
-  bool get isSelectable => _watch.value.isSelectable;
-
   GlobalKey<HtmlWidgetState> get key => _watch.value.key;
 
   bool get showPerformanceOverlay => _watch.value.showPerformanceOverlay;
@@ -17,13 +15,11 @@ extension PopupBuildContext on BuildContext {
 class PopupMenu extends StatelessWidget {
   final bool scrollToTop;
   final bool showPerfOverlay;
-  final bool toggleIsSelectable;
 
   const PopupMenu({
     Key key,
     this.scrollToTop = false,
     this.showPerfOverlay = true,
-    this.toggleIsSelectable = false,
   }) : super(key: key);
 
   @override
@@ -41,9 +37,6 @@ class PopupMenu extends StatelessWidget {
             notifier.value = value.copyWith(
               showPerformanceOverlay: !value.showPerformanceOverlay,
             );
-            break;
-          case _PopupMenuValue.toggleIsSelectable:
-            notifier.value = value.copyWith(isSelectable: !value.isSelectable);
             break;
         }
       },
@@ -63,14 +56,6 @@ class PopupMenu extends StatelessWidget {
               child: _CheckBoxMenuItem(
                 title: 'showPerformanceOverlay',
                 value: value.showPerformanceOverlay,
-              ),
-            ),
-          if (toggleIsSelectable)
-            PopupMenuItem(
-              value: _PopupMenuValue.toggleIsSelectable,
-              child: _CheckBoxMenuItem(
-                title: 'isSelectable',
-                value: value.isSelectable,
               ),
             ),
         ];
@@ -118,12 +103,10 @@ class _CheckBoxMenuItem extends StatelessWidget {
 
 @immutable
 class _PopupMenuState {
-  final bool isSelectable;
   final GlobalKey<HtmlWidgetState> key;
   final bool showPerformanceOverlay;
 
   _PopupMenuState({
-    this.isSelectable = false,
     GlobalKey<HtmlWidgetState> key,
     this.showPerformanceOverlay = false,
   }) : key = key ?? GlobalKey<HtmlWidgetState>();
@@ -133,7 +116,6 @@ class _PopupMenuState {
     bool showPerformanceOverlay,
   }) =>
       _PopupMenuState(
-        isSelectable: isSelectable ?? this.isSelectable,
         showPerformanceOverlay:
             showPerformanceOverlay ?? this.showPerformanceOverlay,
       );
@@ -142,5 +124,4 @@ class _PopupMenuState {
 enum _PopupMenuValue {
   scrollToTop,
   showPerformanceOverlay,
-  toggleIsSelectable,
 }
