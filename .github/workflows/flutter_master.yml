@@ -1,11 +1,11 @@
-name: Flutter@dev
+name: Flutter@master
 on:
   push:
     branches:
-      - release/dev
+      - release/master
   pull_request:
     branches:
-      - release/dev
+      - release/master
 
 jobs:
   unit_test:
@@ -16,5 +16,5 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
-          channel: dev
+          channel: master
       - run: ./tool/test.sh
