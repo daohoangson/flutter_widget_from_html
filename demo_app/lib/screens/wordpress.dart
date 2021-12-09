@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:demo_app/widgets/popup_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:http/http.dart' as http;
@@ -65,6 +66,7 @@ class _PostScreen extends StatelessWidget {
               icon: const Icon(Icons.open_in_browser),
               onPressed: () => launch(post.link),
             ),
+            const PopupMenu(),
           ],
         ),
         body: Padding(
@@ -81,7 +83,9 @@ class _PostScreen extends StatelessWidget {
                     ),
                   ),
                 const SizedBox(height: 8),
-                HtmlWidget(post.content),
+                HtmlWidget(
+                  post.content,
+                ),
               ],
             ),
           ),
