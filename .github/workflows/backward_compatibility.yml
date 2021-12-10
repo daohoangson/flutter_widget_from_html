@@ -52,16 +52,19 @@ jobs:
           # replace:
           #   foo: ">=1.0.0" 
           #   bar: ">=2.0.0 <4.0.0"
+          #   yolo: ">=3.0.0-0"
           # into:
           #   foo: 1.0.0
           #   bar: 2.0.0
+          #   yolo: ">=3.0.0-0" (unchanged)
           sed -i'' -e 's#^\(  [^:]*\): ">=\([0-9.]*\)\( <.*\)\{0,1\}"$#\1: \2#' pubspec.yaml
 
           # restore SDK constraint
           yq e ".environment.sdk = \"${_sdkVersion}\"" -i pubspec.yaml
 
           # extract Flutter version to install later
-          _flutterVersion=$( yq e '.environment.flutter' pubspec.yaml )
+          # the additional `sed` command helps trimming ">=2.8.0-0" into "2.8.0"
+          _flutterVersion=$( yq e '.environment.flutter' pubspec.yaml | sed -e 's#>=\(.*\)-0#\1#' )
           echo "FLUTTER_VERSION=${_flutterVersion}" >> $GITHUB_ENV
 
           # output for debugging
