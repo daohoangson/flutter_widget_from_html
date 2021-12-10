@@ -223,14 +223,14 @@ packages:
       path: "../packages/enhanced"
       relative: true
     source: path
-    version: "0.8.2"
+    version: "0.8.3"
   flutter_widget_from_html_core:
     dependency: "direct main"
     description:
       path: "../packages/core"
       relative: true
     source: path
-    version: "0.8.2"
+    version: "0.8.3"
   frontend_server_client:
     dependency: transitive
     description:
@@ -277,7 +277,7 @@ packages:
       path: "../packages/fwfh_text_style"
       relative: true
     source: path
-    version: "2.7.0"
+    version: "2.7.0+1"
   fwfh_url_launcher:
     dependency: "direct main"
     description:
@@ -522,7 +522,7 @@ packages:
       name: photo_view
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.10.3"
+    version: "0.13.0"
   platform:
     dependency: transitive
     description:
