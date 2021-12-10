@@ -1,3 +1,12 @@
+## 0.8.3
+
+- Add support for Flutter@2.8 (#655)
+- New package: `fwfh_text_style` (#628)
+- Allow `HtmlWidget.textStyle` to be null (#632)
+- Fix detached sub-tree still being built (#650)
+- Fix bug text-align with padding (#651)
+- Fix anchor being stuck (#659)
+
 ## 0.8.2
 
 - Optimize `HtmlListMarker` (#623)
