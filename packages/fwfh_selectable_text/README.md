@@ -14,7 +14,7 @@ Add this to your app's `pubspec.yaml` file:
 ```yaml
 dependencies:
   flutter_widget_from_html_core: any
-  fwfh_selectable_text: ^0.8.2
+  fwfh_selectable_text: ^0.8.3
 ```
 
 ## Usage
