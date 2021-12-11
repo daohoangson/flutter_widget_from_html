@@ -251,7 +251,7 @@ packages:
     source: path
     version: "0.7.0+2"
   fwfh_chewie:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       path: "../packages/fwfh_chewie"
       relative: true
@@ -293,7 +293,7 @@ packages:
     source: path
     version: "0.6.1+3"
   fwfh_webview:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       path: "../packages/fwfh_webview"
       relative: true
