@@ -24,7 +24,7 @@ class StyleTextAlign {
         onTree: (meta, _) => meta.tsb.enqueue(_tsb, value),
         onWidgets: (_, widgets) => _onWidgets(widgets, value),
         onWidgetsIsOptional: true,
-        priority: 4200,
+        priority: 0,
       );
 
   static Iterable<Widget> _onWidgets(Iterable<Widget> widgets, String value) {
@@ -46,7 +46,7 @@ class StyleTextAlign {
   }
 
   static Widget _block(BuildContext _, Widget child) =>
-      child is CssBlock ? child : _TextAlignBlock(child);
+      child is CssBlock ? child : CssBlock(child: child);
 
   static Widget _center(BuildContext _, Widget child) =>
       _TextAlignCenter(child);
@@ -79,11 +79,6 @@ class StyleTextAlign {
 
     return textAlign == null ? tsh : tsh.copyWith(textAlign: textAlign);
   }
-}
-
-class _TextAlignBlock extends CssBlock {
-  const _TextAlignBlock(Widget child, {Key? key})
-      : super(child: child, key: key);
 }
 
 class _TextAlignCenter extends Center {

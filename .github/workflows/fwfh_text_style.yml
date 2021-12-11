@@ -10,11 +10,11 @@ jobs:
       matrix:
         channel:
           - beta
-          - dev
+          - master
 
     # Run these tests on new commits on the `master` branch.
     # In case one of these fails, create a new PR against the `release/*` branch
-    # and publish a new beta/dev version to make sure there is a compatible version
+    # and publish a new version to make sure there is a compatible version
     # of `fwfh_text_style` for all active Flutter versions.
     name: Test on ${{ matrix.channel }} channel
     runs-on: ubuntu-latest

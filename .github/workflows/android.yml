@@ -1,11 +1,11 @@
 name: Android Test
 on:
   push:
-    paths: 
+    paths:
       - .github/workflows/android.yml
-      - 'packages/fwfh_chewie/lib/src/video_player/**'
-      - 'packages/fwfh_webview/lib/src/web_view/**'
-      - 'tool/sylph/**'
+      - "packages/fwfh_chewie/lib/src/video_player/**"
+      - "packages/fwfh_webview/lib/src/web_view/**"
+      - "tool/sylph/**"
 
 jobs:
   sylph:
@@ -28,3 +28,7 @@ jobs:
           sudo snap install yq
 
           exec ./tool/sylph/sylph.sh
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          path: /tmp/sylph_artifacts
