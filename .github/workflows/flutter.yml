@@ -1,13 +1,13 @@
 name: Flutter
 on:
   push:
-    branches:
-      - master
-      - next
+    branches-ignore:
+      - release/beta
+      - release/master
   pull_request:
-    branches:
-      - master
-      - next
+    branches-ignore:
+      - release/beta
+      - release/master
 
 jobs:
   analyze:
