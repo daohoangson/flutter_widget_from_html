@@ -14,6 +14,7 @@ class HelloWorldCoreScreen extends StatelessWidget {
           actions: const [
             PopupMenu(
               scrollToTop: true,
+              toggleIsSelectable: true,
             ),
           ],
         ),
@@ -22,6 +23,7 @@ class HelloWorldCoreScreen extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: HtmlWidget(
               enhanced.kHtml,
+              isSelectable: context.isSelectable,
               key: context.key,
             ),
           ),
