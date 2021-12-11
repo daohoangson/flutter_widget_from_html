@@ -94,7 +94,6 @@ class HtmlWidget extends core.HtmlWidget {
           customWidgetBuilder: customWidgetBuilder,
           enableCaching: enableCaching,
           factoryBuilder: factoryBuilder ?? _getEnhancedWf,
-          isSelectable: isSelectable,
           onErrorBuilder: onErrorBuilder,
           onLoadingBuilder: onLoadingBuilder,
           onTapImage: onTapImage,
