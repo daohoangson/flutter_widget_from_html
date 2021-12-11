@@ -1,3 +1,7 @@
+## 0.8.3+1
+
+- Expose `BuildMetadata.maxLines` and `.overflow`
+
 ## 0.8.3
 
 - Add support for Flutter@2.8 (#655)
