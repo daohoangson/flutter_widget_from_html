@@ -16,8 +16,8 @@ jobs:
           - enhanced
           - fwfh_cached_network_image
           - fwfh_chewie
+          - fwfh_selectable_text
           - fwfh_svg
-          - fwfh_text_style
           - fwfh_url_launcher
           - fwfh_webview
 
@@ -63,8 +63,7 @@ jobs:
           yq e ".environment.sdk = \"${_sdkVersion}\"" -i pubspec.yaml
 
           # extract Flutter version to install later
-          # the additional `sed` command helps trimming ">=2.8.0-0" into "2.8.0"
-          _flutterVersion=$( yq e '.environment.flutter' pubspec.yaml | sed -e 's#>=\(.*\)-0#\1#' )
+          _flutterVersion=$( yq e '.environment.flutter' pubspec.yaml )
           echo "FLUTTER_VERSION=${_flutterVersion}" >> $GITHUB_ENV
 
           # output for debugging

@@ -12,6 +12,7 @@ This repo contains the source code for everything `HtmlWidget`-related.
 | [fwfh_cached_network_image](./packages/fwfh_cached_network_image/) | [![pub package](https://img.shields.io/pub/v/fwfh_cached_network_image.svg)](https://pub.dev/packages/fwfh_cached_network_image)         |
 | [fwfh_chewie](./packages/fwfh_chewie/)                             | [![pub package](https://img.shields.io/pub/v/fwfh_chewie.svg)](https://pub.dev/packages/fwfh_chewie)                                     |
 | [fwfh_just_audio](./packages/fwfh_just_audio/)                     | [![pub package](https://img.shields.io/pub/v/fwfh_just_audio.svg)](https://pub.dev/packages/fwfh_just_audio)                             |
+| [fwfh_selectable_text](./packages/fwfh_selectable_text/)           | [![pub package](https://img.shields.io/pub/v/fwfh_selectable_text.svg)](https://pub.dev/packages/fwfh_selectable_text)                   |
 | [fwfh_svg](./packages/fwfh_svg/)                                   | [![pub package](https://img.shields.io/pub/v/fwfh_svg.svg)](https://pub.dev/packages/fwfh_svg)                                           |
 | [fwfh_url_launcher](./packages/fwfh_url_launcher/)                 | [![pub package](https://img.shields.io/pub/v/fwfh_url_launcher.svg)](https://pub.dev/packages/fwfh_url_launcher)                         |
 | [fwfh_webview](./packages/fwfh_webview/)                           | [![pub package](https://img.shields.io/pub/v/fwfh_webview.svg)](https://pub.dev/packages/fwfh_webview)                                   |
