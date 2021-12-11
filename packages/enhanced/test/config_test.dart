@@ -342,6 +342,17 @@ void main() {
       final explained = await explain(tester, hw);
       expect(explained, equals('[SelectableText:(:Foo)]'));
     });
+
+    testWidgets('renders onSelectionChanged', (WidgetTester tester) async {
+      final hw = HtmlWidget(
+        html,
+        isSelectable: true,
+        key: helper.hwKey,
+        onSelectionChanged: (_, __) {},
+      );
+      final explained = await explain(tester, hw);
+      expect(explained, equals('[SelectableText:+onSelectionChanged,(:Foo)]'));
+    });
   });
 
   group('onErrorBuilder', () {

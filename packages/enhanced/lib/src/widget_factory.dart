@@ -29,6 +29,10 @@ class WidgetFactory extends core.WidgetFactory
   bool get selectableText => _widget?.isSelectable == true;
 
   @override
+  SelectionChangedCallback? get selectableTextOnChanged =>
+      _widget?.onSelectionChanged;
+
+  @override
   bool get webView => _widget?.webView == true;
 
   @override

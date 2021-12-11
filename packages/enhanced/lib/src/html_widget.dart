@@ -19,6 +19,13 @@ class HtmlWidget extends core.HtmlWidget {
   /// Default: `false`, use [RichText].
   final bool isSelectable;
 
+  /// The callback when user changes the selection of text.
+  ///
+  /// This doesn't have any effect if [isSelectable] is disabled.
+  ///
+  /// See [SelectableText.onSelectionChanged].
+  final SelectionChangedCallback? onSelectionChanged;
+
   /// Controls whether IFRAME is rendered as [WebView].
   ///
   /// See [WidgetFactory.webView].
@@ -64,6 +71,7 @@ class HtmlWidget extends core.HtmlWidget {
     CustomWidgetBuilder? customWidgetBuilder,
     OnErrorBuilder? onErrorBuilder,
     OnLoadingBuilder? onLoadingBuilder,
+    this.onSelectionChanged,
     void Function(ImageMetadata)? onTapImage,
     FutureOr<bool> Function(String)? onTapUrl,
     core.RebuildTriggers? rebuildTriggers,
