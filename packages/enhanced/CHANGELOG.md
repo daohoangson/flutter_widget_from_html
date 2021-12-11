@@ -1,3 +1,9 @@
+## 0.8.3+1
+
+- Add support for `HtmlWidget.isSelectable` (#631)
+- Add support for `HtmlWidget.onSelectionChanged` (#672)
+- New package: `fwfh_selectable_text` (#672)
+
 ## 0.8.3
 
 - Add support for Flutter@2.8 (#655)
