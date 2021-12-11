@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core show HtmlWidget, RebuildTriggers;
 
@@ -14,6 +14,11 @@ export 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 /// A widget that builds Flutter widget tree from HTML
 /// with support for IFRAME, VIDEO and many other tags.
 class HtmlWidget extends core.HtmlWidget {
+  /// Controls whether text is rendered with [SelectableText] or [RichText].
+  ///
+  /// Default: `false`, use [RichText].
+  final bool isSelectable;
+
   /// Controls whether IFRAME is rendered as [WebView].
   ///
   /// See [WidgetFactory.webView].
@@ -23,25 +28,25 @@ class HtmlWidget extends core.HtmlWidget {
   /// Controls whether debugging is enabled in WebViews.
   ///
   /// See [WidgetFactory.webViewDebuggingEnabled].
-  @Deprecated("Override WidgetFactory.webView instead")
+  @Deprecated("Override WidgetFactory.webViewDebuggingEnabled instead")
   final bool webViewDebuggingEnabled;
 
   /// Controls whether to enable JavaScript in WebViews.
   ///
   /// See [WidgetFactory.webViewJs].
-  @Deprecated("Override WidgetFactory.webView instead")
+  @Deprecated("Override WidgetFactory.webViewJs instead")
   final bool webViewJs;
 
   /// Controls whether to always allow media playback in WebViews.
   ///
   /// See [WidgetFactory.webViewMediaPlaybackAlwaysAllow].
-  @Deprecated("Override WidgetFactory.webView instead")
+  @Deprecated("Override WidgetFactory.webViewMediaPlaybackAlwaysAllow instead")
   final bool webViewMediaPlaybackAlwaysAllow;
 
   /// The value used for the HTTP `User-Agent` request header in WebViews.
   ///
   /// See [WidgetFactory.webViewUserAgent].
-  @Deprecated("Override WidgetFactory.webView instead")
+  @Deprecated("Override WidgetFactory.webViewUserAgent instead")
   final String? webViewUserAgent;
 
   /// Creates a widget that builds Flutter widget tree from html.
@@ -52,7 +57,7 @@ class HtmlWidget extends core.HtmlWidget {
     bool? buildAsync,
     bool enableCaching = true,
     WidgetFactory Function()? factoryBuilder,
-    bool isSelectable = false,
+    this.isSelectable = false,
     Key? key,
     Uri? baseUrl,
     CustomStylesBuilder? customStylesBuilder,
@@ -81,7 +86,6 @@ class HtmlWidget extends core.HtmlWidget {
           customWidgetBuilder: customWidgetBuilder,
           enableCaching: enableCaching,
           factoryBuilder: factoryBuilder ?? _getEnhancedWf,
-          isSelectable: isSelectable,
           onErrorBuilder: onErrorBuilder,
           onLoadingBuilder: onLoadingBuilder,
           onTapImage: onTapImage,

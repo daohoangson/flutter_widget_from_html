@@ -640,6 +640,12 @@ class Explainer {
       );
     }
 
+    if (widget is SelectableText) {
+      if (widget.onSelectionChanged != null) {
+        attr.add('+onSelectionChanged');
+      }
+    }
+
     if (widget is Tooltip) {
       attr.add('message=${widget.message}');
     }
