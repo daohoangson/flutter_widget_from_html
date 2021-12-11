@@ -66,7 +66,9 @@ class _PostScreen extends StatelessWidget {
               icon: const Icon(Icons.open_in_browser),
               onPressed: () => launch(post.link),
             ),
-            const PopupMenu(),
+            const PopupMenu(
+              toggleIsSelectable: true,
+            ),
           ],
         ),
         body: Padding(
@@ -85,6 +87,7 @@ class _PostScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 HtmlWidget(
                   post.content,
+                  isSelectable: context.isSelectable,
                 ),
               ],
             ),
