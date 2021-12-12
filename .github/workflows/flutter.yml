@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - next
   pull_request:
     branches-ignore:
       - release/beta
