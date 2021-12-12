@@ -30,7 +30,7 @@ void main() {
 
     group('onTree', () {
       testWidgets('renders additional text', (tester) async {
-        const html = '<span>Foo</span>';
+        const html = '<span class="text">Foo</span>';
         final explained = await explain(
           tester,
           null,
@@ -43,14 +43,60 @@ void main() {
         expect(explained, equals('[RichText:(:Foo bar)]'));
       });
 
-      testWidgets('renders widget', (tester) async {
-        const html = '<span>Foo</span>';
+      testWidgets('renders block widget', (tester) async {
+        const html = '<span class="widget-block">Foo</span>';
         final explained = await explain(
           tester,
           null,
           hw: HtmlWidget(
             html,
-            factoryBuilder: () => _BuildOpOnTreeWidget(),
+            factoryBuilder: () => _BuildOpOnTreeWidgetBlock(),
+            key: hwKey,
+          ),
+          useExplainer: false,
+        );
+        expect(
+          explained,
+          equals(
+            'TshWidget\n'
+            '└WidgetPlaceholder\n'
+            ' └Text("hi")\n'
+            '  └RichText(text: "hi")\n\n',
+          ),
+        );
+      });
+
+      testWidgets('renders block widget over div', (tester) async {
+        const html = '<div class="widget-block"><div>Foo</div></div>';
+        final explained = await explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            html,
+            factoryBuilder: () => _BuildOpOnTreeWidgetBlock(),
+            key: hwKey,
+          ),
+          useExplainer: false,
+        );
+        expect(
+          explained,
+          equals(
+            'TshWidget\n'
+            '└WidgetPlaceholder\n'
+            ' └Text("hi")\n'
+            '  └RichText(text: "hi")\n\n',
+          ),
+        );
+      });
+
+      testWidgets('renders inline widget', (tester) async {
+        const html = '<span class="widget-inline">bar</span>';
+        final explained = await explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            html,
+            factoryBuilder: () => _BuildOpOnTreeWidgetInline(),
             key: hwKey,
           ),
           useExplainer: false,
@@ -138,21 +184,44 @@ class _BuildOpDefaultStyles extends WidgetFactory {
 class _BuildOpOnTreeText extends WidgetFactory {
   @override
   void parse(BuildMetadata meta) {
-    meta.register(BuildOp(onTree: (_, tree) => tree.addText(' bar')));
+    if (meta.element.classes.contains('text')) {
+      meta.register(BuildOp(onTree: (_, tree) => tree.addText(' bar')));
+    }
+
     return super.parse(meta);
   }
 }
 
-class _BuildOpOnTreeWidget extends WidgetFactory {
+class _BuildOpOnTreeWidgetBlock extends WidgetFactory {
   @override
   void parse(BuildMetadata meta) {
-    meta.register(
-      BuildOp(
-        onTree: (_, tree) {
-          tree.replaceWith(WidgetBit.inline(tree, const Text('hi')));
-        },
-      ),
-    );
+    if (meta.element.classes.contains('widget-block')) {
+      meta.register(
+        BuildOp(
+          onTree: (_, tree) {
+            tree.replaceWith(WidgetBit.block(tree, const Text('hi')));
+          },
+        ),
+      );
+    }
+
+    return super.parse(meta);
+  }
+}
+
+class _BuildOpOnTreeWidgetInline extends WidgetFactory {
+  @override
+  void parse(BuildMetadata meta) {
+    if (meta.element.classes.contains('widget-inline')) {
+      meta.register(
+        BuildOp(
+          onTree: (_, tree) {
+            tree.replaceWith(WidgetBit.inline(tree, const Text('hi')));
+          },
+        ),
+      );
+    }
+
     return super.parse(meta);
   }
 }

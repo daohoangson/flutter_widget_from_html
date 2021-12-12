@@ -36,7 +36,7 @@ Future<void> main() async {
         explained,
         equals(
           '[Column:children='
-          '[_TextAlignBlock:child=[RichText:align=center,(:Caption)]],'
+          '[CssBlock:child=[RichText:align=center,(:Caption)]],'
           '[HtmlTable:children='
           '${_padding('[RichText:(+b:Header 1)]')},'
           '${_padding('[RichText:(+b:Header 2)]')},'
@@ -55,7 +55,7 @@ Future<void> main() async {
           'HtmlStyleWidget\n'
           '└ColumnPlaceholder(root)\n'
           ' └Column()\n'
-          '  ├_TextAlignBlock()\n'
+          '  ├CssBlock()\n'
           '  │└RichText(textAlign: center, text: "Caption")\n'
           '  └HtmlTable(borderSpacing: 2.0)\n'
           '   ├HtmlTableCell(columnStart: 0, rowStart: 0)\n'
@@ -134,7 +134,7 @@ Future<void> main() async {
         equals(
           '[HtmlTable:children='
           '${_padding('[RichText:(+b:Header 1)]')},'
-          '[HtmlTableCell:child=[Align:alignment=centerLeft,child=[_TextAlignBlock:child=[Padding:(1,1,1,1),child=[RichText:align=center,(+b:Header 2)]]]]],'
+          '[HtmlTableCell:child=[Align:alignment=centerLeft,child=[Padding:(1,1,1,1),child=[CssBlock:child=[RichText:align=center,(+b:Header 2)]]]]],'
           '${_padding('[RichText:(:Value (+i:1))]')},'
           '${_padding('[RichText:(+b:Value 2)]')}'
           ']',
@@ -174,7 +174,7 @@ Future<void> main() async {
         equals(
           '[HtmlTable:children='
           '${_padding('[RichText:align=right,(+b:Header 1)]')},'
-          '[HtmlTableCell:child=[Align:alignment=centerLeft,child=[_TextAlignBlock:child=[Padding:(1,1,1,1),child=[RichText:align=center,(+b:Header 2)]]]]],'
+          '[HtmlTableCell:child=[Align:alignment=centerLeft,child=[Padding:(1,1,1,1),child=[CssBlock:child=[RichText:align=center,(+b:Header 2)]]]]],'
           '${_padding('[RichText:align=right,(:Value (+i:1))]')},'
           '${_padding('[RichText:align=right,(+b:Value 2)]')}'
           ']',
@@ -626,7 +626,7 @@ Future<void> main() async {
       explained,
       equals(
         '[Column:children='
-        '[_TextAlignBlock:child=[RichText:align=center,(:Caption)]],'
+        '[CssBlock:child=[RichText:align=center,(:Caption)]],'
         '[HtmlTable:children='
         '[HtmlTableCell:child=[RichText:(+b:Header 1)]],'
         '[HtmlTableCell:child=[RichText:(+b:Header 2)]],'

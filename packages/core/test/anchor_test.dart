@@ -57,8 +57,9 @@ Future<void> main() async {
         ),
         useExplainer: false,
       );
-      expect(explained, contains('BodyItemWidget-[GlobalKey 0]'));
-      expect(explained, contains('SizedBox-[GlobalKey foo]'));
+      expect(explained, contains('[GlobalKey anchor-0--header]'));
+      expect(explained, contains('[GlobalKey anchor-0--footer]'));
+      expect(explained, contains('[GlobalKey foo]'));
     });
 
     testWidgets('renders in SliverList', (WidgetTester tester) async {
@@ -77,8 +78,9 @@ Future<void> main() async {
         ),
         useExplainer: false,
       );
-      expect(explained, contains('BodyItemWidget-[GlobalKey 0]'));
-      expect(explained, contains('SizedBox-[GlobalKey foo]'));
+      expect(explained, contains('[GlobalKey anchor-0--header]'));
+      expect(explained, contains('[GlobalKey anchor-0--footer]'));
+      expect(explained, contains('[GlobalKey foo]'));
     });
   });
 

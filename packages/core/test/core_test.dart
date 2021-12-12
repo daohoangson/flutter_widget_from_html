@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 
@@ -948,6 +949,21 @@ Future<void> main() async {
       expect(e, equals('[CssBlock:child=[RichText:(:1 [RichText:(:2)])]]'));
     });
 
+    testWidgets('#646: renders onWidgets inline', (WidgetTester tester) async {
+      const html = '<span style="display:inline-block;">Foo</span>';
+      final explained = await explain(
+        tester,
+        null,
+        hw: HtmlWidget(
+          html,
+          factoryBuilder: () => _InlineBlockOnWidgetsFactory(),
+          key: hwKey,
+        ),
+      );
+
+      expect(explained, equals('[Text:Bar]'));
+    });
+
     testWidgets('renders display: none', (WidgetTester tester) async {
       const html = '<div>1 <div style="display: none">2</div></div>';
       final explained = await explain(tester, html);
@@ -1566,4 +1582,18 @@ Future<void> main() async {
       });
     });
   });
+}
+
+class _InlineBlockOnWidgetsFactory extends WidgetFactory {
+  @override
+  void parse(BuildMetadata meta) {
+    if (meta.element.localName == 'span') {
+      meta.register(
+        BuildOp(
+          onWidgets: (_, __) => const [Text('Bar')],
+        ),
+      );
+    }
+    super.parse(meta);
+  }
 }

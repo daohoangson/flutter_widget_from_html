@@ -17,4 +17,10 @@ jobs:
         uses: subosito/flutter-action@v1
         with:
           channel: beta
-      - run: ./tool/test.sh
+      - run: ./tool/test.sh --coverage
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: failures
+          path: demo_app/test/failures/
+      - uses: codecov/codecov-action@v2

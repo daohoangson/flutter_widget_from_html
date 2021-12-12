@@ -44,6 +44,33 @@ void main() {
   const platformViewsMc = MethodChannel('flutter/platform_views');
   platformViewsMc.setMockMethodCallHandler((_) async {});
 
+  for (final name in [
+    'dev.flutter.pigeon.DownloadListenerHostApi.create',
+    'dev.flutter.pigeon.WebChromeClientHostApi.create',
+    'dev.flutter.pigeon.WebSettingsHostApi.create',
+    'dev.flutter.pigeon.WebSettingsHostApi.setBuiltInZoomControls',
+    'dev.flutter.pigeon.WebSettingsHostApi.setDisplayZoomControls',
+    'dev.flutter.pigeon.WebSettingsHostApi.setDomStorageEnabled',
+    'dev.flutter.pigeon.WebSettingsHostApi.setJavaScriptCanOpenWindowsAutomatically',
+    'dev.flutter.pigeon.WebSettingsHostApi.setJavaScriptEnabled',
+    'dev.flutter.pigeon.WebSettingsHostApi.setLoadWithOverviewMode',
+    'dev.flutter.pigeon.WebSettingsHostApi.setMediaPlaybackRequiresUserGesture',
+    'dev.flutter.pigeon.WebSettingsHostApi.setSupportMultipleWindows',
+    'dev.flutter.pigeon.WebSettingsHostApi.setSupportZoom',
+    'dev.flutter.pigeon.WebSettingsHostApi.setUseWideViewPort',
+    'dev.flutter.pigeon.WebSettingsHostApi.setUserAgentString',
+    'dev.flutter.pigeon.WebViewClientHostApi.create',
+    'dev.flutter.pigeon.WebViewHostApi.create',
+    'dev.flutter.pigeon.WebViewHostApi.loadUrl',
+    'dev.flutter.pigeon.WebViewHostApi.setDownloadListener',
+    'dev.flutter.pigeon.WebViewHostApi.setWebChromeClient',
+    'dev.flutter.pigeon.WebViewHostApi.setWebContentsDebuggingEnabled',
+    'dev.flutter.pigeon.WebViewHostApi.setWebViewClient',
+  ]) {
+    BasicMessageChannel(name, const StandardMessageCodec())
+        .setMockMessageHandler((input) async => {'foo': 'bar'});
+  }
+
   final json = File('test/goldens.json').readAsStringSync();
   final map = jsonDecode(json) as Map<String, dynamic>;
   for (final entry in map.entries) {

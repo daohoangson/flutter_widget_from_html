@@ -16,8 +16,8 @@ jobs:
           - enhanced
           - fwfh_cached_network_image
           - fwfh_chewie
+          - fwfh_selectable_text
           - fwfh_svg
-          - fwfh_text_style
           - fwfh_url_launcher
           - fwfh_webview
 
@@ -52,9 +52,11 @@ jobs:
           # replace:
           #   foo: ">=1.0.0" 
           #   bar: ">=2.0.0 <4.0.0"
+          #   yolo: ">=3.0.0-0"
           # into:
           #   foo: 1.0.0
           #   bar: 2.0.0
+          #   yolo: ">=3.0.0-0" (unchanged)
           sed -i'' -e 's#^\(  [^:]*\): ">=\([0-9.]*\)\( <.*\)\{0,1\}"$#\1: \2#' pubspec.yaml
 
           # restore SDK constraint

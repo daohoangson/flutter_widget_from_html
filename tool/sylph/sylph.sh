@@ -25,14 +25,16 @@ _updateDep() {
   yq e ".dependency_overrides.$__package.git.path = \"$__path\"" -i $__yaml
   yq e "del(.dependency_overrides.$__package.path)" -i $__yaml
 }
-_updateDep 'flutter_widget_from_html' 'packages/enhanced'
 _updateDep 'flutter_widget_from_html_core' 'packages/core'
 _updateDep 'fwfh_cached_network_image'
 _updateDep 'fwfh_chewie'
 _updateDep 'fwfh_just_audio'
+_updateDep 'fwfh_selectable_text'
 _updateDep 'fwfh_svg'
+_updateDep 'fwfh_text_style'
 _updateDep 'fwfh_url_launcher'
 _updateDep 'fwfh_webview'
+_updateDep 'flutter_widget_from_html' 'packages/enhanced'
 
 flutter pub get
 
