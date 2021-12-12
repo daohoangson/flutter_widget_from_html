@@ -251,7 +251,7 @@ class Builder extends BuildTree implements BuildMetadata {
     final element = domNode as dom.Element;
     final customWidget = customWidgetBuilder?.call(element);
     if (customWidget != null) {
-      add(WidgetBit.block(this, customWidget));
+      append(WidgetBit.block(this, customWidget));
       // skip further processing if a custom widget found
       return;
     }
@@ -262,7 +262,7 @@ class Builder extends BuildTree implements BuildMetadata {
 
     if (subTree.buildOps.where(_opRequiresBuildingSubtree).isNotEmpty) {
       for (final widget in subTree.build()) {
-        add(WidgetBit.block(this, widget));
+        append(WidgetBit.block(this, widget));
       }
     } else {
       append(subTree);

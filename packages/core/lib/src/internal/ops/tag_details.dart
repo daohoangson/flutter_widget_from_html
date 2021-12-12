@@ -18,14 +18,12 @@ class TagDetails {
 
     _summaryOp = BuildOp(
       onTree: (meta, tree) {
-        final children = tree.children;
-        if (children.isEmpty) {
+        if (tree.isEmpty) {
           return;
         }
 
-        final first = children.first;
         final marker = WidgetBit.inline(
-          first.parent!,
+          tree,
           WidgetPlaceholder(
             builder: (context, child) {
               final tsh = meta.tsb.build(context);
@@ -34,7 +32,7 @@ class TagDetails {
             localName: kTagDetails,
           ),
         );
-        marker.insertBefore(first);
+        tree.prepend(marker);
       },
       onWidgets: (meta, widgets) {
         if (_summary != null) {

@@ -142,7 +142,6 @@ abstract class BuildTree extends BuildBit {
   static final _buffers = Expando<StringBuffer>();
 
   /// The list of direct children.
-  @protected
   final children = <BuildBit>[];
 
   /// Creates a tree.

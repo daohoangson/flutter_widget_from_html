@@ -89,7 +89,7 @@ void main() {
       final text = _text();
       final bit1 = text.addText('1');
       final text2 = text.sub();
-      text.add(text2);
+      text.append(text2);
       final bit21 = text2.addText('(2.1)');
       final bit22 = text2.addText('(2.2)');
       final bit3 = text.addText('3');
@@ -167,7 +167,7 @@ void main() {
       test('returns from sub', () {
         final text = _text();
         final text1 = text.sub();
-        text.add(text1);
+        text.append(text1);
         final bit11 = text1.addText('(1.1)');
         text1.addText('(1.2)');
         expect(_data(text), equals('(1.1)(1.2)'));
@@ -201,7 +201,7 @@ void main() {
       test('returns from sub', () {
         final text = _text();
         final text1 = text.sub();
-        text.add(text1);
+        text.append(text1);
         text1.addText('(1.1)');
         final bit12 = text1.addText('(1.2)');
         expect(_data(text), equals('(1.1)(1.2)'));
@@ -234,7 +234,7 @@ void main() {
 
       final text2 = _text();
       final copied = bit.copyWith(parent: text2);
-      text2.add(copied);
+      text2.append(copied);
       expect(_data(text2), equals('1'));
     });
 
@@ -254,7 +254,7 @@ void main() {
 
       final text2 = _text();
       final copied = bit.copyWith(parent: text2);
-      text2.add(copied);
+      text2.append(copied);
       expect(text2.build(), equals([child]));
     });
 
@@ -273,7 +273,7 @@ void main() {
       final text = root.sub();
       text.addText('1');
       final text1 = text.sub();
-      text.add(text1);
+      text.append(text1);
       text1.addText('2');
       text.addText('3');
       expect(
@@ -323,7 +323,7 @@ void main() {
       final text2 = _text();
       text2.addText('1');
       final copied = whitespace.copyWith(parent: text2);
-      text2.add(copied);
+      text2.append(copied);
       text2.addText('2');
       expect(_data(text2), equals('1 2'));
     });
@@ -334,17 +334,17 @@ void main() {
     text.addText('1');
     text.addWhitespace(' ');
     final text2 = text.sub();
-    text.add(text2);
+    text.append(text2);
     text2.addText('(2.1)');
     final text22 = text2.sub();
-    text2.add(text22);
+    text2.append(text22);
     text22.addText('(2.2.1)');
     text22.addText('(2.2.2)');
     text2.addText('(2.3)');
-    text.add(WidgetBit.block(text, const Text('Hi')));
-    text.add(WidgetBit.inline(text, const Text('Hi')));
-    text.add(_CustomBit(text));
-    text.add(_CircularBit(text));
+    text.append(WidgetBit.block(text, const Text('Hi')));
+    text.append(WidgetBit.inline(text, const Text('Hi')));
+    text.append(_CustomBit(text));
+    text.append(_CircularBit(text));
 
     expect(
       helper.simplifyHashCode(text.toString()),
@@ -411,21 +411,21 @@ class _BuildBitWidgetFactory extends WidgetFactory {
 
     if (classes.contains('output--InlineSpan')) {
       meta.register(
-        BuildOp(onTree: (_, tree) => tree.add(_OutputInlineSpanBit(tree))),
+        BuildOp(onTree: (_, tree) => tree.append(_OutputInlineSpanBit(tree))),
       );
     }
 
     if (classes.contains('output--String')) {
       meta.register(
         BuildOp(
-          onTree: (_, tree) => tree.add(_OutputStringBit(tree)),
+          onTree: (_, tree) => tree.append(_OutputStringBit(tree)),
         ),
       );
     }
 
     if (classes.contains('output--Widget')) {
       meta.register(
-        BuildOp(onTree: (_, tree) => tree.add(_OutputWidgetBit(tree))),
+        BuildOp(onTree: (_, tree) => tree.append(_OutputWidgetBit(tree))),
       );
     }
 

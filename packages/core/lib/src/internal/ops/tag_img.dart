@@ -56,7 +56,7 @@ class TagImg {
             return false;
           }
 
-          tree.add(
+          tree.append(
             WidgetBit.inline(
               tree,
               placeholder,
