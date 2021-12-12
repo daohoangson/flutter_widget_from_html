@@ -89,14 +89,3 @@ void wrapTree(
     append(last.parent!).insertAfter(last);
   }
 }
-
-extension RichTextMetadata on BuildMetadata {
-  static final _maxLines = Expando<int>();
-  static final _overflow = Expando<TextOverflow>();
-
-  int get maxLines => _maxLines[this] ?? -1;
-  set maxLines(int value) => _maxLines[this] = value;
-
-  TextOverflow get overflow => _overflow[this] ?? TextOverflow.clip;
-  set overflow(TextOverflow value) => _overflow[this] = value;
-}

@@ -640,6 +640,12 @@ class Explainer {
       );
     }
 
+    if (widget is SelectableText) {
+      if (widget.onSelectionChanged != null) {
+        attr.add('+onSelectionChanged');
+      }
+    }
+
     if (widget is Tooltip) {
       attr.add('message=${widget.message}');
     }
@@ -674,11 +680,13 @@ class Explainer {
               ? _widgetChild(widget.child)
               : widget is SingleChildScrollView
                   ? _widgetChild(widget.child)
-                  : widget is Text
-                      ? widget.data!
-                      : widget is Tooltip
-                          ? _widgetChild(widget.child)
-                          : '',
+                  : widget is SelectableText
+                      ? _inlineSpan(widget.textSpan!)
+                      : widget is Text
+                          ? widget.data!
+                          : widget is Tooltip
+                              ? _widgetChild(widget.child)
+                              : '',
     );
     // U-Z
 

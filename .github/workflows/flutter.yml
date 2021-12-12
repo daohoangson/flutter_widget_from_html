@@ -1,9 +1,8 @@
 name: Flutter
 on:
   push:
-    branches-ignore:
-      - release/beta
-      - release/master
+    branches:
+      - master
   pull_request:
     branches-ignore:
       - release/beta

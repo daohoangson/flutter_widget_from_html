@@ -264,6 +264,13 @@ packages:
       relative: true
     source: path
     version: "0.6.2+2"
+  fwfh_selectable_text:
+    dependency: "direct overridden"
+    description:
+      path: "../packages/fwfh_selectable_text"
+      relative: true
+    source: path
+    version: "0.8.2"
   fwfh_svg:
     dependency: "direct overridden"
     description:
@@ -279,7 +286,7 @@ packages:
     source: path
     version: "2.7.0+1"
   fwfh_url_launcher:
-    dependency: "direct main"
+    dependency: "direct overridden"
     description:
       path: "../packages/fwfh_url_launcher"
       relative: true
