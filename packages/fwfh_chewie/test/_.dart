@@ -8,7 +8,7 @@ import 'package:video_player_platform_interface/test.dart';
 
 import '../../core/test/_.dart' as helper;
 
-final kDataUri = helper.kDataUri;
+const kDataUri = helper.kDataUri;
 
 String? videoPlayerExplainer(helper.Explainer parent, Widget widget) {
   if (widget is VideoPlayer) {

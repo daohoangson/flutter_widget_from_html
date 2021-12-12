@@ -5,9 +5,9 @@ on:
       - master
       - next
   pull_request:
-    branches:
-      - master
-      - next
+    branches-ignore:
+      - release/beta
+      - release/master
 
 jobs:
   analyze:
@@ -33,7 +33,7 @@ jobs:
         with:
           name: failures
           path: demo_app/test/failures/
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v2
 
   ios:
     name: iOS Test

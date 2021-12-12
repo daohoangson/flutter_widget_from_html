@@ -1,4 +1,4 @@
-import 'package:demo_app/model/show_perf_overlay.dart';
+import 'package:demo_app/widgets/popup_menu.dart';
 import 'package:flutter/material.dart';
 
 import 'audio.dart';
@@ -42,9 +42,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           title: const Text('Demo app'),
-          actions: const [
-            ShowPerfIconButton(),
-          ],
+          actions: const [PopupMenu()],
         ),
         body: ListView(
           children: _screens.keys
