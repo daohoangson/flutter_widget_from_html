@@ -20,6 +20,16 @@ abstract class BuildMetadata {
   /// The associated [TextStyleBuilder].
   final TextStyleBuilder tsb;
 
+  /// The maximum number of lines for the text to span.
+  ///
+  /// Used in [WidgetFactory.buildText] for [RichText.maxLines].
+  int maxLines = -1;
+
+  /// How visual overflow should be handled.
+  ///
+  /// Used in [WidgetFactory.buildText] for [RichText.overflow].
+  TextOverflow overflow = TextOverflow.clip;
+
   /// Creates a node.
   BuildMetadata(this.element, this.tsb);
 

@@ -1,3 +1,7 @@
+## 0.6.2+1
+
+- Add support for webview_flutter@3.0 (#657)
+
 ## 0.6.2
 
 - Add support for webview_flutter@2.2 (#625)

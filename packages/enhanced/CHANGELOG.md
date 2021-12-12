@@ -1,3 +1,22 @@
+## 0.8.3+1
+
+- Add support for `HtmlWidget.isSelectable` (#631)
+- Add support for `HtmlWidget.onSelectionChanged` (#672)
+- New package: `fwfh_selectable_text` (#672)
+
+## 0.8.3
+
+- Add support for Flutter@2.8 (#655)
+- Add support for flutter_svg@1.0 (#648)
+- Add support for webview_flutter@3.0 (#657)
+- New package: `fwfh_text_style` (#628)
+- Allow `HtmlWidget.textStyle` to be null (#632)
+- Conditionally import `flutter_cache_manager` (#641)
+- Avoid importing `dart:io` in svg_factory.dart (#653)
+- Fix detached sub-tree still being built (#650)
+- Fix bug text-align with padding (#651)
+- Fix anchor being stuck (#659)
+
 ## 0.8.2
 
 - Optimize `HtmlListMarker` (#623)
