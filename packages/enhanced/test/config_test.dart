@@ -53,7 +53,7 @@ void main() {
     testWidgets('skips FutureBuilder', (WidgetTester tester) async {
       const html = 'Foo';
       final explained = await explain(tester, html, buildAsync: false);
-      expect(explained, startsWith('TshWidget'));
+      expect(explained, startsWith('HtmlStyleWidget'));
     });
 
     testWidgets('uses FutureBuilder automatically', (tester) async {

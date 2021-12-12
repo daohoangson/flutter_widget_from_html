@@ -14,19 +14,19 @@ mixin SelectableTextFactory on WidgetFactory {
   SelectionChangedCallback? get selectableTextOnChanged => null;
 
   @override
-  Widget? buildText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) {
+  Widget? buildText(BuildMetadata meta, HtmlStyle style, InlineSpan text) {
     if (selectableText &&
         meta.overflow == TextOverflow.clip &&
         text is TextSpan) {
       return SelectableText.rich(
         text,
         maxLines: meta.maxLines > 0 ? meta.maxLines : null,
-        textAlign: tsh.textAlign ?? TextAlign.start,
-        textDirection: tsh.textDirection,
+        textAlign: style.textAlign ?? TextAlign.start,
+        textDirection: style.textDirection,
         onSelectionChanged: selectableTextOnChanged,
       );
     }
 
-    return super.buildText(meta, tsh, text);
+    return super.buildText(meta, style, text);
   }
 }

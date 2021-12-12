@@ -21,6 +21,8 @@ final _regExpSpaces = RegExp('$_asciiWhitespace+', unicode: true);
 class Builder extends BuildTree implements BuildMetadata {
   static final _buildOps = Expando<Set<_BuilderOp>>();
   static final _declarations = Expando<List<css.Declaration>>();
+  static final _maxLines = Expando<int>();
+  static final _overflows = Expando<TextOverflow>();
 
   final CustomStylesBuilder? customStylesBuilder;
   final CustomWidgetBuilder? customWidgetBuilder;
@@ -51,6 +53,18 @@ class Builder extends BuildTree implements BuildMetadata {
       _buildOpSet?.map(_BuilderOp._unwrap) ?? const [];
 
   Set<_BuilderOp>? get _buildOpSet => _buildOps[this];
+
+  @override
+  int get maxLines => _maxLines[this] ?? -1;
+
+  @override
+  set maxLines(int value) => _maxLines[this] = value;
+
+  @override
+  TextOverflow get overflow => _overflows[this] ?? TextOverflow.clip;
+
+  @override
+  set overflow(TextOverflow value) => _overflows[this] = value;
 
   @override
   Iterable<css.Declaration> get styles => _declarationList ?? const [];
@@ -185,6 +199,8 @@ class Builder extends BuildTree implements BuildMetadata {
       }
 
       _declarations[copied] = _declarations[this];
+      _maxLines[copied] = _maxLines[this];
+      _overflows[copied] = _overflows[this];
 
       for (final bit in children) {
         copied.append(bit.copyWith(parent: copied));

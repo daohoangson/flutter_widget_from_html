@@ -229,6 +229,18 @@ class _RootBuildMetadata extends BuildMetadata {
   dom.Element get element => dom.Element.tag('root');
 
   @override
+  int get maxLines => -1;
+
+  @override
+  set maxLines(int value) {}
+
+  @override
+  TextOverflow get overflow => TextOverflow.clip;
+
+  @override
+  set overflow(TextOverflow value) {}
+
+  @override
   Iterable<BuildOp> get parentOps => [];
 
   @override

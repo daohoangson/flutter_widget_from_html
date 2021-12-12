@@ -36,6 +36,22 @@ abstract class BuildMetadata {
   /// The associated DOM element.
   dom.Element get element;
 
+  /// The maximum number of lines for the text to span.
+  ///
+  /// Used in [WidgetFactory.buildText] for [RichText.maxLines].
+  int get maxLines;
+
+  /// Sets the maximum number of lines for the text to span.
+  set maxLines(int value);
+
+  /// How visual overflow should be handled.
+  ///
+  /// Used in [WidgetFactory.buildText] for [RichText.overflow].
+  TextOverflow get overflow;
+
+  /// Changes how visual overflow should be handled.
+  set overflow(TextOverflow value);
+
   /// The associated [HtmlStyle] builder.
   HtmlStyleBuilder get tsb;
 
