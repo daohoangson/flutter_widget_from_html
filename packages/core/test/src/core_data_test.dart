@@ -59,7 +59,7 @@ void main() {
           explained,
           equals(
             'TshWidget\n'
-            '└WidgetPlaceholder<Widget>(Text)\n'
+            '└WidgetPlaceholder\n'
             ' └Text("hi")\n'
             '  └RichText(text: "hi")\n\n',
           ),
@@ -82,7 +82,7 @@ void main() {
           explained,
           equals(
             'TshWidget\n'
-            '└WidgetPlaceholder<Widget>(Text)\n'
+            '└WidgetPlaceholder\n'
             ' └Text("hi")\n'
             '  └RichText(text: "hi")\n\n',
           ),
