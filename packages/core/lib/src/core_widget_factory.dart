@@ -639,14 +639,15 @@ class WidgetFactory {
         _tagA ??= TagA(this).buildOp;
         meta.register(_tagA!);
 
-        meta.tsb.enqueue(
-          _tagAColor ??= (tsh, _) => tsh.copyWith(
-                style: tsh.style.copyWith(
-                  color: attrs[kAttributeAHref] == null ? null :
-                  tsh.getDependency<ThemeData>().colorScheme.primary,
-                ),
+        if (attrs[kAttributeAHref] != null) {
+          meta.tsb.enqueue(
+            _tagAColor ??= (tsh, _) => tsh.copyWith(
+              style: tsh.style.copyWith(
+                color: tsh.getDependency<ThemeData>().colorScheme.primary,
               ),
-        );
+            ),
+          );
+        }
 
         final name = attrs[kAttributeAName];
         if (name != null) {
