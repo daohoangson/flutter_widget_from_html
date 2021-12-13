@@ -642,7 +642,7 @@ class WidgetFactory {
         meta.tsb.enqueue(
           _tagAColor ??= (tsh, _) => tsh.copyWith(
                 style: tsh.style.copyWith(
-                  color: tsh.getDependency<ThemeData>().colorScheme.primary,
+                  color: attrs[kAttributeAHref] == null ? null : tsh.getDependency<ThemeData>().colorScheme.primary,
                 ),
               ),
         );
