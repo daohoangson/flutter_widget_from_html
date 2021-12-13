@@ -68,7 +68,8 @@ class CssBorder {
         radiusTopRight: other.radiusTopRight,
       );
 
-  /// Creates a copy of this border but with the given fields replaced with the new values.
+  /// Creates a copy of this border but with the given fields
+  /// replaced with the new values.
   CssBorder copyWith({
     CssBorderSide? bottom,
     CssBorderSide? inlineEnd,
@@ -399,11 +400,11 @@ enum CssLengthUnit {
 /// The whitespace behavior.
 enum CssWhitespace {
   /// Sequences of white space are collapsed.
-  /// Newline characters in the source are handled the same as other white space.
+  /// Newline characters in the source are handled the same as other whitespace.
   /// Lines are broken as necessary to fill line boxes.
   normal,
 
   /// Sequences of white space are preserved.
-  /// Lines are only broken at newline characters in the source and at <br> elements.
+  /// Lines are only broken at newline characters in the source and at `BR`s.
   pre,
 }

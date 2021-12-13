@@ -13,8 +13,8 @@ String _padding(String child) =>
 
 String _richtext(String text) => _padding('[RichText:(:$text)]');
 
-const bg =
-    'BoxDecoration(border: all(BorderSide(Color(0xff000000), 1.0, BorderStyle.solid)))';
+const bg = 'BoxDecoration(border: all(BorderSide(Color(0xff000000), '
+    '1.0, BorderStyle.solid)))';
 
 const border = 'all(BorderSide(Color(0xff000000), 1.0, BorderStyle.solid))';
 
@@ -36,7 +36,8 @@ Future<void> main() async {
         explained,
         equals(
           '[Column:children='
-          '[_TableCaption:child=[CssBlock:child=[RichText:align=center,(:Caption)]]],'
+          '[_TableCaption:child=[CssBlock:child='
+          '[RichText:align=center,(:Caption)]]],'
           '[HtmlTable:children='
           '${_padding('[RichText:(+b:Header 1)]')},'
           '${_padding('[RichText:(+b:Header 2)]')},'
@@ -135,7 +136,9 @@ Future<void> main() async {
         equals(
           '[HtmlTable:children='
           '${_padding('[RichText:(+b:Header 1)]')},'
-          '[HtmlTableCell:child=[Align:alignment=centerLeft,child=[Padding:(1,1,1,1),child=[CssBlock:child=[RichText:align=center,(+b:Header 2)]]]]],'
+          '[HtmlTableCell:child=[Align:alignment=centerLeft,child='
+          '[Padding:(1,1,1,1),child=[CssBlock:child='
+          '[RichText:align=center,(+b:Header 2)]]]]],'
           '${_padding('[RichText:(:Value (+i:1))]')},'
           '${_padding('[RichText:(+b:Value 2)]')}'
           ']',
@@ -175,7 +178,9 @@ Future<void> main() async {
         equals(
           '[HtmlTable:children='
           '${_padding('[RichText:align=right,(+b:Header 1)]')},'
-          '[HtmlTableCell:child=[Align:alignment=centerLeft,child=[Padding:(1,1,1,1),child=[CssBlock:child=[RichText:align=center,(+b:Header 2)]]]]],'
+          '[HtmlTableCell:child=[Align:alignment=centerLeft,child='
+          '[Padding:(1,1,1,1),child=[CssBlock:child='
+          '[RichText:align=center,(+b:Header 2)]]]]],'
           '${_padding('[RichText:align=right,(:Value (+i:1))]')},'
           '${_padding('[RichText:align=right,(+b:Value 2)]')}'
           ']',
@@ -298,7 +303,8 @@ Future<void> main() async {
       expect(
         explained,
         contains(
-          'HtmlTable(border: $border, borderCollapse: true, borderSpacing: 2.0)',
+          'HtmlTable(border: $border, '
+          'borderCollapse: true, borderSpacing: 2.0)',
         ),
       );
     });
@@ -404,7 +410,8 @@ Future<void> main() async {
       expect(
         explained,
         contains(
-          'HtmlTableCell(columnSpan: 2, columnStart: 0, rowSpan: 2, rowStart: 0)',
+          'HtmlTableCell(columnSpan: 2, columnStart: 0, '
+          'rowSpan: 2, rowStart: 0)',
         ),
       );
     });
@@ -627,7 +634,8 @@ Future<void> main() async {
       explained,
       equals(
         '[Column:children='
-        '[_TableCaption:child=[CssBlock:child=[RichText:align=center,(:Caption)]]],'
+        '[_TableCaption:child=[CssBlock:child='
+        '[RichText:align=center,(:Caption)]]],'
         '[HtmlTable:children='
         '[HtmlTableCell:child=[RichText:(+b:Header 1)]],'
         '[HtmlTableCell:child=[RichText:(+b:Header 2)]],'
@@ -649,7 +657,8 @@ Future<void> main() async {
         expect(
           before,
           contains(
-            '└HtmlTable(border: all(BorderSide(Color(0xff000000), 1.0, BorderStyle.solid)),',
+            '└HtmlTable(border: all(BorderSide(Color(0xff000000), '
+            '1.0, BorderStyle.solid)),',
           ),
         );
 
@@ -661,7 +670,8 @@ Future<void> main() async {
         expect(
           after,
           contains(
-            '└HtmlTable(border: all(BorderSide(Color(0xff000000), 2.0, BorderStyle.solid)),',
+            '└HtmlTable(border: all(BorderSide(Color(0xff000000), '
+            '2.0, BorderStyle.solid)),',
           ),
         );
       });

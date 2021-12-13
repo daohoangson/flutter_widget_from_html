@@ -55,7 +55,8 @@ void main() {
         explained,
         equals(
           '[RichText:(:“'
-          '[CssSizing:height≥0.0,height=auto,width≥0.0,width=auto,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
+          '[CssSizing:height≥0.0,height=auto,width≥0.0,width=auto,child='
+          '[Image:image=NetworkImage("$src", scale: 1.0)]]'
           '(:”))]',
         ),
       );

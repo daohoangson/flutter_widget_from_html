@@ -10,12 +10,12 @@ class CssBlock extends CssSizing {
       : super(child: child, key: key);
 
   @override
-  _RenderCssSizing createRenderObject(BuildContext _) =>
+  RenderObject createRenderObject(BuildContext _) =>
       _RenderCssSizing(preferredWidth: const CssSizingValue.percentage(100));
 
   @override
-  void updateRenderObject(BuildContext _, _RenderCssSizing renderObject) =>
-      renderObject.setPreferredSize(
+  void updateRenderObject(BuildContext _, RenderObject renderObject) =>
+      (renderObject as _RenderCssSizing).setPreferredSize(
         null,
         const CssSizingValue.percentage(100),
         null,
@@ -66,7 +66,7 @@ class CssSizing extends SingleChildRenderObjectWidget {
   }) : super(child: child, key: key);
 
   @override
-  _RenderCssSizing createRenderObject(BuildContext _) => _RenderCssSizing(
+  RenderObject createRenderObject(BuildContext _) => _RenderCssSizing(
         maxHeight: maxHeight,
         maxWidth: maxWidth,
         minHeight: minHeight,
@@ -112,18 +112,19 @@ class CssSizing extends SingleChildRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(BuildContext _, _RenderCssSizing renderObject) {
-    renderObject.setConstraints(
-      maxHeight: maxHeight,
-      maxWidth: maxWidth,
-      minHeight: minHeight,
-      minWidth: minWidth,
-    );
-    renderObject.setPreferredSize(
-      preferredAxis,
-      preferredWidth,
-      preferredHeight,
-    );
+  void updateRenderObject(BuildContext _, RenderObject renderObject) {
+    (renderObject as _RenderCssSizing)
+      ..setConstraints(
+        maxHeight: maxHeight,
+        maxWidth: maxWidth,
+        minHeight: minHeight,
+        minWidth: minWidth,
+      )
+      ..setPreferredSize(
+        preferredAxis,
+        preferredWidth,
+        preferredHeight,
+      );
   }
 }
 
@@ -265,7 +266,7 @@ class _RenderCssSizing extends RenderProxyBox {
       return null;
     }
 
-    // it's unlikely that `child.getDryLayout` works for tight height constraints
+    // it's unlikely that `getDryLayout` works for tight height constraints
     // then fails for tight width so we are not doing error trapping for this:
     final tightWidth = BoxConstraints.tightFor(width: preferredWidth);
     final sizeWidth = child!.getDryLayout(tightWidth);

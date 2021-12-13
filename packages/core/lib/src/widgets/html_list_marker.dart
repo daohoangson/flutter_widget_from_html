@@ -62,11 +62,8 @@ class HtmlListMarker extends LeafRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(
-    BuildContext _,
-    _ListMarkerRenderObject renderObject,
-  ) {
-    renderObject
+  void updateRenderObject(BuildContext _, RenderObject renderObject) {
+    (renderObject as _ListMarkerRenderObject)
       ..markerType = markerType
       ..textStyle = textStyle;
   }

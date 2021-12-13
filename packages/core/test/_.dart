@@ -240,7 +240,9 @@ class Explainer {
   }
 
   String _borderSide(BorderSide s) => s != BorderSide.none
-      ? "${s.width}@${s.style.toString().replaceFirst('BorderStyle.', '')}${_color(s.color)}"
+      ? '${s.width}'
+          '@${s.style.toString().replaceFirst('BorderStyle.', '')}'
+          '${_color(s.color)}'
       : 'none';
 
   String _boxBorder(BoxBorder? b) {
@@ -286,8 +288,10 @@ class Explainer {
     return attr;
   }
 
-  String _color(Color c) =>
-      '#${_colorHex(c.alpha)}${_colorHex(c.red)}${_colorHex(c.green)}${_colorHex(c.blue)}';
+  String _color(Color c) => '#${_colorHex(c.alpha)}'
+      '${_colorHex(c.red)}'
+      '${_colorHex(c.green)}'
+      '${_colorHex(c.blue)}';
 
   String _colorHex(int i) {
     final h = i.toRadixString(16).toUpperCase();
@@ -501,7 +505,8 @@ class Explainer {
         ? ''
         : '/${style.decorationThickness}';
 
-    return "${styleHasIt ? '+' : '-'}$str$decorationColor$decorationStyle$decorationThickness";
+    return '${styleHasIt ? '+' : '-'}$str'
+        '$decorationColor$decorationStyle$decorationThickness';
   }
 
   String _textStyleFontStyle(TextStyle style) {
@@ -651,7 +656,8 @@ class Explainer {
     }
 
     // A-F
-    // `RichText` is an exception, it is a `MultiChildRenderObjectWidget` so it has to be processed first
+    // `RichText` is an exception, it is a `MultiChildRenderObjectWidget`
+    // so it has to be processed first
     attr.add(
       widget is RichText
           ? _inlineSpan(widget.text)

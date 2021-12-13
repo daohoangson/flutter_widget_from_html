@@ -52,7 +52,7 @@ typedef CustomWidgetBuilder = Widget? Function(dom.Element element);
 
 /// A callback to scroll the anchor identified by [id] into the viewport.
 ///
-/// By default, an internal implementation is given to [WidgetFactory.onTapAnchor]
+/// By default, an internal impl is given to [WidgetFactory.onTapAnchor]
 /// when an anchor is tapped to handle the scrolling.
 /// A wf subclass can use this to change the [curve], the animation [duration]
 /// or even request scrolling to a different anchor.
@@ -266,9 +266,21 @@ Uint8List? bytesFromDataUri(String dataUri) {
 Iterable<T>? listOrNull<T>(T? x) => x == null ? null : [x];
 
 /// Parses [key] from [map] as an double literal and return its value.
-double? tryParseDoubleFromMap(Map<dynamic, String> map, String key) =>
-    map.containsKey(key) ? double.tryParse(map[key]!) : null;
+double? tryParseDoubleFromMap(Map<dynamic, String> map, String key) {
+  final value = map[key];
+  if (value == null) {
+    return null;
+  }
 
-/// Parses [key] from [map] as a, possibly signed, integer literal and return its value.
-int? tryParseIntFromMap(Map<dynamic, String> map, String key) =>
-    map.containsKey(key) ? int.tryParse(map[key]!) : null;
+  return double.tryParse(value);
+}
+
+/// Parses [key] from [map] as an integer literal and return its value.
+int? tryParseIntFromMap(Map<dynamic, String> map, String key) {
+  final value = map[key];
+  if (value == null) {
+    return null;
+  }
+
+  return int.tryParse(value);
+}

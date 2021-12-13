@@ -29,31 +29,31 @@ class HtmlWidget extends core.HtmlWidget {
   /// Controls whether IFRAME is rendered as [WebView].
   ///
   /// See [WidgetFactory.webView].
-  @Deprecated("Override WidgetFactory.webView instead")
+  @Deprecated('Override WidgetFactory.webView instead')
   final bool webView;
 
   /// Controls whether debugging is enabled in WebViews.
   ///
   /// See [WidgetFactory.webViewDebuggingEnabled].
-  @Deprecated("Override WidgetFactory.webViewDebuggingEnabled instead")
+  @Deprecated('Override WidgetFactory.webViewDebuggingEnabled instead')
   final bool webViewDebuggingEnabled;
 
   /// Controls whether to enable JavaScript in WebViews.
   ///
   /// See [WidgetFactory.webViewJs].
-  @Deprecated("Override WidgetFactory.webViewJs instead")
+  @Deprecated('Override WidgetFactory.webViewJs instead')
   final bool webViewJs;
 
   /// Controls whether to always allow media playback in WebViews.
   ///
   /// See [WidgetFactory.webViewMediaPlaybackAlwaysAllow].
-  @Deprecated("Override WidgetFactory.webViewMediaPlaybackAlwaysAllow instead")
+  @Deprecated('Override WidgetFactory.webViewMediaPlaybackAlwaysAllow instead')
   final bool webViewMediaPlaybackAlwaysAllow;
 
   /// The value used for the HTTP `User-Agent` request header in WebViews.
   ///
   /// See [WidgetFactory.webViewUserAgent].
-  @Deprecated("Override WidgetFactory.webViewUserAgent instead")
+  @Deprecated('Override WidgetFactory.webViewUserAgent instead')
   final String? webViewUserAgent;
 
   /// Creates a widget that builds Flutter widget tree from html.
@@ -77,14 +77,14 @@ class HtmlWidget extends core.HtmlWidget {
     core.RebuildTriggers? rebuildTriggers,
     RenderMode renderMode = RenderMode.column,
     TextStyle? textStyle,
-    @Deprecated("Override WidgetFactory.webView instead") this.webView = false,
-    @Deprecated("Override WidgetFactory.webViewDebuggingEnabled instead")
+    @Deprecated('Override WidgetFactory.webView instead') this.webView = false,
+    @Deprecated('Override WidgetFactory.webViewDebuggingEnabled instead')
         this.webViewDebuggingEnabled = false,
-    @Deprecated("Override WidgetFactory.webViewJs instead")
+    @Deprecated('Override WidgetFactory.webViewJs instead')
         this.webViewJs = true,
-    @Deprecated("Override WidgetFactory.webViewMediaPlaybackAlwaysAllow instead")
+    @Deprecated('Override WidgetFactory.webViewMediaPlaybackAlwaysAllow')
         this.webViewMediaPlaybackAlwaysAllow = false,
-    @Deprecated("Override WidgetFactory.webViewUserAgent instead")
+    @Deprecated('Override WidgetFactory.webViewUserAgent instead')
         this.webViewUserAgent,
   }) : super(
           html,

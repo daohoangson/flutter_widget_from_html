@@ -56,8 +56,8 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(BuildContext _, _TableRenderObject renderObject) {
-    renderObject
+  void updateRenderObject(BuildContext _, RenderObject renderObject) {
+    (renderObject as _TableRenderObject)
       ..border = border
       ..borderCollapse = borderCollapse
       ..borderSpacing = borderSpacing
@@ -168,13 +168,10 @@ class HtmlTableValignBaseline extends SingleChildRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(
-    BuildContext context,
-    _ValignBaselineRenderObject renderObject,
-  ) {
+  void updateRenderObject(BuildContext context, RenderObject renderObject) {
     final table = context.findAncestorWidgetOfExactType<HtmlTable>()!;
     final cell = context.findAncestorWidgetOfExactType<HtmlTableCell>()!;
-    renderObject
+    (renderObject as _ValignBaselineRenderObject)
       ..companion = table.companion
       ..row = cell.rowStart;
   }
