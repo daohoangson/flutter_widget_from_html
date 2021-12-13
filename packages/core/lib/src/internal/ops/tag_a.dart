@@ -11,7 +11,9 @@ class TagA {
 
   BuildOp get buildOp => BuildOp(
         defaultStyles: (_) {
-          final styles = _.attributes[kAttributeAHref] != null ? {kCssTextDecoration: kCssTextDecorationUnderline} : <String, String>{};
+          final styles = _.attributes[kAttributeAHref] != null ? {
+            kCssTextDecoration: kCssTextDecorationUnderline,
+          } : <String, String>{};
 
           return styles;
         },
