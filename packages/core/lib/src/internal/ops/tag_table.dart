@@ -123,6 +123,7 @@ class TagTable {
           borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
           borderSpacing: borderSpacing?.getValue(tsh) ?? 0.0,
           companion: companion,
+          textDirection: tsh.textDirection,
           children: List.from(
             _data.builders.map((f) => f(context)).where((e) => e != null),
             growable: false,

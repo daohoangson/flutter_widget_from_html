@@ -21,6 +21,11 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   /// The companion data for table.
   final HtmlTableCompanion companion;
 
+  /// Determines the order to lay children out horizontally.
+  ///
+  /// Default: [TextDirection.ltr].
+  final TextDirection textDirection;
+
   /// Creates a TABLE widget.
   HtmlTable({
     this.border,
@@ -28,6 +33,7 @@ class HtmlTable extends MultiChildRenderObjectWidget {
     this.borderSpacing = 0.0,
     required List<Widget> children,
     required this.companion,
+    this.textDirection = TextDirection.ltr,
     Key? key,
   }) : super(children: children, key: key);
 
@@ -36,6 +42,7 @@ class HtmlTable extends MultiChildRenderObjectWidget {
         border,
         borderSpacing,
         companion,
+        textDirection,
         borderCollapse: borderCollapse,
       );
 
@@ -53,6 +60,13 @@ class HtmlTable extends MultiChildRenderObjectWidget {
     );
     properties
         .add(DoubleProperty('borderSpacing', borderSpacing, defaultValue: 0.0));
+    properties.add(
+      DiagnosticsProperty(
+        'textDirection',
+        textDirection,
+        defaultValue: TextDirection.ltr,
+      ),
+    );
   }
 
   @override
@@ -61,7 +75,8 @@ class HtmlTable extends MultiChildRenderObjectWidget {
       ..border = border
       ..borderCollapse = borderCollapse
       ..borderSpacing = borderSpacing
-      ..companion = companion;
+      ..companion = companion
+      ..textDirection = textDirection;
   }
 }
 
@@ -220,7 +235,8 @@ class _TableRenderObject extends RenderBox
   _TableRenderObject(
     this._border,
     this._borderSpacing,
-    this._companion, {
+    this._companion,
+    this._textDirection, {
     required bool borderCollapse,
   }) : _borderCollapse = borderCollapse;
 
@@ -265,6 +281,17 @@ class _TableRenderObject extends RenderBox
     }
 
     _companion = v;
+    markNeedsLayout();
+  }
+
+  TextDirection _textDirection;
+  // ignore: avoid_setters_without_getters
+  set textDirection(TextDirection v) {
+    if (v == _textDirection) {
+      return;
+    }
+
+    _textDirection = v;
     markNeedsLayout();
   }
 
@@ -467,10 +494,21 @@ class _TableRenderObject extends RenderBox
       }
 
       if (child.hasSize) {
-        data.offset = Offset(
-          data.calculateX(tro, columnWidths),
-          data.calculateY(tro, rowHeights),
-        );
+        final calculatedX = data.calculateX(tro, columnWidths);
+
+        // TODO: use `late final` when https://github.com/dart-lang/coverage/issues/341 is fixed
+        late double x;
+        switch (tro._textDirection) {
+          case TextDirection.ltr:
+            x = calculatedX;
+            break;
+          case TextDirection.rtl:
+            x = calculatedWidth - childWidth - calculatedX;
+            break;
+        }
+
+        final y = data.calculateY(tro, rowHeights);
+        data.offset = Offset(x, y);
       }
     }
 
