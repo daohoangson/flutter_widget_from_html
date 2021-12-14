@@ -96,7 +96,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[HtmlTable:dir=rtl,children='
+          '[HtmlTable:children='
           '[HtmlTableCell:child=[Align:alignment=centerRight,child='
           '[Padding:(1,1,1,1),child=[RichText:dir=rtl,(:Foo)]]]],'
           '[HtmlTableCell:child=[Align:alignment=centerRight,child='
@@ -751,6 +751,25 @@ Future<void> main() async {
           useExplainer: false,
         );
         expect(after, contains('└HtmlTable(borderSpacing: 20.0)'));
+      });
+
+      testWidgets('updates textDirection', (WidgetTester tester) async {
+        final before = await explain(
+          tester,
+          '<table><tr><td>Foo</td></tr></table>',
+          useExplainer: false,
+        );
+        expect(before, contains('└HtmlTable(borderSpacing: 2.0)'));
+
+        final after = await explain(
+          tester,
+          '<table dir="rtl"><tr><td>Foo</td></tr></table>',
+          useExplainer: false,
+        );
+        expect(
+          after,
+          contains('└HtmlTable(borderSpacing: 2.0, textDirection: rtl)'),
+        );
       });
     });
 
