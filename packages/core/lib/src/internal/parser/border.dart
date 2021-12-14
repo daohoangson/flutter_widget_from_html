@@ -51,7 +51,7 @@ CssBorder _tryParseBorderSide(CssBorder border, css.Declaration style) {
   if (width == null || width.number <= 0) {
     borderSide = CssBorderSide.none;
   } else {
-    final int positionOfStyle =  expressions.indexWhere((css.Expression element) => <String>['dotted', 'dashed', 'solid', 'double', 'groove', 'ridge', 'inset', 'outset', 'none', 'hidden'].contains(element.span?.text));
+    final int positionOfStyle =  expressions.indexWhere((css.Expression element) => tryParseTextDecorationStyle(element) != null);
     final TextDecorationStyle? style = positionOfStyle == -1 ? null : tryParseTextDecorationStyle(expressions[positionOfStyle]);
 
     final int positionOfColor = expressions.indexWhere((css.Expression element) => tryParseColor(element) != null);
