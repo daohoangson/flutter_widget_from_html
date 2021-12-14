@@ -73,3 +73,37 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
 
       - run: flutter test
+
+  fwfh_text_style:
+    strategy:
+      matrix:
+        channel:
+          - beta
+          - master
+
+    # In case one of these fails, create a new PR against the `release/*` branch
+    # and publish a new version to make sure there is a compatible version
+    # of `fwfh_text_style` for all active Flutter versions.
+    name: fwfh_text_style@${{ matrix.channel }}
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: packages/fwfh_text_style
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Run git fetch
+        run: |
+          git config user.name name
+          git config user.email email@domain.com
+          git fetch
+      - run: git merge -m test origin/release/${{ matrix.channel }}
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          channel: ${{ matrix.channel }}
+      - run: flutter --version
+      - run: flutter test
