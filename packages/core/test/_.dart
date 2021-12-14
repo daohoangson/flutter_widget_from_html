@@ -590,9 +590,11 @@ class Explainer {
       _textDirection(
         widget is Column
             ? widget.textDirection
-            : widget is RichText
+            : widget is HtmlTable
                 ? widget.textDirection
-                : (widget is Text ? widget.textDirection : null),
+                : widget is RichText
+                    ? widget.textDirection
+                    : (widget is Text ? widget.textDirection : null),
       ),
     );
 

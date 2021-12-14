@@ -86,6 +86,50 @@ Future<void> main() async {
     });
   });
 
+  group('rtl', () {
+    const html = '<table dir="rtl">'
+        '<tbody><tr><td>Foo</td><td>Bar</td></tr></tbody>'
+        '</table>';
+
+    testWidgets('renders', (WidgetTester tester) async {
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[HtmlTable:dir=rtl,children='
+          '[HtmlTableCell:child=[Align:alignment=centerRight,child='
+          '[Padding:(1,1,1,1),child=[RichText:dir=rtl,(:Foo)]]]],'
+          '[HtmlTableCell:child=[Align:alignment=centerRight,child='
+          '[Padding:(1,1,1,1),child=[RichText:dir=rtl,(:Bar)]]]]'
+          ']',
+        ),
+      );
+    });
+
+    testWidgets('useExplainer=false', (WidgetTester tester) async {
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        equals(
+          'TshWidget\n'
+          '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
+          ' └HtmlTable(borderSpacing: 2.0, textDirection: rtl)\n'
+          '  ├HtmlTableCell(columnStart: 0, rowStart: 0)\n'
+          '  │└WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
+          '  │ └Align(alignment: centerRight)\n'
+          '  │  └Padding(padding: all(1.0))\n'
+          '  │   └RichText(textDirection: rtl, text: "Foo")\n'
+          '  └HtmlTableCell(columnStart: 1, rowStart: 0)\n'
+          '   └WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
+          '    └Align(alignment: centerRight)\n'
+          '     └Padding(padding: all(1.0))\n'
+          '      └RichText(textDirection: rtl, text: "Bar")\n'
+          '\n',
+        ),
+      );
+    });
+  });
+
   testWidgets('renders 2 tables', (WidgetTester tester) async {
     const html = '<table><tr><td>Foo</td></tr></table>'
         '<table><tr><td>Bar</td></tr></table>';
