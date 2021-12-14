@@ -237,8 +237,20 @@ void main() {
     });
   });
 
-  testWidgets('renders a tag to check decoration and underline', (tester) async {
+  testWidgets('renders a tag with a filled href to check decoration and underline', (tester) async {
     const html = '<a href="$kHref">test</a>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[RichText:(#FF123456+u+onTap:test)]'));
+  });
+
+  testWidgets('renders a tag with an empty href to check decoration and underline', (tester) async {
+    const html = '<a href="">test</a>';
+    final explained = await explain(tester, html);
+    expect(explained, equals('[RichText:(#FF123456+u+onTap:test)]'));
+  });
+
+  testWidgets('renders a tag with a href without value to check decoration and underline', (tester) async {
+    const html = '<a href=>test</a>';
     final explained = await explain(tester, html);
     expect(explained, equals('[RichText:(#FF123456+u+onTap:test)]'));
   });
