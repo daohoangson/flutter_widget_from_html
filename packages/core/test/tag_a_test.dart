@@ -245,27 +245,29 @@ void main() {
     });
   });
 
-  testWidgets('renders a tag with a filled href to check decoration and underline', (tester) async {
-    const html = '<a href="$kHref">test</a>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[RichText:(#FF123456+u+onTap:test)]'));
-  });
+  group('#676: skips decoration', () {
+    testWidgets('renders a filled href', (tester) async {
+      const html = '<a href="$kHref">test</a>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(#FF123456+u+onTap:test)]'));
+    });
 
-  testWidgets('renders a tag with an empty href to check decoration and underline', (tester) async {
-    const html = '<a href="">test</a>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[RichText:(#FF123456+u+onTap:test)]'));
-  });
+    testWidgets('renders an empty href', (tester) async {
+      const html = '<a href="">test</a>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(#FF123456+u+onTap:test)]'));
+    });
 
-  testWidgets('renders a tag with a href without value to check decoration and underline', (tester) async {
-    const html = '<a href=>test</a>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[RichText:(#FF123456+u+onTap:test)]'));
-  });
+    testWidgets('renders href without value', (tester) async {
+      const html = '<a href=>test</a>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(#FF123456+u+onTap:test)]'));
+    });
 
-  testWidgets('renders a tag without href to check decoration and underline are missing', (tester) async {
-    const html = '<a>test</a>';
-    final explained = await explain(tester, html);
-    expect(explained, equals('[RichText:(:test)]'));
+    testWidgets('renders without href', (WidgetTester tester) async {
+      const html = '<a>test</a>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:test)]'));
+    });
   });
 }
