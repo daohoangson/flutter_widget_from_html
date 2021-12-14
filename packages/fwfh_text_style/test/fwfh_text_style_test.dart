@@ -41,9 +41,26 @@ void main() {
         expect(merged.height, isNull);
       });
 
+      test('merges null', () {
+        final merged = obj.merge(null);
+        expect(merged.height, isNull);
+      });
+
       test('merges value', () {
-        final copied = obj.merge(const TextStyle(height: value));
-        expect(copied.height, equals(value));
+        final merged = obj.merge(const TextStyle(height: value));
+        expect(merged.height, equals(value));
+      });
+
+      test('merges another -> null', () {
+        final merged = obj.merge(const FwfhTextStyle.from(TextStyle()));
+        expect(merged.height, isNull);
+      });
+
+      test('merges another -> value', () {
+        final merged = obj.merge(
+          const FwfhTextStyle.from(TextStyle(height: value)),
+        );
+        expect(merged.height, equals(value));
       });
     });
   });
@@ -91,8 +108,25 @@ void main() {
         expect(merged.height, equals(value));
       });
 
+      test('merges null', () {
+        final merged = obj.merge(null);
+        expect(merged.height, equals(value));
+      });
+
       test('merges another value', () {
         final merged = obj.merge(const TextStyle(height: value2));
+        expect(merged.height, equals(value2));
+      });
+
+      test('merges another -> keep value', () {
+        final merged = obj.merge(const FwfhTextStyle.from(TextStyle()));
+        expect(merged.height, equals(value));
+      });
+
+      test('merges another -> new value', () {
+        final merged = obj.merge(
+          const FwfhTextStyle.from(TextStyle(height: value2)),
+        );
         expect(merged.height, equals(value2));
       });
     });
