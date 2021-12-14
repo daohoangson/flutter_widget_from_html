@@ -496,6 +496,7 @@ class _TableRenderObject extends RenderBox
       if (child.hasSize) {
         final calculatedX = data.calculateX(tro, columnWidths);
 
+        // TODO: use `late final` when https://github.com/dart-lang/coverage/issues/341 is fixed
         late double x;
         switch (tro._textDirection) {
           case TextDirection.ltr:
