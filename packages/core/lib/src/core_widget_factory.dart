@@ -636,16 +636,18 @@ class WidgetFactory {
 
     switch (meta.element.localName) {
       case kTagA:
-        _tagA ??= TagA(this).buildOp;
-        meta.register(_tagA!);
+        if (attrs.containsKey(kAttributeAHref)) {
+          final tagA = _tagA ??= TagA(this).buildOp;
+          meta.register(tagA);
 
-        meta.tsb.enqueue(
-          _tagAColor ??= (tsh, _) => tsh.copyWith(
+          final tagAColor = _tagAColor ??= (tsh, _) => tsh.copyWith(
                 style: tsh.style.copyWith(
                   color: tsh.getDependency<ThemeData>().colorScheme.primary,
                 ),
-              ),
-        );
+              );
+
+          meta.tsb.enqueue(tagAColor);
+        }
 
         final name = attrs[kAttributeAName];
         if (name != null) {

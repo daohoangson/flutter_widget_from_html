@@ -244,4 +244,30 @@ void main() {
       );
     });
   });
+
+  group('#676: skips decoration', () {
+    testWidgets('renders a filled href', (tester) async {
+      const html = '<a href="$kHref">test</a>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(#FF123456+u+onTap:test)]'));
+    });
+
+    testWidgets('renders an empty href', (tester) async {
+      const html = '<a href="">test</a>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(#FF123456+u+onTap:test)]'));
+    });
+
+    testWidgets('renders href without value', (tester) async {
+      const html = '<a href=>test</a>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(#FF123456+u+onTap:test)]'));
+    });
+
+    testWidgets('renders without href', (WidgetTester tester) async {
+      const html = '<a>test</a>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:test)]'));
+    });
+  });
 }
