@@ -43,19 +43,37 @@ CssBorder _tryParseBorderSide(CssBorder border, css.Declaration style) {
 
   final List<css.Expression> expressions = style.values;
 
-  final int positionOfWidth =  expressions.indexWhere((css.Expression element) => int.tryParse(element.span?.text[0] ?? '') != null);
-  final CssLength? width = positionOfWidth == -1 ? null : tryParseCssLength(expressions[positionOfWidth]);
+  CssLength? width;
+  for (final expression in expressions) {
+    final tmp = tryParseCssLength(expression);
+    if (tmp != null) {
+      width = tmp;
+      break;
+    }
+  }
 
   // TODO: use `late final` when https://github.com/dart-lang/coverage/issues/341 is fixed
   late CssBorderSide borderSide;
   if (width == null || width.number <= 0) {
     borderSide = CssBorderSide.none;
   } else {
-    final int positionOfStyle =  expressions.indexWhere((css.Expression element) => tryParseTextDecorationStyle(element) != null);
-    final TextDecorationStyle? style = positionOfStyle == -1 ? null : tryParseTextDecorationStyle(expressions[positionOfStyle]);
+    TextDecorationStyle? style;
+    for (final expression in expressions) {
+      final tmp = tryParseTextDecorationStyle(expression);
+      if (tmp != null) {
+        style = tmp;
+        break;
+      }
+    }
 
-    final int positionOfColor = expressions.indexWhere((css.Expression element) => tryParseColor(element) != null);
-    final Color? color = positionOfColor == -1 ? null : tryParseColor(expressions[positionOfColor]);
+    Color? color;
+    for (final expression in expressions) {
+      final tmp = tryParseColor(expression);
+      if (tmp != null) {
+        color = tmp;
+        break;
+      }
+    }
 
     borderSide = CssBorderSide(
       color: color,
