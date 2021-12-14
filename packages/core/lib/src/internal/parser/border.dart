@@ -41,19 +41,25 @@ CssBorder _tryParseBorderSide(CssBorder border, css.Declaration style) {
     return const CssBorder(inherit: true);
   }
 
-  final expressions = style.values;
-  final width =
-      expressions.isNotEmpty ? tryParseCssLength(expressions[0]) : null;
+  final List<css.Expression> expressions = style.values;
+
+  final int positionOfWidth =  expressions.indexWhere((css.Expression element) => int.tryParse(element.span?.text[0] ?? '') != null);
+  final CssLength? width = positionOfWidth == -1 ? null : tryParseCssLength(expressions[positionOfWidth]);
+
   // TODO: use `late final` when https://github.com/dart-lang/coverage/issues/341 is fixed
   late CssBorderSide borderSide;
   if (width == null || width.number <= 0) {
     borderSide = CssBorderSide.none;
   } else {
+    final int positionOfStyle =  expressions.indexWhere((css.Expression element) => <String>['dotted', 'dashed', 'solid', 'double', 'groove', 'ridge', 'inset', 'outset', 'none', 'hidden'].contains(element.span?.text));
+    final TextDecorationStyle? style = positionOfStyle == -1 ? null : tryParseTextDecorationStyle(expressions[positionOfStyle]);
+
+    final int positionOfColor = expressions.indexWhere((css.Expression element) => tryParseColor(element) != null);
+    final Color? color = positionOfColor == -1 ? null : tryParseColor(expressions[positionOfColor]);
+
     borderSide = CssBorderSide(
-      color: expressions.length >= 3 ? tryParseColor(expressions[2]) : null,
-      style: expressions.length >= 2
-          ? tryParseTextDecorationStyle(expressions[1])
-          : null,
+      color: color,
+      style: style,
       width: width,
     );
   }
