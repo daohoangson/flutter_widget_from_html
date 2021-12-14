@@ -16,7 +16,7 @@ import 'internal/platform_specific/fallback.dart'
 
 /// A factory to build widgets.
 class WidgetFactory {
-  /// Setting this property to true replaces the default loading widget with a static [Text].
+  /// Setting this property to true replaces the default with a static [Text].
   /// This property is most useful for testing purposes.
   ///
   /// Defaults to `false`, resulting in a [CircularProgressIndicator].
@@ -49,7 +49,7 @@ class WidgetFactory {
 
   /// Gets the current anchor registry.
   ///
-  /// This is an implementation detail and may be changed without a major version bump.
+  /// This is an impl detail and may be changed without a major version bump.
   @protected
   AnchorRegistry get anchorRegistry => _anchorRegistry;
 

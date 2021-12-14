@@ -52,7 +52,8 @@ class HtmlWidget extends StatefulWidget {
 
   /// The callback when user taps a link.
   ///
-  /// Returns `true` if the url has been handled, the default handler will be skipped.
+  /// Returns `true` if the url has been handled,
+  /// the default handler will be skipped.
   final FutureOr<bool> Function(String)? onTapUrl;
 
   /// The values that should trigger rebuild.
@@ -81,8 +82,9 @@ class HtmlWidget extends StatefulWidget {
   /// The render mode.
   ///
   /// - [RenderMode.column] is the default mode, suitable for small / medium document.
-  /// - [RenderMode.listView] has better performance as it renders contents lazily.
-  /// - [RenderMode.sliverList] has similar performance as `ListView` and can be put inside a `CustomScrollView`.
+  /// - [RenderMode.listView] has better performance as it renders lazily.
+  /// - [RenderMode.sliverList] has similar performance as `ListView`
+  /// and can be put inside a `CustomScrollView`.
   final RenderMode renderMode;
 
   /// The default styling for text elements.

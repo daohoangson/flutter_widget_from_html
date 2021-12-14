@@ -85,9 +85,11 @@ void main() {
         explained,
         equals(
           '[RichText:(:'
-          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=NetworkImage("$src", scale: 1.0)]]'
           '(: )'
-          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=NetworkImage("$src", scale: 1.0)]]'
           ')]',
         ),
       );
@@ -112,8 +114,9 @@ void main() {
         explained,
         equals(
           '[CssSizing:height≥0.0,height=600.0,width≥0.0,width=800.0,child='
-          '[AspectRatio:aspectRatio=1.3,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
-          ']',
+          '[AspectRatio:aspectRatio=1.3,child='
+          '[Image:image=NetworkImage("$src", scale: 1.0)]'
+          ']]',
         ),
       );
     });
@@ -126,7 +129,8 @@ void main() {
         equals(
           '[RichText:(:'
           'Before text. '
-          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=NetworkImage("$src", scale: 1.0)]]'
           '(: After text.)'
           ')]',
         ),

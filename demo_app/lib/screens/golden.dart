@@ -88,7 +88,7 @@ class GoldensScreen extends StatefulWidget {
   const GoldensScreen({Key key}) : super(key: key);
 
   @override
-  _GoldensState createState() => _GoldensState();
+  State<GoldensScreen> createState() => _GoldensState();
 }
 
 class _GoldensState extends State<GoldensScreen> {

@@ -1,3 +1,7 @@
+## 2.7.1
+
+- Fix bug `FwfhTextStyle` has no getter `_fontFamily` (#680)
+
 ## 2.7.0+1
 
 - Relax Flutter version constraint (>=2.6.0-0)

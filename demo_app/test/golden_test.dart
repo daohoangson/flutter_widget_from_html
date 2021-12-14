@@ -51,6 +51,7 @@ void main() {
     'dev.flutter.pigeon.WebSettingsHostApi.setBuiltInZoomControls',
     'dev.flutter.pigeon.WebSettingsHostApi.setDisplayZoomControls',
     'dev.flutter.pigeon.WebSettingsHostApi.setDomStorageEnabled',
+    // ignore: lines_longer_than_80_chars
     'dev.flutter.pigeon.WebSettingsHostApi.setJavaScriptCanOpenWindowsAutomatically',
     'dev.flutter.pigeon.WebSettingsHostApi.setJavaScriptEnabled',
     'dev.flutter.pigeon.WebSettingsHostApi.setLoadWithOverviewMode',

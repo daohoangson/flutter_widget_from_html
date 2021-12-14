@@ -13,7 +13,7 @@ class HtmlDetails extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _HtmlDetailsState createState() => _HtmlDetailsState();
+  State<HtmlDetails> createState() => _HtmlDetailsState();
 }
 
 class _HtmlDetailsState extends State<HtmlDetails> {

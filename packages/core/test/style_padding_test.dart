@@ -574,8 +574,11 @@ void main() {
           '[CssBlock:child='
           '[DecoratedBox:bg=#FFFF0000,child='
           '[Padding:(5,5,5,5),child='
-          '[Column:children=[SizedBox:0.0x12.4],[CssBlock:child=[RichText:(@15.0+b:Foo)]],[SizedBox:0.0x12.4]]'
-          ']]]',
+          '[Column:children='
+          '[SizedBox:0.0x12.4],'
+          '[CssBlock:child=[RichText:(@15.0+b:Foo)]],'
+          '[SizedBox:0.0x12.4]'
+          ']]]]',
         ),
       );
     });

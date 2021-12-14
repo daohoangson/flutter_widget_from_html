@@ -1,21 +1,20 @@
+import 'package:demo_app/screens/audio.dart';
+import 'package:demo_app/screens/custom_styles_builder.dart';
+import 'package:demo_app/screens/custom_widget_builder.dart';
+import 'package:demo_app/screens/font_size.dart';
+import 'package:demo_app/screens/golden.dart';
+import 'package:demo_app/screens/hello_world.dart';
+import 'package:demo_app/screens/hello_world_core.dart';
+import 'package:demo_app/screens/huge_html.dart';
+import 'package:demo_app/screens/iframe.dart';
+import 'package:demo_app/screens/img.dart';
+import 'package:demo_app/screens/img_file.dart';
+import 'package:demo_app/screens/photo_view.dart';
+import 'package:demo_app/screens/smilie.dart';
+import 'package:demo_app/screens/video.dart';
+import 'package:demo_app/screens/wordpress.dart';
 import 'package:demo_app/widgets/popup_menu.dart';
 import 'package:flutter/material.dart';
-
-import 'audio.dart';
-import 'custom_styles_builder.dart';
-import 'custom_widget_builder.dart';
-import 'font_size.dart';
-import 'golden.dart';
-import 'hello_world.dart';
-import 'hello_world_core.dart';
-import 'huge_html.dart';
-import 'iframe.dart';
-import 'img.dart';
-import 'img_file.dart';
-import 'photo_view.dart';
-import 'smilie.dart';
-import 'video.dart';
-import 'wordpress.dart';
 
 class HomeScreen extends StatelessWidget {
   static final _screens = <String, Widget Function()>{
