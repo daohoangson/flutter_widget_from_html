@@ -908,6 +908,14 @@ Foo should float on top of table.''',
     </tr>
   </table>
 </div>''',
+              'rtl': '''
+<table dir="rtl">
+  <tr>
+    <td>Foo</td>
+    <td>Bar</td>
+  </tr>
+</table>
+''',
               'table_in_list': '''
 <ul>
   <li>
