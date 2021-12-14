@@ -10,12 +10,8 @@ class TagA {
   TagA(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        defaultStyles: (_) {
-          final styles = _.attributes[kAttributeAHref] != null ? {
-            kCssTextDecoration: kCssTextDecorationUnderline,
-          } : <String, String>{};
-
-          return styles;
+        defaultStyles: (_) => const {
+          kCssTextDecoration: kCssTextDecorationUnderline,
         },
         onTreeFlattening: (meta, tree) {
           final onTap = _gestureTapCallback(meta);
