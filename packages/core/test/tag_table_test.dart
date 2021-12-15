@@ -211,37 +211,61 @@ Future<void> main() async {
     testWidgets('border width|style|color', (WidgetTester tester) async {
       const html = '<div style="border: 1px solid black">Foo</div>';
       final e = await explain(tester, html, useExplainer: true);
-      expect(e, equals('[CssBlock:child=[Container:border=1.0@solid#FF000000,child=[RichText:(:Foo)]]]'));
+      expect(e, equals('[CssBlock:child='
+          '[Container:border=1.0@solid#FF000000,child='
+          '[RichText:(:Foo)'
+          ']]]'
+      ));
     });
 
     testWidgets('border width|color|style', (WidgetTester tester) async {
       const html = '<div style="border: 1px black solid">Foo</div>';
       final e = await explain(tester, html, useExplainer: true);
-      expect(e, equals('[CssBlock:child=[Container:border=1.0@solid#FF000000,child=[RichText:(:Foo)]]]'));
+      expect(e, equals('[CssBlock:child='
+          '[Container:border=1.0@solid#FF000000,child='
+          '[RichText:(:Foo)'
+          ']]]'
+      ));
     });
 
     testWidgets('border style|width|color', (WidgetTester tester) async {
       const html = '<div style="border:solid 1px black">Foo</div>';
       final e = await explain(tester, html, useExplainer: true);
-      expect(e, equals('[CssBlock:child=[Container:border=1.0@solid#FF000000,child=[RichText:(:Foo)]]]'));
+      expect(e, equals('[CssBlock:child='
+          '[Container:border=1.0@solid#FF000000,child='
+          '[RichText:(:Foo)'
+          ']]]'
+      ));
     });
 
     testWidgets('border style|color|width', (WidgetTester tester) async {
       const html = '<div style="border:solid black 1px">Foo</div>';
       final e = await explain(tester, html, useExplainer: true);
-      expect(e, equals('[CssBlock:child=[Container:border=1.0@solid#FF000000,child=[RichText:(:Foo)]]]'));
+      expect(e, equals('[CssBlock:child='
+          '[Container:border=1.0@solid#FF000000,child='
+          '[RichText:(:Foo)'
+          ']]]'
+      ));
     });
 
     testWidgets('border color|width|style', (WidgetTester tester) async {
       const html = '<div style="border: black 1px solid">Foo</div>';
       final e = await explain(tester, html, useExplainer: true);
-      expect(e, equals('[CssBlock:child=[Container:border=1.0@solid#FF000000,child=[RichText:(:Foo)]]]'));
+      expect(e, equals('[CssBlock:child='
+          '[Container:border=1.0@solid#FF000000,child='
+          '[RichText:(:Foo)'
+          ']]]'
+      ));
     });
 
     testWidgets('border color|style|width', (WidgetTester tester) async {
       const html = '<div style="border: black solid 1px">Foo</div>';
       final e = await explain(tester, html, useExplainer: true);
-      expect(e, equals('[CssBlock:child=[Container:border=1.0@solid#FF000000,child=[RichText:(:Foo)]]]'));
+      expect(e, equals('[CssBlock:child='
+          '[Container:border=1.0@solid#FF000000,child='
+          '[RichText:(:Foo)'
+          ']]]'
+      ));
     });
   });
 
