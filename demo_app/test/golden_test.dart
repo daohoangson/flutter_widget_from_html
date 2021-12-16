@@ -16,6 +16,7 @@ void _test(
   String name,
   String html, {
   bool isSelectable = false,
+  double textScaleSize = 1.0,
 }) =>
     testGoldens(
       name,
@@ -35,6 +36,7 @@ void _test(
             theme: ThemeData.light(),
           ),
           surfaceSize: const Size(400, 1200),
+          textScaleSize: textScaleSize,
         );
 
         await screenMatchesGolden(tester, name, finder: find.byKey(key));
@@ -88,8 +90,21 @@ void main() {
     final html = entry.value as String;
     _test(name, html);
 
+    if (name == 'FONT') {
+      _test('x2/$name', html, textScaleSize: 2.0);
+    }
+
     if (!name.contains('/')) {
       _test('selectable/$name', html, isSelectable: true);
+
+      if (name == 'FONT') {
+        _test(
+          'selectable/x2/$name',
+          html,
+          isSelectable: true,
+          textScaleSize: 2.0,
+        );
+      }
     }
   }
 }
