@@ -165,6 +165,7 @@ class WidgetFactory {
 
     final container = child is Container ? child : null;
     final decoratedBox = child is DecoratedBox ? child : null;
+    final grandChild = container?.child ?? decoratedBox?.child;
     final prevDeco = container?.decoration ?? decoratedBox?.decoration;
     final baseDeco =
         prevDeco is BoxDecoration ? prevDeco : const BoxDecoration();
@@ -177,7 +178,7 @@ class WidgetFactory {
     if (!isBorderBox || container != null) {
       return Container(
         decoration: decoration,
-        child: container?.child ?? child,
+        child: grandChild ?? child,
       );
     } else {
       return DecoratedBox(
