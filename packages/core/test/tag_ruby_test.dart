@@ -240,7 +240,8 @@ Future<void> main() async {
                 body: Padding(
                   padding: EdgeInsets.all(8.0),
                   child: HtmlWidget(
-                    '<div style="background: black; color: white; width: 200px; height: 200px">'
+                    '<div style="background: black; color: white; '
+                    'width: 200px; height: 200px">'
                     '<ruby>Foo <rt>bar</rt></ruby>'
                     '<div>',
                   ),

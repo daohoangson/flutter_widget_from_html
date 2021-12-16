@@ -37,7 +37,8 @@ void main() {
       equals(
         '[CssSizing:$sizingConstraints,child='
         '[SvgPicture:'
-        'pictureProvider=ExactAssetPicture(name: "$assetName", bundle: null, colorFilter: null)'
+        'pictureProvider=ExactAssetPicture(name: "$assetName", '
+        'bundle: null, colorFilter: null)'
         ']]',
       ),
     );

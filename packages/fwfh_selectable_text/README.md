@@ -35,5 +35,11 @@ HtmlWidget(
 // ...
 
 class MyWidgetFactory extends WidgetFactory with SelectableTextFactory {
+
+  @override
+  SelectionChangedCallback? get selectableTextOnChanged => (selection, cause) {
+    // do something when the selection changes
+  };
+
 }
 ```

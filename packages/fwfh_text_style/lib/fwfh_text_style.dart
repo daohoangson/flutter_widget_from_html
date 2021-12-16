@@ -143,7 +143,9 @@ class FwfhTextStyle extends _TextStyleProxy {
   }
 
   @override
-  TextStyle merge(TextStyle? other) => FwfhTextStyle.from(ref.merge(other));
+  TextStyle merge(TextStyle? other) => FwfhTextStyle.from(
+        ref.merge(other is FwfhTextStyle ? other.ref : other),
+      );
 }
 
 class _DefaultValue {

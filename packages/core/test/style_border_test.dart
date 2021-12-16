@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '_.dart';
 
+const _border1 = '1.0@none#FF001234';
+
 void main() {
   testWidgets('renders text without border', (WidgetTester tester) async {
     const html = '<span>Foo</span>';
@@ -79,11 +81,7 @@ void main() {
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals(
-        '[Container:'
-        'border=1.0@none#FF001234,'
-        'child=[RichText:(:Foo)]]',
-      ),
+      equals('[Container:border=$_border1,child=[RichText:(:Foo)]]'),
     );
   });
 
@@ -93,9 +91,9 @@ void main() {
     expect(
       explained,
       equals(
-        '[RichText:(:Foo [Container:'
-        'border=1.0@none#FF001234,'
-        'child=[RichText:(:bar)]])]',
+        '[RichText:(:Foo '
+        '[Container:border=$_border1,child=[RichText:(:bar)]]'
+        ')]',
       ),
     );
   });
@@ -108,7 +106,7 @@ void main() {
       equals(
         '[SizedBox:0.0x1.0],'
         '[Padding:(0,1,0,1),child='
-        '[CssBlock:child=[Container:border=1.0@none#FF001234,child=[RichText:(:Foo)]]]'
+        '[CssBlock:child=[Container:border=$_border1,child=[RichText:(:Foo)]]]'
         '],'
         '[SizedBox:0.0x1.0]',
       ),
@@ -122,7 +120,7 @@ void main() {
     expect(
       explained,
       equals(
-        '[CssBlock:child=[Container:border=1.0@none#FF001234,child='
+        '[CssBlock:child=[Container:border=$_border1,child='
         '[Column:children='
         '[SizedBox:0.0x1.0],'
         '[Padding:(0,1,0,1),child=[CssBlock:child=[RichText:(:Foo)]]],'
@@ -678,11 +676,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals(
-          '[Container:'
-          'border=1.0@none#FF001234,'
-          'child=[RichText:(:Foo)]]',
-        ),
+        equals('[Container:border=$_border1,child=[RichText:(:Foo)]]'),
       );
     });
 
@@ -692,11 +686,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals(
-          '[Container:'
-          'border=1.0@none#FF001234,'
-          'child=[RichText:(:Foo)]]',
-        ),
+        equals('[Container:border=$_border1,child=[RichText:(:Foo)]]'),
       );
     });
 
@@ -706,11 +696,7 @@ void main() {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals(
-          '[DecoratedBox:'
-          'border=1.0@none#FF001234,'
-          'child=[RichText:(:Foo)]]',
-        ),
+        equals('[DecoratedBox:border=$_border1,child=[RichText:(:Foo)]]'),
       );
     });
   });
@@ -723,7 +709,8 @@ void main() {
         explained,
         equals(
           '[Container:'
-          'border=(2.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234),'
+          'border=(2.0@none#FF001234,1.0@none#FF001234,'
+          '1.0@none#FF001234,1.0@none#FF001234),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -737,7 +724,8 @@ void main() {
         explained,
         equals(
           '[Container:'
-          'border=(2.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234),'
+          'border=(2.0@none#FF001234,1.0@none#FF001234,'
+          '1.0@none#FF001234,1.0@none#FF001234),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -750,7 +738,8 @@ void main() {
         explained,
         equals(
           '[Container:'
-          'border=(1.0@none#FF001234,2.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234),'
+          'border=(1.0@none#FF001234,2.0@none#FF001234,'
+          '1.0@none#FF001234,1.0@none#FF001234),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -763,7 +752,8 @@ void main() {
         explained,
         equals(
           '[Container:'
-          'border=(1.0@none#FF001234,1.0@none#FF001234,2.0@none#FF001234,1.0@none#FF001234),'
+          'border=(1.0@none#FF001234,1.0@none#FF001234,'
+          '2.0@none#FF001234,1.0@none#FF001234),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -777,7 +767,8 @@ void main() {
         explained,
         equals(
           '[Container:'
-          'border=(1.0@none#FF001234,1.0@none#FF001234,2.0@none#FF001234,1.0@none#FF001234),'
+          'border=(1.0@none#FF001234,1.0@none#FF001234,'
+          '2.0@none#FF001234,1.0@none#FF001234),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -790,7 +781,8 @@ void main() {
         explained,
         equals(
           '[Container:'
-          'border=(1.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234,2.0@none#FF001234),'
+          'border=(1.0@none#FF001234,1.0@none#FF001234,'
+          '1.0@none#FF001234,2.0@none#FF001234),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -806,7 +798,8 @@ void main() {
           explained,
           equals(
             '[Container:'
-            'border=(1.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234,2.0@none#FF001234),'
+            'border=(1.0@none#FF001234,1.0@none#FF001234,'
+            '1.0@none#FF001234,2.0@none#FF001234),'
             'child=[RichText:(:Foo)]]',
           ),
         );
@@ -818,7 +811,8 @@ void main() {
           explained,
           equals(
             '[Container:'
-            'border=(1.0@none#FF001234,2.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234),'
+            'border=(1.0@none#FF001234,2.0@none#FF001234,'
+            '1.0@none#FF001234,1.0@none#FF001234),'
             'child=[RichText:dir=rtl,(:Foo)]]',
           ),
         );
@@ -835,7 +829,8 @@ void main() {
           explained,
           equals(
             '[Container:'
-            'border=(1.0@none#FF001234,2.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234),'
+            'border=(1.0@none#FF001234,2.0@none#FF001234,'
+            '1.0@none#FF001234,1.0@none#FF001234),'
             'child=[RichText:(:Foo)]]',
           ),
         );
@@ -847,7 +842,8 @@ void main() {
           explained,
           equals(
             '[Container:'
-            'border=(1.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234,2.0@none#FF001234),'
+            'border=(1.0@none#FF001234,1.0@none#FF001234,'
+            '1.0@none#FF001234,2.0@none#FF001234),'
             'child=[RichText:dir=rtl,(:Foo)]]',
           ),
         );
@@ -862,7 +858,8 @@ void main() {
         explained,
         equals(
           '[Container:'
-          'border=(1.0@solid#FF001234,1.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234),'
+          'border=(1.0@solid#FF001234,1.0@none#FF001234,'
+          '1.0@none#FF001234,1.0@none#FF001234),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -876,7 +873,8 @@ void main() {
         explained,
         equals(
           '[Container:'
-          'border=(1.0@none#FFFF0000,1.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234),'
+          'border=(1.0@none#FFFF0000,1.0@none#FF001234,'
+          '1.0@none#FF001234,1.0@none#FF001234),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -903,9 +901,9 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Container:'
-          'border=1.0@none#FF001234,'
-          'child=[RichText:(:Foo)]]]',
+          '[CssBlock:child='
+          '[Container:border=$_border1,child=[RichText:(:Foo)]]'
+          ']',
         ),
       );
     });

@@ -62,7 +62,7 @@ class TextStyleHtml {
   }) {
     assert(
       style is FwfhTextStyle?,
-      'The text style should be modified by calling methods of the existing instance: '
+      'The text style should be modified by methods of the existing instance: '
       'apply(), copyWith() or merge().',
     );
 
@@ -138,6 +138,7 @@ class TextStyleBuilder<T1> {
     final l = _builders!.length;
     for (var i = 0; i < l; i++) {
       final builder = _builders![i];
+      // ignore: avoid_dynamic_calls
       _output = builder(_output, _inputs![i]) as TextStyleHtml;
       assert(_output?.parent == _parentOutput);
     }

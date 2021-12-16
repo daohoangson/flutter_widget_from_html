@@ -8,3 +8,8 @@ linter:
   rules:
     always_put_control_body_on_new_line: true
     missing_whitespace_between_adjacent_strings: false
+
+    # relative vs. package imports
+    always_use_package_imports: false
+    avoid_relative_lib_imports: true
+    prefer_relative_imports: true
