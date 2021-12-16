@@ -99,6 +99,7 @@ class HtmlWidget extends core.HtmlWidget {
           onTapImage: onTapImage,
           onTapUrl: onTapUrl,
           rebuildTriggers: core.RebuildTriggers([
+            isSelectable,
             webView,
             webViewJs,
             if (rebuildTriggers != null) rebuildTriggers,
