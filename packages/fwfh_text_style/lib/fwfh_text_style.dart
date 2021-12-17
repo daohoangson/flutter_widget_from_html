@@ -8,7 +8,8 @@ const _default = _DefaultValue();
 /// A [TextStyle] replacement.
 class FwfhTextStyle extends _TextStyleProxy {
   /// Creates a text style.
-  const FwfhTextStyle.from(TextStyle ref) : super._(ref);
+  FwfhTextStyle.from(TextStyle ref)
+      : super._(ref is FwfhTextStyle ? ref.ref : ref);
 
   @override
   TextStyle apply({

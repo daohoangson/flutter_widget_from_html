@@ -9,7 +9,7 @@ void main() {
   const factor = 3.0;
 
   group('height=null', () {
-    const obj = FwfhTextStyle.from(TextStyle());
+    final obj = FwfhTextStyle.from(const TextStyle());
 
     group('apply()', () {
       test('ignores height delta', () {
@@ -52,13 +52,13 @@ void main() {
       });
 
       test('merges another -> null', () {
-        final merged = obj.merge(const FwfhTextStyle.from(TextStyle()));
+        final merged = obj.merge(FwfhTextStyle.from(const TextStyle()));
         expect(merged.height, isNull);
       });
 
       test('merges another -> value', () {
         final merged = obj.merge(
-          const FwfhTextStyle.from(TextStyle(height: value)),
+          FwfhTextStyle.from(const TextStyle(height: value)),
         );
         expect(merged.height, equals(value));
       });
@@ -66,7 +66,7 @@ void main() {
   });
 
   group('height=value', () {
-    const obj = FwfhTextStyle.from(TextStyle(height: value));
+    final obj = FwfhTextStyle.from(const TextStyle(height: value));
 
     group('apply()', () {
       test('applies height delta', () {
@@ -119,13 +119,13 @@ void main() {
       });
 
       test('merges another -> keep value', () {
-        final merged = obj.merge(const FwfhTextStyle.from(TextStyle()));
+        final merged = obj.merge(FwfhTextStyle.from(const TextStyle()));
         expect(merged.height, equals(value));
       });
 
       test('merges another -> new value', () {
         final merged = obj.merge(
-          const FwfhTextStyle.from(TextStyle(height: value2)),
+          FwfhTextStyle.from(const TextStyle(height: value2)),
         );
         expect(merged.height, equals(value2));
       });
@@ -134,7 +134,7 @@ void main() {
 
   test('copyWith() updates existing debugLabel', () {
     const debugLabel = 'foo';
-    const obj = FwfhTextStyle.from(TextStyle(debugLabel: debugLabel));
+    final obj = FwfhTextStyle.from(const TextStyle(debugLabel: debugLabel));
     expect(obj.debugLabel, equals(debugLabel));
 
     final copied = obj.copyWith();
@@ -144,11 +144,20 @@ void main() {
 
   test('copyWith() replaces debugLabel', () {
     const debugLabel1 = 'foo';
-    const obj = FwfhTextStyle.from(TextStyle(debugLabel: debugLabel1));
+    final obj = FwfhTextStyle.from(const TextStyle(debugLabel: debugLabel1));
     expect(obj.debugLabel, equals(debugLabel1));
 
     const debugLabel2 = 'bar';
     final copied = obj.copyWith(debugLabel: debugLabel2);
     expect(copied.debugLabel, equals(debugLabel2));
+  });
+
+  test('merge() nested obj', () {
+    final obj =
+        FwfhTextStyle.from(FwfhTextStyle.from(const TextStyle(height: value)));
+    final another =
+        FwfhTextStyle.from(FwfhTextStyle.from(const TextStyle(height: value2)));
+    final merged = obj.merge(another);
+    expect(merged.height, equals(value2));
   });
 }
