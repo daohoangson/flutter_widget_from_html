@@ -251,6 +251,21 @@ abstract class _TextStyleProxy implements TextStyle {
       ref.getTextStyle(textScaleFactor: textScaleFactor);
 
   @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    if (other is! TextStyle) {
+      return false;
+    }
+    final otherRef = other is FwfhTextStyle ? other.ref : other;
+    return ref == otherRef;
+  }
+
+  @override
+  int get hashCode => ref.hashCode;
+
+  @override
   double? get height => ref.height;
 
   @override

@@ -15,11 +15,13 @@ void main() {
       test('ignores height delta', () {
         final applied = obj.apply(heightDelta: delta);
         expect(applied.height, isNull);
+        expect(applied, equals(obj));
       });
 
       test('ignores height factor', () {
         final applied = obj.apply(heightFactor: factor);
         expect(applied.height, isNull);
+        expect(applied, equals(obj));
       });
     });
 
@@ -27,11 +29,13 @@ void main() {
       test('keeps null', () {
         final copied = obj.copyWith();
         expect(copied.height, isNull);
+        expect(copied, equals(obj));
       });
 
       test('updates null with value', () {
         final copied = obj.copyWith(height: value);
         expect(copied.height, equals(value));
+        expect(copied, isNot(equals(obj)));
       });
     });
 
@@ -39,21 +43,25 @@ void main() {
       test('keeps null', () {
         final merged = obj.merge(const TextStyle());
         expect(merged.height, isNull);
+        expect(merged, equals(obj));
       });
 
       test('merges null', () {
         final merged = obj.merge(null);
         expect(merged.height, isNull);
+        expect(merged, equals(obj));
       });
 
       test('merges value', () {
         final merged = obj.merge(const TextStyle(height: value));
         expect(merged.height, equals(value));
+        expect(merged, isNot(equals(obj)));
       });
 
       test('merges another -> null', () {
         final merged = obj.merge(FwfhTextStyle.from(const TextStyle()));
         expect(merged.height, isNull);
+        expect(merged, equals(obj));
       });
 
       test('merges another -> value', () {
@@ -61,6 +69,7 @@ void main() {
           FwfhTextStyle.from(const TextStyle(height: value)),
         );
         expect(merged.height, equals(value));
+        expect(merged, isNot(equals(obj)));
       });
     });
   });
@@ -72,16 +81,19 @@ void main() {
       test('applies height delta', () {
         final applied = obj.apply(heightDelta: delta);
         expect(applied.height, equals(value + delta));
+        expect(applied, isNot(equals(obj)));
       });
 
       test('applies height factor', () {
         final applied = obj.apply(heightFactor: factor);
         expect(applied.height, equals(value * factor));
+        expect(applied, isNot(equals(obj)));
       });
 
       test('applies both', () {
         final applied = obj.apply(heightDelta: delta, heightFactor: factor);
         expect(applied.height, equals(value * factor + delta));
+        expect(applied, isNot(equals(obj)));
       });
     });
 
@@ -89,16 +101,19 @@ void main() {
       test('keeps value', () {
         final copied = obj.copyWith();
         expect(copied.height, equals(value));
+        expect(copied, equals(obj));
       });
 
       test('updates with another value', () {
         final copied = obj.copyWith(height: value2);
         expect(copied.height, equals(value2));
+        expect(copied, isNot(equals(obj)));
       });
 
       test('resets to null', () {
         final copied = obj.copyWith(height: null);
         expect(copied.height, isNull);
+        expect(copied, isNot(equals(obj)));
       });
     });
 
@@ -106,21 +121,25 @@ void main() {
       test('keeps value', () {
         final merged = obj.merge(const TextStyle());
         expect(merged.height, equals(value));
+        expect(merged, equals(obj));
       });
 
       test('merges null', () {
         final merged = obj.merge(null);
         expect(merged.height, equals(value));
+        expect(merged, equals(obj));
       });
 
       test('merges another value', () {
         final merged = obj.merge(const TextStyle(height: value2));
         expect(merged.height, equals(value2));
+        expect(merged, isNot(equals(obj)));
       });
 
       test('merges another -> keep value', () {
         final merged = obj.merge(FwfhTextStyle.from(const TextStyle()));
         expect(merged.height, equals(value));
+        expect(merged, equals(obj));
       });
 
       test('merges another -> new value', () {
@@ -128,6 +147,7 @@ void main() {
           FwfhTextStyle.from(const TextStyle(height: value2)),
         );
         expect(merged.height, equals(value2));
+        expect(merged, isNot(equals(obj)));
       });
     });
   });
@@ -140,6 +160,11 @@ void main() {
     final copied = obj.copyWith();
     expect(copied.debugLabel, isNot(equals(debugLabel)));
     expect(copied.debugLabel, contains(debugLabel));
+
+    // `TextStyle.operator==` ignores `debugLabel`
+    expect(copied, equals(obj));
+    expect(copied.hashCode, equals(obj.hashCode));
+    expect(identical(copied, obj), isFalse);
   });
 
   test('copyWith() replaces debugLabel', () {
@@ -150,6 +175,11 @@ void main() {
     const debugLabel2 = 'bar';
     final copied = obj.copyWith(debugLabel: debugLabel2);
     expect(copied.debugLabel, equals(debugLabel2));
+
+    // `TextStyle.operator==` ignores `debugLabel`
+    expect(copied, equals(obj));
+    expect(copied.hashCode, equals(obj.hashCode));
+    expect(identical(copied, obj), isFalse);
   });
 
   test('merge() nested obj', () {
@@ -159,5 +189,6 @@ void main() {
         FwfhTextStyle.from(FwfhTextStyle.from(const TextStyle(height: value2)));
     final merged = obj.merge(another);
     expect(merged.height, equals(value2));
+    expect(merged, isNot(equals(obj)));
   });
 }
