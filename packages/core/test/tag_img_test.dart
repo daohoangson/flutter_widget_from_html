@@ -380,7 +380,9 @@ void main() {
   group('error handing', () {
     testWidgets('executes errorBuilder', (WidgetTester tester) async {
       const html = 'Foo <img src="data:image/jpg;base64,xxxx" /> bar';
-      await tester.pumpWidget(const MaterialApp(home: HtmlWidget(html)));
+      await tester.pumpWidget(
+        const MaterialApp(home: Scaffold(body: HtmlWidget(html))),
+      );
       await tester.pumpAndSettle();
       expect(find.text('❌'), findsOneWidget);
     });

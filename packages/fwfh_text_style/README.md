@@ -22,11 +22,10 @@ dependencies:
 ## Usage
 
 ```dart
-TextStyle style = DefaultTextStyle.of(context);
-style = FwfhTextStyle.from(style);
+TextStyle style = FwfhTextStyle.of(context);
 
 // ...
 
 // reset .height to null (normal line height behavior)
-style = style.copyWith(height: null);
+final withoutHeight = style.copyWith(height: null);
 ```
