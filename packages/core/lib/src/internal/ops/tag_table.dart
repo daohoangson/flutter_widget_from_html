@@ -212,7 +212,7 @@ class TagTable {
 
   static BuildOp borderOp(double border, double borderSpacing) => BuildOp(
         defaultStyles: (_) => {
-          kCssBorder: '${border}px solid black',
+          if (border > 0.0) kCssBorder: '${border}px solid black',
           kCssBorderCollapse: kCssBorderCollapseSeparate,
           kCssBorderSpacing: '${borderSpacing}px',
         },
