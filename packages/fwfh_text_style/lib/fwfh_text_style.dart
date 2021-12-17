@@ -8,6 +8,9 @@ const _default = _DefaultValue();
 /// A [TextStyle] replacement.
 class FwfhTextStyle extends _TextStyleProxy {
   /// Creates a text style.
+  ///
+  /// [ref] must be a complete style,
+  /// it should be obtained from `DefaultTextStyle.of(context)` and the like.
   FwfhTextStyle.from(TextStyle ref)
       : super._(ref is FwfhTextStyle ? ref.ref : ref);
 
@@ -157,7 +160,12 @@ class _DefaultValue {
 abstract class _TextStyleProxy implements TextStyle {
   final TextStyle ref;
 
-  const _TextStyleProxy._(this.ref);
+  _TextStyleProxy._(this.ref)
+      : assert(
+          ref.inherit == false,
+          "FwfhTextStyle.from() doesn't support incomplete TextStyle. "
+          'Use `DefaultTextStyle.of(context)` to obtain the current style.',
+        );
 
   @override
   Paint? get background => ref.background;

@@ -31,11 +31,8 @@ class TextStyleHtml {
 
   /// Creates the root text style.
   factory TextStyleHtml.root(Iterable<dynamic> deps, TextStyle? widgetStyle) {
-    var style = _getDependency<TextStyle>(deps);
+    var style = _getDependency<TextStyle>(deps).merge(widgetStyle);
     style = FwfhTextStyle.from(style);
-    if (widgetStyle != null) {
-      style = widgetStyle.inherit ? style.merge(widgetStyle) : widgetStyle;
-    }
 
     final mqd = _getDependency<MediaQueryData>(deps);
     final tsf = mqd.textScaleFactor;

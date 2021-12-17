@@ -1,15 +1,24 @@
-import 'package:flutter/rendering.dart';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fwfh_text_style/fwfh_text_style.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
 
-void main() {
+Future<void> main() async {
+  await loadAppFonts();
+
   const value = 1.0;
   const value2 = 2.0;
   const delta = .666;
   const factor = 3.0;
 
+  const style0 = TextStyle(inherit: false);
+  const styleValue = TextStyle(height: value, inherit: false);
+  const styleValue2 = TextStyle(height: value2, inherit: false);
+
   group('height=null', () {
-    final obj = FwfhTextStyle.from(const TextStyle());
+    final obj = FwfhTextStyle.from(style0);
 
     group('apply()', () {
       test('ignores height delta', () {
@@ -59,15 +68,13 @@ void main() {
       });
 
       test('merges another -> null', () {
-        final merged = obj.merge(FwfhTextStyle.from(const TextStyle()));
+        final merged = obj.merge(FwfhTextStyle.from(style0));
         expect(merged.height, isNull);
         expect(merged, equals(obj));
       });
 
       test('merges another -> value', () {
-        final merged = obj.merge(
-          FwfhTextStyle.from(const TextStyle(height: value)),
-        );
+        final merged = obj.merge(FwfhTextStyle.from(styleValue));
         expect(merged.height, equals(value));
         expect(merged, isNot(equals(obj)));
       });
@@ -75,7 +82,7 @@ void main() {
   });
 
   group('height=value', () {
-    final obj = FwfhTextStyle.from(const TextStyle(height: value));
+    final obj = FwfhTextStyle.from(styleValue);
 
     group('apply()', () {
       test('applies height delta', () {
@@ -136,16 +143,14 @@ void main() {
         expect(merged, isNot(equals(obj)));
       });
 
-      test('merges another -> keep value', () {
-        final merged = obj.merge(FwfhTextStyle.from(const TextStyle()));
-        expect(merged.height, equals(value));
-        expect(merged, equals(obj));
+      test('merges another -> resets value', () {
+        final merged = obj.merge(FwfhTextStyle.from(style0));
+        expect(merged.height, isNull);
+        expect(merged, isNot(equals(obj)));
       });
 
       test('merges another -> new value', () {
-        final merged = obj.merge(
-          FwfhTextStyle.from(const TextStyle(height: value2)),
-        );
+        final merged = obj.merge(styleValue2);
         expect(merged.height, equals(value2));
         expect(merged, isNot(equals(obj)));
       });
@@ -154,7 +159,12 @@ void main() {
 
   test('copyWith() updates existing debugLabel', () {
     const debugLabel = 'foo';
-    final obj = FwfhTextStyle.from(const TextStyle(debugLabel: debugLabel));
+    final obj = FwfhTextStyle.from(
+      const TextStyle(
+        debugLabel: debugLabel,
+        inherit: false,
+      ),
+    );
     expect(obj.debugLabel, equals(debugLabel));
 
     final copied = obj.copyWith();
@@ -169,7 +179,12 @@ void main() {
 
   test('copyWith() replaces debugLabel', () {
     const debugLabel1 = 'foo';
-    final obj = FwfhTextStyle.from(const TextStyle(debugLabel: debugLabel1));
+    final obj = FwfhTextStyle.from(
+      const TextStyle(
+        debugLabel: debugLabel1,
+        inherit: false,
+      ),
+    );
     expect(obj.debugLabel, equals(debugLabel1));
 
     const debugLabel2 = 'bar';
@@ -183,12 +198,77 @@ void main() {
   });
 
   test('merge() nested obj', () {
-    final obj =
-        FwfhTextStyle.from(FwfhTextStyle.from(const TextStyle(height: value)));
-    final another =
-        FwfhTextStyle.from(FwfhTextStyle.from(const TextStyle(height: value2)));
+    final obj = FwfhTextStyle.from(FwfhTextStyle.from(styleValue));
+    final another = FwfhTextStyle.from(FwfhTextStyle.from(styleValue2));
     final merged = obj.merge(another);
     expect(merged.height, equals(value2));
     expect(merged, isNot(equals(obj)));
   });
+
+  final goldenSkip = Platform.isLinux ? null : 'Linux only';
+  group(
+    'screenshot testing',
+    () {
+      testGoldens('renders Text', (WidgetTester tester) async {
+        await tester.pumpWidgetBuilder(
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Builder(
+              builder: (context) => Text(
+                'Foo 20',
+                style: FwfhTextStyle.from(
+                  context.style.copyWith(fontSize: 20),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await screenMatchesGolden(tester, 'Text');
+      });
+
+      testGoldens('renders Text.rich', (WidgetTester tester) async {
+        await tester.pumpWidgetBuilder(
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Builder(
+              builder: (context) => Text.rich(
+                const TextSpan(text: 'Foo red'),
+                style: FwfhTextStyle.from(
+                  context.style.copyWith(color: Colors.red),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await screenMatchesGolden(tester, 'RichText');
+      });
+
+      testGoldens('renders TextSpan', (WidgetTester tester) async {
+        await tester.pumpWidgetBuilder(
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Builder(
+              builder: (context) => Text.rich(
+                TextSpan(
+                  text: 'Foo bold',
+                  style: FwfhTextStyle.from(
+                    context.style.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await screenMatchesGolden(tester, 'TextSpan');
+      });
+    },
+    skip: goldenSkip,
+  );
+}
+
+extension _BuildContext on BuildContext {
+  TextStyle get style => DefaultTextStyle.of(this).style;
 }
