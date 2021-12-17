@@ -1,18 +1,21 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 
 const _default = _DefaultValue();
 
 /// A [TextStyle] replacement.
 class FwfhTextStyle extends _TextStyleProxy {
-  /// Creates a text style.
+  /// Creates an instance from a [TextStyle] with inherit=false.
   ///
-  /// [ref] must be a complete style,
-  /// it should be obtained from `DefaultTextStyle.of(context)` and the like.
+  /// See also: [FwfhTextStyle.of].
   FwfhTextStyle.from(TextStyle ref)
       : super._(ref is FwfhTextStyle ? ref.ref : ref);
+
+  /// Creates an instance from the closest [DefaultTextStyle].
+  factory FwfhTextStyle.of(BuildContext context) =>
+      FwfhTextStyle.from(DefaultTextStyle.of(context).style);
 
   @override
   TextStyle apply({

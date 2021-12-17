@@ -211,7 +211,7 @@ Future<void> main() async {
   GoldenToolkit.runWithConfiguration(
     () {
       group(
-        'screenshot testing',
+        'FwfhTextStyle.of',
         () {
           testGoldens('renders Text', (WidgetTester tester) async {
             await tester.pumpWidgetBuilder(
@@ -220,9 +220,7 @@ Future<void> main() async {
                 child: Builder(
                   builder: (context) => Text(
                     'Foo 20',
-                    style: FwfhTextStyle.from(
-                      context.style.copyWith(fontSize: 20),
-                    ),
+                    style: FwfhTextStyle.of(context).copyWith(fontSize: 20),
                   ),
                 ),
               ),
@@ -238,9 +236,8 @@ Future<void> main() async {
                 child: Builder(
                   builder: (context) => Text.rich(
                     const TextSpan(text: 'Foo red'),
-                    style: FwfhTextStyle.from(
-                      context.style.copyWith(color: Colors.red),
-                    ),
+                    style:
+                        FwfhTextStyle.of(context).copyWith(color: Colors.red),
                   ),
                 ),
               ),
@@ -257,9 +254,8 @@ Future<void> main() async {
                   builder: (context) => Text.rich(
                     TextSpan(
                       text: 'Foo bold',
-                      style: FwfhTextStyle.from(
-                        context.style.copyWith(fontWeight: FontWeight.bold),
-                      ),
+                      style: FwfhTextStyle.of(context)
+                          .copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -276,8 +272,4 @@ Future<void> main() async {
       fileNameFactory: (name) => '$kGoldenFilePrefix/fwfh_text_style/$name.png',
     ),
   );
-}
-
-extension _BuildContext on BuildContext {
-  TextStyle get style => DefaultTextStyle.of(this).style;
 }
