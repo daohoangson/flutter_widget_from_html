@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
 
+export '_constants.dart';
+
 const kColor = Color(0xFF001234);
 const kColorPrimary = Color(0xFF123456);
 
@@ -13,8 +15,6 @@ const kDataUri = 'data:image/gif;base64,$kDataBase64';
 
 // TODO: switch to GlobalKey<HtmlWidgetState> when backward compatibility allows
 final hwKey = GlobalKey<State<HtmlWidget>>();
-
-const kGoldenFilePrefix = '../../../demo_app/test';
 
 Widget? buildCurrentState({GlobalKey? key}) {
   final hws = (key ?? hwKey).currentState;

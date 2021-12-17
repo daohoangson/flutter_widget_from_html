@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fwfh_text_style/fwfh_text_style.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 
+import '../../core/test/_constants.dart';
+
 Future<void> main() async {
   await loadAppFonts();
 
@@ -206,66 +208,73 @@ Future<void> main() async {
   });
 
   final goldenSkip = Platform.isLinux ? null : 'Linux only';
-  group(
-    'screenshot testing',
+  GoldenToolkit.runWithConfiguration(
     () {
-      testGoldens('renders Text', (WidgetTester tester) async {
-        await tester.pumpWidgetBuilder(
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Builder(
-              builder: (context) => Text(
-                'Foo 20',
-                style: FwfhTextStyle.from(
-                  context.style.copyWith(fontSize: 20),
-                ),
-              ),
-            ),
-          ),
-        );
-
-        await screenMatchesGolden(tester, 'Text');
-      });
-
-      testGoldens('renders Text.rich', (WidgetTester tester) async {
-        await tester.pumpWidgetBuilder(
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Builder(
-              builder: (context) => Text.rich(
-                const TextSpan(text: 'Foo red'),
-                style: FwfhTextStyle.from(
-                  context.style.copyWith(color: Colors.red),
-                ),
-              ),
-            ),
-          ),
-        );
-
-        await screenMatchesGolden(tester, 'RichText');
-      });
-
-      testGoldens('renders TextSpan', (WidgetTester tester) async {
-        await tester.pumpWidgetBuilder(
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Builder(
-              builder: (context) => Text.rich(
-                TextSpan(
-                  text: 'Foo bold',
-                  style: FwfhTextStyle.from(
-                    context.style.copyWith(fontWeight: FontWeight.bold),
+      group(
+        'screenshot testing',
+        () {
+          testGoldens('renders Text', (WidgetTester tester) async {
+            await tester.pumpWidgetBuilder(
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Builder(
+                  builder: (context) => Text(
+                    'Foo 20',
+                    style: FwfhTextStyle.from(
+                      context.style.copyWith(fontSize: 20),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-        );
+            );
 
-        await screenMatchesGolden(tester, 'TextSpan');
-      });
+            await screenMatchesGolden(tester, 'Text');
+          });
+
+          testGoldens('renders Text.rich', (WidgetTester tester) async {
+            await tester.pumpWidgetBuilder(
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Builder(
+                  builder: (context) => Text.rich(
+                    const TextSpan(text: 'Foo red'),
+                    style: FwfhTextStyle.from(
+                      context.style.copyWith(color: Colors.red),
+                    ),
+                  ),
+                ),
+              ),
+            );
+
+            await screenMatchesGolden(tester, 'Text.rich');
+          });
+
+          testGoldens('renders TextSpan', (WidgetTester tester) async {
+            await tester.pumpWidgetBuilder(
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Builder(
+                  builder: (context) => Text.rich(
+                    TextSpan(
+                      text: 'Foo bold',
+                      style: FwfhTextStyle.from(
+                        context.style.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+
+            await screenMatchesGolden(tester, 'TextSpan');
+          });
+        },
+        skip: goldenSkip,
+      );
     },
-    skip: goldenSkip,
+    config: GoldenToolkitConfiguration(
+      fileNameFactory: (name) => '$kGoldenFilePrefix/fwfh_text_style/$name.png',
+    ),
   );
 }
 
