@@ -1,3 +1,8 @@
+## 2.7.2
+
+- New factory method `FwfhTextStyle.of`
+- Avoid TextStyle.merge error (#693)
+
 ## 2.7.1
 
 - Fix bug `FwfhTextStyle` has no getter `_fontFamily` (#680)
@@ -8,6 +13,7 @@
 
 ## 2.7.0
 
+- Add support for Flutter@2.7
 - Add support for `package` parameter [flutter/flutter@0438bdf](https://github.com/flutter/flutter/commit/0438bdfe126b7e890064e0b81a22ade4bbecc8bf)
 
 ## 2.5.0+1
