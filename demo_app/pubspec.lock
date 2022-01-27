@@ -795,7 +795,7 @@ packages:
     source: hosted
     version: "2.2.16"
   video_player_platform_interface:
-    dependency: "direct dev"
+    dependency: transitive
     description:
       name: video_player_platform_interface
       url: "https://pub.dartlang.org"
