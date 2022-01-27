@@ -24,4 +24,5 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   lint: any
+  plugin_platform_interface: any
   video_player_platform_interface: any
