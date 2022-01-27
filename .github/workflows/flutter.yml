@@ -9,16 +9,6 @@ on:
       - release/master
 
 jobs:
-  analyze:
-    name: Format
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-      - name: Run flutter format
-        run: flutter format --dry-run --set-exit-if-changed .
-
   unit_test:
     name: Unit test
     runs-on: ubuntu-latest
@@ -26,6 +16,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
+      - name: Run flutter format
+        run: flutter format --dry-run --set-exit-if-changed .
       - run: ./tool/test.sh --coverage
       - uses: actions/upload-artifact@v2
         if: failure()
