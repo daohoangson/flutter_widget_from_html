@@ -47,11 +47,11 @@ dependency_overrides:
   uuid: ^3.0.0
 
 dev_dependencies:
-  flutter_driver:
-    sdk: flutter
   flutter_test:
     sdk: flutter
   golden_toolkit: ^0.13.0
+  integration_test:
+    sdk: flutter
   lint: any
   test: any
 
