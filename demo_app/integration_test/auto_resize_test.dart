@@ -81,7 +81,7 @@ class WebViewTestCase {
 </body>
 ''';
 
-    const interval = Duration(seconds: 5);
+    const interval = Duration(milliseconds: 500);
 
     final test = _AspectRatioTest(
       child: WebView(
@@ -98,10 +98,11 @@ class WebViewTestCase {
 
     runApp(test);
 
-    await tester.pump();
-    await tester.runAsync(() => Future.delayed(interval));
-    await tester.pump();
-    await tester.runAsync(() => Future.delayed(interval));
+    for (var i = 0; i < 3; i++) {
+      await tester.pump();
+      await tester.runAsync(() => Future.delayed(interval));
+    }
+
     await tester.pump();
 
     return test;
