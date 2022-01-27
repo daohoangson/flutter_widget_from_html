@@ -99,10 +99,13 @@ class WebViewTestCase {
     runApp(test);
 
     for (var i = 0; i < 3; i++) {
+      print('i=$i before pump');
       await tester.pump();
+      print('i=$i after pump');
       await tester.runAsync(() => Future.delayed(interval));
     }
 
+    print('After all ${interval}x');
     await tester.pump();
 
     return test;

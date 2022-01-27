@@ -78,18 +78,21 @@ class WebViewState extends State<WebView> {
       Future.value('');
 
   Future<void> _autoResize() async {
+    print('before _autoResize');
     // TODO: enable codecov when `flutter drive --coverage` is available
     // https://github.com/flutter/flutter/issues/7474
     if (!mounted) {
       return;
     }
 
+    print('before evals');
     final evals = await Future.wait([
       eval('document.body.scrollWidth'),
       eval('document.body.scrollHeight'),
     ]);
     final w = double.tryParse(evals[0]) ?? 0;
     final h = double.tryParse(evals[1]) ?? 0;
+    print('width=$w height=$h');
 
     final r = (h > 0 && w > 0) ? (w / h) : _aspectRatio;
     final changed = (r - _aspectRatio).abs() > 0.0001;
@@ -140,6 +143,7 @@ class WebViewState extends State<WebView> {
 
     if (widget.autoResize) {
       for (final interval in widget.autoResizeIntervals) {
+        print('interval=$interval');
         if (interval == Duration.zero) {
           // get dimensions immediately
           _autoResize();
