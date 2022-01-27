@@ -81,7 +81,7 @@ class WebViewTestCase {
 </body>
 ''';
 
-    const interval = Duration(seconds: 1);
+    const interval = Duration(milliseconds: 1500);
 
     final test = _AspectRatioTest(
       child: WebView(
