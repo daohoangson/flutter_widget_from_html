@@ -14,5 +14,5 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  golden_toolkit: ^0.12.0
+  golden_toolkit: ^0.13.0
   lint: any
