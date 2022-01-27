@@ -27,8 +27,8 @@ class HtmlListItem extends MultiChildRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(BuildContext _, _ListItemRenderObject renderObject) =>
-      renderObject.textDirection = textDirection;
+  void updateRenderObject(BuildContext _, RenderObject renderObject) =>
+      (renderObject as _ListItemRenderObject).textDirection = textDirection;
 }
 
 class _ListItemData extends ContainerBoxParentData<RenderBox> {}

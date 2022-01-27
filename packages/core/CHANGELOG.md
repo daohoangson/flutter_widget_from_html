@@ -1,3 +1,15 @@
+## 0.8.4
+
+- Add support for rtl in `HtmlTable` (#681)
+- Improve parser for `border` inline style (#685, authored by @EA-YOUHOU)
+- Remove decoration when href is missing (#678, authored by @EA-YOUHOU)
+- Fix background color being rendered twice (#691)
+- Fix error on `TextStyle.merge` (#680, #693)
+
+## 0.8.3+1
+
+- Expose `BuildMetadata.maxLines` and `.overflow`
+
 ## 0.8.3
 
 - Add support for Flutter@2.8 (#655)

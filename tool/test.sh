@@ -9,6 +9,13 @@ set -e
     echo 'packages/core OK'
 )
 
+(
+  cd ./packages/fwfh_text_style &&
+    flutter analyze &&
+    flutter test "$@" &&
+    echo 'packages/fwfh_text_style OK'
+)
+
 if [ -z "$UPDATE_GOLDENS" ]; then
   (
     cd ./packages/fwfh_cached_network_image &&
@@ -32,17 +39,17 @@ if [ -z "$UPDATE_GOLDENS" ]; then
   )
 
   (
+    cd ./packages/fwfh_selectable_text &&
+      flutter analyze &&
+      flutter test "$@" &&
+      echo 'packages/fwfh_selectable_text OK'
+  )
+
+  (
     cd ./packages/fwfh_svg &&
       flutter analyze &&
       flutter test "$@" &&
       echo 'packages/fwfh_svg OK'
-  )
-
-  (
-    cd ./packages/fwfh_text_style &&
-      flutter analyze &&
-      flutter test "$@" &&
-      echo 'packages/fwfh_text_style OK'
   )
 
   (

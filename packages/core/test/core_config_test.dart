@@ -534,7 +534,7 @@ void main() {
       final controller = ScrollController();
       final renderMode = ListViewMode(controller: controller);
       final html =
-          '${'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ' * 1000}'
+          '${'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ' * 999}'
           '<a name="bottom">Bottom></a>';
       final key = GlobalKey<HtmlWidgetState>();
       await explain(tester, renderMode, html: html, key: key);

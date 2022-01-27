@@ -89,8 +89,10 @@ void main() {
       explained,
       equals(
         '[Column:children='
-        '[MouseRegion:child=[GestureDetector:child=[CssBlock:child=[RichText:(#FF123456+u:Foo)]]]],'
-        '[MouseRegion:child=[GestureDetector:child=[CssBlock:child=[RichText:(#FF123456+u:Bar)]]]]'
+        '[MouseRegion:child=[GestureDetector:child='
+        '[CssBlock:child=[RichText:(#FF123456+u:Foo)]]]],'
+        '[MouseRegion:child=[GestureDetector:child='
+        '[CssBlock:child=[RichText:(#FF123456+u:Bar)]]]]'
         ']',
       ),
     );
@@ -122,7 +124,8 @@ void main() {
     expect(
       explained,
       equals(
-        '[CssBlock:child=[MouseRegion:child=[GestureDetector:child=[Column:children='
+        '[CssBlock:child=[MouseRegion:child='
+        '[GestureDetector:child=[Column:children='
         '[CssBlock:child=[RichText:(#FF123456+u:Foo)]],'
         '[CssBlock:child=[RichText:(#FF123456+u:Bar)]]'
         ']]]]',
@@ -170,8 +173,9 @@ void main() {
         explained,
         equals(
           '[MouseRegion:child=[GestureDetector:child='
-          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-          ']]',
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]'
+          ']]]',
         ),
       );
     });
@@ -185,8 +189,9 @@ void main() {
           '[RichText:(:'
           '(#FF123456+u+onTap:Foo )'
           '[MouseRegion:child=[GestureDetector:child='
-          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-          ']])]',
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]'
+          ']]])]',
         ),
       );
     });
@@ -199,8 +204,9 @@ void main() {
         equals(
           '[RichText:(:Foo '
           '[MouseRegion:child=[GestureDetector:child='
-          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-          ']])]',
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]'
+          ']]])]',
         ),
       );
     });
@@ -213,8 +219,9 @@ void main() {
         equals(
           '[RichText:(:'
           '[MouseRegion:child=[GestureDetector:child='
-          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-          ']]'
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]'
+          ']]]'
           '(#FF123456+u+onTap: foo)'
           ')]',
         ),
@@ -229,11 +236,38 @@ void main() {
         equals(
           '[RichText:(:'
           '[MouseRegion:child=[GestureDetector:child='
-          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]]'
-          ']]'
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=NetworkImage("$kImgSrc", scale: 1.0)]'
+          ']]]'
           '(: foo))]',
         ),
       );
+    });
+  });
+
+  group('#676: skips decoration', () {
+    testWidgets('renders a filled href', (tester) async {
+      const html = '<a href="$kHref">test</a>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(#FF123456+u+onTap:test)]'));
+    });
+
+    testWidgets('renders an empty href', (tester) async {
+      const html = '<a href="">test</a>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(#FF123456+u+onTap:test)]'));
+    });
+
+    testWidgets('renders href without value', (tester) async {
+      const html = '<a href=>test</a>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(#FF123456+u+onTap:test)]'));
+    });
+
+    testWidgets('renders without href', (WidgetTester tester) async {
+      const html = '<a>test</a>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:test)]'));
     });
   });
 }

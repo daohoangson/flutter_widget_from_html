@@ -17,6 +17,7 @@ If you don't want to include all of its dependencies in your build, it's possibl
 - [fwfh_cached_network_image](https://pub.dev/packages/fwfh_cached_network_image) for optimized image rendering
 - [fwfh_chewie](https://pub.dev/packages/fwfh_chewie) for VIDEO support
 - [fwfh_just_audio](https://pub.dev/packages/fwfh_just_audio) for AUDIO support
+- [fwfh_selectable_text](https://pub.dev/packages/fwfh_selectable_text) for `SelectableText` support
 - [fwfh_svg](https://pub.dev/packages/fwfh_svg) for SVG support
 - [fwfh_url_launcher](https://pub.dev/packages/fwfh_url_launcher) to launch URLs
 - [fwfh_webview](https://pub.dev/packages/fwfh_webview) for IFRAME support
@@ -27,7 +28,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html: ^0.8.3
+  flutter_widget_from_html: ^0.8.4
 ```
 
 ### Platform specific configuration
@@ -84,6 +85,9 @@ HtmlWidget(
     return null;
   },
 
+  // turn on selectable if required (it's disabled by default)
+  isSelectable: true,
+
   // these callbacks are called when a complicated element is loading
   // or failed to render allowing the app to render progress indicator
   // and fallback widget
@@ -101,7 +105,7 @@ HtmlWidget(
   // set the default styling for text
   textStyle: TextStyle(fontSize: 14),
 
-  // turn on `webView` if you need IFRAME support
+  // turn on `webView` if you need IFRAME support (it's disabled by default)
   webView: true,
 ),
 ```

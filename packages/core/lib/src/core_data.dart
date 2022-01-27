@@ -4,7 +4,6 @@ import 'package:fwfh_text_style/fwfh_text_style.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'core_helpers.dart';
-import 'core_widget_factory.dart';
 
 part 'data/build_bits.dart';
 part 'data/css.dart';
@@ -19,6 +18,16 @@ abstract class BuildMetadata {
   /// The associated [TextStyleBuilder].
   final TextStyleBuilder tsb;
 
+  /// The maximum number of lines for the text to span.
+  ///
+  /// Used in [WidgetFactory.buildText] for [RichText.maxLines].
+  int maxLines = -1;
+
+  /// How visual overflow should be handled.
+  ///
+  /// Used in [WidgetFactory.buildText] for [RichText.overflow].
+  TextOverflow overflow = TextOverflow.clip;
+
   /// Creates a node.
   BuildMetadata(this.element, this.tsb);
 
@@ -32,7 +41,7 @@ abstract class BuildMetadata {
   ///
   /// These are collected from:
   ///
-  /// - [WidgetFactory.parse] or [BuildOp.onChild] by calling `meta[key] = value`
+  /// - [WidgetFactory.parse] or [BuildOp.onChild] via `meta[key] = value`
   /// - [BuildOp.defaultStyles] returning a map
   /// - Attribute `style` of [domElement]
   List<css.Declaration> get styles;
@@ -87,7 +96,7 @@ class BuildOp {
 
   /// The callback that will be called whenver a child element is found.
   ///
-  /// Please note that all children and grandchildren etc. will trigger this method,
+  /// Please note that all children and grandchildren etc. will trigger this,
   /// it's easy to check whether an element is direct child:
   ///
   /// ```dart

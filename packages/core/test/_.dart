@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
 
+export '_constants.dart';
+
 const kColor = Color(0xFF001234);
 const kColorPrimary = Color(0xFF123456);
 
@@ -13,8 +15,6 @@ const kDataUri = 'data:image/gif;base64,$kDataBase64';
 
 // TODO: switch to GlobalKey<HtmlWidgetState> when backward compatibility allows
 final hwKey = GlobalKey<State<HtmlWidget>>();
-
-const kGoldenFilePrefix = '../../../demo_app/test';
 
 Widget? buildCurrentState({GlobalKey? key}) {
   final hws = (key ?? hwKey).currentState;
@@ -240,7 +240,9 @@ class Explainer {
   }
 
   String _borderSide(BorderSide s) => s != BorderSide.none
-      ? "${s.width}@${s.style.toString().replaceFirst('BorderStyle.', '')}${_color(s.color)}"
+      ? '${s.width}'
+          '@${s.style.toString().replaceFirst('BorderStyle.', '')}'
+          '${_color(s.color)}'
       : 'none';
 
   String _boxBorder(BoxBorder? b) {
@@ -286,8 +288,10 @@ class Explainer {
     return attr;
   }
 
-  String _color(Color c) =>
-      '#${_colorHex(c.alpha)}${_colorHex(c.red)}${_colorHex(c.green)}${_colorHex(c.blue)}';
+  String _color(Color c) => '#${_colorHex(c.alpha)}'
+      '${_colorHex(c.red)}'
+      '${_colorHex(c.green)}'
+      '${_colorHex(c.blue)}';
 
   String _colorHex(int i) {
     final h = i.toRadixString(16).toUpperCase();
@@ -501,7 +505,8 @@ class Explainer {
         ? ''
         : '/${style.decorationThickness}';
 
-    return "${styleHasIt ? '+' : '-'}$str$decorationColor$decorationStyle$decorationThickness";
+    return '${styleHasIt ? '+' : '-'}$str'
+        '$decorationColor$decorationStyle$decorationThickness';
   }
 
   String _textStyleFontStyle(TextStyle style) {
@@ -640,12 +645,19 @@ class Explainer {
       );
     }
 
+    if (widget is SelectableText) {
+      if (widget.onSelectionChanged != null) {
+        attr.add('+onSelectionChanged');
+      }
+    }
+
     if (widget is Tooltip) {
       attr.add('message=${widget.message}');
     }
 
     // A-F
-    // `RichText` is an exception, it is a `MultiChildRenderObjectWidget` so it has to be processed first
+    // `RichText` is an exception, it is a `MultiChildRenderObjectWidget`
+    // so it has to be processed first
     attr.add(
       widget is RichText
           ? _inlineSpan(widget.text)
@@ -674,11 +686,13 @@ class Explainer {
               ? _widgetChild(widget.child)
               : widget is SingleChildScrollView
                   ? _widgetChild(widget.child)
-                  : widget is Text
-                      ? widget.data!
-                      : widget is Tooltip
-                          ? _widgetChild(widget.child)
-                          : '',
+                  : widget is SelectableText
+                      ? _inlineSpan(widget.textSpan!)
+                      : widget is Text
+                          ? widget.data!
+                          : widget is Tooltip
+                              ? _widgetChild(widget.child)
+                              : '',
     );
     // U-Z
 

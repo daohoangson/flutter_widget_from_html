@@ -167,8 +167,10 @@ void main() {
         explained,
         equals(
           '[CssBlock:child=[Column:children='
-          '[_TextAlignCenter:child=[CssBlock:child=[RichText:align=center,(:Foo)]]],'
-          '[_TextAlignCenter:child=[CssBlock:child=[RichText:align=center,(:_X_)]]]'
+          '[_TextAlignCenter:child=[CssBlock:child='
+          '[RichText:align=center,(:Foo)]]],'
+          '[_TextAlignCenter:child=[CssBlock:child='
+          '[RichText:align=center,(:_X_)]]]'
           ']]',
         ),
       );
@@ -273,7 +275,8 @@ void main() {
         explained,
         equals(
           '[CssBlock:child=[Column:children='
-          '[_TextAlignCenter:child=[CssBlock:child=[RichText:align=center,(:Foo)]]],'
+          '[_TextAlignCenter:child=[CssBlock:child='
+          '[RichText:align=center,(:Foo)]]],'
           '[_TextAlignCenter:child=[RichText:align=center,(:_X_)]]'
           ']]',
         ),

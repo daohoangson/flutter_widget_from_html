@@ -1,14 +1,21 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 
 const _default = _DefaultValue();
 
 /// A [TextStyle] replacement.
 class FwfhTextStyle extends _TextStyleProxy {
-  /// Creates a text style.
-  const FwfhTextStyle.from(TextStyle ref) : super._(ref);
+  /// Creates an instance from a [TextStyle] with inherit=false.
+  ///
+  /// See also: [FwfhTextStyle.of].
+  FwfhTextStyle.from(TextStyle ref)
+      : super._(ref is FwfhTextStyle ? ref.ref : ref);
+
+  /// Creates an instance from the closest [DefaultTextStyle].
+  factory FwfhTextStyle.of(BuildContext context) =>
+      FwfhTextStyle.from(DefaultTextStyle.of(context).style);
 
   @override
   TextStyle apply({
@@ -143,7 +150,9 @@ class FwfhTextStyle extends _TextStyleProxy {
   }
 
   @override
-  TextStyle merge(TextStyle? other) => FwfhTextStyle.from(ref.merge(other));
+  TextStyle merge(TextStyle? other) => FwfhTextStyle.from(
+        ref.merge(other is FwfhTextStyle ? other.ref : other),
+      );
 }
 
 class _DefaultValue {
@@ -154,7 +163,12 @@ class _DefaultValue {
 abstract class _TextStyleProxy implements TextStyle {
   final TextStyle ref;
 
-  const _TextStyleProxy._(this.ref);
+  _TextStyleProxy._(this.ref)
+      : assert(
+          ref.inherit == false,
+          "FwfhTextStyle.from() doesn't support incomplete TextStyle. "
+          'Use `DefaultTextStyle.of(context)` to obtain the current style.',
+        );
 
   @override
   Paint? get background => ref.background;
@@ -246,6 +260,21 @@ abstract class _TextStyleProxy implements TextStyle {
   @override
   ui.TextStyle getTextStyle({double textScaleFactor = 1.0}) =>
       ref.getTextStyle(textScaleFactor: textScaleFactor);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    if (other is! TextStyle) {
+      return false;
+    }
+    final otherRef = other is FwfhTextStyle ? other.ref : other;
+    return ref == otherRef;
+  }
+
+  @override
+  int get hashCode => ref.hashCode;
 
   @override
   double? get height => ref.height;

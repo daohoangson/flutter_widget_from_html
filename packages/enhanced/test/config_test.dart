@@ -328,6 +328,33 @@ void main() {
     });
   });
 
+  group('isSelectable', () {
+    const html = 'Foo';
+
+    testWidgets('renders RichText', (WidgetTester tester) async {
+      final hw = HtmlWidget(html, key: helper.hwKey);
+      final explained = await explain(tester, hw);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('renders SelectableText', (WidgetTester tester) async {
+      final hw = HtmlWidget(html, isSelectable: true, key: helper.hwKey);
+      final explained = await explain(tester, hw);
+      expect(explained, equals('[SelectableText:(:Foo)]'));
+    });
+
+    testWidgets('renders onSelectionChanged', (WidgetTester tester) async {
+      final hw = HtmlWidget(
+        html,
+        isSelectable: true,
+        key: helper.hwKey,
+        onSelectionChanged: (_, __) {},
+      );
+      final explained = await explain(tester, hw);
+      expect(explained, equals('[SelectableText:+onSelectionChanged,(:Foo)]'));
+    });
+  });
+
   group('onErrorBuilder', () {
     Future<String?> explain(
       WidgetTester tester, {
@@ -555,7 +582,7 @@ void main() {
       final controller = ScrollController();
       final renderMode = ListViewMode(controller: controller);
       final html =
-          '${'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ' * 1000}'
+          '${'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ' * 999}'
           '<a name="bottom">Bottom></a>';
       final key = GlobalKey<HtmlWidgetState>();
       await explain(tester, renderMode, html: html, key: key);

@@ -16,17 +16,16 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  fwfh_text_style: ^2.7.0
+  fwfh_text_style: ^2.7.2
 ```
 
 ## Usage
 
 ```dart
-TextStyle style = DefaultTextStyle.of(context);
-style = FwfhTextStyle.from(style);
+TextStyle style = FwfhTextStyle.of(context);
 
 // ...
 
 // reset .height to null (normal line height behavior)
-style = style.copyWith(height: null);
+final withoutHeight = style.copyWith(height: null);
 ```
