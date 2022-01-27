@@ -26,27 +26,25 @@ jobs:
           path: demo_app/test/failures/
       - uses: codecov/codecov-action@v2
 
-  android:
-    name: Integration (Android)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-      - name: Run tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 29
-          script: ./tool/integration.sh
-
-  ios:
-    name: Integration (iOS)
+  integration_test:
+    name: Integration test
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
-      - name: Create simulator
+
+      - uses: actions/setup-java@v2
+        with:
+          distribution: "temurin"
+          java-version: "11"
+      - name: Run tests on Android
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          script: ./tool/integration.sh
+
+      - name: Create iOS simulator
         run: |
           set -e
 
@@ -55,4 +53,5 @@ jobs:
           _deviceTypeId=$( echo $_deviceType | jq .identifier -r )
           _runTime=$( xcrun simctl list runtimes ios -j | jq '.runtimes[].identifier' -r | tail -n 1 )
           xcrun simctl create "$_deviceTypeName" "$_deviceTypeId" "$_runTime" | xargs xcrun simctl boot
-      - run: ./tool/integration.sh
+      - name: Run tests on iOS
+        run: ./tool/integration.sh
