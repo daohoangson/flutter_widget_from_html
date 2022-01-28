@@ -81,7 +81,7 @@ class WebViewTestCase {
 </body>
 ''';
 
-    const interval = Duration(milliseconds: 1500);
+    const interval = Duration(seconds: 1);
 
     final test = _AspectRatioTest(
       child: WebView(
@@ -91,22 +91,22 @@ class WebViewTestCase {
         ).toString(),
         aspectRatio: defaultAspectRatio,
         autoResize: true,
-        autoResizeIntervals: const [interval],
+        autoResizeIntervals: [interval, interval * 2],
         unsupportedWorkaroundForIssue375: issue375,
       ),
     );
 
     runApp(test);
 
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 5; i++) {
       print('i=$i before pump');
       await tester.pump();
       print('i=$i after pump');
       await tester.runAsync(() => Future.delayed(interval));
     }
 
-    print('After all ${interval}x');
     await tester.pump();
+    print('After all pumps');
 
     return test;
   }
