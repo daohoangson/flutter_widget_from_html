@@ -120,6 +120,7 @@ Future<void> main() async {
       });
 
       test('resets to null', () {
+        // ignore: avoid_redundant_argument_values
         final copied = obj.copyWith(height: null);
         expect(copied.height, isNull);
         expect(copied, isNot(equals(obj)));
