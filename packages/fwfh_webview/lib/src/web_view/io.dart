@@ -77,7 +77,7 @@ class WebViewState extends State<WebView> {
       _wvc?.runJavascriptReturningResult(js).catchError((_) => '') ??
       Future.value('');
 
-  Future<void> _autoResize(Duration interval) async {
+  Future<void> _autoResize() async {
     // TODO: enable codecov when `flutter drive --coverage` is available
     // https://github.com/flutter/flutter/issues/7474
     if (!mounted) {
@@ -142,10 +142,10 @@ class WebViewState extends State<WebView> {
       for (final interval in widget.autoResizeIntervals) {
         if (interval == Duration.zero) {
           // get dimensions immediately
-          _autoResize(interval);
+          _autoResize();
         } else {
           // or wait for the specified duration
-          Future.delayed(interval).then((_) => _autoResize(interval));
+          Future.delayed(interval).then((_) => _autoResize());
         }
       }
     }
