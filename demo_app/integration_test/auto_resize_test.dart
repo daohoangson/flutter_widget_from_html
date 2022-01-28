@@ -95,7 +95,7 @@ class WebViewTestCase {
       ).toString(),
       aspectRatio: defaultAspectRatio,
       autoResize: true,
-      autoResizeIntervals: const [interval],
+      autoResizeIntervals: [interval, interval * 2, interval * 3],
       unsupportedWorkaroundForIssue375: issue375,
     );
     final test = _AspectRatioTest(child: webView);
