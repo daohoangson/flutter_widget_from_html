@@ -77,22 +77,21 @@ class WebViewState extends State<WebView> {
       _wvc?.runJavascriptReturningResult(js).catchError((_) => '') ??
       Future.value('');
 
-  Future<void> _autoResize() async {
-    print('before _autoResize');
+  Future<void> _autoResize(Duration interval) async {
+    print('$hashCode $interval _autoResize');
     // TODO: enable codecov when `flutter drive --coverage` is available
     // https://github.com/flutter/flutter/issues/7474
     if (!mounted) {
       return;
     }
 
-    print('before evals');
     final evals = await Future.wait([
       eval('document.body.scrollWidth'),
       eval('document.body.scrollHeight'),
     ]);
     final w = double.tryParse(evals[0]) ?? 0;
     final h = double.tryParse(evals[1]) ?? 0;
-    print('width=$w height=$h');
+    print('$hashCode $interval width=$w height=$h');
 
     final r = (h > 0 && w > 0) ? (w / h) : _aspectRatio;
     final changed = (r - _aspectRatio).abs() > 0.0001;
@@ -108,6 +107,14 @@ class WebViewState extends State<WebView> {
             ? lib.AutoMediaPlaybackPolicy.always_allow
             : lib.AutoMediaPlaybackPolicy
                 .require_user_action_for_all_media_types,
+        javascriptChannels: {
+          lib.JavascriptChannel(
+            name: 'Print',
+            onMessageReceived: (message) {
+              print('$hashCode onMessageReceived: ${message.message}');
+            },
+          )
+        },
         javascriptMode: widget.js
             ? lib.JavascriptMode.unrestricted
             : lib.JavascriptMode.disabled,
@@ -143,13 +150,12 @@ class WebViewState extends State<WebView> {
 
     if (widget.autoResize) {
       for (final interval in widget.autoResizeIntervals) {
-        print('interval=$interval');
         if (interval == Duration.zero) {
           // get dimensions immediately
-          _autoResize();
+          _autoResize(interval);
         } else {
           // or wait for the specified duration
-          Future.delayed(interval).then((_) => _autoResize());
+          Future.delayed(interval).then((_) => _autoResize(interval));
         }
       }
     }

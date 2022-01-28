@@ -68,12 +68,18 @@ class WebViewTestCase {
 
     function resize() {
       attempts++;
+      Print.postMessage(`resizing \${attempts}`);
+
       var width = window.innerWidth;
-      if (width === 0) return setTimeout(resize, 10);
+      if (width === 0) {
+        Print.postMessage(`attempt=\${attempts} -> width === 0`);
+        return setTimeout(resize, 10);
+      }
 
       var height = width / {input};
       block.style.height = height + 'px';
       block.innerHTML = 'input={input}, attempts=' + attempts;
+      Print.postMessage(`attempt=\${attempts} -> width=\${width}, height=\${height}`);
     }
 
     resize();
