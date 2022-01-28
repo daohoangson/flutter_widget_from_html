@@ -25,11 +25,10 @@ void main() {
   });
 
   final webViewTestCases = ValueVariant(const {
-    WebViewTestCase(1.0, false, true),
-    WebViewTestCase(2.0, false, false),
-    WebViewTestCase(0.5, false, true),
-    WebViewTestCase(1.0, true, true),
-    WebViewTestCase(2.0, true, false),
+    WebViewTestCase(0.5, false),
+    WebViewTestCase(1.0, false),
+    WebViewTestCase(2.0, false),
+    WebViewTestCase(1.0, true),
   });
 
   testWidgets(
@@ -37,12 +36,7 @@ void main() {
     (WidgetTester tester) async {
       final testCase = webViewTestCases.currentValue;
       final test = await testCase.run(tester);
-
-      if (testCase.shouldResize) {
-        test.expectValueEquals(testCase.input);
-      } else {
-        test.expectValueEquals(WebViewTestCase.defaultAspectRatio);
-      }
+      test.expectValueEquals(testCase.input);
     },
     variant: webViewTestCases,
   );
@@ -51,32 +45,40 @@ void main() {
 class WebViewTestCase {
   final double input;
   final bool issue375;
-  final bool shouldResize;
 
   // ignore: avoid_positional_boolean_parameters
-  const WebViewTestCase(this.input, this.issue375, this.shouldResize);
-
-  static const defaultAspectRatio = 16 / 9;
+  const WebViewTestCase(this.input, this.issue375);
 
   Future<_AspectRatioTest> run(WidgetTester tester) async {
-    const html = '''
+    final html = '''
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
 <body style="background: gray; margin: 0">
   <div id="block" style="background: black; color: white;">&nbsp;</div>
   <script>
-    var attempts = 0;
-    var block = document.getElementById('block');
+    let attempts = 0;
+    const block = document.getElementById('block');
 
     function resize() {
       attempts++;
 
-      var width = window.innerWidth;
+      const width = window.innerWidth;
       if (width === 0) {
+        DEBUG.postMessage(`($this attempt=\${attempts}) width === 0`);
         return setTimeout(resize, 10);
       }
 
-      var height = width / {input};
+      const height = width / $input;
       block.style.height = height + 'px';
       block.innerHTML = 'input={input}, attempts=' + attempts;
+
+      const size = `\${width}x\${height}`;
+      const scroll = `\${document.body.scrollWidth}x\${document.body.scrollHeight}`;
+      DEBUG.postMessage(`($this attempt=\${attempts}) size=\${size} scroll=\${scroll}`);
       return setTimeout(resize, 100);
     }
 
@@ -87,13 +89,14 @@ class WebViewTestCase {
 
     const interval = Duration(seconds: 1);
     final webView = WebView(
-      Uri.dataFromString(
-        html.replaceAll('{input}', input.toString()),
-        mimeType: 'text/html',
-      ).toString(),
-      aspectRatio: defaultAspectRatio,
+      Uri.dataFromString(html, mimeType: 'text/html').toString(),
+      aspectRatio: 16 / 9,
       autoResize: true,
       autoResizeIntervals: [interval, interval * 2, interval * 3],
+      debuggingEnabled: true,
+      jsCallbacks: {
+        'DEBUG': (message) => debugPrint(message),
+      },
       unsupportedWorkaroundForIssue375: issue375,
     );
     final test = _AspectRatioTest(child: webView);

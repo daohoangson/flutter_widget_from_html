@@ -105,6 +105,16 @@ class WebViewState extends State<WebView> {
             ? lib.AutoMediaPlaybackPolicy.always_allow
             : lib.AutoMediaPlaybackPolicy
                 .require_user_action_for_all_media_types,
+        javascriptChannels: widget.jsCallbacks == null
+            ? null
+            : Set.from(
+                widget.jsCallbacks!.entries.map(
+                  (entry) => lib.JavascriptChannel(
+                    name: entry.key,
+                    onMessageReceived: (_) => entry.value(_.message),
+                  ),
+                ),
+              ),
         javascriptMode: widget.js
             ? lib.JavascriptMode.unrestricted
             : lib.JavascriptMode.disabled,
