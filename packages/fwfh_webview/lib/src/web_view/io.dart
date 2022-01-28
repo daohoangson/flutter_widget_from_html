@@ -14,6 +14,8 @@ class WebViewState extends State<WebView> {
 
   @override
   void initState() {
+    print('${widget.hashCode} $hashCode initState');
+
     super.initState();
     _aspectRatio = widget.aspectRatio;
 
@@ -25,6 +27,8 @@ class WebViewState extends State<WebView> {
 
   @override
   Widget build(BuildContext context) {
+    print('${widget.hashCode} $hashCode build');
+
     final webView = _buildWebView();
 
     if (widget.unsupportedWorkaroundForIssue375 &&
@@ -57,6 +61,8 @@ class WebViewState extends State<WebView> {
 
   @override
   void deactivate() {
+    print('${widget.hashCode} $hashCode deactivate');
+
     super.deactivate();
 
     if (widget.unsupportedWorkaroundForIssue37) {
@@ -66,6 +72,8 @@ class WebViewState extends State<WebView> {
 
   @override
   void dispose() {
+    print('${widget.hashCode} $hashCode dispose');
+
     if (_issue37 != null) {
       WidgetsBinding.instance?.removeObserver(_issue37!);
     }
@@ -78,10 +86,10 @@ class WebViewState extends State<WebView> {
       Future.value('');
 
   Future<void> _autoResize(Duration interval) async {
-    print('$hashCode $interval _autoResize');
     // TODO: enable codecov when `flutter drive --coverage` is available
     // https://github.com/flutter/flutter/issues/7474
     if (!mounted) {
+      print('${widget.hashCode} $hashCode $interval !mounted');
       return;
     }
 
@@ -91,7 +99,7 @@ class WebViewState extends State<WebView> {
     ]);
     final w = double.tryParse(evals[0]) ?? 0;
     final h = double.tryParse(evals[1]) ?? 0;
-    print('$hashCode $interval width=$w height=$h');
+    print('${widget.hashCode} $hashCode $interval width=$w height=$h');
 
     final r = (h > 0 && w > 0) ? (w / h) : _aspectRatio;
     final changed = (r - _aspectRatio).abs() > 0.0001;
@@ -111,7 +119,10 @@ class WebViewState extends State<WebView> {
           lib.JavascriptChannel(
             name: 'Print',
             onMessageReceived: (message) {
-              print('$hashCode onMessageReceived: ${message.message}');
+              print(
+                '${widget.hashCode} $hashCode '
+                'onMessageReceived: ${message.message}',
+              );
             },
           )
         },
@@ -123,7 +134,10 @@ class WebViewState extends State<WebView> {
             ? (req) => _interceptNavigationRequest(req)
             : null,
         onPageFinished: _onPageFinished,
-        onWebViewCreated: (c) => _wvc = c,
+        onWebViewCreated: (c) {
+          _wvc = c;
+          print('${widget.hashCode} $hashCode onWebViewCreated ${c.hashCode}');
+        },
         userAgent: widget.userAgent,
       );
 
@@ -146,6 +160,8 @@ class WebViewState extends State<WebView> {
   }
 
   void _onPageFinished(String url) {
+    print('${widget.hashCode} $hashCode _onPageFinished $url');
+
     _firstFinishedUrl ??= url;
 
     if (widget.autoResize) {

@@ -68,7 +68,6 @@ class WebViewTestCase {
 
     function resize() {
       attempts++;
-      Print.postMessage(`resizing \${attempts}`);
 
       var width = window.innerWidth;
       if (width === 0) {
@@ -80,6 +79,7 @@ class WebViewTestCase {
       block.style.height = height + 'px';
       block.innerHTML = 'input={input}, attempts=' + attempts;
       Print.postMessage(`attempt=\${attempts} -> width=\${width}, height=\${height}`);
+      return setTimeout(resize, 100);
     }
 
     resize();
@@ -88,31 +88,33 @@ class WebViewTestCase {
 ''';
 
     const interval = Duration(seconds: 1);
-
-    final test = _AspectRatioTest(
-      child: WebView(
-        Uri.dataFromString(
-          html.replaceAll('{input}', input.toString()),
-          mimeType: 'text/html',
-        ).toString(),
-        aspectRatio: defaultAspectRatio,
-        autoResize: true,
-        autoResizeIntervals: [interval, interval * 2],
-        unsupportedWorkaroundForIssue375: issue375,
-      ),
+    final webView = WebView(
+      Uri.dataFromString(
+        html.replaceAll('{input}', input.toString()),
+        mimeType: 'text/html',
+      ).toString(),
+      aspectRatio: defaultAspectRatio,
+      autoResize: true,
+      autoResizeIntervals: const [interval],
+      unsupportedWorkaroundForIssue375: issue375,
     );
+    final test = _AspectRatioTest(child: webView);
 
+    print('${webView.hashCode} for $this...');
     runApp(test);
 
-    for (var i = 0; i < 5; i++) {
-      print('i=$i before pump');
+    for (var i = 0; i < 3; i++) {
+      print('${webView.hashCode} i=$i before pump');
       await tester.pump();
-      print('i=$i after pump');
+      print('${webView.hashCode} i=$i after pump');
       await tester.runAsync(() => Future.delayed(interval));
     }
 
     await tester.pump();
-    print('After all pumps');
+    print('${webView.hashCode} After all pumps');
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    print('${webView.hashCode} SizedBox.shrink');
 
     return test;
   }
