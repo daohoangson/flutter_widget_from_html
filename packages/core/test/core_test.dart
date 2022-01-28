@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -1584,6 +1585,22 @@ Future<void> main() async {
         );
       });
     });
+  });
+
+  testWidgets('#698: MaterialApp > CupertinoPageScaffold', (tester) async {
+    const html = 'Hello world';
+    final key = GlobalKey<HtmlWidgetState>();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CupertinoPageScaffold(
+          child: HtmlWidget(html, key: key),
+        ),
+      ),
+    );
+
+    final explained = await explainWithoutPumping(key: key);
+    expect(explained, equals('[RichText:(#D0FF0000:$html)]'));
   });
 }
 
