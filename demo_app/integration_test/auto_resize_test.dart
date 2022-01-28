@@ -78,7 +78,7 @@ class WebViewTestCase {
       var height = width / {input};
       block.style.height = height + 'px';
       block.innerHTML = 'input={input}, attempts=' + attempts;
-      Print.postMessage(`attempt=\${attempts} -> width=\${width}, height=\${height}`);
+      Print.postMessage(`attempt=\${attempts} -> size=\${width}x\${height}, scroll=\${document.body.scrollWidth}x\${document.body.scrollHeight}`);
       return setTimeout(resize, 100);
     }
 
@@ -103,11 +103,11 @@ class WebViewTestCase {
     print('${webView.hashCode} for $this...');
     runApp(test);
 
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 5; i++) {
       print('${webView.hashCode} i=$i before pump');
       await tester.pump();
       print('${webView.hashCode} i=$i after pump');
-      await tester.runAsync(() => Future.delayed(interval * 2));
+      await tester.runAsync(() => Future.delayed(interval));
     }
 
     await tester.pump();
