@@ -107,7 +107,7 @@ class WebViewTestCase {
       print('${webView.hashCode} i=$i before pump');
       await tester.pump();
       print('${webView.hashCode} i=$i after pump');
-      await tester.runAsync(() => Future.delayed(interval));
+      await tester.runAsync(() => Future.delayed(interval * 2));
     }
 
     await tester.pump();
