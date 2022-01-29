@@ -68,7 +68,6 @@ class WebViewTestCase {
 
       const width = window.innerWidth;
       if (width === 0) {
-        DEBUG.postMessage(`($this attempt=\${attempts}) width === 0`);
         return setTimeout(resize, 10);
       }
 
@@ -76,9 +75,6 @@ class WebViewTestCase {
       block.style.height = height + 'px';
       block.innerHTML = 'input={input}, attempts=' + attempts;
 
-      const size = `\${width}x\${height}`;
-      const scroll = `\${document.body.scrollWidth}x\${document.body.scrollHeight}`;
-      DEBUG.postMessage(`($this attempt=\${attempts}) size=\${size} scroll=\${scroll}`);
       return setTimeout(resize, 100);
     }
 
@@ -94,9 +90,6 @@ class WebViewTestCase {
       autoResize: true,
       autoResizeIntervals: [interval, interval * 2, interval * 3],
       debuggingEnabled: true,
-      jsCallbacks: {
-        'DEBUG': (message) => debugPrint(message),
-      },
       unsupportedWorkaroundForIssue375: issue375,
     );
     final test = _AspectRatioTest(child: webView);

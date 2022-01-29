@@ -54,16 +54,6 @@ class WebView extends StatefulWidget {
   /// {@endtemplate}
   final bool js;
 
-  /// {@template web_view.jsCallbacks}
-  /// The callbacks available to JavaScript code running in the web view.
-  ///
-  /// Content scripts will be able to call `window[key].postMessage`
-  /// to trigger the value function.
-  ///
-  /// Flutter Web is not supported.
-  /// {@endtemplate}
-  final Map<String, void Function(String)>? jsCallbacks;
-
   /// {@template web_view.mediaPlaybackAlwaysAllow}
   /// Controls whether to always allow media playback.
   ///
@@ -108,7 +98,6 @@ class WebView extends StatefulWidget {
     this.debuggingEnabled = false,
     this.interceptNavigationRequest,
     this.js = true,
-    this.jsCallbacks,
     this.mediaPlaybackAlwaysAllow = false,
     this.unsupportedWorkaroundForIssue37 = true,
     this.unsupportedWorkaroundForIssue375 = true,
