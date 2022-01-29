@@ -402,6 +402,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.11"
+  measurer:
+    dependency: "direct dev"
+    description:
+      name: measurer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.1"
   meta:
     dependency: transitive
     description:

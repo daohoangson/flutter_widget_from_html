@@ -53,6 +53,7 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   lint: any
+  measurer: ^2.1.1
   test: any
 
 flutter:

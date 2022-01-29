@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -7,6 +8,8 @@ import 'package:webview_flutter/webview_flutter.dart' as lib;
 import 'web_view.dart';
 
 class WebViewState extends State<WebView> {
+  final _timers = <Timer>[];
+
   late double _aspectRatio;
   String? _firstFinishedUrl;
   _Issue37? _issue37;
@@ -66,6 +69,10 @@ class WebViewState extends State<WebView> {
 
   @override
   void dispose() {
+    for (final timer in _timers) {
+      timer.cancel();
+    }
+
     if (_issue37 != null) {
       WidgetsBinding.instance?.removeObserver(_issue37!);
     }
@@ -155,7 +162,7 @@ class WebViewState extends State<WebView> {
           _autoResize();
         } else {
           // or wait for the specified duration
-          Future.delayed(interval).then((_) => _autoResize());
+          _timers.add(Timer(interval, _autoResize));
         }
       }
     }

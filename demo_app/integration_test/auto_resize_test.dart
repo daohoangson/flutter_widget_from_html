@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fwfh_chewie/fwfh_chewie.dart';
 import 'package:fwfh_webview/fwfh_webview.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:measurer/measurer.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -133,8 +133,8 @@ class _AspectRatioTest extends StatelessWidget {
       home: Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: _MeasurableWidget(
-            onChange: (v) => _value[this] = v,
+          child: Measurer(
+            onMeasure: (v, _) => _value[this] = v.width / v.height,
             child: child,
           ),
         ),
@@ -150,41 +150,3 @@ class _AspectRatioTest extends StatelessWidget {
     );
   }
 }
-
-/// https://blog.gskinner.com/archives/2021/01/flutter-how-to-measure-widgets.html
-class _MeasurableWidget extends SingleChildRenderObjectWidget {
-  final _OnSizeChange onChange;
-
-  const _MeasurableWidget({
-    @required Widget child,
-    Key key,
-    @required this.onChange,
-  }) : super(key: key, child: child);
-
-  @override
-  RenderObject createRenderObject(BuildContext context) =>
-      _MeasureSizeRenderObject(onChange);
-}
-
-class _MeasureSizeRenderObject extends RenderProxyBox {
-  final _OnSizeChange onChange;
-
-  Size _prevSize;
-
-  _MeasureSizeRenderObject(this.onChange);
-
-  @override
-  void performLayout() {
-    super.performLayout();
-
-    final newSize = child.size;
-    if (_prevSize != newSize) {
-      _prevSize = newSize;
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) => onChange(newSize.width / newSize.height),
-      );
-    }
-  }
-}
-
-typedef _OnSizeChange = void Function(double aspectRatio);
