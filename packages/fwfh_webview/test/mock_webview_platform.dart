@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 void mockWebViewPlatform() => _FakeWebViewPlatform();
@@ -69,6 +70,10 @@ class FakeWebViewController extends WebViewPlatformController {
     }
 
     final params = uri.queryParameters;
+    if (params['runJavascriptReturningResult'] == 'error') {
+      throw PlatformException(code: 'code');
+    }
+
     if (params.containsKey(javascript)) {
       return params[javascript] ?? '';
     } else {

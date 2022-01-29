@@ -9,6 +9,7 @@ void main() {
   mockWebViewPlatform();
 
   group('autoResize', () {
+    const defaultAspectRatio = 16 / 9;
     const url = 'http://domain.com/?document.body.scrollWidth=1000&'
         'document.body.scrollHeight=1000';
 
@@ -17,14 +18,15 @@ void main() {
     // ignore: prefer_function_declarations_over_variables
     final run = (
       WidgetTester tester, {
+      String urlQueryParams = '',
       bool unsupportedWorkaroundForIssue375 = false,
       Widget Function(Widget)? wrapper,
     }) async {
       final child = Measurer(
         onMeasure: (v, _) => _aspectRatio = v.width / v.height,
         child: WebView(
-          url,
-          aspectRatio: 16 / 9,
+          '$url&$urlQueryParams',
+          aspectRatio: defaultAspectRatio,
           unsupportedWorkaroundForIssue375: unsupportedWorkaroundForIssue375,
         ),
       );
@@ -116,6 +118,15 @@ void main() {
 
         await cleanUp(tester);
       });
+    });
+
+    testWidgets('handles js error', (tester) async {
+      await run(
+        tester,
+        urlQueryParams: 'runJavascriptReturningResult=error',
+      );
+      expectAspectRatioEquals(defaultAspectRatio);
+      await cleanUp(tester);
     });
   });
 
