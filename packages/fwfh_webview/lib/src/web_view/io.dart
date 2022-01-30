@@ -89,8 +89,6 @@ class WebViewState extends State<WebView> {
   }
 
   Future<void> _autoResize() async {
-    // TODO: enable codecov when `flutter drive --coverage` is available
-    // https://github.com/flutter/flutter/issues/7474
     if (!mounted) {
       return;
     }
