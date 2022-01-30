@@ -13,8 +13,8 @@ String _padding(String child) =>
 
 String _richtext(String text) => _padding('[RichText:(:$text)]');
 
-const bg =
-    'BoxDecoration(border: all(BorderSide(Color(0xff000000), 1.0, BorderStyle.solid)))';
+const bg = 'BoxDecoration(border: all(BorderSide(Color(0xff000000), '
+    '1.0, BorderStyle.solid)))';
 
 const border = 'all(BorderSide(Color(0xff000000), 1.0, BorderStyle.solid))';
 
@@ -36,7 +36,8 @@ Future<void> main() async {
         explained,
         equals(
           '[Column:children='
-          '[_TableCaption:child=[CssBlock:child=[RichText:align=center,(:Caption)]]],'
+          '[_TableCaption:child=[CssBlock:child='
+          '[RichText:align=center,(:Caption)]]],'
           '[HtmlTable:children='
           '${_padding('[RichText:(+b:Header 1)]')},'
           '${_padding('[RichText:(+b:Header 2)]')},'
@@ -79,6 +80,50 @@ Future<void> main() async {
           '     └Align(alignment: centerLeft)\n'
           '      └Padding(padding: all(1.0))\n'
           '       └RichText(text: "Value 2")\n'
+          '\n',
+        ),
+      );
+    });
+  });
+
+  group('rtl', () {
+    const html = '<table dir="rtl">'
+        '<tbody><tr><td>Foo</td><td>Bar</td></tr></tbody>'
+        '</table>';
+
+    testWidgets('renders', (WidgetTester tester) async {
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[HtmlTable:children='
+          '[HtmlTableCell:child=[Align:alignment=centerRight,child='
+          '[Padding:(1,1,1,1),child=[RichText:dir=rtl,(:Foo)]]]],'
+          '[HtmlTableCell:child=[Align:alignment=centerRight,child='
+          '[Padding:(1,1,1,1),child=[RichText:dir=rtl,(:Bar)]]]]'
+          ']',
+        ),
+      );
+    });
+
+    testWidgets('useExplainer=false', (WidgetTester tester) async {
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        equals(
+          'TshWidget\n'
+          '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
+          ' └HtmlTable(borderSpacing: 2.0, textDirection: rtl)\n'
+          '  ├HtmlTableCell(columnStart: 0, rowStart: 0)\n'
+          '  │└WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
+          '  │ └Align(alignment: centerRight)\n'
+          '  │  └Padding(padding: all(1.0))\n'
+          '  │   └RichText(textDirection: rtl, text: "Foo")\n'
+          '  └HtmlTableCell(columnStart: 1, rowStart: 0)\n'
+          '   └WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
+          '    └Align(alignment: centerRight)\n'
+          '     └Padding(padding: all(1.0))\n'
+          '      └RichText(textDirection: rtl, text: "Bar")\n'
           '\n',
         ),
       );
@@ -135,7 +180,9 @@ Future<void> main() async {
         equals(
           '[HtmlTable:children='
           '${_padding('[RichText:(+b:Header 1)]')},'
-          '[HtmlTableCell:child=[Align:alignment=centerLeft,child=[Padding:(1,1,1,1),child=[CssBlock:child=[RichText:align=center,(+b:Header 2)]]]]],'
+          '[HtmlTableCell:child=[Align:alignment=centerLeft,child='
+          '[Padding:(1,1,1,1),child=[CssBlock:child='
+          '[RichText:align=center,(+b:Header 2)]]]]],'
           '${_padding('[RichText:(:Value (+i:1))]')},'
           '${_padding('[RichText:(+b:Value 2)]')}'
           ']',
@@ -175,7 +222,9 @@ Future<void> main() async {
         equals(
           '[HtmlTable:children='
           '${_padding('[RichText:align=right,(+b:Header 1)]')},'
-          '[HtmlTableCell:child=[Align:alignment=centerLeft,child=[Padding:(1,1,1,1),child=[CssBlock:child=[RichText:align=center,(+b:Header 2)]]]]],'
+          '[HtmlTableCell:child=[Align:alignment=centerLeft,child='
+          '[Padding:(1,1,1,1),child=[CssBlock:child='
+          '[RichText:align=center,(+b:Header 2)]]]]],'
           '${_padding('[RichText:align=right,(:Value (+i:1))]')},'
           '${_padding('[RichText:align=right,(+b:Value 2)]')}'
           ']',
@@ -298,7 +347,8 @@ Future<void> main() async {
       expect(
         explained,
         contains(
-          'HtmlTable(border: $border, borderCollapse: true, borderSpacing: 2.0)',
+          'HtmlTable(border: $border, '
+          'borderCollapse: true, borderSpacing: 2.0)',
         ),
       );
     });
@@ -404,7 +454,8 @@ Future<void> main() async {
       expect(
         explained,
         contains(
-          'HtmlTableCell(columnSpan: 2, columnStart: 0, rowSpan: 2, rowStart: 0)',
+          'HtmlTableCell(columnSpan: 2, columnStart: 0, '
+          'rowSpan: 2, rowStart: 0)',
         ),
       );
     });
@@ -627,7 +678,8 @@ Future<void> main() async {
       explained,
       equals(
         '[Column:children='
-        '[_TableCaption:child=[CssBlock:child=[RichText:align=center,(:Caption)]]],'
+        '[_TableCaption:child=[CssBlock:child='
+        '[RichText:align=center,(:Caption)]]],'
         '[HtmlTable:children='
         '[HtmlTableCell:child=[RichText:(+b:Header 1)]],'
         '[HtmlTableCell:child=[RichText:(+b:Header 2)]],'
@@ -649,7 +701,8 @@ Future<void> main() async {
         expect(
           before,
           contains(
-            '└HtmlTable(border: all(BorderSide(Color(0xff000000), 1.0, BorderStyle.solid)),',
+            '└HtmlTable(border: all(BorderSide(Color(0xff000000), '
+            '1.0, BorderStyle.solid)),',
           ),
         );
 
@@ -661,7 +714,8 @@ Future<void> main() async {
         expect(
           after,
           contains(
-            '└HtmlTable(border: all(BorderSide(Color(0xff000000), 2.0, BorderStyle.solid)),',
+            '└HtmlTable(border: all(BorderSide(Color(0xff000000), '
+            '2.0, BorderStyle.solid)),',
           ),
         );
       });
@@ -697,6 +751,25 @@ Future<void> main() async {
           useExplainer: false,
         );
         expect(after, contains('└HtmlTable(borderSpacing: 20.0)'));
+      });
+
+      testWidgets('updates textDirection', (WidgetTester tester) async {
+        final before = await explain(
+          tester,
+          '<table><tr><td>Foo</td></tr></table>',
+          useExplainer: false,
+        );
+        expect(before, contains('└HtmlTable(borderSpacing: 2.0)'));
+
+        final after = await explain(
+          tester,
+          '<table dir="rtl"><tr><td>Foo</td></tr></table>',
+          useExplainer: false,
+        );
+        expect(
+          after,
+          contains('└HtmlTable(borderSpacing: 2.0, textDirection: rtl)'),
+        );
       });
     });
 
@@ -835,6 +908,14 @@ Foo should float on top of table.''',
     </tr>
   </table>
 </div>''',
+              'rtl': '''
+<table dir="rtl">
+  <tr>
+    <td>Foo</td>
+    <td>Bar</td>
+  </tr>
+</table>
+''',
               'table_in_list': '''
 <ul>
   <li>

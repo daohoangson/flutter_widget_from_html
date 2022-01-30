@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -58,7 +59,8 @@ Future<void> main() async {
       str,
       equals(
         '[Column:children='
-        '[CssBlock:child=[RichText:(:(+l+o+u:All decorations... )(:and none))]],'
+        '[CssBlock:child=[RichText:(:(+l+o+u:All decorations... )'
+        '(:and none))]],'
         '[CssBlock:child=[RichText:(:I​Like​Playing​football​​game)]],'
         '[CssBlock:child=[RichText:(:\u00A0)]]'
         ']',
@@ -1000,8 +1002,9 @@ Future<void> main() async {
             equals(
               '[Column:children='
               '[RichText:(:Foo)],'
-              '[CssSizing:$imgSizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
-              ']',
+              '[CssSizing:$imgSizingConstraints,child='
+              '[Image:image=NetworkImage("$src", scale: 1.0)]'
+              ']]',
             ),
           );
         }),
@@ -1414,8 +1417,9 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[RichText:(:(+b:bold)(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: )(:four)(: )'
-          '(+w4:five)(: )(+w5:six)(: )(+b:seven)(: )(+w7:eight)(: )(+w8:nine))]',
+          '[RichText:(:(+b:bold)(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: )'
+          '(:four)(: )(+w4:five)(: )(+w5:six)(: )'
+          '(+b:seven)(: )(+w7:eight)(: )(+w8:nine))]',
         ),
       );
     });
@@ -1581,6 +1585,22 @@ Future<void> main() async {
         );
       });
     });
+  });
+
+  testWidgets('#698: MaterialApp > CupertinoPageScaffold', (tester) async {
+    const html = 'Hello world';
+    final key = GlobalKey<HtmlWidgetState>();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CupertinoPageScaffold(
+          child: HtmlWidget(html, key: key),
+        ),
+      ),
+    );
+
+    final explained = await explainWithoutPumping(key: key);
+    expect(explained, equals('[RichText:(#D0FF0000:$html)]'));
   });
 }
 

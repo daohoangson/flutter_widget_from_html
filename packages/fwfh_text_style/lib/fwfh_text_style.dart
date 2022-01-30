@@ -1,14 +1,38 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 
 const _default = _DefaultValue();
 
 /// A [TextStyle] replacement.
 class FwfhTextStyle extends _TextStyleProxy {
-  /// Creates a text style.
-  const FwfhTextStyle.from(TextStyle ref) : super._(ref);
+  /// Creates an instance from another [TextStyle].
+  ///
+  /// See also: [FwfhTextStyle.of].
+  static TextStyle from(TextStyle ref) {
+    if (ref.inherit) {
+      debugPrint(
+        'Warning: Text style instance #${ref.hashCode} has inherit=true, '
+        'resetting its height will not be supported.',
+      );
+      assert(
+        () {
+          debugPrint(StackTrace.current.toString());
+          return true;
+        }(),
+      );
+      return ref;
+    } else {
+      return FwfhTextStyle._(ref is FwfhTextStyle ? ref.ref : ref);
+    }
+  }
+
+  /// Creates an instance from the closest [DefaultTextStyle].
+  static TextStyle of(BuildContext context) =>
+      FwfhTextStyle.from(DefaultTextStyle.of(context).style);
+
+  FwfhTextStyle._(TextStyle ref) : super._(ref);
 
   @override
   TextStyle apply({
@@ -143,7 +167,9 @@ class FwfhTextStyle extends _TextStyleProxy {
   }
 
   @override
-  TextStyle merge(TextStyle? other) => FwfhTextStyle.from(ref.merge(other));
+  TextStyle merge(TextStyle? other) => FwfhTextStyle.from(
+        ref.merge(other is FwfhTextStyle ? other.ref : other),
+      );
 }
 
 class _DefaultValue {
@@ -154,7 +180,7 @@ class _DefaultValue {
 abstract class _TextStyleProxy implements TextStyle {
   final TextStyle ref;
 
-  const _TextStyleProxy._(this.ref);
+  _TextStyleProxy._(this.ref);
 
   @override
   Paint? get background => ref.background;
@@ -248,10 +274,28 @@ abstract class _TextStyleProxy implements TextStyle {
       ref.getTextStyle(textScaleFactor: textScaleFactor);
 
   @override
-  double? get height => ref.height;
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    if (other is! TextStyle) {
+      return false;
+    }
+    final otherRef = other is FwfhTextStyle ? other.ref : other;
+    return ref == otherRef;
+  }
 
   @override
-  bool get inherit => ref.inherit;
+  int get hashCode => ref.hashCode;
+
+  @override
+  double? get height => ref.height;
+
+  /// Flutter's [TextStyle.merge] implementation uses private properties
+  /// which will trigger weird errors in people's apps.
+  /// We cannot let that happen.
+  @override
+  bool get inherit => false;
 
   @override
   TextLeadingDistribution? get leadingDistribution => ref.leadingDistribution;

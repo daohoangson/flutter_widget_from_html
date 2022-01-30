@@ -1,5 +1,5 @@
 name: fwfh_selectable_text
-version: 0.8.3
+version: 0.8.3+1
 description: WidgetFactory extension to render SelectableText.
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
