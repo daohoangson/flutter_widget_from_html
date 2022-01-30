@@ -1,3 +1,8 @@
+## 0.8.5
+
+- Improve `IFRAME` error & timer handling (#709)
+- Fix `FwfhTextStyle` usage within `CupertinoPageScaffold` (#713)
+
 ## 0.8.4
 
 - Add support for rtl in `HtmlTable` (#681)
