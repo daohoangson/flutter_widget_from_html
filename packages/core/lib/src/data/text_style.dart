@@ -57,12 +57,6 @@ class TextStyleHtml {
     TextDirection? textDirection,
     CssWhitespace? whitespace,
   }) {
-    assert(
-      style is FwfhTextStyle?,
-      'The text style should be modified by methods of the existing instance: '
-      'apply(), copyWith() or merge().',
-    );
-
     return TextStyleHtml._(
       deps: _deps,
       parent: parent ?? this.parent,
