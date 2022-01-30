@@ -130,6 +130,123 @@ void main() {
     });
   });
 
+  group('interceptNavigationRequest', () {
+    testWidgets('triggers callback', (WidgetTester tester) async {
+      const url = 'http://domain.com';
+      final navigationRequestUrls = <String>[];
+
+      runApp(
+        WebView(
+          url,
+          aspectRatio: 16 / 9,
+          interceptNavigationRequest: (url) {
+            navigationRequestUrls.add(url);
+            return true;
+          },
+        ),
+      );
+      expect(navigationRequestUrls, equals([]));
+
+      await tester.runAsync(
+        () => Future.delayed(const Duration(milliseconds: 100)),
+      );
+      await tester.pumpAndSettle();
+
+      const url2 = 'http://domain.com/2';
+      final result2 = await FakeWebViewController.instance?.handler
+          .onNavigationRequest(url: url2, isForMainFrame: true);
+
+      expect(navigationRequestUrls, equals([url2]));
+      expect(result2, isFalse);
+    });
+
+    testWidgets('skips callback (initial url)', (WidgetTester tester) async {
+      const url = 'http://domain.com';
+      final navigationRequestUrls = <String>[];
+
+      runApp(
+        WebView(
+          url,
+          aspectRatio: 16 / 9,
+          interceptNavigationRequest: (url) {
+            navigationRequestUrls.add(url);
+            return true;
+          },
+        ),
+      );
+      expect(navigationRequestUrls, equals([]));
+
+      await tester.runAsync(
+        () => Future.delayed(const Duration(milliseconds: 100)),
+      );
+      await tester.pumpAndSettle();
+
+      final result = await FakeWebViewController.instance?.handler
+          .onNavigationRequest(url: url, isForMainFrame: true);
+
+      expect(navigationRequestUrls, equals([]));
+      expect(result, isTrue);
+    });
+
+    testWidgets('skips callback (first url)', (WidgetTester tester) async {
+      const url2 = 'http://domain.com/2';
+      const url = 'http://domain.com/?redirect_to=$url2';
+      final navigationRequestUrls = <String>[];
+
+      runApp(
+        WebView(
+          url,
+          aspectRatio: 16 / 9,
+          interceptNavigationRequest: (url) {
+            navigationRequestUrls.add(url);
+            return true;
+          },
+        ),
+      );
+      expect(navigationRequestUrls, equals([]));
+
+      await tester.runAsync(
+        () => Future.delayed(const Duration(milliseconds: 100)),
+      );
+      await tester.pumpAndSettle();
+
+      final result2 = await FakeWebViewController.instance?.handler
+          .onNavigationRequest(url: url2, isForMainFrame: true);
+
+      expect(navigationRequestUrls, equals([]));
+      expect(result2, isTrue);
+    });
+
+    testWidgets('skips callback (not main frame)', (WidgetTester tester) async {
+      const url = 'http://domain.com';
+      final navigationRequestUrls = <String>[];
+
+      runApp(
+        WebView(
+          url,
+          aspectRatio: 16 / 9,
+          interceptNavigationRequest: (url) {
+            navigationRequestUrls.add(url);
+            return true;
+          },
+        ),
+      );
+      expect(navigationRequestUrls, equals([]));
+
+      await tester.runAsync(
+        () => Future.delayed(const Duration(milliseconds: 100)),
+      );
+      await tester.pumpAndSettle();
+
+      const url2 = 'http://domain.com/2';
+      final result2 = await FakeWebViewController.instance?.handler
+          .onNavigationRequest(url: url2, isForMainFrame: false);
+
+      expect(navigationRequestUrls, equals([]));
+      expect(result2, isTrue);
+    });
+  });
+
   group('unsupportedWorkaroundForIssue37', () {
     testWidgets('reloads on pause', (WidgetTester tester) async {
       const html = 'reloads on pause';

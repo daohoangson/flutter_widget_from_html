@@ -33,8 +33,22 @@ class FakeWebViewController extends WebViewPlatformController {
 
     final url = creationParams.initialUrl;
     if (url != null) {
-      _triggerOnPageFinished(url);
+      _onPageStarted(url);
     }
+  }
+
+  Map<String, String>? get _currentQueryParameters {
+    final url = _currentUrl;
+    if (url == null) {
+      return null;
+    }
+
+    final uri = Uri.tryParse(url);
+    if (uri == null) {
+      return null;
+    }
+
+    return uri.queryParameters;
   }
 
   Iterable<String> get urls => [..._urls];
@@ -49,7 +63,7 @@ class FakeWebViewController extends WebViewPlatformController {
     final url = _currentUrl;
     if (url != null) {
       _onPageFinishedTimer?.cancel();
-      _triggerOnPageFinished(url);
+      _onPageStarted(url);
     }
   }
 
@@ -59,17 +73,11 @@ class FakeWebViewController extends WebViewPlatformController {
       return '';
     }
 
-    final url = await currentUrl();
-    if (url == null) {
+    final params = _currentQueryParameters;
+    if (params == null) {
       return '';
     }
 
-    final uri = Uri.tryParse(url);
-    if (uri == null) {
-      return '';
-    }
-
-    final params = uri.queryParameters;
     if (params['runJavascriptReturningResult'] == 'error') {
       throw PlatformException(code: 'code');
     }
@@ -90,12 +98,24 @@ class FakeWebViewController extends WebViewPlatformController {
     _onPageFinishedTimer?.cancel();
   }
 
-  Future<void> _triggerOnPageFinished(String url) async {
+  Future<void> _onPageStarted(String url) async {
+    handler.onPageStarted(url);
     _urls.add(_currentUrl = url);
 
     _onPageFinishedTimer = Timer(
       const Duration(milliseconds: 10),
-      () => handler.onPageFinished(url),
+      () {
+        final params = _currentQueryParameters;
+        if (params != null) {
+          final redirectTo = params['redirect_to'];
+          if (redirectTo?.isNotEmpty == true) {
+            _onPageStarted(redirectTo!);
+            return;
+          }
+        }
+
+        handler.onPageFinished(url);
+      },
     );
   }
 
