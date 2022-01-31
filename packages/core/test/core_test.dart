@@ -1587,20 +1587,41 @@ Future<void> main() async {
     });
   });
 
-  testWidgets('#698: MaterialApp > CupertinoPageScaffold', (tester) async {
-    const html = 'Hello world';
-    final key = GlobalKey<HtmlWidgetState>();
+  group('#698', () {
+    testWidgets('MaterialApp > CupertinoPageScaffold', (tester) async {
+      const html = 'Hello world';
+      final key = GlobalKey<HtmlWidgetState>();
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home: CupertinoPageScaffold(
-          child: HtmlWidget(html, key: key),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: CupertinoPageScaffold(
+            child: HtmlWidget(html, key: key),
+          ),
         ),
-      ),
-    );
+      );
 
-    final explained = await explainWithoutPumping(key: key);
-    expect(explained, equals('[RichText:(#D0FF0000:$html)]'));
+      final explained = await explainWithoutPumping(key: key);
+      expect(explained, equals('[RichText:(#D0FF0000:$html)]'));
+    });
+
+    testWidgets('Typography.material2018', (tester) async {
+      const html = 'Hello world';
+      final key = GlobalKey<HtmlWidgetState>();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            typography: Typography.material2018(),
+          ),
+          home: Scaffold(
+            body: HtmlWidget(html, key: key),
+          ),
+        ),
+      );
+
+      final explained = await explainWithoutPumping(key: key);
+      expect(explained, equals('[RichText:(#DD000000:$html)]'));
+    });
   });
 }
 
