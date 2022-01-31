@@ -5,6 +5,8 @@ import 'package:flutter/widgets.dart';
 
 const _default = _DefaultValue();
 
+var _warnedAboutInherit = false;
+
 /// A [TextStyle] replacement.
 class FwfhTextStyle extends _TextStyleProxy {
   /// Creates an instance from another [TextStyle].
@@ -12,13 +14,16 @@ class FwfhTextStyle extends _TextStyleProxy {
   /// See also: [FwfhTextStyle.of].
   static TextStyle from(TextStyle ref) {
     if (ref.inherit) {
-      debugPrint(
-        'Warning: Text style instance #${ref.hashCode} has inherit=true, '
-        'resetting its height will not be supported.',
-      );
       assert(
         () {
-          debugPrint(StackTrace.current.toString());
+          if (!_warnedAboutInherit) {
+            debugPrint(
+              "Warning: $ref has inherit=true, resetting height won't work. "
+              'See https://github.com/flutter/flutter/issues/58765 for context. '
+              'This is printed once per debug session.\n${StackTrace.current}',
+            );
+            _warnedAboutInherit = true;
+          }
           return true;
         }(),
       );
