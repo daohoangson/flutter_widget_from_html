@@ -32,13 +32,8 @@ class HtmlStyle {
 
   /// Creates the root HTML styling set.
   factory HtmlStyle.root(Iterable<dynamic> deps, TextStyle? widgetTextStyle) {
-    var textStyle = _getDependency<TextStyle>(deps);
+    var textStyle = _getDependency<TextStyle>(deps).merge(widgetTextStyle);
     textStyle = FwfhTextStyle.from(textStyle);
-    if (widgetTextStyle != null) {
-      textStyle = widgetTextStyle.inherit
-          ? textStyle.merge(widgetTextStyle)
-          : widgetTextStyle;
-    }
 
     final mqd = _getDependency<MediaQueryData>(deps);
     final tsf = mqd.textScaleFactor;
@@ -63,12 +58,6 @@ class HtmlStyle {
     TextDirection? textDirection,
     CssWhitespace? whitespace,
   }) {
-    assert(
-      style is FwfhTextStyle?,
-      'The text style should be modified by calling methods of the existing instance: '
-      'apply(), copyWith() or merge().',
-    );
-
     return HtmlStyle._(
       deps: _deps,
       parent: parent ?? this.parent,

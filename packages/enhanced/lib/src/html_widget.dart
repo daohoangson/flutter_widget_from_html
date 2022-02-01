@@ -26,6 +26,12 @@ class HtmlWidget extends core.HtmlWidget {
   /// See [SelectableText.onSelectionChanged].
   final SelectionChangedCallback? onSelectionChanged;
 
+  @override
+  List<dynamic> get rebuildTriggers => [
+        isSelectable,
+        ...super.rebuildTriggers,
+      ];
+
   /// Creates a widget that builds Flutter widget tree from html.
   ///
   /// The [html] argument must not be null.
@@ -44,6 +50,7 @@ class HtmlWidget extends core.HtmlWidget {
     this.onSelectionChanged,
     void Function(ImageMetadata)? onTapImage,
     FutureOr<bool> Function(String)? onTapUrl,
+    List<dynamic>? rebuildTriggers,
     RenderMode renderMode = RenderMode.column,
     TextStyle? textStyle,
   }) : super(
@@ -58,6 +65,7 @@ class HtmlWidget extends core.HtmlWidget {
           onLoadingBuilder: onLoadingBuilder,
           onTapImage: onTapImage,
           onTapUrl: onTapUrl,
+          rebuildTriggers: rebuildTriggers,
           renderMode: renderMode,
           textStyle: textStyle,
           key: key,

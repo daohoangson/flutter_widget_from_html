@@ -32,10 +32,34 @@ void main() {
     });
   });
 
-  testWidgets('sets onSelectionChanged', (WidgetTester tester) async {
-    const html = 'Foo';
-    final explained = await explain(tester, html, _FactoryWithCallback());
-    expect(explained, equals('[SelectableText:+onSelectionChanged,(:Foo)]'));
+  group('selectableTextOnChanged', () {
+    testWidgets('sets onSelectionChanged', (WidgetTester tester) async {
+      const html = 'Foo';
+      final explained = await explain(tester, html, _FactoryWithCallback());
+      expect(explained, equals('[SelectableText:+onSelectionChanged,(:Foo)]'));
+    });
+
+    testWidgets('calls callback', (WidgetTester tester) async {
+      const html = 'Foo';
+      final list = [];
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: HtmlWidget(
+              html,
+              factoryBuilder: () => _FactoryWithCallback(list),
+            ),
+          ),
+        ),
+      );
+
+      expect(list, isEmpty);
+      await tester.tap(find.byType(SelectableText));
+
+      expect(list, isNotEmpty);
+      expect(list[0], isA<TextSelection>());
+      expect(list[1], equals(SelectionChangedCause.tap));
+    });
   });
 }
 
@@ -48,6 +72,11 @@ class _FactoryGetterReturnsFalse extends WidgetFactory
 }
 
 class _FactoryWithCallback extends WidgetFactory with SelectableTextFactory {
+  final List? list;
+
+  _FactoryWithCallback([this.list]);
+
   @override
-  SelectionChangedCallback? get selectableTextOnChanged => (_, __) {};
+  SelectionChangedCallback? get selectableTextOnChanged =>
+      (selection, cause) => list?.addAll([selection, cause]);
 }

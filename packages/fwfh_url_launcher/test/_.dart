@@ -31,6 +31,7 @@ void mockSetup() {
       case 'canLaunch':
         return true;
       case 'launch':
+        // ignore: avoid_dynamic_calls
         final url = methodCall.arguments['url'];
         if (url is String) {
           _launchUrls.add(url);

@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Setup Flutter
-        uses: subosito/flutter-action@v1
+        uses: subosito/flutter-action@v2
       - run: flutter build apk --split-per-abi
         working-directory: demo_app
       - uses: actions/upload-artifact@v2
@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v1
+        uses: subosito/flutter-action@v2
       - run: flutter config --enable-web
       - name: Run flutter build web
         run: |

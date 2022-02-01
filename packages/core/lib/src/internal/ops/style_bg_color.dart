@@ -6,24 +6,36 @@ const kCssBackgroundColor = 'background-color';
 class StyleBgColor {
   final WidgetFactory wf;
 
+  static final _skipBuilding = Expando<bool>();
+
   StyleBgColor(this.wf);
 
   BuildOp get buildOp => BuildOp(
         onTreeFlattening: (meta, tree) {
+          if (_skipBuilding[meta] == true) {
+            return false;
+          }
+
           final bgColor = _parseColor(wf, meta);
           if (bgColor == null) {
             return false;
           }
 
+          _skipBuilding[meta] = true;
           meta.tsb.enqueue(_tsb, bgColor);
           return true;
         },
         onWidgets: (meta, widgets) {
+          if (_skipBuilding[meta] == true || widgets.isEmpty) {
+            return widgets;
+          }
+
           final color = _parseColor(wf, meta);
           if (color == null) {
             return null;
           }
 
+          _skipBuilding[meta] = true;
           return listOrNull(
                 wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
                       (_, child) =>

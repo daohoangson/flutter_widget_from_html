@@ -73,10 +73,10 @@ class _ImgFileState extends State<_ImgFileTab> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      'This test will write a ${widget.fileExtension} file into '
-                      "the device's file system then try to render with an IMG tag. "
+                      'This test will write a ${widget.fileExtension} into '
+                      'the file system then try to render with an IMG tag. '
                       'The actual file path is semi-random and it should be '
-                      'unique across tests (switch tab to test again and again).',
+                      'unique across tests (switch tab to re-test).',
                     ),
                   ),
                   Center(

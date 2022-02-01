@@ -23,6 +23,7 @@ mixin SelectableTextFactory on WidgetFactory {
         maxLines: meta.maxLines > 0 ? meta.maxLines : null,
         textAlign: style.textAlign ?? TextAlign.start,
         textDirection: style.textDirection,
+        textScaleFactor: 1.0,
         onSelectionChanged: selectableTextOnChanged,
       );
     }

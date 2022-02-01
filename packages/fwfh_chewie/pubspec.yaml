@@ -4,15 +4,15 @@ description: WidgetFactory extension to render VIDEO with the chewie plugin.
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
 environment:
-  flutter: ">=2.2.0"
-  sdk: ">=2.12.0 <3.0.0"
+  flutter: ">=2.5.0"
+  sdk: ">=2.14.0 <3.0.0"
 
 dependencies:
   chewie: ^1.0.0
   flutter:
     sdk: flutter
   flutter_widget_from_html_core: ">=0.7.0 <0.9.0"
-  video_player: ^2.0.0
+  video_player: ^2.2.9
 
 dependency_overrides:
   flutter_widget_from_html_core:
@@ -24,4 +24,5 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   lint: any
-  video_player_platform_interface: any
+  plugin_platform_interface: any
+  video_player_platform_interface: ^5.0.0
