@@ -112,15 +112,15 @@ Future<void> main() async {
         explained,
         equals(
           'TshWidget\n'
-          '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
+          '└WidgetPlaceholder(table)\n'
           ' └HtmlTable(borderSpacing: 2.0, textDirection: rtl)\n'
           '  ├HtmlTableCell(columnStart: 0, rowStart: 0)\n'
-          '  │└WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
+          '  │└WidgetPlaceholder(padding)\n'
           '  │ └Align(alignment: centerRight)\n'
           '  │  └Padding(padding: all(1.0))\n'
           '  │   └RichText(textDirection: rtl, text: "Foo")\n'
           '  └HtmlTableCell(columnStart: 1, rowStart: 0)\n'
-          '   └WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
+          '   └WidgetPlaceholder(padding)\n'
           '    └Align(alignment: centerRight)\n'
           '     └Padding(padding: all(1.0))\n'
           '      └RichText(textDirection: rtl, text: "Bar")\n'
