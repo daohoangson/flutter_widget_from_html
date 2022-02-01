@@ -123,6 +123,7 @@ class TagTable {
           borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
           borderSpacing: borderSpacing?.getValue(tsh) ?? 0.0,
           companion: companion,
+          textDirection: tsh.textDirection,
           children: List.from(
             _data.builders.map((f) => f(context)).where((e) => e != null),
             growable: false,
@@ -211,7 +212,7 @@ class TagTable {
 
   static BuildOp borderOp(double border, double borderSpacing) => BuildOp(
         defaultStyles: (_) => {
-          kCssBorder: '${border}px solid black',
+          if (border > 0.0) kCssBorder: '${border}px solid black',
           kCssBorderCollapse: kCssBorderCollapseSeparate,
           kCssBorderSpacing: '${borderSpacing}px',
         },

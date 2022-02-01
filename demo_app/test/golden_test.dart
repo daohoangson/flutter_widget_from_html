@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:demo_app/screens/golden.dart';
+import 'package:demo_app/widgets/popup_menu.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +12,13 @@ import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '../../packages/fwfh_chewie/test/_.dart';
 
-void _test(String name, String html) => testGoldens(
+void _test(
+  String name,
+  String html, {
+  bool isSelectable = false,
+  double textScaleSize = 1.0,
+}) =>
+    testGoldens(
       name,
       (tester) async {
         const platform = TargetPlatform.android;
@@ -20,12 +27,16 @@ void _test(String name, String html) => testGoldens(
         final key = UniqueKey();
 
         await tester.pumpWidgetBuilder(
-          Golden(name, html, targetKey: key),
+          PopupMenuStateProvider(
+            builder: (_) => Golden(name, html, targetKey: key),
+            initialIsSelectable: isSelectable,
+          ),
           wrapper: materialAppWrapper(
             platform: platform,
             theme: ThemeData.light(),
           ),
           surfaceSize: const Size(400, 1200),
+          textScaleSize: textScaleSize,
         );
 
         await screenMatchesGolden(tester, name, finder: find.byKey(key));
@@ -51,6 +62,7 @@ void main() {
     'dev.flutter.pigeon.WebSettingsHostApi.setBuiltInZoomControls',
     'dev.flutter.pigeon.WebSettingsHostApi.setDisplayZoomControls',
     'dev.flutter.pigeon.WebSettingsHostApi.setDomStorageEnabled',
+    // ignore: lines_longer_than_80_chars
     'dev.flutter.pigeon.WebSettingsHostApi.setJavaScriptCanOpenWindowsAutomatically',
     'dev.flutter.pigeon.WebSettingsHostApi.setJavaScriptEnabled',
     'dev.flutter.pigeon.WebSettingsHostApi.setLoadWithOverviewMode',
@@ -74,6 +86,25 @@ void main() {
   final json = File('test/goldens.json').readAsStringSync();
   final map = jsonDecode(json) as Map<String, dynamic>;
   for (final entry in map.entries) {
-    _test(entry.key, entry.value as String);
+    final name = entry.key;
+    final html = entry.value as String;
+    _test(name, html);
+
+    if (name == 'FONT') {
+      _test('x2/$name', html, textScaleSize: 2.0);
+    }
+
+    if (!name.contains('/')) {
+      _test('selectable/$name', html, isSelectable: true);
+
+      if (name == 'FONT') {
+        _test(
+          'selectable/x2/$name',
+          html,
+          isSelectable: true,
+          textScaleSize: 2.0,
+        );
+      }
+    }
   }
 }

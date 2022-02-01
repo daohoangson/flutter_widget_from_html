@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '_.dart';
 
+const _border1 = '1.0@solid#FF001234';
+
 void main() {
   testWidgets('renders text without border', (WidgetTester tester) async {
     const html = '<span>Foo</span>';
@@ -9,106 +11,179 @@ void main() {
     expect(explained, equals('[RichText:(:Foo)]'));
   });
 
-  testWidgets('parses 3 values', (WidgetTester tester) async {
-    const html = '<span style="border: 1px solid red">Foo</span>';
-    final explained = await explain(tester, html);
-    expect(
-      explained,
-      equals(
-        '[Container:'
-        'border=1.0@solid#FFFF0000,'
-        'child=[RichText:(:Foo)]]',
-      ),
-    );
+  group('3 values', () {
+    const expected = '[Container:'
+        'border=2.0@solid#FFFF0000,'
+        'child=[RichText:(:Foo)]]';
+
+    testWidgets('parses width style color', (WidgetTester tester) async {
+      const html = '<span style="border: 2px solid red">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals(expected));
+    });
+
+    testWidgets('parses width color style', (WidgetTester tester) async {
+      const html = '<span style="border: 2px red solid">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals(expected));
+    });
+
+    testWidgets('parses style width color', (WidgetTester tester) async {
+      const html = '<span style="border: solid 2px red">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals(expected));
+    });
+
+    testWidgets('parses style color width', (WidgetTester tester) async {
+      const html = '<span style="border: solid red 2px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals(expected));
+    });
+
+    testWidgets('parses color width style', (WidgetTester tester) async {
+      const html = '<span style="border: red 2px solid">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals(expected));
+    });
+
+    testWidgets('parses color style width', (WidgetTester tester) async {
+      const html = '<span style="border: red solid 2px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals(expected));
+    });
   });
 
-  testWidgets('parses 2 values', (WidgetTester tester) async {
-    const html = '<span style="border: 1px solid">Foo</span>';
-    final explained = await explain(tester, html);
-    expect(
-      explained,
-      equals(
-        '[Container:'
-        'border=1.0@solid#FF001234,'
-        'child=[RichText:(:Foo)]]',
-      ),
-    );
+  group('2 values', () {
+    testWidgets('parses width style', (WidgetTester tester) async {
+      const html = '<span style="border: 2px solid">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'border=2.0@solid#FF001234,'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('ignores width color', (WidgetTester tester) async {
+      const html = '<span style="border: 2px red">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('parses style width', (WidgetTester tester) async {
+      const html = '<span style="border: 2px solid">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'border=2.0@solid#FF001234,'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('ignores style color', (WidgetTester tester) async {
+      const html = '<span style="border: 2px red">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('ignores color width', (WidgetTester tester) async {
+      const html = '<span style="border: red 2px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('parses color style', (WidgetTester tester) async {
+      const html = '<span style="border: red solid">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:'
+          'border=1.0@solid#FFFF0000,'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+  });
+
+  group('1 value', () {
+    testWidgets('ignores width', (WidgetTester tester) async {
+      const html = '<span style="border: 1px">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
+    testWidgets('parses style', (WidgetTester tester) async {
+      const html = '<span style="border: solid">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals('[Container:border=$_border1,child=[RichText:(:Foo)]]'),
+      );
+    });
+
+    testWidgets('ignores color', (WidgetTester tester) async {
+      const html = '<span style="border: red">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
   });
 
   testWidgets('renders dashed as solid', (WidgetTester tester) async {
-    const html = '<span style="border: 1px dashed">Foo</span>';
+    const html = '<span style="border: dashed">Foo</span>';
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals(
-        '[Container:'
-        'border=1.0@solid#FF001234,'
-        'child=[RichText:(:Foo)]]',
-      ),
+      equals('[Container:border=$_border1,child=[RichText:(:Foo)]]'),
     );
   });
 
   testWidgets('renders dotted as solid', (WidgetTester tester) async {
-    const html = '<span style="border: 1px dotted">Foo</span>';
+    const html = '<span style="border: dotted">Foo</span>';
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals(
-        '[Container:'
-        'border=1.0@solid#FF001234,'
-        'child=[RichText:(:Foo)]]',
-      ),
+      equals('[Container:border=$_border1,child=[RichText:(:Foo)]]'),
     );
   });
 
   testWidgets('renders double as solid', (WidgetTester tester) async {
-    const html = '<span style="border: 1px double">Foo</span>';
+    const html = '<span style="border: double">Foo</span>';
     final explained = await explain(tester, html);
     expect(
       explained,
-      equals(
-        '[Container:'
-        'border=1.0@solid#FF001234,'
-        'child=[RichText:(:Foo)]]',
-      ),
-    );
-  });
-
-  testWidgets('parses 1 value', (WidgetTester tester) async {
-    const html = '<span style="border: 1px">Foo</span>';
-    final explained = await explain(tester, html);
-    expect(
-      explained,
-      equals(
-        '[Container:'
-        'border=1.0@none#FF001234,'
-        'child=[RichText:(:Foo)]]',
-      ),
+      equals('[Container:border=$_border1,child=[RichText:(:Foo)]]'),
     );
   });
 
   testWidgets('renders with other text', (WidgetTester tester) async {
-    const html = 'Foo <span style="border: 1px">bar</span>';
+    const html = 'Foo <span style="border: solid">bar</span>';
     final explained = await explain(tester, html);
     expect(
       explained,
       equals(
-        '[RichText:(:Foo [Container:'
-        'border=1.0@none#FF001234,'
-        'child=[RichText:(:bar)]])]',
+        '[RichText:(:Foo '
+        '[Container:border=$_border1,child=[RichText:(:bar)]]'
+        ')]',
       ),
     );
   });
 
   testWidgets('stays inside margin', (WidgetTester tester) async {
-    const html = '<div style="border: 1px; margin: 1px">Foo</div>';
+    const html = '<div style="border: solid; margin: 1px">Foo</div>';
     final explained = await explainMargin(tester, html);
     expect(
       explained,
       equals(
         '[SizedBox:0.0x1.0],'
         '[Padding:(0,1,0,1),child='
-        '[CssBlock:child=[Container:border=1.0@none#FF001234,child=[RichText:(:Foo)]]]'
+        '[CssBlock:child=[Container:border=$_border1,child=[RichText:(:Foo)]]]'
         '],'
         '[SizedBox:0.0x1.0]',
       ),
@@ -117,12 +192,12 @@ void main() {
 
   testWidgets('wraps child margin', (WidgetTester tester) async {
     const html =
-        '<div style="border: 1px"><div style="margin: 1px">Foo</div></div>';
+        '<div style="border: solid"><div style="margin: 1px">Foo</div></div>';
     final explained = await explain(tester, html);
     expect(
       explained,
       equals(
-        '[CssBlock:child=[Container:border=1.0@none#FF001234,child='
+        '[CssBlock:child=[Container:border=$_border1,child='
         '[Column:children='
         '[SizedBox:0.0x1.0],'
         '[Padding:(0,1,0,1),child=[CssBlock:child=[RichText:(:Foo)]]],'
@@ -134,85 +209,85 @@ void main() {
 
   group('border-xxx', () {
     testWidgets('parses border-top', (WidgetTester tester) async {
-      const html = '<span style="border-top: 1px">Foo</span>';
+      const html = '<span style="border-top: solid">Foo</span>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[Container:'
-          'border=(1.0@none#FF001234,none,none,none),'
+          'border=($_border1,none,none,none),'
           'child=[RichText:(:Foo)]]',
         ),
       );
     });
 
     testWidgets('parses border-block-start', (WidgetTester tester) async {
-      const html = '<span style="border-block-start: 1px">Foo</span>';
+      const html = '<span style="border-block-start: solid">Foo</span>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[Container:'
-          'border=(1.0@none#FF001234,none,none,none),'
+          'border=($_border1,none,none,none),'
           'child=[RichText:(:Foo)]]',
         ),
       );
     });
 
     testWidgets('parses border-right', (WidgetTester tester) async {
-      const html = '<span style="border-right: 1px">Foo</span>';
+      const html = '<span style="border-right: solid">Foo</span>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[Container:'
-          'border=(none,1.0@none#FF001234,none,none),'
+          'border=(none,$_border1,none,none),'
           'child=[RichText:(:Foo)]]',
         ),
       );
     });
 
     testWidgets('parses border-bottom', (WidgetTester tester) async {
-      const html = '<span style="border-bottom: 1px">Foo</span>';
+      const html = '<span style="border-bottom: solid">Foo</span>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[Container:'
-          'border=(none,none,1.0@none#FF001234,none),'
+          'border=(none,none,$_border1,none),'
           'child=[RichText:(:Foo)]]',
         ),
       );
     });
 
     testWidgets('parses border-block-end', (WidgetTester tester) async {
-      const html = '<span style="border-block-end: 1px">Foo</span>';
+      const html = '<span style="border-block-end: solid">Foo</span>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[Container:'
-          'border=(none,none,1.0@none#FF001234,none),'
+          'border=(none,none,$_border1,none),'
           'child=[RichText:(:Foo)]]',
         ),
       );
     });
 
     testWidgets('parses border-left', (WidgetTester tester) async {
-      const html = '<span style="border-left: 1px">Foo</span>';
+      const html = '<span style="border-left: solid">Foo</span>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[Container:'
-          'border=(none,none,none,1.0@none#FF001234),'
+          'border=(none,none,none,$_border1),'
           'child=[RichText:(:Foo)]]',
         ),
       );
     });
 
     group('parses border-inline-start', () {
-      const html = '<span style="border-inline-start: 1px">Foo</span>';
+      const html = '<span style="border-inline-start: solid">Foo</span>';
 
       testWidgets('ltr', (WidgetTester tester) async {
         final explained = await explain(tester, html);
@@ -220,7 +295,7 @@ void main() {
           explained,
           equals(
             '[Container:'
-            'border=(none,none,none,1.0@none#FF001234),'
+            'border=(none,none,none,$_border1),'
             'child=[RichText:(:Foo)]]',
           ),
         );
@@ -232,7 +307,7 @@ void main() {
           explained,
           equals(
             '[Container:'
-            'border=(none,1.0@none#FF001234,none,none),'
+            'border=(none,$_border1,none,none),'
             'child=[RichText:dir=rtl,(:Foo)]]',
           ),
         );
@@ -240,7 +315,7 @@ void main() {
     });
 
     group('parses border-inline-end', () {
-      const html = '<span style="border-inline-end: 1px">Foo</span>';
+      const html = '<span style="border-inline-end: solid">Foo</span>';
 
       testWidgets('ltr', (WidgetTester tester) async {
         final explained = await explain(tester, html);
@@ -248,7 +323,7 @@ void main() {
           explained,
           equals(
             '[Container:'
-            'border=(none,1.0@none#FF001234,none,none),'
+            'border=(none,$_border1,none,none),'
             'child=[RichText:(:Foo)]]',
           ),
         );
@@ -260,7 +335,7 @@ void main() {
           explained,
           equals(
             '[Container:'
-            'border=(none,none,none,1.0@none#FF001234),'
+            'border=(none,none,none,$_border1),'
             'child=[RichText:dir=rtl,(:Foo)]]',
           ),
         );
@@ -674,56 +749,45 @@ void main() {
 
   group('box-sizing', () {
     testWidgets('renders without box-sizing', (tester) async {
-      const html = '<span style="border: 1px">Foo</span>';
+      const html = '<span style="border: solid">Foo</span>';
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals(
-          '[Container:'
-          'border=1.0@none#FF001234,'
-          'child=[RichText:(:Foo)]]',
-        ),
+        equals('[Container:border=$_border1,child=[RichText:(:Foo)]]'),
       );
     });
 
     testWidgets('parses content-box', (tester) async {
       const html =
-          '<span style="border: 1px; box-sizing: content-box">Foo</span>';
+          '<span style="border: solid; box-sizing: content-box">Foo</span>';
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals(
-          '[Container:'
-          'border=1.0@none#FF001234,'
-          'child=[RichText:(:Foo)]]',
-        ),
+        equals('[Container:border=$_border1,child=[RichText:(:Foo)]]'),
       );
     });
 
     testWidgets('parses border-box', (tester) async {
       const html =
-          '<span style="border: 1px; box-sizing: border-box">Foo</span>';
+          '<span style="border: solid; box-sizing: border-box">Foo</span>';
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals(
-          '[DecoratedBox:'
-          'border=1.0@none#FF001234,'
-          'child=[RichText:(:Foo)]]',
-        ),
+        equals('[DecoratedBox:border=$_border1,child=[RichText:(:Foo)]]'),
       );
     });
   });
 
   group('overwriting', () {
     testWidgets('overwrites border with border-top', (tester) async {
-      const html = '<span style="border: 1px; border-top: 2px">Foo</span>';
+      const html =
+          '<span style="border: solid; border-top: 2px solid">Foo</span>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[Container:'
-          'border=(2.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234),'
+          'border=(2.0@solid#FF001234,$_border1,$_border1,$_border1),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -731,39 +795,41 @@ void main() {
 
     testWidgets('overwrites border with border-block-start', (tester) async {
       const html =
-          '<span style="border: 1px; border-block-start: 2px">Foo</span>';
+          '<span style="border: solid; border-block-start: 2px solid">Foo</span>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[Container:'
-          'border=(2.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234),'
+          'border=(2.0@solid#FF001234,$_border1,$_border1,$_border1),'
           'child=[RichText:(:Foo)]]',
         ),
       );
     });
 
     testWidgets('overwrites border with border-right', (tester) async {
-      const html = '<span style="border: 1px; border-right: 2px">Foo</span>';
+      const html =
+          '<span style="border: solid; border-right: 2px solid">Foo</span>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[Container:'
-          'border=(1.0@none#FF001234,2.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234),'
+          'border=($_border1,2.0@solid#FF001234,$_border1,$_border1),'
           'child=[RichText:(:Foo)]]',
         ),
       );
     });
 
     testWidgets('overwrites border with border-bottom', (tester) async {
-      const html = '<span style="border: 1px; border-bottom: 2px">Foo</span>';
+      const html =
+          '<span style="border: solid; border-bottom: 2px solid">Foo</span>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[Container:'
-          'border=(1.0@none#FF001234,1.0@none#FF001234,2.0@none#FF001234,1.0@none#FF001234),'
+          'border=($_border1,$_border1,2.0@solid#FF001234,$_border1),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -771,26 +837,27 @@ void main() {
 
     testWidgets('overwrites border with border-block-end', (tester) async {
       const html =
-          '<span style="border: 1px; border-block-end: 2px">Foo</span>';
+          '<span style="border: solid; border-block-end: 2px solid">Foo</span>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[Container:'
-          'border=(1.0@none#FF001234,1.0@none#FF001234,2.0@none#FF001234,1.0@none#FF001234),'
+          'border=($_border1,$_border1,2.0@solid#FF001234,$_border1),'
           'child=[RichText:(:Foo)]]',
         ),
       );
     });
 
     testWidgets('overwrites border with border-left', (tester) async {
-      const html = '<span style="border: 1px; border-left: 2px">Foo</span>';
+      const html =
+          '<span style="border: solid; border-left: 2px solid">Foo</span>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[Container:'
-          'border=(1.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234,2.0@none#FF001234),'
+          'border=($_border1,$_border1,$_border1,2.0@solid#FF001234),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -798,7 +865,7 @@ void main() {
 
     group('overwrites border with border-inline-start', () {
       const html =
-          '<span style="border: 1px; border-inline-start: 2px">Foo</span>';
+          '<span style="border: solid; border-inline-start: 2px solid">Foo</span>';
 
       testWidgets('ltr', (tester) async {
         final explained = await explain(tester, html);
@@ -806,7 +873,7 @@ void main() {
           explained,
           equals(
             '[Container:'
-            'border=(1.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234,2.0@none#FF001234),'
+            'border=($_border1,$_border1,$_border1,2.0@solid#FF001234),'
             'child=[RichText:(:Foo)]]',
           ),
         );
@@ -818,7 +885,7 @@ void main() {
           explained,
           equals(
             '[Container:'
-            'border=(1.0@none#FF001234,2.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234),'
+            'border=($_border1,2.0@solid#FF001234,$_border1,$_border1),'
             'child=[RichText:dir=rtl,(:Foo)]]',
           ),
         );
@@ -827,7 +894,7 @@ void main() {
 
     group('overwrites border with border-inline-end', () {
       const html =
-          '<span style="border: 1px; border-inline-end: 2px">Foo</span>';
+          '<span style="border: solid; border-inline-end: 2px solid">Foo</span>';
 
       testWidgets('ltr', (tester) async {
         final explained = await explain(tester, html);
@@ -835,7 +902,7 @@ void main() {
           explained,
           equals(
             '[Container:'
-            'border=(1.0@none#FF001234,2.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234),'
+            'border=($_border1,2.0@solid#FF001234,$_border1,$_border1),'
             'child=[RichText:(:Foo)]]',
           ),
         );
@@ -847,7 +914,7 @@ void main() {
           explained,
           equals(
             '[Container:'
-            'border=(1.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234,2.0@none#FF001234),'
+            'border=($_border1,$_border1,$_border1,2.0@solid#FF001234),'
             'child=[RichText:dir=rtl,(:Foo)]]',
           ),
         );
@@ -855,14 +922,13 @@ void main() {
     });
 
     testWidgets('overwrites style', (tester) async {
-      const html =
-          '<span style="border: 1px; border-top: 1px solid">Foo</span>';
+      const html = '<span style="border: solid; border-top: none">Foo</span>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[Container:'
-          'border=(1.0@solid#FF001234,1.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234),'
+          'border=(none,$_border1,$_border1,$_border1),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -870,26 +936,13 @@ void main() {
 
     testWidgets('overwrites color', (tester) async {
       const html =
-          '<span style="border: 1px; border-top: 1px none red">Foo</span>';
+          '<span style="border: solid; border-top: solid red">Foo</span>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[Container:'
-          'border=(1.0@none#FFFF0000,1.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234),'
-          'child=[RichText:(:Foo)]]',
-        ),
-      );
-    });
-
-    testWidgets('resets to none', (tester) async {
-      const html = '<span style="border: 1px; border-top: none">Foo</span>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[Container:'
-          'border=(none,1.0@none#FF001234,1.0@none#FF001234,1.0@none#FF001234),'
+          'border=(1.0@solid#FFFF0000,$_border1,$_border1,$_border1),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -898,98 +951,98 @@ void main() {
 
   group('isBlockElement', () {
     testWidgets('parses border', (WidgetTester tester) async {
-      const html = '<div style="border: 1px">Foo</div>';
+      const html = '<div style="border: solid">Foo</div>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Container:'
-          'border=1.0@none#FF001234,'
-          'child=[RichText:(:Foo)]]]',
+          '[CssBlock:child='
+          '[Container:border=$_border1,child=[RichText:(:Foo)]]'
+          ']',
         ),
       );
     });
 
     testWidgets('parses border-top', (WidgetTester tester) async {
-      const html = '<div style="border-top: 1px">Foo</div>';
+      const html = '<div style="border-top: solid">Foo</div>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[CssBlock:child=[Container:'
-          'border=(1.0@none#FF001234,none,none,none),'
+          'border=($_border1,none,none,none),'
           'child=[RichText:(:Foo)]]]',
         ),
       );
     });
 
     testWidgets('parses border-block-start', (WidgetTester tester) async {
-      const html = '<div style="border-block-start: 1px">Foo</div>';
+      const html = '<div style="border-block-start: solid">Foo</div>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[CssBlock:child=[Container:'
-          'border=(1.0@none#FF001234,none,none,none),'
+          'border=($_border1,none,none,none),'
           'child=[RichText:(:Foo)]]]',
         ),
       );
     });
 
     testWidgets('parses border-right', (WidgetTester tester) async {
-      const html = '<div style="border-right: 1px">Foo</div>';
+      const html = '<div style="border-right: solid">Foo</div>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[CssBlock:child=[Container:'
-          'border=(none,1.0@none#FF001234,none,none),'
+          'border=(none,$_border1,none,none),'
           'child=[RichText:(:Foo)]]]',
         ),
       );
     });
 
     testWidgets('parses border-bottom', (WidgetTester tester) async {
-      const html = '<div style="border-bottom: 1px">Foo</div>';
+      const html = '<div style="border-bottom: solid">Foo</div>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[CssBlock:child=[Container:'
-          'border=(none,none,1.0@none#FF001234,none),'
+          'border=(none,none,$_border1,none),'
           'child=[RichText:(:Foo)]]]',
         ),
       );
     });
 
     testWidgets('parses border-block-end', (WidgetTester tester) async {
-      const html = '<div style="border-block-end: 1px">Foo</div>';
+      const html = '<div style="border-block-end: solid">Foo</div>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[CssBlock:child=[Container:'
-          'border=(none,none,1.0@none#FF001234,none),'
+          'border=(none,none,$_border1,none),'
           'child=[RichText:(:Foo)]]]',
         ),
       );
     });
 
     testWidgets('parses border-left', (WidgetTester tester) async {
-      const html = '<div style="border-left: 1px">Foo</div>';
+      const html = '<div style="border-left: solid">Foo</div>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[CssBlock:child=[Container:'
-          'border=(none,none,none,1.0@none#FF001234),'
+          'border=(none,none,none,$_border1),'
           'child=[RichText:(:Foo)]]]',
         ),
       );
     });
 
     group('parses border-inline-start', () {
-      const html = '<div style="border-inline-start: 1px">Foo</div>';
+      const html = '<div style="border-inline-start: solid">Foo</div>';
 
       testWidgets('ltr', (WidgetTester tester) async {
         final explained = await explain(tester, html);
@@ -997,7 +1050,7 @@ void main() {
           explained,
           equals(
             '[CssBlock:child=[Container:'
-            'border=(none,none,none,1.0@none#FF001234),'
+            'border=(none,none,none,$_border1),'
             'child=[RichText:(:Foo)]]]',
           ),
         );
@@ -1009,7 +1062,7 @@ void main() {
           explained,
           equals(
             '[CssBlock:child=[Container:'
-            'border=(none,1.0@none#FF001234,none,none),'
+            'border=(none,$_border1,none,none),'
             'child=[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
@@ -1017,7 +1070,7 @@ void main() {
     });
 
     group('parses border-inline-end', () {
-      const html = '<div style="border-inline-end: 1px">Foo</div>';
+      const html = '<div style="border-inline-end: solid">Foo</div>';
 
       testWidgets('ltr', (WidgetTester tester) async {
         final explained = await explain(tester, html);
@@ -1025,7 +1078,7 @@ void main() {
           explained,
           equals(
             '[CssBlock:child=[Container:'
-            'border=(none,1.0@none#FF001234,none,none),'
+            'border=(none,$_border1,none,none),'
             'child=[RichText:(:Foo)]]]',
           ),
         );
@@ -1037,7 +1090,7 @@ void main() {
           explained,
           equals(
             '[CssBlock:child=[Container:'
-            'border=(none,none,none,1.0@none#FF001234),'
+            'border=(none,none,none,$_border1),'
             'child=[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
@@ -1047,14 +1100,14 @@ void main() {
 
   group('combos', () {
     testWidgets('renders with background & h2', (WidgetTester tester) async {
-      const html = '<div style="background: red; border: 1px solid">'
+      const html = '<div style="background: red; border: solid">'
           '<h2>Foo</h2></div>';
       final explained = await explain(tester, html);
       expect(
         explained,
         equals(
           '[CssBlock:child='
-          '[Container:bg=#FFFF0000,border=1.0@solid#FF001234,child='
+          '[Container:bg=#FFFF0000,border=$_border1,child='
           '[Column:children='
           '[SizedBox:0.0x12.4],'
           '[CssBlock:child=[RichText:(@15.0+b:Foo)]],'
@@ -1066,7 +1119,7 @@ void main() {
 
     testWidgets('renders border-box with background', (tester) async {
       const html =
-          '<div style="background: red; border: 1px solid red; box-sizing: border-box">Foo</div>';
+          '<div style="background: red; border: solid red; box-sizing: border-box">Foo</div>';
       final explained = await explain(tester, html);
       expect(
         explained,
@@ -1080,7 +1133,7 @@ void main() {
 
     testWidgets('renders content-box with background', (tester) async {
       const html =
-          '<div style="background: red; border: 1px solid red; box-sizing: content-box">Foo</div>';
+          '<div style="background: red; border: solid red; box-sizing: content-box">Foo</div>';
       final explained = await explain(tester, html);
       expect(
         explained,

@@ -31,11 +31,8 @@ class TextStyleHtml {
 
   /// Creates the root text style.
   factory TextStyleHtml.root(Iterable<dynamic> deps, TextStyle? widgetStyle) {
-    var style = _getDependency<TextStyle>(deps);
+    var style = _getDependency<TextStyle>(deps).merge(widgetStyle);
     style = FwfhTextStyle.from(style);
-    if (widgetStyle != null) {
-      style = widgetStyle.inherit ? style.merge(widgetStyle) : widgetStyle;
-    }
 
     final mqd = _getDependency<MediaQueryData>(deps);
     final tsf = mqd.textScaleFactor;
@@ -60,12 +57,6 @@ class TextStyleHtml {
     TextDirection? textDirection,
     CssWhitespace? whitespace,
   }) {
-    assert(
-      style is FwfhTextStyle?,
-      'The text style should be modified by calling methods of the existing instance: '
-      'apply(), copyWith() or merge().',
-    );
-
     return TextStyleHtml._(
       deps: _deps,
       parent: parent ?? this.parent,
@@ -138,6 +129,7 @@ class TextStyleBuilder<T1> {
     final l = _builders!.length;
     for (var i = 0; i < l; i++) {
       final builder = _builders![i];
+      // ignore: avoid_dynamic_calls
       _output = builder(_output, _inputs![i]) as TextStyleHtml;
       assert(_output?.parent == _parentOutput);
     }

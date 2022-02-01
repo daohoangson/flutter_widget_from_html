@@ -127,6 +127,7 @@
   "inline/border-radius/top-right": "<div style=\"background: red; border-top-right-radius: 20px; padding: 20px;\">Foo</div>",
   "inline/border-radius/bottom-right": "<div style=\"background: red; border-bottom-right-radius: 20px; padding: 20px;\">Foo</div>",
   "inline/border-radius/bottom-left": "<div style=\"background: red; border-bottom-left-radius: 20px; padding: 20px;\">Foo</div>",
+  "inline/border-radius/inline": "Foo <span style=\"background: red; border-radius: 20px; padding: 5px\">bar</span> bar.",
   "inline/color": "<span style=\"color: #F00\">red</span>\n<span style=\"color: #0F08\">red 53%</span>\n<span style=\"color: #00FF00\">green</span>\n<span style=\"color: #00FF0080\">green 50%</span>\n",
   "inline/display/block": "<div>1 <span style=\"display: block\">2</span></div>",
   "inline/display/div": "<div>1 <div>2</div></div>",

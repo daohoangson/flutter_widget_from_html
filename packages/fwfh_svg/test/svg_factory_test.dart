@@ -52,7 +52,8 @@ Future<void> main() async {
         equals(
           '[CssSizing:$sizingConstraints,child='
           '[SvgPicture:'
-          'pictureProvider=ExactAssetPicture(name: "$assetName", bundle: null, colorFilter: null)'
+          'pictureProvider=ExactAssetPicture(name: "$assetName", '
+          'bundle: null, colorFilter: null)'
           ']]',
         ),
       );
@@ -361,11 +362,12 @@ HttpClient _createMockSvgImageHttpClient() {
     final onData =
         invocation.positionalArguments[0] as void Function(List<int>);
     final onDone =
-        invocation.namedArguments[const Symbol("onDone")] as Function?;
+        invocation.namedArguments[const Symbol('onDone')] as Function?;
     return Stream.fromIterable(<List<int>>[redTriangleBytes])
         .listen((data) async {
       await Future.delayed(const Duration(milliseconds: 10));
       onData(data);
+      // ignore: avoid_dynamic_calls
       onDone?.call();
     });
   });

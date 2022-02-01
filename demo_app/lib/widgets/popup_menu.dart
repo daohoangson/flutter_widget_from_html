@@ -81,14 +81,22 @@ class PopupMenu extends StatelessWidget {
 
 class PopupMenuStateProvider extends StatelessWidget {
   final WidgetBuilder builder;
+  final bool initialIsSelectable;
 
-  const PopupMenuStateProvider({@required this.builder, Key key})
-      : super(key: key);
+  const PopupMenuStateProvider({
+    @required this.builder,
+    this.initialIsSelectable = false,
+    Key key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ValueNotifier(_PopupMenuState()),
+      create: (_) => ValueNotifier(
+        _PopupMenuState(
+          isSelectable: initialIsSelectable,
+        ),
+      ),
       child: Builder(builder: builder),
     );
   }

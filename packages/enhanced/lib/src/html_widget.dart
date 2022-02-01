@@ -58,6 +58,9 @@ class HtmlWidget extends core.HtmlWidget {
           onLoadingBuilder: onLoadingBuilder,
           onTapImage: onTapImage,
           onTapUrl: onTapUrl,
+          rebuildTriggers: core.RebuildTriggers([
+            isSelectable,
+          ]),
           renderMode: renderMode,
           textStyle: textStyle,
           key: key,
