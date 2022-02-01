@@ -109,7 +109,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          'TshWidget\n'
+          'HtmlStyleWidget\n'
           '└WidgetPlaceholder(table)\n'
           ' └HtmlTable(borderSpacing: 2.0, textDirection: rtl)\n'
           '  ├HtmlTableCell(columnStart: 0, rowStart: 0)\n'
