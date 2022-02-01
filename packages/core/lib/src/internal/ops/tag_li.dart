@@ -32,7 +32,7 @@ class TagLi {
   late final BuildOp _itemOp;
   final _itemWidgets = <WidgetPlaceholder>[];
 
-  _ListConfig? _config;
+  _ListConfig? __config;
 
   TagLi(this.wf, this.listMeta) {
     op = _TagLiListOp(this);
@@ -49,10 +49,10 @@ class TagLi {
     );
   }
 
-  _ListConfig get config {
+  _ListConfig get _config {
     // cannot build config from constructor because
     // inline styles are not fully parsed at that time
-    return _config ??= _ListConfig.fromBuildMetadata(listMeta);
+    return __config ??= _ListConfig.fromBuildMetadata(listMeta);
   }
 
   Map<String, String> defaultStyles(dom.Element element) {
@@ -92,6 +92,7 @@ class TagLi {
   }
 
   Widget _buildItem(BuildContext context, Widget child, int i) {
+    final config = _config;
     final meta = _itemMetas[i];
     final listStyleType = _ListConfig.listStyleTypeFromBuildMetadata(meta) ??
         config.listStyleType;

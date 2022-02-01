@@ -41,22 +41,36 @@ CssBorder _tryParseBorderSide(CssBorder border, css.Declaration style) {
     return const CssBorder(inherit: true);
   }
 
-  final expressions = style.values;
-  final width =
-      expressions.isNotEmpty ? tryParseCssLength(expressions[0]) : null;
-  // TODO: use `late final` when https://github.com/dart-lang/coverage/issues/341 is fixed
-  late CssBorderSide borderSide;
-  if (width == null || width.number <= 0) {
-    borderSide = CssBorderSide.none;
-  } else {
-    borderSide = CssBorderSide(
-      color: expressions.length >= 3 ? tryParseColor(expressions[2]) : null,
-      style: expressions.length >= 2
-          ? tryParseTextDecorationStyle(expressions[1])
-          : null,
-      width: width,
-    );
+  TextDecorationStyle? borderStyle;
+  CssLength? width;
+  Color? color;
+  for (final expression in style.values) {
+    final parsedStyle = tryParseTextDecorationStyle(expression);
+    if (parsedStyle != null) {
+      borderStyle = parsedStyle;
+      continue;
+    }
+
+    final parsedWidth = tryParseCssLength(expression);
+    if (parsedWidth != null) {
+      width = parsedWidth;
+      continue;
+    }
+
+    final parsedColor = tryParseColor(expression);
+    if (parsedColor != null) {
+      color = parsedColor;
+      continue;
+    }
   }
+
+  final borderSide = borderStyle == null
+      ? CssBorderSide.none
+      : CssBorderSide(
+          color: color,
+          style: borderStyle,
+          width: width,
+        );
 
   if (suffix.isEmpty) {
     return CssBorder(all: borderSide);

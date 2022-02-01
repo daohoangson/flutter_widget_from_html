@@ -10,7 +10,7 @@ void main() {
         [
           const MediaQueryData(),
           TextDirection.ltr,
-          const TextStyle(),
+          const TextStyle(inherit: false),
           dep1,
         ],
         null,

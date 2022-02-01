@@ -1,3 +1,7 @@
+## 0.6.2+2
+
+- Improve error & timer handling (#709)
+
 ## 0.6.2+1
 
 - Add support for webview_flutter@3.0 (#657)

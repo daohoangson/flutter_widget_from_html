@@ -32,7 +32,9 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x1.0],'
-          '[Padding:(0,4,0,2),child=[CssBlock:child=[RichText:dir=rtl,(:Foo)]]],'
+          '[Padding:(0,4,0,2),child='
+          '[CssBlock:child=[RichText:dir=rtl,(:Foo)]]'
+          '],'
           '[SizedBox:0.0x3.0]',
         ),
       );
@@ -202,7 +204,10 @@ void main() {
       explained,
       equals(
         '[SizedBox:0.0x2.0],'
-        '[Padding:(0,1,0,1),child=[CssBlock:child=[Padding:(0,2,0,2),child=[CssBlock:child=[RichText:(:Foo)]]]]],'
+        '[Padding:(0,1,0,1),child='
+        '[CssBlock:child=[Padding:(0,2,0,2),child='
+        '[CssBlock:child=[RichText:(:Foo)]]'
+        ']]],'
         '[SizedBox:0.0x2.0]',
       ),
     );
