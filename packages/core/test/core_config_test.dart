@@ -68,6 +68,7 @@ void main() {
       Uri? baseUrl,
       bool? buildAsync,
       required bool enableCaching,
+      List<dynamic>? rebuildTriggers,
       TextStyle? textStyle,
     }) =>
         helper.explain(
@@ -79,6 +80,7 @@ void main() {
             buildAsync: buildAsync,
             enableCaching: enableCaching,
             key: helper.hwKey,
+            rebuildTriggers: rebuildTriggers,
             textStyle: textStyle,
           ),
         );
@@ -148,6 +150,28 @@ void main() {
       final built1 = helper.buildCurrentState();
 
       await explain(tester, html, enableCaching: false);
+      final built2 = helper.buildCurrentState();
+      _expect(built1, built2, isFalse);
+    });
+
+    testWidgets('rebuild new rebuildTriggers', (tester) async {
+      const html = 'Foo';
+
+      final explained1 = await explain(
+        tester,
+        html,
+        enableCaching: true,
+        rebuildTriggers: [1],
+      );
+      expect(explained1, equals('[RichText:(:Foo)]'));
+      final built1 = helper.buildCurrentState();
+
+      await explain(
+        tester,
+        html,
+        enableCaching: true,
+        rebuildTriggers: [2],
+      );
       final built2 = helper.buildCurrentState();
       _expect(built1, built2, isFalse);
     });
@@ -510,7 +534,7 @@ void main() {
       final controller = ScrollController();
       final renderMode = ListViewMode(controller: controller);
       final html =
-          '${'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ' * 1000}'
+          '${'Lorem ipsum dolor sit amet, consectetur adipiscing elit. ' * 999}'
           '<a name="bottom">Bottom></a>';
       final key = GlobalKey<HtmlWidgetState>();
       await explain(tester, renderMode, html: html, key: key);

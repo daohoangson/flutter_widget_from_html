@@ -14,7 +14,7 @@ extension DomElementExtension on dom.Element {
   /// This is different from [BuildMetadata.styles] as it doesn't include
   /// runtime additions from [WidgetFactory] or [BuildOp]s.
   ///
-  /// Parsing CSS is a non-trivial task but the result is cached for each element
+  /// Parsing CSS is a non-trivial task but the result is cached
   /// so it's safe to call this again and again.
   List<css.Declaration> get styles {
     final expando = _expando ??= Expando();

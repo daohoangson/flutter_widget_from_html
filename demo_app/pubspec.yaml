@@ -17,13 +17,10 @@ dependencies:
   http: any
   path_provider: any
   photo_view: ^0.13.0
-  provider: ^5.0.0-0
+  provider: ^6.0.0
   url_launcher: any
 
 dependency_overrides:
-  archive: ^3.0.0
-  crypto: ^3.0.0
-  file: ^6.0.0
   flutter_widget_from_html:
     path: ../packages/enhanced
   flutter_widget_from_html_core:
@@ -44,15 +41,15 @@ dependency_overrides:
     path: ../packages/fwfh_url_launcher
   fwfh_webview:
     path: ../packages/fwfh_webview
-  uuid: ^3.0.0
 
 dev_dependencies:
-  flutter_driver:
-    sdk: flutter
   flutter_test:
     sdk: flutter
-  golden_toolkit: ^0.12.0
+  golden_toolkit: ^0.13.0
+  integration_test:
+    sdk: flutter
   lint: any
+  measurer: ^2.1.1
   test: any
 
 flutter:

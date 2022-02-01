@@ -68,7 +68,8 @@ class CssBorder {
         radiusTopRight: other.radiusTopRight,
       );
 
-  /// Creates a copy of this border but with the given fields replaced with the new values.
+  /// Creates a copy of this border but with the given fields
+  /// replaced with the new values.
   CssBorder copyWith({
     CssBorderSide? bottom,
     CssBorderSide? inlineEnd,
@@ -183,13 +184,15 @@ class CssBorderSide {
   /// A border that is not rendered.
   static const none = CssBorderSide();
 
-  BorderSide? _getValue(TextStyleHtml tsh) => this == none
+  BorderSide? _getValue(TextStyleHtml tsh) => identical(this, none)
       ? null
       : BorderSide(
           color: color ?? tsh.style.color ?? const BorderSide().color,
           // TODO: add proper support for other border styles
           style: style != null ? BorderStyle.solid : BorderStyle.none,
-          width: width?.getValue(tsh) ?? 0.0,
+          // TODO: look for official document regarding this default value
+          // WebKit & Blink seem to follow the same (hidden?) specs
+          width: width?.getValue(tsh) ?? 1.0,
         );
 
   static CssBorderSide? _copyWith(CssBorderSide? base, CssBorderSide? value) =>
@@ -399,11 +402,11 @@ enum CssLengthUnit {
 /// The whitespace behavior.
 enum CssWhitespace {
   /// Sequences of white space are collapsed.
-  /// Newline characters in the source are handled the same as other white space.
+  /// Newline characters in the source are handled the same as other whitespace.
   /// Lines are broken as necessary to fill line boxes.
   normal,
 
   /// Sequences of white space are preserved.
-  /// Lines are only broken at newline characters in the source and at <br> elements.
+  /// Lines are only broken at newline characters in the source and at `BR`s.
   pre,
 }
