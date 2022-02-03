@@ -13,7 +13,7 @@ class StyleBorder {
 
   StyleBorder(this.wf);
 
-  BuildOp get buildOp => BuildOp(
+  BuildOp get inlineOp => BuildOp(
         onTreeFlattening: (meta, tree) {
           if (_skipBuilding[meta] == true) {
             return false;
@@ -35,6 +35,10 @@ class StyleBorder {
           tree.replaceWith(WidgetBit.inline(tree, built, alignment: baseline));
           return true;
         },
+        priority: 0,
+      );
+
+  BuildOp get blockOp => BuildOp(
         onWidgets: (meta, widgets) {
           if (_skipBuilding[meta] == true || widgets.isEmpty) {
             return null;

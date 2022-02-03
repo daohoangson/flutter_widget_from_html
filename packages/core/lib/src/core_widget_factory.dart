@@ -26,7 +26,7 @@ class WidgetFactory {
   late AnchorRegistry _anchorRegistry;
 
   BuildOp? _styleBgColor;
-  BuildOp? _styleBorder;
+  StyleBorder? _styleBorder;
   BuildOp? _styleDisplayBlock;
   BuildOp? _styleDisplayInlineBlock;
   BuildOp? _styleDisplayNone;
@@ -1007,8 +1007,9 @@ class WidgetFactory {
     }
 
     if (key.startsWith(kCssBorder)) {
-      _styleBorder ??= StyleBorder(this).buildOp;
-      meta.register(_styleBorder!);
+      final styleBorder = _styleBorder ??= StyleBorder(this);
+      meta.register(styleBorder.inlineOp);
+      meta.register(styleBorder.blockOp);
     }
 
     if (key.startsWith(kCssMargin)) {
