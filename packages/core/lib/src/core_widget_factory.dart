@@ -377,38 +377,35 @@ class WidgetFactory {
     _flatteners.add(instance);
 
     for (final flattened in instance.flatten(tree)) {
-      if (flattened.widget != null) {
-        widgets.add(WidgetPlaceholder.lazy(flattened.widget!));
+      final widget = flattened.widget;
+      if (widget != null) {
+        widgets.add(WidgetPlaceholder.lazy(widget));
         continue;
       }
 
-      if (flattened.widgetBuilder != null) {
-        widgets.add(
-          WidgetPlaceholder<BuildTree>(tree)
-              .wrapWith((context, _) => flattened.widgetBuilder!(context)),
-        );
-        continue;
-      }
-
-      if (flattened.spanBuilder == null) {
+      final spanBuilder = flattened.spanBuilder;
+      if (spanBuilder == null) {
         continue;
       }
       widgets.add(
-        WidgetPlaceholder<BuildTree>(tree).wrapWith((context, _) {
-          final tsh = tree.tsb.build(context);
-          final span = flattened.spanBuilder!(context, tsh.whitespace);
-          if (span == null) {
-            return widget0;
-          }
+        WidgetPlaceholder(
+          builder: (context, _) {
+            final tsh = tree.tsb.build(context);
+            final span = spanBuilder(context, tsh.whitespace);
+            if (span == null) {
+              return widget0;
+            }
 
-          final textAlign = tsh.textAlign ?? TextAlign.start;
+            final textAlign = tsh.textAlign ?? TextAlign.start;
 
-          if (span is WidgetSpan && textAlign == TextAlign.start) {
-            return span.child;
-          }
+            if (span is WidgetSpan && textAlign == TextAlign.start) {
+              return span.child;
+            }
 
-          return buildText(meta, tsh, span);
-        }),
+            return buildText(meta, tsh, span);
+          },
+          localName: 'text',
+        ),
       );
     }
 
@@ -1140,11 +1137,12 @@ class WidgetFactory {
         tree.registerAnchor(anchor);
       },
       onTreeFlattening: (meta, tree) {
-        final widget = WidgetPlaceholder('#$id').wrapWith(
-          (context, _) => SizedBox(
+        final widget = WidgetPlaceholder(
+          builder: (context, _) => SizedBox(
             height: meta.tsb.build(context).style.fontSize,
             key: anchor,
           ),
+          localName: 'anchor',
         );
 
         final bit = tree.first;

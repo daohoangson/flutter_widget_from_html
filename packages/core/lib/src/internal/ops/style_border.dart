@@ -54,11 +54,9 @@ class StyleBorder {
 
           return [
             WidgetPlaceholder(
-              border,
+              localName: kCssBorder,
               child: wf.buildColumnPlaceholder(meta, widgets),
-            ).wrapWith(
-              (context, child) => _buildBorder(meta, context, child, border),
-            )
+            ).wrapWith((c, w) => _buildBorder(meta, c, w, border))
           ];
         },
         onWidgetsIsOptional: true,

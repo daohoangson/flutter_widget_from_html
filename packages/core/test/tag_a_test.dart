@@ -7,29 +7,10 @@ const kHref = 'http://domain.com/href';
 const kImgSrc = 'http://domain.com/image.png';
 
 void main() {
-  group('basic usage', () {
+  testWidgets('renders A tag', (WidgetTester tester) async {
     const html = '<a href="$kHref">Foo</a>';
-
-    testWidgets('renders', (WidgetTester tester) async {
-      final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(#FF123456+u+onTap:Foo)]'));
-    });
-
-    testWidgets('useExplainer=false', (WidgetTester tester) async {
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(
-        explained,
-        equals(
-          'TshWidget\n'
-          '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
-          ' │  BuildTree#2 tsb#3(parent=#1):\n'
-          ' │    "Foo"\n'
-          ' │    _TagABit#4 tsb#3(parent=#1)\n'
-          ' │)\n'
-          ' └RichText(text: "Foo")\n\n',
-        ),
-      );
-    });
+    final explained = await explain(tester, html);
+    expect(explained, equals('[RichText:(#FF123456+u+onTap:Foo)]'));
   });
 
   group('renders without erroneous white spaces', () {

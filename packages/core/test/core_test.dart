@@ -217,11 +217,11 @@ Future<void> main() async {
         explained,
         equals(
           'TshWidget\n'
-          '└ColumnPlaceholder(BuildMetadata(<root></root>))\n'
+          '└ColumnPlaceholder(root)\n'
           ' └Column()\n'
           '  ├CssBlock()\n'
           '  │└RichText(text: "1")\n'
-          '  ├HeightPlaceholder(1.0em)\n'
+          '  ├HeightPlaceholder(height)\n'
           '  │└SizedBox(height: 10.0)\n'
           '  └CssBlock()\n'
           '   └RichText(text: "2")\n\n',
