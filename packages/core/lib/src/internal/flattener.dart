@@ -10,16 +10,9 @@ import 'margin_vertical.dart';
 class Flattened {
   final SpanBuilder? spanBuilder;
   final Widget? widget;
-  final WidgetBuilder? widgetBuilder;
 
-  const Flattened._({this.spanBuilder, this.widget, this.widgetBuilder});
+  const Flattened._({this.spanBuilder, this.widget});
 }
-
-typedef SpanBuilder = InlineSpan? Function(
-  BuildContext,
-  CssWhitespace whitespace, {
-  bool? isLast,
-});
 
 class Flattener {
   final WidgetFactory wf;
@@ -29,7 +22,7 @@ class Flattener {
 
   late _Recognizer _recognizer;
   late _Recognizer _prevRecognizer;
-  List<SpanBuilder>? _spans;
+  List<_SpanOrBuilder>? _spans;
   late List<_String> _strings;
   late List<_String> _prevStrings;
   var _swallowWhitespace = false;
@@ -98,46 +91,29 @@ class Flattener {
       _saveSpan();
     }
 
-    dynamic built;
-    if (bit is BuildBit<BuildContext, Widget>) {
-      Widget widgetBuilder(BuildContext context) => bit.buildBit(context);
-      built = widgetBuilder;
-    } else if (bit is BuildBit<GestureRecognizer?, dynamic>) {
-      built = bit.buildBit(_prevRecognizer.value);
+    if (bit is BuildBit<GestureRecognizer?, GestureRecognizer?>) {
+      _prevRecognizer.value = bit.buildBit(_prevRecognizer.value);
     } else if (bit is BuildBit<TextStyleHtml, InlineSpan>) {
-      // ignore: prefer_function_declarations_over_variables
-      final SpanBuilder spanBuilder =
-          (context, _, {bool? isLast}) => bit.buildBit(thisTsb.build(context));
-      built = spanBuilder;
-    } else {
-      built = bit.buildBit(null);
-    }
-
-    if (built is GestureRecognizer) {
-      _prevRecognizer.value = built;
-    } else if (built is InlineSpan) {
       _saveSpan();
-
-      final inlineSpan = built;
-      _spans!.add((_, __, {bool? isLast}) => inlineSpan);
-    } else if (built is SpanBuilder) {
+      _spans!.add(
+        _SpanOrBuilder.builder(
+          (context, _, {bool? isLast}) => bit.buildBit(thisTsb.build(context)),
+        ),
+      );
+    } else if (bit is BuildBit<void, InlineSpan>) {
       _saveSpan();
-      _spans!.add(built);
-    } else if (built is String) {
+      _spans!.add(_SpanOrBuilder.span(bit.buildBit(null)));
+    } else if (bit is BuildBit<void, String>) {
       _prevStrings.add(
         _String(
           bit,
-          built,
           shouldBeSwallowed: _shouldSwallow(bit),
           shouldBeTrimmed: shouldBeTrimmed,
         ),
       );
-    } else if (built is Widget) {
+    } else if (bit is BuildBit<void, Widget>) {
       _completeLoop();
-      _flattened.add(Flattened._(widget: built));
-    } else if (built is WidgetBuilder) {
-      _completeLoop();
-      _flattened.add(Flattened._(widgetBuilder: built));
+      _flattened.add(Flattened._(widget: bit.buildBit(null)));
     }
 
     _prevTsb = thisTsb;
@@ -172,7 +148,7 @@ class Flattener {
       }
 
       _spans!.add(
-        (context, whitespace, {bool? isLast}) {
+        _SpanOrBuilder.builder((context, whitespace, {bool? isLast}) {
           final text = scopedStrings.toText(
             whitespace,
             dropNewLine: isLast != false,
@@ -186,7 +162,7 @@ class Flattener {
             style: scopedTsb.build(context).style,
             text: text,
           );
-        },
+        }),
       );
     }
 
@@ -217,12 +193,13 @@ class Flattener {
     _flattened.add(
       Flattened._(
         spanBuilder: (context, whitespace, {bool? isLast}) {
-          final spanBuilders = scopedSpans.reversed.toList(growable: false);
+          final list = scopedSpans.reversed.toList(growable: false);
           final children = <InlineSpan>[];
 
           var _isLast = isLast != false;
-          for (final spanBuilder in spanBuilders) {
-            final child = spanBuilder(context, whitespace, isLast: _isLast);
+          for (final item in list) {
+            final child = item.span ??
+                item.builder?.call(context, whitespace, isLast: _isLast);
             if (child != null) {
               _isLast = false;
               children.insert(0, child);
@@ -299,6 +276,12 @@ class Flattener {
   }
 }
 
+typedef SpanBuilder = InlineSpan? Function(
+  BuildContext,
+  CssWhitespace whitespace, {
+  bool? isLast,
+});
+
 /// A mutable recognizer.
 ///
 /// This class is needed because [GestureRecognizer] is rebuilt
@@ -307,6 +290,17 @@ class _Recognizer {
   GestureRecognizer? value;
 }
 
+@immutable
+class _SpanOrBuilder {
+  final SpanBuilder? builder;
+  final InlineSpan? span;
+
+  const _SpanOrBuilder.builder(this.builder) : span = null;
+
+  const _SpanOrBuilder.span(this.span) : builder = null;
+}
+
+@immutable
 class _String {
   final BuildBit bit;
   final String data;
@@ -314,11 +308,12 @@ class _String {
   final bool shouldBeTrimmed;
 
   _String(
-    this.bit,
-    this.data, {
+    BuildBit<void, String> bit, {
     this.shouldBeSwallowed = false,
     this.shouldBeTrimmed = false,
-  });
+  })  : data = bit.buildBit(null),
+        // ignore: prefer_initializing_formals
+        bit = bit;
 }
 
 extension _StringListToText on List<_String> {

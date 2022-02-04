@@ -115,21 +115,24 @@ class TagTable {
         : null;
 
     return [
-      WidgetPlaceholder<BuildMetadata>(tableMeta).wrapWith((context, _) {
-        final tsh = tableMeta.tsb.build(context);
+      WidgetPlaceholder(
+        builder: (context, _) {
+          final tsh = tableMeta.tsb.build(context);
 
-        return HtmlTable(
-          border: border.getBorder(tsh),
-          borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
-          borderSpacing: borderSpacing?.getValue(tsh) ?? 0.0,
-          companion: companion,
-          textDirection: tsh.textDirection,
-          children: List.from(
-            _data.builders.map((f) => f(context)).where((e) => e != null),
-            growable: false,
-          ),
-        );
-      }),
+          return HtmlTable(
+            border: border.getBorder(tsh),
+            borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
+            borderSpacing: borderSpacing?.getValue(tsh) ?? 0.0,
+            companion: companion,
+            textDirection: tsh.textDirection,
+            children: List.from(
+              _data.builders.map((f) => f(context)).where((e) => e != null),
+              growable: false,
+            ),
+          );
+        },
+        localName: kTagTable,
+      ),
     ];
   }
 

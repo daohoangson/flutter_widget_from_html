@@ -11,7 +11,7 @@ const kTagImg = 'img';
 class TagImg {
   final WidgetFactory wf;
 
-  static final _placeholders = Expando<WidgetPlaceholder<ImageMetadata>>();
+  static final _placeholders = Expando<WidgetPlaceholder>();
 
   TagImg(this.wf);
 
@@ -45,7 +45,10 @@ class TagImg {
             return;
           }
 
-          _placeholders[meta] = WidgetPlaceholder(data, child: built);
+          _placeholders[meta] = WidgetPlaceholder(
+            localName: kTagImg,
+            child: built,
+          );
         },
         onTreeFlattening: (meta, tree) {
           final placeholder = _placeholders[meta];

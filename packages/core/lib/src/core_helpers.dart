@@ -113,30 +113,31 @@ extension WidgetAnchors on Widget {
   }
 }
 
-/// A widget builder that supports builder callbacks.
-class WidgetPlaceholder<T> extends StatelessWidget {
-  /// The origin of this widget.
-  final T generator;
+/// A widget builder that can be extended with callbacks.
+class WidgetPlaceholder extends StatelessWidget {
+  final String? localName;
 
   final bool _autoUnwrap;
-  final List<Widget? Function(BuildContext, Widget)> _builders = [];
+  final List<WidgetPlaceholderBuilder> _builders;
   final Widget? _firstChild;
 
-  /// Creates a widget builder.
-  WidgetPlaceholder(
-    this.generator, {
+  /// Creates a placeholder.
+  WidgetPlaceholder({
     bool autoUnwrap = true,
+    WidgetPlaceholderBuilder? builder,
     Widget? child,
     Key? key,
+    this.localName,
   })  : _autoUnwrap = autoUnwrap,
+        _builders = builder != null ? [builder] : [],
         _firstChild = child,
         super(key: key);
 
-  @visibleForTesting
   @override
   Widget build(BuildContext context) => callBuilders(context, _firstChild);
 
   /// Calls builder callbacks on the specified [child] widget.
+  @protected
   Widget callBuilders(BuildContext context, Widget? child) {
     var built = unwrap(context, child ?? widget0);
     if (child != null && built == widget0) {
@@ -160,30 +161,30 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties
-        .add(DiagnosticsProperty('generator', generator, showName: false));
+
+    if (localName != null) {
+      properties.add(
+        DiagnosticsProperty(
+          'localName',
+          localName,
+          showName: false,
+        ),
+      );
+    }
   }
 
   /// Enqueues [builder] to be built later.
-  WidgetPlaceholder<T> wrapWith(
-    Widget? Function(BuildContext context, Widget child) builder,
-  ) {
+  WidgetPlaceholder wrapWith(WidgetPlaceholderBuilder builder) {
     _builders.add(builder);
     return this;
   }
 
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
-      generator != null
-          ? 'WidgetPlaceholder($generator)'
-          : objectRuntimeType(this, 'WidgetPlaceholder');
-
   /// Creates a placeholder lazily.
   ///
   /// Returns [child] if it is already a placeholder.
-  static WidgetPlaceholder lazy(Widget child) => child is WidgetPlaceholder
-      ? child
-      : WidgetPlaceholder<Widget>(child, child: child);
+  // ignore: prefer_constructors_over_static_methods
+  static WidgetPlaceholder lazy(Widget child) =>
+      child is WidgetPlaceholder ? child : WidgetPlaceholder(child: child);
 
   /// Unwraps a placeholder if `autoUnwrap` has been set.
   static Widget unwrap(BuildContext context, Widget widget) {
@@ -198,6 +199,12 @@ class WidgetPlaceholder<T> extends StatelessWidget {
     }
   }
 }
+
+/// A callback for [WidgetPlaceholder].
+typedef WidgetPlaceholderBuilder = Widget? Function(
+  BuildContext context,
+  Widget child,
+);
 
 final _dataUriRegExp = RegExp('^data:[^;]+;([^,]+),');
 

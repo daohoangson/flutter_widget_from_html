@@ -59,7 +59,7 @@ void main() {
           explained,
           equals(
             'TshWidget\n'
-            '└WidgetPlaceholder<Widget>(Text)\n'
+            '└WidgetPlaceholder\n'
             ' └Text("hi")\n'
             '  └RichText(text: "hi")\n\n',
           ),
@@ -82,7 +82,7 @@ void main() {
           explained,
           equals(
             'TshWidget\n'
-            '└WidgetPlaceholder<Widget>(Text)\n'
+            '└WidgetPlaceholder\n'
             ' └Text("hi")\n'
             '  └RichText(text: "hi")\n\n',
           ),
@@ -105,9 +105,7 @@ void main() {
           explained,
           equals(
             'TshWidget\n'
-            '└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1:\n'
-            ' │  WidgetBit.inline#2 WidgetPlaceholder(Text("hi"))\n'
-            ' │)\n'
+            '└WidgetPlaceholder(text)\n'
             ' └Text("hi")\n'
             '  └RichText(text: "hi")\n\n',
           ),
@@ -132,7 +130,7 @@ void main() {
           explained,
           equals(
             'TshWidget\n'
-            '└WidgetPlaceholder<Widget>(Text)\n'
+            '└WidgetPlaceholder\n'
             ' └Text("Hi")\n'
             '  └RichText(text: "Hi")\n\n',
           ),

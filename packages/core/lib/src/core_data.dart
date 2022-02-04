@@ -1,9 +1,12 @@
 import 'package:csslib/visitor.dart' as css;
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fwfh_text_style/fwfh_text_style.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'core_helpers.dart';
+import 'core_widget_factory.dart';
+import 'internal/flattener.dart';
 
 part 'data/build_bits.dart';
 part 'data/css.dart';
@@ -61,9 +64,6 @@ abstract class BuildMetadata {
 
   /// Registers a build op.
   void register(BuildOp op);
-
-  @override
-  String toString() => 'BuildMetadata(${element.outerHtml})';
 }
 
 /// A building operation to customize how a DOM element is rendered.
