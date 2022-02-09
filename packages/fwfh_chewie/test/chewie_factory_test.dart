@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '_.dart';
+import 'mock_video_player_platform.dart';
 
 void main() {
   const src = 'http://domain.com/video.mp4';
