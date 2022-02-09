@@ -10,11 +10,17 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 
 class Golden extends StatelessWidget {
   final String html;
+  final bool isGoldenTest;
   final String name;
   final Key targetKey;
 
-  const Golden(this.name, this.html, {Key key, this.targetKey})
-      : super(key: key);
+  const Golden(
+    this.name,
+    this.html, {
+    this.isGoldenTest = false,
+    Key key,
+    this.targetKey,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,43 +28,44 @@ class Golden extends StatelessWidget {
     final isSelectable = context.isSelectable;
     final withEnhanced =
         !isSelectable && RegExp(r'^(AUDIO|IFRAME|SVG|VIDEO)$').hasMatch(name);
+    final withCore = !isGoldenTest || !withEnhanced;
+    final withLabels = withCore && withEnhanced;
 
     final children = <Widget>[
-      if (withEnhanced)
+      if (!isGoldenTest) ...[
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Text(html),
-        )
-      else
-        Text(html),
-      const Divider(),
-      if (withEnhanced)
-        Text(
-          'flutter_widget_from_html_core:\n',
-          style: Theme.of(context).textTheme.caption,
         ),
-      LimitedBox(
-        maxHeight: 400,
-        child: isSelectable
-            ? enhanced.HtmlWidget(
-                html,
-                baseUrl: baseUrl,
-                isSelectable: true,
-              )
-            : core.HtmlWidget(
-                html,
-                baseUrl: baseUrl,
-              ),
-      ),
-    ];
-
-    if (withEnhanced) {
-      children.addAll(<Widget>[
         const Divider(),
-        Text(
-          'flutter_widget_from_html:\n',
-          style: Theme.of(context).textTheme.caption,
+      ],
+      if (withCore) ...[
+        if (withLabels)
+          Text(
+            'flutter_widget_from_html_core:\n',
+            style: Theme.of(context).textTheme.caption,
+          ),
+        LimitedBox(
+          maxHeight: 400,
+          child: isSelectable
+              ? enhanced.HtmlWidget(
+                  html,
+                  baseUrl: baseUrl,
+                  isSelectable: true,
+                )
+              : core.HtmlWidget(
+                  html,
+                  baseUrl: baseUrl,
+                ),
         ),
+      ],
+      if (withEnhanced) ...[
+        if (withCore) const Divider(),
+        if (withLabels)
+          Text(
+            'flutter_widget_from_html:\n',
+            style: Theme.of(context).textTheme.caption,
+          ),
         LimitedBox(
           maxHeight: 400,
           child: enhanced.HtmlWidget(
@@ -68,8 +75,8 @@ class Golden extends StatelessWidget {
             webView: true,
           ),
         ),
-      ]);
-    }
+      ],
+    ];
 
     return Scaffold(
       appBar: AppBar(

@@ -2,14 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
 
 Future<void> main() async {
-  await loadAppFonts();
-
   const imgSizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
 
   testWidgets('renders empty string', (WidgetTester tester) async {
