@@ -334,7 +334,8 @@ class _CssSizingPercentage extends CssSizingValue {
   final double percentage;
   const _CssSizingPercentage(this.percentage) : super._();
   @override
-  double clamp(double min, double max) => (max * percentage).clamp(min, max);
+  double clamp(double min, double max) =>
+      (max * percentage / 100.0).clamp(min, max);
 
   @override
   int get hashCode => percentage.hashCode;
