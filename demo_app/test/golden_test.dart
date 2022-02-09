@@ -29,12 +29,7 @@ void _test(
 
         await tester.pumpWidgetBuilder(
           PopupMenuStateProvider(
-            builder: (_) => Golden(
-              name,
-              html,
-              isGoldenTest: true,
-              targetKey: key,
-            ),
+            builder: (_) => Golden(name, html, targetKey: key),
             initialIsSelectable: isSelectable,
           ),
           wrapper: materialAppWrapper(
