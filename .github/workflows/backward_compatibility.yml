@@ -75,6 +75,11 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
 
       - run: flutter test
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: failures
+          path: packages/${{ matrix.package }}/test/failures/
 
   fwfh_text_style:
     strategy:
@@ -109,3 +114,8 @@ jobs:
           channel: ${{ matrix.channel }}
       - run: flutter --version
       - run: flutter test
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: failures
+          path: packages/fwfh_text_style/test/failures/

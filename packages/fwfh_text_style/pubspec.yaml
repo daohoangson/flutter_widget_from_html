@@ -1,5 +1,5 @@
 name: fwfh_text_style
-version: 2.7.2
+version: 2.7.3+1
 description: A TextStyle replacement that allows resetting height behavior to normal.
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 

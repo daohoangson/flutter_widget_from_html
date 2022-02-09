@@ -1,3 +1,11 @@
+## 2.7.3+1
+
+- Make `TextStyle` inherit=true warning less noisy (#715)
+
+## 2.7.3
+
+- Fix `FwfhTextStyle` usage within `CupertinoPageScaffold` (#713)
+
 ## 2.7.2
 
 - New factory method `FwfhTextStyle.of`

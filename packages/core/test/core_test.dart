@@ -1,14 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
 
 Future<void> main() async {
-  await loadAppFonts();
-
   const imgSizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
 
   testWidgets('renders empty string', (WidgetTester tester) async {
@@ -1583,6 +1581,43 @@ Future<void> main() async {
           ),
         );
       });
+    });
+  });
+
+  group('#698', () {
+    testWidgets('MaterialApp > CupertinoPageScaffold', (tester) async {
+      const html = 'Hello world';
+      final key = GlobalKey<HtmlWidgetState>();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: CupertinoPageScaffold(
+            child: HtmlWidget(html, key: key),
+          ),
+        ),
+      );
+
+      final explained = await explainWithoutPumping(key: key);
+      expect(explained, equals('[RichText:(#D0FF0000:$html)]'));
+    });
+
+    testWidgets('Typography.material2018', (tester) async {
+      const html = 'Hello world';
+      final key = GlobalKey<HtmlWidgetState>();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            typography: Typography.material2018(),
+          ),
+          home: Scaffold(
+            body: HtmlWidget(html, key: key),
+          ),
+        ),
+      );
+
+      final explained = await explainWithoutPumping(key: key);
+      expect(explained, equals('[RichText:(#DD000000:$html)]'));
     });
   });
 }

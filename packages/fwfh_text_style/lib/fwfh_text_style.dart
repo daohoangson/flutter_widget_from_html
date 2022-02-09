@@ -5,17 +5,39 @@ import 'package:flutter/widgets.dart';
 
 const _default = _DefaultValue();
 
+var _warnedAboutInherit = false;
+
 /// A [TextStyle] replacement.
 class FwfhTextStyle extends _TextStyleProxy {
-  /// Creates an instance from a [TextStyle] with inherit=false.
+  /// Creates an instance from another [TextStyle].
   ///
   /// See also: [FwfhTextStyle.of].
-  FwfhTextStyle.from(TextStyle ref)
-      : super._(ref is FwfhTextStyle ? ref.ref : ref);
+  static TextStyle from(TextStyle ref) {
+    if (ref.inherit) {
+      assert(
+        () {
+          if (!_warnedAboutInherit) {
+            debugPrint(
+              "Warning: $ref has inherit=true, resetting height won't work. "
+              'See https://github.com/flutter/flutter/issues/58765 for context. '
+              'This is printed once per debug session.\n${StackTrace.current}',
+            );
+            _warnedAboutInherit = true;
+          }
+          return true;
+        }(),
+      );
+      return ref;
+    } else {
+      return FwfhTextStyle._(ref is FwfhTextStyle ? ref.ref : ref);
+    }
+  }
 
   /// Creates an instance from the closest [DefaultTextStyle].
-  factory FwfhTextStyle.of(BuildContext context) =>
+  static TextStyle of(BuildContext context) =>
       FwfhTextStyle.from(DefaultTextStyle.of(context).style);
+
+  FwfhTextStyle._(TextStyle ref) : super._(ref);
 
   @override
   TextStyle apply({
@@ -163,12 +185,7 @@ class _DefaultValue {
 abstract class _TextStyleProxy implements TextStyle {
   final TextStyle ref;
 
-  _TextStyleProxy._(this.ref)
-      : assert(
-          ref.inherit == false,
-          "FwfhTextStyle.from() doesn't support incomplete TextStyle. "
-          'Use `DefaultTextStyle.of(context)` to obtain the current style.',
-        );
+  _TextStyleProxy._(this.ref);
 
   @override
   Paint? get background => ref.background;
@@ -279,8 +296,11 @@ abstract class _TextStyleProxy implements TextStyle {
   @override
   double? get height => ref.height;
 
+  /// Flutter's [TextStyle.merge] implementation uses private properties
+  /// which will trigger weird errors in people's apps.
+  /// We cannot let that happen.
   @override
-  bool get inherit => ref.inherit;
+  bool get inherit => false;
 
   @override
   TextLeadingDistribution? get leadingDistribution => ref.leadingDistribution;
