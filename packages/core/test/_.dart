@@ -198,7 +198,7 @@ String simplifyHashCode(String str) {
   });
 }
 
-Finder findText(String data) => _RichTextFinder(data);
+Finder findText(String data) => _TextFinder(data);
 
 Future<int> tapText(WidgetTester tester, String data) async {
   var tapped = 0;
@@ -728,13 +728,13 @@ class HitTestApp extends StatelessWidget {
       );
 }
 
-class _RichTextFinder extends MatchFinder {
+class _TextFinder extends MatchFinder {
   final String data;
 
-  _RichTextFinder(this.data) : super(skipOffstage: true);
+  _TextFinder(this.data) : super(skipOffstage: true);
 
   @override
-  String get description => 'RichText "$data"';
+  String get description => '_TextFinder "$data"';
 
   @override
   bool matches(Element candidate) {
@@ -746,6 +746,16 @@ class _RichTextFinder extends MatchFinder {
         if (text.toPlainText() == data) {
           return true;
         }
+      }
+    } else if (widget is SelectableText) {
+      final text = widget.data;
+      if (text != null && text == data) {
+        return true;
+      }
+
+      final span = widget.textSpan;
+      if (span != null && span.toPlainText() == data) {
+        return true;
       }
     }
 

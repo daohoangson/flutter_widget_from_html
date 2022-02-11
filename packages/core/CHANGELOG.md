@@ -1,3 +1,8 @@
+## 0.8.5+1
+
+- Fix percentage value bug (#712, authored by @equweiyu)
+- Fix incorrect scrollable state (#728)
+
 ## 0.8.4
 
 - Add support for rtl in `HtmlTable` (#681)

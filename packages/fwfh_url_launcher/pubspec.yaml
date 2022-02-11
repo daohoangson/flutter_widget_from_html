@@ -23,3 +23,5 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   lint: any
+  plugin_platform_interface: any
+  url_launcher_platform_interface: any
