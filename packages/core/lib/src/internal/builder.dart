@@ -6,10 +6,11 @@ import 'package:csslib/visitor.dart' as css;
 import 'package:html/dom.dart' as dom;
 
 import '../core_data.dart';
-import '../core_data.dart' as core_data show BuildMetadata, BuildTree;
+import '../core_data.dart' as core_data;
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
 import 'core_ops.dart';
+import 'flattener.dart';
 
 // https://infra.spec.whatwg.org/#ascii-whitespace
 const _asciiWhitespace = r'[\u{0009}\u{000A}\u{000C}\u{000D}\u{0020}]';
@@ -78,15 +79,6 @@ class BuildTree extends core_data.BuildTree {
     required this.wf,
   }) : super(parent, tsb);
 
-  Iterable<BuildTree> get _subTrees sync* {
-    for (final child in directChildren) {
-      if (child is BuildTree) {
-        yield child;
-        yield* child._subTrees;
-      }
-    }
-  }
-
   void addBitsFromNodes(dom.NodeList domNodes) {
     for (final domNode in domNodes) {
       _addBitsFromNode(domNode);
@@ -102,11 +94,11 @@ class BuildTree extends core_data.BuildTree {
       return _built;
     }
 
-    for (final subTree in _subTrees.toList(growable: false).reversed) {
-      subTree._onFlattening();
+    for (final subTree in subTrees.toList(growable: false).reversed) {
+      subTree.flatten(Flattened.noOp());
     }
 
-    var widgets = wf.flatten(parentMeta, this);
+    var widgets = Flattener(wf, parentMeta, this).widgets;
     for (final op in parentMeta.buildOps) {
       widgets = op.onWidgets
               ?.call(parentMeta, widgets)
@@ -139,6 +131,13 @@ class BuildTree extends core_data.BuildTree {
 
     _built.addAll(widgets);
     return _built;
+  }
+
+  @override
+  void flatten(Flattened _) {
+    for (final op in parentMeta.buildOps) {
+      op.onTreeFlattening?.call(parentMeta, this);
+    }
   }
 
   @override
@@ -290,12 +289,6 @@ class BuildTree extends core_data.BuildTree {
 
     for (final pair in map.entries) {
       meta[pair.key] = pair.value;
-    }
-  }
-
-  void _onFlattening() {
-    for (final op in parentMeta.buildOps) {
-      op.onTreeFlattening?.call(parentMeta, this);
     }
   }
 }

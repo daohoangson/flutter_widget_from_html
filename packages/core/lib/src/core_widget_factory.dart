@@ -9,7 +9,6 @@ import 'core_helpers.dart';
 import 'core_html_widget.dart';
 import 'internal/core_ops.dart';
 import 'internal/core_parser.dart';
-import 'internal/flattener.dart';
 import 'internal/margin_vertical.dart';
 import 'internal/platform_specific/fallback.dart'
     if (dart.library.io) 'internal/platform_specific/io.dart';
@@ -22,7 +21,7 @@ class WidgetFactory {
   /// Defaults to `false`, resulting in a [CircularProgressIndicator].
   static bool debugDeterministicLoadingWidget = false;
 
-  final _flatteners = <Flattener>[];
+  final _recognizersNeedDisposing = <GestureRecognizer>[];
 
   late AnchorRegistry _anchorRegistry;
 
@@ -364,52 +363,17 @@ class WidgetFactory {
   }
 
   void _dispose() {
-    for (final f in _flatteners) {
-      f.dispose();
+    for (final r in _recognizersNeedDisposing) {
+      r.dispose();
     }
-    _flatteners.clear();
+    _recognizersNeedDisposing.clear();
   }
 
-  /// Flattens a [BuildTree] into widgets.
-  Iterable<WidgetPlaceholder> flatten(BuildMetadata meta, BuildTree tree) {
-    final widgets = <WidgetPlaceholder>[];
-    final instance = Flattener(this);
-    _flatteners.add(instance);
-
-    for (final flattened in instance.flatten(tree)) {
-      final widget = flattened.widget;
-      if (widget != null) {
-        widgets.add(WidgetPlaceholder.lazy(widget));
-        continue;
-      }
-
-      final spanBuilder = flattened.spanBuilder;
-      if (spanBuilder == null) {
-        continue;
-      }
-      widgets.add(
-        WidgetPlaceholder(
-          builder: (context, _) {
-            final tsh = tree.tsb.build(context);
-            final span = spanBuilder(context, tsh.whitespace);
-            if (span == null) {
-              return widget0;
-            }
-
-            final textAlign = tsh.textAlign ?? TextAlign.start;
-
-            if (span is WidgetSpan && textAlign == TextAlign.start) {
-              return span.child;
-            }
-
-            return buildText(meta, tsh, span);
-          },
-          localName: 'text',
-        ),
-      );
+  /// Defers freeing resources till the factory itself is disposed.
+  void deferDispose({GestureRecognizer? recognizer}) {
+    if (recognizer != null) {
+      _recognizersNeedDisposing.add(recognizer);
     }
-
-    return widgets;
   }
 
   /// Prepares [GestureTapCallback].

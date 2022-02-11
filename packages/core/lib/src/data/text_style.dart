@@ -82,7 +82,7 @@ class TextStyleHtml {
 }
 
 /// A text styling builder.
-class TextStyleBuilder<T1> {
+class TextStyleBuilder {
   /// The parent builder.
   final TextStyleBuilder? parent;
 
@@ -95,9 +95,9 @@ class TextStyleBuilder<T1> {
   TextStyleBuilder({this.parent});
 
   /// Enqueues a callback.
-  void enqueue<T2>(
-    TextStyleHtml Function(TextStyleHtml tsh, T2 input) builder, [
-    T2? input,
+  void enqueue<T>(
+    TextStyleHtml Function(TextStyleHtml tsh, T input) builder, [
+    T? input,
   ]) {
     assert(_output == null, 'Cannot add builder after being built');
     _builders ??= [];

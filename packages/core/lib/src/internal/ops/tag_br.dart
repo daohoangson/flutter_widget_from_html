@@ -10,7 +10,7 @@ class TagBr {
   BuildOp get buildOp => BuildOp(onTree: (_, tree) => tree.add(TagBrBit(tree)));
 }
 
-class TagBrBit extends BuildBit<void, String> {
+class TagBrBit extends BuildBit {
   TagBrBit(BuildTree parent, {TextStyleBuilder? tsb})
       : super(parent, tsb ?? parent.tsb);
 
@@ -18,11 +18,11 @@ class TagBrBit extends BuildBit<void, String> {
   bool get swallowWhitespace => true;
 
   @override
-  String buildBit(void _) => '\n';
-
-  @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       TagBrBit(parent ?? this.parent!, tsb: tsb ?? this.tsb);
+
+  @override
+  void flatten(Flattened f) => f.text = '\n';
 
   @override
   String toString() => '<BR />';
