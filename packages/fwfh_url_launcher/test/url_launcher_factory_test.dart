@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import '_.dart';
+import 'mock_url_launcher_platform.dart';
 
 void main() {
-  setUp(mockSetup);
-  tearDown(mockTearDown);
+  setUp(mockUrlLauncherPlatform);
 
   testWidgets('launches url', (WidgetTester tester) async {
     const href = 'http://flutter.dev';
@@ -14,6 +14,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(await tapText(tester, 'Tap me'), equals(1));
 
-    expect(mockGetLaunchUrls(), equals(const [href]));
+    expect(mockLaunchedUrls, equals(const [href]));
   });
 }
