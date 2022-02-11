@@ -10,7 +10,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 
-import '../../packages/fwfh_chewie/test/_.dart';
+import '../../packages/fwfh_chewie/test/mock_video_player_platform.dart';
+import '../../packages/fwfh_webview/test/mock_webview_platform.dart';
 
 void _test(
   String name,
@@ -48,40 +49,10 @@ void _test(
 
 void main() {
   mockVideoPlayerPlatform();
+  mockWebViewPlatform();
 
   const audioSessionMc = MethodChannel('com.ryanheise.audio_session');
   audioSessionMc.setMockMethodCallHandler((_) async {});
-
-  const platformViewsMc = MethodChannel('flutter/platform_views');
-  platformViewsMc.setMockMethodCallHandler((_) async {});
-
-  for (final name in [
-    'dev.flutter.pigeon.DownloadListenerHostApi.create',
-    'dev.flutter.pigeon.WebChromeClientHostApi.create',
-    'dev.flutter.pigeon.WebSettingsHostApi.create',
-    'dev.flutter.pigeon.WebSettingsHostApi.setBuiltInZoomControls',
-    'dev.flutter.pigeon.WebSettingsHostApi.setDisplayZoomControls',
-    'dev.flutter.pigeon.WebSettingsHostApi.setDomStorageEnabled',
-    // ignore: lines_longer_than_80_chars
-    'dev.flutter.pigeon.WebSettingsHostApi.setJavaScriptCanOpenWindowsAutomatically',
-    'dev.flutter.pigeon.WebSettingsHostApi.setJavaScriptEnabled',
-    'dev.flutter.pigeon.WebSettingsHostApi.setLoadWithOverviewMode',
-    'dev.flutter.pigeon.WebSettingsHostApi.setMediaPlaybackRequiresUserGesture',
-    'dev.flutter.pigeon.WebSettingsHostApi.setSupportMultipleWindows',
-    'dev.flutter.pigeon.WebSettingsHostApi.setSupportZoom',
-    'dev.flutter.pigeon.WebSettingsHostApi.setUseWideViewPort',
-    'dev.flutter.pigeon.WebSettingsHostApi.setUserAgentString',
-    'dev.flutter.pigeon.WebViewClientHostApi.create',
-    'dev.flutter.pigeon.WebViewHostApi.create',
-    'dev.flutter.pigeon.WebViewHostApi.loadUrl',
-    'dev.flutter.pigeon.WebViewHostApi.setDownloadListener',
-    'dev.flutter.pigeon.WebViewHostApi.setWebChromeClient',
-    'dev.flutter.pigeon.WebViewHostApi.setWebContentsDebuggingEnabled',
-    'dev.flutter.pigeon.WebViewHostApi.setWebViewClient',
-  ]) {
-    BasicMessageChannel(name, const StandardMessageCodec())
-        .setMockMessageHandler((input) async => {'foo': 'bar'});
-  }
 
   final json = File('test/goldens.json').readAsStringSync();
   final map = jsonDecode(json) as Map<String, dynamic>;
