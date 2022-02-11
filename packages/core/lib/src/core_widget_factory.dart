@@ -1097,7 +1097,7 @@ class WidgetFactory {
   void reset(State state) {
     _dispose();
 
-    _anchorRegistry = AnchorRegistry();
+    _anchorRegistry = AnchorRegistry(state.context);
 
     final widget = state.widget;
     _widget = widget is HtmlWidget ? widget : null;

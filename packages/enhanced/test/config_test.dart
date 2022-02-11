@@ -9,7 +9,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
 import 'package:html/dom.dart' as dom;
 
-import '../../fwfh_url_launcher/test/_.dart' as fwfh_url_launcher;
+import '../../fwfh_url_launcher/test/mock_url_launcher_platform.dart';
 import '_.dart' as helper;
 
 Future<String> explain(WidgetTester t, HtmlWidget hw) =>
@@ -412,8 +412,7 @@ void main() {
   });
 
   group('onTapUrl', () {
-    setUp(fwfh_url_launcher.mockSetup);
-    tearDown(fwfh_url_launcher.mockTearDown);
+    setUp(mockUrlLauncherPlatform);
 
     testWidgets('triggers callback (returns false)', (tester) async {
       const href = 'returns-false';
@@ -433,7 +432,7 @@ void main() {
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
       expect(urls, equals(const [href]));
-      expect(fwfh_url_launcher.mockGetLaunchUrls(), equals(const [href]));
+      expect(mockLaunchedUrls, equals(const [href]));
     });
 
     testWidgets('triggers callback (returns true)', (tester) async {
@@ -454,7 +453,7 @@ void main() {
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
       expect(urls, equals(const [href]));
-      expect(fwfh_url_launcher.mockGetLaunchUrls(), equals(const []));
+      expect(mockLaunchedUrls, equals(const []));
     });
 
     testWidgets('triggers callback (async false)', (tester) async {
@@ -475,7 +474,7 @@ void main() {
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
       expect(urls, equals(const [href]));
-      expect(fwfh_url_launcher.mockGetLaunchUrls(), equals(const [href]));
+      expect(mockLaunchedUrls, equals(const [href]));
     });
 
     testWidgets('triggers callback (async true)', (tester) async {
@@ -496,7 +495,7 @@ void main() {
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
       expect(urls, equals(const [href]));
-      expect(fwfh_url_launcher.mockGetLaunchUrls(), equals(const []));
+      expect(mockLaunchedUrls, equals(const []));
     });
 
     testWidgets('default handler', (WidgetTester tester) async {
@@ -508,7 +507,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
 
-      expect(fwfh_url_launcher.mockGetLaunchUrls(), equals(const [href]));
+      expect(mockLaunchedUrls, equals(const [href]));
     });
   });
 

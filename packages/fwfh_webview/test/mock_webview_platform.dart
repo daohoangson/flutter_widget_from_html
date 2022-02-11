@@ -188,6 +188,13 @@ class _FakeWebViewState extends State<_FakeWebViewWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox.shrink();
+    return const DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.grey,
+      ),
+      child: Placeholder(
+        color: Colors.black,
+      ),
+    );
   }
 }

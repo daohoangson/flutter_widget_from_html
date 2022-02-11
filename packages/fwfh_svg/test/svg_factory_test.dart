@@ -294,23 +294,11 @@ class _Golden extends StatelessWidget {
   Widget build(BuildContext _) => Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                contents.replaceAll(
-                  RegExp('file://.+/fwfh_svg/'),
-                  'file://.../fwfh_svg/',
-                ),
-              ),
-              const Divider(),
-              HtmlWidget(
-                contents,
-                factoryBuilder: allowDrawingOutsideViewBox
-                    ? () => _GoldenAllowFactory()
-                    : () => _GoldenDisallowFactory(),
-              ),
-            ],
+          child: HtmlWidget(
+            contents,
+            factoryBuilder: allowDrawingOutsideViewBox
+                ? () => _GoldenAllowFactory()
+                : () => _GoldenDisallowFactory(),
           ),
         ),
       );
