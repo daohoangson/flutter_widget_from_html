@@ -8,30 +8,12 @@ class TagQ {
   TagQ(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTree: (_, tree) =>
-            wrapTree(tree, append: _TagQBit.closing, prepend: _TagQBit.opening),
+        onTree: (_, t) => wrapTree(t, append: _closing, prepend: _opening),
       );
-}
 
-class _TagQBit extends BuildBit<void, String> {
-  final bool isOpening;
+  static BuildBit _closing(BuildTree parent) =>
+      TextBit(parent, '”', tsb: parent.tsb);
 
-  const _TagQBit(
-    BuildTree parent,
-    TextStyleBuilder tsb, {
-    required this.isOpening,
-  }) : super(parent, tsb);
-
-  @override
-  String buildBit(void _) => isOpening ? '“' : '”';
-
-  @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _TagQBit(parent ?? this.parent!, tsb ?? this.tsb, isOpening: isOpening);
-
-  static BuildBit closing(BuildTree parent) =>
-      _TagQBit(parent, parent.tsb, isOpening: false);
-
-  static BuildBit opening(BuildTree parent) =>
-      _TagQBit(parent, parent.tsb, isOpening: true);
+  static BuildBit _opening(BuildTree parent) =>
+      TextBit(parent, '“', tsb: parent.tsb);
 }

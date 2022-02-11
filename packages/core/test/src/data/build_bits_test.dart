@@ -57,12 +57,6 @@ void main() {
         });
       });
 
-      testWidgets('accepts TextStyleHtml', (WidgetTester tester) async {
-        const html = '1 <span class="input--TextStyleHtml">2</span> 3';
-        final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:1 2(:TextStyleHtml)(: 3))]'));
-      });
-
       testWidgets('returns InlineSpan', (WidgetTester tester) async {
         const html = '1 <span class="output--InlineSpan">2</span> 3';
         final explained = await explain(tester, html);
@@ -216,22 +210,12 @@ void main() {
       });
     });
 
-    group('build', () {
-      test('builds RichText', () {
-        final text = _text();
-        text.addText('1');
+    test('builds', () {
+      final text = _text();
+      text.addText('1');
 
-        final widgets = text.build();
-        expect(widgets.length, equals(1));
-      });
-
-      test('builds via buildBit(null)', () {
-        final text = _text();
-        text.addText('1');
-
-        final widgets = text.buildBit(null);
-        expect(widgets.length, equals(1));
-      });
+      final widgets = text.build();
+      expect(widgets.length, equals(1));
     });
   });
 
@@ -271,7 +255,7 @@ void main() {
       final text2 = _text();
       final copied = bit.copyWith(parent: text2);
       text2.add(copied);
-      expect(copied.buildBit(null), equals(child));
+      expect(text2.build(), equals([child]));
     });
 
     test('WidgetBit.inline returns same parent', () {
@@ -281,17 +265,6 @@ void main() {
 
       final copied = bit.copyWith();
       expect(copied.parent, equals(text));
-    });
-
-    test('WidgetBit.inline returns', () {
-      final text = _text();
-      final child = WidgetPlaceholder();
-      final bit = WidgetBit.inline(text, child);
-
-      final text2 = _text();
-      final copied = bit.copyWith(parent: text2);
-      text2.add(copied);
-      expect((copied.buildBit(null) as WidgetSpan).child, equals(child));
     });
 
     test('BuildTree returns', () {
@@ -392,6 +365,31 @@ void main() {
       ),
     );
   });
+
+  test('Flattener', () {
+    final values = [];
+    final flattener = Flattened.forTesting(values);
+
+    expect(() => flattener.recognizer, throwsStateError);
+
+    final recognizer = TapGestureRecognizer();
+    flattener.recognizer = recognizer;
+    expect(flattener.recognizer, equals(recognizer));
+
+    const span = TextSpan();
+    flattener.span = span;
+
+    const text = 'text';
+    flattener.text = text;
+
+    const space = ' ';
+    flattener.whitespace = space;
+
+    final widget = WidgetPlaceholder();
+    flattener.widget = widget;
+
+    expect(values, equals([recognizer, span, text, space, widget]));
+  });
 }
 
 class _BuildBitWidgetFactory extends WidgetFactory {
@@ -403,25 +401,15 @@ class _BuildBitWidgetFactory extends WidgetFactory {
       meta.register(
         BuildOp(
           onTreeFlattening: (_, tree) =>
-              tree.add(_InputGestureRecognizerBit(tree, tree.tsb)),
+              tree.add(_InputGestureRecognizerBit(tree)),
           priority: BuildOp.kPriorityMax,
-        ),
-      );
-    }
-
-    if (classes.contains('input--TextStyleHtml')) {
-      meta.register(
-        BuildOp(
-          onTree: (_, tree) => tree.add(_InputTextStyleHtmlBit(tree, tree.tsb)),
         ),
       );
     }
 
     if (classes.contains('output--InlineSpan')) {
       meta.register(
-        BuildOp(
-          onTree: (_, tree) => tree.add(_OutputInlineSpanBit(tree, tree.tsb)),
-        ),
+        BuildOp(onTree: (_, tree) => tree.add(_OutputInlineSpanBit(tree))),
       );
     }
 
@@ -435,9 +423,7 @@ class _BuildBitWidgetFactory extends WidgetFactory {
 
     if (classes.contains('output--Widget')) {
       meta.register(
-        BuildOp(
-          onTree: (_, tree) => tree.add(_OutputWidgetBit(tree, tree.tsb)),
-        ),
+        BuildOp(onTree: (_, tree) => tree.add(_OutputWidgetBit(tree))),
       );
     }
 
@@ -456,6 +442,9 @@ class _CircularBit extends BuildTree {
   Iterable<WidgetPlaceholder> build() => throw UnimplementedError();
 
   @override
+  void flatten(Flattened _) => throw UnimplementedError();
+
+  @override
   BuildTree sub({BuildTree? parent, TextStyleBuilder? tsb}) =>
       throw UnimplementedError();
 
@@ -463,98 +452,82 @@ class _CircularBit extends BuildTree {
   String toString() => parent.toString();
 }
 
-class _CustomBit extends BuildBit<void, void> {
+class _CustomBit extends BuildBit {
   const _CustomBit(BuildTree? parent, TextStyleBuilder tsb)
       : super(parent, tsb);
 
   @override
-  bool get isInline => false;
-
-  @override
-  void buildBit(void input) {}
+  void flatten(Flattened _) => throw UnimplementedError();
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       throw UnimplementedError();
 }
 
-class _InputGestureRecognizerBit
-    extends BuildBit<GestureRecognizer?, GestureRecognizer?> {
-  const _InputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder tsb)
-      : super(parent, tsb);
+class _InputGestureRecognizerBit extends BuildBit {
+  const _InputGestureRecognizerBit(BuildTree? parent) : super(parent);
 
   @override
-  GestureRecognizer? buildBit(GestureRecognizer? recognizer) {
-    if (recognizer is TapGestureRecognizer) {
-      recognizer.onTapCancel = () {};
-      return recognizer;
+  void flatten(Flattened f) {
+    final existing = f.recognizer;
+    if (existing is TapGestureRecognizer) {
+      existing.onTapCancel = () {};
+      return;
     }
 
-    return MultiTapGestureRecognizer();
+    f.recognizer = MultiTapGestureRecognizer();
   }
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _InputGestureRecognizerBit(parent ?? this.parent, tsb ?? this.tsb);
+      _InputGestureRecognizerBit(parent ?? this.parent);
 }
 
-class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {
-  const _InputTextStyleHtmlBit(BuildTree? parent, TextStyleBuilder tsb)
-      : super(parent, tsb);
+class _OutputInlineSpanBit extends BuildBit {
+  const _OutputInlineSpanBit(BuildTree? parent) : super(parent);
 
   @override
-  InlineSpan buildBit(TextStyleHtml tsh) =>
-      TextSpan(text: tsh.runtimeType.toString(), style: tsh.style);
+  void flatten(Flattened f) => f.span = const WidgetSpan(child: Text('foo'));
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _InputTextStyleHtmlBit(parent ?? this.parent, tsb ?? this.tsb);
+      _OutputInlineSpanBit(parent ?? this.parent);
 }
 
-class _OutputInlineSpanBit extends BuildBit<void, InlineSpan> {
-  const _OutputInlineSpanBit(BuildTree? parent, TextStyleBuilder tsb)
+class _OutputStringBit extends BuildBit {
+  const _OutputStringBit(BuildTree? parent, TextStyleBuilder? tsb)
       : super(parent, tsb);
 
   @override
-  InlineSpan buildBit(void _) => const WidgetSpan(child: Text('foo'));
-
-  @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _OutputInlineSpanBit(parent ?? this.parent, tsb ?? this.tsb);
-}
-
-class _OutputStringBit extends BuildBit<void, String> {
-  const _OutputStringBit(BuildTree? parent, TextStyleBuilder tsb)
-      : super(parent, tsb);
-
-  @override
-  String buildBit(void _) => 'foo';
+  void flatten(Flattened f) => f.text = 'foo';
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
       _OutputStringBit(parent ?? this.parent, tsb ?? this.tsb);
 }
 
-class _OutputWidgetBit extends BuildBit<void, Widget> {
-  const _OutputWidgetBit(BuildTree? parent, TextStyleBuilder tsb)
-      : super(parent, tsb);
+class _OutputWidgetBit extends BuildBit {
+  const _OutputWidgetBit(BuildTree? parent) : super(parent);
 
   @override
   bool get isInline => false;
 
   @override
-  Widget buildBit(void _) => const Text('foo');
+  void flatten(Flattened f) =>
+      f.widget = WidgetPlaceholder(child: const Text('foo'));
 
   @override
   BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _OutputWidgetBit(parent ?? this.parent, tsb ?? this.tsb);
+      _OutputWidgetBit(parent ?? this.parent);
 }
 
 String _data(BuildTree text) => text.bits
     .map(
-      (bit) => (bit is BuildBit<void, String>)
-          ? bit.buildBit(null)
-          : '[$bit]'.replaceAll(RegExp(r'#\w+'), ''),
+      (bit) => bit is TextBit
+          ? bit.data
+          : bit is WhitespaceBit
+              ? bit.data
+              : '[$bit]'.replaceAll(RegExp(r'#\w+'), ''),
     )
     .join();
 
