@@ -366,11 +366,17 @@ class WidgetFactory {
     _recognizersNeedDisposing.clear();
   }
 
-  /// Defers freeing resources till the factory itself is disposed.
-  void deferDispose({GestureRecognizer? recognizer}) {
+  /// Prepares [GestureRecognizer].
+  GestureRecognizer? gestureRecognizer(HtmlStyle tsh) {
+    final onTap = tsh.onTap;
+    final recognizer =
+        onTap != null ? (TapGestureRecognizer()..onTap = onTap) : null;
+
     if (recognizer != null) {
       _recognizersNeedDisposing.add(recognizer);
     }
+
+    return recognizer;
   }
 
   /// Prepares [GestureTapCallback].

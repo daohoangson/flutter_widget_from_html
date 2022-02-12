@@ -13,70 +13,22 @@ class TagA {
         defaultStyles: (_) => const {
           kCssTextDecoration: kCssTextDecorationUnderline,
         },
-        onTreeFlattening: (meta, tree) {
-          final onTap = _gestureTapCallback(meta);
+        onTree: (meta, tree) {
+          final href = meta.element.attributes[kAttributeAHref];
+          if (href == null) {
+            return;
+          }
+
+          final onTap = wf.gestureTapCallback(wf.urlFull(href) ?? href);
           if (onTap == null) {
-            return false;
+            return;
           }
 
-          for (final bit in tree.bits.toList(growable: false)) {
-            if (bit is WidgetBit) {
-              bit.child.wrapWith(
-                (_, child) => wf.buildGestureDetector(meta, child, onTap),
-              );
-            } else if (bit is! _TagABit) {
-              final recognizer = TapGestureRecognizer()..onTap = onTap;
-              wf.deferDispose(recognizer: recognizer);
-              _TagABit(bit.parent, recognizer).insertAfter(bit);
-            }
-          }
-
-          return true;
+          tree.tsb.enqueue(_tsb, onTap);
         },
-        onWidgets: (meta, widgets) {
-          final onTap = _gestureTapCallback(meta);
-          if (onTap == null) {
-            return null;
-          }
-
-          return listOrNull(
-                wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
-                      (_, child) => wf.buildGestureDetector(meta, child, onTap),
-                    ),
-              ) ??
-              widgets;
-        },
-        onWidgetsIsOptional: true,
       );
 
-  GestureTapCallback? _gestureTapCallback(BuildMetadata meta) {
-    final href = meta.element.attributes[kAttributeAHref];
-    return href != null
-        ? wf.gestureTapCallback(wf.urlFull(href) ?? href)
-        : null;
+  static HtmlStyle _tsb(HtmlStyle tsh, GestureTapCallback value) {
+    return tsh.copyWith(onTap: value);
   }
-}
-
-class _TagABit extends BuildBit {
-  final TapGestureRecognizer recognizer;
-
-  const _TagABit(BuildTree? parent, this.recognizer) : super(parent);
-
-  @override
-  bool? get swallowWhitespace => null;
-
-  @override
-  void flatten(Flattened f) {
-    final existing = f.recognizer;
-    if (existing is TapGestureRecognizer) {
-      existing.onTap = recognizer.onTap;
-      return;
-    }
-
-    f.recognizer = recognizer;
-  }
-
-  @override
-  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
-      _TagABit(parent ?? this.parent, recognizer);
 }

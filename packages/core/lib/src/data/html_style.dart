@@ -5,6 +5,9 @@ part of '../core_data.dart';
 class HtmlStyle {
   final Iterable<dynamic> _deps;
 
+  /// The [GestureTapCallback] for inline spans.
+  final GestureTapCallback? onTap;
+
   /// The parent style.
   final HtmlStyle? parent;
 
@@ -23,6 +26,7 @@ class HtmlStyle {
 
   const HtmlStyle._({
     required Iterable<dynamic> deps,
+    this.onTap,
     this.parent,
     required this.style,
     this.textAlign,
@@ -52,6 +56,7 @@ class HtmlStyle {
 
   /// Creates a copy with the given fields replaced with the new values.
   HtmlStyle copyWith({
+    GestureTapCallback? onTap,
     HtmlStyle? parent,
     TextStyle? style,
     TextAlign? textAlign,
@@ -60,6 +65,7 @@ class HtmlStyle {
   }) {
     return HtmlStyle._(
       deps: _deps,
+      onTap: onTap ?? this.onTap,
       parent: parent ?? this.parent,
       style: style ?? this.style,
       textAlign: textAlign ?? this.textAlign,

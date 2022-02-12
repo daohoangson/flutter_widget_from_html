@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
 import '../core_data.dart';
@@ -12,14 +11,12 @@ class Flattener implements Flattened {
   final WidgetFactory wf;
   final _widgets = <WidgetPlaceholder>[];
 
-  List<_SpanOrBuilder>? _children;
-  late _GestureRecognizer _firstRecognizer;
+  List<InlineSpan? Function(BuildContext, {bool? isLast})>? _childrenBuilder;
   late List<_String> _firstStrings;
   late HtmlStyleBuilder _firstTsb;
 
   late BuildBit _bit;
   var _swallowWhitespace = false;
-  late _GestureRecognizer _recognizer;
   late List<_String> _strings;
   late HtmlStyleBuilder _tsb;
 
@@ -34,16 +31,32 @@ class Flattener implements Flattened {
   Iterable<WidgetPlaceholder> get widgets => _widgets;
 
   @override
-  GestureRecognizer? get recognizer => _recognizer.value;
-
-  @override
-  set recognizer(GestureRecognizer? value) => _recognizer.value = value;
-
-  @override
-  // ignore: avoid_setters_without_getters
-  set span(InlineSpan value) {
+  void inlineWidget({
+    PlaceholderAlignment alignment = PlaceholderAlignment.bottom,
+    TextBaseline baseline = TextBaseline.alphabetic,
+    required Widget child,
+  }) {
     _saveSpan();
-    _children?.add(_SpanOrBuilder.span(value));
+
+    final scopedTsb = _tsb;
+
+    _childrenBuilder?.add(
+      (context, {bool? isLast}) {
+        final tsh = scopedTsb.build(context);
+
+        Widget? detector;
+        final onTap = tsh.onTap;
+        if (onTap != null) {
+          detector = wf.buildGestureDetector(meta, child, onTap);
+        }
+
+        return WidgetSpan(
+          alignment: alignment,
+          baseline: baseline,
+          child: detector ?? child,
+        );
+      },
+    );
   }
 
   @override
@@ -54,7 +67,18 @@ class Flattener implements Flattened {
   // ignore: avoid_setters_without_getters
   set widget(Widget value) {
     _completeLoop();
-    _widgets.add(WidgetPlaceholder.lazy(value));
+
+    final placeholder = WidgetPlaceholder.lazy(value);
+    final scopedTsb = _tsb;
+    placeholder.wrapWith((context, child) {
+      final tsh = scopedTsb.build(context);
+      final onTap = tsh.onTap;
+      final detector =
+          onTap != null ? wf.buildGestureDetector(meta, child, onTap) : null;
+      return detector ?? child;
+    });
+
+    _widgets.add(placeholder);
   }
 
   @override
@@ -68,12 +92,10 @@ class Flattener implements Flattened {
       );
 
   void _resetLoop(HtmlStyleBuilder tsb) {
-    _firstRecognizer = _GestureRecognizer();
-    _children = [];
+    _childrenBuilder = [];
     _firstStrings = [];
     _firstTsb = tsb;
 
-    _recognizer = _firstRecognizer;
     _strings = _firstStrings;
     _tsb = _firstTsb;
   }
@@ -81,16 +103,16 @@ class Flattener implements Flattened {
   void _loop(BuildBit bit) {
     _bit = bit;
     final thisTsb = bit.effectiveTsb ?? _tsb;
-    if (_children == null) {
+    if (_childrenBuilder == null) {
       _resetLoop(thisTsb);
     }
     if (!thisTsb.hasSameStyleWith(_tsb)) {
       _saveSpan();
     }
+    _tsb = thisTsb;
 
     bit.flatten(this);
 
-    _tsb = thisTsb;
     _swallowWhitespace = bit.swallowWhitespace ?? _swallowWhitespace;
   }
 
@@ -110,12 +132,11 @@ class Flattener implements Flattened {
 
   void _saveSpan() {
     if (_strings != _firstStrings && _strings.isNotEmpty) {
-      final scopedRecognizer = _recognizer.value;
       final scopedTsb = _tsb;
       final scopedStrings = _strings;
 
-      _children?.add(
-        _SpanOrBuilder.builder((context, {bool? isLast}) {
+      _childrenBuilder?.add(
+        (context, {bool? isLast}) {
           final tsh = scopedTsb.build(context);
           final text = scopedStrings.toText(
             tsh.whitespace,
@@ -127,31 +148,29 @@ class Flattener implements Flattened {
           }
 
           return wf.buildTextSpan(
-            recognizer: scopedRecognizer,
+            recognizer: wf.gestureRecognizer(tsh),
             style: tsh.style,
             text: text,
           );
-        }),
+        },
       );
     }
 
     _strings = [];
-    _recognizer = _GestureRecognizer();
   }
 
   void _completeLoop() {
     _saveSpan();
 
-    final scopedChildren = _children;
-    if (scopedChildren == null) {
+    final scopedChildrenBuilder = _childrenBuilder;
+    if (scopedChildrenBuilder == null) {
       return;
     }
 
-    _children = null;
-    if (scopedChildren.isEmpty && _firstStrings.isEmpty) {
+    _childrenBuilder = null;
+    if (scopedChildrenBuilder.isEmpty && _firstStrings.isEmpty) {
       return;
     }
-    final scopedRecognizer = _firstRecognizer.value;
     final scopedStrings = _firstStrings;
     final scopedTsb = _firstTsb;
 
@@ -159,13 +178,13 @@ class Flattener implements Flattened {
       WidgetPlaceholder(
         builder: (context, _) {
           final tsh = scopedTsb.build(context);
-          final list = scopedChildren.reversed.toList(growable: false);
+          final reversedbuilders =
+              scopedChildrenBuilder.reversed.toList(growable: false);
           final children = <InlineSpan>[];
 
           var _isLast = true;
-          for (final item in list) {
-            final child =
-                item.span ?? item.builder?.call(context, isLast: _isLast);
+          for (final builder in reversedbuilders) {
+            final child = builder(context, isLast: _isLast);
             if (child != null) {
               _isLast = false;
               children.insert(0, child);
@@ -191,7 +210,7 @@ class Flattener implements Flattened {
           } else {
             span = wf.buildTextSpan(
               children: children,
-              recognizer: scopedRecognizer,
+              recognizer: wf.gestureRecognizer(tsh),
               style: tsh.style,
               text: text,
             );
@@ -257,20 +276,6 @@ extension _BuildBit on BuildBit {
 
     return next;
   }
-}
-
-class _GestureRecognizer {
-  GestureRecognizer? value;
-}
-
-@immutable
-class _SpanOrBuilder {
-  final InlineSpan? Function(BuildContext, {bool? isLast})? builder;
-  final InlineSpan? span;
-
-  const _SpanOrBuilder.builder(this.builder) : span = null;
-
-  const _SpanOrBuilder.span(this.span) : builder = null;
 }
 
 @immutable
