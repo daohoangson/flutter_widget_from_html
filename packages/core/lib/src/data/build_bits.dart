@@ -20,7 +20,7 @@ abstract class BuildBit {
     BuildBit? x = this;
 
     while (x != null) {
-      final siblings = x.parent?.children;
+      final siblings = x.parent?._children;
       final i = siblings?.indexOf(x) ?? -1;
       if (i == -1) {
         return null;
@@ -52,7 +52,7 @@ abstract class BuildBit {
     BuildBit? x = this;
 
     while (x != null) {
-      final siblings = x.parent?.children;
+      final siblings = x.parent?._children;
       final i = siblings?.indexOf(x) ?? -1;
       if (i == -1) {
         return null;
@@ -94,9 +94,6 @@ abstract class BuildBit {
   /// Creates a copy with the given fields replaced with the new values.
   BuildBit copyWith({BuildTree? parent});
 
-  /// Removes self from [parent].
-  bool detach() => parent?.children.remove(this) ?? false;
-
   /// Flattens this bit.
   void flatten(Flattened f);
 
@@ -105,7 +102,7 @@ abstract class BuildBit {
     final parent = this.parent!;
     assert(parent == another.parent);
 
-    final siblings = parent.children;
+    final siblings = parent._children;
     final i = siblings.indexOf(another);
     assert(i > -1, 'The reference BuildBit is not registered on tree.');
     if (i == -1) {
@@ -121,7 +118,7 @@ abstract class BuildBit {
     final parent = this.parent!;
     assert(parent == another.parent);
 
-    final siblings = parent.children;
+    final siblings = parent._children;
     final i = siblings.indexOf(another);
     assert(i > -1, 'The reference BuildBit is not registered on tree.');
     if (i == -1) {
@@ -141,8 +138,10 @@ abstract class BuildTree extends BuildBit {
   static final _anchors = Expando<List<Key>>();
   static final _buffers = Expando<StringBuffer>();
 
+  final _children = <BuildBit>[];
+
   /// The list of direct children.
-  final children = <BuildBit>[];
+  Iterable<BuildBit> get children => _children;
 
   /// Creates a tree.
   BuildTree(BuildTree? parent) : super(parent);
@@ -190,7 +189,7 @@ abstract class BuildTree extends BuildBit {
 
   /// The last bit (recursively).
   BuildBit? get last {
-    for (final child in children.reversed) {
+    for (final child in _children.reversed) {
       final last = child is BuildTree ? child.last : child;
       if (last != null) {
         return last;
@@ -209,7 +208,7 @@ abstract class BuildTree extends BuildBit {
   /// See also: [prepend].
   T append<T extends BuildBit>(T bit) {
     final child = bit.parent == this ? bit : bit.copyWith(parent: this);
-    children.add(child);
+    _children.add(child);
     return bit;
   }
 
@@ -222,28 +221,24 @@ abstract class BuildTree extends BuildBit {
   /// Builds widgets from bits.
   Iterable<WidgetPlaceholder> build();
 
-  @override
-  bool detach() {
-    children.clear();
-    return true;
-  }
-
   /// Prepends [bit].
   ///
   /// See also: [append].
   T prepend<T extends BuildBit>(T bit) {
     final child = bit.parent == this ? bit : bit.copyWith(parent: this);
-    children.insert(0, child);
+    _children.insert(0, child);
     return bit;
   }
 
   /// Replaces all children bits with [another].
-  void replaceWith(BuildBit another) {
-    final child =
-        another.parent == this ? another : another.copyWith(parent: this);
-    children
-      ..clear()
-      ..add(child);
+  void replaceWith(BuildBit? another) {
+    _children.clear();
+
+    if (another != null) {
+      final child =
+          another.parent == this ? another : another.copyWith(parent: this);
+      _children.add(child);
+    }
   }
 
   /// Registers anchor [Key].

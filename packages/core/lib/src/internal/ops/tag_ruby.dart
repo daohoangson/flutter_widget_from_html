@@ -78,7 +78,7 @@ class TagRuby {
     // preserve orphan bits if any
     list.addAll(rubyBits);
 
-    tree.detach();
+    tree.replaceWith(null);
     for (final bit in list) {
       tree.append(bit);
     }

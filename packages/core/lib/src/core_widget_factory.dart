@@ -1008,8 +1008,9 @@ class WidgetFactory {
 
     if (key.startsWith(kCssBorder)) {
       final styleBorder = _styleBorder ??= StyleBorder(this);
-      meta.register(styleBorder.inlineOp);
-      meta.register(styleBorder.blockOp);
+      meta
+        ..register(styleBorder.inlineOp)
+        ..register(styleBorder.blockOp);
     }
 
     if (key.startsWith(kCssMargin)) {
@@ -1045,7 +1046,7 @@ class WidgetFactory {
         break;
       case kCssDisplayNone:
         final displayNone = _styleDisplayNone ??= BuildOp(
-          onTree: (_, tree) => tree.detach(),
+          onTree: (_, tree) => tree.replaceWith(null),
           priority: BuildOp.kPriorityMax,
         );
         meta.register(displayNone);

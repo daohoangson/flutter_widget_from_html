@@ -123,15 +123,6 @@ void main() {
       });
     });
 
-    test('detaches', () {
-      final text = _text();
-      final bit = text.addText('data');
-      expect(text.isEmpty, isFalse);
-
-      bit.detach();
-      expect(text.isEmpty, isTrue);
-    });
-
     test('inserts after', () {
       final text = _text();
       final bit1 = text.addText('1');
