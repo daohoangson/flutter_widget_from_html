@@ -25,7 +25,7 @@ class StylePadding {
   StylePadding(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (meta, tree) {
+        onTreeFlattening: (meta, tree, _) {
           final padding = tryParseCssLengthBox(meta, kCssPadding);
           if (padding == null) {
             return false;

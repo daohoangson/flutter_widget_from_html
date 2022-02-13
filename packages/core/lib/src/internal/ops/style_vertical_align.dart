@@ -16,7 +16,7 @@ class StyleVerticalAlign {
   StyleVerticalAlign(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (meta, tree) {
+        onTreeFlattening: (meta, tree, _) {
           final v = meta[kCssVerticalAlign]?.term;
           if (v == null || v == kCssVerticalAlignBaseline) {
             return false;

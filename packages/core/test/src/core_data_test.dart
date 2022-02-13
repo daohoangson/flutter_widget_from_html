@@ -59,7 +59,7 @@ void main() {
           explained,
           equals(
             'HtmlStyleWidget\n'
-            '└WidgetPlaceholder\n'
+            '└WidgetPlaceholder()\n'
             ' └Text("hi")\n'
             '  └RichText(text: "hi")\n\n',
           ),
@@ -82,7 +82,7 @@ void main() {
           explained,
           equals(
             'HtmlStyleWidget\n'
-            '└WidgetPlaceholder\n'
+            '└WidgetPlaceholder()\n'
             ' └CssBlock()\n'
             '  └Text("hi")\n'
             '   └RichText(text: "hi")\n\n',
@@ -131,7 +131,7 @@ void main() {
           explained,
           equals(
             'HtmlStyleWidget\n'
-            '└WidgetPlaceholder\n'
+            '└WidgetPlaceholder()\n'
             ' └Text("Hi")\n'
             '  └RichText(text: "Hi")\n\n',
           ),

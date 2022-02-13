@@ -105,11 +105,12 @@ void main() {
     expect(
       explained,
       equals(
-        '[CssBlock:child=[MouseRegion:child='
-        '[GestureDetector:child=[Column:children='
-        '[CssBlock:child=[RichText:(#FF123456+u:Foo)]],'
-        '[CssBlock:child=[RichText:(#FF123456+u:Bar)]]'
-        ']]]]',
+        '[CssBlock:child=[Column:children='
+        '[MouseRegion:child=[GestureDetector:child='
+        '[CssBlock:child=[RichText:(#FF123456+u:Foo)]]]],'
+        '[MouseRegion:child=[GestureDetector:child='
+        '[CssBlock:child=[RichText:(#FF123456+u:Bar)]]]]'
+        ']]',
       ),
     );
   });

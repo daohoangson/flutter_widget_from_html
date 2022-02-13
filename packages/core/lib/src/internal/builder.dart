@@ -71,19 +71,6 @@ class Builder extends BuildTree implements BuildMetadata {
 
   List<css.Declaration>? get _declarationList => _declarations[this];
 
-  Iterable<BuildTree> get subTrees => _getSubTrees(this);
-
-  static Iterable<BuildTree> _getSubTrees(BuildTree tree) sync* {
-    for (final child in tree.children) {
-      if (child is! BuildTree) {
-        continue;
-      }
-
-      yield child;
-      yield* _getSubTrees(child);
-    }
-  }
-
   @override
   BuildTree get tree => this;
 
@@ -132,10 +119,6 @@ class Builder extends BuildTree implements BuildMetadata {
 
   @override
   Iterable<WidgetPlaceholder> build() {
-    for (final subTree in subTrees.toList(growable: false).reversed) {
-      subTree.flatten(Flattened.noOp());
-    }
-
     var widgets = Flattener(wf, this, this).widgets;
     final ops = _buildOpSet;
     if (ops != null) {
@@ -211,11 +194,11 @@ class Builder extends BuildTree implements BuildMetadata {
   }
 
   @override
-  void flatten(Flattened _) {
+  void flatten(Flattened f) {
     final ops = _buildOpSet;
     if (ops != null) {
       for (final op in ops) {
-        op.onTreeFlattening();
+        op.onTreeFlattening(f);
       }
     }
   }
@@ -401,7 +384,7 @@ class _BuilderOp {
 
   void onTree() => op.onTree?.call(tree, tree);
 
-  bool onTreeFlattening() {
+  bool onTreeFlattening(Flattened f) {
     if (type == _BuilderType.onWidgets) {
       return false;
     }
@@ -409,7 +392,7 @@ class _BuilderOp {
     final prevType = type;
     type = _BuilderType.onTreeFlattening;
 
-    final result = op.onTreeFlattening?.call(tree, tree) ?? false;
+    final result = op.onTreeFlattening?.call(tree, tree, f) ?? false;
     if (!result) {
       type = prevType;
     }

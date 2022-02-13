@@ -14,7 +14,7 @@ class StyleBorder {
   StyleBorder(this.wf);
 
   BuildOp get inlineOp => BuildOp(
-        onTreeFlattening: (meta, tree) {
+        onTreeFlattening: (meta, tree, _) {
           if (_skipBuilding[meta] == true) {
             return false;
           }

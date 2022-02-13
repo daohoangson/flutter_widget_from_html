@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart' show WidgetTester, testWidgets;
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -22,46 +21,6 @@ void main() {
               key: helper.hwKey,
             ),
           );
-
-      group('accepts GestureRecognizer', () {
-        const clazz = 'input--GestureRecognizer';
-
-        testWidgets('SPAN tag without BuildBit', (WidgetTester tester) async {
-          const html = '1 <span>2</span> 3';
-          final explained = await explain(tester, html);
-          expect(explained, equals('[RichText:(:1 2 3)]'));
-        });
-
-        testWidgets('SPAN tag with BuildBit', (WidgetTester tester) async {
-          const html = '1 <span class="$clazz">2</span> 3';
-          final e = await explain(tester, html);
-          expect(e, equals('[RichText:(+MultiTapGestureRecognizer:1 2 3)]'));
-        });
-
-        testWidgets('A tag without BuildBit', (WidgetTester tester) async {
-          const html = '1 <a href="href">2</a> 3';
-          final explained = await explain(tester, html);
-          expect(
-            explained,
-            equals('[RichText:(:1 (#FF123456+u+onTap:2)(: 3))]'),
-          );
-        });
-
-        testWidgets('A tag with BuildBit', (WidgetTester tester) async {
-          const html = '1 <a href="href" class="$clazz">2</a> 3';
-          final explained = await explain(tester, html);
-          expect(
-            explained,
-            equals('[RichText:(:1 (#FF123456+u+onTap+onTapCancel:2)(: 3))]'),
-          );
-        });
-      });
-
-      testWidgets('returns InlineSpan', (WidgetTester tester) async {
-        const html = '1 <span class="output--InlineSpan">2</span> 3';
-        final explained = await explain(tester, html);
-        expect(explained, equals('[RichText:(:1 2[Text:foo]@bottom(: 3))]'));
-      });
 
       testWidgets('returns String', (WidgetTester tester) async {
         const html = '1 <span class="output--String">2</span> 3';
@@ -121,26 +80,6 @@ void main() {
 
         test('returns null', () => expect(bit3.next, isNull));
       });
-    });
-
-    test('inserts after', () {
-      final text = _text();
-      final bit1 = text.addText('1');
-      text.addText('3');
-      expect(_data(text), equals('13'));
-
-      TextBit(text, '2').insertAfter(bit1);
-      expect(_data(text), equals('123'));
-    });
-
-    test('inserts before', () {
-      final text = _text();
-      text.addText('1');
-      final bit3 = text.addText('3');
-      expect(_data(text), equals('13'));
-
-      TextBit(text, '2').insertBefore(bit3);
-      expect(_data(text), equals('123'));
     });
   });
 
@@ -356,55 +295,12 @@ void main() {
       ),
     );
   });
-
-  test('Flattener', () {
-    final values = [];
-    final flattener = Flattened.forTesting(values);
-
-    expect(() => flattener.recognizer, throwsStateError);
-
-    final recognizer = TapGestureRecognizer();
-    flattener.recognizer = recognizer;
-    expect(flattener.recognizer, equals(recognizer));
-
-    const span = TextSpan();
-    flattener.span = span;
-
-    const text = 'text';
-    flattener.text = text;
-
-    const space = ' ';
-    flattener.whitespace = space;
-
-    final widget = WidgetPlaceholder();
-    flattener.widget = widget;
-
-    expect(values, equals([recognizer, span, text, space, widget]));
-  });
 }
 
 class _BuildBitWidgetFactory extends WidgetFactory {
   @override
   void parse(BuildMetadata meta) {
     final classes = meta.element.classes;
-
-    if (classes.contains('input--GestureRecognizer')) {
-      meta.register(
-        BuildOp(
-          onTreeFlattening: (_, tree) {
-            tree.append(_InputGestureRecognizerBit(tree));
-            return true;
-          },
-          priority: BuildOp.kPriorityMax,
-        ),
-      );
-    }
-
-    if (classes.contains('output--InlineSpan')) {
-      meta.register(
-        BuildOp(onTree: (_, tree) => tree.append(_OutputInlineSpanBit(tree))),
-      );
-    }
 
     if (classes.contains('output--String')) {
       meta.register(
@@ -460,41 +356,11 @@ class _CustomBit extends BuildBit {
       throw UnimplementedError();
 }
 
-class _InputGestureRecognizerBit extends BuildBit {
-  const _InputGestureRecognizerBit(BuildTree? parent) : super(parent);
-
-  @override
-  void flatten(Flattened f) {
-    final existing = f.recognizer;
-    if (existing is TapGestureRecognizer) {
-      existing.onTapCancel = () {};
-      return;
-    }
-
-    f.recognizer = MultiTapGestureRecognizer();
-  }
-
-  @override
-  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
-      _InputGestureRecognizerBit(parent ?? this.parent);
-}
-
-class _OutputInlineSpanBit extends BuildBit {
-  const _OutputInlineSpanBit(BuildTree? parent) : super(parent);
-
-  @override
-  void flatten(Flattened f) => f.span = const WidgetSpan(child: Text('foo'));
-
-  @override
-  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
-      _OutputInlineSpanBit(parent ?? this.parent);
-}
-
 class _OutputStringBit extends BuildBit {
   const _OutputStringBit(BuildTree? parent) : super(parent);
 
   @override
-  void flatten(Flattened f) => f.text = 'foo';
+  void flatten(Flattened f) => f.write(text: 'foo');
 
   @override
   BuildBit copyWith({BuildTree? parent}) =>
@@ -509,7 +375,7 @@ class _OutputWidgetBit extends BuildBit {
 
   @override
   void flatten(Flattened f) =>
-      f.widget = WidgetPlaceholder(child: const Text('foo'));
+      f.widget(WidgetPlaceholder(child: const Text('foo')));
 
   @override
   BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
