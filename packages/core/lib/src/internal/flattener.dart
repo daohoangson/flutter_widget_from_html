@@ -45,9 +45,8 @@ class Flattener implements Flattened {
         final tsh = scopedTsb.build(context);
 
         Widget? detector;
-        final onTap = tsh.onTap;
-        if (onTap != null) {
-          detector = wf.buildGestureDetector(meta, child, onTap);
+        if (_needsInlineRecognizer(context, tsh)) {
+          detector = wf.buildGestureDetector(meta, child, tsh.onTap!);
         }
 
         return WidgetSpan(
@@ -148,7 +147,9 @@ class Flattener implements Flattened {
           }
 
           return wf.buildTextSpan(
-            recognizer: wf.gestureRecognizer(tsh),
+            recognizer: _needsInlineRecognizer(context, tsh)
+                ? wf.gestureRecognizer(tsh)
+                : null,
             style: tsh.style,
             text: text,
           );
@@ -210,7 +211,9 @@ class Flattener implements Flattened {
           } else {
             span = wf.buildTextSpan(
               children: children,
-              recognizer: wf.gestureRecognizer(tsh),
+              recognizer: _needsInlineRecognizer(context, tsh)
+                  ? wf.gestureRecognizer(tsh)
+                  : null,
               style: tsh.style,
               text: text,
             );
@@ -230,6 +233,11 @@ class Flattener implements Flattened {
         localName: 'text',
       ),
     );
+  }
+
+  bool _needsInlineRecognizer(BuildContext context, HtmlStyle style) {
+    final rootStyle = tree.tsb.build(context);
+    return style.onTap != null && !identical(style.onTap, rootStyle.onTap);
   }
 }
 
