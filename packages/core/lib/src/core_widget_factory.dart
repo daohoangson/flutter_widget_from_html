@@ -194,15 +194,39 @@ class WidgetFactory {
       );
 
   /// Builds [GestureDetector].
+  ///
+  /// Only [TapGestureRecognizer] is supported for now.
   Widget? buildGestureDetector(
     BuildMetadata meta,
     Widget child,
-    GestureTapCallback onTap,
-  ) =>
-      MouseRegion(
+    GestureRecognizer recognizer,
+  ) {
+    var built = child;
+
+    if (recognizer is TapGestureRecognizer) {
+      built = MouseRegion(
         cursor: SystemMouseCursors.click,
-        child: GestureDetector(onTap: onTap, child: child),
+        child: GestureDetector(onTap: recognizer.onTap, child: child),
       );
+    }
+
+    return built;
+  }
+
+  /// Builds [GestureRecognizer].
+  ///
+  /// Only [TapGestureRecognizer.onTap] is supported for now.
+  GestureRecognizer? buildGestureRecognizer(
+    BuildMetadata meta, {
+    GestureTapCallback? onTap,
+  }) {
+    final recognizer =
+        onTap != null ? (TapGestureRecognizer()..onTap = onTap) : null;
+    if (recognizer != null) {
+      _recognizersNeedDisposing.add(recognizer);
+    }
+    return recognizer;
+  }
 
   /// Builds horizontal scroll view.
   Widget? buildHorizontalScrollView(BuildMetadata meta, Widget child) =>
@@ -231,7 +255,13 @@ class WidgetFactory {
 
     final onTapImage = _widget?.onTapImage;
     if (onTapImage != null && built != null) {
-      built = buildGestureDetector(meta, built, () => onTapImage(data));
+      final recognizer = buildGestureRecognizer(
+        meta,
+        onTap: () => onTapImage(data),
+      );
+      if (recognizer != null) {
+        built = buildGestureDetector(meta, built, recognizer);
+      }
     }
 
     return built;
@@ -365,22 +395,6 @@ class WidgetFactory {
     }
     _recognizersNeedDisposing.clear();
   }
-
-  /// Prepares [GestureRecognizer].
-  GestureRecognizer? gestureRecognizer(HtmlStyle tsh) {
-    final onTap = tsh.onTap;
-    final recognizer =
-        onTap != null ? (TapGestureRecognizer()..onTap = onTap) : null;
-
-    if (recognizer != null) {
-      _recognizersNeedDisposing.add(recognizer);
-    }
-
-    return recognizer;
-  }
-
-  /// Prepares [GestureTapCallback].
-  GestureTapCallback? gestureTapCallback(String url) => () => onTapUrl(url);
 
   /// Returns [context]-based dependencies.
   ///

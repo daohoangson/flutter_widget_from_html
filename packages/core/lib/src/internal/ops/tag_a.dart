@@ -19,16 +19,20 @@ class TagA {
             return;
           }
 
-          final onTap = wf.gestureTapCallback(wf.urlFull(href) ?? href);
-          if (onTap == null) {
+          final url = wf.urlFull(href) ?? href;
+          final recognizer = wf.buildGestureRecognizer(
+            meta,
+            onTap: () => wf.onTapUrl(url),
+          );
+          if (recognizer == null) {
             return;
           }
 
-          tree.tsb.enqueue(_tsb, onTap);
+          tree.tsb.enqueue(_tsb, recognizer);
         },
       );
 
-  static HtmlStyle _tsb(HtmlStyle tsh, GestureTapCallback value) {
-    return tsh.copyWith(onTap: value);
+  static HtmlStyle _tsb(HtmlStyle tsh, GestureRecognizer value) {
+    return tsh.copyWith(gestureRecognizer: value);
   }
 }

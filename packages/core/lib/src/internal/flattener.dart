@@ -45,8 +45,9 @@ class Flattener implements Flattened {
         final tsh = scopedTsb.build(context);
 
         Widget? detector;
-        if (_needsInlineRecognizer(context, tsh)) {
-          detector = wf.buildGestureDetector(meta, child, tsh.onTap!);
+        final recognizer = tsh.gestureRecognizer;
+        if (recognizer != null && _needsInlineRecognizer(context, tsh)) {
+          detector = wf.buildGestureDetector(meta, child, recognizer);
         }
 
         return WidgetSpan(
@@ -71,9 +72,10 @@ class Flattener implements Flattened {
     final scopedTsb = _tsb;
     placeholder.wrapWith((context, child) {
       final tsh = scopedTsb.build(context);
-      final onTap = tsh.onTap;
-      final detector =
-          onTap != null ? wf.buildGestureDetector(meta, child, onTap) : null;
+      final recognizer = tsh.gestureRecognizer;
+      final detector = recognizer != null
+          ? wf.buildGestureDetector(meta, child, recognizer)
+          : null;
       return detector ?? child;
     });
 
@@ -148,7 +150,7 @@ class Flattener implements Flattened {
 
           return wf.buildTextSpan(
             recognizer: _needsInlineRecognizer(context, tsh)
-                ? wf.gestureRecognizer(tsh)
+                ? tsh.gestureRecognizer
                 : null,
             style: tsh.style,
             text: text,
@@ -212,7 +214,7 @@ class Flattener implements Flattened {
             span = wf.buildTextSpan(
               children: children,
               recognizer: _needsInlineRecognizer(context, tsh)
-                  ? wf.gestureRecognizer(tsh)
+                  ? tsh.gestureRecognizer
                   : null,
               style: tsh.style,
               text: text,
@@ -237,7 +239,8 @@ class Flattener implements Flattened {
 
   bool _needsInlineRecognizer(BuildContext context, HtmlStyle style) {
     final rootStyle = tree.tsb.build(context);
-    return style.onTap != null && !identical(style.onTap, rootStyle.onTap);
+    return style.gestureRecognizer != null &&
+        !identical(style.gestureRecognizer, rootStyle.gestureRecognizer);
   }
 }
 
