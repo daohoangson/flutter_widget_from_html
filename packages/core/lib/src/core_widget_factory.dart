@@ -1121,7 +1121,7 @@ class WidgetFactory {
         _anchorRegistry.register(id, anchor);
         tree.registerAnchor(anchor);
       },
-      onTreeFlattening: (meta, tree) {
+      onTreeFlattening: (meta, tree, _) {
         final widget = WidgetPlaceholder(
           builder: (context, _) => SizedBox(
             height: tree.tsb.build(context).style.fontSize,

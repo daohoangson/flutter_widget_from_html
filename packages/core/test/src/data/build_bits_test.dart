@@ -295,22 +295,6 @@ void main() {
       ),
     );
   });
-
-  test('Flattener', () {
-    final values = [];
-    final flattener = Flattened.forTesting(values);
-
-    const text = 'text';
-    flattener.text = text;
-
-    const space = ' ';
-    flattener.whitespace = space;
-
-    final widget = WidgetPlaceholder();
-    flattener.widget = widget;
-
-    expect(values, equals([text, space, widget]));
-  });
 }
 
 class _BuildBitWidgetFactory extends WidgetFactory {
@@ -376,7 +360,7 @@ class _OutputStringBit extends BuildBit {
   const _OutputStringBit(BuildTree? parent) : super(parent);
 
   @override
-  void flatten(Flattened f) => f.text = 'foo';
+  void flatten(Flattened f) => f.write(text: 'foo');
 
   @override
   BuildBit copyWith({BuildTree? parent}) =>
@@ -391,7 +375,7 @@ class _OutputWidgetBit extends BuildBit {
 
   @override
   void flatten(Flattened f) =>
-      f.widget = WidgetPlaceholder(child: const Text('foo'));
+      f.widget(WidgetPlaceholder(child: const Text('foo')));
 
   @override
   BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>

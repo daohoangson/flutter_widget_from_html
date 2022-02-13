@@ -255,7 +255,7 @@ class TextBit extends BuildBit {
       TextBit(parent ?? this.parent!, data);
 
   @override
-  void flatten(Flattened f) => f.text = data;
+  void flatten(Flattened f) => f.write(text: data);
 
   @override
   String toString() => '"$data"';
@@ -299,7 +299,7 @@ class _WidgetBitBlock extends WidgetBit<Widget> {
       _WidgetBitBlock(parent ?? this.parent!, child);
 
   @override
-  void flatten(Flattened f) => f.widget = child;
+  void flatten(Flattened f) => f.widget(child);
 
   @override
   String toString() => 'WidgetBit.block#$hashCode $child';
@@ -346,41 +346,24 @@ class WhitespaceBit extends BuildBit {
       WhitespaceBit(parent ?? this.parent!, data);
 
   @override
-  void flatten(Flattened f) => f.whitespace = data;
+  void flatten(Flattened f) => f.write(whitespace: data);
 
   @override
   String toString() => 'Whitespace[${data.codeUnits.join(' ')}]#$hashCode';
 }
 
 /// A flattened bit.
-class Flattened {
-  final List<dynamic>? _values;
-
-  @visibleForTesting
-  factory Flattened.forTesting(List<dynamic> values) => Flattened._(values);
-
-  /// Disallows extending this class.
-  const Flattened._(this._values);
-
-  /// A no op constant.
-  factory Flattened.noOp() => const Flattened._(null);
-
+abstract class Flattened {
+  /// Renders inline widget.
   void inlineWidget({
     PlaceholderAlignment alignment = PlaceholderAlignment.bottom,
     TextBaseline baseline = TextBaseline.alphabetic,
     required WidgetPlaceholder child,
-  }) =>
-      _values?.add([alignment, baseline, child]);
+  });
 
-  /// Sets the contents [String].
-  // ignore: avoid_setters_without_getters
-  set text(String value) => _values?.add(value);
+  /// Renders block [Widget].
+  void widget(WidgetPlaceholder value);
 
-  /// Sets the whitespace.
-  // ignore: avoid_setters_without_getters
-  set whitespace(String value) => _values?.add(value);
-
-  /// Sets the [Widget].
-  // ignore: avoid_setters_without_getters
-  set widget(WidgetPlaceholder value) => _values?.add(value);
+  /// Writes textual contents.
+  void write({String? text, String? whitespace});
 }

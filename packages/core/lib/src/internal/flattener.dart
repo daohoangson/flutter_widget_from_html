@@ -21,6 +21,8 @@ class Flattener implements Flattened {
   late HtmlStyleBuilder _tsb;
 
   Flattener(this.wf, this.meta, this.tree) {
+    _loopSubTree(tree, flatten: false);
+
     _resetLoop(tree.tsb);
     for (final bit in tree.bits) {
       _loop(bit);
@@ -60,12 +62,7 @@ class Flattener implements Flattened {
   }
 
   @override
-  // ignore: avoid_setters_without_getters
-  set text(String value) => _strings.add(_String(value));
-
-  @override
-  // ignore: avoid_setters_without_getters
-  set widget(Widget value) {
+  void widget(WidgetPlaceholder value) {
     _completeLoop();
 
     final placeholder = WidgetPlaceholder.lazy(value);
@@ -83,14 +80,21 @@ class Flattener implements Flattened {
   }
 
   @override
-  // ignore: avoid_setters_without_getters
-  set whitespace(String value) => _strings.add(
+  void write({String? text, String? whitespace}) {
+    if (text != null) {
+      _strings.add(_String(text));
+    }
+
+    if (whitespace != null) {
+      _strings.add(
         _String(
-          value,
+          whitespace,
           isWhitespace: true,
           shouldBeSwallowed: _shouldSwallow(_bit),
         ),
       );
+    }
+  }
 
   void _resetLoop(HtmlStyleBuilder tsb) {
     _childrenBuilder = [];
@@ -99,6 +103,18 @@ class Flattener implements Flattened {
 
     _strings = _firstStrings;
     _tsb = _firstTsb;
+  }
+
+  void _loopSubTree(BuildTree someTree, {required bool flatten}) {
+    for (final child in someTree.children) {
+      if (child is BuildTree) {
+        _loopSubTree(child, flatten: true);
+      }
+    }
+
+    if (flatten) {
+      someTree.flatten(this);
+    }
   }
 
   void _loop(BuildBit bit) {

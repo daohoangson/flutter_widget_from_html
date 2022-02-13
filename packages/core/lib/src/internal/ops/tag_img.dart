@@ -50,7 +50,7 @@ class TagImg {
             child: built,
           );
         },
-        onTreeFlattening: (meta, tree) {
+        onTreeFlattening: (meta, tree, _) {
           final placeholder = _placeholders[meta];
           if (placeholder == null) {
             return false;

@@ -11,7 +11,7 @@ class StyleBgColor {
   StyleBgColor(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (meta, tree) {
+        onTreeFlattening: (meta, tree, _) {
           if (_skipBuilding[meta] == true) {
             return false;
           }

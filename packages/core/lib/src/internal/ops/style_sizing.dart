@@ -29,7 +29,7 @@ class StyleSizing {
   StyleSizing(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (meta, tree) {
+        onTreeFlattening: (meta, tree, _) {
           final input = _parse(meta);
           if (input == null) {
             return false;

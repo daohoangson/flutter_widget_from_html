@@ -19,7 +19,7 @@ class StyleMargin {
   StyleMargin(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (meta, tree) {
+        onTreeFlattening: (meta, tree, _) {
           final margin = tryParseCssLengthBox(meta, kCssMargin);
           if (margin == null) {
             return false;
