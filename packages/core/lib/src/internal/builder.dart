@@ -16,6 +16,7 @@ const _asciiWhitespace = r'[\u{0009}\u{000A}\u{000C}\u{000D}\u{0020}]';
 final _regExpSpaceLeading = RegExp('^$_asciiWhitespace+', unicode: true);
 final _regExpSpaceTrailing = RegExp('$_asciiWhitespace+\$', unicode: true);
 final _regExpSpaces = RegExp('$_asciiWhitespace+', unicode: true);
+const kRuleImportant = '!important';
 
 class BuildMetadata extends core_data.BuildMetadata {
   final Iterable<BuildOp> _parentOps;
@@ -269,7 +270,10 @@ class BuildTree extends core_data.BuildTree {
     // stylings, step 2: get styles from `style` attribute
     for (final declaration in meta.element.styles) {
       meta._styles ??= [];
-      meta._styles!.add(declaration);
+
+      if (!_importantRuleExists(meta._styles!, declaration.property)) {
+        meta._styles!.add(declaration);
+      }
     }
 
     meta._stylesIsLocked = true;
@@ -280,6 +284,17 @@ class BuildTree extends core_data.BuildTree {
     wf.parseStyleDisplay(meta, meta[kCssDisplay]?.term);
 
     meta._buildOpsIsLocked = true;
+  }
+
+  bool _importantRuleExists(List<css.Declaration> styles, String newProperty) {
+    for (final css.Declaration style in styles) {
+      if (style.property == newProperty) {
+        if (style.span.text.contains(kRuleImportant)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   void _customStylesBuilder(BuildMetadata meta) {
