@@ -6,18 +6,14 @@ const kTagDetails = 'details';
 const kTagSummary = 'summary';
 
 class TagDetails {
-  final BuildMetadata detailsMeta;
-  late final BuildOp op;
   final WidgetFactory wf;
 
   late final BuildOp _summaryOp;
   WidgetPlaceholder? _summary;
 
-  TagDetails(this.wf, this.detailsMeta) {
-    op = BuildOp(onChild: onChild, onWidgets: onWidgets);
-
+  TagDetails(this.wf) {
     _summaryOp = BuildOp(
-      onTree: (meta, tree) {
+      onTree: (tree) {
         if (tree.isEmpty) {
           return;
         }
@@ -26,20 +22,20 @@ class TagDetails {
           tree,
           WidgetPlaceholder(
             builder: (context, child) {
-              final tsh = meta.tsb.build(context);
-              return HtmlDetailsMarker(style: tsh.style);
+              final style = tree.styleBuilder.build(context);
+              return HtmlDetailsMarker(style: style.textStyle);
             },
             localName: kTagDetails,
           ),
         );
         tree.prepend(marker);
       },
-      onWidgets: (meta, widgets) {
+      onWidgets: (tree, widgets) {
         if (_summary != null) {
           return widgets;
         }
 
-        _summary = wf.buildColumnPlaceholder(meta, widgets);
+        _summary = wf.buildColumnPlaceholder(tree, widgets);
         if (_summary == null) {
           return widgets;
         }
@@ -50,43 +46,41 @@ class TagDetails {
     );
   }
 
-  void onChild(BuildMetadata childMeta) {
-    final e = childMeta.element;
-    if (e.parent != detailsMeta.element) {
-      return;
-    }
-    if (e.localName != kTagSummary) {
-      return;
-    }
+  BuildOp get buildOp => BuildOp(
+        onChild: (tree, subTree) {
+          final e = subTree.element;
+          if (e.parent != tree.element) {
+            return;
+          }
+          if (e.localName != kTagSummary) {
+            return;
+          }
 
-    childMeta.register(_summaryOp);
-  }
-
-  Iterable<Widget>? onWidgets(
-    BuildMetadata _,
-    Iterable<WidgetPlaceholder> widgets,
-  ) {
-    final attrs = detailsMeta.element.attributes;
-    final open = attrs.containsKey(kAttributeDetailsOpen);
-    return listOrNull(
-          wf.buildColumnPlaceholder(detailsMeta, widgets)?.wrapWith(
+          subTree.register(_summaryOp);
+        },
+        onWidgets: (tree, widgets) {
+          final attrs = tree.element.attributes;
+          final open = attrs.containsKey(kAttributeDetailsOpen);
+          final placeholder =
+              wf.buildColumnPlaceholder(tree, widgets)?.wrapWith(
             (context, child) {
-              final tsh = detailsMeta.tsb.build(context);
+              final style = tree.styleBuilder.build(context);
 
               return HtmlDetails(
                 open: open,
                 child: wf.buildColumnWidget(
                   context,
                   [
-                    HtmlSummary(style: tsh.style, child: _summary),
+                    HtmlSummary(style: style.textStyle, child: _summary),
                     HtmlDetailsContents(child: child),
                   ],
-                  dir: tsh.getDependency(),
+                  dir: style.getDependency(),
                 ),
               );
             },
-          ),
-        ) ??
-        widgets;
-  }
+          );
+
+          return listOrNull(placeholder) ?? widgets;
+        },
+      );
 }

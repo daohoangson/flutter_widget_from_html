@@ -8,7 +8,7 @@ class TagQ {
   TagQ(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTree: (_, tree) {
+        onTree: (tree) {
           const opening = '“';
           const closing = '”';
           final firstParent = tree.first?.parent;

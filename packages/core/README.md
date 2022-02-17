@@ -240,37 +240,38 @@ The HTML string is parsed into DOM elements and each element is visited once to 
 
 Notes:
 
-- Text related styling can be changed with `TextStyleBuilder`, register your callback to be called when the build context is ready.
-  - The first parameter is a `TextStyleHtml` which is immutable and is calculated from the root down to each element, the callback must return a new `TextStyleHtml` by calling `copyWith`. It's recommended to return the same object if no change is needed.
-  - Optionally, pass any object on registration and your callback will receive it as the second parameter.
+- Styling can be changed with `HtmlStyleBuilder`, register your callback to be called when the build context is ready.
+  - The first parameter is a `HtmlStyle` which is immutable and is calculated from the root down to each element, the callback must return a new `HtmlStyle` by calling `copyWith`. It's recommended to return the same object if no change is needed.
+  - Optionally, pass any object on enqueue and your callback will receive it as the second parameter.
 
 ```dart
 // example 1: simple callback setting accent color from theme
-meta.tsb((parent, _) =>
-  parent.copyWith(
-    style: parent.style.copyWith(
-      color: parent.getDependency<ThemeData>().accentColor,
+tree.styleBuilder.enqueue(
+  (style, _) => style.copyWith(
+    textStyle: style.textStyle.copyWith(
+      color: style.getDependency<ThemeData>().accentColor,
     ),
-  ));
+  ),
+  null,
+);
 
-// example 2: callback using second param to set height
-TextStyleHtml callback(TextStyleHtml parent, double value) =>
-  parent.copyWith(height: value)
+// example 2: callback using second param to set alignment
+HtmlStyle callback(HtmlStyle style, TextAlign value) =>
+  style.copyWith(textAlign: value)
 
 // example 2 (continue): register with some value
-meta.tsb<double>(callback, 2.0);
+tree.styleBuilder.enqueue(callback, TextAlign.justify);
 ```
 
-- The root styling can be customized by overriding `WidgetFactory.onRoot(TextStyleBuilder)`
 - Other complicated styling are supported via `BuildOp`
 
 ```dart
 meta.register(BuildOp(
-  onTree: (meta, tree) {
+  onTree: (tree) {
     // can be used to change text, inline contents, etc.
-    tree.add(...);
+    tree.append(...);
   },
-  onWidgets: (meta, widgets) {
+  onWidgets: (tree, widgets) {
     // use this to render special widget, wrap children into something else, etc.
     return widgets.map((widget) => ...);
   },
@@ -279,7 +280,7 @@ meta.register(BuildOp(
 ));
 ```
 
-- Each metadata may have as many tsb callbacks and build ops as needed.
+- Each metadata may have as many style builder callbacks and build ops as needed.
 
 The example below replaces smilie inline image with an emoji:
 
@@ -313,23 +314,23 @@ class SmilieScreen extends StatelessWidget {
 
 class _SmiliesWidgetFactory extends WidgetFactory {
   final smilieOp = BuildOp(
-    onTree: (meta, tree) {
-      final alt = meta.element.attributes['alt'];
+    onTree: (tree) {
+      final alt = tree.element.attributes['alt'];
       tree.addText(kSmilies[alt] ?? alt);
     },
   );
 
   @override
-  void parse(BuildMetadata meta) {
-    final e = meta.element;
+  void parse(BuildTree tree) {
+    final e = tree.element;
     if (e.localName == 'img' &&
         e.classes.contains('smilie') &&
         e.attributes.containsKey('alt')) {
-      meta.register(smilieOp);
+      tree.register(smilieOp);
       return;
     }
 
-    return super.parse(meta);
+    return super.parse(tree);
   }
 }
 ```

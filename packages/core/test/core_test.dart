@@ -1624,14 +1624,12 @@ Future<void> main() async {
 
 class _InlineBlockOnWidgetsFactory extends WidgetFactory {
   @override
-  void parse(BuildMetadata meta) {
-    if (meta.element.localName == 'span') {
-      meta.register(
-        BuildOp(
-          onWidgets: (_, __) => const [Text('Bar')],
-        ),
+  void parse(BuildTree tree) {
+    if (tree.element.localName == 'span') {
+      tree.register(
+        BuildOp(onWidgets: (_, __) => const [Text('Bar')]),
       );
     }
-    super.parse(meta);
+    super.parse(tree);
   }
 }

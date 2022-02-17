@@ -34,9 +34,9 @@ class TagImg {
 
           return styles;
         },
-        onTree: (meta, tree) {
-          final data = _parse(meta);
-          final built = wf.buildImage(meta, data);
+        onTree: (tree) {
+          final data = _parse(tree);
+          final built = wf.buildImage(tree, data);
           if (built == null) {
             final imgText = data.alt ?? data.title ?? '';
             if (imgText.isNotEmpty) {
@@ -45,13 +45,13 @@ class TagImg {
             return;
           }
 
-          _placeholders[meta] = WidgetPlaceholder(
+          _placeholders[tree] = WidgetPlaceholder(
             localName: kTagImg,
             child: built,
           );
         },
-        onTreeFlattening: (meta, tree, _) {
-          final placeholder = _placeholders[meta];
+        onTreeFlattening: (tree) {
+          final placeholder = _placeholders[tree];
           if (placeholder == null) {
             return false;
           }
@@ -66,8 +66,8 @@ class TagImg {
 
           return true;
         },
-        onWidgets: (meta, widgets) {
-          final placeholder = _placeholders[meta];
+        onWidgets: (tree, widgets) {
+          final placeholder = _placeholders[tree];
           if (placeholder == null) {
             return widgets;
           }
@@ -77,8 +77,8 @@ class TagImg {
         onWidgetsIsOptional: true,
       );
 
-  ImageMetadata _parse(BuildMetadata meta) {
-    final attrs = meta.element.attributes;
+  ImageMetadata _parse(BuildTree tree) {
+    final attrs = tree.element.attributes;
     final url = wf.urlFull(attrs[kAttributeImgSrc] ?? '');
     return ImageMetadata(
       alt: attrs[kAttributeImgAlt],

@@ -2,7 +2,6 @@ import 'dart:collection';
 
 import 'package:csslib/parser.dart' as css;
 import 'package:csslib/visitor.dart' as css;
-import 'package:flutter/widgets.dart';
 
 import 'package:html/dom.dart' as dom;
 
@@ -18,11 +17,8 @@ final _regExpSpaceLeading = RegExp('^$_asciiWhitespace+', unicode: true);
 final _regExpSpaceTrailing = RegExp('$_asciiWhitespace+\$', unicode: true);
 final _regExpSpaces = RegExp('$_asciiWhitespace+', unicode: true);
 
-class Builder extends BuildTree implements BuildMetadata {
+class Builder extends BuildTree {
   static final _buildOps = Expando<Set<_BuilderOp>>();
-  static final _declarations = Expando<List<css.Declaration>>();
-  static final _maxLines = Expando<int>();
-  static final _overflows = Expando<TextOverflow>();
 
   final CustomStylesBuilder? customStylesBuilder;
   final CustomWidgetBuilder? customWidgetBuilder;
@@ -30,22 +26,39 @@ class Builder extends BuildTree implements BuildMetadata {
   @override
   final dom.Element element;
 
-  @override
-  final Iterable<BuildOp> parentOps;
+  final Iterable<_BuilderOp> _parentOps;
+
+  final _styles = <css.Declaration>[];
 
   final WidgetFactory wf;
 
   final HtmlStyleBuilder _styleBuilder;
 
-  Builder({
+  factory Builder({
+    CustomStylesBuilder? customStylesBuilder,
+    CustomWidgetBuilder? customWidgetBuilder,
+    required dom.Element element,
+    required HtmlStyleBuilder styleBuilder,
+    required WidgetFactory wf,
+  }) =>
+      Builder._(
+        customStylesBuilder: customStylesBuilder,
+        customWidgetBuilder: customWidgetBuilder,
+        element: element,
+        styleBuilder: styleBuilder,
+        wf: wf,
+      );
+
+  Builder._({
     this.customStylesBuilder,
     this.customWidgetBuilder,
     required this.element,
     BuildTree? parent,
-    this.parentOps = const [],
+    Iterable<_BuilderOp> parentOps = const [],
     required HtmlStyleBuilder styleBuilder,
     required this.wf,
-  })  : _styleBuilder = styleBuilder,
+  })  : _parentOps = parentOps,
+        _styleBuilder = styleBuilder,
         super(parent);
 
   @override
@@ -55,49 +68,23 @@ class Builder extends BuildTree implements BuildMetadata {
   Set<_BuilderOp>? get _buildOpSet => _buildOps[this];
 
   @override
-  int get maxLines => _maxLines[this] ?? -1;
+  Iterable<css.Declaration> get styles => _styles;
 
   @override
-  set maxLines(int value) => _maxLines[this] = value;
-
-  @override
-  TextOverflow get overflow => _overflows[this] ?? TextOverflow.clip;
-
-  @override
-  set overflow(TextOverflow value) => _overflows[this] = value;
-
-  @override
-  Iterable<css.Declaration> get styles => _declarationList ?? const [];
-
-  List<css.Declaration>? get _declarationList => _declarations[this];
-
-  @override
-  BuildTree get tree => this;
-
-  @override
-  HtmlStyleBuilder get tsb => _styleBuilder;
+  HtmlStyleBuilder get styleBuilder => _styleBuilder;
 
   @override
   void operator []=(String key, String value) {
     final styleSheet = css.parse('*{$key: $value;}');
     final customStyles = styleSheet.collectDeclarations();
-
-    final declarations = _declarationList;
-    if (declarations != null) {
-      declarations.addAll(customStyles);
-    } else {
-      _declarations[this] = [...customStyles];
-    }
+    _styles.addAll(customStyles);
   }
 
   @override
   css.Declaration? operator [](String key) {
-    final declarations = _declarationList;
-    if (declarations != null) {
-      for (final style in declarations.reversed) {
-        if (style.property == key) {
-          return style;
-        }
+    for (final style in _styles.reversed) {
+      if (style.property == key) {
+        return style;
       }
     }
 
@@ -119,7 +106,7 @@ class Builder extends BuildTree implements BuildMetadata {
 
   @override
   Iterable<WidgetPlaceholder> build() {
-    var widgets = Flattener(wf, this, this).widgets;
+    var widgets = Flattener(wf, this).widgets;
     final ops = _buildOpSet;
     if (ops != null) {
       for (final op in ops) {
@@ -160,18 +147,26 @@ class Builder extends BuildTree implements BuildMetadata {
     HtmlStyleBuilder? styleBuilder,
   }) {
     final p = parent ?? this.parent;
-    final sb = styleBuilder ?? _styleBuilder.copyWith(parent: p?.tsb);
-    final copied = Builder(
+    final sb = styleBuilder ?? _styleBuilder.copyWith(parent: p?.styleBuilder);
+    final copied = Builder._(
       customStylesBuilder: customStylesBuilder,
       customWidgetBuilder: customWidgetBuilder,
       element: element ?? this.element,
       parent: p,
-      parentOps: p is Builder ? _prepareParentOps(p.parentOps, p) : const [],
+      parentOps: p is Builder ? _prepareParentOps(p._parentOps, p) : const [],
       styleBuilder: sb,
       wf: wf,
     );
 
     if (copyContents) {
+      for (final bit in children) {
+        copied.append(bit.copyWith(parent: copied));
+      }
+
+      for (final value in values) {
+        copied.value(value);
+      }
+
       final ops = _buildOpSet;
       if (ops != null) {
         final copiedOps = _BuilderOp._newSet();
@@ -181,24 +176,18 @@ class Builder extends BuildTree implements BuildMetadata {
         _buildOps[copied] = copiedOps;
       }
 
-      _declarations[copied] = _declarations[this];
-      _maxLines[copied] = _maxLines[this];
-      _overflows[copied] = _overflows[this];
-
-      for (final bit in children) {
-        copied.append(bit.copyWith(parent: copied));
-      }
+      copied._styles.addAll(_styles);
     }
 
     return copied;
   }
 
   @override
-  void flatten(Flattened f) {
+  void flatten(Flattened _) {
     final ops = _buildOpSet;
     if (ops != null) {
       for (final op in ops) {
-        op.onTreeFlattening(f);
+        op.onTreeFlattening();
       }
     }
   }
@@ -302,8 +291,8 @@ class Builder extends BuildTree implements BuildMetadata {
   void _collectMetadata() {
     wf.parse(this);
 
-    for (final op in parentOps) {
-      op.onChild?.call(this);
+    for (final op in _parentOps) {
+      op.onChild(this);
     }
 
     // stylings, step 1: get default styles from tag-based build ops
@@ -312,12 +301,7 @@ class Builder extends BuildTree implements BuildMetadata {
       for (final op in ops) {
         final defaultStyles = op.defaultStyles;
         if (defaultStyles != null) {
-          final declarations = _declarationList;
-          if (declarations != null) {
-            declarations.insertAll(0, defaultStyles);
-          } else {
-            _declarations[this] = [...defaultStyles];
-          }
+          _styles.insertAll(0, defaultStyles);
         }
       }
     }
@@ -327,19 +311,12 @@ class Builder extends BuildTree implements BuildMetadata {
     // stylings, step 2: get styles from `style` attribute
     final elementStyles = element.styles;
     if (elementStyles.isNotEmpty) {
-      final declarations = _declarationList;
-      if (declarations != null) {
-        declarations.addAll(elementStyles);
-      } else {
-        _declarations[this] = [...elementStyles];
-      }
+      _styles.addAll(elementStyles);
     }
 
-    final finalDeclarations = _declarationList;
-    if (finalDeclarations != null) {
-      for (final style in finalDeclarations) {
-        wf.parseStyle(this, style);
-      }
+    // stylings, step 3: parse one by one
+    for (final style in _styles) {
+      wf.parseStyle(this, style);
     }
 
     wf.parseStyleDisplay(this, this[kCssDisplay]?.term);
@@ -355,12 +332,7 @@ class Builder extends BuildTree implements BuildMetadata {
     final styleSheet = css.parse('*{$str}');
 
     final customStyles = styleSheet.collectDeclarations();
-    final declarations = _declarationList;
-    if (declarations != null) {
-      declarations.addAll(customStyles);
-    } else {
-      _declarations[this] = [...customStyles];
-    }
+    _styles.addAll(customStyles);
   }
 }
 
@@ -382,9 +354,11 @@ class _BuilderOp {
     return styleSheet.collectDeclarations();
   }
 
-  void onTree() => op.onTree?.call(tree, tree);
+  void onChild(BuildTree subTree) => op.onChild?.call(tree, subTree);
 
-  bool onTreeFlattening(Flattened f) {
+  void onTree() => op.onTree?.call(tree);
+
+  bool onTreeFlattening() {
     if (type == _BuilderType.onWidgets) {
       return false;
     }
@@ -392,7 +366,7 @@ class _BuilderOp {
     final prevType = type;
     type = _BuilderType.onTreeFlattening;
 
-    final result = op.onTreeFlattening?.call(tree, tree, f) ?? false;
+    final result = op.onTreeFlattening?.call(tree) ?? false;
     if (!result) {
       type = prevType;
     }
@@ -455,8 +429,15 @@ enum _BuilderType {
 bool _opRequiresBuildingSubtree(BuildOp op) =>
     op.onWidgets != null && !op.onWidgetsIsOptional;
 
-Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, BuildMetadata meta) {
+Iterable<_BuilderOp> _prepareParentOps(
+  Iterable<_BuilderOp> ops,
+  Builder builder,
+) {
   // try to reuse existing list if possible
-  final newOps = meta.buildOps.where((op) => op.onChild != null).toList();
-  return newOps.isEmpty ? ops : List.unmodifiable([...ops, ...newOps]);
+  final newOps = builder._buildOpSet
+      ?.where((op) => op.op.onChild != null)
+      .toList(growable: false);
+  return newOps?.isNotEmpty == true
+      ? List.unmodifiable([...ops, ...newOps!])
+      : ops;
 }

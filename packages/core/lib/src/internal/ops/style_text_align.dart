@@ -20,8 +20,8 @@ class StyleTextAlign {
 
   StyleTextAlign(this.wf, this.value);
 
-  BuildOp get op => BuildOp(
-        onTree: (meta, _) => meta.tsb.enqueue(_tsb, value),
+  BuildOp get buildOp => BuildOp(
+        onTree: (tree) => tree.styleBuilder.enqueue(_builder, value),
         onWidgets: (_, widgets) => _onWidgets(widgets, value),
         onWidgetsIsOptional: true,
         priority: 0,
@@ -51,7 +51,7 @@ class StyleTextAlign {
   static Widget _center(BuildContext _, Widget child) =>
       _TextAlignCenter(child);
 
-  static HtmlStyle _tsb(HtmlStyle tsh, String value) {
+  static HtmlStyle _builder(HtmlStyle style, String value) {
     TextAlign? textAlign;
 
     switch (value) {
@@ -77,7 +77,7 @@ class StyleTextAlign {
         break;
     }
 
-    return textAlign == null ? tsh : tsh.copyWith(textAlign: textAlign);
+    return textAlign == null ? style : style.copyWith(textAlign: textAlign);
   }
 }
 

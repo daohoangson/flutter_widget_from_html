@@ -2,15 +2,23 @@ part of '../core_ops.dart';
 
 const kCssPadding = 'padding';
 
-WidgetPlaceholder _paddingInlineAfter(HtmlStyleBuilder tsb, CssLengthBox b) =>
+WidgetPlaceholder _paddingInlineAfter(
+  HtmlStyleBuilder styleBuilder,
+  CssLengthBox b,
+) =>
     WidgetPlaceholder(
-      builder: (c, _) => _paddingInlineSizedBox(b.getValueRight(tsb.build(c))),
+      builder: (c, _) =>
+          _paddingInlineSizedBox(b.getValueRight(styleBuilder.build(c))),
       localName: kCssPadding,
     );
 
-WidgetPlaceholder _paddingInlineBefore(HtmlStyleBuilder tsb, CssLengthBox b) =>
+WidgetPlaceholder _paddingInlineBefore(
+  HtmlStyleBuilder styleBuilder,
+  CssLengthBox b,
+) =>
     WidgetPlaceholder(
-      builder: (c, _) => _paddingInlineSizedBox(b.getValueLeft(tsb.build(c))),
+      builder: (c, _) =>
+          _paddingInlineSizedBox(b.getValueLeft(styleBuilder.build(c))),
       localName: kCssPadding,
     );
 
@@ -25,26 +33,26 @@ class StylePadding {
   StylePadding(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (meta, tree, _) {
-          final padding = tryParseCssLengthBox(meta, kCssPadding);
+        onTreeFlattening: (tree) {
+          final padding = tryParseCssLengthBox(tree, kCssPadding);
           if (padding == null) {
             return false;
           }
 
           if (padding.mayHaveLeft) {
-            final before = _paddingInlineBefore(tree.tsb, padding);
+            final before = _paddingInlineBefore(tree.styleBuilder, padding);
             tree.prepend(WidgetBit.inline(tree, before));
           }
 
           if (padding.mayHaveRight) {
-            final after = _paddingInlineAfter(tree.tsb, padding);
+            final after = _paddingInlineAfter(tree.styleBuilder, padding);
             tree.append(WidgetBit.inline(tree, after));
           }
 
           return true;
         },
-        onWidgets: (meta, widgets) {
-          final padding = tryParseCssLengthBox(meta, kCssPadding);
+        onWidgets: (tree, widgets) {
+          final padding = tryParseCssLengthBox(tree, kCssPadding);
           if (padding == null) {
             return null;
           }
@@ -56,9 +64,9 @@ class StylePadding {
           return [
             WidgetPlaceholder(
               localName: kCssPadding,
-              child: wf.buildColumnPlaceholder(meta, widgets),
+              child: wf.buildColumnPlaceholder(tree, widgets),
             ).wrapWith(
-              (context, child) => _build(meta, context, child, padding),
+              (context, child) => _build(tree, context, child, padding),
             )
           ];
         },
@@ -67,20 +75,20 @@ class StylePadding {
       );
 
   Widget? _build(
-    BuildMetadata meta,
+    BuildTree tree,
     BuildContext context,
     Widget child,
     CssLengthBox padding,
   ) {
-    final tsh = meta.tsb.build(context);
+    final style = tree.styleBuilder.build(context);
     return wf.buildPadding(
-      meta,
+      tree,
       child,
       EdgeInsets.fromLTRB(
-        max(padding.getValueLeft(tsh) ?? 0.0, 0.0),
-        max(padding.top?.getValue(tsh) ?? 0.0, 0.0),
-        max(padding.getValueRight(tsh) ?? 0.0, 0.0),
-        max(padding.bottom?.getValue(tsh) ?? 0.0, 0.0),
+        max(padding.getValueLeft(style) ?? 0.0, 0.0),
+        max(padding.top?.getValue(style) ?? 0.0, 0.0),
+        max(padding.getValueRight(style) ?? 0.0, 0.0),
+        max(padding.bottom?.getValue(style) ?? 0.0, 0.0),
       ),
     );
   }

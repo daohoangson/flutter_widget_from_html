@@ -367,7 +367,7 @@ class _NullLoadingFactory extends WidgetFactory with SvgFactory {
   @override
   Widget? onLoadingBuilder(
     BuildContext context,
-    BuildMetadata meta, [
+    BuildTree tree, [
     double? loadingProgress,
     dynamic data,
   ]) =>

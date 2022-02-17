@@ -85,11 +85,7 @@ abstract class BuildBit {
   bool? get swallowWhitespace => !isInline;
 
   /// The associated [HtmlStyle] builder.
-  /// TODO: rename
-  HtmlStyleBuilder get tsb {
-    final tsb = parent?.tsb;
-    return tsb!;
-  }
+  HtmlStyleBuilder get styleBuilder => parent!.styleBuilder;
 
   /// Creates a copy with the given fields replaced with the new values.
   BuildBit copyWith({BuildTree? parent});
@@ -98,12 +94,11 @@ abstract class BuildBit {
   void flatten(Flattened f);
 
   @override
-  String toString() => '$runtimeType#$hashCode $tsb';
+  String toString() => '$runtimeType#$hashCode $styleBuilder';
 }
 
 /// A tree of [BuildBit]s.
 abstract class BuildTree extends BuildBit {
-  static final _anchors = Expando<List<Key>>();
   static final _buffers = Expando<StringBuffer>();
 
   final _children = <BuildBit>[];
@@ -111,11 +106,14 @@ abstract class BuildTree extends BuildBit {
   /// The list of direct children.
   Iterable<BuildBit> get children => _children;
 
+  final _values = <dynamic>[];
+
+  /// The list of all values.
+  @protected
+  Iterable<dynamic> get values => _values;
+
   /// Creates a tree.
   BuildTree(BuildTree? parent) : super(parent);
-
-  /// Anchor keys of this tree and its children.
-  Iterable<Key>? get anchors => _anchors[this];
 
   /// The list of bits including direct children and sub-tree's.
   Iterable<BuildBit> get bits sync* {
@@ -127,6 +125,12 @@ abstract class BuildTree extends BuildBit {
       }
     }
   }
+
+  /// The registered build ops.
+  Iterable<BuildOp> get buildOps;
+
+  /// The associated DOM element.
+  dom.Element get element;
 
   /// The first bit (recursively).
   BuildBit? get first {
@@ -166,6 +170,24 @@ abstract class BuildTree extends BuildBit {
 
     return null;
   }
+
+  /// The styling declarations.
+  ///
+  /// These are collected from:
+  ///
+  /// - [WidgetFactory.parse] or [BuildOp.onChild] via `meta[key] = value`
+  /// - [BuildOp.defaultStyles] returning a map
+  /// - Attribute `style` of [domElement]
+  ///
+  /// TODO: remove
+  Iterable<css.Declaration> get styles;
+
+  /// Adds an inline style.
+  void operator []=(String key, String value);
+
+  /// Gets a styling declaration by `property`.
+  /// TODO: remove
+  css.Declaration? operator [](String key);
 
   /// Appends [bit].
   @Deprecated('Use append instead')
@@ -209,13 +231,8 @@ abstract class BuildTree extends BuildBit {
     }
   }
 
-  /// Registers anchor [Key].
-  void registerAnchor(Key anchor) {
-    final existing = _anchors[this];
-    final anchors = existing ?? (_anchors[this] = []);
-    anchors.add(anchor);
-    parent?.registerAnchor(anchor);
-  }
+  /// Registers a build op.
+  void register(BuildOp op);
 
   /// Creates a sub tree without [append]ing.
   BuildTree sub();
@@ -229,7 +246,7 @@ abstract class BuildTree extends BuildBit {
     }
 
     final sb = _buffers[this] = StringBuffer();
-    sb.writeln('BuildTree#$hashCode $tsb:');
+    sb.writeln('BuildTree#$hashCode $styleBuilder:');
 
     const _indent = '  ';
     for (final child in children) {
@@ -240,6 +257,29 @@ abstract class BuildTree extends BuildBit {
     _buffers[this] = null;
 
     return str;
+  }
+
+  T? value<T>([T? newValue]) {
+    if (newValue == null) {
+      // read mode
+      for (final oldValue in _values) {
+        if (oldValue is T) {
+          return oldValue;
+        }
+      }
+
+      return null;
+    } else {
+      // write mode
+      final index = _values.indexWhere((e) => e is T);
+      if (index == -1) {
+        _values.add(newValue);
+      } else {
+        _values[index] = newValue;
+      }
+
+      return newValue;
+    }
   }
 }
 

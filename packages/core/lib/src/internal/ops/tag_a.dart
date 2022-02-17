@@ -13,26 +13,25 @@ class TagA {
         defaultStyles: (_) => const {
           kCssTextDecoration: kCssTextDecorationUnderline,
         },
-        onTree: (meta, tree) {
-          final href = meta.element.attributes[kAttributeAHref];
+        onTree: (tree) {
+          final href = tree.element.attributes[kAttributeAHref];
           if (href == null) {
             return;
           }
 
           final url = wf.urlFull(href) ?? href;
           final recognizer = wf.buildGestureRecognizer(
-            meta,
+            tree,
             onTap: () => wf.onTapUrl(url),
           );
           if (recognizer == null) {
             return;
           }
 
-          tree.tsb.enqueue(_tsb, recognizer);
+          tree.styleBuilder.enqueue(_builder, recognizer);
         },
       );
 
-  static HtmlStyle _tsb(HtmlStyle tsh, GestureRecognizer value) {
-    return tsh.copyWith(gestureRecognizer: value);
-  }
+  static HtmlStyle _builder(HtmlStyle style, GestureRecognizer value) =>
+      style.copyWith(gestureRecognizer: value);
 }

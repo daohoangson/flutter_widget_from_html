@@ -6,9 +6,11 @@ import 'video_player/video_player.dart';
 
 /// A mixin that can build player for VIDEO.
 mixin ChewieFactory on WidgetFactory {
+  BuildOp? _tagVideo;
+
   /// Builds [VideoPlayer].
   Widget? buildVideoPlayer(
-    BuildMetadata meta,
+    BuildTree tree,
     String url, {
     required bool autoplay,
     required bool controls,
@@ -19,7 +21,7 @@ mixin ChewieFactory on WidgetFactory {
   }) {
     final dimensOk = height != null && height > 0 && width != null && width > 0;
     final poster = posterUrl != null
-        ? buildImage(meta, ImageMetadata(sources: [ImageSource(posterUrl)]))
+        ? buildImage(tree, ImageMetadata(sources: [ImageSource(posterUrl)]))
         : null;
     return VideoPlayer(
       url,
@@ -28,21 +30,21 @@ mixin ChewieFactory on WidgetFactory {
       autoplay: autoplay,
       controls: controls,
       errorBuilder: (context, _, error) =>
-          onErrorBuilder(context, meta, error, url) ?? widget0,
+          onErrorBuilder(context, tree, error, url) ?? widget0,
       loadingBuilder: (context, _, child) =>
-          onLoadingBuilder(context, meta, null, url) ?? widget0,
+          onLoadingBuilder(context, tree, null, url) ?? widget0,
       loop: loop,
       poster: poster,
     );
   }
 
   @override
-  void parse(BuildMetadata meta) {
-    switch (meta.element.localName) {
+  void parse(BuildTree tree) {
+    switch (tree.element.localName) {
       case kTagVideo:
-        meta.register(TagVideo(this, meta).op);
+        tree.register(_tagVideo ??= TagVideo(this).buildOp);
         break;
     }
-    return super.parse(meta);
+    return super.parse(tree);
   }
 }

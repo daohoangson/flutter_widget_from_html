@@ -12,63 +12,6 @@ part 'data/css.dart';
 part 'data/html_style.dart';
 part 'data/image.dart';
 
-/// A building element metadata.
-/// TODO: remove class
-@immutable
-abstract class BuildMetadata {
-  const BuildMetadata();
-
-  /// The registered build ops.
-  Iterable<BuildOp> get buildOps;
-
-  /// The parents' build ops that have [BuildOp.onChild].
-  Iterable<BuildOp> get parentOps;
-
-  /// The styling declarations.
-  ///
-  /// These are collected from:
-  ///
-  /// - [WidgetFactory.parse] or [BuildOp.onChild] via `meta[key] = value`
-  /// - [BuildOp.defaultStyles] returning a map
-  /// - Attribute `style` of [domElement]
-  Iterable<css.Declaration> get styles;
-
-  /// The associated DOM element.
-  dom.Element get element;
-
-  /// The maximum number of lines for the text to span.
-  ///
-  /// Used in [WidgetFactory.buildText] for [RichText.maxLines].
-  int get maxLines;
-
-  /// Sets the maximum number of lines for the text to span.
-  set maxLines(int value);
-
-  /// How visual overflow should be handled.
-  ///
-  /// Used in [WidgetFactory.buildText] for [RichText.overflow].
-  TextOverflow get overflow;
-
-  /// Changes how visual overflow should be handled.
-  set overflow(TextOverflow value);
-
-  /// The associated [HtmlStyle] builder.
-  HtmlStyleBuilder get tsb;
-
-  /// The associated [BuildTree].
-  BuildTree get tree;
-
-  /// Adds an inline style.
-  void operator []=(String key, String value);
-
-  /// Gets a styling declaration by `property`.
-  /// TODO: remove
-  css.Declaration? operator [](String key);
-
-  /// Registers a build op.
-  void register(BuildOp op);
-}
-
 /// A building operation to customize how a DOM element is rendered.
 @immutable
 class BuildOp {
@@ -97,36 +40,35 @@ class BuildOp {
   /// in [WidgetFactory.parse] or [onChild].
   final Map<String, String> Function(dom.Element element)? defaultStyles;
 
-  /// The callback that will be called whenver a child element is found.
+  /// The callback that will be called before processing a child element.
   ///
   /// Please note that all children and grandchildren etc. will trigger this,
   /// it's easy to check whether an element is direct child:
   ///
   /// ```dart
   /// BuildOp(
-  ///   onChild: (childMeta) {
-  ///     if (!childElement.element.parent != parentMeta.element) return;
-  ///     childMeta.doSomethingHere;
+  ///   onSubTree: (tree, subTree) {
+  ///     if (!subTree.element.parent != tree.element) return;
+  ///     subTree.doSomething();
   ///   },
   /// );
   ///
   /// ```
-  final void Function(BuildMetadata childMeta)? onChild;
+  final void Function(BuildTree tree, BuildTree subTree)? onChild;
 
   /// The callback that will be called when child elements have been processed.
-  final void Function(BuildMetadata meta, BuildTree tree)? onTree;
+  final void Function(BuildTree tree)? onTree;
 
   /// The callback that will be called before flattening.
   ///
-  /// This is the last chance to modify the [BuildTree] before rendering.
-  final bool Function(BuildMetadata meta, BuildTree tree, Flattened f)?
-      onTreeFlattening;
+  /// This is the last chance to modify the [BuildTree] before inline rendering.
+  final bool Function(BuildTree tree)? onTreeFlattening;
 
   /// The callback that will be called when child elements have been built.
   ///
   /// Note: only works if it's a block element.
   final Iterable<Widget>? Function(
-    BuildMetadata meta,
+    BuildTree tree,
     Iterable<WidgetPlaceholder> widgets,
   )? onWidgets;
 

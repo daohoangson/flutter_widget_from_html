@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
@@ -190,12 +189,13 @@ class HtmlWidgetState extends State<HtmlWidget> {
           if (snapshot.hasData) {
             return snapshot.data!;
           } else if (snapshot.hasError) {
+            final tree = _buildRootBuilder(this);
             return _sliverToBoxAdapterIfNeeded(
-              _wf.onErrorBuilder(context, _rootMeta, snapshot.error) ?? widget0,
+              _wf.onErrorBuilder(context, tree, snapshot.error) ?? widget0,
             );
           } else {
             return _sliverToBoxAdapterIfNeeded(
-              _wf.onLoadingBuilder(context, _rootMeta) ?? widget0,
+              _wf.onLoadingBuilder(context, _buildRootBuilder(this)) ?? widget0,
             );
           }
         },
@@ -243,50 +243,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
       HtmlStyleWidget(style: _rootStyle, child: child);
 }
 
-const _rootMeta = _RootBuildMetadata();
-
-class _RootBuildMetadata extends BuildMetadata {
-  const _RootBuildMetadata();
-
-  @override
-  Iterable<BuildOp> get buildOps => [];
-
-  @override
-  dom.Element get element => dom.Element.tag('root');
-
-  @override
-  int get maxLines => -1;
-
-  @override
-  set maxLines(int value) {}
-
-  @override
-  TextOverflow get overflow => TextOverflow.clip;
-
-  @override
-  set overflow(TextOverflow value) {}
-
-  @override
-  Iterable<BuildOp> get parentOps => [];
-
-  @override
-  Iterable<css.Declaration> get styles => [];
-
-  @override
-  BuildTree get tree => throw UnimplementedError();
-
-  @override
-  HtmlStyleBuilder get tsb => throw UnimplementedError();
-
-  @override
-  void operator []=(String key, String value) {}
-
-  @override
-  css.Declaration? operator [](String key) => null;
-
-  @override
-  void register(BuildOp op) {}
-}
+final _rootElement = dom.Element.tag('root');
 
 class _RootStyleBuilder extends HtmlStyleBuilder {
   final HtmlWidgetState state;
@@ -313,19 +270,22 @@ Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
   final wf = state._wf;
   wf.reset(state);
 
-  final rootBuilder = builder.Builder(
-    customStylesBuilder: state.widget.customStylesBuilder,
-    customWidgetBuilder: state.widget.customWidgetBuilder,
-    element: _rootMeta.element,
-    styleBuilder: state._rootStyleBuilder,
-    wf: wf,
-  )..addBitsFromNodes(domNodes);
+  final rootBuilder = _buildRootBuilder(state);
+  rootBuilder.addBitsFromNodes(domNodes);
 
   return wf
           .buildColumnPlaceholder(rootBuilder, rootBuilder.build())
           ?.wrapWith(wf.buildBodyWidget) ??
       widget0;
 }
+
+builder.Builder _buildRootBuilder(HtmlWidgetState state) => builder.Builder(
+      customStylesBuilder: state.widget.customStylesBuilder,
+      customWidgetBuilder: state.widget.customWidgetBuilder,
+      element: _rootElement,
+      styleBuilder: state._rootStyleBuilder,
+      wf: state._wf,
+    );
 
 dom.NodeList _parseHtml(String html) =>
     parser.HtmlParser(html, parseMeta: false).parseFragment().nodes;

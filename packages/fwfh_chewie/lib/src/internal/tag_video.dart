@@ -16,59 +16,53 @@ const kTagVideo = 'video';
 const kTagVideoSource = 'source';
 
 class TagVideo {
-  final BuildMetadata videoMeta;
   final ChewieFactory wf;
 
-  final _sourceUrls = <String>[];
+  TagVideo(this.wf);
 
-  late final BuildOp op;
+  BuildOp get buildOp => BuildOp(
+        onChild: (tree, subTree) {
+          final e = subTree.element;
+          if (e.localName != kTagVideoSource) {
+            return;
+          }
+          if (e.parent != tree.element) {
+            return;
+          }
 
-  TagVideo(this.wf, this.videoMeta) {
-    op = BuildOp(
-      onChild: onChild,
-      onWidgets: onWidgets,
-    );
-  }
+          final attrs = e.attributes;
+          final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
+          if (url == null) {
+            return;
+          }
 
-  void onChild(BuildMetadata childMeta) {
-    final e = childMeta.element;
-    if (e.localName != kTagVideoSource) {
-      return;
-    }
-    if (e.parent != videoMeta.element) {
-      return;
-    }
+          final sourceUrls = tree.sourceUrls;
+          sourceUrls.add(url);
+          tree.sourceUrls = sourceUrls;
+        },
+        onWidgets: (tree, widgets) {
+          if (defaultTargetPlatform != TargetPlatform.android &&
+              defaultTargetPlatform != TargetPlatform.iOS &&
+              !kIsWeb) {
+            // these are the chewie's supported platforms
+            // https://pub.dev/packages/chewie/versions/1.2.2
+            return null;
+          }
 
-    final attrs = e.attributes;
-    final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
-    if (url == null) {
-      return;
-    }
+          return listOrNull(_buildPlayer(tree)) ?? widgets;
+        },
+      );
 
-    _sourceUrls.add(url);
-  }
-
-  Iterable<Widget>? onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> ws) {
-    if (defaultTargetPlatform != TargetPlatform.android &&
-        defaultTargetPlatform != TargetPlatform.iOS &&
-        !kIsWeb) {
-      // these are the chewie's supported platforms
-      // https://pub.dev/packages/chewie/versions/1.2.2
+  Widget? _buildPlayer(BuildTree tree) {
+    final sourceUrls = tree.sourceUrls;
+    if (sourceUrls.isEmpty) {
       return null;
     }
 
-    return listOrNull(_buildPlayer()) ?? ws;
-  }
-
-  Widget? _buildPlayer() {
-    if (_sourceUrls.isEmpty) {
-      return null;
-    }
-
-    final attrs = videoMeta.element.attributes;
+    final attrs = tree.element.attributes;
     return wf.buildVideoPlayer(
-      videoMeta,
-      _sourceUrls.first,
+      tree,
+      sourceUrls.first,
       autoplay: attrs.containsKey(kAttributeVideoAutoplay),
       controls: attrs.containsKey(kAttributeVideoControls),
       height: tryParseDoubleFromMap(attrs, kAttributeVideoHeight),
@@ -77,4 +71,12 @@ class TagVideo {
       width: tryParseDoubleFromMap(attrs, kAttributeVideoWidth),
     );
   }
+}
+
+extension _BuildTree on BuildTree {
+  static final _sourceUrls = Expando<List<String>>();
+
+  List<String> get sourceUrls => _sourceUrls[this] ?? [];
+
+  set sourceUrls(List<String> v) => _sourceUrls[this] = v;
 }

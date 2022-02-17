@@ -596,11 +596,11 @@ void main() {
 
 class _OnErrorBuilderFactory extends WidgetFactory {
   @override
-  void parse(BuildMetadata meta) {
-    if (meta.element.className == 'throw') {
-      throw UnsupportedError(meta.element.outerHtml);
+  void parse(BuildTree tree) {
+    if (tree.element.className == 'throw') {
+      throw UnsupportedError(tree.element.outerHtml);
     }
 
-    super.parse(meta);
+    super.parse(tree);
   }
 }

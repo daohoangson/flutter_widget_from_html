@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
+// ignore: implementation_imports
+import 'package:flutter_widget_from_html_core/src/internal/core_ops.dart';
+
 /// A mixin that can render [SelectableText].
 mixin SelectableTextFactory on WidgetFactory {
   /// Controls whether text is rendered with [SelectableText] or [RichText].
@@ -14,13 +17,13 @@ mixin SelectableTextFactory on WidgetFactory {
   SelectionChangedCallback? get selectableTextOnChanged => null;
 
   @override
-  Widget? buildText(BuildMetadata meta, HtmlStyle style, InlineSpan text) {
+  Widget? buildText(BuildTree tree, HtmlStyle style, InlineSpan text) {
     if (selectableText &&
-        meta.overflow == TextOverflow.clip &&
+        tree.overflow == TextOverflow.clip &&
         text is TextSpan) {
       return SelectableText.rich(
         text,
-        maxLines: meta.maxLines > 0 ? meta.maxLines : null,
+        maxLines: tree.maxLines > 0 ? tree.maxLines : null,
         textAlign: style.textAlign ?? TextAlign.start,
         textDirection: style.textDirection,
         textScaleFactor: 1.0,
@@ -28,6 +31,6 @@ mixin SelectableTextFactory on WidgetFactory {
       );
     }
 
-    return super.buildText(meta, style, text);
+    return super.buildText(tree, style, text);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:csslib/visitor.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart' show WidgetTester, testWidgets;
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -209,9 +210,9 @@ void main() {
       expect(
         helper.simplifyHashCode(text.toString()),
         equals(
-          'BuildTree#0 tsb#1(parent=#2):\n'
+          'BuildTree#0 styleBuilder#1(parent=#2):\n'
           '  "1"\n'
-          '  BuildTree#3 tsb#4(parent=#1):\n'
+          '  BuildTree#3 styleBuilder#4(parent=#1):\n'
           '    "2"\n'
           '  "3"',
         ),
@@ -221,15 +222,15 @@ void main() {
       expect(
         helper.simplifyHashCode('$text\n\n$copied'),
         equals(
-          'BuildTree#0 tsb#1(parent=#2):\n'
+          'BuildTree#0 styleBuilder#1(parent=#2):\n'
           '  "1"\n'
-          '  BuildTree#3 tsb#4(parent=#1):\n'
+          '  BuildTree#3 styleBuilder#4(parent=#1):\n'
           '    "2"\n'
           '  "3"\n'
           '\n'
-          'BuildTree#5 tsb#6(parent=#2):\n'
+          'BuildTree#5 styleBuilder#6(parent=#2):\n'
           '  "1"\n'
-          '  BuildTree#7 tsb#8(parent=#6):\n'
+          '  BuildTree#7 styleBuilder#8(parent=#6):\n'
           '    "2"\n'
           '  "3"',
         ),
@@ -279,18 +280,18 @@ void main() {
     expect(
       helper.simplifyHashCode(text.toString()),
       equals(
-        'BuildTree#0 tsb#1:\n'
+        'BuildTree#0 styleBuilder#1:\n'
         '  "1"\n'
         '  Whitespace[32]#2\n'
-        '  BuildTree#3 tsb#4(parent=#1):\n'
+        '  BuildTree#3 styleBuilder#4(parent=#1):\n'
         '    "(2.1)"\n'
-        '    BuildTree#5 tsb#6(parent=#4):\n'
+        '    BuildTree#5 styleBuilder#6(parent=#4):\n'
         '      "(2.2.1)"\n'
         '      "(2.2.2)"\n'
         '    "(2.3)"\n'
         '  WidgetBit.block#7 WidgetPlaceholder\n'
         '  WidgetBit.inline#8 WidgetPlaceholder\n'
-        '  _CustomBit#9 tsb#1\n'
+        '  _CustomBit#9 styleBuilder#1\n'
         '  BuildTree#0 (circular)',
       ),
     );
@@ -299,28 +300,28 @@ void main() {
 
 class _BuildBitWidgetFactory extends WidgetFactory {
   @override
-  void parse(BuildMetadata meta) {
-    final classes = meta.element.classes;
+  void parse(BuildTree tree) {
+    final classes = tree.element.classes;
 
     if (classes.contains('output--String')) {
-      meta.register(
+      tree.register(
         BuildOp(
-          onTree: (_, tree) => tree.append(_OutputStringBit(tree)),
+          onTree: (tree) => tree.append(_OutputStringBit(tree)),
         ),
       );
     }
 
     if (classes.contains('output--Widget')) {
-      meta.register(
-        BuildOp(onTree: (_, tree) => tree.append(_OutputWidgetBit(tree))),
+      tree.register(
+        BuildOp(onTree: (tree) => tree.append(_OutputWidgetBit(tree))),
       );
     }
 
     if (classes.contains('custom')) {
-      meta.tsb.enqueue((tsh, _) => tsh.copyWith(), null);
+      tree.styleBuilder.enqueue((style, _) => style.copyWith(), null);
     }
 
-    super.parse(meta);
+    super.parse(tree);
   }
 }
 
@@ -328,17 +329,35 @@ class _CircularBit extends BuildTree {
   _CircularBit(BuildTree parent) : super(parent);
 
   @override
+  Iterable<BuildOp> get buildOps => throw UnimplementedError();
+
+  @override
+  dom.Element get element => throw UnimplementedError();
+
+  @override
+  Iterable<Declaration> get styles => throw UnimplementedError();
+
+  @override
+  Declaration? operator [](String key) => throw UnimplementedError();
+
+  @override
+  void operator []=(String key, String value) => throw UnimplementedError();
+
+  @override
   Iterable<WidgetPlaceholder> build() => throw UnimplementedError();
 
   @override
-  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
+  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? styleBuilder}) =>
       throw UnimplementedError();
 
   @override
   void flatten(Flattened _) => throw UnimplementedError();
 
   @override
-  BuildTree sub({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
+  void register(BuildOp op) => throw UnimplementedError();
+
+  @override
+  BuildTree sub({BuildTree? parent, HtmlStyleBuilder? styleBuilder}) =>
       throw UnimplementedError();
 
   @override
@@ -352,7 +371,7 @@ class _CustomBit extends BuildBit {
   void flatten(Flattened _) => throw UnimplementedError();
 
   @override
-  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
+  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? styleBuilder}) =>
       throw UnimplementedError();
 }
 
@@ -378,7 +397,7 @@ class _OutputWidgetBit extends BuildBit {
       f.widget(WidgetPlaceholder(child: const Text('foo')));
 
   @override
-  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? tsb}) =>
+  BuildBit copyWith({BuildTree? parent, HtmlStyleBuilder? styleBuilder}) =>
       _OutputWidgetBit(parent ?? this.parent);
 }
 

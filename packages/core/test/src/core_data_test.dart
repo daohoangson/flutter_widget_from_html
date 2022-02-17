@@ -173,65 +173,65 @@ void main() {
 
 class _BuildOpDefaultStyles extends WidgetFactory {
   @override
-  void parse(BuildMetadata meta) {
-    meta
+  void parse(BuildTree tree) {
+    tree
       ..register(BuildOp(defaultStyles: (_) => {'color': '#f00'}, priority: 1))
       ..register(BuildOp(defaultStyles: (_) => {'color': '#0f0'}, priority: 2));
 
-    return super.parse(meta);
+    return super.parse(tree);
   }
 }
 
 class _BuildOpOnTreeText extends WidgetFactory {
   @override
-  void parse(BuildMetadata meta) {
-    if (meta.element.classes.contains('text')) {
-      meta.register(BuildOp(onTree: (_, tree) => tree.addText(' bar')));
+  void parse(BuildTree tree) {
+    if (tree.element.classes.contains('text')) {
+      tree.register(BuildOp(onTree: (tree) => tree.addText(' bar')));
     }
 
-    return super.parse(meta);
+    return super.parse(tree);
   }
 }
 
 class _BuildOpOnTreeWidgetBlock extends WidgetFactory {
   @override
-  void parse(BuildMetadata meta) {
-    if (meta.element.classes.contains('widget-block')) {
-      meta.register(
+  void parse(BuildTree tree) {
+    if (tree.element.classes.contains('widget-block')) {
+      tree.register(
         BuildOp(
-          onTree: (_, tree) {
+          onTree: (tree) {
             tree.replaceWith(WidgetBit.block(tree, const Text('hi')));
           },
         ),
       );
     }
 
-    return super.parse(meta);
+    return super.parse(tree);
   }
 }
 
 class _BuildOpOnTreeWidgetInline extends WidgetFactory {
   @override
-  void parse(BuildMetadata meta) {
-    if (meta.element.classes.contains('widget-inline')) {
-      meta.register(
+  void parse(BuildTree tree) {
+    if (tree.element.classes.contains('widget-inline')) {
+      tree.register(
         BuildOp(
-          onTree: (_, tree) {
+          onTree: (tree) {
             tree.replaceWith(WidgetBit.inline(tree, const Text('hi')));
           },
         ),
       );
     }
 
-    return super.parse(meta);
+    return super.parse(tree);
   }
 }
 
 class _BuildOpOnWidgets extends WidgetFactory {
   @override
-  void parse(BuildMetadata meta) {
-    meta.register(BuildOp(onWidgets: (_, __) => const [Text('Hi')]));
-    return super.parse(meta);
+  void parse(BuildTree tree) {
+    tree.register(BuildOp(onWidgets: (_, __) => const [Text('Hi')]));
+    return super.parse(tree);
   }
 }
 
@@ -242,21 +242,21 @@ class _BuildOpPriority extends WidgetFactory {
   _BuildOpPriority({required this.a, required this.b});
 
   @override
-  void parse(BuildMetadata meta) {
-    meta
+  void parse(BuildTree tree) {
+    tree
       ..register(
         BuildOp(
-          onTree: (_, tree) => tree.addText(' A'),
+          onTree: (tree) => tree.addText(' A'),
           priority: a,
         ),
       )
       ..register(
         BuildOp(
-          onTree: (_, tree) => tree.addText(' B'),
+          onTree: (tree) => tree.addText(' B'),
           priority: b,
         ),
       );
 
-    return super.parse(meta);
+    return super.parse(tree);
   }
 }

@@ -9,22 +9,22 @@ mixin CachedNetworkImageFactory on WidgetFactory {
   BaseCacheManager? get cacheManager => null;
 
   @override
-  Widget? buildImageWidget(BuildMetadata meta, ImageSource src) {
+  Widget? buildImageWidget(BuildTree tree, ImageSource src) {
     final url = src.url;
     if (!url.startsWith(RegExp('https?://'))) {
-      return super.buildImageWidget(meta, src);
+      return super.buildImageWidget(tree, src);
     }
 
     return CachedNetworkImage(
       cacheManager: cacheManager,
       errorWidget: (context, _, error) =>
-          onErrorBuilder(context, meta, error, src) ?? widget0,
+          onErrorBuilder(context, tree, error, src) ?? widget0,
       fit: BoxFit.fill,
       imageUrl: url,
       progressIndicatorBuilder: (context, _, progress) =>
           onLoadingBuilder(
             context,
-            meta,
+            tree,
             progress.totalSize != null && progress.totalSize! > 0
                 ? progress.downloaded / progress.totalSize!
                 : null,

@@ -98,19 +98,23 @@ class CssBorder {
       );
 
   /// Calculates [Border].
-  Border? getBorder(HtmlStyle tsh) {
-    final bottom = CssBorderSide._copyWith(_all, _bottom)?._getValue(tsh);
+  Border? getBorder(HtmlStyle style) {
+    final bottom = CssBorderSide._copyWith(_all, _bottom)?._getValue(style);
     final left = CssBorderSide._copyWith(
       _all,
       _left ??
-          (tsh.textDirection == TextDirection.ltr ? _inlineStart : _inlineEnd),
-    )?._getValue(tsh);
+          (style.textDirection == TextDirection.ltr
+              ? _inlineStart
+              : _inlineEnd),
+    )?._getValue(style);
     final right = CssBorderSide._copyWith(
       _all,
       _right ??
-          (tsh.textDirection == TextDirection.ltr ? _inlineEnd : _inlineStart),
-    )?._getValue(tsh);
-    final top = CssBorderSide._copyWith(_all, _top)?._getValue(tsh);
+          (style.textDirection == TextDirection.ltr
+              ? _inlineEnd
+              : _inlineStart),
+    )?._getValue(style);
+    final top = CssBorderSide._copyWith(_all, _top)?._getValue(style);
     if (bottom == null && left == null && right == null && top == null) {
       return null;
     }
@@ -124,11 +128,11 @@ class CssBorder {
   }
 
   /// Calculates [BorderRadius].
-  BorderRadius? getBorderRadius(HtmlStyle tsh) {
-    final topLeft = radiusTopLeft._getValue(tsh);
-    final topRight = radiusTopRight._getValue(tsh);
-    final bottomLeft = radiusBottomLeft._getValue(tsh);
-    final bottomRight = radiusBottomRight._getValue(tsh);
+  BorderRadius? getBorderRadius(HtmlStyle style) {
+    final topLeft = radiusTopLeft._getValue(style);
+    final topRight = radiusTopRight._getValue(style);
+    final bottomLeft = radiusBottomLeft._getValue(style);
+    final bottomRight = radiusBottomRight._getValue(style);
     if (topLeft == null &&
         topRight == null &&
         bottomLeft == null &&
@@ -158,11 +162,11 @@ class CssRadius {
   /// A radius with [x] and [y] values set to zero.
   static const zero = CssRadius(CssLength.zero, CssLength.zero);
 
-  Radius? _getValue(HtmlStyle tsh) => this == zero
+  Radius? _getValue(HtmlStyle style) => this == zero
       ? null
       : Radius.elliptical(
-          x.getValue(tsh) ?? 0.0,
-          y.getValue(tsh) ?? 0.0,
+          x.getValue(style) ?? 0.0,
+          y.getValue(style) ?? 0.0,
         );
 }
 
@@ -184,15 +188,15 @@ class CssBorderSide {
   /// A border that is not rendered.
   static const none = CssBorderSide();
 
-  BorderSide? _getValue(HtmlStyle tsh) => identical(this, none)
+  BorderSide? _getValue(HtmlStyle style) => identical(this, none)
       ? null
       : BorderSide(
-          color: color ?? tsh.style.color ?? const BorderSide().color,
+          color: color ?? style.textStyle.color ?? const BorderSide().color,
           // TODO: add proper support for other border styles
-          style: style != null ? BorderStyle.solid : BorderStyle.none,
+          style: this.style != null ? BorderStyle.solid : BorderStyle.none,
           // TODO: look for official document regarding this default value
           // WebKit & Blink seem to follow the same (hidden?) specs
-          width: width?.getValue(tsh) ?? 1.0,
+          width: width?.getValue(style) ?? 1.0,
         );
 
   static CssBorderSide? _copyWith(CssBorderSide? base, CssBorderSide? value) =>
@@ -227,7 +231,7 @@ class CssLength {
 
   /// Calculates value in logical pixel.
   double? getValue(
-    HtmlStyle tsh, {
+    HtmlStyle style, {
     double? baseValue,
     double? scaleFactor,
   }) {
@@ -238,7 +242,7 @@ class CssLength {
       case CssLengthUnit.auto:
         return null;
       case CssLengthUnit.em:
-        baseValue ??= tsh.style.fontSize;
+        baseValue ??= style.textStyle.fontSize;
         if (baseValue == null) {
           return null;
         }
@@ -333,14 +337,18 @@ class CssLengthBox {
       _right?.isPositive == true;
 
   /// Calculates the left value taking text direction into account.
-  double? getValueLeft(HtmlStyle tsh) => (_left ??
-          (tsh.textDirection == TextDirection.ltr ? _inlineStart : _inlineEnd))
-      ?.getValue(tsh);
+  double? getValueLeft(HtmlStyle style) => (_left ??
+          (style.textDirection == TextDirection.ltr
+              ? _inlineStart
+              : _inlineEnd))
+      ?.getValue(style);
 
   /// Calculates the right value taking text direction into account.
-  double? getValueRight(HtmlStyle tsh) => (_right ??
-          (tsh.textDirection == TextDirection.ltr ? _inlineEnd : _inlineStart))
-      ?.getValue(tsh);
+  double? getValueRight(HtmlStyle style) => (_right ??
+          (style.textDirection == TextDirection.ltr
+              ? _inlineEnd
+              : _inlineStart))
+      ?.getValue(style);
 
   @override
   String toString() {

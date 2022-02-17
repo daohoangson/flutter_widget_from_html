@@ -6,7 +6,7 @@ void main() {
   group('HtmlStyle', () {
     group('getDependency', () {
       final dep1 = _Dep1();
-      final tsh = HtmlStyle.root(
+      final style = HtmlStyle.root(
         [
           const MediaQueryData(),
           TextDirection.ltr,
@@ -17,12 +17,12 @@ void main() {
       );
 
       test('returns dependency', () {
-        final dep = tsh.getDependency<_Dep1>();
+        final dep = style.getDependency<_Dep1>();
         expect(dep, equals(dep1));
       });
 
       test('throws exception', () {
-        expect(() => tsh.getDependency<_Dep2>(), throwsA(isA<StateError>()));
+        expect(() => style.getDependency<_Dep2>(), throwsA(isA<StateError>()));
       });
     });
   });

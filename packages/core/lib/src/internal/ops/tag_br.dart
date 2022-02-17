@@ -7,7 +7,7 @@ class TagBr {
 
   TagBr(this.wf);
 
-  BuildOp get buildOp => BuildOp(onTree: (_, t) => t.append(TagBrBit(t)));
+  BuildOp get buildOp => BuildOp(onTree: (tree) => tree.append(TagBrBit(tree)));
 }
 
 class TagBrBit extends BuildBit {

@@ -14,18 +14,18 @@ class StyleBorder {
   StyleBorder(this.wf);
 
   BuildOp get inlineOp => BuildOp(
-        onTreeFlattening: (meta, tree, _) {
-          if (_skipBuilding[meta] == true) {
+        onTreeFlattening: (tree) {
+          if (_skipBuilding[tree] == true) {
             return false;
           }
 
-          final border = tryParseBorder(meta);
+          final border = tryParseBorder(tree);
           if (border.isNoOp) {
             return false;
           }
 
-          final built = wf.buildColumnPlaceholder(meta, tree.build())?.wrapWith(
-                (context, child) => _buildBorder(meta, context, child, border),
+          final built = wf.buildColumnPlaceholder(tree, tree.build())?.wrapWith(
+                (context, child) => _buildBorder(tree, context, child, border),
               );
           if (built == null) {
             return false;
@@ -39,12 +39,12 @@ class StyleBorder {
       );
 
   BuildOp get blockOp => BuildOp(
-        onWidgets: (meta, widgets) {
-          if (_skipBuilding[meta] == true || widgets.isEmpty) {
+        onWidgets: (tree, widgets) {
+          if (_skipBuilding[tree] == true || widgets.isEmpty) {
             return null;
           }
 
-          final border = tryParseBorder(meta);
+          final border = tryParseBorder(tree);
           if (border.isNoOp) {
             return null;
           }
@@ -52,8 +52,8 @@ class StyleBorder {
           return [
             WidgetPlaceholder(
               localName: kCssBorder,
-              child: wf.buildColumnPlaceholder(meta, widgets),
-            ).wrapWith((c, w) => _buildBorder(meta, c, w, border))
+              child: wf.buildColumnPlaceholder(tree, widgets),
+            ).wrapWith((c, w) => _buildBorder(tree, c, w, border))
           ];
         },
         onWidgetsIsOptional: true,
@@ -61,22 +61,22 @@ class StyleBorder {
       );
 
   Widget? _buildBorder(
-    BuildMetadata meta,
+    BuildTree tree,
     BuildContext context,
     Widget child,
     CssBorder cssBorder,
   ) {
-    final tsh = meta.tsb.build(context);
-    final border = cssBorder.getBorder(tsh);
-    final borderRadius = cssBorder.getBorderRadius(tsh);
+    final style = tree.styleBuilder.build(context);
+    final border = cssBorder.getBorder(style);
+    final borderRadius = cssBorder.getBorderRadius(style);
     return wf.buildDecoration(
-      meta,
+      tree,
       child,
       border: border,
       borderRadius: borderRadius,
-      isBorderBox: meta[kCssBoxSizing]?.term == kCssBoxSizingBorderBox,
+      isBorderBox: tree[kCssBoxSizing]?.term == kCssBoxSizingBorderBox,
     );
   }
 
-  static void skip(BuildMetadata meta) => _skipBuilding[meta] = true;
+  static void skip(BuildTree tree) => _skipBuilding[tree] = true;
 }

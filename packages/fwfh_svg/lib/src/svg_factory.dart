@@ -17,7 +17,7 @@ mixin SvgFactory on WidgetFactory {
   bool get svgAllowDrawingOutsideViewBox => false;
 
   @override
-  Widget? buildImageWidget(BuildMetadata meta, ImageSource src) {
+  Widget? buildImageWidget(BuildTree tree, ImageSource src) {
     final url = src.url;
 
     PictureProvider? provider;
@@ -34,10 +34,10 @@ mixin SvgFactory on WidgetFactory {
     }
 
     if (provider == null) {
-      return super.buildImageWidget(meta, src);
+      return super.buildImageWidget(tree, src);
     }
 
-    return _buildSvgPicture(meta, src, provider);
+    return _buildSvgPicture(tree, src, provider);
   }
 
   /// Returns an [ExactAssetPicture].
@@ -102,29 +102,30 @@ mixin SvgFactory on WidgetFactory {
   }
 
   @override
-  void parse(BuildMetadata meta) {
-    switch (meta.element.localName) {
+  void parse(BuildTree tree) {
+    switch (tree.element.localName) {
       case 'svg':
-        _tagSvg ??= BuildOp(
-          onWidgets: (meta, widgets) {
-            final provider = StringPicture(
-              svgAllowDrawingOutsideViewBox
-                  ? SvgPicture.svgStringDecoderOutsideViewBoxBuilder
-                  : SvgPicture.svgStringDecoderBuilder,
-              meta.element.outerHtml,
-            );
-            return [_buildSvgPicture(meta, const ImageSource(''), provider)];
-          },
+        tree.register(
+          _tagSvg ??= BuildOp(
+            onWidgets: (tree, widgets) {
+              final provider = StringPicture(
+                svgAllowDrawingOutsideViewBox
+                    ? SvgPicture.svgStringDecoderOutsideViewBoxBuilder
+                    : SvgPicture.svgStringDecoderBuilder,
+                tree.element.outerHtml,
+              );
+              return [_buildSvgPicture(tree, const ImageSource(''), provider)];
+            },
+          ),
         );
-        meta.register(_tagSvg!);
         break;
     }
 
-    return super.parse(meta);
+    return super.parse(tree);
   }
 
   Widget _buildSvgPicture(
-    BuildMetadata meta,
+    BuildTree tree,
     ImageSource src,
     PictureProvider provider,
   ) {
@@ -138,7 +139,7 @@ mixin SvgFactory on WidgetFactory {
       fit: BoxFit.fill,
       height: src.height,
       placeholderBuilder: (context) {
-        final loading = onLoadingBuilder(context, meta, null, src);
+        final loading = onLoadingBuilder(context, tree, null, src);
         if (loading != null) {
           return loading;
         }

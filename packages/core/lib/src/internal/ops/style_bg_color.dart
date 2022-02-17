@@ -11,35 +11,35 @@ class StyleBgColor {
   StyleBgColor(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (meta, tree, _) {
-          if (_skipBuilding[meta] == true) {
+        onTreeFlattening: (tree) {
+          if (_skipBuilding[tree] == true) {
             return false;
           }
 
-          final bgColor = _parseColor(wf, meta);
+          final bgColor = _parseColor(wf, tree);
           if (bgColor == null) {
             return false;
           }
 
-          _skipBuilding[meta] = true;
-          meta.tsb.enqueue(_tsb, bgColor);
+          _skipBuilding[tree] = true;
+          tree.styleBuilder.enqueue(_builder, bgColor);
           return true;
         },
-        onWidgets: (meta, widgets) {
-          if (_skipBuilding[meta] == true || widgets.isEmpty) {
+        onWidgets: (tree, widgets) {
+          if (_skipBuilding[tree] == true || widgets.isEmpty) {
             return widgets;
           }
 
-          final color = _parseColor(wf, meta);
+          final color = _parseColor(wf, tree);
           if (color == null) {
             return null;
           }
 
-          _skipBuilding[meta] = true;
+          _skipBuilding[tree] = true;
           return listOrNull(
-                wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
+                wf.buildColumnPlaceholder(tree, widgets)?.wrapWith(
                       (_, child) =>
-                          wf.buildDecoration(meta, child, color: color),
+                          wf.buildDecoration(tree, child, color: color),
                     ),
               ) ??
               widgets;
@@ -48,9 +48,9 @@ class StyleBgColor {
         priority: StyleBorder.kPriorityBoxModel5k + 1,
       );
 
-  Color? _parseColor(WidgetFactory wf, BuildMetadata meta) {
+  Color? _parseColor(WidgetFactory wf, BuildTree tree) {
     Color? color;
-    for (final style in meta.styles) {
+    for (final style in tree.styles) {
       switch (style.property) {
         case kCssBackground:
           for (final expression in style.values) {
@@ -66,6 +66,7 @@ class StyleBgColor {
     return color;
   }
 
-  static HtmlStyle _tsb(HtmlStyle p, Color c) =>
-      p.copyWith(style: p.style.copyWith(background: Paint()..color = c));
+  static HtmlStyle _builder(HtmlStyle style, Color color) => style.copyWith(
+        textStyle: style.textStyle.copyWith(background: Paint()..color = color),
+      );
 }

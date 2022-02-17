@@ -11,15 +11,14 @@ class HtmlStyle {
   /// The parent style.
   final HtmlStyle? parent;
 
-  /// The input [TextStyle].
-  /// TODO: rename
-  final TextStyle style;
-
   /// The text alignment.
   final TextAlign? textAlign;
 
   /// The text direction.
   final TextDirection textDirection;
+
+  /// The input [TextStyle].
+  final TextStyle textStyle;
 
   /// The whitespace behavior.
   final CssWhitespace whitespace;
@@ -28,9 +27,9 @@ class HtmlStyle {
     required Iterable<dynamic> deps,
     this.gestureRecognizer,
     this.parent,
-    required this.style,
     this.textAlign,
     required this.textDirection,
+    required this.textStyle,
     required this.whitespace,
   }) : _deps = deps;
 
@@ -48,7 +47,7 @@ class HtmlStyle {
 
     return HtmlStyle._(
       deps: deps,
-      style: textStyle,
+      textStyle: textStyle,
       textDirection: _getDependency<TextDirection>(deps),
       whitespace: CssWhitespace.normal,
     );
@@ -58,18 +57,18 @@ class HtmlStyle {
   HtmlStyle copyWith({
     GestureRecognizer? gestureRecognizer,
     HtmlStyle? parent,
-    TextStyle? style,
     TextAlign? textAlign,
     TextDirection? textDirection,
+    TextStyle? textStyle,
     CssWhitespace? whitespace,
   }) {
     return HtmlStyle._(
       deps: _deps,
       gestureRecognizer: gestureRecognizer ?? this.gestureRecognizer,
       parent: parent ?? this.parent,
-      style: style ?? this.style,
       textAlign: textAlign ?? this.textAlign,
       textDirection: textDirection ?? this.textDirection,
+      textStyle: textStyle ?? this.textStyle,
       whitespace: whitespace ?? this.whitespace,
     );
   }
@@ -169,8 +168,8 @@ class HtmlStyleBuilder {
   HtmlStyleBuilder sub() => HtmlStyleBuilder(this);
 
   @override
-  String toString() =>
-      'tsb#$hashCode${parent != null ? '(parent=#${parent.hashCode})' : ''}';
+  String toString() => 'styleBuilder#$hashCode'
+      '${parent != null ? '(parent=#${parent.hashCode})' : ''}';
 }
 
 @immutable

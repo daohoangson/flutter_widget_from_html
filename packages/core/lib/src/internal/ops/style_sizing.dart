@@ -10,9 +10,9 @@ const kCssWidth = 'width';
 class DisplayBlockOp extends BuildOp {
   DisplayBlockOp(WidgetFactory wf)
       : super(
-          onWidgets: (meta, widgets) => listOrNull(
+          onWidgets: (tree, widgets) => listOrNull(
             wf
-                .buildColumnPlaceholder(meta, widgets)
+                .buildColumnPlaceholder(tree, widgets)
                 ?.wrapWith((_, w) => w is CssSizing ? w : CssBlock(child: w)),
           ),
           priority: StyleSizing.kPriority7k + 1,
@@ -29,8 +29,8 @@ class StyleSizing {
   StyleSizing(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (meta, tree, _) {
-          final input = _parse(meta);
+        onTreeFlattening: (tree) {
+          final input = _parse(tree);
           if (input == null) {
             return false;
           }
@@ -47,27 +47,25 @@ class StyleSizing {
             }
           }
 
-          widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb));
+          widget?.wrapWith((c, w) => _build(c, w, input, tree.styleBuilder));
           return true;
         },
-        onWidgets: (meta, widgets) {
-          final input = _parse(meta);
+        onWidgets: (tree, widgets) {
+          final input = _parse(tree);
           if (input == null) {
             return widgets;
           }
 
-          return listOrNull(
-                wf
-                    .buildColumnPlaceholder(meta, widgets)
-                    ?.wrapWith((c, w) => _build(c, w, input, meta.tsb)),
-              ) ??
-              widgets;
+          final built = wf.buildColumnPlaceholder(tree, widgets)?.wrapWith(
+                (c, w) => _build(c, w, input, tree.styleBuilder),
+              );
+          return listOrNull(built) ?? widgets;
         },
         onWidgetsIsOptional: true,
         priority: kPriority7k,
       );
 
-  _StyleSizingInput? _parse(BuildMetadata meta) {
+  _StyleSizingInput? _parse(BuildTree tree) {
     CssLength? maxHeight;
     CssLength? maxWidth;
     CssLength? minHeight;
@@ -76,7 +74,7 @@ class StyleSizing {
     CssLength? preferredHeight;
     CssLength? preferredWidth;
 
-    for (final style in meta.styles) {
+    for (final style in tree.styles) {
       final value = style.value;
       if (value == null) {
         continue;
@@ -86,7 +84,7 @@ class StyleSizing {
         case kCssHeight:
           final parsedHeight = tryParseCssLength(value);
           if (parsedHeight != null) {
-            if (_treatHeightAsMinHeight[meta] == true) {
+            if (_treatHeightAsMinHeight[tree] == true) {
               minHeight = parsedHeight;
             } else {
               preferredAxis = Axis.vertical;
@@ -126,7 +124,7 @@ class StyleSizing {
     }
 
     if (preferredWidth == null &&
-        meta.buildOps.whereType<DisplayBlockOp>().isNotEmpty) {
+        tree.buildOps.whereType<DisplayBlockOp>().isNotEmpty) {
       // `display: block` implies a 100% width
       // but it MUST NOT reset width value if specified
       // we need to keep track of block width to calculate contraints correctly
@@ -145,35 +143,35 @@ class StyleSizing {
     );
   }
 
-  static void treatHeightAsMinHeight(BuildMetadata meta) =>
-      _treatHeightAsMinHeight[meta] = true;
+  static void treatHeightAsMinHeight(BuildTree tree) =>
+      _treatHeightAsMinHeight[tree] = true;
 
   static Widget _build(
     BuildContext context,
     Widget child,
     _StyleSizingInput input,
-    HtmlStyleBuilder tsb,
+    HtmlStyleBuilder styleBuilder,
   ) {
-    final tsh = tsb.build(context);
+    final style = styleBuilder.build(context);
 
     return CssSizing(
-      maxHeight: _getValue(input.maxHeight, tsh),
-      maxWidth: _getValue(input.maxWidth, tsh),
-      minHeight: _getValue(input.minHeight, tsh),
-      minWidth: _getValue(input.minWidth, tsh),
+      maxHeight: _getValue(input.maxHeight, style),
+      maxWidth: _getValue(input.maxWidth, style),
+      minHeight: _getValue(input.minHeight, style),
+      minWidth: _getValue(input.minWidth, style),
       preferredAxis: input.preferredAxis,
-      preferredHeight: _getValue(input.preferredHeight, tsh),
-      preferredWidth: _getValue(input.preferredWidth, tsh),
+      preferredHeight: _getValue(input.preferredHeight, style),
+      preferredWidth: _getValue(input.preferredWidth, style),
       child: child,
     );
   }
 
-  static CssSizingValue? _getValue(CssLength? length, HtmlStyle tsh) {
+  static CssSizingValue? _getValue(CssLength? length, HtmlStyle style) {
     if (length == null) {
       return null;
     }
 
-    final value = length.getValue(tsh);
+    final value = length.getValue(style);
     if (value != null) {
       return CssSizingValue.value(value);
     }
