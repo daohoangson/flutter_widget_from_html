@@ -99,9 +99,8 @@ class TagLi {
   Widget _buildItem(BuildContext context, Widget child, int i) {
     final config = _config;
     final itemTree = _itemTrees[i];
-    final listStyleType =
-        _ListConfig.listStyleTypeFromBuildMetadata(itemTree) ??
-            config.listStyleType;
+    final listStyleType = _ListConfig.listStyleTypeFromBuildTree(itemTree) ??
+        config.listStyleType;
     final markerIndex = config.markerReversed
         ? (config.markerStart ?? _itemWidgets.length) - i
         : (config.markerStart ?? 1) + i;
@@ -143,7 +142,7 @@ class _ListConfig {
     );
   }
 
-  static String? listStyleTypeFromBuildMetadata(BuildTree tree) {
+  static String? listStyleTypeFromBuildTree(BuildTree tree) {
     final listStyleType = tree[kCssListStyleType]?.term;
     if (listStyleType != null) {
       return listStyleType;
