@@ -1,8 +1,6 @@
 import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart'
-    show CircularProgressIndicator, Theme, ThemeData, Tooltip;
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 import 'core_data.dart';
 import 'core_helpers.dart';
@@ -188,11 +186,8 @@ class WidgetFactory {
     }
   }
 
-  /// Builds 1-pixel-height divider.
-  Widget? buildDivider(BuildTree tree) => const DecoratedBox(
-        decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 1)),
-        child: SizedBox(height: 1),
-      );
+  /// Builds [Divider].
+  Widget? buildDivider(BuildTree tree) => const Divider();
 
   /// Builds [GestureDetector].
   ///
@@ -762,11 +757,8 @@ class WidgetFactory {
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin + kSuffixBottom] = '1em'
           ..register(
-            _tagHr ??= BuildOp(
-              onWidgets: (tree, _) => listOrNull(
-                buildDivider(tree),
-              ),
-            ),
+            _tagHr ??=
+                BuildOp(onWidgets: (tree, _) => listOrNull(buildDivider(tree))),
           );
         break;
 

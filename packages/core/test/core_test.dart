@@ -263,13 +263,7 @@ Future<void> main() async {
   testWidgets('renders HR tag', (WidgetTester tester) async {
     const html = '<hr/>';
     final explained = await explainMargin(tester, html);
-    expect(
-      explained,
-      equals(
-        '[CssBlock:child=[DecoratedBox:bg=#FF000000,child=[SizedBox:0.0x1.0]]],'
-        '[SizedBox:0.0x10.0]',
-      ),
-    );
+    expect(explained, equals('[CssBlock:child=[Divider]],[SizedBox:0.0x10.0]'));
   });
 
   group('block elements', () {
