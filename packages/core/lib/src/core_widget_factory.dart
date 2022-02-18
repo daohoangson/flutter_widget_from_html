@@ -665,7 +665,7 @@ class WidgetFactory {
             .enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
         break;
 
-      case kTagBr:
+      case 'br':
         tree.register(_tagBr ??= TagBr(this).buildOp);
         break;
 
@@ -832,7 +832,7 @@ class WidgetFactory {
           ..[kCssMargin] = '1em 0';
         break;
 
-      case kTagQ:
+      case 'q':
         tree.register(_tagQ ??= TagQ(this).buildOp);
         break;
 

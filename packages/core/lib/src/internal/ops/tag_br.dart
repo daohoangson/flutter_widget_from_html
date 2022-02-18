@@ -1,7 +1,5 @@
 part of '../core_ops.dart';
 
-const kTagBr = 'br';
-
 class TagBr {
   final WidgetFactory wf;
 

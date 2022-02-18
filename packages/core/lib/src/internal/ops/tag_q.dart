@@ -1,7 +1,5 @@
 part of '../core_ops.dart';
 
-const kTagQ = 'q';
-
 class TagQ {
   final WidgetFactory wf;
 
