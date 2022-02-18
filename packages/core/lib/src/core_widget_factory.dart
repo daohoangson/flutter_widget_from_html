@@ -36,7 +36,6 @@ class WidgetFactory {
   BuildOp? _styleTextDecoration;
   BuildOp? _styleVerticalAlign;
   BuildOp? _tagA;
-  HtmlStyle Function(HtmlStyle, void)? _tagAColor;
   BuildOp? _tagBr;
   BuildOp? _tagDetails;
   BuildOp? _tagFont;
@@ -617,15 +616,7 @@ class WidgetFactory {
         if (attrs.containsKey(kAttributeAHref)) {
           tree
             ..register(_tagA ??= TagA(this).buildOp)
-            ..styleBuilder.enqueue(
-              _tagAColor ??= (style, _) => style.copyWith(
-                    textStyle: style.textStyle.copyWith(
-                      color:
-                          style.getDependency<ThemeData>().colorScheme.primary,
-                    ),
-                  ),
-              null,
-            );
+            ..styleBuilder.enqueue(TagA.defaultColor, null);
         }
 
         final name = attrs[kAttributeAName];

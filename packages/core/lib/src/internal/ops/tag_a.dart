@@ -32,6 +32,12 @@ class TagA {
         },
       );
 
+  static HtmlStyle defaultColor(HtmlStyle style, void _) => style.copyWith(
+        textStyle: style.textStyle.copyWith(
+          color: style.getDependency<ThemeData>().colorScheme.primary,
+        ),
+      );
+
   static HtmlStyle _builder(HtmlStyle style, GestureRecognizer value) =>
       style.copyWith(gestureRecognizer: value);
 }
