@@ -263,14 +263,16 @@ class Flattener implements Flattened {
 
 extension _BuildBit on BuildBit {
   HtmlStyleBuilder? get effectiveStyleBulder {
-    if (this is! WhitespaceBit) {
-      return styleBuilder;
-    }
-
     // the below code will find the best style for this whitespace bit
     // easy case: whitespace at the beginning of a tag, use the previous style
     final parent = this.parent;
-    if (parent == null || this == parent.first) {
+    if (parent == null) {
+      return null;
+    }
+    if (this is! WhitespaceBit) {
+      return parent.styleBuilder;
+    }
+    if (this == parent.first) {
       return null;
     }
 
@@ -285,7 +287,7 @@ extension _BuildBit on BuildBit {
         }
 
         if (tree.parent == next.parent) {
-          return next.styleBuilder;
+          return next.parent!.styleBuilder;
         } else {
           return null;
         }

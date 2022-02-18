@@ -120,6 +120,14 @@ class TagLi {
   }
 }
 
+extension _BuildTreeTagLi on BuildTree {
+  static final _depths = Expando<int>();
+
+  int get depth => _depths[this] ?? 0;
+
+  set depth(int value) => _depths[this] = value;
+}
+
 @immutable
 class _ListConfig {
   final String listStyleType;
@@ -169,12 +177,4 @@ class _ListConfig {
 
     return null;
   }
-}
-
-extension _ListTree on BuildTree {
-  static final _depths = Expando<int>();
-
-  int get depth => _depths[this] ?? 0;
-
-  set depth(int value) => _depths[this] = value;
 }

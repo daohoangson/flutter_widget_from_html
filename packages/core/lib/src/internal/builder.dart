@@ -18,60 +18,30 @@ final _regExpSpaceTrailing = RegExp('$_asciiWhitespace+\$', unicode: true);
 final _regExpSpaces = RegExp('$_asciiWhitespace+', unicode: true);
 
 class Builder extends BuildTree {
-  static final _buildOps = Expando<Set<_BuilderOp>>();
-
   final CustomStylesBuilder? customStylesBuilder;
   final CustomWidgetBuilder? customWidgetBuilder;
-
-  @override
-  final dom.Element element;
-
-  final Iterable<_BuilderOp> _parentOps;
-
-  final _styles = <css.Declaration>[];
-
+  final Iterable<BuilderOp> parentOps;
   final WidgetFactory wf;
 
-  final HtmlStyleBuilder _styleBuilder;
+  final _buildOps = SplayTreeSet<BuilderOp>(BuilderOp._compare);
+  final _styles = <css.Declaration>[];
 
-  factory Builder({
-    CustomStylesBuilder? customStylesBuilder,
-    CustomWidgetBuilder? customWidgetBuilder,
+  Builder({
+    required this.customStylesBuilder,
+    required this.customWidgetBuilder,
     required dom.Element element,
-    required HtmlStyleBuilder styleBuilder,
-    required WidgetFactory wf,
-  }) =>
-      Builder._(
-        customStylesBuilder: customStylesBuilder,
-        customWidgetBuilder: customWidgetBuilder,
-        element: element,
-        styleBuilder: styleBuilder,
-        wf: wf,
-      );
-
-  Builder._({
-    this.customStylesBuilder,
-    this.customWidgetBuilder,
-    required this.element,
     BuildTree? parent,
-    Iterable<_BuilderOp> parentOps = const [],
+    this.parentOps = const [],
     required HtmlStyleBuilder styleBuilder,
     required this.wf,
-  })  : _parentOps = parentOps,
-        _styleBuilder = styleBuilder,
-        super(parent);
-
-  @override
-  Iterable<BuildOp> get buildOps =>
-      _buildOpSet?.map(_BuilderOp._unwrap) ?? const [];
-
-  Set<_BuilderOp>? get _buildOpSet => _buildOps[this];
+  }) : super(
+          element: element,
+          parent: parent,
+          styleBuilder: styleBuilder,
+        );
 
   @override
   Iterable<css.Declaration> get styles => _styles;
-
-  @override
-  HtmlStyleBuilder get styleBuilder => _styleBuilder;
 
   @override
   void operator []=(String key, String value) {
@@ -96,22 +66,16 @@ class Builder extends BuildTree {
       _addBitsFromNode(domNode);
     }
 
-    final ops = _buildOpSet;
-    if (ops != null) {
-      for (final op in ops) {
-        op.onTree();
-      }
+    for (final op in _buildOps) {
+      op.onTree();
     }
   }
 
   @override
   Iterable<WidgetPlaceholder> build() {
     var widgets = Flattener(wf, this).widgets;
-    final ops = _buildOpSet;
-    if (ops != null) {
-      for (final op in ops) {
-        widgets = op.onWidgets(widgets) ?? widgets;
-      }
+    for (final op in _buildOps) {
+      widgets = op.onWidgets(widgets) ?? widgets;
     }
 
     final thisAnchors = anchors;
@@ -147,33 +111,27 @@ class Builder extends BuildTree {
     HtmlStyleBuilder? styleBuilder,
   }) {
     final p = parent ?? this.parent;
-    final sb = styleBuilder ?? _styleBuilder.copyWith(parent: p?.styleBuilder);
-    final copied = Builder._(
+    final sb =
+        styleBuilder ?? this.styleBuilder.copyWith(parent: p?.styleBuilder);
+    final copied = Builder(
       customStylesBuilder: customStylesBuilder,
       customWidgetBuilder: customWidgetBuilder,
       element: element ?? this.element,
       parent: p,
-      parentOps: p is Builder ? _prepareParentOps(p._parentOps, p) : const [],
+      parentOps: p is Builder ? _prepareParentOps(p.parentOps, p) : const [],
       styleBuilder: sb,
       wf: wf,
     );
 
     if (copyContents) {
+      copyTo(copied);
+
       for (final bit in children) {
         copied.append(bit.copyWith(parent: copied));
       }
 
-      for (final value in values) {
-        copied.value(value);
-      }
-
-      final ops = _buildOpSet;
-      if (ops != null) {
-        final copiedOps = _BuilderOp._newSet();
-        for (final op in ops) {
-          copiedOps.add(_BuilderOp(copied, op.op));
-        }
-        _buildOps[copied] = copiedOps;
+      for (final op in _buildOps) {
+        copied.register(op.op);
       }
 
       copied._styles.addAll(_styles);
@@ -184,31 +142,20 @@ class Builder extends BuildTree {
 
   @override
   void flatten(Flattened _) {
-    final ops = _buildOpSet;
-    if (ops != null) {
-      for (final op in ops) {
-        op.onTreeFlattening();
-      }
+    for (final op in _buildOps) {
+      op.onTreeFlattening();
     }
   }
 
   @override
-  void register(BuildOp op) {
-    final existingSet = _buildOpSet;
-    final op0 = _BuilderOp(this, op);
-    if (existingSet != null) {
-      existingSet.add(op0);
-    } else {
-      _buildOps[this] = _BuilderOp._newSet()..add(op0);
-    }
-  }
+  void register(BuildOp op) => _buildOps.add(BuilderOp._(this, op));
 
   @override
   Builder sub({dom.Element? element}) => copyWith(
         copyContents: false,
         element: element,
         parent: this,
-        styleBuilder: _styleBuilder.sub(),
+        styleBuilder: styleBuilder.sub(),
       );
 
   void _addBitsFromNode(dom.Node domNode) {
@@ -232,7 +179,7 @@ class Builder extends BuildTree {
       .._collectMetadata()
       ..addBitsFromNodes(element.nodes);
 
-    if (subTree.buildOps.where(_opRequiresBuildingSubtree).isNotEmpty) {
+    if (subTree._buildOps.where(_opRequiresBuildingSubtree).isNotEmpty) {
       for (final widget in subTree.build()) {
         append(WidgetBit.block(this, widget));
       }
@@ -291,18 +238,15 @@ class Builder extends BuildTree {
   void _collectMetadata() {
     wf.parse(this);
 
-    for (final op in _parentOps) {
+    for (final op in parentOps) {
       op.onChild(this);
     }
 
     // stylings, step 1: get default styles from tag-based build ops
-    final ops = _buildOpSet;
-    if (ops != null) {
-      for (final op in ops) {
-        final defaultStyles = op.defaultStyles;
-        if (defaultStyles != null) {
-          _styles.insertAll(0, defaultStyles);
-        }
+    for (final op in _buildOps) {
+      final defaultStyles = op.defaultStyles;
+      if (defaultStyles != null) {
+        _styles.insertAll(0, defaultStyles);
       }
     }
 
@@ -336,12 +280,13 @@ class Builder extends BuildTree {
   }
 }
 
-class _BuilderOp {
+class BuilderOp {
   final BuildOp op;
-  _BuilderType? type;
   final Builder tree;
 
-  _BuilderOp(this.tree, this.op);
+  _BuilderType? _type;
+
+  BuilderOp._(this.tree, this.op);
 
   List<css.Declaration>? get defaultStyles {
     final map = op.defaultStyles?.call(tree.element);
@@ -359,35 +304,35 @@ class _BuilderOp {
   void onTree() => op.onTree?.call(tree);
 
   bool onTreeFlattening() {
-    if (type == _BuilderType.onWidgets) {
+    if (_type == _BuilderType.onWidgets) {
       return false;
     }
 
-    final prevType = type;
-    type = _BuilderType.onTreeFlattening;
+    final prevType = _type;
+    _type = _BuilderType.onTreeFlattening;
 
     final result = op.onTreeFlattening?.call(tree) ?? false;
     if (!result) {
-      type = prevType;
+      _type = prevType;
     }
 
     return result;
   }
 
   Iterable<WidgetPlaceholder>? onWidgets(Iterable<WidgetPlaceholder> widgets) {
-    if (type == _BuilderType.onTreeFlattening) {
+    if (_type == _BuilderType.onTreeFlattening) {
       return null;
     }
 
-    final prevType = type;
-    type = _BuilderType.onWidgets;
+    final prevType = _type;
+    _type = _BuilderType.onWidgets;
 
     final result = op.onWidgets
         ?.call(tree, widgets)
         ?.map(WidgetPlaceholder.lazy)
         .toList(growable: false);
     if (result == null) {
-      type = prevType;
+      _type = prevType;
     }
 
     return result;
@@ -398,7 +343,7 @@ class _BuilderOp {
     return '_BuilderOp#${op.hashCode}';
   }
 
-  static int _compare(_BuilderOp a0, _BuilderOp b0) {
+  static int _compare(BuilderOp a0, BuilderOp b0) {
     final a = a0.op;
     final b = b0.op;
     if (identical(a, b)) {
@@ -415,10 +360,6 @@ class _BuilderOp {
       return cmp;
     }
   }
-
-  static Set<_BuilderOp> _newSet() => SplayTreeSet<_BuilderOp>(_compare);
-
-  static BuildOp _unwrap(_BuilderOp _) => _.op;
 }
 
 enum _BuilderType {
@@ -426,18 +367,18 @@ enum _BuilderType {
   onWidgets,
 }
 
-bool _opRequiresBuildingSubtree(BuildOp op) =>
-    op.onWidgets != null && !op.onWidgetsIsOptional;
+bool _opRequiresBuildingSubtree(BuilderOp op) =>
+    op.op.onWidgets != null && !op.op.onWidgetsIsOptional;
 
-Iterable<_BuilderOp> _prepareParentOps(
-  Iterable<_BuilderOp> ops,
+Iterable<BuilderOp> _prepareParentOps(
+  Iterable<BuilderOp> ops,
   Builder builder,
 ) {
   // try to reuse existing list if possible
-  final newOps = builder._buildOpSet
-      ?.where((op) => op.op.onChild != null)
+  final newOps = builder._buildOps
+      .where((op) => op.op.onChild != null)
       .toList(growable: false);
-  return newOps?.isNotEmpty == true
-      ? List.unmodifiable([...ops, ...newOps!])
+  return newOps.isNotEmpty == true
+      ? List.unmodifiable([...ops, ...newOps])
       : ops;
 }

@@ -84,9 +84,6 @@ abstract class BuildBit {
   /// By default, do swallow if not [isInline].
   bool? get swallowWhitespace => !isInline;
 
-  /// The associated [HtmlStyle] builder.
-  HtmlStyleBuilder get styleBuilder => parent!.styleBuilder;
-
   /// Creates a copy with the given fields replaced with the new values.
   BuildBit copyWith({BuildTree? parent});
 
@@ -94,7 +91,7 @@ abstract class BuildBit {
   void flatten(Flattened f);
 
   @override
-  String toString() => '$runtimeType#$hashCode $styleBuilder';
+  String toString() => '$runtimeType#$hashCode';
 }
 
 /// A tree of [BuildBit]s.
@@ -106,14 +103,20 @@ abstract class BuildTree extends BuildBit {
   /// The list of direct children.
   Iterable<BuildBit> get children => _children;
 
+  /// The associated DOM element.
+  final dom.Element element;
+
+  /// The associated [HtmlStyle] builder.
+  final HtmlStyleBuilder styleBuilder;
+
   final _values = <dynamic>[];
 
-  /// The list of all values.
-  @protected
-  Iterable<dynamic> get values => _values;
-
   /// Creates a tree.
-  BuildTree(BuildTree? parent) : super(parent);
+  BuildTree({
+    required this.element,
+    BuildTree? parent,
+    required this.styleBuilder,
+  }) : super(parent);
 
   /// The list of bits including direct children and sub-tree's.
   Iterable<BuildBit> get bits sync* {
@@ -125,12 +128,6 @@ abstract class BuildTree extends BuildBit {
       }
     }
   }
-
-  /// The registered build ops.
-  Iterable<BuildOp> get buildOps;
-
-  /// The associated DOM element.
-  dom.Element get element;
 
   /// The first bit (recursively).
   BuildBit? get first {
@@ -210,6 +207,11 @@ abstract class BuildTree extends BuildBit {
 
   /// Builds widgets from bits.
   Iterable<WidgetPlaceholder> build();
+
+  @protected
+  void copyTo(BuildTree target) {
+    target._values.addAll(_values);
+  }
 
   /// Prepends [bit].
   ///

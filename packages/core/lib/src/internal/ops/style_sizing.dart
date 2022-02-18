@@ -30,7 +30,7 @@ class StyleSizing {
 
   BuildOp get buildOp => BuildOp(
         onTreeFlattening: (tree) {
-          final input = _parse(tree);
+          final input = _parse(tree, isDisplayBlock: false);
           if (input == null) {
             return false;
           }
@@ -51,7 +51,7 @@ class StyleSizing {
           return true;
         },
         onWidgets: (tree, widgets) {
-          final input = _parse(tree);
+          final input = _parse(tree, isDisplayBlock: true);
           if (input == null) {
             return widgets;
           }
@@ -65,7 +65,7 @@ class StyleSizing {
         priority: kPriority7k,
       );
 
-  _StyleSizingInput? _parse(BuildTree tree) {
+  _StyleSizingInput? _parse(BuildTree tree, {required bool isDisplayBlock}) {
     CssLength? maxHeight;
     CssLength? maxWidth;
     CssLength? minHeight;
@@ -123,8 +123,7 @@ class StyleSizing {
       return null;
     }
 
-    if (preferredWidth == null &&
-        tree.buildOps.whereType<DisplayBlockOp>().isNotEmpty) {
+    if (preferredWidth == null && isDisplayBlock) {
       // `display: block` implies a 100% width
       // but it MUST NOT reset width value if specified
       // we need to keep track of block width to calculate contraints correctly

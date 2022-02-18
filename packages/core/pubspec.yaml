@@ -23,6 +23,7 @@ dev_dependencies:
     sdk: flutter
   golden_toolkit: ^0.12.0
   lint: any
+  mocktail: any
   mocktail_image_network: ^0.2.0
   test: any
 

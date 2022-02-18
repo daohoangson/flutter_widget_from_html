@@ -73,7 +73,7 @@ class TagVideo {
   }
 }
 
-extension _BuildTree on BuildTree {
+extension _BuildTreeTagVideo on BuildTree {
   static final _sourceUrls = Expando<List<String>>();
 
   List<String> get sourceUrls => _sourceUrls[this] ?? [];
