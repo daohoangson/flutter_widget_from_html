@@ -187,10 +187,6 @@ abstract class BuildTree extends BuildBit {
   css.Declaration? operator [](String key);
 
   /// Appends [bit].
-  @Deprecated('Use append instead')
-  T add<T extends BuildBit>(T bit) => append(bit);
-
-  /// Appends [bit].
   ///
   /// See also: [prepend].
   T append<T extends BuildBit>(T bit) {
