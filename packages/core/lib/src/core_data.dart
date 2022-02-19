@@ -62,11 +62,17 @@ class BuildOp {
   /// The callback that will be called before flattening.
   ///
   /// This is the last chance to modify the [BuildTree] before inline rendering.
+  ///
+  /// If an op has both this callback and [onWidgets], it will be skipped if
+  /// the other callback returns a non-null result.
   final void Function(BuildTree tree)? onTreeFlattening;
 
   /// The callback that will be called when child elements have been built.
   ///
-  /// Note: only works if it's a block element.
+  /// This only works if it's a block element.
+  ///
+  /// If an op has both this callback and [onTreeFlattening], returning
+  /// a non-null result will skip the other callback.
   final Iterable<Widget>? Function(
     BuildTree tree,
     Iterable<WidgetPlaceholder> widgets,

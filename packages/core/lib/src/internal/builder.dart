@@ -264,7 +264,7 @@ class BuilderOp {
   final BuildOp op;
   final Builder tree;
 
-  _BuilderType? _type;
+  var _onWidgets = false;
 
   BuilderOp._(this.tree, this.op);
 
@@ -284,7 +284,7 @@ class BuilderOp {
   void onTree() => op.onTree?.call(tree);
 
   void onTreeFlattening() {
-    if (_type == _BuilderType.onWidgets) {
+    if (_onWidgets) {
       return;
     }
 
@@ -292,27 +292,16 @@ class BuilderOp {
   }
 
   Iterable<WidgetPlaceholder>? onWidgets(Iterable<WidgetPlaceholder> widgets) {
-    if (_type == _BuilderType.onTreeFlattening) {
-      return null;
-    }
-
-    final prevType = _type;
-    _type = _BuilderType.onWidgets;
-
     final result = op.onWidgets
         ?.call(tree, widgets)
         ?.map(WidgetPlaceholder.lazy)
         .toList(growable: false);
-    if (result == null) {
-      _type = prevType;
+
+    if (result != null) {
+      _onWidgets = true;
     }
 
     return result;
-  }
-
-  @override
-  String toString() {
-    return '_BuilderOp#${op.hashCode}';
   }
 
   static int _compare(BuilderOp a0, BuilderOp b0) {
@@ -332,11 +321,6 @@ class BuilderOp {
       return cmp;
     }
   }
-}
-
-enum _BuilderType {
-  onTreeFlattening,
-  onWidgets,
 }
 
 bool _opRequiresBuildingSubtree(BuilderOp op) =>
