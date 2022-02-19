@@ -35,28 +35,29 @@ class Flattener implements Flattened {
   void inlineWidget({
     PlaceholderAlignment alignment = PlaceholderAlignment.bottom,
     TextBaseline baseline = TextBaseline.alphabetic,
-    required Widget child,
+    required WidgetPlaceholder child,
   }) {
     _saveSpan();
 
+    final scopedTree = _bit.parent!;
     final scopedStyleBuilder = _styleBuilder;
 
+    child.wrapWith((context, widget) {
+      final style = scopedStyleBuilder.build(context);
+      final recognizer = style.gestureRecognizer;
+      if (recognizer != null && _needsInlineRecognizer(context, style)) {
+        return wf.buildGestureDetector(scopedTree, widget, recognizer);
+      }
+
+      return widget;
+    });
+
     _childrenBuilder?.add(
-      (context, {bool? isLast}) {
-        final style = scopedStyleBuilder.build(context);
-
-        Widget? detector;
-        final recognizer = style.gestureRecognizer;
-        if (recognizer != null && _needsInlineRecognizer(context, style)) {
-          detector = wf.buildGestureDetector(tree, child, recognizer);
-        }
-
-        return WidgetSpan(
-          alignment: alignment,
-          baseline: baseline,
-          child: detector ?? child,
-        );
-      },
+      (_, {bool? isLast}) => WidgetSpan(
+        alignment: alignment,
+        baseline: baseline,
+        child: child,
+      ),
     );
   }
 
