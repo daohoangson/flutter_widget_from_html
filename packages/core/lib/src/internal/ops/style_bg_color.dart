@@ -13,17 +13,16 @@ class StyleBgColor {
   BuildOp get buildOp => BuildOp(
         onTreeFlattening: (tree) {
           if (_skipBuilding[tree] == true) {
-            return false;
+            return;
           }
 
           final bgColor = _parseColor(wf, tree);
           if (bgColor == null) {
-            return false;
+            return;
           }
 
           _skipBuilding[tree] = true;
           tree.styleBuilder.enqueue(_builder, bgColor);
-          return true;
         },
         onWidgets: (tree, widgets) {
           if (_skipBuilding[tree] == true || widgets.isEmpty) {

@@ -72,35 +72,14 @@ class Builder extends BuildTree {
   }
 
   @override
-  Iterable<WidgetPlaceholder> build() {
+  WidgetPlaceholder? build() {
     var widgets = Flattener(wf, this).widgets;
     for (final op in _buildOps) {
       widgets = op.onWidgets(widgets) ?? widgets;
     }
 
-    final thisAnchors = anchors;
-    if (thisAnchors != null) {
-      var needsColumn = false;
-      for (final widget in widgets) {
-        if (widget.anchors == null) {
-          // the current tree has some anchors
-          // but at least one of its widgets doesn't self-announce
-          // we need a column to wrap things and announce up the chain
-          needsColumn = true;
-          break;
-        }
-      }
-
-      if (needsColumn) {
-        widgets = listOrNull(
-              wf.buildColumnPlaceholder(this, widgets)
-                ?..setAnchorsIfUnset(thisAnchors),
-            ) ??
-            const [];
-      }
-    }
-
-    return widgets;
+    return wf.buildColumnPlaceholder(this, widgets)
+      ?..setAnchorsIfUnset(anchors);
   }
 
   @override
@@ -180,8 +159,9 @@ class Builder extends BuildTree {
       ..addBitsFromNodes(element.nodes);
 
     if (subTree._buildOps.where(_opRequiresBuildingSubtree).isNotEmpty) {
-      for (final widget in subTree.build()) {
-        append(WidgetBit.block(this, widget));
+      final builtSubTree = subTree.build();
+      if (builtSubTree != null) {
+        append(WidgetBit.block(this, builtSubTree));
       }
     } else {
       append(subTree);
@@ -303,20 +283,12 @@ class BuilderOp {
 
   void onTree() => op.onTree?.call(tree);
 
-  bool onTreeFlattening() {
+  void onTreeFlattening() {
     if (_type == _BuilderType.onWidgets) {
-      return false;
+      return;
     }
 
-    final prevType = _type;
-    _type = _BuilderType.onTreeFlattening;
-
-    final result = op.onTreeFlattening?.call(tree) ?? false;
-    if (!result) {
-      _type = prevType;
-    }
-
-    return result;
+    op.onTreeFlattening?.call(tree);
   }
 
   Iterable<WidgetPlaceholder>? onWidgets(Iterable<WidgetPlaceholder> widgets) {

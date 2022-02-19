@@ -22,7 +22,7 @@ class StyleMargin {
         onTreeFlattening: (tree) {
           final margin = tryParseCssLengthBox(tree, kCssMargin);
           if (margin == null) {
-            return false;
+            return;
           }
 
           if (margin.mayHaveLeft) {
@@ -34,8 +34,6 @@ class StyleMargin {
             final after = _paddingInlineAfter(tree.styleBuilder, margin);
             tree.append(WidgetBit.inline(tree, after));
           }
-
-          return true;
         },
         onWidgets: (tree, widgets) {
           final m = tryParseCssLengthBox(tree, kCssMargin);

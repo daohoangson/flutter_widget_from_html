@@ -13,28 +13,34 @@ class StyleVerticalAlign {
 
   final WidgetFactory wf;
 
-  StyleVerticalAlign(this.wf);
+  late final BuildOp inlineOp;
+  late final BuildOp blockOp;
 
-  BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (tree) {
-          final v = tree[kCssVerticalAlign]?.term;
-          if (v == null || v == kCssVerticalAlignBaseline) {
-            return false;
-          }
+  static final _skipBuilding = Expando<bool>();
 
-          final alignment = _tryParsePlaceholderAlignment(v);
-          if (alignment == null) {
-            return false;
-          }
+  StyleVerticalAlign(this.wf) {
+    inlineOp = BuildOp(
+      onTreeFlattening: (tree) {
+        final v = tree[kCssVerticalAlign]?.term;
+        if (v == null || v == kCssVerticalAlignBaseline) {
+          return;
+        }
 
-          final built = _buildTree(tree);
-          if (built == null) {
-            return false;
-          }
+        final alignment = _tryParsePlaceholderAlignment(v);
+        if (alignment == null) {
+          return;
+        }
 
-          if (v == kCssVerticalAlignSub || v == kCssVerticalAlignSuper) {
-            built.wrapWith(
-              (context, child) => _buildPaddedAlign(
+        _skipBuilding[tree] = true;
+        final built = tree.build();
+        if (built == null) {
+          return;
+        }
+
+        if (v == kCssVerticalAlignSub || v == kCssVerticalAlignSuper) {
+          built.wrapWith(
+            (context, child) {
+              return _buildPaddedAlign(
                 context,
                 tree,
                 child,
@@ -42,55 +48,46 @@ class StyleVerticalAlign {
                   bottom: v == kCssVerticalAlignSuper ? .4 : 0,
                   top: v == kCssVerticalAlignSub ? .4 : 0,
                 ),
-              ),
-            );
-          }
+              );
+            },
+          );
+        }
 
-          tree.replaceWith(WidgetBit.inline(tree, built, alignment: alignment));
-          return true;
-        },
-        onWidgets: (tree, widgets) {
-          if (widgets.isEmpty) {
-            return null;
-          }
+        tree.replaceWith(WidgetBit.inline(tree, built, alignment: alignment));
+      },
+      priority: 0,
+    );
 
-          final v = tree[kCssVerticalAlign]?.term;
-          if (v == null) {
-            return null;
-          }
+    blockOp = BuildOp(
+      onWidgets: (tree, widgets) {
+        if (_skipBuilding[tree] == true || widgets.isEmpty) {
+          return null;
+        }
 
-          return listOrNull(
-                wf
-                    .buildColumnPlaceholder(tree, widgets)
-                    ?.wrapWith((context, child) {
-                  final style = tree.styleBuilder.build(context);
-                  final alignment =
-                      _tryParseAlignmentGeometry(style.textDirection, v);
-                  if (alignment == null) {
-                    return child;
-                  }
+        final v = tree[kCssVerticalAlign]?.term;
+        if (v == null) {
+          return null;
+        }
 
-                  return wf.buildAlign(tree, child, alignment);
-                }),
-              ) ??
-              widgets;
-        },
-        onWidgetsIsOptional: true,
-        priority: kPriority4k3,
-      );
+        return listOrNull(
+              wf
+                  .buildColumnPlaceholder(tree, widgets)
+                  ?.wrapWith((context, child) {
+                final style = tree.styleBuilder.build(context);
+                final alignment =
+                    _tryParseAlignmentGeometry(style.textDirection, v);
+                if (alignment == null) {
+                  return child;
+                }
 
-  WidgetPlaceholder? _buildTree(BuildTree tree) {
-    final bits = tree.bits.toList(growable: false);
-    if (bits.length == 1) {
-      final firstBit = bits.first;
-      if (firstBit is WidgetBit) {
-        // use the first widget if possible
-        // and avoid creating a redundant `RichText`
-        return firstBit.child;
-      }
-    }
-
-    return wf.buildColumnPlaceholder(tree, tree.build());
+                return wf.buildAlign(tree, child, alignment);
+              }),
+            ) ??
+            widgets;
+      },
+      onWidgetsIsOptional: true,
+      priority: kPriority4k3,
+    );
   }
 
   Widget? _buildPaddedAlign(

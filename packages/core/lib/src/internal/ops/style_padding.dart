@@ -36,7 +36,7 @@ class StylePadding {
         onTreeFlattening: (tree) {
           final padding = tryParseCssLengthBox(tree, kCssPadding);
           if (padding == null) {
-            return false;
+            return;
           }
 
           if (padding.mayHaveLeft) {
@@ -48,8 +48,6 @@ class StylePadding {
             final after = _paddingInlineAfter(tree.styleBuilder, padding);
             tree.append(WidgetBit.inline(tree, after));
           }
-
-          return true;
         },
         onWidgets: (tree, widgets) {
           final padding = tryParseCssLengthBox(tree, kCssPadding);

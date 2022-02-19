@@ -47,28 +47,17 @@ class TagRuby {
             rubyBits.clear();
 
             final rtTree = bit as BuildTree;
-            final placeholder = WidgetPlaceholder(
-              builder: (context, _) {
-                final style = rubyTree.styleBuilder.build(context);
 
-                final ruby = wf.buildColumnWidget(
-                  context,
-                  rubyTree.build().toList(growable: false),
-                  dir: style.getDependency(),
-                );
-                final rt = wf.buildColumnWidget(
-                  context,
-                  rtTree.build().toList(growable: false),
-                  dir: style.getDependency(),
-                );
-
-                return HtmlRuby(ruby, rt);
-              },
-              localName: kTagRuby,
+            list.add(
+              WidgetBit.inline(
+                tree,
+                HtmlRuby(
+                  rubyTree.build() ?? widget0,
+                  rtTree.build() ?? widget0,
+                ),
+                alignment: PlaceholderAlignment.baseline,
+              ),
             );
-
-            const baseline = PlaceholderAlignment.baseline;
-            list.add(WidgetBit.inline(tree, placeholder, alignment: baseline));
           }
 
           // preserve orphan bits if any

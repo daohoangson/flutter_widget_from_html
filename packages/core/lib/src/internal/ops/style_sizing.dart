@@ -32,23 +32,22 @@ class StyleSizing {
         onTreeFlattening: (tree) {
           final input = _parse(tree, isDisplayBlock: false);
           if (input == null) {
-            return false;
+            return;
           }
 
           WidgetPlaceholder? widget;
           for (final b in tree.bits) {
             if (b is WidgetBit) {
               if (widget != null) {
-                return false;
+                return;
               }
               widget = b.child;
             } else {
-              return false;
+              return;
             }
           }
 
           widget?.wrapWith((c, w) => _build(c, w, input, tree.styleBuilder));
-          return true;
         },
         onWidgets: (tree, widgets) {
           final input = _parse(tree, isDisplayBlock: true);

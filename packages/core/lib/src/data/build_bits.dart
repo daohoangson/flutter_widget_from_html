@@ -205,8 +205,8 @@ abstract class BuildTree extends BuildBit {
   /// Adds a string of text.
   TextBit addText(String data) => append(TextBit(this, data));
 
-  /// Builds widgets from bits.
-  Iterable<WidgetPlaceholder> build();
+  /// Builds widget from bits.
+  WidgetPlaceholder? build();
 
   @protected
   void copyTo(BuildTree target) {

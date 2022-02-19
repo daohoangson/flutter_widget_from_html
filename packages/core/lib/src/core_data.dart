@@ -62,7 +62,7 @@ class BuildOp {
   /// The callback that will be called before flattening.
   ///
   /// This is the last chance to modify the [BuildTree] before inline rendering.
-  final bool Function(BuildTree tree)? onTreeFlattening;
+  final void Function(BuildTree tree)? onTreeFlattening;
 
   /// The callback that will be called when child elements have been built.
   ///

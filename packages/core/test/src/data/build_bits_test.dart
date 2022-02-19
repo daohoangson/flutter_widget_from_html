@@ -145,8 +145,8 @@ void main() {
       final text = _text();
       text.addText('1');
 
-      final widgets = text.build();
-      expect(widgets.length, equals(1));
+      final built = text.build();
+      expect(built, isNotNull);
     });
   });
 
@@ -186,7 +186,7 @@ void main() {
       final text2 = _text();
       final copied = bit.copyWith(parent: text2);
       text2.append(copied);
-      expect(text2.build(), equals([child]));
+      expect(text2.build(), equals(child));
     });
 
     test('WidgetBit.inline returns same parent', () {

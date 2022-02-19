@@ -273,10 +273,7 @@ Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
   final rootBuilder = _buildRootBuilder(state);
   rootBuilder.addBitsFromNodes(domNodes);
 
-  return wf
-          .buildColumnPlaceholder(rootBuilder, rootBuilder.build())
-          ?.wrapWith(wf.buildBodyWidget) ??
-      widget0;
+  return rootBuilder.build()?.wrapWith(wf.buildBodyWidget) ?? widget0;
 }
 
 builder.Builder _buildRootBuilder(HtmlWidgetState state) => builder.Builder(

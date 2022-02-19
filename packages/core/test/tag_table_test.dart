@@ -53,7 +53,7 @@ Future<void> main() async {
         explained,
         equals(
           'HtmlStyleWidget\n'
-          '└ColumnPlaceholder(root)\n'
+          '└ColumnPlaceholder(table)\n'
           ' └Column()\n'
           '  ├CssBlock()\n'
           '  │└RichText(textAlign: center, text: "Caption")\n'

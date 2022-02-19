@@ -32,7 +32,7 @@ class WidgetFactory {
   BuildOp? _stylePadding;
   BuildOp? _styleSizing;
   BuildOp? _styleTextDecoration;
-  BuildOp? _styleVerticalAlign;
+  StyleVerticalAlign? _styleVerticalAlign;
   BuildOp? _tagA;
   BuildOp? _tagBr;
   BuildOp? _tagDetails;
@@ -1006,7 +1006,11 @@ class WidgetFactory {
         break;
 
       case kCssVerticalAlign:
-        tree.register(_styleVerticalAlign ??= StyleVerticalAlign(this).buildOp);
+        final styleVerticalAlign =
+            _styleVerticalAlign ??= StyleVerticalAlign(this);
+        tree
+          ..register(styleVerticalAlign.inlineOp)
+          ..register(styleVerticalAlign.blockOp);
         break;
 
       case kCssWhitespace:
@@ -1044,7 +1048,7 @@ class WidgetFactory {
       case kCssDisplayInlineBlock:
         final displayInlineBlock = _styleDisplayInlineBlock ??= BuildOp(
           onTree: (tree) {
-            final built = buildColumnPlaceholder(tree, tree.build());
+            final built = tree.build();
             if (built != null) {
               const align = PlaceholderAlignment.baseline;
               tree.replaceWith(WidgetBit.inline(tree, built, alignment: align));
@@ -1122,8 +1126,6 @@ class WidgetFactory {
 
         const baseline = PlaceholderAlignment.baseline;
         tree.prepend(WidgetBit.inline(tree, widget, alignment: baseline));
-
-        return true;
       },
       onWidgets: (tree, widgets) {
         return listOrNull(
