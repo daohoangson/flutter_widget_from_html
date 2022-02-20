@@ -289,8 +289,8 @@ void main() {
         '      "(2.2.1)"\n'
         '      "(2.2.2)"\n'
         '    "(2.3)"\n'
-        '  WidgetBit.block#7 WidgetPlaceholder\n'
-        '  WidgetBit.inline#8 WidgetPlaceholder\n'
+        '  WidgetBit.block#7 WidgetPlaceholder(root--WidgetBit.block)\n'
+        '  WidgetBit.inline#8 WidgetPlaceholder(root--WidgetBit.inline)\n'
         '  _CustomBit#9\n'
         '  BuildTree#0 (circular)',
       ),

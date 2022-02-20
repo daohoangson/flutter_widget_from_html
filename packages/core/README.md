@@ -234,8 +234,8 @@ The HTML string is parsed into DOM elements and each element is visited once to 
 |      | b. Loop through children elements to prepare `BuildBit`s                 |                                                                                                               |
 | 7    | Inform build ops                                                         | `BuildOp.onTree(BuildTree)`                                                                                   |
 | 8    | a. If not a block element, go to 10                                      |                                                                                                               |
-|      | b. Build widgets from bits using a `Flattener`                           | `BuildOp.onTreeFlattening(BuildTree)`                                                                         |
-| 9    | Inform build ops                                                         | `BuildOp.onWidgets(BuildTree, Iterable<Widget>)`                                                              |
+|      | b. Build widgets from bits using a `Flattener`                           | `BuildOp.onFlattening(BuildTree)`                                                                             |
+| 9    | Inform build ops                                                         | `BuildOp.onBuilt(BuildTree, WidgetPlaceholder)`                                                               |
 | 10   | The end                                                                  |                                                                                                               |
 
 Notes:
@@ -271,9 +271,9 @@ meta.register(BuildOp(
     // can be used to change text, inline contents, etc.
     tree.append(...);
   },
-  onWidgets: (tree, widgets) {
-    // use this to render special widget, wrap children into something else, etc.
-    return widgets.map((widget) => ...);
+  onBuilt: (tree, child) {
+    // use this to render special widget, wrap it into something else, etc.
+    return MyCustomWidget(child: child);
   },
   // depending on the rendering logic, you may need to adjust the execution order to "jump the line"
   priority: 9999,

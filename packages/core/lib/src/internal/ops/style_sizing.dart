@@ -8,13 +8,11 @@ const kCssMinWidth = 'min-width';
 const kCssWidth = 'width';
 
 class DisplayBlockOp extends BuildOp {
-  DisplayBlockOp(WidgetFactory wf)
+  DisplayBlockOp()
       : super(
-          onWidgets: (tree, widgets) => listOrNull(
-            wf
-                .buildColumnPlaceholder(tree, widgets)
-                ?.wrapWith((_, w) => w is CssSizing ? w : CssBlock(child: w)),
-          ),
+          debugLabel: 'display: block',
+          onBuilt: (tree, placeholder) => placeholder
+              .wrapWith((_, w) => w is CssSizing ? w : CssBlock(child: w)),
           priority: StyleSizing.kPriority7k + 1,
         );
 }
@@ -29,36 +27,36 @@ class StyleSizing {
   StyleSizing(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (tree) {
+        debugLabel: 'sizing',
+        onFlattening: (tree) {
           final input = _parse(tree, isDisplayBlock: false);
           if (input == null) {
             return;
           }
 
-          WidgetPlaceholder? widget;
+          WidgetPlaceholder? placeholder;
           for (final b in tree.bits) {
             if (b is WidgetBit) {
-              if (widget != null) {
+              if (placeholder != null) {
                 return;
               }
-              widget = b.child;
+              placeholder = b.child;
             } else {
               return;
             }
           }
 
-          widget?.wrapWith((c, w) => _build(c, w, input, tree.styleBuilder));
+          placeholder
+              ?.wrapWith((ctx, w) => _build(ctx, w, input, tree.styleBuilder));
         },
-        onWidgets: (tree, widgets) {
+        onBuilt: (tree, placeholder) {
           final input = _parse(tree, isDisplayBlock: true);
           if (input == null) {
-            return widgets;
+            return null;
           }
 
-          final built = wf.buildColumnPlaceholder(tree, widgets)?.wrapWith(
-                (c, w) => _build(c, w, input, tree.styleBuilder),
-              );
-          return listOrNull(built) ?? widgets;
+          return placeholder
+              .wrapWith((ctx, w) => _build(ctx, w, input, tree.styleBuilder));
         },
         onWidgetsIsOptional: true,
         priority: kPriority7k,

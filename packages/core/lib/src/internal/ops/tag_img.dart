@@ -11,11 +11,12 @@ const kTagImg = 'img';
 class TagImg {
   final WidgetFactory wf;
 
-  static final _placeholders = Expando<WidgetPlaceholder>();
+  static final _builts = Expando<Widget>();
 
   TagImg(this.wf);
 
   BuildOp get buildOp => BuildOp(
+        debugLabel: kTagImg,
         defaultStyles: (element) {
           final attrs = element.attributes;
           final styles = {
@@ -45,33 +46,18 @@ class TagImg {
             return;
           }
 
-          _placeholders[tree] = WidgetPlaceholder(
-            localName: kTagImg,
-            child: built,
-          );
+          _builts[tree] = built;
         },
-        onTreeFlattening: (tree) {
-          final placeholder = _placeholders[tree];
-          if (placeholder == null) {
+        onFlattening: (tree) {
+          final built = _builts[tree];
+          if (built == null) {
             return;
           }
 
-          tree.append(
-            WidgetBit.inline(
-              tree,
-              placeholder,
-              alignment: PlaceholderAlignment.baseline,
-            ),
-          );
+          const baseline = PlaceholderAlignment.baseline;
+          tree.append(WidgetBit.inline(tree, built, alignment: baseline));
         },
-        onWidgets: (tree, widgets) {
-          final placeholder = _placeholders[tree];
-          if (placeholder == null) {
-            return widgets;
-          }
-
-          return [placeholder];
-        },
+        onBuilt: (tree, _) => _builts[tree],
         onWidgetsIsOptional: true,
       );
 

@@ -20,6 +20,9 @@ class BuildOp {
   /// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER
   static const kPriorityMax = 9007199254740991;
 
+  /// A human-readable description of this op.
+  final String? debugLabel;
+
   /// The execution priority, op with lower priority will run first.
   ///
   /// Default: 10.
@@ -63,20 +66,20 @@ class BuildOp {
   ///
   /// This is the last chance to modify the [BuildTree] before inline rendering.
   ///
-  /// If an op has both this callback and [onWidgets], it will be skipped if
+  /// If an op has both this callback and [onBuilt], it will be skipped if
   /// the other callback returns a non-null result.
-  final void Function(BuildTree tree)? onTreeFlattening;
+  final void Function(BuildTree tree)? onFlattening;
 
   /// The callback that will be called when child elements have been built.
   ///
   /// This only works if it's a block element.
   ///
-  /// If an op has both this callback and [onTreeFlattening], returning
+  /// If an op has both this callback and [onFlattening],returning
   /// a non-null result will skip the other callback.
-  final Iterable<Widget>? Function(
+  final Widget? Function(
     BuildTree tree,
-    Iterable<WidgetPlaceholder> widgets,
-  )? onWidgets;
+    WidgetPlaceholder placeholder,
+  )? onBuilt;
 
   /// Controls whether the element should be forced to be rendered as block.
   ///
@@ -85,12 +88,13 @@ class BuildOp {
 
   /// Creates a build op.
   const BuildOp({
+    this.debugLabel,
+    this.priority = 10,
     this.defaultStyles,
     this.onChild,
     this.onTree,
-    this.onTreeFlattening,
-    this.onWidgets,
+    this.onFlattening,
+    this.onBuilt,
     this.onWidgetsIsOptional = false,
-    this.priority = 10,
   });
 }

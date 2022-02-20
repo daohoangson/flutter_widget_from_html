@@ -11,7 +11,8 @@ class StyleBgColor {
   StyleBgColor(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (tree) {
+        debugLabel: kCssBackground,
+        onFlattening: (tree) {
           if (_skipBuilding[tree] == true) {
             return;
           }
@@ -24,9 +25,9 @@ class StyleBgColor {
           _skipBuilding[tree] = true;
           tree.styleBuilder.enqueue(_builder, bgColor);
         },
-        onWidgets: (tree, widgets) {
-          if (_skipBuilding[tree] == true || widgets.isEmpty) {
-            return widgets;
+        onBuilt: (tree, placeholder) {
+          if (_skipBuilding[tree] == true) {
+            return null;
           }
 
           final color = _parseColor(wf, tree);
@@ -35,13 +36,9 @@ class StyleBgColor {
           }
 
           _skipBuilding[tree] = true;
-          return listOrNull(
-                wf.buildColumnPlaceholder(tree, widgets)?.wrapWith(
-                      (_, child) =>
-                          wf.buildDecoration(tree, child, color: color),
-                    ),
-              ) ??
-              widgets;
+          return placeholder.wrapWith(
+            (_, child) => wf.buildDecoration(tree, child, color: color),
+          );
         },
         onWidgetsIsOptional: true,
         priority: StyleBorder.kPriorityBoxModel5k + 1,

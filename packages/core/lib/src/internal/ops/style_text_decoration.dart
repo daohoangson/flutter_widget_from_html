@@ -17,6 +17,7 @@ class StyleTextDecoration {
   StyleTextDecoration(this.wf);
 
   BuildOp get buildOp => BuildOp(
+        debugLabel: kCssTextDecoration,
         onTree: (tree) {
           for (final style in tree.styles) {
             for (final value in style.values) {

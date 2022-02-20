@@ -10,6 +10,7 @@ class TagA {
   TagA(this.wf);
 
   BuildOp get buildOp => BuildOp(
+        debugLabel: 'a[href]',
         defaultStyles: (_) => const {
           kCssTextDecoration: kCssTextDecorationUnderline,
         },

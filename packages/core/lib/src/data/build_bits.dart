@@ -308,7 +308,13 @@ abstract class WidgetBit<T> extends BuildBit {
 
   /// Creates a block widget.
   static WidgetBit<Widget> block(BuildTree parent, Widget child) =>
-      _WidgetBitBlock(parent, WidgetPlaceholder.lazy(child));
+      _WidgetBitBlock(
+        parent,
+        WidgetPlaceholder.lazy(
+          child,
+          debugLabel: '${parent.element.localName}--WidgetBit.block',
+        ),
+      );
 
   /// Creates an inline widget.
   static WidgetBit<InlineSpan> inline(
@@ -319,7 +325,10 @@ abstract class WidgetBit<T> extends BuildBit {
   }) =>
       _WidgetBitInline(
         parent,
-        WidgetPlaceholder.lazy(child),
+        WidgetPlaceholder.lazy(
+          child,
+          debugLabel: '${parent.element.localName}--WidgetBit.inline',
+        ),
         alignment,
         baseline,
       );
@@ -396,11 +405,11 @@ abstract class Flattened {
   void inlineWidget({
     PlaceholderAlignment alignment = PlaceholderAlignment.bottom,
     TextBaseline baseline = TextBaseline.alphabetic,
-    required WidgetPlaceholder child,
+    required Widget child,
   });
 
   /// Renders block [Widget].
-  void widget(WidgetPlaceholder value);
+  void widget(Widget value);
 
   /// Writes textual contents.
   void write({String? text, String? whitespace});

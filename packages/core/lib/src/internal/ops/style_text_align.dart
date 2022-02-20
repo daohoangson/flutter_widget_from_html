@@ -21,28 +21,27 @@ class StyleTextAlign {
   StyleTextAlign(this.wf, this.value);
 
   BuildOp get buildOp => BuildOp(
+        debugLabel: kCssTextAlign,
         onTree: (tree) => tree.styleBuilder.enqueue(_builder, value),
-        onWidgets: (_, widgets) => _onWidgets(widgets, value),
+        onBuilt: (_, placeholder) => _wrap(placeholder, value),
         onWidgetsIsOptional: true,
         priority: 0,
       );
 
-  static Iterable<Widget> _onWidgets(Iterable<Widget> widgets, String value) {
+  static Widget? _wrap(WidgetPlaceholder placeholder, String value) {
     switch (value) {
       case kCssTextAlignCenter:
       case kCssTextAlignEnd:
       case kCssTextAlignJustify:
       case kCssTextAlignLeft:
       case kCssTextAlignRight:
-        return widgets
-            .map((child) => WidgetPlaceholder.lazy(child).wrapWith(_block));
+        return placeholder.wrapWith(_block);
       case kCssTextAlignMozCenter:
       case kCssTextAlignWebkitCenter:
-        return widgets
-            .map((child) => WidgetPlaceholder.lazy(child).wrapWith(_center));
+        return placeholder.wrapWith(_center);
     }
 
-    return widgets;
+    return null;
   }
 
   static Widget _block(BuildContext _, Widget child) =>

@@ -29,25 +29,26 @@ class TagLi {
 
   final _itemTrees = <BuildTree>[];
   late final BuildOp _itemOp;
-  final _itemWidgets = <WidgetPlaceholder>[];
 
   _ListConfig? __config;
 
   TagLi(this.wf, this.listTree) {
     _itemOp = BuildOp(
-      onWidgets: (itemTree, widgets) {
-        final column = wf.buildColumnPlaceholder(itemTree, widgets) ??
-            WidgetPlaceholder(localName: kTagLi);
-
+      debugLabel: 'list--item',
+      onBuilt: (itemTree, item) {
         final i = _itemTrees.length;
         _itemTrees.add(itemTree);
-        _itemWidgets.add(column);
-        return [column.wrapWith((c, w) => _buildItem(c, w, i))];
+
+        return WidgetPlaceholder(
+          builder: (context, _) => _buildItem(context, item, i),
+          debugLabel: '${itemTree.element.localName}--$i',
+        );
       },
     );
   }
 
   BuildOp get buildOp => BuildOp(
+        debugLabel: 'list',
         defaultStyles: (element) {
           final attrs = element.attributes;
           final depth = listTree.depth;
@@ -87,7 +88,6 @@ class TagLi {
               break;
           }
         },
-        onWidgets: (_, widgets) => widgets,
       );
 
   _ListConfig get _config {
@@ -102,7 +102,7 @@ class TagLi {
     final listStyleType = _ListConfig.listStyleTypeFromBuildTree(itemTree) ??
         config.listStyleType;
     final markerIndex = config.markerReversed
-        ? (config.markerStart ?? _itemWidgets.length) - i
+        ? (config.markerStart ?? _itemTrees.length) - i
         : (config.markerStart ?? 1) + i;
     final style = itemTree.styleBuilder.build(context);
 

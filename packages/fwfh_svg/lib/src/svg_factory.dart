@@ -103,18 +103,23 @@ mixin SvgFactory on WidgetFactory {
 
   @override
   void parse(BuildTree tree) {
-    switch (tree.element.localName) {
+    final localName = tree.element.localName;
+
+    switch (localName) {
       case 'svg':
         tree.register(
           _tagSvg ??= BuildOp(
-            onWidgets: (tree, widgets) {
+            debugLabel: localName,
+            onBuilt: (tree, _) {
+              final source = tree.element.outerHtml;
               final provider = StringPicture(
                 svgAllowDrawingOutsideViewBox
                     ? SvgPicture.svgStringDecoderOutsideViewBoxBuilder
                     : SvgPicture.svgStringDecoderBuilder,
-                tree.element.outerHtml,
+                source,
               );
-              return [_buildSvgPicture(tree, const ImageSource(''), provider)];
+
+              return _buildSvgPicture(tree, ImageSource(source), provider);
             },
           ),
         );

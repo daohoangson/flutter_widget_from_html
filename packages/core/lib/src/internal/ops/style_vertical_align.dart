@@ -20,7 +20,8 @@ class StyleVerticalAlign {
 
   StyleVerticalAlign(this.wf) {
     inlineOp = BuildOp(
-      onTreeFlattening: (tree) {
+      debugLabel: '$kCssVerticalAlign--inline',
+      onFlattening: (tree) {
         final v = tree[kCssVerticalAlign]?.term;
         if (v == null || v == kCssVerticalAlignBaseline) {
           return;
@@ -59,8 +60,9 @@ class StyleVerticalAlign {
     );
 
     blockOp = BuildOp(
-      onWidgets: (tree, widgets) {
-        if (_skipBuilding[tree] == true || widgets.isEmpty) {
+      debugLabel: '$kCssVerticalAlign--block',
+      onBuilt: (tree, placeholder) {
+        if (_skipBuilding[tree] == true) {
           return null;
         }
 
@@ -69,21 +71,15 @@ class StyleVerticalAlign {
           return null;
         }
 
-        return listOrNull(
-              wf
-                  .buildColumnPlaceholder(tree, widgets)
-                  ?.wrapWith((context, child) {
-                final style = tree.styleBuilder.build(context);
-                final alignment =
-                    _tryParseAlignmentGeometry(style.textDirection, v);
-                if (alignment == null) {
-                  return child;
-                }
+        return placeholder.wrapWith((context, child) {
+          final style = tree.styleBuilder.build(context);
+          final alignment = _tryParseAlignmentGeometry(style.textDirection, v);
+          if (alignment == null) {
+            return child;
+          }
 
-                return wf.buildAlign(tree, child, alignment);
-              }),
-            ) ??
-            widgets;
+          return wf.buildAlign(tree, child, alignment);
+        });
       },
       onWidgetsIsOptional: true,
       priority: kPriority4k3,

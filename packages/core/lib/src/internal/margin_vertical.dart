@@ -12,8 +12,8 @@ class HeightPlaceholder extends WidgetPlaceholder {
       : super(
           autoUnwrap: false,
           builder: (c, w) => _build(c, w, height, styleBuilder),
+          debugLabel: 'height',
           key: key,
-          localName: 'height',
         ) {
     _heights.add(height);
   }
