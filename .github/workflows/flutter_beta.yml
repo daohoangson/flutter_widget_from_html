@@ -18,7 +18,7 @@ jobs:
         with:
           channel: beta
       - run: ./tool/test.sh --coverage
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: failures
