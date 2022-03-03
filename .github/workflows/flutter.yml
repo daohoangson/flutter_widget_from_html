@@ -19,7 +19,7 @@ jobs:
       - name: Run flutter format
         run: flutter format --dry-run --set-exit-if-changed .
       - run: ./tool/test.sh --coverage
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: failures

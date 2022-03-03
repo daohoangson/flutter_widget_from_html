@@ -75,7 +75,7 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
 
       - run: flutter test
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: failures
@@ -114,7 +114,7 @@ jobs:
           channel: ${{ matrix.channel }}
       - run: flutter --version
       - run: flutter test
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: failures
