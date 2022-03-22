@@ -84,12 +84,44 @@ void tests() {
       );
     });
 
+    testGoldens('renders -moz-center', (WidgetTester tester) async {
+      const html = '<div style="text-align: -moz-center">_X_</div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals(
+          '[CssBlock:child=[RichText:align=center,(:_X_)]]',
+        ),
+      );
+    });
+
+    testGoldens('renders -webkit-center', (WidgetTester tester) async {
+      const html = '<div style="text-align: -webkit-center">_X_</div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals(
+          '[CssBlock:child=[Center:child=[RichText:align=center,(:_X_)]]]',
+        ),
+      );
+    });
+
     testGoldens('renders end', (WidgetTester tester) async {
       const html = '<div style="text-align: end">__X</div>';
       await explainScreenMatchesGolden(
         tester,
         html,
         equals('[CssBlock:child=[RichText:align=end,(:__X)]]'),
+      );
+    });
+
+    testGoldens('renders end (rtl)', (WidgetTester tester) async {
+      const html =
+          '<div dir="rtl"><div style="text-align: end">__X</div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:align=end,dir=rtl,(:__X)]]'),
       );
     });
 
@@ -113,6 +145,16 @@ void tests() {
       );
     });
 
+    testGoldens('renders left (rtl)', (WidgetTester tester) async {
+      const html =
+          '<div dir="rtl"><div style="text-align: left">X__</div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:align=left,dir=rtl,(:X__)]]'),
+      );
+    });
+
     testGoldens('renders right', (WidgetTester tester) async {
       const html = '<div style="text-align: right">__X</div>';
       await explainScreenMatchesGolden(
@@ -124,12 +166,34 @@ void tests() {
       );
     });
 
+    testGoldens('renders right (rtl)', (WidgetTester tester) async {
+      const html =
+          '<div dir="rtl"><div style="text-align: right">__X</div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals(
+          '[CssBlock:child=[RichText:align=right,dir=rtl,(:__X)]]',
+        ),
+      );
+    });
+
     testGoldens('renders start', (WidgetTester tester) async {
       const html = '<div style="text-align: start">X__</div>';
       await explainScreenMatchesGolden(
         tester,
         html,
         equals('[CssBlock:child=[RichText:(:X__)]]'),
+      );
+    });
+
+    testGoldens('renders start (rtl)', (WidgetTester tester) async {
+      const html =
+          '<div dir="rtl"><div style="text-align: start">X__</div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:dir=rtl,(:X__)]]'),
       );
     });
   });
@@ -156,12 +220,44 @@ void tests() {
       );
     });
 
+    testGoldens('renders -moz-center', (WidgetTester tester) async {
+      const html = '<div style="text-align: -moz-center"><div>_X_</div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:align=center,(:_X_)]]'),
+      );
+    });
+
+    testGoldens('renders -webkit-center', (WidgetTester tester) async {
+      const html =
+          '<div style="text-align: -webkit-center"><div>_X_</div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals(
+          '[CssBlock:child=[Center:child='
+          '[CssBlock:child=[RichText:align=center,(:_X_)]]]]',
+        ),
+      );
+    });
+
     testGoldens('renders end', (WidgetTester tester) async {
       const html = '<div style="text-align: end"><div>__X</div></div>';
       await explainScreenMatchesGolden(
         tester,
         html,
         equals('[CssBlock:child=[RichText:align=end,(:__X)]]'),
+      );
+    });
+
+    testGoldens('renders end (rtl)', (WidgetTester tester) async {
+      const html = '<div dir="rtl"><div style="text-align: end">'
+          '<div>__X</div></div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:align=end,dir=rtl,(:__X)]]'),
       );
     });
 
@@ -183,6 +279,16 @@ void tests() {
       );
     });
 
+    testGoldens('renders left (rtl)', (WidgetTester tester) async {
+      const html = '<div dir="rtl"><div style="text-align: left">'
+          '<div>X__</div></div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:align=left,dir=rtl,(:X__)]]'),
+      );
+    });
+
     testGoldens('renders right', (WidgetTester tester) async {
       const html = '<div style="text-align: right"><div>__X</div></div>';
       await explainScreenMatchesGolden(
@@ -192,12 +298,32 @@ void tests() {
       );
     });
 
+    testGoldens('renders right (rtl)', (WidgetTester tester) async {
+      const html = '<div dir="rtl"><div style="text-align: right">'
+          '<div>__X</div></div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:align=right,dir=rtl,(:__X)]]'),
+      );
+    });
+
     testGoldens('renders start', (WidgetTester tester) async {
       const html = '<div style="text-align: start"><div>X__</div></div>';
       await explainScreenMatchesGolden(
         tester,
         html,
         equals('[CssBlock:child=[RichText:(:X__)]]'),
+      );
+    });
+
+    testGoldens('renders start (rtl)', (WidgetTester tester) async {
+      const html = '<div dir="rtl"><div style="text-align: start">'
+          '<div>X__</div></div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:dir=rtl,(:X__)]]'),
       );
     });
   });
@@ -234,6 +360,38 @@ void tests() {
       );
     });
 
+    testGoldens('renders -moz-center', (WidgetTester tester) async {
+      const html = '<div style="text-align: -moz-center">'
+          '<div>Foo</div><div>_X_</div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals(
+          '[CssBlock:child='
+          '[Column:crossAxisAlignment=center,children='
+          '[CssBlock:child=[RichText:align=center,(:Foo)]],'
+          '[CssBlock:child=[RichText:align=center,(:_X_)]]'
+          ']]',
+        ),
+      );
+    });
+
+    testGoldens('renders -webkit-center', (WidgetTester tester) async {
+      const html = '<div style="text-align: -webkit-center">'
+          '<div>Foo</div><div>_X_</div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals(
+          '[CssBlock:child=[Center:child='
+          '[Column:crossAxisAlignment=center,children='
+          '[CssBlock:child=[RichText:align=center,(:Foo)]],'
+          '[CssBlock:child=[RichText:align=center,(:_X_)]]'
+          ']]]',
+        ),
+      );
+    });
+
     testGoldens('renders end', (WidgetTester tester) async {
       const html =
           '<div style="text-align: end"><div>Foo</div><div>__X</div></div>';
@@ -245,6 +403,22 @@ void tests() {
           '[Column:crossAxisAlignment=end,children='
           '[CssBlock:child=[RichText:align=end,(:Foo)]],'
           '[CssBlock:child=[RichText:align=end,(:__X)]]'
+          ']]',
+        ),
+      );
+    });
+
+    testGoldens('renders end (rtl)', (WidgetTester tester) async {
+      const html = '<div dir="rtl"><div style="text-align: end">'
+          '<div>Foo</div><div>__X</div></div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals(
+          '[CssBlock:child='
+          '[Column:dir=rtl,crossAxisAlignment=end,children='
+          '[CssBlock:child=[RichText:align=end,dir=rtl,(:Foo)]],'
+          '[CssBlock:child=[RichText:align=end,dir=rtl,(:__X)]]'
           ']]',
         ),
       );
@@ -281,6 +455,22 @@ void tests() {
       );
     });
 
+    testGoldens('renders left (rtl)', (WidgetTester tester) async {
+      const html = '<div dir="rtl"><div style="text-align: left">'
+          '<div>Foo</div><div>X__</div></div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals(
+          '[CssBlock:child='
+          '[Column:dir=rtl,crossAxisAlignment=end,children='
+          '[CssBlock:child=[RichText:align=left,dir=rtl,(:Foo)]],'
+          '[CssBlock:child=[RichText:align=left,dir=rtl,(:X__)]]'
+          ']]',
+        ),
+      );
+    });
+
     testGoldens('renders right', (WidgetTester tester) async {
       const html = '<div style="text-align: right">'
           '<div>Foo</div><div>__X</div></div>';
@@ -297,6 +487,21 @@ void tests() {
       );
     });
 
+    testGoldens('renders right (rtl)', (WidgetTester tester) async {
+      const html = '<div dir="rtl"><div style="text-align: right">'
+          '<div>Foo</div><div>__X</div></div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals(
+          '[CssBlock:child=[Column:dir=rtl,children='
+          '[CssBlock:child=[RichText:align=right,dir=rtl,(:Foo)]],'
+          '[CssBlock:child=[RichText:align=right,dir=rtl,(:__X)]]'
+          ']]',
+        ),
+      );
+    });
+
     testGoldens('renders start', (WidgetTester tester) async {
       const html = '<div style="text-align: start">'
           '<div>Foo</div><div>X__</div></div>';
@@ -307,6 +512,21 @@ void tests() {
           '[CssBlock:child=[Column:children='
           '[CssBlock:child=[RichText:(:Foo)]],'
           '[CssBlock:child=[RichText:(:X__)]]'
+          ']]',
+        ),
+      );
+    });
+
+    testGoldens('renders start (rtl)', (WidgetTester tester) async {
+      const html = '<div dir="rtl"><div style="text-align: start">'
+          '<div>Foo</div><div>X__</div></div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals(
+          '[CssBlock:child=[Column:dir=rtl,children='
+          '[CssBlock:child=[RichText:dir=rtl,(:Foo)]],'
+          '[CssBlock:child=[RichText:dir=rtl,(:X__)]]'
           ']]',
         ),
       );
@@ -343,6 +563,37 @@ void tests() {
       );
     });
 
+    testGoldens('renders -moz-center', (WidgetTester tester) async {
+      const html =
+          '<div style="text-align: -moz-center"><div>Foo</div>_X_</div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals(
+          '[CssBlock:child=[Column:crossAxisAlignment=center,children='
+          '[CssBlock:child=[RichText:align=center,(:Foo)]],'
+          '[RichText:align=center,(:_X_)]'
+          ']]',
+        ),
+      );
+    });
+
+    testGoldens('renders -webkit-center', (WidgetTester tester) async {
+      const html =
+          '<div style="text-align: -webkit-center"><div>Foo</div>_X_</div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals(
+          '[CssBlock:child=[Center:child='
+          '[Column:crossAxisAlignment=center,children='
+          '[CssBlock:child=[RichText:align=center,(:Foo)]],'
+          '[RichText:align=center,(:_X_)]'
+          ']]]',
+        ),
+      );
+    });
+
     testGoldens('renders end', (WidgetTester tester) async {
       const html = '<div style="text-align: end"><div>Foo</div>__X</div>';
       await explainScreenMatchesGolden(
@@ -352,6 +603,21 @@ void tests() {
           '[CssBlock:child=[Column:crossAxisAlignment=end,children='
           '[CssBlock:child=[RichText:align=end,(:Foo)]],'
           '[RichText:align=end,(:__X)]'
+          ']]',
+        ),
+      );
+    });
+
+    testGoldens('renders end (rtl)', (WidgetTester tester) async {
+      const html = '<div dir="rtl"><div style="text-align: end">'
+          '<div>Foo</div>__X</div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals(
+          '[CssBlock:child=[Column:dir=rtl,crossAxisAlignment=end,children='
+          '[CssBlock:child=[RichText:align=end,dir=rtl,(:Foo)]],'
+          '[RichText:align=end,dir=rtl,(:__X)]'
           ']]',
         ),
       );
@@ -385,6 +651,22 @@ void tests() {
       );
     });
 
+    testGoldens('renders left (rtl)', (WidgetTester tester) async {
+      const html = '<div dir="rtl"><div style="text-align: left">'
+          '<div>Foo</div>X__</div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals(
+          '[CssBlock:child='
+          '[Column:dir=rtl,crossAxisAlignment=end,children='
+          '[CssBlock:child=[RichText:align=left,dir=rtl,(:Foo)]],'
+          '[RichText:align=left,dir=rtl,(:X__)]'
+          ']]',
+        ),
+      );
+    });
+
     testGoldens('renders right', (WidgetTester tester) async {
       const html = '<div style="text-align: right"><div>Foo</div>__X</div>';
       await explainScreenMatchesGolden(
@@ -399,6 +681,21 @@ void tests() {
       );
     });
 
+    testGoldens('renders right (rtl)', (WidgetTester tester) async {
+      const html = '<div dir="rtl"><div style="text-align: right">'
+          '<div>Foo</div>__X</div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals(
+          '[CssBlock:child=[Column:dir=rtl,children='
+          '[CssBlock:child=[RichText:align=right,dir=rtl,(:Foo)]],'
+          '[RichText:align=right,dir=rtl,(:__X)]'
+          ']]',
+        ),
+      );
+    });
+
     testGoldens('renders start', (WidgetTester tester) async {
       const html = '<div style="text-align: start"><div>Foo</div>X__</div>';
       await explainScreenMatchesGolden(
@@ -408,6 +705,21 @@ void tests() {
           '[CssBlock:child=[Column:children='
           '[CssBlock:child=[RichText:(:Foo)]],'
           '[RichText:(:X__)]'
+          ']]',
+        ),
+      );
+    });
+
+    testGoldens('renders start (rtl)', (WidgetTester tester) async {
+      const html = '<div dir="rtl"><div style="text-align: start">'
+          '<div>Foo</div>X__</div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals(
+          '[CssBlock:child=[Column:dir=rtl,children='
+          '[CssBlock:child=[RichText:dir=rtl,(:Foo)]],'
+          '[RichText:dir=rtl,(:X__)]'
           ']]',
         ),
       );
