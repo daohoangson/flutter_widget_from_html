@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:flutter_widget_from_html_core/src/internal/html_style_widget.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
 
 export '_constants.dart';
 
@@ -24,6 +27,43 @@ Widget? buildCurrentState({GlobalKey? key}) {
 
   // ignore: invalid_use_of_protected_member
   return hws.build(hws.context);
+}
+
+Future<void> explainScreenMatchesGolden(
+  WidgetTester tester,
+  String html,
+  Matcher matcher, {
+  String? explained,
+  GlobalKey? key,
+}) async {
+  final stackTrace = StackTrace.current.toString();
+
+  final key = GlobalKey<HtmlWidgetState>();
+  final theme = ThemeData.light();
+  await tester.pumpWidgetBuilder(
+    Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        HtmlWidget(html, key: key),
+      ],
+    ),
+    wrapper: materialAppWrapper(
+      theme: theme.copyWith(
+        colorScheme: theme.colorScheme.copyWith(primary: kColorPrimary),
+        textTheme: theme.textTheme.copyWith(
+          bodyText2: theme.textTheme.bodyText2?.copyWith(color: kColor),
+        ),
+      ),
+    ),
+    surfaceSize: const Size(400, 300),
+  );
+
+  explained ??= await explainWithoutPumping(key: key);
+  expect(explained, matcher, reason: stackTrace);
+
+  if (Platform.isLinux) {
+    await screenMatchesGolden(tester, html, finder: find.byKey(key));
+  }
 }
 
 Future<String> explain(
@@ -612,6 +652,14 @@ class Explainer {
 
     if (widget is AspectRatio) {
       attr.add('aspectRatio=${widget.aspectRatio.toStringAsFixed(1)}');
+    }
+
+    if (widget is Column) {
+      final caa = widget.crossAxisAlignment;
+      if (caa != CrossAxisAlignment.start) {
+        final name = caa.toString().replaceAll('CrossAxisAlignment.', '');
+        attr.add('crossAxisAlignment=$name');
+      }
     }
 
     if (widget is ConstrainedBox) {

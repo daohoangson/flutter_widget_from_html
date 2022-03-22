@@ -23,6 +23,7 @@ class ColumnPlaceholder extends WidgetPlaceholder {
     final built = wf.buildColumnWidget(
       context,
       widgets,
+      crossAxisAlignment: style.columnCrossAxisAlignment,
       dir: style.textDirection,
     );
     return isBody ? wf.buildBodyWidget(context, built) : built;
@@ -86,7 +87,12 @@ class ColumnPlaceholder extends WidgetPlaceholder {
 
     final style = tree.styleBuilder.build(context);
     final column = contents.isNotEmpty
-        ? wf.buildColumnWidget(context, contents, dir: style.textDirection)
+        ? wf.buildColumnWidget(
+            context,
+            contents,
+            crossAxisAlignment: style.columnCrossAxisAlignment,
+            dir: style.textDirection,
+          )
         : null;
 
     return [
@@ -106,6 +112,26 @@ class ColumnPlaceholder extends WidgetPlaceholder {
       }
 
       yield child;
+    }
+  }
+}
+
+extension _HtmlStyle on HtmlStyle {
+  CrossAxisAlignment get columnCrossAxisAlignment {
+    final isLtr = textDirection == TextDirection.ltr;
+    switch (textAlign ?? TextAlign.start) {
+      case TextAlign.center:
+        return CrossAxisAlignment.center;
+      case TextAlign.end:
+        return CrossAxisAlignment.end;
+      case TextAlign.justify:
+        return CrossAxisAlignment.stretch;
+      case TextAlign.left:
+        return isLtr ? CrossAxisAlignment.start : CrossAxisAlignment.end;
+      case TextAlign.right:
+        return isLtr ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+      case TextAlign.start:
+        return CrossAxisAlignment.start;
     }
   }
 }

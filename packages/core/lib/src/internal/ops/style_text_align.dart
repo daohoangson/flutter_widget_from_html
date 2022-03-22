@@ -23,32 +23,28 @@ class StyleTextAlign {
   BuildOp get buildOp => BuildOp(
         debugLabel: kCssTextAlign,
         onTree: (tree) => tree.styleBuilder.enqueue(_builder, value),
-        onBuilt: (_, placeholder) => _wrap(placeholder, value),
+        onBuilt: (tree, placeholder) => _wrap(tree, placeholder, value),
         onWidgetsIsOptional: true,
         priority: 0,
       );
 
-  static Widget? _wrap(WidgetPlaceholder placeholder, String value) {
-    switch (value) {
-      case kCssTextAlignCenter:
-      case kCssTextAlignEnd:
-      case kCssTextAlignJustify:
-      case kCssTextAlignLeft:
-      case kCssTextAlignRight:
-        return placeholder.wrapWith(_block);
-      case kCssTextAlignMozCenter:
-      case kCssTextAlignWebkitCenter:
-        return placeholder.wrapWith(_center);
+  static Widget? _wrap(
+    BuildTree tree,
+    WidgetPlaceholder placeholder,
+    String value,
+  ) {
+    if (value == kCssTextAlignWebkitCenter) {
+      return placeholder.wrapWith(_center);
+    } else {
+      return placeholder.wrapWith(_block);
     }
-
-    return null;
   }
 
   static Widget _block(BuildContext _, Widget child) =>
       child is CssBlock ? child : CssBlock(child: child);
 
   static Widget _center(BuildContext _, Widget child) =>
-      _TextAlignCenter(child);
+      Center(heightFactor: 1.0, child: child);
 
   static HtmlStyle _builder(HtmlStyle style, String value) {
     TextAlign? textAlign;
@@ -78,9 +74,4 @@ class StyleTextAlign {
 
     return textAlign == null ? style : style.copyWith(textAlign: textAlign);
   }
-}
-
-class _TextAlignCenter extends Center {
-  const _TextAlignCenter(Widget child, {Key? key})
-      : super(child: child, heightFactor: 1.0, key: key);
 }

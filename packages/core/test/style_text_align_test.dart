@@ -1,54 +1,70 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '_.dart';
 
-void main() {
-  testWidgets('renders CENTER tag', (WidgetTester tester) async {
+Future<void> main() async {
+  await loadAppFonts();
+
+  GoldenToolkit.runWithConfiguration(
+    tests,
+    config: GoldenToolkitConfiguration(
+      fileNameFactory: (name) =>
+          '$kGoldenFilePrefix/style_text_align/$name.png',
+    ),
+  );
+}
+
+void tests() {
+  testGoldens('renders CENTER tag', (WidgetTester tester) async {
     const html = '<center>Foo</center>';
-    final explained = await explain(tester, html);
-    expect(
-      explained,
+    await explainScreenMatchesGolden(
+      tester,
+      html,
       equals(
-        '[CssBlock:child=[_TextAlignCenter:child='
+        '[CssBlock:child=[Center:child='
         '[RichText:align=center,(:Foo)]]]',
       ),
     );
   });
 
   group('attribute', () {
-    testWidgets('renders center text', (WidgetTester tester) async {
+    testGoldens('renders center text', (WidgetTester tester) async {
       const html = '<div align="center">_X_</div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
           '[CssBlock:child=[RichText:align=center,(:_X_)]]',
         ),
       );
     });
 
-    testWidgets('renders justify text', (WidgetTester tester) async {
+    testGoldens('renders justify text', (WidgetTester tester) async {
       const html = '<p align="justify">X_X_X</p>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
           '[CssBlock:child=[RichText:align=justify,(:X_X_X)]]',
         ),
       );
     });
 
-    testWidgets('renders left text', (WidgetTester tester) async {
+    testGoldens('renders left text', (WidgetTester tester) async {
       const html = '<div align="left">X__</div>';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=left,(:X__)]]'));
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:align=left,(:X__)]]'),
+      );
     });
 
-    testWidgets('renders right text', (WidgetTester tester) async {
+    testGoldens('renders right text', (WidgetTester tester) async {
       const html = '<div align="right">__X</div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
           '[CssBlock:child=[RichText:align=right,(:__X)]]',
         ),
@@ -57,133 +73,160 @@ void main() {
   });
 
   group('contents: inline', () {
-    testWidgets('renders center', (WidgetTester tester) async {
+    testGoldens('renders center', (WidgetTester tester) async {
       const html = '<div style="text-align: center">_X_</div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
           '[CssBlock:child=[RichText:align=center,(:_X_)]]',
         ),
       );
     });
 
-    testWidgets('renders end', (WidgetTester tester) async {
+    testGoldens('renders end', (WidgetTester tester) async {
       const html = '<div style="text-align: end">__X</div>';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=end,(:__X)]]'));
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:align=end,(:__X)]]'),
+      );
     });
 
-    testWidgets('renders justify', (WidgetTester tester) async {
+    testGoldens('renders justify', (WidgetTester tester) async {
       const html = '<div style="text-align: justify">X_X_X</div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
           '[CssBlock:child=[RichText:align=justify,(:X_X_X)]]',
         ),
       );
     });
 
-    testWidgets('renders left', (WidgetTester tester) async {
+    testGoldens('renders left', (WidgetTester tester) async {
       const html = '<div style="text-align: left">X__</div>';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=left,(:X__)]]'));
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:align=left,(:X__)]]'),
+      );
     });
 
-    testWidgets('renders right', (WidgetTester tester) async {
+    testGoldens('renders right', (WidgetTester tester) async {
       const html = '<div style="text-align: right">__X</div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
           '[CssBlock:child=[RichText:align=right,(:__X)]]',
         ),
       );
     });
 
-    testWidgets('renders start', (WidgetTester tester) async {
+    testGoldens('renders start', (WidgetTester tester) async {
       const html = '<div style="text-align: start">X__</div>';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:(:X__)]]'));
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:(:X__)]]'),
+      );
     });
   });
 
   group('contents: block', () {
-    testWidgets('renders tag CENTER', (WidgetTester tester) async {
+    testGoldens('renders tag CENTER', (WidgetTester tester) async {
       const html = '<center><div>_X_</div></center>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
-          '[CssBlock:child=[_TextAlignCenter:child='
+          '[CssBlock:child=[Center:child='
           '[CssBlock:child=[RichText:align=center,(:_X_)]]]]',
         ),
       );
     });
 
-    testWidgets('renders center', (WidgetTester tester) async {
+    testGoldens('renders center', (WidgetTester tester) async {
       const html = '<div style="text-align: center"><div>_X_</div></div>';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=center,(:_X_)]]'));
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:align=center,(:_X_)]]'),
+      );
     });
 
-    testWidgets('renders end', (WidgetTester tester) async {
+    testGoldens('renders end', (WidgetTester tester) async {
       const html = '<div style="text-align: end"><div>__X</div></div>';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=end,(:__X)]]'));
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:align=end,(:__X)]]'),
+      );
     });
 
-    testWidgets('renders justify', (WidgetTester tester) async {
+    testGoldens('renders justify', (WidgetTester tester) async {
       const html = '<div style="text-align: justify"><div>X_X_X</div></div>';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=justify,(:X_X_X)]]'));
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:align=justify,(:X_X_X)]]'),
+      );
     });
 
-    testWidgets('renders left', (WidgetTester tester) async {
+    testGoldens('renders left', (WidgetTester tester) async {
       const html = '<div style="text-align: left"><div>X__</div></div>';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=left,(:X__)]]'));
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:align=left,(:X__)]]'),
+      );
     });
 
-    testWidgets('renders right', (WidgetTester tester) async {
+    testGoldens('renders right', (WidgetTester tester) async {
       const html = '<div style="text-align: right"><div>__X</div></div>';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:align=right,(:__X)]]'));
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:align=right,(:__X)]]'),
+      );
     });
 
-    testWidgets('renders start', (WidgetTester tester) async {
+    testGoldens('renders start', (WidgetTester tester) async {
       const html = '<div style="text-align: start"><div>X__</div></div>';
-      final e = await explain(tester, html);
-      expect(e, equals('[CssBlock:child=[RichText:(:X__)]]'));
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals('[CssBlock:child=[RichText:(:X__)]]'),
+      );
     });
   });
 
   group('contents: blocks', () {
-    testWidgets('renders tag CENTER', (WidgetTester tester) async {
+    testGoldens('renders tag CENTER', (WidgetTester tester) async {
       const html = '<center><div>Foo</div><div>_X_</div></center>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
-          '[CssBlock:child=[Column:children='
-          '[_TextAlignCenter:child=[CssBlock:child='
-          '[RichText:align=center,(:Foo)]]],'
-          '[_TextAlignCenter:child=[CssBlock:child='
-          '[RichText:align=center,(:_X_)]]]'
-          ']]',
+          '[CssBlock:child=[Center:child='
+          '[Column:crossAxisAlignment=center,children='
+          '[CssBlock:child=[RichText:align=center,(:Foo)]],'
+          '[CssBlock:child=[RichText:align=center,(:_X_)]]'
+          ']]]',
         ),
       );
     });
 
-    testWidgets('renders center', (WidgetTester tester) async {
-      const html =
-          '<div style="text-align: center"><div>Foo</div><div>_X_</div></div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+    testGoldens('renders center', (WidgetTester tester) async {
+      const html = '<div style="text-align: center">'
+          '<div>Foo</div><div>_X_</div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
-          '[CssBlock:child=[Column:children='
+          '[CssBlock:child='
+          '[Column:crossAxisAlignment=center,children='
           '[CssBlock:child=[RichText:align=center,(:Foo)]],'
           '[CssBlock:child=[RichText:align=center,(:_X_)]]'
           ']]',
@@ -191,14 +234,15 @@ void main() {
       );
     });
 
-    testWidgets('renders end', (WidgetTester tester) async {
+    testGoldens('renders end', (WidgetTester tester) async {
       const html =
           '<div style="text-align: end"><div>Foo</div><div>__X</div></div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
-          '[CssBlock:child=[Column:children='
+          '[CssBlock:child='
+          '[Column:crossAxisAlignment=end,children='
           '[CssBlock:child=[RichText:align=end,(:Foo)]],'
           '[CssBlock:child=[RichText:align=end,(:__X)]]'
           ']]',
@@ -206,14 +250,15 @@ void main() {
       );
     });
 
-    testWidgets('renders justify', (WidgetTester tester) async {
-      const html =
-          '<div style="text-align: justify"><div>Foo</div><div>X_X_X</div></div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+    testGoldens('renders justify', (WidgetTester tester) async {
+      const html = '<div style="text-align: justify">'
+          '<div>Foo</div><div>X_X_X</div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
-          '[CssBlock:child=[Column:children='
+          '[CssBlock:child='
+          '[Column:crossAxisAlignment=stretch,children='
           '[CssBlock:child=[RichText:align=justify,(:Foo)]],'
           '[CssBlock:child=[RichText:align=justify,(:X_X_X)]]'
           ']]',
@@ -221,12 +266,12 @@ void main() {
       );
     });
 
-    testWidgets('renders left', (WidgetTester tester) async {
+    testGoldens('renders left', (WidgetTester tester) async {
       const html =
           '<div style="text-align: left"><div>Foo</div><div>X__</div></div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
           '[CssBlock:child=[Column:children='
           '[CssBlock:child=[RichText:align=left,(:Foo)]],'
@@ -236,14 +281,15 @@ void main() {
       );
     });
 
-    testWidgets('renders right', (WidgetTester tester) async {
-      const html =
-          '<div style="text-align: right"><div>Foo</div><div>__X</div></div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+    testGoldens('renders right', (WidgetTester tester) async {
+      const html = '<div style="text-align: right">'
+          '<div>Foo</div><div>__X</div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
-          '[CssBlock:child=[Column:children='
+          '[CssBlock:child='
+          '[Column:crossAxisAlignment=end,children='
           '[CssBlock:child=[RichText:align=right,(:Foo)]],'
           '[CssBlock:child=[RichText:align=right,(:__X)]]'
           ']]',
@@ -251,12 +297,12 @@ void main() {
       );
     });
 
-    testWidgets('renders start', (WidgetTester tester) async {
-      const html =
-          '<div style="text-align: start"><div>Foo</div><div>X__</div></div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+    testGoldens('renders start', (WidgetTester tester) async {
+      const html = '<div style="text-align: start">'
+          '<div>Foo</div><div>X__</div></div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
           '[CssBlock:child=[Column:children='
           '[CssBlock:child=[RichText:(:Foo)]],'
@@ -268,96 +314,96 @@ void main() {
   });
 
   group('contents: mixed', () {
-    testWidgets('renders tag CENTER', (WidgetTester tester) async {
+    testGoldens('renders tag CENTER', (WidgetTester tester) async {
       const html = '<center><div>Foo</div>_X_</center>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
-          '[CssBlock:child=[Column:children='
-          '[_TextAlignCenter:child=[CssBlock:child='
-          '[RichText:align=center,(:Foo)]]],'
-          '[_TextAlignCenter:child=[RichText:align=center,(:_X_)]]'
-          ']]',
-        ),
-      );
-    });
-
-    testWidgets('renders center', (WidgetTester tester) async {
-      const html = '<div style="text-align: center"><div>Foo</div>_X_</div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[Center:child='
+          '[Column:crossAxisAlignment=center,children='
           '[CssBlock:child=[RichText:align=center,(:Foo)]],'
-          '[CssBlock:child=[RichText:align=center,(:_X_)]]'
+          '[RichText:align=center,(:_X_)]'
+          ']]]',
+        ),
+      );
+    });
+
+    testGoldens('renders center', (WidgetTester tester) async {
+      const html = '<div style="text-align: center"><div>Foo</div>_X_</div>';
+      await explainScreenMatchesGolden(
+        tester,
+        html,
+        equals(
+          '[CssBlock:child=[Column:crossAxisAlignment=center,children='
+          '[CssBlock:child=[RichText:align=center,(:Foo)]],'
+          '[RichText:align=center,(:_X_)]'
           ']]',
         ),
       );
     });
 
-    testWidgets('renders end', (WidgetTester tester) async {
+    testGoldens('renders end', (WidgetTester tester) async {
       const html = '<div style="text-align: end"><div>Foo</div>__X</div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
-          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[Column:crossAxisAlignment=end,children='
           '[CssBlock:child=[RichText:align=end,(:Foo)]],'
-          '[CssBlock:child=[RichText:align=end,(:__X)]]'
+          '[RichText:align=end,(:__X)]'
           ']]',
         ),
       );
     });
 
-    testWidgets('renders justify', (WidgetTester tester) async {
+    testGoldens('renders justify', (WidgetTester tester) async {
       const html = '<div style="text-align: justify"><div>Foo</div>X_X_X</div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
-          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[Column:crossAxisAlignment=stretch,children='
           '[CssBlock:child=[RichText:align=justify,(:Foo)]],'
-          '[CssBlock:child=[RichText:align=justify,(:X_X_X)]]'
+          '[RichText:align=justify,(:X_X_X)]'
           ']]',
         ),
       );
     });
 
-    testWidgets('renders left', (WidgetTester tester) async {
+    testGoldens('renders left', (WidgetTester tester) async {
       const html = '<div style="text-align: left"><div>Foo</div>X__</div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
           '[CssBlock:child=[Column:children='
           '[CssBlock:child=[RichText:align=left,(:Foo)]],'
-          '[CssBlock:child=[RichText:align=left,(:X__)]]'
+          '[RichText:align=left,(:X__)]'
           ']]',
         ),
       );
     });
 
-    testWidgets('renders right', (WidgetTester tester) async {
+    testGoldens('renders right', (WidgetTester tester) async {
       const html = '<div style="text-align: right"><div>Foo</div>__X</div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
-          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[Column:crossAxisAlignment=end,children='
           '[CssBlock:child=[RichText:align=right,(:Foo)]],'
-          '[CssBlock:child=[RichText:align=right,(:__X)]]'
+          '[RichText:align=right,(:__X)]'
           ']]',
         ),
       );
     });
 
-    testWidgets('renders start', (WidgetTester tester) async {
+    testGoldens('renders start', (WidgetTester tester) async {
       const html = '<div style="text-align: start"><div>Foo</div>X__</div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
+      await explainScreenMatchesGolden(
+        tester,
+        html,
         equals(
           '[CssBlock:child=[Column:children='
           '[CssBlock:child=[RichText:(:Foo)]],'
@@ -368,13 +414,13 @@ void main() {
     });
   });
 
-  testWidgets('renders styling from outside', (WidgetTester tester) async {
+  testGoldens('renders styling from outside', (WidgetTester tester) async {
     // https://github.com/daohoangson/flutter_widget_from_html/issues/10
     const html = '<em><span style="color: red;">'
         '<div style="text-align: right;">right</div></span></em>';
-    final explained = await explain(tester, html);
-    expect(
-      explained,
+    await explainScreenMatchesGolden(
+      tester,
+      html,
       equals(
         '[CssBlock:child='
         '[RichText:align=right,(#FFFF0000+i:right)]]',
@@ -382,12 +428,12 @@ void main() {
     );
   });
 
-  testWidgets('renders margin inside', (WidgetTester tester) async {
+  testGoldens('renders margin inside', (WidgetTester tester) async {
     const html = '<div style="text-align: center">'
         '<div style="margin: 5px">Foo</div></div>';
-    final explained = await explainMargin(tester, html);
-    expect(
-      explained,
+    await explainScreenMatchesGolden(
+      tester,
+      html,
       equals(
         '[SizedBox:0.0x5.0],'
         '[CssBlock:child='
@@ -396,21 +442,24 @@ void main() {
         ']],'
         '[SizedBox:0.0x5.0]',
       ),
+      explained: await explainMargin(tester, html),
     );
   });
 
-  testWidgets('renders padding with block & inline', (tester) async {
+  testGoldens('renders padding with block & inline', (tester) async {
     const html = '<div style="text-align: right; padding: 5px">'
         '<div>Foo</div><span>Bar</span></div>';
-    final explained = await explainMargin(tester, html);
-    expect(
-      explained,
+    await explainScreenMatchesGolden(
+      tester,
+      html,
       equals(
-        '[CssBlock:child=[Padding:(5,5,5,5),child=[Column:children='
+        '[CssBlock:child=[Padding:(5,5,5,5),child='
+        '[CssBlock:child=[Column:crossAxisAlignment=end,children='
         '[CssBlock:child=[RichText:align=right,(:Foo)]],'
-        '[CssBlock:child=[RichText:align=right,(:Bar)]]'
-        ']]]',
+        '[RichText:align=right,(:Bar)]'
+        ']]]]',
       ),
+      explained: await explainMargin(tester, html),
     );
   });
 }

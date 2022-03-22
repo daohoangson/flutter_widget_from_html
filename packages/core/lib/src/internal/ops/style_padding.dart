@@ -57,8 +57,9 @@ class StylePadding {
           }
 
           return WidgetPlaceholder(
-            builder: (context, _) => _build(tree, context, child, padding),
+            builder: (ctx, w) => _build(tree, ctx, w, padding),
             debugLabel: kCssPadding,
+            child: child,
           );
         },
         onWidgetsIsOptional: true,

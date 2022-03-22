@@ -130,6 +130,7 @@ class WidgetFactory {
   Widget buildColumnWidget(
     BuildContext context,
     List<Widget> children, {
+    CrossAxisAlignment? crossAxisAlignment,
     TextDirection? dir,
   }) {
     if (children.length == 1) {
@@ -137,7 +138,7 @@ class WidgetFactory {
     }
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       textDirection: dir,
       children: children,
