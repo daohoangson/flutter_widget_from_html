@@ -206,12 +206,12 @@ class _TableCellData extends ContainerBoxParentData<RenderBox> {
   int rowStart = -1;
 
   double calculateHeight(_TableRenderObject tro, List<double> heights) {
-    final gaps = (rowSpan - 1) * tro.rowGap;
+    final gaps = tro._calculateRowGaps(this);
     return heights.getRange(rowStart, rowStart + rowSpan).sum + gaps;
   }
 
   double calculateWidth(_TableRenderObject tro, List<double> widths) {
-    final gaps = (columnSpan - 1) * tro.columnGap;
+    final gaps = tro._calculateColumnGaps(this);
     return widths.getRange(columnStart, columnStart + columnSpan).sum + gaps;
   }
 
@@ -406,6 +406,14 @@ class _TableRenderObject extends RenderBox
     }
   }
 
+  double _calculateColumnGaps(_TableCellData data) {
+    return (data.columnSpan - 1) * columnGap;
+  }
+
+  double _calculateRowGaps(_TableCellData data) {
+    return (data.rowSpan - 1) * rowGap;
+  }
+
   static Size _performLayout(
     final _TableRenderObject tro,
     final RenderBox firstChild,
@@ -415,6 +423,7 @@ class _TableRenderObject extends RenderBox
   ) {
     final children = <RenderBox>[];
     final cells = <_TableCellData>[];
+    final drySizes = <Size>[];
 
     RenderBox? child = firstChild;
     var columnCount = 0;
@@ -423,6 +432,7 @@ class _TableRenderObject extends RenderBox
       final data = child.parentData! as _TableCellData;
       children.add(child);
       cells.add(data);
+      drySizes.add(_performLayoutDry(child, const BoxConstraints()));
 
       columnCount = max(columnCount, data.columnStart + data.columnSpan);
       rowCount = max(rowCount, data.rowStart + data.rowSpan);
@@ -431,39 +441,53 @@ class _TableRenderObject extends RenderBox
     }
 
     final columnGaps = (columnCount + 1) * tro.columnGap;
+    final dryColumnWidths = List.filled(columnCount, 0.0);
+    for (var i = 0; i < children.length; i++) {
+      final data = cells[i];
+      final drySize = drySizes[i];
+
+      final dryColumnWidth =
+          (drySize.width - tro._calculateColumnGaps(data)) / data.columnSpan;
+
+      // distribute cell width across spanned columns
+      for (var c = 0; c < data.columnSpan; c++) {
+        final column = data.columnStart + c;
+        dryColumnWidths[column] = max(dryColumnWidths[column], dryColumnWidth);
+      }
+    }
+
+    // being naive: take dry widths as render widths
+    var columnWidths = [...dryColumnWidths];
+
+    final drySum = dryColumnWidths.sum;
+    final dryWidth = tro.paddingLeft + drySum + columnGaps + tro.paddingRight;
+    if (constraints.hasBoundedWidth && dryWidth > constraints.maxWidth) {
+      // viewport is too small: re-calculate widths using weighted distribution
+      // e.g. if a column has huge dry width, it will have bigger width
+      final availableWidth = constraints.maxWidth - (dryWidth - drySum);
+      columnWidths = dryColumnWidths
+          .map((dryColumnWidth) => dryColumnWidth / drySum * availableWidth)
+          .toList(growable: false);
+    }
+
     final rowGaps = (rowCount + 1) * tro.rowGap;
-    final width0 = (constraints.maxWidth -
-            tro.paddingLeft -
-            tro.paddingRight -
-            columnGaps) /
-        columnCount;
     final childSizes = List.filled(children.length, Size.zero);
-    final columnWidths = List.filled(columnCount, 0.0);
     final rowHeights = List.filled(rowCount, 0.0);
     for (var i = 0; i < children.length; i++) {
       final child = children[i];
       final data = cells[i];
+      final drySize = drySizes[i];
 
-      // assume even distribution of column widths if width is finite
-      final childColumnGaps = (data.columnSpan - 1) * tro.columnGap;
-      final childWidth =
-          width0.isFinite ? width0 * data.columnSpan + childColumnGaps : null;
-      final cc = BoxConstraints(
-        maxWidth: childWidth ?? double.infinity,
-        minWidth: childWidth ?? 0.0,
-      );
-      final childSize = childSizes[i] = layouter(child, cc);
-
-      // distribute cell width across spanned columns
-      final columnWidth = (childSize.width - childColumnGaps) / data.columnSpan;
-      for (var c = 0; c < data.columnSpan; c++) {
-        final column = data.columnStart + c;
-        columnWidths[column] = max(columnWidths[column], columnWidth);
-      }
+      final childWidth = data.calculateWidth(tro, columnWidths);
+      final childSize =
+          childWidth == drySize.width && identical(layouter, _performLayoutDry)
+              ? drySize
+              : layouter(child, BoxConstraints.tightFor(width: childWidth));
+      childSizes[i] = childSize;
 
       // distribute cell height across spanned rows
-      final childRowGaps = (data.rowSpan - 1) * tro.rowGap;
-      final rowHeight = (childSize.height - childRowGaps) / data.rowSpan;
+      final rowHeight =
+          (childSize.height - tro._calculateRowGaps(data)) / data.rowSpan;
       for (var r = 0; r < data.rowSpan; r++) {
         final row = data.rowStart + r;
         rowHeights[row] = max(rowHeights[row], rowHeight);
@@ -479,16 +503,14 @@ class _TableRenderObject extends RenderBox
         max(0, (constraintedHeight - calculatedHeight) / rowCount);
     final calculatedWidth =
         tro.paddingLeft + columnWidths.sum + columnGaps + tro.paddingRight;
-    final constraintedWidth = constraints.constrainWidth(calculatedWidth);
-    final deltaWidth = (constraintedWidth - calculatedWidth) / columnCount;
     for (var i = 0; i < children.length; i++) {
       final child = children[i];
       final data = cells[i];
       final childSize = childSizes[i];
 
       final childHeight = data.calculateHeight(tro, rowHeights) + deltaHeight;
-      final childWidth = data.calculateWidth(tro, columnWidths) + deltaWidth;
-      if (childSize.height != childHeight || childSize.width != childWidth) {
+      final childWidth = data.calculateWidth(tro, columnWidths);
+      if (childSize.height != childHeight) {
         final cc2 = BoxConstraints.tight(Size(childWidth, childHeight));
         layouter(child, cc2);
       }

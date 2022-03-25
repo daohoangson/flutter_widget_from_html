@@ -74,7 +74,7 @@ class StyleVerticalAlign {
                 return child;
               }
 
-              return wf.buildAlign(meta, child, alignment);
+              return wf.buildAlign(meta, child, alignment, widthFactor: 1.0);
             }),
           );
         },
