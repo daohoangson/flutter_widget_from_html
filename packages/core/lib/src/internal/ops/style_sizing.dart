@@ -7,6 +7,24 @@ const kCssMinHeight = 'min-height';
 const kCssMinWidth = 'min-width';
 const kCssWidth = 'width';
 
+extension CssLengthToSizing on CssLength {
+  CssSizingValue? getSizing(TextStyleHtml tsh) {
+    final value = getValue(tsh);
+    if (value != null) {
+      return CssSizingValue.value(value);
+    }
+
+    switch (unit) {
+      case CssLengthUnit.auto:
+        return const CssSizingValue.auto();
+      case CssLengthUnit.percentage:
+        return CssSizingValue.percentage(number);
+      default:
+        return null;
+    }
+  }
+}
+
 class DisplayBlockOp extends BuildOp {
   DisplayBlockOp(WidgetFactory wf)
       : super(
@@ -155,35 +173,15 @@ class StyleSizing {
     final tsh = tsb.build(context);
 
     return CssSizing(
-      maxHeight: _getValue(input.maxHeight, tsh),
-      maxWidth: _getValue(input.maxWidth, tsh),
-      minHeight: _getValue(input.minHeight, tsh),
-      minWidth: _getValue(input.minWidth, tsh),
+      maxHeight: input.maxHeight?.getSizing(tsh),
+      maxWidth: input.maxWidth?.getSizing(tsh),
+      minHeight: input.minHeight?.getSizing(tsh),
+      minWidth: input.minWidth?.getSizing(tsh),
       preferredAxis: input.preferredAxis,
-      preferredHeight: _getValue(input.preferredHeight, tsh),
-      preferredWidth: _getValue(input.preferredWidth, tsh),
+      preferredHeight: input.preferredHeight?.getSizing(tsh),
+      preferredWidth: input.preferredWidth?.getSizing(tsh),
       child: child,
     );
-  }
-
-  static CssSizingValue? _getValue(CssLength? length, TextStyleHtml tsh) {
-    if (length == null) {
-      return null;
-    }
-
-    final value = length.getValue(tsh);
-    if (value != null) {
-      return CssSizingValue.value(value);
-    }
-
-    switch (length.unit) {
-      case CssLengthUnit.auto:
-        return const CssSizingValue.auto();
-      case CssLengthUnit.percentage:
-        return CssSizingValue.percentage(length.number);
-      default:
-        return null;
-    }
   }
 }
 

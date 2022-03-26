@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+import 'css_sizing.dart';
+
 /// A TABLE widget.
 class HtmlTable extends MultiChildRenderObjectWidget {
   /// The table border sides.
@@ -102,6 +104,9 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   /// The row index this cell should start.
   final int rowStart;
 
+  /// The cell width.
+  final CssSizingValue? width;
+
   /// Creates a TD (table cell) widget.
   const HtmlTableCell({
     this.border,
@@ -111,6 +116,7 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
     Key? key,
     this.rowSpan = 1,
     required this.rowStart,
+    this.width,
   })  : assert(columnSpan >= 1),
         assert(columnStart >= 0),
         assert(rowSpan >= 1),
@@ -144,6 +150,11 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
 
     if (data.rowSpan != rowSpan) {
       data.rowSpan = rowSpan;
+      needsLayout = true;
+    }
+
+    if (data.width != width) {
+      data.width = width;
       needsLayout = true;
     }
 
@@ -204,6 +215,7 @@ class _TableCellData extends ContainerBoxParentData<RenderBox> {
   int columnStart = -1;
   int rowSpan = 1;
   int rowStart = -1;
+  CssSizingValue? width;
 
   double calculateHeight(_TableRenderObject tro, List<double> heights) {
     final gaps = tro._calculateRowGaps(this);
@@ -432,7 +444,13 @@ class _TableRenderObject extends RenderBox
       final data = child.parentData! as _TableCellData;
       children.add(child);
       cells.add(data);
-      drySizes.add(_performLayoutDry(child, const BoxConstraints()));
+
+      final width = data.width?.clamp(0, constraints.maxWidth);
+      if (width != null) {
+        drySizes.add(Size(width, .0));
+      } else {
+        drySizes.add(_performLayoutDry(child, const BoxConstraints()));
+      }
 
       columnCount = max(columnCount, data.columnStart + data.columnSpan);
       rowCount = max(rowCount, data.rowStart + data.rowSpan);
@@ -479,10 +497,11 @@ class _TableRenderObject extends RenderBox
       final drySize = drySizes[i];
 
       final childWidth = data.calculateWidth(tro, columnWidths);
-      final childSize =
-          childWidth == drySize.width && identical(layouter, _performLayoutDry)
-              ? drySize
-              : layouter(child, BoxConstraints.tightFor(width: childWidth));
+      final childSize = childWidth == drySize.width &&
+              drySize.height > 0 &&
+              identical(layouter, _performLayoutDry)
+          ? drySize
+          : layouter(child, BoxConstraints.tightFor(width: childWidth));
       childSizes[i] = childSize;
 
       // distribute cell height across spanned rows

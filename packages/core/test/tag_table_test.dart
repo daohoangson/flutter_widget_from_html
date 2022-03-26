@@ -947,6 +947,20 @@ Future<void> main() async {
     <td>$multiline</td>
   </tr>
 </table>''',
+              'width_in_percent': '''
+<table border="1">
+  <tr>
+    <td style="width: 30%">Foo</td>
+    <td style="width: 70%">Bar</td>
+  </tr>
+</table>''',
+              'width_in_px': '''
+<table border="1">
+  <tr>
+    <td style="width: 50px">Foo</td>
+    <td style="width: 100px">Bar</td>
+  </tr>
+</table>''',
             };
 
             for (final testCase in testCases.entries) {

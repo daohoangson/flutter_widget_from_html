@@ -164,6 +164,7 @@ class TagTable {
           columnStart: columnStart,
           rowSpan: rowSpan,
           rowStart: rowStart,
+          width: cell.width,
         );
 
         for (var r = 0; r < rowSpan; r++) {
@@ -182,7 +183,8 @@ class TagTable {
         _data.builders.add((context) {
           Widget? child = cell.child;
 
-          final border = cssBorder.getBorder(cellMeta.tsb.build(context));
+          final tsh = cellMeta.tsb.build(context);
+          final border = cssBorder.getBorder(tsh);
           if (border != null) {
             child = wf.buildPadding(cellMeta, cell.child, border.dimensions);
           }
@@ -196,6 +198,7 @@ class TagTable {
             columnStart: columnStart,
             rowSpan: rowSpan,
             rowStart: rowStart,
+            width: cell.width?.getSizing(tsh),
             child: child,
           );
         });
@@ -280,6 +283,9 @@ class _TagTableRow {
         final child =
             parent.wf.buildColumnPlaceholder(cellMeta, widgets) ?? widget0;
 
+        final widthValue = cellMeta[kCssWidth]?.value;
+        final width = widthValue != null ? tryParseCssLength(widthValue) : null;
+
         final attributes = cellMeta.element.attributes;
         row.cells.add(
           _TagTableDataCell(
@@ -287,6 +293,7 @@ class _TagTableRow {
             child: child,
             columnSpan: tryParseIntFromMap(attributes, kAttributeColspan) ?? 1,
             rowSpan: tryParseIntFromMap(attributes, kAttributeRowspan) ?? 1,
+            width: width,
           ),
         );
 
@@ -408,6 +415,7 @@ class _TagTableDataCell {
   final BuildMetadata meta;
   final int rowSpan;
   final int? rowStart;
+  final CssLength? width;
 
   const _TagTableDataCell(
     this.meta, {
@@ -416,5 +424,6 @@ class _TagTableDataCell {
     this.columnStart,
     required this.rowSpan,
     this.rowStart,
+    this.width,
   });
 }
