@@ -30,7 +30,6 @@ const kCssDisplayTableCell = 'table-cell';
 const kCssDisplayTableCaption = 'table-caption';
 
 class TagTable {
-  final companion = HtmlTableCompanion();
   final BuildMetadata tableMeta;
   final WidgetFactory wf;
 
@@ -122,7 +121,6 @@ class TagTable {
           border: border.getBorder(tsh),
           borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
           borderSpacing: borderSpacing?.getValue(tsh) ?? 0.0,
-          companion: companion,
           textDirection: tsh.textDirection,
           children: List.from(
             _data.builders.map((f) => f(context)).where((e) => e != null),

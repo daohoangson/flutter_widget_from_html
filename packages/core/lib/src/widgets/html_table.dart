@@ -21,7 +21,6 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   final double borderSpacing;
 
   /// The companion data for table.
-  final HtmlTableCompanion companion;
 
   /// Determines the order to lay children out horizontally.
   ///
@@ -34,7 +33,6 @@ class HtmlTable extends MultiChildRenderObjectWidget {
     this.borderCollapse = false,
     this.borderSpacing = 0.0,
     required List<Widget> children,
-    required this.companion,
     this.textDirection = TextDirection.ltr,
     Key? key,
   }) : super(children: children, key: key);
@@ -43,7 +41,6 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   RenderObject createRenderObject(BuildContext _) => _TableRenderObject(
         border,
         borderSpacing,
-        companion,
         textDirection,
         borderCollapse: borderCollapse,
       );
@@ -77,14 +74,8 @@ class HtmlTable extends MultiChildRenderObjectWidget {
       ..border = border
       ..borderCollapse = borderCollapse
       ..borderSpacing = borderSpacing
-      ..companion = companion
       ..textDirection = textDirection;
   }
-}
-
-/// Companion data for table.
-class HtmlTableCompanion {
-  final _baselines = <int, List<_ValignBaselineRenderObject>>{};
 }
 
 /// A TD (table cell) widget.
@@ -188,17 +179,17 @@ class HtmlTableValignBaseline extends SingleChildRenderObjectWidget {
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    final table = context.findAncestorWidgetOfExactType<HtmlTable>()!;
+    final table = context.findAncestorRenderObjectOfType<_TableRenderObject>()!;
     final cell = context.findAncestorWidgetOfExactType<HtmlTableCell>()!;
-    return _ValignBaselineRenderObject(table.companion, cell.rowStart);
+    return _ValignBaselineRenderObject(table._tableRenderData, cell.rowStart);
   }
 
   @override
   void updateRenderObject(BuildContext context, RenderObject renderObject) {
-    final table = context.findAncestorWidgetOfExactType<HtmlTable>()!;
+    final table = context.findAncestorRenderObjectOfType<_TableRenderObject>()!;
     final cell = context.findAncestorWidgetOfExactType<HtmlTableCell>()!;
     (renderObject as _ValignBaselineRenderObject)
-      ..companion = table.companion
+      ..tableRenderData = table._tableRenderData
       ..row = cell.rowStart;
   }
 }
@@ -240,6 +231,10 @@ class _TableCellData extends ContainerBoxParentData<RenderBox> {
   }
 }
 
+class _TableRenderData {
+  final _baselines = <int, List<_ValignBaselineRenderObject>>{};
+}
+
 class _TableRenderObject extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, _TableCellData>,
@@ -247,7 +242,6 @@ class _TableRenderObject extends RenderBox
   _TableRenderObject(
     this._border,
     this._borderSpacing,
-    this._companion,
     this._textDirection, {
     required bool borderCollapse,
   }) : _borderCollapse = borderCollapse;
@@ -285,16 +279,7 @@ class _TableRenderObject extends RenderBox
     markNeedsLayout();
   }
 
-  HtmlTableCompanion _companion;
-  // ignore: avoid_setters_without_getters
-  set companion(HtmlTableCompanion v) {
-    if (v == _companion) {
-      return;
-    }
-
-    _companion = v;
-    markNeedsLayout();
-  }
+  final _tableRenderData = _TableRenderData();
 
   TextDirection _textDirection;
   // ignore: avoid_setters_without_getters
@@ -366,7 +351,7 @@ class _TableRenderObject extends RenderBox
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    _companion._baselines.clear();
+    _tableRenderData._baselines.clear();
 
     assert(_calculatedHeight != null);
     assert(_calculatedWidth != null);
@@ -572,15 +557,15 @@ class _TableRenderObject extends RenderBox
 }
 
 class _ValignBaselineRenderObject extends RenderProxyBox {
-  _ValignBaselineRenderObject(this._companion, this._row);
+  _ValignBaselineRenderObject(this._tableRenderData, this._row);
 
-  HtmlTableCompanion _companion;
+  _TableRenderData _tableRenderData;
   // ignore: avoid_setters_without_getters
-  set companion(HtmlTableCompanion v) {
-    if (v == _companion) {
+  set tableRenderData(_TableRenderData v) {
+    if (v == _tableRenderData) {
       return;
     }
-    _companion = v;
+    _tableRenderData = v;
     markNeedsLayout();
   }
 
@@ -613,7 +598,7 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
     final baselineWithOffset = _baselineWithOffset = effectiveOffset.dy +
         (child.getDistanceToBaseline(TextBaseline.alphabetic) ?? 0.0);
 
-    final siblings = _companion._baselines;
+    final siblings = _tableRenderData._baselines;
     if (siblings.containsKey(_row)) {
       final rowBaseline = siblings[_row]!
           .map((e) => e._baselineWithOffset!)
