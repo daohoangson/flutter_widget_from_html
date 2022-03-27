@@ -42,12 +42,16 @@ class StyleSizing {
 
   final WidgetFactory wf;
 
-  static final _treatHeightAsMinHeight = Expando<bool>();
+  static final _skipBuilding = Expando<bool>();
 
   StyleSizing(this.wf);
 
   BuildOp get buildOp => BuildOp(
         onTreeFlattening: (meta, tree) {
+          if (_skipBuilding[meta] == true) {
+            return;
+          }
+
           final input = _parse(meta);
           if (input == null) {
             return;
@@ -68,6 +72,10 @@ class StyleSizing {
           widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb));
         },
         onWidgets: (meta, widgets) {
+          if (_skipBuilding[meta] == true || widgets.isEmpty) {
+            return widgets;
+          }
+
           final input = _parse(meta);
           if (input == null) {
             return widgets;
@@ -102,12 +110,8 @@ class StyleSizing {
         case kCssHeight:
           final parsedHeight = tryParseCssLength(value);
           if (parsedHeight != null) {
-            if (_treatHeightAsMinHeight[meta] == true) {
-              minHeight = parsedHeight;
-            } else {
-              preferredAxis = Axis.vertical;
-              preferredHeight = parsedHeight;
-            }
+            preferredAxis = Axis.vertical;
+            preferredHeight = parsedHeight;
           }
           break;
         case kCssMaxHeight:
@@ -161,8 +165,10 @@ class StyleSizing {
     );
   }
 
-  static void treatHeightAsMinHeight(BuildMetadata meta) =>
-      _treatHeightAsMinHeight[meta] = true;
+  static void skip(BuildMetadata meta) {
+    assert(_skipBuilding[meta] != true, 'Built ${meta.element} already');
+    _skipBuilding[meta] = true;
+  }
 
   static Widget _build(
     BuildContext context,

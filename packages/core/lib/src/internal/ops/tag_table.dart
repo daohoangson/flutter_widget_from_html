@@ -92,7 +92,7 @@ class TagTable {
 
   void onTree(BuildMetadata _, BuildTree tree) {
     StyleBorder.skip(tableMeta);
-    StyleSizing.treatHeightAsMinHeight(tableMeta);
+    StyleSizing.skip(tableMeta);
   }
 
   Iterable<Widget> onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> __) {
@@ -340,7 +340,7 @@ class _TagTableRow {
 
     childMeta.register(_cellOp);
     StyleBorder.skip(childMeta);
-    StyleSizing.treatHeightAsMinHeight(childMeta);
+    StyleSizing.skip(childMeta);
     childMeta.register(_valignBaselineOp);
   }
 }

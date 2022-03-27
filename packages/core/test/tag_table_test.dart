@@ -850,9 +850,8 @@ Future<void> main() async {
   <tr><td colspan="2">Lorem ipsum dolor sit amet.</td></tr>
   <tr><td>Foo</td><td>Bar</td></tr>
 </table>''',
-              'height_as_min_height':
-                  'Above<table border="1" style="height: 1px">'
-                      '<tr><td style="height: 1px">Foo</td></tr></table>Below',
+              'height_1px': 'Above<table border="1" style="height: 1px">'
+                  '<tr><td style="height: 1px">Foo</td></tr></table>Below',
               'rowspan': '''
 <table border="1">
   <tr><td rowspan="2">$multiline</td><td>Foo</td></tr>
@@ -950,8 +949,8 @@ Future<void> main() async {
               'width_in_percent': '''
 <table border="1">
   <tr>
-    <td style="width: 30%">Foo</td>
-    <td style="width: 70%">Bar</td>
+    <td style="background: red; width: 30%">Foo</td>
+    <td style="background: green; width: 70%">Bar</td>
   </tr>
 </table>''',
               'width_in_px': '''
