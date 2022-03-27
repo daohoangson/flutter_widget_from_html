@@ -35,15 +35,14 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[Column:children='
-          '[_TableCaption:child=[CssBlock:child='
-          '[RichText:align=center,(:Caption)]]],'
           '[HtmlTable:children='
+          '[HtmlTableCaption:child=[CssBlock:child='
+          '[RichText:align=center,(:Caption)]]],'
           '${_padding('[RichText:(+b:Header 1)]')},'
           '${_padding('[RichText:(+b:Header 2)]')},'
           '${_richtext('Value 1')},'
           '${_richtext('Value 2')}'
-          ']]',
+          ']',
         ),
       );
     });
@@ -54,32 +53,34 @@ Future<void> main() async {
         explained,
         equals(
           'TshWidget\n'
-          '└ColumnPlaceholder(BuildMetadata(<root></root>))\n'
-          ' └Column()\n'
-          '  ├_TableCaption()\n'
-          '  │└CssBlock()\n'
-          '  │ └RichText(textAlign: center, text: "Caption")\n'
-          '  └HtmlTable(borderSpacing: 2.0)\n'
-          '   ├HtmlTableCell(columnStart: 0, rowStart: 0)\n'
-          '   │└WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
-          '   │ └Align(alignment: centerLeft, widthFactor: 1.0)\n'
-          '   │  └Padding(padding: all(1.0))\n'
-          '   │   └RichText(text: "Header 1")\n'
-          '   ├HtmlTableCell(columnStart: 1, rowStart: 0)\n'
-          '   │└WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
-          '   │ └Align(alignment: centerLeft, widthFactor: 1.0)\n'
-          '   │  └Padding(padding: all(1.0))\n'
-          '   │   └RichText(text: "Header 2")\n'
-          '   ├HtmlTableCell(columnStart: 0, rowStart: 1)\n'
-          '   │└WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
-          '   │ └Align(alignment: centerLeft, widthFactor: 1.0)\n'
-          '   │  └Padding(padding: all(1.0))\n'
-          '   │   └RichText(text: "Value 1")\n'
-          '   └HtmlTableCell(columnStart: 1, rowStart: 1)\n'
-          '    └WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
-          '     └Align(alignment: centerLeft, widthFactor: 1.0)\n'
-          '      └Padding(padding: all(1.0))\n'
-          '       └RichText(text: "Value 2")\n'
+          '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
+          ' └HtmlTable(borderSpacing: 2.0)\n'
+          '  ├HtmlTableCaption(columnSpan: 2, columnStart: 0, rowStart: 0)\n'
+          '  │└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
+          '  │ │  "Caption"\n'
+          '  │ │)\n'
+          '  │ └CssBlock()\n'
+          '  │  └RichText(textAlign: center, text: "Caption")\n'
+          '  ├HtmlTableCell(columnStart: 0, rowStart: 1)\n'
+          '  │└WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
+          '  │ └Align(alignment: centerLeft, widthFactor: 1.0)\n'
+          '  │  └Padding(padding: all(1.0))\n'
+          '  │   └RichText(text: "Header 1")\n'
+          '  ├HtmlTableCell(columnStart: 1, rowStart: 1)\n'
+          '  │└WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
+          '  │ └Align(alignment: centerLeft, widthFactor: 1.0)\n'
+          '  │  └Padding(padding: all(1.0))\n'
+          '  │   └RichText(text: "Header 2")\n'
+          '  ├HtmlTableCell(columnStart: 0, rowStart: 2)\n'
+          '  │└WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
+          '  │ └Align(alignment: centerLeft, widthFactor: 1.0)\n'
+          '  │  └Padding(padding: all(1.0))\n'
+          '  │   └RichText(text: "Value 1")\n'
+          '  └HtmlTableCell(columnStart: 1, rowStart: 2)\n'
+          '   └WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
+          '    └Align(alignment: centerLeft, widthFactor: 1.0)\n'
+          '     └Padding(padding: all(1.0))\n'
+          '      └RichText(text: "Value 2")\n'
           '\n',
         ),
       );
@@ -677,15 +678,14 @@ Future<void> main() async {
     expect(
       explained,
       equals(
-        '[Column:children='
-        '[_TableCaption:child=[CssBlock:child='
-        '[RichText:align=center,(:Caption)]]],'
         '[HtmlTable:children='
+        '[HtmlTableCaption:child=[CssBlock:child='
+        '[RichText:align=center,(:Caption)]]],'
         '[HtmlTableCell:child=[RichText:(+b:Header 1)]],'
         '[HtmlTableCell:child=[RichText:(+b:Header 2)]],'
         '[HtmlTableCell:child=[RichText:(:Value 1)]],'
         '[HtmlTableCell:child=[RichText:(:Value 2)]]'
-        ']]',
+        ']',
       ),
     );
   });
