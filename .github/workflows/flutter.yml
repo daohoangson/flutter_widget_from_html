@@ -24,7 +24,7 @@ jobs:
         with:
           name: failures
           path: demo_app/test/failures/
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
 
   integration_test:
     name: Integration test
