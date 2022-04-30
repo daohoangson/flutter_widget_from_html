@@ -1,8 +1,8 @@
+import 'package:demo_app/screens/custom_widget_builder.dart'
+    as custom_widget_builder;
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:photo_view/photo_view.dart';
-
-import 'custom_widget_builder.dart' as custom_widget_builder;
 
 class PhotoViewScreen extends StatelessWidget {
   const PhotoViewScreen({Key key}) : super(key: key);

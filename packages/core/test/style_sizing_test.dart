@@ -437,8 +437,9 @@ void main() {
         explained,
         equals(
           '[RichText:(:Foo '
-          '[CssSizing:height≥0.0,height=10.0,width≥0.0,width=10.0,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
-          ')]',
+          '[CssSizing:height≥0.0,height=10.0,width≥0.0,width=10.0,child='
+          '[Image:image=NetworkImage("$src", scale: 1.0)]'
+          '])]',
         ),
       );
     });
@@ -517,7 +518,13 @@ void main() {
       );
     });
 
-    final goldenSkip = Platform.isLinux ? null : 'Linux only';
+    final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
+    final goldenSkip = goldenSkipEnvVar == ''
+        ? Platform.isLinux
+            ? null
+            : 'Linux only'
+        : 'GOLDEN_SKIP=$goldenSkipEnvVar';
+
     GoldenToolkit.runWithConfiguration(
       () {
         group(

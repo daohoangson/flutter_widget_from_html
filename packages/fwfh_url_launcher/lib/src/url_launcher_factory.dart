@@ -10,11 +10,14 @@ mixin UrlLauncherFactory on WidgetFactory {
       return result;
     }
 
+    // TODO: remove lint ignores when mininum url_launcher version >= 6.1.0
+    // ignore: deprecated_member_use
     final ok = await canLaunch(url);
     if (!ok) {
       return false;
     }
 
+    // ignore: deprecated_member_use
     return launch(url);
   }
 }

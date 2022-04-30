@@ -1,7 +1,6 @@
+import 'package:demo_app/screens/home.dart';
+import 'package:demo_app/widgets/popup_menu.dart';
 import 'package:flutter/material.dart';
-
-import 'screens/home.dart';
-import 'widgets/popup_menu.dart';
 
 void main() => runApp(const MyApp());
 

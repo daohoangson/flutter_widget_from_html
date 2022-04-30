@@ -16,6 +16,7 @@ jobs:
           - enhanced
           - fwfh_cached_network_image
           - fwfh_chewie
+          - fwfh_selectable_text
           - fwfh_svg
           - fwfh_url_launcher
           - fwfh_webview
@@ -26,8 +27,10 @@ jobs:
     defaults:
       run:
         working-directory: packages/${{ matrix.package }}
+    env:
+      GOLDEN_SKIP: "yes"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Update pubspec.yaml
         run: |
           set -e
@@ -69,8 +72,54 @@ jobs:
           cat pubspec.yaml
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v1
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
 
       - run: flutter test
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: failures
+          path: packages/${{ matrix.package }}/test/failures/
+
+  fwfh_text_style:
+    strategy:
+      matrix:
+        channel:
+          - beta
+          - master
+
+    # In case one of these fails, create a new PR against the `release/*` branch
+    # and publish a new version to make sure there is a compatible version
+    # of `fwfh_text_style` for all active Flutter versions.
+    name: fwfh_text_style@${{ matrix.channel }}
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: packages/fwfh_text_style
+    env:
+      GOLDEN_SKIP: "yes"
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Run git fetch
+        run: |
+          git config user.name name
+          git config user.email email@domain.com
+          git fetch
+      - run: git merge -X ours -m test origin/release/${{ matrix.channel }}
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ matrix.channel }}
+      - run: flutter --version
+      - run: flutter test
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: failures
+          path: packages/fwfh_text_style/test/failures/

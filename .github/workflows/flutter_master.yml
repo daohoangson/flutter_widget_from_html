@@ -11,10 +11,12 @@ jobs:
   unit_test:
     name: Unit test
     runs-on: ubuntu-latest
+    env:
+      GOLDEN_SKIP: "yes"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup Flutter
-        uses: subosito/flutter-action@v1
+        uses: subosito/flutter-action@v2
         with:
           channel: master
       - run: ./tool/test.sh

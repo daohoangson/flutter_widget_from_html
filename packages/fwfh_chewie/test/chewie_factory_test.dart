@@ -2,14 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '_.dart';
+import 'mock_video_player_platform.dart';
 
 void main() {
   const src = 'http://domain.com/video.mp4';
   const defaultAspectRatio = '1.78';
 
-  setUp(() {
-    mockVideoPlayerPlatform();
-  });
+  mockVideoPlayerPlatform();
 
   testWidgets('renders video player', (tester) async {
     const html = '<video><source src="$src"></video>';

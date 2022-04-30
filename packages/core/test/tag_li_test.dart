@@ -18,8 +18,10 @@ String padding(String child) =>
 
 String list(List<String> children) => '[Column:children=${children.join(",")}]';
 
-String item(String markerText, String contents, {String? child}) =>
-    '[HtmlListItem:children=${child ?? '[RichText:(:$contents)]'},${marker(markerText)}]';
+String item(String markerText, String contents, {String? child}) {
+  final children = child ?? '[RichText:(:$contents)]';
+  return '[HtmlListItem:children=$children,${marker(markerText)}]';
+}
 
 String marker(String text) => text.startsWith('[HtmlListMarker.')
     ? text
@@ -622,8 +624,10 @@ Future<void> main() async {
           explained,
           equals(
             '[CssBlock:child=[Padding:(0,0,0,99),child=[Column:children='
-            '[Padding:(0,0,0,199),child=[HtmlListItem:children=[RichText:(:199px)],${marker(disc)}]],'
-            '[Padding:(0,0,0,299),child=[HtmlListItem:children=[RichText:(:299px)],${marker(disc)}]],'
+            '[Padding:(0,0,0,199),child=[HtmlListItem:children='
+            '[RichText:(:199px)],${marker(disc)}]],'
+            '[Padding:(0,0,0,299),child=[HtmlListItem:children='
+            '[RichText:(:299px)],${marker(disc)}]],'
             '${item(disc, "99px")}'
             ']]]',
           ),
@@ -760,9 +764,12 @@ Future<void> main() async {
         explained,
         equals(
           '[CssBlock:child=[Padding:(0,40,0,0),child=[Column:dir=rtl,children='
-          '[HtmlListItem:children=[RichText:dir=rtl,(:One)],[RichText:maxLines=1,dir=rtl,(:1.)]],'
-          '[HtmlListItem:children=[RichText:dir=rtl,(:Two)],[RichText:maxLines=1,dir=rtl,(:2.)]],'
-          '[HtmlListItem:children=[RichText:dir=rtl,(+b:Three)],[RichText:maxLines=1,dir=rtl,(:3.)]]'
+          '[HtmlListItem:children=[RichText:dir=rtl,(:One)],'
+          '[RichText:maxLines=1,dir=rtl,(:1.)]],'
+          '[HtmlListItem:children=[RichText:dir=rtl,(:Two)],'
+          '[RichText:maxLines=1,dir=rtl,(:2.)]],'
+          '[HtmlListItem:children=[RichText:dir=rtl,(+b:Three)],'
+          '[RichText:maxLines=1,dir=rtl,(:3.)]]'
           ']]]',
         ),
       );
@@ -860,7 +867,13 @@ Future<void> main() async {
       expect(urls, equals(const [href]));
     });
 
-    final goldenSkip = Platform.isLinux ? null : 'Linux only';
+    final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
+    final goldenSkip = goldenSkipEnvVar == ''
+        ? Platform.isLinux
+            ? null
+            : 'Linux only'
+        : 'GOLDEN_SKIP=$goldenSkipEnvVar';
+
     GoldenToolkit.runWithConfiguration(
       () {
         group(
@@ -888,9 +901,7 @@ Future<void> main() async {
               'li_within_li': '<li>Foo</li>',
               'list_within_li': '<ul><li>Foo</li></ul>',
               'list_of_items_within_li': '<ol><li>Foo</li><li>Bar</li></ol>',
-              'multiline':
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br />\n' *
-                      3,
+              'multiline': 'Lorem ipsum dolor sit amet.<br />\n' * 3,
               'padding': '<div style="padding: 10px">Foo</div>',
               'ruby': '<ruby>明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby>',
             };
@@ -922,7 +933,8 @@ Future<void> main() async {
                 body: Padding(
                   padding: EdgeInsets.all(8.0),
                   child: HtmlWidget(
-                    '<div style="background: black; color: white; width: 200px; height: 200px">'
+                    '<div style="background: black; color: white; '
+                    'width: 200px; height: 200px">'
                     '<ul><li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li></ul>'
                     '<div>',
                   ),
@@ -990,14 +1002,6 @@ class _Golden extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(contents),
-              const Divider(),
-              Builder(
-                builder: (context) => Text(
-                  'UL:\n',
-                  style: Theme.of(context).textTheme.caption,
-                ),
-              ),
               HtmlWidget(
                 '''
 <ul>
@@ -1005,17 +1009,7 @@ class _Golden extends StatelessWidget {
   <li>$contents</li>
   <li>Below</li>
 </ul>
-''',
-              ),
-              const Divider(),
-              Builder(
-                builder: (context) => Text(
-                  'OL:\n',
-                  style: Theme.of(context).textTheme.caption,
-                ),
-              ),
-              HtmlWidget(
-                '''
+<br />
 <ol>
   <li>First</li>
   <li>$contents</li>

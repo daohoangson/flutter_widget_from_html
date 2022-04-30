@@ -1,3 +1,4 @@
+import 'package:demo_app/widgets/popup_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
@@ -8,6 +9,11 @@ class FontSizeScreen extends StatelessWidget {
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           title: const Text('FontSizeScreen'),
+          actions: const [
+            PopupMenu(
+              toggleIsSelectable: true,
+            ),
+          ],
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -40,34 +46,36 @@ class _Panel extends StatelessWidget {
               _Values(),
               Table(
                 children: [
-                  _row(null, 10),
-                  _row('2em', 20),
-                  _row('200%', 20),
-                  _row('20pt', 20 * 96 / 72),
-                  _row('20px', 20),
+                  _row(context, null, 10),
+                  _row(context, '2em', 20),
+                  _row(context, '200%', 20),
+                  _row(context, '20pt', 20 * 96 / 72),
+                  _row(context, '20px', 20),
                 ],
               ),
               const Divider(),
               HtmlWidget(
-                '<p style="font-size: 1em">Almost every developer\'s favorite molecule is '
-                'C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, '
+                '<p style="font-size: 1em">Almost every developer\'s favorite '
+                'molecule is C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, '
                 'also known as "caffeine."</p>',
+                isSelectable: context.isSelectable,
               ),
             ],
           ),
         ),
       );
 
-  TableRow _row(String data, double fontSize) => TableRow(
+  TableRow _row(BuildContext context, String data, double fontSize) => TableRow(
         children: [
           Text(
-            data ?? 'Default',
+            data ?? 'Text',
             style: TextStyle(fontSize: fontSize),
           ),
           HtmlWidget(
             data != null
                 ? '<span style="font-size: $data">$data</span>'
-                : 'No font-size',
+                : 'HtmlWidget',
+            isSelectable: context.isSelectable,
           ),
         ],
       );

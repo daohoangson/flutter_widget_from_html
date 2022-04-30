@@ -1,8 +1,7 @@
+import 'package:demo_app/screens/hello_world.dart' as enhanced;
 import 'package:demo_app/widgets/popup_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-
-import 'hello_world.dart' as enhanced;
 
 class HelloWorldCoreScreen extends StatelessWidget {
   const HelloWorldCoreScreen({Key key}) : super(key: key);

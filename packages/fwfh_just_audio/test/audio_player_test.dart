@@ -23,7 +23,7 @@ void main() {
       _duration = const Duration(milliseconds: 10);
       _playbackEvents = StreamController<PlaybackEventMessage>.broadcast();
 
-      audioSessionMc.setMockMethodCallHandler((_) {});
+      audioSessionMc.setMockMethodCallHandler((_) async {});
     });
 
     tearDown(() {
