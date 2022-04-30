@@ -68,7 +68,7 @@ class FwfhTextStyle extends _TextStyleProxy {
     String? package,
     TextOverflow? overflow,
     List<ui.FontVariation>? fontVariations,
-    }) =>
+  }) =>
       FwfhTextStyle.from(
         ref.apply(
           color: color,
@@ -97,7 +97,7 @@ class FwfhTextStyle extends _TextStyleProxy {
           fontFeatures: fontFeatures,
           package: package,
           overflow: overflow,
-          fontVariations: fontVariations
+          fontVariations: fontVariations,
         ),
       );
 
