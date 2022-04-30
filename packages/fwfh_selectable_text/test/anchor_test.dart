@@ -93,15 +93,13 @@ Future<void> pumpWidget(WidgetTester tester, Widget child) async {
 }
 
 class _ColumnTestApp extends StatelessWidget {
-  final String? html;
-
-  const _ColumnTestApp({this.html, Key? key}) : super(key: key);
+  const _ColumnTestApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => Scaffold(
         body: SingleChildScrollView(
           child: HtmlWidget(
-            html ?? htmlDefault,
+            htmlDefault,
             factoryBuilder: () => _WidgetFactory(),
           ),
         ),
@@ -109,14 +107,12 @@ class _ColumnTestApp extends StatelessWidget {
 }
 
 class _ListViewTestApp extends StatelessWidget {
-  final String? html;
-
-  const _ListViewTestApp({this.html, Key? key}) : super(key: key);
+  const _ListViewTestApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => Scaffold(
         body: HtmlWidget(
-          html ?? htmlDefault,
+          htmlDefault,
           factoryBuilder: () => _WidgetFactory(),
           renderMode: RenderMode.listView,
         ),
@@ -124,9 +120,7 @@ class _ListViewTestApp extends StatelessWidget {
 }
 
 class _SliverListTestApp extends StatelessWidget {
-  final String? html;
-
-  const _SliverListTestApp({this.html, Key? key}) : super(key: key);
+  const _SliverListTestApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => Scaffold(
@@ -134,7 +128,7 @@ class _SliverListTestApp extends StatelessWidget {
           cacheExtent: 0,
           slivers: [
             HtmlWidget(
-              html ?? htmlDefault,
+              htmlDefault,
               factoryBuilder: () => _WidgetFactory(),
               renderMode: RenderMode.sliverList,
             ),
