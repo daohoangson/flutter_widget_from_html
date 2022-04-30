@@ -1275,9 +1275,12 @@ Future<void> main() async {
 
     group('textScaleFactor=2', () {
       Future<String> explain2x(WidgetTester tester, String html) async {
-        tester.binding.window.textScaleFactorTestValue = 2;
+        tester.binding.platformDispatcher.textScaleFactorTestValue = 2;
+        addTearDown(
+          tester.binding.platformDispatcher.clearTextScaleFactorTestValue,
+        );
+
         final explained = await explain(tester, html);
-        tester.binding.window.clearTextScaleFactorTestValue();
         return explained;
       }
 

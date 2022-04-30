@@ -373,8 +373,8 @@ Future<void> pumpWidget(WidgetTester tester, Widget child) async {
   tester.binding.window.devicePixelRatioTestValue = 1.0;
   addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
 
-  tester.binding.window.textScaleFactorTestValue = 1.0;
-  addTearDown(tester.binding.window.clearTextScaleFactorTestValue);
+  tester.binding.platformDispatcher.textScaleFactorTestValue = 1.0;
+  addTearDown(tester.binding.platformDispatcher.clearTextScaleFactorTestValue);
 
   await tester.pumpWidget(MaterialApp(home: child));
   await tester.pump();
