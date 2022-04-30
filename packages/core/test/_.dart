@@ -655,46 +655,52 @@ class Explainer {
       attr.add('message=${widget.message}');
     }
 
-    // A-F
-    // `RichText` is an exception, it is a `MultiChildRenderObjectWidget`
-    // so it has to be processed first
+    // Special cases
+    // `RichText` is a `MultiChildRenderObjectWidget` but needs different logic
     attr.add(
       widget is RichText
           ? _inlineSpan(widget.text)
-          : widget is Container
+          : widget is MultiChildRenderObjectWidget
+              ? _widgetChildren(widget.children)
+              : '',
+    );
+    // `MouseRegion` is a `SingleChildRenderObjectWidget` since Flutter 2.11
+    // (see https://github.com/flutter/flutter/pull/96636)
+    attr.add(
+      widget is MouseRegion
+          ? _widgetChild(widget.child)
+          : widget is SingleChildRenderObjectWidget
               ? _widgetChild(widget.child)
               : '',
     );
+
+    // A-F
+    attr.add(
+      widget is Container ? _widgetChild(widget.child) : '',
+    );
+
     // G-M
     attr.add(
-      widget is GestureDetector
-          ? _widgetChild(widget.child)
-          : widget is MouseRegion
-              ? _widgetChild(widget.child)
-              : widget is MultiChildRenderObjectWidget
-                  ? (widget is! RichText
-                      ? _widgetChildren(widget.children)
-                      : '')
-                  : '',
+      widget is GestureDetector ? _widgetChild(widget.child) : '',
     );
 
     // N-T
     attr.add(
       widget is ProxyWidget
           ? _widgetChild(widget.child)
-          : widget is SingleChildRenderObjectWidget
+          : widget is SingleChildScrollView
               ? _widgetChild(widget.child)
-              : widget is SingleChildScrollView
-                  ? _widgetChild(widget.child)
-                  : widget is SelectableText
-                      ? _inlineSpan(widget.textSpan!)
-                      : widget is Text
-                          ? widget.data!
-                          : widget is Tooltip
-                              ? _widgetChild(widget.child)
-                              : '',
+              : widget is SelectableText
+                  ? _inlineSpan(widget.textSpan!)
+                  : widget is Text
+                      ? widget.data!
+                      : widget is Tooltip
+                          ? _widgetChild(widget.child)
+                          : '',
     );
+
     // U-Z
+    attr.add('');
 
     final attrStr = attr.where((a) => a.isNotEmpty).join(',');
     return '[$type${attrStr.isNotEmpty ? ':$attrStr' : ''}]';

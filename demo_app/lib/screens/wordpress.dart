@@ -64,7 +64,7 @@ class _PostScreen extends StatelessWidget {
           actions: [
             IconButton(
               icon: const Icon(Icons.open_in_browser),
-              onPressed: () => launch(post.link),
+              onPressed: () => launchUrl(Uri.parse(post.link)),
             ),
             const PopupMenu(
               toggleIsSelectable: true,
