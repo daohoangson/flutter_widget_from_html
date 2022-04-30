@@ -27,6 +27,8 @@ jobs:
     defaults:
       run:
         working-directory: packages/${{ matrix.package }}
+    env:
+      GOLDEN_SKIP: "yes"
     steps:
       - uses: actions/checkout@v3
       - name: Update pubspec.yaml
@@ -97,6 +99,8 @@ jobs:
     defaults:
       run:
         working-directory: packages/fwfh_text_style
+    env:
+      GOLDEN_SKIP: "yes"
     steps:
       - uses: actions/checkout@v3
         with:

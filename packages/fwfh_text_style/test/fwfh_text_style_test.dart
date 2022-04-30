@@ -208,7 +208,13 @@ Future<void> main() async {
     expect(merged, isNot(equals(obj)));
   });
 
-  final goldenSkip = Platform.isLinux ? null : 'Linux only';
+  final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
+  final goldenSkip = goldenSkipEnvVar == ''
+      ? Platform.isLinux
+          ? null
+          : 'Linux only'
+      : 'GOLDEN_SKIP=$goldenSkipEnvVar';
+
   GoldenToolkit.runWithConfiguration(
     () {
       group(
