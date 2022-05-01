@@ -7,4 +7,5 @@ RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/instal
   && echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/codespace/.profile
 
 ADD build.sh /tmp/build.sh
-RUN /tmp/build.sh
+RUN eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" \
+  && /tmp/build.sh
