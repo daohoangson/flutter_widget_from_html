@@ -65,9 +65,9 @@ class FwfhTextStyle extends _TextStyleProxy {
     Locale? locale,
     List<ui.Shadow>? shadows,
     List<ui.FontFeature>? fontFeatures,
+    List<ui.FontVariation>? fontVariations,
     String? package,
     TextOverflow? overflow,
-    List<ui.FontVariation>? fontVariations,
   }) =>
       FwfhTextStyle.from(
         ref.apply(
@@ -95,9 +95,9 @@ class FwfhTextStyle extends _TextStyleProxy {
           locale: locale,
           shadows: shadows,
           fontFeatures: fontFeatures,
+          fontVariations: fontVariations,
           package: package,
           overflow: overflow,
-          fontVariations: fontVariations,
         ),
       );
 
@@ -119,6 +119,7 @@ class FwfhTextStyle extends _TextStyleProxy {
     Paint? background,
     List<ui.Shadow>? shadows,
     List<ui.FontFeature>? fontFeatures,
+    List<ui.FontVariation>? fontVariations,
     TextDecoration? decoration,
     Color? decorationColor,
     TextDecorationStyle? decorationStyle,
@@ -128,7 +129,6 @@ class FwfhTextStyle extends _TextStyleProxy {
     List<String>? fontFamilyFallback,
     String? package,
     TextOverflow? overflow,
-    List<ui.FontVariation>? fontVariations,
   }) {
     String? newDebugLabel;
     assert(
@@ -161,6 +161,7 @@ class FwfhTextStyle extends _TextStyleProxy {
         background: background ?? this.background,
         shadows: shadows ?? this.shadows,
         fontFeatures: fontFeatures ?? this.fontFeatures,
+        fontVariations: fontVariations ?? this.fontVariations,
         decoration: decoration ?? this.decoration,
         decorationColor: decorationColor ?? this.decorationColor,
         decorationStyle: decorationStyle ?? this.decorationStyle,
@@ -170,7 +171,6 @@ class FwfhTextStyle extends _TextStyleProxy {
         fontFamilyFallback: fontFamilyFallback ?? this.fontFamilyFallback,
         package: package,
         overflow: overflow ?? this.overflow,
-        fontVariations: fontVariations ?? this.fontVariations,
       ),
     );
   }
@@ -241,13 +241,13 @@ abstract class _TextStyleProxy implements TextStyle {
   FontStyle? get fontStyle => ref.fontStyle;
 
   @override
+  List<ui.FontVariation>? get fontVariations => ref.fontVariations;
+
+  @override
   FontWeight? get fontWeight => ref.fontWeight;
 
   @override
   Paint? get foreground => ref.foreground;
-
-  @override
-  List<ui.FontVariation>? get fontVariations => ref.fontVariations;
 
   @override
   ui.ParagraphStyle getParagraphStyle({

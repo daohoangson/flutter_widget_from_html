@@ -1,3 +1,7 @@
+# 2.13.0-master.1
+
+- Add support for `TextStyle.fontVariations` (#756, authored by @ashutosh2014)
+
 ## 2.7.3+1
 
 - Make `TextStyle` inherit=true warning less noisy (#715)
