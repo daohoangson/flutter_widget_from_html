@@ -1,3 +1,7 @@
+## 0.8.5+2
+
+- Catch error when building synchronously (#760)
+
 ## 0.8.5+1
 
 - Fix percentage value bug (#712, authored by @equweiyu)
