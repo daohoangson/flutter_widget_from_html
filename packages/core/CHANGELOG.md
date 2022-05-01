@@ -1,3 +1,7 @@
+## 0.8.5+3
+
+- Fix min constraints being 100% (#761)
+
 ## 0.8.5+2
 
 - Catch error when building synchronously (#760)
