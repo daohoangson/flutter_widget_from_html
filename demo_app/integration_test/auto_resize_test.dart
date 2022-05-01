@@ -143,6 +143,7 @@ class _AspectRatioTest extends StatelessWidget {
     expect(
       _value[this]?.toStringAsFixed(fractionDigits),
       equals(expected.toStringAsFixed(fractionDigits)),
+      reason: 'actual ${_value[this]} != expected $expected',
     );
   }
 }
