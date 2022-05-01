@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fwfh_chewie/fwfh_chewie.dart';
@@ -140,9 +142,12 @@ class _AspectRatioTest extends StatelessWidget {
 
   void expectValueEquals(double expected) {
     const fractionDigits = 2;
+    final powerOfTen = pow(10, fractionDigits);
+    final actual = _value[this] ?? .0;
     expect(
-      _value[this]?.toStringAsFixed(fractionDigits),
-      equals(expected.toStringAsFixed(fractionDigits)),
+      (actual * powerOfTen).floorToDouble() / powerOfTen,
+      (expected * powerOfTen).floorToDouble() / powerOfTen,
+      reason: 'actual $actual != expected $expected',
     );
   }
 }
