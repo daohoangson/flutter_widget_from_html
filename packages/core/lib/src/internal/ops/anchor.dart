@@ -117,7 +117,7 @@ class AnchorRegistry {
       return completer.complete(false);
     }
 
-    WidgetsBinding.instance?.addPostFrameCallback(
+    _widgetsBindingInstance?.addPostFrameCallback(
       (_) => _ensureVisible(
         id,
         completer: completer,
@@ -237,6 +237,9 @@ extension BuildTreeAnchors on BuildTree {
     parent?.registerAnchor(anchor);
   }
 }
+
+// TODO: remove workaround when our minimum Flutter version >2.12
+WidgetsBinding? get _widgetsBindingInstance => WidgetsBinding.instance;
 
 class _AnchorBodyItemIndex {
   final bool isExact;

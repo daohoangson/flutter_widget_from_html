@@ -209,19 +209,17 @@ class _RenderCssSizing extends RenderProxyBox {
         min(c.maxHeight, _maxHeight?.clamp(0.0, c.maxHeight) ?? c.maxHeight);
     final maxWidth =
         min(c.maxWidth, _maxWidth?.clamp(0.0, c.maxWidth) ?? c.maxWidth);
-    final minHeight =
-        min(maxHeight, _minHeight?.clamp(0.0, c.maxHeight) ?? c.minHeight);
-    final minWidth =
-        min(maxWidth, _minWidth?.clamp(0.0, c.maxWidth) ?? c.minWidth);
 
-    final effectiveMinHeight =
-        c.hasTightHeight && _minHeight == null ? 0.0 : minHeight;
-    final effectiveMinWidth =
-        c.hasTightWidth && _minWidth == null ? 0.0 : minWidth;
-    final __preferredHeight =
-        _preferredHeight?.clamp(effectiveMinHeight, maxHeight);
-    final __preferredWidth =
-        _preferredWidth?.clamp(effectiveMinWidth, maxWidth);
+    final __minHeight =
+        min(maxHeight, _minHeight?.clamp(0.0, c.maxHeight) ?? c.minHeight);
+    final __minWidth =
+        min(maxWidth, _minWidth?.clamp(0.0, c.maxWidth) ?? c.minWidth);
+    // ignore min value if it's infinite
+    final minHeight = __minHeight.isFinite ? __minHeight : .0;
+    final minWidth = __minWidth.isFinite ? __minWidth : .0;
+
+    final __preferredHeight = _preferredHeight?.clamp(minHeight, maxHeight);
+    final __preferredWidth = _preferredWidth?.clamp(minWidth, maxWidth);
     // ignore preferred value if it's infinite
     final preferredHeight =
         __preferredHeight?.isFinite == true ? __preferredHeight : null;
