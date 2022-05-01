@@ -230,7 +230,7 @@ packages:
       path: "../packages/core"
       relative: true
     source: path
-    version: "0.8.4"
+    version: "0.8.5+2"
   frontend_server_client:
     dependency: transitive
     description:
