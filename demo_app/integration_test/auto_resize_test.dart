@@ -6,7 +6,9 @@ import 'package:integration_test/integration_test.dart';
 import 'package:measurer/measurer.dart';
 
 void main() {
+  debugPrint('before ensureInitialized');
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  debugPrint('after ensureInitialized');
 
   testWidgets('VideoPlayer', (WidgetTester tester) async {
     final test = _AspectRatioTest(
@@ -18,8 +20,11 @@ void main() {
       ),
     );
 
+    debugPrint('before runApp');
     runApp(test);
+    debugPrint('before pumpAndSettle');
     await tester.pumpAndSettle();
+    debugPrint('after pumpAndSettle');
 
     test.expectValueEquals(16 / 9);
   });
