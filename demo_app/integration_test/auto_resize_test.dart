@@ -127,7 +127,10 @@ class _AspectRatioTest extends StatelessWidget {
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Measurer(
-            onMeasure: (v, _) => _value[this] = v.width / v.height,
+            onMeasure: (size, _) {
+              debugPrint('onMeasure: size=$size');
+              _value[this] = size.width / size.height;
+            },
             child: child,
           ),
         ),
