@@ -230,7 +230,7 @@ packages:
       path: "../packages/core"
       relative: true
     source: path
-    version: "0.8.4"
+    version: "0.8.5+3"
   frontend_server_client:
     dependency: transitive
     description:
@@ -284,7 +284,7 @@ packages:
       path: "../packages/fwfh_text_style"
       relative: true
     source: path
-    version: "2.7.3+1"
+    version: "2.7.3+2"
   fwfh_url_launcher:
     dependency: "direct overridden"
     description:
@@ -742,7 +742,7 @@ packages:
       name: url_launcher
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.0.18"
+    version: "6.1.0"
   url_launcher_android:
     dependency: transitive
     description:

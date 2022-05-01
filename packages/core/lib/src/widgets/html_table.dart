@@ -192,6 +192,9 @@ class HtmlTableValignBaseline extends SingleChildRenderObjectWidget {
   }
 }
 
+// TODO: remove workaround when our minimum Flutter version >2.12
+WidgetsBinding? get _widgetsBindingInstance => WidgetsBinding.instance;
+
 extension _IterableDouble on Iterable<double> {
   double get sum => isEmpty ? 0.0 : reduce(_sum);
 
@@ -589,7 +592,7 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
           // skip painting this frame, wait for the correct padding
           _paddingTop += offsetY;
           _baselineWithOffset = rowBaseline;
-          WidgetsBinding.instance
+          _widgetsBindingInstance
               ?.addPostFrameCallback((_) => markNeedsLayout());
           return;
         }
@@ -603,7 +606,7 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
           if (offsetY != 0.0) {
             sibling._paddingTop += offsetY;
             sibling._baselineWithOffset = baselineWithOffset;
-            WidgetsBinding.instance
+            _widgetsBindingInstance
                 ?.addPostFrameCallback((_) => sibling.markNeedsLayout());
           }
         }
