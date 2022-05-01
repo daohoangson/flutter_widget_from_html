@@ -92,7 +92,7 @@ jobs:
             - [app-armeabi-v7a-release.apk](${{ steps.now.outputs.url }}/apks/app-armeabi-v7a-release.apk)
             - [app-arm64-v8a-release.apk](${{ steps.now.outputs.url }}/apks/app-arm64-v8a-release.apk)
             - [app-x86_64-release.apk](${{ steps.now.outputs.url }}/apks/app-x86_64-release.apk)
-            - [Debug APK via appetize.io](${{ steps.appetize.outputs.url }})
+            - [Debug APK](${{ steps.appetize.outputs.url }}) via https://appetize.io
 
             Web build has been deployed to ${{ steps.now.outputs.url }}. Quick links:
 
