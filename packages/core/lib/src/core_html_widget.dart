@@ -189,13 +189,13 @@ class HtmlWidgetState extends State<HtmlWidget> {
           if (snapshot.hasData) {
             return snapshot.data!;
           } else if (snapshot.hasError) {
-            final tree = _buildRootBuilder(this);
+            final tree = _newRootBuilder();
             return _sliverToBoxAdapterIfNeeded(
               _wf.onErrorBuilder(context, tree, snapshot.error) ?? widget0,
             );
           } else {
             return _sliverToBoxAdapterIfNeeded(
-              _wf.onLoadingBuilder(context, _buildRootBuilder(this)) ?? widget0,
+              _wf.onLoadingBuilder(context, _newRootBuilder()) ?? widget0,
             );
           }
         },
@@ -226,13 +226,26 @@ class HtmlWidgetState extends State<HtmlWidget> {
   Widget _buildSync() {
     Timeline.startSync('Build $widget (sync)');
 
-    final domNodes = _parseHtml(widget.html);
-    final built = _buildBody(this, domNodes);
+    Widget built;
+    try {
+      final domNodes = _parseHtml(widget.html);
+      built = _buildBody(this, domNodes);
+    } catch (error) {
+      built = _wf.onErrorBuilder(context, _newRootBuilder(), error) ?? widget0;
+    }
 
     Timeline.finishSync();
 
     return built;
   }
+
+  builder.Builder _newRootBuilder() => builder.Builder(
+        customStylesBuilder: widget.customStylesBuilder,
+        customWidgetBuilder: widget.customWidgetBuilder,
+        element: _rootElement,
+        styleBuilder: _rootStyleBuilder,
+        wf: _wf,
+      );
 
   Widget _sliverToBoxAdapterIfNeeded(Widget child) =>
       widget.renderMode == RenderMode.sliverList
@@ -270,19 +283,11 @@ Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
   final wf = state._wf;
   wf.reset(state);
 
-  final rootBuilder = _buildRootBuilder(state);
+  final rootBuilder = state._newRootBuilder();
   rootBuilder.addBitsFromNodes(domNodes);
 
   return rootBuilder.build()?.wrapWith(wf.buildBodyWidget) ?? widget0;
 }
-
-builder.Builder _buildRootBuilder(HtmlWidgetState state) => builder.Builder(
-      customStylesBuilder: state.widget.customStylesBuilder,
-      customWidgetBuilder: state.widget.customWidgetBuilder,
-      element: _rootElement,
-      styleBuilder: state._rootStyleBuilder,
-      wf: state._wf,
-    );
 
 dom.NodeList _parseHtml(String html) =>
     parser.HtmlParser(html, parseMeta: false).parseFragment().nodes;

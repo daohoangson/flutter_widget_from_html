@@ -303,6 +303,7 @@ void main() {
   group('onErrorBuilder', () {
     Future<String?> explain(
       WidgetTester tester, {
+      required bool buildAsync,
       OnErrorBuilder? onErrorBuilder,
     }) async {
       await runZonedGuarded(
@@ -312,11 +313,12 @@ void main() {
             null,
             hw: HtmlWidget(
               'Foo <span class="throw">bar</span>.',
-              buildAsync: true,
+              buildAsync: buildAsync,
               factoryBuilder: () => _OnErrorBuilderFactory(),
               key: helper.hwKey,
               onErrorBuilder: onErrorBuilder,
             ),
+            useExplainer: false,
           );
 
           await tester
@@ -329,17 +331,32 @@ void main() {
       return helper.explainWithoutPumping(useExplainer: false);
     }
 
-    testWidgets('renders default', (tester) async {
-      final explained = await explain(tester);
+    testWidgets('[sync] renders default', (tester) async {
+      final explained = await explain(tester, buildAsync: false);
       expect(explained, contains('Text("❌")'));
     });
 
-    testWidgets('renders custom', (tester) async {
+    testWidgets('[sync] renders custom', (tester) async {
       final explained = await explain(
         tester,
-        onErrorBuilder: (_, __, ___) => const Text('Custom'),
+        buildAsync: false,
+        onErrorBuilder: (_, __, ___) => const Text('sync error'),
       );
-      expect(explained, contains('RichText(text: "Custom")'));
+      expect(explained, contains('RichText(text: "sync error")'));
+    });
+
+    testWidgets('[async] renders default', (tester) async {
+      final explained = await explain(tester, buildAsync: true);
+      expect(explained, contains('Text("❌")'));
+    });
+
+    testWidgets('[async] renders custom', (tester) async {
+      final explained = await explain(
+        tester,
+        buildAsync: true,
+        onErrorBuilder: (_, __, ___) => const Text('async error'),
+      );
+      expect(explained, contains('RichText(text: "async error")'));
     });
   });
 

@@ -420,11 +420,9 @@ class _ListViewTestApp extends StatelessWidget {
 }
 
 class _SliverListTestApp extends StatelessWidget {
-  final String? html;
   final Key? keyBottom;
 
-  const _SliverListTestApp({this.html, Key? key, this.keyBottom})
-      : super(key: key);
+  const _SliverListTestApp({Key? key, this.keyBottom}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => Scaffold(
@@ -432,7 +430,7 @@ class _SliverListTestApp extends StatelessWidget {
           cacheExtent: 0,
           slivers: [
             HtmlWidget(
-              html ?? htmlDefault,
+              htmlDefault,
               factoryBuilder: () => _WidgetFactory(),
               key: globalKey,
               renderMode: RenderMode.sliverList,

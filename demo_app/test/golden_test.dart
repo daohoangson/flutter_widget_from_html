@@ -13,6 +13,13 @@ import 'package:golden_toolkit/golden_toolkit.dart';
 import '../../packages/fwfh_chewie/test/mock_video_player_platform.dart';
 import '../../packages/fwfh_webview/test/mock_webview_platform.dart';
 
+final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
+final goldenSkip = goldenSkipEnvVar == ''
+    ? Platform.isLinux
+        ? null
+        : 'Linux only'
+    : 'GOLDEN_SKIP=$goldenSkipEnvVar';
+
 void _test(
   String name,
   String html, {
@@ -44,7 +51,7 @@ void _test(
         debugDefaultTargetPlatformOverride = null;
         WidgetFactory.debugDeterministicLoadingWidget = false;
       },
-      skip: !Platform.isLinux,
+      skip: goldenSkip != null,
     );
 
 void main() {
