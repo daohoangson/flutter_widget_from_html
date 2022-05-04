@@ -205,15 +205,19 @@ class _RenderCssSizing extends RenderProxyBox {
   }
 
   BoxConstraints _applyContraints(BoxConstraints c) {
-    final maxHeight =
-        min(c.maxHeight, _maxHeight?.clamp(0.0, c.maxHeight) ?? c.maxHeight);
-    final maxWidth =
-        min(c.maxWidth, _maxWidth?.clamp(0.0, c.maxWidth) ?? c.maxWidth);
+    final maxHeight = _maxHeight?.clamp(0.0, c.maxHeight) ?? c.maxHeight;
+    final maxWidth = _maxWidth?.clamp(0.0, c.maxWidth) ?? c.maxWidth;
 
-    final __minHeight =
-        min(maxHeight, _minHeight?.clamp(0.0, c.maxHeight) ?? c.minHeight);
-    final __minWidth =
-        min(maxWidth, _minWidth?.clamp(0.0, c.maxWidth) ?? c.minWidth);
+    // special treatment for min values: ignore incoming constraint if it's tight
+    final __minHeight = min(
+      maxHeight,
+      _minHeight?.clamp(0.0, c.maxHeight) ??
+          (c.hasTightHeight ? .0 : c.minHeight),
+    );
+    final __minWidth = min(
+      maxWidth,
+      _minWidth?.clamp(0.0, c.maxWidth) ?? (c.hasTightWidth ? .0 : c.minWidth),
+    );
     // ignore min value if it's infinite
     final minHeight = __minHeight.isFinite ? __minHeight : .0;
     final minWidth = __minWidth.isFinite ? __minWidth : .0;
