@@ -162,7 +162,7 @@ class WebViewState extends State<WebView> {
 }
 
 // TODO: remove workaround when our minimum Flutter version >2.12
-WidgetsBinding? get _widgetsBindingInstance => WidgetsBinding.instance;
+WidgetsBinding get _widgetsBindingInstance => WidgetsBinding.instance;
 
 class _Issue37 with WidgetsBindingObserver {
   final WebViewState wvs;

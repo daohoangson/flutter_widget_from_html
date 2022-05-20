@@ -127,7 +127,7 @@ class FakeWebViewController extends WebViewPlatformController {
 }
 
 // TODO: remove workaround when our minimum Flutter version >2.12
-WidgetsBinding? get _widgetsBindingInstance => WidgetsBinding.instance;
+WidgetsBinding get _widgetsBindingInstance => WidgetsBinding.instance;
 
 class _FakeWebViewPlatform extends WebViewPlatform {
   _FakeWebViewPlatform() {
