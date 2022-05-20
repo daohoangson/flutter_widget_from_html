@@ -22,7 +22,7 @@ class WebViewState extends State<WebView> {
 
     if (widget.unsupportedWorkaroundForIssue37) {
       _issue37 = _Issue37(this);
-      _widgetsBindingInstance?.addObserver(_issue37!);
+      _widgetsBindingInstance.addObserver(_issue37!);
     }
   }
 
@@ -74,7 +74,7 @@ class WebViewState extends State<WebView> {
     }
 
     if (_issue37 != null) {
-      _widgetsBindingInstance?.removeObserver(_issue37!);
+      _widgetsBindingInstance.removeObserver(_issue37!);
     }
 
     super.dispose();

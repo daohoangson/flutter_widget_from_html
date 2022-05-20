@@ -117,7 +117,7 @@ class AnchorRegistry {
       return completer.complete(false);
     }
 
-    _widgetsBindingInstance?.addPostFrameCallback(
+    _widgetsBindingInstance.addPostFrameCallback(
       (_) => _ensureVisible(
         id,
         completer: completer,
@@ -228,7 +228,7 @@ class AnchorRegistry {
 }
 
 // TODO: remove workaround when our minimum Flutter version >2.12
-WidgetsBinding? get _widgetsBindingInstance => WidgetsBinding.instance;
+WidgetsBinding get _widgetsBindingInstance => WidgetsBinding.instance;
 
 class _AnchorBodyItemIndex {
   final bool isExact;

@@ -178,7 +178,7 @@ class _FakeWebViewState extends State<_FakeWebViewWidget> {
       widget.webViewPlatformCallbacksHandler,
       creationParams: widget.creationParams,
     );
-    _widgetsBindingInstance?.addPostFrameCallback((_) {
+    _widgetsBindingInstance.addPostFrameCallback((_) {
       widget.onWebViewPlatformCreated?.call(controller);
     });
   }
