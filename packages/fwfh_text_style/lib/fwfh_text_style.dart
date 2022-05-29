@@ -34,18 +34,17 @@ class FwfhTextStyle extends _TextStyleProxy {
   }
 
   /// Creates an instance from the closest [DefaultTextStyle].
-  static TextStyle of(BuildContext context) =>
-      FwfhTextStyle.from(DefaultTextStyle.of(context).style);
+  static TextStyle of(BuildContext context) => FwfhTextStyle.from(DefaultTextStyle.of(context).style);
 
   FwfhTextStyle._(TextStyle ref) : super._(ref);
 
   @override
   TextStyle apply({
-    Color? color,
-    Color? backgroundColor,
-    TextDecoration? decoration,
-    Color? decorationColor,
-    TextDecorationStyle? decorationStyle,
+    ui.Color? color,
+    ui.Color? backgroundColor,
+    ui.TextDecoration? decoration,
+    ui.Color? decorationColor,
+    ui.TextDecorationStyle? decorationStyle,
     double decorationThicknessFactor = 1.0,
     double decorationThicknessDelta = 0.0,
     String? fontFamily,
@@ -53,73 +52,76 @@ class FwfhTextStyle extends _TextStyleProxy {
     double fontSizeFactor = 1.0,
     double fontSizeDelta = 0.0,
     int fontWeightDelta = 0,
-    FontStyle? fontStyle,
+    ui.FontStyle? fontStyle,
     double letterSpacingFactor = 1.0,
     double letterSpacingDelta = 0.0,
     double wordSpacingFactor = 1.0,
     double wordSpacingDelta = 0.0,
     double heightFactor = 1.0,
     double heightDelta = 0.0,
-    TextBaseline? textBaseline,
+    ui.TextBaseline? textBaseline,
     ui.TextLeadingDistribution? leadingDistribution,
-    Locale? locale,
+    ui.Locale? locale,
     List<ui.Shadow>? shadows,
     List<ui.FontFeature>? fontFeatures,
+    List<ui.FontVariation>? fontVariations,
     String? package,
     TextOverflow? overflow,
-  }) =>
-      FwfhTextStyle.from(
-        ref.apply(
-          color: color,
-          backgroundColor: backgroundColor,
-          decoration: decoration,
-          decorationColor: decorationColor,
-          decorationStyle: decorationStyle,
-          decorationThicknessFactor: decorationThicknessFactor,
-          decorationThicknessDelta: decorationThicknessDelta,
-          fontFamily: fontFamily,
-          fontFamilyFallback: fontFamilyFallback,
-          fontSizeFactor: fontSizeFactor,
-          fontSizeDelta: fontSizeDelta,
-          fontWeightDelta: fontWeightDelta,
-          fontStyle: fontStyle,
-          letterSpacingFactor: letterSpacingFactor,
-          letterSpacingDelta: letterSpacingDelta,
-          wordSpacingFactor: wordSpacingFactor,
-          wordSpacingDelta: wordSpacingDelta,
-          heightFactor: heightFactor,
-          heightDelta: heightDelta,
-          textBaseline: textBaseline,
-          leadingDistribution: leadingDistribution,
-          locale: locale,
-          shadows: shadows,
-          fontFeatures: fontFeatures,
-          package: package,
-          overflow: overflow,
-        ),
-      );
+  }) {
+    return FwfhTextStyle.from(
+      ref.apply(
+        color: color,
+        backgroundColor: backgroundColor,
+        decoration: decoration,
+        decorationColor: decorationColor,
+        decorationStyle: decorationStyle,
+        decorationThicknessFactor: decorationThicknessFactor,
+        decorationThicknessDelta: decorationThicknessDelta,
+        fontFamily: fontFamily,
+        fontFamilyFallback: fontFamilyFallback,
+        fontSizeFactor: fontSizeFactor,
+        fontSizeDelta: fontSizeDelta,
+        fontWeightDelta: fontWeightDelta,
+        fontStyle: fontStyle,
+        letterSpacingFactor: letterSpacingFactor,
+        letterSpacingDelta: letterSpacingDelta,
+        wordSpacingFactor: wordSpacingFactor,
+        wordSpacingDelta: wordSpacingDelta,
+        heightFactor: heightFactor,
+        heightDelta: heightDelta,
+        textBaseline: textBaseline,
+        leadingDistribution: leadingDistribution,
+        locale: locale,
+        shadows: shadows,
+        fontFeatures: fontFeatures,
+        package: package,
+        overflow: overflow,
+      ),
+    );
+  }
 
   @override
   TextStyle copyWith({
     bool? inherit,
-    Color? color,
-    Color? backgroundColor,
+    ui.Color? color,
+    ui.Color? backgroundColor,
     double? fontSize,
-    FontWeight? fontWeight,
-    FontStyle? fontStyle,
+    ui.FontWeight? fontWeight,
+    ui.FontStyle? fontStyle,
     double? letterSpacing,
     double? wordSpacing,
-    TextBaseline? textBaseline,
-    dynamic height = _default,
+    ui.TextBaseline? textBaseline,
+    double? height,
     ui.TextLeadingDistribution? leadingDistribution,
-    Locale? locale,
-    Paint? foreground,
-    Paint? background,
+    ui.Locale? locale,
+    ui.Paint? foreground,
+    ui.Paint? background,
     List<ui.Shadow>? shadows,
     List<ui.FontFeature>? fontFeatures,
-    TextDecoration? decoration,
-    Color? decorationColor,
-    TextDecorationStyle? decorationStyle,
+    List<ui.FontVariation>? fontVariations,
+    ui.TextDecoration? decoration,
+    ui.Color? decorationColor,
+    ui.TextDecorationStyle? decorationStyle,
     double? decorationThickness,
     String? debugLabel,
     String? fontFamily,
@@ -139,12 +141,8 @@ class FwfhTextStyle extends _TextStyleProxy {
     return FwfhTextStyle.from(
       TextStyle(
         inherit: inherit ?? this.inherit,
-        color: this.foreground == null && foreground == null
-            ? color ?? this.color
-            : null,
-        backgroundColor: this.background == null && background == null
-            ? backgroundColor ?? this.backgroundColor
-            : null,
+        color: this.foreground == null && foreground == null ? color ?? this.color : null,
+        backgroundColor: this.background == null && background == null ? backgroundColor ?? this.backgroundColor : null,
         fontSize: fontSize ?? this.fontSize,
         fontWeight: fontWeight ?? this.fontWeight,
         fontStyle: fontStyle ?? this.fontStyle,
@@ -175,6 +173,10 @@ class FwfhTextStyle extends _TextStyleProxy {
   TextStyle merge(TextStyle? other) => FwfhTextStyle.from(
         ref.merge(other is FwfhTextStyle ? other.ref : other),
       );
+
+  @override
+  // TODO: implement fontVariations
+  List<ui.FontVariation>? get fontVariations => throw UnimplementedError();
 }
 
 class _DefaultValue {
@@ -275,8 +277,7 @@ abstract class _TextStyleProxy implements TextStyle {
       );
 
   @override
-  ui.TextStyle getTextStyle({double textScaleFactor = 1.0}) =>
-      ref.getTextStyle(textScaleFactor: textScaleFactor);
+  ui.TextStyle getTextStyle({double textScaleFactor = 1.0}) => ref.getTextStyle(textScaleFactor: textScaleFactor);
 
   @override
   bool operator ==(Object other) {
@@ -328,8 +329,7 @@ abstract class _TextStyleProxy implements TextStyle {
       ref.toDiagnosticsNode(name: name, style: style);
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) =>
-      ref.toString(minLevel: minLevel);
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) => ref.toString(minLevel: minLevel);
 
   @override
   String toStringShort() => ref.toStringShort();

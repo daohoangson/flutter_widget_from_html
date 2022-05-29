@@ -1,7 +1,6 @@
 import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart'
-    show CircularProgressIndicator, Theme, ThemeData, Tooltip;
+import 'package:flutter/material.dart' show CircularProgressIndicator, Theme, ThemeData, Tooltip;
 import 'package:flutter/widgets.dart';
 
 import 'core_data.dart';
@@ -11,8 +10,7 @@ import 'internal/core_ops.dart';
 import 'internal/core_parser.dart';
 import 'internal/flattener.dart';
 import 'internal/margin_vertical.dart';
-import 'internal/platform_specific/fallback.dart'
-    if (dart.library.io) 'internal/platform_specific/io.dart';
+import 'internal/platform_specific/fallback.dart' if (dart.library.io) 'internal/platform_specific/io.dart';
 
 /// A factory to build widgets.
 class WidgetFactory {
@@ -167,8 +165,7 @@ class WidgetFactory {
     final decoratedBox = child is DecoratedBox ? child : null;
     final grandChild = container?.child ?? decoratedBox?.child;
     final prevDeco = container?.decoration ?? decoratedBox?.decoration;
-    final baseDeco =
-        prevDeco is BoxDecoration ? prevDeco : const BoxDecoration();
+    final baseDeco = prevDeco is BoxDecoration ? prevDeco : const BoxDecoration();
     final decoration = baseDeco.copyWith(
       border: border,
       borderRadius: borderRadius,
@@ -223,10 +220,7 @@ class WidgetFactory {
       built = buildTooltip(meta, built, title);
     }
 
-    if (built != null &&
-        src.height?.isNegative == false &&
-        src.width?.isNegative == false &&
-        src.height != 0) {
+    if (built != null && src.height?.isNegative == false && src.width?.isNegative == false && src.height != 0) {
       built = buildAspectRatio(meta, built, src.width! / src.height!);
     }
 
@@ -262,22 +256,18 @@ class WidgetFactory {
     final image = src.image;
     final semanticLabel = image?.alt ?? image?.title;
     return Image(
-      errorBuilder: (context, error, _) =>
-          onErrorBuilder(context, meta, error, src) ?? widget0,
-      loadingBuilder: (context, child, loadingProgress) =>
-          loadingProgress == null
-              ? child
-              : onLoadingBuilder(
-                    context,
-                    meta,
-                    loadingProgress.expectedTotalBytes != null &&
-                            loadingProgress.expectedTotalBytes! > 0
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
-                    src,
-                  ) ??
-                  child,
+      errorBuilder: (context, error, _) => onErrorBuilder(context, meta, error, src) ?? widget0,
+      loadingBuilder: (context, child, loadingProgress) => loadingProgress == null
+          ? child
+          : onLoadingBuilder(
+                context,
+                meta,
+                loadingProgress.expectedTotalBytes != null && loadingProgress.expectedTotalBytes! > 0
+                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                    : null,
+                src,
+              ) ??
+              child,
       excludeFromSemantics: semanticLabel == null,
       fit: BoxFit.fill,
       image: provider,
@@ -314,13 +304,10 @@ class WidgetFactory {
     Widget child,
     EdgeInsetsGeometry padding,
   ) =>
-      padding == EdgeInsets.zero
-          ? child
-          : Padding(padding: padding, child: child);
+      padding == EdgeInsets.zero ? child : Padding(padding: padding, child: child);
 
   /// Builds [RichText].
-  Widget? buildText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) =>
-      RichText(
+  Widget? buildText(BuildMetadata meta, TextStyleHtml tsh, InlineSpan text) => RichText(
         maxLines: meta.maxLines > 0 ? meta.maxLines : null,
         overflow: meta.overflow,
         text: text,
@@ -354,8 +341,7 @@ class WidgetFactory {
   }
 
   /// Builds [Tooltip].
-  Widget? buildTooltip(BuildMetadata meta, Widget child, String message) =>
-      Tooltip(message: message, child: child);
+  Widget? buildTooltip(BuildMetadata meta, Widget child, String message) => Tooltip(message: message, child: child);
 
   /// Called when the [HtmlWidget]'s state is disposed.
   @mustCallSuper
@@ -384,8 +370,7 @@ class WidgetFactory {
 
       if (flattened.widgetBuilder != null) {
         widgets.add(
-          WidgetPlaceholder<BuildTree>(tree)
-              .wrapWith((context, _) => flattened.widgetBuilder!(context)),
+          WidgetPlaceholder<BuildTree>(tree).wrapWith((context, _) => flattened.widgetBuilder!(context)),
         );
         continue;
       }
@@ -514,9 +499,7 @@ class WidgetFactory {
       return null;
     }
 
-    final package = uri.queryParameters.containsKey('package') == true
-        ? uri.queryParameters['package']
-        : null;
+    final package = uri.queryParameters.containsKey('package') == true ? uri.queryParameters['package'] : null;
 
     return AssetImage(assetName, package: package);
   }
@@ -542,8 +525,7 @@ class WidgetFactory {
   }
 
   /// Returns a [NetworkImage].
-  ImageProvider? imageProviderFromNetwork(String url) =>
-      url.isNotEmpty ? NetworkImage(url) : null;
+  ImageProvider? imageProviderFromNetwork(String url) => url.isNotEmpty ? NetworkImage(url) : null;
 
   /// Builder for error widget if a complicated element failed to render.
   ///
@@ -621,8 +603,7 @@ class WidgetFactory {
 
     if (url.startsWith('#')) {
       final id = url.substring(1);
-      final handledViaAnchor =
-          await onTapAnchor(id, _anchorRegistry.ensureVisible);
+      final handledViaAnchor = await onTapAnchor(id, _anchorRegistry.ensureVisible);
       if (handledViaAnchor) {
         return true;
       }
@@ -729,8 +710,7 @@ class WidgetFactory {
       case kTagPre:
         _tagPre ??= BuildOp(
           onWidgets: (meta, widgets) => listOrNull(
-            buildColumnPlaceholder(meta, widgets)
-                ?.wrapWith((_, w) => buildHorizontalScrollView(meta, w)),
+            buildColumnPlaceholder(meta, widgets)?.wrapWith((_, w) => buildHorizontalScrollView(meta, w)),
           ),
         );
         meta
@@ -785,8 +765,7 @@ class WidgetFactory {
         break;
 
       case 'hr':
-        _tagHr ??=
-            BuildOp(onWidgets: (meta, _) => listOrNull(buildDivider(meta)));
+        _tagHr ??= BuildOp(onWidgets: (meta, _) => listOrNull(buildDivider(meta)));
         meta
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin + kSuffixBottom] = '1em'
@@ -964,8 +943,7 @@ class WidgetFactory {
 
       case kCssFontStyle:
         final term = style.term;
-        final fontStyle =
-            term != null ? TextStyleOps.fontStyleTryParse(term) : null;
+        final fontStyle = term != null ? TextStyleOps.fontStyleTryParse(term) : null;
         if (fontStyle != null) {
           meta.tsb.enqueue(TextStyleOps.fontStyle, fontStyle);
         }
@@ -973,8 +951,7 @@ class WidgetFactory {
 
       case kCssFontWeight:
         final value = style.value;
-        final fontWeight =
-            value != null ? TextStyleOps.fontWeightTryParse(value) : null;
+        final fontWeight = value != null ? TextStyleOps.fontWeightTryParse(value) : null;
         if (fontWeight != null) {
           meta.tsb.enqueue(TextStyleOps.fontWeight, fontWeight);
         }
@@ -1034,8 +1011,7 @@ class WidgetFactory {
 
       case kCssWhitespace:
         final term = style.term;
-        final whitespace =
-            term != null ? TextStyleOps.whitespaceTryParse(term) : null;
+        final whitespace = term != null ? TextStyleOps.whitespaceTryParse(term) : null;
         if (whitespace != null) {
           meta.tsb.enqueue(TextStyleOps.whitespace, whitespace);
         }
