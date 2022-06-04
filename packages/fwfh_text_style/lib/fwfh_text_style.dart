@@ -65,6 +65,7 @@ class FwfhTextStyle extends _TextStyleProxy {
     Locale? locale,
     List<ui.Shadow>? shadows,
     List<ui.FontFeature>? fontFeatures,
+    List<ui.FontVariation>? fontVariations,
     String? package,
     TextOverflow? overflow,
   }) =>
@@ -94,6 +95,7 @@ class FwfhTextStyle extends _TextStyleProxy {
           locale: locale,
           shadows: shadows,
           fontFeatures: fontFeatures,
+          fontVariations: fontVariations,
           package: package,
           overflow: overflow,
         ),
@@ -124,6 +126,7 @@ class FwfhTextStyle extends _TextStyleProxy {
     String? debugLabel,
     String? fontFamily,
     List<String>? fontFamilyFallback,
+    List<ui.FontVariation>? fontVariations,
     String? package,
     TextOverflow? overflow,
   }) {
@@ -165,6 +168,7 @@ class FwfhTextStyle extends _TextStyleProxy {
         debugLabel: newDebugLabel,
         fontFamily: fontFamily ?? this.fontFamily,
         fontFamilyFallback: fontFamilyFallback ?? this.fontFamilyFallback,
+        fontVariations: fontVariations ?? this.fontVariations,
         package: package,
         overflow: overflow ?? this.overflow,
       ),
@@ -175,6 +179,9 @@ class FwfhTextStyle extends _TextStyleProxy {
   TextStyle merge(TextStyle? other) => FwfhTextStyle.from(
         ref.merge(other is FwfhTextStyle ? other.ref : other),
       );
+
+  @override
+  List<ui.FontVariation>? get fontVariations => ref.fontVariations;
 }
 
 class _DefaultValue {
