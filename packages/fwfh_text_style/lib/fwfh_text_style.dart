@@ -67,6 +67,7 @@ class FwfhTextStyle extends _TextStyleProxy {
     List<ui.FontFeature>? fontFeatures,
     String? package,
     TextOverflow? overflow,
+    List<ui.FontVariation>? fontVariations,
   }) =>
       FwfhTextStyle.from(
         ref.apply(
@@ -96,6 +97,7 @@ class FwfhTextStyle extends _TextStyleProxy {
           fontFeatures: fontFeatures,
           package: package,
           overflow: overflow,
+          fontVariations:fontVariations
         ),
       );
 
@@ -126,6 +128,7 @@ class FwfhTextStyle extends _TextStyleProxy {
     List<String>? fontFamilyFallback,
     String? package,
     TextOverflow? overflow,
+    List<ui.FontVariation>? fontVariations,
   }) {
     String? newDebugLabel;
     assert(
@@ -167,6 +170,7 @@ class FwfhTextStyle extends _TextStyleProxy {
         fontFamilyFallback: fontFamilyFallback ?? this.fontFamilyFallback,
         package: package,
         overflow: overflow ?? this.overflow,
+        fontVariations: fontVariations ?? this.fontVariations
       ),
     );
   }
@@ -241,6 +245,9 @@ abstract class _TextStyleProxy implements TextStyle {
 
   @override
   Paint? get foreground => ref.foreground;
+
+  @override
+  List<ui.FontVariation>? get fontVariations => ref.fontVariations;
 
   @override
   ui.ParagraphStyle getParagraphStyle({
