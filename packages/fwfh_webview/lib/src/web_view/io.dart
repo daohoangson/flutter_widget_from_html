@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:webview_flutter/webview_flutter.dart' as lib;
+import 'package:flutter_webview_pro/webview_flutter.dart' as lib;
 
 import 'web_view.dart';
 
@@ -30,20 +30,15 @@ class WebViewState extends State<WebView> {
   Widget build(BuildContext context) {
     final webView = _buildWebView();
 
-    if (widget.unsupportedWorkaroundForIssue375 &&
-        defaultTargetPlatform == TargetPlatform.android) {
+    if (widget.unsupportedWorkaroundForIssue375 && defaultTargetPlatform == TargetPlatform.android) {
       return LayoutBuilder(
         builder: (context, constraints) {
-          final width = constraints.hasBoundedWidth
-              ? constraints.maxWidth
-              : MediaQuery.of(context).size.width;
+          final width = constraints.hasBoundedWidth ? constraints.maxWidth : MediaQuery.of(context).size.width;
           final height = width / _aspectRatio;
           return SizedBox(
             height: min(
               height,
-              constraints.hasBoundedHeight
-                  ? constraints.maxHeight
-                  : MediaQuery.of(context).size.height,
+              constraints.hasBoundedHeight ? constraints.maxHeight : MediaQuery.of(context).size.height,
             ),
             width: width,
             child: webView,
@@ -112,15 +107,11 @@ class WebViewState extends State<WebView> {
         initialUrl: widget.url,
         initialMediaPlaybackPolicy: widget.mediaPlaybackAlwaysAllow
             ? lib.AutoMediaPlaybackPolicy.always_allow
-            : lib.AutoMediaPlaybackPolicy
-                .require_user_action_for_all_media_types,
-        javascriptMode: widget.js
-            ? lib.JavascriptMode.unrestricted
-            : lib.JavascriptMode.disabled,
+            : lib.AutoMediaPlaybackPolicy.require_user_action_for_all_media_types,
+        javascriptMode: widget.js ? lib.JavascriptMode.unrestricted : lib.JavascriptMode.disabled,
         key: Key(widget.url),
-        navigationDelegate: widget.interceptNavigationRequest != null
-            ? (req) => _interceptNavigationRequest(req)
-            : null,
+        navigationDelegate:
+            widget.interceptNavigationRequest != null ? (req) => _interceptNavigationRequest(req) : null,
         onPageFinished: _onPageFinished,
         onWebViewCreated: (c) => _wvc = c,
         userAgent: widget.userAgent,
@@ -139,9 +130,7 @@ class WebViewState extends State<WebView> {
       intercepted = widget.interceptNavigationRequest!(req.url);
     }
 
-    return intercepted
-        ? lib.NavigationDecision.prevent
-        : lib.NavigationDecision.navigate;
+    return intercepted ? lib.NavigationDecision.prevent : lib.NavigationDecision.navigate;
   }
 
   void _onPageFinished(String url) {
