@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_webview_pro/webview_flutter.dart' as lib;
+import 'package:webview_flutter/webview_flutter.dart' as lib;
 
 import 'web_view.dart';
 
