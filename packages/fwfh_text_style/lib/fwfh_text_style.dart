@@ -176,7 +176,7 @@ class FwfhTextStyle extends _TextStyleProxy {
 
   @override
   // TODO: implement fontVariations
-  List<ui.FontVariation>? get fontVariations => throw UnimplementedError();
+  List<ui.FontVariation>? get fontVariations => ref.fontVariations;
 }
 
 class _DefaultValue {
