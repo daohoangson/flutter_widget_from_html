@@ -87,7 +87,7 @@ class Flattener {
   }
 
   void _loop(
-    final BuildBit bit, {
+    BuildBit bit, {
     required bool shouldBeTrimmed,
   }) {
     final thisTsb = _getBitTsb(bit);
@@ -220,16 +220,16 @@ class Flattener {
           final spanBuilders = scopedSpans.reversed.toList(growable: false);
           final children = <InlineSpan>[];
 
-          var _isLast = isLast != false;
+          var isLast_ = isLast != false;
           for (final spanBuilder in spanBuilders) {
-            final child = spanBuilder(context, whitespace, isLast: _isLast);
+            final child = spanBuilder(context, whitespace, isLast: isLast_);
             if (child != null) {
-              _isLast = false;
+              isLast_ = false;
               children.insert(0, child);
             }
           }
 
-          final text = scopedStrings.toText(whitespace, dropNewLine: _isLast);
+          final text = scopedStrings.toText(whitespace, dropNewLine: isLast_);
           if (text.isEmpty && children.isEmpty) {
             final nonWhitespaceStrings = scopedStrings
                 .where((str) => str.bit is! WhitespaceBit)

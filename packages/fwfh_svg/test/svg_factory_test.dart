@@ -323,7 +323,7 @@ class _GoldenDisallowFactory extends WidgetFactory with SvgFactory {
 class _MockHttpClient extends Mock implements HttpClient {
   @override
   // ignore: avoid_setters_without_getters
-  set autoUncompress(bool _autoUncompress) {}
+  set autoUncompress(bool _) {}
 }
 
 class _MockHttpClientRequest extends Mock implements HttpClientRequest {}

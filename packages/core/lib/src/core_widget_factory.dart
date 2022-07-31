@@ -176,6 +176,8 @@ class WidgetFactory {
     );
 
     if (!isBorderBox || container != null) {
+      // we are using Container intentionally because it handles border differently
+      // ignore: use_decorated_box
       return Container(
         decoration: decoration,
         child: grandChild ?? child,
