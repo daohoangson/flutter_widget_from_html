@@ -1,5 +1,5 @@
 name: flutter_widget_from_html_core
-version: 0.8.5+1
+version: 0.8.5+3
 description: Flutter package to render html as widgets that focuses on correctness and extensibility.
 homepage: https://github.com/daohoangson/flutter_widget_from_html/tree/master/packages/core
 

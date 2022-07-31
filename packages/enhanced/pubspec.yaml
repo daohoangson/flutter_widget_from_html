@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_widget_from_html_core: ^0.8.4
+  flutter_widget_from_html_core: ^0.8.5+3
   fwfh_cached_network_image: ^0.7.0+2
   fwfh_chewie: ^0.7.0+1
   fwfh_just_audio: ^0.6.2+2

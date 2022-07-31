@@ -224,8 +224,13 @@ class HtmlWidgetState extends State<HtmlWidget> {
   Widget _buildSync() {
     Timeline.startSync('Build $widget (sync)');
 
-    final domNodes = _parseHtml(widget.html);
-    final built = _buildBody(this, domNodes);
+    Widget built;
+    try {
+      final domNodes = _parseHtml(widget.html);
+      built = _buildBody(this, domNodes);
+    } catch (error) {
+      built = _wf.onErrorBuilder(context, _rootMeta, error) ?? widget0;
+    }
 
     Timeline.finishSync();
 

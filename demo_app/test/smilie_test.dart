@@ -6,7 +6,7 @@ import 'package:golden_toolkit/golden_toolkit.dart';
 
 void main() {
   final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
-  final goldenSkip = goldenSkipEnvVar == ''
+  final goldenSkip = goldenSkipEnvVar == null
       ? Platform.isLinux
           ? null
           : 'Linux only'
