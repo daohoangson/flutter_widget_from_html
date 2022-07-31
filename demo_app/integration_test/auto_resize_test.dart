@@ -15,7 +15,7 @@ void main() {
       child: VideoPlayer(
         'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
         aspectRatio: 1,
-        loadingBuilder: (_a, _b, _c) =>
+        loadingBuilder: (_, __, ___) =>
             const Center(child: CircularProgressIndicator()),
       ),
     );

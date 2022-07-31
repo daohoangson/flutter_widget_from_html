@@ -20,11 +20,11 @@ class FontSizeScreen extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                Container(
+                ColoredBox(
                   color: Colors.blue,
                   child: _Panel(),
                 ),
-                Container(
+                ColoredBox(
                   color: Colors.red,
                   child: _Slider(),
                 ),

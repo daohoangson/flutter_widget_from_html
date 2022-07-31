@@ -13,7 +13,7 @@ void main() {
     const url = 'http://domain.com/?document.body.scrollWidth=1000&'
         'document.body.scrollHeight=1000';
 
-    var _aspectRatio = double.nan;
+    var aspectRatio = double.nan;
 
     // ignore: prefer_function_declarations_over_variables
     final run = (
@@ -23,7 +23,7 @@ void main() {
       Widget Function(Widget)? wrapper,
     }) async {
       final child = Measurer(
-        onMeasure: (v, _) => _aspectRatio = v.width / v.height,
+        onMeasure: (v, _) => aspectRatio = v.width / v.height,
         child: WebView(
           '$url&$urlQueryParams',
           aspectRatio: defaultAspectRatio,
@@ -47,7 +47,7 @@ void main() {
 
     // ignore: prefer_function_declarations_over_variables
     final expectAspectRatioEquals = (double expected) => expect(
-          _aspectRatio.toStringAsFixed(2),
+          aspectRatio.toStringAsFixed(2),
           equals(expected.toStringAsFixed(2)),
         );
 
