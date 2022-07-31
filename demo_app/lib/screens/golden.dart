@@ -83,7 +83,7 @@ class Golden extends StatelessWidget {
       body: SingleChildScrollView(
         child: RepaintBoundary(
           key: targetKey,
-          child: Container(
+          child: ColoredBox(
             color: Colors.white,
             child: Padding(
               padding: const EdgeInsets.all(10),

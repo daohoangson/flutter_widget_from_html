@@ -192,6 +192,9 @@ class HtmlTableValignBaseline extends SingleChildRenderObjectWidget {
   }
 }
 
+// TODO: remove workaround when our minimum Flutter version >2.12
+WidgetsBinding? get _widgetsBindingInstance => WidgetsBinding.instance;
+
 extension _IterableDouble on Iterable<double> {
   double get sum => isEmpty ? 0.0 : reduce(_sum);
 
@@ -407,11 +410,10 @@ class _TableRenderObject extends RenderBox
   }
 
   static Size _performLayout(
-    final _TableRenderObject tro,
-    final RenderBox firstChild,
-    final BoxConstraints constraints,
-    final Size Function(RenderBox renderBox, BoxConstraints constraints)
-        layouter,
+    _TableRenderObject tro,
+    RenderBox firstChild,
+    BoxConstraints constraints,
+    Size Function(RenderBox renderBox, BoxConstraints constraints) layouter,
   ) {
     final children = <RenderBox>[];
     final cells = <_TableCellData>[];
@@ -589,7 +591,7 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
           // skip painting this frame, wait for the correct padding
           _paddingTop += offsetY;
           _baselineWithOffset = rowBaseline;
-          WidgetsBinding.instance
+          _widgetsBindingInstance
               ?.addPostFrameCallback((_) => markNeedsLayout());
           return;
         }
@@ -603,7 +605,7 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
           if (offsetY != 0.0) {
             sibling._paddingTop += offsetY;
             sibling._baselineWithOffset = baselineWithOffset;
-            WidgetsBinding.instance
+            _widgetsBindingInstance
                 ?.addPostFrameCallback((_) => sibling.markNeedsLayout());
           }
         }
@@ -629,11 +631,10 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
   String toStringShort() => '_ValignBaselineRenderObject(row: $_row)';
 
   static Size _performLayout(
-    final RenderBox? child,
-    final double paddingTop,
-    final BoxConstraints constraints,
-    final Size? Function(RenderBox? renderBox, BoxConstraints constraints)
-        layouter,
+    RenderBox? child,
+    double paddingTop,
+    BoxConstraints constraints,
+    Size? Function(RenderBox? renderBox, BoxConstraints constraints) layouter,
   ) {
     final cc = constraints.loosen().deflate(EdgeInsets.only(top: paddingTop));
     final childSize = layouter(child, cc) ?? Size.zero;

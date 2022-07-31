@@ -24,7 +24,7 @@ jobs:
         with:
           name: failures
           path: demo_app/test/failures/
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
 
   integration_test:
     name: Integration test
@@ -39,18 +39,20 @@ jobs:
           distribution: "temurin"
           java-version: "11"
       - name: AVD cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: avd-cache
         with:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd
+          key: avd-20220501
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
+          target: google_apis
+          profile: pixel_3a
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
@@ -59,6 +61,8 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
+          target: google_apis
+          profile: pixel_3a
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true

@@ -11,6 +11,8 @@ jobs:
   unit_test:
     name: Unit test
     runs-on: ubuntu-latest
+    env:
+      GOLDEN_SKIP: "yes"
     steps:
       - uses: actions/checkout@v3
       - name: Setup Flutter
@@ -23,4 +25,4 @@ jobs:
         with:
           name: failures
           path: demo_app/test/failures/
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3

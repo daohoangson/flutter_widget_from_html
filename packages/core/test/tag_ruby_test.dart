@@ -229,7 +229,13 @@ Future<void> main() async {
       expect(urls, equals(const [href]));
     });
 
-    final goldenSkip = Platform.isLinux ? null : 'Linux only';
+    final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
+    final goldenSkip = goldenSkipEnvVar == null
+        ? Platform.isLinux
+            ? null
+            : 'Linux only'
+        : 'GOLDEN_SKIP=$goldenSkipEnvVar';
+
     GoldenToolkit.runWithConfiguration(
       () {
         testGoldens(

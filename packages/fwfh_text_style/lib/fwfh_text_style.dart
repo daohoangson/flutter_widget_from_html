@@ -65,6 +65,7 @@ class FwfhTextStyle extends _TextStyleProxy {
     Locale? locale,
     List<ui.Shadow>? shadows,
     List<ui.FontFeature>? fontFeatures,
+    List<ui.FontVariation>? fontVariations,
     String? package,
     TextOverflow? overflow,
   }) =>
@@ -94,6 +95,7 @@ class FwfhTextStyle extends _TextStyleProxy {
           locale: locale,
           shadows: shadows,
           fontFeatures: fontFeatures,
+          fontVariations: fontVariations,
           package: package,
           overflow: overflow,
         ),
@@ -117,6 +119,7 @@ class FwfhTextStyle extends _TextStyleProxy {
     Paint? background,
     List<ui.Shadow>? shadows,
     List<ui.FontFeature>? fontFeatures,
+    List<ui.FontVariation>? fontVariations,
     TextDecoration? decoration,
     Color? decorationColor,
     TextDecorationStyle? decorationStyle,
@@ -158,6 +161,7 @@ class FwfhTextStyle extends _TextStyleProxy {
         background: background ?? this.background,
         shadows: shadows ?? this.shadows,
         fontFeatures: fontFeatures ?? this.fontFeatures,
+        fontVariations: fontVariations ?? this.fontVariations,
         decoration: decoration ?? this.decoration,
         decorationColor: decorationColor ?? this.decorationColor,
         decorationStyle: decorationStyle ?? this.decorationStyle,
@@ -235,6 +239,9 @@ abstract class _TextStyleProxy implements TextStyle {
 
   @override
   FontStyle? get fontStyle => ref.fontStyle;
+
+  @override
+  List<ui.FontVariation>? get fontVariations => ref.fontVariations;
 
   @override
   FontWeight? get fontWeight => ref.fontWeight;

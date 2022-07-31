@@ -19,4 +19,6 @@ This repo contains the source code for everything `HtmlWidget`-related.
 | [Demo app](./demo_app/)                                            | https://demo.fwfh.dev, [supported/tags.html](https://demo.fwfh.dev/supported/tags.html)                                                  |
 | Special [dartpad](https://dartpad.dev) with our packages           | https://try.fwfh.dev                                                                                                                     |
 
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/daohoangson/flutter_widget_from_html)
+
 <a href="https://www.buymeacoffee.com/daohoangson" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
