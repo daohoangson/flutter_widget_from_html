@@ -344,35 +344,35 @@ class CssLengthBox {
 
   @override
   String toString() {
-    const _null = 'null';
-    final left = (_left ?? _inlineStart)?.toString() ?? _null;
-    final top = this.top?.toString() ?? _null;
-    final right = (_right ?? _inlineEnd)?.toString() ?? _null;
-    final bottom = this.bottom?.toString() ?? _null;
+    const null_ = 'null';
+    final left = (_left ?? _inlineStart)?.toString() ?? null_;
+    final top = this.top?.toString() ?? null_;
+    final right = (_right ?? _inlineEnd)?.toString() ?? null_;
+    final bottom = this.bottom?.toString() ?? null_;
     if (left == right && right == top && top == bottom) {
       return 'CssLengthBox.all($left)';
     }
 
     final values = [left, top, right, bottom];
-    if (values.where((v) => v == _null).length == 3) {
-      if (left != _null) {
+    if (values.where((v) => v == null_).length == 3) {
+      if (left != null_) {
         if (_left != null) {
           return 'CssLengthBox(left=$_left)';
         } else {
           return 'CssLengthBox(inline-start=$_inlineStart)';
         }
       }
-      if (top != _null) {
+      if (top != null_) {
         return 'CssLengthBox(top=$top)';
       }
-      if (right != _null) {
+      if (right != null_) {
         if (_right != null) {
           return 'CssLengthBox(right=$_right)';
         } else {
           return 'CssLengthBox(inline-end=$_inlineEnd)';
         }
       }
-      if (bottom != _null) {
+      if (bottom != null_) {
         return 'CssLengthBox(bottom=$bottom)';
       }
     }

@@ -789,8 +789,8 @@ Future<void> main() async {
     });
 
     testWidgets('renders within dir attribute', (tester) async {
-      const _dirRtl = '<div dir="rtl">$html</div>';
-      final explained = await explain(tester, _dirRtl, useExplainer: false);
+      const dirRtl = '<div dir="rtl">$html</div>';
+      final explained = await explain(tester, dirRtl, useExplainer: false);
       expect(explained, contains('HtmlListItem(textDirection: rtl)'));
     });
   });
