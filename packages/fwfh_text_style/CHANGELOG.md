@@ -1,4 +1,4 @@
-# 2.13.0-master.1
+# 2.13.0
 
 - Add support for `TextStyle.fontVariations` (#756, authored by @ashutosh2014)
 
