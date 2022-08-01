@@ -83,6 +83,7 @@ jobs:
         channel:
           - beta
           - master
+          - stable
 
     # In case one of these fails, create a new PR against the `release/*` branch
     # and publish a new version to make sure there is a compatible version

@@ -1,3 +1,7 @@
+## 2.22.08
+
+- Remove upper Flutter version constraint
+
 ## 2.7.3+2
 
 - Restrict maximum Flutter version (<2.13.0, see #756)
