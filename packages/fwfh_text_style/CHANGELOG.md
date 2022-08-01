@@ -1,3 +1,7 @@
+# 2.22.08+1
+
+- Restrict minimum Flutter version (>=3.1.0-0)
+
 # 2.13.0
 
 - Add support for `TextStyle.fontVariations` (#756, authored by @ashutosh2014)
