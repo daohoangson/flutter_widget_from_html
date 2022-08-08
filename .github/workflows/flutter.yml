@@ -69,6 +69,7 @@ jobs:
           script: ./tool/integration.sh
 
       - name: Create iOS simulator
+        if: always()
         run: |
           set -e
 
