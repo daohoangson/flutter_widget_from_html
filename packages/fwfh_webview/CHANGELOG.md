@@ -1,3 +1,7 @@
+## 0.6.2+3
+
+- Suppress Flutter 3 warning about `WidgetsBinding` usage
+
 ## 0.6.2+2
 
 - Improve error & timer handling (#709)
