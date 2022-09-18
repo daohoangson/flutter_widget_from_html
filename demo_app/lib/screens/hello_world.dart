@@ -146,20 +146,20 @@ class HelloWorldScreen extends StatelessWidget {
   const HelloWorldScreen({Key key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: const Text('HelloWorldScreen'),
-          actions: const [
-            PopupMenu(
-              scrollToTop: true,
-              toggleIsSelectable: true,
-            ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ContextualSelectionArea(
+  Widget build(BuildContext context) => ContextualSelectionArea(
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('HelloWorldScreen'),
+            actions: const [
+              PopupMenu(
+                scrollToTop: true,
+                toggleIsSelectable: true,
+              ),
+            ],
+          ),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
               child: HtmlWidget(
                 kHtml,
                 key: context.key,

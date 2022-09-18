@@ -2,7 +2,7 @@ import 'package:demo_app/widgets/popup_menu.dart';
 import 'package:flutter/material.dart';
 
 class ContextualSelectionArea extends StatelessWidget {
-  final Widget child;
+  final Scaffold child;
 
   const ContextualSelectionArea({
     @required this.child,

@@ -38,11 +38,9 @@ class Golden extends StatelessWidget {
         ),
       LimitedBox(
         maxHeight: 400,
-        child: ContextualSelectionArea(
-          child: core.HtmlWidget(
-            html,
-            baseUrl: baseUrl,
-          ),
+        child: core.HtmlWidget(
+          html,
+          baseUrl: baseUrl,
         ),
       ),
     ];
@@ -56,38 +54,38 @@ class Golden extends StatelessWidget {
         ),
         LimitedBox(
           maxHeight: 400,
-          child: ContextualSelectionArea(
-            child: enhanced.HtmlWidget(
-              html,
-              baseUrl: baseUrl,
-              // ignore: deprecated_member_use
-              webView: true,
-            ),
+          child: enhanced.HtmlWidget(
+            html,
+            baseUrl: baseUrl,
+            // ignore: deprecated_member_use
+            webView: true,
           ),
         ),
       ]);
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(name),
-        actions: const [
-          PopupMenu(
-            toggleIsSelectable: true,
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: RepaintBoundary(
-          key: targetKey,
-          child: ColoredBox(
-            color: Colors.white,
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: children,
+    return ContextualSelectionArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(name),
+          actions: const [
+            PopupMenu(
+              toggleIsSelectable: true,
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
+          child: RepaintBoundary(
+            key: targetKey,
+            child: ColoredBox(
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: children,
+                ),
               ),
             ),
           ),
