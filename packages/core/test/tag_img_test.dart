@@ -429,6 +429,8 @@ class _TestImageProvider extends ImageProvider<Object> {
       SynchronousFuture<_TestImageProvider>(this);
 
   @override
+  // TODO: switch to use load buffer when ImageProvider does
+  // ignore: deprecated_member_use
   ImageStreamCompleter load(Object key, DecoderCallback decode) =>
       streamCompleter;
 }
