@@ -79,4 +79,5 @@ jobs:
           _runTime=$( xcrun simctl list runtimes ios -j | jq '.runtimes[].identifier' -r | tail -n 1 )
           xcrun simctl create "$_deviceTypeName" "$_deviceTypeId" "$_runTime" | xargs xcrun simctl boot
       - name: Run tests on iOS
+        if: always()
         run: ./tool/integration.sh
