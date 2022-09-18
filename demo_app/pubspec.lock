@@ -258,11 +258,11 @@ packages:
     source: path
     version: "0.6.2+2"
   fwfh_selectable_text:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "../packages/fwfh_selectable_text"
-      relative: true
-    source: path
+      name: fwfh_selectable_text
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "0.8.3+1"
   fwfh_svg:
     dependency: "direct overridden"

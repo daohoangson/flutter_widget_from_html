@@ -14,18 +14,6 @@ export 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 /// A widget that builds Flutter widget tree from HTML
 /// with support for IFRAME, VIDEO and many other tags.
 class HtmlWidget extends core.HtmlWidget {
-  /// Controls whether text is rendered with [SelectableText] or [RichText].
-  ///
-  /// Default: `false`, use [RichText].
-  final bool isSelectable;
-
-  /// The callback when user changes the selection of text.
-  ///
-  /// This doesn't have any effect if [isSelectable] is disabled.
-  ///
-  /// See [SelectableText.onSelectionChanged].
-  final SelectionChangedCallback? onSelectionChanged;
-
   /// Controls whether IFRAME is rendered as [WebView].
   ///
   /// See [WidgetFactory.webView].
@@ -64,14 +52,12 @@ class HtmlWidget extends core.HtmlWidget {
     bool? buildAsync,
     bool enableCaching = true,
     WidgetFactory Function()? factoryBuilder,
-    this.isSelectable = false,
     Key? key,
     Uri? baseUrl,
     CustomStylesBuilder? customStylesBuilder,
     CustomWidgetBuilder? customWidgetBuilder,
     OnErrorBuilder? onErrorBuilder,
     OnLoadingBuilder? onLoadingBuilder,
-    this.onSelectionChanged,
     void Function(ImageMetadata)? onTapImage,
     FutureOr<bool> Function(String)? onTapUrl,
     core.RebuildTriggers? rebuildTriggers,
@@ -99,7 +85,6 @@ class HtmlWidget extends core.HtmlWidget {
           onTapImage: onTapImage,
           onTapUrl: onTapUrl,
           rebuildTriggers: core.RebuildTriggers([
-            isSelectable,
             webView,
             webViewJs,
             if (rebuildTriggers != null) rebuildTriggers,

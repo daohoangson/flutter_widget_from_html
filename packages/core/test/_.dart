@@ -645,12 +645,6 @@ class Explainer {
       );
     }
 
-    if (widget is SelectableText) {
-      if (widget.onSelectionChanged != null) {
-        attr.add('+onSelectionChanged');
-      }
-    }
-
     if (widget is Tooltip) {
       attr.add('message=${widget.message}');
     }
@@ -690,13 +684,11 @@ class Explainer {
           ? _widgetChild(widget.child)
           : widget is SingleChildScrollView
               ? _widgetChild(widget.child)
-              : widget is SelectableText
-                  ? _inlineSpan(widget.textSpan!)
-                  : widget is Text
-                      ? widget.data!
-                      : widget is Tooltip
-                          ? _widgetChild(widget.child)
-                          : '',
+              : widget is Text
+                  ? widget.data!
+                  : widget is Tooltip
+                      ? _widgetChild(widget.child)
+                      : '',
     );
 
     // U-Z
@@ -752,16 +744,6 @@ class _TextFinder extends MatchFinder {
         if (text.toPlainText() == data) {
           return true;
         }
-      }
-    } else if (widget is SelectableText) {
-      final text = widget.data;
-      if (text != null && text == data) {
-        return true;
-      }
-
-      final span = widget.textSpan;
-      if (span != null && span.toPlainText() == data) {
-        return true;
       }
     }
 
