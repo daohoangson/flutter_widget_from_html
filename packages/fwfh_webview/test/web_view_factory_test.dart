@@ -31,7 +31,7 @@ void main() {
 
   group('useExplainer: false', () {
     const html = '<iframe src="$src"></iframe>';
-    Future<String> _explain(WidgetTester tester) async {
+    Future<String> explainWithoutExplainer(WidgetTester tester) async {
       lib.WebView.platform = null;
       final explained = await explain(tester, html, useExplainer: false);
       return explained;
@@ -39,21 +39,21 @@ void main() {
 
     testWidgets('renders web view (Android)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
-      final explained = await _explain(tester);
+      final explained = await explainWithoutExplainer(tester);
       expect(explained, contains('└WebViewAndroidWidget'));
       debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets('renders web view (iOS)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-      final explained = await _explain(tester);
+      final explained = await explainWithoutExplainer(tester);
       expect(explained, contains('└UiKitView'));
       debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets('skips web view (linux)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.linux;
-      final explained = await _explain(tester);
+      final explained = await explainWithoutExplainer(tester);
       expect(
         explained,
         equals(
