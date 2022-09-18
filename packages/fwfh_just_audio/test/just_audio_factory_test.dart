@@ -14,33 +14,33 @@ void main() {
 
   group('useExplainer: false', () {
     const html = '<audio src="$src"></audio>';
-    Future<String> _explain(WidgetTester tester) =>
+    Future<String> explainWithoutExplainer(WidgetTester tester) =>
         explain(tester, html, useExplainer: false);
 
     testWidgets('renders audio player (Android)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
-      final explained = await _explain(tester);
+      final explained = await explainWithoutExplainer(tester);
       expect(explained, contains('AudioPlayer(state: _AudioPlayerState)'));
       debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets('renders audio player (iOS)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-      final explained = await _explain(tester);
+      final explained = await explainWithoutExplainer(tester);
       expect(explained, contains('AudioPlayer(state: _AudioPlayerState)'));
       debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets('renders audio player (macOS)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
-      final explained = await _explain(tester);
+      final explained = await explainWithoutExplainer(tester);
       expect(explained, contains('AudioPlayer(state: _AudioPlayerState)'));
       debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets('skips audio player (linux)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.linux;
-      final e = await _explain(tester);
+      final e = await explainWithoutExplainer(tester);
       expect(e, isNot(contains('AudioPlayer(state: _AudioPlayerState)')));
       debugDefaultTargetPlatformOverride = null;
     });
