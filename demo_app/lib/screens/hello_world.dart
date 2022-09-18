@@ -1,4 +1,5 @@
 import 'package:demo_app/widgets/popup_menu.dart';
+import 'package:demo_app/widgets/selection_area.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
@@ -158,12 +159,13 @@ class HelloWorldScreen extends StatelessWidget {
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: HtmlWidget(
-              kHtml,
-              isSelectable: context.isSelectable,
-              key: context.key,
-              // ignore: deprecated_member_use
-              webView: true,
+            child: ContextualSelectionArea(
+              child: HtmlWidget(
+                kHtml,
+                key: context.key,
+                // ignore: deprecated_member_use
+                webView: true,
+              ),
             ),
           ),
         ),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:demo_app/widgets/popup_menu.dart';
+import 'package:demo_app/widgets/selection_area.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
@@ -19,9 +20,7 @@ class Golden extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final baseUrl = Uri.parse('https://www.w3schools.com/html/');
-    final isSelectable = context.isSelectable;
-    final withEnhanced =
-        !isSelectable && RegExp(r'^(AUDIO|IFRAME|SVG|VIDEO)$').hasMatch(name);
+    final withEnhanced = RegExp(r'^(AUDIO|IFRAME|SVG|VIDEO)$').hasMatch(name);
 
     final children = <Widget>[
       if (withEnhanced)
@@ -39,16 +38,12 @@ class Golden extends StatelessWidget {
         ),
       LimitedBox(
         maxHeight: 400,
-        child: isSelectable
-            ? enhanced.HtmlWidget(
-                html,
-                baseUrl: baseUrl,
-                isSelectable: true,
-              )
-            : core.HtmlWidget(
-                html,
-                baseUrl: baseUrl,
-              ),
+        child: ContextualSelectionArea(
+          child: core.HtmlWidget(
+            html,
+            baseUrl: baseUrl,
+          ),
+        ),
       ),
     ];
 
@@ -61,11 +56,13 @@ class Golden extends StatelessWidget {
         ),
         LimitedBox(
           maxHeight: 400,
-          child: enhanced.HtmlWidget(
-            html,
-            baseUrl: baseUrl,
-            // ignore: deprecated_member_use
-            webView: true,
+          child: ContextualSelectionArea(
+            child: enhanced.HtmlWidget(
+              html,
+              baseUrl: baseUrl,
+              // ignore: deprecated_member_use
+              webView: true,
+            ),
           ),
         ),
       ]);

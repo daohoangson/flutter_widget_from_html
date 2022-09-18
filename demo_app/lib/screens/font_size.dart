@@ -10,9 +10,7 @@ class FontSizeScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text('FontSizeScreen'),
           actions: const [
-            PopupMenu(
-              toggleIsSelectable: true,
-            ),
+            PopupMenu(),
           ],
         ),
         body: Padding(
@@ -58,7 +56,6 @@ class _Panel extends StatelessWidget {
                 '<p style="font-size: 1em">Almost every developer\'s favorite '
                 'molecule is C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, '
                 'also known as "caffeine."</p>',
-                isSelectable: context.isSelectable,
               ),
             ],
           ),
@@ -75,7 +72,6 @@ class _Panel extends StatelessWidget {
             data != null
                 ? '<span style="font-size: $data">$data</span>'
                 : 'HtmlWidget',
-            isSelectable: context.isSelectable,
           ),
         ],
       );

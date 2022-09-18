@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:demo_app/widgets/popup_menu.dart';
+import 'package:demo_app/widgets/selection_area.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:http/http.dart' as http;
@@ -85,9 +86,8 @@ class _PostScreen extends StatelessWidget {
                     ),
                   ),
                 const SizedBox(height: 8),
-                HtmlWidget(
-                  post.content,
-                  isSelectable: context.isSelectable,
+                ContextualSelectionArea(
+                  child: HtmlWidget(post.content),
                 ),
               ],
             ),
