@@ -59,37 +59,35 @@ class _PostScreen extends StatelessWidget {
   const _PostScreen(this.post, {Key key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => ContextualSelectionArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: HtmlWidget(post.title),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.open_in_browser),
-                onPressed: () => launchUrl(Uri.parse(post.link)),
-              ),
-              const PopupMenu(
-                toggleIsSelectable: true,
-              ),
-            ],
-          ),
-          body: Padding(
-            padding: const EdgeInsets.all(8),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  if (post.featuredMedia != null)
-                    AspectRatio(
-                      aspectRatio:
-                          post.featuredMedia.width / post.featuredMedia.height,
-                      child: Center(
-                        child: Image.network(post.featuredMedia.sourceUrl),
-                      ),
+  Widget build(BuildContext context) => SelectionAreaScaffold(
+        appBar: AppBar(
+          title: HtmlWidget(post.title),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.open_in_browser),
+              onPressed: () => launchUrl(Uri.parse(post.link)),
+            ),
+            const PopupMenu(
+              toggleIsSelectable: true,
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(8),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                if (post.featuredMedia != null)
+                  AspectRatio(
+                    aspectRatio:
+                        post.featuredMedia.width / post.featuredMedia.height,
+                    child: Center(
+                      child: Image.network(post.featuredMedia.sourceUrl),
                     ),
-                  const SizedBox(height: 8),
-                  HtmlWidget(post.content),
-                ],
-              ),
+                  ),
+                const SizedBox(height: 8),
+                HtmlWidget(post.content),
+              ],
             ),
           ),
         ),

@@ -7,31 +7,29 @@ class FontSizeScreen extends StatelessWidget {
   const FontSizeScreen({Key key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => ContextualSelectionArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text('FontSizeScreen'),
-            actions: const [
-              PopupMenu(
-                toggleIsSelectable: true,
-              ),
-            ],
-          ),
-          body: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  ColoredBox(
-                    color: Colors.blue,
-                    child: _Panel(),
-                  ),
-                  ColoredBox(
-                    color: Colors.red,
-                    child: _Slider(),
-                  ),
-                ],
-              ),
+  Widget build(BuildContext context) => SelectionAreaScaffold(
+        appBar: AppBar(
+          title: const Text('FontSizeScreen'),
+          actions: const [
+            PopupMenu(
+              toggleIsSelectable: true,
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                ColoredBox(
+                  color: Colors.blue,
+                  child: _Panel(),
+                ),
+                ColoredBox(
+                  color: Colors.red,
+                  child: _Slider(),
+                ),
+              ],
             ),
           ),
         ),

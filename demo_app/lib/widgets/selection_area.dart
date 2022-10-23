@@ -1,17 +1,22 @@
 import 'package:demo_app/widgets/popup_menu.dart';
 import 'package:flutter/material.dart';
 
-class ContextualSelectionArea extends StatelessWidget {
-  final Scaffold child;
+class SelectionAreaScaffold extends StatelessWidget {
+  final PreferredSizeWidget appBar;
+  final Widget body;
 
-  const ContextualSelectionArea({
-    @required this.child,
+  const SelectionAreaScaffold({
+    @required this.appBar,
+    @required this.body,
     Key key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    Widget built = child;
+    Widget built = Scaffold(
+      appBar: appBar,
+      body: body,
+    );
 
     if (context.isSelectable) {
       built = SelectionArea(child: built);

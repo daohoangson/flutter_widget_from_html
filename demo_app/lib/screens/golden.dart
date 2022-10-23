@@ -64,28 +64,26 @@ class Golden extends StatelessWidget {
       ]);
     }
 
-    return ContextualSelectionArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(name),
-          actions: const [
-            PopupMenu(
-              toggleIsSelectable: true,
-            ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          child: RepaintBoundary(
-            key: targetKey,
-            child: ColoredBox(
-              color: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: children,
-                ),
+    return SelectionAreaScaffold(
+      appBar: AppBar(
+        title: Text(name),
+        actions: const [
+          PopupMenu(
+            toggleIsSelectable: true,
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: RepaintBoundary(
+          key: targetKey,
+          child: ColoredBox(
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: children,
               ),
             ),
           ),
