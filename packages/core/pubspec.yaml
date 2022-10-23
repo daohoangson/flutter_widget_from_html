@@ -4,8 +4,8 @@ description: Flutter package to render html as widgets that focuses on correctne
 homepage: https://github.com/daohoangson/flutter_widget_from_html/tree/master/packages/core
 
 environment:
-  flutter: ">=2.2.0"
-  sdk: ">=2.12.0 <3.0.0"
+  flutter: ">=3.3.0"
+  sdk: ">=2.18.0 <3.0.0"
 
 dependencies:
   csslib: ^0.17.0
