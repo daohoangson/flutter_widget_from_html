@@ -23,7 +23,6 @@ final goldenSkip = goldenSkipEnvVar == null
 void _test(
   String name,
   String html, {
-  bool isSelectable = false,
   double textScaleSize = 1.0,
 }) =>
     testGoldens(
@@ -37,7 +36,6 @@ void _test(
         await tester.pumpWidgetBuilder(
           PopupMenuStateProvider(
             builder: (_) => Golden(name, html, targetKey: key),
-            initialIsSelectable: isSelectable,
           ),
           wrapper: materialAppWrapper(
             platform: platform,
@@ -70,19 +68,6 @@ void main() {
 
     if (name == 'FONT') {
       _test('x2/$name', html, textScaleSize: 2.0);
-    }
-
-    if (!name.contains('/')) {
-      _test('selectable/$name', html, isSelectable: true);
-
-      if (name == 'FONT') {
-        _test(
-          'selectable/x2/$name',
-          html,
-          isSelectable: true,
-          textScaleSize: 2.0,
-        );
-      }
     }
   }
 }

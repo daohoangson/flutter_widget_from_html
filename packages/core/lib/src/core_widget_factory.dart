@@ -325,6 +325,9 @@ class WidgetFactory {
       RichText(
         maxLines: meta.maxLines > 0 ? meta.maxLines : null,
         overflow: meta.overflow,
+        selectionRegistrar: tsh.getDependency(),
+        selectionColor:
+            tsh.getDependency<DefaultSelectionStyle>().selectionColor,
         text: text,
         textAlign: tsh.textAlign ?? TextAlign.start,
         textDirection: tsh.textDirection,
@@ -454,7 +457,9 @@ class WidgetFactory {
   Iterable<dynamic> getDependencies(BuildContext context) => [
         MediaQuery.of(context),
         Directionality.of(context),
+        DefaultSelectionStyle.of(context),
         DefaultTextStyle.of(context).style,
+        SelectionContainer.maybeOf(context),
         Theme.of(context),
       ];
 
