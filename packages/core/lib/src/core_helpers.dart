@@ -1,10 +1,5 @@
 import 'dart:convert';
 
-// TODO: remove import when our minimum Flutter version >=3.3
-// https://github.com/flutter/flutter/pull/105648
-// ignore: unnecessary_import
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
