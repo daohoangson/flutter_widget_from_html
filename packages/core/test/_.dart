@@ -13,8 +13,7 @@ const kColorPrimary = Color(0xFF123456);
 const kDataBase64 = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 const kDataUri = 'data:image/gif;base64,$kDataBase64';
 
-// TODO: switch to GlobalKey<HtmlWidgetState> when backward compatibility allows
-final hwKey = GlobalKey<State<HtmlWidget>>();
+final hwKey = GlobalKey<HtmlWidgetState>();
 
 Widget? buildCurrentState({GlobalKey? key}) {
   final hws = (key ?? hwKey).currentState;
@@ -336,6 +335,21 @@ class Explainer {
           '${e.bottom.truncate()},${e.left.truncate()})'
       : e.toString();
 
+  String _htmlListMarker(HtmlListMarker marker) {
+    switch (marker.markerType) {
+      case HtmlListMarkerType.circle:
+        return '[HtmlListMarker.circle]';
+      case HtmlListMarkerType.disc:
+        return '[HtmlListMarker.disc]';
+      case HtmlListMarkerType.disclosureClosed:
+        return '[HtmlListMarker.disclosureClosed]';
+      case HtmlListMarkerType.disclosureOpen:
+        return '[HtmlListMarker.disclosureOpen]';
+      case HtmlListMarkerType.square:
+        return '[HtmlListMarker.square]';
+    }
+  }
+
   String _image(Image image) {
     final buffer = StringBuffer();
 
@@ -553,8 +567,8 @@ class Explainer {
       return '[widget0]';
     }
 
-    if (widget.runtimeType.toString() == 'HtmlListMarker') {
-      return widget.toStringShort();
+    if (widget is HtmlListMarker) {
+      return _htmlListMarker(widget);
     }
 
     if (widget is TshWidget) {
