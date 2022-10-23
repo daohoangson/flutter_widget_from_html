@@ -13,7 +13,7 @@ dependencies:
   flutter_widget_from_html_core: ^0.9.0
   fwfh_cached_network_image: ^0.7.0+3
   fwfh_chewie: ^0.7.0+2
-  fwfh_just_audio: ^0.6.2+2
+  fwfh_just_audio: ^0.9.0
   fwfh_svg: ^0.7.2
   fwfh_url_launcher: ^0.6.1+3
   fwfh_webview: ^0.6.2+3
