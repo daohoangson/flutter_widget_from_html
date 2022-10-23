@@ -373,11 +373,10 @@ Future<void> pumpWidget(WidgetTester tester, Widget child) async {
   tester.binding.window.devicePixelRatioTestValue = 1.0;
   addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
 
-  // TODO: remove lint ignore when our minimum Flutter version >2.11
-  // ignore: deprecated_member_use
-  tester.binding.window.textScaleFactorTestValue = 1.0;
-  // ignore: deprecated_member_use
-  addTearDown(tester.binding.window.clearTextScaleFactorTestValue);
+  tester.binding.window.platformDispatcher.textScaleFactorTestValue = 1.0;
+  addTearDown(
+    tester.binding.window.platformDispatcher.clearTextScaleFactorTestValue,
+  );
 
   await tester.pumpWidget(MaterialApp(home: child));
   await tester.pump();
