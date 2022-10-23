@@ -1,3 +1,8 @@
+## 0.9.0
+
+- Requires Flutter 3.3 (#821)
+- Add support for `SelectionArea` (#821)
+
 ## 0.8.5+3
 
 - Fix min constraints being 100% (#761)
