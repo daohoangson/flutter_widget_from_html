@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:demo_app/screens/golden.dart';
+import 'package:demo_app/widgets/popup_menu.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,7 +34,9 @@ void _test(
         final key = UniqueKey();
 
         await tester.pumpWidgetBuilder(
-          Golden(name, html, targetKey: key),
+          PopupMenuStateProvider(
+            builder: (_) => Golden(name, html, targetKey: key),
+          ),
           wrapper: materialAppWrapper(
             platform: platform,
             theme: ThemeData.light(),
