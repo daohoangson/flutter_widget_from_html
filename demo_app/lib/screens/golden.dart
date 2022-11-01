@@ -54,12 +54,7 @@ class Golden extends StatelessWidget {
         ),
         LimitedBox(
           maxHeight: 400,
-          child: enhanced.HtmlWidget(
-            html,
-            baseUrl: baseUrl,
-            // ignore: deprecated_member_use
-            webView: true,
-          ),
+          child: enhanced.HtmlWidget(html, baseUrl: baseUrl),
         ),
       ]);
     }

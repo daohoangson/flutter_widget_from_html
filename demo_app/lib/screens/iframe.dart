@@ -39,7 +39,7 @@ class _State extends State<IframeScreen> {
             CheckboxListTile(
               value: webView,
               onChanged: (v) => setState(() => webView = v),
-              title: HtmlWidget('<var>.webView</var>'),
+              title: const HtmlWidget('<var>.webView</var>'),
               subtitle: const Text('Renders web view, default ❌'),
             ),
             CheckboxListTile(
@@ -50,20 +50,34 @@ class _State extends State<IframeScreen> {
                 }
                 webViewJs = v;
               }),
-              title: HtmlWidget('<var>.webViewJs</var>'),
+              title: const HtmlWidget('<var>.webViewJs</var>'),
               subtitle: const Text('Allows JavaScript execution, default ✅'),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: HtmlWidget(
                 html,
-                // ignore: deprecated_member_use
-                webView: webView,
-                // ignore: deprecated_member_use
-                webViewJs: webViewJs,
+                factoryBuilder: () => _WidgetFactory(
+                  webView: webView,
+                  webViewJs: webViewJs,
+                ),
+                rebuildTriggers: RebuildTriggers([webView, webViewJs]),
               ),
             ),
           ],
         ),
       );
+}
+
+class _WidgetFactory extends WidgetFactory {
+  @override
+  final bool webView;
+
+  @override
+  final bool webViewJs;
+
+  _WidgetFactory({
+    @required this.webView,
+    @required this.webViewJs,
+  });
 }

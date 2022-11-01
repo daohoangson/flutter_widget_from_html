@@ -1,3 +1,9 @@
+## 0.9.0
+
+- Requires Flutter 3.3 (#821)
+- Add support for `SelectionArea` (#821)
+- Breaking changes: remove support for web view `HtmlWidget` parameters (#830)
+
 ## 0.8.5
 
 - Improve `IFRAME` error & timer handling (#709)

@@ -159,12 +159,7 @@ class HelloWorldScreen extends StatelessWidget {
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: HtmlWidget(
-              kHtml,
-              key: context.key,
-              // ignore: deprecated_member_use
-              webView: true,
-            ),
+            child: HtmlWidget(kHtml, key: context.key),
           ),
         ),
       );
