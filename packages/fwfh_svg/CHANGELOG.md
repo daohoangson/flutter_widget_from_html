@@ -1,3 +1,7 @@
+## 0.7.2+1
+
+- Add support for flutter_widget_from_html_core@0.9.0 (#828)
+
 ## 0.7.2
 
 - Add support for flutter_svg@1.0 (#648)

@@ -1,3 +1,7 @@
+## 0.6.2+4
+
+- Add support for flutter_widget_from_html_core@0.9.0 (#828)
+
 ## 0.6.2+3
 
 - Suppress Flutter 3 warning about `WidgetsBinding` usage
