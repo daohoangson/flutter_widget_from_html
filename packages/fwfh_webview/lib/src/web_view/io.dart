@@ -97,6 +97,10 @@ class WebViewState extends State<WebView> {
       eval('document.body.scrollWidth'),
       eval('document.body.scrollHeight'),
     ]);
+    if (!mounted) {
+      return;
+    }
+
     final w = double.tryParse(evals[0]) ?? 0;
     final h = double.tryParse(evals[1]) ?? 0;
 
