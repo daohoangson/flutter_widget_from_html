@@ -1,3 +1,7 @@
+## 0.9.0+1
+
+- Fix context usage across async gaps (#835)
+
 ## 0.9.0
 
 - Requires Flutter 3.3 (#821)
