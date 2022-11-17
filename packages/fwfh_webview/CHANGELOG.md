@@ -1,3 +1,7 @@
+## 0.6.2+5
+
+- Fix context usage across async gaps (#835)
+
 ## 0.6.2+4
 
 - Add support for flutter_widget_from_html_core@0.9.0 (#828)
