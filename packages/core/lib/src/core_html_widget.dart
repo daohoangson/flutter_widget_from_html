@@ -213,6 +213,9 @@ class HtmlWidgetState extends State<HtmlWidget> {
 
   Future<Widget> _buildAsync() async {
     final domNodes = await compute(_parseHtml, widget.html);
+    if (!mounted) {
+      return widget0;
+    }
 
     Timeline.startSync('Build $widget (async)');
     final built = _buildBody(this, domNodes);
