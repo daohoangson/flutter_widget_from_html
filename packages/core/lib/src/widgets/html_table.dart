@@ -519,6 +519,21 @@ class _TableRenderObject extends RenderBox
       columnWidths = dryColumnWidths
           .map((dryColumnWidth) => dryColumnWidth / drySum * availableWidth)
           .toList(growable: false);
+
+      // calculate minimum widths and make sure we allocate enough room
+      for (var i = 0; i < children.length; i++) {
+        final child = children[i];
+        final data = cells[i];
+
+        final minWidth = child.getMinIntrinsicWidth(double.infinity);
+        final minColumnWidth =
+            (minWidth - tro._calculateColumnGaps(data)) / data.columnSpan;
+
+        for (var c = 0; c < data.columnSpan; c++) {
+          final column = data.columnStart + c;
+          columnWidths[column] = max(columnWidths[column], minColumnWidth);
+        }
+      }
     }
 
     final rowGaps = (rowCount + 1) * tro.rowGap;
