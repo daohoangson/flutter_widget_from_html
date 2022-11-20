@@ -402,21 +402,15 @@ class _TagTableDataRow {
 class _TagTableDataCell {
   final Widget child;
   final int columnSpan;
-  final int? columnStart;
-  final bool isCaption;
   final BuildMetadata meta;
   final int rowSpan;
-  final int? rowStart;
   final CssLength? width;
 
   const _TagTableDataCell(
     this.meta, {
     required this.child,
     required this.columnSpan,
-    this.columnStart,
-    this.isCaption = false,
     required this.rowSpan,
-    this.rowStart,
     this.width,
   });
 }
