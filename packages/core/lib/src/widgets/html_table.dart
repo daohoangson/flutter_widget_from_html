@@ -20,8 +20,6 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   /// Default: `0.0`.
   final double borderSpacing;
 
-  /// The companion data for table.
-
   /// Determines the order to lay children out horizontally.
   ///
   /// Default: [TextDirection.ltr].
@@ -224,11 +222,8 @@ class HtmlTableValignBaseline extends SingleChildRenderObjectWidget {
 
   @override
   void updateRenderObject(BuildContext context, RenderObject renderObject) {
-    final table = context.findAncestorRenderObjectOfType<_TableRenderObject>()!;
     final cell = context.findAncestorWidgetOfExactType<HtmlTableCell>()!;
-    (renderObject as _ValignBaselineRenderObject)
-      ..tableRenderData = table._tableRenderData
-      ..row = cell.rowStart;
+    (renderObject as _ValignBaselineRenderObject).row = cell.rowStart;
   }
 }
 
@@ -637,15 +632,10 @@ class _TableRenderObject extends RenderBox
 class _ValignBaselineRenderObject extends RenderProxyBox {
   _ValignBaselineRenderObject(this._tableRenderData, this._row);
 
-  _TableRenderData _tableRenderData;
-  // ignore: avoid_setters_without_getters
-  set tableRenderData(_TableRenderData v) {
-    if (v == _tableRenderData) {
-      return;
-    }
-    _tableRenderData = v;
-    markNeedsLayout();
-  }
+  // it's unlikely valign render object is kept in memory
+  // while the table one is recreated...
+  // we are not implementing a setter with that asumption
+  final _TableRenderData _tableRenderData;
 
   int _row;
   // ignore: avoid_setters_without_getters
