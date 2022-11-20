@@ -519,14 +519,28 @@ class _TableRenderObject extends RenderBox
       for (var i = 0; i < children.length; i++) {
         final child = children[i];
         final data = cells[i];
+        final drySize = drySizes[i];
 
-        final minWidth = child.getMinIntrinsicWidth(double.infinity);
-        final minColumnWidth =
-            (minWidth - tro._calculateColumnGaps(data)) / data.columnSpan;
-
+        final columnGaps = tro._calculateColumnGaps(data);
+        final dryColumnWidth = (drySize.width - columnGaps) / data.columnSpan;
+        var columnWidthSmallerThanDry = false;
         for (var c = 0; c < data.columnSpan; c++) {
           final column = data.columnStart + c;
-          columnWidths[column] = max(columnWidths[column], minColumnWidth);
+          if (columnWidths[column] < dryColumnWidth) {
+            columnWidthSmallerThanDry = true;
+            break;
+          }
+        }
+
+        if (columnWidthSmallerThanDry) {
+          // this call is expensive, we try to avoid it as much as possible
+          final minWidth = child.getMinIntrinsicWidth(double.infinity);
+          final minColumnWidth = (minWidth - columnGaps) / data.columnSpan;
+
+          for (var c = 0; c < data.columnSpan; c++) {
+            final column = data.columnStart + c;
+            columnWidths[column] = max(columnWidths[column], minColumnWidth);
+          }
         }
       }
     }
