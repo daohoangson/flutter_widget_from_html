@@ -213,6 +213,9 @@ class HtmlWidgetState extends State<HtmlWidget> {
 
   Future<Widget> _buildAsync() async {
     final domNodes = await compute(_parseHtml, widget.html);
+    if (!mounted) {
+      return widget0;
+    }
 
     Timeline.startSync('Build $widget (async)');
     final built = _buildBody(this, domNodes);
@@ -224,8 +227,13 @@ class HtmlWidgetState extends State<HtmlWidget> {
   Widget _buildSync() {
     Timeline.startSync('Build $widget (sync)');
 
-    final domNodes = _parseHtml(widget.html);
-    final built = _buildBody(this, domNodes);
+    Widget built;
+    try {
+      final domNodes = _parseHtml(widget.html);
+      built = _buildBody(this, domNodes);
+    } catch (error) {
+      built = _wf.onErrorBuilder(context, _rootMeta, error) ?? widget0;
+    }
 
     Timeline.finishSync();
 

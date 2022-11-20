@@ -789,8 +789,8 @@ Future<void> main() async {
     });
 
     testWidgets('renders within dir attribute', (tester) async {
-      const _dirRtl = '<div dir="rtl">$html</div>';
-      final explained = await explain(tester, _dirRtl, useExplainer: false);
+      const dirRtl = '<div dir="rtl">$html</div>';
+      final explained = await explain(tester, dirRtl, useExplainer: false);
       expect(explained, contains('HtmlListItem(textDirection: rtl)'));
     });
   });
@@ -867,7 +867,13 @@ Future<void> main() async {
       expect(urls, equals(const [href]));
     });
 
-    final goldenSkip = Platform.isLinux ? null : 'Linux only';
+    final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
+    final goldenSkip = goldenSkipEnvVar == null
+        ? Platform.isLinux
+            ? null
+            : 'Linux only'
+        : 'GOLDEN_SKIP=$goldenSkipEnvVar';
+
     GoldenToolkit.runWithConfiguration(
       () {
         group(

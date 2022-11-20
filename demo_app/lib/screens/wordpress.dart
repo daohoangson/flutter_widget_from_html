@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:demo_app/widgets/popup_menu.dart';
+import 'package:demo_app/widgets/selection_area.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:http/http.dart' as http;
@@ -58,13 +59,13 @@ class _PostScreen extends StatelessWidget {
   const _PostScreen(this.post, {Key key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => SelectionAreaScaffold(
         appBar: AppBar(
           title: HtmlWidget(post.title),
           actions: [
             IconButton(
               icon: const Icon(Icons.open_in_browser),
-              onPressed: () => launch(post.link),
+              onPressed: () => launchUrl(Uri.parse(post.link)),
             ),
             const PopupMenu(
               toggleIsSelectable: true,
@@ -85,10 +86,7 @@ class _PostScreen extends StatelessWidget {
                     ),
                   ),
                 const SizedBox(height: 8),
-                HtmlWidget(
-                  post.content,
-                  isSelectable: context.isSelectable,
-                ),
+                HtmlWidget(post.content),
               ],
             ),
           ),

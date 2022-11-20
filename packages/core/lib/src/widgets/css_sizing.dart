@@ -205,28 +205,33 @@ class _RenderCssSizing extends RenderProxyBox {
   }
 
   BoxConstraints _applyContraints(BoxConstraints c) {
-    final maxHeight =
-        min(c.maxHeight, _maxHeight?.clamp(0.0, c.maxHeight) ?? c.maxHeight);
-    final maxWidth =
-        min(c.maxWidth, _maxWidth?.clamp(0.0, c.maxWidth) ?? c.maxWidth);
-    final minHeight =
-        min(maxHeight, _minHeight?.clamp(0.0, c.maxHeight) ?? c.minHeight);
-    final minWidth =
-        min(maxWidth, _minWidth?.clamp(0.0, c.maxWidth) ?? c.minWidth);
+    final maxHeight = _maxHeight?.clamp(0.0, c.maxHeight) ?? c.maxHeight;
+    final maxWidth = _maxWidth?.clamp(0.0, c.maxWidth) ?? c.maxWidth;
 
-    final effectiveMinHeight =
-        c.hasTightHeight && _minHeight == null ? 0.0 : minHeight;
-    final effectiveMinWidth =
-        c.hasTightWidth && _minWidth == null ? 0.0 : minWidth;
-    final __preferredHeight =
-        _preferredHeight?.clamp(effectiveMinHeight, maxHeight);
-    final __preferredWidth =
-        _preferredWidth?.clamp(effectiveMinWidth, maxWidth);
+    // special treatment for min values: ignore incoming constraint if it's tight
+    final calculatedMinHeight = min(
+      maxHeight,
+      _minHeight?.clamp(0.0, c.maxHeight) ??
+          (c.hasTightHeight ? .0 : c.minHeight),
+    );
+    final calculatedMinWidth = min(
+      maxWidth,
+      _minWidth?.clamp(0.0, c.maxWidth) ?? (c.hasTightWidth ? .0 : c.minWidth),
+    );
+    // ignore min value if it's infinite
+    final minHeight = calculatedMinHeight.isFinite ? calculatedMinHeight : .0;
+    final minWidth = calculatedMinWidth.isFinite ? calculatedMinWidth : .0;
+
+    final calculatedPreferredHeight =
+        _preferredHeight?.clamp(minHeight, maxHeight);
+    final calculatedPreferredWidth = _preferredWidth?.clamp(minWidth, maxWidth);
     // ignore preferred value if it's infinite
-    final preferredHeight =
-        __preferredHeight?.isFinite == true ? __preferredHeight : null;
-    final preferredWidth =
-        __preferredWidth?.isFinite == true ? __preferredWidth : null;
+    final preferredHeight = calculatedPreferredHeight?.isFinite == true
+        ? calculatedPreferredHeight
+        : null;
+    final preferredWidth = calculatedPreferredWidth?.isFinite == true
+        ? calculatedPreferredWidth
+        : null;
 
     final stableChildSize = (preferredHeight != null && preferredWidth != null)
         ? _guessChildSize(

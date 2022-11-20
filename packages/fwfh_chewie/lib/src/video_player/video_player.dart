@@ -116,21 +116,30 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   Future<void> _initControllers() async {
     final vpc = _vpc = lib.VideoPlayerController.network(widget.url);
+    Object? vpcError;
     try {
       await vpc.initialize();
     } catch (error) {
-      setState(() => _error = error);
+      vpcError = error;
+    }
+
+    if (!mounted) {
       return;
     }
 
-    setState(
-      () => _controller = lib.ChewieController(
+    setState(() {
+      if (vpcError != null) {
+        _error = vpcError;
+        return;
+      }
+
+      _controller = lib.ChewieController(
         autoPlay: widget.autoplay,
         looping: widget.loop,
         placeholder: placeholder,
         showControls: widget.controls,
         videoPlayerController: vpc,
-      ),
-    );
+      );
+    });
   }
 }

@@ -1,3 +1,20 @@
+## 0.9.0+1
+
+- Fix context usage across async gaps (#835)
+
+## 0.9.0
+
+- Requires Flutter 3.3 (#821)
+- Add support for `SelectionArea` (#821)
+
+## 0.8.5+3
+
+- Fix min constraints being 100% (#761)
+
+## 0.8.5+2
+
+- Catch error when building synchronously (#760)
+
 ## 0.8.5+1
 
 - Fix percentage value bug (#712, authored by @equweiyu)

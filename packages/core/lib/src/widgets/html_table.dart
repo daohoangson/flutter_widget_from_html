@@ -461,11 +461,10 @@ class _TableRenderObject extends RenderBox
   }
 
   static _TableRenderLayout _performLayout(
-    final _TableRenderObject tro,
-    final RenderBox firstChild,
-    final BoxConstraints constraints,
-    final Size Function(RenderBox renderBox, BoxConstraints constraints)
-        layouter,
+    _TableRenderObject tro,
+    RenderBox firstChild,
+    BoxConstraints constraints,
+    Size Function(RenderBox renderBox, BoxConstraints constraints) layouter,
   ) {
     final children = <RenderBox>[];
     final cells = <_TableCellData>[];
@@ -680,7 +679,7 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
           _paddingTop += offsetY;
           _baselineWithOffset = rowBaseline;
           WidgetsBinding.instance
-              ?.addPostFrameCallback((_) => markNeedsLayout());
+              .addPostFrameCallback((_) => markNeedsLayout());
           return;
         }
       } else if (rowBaseline < baselineWithOffset) {
@@ -694,7 +693,7 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
             sibling._paddingTop += offsetY;
             sibling._baselineWithOffset = baselineWithOffset;
             WidgetsBinding.instance
-                ?.addPostFrameCallback((_) => sibling.markNeedsLayout());
+                .addPostFrameCallback((_) => sibling.markNeedsLayout());
           }
         }
       }
@@ -719,11 +718,10 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
   String toStringShort() => '_ValignBaselineRenderObject(row: $_row)';
 
   static Size _performLayout(
-    final RenderBox? child,
-    final double paddingTop,
-    final BoxConstraints constraints,
-    final Size? Function(RenderBox? renderBox, BoxConstraints constraints)
-        layouter,
+    RenderBox? child,
+    double paddingTop,
+    BoxConstraints constraints,
+    Size? Function(RenderBox? renderBox, BoxConstraints constraints) layouter,
   ) {
     final cc = constraints.loosen().deflate(EdgeInsets.only(top: paddingTop));
     final childSize = layouter(child, cc) ?? Size.zero;

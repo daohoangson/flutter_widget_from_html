@@ -1,4 +1,5 @@
 import 'package:demo_app/widgets/popup_menu.dart';
+import 'package:demo_app/widgets/selection_area.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
@@ -6,7 +7,7 @@ class FontSizeScreen extends StatelessWidget {
   const FontSizeScreen({Key key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => SelectionAreaScaffold(
         appBar: AppBar(
           title: const Text('FontSizeScreen'),
           actions: const [
@@ -20,11 +21,11 @@ class FontSizeScreen extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                Container(
+                ColoredBox(
                   color: Colors.blue,
                   child: _Panel(),
                 ),
-                Container(
+                ColoredBox(
                   color: Colors.red,
                   child: _Slider(),
                 ),
@@ -54,11 +55,10 @@ class _Panel extends StatelessWidget {
                 ],
               ),
               const Divider(),
-              HtmlWidget(
+              const HtmlWidget(
                 '<p style="font-size: 1em">Almost every developer\'s favorite '
                 'molecule is C<sub>8</sub>H<sub>10</sub>N<sub>4</sub>O<sub>2</sub>, '
                 'also known as "caffeine."</p>',
-                isSelectable: context.isSelectable,
               ),
             ],
           ),
@@ -75,7 +75,6 @@ class _Panel extends StatelessWidget {
             data != null
                 ? '<span style="font-size: $data">$data</span>'
                 : 'HtmlWidget',
-            isSelectable: context.isSelectable,
           ),
         ],
       );

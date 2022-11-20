@@ -13,10 +13,16 @@ import 'package:golden_toolkit/golden_toolkit.dart';
 import '../../packages/fwfh_chewie/test/mock_video_player_platform.dart';
 import '../../packages/fwfh_webview/test/mock_webview_platform.dart';
 
+final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
+final goldenSkip = goldenSkipEnvVar == null
+    ? Platform.isLinux
+        ? null
+        : 'Linux only'
+    : 'GOLDEN_SKIP=$goldenSkipEnvVar';
+
 void _test(
   String name,
   String html, {
-  bool isSelectable = false,
   double textScaleSize = 1.0,
 }) =>
     testGoldens(
@@ -30,7 +36,6 @@ void _test(
         await tester.pumpWidgetBuilder(
           PopupMenuStateProvider(
             builder: (_) => Golden(name, html, targetKey: key),
-            initialIsSelectable: isSelectable,
           ),
           wrapper: materialAppWrapper(
             platform: platform,
@@ -44,7 +49,7 @@ void _test(
         debugDefaultTargetPlatformOverride = null;
         WidgetFactory.debugDeterministicLoadingWidget = false;
       },
-      skip: !Platform.isLinux,
+      skip: goldenSkip != null,
     );
 
 void main() {
@@ -63,19 +68,6 @@ void main() {
 
     if (name == 'FONT') {
       _test('x2/$name', html, textScaleSize: 2.0);
-    }
-
-    if (!name.contains('/')) {
-      _test('selectable/$name', html, isSelectable: true);
-
-      if (name == 'FONT') {
-        _test(
-          'selectable/x2/$name',
-          html,
-          isSelectable: true,
-          textScaleSize: 2.0,
-        );
-      }
     }
   }
 }

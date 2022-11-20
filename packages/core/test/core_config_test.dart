@@ -85,7 +85,7 @@ void main() {
           ),
         );
 
-    void _expect(Widget? built1, Widget? built2, Matcher matcher) {
+    void enableCachingExpect(Widget? built1, Widget? built2, Matcher matcher) {
       final widget1 = (built1! as TshWidget).child;
       final widget2 = (built2! as TshWidget).child;
       expect(widget1 == widget2, matcher);
@@ -99,7 +99,7 @@ void main() {
 
       await explain(tester, html, enableCaching: true);
       final built2 = helper.buildCurrentState();
-      _expect(built1, built2, isTrue);
+      enableCachingExpect(built1, built2, isTrue);
     });
 
     testWidgets('rebuild new html', (WidgetTester tester) async {
@@ -127,7 +127,7 @@ void main() {
         baseUrl: Uri.http('domain.com', ''),
       );
       final built2 = helper.buildCurrentState();
-      _expect(built1, built2, isFalse);
+      enableCachingExpect(built1, built2, isFalse);
     });
 
     testWidgets('rebuild new buildAsync', (tester) async {
@@ -139,7 +139,7 @@ void main() {
 
       await explain(tester, html, enableCaching: true, buildAsync: false);
       final built2 = helper.buildCurrentState();
-      _expect(built1, built2, isFalse);
+      enableCachingExpect(built1, built2, isFalse);
     });
 
     testWidgets('rebuild new enableCaching', (tester) async {
@@ -151,7 +151,7 @@ void main() {
 
       await explain(tester, html, enableCaching: false);
       final built2 = helper.buildCurrentState();
-      _expect(built1, built2, isFalse);
+      enableCachingExpect(built1, built2, isFalse);
     });
 
     testWidgets('rebuild new rebuildTriggers', (tester) async {
@@ -173,7 +173,7 @@ void main() {
         rebuildTriggers: RebuildTriggers([2]),
       );
       final built2 = helper.buildCurrentState();
-      _expect(built1, built2, isFalse);
+      enableCachingExpect(built1, built2, isFalse);
     });
 
     testWidgets('rebuild new textStyle', (tester) async {
@@ -199,7 +199,7 @@ void main() {
 
       await explain(tester, html, enableCaching: false);
       final built2 = helper.buildCurrentState();
-      _expect(built1, built2, isFalse);
+      enableCachingExpect(built1, built2, isFalse);
     });
   });
 
@@ -303,6 +303,7 @@ void main() {
   group('onErrorBuilder', () {
     Future<String?> explain(
       WidgetTester tester, {
+      required bool buildAsync,
       OnErrorBuilder? onErrorBuilder,
     }) async {
       await runZonedGuarded(
@@ -312,11 +313,12 @@ void main() {
             null,
             hw: HtmlWidget(
               'Foo <span class="throw">bar</span>.',
-              buildAsync: true,
+              buildAsync: buildAsync,
               factoryBuilder: () => _OnErrorBuilderFactory(),
               key: helper.hwKey,
               onErrorBuilder: onErrorBuilder,
             ),
+            useExplainer: false,
           );
 
           await tester
@@ -329,17 +331,32 @@ void main() {
       return helper.explainWithoutPumping(useExplainer: false);
     }
 
-    testWidgets('renders default', (tester) async {
-      final explained = await explain(tester);
+    testWidgets('[sync] renders default', (tester) async {
+      final explained = await explain(tester, buildAsync: false);
       expect(explained, contains('Text("❌")'));
     });
 
-    testWidgets('renders custom', (tester) async {
+    testWidgets('[sync] renders custom', (tester) async {
       final explained = await explain(
         tester,
-        onErrorBuilder: (_, __, ___) => const Text('Custom'),
+        buildAsync: false,
+        onErrorBuilder: (_, __, ___) => const Text('sync error'),
       );
-      expect(explained, contains('RichText(text: "Custom")'));
+      expect(explained, contains('RichText(text: "sync error")'));
+    });
+
+    testWidgets('[async] renders default', (tester) async {
+      final explained = await explain(tester, buildAsync: true);
+      expect(explained, contains('Text("❌")'));
+    });
+
+    testWidgets('[async] renders custom', (tester) async {
+      final explained = await explain(
+        tester,
+        buildAsync: true,
+        onErrorBuilder: (_, __, ___) => const Text('async error'),
+      );
+      expect(explained, contains('RichText(text: "async error")'));
     });
   });
 

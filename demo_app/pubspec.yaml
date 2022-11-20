@@ -16,7 +16,7 @@ dependencies:
   html: any
   http: any
   path_provider: any
-  photo_view: ^0.13.0
+  photo_view: ^0.14.0
   provider: ^6.0.0
   url_launcher: any
 
@@ -31,8 +31,6 @@ dependency_overrides:
     path: ../packages/fwfh_chewie
   fwfh_just_audio:
     path: ../packages/fwfh_just_audio
-  fwfh_selectable_text:
-    path: ../packages/fwfh_selectable_text
   fwfh_svg:
     path: ../packages/fwfh_svg
   fwfh_text_style:

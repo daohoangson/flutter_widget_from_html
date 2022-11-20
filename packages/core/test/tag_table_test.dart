@@ -13,11 +13,6 @@ String _padding(String child) =>
 
 String _richtext(String text) => _padding('[RichText:(:$text)]');
 
-const bg = 'BoxDecoration(border: all(BorderSide(Color(0xff000000), '
-    '1.0, BorderStyle.solid)))';
-
-const border = 'all(BorderSide(Color(0xff000000), 1.0, BorderStyle.solid))';
-
 Future<void> main() async {
   await loadAppFonts();
 
@@ -245,15 +240,15 @@ Future<void> main() async {
     testWidgets('renders border=1', (WidgetTester tester) async {
       const html =
           '<table border="1"><tbody><tr><td>Foo</td></tr></tbody></table>';
-      final e = await explain(tester, html, useExplainer: false);
-      expect(e, contains('HtmlTable(border: $border, borderSpacing: 2.0)'));
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(explained, contains('HtmlTable(borderSpacing: 2.0)'));
     });
 
     testWidgets('renders style', (WidgetTester tester) async {
       const html = '<table style="border: 1px solid black"><tbody>'
           '<tr><td>Foo</td></tr></tbody></table>';
-      final e = await explain(tester, html, useExplainer: false);
-      expect(e, contains('HtmlTable(border: $border, borderSpacing: 2.0)'));
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(explained, contains('HtmlTable(borderSpacing: 2.0)'));
     });
   });
 
@@ -344,14 +339,8 @@ Future<void> main() async {
       const html = '<table border="1" style="border-collapse: collapse"><tbody>'
           '<tr><td>Foo</td></tr>'
           '</tbody></table>';
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(
-        explained,
-        contains(
-          'HtmlTable(border: $border, '
-          'borderCollapse: true, borderSpacing: 2.0)',
-        ),
-      );
+      final e = await explain(tester, html, useExplainer: false);
+      expect(e, contains('(borderCollapse: true, borderSpacing: 2.0)'));
     });
   });
 
@@ -692,32 +681,15 @@ Future<void> main() async {
 
   group('HtmlTable', () {
     group('_TableRenderObject setters', () {
-      testWidgets('updates border', (WidgetTester tester) async {
-        final before = await explain(
-          tester,
-          '<table border="1"><tr><td>Foo</td></tr></table>',
-          useExplainer: false,
-        );
-        expect(
-          before,
-          contains(
-            '└HtmlTable(border: all(BorderSide(Color(0xff000000), '
-            '1.0, BorderStyle.solid)),',
-          ),
-        );
+      testWidgets('updates border', (WidgetTester t) async {
+        await explain(t, '<table border="1"><tr><td>Foo</td></tr></table>');
+        final element = find.byType(HtmlTable).evaluate().single;
+        final before = element.widget as HtmlTable;
+        expect(before.border!.bottom.width, equals(1.0));
 
-        final after = await explain(
-          tester,
-          '<table border="2"><tr><td>Foo</td></tr></table>',
-          useExplainer: false,
-        );
-        expect(
-          after,
-          contains(
-            '└HtmlTable(border: all(BorderSide(Color(0xff000000), '
-            '2.0, BorderStyle.solid)),',
-          ),
-        );
+        await explain(t, '<table border="2"><tr><td>Foo</td></tr></table>');
+        final after = element.widget as HtmlTable;
+        expect(after.border!.bottom.width, equals(2.0));
       });
 
       testWidgets('updates borderCollapse', (WidgetTester tester) async {
@@ -814,7 +786,13 @@ Future<void> main() async {
       expect(urls, equals(const [href]));
     });
 
-    final goldenSkip = Platform.isLinux ? null : 'Linux only';
+    final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
+    final goldenSkip = goldenSkipEnvVar == null
+        ? Platform.isLinux
+            ? null
+            : 'Linux only'
+        : 'GOLDEN_SKIP=$goldenSkipEnvVar';
+
     GoldenToolkit.runWithConfiguration(
       () {
         group(

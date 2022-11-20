@@ -22,7 +22,7 @@ class WebViewState extends State<WebView> {
 
     if (widget.unsupportedWorkaroundForIssue37) {
       _issue37 = _Issue37(this);
-      WidgetsBinding.instance?.addObserver(_issue37!);
+      _widgetsBindingInstance?.addObserver(_issue37!);
     }
   }
 
@@ -74,7 +74,7 @@ class WebViewState extends State<WebView> {
     }
 
     if (_issue37 != null) {
-      WidgetsBinding.instance?.removeObserver(_issue37!);
+      _widgetsBindingInstance?.removeObserver(_issue37!);
     }
 
     super.dispose();
@@ -97,6 +97,10 @@ class WebViewState extends State<WebView> {
       eval('document.body.scrollWidth'),
       eval('document.body.scrollHeight'),
     ]);
+    if (!mounted) {
+      return;
+    }
+
     final w = double.tryParse(evals[0]) ?? 0;
     final h = double.tryParse(evals[1]) ?? 0;
 
@@ -160,6 +164,9 @@ class WebViewState extends State<WebView> {
     }
   }
 }
+
+// TODO: remove workaround when our minimum Flutter version >2.12
+WidgetsBinding? get _widgetsBindingInstance => WidgetsBinding.instance;
 
 class _Issue37 with WidgetsBindingObserver {
   final WebViewState wvs;

@@ -126,6 +126,9 @@ class FakeWebViewController extends WebViewPlatformController {
   }
 }
 
+// TODO: remove workaround when our minimum Flutter version >2.12
+WidgetsBinding? get _widgetsBindingInstance => WidgetsBinding.instance;
+
 class _FakeWebViewPlatform extends WebViewPlatform {
   _FakeWebViewPlatform() {
     WebView.platform = this;
@@ -175,7 +178,7 @@ class _FakeWebViewState extends State<_FakeWebViewWidget> {
       widget.webViewPlatformCallbacksHandler,
       creationParams: widget.creationParams,
     );
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    _widgetsBindingInstance?.addPostFrameCallback((_) {
       widget.onWebViewPlatformCreated?.call(controller);
     });
   }

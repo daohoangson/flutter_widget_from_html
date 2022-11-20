@@ -5,6 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 
 void main() {
+  final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
+  final goldenSkip = goldenSkipEnvVar == null
+      ? Platform.isLinux
+          ? null
+          : 'Linux only'
+      : 'GOLDEN_SKIP=$goldenSkipEnvVar';
+
   testGoldens(
     'smilie',
     (tester) async {
@@ -16,6 +23,6 @@ void main() {
 
       await screenMatchesGolden(tester, 'others/smilie');
     },
-    skip: !Platform.isLinux,
+    skip: goldenSkip != null,
   );
 }
