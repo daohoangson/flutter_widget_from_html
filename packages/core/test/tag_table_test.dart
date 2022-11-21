@@ -41,45 +41,6 @@ Future<void> main() async {
         ),
       );
     });
-
-    testWidgets('useExplainer=false', (WidgetTester tester) async {
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(
-        explained,
-        equals(
-          'TshWidget\n'
-          '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-          ' └HtmlTable(borderSpacing: 2.0)\n'
-          '  ├HtmlTableCaption(columnSpan: 2, columnStart: 0, rowStart: 0)\n'
-          '  │└WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
-          '  │ │  "Caption"\n'
-          '  │ │)\n'
-          '  │ └CssBlock()\n'
-          '  │  └RichText(textAlign: center, text: "Caption")\n'
-          '  ├HtmlTableCell(columnStart: 0, rowStart: 1)\n'
-          '  │└WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
-          '  │ └Align(alignment: centerLeft, widthFactor: 1.0)\n'
-          '  │  └Padding(padding: all(1.0))\n'
-          '  │   └RichText(text: "Header 1")\n'
-          '  ├HtmlTableCell(columnStart: 1, rowStart: 1)\n'
-          '  │└WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
-          '  │ └Align(alignment: centerLeft, widthFactor: 1.0)\n'
-          '  │  └Padding(padding: all(1.0))\n'
-          '  │   └RichText(text: "Header 2")\n'
-          '  ├HtmlTableCell(columnStart: 0, rowStart: 2)\n'
-          '  │└WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
-          '  │ └Align(alignment: centerLeft, widthFactor: 1.0)\n'
-          '  │  └Padding(padding: all(1.0))\n'
-          '  │   └RichText(text: "Value 1")\n'
-          '  └HtmlTableCell(columnStart: 1, rowStart: 2)\n'
-          '   └WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
-          '    └Align(alignment: centerLeft, widthFactor: 1.0)\n'
-          '     └Padding(padding: all(1.0))\n'
-          '      └RichText(text: "Value 2")\n'
-          '\n',
-        ),
-      );
-    });
   });
 
   group('rtl', () {
@@ -98,29 +59,6 @@ Future<void> main() async {
           '[HtmlTableCell:child=[Align:alignment=centerRight,child='
           '[Padding:(1,1,1,1),child=[RichText:dir=rtl,(:Bar)]]]]'
           ']',
-        ),
-      );
-    });
-
-    testWidgets('useExplainer=false', (WidgetTester tester) async {
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(
-        explained,
-        equals(
-          'TshWidget\n'
-          '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-          ' └HtmlTable(borderSpacing: 2.0, textDirection: rtl)\n'
-          '  ├HtmlTableCell(columnStart: 0, rowStart: 0)\n'
-          '  │└WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
-          '  │ └Align(alignment: centerRight, widthFactor: 1.0)\n'
-          '  │  └Padding(padding: all(1.0))\n'
-          '  │   └RichText(textDirection: rtl, text: "Foo")\n'
-          '  └HtmlTableCell(columnStart: 1, rowStart: 0)\n'
-          '   └WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
-          '    └Align(alignment: centerRight, widthFactor: 1.0)\n'
-          '     └Padding(padding: all(1.0))\n'
-          '      └RichText(textDirection: rtl, text: "Bar")\n'
-          '\n',
         ),
       );
     });
@@ -745,7 +683,7 @@ Future<void> main() async {
       });
     });
 
-    testWidgets('_ValignBaselineRenderObject updates row', (tester) async {
+    testWidgets('_ValignBaselineRenderObject updates index', (tester) async {
       await explain(
         tester,
         '<table style="border-collapse: separate">'
@@ -754,9 +692,9 @@ Future<void> main() async {
         '</table>',
         useExplainer: false,
       );
-      final finder = find.byType(HtmlTableValignBaseline);
+      final finder = find.byType(ValignBaseline);
       final before = tester.firstRenderObject(finder);
-      expect(before.toStringShort(), endsWith('(row: 0)'));
+      expect(before.toStringShort(), endsWith('(index: 0)'));
 
       await explain(
         tester,
@@ -767,7 +705,7 @@ Future<void> main() async {
         useExplainer: false,
       );
       final after = tester.firstRenderObject(finder);
-      expect(after.toStringShort(), endsWith('(row: 1)'));
+      expect(after.toStringShort(), endsWith('(index: 1)'));
     });
 
     testWidgets('performs hit test', (tester) async {

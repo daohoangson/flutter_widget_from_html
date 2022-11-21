@@ -575,6 +575,11 @@ class Explainer {
       return _widget(widget.child);
     }
 
+    if (widget.runtimeType.toString() == 'ValignBaselineContainer') {
+      // ignore: avoid_dynamic_calls
+      return _widget((widget as dynamic).child as Widget);
+    }
+
     if (widget is WidgetPlaceholder) {
       return _widget(widget.build(context));
     }

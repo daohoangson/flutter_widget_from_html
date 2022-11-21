@@ -69,10 +69,10 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   @override
   void updateRenderObject(BuildContext _, RenderObject renderObject) {
     (renderObject as _TableRenderObject)
-      ..border = border
-      ..borderCollapse = borderCollapse
-      ..borderSpacing = borderSpacing
-      ..textDirection = textDirection;
+      ..setBorder(border)
+      ..setBorderCollapse(borderCollapse)
+      ..setBorderSpacing(borderSpacing)
+      ..setTextDirection(textDirection);
   }
 }
 
@@ -207,26 +207,6 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   Type get debugTypicalAncestorWidgetClass => HtmlTable;
 }
 
-/// A `valign=baseline` widget.
-class HtmlTableValignBaseline extends SingleChildRenderObjectWidget {
-  /// Creates a `valign=baseline` widget.
-  const HtmlTableValignBaseline({Widget? child, Key? key})
-      : super(child: child, key: key);
-
-  @override
-  RenderObject createRenderObject(BuildContext context) {
-    final table = context.findAncestorRenderObjectOfType<_TableRenderObject>()!;
-    final cell = context.findAncestorWidgetOfExactType<HtmlTableCell>()!;
-    return _ValignBaselineRenderObject(table._tableRenderData, cell.rowStart);
-  }
-
-  @override
-  void updateRenderObject(BuildContext context, RenderObject renderObject) {
-    final cell = context.findAncestorWidgetOfExactType<HtmlTableCell>()!;
-    (renderObject as _ValignBaselineRenderObject).row = cell.rowStart;
-  }
-}
-
 extension _IterableDouble on Iterable<double> {
   double get sum => isEmpty ? 0.0 : reduce(_sum);
 
@@ -266,26 +246,17 @@ class _TableCellData extends ContainerBoxParentData<RenderBox> {
 }
 
 class _TableRenderData {
-  final baselines = <int, List<_ValignBaselineRenderObject>>{};
-
-  // TODO: remove lint ignore
-  // ignore: type_annotate_public_apis
-  var layout = _TableRenderLayout.zero;
+  var _layout = _TableRenderLayout.zero;
 }
 
 class _TableRenderLayout {
   final Rect cellRect;
   final Size totalSize;
 
-  const _TableRenderLayout({
-    required this.cellRect,
-    required this.totalSize,
-  });
+  const _TableRenderLayout(this.cellRect, this.totalSize);
 
-  static const _TableRenderLayout zero = _TableRenderLayout(
-    cellRect: Rect.zero,
-    totalSize: Size.zero,
-  );
+  static const _TableRenderLayout zero =
+      _TableRenderLayout(Rect.zero, Size.zero);
 }
 
 class _TableRenderObject extends RenderBox
@@ -299,50 +270,39 @@ class _TableRenderObject extends RenderBox
     required bool borderCollapse,
   }) : _borderCollapse = borderCollapse;
 
-  final _tableRenderData = _TableRenderData();
+  final _renderData = _TableRenderData();
 
   Border? _border;
-  // ignore: avoid_setters_without_getters
-  set border(Border? v) {
-    if (v == _border) {
-      return;
+  void setBorder(Border? v) {
+    if (v != _border) {
+      _border = v;
+      markNeedsLayout();
     }
-
-    _border = v;
-    markNeedsLayout();
   }
 
   bool _borderCollapse;
-  // ignore: avoid_setters_without_getters
-  set borderCollapse(bool v) {
-    if (v == _borderCollapse) {
-      return;
+  // ignore: avoid_positional_boolean_parameters
+  void setBorderCollapse(bool v) {
+    if (v != _borderCollapse) {
+      _borderCollapse = v;
+      markNeedsLayout();
     }
-
-    _borderCollapse = v;
-    markNeedsLayout();
   }
 
   double _borderSpacing;
-  // ignore: avoid_setters_without_getters
-  set borderSpacing(double v) {
-    if (v == _borderSpacing) {
-      return;
+  void setBorderSpacing(double v) {
+    if (v != _borderSpacing) {
+      _borderSpacing = v;
+      markNeedsLayout();
     }
-
-    _borderSpacing = v;
-    markNeedsLayout();
   }
 
   TextDirection _textDirection;
-  // ignore: avoid_setters_without_getters
-  set textDirection(TextDirection v) {
-    if (v == _textDirection) {
-      return;
+  void setTextDirection(TextDirection v) {
+    if (v != _textDirection) {
+      _textDirection = v;
+      markNeedsLayout();
     }
-
-    _textDirection = v;
-    markNeedsLayout();
   }
 
   double get columnGap => _border != null && _borderCollapse
@@ -402,32 +362,20 @@ class _TableRenderObject extends RenderBox
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    _tableRenderData.baselines.clear();
-
-    final cellRect = _tableRenderData.layout.cellRect;
+    final cellRect = _renderData._layout.cellRect;
     if (!cellRect.isEmpty) {
-      _border?.paint(
-        context.canvas,
-        cellRect.shift(offset),
-      );
+      _border?.paint(context.canvas, cellRect.shift(offset));
     }
 
     var child = firstChild;
     while (child != null) {
       final data = child.parentData! as _TableCellData;
-      final childOffset = data.offset + offset;
-      final childSize = child.size;
-      context.paintChild(child, childOffset);
+      final o = data.offset + offset;
+      final s = child.size;
+      context.paintChild(child, o);
 
-      data.border?.paint(
-        context.canvas,
-        Rect.fromLTWH(
-          childOffset.dx,
-          childOffset.dy,
-          childSize.width,
-          childSize.height,
-        ),
-      );
+      final borderRect = Rect.fromLTWH(o.dx, o.dy, s.width, s.height);
+      data.border?.paint(context.canvas, borderRect);
 
       child = data.nextSibling;
     }
@@ -435,9 +383,9 @@ class _TableRenderObject extends RenderBox
 
   @override
   void performLayout() {
-    final layout = _tableRenderData.layout =
+    final result = _renderData._layout =
         _performLayout(this, firstChild!, constraints, _performLayoutLayouter);
-    size = constraints.constrain(layout.totalSize);
+    size = constraints.constrain(result.totalSize);
   }
 
   @override
@@ -598,8 +546,7 @@ class _TableRenderObject extends RenderBox
       if (child.hasSize) {
         final calculatedX = data.calculateX(tro, columnWidths);
 
-        // TODO: use `late final` when https://github.com/dart-lang/coverage/issues/341 is fixed
-        late double x;
+        double x;
         switch (tro._textDirection) {
           case TextDirection.ltr:
             x = calculatedX;
@@ -618,13 +565,13 @@ class _TableRenderObject extends RenderBox
     }
 
     return _TableRenderLayout(
-      cellRect: Rect.fromLTWH(
+      Rect.fromLTWH(
         0,
         captionHeight,
         calculatedWidth,
         calculatedHeight - captionHeight,
       ),
-      totalSize: Size(calculatedWidth, calculatedHeight),
+      Size(calculatedWidth, calculatedHeight),
     );
   }
 
@@ -640,124 +587,5 @@ class _TableRenderObject extends RenderBox
   ) {
     renderBox.layout(constraints, parentUsesSize: true);
     return renderBox.size;
-  }
-}
-
-class _ValignBaselineRenderObject extends RenderProxyBox {
-  _ValignBaselineRenderObject(this._tableRenderData, this._row);
-
-  // it's unlikely valign render object is kept in memory
-  // while the table one is recreated...
-  // we are not implementing a setter with that asumption
-  final _TableRenderData _tableRenderData;
-
-  int _row;
-  // ignore: avoid_setters_without_getters
-  set row(int v) {
-    if (v == _row) {
-      return;
-    }
-    _row = v;
-    markNeedsLayout();
-  }
-
-  double? _baselineWithOffset;
-  var _paddingTop = 0.0;
-
-  @override
-  Size computeDryLayout(BoxConstraints constraints) =>
-      _performLayout(child, _paddingTop, constraints, _performLayoutDry);
-
-  @override
-  void paint(PaintingContext context, Offset offset) {
-    final effectiveOffset = offset.translate(0, _paddingTop);
-
-    final child = this.child;
-    if (child == null) {
-      return;
-    }
-
-    final baselineWithOffset = _baselineWithOffset = effectiveOffset.dy +
-        (child.getDistanceToBaseline(TextBaseline.alphabetic) ?? 0.0);
-
-    final siblings = _tableRenderData.baselines;
-    if (siblings.containsKey(_row)) {
-      final rowBaseline = siblings[_row]!
-          .map((e) => e._baselineWithOffset!)
-          .reduce((v, e) => max(v, e));
-      siblings[_row]!.add(this);
-
-      if (rowBaseline > baselineWithOffset) {
-        final offsetY = rowBaseline - baselineWithOffset;
-        if (size.height - child.size.height >= offsetY) {
-          // paint child with additional offset
-          context.paintChild(child, effectiveOffset.translate(0, offsetY));
-          return;
-        } else {
-          // skip painting this frame, wait for the correct padding
-          _paddingTop += offsetY;
-          _baselineWithOffset = rowBaseline;
-          WidgetsBinding.instance
-              .addPostFrameCallback((_) => markNeedsLayout());
-          return;
-        }
-      } else if (rowBaseline < baselineWithOffset) {
-        for (final sibling in siblings[_row]!) {
-          if (sibling == this) {
-            continue;
-          }
-
-          final offsetY = baselineWithOffset - sibling._baselineWithOffset!;
-          if (offsetY != 0.0) {
-            sibling._paddingTop += offsetY;
-            sibling._baselineWithOffset = baselineWithOffset;
-            WidgetsBinding.instance
-                .addPostFrameCallback((_) => sibling.markNeedsLayout());
-          }
-        }
-      }
-    } else {
-      siblings[_row] = [this];
-    }
-
-    context.paintChild(child, effectiveOffset);
-  }
-
-  @override
-  void performLayout() {
-    size = _performLayout(
-      child,
-      _paddingTop,
-      constraints,
-      _performLayoutLayouter,
-    );
-  }
-
-  @override
-  String toStringShort() => '_ValignBaselineRenderObject(row: $_row)';
-
-  static Size _performLayout(
-    RenderBox? child,
-    double paddingTop,
-    BoxConstraints constraints,
-    Size? Function(RenderBox? renderBox, BoxConstraints constraints) layouter,
-  ) {
-    final cc = constraints.loosen().deflate(EdgeInsets.only(top: paddingTop));
-    final childSize = layouter(child, cc) ?? Size.zero;
-    return constraints.constrain(childSize + Offset(0, paddingTop));
-  }
-
-  static Size? _performLayoutDry(
-    RenderBox? renderBox,
-    BoxConstraints constraints,
-  ) =>
-      renderBox?.getDryLayout(constraints);
-
-  static Size? _performLayoutLayouter(
-    RenderBox? renderBox,
-    BoxConstraints constraints,
-  ) {
-    renderBox?.layout(constraints, parentUsesSize: true);
-    return renderBox?.size;
   }
 }
