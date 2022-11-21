@@ -30,52 +30,14 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[Column:children='
-          '[_TableCaption:child=[CssBlock:child='
-          '[RichText:align=center,(:Caption)]]],'
           '[HtmlTable:children='
+          '[HtmlTableCaption:child=[CssBlock:child='
+          '[RichText:align=center,(:Caption)]]],'
           '${_padding('[RichText:(+b:Header 1)]')},'
           '${_padding('[RichText:(+b:Header 2)]')},'
           '${_richtext('Value 1')},'
           '${_richtext('Value 2')}'
-          ']]',
-        ),
-      );
-    });
-
-    testWidgets('useExplainer=false', (WidgetTester tester) async {
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(
-        explained,
-        equals(
-          'TshWidget\n'
-          '└ColumnPlaceholder(BuildMetadata(<root></root>))\n'
-          ' └Column()\n'
-          '  ├_TableCaption()\n'
-          '  │└CssBlock()\n'
-          '  │ └RichText(textAlign: center, text: "Caption")\n'
-          '  └HtmlTable(borderSpacing: 2.0)\n'
-          '   ├HtmlTableCell(columnStart: 0, rowStart: 0)\n'
-          '   │└WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
-          '   │ └Align(alignment: centerLeft)\n'
-          '   │  └Padding(padding: all(1.0))\n'
-          '   │   └RichText(text: "Header 1")\n'
-          '   ├HtmlTableCell(columnStart: 1, rowStart: 0)\n'
-          '   │└WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
-          '   │ └Align(alignment: centerLeft)\n'
-          '   │  └Padding(padding: all(1.0))\n'
-          '   │   └RichText(text: "Header 2")\n'
-          '   ├HtmlTableCell(columnStart: 0, rowStart: 1)\n'
-          '   │└WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
-          '   │ └Align(alignment: centerLeft)\n'
-          '   │  └Padding(padding: all(1.0))\n'
-          '   │   └RichText(text: "Value 1")\n'
-          '   └HtmlTableCell(columnStart: 1, rowStart: 1)\n'
-          '    └WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
-          '     └Align(alignment: centerLeft)\n'
-          '      └Padding(padding: all(1.0))\n'
-          '       └RichText(text: "Value 2")\n'
-          '\n',
+          ']',
         ),
       );
     });
@@ -97,29 +59,6 @@ Future<void> main() async {
           '[HtmlTableCell:child=[Align:alignment=centerRight,child='
           '[Padding:(1,1,1,1),child=[RichText:dir=rtl,(:Bar)]]]]'
           ']',
-        ),
-      );
-    });
-
-    testWidgets('useExplainer=false', (WidgetTester tester) async {
-      final explained = await explain(tester, html, useExplainer: false);
-      expect(
-        explained,
-        equals(
-          'TshWidget\n'
-          '└WidgetPlaceholder<BuildMetadata>(BuildMetadata($html))\n'
-          ' └HtmlTable(borderSpacing: 2.0, textDirection: rtl)\n'
-          '  ├HtmlTableCell(columnStart: 0, rowStart: 0)\n'
-          '  │└WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
-          '  │ └Align(alignment: centerRight)\n'
-          '  │  └Padding(padding: all(1.0))\n'
-          '  │   └RichText(textDirection: rtl, text: "Foo")\n'
-          '  └HtmlTableCell(columnStart: 1, rowStart: 0)\n'
-          '   └WidgetPlaceholder<CssLengthBox>(CssLengthBox.all(1.0px))\n'
-          '    └Align(alignment: centerRight)\n'
-          '     └Padding(padding: all(1.0))\n'
-          '      └RichText(textDirection: rtl, text: "Bar")\n'
-          '\n',
         ),
       );
     });
@@ -666,15 +605,14 @@ Future<void> main() async {
     expect(
       explained,
       equals(
-        '[Column:children='
-        '[_TableCaption:child=[CssBlock:child='
-        '[RichText:align=center,(:Caption)]]],'
         '[HtmlTable:children='
+        '[HtmlTableCaption:child=[CssBlock:child='
+        '[RichText:align=center,(:Caption)]]],'
         '[HtmlTableCell:child=[RichText:(+b:Header 1)]],'
         '[HtmlTableCell:child=[RichText:(+b:Header 2)]],'
         '[HtmlTableCell:child=[RichText:(:Value 1)]],'
         '[HtmlTableCell:child=[RichText:(:Value 2)]]'
-        ']]',
+        ']',
       ),
     );
   });
@@ -745,7 +683,7 @@ Future<void> main() async {
       });
     });
 
-    testWidgets('_ValignBaselineRenderObject updates row', (tester) async {
+    testWidgets('_ValignBaselineRenderObject updates index', (tester) async {
       await explain(
         tester,
         '<table style="border-collapse: separate">'
@@ -754,9 +692,9 @@ Future<void> main() async {
         '</table>',
         useExplainer: false,
       );
-      final finder = find.byType(HtmlTableValignBaseline);
+      final finder = find.byType(ValignBaseline);
       final before = tester.firstRenderObject(finder);
-      expect(before.toStringShort(), endsWith('(row: 0)'));
+      expect(before.toStringShort(), endsWith('(index: 0)'));
 
       await explain(
         tester,
@@ -767,7 +705,7 @@ Future<void> main() async {
         useExplainer: false,
       );
       final after = tester.firstRenderObject(finder);
-      expect(after.toStringShort(), endsWith('(row: 1)'));
+      expect(after.toStringShort(), endsWith('(index: 1)'));
     });
 
     testWidgets('performs hit test', (tester) async {
@@ -814,9 +752,7 @@ Future<void> main() async {
 
 <div style="width: 25px">$tableWithImage</div><br />
 
-<div style="height: 25px">$tableWithImage</div>
-
-Foo should float on top of table.''',
+<div style="height: 25px">$tableWithImage</div>''',
               'collapsed_border': '''
 <table border="1" style="border-collapse: collapse">
   <tr>
@@ -830,9 +766,8 @@ Foo should float on top of table.''',
   <tr><td colspan="2">Lorem ipsum dolor sit amet.</td></tr>
   <tr><td>Foo</td><td>Bar</td></tr>
 </table>''',
-              'height_as_min_height':
-                  'Above<table border="1" style="height: 1px">'
-                      '<tr><td style="height: 1px">Foo</td></tr></table>Below',
+              'height_1px': 'Above<table border="1" style="height: 1px">'
+                  '<tr><td style="height: 1px">Foo</td></tr></table>Below',
               'rowspan': '''
 <table border="1">
   <tr><td rowspan="2">$multiline</td><td>Foo</td></tr>
@@ -877,6 +812,7 @@ Foo should float on top of table.''',
     <td valign="baseline">Foo</td>
   </tr>
 </table>''',
+              // TODO: doesn't match browser output
               'valign_baseline_computeDryLayout': '''
 <div style="width: 100px; height: 100px;">
   <table border="1">
@@ -889,8 +825,12 @@ Foo should float on top of table.''',
               'rtl': '''
 <table dir="rtl">
   <tr>
-    <td>Foo</td>
+    <td>Foo Foo Foo</td>
     <td>Bar</td>
+  </tr>
+  <tr>
+    <td>Foo</td>
+    <td>Bar Bar Bar</td>
   </tr>
 </table>
 ''',
@@ -920,6 +860,20 @@ Foo should float on top of table.''',
       </table>
     </td>
     <td>$multiline</td>
+  </tr>
+</table>''',
+              'width_in_percent': '''
+<table border="1">
+  <tr>
+    <td style="background: red; width: 30%">Foo</td>
+    <td style="background: green; width: 70%">Bar</td>
+  </tr>
+</table>''',
+              'width_in_px': '''
+<table border="1">
+  <tr>
+    <td style="width: 50px">Foo</td>
+    <td style="width: 100px">Bar</td>
   </tr>
 </table>''',
             };

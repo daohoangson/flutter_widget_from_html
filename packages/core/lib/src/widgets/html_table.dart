@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+import 'css_sizing.dart';
+
 /// A TABLE widget.
 class HtmlTable extends MultiChildRenderObjectWidget {
   /// The table border sides.
@@ -18,9 +20,6 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   /// Default: `0.0`.
   final double borderSpacing;
 
-  /// The companion data for table.
-  final HtmlTableCompanion companion;
-
   /// Determines the order to lay children out horizontally.
   ///
   /// Default: [TextDirection.ltr].
@@ -32,7 +31,6 @@ class HtmlTable extends MultiChildRenderObjectWidget {
     this.borderCollapse = false,
     this.borderSpacing = 0.0,
     required List<Widget> children,
-    required this.companion,
     this.textDirection = TextDirection.ltr,
     Key? key,
   }) : super(children: children, key: key);
@@ -41,7 +39,6 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   RenderObject createRenderObject(BuildContext _) => _TableRenderObject(
         border,
         borderSpacing,
-        companion,
         textDirection,
         borderCollapse: borderCollapse,
       );
@@ -72,17 +69,29 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   @override
   void updateRenderObject(BuildContext _, RenderObject renderObject) {
     (renderObject as _TableRenderObject)
-      ..border = border
-      ..borderCollapse = borderCollapse
-      ..borderSpacing = borderSpacing
-      ..companion = companion
-      ..textDirection = textDirection;
+      ..setBorder(border)
+      ..setBorderCollapse(borderCollapse)
+      ..setBorderSpacing(borderSpacing)
+      ..setTextDirection(textDirection);
   }
 }
 
-/// Companion data for table.
-class HtmlTableCompanion {
-  final _baselines = <int, List<_ValignBaselineRenderObject>>{};
+/// A table caption widget.
+class HtmlTableCaption extends HtmlTableCell {
+  /// Creates a table caption widget.
+  const HtmlTableCaption({
+    required Widget child,
+    required int columnSpan,
+    required int rowIndex,
+    Key? key,
+  }) : super._(
+          columnStart: 0,
+          columnSpan: columnSpan,
+          isCaption: true,
+          key: key,
+          rowStart: rowIndex,
+          child: child,
+        );
 }
 
 /// A TD (table cell) widget.
@@ -102,19 +111,38 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   /// The row index this cell should start.
   final int rowStart;
 
+  /// The cell width.
+  final CssSizingValue? width;
+
+  final bool _isCaption;
+
   /// Creates a TD (table cell) widget.
-  const HtmlTableCell({
+  const factory HtmlTableCell({
+    Border? border,
+    required Widget child,
+    int columnSpan,
+    required int columnStart,
+    Key? key,
+    int rowSpan,
+    required int rowStart,
+    CssSizingValue? width,
+  }) = HtmlTableCell._;
+
+  const HtmlTableCell._({
     this.border,
     required Widget child,
     this.columnSpan = 1,
     required this.columnStart,
+    bool isCaption = false,
     Key? key,
     this.rowSpan = 1,
     required this.rowStart,
+    this.width,
   })  : assert(columnSpan >= 1),
         assert(columnStart >= 0),
         assert(rowSpan >= 1),
         assert(rowStart >= 0),
+        _isCaption = isCaption,
         super(child: child, key: key);
 
   @override
@@ -137,6 +165,11 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
       needsLayout = true;
     }
 
+    if (data.isCaption != _isCaption) {
+      data.isCaption = _isCaption;
+      needsLayout = true;
+    }
+
     if (data.rowStart != rowStart) {
       data.rowStart = rowStart;
       needsLayout = true;
@@ -144,6 +177,11 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
 
     if (data.rowSpan != rowSpan) {
       data.rowSpan = rowSpan;
+      needsLayout = true;
+    }
+
+    if (data.width != width) {
+      data.width = width;
       needsLayout = true;
     }
 
@@ -169,29 +207,6 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   Type get debugTypicalAncestorWidgetClass => HtmlTable;
 }
 
-/// A `valign=baseline` widget.
-class HtmlTableValignBaseline extends SingleChildRenderObjectWidget {
-  /// Creates a `valign=baseline` widget.
-  const HtmlTableValignBaseline({Widget? child, Key? key})
-      : super(child: child, key: key);
-
-  @override
-  RenderObject createRenderObject(BuildContext context) {
-    final table = context.findAncestorWidgetOfExactType<HtmlTable>()!;
-    final cell = context.findAncestorWidgetOfExactType<HtmlTableCell>()!;
-    return _ValignBaselineRenderObject(table.companion, cell.rowStart);
-  }
-
-  @override
-  void updateRenderObject(BuildContext context, RenderObject renderObject) {
-    final table = context.findAncestorWidgetOfExactType<HtmlTable>()!;
-    final cell = context.findAncestorWidgetOfExactType<HtmlTableCell>()!;
-    (renderObject as _ValignBaselineRenderObject)
-      ..companion = table.companion
-      ..row = cell.rowStart;
-  }
-}
-
 extension _IterableDouble on Iterable<double> {
   double get sum => isEmpty ? 0.0 : reduce(_sum);
 
@@ -201,17 +216,19 @@ extension _IterableDouble on Iterable<double> {
 class _TableCellData extends ContainerBoxParentData<RenderBox> {
   Border? border;
   int columnSpan = 1;
-  int columnStart = -1;
+  int columnStart = 0;
+  bool isCaption = false;
   int rowSpan = 1;
-  int rowStart = -1;
+  int rowStart = 0;
+  CssSizingValue? width;
 
   double calculateHeight(_TableRenderObject tro, List<double> heights) {
-    final gaps = (rowSpan - 1) * tro.rowGap;
+    final gaps = tro._calculateRowGaps(this);
     return heights.getRange(rowStart, rowStart + rowSpan).sum + gaps;
   }
 
   double calculateWidth(_TableRenderObject tro, List<double> widths) {
-    final gaps = (columnSpan - 1) * tro.columnGap;
+    final gaps = tro._calculateColumnGaps(this);
     return widths.getRange(columnStart, columnStart + columnSpan).sum + gaps;
   }
 
@@ -222,10 +239,20 @@ class _TableCellData extends ContainerBoxParentData<RenderBox> {
   }
 
   double calculateY(_TableRenderObject tro, List<double> heights) {
-    final padding = tro._border?.top.width ?? 0.0;
+    final padding = isCaption ? .0 : (tro._border?.top.width ?? 0.0);
     final gaps = (rowStart + 1) * tro.rowGap;
     return padding + heights.getRange(0, rowStart).sum + gaps;
   }
+}
+
+class _TableRenderLayout {
+  final Rect cellRect;
+  final Size totalSize;
+
+  const _TableRenderLayout(this.cellRect, this.totalSize);
+
+  static const _TableRenderLayout zero =
+      _TableRenderLayout(Rect.zero, Size.zero);
 }
 
 class _TableRenderObject extends RenderBox
@@ -235,64 +262,43 @@ class _TableRenderObject extends RenderBox
   _TableRenderObject(
     this._border,
     this._borderSpacing,
-    this._companion,
     this._textDirection, {
     required bool borderCollapse,
   }) : _borderCollapse = borderCollapse;
 
   Border? _border;
-  // ignore: avoid_setters_without_getters
-  set border(Border? v) {
-    if (v == _border) {
-      return;
+  void setBorder(Border? v) {
+    if (v != _border) {
+      _border = v;
+      markNeedsLayout();
     }
-
-    _border = v;
-    markNeedsLayout();
   }
 
   bool _borderCollapse;
-  // ignore: avoid_setters_without_getters
-  set borderCollapse(bool v) {
-    if (v == _borderCollapse) {
-      return;
+  // ignore: avoid_positional_boolean_parameters
+  void setBorderCollapse(bool v) {
+    if (v != _borderCollapse) {
+      _borderCollapse = v;
+      markNeedsLayout();
     }
-
-    _borderCollapse = v;
-    markNeedsLayout();
   }
 
   double _borderSpacing;
-  // ignore: avoid_setters_without_getters
-  set borderSpacing(double v) {
-    if (v == _borderSpacing) {
-      return;
+  void setBorderSpacing(double v) {
+    if (v != _borderSpacing) {
+      _borderSpacing = v;
+      markNeedsLayout();
     }
-
-    _borderSpacing = v;
-    markNeedsLayout();
   }
 
-  HtmlTableCompanion _companion;
-  // ignore: avoid_setters_without_getters
-  set companion(HtmlTableCompanion v) {
-    if (v == _companion) {
-      return;
-    }
-
-    _companion = v;
-    markNeedsLayout();
-  }
+  var _layout = _TableRenderLayout.zero;
 
   TextDirection _textDirection;
-  // ignore: avoid_setters_without_getters
-  set textDirection(TextDirection v) {
-    if (v == _textDirection) {
-      return;
+  void setTextDirection(TextDirection v) {
+    if (v != _textDirection) {
+      _textDirection = v;
+      markNeedsLayout();
     }
-
-    _textDirection = v;
-    markNeedsLayout();
   }
 
   double get columnGap => _border != null && _borderCollapse
@@ -310,9 +316,6 @@ class _TableRenderObject extends RenderBox
   double get rowGap => _border != null && _borderCollapse
       ? (_border!.top.width * -1.0)
       : _borderSpacing;
-
-  double? _calculatedHeight;
-  double? _calculatedWidth;
 
   @override
   double? computeDistanceToActualBaseline(TextBaseline baseline) {
@@ -346,7 +349,8 @@ class _TableRenderObject extends RenderBox
 
   @override
   Size computeDryLayout(BoxConstraints constraints) =>
-      _performLayout(this, firstChild!, constraints, _performLayoutDry);
+      _performLayout(this, firstChild!, constraints, _performLayoutDry)
+          .totalSize;
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
@@ -354,36 +358,20 @@ class _TableRenderObject extends RenderBox
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    _companion._baselines.clear();
-
-    assert(_calculatedHeight != null);
-    assert(_calculatedWidth != null);
-    _border?.paint(
-      context.canvas,
-      Rect.fromLTWH(
-        offset.dx,
-        offset.dy,
-        _calculatedWidth ?? 0.0,
-        _calculatedHeight ?? 0.0,
-      ),
-    );
+    final cellRect = _layout.cellRect;
+    if (!cellRect.isEmpty) {
+      _border?.paint(context.canvas, cellRect.shift(offset));
+    }
 
     var child = firstChild;
     while (child != null) {
       final data = child.parentData! as _TableCellData;
-      final childOffset = data.offset + offset;
-      final childSize = child.size;
-      context.paintChild(child, childOffset);
+      final o = data.offset + offset;
+      final s = child.size;
+      context.paintChild(child, o);
 
-      data.border?.paint(
-        context.canvas,
-        Rect.fromLTWH(
-          childOffset.dx,
-          childOffset.dy,
-          childSize.width,
-          childSize.height,
-        ),
-      );
+      final borderRect = Rect.fromLTWH(o.dx, o.dy, s.width, s.height);
+      data.border?.paint(context.canvas, borderRect);
 
       child = data.nextSibling;
     }
@@ -391,12 +379,9 @@ class _TableRenderObject extends RenderBox
 
   @override
   void performLayout() {
-    final calculatedSize =
-        _performLayout(this, firstChild!, constraints, _performLayoutLayouter);
-    _calculatedHeight = calculatedSize.height;
-    _calculatedWidth = calculatedSize.width;
-
-    size = constraints.constrain(calculatedSize);
+    const layouter = _performLayoutLayouter;
+    _layout = _performLayout(this, firstChild!, constraints, layouter);
+    size = constraints.constrain(_layout.totalSize);
   }
 
   @override
@@ -406,7 +391,15 @@ class _TableRenderObject extends RenderBox
     }
   }
 
-  static Size _performLayout(
+  double _calculateColumnGaps(_TableCellData data) {
+    return (data.columnSpan - 1) * columnGap;
+  }
+
+  double _calculateRowGaps(_TableCellData data) {
+    return (data.rowSpan - 1) * rowGap;
+  }
+
+  static _TableRenderLayout _performLayout(
     _TableRenderObject tro,
     RenderBox firstChild,
     BoxConstraints constraints,
@@ -414,6 +407,7 @@ class _TableRenderObject extends RenderBox
   ) {
     final children = <RenderBox>[];
     final cells = <_TableCellData>[];
+    final drySizes = <Size>[];
 
     RenderBox? child = firstChild;
     var columnCount = 0;
@@ -423,6 +417,13 @@ class _TableRenderObject extends RenderBox
       children.add(child);
       cells.add(data);
 
+      final width = data.width?.clamp(0, constraints.maxWidth);
+      if (width != null) {
+        drySizes.add(Size(width, .0));
+      } else {
+        drySizes.add(_performLayoutDry(child, const BoxConstraints()));
+      }
+
       columnCount = max(columnCount, data.columnStart + data.columnSpan);
       rowCount = max(rowCount, data.rowStart + data.rowSpan);
 
@@ -430,39 +431,83 @@ class _TableRenderObject extends RenderBox
     }
 
     final columnGaps = (columnCount + 1) * tro.columnGap;
+    final dryColumnWidths = List.filled(columnCount, 0.0);
+    for (var i = 0; i < children.length; i++) {
+      final data = cells[i];
+      final drySize = drySizes[i];
+
+      final dryColumnWidth =
+          (drySize.width - tro._calculateColumnGaps(data)) / data.columnSpan;
+
+      // distribute cell width across spanned columns
+      for (var c = 0; c < data.columnSpan; c++) {
+        final column = data.columnStart + c;
+        dryColumnWidths[column] = max(dryColumnWidths[column], dryColumnWidth);
+      }
+    }
+
+    // being naive: take dry widths as render widths
+    var columnWidths = [...dryColumnWidths];
+
+    final drySum = dryColumnWidths.sum;
+    final dryWidth = tro.paddingLeft + drySum + columnGaps + tro.paddingRight;
+    if (constraints.hasBoundedWidth && dryWidth > constraints.maxWidth) {
+      // viewport is too small: re-calculate widths using weighted distribution
+      // e.g. if a column has huge dry width, it will have bigger width
+      final availableWidth = constraints.maxWidth - (dryWidth - drySum);
+      columnWidths = dryColumnWidths
+          .map((dryColumnWidth) => dryColumnWidth / drySum * availableWidth)
+          .toList(growable: false);
+
+      // calculate minimum widths and make sure we allocate enough room
+      for (var i = 0; i < children.length; i++) {
+        final child = children[i];
+        final data = cells[i];
+        final drySize = drySizes[i];
+
+        final columnGaps = tro._calculateColumnGaps(data);
+        final dryColumnWidth = (drySize.width - columnGaps) / data.columnSpan;
+        var columnWidthSmallerThanDry = false;
+        for (var c = 0; c < data.columnSpan; c++) {
+          final column = data.columnStart + c;
+          if (columnWidths[column] < dryColumnWidth) {
+            columnWidthSmallerThanDry = true;
+            break;
+          }
+        }
+
+        if (columnWidthSmallerThanDry) {
+          // this call is expensive, we try to avoid it as much as possible
+          final minWidth = child.getMinIntrinsicWidth(double.infinity);
+          final minColumnWidth = (minWidth - columnGaps) / data.columnSpan;
+
+          for (var c = 0; c < data.columnSpan; c++) {
+            final column = data.columnStart + c;
+            columnWidths[column] = max(columnWidths[column], minColumnWidth);
+          }
+        }
+      }
+    }
+
     final rowGaps = (rowCount + 1) * tro.rowGap;
-    final width0 = (constraints.maxWidth -
-            tro.paddingLeft -
-            tro.paddingRight -
-            columnGaps) /
-        columnCount;
     final childSizes = List.filled(children.length, Size.zero);
-    final columnWidths = List.filled(columnCount, 0.0);
     final rowHeights = List.filled(rowCount, 0.0);
     for (var i = 0; i < children.length; i++) {
       final child = children[i];
       final data = cells[i];
+      final drySize = drySizes[i];
 
-      // assume even distribution of column widths if width is finite
-      final childColumnGaps = (data.columnSpan - 1) * tro.columnGap;
-      final childWidth =
-          width0.isFinite ? width0 * data.columnSpan + childColumnGaps : null;
-      final cc = BoxConstraints(
-        maxWidth: childWidth ?? double.infinity,
-        minWidth: childWidth ?? 0.0,
-      );
-      final childSize = childSizes[i] = layouter(child, cc);
-
-      // distribute cell width across spanned columns
-      final columnWidth = (childSize.width - childColumnGaps) / data.columnSpan;
-      for (var c = 0; c < data.columnSpan; c++) {
-        final column = data.columnStart + c;
-        columnWidths[column] = max(columnWidths[column], columnWidth);
-      }
+      final childWidth = data.calculateWidth(tro, columnWidths);
+      final childSize = childWidth == drySize.width &&
+              drySize.height > 0 &&
+              identical(layouter, _performLayoutDry)
+          ? drySize
+          : layouter(child, BoxConstraints.tightFor(width: childWidth));
+      childSizes[i] = childSize;
 
       // distribute cell height across spanned rows
-      final childRowGaps = (data.rowSpan - 1) * tro.rowGap;
-      final rowHeight = (childSize.height - childRowGaps) / data.rowSpan;
+      final rowHeight =
+          (childSize.height - tro._calculateRowGaps(data)) / data.rowSpan;
       for (var r = 0; r < data.rowSpan; r++) {
         final row = data.rowStart + r;
         rowHeights[row] = max(rowHeights[row], rowHeight);
@@ -471,6 +516,7 @@ class _TableRenderObject extends RenderBox
 
     // we now know all the widths and heights, let's position cells
     // sometime we have to relayout child, e.g. stretch its height for rowspan
+    var captionHeight = .0;
     final calculatedHeight =
         tro.paddingTop + rowHeights.sum + rowGaps + tro.paddingBottom;
     final constraintedHeight = constraints.constrainHeight(calculatedHeight);
@@ -478,25 +524,25 @@ class _TableRenderObject extends RenderBox
         max(0, (constraintedHeight - calculatedHeight) / rowCount);
     final calculatedWidth =
         tro.paddingLeft + columnWidths.sum + columnGaps + tro.paddingRight;
-    final constraintedWidth = constraints.constrainWidth(calculatedWidth);
-    final deltaWidth = (constraintedWidth - calculatedWidth) / columnCount;
     for (var i = 0; i < children.length; i++) {
       final child = children[i];
       final data = cells[i];
-      final childSize = childSizes[i];
+      var childSize = childSizes[i];
 
-      final childHeight = data.calculateHeight(tro, rowHeights) + deltaHeight;
-      final childWidth = data.calculateWidth(tro, columnWidths) + deltaWidth;
-      if (childSize.height != childHeight || childSize.width != childWidth) {
+      var childHeight = data.calculateHeight(tro, rowHeights) + deltaHeight;
+      var childWidth = data.calculateWidth(tro, columnWidths);
+      if (childSize.height != childHeight) {
         final cc2 = BoxConstraints.tight(Size(childWidth, childHeight));
-        layouter(child, cc2);
+        childSize = layouter(child, cc2);
+        childHeight = childSize.height;
+        childWidth = childSize.width;
       }
 
+      final calculatedY = data.calculateY(tro, rowHeights);
       if (child.hasSize) {
         final calculatedX = data.calculateX(tro, columnWidths);
 
-        // TODO: use `late final` when https://github.com/dart-lang/coverage/issues/341 is fixed
-        late double x;
+        double x;
         switch (tro._textDirection) {
           case TextDirection.ltr:
             x = calculatedX;
@@ -506,12 +552,23 @@ class _TableRenderObject extends RenderBox
             break;
         }
 
-        final y = data.calculateY(tro, rowHeights);
-        data.offset = Offset(x, y);
+        data.offset = Offset(x, calculatedY);
+      }
+
+      if (data.isCaption) {
+        captionHeight = max(captionHeight, calculatedY + childHeight);
       }
     }
 
-    return Size(calculatedWidth, calculatedHeight);
+    return _TableRenderLayout(
+      Rect.fromLTWH(
+        0,
+        captionHeight,
+        calculatedWidth,
+        calculatedHeight - captionHeight,
+      ),
+      Size(calculatedWidth, calculatedHeight),
+    );
   }
 
   static Size _performLayoutDry(
@@ -526,129 +583,5 @@ class _TableRenderObject extends RenderBox
   ) {
     renderBox.layout(constraints, parentUsesSize: true);
     return renderBox.size;
-  }
-}
-
-class _ValignBaselineRenderObject extends RenderProxyBox {
-  _ValignBaselineRenderObject(this._companion, this._row);
-
-  HtmlTableCompanion _companion;
-  // ignore: avoid_setters_without_getters
-  set companion(HtmlTableCompanion v) {
-    if (v == _companion) {
-      return;
-    }
-    _companion = v;
-    markNeedsLayout();
-  }
-
-  int _row;
-  // ignore: avoid_setters_without_getters
-  set row(int v) {
-    if (v == _row) {
-      return;
-    }
-    _row = v;
-    markNeedsLayout();
-  }
-
-  double? _baselineWithOffset;
-  var _paddingTop = 0.0;
-
-  @override
-  Size computeDryLayout(BoxConstraints constraints) =>
-      _performLayout(child, _paddingTop, constraints, _performLayoutDry);
-
-  @override
-  void paint(PaintingContext context, Offset offset) {
-    final effectiveOffset = offset.translate(0, _paddingTop);
-
-    final child = this.child;
-    if (child == null) {
-      return;
-    }
-
-    final baselineWithOffset = _baselineWithOffset = effectiveOffset.dy +
-        (child.getDistanceToBaseline(TextBaseline.alphabetic) ?? 0.0);
-
-    final siblings = _companion._baselines;
-    if (siblings.containsKey(_row)) {
-      final rowBaseline = siblings[_row]!
-          .map((e) => e._baselineWithOffset!)
-          .reduce((v, e) => max(v, e));
-      siblings[_row]!.add(this);
-
-      if (rowBaseline > baselineWithOffset) {
-        final offsetY = rowBaseline - baselineWithOffset;
-        if (size.height - child.size.height >= offsetY) {
-          // paint child with additional offset
-          context.paintChild(child, effectiveOffset.translate(0, offsetY));
-          return;
-        } else {
-          // skip painting this frame, wait for the correct padding
-          _paddingTop += offsetY;
-          _baselineWithOffset = rowBaseline;
-          WidgetsBinding.instance
-              .addPostFrameCallback((_) => markNeedsLayout());
-          return;
-        }
-      } else if (rowBaseline < baselineWithOffset) {
-        for (final sibling in siblings[_row]!) {
-          if (sibling == this) {
-            continue;
-          }
-
-          final offsetY = baselineWithOffset - sibling._baselineWithOffset!;
-          if (offsetY != 0.0) {
-            sibling._paddingTop += offsetY;
-            sibling._baselineWithOffset = baselineWithOffset;
-            WidgetsBinding.instance
-                .addPostFrameCallback((_) => sibling.markNeedsLayout());
-          }
-        }
-      }
-    } else {
-      siblings[_row] = [this];
-    }
-
-    context.paintChild(child, effectiveOffset);
-  }
-
-  @override
-  void performLayout() {
-    size = _performLayout(
-      child,
-      _paddingTop,
-      constraints,
-      _performLayoutLayouter,
-    );
-  }
-
-  @override
-  String toStringShort() => '_ValignBaselineRenderObject(row: $_row)';
-
-  static Size _performLayout(
-    RenderBox? child,
-    double paddingTop,
-    BoxConstraints constraints,
-    Size? Function(RenderBox? renderBox, BoxConstraints constraints) layouter,
-  ) {
-    final cc = constraints.loosen().deflate(EdgeInsets.only(top: paddingTop));
-    final childSize = layouter(child, cc) ?? Size.zero;
-    return constraints.constrain(childSize + Offset(0, paddingTop));
-  }
-
-  static Size? _performLayoutDry(
-    RenderBox? renderBox,
-    BoxConstraints constraints,
-  ) =>
-      renderBox?.getDryLayout(constraints);
-
-  static Size? _performLayoutLayouter(
-    RenderBox? renderBox,
-    BoxConstraints constraints,
-  ) {
-    renderBox?.layout(constraints, parentUsesSize: true);
-    return renderBox?.size;
   }
 }

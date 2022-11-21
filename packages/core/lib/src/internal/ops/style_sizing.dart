@@ -7,6 +7,24 @@ const kCssMinHeight = 'min-height';
 const kCssMinWidth = 'min-width';
 const kCssWidth = 'width';
 
+extension CssLengthToSizing on CssLength {
+  CssSizingValue? getSizing(TextStyleHtml tsh) {
+    final value = getValue(tsh);
+    if (value != null) {
+      return CssSizingValue.value(value);
+    }
+
+    switch (unit) {
+      case CssLengthUnit.auto:
+        return const CssSizingValue.auto();
+      case CssLengthUnit.percentage:
+        return CssSizingValue.percentage(number);
+      default:
+        return null;
+    }
+  }
+}
+
 class DisplayBlockOp extends BuildOp {
   DisplayBlockOp(WidgetFactory wf)
       : super(
@@ -24,12 +42,16 @@ class StyleSizing {
 
   final WidgetFactory wf;
 
-  static final _treatHeightAsMinHeight = Expando<bool>();
+  static final _skipBuilding = Expando<bool>();
 
   StyleSizing(this.wf);
 
   BuildOp get buildOp => BuildOp(
         onTreeFlattening: (meta, tree) {
+          if (_skipBuilding[meta] == true) {
+            return;
+          }
+
           final input = _parse(meta);
           if (input == null) {
             return;
@@ -50,6 +72,10 @@ class StyleSizing {
           widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb));
         },
         onWidgets: (meta, widgets) {
+          if (_skipBuilding[meta] == true || widgets.isEmpty) {
+            return widgets;
+          }
+
           final input = _parse(meta);
           if (input == null) {
             return widgets;
@@ -84,12 +110,8 @@ class StyleSizing {
         case kCssHeight:
           final parsedHeight = tryParseCssLength(value);
           if (parsedHeight != null) {
-            if (_treatHeightAsMinHeight[meta] == true) {
-              minHeight = parsedHeight;
-            } else {
-              preferredAxis = Axis.vertical;
-              preferredHeight = parsedHeight;
-            }
+            preferredAxis = Axis.vertical;
+            preferredHeight = parsedHeight;
           }
           break;
         case kCssMaxHeight:
@@ -143,8 +165,10 @@ class StyleSizing {
     );
   }
 
-  static void treatHeightAsMinHeight(BuildMetadata meta) =>
-      _treatHeightAsMinHeight[meta] = true;
+  static void skip(BuildMetadata meta) {
+    assert(_skipBuilding[meta] != true, 'Built ${meta.element} already');
+    _skipBuilding[meta] = true;
+  }
 
   static Widget _build(
     BuildContext context,
@@ -155,35 +179,15 @@ class StyleSizing {
     final tsh = tsb.build(context);
 
     return CssSizing(
-      maxHeight: _getValue(input.maxHeight, tsh),
-      maxWidth: _getValue(input.maxWidth, tsh),
-      minHeight: _getValue(input.minHeight, tsh),
-      minWidth: _getValue(input.minWidth, tsh),
+      maxHeight: input.maxHeight?.getSizing(tsh),
+      maxWidth: input.maxWidth?.getSizing(tsh),
+      minHeight: input.minHeight?.getSizing(tsh),
+      minWidth: input.minWidth?.getSizing(tsh),
       preferredAxis: input.preferredAxis,
-      preferredHeight: _getValue(input.preferredHeight, tsh),
-      preferredWidth: _getValue(input.preferredWidth, tsh),
+      preferredHeight: input.preferredHeight?.getSizing(tsh),
+      preferredWidth: input.preferredWidth?.getSizing(tsh),
       child: child,
     );
-  }
-
-  static CssSizingValue? _getValue(CssLength? length, TextStyleHtml tsh) {
-    if (length == null) {
-      return null;
-    }
-
-    final value = length.getValue(tsh);
-    if (value != null) {
-      return CssSizingValue.value(value);
-    }
-
-    switch (length.unit) {
-      case CssLengthUnit.auto:
-        return const CssSizingValue.auto();
-      case CssLengthUnit.percentage:
-        return CssSizingValue.percentage(length.number);
-      default:
-        return null;
-    }
   }
 }
 
