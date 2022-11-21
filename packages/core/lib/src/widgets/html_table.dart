@@ -245,10 +245,6 @@ class _TableCellData extends ContainerBoxParentData<RenderBox> {
   }
 }
 
-class _TableRenderData {
-  var _layout = _TableRenderLayout.zero;
-}
-
 class _TableRenderLayout {
   final Rect cellRect;
   final Size totalSize;
@@ -269,8 +265,6 @@ class _TableRenderObject extends RenderBox
     this._textDirection, {
     required bool borderCollapse,
   }) : _borderCollapse = borderCollapse;
-
-  final _renderData = _TableRenderData();
 
   Border? _border;
   void setBorder(Border? v) {
@@ -296,6 +290,8 @@ class _TableRenderObject extends RenderBox
       markNeedsLayout();
     }
   }
+
+  var _layout = _TableRenderLayout.zero;
 
   TextDirection _textDirection;
   void setTextDirection(TextDirection v) {
@@ -362,7 +358,7 @@ class _TableRenderObject extends RenderBox
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    final cellRect = _renderData._layout.cellRect;
+    final cellRect = _layout.cellRect;
     if (!cellRect.isEmpty) {
       _border?.paint(context.canvas, cellRect.shift(offset));
     }
@@ -383,9 +379,9 @@ class _TableRenderObject extends RenderBox
 
   @override
   void performLayout() {
-    final result = _renderData._layout =
-        _performLayout(this, firstChild!, constraints, _performLayoutLayouter);
-    size = constraints.constrain(result.totalSize);
+    const layouter = _performLayoutLayouter;
+    _layout = _performLayout(this, firstChild!, constraints, layouter);
+    size = constraints.constrain(_layout.totalSize);
   }
 
   @override
