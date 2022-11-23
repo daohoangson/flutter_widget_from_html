@@ -1,3 +1,7 @@
+## 0.9.0+2
+
+- Change column width calculation logic (#747)
+
 ## 0.9.0+1
 
 - Fix context usage across async gaps (#835)
