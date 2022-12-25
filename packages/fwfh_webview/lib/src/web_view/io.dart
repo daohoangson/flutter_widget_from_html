@@ -99,9 +99,7 @@ class WebViewState extends State<WebView> {
   Future<String> eval(String js) async {
     try {
       final result = await _controller.runJavaScriptReturningResult(js);
-      if (result is String) {
-        return result;
-      }
+      return '$result';
     } catch (evalError) {
       debugPrint('evalError: $evalError');
     }
