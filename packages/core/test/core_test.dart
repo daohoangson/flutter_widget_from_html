@@ -41,7 +41,6 @@ Future<void> main() async {
     <span style="text-decoration: overline">
       <span style="text-decoration: underline">
         All   decorations...
-        <span style="text-decoration: none">and none</span>
       </span>
     </span>
   </span>
@@ -56,8 +55,7 @@ Future<void> main() async {
       str,
       equals(
         '[Column:children='
-        '[CssBlock:child=[RichText:(:(+l+o+u:All decorations... )'
-        '(:and none))]],'
+        '[CssBlock:child=[RichText:(+l+o+u:All decorations...)]],'
         '[CssBlock:child=[RichText:(:I​Like​Playing​football​​game)]],'
         '[CssBlock:child=[RichText:(:\u00A0)]]'
         ']',

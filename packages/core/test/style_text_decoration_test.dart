@@ -141,12 +141,41 @@ foo</span></span></span>
       expect(explained, equals('[RichText:(+l+o+u:foo)]'));
     });
 
-    testWidgets('renders none', (WidgetTester tester) async {
+    testWidgets('renders all (child with none)', (WidgetTester tester) async {
       const html =
           '<span style="text-decoration: line-through overline underline">foo '
           '<span style="text-decoration-line: none">bar</span></span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:(:(+l+o+u:foo )(:bar))]'));
+      expect(explained, equals('[RichText:(:(+l+o+u:foo )(+l+o+u:bar))]'));
+    });
+
+    testWidgets('renders none after line-through', (WidgetTester tester) async {
+      const html = '<span style="text-decoration-line: line-through; '
+          'text-decoration-line: none">foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:foo)]'));
+    });
+
+    testWidgets('renders none after overline', (WidgetTester tester) async {
+      const html = '<span style="text-decoration-line: overline; '
+          'text-decoration-line: none">foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:foo)]'));
+    });
+
+    testWidgets('renders none after underline', (WidgetTester tester) async {
+      const html = '<span style="text-decoration-line: underline; '
+          'text-decoration-line: none">foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:foo)]'));
+    });
+
+    testWidgets('renders none after all', (WidgetTester tester) async {
+      const html =
+          '<span style="text-decoration-line: line-through overline underline; '
+          'text-decoration-line: none">foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:foo)]'));
     });
   });
 
