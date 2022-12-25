@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fwfh_webview/src/web_view/web_view.dart';
 import 'package:measurer/measurer.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import 'mock_webview_platform.dart';
 
@@ -64,7 +65,7 @@ void main() {
     testWidgets('handles js error', (tester) async {
       await run(
         tester,
-        urlQueryParams: 'runJavascriptReturningResult=error',
+        urlQueryParams: 'runJavaScriptReturningResult=error',
       );
       expectAspectRatioEquals(defaultAspectRatio);
       await cleanUp(tester);
@@ -94,11 +95,11 @@ void main() {
       await tester.pumpAndSettle();
 
       const url2 = 'http://domain.com/2';
-      final result2 = await FakeWebViewController.instance?.handler
-          .onNavigationRequest(url: url2, isForMainFrame: true);
+      final result2 = await FakeWebViewController.instance
+          ?.onNavigationRequest(url: url2, isMainFrame: true);
 
       expect(navigationRequestUrls, equals([url2]));
-      expect(result2, isFalse);
+      expect(result2, equals(NavigationDecision.prevent));
     });
 
     testWidgets('skips callback (initial url)', (WidgetTester tester) async {
@@ -122,11 +123,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final result = await FakeWebViewController.instance?.handler
-          .onNavigationRequest(url: url, isForMainFrame: true);
+      final result = await FakeWebViewController.instance
+          ?.onNavigationRequest(url: url, isMainFrame: true);
 
       expect(navigationRequestUrls, equals([]));
-      expect(result, isTrue);
+      expect(result, equals(NavigationDecision.navigate));
     });
 
     testWidgets('skips callback (first url)', (WidgetTester tester) async {
@@ -151,11 +152,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final result2 = await FakeWebViewController.instance?.handler
-          .onNavigationRequest(url: url2, isForMainFrame: true);
+      final result2 = await FakeWebViewController.instance
+          ?.onNavigationRequest(url: url2, isMainFrame: true);
 
       expect(navigationRequestUrls, equals([]));
-      expect(result2, isTrue);
+      expect(result2, equals(NavigationDecision.navigate));
     });
 
     testWidgets('skips callback (not main frame)', (WidgetTester tester) async {
@@ -180,11 +181,11 @@ void main() {
       await tester.pumpAndSettle();
 
       const url2 = 'http://domain.com/2';
-      final result2 = await FakeWebViewController.instance?.handler
-          .onNavigationRequest(url: url2, isForMainFrame: false);
+      final result2 = await FakeWebViewController.instance
+          ?.onNavigationRequest(url: url2, isMainFrame: false);
 
       expect(navigationRequestUrls, equals([]));
-      expect(result2, isTrue);
+      expect(result2, equals(NavigationDecision.navigate));
     });
   });
 
