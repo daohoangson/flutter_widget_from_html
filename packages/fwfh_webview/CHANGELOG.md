@@ -1,3 +1,8 @@
+## 0.7.0
+
+- Add support for webview_flutter@4.0.0 (#841)
+- Remove support for `unsupportedWorkaroundForIssue375`
+
 ## 0.6.2+5
 
 - Fix context usage across async gaps (#835)
