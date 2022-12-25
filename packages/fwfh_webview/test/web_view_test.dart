@@ -19,7 +19,6 @@ void main() {
     final run = (
       WidgetTester tester, {
       String urlQueryParams = '',
-      bool unsupportedWorkaroundForIssue375 = false,
       Widget Function(Widget)? wrapper,
     }) async {
       final child = Measurer(
@@ -27,7 +26,6 @@ void main() {
         child: WebView(
           '$url&$urlQueryParams',
           aspectRatio: defaultAspectRatio,
-          unsupportedWorkaroundForIssue375: unsupportedWorkaroundForIssue375,
         ),
       );
 
@@ -57,67 +55,10 @@ void main() {
       await tester.pumpAndSettle();
     };
 
-    testWidgets('unsupportedWorkaroundForIssue375=false', (tester) async {
+    testWidgets('ratio 1.0', (tester) async {
       await run(tester);
       expectAspectRatioEquals(1.0);
       await cleanUp(tester);
-    });
-
-    group('unsupportedWorkaroundForIssue375=true', () {
-      testWidgets('requires too much height', (WidgetTester tester) async {
-        const testSize = Size(800, 600);
-        tester.binding.window.physicalSizeTestValue = testSize;
-        addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
-
-        await run(tester, unsupportedWorkaroundForIssue375: true);
-        expectAspectRatioEquals(testSize.width / testSize.height);
-
-        await cleanUp(tester);
-      });
-
-      testWidgets('height fits', (WidgetTester tester) async {
-        const testSize = Size(600, 800);
-        tester.binding.window.physicalSizeTestValue = testSize;
-        addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
-
-        await run(tester, unsupportedWorkaroundForIssue375: true);
-        expectAspectRatioEquals(1.0);
-
-        await cleanUp(tester);
-      });
-
-      testWidgets('in vertical ListView', (WidgetTester tester) async {
-        const testSize = Size(800, 600);
-        tester.binding.window.physicalSizeTestValue = testSize;
-        addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
-
-        await run(
-          tester,
-          unsupportedWorkaroundForIssue375: true,
-          wrapper: (child) => ListView(children: [child]),
-        );
-        expectAspectRatioEquals(testSize.width / testSize.height);
-
-        await cleanUp(tester);
-      });
-
-      testWidgets('in horizontal ListView', (WidgetTester tester) async {
-        const testSize = Size(800, 600);
-        tester.binding.window.physicalSizeTestValue = testSize;
-        addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
-
-        await run(
-          tester,
-          unsupportedWorkaroundForIssue375: true,
-          wrapper: (child) => ListView(
-            scrollDirection: Axis.horizontal,
-            children: [child],
-          ),
-        );
-        expectAspectRatioEquals(testSize.width / testSize.height);
-
-        await cleanUp(tester);
-      });
     });
 
     testWidgets('handles js error', (tester) async {

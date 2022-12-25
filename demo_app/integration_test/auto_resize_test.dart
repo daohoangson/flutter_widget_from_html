@@ -92,7 +92,6 @@ class WebViewTestCase {
       autoResize: true,
       autoResizeIntervals: [interval, interval * 2, interval * 3],
       debuggingEnabled: true,
-      unsupportedWorkaroundForIssue375: issue375,
     );
     final test = _AspectRatioTest(child: webView);
 
