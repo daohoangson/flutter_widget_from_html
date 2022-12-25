@@ -1,3 +1,7 @@
+## 0.9.0+2
+
+- Add support for webview_flutter@4.0.0 (#841)
+
 ## 0.9.0+1
 
 - Fix context usage across async gaps (#835)
