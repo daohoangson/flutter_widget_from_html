@@ -315,6 +315,12 @@ Future<void> main() async {
         expect(explained, equals(padding(item(circle, 'Foo'))));
       });
 
+      testWidgets('renders none', (WidgetTester tester) async {
+        const html = '<ul style="list-style-type: none"><li>Foo</li></ul>';
+        final explained = await explain(tester, html);
+        expect(explained, equals(padding('[RichText:(:Foo)]')));
+      });
+
       testWidgets('renders square', (WidgetTester tester) async {
         const html = '<ul style="list-style-type: square"><li>Foo</li></ul>';
         final explained = await explain(tester, html);
@@ -325,6 +331,7 @@ Future<void> main() async {
         const html = '''
 <ul style="list-style-type: circle">
   <li style="list-style-type: disc"">disc</li>
+  <li style="list-style-type: none"">none</li>
   <li style="list-style-type: square">square</li>
   <li>circle</li>
 <ul>
@@ -336,6 +343,7 @@ Future<void> main() async {
             padding(
               list([
                 item(disc, 'disc'),
+                '[RichText:(:none)]',
                 item(square, 'square'),
                 item(circle, 'circle'),
               ]),
