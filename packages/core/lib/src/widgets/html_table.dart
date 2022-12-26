@@ -421,7 +421,15 @@ class _TableRenderObject extends RenderBox
       if (width != null) {
         drySizes.add(Size(width, .0));
       } else {
-        drySizes.add(_performLayoutDry(child, const BoxConstraints()));
+        var drySize =
+            Size(constraints.hasBoundedWidth ? constraints.maxWidth : 100.0, 0);
+        try {
+          drySize = _performLayoutDry(child, const BoxConstraints());
+        } catch (dryLayoutError, stackTrace) {
+          debugPrint('Ignored _performLayoutDry error: '
+              '$dryLayoutError\n$stackTrace');
+        }
+        drySizes.add(drySize);
       }
 
       columnCount = max(columnCount, data.columnStart + data.columnSpan);
@@ -477,13 +485,23 @@ class _TableRenderObject extends RenderBox
         }
 
         if (columnWidthSmallerThanDry) {
-          // this call is expensive, we try to avoid it as much as possible
-          final minWidth = child.getMinIntrinsicWidth(double.infinity);
-          final minColumnWidth = (minWidth - columnGaps) / data.columnSpan;
+          double? minWidth;
+          try {
+            // this call is expensive, we try to avoid it as much as possible
+            // width being smaller than dry size means the table is too crowded
+            // calculating min to avoid breaking line in the middle of a word
+            minWidth = child.getMinIntrinsicWidth(double.infinity);
+          } catch (minWidthError, stackTrace) {
+            debugPrint('Ignored getMinIntrinsicWidth error: '
+                '$minWidthError\n$stackTrace');
+          }
 
-          for (var c = 0; c < data.columnSpan; c++) {
-            final column = data.columnStart + c;
-            columnWidths[column] = max(columnWidths[column], minColumnWidth);
+          if (minWidth != null) {
+            final minColumnWidth = (minWidth - columnGaps) / data.columnSpan;
+            for (var c = 0; c < data.columnSpan; c++) {
+              final column = data.columnStart + c;
+              columnWidths[column] = max(columnWidths[column], minColumnWidth);
+            }
           }
         }
       }
