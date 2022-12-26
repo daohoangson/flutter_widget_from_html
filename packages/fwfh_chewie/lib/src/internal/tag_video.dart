@@ -28,6 +28,12 @@ class TagVideo {
       onChild: onChild,
       onWidgets: onWidgets,
     );
+
+    final attrs = videoMeta.element.attributes;
+    final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
+    if (url != null) {
+      _sourceUrls.add(url);
+    }
   }
 
   void onChild(BuildMetadata childMeta) {
