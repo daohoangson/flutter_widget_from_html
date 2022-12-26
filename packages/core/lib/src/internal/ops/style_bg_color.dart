@@ -42,7 +42,7 @@ class StyleBgColor {
           );
         },
         onWidgetsIsOptional: true,
-        priority: StyleBorder.kPriorityBoxModel5k + 1,
+        priority: StyleBorder.kPriorityBoxModel7k + 1,
       );
 
   Color? _parseColor(WidgetFactory wf, BuildMetadata meta) {
