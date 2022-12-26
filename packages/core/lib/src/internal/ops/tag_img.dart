@@ -16,6 +16,24 @@ class TagImg {
   TagImg(this.wf);
 
   BuildOp get buildOp => BuildOp(
+        defaultStyles: (element) {
+          final attrs = element.attributes;
+          final styles = {
+            kCssHeight: 'auto',
+            kCssMinWidth: '0px',
+            kCssMinHeight: '0px',
+            kCssWidth: 'auto',
+          };
+
+          if (attrs.containsKey(kAttributeImgHeight)) {
+            styles[kCssHeight] = '${attrs[kAttributeImgHeight]}px';
+          }
+          if (attrs.containsKey(kAttributeImgWidth)) {
+            styles[kCssWidth] = '${attrs[kAttributeImgWidth]}px';
+          }
+
+          return styles;
+        },
         onTree: (meta, tree) {
           final data = _parse(meta);
           final built = wf.buildImage(meta, data);
@@ -27,27 +45,7 @@ class TagImg {
             return;
           }
 
-          final placeholder =
-              _placeholders[meta] = WidgetPlaceholder(data, child: built);
-
-          if (data.sources.isNotEmpty) {
-            final src = data.sources.first;
-            final width = src.width;
-            final height = src.height;
-            placeholder.wrapWith(
-              (_, child) => CssSizing(
-                minHeight: const CssSizingValue.value(0),
-                minWidth: const CssSizingValue.value(0),
-                preferredHeight: height != null
-                    ? CssSizingValue.value(height)
-                    : const CssSizingValue.auto(),
-                preferredWidth: width != null
-                    ? CssSizingValue.value(width)
-                    : const CssSizingValue.auto(),
-                child: child,
-              ),
-            );
-          }
+          _placeholders[meta] = WidgetPlaceholder(data, child: built);
         },
         onTreeFlattening: (meta, tree) {
           final placeholder = _placeholders[meta];
