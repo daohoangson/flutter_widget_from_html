@@ -10,7 +10,13 @@ void main() {
 
   mockVideoPlayerPlatform();
 
-  testWidgets('renders video player', (tester) async {
+  testWidgets('renders video player with src attribute', (tester) async {
+    const html = '<video src="$src"></video>';
+    final e = await explain(tester, html);
+    expect(e, equals('[VideoPlayer:url=$src,aspectRatio=$defaultAspectRatio]'));
+  });
+
+  testWidgets('renders video player with SOURCE child tag', (tester) async {
     const html = '<video><source src="$src"></video>';
     final e = await explain(tester, html);
     expect(e, equals('[VideoPlayer:url=$src,aspectRatio=$defaultAspectRatio]'));
