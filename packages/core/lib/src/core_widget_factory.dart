@@ -296,18 +296,26 @@ class WidgetFactory {
   ) {
     final text = getListMarkerText(listStyleType, index);
     final style = tsh.style;
-    return text.isNotEmpty
-        ? RichText(
-            maxLines: 1,
-            softWrap: false,
-            text: TextSpan(style: style, text: text),
-            textDirection: tsh.textDirection,
-          )
-        : listStyleType == kCssListStyleTypeCircle
-            ? HtmlListMarker.circle(style)
-            : listStyleType == kCssListStyleTypeSquare
-                ? HtmlListMarker.square(style)
-                : HtmlListMarker.disc(style);
+    if (text.isNotEmpty) {
+      return RichText(
+        maxLines: 1,
+        softWrap: false,
+        text: TextSpan(style: style, text: text),
+        textDirection: tsh.textDirection,
+      );
+    }
+
+    switch (listStyleType) {
+      case kCssListStyleTypeCircle:
+        return HtmlListMarker.circle(style);
+      case kCssListStyleTypeNone:
+        return null;
+      case kCssListStyleTypeSquare:
+        return HtmlListMarker.square(style);
+      case kCssListStyleTypeDisc:
+      default:
+        return HtmlListMarker.disc(style);
+    }
   }
 
   /// Builds [Padding].
@@ -490,9 +498,10 @@ class WidgetFactory {
       case kCssListStyleTypeRomanUpper:
         final roman = _getListMarkerRoman(i);
         return roman != null ? '$roman.' : '';
+      case kCssListStyleTypeNone:
+      default:
+        return '';
     }
-
-    return '';
   }
 
   String? _getListMarkerRoman(int i) {
