@@ -724,6 +724,18 @@ Future<void> main() async {
       expect(urls, equals(const [href]));
     });
 
+    testWidgets('handles dry layout / intrinsic errors', (tester) async {
+      final explained = await explain(
+        tester,
+        '<table>'
+        '<tr><td>Hello <ruby>foo<rt>bar</rt></ruby></td></tr>'
+        '</table>',
+        useExplainer: false,
+      );
+      expect(explained, contains('RichText(text: "foo")'));
+      expect(explained, contains('RichText(text: "bar")'));
+    });
+
     final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
     final goldenSkip = goldenSkipEnvVar == null
         ? Platform.isLinux
