@@ -33,12 +33,12 @@ class DisplayBlockOp extends BuildOp {
                 .buildColumnPlaceholder(meta, widgets)
                 ?.wrapWith((_, w) => w is CssSizing ? w : CssBlock(child: w)),
           ),
-          priority: StyleSizing.kPriority7k + 1,
+          priority: StyleSizing.kPriorityBoxModel3k + 1,
         );
 }
 
 class StyleSizing {
-  static const kPriority7k = 7000;
+  static const kPriorityBoxModel3k = 3000;
 
   final WidgetFactory wf;
 
@@ -88,7 +88,7 @@ class StyleSizing {
           );
         },
         onWidgetsIsOptional: true,
-        priority: kPriority7k,
+        priority: kPriorityBoxModel3k,
       );
 
   _StyleSizingInput? _parse(BuildMetadata meta) {
