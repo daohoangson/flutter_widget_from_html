@@ -421,15 +421,20 @@ class _TableRenderObject extends RenderBox
       if (width != null) {
         drySizes.add(Size(width, .0));
       } else {
-        var drySize =
-            Size(constraints.hasBoundedWidth ? constraints.maxWidth : 100.0, 0);
+        final defaultColumnWidth =
+            constraints.hasBoundedWidth ? constraints.maxWidth : 100.0;
+        var drySize = Size(defaultColumnWidth, 0);
         try {
           drySize = _performLayoutDry(child, const BoxConstraints());
         } catch (dryLayoutError, stackTrace) {
           debugPrint('Ignored _performLayoutDry error: '
               '$dryLayoutError\n$stackTrace');
         }
-        drySizes.add(drySize);
+        if (drySize.width.isFinite) {
+          drySizes.add(drySize);
+        } else {
+          drySizes.add(Size(defaultColumnWidth, .0));
+        }
       }
 
       columnCount = max(columnCount, data.columnStart + data.columnSpan);

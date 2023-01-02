@@ -84,7 +84,6 @@ class _TextAlignBlock extends FractionallySizedBox {
       : super(
           alignment: Alignment.topLeft,
           child: child,
-          heightFactor: 1.0,
           key: key,
           widthFactor: 1.0,
         );
