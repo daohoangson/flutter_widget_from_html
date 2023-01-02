@@ -25,71 +25,111 @@ extension CssLengthToSizing on CssLength {
   }
 }
 
-class DisplayBlockOp extends BuildOp {
-  DisplayBlockOp(WidgetFactory wf)
-      : super(
-          onWidgets: (meta, widgets) => listOrNull(
-            wf
-                .buildColumnPlaceholder(meta, widgets)
-                ?.wrapWith((_, w) => w is CssSizing ? w : CssBlock(child: w)),
-          ),
-          priority: StyleSizing.kPriorityBoxModel3k + 1,
-        );
-}
-
 class StyleSizing {
   static const kPriorityBoxModel3k = 3000;
 
+  final BuildMetadata meta;
+  late final BuildOp op;
   final WidgetFactory wf;
 
+  static final _isBlock = Expando<bool>();
   static final _skipBuilding = Expando<bool>();
+  static final _customInstances = Expando<StyleSizing>();
 
-  StyleSizing(this.wf);
+  factory StyleSizing(WidgetFactory wf, BuildMetadata meta) {
+    final existingInstance = _customInstances[meta];
+    if (existingInstance != null) {
+      return existingInstance;
+    }
+    return _customInstances[meta] = StyleSizing._(wf, meta);
+  }
 
-  BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (meta, tree) {
-          if (_skipBuilding[meta] == true) {
-            return;
-          }
+  StyleSizing._(this.wf, this.meta) {
+    op = _StyleSizingOp(
+      meta,
+      onChild: (childMeta) {
+        if (!identical(childMeta.element.parent, meta.element)) {
+          return;
+        }
 
-          final input = _parse(meta);
-          if (input == null) {
-            return;
-          }
-
-          WidgetPlaceholder? widget;
-          for (final b in tree.bits) {
-            if (b is WidgetBit) {
-              if (widget != null) {
-                return;
+        childMeta.register(
+          BuildOp(
+            onWidgets: (meta, widgets) {
+              final parsed = _parse(meta);
+              if (parsed == null ||
+                  (parsed.minWidth == null && parsed.preferredWidth == null)) {
+                return widgets;
               }
-              widget = b.child;
-            } else {
+
+              // this element has some width contraints applied
+              // we should reset things back to normal for its children
+              final placeholder = wf.buildColumnPlaceholder(meta, widgets);
+              placeholder?.wrapWith(
+                (context, child) {
+                  final textDirection = meta.tsb.build(context).textDirection;
+                  return ConstraintsTransformBox(
+                    alignment: textDirection == TextDirection.ltr
+                        ? Alignment.topLeft
+                        : Alignment.topRight,
+                    constraintsTransform: (bc) => bc.copyWith(minWidth: 0),
+                    child: child,
+                  );
+                },
+              );
+              return listOrNull(placeholder);
+            },
+            onWidgetsIsOptional: true,
+            priority: 0,
+          ),
+        );
+      },
+      onTreeFlattening: (meta, tree) {
+        if (_skipBuilding[meta] == true) {
+          return;
+        }
+
+        final parsed = _parse(meta);
+        if (parsed == null) {
+          return;
+        }
+
+        WidgetPlaceholder? widget;
+        for (final b in tree.bits) {
+          if (b is WidgetBit) {
+            if (widget != null) {
               return;
             }
+            widget = b.child;
+          } else {
+            return;
           }
+        }
 
-          widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb));
-        },
-        onWidgets: (meta, widgets) {
-          if (_skipBuilding[meta] == true || widgets.isEmpty) {
-            return widgets;
-          }
+        widget?.wrapWith((c, w) => _build(c, w, parsed, meta.tsb));
+      },
+      onWidgets: (meta, widgets) {
+        if (_skipBuilding[meta] == true || widgets.isEmpty) {
+          return widgets;
+        }
 
-          final input = _parse(meta);
-          if (input == null) {
-            return widgets;
-          }
+        final parsed = _parse(meta);
+        if (parsed == null) {
+          return widgets;
+        }
 
-          return listOrNull(
-            wf
-                .buildColumnPlaceholder(meta, widgets)
-                ?.wrapWith((c, w) => _build(c, w, input, meta.tsb)),
-          );
-        },
-        onWidgetsIsOptional: true,
-        priority: kPriorityBoxModel3k,
-      );
+        return listOrNull(
+          wf
+              .buildColumnPlaceholder(meta, widgets)
+              ?.wrapWith((c, w) => _build(c, w, parsed, meta.tsb)),
+        );
+      },
+    );
+  }
+
+  factory StyleSizing.block(WidgetFactory wf, BuildMetadata meta) {
+    _isBlock[meta] = true;
+    return StyleSizing(wf, meta);
+  }
 
   _StyleSizingInput? _parse(BuildMetadata meta) {
     CssLength? maxHeight;
@@ -136,6 +176,14 @@ class StyleSizing {
       }
     }
 
+    if (preferredWidth == null && _isBlock[meta] == true) {
+      // `display: block` implies a 100% width
+      // but it MUST NOT reset width value if specified
+      // we need to keep track of block width to calculate contraints correctly
+      preferredWidth = const CssLength(100, CssLengthUnit.percentage);
+      preferredAxis ??= Axis.horizontal;
+    }
+
     if (maxHeight == null &&
         maxWidth == null &&
         minHeight == null &&
@@ -143,15 +191,6 @@ class StyleSizing {
         preferredHeight == null &&
         preferredWidth == null) {
       return null;
-    }
-
-    if (preferredWidth == null &&
-        meta.buildOps.whereType<DisplayBlockOp>().isNotEmpty) {
-      // `display: block` implies a 100% width
-      // but it MUST NOT reset width value if specified
-      // we need to keep track of block width to calculate contraints correctly
-      preferredWidth = const CssLength(100, CssLengthUnit.percentage);
-      preferredAxis ??= Axis.horizontal;
     }
 
     return _StyleSizingInput(
@@ -188,6 +227,34 @@ class StyleSizing {
       preferredWidth: input.preferredWidth?.getSizing(tsh),
       child: child,
     );
+  }
+}
+
+class _StyleSizingOp extends BuildOp {
+  final BuildMetadata meta;
+
+  const _StyleSizingOp(
+    this.meta, {
+    required void Function(BuildMetadata meta) onChild,
+    required void Function(BuildMetadata meta, BuildTree tree) onTreeFlattening,
+    required Iterable<Widget>? Function(
+      BuildMetadata meta,
+      Iterable<WidgetPlaceholder> widgets,
+    )
+        onWidgets,
+  }) : super(
+          onChild: onChild,
+          onTreeFlattening: onTreeFlattening,
+          onWidgets: onWidgets,
+          priority: StyleSizing.kPriorityBoxModel3k,
+        );
+
+  @override
+  bool get onWidgetsIsOptional {
+    // an element is inline unless specified otherwise
+    final isBlock = StyleSizing._isBlock[meta] ?? false;
+    // `onWidgets` callback is optional unless it's a block element
+    return !isBlock;
   }
 }
 

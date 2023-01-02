@@ -3,25 +3,6 @@ import 'dart:math';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-/// A CSS block.
-class CssBlock extends CssSizing {
-  /// Creates a CSS block.
-  const CssBlock({required Widget child, Key? key})
-      : super(child: child, key: key);
-
-  @override
-  RenderObject createRenderObject(BuildContext _) =>
-      _RenderCssSizing(preferredWidth: const CssSizingValue.percentage(100));
-
-  @override
-  void updateRenderObject(BuildContext _, RenderObject renderObject) =>
-      (renderObject as _RenderCssSizing).setPreferredSize(
-        null,
-        const CssSizingValue.percentage(100),
-        null,
-      );
-}
-
 /// A CSS sizing widget.
 class CssSizing extends SingleChildRenderObjectWidget {
   /// The maximum height.

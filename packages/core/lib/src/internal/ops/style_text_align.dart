@@ -45,11 +45,9 @@ class StyleTextAlign {
     return widgets;
   }
 
-  static Widget _block(BuildContext _, Widget child) =>
-      child is CssBlock ? child : CssBlock(child: child);
+  static Widget _block(BuildContext _, Widget w) => _TextAlignBlock(w);
 
-  static Widget _center(BuildContext _, Widget child) =>
-      _TextAlignCenter(child);
+  static Widget _center(BuildContext _, Widget w) => _TextAlignCenter(w);
 
   static TextStyleHtml _tsb(TextStyleHtml tsh, String value) {
     TextAlign? textAlign;
@@ -79,6 +77,17 @@ class StyleTextAlign {
 
     return textAlign == null ? tsh : tsh.copyWith(textAlign: textAlign);
   }
+}
+
+class _TextAlignBlock extends FractionallySizedBox {
+  const _TextAlignBlock(Widget child, {Key? key})
+      : super(
+          alignment: Alignment.topLeft,
+          child: child,
+          heightFactor: 1.0,
+          key: key,
+          widthFactor: 1.0,
+        );
 }
 
 class _TextAlignCenter extends Center {
