@@ -79,13 +79,13 @@ class StyleTextAlign {
   }
 }
 
-class _TextAlignBlock extends FractionallySizedBox {
-  const _TextAlignBlock(Widget child, {Key? key})
+class _TextAlignBlock extends ConstraintsTransformBox {
+  _TextAlignBlock(Widget child, {Key? key})
       : super(
-          alignment: Alignment.topLeft,
+          constraintsTransform: (bc) =>
+              bc.copyWith(minWidth: bc.hasBoundedWidth ? bc.maxWidth : null),
           child: child,
           key: key,
-          widthFactor: 1.0,
         );
 }
 
