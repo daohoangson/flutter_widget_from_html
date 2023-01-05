@@ -46,94 +46,6 @@ class StyleSizing {
     return _instances[wf] = StyleSizing._(wf);
   }
 
-  StyleSizing._(this.wf) {
-    op = _StyleSizingOp(
-      onChild: (childMeta) {
-        final parentElement = childMeta.element.parent;
-        if (parentElement == null) {
-          return;
-        }
-        final parentMeta = _elementMeta[parentElement];
-        if (parentMeta == null) {
-          // parent element is not a sizing element, nothing to do here
-          return;
-        }
-
-        childMeta.register(
-          BuildOp(
-            onWidgets: (meta, widgets) {
-              final parentInput = _tryParseInput(parentMeta);
-              if (parentInput == null ||
-                  (parentInput.minWidth == null &&
-                      parentInput.preferredWidth == null)) {
-                return widgets;
-              }
-
-              // the parent element has some width contraints applied
-              // we should reset things back to normal for this child
-              final placeholder = wf.buildColumnPlaceholder(meta, widgets);
-              placeholder?.wrapWith(
-                (context, child) {
-                  final textDirection = meta.tsb.build(context).textDirection;
-                  return ConstraintsTransformBox(
-                    alignment: textDirection == TextDirection.ltr
-                        ? Alignment.topLeft
-                        : Alignment.topRight,
-                    constraintsTransform: (bc) => bc.copyWith(minWidth: 0),
-                    child: child,
-                  );
-                },
-              );
-              return listOrNull(placeholder);
-            },
-            onWidgetsIsOptional: true,
-            priority: 0,
-          ),
-        );
-      },
-      onTreeFlattening: (meta, tree) {
-        if (_skipBuilding[meta] == true) {
-          return;
-        }
-
-        final input = _tryParseInput(meta);
-        if (input == null) {
-          return;
-        }
-
-        WidgetPlaceholder? widget;
-        for (final b in tree.bits) {
-          if (b is WidgetBit) {
-            if (widget != null) {
-              return;
-            }
-            widget = b.child;
-          } else {
-            return;
-          }
-        }
-
-        widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb));
-      },
-      onWidgets: (meta, widgets) {
-        if (_skipBuilding[meta] == true || widgets.isEmpty) {
-          return widgets;
-        }
-
-        final input = _tryParseInput(meta);
-        if (input == null) {
-          return widgets;
-        }
-
-        return listOrNull(
-          wf
-              .buildColumnPlaceholder(meta, widgets)
-              ?.wrapWith((c, w) => _build(c, w, input, meta.tsb)),
-        );
-      },
-    );
-  }
-
   factory StyleSizing.block(WidgetFactory wf, BuildMetadata meta) {
     _metaIsBlock[meta] = true;
     return StyleSizing(wf, meta);
@@ -142,6 +54,109 @@ class StyleSizing {
   static void skip(BuildMetadata meta) {
     assert(_skipBuilding[meta] != true, 'Built ${meta.element} already');
     _skipBuilding[meta] = true;
+  }
+
+  StyleSizing._(this.wf) {
+    op = _StyleSizingOp(
+      onChild: _onChild,
+      onTreeFlattening: _onTreeFlattening,
+      onWidgets: _onWidgets,
+    );
+  }
+
+  void _onChild(BuildMetadata childMeta) {
+    final parentElement = childMeta.element.parent;
+    if (parentElement == null) {
+      return;
+    }
+    final parentMeta = _elementMeta[parentElement];
+    if (parentMeta == null) {
+      // parent element is not a sizing element, nothing to do here
+      return;
+    }
+
+    childMeta.register(
+      BuildOp(
+        onWidgets: (childMeta, widgets) =>
+            _onChildWidgets(parentMeta, childMeta, widgets),
+        onWidgetsIsOptional: true,
+        priority: 0,
+      ),
+    );
+  }
+
+  Iterable<Widget>? _onChildWidgets(
+    BuildMetadata parentMeta,
+    BuildMetadata childMeta,
+    Iterable<WidgetPlaceholder> widgets,
+  ) {
+    final parentInput = _tryParseInput(parentMeta);
+    if (parentInput == null ||
+        (parentInput.minWidth == null && parentInput.preferredWidth == null)) {
+      return widgets;
+    }
+
+    // the parent element has some width contraints applied
+    // we should reset things back to normal for this child
+    final placeholder = wf.buildColumnPlaceholder(childMeta, widgets);
+    placeholder?.wrapWith(
+      (context, child) {
+        final textDirection = childMeta.tsb.build(context).textDirection;
+        return ConstraintsTransformBox(
+          alignment: textDirection == TextDirection.ltr
+              ? Alignment.topLeft
+              : Alignment.topRight,
+          constraintsTransform: (bc) => bc.copyWith(minWidth: 0),
+          child: child,
+        );
+      },
+    );
+    return listOrNull(placeholder);
+  }
+
+  void _onTreeFlattening(BuildMetadata meta, BuildTree tree) {
+    if (_skipBuilding[meta] == true) {
+      return;
+    }
+
+    final input = _tryParseInput(meta);
+    if (input == null) {
+      return;
+    }
+
+    WidgetPlaceholder? widget;
+    for (final b in tree.bits) {
+      if (b is WidgetBit) {
+        if (widget != null) {
+          return;
+        }
+        widget = b.child;
+      } else {
+        return;
+      }
+    }
+
+    widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb));
+  }
+
+  Iterable<Widget>? _onWidgets(
+    BuildMetadata meta,
+    Iterable<WidgetPlaceholder> widgets,
+  ) {
+    if (_skipBuilding[meta] == true || widgets.isEmpty) {
+      return widgets;
+    }
+
+    final input = _tryParseInput(meta);
+    if (input == null) {
+      return widgets;
+    }
+
+    return listOrNull(
+      wf
+          .buildColumnPlaceholder(meta, widgets)
+          ?.wrapWith((c, w) => _build(c, w, input, meta.tsb)),
+    );
   }
 
   static Widget _build(
