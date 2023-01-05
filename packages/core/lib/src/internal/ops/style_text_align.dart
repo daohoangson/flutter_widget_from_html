@@ -15,39 +15,49 @@ const kCssTextAlignWebkitCenter = '-webkit-center';
 const kTagCenter = 'center';
 
 class StyleTextAlign {
+  late final BuildOp op;
   final WidgetFactory wf;
   final String value;
 
-  StyleTextAlign(this.wf, this.value);
+  StyleTextAlign(this.wf, this.value) {
+    op = BuildOp(
+      onTree: _onTree,
+      onWidgets: _onWidgets,
+      onWidgetsIsOptional: true,
+      priority: 0,
+    );
+  }
 
-  BuildOp get op => BuildOp(
-        onTree: (meta, _) => meta.tsb.enqueue(_tsb, value),
-        onWidgets: (_, widgets) => _onWidgets(widgets, value),
-        onWidgetsIsOptional: true,
-        priority: 0,
-      );
+  void _onTree(BuildMetadata meta, BuildTree _) =>
+      meta.tsb.enqueue(_tsb, value);
 
-  static Iterable<Widget> _onWidgets(Iterable<Widget> widgets, String value) {
+  Iterable<Widget> _onWidgets(BuildMetadata _, Iterable<Widget> widgets) {
     switch (value) {
       case kCssTextAlignCenter:
       case kCssTextAlignEnd:
       case kCssTextAlignJustify:
       case kCssTextAlignLeft:
       case kCssTextAlignRight:
-        return widgets
-            .map((child) => WidgetPlaceholder.lazy(child).wrapWith(_block));
+        return widgets.map(_toStretchWidth);
       case kCssTextAlignMozCenter:
       case kCssTextAlignWebkitCenter:
-        return widgets
-            .map((child) => WidgetPlaceholder.lazy(child).wrapWith(_center));
+        return widgets.map(_toCenter);
     }
 
     return widgets;
   }
 
-  static Widget _block(BuildContext _, Widget w) => _TextAlignBlock(w);
+  static Widget _toCenter(Widget w) =>
+      WidgetPlaceholder.lazy(w).wrapWith(_toCenterBuilder);
 
-  static Widget _center(BuildContext _, Widget w) => _TextAlignCenter(w);
+  static Widget _toCenterBuilder(BuildContext _, Widget w) =>
+      _TextAlignCenter(w);
+
+  static Widget _toStretchWidth(Widget w) =>
+      WidgetPlaceholder.lazy(w).wrapWith(_toStretchWidthBuilder);
+
+  static Widget _toStretchWidthBuilder(BuildContext _, Widget w) =>
+      _TextAlignStretchWidth(w);
 
   static TextStyleHtml _tsb(TextStyleHtml tsh, String value) {
     TextAlign? textAlign;
@@ -79,17 +89,15 @@ class StyleTextAlign {
   }
 }
 
-class _TextAlignBlock extends ConstraintsTransformBox {
-  _TextAlignBlock(Widget child, {Key? key})
-      : super(
-          constraintsTransform: (bc) =>
-              bc.copyWith(minWidth: bc.hasBoundedWidth ? bc.maxWidth : null),
-          child: child,
-          key: key,
-        );
-}
-
 class _TextAlignCenter extends Center {
   const _TextAlignCenter(Widget child, {Key? key})
       : super(child: child, heightFactor: 1.0, key: key);
+}
+
+class _TextAlignStretchWidth extends ConstraintsTransformBox {
+  const _TextAlignStretchWidth(Widget child, {Key? key})
+      : super(constraintsTransform: transform, child: child, key: key);
+
+  static BoxConstraints transform(BoxConstraints bc) =>
+      bc.copyWith(minWidth: bc.hasBoundedWidth ? bc.maxWidth : null);
 }

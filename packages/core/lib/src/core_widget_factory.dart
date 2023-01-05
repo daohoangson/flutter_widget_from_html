@@ -32,6 +32,7 @@ class WidgetFactory {
   BuildOp? _styleDisplayNone;
   BuildOp? _styleMargin;
   BuildOp? _stylePadding;
+  Map<String, BuildOp>? _styleTextAligns;
   BuildOp? _styleTextDecoration;
   BuildOp? _styleVerticalAlign;
   BuildOp? _tagA;
@@ -1011,7 +1012,13 @@ class WidgetFactory {
       case kCssTextAlign:
         final term = style.term;
         if (term != null) {
-          meta.register(StyleTextAlign(this, term).op);
+          final styleTextAligns = _styleTextAligns ??= {};
+          meta.register(
+            styleTextAligns.putIfAbsent(
+              term,
+              () => StyleTextAlign(this, term).op,
+            ),
+          );
         }
         break;
 
