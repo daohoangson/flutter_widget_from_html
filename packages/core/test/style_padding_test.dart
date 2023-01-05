@@ -18,7 +18,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(1,2,3,4),child='
+          '[Padding:(1,2,3,4),child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -30,7 +30,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(1,4,3,2),child='
+          '[Padding:(1,4,3,2),child=[CssBlock:child='
           '[RichText:dir=rtl,(:Foo)]]]',
         ),
       );
@@ -42,7 +42,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(1,0,0,0),child='
+          '[Padding:(1,0,0,0),child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -56,7 +56,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Padding:(0,2,0,0),child='
+            '[Padding:(0,2,0,0),child=[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
         );
@@ -67,7 +67,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Padding:(0,0,0,2),child='
+            '[Padding:(0,0,0,2),child=[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
@@ -80,7 +80,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(0,0,3,0),child='
+          '[Padding:(0,0,3,0),child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -94,7 +94,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Padding:(0,0,0,4),child='
+            '[Padding:(0,0,0,4),child=[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
         );
@@ -105,7 +105,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Padding:(0,4,0,0),child='
+            '[Padding:(0,4,0,0),child=[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
@@ -120,7 +120,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(5,10,5,10),child='
+          '[Padding:(5,10,5,10),child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -132,7 +132,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(5,0,5,0),child='
+          '[Padding:(5,0,5,0),child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -144,7 +144,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(0,10,0,10),child='
+          '[Padding:(0,10,0,10),child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -158,7 +158,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(20,20,20,20),child='
+          '[Padding:(20,20,20,20),child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -170,7 +170,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(13,13,13,13),child='
+          '[Padding:(13,13,13,13),child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -182,7 +182,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(10,10,10,10),child='
+          '[Padding:(10,10,10,10),child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -196,8 +196,8 @@ void main() {
     expect(
       explained,
       equals(
-        '[CssBlock:child=[Padding:(1,1,1,1),child='
-        '[CssBlock:child=[Padding:(2,2,2,2),child='
+        '[Padding:(1,1,1,1),child=[CssBlock:child='
+        '[Padding:(2,2,2,2),child=[CssBlock:child='
         '[RichText:(:Foo)]'
         ']]]]',
       ),
@@ -212,9 +212,9 @@ void main() {
     expect(
       explained,
       equals(
-        '[CssBlock:child=[Padding:(3,3,3,3),child=[RichText:(:1)]]],'
-        '[CssBlock:child=[Padding:(3,3,3,3),child=[RichText:(:2)]]],'
-        '[CssBlock:child=[Padding:(3,3,3,3),child=[RichText:(:3)]]]',
+        '[Padding:(3,3,3,3),child=[CssBlock:child=[RichText:(:1)]]],'
+        '[Padding:(3,3,3,3),child=[CssBlock:child=[RichText:(:2)]]],'
+        '[Padding:(3,3,3,3),child=[CssBlock:child=[RichText:(:3)]]]',
       ),
     );
   });
@@ -226,11 +226,11 @@ void main() {
     expect(
       explained,
       equals(
-        '[CssBlock:child=[Padding:(3,3,3,3),child=[Column:children='
+        '[Padding:(3,3,3,3),child=[CssBlock:child=[Column:children='
         '[CssBlock:child=[RichText:(:1a)]],'
         '[CssBlock:child=[RichText:(:1b)]]'
         ']]],'
-        '[CssBlock:child=[Padding:(3,3,3,3),child=[Column:children='
+        '[Padding:(3,3,3,3),child=[CssBlock:child=[Column:children='
         '[CssBlock:child=[RichText:(:2a)]],'
         '[CssBlock:child=[RichText:(:2b)]]'
         ']]]',
@@ -245,7 +245,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(3,0,0,0),child='
+          '[Padding:(3,0,0,0),child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -257,7 +257,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(3,0,0,0),child='
+          '[Padding:(3,0,0,0),child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -269,7 +269,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(0,3,0,0),child='
+          '[Padding:(0,3,0,0),child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -283,7 +283,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Padding:(0,3,0,0),child='
+            '[Padding:(0,3,0,0),child=[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
         );
@@ -294,7 +294,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Padding:(0,0,0,3),child='
+            '[Padding:(0,0,0,3),child=[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
@@ -307,7 +307,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(0,0,3,0),child='
+          '[Padding:(0,0,3,0),child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -319,7 +319,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(0,0,3,0),child='
+          '[Padding:(0,0,3,0),child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -331,7 +331,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(0,0,0,3),child='
+          '[Padding:(0,0,0,3),child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -345,7 +345,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Padding:(0,0,0,3),child='
+            '[Padding:(0,0,0,3),child=[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
         );
@@ -356,7 +356,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Padding:(0,3,0,0),child='
+            '[Padding:(0,3,0,0),child=[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
@@ -369,7 +369,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(5,3,3,3),child='
+          '[Padding:(5,3,3,3),child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -381,7 +381,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(3,3,0,3),child='
+          '[Padding:(3,3,0,3),child=[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -571,14 +571,13 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child='
           '[DecoratedBox:bg=#FFFF0000,child='
           '[Padding:(5,5,5,5),child='
           '[Column:children='
           '[SizedBox:0.0x12.4],'
-          '[CssBlock:child=[RichText:(@15.0+b:Foo)]],'
+          '[CssBlock:child=[CssBlock:child=[RichText:(@15.0+b:Foo)]]],'
           '[SizedBox:0.0x12.4]'
-          ']]]]',
+          ']]]',
         ),
       );
     });

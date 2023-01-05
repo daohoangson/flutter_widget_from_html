@@ -14,7 +14,7 @@ const square = '[HtmlListMarker.square]';
 const sizedBox = '[SizedBox:0.0x10.0]';
 
 String padding(String child) =>
-    '[CssBlock:child=[Padding:(0,0,0,40),child=$child]]';
+    '[Padding:(0,0,0,40),child=[CssBlock:child=$child]]';
 
 String list(List<String> children) => '[Column:children=${children.join(",")}]';
 
@@ -611,7 +611,7 @@ Future<void> main() async {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Padding:(0,0,0,99),child='
+            '[Padding:(0,0,0,99),child=[CssBlock:child='
             '${item(disc, "Foo")}'
             ']]',
           ),
@@ -631,7 +631,7 @@ Future<void> main() async {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Padding:(0,0,0,99),child=[Column:children='
+            '[Padding:(0,0,0,99),child=[CssBlock:child=[Column:children='
             '[Padding:(0,0,0,199),child=[HtmlListItem:children='
             '[RichText:(:199px)],${marker(disc)}]],'
             '[Padding:(0,0,0,299),child=[HtmlListItem:children='
@@ -651,7 +651,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(0,0,0,40),child=[RichText:(:Foo)]]]',
+          '[Padding:(0,0,0,40),child=[CssBlock:child=[RichText:(:Foo)]]]',
         ),
       );
     });
@@ -662,7 +662,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(0,0,0,40),child=[RichText:(:Foo)]]]',
+          '[Padding:(0,0,0,40),child=[CssBlock:child=[RichText:(:Foo)]]]',
         ),
       );
     });
@@ -771,7 +771,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Padding:(0,40,0,0),child=[Column:dir=rtl,children='
+          '[Padding:(0,40,0,0),child=[CssBlock:child=[Column:dir=rtl,children='
           '[HtmlListItem:children=[RichText:dir=rtl,(:One)],'
           '[RichText:maxLines=1,dir=rtl,(:1.)]],'
           '[HtmlListItem:children=[RichText:dir=rtl,(:Two)],'
