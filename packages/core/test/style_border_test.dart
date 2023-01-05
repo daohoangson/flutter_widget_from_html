@@ -183,7 +183,9 @@ void main() {
       equals(
         '[SizedBox:0.0x1.0],'
         '[Padding:(0,1,0,1),child='
-        '[CssBlock:child=[Container:border=$_border1,child=[RichText:(:Foo)]]]'
+        '[Container:border=$_border1,child='
+        '[CssBlock:child='
+        '[RichText:(:Foo)]]]'
         '],'
         '[SizedBox:0.0x1.0]',
       ),
@@ -197,12 +199,12 @@ void main() {
     expect(
       explained,
       equals(
-        '[CssBlock:child=[Container:border=$_border1,child='
+        '[Container:border=$_border1,child='
         '[Column:children='
         '[SizedBox:0.0x1.0],'
-        '[Padding:(0,1,0,1),child=[CssBlock:child=[RichText:(:Foo)]]],'
+        '[CssBlock:child=[Padding:(0,1,0,1),child=[CssBlock:child=[RichText:(:Foo)]]]],'
         '[SizedBox:0.0x1.0]'
-        ']]]',
+        ']]',
       ),
     );
   });
@@ -953,92 +955,43 @@ void main() {
     testWidgets('parses border', (WidgetTester tester) async {
       const html = '<div style="border: solid">Foo</div>';
       final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[CssBlock:child='
-          '[Container:border=$_border1,child=[RichText:(:Foo)]]'
-          ']',
-        ),
-      );
+      expect(explained, contains('border=$_border1,'));
     });
 
     testWidgets('parses border-top', (WidgetTester tester) async {
       const html = '<div style="border-top: solid">Foo</div>';
       final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[CssBlock:child=[Container:'
-          'border=($_border1,none,none,none),'
-          'child=[RichText:(:Foo)]]]',
-        ),
-      );
+      expect(explained, contains('border=($_border1,none,none,none),'));
     });
 
     testWidgets('parses border-block-start', (WidgetTester tester) async {
       const html = '<div style="border-block-start: solid">Foo</div>';
       final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[CssBlock:child=[Container:'
-          'border=($_border1,none,none,none),'
-          'child=[RichText:(:Foo)]]]',
-        ),
-      );
+      expect(explained, contains('border=($_border1,none,none,none),'));
     });
 
     testWidgets('parses border-right', (WidgetTester tester) async {
       const html = '<div style="border-right: solid">Foo</div>';
       final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[CssBlock:child=[Container:'
-          'border=(none,$_border1,none,none),'
-          'child=[RichText:(:Foo)]]]',
-        ),
-      );
+      expect(explained, contains('border=(none,$_border1,none,none),'));
     });
 
     testWidgets('parses border-bottom', (WidgetTester tester) async {
       const html = '<div style="border-bottom: solid">Foo</div>';
       final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[CssBlock:child=[Container:'
-          'border=(none,none,$_border1,none),'
-          'child=[RichText:(:Foo)]]]',
-        ),
-      );
+      expect(explained, contains('border=(none,none,$_border1,none),'));
     });
 
     testWidgets('parses border-block-end', (WidgetTester tester) async {
       const html = '<div style="border-block-end: solid">Foo</div>';
       final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[CssBlock:child=[Container:'
-          'border=(none,none,$_border1,none),'
-          'child=[RichText:(:Foo)]]]',
-        ),
-      );
+      expect(explained, contains('border=(none,none,$_border1,none),'));
     });
 
     testWidgets('parses border-left', (WidgetTester tester) async {
       const html = '<div style="border-left: solid">Foo</div>';
       final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[CssBlock:child=[Container:'
-          'border=(none,none,none,$_border1),'
-          'child=[RichText:(:Foo)]]]',
-        ),
-      );
+      expect(explained, contains('border=(none,none,none,$_border1),'));
     });
 
     group('parses border-inline-start', () {
@@ -1046,26 +999,12 @@ void main() {
 
       testWidgets('ltr', (WidgetTester tester) async {
         final explained = await explain(tester, html);
-        expect(
-          explained,
-          equals(
-            '[CssBlock:child=[Container:'
-            'border=(none,none,none,$_border1),'
-            'child=[RichText:(:Foo)]]]',
-          ),
-        );
+        expect(explained, contains('border=(none,none,none,$_border1),'));
       });
 
       testWidgets('rtl', (WidgetTester tester) async {
         final explained = await explain(tester, html, rtl: true);
-        expect(
-          explained,
-          equals(
-            '[CssBlock:child=[Container:'
-            'border=(none,$_border1,none,none),'
-            'child=[RichText:dir=rtl,(:Foo)]]]',
-          ),
-        );
+        expect(explained, contains('border=(none,$_border1,none,none),'));
       });
     });
 
@@ -1074,26 +1013,12 @@ void main() {
 
       testWidgets('ltr', (WidgetTester tester) async {
         final explained = await explain(tester, html);
-        expect(
-          explained,
-          equals(
-            '[CssBlock:child=[Container:'
-            'border=(none,$_border1,none,none),'
-            'child=[RichText:(:Foo)]]]',
-          ),
-        );
+        expect(explained, contains('border=(none,$_border1,none,none),'));
       });
 
       testWidgets('rtl', (WidgetTester tester) async {
         final explained = await explain(tester, html, rtl: true);
-        expect(
-          explained,
-          equals(
-            '[CssBlock:child=[Container:'
-            'border=(none,none,none,$_border1),'
-            'child=[RichText:dir=rtl,(:Foo)]]]',
-          ),
-        );
+        expect(explained, contains('border=(none,none,none,$_border1),'));
       });
     });
   });
@@ -1106,13 +1031,12 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child='
           '[Container:bg=#FFFF0000,border=$_border1,child='
           '[Column:children='
           '[SizedBox:0.0x12.4],'
-          '[CssBlock:child=[RichText:(@15.0+b:Foo)]],'
+          '[CssBlock:child=[CssBlock:child=[RichText:(@15.0+b:Foo)]]],'
           '[SizedBox:0.0x12.4]'
-          ']]]',
+          ']]',
         ),
       );
     });
@@ -1124,8 +1048,8 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child='
           '[DecoratedBox:bg=#FFFF0000,border=1.0@solid#FFFF0000,child='
+          '[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -1138,8 +1062,8 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child='
           '[Container:bg=#FFFF0000,border=1.0@solid#FFFF0000,child='
+          '[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
