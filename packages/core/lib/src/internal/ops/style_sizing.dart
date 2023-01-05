@@ -28,41 +28,47 @@ extension CssLengthToSizing on CssLength {
 class StyleSizing {
   static const kPriorityBoxModel3k = 3000;
 
-  final BuildMetadata meta;
   late final BuildOp op;
   final WidgetFactory wf;
 
-  static final _isBlock = Expando<bool>();
+  static final _elementMeta = Expando<BuildMetadata>();
+  static final _instances = Expando<StyleSizing>();
+  static final _metaIsBlock = Expando<bool>();
   static final _skipBuilding = Expando<bool>();
-  static final _customInstances = Expando<StyleSizing>();
 
   factory StyleSizing(WidgetFactory wf, BuildMetadata meta) {
-    final existingInstance = _customInstances[meta];
+    _elementMeta[meta.element] = meta;
+    final existingInstance = _instances[wf];
     if (existingInstance != null) {
       return existingInstance;
     }
-    return _customInstances[meta] = StyleSizing._(wf, meta);
+    return _instances[wf] = StyleSizing._(wf);
   }
 
-  StyleSizing._(this.wf, this.meta) {
+  StyleSizing._(this.wf) {
     op = _StyleSizingOp(
-      meta,
       onChild: (childMeta) {
-        if (!identical(childMeta.element.parent, meta.element)) {
+        final parentElement = childMeta.element.parent;
+        if (parentElement == null) {
+          return;
+        }
+        final parentMeta = _elementMeta[parentElement];
+        if (parentMeta == null) {
+          // parent element is not a sizing element, nothing to do here
           return;
         }
 
         childMeta.register(
           BuildOp(
             onWidgets: (meta, widgets) {
-              final parsed = _parse(meta);
+              final parsed = _parse(parentMeta);
               if (parsed == null ||
                   (parsed.minWidth == null && parsed.preferredWidth == null)) {
                 return widgets;
               }
 
-              // this element has some width contraints applied
-              // we should reset things back to normal for its children
+              // the parent element has some width contraints applied
+              // we should reset things back to normal for this child
               final placeholder = wf.buildColumnPlaceholder(meta, widgets);
               placeholder?.wrapWith(
                 (context, child) {
@@ -127,7 +133,7 @@ class StyleSizing {
   }
 
   factory StyleSizing.block(WidgetFactory wf, BuildMetadata meta) {
-    _isBlock[meta] = true;
+    _metaIsBlock[meta] = true;
     return StyleSizing(wf, meta);
   }
 
@@ -176,7 +182,7 @@ class StyleSizing {
       }
     }
 
-    if (preferredWidth == null && _isBlock[meta] == true) {
+    if (preferredWidth == null && _metaIsBlock[meta] == true) {
       // `display: block` implies a 100% width
       // but it MUST NOT reset width value if specified
       // we need to keep track of block width to calculate contraints correctly
@@ -231,10 +237,7 @@ class StyleSizing {
 }
 
 class _StyleSizingOp extends BuildOp {
-  final BuildMetadata meta;
-
-  const _StyleSizingOp(
-    this.meta, {
+  const _StyleSizingOp({
     required void Function(BuildMetadata meta) onChild,
     required void Function(BuildMetadata meta, BuildTree tree) onTreeFlattening,
     required Iterable<Widget>? Function(
@@ -250,11 +253,9 @@ class _StyleSizingOp extends BuildOp {
         );
 
   @override
-  bool get onWidgetsIsOptional {
+  bool shouldBuildSubTreeAsBlocks(BuildMetadata meta) {
     // an element is inline unless specified otherwise
-    final isBlock = StyleSizing._isBlock[meta] ?? false;
-    // `onWidgets` callback is optional unless it's a block element
-    return !isBlock;
+    return StyleSizing._metaIsBlock[meta] ?? false;
   }
 }
 

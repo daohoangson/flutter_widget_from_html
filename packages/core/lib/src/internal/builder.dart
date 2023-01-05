@@ -188,7 +188,10 @@ class BuildTree extends core_data.BuildTree {
     subTree.addBitsFromNodes(element.nodes);
 
     if (directChildren.contains(subTree) &&
-        meta._buildOps?.where(_opRequiresBuildingSubtree).isNotEmpty == true) {
+        meta._buildOps
+                ?.where((op) => op.shouldBuildSubTreeAsBlocks(meta))
+                .isNotEmpty ==
+            true) {
       for (final widget in subTree.build()) {
         add(WidgetBit.block(this, widget));
       }
@@ -315,9 +318,6 @@ int _compareBuildOps(BuildOp a, BuildOp b) {
     return cmp;
   }
 }
-
-bool _opRequiresBuildingSubtree(BuildOp op) =>
-    op.onWidgets != null && !op.onWidgetsIsOptional;
 
 Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, BuildMetadata meta) {
   // try to reuse existing list if possible

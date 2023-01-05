@@ -124,10 +124,7 @@ class BuildOp {
     Iterable<WidgetPlaceholder> widgets,
   )? onWidgets;
 
-  /// Controls whether the element should be forced to be rendered as block.
-  ///
-  /// Default: `false`.
-  final bool onWidgetsIsOptional;
+  final bool _onWidgetsIsOptional;
 
   /// Creates a build op.
   const BuildOp({
@@ -136,7 +133,16 @@ class BuildOp {
     this.onTree,
     this.onTreeFlattening,
     this.onWidgets,
-    this.onWidgetsIsOptional = false,
+    bool onWidgetsIsOptional = false,
     this.priority = 10,
-  });
+  }) : _onWidgetsIsOptional = onWidgetsIsOptional;
+
+  /// Returns whether children elements should be built as blocks.
+  ///
+  /// By default, they will be if [onWidgets] is set.
+  ///
+  /// This behavior can be changed by setting
+  /// `onWidgetsIsOptional=true` in the constructor.
+  bool shouldBuildSubTreeAsBlocks(BuildMetadata meta) =>
+      onWidgets != null && !_onWidgetsIsOptional;
 }
