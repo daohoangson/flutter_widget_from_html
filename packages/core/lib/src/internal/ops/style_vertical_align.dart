@@ -9,8 +9,6 @@ const kCssVerticalAlignSub = 'sub';
 const kCssVerticalAlignSuper = 'super';
 
 class StyleVerticalAlign {
-  static const kPriority4k3 = 4300;
-
   final WidgetFactory wf;
 
   static final _skipBuilding = Expando<bool>();
@@ -79,7 +77,6 @@ class StyleVerticalAlign {
           );
         },
         onWidgetsIsOptional: true,
-        priority: kPriority4k3,
       );
 
   WidgetPlaceholder? _buildTree(BuildMetadata meta, BuildTree tree) {
