@@ -94,6 +94,14 @@ class WidgetFactory {
         continue;
       }
 
+      if (renderMode != RenderMode.column && child is CssBlock) {
+        final grandChild = child.child;
+        if (grandChild is Column) {
+          children = grandChild.children;
+          continue;
+        }
+      }
+
       break;
     }
 

@@ -96,19 +96,19 @@ class StyleSizing {
       return widgets;
     }
 
+    final childHasSizing = _elementMeta[childMeta.element] != null;
+    if (childHasSizing) {
+      // the child element itself is a sizing element, skip now
+      return widgets;
+    }
+
     // the parent element has some width contraints applied
     // we should reset things back to normal for this child
     final placeholder = wf.buildColumnPlaceholder(childMeta, widgets);
     placeholder?.wrapWith(
       (context, child) {
         final textDirection = childMeta.tsb.build(context).textDirection;
-        return ConstraintsTransformBox(
-          alignment: textDirection == TextDirection.ltr
-              ? Alignment.topLeft
-              : Alignment.topRight,
-          constraintsTransform: (bc) => bc.copyWith(minWidth: 0),
-          child: child,
-        );
+        return _MinWidthZero(textDirection: textDirection, child: child);
       },
     );
     return listOrNull(placeholder);
@@ -167,14 +167,40 @@ class StyleSizing {
   ) {
     final tsh = tsb.build(context);
 
+    final maxHeight = input.maxHeight?.getSizing(tsh);
+    final maxWidth = input.maxWidth?.getSizing(tsh);
+    final minHeight = input.minHeight?.getSizing(tsh);
+    final minWidth = input.minWidth?.getSizing(tsh);
+    final preferredHeight = input.preferredHeight?.getSizing(tsh);
+    final preferredWidth = input.preferredWidth?.getSizing(tsh);
+
+    if (maxHeight == null &&
+        maxWidth == null &&
+        minHeight == null &&
+        minWidth == null &&
+        preferredHeight == null) {
+      if (preferredWidth == null) {
+        // everything is null?! Nothing to do here.
+        return child;
+      } else {
+        if (child is _MinWidthZero) {
+          // there is no point to wrap a min-width=0 inside a CSS block
+          // just return the grand child directly
+          return child.child!;
+        } else {
+          return CssBlock(child: child);
+        }
+      }
+    }
+
     return CssSizing(
-      maxHeight: input.maxHeight?.getSizing(tsh),
-      maxWidth: input.maxWidth?.getSizing(tsh),
-      minHeight: input.minHeight?.getSizing(tsh),
-      minWidth: input.minWidth?.getSizing(tsh),
+      maxHeight: maxHeight,
+      maxWidth: maxWidth,
+      minHeight: minHeight,
+      minWidth: minWidth,
       preferredAxis: input.preferredAxis,
-      preferredHeight: input.preferredHeight?.getSizing(tsh),
-      preferredWidth: input.preferredWidth?.getSizing(tsh),
+      preferredHeight: preferredHeight,
+      preferredWidth: preferredWidth,
       child: child,
     );
   }
@@ -260,6 +286,24 @@ class StyleSizing {
 
     return parsed;
   }
+}
+
+class _MinWidthZero extends ConstraintsTransformBox {
+  const _MinWidthZero({
+    required Widget child,
+    Key? key,
+    required TextDirection textDirection,
+  }) : super(
+          alignment: textDirection == TextDirection.ltr
+              ? Alignment.topLeft
+              : Alignment.topRight,
+          constraintsTransform: transform,
+          key: key,
+          child: child,
+        );
+
+  static BoxConstraints transform(BoxConstraints bc) =>
+      bc.copyWith(minWidth: 0);
 }
 
 class _StyleSizingOp extends BuildOp {
