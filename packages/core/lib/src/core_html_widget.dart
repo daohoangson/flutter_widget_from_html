@@ -189,7 +189,13 @@ class HtmlWidgetState extends State<HtmlWidget> {
             return snapshot.data!;
           } else if (snapshot.hasError) {
             return _sliverToBoxAdapterIfNeeded(
-              _wf.onErrorBuilder(context, _rootMeta, snapshot.error) ?? widget0,
+              _wf.onErrorBuilder(
+                    context,
+                    _rootMeta,
+                    snapshot.error,
+                    snapshot.stackTrace,
+                  ) ??
+                  widget0,
             );
           } else {
             return _sliverToBoxAdapterIfNeeded(
@@ -231,8 +237,9 @@ class HtmlWidgetState extends State<HtmlWidget> {
     try {
       final domNodes = _parseHtml(widget.html);
       built = _buildBody(this, domNodes);
-    } catch (error) {
-      built = _wf.onErrorBuilder(context, _rootMeta, error) ?? widget0;
+    } catch (error, stackTrace) {
+      built =
+          _wf.onErrorBuilder(context, _rootMeta, error, stackTrace) ?? widget0;
     }
 
     Timeline.finishSync();
