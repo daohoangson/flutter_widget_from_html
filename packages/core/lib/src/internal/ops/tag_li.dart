@@ -58,7 +58,7 @@ class TagLi {
 
   Map<String, String> defaultStyles(dom.Element element) {
     final attrs = element.attributes;
-    final depth = listMeta.parentOps.whereType<_TagLiListOp>().length;
+    final depth = listMeta.parentOps.where((e) => e.op is _TagLiListOp).length;
 
     final styles = {
       'padding-inline-start': '40px',
@@ -81,7 +81,7 @@ class TagLi {
     return styles;
   }
 
-  void onChild(BuildMetadata childMeta) {
+  void onChild(BuildMetadata _, BuildMetadata childMeta) {
     final e = childMeta.element;
     if (e.localName != kTagLi) {
       return;

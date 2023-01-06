@@ -6,50 +6,24 @@ const kTagDetails = 'details';
 const kTagSummary = 'summary';
 
 class TagDetails {
-  final BuildMetadata detailsMeta;
   late final BuildOp op;
   final WidgetFactory wf;
 
   late final BuildOp _summaryOp;
-  WidgetPlaceholder? _summary;
+  static final _summaryDetailsMeta = Expando<BuildMetadata>();
+  static final _summaryPlaceholder = Expando<WidgetPlaceholder>();
 
-  TagDetails(this.wf, this.detailsMeta) {
-    op = BuildOp(onChild: onChild, onWidgets: onWidgets);
+  TagDetails(this.wf) {
+    op = BuildOp(onChild: _onChild, onWidgets: _onWidgets);
 
     _summaryOp = BuildOp(
-      onTree: (meta, tree) {
-        final children = tree.directChildren;
-        if (children.isEmpty) {
-          return;
-        }
-
-        final first = children.first;
-        final marker = WidgetBit.inline(
-          first.parent!,
-          WidgetPlaceholder(meta).wrapWith((context, child) {
-            final tsh = meta.tsb.build(context);
-            return HtmlDetailsMarker(style: tsh.style);
-          }),
-        );
-        marker.insertBefore(first);
-      },
-      onWidgets: (meta, widgets) {
-        if (_summary != null) {
-          return widgets;
-        }
-
-        _summary = wf.buildColumnPlaceholder(meta, widgets);
-        if (_summary == null) {
-          return widgets;
-        }
-
-        return const [];
-      },
+      onTree: _onSummaryTree,
+      onWidgets: _onSummaryWidgets,
       priority: BuildOp.kPriorityMax,
     );
   }
 
-  void onChild(BuildMetadata childMeta) {
+  void _onChild(BuildMetadata detailsMeta, BuildMetadata childMeta) {
     final e = childMeta.element;
     if (e.parent != detailsMeta.element) {
       return;
@@ -58,11 +32,52 @@ class TagDetails {
       return;
     }
 
+    _summaryDetailsMeta[e] = detailsMeta;
     childMeta.register(_summaryOp);
   }
 
-  Iterable<Widget>? onWidgets(
-    BuildMetadata _,
+  void _onSummaryTree(BuildMetadata summaryMeta, BuildTree tree) {
+    final children = tree.directChildren;
+    if (children.isEmpty) {
+      return;
+    }
+
+    final first = children.first;
+    final marker = WidgetBit.inline(
+      first.parent!,
+      WidgetPlaceholder(summaryMeta).wrapWith((context, child) {
+        final tsh = summaryMeta.tsb.build(context);
+        return HtmlDetailsMarker(style: tsh.style);
+      }),
+    );
+    marker.insertBefore(first);
+  }
+
+  Iterable<Widget>? _onSummaryWidgets(
+    BuildMetadata summaryMeta,
+    Iterable<WidgetPlaceholder> widgets,
+  ) {
+    final detailsMeta = _summaryDetailsMeta[summaryMeta.element];
+    if (detailsMeta == null) {
+      return widgets;
+    }
+
+    final existingSummary = _summaryPlaceholder[detailsMeta];
+    if (existingSummary != null) {
+      return widgets;
+    }
+
+    final placeholder = wf.buildColumnPlaceholder(summaryMeta, widgets);
+    if (placeholder == null) {
+      return widgets;
+    }
+
+    _summaryPlaceholder[detailsMeta] = placeholder;
+    return const [];
+  }
+
+  Iterable<Widget>? _onWidgets(
+    BuildMetadata detailsMeta,
     Iterable<WidgetPlaceholder> widgets,
   ) {
     final attrs = detailsMeta.element.attributes;
@@ -70,6 +85,7 @@ class TagDetails {
     return listOrNull(
       wf.buildColumnPlaceholder(detailsMeta, widgets)?.wrapWith(
         (context, child) {
+          final summary = _summaryPlaceholder[detailsMeta];
           final tsh = detailsMeta.tsb.build(context);
 
           return HtmlDetails(
@@ -77,7 +93,7 @@ class TagDetails {
             child: wf.buildColumnWidget(
               context,
               [
-                HtmlSummary(style: tsh.style, child: _summary),
+                HtmlSummary(style: tsh.style, child: summary),
                 HtmlDetailsContents(child: child),
               ],
               dir: tsh.getDependency(),

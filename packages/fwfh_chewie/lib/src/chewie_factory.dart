@@ -6,6 +6,8 @@ import 'video_player/video_player.dart';
 
 /// A mixin that can build player for VIDEO.
 mixin ChewieFactory on WidgetFactory {
+  BuildOp? _tagVideo;
+
   /// Builds [VideoPlayer].
   Widget? buildVideoPlayer(
     BuildMetadata meta,
@@ -40,7 +42,7 @@ mixin ChewieFactory on WidgetFactory {
   void parse(BuildMetadata meta) {
     switch (meta.element.localName) {
       case kTagVideo:
-        meta.register(TagVideo(this, meta).op);
+        meta.register(_tagVideo ??= TagVideo(this).op);
         break;
     }
     return super.parse(meta);

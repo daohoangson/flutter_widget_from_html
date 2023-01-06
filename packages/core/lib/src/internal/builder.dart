@@ -18,7 +18,7 @@ final _regExpSpaceTrailing = RegExp('$_asciiWhitespace+\$', unicode: true);
 final _regExpSpaces = RegExp('$_asciiWhitespace+', unicode: true);
 
 class BuildMetadata extends core_data.BuildMetadata {
-  final Iterable<BuildOp> _parentOps;
+  final Iterable<ParentOp> _parentOps;
 
   Set<BuildOp>? _buildOps;
   var _buildOpsIsLocked = false;
@@ -35,7 +35,7 @@ class BuildMetadata extends core_data.BuildMetadata {
   Iterable<BuildOp> get buildOps => _buildOps ?? const [];
 
   @override
-  Iterable<BuildOp> get parentOps => _parentOps;
+  Iterable<ParentOp> get parentOps => _parentOps;
 
   @override
   List<css.Declaration> get styles {
@@ -63,7 +63,7 @@ class BuildTree extends core_data.BuildTree {
   final CustomStylesBuilder? customStylesBuilder;
   final CustomWidgetBuilder? customWidgetBuilder;
   final core_data.BuildMetadata parentMeta;
-  final Iterable<BuildOp> parentOps;
+  final Iterable<ParentOp> parentOps;
   final WidgetFactory wf;
 
   final _built = <WidgetPlaceholder>[];
@@ -145,7 +145,7 @@ class BuildTree extends core_data.BuildTree {
   BuildTree sub({
     core_data.BuildTree? parent,
     BuildMetadata? parentMeta,
-    Iterable<BuildOp> parentOps = const [],
+    Iterable<ParentOp> parentOps = const [],
     TextStyleBuilder? tsb,
   }) =>
       BuildTree(
@@ -249,8 +249,8 @@ class BuildTree extends core_data.BuildTree {
   void _collectMetadata(BuildMetadata meta) {
     wf.parse(meta);
 
-    for (final op in meta.parentOps) {
-      op.onChild?.call(meta);
+    for (final parent in meta.parentOps) {
+      parent.op.onChild?.call(parent.meta, meta);
     }
 
     // stylings, step 1: get default styles from tag-based build ops
@@ -319,10 +319,16 @@ int _compareBuildOps(BuildOp a, BuildOp b) {
   }
 }
 
-Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, BuildMetadata meta) {
+Iterable<ParentOp> _prepareParentOps(
+  Iterable<ParentOp> inheritedParentOps,
+  BuildMetadata meta,
+) {
   // try to reuse existing list if possible
-  final withOnChild = meta.buildOps.where((op) => op.onChild != null).toList();
-  return withOnChild.isEmpty
-      ? ops
-      : List.unmodifiable([...ops, ...withOnChild]);
+  final opsWithOnChild = meta.buildOps
+      .where((op) => op.onChild != null)
+      .map((op) => ParentOp(meta, op))
+      .toList();
+  return opsWithOnChild.isEmpty
+      ? inheritedParentOps
+      : List.unmodifiable([...inheritedParentOps, ...opsWithOnChild]);
 }
