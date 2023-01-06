@@ -64,14 +64,8 @@ class StyleSizing {
     );
   }
 
-  void _onChild(BuildMetadata childMeta) {
-    final parentElement = childMeta.element.parent;
-    if (parentElement == null) {
-      return;
-    }
-    final parentMeta = _elementMeta[parentElement];
-    if (parentMeta == null) {
-      // parent element is not a sizing element, nothing to do here
+  void _onChild(BuildMetadata parentMeta, BuildMetadata childMeta) {
+    if (!identical(parentMeta.element, childMeta.element.parent)) {
       return;
     }
 
@@ -308,7 +302,8 @@ class _MinWidthZero extends ConstraintsTransformBox {
 
 class _StyleSizingOp extends BuildOp {
   const _StyleSizingOp({
-    required void Function(BuildMetadata meta) onChild,
+    required void Function(BuildMetadata parentMeta, BuildMetadata childMeta)
+        onChild,
     required void Function(BuildMetadata meta, BuildTree tree) onTreeFlattening,
     required Iterable<Widget>? Function(
       BuildMetadata meta,
