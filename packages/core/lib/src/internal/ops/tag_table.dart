@@ -30,7 +30,6 @@ const kCssDisplayTableCell = 'table-cell';
 const kCssDisplayTableCaption = 'table-caption';
 
 class TagTable {
-  final BuildMetadata tableMeta;
   final WidgetFactory wf;
 
   final _data = _TagTableData();
@@ -38,7 +37,7 @@ class TagTable {
   late final BuildOp _captionOp;
   late final BuildOp _tableOp;
 
-  TagTable(this.wf, this.tableMeta) {
+  TagTable.notReusable(this.wf) {
     _tableOp = BuildOp(
       onChild: _onChild,
       onTree: _onTree,
@@ -53,7 +52,7 @@ class TagTable {
 
   BuildOp get op => _tableOp;
 
-  void _onChild(BuildMetadata childMeta) {
+  void _onChild(BuildMetadata tableMeta, BuildMetadata childMeta) {
     if (childMeta.element.parent != tableMeta.element) {
       return;
     }
@@ -65,7 +64,7 @@ class TagTable {
         latestGroup ??= _data.body;
         final row = _TagTableDataRow();
         latestGroup.rows.add(row);
-        childMeta.register(_TagTableRow(this, childMeta, row)._rowOp);
+        childMeta.register(_TagTableRow(this, row)._rowOp);
         break;
       case kCssDisplayTableHeaderGroup:
       case kCssDisplayTableRowGroup:
@@ -75,7 +74,7 @@ class TagTable {
             : which == kCssDisplayTableRowGroup
                 ? _data.body.rows
                 : _data.footer.rows;
-        childMeta.register(_TagTableRowGroup(this, childMeta, rows).op);
+        childMeta.register(_TagTableRowGroup(this, rows).op);
         latestGroup = null;
         break;
       case kCssDisplayTableCaption:
@@ -84,18 +83,21 @@ class TagTable {
     }
   }
 
-  void _onTree(BuildMetadata _, BuildTree tree) {
+  void _onTree(BuildMetadata tableMeta, BuildTree tree) {
     StyleBorder.skip(tableMeta);
     StyleSizing.skip(tableMeta);
   }
 
-  Iterable<Widget> _onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> __) {
+  Iterable<Widget> _onWidgets(
+    BuildMetadata tableMeta,
+    Iterable<WidgetPlaceholder> _,
+  ) {
     _prepareHtmlTableCaptionBuilders();
-    _prepareHtmlTableCellBuilders(_data.header);
+    _prepareHtmlTableCellBuilders(tableMeta, _data.header);
     for (final body in _data.bodies) {
-      _prepareHtmlTableCellBuilders(body);
+      _prepareHtmlTableCellBuilders(tableMeta, body);
     }
-    _prepareHtmlTableCellBuilders(_data.footer);
+    _prepareHtmlTableCellBuilders(tableMeta, _data.footer);
     if (_data.builders.isEmpty) {
       return [];
     }
@@ -156,7 +158,10 @@ class TagTable {
     }
   }
 
-  void _prepareHtmlTableCellBuilders(_TagTableDataGroup group) {
+  void _prepareHtmlTableCellBuilders(
+    BuildMetadata tableMeta,
+    _TagTableDataGroup group,
+  ) {
     final rowStartOffset = _data.rows;
     final rowSpanMax = group.rows.length;
 
@@ -231,7 +236,7 @@ class TagTable {
   }
 
   static BuildOp cellPaddingOp(double px) => BuildOp(
-        onChild: (meta) =>
+        onChild: (_, meta) =>
             (meta.element.localName == 'td' || meta.element.localName == 'th')
                 ? meta[kCssPadding] = '${px}px'
                 : null,
@@ -244,7 +249,7 @@ class TagTable {
           kCssBorderSpacing: '${borderSpacing}px',
         },
         onChild: border > 0
-            ? (meta) {
+            ? (_, meta) {
                 switch (meta.element.localName) {
                   case kTagTableCell:
                   case kTagTableHeaderCell:
@@ -287,18 +292,17 @@ class TagTable {
 class _TagTableRow {
   final TagTable parent;
   final _TagTableDataRow row;
-  final BuildMetadata rowMeta;
 
   late final BuildOp _rowOp;
   late final BuildOp _cellOp;
 
-  _TagTableRow(this.parent, this.rowMeta, this.row) {
+  _TagTableRow(this.parent, this.row) {
     _rowOp = BuildOp(onChild: _onRowChild);
     _cellOp =
         BuildOp(onWidgets: _onCellWidgets, priority: BuildOp.kPriorityMax);
   }
 
-  void _onRowChild(BuildMetadata childMeta) {
+  void _onRowChild(BuildMetadata rowMeta, BuildMetadata childMeta) {
     if (childMeta.element.parent != rowMeta.element) {
       return;
     }
@@ -342,17 +346,15 @@ class _TagTableRow {
 }
 
 class _TagTableRowGroup {
+  late final BuildOp op;
   final TagTable parent;
   final List<_TagTableDataRow> rows;
-  final BuildMetadata groupMeta;
 
-  late BuildOp op;
-
-  _TagTableRowGroup(this.parent, this.groupMeta, this.rows) {
+  _TagTableRowGroup(this.parent, this.rows) {
     op = BuildOp(onChild: onChild);
   }
 
-  void onChild(BuildMetadata childMeta) {
+  void onChild(BuildMetadata groupMeta, BuildMetadata childMeta) {
     if (childMeta.element.parent != groupMeta.element) {
       return;
     }
@@ -362,7 +364,7 @@ class _TagTableRowGroup {
 
     final row = _TagTableDataRow();
     rows.add(row);
-    childMeta.register(_TagTableRow(parent, childMeta, row)._rowOp);
+    childMeta.register(_TagTableRow(parent, row)._rowOp);
   }
 }
 

@@ -35,7 +35,7 @@ abstract class BuildMetadata {
   Iterable<BuildOp> get buildOps;
 
   /// The parents' build ops that have [BuildOp.onChild].
-  Iterable<BuildOp> get parentOps;
+  Iterable<ParentOp> get parentOps;
 
   /// The styling declarations.
   ///
@@ -101,14 +101,15 @@ class BuildOp {
   ///
   /// ```dart
   /// BuildOp(
-  ///   onChild: (childMeta) {
+  ///   onChild: (parentMeta, childMeta) {
   ///     if (!childElement.element.parent != parentMeta.element) return;
   ///     childMeta.doSomethingHere;
   ///   },
   /// );
   ///
   /// ```
-  final void Function(BuildMetadata childMeta)? onChild;
+  final void Function(BuildMetadata parentMeta, BuildMetadata childMeta)?
+      onChild;
 
   /// The callback that will be called when child elements have been processed.
   final void Function(BuildMetadata meta, BuildTree tree)? onTree;
@@ -139,4 +140,11 @@ class BuildOp {
     this.onWidgetsIsOptional = false,
     this.priority = 10,
   });
+}
+
+@immutable
+class ParentOp {
+  final BuildMetadata meta;
+  final BuildOp op;
+  const ParentOp(this.meta, this.op);
 }

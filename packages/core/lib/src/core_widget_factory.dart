@@ -39,11 +39,13 @@ class WidgetFactory {
   BuildOp? _tagA;
   TextStyleHtml Function(TextStyleHtml, void)? _tagAColor;
   BuildOp? _tagBr;
+  BuildOp? _tagDetails;
   BuildOp? _tagFont;
   BuildOp? _tagHr;
   BuildOp? _tagImg;
   BuildOp? _tagPre;
   BuildOp? _tagQ;
+  BuildOp? _tagRuby;
   TextStyleHtml Function(TextStyleHtml, css.Expression)? _tsbLineHeight;
   HtmlWidget? _widget;
 
@@ -760,7 +762,7 @@ class WidgetFactory {
         break;
 
       case kTagDetails:
-        meta.register(TagDetails(this, meta).op);
+        meta.register(_tagDetails ??= TagDetails(this).op);
         break;
 
       case 'dd':
@@ -886,7 +888,7 @@ class WidgetFactory {
         break;
 
       case kTagRuby:
-        meta.register(TagRuby(this, meta).op);
+        meta.register(_tagRuby ??= TagRuby(this).op);
         break;
 
       case 'script':
@@ -1106,7 +1108,7 @@ class WidgetFactory {
         meta.register(displayNone);
         break;
       case kCssDisplayTable:
-        meta.register(TagTable(this, meta).op);
+        meta.register(TagTable.notReusable(this).op);
         break;
     }
   }

@@ -225,7 +225,7 @@ The HTML string is parsed into DOM elements and each element is visited once to 
 | Step |                                                                          | Integration point                                                                                                   |
 |------|--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
 | 1    | Parse                                                                    | `WidgetFactory.parse(BuildMetadata)`                                                                                |
-| 2    | Inform parents if any                                                    | `BuildOp.onChild(BuildMetadata)`                                                                                    |
+| 2    | Inform parents if any                                                    | `BuildOp.onChild(BuildMetadata, BuildMetadata)`                                                                     |
 | 3    | Populate default styling                                                 | `BuildOp.defaultStyles(Element)`                                                                                    |
 | 4    | Populate custom styling                                                  | `HtmlWidget.customStylesBuilder`                                                                                    |
 | 5    | Parse styling key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(BuildMetadata, String, String)`, `WidgetFactory.parseStyleDisplay(BuildMetadata, String)` |

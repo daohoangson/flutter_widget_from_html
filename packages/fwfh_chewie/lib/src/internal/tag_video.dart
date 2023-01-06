@@ -16,27 +16,14 @@ const kTagVideo = 'video';
 const kTagVideoSource = 'source';
 
 class TagVideo {
-  final BuildMetadata videoMeta;
+  late final BuildOp op;
   final ChewieFactory wf;
 
-  final _sourceUrls = <String>[];
-
-  late final BuildOp op;
-
-  TagVideo(this.wf, this.videoMeta) {
-    op = BuildOp(
-      onChild: onChild,
-      onWidgets: onWidgets,
-    );
-
-    final attrs = videoMeta.element.attributes;
-    final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
-    if (url != null) {
-      _sourceUrls.add(url);
-    }
+  TagVideo(this.wf) {
+    op = BuildOp(onChild: _onChild, onWidgets: _onWidgets);
   }
 
-  void onChild(BuildMetadata childMeta) {
+  void _onChild(BuildMetadata videoMeta, BuildMetadata childMeta) {
     final e = childMeta.element;
     if (e.localName != kTagVideoSource) {
       return;
@@ -51,10 +38,13 @@ class TagVideo {
       return;
     }
 
-    _sourceUrls.add(url);
+    videoMeta.sourceUrls.add(url);
   }
 
-  Iterable<Widget>? onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> ws) {
+  Iterable<Widget>? _onWidgets(
+    BuildMetadata meta,
+    Iterable<WidgetPlaceholder> ws,
+  ) {
     if (defaultTargetPlatform != TargetPlatform.android &&
         defaultTargetPlatform != TargetPlatform.iOS &&
         !kIsWeb) {
@@ -63,18 +53,25 @@ class TagVideo {
       return ws;
     }
 
-    return listOrNull(_buildPlayer()) ?? ws;
+    final attrs = meta.element.attributes;
+    final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
+    if (url != null) {
+      meta.sourceUrls.add(url);
+    }
+
+    return listOrNull(_buildPlayer(meta)) ?? ws;
   }
 
-  Widget? _buildPlayer() {
-    if (_sourceUrls.isEmpty) {
+  Widget? _buildPlayer(BuildMetadata meta) {
+    final sourceUrls = meta.sourceUrls;
+    if (sourceUrls.isEmpty) {
       return null;
     }
 
-    final attrs = videoMeta.element.attributes;
+    final attrs = meta.element.attributes;
     return wf.buildVideoPlayer(
-      videoMeta,
-      _sourceUrls.first,
+      meta,
+      sourceUrls.first,
       autoplay: attrs.containsKey(kAttributeVideoAutoplay),
       controls: attrs.containsKey(kAttributeVideoControls),
       height: tryParseDoubleFromMap(attrs, kAttributeVideoHeight),
@@ -82,5 +79,18 @@ class TagVideo {
       posterUrl: wf.urlFull(attrs[kAttributeVideoPoster] ?? ''),
       width: tryParseDoubleFromMap(attrs, kAttributeVideoWidth),
     );
+  }
+}
+
+extension _BuildMetadata on BuildMetadata {
+  static final _sourceUrls = Expando<List<String>>();
+
+  List<String> get sourceUrls {
+    final existing = _sourceUrls[this];
+    if (existing != null) {
+      return existing;
+    }
+
+    return _sourceUrls[this] = [];
   }
 }
