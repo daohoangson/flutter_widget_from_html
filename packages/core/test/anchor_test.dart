@@ -463,12 +463,14 @@ class _NoBuildBodyAnchorForItemListViewRenderMode extends RenderMode {
   Widget buildBodyWidget(
     WidgetFactory wf,
     BuildContext context,
-    List<Widget> children,
-  ) =>
-      ListView.builder(
-        addAutomaticKeepAlives: false,
-        addSemanticIndexes: false,
-        itemBuilder: (c, i) => children[i],
-        itemCount: children.length,
-      );
+    Iterable<Widget> childrenIterable,
+  ) {
+    final childrenList = childrenIterable.toList(growable: false);
+    return ListView.builder(
+      addAutomaticKeepAlives: false,
+      addSemanticIndexes: false,
+      itemBuilder: (c, i) => childrenList[i],
+      itemCount: childrenList.length,
+    );
+  }
 }

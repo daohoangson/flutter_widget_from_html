@@ -9,7 +9,7 @@ class ColumnMode extends RenderMode {
   Widget buildBodyWidget(
     WidgetFactory wf,
     BuildContext context,
-    List<Widget> children,
+    Iterable<Widget> children,
   ) =>
       wf.buildColumnWidget(context, children);
 }

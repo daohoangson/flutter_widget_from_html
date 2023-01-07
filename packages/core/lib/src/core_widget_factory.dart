@@ -79,14 +79,14 @@ class WidgetFactory {
 
   /// Builds body widget.
   Widget buildBodyWidget(BuildContext context, Widget child) {
-    var children = child is Column ? child.children : [child];
+    Iterable<Widget> children = child is Column ? child.children : [child];
     final renderMode = _widget?.renderMode ?? RenderMode.column;
 
     if (children.isNotEmpty && children.first is HeightPlaceholder) {
-      children.removeAt(0);
+      children = children.skip(1);
     }
     if (children.isNotEmpty && children.last is HeightPlaceholder) {
-      children.removeLast();
+      children = children.take(children.length - 1);
     }
 
     while (children.length == 1) {
@@ -132,7 +132,7 @@ class WidgetFactory {
   /// Builds [Column].
   Widget buildColumnWidget(
     BuildContext context,
-    List<Widget> children, {
+    Iterable<Widget> children, {
     TextDirection? dir,
   }) {
     if (children.length == 1) {

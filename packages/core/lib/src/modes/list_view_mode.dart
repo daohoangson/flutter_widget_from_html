@@ -70,11 +70,12 @@ class ListViewMode extends RenderMode {
   Widget buildBodyWidget(
     WidgetFactory wf,
     BuildContext context,
-    List<Widget> children,
+    Iterable<Widget> childrenIterable,
   ) {
     // ignore: invalid_use_of_protected_member
     final anchorRegistry = wf.anchorRegistry;
-    anchorRegistry.prepareIndexByAnchor(children);
+    final childrenList = childrenIterable.toList(growable: false);
+    anchorRegistry.prepareIndexByAnchor(childrenList);
 
     return ListView.builder(
       addAutomaticKeepAlives: addAutomaticKeepAlives,
@@ -83,8 +84,9 @@ class ListViewMode extends RenderMode {
       clipBehavior: clipBehavior,
       controller: controller,
       dragStartBehavior: dragStartBehavior,
-      itemBuilder: (c, i) => anchorRegistry.buildBodyItem(c, i, children[i]),
-      itemCount: children.length,
+      itemBuilder: (c, i) =>
+          anchorRegistry.buildBodyItem(c, i, childrenList[i]),
+      itemCount: childrenList.length,
       keyboardDismissBehavior: keyboardDismissBehavior,
       padding: padding,
       primary: primary,

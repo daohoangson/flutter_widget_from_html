@@ -28,19 +28,20 @@ class SliverListMode extends RenderMode {
   Widget buildBodyWidget(
     WidgetFactory wf,
     BuildContext context,
-    List<Widget> children,
+    Iterable<Widget> childrenIterable,
   ) {
     // ignore: invalid_use_of_protected_member
     final anchorRegistry = wf.anchorRegistry;
-    anchorRegistry.prepareIndexByAnchor(children);
+    final childrenList = childrenIterable.toList(growable: false);
+    anchorRegistry.prepareIndexByAnchor(childrenList);
 
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-        (c, i) => anchorRegistry.buildBodyItem(c, i, children[i]),
+        (c, i) => anchorRegistry.buildBodyItem(c, i, childrenList[i]),
         addAutomaticKeepAlives: addAutomaticKeepAlives,
         addRepaintBoundaries: addRepaintBoundaries,
         addSemanticIndexes: addSemanticIndexes,
-        childCount: children.length,
+        childCount: childrenList.length,
       ),
     );
   }

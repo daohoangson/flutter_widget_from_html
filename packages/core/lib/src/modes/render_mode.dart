@@ -42,6 +42,6 @@ abstract class RenderMode {
   Widget buildBodyWidget(
     WidgetFactory wf,
     BuildContext context,
-    List<Widget> children,
+    Iterable<Widget> children,
   );
 }
