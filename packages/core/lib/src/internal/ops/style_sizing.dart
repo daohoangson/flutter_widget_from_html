@@ -25,6 +25,27 @@ extension CssLengthToSizing on CssLength {
   }
 }
 
+class MinWidthZero extends ConstraintsTransformBox {
+  final String tag;
+
+  const MinWidthZero({
+    required Widget child,
+    Key? key,
+    required this.tag,
+    required TextDirection textDirection,
+  }) : super(
+          alignment: textDirection == TextDirection.ltr
+              ? Alignment.topLeft
+              : Alignment.topRight,
+          constraintsTransform: transform,
+          key: key,
+          child: child,
+        );
+
+  static BoxConstraints transform(BoxConstraints bc) =>
+      bc.copyWith(minWidth: 0);
+}
+
 class StyleSizing {
   static const k100percent = CssLength(100, CssLengthUnit.percentage);
   static const kPriorityBoxModel3k = 3000;
@@ -96,7 +117,7 @@ class StyleSizing {
     placeholder?.wrapWith(
       (context, child) {
         final textDirection = childMeta.tsb.build(context).textDirection;
-        return _MinWidthZero(
+        return MinWidthZero(
           tag: parentInput.tag,
           textDirection: textDirection,
           child: child,
@@ -175,7 +196,7 @@ class StyleSizing {
         // everything is null?! Nothing to do here.
         return child;
       } else if (input.preferredWidth == k100percent) {
-        if (child is _MinWidthZero && child.tag == input.tag) {
+        if (child is MinWidthZero && child.tag == input.tag) {
           // there is no point to wrap a min-width=0 directly inside a CSS block
           // just return the grand child directly
           return child.child!;
@@ -279,27 +300,6 @@ class StyleSizing {
 
     return parsed;
   }
-}
-
-class _MinWidthZero extends ConstraintsTransformBox {
-  final String tag;
-
-  const _MinWidthZero({
-    required Widget child,
-    Key? key,
-    required this.tag,
-    required TextDirection textDirection,
-  }) : super(
-          alignment: textDirection == TextDirection.ltr
-              ? Alignment.topLeft
-              : Alignment.topRight,
-          constraintsTransform: transform,
-          key: key,
-          child: child,
-        );
-
-  static BoxConstraints transform(BoxConstraints bc) =>
-      bc.copyWith(minWidth: 0);
 }
 
 class _StyleSizingOp extends BuildOp {

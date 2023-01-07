@@ -143,7 +143,9 @@ class WidgetFactory {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       textDirection: dir,
-      children: children,
+      children: children
+          .map((widget) => widget is MinWidthZero ? widget.child! : widget)
+          .toList(growable: false),
     );
   }
 
