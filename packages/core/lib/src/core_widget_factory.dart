@@ -1003,7 +1003,7 @@ class WidgetFactory {
       case kCssMinHeight:
       case kCssMinWidth:
       case kCssWidth:
-        meta.register(StyleSizing(this, meta).op);
+        meta.register(StyleSizing(this).op);
         break;
 
       case kCssLineHeight:

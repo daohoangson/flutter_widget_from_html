@@ -31,14 +31,12 @@ class StyleSizing {
   late final BuildOp op;
   final WidgetFactory wf;
 
-  static final _elementMeta = Expando<BuildMetadata>();
   static final _instances = Expando<StyleSizing>();
   static final _metaIsBlock = Expando<bool>();
   static final _metaParsedInput = Expando<_StyleSizingInput>();
   static final _skipBuilding = Expando<bool>();
 
-  factory StyleSizing(WidgetFactory wf, BuildMetadata meta) {
-    _elementMeta[meta.element] = meta;
+  factory StyleSizing(WidgetFactory wf) {
     final existingInstance = _instances[wf];
     if (existingInstance != null) {
       return existingInstance;
@@ -48,7 +46,7 @@ class StyleSizing {
 
   factory StyleSizing.block(WidgetFactory wf, BuildMetadata meta) {
     _metaIsBlock[meta] = true;
-    return StyleSizing(wf, meta);
+    return StyleSizing(wf);
   }
 
   static void skip(BuildMetadata meta) {
@@ -87,12 +85,6 @@ class StyleSizing {
     final parentInput = _tryParseInput(parentMeta);
     if (parentInput == null ||
         (parentInput.minWidth == null && parentInput.preferredWidth == null)) {
-      return widgets;
-    }
-
-    final childHasSizing = _elementMeta[childMeta.element] != null;
-    if (childHasSizing) {
-      // the child element itself is a sizing element, skip now
       return widgets;
     }
 
