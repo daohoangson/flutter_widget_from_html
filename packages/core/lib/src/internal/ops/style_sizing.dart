@@ -27,6 +27,7 @@ extension CssLengthToSizing on CssLength {
 
 class StyleSizing {
   static const kPriorityBoxModel3k = 3000;
+  static const kPriorityBoxModel8k = 8000;
 
   late final BuildOp op;
   final WidgetFactory wf;
@@ -72,7 +73,7 @@ class StyleSizing {
         onWidgets: (childMeta, widgets) =>
             _onChildWidgets(parentMeta, childMeta, widgets),
         onWidgetsIsOptional: true,
-        priority: 0,
+        priority: kPriorityBoxModel8k,
       ),
     );
   }
@@ -94,7 +95,11 @@ class StyleSizing {
     placeholder?.wrapWith(
       (context, child) {
         final textDirection = childMeta.tsb.build(context).textDirection;
-        return _MinWidthZero(textDirection: textDirection, child: child);
+        return _MinWidthZero(
+          tag: parentInput.tag,
+          textDirection: textDirection,
+          child: child,
+        );
       },
     );
     return listOrNull(placeholder);
@@ -169,12 +174,12 @@ class StyleSizing {
         // everything is null?! Nothing to do here.
         return child;
       } else {
-        if (child is _MinWidthZero) {
-          // there is no point to wrap a min-width=0 inside a CSS block
+        if (child is _MinWidthZero && child.tag == input.tag) {
+          // there is no point to wrap a min-width=0 directly inside a CSS block
           // just return the grand child directly
           return child.child!;
         } else {
-          return CssBlock(child: child);
+          return CssBlock(tag: input.tag, child: child);
         }
       }
     }
@@ -187,6 +192,7 @@ class StyleSizing {
       preferredAxis: input.preferredAxis,
       preferredHeight: preferredHeight,
       preferredWidth: preferredWidth,
+      tag: input.tag,
       child: child,
     );
   }
@@ -275,9 +281,12 @@ class StyleSizing {
 }
 
 class _MinWidthZero extends ConstraintsTransformBox {
+  final String tag;
+
   const _MinWidthZero({
     required Widget child,
     Key? key,
+    required this.tag,
     required TextDirection textDirection,
   }) : super(
           alignment: textDirection == TextDirection.ltr
@@ -335,4 +344,6 @@ class _StyleSizingInput {
     this.preferredHeight,
     this.preferredWidth,
   });
+
+  String get tag => hashCode.toString();
 }

@@ -5,8 +5,11 @@ import 'package:flutter/widgets.dart';
 
 /// A CSS block.
 class CssBlock extends SingleChildRenderObjectWidget {
+  /// The optional tag value to keep track of block widgets.
+  final String? tag;
+
   /// Creates a CSS block.
-  const CssBlock({required Widget child, Key? key})
+  const CssBlock({required Widget child, Key? key, this.tag})
       : super(child: child, key: key);
 
   @override
@@ -24,6 +27,9 @@ class CssBlock extends SingleChildRenderObjectWidget {
 
 /// A CSS sizing widget.
 class CssSizing extends SingleChildRenderObjectWidget {
+  /// The optional tag value to keep track of sizing widgets.
+  final String? tag;
+
   /// The maximum height.
   final CssSizingValue? maxHeight;
 
@@ -63,6 +69,7 @@ class CssSizing extends SingleChildRenderObjectWidget {
     this.preferredAxis,
     this.preferredHeight,
     this.preferredWidth,
+    this.tag,
   }) : super(child: child, key: key);
 
   @override
@@ -208,15 +215,13 @@ class _RenderCssSizing extends RenderProxyBox {
     final maxHeight = _maxHeight?.clamp(0.0, c.maxHeight) ?? c.maxHeight;
     final maxWidth = _maxWidth?.clamp(0.0, c.maxWidth) ?? c.maxWidth;
 
-    // special treatment for min values: ignore incoming constraint if it's tight
     final calculatedMinHeight = min(
       maxHeight,
-      _minHeight?.clamp(0.0, c.maxHeight) ??
-          (c.hasTightHeight ? .0 : c.minHeight),
+      _minHeight?.clamp(0.0, c.maxHeight) ?? c.minHeight,
     );
     final calculatedMinWidth = min(
       maxWidth,
-      _minWidth?.clamp(0.0, c.maxWidth) ?? (c.hasTightWidth ? .0 : c.minWidth),
+      _minWidth?.clamp(0.0, c.maxWidth) ?? c.minWidth,
     );
     // ignore min value if it's infinite
     final minHeight = calculatedMinHeight.isFinite ? calculatedMinHeight : .0;
