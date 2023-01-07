@@ -26,6 +26,7 @@ extension CssLengthToSizing on CssLength {
 }
 
 class StyleSizing {
+  static const k100percent = CssLength(100, CssLengthUnit.percentage);
   static const kPriorityBoxModel3k = 3000;
   static const kPriorityBoxModel8k = 8000;
 
@@ -173,7 +174,7 @@ class StyleSizing {
       if (preferredWidth == null) {
         // everything is null?! Nothing to do here.
         return child;
-      } else {
+      } else if (input.preferredWidth == k100percent) {
         if (child is _MinWidthZero && child.tag == input.tag) {
           // there is no point to wrap a min-width=0 directly inside a CSS block
           // just return the grand child directly
@@ -246,7 +247,7 @@ class StyleSizing {
       // `display: block` implies a 100% width
       // but it MUST NOT reset width value if specified
       // we need to keep track of block width to calculate contraints correctly
-      preferredWidth = const CssLength(100, CssLengthUnit.percentage);
+      preferredWidth = k100percent;
       preferredAxis ??= Axis.horizontal;
     }
 
