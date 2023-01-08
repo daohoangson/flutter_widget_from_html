@@ -42,6 +42,7 @@
   "IMG/inline_height_only": "Foo <img src=\"asset:images/100x10.png\" height=\"5\" /> bar.",
   "IMG/inline_small": "Foo <img src=\"asset:images/100x10.png\" /> bar.",
   "IMG/inline_small_dimensions": "Foo <img src=\"asset:images/100x10.png\" width=\"100\" height=\"10\" /> bar.",
+  "IMG/inline_small_dimensions_then_padding": "Foo <img src=\"asset:images/100x10.png\" height=\"10\" width=\"100\" style=\"padding-inline-end: 50px\" /> bar.",
   "IMG/inline_width_only": "Foo <img src=\"asset:images/100x10.png\" width=\"50\" /> bar.",
   "IMG/downscale/block_both": "Foo <img src=\"asset:images/2000x200.png\" style=\"display: block; height: 20px; width: 200px\" /> bar.",
   "IMG/downscale/block_height": "Foo <img src=\"asset:images/2000x200.png\" style=\"display: block; height: 20px\" /> bar.",

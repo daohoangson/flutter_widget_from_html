@@ -406,7 +406,7 @@ void main() {
     expect(
       explained,
       equals(
-        '[CssBlock:child=[Padding:(5,5,5,5),child=[Column:children='
+        '[Padding:(5,5,5,5),child=[CssBlock:child=[Column:children='
         '[CssBlock:child=[RichText:align=right,(:Foo)]],'
         '[CssBlock:child=[RichText:align=right,(:Bar)]]'
         ']]]',
