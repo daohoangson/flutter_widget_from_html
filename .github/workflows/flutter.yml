@@ -39,12 +39,10 @@ jobs:
           set -e
 
           _runtime=$(xcrun simctl list runtimes ios -j | jq -r '.runtimes[-1]')
-          echo $_runtime | jq
           _runtimeId=$(echo $_runtime | jq -r .identifier)
           echo "_runtimeId=$_runtimeId"
 
           _deviceType=$(echo $_runtime | jq -r '.supportedDeviceTypes[-1]')
-          echo $_deviceType | jq
           _deviceTypeName=$(echo $_deviceType | jq -r .name)
           echo "_deviceTypeName=$_deviceTypeName"
           _deviceTypeId=$(echo $_deviceType | jq -r .identifier)
