@@ -28,12 +28,10 @@ class WidgetFactory {
 
   BuildOp? _styleBgColor;
   BuildOp? _styleBorder;
-  BuildOp? _styleDisplayBlock;
   BuildOp? _styleDisplayInlineBlock;
   BuildOp? _styleDisplayNone;
   BuildOp? _styleMargin;
   BuildOp? _stylePadding;
-  BuildOp? _styleSizing;
   BuildOp? _styleTextDecoration;
   BuildOp? _styleVerticalAlign;
   BuildOp? _tagA;
@@ -1002,8 +1000,7 @@ class WidgetFactory {
       case kCssMinHeight:
       case kCssMinWidth:
       case kCssWidth:
-        _styleSizing ??= StyleSizing(this).buildOp;
-        meta.register(_styleSizing!);
+        StyleSizing.registerSizing(this, meta);
         break;
 
       case kCssLineHeight:
@@ -1076,10 +1073,11 @@ class WidgetFactory {
 
   /// Parses display inline style.
   void parseStyleDisplay(BuildMetadata meta, String? value) {
+    StyleSizing.registerChild(this, meta);
+
     switch (value) {
       case kCssDisplayBlock:
-        final displayBlock = _styleDisplayBlock ??= DisplayBlockOp(this);
-        meta.register(displayBlock);
+        StyleSizing.registerBlock(this, meta);
         break;
       case kCssDisplayInlineBlock:
         final displayInlineBlock = _styleDisplayInlineBlock ??= BuildOp(

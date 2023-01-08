@@ -25,28 +25,94 @@ extension CssLengthToSizing on CssLength {
   }
 }
 
-class DisplayBlockOp extends BuildOp {
-  DisplayBlockOp(WidgetFactory wf)
-      : super(
-          onWidgets: (meta, widgets) => listOrNull(
-            wf
-                .buildColumnPlaceholder(meta, widgets)
-                ?.wrapWith((_, w) => w is CssSizing ? w : CssBlock(child: w)),
-          ),
-          priority: StyleSizing.kPriority7k + 1,
-        );
-}
-
 class StyleSizing {
-  static const kPriority7k = 7000;
+  static const k100percent = CssLength(100, CssLengthUnit.percentage);
+  static const kPriorityBoxModel3k = 3000;
+  static const kPriorityBoxModel8k = 8000;
 
+  late final BuildOp opBlock;
+  late final BuildOp opChild;
+  late final BuildOp opSizing;
   final WidgetFactory wf;
 
+  static final _instances = Expando<StyleSizing>();
+  static final _elementMeta = Expando<BuildMetadata>();
+  static final _metaIsBlock = Expando<bool>();
   static final _skipBuilding = Expando<bool>();
 
-  StyleSizing(this.wf);
+  static void registerBlock(WidgetFactory wf, BuildMetadata meta) {
+    _elementMeta[meta.element] = meta;
+    _metaIsBlock[meta] = true;
 
-  BuildOp get buildOp => BuildOp(
+    final instance = StyleSizing._factory(wf);
+    meta
+      ..register(instance.opBlock)
+      ..register(instance.opSizing);
+  }
+
+  static void registerChild(WidgetFactory wf, BuildMetadata meta) {
+    final parentElement = meta.element.parent;
+    if (parentElement == null || _elementMeta[parentElement] == null) {
+      return;
+    }
+
+    meta.register(StyleSizing._factory(wf).opChild);
+  }
+
+  static void registerSizing(WidgetFactory wf, BuildMetadata meta) {
+    _elementMeta[meta.element] = meta;
+    meta.register(StyleSizing._factory(wf).opSizing);
+  }
+
+  factory StyleSizing._factory(WidgetFactory wf) {
+    final existingInstance = _instances[wf];
+    if (existingInstance != null) {
+      return existingInstance;
+    }
+    return _instances[wf] = StyleSizing._(wf);
+  }
+
+  StyleSizing._(this.wf) {
+    opBlock = BuildOp(onWidgets: (meta, widgets) => widgets);
+
+    opChild = BuildOp(
+      onWidgets: (meta, widgets) {
+        final parentElement = meta.element.parent;
+        if (parentElement == null) {
+          return widgets;
+        }
+
+        final parentMeta = _elementMeta[parentElement];
+        if (parentMeta == null) {
+          return widgets;
+        }
+
+        final parentInput = _parse(parentMeta);
+        if (parentInput == null ||
+            (parentInput.minWidth == null &&
+                parentInput.preferredWidth == null)) {
+          return widgets;
+        }
+
+        return listOrNull(
+          wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
+            (context, child) {
+              final textDirection = meta.tsb.build(context).textDirection;
+              return _MinWidthZero(
+                textDirection: textDirection,
+                child: child,
+              );
+            },
+          ),
+        );
+      },
+      onWidgetsIsOptional: true,
+      priority: 0,
+    );
+
+    // ignore: literal_only_boolean_expressions
+    if (true) {
+      opSizing = BuildOp(
         onTreeFlattening: (meta, tree) {
           if (_skipBuilding[meta] == true) {
             return;
@@ -88,8 +154,10 @@ class StyleSizing {
           );
         },
         onWidgetsIsOptional: true,
-        priority: kPriority7k,
+        priority: StyleSizing.kPriorityBoxModel3k,
       );
+    }
+  }
 
   _StyleSizingInput? _parse(BuildMetadata meta) {
     CssLength? maxHeight;
@@ -136,6 +204,14 @@ class StyleSizing {
       }
     }
 
+    if (preferredWidth == null && _metaIsBlock[meta] == true) {
+      // `display: block` implies a 100% width
+      // but it MUST NOT reset width value if specified
+      // we need to keep track of block width to calculate contraints correctly
+      preferredWidth = k100percent;
+      preferredAxis ??= Axis.horizontal;
+    }
+
     if (maxHeight == null &&
         maxWidth == null &&
         minHeight == null &&
@@ -143,15 +219,6 @@ class StyleSizing {
         preferredHeight == null &&
         preferredWidth == null) {
       return null;
-    }
-
-    if (preferredWidth == null &&
-        meta.buildOps.whereType<DisplayBlockOp>().isNotEmpty) {
-      // `display: block` implies a 100% width
-      // but it MUST NOT reset width value if specified
-      // we need to keep track of block width to calculate contraints correctly
-      preferredWidth = const CssLength(100, CssLengthUnit.percentage);
-      preferredAxis ??= Axis.horizontal;
     }
 
     return _StyleSizingInput(
@@ -178,17 +245,51 @@ class StyleSizing {
   ) {
     final tsh = tsb.build(context);
 
+    final maxHeight = input.maxHeight?.getSizing(tsh);
+    final maxWidth = input.maxWidth?.getSizing(tsh);
+    final minHeight = input.minHeight?.getSizing(tsh);
+    final minWidth = input.minWidth?.getSizing(tsh);
+    final preferredHeight = input.preferredHeight?.getSizing(tsh);
+    final preferredWidth = input.preferredWidth?.getSizing(tsh);
+
+    if (maxHeight == null &&
+        maxWidth == null &&
+        minHeight == null &&
+        minWidth == null &&
+        preferredHeight == null &&
+        input.preferredWidth == k100percent) {
+      return CssBlock(child: child);
+    }
+
     return CssSizing(
-      maxHeight: input.maxHeight?.getSizing(tsh),
-      maxWidth: input.maxWidth?.getSizing(tsh),
-      minHeight: input.minHeight?.getSizing(tsh),
-      minWidth: input.minWidth?.getSizing(tsh),
+      maxHeight: maxHeight,
+      maxWidth: maxWidth,
+      minHeight: minHeight,
+      minWidth: minWidth,
       preferredAxis: input.preferredAxis,
-      preferredHeight: input.preferredHeight?.getSizing(tsh),
-      preferredWidth: input.preferredWidth?.getSizing(tsh),
+      preferredHeight: preferredHeight,
+      preferredWidth: preferredWidth,
       child: child,
     );
   }
+}
+
+class _MinWidthZero extends ConstraintsTransformBox {
+  const _MinWidthZero({
+    required Widget child,
+    Key? key,
+    required TextDirection textDirection,
+  }) : super(
+          alignment: textDirection == TextDirection.ltr
+              ? Alignment.topLeft
+              : Alignment.topRight,
+          constraintsTransform: transform,
+          key: key,
+          child: child,
+        );
+
+  static BoxConstraints transform(BoxConstraints bc) =>
+      bc.copyWith(minWidth: 0);
 }
 
 @immutable
