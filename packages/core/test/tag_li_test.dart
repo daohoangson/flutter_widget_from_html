@@ -906,6 +906,7 @@ Future<void> main() async {
                   'foo <img src="asset:$assetName" style="height: 30px;" /> bar',
               'img_inline_then_text':
                   '<img src="asset:$assetName" style="height: 30px;" /> foo',
+              // TODO: doesn't match browser output
               'li_within_li': '<li>Foo</li>',
               'list_within_li': '<ul><li>Foo</li></ul>',
               'list_of_items_within_li': '<ol><li>Foo</li><li>Bar</li></ol>',
