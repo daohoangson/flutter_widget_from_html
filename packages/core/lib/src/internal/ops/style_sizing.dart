@@ -28,7 +28,6 @@ extension CssLengthToSizing on CssLength {
 class StyleSizing {
   static const k100percent = CssLength(100, CssLengthUnit.percentage);
   static const kPriorityBoxModel3k = 3000;
-  static const kPriorityBoxModel8k = 8000;
 
   late final BuildOp opBlock;
   late final BuildOp opChild;
@@ -73,10 +72,7 @@ class StyleSizing {
   }
 
   StyleSizing._(this.wf) {
-    opBlock = BuildOp(
-      onWidgets: buildCssBlock,
-      priority: StyleSizing.kPriorityBoxModel8k,
-    );
+    opBlock = const BuildOp(onWidgets: bypass);
 
     opChild = BuildOp(
       onWidgets: buildMinWidthZero,
@@ -93,26 +89,6 @@ class StyleSizing {
     );
   }
 
-  Iterable<Widget>? buildCssBlock(
-    BuildMetadata blockMeta,
-    Iterable<WidgetPlaceholder> widgets,
-  ) {
-    if (_skipBuilding[blockMeta] == true || widgets.isEmpty) {
-      return widgets;
-    }
-
-    final input = _StyleSizingInput.tryParse(blockMeta);
-    if (input == null || !input.isBlock) {
-      return widgets;
-    }
-
-    return listOrNull(
-      wf
-          .buildColumnPlaceholder(blockMeta, widgets)
-          ?.wrapWith((c, w) => _build(c, w, input, blockMeta.tsb)),
-    );
-  }
-
   Iterable<Widget>? buildCssSizing(
     BuildMetadata meta,
     Iterable<WidgetPlaceholder> widgets,
@@ -122,7 +98,7 @@ class StyleSizing {
     }
 
     final input = _StyleSizingInput.tryParse(meta);
-    if (input == null || input.isBlock) {
+    if (input == null) {
       return widgets;
     }
 
@@ -170,6 +146,12 @@ class StyleSizing {
     );
   }
 
+  static Iterable<Widget>? bypass(
+    BuildMetadata _,
+    Iterable<WidgetPlaceholder> widgets,
+  ) =>
+      widgets;
+
   static void handleInlineSizing(BuildMetadata meta, BuildTree tree) {
     if (_skipBuilding[meta] == true) {
       return;
@@ -206,31 +188,29 @@ class StyleSizing {
     _StyleSizingInput input,
     TextStyleBuilder tsb,
   ) {
-    final tsh = tsb.build(context);
-
-    final maxHeight = input.maxHeight?.getSizing(tsh);
-    final maxWidth = input.maxWidth?.getSizing(tsh);
-    final minHeight = input.minHeight?.getSizing(tsh);
-    final minWidth = input.minWidth?.getSizing(tsh);
-    final preferredHeight = input.preferredHeight?.getSizing(tsh);
-    final preferredWidth = input.preferredWidth?.getSizing(tsh);
-
-    if (input.isBlock) {
+    if (input.maxHeight == null &&
+        input.maxWidth == null &&
+        input.minHeight == null &&
+        input.minWidth == null &&
+        input.preferredHeight == null &&
+        input.preferredWidth == StyleSizing.k100percent) {
       if (child is CssBlock) {
+        // deduplicate whenever possible
         return child;
       }
 
       return CssBlock(child: child);
     }
 
+    final tsh = tsb.build(context);
     return CssSizing(
-      maxHeight: maxHeight,
-      maxWidth: maxWidth,
-      minHeight: minHeight,
-      minWidth: minWidth,
+      maxHeight: input.maxHeight?.getSizing(tsh),
+      maxWidth: input.maxWidth?.getSizing(tsh),
+      minHeight: input.minHeight?.getSizing(tsh),
+      minWidth: input.minWidth?.getSizing(tsh),
       preferredAxis: input.preferredAxis,
-      preferredHeight: preferredHeight,
-      preferredWidth: preferredWidth,
+      preferredHeight: input.preferredHeight?.getSizing(tsh),
+      preferredWidth: input.preferredWidth?.getSizing(tsh),
       child: child,
     );
   }
@@ -256,7 +236,6 @@ class _MinWidthZero extends ConstraintsTransformBox {
 
 @immutable
 class _StyleSizingInput {
-  late final bool isBlock;
   final CssLength? maxHeight;
   final CssLength? maxWidth;
   final CssLength? minHeight;
@@ -265,7 +244,7 @@ class _StyleSizingInput {
   final CssLength? preferredHeight;
   final CssLength? preferredWidth;
 
-  _StyleSizingInput({
+  const _StyleSizingInput({
     this.maxHeight,
     this.maxWidth,
     this.minHeight,
@@ -273,14 +252,7 @@ class _StyleSizingInput {
     this.preferredAxis,
     this.preferredHeight,
     this.preferredWidth,
-  }) {
-    isBlock = maxHeight == null &&
-        maxWidth == null &&
-        minHeight == null &&
-        minWidth == null &&
-        preferredHeight == null &&
-        preferredWidth == StyleSizing.k100percent;
-  }
+  });
 
   factory _StyleSizingInput.fromMeta(BuildMetadata meta) {
     CssLength? maxHeight;
