@@ -34,26 +34,22 @@ class StyleTextAlign {
       case kCssTextAlignJustify:
       case kCssTextAlignLeft:
       case kCssTextAlignRight:
-        return widgets.map(_toStretchWidth);
+        return widgets
+            .map((child) => WidgetPlaceholder.lazy(child).wrapWith(_block));
       case kCssTextAlignMozCenter:
       case kCssTextAlignWebkitCenter:
-        return widgets.map(_toCenter);
+        return widgets
+            .map((child) => WidgetPlaceholder.lazy(child).wrapWith(_center));
     }
 
     return widgets;
   }
 
-  static Widget _toCenter(Widget w) =>
-      WidgetPlaceholder.lazy(w).wrapWith(_toCenterBuilder);
+  static Widget _block(BuildContext _, Widget child) =>
+      child is CssBlock ? child : CssBlock(child: child);
 
-  static Widget _toCenterBuilder(BuildContext _, Widget w) =>
-      _TextAlignCenter(w);
-
-  static Widget _toStretchWidth(Widget w) =>
-      WidgetPlaceholder.lazy(w).wrapWith(_toStretchWidthBuilder);
-
-  static Widget _toStretchWidthBuilder(BuildContext _, Widget w) =>
-      _TextAlignStretchWidth(w);
+  static Widget _center(BuildContext _, Widget child) =>
+      _TextAlignCenter(child);
 
   static TextStyleHtml _tsb(TextStyleHtml tsh, String value) {
     TextAlign? textAlign;
@@ -88,12 +84,4 @@ class StyleTextAlign {
 class _TextAlignCenter extends Center {
   const _TextAlignCenter(Widget child, {Key? key})
       : super(child: child, heightFactor: 1.0, key: key);
-}
-
-class _TextAlignStretchWidth extends ConstraintsTransformBox {
-  const _TextAlignStretchWidth(Widget child, {Key? key})
-      : super(constraintsTransform: transform, child: child, key: key);
-
-  static BoxConstraints transform(BoxConstraints bc) =>
-      bc.copyWith(minWidth: bc.hasBoundedWidth ? bc.maxWidth : null);
 }
