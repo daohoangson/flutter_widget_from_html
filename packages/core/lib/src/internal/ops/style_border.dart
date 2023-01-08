@@ -5,7 +5,7 @@ const kCssBoxSizingContentBox = 'content-box';
 const kCssBoxSizingBorderBox = 'border-box';
 
 class StyleBorder {
-  static const kPriorityBoxModel5k = 5000;
+  static const kPriorityBoxModel7k = 7000;
 
   final WidgetFactory wf;
 
@@ -62,7 +62,7 @@ class StyleBorder {
           ];
         },
         onWidgetsIsOptional: true,
-        priority: kPriorityBoxModel5k,
+        priority: kPriorityBoxModel7k,
       );
 
   Widget? _buildBorder(

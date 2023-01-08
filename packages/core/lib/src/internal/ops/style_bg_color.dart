@@ -4,6 +4,8 @@ const kCssBackground = 'background';
 const kCssBackgroundColor = 'background-color';
 
 class StyleBgColor {
+  static const kPriorityBoxModel7k5 = 7500;
+
   final WidgetFactory wf;
 
   static final _skipBuilding = Expando<bool>();
@@ -42,7 +44,7 @@ class StyleBgColor {
           );
         },
         onWidgetsIsOptional: true,
-        priority: StyleBorder.kPriorityBoxModel5k + 1,
+        priority: kPriorityBoxModel7k5,
       );
 
   Color? _parseColor(WidgetFactory wf, BuildMetadata meta) {

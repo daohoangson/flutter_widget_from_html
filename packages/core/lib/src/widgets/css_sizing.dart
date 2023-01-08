@@ -4,7 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 /// A CSS block.
-class CssBlock extends CssSizing {
+class CssBlock extends SingleChildRenderObjectWidget {
   /// Creates a CSS block.
   const CssBlock({required Widget child, Key? key})
       : super(child: child, key: key);
@@ -208,15 +208,13 @@ class _RenderCssSizing extends RenderProxyBox {
     final maxHeight = _maxHeight?.clamp(0.0, c.maxHeight) ?? c.maxHeight;
     final maxWidth = _maxWidth?.clamp(0.0, c.maxWidth) ?? c.maxWidth;
 
-    // special treatment for min values: ignore incoming constraint if it's tight
     final calculatedMinHeight = min(
       maxHeight,
-      _minHeight?.clamp(0.0, c.maxHeight) ??
-          (c.hasTightHeight ? .0 : c.minHeight),
+      _minHeight?.clamp(0.0, c.maxHeight) ?? c.minHeight,
     );
     final calculatedMinWidth = min(
       maxWidth,
-      _minWidth?.clamp(0.0, c.maxWidth) ?? (c.hasTightWidth ? .0 : c.minWidth),
+      _minWidth?.clamp(0.0, c.maxWidth) ?? c.minWidth,
     );
     // ignore min value if it's infinite
     final minHeight = calculatedMinHeight.isFinite ? calculatedMinHeight : .0;
