@@ -50,6 +50,6 @@ jobs:
           _deviceTypeId=$(echo $_deviceType | jq -r .identifier)
           echo "_deviceTypeId=$_deviceTypeId"
 
-          xcrun simctl create "$_deviceTypeName" "$_deviceTypeId" "$_runTime" | xargs xcrun simctl boot
+          xcrun simctl create "$_deviceTypeName" "$_deviceTypeId" "$_runtimeId" | xargs xcrun simctl boot
       - name: Run tests on iOS
         run: ./tool/integration.sh
