@@ -28,7 +28,6 @@ extension CssLengthToSizing on CssLength {
 class StyleSizing {
   static const k100percent = CssLength(100, CssLengthUnit.percentage);
   static const kPriorityBoxModel3k = 3000;
-  static const kPriorityBoxModel8k = 8000;
 
   late final BuildOp opBlock;
   late final BuildOp opChild;
@@ -107,7 +106,8 @@ class StyleSizing {
         );
       },
       onWidgetsIsOptional: true,
-      priority: 0,
+      // min-width resetter should wrap all other box model widgets
+      priority: StyleMargin.kPriorityBoxModel9k + 1,
     );
 
     // ignore: literal_only_boolean_expressions
