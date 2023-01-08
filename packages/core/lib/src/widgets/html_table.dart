@@ -399,6 +399,42 @@ class _TableRenderObject extends RenderBox
     return (data.rowSpan - 1) * rowGap;
   }
 
+  static List<double> redistributeValues(
+    List<double> values,
+    List<double> calculatedMinValues,
+    double available,
+  ) {
+    final effectiveMinValues = List.filled(values.length, .0);
+    for (var i = 0; i < values.length; i++) {
+      if (calculatedMinValues[i] > 0 && calculatedMinValues[i] >= values[i]) {
+        // min value is smaller than in-calculation width
+        // let's keep the current value as long as possible
+        // we want the column to grow to its dry size naturally
+        effectiveMinValues[i] = calculatedMinValues[i];
+      }
+    }
+
+    final remaining = max(.0, available - effectiveMinValues.sum);
+    var valuesSum = .0;
+    for (var i = 0; i < values.length; i++) {
+      if (effectiveMinValues[i] == 0) {
+        valuesSum += values[i];
+      }
+    }
+
+    final result = effectiveMinValues.toList(growable: false);
+    if (valuesSum > .0) {
+      for (var i = 0; i < values.length; i++) {
+        if (result[i] == 0) {
+          // calculate widths using weighted distribution
+          result[i] = values[i] / valuesSum * remaining;
+        }
+      }
+    }
+
+    return result;
+  }
+
   static _TableRenderLayout _performLayout(
     _TableRenderObject tro,
     RenderBox firstChild,
@@ -438,7 +474,7 @@ class _TableRenderObject extends RenderBox
       child = data.nextSibling;
     }
 
-    final columnGaps = (columnCount + 1) * tro.columnGap;
+    final columnGapsSum = (columnCount + 1) * tro.columnGap;
     final dryColumnWidths = List.filled(columnCount, 0.0);
     for (var i = 0; i < children.length; i++) {
       final data = cells[i];
@@ -458,51 +494,74 @@ class _TableRenderObject extends RenderBox
     var columnWidths = [...dryColumnWidths];
 
     final drySum = dryColumnWidths.sum;
-    final dryWidth = tro.paddingLeft + drySum + columnGaps + tro.paddingRight;
+    final dryWidth =
+        tro.paddingLeft + drySum + columnGapsSum + tro.paddingRight;
     if (constraints.hasBoundedWidth && dryWidth > constraints.maxWidth) {
       // viewport is too small: re-calculate widths using weighted distribution
       // e.g. if a column has huge dry width, it will have bigger width
       final availableWidth = constraints.maxWidth - (dryWidth - drySum);
-      columnWidths = dryColumnWidths
-          .map((dryColumnWidth) => dryColumnWidth / drySum * availableWidth)
-          .toList(growable: false);
+      final minColumnWidths = List.filled(columnCount, 0.0);
 
-      // calculate minimum widths and make sure we allocate enough room
-      for (var i = 0; i < children.length; i++) {
-        final child = children[i];
-        final data = cells[i];
-        final drySize = drySizes[i];
+      bool? shouldLoop;
+      var loopCount = 0;
+      while (shouldLoop != false) {
+        columnWidths = redistributeValues(
+          columnWidths,
+          minColumnWidths,
+          availableWidth,
+        );
+        shouldLoop = false;
 
-        final columnGaps = tro._calculateColumnGaps(data);
-        final dryColumnWidth = (drySize.width - columnGaps) / data.columnSpan;
-        var columnWidthSmallerThanDry = false;
-        for (var c = 0; c < data.columnSpan; c++) {
-          final column = data.columnStart + c;
-          if (columnWidths[column] < dryColumnWidth) {
-            columnWidthSmallerThanDry = true;
-            break;
+        // calculate minimum widths and make sure we allocate enough room
+        for (var i = 0; i < children.length; i++) {
+          final child = children[i];
+          final data = cells[i];
+          final drySize = drySizes[i];
+
+          final dataGaps = tro._calculateColumnGaps(data);
+          final inCalculationWidth = columnWidths
+                  .getRange(
+                    data.columnStart,
+                    data.columnStart + data.columnSpan,
+                  )
+                  .sum +
+              dataGaps;
+          if (drySize.width > inCalculationWidth) {
+            double? minWidth;
+            try {
+              // this call is expensive, we try to avoid it as much as possible
+              // width being smaller than dry size means the table is too crowded
+              // calculating min to avoid breaking line in the middle of a word
+              minWidth = child.getMinIntrinsicWidth(double.infinity);
+            } catch (minWidthError, stackTrace) {
+              minWidth = drySize.width;
+              debugPrint('Ignored getMinIntrinsicWidth error: '
+                  '$minWidthError\n$stackTrace');
+            }
+
+            final minColumnWidth = (minWidth - dataGaps) / data.columnSpan;
+            for (var c = 0; c < data.columnSpan; c++) {
+              final column = data.columnStart + c;
+              minColumnWidths[column] =
+                  max(minColumnWidths[column], minColumnWidth);
+            }
+
+            // keep track of min width in the array to avoid
+            // processing the same child more than once
+            drySizes[i] = Size(minWidth, 0);
+
+            // the loop should run at least one more time with new min-width
+            shouldLoop = true;
           }
         }
 
-        if (columnWidthSmallerThanDry) {
-          double? minWidth;
-          try {
-            // this call is expensive, we try to avoid it as much as possible
-            // width being smaller than dry size means the table is too crowded
-            // calculating min to avoid breaking line in the middle of a word
-            minWidth = child.getMinIntrinsicWidth(double.infinity);
-          } catch (minWidthError, stackTrace) {
-            debugPrint('Ignored getMinIntrinsicWidth error: '
-                '$minWidthError\n$stackTrace');
-          }
-
-          if (minWidth != null) {
-            final minColumnWidth = (minWidth - columnGaps) / data.columnSpan;
-            for (var c = 0; c < data.columnSpan; c++) {
-              final column = data.columnStart + c;
-              columnWidths[column] = max(columnWidths[column], minColumnWidth);
-            }
-          }
+        loopCount++;
+        if (loopCount > columnCount) {
+          // using column count to stop early, not a typo
+          // we don't want to waste too much time in this loop
+          // in case the table is extra long with many many rows
+          debugPrint('Stopped to avoid infinite loops latest=$columnWidths');
+          break;
         }
       }
     }
@@ -541,7 +600,7 @@ class _TableRenderObject extends RenderBox
     final deltaHeight =
         max(0, (constraintedHeight - calculatedHeight) / rowCount);
     final calculatedWidth =
-        tro.paddingLeft + columnWidths.sum + columnGaps + tro.paddingRight;
+        tro.paddingLeft + columnWidths.sum + columnGapsSum + tro.paddingRight;
     for (var i = 0; i < children.length; i++) {
       final child = children[i];
       final data = cells[i];
