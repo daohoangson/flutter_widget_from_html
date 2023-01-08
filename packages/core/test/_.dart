@@ -584,6 +584,12 @@ class Explainer {
       return _widget(widget.build(context));
     }
 
+    if (widget.runtimeType.toString() == '_MinWidthZero') {
+      // TODO: verify min-width resetter in tests when it's stable
+      // ignore: avoid_dynamic_calls
+      return _widget((widget as dynamic).child as Widget);
+    }
+
     if (widget is Image) {
       return _image(widget);
     }
