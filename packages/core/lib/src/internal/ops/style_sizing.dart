@@ -28,6 +28,7 @@ extension CssLengthToSizing on CssLength {
 class StyleSizing {
   static const k100percent = CssLength(100, CssLengthUnit.percentage);
   static const kPriorityBoxModel3k = 3000;
+  static const kPriorityBoxModel8k = 8000;
 
   late final BuildOp opBlock;
   late final BuildOp opChild;
@@ -72,10 +73,32 @@ class StyleSizing {
   }
 
   StyleSizing._(this.wf) {
-    opBlock = BuildOp(onWidgets: (meta, widgets) => widgets);
+    opBlock = BuildOp(
+      onWidgets: (meta, widgets) {
+        if (_skipBuilding[meta] == true || widgets.isEmpty) {
+          return widgets;
+        }
+
+        final input = _parse(meta);
+        if (input == null || !input.isBlock) {
+          return widgets;
+        }
+
+        return listOrNull(
+          wf
+              .buildColumnPlaceholder(meta, widgets)
+              ?.wrapWith((c, w) => _build(c, w, input, meta.tsb)),
+        );
+      },
+      priority: StyleSizing.kPriorityBoxModel8k,
+    );
 
     opChild = BuildOp(
       onWidgets: (meta, widgets) {
+        if (_parse(meta)?.preferredWidth == k100percent) {
+          return widgets;
+        }
+
         final parentElement = meta.element.parent;
         if (parentElement == null) {
           return widgets;
@@ -143,7 +166,7 @@ class StyleSizing {
           }
 
           final input = _parse(meta);
-          if (input == null) {
+          if (input == null || input.isBlock) {
             return widgets;
           }
 
@@ -252,12 +275,11 @@ class StyleSizing {
     final preferredHeight = input.preferredHeight?.getSizing(tsh);
     final preferredWidth = input.preferredWidth?.getSizing(tsh);
 
-    if (maxHeight == null &&
-        maxWidth == null &&
-        minHeight == null &&
-        minWidth == null &&
-        preferredHeight == null &&
-        input.preferredWidth == k100percent) {
+    if (input.isBlock) {
+      if (child is CssBlock) {
+        return child;
+      }
+
       return CssBlock(child: child);
     }
 
@@ -294,6 +316,7 @@ class _MinWidthZero extends ConstraintsTransformBox {
 
 @immutable
 class _StyleSizingInput {
+  late final bool isBlock;
   final CssLength? maxHeight;
   final CssLength? maxWidth;
   final CssLength? minHeight;
@@ -302,7 +325,7 @@ class _StyleSizingInput {
   final CssLength? preferredHeight;
   final CssLength? preferredWidth;
 
-  const _StyleSizingInput({
+  _StyleSizingInput({
     this.maxHeight,
     this.maxWidth,
     this.minHeight,
@@ -310,5 +333,12 @@ class _StyleSizingInput {
     this.preferredAxis,
     this.preferredHeight,
     this.preferredWidth,
-  });
+  }) {
+    isBlock = maxHeight == null &&
+        maxWidth == null &&
+        minHeight == null &&
+        minWidth == null &&
+        preferredHeight == null &&
+        preferredWidth == StyleSizing.k100percent;
+  }
 }
