@@ -1,5 +1,6 @@
 ## 0.9.1
 
+- Adjust text-decoration-line cascading logic (#843)
 - Try catch possible errors during table layout (#846)
 - Add support for `list-style-type: none` (#847)
 - Add support for `src` attribute in VIDEO tag (#848)
