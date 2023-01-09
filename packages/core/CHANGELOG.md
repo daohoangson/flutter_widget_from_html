@@ -1,3 +1,10 @@
+## 0.9.1
+
+- Try catch possible errors during table layout (#846)
+- Add support for `list-style-type: none` (#847)
+- Adjust sizing logic for IMG tag (#854)
+- Redistribute table column width to avoid overflow (#856)
+
 ## 0.9.0+2
 
 - Change column width calculation logic (#747)
