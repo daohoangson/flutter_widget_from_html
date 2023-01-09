@@ -1,3 +1,11 @@
+## 0.9.1
+
+- Try catch possible errors during table layout (#846)
+- Add support for `list-style-type: none` (#847)
+- Add support for `src` attribute in VIDEO tag (#848)
+- Adjust sizing logic for IMG tag (#854)
+- Redistribute table column width to avoid overflow (#856)
+
 ## 0.9.0+2
 
 - Add support for webview_flutter@4.0.0 (#841)

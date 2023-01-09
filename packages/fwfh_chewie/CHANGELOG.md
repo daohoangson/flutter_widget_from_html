@@ -1,3 +1,7 @@
+## 0.7.1
+
+- Add support for `src` attribute in VIDEO tag (#848)
+
 ## 0.7.0+3
 
 - Fix context usage across async gaps (#835)
