@@ -6,8 +6,7 @@ import 'package:flutter/widgets.dart';
 /// A CSS block.
 class CssBlock extends SingleChildRenderObjectWidget {
   /// Creates a CSS block.
-  const CssBlock({required Widget child, Key? key})
-      : super(child: child, key: key);
+  const CssBlock({required Widget super.child, super.key});
 
   @override
   RenderObject createRenderObject(BuildContext _) =>
@@ -54,8 +53,8 @@ class CssSizing extends SingleChildRenderObjectWidget {
 
   /// Creates a CSS sizing.
   const CssSizing({
-    required Widget child,
-    Key? key,
+    required Widget super.child,
+    super.key,
     this.maxHeight,
     this.maxWidth,
     this.minHeight,
@@ -63,7 +62,7 @@ class CssSizing extends SingleChildRenderObjectWidget {
     this.preferredAxis,
     this.preferredHeight,
     this.preferredWidth,
-  }) : super(child: child, key: key);
+  });
 
   @override
   RenderObject createRenderObject(BuildContext _) => _RenderCssSizing(

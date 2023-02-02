@@ -248,18 +248,17 @@ class _BodyItemWidget extends ProxyWidget {
   final AnchorRegistry registry;
 
   const _BodyItemWidget({
-    required Widget child,
+    required super.child,
     required this.index,
     required this.registry,
-    Key? key,
-  }) : super(key: key, child: child);
+  });
 
   @override
   Element createElement() => _BodyItemElement(this);
 }
 
 class _BodyItemElement extends ProxyElement {
-  _BodyItemElement(_BodyItemWidget widget) : super(widget);
+  _BodyItemElement(super.widget);
 
   _BodyItemWidget get bodyItem => widget as _BodyItemWidget;
 

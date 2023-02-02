@@ -6,8 +6,7 @@ import 'package:flutter/widgets.dart';
 /// A RUBY widget.
 class HtmlRuby extends MultiChildRenderObjectWidget {
   /// Creates a RUBY widget.
-  HtmlRuby(Widget ruby, Widget rt, {Key? key})
-      : super(children: [ruby, rt], key: key);
+  HtmlRuby(Widget ruby, Widget rt, {super.key}) : super(children: [ruby, rt]);
 
   @override
   RenderObject createRenderObject(BuildContext _) => _RubyRenderObject();

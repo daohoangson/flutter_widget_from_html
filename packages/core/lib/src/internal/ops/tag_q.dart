@@ -16,11 +16,7 @@ class TagQ {
 class _TagQBit extends BuildBit<void, String> {
   final bool isOpening;
 
-  const _TagQBit(
-    BuildTree parent,
-    TextStyleBuilder tsb, {
-    required this.isOpening,
-  }) : super(parent, tsb);
+  const _TagQBit(super.parent, super.tsb, {required this.isOpening});
 
   @override
   String buildBit(void _) => isOpening ? '“' : '”';

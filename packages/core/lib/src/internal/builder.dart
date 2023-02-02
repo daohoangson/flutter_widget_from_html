@@ -26,10 +26,10 @@ class BuildMetadata extends core_data.BuildMetadata {
   var _stylesIsLocked = false;
 
   BuildMetadata(
-    dom.Element element,
-    TextStyleBuilder tsb, [
+    super.element,
+    super.tsb, [
     this._parentOps = const [],
-  ]) : super(element, tsb);
+  ]);
 
   @override
   Iterable<BuildOp> get buildOps => _buildOps ?? const [];
