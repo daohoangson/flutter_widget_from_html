@@ -82,5 +82,6 @@ class StyleTextAlign {
 }
 
 class _TextAlignCenter extends Center {
-  const _TextAlignCenter(Widget child) : super(child: child, heightFactor: 1.0);
+  const _TextAlignCenter(Widget child, {Key? key})
+      : super(child: child, heightFactor: 1.0, key: key);
 }

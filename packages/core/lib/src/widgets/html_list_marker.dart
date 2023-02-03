@@ -13,22 +13,25 @@ class HtmlListMarker extends LeafRenderObjectWidget {
 
   /// Creates a marker.
   const HtmlListMarker({
-    super.key,
     required this.markerType,
     required this.textStyle,
-  });
+    Key? key,
+  }) : super(key: key);
 
   /// Creates a circle marker.
-  const HtmlListMarker.circle(this.textStyle, {super.key})
-      : markerType = HtmlListMarkerType.circle;
+  const HtmlListMarker.circle(this.textStyle, {Key? key})
+      : markerType = HtmlListMarkerType.circle,
+        super(key: key);
 
   /// Creates a disc marker.
-  const HtmlListMarker.disc(this.textStyle, {super.key})
-      : markerType = HtmlListMarkerType.disc;
+  const HtmlListMarker.disc(this.textStyle, {Key? key})
+      : markerType = HtmlListMarkerType.disc,
+        super(key: key);
 
   /// Creates a square marker.
-  const HtmlListMarker.square(this.textStyle, {super.key})
-      : markerType = HtmlListMarkerType.square;
+  const HtmlListMarker.square(this.textStyle, {Key? key})
+      : markerType = HtmlListMarkerType.square,
+        super(key: key);
 
   @override
   RenderObject createRenderObject(BuildContext _) =>

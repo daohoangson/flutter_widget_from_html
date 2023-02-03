@@ -164,9 +164,10 @@ class WidgetPlaceholder<T> extends StatelessWidget {
     this.generator, {
     bool autoUnwrap = true,
     Widget? child,
-    super.key,
+    Key? key,
   })  : _autoUnwrap = autoUnwrap,
-        _firstChild = child;
+        _firstChild = child,
+        super(key: key);
 
   @visibleForTesting
   @override

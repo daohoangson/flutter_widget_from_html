@@ -486,7 +486,8 @@ class _BuildBitWidgetFactory extends WidgetFactory {
 }
 
 class _InputBuildContextBit extends BuildBit<BuildContext, Widget> {
-  const _InputBuildContextBit(super.parent, super.tsb);
+  const _InputBuildContextBit(BuildTree? parent, TextStyleBuilder tsb)
+      : super(parent, tsb);
 
   @override
   bool get isInline => false;
@@ -500,7 +501,8 @@ class _InputBuildContextBit extends BuildBit<BuildContext, Widget> {
 }
 
 class _InputGestureRecognizerBit extends BuildBit<GestureRecognizer?, dynamic> {
-  const _InputGestureRecognizerBit(super.parent, super.tsb);
+  const _InputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder tsb)
+      : super(parent, tsb);
 
   @override
   dynamic buildBit(GestureRecognizer? recognizer) {
@@ -518,7 +520,8 @@ class _InputGestureRecognizerBit extends BuildBit<GestureRecognizer?, dynamic> {
 }
 
 class _InputVoidBit extends BuildBit<void, dynamic> {
-  const _InputVoidBit(super.parent, super.tsb);
+  const _InputVoidBit(BuildTree? parent, TextStyleBuilder tsb)
+      : super(parent, tsb);
 
   @override
   dynamic buildBit(void _) => '(null)';
@@ -529,7 +532,8 @@ class _InputVoidBit extends BuildBit<void, dynamic> {
 }
 
 class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {
-  const _InputTextStyleHtmlBit(super.parent, super.tsb);
+  const _InputTextStyleHtmlBit(BuildTree? parent, TextStyleBuilder tsb)
+      : super(parent, tsb);
 
   @override
   InlineSpan buildBit(TextStyleHtml tsh) =>
@@ -541,7 +545,8 @@ class _InputTextStyleHtmlBit extends BuildBit<TextStyleHtml, InlineSpan> {
 }
 
 class _OutputGestureRecognizerBit extends BuildBit<void, GestureRecognizer> {
-  const _OutputGestureRecognizerBit(super.parent, super.tsb);
+  const _OutputGestureRecognizerBit(BuildTree? parent, TextStyleBuilder tsb)
+      : super(parent, tsb);
 
   @override
   GestureRecognizer buildBit(void _) => MultiTapGestureRecognizer();
@@ -552,7 +557,8 @@ class _OutputGestureRecognizerBit extends BuildBit<void, GestureRecognizer> {
 }
 
 class _OutputInlineSpanBit extends BuildBit<void, InlineSpan> {
-  const _OutputInlineSpanBit(super.parent, super.tsb);
+  const _OutputInlineSpanBit(BuildTree? parent, TextStyleBuilder tsb)
+      : super(parent, tsb);
 
   @override
   InlineSpan buildBit(void _) => const WidgetSpan(child: Text('foo'));
@@ -563,7 +569,8 @@ class _OutputInlineSpanBit extends BuildBit<void, InlineSpan> {
 }
 
 class _OutputStringBit extends BuildBit<void, String> {
-  const _OutputStringBit(super.parent, super.tsb);
+  const _OutputStringBit(BuildTree? parent, TextStyleBuilder tsb)
+      : super(parent, tsb);
 
   @override
   String buildBit(void _) => 'foo';
@@ -574,7 +581,8 @@ class _OutputStringBit extends BuildBit<void, String> {
 }
 
 class _OutputWidgetBit extends BuildBit<void, Widget> {
-  const _OutputWidgetBit(super.parent, super.tsb);
+  const _OutputWidgetBit(BuildTree? parent, TextStyleBuilder tsb)
+      : super(parent, tsb);
 
   @override
   bool get isInline => false;

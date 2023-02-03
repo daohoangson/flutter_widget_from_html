@@ -160,7 +160,7 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
   final _children = <BuildBit>[];
 
   /// Creates a tree.
-  BuildTree(super.parent, super.tsb);
+  BuildTree(BuildTree? parent, TextStyleBuilder tsb) : super(parent, tsb);
 
   /// Anchor keys of this tree and its children.
   Iterable<Key>? get anchors => _anchors[this];
@@ -313,12 +313,12 @@ class WidgetBit extends BuildBit<void, dynamic> {
   final WidgetPlaceholder child;
 
   const WidgetBit._(
-    super.parent,
-    super.tsb,
+    BuildTree parent,
+    TextStyleBuilder tsb,
     this.child, [
     this.alignment,
     this.baseline,
-  ]);
+  ]) : super(parent, tsb);
 
   /// Creates a block widget.
   factory WidgetBit.block(

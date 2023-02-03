@@ -11,10 +11,10 @@ class HtmlListItem extends MultiChildRenderObjectWidget {
   /// Creates a list item widget.
   HtmlListItem({
     required Widget child,
-    super.key,
+    Key? key,
     required Widget marker,
     required this.textDirection,
-  }) : super(children: [child, marker]);
+  }) : super(children: [child, marker], key: key);
 
   @override
   RenderObject createRenderObject(BuildContext _) =>

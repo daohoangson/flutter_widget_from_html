@@ -218,13 +218,16 @@ class StyleSizing {
 
 class _MinWidthZero extends ConstraintsTransformBox {
   const _MinWidthZero({
-    required Widget super.child,
+    required Widget child,
+    Key? key,
     required TextDirection textDirection,
   }) : super(
           alignment: textDirection == TextDirection.ltr
               ? Alignment.topLeft
               : Alignment.topRight,
           constraintsTransform: transform,
+          key: key,
+          child: child,
         );
 
   static BoxConstraints transform(BoxConstraints bc) =>

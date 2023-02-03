@@ -55,7 +55,8 @@ class TagA {
 class _TagABit extends BuildBit<GestureRecognizer?, GestureRecognizer> {
   final GestureTapCallback onTap;
 
-  const _TagABit(super.parent, super.tsb, this.onTap);
+  const _TagABit(BuildTree? parent, TextStyleBuilder tsb, this.onTap)
+      : super(parent, tsb);
 
   @override
   bool? get swallowWhitespace => null;

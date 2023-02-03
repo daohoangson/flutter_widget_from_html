@@ -9,8 +9,8 @@ class HtmlDetails extends StatefulWidget {
   const HtmlDetails({
     required this.child,
     this.open = false,
-    super.key,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<HtmlDetails> createState() => _HtmlDetailsState();
@@ -51,7 +51,7 @@ class _HtmlDetailsState extends State<HtmlDetails> {
 class HtmlDetailsContents extends StatelessWidget {
   final Widget child;
 
-  const HtmlDetailsContents({required this.child, super.key});
+  const HtmlDetailsContents({required this.child, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +63,7 @@ class HtmlDetailsContents extends StatelessWidget {
 class HtmlDetailsMarker extends StatelessWidget {
   final TextStyle style;
 
-  const HtmlDetailsMarker({super.key, required this.style});
+  const HtmlDetailsMarker({Key? key, required this.style}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +85,11 @@ class HtmlSummary extends StatelessWidget {
   final Widget? child;
   final TextStyle style;
 
-  const HtmlSummary({super.key, this.child, required this.style});
+  const HtmlSummary({
+    Key? key,
+    this.child,
+    required this.style,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -120,10 +124,11 @@ class _HtmlDetailsInherited extends InheritedWidget {
   final void Function(bool) setIsOpen;
 
   const _HtmlDetailsInherited({
-    required super.child,
+    required Widget child,
+    Key? key,
     required this.isOpen,
     required this.setIsOpen,
-  });
+  }) : super(key: key, child: child);
 
   @override
   bool updateShouldNotify(_HtmlDetailsInherited oldWidget) =>

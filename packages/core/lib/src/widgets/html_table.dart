@@ -30,10 +30,10 @@ class HtmlTable extends MultiChildRenderObjectWidget {
     this.border,
     this.borderCollapse = false,
     this.borderSpacing = 0.0,
-    required super.children,
-    super.key,
+    required List<Widget> children,
     this.textDirection = TextDirection.ltr,
-  });
+    Key? key,
+  }) : super(children: children, key: key);
 
   @override
   RenderObject createRenderObject(BuildContext _) => _TableRenderObject(
@@ -80,14 +80,17 @@ class HtmlTable extends MultiChildRenderObjectWidget {
 class HtmlTableCaption extends HtmlTableCell {
   /// Creates a table caption widget.
   const HtmlTableCaption({
-    required super.child,
-    required super.columnSpan,
-    super.key,
+    required Widget child,
+    required int columnSpan,
     required int rowIndex,
+    Key? key,
   }) : super._(
           columnStart: 0,
+          columnSpan: columnSpan,
           isCaption: true,
+          key: key,
           rowStart: rowIndex,
+          child: child,
         );
 }
 
@@ -127,11 +130,11 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
 
   const HtmlTableCell._({
     this.border,
-    required super.child,
+    required Widget child,
     this.columnSpan = 1,
     required this.columnStart,
     bool isCaption = false,
-    super.key,
+    Key? key,
     this.rowSpan = 1,
     required this.rowStart,
     this.width,
@@ -139,7 +142,8 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
         assert(columnStart >= 0),
         assert(rowSpan >= 1),
         assert(rowStart >= 0),
-        _isCaption = isCaption;
+        _isCaption = isCaption,
+        super(child: child, key: key);
 
   @override
   void applyParentData(RenderObject renderObject) {

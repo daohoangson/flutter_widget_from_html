@@ -699,7 +699,7 @@ void main() {
 class _Golden extends StatelessWidget {
   final String html;
 
-  const _Golden(this.html);
+  const _Golden(this.html, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext _) => Scaffold(
