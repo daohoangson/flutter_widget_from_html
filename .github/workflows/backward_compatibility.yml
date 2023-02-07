@@ -65,7 +65,7 @@ jobs:
           yq e ".environment.sdk = \"${_sdkVersion}\"" -i pubspec.yaml
 
           # extract Flutter version to install later
-          _flutterVersion=$( yq e '.environment.flutter' pubspec.yaml )
+          _flutterVersion=$( yq e '.environment.flutter' pubspec.yaml | sed -e 's/^>=//' | sed -e 's/-0$//' )
           echo "FLUTTER_VERSION=${_flutterVersion}" >> $GITHUB_ENV
 
           # output for debugging

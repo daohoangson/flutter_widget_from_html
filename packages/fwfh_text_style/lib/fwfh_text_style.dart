@@ -37,7 +37,7 @@ class FwfhTextStyle extends _TextStyleProxy {
   static TextStyle of(BuildContext context) =>
       FwfhTextStyle.from(DefaultTextStyle.of(context).style);
 
-  FwfhTextStyle._(TextStyle ref) : super._(ref);
+  FwfhTextStyle._(super.ref) : super._();
 
   @override
   TextStyle apply({
