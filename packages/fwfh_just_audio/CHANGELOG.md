@@ -1,3 +1,7 @@
+## 0.9.0+1
+
+- Add support for flutter_widget_from_html_core@0.10.0 (#867)
+
 ## 0.9.0
 
 - Minimum supported Flutter version is 2.2 (#828)

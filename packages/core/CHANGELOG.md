@@ -1,3 +1,7 @@
+## 0.10.0
+
+- Add support for Flutter 3.7 (#861)
+
 ## 0.9.1
 
 - Adjust text-decoration-line cascading logic (#843)
