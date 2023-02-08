@@ -1,3 +1,8 @@
+## 0.10.0
+
+- Add support for Flutter 3.7 (#861)
+- Update dependency flutter_svg to v2 (#862)
+
 ## 0.9.1
 
 - Adjust text-decoration-line cascading logic (#843)
