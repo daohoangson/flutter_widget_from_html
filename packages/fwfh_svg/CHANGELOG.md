@@ -1,3 +1,7 @@
+## 0.8.0+1
+
+- Add support for flutter_widget_from_html_core@0.10.0 (#867)
+
 ## 0.8.0
 
 - Update dependency flutter_svg to v2 #862
