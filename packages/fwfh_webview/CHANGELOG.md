@@ -1,3 +1,7 @@
+## 0.7.0+1
+
+- Add support for flutter_widget_from_html_core@0.10.0 (#867)
+
 ## 0.7.0
 
 - Add support for webview_flutter@4.0.0 (#841)
