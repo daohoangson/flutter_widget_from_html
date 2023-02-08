@@ -34,7 +34,7 @@ class Golden extends StatelessWidget {
       if (withEnhanced)
         Text(
           'flutter_widget_from_html_core:\n',
-          style: Theme.of(context).textTheme.caption,
+          style: Theme.of(context).textTheme.bodySmall,
         ),
       LimitedBox(
         maxHeight: 400,
@@ -50,7 +50,7 @@ class Golden extends StatelessWidget {
         const Divider(),
         Text(
           'flutter_widget_from_html:\n',
-          style: Theme.of(context).textTheme.caption,
+          style: Theme.of(context).textTheme.bodySmall,
         ),
         LimitedBox(
           maxHeight: 400,
