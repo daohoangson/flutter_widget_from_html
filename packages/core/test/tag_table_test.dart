@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
@@ -132,6 +133,25 @@ Future<void> main() async {
       expect(explained, contains('[RichText:align=right,(:Value (+i:1))]'));
       expect(explained, contains('[RichText:align=right,(+b:Value 2)]'));
     });
+  });
+
+  testWidgets("No Overflowing Text", (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 500,
+            child: HtmlWidget("""
+    <table><tr><td>
+    <p>https://tech.slashdot.org/story/23/05/06/1715225/nvidia-details-neural-texture-compression-claims-significant-improvements?utm_source=atom1.0mainlinkanon&amp;utm_medium=feed</p>
+    </td></tr></table>"""),
+          ),
+        ),
+      ),
+    );
+
+    final RenderParagraph renderParagraph = tester.renderObject(find.byType(RichText)) as RenderParagraph;
+    expect(renderParagraph.size.width <= 500, true);
   });
 
   group('border', () {
