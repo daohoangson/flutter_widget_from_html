@@ -235,14 +235,14 @@ packages:
       path: "../packages/enhanced"
       relative: true
     source: path
-    version: "0.9.1"
+    version: "0.10.0"
   flutter_widget_from_html_core:
     dependency: "direct main"
     description:
       path: "../packages/core"
       relative: true
     source: path
-    version: "0.9.1"
+    version: "0.10.0"
   frontend_server_client:
     dependency: transitive
     description:
@@ -262,28 +262,28 @@ packages:
       path: "../packages/fwfh_cached_network_image"
       relative: true
     source: path
-    version: "0.7.0+3"
+    version: "0.7.0+4"
   fwfh_chewie:
     dependency: "direct main"
     description:
       path: "../packages/fwfh_chewie"
       relative: true
     source: path
-    version: "0.7.1"
+    version: "0.7.1+1"
   fwfh_just_audio:
     dependency: "direct overridden"
     description:
       path: "../packages/fwfh_just_audio"
       relative: true
     source: path
-    version: "0.9.0"
+    version: "0.9.0+1"
   fwfh_svg:
     dependency: "direct overridden"
     description:
       path: "../packages/fwfh_svg"
       relative: true
     source: path
-    version: "0.7.2+1"
+    version: "0.8.0+1"
   fwfh_text_style:
     dependency: "direct overridden"
     description:
@@ -297,14 +297,14 @@ packages:
       path: "../packages/fwfh_url_launcher"
       relative: true
     source: path
-    version: "0.9.0"
+    version: "0.9.0+1"
   fwfh_webview:
     dependency: "direct main"
     description:
       path: "../packages/fwfh_webview"
       relative: true
     source: path
-    version: "0.7.0"
+    version: "0.7.0+1"
   glob:
     dependency: transitive
     description:
@@ -317,10 +317,10 @@ packages:
     dependency: "direct dev"
     description:
       name: golden_toolkit
-      sha256: ec9d7f1f429ad8c317f1dd08e6e4c81535af5d68e8bd05e02a07edb2e9e9f7ad
+      sha256: "8f74adab33154fe7b731395782797021f97d2edc52f7bfb85ff4f1b5c4a215f0"
       url: "https://pub.dev"
     source: hosted
-    version: "0.13.0"
+    version: "0.15.0"
   html:
     dependency: "direct main"
     description:
