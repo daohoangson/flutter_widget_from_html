@@ -1,4 +1,4 @@
-name: Scorecard supply-chain security
+name: Security
 on:
   branch_protection_rule:
   schedule:
@@ -9,7 +9,7 @@ on:
 permissions: read-all
 
 jobs:
-  analysis:
+  ossf:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -32,3 +32,13 @@ jobs:
       - uses: github/codeql-action/upload-sarif@29b1f65c5e92e24fe6b6647da1eaabe529cec70f # v2.3.3
         with:
           sarif_file: results.sarif
+
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@128a63446a954579617e875aaab7d2978154e969 # v2.4.0
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
+      - uses: actions/dependency-review-action@0efb1d1d84fc9633afcdaad14c485cbbc90ef46c # v2.5.1
