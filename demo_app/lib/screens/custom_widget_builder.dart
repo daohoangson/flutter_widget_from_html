@@ -25,7 +25,7 @@ const kHtml = '''
 ''';
 
 class CustomWidgetBuilderScreen extends StatelessWidget {
-  const CustomWidgetBuilderScreen({Key key}) : super(key: key);
+  const CustomWidgetBuilderScreen({super.key});
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -45,7 +45,9 @@ class CustomWidgetBuilderScreen extends StatelessWidget {
                 final srcs = <String>[];
                 for (final child in e.children) {
                   for (final grandChild in child.children) {
-                    srcs.add(grandChild.attributes['src']);
+                    if (grandChild.attributes case {'src': final String src}) {
+                      srcs.add(src);
+                    }
                   }
                 }
 

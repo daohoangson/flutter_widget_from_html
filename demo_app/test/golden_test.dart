@@ -38,7 +38,6 @@ void _test(
             builder: (_) => Golden(name, html, targetKey: key),
           ),
           wrapper: materialAppWrapper(
-            platform: platform,
             theme: ThemeData.light(),
           ),
           surfaceSize: const Size(400, 1200),
