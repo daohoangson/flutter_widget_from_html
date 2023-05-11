@@ -7,7 +7,7 @@ environment:
   flutter: ">=3.7.0-0"
 
   # flutter@3.7 uses sdk@2.19 but our test scripts are reused in earlier SDK
-  sdk: ">=2.13.0 <3.0.0"
+  sdk: ">=2.13.0 <4.0.0"
 
 dependencies:
   csslib: ^0.17.0
@@ -23,7 +23,7 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  golden_toolkit: ^0.13.0
+  golden_toolkit: ^0.15.0
   lint: any
   mocktail_image_network: ^0.3.0
   test: any

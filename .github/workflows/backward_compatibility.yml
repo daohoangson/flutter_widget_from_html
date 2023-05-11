@@ -7,6 +7,9 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
 jobs:
   test:
     strategy:
@@ -30,7 +33,7 @@ jobs:
     env:
       GOLDEN_SKIP: "yes"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
       - name: Update pubspec.yaml
         run: |
           set -e
@@ -72,8 +75,9 @@ jobs:
           cat pubspec.yaml
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
         with:
+          cache: true
           flutter-version: ${{ env.FLUTTER_VERSION }}
       - run: flutter test
 
@@ -97,7 +101,7 @@ jobs:
     env:
       GOLDEN_SKIP: "yes"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
       - name: Update pubspec.yaml
         run: |
           set -e
@@ -110,7 +114,8 @@ jobs:
           # output for debugging
           cat pubspec.yaml
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
         with:
+          cache: true
           channel: ${{ matrix.channel }}
       - run: flutter test

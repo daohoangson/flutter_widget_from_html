@@ -5,7 +5,7 @@ homepage: https://github.com/daohoangson/flutter_widget_from_html
 
 environment:
   flutter: ">=3.7.0"
-  sdk: ">=2.19.0 <3.0.0"
+  sdk: ">=2.19.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -41,7 +41,7 @@ dev_dependencies:
   file:
   flutter_test:
     sdk: flutter
-  golden_toolkit: ^0.13.0
+  golden_toolkit: ^0.15.0
   lint: any
   mocktail: ^0.3.0
 
