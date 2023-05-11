@@ -20,11 +20,11 @@ class PopupMenu extends StatelessWidget {
   final bool toggleIsSelectable;
 
   const PopupMenu({
-    Key key,
+    super.key,
     this.scrollToTop = false,
     this.showPerfOverlay = true,
     this.toggleIsSelectable = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -84,10 +84,10 @@ class PopupMenuStateProvider extends StatelessWidget {
   final bool initialIsSelectable;
 
   const PopupMenuStateProvider({
-    @required this.builder,
+    required this.builder,
     this.initialIsSelectable = false,
-    Key key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -107,10 +107,9 @@ class _CheckBoxMenuItem extends StatelessWidget {
   final bool value;
 
   const _CheckBoxMenuItem({
-    Key key,
-    @required this.title,
-    @required this.value,
-  }) : super(key: key);
+    required this.title,
+    required this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -132,13 +131,13 @@ class _PopupMenuState {
 
   _PopupMenuState({
     this.isSelectable = false,
-    GlobalKey<HtmlWidgetState> key,
+    GlobalKey<HtmlWidgetState>? key,
     this.showPerformanceOverlay = false,
   }) : key = key ?? GlobalKey<HtmlWidgetState>();
 
   _PopupMenuState copyWith({
-    bool isSelectable,
-    bool showPerformanceOverlay,
+    bool? isSelectable,
+    bool? showPerformanceOverlay,
   }) =>
       _PopupMenuState(
         isSelectable: isSelectable ?? this.isSelectable,

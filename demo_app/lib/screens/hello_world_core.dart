@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 class HelloWorldCoreScreen extends StatelessWidget {
-  const HelloWorldCoreScreen({Key key}) : super(key: key);
+  const HelloWorldCoreScreen({super.key});
 
   @override
   Widget build(BuildContext context) => SelectionAreaScaffold(

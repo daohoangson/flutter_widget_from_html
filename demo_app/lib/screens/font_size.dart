@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class FontSizeScreen extends StatelessWidget {
-  const FontSizeScreen({Key key}) : super(key: key);
+  const FontSizeScreen({super.key});
 
   @override
   Widget build(BuildContext context) => SelectionAreaScaffold(
@@ -65,7 +65,8 @@ class _Panel extends StatelessWidget {
         ),
       );
 
-  TableRow _row(BuildContext context, String data, double fontSize) => TableRow(
+  TableRow _row(BuildContext context, String? data, double fontSize) =>
+      TableRow(
         children: [
           Text(
             data ?? 'Text',

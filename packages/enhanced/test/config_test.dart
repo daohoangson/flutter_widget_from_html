@@ -125,7 +125,7 @@ void main() {
       await explain(
         tester,
         html,
-        baseUrl: Uri.http('domain.com', ''),
+        baseUrl: Uri.http('domain.com'),
         enableCaching: true,
       );
       final built2 = helper.buildCurrentState();
