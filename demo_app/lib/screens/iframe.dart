@@ -19,7 +19,7 @@ const html = '''
 ''';
 
 class IframeScreen extends StatefulWidget {
-  const IframeScreen({Key key}) : super(key: key);
+  const IframeScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _State();
@@ -38,13 +38,14 @@ class _State extends State<IframeScreen> {
           children: <Widget>[
             CheckboxListTile(
               value: webView,
-              onChanged: (v) => setState(() => webView = v),
+              onChanged: (v) => setState(() => webView = v == true),
               title: const HtmlWidget('<var>.webView</var>'),
               subtitle: const Text('Renders web view, default ❌'),
             ),
             CheckboxListTile(
               value: webViewJs,
-              onChanged: (v) => setState(() {
+              onChanged: (v0) => setState(() {
+                final v = v0 == true;
                 if (v) {
                   webView = true;
                 }
@@ -77,7 +78,7 @@ class _WidgetFactory extends WidgetFactory {
   final bool webViewJs;
 
   _WidgetFactory({
-    @required this.webView,
-    @required this.webViewJs,
+    required this.webView,
+    required this.webViewJs,
   });
 }

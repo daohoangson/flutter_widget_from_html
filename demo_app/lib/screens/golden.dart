@@ -12,10 +12,9 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 class Golden extends StatelessWidget {
   final String html;
   final String name;
-  final Key targetKey;
+  final Key? targetKey;
 
-  const Golden(this.name, this.html, {Key key, this.targetKey})
-      : super(key: key);
+  const Golden(this.name, this.html, {super.key, this.targetKey});
 
   @override
   Widget build(BuildContext context) {
@@ -89,17 +88,17 @@ class Golden extends StatelessWidget {
 }
 
 class GoldensScreen extends StatefulWidget {
-  const GoldensScreen({Key key}) : super(key: key);
+  const GoldensScreen({super.key});
 
   @override
   State<GoldensScreen> createState() => _GoldensState();
 }
 
 class _GoldensState extends State<GoldensScreen> {
-  Future<List<MapEntry<String, String>>> _goldens;
+  late final Future<List<MapEntry<String, String>>> _goldens;
 
   final _filter = TextEditingController();
-  List<MapEntry<String, String>> _filtered;
+  List<MapEntry<String, String>>? _filtered;
 
   @override
   void initState() {
@@ -134,9 +133,9 @@ class _GoldensState extends State<GoldensScreen> {
         appBar: AppBar(title: const Text('GoldensScreen')),
         body: FutureBuilder<List<MapEntry<String, String>>>(
           builder: (context, snapshot) => snapshot.hasData
-              ? _onData(_filtered ?? snapshot.data)
+              ? _onData(_filtered ?? snapshot.requireData)
               : snapshot.hasError
-                  ? _onError(snapshot.error)
+                  ? _onError(snapshot.error!)
                   : _onLoading(),
           future: _goldens,
         ),

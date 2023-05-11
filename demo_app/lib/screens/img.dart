@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class ImgScreen extends StatefulWidget {
-  const ImgScreen({Key key}) : super(key: key);
+  const ImgScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _State();

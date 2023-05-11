@@ -6,10 +6,10 @@ class SelectionAreaScaffold extends StatelessWidget {
   final Widget body;
 
   const SelectionAreaScaffold({
-    @required this.appBar,
-    @required this.body,
-    Key key,
-  }) : super(key: key);
+    required this.appBar,
+    required this.body,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

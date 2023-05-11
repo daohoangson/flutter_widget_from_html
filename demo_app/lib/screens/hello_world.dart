@@ -143,7 +143,7 @@ const kHtml = '''
 ''';
 
 class HelloWorldScreen extends StatelessWidget {
-  const HelloWorldScreen({Key key}) : super(key: key);
+  const HelloWorldScreen({super.key});
 
   @override
   Widget build(BuildContext context) => SelectionAreaScaffold(

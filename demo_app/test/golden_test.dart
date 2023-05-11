@@ -38,7 +38,6 @@ void _test(
             builder: (_) => Golden(name, html, targetKey: key),
           ),
           wrapper: materialAppWrapper(
-            platform: platform,
             theme: ThemeData.light(),
           ),
           surfaceSize: const Size(400, 1200),
@@ -57,7 +56,8 @@ void main() {
   mockWebViewPlatform();
 
   const audioSessionMc = MethodChannel('com.ryanheise.audio_session');
-  audioSessionMc.setMockMethodCallHandler((_) async {});
+  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+      .setMockMethodCallHandler(audioSessionMc, (_) => Future.value());
 
   final json = File('test/goldens.json').readAsStringSync();
   final map = jsonDecode(json) as Map<String, dynamic>;

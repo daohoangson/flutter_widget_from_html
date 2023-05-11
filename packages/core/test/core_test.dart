@@ -1277,10 +1277,17 @@ Future<void> main() async {
 
     group('textScaleFactor=2', () {
       Future<String> explain2x(WidgetTester tester, String html) async {
+        // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+        // ignore: deprecated_member_use
         tester.binding.window.platformDispatcher.textScaleFactorTestValue = 2;
         addTearDown(
           tester
-              .binding.window.platformDispatcher.clearTextScaleFactorTestValue,
+              .binding
+              // ignore: deprecated_member_use
+              .window
+              // ignore: deprecated_member_use
+              .platformDispatcher
+              .clearTextScaleFactorTestValue,
         );
 
         final explained = await explain(tester, html);
