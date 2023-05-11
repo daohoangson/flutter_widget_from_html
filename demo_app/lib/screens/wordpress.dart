@@ -59,39 +59,42 @@ class _PostScreen extends StatelessWidget {
   const _PostScreen(this.post);
 
   @override
-  Widget build(BuildContext context) => SelectionAreaScaffold(
-        appBar: AppBar(
-          title: HtmlWidget(post.title),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.open_in_browser),
-              onPressed: () => launchUrl(Uri.parse(post.link)),
-            ),
-            const PopupMenu(
-              toggleIsSelectable: true,
-            ),
-          ],
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(8),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                if (post case _Post(:final featuredMedia)
-                    when featuredMedia != null)
-                  AspectRatio(
-                    aspectRatio: featuredMedia.width / featuredMedia.height,
-                    child: Center(
-                      child: Image.network(featuredMedia.sourceUrl),
-                    ),
+  Widget build(BuildContext context) {
+    final featuredMedia = post.featuredMedia;
+
+    return SelectionAreaScaffold(
+      appBar: AppBar(
+        title: HtmlWidget(post.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.open_in_browser),
+            onPressed: () => launchUrl(Uri.parse(post.link)),
+          ),
+          const PopupMenu(
+            toggleIsSelectable: true,
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              if (featuredMedia != null)
+                AspectRatio(
+                  aspectRatio: featuredMedia.width / featuredMedia.height,
+                  child: Center(
+                    child: Image.network(featuredMedia.sourceUrl),
                   ),
-                const SizedBox(height: 8),
-                HtmlWidget(post.content),
-              ],
-            ),
+                ),
+              const SizedBox(height: 8),
+              HtmlWidget(post.content),
+            ],
           ),
         ),
-      );
+      ),
+    );
+  }
 
   static void pushRoute(BuildContext context, _Post post) =>
       Navigator.of(context)
