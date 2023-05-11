@@ -26,7 +26,7 @@ class HtmlTable extends MultiChildRenderObjectWidget {
   final TextDirection textDirection;
 
   /// Creates a TABLE widget.
-  HtmlTable({
+  const HtmlTable({
     this.border,
     this.borderCollapse = false,
     this.borderSpacing = 0.0,

@@ -23,11 +23,13 @@ void main() {
       _duration = const Duration(milliseconds: 10);
       _playbackEvents = StreamController<PlaybackEventMessage>.broadcast();
 
-      audioSessionMc.setMockMethodCallHandler((_) async {});
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(audioSessionMc, (_) => Future.value());
     });
 
     tearDown(() {
-      audioSessionMc.setMockMethodCallHandler(null);
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(audioSessionMc, null);
       _playbackEvents.close();
     });
 
@@ -82,10 +84,10 @@ void main() {
     });
 
     testWidgets('shows remaining (narrow)', (tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(320, 568);
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
-      tester.binding.window.devicePixelRatioTestValue = 1;
-      addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
+      tester.view.physicalSize = const Size(320, 568);
+      addTearDown(tester.view.resetPhysicalSize);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetDevicePixelRatio);
 
       _duration = const Duration(minutes: 12, seconds: 34);
 

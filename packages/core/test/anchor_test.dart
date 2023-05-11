@@ -367,16 +367,14 @@ ${htmlDesc * 3}
 final globalKey = GlobalKey<HtmlWidgetState>();
 
 Future<void> pumpWidget(WidgetTester tester, Widget child) async {
-  tester.binding.window.physicalSizeTestValue = const Size(200, 200);
-  addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+  tester.view.physicalSize = const Size(200, 200);
+  addTearDown(tester.view.resetPhysicalSize);
 
-  tester.binding.window.devicePixelRatioTestValue = 1.0;
-  addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetDevicePixelRatio);
 
-  tester.binding.window.platformDispatcher.textScaleFactorTestValue = 1.0;
-  addTearDown(
-    tester.binding.window.platformDispatcher.clearTextScaleFactorTestValue,
-  );
+  tester.platformDispatcher.textScaleFactorTestValue = 1.0;
+  addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 
   await tester.pumpWidget(MaterialApp(home: child));
   await tester.pump();

@@ -57,7 +57,8 @@ void main() {
   mockWebViewPlatform();
 
   const audioSessionMc = MethodChannel('com.ryanheise.audio_session');
-  audioSessionMc.setMockMethodCallHandler((_) async {});
+  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+      .setMockMethodCallHandler(audioSessionMc, (_) => Future.value());
 
   final json = File('test/goldens.json').readAsStringSync();
   final map = jsonDecode(json) as Map<String, dynamic>;
