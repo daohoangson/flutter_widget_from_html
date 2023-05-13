@@ -4,7 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 /// A CSS block.
-class CssBlock extends CssSizing {
+class CssBlock extends SingleChildRenderObjectWidget {
   /// Creates a CSS block.
   const CssBlock({required Widget child, Key? key})
       : super(child: child, key: key);
@@ -208,27 +208,28 @@ class _RenderCssSizing extends RenderProxyBox {
     final maxHeight = _maxHeight?.clamp(0.0, c.maxHeight) ?? c.maxHeight;
     final maxWidth = _maxWidth?.clamp(0.0, c.maxWidth) ?? c.maxWidth;
 
-    // special treatment for min values: ignore incoming constraint if it's tight
-    final __minHeight = min(
+    final calculatedMinHeight = min(
       maxHeight,
-      _minHeight?.clamp(0.0, c.maxHeight) ??
-          (c.hasTightHeight ? .0 : c.minHeight),
+      _minHeight?.clamp(0.0, c.maxHeight) ?? c.minHeight,
     );
-    final __minWidth = min(
+    final calculatedMinWidth = min(
       maxWidth,
-      _minWidth?.clamp(0.0, c.maxWidth) ?? (c.hasTightWidth ? .0 : c.minWidth),
+      _minWidth?.clamp(0.0, c.maxWidth) ?? c.minWidth,
     );
     // ignore min value if it's infinite
-    final minHeight = __minHeight.isFinite ? __minHeight : .0;
-    final minWidth = __minWidth.isFinite ? __minWidth : .0;
+    final minHeight = calculatedMinHeight.isFinite ? calculatedMinHeight : .0;
+    final minWidth = calculatedMinWidth.isFinite ? calculatedMinWidth : .0;
 
-    final __preferredHeight = _preferredHeight?.clamp(minHeight, maxHeight);
-    final __preferredWidth = _preferredWidth?.clamp(minWidth, maxWidth);
+    final calculatedPreferredHeight =
+        _preferredHeight?.clamp(minHeight, maxHeight);
+    final calculatedPreferredWidth = _preferredWidth?.clamp(minWidth, maxWidth);
     // ignore preferred value if it's infinite
-    final preferredHeight =
-        __preferredHeight?.isFinite == true ? __preferredHeight : null;
-    final preferredWidth =
-        __preferredWidth?.isFinite == true ? __preferredWidth : null;
+    final preferredHeight = calculatedPreferredHeight?.isFinite == true
+        ? calculatedPreferredHeight
+        : null;
+    final preferredWidth = calculatedPreferredWidth?.isFinite == true
+        ? calculatedPreferredWidth
+        : null;
 
     final stableChildSize = (preferredHeight != null && preferredWidth != null)
         ? _guessChildSize(

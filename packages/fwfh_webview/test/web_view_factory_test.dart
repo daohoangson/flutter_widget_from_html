@@ -1,10 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:webview_flutter/webview_flutter.dart' as lib;
 
 import '_.dart';
+import 'mock_webview_platform.dart';
 
 void main() {
+  mockWebViewPlatform();
+
   const src = 'http://domain.com';
   const defaultAspectRatio = '1.78';
 
@@ -31,37 +33,29 @@ void main() {
 
   group('useExplainer: false', () {
     const html = '<iframe src="$src"></iframe>';
-    Future<String> _explain(WidgetTester tester) async {
-      lib.WebView.platform = null;
+    Future<String> explainWithoutExplainer(WidgetTester tester) async {
       final explained = await explain(tester, html, useExplainer: false);
       return explained;
     }
 
     testWidgets('renders web view (Android)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
-      final explained = await _explain(tester);
-      expect(explained, contains('└WebViewAndroidWidget'));
+      final explained = await explainWithoutExplainer(tester);
+      expect(explained, contains('└WebViewWidget'));
       debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets('renders web view (iOS)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-      final explained = await _explain(tester);
-      expect(explained, contains('└UiKitView'));
+      final explained = await explainWithoutExplainer(tester);
+      expect(explained, contains('└WebViewWidget'));
       debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets('skips web view (linux)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.linux;
-      final explained = await _explain(tester);
-      expect(
-        explained,
-        equals(
-          'TshWidget\n'
-          '└SizedBox.shrink()\n'
-          '\n',
-        ),
-      );
+      final explained = await explainWithoutExplainer(tester);
+      expect(explained, isNot(contains('└WebViewWidget')));
       debugDefaultTargetPlatformOverride = null;
     });
   });

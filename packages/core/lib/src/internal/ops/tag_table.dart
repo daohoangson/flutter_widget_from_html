@@ -30,27 +30,30 @@ const kCssDisplayTableCell = 'table-cell';
 const kCssDisplayTableCaption = 'table-caption';
 
 class TagTable {
-  final companion = HtmlTableCompanion();
   final BuildMetadata tableMeta;
   final WidgetFactory wf;
 
-  final _captions = <BuildTree>[];
   final _data = _TagTableData();
 
-  BuildOp? _tableOp;
+  late final BuildOp _captionOp;
+  late final BuildOp _tableOp;
 
-  TagTable(this.wf, this.tableMeta);
-
-  BuildOp get op {
-    return _tableOp ??= BuildOp(
-      onChild: onChild,
-      onTree: onTree,
-      onWidgets: onWidgets,
+  TagTable(this.wf, this.tableMeta) {
+    _tableOp = BuildOp(
+      onChild: _onChild,
+      onTree: _onTree,
+      onWidgets: _onWidgets,
       priority: 0,
+    );
+    _captionOp = BuildOp(
+      onWidgets: _onCaptionWidgets,
+      priority: BuildOp.kPriorityMax,
     );
   }
 
-  void onChild(BuildMetadata childMeta) {
+  BuildOp get op => _tableOp;
+
+  void _onChild(BuildMetadata childMeta) {
     if (childMeta.element.parent != tableMeta.element) {
       return;
     }
@@ -62,7 +65,7 @@ class TagTable {
         latestGroup ??= _data.body;
         final row = _TagTableDataRow();
         latestGroup.rows.add(row);
-        childMeta.register(_TagTableRow(this, childMeta, row).op);
+        childMeta.register(_TagTableRow(this, childMeta, row)._rowOp);
         break;
       case kCssDisplayTableHeaderGroup:
       case kCssDisplayTableRowGroup:
@@ -76,28 +79,18 @@ class TagTable {
         latestGroup = null;
         break;
       case kCssDisplayTableCaption:
-        childMeta.register(BuildOp(onTree: (_, tree) => _captions.add(tree)));
+        childMeta.register(_captionOp);
         break;
     }
   }
 
-  void onTree(BuildMetadata _, BuildTree tree) {
+  void _onTree(BuildMetadata _, BuildTree tree) {
     StyleBorder.skip(tableMeta);
-    StyleSizing.treatHeightAsMinHeight(tableMeta);
-
-    for (final caption in _captions) {
-      final built = wf
-          .buildColumnPlaceholder(tableMeta, caption.build())
-          ?.wrapWith((_, child) => _TableCaption(child));
-      if (built != null) {
-        WidgetBit.block(tree.parent!, built).insertBefore(tree);
-      }
-
-      caption.detach();
-    }
+    StyleSizing.skip(tableMeta);
   }
 
-  Iterable<Widget> onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> __) {
+  Iterable<Widget> _onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> __) {
+    _prepareHtmlTableCaptionBuilders();
     _prepareHtmlTableCellBuilders(_data.header);
     for (final body in _data.bodies) {
       _prepareHtmlTableCellBuilders(body);
@@ -119,21 +112,51 @@ class TagTable {
         builder: (context, _) {
           final tsh = tableMeta.tsb.build(context);
 
-          return HtmlTable(
-            border: border.getBorder(tsh),
-            borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
-            borderSpacing: borderSpacing?.getValue(tsh) ?? 0.0,
-            companion: companion,
-            textDirection: tsh.textDirection,
-            children: List.from(
-              _data.builders.map((f) => f(context)).where((e) => e != null),
-              growable: false,
+          return ValignBaselineContainer(
+            child: HtmlTable(
+              border: border.getBorder(tsh),
+              borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
+              borderSpacing: borderSpacing?.getValue(tsh) ?? 0.0,
+              textDirection: tsh.textDirection,
+              children: List.from(
+                _data.builders.map((f) => f(context)).where((e) => e != null),
+                growable: false,
+              ),
             ),
           );
         },
         localName: kTagTable,
       ),
     ];
+  }
+
+  Iterable<Widget>? _onCaptionWidgets(
+    BuildMetadata captionMeta,
+    Iterable<WidgetPlaceholder> widgets,
+  ) {
+    final child = wf.buildColumnPlaceholder(captionMeta, widgets);
+    if (child != null) {
+      _data.captions.add(child);
+    }
+    return [];
+  }
+
+  void _prepareHtmlTableCaptionBuilders() {
+    for (final child in _data.captions) {
+      final rowIndex = _data.rows;
+      final builderIndex = _data.builders.length;
+      _data.cells[rowIndex] = {0: builderIndex};
+      _data.columns = max(_data.columns, 1);
+      _data.rows = _data.cells.keys.length;
+
+      _data.builders.add(
+        (_) => HtmlTableCaption(
+          columnSpan: _data.columns,
+          rowIndex: rowIndex,
+          child: child,
+        ),
+      );
+    }
   }
 
   void _prepareHtmlTableCellBuilders(_TagTableDataGroup group) {
@@ -160,21 +183,18 @@ class TagTable {
                   ? group.rows.length
                   : 1,
         );
-        final cell0 = _TagTableDataCell(
-          cell.meta,
-          child: cell.child,
-          columnSpan: columnSpan,
-          columnStart: columnStart,
-          rowSpan: rowSpan,
-          rowStart: rowStart,
-        );
 
+        final builderIndex = _data.builders.length;
         for (var r = 0; r < rowSpan; r++) {
           final rCells = _data.cells[rowStart + r] ??= {};
+          _data.rows = _data.cells.length;
+
           for (var c = 0; c < columnSpan; c++) {
-            rCells[columnStart + c] = cell0;
+            rCells[columnStart + c] = builderIndex;
           }
         }
+        _data.columns = max(_data.columns, columnStart + 1);
+        _data.rows = _data.cells.keys.length;
 
         final cellMeta = cell.meta;
         final cssBorderParsed = tryParseBorder(cellMeta);
@@ -185,12 +205,18 @@ class TagTable {
         _data.builders.add((context) {
           Widget? child = cell.child;
 
-          final border = cssBorder.getBorder(cellMeta.tsb.build(context));
+          final tsh = cellMeta.tsb.build(context);
+          final border = cssBorder.getBorder(tsh);
           if (border != null) {
             child = wf.buildPadding(cellMeta, cell.child, border.dimensions);
           }
           if (child == null) {
             return null;
+          }
+
+          final v = cellMeta[kCssVerticalAlign]?.term;
+          if (v == kCssVerticalAlignBaseline) {
+            child = ValignBaseline(index: rowStart, child: child);
           }
 
           return HtmlTableCell(
@@ -199,6 +225,7 @@ class TagTable {
             columnStart: columnStart,
             rowSpan: rowSpan,
             rowStart: rowStart,
+            width: cell.width?.getSizing(tsh),
             child: child,
           );
         });
@@ -260,63 +287,21 @@ class TagTable {
   }
 }
 
-class _TableCaption extends SingleChildRenderObjectWidget {
-  const _TableCaption(Widget child, {Key? key}) : super(child: child, key: key);
-
-  @override
-  RenderObject createRenderObject(BuildContext context) => RenderProxyBox();
-}
-
 class _TagTableRow {
-  late final BuildOp op;
   final TagTable parent;
   final _TagTableDataRow row;
   final BuildMetadata rowMeta;
 
+  late final BuildOp _rowOp;
   late final BuildOp _cellOp;
-  late final BuildOp _valignBaselineOp;
 
   _TagTableRow(this.parent, this.rowMeta, this.row) {
-    op = BuildOp(onChild: onChild);
-    _cellOp = BuildOp(
-      onWidgets: (cellMeta, widgets) {
-        final child =
-            parent.wf.buildColumnPlaceholder(cellMeta, widgets) ?? widget0;
-
-        final attributes = cellMeta.element.attributes;
-        row.cells.add(
-          _TagTableDataCell(
-            cellMeta,
-            child: child,
-            columnSpan: tryParseIntFromMap(attributes, kAttributeColspan) ?? 1,
-            rowSpan: tryParseIntFromMap(attributes, kAttributeRowspan) ?? 1,
-          ),
-        );
-
-        return [child];
-      },
-      priority: BuildOp.kPriorityMax,
-    );
-    _valignBaselineOp = BuildOp(
-      onWidgets: (cellMeta, widgets) {
-        final v = cellMeta[kCssVerticalAlign]?.term;
-        if (v != kCssVerticalAlignBaseline) {
-          return widgets;
-        }
-
-        return listOrNull(
-          parent.wf
-              .buildColumnPlaceholder(cellMeta, widgets)
-              ?.wrapWith((_, child) {
-            return HtmlTableValignBaseline(child: child);
-          }),
-        );
-      },
-      priority: StyleVerticalAlign.kPriority4k3,
-    );
+    _rowOp = BuildOp(onChild: _onRowChild);
+    _cellOp =
+        BuildOp(onWidgets: _onCellWidgets, priority: BuildOp.kPriorityMax);
   }
 
-  void onChild(BuildMetadata childMeta) {
+  void _onRowChild(BuildMetadata childMeta) {
     if (childMeta.element.parent != rowMeta.element) {
       return;
     }
@@ -331,8 +316,31 @@ class _TagTableRow {
 
     childMeta.register(_cellOp);
     StyleBorder.skip(childMeta);
-    StyleSizing.treatHeightAsMinHeight(childMeta);
-    childMeta.register(_valignBaselineOp);
+    StyleSizing.skip(childMeta);
+  }
+
+  Iterable<Widget>? _onCellWidgets(
+    BuildMetadata cellMeta,
+    Iterable<WidgetPlaceholder> widgets,
+  ) {
+    final child =
+        parent.wf.buildColumnPlaceholder(cellMeta, widgets) ?? widget0;
+
+    final widthValue = cellMeta[kCssWidth]?.value;
+    final width = widthValue != null ? tryParseCssLength(widthValue) : null;
+
+    final attributes = cellMeta.element.attributes;
+    row.cells.add(
+      _TagTableDataCell(
+        cellMeta,
+        child: child,
+        columnSpan: tryParseIntFromMap(attributes, kAttributeColspan) ?? 1,
+        rowSpan: tryParseIntFromMap(attributes, kAttributeRowspan) ?? 1,
+        width: width,
+      ),
+    );
+
+    return [child];
   }
 }
 
@@ -357,40 +365,26 @@ class _TagTableRowGroup {
 
     final row = _TagTableDataRow();
     rows.add(row);
-    childMeta.register(_TagTableRow(parent, childMeta, row).op);
+    childMeta.register(_TagTableRow(parent, childMeta, row)._rowOp);
   }
 }
 
-@immutable
 class _TagTableData {
   final bodies = <_TagTableDataGroup>[];
+  final captions = <Widget>[];
   final footer = _TagTableDataGroup();
   final header = _TagTableDataGroup();
 
-  final cells = <int, Map<int, _TagTableDataCell>>{};
   final builders = <HtmlTableCell? Function(BuildContext)>[];
+  final cells = <int, Map<int, int>>{};
+  int columns = 0;
+  int rows = 0;
 
   _TagTableDataGroup get body {
     final body = _TagTableDataGroup();
     bodies.add(body);
     return body;
   }
-
-  int get columns => cells.entries.fold(
-        0,
-        (prev, row) {
-          final cells = row.value.entries;
-          return max(
-            prev,
-            cells.fold(
-              0,
-              (prev, cell) => max(prev, (cell.value.columnStart ?? 0) + 1),
-            ),
-          );
-        },
-      );
-
-  int get rows => cells.keys.length;
 }
 
 @immutable
@@ -407,17 +401,15 @@ class _TagTableDataRow {
 class _TagTableDataCell {
   final Widget child;
   final int columnSpan;
-  final int? columnStart;
   final BuildMetadata meta;
   final int rowSpan;
-  final int? rowStart;
+  final CssLength? width;
 
   const _TagTableDataCell(
     this.meta, {
     required this.child,
     required this.columnSpan,
-    this.columnStart,
     required this.rowSpan,
-    this.rowStart,
+    this.width,
   });
 }

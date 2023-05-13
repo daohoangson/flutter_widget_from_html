@@ -48,7 +48,7 @@ mixin WebViewFactory on WidgetFactory {
             sandbox.contains(kAttributeIframeSandboxAllowScripts));
     return WebView(
       url,
-      aspectRatio: dimensOk ? width! / height! : 16 / 9,
+      aspectRatio: dimensOk ? width / height : 16 / 9,
       autoResize: !dimensOk && js,
       debuggingEnabled: webViewDebuggingEnabled,
       interceptNavigationRequest: (newUrl) {

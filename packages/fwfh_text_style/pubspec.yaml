@@ -1,11 +1,11 @@
 name: fwfh_text_style
-version: 2.7.3+2
+version: 2.22.08+1
 description: A TextStyle replacement that allows resetting height behavior to normal.
 homepage: https://github.com/daohoangson/flutter_widget_from_html
 
 environment:
-  flutter: ">=2.6.0-0 <2.13.0"
-  sdk: ">=2.12.0 <3.0.0"
+  flutter: ">=3.1.0-0"
+  sdk: ">=2.17.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -14,5 +14,5 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  golden_toolkit: ^0.13.0
+  golden_toolkit: ^0.15.0
   lint: any

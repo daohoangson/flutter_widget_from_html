@@ -19,7 +19,7 @@ const html = '''
 ''';
 
 class IframeScreen extends StatefulWidget {
-  const IframeScreen({Key key}) : super(key: key);
+  const IframeScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _State();
@@ -38,13 +38,14 @@ class _State extends State<IframeScreen> {
           children: <Widget>[
             CheckboxListTile(
               value: webView,
-              onChanged: (v) => setState(() => webView = v),
+              onChanged: (v) => setState(() => webView = v == true),
               title: const HtmlWidget('<var>.webView</var>'),
               subtitle: const Text('Renders web view, default ❌'),
             ),
             CheckboxListTile(
               value: webViewJs,
-              onChanged: (v) => setState(() {
+              onChanged: (v0) => setState(() {
+                final v = v0 == true;
                 if (v) {
                   webView = true;
                 }
@@ -58,10 +59,10 @@ class _State extends State<IframeScreen> {
               child: HtmlWidget(
                 html,
                 factoryBuilder: () => _WidgetFactory(
-                  webViewOverride: webView,
-                  webViewJsOverride: webViewJs,
+                  webView: webView,
+                  webViewJs: webViewJs,
                 ),
-                key: ValueKey('$webView$webViewJs'),
+                rebuildTriggers: [webView, webViewJs],
               ),
             ),
           ],
@@ -70,17 +71,14 @@ class _State extends State<IframeScreen> {
 }
 
 class _WidgetFactory extends WidgetFactory {
-  final bool webViewOverride;
-  final bool webViewJsOverride;
+  @override
+  final bool webView;
+
+  @override
+  final bool webViewJs;
 
   _WidgetFactory({
-    this.webViewOverride,
-    this.webViewJsOverride,
+    required this.webView,
+    required this.webViewJs,
   });
-
-  @override
-  bool get webView => webViewOverride ?? super.webView;
-
-  @override
-  bool get webViewJs => webViewJsOverride ?? super.webViewJs;
 }

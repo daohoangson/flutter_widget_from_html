@@ -9,7 +9,7 @@ const kHtml = '''
 const kSmilies = {':)': '🙂'};
 
 class SmilieScreen extends StatelessWidget {
-  const SmilieScreen({Key key}) : super(key: key);
+  const SmilieScreen({super.key});
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -30,7 +30,7 @@ class _SmiliesWidgetFactory extends WidgetFactory {
   final smilieOp = BuildOp(
     onTree: (meta, tree) {
       final alt = meta.element.attributes['alt'];
-      tree.addText(kSmilies[alt] ?? alt);
+      tree.addText(kSmilies[alt] ?? alt ?? '');
     },
   );
 

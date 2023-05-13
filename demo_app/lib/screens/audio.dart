@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class AudioScreen extends StatefulWidget {
-  const AudioScreen({Key key}) : super(key: key);
+  const AudioScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _State();
@@ -31,22 +31,22 @@ class _State extends State<AudioScreen> {
           children: <Widget>[
             CheckboxListTile(
               value: autoplay,
-              onChanged: (v) => _setState(() => autoplay = v),
+              onChanged: (v) => _setState(() => autoplay = v == true),
               title: const Text('autoplay'),
             ),
             CheckboxListTile(
               value: loop,
-              onChanged: (v) => _setState(() => loop = v),
+              onChanged: (v) => _setState(() => loop = v == true),
               title: const Text('loop'),
             ),
             CheckboxListTile(
               value: muted,
-              onChanged: (v) => _setState(() => muted = v),
+              onChanged: (v) => _setState(() => muted = v == true),
               title: const Text('muted'),
             ),
             CheckboxListTile(
               value: preload,
-              onChanged: (v) => _setState(() => preload = v),
+              onChanged: (v) => _setState(() => preload = v == true),
               title: const Text('preload'),
             ),
             ListTile(

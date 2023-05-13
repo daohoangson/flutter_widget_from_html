@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -16,6 +15,7 @@ export 'widgets/html_list_item.dart';
 export 'widgets/html_list_marker.dart';
 export 'widgets/html_ruby.dart';
 export 'widgets/html_table.dart';
+export 'widgets/valign_baseline.dart';
 
 /// The default character threshold to build widget tree asynchronously.
 ///

@@ -35,7 +35,7 @@ class HomeScreen extends StatelessWidget {
     'Wordpress': () => const WordpressScreen(),
   };
 
-  const HomeScreen({Key key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -63,7 +63,7 @@ class HomeScreen extends StatelessWidget {
       }
 
       return MaterialPageRoute(
-        builder: (_) => _screens[title].call(),
+        builder: (_) => _screens[title]?.call() ?? const SizedBox.shrink(),
         settings: RouteSettings(name: route.name),
       );
     }
