@@ -20,85 +20,67 @@ mixin SvgFactory on WidgetFactory {
   Widget? buildImageWidget(BuildTree tree, ImageSource src) {
     final url = src.url;
 
-    PictureProvider? provider;
+    BytesLoader? bytesLoader;
     if (url.startsWith('data:image/svg+xml')) {
-      provider = imageSvgFromDataUri(url);
+      bytesLoader = imageSvgFromDataUri(url);
     } else if (Uri.tryParse(url)?.path.toLowerCase().endsWith('.svg') == true) {
       if (url.startsWith('asset:')) {
-        provider = imageSvgFromAsset(url);
+        bytesLoader = imageSvgFromAsset(url);
       } else if (url.startsWith('file:')) {
-        provider = imageSvgFromFileUri(url);
+        bytesLoader = imageSvgFromFileUri(url);
       } else {
-        provider = imageSvgFromNetwork(url);
+        bytesLoader = imageSvgFromNetwork(url);
       }
     }
 
-    if (provider == null) {
+    if (bytesLoader == null) {
       return super.buildImageWidget(tree, src);
     }
 
-    return _buildSvgPicture(tree, src, provider);
+    return _buildSvgPicture(tree, src, bytesLoader);
   }
 
-  /// Returns an [ExactAssetPicture].
-  PictureProvider? imageSvgFromAsset(String url) {
+  /// Returns an [SvgAssetLoader].
+  BytesLoader? imageSvgFromAsset(String url) {
     final uri = Uri.parse(url);
     final assetName = uri.path;
     if (assetName.isEmpty) {
       return null;
     }
 
-    return ExactAssetPicture(
-      svgAllowDrawingOutsideViewBox
-          ? SvgPicture.svgStringDecoderOutsideViewBoxBuilder
-          : SvgPicture.svgStringDecoderBuilder,
+    return SvgAssetLoader(
       assetName,
-      package: uri.queryParameters['package'],
+      packageName: uri.queryParameters['package'],
     );
   }
 
-  /// Returns a [MemoryPicture].
-  PictureProvider? imageSvgFromDataUri(String dataUri) {
+  /// Returns a [SvgBytesLoader].
+  BytesLoader? imageSvgFromDataUri(String dataUri) {
     final bytes = bytesFromDataUri(dataUri);
     if (bytes == null) {
       return null;
     }
 
-    return MemoryPicture(
-      svgAllowDrawingOutsideViewBox
-          ? SvgPicture.svgByteDecoderOutsideViewBoxBuilder
-          : SvgPicture.svgByteDecoderBuilder,
-      bytes,
-    );
+    return SvgBytesLoader(bytes);
   }
 
-  /// Returns a [FilePicture].
-  PictureProvider? imageSvgFromFileUri(String url) {
+  /// Returns a [SvgFileLoader].
+  BytesLoader? imageSvgFromFileUri(String url) {
     final filePath = Uri.parse(url).toFilePath();
     if (filePath.isEmpty) {
       return null;
     }
 
-    return filePicture(
-      svgAllowDrawingOutsideViewBox
-          ? SvgPicture.svgByteDecoderOutsideViewBoxBuilder
-          : SvgPicture.svgByteDecoderBuilder,
-      filePath,
-    );
+    return fileLoader(filePath);
   }
 
-  /// Returns a [NetworkPicture].
-  PictureProvider? imageSvgFromNetwork(String url) {
+  /// Returns a [SvgNetworkLoader].
+  BytesLoader? imageSvgFromNetwork(String url) {
     if (url.isEmpty) {
       return null;
     }
 
-    return NetworkPicture(
-      svgAllowDrawingOutsideViewBox
-          ? SvgPicture.svgByteDecoderOutsideViewBoxBuilder
-          : SvgPicture.svgByteDecoderBuilder,
-      url,
-    );
+    return SvgNetworkLoader(url);
   }
 
   @override
@@ -108,13 +90,10 @@ mixin SvgFactory on WidgetFactory {
         tree.register(
           _tagSvg ??= BuildOp(
             onWidgets: (tree, widgets) {
-              final provider = StringPicture(
-                svgAllowDrawingOutsideViewBox
-                    ? SvgPicture.svgStringDecoderOutsideViewBoxBuilder
-                    : SvgPicture.svgStringDecoderBuilder,
-                tree.element.outerHtml,
-              );
-              return [_buildSvgPicture(tree, const ImageSource(''), provider)];
+              final bytesLoader = SvgStringLoader(tree.element.outerHtml);
+              return [
+                _buildSvgPicture(tree, const ImageSource(''), bytesLoader)
+              ];
             },
           ),
         );
@@ -127,13 +106,13 @@ mixin SvgFactory on WidgetFactory {
   Widget _buildSvgPicture(
     BuildTree tree,
     ImageSource src,
-    PictureProvider provider,
+    BytesLoader bytesLoader,
   ) {
     final image = src.image;
     final semanticLabel = image?.alt ?? image?.title;
 
     return SvgPicture(
-      provider,
+      bytesLoader,
       allowDrawingOutsideViewBox: svgAllowDrawingOutsideViewBox,
       excludeFromSemantics: semanticLabel == null,
       fit: BoxFit.fill,

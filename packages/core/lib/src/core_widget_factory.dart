@@ -25,12 +25,10 @@ class WidgetFactory {
 
   BuildOp? _styleBgColor;
   StyleBorder? _styleBorder;
-  BuildOp? _styleDisplayBlock;
   BuildOp? _styleDisplayInlineBlock;
   BuildOp? _styleDisplayNone;
   BuildOp? _styleMargin;
   BuildOp? _stylePadding;
-  BuildOp? _styleSizing;
   BuildOp? _styleTextDecoration;
   StyleVerticalAlign? _styleVerticalAlign;
   BuildOp? _tagA;
@@ -174,6 +172,8 @@ class WidgetFactory {
     );
 
     if (!isBorderBox || container != null) {
+      // we are using Container intentionally because it handles border differently
+      // ignore: use_decorated_box
       return Container(
         decoration: decoration,
         child: grandChild ?? child,
@@ -316,18 +316,26 @@ class WidgetFactory {
   ) {
     final text = getListMarkerText(listStyleType, index);
     final textStyle = style.textStyle;
-    return text.isNotEmpty
-        ? RichText(
-            maxLines: 1,
-            softWrap: false,
-            text: TextSpan(style: textStyle, text: text),
-            textDirection: style.textDirection,
-          )
-        : listStyleType == kCssListStyleTypeCircle
-            ? HtmlListMarker.circle(textStyle)
-            : listStyleType == kCssListStyleTypeSquare
-                ? HtmlListMarker.square(textStyle)
-                : HtmlListMarker.disc(textStyle);
+    if (text.isNotEmpty) {
+      return RichText(
+        maxLines: 1,
+        softWrap: false,
+        text: TextSpan(style: textStyle, text: text),
+        textDirection: style.textDirection,
+      );
+    }
+
+    switch (listStyleType) {
+      case kCssListStyleTypeCircle:
+        return HtmlListMarker.circle(textStyle);
+      case kCssListStyleTypeNone:
+        return null;
+      case kCssListStyleTypeSquare:
+        return HtmlListMarker.square(textStyle);
+      case kCssListStyleTypeDisc:
+      default:
+        return HtmlListMarker.disc(textStyle);
+    }
   }
 
   /// Builds [Padding].
@@ -345,6 +353,9 @@ class WidgetFactory {
       RichText(
         maxLines: tree.maxLines > 0 ? tree.maxLines : null,
         overflow: tree.overflow,
+        selectionRegistrar: style.getDependency(),
+        selectionColor:
+            style.getDependency<DefaultSelectionStyle>().selectionColor,
         text: text,
         textAlign: style.textAlign ?? TextAlign.start,
         textDirection: style.textDirection,
@@ -426,7 +437,9 @@ class WidgetFactory {
   Iterable<dynamic> getDependencies(BuildContext context) => [
         MediaQuery.of(context),
         Directionality.of(context),
+        DefaultSelectionStyle.of(context),
         DefaultTextStyle.of(context).style,
+        SelectionContainer.maybeOf(context),
         Theme.of(context),
       ];
 
@@ -457,9 +470,10 @@ class WidgetFactory {
       case kCssListStyleTypeRomanUpper:
         final roman = _getListMarkerRoman(i);
         return roman != null ? '$roman.' : '';
+      case kCssListStyleTypeNone:
+      default:
+        return '';
     }
-
-    return '';
   }
 
   String? _getListMarkerRoman(int i) {
@@ -960,7 +974,7 @@ class WidgetFactory {
       case kCssMinHeight:
       case kCssMinWidth:
       case kCssWidth:
-        tree.register(_styleSizing ??= StyleSizing(this).buildOp);
+        StyleSizing.registerSizing(this, tree);
         break;
 
       case kCssLineHeight:
@@ -1043,7 +1057,7 @@ class WidgetFactory {
   void parseStyleDisplay(BuildTree tree, String? value) {
     switch (value) {
       case kCssDisplayBlock:
-        tree.register(_styleDisplayBlock ??= DisplayBlockOp(this));
+        StyleSizing.registerBlock(this, tree);
         break;
       case kCssDisplayInlineBlock:
         final displayInlineBlock = _styleDisplayInlineBlock ??= BuildOp(

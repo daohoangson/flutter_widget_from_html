@@ -1,3 +1,28 @@
+## 0.10.0
+
+- Add support for Flutter 3.7 (#861)
+
+## 0.9.1
+
+- Adjust text-decoration-line cascading logic (#843)
+- Try catch possible errors during table layout (#846)
+- Add support for `list-style-type: none` (#847)
+- Adjust sizing logic for IMG tag (#854)
+- Redistribute table column width to avoid overflow (#856)
+
+## 0.9.0+2
+
+- Change column width calculation logic (#747)
+
+## 0.9.0+1
+
+- Fix context usage across async gaps (#835)
+
+## 0.9.0
+
+- Requires Flutter 3.3 (#821)
+- Add support for `SelectionArea` (#821)
+
 ## 0.8.5+3
 
 - Fix min constraints being 100% (#761)

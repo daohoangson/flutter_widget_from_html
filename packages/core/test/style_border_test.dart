@@ -183,7 +183,9 @@ void main() {
       equals(
         '[SizedBox:0.0x1.0],'
         '[Padding:(0,1,0,1),child='
-        '[CssBlock:child=[Container:border=$_border1,child=[RichText:(:Foo)]]]'
+        '[Container:border=$_border1,child='
+        '[CssBlock:child='
+        '[RichText:(:Foo)]]]'
         '],'
         '[SizedBox:0.0x1.0]',
       ),
@@ -197,12 +199,12 @@ void main() {
     expect(
       explained,
       equals(
-        '[CssBlock:child=[Container:border=$_border1,child='
+        '[Container:border=$_border1,child='
         '[Column:children='
         '[SizedBox:0.0x1.0],'
-        '[Padding:(0,1,0,1),child=[CssBlock:child=[RichText:(:Foo)]]],'
+        '[CssBlock:child=[Padding:(0,1,0,1),child=[CssBlock:child=[RichText:(:Foo)]]]],'
         '[SizedBox:0.0x1.0]'
-        ']]]',
+        ']]',
       ),
     );
   });
@@ -956,8 +958,9 @@ void main() {
       expect(
         explained,
         equals(
+          '[Container:border=$_border1,child='
           '[CssBlock:child='
-          '[Container:border=$_border1,child=[RichText:(:Foo)]]'
+          '[RichText:(:Foo)]]'
           ']',
         ),
       );
@@ -969,9 +972,9 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Container:'
-          'border=($_border1,none,none,none),'
-          'child=[RichText:(:Foo)]]]',
+          '[Container:border=($_border1,none,none,none),child='
+          '[CssBlock:child='
+          '[RichText:(:Foo)]]]',
         ),
       );
     });
@@ -982,9 +985,9 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Container:'
-          'border=($_border1,none,none,none),'
-          'child=[RichText:(:Foo)]]]',
+          '[Container:border=($_border1,none,none,none),child='
+          '[CssBlock:child='
+          '[RichText:(:Foo)]]]',
         ),
       );
     });
@@ -995,9 +998,9 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Container:'
-          'border=(none,$_border1,none,none),'
-          'child=[RichText:(:Foo)]]]',
+          '[Container:border=(none,$_border1,none,none),child='
+          '[CssBlock:child='
+          '[RichText:(:Foo)]]]',
         ),
       );
     });
@@ -1008,9 +1011,9 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Container:'
-          'border=(none,none,$_border1,none),'
-          'child=[RichText:(:Foo)]]]',
+          '[Container:border=(none,none,$_border1,none),child='
+          '[CssBlock:child='
+          '[RichText:(:Foo)]]]',
         ),
       );
     });
@@ -1021,9 +1024,9 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Container:'
-          'border=(none,none,$_border1,none),'
-          'child=[RichText:(:Foo)]]]',
+          '[Container:border=(none,none,$_border1,none),child='
+          '[CssBlock:child='
+          '[RichText:(:Foo)]]]',
         ),
       );
     });
@@ -1034,9 +1037,9 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Container:'
-          'border=(none,none,none,$_border1),'
-          'child=[RichText:(:Foo)]]]',
+          '[Container:border=(none,none,none,$_border1),child='
+          '[CssBlock:child='
+          '[RichText:(:Foo)]]]',
         ),
       );
     });
@@ -1049,9 +1052,9 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Container:'
-            'border=(none,none,none,$_border1),'
-            'child=[RichText:(:Foo)]]]',
+            '[Container:border=(none,none,none,$_border1),child='
+            '[CssBlock:child='
+            '[RichText:(:Foo)]]]',
           ),
         );
       });
@@ -1061,9 +1064,9 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Container:'
-            'border=(none,$_border1,none,none),'
-            'child=[RichText:dir=rtl,(:Foo)]]]',
+            '[Container:border=(none,$_border1,none,none),child='
+            '[CssBlock:child='
+            '[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
       });
@@ -1077,9 +1080,9 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Container:'
-            'border=(none,$_border1,none,none),'
-            'child=[RichText:(:Foo)]]]',
+            '[Container:border=(none,$_border1,none,none),child='
+            '[CssBlock:child='
+            '[RichText:(:Foo)]]]',
           ),
         );
       });
@@ -1089,9 +1092,9 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Container:'
-            'border=(none,none,none,$_border1),'
-            'child=[RichText:dir=rtl,(:Foo)]]]',
+            '[Container:border=(none,none,none,$_border1),child='
+            '[CssBlock:child='
+            '[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
       });
@@ -1106,13 +1109,12 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child='
           '[Container:bg=#FFFF0000,border=$_border1,child='
           '[Column:children='
           '[SizedBox:0.0x12.4],'
           '[CssBlock:child=[RichText:(@15.0+b:Foo)]],'
           '[SizedBox:0.0x12.4]'
-          ']]]',
+          ']]',
         ),
       );
     });
@@ -1124,8 +1126,8 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child='
           '[DecoratedBox:bg=#FFFF0000,border=1.0@solid#FFFF0000,child='
+          '[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -1138,8 +1140,8 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child='
           '[Container:bg=#FFFF0000,border=1.0@solid#FFFF0000,child='
+          '[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );

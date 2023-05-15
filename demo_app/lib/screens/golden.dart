@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:demo_app/widgets/popup_menu.dart';
+import 'package:demo_app/widgets/selection_area.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'
@@ -11,17 +12,14 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 class Golden extends StatelessWidget {
   final String html;
   final String name;
-  final Key targetKey;
+  final Key? targetKey;
 
-  const Golden(this.name, this.html, {Key key, this.targetKey})
-      : super(key: key);
+  const Golden(this.name, this.html, {super.key, this.targetKey});
 
   @override
   Widget build(BuildContext context) {
     final baseUrl = Uri.parse('https://www.w3schools.com/html/');
-    final isSelectable = context.isSelectable;
-    final withEnhanced =
-        !isSelectable && RegExp(r'^(AUDIO|IFRAME|SVG|VIDEO)$').hasMatch(name);
+    final withEnhanced = RegExp(r'^(AUDIO|IFRAME|SVG|VIDEO)$').hasMatch(name);
 
     final children = <Widget>[
       if (withEnhanced)
@@ -35,20 +33,14 @@ class Golden extends StatelessWidget {
       if (withEnhanced)
         Text(
           'flutter_widget_from_html_core:\n',
-          style: Theme.of(context).textTheme.caption,
+          style: Theme.of(context).textTheme.bodySmall,
         ),
       LimitedBox(
         maxHeight: 400,
-        child: isSelectable
-            ? enhanced.HtmlWidget(
-                html,
-                baseUrl: baseUrl,
-                isSelectable: true,
-              )
-            : core.HtmlWidget(
-                html,
-                baseUrl: baseUrl,
-              ),
+        child: core.HtmlWidget(
+          html,
+          baseUrl: baseUrl,
+        ),
       ),
     ];
 
@@ -57,19 +49,16 @@ class Golden extends StatelessWidget {
         const Divider(),
         Text(
           'flutter_widget_from_html:\n',
-          style: Theme.of(context).textTheme.caption,
+          style: Theme.of(context).textTheme.bodySmall,
         ),
         LimitedBox(
           maxHeight: 400,
-          child: enhanced.HtmlWidget(
-            html,
-            baseUrl: baseUrl,
-          ),
+          child: enhanced.HtmlWidget(html, baseUrl: baseUrl),
         ),
       ]);
     }
 
-    return Scaffold(
+    return SelectionAreaScaffold(
       appBar: AppBar(
         title: Text(name),
         actions: const [
@@ -81,7 +70,7 @@ class Golden extends StatelessWidget {
       body: SingleChildScrollView(
         child: RepaintBoundary(
           key: targetKey,
-          child: Container(
+          child: ColoredBox(
             color: Colors.white,
             child: Padding(
               padding: const EdgeInsets.all(10),
@@ -99,17 +88,17 @@ class Golden extends StatelessWidget {
 }
 
 class GoldensScreen extends StatefulWidget {
-  const GoldensScreen({Key key}) : super(key: key);
+  const GoldensScreen({super.key});
 
   @override
   State<GoldensScreen> createState() => _GoldensState();
 }
 
 class _GoldensState extends State<GoldensScreen> {
-  Future<List<MapEntry<String, String>>> _goldens;
+  late final Future<List<MapEntry<String, String>>> _goldens;
 
   final _filter = TextEditingController();
-  List<MapEntry<String, String>> _filtered;
+  List<MapEntry<String, String>>? _filtered;
 
   @override
   void initState() {
@@ -144,9 +133,9 @@ class _GoldensState extends State<GoldensScreen> {
         appBar: AppBar(title: const Text('GoldensScreen')),
         body: FutureBuilder<List<MapEntry<String, String>>>(
           builder: (context, snapshot) => snapshot.hasData
-              ? _onData(_filtered ?? snapshot.data)
+              ? _onData(_filtered ?? snapshot.requireData)
               : snapshot.hasError
-                  ? _onError(snapshot.error)
+                  ? _onError(snapshot.error!)
                   : _onLoading(),
           future: _goldens,
         ),

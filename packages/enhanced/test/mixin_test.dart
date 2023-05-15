@@ -16,14 +16,10 @@ void main() {
   <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
   SVG support is not enabled.
 </svg>''';
-    final e = await explain(tester, html);
-    final explained = e.replaceAll(RegExp('String#[0-9a-f]+,'), 'String,');
+    final explained = await explain(tester, html);
     expect(
       explained,
-      equals(
-        '[SvgPicture:pictureProvider='
-        'StringPicture(String, colorFilter: null)]',
-      ),
+      equals('[SvgPicture:bytesLoader=SvgStringLoader]'),
     );
   });
 
@@ -37,8 +33,7 @@ void main() {
       equals(
         '[CssSizing:$sizingConstraints,child='
         '[SvgPicture:'
-        'pictureProvider=ExactAssetPicture(name: "$assetName", '
-        'bundle: null, colorFilter: null)'
+        'bytesLoader=SvgAssetLoader(assetName: $assetName, packageName: null)'
         ']]',
       ),
     );

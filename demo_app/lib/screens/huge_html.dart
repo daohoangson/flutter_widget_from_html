@@ -5185,7 +5185,7 @@ const kHtml = r'''
 ''';
 
 class HugeHtmlScreen extends StatelessWidget {
-  const HugeHtmlScreen({Key key}) : super(key: key);
+  const HugeHtmlScreen({super.key});
 
   @override
   Widget build(BuildContext context) => Scaffold(

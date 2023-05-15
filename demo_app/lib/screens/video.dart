@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class VideoScreen extends StatefulWidget {
-  const VideoScreen({Key key}) : super(key: key);
+  const VideoScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _State();
@@ -32,27 +32,27 @@ class _State extends State<VideoScreen> {
           children: <Widget>[
             CheckboxListTile(
               value: autoplay,
-              onChanged: (v) => _setState(() => autoplay = v),
+              onChanged: (v) => _setState(() => autoplay = v == true),
               title: const Text('autoplay'),
             ),
             CheckboxListTile(
               value: controls,
-              onChanged: (v) => _setState(() => controls = v),
+              onChanged: (v) => _setState(() => controls = v == true),
               title: const Text('controls'),
             ),
             CheckboxListTile(
               value: loop,
-              onChanged: (v) => _setState(() => loop = v),
+              onChanged: (v) => _setState(() => loop = v == true),
               title: const Text('loop'),
             ),
             CheckboxListTile(
               value: poster,
-              onChanged: (v) => _setState(() => poster = v),
+              onChanged: (v) => _setState(() => poster = v == true),
               title: const Text('poster'),
             ),
             CheckboxListTile(
               value: widthHeight,
-              onChanged: (v) => _setState(() => widthHeight = v),
+              onChanged: (v) => _setState(() => widthHeight = v == true),
               title: const Text('width & height'),
             ),
             ListTile(

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:fwfh_svg/fwfh_svg.dart';
@@ -36,9 +35,7 @@ Future<void> main() async {
     final explained = await helper.explain(tester, html);
     expect(
       explained.replaceAll(RegExp('String#[^,]+,'), 'String,'),
-      equals(
-        '[SvgPicture:pictureProvider=StringPicture(String, colorFilter: null)]',
-      ),
+      equals('[SvgPicture:bytesLoader=SvgStringLoader]'),
     );
   });
 
@@ -52,8 +49,7 @@ Future<void> main() async {
         equals(
           '[CssSizing:$sizingConstraints,child='
           '[SvgPicture:'
-          'pictureProvider=ExactAssetPicture(name: "$assetName", '
-          'bundle: null, colorFilter: null)'
+          'bytesLoader=SvgAssetLoader(assetName: test/images/logo.svg, packageName: null)'
           ']]',
         ),
       );
@@ -68,7 +64,7 @@ Future<void> main() async {
         equals(
           '[CssSizing:$sizingConstraints,child='
           '[SvgPicture:'
-          'pictureProvider=FilePicture("$filePath", colorFilter: null)'
+          'bytesLoader=SvgFileLoader($filePath)'
           ']]',
         ),
       );
@@ -93,7 +89,7 @@ Future<void> main() async {
           explained,
           equals(
             '[CssSizing:$sizingConstraints,child='
-            '[SvgPicture:pictureProvider=MemoryPicture(bytes)]'
+            '[SvgPicture:bytesLoader=SvgBytesLoader]'
             ']',
           ),
         );
@@ -107,7 +103,7 @@ Future<void> main() async {
           explained,
           equals(
             '[CssSizing:$sizingConstraints,child='
-            '[SvgPicture:pictureProvider=MemoryPicture(bytes)]'
+            '[SvgPicture:bytesLoader=SvgBytesLoader]'
             ']',
           ),
         );
@@ -115,7 +111,7 @@ Future<void> main() async {
     });
 
     group('network picture', () {
-      const expectedPicture = '└RawPicture';
+      const expectedPicture = '└_RawPictureVectorGraphicWidget';
 
       testWidgets('renders picture', (WidgetTester tester) async {
         const src = 'http://domain.com/loading.svg';
@@ -208,7 +204,6 @@ Future<void> main() async {
         () {
           setUp(() {
             WidgetFactory.debugDeterministicLoadingWidget = true;
-            PictureProvider.cache.clear();
           });
           tearDown(
             () => WidgetFactory.debugDeterministicLoadingWidget = false,
@@ -293,8 +288,7 @@ class _Golden extends StatelessWidget {
   const _Golden(
     this.contents, {
     required this.allowDrawingOutsideViewBox,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext _) => Scaffold(
@@ -323,7 +317,7 @@ class _GoldenDisallowFactory extends WidgetFactory with SvgFactory {
 class _MockHttpClient extends Mock implements HttpClient {
   @override
   // ignore: avoid_setters_without_getters
-  set autoUncompress(bool _autoUncompress) {}
+  set autoUncompress(bool _) {}
 }
 
 class _MockHttpClientRequest extends Mock implements HttpClientRequest {}

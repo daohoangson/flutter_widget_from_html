@@ -5,7 +5,7 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:photo_view/photo_view.dart';
 
 class PhotoViewScreen extends StatelessWidget {
-  const PhotoViewScreen({Key key}) : super(key: key);
+  const PhotoViewScreen({super.key});
 
   @override
   Widget build(BuildContext context) => DefaultTabController(
@@ -95,7 +95,7 @@ class _PopupPhotoViewWidgetFactory extends WidgetFactory {
       );
     }
 
-    return built;
+    return built ?? const SizedBox.shrink();
   }
 
   @override

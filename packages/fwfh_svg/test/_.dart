@@ -8,7 +8,16 @@ import '../../core/test/_.dart' as helper;
 
 String? svgExplainer(helper.Explainer parent, Widget widget) {
   if (widget is SvgPicture) {
-    return '[SvgPicture:pictureProvider=${widget.pictureProvider}]';
+    final bytesLoader = widget.bytesLoader;
+    var bytesLoaderString = bytesLoader.runtimeType.toString();
+    if (bytesLoader is SvgAssetLoader) {
+      bytesLoaderString = 'SvgAssetLoader(assetName: ${bytesLoader.assetName}, '
+          'packageName: ${bytesLoader.packageName})';
+    } else if (bytesLoader is SvgFileLoader) {
+      bytesLoaderString = 'SvgFileLoader(${bytesLoader.file.path})';
+    }
+
+    return '[SvgPicture:bytesLoader=$bytesLoaderString]';
   }
 
   return null;

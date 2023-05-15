@@ -36,9 +36,7 @@ class TagVideo {
             return;
           }
 
-          final sourceUrls = tree.sourceUrls;
-          sourceUrls.add(url);
-          tree.sourceUrls = sourceUrls;
+          tree.sourceUrls = [...tree.sourceUrls, url];
         },
         onWidgets: (tree, widgets) {
           if (defaultTargetPlatform != TargetPlatform.android &&
@@ -47,6 +45,12 @@ class TagVideo {
             // these are the chewie's supported platforms
             // https://pub.dev/packages/chewie/versions/1.2.2
             return null;
+          }
+
+          final attrs = tree.element.attributes;
+          final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
+          if (url != null) {
+            tree.sourceUrls = [...tree.sourceUrls, url];
           }
 
           return listOrNull(_buildPlayer(tree)) ?? widgets;
@@ -76,7 +80,7 @@ class TagVideo {
 extension _BuildTreeTagVideo on BuildTree {
   static final _sourceUrls = Expando<List<String>>();
 
-  List<String> get sourceUrls => _sourceUrls[this] ?? [];
+  List<String> get sourceUrls => _sourceUrls[this] ?? const [];
 
   set sourceUrls(List<String> v) => _sourceUrls[this] = v;
 }

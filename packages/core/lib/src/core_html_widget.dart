@@ -191,7 +191,13 @@ class HtmlWidgetState extends State<HtmlWidget> {
           } else if (snapshot.hasError) {
             final tree = _newRootBuilder();
             return _sliverToBoxAdapterIfNeeded(
-              _wf.onErrorBuilder(context, tree, snapshot.error) ?? widget0,
+              _wf.onErrorBuilder(
+                    context,
+                    tree,
+                    snapshot.error,
+                    snapshot.stackTrace,
+                  ) ??
+                  widget0,
             );
           } else {
             return _sliverToBoxAdapterIfNeeded(
@@ -215,6 +221,9 @@ class HtmlWidgetState extends State<HtmlWidget> {
 
   Future<Widget> _buildAsync() async {
     final domNodes = await compute(_parseHtml, widget.html);
+    if (!mounted) {
+      return widget0;
+    }
 
     Timeline.startSync('Build $widget (async)');
     final built = _buildBody(this, domNodes);
@@ -230,8 +239,14 @@ class HtmlWidgetState extends State<HtmlWidget> {
     try {
       final domNodes = _parseHtml(widget.html);
       built = _buildBody(this, domNodes);
-    } catch (error) {
-      built = _wf.onErrorBuilder(context, _newRootBuilder(), error) ?? widget0;
+    } catch (error, stackTrace) {
+      built = _wf.onErrorBuilder(
+            context,
+            _newRootBuilder(),
+            error,
+            stackTrace,
+          ) ??
+          widget0;
     }
 
     Timeline.finishSync();
