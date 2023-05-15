@@ -319,12 +319,14 @@ class _StyleSizingInput {
     );
   }
 
-  static final _treeInput = Expando<_StyleSizingInput>();
-
   static _StyleSizingInput? tryParse(BuildTree tree) {
-    var input = _treeInput[tree];
-    if (input == null) {
-      _treeInput[tree] = input = _StyleSizingInput.fromTree(tree);
+    _StyleSizingInput input;
+    final existing = tree.value<_StyleSizingInput>();
+    if (existing == null) {
+      input = _StyleSizingInput.fromTree(tree);
+      tree.value(input);
+    } else {
+      input = existing;
     }
 
     if (input.maxHeight == null &&

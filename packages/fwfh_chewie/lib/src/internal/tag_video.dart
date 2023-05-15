@@ -77,10 +77,16 @@ class TagVideo {
   }
 }
 
-extension _BuildTreeTagVideo on BuildTree {
-  static final _sourceUrls = Expando<List<String>>();
+extension _BuildTreeSourceUrls on BuildTree {
+  List<String> get sourceUrls => value<_TagVideoData>()?.sourceUrls ?? const [];
 
-  List<String> get sourceUrls => _sourceUrls[this] ?? const [];
+  set sourceUrls(List<String> v) {
+    value(_TagVideoData(v));
+  }
+}
 
-  set sourceUrls(List<String> v) => _sourceUrls[this] = v;
+@immutable
+class _TagVideoData {
+  final List<String> sourceUrls;
+  const _TagVideoData(this.sourceUrls);
 }
