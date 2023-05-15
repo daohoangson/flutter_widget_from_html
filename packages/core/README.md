@@ -245,7 +245,7 @@ Notes:
 
 ```dart
 // example 1: simple callback setting accent color from theme
-tree.styleBuilder.enqueue(
+tree.apply(
   (style, _) => style.copyWith(
     textStyle: style.textStyle.copyWith(
       color: style.getDependency<ThemeData>().accentColor,
@@ -259,7 +259,7 @@ HtmlStyle callback(HtmlStyle style, TextAlign value) =>
   style.copyWith(textAlign: value)
 
 // example 2 (continue): register with some value
-tree.styleBuilder.enqueue(callback, TextAlign.justify);
+tree.apply(callback, TextAlign.justify);
 ```
 
 - Other complicated styling are supported via `BuildOp`

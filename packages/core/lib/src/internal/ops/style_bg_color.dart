@@ -24,7 +24,7 @@ class StyleBgColor {
           }
 
           _skipBuilding[tree] = true;
-          tree.styleBuilder.enqueue(_builder, bgColor);
+          tree.apply(_builder, bgColor);
         },
         onWidgets: (tree, widgets) {
           if (_skipBuilding[tree] == true || widgets.isEmpty) {

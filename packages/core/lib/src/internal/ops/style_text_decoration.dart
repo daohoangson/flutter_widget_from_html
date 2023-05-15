@@ -24,7 +24,7 @@ class StyleTextDecoration {
                   style.property == kCssTextDecorationLine) {
                 final line = TextDecorationLine.tryParse(value);
                 if (line != null) {
-                  tree.styleBuilder.enqueue(textDecorationLine, line);
+                  tree.apply(textDecorationLine, line);
                   continue;
                 }
               }
@@ -33,7 +33,7 @@ class StyleTextDecoration {
                   style.property == kCssTextDecorationStyle) {
                 final tds = tryParseTextDecorationStyle(value);
                 if (tds != null) {
-                  tree.styleBuilder.enqueue(textDecorationStyle, tds);
+                  tree.apply(textDecorationStyle, tds);
                   continue;
                 }
               }
@@ -42,7 +42,7 @@ class StyleTextDecoration {
                   style.property == kCssTextDecorationColor) {
                 final color = tryParseColor(value);
                 if (color != null) {
-                  tree.styleBuilder.enqueue(textDecorationColor, color);
+                  tree.apply(textDecorationColor, color);
                   continue;
                 }
               }
@@ -52,8 +52,7 @@ class StyleTextDecoration {
                   style.property == kCssTextDecorationWidth) {
                 final length = tryParseCssLength(value);
                 if (length != null && length.unit == CssLengthUnit.percentage) {
-                  tree.styleBuilder
-                      .enqueue(textDecorationThickness, length.number / 100.0);
+                  tree.apply(textDecorationThickness, length.number / 100.0);
                   continue;
                 }
               }

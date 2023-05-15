@@ -186,6 +186,13 @@ abstract class BuildTree extends BuildBit {
   /// TODO: remove
   css.Declaration? operator [](String key);
 
+  /// Enqueues an HTML styling callback.
+  void apply<T>(
+    HtmlStyle Function(HtmlStyle style, T input) callback,
+    T input,
+  ) =>
+      styleBuilder.enqueue(callback, input);
+
   /// Appends [bit].
   ///
   /// See also: [prepend].

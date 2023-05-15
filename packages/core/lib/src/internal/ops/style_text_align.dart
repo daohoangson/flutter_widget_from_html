@@ -21,7 +21,7 @@ class StyleTextAlign {
   StyleTextAlign(this.wf, this.value);
 
   BuildOp get buildOp => BuildOp(
-        onTree: (tree) => tree.styleBuilder.enqueue(_builder, value),
+        onTree: (tree) => tree.apply(_builder, value),
         onWidgets: (_, widgets) => _onWidgets(widgets, value),
         onWidgetsIsOptional: true,
         priority: 0,

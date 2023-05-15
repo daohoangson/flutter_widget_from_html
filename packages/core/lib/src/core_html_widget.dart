@@ -67,18 +67,14 @@ class HtmlWidget extends StatefulWidget {
   /// - [enableCaching]
   /// - [html]
   /// - [renderMode]
-  ///
-  /// In `flutter_widget_from_html` package, these are also included:
-  ///
-  /// - `isSelectable`
+  /// - [textStyle]
   List<dynamic> get rebuildTriggers => [
         html,
         baseUrl,
         buildAsync,
-        customStylesBuilder,
-        customWidgetBuilder,
         enableCaching,
         renderMode,
+        textStyle,
         if (_rebuildTriggers != null) ..._rebuildTriggers!,
       ];
   final List<dynamic>? _rebuildTriggers;
@@ -133,6 +129,14 @@ class HtmlWidgetState extends State<HtmlWidget> {
       widget.buildAsync ?? widget.html.length > kShouldBuildAsync;
 
   bool get enableCaching => widget.enableCaching ?? !buildAsync;
+
+  builder.Builder get _rootBuilder => builder.Builder(
+        customStylesBuilder: widget.customStylesBuilder,
+        customWidgetBuilder: widget.customWidgetBuilder,
+        element: _rootElement,
+        styleBuilder: _rootStyleBuilder,
+        wf: _wf,
+      );
 
   @override
   void initState() {
@@ -189,11 +193,10 @@ class HtmlWidgetState extends State<HtmlWidget> {
           if (snapshot.hasData) {
             return snapshot.data!;
           } else if (snapshot.hasError) {
-            final tree = _newRootBuilder();
             return _sliverToBoxAdapterIfNeeded(
               _wf.onErrorBuilder(
                     context,
-                    tree,
+                    _rootBuilder,
                     snapshot.error,
                     snapshot.stackTrace,
                   ) ??
@@ -201,7 +204,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
             );
           } else {
             return _sliverToBoxAdapterIfNeeded(
-              _wf.onLoadingBuilder(context, _newRootBuilder()) ?? widget0,
+              _wf.onLoadingBuilder(context, _rootBuilder) ?? widget0,
             );
           }
         },
@@ -240,12 +243,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
       final domNodes = _parseHtml(widget.html);
       built = _buildBody(this, domNodes);
     } catch (error, stackTrace) {
-      built = _wf.onErrorBuilder(
-            context,
-            _newRootBuilder(),
-            error,
-            stackTrace,
-          ) ??
+      built = _wf.onErrorBuilder(context, _rootBuilder, error, stackTrace) ??
           widget0;
     }
 
@@ -253,14 +251,6 @@ class HtmlWidgetState extends State<HtmlWidget> {
 
     return built;
   }
-
-  builder.Builder _newRootBuilder() => builder.Builder(
-        customStylesBuilder: widget.customStylesBuilder,
-        customWidgetBuilder: widget.customWidgetBuilder,
-        element: _rootElement,
-        styleBuilder: _rootStyleBuilder,
-        wf: _wf,
-      );
 
   Widget _sliverToBoxAdapterIfNeeded(Widget child) =>
       widget.renderMode == RenderMode.sliverList
@@ -298,7 +288,7 @@ Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
   final wf = state._wf;
   wf.reset(state);
 
-  final rootBuilder = state._newRootBuilder();
+  final rootBuilder = state._rootBuilder;
   rootBuilder.addBitsFromNodes(domNodes);
 
   return rootBuilder.build()?.wrapWith(wf.buildBodyWidget) ?? widget0;
