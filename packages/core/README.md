@@ -265,7 +265,7 @@ tree.apply(callback, TextAlign.justify);
 - Other complicated styling are supported via `BuildOp`
 
 ```dart
-meta.register(BuildOp(
+tree.register(BuildOp(
   onTree: (tree) {
     // can be used to change text, inline contents, etc.
     tree.append(...);

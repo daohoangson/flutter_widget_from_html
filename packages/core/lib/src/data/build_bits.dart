@@ -172,18 +172,15 @@ abstract class BuildTree extends BuildBit {
   ///
   /// These are collected from:
   ///
-  /// - [WidgetFactory.parse] or [BuildOp.onChild] via `meta[key] = value`
+  /// - [WidgetFactory.parse] or [BuildOp.onChild] via `tree[key] = value`
   /// - [BuildOp.defaultStyles] returning a map
   /// - Attribute `style` of [domElement]
-  ///
-  /// TODO: remove
   Iterable<css.Declaration> get styles;
 
   /// Adds an inline style.
   void operator []=(String key, String value);
 
   /// Gets a styling declaration by `property`.
-  /// TODO: remove
   css.Declaration? operator [](String key);
 
   /// Enqueues an HTML styling callback.
