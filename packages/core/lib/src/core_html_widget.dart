@@ -62,17 +62,15 @@ class HtmlWidget extends StatefulWidget {
   ///
   /// - [baseUrl]
   /// - [buildAsync]
-  /// - [customStylesBuilder]
-  /// - [customWidgetBuilder]
   /// - [enableCaching]
   /// - [html]
   /// - [renderMode]
   /// - [textStyle]
   List<dynamic> get rebuildTriggers => [
-        html,
         baseUrl,
         buildAsync,
         enableCaching,
+        html,
         renderMode,
         textStyle,
         if (_rebuildTriggers != null) ..._rebuildTriggers!,

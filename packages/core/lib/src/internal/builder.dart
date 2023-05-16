@@ -155,7 +155,7 @@ class Builder extends BuildTree {
     }
 
     final subTree = sub(element: element)
-      .._collectMetadata()
+      .._parseEverything()
       ..addBitsFromNodes(element.nodes);
 
     if (subTree._buildOps.where(_opRequiresBuildingSubtree).isNotEmpty) {
@@ -215,7 +215,20 @@ class Builder extends BuildTree {
     }
   }
 
-  void _collectMetadata() {
+  void _customStylesBuilder() {
+    final map = customStylesBuilder?.call(element);
+    if (map == null) {
+      return;
+    }
+
+    final str = map.entries.map((e) => '${e.key}: ${e.value}').join(';');
+    final styleSheet = css.parse('*{$str}');
+
+    final customStyles = styleSheet.collectDeclarations();
+    _styles.addAll(customStyles);
+  }
+
+  void _parseEverything() {
     wf.parse(this);
 
     for (final op in parentOps) {
@@ -244,19 +257,6 @@ class Builder extends BuildTree {
     }
 
     wf.parseStyleDisplay(this, this[kCssDisplay]?.term);
-  }
-
-  void _customStylesBuilder() {
-    final map = customStylesBuilder?.call(element);
-    if (map == null) {
-      return;
-    }
-
-    final str = map.entries.map((e) => '${e.key}: ${e.value}').join(';');
-    final styleSheet = css.parse('*{$str}');
-
-    final customStyles = styleSheet.collectDeclarations();
-    _styles.addAll(customStyles);
   }
 }
 

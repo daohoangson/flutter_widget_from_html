@@ -279,7 +279,7 @@ meta.register(BuildOp(
 ));
 ```
 
-- Each metadata may have as many style builder callbacks and build ops as needed.
+- Each tree may have as many style builder callbacks and build ops as needed.
 
 The example below replaces smilie inline image with an emoji:
 
