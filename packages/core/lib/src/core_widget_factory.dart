@@ -942,7 +942,7 @@ class WidgetFactory {
       case kCssMinHeight:
       case kCssMinWidth:
       case kCssWidth:
-        StyleSizing.registerSizing(this, tree);
+        StyleSizing.registerSizingOp(this, tree);
         break;
 
       case kCssLineHeight:
@@ -1024,9 +1024,11 @@ class WidgetFactory {
 
   /// Parses display inline style.
   void parseStyleDisplay(BuildTree tree, String? value) {
+    StyleSizing.maybeRegisterChildOp(this, tree);
+
     switch (value) {
       case kCssDisplayBlock:
-        StyleSizing.registerBlock(this, tree);
+        StyleSizing.registerBlockOp(this, tree);
         break;
       case kCssDisplayInlineBlock:
         final displayInlineBlock = _styleDisplayInlineBlock ??= BuildOp(

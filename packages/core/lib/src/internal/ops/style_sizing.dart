@@ -29,38 +29,40 @@ class StyleSizing {
   static const k100percent = CssLength(100, CssLengthUnit.percentage);
   static const kPriorityBoxModel3k = 3000;
 
-  late final BuildOp _opBlock;
-  late final BuildOp _opChild;
-  late final BuildOp _opSizing;
   final WidgetFactory wf;
 
-  static final _elementTree = Expando<BuildTree>();
+  late final BuildOp _blockOp;
+  late final BuildOp _childOp;
+  late final BuildOp _sizingOp;
+
   static final _instances = Expando<StyleSizing>();
+
+  static final _elementTree = Expando<BuildTree>();
   static final _treeIsBlock = Expando<bool>();
   static final _skipBuilding = Expando<bool>();
 
-  static void registerBlock(WidgetFactory wf, BuildTree tree) {
-    _elementTree[tree.element] = tree;
-    _treeIsBlock[tree] = true;
-
-    final instance = StyleSizing._factory(wf);
-    tree
-      ..register(instance._opBlock)
-      ..register(instance._opSizing);
-  }
-
-  static void registerChild(WidgetFactory wf, BuildTree tree) {
+  static void maybeRegisterChildOp(WidgetFactory wf, BuildTree tree) {
     final parentElement = tree.element.parent;
     if (parentElement == null || _elementTree[parentElement] == null) {
       return;
     }
 
-    tree.register(StyleSizing._factory(wf)._opChild);
+    tree.register(StyleSizing._factory(wf)._childOp);
   }
 
-  static void registerSizing(WidgetFactory wf, BuildTree tree) {
+  static void registerBlockOp(WidgetFactory wf, BuildTree tree) {
     _elementTree[tree.element] = tree;
-    tree.register(StyleSizing._factory(wf)._opSizing);
+    _treeIsBlock[tree] = true;
+
+    final instance = StyleSizing._factory(wf);
+    tree
+      ..register(instance._blockOp)
+      ..register(instance._sizingOp);
+  }
+
+  static void registerSizingOp(WidgetFactory wf, BuildTree tree) {
+    _elementTree[tree.element] = tree;
+    tree.register(StyleSizing._factory(wf)._sizingOp);
   }
 
   factory StyleSizing._factory(WidgetFactory wf) {
@@ -72,16 +74,16 @@ class StyleSizing {
   }
 
   StyleSizing._(this.wf) {
-    _opBlock = const BuildOp(onWidgets: bypass);
+    _blockOp = const BuildOp(onWidgets: bypass);
 
-    _opChild = BuildOp(
+    _childOp = BuildOp(
       onWidgets: buildMinWidthZero,
       onWidgetsIsOptional: true,
       // min-width resetter should wrap all other box model widgets
       priority: StyleMargin.kPriorityBoxModel9k + 1,
     );
 
-    _opSizing = BuildOp(
+    _sizingOp = BuildOp(
       onTreeFlattening: handleInlineSizing,
       onWidgets: buildCssSizing,
       onWidgetsIsOptional: true,
