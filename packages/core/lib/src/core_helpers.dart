@@ -115,7 +115,8 @@ extension WidgetAnchors on Widget {
 
 /// A widget builder that can be extended with callbacks.
 class WidgetPlaceholder extends StatelessWidget {
-  final String? localName;
+  /// A human-readable description of this placeholder.
+  final String? debugLabel;
 
   final bool _autoUnwrap;
   final List<WidgetPlaceholderBuilder> _builders;
@@ -126,12 +127,15 @@ class WidgetPlaceholder extends StatelessWidget {
     bool autoUnwrap = true,
     WidgetPlaceholderBuilder? builder,
     Widget? child,
+    this.debugLabel,
     Key? key,
-    this.localName,
   })  : _autoUnwrap = autoUnwrap,
         _builders = builder != null ? [builder] : [],
         _firstChild = child,
         super(key: key);
+
+  /// Whether this placeholder renders anything.
+  bool get isEmpty => _firstChild == null && _builders.isEmpty;
 
   @override
   Widget build(BuildContext context) => callBuilders(context, _firstChild);
@@ -162,13 +166,9 @@ class WidgetPlaceholder extends StatelessWidget {
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
 
-    if (localName != null) {
+    if (debugLabel != null) {
       properties.add(
-        DiagnosticsProperty(
-          'localName',
-          localName,
-          showName: false,
-        ),
+        DiagnosticsProperty('debugLabel', debugLabel, showName: false),
       );
     }
   }
@@ -183,8 +183,10 @@ class WidgetPlaceholder extends StatelessWidget {
   ///
   /// Returns [child] if it is already a placeholder.
   // ignore: prefer_constructors_over_static_methods
-  static WidgetPlaceholder lazy(Widget child) =>
-      child is WidgetPlaceholder ? child : WidgetPlaceholder(child: child);
+  static WidgetPlaceholder lazy(Widget child, {String? debugLabel}) =>
+      child is WidgetPlaceholder
+          ? child
+          : WidgetPlaceholder(debugLabel: debugLabel, child: child);
 
   /// Unwraps a placeholder if `autoUnwrap` has been set.
   static Widget unwrap(BuildContext context, Widget widget) {
@@ -231,9 +233,6 @@ Uint8List? bytesFromDataUri(String dataUri) {
 
   return bytes?.isNotEmpty == true ? bytes : null;
 }
-
-/// Returns [List<T>] if [x] is provided or `null` otherwise.
-Iterable<T>? listOrNull<T>(T? x) => x == null ? null : [x];
 
 /// Parses [key] from [map] as an double literal and return its value.
 double? tryParseDoubleFromMap(Map<dynamic, String> map, String key) {

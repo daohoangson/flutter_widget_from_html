@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:csslib/parser.dart' as css;
 import 'package:csslib/visitor.dart' as css;
+import 'package:flutter/widgets.dart';
 
 import 'package:html/dom.dart' as dom;
 
@@ -73,13 +74,23 @@ class Builder extends BuildTree {
 
   @override
   WidgetPlaceholder? build() {
-    var widgets = Flattener(wf, this).widgets;
+    final children = Flattener(wf, this).widgets;
+    var placeholder = wf.buildColumnPlaceholder(this, children) ??
+        WidgetPlaceholder(debugLabel: '${element.localName}--zero');
+
     for (final op in _buildOps) {
-      widgets = op.onWidgets(widgets) ?? widgets;
+      placeholder = WidgetPlaceholder.lazy(
+        op.onBuilt(placeholder) ?? placeholder,
+        debugLabel: '${element.localName}--${op.op.debugLabel ?? 'lazy'}',
+      );
     }
 
-    return wf.buildColumnPlaceholder(this, widgets)
-      ?..setAnchorsIfUnset(anchors);
+    if (placeholder.isEmpty) {
+      // bailing out early if there's nothing to render
+      return null;
+    }
+
+    return placeholder..setAnchorsIfUnset(anchors);
   }
 
   @override
@@ -122,7 +133,7 @@ class Builder extends BuildTree {
   @override
   void flatten(Flattened _) {
     for (final op in _buildOps) {
-      op.onTreeFlattening();
+      op.onFlattening();
     }
   }
 
@@ -158,7 +169,7 @@ class Builder extends BuildTree {
       .._parseEverything()
       ..addBitsFromNodes(element.nodes);
 
-    if (subTree._buildOps.where(_opRequiresBuildingSubtree).isNotEmpty) {
+    if (subTree._buildOps.where(_mustBeBlock).isNotEmpty) {
       final builtSubTree = subTree.build();
       if (builtSubTree != null) {
         append(WidgetBit.block(this, builtSubTree));
@@ -264,12 +275,12 @@ class BuilderOp {
   final BuildOp op;
   final Builder tree;
 
-  var _onWidgets = false;
+  var _onBuilt = false;
 
   BuilderOp._(this.tree, this.op);
 
   List<css.Declaration>? get defaultStyles {
-    final map = op.defaultStyles?.call(tree.element);
+    final map = op.defaultStyles?.call(tree);
     if (map == null) {
       return null;
     }
@@ -283,22 +294,19 @@ class BuilderOp {
 
   void onTree() => op.onTree?.call(tree);
 
-  void onTreeFlattening() {
-    if (_onWidgets) {
+  void onFlattening() {
+    if (_onBuilt) {
       return;
     }
 
-    op.onTreeFlattening?.call(tree);
+    op.onFlattening?.call(tree);
   }
 
-  Iterable<WidgetPlaceholder>? onWidgets(Iterable<WidgetPlaceholder> widgets) {
-    final result = op.onWidgets
-        ?.call(tree, widgets)
-        ?.map(WidgetPlaceholder.lazy)
-        .toList(growable: false);
+  Widget? onBuilt(WidgetPlaceholder placeholder) {
+    final result = op.onBuilt?.call(tree, placeholder);
 
     if (result != null) {
-      _onWidgets = true;
+      _onBuilt = true;
     }
 
     return result;
@@ -323,8 +331,7 @@ class BuilderOp {
   }
 }
 
-bool _opRequiresBuildingSubtree(BuilderOp op) =>
-    op.op.onWidgets != null && !op.op.onWidgetsIsOptional;
+bool _mustBeBlock(BuilderOp op) => op.op.mustBeBlock ?? op.op.onBuilt != null;
 
 Iterable<BuilderOp> _prepareParentOps(
   Iterable<BuilderOp> ops,

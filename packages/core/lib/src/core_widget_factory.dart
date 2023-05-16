@@ -46,6 +46,7 @@ class WidgetFactory {
   BuildOp? _tagFont;
   BuildOp? _tagHr;
   BuildOp? _tagImg;
+  BuildOp? _tagLi;
   BuildOp? _tagPre;
   BuildOp? _tagQ;
   BuildOp? _tagRuby;
@@ -138,6 +139,7 @@ class WidgetFactory {
   Widget buildColumnWidget(
     BuildContext context,
     List<Widget> children, {
+    CrossAxisAlignment? crossAxisAlignment,
     TextDirection? dir,
   }) {
     if (children.length == 1) {
@@ -145,7 +147,7 @@ class WidgetFactory {
     }
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       textDirection: dir,
       children: children,
@@ -634,8 +636,9 @@ class WidgetFactory {
   /// Parses [tree] for build ops and text styles.
   void parse(BuildTree tree) {
     final attrs = tree.element.attributes;
+    final localName = tree.element.localName;
 
-    switch (tree.element.localName) {
+    switch (localName) {
       case kTagA:
         if (attrs.containsKey(kAttributeAHref)) {
           tree
@@ -692,7 +695,7 @@ class WidgetFactory {
         tree.apply(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
         break;
 
-      case 'br':
+      case kTagBr:
         tree.register(_tagBr ??= TagBr(this).buildOp);
         break;
 
@@ -756,8 +759,10 @@ class WidgetFactory {
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin + kSuffixBottom] = '1em'
           ..register(
-            _tagHr ??=
-                BuildOp(onWidgets: (tree, _) => listOrNull(buildDivider(tree))),
+            _tagHr ??= BuildOp(
+              debugLabel: localName,
+              onBuilt: (tree, _) => buildDivider(tree),
+            ),
           );
         break;
 
@@ -814,9 +819,7 @@ class WidgetFactory {
 
       case kTagOrderedList:
       case kTagUnorderedList:
-        tree
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..register(TagLi(this, tree).buildOp);
+        tree.register(_tagLi ??= TagLi(this).buildOp);
         break;
 
       case 'mark':
@@ -831,7 +834,7 @@ class WidgetFactory {
           ..[kCssMargin] = '1em 0';
         break;
 
-      case 'q':
+      case kTagQ:
         tree.register(_tagQ ??= TagQ(this).buildOp);
         break;
 
@@ -1039,6 +1042,7 @@ class WidgetFactory {
         break;
       case kCssDisplayInlineBlock:
         final displayInlineBlock = _styleDisplayInlineBlock ??= BuildOp(
+          debugLabel: 'display: $value',
           onTree: (tree) {
             final built = tree.build();
             if (built != null) {
@@ -1052,6 +1056,7 @@ class WidgetFactory {
         break;
       case kCssDisplayNone:
         final displayNone = _styleDisplayNone ??= BuildOp(
+          debugLabel: 'display: $value',
           onTree: (tree) => tree.replaceWith(null),
           priority: BuildOp.kPriorityMax,
         );
@@ -1102,33 +1107,30 @@ class WidgetFactory {
 
   BuildOp _anchorOp(String id) {
     final anchor = GlobalKey(debugLabel: id);
+    const debugLabel = 'anchor';
 
     return BuildOp(
+      debugLabel: debugLabel,
+      mustBeBlock: false,
       onTree: (tree) {
         _anchorRegistry.register(id, anchor);
         tree.registerAnchor(anchor);
       },
-      onTreeFlattening: (tree) {
+      onFlattening: (tree) {
         final widget = WidgetPlaceholder(
           builder: (context, _) => SizedBox(
             height: tree.styleBuilder.build(context).textStyle.fontSize,
             key: anchor,
           ),
-          localName: 'anchor',
+          debugLabel: debugLabel,
         );
 
         const baseline = PlaceholderAlignment.baseline;
         tree.prepend(WidgetBit.inline(tree, widget, alignment: baseline));
       },
-      onWidgets: (tree, widgets) {
-        return listOrNull(
-              buildColumnPlaceholder(tree, widgets)?.wrapWith(
-                (context, child) => SizedBox(key: anchor, child: child),
-              ),
-            ) ??
-            widgets;
-      },
-      onWidgetsIsOptional: true,
+      onBuilt: (_, placeholder) => placeholder.wrapWith(
+        (_, child) => SizedBox(key: anchor, child: child),
+      ),
       priority: BuildOp.kPriorityMax,
     );
   }

@@ -18,7 +18,8 @@ class TagAudio {
   TagAudio(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onWidgets: (tree, widgets) {
+        debugLabel: kTagAudio,
+        onBuilt: (tree, _) {
           if (defaultTargetPlatform != TargetPlatform.android &&
               defaultTargetPlatform != TargetPlatform.iOS &&
               defaultTargetPlatform != TargetPlatform.macOS &&
@@ -34,19 +35,15 @@ class TagAudio {
             return null;
           }
 
-          return listOrNull(
-                wf.buildAudioPlayer(
-                  tree,
-                  url,
-                  autoplay: attrs.containsKey(kAttributeAudioAutoplay),
-                  loop: attrs.containsKey(kAttributeAudioLoop),
-                  muted: attrs.containsKey(kAttributeAudioMuted),
-                  preload: attrs.containsKey(kAttributeAudioPreload) &&
-                      attrs[kAttributeAudioPreload] !=
-                          kAttributeAudioPreloadNone,
-                ),
-              ) ??
-              widgets;
+          return wf.buildAudioPlayer(
+            tree,
+            url,
+            autoplay: attrs.containsKey(kAttributeAudioAutoplay),
+            loop: attrs.containsKey(kAttributeAudioLoop),
+            muted: attrs.containsKey(kAttributeAudioMuted),
+            preload: attrs.containsKey(kAttributeAudioPreload) &&
+                attrs[kAttributeAudioPreload] != kAttributeAudioPreloadNone,
+          );
         },
       );
 }

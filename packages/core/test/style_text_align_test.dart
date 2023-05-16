@@ -9,7 +9,7 @@ void main() {
     expect(
       explained,
       equals(
-        '[CssBlock:child=[_TextAlignCenter:child='
+        '[CssBlock:child=[Center:child='
         '[RichText:align=center,(:Foo)]]]',
       ),
     );
@@ -116,7 +116,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[_TextAlignCenter:child='
+          '[CssBlock:child=[Center:child='
           '[CssBlock:child=[RichText:align=center,(:_X_)]]]]',
         ),
       );
@@ -166,12 +166,11 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Column:children='
-          '[_TextAlignCenter:child=[CssBlock:child='
-          '[RichText:align=center,(:Foo)]]],'
-          '[_TextAlignCenter:child=[CssBlock:child='
-          '[RichText:align=center,(:_X_)]]]'
-          ']]',
+          '[CssBlock:child=[Center:child='
+          '[Column:crossAxisAlignment=center,children='
+          '[CssBlock:child=[RichText:align=center,(:Foo)]],'
+          '[CssBlock:child=[RichText:align=center,(:_X_)]]'
+          ']]]',
         ),
       );
     });
@@ -183,7 +182,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[Column:crossAxisAlignment=center,children='
           '[CssBlock:child=[RichText:align=center,(:Foo)]],'
           '[CssBlock:child=[RichText:align=center,(:_X_)]]'
           ']]',
@@ -198,7 +197,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[Column:crossAxisAlignment=end,children='
           '[CssBlock:child=[RichText:align=end,(:Foo)]],'
           '[CssBlock:child=[RichText:align=end,(:__X)]]'
           ']]',
@@ -213,7 +212,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[Column:crossAxisAlignment=stretch,children='
           '[CssBlock:child=[RichText:align=justify,(:Foo)]],'
           '[CssBlock:child=[RichText:align=justify,(:X_X_X)]]'
           ']]',
@@ -243,7 +242,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[Column:crossAxisAlignment=end,children='
           '[CssBlock:child=[RichText:align=right,(:Foo)]],'
           '[CssBlock:child=[RichText:align=right,(:__X)]]'
           ']]',
@@ -274,11 +273,11 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Column:children='
-          '[_TextAlignCenter:child=[CssBlock:child='
-          '[RichText:align=center,(:Foo)]]],'
-          '[_TextAlignCenter:child=[RichText:align=center,(:_X_)]]'
-          ']]',
+          '[CssBlock:child=[Center:child='
+          '[Column:crossAxisAlignment=center,children='
+          '[CssBlock:child=[RichText:align=center,(:Foo)]],'
+          '[RichText:align=center,(:_X_)]'
+          ']]]',
         ),
       );
     });
@@ -289,9 +288,9 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[Column:crossAxisAlignment=center,children='
           '[CssBlock:child=[RichText:align=center,(:Foo)]],'
-          '[CssBlock:child=[RichText:align=center,(:_X_)]]'
+          '[RichText:align=center,(:_X_)]'
           ']]',
         ),
       );
@@ -303,9 +302,9 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[Column:crossAxisAlignment=end,children='
           '[CssBlock:child=[RichText:align=end,(:Foo)]],'
-          '[CssBlock:child=[RichText:align=end,(:__X)]]'
+          '[RichText:align=end,(:__X)]'
           ']]',
         ),
       );
@@ -317,9 +316,9 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[Column:crossAxisAlignment=stretch,children='
           '[CssBlock:child=[RichText:align=justify,(:Foo)]],'
-          '[CssBlock:child=[RichText:align=justify,(:X_X_X)]]'
+          '[RichText:align=justify,(:X_X_X)]'
           ']]',
         ),
       );
@@ -333,7 +332,7 @@ void main() {
         equals(
           '[CssBlock:child=[Column:children='
           '[CssBlock:child=[RichText:align=left,(:Foo)]],'
-          '[CssBlock:child=[RichText:align=left,(:X__)]]'
+          '[RichText:align=left,(:X__)]'
           ']]',
         ),
       );
@@ -345,9 +344,9 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Column:children='
+          '[CssBlock:child=[Column:crossAxisAlignment=end,children='
           '[CssBlock:child=[RichText:align=right,(:Foo)]],'
-          '[CssBlock:child=[RichText:align=right,(:__X)]]'
+          '[RichText:align=right,(:__X)]'
           ']]',
         ),
       );
@@ -406,9 +405,10 @@ void main() {
     expect(
       explained,
       equals(
-        '[Padding:(5,5,5,5),child=[CssBlock:child=[Column:children='
+        '[Padding:(5,5,5,5),child=[CssBlock:child='
+        '[Column:crossAxisAlignment=end,children='
         '[CssBlock:child=[RichText:align=right,(:Foo)]],'
-        '[CssBlock:child=[RichText:align=right,(:Bar)]]'
+        '[RichText:align=right,(:Bar)]'
         ']]]',
       ),
     );

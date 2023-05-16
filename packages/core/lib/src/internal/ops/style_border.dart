@@ -16,7 +16,8 @@ class StyleBorder {
 
   StyleBorder(this.wf) {
     inlineOp = BuildOp(
-      onTreeFlattening: (tree) {
+      debugLabel: '$kCssBorder--inline',
+      onFlattening: (tree) {
         if (_skipBuilding[tree] == true) {
           return;
         }
@@ -40,8 +41,10 @@ class StyleBorder {
     );
 
     blockOp = BuildOp(
-      onWidgets: (tree, widgets) {
-        if (_skipBuilding[tree] == true || widgets.isEmpty) {
+      debugLabel: '$kCssBorder--block',
+      mustBeBlock: false,
+      onBuilt: (tree, child) {
+        if (_skipBuilding[tree] == true) {
           return null;
         }
 
@@ -50,14 +53,11 @@ class StyleBorder {
           return null;
         }
 
-        return [
-          WidgetPlaceholder(
-            localName: kCssBorder,
-            child: wf.buildColumnPlaceholder(tree, widgets),
-          ).wrapWith((c, w) => _buildBorder(tree, c, w, border))
-        ];
+        return WidgetPlaceholder(
+          builder: (ctx, _) => _buildBorder(tree, ctx, child, border),
+          debugLabel: kCssBorder,
+        );
       },
-      onWidgetsIsOptional: true,
       priority: kPriorityBoxModel7k,
     );
   }

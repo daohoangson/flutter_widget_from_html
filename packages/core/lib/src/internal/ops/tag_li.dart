@@ -25,38 +25,20 @@ const kCssListStyleTypeRomanUpper = 'upper-roman';
 const kCssListStyleTypeSquare = 'square';
 
 class TagLi {
-  final BuildTree listTree;
   final WidgetFactory wf;
 
-  final _itemTrees = <BuildTree>[];
-  late final BuildOp _itemOp;
-  final _itemWidgets = <WidgetPlaceholder>[];
-
-  _ListConfig? __config;
-
-  TagLi(this.wf, this.listTree) {
-    _itemOp = BuildOp(
-      onWidgets: (itemTree, widgets) {
-        final column = wf.buildColumnPlaceholder(itemTree, widgets) ??
-            WidgetPlaceholder(localName: kTagLi);
-
-        final i = _itemTrees.length;
-        _itemTrees.add(itemTree);
-        _itemWidgets.add(column);
-        return [column.wrapWith((c, w) => _buildItem(c, w, i))];
-      },
-    );
-  }
+  TagLi(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        defaultStyles: (element) {
-          final attrs = element.attributes;
-          final depth = listTree.depth;
+        debugLabel: kTagUnorderedList,
+        defaultStyles: (tree) {
+          final attrs = tree.element.attributes;
+          final depth = tree.listData.depth;
 
           final styles = {
-            'padding-inline-start': '40px',
-            kCssListStyleType: element.localName == kTagOrderedList
-                ? _ListConfig.listStyleTypeFromAttributeType(
+            kCssDisplay: kCssDisplayBlock,
+            kCssListStyleType: tree.element.localName == kTagOrderedList
+                ? _listStyleTypeFromAttributeType(
                       attrs[kAttributeLiType] ?? '',
                     ) ??
                     kCssListStyleTypeDecimal
@@ -65,6 +47,7 @@ class TagLi {
                     : depth == 1
                         ? kCssListStyleTypeCircle
                         : kCssListStyleTypeSquare,
+            '$kCssPadding$kSuffixInlineStart': '40px',
           };
 
           if (depth == 0) {
@@ -73,38 +56,48 @@ class TagLi {
 
           return styles;
         },
-        onChild: (_, subTree) {
+        onChild: (listTree, subTree) {
           final element = subTree.element;
 
           switch (element.localName) {
             case kTagOrderedList:
             case kTagUnorderedList:
-              subTree.depth++;
+              subTree.increaseListDepth();
               break;
             case kTagLi:
               if (element.parent == listTree.element) {
-                subTree.register(_itemOp);
+                subTree.register(
+                  BuildOp(
+                    debugLabel: kTagLi,
+                    onBuilt: (itemTree, item) {
+                      final i = listTree.increaseListItems() - 1;
+
+                      return WidgetPlaceholder(
+                        builder: (context, _) =>
+                            _buildItem(context, listTree, itemTree, item, i),
+                        debugLabel: '${listTree.element.localName}--$i',
+                      );
+                    },
+                  ),
+                );
               }
               break;
           }
         },
-        onWidgets: (_, widgets) => widgets,
       );
 
-  _ListConfig get _config {
-    // cannot build config from constructor because
-    // inline styles are not fully parsed at that time
-    return __config ??= _ListConfig.fromTree(listTree);
-  }
-
-  Widget _buildItem(BuildContext context, Widget child, int i) {
-    final config = _config;
-    final itemTree = _itemTrees[i];
-    final listStyleType = _ListConfig.listStyleTypeFromBuildTree(itemTree) ??
-        config.listStyleType;
-    final markerIndex = config.markerReversed
-        ? (config.markerStart ?? _itemWidgets.length) - i
-        : (config.markerStart ?? 1) + i;
+  Widget _buildItem(
+    BuildContext context,
+    BuildTree listTree,
+    BuildTree itemTree,
+    Widget child,
+    int i,
+  ) {
+    final listData = listTree.listData;
+    final listStyleType = itemTree.itemStyleType ?? listTree.listStyleType;
+    final markerIndex = listData.markerReversed
+        ? (listData.markerStart ?? listData.items) - i
+        : (listData.markerStart ?? 1) + i;
     final style = itemTree.styleBuilder.build(context);
 
     final marker =
@@ -121,61 +114,87 @@ class TagLi {
   }
 }
 
-extension _BuildTreeTagLi on BuildTree {
-  static final _depths = Expando<int>();
+String? _listStyleTypeFromAttributeType(String type) {
+  switch (type) {
+    case kAttributeLiTypeAlphaLower:
+      return kCssListStyleTypeAlphaLower;
+    case kAttributeLiTypeAlphaUpper:
+      return kCssListStyleTypeAlphaUpper;
+    case kAttributeLiTypeDecimal:
+      return kCssListStyleTypeDecimal;
+    case kAttributeLiTypeRomanLower:
+      return kCssListStyleTypeRomanLower;
+    case kAttributeLiTypeRomanUpper:
+      return kCssListStyleTypeRomanUpper;
+  }
 
-  int get depth => _depths[this] ?? 0;
-
-  set depth(int value) => _depths[this] = value;
+  return null;
 }
 
-@immutable
-class _ListConfig {
-  final String listStyleType;
-  final bool markerReversed;
-  final int? markerStart;
+extension _BuildTreeItemData on BuildTree {
+  String? get itemStyleType =>
+      this[kCssListStyleType]?.term ??
+      _listStyleTypeFromAttributeType(
+        element.attributes[kAttributeLiType] ?? '',
+      );
+}
 
-  const _ListConfig({
-    required this.listStyleType,
-    required this.markerReversed,
-    this.markerStart,
-  });
+extension _BuildTreeListData on BuildTree {
+  _TagLiListData get listData {
+    final existing = value<_TagLiListData>();
+    if (existing != null) {
+      return existing;
+    }
 
-  factory _ListConfig.fromTree(BuildTree tree) {
-    final attrs = tree.element.attributes;
-
-    return _ListConfig(
-      listStyleType: tree[kCssListStyleType]?.term ?? kCssListStyleTypeDisc,
+    final attrs = element.attributes;
+    final newData = _TagLiListData(
       markerReversed: attrs.containsKey(kAttributeOlReversed),
       markerStart: tryParseIntFromMap(attrs, kAttributeOlStart),
     );
+    value(newData);
+    return newData;
   }
 
-  static String? listStyleTypeFromBuildTree(BuildTree tree) {
-    final listStyleType = tree[kCssListStyleType]?.term;
-    if (listStyleType != null) {
-      return listStyleType;
-    }
+  String get listStyleType =>
+      this[kCssListStyleType]?.term ?? kCssListStyleTypeDisc;
 
-    return listStyleTypeFromAttributeType(
-      tree.element.attributes[kAttributeLiType] ?? '',
+  int increaseListDepth() {
+    final newData = listData.copyWith(depth: listData.depth + 1);
+    value(newData);
+    return newData.depth;
+  }
+
+  int increaseListItems() {
+    final newData = listData.copyWith(items: listData.items + 1);
+    value(newData);
+    return newData.items;
+  }
+}
+
+@immutable
+class _TagLiListData {
+  final bool markerReversed;
+  final int? markerStart;
+
+  final int depth;
+  final int items;
+
+  const _TagLiListData({
+    required this.markerReversed,
+    this.markerStart,
+    this.depth = 0,
+    this.items = 0,
+  });
+
+  _TagLiListData copyWith({
+    int? depth,
+    int? items,
+  }) {
+    return _TagLiListData(
+      markerReversed: markerReversed,
+      markerStart: markerStart,
+      depth: depth ?? this.depth,
+      items: items ?? this.items,
     );
-  }
-
-  static String? listStyleTypeFromAttributeType(String type) {
-    switch (type) {
-      case kAttributeLiTypeAlphaLower:
-        return kCssListStyleTypeAlphaLower;
-      case kAttributeLiTypeAlphaUpper:
-        return kCssListStyleTypeAlphaUpper;
-      case kAttributeLiTypeDecimal:
-        return kCssListStyleTypeDecimal;
-      case kAttributeLiTypeRomanLower:
-        return kCssListStyleTypeRomanLower;
-      case kAttributeLiTypeRomanUpper:
-        return kCssListStyleTypeRomanUpper;
-    }
-
-    return null;
   }
 }

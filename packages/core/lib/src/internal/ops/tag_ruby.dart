@@ -10,6 +10,7 @@ class TagRuby {
   TagRuby(this.wf);
 
   BuildOp get buildOp => BuildOp(
+        debugLabel: kTagRuby,
         onChild: (tree, subTree) {
           final e = subTree.element;
           if (e.parent != tree.element) {

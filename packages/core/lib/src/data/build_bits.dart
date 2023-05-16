@@ -172,18 +172,15 @@ abstract class BuildTree extends BuildBit {
   ///
   /// These are collected from:
   ///
-  /// - [WidgetFactory.parse] or [BuildOp.onChild] via `meta[key] = value`
+  /// - [WidgetFactory.parse] or [BuildOp.onChild] via `tree[key] = value`
   /// - [BuildOp.defaultStyles] returning a map
   /// - Attribute `style` of [domElement]
-  ///
-  /// TODO: remove
   Iterable<css.Declaration> get styles;
 
   /// Adds an inline style.
   void operator []=(String key, String value);
 
   /// Gets a styling declaration by `property`.
-  /// TODO: remove
   css.Declaration? operator [](String key);
 
   /// Enqueues an HTML styling callback.
@@ -315,7 +312,13 @@ abstract class WidgetBit<T> extends BuildBit {
 
   /// Creates a block widget.
   static WidgetBit<Widget> block(BuildTree parent, Widget child) =>
-      _WidgetBitBlock(parent, WidgetPlaceholder.lazy(child));
+      _WidgetBitBlock(
+        parent,
+        WidgetPlaceholder.lazy(
+          child,
+          debugLabel: '${parent.element.localName}--WidgetBit.block',
+        ),
+      );
 
   /// Creates an inline widget.
   static WidgetBit<InlineSpan> inline(
@@ -326,7 +329,10 @@ abstract class WidgetBit<T> extends BuildBit {
   }) =>
       _WidgetBitInline(
         parent,
-        WidgetPlaceholder.lazy(child),
+        WidgetPlaceholder.lazy(
+          child,
+          debugLabel: '${parent.element.localName}--WidgetBit.inline',
+        ),
         alignment,
         baseline,
       );
@@ -403,11 +409,11 @@ abstract class Flattened {
   void inlineWidget({
     PlaceholderAlignment alignment = PlaceholderAlignment.bottom,
     TextBaseline baseline = TextBaseline.alphabetic,
-    required WidgetPlaceholder child,
+    required Widget child,
   });
 
   /// Renders block [Widget].
-  void widget(WidgetPlaceholder value);
+  void widget(Widget value);
 
   /// Writes textual contents.
   void write({String? text, String? whitespace});

@@ -85,15 +85,16 @@ mixin SvgFactory on WidgetFactory {
 
   @override
   void parse(BuildTree tree) {
-    switch (tree.element.localName) {
+    final localName = tree.element.localName;
+
+    switch (localName) {
       case 'svg':
         tree.register(
           _tagSvg ??= BuildOp(
-            onWidgets: (tree, widgets) {
+            debugLabel: localName,
+            onBuilt: (tree, _) {
               final bytesLoader = SvgStringLoader(tree.element.outerHtml);
-              return [
-                _buildSvgPicture(tree, const ImageSource(''), bytesLoader)
-              ];
+              return _buildSvgPicture(tree, const ImageSource(''), bytesLoader);
             },
           ),
         );

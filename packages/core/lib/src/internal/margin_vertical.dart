@@ -12,13 +12,16 @@ class HeightPlaceholder extends WidgetPlaceholder {
       : super(
           autoUnwrap: false,
           builder: (c, w) => _build(c, w, height, styleBuilder),
+          debugLabel: 'height',
           key: key,
-          localName: 'height',
         ) {
     _heights.add(height);
   }
 
   CssLength get height => _heights.first;
+
+  @override
+  bool get isEmpty => false;
 
   void mergeWith(HeightPlaceholder other) {
     final height = other.height;

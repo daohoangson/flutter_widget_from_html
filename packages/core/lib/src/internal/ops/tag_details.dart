@@ -13,6 +13,7 @@ class TagDetails {
 
   TagDetails(this.wf) {
     _summaryOp = BuildOp(
+      debugLabel: kTagSummary,
       onTree: (tree) {
         if (tree.isEmpty) {
           return;
@@ -25,28 +26,25 @@ class TagDetails {
               final style = tree.styleBuilder.build(context);
               return HtmlDetailsMarker(style: style.textStyle);
             },
-            localName: kTagDetails,
+            debugLabel: tree.element.localName,
           ),
         );
         tree.prepend(marker);
       },
-      onWidgets: (tree, widgets) {
+      onBuilt: (tree, placeholder) {
         if (_summary != null) {
-          return widgets;
+          return null;
         }
 
-        _summary = wf.buildColumnPlaceholder(tree, widgets);
-        if (_summary == null) {
-          return widgets;
-        }
-
-        return const [];
+        _summary = placeholder;
+        return WidgetPlaceholder(debugLabel: tree.element.localName);
       },
       priority: BuildOp.kPriorityMax,
     );
   }
 
   BuildOp get buildOp => BuildOp(
+        debugLabel: kTagDetails,
         onChild: (tree, subTree) {
           final e = subTree.element;
           if (e.parent != tree.element) {
@@ -58,11 +56,11 @@ class TagDetails {
 
           subTree.register(_summaryOp);
         },
-        onWidgets: (tree, widgets) {
+        onBuilt: (tree, placeholder) {
           final attrs = tree.element.attributes;
           final open = attrs.containsKey(kAttributeDetailsOpen);
-          final placeholder =
-              wf.buildColumnPlaceholder(tree, widgets)?.wrapWith(
+
+          return placeholder.wrapWith(
             (context, child) {
               final style = tree.styleBuilder.build(context);
 
@@ -79,8 +77,6 @@ class TagDetails {
               );
             },
           );
-
-          return listOrNull(placeholder) ?? widgets;
         },
       );
 }

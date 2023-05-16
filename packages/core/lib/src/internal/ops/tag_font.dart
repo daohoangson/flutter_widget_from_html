@@ -11,8 +11,9 @@ class TagFont {
   TagFont(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        defaultStyles: (element) {
-          final attrs = element.attributes;
+        debugLabel: kTagFont,
+        defaultStyles: (tree) {
+          final attrs = tree.element.attributes;
           final color = attrs[kAttributeFontColor];
           final fontFace = attrs[kAttributeFontFace];
           final fontSize = kCssFontSizes[attrs[kAttributeFontSize] ?? ''];

@@ -1,11 +1,14 @@
 part of '../core_ops.dart';
 
+const kTagQ = 'q';
+
 class TagQ {
   final WidgetFactory wf;
 
   TagQ(this.wf);
 
   BuildOp get buildOp => BuildOp(
+        debugLabel: kTagQ,
         onTree: (tree) {
           const opening = '“';
           const closing = '”';

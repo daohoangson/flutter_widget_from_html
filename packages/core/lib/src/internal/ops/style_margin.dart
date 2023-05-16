@@ -19,7 +19,9 @@ class StyleMargin {
   StyleMargin(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (tree) {
+        debugLabel: kCssMargin,
+        mustBeBlock: false,
+        onFlattening: (tree) {
           final margin = tryParseCssLengthBox(tree, kCssMargin);
           if (margin == null) {
             return;
@@ -35,29 +37,30 @@ class StyleMargin {
             tree.append(WidgetBit.inline(tree, after));
           }
         },
-        onWidgets: (tree, widgets) {
-          final m = tryParseCssLengthBox(tree, kCssMargin);
-          if (m == null) {
+        onBuilt: (tree, placeholder) {
+          final margin = tryParseCssLengthBox(tree, kCssMargin);
+          if (margin == null) {
             return null;
           }
 
           final styleBuilder = tree.styleBuilder;
-          return [
-            if (m.top?.isPositive ?? false)
-              HeightPlaceholder(m.top!, styleBuilder),
-            for (final widget in widgets)
-              if (m.mayHaveLeft || m.mayHaveRight)
-                widget.wrapWith(
-                  (c, w) =>
-                      _marginHorizontalBuilder(w, m, styleBuilder.build(c)),
-                )
-              else
-                widget,
-            if (m.bottom?.isPositive ?? false)
-              HeightPlaceholder(m.bottom!, styleBuilder),
-          ];
+          return wf.buildColumnPlaceholder(tree, [
+            if (margin.top?.isPositive ?? false)
+              HeightPlaceholder(margin.top!, styleBuilder),
+            if (margin.mayHaveLeft || margin.mayHaveRight)
+              placeholder.wrapWith(
+                (context, child) => _marginHorizontalBuilder(
+                  child,
+                  margin,
+                  styleBuilder.build(context),
+                ),
+              )
+            else
+              placeholder,
+            if (margin.bottom?.isPositive ?? false)
+              HeightPlaceholder(margin.bottom!, styleBuilder),
+          ]);
         },
-        onWidgetsIsOptional: true,
         priority: kPriorityBoxModel9k,
       );
 }

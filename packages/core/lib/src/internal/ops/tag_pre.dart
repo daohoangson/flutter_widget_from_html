@@ -8,15 +8,14 @@ class TagPre {
   TagPre(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        defaultStyles: (element) => {
+        debugLabel: kTagPre,
+        defaultStyles: (_) => {
           kCssDisplay: kCssDisplayBlock,
           kCssFontFamily: '$kTagCodeFont1, $kTagCodeFont2',
           kCssWhitespace: kCssWhitespacePre,
         },
-        onWidgets: (tree, widgets) => listOrNull(
-          wf
-              .buildColumnPlaceholder(tree, widgets)
-              ?.wrapWith((_, w) => wf.buildHorizontalScrollView(tree, w)),
+        onBuilt: (tree, placeholder) => placeholder.wrapWith(
+          (_, child) => wf.buildHorizontalScrollView(tree, child),
         ),
       );
 }

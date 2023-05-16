@@ -77,7 +77,8 @@ mixin WebViewFactory on WidgetFactory {
       case kTagIframe:
         tree.register(
           _tagIframe ??= BuildOp(
-            onWidgets: (tree, widgets) {
+            debugLabel: kTagIframe,
+            onBuilt: (tree, _) {
               if (defaultTargetPlatform != TargetPlatform.android &&
                   defaultTargetPlatform != TargetPlatform.iOS &&
                   !kIsWeb) {
@@ -96,15 +97,14 @@ mixin WebViewFactory on WidgetFactory {
               final height = tryParseDoubleFromMap(a, kAttributeIframeHeight);
               final width = tryParseDoubleFromMap(a, kAttributeIframeWidth);
               final sandbox = a[kAttributeIframeSandbox]?.split(RegExp(r'\s+'));
-              final built = buildWebView(
+
+              return buildWebView(
                 tree,
                 src,
                 height: height,
                 sandbox: sandbox,
                 width: width,
               );
-
-              return listOrNull(built) ?? widgets;
             },
           ),
         );

@@ -21,6 +21,7 @@ class TagVideo {
   TagVideo(this.wf);
 
   BuildOp get buildOp => BuildOp(
+        debugLabel: kTagVideo,
         onChild: (tree, subTree) {
           final e = subTree.element;
           if (e.localName != kTagVideoSource) {
@@ -38,7 +39,7 @@ class TagVideo {
 
           tree.sourceUrls = [...tree.sourceUrls, url];
         },
-        onWidgets: (tree, widgets) {
+        onBuilt: (tree, _) {
           if (defaultTargetPlatform != TargetPlatform.android &&
               defaultTargetPlatform != TargetPlatform.iOS &&
               !kIsWeb) {
@@ -53,7 +54,7 @@ class TagVideo {
             tree.sourceUrls = [...tree.sourceUrls, url];
           }
 
-          return listOrNull(_buildPlayer(tree)) ?? widgets;
+          return _buildPlayer(tree);
         },
       );
 

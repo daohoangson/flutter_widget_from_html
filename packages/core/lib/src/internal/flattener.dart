@@ -35,14 +35,18 @@ class Flattener implements Flattened {
   void inlineWidget({
     PlaceholderAlignment alignment = PlaceholderAlignment.bottom,
     TextBaseline baseline = TextBaseline.alphabetic,
-    required WidgetPlaceholder child,
+    required Widget child,
   }) {
     _saveSpan();
 
     final scopedTree = _bit.parent!;
     final scopedStyleBuilder = _styleBuilder;
+    final placeholder = WidgetPlaceholder.lazy(
+      child,
+      debugLabel: _bit.parent?.element.localName,
+    );
 
-    child.wrapWith((context, widget) {
+    placeholder.wrapWith((context, widget) {
       final style = scopedStyleBuilder.build(context);
       final recognizer = style.gestureRecognizer;
       if (recognizer != null && _needsInlineRecognizer(context, style)) {
@@ -56,16 +60,19 @@ class Flattener implements Flattened {
       (_, {bool? isLast}) => WidgetSpan(
         alignment: alignment,
         baseline: baseline,
-        child: child,
+        child: placeholder,
       ),
     );
   }
 
   @override
-  void widget(WidgetPlaceholder value) {
+  void widget(Widget value) {
     _completeLoop();
 
-    final placeholder = WidgetPlaceholder.lazy(value);
+    final placeholder = WidgetPlaceholder.lazy(
+      value,
+      debugLabel: _bit.parent?.element.localName,
+    );
     final scopedStyleBuilder = _styleBuilder;
     placeholder.wrapWith((context, child) {
       final style = scopedStyleBuilder.build(context);
@@ -250,7 +257,7 @@ class Flattener implements Flattened {
 
           return wf.buildText(tree, style, span);
         },
-        localName: 'text',
+        debugLabel: 'text',
       ),
     );
   }

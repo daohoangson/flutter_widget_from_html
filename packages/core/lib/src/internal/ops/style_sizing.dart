@@ -74,86 +74,72 @@ class StyleSizing {
   }
 
   StyleSizing._(this.wf) {
-    _blockOp = const BuildOp(onWidgets: bypass);
+    _blockOp = const BuildOp(debugLabel: 'display: block', onBuilt: bypass);
 
     _childOp = BuildOp(
-      onWidgets: buildMinWidthZero,
-      onWidgetsIsOptional: true,
+      debugLabel: 'sizing (min-width=0)',
+      mustBeBlock: false,
+      onBuilt: buildMinWidthZero,
       // min-width resetter should wrap all other box model widgets
       priority: StyleMargin.kPriorityBoxModel9k + 1,
     );
 
     _sizingOp = BuildOp(
-      onTreeFlattening: handleInlineSizing,
-      onWidgets: buildCssSizing,
-      onWidgetsIsOptional: true,
+      debugLabel: 'sizing',
+      mustBeBlock: false,
+      onBuilt: buildCssSizing,
+      onFlattening: handleInlineSizing,
       priority: StyleSizing.kPriorityBoxModel3k,
     );
   }
 
-  Iterable<Widget>? buildCssSizing(
-    BuildTree tree,
-    Iterable<WidgetPlaceholder> widgets,
-  ) {
-    if (_skipBuilding[tree] == true || widgets.isEmpty) {
-      return widgets;
+  Widget? buildCssSizing(BuildTree tree, WidgetPlaceholder placeholder) {
+    if (_skipBuilding[tree] == true || placeholder.isEmpty) {
+      return null;
     }
 
     final input = _StyleSizingInput.tryParse(tree);
     if (input == null) {
-      return widgets;
+      return null;
     }
 
-    return listOrNull(
-      wf
-          .buildColumnPlaceholder(tree, widgets)
-          ?.wrapWith((c, w) => _build(c, w, input, tree.styleBuilder)),
+    return placeholder.wrapWith(
+      (context, child) => _build(context, child, input, tree.styleBuilder),
     );
   }
 
-  Iterable<Widget>? buildMinWidthZero(
-    BuildTree subTree,
-    Iterable<WidgetPlaceholder> widgets,
-  ) {
+  Widget? buildMinWidthZero(BuildTree subTree, WidgetPlaceholder placeholder) {
     if (_StyleSizingInput.tryParse(subTree)?.preferredWidth == k100percent) {
-      return widgets;
+      return null;
     }
 
     final parentElement = subTree.element.parent;
     if (parentElement == null) {
-      return widgets;
+      return null;
     }
 
     final parentMeta = _elementTree[parentElement];
     if (parentMeta == null) {
-      return widgets;
+      return null;
     }
 
     final parentInput = _StyleSizingInput.tryParse(parentMeta);
     if (parentInput == null ||
         (parentInput.minWidth == null && parentInput.preferredWidth == null)) {
-      return widgets;
+      return null;
     }
 
-    return listOrNull(
-      wf.buildColumnPlaceholder(subTree, widgets)?.wrapWith(
-        (context, child) {
-          final textDirection =
-              subTree.styleBuilder.build(context).textDirection;
-          return _MinWidthZero(
-            textDirection: textDirection,
-            child: child,
-          );
-        },
-      ),
-    );
+    return placeholder.wrapWith((context, child) {
+      final textDirection = subTree.styleBuilder.build(context).textDirection;
+      return _MinWidthZero(
+        textDirection: textDirection,
+        child: child,
+      );
+    });
   }
 
-  static Iterable<Widget>? bypass(
-    BuildTree _,
-    Iterable<WidgetPlaceholder> widgets,
-  ) =>
-      widgets;
+  static Widget? bypass(BuildTree _, WidgetPlaceholder placeholder) =>
+      placeholder;
 
   static void handleInlineSizing(BuildTree tree) {
     if (_skipBuilding[tree] == true) {
@@ -165,19 +151,24 @@ class StyleSizing {
       return;
     }
 
-    WidgetPlaceholder? widget;
+    WidgetPlaceholder? placeholder;
     for (final b in tree.bits) {
       if (b is WidgetBit) {
-        if (widget != null) {
+        if (placeholder != null) {
+          // TODO: handle multiple inline widgets in the same tree
           return;
         }
-        widget = b.child;
+        placeholder = b.child;
       } else {
         return;
       }
     }
 
-    widget?.wrapWith((c, w) => _build(c, w, input, tree.styleBuilder));
+    if (placeholder == null || placeholder.isEmpty) {
+      return;
+    }
+
+    placeholder.wrapWith((c, w) => _build(c, w, input, tree.styleBuilder));
   }
 
   static void skip(BuildTree tree) {

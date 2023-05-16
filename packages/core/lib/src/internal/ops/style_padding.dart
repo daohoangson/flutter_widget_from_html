@@ -9,7 +9,7 @@ WidgetPlaceholder _paddingInlineAfter(
     WidgetPlaceholder(
       builder: (c, _) =>
           _paddingInlineSizedBox(b.getValueRight(styleBuilder.build(c))),
-      localName: kCssPadding,
+      debugLabel: kCssPadding,
     );
 
 WidgetPlaceholder _paddingInlineBefore(
@@ -19,7 +19,7 @@ WidgetPlaceholder _paddingInlineBefore(
     WidgetPlaceholder(
       builder: (c, _) =>
           _paddingInlineSizedBox(b.getValueLeft(styleBuilder.build(c))),
-      localName: kCssPadding,
+      debugLabel: kCssPadding,
     );
 
 Widget _paddingInlineSizedBox(double? width) =>
@@ -33,7 +33,9 @@ class StylePadding {
   StylePadding(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (tree) {
+        debugLabel: kCssPadding,
+        mustBeBlock: false,
+        onFlattening: (tree) {
           final padding = tryParseCssLengthBox(tree, kCssPadding);
           if (padding == null) {
             return;
@@ -49,26 +51,18 @@ class StylePadding {
             tree.append(WidgetBit.inline(tree, after));
           }
         },
-        onWidgets: (tree, widgets) {
+        onBuilt: (tree, child) {
           final padding = tryParseCssLengthBox(tree, kCssPadding);
           if (padding == null) {
             return null;
           }
 
-          if (widgets.isEmpty) {
-            return widgets;
-          }
-
-          return [
-            WidgetPlaceholder(
-              localName: kCssPadding,
-              child: wf.buildColumnPlaceholder(tree, widgets),
-            ).wrapWith(
-              (context, child) => _build(tree, context, child, padding),
-            )
-          ];
+          return WidgetPlaceholder(
+            builder: (ctx, w) => _build(tree, ctx, w, padding),
+            debugLabel: kCssPadding,
+            child: child,
+          );
         },
-        onWidgetsIsOptional: true,
         priority: kPriorityBoxModel5k,
       );
 

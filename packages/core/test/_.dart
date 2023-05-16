@@ -646,6 +646,14 @@ class Explainer {
       attr.add('aspectRatio=${widget.aspectRatio.toStringAsFixed(1)}');
     }
 
+    if (widget is Column) {
+      final caa = widget.crossAxisAlignment;
+      if (caa != CrossAxisAlignment.start) {
+        final name = caa.toString().replaceAll('CrossAxisAlignment.', '');
+        attr.add('crossAxisAlignment=$name');
+      }
+    }
+
     if (widget is ConstrainedBox) {
       attr.add(_boxConstraints(widget.constraints));
     }

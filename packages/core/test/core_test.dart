@@ -944,14 +944,14 @@ Future<void> main() async {
       expect(e, equals('[CssBlock:child=[RichText:(:1 [RichText:(:2)])]]'));
     });
 
-    testWidgets('#646: renders onWidgets inline', (WidgetTester tester) async {
+    testWidgets('#646: renders onBuilt inline', (WidgetTester tester) async {
       const html = '<span style="display:inline-block;">Foo</span>';
       final explained = await explain(
         tester,
         null,
         hw: HtmlWidget(
           html,
-          factoryBuilder: () => _InlineBlockOnWidgetsFactory(),
+          factoryBuilder: () => _InlineBlockOnBuiltFactory(),
           key: hwKey,
         ),
       );
@@ -1629,13 +1629,11 @@ Future<void> main() async {
   });
 }
 
-class _InlineBlockOnWidgetsFactory extends WidgetFactory {
+class _InlineBlockOnBuiltFactory extends WidgetFactory {
   @override
   void parse(BuildTree tree) {
     if (tree.element.localName == 'span') {
-      tree.register(
-        BuildOp(onWidgets: (_, __) => const [Text('Bar')]),
-      );
+      tree.register(BuildOp(onBuilt: (_, __) => const Text('Bar')));
     }
     super.parse(tree);
   }
