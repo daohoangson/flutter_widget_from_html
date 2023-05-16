@@ -49,6 +49,7 @@ class WidgetFactory {
   BuildOp? _tagPre;
   BuildOp? _tagQ;
   BuildOp? _tagRuby;
+  TagTable? _tagTable;
   HtmlStyle Function(HtmlStyle, css.Expression)? _styleBuilderLineHeight;
   HtmlWidget? _widget;
 
@@ -855,19 +856,11 @@ class WidgetFactory {
         break;
 
       case kTagTable:
+        final tagTable = _tagTable ??= TagTable(this);
         tree
           ..[kCssDisplay] = kCssDisplayTable
-          ..register(
-            TagTable.borderOp(
-              tryParseDoubleFromMap(attrs, kAttributeBorder) ?? 0.0,
-              tryParseDoubleFromMap(attrs, kAttributeCellSpacing) ?? 2.0,
-            ),
-          )
-          ..register(
-            TagTable.cellPaddingOp(
-              tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1.0,
-            ),
-          );
+          ..register(tagTable.borderOp)
+          ..register(tagTable.cellPaddingOp);
         break;
       case kTagTableCell:
         tree[kCssVerticalAlign] = kCssVerticalAlignMiddle;
@@ -1065,7 +1058,8 @@ class WidgetFactory {
         tree.register(displayNone);
         break;
       case kCssDisplayTable:
-        tree.register(TagTable(this).buildOp);
+        final tagTable = _tagTable ??= TagTable(this);
+        tree.register(tagTable.tableOp);
         break;
     }
   }

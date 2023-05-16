@@ -32,23 +32,56 @@ const kCssDisplayTableCaption = 'table-caption';
 class TagTable {
   final WidgetFactory wf;
 
-  final _data = _TagTableData();
+  late final BuildOp borderOp;
+  late final BuildOp cellPaddingOp;
+  late final BuildOp tableOp;
 
-  TagTable(this.wf);
+  TagTable(this.wf) {
+    borderOp = BuildOp(
+      defaultStyles: (element) {
+        final data = element.parse();
+        return {
+          if (data.border > 0.0) kCssBorder: '${data.border}px solid black',
+          kCssBorderCollapse: kCssBorderCollapseSeparate,
+          kCssBorderSpacing: '${data.borderSpacing}px',
+        };
+      },
+      onChild: (tree, subTree) {
+        final data = tree.data;
+        if (data.border > 0) {
+          switch (subTree.element.localName) {
+            case kTagTableCell:
+            case kTagTableHeaderCell:
+              subTree[kCssBorder] = kCssBorderInherit;
+          }
+        }
+      },
+    );
 
-  BuildOp get buildOp => BuildOp(
-        onChild: _onTableChild,
-        onTree: _onTableTree,
-        onWidgets: _onTableWidgets,
-        priority: 0,
-      );
+    cellPaddingOp = BuildOp(
+      onChild: (tree, subTree) {
+        if (subTree.element.localName == 'td' ||
+            subTree.element.localName == 'th') {
+          final data = tree.data;
+          subTree[kCssPadding] = '${data.cellPadding}px';
+        }
+      },
+    );
+
+    tableOp = BuildOp(
+      onChild: _onTableChild,
+      onTree: _onTableTree,
+      onWidgets: _onTableWidgets,
+      priority: 0,
+    );
+  }
 
   void _onTableChild(BuildTree tableTree, BuildTree subTree) {
     if (subTree.element.parent != tableTree.element) {
       return;
     }
 
-    final data = _data;
+    final data = tableTree.data;
     final which = _getCssDisplayValue(subTree);
     _TagTableDataGroup? latestGroup;
     switch (which) {
@@ -95,7 +128,7 @@ class TagTable {
     BuildTree tableTree,
     Iterable<WidgetPlaceholder> _,
   ) {
-    final data = _data;
+    final data = tableTree.data;
 
     _prepareHtmlTableCaptionBuilders(data);
     _prepareHtmlTableCellBuilders(tableTree, data.header);
@@ -159,7 +192,7 @@ class TagTable {
     BuildTree tableTree,
     _TagTableDataGroup group,
   ) {
-    final data = _data;
+    final data = tableTree.data;
     final rowStartOffset = data.rows;
     final rowSpanMax = group.rows.length;
 
@@ -233,30 +266,6 @@ class TagTable {
     }
   }
 
-  static BuildOp cellPaddingOp(double px) => BuildOp(
-        onChild: (_, subTree) => (subTree.element.localName == 'td' ||
-                subTree.element.localName == 'th')
-            ? subTree[kCssPadding] = '${px}px'
-            : null,
-      );
-
-  static BuildOp borderOp(double border, double borderSpacing) => BuildOp(
-        defaultStyles: (_) => {
-          if (border > 0.0) kCssBorder: '${border}px solid black',
-          kCssBorderCollapse: kCssBorderCollapseSeparate,
-          kCssBorderSpacing: '${borderSpacing}px',
-        },
-        onChild: border > 0
-            ? (_, subTree) {
-                switch (subTree.element.localName) {
-                  case kTagTableCell:
-                  case kTagTableHeaderCell:
-                    subTree[kCssBorder] = kCssBorderInherit;
-                }
-              }
-            : null,
-      );
-
   static String? _getCssDisplayValue(BuildTree tree) {
     for (final style in tree.element.styles.reversed) {
       if (style.property == kCssDisplay) {
@@ -284,6 +293,30 @@ class TagTable {
     }
 
     return null;
+  }
+}
+
+extension _BuildTreeData on BuildTree {
+  _TagTableData get data {
+    final existing = value<_TagTableData>();
+    if (existing != null) {
+      return existing;
+    }
+
+    final newData = element.parse();
+    value(newData);
+    return newData;
+  }
+}
+
+extension _BuildTreeDataParser on dom.Element {
+  _TagTableData parse() {
+    final attrs = attributes;
+    return _TagTableData(
+      border: tryParseDoubleFromMap(attrs, kAttributeBorder) ?? 0.0,
+      borderSpacing: tryParseDoubleFromMap(attrs, kAttributeCellSpacing) ?? 2.0,
+      cellPadding: tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1.0,
+    );
   }
 }
 
@@ -371,6 +404,10 @@ class _TagTableRowGroup {
 }
 
 class _TagTableData {
+  final double border;
+  final double borderSpacing;
+  final double cellPadding;
+
   final bodies = <_TagTableDataGroup>[];
   final captions = <Widget>[];
   final footer = _TagTableDataGroup();
@@ -380,6 +417,12 @@ class _TagTableData {
   final cells = <int, Map<int, int>>{};
   int columns = 0;
   int rows = 0;
+
+  _TagTableData({
+    required this.border,
+    required this.borderSpacing,
+    required this.cellPadding,
+  });
 
   _TagTableDataGroup get body {
     final body = _TagTableDataGroup();
