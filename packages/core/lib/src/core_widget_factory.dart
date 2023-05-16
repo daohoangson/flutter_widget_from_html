@@ -1,6 +1,15 @@
 import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    show
+        // we want to limit Material usages to be as generic as possible
+        CircularProgressIndicator,
+        Divider,
+        Theme,
+        ThemeData,
+        Tooltip;
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 
 import 'core_data.dart';
 import 'core_helpers.dart';
@@ -407,10 +416,12 @@ class WidgetFactory {
   ///
   /// Includes these by default:
   ///
-  /// - [MediaQueryData] via [MediaQuery.of]
   /// - [TextDirection] via [Directionality.of]
+  /// - [DefaultSelectionStyle] via [DefaultSelectionStyle.of]
   /// - [TextStyle] via [DefaultTextStyle.of]
+  /// - [SelectionRegistrar] via [SelectionContainer.maybeOf]
   /// - [ThemeData] via [Theme.of]
+  /// - [MediaQueryData] via [MediaQuery.of]
   ///
   /// Use [HtmlStyle.getDependency] to get value by type.
   ///
@@ -435,12 +446,15 @@ class WidgetFactory {
   /// final buildOpValue = style.textDirection;
   /// ```
   Iterable<dynamic> getDependencies(BuildContext context) => [
-        MediaQuery.of(context),
         Directionality.of(context),
         DefaultSelectionStyle.of(context),
         DefaultTextStyle.of(context).style,
         SelectionContainer.maybeOf(context),
         Theme.of(context),
+
+        // TODO: use inherited model scope when it's merged into stable
+        // https://github.com/flutter/flutter/pull/114459
+        MediaQuery.of(context),
       ];
 
   /// Returns marker text for the specified list style [type] at index [i].

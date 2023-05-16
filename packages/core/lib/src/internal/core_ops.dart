@@ -3,7 +3,11 @@ import 'dart:math';
 
 import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    show
+        // we want to limit Material usages to be as generic as possible
+        ThemeData;
+import 'package:flutter/widgets.dart';
 
 import '../core_data.dart';
 import '../core_helpers.dart';
