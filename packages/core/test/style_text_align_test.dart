@@ -1,4 +1,7 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '_.dart';
@@ -774,4 +777,41 @@ void tests() {
       explained: await explainMargin(tester, html),
     );
   });
+}
+
+Future<void> explainScreenMatchesGolden(
+  WidgetTester tester,
+  String html,
+  Matcher matcher, {
+  String? explained,
+  GlobalKey? key,
+}) async {
+  final stackTrace = StackTrace.current.toString();
+
+  final key = GlobalKey<HtmlWidgetState>();
+  final theme = ThemeData.light();
+  await tester.pumpWidgetBuilder(
+    Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        HtmlWidget(html, key: key),
+      ],
+    ),
+    wrapper: materialAppWrapper(
+      theme: theme.copyWith(
+        colorScheme: theme.colorScheme.copyWith(primary: kColorPrimary),
+        textTheme: theme.textTheme.copyWith(
+          bodyMedium: theme.textTheme.bodyMedium?.copyWith(color: kColor),
+        ),
+      ),
+    ),
+    surfaceSize: const Size(400, 300),
+  );
+
+  explained ??= await explainWithoutPumping(key: key);
+  expect(explained, matcher, reason: stackTrace);
+
+  if (defaultTargetPlatform == TargetPlatform.linux) {
+    await screenMatchesGolden(tester, html, finder: find.byKey(key));
+  }
 }
