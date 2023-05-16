@@ -6,7 +6,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ImgFileScreen extends StatelessWidget {
-  const ImgFileScreen({Key key}) : super(key: key);
+  const ImgFileScreen({super.key});
 
   @override
   Widget build(BuildContext context) => DefaultTabController(
@@ -42,10 +42,9 @@ class _ImgFileTab extends StatefulWidget {
   final String fileExtension;
 
   const _ImgFileTab({
-    @required this.assetKey,
-    @required this.fileExtension,
-    Key key,
-  }) : super(key: key);
+    required this.assetKey,
+    required this.fileExtension,
+  });
 
   @override
   State<_ImgFileTab> createState() => _ImgFileState();
@@ -96,7 +95,7 @@ class _ImgFileState extends State<_ImgFileTab> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final file = snapshot.data;
+                  final file = snapshot.requireData;
                   final html = '<img src="file://${file.path}" />';
 
                   return Padding(
@@ -115,8 +114,6 @@ class _ImgFileState extends State<_ImgFileTab> {
             case _ImgFileStatus.writeFileError:
               return const Center(child: Text('Unable to write file'));
           }
-
-          return const SizedBox.shrink();
         },
       );
 

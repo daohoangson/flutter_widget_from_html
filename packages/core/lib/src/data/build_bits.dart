@@ -186,6 +186,13 @@ abstract class BuildTree extends BuildBit {
   /// TODO: remove
   css.Declaration? operator [](String key);
 
+  /// Enqueues an HTML styling callback.
+  void apply<T>(
+    HtmlStyle Function(HtmlStyle style, T input) callback,
+    T input,
+  ) =>
+      styleBuilder.enqueue(callback, input);
+
   /// Appends [bit].
   ///
   /// See also: [prepend].
@@ -246,9 +253,9 @@ abstract class BuildTree extends BuildBit {
     final sb = _buffers[this] = StringBuffer();
     sb.writeln('BuildTree#$hashCode $styleBuilder:');
 
-    const _indent = '  ';
+    const indent = '  ';
     for (final child in children) {
-      sb.write('$_indent${child.toString().replaceAll('\n', '\n$_indent')}\n');
+      sb.write('$indent${child.toString().replaceAll('\n', '\n$indent')}\n');
     }
 
     final str = sb.toString().trimRight();

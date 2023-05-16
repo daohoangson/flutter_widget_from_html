@@ -97,10 +97,9 @@ class _RubyRenderObject extends RenderBox
   }
 
   static Size _performLayout(
-    final RenderBox ruby,
-    final BoxConstraints constraints,
-    final Size Function(RenderBox renderBox, BoxConstraints constraints)
-        layouter,
+    RenderBox ruby,
+    BoxConstraints constraints,
+    Size Function(RenderBox renderBox, BoxConstraints constraints) layouter,
   ) {
     final rubyConstraints = constraints.loosen();
     final rubyData = ruby.parentData! as _RubyParentData;

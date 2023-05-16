@@ -17,6 +17,9 @@ class ColumnPlaceholder extends WidgetPlaceholder {
   bool get isBody => _isBody[this] == true;
 
   @override
+  bool get isEmpty => children.isEmpty;
+
+  @override
   Widget build(BuildContext context) {
     final style = tree.styleBuilder.build(context);
     final widgets = _buildWidgets(context);

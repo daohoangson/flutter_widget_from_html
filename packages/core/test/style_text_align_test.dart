@@ -765,11 +765,11 @@ void tests() {
       tester,
       html,
       equals(
-        '[CssBlock:child=[Padding:(5,5,5,5),child='
-        '[CssBlock:child=[Column:crossAxisAlignment=end,children='
+        '[Padding:(5,5,5,5),child=[CssBlock:child='
+        '[Column:crossAxisAlignment=end,children='
         '[CssBlock:child=[RichText:align=right,(:Foo)]],'
         '[RichText:align=right,(:Bar)]'
-        ']]]]',
+        ']]]',
       ),
       explained: await explainMargin(tester, html),
     );

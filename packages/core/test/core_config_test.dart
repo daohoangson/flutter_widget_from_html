@@ -85,7 +85,7 @@ void main() {
           ),
         );
 
-    void _expect(Widget? built1, Widget? built2, Matcher matcher) {
+    void enableCachingExpect(Widget? built1, Widget? built2, Matcher matcher) {
       final widget1 = (built1! as HtmlStyleWidget).child;
       final widget2 = (built2! as HtmlStyleWidget).child;
       expect(widget1 == widget2, matcher);
@@ -99,7 +99,7 @@ void main() {
 
       await explain(tester, html, enableCaching: true);
       final built2 = helper.buildCurrentState();
-      _expect(built1, built2, isTrue);
+      enableCachingExpect(built1, built2, isTrue);
     });
 
     testWidgets('rebuild new html', (WidgetTester tester) async {
@@ -124,10 +124,10 @@ void main() {
         tester,
         html,
         enableCaching: true,
-        baseUrl: Uri.http('domain.com', ''),
+        baseUrl: Uri.http('domain.com'),
       );
       final built2 = helper.buildCurrentState();
-      _expect(built1, built2, isFalse);
+      enableCachingExpect(built1, built2, isFalse);
     });
 
     testWidgets('rebuild new buildAsync', (tester) async {
@@ -139,7 +139,7 @@ void main() {
 
       await explain(tester, html, enableCaching: true, buildAsync: false);
       final built2 = helper.buildCurrentState();
-      _expect(built1, built2, isFalse);
+      enableCachingExpect(built1, built2, isFalse);
     });
 
     testWidgets('rebuild new enableCaching', (tester) async {
@@ -151,7 +151,7 @@ void main() {
 
       await explain(tester, html, enableCaching: false);
       final built2 = helper.buildCurrentState();
-      _expect(built1, built2, isFalse);
+      enableCachingExpect(built1, built2, isFalse);
     });
 
     testWidgets('rebuild new rebuildTriggers', (tester) async {
@@ -173,7 +173,7 @@ void main() {
         rebuildTriggers: [2],
       );
       final built2 = helper.buildCurrentState();
-      _expect(built1, built2, isFalse);
+      enableCachingExpect(built1, built2, isFalse);
     });
 
     testWidgets('rebuild new textStyle', (tester) async {
@@ -199,7 +199,7 @@ void main() {
 
       await explain(tester, html, enableCaching: false);
       final built2 = helper.buildCurrentState();
-      _expect(built1, built2, isFalse);
+      enableCachingExpect(built1, built2, isFalse);
     });
   });
 

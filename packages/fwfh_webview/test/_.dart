@@ -18,11 +18,6 @@ String? webViewExplainer(helper.Explainer parent, Widget widget) {
             ? ',unsupportedWorkaroundForIssue37='
                 '${widget.unsupportedWorkaroundForIssue37}'
             : '';
-    final unsupportedWorkaroundForIssue375 =
-        !widget.unsupportedWorkaroundForIssue375
-            ? ',unsupportedWorkaroundForIssue375='
-                '${widget.unsupportedWorkaroundForIssue375}'
-            : '';
     final userAgent = widget.userAgent?.isNotEmpty == true
         ? ',userAgent=${widget.userAgent}'
         : '';
@@ -34,7 +29,6 @@ String? webViewExplainer(helper.Explainer parent, Widget widget) {
         "${!widget.js ? ',js=${widget.js}' : ''}"
         '$mediaPlaybackAlwaysAllow'
         '$unsupportedWorkaroundForIssue37'
-        '$unsupportedWorkaroundForIssue375'
         '$userAgent'
         ']';
   }

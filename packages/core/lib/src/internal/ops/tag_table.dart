@@ -30,113 +30,175 @@ const kCssDisplayTableCell = 'table-cell';
 const kCssDisplayTableCaption = 'table-caption';
 
 class TagTable {
-  final companion = HtmlTableCompanion();
   final WidgetFactory wf;
 
-  final _data = _TagTableData();
+  late final BuildOp borderOp;
+  late final BuildOp cellPaddingOp;
+  late final BuildOp tableOp;
 
-  BuildOp? _captionOp;
-
-  TagTable(this.wf);
-
-  BuildOp get buildOp => BuildOp(
-        debugLabel: kTagTable,
-        onChild: (tableTree, subTree) {
-          if (subTree.element.parent != tableTree.element) {
-            return;
+  TagTable(this.wf) {
+    borderOp = BuildOp(
+      debugLabel: '$kTagTable--$kAttributeBorder',
+      defaultStyles: (element) {
+        final data = element.parse();
+        return {
+          if (data.border > 0.0) kCssBorder: '${data.border}px solid black',
+          kCssBorderCollapse: kCssBorderCollapseSeparate,
+          kCssBorderSpacing: '${data.borderSpacing}px',
+        };
+      },
+      onChild: (tree, subTree) {
+        final data = tree.data;
+        if (data.border > 0) {
+          switch (subTree.element.localName) {
+            case kTagTableCell:
+            case kTagTableHeaderCell:
+              subTree[kCssBorder] = kCssBorderInherit;
           }
+        }
+      },
+    );
 
-          final which = _getCssDisplayValue(subTree);
-          _TagTableDataGroup? latestGroup;
-          switch (which) {
-            case kCssDisplayTableRow:
-              latestGroup ??= _data.body;
-              final row = _TagTableDataRow();
-              latestGroup.rows.add(row);
-              subTree.register(_TagTableRow(row).buildOp);
-              break;
-            case kCssDisplayTableHeaderGroup:
-            case kCssDisplayTableRowGroup:
-            case kCssDisplayTableFooterGroup:
-              final rows = which == kCssDisplayTableHeaderGroup
-                  ? _data.header.rows
-                  : which == kCssDisplayTableRowGroup
-                      ? _data.body.rows
-                      : _data.footer.rows;
-              subTree.register(_TagTableRowGroup(rows).buildOp);
-              latestGroup = null;
-              break;
-            case kCssDisplayTableCaption:
-              subTree.register(
-                _captionOp ??= BuildOp(
-                  debugLabel: kTagTableCaption,
-                  onBuilt: (captionTree, caption) {
-                    _data.captions.add(caption);
-                    return captionTree.placeholder;
-                  },
-                ),
-              );
-              break;
-          }
-        },
-        onTree: (tableTree) {
-          StyleBorder.skip(tableTree);
-          StyleSizing.treatHeightAsMinHeight(tableTree);
-        },
-        onBuilt: (tableTree, _) {
-          _prepareHtmlTableCellBuilders(tableTree, _data.header);
-          for (final body in _data.bodies) {
-            _prepareHtmlTableCellBuilders(tableTree, body);
-          }
-          _prepareHtmlTableCellBuilders(tableTree, _data.footer);
-          if (_data.builders.isEmpty) {
-            return null;
-          }
+    cellPaddingOp = BuildOp(
+      debugLabel: '$kTagTable--$kAttributeCellPadding',
+      onChild: (tree, subTree) {
+        if (subTree.element.localName == 'td' ||
+            subTree.element.localName == 'th') {
+          final data = tree.data;
+          subTree[kCssPadding] = '${data.cellPadding}px';
+        }
+      },
+    );
 
-          final border = tryParseBorder(tableTree);
-          final borderCollapse = tableTree[kCssBorderCollapse]?.term;
-          final borderSpacingExpression = tableTree[kCssBorderSpacing]?.value;
-          final borderSpacing = borderSpacingExpression != null
-              ? tryParseCssLength(borderSpacingExpression)
-              : null;
+    tableOp = BuildOp(
+      debugLabel: kTagTable,
+      onBuilt: _onTableBuilt,
+      onChild: _onTableChild,
+      onTree: _onTableTree,
+      priority: 0,
+    );
+  }
 
-          return wf.buildColumnPlaceholder(
-            tableTree,
-            [
-              ..._data.captions,
-              tableTree.placeholder.wrapWith((context, _) {
-                final tableStyle = tableTree.styleBuilder.build(context);
+  void _onTableChild(BuildTree tableTree, BuildTree subTree) {
+    if (subTree.element.parent != tableTree.element) {
+      return;
+    }
 
-                return HtmlTable(
-                  border: border.getBorder(tableStyle),
-                  borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
-                  borderSpacing: borderSpacing?.getValue(tableStyle) ?? 0.0,
-                  companion: companion,
-                  textDirection: tableStyle.textDirection,
-                  children: List.from(
-                    _data.builders
-                        .map((f) => f(context))
-                        .where((e) => e != null),
-                    growable: false,
-                  ),
-                );
-              }),
-            ],
-          );
-        },
+    final data = tableTree.data;
+    final which = _getCssDisplayValue(subTree);
+    _TagTableDataGroup? latestGroup;
+    switch (which) {
+      case kCssDisplayTableRow:
+        latestGroup ??= data.body;
+        final row = _TagTableDataRow();
+        latestGroup.rows.add(row);
+        subTree.register(_TagTableRow(row)._rowOp);
+        break;
+      case kCssDisplayTableHeaderGroup:
+      case kCssDisplayTableRowGroup:
+      case kCssDisplayTableFooterGroup:
+        final rows = which == kCssDisplayTableHeaderGroup
+            ? data.header.rows
+            : which == kCssDisplayTableRowGroup
+                ? data.body.rows
+                : data.footer.rows;
+        subTree.register(_TagTableRowGroup(which!, rows)._groupOp);
+        latestGroup = null;
+        break;
+      case kCssDisplayTableCaption:
+        subTree.register(
+          BuildOp(
+            debugLabel: kTagTableCaption,
+            onBuilt: (captionTree, placeholder) {
+              if (placeholder.isEmpty) {
+                return null;
+              }
+              data.captions.add(placeholder);
+              return placeholder;
+            },
+            priority: BuildOp.kPriorityMax,
+          ),
+        );
+        break;
+    }
+  }
+
+  void _onTableTree(BuildTree tableTree) {
+    StyleBorder.skip(tableTree);
+    StyleSizing.skip(tableTree);
+  }
+
+  Widget? _onTableBuilt(BuildTree tableTree, WidgetPlaceholder _) {
+    final data = tableTree.data;
+
+    _prepareHtmlTableCaptionBuilders(data);
+    _prepareHtmlTableCellBuilders(tableTree, data.header);
+    for (final body in data.bodies) {
+      _prepareHtmlTableCellBuilders(tableTree, body);
+    }
+    _prepareHtmlTableCellBuilders(tableTree, data.footer);
+    if (data.builders.isEmpty) {
+      return null;
+    }
+
+    final border = tryParseBorder(tableTree);
+    final borderCollapse = tableTree[kCssBorderCollapse]?.term;
+    final borderSpacingExpression = tableTree[kCssBorderSpacing]?.value;
+    final borderSpacing = borderSpacingExpression != null
+        ? tryParseCssLength(borderSpacingExpression)
+        : null;
+
+    return WidgetPlaceholder(
+      debugLabel: kTagTable,
+      builder: (context, _) {
+        final tableStyle = tableTree.styleBuilder.build(context);
+
+        return ValignBaselineContainer(
+          child: HtmlTable(
+            border: border.getBorder(tableStyle),
+            borderCollapse: borderCollapse == kCssBorderCollapseCollapse,
+            borderSpacing: borderSpacing?.getValue(tableStyle) ?? 0.0,
+            textDirection: tableStyle.textDirection,
+            children: List.from(
+              data.builders.map((f) => f(context)).where((e) => e != null),
+              growable: false,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _prepareHtmlTableCaptionBuilders(_TagTableData data) {
+    for (final child in data.captions) {
+      final rowIndex = data.rows;
+      final builderIndex = data.builders.length;
+      data.cells[rowIndex] = {0: builderIndex};
+      data.columns = max(data.columns, 1);
+      data.rows = data.cells.keys.length;
+
+      data.builders.add(
+        (_) => HtmlTableCaption(
+          columnSpan: data.columns,
+          rowIndex: rowIndex,
+          child: child,
+        ),
       );
+    }
+  }
 
   void _prepareHtmlTableCellBuilders(
     BuildTree tableTree,
     _TagTableDataGroup group,
   ) {
-    final rowStartOffset = _data.rows;
+    final data = tableTree.data;
+    final rowStartOffset = data.rows;
     final rowSpanMax = group.rows.length;
 
     for (var i = 0; i < group.rows.length; i++) {
       final row = group.rows[i];
       final rowStart = rowStartOffset + i;
-      final rowCells = _data.cells[rowStart] ??= {};
+      final rowCells = data.cells[rowStart] ??= {};
 
       for (final cell in row.cells) {
         var columnStart = 0;
@@ -153,21 +215,18 @@ class TagTable {
                   ? group.rows.length
                   : 1,
         );
-        final cell0 = _TagTableDataCell(
-          cell.tree,
-          child: cell.child,
-          columnSpan: columnSpan,
-          columnStart: columnStart,
-          rowSpan: rowSpan,
-          rowStart: rowStart,
-        );
 
+        final builderIndex = data.builders.length;
         for (var r = 0; r < rowSpan; r++) {
-          final rCells = _data.cells[rowStart + r] ??= {};
+          final rCells = data.cells[rowStart + r] ??= {};
+          data.rows = data.cells.length;
+
           for (var c = 0; c < columnSpan; c++) {
-            rCells[columnStart + c] = cell0;
+            rCells[columnStart + c] = builderIndex;
           }
         }
+        data.columns = max(data.columns, columnStart + 1);
+        data.rows = data.cells.keys.length;
 
         final cellTree = cell.tree;
         final cssBorderParsed = tryParseBorder(cellTree);
@@ -175,7 +234,7 @@ class TagTable {
             ? tryParseBorder(tableTree).copyFrom(cssBorderParsed)
             : cssBorderParsed;
 
-        _data.builders.add((context) {
+        data.builders.add((context) {
           Widget? child = cell.child;
 
           final cellStyle = cellTree.styleBuilder.build(context);
@@ -187,44 +246,24 @@ class TagTable {
             return null;
           }
 
+          final v = cellTree[kCssVerticalAlign]?.term;
+          if (v == kCssVerticalAlignBaseline) {
+            child = ValignBaseline(index: rowStart, child: child);
+          }
+
           return HtmlTableCell(
             border: border,
-            columnSpan: min(columnSpan, _data.columns - columnStart),
+            columnSpan: min(columnSpan, data.columns - columnStart),
             columnStart: columnStart,
             rowSpan: rowSpan,
             rowStart: rowStart,
+            width: cell.width?.getSizing(cellStyle),
             child: child,
           );
         });
       }
     }
   }
-
-  static BuildOp cellPaddingOp(double px) => BuildOp(
-        debugLabel: '$kTagTable--$kAttributeCellPadding',
-        onChild: (_, subTree) => (subTree.element.localName == 'td' ||
-                subTree.element.localName == 'th')
-            ? subTree[kCssPadding] = '${px}px'
-            : null,
-      );
-
-  static BuildOp borderOp(double border, double borderSpacing) => BuildOp(
-        debugLabel: '$kTagTable--$kAttributeBorder',
-        defaultStyles: (_) => {
-          if (border > 0.0) kCssBorder: '${border}px solid black',
-          kCssBorderCollapse: kCssBorderCollapseSeparate,
-          kCssBorderSpacing: '${borderSpacing}px',
-        },
-        onChild: border > 0
-            ? (_, subTree) {
-                switch (subTree.element.localName) {
-                  case kTagTableCell:
-                  case kTagTableHeaderCell:
-                    subTree[kCssBorder] = kCssBorderInherit;
-                }
-              }
-            : null,
-      );
 
   static String? _getCssDisplayValue(BuildTree tree) {
     for (final style in tree.element.styles.reversed) {
@@ -256,126 +295,132 @@ class TagTable {
   }
 }
 
-extension _BuildTreeTagTable on BuildTree {
-  WidgetPlaceholder get placeholder =>
-      WidgetPlaceholder(debugLabel: element.localName);
+extension _BuildTreeData on BuildTree {
+  _TagTableData get data {
+    final existing = value<_TagTableData>();
+    if (existing != null) {
+      return existing;
+    }
+
+    final newData = element.parse();
+    value(newData);
+    return newData;
+  }
+}
+
+extension _BuildTreeDataParser on dom.Element {
+  _TagTableData parse() {
+    final attrs = attributes;
+    return _TagTableData(
+      border: tryParseDoubleFromMap(attrs, kAttributeBorder) ?? 0.0,
+      borderSpacing: tryParseDoubleFromMap(attrs, kAttributeCellSpacing) ?? 2.0,
+      cellPadding: tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1.0,
+    );
+  }
 }
 
 class _TagTableRow {
   final _TagTableDataRow row;
 
+  late final BuildOp _rowOp;
   late final BuildOp _cellOp;
-  late final BuildOp _valignBaselineOp;
 
   _TagTableRow(this.row) {
+    _rowOp = BuildOp(debugLabel: kTagTableRow, onChild: _onRowChild);
     _cellOp = BuildOp(
       debugLabel: kTagTableCell,
-      onBuilt: (cellTree, cellWidget) {
-        final attributes = cellTree.element.attributes;
-        row.cells.add(
-          _TagTableDataCell(
-            cellTree,
-            child: cellWidget,
-            columnSpan: tryParseIntFromMap(attributes, kAttributeColspan) ?? 1,
-            rowSpan: tryParseIntFromMap(attributes, kAttributeRowspan) ?? 1,
-          ),
-        );
-
-        return cellTree.placeholder;
-      },
+      onBuilt: _onCellBuilt,
       priority: BuildOp.kPriorityMax,
-    );
-    _valignBaselineOp = BuildOp(
-      debugLabel: '$kTagTable--$kCssVerticalAlign',
-      onBuilt: (cellTree, cellPlaceholder) {
-        final v = cellTree[kCssVerticalAlign]?.term;
-        if (v != kCssVerticalAlignBaseline) {
-          return null;
-        }
-
-        return cellPlaceholder
-            .wrapWith((_, child) => HtmlTableValignBaseline(child: child));
-      },
-      priority: StyleVerticalAlign.kPriority4k3,
     );
   }
 
-  BuildOp get buildOp => BuildOp(
-        debugLabel: kTagTableRow,
-        onChild: (rowTree, cellTree) {
-          if (cellTree.element.parent != rowTree.element) {
-            return;
-          }
-          if (TagTable._getCssDisplayValue(cellTree) != kCssDisplayTableCell) {
-            return;
-          }
+  void _onRowChild(BuildTree rowTree, BuildTree cellTree) {
+    final e = cellTree.element;
+    if (e.parent != rowTree.element) {
+      return;
+    }
+    if (TagTable._getCssDisplayValue(cellTree) != kCssDisplayTableCell) {
+      return;
+    }
 
-          final attrs = cellTree.element.attributes;
-          if (attrs.containsKey(kAttributeValign)) {
-            cellTree[kCssVerticalAlign] = attrs[kAttributeValign]!;
-          }
+    final attrs = e.attributes;
+    if (attrs.containsKey(kAttributeValign)) {
+      cellTree[kCssVerticalAlign] = attrs[kAttributeValign]!;
+    }
 
-          cellTree.register(_cellOp);
-          StyleBorder.skip(cellTree);
-          StyleSizing.treatHeightAsMinHeight(cellTree);
-          cellTree.register(_valignBaselineOp);
-        },
-      );
+    cellTree.register(_cellOp);
+    StyleBorder.skip(cellTree);
+    StyleSizing.skip(cellTree);
+  }
+
+  Widget? _onCellBuilt(BuildTree cellTree, WidgetPlaceholder placeholder) {
+    final widthValue = cellTree[kCssWidth]?.value;
+    final width = widthValue != null ? tryParseCssLength(widthValue) : null;
+
+    final attributes = cellTree.element.attributes;
+    row.cells.add(
+      _TagTableDataCell(
+        cellTree,
+        child: placeholder,
+        columnSpan: tryParseIntFromMap(attributes, kAttributeColspan) ?? 1,
+        rowSpan: tryParseIntFromMap(attributes, kAttributeRowspan) ?? 1,
+        width: width,
+      ),
+    );
+
+    return placeholder;
+  }
 }
 
 class _TagTableRowGroup {
   final List<_TagTableDataRow> rows;
 
-  _TagTableRowGroup(this.rows);
+  late final BuildOp _groupOp;
 
-  BuildOp get buildOp => BuildOp(
-        debugLabel: kTagTableRowGroup,
-        onChild: (groupTree, rowTree) {
-          if (rowTree.element.parent != groupTree.element) {
-            return;
-          }
-          if (TagTable._getCssDisplayValue(rowTree) != kCssDisplayTableRow) {
-            return;
-          }
+  _TagTableRowGroup(String debugLabel, this.rows) {
+    _groupOp = BuildOp(debugLabel: debugLabel, onChild: _onGroupChild);
+  }
 
-          final row = _TagTableDataRow();
-          rows.add(row);
-          rowTree.register(_TagTableRow(row).buildOp);
-        },
-      );
+  void _onGroupChild(BuildTree groupTree, BuildTree rowTree) {
+    if (rowTree.element.parent != groupTree.element) {
+      return;
+    }
+    if (TagTable._getCssDisplayValue(rowTree) != kCssDisplayTableRow) {
+      return;
+    }
+
+    final row = _TagTableDataRow();
+    rows.add(row);
+    rowTree.register(_TagTableRow(row)._rowOp);
+  }
 }
 
-@immutable
 class _TagTableData {
+  final double border;
+  final double borderSpacing;
+  final double cellPadding;
+
   final bodies = <_TagTableDataGroup>[];
   final captions = <WidgetPlaceholder>[];
   final footer = _TagTableDataGroup();
   final header = _TagTableDataGroup();
 
-  final cells = <int, Map<int, _TagTableDataCell>>{};
   final builders = <HtmlTableCell? Function(BuildContext)>[];
+  final cells = <int, Map<int, int>>{};
+  int columns = 0;
+  int rows = 0;
+
+  _TagTableData({
+    required this.border,
+    required this.borderSpacing,
+    required this.cellPadding,
+  });
 
   _TagTableDataGroup get body {
     final body = _TagTableDataGroup();
     bodies.add(body);
     return body;
   }
-
-  int get columns => cells.entries.fold(
-        0,
-        (prev, row) {
-          final cells = row.value.entries;
-          return max(
-            prev,
-            cells.fold(
-              0,
-              (prev, cell) => max(prev, (cell.value.columnStart ?? 0) + 1),
-            ),
-          );
-        },
-      );
-
-  int get rows => cells.keys.length;
 }
 
 @immutable
@@ -392,17 +437,15 @@ class _TagTableDataRow {
 class _TagTableDataCell {
   final Widget child;
   final int columnSpan;
-  final int? columnStart;
   final BuildTree tree;
   final int rowSpan;
-  final int? rowStart;
+  final CssLength? width;
 
   const _TagTableDataCell(
     this.tree, {
     required this.child,
     required this.columnSpan,
-    this.columnStart,
     required this.rowSpan,
-    this.rowStart,
+    this.width,
   });
 }

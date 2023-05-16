@@ -1,6 +1,15 @@
 import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    show
+        // we want to limit Material usages to be as generic as possible
+        CircularProgressIndicator,
+        Divider,
+        Theme,
+        ThemeData,
+        Tooltip;
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 
 import 'core_data.dart';
 import 'core_helpers.dart';
@@ -25,12 +34,10 @@ class WidgetFactory {
 
   BuildOp? _styleBgColor;
   StyleBorder? _styleBorder;
-  BuildOp? _styleDisplayBlock;
   BuildOp? _styleDisplayInlineBlock;
   BuildOp? _styleDisplayNone;
   BuildOp? _styleMargin;
   BuildOp? _stylePadding;
-  BuildOp? _styleSizing;
   BuildOp? _styleTextDecoration;
   StyleVerticalAlign? _styleVerticalAlign;
   BuildOp? _tagA;
@@ -42,6 +49,7 @@ class WidgetFactory {
   BuildOp? _tagPre;
   BuildOp? _tagQ;
   BuildOp? _tagRuby;
+  TagTable? _tagTable;
   HtmlStyle Function(HtmlStyle, css.Expression)? _styleBuilderLineHeight;
   HtmlWidget? _widget;
 
@@ -175,6 +183,8 @@ class WidgetFactory {
     );
 
     if (!isBorderBox || container != null) {
+      // we are using Container intentionally because it handles border differently
+      // ignore: use_decorated_box
       return Container(
         decoration: decoration,
         child: grandChild ?? child,
@@ -317,18 +327,26 @@ class WidgetFactory {
   ) {
     final text = getListMarkerText(listStyleType, index);
     final textStyle = style.textStyle;
-    return text.isNotEmpty
-        ? RichText(
-            maxLines: 1,
-            softWrap: false,
-            text: TextSpan(style: textStyle, text: text),
-            textDirection: style.textDirection,
-          )
-        : listStyleType == kCssListStyleTypeCircle
-            ? HtmlListMarker.circle(textStyle)
-            : listStyleType == kCssListStyleTypeSquare
-                ? HtmlListMarker.square(textStyle)
-                : HtmlListMarker.disc(textStyle);
+    if (text.isNotEmpty) {
+      return RichText(
+        maxLines: 1,
+        softWrap: false,
+        text: TextSpan(style: textStyle, text: text),
+        textDirection: style.textDirection,
+      );
+    }
+
+    switch (listStyleType) {
+      case kCssListStyleTypeCircle:
+        return HtmlListMarker.circle(textStyle);
+      case kCssListStyleTypeNone:
+        return null;
+      case kCssListStyleTypeSquare:
+        return HtmlListMarker.square(textStyle);
+      case kCssListStyleTypeDisc:
+      default:
+        return HtmlListMarker.disc(textStyle);
+    }
   }
 
   /// Builds [Padding].
@@ -346,6 +364,9 @@ class WidgetFactory {
       RichText(
         maxLines: tree.maxLines > 0 ? tree.maxLines : null,
         overflow: tree.overflow,
+        selectionRegistrar: style.getDependency(),
+        selectionColor:
+            style.getDependency<DefaultSelectionStyle>().selectionColor,
         text: text,
         textAlign: style.textAlign ?? TextAlign.start,
         textDirection: style.textDirection,
@@ -397,10 +418,12 @@ class WidgetFactory {
   ///
   /// Includes these by default:
   ///
-  /// - [MediaQueryData] via [MediaQuery.of]
   /// - [TextDirection] via [Directionality.of]
+  /// - [DefaultSelectionStyle] via [DefaultSelectionStyle.of]
   /// - [TextStyle] via [DefaultTextStyle.of]
+  /// - [SelectionRegistrar] via [SelectionContainer.maybeOf]
   /// - [ThemeData] via [Theme.of]
+  /// - [MediaQueryData] via [MediaQuery.of]
   ///
   /// Use [HtmlStyle.getDependency] to get value by type.
   ///
@@ -425,10 +448,15 @@ class WidgetFactory {
   /// final buildOpValue = style.textDirection;
   /// ```
   Iterable<dynamic> getDependencies(BuildContext context) => [
-        MediaQuery.of(context),
         Directionality.of(context),
+        DefaultSelectionStyle.of(context),
         DefaultTextStyle.of(context).style,
+        SelectionContainer.maybeOf(context),
         Theme.of(context),
+
+        // TODO: use inherited model scope when it's merged into stable
+        // https://github.com/flutter/flutter/pull/114459
+        MediaQuery.of(context),
       ];
 
   /// Returns marker text for the specified list style [type] at index [i].
@@ -458,9 +486,10 @@ class WidgetFactory {
       case kCssListStyleTypeRomanUpper:
         final roman = _getListMarkerRoman(i);
         return roman != null ? '$roman.' : '';
+      case kCssListStyleTypeNone:
+      default:
+        return '';
     }
-
-    return '';
   }
 
   String? _getListMarkerRoman(int i) {
@@ -612,8 +641,8 @@ class WidgetFactory {
       case kTagA:
         if (attrs.containsKey(kAttributeAHref)) {
           tree
-            ..register(_tagA ??= TagA(this).buildOp)
-            ..styleBuilder.enqueue(TagA.defaultColor, null);
+            ..apply(TagA.defaultColor, null)
+            ..register(_tagA ??= TagA(this).buildOp);
         }
 
         final name = attrs[kAttributeAName];
@@ -631,7 +660,7 @@ class WidgetFactory {
       case 'address':
         tree
           ..[kCssDisplay] = kCssDisplayBlock
-          ..styleBuilder.enqueue(TextStyleOps.fontStyle, FontStyle.italic);
+          ..apply(TextStyleOps.fontStyle, FontStyle.italic);
         break;
 
       case 'article':
@@ -655,16 +684,14 @@ class WidgetFactory {
 
       case 'b':
       case 'strong':
-        tree.styleBuilder.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+        tree.apply(TextStyleOps.fontWeight, FontWeight.bold);
         break;
 
       case 'big':
-        tree.styleBuilder
-            .enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeLarger);
+        tree.apply(TextStyleOps.fontSizeTerm, kCssFontSizeLarger);
         break;
       case 'small':
-        tree.styleBuilder
-            .enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
+        tree.apply(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
         break;
 
       case kTagBr:
@@ -682,34 +709,20 @@ class WidgetFactory {
       case 'em':
       case 'i':
       case 'var':
-        tree.styleBuilder.enqueue(TextStyleOps.fontStyle, FontStyle.italic);
+        tree.apply(TextStyleOps.fontStyle, FontStyle.italic);
         break;
 
       case kTagCode:
       case kTagKbd:
       case kTagSamp:
       case kTagTt:
-        tree.styleBuilder.enqueue(
+        tree.apply(
           TextStyleOps.fontFamily,
           const [kTagCodeFont1, kTagCodeFont2],
         );
         break;
       case kTagPre:
-        tree
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssWhitespace] = kCssWhitespacePre
-          ..styleBuilder.enqueue(
-            TextStyleOps.fontFamily,
-            const [kTagCodeFont1, kTagCodeFont2],
-          )
-          ..register(
-            _tagPre ??= BuildOp(
-              debugLabel: localName,
-              onBuilt: (tree, placeholder) => placeholder.wrapWith(
-                (_, child) => buildHorizontalScrollView(tree, child),
-              ),
-            ),
-          );
+        tree.register(_tagPre ??= TagPre(this).buildOp);
         break;
 
       case kTagDetails:
@@ -727,7 +740,7 @@ class WidgetFactory {
       case 'dt':
         tree
           ..[kCssDisplay] = kCssDisplayBlock
-          ..styleBuilder.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+          ..apply(TextStyleOps.fontWeight, FontWeight.bold);
         break;
 
       case 'del':
@@ -737,22 +750,7 @@ class WidgetFactory {
         break;
 
       case kTagFont:
-        tree.register(
-          _tagFont ??= BuildOp(
-            debugLabel: localName,
-            defaultStyles: (element) {
-              final attrs = element.attributes;
-              final color = attrs[kAttributeFontColor];
-              final fontFace = attrs[kAttributeFontFace];
-              final fontSize = kCssFontSizes[attrs[kAttributeFontSize] ?? ''];
-              return {
-                if (color != null) kCssColor: color,
-                if (fontFace != null) kCssFontFamily: fontFace,
-                if (fontSize != null) kCssFontSize: fontSize,
-              };
-            },
-          ),
-        );
+        tree.register(_tagFont ??= TagFont(this).buildOp);
         break;
 
       case 'hr':
@@ -771,42 +769,42 @@ class WidgetFactory {
         tree
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '0.67em 0'
-          ..styleBuilder.enqueue(TextStyleOps.fontSizeEm, 2.0)
-          ..styleBuilder.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+          ..apply(TextStyleOps.fontSizeEm, 2.0)
+          ..apply(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h2':
         tree
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '0.83em 0'
-          ..styleBuilder.enqueue(TextStyleOps.fontSizeEm, 1.5)
-          ..styleBuilder.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+          ..apply(TextStyleOps.fontSizeEm, 1.5)
+          ..apply(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h3':
         tree
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '1em 0'
-          ..styleBuilder.enqueue(TextStyleOps.fontSizeEm, 1.17)
-          ..styleBuilder.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+          ..apply(TextStyleOps.fontSizeEm, 1.17)
+          ..apply(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h4':
         tree
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '1.33em 0'
-          ..styleBuilder.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+          ..apply(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h5':
         tree
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '1.67em 0'
-          ..styleBuilder.enqueue(TextStyleOps.fontSizeEm, .83)
-          ..styleBuilder.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+          ..apply(TextStyleOps.fontSizeEm, .83)
+          ..apply(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case 'h6':
         tree
           ..[kCssDisplay] = kCssDisplayBlock
           ..[kCssMargin] = '2.33em 0'
-          ..styleBuilder.enqueue(TextStyleOps.fontSizeEm, .67)
-          ..styleBuilder.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+          ..apply(TextStyleOps.fontSizeEm, .67)
+          ..apply(TextStyleOps.fontWeight, FontWeight.bold);
         break;
 
       case kTagImg:
@@ -853,30 +851,20 @@ class WidgetFactory {
       case 'sub':
         tree
           ..[kCssVerticalAlign] = kCssVerticalAlignSub
-          ..styleBuilder
-              .enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
+          ..apply(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
         break;
       case 'sup':
         tree
           ..[kCssVerticalAlign] = kCssVerticalAlignSuper
-          ..styleBuilder
-              .enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
+          ..apply(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
         break;
 
       case kTagTable:
+        final tagTable = _tagTable ??= TagTable(this);
         tree
           ..[kCssDisplay] = kCssDisplayTable
-          ..register(
-            TagTable.borderOp(
-              tryParseDoubleFromMap(attrs, kAttributeBorder) ?? 0.0,
-              tryParseDoubleFromMap(attrs, kAttributeCellSpacing) ?? 2.0,
-            ),
-          )
-          ..register(
-            TagTable.cellPaddingOp(
-              tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1.0,
-            ),
-          );
+          ..register(tagTable.borderOp)
+          ..register(tagTable.cellPaddingOp);
         break;
       case kTagTableCell:
         tree[kCssVerticalAlign] = kCssVerticalAlignMiddle;
@@ -884,7 +872,7 @@ class WidgetFactory {
       case kTagTableHeaderCell:
         tree
           ..[kCssVerticalAlign] = kCssVerticalAlignMiddle
-          ..styleBuilder.enqueue(TextStyleOps.fontWeight, FontWeight.bold);
+          ..apply(TextStyleOps.fontWeight, FontWeight.bold);
         break;
       case kTagTableCaption:
         tree[kCssTextAlign] = kCssTextAlignCenter;
@@ -918,26 +906,26 @@ class WidgetFactory {
       case kCssColor:
         final color = tryParseColor(style.value);
         if (color != null) {
-          tree.styleBuilder.enqueue(TextStyleOps.color, color);
+          tree.apply(TextStyleOps.color, color);
         }
         break;
 
       case kCssDirection:
         final term = style.term;
         if (term != null) {
-          tree.styleBuilder.enqueue(TextStyleOps.textDirection, term);
+          tree.apply(TextStyleOps.textDirection, term);
         }
         break;
 
       case kCssFontFamily:
         final list = TextStyleOps.fontFamilyTryParse(style.values);
-        tree.styleBuilder.enqueue(TextStyleOps.fontFamily, list);
+        tree.apply(TextStyleOps.fontFamily, list);
         break;
 
       case kCssFontSize:
         final value = style.value;
         if (value != null) {
-          tree.styleBuilder.enqueue(TextStyleOps.fontSize, value);
+          tree.apply(TextStyleOps.fontSize, value);
         }
         break;
 
@@ -946,7 +934,7 @@ class WidgetFactory {
         final fontStyle =
             term != null ? TextStyleOps.fontStyleTryParse(term) : null;
         if (fontStyle != null) {
-          tree.styleBuilder.enqueue(TextStyleOps.fontStyle, fontStyle);
+          tree.apply(TextStyleOps.fontStyle, fontStyle);
         }
         break;
 
@@ -955,7 +943,7 @@ class WidgetFactory {
         final fontWeight =
             value != null ? TextStyleOps.fontWeightTryParse(value) : null;
         if (fontWeight != null) {
-          tree.styleBuilder.enqueue(TextStyleOps.fontWeight, fontWeight);
+          tree.apply(TextStyleOps.fontWeight, fontWeight);
         }
         break;
 
@@ -965,15 +953,16 @@ class WidgetFactory {
       case kCssMinHeight:
       case kCssMinWidth:
       case kCssWidth:
-        tree.register(_styleSizing ??= StyleSizing(this).buildOp);
+        StyleSizing.registerSizingOp(this, tree);
         break;
 
       case kCssLineHeight:
         final value = style.value;
         if (value != null) {
-          final callback =
-              _styleBuilderLineHeight ??= TextStyleOps.lineHeight(this);
-          tree.styleBuilder.enqueue(callback, value);
+          tree.apply(
+            _styleBuilderLineHeight ??= TextStyleOps.lineHeight(this),
+            value,
+          );
         }
         break;
 
@@ -1023,7 +1012,7 @@ class WidgetFactory {
         final whitespace =
             term != null ? TextStyleOps.whitespaceTryParse(term) : null;
         if (whitespace != null) {
-          tree.styleBuilder.enqueue(TextStyleOps.whitespace, whitespace);
+          tree.apply(TextStyleOps.whitespace, whitespace);
         }
         break;
     }
@@ -1046,9 +1035,11 @@ class WidgetFactory {
 
   /// Parses display inline style.
   void parseStyleDisplay(BuildTree tree, String? value) {
+    StyleSizing.maybeRegisterChildOp(this, tree);
+
     switch (value) {
       case kCssDisplayBlock:
-        tree.register(_styleDisplayBlock ??= DisplayBlockOp());
+        StyleSizing.registerBlockOp(this, tree);
         break;
       case kCssDisplayInlineBlock:
         final displayInlineBlock = _styleDisplayInlineBlock ??= BuildOp(
@@ -1073,7 +1064,8 @@ class WidgetFactory {
         tree.register(displayNone);
         break;
       case kCssDisplayTable:
-        tree.register(TagTable(this).buildOp);
+        final tagTable = _tagTable ??= TagTable(this);
+        tree.register(tagTable.tableOp);
         break;
     }
   }

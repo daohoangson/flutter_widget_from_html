@@ -22,7 +22,7 @@ class StyleTextAlign {
 
   BuildOp get buildOp => BuildOp(
         debugLabel: kCssTextAlign,
-        onTree: (tree) => tree.styleBuilder.enqueue(_builder, value),
+        onTree: (tree) => tree.apply(_builder, value),
         onBuilt: (tree, placeholder) => _wrap(tree, placeholder, value),
         onWidgetsIsOptional: true,
         priority: 0,
@@ -33,6 +33,10 @@ class StyleTextAlign {
     WidgetPlaceholder placeholder,
     String value,
   ) {
+    if (placeholder.isEmpty) {
+      return null;
+    }
+
     if (value == kCssTextAlignWebkitCenter) {
       return placeholder.wrapWith(_center);
     } else {

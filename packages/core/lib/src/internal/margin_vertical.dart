@@ -20,6 +20,9 @@ class HeightPlaceholder extends WidgetPlaceholder {
 
   CssLength get height => _heights.first;
 
+  @override
+  bool get isEmpty => false;
+
   void mergeWith(HeightPlaceholder other) {
     final height = other.height;
     _heights.add(height);

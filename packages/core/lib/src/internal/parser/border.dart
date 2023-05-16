@@ -10,10 +10,8 @@ const kCssBorderRadiusBottomRight = 'border-bottom-right-radius';
 const kCssBorderRadiusTopLeft = 'border-top-left-radius';
 const kCssBorderRadiusTopRight = 'border-top-right-radius';
 
-final _elementBorder = Expando<CssBorder>();
-
 CssBorder tryParseBorder(BuildTree tree) {
-  final existing = _elementBorder[tree.element];
+  final existing = tree.value<CssBorder>();
   if (existing != null) {
     return existing;
   }
@@ -32,7 +30,9 @@ CssBorder tryParseBorder(BuildTree tree) {
     }
   }
 
-  return _elementBorder[tree.element] = border;
+  tree.value(border);
+
+  return border;
 }
 
 CssBorder _tryParseBorderSide(CssBorder border, css.Declaration style) {

@@ -107,7 +107,8 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Align:alignment=topLeft,child='
+            '[Align:alignment=topLeft,child='
+            '[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
         );
@@ -118,7 +119,8 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Align:alignment=topRight,child='
+            '[Align:alignment=topRight,child='
+            '[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
@@ -133,7 +135,8 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Align:alignment=centerLeft,child='
+            '[Align:alignment=centerLeft,child='
+            '[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
         );
@@ -144,7 +147,8 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Align:alignment=centerRight,child='
+            '[Align:alignment=centerRight,child='
+            '[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
         );
@@ -159,7 +163,8 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Align:alignment=bottomLeft,child='
+            '[Align:alignment=bottomLeft,child='
+            '[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
         );
@@ -170,7 +175,8 @@ void main() {
         expect(
           explained,
           equals(
-            '[CssBlock:child=[Align:alignment=bottomRight,child='
+            '[Align:alignment=bottomRight,child='
+            '[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
         );

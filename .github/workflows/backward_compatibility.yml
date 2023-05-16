@@ -7,6 +7,9 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
 jobs:
   test:
     strategy:
@@ -16,7 +19,7 @@ jobs:
           - enhanced
           - fwfh_cached_network_image
           - fwfh_chewie
-          - fwfh_selectable_text
+          - fwfh_just_audio
           - fwfh_svg
           - fwfh_url_launcher
           - fwfh_webview
@@ -30,7 +33,7 @@ jobs:
     env:
       GOLDEN_SKIP: "yes"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
       - name: Update pubspec.yaml
         run: |
           set -e
@@ -65,61 +68,54 @@ jobs:
           yq e ".environment.sdk = \"${_sdkVersion}\"" -i pubspec.yaml
 
           # extract Flutter version to install later
-          _flutterVersion=$( yq e '.environment.flutter' pubspec.yaml )
+          _flutterVersion=$( yq e '.environment.flutter' pubspec.yaml | sed -e 's/^>=//' | sed -e 's/-0$//' )
           echo "FLUTTER_VERSION=${_flutterVersion}" >> $GITHUB_ENV
 
           # output for debugging
           cat pubspec.yaml
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
         with:
+          cache: true
           flutter-version: ${{ env.FLUTTER_VERSION }}
-
       - run: flutter test
-      - uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: failures
-          path: packages/${{ matrix.package }}/test/failures/
 
-  fwfh_text_style:
+  core:
     strategy:
       matrix:
         channel:
           - beta
           - master
+          - stable
 
     # In case one of these fails, create a new PR against the `release/*` branch
     # and publish a new version to make sure there is a compatible version
     # of `fwfh_text_style` for all active Flutter versions.
-    name: fwfh_text_style@${{ matrix.channel }}
+    name: core@${{ matrix.channel }}
     runs-on: ubuntu-latest
     continue-on-error: true
     defaults:
       run:
-        working-directory: packages/fwfh_text_style
+        working-directory: packages/core
     env:
       GOLDEN_SKIP: "yes"
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
-      - name: Run git fetch
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
+      - name: Update pubspec.yaml
         run: |
-          git config user.name name
-          git config user.email email@domain.com
-          git fetch
-      - run: git merge -X ours -m test origin/release/${{ matrix.channel }}
+          set -e
+
+          sudo snap install yq
+
+          # delete all overrides and use pub.dev versions
+          yq e 'del(.dependency_overrides)' -i pubspec.yaml
+
+          # output for debugging
+          cat pubspec.yaml
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
         with:
+          cache: true
           channel: ${{ matrix.channel }}
-      - run: flutter --version
       - run: flutter test
-      - uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: failures
-          path: packages/fwfh_text_style/test/failures/

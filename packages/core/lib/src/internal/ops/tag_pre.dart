@@ -1,0 +1,21 @@
+part of '../core_ops.dart';
+
+const kTagPre = 'pre';
+
+class TagPre {
+  final WidgetFactory wf;
+
+  TagPre(this.wf);
+
+  BuildOp get buildOp => BuildOp(
+        debugLabel: kTagPre,
+        defaultStyles: (element) => {
+          kCssDisplay: kCssDisplayBlock,
+          kCssFontFamily: '$kTagCodeFont1, $kTagCodeFont2',
+          kCssWhitespace: kCssWhitespacePre,
+        },
+        onBuilt: (tree, placeholder) => placeholder.wrapWith(
+          (_, child) => wf.buildHorizontalScrollView(tree, child),
+        ),
+      );
+}

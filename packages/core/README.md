@@ -17,7 +17,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html_core: ^0.8.5
+  flutter_widget_from_html_core: ^0.10.0
 ```
 
 ## Usage
@@ -176,7 +176,6 @@ The enhanced package ([flutter_widget_from_html](https://pub.dev/packages/flutte
 - [fwfh_cached_network_image](https://pub.dev/packages/fwfh_cached_network_image) for optimized image rendering
 - [fwfh_chewie](https://pub.dev/packages/fwfh_chewie) for VIDEO support
 - [fwfh_just_audio](https://pub.dev/packages/fwfh_just_audio) for AUDIO support
-- [fwfh_selectable_text](https://pub.dev/packages/fwfh_selectable_text) for `SelectableText` support
 - [fwfh_svg](https://pub.dev/packages/fwfh_svg) for SVG support
 - [fwfh_url_launcher](https://pub.dev/packages/fwfh_url_launcher) to launch URLs
 - [fwfh_webview](https://pub.dev/packages/fwfh_webview) for IFRAME support
@@ -246,7 +245,7 @@ Notes:
 
 ```dart
 // example 1: simple callback setting accent color from theme
-tree.styleBuilder.enqueue(
+tree.apply(
   (style, _) => style.copyWith(
     textStyle: style.textStyle.copyWith(
       color: style.getDependency<ThemeData>().accentColor,
@@ -260,7 +259,7 @@ HtmlStyle callback(HtmlStyle style, TextAlign value) =>
   style.copyWith(textAlign: value)
 
 // example 2 (continue): register with some value
-tree.styleBuilder.enqueue(callback, TextAlign.justify);
+tree.apply(callback, TextAlign.justify);
 ```
 
 - Other complicated styling are supported via `BuildOp`
@@ -280,7 +279,7 @@ meta.register(BuildOp(
 ));
 ```
 
-- Each metadata may have as many style builder callbacks and build ops as needed.
+- Each tree may have as many style builder callbacks and build ops as needed.
 
 The example below replaces smilie inline image with an emoji:
 

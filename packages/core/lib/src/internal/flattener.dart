@@ -208,11 +208,11 @@ class Flattener implements Flattened {
               scopedChildrenBuilder.reversed.toList(growable: false);
           final children = <InlineSpan>[];
 
-          var _isLast = true;
+          var isLast_ = true;
           for (final builder in reversedbuilders) {
-            final child = builder(context, isLast: _isLast);
+            final child = builder(context, isLast: isLast_);
             if (child != null) {
-              _isLast = false;
+              isLast_ = false;
               children.insert(0, child);
             }
           }
@@ -220,7 +220,7 @@ class Flattener implements Flattened {
           final text = scopedStrings.toText(
             style.whitespace,
             isFirst: true,
-            isLast: _isLast,
+            isLast: isLast_,
           );
           InlineSpan? span;
           if (text.isEmpty && children.isEmpty) {
@@ -321,13 +321,11 @@ class _String {
   final String data;
   final bool isWhitespace;
   final bool shouldBeSwallowed;
-  final bool shouldBeTrimmed;
 
   const _String(
     this.data, {
     this.isWhitespace = false,
     this.shouldBeSwallowed = false,
-    this.shouldBeTrimmed = false,
   });
 }
 

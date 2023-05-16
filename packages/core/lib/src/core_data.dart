@@ -67,15 +67,15 @@ class BuildOp {
   /// This is the last chance to modify the [BuildTree] before inline rendering.
   ///
   /// If an op has both this callback and [onBuilt], it will be skipped if
-  /// the other callback returns a non-null result.
+  /// `onBuilt` returns a non-null result.
   final void Function(BuildTree tree)? onFlattening;
 
   /// The callback that will be called when child elements have been built.
   ///
   /// This only works if it's a block element.
   ///
-  /// If an op has both this callback and [onFlattening],returning
-  /// a non-null result will skip the other callback.
+  /// If an op has both this callback and [onFlattening], returning
+  /// a non-null result will skip `onTreeFlattening`.
   final Widget? Function(
     BuildTree tree,
     WidgetPlaceholder placeholder,
@@ -84,6 +84,7 @@ class BuildOp {
   /// Controls whether the element should be forced to be rendered as block.
   ///
   /// Default: `false`.
+  /// TODO: rename this
   final bool onWidgetsIsOptional;
 
   /// Creates a build op.

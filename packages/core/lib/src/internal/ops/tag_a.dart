@@ -29,7 +29,7 @@ class TagA {
             return;
           }
 
-          tree.styleBuilder.enqueue(_builder, recognizer);
+          tree.apply(_builder, recognizer);
         },
       );
 

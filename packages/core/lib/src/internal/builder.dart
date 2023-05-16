@@ -75,31 +75,22 @@ class Builder extends BuildTree {
   @override
   WidgetPlaceholder? build() {
     final children = Flattener(wf, this).widgets;
-    var placeholder = wf.buildColumnPlaceholder(this, children);
-
-    WidgetPlaceholder? placeholder0;
-    if (placeholder == null) {
-      placeholder0 = WidgetPlaceholder(
-        debugLabel: '${element.localName}--widget0',
-        child: widget0,
-      );
-      placeholder = placeholder0;
-    }
+    var placeholder = wf.buildColumnPlaceholder(this, children) ??
+        WidgetPlaceholder(debugLabel: '${element.localName}--zero');
 
     for (final op in _buildOps) {
       placeholder = WidgetPlaceholder.lazy(
-        op.onBuilt(placeholder!) ?? placeholder,
+        op.onBuilt(placeholder) ?? placeholder,
         debugLabel: '${element.localName}--${op.op.debugLabel ?? 'lazy'}',
       );
     }
 
-    if (placeholder0 != null && identical(placeholder, placeholder0)) {
-      // the `widget0` as first child won't be rendered anyway
-      // so we are bailing out early right here
+    if (placeholder.isEmpty) {
+      // bailing out early if there's nothing to render
       return null;
     }
 
-    return placeholder!..setAnchorsIfUnset(anchors);
+    return placeholder..setAnchorsIfUnset(anchors);
   }
 
   @override
@@ -175,7 +166,7 @@ class Builder extends BuildTree {
     }
 
     final subTree = sub(element: element)
-      .._collectMetadata()
+      .._parseEverything()
       ..addBitsFromNodes(element.nodes);
 
     if (subTree._buildOps.where(_opRequiresBuildingSubtree).isNotEmpty) {
@@ -235,7 +226,20 @@ class Builder extends BuildTree {
     }
   }
 
-  void _collectMetadata() {
+  void _customStylesBuilder() {
+    final map = customStylesBuilder?.call(element);
+    if (map == null) {
+      return;
+    }
+
+    final str = map.entries.map((e) => '${e.key}: ${e.value}').join(';');
+    final styleSheet = css.parse('*{$str}');
+
+    final customStyles = styleSheet.collectDeclarations();
+    _styles.addAll(customStyles);
+  }
+
+  void _parseEverything() {
     wf.parse(this);
 
     for (final op in parentOps) {
@@ -264,19 +268,6 @@ class Builder extends BuildTree {
     }
 
     wf.parseStyleDisplay(this, this[kCssDisplay]?.term);
-  }
-
-  void _customStylesBuilder() {
-    final map = customStylesBuilder?.call(element);
-    if (map == null) {
-      return;
-    }
-
-    final str = map.entries.map((e) => '${e.key}: ${e.value}').join(';');
-    final styleSheet = css.parse('*{$str}');
-
-    final customStyles = styleSheet.collectDeclarations();
-    _styles.addAll(customStyles);
   }
 }
 

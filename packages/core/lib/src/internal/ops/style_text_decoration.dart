@@ -25,7 +25,7 @@ class StyleTextDecoration {
                   style.property == kCssTextDecorationLine) {
                 final line = TextDecorationLine.tryParse(value);
                 if (line != null) {
-                  tree.styleBuilder.enqueue(textDecorationLine, line);
+                  tree.apply(textDecorationLine, line);
                   continue;
                 }
               }
@@ -34,7 +34,7 @@ class StyleTextDecoration {
                   style.property == kCssTextDecorationStyle) {
                 final tds = tryParseTextDecorationStyle(value);
                 if (tds != null) {
-                  tree.styleBuilder.enqueue(textDecorationStyle, tds);
+                  tree.apply(textDecorationStyle, tds);
                   continue;
                 }
               }
@@ -43,7 +43,7 @@ class StyleTextDecoration {
                   style.property == kCssTextDecorationColor) {
                 final color = tryParseColor(value);
                 if (color != null) {
-                  tree.styleBuilder.enqueue(textDecorationColor, color);
+                  tree.apply(textDecorationColor, color);
                   continue;
                 }
               }
@@ -53,8 +53,7 @@ class StyleTextDecoration {
                   style.property == kCssTextDecorationWidth) {
                 final length = tryParseCssLength(value);
                 if (length != null && length.unit == CssLengthUnit.percentage) {
-                  tree.styleBuilder
-                      .enqueue(textDecorationThickness, length.number / 100.0);
+                  tree.apply(textDecorationThickness, length.number / 100.0);
                   continue;
                 }
               }
@@ -67,27 +66,40 @@ class StyleTextDecoration {
 HtmlStyle textDecorationColor(HtmlStyle style, Color v) =>
     style.copyWith(textStyle: style.textStyle.copyWith(decorationColor: v));
 
-HtmlStyle textDecorationLine(HtmlStyle style, TextDecorationLine v) {
-  final decoration = style.textStyle.decoration;
-  final lineThough = decoration?.contains(TextDecoration.lineThrough) == true;
-  final overline = decoration?.contains(TextDecoration.overline) == true;
-  final underline = decoration?.contains(TextDecoration.underline) == true;
+HtmlStyle textDecorationLine(HtmlStyle p, TextDecorationLine v) {
+  final parent = p.parent?.textStyle.decoration;
+  final parentOverline = parent?.contains(TextDecoration.overline) == true;
+  final parentLineThrough =
+      parent?.contains(TextDecoration.lineThrough) == true;
+  final parentUnderline = parent?.contains(TextDecoration.underline) == true;
+
+  final current = p.textStyle.decoration;
+  final currentOverline = current?.contains(TextDecoration.overline) == true;
+  final currentLineThrough =
+      current?.contains(TextDecoration.lineThrough) == true;
+  final currentUnderline = current?.contains(TextDecoration.underline) == true;
 
   final list = <TextDecoration>[];
-  if (v.over == true || (overline && v.over != false)) {
+  if (parentOverline || (v.over ?? currentOverline)) {
+    // 1. Honor parent's styling if the line decoration is turned on
+    // 2. Then apply incoing value (if set)
+    // 3. Finally fallback to the current styling
+    //
+    // According to https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration
+    // > Text decorations are drawn across descendant text elements.
+    // > This means that if an element specifies a text decoration,
+    // > then a child element can't remove the decoration.
     list.add(TextDecoration.overline);
   }
-  if (v.strike == true || (lineThough && v.strike != false)) {
+  if (parentLineThrough || (v.strike ?? currentLineThrough)) {
     list.add(TextDecoration.lineThrough);
   }
-  if (v.under == true || (underline && v.under != false)) {
+  if (parentUnderline || (v.under ?? currentUnderline)) {
     list.add(TextDecoration.underline);
   }
 
-  return style.copyWith(
-    textStyle:
-        style.textStyle.copyWith(decoration: TextDecoration.combine(list)),
-  );
+  final combined = TextDecoration.combine(list);
+  return p.copyWith(textStyle: p.textStyle.copyWith(decoration: combined));
 }
 
 HtmlStyle textDecorationStyle(HtmlStyle style, TextDecorationStyle v) =>
