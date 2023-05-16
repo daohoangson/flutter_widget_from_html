@@ -1112,6 +1112,7 @@ class WidgetFactory {
 
     return BuildOp(
       debugLabel: debugLabel,
+      mustBeBlock: false,
       onTree: (tree) {
         _anchorRegistry.register(id, anchor);
         tree.registerAnchor(anchor);
@@ -1131,7 +1132,6 @@ class WidgetFactory {
       onBuilt: (_, placeholder) => placeholder.wrapWith(
         (_, child) => SizedBox(key: anchor, child: child),
       ),
-      onWidgetsIsOptional: true,
       priority: BuildOp.kPriorityMax,
     );
   }

@@ -20,6 +20,7 @@ class StyleMargin {
 
   BuildOp get buildOp => BuildOp(
         debugLabel: kCssMargin,
+        mustBeBlock: false,
         onFlattening: (tree) {
           final margin = tryParseCssLengthBox(tree, kCssMargin);
           if (margin == null) {
@@ -60,7 +61,6 @@ class StyleMargin {
               HeightPlaceholder(margin.bottom!, styleBuilder),
           ]);
         },
-        onWidgetsIsOptional: true,
         priority: kPriorityBoxModel9k,
       );
 }

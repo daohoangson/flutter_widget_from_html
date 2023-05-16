@@ -61,6 +61,7 @@ class StyleVerticalAlign {
 
     blockOp = BuildOp(
       debugLabel: '$kCssVerticalAlign--block',
+      mustBeBlock: false,
       onBuilt: (tree, placeholder) {
         if (_skipBuilding[tree] == true) {
           return null;
@@ -81,7 +82,6 @@ class StyleVerticalAlign {
           return wf.buildAlign(tree, child, alignment);
         });
       },
-      onWidgetsIsOptional: true,
       priority: kPriority4k3,
     );
   }

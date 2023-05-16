@@ -42,6 +42,7 @@ class StyleBorder {
 
     blockOp = BuildOp(
       debugLabel: '$kCssBorder--block',
+      mustBeBlock: false,
       onBuilt: (tree, child) {
         if (_skipBuilding[tree] == true) {
           return null;
@@ -57,7 +58,6 @@ class StyleBorder {
           debugLabel: kCssBorder,
         );
       },
-      onWidgetsIsOptional: true,
       priority: kPriorityBoxModel7k,
     );
   }

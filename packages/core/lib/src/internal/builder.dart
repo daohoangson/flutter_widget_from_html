@@ -169,7 +169,7 @@ class Builder extends BuildTree {
       .._parseEverything()
       ..addBitsFromNodes(element.nodes);
 
-    if (subTree._buildOps.where(_opRequiresBuildingSubtree).isNotEmpty) {
+    if (subTree._buildOps.where(_mustBeBlock).isNotEmpty) {
       final builtSubTree = subTree.build();
       if (builtSubTree != null) {
         append(WidgetBit.block(this, builtSubTree));
@@ -331,8 +331,7 @@ class BuilderOp {
   }
 }
 
-bool _opRequiresBuildingSubtree(BuilderOp op) =>
-    op.op.onBuilt != null && !op.op.onWidgetsIsOptional;
+bool _mustBeBlock(BuilderOp op) => op.op.mustBeBlock ?? op.op.onBuilt != null;
 
 Iterable<BuilderOp> _prepareParentOps(
   Iterable<BuilderOp> ops,

@@ -35,6 +35,7 @@ class TagImg {
 
           return styles;
         },
+        mustBeBlock: false,
         onTree: (tree) {
           final data = _parse(tree);
           final built = wf.buildImage(tree, data);
@@ -58,7 +59,6 @@ class TagImg {
           tree.append(WidgetBit.inline(tree, built, alignment: baseline));
         },
         onBuilt: (tree, _) => _builts[tree],
-        onWidgetsIsOptional: true,
       );
 
   ImageMetadata _parse(BuildTree tree) {

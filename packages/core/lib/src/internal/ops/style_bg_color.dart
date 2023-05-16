@@ -14,6 +14,7 @@ class StyleBgColor {
 
   BuildOp get buildOp => BuildOp(
         debugLabel: kCssBackground,
+        mustBeBlock: false,
         onFlattening: (tree) {
           if (_skipBuilding[tree] == true) {
             return;
@@ -42,7 +43,6 @@ class StyleBgColor {
             (_, child) => wf.buildDecoration(tree, child, color: color),
           );
         },
-        onWidgetsIsOptional: true,
         priority: kPriorityBoxModel7k5,
       );
 

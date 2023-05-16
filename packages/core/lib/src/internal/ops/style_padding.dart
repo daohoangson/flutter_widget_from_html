@@ -34,6 +34,7 @@ class StylePadding {
 
   BuildOp get buildOp => BuildOp(
         debugLabel: kCssPadding,
+        mustBeBlock: false,
         onFlattening: (tree) {
           final padding = tryParseCssLengthBox(tree, kCssPadding);
           if (padding == null) {
@@ -62,7 +63,6 @@ class StylePadding {
             child: child,
           );
         },
-        onWidgetsIsOptional: true,
         priority: kPriorityBoxModel5k,
       );
 

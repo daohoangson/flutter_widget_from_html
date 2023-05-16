@@ -78,17 +78,17 @@ class StyleSizing {
 
     _childOp = BuildOp(
       debugLabel: 'sizing (min-width=0)',
+      mustBeBlock: false,
       onBuilt: buildMinWidthZero,
-      onWidgetsIsOptional: true,
       // min-width resetter should wrap all other box model widgets
       priority: StyleMargin.kPriorityBoxModel9k + 1,
     );
 
     _sizingOp = BuildOp(
       debugLabel: 'sizing',
+      mustBeBlock: false,
       onBuilt: buildCssSizing,
       onFlattening: handleInlineSizing,
-      onWidgetsIsOptional: true,
       priority: StyleSizing.kPriorityBoxModel3k,
     );
   }

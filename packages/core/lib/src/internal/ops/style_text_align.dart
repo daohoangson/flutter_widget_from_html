@@ -22,9 +22,9 @@ class StyleTextAlign {
 
   BuildOp get buildOp => BuildOp(
         debugLabel: kCssTextAlign,
+        mustBeBlock: false,
         onTree: (tree) => tree.apply(_builder, value),
         onBuilt: (tree, placeholder) => _wrap(tree, placeholder, value),
-        onWidgetsIsOptional: true,
         priority: 0,
       );
 
