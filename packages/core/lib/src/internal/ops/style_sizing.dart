@@ -151,24 +151,24 @@ class StyleSizing {
       return;
     }
 
-    WidgetPlaceholder? widget;
+    WidgetPlaceholder? placeholder;
     for (final b in tree.bits) {
       if (b is WidgetBit) {
-        if (widget != null) {
+        if (placeholder != null) {
           // TODO: handle multiple inline widgets in the same tree
           return;
         }
-        widget = b.child;
+        placeholder = b.child;
       } else {
         return;
       }
     }
 
-    if (widget == null || widget.isEmpty) {
+    if (placeholder == null || placeholder.isEmpty) {
       return;
     }
 
-    widget.wrapWith((c, w) => _build(c, w, input, tree.styleBuilder));
+    placeholder.wrapWith((c, w) => _build(c, w, input, tree.styleBuilder));
   }
 
   static void skip(BuildTree tree) {
