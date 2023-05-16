@@ -27,7 +27,7 @@ part 'data/image.dart';
 /// Note: op must be registered early for this to work e.g.
 /// in [WidgetFactory.parse] or [onChild].
 /// {@endtemplate}
-typedef DefaultStyles = Map<String, String> Function(dom.Element element);
+typedef DefaultStyles = Map<String, String> Function(BuildTree tree);
 
 /// {@template flutter_widget_from_html.onChild}
 /// The callback that will be called before processing a child element.

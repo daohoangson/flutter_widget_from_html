@@ -226,7 +226,7 @@ The HTML string is parsed into DOM elements and each element is visited once to 
 |------|--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
 | 1    | Parse                                                                    | `WidgetFactory.parse(BuildTree)`                                                                              |
 | 2    | Inform parents if any                                                    | `BuildOp.onChild(BuildTree, BuildTree)`                                                                       |
-| 3    | Populate default styling                                                 | `BuildOp.defaultStyles(Element)`                                                                              |
+| 3    | Populate default styling                                                 | `BuildOp.defaultStyles(BuildTree)`                                                                            |
 | 4    | Populate custom styling                                                  | `HtmlWidget.customStylesBuilder`                                                                              |
 | 5    | Parse styling key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(BuildTree, css.Declaration)`, `WidgetFactory.parseStyleDisplay(BuildTree, String?)` |
 | 6    | a. If a custom widget is provided, go to 7                               | `HtmlWidget.customWidgetBuilder`                                                                              |

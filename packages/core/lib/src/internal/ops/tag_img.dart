@@ -17,8 +17,8 @@ class TagImg {
 
   BuildOp get buildOp => BuildOp(
         debugLabel: kTagImg,
-        defaultStyles: (element) {
-          final attrs = element.attributes;
+        defaultStyles: (tree) {
+          final attrs = tree.element.attributes;
           final styles = {
             kCssHeight: 'auto',
             kCssMinWidth: '0px',

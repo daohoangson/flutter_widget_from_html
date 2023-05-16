@@ -9,7 +9,7 @@ class TagPre {
 
   BuildOp get buildOp => BuildOp(
         debugLabel: kTagPre,
-        defaultStyles: (element) => {
+        defaultStyles: (_) => {
           kCssDisplay: kCssDisplayBlock,
           kCssFontFamily: '$kTagCodeFont1, $kTagCodeFont2',
           kCssWhitespace: kCssWhitespacePre,

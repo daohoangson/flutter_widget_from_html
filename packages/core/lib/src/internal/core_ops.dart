@@ -8,7 +8,6 @@ import 'package:flutter/material.dart'
         // we want to limit Material usages to be as generic as possible
         ThemeData;
 import 'package:flutter/widgets.dart';
-import 'package:html/dom.dart' as dom;
 
 import '../core_data.dart';
 import '../core_helpers.dart';

@@ -46,6 +46,7 @@ class WidgetFactory {
   BuildOp? _tagFont;
   BuildOp? _tagHr;
   BuildOp? _tagImg;
+  BuildOp? _tagLi;
   BuildOp? _tagPre;
   BuildOp? _tagQ;
   BuildOp? _tagRuby;
@@ -818,9 +819,7 @@ class WidgetFactory {
 
       case kTagOrderedList:
       case kTagUnorderedList:
-        tree
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..register(TagLi(this, tree).buildOp);
+        tree.register(_tagLi ??= TagLi(this).buildOp);
         break;
 
       case 'mark':

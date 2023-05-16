@@ -12,8 +12,8 @@ class TagFont {
 
   BuildOp get buildOp => BuildOp(
         debugLabel: kTagFont,
-        defaultStyles: (element) {
-          final attrs = element.attributes;
+        defaultStyles: (tree) {
+          final attrs = tree.element.attributes;
           final color = attrs[kAttributeFontColor];
           final fontFace = attrs[kAttributeFontFace];
           final fontSize = kCssFontSizes[attrs[kAttributeFontSize] ?? ''];

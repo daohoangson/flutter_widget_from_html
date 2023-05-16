@@ -280,7 +280,7 @@ class BuilderOp {
   BuilderOp._(this.tree, this.op);
 
   List<css.Declaration>? get defaultStyles {
-    final map = op.defaultStyles?.call(tree.element);
+    final map = op.defaultStyles?.call(tree);
     if (map == null) {
       return null;
     }

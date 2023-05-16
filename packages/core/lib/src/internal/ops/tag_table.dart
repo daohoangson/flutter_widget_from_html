@@ -39,8 +39,8 @@ class TagTable {
   TagTable(this.wf) {
     borderOp = BuildOp(
       debugLabel: '$kTagTable--$kAttributeBorder',
-      defaultStyles: (element) {
-        final data = element.parse();
+      defaultStyles: (tree) {
+        final data = tree.data;
         return {
           if (data.border > 0.0) kCssBorder: '${data.border}px solid black',
           kCssBorderCollapse: kCssBorderCollapseSeparate,
@@ -302,20 +302,14 @@ extension _BuildTreeData on BuildTree {
       return existing;
     }
 
-    final newData = element.parse();
-    value(newData);
-    return newData;
-  }
-}
-
-extension _BuildTreeDataParser on dom.Element {
-  _TagTableData parse() {
-    final attrs = attributes;
-    return _TagTableData(
+    final attrs = element.attributes;
+    final newData = _TagTableData(
       border: tryParseDoubleFromMap(attrs, kAttributeBorder) ?? 0.0,
       borderSpacing: tryParseDoubleFromMap(attrs, kAttributeCellSpacing) ?? 2.0,
       cellPadding: tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1.0,
     );
+    value(newData);
+    return newData;
   }
 }
 
