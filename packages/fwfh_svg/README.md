@@ -14,7 +14,7 @@ Add this to your app's `pubspec.yaml` file:
 ```yaml
 dependencies:
   flutter_widget_from_html_core: any
-  fwfh_svg: ^0.8.0
+  fwfh_svg: ^0.11.0-0
 ```
 
 ## Usage

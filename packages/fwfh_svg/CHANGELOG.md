@@ -1,3 +1,7 @@
+## 0.11.0-alpha.1
+
+- Add support for flutter_widget_from_html_core@0.11.0 (#899)
+
 ## 0.8.0+1
 
 - Add support for flutter_widget_from_html_core@0.10.0 (#867)
