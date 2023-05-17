@@ -10,7 +10,13 @@ void main() {
 
   mockVideoPlayerPlatform();
 
-  testWidgets('renders video player', (tester) async {
+  testWidgets('renders video player with src attribute', (tester) async {
+    const html = '<video src="$src"></video>';
+    final e = await explain(tester, html);
+    expect(e, equals('[VideoPlayer:url=$src,aspectRatio=$defaultAspectRatio]'));
+  });
+
+  testWidgets('renders video player with SOURCE child tag', (tester) async {
     const html = '<video><source src="$src"></video>';
     final e = await explain(tester, html);
     expect(e, equals('[VideoPlayer:url=$src,aspectRatio=$defaultAspectRatio]'));
@@ -18,7 +24,7 @@ void main() {
 
   group('renders progress indicator', () {
     const html = '<video><source src="$src"></video>';
-    Future<String> _explain(WidgetTester tester) async {
+    Future<String> progressIndicatorExplain(WidgetTester tester) async {
       final explained = await explain(
         tester,
         html,
@@ -30,7 +36,7 @@ void main() {
 
     testWidgets('renders material style (Android)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
-      final explained = await _explain(tester);
+      final explained = await progressIndicatorExplain(tester);
       expect(explained, contains('CircularProgressIndicator'));
       expect(explained, isNot(contains('CupertinoActivityIndicator')));
       debugDefaultTargetPlatformOverride = null;
@@ -38,7 +44,7 @@ void main() {
 
     testWidgets('renders cupertino style (iOS)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-      final explained = await _explain(tester);
+      final explained = await progressIndicatorExplain(tester);
       expect(explained, contains('CupertinoActivityIndicator'));
       debugDefaultTargetPlatformOverride = null;
     });
@@ -46,28 +52,28 @@ void main() {
 
   group('useExplainer: false', () {
     const html = '<video><source src="$src"></video>';
-    Future<String> _explain(WidgetTester tester) async {
+    Future<String> explainWithoutExplainer(WidgetTester tester) async {
       final explained = await explain(tester, html, useExplainer: false);
       return explained;
     }
 
     testWidgets('renders video player (Android)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
-      final explained = await _explain(tester);
+      final explained = await explainWithoutExplainer(tester);
       expect(explained, contains('Chewie(state: ChewieState)'));
       debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets('renders video player (iOS)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-      final explained = await _explain(tester);
+      final explained = await explainWithoutExplainer(tester);
       expect(explained, contains('Chewie(state: ChewieState)'));
       debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets('skips video player (linux)', (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.linux;
-      final explained = await _explain(tester);
+      final explained = await explainWithoutExplainer(tester);
       expect(explained, isNot(contains('Chewie(state: ChewieState)')));
       debugDefaultTargetPlatformOverride = null;
     });

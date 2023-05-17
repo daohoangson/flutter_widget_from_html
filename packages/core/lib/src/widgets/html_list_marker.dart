@@ -45,23 +45,6 @@ class HtmlListMarker extends LeafRenderObjectWidget {
   }
 
   @override
-  String toStringShort() {
-    // TODO: bring this into test/_.dart once 0.7.0 reaches stable
-    switch (markerType) {
-      case HtmlListMarkerType.circle:
-        return '[HtmlListMarker.circle]';
-      case HtmlListMarkerType.disc:
-        return '[HtmlListMarker.disc]';
-      case HtmlListMarkerType.disclosureClosed:
-        return '[HtmlListMarker.disclosureClosed]';
-      case HtmlListMarkerType.disclosureOpen:
-        return '[HtmlListMarker.disclosureOpen]';
-      case HtmlListMarkerType.square:
-        return '[HtmlListMarker.square]';
-    }
-  }
-
-  @override
   void updateRenderObject(BuildContext _, RenderObject renderObject) {
     (renderObject as _ListMarkerRenderObject)
       ..markerType = markerType

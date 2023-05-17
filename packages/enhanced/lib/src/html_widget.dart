@@ -1,11 +1,6 @@
-import 'dart:async';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
     as core show HtmlWidget;
 
-import 'data.dart';
-import 'helpers.dart';
 import 'widget_factory.dart';
 
 export 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
@@ -14,62 +9,26 @@ export 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 /// A widget that builds Flutter widget tree from HTML
 /// with support for IFRAME, VIDEO and many other tags.
 class HtmlWidget extends core.HtmlWidget {
-  /// Controls whether text is rendered with [SelectableText] or [RichText].
-  ///
-  /// Default: `false`, use [RichText].
-  final bool isSelectable;
-
-  /// The callback when user changes the selection of text.
-  ///
-  /// This doesn't have any effect if [isSelectable] is disabled.
-  ///
-  /// See [SelectableText.onSelectionChanged].
-  final SelectionChangedCallback? onSelectionChanged;
-
-  @override
-  List<dynamic> get rebuildTriggers => [
-        isSelectable,
-        ...super.rebuildTriggers,
-      ];
-
   /// Creates a widget that builds Flutter widget tree from html.
   ///
   /// The [html] argument must not be null.
   const HtmlWidget(
-    String html, {
-    bool? buildAsync,
-    bool enableCaching = true,
+    super.html, {
+    super.buildAsync,
+    bool super.enableCaching = true,
     WidgetFactory Function()? factoryBuilder,
-    this.isSelectable = false,
-    Key? key,
-    Uri? baseUrl,
-    CustomStylesBuilder? customStylesBuilder,
-    CustomWidgetBuilder? customWidgetBuilder,
-    OnErrorBuilder? onErrorBuilder,
-    OnLoadingBuilder? onLoadingBuilder,
-    this.onSelectionChanged,
-    void Function(ImageMetadata)? onTapImage,
-    FutureOr<bool> Function(String)? onTapUrl,
-    List<dynamic>? rebuildTriggers,
-    RenderMode renderMode = RenderMode.column,
-    TextStyle? textStyle,
-  }) : super(
-          html,
-          baseUrl: baseUrl,
-          buildAsync: buildAsync,
-          customStylesBuilder: customStylesBuilder,
-          customWidgetBuilder: customWidgetBuilder,
-          enableCaching: enableCaching,
-          factoryBuilder: factoryBuilder ?? _getEnhancedWf,
-          onErrorBuilder: onErrorBuilder,
-          onLoadingBuilder: onLoadingBuilder,
-          onTapImage: onTapImage,
-          onTapUrl: onTapUrl,
-          rebuildTriggers: rebuildTriggers,
-          renderMode: renderMode,
-          textStyle: textStyle,
-          key: key,
-        );
+    super.key,
+    super.baseUrl,
+    super.customStylesBuilder,
+    super.customWidgetBuilder,
+    super.onErrorBuilder,
+    super.onLoadingBuilder,
+    super.onTapImage,
+    super.onTapUrl,
+    super.rebuildTriggers,
+    super.renderMode,
+    super.textStyle,
+  }) : super(factoryBuilder: factoryBuilder ?? _getEnhancedWf);
 
   static WidgetFactory _getEnhancedWf() => WidgetFactory();
 }

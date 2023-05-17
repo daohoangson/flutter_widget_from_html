@@ -13,8 +13,7 @@ const kColorPrimary = Color(0xFF123456);
 const kDataBase64 = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 const kDataUri = 'data:image/gif;base64,$kDataBase64';
 
-// TODO: switch to GlobalKey<HtmlWidgetState> when backward compatibility allows
-final hwKey = GlobalKey<State<HtmlWidget>>();
+final hwKey = GlobalKey<HtmlWidgetState>();
 
 Widget? buildCurrentState({GlobalKey? key}) {
   final hws = (key ?? hwKey).currentState;
@@ -143,6 +142,13 @@ Future<String> explainWithoutPumping({
     );
     str = str.replaceAll(RegExp(r'(, )?softWrap: [a-z\s]+'), '');
     str = str.replaceAll(RegExp('(, )?textDirection: ltr+'), '');
+
+    // TODO: remove trimming when our minimum Flutter version >=3.3
+    // old versions implement `BorderSide.toString` while newer ones don't...
+    str = str.replaceAllMapped(
+      RegExp('\\(border: .+?, (\\w+:)'),
+      (m) => '(${m.group(1)}',
+    );
 
     // delete leading comma (because of property trimmings)
     str = str.replaceAll('(, ', '(');
@@ -328,6 +334,21 @@ class Explainer {
       ? '(${e.top.truncate()},${e.right.truncate()},'
           '${e.bottom.truncate()},${e.left.truncate()})'
       : e.toString();
+
+  String _htmlListMarker(HtmlListMarker marker) {
+    switch (marker.markerType) {
+      case HtmlListMarkerType.circle:
+        return '[HtmlListMarker.circle]';
+      case HtmlListMarkerType.disc:
+        return '[HtmlListMarker.disc]';
+      case HtmlListMarkerType.disclosureClosed:
+        return '[HtmlListMarker.disclosureClosed]';
+      case HtmlListMarkerType.disclosureOpen:
+        return '[HtmlListMarker.disclosureOpen]';
+      case HtmlListMarkerType.square:
+        return '[HtmlListMarker.square]';
+    }
+  }
 
   String _image(Image image) {
     final buffer = StringBuffer();
@@ -546,16 +567,27 @@ class Explainer {
       return '[widget0]';
     }
 
-    if (widget.runtimeType.toString() == 'HtmlListMarker') {
-      return widget.toStringShort();
+    if (widget is HtmlListMarker) {
+      return _htmlListMarker(widget);
     }
 
     if (widget is TshWidget) {
       return _widget(widget.child);
     }
 
+    if (widget.runtimeType.toString() == 'ValignBaselineContainer') {
+      // ignore: avoid_dynamic_calls
+      return _widget((widget as dynamic).child as Widget);
+    }
+
     if (widget is WidgetPlaceholder) {
       return _widget(widget.build(context));
+    }
+
+    if (widget.runtimeType.toString() == '_MinWidthZero') {
+      // TODO: verify min-width resetter in tests when it's stable
+      // ignore: avoid_dynamic_calls
+      return _widget((widget as dynamic).child as Widget);
     }
 
     if (widget is Image) {
@@ -645,56 +677,54 @@ class Explainer {
       );
     }
 
-    if (widget is SelectableText) {
-      if (widget.onSelectionChanged != null) {
-        attr.add('+onSelectionChanged');
-      }
-    }
-
     if (widget is Tooltip) {
       attr.add('message=${widget.message}');
     }
 
-    // A-F
-    // `RichText` is an exception, it is a `MultiChildRenderObjectWidget`
-    // so it has to be processed first
+    // Special cases
+    // `RichText` is a `MultiChildRenderObjectWidget` but needs different logic
     attr.add(
       widget is RichText
           ? _inlineSpan(widget.text)
-          : widget is Container
+          : widget is MultiChildRenderObjectWidget
+              ? _widgetChildren(widget.children)
+              : '',
+    );
+    // `MouseRegion` is a `SingleChildRenderObjectWidget` since Flutter 2.11
+    // (see https://github.com/flutter/flutter/pull/96636)
+    attr.add(
+      widget is MouseRegion
+          ? _widgetChild(widget.child)
+          : widget is SingleChildRenderObjectWidget
               ? _widgetChild(widget.child)
               : '',
     );
+
+    // A-F
+    attr.add(
+      widget is Container ? _widgetChild(widget.child) : '',
+    );
+
     // G-M
     attr.add(
-      widget is GestureDetector
-          ? _widgetChild(widget.child)
-          : widget is MouseRegion
-              ? _widgetChild(widget.child)
-              : widget is MultiChildRenderObjectWidget
-                  ? (widget is! RichText
-                      ? _widgetChildren(widget.children)
-                      : '')
-                  : '',
+      widget is GestureDetector ? _widgetChild(widget.child) : '',
     );
 
     // N-T
     attr.add(
       widget is ProxyWidget
           ? _widgetChild(widget.child)
-          : widget is SingleChildRenderObjectWidget
+          : widget is SingleChildScrollView
               ? _widgetChild(widget.child)
-              : widget is SingleChildScrollView
-                  ? _widgetChild(widget.child)
-                  : widget is SelectableText
-                      ? _inlineSpan(widget.textSpan!)
-                      : widget is Text
-                          ? widget.data!
-                          : widget is Tooltip
-                              ? _widgetChild(widget.child)
-                              : '',
+              : widget is Text
+                  ? widget.data!
+                  : widget is Tooltip
+                      ? _widgetChild(widget.child)
+                      : '',
     );
+
     // U-Z
+    attr.add('');
 
     final attrStr = attr.where((a) => a.isNotEmpty).join(',');
     return '[$type${attrStr.isNotEmpty ? ':$attrStr' : ''}]';
@@ -746,16 +776,6 @@ class _TextFinder extends MatchFinder {
         if (text.toPlainText() == data) {
           return true;
         }
-      }
-    } else if (widget is SelectableText) {
-      final text = widget.data;
-      if (text != null && text == data) {
-        return true;
-      }
-
-      final span = widget.textSpan;
-      if (span != null && span.toPlainText() == data) {
-        return true;
       }
     }
 

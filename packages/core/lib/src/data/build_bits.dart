@@ -265,9 +265,9 @@ abstract class BuildTree extends BuildBit {
     final sb = _buffers[this] = StringBuffer();
     sb.writeln('$runtimeType#$hashCode $tsb:');
 
-    const _indent = '  ';
+    const indent = '  ';
     for (final child in _children) {
-      sb.write('$_indent${child.toString().replaceAll('\n', '\n$_indent')}\n');
+      sb.write('$indent${child.toString().replaceAll('\n', '\n$indent')}\n');
     }
 
     final str = sb.toString().trimRight();

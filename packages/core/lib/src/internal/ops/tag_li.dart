@@ -19,6 +19,7 @@ const kCssListStyleTypeAlphaLatinUpper = 'upper-latin';
 const kCssListStyleTypeCircle = 'circle';
 const kCssListStyleTypeDecimal = 'decimal';
 const kCssListStyleTypeDisc = 'disc';
+const kCssListStyleTypeNone = 'none';
 const kCssListStyleTypeRomanLower = 'lower-roman';
 const kCssListStyleTypeRomanUpper = 'upper-roman';
 const kCssListStyleTypeSquare = 'square';

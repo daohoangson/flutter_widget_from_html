@@ -1,84 +1,86 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
 
 void mockWebViewPlatform() => _FakeWebViewPlatform();
 
-class FakeWebViewController extends WebViewPlatformController {
+class _FakeNavigationDelegate extends PlatformNavigationDelegate {
+  NavigationRequestCallback? _onNavigationRequest;
+  PageEventCallback? _onPageFinished;
+
+  _FakeNavigationDelegate(super.params) : super.implementation();
+
+  @override
+  Future<void> setOnNavigationRequest(
+    NavigationRequestCallback onNavigationRequest,
+  ) async {
+    _onNavigationRequest = onNavigationRequest;
+  }
+
+  @override
+  Future<void> setOnPageFinished(PageEventCallback onPageFinished) async {
+    _onPageFinished = onPageFinished;
+  }
+}
+
+class FakeWebViewController extends PlatformWebViewController {
   static FakeWebViewController? _instance;
   static FakeWebViewController? get instance => _instance;
 
-  final CreationParams creationParams;
-  final WebViewPlatformCallbacksHandler handler;
-
-  String? _currentUrl;
+  Uri? _currentUri;
+  _FakeNavigationDelegate? _handler;
   bool _js = true;
   Timer? _onPageFinishedTimer;
-  final _urls = <String>[];
+  final _uris = <Uri>[];
 
-  FakeWebViewController(
-    this.handler, {
-    required this.creationParams,
-  }) : super(handler) {
+  FakeWebViewController(super.params) : super.implementation() {
     _instance = this;
-
-    final settings = creationParams.webSettings;
-    if (settings != null) {
-      _updateSettings(settings);
-    }
-
-    final url = creationParams.initialUrl;
-    if (url != null) {
-      _onPageStarted(url);
-    }
   }
 
-  Map<String, String>? get _currentQueryParameters {
-    final url = _currentUrl;
-    if (url == null) {
-      return null;
-    }
+  Iterable<String> get urls => _uris.map((_) => _.toString());
 
-    final uri = Uri.tryParse(url);
-    if (uri == null) {
-      return null;
-    }
-
-    return uri.queryParameters;
+  FutureOr<NavigationDecision?> onNavigationRequest({
+    required String url,
+    required bool isMainFrame,
+  }) async {
+    final req = NavigationRequest(url: url, isMainFrame: isMainFrame);
+    return _handler?._onNavigationRequest?.call(req);
   }
-
-  Iterable<String> get urls => [..._urls];
 
   @override
   Future<String?> currentUrl() async {
-    return _currentUrl;
+    return _currentUri.toString();
+  }
+
+  @override
+  Future<void> loadRequest(LoadRequestParams params) async {
+    _onPageStarted(params.uri);
   }
 
   @override
   Future<void> reload() async {
-    final url = _currentUrl;
-    if (url != null) {
-      _onPageFinishedTimer?.cancel();
-      _onPageStarted(url);
+    final uri = _currentUri;
+    if (uri != null) {
+      _onPageStarted(uri);
     }
   }
 
   @override
-  Future<String> runJavascriptReturningResult(String javascript) async {
+  Future<Object> runJavaScriptReturningResult(String javascript) async {
     if (!_js) {
-      return '';
+      throw UnsupportedError('JavaScript is disabled');
     }
 
-    final params = _currentQueryParameters;
+    final params = _currentUri?.queryParameters;
     if (params == null) {
       return '';
     }
 
-    if (params['runJavascriptReturningResult'] == 'error') {
+    if (params['runJavaScriptReturningResult'] == 'error') {
       throw PlatformException(code: 'code');
     }
 
@@ -90,111 +92,119 @@ class FakeWebViewController extends WebViewPlatformController {
   }
 
   @override
-  Future<void> updateSettings(WebSettings settings) async {
-    _updateSettings(settings);
+  Future<void> setJavaScriptMode(JavaScriptMode javaScriptMode) async {
+    _js = javaScriptMode == JavaScriptMode.unrestricted;
   }
 
-  void _dispose() {
+  @override
+  Future<void> setPlatformNavigationDelegate(
+    PlatformNavigationDelegate handler,
+  ) async {
+    if (handler is _FakeNavigationDelegate) {
+      _handler = handler;
+    }
+  }
+
+  @override
+  Future<void> setUserAgent(String? userAgent) async {
+    // intentionally left empty
+  }
+
+  Future<void> _onPageStarted(Uri uri) async {
+    _uris.add(_currentUri = uri);
+
     _onPageFinishedTimer?.cancel();
-  }
-
-  Future<void> _onPageStarted(String url) async {
-    handler.onPageStarted(url);
-    _urls.add(_currentUrl = url);
-
     _onPageFinishedTimer = Timer(
       const Duration(milliseconds: 10),
       () {
-        final params = _currentQueryParameters;
-        if (params != null) {
-          final redirectTo = params['redirect_to'];
-          if (redirectTo?.isNotEmpty == true) {
-            _onPageStarted(redirectTo!);
+        final redirectToString =
+            _currentUri?.queryParameters['redirect_to'] ?? '';
+        if (redirectToString.isNotEmpty) {
+          final redirectTo = Uri.tryParse(redirectToString);
+          if (redirectTo != null) {
+            _onPageStarted(redirectTo);
             return;
           }
         }
 
-        handler.onPageFinished(url);
+        _handler?._onPageFinished?.call(uri.toString());
       },
     );
   }
-
-  void _updateSettings(WebSettings settings) {
-    if (settings.javascriptMode != null) {
-      _js = settings.javascriptMode == JavascriptMode.unrestricted;
-    }
-  }
 }
 
-class _FakeWebViewPlatform extends WebViewPlatform {
-  _FakeWebViewPlatform() {
-    WebView.platform = this;
-  }
+class _FakeWebViewControllerTimerDisposer extends StatefulWidget {
+  final Widget child;
+  final FakeWebViewController controller;
+
+  const _FakeWebViewControllerTimerDisposer({
+    required this.child,
+    required this.controller,
+  });
 
   @override
-  Widget build({
-    required BuildContext context,
-    required CreationParams creationParams,
-    required WebViewPlatformCallbacksHandler webViewPlatformCallbacksHandler,
-    required JavascriptChannelRegistry javascriptChannelRegistry,
-    WebViewPlatformCreatedCallback? onWebViewPlatformCreated,
-    Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers,
-  }) {
-    return _FakeWebViewWidget(
-      creationParams: creationParams,
-      onWebViewPlatformCreated: onWebViewPlatformCreated,
-      webViewPlatformCallbacksHandler: webViewPlatformCallbacksHandler,
-    );
-  }
+  State<StatefulWidget> createState() =>
+      _FakeWebViewControllerTimerDisposerState();
 }
 
-class _FakeWebViewWidget extends StatefulWidget {
-  final CreationParams creationParams;
-  final WebViewPlatformCreatedCallback? onWebViewPlatformCreated;
-  final WebViewPlatformCallbacksHandler webViewPlatformCallbacksHandler;
-
-  const _FakeWebViewWidget({
-    required this.creationParams,
-    Key? key,
-    this.onWebViewPlatformCreated,
-    required this.webViewPlatformCallbacksHandler,
-  }) : super(key: key);
-
-  @override
-  State<_FakeWebViewWidget> createState() => _FakeWebViewState();
-}
-
-class _FakeWebViewState extends State<_FakeWebViewWidget> {
-  late FakeWebViewController controller;
-
-  @override
-  void initState() {
-    super.initState();
-
-    controller = FakeWebViewController(
-      widget.webViewPlatformCallbacksHandler,
-      creationParams: widget.creationParams,
-    );
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
-      widget.onWebViewPlatformCreated?.call(controller);
-    });
-  }
-
+class _FakeWebViewControllerTimerDisposerState
+    extends State<_FakeWebViewControllerTimerDisposer> {
   @override
   void dispose() {
-    controller._dispose();
+    widget.controller._onPageFinishedTimer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return const DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.grey,
-      ),
-      child: Placeholder(
-        color: Colors.black,
+    return widget.child;
+  }
+}
+
+class _FakeWebViewWidget extends PlatformWebViewWidget {
+  _FakeWebViewWidget(super.params) : super.implementation();
+
+  @override
+  Widget build(BuildContext context) {
+    return _FakeWebViewControllerTimerDisposer(
+      controller: params.controller as FakeWebViewController,
+      child: const DecoratedBox(
+        decoration: BoxDecoration(
+          color: Colors.grey,
+        ),
+        child: Placeholder(
+          color: Colors.black,
+        ),
       ),
     );
+  }
+}
+
+class _FakeWebViewPlatform extends Fake
+    with MockPlatformInterfaceMixin
+    implements WebViewPlatform {
+  _FakeWebViewPlatform() {
+    WebViewPlatform.instance = this;
+  }
+
+  @override
+  PlatformNavigationDelegate createPlatformNavigationDelegate(
+    PlatformNavigationDelegateCreationParams params,
+  ) {
+    return _FakeNavigationDelegate(params);
+  }
+
+  @override
+  PlatformWebViewController createPlatformWebViewController(
+    PlatformWebViewControllerCreationParams params,
+  ) {
+    return FakeWebViewController(params);
+  }
+
+  @override
+  PlatformWebViewWidget createPlatformWebViewWidget(
+    PlatformWebViewWidgetCreationParams params,
+  ) {
+    return _FakeWebViewWidget(params);
   }
 }

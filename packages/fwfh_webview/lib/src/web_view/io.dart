@@ -1,60 +1,76 @@
 import 'dart:async';
-import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:webview_flutter/webview_flutter.dart' as lib;
+import 'package:webview_flutter_android/webview_flutter_android.dart' as lib;
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart'
+    as lib;
 
 import 'web_view.dart';
 
 class WebViewState extends State<WebView> {
   final _timers = <Timer>[];
+  late final lib.WebViewController _controller;
 
   late double _aspectRatio;
   String? _firstFinishedUrl;
   _Issue37? _issue37;
-  lib.WebViewController? _wvc;
 
   @override
   void initState() {
     super.initState();
     _aspectRatio = widget.aspectRatio;
 
+    _initController();
+
     if (widget.unsupportedWorkaroundForIssue37) {
       _issue37 = _Issue37(this);
-      WidgetsBinding.instance?.addObserver(_issue37!);
+      WidgetsBinding.instance.addObserver(_issue37!);
+    }
+  }
+
+  void _initController() {
+    var params = const lib.PlatformWebViewControllerCreationParams();
+    if (lib.WebViewPlatform.instance is lib.WebKitWebViewPlatform) {
+      params = lib.WebKitWebViewControllerCreationParams(
+        allowsInlineMediaPlayback: true,
+        mediaTypesRequiringUserAction: widget.mediaPlaybackAlwaysAllow
+            ? {}
+            : {...lib.PlaybackMediaTypes.values},
+      );
+    }
+
+    _controller = lib.WebViewController.fromPlatformCreationParams(params)
+      ..setJavaScriptMode(
+        widget.js
+            ? lib.JavaScriptMode.unrestricted
+            : lib.JavaScriptMode.disabled,
+      )
+      ..setNavigationDelegate(
+        lib.NavigationDelegate(
+          onPageFinished: _onPageFinished,
+          onNavigationRequest: widget.interceptNavigationRequest != null
+              ? (req) => _interceptNavigationRequest(req)
+              : null,
+        ),
+      )
+      ..setUserAgent(widget.userAgent)
+      ..loadRequest(Uri.parse(widget.url));
+
+    final platformController = _controller.platform;
+    if (platformController is lib.AndroidWebViewController) {
+      lib.AndroidWebViewController.enableDebugging(widget.debuggingEnabled);
+      platformController.setMediaPlaybackRequiresUserGesture(
+        !widget.mediaPlaybackAlwaysAllow,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final webView = _buildWebView();
-
-    if (widget.unsupportedWorkaroundForIssue375 &&
-        defaultTargetPlatform == TargetPlatform.android) {
-      return LayoutBuilder(
-        builder: (context, constraints) {
-          final width = constraints.hasBoundedWidth
-              ? constraints.maxWidth
-              : MediaQuery.of(context).size.width;
-          final height = width / _aspectRatio;
-          return SizedBox(
-            height: min(
-              height,
-              constraints.hasBoundedHeight
-                  ? constraints.maxHeight
-                  : MediaQuery.of(context).size.height,
-            ),
-            width: width,
-            child: webView,
-          );
-        },
-      );
-    }
-
     return AspectRatio(
       aspectRatio: _aspectRatio,
-      child: webView,
+      child: _buildWebView(),
     );
   }
 
@@ -63,7 +79,7 @@ class WebViewState extends State<WebView> {
     super.deactivate();
 
     if (widget.unsupportedWorkaroundForIssue37) {
-      _wvc?.reload();
+      _controller.reload();
     }
   }
 
@@ -74,7 +90,7 @@ class WebViewState extends State<WebView> {
     }
 
     if (_issue37 != null) {
-      WidgetsBinding.instance?.removeObserver(_issue37!);
+      WidgetsBinding.instance.removeObserver(_issue37!);
     }
 
     super.dispose();
@@ -82,10 +98,13 @@ class WebViewState extends State<WebView> {
 
   Future<String> eval(String js) async {
     try {
-      return await _wvc!.runJavascriptReturningResult(js);
-    } catch (_) {
-      return '';
+      final result = await _controller.runJavaScriptReturningResult(js);
+      return '$result';
+    } catch (evalError) {
+      debugPrint('evalError: $evalError');
     }
+
+    return '';
   }
 
   Future<void> _autoResize() async {
@@ -97,6 +116,10 @@ class WebViewState extends State<WebView> {
       eval('document.body.scrollWidth'),
       eval('document.body.scrollHeight'),
     ]);
+    if (!mounted) {
+      return;
+    }
+
     final w = double.tryParse(evals[0]) ?? 0;
     final h = double.tryParse(evals[1]) ?? 0;
 
@@ -107,36 +130,22 @@ class WebViewState extends State<WebView> {
     }
   }
 
-  Widget _buildWebView() => lib.WebView(
-        debuggingEnabled: widget.debuggingEnabled,
-        initialUrl: widget.url,
-        initialMediaPlaybackPolicy: widget.mediaPlaybackAlwaysAllow
-            ? lib.AutoMediaPlaybackPolicy.always_allow
-            : lib.AutoMediaPlaybackPolicy
-                .require_user_action_for_all_media_types,
-        javascriptMode: widget.js
-            ? lib.JavascriptMode.unrestricted
-            : lib.JavascriptMode.disabled,
+  Widget _buildWebView() => lib.WebViewWidget(
+        controller: _controller,
         key: Key(widget.url),
-        navigationDelegate: widget.interceptNavigationRequest != null
-            ? (req) => _interceptNavigationRequest(req)
-            : null,
-        onPageFinished: _onPageFinished,
-        onWebViewCreated: (c) => _wvc = c,
-        userAgent: widget.userAgent,
       );
 
   lib.NavigationDecision _interceptNavigationRequest(
     lib.NavigationRequest req,
   ) {
     var intercepted = false;
-
-    if (widget.interceptNavigationRequest != null &&
+    final callback = widget.interceptNavigationRequest;
+    if (callback != null &&
         _firstFinishedUrl != null &&
-        req.isForMainFrame &&
+        req.isMainFrame &&
         req.url != widget.url &&
         req.url != _firstFinishedUrl) {
-      intercepted = widget.interceptNavigationRequest!(req.url);
+      intercepted = callback(req.url);
     }
 
     return intercepted
@@ -169,7 +178,7 @@ class _Issue37 with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
-      wvs._wvc?.reload();
+      wvs._controller.reload();
     }
   }
 }

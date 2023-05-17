@@ -92,7 +92,7 @@ class _AudioPlayerState extends State<AudioPlayer> {
           final iconSize = DefaultTextStyle.of(context).style.fontSize! *
               MediaQuery.of(context).textScaleFactor;
 
-          return Container(
+          return DecoratedBox(
             decoration: BoxDecoration(
               color: theme.brightness == Brightness.light
                   ? const Color.fromRGBO(0, 0, 0, .1)

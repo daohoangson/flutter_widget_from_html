@@ -8,70 +8,54 @@ on:
       - release/beta
       - release/master
 
+permissions:
+  contents: read
+
 jobs:
   unit_test:
     name: Unit test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
+      - uses: actions/dependency-review-action@f46c48ed6d4f1227fb2d9ea62bf6bcbed315589e # v3.0.4
+        if: github.base_ref
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-      - name: Run flutter format
-        run: flutter format --dry-run --set-exit-if-changed .
+        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
+        with:
+          cache: true
+      - run: dart format --set-exit-if-changed --output none .
       - run: ./tool/test.sh --coverage
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
         if: failure()
         with:
           name: failures
           path: demo_app/test/failures/
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@894ff025c7b54547a9a2a1e9f228beae737ad3c2 # v3.1.3
 
   integration_test:
     name: Integration test
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-
-      - uses: actions/setup-java@v2
+        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
         with:
-          distribution: "temurin"
-          java-version: "11"
-      - name: AVD cache
-        uses: actions/cache@v2
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd
-      - name: Create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 29
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
-      - name: Run tests on Android
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 29
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: ./tool/integration.sh
+          cache: true
 
       - name: Create iOS simulator
         run: |
           set -e
 
-          _deviceType=$( xcrun simctl list devicetypes iphone -j | jq '.devicetypes[-1]' )
-          _deviceTypeName=$( echo $_deviceType | jq .name -r )
-          _deviceTypeId=$( echo $_deviceType | jq .identifier -r )
-          _runTime=$( xcrun simctl list runtimes ios -j | jq '.runtimes[].identifier' -r | tail -n 1 )
-          xcrun simctl create "$_deviceTypeName" "$_deviceTypeId" "$_runTime" | xargs xcrun simctl boot
+          _runtime=$(xcrun simctl list runtimes ios -j | jq -r '.runtimes[-1]')
+          _runtimeId=$(echo $_runtime | jq -r .identifier)
+          echo "_runtimeId=$_runtimeId"
+
+          _deviceType=$(echo $_runtime | jq -r '.supportedDeviceTypes[-1]')
+          _deviceTypeName=$(echo $_deviceType | jq -r .name)
+          echo "_deviceTypeName=$_deviceTypeName"
+          _deviceTypeId=$(echo $_deviceType | jq -r .identifier)
+          echo "_deviceTypeId=$_deviceTypeId"
+
+          xcrun simctl create "$_deviceTypeName" "$_deviceTypeId" "$_runtimeId" | xargs xcrun simctl boot
       - name: Run tests on iOS
         run: ./tool/integration.sh

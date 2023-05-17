@@ -4,7 +4,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 const kHtml = 'Hello <span class="name">World</span>!';
 
 class CustomStylesBuilderScreen extends StatelessWidget {
-  const CustomStylesBuilderScreen({Key key}) : super(key: key);
+  const CustomStylesBuilderScreen({super.key});
 
   @override
   Widget build(BuildContext context) => Scaffold(

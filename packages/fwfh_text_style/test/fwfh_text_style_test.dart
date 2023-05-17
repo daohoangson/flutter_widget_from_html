@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fwfh_text_style/fwfh_text_style.dart';
@@ -209,7 +208,13 @@ Future<void> main() async {
     expect(merged, isNot(equals(obj)));
   });
 
-  final goldenSkip = Platform.isLinux ? null : 'Linux only';
+  final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
+  final goldenSkip = goldenSkipEnvVar == null
+      ? Platform.isLinux
+          ? null
+          : 'Linux only'
+      : 'GOLDEN_SKIP=$goldenSkipEnvVar';
+
   GoldenToolkit.runWithConfiguration(
     () {
       group(
@@ -266,27 +271,6 @@ Future<void> main() async {
 
             await screenMatchesGolden(tester, 'TextSpan');
           });
-
-          testGoldens(
-            '#698: MaterialApp > CupertinoPageScaffold',
-            (tester) async {
-              await tester.pumpWidget(
-                MaterialApp(
-                  home: CupertinoPageScaffold(
-                    child: Builder(
-                      builder: (context) => Text(
-                        'Foo Roboto',
-                        style: FwfhTextStyle.of(context)
-                            .copyWith(fontFamily: 'Roboto'),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-
-              await screenMatchesGolden(tester, 'CupertinoPageScaffold');
-            },
-          );
         },
         skip: goldenSkip,
       );

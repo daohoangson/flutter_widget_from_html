@@ -67,25 +67,39 @@ TextStyleHtml textDecorationColor(TextStyleHtml p, Color v) =>
     p.copyWith(style: p.style.copyWith(decorationColor: v));
 
 TextStyleHtml textDecorationLine(TextStyleHtml p, TextDecorationLine v) {
-  final pd = p.style.decoration;
-  final lineThough = pd?.contains(TextDecoration.lineThrough) == true;
-  final overline = pd?.contains(TextDecoration.overline) == true;
-  final underline = pd?.contains(TextDecoration.underline) == true;
+  final parent = p.parent?.style.decoration;
+  final parentOverline = parent?.contains(TextDecoration.overline) == true;
+  final parentLineThrough =
+      parent?.contains(TextDecoration.lineThrough) == true;
+  final parentUnderline = parent?.contains(TextDecoration.underline) == true;
+
+  final current = p.style.decoration;
+  final currentOverline = current?.contains(TextDecoration.overline) == true;
+  final currentLineThrough =
+      current?.contains(TextDecoration.lineThrough) == true;
+  final currentUnderline = current?.contains(TextDecoration.underline) == true;
 
   final list = <TextDecoration>[];
-  if (v.over == true || (overline && v.over != false)) {
+  if (parentOverline || (v.over ?? currentOverline)) {
+    // 1. Honor parent's styling if the line decoration is turned on
+    // 2. Then apply incoing value (if set)
+    // 3. Finally fallback to the current styling
+    //
+    // According to https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration
+    // > Text decorations are drawn across descendant text elements.
+    // > This means that if an element specifies a text decoration,
+    // > then a child element can't remove the decoration.
     list.add(TextDecoration.overline);
   }
-  if (v.strike == true || (lineThough && v.strike != false)) {
+  if (parentLineThrough || (v.strike ?? currentLineThrough)) {
     list.add(TextDecoration.lineThrough);
   }
-  if (v.under == true || (underline && v.under != false)) {
+  if (parentUnderline || (v.under ?? currentUnderline)) {
     list.add(TextDecoration.underline);
   }
 
-  return p.copyWith(
-    style: p.style.copyWith(decoration: TextDecoration.combine(list)),
-  );
+  final combined = TextDecoration.combine(list);
+  return p.copyWith(style: p.style.copyWith(decoration: combined));
 }
 
 TextStyleHtml textDecorationStyle(TextStyleHtml p, TextDecorationStyle v) =>

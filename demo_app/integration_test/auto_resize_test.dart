@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fwfh_chewie/fwfh_chewie.dart';
@@ -13,7 +15,7 @@ void main() {
       child: VideoPlayer(
         'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
         aspectRatio: 1,
-        loadingBuilder: (_a, _b, _c) =>
+        loadingBuilder: (_, __, ___) =>
             const Center(child: CircularProgressIndicator()),
       ),
     );
@@ -34,7 +36,7 @@ void main() {
   testWidgets(
     'WebView',
     (WidgetTester tester) async {
-      final testCase = webViewTestCases.currentValue;
+      final testCase = webViewTestCases.currentValue!;
       final test = await testCase.run(tester);
       test.expectValueEquals(testCase.input);
     },
@@ -90,7 +92,6 @@ class WebViewTestCase {
       autoResize: true,
       autoResizeIntervals: [interval, interval * 2, interval * 3],
       debuggingEnabled: true,
-      unsupportedWorkaroundForIssue375: issue375,
     );
     final test = _AspectRatioTest(child: webView);
 
@@ -118,7 +119,7 @@ class _AspectRatioTest extends StatelessWidget {
 
   final Widget child;
 
-  const _AspectRatioTest({@required this.child, Key key}) : super(key: key);
+  const _AspectRatioTest({required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +128,10 @@ class _AspectRatioTest extends StatelessWidget {
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Measurer(
-            onMeasure: (v, _) => _value[this] = v.width / v.height,
+            onMeasure: (size, _) {
+              debugPrint('onMeasure: size=$size');
+              _value[this] = size.width / size.height;
+            },
             child: child,
           ),
         ),
@@ -137,9 +141,12 @@ class _AspectRatioTest extends StatelessWidget {
 
   void expectValueEquals(double expected) {
     const fractionDigits = 2;
+    final powerOfTen = pow(10, fractionDigits);
+    final actual = _value[this] ?? .0;
     expect(
-      _value[this]?.toStringAsFixed(fractionDigits),
-      equals(expected.toStringAsFixed(fractionDigits)),
+      (actual * powerOfTen).floorToDouble() / powerOfTen,
+      (expected * powerOfTen).floorToDouble() / powerOfTen,
+      reason: 'actual $actual != expected $expected',
     );
   }
 }
