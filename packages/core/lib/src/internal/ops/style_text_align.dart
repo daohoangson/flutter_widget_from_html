@@ -20,38 +20,37 @@ class StyleTextAlign {
 
   StyleTextAlign(this.wf, this.value);
 
-  BuildOp get op => BuildOp(
-        onTree: (meta, _) => meta.tsb.enqueue(_tsb, value),
-        onWidgets: (_, widgets) => _onWidgets(widgets, value),
-        onWidgetsIsOptional: true,
+  BuildOp get buildOp => BuildOp(
+        debugLabel: kCssTextAlign,
+        mustBeBlock: false,
+        onTree: (tree) => tree.apply(_builder, value),
+        onBuilt: (tree, placeholder) => _wrap(tree, placeholder, value),
         priority: 0,
       );
 
-  static Iterable<Widget> _onWidgets(Iterable<Widget> widgets, String value) {
-    switch (value) {
-      case kCssTextAlignCenter:
-      case kCssTextAlignEnd:
-      case kCssTextAlignJustify:
-      case kCssTextAlignLeft:
-      case kCssTextAlignRight:
-        return widgets
-            .map((child) => WidgetPlaceholder.lazy(child).wrapWith(_block));
-      case kCssTextAlignMozCenter:
-      case kCssTextAlignWebkitCenter:
-        return widgets
-            .map((child) => WidgetPlaceholder.lazy(child).wrapWith(_center));
+  static Widget? _wrap(
+    BuildTree tree,
+    WidgetPlaceholder placeholder,
+    String value,
+  ) {
+    if (placeholder.isEmpty) {
+      return null;
     }
 
-    return widgets;
+    if (value == kCssTextAlignWebkitCenter) {
+      return placeholder.wrapWith(_center);
+    } else {
+      return placeholder.wrapWith(_block);
+    }
   }
 
   static Widget _block(BuildContext _, Widget child) =>
       child is CssBlock ? child : CssBlock(child: child);
 
   static Widget _center(BuildContext _, Widget child) =>
-      _TextAlignCenter(child);
+      Center(heightFactor: 1.0, child: child);
 
-  static TextStyleHtml _tsb(TextStyleHtml tsh, String value) {
+  static HtmlStyle _builder(HtmlStyle style, String value) {
     TextAlign? textAlign;
 
     switch (value) {
@@ -77,11 +76,6 @@ class StyleTextAlign {
         break;
     }
 
-    return textAlign == null ? tsh : tsh.copyWith(textAlign: textAlign);
+    return textAlign == null ? style : style.copyWith(textAlign: textAlign);
   }
-}
-
-class _TextAlignCenter extends Center {
-  const _TextAlignCenter(Widget child, {Key? key})
-      : super(child: child, heightFactor: 1.0, key: key);
 }

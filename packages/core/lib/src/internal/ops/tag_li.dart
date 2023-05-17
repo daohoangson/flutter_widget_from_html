@@ -25,158 +25,176 @@ const kCssListStyleTypeRomanUpper = 'upper-roman';
 const kCssListStyleTypeSquare = 'square';
 
 class TagLi {
-  final BuildMetadata listMeta;
-  late final BuildOp op;
   final WidgetFactory wf;
 
-  final _itemMetas = <BuildMetadata>[];
-  late final BuildOp _itemOp;
-  final _itemWidgets = <WidgetPlaceholder>[];
+  TagLi(this.wf);
 
-  _ListConfig? __config;
+  BuildOp get buildOp => BuildOp(
+        debugLabel: kTagUnorderedList,
+        defaultStyles: (tree) {
+          final attrs = tree.element.attributes;
+          final depth = tree.listData.depth;
 
-  TagLi(this.wf, this.listMeta) {
-    op = _TagLiListOp(this);
-    _itemOp = BuildOp(
-      onWidgets: (itemMeta, widgets) {
-        final column = wf.buildColumnPlaceholder(itemMeta, widgets) ??
-            WidgetPlaceholder(localName: kTagLi);
+          final styles = {
+            kCssDisplay: kCssDisplayBlock,
+            kCssListStyleType: tree.element.localName == kTagOrderedList
+                ? _listStyleTypeFromAttributeType(
+                      attrs[kAttributeLiType] ?? '',
+                    ) ??
+                    kCssListStyleTypeDecimal
+                : depth == 0
+                    ? kCssListStyleTypeDisc
+                    : depth == 1
+                        ? kCssListStyleTypeCircle
+                        : kCssListStyleTypeSquare,
+            '$kCssPadding$kSuffixInlineStart': '40px',
+          };
 
-        final i = _itemMetas.length;
-        _itemMetas.add(itemMeta);
-        _itemWidgets.add(column);
-        return [column.wrapWith((c, w) => _buildItem(c, w, i))];
-      },
-    );
-  }
+          if (depth == 0) {
+            styles[kCssMargin] = '1em 0';
+          }
 
-  _ListConfig get _config {
-    // cannot build config from constructor because
-    // inline styles are not fully parsed at that time
-    return __config ??= _ListConfig.fromBuildMetadata(listMeta);
-  }
+          return styles;
+        },
+        onChild: (listTree, subTree) {
+          final element = subTree.element;
 
-  Map<String, String> defaultStyles(dom.Element element) {
-    final attrs = element.attributes;
-    final depth = listMeta.parentOps.whereType<_TagLiListOp>().length;
+          switch (element.localName) {
+            case kTagOrderedList:
+            case kTagUnorderedList:
+              subTree.increaseListDepth();
+              break;
+            case kTagLi:
+              if (element.parent == listTree.element) {
+                subTree.register(
+                  BuildOp(
+                    debugLabel: kTagLi,
+                    onBuilt: (itemTree, item) {
+                      final i = listTree.increaseListItems() - 1;
 
-    final styles = {
-      'padding-inline-start': '40px',
-      kCssListStyleType: element.localName == kTagOrderedList
-          ? _ListConfig.listStyleTypeFromAttributeType(
-                attrs[kAttributeLiType] ?? '',
-              ) ??
-              kCssListStyleTypeDecimal
-          : depth == 0
-              ? kCssListStyleTypeDisc
-              : depth == 1
-                  ? kCssListStyleTypeCircle
-                  : kCssListStyleTypeSquare,
-    };
+                      return WidgetPlaceholder(
+                        builder: (context, _) =>
+                            _buildItem(context, listTree, itemTree, item, i),
+                        debugLabel: '${listTree.element.localName}--$i',
+                      );
+                    },
+                  ),
+                );
+              }
+              break;
+          }
+        },
+      );
 
-    if (depth == 0) {
-      styles[kCssMargin] = '1em 0';
-    }
+  Widget _buildItem(
+    BuildContext context,
+    BuildTree listTree,
+    BuildTree itemTree,
+    Widget child,
+    int i,
+  ) {
+    final listData = listTree.listData;
+    final listStyleType = itemTree.itemStyleType ?? listTree.listStyleType;
+    final markerIndex = listData.markerReversed
+        ? (listData.markerStart ?? listData.items) - i
+        : (listData.markerStart ?? 1) + i;
+    final style = itemTree.styleBuilder.build(context);
 
-    return styles;
-  }
-
-  void onChild(BuildMetadata childMeta) {
-    final e = childMeta.element;
-    if (e.localName != kTagLi) {
-      return;
-    }
-    if (e.parent != listMeta.element) {
-      return;
-    }
-    childMeta.register(_itemOp);
-  }
-
-  Widget _buildItem(BuildContext context, Widget child, int i) {
-    final config = _config;
-    final meta = _itemMetas[i];
-    final listStyleType = _ListConfig.listStyleTypeFromBuildMetadata(meta) ??
-        config.listStyleType;
-    final markerIndex = config.markerReversed
-        ? (config.markerStart ?? _itemWidgets.length) - i
-        : (config.markerStart ?? 1) + i;
-    final tsh = meta.tsb.build(context);
-
-    final marker = wf.buildListMarker(meta, tsh, listStyleType, markerIndex);
+    final marker =
+        wf.buildListMarker(itemTree, style, listStyleType, markerIndex);
     if (marker == null) {
       return child;
     }
 
     return HtmlListItem(
       marker: marker,
-      textDirection: tsh.textDirection,
+      textDirection: style.textDirection,
       child: child,
     );
   }
 }
 
-@immutable
-class _ListConfig {
-  final String listStyleType;
-  final bool markerReversed;
-  final int? markerStart;
+String? _listStyleTypeFromAttributeType(String type) {
+  switch (type) {
+    case kAttributeLiTypeAlphaLower:
+      return kCssListStyleTypeAlphaLower;
+    case kAttributeLiTypeAlphaUpper:
+      return kCssListStyleTypeAlphaUpper;
+    case kAttributeLiTypeDecimal:
+      return kCssListStyleTypeDecimal;
+    case kAttributeLiTypeRomanLower:
+      return kCssListStyleTypeRomanLower;
+    case kAttributeLiTypeRomanUpper:
+      return kCssListStyleTypeRomanUpper;
+  }
 
-  const _ListConfig({
-    required this.listStyleType,
-    required this.markerReversed,
-    this.markerStart,
-  });
+  return null;
+}
 
-  factory _ListConfig.fromBuildMetadata(BuildMetadata meta) {
-    final attrs = meta.element.attributes;
+extension _BuildTreeItemData on BuildTree {
+  String? get itemStyleType =>
+      this[kCssListStyleType]?.term ??
+      _listStyleTypeFromAttributeType(
+        element.attributes[kAttributeLiType] ?? '',
+      );
+}
 
-    return _ListConfig(
-      listStyleType: meta[kCssListStyleType]?.term ?? kCssListStyleTypeDisc,
+extension _BuildTreeListData on BuildTree {
+  _TagLiListData get listData {
+    final existing = value<_TagLiListData>();
+    if (existing != null) {
+      return existing;
+    }
+
+    final attrs = element.attributes;
+    final newData = _TagLiListData(
       markerReversed: attrs.containsKey(kAttributeOlReversed),
       markerStart: tryParseIntFromMap(attrs, kAttributeOlStart),
     );
+    value(newData);
+    return newData;
   }
 
-  static String? listStyleTypeFromBuildMetadata(BuildMetadata meta) {
-    final listStyleType = meta[kCssListStyleType]?.term;
-    if (listStyleType != null) {
-      return listStyleType;
-    }
+  String get listStyleType =>
+      this[kCssListStyleType]?.term ?? kCssListStyleTypeDisc;
 
-    return listStyleTypeFromAttributeType(
-      meta.element.attributes[kAttributeLiType] ?? '',
-    );
+  int increaseListDepth() {
+    final newData = listData.copyWith(depth: listData.depth + 1);
+    value(newData);
+    return newData.depth;
   }
 
-  static String? listStyleTypeFromAttributeType(String type) {
-    switch (type) {
-      case kAttributeLiTypeAlphaLower:
-        return kCssListStyleTypeAlphaLower;
-      case kAttributeLiTypeAlphaUpper:
-        return kCssListStyleTypeAlphaUpper;
-      case kAttributeLiTypeDecimal:
-        return kCssListStyleTypeDecimal;
-      case kAttributeLiTypeRomanLower:
-        return kCssListStyleTypeRomanLower;
-      case kAttributeLiTypeRomanUpper:
-        return kCssListStyleTypeRomanUpper;
-    }
-
-    return null;
+  int increaseListItems() {
+    final newData = listData.copyWith(items: listData.items + 1);
+    value(newData);
+    return newData.items;
   }
 }
 
-class _TagLiListOp extends BuildOp {
-  _TagLiListOp(TagLi tagLi)
-      : super(
-          defaultStyles: tagLi.defaultStyles,
-          onChild: tagLi.onChild,
-          onWidgets: _onWidgetsPassThrough,
-        );
+@immutable
+class _TagLiListData {
+  final bool markerReversed;
+  final int? markerStart;
 
-  static Iterable<Widget> _onWidgetsPassThrough(
-    BuildMetadata _,
-    Iterable<Widget> widgets,
-  ) =>
-      widgets;
+  final int depth;
+  final int items;
+
+  const _TagLiListData({
+    required this.markerReversed,
+    this.markerStart,
+    this.depth = 0,
+    this.items = 0,
+  });
+
+  _TagLiListData copyWith({
+    int? depth,
+    int? items,
+  }) {
+    return _TagLiListData(
+      markerReversed: markerReversed,
+      markerStart: markerStart,
+      depth: depth ?? this.depth,
+      items: items ?? this.items,
+    );
+  }
 }

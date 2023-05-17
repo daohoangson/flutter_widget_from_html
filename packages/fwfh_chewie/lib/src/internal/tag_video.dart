@@ -16,65 +16,58 @@ const kTagVideo = 'video';
 const kTagVideoSource = 'source';
 
 class TagVideo {
-  final BuildMetadata videoMeta;
   final ChewieFactory wf;
 
-  final _sourceUrls = <String>[];
+  TagVideo(this.wf);
 
-  late final BuildOp op;
+  BuildOp get buildOp => BuildOp(
+        debugLabel: kTagVideo,
+        onChild: (tree, subTree) {
+          final e = subTree.element;
+          if (e.localName != kTagVideoSource) {
+            return;
+          }
+          if (e.parent != tree.element) {
+            return;
+          }
 
-  TagVideo(this.wf, this.videoMeta) {
-    op = BuildOp(
-      onChild: onChild,
-      onWidgets: onWidgets,
-    );
+          final attrs = e.attributes;
+          final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
+          if (url == null) {
+            return;
+          }
 
-    final attrs = videoMeta.element.attributes;
-    final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
-    if (url != null) {
-      _sourceUrls.add(url);
-    }
-  }
+          tree.sourceUrls = [...tree.sourceUrls, url];
+        },
+        onBuilt: (tree, _) {
+          if (defaultTargetPlatform != TargetPlatform.android &&
+              defaultTargetPlatform != TargetPlatform.iOS &&
+              !kIsWeb) {
+            // these are the chewie's supported platforms
+            // https://pub.dev/packages/chewie/versions/1.2.2
+            return null;
+          }
 
-  void onChild(BuildMetadata childMeta) {
-    final e = childMeta.element;
-    if (e.localName != kTagVideoSource) {
-      return;
-    }
-    if (e.parent != videoMeta.element) {
-      return;
-    }
+          final attrs = tree.element.attributes;
+          final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
+          if (url != null) {
+            tree.sourceUrls = [...tree.sourceUrls, url];
+          }
 
-    final attrs = e.attributes;
-    final url = wf.urlFull(attrs[kAttributeVideoSrc] ?? '');
-    if (url == null) {
-      return;
-    }
+          return _buildPlayer(tree);
+        },
+      );
 
-    _sourceUrls.add(url);
-  }
-
-  Iterable<Widget>? onWidgets(BuildMetadata _, Iterable<WidgetPlaceholder> ws) {
-    if (defaultTargetPlatform != TargetPlatform.android &&
-        defaultTargetPlatform != TargetPlatform.iOS &&
-        !kIsWeb) {
-      // these are the chewie's supported platforms
-      // https://pub.dev/packages/chewie/versions/1.2.2
-      return ws;
-    }
-
-    return listOrNull(_buildPlayer()) ?? ws;
-  }
-
-  Widget? _buildPlayer() {
-    if (_sourceUrls.isEmpty) {
+  Widget? _buildPlayer(BuildTree tree) {
+    final sourceUrls = tree.sourceUrls;
+    if (sourceUrls.isEmpty) {
       return null;
     }
 
-    final attrs = videoMeta.element.attributes;
+    final attrs = tree.element.attributes;
     return wf.buildVideoPlayer(
-      videoMeta,
-      _sourceUrls.first,
+      tree,
+      sourceUrls.first,
       autoplay: attrs.containsKey(kAttributeVideoAutoplay),
       controls: attrs.containsKey(kAttributeVideoControls),
       height: tryParseDoubleFromMap(attrs, kAttributeVideoHeight),
@@ -83,4 +76,18 @@ class TagVideo {
       width: tryParseDoubleFromMap(attrs, kAttributeVideoWidth),
     );
   }
+}
+
+extension _BuildTreeSourceUrls on BuildTree {
+  List<String> get sourceUrls => value<_TagVideoData>()?.sourceUrls ?? const [];
+
+  set sourceUrls(List<String> v) {
+    value(_TagVideoData(v));
+  }
+}
+
+@immutable
+class _TagVideoData {
+  final List<String> sourceUrls;
+  const _TagVideoData(this.sourceUrls);
 }

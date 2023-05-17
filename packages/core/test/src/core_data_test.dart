@@ -58,8 +58,8 @@ void main() {
         expect(
           explained,
           equals(
-            'TshWidget\n'
-            '└WidgetPlaceholder\n'
+            'HtmlStyleWidget\n'
+            '└WidgetPlaceholder(span--WidgetBit.block)\n'
             ' └Text("hi")\n'
             '  └RichText(text: "hi")\n\n',
           ),
@@ -81,10 +81,11 @@ void main() {
         expect(
           explained,
           equals(
-            'TshWidget\n'
-            '└WidgetPlaceholder\n'
-            ' └Text("hi")\n'
-            '  └RichText(text: "hi")\n\n',
+            'HtmlStyleWidget\n'
+            '└WidgetPlaceholder(div--WidgetBit.block)\n'
+            ' └CssBlock()\n'
+            '  └Text("hi")\n'
+            '   └RichText(text: "hi")\n\n',
           ),
         );
       });
@@ -104,7 +105,7 @@ void main() {
         expect(
           explained,
           equals(
-            'TshWidget\n'
+            'HtmlStyleWidget\n'
             '└WidgetPlaceholder(text)\n'
             ' └Text("hi")\n'
             '  └RichText(text: "hi")\n\n',
@@ -113,7 +114,7 @@ void main() {
       });
     });
 
-    group('onWidgets', () {
+    group('onBuilt', () {
       testWidgets('renders widget', (tester) async {
         const html = '<span>Foo</span>';
         final explained = await explain(
@@ -121,7 +122,7 @@ void main() {
           null,
           hw: HtmlWidget(
             html,
-            factoryBuilder: () => _BuildOpOnWidgets(),
+            factoryBuilder: () => _BuildOpOnBuilt(),
             key: hwKey,
           ),
           useExplainer: false,
@@ -129,8 +130,8 @@ void main() {
         expect(
           explained,
           equals(
-            'TshWidget\n'
-            '└WidgetPlaceholder\n'
+            'HtmlStyleWidget\n'
+            '└WidgetPlaceholder(span--lazy)\n'
             ' └Text("Hi")\n'
             '  └RichText(text: "Hi")\n\n',
           ),
@@ -172,67 +173,65 @@ void main() {
 
 class _BuildOpDefaultStyles extends WidgetFactory {
   @override
-  void parse(BuildMetadata meta) {
-    meta
+  void parse(BuildTree tree) {
+    tree
       ..register(BuildOp(defaultStyles: (_) => {'color': '#f00'}, priority: 1))
       ..register(BuildOp(defaultStyles: (_) => {'color': '#0f0'}, priority: 2));
 
-    return super.parse(meta);
+    return super.parse(tree);
   }
 }
 
 class _BuildOpOnTreeText extends WidgetFactory {
   @override
-  void parse(BuildMetadata meta) {
-    if (meta.element.classes.contains('text')) {
-      meta.register(BuildOp(onTree: (_, tree) => tree.addText(' bar')));
+  void parse(BuildTree tree) {
+    if (tree.element.classes.contains('text')) {
+      tree.register(BuildOp(onTree: (tree) => tree.addText(' bar')));
     }
 
-    return super.parse(meta);
+    return super.parse(tree);
   }
 }
 
 class _BuildOpOnTreeWidgetBlock extends WidgetFactory {
   @override
-  void parse(BuildMetadata meta) {
-    if (meta.element.classes.contains('widget-block')) {
-      meta.register(
+  void parse(BuildTree tree) {
+    if (tree.element.classes.contains('widget-block')) {
+      tree.register(
         BuildOp(
-          onTree: (_, tree) {
-            WidgetBit.block(tree.parent!, const Text('hi')).insertBefore(tree);
-            tree.detach();
+          onTree: (tree) {
+            tree.replaceWith(WidgetBit.block(tree, const Text('hi')));
           },
         ),
       );
     }
 
-    return super.parse(meta);
+    return super.parse(tree);
   }
 }
 
 class _BuildOpOnTreeWidgetInline extends WidgetFactory {
   @override
-  void parse(BuildMetadata meta) {
-    if (meta.element.classes.contains('widget-inline')) {
-      meta.register(
+  void parse(BuildTree tree) {
+    if (tree.element.classes.contains('widget-inline')) {
+      tree.register(
         BuildOp(
-          onTree: (_, tree) {
-            WidgetBit.inline(tree.parent!, const Text('hi')).insertBefore(tree);
-            tree.detach();
+          onTree: (tree) {
+            tree.replaceWith(WidgetBit.inline(tree, const Text('hi')));
           },
         ),
       );
     }
 
-    return super.parse(meta);
+    return super.parse(tree);
   }
 }
 
-class _BuildOpOnWidgets extends WidgetFactory {
+class _BuildOpOnBuilt extends WidgetFactory {
   @override
-  void parse(BuildMetadata meta) {
-    meta.register(BuildOp(onWidgets: (_, __) => const [Text('Hi')]));
-    return super.parse(meta);
+  void parse(BuildTree tree) {
+    tree.register(BuildOp(onBuilt: (_, __) => const Text('Hi')));
+    return super.parse(tree);
   }
 }
 
@@ -243,21 +242,21 @@ class _BuildOpPriority extends WidgetFactory {
   _BuildOpPriority({required this.a, required this.b});
 
   @override
-  void parse(BuildMetadata meta) {
-    meta
+  void parse(BuildTree tree) {
+    tree
       ..register(
         BuildOp(
-          onTree: (_, tree) => tree.addText(' A'),
+          onTree: (tree) => tree.addText(' A'),
           priority: a,
         ),
       )
       ..register(
         BuildOp(
-          onTree: (_, tree) => tree.addText(' B'),
+          onTree: (tree) => tree.addText(' B'),
           priority: b,
         ),
       );
 
-    return super.parse(meta);
+    return super.parse(tree);
   }
 }

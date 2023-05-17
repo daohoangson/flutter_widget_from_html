@@ -10,70 +10,35 @@ class TagA {
   TagA(this.wf);
 
   BuildOp get buildOp => BuildOp(
+        debugLabel: 'a[href]',
         defaultStyles: (_) => const {
           kCssTextDecoration: kCssTextDecorationUnderline,
         },
-        onTreeFlattening: (meta, tree) {
-          final onTap = _gestureTapCallback(meta);
-          if (onTap == null) {
+        onTree: (tree) {
+          final href = tree.element.attributes[kAttributeAHref];
+          if (href == null) {
             return;
           }
 
-          for (final bit in tree.bits.toList(growable: false)) {
-            if (bit is WidgetBit) {
-              bit.child.wrapWith(
-                (_, child) => wf.buildGestureDetector(meta, child, onTap),
-              );
-            } else if (bit is! _TagABit) {
-              final recognizer = TapGestureRecognizer()..onTap = onTap;
-              wf.deferDispose(recognizer: recognizer);
-              _TagABit(bit.parent, recognizer).insertAfter(bit);
-            }
-          }
-        },
-        onWidgets: (meta, widgets) {
-          final onTap = _gestureTapCallback(meta);
-          if (onTap == null) {
-            return widgets;
+          final url = wf.urlFull(href) ?? href;
+          final recognizer = wf.buildGestureRecognizer(
+            tree,
+            onTap: () => wf.onTapUrl(url),
+          );
+          if (recognizer == null) {
+            return;
           }
 
-          return listOrNull(
-            wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
-                  (_, child) => wf.buildGestureDetector(meta, child, onTap),
-                ),
-          );
+          tree.apply(_builder, recognizer);
         },
-        onWidgetsIsOptional: true,
       );
 
-  GestureTapCallback? _gestureTapCallback(BuildMetadata meta) {
-    final href = meta.element.attributes[kAttributeAHref];
-    return href != null
-        ? wf.gestureTapCallback(wf.urlFull(href) ?? href)
-        : null;
-  }
-}
+  static HtmlStyle defaultColor(HtmlStyle style, void _) => style.copyWith(
+        textStyle: style.textStyle.copyWith(
+          color: style.getDependency<ThemeData>().colorScheme.primary,
+        ),
+      );
 
-class _TagABit extends BuildBit {
-  final TapGestureRecognizer recognizer;
-
-  const _TagABit(BuildTree? parent, this.recognizer) : super(parent);
-
-  @override
-  bool? get swallowWhitespace => null;
-
-  @override
-  void flatten(Flattened f) {
-    final existing = f.recognizer;
-    if (existing is TapGestureRecognizer) {
-      existing.onTap = recognizer.onTap;
-      return;
-    }
-
-    f.recognizer = recognizer;
-  }
-
-  @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _TagABit(parent ?? this.parent, recognizer);
+  static HtmlStyle _builder(HtmlStyle style, GestureRecognizer value) =>
+      style.copyWith(gestureRecognizer: value);
 }

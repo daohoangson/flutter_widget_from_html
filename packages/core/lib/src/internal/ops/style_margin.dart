@@ -2,11 +2,11 @@ part of '../core_ops.dart';
 
 const kCssMargin = 'margin';
 
-Widget _marginHorizontalBuilder(Widget w, CssLengthBox b, TextStyleHtml tsh) =>
+Widget _marginHorizontalBuilder(Widget w, CssLengthBox b, HtmlStyle style) =>
     Padding(
       padding: EdgeInsets.only(
-        left: max(b.getValueLeft(tsh) ?? 0.0, 0.0),
-        right: max(b.getValueRight(tsh) ?? 0.0, 0.0),
+        left: max(b.getValueLeft(style) ?? 0.0, 0.0),
+        right: max(b.getValueRight(style) ?? 0.0, 0.0),
       ),
       child: w,
     );
@@ -19,49 +19,48 @@ class StyleMargin {
   StyleMargin(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (meta, tree) {
-          final m = tryParseCssLengthBox(meta, kCssMargin);
-          if (m == null) {
+        debugLabel: kCssMargin,
+        mustBeBlock: false,
+        onFlattening: (tree) {
+          final margin = tryParseCssLengthBox(tree, kCssMargin);
+          if (margin == null) {
             return;
           }
 
-          final mayHaveLeft = m.mayHaveLeft;
-          final mayHaveRight = m.mayHaveRight;
-          if (!mayHaveLeft && !mayHaveRight) {
-            return;
+          if (margin.mayHaveLeft) {
+            final before = _paddingInlineBefore(tree.styleBuilder, margin);
+            tree.prepend(WidgetBit.inline(tree, before));
           }
 
-          return wrapTree(
-            tree,
-            append: mayHaveRight
-                ? (p) => WidgetBit.inline(p, _paddingInlineAfter(p.tsb, m))
-                : null,
-            prepend: mayHaveLeft
-                ? (p) => WidgetBit.inline(p, _paddingInlineBefore(p.tsb, m))
-                : null,
-          );
+          if (margin.mayHaveRight) {
+            final after = _paddingInlineAfter(tree.styleBuilder, margin);
+            tree.append(WidgetBit.inline(tree, after));
+          }
         },
-        onWidgets: (meta, widgets) {
-          final m = tryParseCssLengthBox(meta, kCssMargin);
-          if (m == null) {
-            return widgets;
+        onBuilt: (tree, placeholder) {
+          final margin = tryParseCssLengthBox(tree, kCssMargin);
+          if (margin == null) {
+            return null;
           }
 
-          final tsb = meta.tsb;
-          return [
-            if (m.top?.isPositive ?? false) HeightPlaceholder(m.top!, tsb),
-            for (final widget in widgets)
-              if (m.mayHaveLeft || m.mayHaveRight)
-                widget.wrapWith(
-                  (c, w) => _marginHorizontalBuilder(w, m, tsb.build(c)),
-                )
-              else
-                widget,
-            if (m.bottom?.isPositive ?? false)
-              HeightPlaceholder(m.bottom!, tsb),
-          ];
+          final styleBuilder = tree.styleBuilder;
+          return wf.buildColumnPlaceholder(tree, [
+            if (margin.top?.isPositive ?? false)
+              HeightPlaceholder(margin.top!, styleBuilder),
+            if (margin.mayHaveLeft || margin.mayHaveRight)
+              placeholder.wrapWith(
+                (context, child) => _marginHorizontalBuilder(
+                  child,
+                  margin,
+                  styleBuilder.build(context),
+                ),
+              )
+            else
+              placeholder,
+            if (margin.bottom?.isPositive ?? false)
+              HeightPlaceholder(margin.bottom!, styleBuilder),
+          ]);
         },
-        onWidgetsIsOptional: true,
         priority: kPriorityBoxModel9k,
       );
 }

@@ -9,61 +9,64 @@ import 'core_widget_factory.dart';
 
 part 'data/build_bits.dart';
 part 'data/css.dart';
+part 'data/html_style.dart';
 part 'data/image.dart';
-part 'data/text_style.dart';
 
-/// A building element metadata.
-abstract class BuildMetadata {
-  /// The associated element.
-  final dom.Element element;
+/// {@template flutter_widget_from_html.defaultStyles}
+/// The callback that should return default styling map.
+///
+/// See list of all supported inline stylings in README.md, the sample op
+/// below just changes the color:
+///
+/// ```dart
+/// BuildOp(
+///   defaultStyles: (_) => {'color': 'red'},
+/// )
+/// ```
+///
+/// Note: op must be registered early for this to work e.g.
+/// in [WidgetFactory.parse] or [onChild].
+/// {@endtemplate}
+typedef DefaultStyles = Map<String, String> Function(BuildTree tree);
 
-  /// The associated [TextStyleBuilder].
-  final TextStyleBuilder tsb;
+/// {@template flutter_widget_from_html.onChild}
+/// The callback that will be called before processing a child element.
+///
+/// Please note that all children and grandchildren etc. will trigger this,
+/// it's easy to check whether an element is direct child:
+///
+/// ```dart
+/// BuildOp(
+///   onSubTree: (tree, subTree) {
+///     if (!subTree.element.parent != tree.element) return;
+///     subTree.doSomething();
+///   },
+/// );
+/// ```
+/// {@endtemplate}
+typedef OnChild = void Function(BuildTree tree, BuildTree subTree);
 
-  /// The maximum number of lines for the text to span.
-  ///
-  /// Used in [WidgetFactory.buildText] for [RichText.maxLines].
-  int maxLines = -1;
+/// {@template flutter_widget_from_html.onTree}
+/// The callback that will be called when child elements have been processed.
+/// {@endtemplate}
+typedef OnTree = void Function(BuildTree tree);
 
-  /// How visual overflow should be handled.
-  ///
-  /// Used in [WidgetFactory.buildText] for [RichText.overflow].
-  TextOverflow overflow = TextOverflow.clip;
+/// {@template flutter_widget_from_html.onFlattening}
+/// The callback that will be called before flattening.
+///
+/// This is the last chance to modify the [BuildTree] before inline rendering.
+/// {@endtemplate}
+typedef OnFlattening = void Function(BuildTree tree);
 
-  /// Creates a node.
-  BuildMetadata(this.element, this.tsb);
-
-  /// The registered build ops.
-  Iterable<BuildOp> get buildOps;
-
-  /// The parents' build ops that have [BuildOp.onChild].
-  Iterable<BuildOp> get parentOps;
-
-  /// The styling declarations.
-  ///
-  /// These are collected from:
-  ///
-  /// - [WidgetFactory.parse] or [BuildOp.onChild] via `meta[key] = value`
-  /// - [BuildOp.defaultStyles] returning a map
-  /// - Attribute `style` of [domElement]
-  List<css.Declaration> get styles;
-
-  /// Adds an inline style.
-  void operator []=(String key, String value);
-
-  /// Gets a styling declaration by `property`.
-  css.Declaration? operator [](String key) {
-    for (final style in styles.reversed) {
-      if (style.property == key) {
-        return style;
-      }
-    }
-    return null;
-  }
-
-  /// Registers a build op.
-  void register(BuildOp op);
-}
+/// {@template flutter_widget_from_html.onBuilt}
+/// The callback that will be called after building widget.
+///
+/// This only works if it's a block element.
+/// {@endtemplate}
+typedef OnBuilt = Widget? Function(
+  BuildTree tree,
+  WidgetPlaceholder placeholder,
+);
 
 /// A building operation to customize how a DOM element is rendered.
 @immutable
@@ -73,69 +76,52 @@ class BuildOp {
   /// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER
   static const kPriorityMax = 9007199254740991;
 
+  /// A human-readable description of this op.
+  final String? debugLabel;
+
   /// The execution priority, op with lower priority will run first.
   ///
   /// Default: 10.
   final int priority;
 
-  /// The callback that should return default styling map.
-  ///
-  /// See list of all supported inline stylings in README.md, the sample op
-  /// below just changes the color:
-  ///
-  /// ```dart
-  /// BuildOp(
-  ///   defaultStyles: (_) => {'color': 'red'},
-  /// )
-  /// ```
-  ///
-  /// Note: op must be registered early for this to work e.g.
-  /// in [WidgetFactory.parse] or [onChild].
-  final Map<String, String> Function(dom.Element element)? defaultStyles;
+  /// {@macro flutter_widget_from_html.defaultStyles}
+  final DefaultStyles? defaultStyles;
 
-  /// The callback that will be called whenver a child element is found.
+  /// Controls whether the element must be rendered as a block.
   ///
-  /// Please note that all children and grandchildren etc. will trigger this,
-  /// it's easy to check whether an element is direct child:
+  /// Default: `true` if [onBuilt] is set, `false` otherwise.
   ///
-  /// ```dart
-  /// BuildOp(
-  ///   onChild: (childMeta) {
-  ///     if (!childElement.element.parent != parentMeta.element) return;
-  ///     childMeta.doSomethingHere;
-  ///   },
-  /// );
-  ///
-  /// ```
-  final void Function(BuildMetadata childMeta)? onChild;
+  /// If an element has multiple build ops and one of them require block rendering,
+  /// it will be rendered as block.
+  final bool? mustBeBlock;
 
-  /// The callback that will be called when child elements have been processed.
-  final void Function(BuildMetadata meta, BuildTree tree)? onTree;
+  /// {@macro flutter_widget_from_html.onChild}
+  final OnChild? onChild;
 
-  /// The callback that will be called before flattening.
-  final void Function(BuildMetadata meta, BuildTree tree)? onTreeFlattening;
+  /// {@macro flutter_widget_from_html.onTree}
+  final OnTree? onTree;
 
-  /// The callback that will be called when child elements have been built.
+  /// {@macro flutter_widget_from_html.onFlattening}
   ///
-  /// Note: only works if it's a block element.
-  final Iterable<Widget>? Function(
-    BuildMetadata meta,
-    Iterable<WidgetPlaceholder> widgets,
-  )? onWidgets;
+  /// If an op has both this callback and [onBuilt], it will be skipped if
+  /// `onBuilt` returns a non-null result.
+  final OnFlattening? onFlattening;
 
-  /// Controls whether the element should be forced to be rendered as block.
+  /// {@macro flutter_widget_from_html.onBuilt}
   ///
-  /// Default: `false`.
-  final bool onWidgetsIsOptional;
+  /// If an op has both this callback and [onFlattening], returning
+  /// a non-null result will skip `onFlattening`.
+  final OnBuilt? onBuilt;
 
   /// Creates a build op.
   const BuildOp({
+    this.debugLabel,
+    this.priority = 10,
     this.defaultStyles,
+    this.mustBeBlock,
     this.onChild,
     this.onTree,
-    this.onTreeFlattening,
-    this.onWidgets,
-    this.onWidgetsIsOptional = false,
-    this.priority = 10,
+    this.onFlattening,
+    this.onBuilt,
   });
 }

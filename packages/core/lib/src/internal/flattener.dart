@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
 import '../core_data.dart';
@@ -7,24 +6,23 @@ import '../core_widget_factory.dart';
 import 'margin_vertical.dart';
 
 class Flattener implements Flattened {
-  final BuildMetadata meta;
   final BuildTree tree;
   final WidgetFactory wf;
   final _widgets = <WidgetPlaceholder>[];
 
-  List<_SpanOrBuilder>? _children;
-  late _GestureRecognizer _firstRecognizer;
+  List<InlineSpan? Function(BuildContext, {bool? isLast})>? _childrenBuilder;
   late List<_String> _firstStrings;
-  late TextStyleBuilder _firstTsb;
+  late HtmlStyleBuilder _firstStyleBuilder;
 
   late BuildBit _bit;
   var _swallowWhitespace = false;
-  late _GestureRecognizer _recognizer;
   late List<_String> _strings;
-  late TextStyleBuilder _tsb;
+  late HtmlStyleBuilder _styleBuilder;
 
-  Flattener(this.wf, this.meta, this.tree) {
-    _resetLoop(tree.tsb);
+  Flattener(this.wf, this.tree) {
+    _loopSubTree(tree, flatten: false);
+
+    _resetLoop(tree.styleBuilder);
     for (final bit in tree.bits) {
       _loop(bit);
     }
@@ -34,63 +32,111 @@ class Flattener implements Flattened {
   Iterable<WidgetPlaceholder> get widgets => _widgets;
 
   @override
-  GestureRecognizer? get recognizer => _recognizer.value;
-
-  @override
-  set recognizer(GestureRecognizer? value) => _recognizer.value = value;
-
-  @override
-  // ignore: avoid_setters_without_getters
-  set span(InlineSpan value) {
+  void inlineWidget({
+    PlaceholderAlignment alignment = PlaceholderAlignment.bottom,
+    TextBaseline baseline = TextBaseline.alphabetic,
+    required Widget child,
+  }) {
     _saveSpan();
-    _children?.add(_SpanOrBuilder.span(value));
+
+    final scopedTree = _bit.parent!;
+    final scopedStyleBuilder = _styleBuilder;
+    final placeholder = WidgetPlaceholder.lazy(
+      child,
+      debugLabel: _bit.parent?.element.localName,
+    );
+
+    placeholder.wrapWith((context, widget) {
+      final style = scopedStyleBuilder.build(context);
+      final recognizer = style.gestureRecognizer;
+      if (recognizer != null && _needsInlineRecognizer(context, style)) {
+        return wf.buildGestureDetector(scopedTree, widget, recognizer);
+      }
+
+      return widget;
+    });
+
+    _childrenBuilder?.add(
+      (_, {bool? isLast}) => WidgetSpan(
+        alignment: alignment,
+        baseline: baseline,
+        child: placeholder,
+      ),
+    );
   }
 
   @override
-  // ignore: avoid_setters_without_getters
-  set text(String value) => _strings.add(_String(value));
-
-  @override
-  // ignore: avoid_setters_without_getters
-  set widget(Widget value) {
+  void widget(Widget value) {
     _completeLoop();
-    _widgets.add(WidgetPlaceholder.lazy(value));
+
+    final placeholder = WidgetPlaceholder.lazy(
+      value,
+      debugLabel: _bit.parent?.element.localName,
+    );
+    final scopedStyleBuilder = _styleBuilder;
+    placeholder.wrapWith((context, child) {
+      final style = scopedStyleBuilder.build(context);
+      final recognizer = style.gestureRecognizer;
+      final detector = recognizer != null
+          ? wf.buildGestureDetector(tree, child, recognizer)
+          : null;
+      return detector ?? child;
+    });
+
+    _widgets.add(placeholder);
   }
 
   @override
-  // ignore: avoid_setters_without_getters
-  set whitespace(String value) => _strings.add(
+  void write({String? text, String? whitespace}) {
+    if (text != null) {
+      _strings.add(_String(text));
+    }
+
+    if (whitespace != null) {
+      _strings.add(
         _String(
-          value,
+          whitespace,
           isWhitespace: true,
           shouldBeSwallowed: _shouldSwallow(_bit),
         ),
       );
+    }
+  }
 
-  void _resetLoop(TextStyleBuilder tsb) {
-    _firstRecognizer = _GestureRecognizer();
-    _children = [];
+  void _resetLoop(HtmlStyleBuilder styleBuilder) {
+    _childrenBuilder = [];
     _firstStrings = [];
-    _firstTsb = tsb;
+    _firstStyleBuilder = styleBuilder;
 
-    _recognizer = _firstRecognizer;
     _strings = _firstStrings;
-    _tsb = _firstTsb;
+    _styleBuilder = _firstStyleBuilder;
+  }
+
+  void _loopSubTree(BuildTree someTree, {required bool flatten}) {
+    for (final child in someTree.children) {
+      if (child is BuildTree) {
+        _loopSubTree(child, flatten: true);
+      }
+    }
+
+    if (flatten) {
+      someTree.flatten(this);
+    }
   }
 
   void _loop(BuildBit bit) {
     _bit = bit;
-    final thisTsb = bit.effectiveTsb ?? _tsb;
-    if (_children == null) {
-      _resetLoop(thisTsb);
+    final thisStyleBulder = bit.effectiveStyleBulder ?? _styleBuilder;
+    if (_childrenBuilder == null) {
+      _resetLoop(thisStyleBulder);
     }
-    if (!thisTsb.hasSameStyleWith(_tsb)) {
+    if (!thisStyleBulder.hasSameStyleWith(_styleBuilder)) {
       _saveSpan();
     }
+    _styleBuilder = thisStyleBulder;
 
     bit.flatten(this);
 
-    _tsb = thisTsb;
     _swallowWhitespace = bit.swallowWhitespace ?? _swallowWhitespace;
   }
 
@@ -110,15 +156,14 @@ class Flattener implements Flattened {
 
   void _saveSpan() {
     if (_strings != _firstStrings && _strings.isNotEmpty) {
-      final scopedRecognizer = _recognizer.value;
-      final scopedTsb = _tsb;
+      final scopedStyleBuilder = _styleBuilder;
       final scopedStrings = _strings;
 
-      _children?.add(
-        _SpanOrBuilder.builder((context, {bool? isLast}) {
-          final tsh = scopedTsb.build(context);
+      _childrenBuilder?.add(
+        (context, {bool? isLast}) {
+          final style = scopedStyleBuilder.build(context);
           final text = scopedStrings.toText(
-            tsh.whitespace,
+            style.whitespace,
             isFirst: false,
             isLast: isLast != false,
           );
@@ -127,45 +172,45 @@ class Flattener implements Flattened {
           }
 
           return wf.buildTextSpan(
-            recognizer: scopedRecognizer,
-            style: tsh.style,
+            recognizer: _needsInlineRecognizer(context, style)
+                ? style.gestureRecognizer
+                : null,
+            style: style.textStyle,
             text: text,
           );
-        }),
+        },
       );
     }
 
     _strings = [];
-    _recognizer = _GestureRecognizer();
   }
 
   void _completeLoop() {
     _saveSpan();
 
-    final scopedChildren = _children;
-    if (scopedChildren == null) {
+    final scopedChildrenBuilder = _childrenBuilder;
+    if (scopedChildrenBuilder == null) {
       return;
     }
 
-    _children = null;
-    if (scopedChildren.isEmpty && _firstStrings.isEmpty) {
+    _childrenBuilder = null;
+    if (scopedChildrenBuilder.isEmpty && _firstStrings.isEmpty) {
       return;
     }
-    final scopedRecognizer = _firstRecognizer.value;
     final scopedStrings = _firstStrings;
-    final scopedTsb = _firstTsb;
+    final scopedStyleBulder = _firstStyleBuilder;
 
     _widgets.add(
       WidgetPlaceholder(
         builder: (context, _) {
-          final tsh = scopedTsb.build(context);
-          final list = scopedChildren.reversed.toList(growable: false);
+          final style = scopedStyleBulder.build(context);
+          final reversedbuilders =
+              scopedChildrenBuilder.reversed.toList(growable: false);
           final children = <InlineSpan>[];
 
           var isLast_ = true;
-          for (final item in list) {
-            final child =
-                item.span ?? item.builder?.call(context, isLast: isLast_);
+          for (final builder in reversedbuilders) {
+            final child = builder(context, isLast: isLast_);
             if (child != null) {
               isLast_ = false;
               children.insert(0, child);
@@ -173,7 +218,7 @@ class Flattener implements Flattened {
           }
 
           final text = scopedStrings.toText(
-            tsh.whitespace,
+            style.whitespace,
             isFirst: true,
             isLast: isLast_,
           );
@@ -186,13 +231,17 @@ class Flattener implements Flattened {
                 nonWhitespaceStrings[0].data == '\n') {
               // special handling for paragraph with <BR /> only
               const oneEm = CssLength(1, CssLengthUnit.em);
-              span = WidgetSpan(child: HeightPlaceholder(oneEm, scopedTsb));
+              span = WidgetSpan(
+                child: HeightPlaceholder(oneEm, scopedStyleBulder),
+              );
             }
           } else {
             span = wf.buildTextSpan(
               children: children,
-              recognizer: scopedRecognizer,
-              style: tsh.style,
+              recognizer: _needsInlineRecognizer(context, style)
+                  ? style.gestureRecognizer
+                  : null,
+              style: style.textStyle,
               text: text,
             );
           }
@@ -201,29 +250,37 @@ class Flattener implements Flattened {
             return widget0;
           }
 
-          final textAlign = tsh.textAlign ?? TextAlign.start;
+          final textAlign = style.textAlign ?? TextAlign.start;
           if (span is WidgetSpan && textAlign == TextAlign.start) {
             return span.child;
           }
 
-          return wf.buildText(meta, tsh, span);
+          return wf.buildText(tree, style, span);
         },
-        localName: 'text',
+        debugLabel: 'text',
       ),
     );
+  }
+
+  bool _needsInlineRecognizer(BuildContext context, HtmlStyle style) {
+    final rootStyle = tree.styleBuilder.build(context);
+    return style.gestureRecognizer != null &&
+        !identical(style.gestureRecognizer, rootStyle.gestureRecognizer);
   }
 }
 
 extension _BuildBit on BuildBit {
-  TextStyleBuilder? get effectiveTsb {
-    if (this is! WhitespaceBit) {
-      return tsb;
-    }
-
+  HtmlStyleBuilder? get effectiveStyleBulder {
     // the below code will find the best style for this whitespace bit
     // easy case: whitespace at the beginning of a tag, use the previous style
     final parent = this.parent;
-    if (parent == null || this == parent.first) {
+    if (parent == null) {
+      return null;
+    }
+    if (this is! WhitespaceBit) {
+      return parent.styleBuilder;
+    }
+    if (this == parent.first) {
       return null;
     }
 
@@ -238,7 +295,7 @@ extension _BuildBit on BuildBit {
         }
 
         if (tree.parent == next.parent) {
-          return next.tsb;
+          return next.parent!.styleBuilder;
         } else {
           return null;
         }
@@ -246,7 +303,7 @@ extension _BuildBit on BuildBit {
     }
 
     // fallback to parent's
-    return parent.tsb;
+    return parent.styleBuilder;
   }
 
   BuildBit? get nextNonWhitespace {
@@ -257,20 +314,6 @@ extension _BuildBit on BuildBit {
 
     return next;
   }
-}
-
-class _GestureRecognizer {
-  GestureRecognizer? value;
-}
-
-@immutable
-class _SpanOrBuilder {
-  final InlineSpan? Function(BuildContext, {bool? isLast})? builder;
-  final InlineSpan? span;
-
-  const _SpanOrBuilder.builder(this.builder) : span = null;
-
-  const _SpanOrBuilder.span(this.span) : builder = null;
 }
 
 @immutable

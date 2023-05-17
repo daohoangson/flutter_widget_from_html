@@ -8,8 +8,8 @@ const kCssMinWidth = 'min-width';
 const kCssWidth = 'width';
 
 extension CssLengthToSizing on CssLength {
-  CssSizingValue? getSizing(TextStyleHtml tsh) {
-    final value = getValue(tsh);
+  CssSizingValue? getSizing(HtmlStyle style) {
+    final value = getValue(style);
     if (value != null) {
       return CssSizingValue.value(value);
     }
@@ -29,38 +29,40 @@ class StyleSizing {
   static const k100percent = CssLength(100, CssLengthUnit.percentage);
   static const kPriorityBoxModel3k = 3000;
 
-  late final BuildOp opBlock;
-  late final BuildOp opChild;
-  late final BuildOp opSizing;
   final WidgetFactory wf;
 
+  late final BuildOp _blockOp;
+  late final BuildOp _childOp;
+  late final BuildOp _sizingOp;
+
   static final _instances = Expando<StyleSizing>();
-  static final _elementMeta = Expando<BuildMetadata>();
-  static final _metaIsBlock = Expando<bool>();
+
+  static final _elementTree = Expando<BuildTree>();
+  static final _treeIsBlock = Expando<bool>();
   static final _skipBuilding = Expando<bool>();
 
-  static void registerBlock(WidgetFactory wf, BuildMetadata meta) {
-    _elementMeta[meta.element] = meta;
-    _metaIsBlock[meta] = true;
-
-    final instance = StyleSizing._factory(wf);
-    meta
-      ..register(instance.opBlock)
-      ..register(instance.opSizing);
-  }
-
-  static void registerChild(WidgetFactory wf, BuildMetadata meta) {
-    final parentElement = meta.element.parent;
-    if (parentElement == null || _elementMeta[parentElement] == null) {
+  static void maybeRegisterChildOp(WidgetFactory wf, BuildTree tree) {
+    final parentElement = tree.element.parent;
+    if (parentElement == null || _elementTree[parentElement] == null) {
       return;
     }
 
-    meta.register(StyleSizing._factory(wf).opChild);
+    tree.register(StyleSizing._factory(wf)._childOp);
   }
 
-  static void registerSizing(WidgetFactory wf, BuildMetadata meta) {
-    _elementMeta[meta.element] = meta;
-    meta.register(StyleSizing._factory(wf).opSizing);
+  static void registerBlockOp(WidgetFactory wf, BuildTree tree) {
+    _elementTree[tree.element] = tree;
+    _treeIsBlock[tree] = true;
+
+    final instance = StyleSizing._factory(wf);
+    tree
+      ..register(instance._blockOp)
+      ..register(instance._sizingOp);
+  }
+
+  static void registerSizingOp(WidgetFactory wf, BuildTree tree) {
+    _elementTree[tree.element] = tree;
+    tree.register(StyleSizing._factory(wf)._sizingOp);
   }
 
   factory StyleSizing._factory(WidgetFactory wf) {
@@ -72,121 +74,113 @@ class StyleSizing {
   }
 
   StyleSizing._(this.wf) {
-    opBlock = const BuildOp(onWidgets: bypass);
+    _blockOp = const BuildOp(debugLabel: 'display: block', onBuilt: bypass);
 
-    opChild = BuildOp(
-      onWidgets: buildMinWidthZero,
-      onWidgetsIsOptional: true,
+    _childOp = BuildOp(
+      debugLabel: 'sizing (min-width=0)',
+      mustBeBlock: false,
+      onBuilt: buildMinWidthZero,
       // min-width resetter should wrap all other box model widgets
       priority: StyleMargin.kPriorityBoxModel9k + 1,
     );
 
-    opSizing = BuildOp(
-      onTreeFlattening: handleInlineSizing,
-      onWidgets: buildCssSizing,
-      onWidgetsIsOptional: true,
+    _sizingOp = BuildOp(
+      debugLabel: 'sizing',
+      mustBeBlock: false,
+      onBuilt: buildCssSizing,
+      onFlattening: handleInlineSizing,
       priority: StyleSizing.kPriorityBoxModel3k,
     );
   }
 
-  Iterable<Widget>? buildCssSizing(
-    BuildMetadata meta,
-    Iterable<WidgetPlaceholder> widgets,
-  ) {
-    if (_skipBuilding[meta] == true || widgets.isEmpty) {
-      return widgets;
+  Widget? buildCssSizing(BuildTree tree, WidgetPlaceholder placeholder) {
+    if (_skipBuilding[tree] == true || placeholder.isEmpty) {
+      return null;
     }
 
-    final input = _StyleSizingInput.tryParse(meta);
+    final input = _StyleSizingInput.tryParse(tree);
     if (input == null) {
-      return widgets;
+      return null;
     }
 
-    return listOrNull(
-      wf
-          .buildColumnPlaceholder(meta, widgets)
-          ?.wrapWith((c, w) => _build(c, w, input, meta.tsb)),
+    return placeholder.wrapWith(
+      (context, child) => _build(context, child, input, tree.styleBuilder),
     );
   }
 
-  Iterable<Widget>? buildMinWidthZero(
-    BuildMetadata childMeta,
-    Iterable<WidgetPlaceholder> widgets,
-  ) {
-    if (_StyleSizingInput.tryParse(childMeta)?.preferredWidth == k100percent) {
-      return widgets;
+  Widget? buildMinWidthZero(BuildTree subTree, WidgetPlaceholder placeholder) {
+    if (_StyleSizingInput.tryParse(subTree)?.preferredWidth == k100percent) {
+      return null;
     }
 
-    final parentElement = childMeta.element.parent;
+    final parentElement = subTree.element.parent;
     if (parentElement == null) {
-      return widgets;
+      return null;
     }
 
-    final parentMeta = _elementMeta[parentElement];
+    final parentMeta = _elementTree[parentElement];
     if (parentMeta == null) {
-      return widgets;
+      return null;
     }
 
     final parentInput = _StyleSizingInput.tryParse(parentMeta);
     if (parentInput == null ||
         (parentInput.minWidth == null && parentInput.preferredWidth == null)) {
-      return widgets;
+      return null;
     }
 
-    return listOrNull(
-      wf.buildColumnPlaceholder(childMeta, widgets)?.wrapWith(
-        (context, child) {
-          final textDirection = childMeta.tsb.build(context).textDirection;
-          return _MinWidthZero(
-            textDirection: textDirection,
-            child: child,
-          );
-        },
-      ),
-    );
+    return placeholder.wrapWith((context, child) {
+      final textDirection = subTree.styleBuilder.build(context).textDirection;
+      return _MinWidthZero(
+        textDirection: textDirection,
+        child: child,
+      );
+    });
   }
 
-  static Iterable<Widget>? bypass(
-    BuildMetadata _,
-    Iterable<WidgetPlaceholder> widgets,
-  ) =>
-      widgets;
+  static Widget? bypass(BuildTree _, WidgetPlaceholder placeholder) =>
+      placeholder;
 
-  static void handleInlineSizing(BuildMetadata meta, BuildTree tree) {
-    if (_skipBuilding[meta] == true) {
+  static void handleInlineSizing(BuildTree tree) {
+    if (_skipBuilding[tree] == true) {
       return;
     }
 
-    final input = _StyleSizingInput.tryParse(meta);
+    final input = _StyleSizingInput.tryParse(tree);
     if (input == null) {
       return;
     }
 
-    WidgetPlaceholder? widget;
+    WidgetPlaceholder? placeholder;
     for (final b in tree.bits) {
       if (b is WidgetBit) {
-        if (widget != null) {
+        if (placeholder != null) {
+          // TODO: handle multiple inline widgets in the same tree
           return;
         }
-        widget = b.child;
+        placeholder = b.child;
       } else {
         return;
       }
     }
 
-    widget?.wrapWith((c, w) => _build(c, w, input, meta.tsb));
+    if (placeholder == null || placeholder.isEmpty) {
+      return;
+    }
+
+    placeholder.wrapWith((c, w) => _build(c, w, input, tree.styleBuilder));
   }
 
-  static void skip(BuildMetadata meta) {
-    assert(_skipBuilding[meta] != true, 'Built ${meta.element} already');
-    _skipBuilding[meta] = true;
+  static void skip(BuildTree tree) {
+    assert(_skipBuilding[tree] != true, 'Built ${tree.element} already');
+    _skipBuilding[tree] = true;
   }
 
   static Widget _build(
     BuildContext context,
     Widget child,
     _StyleSizingInput input,
-    TextStyleBuilder tsb,
+    HtmlStyleBuilder styleBuilder,
   ) {
     if (input.maxHeight == null &&
         input.maxWidth == null &&
@@ -202,15 +196,15 @@ class StyleSizing {
       return CssBlock(child: child);
     }
 
-    final tsh = tsb.build(context);
+    final style = styleBuilder.build(context);
     return CssSizing(
-      maxHeight: input.maxHeight?.getSizing(tsh),
-      maxWidth: input.maxWidth?.getSizing(tsh),
-      minHeight: input.minHeight?.getSizing(tsh),
-      minWidth: input.minWidth?.getSizing(tsh),
+      maxHeight: input.maxHeight?.getSizing(style),
+      maxWidth: input.maxWidth?.getSizing(style),
+      minHeight: input.minHeight?.getSizing(style),
+      minWidth: input.minWidth?.getSizing(style),
       preferredAxis: input.preferredAxis,
-      preferredHeight: input.preferredHeight?.getSizing(tsh),
-      preferredWidth: input.preferredWidth?.getSizing(tsh),
+      preferredHeight: input.preferredHeight?.getSizing(style),
+      preferredWidth: input.preferredWidth?.getSizing(style),
       child: child,
     );
   }
@@ -254,7 +248,7 @@ class _StyleSizingInput {
     this.preferredWidth,
   });
 
-  factory _StyleSizingInput.fromMeta(BuildMetadata meta) {
+  factory _StyleSizingInput.fromTree(BuildTree tree) {
     CssLength? maxHeight;
     CssLength? maxWidth;
     CssLength? minHeight;
@@ -263,7 +257,7 @@ class _StyleSizingInput {
     CssLength? preferredHeight;
     CssLength? preferredWidth;
 
-    for (final style in meta.styles) {
+    for (final style in tree.styles) {
       final value = style.value;
       if (value == null) {
         continue;
@@ -299,7 +293,7 @@ class _StyleSizingInput {
       }
     }
 
-    if (preferredWidth == null && StyleSizing._metaIsBlock[meta] == true) {
+    if (preferredWidth == null && StyleSizing._treeIsBlock[tree] == true) {
       // `display: block` implies a 100% width
       // but it MUST NOT reset width value if specified
       // we need to keep track of block width to calculate contraints correctly
@@ -318,12 +312,14 @@ class _StyleSizingInput {
     );
   }
 
-  static final _metaInput = Expando<_StyleSizingInput>();
-
-  static _StyleSizingInput? tryParse(BuildMetadata meta) {
-    var input = _metaInput[meta];
-    if (input == null) {
-      _metaInput[meta] = input = _StyleSizingInput.fromMeta(meta);
+  static _StyleSizingInput? tryParse(BuildTree tree) {
+    _StyleSizingInput input;
+    final existing = tree.value<_StyleSizingInput>();
+    if (existing == null) {
+      input = _StyleSizingInput.fromTree(tree);
+      tree.value(input);
+    } else {
+      input = existing;
     }
 
     if (input.maxHeight == null &&

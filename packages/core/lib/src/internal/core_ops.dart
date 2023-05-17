@@ -3,8 +3,11 @@ import 'dart:math';
 
 import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart'
+    show
+        // we want to limit Material usages to be as generic as possible
+        ThemeData;
 import 'package:flutter/widgets.dart';
-import 'package:html/dom.dart' as dom;
 
 import '../core_data.dart';
 import '../core_helpers.dart';
@@ -25,8 +28,10 @@ part 'ops/style_vertical_align.dart';
 part 'ops/tag_a.dart';
 part 'ops/tag_br.dart';
 part 'ops/tag_details.dart';
+part 'ops/tag_font.dart';
 part 'ops/tag_img.dart';
 part 'ops/tag_li.dart';
+part 'ops/tag_pre.dart';
 part 'ops/tag_q.dart';
 part 'ops/tag_ruby.dart';
 part 'ops/tag_table.dart';
@@ -38,14 +43,8 @@ const kTagCode = 'code';
 const kTagCodeFont1 = 'Courier';
 const kTagCodeFont2 = 'monospace';
 const kTagKbd = 'kbd';
-const kTagPre = 'pre';
 const kTagSamp = 'samp';
 const kTagTt = 'tt';
-
-const kTagFont = 'font';
-const kAttributeFontColor = 'color';
-const kAttributeFontFace = 'face';
-const kAttributeFontSize = 'size';
 
 const kCssDisplay = 'display';
 const kCssDisplayBlock = 'block';
@@ -56,35 +55,3 @@ const kCssDisplayNone = 'none';
 const kCssWhitespace = 'white-space';
 const kCssWhitespacePre = 'pre';
 const kCssWhitespaceNormal = 'normal';
-
-void wrapTree(
-  BuildTree tree, {
-  BuildBit Function(BuildTree parent)? append,
-  BuildBit Function(BuildTree parent)? prepend,
-}) {
-  final children = tree.directChildren;
-  final first0 = children.isEmpty ? null : children.first;
-  final first = (first0 is BuildTree ? first0.first : null) ?? first0;
-  final last0 = children.isEmpty ? null : children.last;
-  final last = (last0 is BuildTree ? last0.last : null) ?? last0;
-
-  if (first == null || last == null) {
-    if (prepend != null) {
-      final prependBit = prepend(tree);
-      tree.add(prependBit);
-    }
-    if (append != null) {
-      final appendBit = append(tree);
-      tree.add(appendBit);
-    }
-    return;
-  }
-
-  if (prepend != null) {
-    prepend(first.parent!).insertBefore(first);
-  }
-
-  if (append != null) {
-    append(last.parent!).insertAfter(last);
-  }
-}

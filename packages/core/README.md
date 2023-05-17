@@ -220,65 +220,66 @@ This example renders a carousel ([live demo](https://demo.fwfh.dev/#/customwidge
 
 ### Custom `WidgetFactory`
 
-The HTML string is parsed into DOM elements and each element is visited once to collect `BuildMetadata` and prepare `BuildBit`s. See step by step how it works:
+The HTML string is parsed into DOM elements and each element is visited once to prepare `BuildBit`s. See step by step how it works:
 
-| Step |                                                                          | Integration point                                                                                                   |
-|------|--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
-| 1    | Parse                                                                    | `WidgetFactory.parse(BuildMetadata)`                                                                                |
-| 2    | Inform parents if any                                                    | `BuildOp.onChild(BuildMetadata)`                                                                                    |
-| 3    | Populate default styling                                                 | `BuildOp.defaultStyles(Element)`                                                                                    |
-| 4    | Populate custom styling                                                  | `HtmlWidget.customStylesBuilder`                                                                                    |
-| 5    | Parse styling key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(BuildMetadata, String, String)`, `WidgetFactory.parseStyleDisplay(BuildMetadata, String)` |
-| 6    | a. If a custom widget is provided, go to 7                               | `HtmlWidget.customWidgetBuilder`                                                                                    |
-|      | b. Loop through children elements to prepare `BuildBit`s                 |                                                                                                                     |
-| 7    | Inform build ops                                                         | `BuildOp.onTree(BuildMetadata, BuildTree)`                                                                          |
-| 8    | a. If not a block element, go to 10                                      |                                                                                                                     |
-|      | b. Build widgets from bits using a `Flattener`                           | `BuildOp.onTreeFlattening(BuildMetadata, BuildTree)`                                                                |
-| 9    | Inform build ops                                                         | `BuildOp.onWidgets(BuildMetadata, Iterable<Widget>)`                                                                |
-| 10   | The end                                                                  |                                                                                                                     |
+| Step |                                                                          | Integration point                                                                                             |
+|------|--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
+| 1    | Parse                                                                    | `WidgetFactory.parse(BuildTree)`                                                                              |
+| 2    | Inform parents if any                                                    | `BuildOp.onChild(BuildTree, BuildTree)`                                                                       |
+| 3    | Populate default styling                                                 | `BuildOp.defaultStyles(BuildTree)`                                                                            |
+| 4    | Populate custom styling                                                  | `HtmlWidget.customStylesBuilder`                                                                              |
+| 5    | Parse styling key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(BuildTree, css.Declaration)`, `WidgetFactory.parseStyleDisplay(BuildTree, String?)` |
+| 6    | a. If a custom widget is provided, go to 7                               | `HtmlWidget.customWidgetBuilder`                                                                              |
+|      | b. Loop through children elements to prepare `BuildBit`s                 |                                                                                                               |
+| 7    | Inform build ops                                                         | `BuildOp.onTree(BuildTree)`                                                                                   |
+| 8    | a. If not a block element, go to 10                                      |                                                                                                               |
+|      | b. Build widgets from bits using a `Flattener`                           | `BuildOp.onFlattening(BuildTree)`                                                                             |
+| 9    | Inform build ops                                                         | `BuildOp.onBuilt(BuildTree, WidgetPlaceholder)`                                                               |
+| 10   | The end                                                                  |                                                                                                               |
 
 Notes:
 
-- Text related styling can be changed with `TextStyleBuilder`, register your callback to be called when the build context is ready.
-  - The first parameter is a `TextStyleHtml` which is immutable and is calculated from the root down to each element, the callback must return a new `TextStyleHtml` by calling `copyWith`. It's recommended to return the same object if no change is needed.
-  - Optionally, pass any object on registration and your callback will receive it as the second parameter.
+- Styling can be changed with `HtmlStyleBuilder`, register your callback to be called when the build context is ready.
+  - The first parameter is a `HtmlStyle` which is immutable and is calculated from the root down to each element, the callback must return a new `HtmlStyle` by calling `copyWith`. It's recommended to return the same object if no change is needed.
+  - Optionally, pass any object on enqueue and your callback will receive it as the second parameter.
 
 ```dart
 // example 1: simple callback setting accent color from theme
-meta.tsb((parent, _) =>
-  parent.copyWith(
-    style: parent.style.copyWith(
-      color: parent.getDependency<ThemeData>().accentColor,
+tree.apply(
+  (style, _) => style.copyWith(
+    textStyle: style.textStyle.copyWith(
+      color: style.getDependency<ThemeData>().accentColor,
     ),
-  ));
+  ),
+  null,
+);
 
-// example 2: callback using second param to set height
-TextStyleHtml callback(TextStyleHtml parent, double value) =>
-  parent.copyWith(height: value)
+// example 2: callback using second param to set alignment
+HtmlStyle callback(HtmlStyle style, TextAlign value) =>
+  style.copyWith(textAlign: value)
 
 // example 2 (continue): register with some value
-meta.tsb<double>(callback, 2.0);
+tree.apply(callback, TextAlign.justify);
 ```
 
-- The root styling can be customized by overriding `WidgetFactory.onRoot(TextStyleBuilder)`
 - Other complicated styling are supported via `BuildOp`
 
 ```dart
-meta.register(BuildOp(
-  onTree: (meta, tree) {
+tree.register(BuildOp(
+  onTree: (tree) {
     // can be used to change text, inline contents, etc.
-    tree.add(...);
+    tree.append(...);
   },
-  onWidgets: (meta, widgets) {
-    // use this to render special widget, wrap children into something else, etc.
-    return widgets.map((widget) => ...);
+  onBuilt: (tree, child) {
+    // use this to render special widget, wrap it into something else, etc.
+    return MyCustomWidget(child: child);
   },
   // depending on the rendering logic, you may need to adjust the execution order to "jump the line"
   priority: 9999,
 ));
 ```
 
-- Each metadata may have as many tsb callbacks and build ops as needed.
+- Each tree may have as many style builder callbacks and build ops as needed.
 
 The example below replaces smilie inline image with an emoji:
 
@@ -312,23 +313,23 @@ class SmilieScreen extends StatelessWidget {
 
 class _SmiliesWidgetFactory extends WidgetFactory {
   final smilieOp = BuildOp(
-    onTree: (meta, tree) {
-      final alt = meta.element.attributes['alt'];
+    onTree: (tree) {
+      final alt = tree.element.attributes['alt'];
       tree.addText(kSmilies[alt] ?? alt);
     },
   );
 
   @override
-  void parse(BuildMetadata meta) {
-    final e = meta.element;
+  void parse(BuildTree tree) {
+    final e = tree.element;
     if (e.localName == 'img' &&
         e.classes.contains('smilie') &&
         e.attributes.containsKey('alt')) {
-      meta.register(smilieOp);
+      tree.register(smilieOp);
       return;
     }
 
-    return super.parse(meta);
+    return super.parse(tree);
   }
 }
 ```

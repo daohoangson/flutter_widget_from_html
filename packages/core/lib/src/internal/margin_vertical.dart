@@ -4,27 +4,30 @@ import '../core_data.dart';
 import '../core_helpers.dart';
 
 class HeightPlaceholder extends WidgetPlaceholder {
-  final TextStyleBuilder tsb;
+  final HtmlStyleBuilder styleBuilder;
 
   final List<CssLength> _heights = [];
 
-  HeightPlaceholder(CssLength height, this.tsb, {Key? key})
+  HeightPlaceholder(CssLength height, this.styleBuilder, {Key? key})
       : super(
           autoUnwrap: false,
-          builder: (context, child) => _build(context, child, height, tsb),
+          builder: (c, w) => _build(c, w, height, styleBuilder),
+          debugLabel: 'height',
           key: key,
-          localName: 'height',
         ) {
     _heights.add(height);
   }
 
   CssLength get height => _heights.first;
 
+  @override
+  bool get isEmpty => false;
+
   void mergeWith(HeightPlaceholder other) {
     final height = other.height;
     _heights.add(height);
 
-    super.wrapWith((c, w) => _build(c, w, height, other.tsb));
+    super.wrapWith((c, w) => _build(c, w, height, other.styleBuilder));
   }
 
   @override
@@ -35,10 +38,10 @@ class HeightPlaceholder extends WidgetPlaceholder {
     BuildContext context,
     Widget child,
     CssLength height,
-    TextStyleBuilder tsb,
+    HtmlStyleBuilder styleBuilder,
   ) {
     final existing = (child is SizedBox ? child.height : null) ?? 0.0;
-    final value = height.getValue(tsb.build(context));
+    final value = height.getValue(styleBuilder.build(context));
     if (value != null && value > existing) {
       return SizedBox(height: value);
     }

@@ -2,11 +2,11 @@ import 'dart:collection';
 
 import 'package:csslib/parser.dart' as css;
 import 'package:csslib/visitor.dart' as css;
+import 'package:flutter/widgets.dart';
 
 import 'package:html/dom.dart' as dom;
 
 import '../core_data.dart';
-import '../core_data.dart' as core_data;
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
 import 'core_ops.dart';
@@ -18,143 +18,134 @@ final _regExpSpaceLeading = RegExp('^$_asciiWhitespace+', unicode: true);
 final _regExpSpaceTrailing = RegExp('$_asciiWhitespace+\$', unicode: true);
 final _regExpSpaces = RegExp('$_asciiWhitespace+', unicode: true);
 
-class BuildMetadata extends core_data.BuildMetadata {
-  final Iterable<BuildOp> _parentOps;
+class Builder extends BuildTree {
+  final CustomStylesBuilder? customStylesBuilder;
+  final CustomWidgetBuilder? customWidgetBuilder;
+  final Iterable<BuilderOp> parentOps;
+  final WidgetFactory wf;
 
-  Set<BuildOp>? _buildOps;
-  var _buildOpsIsLocked = false;
-  List<css.Declaration>? _styles;
-  var _stylesIsLocked = false;
+  final _buildOps = SplayTreeSet<BuilderOp>(BuilderOp._compare);
+  final _styles = <css.Declaration>[];
 
-  BuildMetadata(
-    dom.Element element,
-    TextStyleBuilder tsb, [
-    this._parentOps = const [],
-  ]) : super(element, tsb);
+  Builder({
+    required this.customStylesBuilder,
+    required this.customWidgetBuilder,
+    required dom.Element element,
+    BuildTree? parent,
+    this.parentOps = const [],
+    required HtmlStyleBuilder styleBuilder,
+    required this.wf,
+  }) : super(
+          element: element,
+          parent: parent,
+          styleBuilder: styleBuilder,
+        );
 
   @override
-  Iterable<BuildOp> get buildOps => _buildOps ?? const [];
-
-  @override
-  Iterable<BuildOp> get parentOps => _parentOps;
-
-  @override
-  List<css.Declaration> get styles {
-    assert(_stylesIsLocked);
-    return _styles ?? const [];
-  }
+  Iterable<css.Declaration> get styles => _styles;
 
   @override
   void operator []=(String key, String value) {
-    assert(!_stylesIsLocked, 'Metadata can no longer be changed.');
     final styleSheet = css.parse('*{$key: $value;}');
-    _styles ??= [];
-    _styles!.addAll(styleSheet.collectDeclarations());
+    final customStyles = styleSheet.collectDeclarations();
+    _styles.addAll(customStyles);
   }
 
   @override
-  void register(BuildOp op) {
-    assert(!_buildOpsIsLocked, 'Metadata can no longer be changed.');
-    _buildOps ??= SplayTreeSet(_compareBuildOps);
-    _buildOps!.add(op);
+  css.Declaration? operator [](String key) {
+    for (final style in _styles.reversed) {
+      if (style.property == key) {
+        return style;
+      }
+    }
+
+    return null;
   }
-}
-
-class BuildTree extends core_data.BuildTree {
-  final CustomStylesBuilder? customStylesBuilder;
-  final CustomWidgetBuilder? customWidgetBuilder;
-  final core_data.BuildMetadata parentMeta;
-  final Iterable<BuildOp> parentOps;
-  final WidgetFactory wf;
-
-  final _built = <WidgetPlaceholder>[];
-
-  BuildTree({
-    this.customStylesBuilder,
-    this.customWidgetBuilder,
-    core_data.BuildTree? parent,
-    required this.parentMeta,
-    this.parentOps = const [],
-    required TextStyleBuilder tsb,
-    required this.wf,
-  }) : super(parent, tsb);
 
   void addBitsFromNodes(dom.NodeList domNodes) {
     for (final domNode in domNodes) {
       _addBitsFromNode(domNode);
     }
-    for (final op in parentMeta.buildOps) {
-      op.onTree?.call(parentMeta, this);
+
+    for (final op in _buildOps) {
+      op.onTree();
     }
   }
 
   @override
-  Iterable<WidgetPlaceholder> build() {
-    if (_built.isNotEmpty) {
-      return _built;
+  WidgetPlaceholder? build() {
+    final children = Flattener(wf, this).widgets;
+    var placeholder = wf.buildColumnPlaceholder(this, children) ??
+        WidgetPlaceholder(debugLabel: '${element.localName}--zero');
+
+    for (final op in _buildOps) {
+      placeholder = WidgetPlaceholder.lazy(
+        op.onBuilt(placeholder) ?? placeholder,
+        debugLabel: '${element.localName}--${op.op.debugLabel ?? 'lazy'}',
+      );
     }
 
-    for (final subTree in subTrees.toList(growable: false).reversed) {
-      subTree.flatten(Flattened.noOp());
+    if (placeholder.isEmpty) {
+      // bailing out early if there's nothing to render
+      return null;
     }
 
-    var widgets = Flattener(wf, parentMeta, this).widgets;
-    for (final op in parentMeta.buildOps) {
-      widgets = op.onWidgets
-              ?.call(parentMeta, widgets)
-              ?.map(WidgetPlaceholder.lazy)
-              .toList(growable: false) ??
-          widgets;
-    }
+    return placeholder..setAnchorsIfUnset(anchors);
+  }
 
-    final thisAnchors = anchors;
-    if (thisAnchors != null) {
-      var needsColumn = false;
-      for (final widget in widgets) {
-        if (widget.anchors == null) {
-          // the current tree has some anchors
-          // but at least one of its widgets doesn't self-announce
-          // we need a column to wrap things and announce up the chain
-          needsColumn = true;
-          break;
-        }
+  @override
+  Builder copyWith({
+    bool copyContents = true,
+    dom.Element? element,
+    BuildTree? parent,
+    HtmlStyleBuilder? styleBuilder,
+  }) {
+    final p = parent ?? this.parent;
+    final sb =
+        styleBuilder ?? this.styleBuilder.copyWith(parent: p?.styleBuilder);
+    final copied = Builder(
+      customStylesBuilder: customStylesBuilder,
+      customWidgetBuilder: customWidgetBuilder,
+      element: element ?? this.element,
+      parent: p,
+      parentOps: p is Builder ? _prepareParentOps(p.parentOps, p) : const [],
+      styleBuilder: sb,
+      wf: wf,
+    );
+
+    if (copyContents) {
+      copyTo(copied);
+
+      for (final bit in children) {
+        copied.append(bit.copyWith(parent: copied));
       }
 
-      if (needsColumn) {
-        widgets = listOrNull(
-              wf.buildColumnPlaceholder(parentMeta, widgets)
-                ?..setAnchorsIfUnset(thisAnchors),
-            ) ??
-            const [];
+      for (final op in _buildOps) {
+        copied.register(op.op);
       }
+
+      copied._styles.addAll(_styles);
     }
 
-    _built.addAll(widgets);
-    return _built;
+    return copied;
   }
 
   @override
   void flatten(Flattened _) {
-    for (final op in parentMeta.buildOps) {
-      op.onTreeFlattening?.call(parentMeta, this);
+    for (final op in _buildOps) {
+      op.onFlattening();
     }
   }
 
   @override
-  BuildTree sub({
-    core_data.BuildTree? parent,
-    BuildMetadata? parentMeta,
-    Iterable<BuildOp> parentOps = const [],
-    TextStyleBuilder? tsb,
-  }) =>
-      BuildTree(
-        customStylesBuilder: customStylesBuilder,
-        customWidgetBuilder: customWidgetBuilder,
-        parent: parent ?? this,
-        parentMeta: parentMeta ?? this.parentMeta,
-        parentOps: parentOps,
-        tsb: tsb ?? this.tsb.sub(),
-        wf: wf,
+  void register(BuildOp op) => _buildOps.add(BuilderOp._(this, op));
+
+  @override
+  Builder sub({dom.Element? element}) => copyWith(
+        copyContents: false,
+        element: element,
+        parent: this,
+        styleBuilder: styleBuilder.sub(),
       );
 
   void _addBitsFromNode(dom.Node domNode) {
@@ -169,29 +160,22 @@ class BuildTree extends core_data.BuildTree {
     final element = domNode as dom.Element;
     final customWidget = customWidgetBuilder?.call(element);
     if (customWidget != null) {
-      add(WidgetBit.block(this, customWidget));
+      append(WidgetBit.block(this, customWidget));
       // skip further processing if a custom widget found
       return;
     }
 
-    final meta = BuildMetadata(element, parentMeta.tsb.sub(), parentOps);
-    _collectMetadata(meta);
+    final subTree = sub(element: element)
+      .._parseEverything()
+      ..addBitsFromNodes(element.nodes);
 
-    final subTree = sub(
-      parentMeta: meta,
-      parentOps: _prepareParentOps(parentOps, meta),
-      tsb: meta.tsb,
-    );
-    add(subTree);
-
-    subTree.addBitsFromNodes(element.nodes);
-
-    if (directChildren.contains(subTree) &&
-        meta._buildOps?.where(_opRequiresBuildingSubtree).isNotEmpty == true) {
-      for (final widget in subTree.build()) {
-        add(WidgetBit.block(this, widget));
+    if (subTree._buildOps.where(_mustBeBlock).isNotEmpty) {
+      final builtSubTree = subTree.build();
+      if (builtSubTree != null) {
+        append(WidgetBit.block(this, builtSubTree));
       }
-      subTree.detach();
+    } else {
+      append(subTree);
     }
   }
 
@@ -242,80 +226,122 @@ class BuildTree extends core_data.BuildTree {
     }
   }
 
-  void _collectMetadata(BuildMetadata meta) {
-    wf.parse(meta);
-
-    for (final op in meta.parentOps) {
-      op.onChild?.call(meta);
-    }
-
-    // stylings, step 1: get default styles from tag-based build ops
-    for (final op in meta.buildOps) {
-      final map = op.defaultStyles?.call(meta.element);
-      if (map == null) {
-        continue;
-      }
-
-      final str = map.entries.map((e) => '${e.key}: ${e.value}').join(';');
-      final styleSheet = css.parse('*{$str}');
-
-      meta._styles ??= [];
-      meta._styles!.insertAll(0, styleSheet.collectDeclarations());
-    }
-
-    _customStylesBuilder(meta);
-
-    // stylings, step 2: get styles from `style` attribute
-    for (final declaration in meta.element.styles) {
-      meta._styles ??= [];
-      meta._styles!.add(declaration);
-    }
-
-    meta._stylesIsLocked = true;
-    for (final style in meta.styles) {
-      wf.parseStyle(meta, style);
-    }
-
-    wf.parseStyleDisplay(meta, meta[kCssDisplay]?.term);
-
-    meta._buildOpsIsLocked = true;
-  }
-
-  void _customStylesBuilder(BuildMetadata meta) {
-    final map = customStylesBuilder?.call(meta.element);
+  void _customStylesBuilder() {
+    final map = customStylesBuilder?.call(element);
     if (map == null) {
       return;
     }
 
-    for (final pair in map.entries) {
-      meta[pair.key] = pair.value;
+    final str = map.entries.map((e) => '${e.key}: ${e.value}').join(';');
+    final styleSheet = css.parse('*{$str}');
+
+    final customStyles = styleSheet.collectDeclarations();
+    _styles.addAll(customStyles);
+  }
+
+  void _parseEverything() {
+    wf.parse(this);
+
+    for (final op in parentOps) {
+      op.onChild(this);
+    }
+
+    // stylings, step 1: get default styles from tag-based build ops
+    for (final op in _buildOps) {
+      final defaultStyles = op.defaultStyles;
+      if (defaultStyles != null) {
+        _styles.insertAll(0, defaultStyles);
+      }
+    }
+
+    _customStylesBuilder();
+
+    // stylings, step 2: get styles from `style` attribute
+    final elementStyles = element.styles;
+    if (elementStyles.isNotEmpty) {
+      _styles.addAll(elementStyles);
+    }
+
+    // stylings, step 3: parse one by one
+    for (final style in _styles) {
+      wf.parseStyle(this, style);
+    }
+
+    wf.parseStyleDisplay(this, this[kCssDisplay]?.term);
+  }
+}
+
+class BuilderOp {
+  final BuildOp op;
+  final Builder tree;
+
+  var _onBuilt = false;
+
+  BuilderOp._(this.tree, this.op);
+
+  List<css.Declaration>? get defaultStyles {
+    final map = op.defaultStyles?.call(tree);
+    if (map == null) {
+      return null;
+    }
+
+    final str = map.entries.map((e) => '${e.key}: ${e.value}').join(';');
+    final styleSheet = css.parse('*{$str}');
+    return styleSheet.collectDeclarations();
+  }
+
+  void onChild(BuildTree subTree) => op.onChild?.call(tree, subTree);
+
+  void onTree() => op.onTree?.call(tree);
+
+  void onFlattening() {
+    if (_onBuilt) {
+      return;
+    }
+
+    op.onFlattening?.call(tree);
+  }
+
+  Widget? onBuilt(WidgetPlaceholder placeholder) {
+    final result = op.onBuilt?.call(tree, placeholder);
+
+    if (result != null) {
+      _onBuilt = true;
+    }
+
+    return result;
+  }
+
+  static int _compare(BuilderOp a0, BuilderOp b0) {
+    final a = a0.op;
+    final b = b0.op;
+    if (identical(a, b)) {
+      return 0;
+    }
+
+    final cmp = a.priority.compareTo(b.priority);
+    if (cmp == 0) {
+      // if two ops have the same priority, they should not be considered equal
+      // fallback to compare hash codes for stable sorting
+      // while still provide pseudo random order across different runs
+      return a.hashCode.compareTo(b.hashCode);
+    } else {
+      return cmp;
     }
   }
 }
 
-int _compareBuildOps(BuildOp a, BuildOp b) {
-  if (identical(a, b)) {
-    return 0;
-  }
+bool _mustBeBlock(BuilderOp op) => op.op.mustBeBlock ?? op.op.onBuilt != null;
 
-  final cmp = a.priority.compareTo(b.priority);
-  if (cmp == 0) {
-    // if two ops have the same priority, they should not be considered equal
-    // fallback to compare hash codes for stable sorting
-    // while still provide pseudo random order across different runs
-    return a.hashCode.compareTo(b.hashCode);
-  } else {
-    return cmp;
-  }
-}
-
-bool _opRequiresBuildingSubtree(BuildOp op) =>
-    op.onWidgets != null && !op.onWidgetsIsOptional;
-
-Iterable<BuildOp> _prepareParentOps(Iterable<BuildOp> ops, BuildMetadata meta) {
+Iterable<BuilderOp> _prepareParentOps(
+  Iterable<BuilderOp> ops,
+  Builder builder,
+) {
   // try to reuse existing list if possible
-  final withOnChild = meta.buildOps.where((op) => op.onChild != null).toList();
-  return withOnChild.isEmpty
-      ? ops
-      : List.unmodifiable([...ops, ...withOnChild]);
+  final newOps = builder._buildOps
+      .where((op) => op.op.onChild != null)
+      .toList(growable: false);
+  return newOps.isNotEmpty == true
+      ? List.unmodifiable([...ops, ...newOps])
+      : ops;
 }

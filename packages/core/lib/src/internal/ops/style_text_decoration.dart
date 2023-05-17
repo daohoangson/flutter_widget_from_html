@@ -16,15 +16,16 @@ class StyleTextDecoration {
 
   StyleTextDecoration(this.wf);
 
-  BuildOp get op => BuildOp(
-        onTree: (meta, _) {
-          for (final style in meta.styles) {
+  BuildOp get buildOp => BuildOp(
+        debugLabel: kCssTextDecoration,
+        onTree: (tree) {
+          for (final style in tree.styles) {
             for (final value in style.values) {
               if (style.property == kCssTextDecoration ||
                   style.property == kCssTextDecorationLine) {
                 final line = TextDecorationLine.tryParse(value);
                 if (line != null) {
-                  meta.tsb.enqueue(textDecorationLine, line);
+                  tree.apply(textDecorationLine, line);
                   continue;
                 }
               }
@@ -33,7 +34,7 @@ class StyleTextDecoration {
                   style.property == kCssTextDecorationStyle) {
                 final tds = tryParseTextDecorationStyle(value);
                 if (tds != null) {
-                  meta.tsb.enqueue(textDecorationStyle, tds);
+                  tree.apply(textDecorationStyle, tds);
                   continue;
                 }
               }
@@ -42,7 +43,7 @@ class StyleTextDecoration {
                   style.property == kCssTextDecorationColor) {
                 final color = tryParseColor(value);
                 if (color != null) {
-                  meta.tsb.enqueue(textDecorationColor, color);
+                  tree.apply(textDecorationColor, color);
                   continue;
                 }
               }
@@ -52,8 +53,7 @@ class StyleTextDecoration {
                   style.property == kCssTextDecorationWidth) {
                 final length = tryParseCssLength(value);
                 if (length != null && length.unit == CssLengthUnit.percentage) {
-                  meta.tsb
-                      .enqueue(textDecorationThickness, length.number / 100.0);
+                  tree.apply(textDecorationThickness, length.number / 100.0);
                   continue;
                 }
               }
@@ -63,17 +63,17 @@ class StyleTextDecoration {
       );
 }
 
-TextStyleHtml textDecorationColor(TextStyleHtml p, Color v) =>
-    p.copyWith(style: p.style.copyWith(decorationColor: v));
+HtmlStyle textDecorationColor(HtmlStyle style, Color v) =>
+    style.copyWith(textStyle: style.textStyle.copyWith(decorationColor: v));
 
-TextStyleHtml textDecorationLine(TextStyleHtml p, TextDecorationLine v) {
-  final parent = p.parent?.style.decoration;
+HtmlStyle textDecorationLine(HtmlStyle p, TextDecorationLine v) {
+  final parent = p.parent?.textStyle.decoration;
   final parentOverline = parent?.contains(TextDecoration.overline) == true;
   final parentLineThrough =
       parent?.contains(TextDecoration.lineThrough) == true;
   final parentUnderline = parent?.contains(TextDecoration.underline) == true;
 
-  final current = p.style.decoration;
+  final current = p.textStyle.decoration;
   final currentOverline = current?.contains(TextDecoration.overline) == true;
   final currentLineThrough =
       current?.contains(TextDecoration.lineThrough) == true;
@@ -99,14 +99,14 @@ TextStyleHtml textDecorationLine(TextStyleHtml p, TextDecorationLine v) {
   }
 
   final combined = TextDecoration.combine(list);
-  return p.copyWith(style: p.style.copyWith(decoration: combined));
+  return p.copyWith(textStyle: p.textStyle.copyWith(decoration: combined));
 }
 
-TextStyleHtml textDecorationStyle(TextStyleHtml p, TextDecorationStyle v) =>
-    p.copyWith(style: p.style.copyWith(decorationStyle: v));
+HtmlStyle textDecorationStyle(HtmlStyle style, TextDecorationStyle v) =>
+    style.copyWith(textStyle: style.textStyle.copyWith(decorationStyle: v));
 
-TextStyleHtml textDecorationThickness(TextStyleHtml p, double v) =>
-    p.copyWith(style: p.style.copyWith(decorationThickness: v));
+HtmlStyle textDecorationThickness(HtmlStyle style, double v) =>
+    style.copyWith(textStyle: style.textStyle.copyWith(decorationThickness: v));
 
 @immutable
 class TextDecorationLine {

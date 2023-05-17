@@ -10,7 +10,7 @@ import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_widget_factory.dart';
 import 'internal/builder.dart' as builder;
-import 'internal/tsh_widget.dart';
+import 'internal/html_style_widget.dart';
 
 /// A widget that builds Flutter widget tree from HTML
 /// (supports most popular tags and stylings).
@@ -66,15 +66,11 @@ class HtmlWidget extends StatefulWidget {
   /// - [html]
   /// - [renderMode]
   /// - [textStyle]
-  ///
-  /// In `flutter_widget_from_html` package, these are also included:
-  ///
-  /// - `isSelectable`
   List<dynamic> get rebuildTriggers => [
-        html,
         baseUrl,
         buildAsync,
         enableCaching,
+        html,
         renderMode,
         textStyle,
         if (_rebuildTriggers != null) ..._rebuildTriggers!,
@@ -120,27 +116,33 @@ class HtmlWidget extends StatefulWidget {
 
 /// State for a [HtmlWidget].
 class HtmlWidgetState extends State<HtmlWidget> {
-  late final BuildMetadata _rootMeta;
-  late final _RootTsb _rootTsb;
+  late final _RootStyleBuilder _rootStyleBuilder;
   late final WidgetFactory _wf;
 
   Widget? _cache;
   Future<Widget>? _future;
+  HtmlStyle? _rootStyle;
 
   bool get buildAsync =>
       widget.buildAsync ?? widget.html.length > kShouldBuildAsync;
 
   bool get enableCaching => widget.enableCaching ?? !buildAsync;
 
+  builder.Builder get _rootBuilder => builder.Builder(
+        customStylesBuilder: widget.customStylesBuilder,
+        customWidgetBuilder: widget.customWidgetBuilder,
+        element: _rootElement,
+        styleBuilder: _rootStyleBuilder,
+        wf: _wf,
+      );
+
   @override
   void initState() {
     super.initState();
 
-    _rootTsb = _RootTsb(this);
-    _rootMeta = builder.BuildMetadata(dom.Element.tag('root'), _rootTsb);
+    _rootStyleBuilder = _RootStyleBuilder(this);
     _wf = widget.factoryBuilder?.call() ?? WidgetFactory();
 
-    _wf.onRoot(_rootTsb);
     _wf.reset(this);
 
     if (buildAsync) {
@@ -157,8 +159,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    _rootTsb.reset();
+    _rootStyle = null;
   }
 
   @override
@@ -172,7 +173,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
     }
 
     if (widget.textStyle != oldWidget.textStyle) {
-      _rootTsb.reset();
+      _rootStyle = null;
     }
 
     if (needsRebuild) {
@@ -183,7 +184,8 @@ class HtmlWidgetState extends State<HtmlWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (_future != null) {
+    final future = _future;
+    if (future != null) {
       return FutureBuilder<Widget>(
         builder: (context, snapshot) {
           if (snapshot.hasData) {
@@ -192,7 +194,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
             return _sliverToBoxAdapterIfNeeded(
               _wf.onErrorBuilder(
                     context,
-                    _rootMeta,
+                    _rootBuilder,
                     snapshot.error,
                     snapshot.stackTrace,
                   ) ??
@@ -200,11 +202,11 @@ class HtmlWidgetState extends State<HtmlWidget> {
             );
           } else {
             return _sliverToBoxAdapterIfNeeded(
-              _wf.onLoadingBuilder(context, _rootMeta) ?? widget0,
+              _wf.onLoadingBuilder(context, _rootBuilder) ?? widget0,
             );
           }
         },
-        future: _future!.then(_tshWidget),
+        future: future.then(_wrapper),
       );
     }
 
@@ -212,7 +214,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
       _cache = _buildSync();
     }
 
-    return _tshWidget(_cache!);
+    return _wrapper(_cache!);
   }
 
   /// Scrolls to make sure the requested anchor is as visible as possible.
@@ -239,8 +241,8 @@ class HtmlWidgetState extends State<HtmlWidget> {
       final domNodes = _parseHtml(widget.html);
       built = _buildBody(this, domNodes);
     } catch (error, stackTrace) {
-      built =
-          _wf.onErrorBuilder(context, _rootMeta, error, stackTrace) ?? widget0;
+      built = _wf.onErrorBuilder(context, _rootBuilder, error, stackTrace) ??
+          widget0;
     }
 
     Timeline.finishSync();
@@ -253,54 +255,41 @@ class HtmlWidgetState extends State<HtmlWidget> {
           ? SliverToBoxAdapter(child: child)
           : child;
 
-  Widget _tshWidget(Widget child) =>
-      TshWidget(tsh: _rootTsb._output, child: child);
+  Widget _wrapper(Widget child) =>
+      HtmlStyleWidget(style: _rootStyle, child: child);
 }
 
-class _RootTsb extends TextStyleBuilder {
-  TextStyleHtml? _output;
+final _rootElement = dom.Element.tag('root');
 
-  _RootTsb(HtmlWidgetState state) {
-    enqueue(builder, state);
-  }
+class _RootStyleBuilder extends HtmlStyleBuilder {
+  final HtmlWidgetState state;
+
+  _RootStyleBuilder(this.state);
 
   @override
-  TextStyleHtml build(BuildContext context) {
-    context.dependOnInheritedWidgetOfExactType<TshWidget>();
-    return super.build(context);
-  }
+  HtmlStyle build(BuildContext context) {
+    context.dependOnInheritedWidgetOfExactType<HtmlStyleWidget>();
 
-  TextStyleHtml builder(TextStyleHtml? _, HtmlWidgetState state) {
-    if (_output != null) {
-      return _output!;
+    final built = state._rootStyle;
+    if (built != null) {
+      return built;
     }
 
-    return _output = TextStyleHtml.root(
+    return state._rootStyle = HtmlStyle.root(
       state._wf.getDependencies(state.context),
       state.widget.textStyle,
     );
   }
-
-  void reset() => _output = null;
 }
 
 Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
-  final rootMeta = state._rootMeta;
   final wf = state._wf;
   wf.reset(state);
 
-  final tree = builder.BuildTree(
-    customStylesBuilder: state.widget.customStylesBuilder,
-    customWidgetBuilder: state.widget.customWidgetBuilder,
-    parentMeta: rootMeta,
-    tsb: rootMeta.tsb,
-    wf: wf,
-  )..addBitsFromNodes(domNodes);
+  final rootBuilder = state._rootBuilder;
+  rootBuilder.addBitsFromNodes(domNodes);
 
-  return wf
-          .buildColumnPlaceholder(rootMeta, tree.build())
-          ?.wrapWith(wf.buildBodyWidget) ??
-      widget0;
+  return rootBuilder.build()?.wrapWith(wf.buildBodyWidget) ?? widget0;
 }
 
 dom.NodeList _parseHtml(String html) =>

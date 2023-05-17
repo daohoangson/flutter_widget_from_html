@@ -4,26 +4,30 @@ final _isBody = Expando<bool>();
 
 class ColumnPlaceholder extends WidgetPlaceholder {
   final Iterable<WidgetPlaceholder> children;
-  final BuildMetadata meta;
+  final BuildTree tree;
   final WidgetFactory wf;
 
   ColumnPlaceholder({
     required this.children,
     Key? key,
-    required this.meta,
+    required this.tree,
     required this.wf,
-  }) : super(key: key, localName: meta.element.localName);
+  }) : super(debugLabel: tree.element.localName, key: key);
 
   bool get isBody => _isBody[this] == true;
 
   @override
+  bool get isEmpty => children.isEmpty;
+
+  @override
   Widget build(BuildContext context) {
-    final tsh = meta.tsb.build(context);
+    final style = tree.styleBuilder.build(context);
     final widgets = _buildWidgets(context);
     final built = wf.buildColumnWidget(
       context,
       widgets,
-      dir: tsh.textDirection,
+      crossAxisAlignment: style.columnCrossAxisAlignment,
+      dir: style.textDirection,
     );
     return isBody ? wf.buildBodyWidget(context, built) : built;
   }
@@ -84,9 +88,14 @@ class ColumnPlaceholder extends WidgetPlaceholder {
       }
     }
 
-    final tsh = meta.tsb.build(context);
+    final style = tree.styleBuilder.build(context);
     final column = contents.isNotEmpty
-        ? wf.buildColumnWidget(context, contents, dir: tsh.textDirection)
+        ? wf.buildColumnWidget(
+            context,
+            contents,
+            crossAxisAlignment: style.columnCrossAxisAlignment,
+            dir: style.textDirection,
+          )
         : null;
 
     return [
@@ -106,6 +115,26 @@ class ColumnPlaceholder extends WidgetPlaceholder {
       }
 
       yield child;
+    }
+  }
+}
+
+extension _HtmlStyle on HtmlStyle {
+  CrossAxisAlignment get columnCrossAxisAlignment {
+    final isLtr = textDirection == TextDirection.ltr;
+    switch (textAlign ?? TextAlign.start) {
+      case TextAlign.center:
+        return CrossAxisAlignment.center;
+      case TextAlign.end:
+        return CrossAxisAlignment.end;
+      case TextAlign.justify:
+        return CrossAxisAlignment.stretch;
+      case TextAlign.left:
+        return isLtr ? CrossAxisAlignment.start : CrossAxisAlignment.end;
+      case TextAlign.right:
+        return isLtr ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+      case TextAlign.start:
+        return CrossAxisAlignment.start;
     }
   }
 }

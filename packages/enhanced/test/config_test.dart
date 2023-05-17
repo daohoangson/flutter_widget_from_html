@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
+import 'package:flutter_widget_from_html_core/src/internal/html_style_widget.dart';
 import 'package:html/dom.dart' as dom;
 
 import '../../fwfh_url_launcher/test/mock_url_launcher_platform.dart';
@@ -53,7 +53,7 @@ void main() {
     testWidgets('skips FutureBuilder', (WidgetTester tester) async {
       const html = 'Foo';
       final explained = await explain(tester, html, buildAsync: false);
-      expect(explained, startsWith('TshWidget'));
+      expect(explained, startsWith('HtmlStyleWidget'));
     });
 
     testWidgets('uses FutureBuilder automatically', (tester) async {
@@ -88,8 +88,8 @@ void main() {
         );
 
     void enableCachingExpect(Widget? built1, Widget? built2, Matcher matcher) {
-      final widget1 = (built1! as TshWidget).child;
-      final widget2 = (built2! as TshWidget).child;
+      final widget1 = (built1! as HtmlStyleWidget).child;
+      final widget2 = (built2! as HtmlStyleWidget).child;
       expect(widget1 == widget2, matcher);
     }
 
@@ -586,11 +586,11 @@ void main() {
 
 class _OnErrorBuilderFactory extends WidgetFactory {
   @override
-  void parse(BuildMetadata meta) {
-    if (meta.element.className == 'throw') {
-      throw UnsupportedError(meta.element.outerHtml);
+  void parse(BuildTree tree) {
+    if (tree.element.className == 'throw') {
+      throw UnsupportedError(tree.element.outerHtml);
     }
 
-    super.parse(meta);
+    super.parse(tree);
   }
 }

@@ -7,22 +7,23 @@ class TagBr {
 
   TagBr(this.wf);
 
-  BuildOp get buildOp => BuildOp(onTree: (_, tree) => tree.add(TagBrBit(tree)));
+  BuildOp get buildOp => BuildOp(
+        debugLabel: kTagBr,
+        onTree: (tree) => tree.append(TagBrBit(tree)),
+      );
 }
 
 class TagBrBit extends BuildBit {
-  TagBrBit(BuildTree parent, {TextStyleBuilder? tsb})
-      : super(parent, tsb ?? parent.tsb);
+  const TagBrBit(BuildTree? parent) : super(parent);
 
   @override
   bool get swallowWhitespace => true;
 
   @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      TagBrBit(parent ?? this.parent!, tsb: tsb ?? this.tsb);
+  BuildBit copyWith({BuildTree? parent}) => TagBrBit(parent ?? this.parent);
 
   @override
-  void flatten(Flattened f) => f.text = '\n';
+  void flatten(Flattened f) => f.write(text: '\n');
 
   @override
   String toString() => '<BR />';

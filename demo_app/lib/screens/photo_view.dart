@@ -49,7 +49,7 @@ class PhotoViewScreen extends StatelessWidget {
 
 class _InlinePhotoViewWidgetFactory extends WidgetFactory {
   @override
-  Widget buildImage(BuildMetadata meta, ImageMetadata data) {
+  Widget buildImage(BuildTree tree, ImageMetadata data) {
     return AspectRatio(
       aspectRatio: 16.0 / 9.0,
       child: ClipRect(
@@ -61,19 +61,19 @@ class _InlinePhotoViewWidgetFactory extends WidgetFactory {
   }
 
   @override
-  void parse(BuildMetadata meta) {
-    if (meta.element.classes.contains('image')) {
-      meta['margin'] = '1em 0';
+  void parse(BuildTree tree) {
+    if (tree.element.classes.contains('image')) {
+      tree['margin'] = '1em 0';
     }
 
-    super.parse(meta);
+    super.parse(tree);
   }
 }
 
 class _PopupPhotoViewWidgetFactory extends WidgetFactory {
   @override
-  Widget buildImageWidget(BuildMetadata meta, ImageSource src) {
-    final built = super.buildImageWidget(meta, src);
+  Widget buildImageWidget(BuildTree tree, ImageSource src) {
+    final built = super.buildImageWidget(tree, src);
 
     if (built is Image) {
       final url = src.url;
@@ -99,11 +99,11 @@ class _PopupPhotoViewWidgetFactory extends WidgetFactory {
   }
 
   @override
-  void parse(BuildMetadata meta) {
-    if (meta.element.classes.contains('image')) {
-      meta['margin'] = '1em 0';
+  void parse(BuildTree tree) {
+    if (tree.element.classes.contains('image')) {
+      tree['margin'] = '1em 0';
     }
 
-    super.parse(meta);
+    super.parse(tree);
   }
 }

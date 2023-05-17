@@ -13,43 +13,42 @@ class StyleBgColor {
   StyleBgColor(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (meta, tree) {
-          if (_skipBuilding[meta] == true) {
+        debugLabel: kCssBackground,
+        mustBeBlock: false,
+        onFlattening: (tree) {
+          if (_skipBuilding[tree] == true) {
             return;
           }
 
-          final bgColor = _parseColor(wf, meta);
+          final bgColor = _parseColor(wf, tree);
           if (bgColor == null) {
             return;
           }
 
-          _skipBuilding[meta] = true;
-          meta.tsb.enqueue(_tsb, bgColor);
+          _skipBuilding[tree] = true;
+          tree.apply(_builder, bgColor);
         },
-        onWidgets: (meta, widgets) {
-          if (_skipBuilding[meta] == true || widgets.isEmpty) {
-            return widgets;
+        onBuilt: (tree, placeholder) {
+          if (_skipBuilding[tree] == true) {
+            return null;
           }
 
-          final color = _parseColor(wf, meta);
+          final color = _parseColor(wf, tree);
           if (color == null) {
             return null;
           }
 
-          _skipBuilding[meta] = true;
-          return listOrNull(
-            wf.buildColumnPlaceholder(meta, widgets)?.wrapWith(
-                  (_, child) => wf.buildDecoration(meta, child, color: color),
-                ),
+          _skipBuilding[tree] = true;
+          return placeholder.wrapWith(
+            (_, child) => wf.buildDecoration(tree, child, color: color),
           );
         },
-        onWidgetsIsOptional: true,
         priority: kPriorityBoxModel7k5,
       );
 
-  Color? _parseColor(WidgetFactory wf, BuildMetadata meta) {
+  Color? _parseColor(WidgetFactory wf, BuildTree tree) {
     Color? color;
-    for (final style in meta.styles) {
+    for (final style in tree.styles) {
       switch (style.property) {
         case kCssBackground:
           for (final expression in style.values) {
@@ -65,6 +64,7 @@ class StyleBgColor {
     return color;
   }
 
-  static TextStyleHtml _tsb(TextStyleHtml p, Color c) =>
-      p.copyWith(style: p.style.copyWith(background: Paint()..color = c));
+  static HtmlStyle _builder(HtmlStyle style, Color color) => style.copyWith(
+        textStyle: style.textStyle.copyWith(background: Paint()..color = color),
+      );
 }

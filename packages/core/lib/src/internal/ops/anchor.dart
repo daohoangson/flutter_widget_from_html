@@ -227,6 +227,17 @@ class AnchorRegistry {
   }
 }
 
+extension BuildTreeAnchors on BuildTree {
+  List<Key>? get anchors => value<_BuildTreeAnchors>()?.keys;
+
+  void registerAnchor(Key anchor) {
+    final keys = anchors ?? (value(_BuildTreeAnchors())!.keys);
+    keys.add(anchor);
+
+    parent?.registerAnchor(anchor);
+  }
+}
+
 class _AnchorBodyItemIndex {
   final bool isExact;
   final int min;
@@ -277,4 +288,8 @@ class _BodyItemElement extends ProxyElement {
     bodyItem.registry._bodyItemIndeces.remove(bodyItem.index);
     super.unmount();
   }
+}
+
+class _BuildTreeAnchors {
+  final keys = <Key>[];
 }

@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:flutter_widget_from_html_core/src/internal/tsh_widget.dart';
+import 'package:flutter_widget_from_html_core/src/internal/html_style_widget.dart';
 
 export '_constants.dart';
 
@@ -571,7 +571,7 @@ class Explainer {
       return _htmlListMarker(widget);
     }
 
-    if (widget is TshWidget) {
+    if (widget is HtmlStyleWidget) {
       return _widget(widget.child);
     }
 
@@ -644,6 +644,14 @@ class Explainer {
 
     if (widget is AspectRatio) {
       attr.add('aspectRatio=${widget.aspectRatio.toStringAsFixed(1)}');
+    }
+
+    if (widget is Column) {
+      final caa = widget.crossAxisAlignment;
+      if (caa != CrossAxisAlignment.start) {
+        final name = caa.toString().replaceAll('CrossAxisAlignment.', '');
+        attr.add('crossAxisAlignment=$name');
+      }
     }
 
     if (widget is ConstrainedBox) {

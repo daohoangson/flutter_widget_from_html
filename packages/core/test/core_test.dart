@@ -211,7 +211,7 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          'TshWidget\n'
+          'HtmlStyleWidget\n'
           '└ColumnPlaceholder(root)\n'
           ' └Column()\n'
           '  ├CssBlock()\n'
@@ -261,13 +261,7 @@ Future<void> main() async {
   testWidgets('renders HR tag', (WidgetTester tester) async {
     const html = '<hr/>';
     final explained = await explainMargin(tester, html);
-    expect(
-      explained,
-      equals(
-        '[CssBlock:child=[DecoratedBox:bg=#FF000000,child=[SizedBox:0.0x1.0]]],'
-        '[SizedBox:0.0x10.0]',
-      ),
-    );
+    expect(explained, equals('[CssBlock:child=[Divider]],[SizedBox:0.0x10.0]'));
   });
 
   group('block elements', () {
@@ -950,14 +944,14 @@ Future<void> main() async {
       expect(e, equals('[CssBlock:child=[RichText:(:1 [RichText:(:2)])]]'));
     });
 
-    testWidgets('#646: renders onWidgets inline', (WidgetTester tester) async {
+    testWidgets('#646: renders onBuilt inline', (WidgetTester tester) async {
       const html = '<span style="display:inline-block;">Foo</span>';
       final explained = await explain(
         tester,
         null,
         hw: HtmlWidget(
           html,
-          factoryBuilder: () => _InlineBlockOnWidgetsFactory(),
+          factoryBuilder: () => _InlineBlockOnBuiltFactory(),
           key: hwKey,
         ),
       );
@@ -1635,16 +1629,12 @@ Future<void> main() async {
   });
 }
 
-class _InlineBlockOnWidgetsFactory extends WidgetFactory {
+class _InlineBlockOnBuiltFactory extends WidgetFactory {
   @override
-  void parse(BuildMetadata meta) {
-    if (meta.element.localName == 'span') {
-      meta.register(
-        BuildOp(
-          onWidgets: (_, __) => const [Text('Bar')],
-        ),
-      );
+  void parse(BuildTree tree) {
+    if (tree.element.localName == 'span') {
+      tree.register(BuildOp(onBuilt: (_, __) => const Text('Bar')));
     }
-    super.parse(meta);
+    super.parse(tree);
   }
 }

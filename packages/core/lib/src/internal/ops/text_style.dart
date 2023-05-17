@@ -37,65 +37,99 @@ const kCssFontWeightBold = 'bold';
 const kCssLineHeight = 'line-height';
 const kCssLineHeightNormal = 'normal';
 
+extension BuildTreeEllipsis on BuildTree {
+  _BuildTreeEllipsis get _ => value() ?? _BuildTreeEllipsis();
+
+  set _(_BuildTreeEllipsis v) => value<_BuildTreeEllipsis>(v);
+
+  int get maxLines => _.maxLines;
+
+  set maxLines(int value) {
+    final v = _;
+    v.maxLines = value;
+    _ = v;
+  }
+
+  TextOverflow get overflow => _.overflow;
+
+  set overflow(TextOverflow value) {
+    final v = _;
+    v.overflow = value;
+    _ = v;
+  }
+}
+
 // ignore: avoid_classes_with_only_static_members
 class TextStyleOps {
-  static TextStyleHtml color(TextStyleHtml p, Color color) =>
-      p.copyWith(style: p.style.copyWith(color: color));
+  static HtmlStyle color(HtmlStyle style, Color color) =>
+      style.copyWith(textStyle: style.textStyle.copyWith(color: color));
 
-  static TextStyleHtml fontFamily(TextStyleHtml p, List<String> list) =>
-      p.copyWith(
-        style: p.style.copyWith(
+  static HtmlStyle fontFamily(HtmlStyle style, List<String> list) =>
+      style.copyWith(
+        textStyle: style.textStyle.copyWith(
           fontFamily: list.isNotEmpty ? list.first : null,
           fontFamilyFallback: list.skip(1).toList(growable: false),
         ),
       );
 
-  static TextStyleHtml fontSize(TextStyleHtml p, css.Expression v) =>
-      p.copyWith(style: p.style.copyWith(fontSize: _fontSizeTryParse(p, v)));
-
-  static TextStyleHtml fontSizeEm(TextStyleHtml p, double v) => p.copyWith(
-        style: p.style.copyWith(
-          fontSize:
-              _fontSizeTryParseCssLength(p, CssLength(v, CssLengthUnit.em)),
+  static HtmlStyle fontSize(HtmlStyle style, css.Expression v) =>
+      style.copyWith(
+        textStyle: style.textStyle.copyWith(
+          fontSize: _fontSizeTryParse(style, v),
         ),
       );
 
-  static TextStyleHtml fontSizeTerm(TextStyleHtml p, String v) => p.copyWith(
-        style: p.style.copyWith(fontSize: _fontSizeTryParseTerm(p, v)),
+  static HtmlStyle fontSizeEm(HtmlStyle style, double v) => style.copyWith(
+        textStyle: style.textStyle.copyWith(
+          fontSize: _fontSizeTryParseCssLength(
+            style,
+            CssLength(v, CssLengthUnit.em),
+          ),
+        ),
       );
 
-  static TextStyleHtml fontStyle(TextStyleHtml p, FontStyle fontStyle) =>
-      p.copyWith(style: p.style.copyWith(fontStyle: fontStyle));
+  static HtmlStyle fontSizeTerm(HtmlStyle style, String v) => style.copyWith(
+        textStyle: style.textStyle.copyWith(
+          fontSize: _fontSizeTryParseTerm(style, v),
+        ),
+      );
 
-  static TextStyleHtml fontWeight(TextStyleHtml p, FontWeight v) =>
-      p.copyWith(style: p.style.copyWith(fontWeight: v));
+  static HtmlStyle fontStyle(HtmlStyle style, FontStyle fontStyle) =>
+      style.copyWith(textStyle: style.textStyle.copyWith(fontStyle: fontStyle));
 
-  static TextStyleHtml Function(TextStyleHtml, css.Expression) lineHeight(
+  static HtmlStyle fontWeight(HtmlStyle style, FontWeight v) =>
+      style.copyWith(textStyle: style.textStyle.copyWith(fontWeight: v));
+
+  static HtmlStyle Function(HtmlStyle, css.Expression) lineHeight(
     WidgetFactory wf,
   ) =>
-      (p, v) {
-        final height = _lineHeightTryParse(wf, p, v);
+      (style, v) {
+        final height = _lineHeightTryParse(wf, style, v);
         if (height == null) {
-          return p;
+          return style;
         }
 
         if (height == -1) {
-          // ignore: avoid_redundant_argument_values
-          return p.copyWith(style: p.style.copyWith(height: null));
+          return style.copyWith(
+            // ignore: avoid_redundant_argument_values
+            textStyle: style.textStyle.copyWith(height: null),
+          );
         }
 
-        return p.copyWith(style: p.style.copyWith(height: height));
+        return style.copyWith(
+          textStyle: style.textStyle.copyWith(height: height),
+        );
       };
 
-  static TextStyleHtml textDirection(TextStyleHtml p, String v) {
+  static HtmlStyle textDirection(HtmlStyle style, String v) {
     switch (v) {
       case kCssDirectionLtr:
-        return p.copyWith(textDirection: TextDirection.ltr);
+        return style.copyWith(textDirection: TextDirection.ltr);
       case kCssDirectionRtl:
-        return p.copyWith(textDirection: TextDirection.rtl);
+        return style.copyWith(textDirection: TextDirection.rtl);
     }
 
-    return p;
+    return style;
   }
 
   static List<String> fontFamilyTryParse(List<css.Expression> expressions) {
@@ -158,8 +192,8 @@ class TextStyleOps {
     return null;
   }
 
-  static TextStyleHtml whitespace(TextStyleHtml p, CssWhitespace v) =>
-      p.copyWith(whitespace: v);
+  static HtmlStyle whitespace(HtmlStyle style, CssWhitespace v) =>
+      style.copyWith(whitespace: v);
 
   static CssWhitespace? whitespaceTryParse(String value) {
     switch (value) {
@@ -172,62 +206,62 @@ class TextStyleOps {
     return null;
   }
 
-  static double? _fontSizeTryParse(TextStyleHtml p, css.Expression v) {
+  static double? _fontSizeTryParse(HtmlStyle style, css.Expression v) {
     final length = tryParseCssLength(v);
     if (length != null) {
-      final lengthValue = _fontSizeTryParseCssLength(p, length);
+      final lengthValue = _fontSizeTryParseCssLength(style, length);
       if (lengthValue != null) {
         return lengthValue;
       }
     }
 
     if (v is css.LiteralTerm) {
-      return _fontSizeTryParseTerm(p, v.valueAsString);
+      return _fontSizeTryParseTerm(style, v.valueAsString);
     }
 
     return null;
   }
 
-  static double? _fontSizeTryParseCssLength(TextStyleHtml p, CssLength v) =>
+  static double? _fontSizeTryParseCssLength(HtmlStyle style, CssLength v) =>
       v.getValue(
-        p,
-        baseValue: p.parent?.style.fontSize,
-        scaleFactor: p.getDependency<MediaQueryData>().textScaleFactor,
+        style,
+        baseValue: style.parent?.textStyle.fontSize,
+        scaleFactor: style.getDependency<MediaQueryData>().textScaleFactor,
       );
 
-  static double? _fontSizeTryParseTerm(TextStyleHtml p, String v) {
+  static double? _fontSizeTryParseTerm(HtmlStyle style, String v) {
     switch (v) {
       case kCssFontSizeXxLarge:
-        return _fontSizeMultiplyRootWith(p, 2.0);
+        return _fontSizeMultiplyRootWith(style, 2.0);
       case kCssFontSizeXLarge:
-        return _fontSizeMultiplyRootWith(p, 1.5);
+        return _fontSizeMultiplyRootWith(style, 1.5);
       case kCssFontSizeLarge:
-        return _fontSizeMultiplyRootWith(p, 1.125);
+        return _fontSizeMultiplyRootWith(style, 1.125);
       case kCssFontSizeMedium:
-        return _fontSizeMultiplyRootWith(p, 1);
+        return _fontSizeMultiplyRootWith(style, 1);
       case kCssFontSizeSmall:
-        return _fontSizeMultiplyRootWith(p, .8125);
+        return _fontSizeMultiplyRootWith(style, .8125);
       case kCssFontSizeXSmall:
-        return _fontSizeMultiplyRootWith(p, .625);
+        return _fontSizeMultiplyRootWith(style, .625);
       case kCssFontSizeXxSmall:
-        return _fontSizeMultiplyRootWith(p, .5625);
+        return _fontSizeMultiplyRootWith(style, .5625);
 
       case kCssFontSizeLarger:
-        return _fontSizeMultiplyWith(p.parent?.style.fontSize, 1.2);
+        return _fontSizeMultiplyWith(style.parent?.textStyle.fontSize, 1.2);
       case kCssFontSizeSmaller:
-        return _fontSizeMultiplyWith(p.parent?.style.fontSize, 15 / 18);
+        return _fontSizeMultiplyWith(style.parent?.textStyle.fontSize, 15 / 18);
     }
 
     return null;
   }
 
-  static double? _fontSizeMultiplyRootWith(TextStyleHtml tsh, double value) {
-    var root = tsh;
-    while (root.parent != null) {
-      root = root.parent!;
+  static double? _fontSizeMultiplyRootWith(HtmlStyle style, double value) {
+    var root = style;
+    for (HtmlStyle? x = root; x != null; x = x.parent) {
+      root = x;
     }
 
-    return _fontSizeMultiplyWith(root.style.fontSize, value);
+    return _fontSizeMultiplyWith(root.textStyle.fontSize, value);
   }
 
   static double? _fontSizeMultiplyWith(double? fontSize, double value) =>
@@ -235,7 +269,7 @@ class TextStyleOps {
 
   static double? _lineHeightTryParse(
     WidgetFactory wf,
-    TextStyleHtml p,
+    HtmlStyle style,
     css.Expression v,
   ) {
     if (v is css.LiteralTerm) {
@@ -252,7 +286,7 @@ class TextStyleOps {
       }
     }
 
-    final fontSize = p.style.fontSize;
+    final fontSize = style.textStyle.fontSize;
     if (fontSize == null) {
       return null;
     }
@@ -263,9 +297,9 @@ class TextStyleOps {
     }
 
     final lengthValue = length.getValue(
-      p,
+      style,
       baseValue: fontSize,
-      scaleFactor: p.getDependency<MediaQueryData>().textScaleFactor,
+      scaleFactor: style.getDependency<MediaQueryData>().textScaleFactor,
     );
     if (lengthValue == null) {
       return null;
@@ -273,4 +307,9 @@ class TextStyleOps {
 
     return lengthValue / fontSize;
   }
+}
+
+class _BuildTreeEllipsis {
+  int maxLines = -1;
+  TextOverflow overflow = TextOverflow.clip;
 }

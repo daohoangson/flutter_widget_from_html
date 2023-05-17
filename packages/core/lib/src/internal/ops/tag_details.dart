@@ -6,88 +6,77 @@ const kTagDetails = 'details';
 const kTagSummary = 'summary';
 
 class TagDetails {
-  final BuildMetadata detailsMeta;
-  late final BuildOp op;
   final WidgetFactory wf;
 
   late final BuildOp _summaryOp;
   WidgetPlaceholder? _summary;
 
-  TagDetails(this.wf, this.detailsMeta) {
-    op = BuildOp(onChild: onChild, onWidgets: onWidgets);
-
+  TagDetails(this.wf) {
     _summaryOp = BuildOp(
-      onTree: (meta, tree) {
-        final children = tree.directChildren;
-        if (children.isEmpty) {
+      debugLabel: kTagSummary,
+      onTree: (tree) {
+        if (tree.isEmpty) {
           return;
         }
 
-        final first = children.first;
         final marker = WidgetBit.inline(
-          first.parent!,
+          tree,
           WidgetPlaceholder(
             builder: (context, child) {
-              final tsh = meta.tsb.build(context);
-              return HtmlDetailsMarker(style: tsh.style);
+              final style = tree.styleBuilder.build(context);
+              return HtmlDetailsMarker(style: style.textStyle);
             },
-            localName: kTagDetails,
+            debugLabel: tree.element.localName,
           ),
         );
-        marker.insertBefore(first);
+        tree.prepend(marker);
       },
-      onWidgets: (meta, widgets) {
+      onBuilt: (tree, placeholder) {
         if (_summary != null) {
-          return widgets;
+          return null;
         }
 
-        _summary = wf.buildColumnPlaceholder(meta, widgets);
-        if (_summary == null) {
-          return widgets;
-        }
-
-        return const [];
+        _summary = placeholder;
+        return WidgetPlaceholder(debugLabel: tree.element.localName);
       },
       priority: BuildOp.kPriorityMax,
     );
   }
 
-  void onChild(BuildMetadata childMeta) {
-    final e = childMeta.element;
-    if (e.parent != detailsMeta.element) {
-      return;
-    }
-    if (e.localName != kTagSummary) {
-      return;
-    }
+  BuildOp get buildOp => BuildOp(
+        debugLabel: kTagDetails,
+        onChild: (tree, subTree) {
+          final e = subTree.element;
+          if (e.parent != tree.element) {
+            return;
+          }
+          if (e.localName != kTagSummary) {
+            return;
+          }
 
-    childMeta.register(_summaryOp);
-  }
+          subTree.register(_summaryOp);
+        },
+        onBuilt: (tree, placeholder) {
+          final attrs = tree.element.attributes;
+          final open = attrs.containsKey(kAttributeDetailsOpen);
 
-  Iterable<Widget>? onWidgets(
-    BuildMetadata _,
-    Iterable<WidgetPlaceholder> widgets,
-  ) {
-    final attrs = detailsMeta.element.attributes;
-    final open = attrs.containsKey(kAttributeDetailsOpen);
-    return listOrNull(
-      wf.buildColumnPlaceholder(detailsMeta, widgets)?.wrapWith(
-        (context, child) {
-          final tsh = detailsMeta.tsb.build(context);
+          return placeholder.wrapWith(
+            (context, child) {
+              final style = tree.styleBuilder.build(context);
 
-          return HtmlDetails(
-            open: open,
-            child: wf.buildColumnWidget(
-              context,
-              [
-                HtmlSummary(style: tsh.style, child: _summary),
-                HtmlDetailsContents(child: child),
-              ],
-              dir: tsh.getDependency(),
-            ),
+              return HtmlDetails(
+                open: open,
+                child: wf.buildColumnWidget(
+                  context,
+                  [
+                    HtmlSummary(style: style.textStyle, child: _summary),
+                    HtmlDetailsContents(child: child),
+                  ],
+                  dir: style.getDependency(),
+                ),
+              );
+            },
           );
         },
-      ),
-    );
-  }
+      );
 }

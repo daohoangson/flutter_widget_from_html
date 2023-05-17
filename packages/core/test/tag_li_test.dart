@@ -1008,8 +1008,8 @@ class _Golden extends StatelessWidget {
 class _NullListMarkerWidgetFactory extends WidgetFactory {
   @override
   Widget? buildListMarker(
-    BuildMetadata meta,
-    TextStyleHtml tsh,
+    BuildTree tree,
+    HtmlStyle style,
     String listStyleType,
     int index,
   ) {

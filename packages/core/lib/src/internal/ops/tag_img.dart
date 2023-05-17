@@ -11,13 +11,14 @@ const kTagImg = 'img';
 class TagImg {
   final WidgetFactory wf;
 
-  static final _placeholders = Expando<WidgetPlaceholder>();
+  static final _builts = Expando<Widget>();
 
   TagImg(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        defaultStyles: (element) {
-          final attrs = element.attributes;
+        debugLabel: kTagImg,
+        defaultStyles: (tree) {
+          final attrs = tree.element.attributes;
           final styles = {
             kCssHeight: 'auto',
             kCssMinWidth: '0px',
@@ -34,9 +35,10 @@ class TagImg {
 
           return styles;
         },
-        onTree: (meta, tree) {
-          final data = _parse(meta);
-          final built = wf.buildImage(meta, data);
+        mustBeBlock: false,
+        onTree: (tree) {
+          final data = _parse(tree);
+          final built = wf.buildImage(tree, data);
           if (built == null) {
             final imgText = data.alt ?? data.title ?? '';
             if (imgText.isNotEmpty) {
@@ -45,38 +47,22 @@ class TagImg {
             return;
           }
 
-          _placeholders[meta] = WidgetPlaceholder(
-            localName: kTagImg,
-            child: built,
-          );
+          _builts[tree] = built;
         },
-        onTreeFlattening: (meta, tree) {
-          final placeholder = _placeholders[meta];
-          if (placeholder == null) {
+        onFlattening: (tree) {
+          final built = _builts[tree];
+          if (built == null) {
             return;
           }
 
-          tree.add(
-            WidgetBit.inline(
-              tree,
-              placeholder,
-              alignment: PlaceholderAlignment.baseline,
-            ),
-          );
+          const baseline = PlaceholderAlignment.baseline;
+          tree.append(WidgetBit.inline(tree, built, alignment: baseline));
         },
-        onWidgets: (meta, widgets) {
-          final placeholder = _placeholders[meta];
-          if (placeholder == null) {
-            return widgets;
-          }
-
-          return [placeholder];
-        },
-        onWidgetsIsOptional: true,
+        onBuilt: (tree, _) => _builts[tree],
       );
 
-  ImageMetadata _parse(BuildMetadata meta) {
-    final attrs = meta.element.attributes;
+  ImageMetadata _parse(BuildTree tree) {
+    final attrs = tree.element.attributes;
     final url = wf.urlFull(attrs[kAttributeImgSrc] ?? '');
     return ImageMetadata(
       alt: attrs[kAttributeImgAlt],

@@ -2,16 +2,24 @@ part of '../core_ops.dart';
 
 const kCssPadding = 'padding';
 
-WidgetPlaceholder _paddingInlineAfter(TextStyleBuilder tsb, CssLengthBox b) =>
+WidgetPlaceholder _paddingInlineAfter(
+  HtmlStyleBuilder styleBuilder,
+  CssLengthBox b,
+) =>
     WidgetPlaceholder(
-      builder: (c, _) => _paddingInlineSizedBox(b.getValueRight(tsb.build(c))),
-      localName: kCssPadding,
+      builder: (c, _) =>
+          _paddingInlineSizedBox(b.getValueRight(styleBuilder.build(c))),
+      debugLabel: kCssPadding,
     );
 
-WidgetPlaceholder _paddingInlineBefore(TextStyleBuilder tsb, CssLengthBox b) =>
+WidgetPlaceholder _paddingInlineBefore(
+  HtmlStyleBuilder styleBuilder,
+  CssLengthBox b,
+) =>
     WidgetPlaceholder(
-      builder: (c, _) => _paddingInlineSizedBox(b.getValueLeft(tsb.build(c))),
-      localName: kCssPadding,
+      builder: (c, _) =>
+          _paddingInlineSizedBox(b.getValueLeft(styleBuilder.build(c))),
+      debugLabel: kCssPadding,
     );
 
 Widget _paddingInlineSizedBox(double? width) =>
@@ -25,68 +33,54 @@ class StylePadding {
   StylePadding(this.wf);
 
   BuildOp get buildOp => BuildOp(
-        onTreeFlattening: (meta, tree) {
-          final padding = tryParseCssLengthBox(meta, kCssPadding);
+        debugLabel: kCssPadding,
+        mustBeBlock: false,
+        onFlattening: (tree) {
+          final padding = tryParseCssLengthBox(tree, kCssPadding);
           if (padding == null) {
             return;
           }
 
-          final mayHaveLeft = padding.mayHaveLeft;
-          final mayHaveRight = padding.mayHaveRight;
-          if (!mayHaveLeft && !mayHaveRight) {
-            return;
+          if (padding.mayHaveLeft) {
+            final before = _paddingInlineBefore(tree.styleBuilder, padding);
+            tree.prepend(WidgetBit.inline(tree, before));
           }
 
-          return wrapTree(
-            tree,
-            append: mayHaveRight
-                ? (p) =>
-                    WidgetBit.inline(p, _paddingInlineAfter(p.tsb, padding))
-                : null,
-            prepend: mayHaveLeft
-                ? (p) =>
-                    WidgetBit.inline(p, _paddingInlineBefore(p.tsb, padding))
-                : null,
-          );
+          if (padding.mayHaveRight) {
+            final after = _paddingInlineAfter(tree.styleBuilder, padding);
+            tree.append(WidgetBit.inline(tree, after));
+          }
         },
-        onWidgets: (meta, widgets) {
-          if (widgets.isEmpty) {
-            return widgets;
-          }
-
-          final padding = tryParseCssLengthBox(meta, kCssPadding);
+        onBuilt: (tree, child) {
+          final padding = tryParseCssLengthBox(tree, kCssPadding);
           if (padding == null) {
             return null;
           }
 
-          return [
-            WidgetPlaceholder(
-              localName: kCssPadding,
-              child: wf.buildColumnPlaceholder(meta, widgets),
-            ).wrapWith(
-              (context, child) => _build(meta, context, child, padding),
-            )
-          ];
+          return WidgetPlaceholder(
+            builder: (ctx, w) => _build(tree, ctx, w, padding),
+            debugLabel: kCssPadding,
+            child: child,
+          );
         },
-        onWidgetsIsOptional: true,
         priority: kPriorityBoxModel5k,
       );
 
   Widget? _build(
-    BuildMetadata meta,
+    BuildTree tree,
     BuildContext context,
     Widget child,
     CssLengthBox padding,
   ) {
-    final tsh = meta.tsb.build(context);
+    final style = tree.styleBuilder.build(context);
     return wf.buildPadding(
-      meta,
+      tree,
       child,
       EdgeInsets.fromLTRB(
-        max(padding.getValueLeft(tsh) ?? 0.0, 0.0),
-        max(padding.top?.getValue(tsh) ?? 0.0, 0.0),
-        max(padding.getValueRight(tsh) ?? 0.0, 0.0),
-        max(padding.bottom?.getValue(tsh) ?? 0.0, 0.0),
+        max(padding.getValueLeft(style) ?? 0.0, 0.0),
+        max(padding.top?.getValue(style) ?? 0.0, 0.0),
+        max(padding.getValueRight(style) ?? 0.0, 0.0),
+        max(padding.bottom?.getValue(style) ?? 0.0, 0.0),
       ),
     );
   }

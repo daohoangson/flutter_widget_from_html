@@ -17,7 +17,7 @@ mixin SvgFactory on WidgetFactory {
   bool get svgAllowDrawingOutsideViewBox => false;
 
   @override
-  Widget? buildImageWidget(BuildMetadata meta, ImageSource src) {
+  Widget? buildImageWidget(BuildTree tree, ImageSource src) {
     final url = src.url;
 
     BytesLoader? bytesLoader;
@@ -34,10 +34,10 @@ mixin SvgFactory on WidgetFactory {
     }
 
     if (bytesLoader == null) {
-      return super.buildImageWidget(meta, src);
+      return super.buildImageWidget(tree, src);
     }
 
-    return _buildSvgPicture(meta, src, bytesLoader);
+    return _buildSvgPicture(tree, src, bytesLoader);
   }
 
   /// Returns an [SvgAssetLoader].
@@ -84,24 +84,28 @@ mixin SvgFactory on WidgetFactory {
   }
 
   @override
-  void parse(BuildMetadata meta) {
-    switch (meta.element.localName) {
+  void parse(BuildTree tree) {
+    final localName = tree.element.localName;
+
+    switch (localName) {
       case 'svg':
-        _tagSvg ??= BuildOp(
-          onWidgets: (meta, widgets) {
-            final bytesLoader = SvgStringLoader(meta.element.outerHtml);
-            return [_buildSvgPicture(meta, const ImageSource(''), bytesLoader)];
-          },
+        tree.register(
+          _tagSvg ??= BuildOp(
+            debugLabel: localName,
+            onBuilt: (tree, _) {
+              final bytesLoader = SvgStringLoader(tree.element.outerHtml);
+              return _buildSvgPicture(tree, const ImageSource(''), bytesLoader);
+            },
+          ),
         );
-        meta.register(_tagSvg!);
         break;
     }
 
-    return super.parse(meta);
+    return super.parse(tree);
   }
 
   Widget _buildSvgPicture(
-    BuildMetadata meta,
+    BuildTree tree,
     ImageSource src,
     BytesLoader bytesLoader,
   ) {
@@ -115,7 +119,7 @@ mixin SvgFactory on WidgetFactory {
       fit: BoxFit.fill,
       height: src.height,
       placeholderBuilder: (context) {
-        final loading = onLoadingBuilder(context, meta, null, src);
+        final loading = onLoadingBuilder(context, tree, null, src);
         if (loading != null) {
           return loading;
         }
