@@ -30,15 +30,15 @@ void main() {
   testWidgets('renders IMG tag with .svg', (WidgetTester tester) async {
     const sizingConstraints = 'height≥0.0,height=auto,width≥0.0,width=auto';
     const assetName = 'test/images/logo.svg';
-    const package = 'fwfh_svg';
-    const html = '<img src="asset:$assetName?package=$package" />';
+    const html = '<img src="asset:$assetName" />';
     final explained = await explain(tester, html);
     expect(
       explained,
       equals(
         '[CssSizing:$sizingConstraints,child='
         '[SvgPicture:'
-        'pictureProvider=ExactAssetPicture(name: "packages/$package/$assetName", bundle: null, colorFilter: null)'
+        'pictureProvider=ExactAssetPicture(name: "$assetName", '
+        'bundle: null, colorFilter: null)'
         ']]',
       ),
     );

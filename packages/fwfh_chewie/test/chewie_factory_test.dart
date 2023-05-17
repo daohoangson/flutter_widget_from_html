@@ -7,9 +7,7 @@ void main() {
   const src = 'http://domain.com/video.mp4';
   const defaultAspectRatio = '1.78';
 
-  setUp(() {
-    mockVideoPlayerPlatform();
-  });
+  mockVideoPlayerPlatform();
 
   testWidgets('renders video player', (tester) async {
     const html = '<video><source src="$src"></video>';
@@ -154,7 +152,7 @@ void main() {
     });
 
     testWidgets('renders video player with data uri', (tester) async {
-      final h = '<video poster="$kDataUri"><source src="$src"></video>';
+      const h = '<video poster="$kDataUri"><source src="$src"></video>';
       final e = await explain(tester, h);
       final explained = e.replaceAll(RegExp('Uint8List#[0-9a-f]+,'), 'bytes,');
       expect(

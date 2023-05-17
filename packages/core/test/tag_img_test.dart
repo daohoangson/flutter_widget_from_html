@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -86,9 +85,11 @@ void main() {
         explained,
         equals(
           '[RichText:(:'
-          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=NetworkImage("$src", scale: 1.0)]]'
           '(: )'
-          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=NetworkImage("$src", scale: 1.0)]]'
           ')]',
         ),
       );
@@ -113,8 +114,9 @@ void main() {
         explained,
         equals(
           '[CssSizing:height≥0.0,height=600.0,width≥0.0,width=800.0,child='
-          '[AspectRatio:aspectRatio=1.3,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
-          ']',
+          '[AspectRatio:aspectRatio=1.3,child='
+          '[Image:image=NetworkImage("$src", scale: 1.0)]'
+          ']]',
         ),
       );
     });
@@ -127,7 +129,8 @@ void main() {
         equals(
           '[RichText:(:'
           'Before text. '
-          '[CssSizing:$sizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
+          '[CssSizing:$sizingConstraints,child='
+          '[Image:image=NetworkImage("$src", scale: 1.0)]]'
           '(: After text.)'
           ')]',
         ),
@@ -381,7 +384,9 @@ void main() {
   group('error handing', () {
     testWidgets('executes errorBuilder', (WidgetTester tester) async {
       const html = 'Foo <img src="data:image/jpg;base64,xxxx" /> bar';
-      await tester.pumpWidget(const MaterialApp(home: HtmlWidget(html)));
+      await tester.pumpWidget(
+        const MaterialApp(home: Scaffold(body: HtmlWidget(html))),
+      );
       await tester.pumpAndSettle();
       expect(find.text('❌'), findsOneWidget);
     });

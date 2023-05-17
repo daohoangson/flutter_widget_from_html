@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 
@@ -57,7 +59,8 @@ Future<void> main() async {
       str,
       equals(
         '[Column:children='
-        '[CssBlock:child=[RichText:(:(+l+o+u:All decorations... )(:and none))]],'
+        '[CssBlock:child=[RichText:(:(+l+o+u:All decorations... )'
+        '(:and none))]],'
         '[CssBlock:child=[RichText:(:I​Like​Playing​football​​game)]],'
         '[CssBlock:child=[RichText:(:\u00A0)]]'
         ']',
@@ -216,18 +219,12 @@ Future<void> main() async {
           'TshWidget\n'
           '└ColumnPlaceholder(BuildMetadata(<root></root>))\n'
           ' └Column()\n'
-          '  ├WidgetPlaceholder<BuildTree>(BuildTree#0 tsb#1(parent=#2):\n'
-          '  ││  "1"\n'
-          '  ││)\n'
-          '  │└CssBlock()\n'
-          '  │ └RichText(text: "1")\n'
+          '  ├CssBlock()\n'
+          '  │└RichText(text: "1")\n'
           '  ├HeightPlaceholder(1.0em)\n'
           '  │└SizedBox(height: 10.0)\n'
-          '  └WidgetPlaceholder<BuildTree>(BuildTree#3 tsb#4(parent=#2):\n'
-          '   │  "2"\n'
-          '   │)\n'
-          '   └CssBlock()\n'
-          '    └RichText(text: "2")\n\n',
+          '  └CssBlock()\n'
+          '   └RichText(text: "2")\n\n',
         ),
       );
     });
@@ -954,6 +951,21 @@ Future<void> main() async {
       expect(e, equals('[CssBlock:child=[RichText:(:1 [RichText:(:2)])]]'));
     });
 
+    testWidgets('#646: renders onWidgets inline', (WidgetTester tester) async {
+      const html = '<span style="display:inline-block;">Foo</span>';
+      final explained = await explain(
+        tester,
+        null,
+        hw: HtmlWidget(
+          html,
+          factoryBuilder: () => _InlineBlockOnWidgetsFactory(),
+          key: hwKey,
+        ),
+      );
+
+      expect(explained, equals('[Text:Bar]'));
+    });
+
     testWidgets('renders display: none', (WidgetTester tester) async {
       const html = '<div>1 <div style="display: none">2</div></div>';
       final explained = await explain(tester, html);
@@ -990,8 +1002,9 @@ Future<void> main() async {
             equals(
               '[Column:children='
               '[RichText:(:Foo)],'
-              '[CssSizing:$imgSizingConstraints,child=[Image:image=NetworkImage("$src", scale: 1.0)]]'
-              ']',
+              '[CssSizing:$imgSizingConstraints,child='
+              '[Image:image=NetworkImage("$src", scale: 1.0)]'
+              ']]',
             ),
           );
         }),
@@ -1404,8 +1417,9 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[RichText:(:(+b:bold)(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: )(:four)(: )'
-          '(+w4:five)(: )(+w5:six)(: )(+b:seven)(: )(+w7:eight)(: )(+w8:nine))]',
+          '[RichText:(:(+b:bold)(: )(+w0:one)(: )(+w1:two)(: )(+w2:three)(: )'
+          '(:four)(: )(+w4:five)(: )(+w5:six)(: )'
+          '(+b:seven)(: )(+w7:eight)(: )(+w8:nine))]',
         ),
       );
     });
@@ -1540,9 +1554,10 @@ Future<void> main() async {
     });
 
     testWidgets('renders pre', (tester) async {
-      const html = '<div style="white-space: pre">Foo\nbar</div>';
+      const code = '\n  Foo\n  bar  \n';
+      const html = '<div style="white-space: pre">$code</div>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[CssBlock:child=[RichText:(:Foo\nbar)]]'));
+      expect(explained, equals('[CssBlock:child=[RichText:(:$code)]]'));
     });
 
     group('PRE tag', () {
@@ -1571,4 +1586,55 @@ Future<void> main() async {
       });
     });
   });
+
+  group('#698', () {
+    testWidgets('MaterialApp > CupertinoPageScaffold', (tester) async {
+      const html = 'Hello world';
+      final key = GlobalKey<HtmlWidgetState>();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: CupertinoPageScaffold(
+            child: HtmlWidget(html, key: key),
+          ),
+        ),
+      );
+
+      final explained = await explainWithoutPumping(key: key);
+      expect(explained, equals('[RichText:(#D0FF0000:$html)]'));
+    });
+
+    testWidgets('Typography.material2018', (tester) async {
+      const html = 'Hello world';
+      final key = GlobalKey<HtmlWidgetState>();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            typography: Typography.material2018(),
+          ),
+          home: Scaffold(
+            body: HtmlWidget(html, key: key),
+          ),
+        ),
+      );
+
+      final explained = await explainWithoutPumping(key: key);
+      expect(explained, equals('[RichText:(#DD000000:$html)]'));
+    });
+  });
+}
+
+class _InlineBlockOnWidgetsFactory extends WidgetFactory {
+  @override
+  void parse(BuildMetadata meta) {
+    if (meta.element.localName == 'span') {
+      meta.register(
+        BuildOp(
+          onWidgets: (_, __) => const [Text('Bar')],
+        ),
+      );
+    }
+    super.parse(meta);
+  }
 }

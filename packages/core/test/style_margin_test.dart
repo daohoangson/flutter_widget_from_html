@@ -32,7 +32,9 @@ void main() {
         explained,
         equals(
           '[SizedBox:0.0x1.0],'
-          '[Padding:(0,4,0,2),child=[CssBlock:child=[RichText:dir=rtl,(:Foo)]]],'
+          '[Padding:(0,4,0,2),child='
+          '[CssBlock:child=[RichText:dir=rtl,(:Foo)]]'
+          '],'
           '[SizedBox:0.0x3.0]',
         ),
       );
@@ -202,7 +204,10 @@ void main() {
       explained,
       equals(
         '[SizedBox:0.0x2.0],'
-        '[Padding:(0,1,0,1),child=[CssBlock:child=[Padding:(0,2,0,2),child=[CssBlock:child=[RichText:(:Foo)]]]]],'
+        '[Padding:(0,1,0,1),child='
+        '[CssBlock:child=[Padding:(0,2,0,2),child='
+        '[CssBlock:child=[RichText:(:Foo)]]'
+        ']]],'
         '[SizedBox:0.0x2.0]',
       ),
     );
@@ -448,7 +453,7 @@ void main() {
 
     testWidgets('renders inline-start (ltr)', (WidgetTester tester) async {
       const html = 'a<span style="margin-inline-start: 5px">b</span>c';
-      final explained = await explain(tester, html, rtl: false);
+      final explained = await explain(tester, html);
       expect(
         explained,
         equals(
@@ -465,7 +470,7 @@ void main() {
 
     testWidgets('renders inline-end (ltr)', (WidgetTester tester) async {
       const html = 'a<span style="margin-inline-end: 5px">b</span>c';
-      final explained = await explain(tester, html, rtl: false);
+      final explained = await explain(tester, html);
       expect(
         explained,
         equals(
@@ -520,24 +525,14 @@ void main() {
       const html = '<div style="margin-top: 1em">'
           '<div style="margin-top: 1em">Foo</div></div>';
       final explained = await helper.explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[CssBlock:child=[CssBlock:child=[RichText:(:Foo)]]]',
-        ),
-      );
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('trims bottom instances', (WidgetTester tester) async {
       const html = '<div style="margin-bottom: 1em">'
           '<div style="margin-bottom: 1em">Foo</div></div>';
       final explained = await helper.explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[CssBlock:child=[CssBlock:child=[RichText:(:Foo)]]]',
-        ),
-      );
+      expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('trims both ways', (WidgetTester tester) async {

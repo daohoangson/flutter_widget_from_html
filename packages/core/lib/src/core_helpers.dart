@@ -52,7 +52,7 @@ typedef CustomWidgetBuilder = Widget? Function(dom.Element element);
 
 /// A callback to scroll the anchor identified by [id] into the viewport.
 ///
-/// By default, an internal implementation is given to [WidgetFactory.onTapAnchor]
+/// By default, an internal impl is given to [WidgetFactory.onTapAnchor]
 /// when an anchor is tapped to handle the scrolling.
 /// A wf subclass can use this to change the [curve], the animation [duration]
 /// or even request scrolling to a different anchor.
@@ -118,12 +118,18 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   /// The origin of this widget.
   final T generator;
 
+  final bool _autoUnwrap;
   final List<Widget? Function(BuildContext, Widget)> _builders = [];
   final Widget? _firstChild;
 
   /// Creates a widget builder.
-  WidgetPlaceholder(this.generator, {Widget? child, Key? key})
-      : _firstChild = child,
+  WidgetPlaceholder(
+    this.generator, {
+    bool autoUnwrap = true,
+    Widget? child,
+    Key? key,
+  })  : _autoUnwrap = autoUnwrap,
+        _firstChild = child,
         super(key: key);
 
   @visibleForTesting
@@ -132,10 +138,18 @@ class WidgetPlaceholder<T> extends StatelessWidget {
 
   /// Calls builder callbacks on the specified [child] widget.
   Widget callBuilders(BuildContext context, Widget? child) {
-    var built = child ?? widget0;
+    var built = unwrap(context, child ?? widget0);
+    if (child != null && built == widget0) {
+      // child has been unwrapped into no op, stop processing further right now
+      return widget0;
+    }
 
     for (final builder in _builders) {
-      built = builder(context, built) ?? widget0;
+      built = unwrap(context, builder(context, built) ?? widget0);
+      if (built == widget0) {
+        // builder returns no op, cancel subsequent callbacks
+        return widget0;
+      }
     }
 
     built.setAnchorsIfUnset(anchors);
@@ -170,6 +184,19 @@ class WidgetPlaceholder<T> extends StatelessWidget {
   static WidgetPlaceholder lazy(Widget child) => child is WidgetPlaceholder
       ? child
       : WidgetPlaceholder<Widget>(child, child: child);
+
+  /// Unwraps a placeholder if `autoUnwrap` has been set.
+  static Widget unwrap(BuildContext context, Widget widget) {
+    if (widget is WidgetPlaceholder) {
+      if (widget._autoUnwrap) {
+        return widget.build(context);
+      } else {
+        return widget;
+      }
+    } else {
+      return widget;
+    }
+  }
 }
 
 final _dataUriRegExp = RegExp('^data:[^;]+;([^,]+),');
@@ -202,9 +229,21 @@ Uint8List? bytesFromDataUri(String dataUri) {
 Iterable<T>? listOrNull<T>(T? x) => x == null ? null : [x];
 
 /// Parses [key] from [map] as an double literal and return its value.
-double? tryParseDoubleFromMap(Map<dynamic, String> map, String key) =>
-    map.containsKey(key) ? double.tryParse(map[key]!) : null;
+double? tryParseDoubleFromMap(Map<dynamic, String> map, String key) {
+  final value = map[key];
+  if (value == null) {
+    return null;
+  }
 
-/// Parses [key] from [map] as a, possibly signed, integer literal and return its value.
-int? tryParseIntFromMap(Map<dynamic, String> map, String key) =>
-    map.containsKey(key) ? int.tryParse(map[key]!) : null;
+  return double.tryParse(value);
+}
+
+/// Parses [key] from [map] as an integer literal and return its value.
+int? tryParseIntFromMap(Map<dynamic, String> map, String key) {
+  final value = map[key];
+  if (value == null) {
+    return null;
+  }
+
+  return int.tryParse(value);
+}

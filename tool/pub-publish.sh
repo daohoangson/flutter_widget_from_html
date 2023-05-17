@@ -30,17 +30,24 @@ function publish {
     flutter test
   fi
 
+  cat .gitignore >.pubignore
+  echo '/test/' >>.pubignore
+  yq e 'del(.flutter)' -i pubspec.yaml
+
   flutter pub publish
 
   # revert the changes
   git checkout .
+  rm .pubignore
 }
 
 (cd packages/core && publish)
 (cd packages/fwfh_cached_network_image && publish)
 (cd packages/fwfh_chewie && publish)
 (cd packages/fwfh_just_audio && publish)
+(cd packages/fwfh_selectable_text && publish)
 (cd packages/fwfh_svg && publish)
+(cd packages/fwfh_text_style && publish)
 (cd packages/fwfh_url_launcher && publish)
 (cd packages/fwfh_webview && publish)
 (cd packages/enhanced && publish)

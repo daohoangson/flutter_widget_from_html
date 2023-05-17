@@ -1,8 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+
+import 'internal/platform_specific/fallback.dart'
+    if (dart.library.io) 'internal/platform_specific/io.dart';
 
 /// A mixin that can render SVG with `flutter_svg` plugin.
 mixin SvgFactory on WidgetFactory {
@@ -78,11 +79,11 @@ mixin SvgFactory on WidgetFactory {
       return null;
     }
 
-    return FilePicture(
+    return filePicture(
       svgAllowDrawingOutsideViewBox
           ? SvgPicture.svgByteDecoderOutsideViewBoxBuilder
           : SvgPicture.svgByteDecoderBuilder,
-      File(filePath),
+      filePath,
     );
   }
 

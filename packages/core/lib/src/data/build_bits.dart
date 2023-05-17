@@ -155,9 +155,9 @@ abstract class BuildBit<InputType, OutputType> {
 /// A tree of [BuildBit]s.
 abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
   static final _anchors = Expando<List<Key>>();
+  static final _buffers = Expando<StringBuffer>();
 
   final _children = <BuildBit>[];
-  final _toStringBuffer = StringBuffer();
 
   /// Creates a tree.
   BuildTree(BuildTree? parent, TextStyleBuilder tsb) : super(parent, tsb);
@@ -225,9 +225,6 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
     return bit;
   }
 
-  /// Adds a new line.
-  BuildBit addNewLine() => add(_SwallowWhitespaceBit(this, 10));
-
   /// Adds whitespace.
   BuildBit addWhitespace(String data) => add(WhitespaceBit(this, data));
 
@@ -265,11 +262,12 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
   @override
   String toString() {
     // avoid circular references
-    if (_toStringBuffer.length > 0) {
+    final existing = _buffers[this];
+    if (existing != null) {
       return '$runtimeType#$hashCode (circular)';
     }
 
-    final sb = _toStringBuffer;
+    final sb = _buffers[this] = StringBuffer();
     sb.writeln('$runtimeType#$hashCode $tsb:');
 
     const _indent = '  ';
@@ -278,7 +276,7 @@ abstract class BuildTree extends BuildBit<void, Iterable<Widget>> {
     }
 
     final str = sb.toString().trimRight();
-    sb.clear();
+    _buffers[this] = null;
 
     return str;
   }
@@ -392,31 +390,4 @@ class WhitespaceBit extends BuildBit<void, String> {
 
   @override
   String toString() => 'Whitespace[${data.codeUnits.join(' ')}]#$hashCode';
-}
-
-class _SwallowWhitespaceBit extends BuildBit<void, String> {
-  final int charCode;
-
-  _SwallowWhitespaceBit(
-    BuildTree parent,
-    this.charCode, {
-    TextStyleBuilder? tsb,
-  }) : super(parent, tsb ?? parent.tsb);
-
-  @override
-  bool get swallowWhitespace => true;
-
-  @override
-  String buildBit(void _) => String.fromCharCode(charCode);
-
-  @override
-  BuildBit copyWith({BuildTree? parent, TextStyleBuilder? tsb}) =>
-      _SwallowWhitespaceBit(
-        parent ?? this.parent!,
-        charCode,
-        tsb: tsb ?? this.tsb,
-      );
-
-  @override
-  String toString() => 'ASCII-$charCode';
 }

@@ -2,7 +2,6 @@ import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart'
     show CircularProgressIndicator, Theme, ThemeData, Tooltip;
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import 'core_data.dart';
@@ -17,7 +16,7 @@ import 'internal/platform_specific/fallback.dart'
 
 /// A factory to build widgets.
 class WidgetFactory {
-  /// Setting this property to true replaces the default loading widget with a static [Text].
+  /// Setting this property to true replaces the default with a static [Text].
   /// This property is most useful for testing purposes.
   ///
   /// Defaults to `false`, resulting in a [CircularProgressIndicator].
@@ -50,7 +49,7 @@ class WidgetFactory {
 
   /// Gets the current anchor registry.
   ///
-  /// This is an implementation detail and may be changed without a major version bump.
+  /// This is an impl detail and may be changed without a major version bump.
   @protected
   AnchorRegistry get anchorRegistry => _anchorRegistry;
 
@@ -166,6 +165,7 @@ class WidgetFactory {
 
     final container = child is Container ? child : null;
     final decoratedBox = child is DecoratedBox ? child : null;
+    final grandChild = container?.child ?? decoratedBox?.child;
     final prevDeco = container?.decoration ?? decoratedBox?.decoration;
     final baseDeco =
         prevDeco is BoxDecoration ? prevDeco : const BoxDecoration();
@@ -178,7 +178,7 @@ class WidgetFactory {
     if (!isBorderBox || container != null) {
       return Container(
         decoration: decoration,
-        child: container?.child ?? child,
+        child: grandChild ?? child,
       );
     } else {
       return DecoratedBox(
@@ -293,7 +293,7 @@ class WidgetFactory {
     int index,
   ) {
     final text = getListMarkerText(listStyleType, index);
-    final style = tsh.styleWithHeight;
+    final style = tsh.style;
     return text.isNotEmpty
         ? RichText(
             maxLines: 1,
@@ -397,7 +397,7 @@ class WidgetFactory {
         WidgetPlaceholder<BuildTree>(tree).wrapWith((context, _) {
           final tsh = tree.tsb.build(context);
           final span = flattened.spanBuilder!(context, tsh.whitespace);
-          if (span == null || span is! InlineSpan) {
+          if (span == null) {
             return widget0;
           }
 
@@ -637,16 +637,18 @@ class WidgetFactory {
 
     switch (meta.element.localName) {
       case kTagA:
-        _tagA ??= TagA(this).buildOp;
-        meta.register(_tagA!);
+        if (attrs.containsKey(kAttributeAHref)) {
+          final tagA = _tagA ??= TagA(this).buildOp;
+          meta.register(tagA);
 
-        meta.tsb.enqueue(
-          _tagAColor ??= (tsh, _) => tsh.copyWith(
+          final tagAColor = _tagAColor ??= (tsh, _) => tsh.copyWith(
                 style: tsh.style.copyWith(
                   color: tsh.getDependency<ThemeData>().colorScheme.primary,
                 ),
-              ),
-        );
+              );
+
+          meta.tsb.enqueue(tagAColor);
+        }
 
         final name = attrs[kAttributeAName];
         if (name != null) {
@@ -697,9 +699,8 @@ class WidgetFactory {
         meta.tsb.enqueue(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
         break;
 
-      case 'br':
-        _tagBr ??= BuildOp(onTree: (_, tree) => tree.addNewLine());
-        meta.register(_tagBr!);
+      case kTagBr:
+        meta.register(_tagBr ??= TagBr(this).buildOp);
         break;
 
       case kTagCenter:

@@ -440,7 +440,7 @@ void main() {
 
     testWidgets('renders inline-start (ltr)', (WidgetTester tester) async {
       const html = 'a<span style="padding-inline-start: 5px">b</span>c';
-      final explained = await explain(tester, html, rtl: false);
+      final explained = await explain(tester, html);
       expect(
         explained,
         equals(
@@ -457,7 +457,7 @@ void main() {
 
     testWidgets('renders inline-end (ltr)', (WidgetTester tester) async {
       const html = 'a<span style="padding-inline-end: 5px">b</span>c';
-      final explained = await explain(tester, html, rtl: false);
+      final explained = await explain(tester, html);
       expect(
         explained,
         equals(
@@ -574,8 +574,11 @@ void main() {
           '[CssBlock:child='
           '[DecoratedBox:bg=#FFFF0000,child='
           '[Padding:(5,5,5,5),child='
-          '[Column:children=[SizedBox:0.0x12.4],[CssBlock:child=[RichText:(@15.0+b:Foo)]],[SizedBox:0.0x12.4]]'
-          ']]]',
+          '[Column:children='
+          '[SizedBox:0.0x12.4],'
+          '[CssBlock:child=[RichText:(@15.0+b:Foo)]],'
+          '[SizedBox:0.0x12.4]'
+          ']]]]',
         ),
       );
     });

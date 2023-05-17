@@ -1,3 +1,29 @@
+## 0.8.4
+
+- Add support for rtl in `HtmlTable` (#681)
+- Improve parser for `border` inline style (#685, authored by @EA-YOUHOU)
+- Remove decoration when href is missing (#678, authored by @EA-YOUHOU)
+- Fix background color being rendered twice (#691)
+- Fix error on `TextStyle.merge` (#680, #693)
+
+## 0.8.3+1
+
+- Expose `BuildMetadata.maxLines` and `.overflow`
+
+## 0.8.3
+
+- Add support for Flutter@2.8 (#655)
+- New package: `fwfh_text_style` (#628)
+- Allow `HtmlWidget.textStyle` to be null (#632)
+- Fix detached sub-tree still being built (#650)
+- Fix bug text-align with padding (#651)
+- Fix anchor being stuck (#659)
+
+## 0.8.2
+
+- Optimize `HtmlListMarker` (#623)
+- Fix leading and trailing whitespace within `PRE` being trimmed (#624)
+
 ## 0.8.1
 
 - Mark enhanced `HtmlWidget.webViewXxx` properties as deprecated (#614)

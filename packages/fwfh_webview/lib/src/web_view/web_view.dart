@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'fallback.dart'
@@ -40,7 +39,7 @@ class WebView extends StatefulWidget {
 
   /// The callback to handle navigation request.
   ///
-  /// This callback will be triggered on generated navigation within the web view.
+  /// This will be triggered on generated navigation within the web view.
   /// Returning `true` will stop web view from navigating.
   ///
   /// Flutter Web is not supported.

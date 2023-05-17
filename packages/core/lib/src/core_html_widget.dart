@@ -3,11 +3,11 @@ import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 
 import 'core_data.dart';
+import 'core_helpers.dart';
 import 'core_widget_factory.dart';
 import 'internal/builder.dart' as builder;
 import 'internal/tsh_widget.dart';
@@ -52,14 +52,16 @@ class HtmlWidget extends StatefulWidget {
 
   /// The callback when user taps a link.
   ///
-  /// Returns `true` if the url has been handled, the default handler will be skipped.
+  /// Returns `true` if the url has been handled,
+  /// the default handler will be skipped.
   final FutureOr<bool> Function(String)? onTapUrl;
 
   /// The render mode.
   ///
   /// - [RenderMode.column] is the default mode, suitable for small / medium document.
-  /// - [RenderMode.listView] has better performance as it renders contents lazily.
-  /// - [RenderMode.sliverList] has similar performance as `ListView` and can be put inside a `CustomScrollView`.
+  /// - [RenderMode.listView] has better performance as it renders lazily.
+  /// - [RenderMode.sliverList] has similar performance as `ListView`
+  /// and can be put inside a `CustomScrollView`.
   final RenderMode renderMode;
 
   /// The default styling for text elements.
@@ -82,7 +84,7 @@ class HtmlWidget extends StatefulWidget {
     this.onTapImage,
     this.onTapUrl,
     this.renderMode = RenderMode.column,
-    this.textStyle = const TextStyle(),
+    this.textStyle,
   }) : super(key: key);
 
   @override

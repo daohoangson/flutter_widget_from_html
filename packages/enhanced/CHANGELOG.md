@@ -1,3 +1,46 @@
+## 0.8.5
+
+- Improve `IFRAME` error & timer handling (#709)
+- Fix `FwfhTextStyle` usage within `CupertinoPageScaffold` (#713)
+
+## 0.8.4
+
+- Add support for rtl in `HtmlTable` (#681)
+- Improve parser for `border` inline style (#685, authored by @EA-YOUHOU)
+- Remove decoration when href is missing (#678, authored by @EA-YOUHOU)
+- Fix wrong text scale when `isSelectable=true` (#689)
+- Fix background color being rendered twice (#691)
+- Fix error on `TextStyle.merge` (#680, #693)
+
+## 0.8.3+1
+
+- Add support for `HtmlWidget.isSelectable` (#631)
+- Add support for `HtmlWidget.onSelectionChanged` (#672)
+- New package: `fwfh_selectable_text` (#672)
+
+## 0.8.3
+
+- Add support for Flutter@2.8 (#655)
+- Add support for flutter_svg@1.0 (#648)
+- Add support for webview_flutter@3.0 (#657)
+- New package: `fwfh_text_style` (#628)
+- Allow `HtmlWidget.textStyle` to be null (#632)
+- Conditionally import `flutter_cache_manager` (#641)
+- Avoid importing `dart:io` in svg_factory.dart (#653)
+- Fix detached sub-tree still being built (#650)
+- Fix bug text-align with padding (#651)
+- Fix anchor being stuck (#659)
+
+## 0.8.2
+
+- Optimize `HtmlListMarker` (#623)
+- Fix leading and trailing whitespace within `PRE` being trimmed (#624)
+- Replace `evaluateJavascript` with `runJavascriptReturningResult` (#625)
+
+## 0.8.1+1
+
+- Fix missing `test/images` directory
+
 ## 0.8.1
 
 - Mark enhanced `HtmlWidget.webViewXxx` properties as deprecated (#614)

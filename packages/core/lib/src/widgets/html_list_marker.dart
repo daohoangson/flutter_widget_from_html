@@ -4,7 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 /// A list marker.
-class HtmlListMarker extends SingleChildRenderObjectWidget {
+class HtmlListMarker extends LeafRenderObjectWidget {
   /// The marker type.
   final HtmlListMarkerType markerType;
 
@@ -62,11 +62,8 @@ class HtmlListMarker extends SingleChildRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(
-    BuildContext _,
-    _ListMarkerRenderObject renderObject,
-  ) {
-    renderObject
+  void updateRenderObject(BuildContext _, RenderObject renderObject) {
+    (renderObject as _ListMarkerRenderObject)
       ..markerType = markerType
       ..textStyle = textStyle;
   }
