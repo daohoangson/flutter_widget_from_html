@@ -1,3 +1,17 @@
+## 0.11.0-alpha.1
+
+- Replace `RebuildTriggers` with `listEquals`
+- Refactor `WidgetPlaceholder` to be simpler (#619)
+- Refactor `Flattener` to be simpler (#627)
+- Refactor `BuildMetadata` into `BuildTree` (#649)
+
+Major breaking changes if you have custom rendering:
+
+- BuildOp: renamed onTreeFlattening, onWidgets
+- Added: HtmlStyle, HtmlStyleBuilder
+- Removed: BuildMetadata, RebuildTriggers
+- Changed: BuildBit, WidgetPlaceholder
+
 ## 0.10.0
 
 - Add support for Flutter 3.7 (#861)

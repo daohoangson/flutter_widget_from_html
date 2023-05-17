@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_widget_from_html_core: ">=0.8.0 <0.11.0"
+  flutter_widget_from_html_core: ^0.11.0-0
   webview_flutter: ^4.0.1
   webview_flutter_android: ^3.0.0
   webview_flutter_wkwebview: ^3.0.0
