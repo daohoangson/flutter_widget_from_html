@@ -2,7 +2,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:flutter_widget_from_html_core/src/internal/html_style_widget.dart';
 
 export '_constants.dart';
 
@@ -571,7 +570,8 @@ class Explainer {
       return _htmlListMarker(widget);
     }
 
-    if (widget is HtmlStyleWidget) {
+    if (widget.runtimeType.toString() == 'HtmlStyleWidget' &&
+        widget is InheritedWidget) {
       return _widget(widget.child);
     }
 
@@ -584,10 +584,10 @@ class Explainer {
       return _widget(widget.build(context));
     }
 
-    if (widget.runtimeType.toString() == '_MinWidthZero') {
+    if (widget.runtimeType.toString() == '_MinWidthZero' &&
+        widget is ConstraintsTransformBox) {
       // TODO: verify min-width resetter in tests when it's stable
-      // ignore: avoid_dynamic_calls
-      return _widget((widget as dynamic).child as Widget);
+      return _widget(widget.child!);
     }
 
     if (widget is Image) {

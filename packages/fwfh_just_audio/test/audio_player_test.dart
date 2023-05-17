@@ -237,7 +237,7 @@ class _JustAudioPlatform extends JustAudioPlatform {
 }
 
 class _AudioPlayerPlatform extends AudioPlayerPlatform {
-  _AudioPlayerPlatform(String id) : super(id);
+  _AudioPlayerPlatform(super.id);
 
   @override
   Stream<PlaybackEventMessage> get playbackEventMessageStream =>
