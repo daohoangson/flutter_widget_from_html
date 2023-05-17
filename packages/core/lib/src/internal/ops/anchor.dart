@@ -6,6 +6,9 @@ class AnchorRegistry {
   final _bodyItemIndeces = <int>[];
   final _bodyItemKeys = <GlobalKey>[];
   final _indexByAnchor = <Key, _AnchorBodyItemIndex>{};
+  final BuildContext _rootContext;
+
+  AnchorRegistry(this._rootContext);
 
   Widget buildBodyItem(BuildContext context, int index, Widget widget) {
     final header = index * 2;
@@ -139,7 +142,22 @@ class AnchorRegistry {
       return false;
     }
 
-    final position = Scrollable.of(context!)?.position;
+    ScrollableState? scrollState;
+    if (_bodyItemIndeces.isNotEmpty) {
+      final currentIndex = _bodyItemIndeces.first;
+      final currentKey = _bodyItemKeys[currentIndex * 2];
+      final currentContext = currentKey.currentContext;
+      if (currentContext != null) {
+        // we have body key, find the nearest scrollable accestor
+        // should work for ListView render mode
+        scrollState = Scrollable.of(currentContext);
+      }
+    }
+    // plan B: look for scrollable from the root build context
+    // should work for Column, SliverList render mode
+    scrollState ??= Scrollable.of(_rootContext);
+
+    final position = scrollState?.position;
     if (position == null) {
       return false;
     }
