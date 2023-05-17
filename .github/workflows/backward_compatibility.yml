@@ -4,8 +4,9 @@ on:
     branches:
       - master
   pull_request:
-    branches:
-      - master
+    branches-ignore:
+      - release/beta
+      - release/master
 
 permissions:
   contents: read
