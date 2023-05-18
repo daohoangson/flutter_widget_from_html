@@ -1,17 +1,23 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fwfh_just_audio/fwfh_just_audio.dart' as fwfh;
+import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:just_audio_platform_interface/just_audio_platform_interface.dart';
 import 'package:tuple/tuple.dart';
+
+import '../../core/test/_.dart' as core;
 
 final _commands = <Tuple2>[];
 late Duration _duration;
 late StreamController<PlaybackEventMessage> _playbackEvents;
 
-void main() {
+Future<void> main() async {
+  await loadAppFonts();
+
   const audioSessionMc = MethodChannel('com.ryanheise.audio_session');
   const src = 'http://domain.com/audio.mp3';
 
@@ -221,6 +227,41 @@ void main() {
         await tester.pumpAndSettle();
       });
     });
+
+    final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
+    final goldenSkip = goldenSkipEnvVar == null
+        ? Platform.isLinux
+            ? null
+            : 'Linux only'
+        : 'GOLDEN_SKIP=$goldenSkipEnvVar';
+
+    GoldenToolkit.runWithConfiguration(
+      () {
+        testGoldens(
+          'screenshot testing',
+          (tester) async {
+            Widget build(ThemeData theme) {
+              final wrapper = materialAppWrapper(theme: theme);
+              return AspectRatio(
+                aspectRatio: 4,
+                child: wrapper(const Center(child: fwfh.AudioPlayer(src))),
+              );
+            }
+
+            final builder = GoldenBuilder.column()
+              ..addScenario('Light theme', build(ThemeData.light()))
+              ..addScenario('Dark theme', build(ThemeData.dark()));
+            await tester.pumpWidgetBuilder(builder.build());
+            await screenMatchesGolden(tester, 'scenarios');
+          },
+          skip: goldenSkip != null,
+        );
+      },
+      config: GoldenToolkitConfiguration(
+        fileNameFactory: (name) =>
+            '${core.kGoldenFilePrefix}/just_audio/$name.png',
+      ),
+    );
   });
 }
 

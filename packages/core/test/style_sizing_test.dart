@@ -425,14 +425,14 @@ void main() {
     expect(
       explained,
       equals(
-        '[DecoratedBox:bg=#FFFF0000,child='
+        '[Container:bg=#FFFF0000,child='
         '[Padding:(20,20,20,20),child='
         '[Column:children=[SizedBox:0.0x15.0],'
         '[CssBlock:child='
-        '[DecoratedBox:bg=#FF008000,child='
+        '[Container:bg=#FF008000,child='
         '[CssBlock:child='
         '[Padding:(0,15,0,15),child='
-        '[DecoratedBox:bg=#FF0000FF,child='
+        '[Container:bg=#FF0000FF,child='
         '[Padding:(5,5,5,5),child='
         '[CssSizing:height=100.0,width=100.0,child='
         '[RichText:(#FFFFFFFF:Foo)]'

@@ -168,10 +168,8 @@ class _FakeWebViewWidget extends PlatformWebViewWidget {
   Widget build(BuildContext context) {
     return _FakeWebViewControllerTimerDisposer(
       controller: params.controller as FakeWebViewController,
-      child: const DecoratedBox(
-        decoration: BoxDecoration(
-          color: Colors.grey,
-        ),
+      child: const ColoredBox(
+        color: Colors.grey,
         child: Placeholder(
           color: Colors.black,
         ),

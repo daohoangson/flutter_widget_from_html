@@ -749,37 +749,6 @@ void main() {
     });
   });
 
-  group('box-sizing', () {
-    testWidgets('renders without box-sizing', (tester) async {
-      const html = '<span style="border: solid">Foo</span>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals('[Container:border=$_border1,child=[RichText:(:Foo)]]'),
-      );
-    });
-
-    testWidgets('parses content-box', (tester) async {
-      const html =
-          '<span style="border: solid; box-sizing: content-box">Foo</span>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals('[Container:border=$_border1,child=[RichText:(:Foo)]]'),
-      );
-    });
-
-    testWidgets('parses border-box', (tester) async {
-      const html =
-          '<span style="border: solid; box-sizing: border-box">Foo</span>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals('[DecoratedBox:border=$_border1,child=[RichText:(:Foo)]]'),
-      );
-    });
-  });
-
   group('overwriting', () {
     testWidgets('overwrites border with border-top', (tester) async {
       const html =
@@ -1115,34 +1084,6 @@ void main() {
           '[CssBlock:child=[RichText:(@15.0+b:Foo)]],'
           '[SizedBox:0.0x12.4]'
           ']]',
-        ),
-      );
-    });
-
-    testWidgets('renders border-box with background', (tester) async {
-      const html =
-          '<div style="background: red; border: solid red; box-sizing: border-box">Foo</div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[DecoratedBox:bg=#FFFF0000,border=1.0@solid#FFFF0000,child='
-          '[CssBlock:child='
-          '[RichText:(:Foo)]]]',
-        ),
-      );
-    });
-
-    testWidgets('renders content-box with background', (tester) async {
-      const html =
-          '<div style="background: red; border: solid red; box-sizing: content-box">Foo</div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[Container:bg=#FFFF0000,border=1.0@solid#FFFF0000,child='
-          '[CssBlock:child='
-          '[RichText:(:Foo)]]]',
         ),
       );
     });

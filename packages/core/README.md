@@ -133,7 +133,6 @@ These tags and their contents will be ignored:
   - border-top-right-radius: 2 values or 1 value in `em`, `pt` and `px`
   - border-bottom-right-radius: 2 values or 1 value in `em`, `pt` and `px`
   - border-bottom-left-radius: 2 values or 1 value in `em`, `pt` and `px`
-- box-sizing: border-box/content-box
 - color: hex values, `rgb()`, `hsl()` or named colors
 - direction (similar to `dir` attribute)
 - font-family

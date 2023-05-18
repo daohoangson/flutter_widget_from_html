@@ -499,7 +499,7 @@ Future<void> main() async {
         equals(
           '[HtmlTable:children='
           '[HtmlTableCell:child='
-          '[DecoratedBox:bg=#FFFF0000,child='
+          '[Container:bg=#FFFF0000,child='
           '[Padding:(1,1,1,1),child='
           '[Align:alignment=centerLeft,child='
           '[RichText:(:Foo)]'
