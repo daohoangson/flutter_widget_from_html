@@ -182,7 +182,7 @@ These tags and their contents will be ignored:
   - text-decoration-style: dotted/dashed/double/solid
   - text-decoration-thickness, text-decoration-width: values in `%` only
 - text-overflow: clip/ellipsis. Note: `text-overflow: ellipsis` should be used in conjuntion with `max-lines` or `-webkit-line-clamp` for better result.
-- white-space: normal/pre
+- white-space: pre/normal/nowrap
 - Sizing: `auto` or values in `em`, `%`, `pt` and `px`
   - width, max-width, min-width
   - height, max-height, min-height

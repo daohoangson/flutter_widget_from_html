@@ -417,6 +417,10 @@ enum CssWhitespace {
   /// Lines are broken as necessary to fill line boxes.
   normal,
 
+  /// Collapses white space as for normal,
+  /// but suppresses line breaks (text wrapping) within the source.
+  nowrap,
+
   /// Sequences of white space are preserved.
   /// Lines are only broken at newline characters in the source and at `BR`s.
   pre,

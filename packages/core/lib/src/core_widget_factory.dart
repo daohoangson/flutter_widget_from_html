@@ -329,12 +329,7 @@ class WidgetFactory {
     final text = getListMarkerText(listStyleType, index);
     final textStyle = style.textStyle;
     if (text.isNotEmpty) {
-      return RichText(
-        maxLines: 1,
-        softWrap: false,
-        text: TextSpan(style: textStyle, text: text),
-        textDirection: style.textDirection,
-      );
+      return buildText(tree, style, TextSpan(style: textStyle, text: text));
     }
 
     switch (listStyleType) {
@@ -361,17 +356,28 @@ class WidgetFactory {
           : Padding(padding: padding, child: child);
 
   /// Builds [RichText].
-  Widget? buildText(BuildTree tree, HtmlStyle style, InlineSpan text) =>
-      RichText(
-        maxLines: tree.maxLines > 0 ? tree.maxLines : null,
-        overflow: tree.overflow,
-        selectionRegistrar: style.getDependency(),
-        selectionColor:
-            style.getDependency<DefaultSelectionStyle>().selectionColor,
-        text: text,
-        textAlign: style.textAlign ?? TextAlign.start,
-        textDirection: style.textDirection,
-      );
+  Widget? buildText(BuildTree tree, HtmlStyle style, InlineSpan text) {
+    const selectionColorDefault = DefaultSelectionStyle.defaultColor;
+    final selectionRegistrar = style.getDependency<SelectionRegistrar?>();
+    final selectionStyle = style.getDependency<DefaultSelectionStyle>();
+
+    Widget built = RichText(
+      maxLines: tree.maxLines > 0 ? tree.maxLines : null,
+      overflow: tree.overflow,
+      selectionColor: selectionStyle.selectionColor ?? selectionColorDefault,
+      selectionRegistrar: selectionRegistrar,
+      softWrap: style.whitespace != CssWhitespace.nowrap,
+      text: text,
+      textAlign: style.textAlign ?? TextAlign.start,
+      textDirection: style.textDirection,
+    );
+
+    if (selectionRegistrar != null) {
+      built = MouseRegion(cursor: SystemMouseCursors.text, child: built);
+    }
+
+    return built;
+  }
 
   /// Builds [TextSpan].
   InlineSpan? buildTextSpan({

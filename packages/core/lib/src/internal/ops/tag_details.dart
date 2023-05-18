@@ -63,13 +63,26 @@ class TagDetails {
           return placeholder.wrapWith(
             (context, child) {
               final style = tree.styleBuilder.build(context);
+              final textStyle = style.textStyle;
+              final summary = _summary ??
+                  wf.buildText(
+                    tree,
+                    style,
+                    TextSpan(
+                      children: [
+                        WidgetSpan(child: HtmlDetailsMarker(style: textStyle)),
+                        // TODO: i18n
+                        TextSpan(text: 'Details', style: textStyle),
+                      ],
+                    ),
+                  );
 
               return HtmlDetails(
                 open: open,
                 child: wf.buildColumnWidget(
                   context,
                   [
-                    HtmlSummary(style: style.textStyle, child: _summary),
+                    HtmlSummary(style: style.textStyle, child: summary),
                     HtmlDetailsContents(child: child),
                   ],
                   dir: style.getDependency(),

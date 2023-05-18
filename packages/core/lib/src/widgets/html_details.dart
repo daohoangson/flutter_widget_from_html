@@ -100,21 +100,7 @@ class HtmlSummary extends StatelessWidget {
           htmlDetails.setIsOpen(!htmlDetails.isOpen);
         }
       },
-      child: child ?? _buildDefault(context),
-    );
-  }
-
-  Widget _buildDefault(BuildContext context) {
-    // TODO: i18n
-    const text = 'Details';
-
-    return RichText(
-      text: TextSpan(
-        children: [
-          WidgetSpan(child: HtmlDetailsMarker(style: style)),
-          TextSpan(text: text, style: style),
-        ],
-      ),
+      child: child,
     );
   }
 }

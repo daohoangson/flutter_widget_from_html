@@ -25,7 +25,7 @@ String item(String markerText, String contents, {String? child}) {
 
 String marker(String text) => text.startsWith('[HtmlListMarker.')
     ? text
-    : '[RichText:maxLines=1,(:$text)]';
+    : '[RichText:maxLines=1,softWrap=false,(:$text)]';
 
 Future<void> main() async {
   await loadAppFonts();
@@ -746,11 +746,11 @@ Future<void> main() async {
         equals(
           '[Padding:(0,40,0,0),child=[CssBlock:child=[Column:dir=rtl,children='
           '[HtmlListItem:children=[RichText:dir=rtl,(:One)],'
-          '[RichText:maxLines=1,dir=rtl,(:1.)]],'
+          '[RichText:maxLines=1,softWrap=false,dir=rtl,(:1.)]],'
           '[HtmlListItem:children=[RichText:dir=rtl,(:Two)],'
-          '[RichText:maxLines=1,dir=rtl,(:2.)]],'
+          '[RichText:maxLines=1,softWrap=false,dir=rtl,(:2.)]],'
           '[HtmlListItem:children=[RichText:dir=rtl,(+b:Three)],'
-          '[RichText:maxLines=1,dir=rtl,(:3.)]]'
+          '[RichText:maxLines=1,softWrap=false,dir=rtl,(:3.)]]'
           ']]]',
         ),
       );

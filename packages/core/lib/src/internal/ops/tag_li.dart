@@ -93,15 +93,16 @@ class TagLi {
     Widget child,
     int i,
   ) {
+    final tree = itemTree.sub()
+      ..maxLines = 1
+      ..apply(TextStyleOps.whitespace, CssWhitespace.nowrap);
     final listData = listTree.listData;
     final listStyleType = itemTree.itemStyleType ?? listTree.listStyleType;
-    final markerIndex = listData.markerReversed
+    final index = listData.markerReversed
         ? (listData.markerStart ?? listData.items) - i
         : (listData.markerStart ?? 1) + i;
-    final style = itemTree.styleBuilder.build(context);
-
-    final marker =
-        wf.buildListMarker(itemTree, style, listStyleType, markerIndex);
+    final style = tree.styleBuilder.build(context);
+    final marker = wf.buildListMarker(tree, style, listStyleType, index);
     if (marker == null) {
       return child;
     }
