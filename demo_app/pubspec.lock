@@ -227,7 +227,7 @@ packages:
       path: "../packages/enhanced"
       relative: true
     source: path
-    version: "0.10.0"
+    version: "0.10.1"
   flutter_widget_from_html_core:
     dependency: "direct main"
     description:

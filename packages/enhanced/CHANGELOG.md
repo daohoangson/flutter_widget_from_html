@@ -1,3 +1,9 @@
+## 0.10.1
+
+- Add support for Flutter 3.10 (#889)
+- Apply OpenSSF Scorecard (#888)
+- Remove default value `enableCaching=true` (#893)
+
 ## 0.10.0
 
 - Add support for Flutter 3.7 (#861)
