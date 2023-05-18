@@ -329,11 +329,10 @@ class WidgetFactory {
     final text = getListMarkerText(listStyleType, index);
     final textStyle = style.textStyle;
     if (text.isNotEmpty) {
-      return RichText(
-        maxLines: 1,
-        softWrap: false,
-        text: TextSpan(style: textStyle, text: text),
-        textDirection: style.textDirection,
+      return buildText(
+        tree.sub()..maxLines = 1,
+        style.copyWith(softWrap: false),
+        TextSpan(style: textStyle, text: text),
       );
     }
 
@@ -371,6 +370,7 @@ class WidgetFactory {
       overflow: tree.overflow,
       selectionColor: selectionStyle.selectionColor ?? selectionColorDefault,
       selectionRegistrar: selectionRegistrar,
+      softWrap: style.softWrap,
       text: text,
       textAlign: style.textAlign ?? TextAlign.start,
       textDirection: style.textDirection,

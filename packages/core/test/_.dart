@@ -610,6 +610,15 @@ class Explainer {
       attr.add('maxLines=$maxLines');
     }
 
+    final softWrap = widget is RichText
+        ? widget.softWrap
+        : widget is Text
+            ? widget.softWrap
+            : null;
+    if (softWrap == false) {
+      attr.add('softWrap=$softWrap');
+    }
+
     attr.add(
       _textAlign(
         widget is RichText
