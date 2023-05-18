@@ -282,7 +282,7 @@ packages:
       path: "../packages/fwfh_text_style"
       relative: true
     source: path
-    version: "2.22.08+1"
+    version: "2.22.8+2"
   fwfh_url_launcher:
     dependency: "direct overridden"
     description:
