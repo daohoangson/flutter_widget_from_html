@@ -329,11 +329,7 @@ class WidgetFactory {
     final text = getListMarkerText(listStyleType, index);
     final textStyle = style.textStyle;
     if (text.isNotEmpty) {
-      return buildText(
-        tree.sub()..maxLines = 1,
-        style.copyWith(whitespace: CssWhitespace.nowrap),
-        TextSpan(style: textStyle, text: text),
-      );
+      return buildText(tree, style, TextSpan(style: textStyle, text: text));
     }
 
     switch (listStyleType) {
