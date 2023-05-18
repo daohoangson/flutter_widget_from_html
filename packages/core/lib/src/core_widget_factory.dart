@@ -155,26 +155,20 @@ class WidgetFactory {
   }
 
   /// Builds [Decoration].
-  ///
-  /// See https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
-  /// for more information regarding `content-box` (the default)
-  /// and `border-box` (set [isBorderBox] to use).
   Widget? buildDecoration(
     BuildTree tree,
     Widget child, {
     BoxBorder? border,
     BorderRadius? borderRadius,
     Color? color,
-    bool isBorderBox = true,
   }) {
     if (border == null && borderRadius == null && color == null) {
       return child;
     }
 
     final container = child is Container ? child : null;
-    final decoratedBox = child is DecoratedBox ? child : null;
-    final grandChild = container?.child ?? decoratedBox?.child;
-    final prevDeco = container?.decoration ?? decoratedBox?.decoration;
+    final grandChild = container?.child;
+    final prevDeco = container?.decoration;
     final baseDeco =
         prevDeco is BoxDecoration ? prevDeco : const BoxDecoration();
     final decoration = baseDeco.copyWith(
@@ -182,20 +176,13 @@ class WidgetFactory {
       borderRadius: borderRadius,
       color: color,
     );
+    final clipBehavior = borderRadius != null ? Clip.hardEdge : Clip.none;
 
-    if (!isBorderBox || container != null) {
-      // we are using Container intentionally because it handles border differently
-      // ignore: use_decorated_box
-      return Container(
-        decoration: decoration,
-        child: grandChild ?? child,
-      );
-    } else {
-      return DecoratedBox(
-        decoration: decoration,
-        child: decoratedBox?.child ?? child,
-      );
-    }
+    return Container(
+      decoration: decoration,
+      clipBehavior: clipBehavior,
+      child: grandChild ?? child,
+    );
   }
 
   /// Builds [Divider].

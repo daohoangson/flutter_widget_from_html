@@ -1,9 +1,5 @@
 part of '../core_ops.dart';
 
-const kCssBoxSizing = 'box-sizing';
-const kCssBoxSizingContentBox = 'content-box';
-const kCssBoxSizingBorderBox = 'border-box';
-
 class StyleBorder {
   static const kPriorityBoxModel7k = 7000;
 
@@ -76,7 +72,6 @@ class StyleBorder {
       child,
       border: border,
       borderRadius: borderRadius,
-      isBorderBox: tree[kCssBoxSizing]?.term == kCssBoxSizingBorderBox,
     );
   }
 

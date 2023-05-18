@@ -597,7 +597,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[DecoratedBox:bg=#FFFF0000,child='
+          '[Container:bg=#FFFF0000,child='
           '[Padding:(5,5,5,5),child='
           '[Column:children='
           '[SizedBox:0.0x12.4],'
