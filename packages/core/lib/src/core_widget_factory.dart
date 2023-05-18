@@ -361,17 +361,27 @@ class WidgetFactory {
           : Padding(padding: padding, child: child);
 
   /// Builds [RichText].
-  Widget? buildText(BuildTree tree, HtmlStyle style, InlineSpan text) =>
-      RichText(
-        maxLines: tree.maxLines > 0 ? tree.maxLines : null,
-        overflow: tree.overflow,
-        selectionRegistrar: style.getDependency(),
-        selectionColor:
-            style.getDependency<DefaultSelectionStyle>().selectionColor,
-        text: text,
-        textAlign: style.textAlign ?? TextAlign.start,
-        textDirection: style.textDirection,
-      );
+  Widget? buildText(BuildTree tree, HtmlStyle style, InlineSpan text) {
+    const selectionColorDefault = DefaultSelectionStyle.defaultColor;
+    final selectionRegistrar = style.getDependency<SelectionRegistrar?>();
+    final selectionStyle = style.getDependency<DefaultSelectionStyle>();
+
+    Widget built = RichText(
+      maxLines: tree.maxLines > 0 ? tree.maxLines : null,
+      overflow: tree.overflow,
+      selectionColor: selectionStyle.selectionColor ?? selectionColorDefault,
+      selectionRegistrar: selectionRegistrar,
+      text: text,
+      textAlign: style.textAlign ?? TextAlign.start,
+      textDirection: style.textDirection,
+    );
+
+    if (selectionRegistrar != null) {
+      built = MouseRegion(cursor: SystemMouseCursors.text, child: built);
+    }
+
+    return built;
+  }
 
   /// Builds [TextSpan].
   InlineSpan? buildTextSpan({
