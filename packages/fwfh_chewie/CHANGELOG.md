@@ -3,6 +3,11 @@
 - Add support for flutter_widget_from_html_core@0.11.0 (#899)
 - Requires Flutter 3.7
 
+## 0.7.1+2
+
+- Add support for Flutter 3.10 (#889)
+- Apply OpenSSF Scorecard (#888)
+
 ## 0.7.1+1
 
 - Add support for flutter_widget_from_html_core@0.10.0 (#867)
