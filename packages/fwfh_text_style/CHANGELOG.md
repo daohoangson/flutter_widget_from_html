@@ -1,4 +1,4 @@
-# 2.22.08+2
+# 2.22.8+2
 
 - Add support for Flutter 3.10 (#889)
 - Apply OpenSSF Scorecard (#888)
