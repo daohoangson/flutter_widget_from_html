@@ -53,5 +53,6 @@ const kCssDisplayInlineBlock = 'inline-block';
 const kCssDisplayNone = 'none';
 
 const kCssWhitespace = 'white-space';
-const kCssWhitespacePre = 'pre';
 const kCssWhitespaceNormal = 'normal';
+const kCssWhitespaceNowrap = 'nowrap';
+const kCssWhitespacePre = 'pre';

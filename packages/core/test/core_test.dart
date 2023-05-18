@@ -1562,17 +1562,27 @@ Future<void> main() async {
   });
 
   group('white-space', () {
+    const text = '\n  Foo\n  bar  \n';
+
+    testWidgets('renders pre', (tester) async {
+      const html = '<div style="white-space: pre">$text</div>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[CssBlock:child=[RichText:(:$text)]]'));
+    });
+
     testWidgets('renders normal', (tester) async {
-      const html = '<div style="white-space: normal">Foo\nbar</div>';
+      const html = '<div style="white-space: normal">$text</div>';
       final explained = await explain(tester, html);
       expect(explained, equals('[CssBlock:child=[RichText:(:Foo bar)]]'));
     });
 
-    testWidgets('renders pre', (tester) async {
-      const code = '\n  Foo\n  bar  \n';
-      const html = '<div style="white-space: pre">$code</div>';
+    testWidgets('renders nowrap', (tester) async {
+      const html = '<div style="white-space: nowrap">$text</div>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[CssBlock:child=[RichText:(:$code)]]'));
+      expect(
+        explained,
+        equals('[CssBlock:child=[RichText:softWrap=false,(:Foo bar)]]'),
+      );
     });
 
     group('PRE tag', () {

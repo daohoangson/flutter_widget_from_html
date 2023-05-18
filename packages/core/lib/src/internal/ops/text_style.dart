@@ -197,10 +197,12 @@ class TextStyleOps {
 
   static CssWhitespace? whitespaceTryParse(String value) {
     switch (value) {
-      case kCssWhitespacePre:
-        return CssWhitespace.pre;
       case kCssWhitespaceNormal:
         return CssWhitespace.normal;
+      case kCssWhitespaceNowrap:
+        return CssWhitespace.nowrap;
+      case kCssWhitespacePre:
+        return CssWhitespace.pre;
     }
 
     return null;

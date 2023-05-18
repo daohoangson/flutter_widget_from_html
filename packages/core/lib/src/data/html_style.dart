@@ -11,9 +11,6 @@ class HtmlStyle {
   /// The parent style.
   final HtmlStyle? parent;
 
-  /// Whether the text should break at soft line breaks.
-  final bool softWrap;
-
   /// The text alignment.
   final TextAlign? textAlign;
 
@@ -30,7 +27,6 @@ class HtmlStyle {
     required Iterable<dynamic> deps,
     this.gestureRecognizer,
     this.parent,
-    required this.softWrap,
     this.textAlign,
     required this.textDirection,
     required this.textStyle,
@@ -51,7 +47,6 @@ class HtmlStyle {
 
     return HtmlStyle._(
       deps: deps,
-      softWrap: true,
       textStyle: textStyle,
       textDirection: _getDependency<TextDirection>(deps),
       whitespace: CssWhitespace.normal,
@@ -62,7 +57,6 @@ class HtmlStyle {
   HtmlStyle copyWith({
     GestureRecognizer? gestureRecognizer,
     HtmlStyle? parent,
-    bool? softWrap,
     TextAlign? textAlign,
     TextDirection? textDirection,
     TextStyle? textStyle,
@@ -72,7 +66,6 @@ class HtmlStyle {
       deps: _deps,
       gestureRecognizer: gestureRecognizer ?? this.gestureRecognizer,
       parent: parent ?? this.parent,
-      softWrap: softWrap ?? this.softWrap,
       textAlign: textAlign ?? this.textAlign,
       textDirection: textDirection ?? this.textDirection,
       textStyle: textStyle ?? this.textStyle,

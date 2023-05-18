@@ -331,7 +331,7 @@ class WidgetFactory {
     if (text.isNotEmpty) {
       return buildText(
         tree.sub()..maxLines = 1,
-        style.copyWith(softWrap: false),
+        style.copyWith(whitespace: CssWhitespace.nowrap),
         TextSpan(style: textStyle, text: text),
       );
     }
@@ -370,7 +370,7 @@ class WidgetFactory {
       overflow: tree.overflow,
       selectionColor: selectionStyle.selectionColor ?? selectionColorDefault,
       selectionRegistrar: selectionRegistrar,
-      softWrap: style.softWrap,
+      softWrap: style.whitespace != CssWhitespace.nowrap,
       text: text,
       textAlign: style.textAlign ?? TextAlign.start,
       textDirection: style.textDirection,
