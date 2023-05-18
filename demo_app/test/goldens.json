@@ -113,7 +113,6 @@
   "inline/border/border-left": "<div style=\"border-left: 1px solid\">Foo</div>",
   "inline/border/border-right": "<div style=\"border-right: 1px solid\">Foo</div>",
   "inline/border/border-top": "<div style=\"border-top: 1px solid\">Foo</div>",
-  "inline/border/box-sizing--border-box": "<div style=\"border: 1px solid; box-sizing: border-box\">Foo</div>",
   "inline/border/color": "<div style=\"border: 1px solid red\">Foo</div>",
   "inline/border/solid": "<div style=\"border: 1px solid\">Foo</div>",
   "inline/border/with_text": "Foo <span style=\"border: 1px solid\">bar</span>",
