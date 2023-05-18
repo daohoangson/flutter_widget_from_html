@@ -675,10 +675,6 @@ class Explainer {
       attr.addAll(_cssSizing(widget));
     }
 
-    if (widget is DecoratedBox) {
-      attr.addAll(_boxDecoration(widget.decoration));
-    }
-
     if (widget is LimitedBox) {
       attr.add(_limitBox(widget));
     }
