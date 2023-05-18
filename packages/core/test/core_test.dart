@@ -34,6 +34,17 @@ Future<void> main() async {
     expect(explained, equals('[RichText:(@20.0+b:Hello world)]'));
   });
 
+  testWidgets('renders MouseRegion', (WidgetTester tester) async {
+    final explained = await explain(
+      tester,
+      null,
+      hw: SelectionArea(
+        child: HtmlWidget('Foo', key: hwKey),
+      ),
+    );
+    expect(explained, equals('[MouseRegion:child=[RichText:(:Foo)]]'));
+  });
+
   testWidgets('renders without erroneous white spaces', (tester) async {
     const html = '''
 <div>
