@@ -75,9 +75,13 @@ class Builder extends BuildTree {
   @override
   WidgetPlaceholder? build() {
     final children = Flattener(wf, this).widgets;
-    var placeholder = wf.buildColumnPlaceholder(this, children) ??
-        WidgetPlaceholder(debugLabel: '${element.localName}--zero');
+    final column = wf.buildColumnPlaceholder(this, children);
+    if (column == null && _buildOps.isEmpty) {
+      return null;
+    }
 
+    var placeholder =
+        column ?? WidgetPlaceholder(debugLabel: '${element.localName}--zero');
     for (final op in _buildOps) {
       placeholder = WidgetPlaceholder.lazy(
         op.onBuilt(placeholder) ?? placeholder,
@@ -86,7 +90,6 @@ class Builder extends BuildTree {
     }
 
     if (placeholder.isEmpty) {
-      // bailing out early if there's nothing to render
       return null;
     }
 
