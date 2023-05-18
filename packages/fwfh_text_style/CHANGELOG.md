@@ -1,3 +1,8 @@
+# 2.22.08+2
+
+- Add support for Flutter 3.10 (#889)
+- Apply OpenSSF Scorecard (#888)
+
 # 2.22.08+1
 
 - Restrict minimum Flutter version (>=3.1.0-0)
