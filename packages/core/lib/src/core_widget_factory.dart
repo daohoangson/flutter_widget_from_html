@@ -171,12 +171,16 @@ class WidgetFactory {
     final prevDeco = container?.decoration;
     final baseDeco =
         prevDeco is BoxDecoration ? prevDeco : const BoxDecoration();
-    final decoration = baseDeco.copyWith(
-      border: border,
-      borderRadius: borderRadius,
-      color: color,
-    );
-    final clipBehavior = borderRadius != null ? Clip.hardEdge : Clip.none;
+    var decoration = baseDeco.copyWith(border: border, color: color);
+
+    var clipBehavior = Clip.none;
+    if (borderRadius != null) {
+      final borderIsUniform = decoration.border?.isUniform ?? true;
+      if (borderIsUniform) {
+        decoration = decoration.copyWith(borderRadius: borderRadius);
+        clipBehavior = Clip.hardEdge;
+      }
+    }
 
     return Container(
       decoration: decoration,
