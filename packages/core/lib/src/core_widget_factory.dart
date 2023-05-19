@@ -177,6 +177,9 @@ class WidgetFactory {
     if (borderRadius != null) {
       final borderIsUniform = decoration.border?.isUniform ?? true;
       if (borderIsUniform) {
+        // TODO: require uniform color & style when our minimum Flutter version >= 3.10
+        // support for non-uniform border has been improved since this commit
+        // https://github.com/flutter/flutter/commit/5054b6e514a7af91db9859b4eb55d71177d19cfa
         decoration = decoration.copyWith(borderRadius: borderRadius);
         clipBehavior = Clip.hardEdge;
       }
