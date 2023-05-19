@@ -614,8 +614,9 @@ class WidgetFactory {
       return true;
     }
 
-    if (url.startsWith('#')) {
-      final id = url.substring(1);
+    final idPrefix = '${_widget?.baseUrl ?? ''}#';
+    if (url.startsWith(idPrefix)) {
+      final id = url.substring(idPrefix.length);
       final handledViaAnchor =
           await onTapAnchor(id, _anchorRegistry.ensureVisible);
       if (handledViaAnchor) {
