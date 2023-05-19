@@ -171,12 +171,19 @@ class WidgetFactory {
     final prevDeco = container?.decoration;
     final baseDeco =
         prevDeco is BoxDecoration ? prevDeco : const BoxDecoration();
-    final decoration = baseDeco.copyWith(
-      border: border,
-      borderRadius: borderRadius,
-      color: color,
-    );
-    final clipBehavior = borderRadius != null ? Clip.hardEdge : Clip.none;
+    var decoration = baseDeco.copyWith(border: border, color: color);
+
+    var clipBehavior = Clip.none;
+    if (borderRadius != null) {
+      final borderIsUniform = decoration.border?.isUniform ?? true;
+      if (borderIsUniform) {
+        // TODO: require uniform color & style when our minimum Flutter version >= 3.10
+        // support for non-uniform border has been improved since this commit
+        // https://github.com/flutter/flutter/commit/5054b6e514a7af91db9859b4eb55d71177d19cfa
+        decoration = decoration.copyWith(borderRadius: borderRadius);
+        clipBehavior = Clip.hardEdge;
+      }
+    }
 
     return Container(
       decoration: decoration,
