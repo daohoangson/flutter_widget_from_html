@@ -158,7 +158,7 @@ class WidgetFactory {
   Widget? buildDecoration(
     BuildTree tree,
     Widget child, {
-    BoxBorder? border,
+    Border? border,
     BorderRadius? borderRadius,
     Color? color,
   }) {

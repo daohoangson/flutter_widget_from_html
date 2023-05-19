@@ -1,0 +1,25 @@
+name: fwfh_non_uniform_border
+version: 0.11.0-alpha.1
+description: WidgetFactory extension to render border radius with non_uniform_border package.
+homepage: https://github.com/daohoangson/flutter_widget_from_html
+
+environment:
+  flutter: ">=3.7.0"
+  sdk: ">=2.19.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_widget_from_html_core: ^0.11.0-0
+  non_uniform_border: ^1.0.0
+
+dependency_overrides:
+  flutter_widget_from_html_core:
+    path: ../core
+  fwfh_text_style:
+    path: ../fwfh_text_style
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  lint: any
