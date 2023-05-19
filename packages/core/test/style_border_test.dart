@@ -747,6 +747,20 @@ void main() {
         ),
       );
     });
+
+    testWidgets('#909: ignore radius if border is not uniform', (t) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/909
+      const html = '<section style="border-bottom: 1px solid rgb(62, 62, 62); '
+          'border-bottom-right-radius: 0px;">Foo</section>';
+      final explained = await explain(t, html);
+      expect(
+        explained,
+        equals(
+          '[Container:border=(none,none,1.0@solid#FF3E3E3E,none),child='
+          '[CssBlock:child=[RichText:(:Foo)]]]',
+        ),
+      );
+    });
   });
 
   group('overwriting', () {
