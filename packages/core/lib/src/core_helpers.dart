@@ -118,19 +118,16 @@ class WidgetPlaceholder extends StatelessWidget {
   /// A human-readable description of this placeholder.
   final String? debugLabel;
 
-  final bool _autoUnwrap;
   final List<WidgetPlaceholderBuilder> _builders;
   final Widget? _firstChild;
 
   /// Creates a placeholder.
   WidgetPlaceholder({
-    bool autoUnwrap = true,
     WidgetPlaceholderBuilder? builder,
     Widget? child,
     this.debugLabel,
     Key? key,
-  })  : _autoUnwrap = autoUnwrap,
-        _builders = builder != null ? [builder] : [],
+  })  : _builders = builder != null ? [builder] : [],
         _firstChild = child,
         super(key: key);
 
@@ -180,18 +177,9 @@ class WidgetPlaceholder extends StatelessWidget {
           ? child
           : WidgetPlaceholder(debugLabel: debugLabel, child: child);
 
-  /// Unwraps a placeholder if `autoUnwrap` has been set.
-  static Widget unwrap(BuildContext context, Widget widget) {
-    if (widget is WidgetPlaceholder) {
-      if (widget._autoUnwrap) {
-        return widget.build(context);
-      } else {
-        return widget;
-      }
-    } else {
-      return widget;
-    }
-  }
+  /// Builds widget if it is a placeholder.
+  static Widget unwrap(BuildContext context, Widget widget) =>
+      widget is WidgetPlaceholder ? widget.build(context) : widget;
 }
 
 /// A callback for [WidgetPlaceholder].

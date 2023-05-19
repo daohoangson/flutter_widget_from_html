@@ -10,7 +10,6 @@ class HeightPlaceholder extends WidgetPlaceholder {
 
   HeightPlaceholder(CssLength height, this.styleBuilder, {Key? key})
       : super(
-          autoUnwrap: false,
           builder: (c, w) => _build(c, w, height, styleBuilder),
           debugLabel: 'height',
           key: key,
@@ -22,6 +21,15 @@ class HeightPlaceholder extends WidgetPlaceholder {
 
   @override
   bool get isEmpty => false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (context.skipBuildHeightPlaceholder) {
+      return this;
+    } else {
+      return super.build(context);
+    }
+  }
 
   void mergeWith(HeightPlaceholder other) {
     final height = other.height;
@@ -47,4 +55,12 @@ class HeightPlaceholder extends WidgetPlaceholder {
     }
     return child;
   }
+}
+
+extension SkipBuildHeightPlaceholder on BuildContext {
+  static final _skipBuild = Expando<bool>();
+
+  bool get skipBuildHeightPlaceholder => _skipBuild[this] == true;
+
+  set skipBuildHeightPlaceholder(bool v) => _skipBuild[this] = v;
 }

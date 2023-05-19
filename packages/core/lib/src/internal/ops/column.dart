@@ -21,6 +21,8 @@ class ColumnPlaceholder extends WidgetPlaceholder {
 
   @override
   Widget build(BuildContext context) {
+    context.skipBuildHeightPlaceholder = true;
+
     final style = tree.styleBuilder.build(context);
     final widgets = _buildWidgets(context);
     final built = wf.buildColumnWidget(
