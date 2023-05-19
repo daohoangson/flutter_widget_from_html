@@ -24,7 +24,7 @@ class HeightPlaceholder extends WidgetPlaceholder {
 
   @override
   Widget build(BuildContext context) {
-    if (context.skipBuildHeightPlaceholder) {
+    if (context._skipBuildOrZero > 0) {
       return this;
     } else {
       return super.build(context);
@@ -57,11 +57,14 @@ class HeightPlaceholder extends WidgetPlaceholder {
   }
 }
 
+/// An extension on [BuildContext].
 extension SkipBuildHeightPlaceholder on BuildContext {
   static final _skipBuild = Expando<int>();
 
-  bool get skipBuildHeightPlaceholder => _skipBuildOrZero > 0;
-
+  /// Sets whether to skip building [HeightPlaceholder]s.
+  ///
+  /// This type of placeholder has special merging logic so they need
+  /// to be preserved during column contents traversal.
   set skipBuildHeightPlaceholder(bool newValue) {
     final v = _skipBuildOrZero;
     _skipBuild[this] = newValue ? (v + 1) : (v > 0 ? v - 1 : 0);
