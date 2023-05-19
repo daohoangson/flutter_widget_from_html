@@ -614,8 +614,7 @@ class WidgetFactory {
       return true;
     }
 
-    final baseUrlOrEmptyString = _widget?.baseUrl ?? '';
-    final idPrefix = '$baseUrlOrEmptyString#';
+    final idPrefix = '${_widget?.baseUrl ?? ''}#';
     if (url.startsWith(idPrefix)) {
       final id = url.substring(idPrefix.length);
       final handledViaAnchor =

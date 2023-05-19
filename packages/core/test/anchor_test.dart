@@ -94,7 +94,7 @@ void main() {
       expect(_onTapAnchorResults, equals({'foo': true}));
     });
 
-    testWidgets('hits id with baseUrl', (WidgetTester tester) async {
+    testWidgets('hits id with baseUrl specified', (WidgetTester tester) async {
       await pumpWidget(
         tester,
         _ColumnTestApp(
