@@ -144,17 +144,9 @@ class WidgetPlaceholder extends StatelessWidget {
   @protected
   Widget callBuilders(BuildContext context, Widget? child) {
     var built = unwrap(context, child ?? widget0);
-    if (child != null && built == widget0) {
-      // child has been unwrapped into no op, stop processing further right now
-      return widget0;
-    }
 
     for (final builder in _builders) {
       built = unwrap(context, builder(context, built) ?? widget0);
-      if (built == widget0) {
-        // builder returns no op, cancel subsequent callbacks
-        return widget0;
-      }
     }
 
     built.setAnchorsIfUnset(anchors);
