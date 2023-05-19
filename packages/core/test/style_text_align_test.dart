@@ -367,7 +367,7 @@ void main() {
     });
   });
 
-  testWidgets('renders styling from outside', (WidgetTester tester) async {
+  testWidgets('#10: renders styling from outside', (WidgetTester tester) async {
     // https://github.com/daohoangson/flutter_widget_from_html/issues/10
     const html = '<em><span style="color: red;">'
         '<div style="text-align: right;">right</div></span></em>';

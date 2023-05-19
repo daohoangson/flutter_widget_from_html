@@ -118,19 +118,16 @@ class WidgetPlaceholder extends StatelessWidget {
   /// A human-readable description of this placeholder.
   final String? debugLabel;
 
-  final bool _autoUnwrap;
   final List<WidgetPlaceholderBuilder> _builders;
   final Widget? _firstChild;
 
   /// Creates a placeholder.
   WidgetPlaceholder({
-    bool autoUnwrap = true,
     WidgetPlaceholderBuilder? builder,
     Widget? child,
     this.debugLabel,
     Key? key,
-  })  : _autoUnwrap = autoUnwrap,
-        _builders = builder != null ? [builder] : [],
+  })  : _builders = builder != null ? [builder] : [],
         _firstChild = child,
         super(key: key);
 
@@ -144,17 +141,9 @@ class WidgetPlaceholder extends StatelessWidget {
   @protected
   Widget callBuilders(BuildContext context, Widget? child) {
     var built = unwrap(context, child ?? widget0);
-    if (child != null && built == widget0) {
-      // child has been unwrapped into no op, stop processing further right now
-      return widget0;
-    }
 
     for (final builder in _builders) {
       built = unwrap(context, builder(context, built) ?? widget0);
-      if (built == widget0) {
-        // builder returns no op, cancel subsequent callbacks
-        return widget0;
-      }
     }
 
     built.setAnchorsIfUnset(anchors);
@@ -188,18 +177,9 @@ class WidgetPlaceholder extends StatelessWidget {
           ? child
           : WidgetPlaceholder(debugLabel: debugLabel, child: child);
 
-  /// Unwraps a placeholder if `autoUnwrap` has been set.
-  static Widget unwrap(BuildContext context, Widget widget) {
-    if (widget is WidgetPlaceholder) {
-      if (widget._autoUnwrap) {
-        return widget.build(context);
-      } else {
-        return widget;
-      }
-    } else {
-      return widget;
-    }
-  }
+  /// Builds widget if it is a placeholder.
+  static Widget unwrap(BuildContext context, Widget widget) =>
+      widget is WidgetPlaceholder ? widget.build(context) : widget;
 }
 
 /// A callback for [WidgetPlaceholder].

@@ -956,6 +956,7 @@ Future<void> main() async {
     });
 
     testWidgets('#646: renders onBuilt inline', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/646
       const html = '<span style="display:inline-block;">Foo</span>';
       final explained = await explain(
         tester,

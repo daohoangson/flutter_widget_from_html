@@ -254,6 +254,7 @@ void main() {
   });
 
   group('#676: skips decoration', () {
+    // https://github.com/daohoangson/flutter_widget_from_html/issues/676
     testWidgets('renders a filled href', (tester) async {
       const html = '<a href="$kHref">test</a>';
       final explained = await explain(tester, html);
