@@ -28,12 +28,12 @@ class StyleMargin {
           }
 
           if (margin.mayHaveLeft) {
-            final before = _paddingInlineBefore(tree.styleBuilder, margin);
+            final before = _paddingInlineBefore(tree, margin);
             tree.prepend(WidgetBit.inline(tree, before));
           }
 
           if (margin.mayHaveRight) {
-            final after = _paddingInlineAfter(tree.styleBuilder, margin);
+            final after = _paddingInlineAfter(tree, margin);
             tree.append(WidgetBit.inline(tree, after));
           }
         },
@@ -43,10 +43,16 @@ class StyleMargin {
             return null;
           }
 
+          final marginTop = margin.top;
+          final marginBottom = margin.bottom;
           final styleBuilder = tree.styleBuilder;
           return wf.buildColumnPlaceholder(tree, [
-            if (margin.top?.isPositive ?? false)
-              HeightPlaceholder(margin.top!, styleBuilder),
+            if (marginTop != null && marginTop.isPositive)
+              HeightPlaceholder(
+                marginTop,
+                styleBuilder,
+                debugLabel: '${tree.element.localName}--marginTop',
+              ),
             if (margin.mayHaveLeft || margin.mayHaveRight)
               placeholder.wrapWith(
                 (context, child) => _marginHorizontalBuilder(
@@ -57,8 +63,12 @@ class StyleMargin {
               )
             else
               placeholder,
-            if (margin.bottom?.isPositive ?? false)
-              HeightPlaceholder(margin.bottom!, styleBuilder),
+            if (marginBottom != null && marginBottom.isPositive)
+              HeightPlaceholder(
+                marginBottom,
+                styleBuilder,
+                debugLabel: '${tree.element.localName}--marginBottom',
+              ),
           ]);
         },
         priority: kPriorityBoxModel9k,

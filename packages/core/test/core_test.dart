@@ -223,11 +223,11 @@ Future<void> main() async {
         explained,
         equals(
           'HtmlStyleWidget\n'
-          '└ColumnPlaceholder(root)\n'
+          '└ColumnPlaceholder(root--column)\n'
           ' └Column()\n'
           '  ├CssBlock()\n'
           '  │└RichText(text: "1")\n'
-          '  ├HeightPlaceholder(height)\n'
+          '  ├HeightPlaceholder(root--1.0em)\n'
           '  │└SizedBox(height: 10.0)\n'
           '  └CssBlock()\n'
           '   └RichText(text: "2")\n\n',

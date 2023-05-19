@@ -26,7 +26,7 @@ class TagDetails {
               final style = tree.styleBuilder.build(context);
               return HtmlDetailsMarker(style: style.textStyle);
             },
-            debugLabel: tree.element.localName,
+            debugLabel: '$kTagSummary--inlineMarker',
           ),
         );
         tree.prepend(marker);
@@ -37,7 +37,7 @@ class TagDetails {
         }
 
         _summary = placeholder;
-        return WidgetPlaceholder(debugLabel: tree.element.localName);
+        return WidgetPlaceholder(debugLabel: '$kTagSummary--block');
       },
       priority: BuildOp.kPriorityMax,
     );

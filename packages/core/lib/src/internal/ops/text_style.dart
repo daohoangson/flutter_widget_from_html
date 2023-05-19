@@ -61,12 +61,17 @@ extension BuildTreeEllipsis on BuildTree {
 
 // ignore: avoid_classes_with_only_static_members
 class TextStyleOps {
-  static HtmlStyle color(HtmlStyle style, Color color) =>
-      style.copyWith(textStyle: style.textStyle.copyWith(color: color));
+  static HtmlStyle color(HtmlStyle style, Color color) => style.copyWith(
+        textStyle: style.textStyle.copyWith(
+          color: color,
+          debugLabel: 'fwfh: $kCssColor',
+        ),
+      );
 
   static HtmlStyle fontFamily(HtmlStyle style, List<String> list) =>
       style.copyWith(
         textStyle: style.textStyle.copyWith(
+          debugLabel: 'fwfh: $kCssFontFamily',
           fontFamily: list.isNotEmpty ? list.first : null,
           fontFamilyFallback: list.skip(1).toList(growable: false),
         ),
@@ -75,12 +80,14 @@ class TextStyleOps {
   static HtmlStyle fontSize(HtmlStyle style, css.Expression v) =>
       style.copyWith(
         textStyle: style.textStyle.copyWith(
+          debugLabel: 'fwfh: $kCssFontSize',
           fontSize: _fontSizeTryParse(style, v),
         ),
       );
 
   static HtmlStyle fontSizeEm(HtmlStyle style, double v) => style.copyWith(
         textStyle: style.textStyle.copyWith(
+          debugLabel: 'fwfh: $kCssFontSize ${v}em',
           fontSize: _fontSizeTryParseCssLength(
             style,
             CssLength(v, CssLengthUnit.em),
@@ -90,15 +97,25 @@ class TextStyleOps {
 
   static HtmlStyle fontSizeTerm(HtmlStyle style, String v) => style.copyWith(
         textStyle: style.textStyle.copyWith(
+          debugLabel: 'fwfh: $kCssFontSize $v',
           fontSize: _fontSizeTryParseTerm(style, v),
         ),
       );
 
   static HtmlStyle fontStyle(HtmlStyle style, FontStyle fontStyle) =>
-      style.copyWith(textStyle: style.textStyle.copyWith(fontStyle: fontStyle));
+      style.copyWith(
+        textStyle: style.textStyle.copyWith(
+          debugLabel: 'fwfh: $kCssFontStyle',
+          fontStyle: fontStyle,
+        ),
+      );
 
-  static HtmlStyle fontWeight(HtmlStyle style, FontWeight v) =>
-      style.copyWith(textStyle: style.textStyle.copyWith(fontWeight: v));
+  static HtmlStyle fontWeight(HtmlStyle style, FontWeight v) => style.copyWith(
+        textStyle: style.textStyle.copyWith(
+          debugLabel: 'fwfh: $kCssFontWeight',
+          fontWeight: v,
+        ),
+      );
 
   static HtmlStyle Function(HtmlStyle, css.Expression) lineHeight(
     WidgetFactory wf,
@@ -111,13 +128,19 @@ class TextStyleOps {
 
         if (height == -1) {
           return style.copyWith(
-            // ignore: avoid_redundant_argument_values
-            textStyle: style.textStyle.copyWith(height: null),
+            textStyle: style.textStyle.copyWith(
+              debugLabel: 'fwfh: $kCssLineHeight $height',
+              // ignore: avoid_redundant_argument_values
+              height: null,
+            ),
           );
         }
 
         return style.copyWith(
-          textStyle: style.textStyle.copyWith(height: height),
+          textStyle: style.textStyle.copyWith(
+            debugLabel: 'fwfh: $kCssLineHeight $height',
+            height: height,
+          ),
         );
       };
 

@@ -147,7 +147,6 @@ class TagTable {
         : null;
 
     return WidgetPlaceholder(
-      debugLabel: kTagTable,
       builder: (context, _) {
         final tableStyle = tableTree.styleBuilder.build(context);
 
@@ -164,6 +163,7 @@ class TagTable {
           ),
         );
       },
+      debugLabel: kTagTable,
     );
   }
 

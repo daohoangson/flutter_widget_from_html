@@ -36,6 +36,7 @@ class TagA {
   static HtmlStyle defaultColor(HtmlStyle style, void _) => style.copyWith(
         textStyle: style.textStyle.copyWith(
           color: style.getDependency<ThemeData>().colorScheme.primary,
+          debugLabel: 'fwfh: a[href] default color',
         ),
       );
 

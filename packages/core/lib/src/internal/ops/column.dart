@@ -12,7 +12,7 @@ class ColumnPlaceholder extends WidgetPlaceholder {
     Key? key,
     required this.tree,
     required this.wf,
-  }) : super(debugLabel: tree.element.localName, key: key);
+  }) : super(debugLabel: '${tree.element.localName}--column', key: key);
 
   bool get isBody => _isBody[this] == true;
 

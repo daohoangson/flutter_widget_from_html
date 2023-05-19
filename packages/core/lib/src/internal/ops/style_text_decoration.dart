@@ -63,8 +63,12 @@ class StyleTextDecoration {
       );
 }
 
-HtmlStyle textDecorationColor(HtmlStyle style, Color v) =>
-    style.copyWith(textStyle: style.textStyle.copyWith(decorationColor: v));
+HtmlStyle textDecorationColor(HtmlStyle style, Color v) => style.copyWith(
+      textStyle: style.textStyle.copyWith(
+        decorationColor: v,
+        debugLabel: 'fwfh: $kCssTextDecorationColor',
+      ),
+    );
 
 HtmlStyle textDecorationLine(HtmlStyle p, TextDecorationLine v) {
   final parent = p.parent?.textStyle.decoration;
@@ -99,14 +103,28 @@ HtmlStyle textDecorationLine(HtmlStyle p, TextDecorationLine v) {
   }
 
   final combined = TextDecoration.combine(list);
-  return p.copyWith(textStyle: p.textStyle.copyWith(decoration: combined));
+  return p.copyWith(
+    textStyle: p.textStyle.copyWith(
+      decoration: combined,
+      debugLabel: 'fwfh: $kCssTextDecorationLine',
+    ),
+  );
 }
 
 HtmlStyle textDecorationStyle(HtmlStyle style, TextDecorationStyle v) =>
-    style.copyWith(textStyle: style.textStyle.copyWith(decorationStyle: v));
+    style.copyWith(
+      textStyle: style.textStyle.copyWith(
+        decorationStyle: v,
+        debugLabel: 'fwfh: $kCssTextDecorationStyle',
+      ),
+    );
 
-HtmlStyle textDecorationThickness(HtmlStyle style, double v) =>
-    style.copyWith(textStyle: style.textStyle.copyWith(decorationThickness: v));
+HtmlStyle textDecorationThickness(HtmlStyle style, double v) => style.copyWith(
+      textStyle: style.textStyle.copyWith(
+        decorationThickness: v,
+        debugLabel: 'fwfh: $kCssTextDecorationThickness',
+      ),
+    );
 
 @immutable
 class TextDecorationLine {

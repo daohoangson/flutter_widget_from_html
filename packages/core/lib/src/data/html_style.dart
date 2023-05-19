@@ -42,7 +42,10 @@ class HtmlStyle {
     final tsf = mqd.textScaleFactor;
     final fontSize = textStyle.fontSize;
     if (tsf != 1 && fontSize != null) {
-      textStyle = textStyle.copyWith(fontSize: fontSize * tsf);
+      textStyle = textStyle.copyWith(
+        debugLabel: 'fwfh: fontSize *= textScaleFactor',
+        fontSize: fontSize * tsf,
+      );
     }
 
     return HtmlStyle._(

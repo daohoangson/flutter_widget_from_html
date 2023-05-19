@@ -51,7 +51,7 @@ class StyleBorder {
 
         return WidgetPlaceholder(
           builder: (ctx, _) => _buildBorder(tree, ctx, child, border),
-          debugLabel: kCssBorder,
+          debugLabel: '${tree.element.localName}--$kCssBorder',
         );
       },
       priority: kPriorityBoxModel7k,

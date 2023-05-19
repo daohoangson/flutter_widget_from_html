@@ -80,8 +80,8 @@ class Builder extends BuildTree {
       return null;
     }
 
-    var placeholder =
-        column ?? WidgetPlaceholder(debugLabel: '${element.localName}--zero');
+    var placeholder = column ??
+        WidgetPlaceholder(debugLabel: '${element.localName}--default');
     for (final op in _buildOps) {
       placeholder = WidgetPlaceholder.lazy(
         op.onBuilt(placeholder) ?? placeholder,

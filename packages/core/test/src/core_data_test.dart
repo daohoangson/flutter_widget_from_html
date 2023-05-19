@@ -106,7 +106,7 @@ void main() {
           explained,
           equals(
             'HtmlStyleWidget\n'
-            '└WidgetPlaceholder(text)\n'
+            '└WidgetPlaceholder(root--text)\n'
             ' └Text("hi")\n'
             '  └RichText(text: "hi")\n\n',
           ),

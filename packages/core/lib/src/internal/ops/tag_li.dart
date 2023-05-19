@@ -75,7 +75,7 @@ class TagLi {
                       return WidgetPlaceholder(
                         builder: (context, _) =>
                             _buildItem(context, listTree, itemTree, item, i),
-                        debugLabel: '${listTree.element.localName}--$i',
+                        debugLabel: '$kTagLi--$i',
                       );
                     },
                   ),

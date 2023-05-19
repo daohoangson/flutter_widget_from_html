@@ -1108,10 +1108,9 @@ class WidgetFactory {
 
   BuildOp _anchorOp(String id) {
     final anchor = GlobalKey(debugLabel: id);
-    const debugLabel = 'anchor';
 
     return BuildOp(
-      debugLabel: debugLabel,
+      debugLabel: 'anchor',
       mustBeBlock: false,
       onTree: (tree) {
         _anchorRegistry.register(id, anchor);
@@ -1123,7 +1122,7 @@ class WidgetFactory {
             height: tree.styleBuilder.build(context).textStyle.fontSize,
             key: anchor,
           ),
-          debugLabel: debugLabel,
+          debugLabel: '${tree.element.localName}--anchor#$id',
         );
 
         const baseline = PlaceholderAlignment.baseline;

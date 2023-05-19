@@ -2,24 +2,18 @@ part of '../core_ops.dart';
 
 const kCssPadding = 'padding';
 
-WidgetPlaceholder _paddingInlineAfter(
-  HtmlStyleBuilder styleBuilder,
-  CssLengthBox b,
-) =>
+WidgetPlaceholder _paddingInlineAfter(BuildTree tree, CssLengthBox b) =>
     WidgetPlaceholder(
       builder: (c, _) =>
-          _paddingInlineSizedBox(b.getValueRight(styleBuilder.build(c))),
-      debugLabel: kCssPadding,
+          _paddingInlineSizedBox(b.getValueRight(tree.styleBuilder.build(c))),
+      debugLabel: '${tree.element.localName}--paddingInlineAfter',
     );
 
-WidgetPlaceholder _paddingInlineBefore(
-  HtmlStyleBuilder styleBuilder,
-  CssLengthBox b,
-) =>
+WidgetPlaceholder _paddingInlineBefore(BuildTree tree, CssLengthBox b) =>
     WidgetPlaceholder(
       builder: (c, _) =>
-          _paddingInlineSizedBox(b.getValueLeft(styleBuilder.build(c))),
-      debugLabel: kCssPadding,
+          _paddingInlineSizedBox(b.getValueLeft(tree.styleBuilder.build(c))),
+      debugLabel: '${tree.element.localName}--paddingInlineBefore',
     );
 
 Widget _paddingInlineSizedBox(double? width) =>
@@ -42,12 +36,12 @@ class StylePadding {
           }
 
           if (padding.mayHaveLeft) {
-            final before = _paddingInlineBefore(tree.styleBuilder, padding);
+            final before = _paddingInlineBefore(tree, padding);
             tree.prepend(WidgetBit.inline(tree, before));
           }
 
           if (padding.mayHaveRight) {
-            final after = _paddingInlineAfter(tree.styleBuilder, padding);
+            final after = _paddingInlineAfter(tree, padding);
             tree.append(WidgetBit.inline(tree, after));
           }
         },
@@ -59,7 +53,7 @@ class StylePadding {
 
           return WidgetPlaceholder(
             builder: (ctx, w) => _build(tree, ctx, w, padding),
-            debugLabel: kCssPadding,
+            debugLabel: '${tree.element.localName}--paddingBlock',
             child: child,
           );
         },

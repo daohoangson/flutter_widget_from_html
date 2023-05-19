@@ -43,7 +43,7 @@ class Flattener implements Flattened {
     final scopedStyleBuilder = _styleBuilder;
     final placeholder = WidgetPlaceholder.lazy(
       child,
-      debugLabel: _bit.parent?.element.localName,
+      debugLabel: '${_bit.parent?.element.localName}--Flattener.inlineWidget',
     );
 
     placeholder.wrapWith((context, widget) {
@@ -71,7 +71,7 @@ class Flattener implements Flattened {
 
     final placeholder = WidgetPlaceholder.lazy(
       value,
-      debugLabel: _bit.parent?.element.localName,
+      debugLabel: '${_bit.parent?.element.localName}--Flattener.widget',
     );
     final scopedStyleBuilder = _styleBuilder;
     placeholder.wrapWith((context, child) {
@@ -232,7 +232,11 @@ class Flattener implements Flattened {
               // special handling for paragraph with <BR /> only
               const oneEm = CssLength(1, CssLengthUnit.em);
               span = WidgetSpan(
-                child: HeightPlaceholder(oneEm, scopedStyleBulder),
+                child: HeightPlaceholder(
+                  oneEm,
+                  scopedStyleBulder,
+                  debugLabel: '${tree.element.localName}--$oneEm',
+                ),
               );
             }
           } else {
@@ -257,7 +261,7 @@ class Flattener implements Flattened {
 
           return wf.buildText(tree, style, span);
         },
-        debugLabel: 'text',
+        debugLabel: '${tree.element.localName}--text',
       ),
     );
   }

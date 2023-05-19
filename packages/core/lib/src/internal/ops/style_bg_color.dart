@@ -65,6 +65,9 @@ class StyleBgColor {
   }
 
   static HtmlStyle _builder(HtmlStyle style, Color color) => style.copyWith(
-        textStyle: style.textStyle.copyWith(background: Paint()..color = color),
+        textStyle: style.textStyle.copyWith(
+          background: Paint()..color = color,
+          debugLabel: 'fwfh: $kCssBackgroundColor',
+        ),
       );
 }
