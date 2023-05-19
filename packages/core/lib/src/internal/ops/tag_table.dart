@@ -113,19 +113,10 @@ class TagTable {
         subTree.register(group._groupOp);
         break;
       case kCssDisplayTableRow:
-        final row = _TagTableRow();
-        data.newBody().rows.add(row);
-        subTree.register(row._rowOp);
+        subTree.register(data.newBody().newRow()._rowOp);
         break;
       case kCssDisplayTableCell:
-        final body = data.bodies.isNotEmpty ? data.bodies.last : data.newBody();
-        var row = body.rows.isNotEmpty ? body.rows.last : null;
-        if (row == null) {
-          final newRow = _TagTableRow();
-          body.rows.add(newRow);
-          row = newRow;
-        }
-        row._registerCellOp(subTree);
+        data.latestBody.latestRow._registerCellOp(subTree);
         break;
     }
   }
@@ -386,6 +377,22 @@ class _TagTableRowGroup {
     _groupOp = BuildOp(debugLabel: debugLabel, onChild: _onGroupChild);
   }
 
+  _TagTableRow get latestRow {
+    if (rows.isNotEmpty) {
+      return rows.last;
+    }
+
+    final row = _TagTableRow();
+    rows.add(row);
+    return row;
+  }
+
+  _TagTableRow newRow() {
+    final row = _TagTableRow();
+    rows.add(row);
+    return row;
+  }
+
   void _onGroupChild(BuildTree groupTree, BuildTree rowTree) {
     if (rowTree.element.parent != groupTree.element) {
       return;
@@ -394,9 +401,7 @@ class _TagTableRowGroup {
       return;
     }
 
-    final row = _TagTableRow();
-    rows.add(row);
-    rowTree.register(row._rowOp);
+    rowTree.register(newRow()._rowOp);
   }
 }
 
@@ -420,6 +425,9 @@ class _TagTableData {
     required this.borderSpacing,
     required this.cellPadding,
   });
+
+  _TagTableRowGroup get latestBody =>
+      bodies.isNotEmpty ? bodies.last : newBody();
 
   _TagTableRowGroup newBody() {
     final body = _TagTableRowGroup(kCssDisplayTableRowGroup);
