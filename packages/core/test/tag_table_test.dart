@@ -538,6 +538,24 @@ Future<void> main() async {
     );
   });
 
+  testWidgets('renders display: table-cell without row', (tester) async {
+    const html = '''
+<div style="display: table">
+  <div style="display: table-cell">Foo</div>
+  <div style="display: table-cell">Bar</div>
+</div>''';
+    final explained = await explain(tester, html);
+    expect(
+      explained,
+      equals(
+        '[HtmlTable:children='
+        '[HtmlTableCell:child=[RichText:(:Foo)]],'
+        '[HtmlTableCell:child=[RichText:(:Bar)]]'
+        ']',
+      ),
+    );
+  });
+
   group('HtmlTable', () {
     group('_TableRenderObject setters', () {
       testWidgets('updates border', (WidgetTester t) async {

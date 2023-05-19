@@ -86,25 +86,7 @@ class TagTable {
 
     final data = tableTree.data;
     final which = _getCssDisplayValue(subTree);
-    _TagTableDataGroup? latestGroup;
     switch (which) {
-      case kCssDisplayTableRow:
-        latestGroup ??= data.body;
-        final row = _TagTableDataRow();
-        latestGroup.rows.add(row);
-        subTree.register(_TagTableRow(row)._rowOp);
-        break;
-      case kCssDisplayTableHeaderGroup:
-      case kCssDisplayTableRowGroup:
-      case kCssDisplayTableFooterGroup:
-        final rows = which == kCssDisplayTableHeaderGroup
-            ? data.header.rows
-            : which == kCssDisplayTableRowGroup
-                ? data.body.rows
-                : data.footer.rows;
-        subTree.register(_TagTableRowGroup(which!, rows)._groupOp);
-        latestGroup = null;
-        break;
       case kCssDisplayTableCaption:
         subTree.register(
           BuildOp(
@@ -119,6 +101,22 @@ class TagTable {
             priority: BuildOp.kPriorityMax,
           ),
         );
+        break;
+      case kCssDisplayTableHeaderGroup:
+      case kCssDisplayTableRowGroup:
+      case kCssDisplayTableFooterGroup:
+        final group = which == kCssDisplayTableHeaderGroup
+            ? data.header
+            : which == kCssDisplayTableRowGroup
+                ? data.newBody()
+                : data.footer;
+        subTree.register(group._groupOp);
+        break;
+      case kCssDisplayTableRow:
+        subTree.register(data.newBody().newRow()._rowOp);
+        break;
+      case kCssDisplayTableCell:
+        data.latestBody.latestRow._registerCellOp(subTree);
         break;
     }
   }
@@ -189,7 +187,7 @@ class TagTable {
 
   void _prepareHtmlTableCellBuilders(
     BuildTree tableTree,
-    _TagTableDataGroup group,
+    _TagTableRowGroup group,
   ) {
     final data = tableTree.data;
     final rowStartOffset = data.rows;
@@ -314,12 +312,12 @@ extension _BuildTreeData on BuildTree {
 }
 
 class _TagTableRow {
-  final _TagTableDataRow row;
+  final cells = <_TagTableDataCell>[];
 
   late final BuildOp _rowOp;
   late final BuildOp _cellOp;
 
-  _TagTableRow(this.row) {
+  _TagTableRow() {
     _rowOp = BuildOp(debugLabel: kTagTableRow, onChild: _onRowChild);
     _cellOp = BuildOp(
       debugLabel: kTagTableCell,
@@ -337,14 +335,7 @@ class _TagTableRow {
       return;
     }
 
-    final attrs = e.attributes;
-    if (attrs.containsKey(kAttributeValign)) {
-      cellTree[kCssVerticalAlign] = attrs[kAttributeValign]!;
-    }
-
-    cellTree.register(_cellOp);
-    StyleBorder.skip(cellTree);
-    StyleSizing.skip(cellTree);
+    _registerCellOp(cellTree);
   }
 
   Widget? _onCellBuilt(BuildTree cellTree, WidgetPlaceholder placeholder) {
@@ -352,7 +343,7 @@ class _TagTableRow {
     final width = widthValue != null ? tryParseCssLength(widthValue) : null;
 
     final attributes = cellTree.element.attributes;
-    row.cells.add(
+    cells.add(
       _TagTableDataCell(
         cellTree,
         child: placeholder,
@@ -364,15 +355,42 @@ class _TagTableRow {
 
     return placeholder;
   }
+
+  void _registerCellOp(BuildTree cellTree) {
+    final attrs = cellTree.element.attributes;
+    if (attrs.containsKey(kAttributeValign)) {
+      cellTree[kCssVerticalAlign] = attrs[kAttributeValign]!;
+    }
+
+    cellTree.register(_cellOp);
+    StyleBorder.skip(cellTree);
+    StyleSizing.skip(cellTree);
+  }
 }
 
 class _TagTableRowGroup {
-  final List<_TagTableDataRow> rows;
+  final rows = <_TagTableRow>[];
 
   late final BuildOp _groupOp;
 
-  _TagTableRowGroup(String debugLabel, this.rows) {
+  _TagTableRowGroup(String debugLabel) {
     _groupOp = BuildOp(debugLabel: debugLabel, onChild: _onGroupChild);
+  }
+
+  _TagTableRow get latestRow {
+    if (rows.isNotEmpty) {
+      return rows.last;
+    }
+
+    final row = _TagTableRow();
+    rows.add(row);
+    return row;
+  }
+
+  _TagTableRow newRow() {
+    final row = _TagTableRow();
+    rows.add(row);
+    return row;
   }
 
   void _onGroupChild(BuildTree groupTree, BuildTree rowTree) {
@@ -383,9 +401,7 @@ class _TagTableRowGroup {
       return;
     }
 
-    final row = _TagTableDataRow();
-    rows.add(row);
-    rowTree.register(_TagTableRow(row)._rowOp);
+    rowTree.register(newRow()._rowOp);
   }
 }
 
@@ -394,10 +410,10 @@ class _TagTableData {
   final double borderSpacing;
   final double cellPadding;
 
-  final bodies = <_TagTableDataGroup>[];
+  final bodies = <_TagTableRowGroup>[];
   final captions = <WidgetPlaceholder>[];
-  final footer = _TagTableDataGroup();
-  final header = _TagTableDataGroup();
+  final footer = _TagTableRowGroup(kCssDisplayTableFooterGroup);
+  final header = _TagTableRowGroup(kCssDisplayTableHeaderGroup);
 
   final builders = <HtmlTableCell? Function(BuildContext)>[];
   final cells = <int, Map<int, int>>{};
@@ -410,21 +426,14 @@ class _TagTableData {
     required this.cellPadding,
   });
 
-  _TagTableDataGroup get body {
-    final body = _TagTableDataGroup();
+  _TagTableRowGroup get latestBody =>
+      bodies.isNotEmpty ? bodies.last : newBody();
+
+  _TagTableRowGroup newBody() {
+    final body = _TagTableRowGroup(kCssDisplayTableRowGroup);
     bodies.add(body);
     return body;
   }
-}
-
-@immutable
-class _TagTableDataGroup {
-  final rows = <_TagTableDataRow>[];
-}
-
-@immutable
-class _TagTableDataRow {
-  final cells = <_TagTableDataCell>[];
 }
 
 @immutable
