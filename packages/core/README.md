@@ -219,22 +219,19 @@ This example renders a carousel ([live demo](https://demo.fwfh.dev/#/customwidge
 
 ### Custom `WidgetFactory`
 
-The HTML string is parsed into DOM elements and each element is visited once to prepare `BuildBit`s. See step by step how it works:
+The HTML string is parsed into DOM elements and each element is visited once to prepare `BuildTree`s.
 
-| Step |                                                                          | Integration point                                                                                             |
-|------|--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
-| 1    | Parse                                                                    | `WidgetFactory.parse(BuildTree)`                                                                              |
-| 2    | Inform parents if any                                                    | `BuildOp.onChild(BuildTree, BuildTree)`                                                                       |
-| 3    | Populate default styling                                                 | `BuildOp.defaultStyles(BuildTree)`                                                                            |
-| 4    | Populate custom styling                                                  | `HtmlWidget.customStylesBuilder`                                                                              |
-| 5    | Parse styling key+value pairs, `parseStyle` may be called multiple times | `WidgetFactory.parseStyle(BuildTree, css.Declaration)`, `WidgetFactory.parseStyleDisplay(BuildTree, String?)` |
-| 6    | a. If a custom widget is provided, go to 7                               | `HtmlWidget.customWidgetBuilder`                                                                              |
-|      | b. Loop through children elements to prepare `BuildBit`s                 |                                                                                                               |
-| 7    | Inform build ops                                                         | `BuildOp.onTree(BuildTree)`                                                                                   |
-| 8    | a. If not a block element, go to 10                                      |                                                                                                               |
-|      | b. Build widgets from bits using a `Flattener`                           | `BuildOp.onFlattening(BuildTree)`                                                                             |
-| 9    | Inform build ops                                                         | `BuildOp.onBuilt(BuildTree, WidgetPlaceholder)`                                                               |
-| 10   | The end                                                                  |                                                                                                               |
+```mermaid
+flowchart TD
+    _addBitsFromNode[/process DOM element/] --> ifIsText{TEXT?} --->|yes\n\nBuildTree.addText\nBuildTree.addWhitespace| bitOK( )
+
+    ifIsText --->|no| ifCustomWidget{customWidget?} -->|yes\n\nHtmlWidget.\ncustomWidgetBuilder| customWidget[/render custom widget/] --> bitOK
+
+    ifCustomWidget -->|no| _parseEverything[/parse styles/] -->|WidgetFactory.parse\nBuildOp.defaultStyles\nHtmlWidget.customStylesBuilder\nWidgetFactory.parseStyle\nWidgetFactory.parseStyleDisplay| _parseOK( ) ~~~ _addBitsFromNodeOK
+    _parseOK -.->|process children\nelements recursively| _addBitsFromNode -.->|BuildOp.onChild| _addBitsFromNodeOK( ) -->|BuildOp.onTree| ifIsBlock{block\nelement?} -->|no| appendSubTree>ready for\ninline rendering] -->|BuildOp.\nonFlattening| bitOK
+
+    ifIsBlock -->|yes\n\nBuildOp.onBuilt| appendBuiltSubTree[/render block/] --> bitOK
+```
 
 Notes:
 
