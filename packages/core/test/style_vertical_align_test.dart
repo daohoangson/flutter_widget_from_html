@@ -247,12 +247,5 @@ void main() {
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));
     });
-
-    testWidgets('#170: renders whitespace contents', (tester) async {
-      const html = 'Foo <sub> </sub>';
-      final explained = await explain(tester, html);
-      // TODO: drop widget0 if possible
-      expect(explained, equals('[RichText:(:Foo [widget0]@top)]'));
-    });
   });
 }

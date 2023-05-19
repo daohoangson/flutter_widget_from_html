@@ -277,7 +277,7 @@ Future<void> main() async {
   <li type="1">decimal</li>
   <li type="i">lower-roman</li>
   <li>lower-alpha</li>
-<ol>
+</ol>
 ''';
       final explained = await explain(tester, html);
       expect(
@@ -334,7 +334,7 @@ Future<void> main() async {
   <li style="list-style-type: none"">none</li>
   <li style="list-style-type: square">square</li>
   <li>circle</li>
-<ul>
+</ul>
 ''';
         final explained = await explain(tester, html);
         expect(
