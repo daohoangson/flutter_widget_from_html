@@ -490,6 +490,7 @@ Future<void> main() async {
     });
 
     testWidgets('#171: background-color', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/171
       const html = '<table><tr>'
           '<td style="background-color: #f00">Foo</td>'
           '</tr></table>';
