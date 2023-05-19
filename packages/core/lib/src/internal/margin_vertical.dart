@@ -58,9 +58,14 @@ class HeightPlaceholder extends WidgetPlaceholder {
 }
 
 extension SkipBuildHeightPlaceholder on BuildContext {
-  static final _skipBuild = Expando<bool>();
+  static final _skipBuild = Expando<int>();
 
-  bool get skipBuildHeightPlaceholder => _skipBuild[this] == true;
+  bool get skipBuildHeightPlaceholder => _skipBuildOrZero > 0;
 
-  set skipBuildHeightPlaceholder(bool v) => _skipBuild[this] = v;
+  set skipBuildHeightPlaceholder(bool newValue) {
+    final v = _skipBuildOrZero;
+    _skipBuild[this] = newValue ? (v + 1) : (v > 0 ? v - 1 : 0);
+  }
+
+  int get _skipBuildOrZero => _skipBuild[this] ?? 0;
 }

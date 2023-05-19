@@ -582,7 +582,6 @@ class Explainer {
     }
 
     if (widget is WidgetPlaceholder) {
-      context.skipBuildHeightPlaceholder = false;
       return _widget(widget.build(context));
     }
 

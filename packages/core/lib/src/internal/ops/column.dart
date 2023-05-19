@@ -23,15 +23,19 @@ class ColumnPlaceholder extends WidgetPlaceholder {
   Widget build(BuildContext context) {
     context.skipBuildHeightPlaceholder = true;
 
-    final style = tree.styleBuilder.build(context);
-    final widgets = _buildWidgets(context);
-    final built = wf.buildColumnWidget(
-      context,
-      widgets,
-      crossAxisAlignment: style.columnCrossAxisAlignment,
-      dir: style.textDirection,
-    );
-    return isBody ? wf.buildBodyWidget(context, built) : built;
+    try {
+      final style = tree.styleBuilder.build(context);
+      final widgets = _buildWidgets(context);
+      final built = wf.buildColumnWidget(
+        context,
+        widgets,
+        crossAxisAlignment: style.columnCrossAxisAlignment,
+        dir: style.textDirection,
+      );
+      return isBody ? wf.buildBodyWidget(context, built) : built;
+    } finally {
+      context.skipBuildHeightPlaceholder = false;
+    }
   }
 
   @override
