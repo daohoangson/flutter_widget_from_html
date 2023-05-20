@@ -65,27 +65,8 @@ class _ListItemRenderObject extends RenderBox
       defaultComputeDistanceToFirstActualBaseline(baseline);
 
   @override
-  Size computeDryLayout(BoxConstraints constraints) {
-    final child = firstChild;
-    if (child == null) {
-      return constraints.smallest;
-    }
-
-    final childConstraints = constraints;
-    final childData = child.parentData! as _ListItemData;
-    final childSize = child.getDryLayout(childConstraints);
-
-    final marker = childData.nextSibling;
-    final markerConstraints = childConstraints.loosen();
-    final markerSize = marker?.getDryLayout(markerConstraints) ?? Size.zero;
-
-    return constraints.constrain(
-      Size(
-        childSize.width,
-        childSize.height > 0 ? childSize.height : markerSize.height,
-      ),
-    );
-  }
+  Size computeDryLayout(BoxConstraints constraints) =>
+      _compute(firstChild, constraints, ChildLayoutHelper.dryLayoutChild);
 
   @override
   double computeMaxIntrinsicHeight(double width) =>
@@ -116,51 +97,46 @@ class _ListItemRenderObject extends RenderBox
       defaultPaint(context, offset);
 
   @override
-  void performLayout() {
-    final child = firstChild;
-    if (child == null) {
-      size = constraints.smallest;
-      return;
-    }
-
-    final childConstraints = constraints;
-    final childData = child.parentData! as _ListItemData;
-    child.layout(childConstraints, parentUsesSize: true);
-    final childSize = child.size;
-
-    final marker = childData.nextSibling;
-    final markerConstraints = childConstraints.loosen();
-    final _ListItemData? markerData =
-        marker != null ? marker.parentData! as _ListItemData : null;
-    marker?.layout(markerConstraints, parentUsesSize: true);
-    final markerSize = marker?.size ?? Size.zero;
-
-    size = constraints.constrain(
-      Size(
-        childSize.width,
-        childSize.height > 0 ? childSize.height : markerSize.height,
-      ),
-    );
-
-    const baseline = TextBaseline.alphabetic;
-    final markerDistance =
-        marker?.getDistanceToBaseline(baseline, onlyReal: true) ??
-            markerSize.height;
-    final childDistance =
-        child.getDistanceToBaseline(baseline, onlyReal: true) ?? markerDistance;
-
-    markerData?.offset = Offset(
-      textDirection == TextDirection.ltr
-          ? -markerSize.width - _kGapVsMarker
-          : childSize.width + _kGapVsMarker,
-      childDistance - markerDistance,
-    );
-  }
+  void performLayout() =>
+      size = _compute(firstChild, constraints, ChildLayoutHelper.layoutChild);
 
   @override
   void setupParentData(RenderBox child) {
     if (child.parentData is! _ListItemData) {
       child.parentData = _ListItemData();
     }
+  }
+
+  Size _compute(RenderBox? child, BoxConstraints bc, ChildLayouter fn) {
+    if (child == null) {
+      return bc.smallest;
+    }
+
+    final childData = child.parentData! as _ListItemData;
+    final childSize = fn(child, bc);
+    final marker = childData.nextSibling;
+    final markerSize = marker != null ? fn(marker, bc.loosen()) : Size.zero;
+    final height = childSize.height > 0 ? childSize.height : markerSize.height;
+    final size = bc.constrain(Size(childSize.width, height));
+
+    if (identical(fn, ChildLayoutHelper.layoutChild) && marker != null) {
+      const baseline = TextBaseline.alphabetic;
+      final markerDistance =
+          marker.getDistanceToBaseline(baseline, onlyReal: true) ??
+              markerSize.height;
+      final childDistance =
+          child.getDistanceToBaseline(baseline, onlyReal: true) ??
+              markerDistance;
+
+      final markerData = marker.parentData! as _ListItemData;
+      markerData.offset = Offset(
+        textDirection == TextDirection.ltr
+            ? -markerSize.width - _kGapVsMarker
+            : childSize.width + _kGapVsMarker,
+        childDistance - markerDistance,
+      );
+    }
+
+    return size;
   }
 }

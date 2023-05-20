@@ -283,7 +283,7 @@ class _TableRenderLayout {
 
 class _TableRenderLayouter {
   final BoxConstraints constraints;
-  final Size Function(RenderBox renderBox, BoxConstraints constraints) layouter;
+  final ChildLayouter layouter;
   final _TableRenderObject tro;
 
   final List<_TableCellData> cells = [];
@@ -295,12 +295,16 @@ class _TableRenderLayouter {
   int rowCount = 0;
 
   _TableRenderLayouter(this.tro, this.constraints)
-      : layouter = performLayoutLayout;
+      : layouter = ChildLayoutHelper.layoutChild;
 
   _TableRenderLayouter.dry(this.tro, this.constraints)
-      : layouter = performLayoutGetDryLayout;
+      : layouter = ChildLayoutHelper.dryLayoutChild;
 
-  _TableRenderLayout layout(RenderBox firstChild) {
+  _TableRenderLayout compute(RenderBox? firstChild) {
+    if (firstChild == null) {
+      return _TableRenderLayout(Rect.zero, constraints.smallest);
+    }
+
     step1GuessDrySizes(firstChild);
 
     final columnGapsSum = (columnCount + 1) * tro.columnGap;
@@ -336,7 +340,8 @@ class _TableRenderLayouter {
         drySize =
             Size(constraints.hasBoundedWidth ? constraints.maxWidth : 100.0, 0);
         try {
-          drySize = performLayoutGetDryLayout(child, const BoxConstraints());
+          const bc0 = BoxConstraints();
+          drySize = ChildLayoutHelper.dryLayoutChild(child, bc0);
         } catch (dryLayoutError, stackTrace) {
           debugPrint('Ignored _performLayoutDry error: '
               '$dryLayoutError\n$stackTrace');
@@ -439,7 +444,7 @@ class _TableRenderLayouter {
       final childWidth = data.calculateWidth(tro, columnWidths);
       final canUseDrySize = childWidth == drySize.width &&
           drySize.height > 0 &&
-          identical(layouter, performLayoutGetDryLayout);
+          identical(layouter, ChildLayoutHelper.dryLayoutChild);
       Size childSize;
       if (canUseDrySize) {
         childSize = drySize;
@@ -519,20 +524,6 @@ class _TableRenderLayouter {
       ),
       Size(calculatedWidth, calculatedHeight),
     );
-  }
-
-  static Size performLayoutGetDryLayout(
-    RenderBox renderBox,
-    BoxConstraints constraints,
-  ) =>
-      renderBox.getDryLayout(constraints);
-
-  static Size performLayoutLayout(
-    RenderBox renderBox,
-    BoxConstraints constraints,
-  ) {
-    renderBox.layout(constraints, parentUsesSize: true);
-    return renderBox.size;
   }
 
   static List<double> redistributeValues(
@@ -672,15 +663,8 @@ class _TableRenderObject extends RenderBox
   }
 
   @override
-  Size computeDryLayout(BoxConstraints constraints) {
-    final child = firstChild;
-    if (child == null) {
-      return Size.zero;
-    }
-
-    final layouter = _TableRenderLayouter.dry(this, constraints);
-    return layouter.layout(child).totalSize;
-  }
+  Size computeDryLayout(BoxConstraints constraints) =>
+      _TableRenderLayouter.dry(this, constraints).compute(firstChild).totalSize;
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
@@ -709,14 +693,8 @@ class _TableRenderObject extends RenderBox
 
   @override
   void performLayout() {
-    final child = firstChild;
-    if (child == null) {
-      size = constraints.smallest;
-      return;
-    }
-
     final layouter = _TableRenderLayouter(this, constraints);
-    _layout = layouter.layout(child);
+    _layout = layouter.compute(firstChild);
     size = constraints.constrain(_layout.totalSize);
   }
 

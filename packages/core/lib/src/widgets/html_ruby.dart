@@ -41,13 +41,8 @@ class _RubyRenderObject extends RenderBox
   }
 
   @override
-  Size computeDryLayout(BoxConstraints constraints) {
-    final ruby = firstChild;
-    if (ruby == null) {
-      return constraints.smallest;
-    }
-    return _performLayout(ruby, constraints, _performLayoutDry);
-  }
+  Size computeDryLayout(BoxConstraints constraints) =>
+      _compute(firstChild, constraints, ChildLayoutHelper.dryLayoutChild);
 
   @override
   double computeMaxIntrinsicHeight(double width) {
@@ -124,14 +119,8 @@ class _RubyRenderObject extends RenderBox
       defaultPaint(context, offset);
 
   @override
-  void performLayout() {
-    final ruby = firstChild;
-    if (ruby == null) {
-      size = constraints.smallest;
-      return;
-    }
-    size = _performLayout(ruby, constraints, _performLayoutLayouter);
-  }
+  void performLayout() =>
+      size = _compute(firstChild, constraints, ChildLayoutHelper.layoutChild);
 
   @override
   void setupParentData(RenderBox child) {
@@ -140,14 +129,14 @@ class _RubyRenderObject extends RenderBox
     }
   }
 
-  static Size _performLayout(
-    RenderBox ruby,
-    BoxConstraints constraints,
-    Size Function(RenderBox renderBox, BoxConstraints constraints) layouter,
-  ) {
-    final rubyConstraints = constraints.loosen();
+  static Size _compute(RenderBox? ruby, BoxConstraints bc, ChildLayouter fn) {
+    if (ruby == null) {
+      return bc.smallest;
+    }
+
+    final rubyConstraints = bc.loosen();
     final rubyData = ruby.parentData! as _RubyParentData;
-    final rubySize = layouter(ruby, rubyConstraints);
+    final rubySize = fn(ruby, rubyConstraints);
 
     final rt = rubyData.nextSibling;
     final rtConstraints = rubyConstraints.copyWith(
@@ -157,7 +146,7 @@ class _RubyRenderObject extends RenderBox
     var rtSize = Size.zero;
     if (rt != null) {
       rtData = rt.parentData! as _RubyParentData;
-      rtSize = layouter(rt, rtConstraints);
+      rtSize = fn(rt, rtConstraints);
     }
 
     final height = rubySize.height + rtSize.height;
@@ -168,20 +157,6 @@ class _RubyRenderObject extends RenderBox
       rtData?.offset = Offset((width - rtSize.width) / 2, 0);
     }
 
-    return constraints.constrain(Size(width, height));
-  }
-
-  static Size _performLayoutDry(
-    RenderBox renderBox,
-    BoxConstraints constraints,
-  ) =>
-      renderBox.getDryLayout(constraints);
-
-  static Size _performLayoutLayouter(
-    RenderBox renderBox,
-    BoxConstraints constraints,
-  ) {
-    renderBox.layout(constraints, parentUsesSize: true);
-    return renderBox.size;
+    return bc.constrain(Size(width, height));
   }
 }
