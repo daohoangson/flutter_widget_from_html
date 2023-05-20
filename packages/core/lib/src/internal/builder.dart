@@ -145,8 +145,8 @@ class Builder extends BuildTree {
   void register(BuildOp op) {
     _buildOps.add(BuilderOp._(this, op));
     _logger.finest(
-      () => 'Registered ${op.debugLabel ?? 'a build op'} '
-          'for ${element.localName?.toUpperCase()} tag',
+      'Registered ${op.debugLabel ?? 'a build op'} '
+      'for ${element.localName?.toUpperCase()} tag',
     );
   }
 
