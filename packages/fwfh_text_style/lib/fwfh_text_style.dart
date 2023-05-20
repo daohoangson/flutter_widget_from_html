@@ -2,8 +2,11 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:logging/logging.dart';
 
 const _default = _DefaultValue();
+
+final _logger = Logger('fwfh_text_style');
 
 var _warnedAboutInherit = false;
 
@@ -17,10 +20,10 @@ class FwfhTextStyle extends _TextStyleProxy {
       assert(
         () {
           if (!_warnedAboutInherit) {
-            debugPrint(
-              "Warning: $ref has inherit=true, resetting height won't work. "
+            _logger.warning(
+              "$ref has inherit=true, resetting height won't work. "
               'See https://github.com/flutter/flutter/issues/58765 for context. '
-              'This is printed once per debug session.\n${StackTrace.current}',
+              'This is printed once per debugging session.',
             );
             _warnedAboutInherit = true;
           }

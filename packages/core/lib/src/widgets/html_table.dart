@@ -2,8 +2,11 @@ import 'dart:math';
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:logging/logging.dart';
 
 import 'css_sizing.dart';
+
+final _logger = Logger('fwfh.HtmlTable');
 
 /// A TABLE widget.
 class HtmlTable extends MultiChildRenderObjectWidget {
@@ -327,6 +330,7 @@ class _TableRenderLayouter {
 
   void step1GuessDrySizes(RenderBox firstChild) {
     RenderBox? child = firstChild;
+    var i = 0;
     while (child != null) {
       final data = child.parentData! as _TableCellData;
       children.add(child);
@@ -337,14 +341,14 @@ class _TableRenderLayouter {
       if (width != null) {
         drySize = Size(width, .0);
       } else {
-        drySize =
-            Size(constraints.hasBoundedWidth ? constraints.maxWidth : 100.0, 0);
+        final boundedWidthOr100 =
+            constraints.hasBoundedWidth ? constraints.maxWidth : 100.0;
+        drySize = Size(boundedWidthOr100, 0);
         try {
           const bc0 = BoxConstraints();
           drySize = ChildLayoutHelper.dryLayoutChild(child, bc0);
-        } catch (dryLayoutError, stackTrace) {
-          debugPrint('Ignored _performLayoutDry error: '
-              '$dryLayoutError\n$stackTrace');
+        } catch (error, stackTrace) {
+          _logger.fine('Skipped guessing size for child#$i', error, stackTrace);
         }
       }
       drySizes.add(drySize);
@@ -353,6 +357,7 @@ class _TableRenderLayouter {
       rowCount = max(rowCount, data.rowStart + data.rowSpan);
 
       child = data.nextSibling;
+      i++;
     }
   }
 
@@ -400,10 +405,9 @@ class _TableRenderLayouter {
             // width being smaller than dry size means the table is too crowded
             // calculating min to avoid breaking line in the middle of a word
             minWidth = child.getMinIntrinsicWidth(double.infinity);
-          } catch (minWidthError, stackTrace) {
+          } catch (error, stackTrace) {
             minWidth = drySize.width;
-            debugPrint('Ignored getMinIntrinsicWidth error: '
-                '$minWidthError\n$stackTrace');
+            _logger.fine('Skipped measuring child#$i', error, stackTrace);
           }
 
           minColumnWidths.setMaxColumnWidths(tro, data, minWidth);
@@ -423,7 +427,7 @@ class _TableRenderLayouter {
         // using column count to stop early, not a typo
         // we don't want to waste too much time in this loop
         // in case the table is extra long with many many rows
-        debugPrint('Stopped to avoid infinite loops latest=$columnWidths');
+        _logger.info('Finished measuring children x$loopCount');
         break;
       }
     }

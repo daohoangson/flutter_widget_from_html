@@ -3,8 +3,8 @@ import 'dart:collection';
 import 'package:csslib/parser.dart' as css;
 import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/widgets.dart';
-
 import 'package:html/dom.dart' as dom;
+import 'package:logging/logging.dart';
 
 import '../core_data.dart';
 import '../core_helpers.dart';
@@ -14,6 +14,7 @@ import 'flattener.dart';
 
 // https://infra.spec.whatwg.org/#ascii-whitespace
 const _asciiWhitespace = r'[\u{0009}\u{000A}\u{000C}\u{000D}\u{0020}]';
+final _logger = Logger('fwfh.Builder');
 final _regExpSpaceLeading = RegExp('^$_asciiWhitespace+', unicode: true);
 final _regExpSpaceTrailing = RegExp('$_asciiWhitespace+\$', unicode: true);
 final _regExpSpaces = RegExp('$_asciiWhitespace+', unicode: true);
@@ -141,7 +142,13 @@ class Builder extends BuildTree {
   }
 
   @override
-  void register(BuildOp op) => _buildOps.add(BuilderOp._(this, op));
+  void register(BuildOp op) {
+    _buildOps.add(BuilderOp._(this, op));
+    _logger.finest(
+      'Registered ${op.debugLabel ?? 'a build op'} '
+      'for ${element.localName?.toUpperCase()} tag',
+    );
+  }
 
   @override
   Builder sub({dom.Element? element}) => copyWith(
@@ -164,7 +171,7 @@ class Builder extends BuildTree {
     final customWidget = customWidgetBuilder?.call(element);
     if (customWidget != null) {
       append(WidgetBit.block(this, customWidget));
-      // skip further processing if a custom widget found
+      _logger.fine('Custom widget for ${element.localName?.toUpperCase()} tag');
       return;
     }
 
@@ -235,6 +242,7 @@ class Builder extends BuildTree {
       return;
     }
 
+    _logger.fine('Custom styles for ${element.localName?.toUpperCase()}: $map');
     final str = map.entries.map((e) => '${e.key}: ${e.value}').join(';');
     final styleSheet = css.parse('*{$str}');
 

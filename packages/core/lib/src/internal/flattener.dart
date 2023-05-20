@@ -1,9 +1,12 @@
 import 'package:flutter/widgets.dart';
+import 'package:logging/logging.dart';
 
 import '../core_data.dart';
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
 import 'margin_vertical.dart';
+
+final _logger = Logger('fwfh.Flattener');
 
 class Flattener implements Flattened {
   final BuildTree tree;
@@ -84,6 +87,7 @@ class Flattener implements Flattened {
     });
 
     _widgets.add(placeholder);
+    _logger.finest('Added ${placeholder.debugLabel} widget');
   }
 
   @override
@@ -188,82 +192,81 @@ class Flattener implements Flattened {
   void _completeLoop() {
     _saveSpan();
 
-    final scopedChildrenBuilder = _childrenBuilder;
-    if (scopedChildrenBuilder == null) {
+    final reversedBuilders = _childrenBuilder?.reversed.toList(growable: false);
+    if (reversedBuilders == null) {
       return;
     }
 
     _childrenBuilder = null;
-    if (scopedChildrenBuilder.isEmpty && _firstStrings.isEmpty) {
+    if (reversedBuilders.isEmpty && _firstStrings.isEmpty) {
       return;
     }
     final scopedStrings = _firstStrings;
     final scopedStyleBulder = _firstStyleBuilder;
 
-    _widgets.add(
-      WidgetPlaceholder(
-        builder: (context, _) {
-          final style = scopedStyleBulder.build(context);
-          final reversedbuilders =
-              scopedChildrenBuilder.reversed.toList(growable: false);
-          final children = <InlineSpan>[];
+    final placeholder = WidgetPlaceholder(
+      builder: (context, _) {
+        final style = scopedStyleBulder.build(context);
+        final children = <InlineSpan>[];
 
-          var isLast_ = true;
-          for (final builder in reversedbuilders) {
-            final child = builder(context, isLast: isLast_);
-            if (child != null) {
-              isLast_ = false;
-              children.insert(0, child);
-            }
+        var isLast_ = true;
+        for (final builder in reversedBuilders) {
+          final child = builder(context, isLast: isLast_);
+          if (child != null) {
+            isLast_ = false;
+            children.insert(0, child);
           }
+        }
 
-          final text = scopedStrings.toText(
-            style.whitespace,
-            isFirst: true,
-            isLast: isLast_,
-          );
-          InlineSpan? span;
-          if (text.isEmpty && children.isEmpty) {
-            final nonWhitespaceStrings = scopedStrings
-                .where((str) => !str.isWhitespace)
-                .toList(growable: false);
-            if (nonWhitespaceStrings.length == 1 &&
-                nonWhitespaceStrings[0].data == '\n') {
-              // special handling for paragraph with <BR /> only
-              const oneEm = CssLength(1, CssLengthUnit.em);
-              span = WidgetSpan(
-                child: HeightPlaceholder(
-                  oneEm,
-                  scopedStyleBulder,
-                  debugLabel: '${tree.element.localName}--$oneEm',
-                ),
-              );
-            }
-          } else {
-            span = wf.buildTextSpan(
-              children: children,
-              recognizer: _needsInlineRecognizer(context, style)
-                  ? style.gestureRecognizer
-                  : null,
-              style: style.textStyle,
-              text: text,
+        final text = scopedStrings.toText(
+          style.whitespace,
+          isFirst: true,
+          isLast: isLast_,
+        );
+        InlineSpan? span;
+        if (text.isEmpty && children.isEmpty) {
+          final nonWhitespaceStrings = scopedStrings
+              .where((str) => !str.isWhitespace)
+              .toList(growable: false);
+          if (nonWhitespaceStrings.length == 1 &&
+              nonWhitespaceStrings[0].data == '\n') {
+            // special handling for paragraph with <BR /> only
+            const oneEm = CssLength(1, CssLengthUnit.em);
+            span = WidgetSpan(
+              child: HeightPlaceholder(
+                oneEm,
+                scopedStyleBulder,
+                debugLabel: '${tree.element.localName}--$oneEm',
+              ),
             );
           }
+        } else {
+          span = wf.buildTextSpan(
+            children: children,
+            recognizer: _needsInlineRecognizer(context, style)
+                ? style.gestureRecognizer
+                : null,
+            style: style.textStyle,
+            text: text,
+          );
+        }
 
-          if (span == null) {
-            return widget0;
-          }
+        if (span == null) {
+          return widget0;
+        }
 
-          final textAlign = style.textAlign ?? TextAlign.start;
-          if (span is WidgetSpan && textAlign == TextAlign.start) {
-            return span.child;
-          }
+        final textAlign = style.textAlign ?? TextAlign.start;
+        if (span is WidgetSpan && textAlign == TextAlign.start) {
+          return span.child;
+        }
 
-          return wf.buildText(tree, style, span);
-        },
-        debugLabel: '${tree.element.localName}--text',
-      ),
+        return wf.buildText(tree, style, span);
+      },
+      debugLabel: '${tree.element.localName}--text',
     );
+
+    _widgets.add(placeholder);
+    _logger.finest('Added ${placeholder.debugLabel} widget');
   }
 
   bool _needsInlineRecognizer(BuildContext context, HtmlStyle style) {

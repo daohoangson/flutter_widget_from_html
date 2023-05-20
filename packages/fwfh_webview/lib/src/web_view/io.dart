@@ -1,12 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:logging/logging.dart';
 import 'package:webview_flutter/webview_flutter.dart' as lib;
 import 'package:webview_flutter_android/webview_flutter_android.dart' as lib;
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart'
     as lib;
 
 import 'web_view.dart';
+
+final _logger = Logger('fwfh_webview');
 
 class WebViewState extends State<WebView> {
   final _timers = <Timer>[];
@@ -100,8 +103,8 @@ class WebViewState extends State<WebView> {
     try {
       final result = await _controller.runJavaScriptReturningResult(js);
       return '$result';
-    } catch (evalError) {
-      debugPrint('evalError: $evalError');
+    } catch (error, stackTrace) {
+      _logger.warning('Could not eval JS', error, stackTrace);
     }
 
     return '';
