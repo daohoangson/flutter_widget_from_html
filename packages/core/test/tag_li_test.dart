@@ -788,49 +788,72 @@ Future<void> main() async {
       expect(rtl, contains('HtmlListItem(textDirection: rtl)'));
     });
 
-    testWidgets('computeIntrinsic', (tester) async {
-      final child = GlobalKey();
-      final listItem = GlobalKey();
+    testWidgets('computeDryLayout', (tester) async {
+      final key = GlobalKey();
       await tester.pumpWidget(
         HtmlListItem(
-          key: listItem,
-          marker: widget0,
+          key: key,
           textDirection: TextDirection.ltr,
-          child: SizedBox(key: child, width: 50, height: 5),
+          child: const SizedBox(width: 50, height: 5),
         ),
       );
       await tester.pumpAndSettle();
 
-      final childRenderBox =
-          child.currentContext!.findRenderObject() as RenderBox?;
-      final listItemRenderBox =
-          listItem.currentContext!.findRenderObject() as RenderBox?;
+      expect(
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(const Size(50, 5)),
+      );
+    });
 
-      if (childRenderBox == null) {
-        expect(childRenderBox, isNotNull);
-        return;
-      }
-      if (listItemRenderBox == null) {
-        expect(listItemRenderBox, isNotNull);
-        return;
-      }
+    testWidgets('computeDryLayout without child', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        HtmlListItem(
+          key: key,
+          textDirection: TextDirection.ltr,
+        ),
+      );
+      await tester.pumpAndSettle();
 
       expect(
-        listItemRenderBox.getMaxIntrinsicHeight(100),
-        equals(childRenderBox.getMaxIntrinsicHeight(100)),
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(Size.zero),
       );
-      expect(
-        listItemRenderBox.getMaxIntrinsicWidth(100),
-        equals(childRenderBox.getMaxIntrinsicWidth(100)),
+    });
+
+    testWidgets('computeIntrinsic', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        HtmlListItem(
+          key: key,
+          textDirection: TextDirection.ltr,
+          child: const SizedBox(width: 50, height: 5),
+        ),
       );
-      expect(
-        listItemRenderBox.getMinIntrinsicHeight(100),
-        equals(childRenderBox.getMinIntrinsicHeight(100)),
+      await tester.pumpAndSettle();
+
+      final renderBox = key.renderBox;
+      expect(renderBox.getMaxIntrinsicHeight(100), equals(5));
+      expect(renderBox.getMaxIntrinsicWidth(100), equals(50));
+      expect(renderBox.getMinIntrinsicHeight(100), equals(5));
+      expect(renderBox.getMinIntrinsicWidth(100), equals(50));
+    });
+
+    testWidgets('computeIntrinsic without child', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        HtmlListItem(
+          key: key,
+          textDirection: TextDirection.ltr,
+        ),
       );
-      expect(
-        listItemRenderBox.getMinIntrinsicWidth(100),
-        equals(childRenderBox.getMinIntrinsicWidth(100)),
-      );
+      await tester.pumpAndSettle();
+
+      final renderBox = key.renderBox;
+      expect(renderBox.getMaxIntrinsicHeight(100), equals(0));
+      expect(renderBox.getMaxIntrinsicWidth(100), equals(0));
+      expect(renderBox.getMinIntrinsicHeight(100), equals(0));
+      expect(renderBox.getMinIntrinsicWidth(100), equals(0));
     });
 
     testWidgets('performs hit test', (tester) async {
@@ -906,30 +929,6 @@ Future<void> main() async {
             }
           },
           skip: goldenSkip,
-        );
-
-        testGoldens(
-          'computeDryLayout',
-          (tester) async {
-            await tester.pumpWidgetBuilder(
-              const Scaffold(
-                body: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: HtmlWidget(
-                    '<div style="background: black; color: white; '
-                    'width: 200px; height: 200px">'
-                    '<ul><li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li></ul>'
-                    '<div>',
-                  ),
-                ),
-              ),
-              wrapper: materialAppWrapper(theme: ThemeData.light()),
-              surfaceSize: const Size(600, 400),
-            );
-
-            await screenMatchesGolden(tester, 'computeDryLayout');
-          },
-          skip: goldenSkip != null,
         );
       },
       config: GoldenToolkitConfiguration(

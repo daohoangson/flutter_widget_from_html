@@ -10,11 +10,19 @@ class HtmlListItem extends MultiChildRenderObjectWidget {
 
   /// Creates a list item widget.
   HtmlListItem({
-    required Widget child,
+    Widget? child,
     Key? key,
-    required Widget marker,
+    Widget? marker,
     required this.textDirection,
-  }) : super(children: [child, marker], key: key);
+  }) : super(
+          children: child != null
+              ? [
+                  child,
+                  if (marker != null) marker,
+                ]
+              : const [],
+          key: key,
+        );
 
   @override
   RenderObject createRenderObject(BuildContext _) =>
@@ -57,6 +65,29 @@ class _ListItemRenderObject extends RenderBox
       defaultComputeDistanceToFirstActualBaseline(baseline);
 
   @override
+  Size computeDryLayout(BoxConstraints constraints) {
+    final child = firstChild;
+    if (child == null) {
+      return constraints.smallest;
+    }
+
+    final childConstraints = constraints;
+    final childData = child.parentData! as _ListItemData;
+    final childSize = child.getDryLayout(childConstraints);
+
+    final marker = childData.nextSibling;
+    final markerConstraints = childConstraints.loosen();
+    final markerSize = marker?.getDryLayout(markerConstraints) ?? Size.zero;
+
+    return constraints.constrain(
+      Size(
+        childSize.width,
+        childSize.height > 0 ? childSize.height : markerSize.height,
+      ),
+    );
+  }
+
+  @override
   double computeMaxIntrinsicHeight(double width) =>
       firstChild?.computeMaxIntrinsicHeight(width) ??
       super.computeMaxIntrinsicHeight(width);
@@ -75,29 +106,6 @@ class _ListItemRenderObject extends RenderBox
   double computeMinIntrinsicWidth(double height) =>
       firstChild?.getMinIntrinsicWidth(height) ??
       super.computeMinIntrinsicWidth(height);
-
-  @override
-  Size computeDryLayout(BoxConstraints constraints) {
-    final child = firstChild;
-    if (child == null) {
-      return super.computeDryLayout(constraints);
-    }
-
-    final childConstraints = constraints;
-    final childData = child.parentData! as _ListItemData;
-    final childSize = child.getDryLayout(childConstraints);
-
-    final marker = childData.nextSibling;
-    final markerConstraints = childConstraints.loosen();
-    final markerSize = marker?.getDryLayout(markerConstraints) ?? Size.zero;
-
-    return constraints.constrain(
-      Size(
-        childSize.width,
-        childSize.height > 0 ? childSize.height : markerSize.height,
-      ),
-    );
-  }
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
