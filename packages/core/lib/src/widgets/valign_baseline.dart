@@ -123,7 +123,7 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
 
   @override
   Size computeDryLayout(BoxConstraints constraints) =>
-      _performLayout(child, _paddingTop, constraints, _performLayoutDry);
+      _compute(child, constraints, ChildLayoutHelper.dryLayoutChild);
 
   @override
   void paint(PaintingContext context, Offset offset) {
@@ -181,40 +181,15 @@ class _ValignBaselineRenderObject extends RenderProxyBox {
   }
 
   @override
-  void performLayout() {
-    size = _performLayout(
-      child,
-      _paddingTop,
-      constraints,
-      _performLayoutLayouter,
-    );
-  }
+  void performLayout() =>
+      size = _compute(child, constraints, ChildLayoutHelper.layoutChild);
 
   @override
   String toStringShort() => '_ValignBaselineRenderObject(index: $_index)';
 
-  static Size _performLayout(
-    RenderBox? child,
-    double paddingTop,
-    BoxConstraints constraints,
-    Size? Function(RenderBox? renderBox, BoxConstraints constraints) layouter,
-  ) {
-    final cc = constraints.loosen().deflate(EdgeInsets.only(top: paddingTop));
-    final childSize = layouter(child, cc) ?? Size.zero;
-    return constraints.constrain(childSize + Offset(0, paddingTop));
-  }
-
-  static Size? _performLayoutDry(
-    RenderBox? renderBox,
-    BoxConstraints constraints,
-  ) =>
-      renderBox?.getDryLayout(constraints);
-
-  static Size? _performLayoutLayouter(
-    RenderBox? renderBox,
-    BoxConstraints constraints,
-  ) {
-    renderBox?.layout(constraints, parentUsesSize: true);
-    return renderBox?.size;
+  Size _compute(RenderBox? child, BoxConstraints bc, ChildLayouter fn) {
+    final cc = bc.loosen().deflate(EdgeInsets.only(top: _paddingTop));
+    final childSize = child != null ? fn(child, cc) : Size.zero;
+    return bc.constrain(childSize + Offset(0, _paddingTop));
   }
 }

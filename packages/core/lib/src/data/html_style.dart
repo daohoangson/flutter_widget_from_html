@@ -38,13 +38,12 @@ class HtmlStyle {
     var textStyle = _getDependency<TextStyle>(deps).merge(widgetTextStyle);
     textStyle = FwfhTextStyle.from(textStyle);
 
-    final mqd = _getDependency<MediaQueryData>(deps);
-    final tsf = mqd.textScaleFactor;
+    final tsf = _getDependency<TextScaleFactor>(deps);
     final fontSize = textStyle.fontSize;
-    if (tsf != 1 && fontSize != null) {
+    if (tsf.value != 1.0 && fontSize != null) {
       textStyle = textStyle.copyWith(
         debugLabel: 'fwfh: fontSize *= textScaleFactor',
-        fontSize: fontSize * tsf,
+        fontSize: fontSize * tsf.value,
       );
     }
 

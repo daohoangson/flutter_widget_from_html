@@ -648,6 +648,130 @@ Future<void> main() async {
       expect(after.toStringShort(), endsWith('(index: 1)'));
     });
 
+    testWidgets('computeDistanceToActualBaseline', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                HtmlTable(
+                  children: const [
+                    HtmlTableCell(
+                      columnStart: 0,
+                      rowStart: 0,
+                      child: Text('Foo'),
+                    ),
+                  ],
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text('Bar'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('computeDistanceToActualBaseline with 2 cells', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                HtmlTable(
+                  children: const [
+                    HtmlTableCell(
+                      columnStart: 0,
+                      rowStart: 0,
+                      child: Text('One'),
+                    ),
+                    HtmlTableCell(
+                      columnStart: 1,
+                      rowStart: 0,
+                      child: Text('Two'),
+                    ),
+                  ],
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text('Foo'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('computeDistanceToActualBaseline without cell', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                HtmlTable(
+                  children: const [],
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text('Foo'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('computeDryLayout', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        HtmlTable(
+          key: key,
+          children: const [
+            HtmlTableCell(
+              columnStart: 0,
+              rowStart: 0,
+              child: SizedBox(width: 100, height: 50),
+            ),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(const Size(100, 50)),
+      );
+    });
+
+    testWidgets('computeDryLayout without cell', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        HtmlTable(
+          key: key,
+          children: const [],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(Size.zero),
+      );
+    });
+
     testWidgets('performs hit test', (tester) async {
       const href = 'href';
       final urls = <String>[];

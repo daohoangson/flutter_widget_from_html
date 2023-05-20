@@ -563,6 +563,134 @@ void main() {
       );
     });
 
+    testWidgets('computeDryLayout', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        CssSizing(
+          key: key,
+          child: const SizedBox(width: 50, height: 50),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(const Size(50, 50)),
+      );
+    });
+
+    testWidgets('computeDryLayout without child', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(CssSizing(key: key));
+      await tester.pumpAndSettle();
+
+      expect(
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(Size.zero),
+      );
+    });
+
+    group('_guessChildSize with 2 dimensions', () {
+      testWidgets('respect wide child', (tester) async {
+        final key = GlobalKey();
+        await tester.pumpWidget(
+          Center(
+            child: CssSizing(
+              key: key,
+              preferredHeight: const CssSizingValue.value(100),
+              preferredWidth: const CssSizingValue.value(100),
+              child: const AspectRatio(aspectRatio: 2),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(key.renderBox.size, equals(const Size(100, 50)));
+      });
+
+      testWidgets('respect wide child (vertical)', (tester) async {
+        final key = GlobalKey();
+        await tester.pumpWidget(
+          Center(
+            child: CssSizing(
+              key: key,
+              preferredAxis: Axis.vertical,
+              preferredHeight: const CssSizingValue.value(100),
+              preferredWidth: const CssSizingValue.value(100),
+              child: const AspectRatio(aspectRatio: 2),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(key.renderBox.size, equals(const Size(200, 100)));
+      });
+
+      testWidgets('child too wide', (tester) async {
+        final key = GlobalKey();
+        await tester.pumpWidget(
+          Center(
+            child: CssSizing(
+              key: key,
+              preferredAxis: Axis.vertical,
+              preferredHeight: const CssSizingValue.value(100),
+              preferredWidth: const CssSizingValue.value(100),
+              child: const AspectRatio(aspectRatio: 20),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(key.renderBox.size, equals(const Size(800, 40)));
+      });
+
+      testWidgets('respect tall child', (tester) async {
+        final key = GlobalKey();
+        await tester.pumpWidget(
+          Center(
+            child: CssSizing(
+              key: key,
+              preferredHeight: const CssSizingValue.value(100),
+              preferredWidth: const CssSizingValue.value(100),
+              child: const AspectRatio(aspectRatio: .5),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(key.renderBox.size, equals(const Size(100, 200)));
+      });
+
+      testWidgets('respect tall child (vertical)', (tester) async {
+        final key = GlobalKey();
+        await tester.pumpWidget(
+          Center(
+            child: CssSizing(
+              key: key,
+              preferredAxis: Axis.vertical,
+              preferredHeight: const CssSizingValue.value(100),
+              preferredWidth: const CssSizingValue.value(100),
+              child: const AspectRatio(aspectRatio: .5),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(key.renderBox.size, equals(const Size(50, 100)));
+      });
+
+      testWidgets('child too tall', (tester) async {
+        final key = GlobalKey();
+        await tester.pumpWidget(
+          Center(
+            child: CssSizing(
+              key: key,
+              preferredHeight: const CssSizingValue.value(100),
+              preferredWidth: const CssSizingValue.value(100),
+              child: const AspectRatio(aspectRatio: .05),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(key.renderBox.size, equals(const Size(30, 600)));
+      });
+    });
+
     final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
     final goldenSkip = goldenSkipEnvVar == null
         ? Platform.isLinux

@@ -185,8 +185,8 @@ class Builder extends BuildTree {
   void _addText(String data) {
     final leading = _regExpSpaceLeading.firstMatch(data);
     final trailing = _regExpSpaceTrailing.firstMatch(data);
-    final start = leading == null ? 0 : leading.end;
-    final end = trailing == null ? data.length : trailing.start;
+    final start = leading?.end ?? 0;
+    final end = trailing?.start ?? data.length;
 
     if (end <= start) {
       // the string contains all spaces
@@ -194,8 +194,8 @@ class Builder extends BuildTree {
       return;
     }
 
-    if (start > 0) {
-      addWhitespace(leading!.group(0)!);
+    if (leading != null) {
+      addWhitespace(leading.group(0)!);
     }
 
     final contents = data.substring(start, end);
@@ -224,8 +224,8 @@ class Builder extends BuildTree {
       }
     }
 
-    if (end < data.length) {
-      addWhitespace(trailing!.group(0)!);
+    if (trailing != null) {
+      addWhitespace(trailing.group(0)!);
     }
   }
 

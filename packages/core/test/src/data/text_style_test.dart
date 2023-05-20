@@ -8,7 +8,7 @@ void main() {
       final dep1 = _Dep1();
       final style = HtmlStyle.root(
         [
-          const MediaQueryData(),
+          const TextScaleFactor(1.0),
           TextDirection.ltr,
           const TextStyle(inherit: false),
           dep1,

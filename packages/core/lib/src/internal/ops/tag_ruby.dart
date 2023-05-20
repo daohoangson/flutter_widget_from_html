@@ -53,8 +53,8 @@ class TagRuby {
               WidgetBit.inline(
                 tree,
                 HtmlRuby(
-                  rubyTree.build() ?? widget0,
-                  rtTree.build() ?? widget0,
+                  rt: rtTree.build(),
+                  ruby: rubyTree.build(),
                 ),
                 alignment: PlaceholderAlignment.baseline,
               ),

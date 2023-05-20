@@ -771,6 +771,10 @@ class HitTestApp extends StatelessWidget {
       );
 }
 
+extension RenderBoxGetter on GlobalKey {
+  RenderBox get renderBox => currentContext!.findRenderObject()! as RenderBox;
+}
+
 class _TextFinder extends MatchFinder {
   final String data;
 

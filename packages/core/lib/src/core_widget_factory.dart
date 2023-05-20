@@ -248,11 +248,12 @@ class WidgetFactory {
       built = buildTooltip(tree, built, title);
     }
 
-    if (built != null &&
-        src.height?.isNegative == false &&
-        src.width?.isNegative == false &&
-        src.height != 0) {
-      built = buildAspectRatio(tree, built, src.width! / src.height!);
+    if (built != null) {
+      final height = src.height;
+      final width = src.width;
+      if (height != null && height > 0 && width != null && width > 0) {
+        built = buildAspectRatio(tree, built, width / height);
+      }
     }
 
     final onTapImage = _widget?.onTapImage;
@@ -292,20 +293,16 @@ class WidgetFactory {
     return Image(
       errorBuilder: (context, error, _) =>
           onErrorBuilder(context, tree, error, src) ?? widget0,
-      loadingBuilder: (context, child, loadingProgress) =>
-          loadingProgress == null
-              ? child
-              : onLoadingBuilder(
-                    context,
-                    tree,
-                    loadingProgress.expectedTotalBytes != null &&
-                            loadingProgress.expectedTotalBytes! > 0
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
-                    src,
-                  ) ??
-                  child,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) {
+          return child;
+        }
+
+        final t = loadingProgress.expectedTotalBytes;
+        final loaded = loadingProgress.cumulativeBytesLoaded;
+        final v = t != null && t > 0 ? loaded / t : null;
+        return onLoadingBuilder(context, tree, v, src) ?? child;
+      },
       excludeFromSemantics: semanticLabel == null,
       fit: BoxFit.fill,
       image: provider,
@@ -381,11 +378,11 @@ class WidgetFactory {
     String? text,
   }) {
     if (text?.isEmpty == true) {
-      if (children?.isEmpty == true) {
+      if (children == null) {
         return null;
       }
-      if (children?.length == 1) {
-        return children!.first;
+      if (children.length == 1) {
+        return children.first;
       }
     }
 
@@ -423,8 +420,8 @@ class WidgetFactory {
   /// - [DefaultSelectionStyle] via [DefaultSelectionStyle.of]
   /// - [TextStyle] via [DefaultTextStyle.of]
   /// - [SelectionRegistrar] via [SelectionContainer.maybeOf]
+  /// - [TextScaleFactor] via [MediaQuery.textScaleFactorOf]
   /// - [ThemeData] via [Theme.of]
-  /// - [MediaQueryData] via [MediaQuery.of]
   ///
   /// Use [HtmlStyle.getDependency] to get value by type.
   ///
@@ -434,7 +431,7 @@ class WidgetFactory {
   /// final color = Theme.of(context).accentColor;
   ///
   /// // in build ops:
-  /// final scale = style.getDependency<MediaQueryData>().textScaleFactor;
+  /// final tsf = style.getDependency<TextScaleFactor>();
   /// final color = style.getDependency<ThemeData>().accentColor;
   /// ```
   ///
@@ -449,15 +446,12 @@ class WidgetFactory {
   /// final buildOpValue = style.textDirection;
   /// ```
   Iterable<dynamic> getDependencies(BuildContext context) => [
-        Directionality.of(context),
+        Directionality.maybeOf(context) ?? TextDirection.ltr,
         DefaultSelectionStyle.of(context),
         DefaultTextStyle.of(context).style,
         SelectionContainer.maybeOf(context),
+        TextScaleFactor(MediaQuery.textScaleFactorOf(context)),
         Theme.of(context),
-
-        // TODO: use inherited model scope when it's merged into stable
-        // https://github.com/flutter/flutter/pull/114459
-        MediaQuery.of(context),
       ];
 
   /// Returns marker text for the specified list style [type] at index [i].
