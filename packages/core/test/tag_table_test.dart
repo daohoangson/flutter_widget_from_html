@@ -32,8 +32,7 @@ Future<void> main() async {
         explained,
         equals(
           '[HtmlTable:children='
-          '[HtmlTableCaption:child=[CssBlock:child='
-          '[RichText:align=center,(:Caption)]]],'
+          '[HtmlTableCaption:child=[RichText:align=center,(:Caption)]],'
           '${_padding('[RichText:(+b:Header 1)]')},'
           '${_padding('[RichText:(+b:Header 2)]')},'
           '${_richtext('Value 1')},'
@@ -528,8 +527,7 @@ Future<void> main() async {
       explained,
       equals(
         '[HtmlTable:children='
-        '[HtmlTableCaption:child=[CssBlock:child='
-        '[RichText:align=center,(:Caption)]]],'
+        '[HtmlTableCaption:child=[RichText:align=center,(:Caption)]],'
         '[HtmlTableCell:child=[RichText:(+b:Header 1)]],'
         '[HtmlTableCell:child=[RichText:(+b:Header 2)]],'
         '[HtmlTableCell:child=[RichText:(:Value 1)]],'
