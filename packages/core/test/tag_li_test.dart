@@ -788,7 +788,47 @@ Future<void> main() async {
       expect(rtl, contains('HtmlListItem(textDirection: rtl)'));
     });
 
-    testWidgets('computeDryLayout', (tester) async {
+    testWidgets('computeDryLayout with text marker', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: HtmlListItem(
+              key: key,
+              marker: const Text('marker'),
+              textDirection: TextDirection.ltr,
+              child: const SizedBox(width: 50, height: 5),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(const Size(50, 5)),
+      );
+    });
+
+    testWidgets('computeDryLayout with no op marker', (tester) async {
+      final key = GlobalKey();
+      await tester.pumpWidget(
+        HtmlListItem(
+          key: key,
+          marker: widget0,
+          textDirection: TextDirection.ltr,
+          child: const SizedBox(width: 50, height: 5),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        key.renderBox.getDryLayout(const BoxConstraints()),
+        equals(const Size(50, 5)),
+      );
+    });
+
+    testWidgets('computeDryLayout without marker', (tester) async {
       final key = GlobalKey();
       await tester.pumpWidget(
         HtmlListItem(
