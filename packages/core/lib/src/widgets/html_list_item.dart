@@ -58,30 +58,38 @@ class _ListItemRenderObject extends RenderBox
 
   @override
   double computeMaxIntrinsicHeight(double width) =>
-      firstChild!.computeMaxIntrinsicHeight(width);
+      firstChild?.computeMaxIntrinsicHeight(width) ??
+      super.computeMaxIntrinsicHeight(width);
 
   @override
   double computeMaxIntrinsicWidth(double height) =>
-      firstChild!.computeMaxIntrinsicWidth(height);
+      firstChild?.computeMaxIntrinsicWidth(height) ??
+      super.computeMaxIntrinsicWidth(height);
 
   @override
   double computeMinIntrinsicHeight(double width) =>
-      firstChild!.computeMinIntrinsicHeight(width);
+      firstChild?.computeMinIntrinsicHeight(width) ??
+      super.computeMinIntrinsicHeight(width);
 
   @override
   double computeMinIntrinsicWidth(double height) =>
-      firstChild!.getMinIntrinsicWidth(height);
+      firstChild?.getMinIntrinsicWidth(height) ??
+      super.computeMinIntrinsicWidth(height);
 
   @override
   Size computeDryLayout(BoxConstraints constraints) {
-    final child = firstChild!;
+    final child = firstChild;
+    if (child == null) {
+      return super.computeDryLayout(constraints);
+    }
+
     final childConstraints = constraints;
     final childData = child.parentData! as _ListItemData;
     final childSize = child.getDryLayout(childConstraints);
 
-    final marker = childData.nextSibling!;
+    final marker = childData.nextSibling;
     final markerConstraints = childConstraints.loosen();
-    final markerSize = marker.getDryLayout(markerConstraints);
+    final markerSize = marker?.getDryLayout(markerConstraints) ?? Size.zero;
 
     return constraints.constrain(
       Size(
@@ -101,17 +109,23 @@ class _ListItemRenderObject extends RenderBox
 
   @override
   void performLayout() {
-    final child = firstChild!;
+    final child = firstChild;
+    if (child == null) {
+      size = constraints.smallest;
+      return;
+    }
+
     final childConstraints = constraints;
     final childData = child.parentData! as _ListItemData;
     child.layout(childConstraints, parentUsesSize: true);
     final childSize = child.size;
 
-    final marker = childData.nextSibling!;
+    final marker = childData.nextSibling;
     final markerConstraints = childConstraints.loosen();
-    final markerData = marker.parentData! as _ListItemData;
-    marker.layout(markerConstraints, parentUsesSize: true);
-    final markerSize = marker.size;
+    final _ListItemData? markerData =
+        marker != null ? marker.parentData! as _ListItemData : null;
+    marker?.layout(markerConstraints, parentUsesSize: true);
+    final markerSize = marker?.size ?? Size.zero;
 
     size = constraints.constrain(
       Size(
@@ -122,12 +136,12 @@ class _ListItemRenderObject extends RenderBox
 
     const baseline = TextBaseline.alphabetic;
     final markerDistance =
-        marker.getDistanceToBaseline(baseline, onlyReal: true) ??
+        marker?.getDistanceToBaseline(baseline, onlyReal: true) ??
             markerSize.height;
     final childDistance =
         child.getDistanceToBaseline(baseline, onlyReal: true) ?? markerDistance;
 
-    markerData.offset = Offset(
+    markerData?.offset = Offset(
       textDirection == TextDirection.ltr
           ? -markerSize.width - _kGapVsMarker
           : childSize.width + _kGapVsMarker,

@@ -619,9 +619,12 @@ class _TableRenderObject extends RenderBox
     }
   }
 
-  double get columnGap => _border != null && _borderCollapse
-      ? (_border!.left.width * -1.0)
-      : _borderSpacing;
+  double get columnGap {
+    final border = _border;
+    return border != null && _borderCollapse
+        ? (border.left.width * -1.0)
+        : _borderSpacing;
+  }
 
   double get paddingBottom => _border?.bottom.width ?? 0.0;
 
@@ -631,9 +634,12 @@ class _TableRenderObject extends RenderBox
 
   double get paddingTop => _border?.top.width ?? 0.0;
 
-  double get rowGap => _border != null && _borderCollapse
-      ? (_border!.top.width * -1.0)
-      : _borderSpacing;
+  double get rowGap {
+    final border = _border;
+    return border != null && _borderCollapse
+        ? (border.top.width * -1.0)
+        : _borderSpacing;
+  }
 
   @override
   double? computeDistanceToActualBaseline(TextBaseline baseline) {
@@ -667,8 +673,13 @@ class _TableRenderObject extends RenderBox
 
   @override
   Size computeDryLayout(BoxConstraints constraints) {
+    final child = firstChild;
+    if (child == null) {
+      return super.computeDryLayout(constraints);
+    }
+
     final layouter = _TableRenderLayouter.dry(this, constraints);
-    return layouter.layout(firstChild!).totalSize;
+    return layouter.layout(child).totalSize;
   }
 
   @override
@@ -698,8 +709,14 @@ class _TableRenderObject extends RenderBox
 
   @override
   void performLayout() {
+    final child = firstChild;
+    if (child == null) {
+      size = constraints.smallest;
+      return;
+    }
+
     final layouter = _TableRenderLayouter(this, constraints);
-    _layout = layouter.layout(firstChild!);
+    _layout = layouter.layout(child);
     size = constraints.constrain(_layout.totalSize);
   }
 

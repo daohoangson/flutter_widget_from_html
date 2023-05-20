@@ -21,16 +21,11 @@ mixin CachedNetworkImageFactory on WidgetFactory {
           onErrorBuilder(context, tree, error, src) ?? widget0,
       fit: BoxFit.fill,
       imageUrl: url,
-      progressIndicatorBuilder: (context, _, progress) =>
-          onLoadingBuilder(
-            context,
-            tree,
-            progress.totalSize != null && progress.totalSize! > 0
-                ? progress.downloaded / progress.totalSize!
-                : null,
-            src,
-          ) ??
-          widget0,
+      progressIndicatorBuilder: (context, _, progress) {
+        final t = progress.totalSize;
+        final v = t != null && t > 0 ? progress.downloaded / t : null;
+        return onLoadingBuilder(context, tree, v, src) ?? widget0;
+      },
     );
   }
 }

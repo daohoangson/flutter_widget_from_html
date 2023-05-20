@@ -73,7 +73,7 @@ class HtmlWidget extends StatefulWidget {
         html,
         renderMode,
         textStyle,
-        if (_rebuildTriggers != null) ..._rebuildTriggers!,
+        ..._rebuildTriggers ?? const [],
       ];
   final List<dynamic>? _rebuildTriggers;
 
@@ -189,7 +189,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
       return FutureBuilder<Widget>(
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return snapshot.data!;
+            return snapshot.requireData;
           } else if (snapshot.hasError) {
             return _sliverToBoxAdapterIfNeeded(
               _wf.onErrorBuilder(

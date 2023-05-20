@@ -21,60 +21,92 @@ class _RubyRenderObject extends RenderBox
         RenderBoxContainerDefaultsMixin<RenderBox, _RubyParentData> {
   @override
   double? computeDistanceToActualBaseline(TextBaseline baseline) {
-    final ruby = firstChild!;
-    final rubyValue = ruby.getDistanceToActualBaseline(baseline) ?? 0.0;
+    final ruby = firstChild;
+    if (ruby == null) {
+      return super.computeDistanceToActualBaseline(baseline);
+    }
 
+    final rubyValue = ruby.getDistanceToActualBaseline(baseline) ?? 0.0;
     final offset = (ruby.parentData! as _RubyParentData).offset;
     return offset.dy + rubyValue;
   }
 
   @override
   double computeMaxIntrinsicHeight(double width) {
-    final ruby = firstChild!;
+    final ruby = firstChild;
+    if (ruby == null) {
+      return super.computeMaxIntrinsicHeight(width);
+    }
+
     final rubyValue = ruby.computeMaxIntrinsicHeight(width);
+    final rt = (ruby.parentData! as _RubyParentData).nextSibling;
+    if (rt == null) {
+      return rubyValue;
+    }
 
-    final rt = (ruby.parentData! as _RubyParentData).nextSibling!;
     final rtValue = rt.computeMaxIntrinsicHeight(width);
-
     return rubyValue + rtValue;
   }
 
   @override
   double computeMaxIntrinsicWidth(double height) {
-    final ruby = firstChild!;
+    final ruby = firstChild;
+    if (ruby == null) {
+      return super.computeMaxIntrinsicWidth(height);
+    }
+
     final rubyValue = ruby.computeMaxIntrinsicWidth(height);
+    final rt = (ruby.parentData! as _RubyParentData).nextSibling;
+    if (rt == null) {
+      return rubyValue;
+    }
 
-    final rt = (ruby.parentData! as _RubyParentData).nextSibling!;
     final rtValue = rt.computeMaxIntrinsicWidth(height);
-
     return max(rubyValue, rtValue);
   }
 
   @override
   double computeMinIntrinsicHeight(double width) {
-    final ruby = firstChild!;
+    final ruby = firstChild;
+    if (ruby == null) {
+      return super.computeMinIntrinsicHeight(width);
+    }
+
     final rubyValue = ruby.computeMinIntrinsicHeight(width);
+    final rt = (ruby.parentData! as _RubyParentData).nextSibling;
+    if (rt == null) {
+      return rubyValue;
+    }
 
-    final rt = (ruby.parentData! as _RubyParentData).nextSibling!;
     final rtValue = rt.computeMinIntrinsicHeight(width);
-
     return rubyValue + rtValue;
   }
 
   @override
   double computeMinIntrinsicWidth(double height) {
-    final ruby = firstChild!;
+    final ruby = firstChild;
+    if (ruby == null) {
+      return super.computeMinIntrinsicWidth(height);
+    }
+
     final rubyValue = ruby.getMinIntrinsicWidth(height);
+    final rt = (ruby.parentData! as _RubyParentData).nextSibling;
+    if (rt == null) {
+      return rubyValue;
+    }
 
-    final rt = (ruby.parentData! as _RubyParentData).nextSibling!;
     final rtValue = rt.getMinIntrinsicWidth(height);
-
     return min(rubyValue, rtValue);
   }
 
   @override
-  Size computeDryLayout(BoxConstraints constraints) =>
-      _performLayout(firstChild!, constraints, _performLayoutDry);
+  Size computeDryLayout(BoxConstraints constraints) {
+    final ruby = firstChild;
+    if (ruby == null) {
+      return super.computeDryLayout(constraints);
+    }
+    return _performLayout(ruby, constraints, _performLayoutDry);
+  }
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
@@ -86,7 +118,12 @@ class _RubyRenderObject extends RenderBox
 
   @override
   void performLayout() {
-    size = _performLayout(firstChild!, constraints, _performLayoutLayouter);
+    final ruby = firstChild;
+    if (ruby == null) {
+      size = constraints.smallest;
+      return;
+    }
+    size = _performLayout(ruby, constraints, _performLayoutLayouter);
   }
 
   @override
@@ -105,19 +142,23 @@ class _RubyRenderObject extends RenderBox
     final rubyData = ruby.parentData! as _RubyParentData;
     final rubySize = layouter(ruby, rubyConstraints);
 
-    final rt = rubyData.nextSibling!;
+    final rt = rubyData.nextSibling;
     final rtConstraints = rubyConstraints.copyWith(
       maxHeight: rubyConstraints.maxHeight - rubySize.height,
     );
-    final rtData = rt.parentData! as _RubyParentData;
-    final rtSize = layouter(rt, rtConstraints);
+    _RubyParentData? rtData;
+    var rtSize = Size.zero;
+    if (rt != null) {
+      rtData = rt.parentData! as _RubyParentData;
+      rtSize = layouter(rt, rtConstraints);
+    }
 
     final height = rubySize.height + rtSize.height;
     final width = max(rubySize.width, rtSize.width);
 
     if (ruby.hasSize) {
       rubyData.offset = Offset((width - rubySize.width) / 2, rtSize.height);
-      rtData.offset = Offset((width - rtSize.width) / 2, 0);
+      rtData?.offset = Offset((width - rtSize.width) / 2, 0);
     }
 
     return constraints.constrain(Size(width, height));

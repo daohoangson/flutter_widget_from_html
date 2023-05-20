@@ -21,12 +21,15 @@ abstract class BuildBit {
 
     while (x != null) {
       final siblings = x.parent?._children;
-      final i = siblings?.indexOf(x) ?? -1;
+      if (siblings == null) {
+        return null;
+      }
+      final i = siblings.indexOf(x);
       if (i == -1) {
         return null;
       }
 
-      for (var j = i + 1; j < siblings!.length; j++) {
+      for (var j = i + 1; j < siblings.length; j++) {
         final candidate = siblings[j];
         if (candidate is BuildTree) {
           final first = candidate.first;
@@ -53,13 +56,16 @@ abstract class BuildBit {
 
     while (x != null) {
       final siblings = x.parent?._children;
-      final i = siblings?.indexOf(x) ?? -1;
+      if (siblings == null) {
+        return null;
+      }
+      final i = siblings.indexOf(x);
       if (i == -1) {
         return null;
       }
 
       for (var j = i - 1; j > -1; j--) {
-        final candidate = siblings![j];
+        final candidate = siblings[j];
         if (candidate is BuildTree) {
           final last = candidate.last;
           if (last != null) {
