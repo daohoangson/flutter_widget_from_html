@@ -675,7 +675,7 @@ class _TableRenderObject extends RenderBox
   Size computeDryLayout(BoxConstraints constraints) {
     final child = firstChild;
     if (child == null) {
-      return super.computeDryLayout(constraints);
+      return Size.zero;
     }
 
     final layouter = _TableRenderLayouter.dry(this, constraints);
