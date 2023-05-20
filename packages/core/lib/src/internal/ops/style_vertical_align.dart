@@ -79,7 +79,7 @@ class StyleVerticalAlign {
             return child;
           }
 
-          return wf.buildAlign(tree, child, alignment);
+          return wf.buildAlign(tree, child, alignment, widthFactor: 1.0);
         });
       },
       priority: kPriority4k3,
@@ -110,12 +110,9 @@ class StyleVerticalAlign {
       return child;
     }
 
-    return wf.buildAlign(
-      tree,
-      withPadding,
-      padding.bottom > 0 ? Alignment.topCenter : Alignment.bottomCenter,
-      widthFactor: 1.0,
-    );
+    final alignment =
+        padding.bottom > 0 ? Alignment.topCenter : Alignment.bottomCenter;
+    return wf.buildAlign(tree, withPadding, alignment, widthFactor: 1.0);
   }
 }
 
