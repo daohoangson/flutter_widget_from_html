@@ -6,8 +6,17 @@ import 'package:flutter/widgets.dart';
 /// A RUBY widget.
 class HtmlRuby extends MultiChildRenderObjectWidget {
   /// Creates a RUBY widget.
-  HtmlRuby(Widget ruby, Widget rt, {Key? key})
-      : super(children: [ruby, rt], key: key);
+  HtmlRuby({
+    Key? key,
+    Widget? rt,
+    Widget? ruby,
+  }) : super(
+          children: [
+            if (ruby != null) ruby,
+            if (rt != null) rt,
+          ],
+          key: key,
+        );
 
   @override
   RenderObject createRenderObject(BuildContext _) => _RubyRenderObject();
@@ -29,6 +38,15 @@ class _RubyRenderObject extends RenderBox
     final rubyValue = ruby.getDistanceToActualBaseline(baseline) ?? 0.0;
     final offset = (ruby.parentData! as _RubyParentData).offset;
     return offset.dy + rubyValue;
+  }
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) {
+    final ruby = firstChild;
+    if (ruby == null) {
+      return constraints.smallest;
+    }
+    return _performLayout(ruby, constraints, _performLayoutDry);
   }
 
   @override
@@ -61,8 +79,7 @@ class _RubyRenderObject extends RenderBox
       return rubyValue;
     }
 
-    final rtValue = rt.computeMaxIntrinsicWidth(height);
-    return max(rubyValue, rtValue);
+    return max(rubyValue, rt.computeMaxIntrinsicWidth(height));
   }
 
   @override
@@ -95,17 +112,7 @@ class _RubyRenderObject extends RenderBox
       return rubyValue;
     }
 
-    final rtValue = rt.getMinIntrinsicWidth(height);
-    return min(rubyValue, rtValue);
-  }
-
-  @override
-  Size computeDryLayout(BoxConstraints constraints) {
-    final ruby = firstChild;
-    if (ruby == null) {
-      return super.computeDryLayout(constraints);
-    }
-    return _performLayout(ruby, constraints, _performLayoutDry);
+    return min(rubyValue, rt.getMinIntrinsicWidth(height));
   }
 
   @override
