@@ -54,7 +54,7 @@ class CssSizing extends SingleChildRenderObjectWidget {
 
   /// Creates a CSS sizing.
   const CssSizing({
-    required Widget child,
+    Widget? child,
     Key? key,
     this.maxHeight,
     this.maxWidth,
@@ -194,7 +194,7 @@ class _RenderCssSizing extends RenderProxyBox {
   Size computeDryLayout(BoxConstraints constraints) {
     final scopedChild = child;
     if (scopedChild == null) {
-      return super.computeDryLayout(constraints);
+      return Size.zero;
     }
 
     final cc = _applyContraints(constraints);
