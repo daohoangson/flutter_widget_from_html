@@ -5,12 +5,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
+import 'package:logging/logging.dart';
 
 import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_widget_factory.dart';
 import 'internal/builder.dart' as builder;
 import 'internal/html_style_widget.dart';
+
+final _logger = Logger('fwfh.HtmlWidget');
 
 /// A widget that builds Flutter widget tree from HTML
 /// (supports most popular tags and stylings).
@@ -283,13 +286,18 @@ class _RootStyleBuilder extends HtmlStyleBuilder {
 }
 
 Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
+  _logger.fine('Building body...');
   final wf = state._wf;
   wf.reset(state);
 
   final rootBuilder = state._rootBuilder;
   rootBuilder.addBitsFromNodes(domNodes);
 
-  return rootBuilder.build()?.wrapWith(wf.buildBodyWidget) ?? widget0;
+  final built = rootBuilder.build()?.wrapWith(wf.buildBodyWidget) ?? widget0;
+
+  _logger.fine('Built body successfuly.');
+
+  return built;
 }
 
 dom.NodeList _parseHtml(String html) =>

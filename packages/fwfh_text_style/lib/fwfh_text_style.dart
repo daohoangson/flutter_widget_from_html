@@ -24,8 +24,6 @@ class FwfhTextStyle extends _TextStyleProxy {
               "$ref has inherit=true, resetting height won't work. "
               'See https://github.com/flutter/flutter/issues/58765 for context. '
               'This is printed once per debugging session.',
-              null,
-              StackTrace.current,
             );
             _warnedAboutInherit = true;
           }
