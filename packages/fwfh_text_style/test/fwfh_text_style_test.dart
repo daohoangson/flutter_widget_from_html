@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fwfh_text_style/fwfh_text_style.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
+import 'package:logging/logging.dart';
 
 import '../../core/test/_constants.dart';
 
@@ -160,6 +162,18 @@ Future<void> main() async {
     });
   });
 
+  test('FwfhTextStyle.from(inherit=true) warns once', () {
+    final records = <LogRecord>[];
+    Logger.root.onRecord.listen(records.add);
+
+    FwfhTextStyle.from(const TextStyle(fontSize: 1));
+    expect(records, hasLength(1));
+    expect(records.first.level, equals(Level.WARNING));
+
+    FwfhTextStyle.from(const TextStyle(fontSize: 2));
+    expect(records, hasLength(1));
+  });
+
   test('copyWith() updates existing debugLabel', () {
     const debugLabel = 'foo';
     final obj = FwfhTextStyle.from(
@@ -200,12 +214,74 @@ Future<void> main() async {
     expect(identical(copied, obj), isFalse);
   });
 
+  group('compareTo', () {
+    test('returns identical', () {
+      const textStyle = TextStyle(inherit: false, fontSize: 1);
+      final fwfh = FwfhTextStyle.from(textStyle);
+      expect(fwfh.compareTo(textStyle), equals(RenderComparison.identical));
+    });
+
+    test('returns layout', () {
+      const fontSize1 = TextStyle(inherit: false, fontSize: 1);
+      const fontSize2 = TextStyle(inherit: false, fontSize: 2);
+      final fwfh = FwfhTextStyle.from(fontSize1);
+      expect(fwfh.compareTo(fontSize2), equals(RenderComparison.layout));
+    });
+
+    test('returns paint', () {
+      const red = TextStyle(inherit: false, color: Colors.red);
+      const green = TextStyle(inherit: false, color: Colors.green);
+      final fwfh = FwfhTextStyle.from(red);
+      expect(fwfh.compareTo(green), equals(RenderComparison.paint));
+    });
+  });
+
+  test('debugFillProperties', () {
+    const textStyle = TextStyle(inherit: false, fontSize: 1);
+    final fwfh = FwfhTextStyle.from(textStyle);
+    final properties = DiagnosticPropertiesBuilder();
+    fwfh.debugFillProperties(properties);
+    expect(
+      properties.properties
+          .whereType<DoubleProperty>()
+          .where((property) => property.name == 'size')
+          .map((property) => property.value),
+      equals([1.0]),
+    );
+  });
+
   test('merge() nested obj', () {
     final obj = FwfhTextStyle.from(FwfhTextStyle.from(styleValue));
     final another = FwfhTextStyle.from(FwfhTextStyle.from(styleValue2));
     final merged = obj.merge(another);
     expect(merged.height, equals(value2));
     expect(merged, isNot(equals(obj)));
+  });
+
+  test('toDiagnosticsNode', () {
+    const textStyle = TextStyle(inherit: false, fontSize: 1);
+    final fwfh = FwfhTextStyle.from(textStyle);
+    expect(
+      fwfh
+          .toDiagnosticsNode()
+          .getProperties()
+          .whereType<DoubleProperty>()
+          .where((property) => property.name == 'size')
+          .map((property) => property.value),
+      equals([1.0]),
+    );
+  });
+
+  test('toString', () {
+    const textStyle = TextStyle(inherit: false, fontSize: 1);
+    final fwfh = FwfhTextStyle.from(textStyle);
+    expect(fwfh.toString(), equals(textStyle.toString()));
+  });
+
+  test('toStringShort', () {
+    const textStyle = TextStyle(inherit: false, fontSize: 1);
+    final fwfh = FwfhTextStyle.from(textStyle);
+    expect(fwfh.toStringShort(), equals(textStyle.toStringShort()));
   });
 
   final goldenSkipEnvVar = Platform.environment['GOLDEN_SKIP'];
