@@ -8,6 +8,7 @@ import 'core_html_widget.dart';
 import 'core_widget_factory.dart';
 
 export 'external/csslib.dart';
+export 'external/text_scale_factor.dart';
 export 'modes/render_mode.dart';
 export 'widgets/css_sizing.dart';
 export 'widgets/html_details.dart';

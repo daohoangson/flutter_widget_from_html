@@ -420,8 +420,8 @@ class WidgetFactory {
   /// - [DefaultSelectionStyle] via [DefaultSelectionStyle.of]
   /// - [TextStyle] via [DefaultTextStyle.of]
   /// - [SelectionRegistrar] via [SelectionContainer.maybeOf]
+  /// - [TextScaleFactor] via [MediaQuery.textScaleFactorOf]
   /// - [ThemeData] via [Theme.of]
-  /// - [MediaQueryData] via [MediaQuery.of]
   ///
   /// Use [HtmlStyle.getDependency] to get value by type.
   ///
@@ -431,7 +431,7 @@ class WidgetFactory {
   /// final color = Theme.of(context).accentColor;
   ///
   /// // in build ops:
-  /// final scale = style.getDependency<MediaQueryData>().textScaleFactor;
+  /// final tsf = style.getDependency<TextScaleFactor>();
   /// final color = style.getDependency<ThemeData>().accentColor;
   /// ```
   ///
@@ -446,15 +446,12 @@ class WidgetFactory {
   /// final buildOpValue = style.textDirection;
   /// ```
   Iterable<dynamic> getDependencies(BuildContext context) => [
-        Directionality.of(context),
+        Directionality.maybeOf(context) ?? TextDirection.ltr,
         DefaultSelectionStyle.of(context),
         DefaultTextStyle.of(context).style,
         SelectionContainer.maybeOf(context),
+        TextScaleFactor(MediaQuery.textScaleFactorOf(context)),
         Theme.of(context),
-
-        // TODO: use inherited model scope when it's merged into stable
-        // https://github.com/flutter/flutter/pull/114459
-        MediaQuery.of(context),
       ];
 
   /// Returns marker text for the specified list style [type] at index [i].
