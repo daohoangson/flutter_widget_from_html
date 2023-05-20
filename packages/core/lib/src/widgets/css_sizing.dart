@@ -2,6 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:logging/logging.dart';
+
+final _logger = Logger('fwfh.CssSizing');
 
 /// A CSS block.
 class CssBlock extends SingleChildRenderObjectWidget {
@@ -276,11 +279,12 @@ class _RenderCssSizing extends RenderProxyBox {
     late Size sizeHeight;
     try {
       sizeHeight = scopedChild.getDryLayout(tightHeight);
-    } catch (error) {
-      debugPrint(
-        'Unable to guess child size '
-        '(preferred size=${preferredWidth}x$preferredHeight) '
-        'on tight height: $error',
+    } catch (error, stackTrace) {
+      _logger.fine(
+        'Skipped guessing child size on tight height '
+        '(preferred ${preferredWidth}x$preferredHeight)',
+        error,
+        stackTrace,
       );
       return null;
     }
