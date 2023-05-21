@@ -741,6 +741,9 @@ Future<void> main() async {
                         : const Size(200, 250),
                   );
 
+                  final explained = await explainWithoutPumping();
+                  print(explained);
+
                   await screenMatchesGolden(tester, testCase.key);
                 },
                 skip: goldenSkip != null,
@@ -843,7 +846,7 @@ class _Golden extends StatelessWidget {
   Widget build(BuildContext _) => Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: HtmlWidget(html),
+          child: HtmlWidget(html, key: hwKey),
         ),
       );
 }
