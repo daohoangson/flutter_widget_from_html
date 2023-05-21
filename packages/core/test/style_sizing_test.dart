@@ -721,7 +721,7 @@ Future<void> main() async {
                   '<img src="asset:$assetName" width="192" height="192" style="height: 96px; width: 250px;" />',
               'sized_inline_block': '''
 <!-- https://github.com/daohoangson/flutter_widget_from_html/issues/799 -->
-<span style="display: inline-block; padding: 0px 2px; text-align: center; vertical-align: middle; color: #FFFFFF; overflow: hidden; margin-left: 6px; height: 16px; border-radius: 4px; background-color: #FF6600;">bar</span>
+Foo <span style="display: inline-block; text-align: center; vertical-align: middle; color: #FFFFFF; height: 16px; border-radius: 4px; background-color: #FF6600;">bar</span>
 ''',
             };
 
