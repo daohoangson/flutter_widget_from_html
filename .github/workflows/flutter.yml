@@ -23,6 +23,7 @@ jobs:
         uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
         with:
           cache: true
+          flutter-version: 3.10.0
       - run: dart format --set-exit-if-changed --output none .
       - run: ./tool/test.sh --coverage
       - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
