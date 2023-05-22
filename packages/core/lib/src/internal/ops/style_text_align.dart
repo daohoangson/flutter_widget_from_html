@@ -25,7 +25,7 @@ class StyleTextAlign {
         mustBeBlock: false,
         onTree: (tree) => tree.apply(_builder, value),
         onBuilt: value == kCssTextAlignWebkitCenter ? _centerIfNotEmpty : null,
-        priority: 0,
+        priority: Early.cssTextAlign,
       );
 
   static Widget _center(BuildContext _, Widget child) =>

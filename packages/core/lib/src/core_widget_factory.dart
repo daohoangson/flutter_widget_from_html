@@ -757,6 +757,7 @@ class WidgetFactory {
             _tagHr ??= BuildOp(
               debugLabel: localName,
               onBuilt: (tree, _) => buildDivider(tree),
+              priority: Prioritiy.tagHr,
             ),
           );
         break;
@@ -1045,7 +1046,7 @@ class WidgetFactory {
               tree.replaceWith(WidgetBit.inline(tree, built, alignment: align));
             }
           },
-          priority: BuildOp.kPriorityMax,
+          priority: Late.displayInlineBlock,
         );
         tree.register(displayInlineBlock);
         break;
@@ -1053,7 +1054,7 @@ class WidgetFactory {
         final displayNone = _styleDisplayNone ??= BuildOp(
           debugLabel: 'display: $value',
           onTree: (tree) => tree.replaceWith(null),
-          priority: BuildOp.kPriorityMax,
+          priority: Late.displayNone,
         );
         tree.register(displayNone);
         break;
@@ -1125,7 +1126,7 @@ class WidgetFactory {
       onBuilt: (_, placeholder) => placeholder.wrapWith(
         (_, child) => SizedBox(key: anchor, child: child),
       ),
-      priority: BuildOp.kPriorityMax,
+      priority: Late.anchor,
     );
   }
 }

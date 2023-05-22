@@ -59,6 +59,7 @@ class TagImg {
           tree.append(WidgetBit.inline(tree, built, alignment: baseline));
         },
         onBuilt: (tree, _) => _builts[tree],
+        priority: Prioritiy.tagImg,
       );
 
   ImageMetadata _parse(BuildTree tree) {

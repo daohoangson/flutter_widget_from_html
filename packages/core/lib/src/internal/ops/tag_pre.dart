@@ -17,5 +17,6 @@ class TagPre {
         onBuilt: (tree, placeholder) => placeholder.wrapWith(
           (_, child) => wf.buildHorizontalScrollView(tree, child),
         ),
+        priority: Prioritiy.tagPre,
       );
 }

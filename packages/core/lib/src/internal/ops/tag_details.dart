@@ -39,7 +39,7 @@ class TagDetails {
         _summary = placeholder;
         return WidgetPlaceholder(debugLabel: '$kTagSummary--block');
       },
-      priority: BuildOp.kPriorityMax,
+      priority: Late.tagSummary,
     );
   }
 
@@ -91,5 +91,6 @@ class TagDetails {
             },
           );
         },
+        priority: Prioritiy.tagDetails,
       );
 }

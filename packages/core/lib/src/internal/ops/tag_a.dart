@@ -31,6 +31,7 @@ class TagA {
 
           tree.apply(_builder, recognizer);
         },
+        priority: Prioritiy.tagA,
       );
 
   static HtmlStyle defaultColor(HtmlStyle style, void _) => style.copyWith(
