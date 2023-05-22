@@ -19,7 +19,7 @@ class TagAudio {
 
   BuildOp get buildOp => BuildOp(
         debugLabel: kTagAudio,
-        onBuilt: (tree, _) {
+        onRenderBlock: (tree, _) {
           if (defaultTargetPlatform != TargetPlatform.android &&
               defaultTargetPlatform != TargetPlatform.iOS &&
               defaultTargetPlatform != TargetPlatform.macOS &&

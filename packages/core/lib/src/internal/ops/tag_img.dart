@@ -36,7 +36,7 @@ class TagImg {
           return styles;
         },
         mustBeBlock: false,
-        onTree: (tree) {
+        onParsed: (tree) {
           final data = _parse(tree);
           final built = wf.buildImage(tree, data);
           if (built == null) {
@@ -49,7 +49,8 @@ class TagImg {
 
           _builts[tree] = built;
         },
-        onFlattening: (tree) {
+        onRenderBlock: (tree, _) => _builts[tree],
+        onRenderInline: (tree) {
           final built = _builts[tree];
           if (built == null) {
             return;
@@ -58,7 +59,6 @@ class TagImg {
           const baseline = PlaceholderAlignment.baseline;
           tree.append(WidgetBit.inline(tree, built, alignment: baseline));
         },
-        onBuilt: (tree, _) => _builts[tree],
         priority: Prioritiy.tagImg,
       );
 

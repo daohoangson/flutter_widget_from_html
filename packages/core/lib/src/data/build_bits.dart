@@ -1,7 +1,6 @@
 part of '../core_data.dart';
 
 /// A piece of HTML being built.
-@immutable
 abstract class BuildBit {
   /// The container tree.
   final BuildTree? parent;
@@ -134,6 +133,11 @@ abstract class BuildTree extends BuildBit {
       }
     }
   }
+
+  /// Gets flattened children widgets.
+  ///
+  /// Returns `null` if tree has not been built.
+  Iterable<WidgetPlaceholder>? get childrenWidgets;
 
   /// The first bit (recursively).
   BuildBit? get first {

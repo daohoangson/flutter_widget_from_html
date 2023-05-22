@@ -37,7 +37,7 @@ typedef DefaultStyles = Map<String, String> Function(BuildTree tree);
 ///
 /// ```dart
 /// BuildOp(
-///   onSubTree: (tree, subTree) {
+///   onChild: (tree, subTree) {
 ///     if (!subTree.element.parent != tree.element) return;
 ///     subTree.doSomething();
 ///   },
@@ -46,27 +46,27 @@ typedef DefaultStyles = Map<String, String> Function(BuildTree tree);
 /// {@endtemplate}
 typedef OnChild = void Function(BuildTree tree, BuildTree subTree);
 
-/// {@template flutter_widget_from_html.onTree}
+/// {@template flutter_widget_from_html.onParsed}
 /// The callback that will be called when child elements have been processed.
 /// {@endtemplate}
-typedef OnTree = void Function(BuildTree tree);
+typedef OnParsed = void Function(BuildTree tree);
 
-/// {@template flutter_widget_from_html.onFlattening}
-/// The callback that will be called before flattening.
-///
-/// This is the last chance to modify the [BuildTree] before inline rendering.
-/// {@endtemplate}
-typedef OnFlattening = void Function(BuildTree tree);
-
-/// {@template flutter_widget_from_html.onBuilt}
+/// {@template flutter_widget_from_html.onRenderBlock}
 /// The callback that will be called after building widget.
 ///
 /// This only works if it's a block element.
 /// {@endtemplate}
-typedef OnBuilt = Widget? Function(
+typedef OnRenderBlock = Widget? Function(
   BuildTree tree,
   WidgetPlaceholder placeholder,
 );
+
+/// {@template flutter_widget_from_html.onRenderInline}
+/// The callback that will be called before flattening.
+///
+/// This is the last chance to modify the [BuildTree] for inline rendering.
+/// {@endtemplate}
+typedef OnRenderInline = void Function(BuildTree tree);
 
 /// A building operation to customize how a DOM element is rendered.
 @immutable
@@ -74,17 +74,12 @@ class BuildOp {
   /// A human-readable description of this op.
   final String? debugLabel;
 
-  /// The execution priority, op with lower priority will run first.
-  ///
-  /// Default: 10.
-  final int priority;
-
   /// {@macro flutter_widget_from_html.defaultStyles}
   final DefaultStyles? defaultStyles;
 
   /// Controls whether the element must be rendered as a block.
   ///
-  /// Default: `true` if [onBuilt] is set, `false` otherwise.
+  /// Default: `true` if [onRenderBlock] is set, `false` otherwise.
   ///
   /// If an element has multiple build ops and one of them require block rendering,
   /// it will be rendered as block.
@@ -93,30 +88,35 @@ class BuildOp {
   /// {@macro flutter_widget_from_html.onChild}
   final OnChild? onChild;
 
-  /// {@macro flutter_widget_from_html.onTree}
-  final OnTree? onTree;
+  /// {@macro flutter_widget_from_html.onParsed}
+  final OnParsed? onParsed;
 
-  /// {@macro flutter_widget_from_html.onFlattening}
+  /// {@macro flutter_widget_from_html.onRenderBlock}
   ///
-  /// If an op has both this callback and [onBuilt], it will be skipped if
-  /// `onBuilt` returns a non-null result.
-  final OnFlattening? onFlattening;
+  /// If an op has both this callback and [onRenderInline], returning
+  /// a non-null result will skip `onRenderInline`.
+  final OnRenderBlock? onRenderBlock;
 
-  /// {@macro flutter_widget_from_html.onBuilt}
+  /// {@macro flutter_widget_from_html.onRenderInline}
   ///
-  /// If an op has both this callback and [onFlattening], returning
-  /// a non-null result will skip `onFlattening`.
-  final OnBuilt? onBuilt;
+  /// If an op has both this callback and [onRenderBlock], it will be skipped if
+  /// `onRenderBlock` returns a non-null result.
+  final OnRenderInline? onRenderInline;
+
+  /// The execution priority, op with lower priority will run first.
+  ///
+  /// Default: 10.
+  final int priority;
 
   /// Creates a build op.
   const BuildOp({
     this.debugLabel,
-    this.priority = 10,
     this.defaultStyles,
     this.mustBeBlock,
     this.onChild,
-    this.onTree,
-    this.onFlattening,
-    this.onBuilt,
+    this.onParsed,
+    this.onRenderBlock,
+    this.onRenderInline,
+    this.priority = 10,
   });
 }

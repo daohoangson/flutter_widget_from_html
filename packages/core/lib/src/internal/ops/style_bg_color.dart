@@ -13,20 +13,7 @@ class StyleBgColor {
   BuildOp get buildOp => BuildOp(
         debugLabel: kCssBackground,
         mustBeBlock: false,
-        onFlattening: (tree) {
-          if (_skipBuilding[tree] == true) {
-            return;
-          }
-
-          final bgColor = _parseColor(wf, tree);
-          if (bgColor == null) {
-            return;
-          }
-
-          _skipBuilding[tree] = true;
-          tree.apply(_builder, bgColor);
-        },
-        onBuilt: (tree, placeholder) {
+        onRenderBlock: (tree, placeholder) {
           if (_skipBuilding[tree] == true) {
             return null;
           }
@@ -40,6 +27,19 @@ class StyleBgColor {
           return placeholder.wrapWith(
             (_, child) => wf.buildDecoration(tree, child, color: color),
           );
+        },
+        onRenderInline: (tree) {
+          if (_skipBuilding[tree] == true) {
+            return;
+          }
+
+          final bgColor = _parseColor(wf, tree);
+          if (bgColor == null) {
+            return;
+          }
+
+          _skipBuilding[tree] = true;
+          tree.apply(_builder, bgColor);
         },
         priority: BoxModel.background,
       );

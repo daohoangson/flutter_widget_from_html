@@ -23,8 +23,9 @@ class StyleTextAlign {
   BuildOp get buildOp => BuildOp(
         debugLabel: kCssTextAlign,
         mustBeBlock: false,
-        onTree: (tree) => tree.apply(_builder, value),
-        onBuilt: value == kCssTextAlignWebkitCenter ? _centerIfNotEmpty : null,
+        onParsed: (tree) => tree.apply(_builder, value),
+        onRenderBlock:
+            value == kCssTextAlignWebkitCenter ? _centerIfNotEmpty : null,
         priority: Early.cssTextAlign,
       );
 

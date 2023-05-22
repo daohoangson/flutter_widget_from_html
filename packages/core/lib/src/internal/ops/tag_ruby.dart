@@ -26,7 +26,7 @@ class TagRuby {
               break;
           }
         },
-        onTree: (tree) {
+        onParsed: (tree) {
           final rubyBits = <BuildBit>[];
           final list = <BuildBit>[];
 

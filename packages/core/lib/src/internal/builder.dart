@@ -28,6 +28,8 @@ class Builder extends BuildTree {
   final _buildOps = SplayTreeSet<BuilderOp>(BuilderOp._compare);
   final _styles = <css.Declaration>[];
 
+  Iterable<WidgetPlaceholder>? _flattenedWidgets;
+
   Builder({
     required this.customStylesBuilder,
     required this.customWidgetBuilder,
@@ -41,6 +43,9 @@ class Builder extends BuildTree {
           parent: parent,
           styleBuilder: styleBuilder,
         );
+
+  @override
+  Iterable<WidgetPlaceholder>? get childrenWidgets => _flattenedWidgets;
 
   @override
   Iterable<css.Declaration> get styles => _styles;
@@ -69,13 +74,13 @@ class Builder extends BuildTree {
     }
 
     for (final op in _buildOps) {
-      op.onTree();
+      op.onParsed();
     }
   }
 
   @override
   WidgetPlaceholder? build() {
-    final children = Flattener(wf, this).widgets;
+    final children = _flattenedWidgets = Flattener(wf, this).widgets;
     final column = wf.buildColumnPlaceholder(this, children);
     if (column == null && _buildOps.isEmpty) {
       return null;
@@ -85,7 +90,7 @@ class Builder extends BuildTree {
         WidgetPlaceholder(debugLabel: '${element.localName}--default');
     for (final op in _buildOps) {
       placeholder = WidgetPlaceholder.lazy(
-        op.onBuilt(placeholder) ?? placeholder,
+        op.onRenderBlock(placeholder) ?? placeholder,
         debugLabel: '${element.localName}--${op.op.debugLabel ?? 'lazy'}',
       );
     }
@@ -137,7 +142,7 @@ class Builder extends BuildTree {
   @override
   void flatten(Flattened _) {
     for (final op in _buildOps) {
-      op.onFlattening();
+      op.onRenderInline();
     }
   }
 
@@ -286,7 +291,7 @@ class BuilderOp {
   final BuildOp op;
   final Builder tree;
 
-  var _onBuilt = false;
+  var _isBlock = false;
 
   BuilderOp._(this.tree, this.op);
 
@@ -303,24 +308,24 @@ class BuilderOp {
 
   void onChild(BuildTree subTree) => op.onChild?.call(tree, subTree);
 
-  void onTree() => op.onTree?.call(tree);
+  void onParsed() => op.onParsed?.call(tree);
 
-  void onFlattening() {
-    if (_onBuilt) {
-      return;
-    }
-
-    op.onFlattening?.call(tree);
-  }
-
-  Widget? onBuilt(WidgetPlaceholder placeholder) {
-    final result = op.onBuilt?.call(tree, placeholder);
+  Widget? onRenderBlock(WidgetPlaceholder placeholder) {
+    final result = op.onRenderBlock?.call(tree, placeholder);
 
     if (result != null) {
-      _onBuilt = true;
+      _isBlock = true;
     }
 
     return result;
+  }
+
+  void onRenderInline() {
+    if (_isBlock) {
+      return;
+    }
+
+    op.onRenderInline?.call(tree);
   }
 
   static int _compare(BuilderOp a0, BuilderOp b0) {
@@ -342,7 +347,8 @@ class BuilderOp {
   }
 }
 
-bool _mustBeBlock(BuilderOp op) => op.op.mustBeBlock ?? op.op.onBuilt != null;
+bool _mustBeBlock(BuilderOp op) =>
+    op.op.mustBeBlock ?? op.op.onRenderBlock != null;
 
 Iterable<BuilderOp> _prepareParentOps(
   Iterable<BuilderOp> ops,

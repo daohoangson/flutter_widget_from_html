@@ -14,7 +14,7 @@ class TagDetails {
   TagDetails(this.wf) {
     _summaryOp = BuildOp(
       debugLabel: kTagSummary,
-      onTree: (tree) {
+      onParsed: (tree) {
         if (tree.isEmpty) {
           return;
         }
@@ -31,7 +31,7 @@ class TagDetails {
         );
         tree.prepend(marker);
       },
-      onBuilt: (tree, placeholder) {
+      onRenderBlock: (tree, placeholder) {
         if (_summary != null) {
           return null;
         }
@@ -56,7 +56,7 @@ class TagDetails {
 
           subTree.register(_summaryOp);
         },
-        onBuilt: (tree, placeholder) {
+        onRenderBlock: (tree, placeholder) {
           final attrs = tree.element.attributes;
           final open = attrs.containsKey(kAttributeDetailsOpen);
 

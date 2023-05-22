@@ -11,7 +11,7 @@ class StyleBorder {
   StyleBorder(this.wf) {
     inlineOp = BuildOp(
       debugLabel: '$kCssBorder--inline',
-      onFlattening: (tree) {
+      onRenderInline: (tree) {
         if (_skipBuilding[tree] == true) {
           return;
         }
@@ -37,7 +37,7 @@ class StyleBorder {
     blockOp = BuildOp(
       debugLabel: '$kCssBorder--block',
       mustBeBlock: false,
-      onBuilt: (tree, child) {
+      onRenderBlock: (tree, child) {
         if (_skipBuilding[tree] == true) {
           return null;
         }

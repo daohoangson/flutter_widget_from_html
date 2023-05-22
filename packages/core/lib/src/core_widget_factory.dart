@@ -756,7 +756,7 @@ class WidgetFactory {
           ..register(
             _tagHr ??= BuildOp(
               debugLabel: localName,
-              onBuilt: (tree, _) => buildDivider(tree),
+              onRenderBlock: (tree, _) => buildDivider(tree),
               priority: Prioritiy.tagHr,
             ),
           );
@@ -1039,7 +1039,7 @@ class WidgetFactory {
       case kCssDisplayInlineBlock:
         final displayInlineBlock = _styleDisplayInlineBlock ??= BuildOp(
           debugLabel: 'display: $value',
-          onTree: (tree) {
+          onParsed: (tree) {
             final built = tree.build();
             if (built != null) {
               const align = PlaceholderAlignment.baseline;
@@ -1053,7 +1053,7 @@ class WidgetFactory {
       case kCssDisplayNone:
         final displayNone = _styleDisplayNone ??= BuildOp(
           debugLabel: 'display: $value',
-          onTree: (tree) => tree.replaceWith(null),
+          onParsed: (tree) => tree.replaceWith(null),
           priority: Late.displayNone,
         );
         tree.register(displayNone);
@@ -1107,11 +1107,11 @@ class WidgetFactory {
     return BuildOp(
       debugLabel: 'anchor',
       mustBeBlock: false,
-      onTree: (tree) {
+      onParsed: (tree) {
         _anchorRegistry.register(id, anchor);
         tree.registerAnchor(anchor);
       },
-      onFlattening: (tree) {
+      onRenderInline: (tree) {
         final widget = WidgetPlaceholder(
           builder: (context, _) => SizedBox(
             height: tree.styleBuilder.build(context).textStyle.fontSize,
@@ -1123,7 +1123,7 @@ class WidgetFactory {
         const baseline = PlaceholderAlignment.baseline;
         tree.prepend(WidgetBit.inline(tree, widget, alignment: baseline));
       },
-      onBuilt: (_, placeholder) => placeholder.wrapWith(
+      onRenderBlock: (_, placeholder) => placeholder.wrapWith(
         (_, child) => SizedBox(key: anchor, child: child),
       ),
       priority: Late.anchor,

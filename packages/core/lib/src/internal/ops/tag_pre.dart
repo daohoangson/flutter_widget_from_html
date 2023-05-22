@@ -14,7 +14,7 @@ class TagPre {
           kCssFontFamily: '$kTagCodeFont1, $kTagCodeFont2',
           kCssWhitespace: kCssWhitespacePre,
         },
-        onBuilt: (tree, placeholder) => placeholder.wrapWith(
+        onRenderBlock: (tree, placeholder) => placeholder.wrapWith(
           (_, child) => wf.buildHorizontalScrollView(tree, child),
         ),
         priority: Prioritiy.tagPre,

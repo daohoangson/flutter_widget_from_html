@@ -78,7 +78,7 @@ mixin WebViewFactory on WidgetFactory {
         tree.register(
           _tagIframe ??= BuildOp(
             debugLabel: kTagIframe,
-            onBuilt: (tree, _) {
+            onRenderBlock: (tree, _) {
               if (defaultTargetPlatform != TargetPlatform.android &&
                   defaultTargetPlatform != TargetPlatform.iOS &&
                   !kIsWeb) {

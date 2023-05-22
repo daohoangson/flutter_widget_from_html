@@ -14,7 +14,7 @@ class TagA {
         defaultStyles: (_) => const {
           kCssTextDecoration: kCssTextDecorationUnderline,
         },
-        onTree: (tree) {
+        onParsed: (tree) {
           final href = tree.element.attributes[kAttributeAHref];
           if (href == null) {
             return;

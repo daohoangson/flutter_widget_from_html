@@ -39,7 +39,7 @@ class TagVideo {
 
           tree.sourceUrls = [...tree.sourceUrls, url];
         },
-        onBuilt: (tree, _) {
+        onRenderBlock: (tree, _) {
           if (defaultTargetPlatform != TargetPlatform.android &&
               defaultTargetPlatform != TargetPlatform.iOS &&
               !kIsWeb) {

@@ -69,7 +69,7 @@ class TagLi {
                 subTree.register(
                   BuildOp(
                     debugLabel: kTagLi,
-                    onBuilt: (itemTree, item) {
+                    onRenderBlock: (itemTree, item) {
                       final i = listTree.increaseListItems() - 1;
 
                       return WidgetPlaceholder(

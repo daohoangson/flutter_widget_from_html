@@ -27,7 +27,19 @@ class StylePadding {
   BuildOp get buildOp => BuildOp(
         debugLabel: kCssPadding,
         mustBeBlock: false,
-        onFlattening: (tree) {
+        onRenderBlock: (tree, child) {
+          final padding = tryParseCssLengthBox(tree, kCssPadding);
+          if (padding == null) {
+            return null;
+          }
+
+          return WidgetPlaceholder(
+            builder: (ctx, w) => _build(tree, ctx, w, padding),
+            debugLabel: '${tree.element.localName}--paddingBlock',
+            child: child,
+          );
+        },
+        onRenderInline: (tree) {
           final padding = tryParseCssLengthBox(tree, kCssPadding);
           if (padding == null) {
             return;
@@ -42,18 +54,6 @@ class StylePadding {
             final after = _paddingInlineAfter(tree, padding);
             tree.append(WidgetBit.inline(tree, after));
           }
-        },
-        onBuilt: (tree, child) {
-          final padding = tryParseCssLengthBox(tree, kCssPadding);
-          if (padding == null) {
-            return null;
-          }
-
-          return WidgetPlaceholder(
-            builder: (ctx, w) => _build(tree, ctx, w, padding),
-            debugLabel: '${tree.element.localName}--paddingBlock',
-            child: child,
-          );
         },
         priority: BoxModel.padding,
       );

@@ -75,22 +75,22 @@ class StyleSizing {
   StyleSizing._(this.wf) {
     _blockOp = const BuildOp(
       debugLabel: 'display: block',
-      onBuilt: bypass,
+      onRenderBlock: bypass,
       priority: Late.displayBlock,
     );
 
     _childOp = BuildOp(
       debugLabel: 'sizing (min-width=0)',
       mustBeBlock: false,
-      onBuilt: buildMinWidthZero,
+      onRenderBlock: buildMinWidthZero,
       priority: BoxModel.sizingMinWidthZero,
     );
 
     _sizingOp = BuildOp(
       debugLabel: 'sizing',
       mustBeBlock: false,
-      onBuilt: buildCssSizing,
-      onFlattening: handleInlineSizing,
+      onRenderBlock: buildCssSizing,
+      onRenderInline: handleInlineSizing,
       priority: BoxModel.sizing,
     );
   }

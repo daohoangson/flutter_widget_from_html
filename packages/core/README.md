@@ -262,11 +262,11 @@ tree.apply(callback, TextAlign.justify);
 
 ```dart
 tree.register(BuildOp(
-  onTree: (tree) {
+  onParsed: (tree) {
     // can be used to change text, inline contents, etc.
     tree.append(...);
   },
-  onBuilt: (tree, child) {
+  onRenderBlock: (tree, child) {
     // use this to render special widget, wrap it into something else, etc.
     return MyCustomWidget(child: child);
   },
@@ -309,7 +309,7 @@ class SmilieScreen extends StatelessWidget {
 
 class _SmiliesWidgetFactory extends WidgetFactory {
   final smilieOp = BuildOp(
-    onTree: (tree) {
+    onParsed: (tree) {
       final alt = tree.element.attributes['alt'];
       tree.addText(kSmilies[alt] ?? alt);
     },

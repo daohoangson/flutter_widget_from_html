@@ -19,7 +19,7 @@ class StyleVerticalAlign {
   StyleVerticalAlign(this.wf) {
     inlineOp = BuildOp(
       debugLabel: '$kCssVerticalAlign--inline',
-      onFlattening: (tree) {
+      onRenderInline: (tree) {
         final v = tree[kCssVerticalAlign]?.term;
         if (v == null || v == kCssVerticalAlignBaseline) {
           return;
@@ -60,7 +60,7 @@ class StyleVerticalAlign {
     blockOp = BuildOp(
       debugLabel: '$kCssVerticalAlign--block',
       mustBeBlock: false,
-      onBuilt: (tree, placeholder) {
+      onRenderBlock: (tree, placeholder) {
         if (_skipBuilding[tree] == true) {
           return null;
         }

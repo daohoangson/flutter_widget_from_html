@@ -74,9 +74,9 @@ class TagTable {
 
     tableOp = BuildOp(
       debugLabel: kTagTable,
-      onBuilt: _onTableBuilt,
       onChild: _onTableChild,
-      onTree: _onTableTree,
+      onParsed: _onTableParsed,
+      onRenderBlock: _onTableRenderBlock,
       priority: Early.tagTable,
     );
   }
@@ -93,7 +93,7 @@ class TagTable {
         subTree.register(
           BuildOp(
             debugLabel: kTagTableCaption,
-            onBuilt: (captionTree, placeholder) {
+            onRenderBlock: (captionTree, placeholder) {
               if (placeholder.isEmpty) {
                 return null;
               }
@@ -123,12 +123,12 @@ class TagTable {
     }
   }
 
-  void _onTableTree(BuildTree tableTree) {
+  void _onTableParsed(BuildTree tableTree) {
     StyleBorder.skip(tableTree);
     StyleSizing.skip(tableTree);
   }
 
-  Widget? _onTableBuilt(BuildTree tableTree, WidgetPlaceholder _) {
+  Widget? _onTableRenderBlock(BuildTree tableTree, WidgetPlaceholder _) {
     final data = tableTree.data;
 
     _prepareHtmlTableCaptionBuilders(data);
@@ -327,7 +327,7 @@ class _TagTableRow {
     );
     _cellOp = BuildOp(
       debugLabel: kTagTableCell,
-      onBuilt: _onCellBuilt,
+      onRenderBlock: _onCellRenderBlock,
       priority: Late.tagTableCell,
     );
   }
@@ -344,7 +344,10 @@ class _TagTableRow {
     _registerCellOp(cellTree);
   }
 
-  Widget? _onCellBuilt(BuildTree cellTree, WidgetPlaceholder placeholder) {
+  Widget? _onCellRenderBlock(
+    BuildTree cellTree,
+    WidgetPlaceholder placeholder,
+  ) {
     final widthValue = cellTree[kCssWidth]?.value;
     final width = widthValue != null ? tryParseCssLength(widthValue) : null;
 

@@ -28,7 +28,7 @@ void main() {
       });
     });
 
-    group('onTree', () {
+    group('onParsed', () {
       testWidgets('renders additional text', (tester) async {
         const html = '<span class="text">Foo</span>';
         final explained = await explain(
@@ -36,7 +36,7 @@ void main() {
           null,
           hw: HtmlWidget(
             html,
-            factoryBuilder: () => _BuildOpOnTreeText(),
+            factoryBuilder: () => _BuildOpOnParsedText(),
             key: hwKey,
           ),
         );
@@ -50,7 +50,7 @@ void main() {
           null,
           hw: HtmlWidget(
             html,
-            factoryBuilder: () => _BuildOpOnTreeWidgetBlock(),
+            factoryBuilder: () => _BuildOpOnParsedWidgetBlock(),
             key: hwKey,
           ),
           useExplainer: false,
@@ -73,7 +73,7 @@ void main() {
           null,
           hw: HtmlWidget(
             html,
-            factoryBuilder: () => _BuildOpOnTreeWidgetBlock(),
+            factoryBuilder: () => _BuildOpOnParsedWidgetBlock(),
             key: hwKey,
           ),
           useExplainer: false,
@@ -97,7 +97,7 @@ void main() {
           null,
           hw: HtmlWidget(
             html,
-            factoryBuilder: () => _BuildOpOnTreeWidgetInline(),
+            factoryBuilder: () => _BuildOpOnParsedWidgetInline(),
             key: hwKey,
           ),
           useExplainer: false,
@@ -114,7 +114,7 @@ void main() {
       });
     });
 
-    group('onBuilt', () {
+    group('onRenderBlock', () {
       testWidgets('renders widget', (tester) async {
         const html = '<span>Foo</span>';
         final explained = await explain(
@@ -122,7 +122,7 @@ void main() {
           null,
           hw: HtmlWidget(
             html,
-            factoryBuilder: () => _BuildOpOnBuilt(),
+            factoryBuilder: () => _BuildOpOnRenderBlock(),
             key: hwKey,
           ),
           useExplainer: false,
@@ -182,24 +182,24 @@ class _BuildOpDefaultStyles extends WidgetFactory {
   }
 }
 
-class _BuildOpOnTreeText extends WidgetFactory {
+class _BuildOpOnParsedText extends WidgetFactory {
   @override
   void parse(BuildTree tree) {
     if (tree.element.classes.contains('text')) {
-      tree.register(BuildOp(onTree: (tree) => tree.addText(' bar')));
+      tree.register(BuildOp(onParsed: (tree) => tree.addText(' bar')));
     }
 
     return super.parse(tree);
   }
 }
 
-class _BuildOpOnTreeWidgetBlock extends WidgetFactory {
+class _BuildOpOnParsedWidgetBlock extends WidgetFactory {
   @override
   void parse(BuildTree tree) {
     if (tree.element.classes.contains('widget-block')) {
       tree.register(
         BuildOp(
-          onTree: (tree) {
+          onParsed: (tree) {
             tree.replaceWith(WidgetBit.block(tree, const Text('hi')));
           },
         ),
@@ -210,13 +210,13 @@ class _BuildOpOnTreeWidgetBlock extends WidgetFactory {
   }
 }
 
-class _BuildOpOnTreeWidgetInline extends WidgetFactory {
+class _BuildOpOnParsedWidgetInline extends WidgetFactory {
   @override
   void parse(BuildTree tree) {
     if (tree.element.classes.contains('widget-inline')) {
       tree.register(
         BuildOp(
-          onTree: (tree) {
+          onParsed: (tree) {
             tree.replaceWith(WidgetBit.inline(tree, const Text('hi')));
           },
         ),
@@ -227,10 +227,10 @@ class _BuildOpOnTreeWidgetInline extends WidgetFactory {
   }
 }
 
-class _BuildOpOnBuilt extends WidgetFactory {
+class _BuildOpOnRenderBlock extends WidgetFactory {
   @override
   void parse(BuildTree tree) {
-    tree.register(BuildOp(onBuilt: (_, __) => const Text('Hi')));
+    tree.register(BuildOp(onRenderBlock: (_, __) => const Text('Hi')));
     return super.parse(tree);
   }
 }
@@ -246,13 +246,13 @@ class _BuildOpPriority extends WidgetFactory {
     tree
       ..register(
         BuildOp(
-          onTree: (tree) => tree.addText(' A'),
+          onParsed: (tree) => tree.addText(' A'),
           priority: a,
         ),
       )
       ..register(
         BuildOp(
-          onTree: (tree) => tree.addText(' B'),
+          onParsed: (tree) => tree.addText(' B'),
           priority: b,
         ),
       );

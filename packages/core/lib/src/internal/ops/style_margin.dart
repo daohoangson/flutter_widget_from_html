@@ -19,23 +19,7 @@ class StyleMargin {
   BuildOp get buildOp => BuildOp(
         debugLabel: kCssMargin,
         mustBeBlock: false,
-        onFlattening: (tree) {
-          final margin = tryParseCssLengthBox(tree, kCssMargin);
-          if (margin == null) {
-            return;
-          }
-
-          if (margin.mayHaveLeft) {
-            final before = _paddingInlineBefore(tree, margin);
-            tree.prepend(WidgetBit.inline(tree, before));
-          }
-
-          if (margin.mayHaveRight) {
-            final after = _paddingInlineAfter(tree, margin);
-            tree.append(WidgetBit.inline(tree, after));
-          }
-        },
-        onBuilt: (tree, placeholder) {
+        onRenderBlock: (tree, placeholder) {
           final margin = tryParseCssLengthBox(tree, kCssMargin);
           if (margin == null) {
             return null;
@@ -68,6 +52,22 @@ class StyleMargin {
                 debugLabel: '${tree.element.localName}--marginBottom',
               ),
           ]);
+        },
+        onRenderInline: (tree) {
+          final margin = tryParseCssLengthBox(tree, kCssMargin);
+          if (margin == null) {
+            return;
+          }
+
+          if (margin.mayHaveLeft) {
+            final before = _paddingInlineBefore(tree, margin);
+            tree.prepend(WidgetBit.inline(tree, before));
+          }
+
+          if (margin.mayHaveRight) {
+            final after = _paddingInlineAfter(tree, margin);
+            tree.append(WidgetBit.inline(tree, after));
+          }
         },
         priority: BoxModel.margin,
       );

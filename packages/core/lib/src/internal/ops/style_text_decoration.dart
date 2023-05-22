@@ -18,7 +18,7 @@ class StyleTextDecoration {
 
   BuildOp get buildOp => BuildOp(
         debugLabel: kCssTextDecoration,
-        onTree: (tree) {
+        onParsed: (tree) {
           for (final style in tree.styles) {
             for (final value in style.values) {
               if (style.property == kCssTextDecoration ||
