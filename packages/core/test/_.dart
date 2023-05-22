@@ -647,8 +647,16 @@ class Explainer {
       ),
     );
 
-    if (widget is Align && widget is! Center) {
-      attr.add(_alignment(widget.alignment));
+    if (widget is Align) {
+      if (widget is! Center) {
+        attr.add(_alignment(widget.alignment));
+      }
+      if (widget.heightFactor != null) {
+        attr.add('heightFactor=${widget.heightFactor}');
+      }
+      if (widget.widthFactor != null) {
+        attr.add('widthFactor=${widget.widthFactor}');
+      }
     }
 
     if (widget is AspectRatio) {
