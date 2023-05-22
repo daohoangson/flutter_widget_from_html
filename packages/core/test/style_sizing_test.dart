@@ -9,7 +9,9 @@ import 'package:mocktail_image_network/mocktail_image_network.dart';
 
 import '_.dart';
 
-void main() {
+Future<void> main() async {
+  await loadAppFonts();
+
   group('height', () {
     testWidgets('renders em', (WidgetTester tester) async {
       const html = '<div style="height: 2em">Foo</div>';
@@ -716,7 +718,11 @@ void main() {
               'child_width_gt_max_width':
                   '<img src="asset:$assetName" width="192" height="192" style="width: 96px; height: 250px;" />',
               childHeightGtMaxHeight:
-                  '<img src="asset:$assetName" width="192" height="192" style="height: 96px; width: 250px;" />'
+                  '<img src="asset:$assetName" width="192" height="192" style="height: 96px; width: 250px;" />',
+              'sized_inline_block': '''
+<!-- https://github.com/daohoangson/flutter_widget_from_html/issues/799 -->
+Foo <span style="display: inline-block; text-align: center; vertical-align: middle; color: #FFFFFF; height: 16px; border-radius: 4px; background-color: #FF6600;">bar</span>
+''',
             };
 
             for (final testCase in testCases.entries) {

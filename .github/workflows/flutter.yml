@@ -29,7 +29,7 @@ jobs:
         if: failure()
         with:
           name: failures
-          path: demo_app/test/failures/
+          path: '**/failures/'
       - uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d # v3.1.4
 
   integration_test:

@@ -9,7 +9,7 @@ import '_.dart';
 
 String _padding(String child) => '[HtmlTableCell:child='
     '[Padding:(1,1,1,1),child='
-    '[Align:alignment=centerLeft,child='
+    '[Align:alignment=centerLeft,widthFactor=1.0,child='
     '$child]]]';
 
 String _richtext(String text) => _padding('[RichText:(:$text)]');
@@ -32,8 +32,7 @@ Future<void> main() async {
         explained,
         equals(
           '[HtmlTable:children='
-          '[HtmlTableCaption:child=[CssBlock:child='
-          '[RichText:align=center,(:Caption)]]],'
+          '[HtmlTableCaption:child=[RichText:align=center,(:Caption)]],'
           '${_padding('[RichText:(+b:Header 1)]')},'
           '${_padding('[RichText:(+b:Header 2)]')},'
           '${_richtext('Value 1')},'
@@ -51,7 +50,7 @@ Future<void> main() async {
 
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
-      expect(explained, contains('[Align:alignment=centerRight,child='));
+      expect(explained, contains('[Align:alignment=centerRight,'));
       expect(explained, contains('[RichText:dir=rtl,(:Foo)]'));
       expect(explained, contains('[RichText:dir=rtl,(:Bar)]'));
     });
@@ -356,27 +355,27 @@ Future<void> main() async {
     testWidgets('renders without align', (WidgetTester tester) async {
       const html = '<table><tr><td>Foo</td></tr></table>';
       final explained = await explain(tester, html);
-      expect(explained, contains('[Align:alignment=centerLeft,child='));
+      expect(explained, contains('[Align:alignment=centerLeft,'));
     });
 
     testWidgets('renders align=bottom', (WidgetTester tester) async {
       const html = '<table><tr><td valign="bottom">Foo</td></tr></table>';
       final explained = await explain(tester, html);
-      expect(explained, isNot(contains('[Align:alignment=centerLeft,child=')));
-      expect(explained, contains('[Align:alignment=bottomLeft,child='));
+      expect(explained, isNot(contains('[Align:alignment=centerLeft,')));
+      expect(explained, contains('[Align:alignment=bottomLeft,'));
     });
 
     testWidgets('renders align=middle', (WidgetTester tester) async {
       const html = '<table><tr><td valign="middle">Foo</td></tr></table>';
       final explained = await explain(tester, html);
-      expect(explained, contains('[Align:alignment=centerLeft,child='));
+      expect(explained, contains('[Align:alignment=centerLeft,'));
     });
 
     testWidgets('renders align=top', (WidgetTester tester) async {
       const html = '<table><tr><td valign="top">Foo</td></tr></table>';
       final explained = await explain(tester, html);
-      expect(explained, isNot(contains('[Align:alignment=centerLeft,child=')));
-      expect(explained, contains('[Align:alignment=topLeft,child='));
+      expect(explained, isNot(contains('[Align:alignment=centerLeft,')));
+      expect(explained, contains('[Align:alignment=topLeft,'));
     });
   });
 
@@ -502,7 +501,7 @@ Future<void> main() async {
           '[HtmlTableCell:child='
           '[Container:bg=#FFFF0000,child='
           '[Padding:(1,1,1,1),child='
-          '[Align:alignment=centerLeft,child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child='
           '[RichText:(:Foo)]'
           ']]]]]',
         ),
@@ -528,8 +527,7 @@ Future<void> main() async {
       explained,
       equals(
         '[HtmlTable:children='
-        '[HtmlTableCaption:child=[CssBlock:child='
-        '[RichText:align=center,(:Caption)]]],'
+        '[HtmlTableCaption:child=[RichText:align=center,(:Caption)]],'
         '[HtmlTableCell:child=[RichText:(+b:Header 1)]],'
         '[HtmlTableCell:child=[RichText:(+b:Header 2)]],'
         '[HtmlTableCell:child=[RichText:(:Value 1)]],'
