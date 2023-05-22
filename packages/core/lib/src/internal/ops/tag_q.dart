@@ -24,5 +24,6 @@ class TagQ {
           firstParent.prepend(TextBit(firstParent, opening));
           lastParent.append(TextBit(lastParent, closing));
         },
+        priority: Prioritiy.tagQ,
       );
 }

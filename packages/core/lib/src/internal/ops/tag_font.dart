@@ -23,5 +23,6 @@ class TagFont {
             if (fontSize != null) kCssFontSize: fontSize,
           };
         },
+        priority: Prioritiy.tagFont,
       );
 }

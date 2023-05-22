@@ -10,7 +10,7 @@ void main() {
     expect(
       explained,
       equals(
-        '[Align:alignment=bottomCenter,child='
+        '[Align:alignment=bottomCenter,widthFactor=1.0,child='
         '[Padding:(3,0,0,0),child=[RichText:(@8.3:Foo)]]'
         ']',
       ),
@@ -23,7 +23,7 @@ void main() {
     expect(
       explained,
       equals(
-        '[Align:alignment=topCenter,child='
+        '[Align:alignment=topCenter,widthFactor=1.0,child='
         '[Padding:(0,0,3,0),child=[RichText:(@8.3:Foo)]]'
         ']',
       ),
@@ -61,7 +61,7 @@ void main() {
       explained,
       equals(
         '[RichText:(:'
-        '[Align:alignment=bottomCenter,child='
+        '[Align:alignment=bottomCenter,widthFactor=1.0,child='
         '[Padding:(4,0,0,0),child=[RichText:(:Foo)]]'
         ']@top'
         '(: bar)'
@@ -77,7 +77,7 @@ void main() {
       explained,
       equals(
         '[RichText:(:'
-        '[Align:alignment=topCenter,child='
+        '[Align:alignment=topCenter,widthFactor=1.0,child='
         '[Padding:(0,0,4,0),child=[RichText:(:Foo)]]'
         ']@bottom'
         '(: bar)'
@@ -107,7 +107,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Align:alignment=topLeft,child='
+            '[Align:alignment=topLeft,widthFactor=1.0,child='
             '[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
@@ -119,7 +119,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Align:alignment=topRight,child='
+            '[Align:alignment=topRight,widthFactor=1.0,child='
             '[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
@@ -135,7 +135,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Align:alignment=centerLeft,child='
+            '[Align:alignment=centerLeft,widthFactor=1.0,child='
             '[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
@@ -147,7 +147,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Align:alignment=centerRight,child='
+            '[Align:alignment=centerRight,widthFactor=1.0,child='
             '[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
@@ -163,7 +163,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Align:alignment=bottomLeft,child='
+            '[Align:alignment=bottomLeft,widthFactor=1.0,child='
             '[CssBlock:child='
             '[RichText:(:Foo)]]]',
           ),
@@ -175,7 +175,7 @@ void main() {
         expect(
           explained,
           equals(
-            '[Align:alignment=bottomRight,child='
+            '[Align:alignment=bottomRight,widthFactor=1.0,child='
             '[CssBlock:child='
             '[RichText:dir=rtl,(:Foo)]]]',
           ),
@@ -207,7 +207,7 @@ void main() {
           explained,
           equals(
             '[RichText:(:$imgRendered'
-            '[Align:alignment=topCenter,child='
+            '[Align:alignment=topCenter,widthFactor=1.0,child='
             '[Padding:(0,0,3,0),child=[RichText:(@8.3:Foo)]]'
             ']@bottom)]',
           ),
@@ -221,7 +221,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[Align:alignment=topCenter,child='
+          '[Align:alignment=topCenter,widthFactor=1.0,child='
           '[Padding:(0,0,3,0),child=[RichText:(#FF123456+u@8.3+onTap:foo)]]'
           ']',
         ),

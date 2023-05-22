@@ -1,8 +1,6 @@
 part of '../core_ops.dart';
 
 class StyleBorder {
-  static const kPriorityBoxModel7k = 7000;
-
   final WidgetFactory wf;
 
   late final BuildOp inlineOp;
@@ -33,7 +31,7 @@ class StyleBorder {
         const baseline = PlaceholderAlignment.baseline;
         tree.replaceWith(WidgetBit.inline(tree, built, alignment: baseline));
       },
-      priority: 0,
+      priority: Early.cssBorderInline,
     );
 
     blockOp = BuildOp(
@@ -54,7 +52,7 @@ class StyleBorder {
           debugLabel: '${tree.element.localName}--$kCssBorder',
         );
       },
-      priority: kPriorityBoxModel7k,
+      priority: BoxModel.border,
     );
   }
 

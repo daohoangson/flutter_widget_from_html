@@ -57,6 +57,7 @@ class TagTable {
           }
         }
       },
+      priority: Prioritiy.tagTableAttributeBorder,
     );
 
     cellPaddingOp = BuildOp(
@@ -68,6 +69,7 @@ class TagTable {
           subTree[kCssPadding] = '${data.cellPadding}px';
         }
       },
+      priority: Prioritiy.tagTableAttributeCellPadding,
     );
 
     tableOp = BuildOp(
@@ -75,7 +77,7 @@ class TagTable {
       onBuilt: _onTableBuilt,
       onChild: _onTableChild,
       onTree: _onTableTree,
-      priority: 0,
+      priority: Early.tagTable,
     );
   }
 
@@ -98,7 +100,7 @@ class TagTable {
               data.captions.add(placeholder);
               return placeholder;
             },
-            priority: BuildOp.kPriorityMax,
+            priority: Late.tagTableCaption,
           ),
         );
         break;
@@ -318,11 +320,15 @@ class _TagTableRow {
   late final BuildOp _cellOp;
 
   _TagTableRow() {
-    _rowOp = BuildOp(debugLabel: kTagTableRow, onChild: _onRowChild);
+    _rowOp = BuildOp(
+      debugLabel: kTagTableRow,
+      onChild: _onRowChild,
+      priority: Prioritiy.tagTableRow,
+    );
     _cellOp = BuildOp(
       debugLabel: kTagTableCell,
       onBuilt: _onCellBuilt,
-      priority: BuildOp.kPriorityMax,
+      priority: Late.tagTableCell,
     );
   }
 
@@ -374,7 +380,11 @@ class _TagTableRowGroup {
   late final BuildOp _groupOp;
 
   _TagTableRowGroup(String debugLabel) {
-    _groupOp = BuildOp(debugLabel: debugLabel, onChild: _onGroupChild);
+    _groupOp = BuildOp(
+      debugLabel: debugLabel,
+      onChild: _onGroupChild,
+      priority: Prioritiy.tagTableRowGroup,
+    );
   }
 
   _TagTableRow get latestRow {

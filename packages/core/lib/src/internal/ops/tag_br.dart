@@ -10,6 +10,7 @@ class TagBr {
   BuildOp get buildOp => BuildOp(
         debugLabel: kTagBr,
         onTree: (tree) => tree.append(TagBrBit(tree)),
+        priority: Prioritiy.tagBr,
       );
 }
 

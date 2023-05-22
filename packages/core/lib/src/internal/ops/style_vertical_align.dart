@@ -9,8 +9,6 @@ const kCssVerticalAlignSub = 'sub';
 const kCssVerticalAlignSuper = 'super';
 
 class StyleVerticalAlign {
-  static const kPriority4k3 = 4300;
-
   final WidgetFactory wf;
 
   late final BuildOp inlineOp;
@@ -56,7 +54,7 @@ class StyleVerticalAlign {
 
         tree.replaceWith(WidgetBit.inline(tree, built, alignment: alignment));
       },
-      priority: 0,
+      priority: Early.cssVerticalAlign,
     );
 
     blockOp = BuildOp(
@@ -79,10 +77,10 @@ class StyleVerticalAlign {
             return child;
           }
 
-          return wf.buildAlign(tree, child, alignment);
+          return wf.buildAlign(tree, child, alignment, widthFactor: 1.0);
         });
       },
-      priority: kPriority4k3,
+      priority: BoxModel.verticalAlign,
     );
   }
 
@@ -110,12 +108,9 @@ class StyleVerticalAlign {
       return child;
     }
 
-    return wf.buildAlign(
-      tree,
-      withPadding,
-      padding.bottom > 0 ? Alignment.topCenter : Alignment.bottomCenter,
-      widthFactor: 1.0,
-    );
+    final alignment =
+        padding.bottom > 0 ? Alignment.topCenter : Alignment.bottomCenter;
+    return wf.buildAlign(tree, withPadding, alignment, widthFactor: 1.0);
   }
 }
 

@@ -24,31 +24,20 @@ class StyleTextAlign {
         debugLabel: kCssTextAlign,
         mustBeBlock: false,
         onTree: (tree) => tree.apply(_builder, value),
-        onBuilt: (tree, placeholder) => _wrap(tree, placeholder, value),
-        priority: 0,
+        onBuilt: value == kCssTextAlignWebkitCenter ? _centerIfNotEmpty : null,
+        priority: Early.cssTextAlign,
       );
-
-  static Widget? _wrap(
-    BuildTree tree,
-    WidgetPlaceholder placeholder,
-    String value,
-  ) {
-    if (placeholder.isEmpty) {
-      return null;
-    }
-
-    if (value == kCssTextAlignWebkitCenter) {
-      return placeholder.wrapWith(_center);
-    } else {
-      return placeholder.wrapWith(_block);
-    }
-  }
-
-  static Widget _block(BuildContext _, Widget child) =>
-      child is CssBlock ? child : CssBlock(child: child);
 
   static Widget _center(BuildContext _, Widget child) =>
       Center(heightFactor: 1.0, child: child);
+
+  static Widget? _centerIfNotEmpty(BuildTree tree, WidgetPlaceholder widget) {
+    if (widget.isEmpty) {
+      return null;
+    }
+
+    return widget.wrapWith(_center);
+  }
 
   static HtmlStyle _builder(HtmlStyle style, String value) {
     TextAlign? textAlign;

@@ -9,7 +9,7 @@ void main() {
     expect(
       explained,
       equals(
-        '[CssBlock:child=[Center:child='
+        '[CssBlock:child=[Center:heightFactor=1.0,child='
         '[RichText:align=center,(:Foo)]]]',
       ),
     );
@@ -116,7 +116,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Center:child='
+          '[CssBlock:child=[Center:heightFactor=1.0,child='
           '[CssBlock:child=[RichText:align=center,(:_X_)]]]]',
         ),
       );
@@ -166,7 +166,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Center:child='
+          '[CssBlock:child=[Center:heightFactor=1.0,child='
           '[Column:crossAxisAlignment=center,children='
           '[CssBlock:child=[RichText:align=center,(:Foo)]],'
           '[CssBlock:child=[RichText:align=center,(:_X_)]]'
@@ -273,7 +273,7 @@ void main() {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[Center:child='
+          '[CssBlock:child=[Center:heightFactor=1.0,child='
           '[Column:crossAxisAlignment=center,children='
           '[CssBlock:child=[RichText:align=center,(:Foo)]],'
           '[RichText:align=center,(:_X_)]'

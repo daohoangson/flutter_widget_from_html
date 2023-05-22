@@ -69,6 +69,7 @@ class TagRuby {
             tree.append(bit);
           }
         },
+        priority: Prioritiy.tagRuby,
       );
 }
 
