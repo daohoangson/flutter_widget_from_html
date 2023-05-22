@@ -18,6 +18,7 @@ import 'margin_vertical.dart';
 
 part 'ops/anchor.dart';
 part 'ops/column.dart';
+part 'ops/priorities.dart';
 part 'ops/style_bg_color.dart';
 part 'ops/style_border.dart';
 part 'ops/style_margin.dart';

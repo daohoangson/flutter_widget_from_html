@@ -20,8 +20,6 @@ Widget _paddingInlineSizedBox(double? width) =>
     width != null && width > 0 ? SizedBox(width: width) : widget0;
 
 class StylePadding {
-  static const kPriorityBoxModel5k = 5000;
-
   final WidgetFactory wf;
 
   StylePadding(this.wf);
@@ -57,7 +55,7 @@ class StylePadding {
             child: child,
           );
         },
-        priority: kPriorityBoxModel5k,
+        priority: BoxModel.padding,
       );
 
   Widget? _build(

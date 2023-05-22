@@ -27,7 +27,6 @@ extension CssLengthToSizing on CssLength {
 
 class StyleSizing {
   static const k100percent = CssLength(100, CssLengthUnit.percentage);
-  static const kPriorityBoxModel3k = 3000;
 
   final WidgetFactory wf;
 
@@ -74,14 +73,17 @@ class StyleSizing {
   }
 
   StyleSizing._(this.wf) {
-    _blockOp = const BuildOp(debugLabel: 'display: block', onBuilt: bypass);
+    _blockOp = const BuildOp(
+      debugLabel: 'display: block',
+      onBuilt: bypass,
+      priority: Late.displayBlock,
+    );
 
     _childOp = BuildOp(
       debugLabel: 'sizing (min-width=0)',
       mustBeBlock: false,
       onBuilt: buildMinWidthZero,
-      // min-width resetter should wrap all other box model widgets
-      priority: StyleMargin.kPriorityBoxModel9k + 1,
+      priority: BoxModel.sizingMinWidthZero,
     );
 
     _sizingOp = BuildOp(
@@ -89,7 +91,7 @@ class StyleSizing {
       mustBeBlock: false,
       onBuilt: buildCssSizing,
       onFlattening: handleInlineSizing,
-      priority: StyleSizing.kPriorityBoxModel3k,
+      priority: BoxModel.sizing,
     );
   }
 
