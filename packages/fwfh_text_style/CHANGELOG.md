@@ -1,3 +1,7 @@
+# 2.22.8+3
+
+- Improve observability with better logging (#912)
+
 # 2.22.8+2
 
 - Add support for Flutter 3.10 (#889)

@@ -1,3 +1,8 @@
+## 0.11.0-alpha.2
+
+- Refactor: safer typing (#911)
+- Improve observability with better logging (#912)
+
 ## 0.11.0-alpha.1
 
 - Add support for flutter_widget_from_html_core@0.11.0 (#899)
