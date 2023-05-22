@@ -1,3 +1,21 @@
+## 0.11.0-alpha.2
+
+- Wrap `RichText` in `MouseRegion` with text cursor (#902)
+- Fix border radius does not clip contents (#903)
+- Fix anchor doesn't work with `baseUrl` specified (#904)
+- Add support for `display: table-cell` without row (#905)
+- Fix padding is ignored on empty P tag (#906)
+- Ignore `border-radius` if border is not uniform (#910)
+- Refactor: safer typing (#911)
+- Improve observability with better logging (#912)
+- Skip rendering `CssBlock` for text align (#915)
+
+Breaking changes:
+
+- Remove support for `box-sizing` (#903)
+- Remove `WidgetPlaceholder.autoUnwrap` (#906)
+- `.getDependency<MediaQueryData>()` no longer works (#911)
+
 ## 0.11.0-alpha.1
 
 - Replace `RebuildTriggers` with `listEquals`
