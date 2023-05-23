@@ -28,6 +28,12 @@ class WidgetFactory {
   /// Defaults to `false`, resulting in a [CircularProgressIndicator].
   static bool debugDeterministicLoadingWidget = false;
 
+  static BuildOp? _tagBr;
+  static BuildOp? _tagFont;
+  static BuildOp? _tagQ;
+  static BuildOp? _tagRuby;
+  static BuildOp? _styleTextDecoration;
+
   final _recognizersNeedDisposing = <GestureRecognizer>[];
 
   late AnchorRegistry _anchorRegistry;
@@ -38,18 +44,13 @@ class WidgetFactory {
   BuildOp? _styleDisplayNone;
   BuildOp? _styleMargin;
   BuildOp? _stylePadding;
-  BuildOp? _styleTextDecoration;
   StyleVerticalAlign? _styleVerticalAlign;
   BuildOp? _tagA;
-  BuildOp? _tagBr;
   BuildOp? _tagDetails;
-  BuildOp? _tagFont;
   BuildOp? _tagHr;
   BuildOp? _tagImg;
   BuildOp? _tagLi;
   BuildOp? _tagPre;
-  BuildOp? _tagQ;
-  BuildOp? _tagRuby;
   TagTable? _tagTable;
   HtmlStyle Function(HtmlStyle, css.Expression)? _styleBuilderLineHeight;
   HtmlWidget? _widget;
@@ -691,7 +692,7 @@ class WidgetFactory {
         break;
 
       case kTagBr:
-        tree.register(_tagBr ??= TagBr(this).buildOp);
+        tree.register(_tagBr ??= TagBr().buildOp);
         break;
 
       case kTagCenter:
@@ -746,7 +747,7 @@ class WidgetFactory {
         break;
 
       case kTagFont:
-        tree.register(_tagFont ??= TagFont(this).buildOp);
+        tree.register(_tagFont ??= TagFont().buildOp);
         break;
 
       case 'hr':
@@ -831,11 +832,11 @@ class WidgetFactory {
         break;
 
       case kTagQ:
-        tree.register(_tagQ ??= TagQ(this).buildOp);
+        tree.register(_tagQ ??= TagQ().buildOp);
         break;
 
       case kTagRuby:
-        tree.register(_tagRuby ??= TagRuby(this).buildOp);
+        tree.register(_tagRuby ??= TagRuby().buildOp);
         break;
 
       case 'script':
@@ -972,7 +973,7 @@ class WidgetFactory {
       case kCssTextAlign:
         final term = style.term;
         if (term != null) {
-          tree.register(StyleTextAlign(this, term).buildOp);
+          tree.register(StyleTextAlign(term).buildOp);
         }
         break;
 
@@ -983,7 +984,7 @@ class WidgetFactory {
       case kCssTextDecorationThickness:
       case kCssTextDecorationWidth:
         tree.register(
-          _styleTextDecoration ??= StyleTextDecoration(this).buildOp,
+          _styleTextDecoration ??= StyleTextDecoration().buildOp,
         );
         break;
 

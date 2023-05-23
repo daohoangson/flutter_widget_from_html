@@ -3,10 +3,6 @@ part of '../core_ops.dart';
 const kTagBr = 'br';
 
 class TagBr {
-  final WidgetFactory wf;
-
-  TagBr(this.wf);
-
   BuildOp get buildOp => BuildOp(
         debugLabel: kTagBr,
         onRenderInline: (tree) => tree.append(TagBrBit(tree)),

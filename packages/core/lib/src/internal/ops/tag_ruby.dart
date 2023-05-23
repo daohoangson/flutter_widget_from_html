@@ -5,10 +5,6 @@ const kTagRp = 'rp';
 const kTagRt = 'rt';
 
 class TagRuby {
-  final WidgetFactory wf;
-
-  TagRuby(this.wf);
-
   BuildOp get buildOp => BuildOp(
         debugLabel: kTagRuby,
         onChild: (tree, subTree) {

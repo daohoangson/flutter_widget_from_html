@@ -28,13 +28,11 @@ extension CssLengthToSizing on CssLength {
 class StyleSizing {
   static const k100percent = CssLength(100, CssLengthUnit.percentage);
 
-  final WidgetFactory wf;
-
   late final BuildOp _blockOp;
   late final BuildOp _childOp;
   late final BuildOp _sizingOp;
 
-  static final _instances = Expando<StyleSizing>();
+  static final _instance = StyleSizing._();
 
   static final _elementTree = Expando<BuildTree>();
   static final _treeIsBlock = Expando<bool>();
@@ -46,33 +44,24 @@ class StyleSizing {
       return;
     }
 
-    tree.register(StyleSizing._factory(wf)._childOp);
+    tree.register(_instance._childOp);
   }
 
   static void registerBlockOp(WidgetFactory wf, BuildTree tree) {
     _elementTree[tree.element] = tree;
     _treeIsBlock[tree] = true;
 
-    final instance = StyleSizing._factory(wf);
     tree
-      ..register(instance._blockOp)
-      ..register(instance._sizingOp);
+      ..register(_instance._blockOp)
+      ..register(_instance._sizingOp);
   }
 
   static void registerSizingOp(WidgetFactory wf, BuildTree tree) {
     _elementTree[tree.element] = tree;
-    tree.register(StyleSizing._factory(wf)._sizingOp);
+    tree.register(_instance._sizingOp);
   }
 
-  factory StyleSizing._factory(WidgetFactory wf) {
-    final existingInstance = _instances[wf];
-    if (existingInstance != null) {
-      return existingInstance;
-    }
-    return _instances[wf] = StyleSizing._(wf);
-  }
-
-  StyleSizing._(this.wf) {
+  StyleSizing._() {
     _blockOp = const BuildOp(
       debugLabel: 'display: block',
       onRenderBlock: bypass,

@@ -12,10 +12,6 @@ const kCssTextDecorationOverline = 'overline';
 const kCssTextDecorationUnderline = 'underline';
 
 class StyleTextDecoration {
-  final WidgetFactory wf;
-
-  StyleTextDecoration(this.wf);
-
   BuildOp get buildOp => BuildOp.styling(
         debugLabel: kCssTextDecoration,
         onRender: (tree) {
