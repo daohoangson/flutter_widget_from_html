@@ -291,7 +291,7 @@ class BuilderOp {
   final BuildOp op;
   final Builder tree;
 
-  var _isBlock = false;
+  var _hasBeenRendered = false;
 
   BuilderOp._(this.tree, this.op);
 
@@ -314,18 +314,22 @@ class BuilderOp {
     final result = op.onRenderBlock?.call(tree, placeholder);
 
     if (result != null) {
-      _isBlock = true;
+      _hasBeenRendered = true;
     }
 
     return result;
   }
 
   void onRenderInline() {
-    if (_isBlock) {
+    if (_hasBeenRendered) {
       return;
     }
 
-    op.onRenderInline?.call(tree);
+    final fn = op.onRenderInline;
+    if (fn != null) {
+      fn(tree);
+      _hasBeenRendered = true;
+    }
   }
 
   static int _compare(BuilderOp a0, BuilderOp b0) {

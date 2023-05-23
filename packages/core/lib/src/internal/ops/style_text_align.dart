@@ -23,22 +23,21 @@ class StyleTextAlign {
   BuildOp get buildOp => BuildOp(
         debugLabel: kCssTextAlign,
         mustBeBlock: false,
-        onParsed: (tree) => tree.apply(_builder, value),
-        onRenderBlock:
-            value == kCssTextAlignWebkitCenter ? _centerIfNotEmpty : null,
+        onRenderBlock: (tree, placeholder) {
+          tree.apply(_builder, value);
+
+          if (!placeholder.isEmpty && value == kCssTextAlignWebkitCenter) {
+            return placeholder.wrapWith(_center);
+          } else {
+            return null;
+          }
+        },
+        onRenderInline: (tree) => tree.apply(_builder, value),
         priority: Early.cssTextAlign,
       );
 
   static Widget _center(BuildContext _, Widget child) =>
       Center(heightFactor: 1.0, child: child);
-
-  static Widget? _centerIfNotEmpty(BuildTree tree, WidgetPlaceholder widget) {
-    if (widget.isEmpty) {
-      return null;
-    }
-
-    return widget.wrapWith(_center);
-  }
 
   static HtmlStyle _builder(HtmlStyle style, String value) {
     TextAlign? textAlign;

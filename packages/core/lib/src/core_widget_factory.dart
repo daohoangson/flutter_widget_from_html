@@ -1039,7 +1039,7 @@ class WidgetFactory {
       case kCssDisplayInlineBlock:
         final displayInlineBlock = _styleDisplayInlineBlock ??= BuildOp(
           debugLabel: 'display: $value',
-          onParsed: (tree) {
+          onRenderInline: (tree) {
             final built = tree.build();
             if (built != null) {
               const align = PlaceholderAlignment.baseline;
@@ -1053,7 +1053,7 @@ class WidgetFactory {
       case kCssDisplayNone:
         final displayNone = _styleDisplayNone ??= BuildOp(
           debugLabel: 'display: $value',
-          onParsed: (tree) => tree.replaceWith(null),
+          onRenderInline: (tree) => tree.replaceWith(null),
           priority: Late.displayNone,
         );
         tree.register(displayNone);
@@ -1107,11 +1107,10 @@ class WidgetFactory {
     return BuildOp(
       debugLabel: 'anchor',
       mustBeBlock: false,
-      onParsed: (tree) {
+      onRenderInline: (tree) {
         _anchorRegistry.register(id, anchor);
         tree.registerAnchor(anchor);
-      },
-      onRenderInline: (tree) {
+
         final widget = WidgetPlaceholder(
           builder: (context, _) => SizedBox(
             height: tree.styleBuilder.build(context).textStyle.fontSize,
@@ -1123,9 +1122,14 @@ class WidgetFactory {
         const baseline = PlaceholderAlignment.baseline;
         tree.prepend(WidgetBit.inline(tree, widget, alignment: baseline));
       },
-      onRenderBlock: (_, placeholder) => placeholder.wrapWith(
-        (_, child) => SizedBox(key: anchor, child: child),
-      ),
+      onRenderBlock: (tree, placeholder) {
+        _anchorRegistry.register(id, anchor);
+        tree.registerAnchor(anchor);
+
+        return placeholder.wrapWith(
+          (_, child) => SizedBox(key: anchor, child: child),
+        );
+      },
       priority: Late.anchor,
     );
   }
