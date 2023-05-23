@@ -32,7 +32,6 @@ class WidgetFactory {
   static BuildOp? _tagFont;
   static BuildOp? _tagQ;
   static BuildOp? _tagRuby;
-  static BuildOp? _styleTextDecoration;
 
   final _recognizersNeedDisposing = <GestureRecognizer>[];
 
@@ -983,9 +982,7 @@ class WidgetFactory {
       case kCssTextDecorationStyle:
       case kCssTextDecorationThickness:
       case kCssTextDecorationWidth:
-        tree.register(
-          _styleTextDecoration ??= StyleTextDecoration().buildOp,
-        );
+        textDecorationApply(tree, style);
         break;
 
       case kCssTextOverflow:

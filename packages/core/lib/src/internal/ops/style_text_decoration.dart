@@ -11,53 +11,45 @@ const kCssTextDecorationNone = 'none';
 const kCssTextDecorationOverline = 'overline';
 const kCssTextDecorationUnderline = 'underline';
 
-class StyleTextDecoration {
-  BuildOp get buildOp => BuildOp.styling(
-        debugLabel: kCssTextDecoration,
-        onRender: (tree) {
-          for (final style in tree.styles) {
-            for (final value in style.values) {
-              if (style.property == kCssTextDecoration ||
-                  style.property == kCssTextDecorationLine) {
-                final line = TextDecorationLine.tryParse(value);
-                if (line != null) {
-                  tree.apply(textDecorationLine, line);
-                  continue;
-                }
-              }
+void textDecorationApply(BuildTree tree, css.Declaration style) {
+  for (final value in style.values) {
+    if (style.property == kCssTextDecoration ||
+        style.property == kCssTextDecorationLine) {
+      final line = TextDecorationLine.tryParse(value);
+      if (line != null) {
+        tree.apply(textDecorationLine, line);
+        continue;
+      }
+    }
 
-              if (style.property == kCssTextDecoration ||
-                  style.property == kCssTextDecorationStyle) {
-                final tds = tryParseTextDecorationStyle(value);
-                if (tds != null) {
-                  tree.apply(textDecorationStyle, tds);
-                  continue;
-                }
-              }
+    if (style.property == kCssTextDecoration ||
+        style.property == kCssTextDecorationStyle) {
+      final tds = tryParseTextDecorationStyle(value);
+      if (tds != null) {
+        tree.apply(textDecorationStyle, tds);
+        continue;
+      }
+    }
 
-              if (style.property == kCssTextDecoration ||
-                  style.property == kCssTextDecorationColor) {
-                final color = tryParseColor(value);
-                if (color != null) {
-                  tree.apply(textDecorationColor, color);
-                  continue;
-                }
-              }
+    if (style.property == kCssTextDecoration ||
+        style.property == kCssTextDecorationColor) {
+      final color = tryParseColor(value);
+      if (color != null) {
+        tree.apply(textDecorationColor, color);
+        continue;
+      }
+    }
 
-              if (style.property == kCssTextDecoration ||
-                  style.property == kCssTextDecorationThickness ||
-                  style.property == kCssTextDecorationWidth) {
-                final length = tryParseCssLength(value);
-                if (length != null && length.unit == CssLengthUnit.percentage) {
-                  tree.apply(textDecorationThickness, length.number / 100.0);
-                  continue;
-                }
-              }
-            }
-          }
-        },
-        priority: Prioritiy.cssTextDecoration,
-      );
+    if (style.property == kCssTextDecoration ||
+        style.property == kCssTextDecorationThickness ||
+        style.property == kCssTextDecorationWidth) {
+      final length = tryParseCssLength(value);
+      if (length != null && length.unit == CssLengthUnit.percentage) {
+        tree.apply(textDecorationThickness, length.number / 100.0);
+        continue;
+      }
+    }
+  }
 }
 
 HtmlStyle textDecorationColor(HtmlStyle style, Color v) => style.copyWith(

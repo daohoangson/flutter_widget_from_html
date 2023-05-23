@@ -14,8 +14,7 @@ class Prioritiy {
   static const _step = 1000000000;
   static const _max = 9007199254740991;
 
-  static const cssTextDecoration = _baseNormal00 + _step;
-  static const tagA = cssTextDecoration + _step;
+  static const tagA = _baseNormal00 + _step;
   static const tagBr = tagA + _step;
   static const tagDetails = tagBr + _step;
   static const tagFont = tagDetails + _step;
