@@ -16,9 +16,9 @@ class StyleTextDecoration {
 
   StyleTextDecoration(this.wf);
 
-  BuildOp get buildOp => BuildOp(
+  BuildOp get buildOp => BuildOp.styling(
         debugLabel: kCssTextDecoration,
-        onRenderInline: (tree) {
+        onRender: (tree) {
           for (final style in tree.styles) {
             for (final value in style.values) {
               if (style.property == kCssTextDecoration ||

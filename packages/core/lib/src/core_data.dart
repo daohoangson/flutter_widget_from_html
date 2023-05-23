@@ -119,4 +119,23 @@ class BuildOp {
     this.onRenderInline,
     this.priority = 10,
   });
+
+  /// Creates a styling build op.
+  ///
+  /// For simple styleing, it may be easier to use [BuildTree.apply].
+  factory BuildOp.styling({
+    String? debugLabel,
+    OnRenderInline? onRender,
+    int priority = 10,
+  }) =>
+      BuildOp(
+        debugLabel: debugLabel,
+        mustBeBlock: false,
+        onRenderBlock: (tree, placeholder) {
+          onRender?.call(tree);
+          return placeholder;
+        },
+        onRenderInline: onRender,
+        priority: priority,
+      );
 }
