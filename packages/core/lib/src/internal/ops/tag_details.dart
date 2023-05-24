@@ -31,7 +31,7 @@ class TagDetails {
         );
         return tree..prepend(marker);
       },
-      onRenderBlock: (tree, placeholder) {
+      onRenderBlock: (_, placeholder) {
         if (_summary != null) {
           return null;
         }

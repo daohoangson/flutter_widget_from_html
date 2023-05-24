@@ -1135,7 +1135,7 @@ class WidgetFactory {
         const baseline = PlaceholderAlignment.baseline;
         tree.prepend(WidgetBit.inline(tree, widget, alignment: baseline));
       },
-      onRenderBlock: (tree, placeholder) => placeholder.wrapWith(
+      onRenderBlock: (_, placeholder) => placeholder.wrapWith(
         (_, child) => SizedBox(key: anchor, child: child),
       ),
       priority: Late.anchor,
