@@ -3,48 +3,43 @@ part of '../core_ops.dart';
 const kCssBackground = 'background';
 const kCssBackgroundColor = 'background-color';
 
-class StyleBgColor {
+class StyleBackground {
   final WidgetFactory wf;
 
-  static final _skipBuilding = Expando<bool>();
-
-  StyleBgColor(this.wf);
+  StyleBackground(this.wf);
 
   BuildOp get buildOp => BuildOp(
         debugLabel: kCssBackground,
         mustBeBlock: false,
         onRenderBlock: (tree, placeholder) {
-          if (_skipBuilding[tree] == true) {
-            return null;
-          }
-
-          final color = _parseColor(wf, tree);
+          final color = _parseColor(tree);
           if (color == null) {
             return null;
           }
 
-          _skipBuilding[tree] = true;
           return placeholder.wrapWith(
             (_, child) => wf.buildDecoration(tree, child, color: color),
           );
         },
         onRenderInline: (tree) {
-          if (_skipBuilding[tree] == true) {
+          final color = _parseColor(tree);
+          if (color == null) {
             return;
           }
 
-          final bgColor = _parseColor(wf, tree);
-          if (bgColor == null) {
-            return;
-          }
-
-          _skipBuilding[tree] = true;
-          tree.apply(_builder, bgColor);
+          tree.apply(_color, color);
         },
         priority: BoxModel.background,
       );
 
-  Color? _parseColor(WidgetFactory wf, BuildTree tree) {
+  static HtmlStyle _color(HtmlStyle style, Color color) => style.copyWith(
+        textStyle: style.textStyle.copyWith(
+          background: Paint()..color = color,
+          debugLabel: 'fwfh: $kCssBackgroundColor',
+        ),
+      );
+
+  static Color? _parseColor(BuildTree tree) {
     Color? color;
     for (final style in tree.styles) {
       switch (style.property) {
@@ -61,11 +56,4 @@ class StyleBgColor {
 
     return color;
   }
-
-  static HtmlStyle _builder(HtmlStyle style, Color color) => style.copyWith(
-        textStyle: style.textStyle.copyWith(
-          background: Paint()..color = color,
-          debugLabel: 'fwfh: $kCssBackgroundColor',
-        ),
-      );
 }

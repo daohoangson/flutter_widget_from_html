@@ -28,6 +28,7 @@ class StyleBorder {
           return;
         }
 
+        skip(tree);
         const baseline = PlaceholderAlignment.baseline;
         tree.replaceWith(WidgetBit.inline(tree, built, alignment: baseline));
       },
@@ -47,6 +48,7 @@ class StyleBorder {
           return null;
         }
 
+        skip(tree);
         return WidgetPlaceholder(
           builder: (ctx, _) => _buildBorder(tree, ctx, child, border),
           debugLabel: '${tree.element.localName}--$kCssBorder',

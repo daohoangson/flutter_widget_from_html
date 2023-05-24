@@ -28,6 +28,7 @@ class WidgetFactory {
   /// Defaults to `false`, resulting in a [CircularProgressIndicator].
   static bool debugDeterministicLoadingWidget = false;
 
+  static BuildOp? _styleTextAlign;
   static BuildOp? _tagBr;
   static BuildOp? _tagFont;
   static BuildOp? _tagQ;
@@ -37,7 +38,7 @@ class WidgetFactory {
 
   late AnchorRegistry _anchorRegistry;
 
-  BuildOp? _styleBgColor;
+  BuildOp? _styleBackground;
   StyleBorder? _styleBorder;
   BuildOp? _styleDisplayInlineBlock;
   BuildOp? _styleDisplayNone;
@@ -895,7 +896,7 @@ class WidgetFactory {
     switch (key) {
       case kCssBackground:
       case kCssBackgroundColor:
-        tree.register(_styleBgColor ??= StyleBgColor(this).buildOp);
+        tree.register(_styleBackground ??= StyleBackground(this).buildOp);
         break;
 
       case kCssColor:
@@ -970,10 +971,7 @@ class WidgetFactory {
         break;
 
       case kCssTextAlign:
-        final term = style.term;
-        if (term != null) {
-          tree.register(StyleTextAlign(term).buildOp);
-        }
+        tree.register(_styleTextAlign ??= StyleTextAlign().buildOp);
         break;
 
       case kCssTextDecoration:
@@ -1105,10 +1103,11 @@ class WidgetFactory {
     return BuildOp(
       debugLabel: 'anchor',
       mustBeBlock: false,
-      onRenderInline: (tree) {
+      onParsed: (tree) {
         _anchorRegistry.register(id, anchor);
         tree.registerAnchor(anchor);
-
+      },
+      onRenderInline: (tree) {
         final widget = WidgetPlaceholder(
           builder: (context, _) => SizedBox(
             height: tree.styleBuilder.build(context).textStyle.fontSize,
@@ -1120,14 +1119,9 @@ class WidgetFactory {
         const baseline = PlaceholderAlignment.baseline;
         tree.prepend(WidgetBit.inline(tree, widget, alignment: baseline));
       },
-      onRenderBlock: (tree, placeholder) {
-        _anchorRegistry.register(id, anchor);
-        tree.registerAnchor(anchor);
-
-        return placeholder.wrapWith(
-          (_, child) => SizedBox(key: anchor, child: child),
-        );
-      },
+      onRenderBlock: (tree, placeholder) => placeholder.wrapWith(
+        (_, child) => SizedBox(key: anchor, child: child),
+      ),
       priority: Late.anchor,
     );
   }

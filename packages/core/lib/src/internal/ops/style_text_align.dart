@@ -15,33 +15,33 @@ const kCssTextAlignWebkitCenter = '-webkit-center';
 const kTagCenter = 'center';
 
 class StyleTextAlign {
-  final String value;
-
-  StyleTextAlign(this.value);
-
   BuildOp get buildOp => BuildOp(
         debugLabel: kCssTextAlign,
         mustBeBlock: false,
+        onParsed: (tree) {
+          final textAlign = _parse(tree);
+          if (textAlign != null) {
+            tree.apply(_textAlign, textAlign);
+          }
+        },
         onRenderBlock: (tree, placeholder) {
-          tree.apply(_builder, value);
-
-          if (!placeholder.isEmpty && value == kCssTextAlignWebkitCenter) {
+          if (!placeholder.isEmpty &&
+              tree[kCssTextAlign]?.term == kCssTextAlignWebkitCenter) {
             return placeholder.wrapWith(_center);
           } else {
             return null;
           }
         },
-        onRenderInline: (tree) => tree.apply(_builder, value),
         priority: Early.cssTextAlign,
       );
 
   static Widget _center(BuildContext _, Widget child) =>
       Center(heightFactor: 1.0, child: child);
 
-  static HtmlStyle _builder(HtmlStyle style, String value) {
+  static TextAlign? _parse(BuildTree tree) {
     TextAlign? textAlign;
 
-    switch (value) {
+    switch (tree[kCssTextAlign]?.term) {
       case kCssTextAlignCenter:
       case kCssTextAlignMozCenter:
       case kCssTextAlignWebkitCenter:
@@ -64,6 +64,9 @@ class StyleTextAlign {
         break;
     }
 
-    return textAlign == null ? style : style.copyWith(textAlign: textAlign);
+    return textAlign;
   }
+
+  static HtmlStyle _textAlign(HtmlStyle style, TextAlign value) =>
+      style.copyWith(textAlign: value);
 }
