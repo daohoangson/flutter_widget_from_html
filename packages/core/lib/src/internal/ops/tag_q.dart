@@ -5,7 +5,7 @@ const kTagQ = 'q';
 class TagQ {
   BuildOp get buildOp => BuildOp(
         debugLabel: kTagQ,
-        onRenderInline: (tree) {
+        onParsed: (tree) {
           const opening = '“';
           const closing = '”';
           final firstParent = tree.first?.parent;

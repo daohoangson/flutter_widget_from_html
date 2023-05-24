@@ -1037,7 +1037,7 @@ class WidgetFactory {
       case kCssDisplayInlineBlock:
         final displayInlineBlock = _styleDisplayInlineBlock ??= BuildOp(
           debugLabel: 'display: $value',
-          onRenderInline: (tree) {
+          onParsed: (tree) {
             final built = tree.build();
             if (built != null) {
               const align = PlaceholderAlignment.baseline;
@@ -1051,7 +1051,7 @@ class WidgetFactory {
       case kCssDisplayNone:
         final displayNone = _styleDisplayNone ??= BuildOp(
           debugLabel: 'display: $value',
-          onRenderInline: (tree) => tree.replaceWith(null),
+          onParsed: (tree) => tree.replaceWith(null),
           priority: Late.displayNone,
         );
         tree.register(displayNone);

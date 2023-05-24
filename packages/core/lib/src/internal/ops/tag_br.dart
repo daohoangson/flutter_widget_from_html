@@ -5,7 +5,7 @@ const kTagBr = 'br';
 class TagBr {
   BuildOp get buildOp => BuildOp(
         debugLabel: kTagBr,
-        onRenderInline: (tree) => tree.append(TagBrBit(tree)),
+        onParsed: (tree) => tree.append(TagBrBit(tree)),
         priority: Prioritiy.tagBr,
       );
 }
