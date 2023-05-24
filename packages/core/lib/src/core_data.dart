@@ -48,8 +48,10 @@ typedef OnChild = void Function(BuildTree tree, BuildTree subTree);
 
 /// {@template flutter_widget_from_html.onParsed}
 /// The callback that will be called when child elements have been processed.
+///
+/// Returning a different build tree is allowed.
 /// {@endtemplate}
-typedef OnParsed = void Function(BuildTree tree);
+typedef OnParsed = BuildTree Function(BuildTree tree);
 
 /// {@template flutter_widget_from_html.onRenderBlock}
 /// The callback that will be called after building widget.

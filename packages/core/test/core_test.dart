@@ -971,6 +971,21 @@ Future<void> main() async {
       expect(explained, equals('[Text:Bar]'));
     });
 
+    testWidgets('#799: inline block with bg, v-align', (tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/799
+      const html = '<span style="background-color: #FF6600; '
+          'display: inline-block; vertical-align: middle">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:bg=#FFFF6600,child='
+          '[Align:alignment=centerLeft,widthFactor=1.0,child='
+          '[RichText:(:Foo)]]]',
+        ),
+      );
+    });
+
     testWidgets('renders display: none', (WidgetTester tester) async {
       const html = '<div>1 <div style="display: none">2</div></div>';
       final explained = await explain(tester, html);

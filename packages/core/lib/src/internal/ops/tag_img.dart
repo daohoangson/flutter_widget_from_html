@@ -44,10 +44,11 @@ class TagImg {
             if (imgText.isNotEmpty) {
               tree.addText(imgText);
             }
-            return;
+            return tree;
           }
 
           _builts[tree] = built;
+          return tree;
         },
         onRenderBlock: (tree, _) => _builts[tree],
         onRenderInline: (tree) {

@@ -290,11 +290,8 @@ Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
   final wf = state._wf;
   wf.reset(state);
 
-  final rootBuilder = state._rootBuilder;
-  rootBuilder.addBitsFromNodes(domNodes);
-
-  final built = rootBuilder.build()?.wrapWith(wf.buildBodyWidget) ?? widget0;
-
+  final rootTree = state._rootBuilder.addBitsFromNodes(domNodes);
+  final built = rootTree.build()?.wrapWith(wf.buildBodyWidget) ?? widget0;
   _logger.fine('Built body successfuly.');
 
   return built;

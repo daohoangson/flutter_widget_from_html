@@ -31,7 +31,7 @@ class _SmiliesWidgetFactory extends WidgetFactory {
     debugLabel: 'smilie',
     onParsed: (tree) {
       final alt = tree.element.attributes['alt'];
-      tree.addText(kSmilies[alt] ?? alt ?? '');
+      return tree..addText(kSmilies[alt] ?? alt ?? '');
     },
   );
 

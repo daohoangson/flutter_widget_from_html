@@ -16,7 +16,7 @@ class TagDetails {
       debugLabel: kTagSummary,
       onParsed: (tree) {
         if (tree.isEmpty) {
-          return;
+          return tree;
         }
 
         final marker = WidgetBit.inline(
@@ -29,7 +29,7 @@ class TagDetails {
             debugLabel: '$kTagSummary--inlineMarker',
           ),
         );
-        tree.prepend(marker);
+        return tree..prepend(marker);
       },
       onRenderBlock: (tree, placeholder) {
         if (_summary != null) {

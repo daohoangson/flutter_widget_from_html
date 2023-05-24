@@ -306,14 +306,14 @@ class _BuildBitWidgetFactory extends WidgetFactory {
     if (classes.contains('output--String')) {
       tree.register(
         BuildOp(
-          onParsed: (tree) => tree.append(_OutputStringBit(tree)),
+          onParsed: (tree) => tree..append(_OutputStringBit(tree)),
         ),
       );
     }
 
     if (classes.contains('output--Widget')) {
       tree.register(
-        BuildOp(onParsed: (tree) => tree.append(_OutputWidgetBit(tree))),
+        BuildOp(onParsed: (tree) => tree..append(_OutputWidgetBit(tree))),
       );
     }
 

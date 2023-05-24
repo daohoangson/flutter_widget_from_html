@@ -68,14 +68,16 @@ class Builder extends BuildTree {
     return null;
   }
 
-  void addBitsFromNodes(dom.NodeList domNodes) {
+  BuildTree addBitsFromNodes(dom.NodeList domNodes) {
     for (final domNode in domNodes) {
       _addBitsFromNode(domNode);
     }
 
+    BuildTree tree = this;
     for (final op in _buildOps) {
-      op.onParsed();
+      tree = op.onParsed(tree);
     }
+    return tree;
   }
 
   @override
@@ -181,10 +183,11 @@ class Builder extends BuildTree {
     }
 
     final subTree = sub(element: element)
-      .._parseEverything()
-      ..addBitsFromNodes(element.nodes);
+        ._parseEverything()
+        .addBitsFromNodes(element.nodes);
 
-    if (subTree._buildOps.where(_mustBeBlock).isNotEmpty) {
+    if (subTree is Builder &&
+        subTree._buildOps.where(_mustBeBlock).isNotEmpty) {
       final builtSubTree = subTree.build();
       if (builtSubTree != null) {
         append(WidgetBit.block(this, builtSubTree));
@@ -255,7 +258,7 @@ class Builder extends BuildTree {
     _styles.addAll(customStyles);
   }
 
-  void _parseEverything() {
+  Builder _parseEverything() {
     wf.parse(this);
 
     for (final op in parentOps) {
@@ -284,6 +287,8 @@ class Builder extends BuildTree {
     }
 
     wf.parseStyleDisplay(this, this[kCssDisplay]?.term);
+
+    return this;
   }
 }
 
@@ -308,7 +313,7 @@ class BuilderOp {
 
   void onChild(BuildTree subTree) => op.onChild?.call(tree, subTree);
 
-  void onParsed() => op.onParsed?.call(tree);
+  BuildTree onParsed(BuildTree input) => op.onParsed?.call(input) ?? input;
 
   Widget? onRenderBlock(WidgetPlaceholder placeholder) {
     final result = op.onRenderBlock?.call(tree, placeholder);

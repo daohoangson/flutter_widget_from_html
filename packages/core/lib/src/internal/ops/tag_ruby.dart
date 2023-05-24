@@ -23,14 +23,17 @@ class TagRuby {
           }
         },
         onParsed: (tree) {
-          final rubyBits = <BuildBit>[];
-          final list = <BuildBit>[];
+          final replacement = tree.parent?.sub();
+          if (replacement == null) {
+            return tree;
+          }
 
+          final rubyBits = <BuildBit>[];
           for (final bit in tree.children) {
             if (!bit.isRtTree || rubyBits.isEmpty) {
               if (rubyBits.isEmpty && bit is WhitespaceBit) {
                 // ruby contents should not start with a whitespace
-                list.add(bit);
+                replacement.append(bit);
               } else {
                 rubyBits.add(bit);
               }
@@ -45,25 +48,26 @@ class TagRuby {
 
             final rtTree = bit as BuildTree;
 
-            list.add(
+            replacement.append(
               WidgetBit.inline(
-                tree,
-                HtmlRuby(
-                  rt: rtTree.build(),
-                  ruby: rubyTree.build(),
+                replacement,
+                WidgetPlaceholder(
+                  builder: (_, __) => HtmlRuby(
+                    rt: rtTree.build(),
+                    ruby: rubyTree.build(),
+                  ),
                 ),
                 alignment: PlaceholderAlignment.baseline,
               ),
             );
           }
 
-          // preserve orphan bits if any
-          list.addAll(rubyBits);
-
-          tree.replaceWith(null);
-          for (final bit in list) {
-            tree.append(bit);
+          for (final rubyBit in rubyBits) {
+            // preserve orphan bits if any
+            replacement.append(rubyBit);
           }
+
+          return replacement;
         },
         priority: Prioritiy.tagRuby,
       );

@@ -23,6 +23,7 @@ class StyleTextAlign {
           if (textAlign != null) {
             tree.apply(_textAlign, textAlign);
           }
+          return tree;
         },
         onRenderBlock: (tree, placeholder) {
           if (!placeholder.isEmpty &&

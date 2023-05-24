@@ -123,9 +123,10 @@ class TagTable {
     }
   }
 
-  void _onTableParsed(BuildTree tableTree) {
+  BuildTree _onTableParsed(BuildTree tableTree) {
     StyleBorder.skip(tableTree);
     StyleSizing.skip(tableTree);
+    return tableTree;
   }
 
   Widget? _onTableRenderBlock(BuildTree tableTree, WidgetPlaceholder _) {

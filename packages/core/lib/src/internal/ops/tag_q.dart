@@ -11,14 +11,14 @@ class TagQ {
           final firstParent = tree.first?.parent;
           final lastParent = tree.last?.parent;
           if (firstParent == null || lastParent == null) {
-            tree
+            return tree
               ..prepend(TextBit(tree, opening))
               ..append(TextBit(tree, closing));
-            return;
           }
 
           firstParent.prepend(TextBit(firstParent, opening));
           lastParent.append(TextBit(lastParent, closing));
+          return tree;
         },
         priority: Prioritiy.tagQ,
       );

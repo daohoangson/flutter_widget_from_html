@@ -186,7 +186,7 @@ class _BuildOpOnParsedText extends WidgetFactory {
   @override
   void parse(BuildTree tree) {
     if (tree.element.classes.contains('text')) {
-      tree.register(BuildOp(onParsed: (tree) => tree.addText(' bar')));
+      tree.register(BuildOp(onParsed: (tree) => tree..addText(' bar')));
     }
 
     return super.parse(tree);
@@ -199,9 +199,8 @@ class _BuildOpOnParsedWidgetBlock extends WidgetFactory {
     if (tree.element.classes.contains('widget-block')) {
       tree.register(
         BuildOp(
-          onParsed: (tree) {
-            tree.replaceWith(WidgetBit.block(tree, const Text('hi')));
-          },
+          onParsed: (tree) =>
+              tree..replaceWith(WidgetBit.block(tree, const Text('hi'))),
         ),
       );
     }
@@ -216,9 +215,8 @@ class _BuildOpOnParsedWidgetInline extends WidgetFactory {
     if (tree.element.classes.contains('widget-inline')) {
       tree.register(
         BuildOp(
-          onParsed: (tree) {
-            tree.replaceWith(WidgetBit.inline(tree, const Text('hi')));
-          },
+          onParsed: (tree) =>
+              tree..replaceWith(WidgetBit.inline(tree, const Text('hi'))),
         ),
       );
     }
@@ -246,13 +244,13 @@ class _BuildOpPriority extends WidgetFactory {
     tree
       ..register(
         BuildOp(
-          onParsed: (tree) => tree.addText(' A'),
+          onParsed: (tree) => tree..addText(' A'),
           priority: a,
         ),
       )
       ..register(
         BuildOp(
-          onParsed: (tree) => tree.addText(' B'),
+          onParsed: (tree) => tree..addText(' B'),
           priority: b,
         ),
       );

@@ -10,6 +10,7 @@ import 'package:flutter/material.dart'
         Tooltip;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:logging/logging.dart';
 
 import 'core_data.dart';
 import 'core_helpers.dart';
@@ -19,6 +20,8 @@ import 'internal/core_parser.dart';
 import 'internal/margin_vertical.dart';
 import 'internal/platform_specific/fallback.dart'
     if (dart.library.io) 'internal/platform_specific/io.dart';
+
+final _logger = Logger('fwfh.WidgetFactory');
 
 /// A factory to build widgets.
 class WidgetFactory {
@@ -554,6 +557,8 @@ class WidgetFactory {
     dynamic error,
     dynamic data,
   ]) {
+    _logger.warning('Could not render data=$data', error);
+
     final callback = _widget?.onErrorBuilder;
     if (callback != null) {
       final result = callback(context, tree.element, error);
@@ -1036,11 +1041,22 @@ class WidgetFactory {
         final displayInlineBlock = _styleDisplayInlineBlock ??= BuildOp(
           debugLabel: 'display: $value',
           onParsed: (tree) {
-            final built = tree.build();
-            if (built != null) {
-              const align = PlaceholderAlignment.baseline;
-              tree.replaceWith(WidgetBit.inline(tree, built, alignment: align));
+            final parent = tree.parent;
+            if (parent == null) {
+              return tree;
             }
+
+            return parent.sub()
+              ..append(
+                WidgetBit.inline(
+                  parent,
+                  WidgetPlaceholder(
+                    builder: (_, __) => tree.build(),
+                    debugLabel: kCssDisplayInlineBlock,
+                  ),
+                  alignment: PlaceholderAlignment.baseline,
+                ),
+              );
           },
           priority: Late.displayInlineBlock,
         );
@@ -1049,7 +1065,7 @@ class WidgetFactory {
       case kCssDisplayNone:
         final displayNone = _styleDisplayNone ??= BuildOp(
           debugLabel: 'display: $value',
-          onParsed: (tree) => tree.replaceWith(null),
+          onParsed: (tree) => tree.parent?.sub() ?? tree,
           priority: Late.displayNone,
         );
         tree.register(displayNone);
@@ -1105,7 +1121,7 @@ class WidgetFactory {
       mustBeBlock: false,
       onParsed: (tree) {
         _anchorRegistry.register(id, anchor);
-        tree.registerAnchor(anchor);
+        return tree..registerAnchor(anchor);
       },
       onRenderInline: (tree) {
         final widget = WidgetPlaceholder(
