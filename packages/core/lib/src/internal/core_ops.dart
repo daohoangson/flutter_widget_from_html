@@ -41,11 +41,30 @@ part 'ops/text_style.dart';
 
 const kAttributeId = 'id';
 
+const kTagAcronym = 'acronym';
+const kTagAddress = 'address';
 const kTagCode = 'code';
 const kTagCodeFont1 = 'Courier';
 const kTagCodeFont2 = 'monospace';
+const kTagDd = 'dd';
+const kTagDiv = 'div';
+const kTagDt = 'dt';
+const kTagFigure = 'figure';
+const kTagH1 = 'h1';
+const kTagH2 = 'h2';
+const kTagH3 = 'h3';
+const kTagH4 = 'h4';
+const kTagH5 = 'h5';
+const kTagH6 = 'h6';
+const kTagIns = 'ins';
 const kTagKbd = 'kbd';
+const kTagMark = 'mark';
+const kTagP = 'p';
 const kTagSamp = 'samp';
+const kTagScript = 'script';
+const kTagStrike = 'strike';
+const kTagSub = 'sub';
+const kTagSup = 'sup';
 const kTagTt = 'tt';
 
 const kCssDisplay = 'display';

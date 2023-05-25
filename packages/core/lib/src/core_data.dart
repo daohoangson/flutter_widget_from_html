@@ -12,6 +12,9 @@ part 'data/css.dart';
 part 'data/html_style.dart';
 part 'data/image.dart';
 
+/// A collection of style's key and value pairs.
+typedef StylesMap = Map<String, String>;
+
 /// {@template flutter_widget_from_html.defaultStyles}
 /// The callback that should return default styling map.
 ///
@@ -27,7 +30,7 @@ part 'data/image.dart';
 /// Note: op must be registered early for this to work e.g.
 /// in [WidgetFactory.parse] or [onChild].
 /// {@endtemplate}
-typedef DefaultStyles = Map<String, String> Function(BuildTree tree);
+typedef DefaultStyles = StylesMap Function(BuildTree tree);
 
 /// {@template flutter_widget_from_html.onChild}
 /// The callback that will be called before processing a child element.

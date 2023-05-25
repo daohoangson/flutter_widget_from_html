@@ -639,34 +639,54 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         break;
 
       case 'abbr':
-      case 'acronym':
-        tree[kCssTextDecorationLine] = kCssTextDecorationUnderline;
-        tree[kCssTextDecorationStyle] = kCssTextDecorationStyleDotted;
+      case kTagAcronym:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagAcronym,
+            defaultStyles: _tagAcronym,
+            priority: Early.tagAcronym,
+          ),
+        );
         break;
 
-      case 'address':
-        tree
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..apply(TextStyleOps.fontStyle, FontStyle.italic);
+      case kTagAddress:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagAddress,
+            defaultStyles: _tagAddress,
+            priority: Early.tagAddress,
+          ),
+        );
         break;
 
       case 'article':
       case 'aside':
-      case 'div':
+      case 'dl':
       case 'figcaption':
       case 'footer':
       case 'header':
       case 'main':
       case 'nav':
       case 'section':
-        tree[kCssDisplay] = kCssDisplayBlock;
+      case kTagDiv:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagDiv,
+            defaultStyles: _cssDisplayBlock,
+            priority: Early.tagDiv,
+          ),
+        );
         break;
 
       case 'blockquote':
-      case 'figure':
-        tree
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '1em 40px';
+      case kTagFigure:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagFigure,
+            defaultStyles: _tagFigure,
+            priority: Early.tagFigure,
+          ),
+        );
         break;
 
       case 'b':
@@ -686,9 +706,13 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         break;
 
       case kTagCenter:
-        tree
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssTextAlign] = kCssTextAlignWebkitCenter;
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagCenter,
+            defaultStyles: _tagCenter,
+            priority: Early.tagCenter,
+          ),
+        );
         break;
 
       case 'cite':
@@ -716,24 +740,35 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         tree.register(_tagDetails ??= TagDetails(this).buildOp);
         break;
 
-      case 'dd':
-        tree
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '0 0 1em 40px';
+      case kTagDd:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagDd,
+            defaultStyles: _tagDd,
+            priority: Early.tagDd,
+          ),
+        );
         break;
-      case 'dl':
-        tree[kCssDisplay] = kCssDisplayBlock;
-        break;
-      case 'dt':
-        tree
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..apply(TextStyleOps.fontWeight, FontWeight.bold);
+      case kTagDt:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagDt,
+            defaultStyles: _tagDt,
+            priority: Early.tagDt,
+          ),
+        );
         break;
 
       case 'del':
       case 's':
-      case 'strike':
-        tree[kCssTextDecorationLine] = kCssTextDecorationLineThrough;
+      case kTagStrike:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagStrike,
+            defaultStyles: _cssTextDecorationLineThrough,
+            priority: Early.tagStrike,
+          ),
+        );
         break;
 
       case kTagFont:
@@ -741,67 +776,76 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         break;
 
       case 'hr':
-        tree
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin + kSuffixBottom] = '1em'
-          ..register(
-            _tagHr ??= BuildOp(
-              debugLabel: localName,
-              onRenderBlock: (tree, _) => buildDivider(tree),
-              priority: Prioritiy.tagHr,
-            ),
-          );
+        tree.register(
+          _tagHr ??= BuildOp(
+            debugLabel: localName,
+            defaultStyles: (_) => {
+              kCssDisplay: kCssDisplayBlock,
+              kCssMargin + kSuffixBottom: '1em',
+            },
+            onRenderBlock: (tree, _) => buildDivider(tree),
+            priority: Prioritiy.tagHr,
+          ),
+        );
         break;
 
-      case 'h1':
-        tree
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '0.67em 0'
-          ..apply(TextStyleOps.fontSizeEm, 2.0)
-          ..apply(TextStyleOps.fontWeight, FontWeight.bold);
+      case kTagH1:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagH1,
+            defaultStyles: _tagH1,
+            priority: Early.tagH1,
+          ),
+        );
         break;
-      case 'h2':
-        tree
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '0.83em 0'
-          ..apply(TextStyleOps.fontSizeEm, 1.5)
-          ..apply(TextStyleOps.fontWeight, FontWeight.bold);
+      case kTagH2:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagH2,
+            defaultStyles: _tagH2,
+            priority: Early.tagH2,
+          ),
+        );
         break;
-      case 'h3':
-        tree
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '1em 0'
-          ..apply(TextStyleOps.fontSizeEm, 1.17)
-          ..apply(TextStyleOps.fontWeight, FontWeight.bold);
+      case kTagH3:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagH3,
+            defaultStyles: _tagH3,
+            priority: Early.tagH3,
+          ),
+        );
         break;
-      case 'h4':
-        tree
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '1.33em 0'
-          ..apply(TextStyleOps.fontWeight, FontWeight.bold);
+      case kTagH4:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagH4,
+            defaultStyles: _tagH4,
+            priority: Early.tagH4,
+          ),
+        );
         break;
-      case 'h5':
-        tree
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '1.67em 0'
-          ..apply(TextStyleOps.fontSizeEm, .83)
-          ..apply(TextStyleOps.fontWeight, FontWeight.bold);
+      case kTagH5:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagH5,
+            defaultStyles: _tagH5,
+            priority: Early.tagH5,
+          ),
+        );
         break;
-      case 'h6':
-        tree
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '2.33em 0'
-          ..apply(TextStyleOps.fontSizeEm, .67)
-          ..apply(TextStyleOps.fontWeight, FontWeight.bold);
+      case kTagH6:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagH6,
+            defaultStyles: _tagH6,
+            priority: Early.tagH6,
+          ),
+        );
         break;
 
       case kTagImg:
         tree.register(_tagImg ??= TagImg(this).buildOp);
-        break;
-
-      case 'ins':
-      case 'u':
-        tree[kCssTextDecorationLine] = kCssTextDecorationUnderline;
         break;
 
       case kTagOrderedList:
@@ -809,16 +853,24 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         tree.register(_tagLi ??= TagLi(this).buildOp);
         break;
 
-      case 'mark':
-        tree
-          ..[kCssBackgroundColor] = '#ff0'
-          ..[kCssColor] = '#000';
+      case kTagMark:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagMark,
+            defaultStyles: _tagMark,
+            priority: Early.tagMark,
+          ),
+        );
         break;
 
-      case 'p':
-        tree
-          ..[kCssDisplay] = kCssDisplayBlock
-          ..[kCssMargin] = '1em 0';
+      case kTagP:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagP,
+            defaultStyles: _tagP,
+            priority: Early.tagP,
+          ),
+        );
         break;
 
       case kTagQ:
@@ -829,49 +881,108 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
         tree.register(_tagRuby ??= TagRuby().buildOp);
         break;
 
-      case 'script':
       case 'style':
-        tree[kCssDisplay] = kCssDisplayNone;
+      case kTagScript:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagScript,
+            defaultStyles: _cssDisplayNone,
+            priority: Early.tagScript,
+          ),
+        );
         break;
 
-      case 'sub':
-        tree
-          ..[kCssVerticalAlign] = kCssVerticalAlignSub
-          ..apply(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
+      case kTagSub:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagSub,
+            defaultStyles: _tagSub,
+            priority: Early.tagSub,
+          ),
+        );
         break;
-      case 'sup':
-        tree
-          ..[kCssVerticalAlign] = kCssVerticalAlignSuper
-          ..apply(TextStyleOps.fontSizeTerm, kCssFontSizeSmaller);
+      case kTagSup:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagSup,
+            defaultStyles: _tagSup,
+            priority: Early.tagSup,
+          ),
+        );
         break;
 
       case kTagTable:
         final tagTable = _tagTable ??= TagTable(this);
         tree
-          ..[kCssDisplay] = kCssDisplayTable
+          ..register(
+            const BuildOp(
+              debugLabel: kTagTable,
+              defaultStyles: _cssDisplayTable,
+              priority: Early.tagTableDisplayTable,
+            ),
+          )
           ..register(tagTable.borderOp)
           ..register(tagTable.cellPaddingOp);
         break;
       case kTagTableCell:
-        tree[kCssVerticalAlign] = kCssVerticalAlignMiddle;
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagTableCell,
+            defaultStyles: _cssVerticalAlignMiddle,
+            priority: Early.tagTableCellDefaultStyles,
+          ),
+        );
         break;
       case kTagTableHeaderCell:
-        tree
-          ..[kCssVerticalAlign] = kCssVerticalAlignMiddle
-          ..apply(TextStyleOps.fontWeight, FontWeight.bold);
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagTableHeaderCell,
+            defaultStyles: _tagTableHeaderCell,
+            priority: Early.tagTableHeaderCellDefaultStyles,
+          ),
+        );
         break;
       case kTagTableCaption:
-        tree[kCssTextAlign] = kCssTextAlignCenter;
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagTableCaption,
+            defaultStyles: _cssTextAlignCenter,
+            priority: Early.tagTableCaptionTextAlignCenter,
+          ),
+        );
+        break;
+
+      case 'u':
+      case kTagIns:
+        tree.register(
+          const BuildOp(
+            debugLabel: kTagIns,
+            defaultStyles: _cssTextDecorationUnderline,
+            priority: Early.tagIns,
+          ),
+        );
         break;
     }
 
     for (final attribute in attrs.entries) {
       switch (attribute.key) {
         case kAttributeAlign:
-          tree[kCssTextAlign] = attribute.value;
+          tree.register(
+            const BuildOp(
+              debugLabel: kAttributeAlign,
+              defaultStyles: _cssTextAlignFromAttribute,
+              priority: Early.attributeAlign,
+            ),
+          );
           break;
         case kAttributeDir:
-          tree[kCssDirection] = attribute.value;
+          tree.register(
+            const BuildOp(
+              debugLabel: kAttributeDir,
+              defaultStyles: _cssDirectionFromAttribute,
+              priority: Early.attributeDir,
+            ),
+          );
           break;
         case kAttributeId:
           tree.register(Anchor(this, attribute.value).buildOp);
@@ -1088,6 +1199,135 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
     return baseUrl.resolveUri(uri).toString();
   }
+
+  // TODO: switch to use constant function literal when available
+  // https://github.com/dart-lang/language/issues/1048
+  static StylesMap _cssDirectionFromAttribute(BuildTree tree) {
+    final value = tree.element.attributes[kAttributeDir];
+    return value != null ? {kCssDirection: value} : const {};
+  }
+
+  static StylesMap _cssDisplayBlock(BuildTree _) =>
+      {kCssDisplay: kCssDisplayBlock};
+
+  static StylesMap _cssDisplayNone(BuildTree _) =>
+      {kCssDisplay: kCssDisplayNone};
+
+  static StylesMap _cssDisplayTable(BuildTree _) =>
+      {kCssDisplay: kCssDisplayTable};
+
+  static StylesMap _cssTextAlignCenter(BuildTree _) =>
+      {kCssTextAlign: kCssTextAlignCenter};
+
+  static StylesMap _cssTextAlignFromAttribute(BuildTree tree) {
+    final value = tree.element.attributes[kAttributeAlign];
+    return value != null ? {kCssTextAlign: value} : const {};
+  }
+
+  static StylesMap _cssTextDecorationLineThrough(BuildTree _) =>
+      {kCssTextDecorationLine: kCssTextDecorationLineThrough};
+
+  static StylesMap _cssTextDecorationUnderline(BuildTree _) =>
+      {kCssTextDecorationLine: kCssTextDecorationUnderline};
+
+  static StylesMap _cssVerticalAlignMiddle(BuildTree _) =>
+      {kCssVerticalAlign: kCssVerticalAlignMiddle};
+
+  static StylesMap _tagAcronym(BuildTree _) => {
+        kCssTextDecorationLine: kCssTextDecorationUnderline,
+        kCssTextDecorationStyle: kCssTextDecorationStyleDotted,
+      };
+
+  static StylesMap _tagAddress(BuildTree _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontStyle: kCssFontStyleItalic,
+      };
+
+  static StylesMap _tagCenter(BuildTree _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssTextAlign: kCssTextAlignWebkitCenter,
+      };
+
+  static StylesMap _tagDd(BuildTree _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssMargin: '0 0 1em 40px',
+      };
+
+  static StylesMap _tagDt(BuildTree _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontWeight: kCssFontWeightBold,
+      };
+
+  static StylesMap _tagFigure(BuildTree _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssMargin: '1em 40px',
+      };
+
+  static StylesMap _tagH1(BuildTree _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontSize: '2em',
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '0.67em 0',
+      };
+
+  static StylesMap _tagH2(BuildTree _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontSize: '1.5em',
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '0.83em 0',
+      };
+
+  static StylesMap _tagH3(BuildTree _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontSize: '1.17em',
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '1em 0',
+      };
+
+  static StylesMap _tagH4(BuildTree _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '1.33em 0',
+      };
+
+  static StylesMap _tagH5(BuildTree _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontSize: '0.83em',
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '1.67em 0',
+      };
+
+  static StylesMap _tagH6(BuildTree _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssFontSize: '0.67em',
+        kCssFontWeight: kCssFontWeightBold,
+        kCssMargin: '2.33em 0',
+      };
+
+  static StylesMap _tagMark(BuildTree _) => {
+        kCssBackgroundColor: '#ff0',
+        kCssColor: '#000',
+      };
+
+  static StylesMap _tagP(BuildTree _) => {
+        kCssDisplay: kCssDisplayBlock,
+        kCssMargin: '1em 0',
+      };
+
+  static StylesMap _tagSub(BuildTree _) => {
+        kCssVerticalAlign: kCssVerticalAlignSub,
+        kCssFontSize: kCssFontSizeSmaller,
+      };
+
+  static StylesMap _tagSup(BuildTree _) => {
+        kCssVerticalAlign: kCssVerticalAlignSuper,
+        kCssFontSize: kCssFontSizeSmaller,
+      };
+
+  static StylesMap _tagTableHeaderCell(BuildTree _) => {
+        kCssFontWeight: kCssFontWeightBold,
+        kCssVerticalAlign: kCssVerticalAlignMiddle,
+      };
 }
 
 /// A factory to build widgets.

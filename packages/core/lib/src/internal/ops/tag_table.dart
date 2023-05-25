@@ -53,7 +53,13 @@ class TagTable {
           switch (subTree.element.localName) {
             case kTagTableCell:
             case kTagTableHeaderCell:
-              subTree[kCssBorder] = kCssBorderInherit;
+              subTree.register(
+                const BuildOp(
+                  debugLabel: '$kTagTable--$kAttributeBorder--child',
+                  defaultStyles: _cssBorderInherit,
+                  priority: Early.tagTableAttributeBorderChild,
+                ),
+              );
           }
         }
       },
@@ -66,7 +72,13 @@ class TagTable {
         if (subTree.element.localName == 'td' ||
             subTree.element.localName == 'th') {
           final data = tree.data;
-          subTree[kCssPadding] = '${data.cellPadding}px';
+          subTree.register(
+            BuildOp(
+              debugLabel: '$kTagTable--$kAttributeCellPadding--child',
+              defaultStyles: (_) => {kCssPadding: '${data.cellPadding}px'},
+              priority: Early.tagTableAttributeCellPaddingChild,
+            ),
+          );
         }
       },
       priority: Prioritiy.tagTableAttributeCellPadding,
@@ -77,7 +89,7 @@ class TagTable {
       onChild: _onTableChild,
       onParsed: _onTableParsed,
       onRenderBlock: _onTableRenderBlock,
-      priority: Early.tagTable,
+      priority: Early.tagTableRenderBlock,
     );
   }
 
@@ -100,7 +112,7 @@ class TagTable {
               data.captions.add(placeholder);
               return placeholder;
             },
-            priority: Late.tagTableCaption,
+            priority: Late.tagTableCaptionRenderBlock,
           ),
         );
         break;
@@ -294,6 +306,9 @@ class TagTable {
 
     return null;
   }
+
+  static StylesMap _cssBorderInherit(BuildTree _) =>
+      {kCssBorder: kCssBorderInherit};
 }
 
 extension on BuildTree {
@@ -329,7 +344,7 @@ class _TagTableRow {
     _cellOp = BuildOp(
       debugLabel: kTagTableCell,
       onRenderBlock: _onCellRenderBlock,
-      priority: Late.tagTableCell,
+      priority: Late.tagTableCellRenderBlock,
     );
   }
 
@@ -367,14 +382,24 @@ class _TagTableRow {
   }
 
   void _registerCellOp(BuildTree cellTree) {
-    final attrs = cellTree.element.attributes;
-    if (attrs.containsKey(kAttributeValign)) {
-      cellTree[kCssVerticalAlign] = attrs[kAttributeValign]!;
+    if (cellTree.element.attributes.containsKey(kAttributeValign)) {
+      cellTree.register(
+        const BuildOp(
+          debugLabel: kTagTableCell,
+          defaultStyles: _cssVerticalAlignFromAttribute,
+          priority: Early.tagTableCellAttributeValign,
+        ),
+      );
     }
 
     cellTree.register(_cellOp);
     StyleBorder.skip(cellTree);
     StyleSizing.skip(cellTree);
+  }
+
+  static StylesMap _cssVerticalAlignFromAttribute(BuildTree tree) {
+    final value = tree.element.attributes[kAttributeValign];
+    return value != null ? {kCssVerticalAlign: value} : const {};
   }
 }
 

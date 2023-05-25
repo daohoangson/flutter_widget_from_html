@@ -51,13 +51,6 @@ class Builder extends BuildTree {
   Iterable<css.Declaration> get styles => _styles;
 
   @override
-  void operator []=(String key, String value) {
-    final styleSheet = css.parse('*{$key: $value;}');
-    final customStyles = styleSheet.collectDeclarations();
-    _styles.addAll(customStyles);
-  }
-
-  @override
   css.Declaration? operator [](String key) {
     for (final style in _styles.reversed) {
       if (style.property == key) {

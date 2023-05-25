@@ -34,8 +34,41 @@ class Prioritiy {
 class Early {
   static const _step = Prioritiy._step;
 
-  static const cssTextAlign = Prioritiy._baseEarly00 + _step;
-  static const tagTable = cssTextAlign + _step;
+  static const attributeAlign = Prioritiy._baseEarly00 + _step;
+  static const attributeDir = attributeAlign + _step;
+  static const cssTextAlign = attributeDir + _step;
+  static const tagAcronym = cssTextAlign + _step;
+  static const tagAddress = tagAcronym + _step;
+  static const tagCenter = tagAddress + _step;
+  static const tagDd = tagCenter + _step;
+  static const tagDiv = tagDd + _step;
+  static const tagDt = tagDiv + _step;
+  static const tagFigure = tagDt + _step;
+  static const tagH1 = tagFigure + _step;
+  static const tagH2 = tagH1 + _step;
+  static const tagH3 = tagH2 + _step;
+  static const tagH4 = tagH3 + _step;
+  static const tagH5 = tagH4 + _step;
+  static const tagH6 = tagH5 + _step;
+  static const tagIns = tagH6 + _step;
+  static const tagMark = tagIns + _step;
+  static const tagP = tagMark + _step;
+  static const tagRp = tagP + _step;
+  static const tagScript = tagRp + _step;
+  static const tagStrike = tagScript + _step;
+  static const tagSub = tagStrike + _step;
+  static const tagSup = tagSub + _step;
+  static const tagTableAttributeBorderChild = tagSup + _step;
+  static const tagTableAttributeCellPaddingChild =
+      tagTableAttributeBorderChild + _step;
+  static const tagTableCaptionTextAlignCenter =
+      tagTableAttributeCellPaddingChild - _step;
+  static const tagTableCellAttributeValign =
+      tagTableCaptionTextAlignCenter + _step;
+  static const tagTableCellDefaultStyles = tagTableCellAttributeValign + _step;
+  static const tagTableDisplayTable = tagTableCellDefaultStyles + _step;
+  static const tagTableHeaderCellDefaultStyles = tagTableDisplayTable + _step;
+  static const tagTableRenderBlock = tagTableHeaderCellDefaultStyles + _step;
 }
 
 /// Box model priorities.
@@ -62,8 +95,8 @@ class Late {
   static const anchor = displayBlock - _step;
   static const displayBlock = displayInlineBlock - _step;
   static const displayInlineBlock = tagSummary - _step;
-  static const tagSummary = tagTableCaption - _step;
-  static const tagTableCaption = tagTableCell - _step;
-  static const tagTableCell = displayNone - _step;
+  static const tagSummary = tagTableCaptionRenderBlock - _step;
+  static const tagTableCaptionRenderBlock = tagTableCellRenderBlock - _step;
+  static const tagTableCellRenderBlock = displayNone - _step;
   static const displayNone = Prioritiy._max;
 }

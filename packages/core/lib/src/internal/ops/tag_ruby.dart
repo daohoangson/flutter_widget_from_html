@@ -15,10 +15,16 @@ class TagRuby {
 
           switch (e.localName) {
             case kTagRp:
-              subTree[kCssDisplay] = kCssDisplayNone;
+              subTree.register(
+                const BuildOp(
+                  debugLabel: kTagRp,
+                  defaultStyles: _cssDisplayNone,
+                  priority: Early.tagRp,
+                ),
+              );
               break;
             case kTagRt:
-              subTree[kCssFontSize] = '0.5em';
+              subTree.apply(TextStyleOps.fontSizeEm, .5);
               break;
           }
         },
@@ -71,6 +77,9 @@ class TagRuby {
         },
         priority: Prioritiy.tagRuby,
       );
+
+  static StylesMap _cssDisplayNone(BuildTree _) =>
+      {kCssDisplay: kCssDisplayNone};
 }
 
 extension on BuildBit {

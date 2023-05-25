@@ -187,9 +187,6 @@ abstract class BuildTree extends BuildBit {
   /// - Attribute `style` of [domElement]
   Iterable<css.Declaration> get styles;
 
-  /// Adds an inline style.
-  void operator []=(String key, String value);
-
   /// Gets a styling declaration by `property`.
   css.Declaration? operator [](String key);
 

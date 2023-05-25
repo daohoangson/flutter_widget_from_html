@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'core_data.dart';
 import 'core_html_widget.dart';
 import 'core_widget_factory.dart';
 
@@ -39,9 +40,7 @@ const widget0 = SizedBox.shrink();
 ///     element.classes.contains('name') ? {'color': 'red'} : null,
 /// )
 /// ```
-typedef CustomStylesBuilder = Map<String, String>? Function(
-  dom.Element element,
-);
+typedef CustomStylesBuilder = StylesMap? Function(dom.Element element);
 
 /// A callback to render custom widget for a DOM element.
 ///
