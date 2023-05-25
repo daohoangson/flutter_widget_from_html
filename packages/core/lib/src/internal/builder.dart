@@ -28,7 +28,6 @@ class Builder extends BuildTree {
   final _buildOps = SplayTreeSet<BuilderOp>(BuilderOp._compare);
   final _styles = <css.Declaration>[];
 
-  Iterable<WidgetPlaceholder>? _flattenedWidgets;
   bool? _isInline;
 
   Builder({
@@ -44,9 +43,6 @@ class Builder extends BuildTree {
           parent: parent,
           styleBuilder: styleBuilder,
         );
-
-  @override
-  Iterable<WidgetPlaceholder>? get childrenWidgets => _flattenedWidgets;
 
   @override
   bool? get isInline => _isInline;
@@ -80,7 +76,7 @@ class Builder extends BuildTree {
 
   @override
   WidgetPlaceholder? build() {
-    final children = _flattenedWidgets = Flattener(wf, this).widgets;
+    final children = Flattener(wf, this).widgets;
     final column = wf.buildColumnPlaceholder(this, children);
     if (column == null && _buildOps.isEmpty) {
       return null;

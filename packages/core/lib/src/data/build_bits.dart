@@ -110,9 +110,6 @@ abstract class BuildTree extends BuildBit {
 
   final _children = <BuildBit>[];
 
-  /// The list of direct children.
-  Iterable<BuildBit> get children => _children;
-
   /// The associated DOM element.
   final dom.Element element;
 
@@ -139,10 +136,8 @@ abstract class BuildTree extends BuildBit {
     }
   }
 
-  /// Gets flattened children widgets.
-  ///
-  /// Returns `null` if tree has not been built.
-  Iterable<WidgetPlaceholder>? get childrenWidgets;
+  /// The list of direct children.
+  Iterable<BuildBit> get children => _children;
 
   /// The first bit (recursively).
   BuildBit? get first {
