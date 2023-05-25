@@ -296,7 +296,7 @@ class TagTable {
   }
 }
 
-extension _BuildTreeData on BuildTree {
+extension on BuildTree {
   _TagTableData get data {
     final existing = value<_TagTableData>();
     if (existing != null) {

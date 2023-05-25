@@ -37,6 +37,13 @@ class ValignBaseline extends SingleChildRenderObjectWidget {
         ..setIndex(index);
 }
 
+extension on BuildContext {
+  Baselines get baselines =>
+      dependOnInheritedWidgetOfExactType<_ValignBaselineInheritedWidget>()
+          ?.baselines ??
+      {};
+}
+
 class _ValignBaselineState extends State<ValignBaselineContainer> {
   final Baselines baselines = {};
 
@@ -58,13 +65,6 @@ class _ValignBaselineInheritedWidget extends InheritedWidget {
   @override
   bool updateShouldNotify(_ValignBaselineInheritedWidget oldWidget) =>
       !identical(baselines, oldWidget.baselines);
-}
-
-extension _ValignBaselineInheritedWidgetContext on BuildContext {
-  Baselines get baselines =>
-      dependOnInheritedWidgetOfExactType<_ValignBaselineInheritedWidget>()
-          ?.baselines ??
-      {};
 }
 
 class _ValignBaselineClearer extends SingleChildRenderObjectWidget {

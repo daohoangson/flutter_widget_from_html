@@ -7,7 +7,7 @@ const kCssMinHeight = 'min-height';
 const kCssMinWidth = 'min-width';
 const kCssWidth = 'width';
 
-extension CssLengthToSizing on CssLength {
+extension GetSizing on CssLength {
   CssSizingValue? getSizing(HtmlStyle style) {
     final value = getValue(style);
     if (value != null) {

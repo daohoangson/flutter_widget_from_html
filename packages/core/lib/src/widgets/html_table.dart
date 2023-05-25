@@ -215,13 +215,13 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   Type get debugTypicalAncestorWidgetClass => HtmlTable;
 }
 
-extension _IterableDouble on Iterable<double> {
+extension on Iterable<double> {
   double get sum => isEmpty ? 0.0 : reduce(_sum);
 
   static double _sum(double value, double element) => value + element;
 }
 
-extension _IterableDoubleList on List<double> {
+extension on List<double> {
   void setMaxColumnWidths(
     _TableRenderObject tro,
     _TableCellData data,

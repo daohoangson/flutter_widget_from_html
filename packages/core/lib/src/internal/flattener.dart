@@ -276,7 +276,7 @@ class Flattener implements Flattened {
   }
 }
 
-extension _BuildBit on BuildBit {
+extension on BuildBit {
   HtmlStyleBuilder? get effectiveStyleBulder {
     // the below code will find the best style for this whitespace bit
     // easy case: whitespace at the beginning of a tag, use the previous style
@@ -336,7 +336,7 @@ class _String {
   });
 }
 
-extension _StringListToText on List<_String> {
+extension on List<_String> {
   String toText(
     CssWhitespace whitespace, {
     required bool isFirst,

@@ -78,7 +78,7 @@ class TagVideo {
   }
 }
 
-extension _BuildTreeSourceUrls on BuildTree {
+extension on BuildTree {
   List<String> get sourceUrls => value<_TagVideoData>()?.sourceUrls ?? const [];
 
   set sourceUrls(List<String> v) {

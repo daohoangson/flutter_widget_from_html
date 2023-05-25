@@ -134,7 +134,7 @@ String? _listStyleTypeFromAttributeType(String type) {
   return null;
 }
 
-extension _BuildTreeItemData on BuildTree {
+extension on BuildTree {
   String? get itemStyleType =>
       this[kCssListStyleType]?.term ??
       _listStyleTypeFromAttributeType(
@@ -142,7 +142,7 @@ extension _BuildTreeItemData on BuildTree {
       );
 }
 
-extension _BuildTreeListData on BuildTree {
+extension on BuildTree {
   _TagLiListData get listData {
     final existing = value<_TagLiListData>();
     if (existing != null) {

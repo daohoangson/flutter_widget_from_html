@@ -73,7 +73,7 @@ class TagRuby {
       );
 }
 
-extension _RtTree on BuildBit {
+extension on BuildBit {
   bool get isRtTree {
     final thiz = this;
 
