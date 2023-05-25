@@ -11,78 +11,79 @@ const kCssVerticalAlignSuper = 'super';
 class StyleVerticalAlign {
   final WidgetFactory wf;
 
-  late final BuildOp inlineOp;
-  late final BuildOp blockOp;
-
   static final _skipBuilding = Expando<bool>();
 
-  StyleVerticalAlign(this.wf) {
-    inlineOp = BuildOp(
-      debugLabel: '$kCssVerticalAlign--inline',
-      onRenderInline: (tree) {
-        final v = tree[kCssVerticalAlign]?.term;
-        if (v == null || v == kCssVerticalAlignBaseline) {
-          return;
-        }
+  StyleVerticalAlign(this.wf);
 
-        final alignment = _tryParsePlaceholderAlignment(v);
-        if (alignment == null) {
-          return;
-        }
-
-        _skipBuilding[tree] = true;
-        final built = tree.build();
-        if (built == null) {
-          return;
-        }
-
-        if (v == kCssVerticalAlignSub || v == kCssVerticalAlignSuper) {
-          built.wrapWith(
-            (context, child) {
-              return _buildPaddedAlign(
-                context,
-                tree,
-                child,
-                EdgeInsets.only(
-                  bottom: v == kCssVerticalAlignSuper ? .4 : 0,
-                  top: v == kCssVerticalAlignSub ? .4 : 0,
-                ),
-              );
-            },
-          );
-        }
-
-        tree.replaceWith(WidgetBit.inline(tree, built, alignment: alignment));
-      },
-      priority: Early.cssVerticalAlign,
-    );
-
-    blockOp = BuildOp(
-      debugLabel: '$kCssVerticalAlign--block',
-      mustBeBlock: false,
-      onRenderBlock: (tree, placeholder) {
-        if (_skipBuilding[tree] == true) {
-          return null;
-        }
-
-        final v = tree[kCssVerticalAlign]?.term;
-        if (v == null) {
-          return null;
-        }
-
-        return placeholder.wrapWith((context, child) {
-          final style = tree.styleBuilder.build(context);
-          final alignment = _tryParseAlignmentGeometry(style.textDirection, v);
-          if (alignment == null) {
-            return child;
+  BuildOp get buildOp => BuildOp(
+        debugLabel: kCssVerticalAlign,
+        mustBeBlock: false,
+        onParsed: (tree) {
+          final parent = tree.parent;
+          if (tree.isInline != true || parent == null) {
+            return tree;
           }
 
-          return wf.buildAlign(tree, child, alignment, widthFactor: 1.0);
-        });
-      },
-      priority: BoxModel.verticalAlign,
-    );
-  }
+          final v = tree[kCssVerticalAlign]?.term;
+          if (v == null || v == kCssVerticalAlignBaseline) {
+            return tree;
+          }
+
+          final alignment = _tryParsePlaceholderAlignment(v);
+          if (alignment == null) {
+            return tree;
+          }
+
+          final placeholder = WidgetPlaceholder(
+            builder: (context, child) => tree.build(),
+            debugLabel: '${tree.element.localName}--$kCssVerticalAlign',
+          );
+
+          if (v == kCssVerticalAlignSub || v == kCssVerticalAlignSuper) {
+            placeholder.wrapWith(
+              (context, child) {
+                final padding = EdgeInsets.only(
+                  bottom: v == kCssVerticalAlignSuper ? .4 : 0,
+                  top: v == kCssVerticalAlignSub ? .4 : 0,
+                );
+                return _buildPaddedAlign(context, tree, child, padding);
+              },
+            );
+          }
+
+          _skipBuilding[tree] = true;
+          return parent.sub()
+            ..append(
+              WidgetBit.inline(
+                tree,
+                placeholder,
+                alignment: alignment,
+              ),
+            );
+        },
+        onRenderBlock: (tree, placeholder) {
+          if (_skipBuilding[tree] == true) {
+            return null;
+          }
+
+          final v = tree[kCssVerticalAlign]?.term;
+          if (v == null) {
+            return null;
+          }
+
+          return placeholder.wrapWith((context, child) {
+            final style = tree.styleBuilder.build(context);
+            final alignment =
+                _tryParseAlignmentGeometry(style.textDirection, v);
+            if (alignment == null) {
+              return child;
+            }
+
+            return wf.buildAlign(tree, child, alignment, widthFactor: 1.0);
+          });
+        },
+        priority: BoxModel.verticalAlign,
+      );
 
   Widget? _buildPaddedAlign(
     BuildContext context,

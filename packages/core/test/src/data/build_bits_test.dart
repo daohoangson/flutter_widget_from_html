@@ -361,7 +361,7 @@ class _OutputWidgetBit extends BuildBit {
   const _OutputWidgetBit(BuildTree? parent) : super(parent);
 
   @override
-  bool get isInline => false;
+  bool? get isInline => false;
 
   @override
   void flatten(Flattened f) =>

@@ -975,15 +975,8 @@ Future<void> main() async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/799
       const html = '<span style="background-color: #FF6600; '
           'display: inline-block; vertical-align: middle">Foo</span>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[Container:bg=#FFFF6600,child='
-          '[Align:alignment=centerLeft,widthFactor=1.0,child='
-          '[RichText:(:Foo)]]]',
-        ),
-      );
+      final e = await explain(tester, html);
+      expect(e, equals('[Container:bg=#FFFF6600,child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('renders display: none', (WidgetTester tester) async {

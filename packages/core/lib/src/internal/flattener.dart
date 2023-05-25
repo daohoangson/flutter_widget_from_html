@@ -150,7 +150,7 @@ class Flattener implements Flattened {
     }
 
     final next = bit.nextNonWhitespace;
-    if (next != null && !next.isInline) {
+    if (next != null && next.isInline == false) {
       // skip whitespace before a new block
       return true;
     }

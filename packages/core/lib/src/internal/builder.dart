@@ -29,6 +29,7 @@ class Builder extends BuildTree {
   final _styles = <css.Declaration>[];
 
   Iterable<WidgetPlaceholder>? _flattenedWidgets;
+  bool? _isInline;
 
   Builder({
     required this.customStylesBuilder,
@@ -46,6 +47,9 @@ class Builder extends BuildTree {
 
   @override
   Iterable<WidgetPlaceholder>? get childrenWidgets => _flattenedWidgets;
+
+  @override
+  bool? get isInline => _isInline;
 
   @override
   Iterable<css.Declaration> get styles => _styles;
@@ -68,16 +72,10 @@ class Builder extends BuildTree {
     return null;
   }
 
-  BuildTree addBitsFromNodes(dom.NodeList domNodes) {
+  void addBitsFromNodes(dom.NodeList domNodes) {
     for (final domNode in domNodes) {
       _addBitsFromNode(domNode);
     }
-
-    BuildTree tree = this;
-    for (final op in _buildOps) {
-      tree = op.onParsed(tree);
-    }
-    return tree;
   }
 
   @override
@@ -182,12 +180,19 @@ class Builder extends BuildTree {
       return;
     }
 
-    final subTree = sub(element: element)
-        ._parseEverything()
-        .addBitsFromNodes(element.nodes);
+    final subBuilder = sub(element: element)
+      .._parseEverything()
+      ..addBitsFromNodes(element.nodes);
 
-    if (subTree is Builder &&
-        subTree._buildOps.where(_mustBeBlock).isNotEmpty) {
+    final isBlock = subBuilder._buildOps.where(_mustBeBlock).isNotEmpty;
+    subBuilder._isInline = !isBlock;
+
+    BuildTree subTree = subBuilder;
+    for (final op in subBuilder._buildOps) {
+      subTree = op.onParsed(subTree);
+    }
+
+    if (isBlock) {
       final builtSubTree = subTree.build();
       if (builtSubTree != null) {
         append(WidgetBit.block(this, builtSubTree));
@@ -258,7 +263,7 @@ class Builder extends BuildTree {
     _styles.addAll(customStyles);
   }
 
-  Builder _parseEverything() {
+  void _parseEverything() {
     wf.parse(this);
 
     for (final op in parentOps) {
@@ -287,8 +292,6 @@ class Builder extends BuildTree {
     }
 
     wf.parseStyleDisplay(this, this[kCssDisplay]?.term);
-
-    return this;
   }
 }
 

@@ -14,7 +14,7 @@ class TagBrBit extends BuildBit {
   const TagBrBit(BuildTree? parent) : super(parent);
 
   @override
-  bool get swallowWhitespace => true;
+  bool? get swallowWhitespace => true;
 
   @override
   BuildBit copyWith({BuildTree? parent}) => TagBrBit(parent ?? this.parent);

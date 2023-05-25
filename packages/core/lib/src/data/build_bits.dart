@@ -8,8 +8,10 @@ abstract class BuildBit {
   /// Creates a build bit.
   const BuildBit(this.parent);
 
-  /// Returns true if this bit should be rendered inline.
-  bool get isInline => true;
+  /// Controls whether to render inline.
+  ///
+  /// Returns `null` if it's indecisive (e.g. [BuildTree] not completely parsed).
+  bool? get isInline => true;
 
   /// The next bit in the tree.
   ///
@@ -87,7 +89,10 @@ abstract class BuildBit {
   /// Returns `null` to use configuration from the previous bit.
   ///
   /// By default, do swallow if not [isInline].
-  bool? get swallowWhitespace => !isInline;
+  bool? get swallowWhitespace {
+    final scopedIsInline = isInline;
+    return scopedIsInline == null ? null : !scopedIsInline;
+  }
 
   /// Creates a copy with the given fields replaced with the new values.
   BuildBit copyWith({BuildTree? parent});
@@ -353,7 +358,7 @@ class _WidgetBitBlock extends WidgetBit<Widget> {
       : super._(parent, child);
 
   @override
-  bool get isInline => false;
+  bool? get isInline => false;
 
   @override
   BuildBit copyWith({BuildTree? parent}) =>

@@ -47,7 +47,7 @@ class WidgetFactory {
   BuildOp? _styleDisplayNone;
   BuildOp? _styleMargin;
   BuildOp? _stylePadding;
-  StyleVerticalAlign? _styleVerticalAlign;
+  BuildOp? _styleVerticalAlign;
   BuildOp? _tagA;
   BuildOp? _tagDetails;
   BuildOp? _tagHr;
@@ -996,11 +996,7 @@ class WidgetFactory {
         break;
 
       case kCssVerticalAlign:
-        final styleVerticalAlign =
-            _styleVerticalAlign ??= StyleVerticalAlign(this);
-        tree
-          ..register(styleVerticalAlign.inlineOp)
-          ..register(styleVerticalAlign.blockOp);
+        tree.register(_styleVerticalAlign ??= StyleVerticalAlign(this).buildOp);
         break;
 
       case kCssWhitespace:

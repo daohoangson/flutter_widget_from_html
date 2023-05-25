@@ -36,8 +36,7 @@ class Early {
 
   static const cssBorderInline = Prioritiy._baseEarly00 + _step;
   static const cssTextAlign = cssBorderInline + _step;
-  static const cssVerticalAlign = cssTextAlign + _step;
-  static const tagTable = cssVerticalAlign + _step;
+  static const tagTable = cssTextAlign + _step;
 }
 
 /// Box model priorities.
