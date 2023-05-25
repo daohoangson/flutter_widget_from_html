@@ -34,8 +34,7 @@ class Prioritiy {
 class Early {
   static const _step = Prioritiy._step;
 
-  static const cssBorderInline = Prioritiy._baseEarly00 + _step;
-  static const cssTextAlign = cssBorderInline + _step;
+  static const cssTextAlign = Prioritiy._baseEarly00 + _step;
   static const tagTable = cssTextAlign + _step;
 }
 

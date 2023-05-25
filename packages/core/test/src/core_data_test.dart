@@ -59,9 +59,11 @@ void main() {
           explained,
           equals(
             'HtmlStyleWidget\n'
-            '└WidgetPlaceholder(span--WidgetBit.block)\n'
-            ' └Text("hi")\n'
-            '  └RichText(text: "hi")\n\n',
+            '└ColumnPlaceholder(root--column)\n'
+            ' └Column()\n'
+            '  ├RichText(text: "Foo")\n'
+            '  └Text("hi")\n'
+            '   └RichText(text: "hi")\n\n',
           ),
         );
       });
@@ -82,10 +84,13 @@ void main() {
           explained,
           equals(
             'HtmlStyleWidget\n'
-            '└WidgetPlaceholder(div--WidgetBit.block)\n'
+            '└ColumnPlaceholder(div--column)\n'
             ' └CssBlock()\n'
-            '  └Text("hi")\n'
-            '   └RichText(text: "hi")\n\n',
+            '  └Column()\n'
+            '   ├CssBlock()\n'
+            '   │└RichText(text: "Foo")\n'
+            '   └Text("hi")\n'
+            '    └RichText(text: "hi")\n\n',
           ),
         );
       });
@@ -107,8 +112,33 @@ void main() {
           equals(
             'HtmlStyleWidget\n'
             '└WidgetPlaceholder(root--text)\n'
-            ' └Text("hi")\n'
-            '  └RichText(text: "hi")\n\n',
+            ' └RichText(text: "bar￼")\n'
+            '  └Semantics(...)\n'
+            '   └WidgetPlaceholder(span--WidgetBit.inline)\n'
+            '    └Text("hi")\n'
+            '     └RichText(text: "hi")\n\n',
+          ),
+        );
+      });
+
+      testWidgets('renders replacement', (tester) async {
+        const html = '<span class="replace">foo</span>';
+        final explained = await explain(
+          tester,
+          null,
+          hw: HtmlWidget(
+            html,
+            factoryBuilder: () => _BuildOpOnParsedReplace(),
+            key: hwKey,
+          ),
+          useExplainer: false,
+        );
+        expect(
+          explained,
+          equals(
+            'HtmlStyleWidget\n'
+            '└WidgetPlaceholder(root--text)\n'
+            ' └RichText(text: "hi")\n\n',
           ),
         );
       });
@@ -200,7 +230,7 @@ class _BuildOpOnParsedWidgetBlock extends WidgetFactory {
       tree.register(
         BuildOp(
           onParsed: (tree) =>
-              tree..replaceWith(WidgetBit.block(tree, const Text('hi'))),
+              tree..append(WidgetBit.block(tree, const Text('hi'))),
         ),
       );
     }
@@ -216,7 +246,22 @@ class _BuildOpOnParsedWidgetInline extends WidgetFactory {
       tree.register(
         BuildOp(
           onParsed: (tree) =>
-              tree..replaceWith(WidgetBit.inline(tree, const Text('hi'))),
+              tree..append(WidgetBit.inline(tree, const Text('hi'))),
+        ),
+      );
+    }
+
+    return super.parse(tree);
+  }
+}
+
+class _BuildOpOnParsedReplace extends WidgetFactory {
+  @override
+  void parse(BuildTree tree) {
+    if (tree.element.classes.contains('replace')) {
+      tree.register(
+        BuildOp(
+          onParsed: (tree) => tree.parent!.sub()..addText('hi'),
         ),
       );
     }

@@ -237,17 +237,6 @@ abstract class BuildTree extends BuildBit {
     return bit;
   }
 
-  /// Replaces all children bits with [another].
-  void replaceWith(BuildBit? another) {
-    _children.clear();
-
-    if (another != null) {
-      final child =
-          another.parent == this ? another : another.copyWith(parent: this);
-      _children.add(child);
-    }
-  }
-
   /// Registers a build op.
   void register(BuildOp op);
 

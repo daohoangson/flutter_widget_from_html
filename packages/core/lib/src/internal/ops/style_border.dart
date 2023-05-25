@@ -3,60 +3,59 @@ part of '../core_ops.dart';
 class StyleBorder {
   final WidgetFactory wf;
 
-  late final BuildOp inlineOp;
-  late final BuildOp blockOp;
-
   static final _skipBuilding = Expando<bool>();
 
-  StyleBorder(this.wf) {
-    inlineOp = BuildOp(
-      debugLabel: '$kCssBorder--inline',
-      onRenderInline: (tree) {
-        if (_skipBuilding[tree] == true) {
-          return;
-        }
+  StyleBorder(this.wf);
 
-        final border = tryParseBorder(tree);
-        if (border.isNoOp) {
-          return;
-        }
+  BuildOp get buildOp => BuildOp(
+        debugLabel: '$kCssBorder--block',
+        mustBeBlock: false,
+        onParsed: (tree) {
+          final parent = tree.parent;
+          if (tree.isInline != true || parent == null) {
+            return tree;
+          }
 
-        final built = tree.build()?.wrapWith(
-              (context, child) => _buildBorder(tree, context, child, border),
+          final border = tryParseBorder(tree);
+          if (border.isNoOp) {
+            return tree;
+          }
+
+          skip(tree);
+          return parent.sub()
+            ..append(
+              WidgetBit.inline(
+                tree,
+                WidgetPlaceholder(
+                  builder: (context, child) {
+                    Widget? built = tree.build() ?? child;
+                    built = _buildBorder(tree, context, built, border);
+                    return built ?? child;
+                  },
+                  debugLabel: '${tree.element.localName}--$kCssBorder',
+                ),
+                alignment: PlaceholderAlignment.baseline,
+              ),
             );
-        if (built == null) {
-          return;
-        }
+        },
+        onRenderBlock: (tree, child) {
+          if (_skipBuilding[tree] == true) {
+            return null;
+          }
 
-        skip(tree);
-        const baseline = PlaceholderAlignment.baseline;
-        tree.replaceWith(WidgetBit.inline(tree, built, alignment: baseline));
-      },
-      priority: Early.cssBorderInline,
-    );
+          final border = tryParseBorder(tree);
+          if (border.isNoOp) {
+            return null;
+          }
 
-    blockOp = BuildOp(
-      debugLabel: '$kCssBorder--block',
-      mustBeBlock: false,
-      onRenderBlock: (tree, child) {
-        if (_skipBuilding[tree] == true) {
-          return null;
-        }
-
-        final border = tryParseBorder(tree);
-        if (border.isNoOp) {
-          return null;
-        }
-
-        skip(tree);
-        return WidgetPlaceholder(
-          builder: (ctx, _) => _buildBorder(tree, ctx, child, border),
-          debugLabel: '${tree.element.localName}--$kCssBorder',
-        );
-      },
-      priority: BoxModel.border,
-    );
-  }
+          skip(tree);
+          return WidgetPlaceholder(
+            builder: (ctx, _) => _buildBorder(tree, ctx, child, border),
+            debugLabel: '${tree.element.localName}--$kCssBorder',
+          );
+        },
+        priority: BoxModel.border,
+      );
 
   Widget? _buildBorder(
     BuildTree tree,
