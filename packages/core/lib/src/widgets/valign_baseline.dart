@@ -90,7 +90,7 @@ class _ValignBaselineClearerRenderObject extends RenderProxyBox {
   void setBaselines(Baselines v) {
     if (!identical(v, _baselines)) {
       _baselines = v;
-      markNeedsLayout();
+      markNeedsPaint();
     }
   }
 
