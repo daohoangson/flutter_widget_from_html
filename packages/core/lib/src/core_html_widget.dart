@@ -294,6 +294,7 @@ Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
   rootBuilder.addBitsFromNodes(domNodes);
 
   final built = rootBuilder.build()?.wrapWith(wf.buildBodyWidget) ?? widget0;
+
   _logger.fine('Built body successfuly.');
 
   return built;

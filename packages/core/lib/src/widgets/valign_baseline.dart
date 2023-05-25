@@ -76,9 +76,11 @@ class _ValignBaselineClearer extends SingleChildRenderObjectWidget {
       _ValignBaselineClearerRenderObject(context.baselines);
 
   @override
-  void updateRenderObject(BuildContext context, RenderObject renderObject) =>
-      (renderObject as _ValignBaselineClearerRenderObject)
-          .setBaselines(context.baselines);
+  void updateRenderObject(
+    BuildContext context,
+    covariant _ValignBaselineClearerRenderObject renderObject,
+  ) =>
+      renderObject.setBaselines(context.baselines);
 }
 
 class _ValignBaselineClearerRenderObject extends RenderProxyBox {
