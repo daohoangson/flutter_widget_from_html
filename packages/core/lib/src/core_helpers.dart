@@ -91,29 +91,6 @@ typedef OnLoadingBuilder = Widget? Function(
   double? loadingProgress,
 );
 
-/// An extension on [Widget] to keep track of anchors.
-extension WidgetAnchors on Widget {
-  static final _anchors = Expando<Iterable<Key>>();
-
-  /// Anchor keys of this widget and its children.
-  Iterable<Key>? get anchors => _anchors[this];
-
-  /// Set anchor keys.
-  bool setAnchorsIfUnset(Iterable<Key>? anchors) {
-    if (anchors == null) {
-      return false;
-    }
-
-    final existing = _anchors[this];
-    if (existing != null) {
-      return false;
-    }
-
-    _anchors[this] = anchors;
-    return true;
-  }
-}
-
 /// A widget builder that can be extended with callbacks.
 class WidgetPlaceholder extends StatelessWidget {
   /// A human-readable description of this placeholder.
@@ -146,8 +123,6 @@ class WidgetPlaceholder extends StatelessWidget {
     for (final builder in _builders) {
       built = unwrap(context, builder(context, built) ?? widget0);
     }
-
-    built.setAnchorsIfUnset(anchors);
 
     return built;
   }

@@ -24,7 +24,7 @@ import 'internal/platform_specific/fallback.dart'
 final _logger = Logger('fwfh.WidgetFactory');
 
 /// A factory to build widgets.
-class WidgetFactory {
+class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   /// Setting this property to true replaces the default with a static [Text].
   /// This property is most useful for testing purposes.
   ///
@@ -38,8 +38,6 @@ class WidgetFactory {
   static BuildOp? _tagRuby;
 
   final _recognizersNeedDisposing = <GestureRecognizer>[];
-
-  late AnchorRegistry _anchorRegistry;
 
   BuildOp? _styleBackground;
   BuildOp? _styleBorder;
@@ -57,12 +55,6 @@ class WidgetFactory {
   TagTable? _tagTable;
   HtmlStyle Function(HtmlStyle, css.Expression)? _styleBuilderLineHeight;
   HtmlWidget? _widget;
-
-  /// Gets the current anchor registry.
-  ///
-  /// This is an impl detail and may be changed without a major version bump.
-  @protected
-  AnchorRegistry get anchorRegistry => _anchorRegistry;
 
   /// Builds [Align].
   Widget? buildAlign(
@@ -403,9 +395,9 @@ class WidgetFactory {
   Widget? buildTooltip(BuildTree tree, Widget child, String message) =>
       Tooltip(message: message, child: child);
 
-  /// Called when the [HtmlWidget]'s state is disposed.
-  @mustCallSuper
+  @override
   void dispose() {
+    super.dispose();
     _dispose();
   }
 
@@ -600,12 +592,6 @@ class WidgetFactory {
     );
   }
 
-  /// Ensures anchor is visible.
-  ///
-  /// Returns `true` if anchor has been found and
-  /// [ScrollPosition.ensureVisible] completes successfully.
-  Future<bool> onTapAnchor(String id, EnsureVisible scrollTo) => scrollTo(id);
-
   /// Calls [HtmlWidget.onTapUrl] with [url].
   ///
   /// Returns `true` if there is a callback and it has handled the tap.
@@ -624,8 +610,7 @@ class WidgetFactory {
     final idPrefix = '${_widget?.baseUrl ?? ''}#';
     if (url.startsWith(idPrefix)) {
       final id = url.substring(idPrefix.length);
-      final handledViaAnchor =
-          await onTapAnchor(id, _anchorRegistry.ensureVisible);
+      final handledViaAnchor = await onTapAnchorWrapper(id);
       if (handledViaAnchor) {
         return true;
       }
@@ -649,7 +634,7 @@ class WidgetFactory {
 
         final name = attrs[kAttributeAName];
         if (name != null) {
-          tree.register(_anchorOp(name));
+          tree.register(Anchor(this, name).buildOp);
         }
         break;
 
@@ -889,7 +874,7 @@ class WidgetFactory {
           tree[kCssDirection] = attribute.value;
           break;
         case kAttributeId:
-          tree.register(_anchorOp(attribute.value));
+          tree.register(Anchor(this, attribute.value).buildOp);
           break;
       }
     }
@@ -1070,12 +1055,10 @@ class WidgetFactory {
     }
   }
 
-  /// Resets for a new build.
-  @mustCallSuper
+  @override
   void reset(State state) {
+    super.reset(state);
     _dispose();
-
-    _anchorRegistry = AnchorRegistry(state.context);
 
     final widget = state.widget;
     _widget = widget is HtmlWidget ? widget : null;
@@ -1105,33 +1088,15 @@ class WidgetFactory {
 
     return baseUrl.resolveUri(uri).toString();
   }
+}
 
-  BuildOp _anchorOp(String id) {
-    final anchor = GlobalKey(debugLabel: id);
+/// A factory to build widgets.
+class WidgetFactoryResetter {
+  /// Called when the [HtmlWidget]'s state is disposed.
+  @mustCallSuper
+  void dispose() {}
 
-    return BuildOp(
-      debugLabel: 'anchor',
-      mustBeBlock: false,
-      onParsed: (tree) {
-        _anchorRegistry.register(id, anchor);
-        return tree..registerAnchor(anchor);
-      },
-      onRenderInline: (tree) {
-        final widget = WidgetPlaceholder(
-          builder: (context, _) => SizedBox(
-            height: tree.styleBuilder.build(context).textStyle.fontSize,
-            key: anchor,
-          ),
-          debugLabel: '${tree.element.localName}--anchor#$id',
-        );
-
-        const baseline = PlaceholderAlignment.baseline;
-        tree.prepend(WidgetBit.inline(tree, widget, alignment: baseline));
-      },
-      onRenderBlock: (_, placeholder) => placeholder.wrapWith(
-        (_, child) => SizedBox(key: anchor, child: child),
-      ),
-      priority: Late.anchor,
-    );
-  }
+  /// Resets for a new build.
+  @mustCallSuper
+  void reset(State state) {}
 }

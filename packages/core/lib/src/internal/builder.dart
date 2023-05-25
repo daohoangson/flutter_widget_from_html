@@ -95,7 +95,10 @@ class Builder extends BuildTree {
       return null;
     }
 
-    return placeholder..setAnchorsIfUnset(anchors);
+    // TODO: avoid special handling of anchors
+    Anchor.wrapWidgetAnchors(this, placeholder);
+
+    return placeholder;
   }
 
   @override
