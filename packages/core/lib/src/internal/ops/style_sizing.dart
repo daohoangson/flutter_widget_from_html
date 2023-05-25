@@ -28,11 +28,9 @@ extension GetSizing on CssLength {
 class StyleSizing {
   static const k100percent = CssLength(100, CssLengthUnit.percentage);
 
-  late final BuildOp _blockOp;
-  late final BuildOp _childOp;
-  late final BuildOp _sizingOp;
-
-  static final _instance = StyleSizing._();
+  final BuildOp blockOp;
+  final BuildOp childOp;
+  final BuildOp sizingOp;
 
   static final _elementTree = Expando<BuildTree>();
   static final _treeIsBlock = Expando<bool>();
@@ -44,62 +42,55 @@ class StyleSizing {
       return;
     }
 
-    tree.register(_instance._childOp);
+    tree.register(StyleSizing().childOp);
   }
 
   static void registerBlockOp(WidgetFactory wf, BuildTree tree) {
     _elementTree[tree.element] = tree;
     _treeIsBlock[tree] = true;
 
+    final instance = StyleSizing();
     tree
-      ..register(_instance._blockOp)
-      ..register(_instance._sizingOp);
+      ..register(instance.blockOp)
+      ..register(instance.sizingOp);
   }
 
   static void registerSizingOp(WidgetFactory wf, BuildTree tree) {
     _elementTree[tree.element] = tree;
-    tree.register(_instance._sizingOp);
+    tree.register(StyleSizing().sizingOp);
   }
 
-  StyleSizing._() {
-    _blockOp = const BuildOp(
-      debugLabel: 'display: block',
-      onRenderBlock: bypass,
-      priority: Late.displayBlock,
-    );
+  factory StyleSizing() => const StyleSizing._(
+        blockOp: BuildOp(
+          debugLabel: 'display: block',
+          onRenderBlock: _blockBypass,
+          priority: Late.displayBlock,
+        ),
+        childOp: BuildOp(
+          debugLabel: 'sizing (min-width=0)',
+          mustBeBlock: false,
+          onRenderBlock: _childZero,
+          priority: BoxModel.sizingMinWidthZero,
+        ),
+        sizingOp: BuildOp(
+          debugLabel: 'sizing',
+          mustBeBlock: false,
+          onRenderBlock: _sizingBlock,
+          onRenderInline: _sizingInline,
+          priority: BoxModel.sizing,
+        ),
+      );
 
-    _childOp = BuildOp(
-      debugLabel: 'sizing (min-width=0)',
-      mustBeBlock: false,
-      onRenderBlock: buildMinWidthZero,
-      priority: BoxModel.sizingMinWidthZero,
-    );
+  const StyleSizing._({
+    required this.blockOp,
+    required this.childOp,
+    required this.sizingOp,
+  });
 
-    _sizingOp = BuildOp(
-      debugLabel: 'sizing',
-      mustBeBlock: false,
-      onRenderBlock: buildCssSizing,
-      onRenderInline: handleInlineSizing,
-      priority: BoxModel.sizing,
-    );
-  }
+  static Widget? _blockBypass(BuildTree _, WidgetPlaceholder placeholder) =>
+      placeholder;
 
-  Widget? buildCssSizing(BuildTree tree, WidgetPlaceholder placeholder) {
-    if (_skipBuilding[tree] == true || placeholder.isEmpty) {
-      return null;
-    }
-
-    final input = _StyleSizingInput.tryParse(tree);
-    if (input == null) {
-      return null;
-    }
-
-    return placeholder.wrapWith(
-      (context, child) => _build(context, child, input, tree.styleBuilder),
-    );
-  }
-
-  Widget? buildMinWidthZero(BuildTree subTree, WidgetPlaceholder placeholder) {
+  static Widget? _childZero(BuildTree subTree, WidgetPlaceholder placeholder) {
     if (_StyleSizingInput.tryParse(subTree)?.preferredWidth == k100percent) {
       return null;
     }
@@ -129,10 +120,22 @@ class StyleSizing {
     });
   }
 
-  static Widget? bypass(BuildTree _, WidgetPlaceholder placeholder) =>
-      placeholder;
+  static Widget? _sizingBlock(BuildTree tree, WidgetPlaceholder placeholder) {
+    if (_skipBuilding[tree] == true || placeholder.isEmpty) {
+      return null;
+    }
 
-  static void handleInlineSizing(BuildTree tree) {
+    final input = _StyleSizingInput.tryParse(tree);
+    if (input == null) {
+      return null;
+    }
+
+    return placeholder.wrapWith(
+      (context, child) => _build(context, child, input, tree.styleBuilder),
+    );
+  }
+
+  static void _sizingInline(BuildTree tree) {
     if (_skipBuilding[tree] == true) {
       return;
     }
