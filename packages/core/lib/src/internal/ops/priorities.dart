@@ -27,8 +27,7 @@ class Priority {
   static const tagRuby = tagQ + _step;
   static const tagTableAttributeBorder = tagRuby + _step;
   static const tagTableAttributeCellPadding = tagTableAttributeBorder + _step;
-  static const tagTableCellRenderedBlock = tagTableAttributeCellPadding + _step;
-  static const tagTableRow = tagTableCellRenderedBlock + _step;
+  static const tagTableRow = tagTableAttributeCellPadding + _step;
   static const tagTableRowGroup = tagTableRow + _step;
 }
 

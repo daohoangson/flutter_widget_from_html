@@ -135,10 +135,7 @@ class TagTable {
     return tableTree;
   }
 
-  Widget _onTableRenderBlock(
-    BuildTree tableTree,
-    WidgetPlaceholder _,
-  ) {
+  Widget _onTableRenderBlock(BuildTree tableTree, WidgetPlaceholder _) {
     final data = tableTree.tableData;
 
     _prepareHtmlTableCaptionBuilders(data);
@@ -343,7 +340,6 @@ class _TagTableRow {
       debugLabel: kTagTableCell,
       mustBeBlock: true,
       onRenderedBlock: _onCellRenderedBlock,
-      priority: Priority.tagTableCellRenderedBlock,
     );
   }
 
