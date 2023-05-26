@@ -62,6 +62,7 @@ class TagRuby {
                     rt: rtTree.build(),
                     ruby: rubyTree.build(),
                   ),
+                  debugLabel: kTagRuby,
                 ),
                 alignment: PlaceholderAlignment.baseline,
               ),
