@@ -50,17 +50,6 @@ class Builder extends BuildTree {
   @override
   Iterable<css.Declaration> get styles => _styles;
 
-  @override
-  css.Declaration? operator [](String key) {
-    for (final style in _styles.reversed) {
-      if (style.property == key) {
-        return style;
-      }
-    }
-
-    return null;
-  }
-
   void addBitsFromNodes(dom.NodeList domNodes) {
     for (final domNode in domNodes) {
       _addBitsFromNode(domNode);
@@ -136,6 +125,19 @@ class Builder extends BuildTree {
     for (final op in _buildOps) {
       op.onRenderInline();
     }
+  }
+
+  @override
+  css.Declaration? getStyle(String property) {
+    for (final style in _styles.reversed) {
+      if (style.property == property) {
+        // TODO: add support for `!important`
+        // https://github.com/daohoangson/flutter_widget_from_html/issues/773
+        return style;
+      }
+    }
+
+    return null;
   }
 
   @override
@@ -262,7 +264,6 @@ class Builder extends BuildTree {
       op.onChild(this);
     }
 
-    // stylings, step 1: get default styles from tag-based build ops
     for (final op in _buildOps) {
       final defaultStyles = op.defaultStyles;
       if (defaultStyles != null) {
@@ -272,18 +273,16 @@ class Builder extends BuildTree {
 
     _customStylesBuilder();
 
-    // stylings, step 2: get styles from `style` attribute
     final elementStyles = element.styles;
     if (elementStyles.isNotEmpty) {
       _styles.addAll(elementStyles);
     }
 
-    // stylings, step 3: parse one by one
     for (final style in _styles) {
       wf.parseStyle(this, style);
     }
 
-    wf.parseStyleDisplay(this, this[kCssDisplay]?.term);
+    wf.parseStyleDisplay(this, getStyle(kCssDisplay)?.term);
   }
 }
 
@@ -295,7 +294,7 @@ class BuilderOp {
 
   BuilderOp._(this.tree, this.op);
 
-  List<css.Declaration>? get defaultStyles {
+  Iterable<css.Declaration>? get defaultStyles {
     final map = op.defaultStyles?.call(tree);
     if (map == null) {
       return null;

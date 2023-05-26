@@ -40,7 +40,7 @@ class TagTable {
     borderOp = BuildOp(
       debugLabel: '$kTagTable--$kAttributeBorder',
       defaultStyles: (tree) {
-        final data = tree.data;
+        final data = tree.tableData;
         return {
           if (data.border > 0.0) kCssBorder: '${data.border}px solid black',
           kCssBorderCollapse: kCssBorderCollapseSeparate,
@@ -48,7 +48,7 @@ class TagTable {
         };
       },
       onChild: (tree, subTree) {
-        final data = tree.data;
+        final data = tree.tableData;
         if (data.border > 0) {
           switch (subTree.element.localName) {
             case kTagTableCell:
@@ -71,7 +71,7 @@ class TagTable {
       onChild: (tree, subTree) {
         if (subTree.element.localName == 'td' ||
             subTree.element.localName == 'th') {
-          final data = tree.data;
+          final data = tree.tableData;
           subTree.register(
             BuildOp(
               debugLabel: '$kTagTable--$kAttributeCellPadding--child',
@@ -98,7 +98,7 @@ class TagTable {
       return;
     }
 
-    final data = tableTree.data;
+    final data = tableTree.tableData;
     final which = _getCssDisplayValue(subTree);
     switch (which) {
       case kCssDisplayTableCaption:
@@ -142,7 +142,7 @@ class TagTable {
   }
 
   Widget? _onTableRenderBlock(BuildTree tableTree, WidgetPlaceholder _) {
-    final data = tableTree.data;
+    final data = tableTree.tableData;
 
     _prepareHtmlTableCaptionBuilders(data);
     _prepareHtmlTableCellBuilders(tableTree, data.header);
@@ -155,8 +155,9 @@ class TagTable {
     }
 
     final border = tryParseBorder(tableTree);
-    final borderCollapse = tableTree[kCssBorderCollapse]?.term;
-    final borderSpacingExpression = tableTree[kCssBorderSpacing]?.value;
+    final borderCollapse = tableTree.getStyle(kCssBorderCollapse)?.term;
+    final borderSpacingExpression =
+        tableTree.getStyle(kCssBorderSpacing)?.value;
     final borderSpacing = borderSpacingExpression != null
         ? tryParseCssLength(borderSpacingExpression)
         : null;
@@ -204,7 +205,7 @@ class TagTable {
     BuildTree tableTree,
     _TagTableRowGroup group,
   ) {
-    final data = tableTree.data;
+    final data = tableTree.tableData;
     final rowStartOffset = data.rows;
     final rowSpanMax = group.rows.length;
 
@@ -259,7 +260,7 @@ class TagTable {
             return null;
           }
 
-          final v = cellTree[kCssVerticalAlign]?.term;
+          final v = cellTree.getStyle(kCssVerticalAlign)?.term;
           if (v == kCssVerticalAlignBaseline) {
             child = ValignBaseline(index: rowStart, child: child);
           }
@@ -312,7 +313,7 @@ class TagTable {
 }
 
 extension on BuildTree {
-  _TagTableData get data {
+  _TagTableData get tableData {
     final existing = value<_TagTableData>();
     if (existing != null) {
       return existing;
@@ -364,7 +365,7 @@ class _TagTableRow {
     BuildTree cellTree,
     WidgetPlaceholder placeholder,
   ) {
-    final widthValue = cellTree[kCssWidth]?.value;
+    final widthValue = cellTree.getStyle(kCssWidth)?.value;
     final width = widthValue != null ? tryParseCssLength(widthValue) : null;
 
     final attributes = cellTree.element.attributes;

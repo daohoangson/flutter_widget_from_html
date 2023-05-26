@@ -79,15 +79,16 @@ class TagVideo {
 }
 
 extension on BuildTree {
-  List<String> get sourceUrls => value<_TagVideoData>()?.sourceUrls ?? const [];
+  Iterable<String> get sourceUrls =>
+      value<_TagVideoData>()?.sourceUrls ?? const [];
 
-  set sourceUrls(List<String> v) {
+  set sourceUrls(Iterable<String> v) {
     value(_TagVideoData(v));
   }
 }
 
 @immutable
 class _TagVideoData {
-  final List<String> sourceUrls;
+  final Iterable<String> sourceUrls;
   const _TagVideoData(this.sourceUrls);
 }

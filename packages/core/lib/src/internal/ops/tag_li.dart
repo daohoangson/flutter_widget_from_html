@@ -136,7 +136,7 @@ String? _listStyleTypeFromAttributeType(String type) {
 
 extension on BuildTree {
   String? get itemStyleType =>
-      this[kCssListStyleType]?.term ??
+      getStyle(kCssListStyleType)?.term ??
       _listStyleTypeFromAttributeType(
         element.attributes[kAttributeLiType] ?? '',
       );
@@ -159,7 +159,7 @@ extension on BuildTree {
   }
 
   String get listStyleType =>
-      this[kCssListStyleType]?.term ?? kCssListStyleTypeDisc;
+      getStyle(kCssListStyleType)?.term ?? kCssListStyleTypeDisc;
 
   int increaseListDepth() {
     final newData = listData.copyWith(depth: listData.depth + 1);

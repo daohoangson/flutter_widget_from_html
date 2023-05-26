@@ -24,7 +24,7 @@ class StyleVerticalAlign {
             return tree;
           }
 
-          final v = tree[kCssVerticalAlign]?.term;
+          final v = tree.getStyle(kCssVerticalAlign)?.term;
           if (v == null || v == kCssVerticalAlignBaseline) {
             return tree;
           }
@@ -66,7 +66,7 @@ class StyleVerticalAlign {
             return null;
           }
 
-          final v = tree[kCssVerticalAlign]?.term;
+          final v = tree.getStyle(kCssVerticalAlign)?.term;
           if (v == null) {
             return null;
           }

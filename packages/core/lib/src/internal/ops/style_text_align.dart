@@ -19,7 +19,7 @@ class StyleTextAlign {
         debugLabel: kCssTextAlign,
         mustBeBlock: false,
         onParsed: (tree) {
-          final textAlign = _parse(tree);
+          final textAlign = tree.textAlignData.textAlign;
           if (textAlign != null) {
             tree.apply(_textAlign, textAlign);
           }
@@ -27,7 +27,7 @@ class StyleTextAlign {
         },
         onRenderBlock: (tree, placeholder) {
           if (!placeholder.isEmpty &&
-              tree[kCssTextAlign]?.term == kCssTextAlignWebkitCenter) {
+              tree.textAlignData.term == kCssTextAlignWebkitCenter) {
             return placeholder.wrapWith(_center);
           } else {
             return null;
@@ -39,10 +39,30 @@ class StyleTextAlign {
   static Widget _center(BuildContext _, Widget child) =>
       Center(heightFactor: 1.0, child: child);
 
-  static TextAlign? _parse(BuildTree tree) {
-    TextAlign? textAlign;
+  static HtmlStyle _textAlign(HtmlStyle style, TextAlign value) =>
+      style.copyWith(textAlign: value);
+}
 
-    switch (tree[kCssTextAlign]?.term) {
+extension on BuildTree {
+  _StyleTextAlignData get textAlignData {
+    final existing = value<_StyleTextAlignData>();
+    if (existing != null) {
+      return existing;
+    }
+
+    final newData = _parse(this);
+    value(newData);
+    return newData;
+  }
+
+  static _StyleTextAlignData _parse(BuildTree tree) {
+    final term = tree.getStyle(kCssTextAlign)?.term;
+    if (term == null) {
+      return const _StyleTextAlignData(null, null);
+    }
+
+    TextAlign? textAlign;
+    switch (term) {
       case kCssTextAlignCenter:
       case kCssTextAlignMozCenter:
       case kCssTextAlignWebkitCenter:
@@ -65,9 +85,13 @@ class StyleTextAlign {
         break;
     }
 
-    return textAlign;
+    return _StyleTextAlignData(term, textAlign);
   }
+}
 
-  static HtmlStyle _textAlign(HtmlStyle style, TextAlign value) =>
-      style.copyWith(textAlign: value);
+@immutable
+class _StyleTextAlignData {
+  final String? term;
+  final TextAlign? textAlign;
+  const _StyleTextAlignData(this.term, this.textAlign);
 }

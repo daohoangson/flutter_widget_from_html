@@ -361,7 +361,7 @@ class _TableRenderLayouter {
     }
   }
 
-  List<double> step2DryColumnWidths() {
+  Iterable<double> step2DryColumnWidths() {
     final dryColumnWidths = List.filled(columnCount, .0);
     for (var i = 0; i < children.length; i++) {
       final data = children[i].parentData! as _TableCellData;
@@ -374,7 +374,7 @@ class _TableRenderLayouter {
 
   List<double> step3ColumnWiths(
     double availableWidth,
-    List<double> dryColumnWidths,
+    Iterable<double> dryColumnWidths,
   ) {
     // being naive: take dry widths as render widths
     var columnWidths = [...dryColumnWidths];

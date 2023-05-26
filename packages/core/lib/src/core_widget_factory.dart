@@ -991,7 +991,8 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     }
   }
 
-  /// Parses inline style [key] and [value] pair.
+  /// Parses inline style [css.Declaration] one by one.
+  /// This also handles styling from [BuildOp]s and [HtmlWidget.customStylesBuilder].
   void parseStyle(BuildTree tree, css.Declaration style) {
     final key = style.property;
     switch (key) {
