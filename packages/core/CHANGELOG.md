@@ -1,3 +1,14 @@
+## 0.12.0-alpha.1
+
+Breaking changes since #917:
+
+- Remove operator `BuildTree.[]=`
+- Replace operator `BuildTree.[String]` with `.getStyle`
+- Remove `BuildTree.replaceWith`
+- Renamed `BuildOp.onBuilt` -> `.onRenderBlock`, now disallows returning `null`
+- Renamed `BuildOp.onFlattening` -> `.onRenderInline`
+- Renamed `BuildOp.onTree` -> `.onParsed`, now allows returning a different build tree
+
 ## 0.11.0-alpha.2
 
 - Wrap `RichText` in `MouseRegion` with text cursor (#902)
