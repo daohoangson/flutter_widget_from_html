@@ -79,6 +79,10 @@ class Builder extends BuildTree {
     // TODO: avoid special handling of anchors
     Anchor.wrapWidgetAnchors(this, placeholder);
 
+    for (final op in _buildOps) {
+      op.onRenderedBlock(placeholder);
+    }
+
     return placeholder;
   }
 
@@ -311,6 +315,9 @@ class BuilderOp {
       op.onRenderBlock?.call(tree, placeholder) ?? placeholder;
 
   void onRenderInline() => op.onRenderInline?.call(tree);
+
+  void onRenderedBlock(WidgetPlaceholder placeholder) =>
+      op.onRenderedBlock?.call(tree, placeholder);
 
   static int _compare(BuilderOp a0, BuilderOp b0) {
     final a = a0.op;

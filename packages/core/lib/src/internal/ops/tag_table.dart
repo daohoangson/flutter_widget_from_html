@@ -346,8 +346,9 @@ class _TagTableRow {
     );
     _cellOp = BuildOp(
       debugLabel: kTagTableCell,
-      onRenderBlock: _onCellRenderBlock,
-      priority: Late.tagTableCellRenderBlock,
+      mustBeBlock: true,
+      onRenderedBlock: _onCellRenderedBlock,
+      priority: Prioritiy.tagTableCellRenderedBlock,
     );
   }
 
@@ -363,7 +364,7 @@ class _TagTableRow {
     _registerCellOp(cellTree);
   }
 
-  Widget _onCellRenderBlock(BuildTree cellTree, WidgetPlaceholder placeholder) {
+  void _onCellRenderedBlock(BuildTree cellTree, WidgetPlaceholder placeholder) {
     final widthValue = cellTree.getStyle(kCssWidth)?.value;
     final width = widthValue != null ? tryParseCssLength(widthValue) : null;
 
@@ -377,8 +378,6 @@ class _TagTableRow {
         width: width,
       ),
     );
-
-    return placeholder;
   }
 
   void _registerCellOp(BuildTree cellTree) {

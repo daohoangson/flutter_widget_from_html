@@ -57,7 +57,9 @@ typedef OnChild = void Function(BuildTree tree, BuildTree subTree);
 typedef OnParsed = BuildTree Function(BuildTree tree);
 
 /// {@template flutter_widget_from_html.onRenderBlock}
-/// The callback that will be called after building widget.
+/// The callback that will be called during widget build.
+///
+/// Returning a new placeholder is allowed.
 ///
 /// This only works if it's a block element.
 /// {@endtemplate}
@@ -72,6 +74,17 @@ typedef OnRenderBlock = Widget Function(
 /// This is the last chance to modify the [BuildTree] for inline rendering.
 /// {@endtemplate}
 typedef OnRenderInline = void Function(BuildTree tree);
+
+/// {@template flutter_widget_from_html.onRenderedBlock}
+/// The callback that will be called after widget has been built.
+///
+/// This cannot return a different placeholder,
+/// use [BuildOp.onRenderBlock] for that.
+/// {@endtemplate}
+typedef OnRenderedBlock = void Function(
+  BuildTree tree,
+  WidgetPlaceholder placeholder,
+);
 
 /// A building operation to customize how a DOM element is rendered.
 @immutable
@@ -102,6 +115,9 @@ class BuildOp {
   /// {@macro flutter_widget_from_html.onRenderInline}
   final OnRenderInline? onRenderInline;
 
+  /// {@macro flutter_widget_from_html.onRenderedBlock}
+  final OnRenderedBlock? onRenderedBlock;
+
   /// The execution priority, op with lower priority will run first.
   ///
   /// Default: 10.
@@ -116,6 +132,7 @@ class BuildOp {
     this.onParsed,
     this.onRenderBlock,
     this.onRenderInline,
+    this.onRenderedBlock,
     this.priority = 10,
   });
 }
