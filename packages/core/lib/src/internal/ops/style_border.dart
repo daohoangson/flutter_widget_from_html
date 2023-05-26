@@ -38,19 +38,19 @@ class StyleBorder {
               ),
             );
         },
-        onRenderBlock: (tree, child) {
+        onRenderBlock: (tree, placeholder) {
           if (_skipBuilding[tree] == true) {
-            return null;
+            return placeholder;
           }
 
           final border = tryParseBorder(tree);
           if (border.isNoOp) {
-            return null;
+            return placeholder;
           }
 
           skip(tree);
           return WidgetPlaceholder(
-            builder: (ctx, _) => _buildBorder(tree, ctx, child, border),
+            builder: (ctx, _) => _buildBorder(tree, ctx, placeholder, border),
             debugLabel: '${tree.element.localName}--$kCssBorder',
           );
         },

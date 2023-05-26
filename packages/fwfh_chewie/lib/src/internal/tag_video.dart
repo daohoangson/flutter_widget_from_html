@@ -39,13 +39,13 @@ class TagVideo {
 
           tree.sourceUrls = [...tree.sourceUrls, url];
         },
-        onRenderBlock: (tree, _) {
+        onRenderBlock: (tree, placeholder) {
           if (defaultTargetPlatform != TargetPlatform.android &&
               defaultTargetPlatform != TargetPlatform.iOS &&
               !kIsWeb) {
             // these are the chewie's supported platforms
             // https://pub.dev/packages/chewie/versions/1.2.2
-            return null;
+            return placeholder;
           }
 
           final attrs = tree.element.attributes;
@@ -54,7 +54,7 @@ class TagVideo {
             tree.sourceUrls = [...tree.sourceUrls, url];
           }
 
-          return _buildPlayer(tree);
+          return _buildPlayer(tree) ?? placeholder;
         },
       );
 

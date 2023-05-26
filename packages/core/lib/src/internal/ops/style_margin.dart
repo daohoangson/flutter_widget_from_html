@@ -22,13 +22,13 @@ class StyleMargin {
         onRenderBlock: (tree, placeholder) {
           final margin = tryParseCssLengthBox(tree, kCssMargin);
           if (margin == null) {
-            return null;
+            return placeholder;
           }
 
           final marginTop = margin.top;
           final marginBottom = margin.bottom;
           final styleBuilder = tree.styleBuilder;
-          return wf.buildColumnPlaceholder(tree, [
+          final column = wf.buildColumnPlaceholder(tree, [
             if (marginTop != null && marginTop.isPositive)
               HeightPlaceholder(
                 marginTop,
@@ -52,6 +52,7 @@ class StyleMargin {
                 debugLabel: '${tree.element.localName}--marginBottom',
               ),
           ]);
+          return column ?? placeholder;
         },
         onRenderInline: (tree) {
           final margin = tryParseCssLengthBox(tree, kCssMargin);

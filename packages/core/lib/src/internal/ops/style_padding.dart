@@ -27,16 +27,16 @@ class StylePadding {
   BuildOp get buildOp => BuildOp(
         debugLabel: kCssPadding,
         mustBeBlock: false,
-        onRenderBlock: (tree, child) {
+        onRenderBlock: (tree, placeholder) {
           final padding = tryParseCssLengthBox(tree, kCssPadding);
           if (padding == null) {
-            return null;
+            return placeholder;
           }
 
           return WidgetPlaceholder(
             builder: (ctx, w) => _build(tree, ctx, w, padding),
             debugLabel: '${tree.element.localName}--paddingBlock',
-            child: child,
+            child: placeholder,
           );
         },
         onRenderInline: (tree) {

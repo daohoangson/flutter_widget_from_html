@@ -14,7 +14,7 @@ class StyleBackground {
         onRenderBlock: (tree, placeholder) {
           final color = _parseColor(tree);
           if (color == null) {
-            return null;
+            return placeholder;
           }
 
           return placeholder.wrapWith(

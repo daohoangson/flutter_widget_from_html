@@ -783,7 +783,8 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
               kCssDisplay: kCssDisplayBlock,
               kCssMargin + kSuffixBottom: '1em',
             },
-            onRenderBlock: (tree, _) => buildDivider(tree),
+            onRenderBlock: (tree, placeholder) =>
+                buildDivider(tree) ?? placeholder,
             priority: Prioritiy.tagHr,
           ),
         );

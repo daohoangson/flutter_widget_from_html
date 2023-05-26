@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '_.dart';
 
 void main() {
-  const defaultSummaryText = '￼Details';
+  const defaultSummaryText = '\u{fffc}Details';
 
   group('renders DETAILS tag', () {
     const expected = [
@@ -62,7 +62,7 @@ void main() {
   });
 
   group('renders SUMMARY tag', () {
-    const summaryText = '￼Foo';
+    const summaryText = '\u{fffc}Foo';
     const expected = [
       ' └HtmlDetails(state: _HtmlDetailsState)\n',
       '    ├HtmlSummary\n',
@@ -118,6 +118,15 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(contentsFinder, findsNothing);
+    });
+
+    testWidgets('twice', (WidgetTester tester) async {
+      const html = '<details open><summary>One</summary>'
+          '<summary>Two</summary>Foo</details>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(explained, contains('RichText(text: "\u{fffc}One")'));
+      expect(explained, contains('RichText(text: "\u{fffc}Two")'));
+      expect(explained, contains('RichText(text: "Foo")'));
     });
   });
 

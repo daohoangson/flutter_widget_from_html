@@ -112,7 +112,7 @@ void main() {
           equals(
             'HtmlStyleWidget\n'
             '└WidgetPlaceholder(root--text)\n'
-            ' └RichText(text: "bar￼")\n'
+            ' └RichText(text: "bar\u{fffc}")\n'
             '  └Semantics(...)\n'
             '   └WidgetPlaceholder(span--WidgetBit.inline)\n'
             '    └Text("hi")\n'

@@ -87,28 +87,28 @@ class StyleSizing {
     required this.sizingOp,
   });
 
-  static Widget? _blockBypass(BuildTree _, WidgetPlaceholder placeholder) =>
+  static Widget _blockBypass(BuildTree _, WidgetPlaceholder placeholder) =>
       placeholder;
 
-  static Widget? _childZero(BuildTree subTree, WidgetPlaceholder placeholder) {
+  static Widget _childZero(BuildTree subTree, WidgetPlaceholder placeholder) {
     if (_StyleSizingInput.tryParse(subTree)?.preferredWidth == k100percent) {
-      return null;
+      return placeholder;
     }
 
     final parentElement = subTree.element.parent;
     if (parentElement == null) {
-      return null;
+      return placeholder;
     }
 
     final parentMeta = _elementTree[parentElement];
     if (parentMeta == null) {
-      return null;
+      return placeholder;
     }
 
     final parentInput = _StyleSizingInput.tryParse(parentMeta);
     if (parentInput == null ||
         (parentInput.minWidth == null && parentInput.preferredWidth == null)) {
-      return null;
+      return placeholder;
     }
 
     return placeholder.wrapWith((context, child) {
@@ -120,14 +120,14 @@ class StyleSizing {
     });
   }
 
-  static Widget? _sizingBlock(BuildTree tree, WidgetPlaceholder placeholder) {
+  static Widget _sizingBlock(BuildTree tree, WidgetPlaceholder placeholder) {
     if (_skipBuilding[tree] == true || placeholder.isEmpty) {
-      return null;
+      return placeholder;
     }
 
     final input = _StyleSizingInput.tryParse(tree);
     if (input == null) {
-      return null;
+      return placeholder;
     }
 
     return placeholder.wrapWith(

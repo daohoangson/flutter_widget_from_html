@@ -63,12 +63,12 @@ class StyleVerticalAlign {
         },
         onRenderBlock: (tree, placeholder) {
           if (_skipBuilding[tree] == true) {
-            return null;
+            return placeholder;
           }
 
           final v = tree.getStyle(kCssVerticalAlign)?.term;
           if (v == null) {
-            return null;
+            return placeholder;
           }
 
           return placeholder.wrapWith((context, child) {

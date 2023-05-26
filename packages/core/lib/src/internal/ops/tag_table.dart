@@ -106,10 +106,9 @@ class TagTable {
           BuildOp(
             debugLabel: kTagTableCaption,
             onRenderBlock: (captionTree, placeholder) {
-              if (placeholder.isEmpty) {
-                return null;
+              if (!placeholder.isEmpty) {
+                data.captions.add(placeholder);
               }
-              data.captions.add(placeholder);
               return placeholder;
             },
             priority: Late.tagTableCaptionRenderBlock,
@@ -141,7 +140,10 @@ class TagTable {
     return tableTree;
   }
 
-  Widget? _onTableRenderBlock(BuildTree tableTree, WidgetPlaceholder _) {
+  Widget _onTableRenderBlock(
+    BuildTree tableTree,
+    WidgetPlaceholder placeholder,
+  ) {
     final data = tableTree.tableData;
 
     _prepareHtmlTableCaptionBuilders(data);
@@ -151,7 +153,7 @@ class TagTable {
     }
     _prepareHtmlTableCellBuilders(tableTree, data.footer);
     if (data.builders.isEmpty) {
-      return null;
+      return placeholder;
     }
 
     final border = tryParseBorder(tableTree);
@@ -361,10 +363,7 @@ class _TagTableRow {
     _registerCellOp(cellTree);
   }
 
-  Widget? _onCellRenderBlock(
-    BuildTree cellTree,
-    WidgetPlaceholder placeholder,
-  ) {
+  Widget _onCellRenderBlock(BuildTree cellTree, WidgetPlaceholder placeholder) {
     final widthValue = cellTree.getStyle(kCssWidth)?.value;
     final width = widthValue != null ? tryParseCssLength(widthValue) : null;
 

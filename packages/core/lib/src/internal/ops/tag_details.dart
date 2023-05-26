@@ -33,7 +33,7 @@ class TagDetails {
       },
       onRenderBlock: (_, placeholder) {
         if (_summary != null) {
-          return null;
+          return placeholder;
         }
 
         _summary = placeholder;

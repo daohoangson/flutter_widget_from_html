@@ -78,33 +78,34 @@ mixin WebViewFactory on WidgetFactory {
         tree.register(
           _tagIframe ??= BuildOp(
             debugLabel: kTagIframe,
-            onRenderBlock: (tree, _) {
+            onRenderBlock: (tree, placeholder) {
               if (defaultTargetPlatform != TargetPlatform.android &&
                   defaultTargetPlatform != TargetPlatform.iOS &&
                   !kIsWeb) {
                 // Android & iOS are the webview_flutter's supported platforms
                 // Flutter web support is implemented by this package
                 // https://pub.dev/packages/webview_flutter/versions/2.0.12
-                return null;
+                return placeholder;
               }
 
               final a = tree.element.attributes;
               final src = urlFull(a[kAttributeIframeSrc] ?? '');
               if (src == null) {
-                return null;
+                return placeholder;
               }
 
               final height = tryParseDoubleFromMap(a, kAttributeIframeHeight);
               final width = tryParseDoubleFromMap(a, kAttributeIframeWidth);
               final sandbox = a[kAttributeIframeSandbox]?.split(RegExp(r'\s+'));
 
-              return buildWebView(
+              final built = buildWebView(
                 tree,
                 src,
                 height: height,
                 sandbox: sandbox,
                 width: width,
               );
+              return built ?? placeholder;
             },
           ),
         );

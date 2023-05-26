@@ -50,7 +50,7 @@ class TagImg {
           _builts[tree] = built;
           return tree;
         },
-        onRenderBlock: (tree, _) => _builts[tree],
+        onRenderBlock: (tree, placeholder) => _builts[tree] ?? placeholder,
         onRenderInline: (tree) {
           final built = _builts[tree];
           if (built == null) {

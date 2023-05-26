@@ -26,12 +26,12 @@ class StyleTextAlign {
           return tree;
         },
         onRenderBlock: (tree, placeholder) {
-          if (!placeholder.isEmpty &&
-              tree.textAlignData.term == kCssTextAlignWebkitCenter) {
-            return placeholder.wrapWith(_center);
-          } else {
-            return null;
+          if (placeholder.isEmpty ||
+              tree.textAlignData.term != kCssTextAlignWebkitCenter) {
+            return placeholder;
           }
+
+          return placeholder.wrapWith(_center);
         },
         priority: Early.cssTextAlign,
       );

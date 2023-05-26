@@ -61,7 +61,7 @@ typedef OnParsed = BuildTree Function(BuildTree tree);
 ///
 /// This only works if it's a block element.
 /// {@endtemplate}
-typedef OnRenderBlock = Widget? Function(
+typedef OnRenderBlock = Widget Function(
   BuildTree tree,
   WidgetPlaceholder placeholder,
 );
@@ -97,15 +97,9 @@ class BuildOp {
   final OnParsed? onParsed;
 
   /// {@macro flutter_widget_from_html.onRenderBlock}
-  ///
-  /// If an op has both this callback and [onRenderInline], returning
-  /// a non-null result will skip `onRenderInline`.
   final OnRenderBlock? onRenderBlock;
 
   /// {@macro flutter_widget_from_html.onRenderInline}
-  ///
-  /// If an op has both this callback and [onRenderBlock], it will be skipped if
-  /// `onRenderBlock` returns a non-null result.
   final OnRenderInline? onRenderInline;
 
   /// The execution priority, op with lower priority will run first.

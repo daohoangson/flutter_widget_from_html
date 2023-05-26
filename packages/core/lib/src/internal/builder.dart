@@ -67,7 +67,7 @@ class Builder extends BuildTree {
         WidgetPlaceholder(debugLabel: '${element.localName}--default');
     for (final op in _buildOps) {
       placeholder = WidgetPlaceholder.lazy(
-        op.onRenderBlock(placeholder) ?? placeholder,
+        op.onRenderBlock(placeholder),
         debugLabel: '${element.localName}--${op.op.debugLabel ?? 'lazy'}',
       );
     }
@@ -289,8 +289,6 @@ class BuilderOp {
   final BuildOp op;
   final Builder tree;
 
-  var _hasBeenRendered = false;
-
   BuilderOp._(this.tree, this.op);
 
   Iterable<css.Declaration>? get defaultStyles {
@@ -308,27 +306,10 @@ class BuilderOp {
 
   BuildTree onParsed(BuildTree input) => op.onParsed?.call(input) ?? input;
 
-  Widget? onRenderBlock(WidgetPlaceholder placeholder) {
-    final result = op.onRenderBlock?.call(tree, placeholder);
+  Widget onRenderBlock(WidgetPlaceholder placeholder) =>
+      op.onRenderBlock?.call(tree, placeholder) ?? placeholder;
 
-    if (result != null) {
-      _hasBeenRendered = true;
-    }
-
-    return result;
-  }
-
-  void onRenderInline() {
-    if (_hasBeenRendered) {
-      return;
-    }
-
-    final fn = op.onRenderInline;
-    if (fn != null) {
-      fn(tree);
-      _hasBeenRendered = true;
-    }
-  }
+  void onRenderInline() => op.onRenderInline?.call(tree);
 
   static int _compare(BuilderOp a0, BuilderOp b0) {
     final a = a0.op;
