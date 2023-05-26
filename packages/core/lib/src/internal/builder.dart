@@ -26,9 +26,8 @@ class Builder extends BuildTree {
   final WidgetFactory wf;
 
   final _buildOps = SplayTreeSet<BuilderOp>(BuilderOp._compare);
+  final _isInlines = <bool>[];
   final _styles = <css.Declaration>[];
-
-  bool? _isInline;
 
   Builder({
     required this.customStylesBuilder,
@@ -45,7 +44,7 @@ class Builder extends BuildTree {
         );
 
   @override
-  bool? get isInline => _isInline;
+  bool? get isInline => _isInlines.isEmpty ? null : _isInlines.last;
 
   @override
   Iterable<css.Declaration> get styles => _styles;
@@ -179,7 +178,7 @@ class Builder extends BuildTree {
       ..addBitsFromNodes(element.nodes);
 
     final isBlock = subBuilder._buildOps.where(_mustBeBlock).isNotEmpty;
-    subBuilder._isInline = !isBlock;
+    subBuilder._isInlines.add(!isBlock);
 
     BuildTree subTree = subBuilder;
     for (final op in subBuilder._buildOps) {

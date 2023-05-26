@@ -1,6 +1,7 @@
 part of '../core_data.dart';
 
 /// A piece of HTML being built.
+@immutable
 abstract class BuildBit {
   /// The container tree.
   final BuildTree? parent;
