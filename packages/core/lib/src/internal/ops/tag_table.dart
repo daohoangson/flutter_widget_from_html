@@ -106,7 +106,7 @@ class TagTable {
           BuildOp(
             debugLabel: kTagTableCaption,
             mustBeBlock: true,
-            onRenderedBlock: (_, placeholder) => data.captions.add(placeholder),
+            onRenderedBlock: (_, block) => data.captions.add(block),
           ),
         );
         break;
@@ -359,7 +359,7 @@ class _TagTableRow {
     _registerCellOp(cellTree);
   }
 
-  void _onCellRenderedBlock(BuildTree cellTree, WidgetPlaceholder placeholder) {
+  void _onCellRenderedBlock(BuildTree cellTree, Widget block) {
     final widthValue = cellTree.getStyle(kCssWidth)?.value;
     final width = widthValue != null ? tryParseCssLength(widthValue) : null;
 
@@ -367,7 +367,7 @@ class _TagTableRow {
     cells.add(
       _TagTableDataCell(
         cellTree,
-        child: placeholder,
+        child: block,
         columnSpan: tryParseIntFromMap(attributes, kAttributeColspan) ?? 1,
         rowSpan: tryParseIntFromMap(attributes, kAttributeRowspan) ?? 1,
         width: width,
@@ -444,7 +444,7 @@ class _TagTableData {
   final double cellPadding;
 
   final bodies = <_TagTableRowGroup>[];
-  final captions = <WidgetPlaceholder>[];
+  final captions = <Widget>[];
   final footer = _TagTableRowGroup(kCssDisplayTableFooterGroup);
   final header = _TagTableRowGroup(kCssDisplayTableHeaderGroup);
 

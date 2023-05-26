@@ -81,10 +81,7 @@ typedef OnRenderInline = void Function(BuildTree tree);
 /// This cannot return a different placeholder,
 /// use [BuildOp.onRenderBlock] for that.
 /// {@endtemplate}
-typedef OnRenderedBlock = void Function(
-  BuildTree tree,
-  WidgetPlaceholder placeholder,
-);
+typedef OnRenderedBlock = void Function(BuildTree tree, Widget block);
 
 /// A building operation to customize how a DOM element is rendered.
 @immutable
