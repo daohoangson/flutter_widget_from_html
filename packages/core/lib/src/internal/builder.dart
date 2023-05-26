@@ -63,8 +63,7 @@ class Builder extends BuildTree {
       return null;
     }
 
-    var placeholder = column ??
-        WidgetPlaceholder(debugLabel: '${element.localName}--default');
+    var placeholder = column ?? const _WidgetPlaceholderDefault();
     for (final op in _buildOps) {
       placeholder = WidgetPlaceholder.lazy(
         op.onRenderBlock(placeholder),
@@ -352,4 +351,31 @@ Iterable<BuilderOp> _prepareParentOps(
   return newOps.isNotEmpty == true
       ? List.unmodifiable([...ops, ...newOps])
       : ops;
+}
+
+class _WidgetPlaceholderDefault extends StatelessWidget
+    implements
+        // ignore: avoid_implementing_value_types
+        WidgetPlaceholder {
+  const _WidgetPlaceholderDefault();
+
+  @override
+  Widget build(BuildContext context) => widget0;
+
+  @override
+  Widget callBuilders(BuildContext context, Widget? child) => child ?? widget0;
+
+  @override
+  String? get debugLabel => null;
+
+  @override
+  bool get isEmpty => true;
+
+  @override
+  WidgetPlaceholder wrapWith(WidgetPlaceholderBuilder builder) {
+    // We don't want to waste time creating unneccessary placeholder,
+    // this const default placeholder is used instead.
+    // Create a real one when the first builder is provided.
+    return WidgetPlaceholder(builder: builder);
+  }
 }
