@@ -40,7 +40,7 @@ class TagTable {
     borderOp = BuildOp(
       debugLabel: '$kTagTable--$kAttributeBorder',
       defaultStyles: (tree) {
-        final data = tree.data;
+        final data = tree.tableData;
         return {
           if (data.border > 0.0) kCssBorder: '${data.border}px solid black',
           kCssBorderCollapse: kCssBorderCollapseSeparate,
@@ -48,12 +48,18 @@ class TagTable {
         };
       },
       onChild: (tree, subTree) {
-        final data = tree.data;
+        final data = tree.tableData;
         if (data.border > 0) {
           switch (subTree.element.localName) {
             case kTagTableCell:
             case kTagTableHeaderCell:
-              subTree[kCssBorder] = kCssBorderInherit;
+              subTree.register(
+                const BuildOp(
+                  debugLabel: '$kTagTable--$kAttributeBorder--child',
+                  defaultStyles: _cssBorderInherit,
+                  priority: Early.tagTableAttributeBorderChild,
+                ),
+              );
           }
         }
       },
@@ -65,8 +71,14 @@ class TagTable {
       onChild: (tree, subTree) {
         if (subTree.element.localName == 'td' ||
             subTree.element.localName == 'th') {
-          final data = tree.data;
-          subTree[kCssPadding] = '${data.cellPadding}px';
+          final data = tree.tableData;
+          subTree.register(
+            BuildOp(
+              debugLabel: '$kTagTable--$kAttributeCellPadding--child',
+              defaultStyles: (_) => {kCssPadding: '${data.cellPadding}px'},
+              priority: Early.tagTableAttributeCellPaddingChild,
+            ),
+          );
         }
       },
       priority: Prioritiy.tagTableAttributeCellPadding,
@@ -74,10 +86,10 @@ class TagTable {
 
     tableOp = BuildOp(
       debugLabel: kTagTable,
-      onBuilt: _onTableBuilt,
       onChild: _onTableChild,
-      onTree: _onTableTree,
-      priority: Early.tagTable,
+      onParsed: _onTableParsed,
+      onRenderBlock: _onTableRenderBlock,
+      priority: Early.tagTableRenderBlock,
     );
   }
 
@@ -86,21 +98,20 @@ class TagTable {
       return;
     }
 
-    final data = tableTree.data;
+    final data = tableTree.tableData;
     final which = _getCssDisplayValue(subTree);
     switch (which) {
       case kCssDisplayTableCaption:
         subTree.register(
           BuildOp(
             debugLabel: kTagTableCaption,
-            onBuilt: (captionTree, placeholder) {
-              if (placeholder.isEmpty) {
-                return null;
+            onRenderBlock: (captionTree, placeholder) {
+              if (!placeholder.isEmpty) {
+                data.captions.add(placeholder);
               }
-              data.captions.add(placeholder);
               return placeholder;
             },
-            priority: Late.tagTableCaption,
+            priority: Late.tagTableCaptionRenderBlock,
           ),
         );
         break;
@@ -123,13 +134,17 @@ class TagTable {
     }
   }
 
-  void _onTableTree(BuildTree tableTree) {
+  BuildTree _onTableParsed(BuildTree tableTree) {
     StyleBorder.skip(tableTree);
     StyleSizing.skip(tableTree);
+    return tableTree;
   }
 
-  Widget? _onTableBuilt(BuildTree tableTree, WidgetPlaceholder _) {
-    final data = tableTree.data;
+  Widget _onTableRenderBlock(
+    BuildTree tableTree,
+    WidgetPlaceholder placeholder,
+  ) {
+    final data = tableTree.tableData;
 
     _prepareHtmlTableCaptionBuilders(data);
     _prepareHtmlTableCellBuilders(tableTree, data.header);
@@ -138,12 +153,13 @@ class TagTable {
     }
     _prepareHtmlTableCellBuilders(tableTree, data.footer);
     if (data.builders.isEmpty) {
-      return null;
+      return placeholder;
     }
 
     final border = tryParseBorder(tableTree);
-    final borderCollapse = tableTree[kCssBorderCollapse]?.term;
-    final borderSpacingExpression = tableTree[kCssBorderSpacing]?.value;
+    final borderCollapse = tableTree.getStyle(kCssBorderCollapse)?.term;
+    final borderSpacingExpression =
+        tableTree.getStyle(kCssBorderSpacing)?.value;
     final borderSpacing = borderSpacingExpression != null
         ? tryParseCssLength(borderSpacingExpression)
         : null;
@@ -191,7 +207,7 @@ class TagTable {
     BuildTree tableTree,
     _TagTableRowGroup group,
   ) {
-    final data = tableTree.data;
+    final data = tableTree.tableData;
     final rowStartOffset = data.rows;
     final rowSpanMax = group.rows.length;
 
@@ -246,7 +262,7 @@ class TagTable {
             return null;
           }
 
-          final v = cellTree[kCssVerticalAlign]?.term;
+          final v = cellTree.getStyle(kCssVerticalAlign)?.term;
           if (v == kCssVerticalAlignBaseline) {
             child = ValignBaseline(index: rowStart, child: child);
           }
@@ -293,10 +309,13 @@ class TagTable {
 
     return null;
   }
+
+  static StylesMap _cssBorderInherit(BuildTree _) =>
+      {kCssBorder: kCssBorderInherit};
 }
 
-extension _BuildTreeData on BuildTree {
-  _TagTableData get data {
+extension on BuildTree {
+  _TagTableData get tableData {
     final existing = value<_TagTableData>();
     if (existing != null) {
       return existing;
@@ -327,8 +346,8 @@ class _TagTableRow {
     );
     _cellOp = BuildOp(
       debugLabel: kTagTableCell,
-      onBuilt: _onCellBuilt,
-      priority: Late.tagTableCell,
+      onRenderBlock: _onCellRenderBlock,
+      priority: Late.tagTableCellRenderBlock,
     );
   }
 
@@ -344,8 +363,8 @@ class _TagTableRow {
     _registerCellOp(cellTree);
   }
 
-  Widget? _onCellBuilt(BuildTree cellTree, WidgetPlaceholder placeholder) {
-    final widthValue = cellTree[kCssWidth]?.value;
+  Widget _onCellRenderBlock(BuildTree cellTree, WidgetPlaceholder placeholder) {
+    final widthValue = cellTree.getStyle(kCssWidth)?.value;
     final width = widthValue != null ? tryParseCssLength(widthValue) : null;
 
     final attributes = cellTree.element.attributes;
@@ -363,14 +382,24 @@ class _TagTableRow {
   }
 
   void _registerCellOp(BuildTree cellTree) {
-    final attrs = cellTree.element.attributes;
-    if (attrs.containsKey(kAttributeValign)) {
-      cellTree[kCssVerticalAlign] = attrs[kAttributeValign]!;
+    if (cellTree.element.attributes.containsKey(kAttributeValign)) {
+      cellTree.register(
+        const BuildOp(
+          debugLabel: kTagTableCell,
+          defaultStyles: _cssVerticalAlignFromAttribute,
+          priority: Early.tagTableCellAttributeValign,
+        ),
+      );
     }
 
     cellTree.register(_cellOp);
     StyleBorder.skip(cellTree);
     StyleSizing.skip(cellTree);
+  }
+
+  static StylesMap _cssVerticalAlignFromAttribute(BuildTree tree) {
+    final value = tree.element.attributes[kAttributeValign];
+    return value != null ? {kCssVerticalAlign: value} : const {};
   }
 }
 

@@ -14,9 +14,9 @@ class TagDetails {
   TagDetails(this.wf) {
     _summaryOp = BuildOp(
       debugLabel: kTagSummary,
-      onTree: (tree) {
+      onParsed: (tree) {
         if (tree.isEmpty) {
-          return;
+          return tree;
         }
 
         final marker = WidgetBit.inline(
@@ -29,11 +29,11 @@ class TagDetails {
             debugLabel: '$kTagSummary--inlineMarker',
           ),
         );
-        tree.prepend(marker);
+        return tree..prepend(marker);
       },
-      onBuilt: (tree, placeholder) {
+      onRenderBlock: (_, placeholder) {
         if (_summary != null) {
-          return null;
+          return placeholder;
         }
 
         _summary = placeholder;
@@ -56,7 +56,7 @@ class TagDetails {
 
           subTree.register(_summaryOp);
         },
-        onBuilt: (tree, placeholder) {
+        onRenderBlock: (tree, placeholder) {
           final attrs = tree.element.attributes;
           final open = attrs.containsKey(kAttributeDetailsOpen);
 

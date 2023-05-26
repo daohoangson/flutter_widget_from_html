@@ -955,7 +955,7 @@ Future<void> main() async {
       expect(e, equals('[CssBlock:child=[RichText:(:1 [RichText:(:2)])]]'));
     });
 
-    testWidgets('#646: renders onBuilt inline', (WidgetTester tester) async {
+    testWidgets('#646: renders onRenderBlock inline', (tester) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/646
       const html = '<span style="display:inline-block;">Foo</span>';
       final explained = await explain(
@@ -963,12 +963,20 @@ Future<void> main() async {
         null,
         hw: HtmlWidget(
           html,
-          factoryBuilder: () => _InlineBlockOnBuiltFactory(),
+          factoryBuilder: () => _InlineOnRenderBlockFactory(),
           key: hwKey,
         ),
       );
 
       expect(explained, equals('[Text:Bar]'));
+    });
+
+    testWidgets('#799: inline block with bg, v-align', (tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/799
+      const html = '<span style="background-color: #FF6600; '
+          'display: inline-block; vertical-align: middle">Foo</span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Container:bg=#FFFF6600,child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('renders display: none', (WidgetTester tester) async {
@@ -1651,11 +1659,11 @@ Future<void> main() async {
   });
 }
 
-class _InlineBlockOnBuiltFactory extends WidgetFactory {
+class _InlineOnRenderBlockFactory extends WidgetFactory {
   @override
   void parse(BuildTree tree) {
     if (tree.element.localName == 'span') {
-      tree.register(BuildOp(onBuilt: (_, __) => const Text('Bar')));
+      tree.register(BuildOp(onRenderBlock: (_, __) => const Text('Bar')));
     }
     super.parse(tree);
   }

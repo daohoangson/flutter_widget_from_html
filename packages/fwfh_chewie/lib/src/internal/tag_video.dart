@@ -39,13 +39,13 @@ class TagVideo {
 
           tree.sourceUrls = [...tree.sourceUrls, url];
         },
-        onBuilt: (tree, _) {
+        onRenderBlock: (tree, placeholder) {
           if (defaultTargetPlatform != TargetPlatform.android &&
               defaultTargetPlatform != TargetPlatform.iOS &&
               !kIsWeb) {
             // these are the chewie's supported platforms
             // https://pub.dev/packages/chewie/versions/1.2.2
-            return null;
+            return placeholder;
           }
 
           final attrs = tree.element.attributes;
@@ -54,7 +54,7 @@ class TagVideo {
             tree.sourceUrls = [...tree.sourceUrls, url];
           }
 
-          return _buildPlayer(tree);
+          return _buildPlayer(tree) ?? placeholder;
         },
       );
 
@@ -78,16 +78,17 @@ class TagVideo {
   }
 }
 
-extension _BuildTreeSourceUrls on BuildTree {
-  List<String> get sourceUrls => value<_TagVideoData>()?.sourceUrls ?? const [];
+extension on BuildTree {
+  Iterable<String> get sourceUrls =>
+      value<_TagVideoData>()?.sourceUrls ?? const [];
 
-  set sourceUrls(List<String> v) {
+  set sourceUrls(Iterable<String> v) {
     value(_TagVideoData(v));
   }
 }
 
 @immutable
 class _TagVideoData {
-  final List<String> sourceUrls;
+  final Iterable<String> sourceUrls;
   const _TagVideoData(this.sourceUrls);
 }

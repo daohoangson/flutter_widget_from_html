@@ -306,14 +306,14 @@ class _BuildBitWidgetFactory extends WidgetFactory {
     if (classes.contains('output--String')) {
       tree.register(
         BuildOp(
-          onTree: (tree) => tree.append(_OutputStringBit(tree)),
+          onParsed: (tree) => tree..append(_OutputStringBit(tree)),
         ),
       );
     }
 
     if (classes.contains('output--Widget')) {
       tree.register(
-        BuildOp(onTree: (tree) => tree.append(_OutputWidgetBit(tree))),
+        BuildOp(onParsed: (tree) => tree..append(_OutputWidgetBit(tree))),
       );
     }
 
@@ -361,7 +361,7 @@ class _OutputWidgetBit extends BuildBit {
   const _OutputWidgetBit(BuildTree? parent) : super(parent);
 
   @override
-  bool get isInline => false;
+  bool? get isInline => false;
 
   @override
   void flatten(Flattened f) =>

@@ -7,7 +7,7 @@ const kCssMinHeight = 'min-height';
 const kCssMinWidth = 'min-width';
 const kCssWidth = 'width';
 
-extension CssLengthToSizing on CssLength {
+extension GetSizing on CssLength {
   CssSizingValue? getSizing(HtmlStyle style) {
     final value = getValue(style);
     if (value != null) {
@@ -28,13 +28,9 @@ extension CssLengthToSizing on CssLength {
 class StyleSizing {
   static const k100percent = CssLength(100, CssLengthUnit.percentage);
 
-  final WidgetFactory wf;
-
-  late final BuildOp _blockOp;
-  late final BuildOp _childOp;
-  late final BuildOp _sizingOp;
-
-  static final _instances = Expando<StyleSizing>();
+  final BuildOp blockOp;
+  final BuildOp childOp;
+  final BuildOp sizingOp;
 
   static final _elementTree = Expando<BuildTree>();
   static final _treeIsBlock = Expando<bool>();
@@ -46,89 +42,73 @@ class StyleSizing {
       return;
     }
 
-    tree.register(StyleSizing._factory(wf)._childOp);
+    tree.register(StyleSizing().childOp);
   }
 
   static void registerBlockOp(WidgetFactory wf, BuildTree tree) {
     _elementTree[tree.element] = tree;
     _treeIsBlock[tree] = true;
 
-    final instance = StyleSizing._factory(wf);
+    final instance = StyleSizing();
     tree
-      ..register(instance._blockOp)
-      ..register(instance._sizingOp);
+      ..register(instance.blockOp)
+      ..register(instance.sizingOp);
   }
 
   static void registerSizingOp(WidgetFactory wf, BuildTree tree) {
     _elementTree[tree.element] = tree;
-    tree.register(StyleSizing._factory(wf)._sizingOp);
+    tree.register(StyleSizing().sizingOp);
   }
 
-  factory StyleSizing._factory(WidgetFactory wf) {
-    final existingInstance = _instances[wf];
-    if (existingInstance != null) {
-      return existingInstance;
-    }
-    return _instances[wf] = StyleSizing._(wf);
-  }
+  factory StyleSizing() => const StyleSizing._(
+        blockOp: BuildOp(
+          debugLabel: 'display: block',
+          onRenderBlock: _blockBypass,
+          priority: Late.displayBlock,
+        ),
+        childOp: BuildOp(
+          debugLabel: 'sizing (min-width=0)',
+          mustBeBlock: false,
+          onRenderBlock: _childZero,
+          priority: BoxModel.sizingMinWidthZero,
+        ),
+        sizingOp: BuildOp(
+          debugLabel: 'sizing',
+          mustBeBlock: false,
+          onRenderBlock: _sizingBlock,
+          onRenderInline: _sizingInline,
+          priority: BoxModel.sizing,
+        ),
+      );
 
-  StyleSizing._(this.wf) {
-    _blockOp = const BuildOp(
-      debugLabel: 'display: block',
-      onBuilt: bypass,
-      priority: Late.displayBlock,
-    );
+  const StyleSizing._({
+    required this.blockOp,
+    required this.childOp,
+    required this.sizingOp,
+  });
 
-    _childOp = BuildOp(
-      debugLabel: 'sizing (min-width=0)',
-      mustBeBlock: false,
-      onBuilt: buildMinWidthZero,
-      priority: BoxModel.sizingMinWidthZero,
-    );
+  static Widget _blockBypass(BuildTree _, WidgetPlaceholder placeholder) =>
+      placeholder;
 
-    _sizingOp = BuildOp(
-      debugLabel: 'sizing',
-      mustBeBlock: false,
-      onBuilt: buildCssSizing,
-      onFlattening: handleInlineSizing,
-      priority: BoxModel.sizing,
-    );
-  }
-
-  Widget? buildCssSizing(BuildTree tree, WidgetPlaceholder placeholder) {
-    if (_skipBuilding[tree] == true || placeholder.isEmpty) {
-      return null;
-    }
-
-    final input = _StyleSizingInput.tryParse(tree);
-    if (input == null) {
-      return null;
-    }
-
-    return placeholder.wrapWith(
-      (context, child) => _build(context, child, input, tree.styleBuilder),
-    );
-  }
-
-  Widget? buildMinWidthZero(BuildTree subTree, WidgetPlaceholder placeholder) {
+  static Widget _childZero(BuildTree subTree, WidgetPlaceholder placeholder) {
     if (_StyleSizingInput.tryParse(subTree)?.preferredWidth == k100percent) {
-      return null;
+      return placeholder;
     }
 
     final parentElement = subTree.element.parent;
     if (parentElement == null) {
-      return null;
+      return placeholder;
     }
 
     final parentMeta = _elementTree[parentElement];
     if (parentMeta == null) {
-      return null;
+      return placeholder;
     }
 
     final parentInput = _StyleSizingInput.tryParse(parentMeta);
     if (parentInput == null ||
         (parentInput.minWidth == null && parentInput.preferredWidth == null)) {
-      return null;
+      return placeholder;
     }
 
     return placeholder.wrapWith((context, child) {
@@ -140,10 +120,22 @@ class StyleSizing {
     });
   }
 
-  static Widget? bypass(BuildTree _, WidgetPlaceholder placeholder) =>
-      placeholder;
+  static Widget _sizingBlock(BuildTree tree, WidgetPlaceholder placeholder) {
+    if (_skipBuilding[tree] == true || placeholder.isEmpty) {
+      return placeholder;
+    }
 
-  static void handleInlineSizing(BuildTree tree) {
+    final input = _StyleSizingInput.tryParse(tree);
+    if (input == null) {
+      return placeholder;
+    }
+
+    return placeholder.wrapWith(
+      (context, child) => _build(context, child, input, tree.styleBuilder),
+    );
+  }
+
+  static void _sizingInline(BuildTree tree) {
     if (_skipBuilding[tree] == true) {
       return;
     }

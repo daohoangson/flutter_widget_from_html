@@ -15,34 +15,54 @@ const kCssTextAlignWebkitCenter = '-webkit-center';
 const kTagCenter = 'center';
 
 class StyleTextAlign {
-  final WidgetFactory wf;
-  final String value;
-
-  StyleTextAlign(this.wf, this.value);
-
   BuildOp get buildOp => BuildOp(
         debugLabel: kCssTextAlign,
         mustBeBlock: false,
-        onTree: (tree) => tree.apply(_builder, value),
-        onBuilt: value == kCssTextAlignWebkitCenter ? _centerIfNotEmpty : null,
+        onParsed: (tree) {
+          final textAlign = tree.textAlignData.textAlign;
+          if (textAlign != null) {
+            tree.apply(_textAlign, textAlign);
+          }
+          return tree;
+        },
+        onRenderBlock: (tree, placeholder) {
+          if (placeholder.isEmpty ||
+              tree.textAlignData.term != kCssTextAlignWebkitCenter) {
+            return placeholder;
+          }
+
+          return placeholder.wrapWith(_center);
+        },
         priority: Early.cssTextAlign,
       );
 
   static Widget _center(BuildContext _, Widget child) =>
       Center(heightFactor: 1.0, child: child);
 
-  static Widget? _centerIfNotEmpty(BuildTree tree, WidgetPlaceholder widget) {
-    if (widget.isEmpty) {
-      return null;
+  static HtmlStyle _textAlign(HtmlStyle style, TextAlign value) =>
+      style.copyWith(textAlign: value);
+}
+
+extension on BuildTree {
+  _StyleTextAlignData get textAlignData {
+    final existing = value<_StyleTextAlignData>();
+    if (existing != null) {
+      return existing;
     }
 
-    return widget.wrapWith(_center);
+    final newData = _parse(this);
+    value(newData);
+    return newData;
   }
 
-  static HtmlStyle _builder(HtmlStyle style, String value) {
-    TextAlign? textAlign;
+  static _StyleTextAlignData _parse(BuildTree tree) {
+    final term = tree.getStyle(kCssTextAlign)?.term;
+    if (term == null) {
+      return const _StyleTextAlignData(null, null);
+    }
 
-    switch (value) {
+    TextAlign? textAlign;
+    switch (term) {
       case kCssTextAlignCenter:
       case kCssTextAlignMozCenter:
       case kCssTextAlignWebkitCenter:
@@ -65,6 +85,13 @@ class StyleTextAlign {
         break;
     }
 
-    return textAlign == null ? style : style.copyWith(textAlign: textAlign);
+    return _StyleTextAlignData(term, textAlign);
   }
+}
+
+@immutable
+class _StyleTextAlignData {
+  final String? term;
+  final TextAlign? textAlign;
+  const _StyleTextAlignData(this.term, this.textAlign);
 }

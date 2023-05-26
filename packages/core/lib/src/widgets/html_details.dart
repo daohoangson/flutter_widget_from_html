@@ -105,6 +105,11 @@ class HtmlSummary extends StatelessWidget {
   }
 }
 
+extension on BuildContext {
+  _HtmlDetailsInherited? get htmlDetails =>
+      dependOnInheritedWidgetOfExactType<_HtmlDetailsInherited>();
+}
+
 class _HtmlDetailsInherited extends InheritedWidget {
   final bool isOpen;
   final void Function(bool) setIsOpen;
@@ -119,9 +124,4 @@ class _HtmlDetailsInherited extends InheritedWidget {
   @override
   bool updateShouldNotify(_HtmlDetailsInherited oldWidget) =>
       isOpen != oldWidget.isOpen;
-}
-
-extension _BuildContext on BuildContext {
-  _HtmlDetailsInherited? get htmlDetails =>
-      dependOnInheritedWidgetOfExactType<_HtmlDetailsInherited>();
 }

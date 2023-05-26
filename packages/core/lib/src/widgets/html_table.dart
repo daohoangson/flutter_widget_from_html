@@ -215,13 +215,13 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
   Type get debugTypicalAncestorWidgetClass => HtmlTable;
 }
 
-extension _IterableDouble on Iterable<double> {
+extension on Iterable<double> {
   double get sum => isEmpty ? 0.0 : reduce(_sum);
 
   static double _sum(double value, double element) => value + element;
 }
 
-extension _IterableDoubleList on List<double> {
+extension on List<double> {
   void setMaxColumnWidths(
     _TableRenderObject tro,
     _TableCellData data,
@@ -361,7 +361,7 @@ class _TableRenderLayouter {
     }
   }
 
-  List<double> step2DryColumnWidths() {
+  Iterable<double> step2DryColumnWidths() {
     final dryColumnWidths = List.filled(columnCount, .0);
     for (var i = 0; i < children.length; i++) {
       final data = children[i].parentData! as _TableCellData;
@@ -374,7 +374,7 @@ class _TableRenderLayouter {
 
   List<double> step3ColumnWiths(
     double availableWidth,
-    List<double> dryColumnWidths,
+    Iterable<double> dryColumnWidths,
   ) {
     // being naive: take dry widths as render widths
     var columnWidths = [...dryColumnWidths];

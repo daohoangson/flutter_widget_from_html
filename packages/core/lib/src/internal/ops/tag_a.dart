@@ -14,10 +14,10 @@ class TagA {
         defaultStyles: (_) => const {
           kCssTextDecoration: kCssTextDecorationUnderline,
         },
-        onTree: (tree) {
+        onParsed: (tree) {
           final href = tree.element.attributes[kAttributeAHref];
           if (href == null) {
-            return;
+            return tree;
           }
 
           final url = wf.urlFull(href) ?? href;
@@ -26,10 +26,10 @@ class TagA {
             onTap: () => wf.onTapUrl(url),
           );
           if (recognizer == null) {
-            return;
+            return tree;
           }
 
-          tree.apply(_builder, recognizer);
+          return tree..apply(_builder, recognizer);
         },
         priority: Prioritiy.tagA,
       );

@@ -228,9 +228,9 @@ flowchart TD
     ifIsText --->|no| ifCustomWidget{customWidget?} -->|yes\n\nHtmlWidget.\ncustomWidgetBuilder| customWidget[/render custom widget/] --> bitOK
 
     ifCustomWidget -->|no| _parseEverything[/parse styles/] -->|WidgetFactory.parse\nBuildOp.defaultStyles\nHtmlWidget.customStylesBuilder\nWidgetFactory.parseStyle\nWidgetFactory.parseStyleDisplay| _parseOK( ) ~~~ _addBitsFromNodeOK
-    _parseOK -.->|process children\nelements recursively| _addBitsFromNode -.->|BuildOp.onChild| _addBitsFromNodeOK( ) -->|BuildOp.onTree| ifIsBlock{block\nelement?} -->|no| appendSubTree>ready for\ninline rendering] -->|BuildOp.\nonFlattening| bitOK
+    _parseOK -.->|process children\nelements recursively| _addBitsFromNode -.->|BuildOp.onChild| _addBitsFromNodeOK( ) -->|BuildOp.onParsed| ifIsBlock{block\nelement?} -->|no| appendSubTree>ready for\ninline rendering] -->|BuildOp.\nonRenderInline| bitOK
 
-    ifIsBlock -->|yes\n\nBuildOp.onBuilt| appendBuiltSubTree[/render block/] --> bitOK
+    ifIsBlock -->|yes\n\nBuildOp\n.onRenderBlock| appendBuiltSubTree[/render block/] --> bitOK
 ```
 
 Notes:
@@ -262,11 +262,11 @@ tree.apply(callback, TextAlign.justify);
 
 ```dart
 tree.register(BuildOp(
-  onTree: (tree) {
+  onParsed: (tree) {
     // can be used to change text, inline contents, etc.
     tree.append(...);
   },
-  onBuilt: (tree, child) {
+  onRenderBlock: (tree, child) {
     // use this to render special widget, wrap it into something else, etc.
     return MyCustomWidget(child: child);
   },
@@ -309,7 +309,7 @@ class SmilieScreen extends StatelessWidget {
 
 class _SmiliesWidgetFactory extends WidgetFactory {
   final smilieOp = BuildOp(
-    onTree: (tree) {
+    onParsed: (tree) {
       final alt = tree.element.attributes['alt'];
       tree.addText(kSmilies[alt] ?? alt);
     },

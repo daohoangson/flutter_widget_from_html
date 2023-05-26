@@ -621,31 +621,6 @@ Future<void> main() async {
       });
     });
 
-    testWidgets('_ValignBaselineRenderObject updates index', (tester) async {
-      await explain(
-        tester,
-        '<table style="border-collapse: separate">'
-        '<tr><td>Foo</td>'
-        '<td valign="baseline">Bar</td></tr>'
-        '</table>',
-        useExplainer: false,
-      );
-      final finder = find.byType(ValignBaseline);
-      final before = tester.firstRenderObject(finder);
-      expect(before.toStringShort(), endsWith('(index: 0)'));
-
-      await explain(
-        tester,
-        '<table style="border-collapse: separate">'
-        '<tr><td>Foo</td></tr>'
-        '<tr><td valign="baseline">Bar</td></tr>'
-        '</table>',
-        useExplainer: false,
-      );
-      final after = tester.firstRenderObject(finder);
-      expect(after.toStringShort(), endsWith('(index: 1)'));
-    });
-
     testWidgets('computeDistanceToActualBaseline', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
@@ -1031,6 +1006,121 @@ Future<void> main() async {
         fileNameFactory: (name) => '$kGoldenFilePrefix/table/$name.png',
       ),
     );
+  });
+
+  group('ValignBaseline', () {
+    testWidgets('_ValignBaselineRenderObject updates index', (tester) async {
+      await explain(
+        tester,
+        '<table style="border-collapse: separate">'
+        '<tr><td>Foo</td>'
+        '<td valign="baseline">Bar</td></tr>'
+        '</table>',
+        useExplainer: false,
+      );
+      final finder = find.byType(ValignBaseline);
+      final before = tester.firstRenderObject(finder);
+      expect(before.toStringShort(), endsWith('(index: 0)'));
+
+      await explain(
+        tester,
+        '<table style="border-collapse: separate">'
+        '<tr><td>Foo</td></tr>'
+        '<tr><td valign="baseline">Bar</td></tr>'
+        '</table>',
+        useExplainer: false,
+      );
+      final after = tester.firstRenderObject(finder);
+      expect(after.toStringShort(), endsWith('(index: 1)'));
+    });
+
+    testWidgets("renders first text by second's baseline", (tester) async {
+      final foo = GlobalKey();
+      final bar = GlobalKey();
+      const padding = EdgeInsets.all(12);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ValignBaselineContainer(
+              child: Row(
+                children: [
+                  ValignBaseline(
+                    index: 0,
+                    child: Text('Foo', key: foo),
+                  ),
+                  ValignBaseline(
+                    index: 0,
+                    child: Padding(
+                      padding: padding,
+                      child: Text('Bar', key: bar),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final fooTop = foo.renderBox.localToGlobal(Offset.zero).dy;
+      final barTop = bar.renderBox.localToGlobal(Offset.zero).dy;
+      expect(fooTop, equals(padding.top));
+      expect(barTop, equals(fooTop));
+    });
+
+    testWidgets("renders second text by first's baseline", (tester) async {
+      final foo = GlobalKey();
+      final bar = GlobalKey();
+      const padding = EdgeInsets.all(21);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ValignBaselineContainer(
+              child: Row(
+                children: [
+                  ValignBaseline(
+                    index: 0,
+                    child: Padding(
+                      padding: padding,
+                      child: Text('Foo', key: foo),
+                    ),
+                  ),
+                  ValignBaseline(
+                    index: 0,
+                    child: Text('Bar', key: bar),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final fooTop = foo.renderBox.localToGlobal(Offset.zero).dy;
+      final barTop = bar.renderBox.localToGlobal(Offset.zero).dy;
+      expect(fooTop, equals(padding.top));
+      expect(barTop, equals(fooTop));
+    });
+
+    testWidgets('renders without container', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ValignBaseline(
+              index: 0,
+              child: Text('Foo'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Foo'), findsOneWidget);
+    });
   });
 }
 

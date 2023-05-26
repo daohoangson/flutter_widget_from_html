@@ -125,7 +125,7 @@ class ColumnPlaceholder extends WidgetPlaceholder {
   }
 }
 
-extension _HtmlStyle on HtmlStyle {
+extension on HtmlStyle {
   CrossAxisAlignment get columnCrossAxisAlignment {
     final isLtr = textDirection == TextDirection.ltr;
     switch (textAlign ?? TextAlign.start) {

@@ -26,6 +26,7 @@ class Builder extends BuildTree {
   final WidgetFactory wf;
 
   final _buildOps = SplayTreeSet<BuilderOp>(BuilderOp._compare);
+  final _isInlines = <bool>[];
   final _styles = <css.Declaration>[];
 
   Builder({
@@ -43,33 +44,14 @@ class Builder extends BuildTree {
         );
 
   @override
+  bool? get isInline => _isInlines.isEmpty ? null : _isInlines.last;
+
+  @override
   Iterable<css.Declaration> get styles => _styles;
-
-  @override
-  void operator []=(String key, String value) {
-    final styleSheet = css.parse('*{$key: $value;}');
-    final customStyles = styleSheet.collectDeclarations();
-    _styles.addAll(customStyles);
-  }
-
-  @override
-  css.Declaration? operator [](String key) {
-    for (final style in _styles.reversed) {
-      if (style.property == key) {
-        return style;
-      }
-    }
-
-    return null;
-  }
 
   void addBitsFromNodes(dom.NodeList domNodes) {
     for (final domNode in domNodes) {
       _addBitsFromNode(domNode);
-    }
-
-    for (final op in _buildOps) {
-      op.onTree();
     }
   }
 
@@ -85,7 +67,7 @@ class Builder extends BuildTree {
         WidgetPlaceholder(debugLabel: '${element.localName}--default');
     for (final op in _buildOps) {
       placeholder = WidgetPlaceholder.lazy(
-        op.onBuilt(placeholder) ?? placeholder,
+        op.onRenderBlock(placeholder),
         debugLabel: '${element.localName}--${op.op.debugLabel ?? 'lazy'}',
       );
     }
@@ -94,7 +76,10 @@ class Builder extends BuildTree {
       return null;
     }
 
-    return placeholder..setAnchorsIfUnset(anchors);
+    // TODO: avoid special handling of anchors
+    Anchor.wrapWidgetAnchors(this, placeholder);
+
+    return placeholder;
   }
 
   @override
@@ -137,8 +122,21 @@ class Builder extends BuildTree {
   @override
   void flatten(Flattened _) {
     for (final op in _buildOps) {
-      op.onFlattening();
+      op.onRenderInline();
     }
+  }
+
+  @override
+  css.Declaration? getStyle(String property) {
+    for (final style in _styles.reversed) {
+      if (style.property == property) {
+        // TODO: add support for `!important`
+        // https://github.com/daohoangson/flutter_widget_from_html/issues/773
+        return style;
+      }
+    }
+
+    return null;
   }
 
   @override
@@ -175,11 +173,19 @@ class Builder extends BuildTree {
       return;
     }
 
-    final subTree = sub(element: element)
+    final subBuilder = sub(element: element)
       .._parseEverything()
       ..addBitsFromNodes(element.nodes);
 
-    if (subTree._buildOps.where(_mustBeBlock).isNotEmpty) {
+    final isBlock = subBuilder._buildOps.where(_mustBeBlock).isNotEmpty;
+    subBuilder._isInlines.add(!isBlock);
+
+    BuildTree subTree = subBuilder;
+    for (final op in subBuilder._buildOps) {
+      subTree = op.onParsed(subTree);
+    }
+
+    if (isBlock) {
       final builtSubTree = subTree.build();
       if (builtSubTree != null) {
         append(WidgetBit.block(this, builtSubTree));
@@ -257,7 +263,6 @@ class Builder extends BuildTree {
       op.onChild(this);
     }
 
-    // stylings, step 1: get default styles from tag-based build ops
     for (final op in _buildOps) {
       final defaultStyles = op.defaultStyles;
       if (defaultStyles != null) {
@@ -267,28 +272,25 @@ class Builder extends BuildTree {
 
     _customStylesBuilder();
 
-    // stylings, step 2: get styles from `style` attribute
     final elementStyles = element.styles;
     if (elementStyles.isNotEmpty) {
       _styles.addAll(elementStyles);
     }
 
-    // stylings, step 3: parse one by one
     for (final style in _styles) {
       wf.parseStyle(this, style);
     }
 
-    wf.parseStyleDisplay(this, this[kCssDisplay]?.term);
+    wf.parseStyleDisplay(this, getStyle(kCssDisplay)?.term);
   }
 }
 
+@immutable
 class BuilderOp {
   final BuildOp op;
   final Builder tree;
 
-  var _onBuilt = false;
-
-  BuilderOp._(this.tree, this.op);
+  const BuilderOp._(this.tree, this.op);
 
   List<css.Declaration>? get defaultStyles {
     final map = op.defaultStyles?.call(tree);
@@ -303,25 +305,12 @@ class BuilderOp {
 
   void onChild(BuildTree subTree) => op.onChild?.call(tree, subTree);
 
-  void onTree() => op.onTree?.call(tree);
+  BuildTree onParsed(BuildTree input) => op.onParsed?.call(input) ?? input;
 
-  void onFlattening() {
-    if (_onBuilt) {
-      return;
-    }
+  Widget onRenderBlock(WidgetPlaceholder placeholder) =>
+      op.onRenderBlock?.call(tree, placeholder) ?? placeholder;
 
-    op.onFlattening?.call(tree);
-  }
-
-  Widget? onBuilt(WidgetPlaceholder placeholder) {
-    final result = op.onBuilt?.call(tree, placeholder);
-
-    if (result != null) {
-      _onBuilt = true;
-    }
-
-    return result;
-  }
+  void onRenderInline() => op.onRenderInline?.call(tree);
 
   static int _compare(BuilderOp a0, BuilderOp b0) {
     final a = a0.op;
@@ -342,7 +331,8 @@ class BuilderOp {
   }
 }
 
-bool _mustBeBlock(BuilderOp op) => op.op.mustBeBlock ?? op.op.onBuilt != null;
+bool _mustBeBlock(BuilderOp op) =>
+    op.op.mustBeBlock ?? op.op.onRenderBlock != null;
 
 Iterable<BuilderOp> _prepareParentOps(
   Iterable<BuilderOp> ops,

@@ -92,7 +92,7 @@ mixin SvgFactory on WidgetFactory {
         tree.register(
           _tagSvg ??= BuildOp(
             debugLabel: localName,
-            onBuilt: (tree, _) {
+            onRenderBlock: (tree, _) {
               final bytesLoader = SvgStringLoader(tree.element.outerHtml);
               return _buildSvgPicture(tree, const ImageSource(''), bytesLoader);
             },

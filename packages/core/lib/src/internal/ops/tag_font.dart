@@ -6,10 +6,6 @@ const kAttributeFontFace = 'face';
 const kAttributeFontSize = 'size';
 
 class TagFont {
-  final WidgetFactory wf;
-
-  TagFont(this.wf);
-
   BuildOp get buildOp => BuildOp(
         debugLabel: kTagFont,
         defaultStyles: (tree) {

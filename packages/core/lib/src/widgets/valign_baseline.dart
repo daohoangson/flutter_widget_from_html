@@ -37,6 +37,13 @@ class ValignBaseline extends SingleChildRenderObjectWidget {
         ..setIndex(index);
 }
 
+extension on BuildContext {
+  Baselines get baselines =>
+      dependOnInheritedWidgetOfExactType<_ValignBaselineInheritedWidget>()
+          ?.baselines ??
+      {};
+}
+
 class _ValignBaselineState extends State<ValignBaselineContainer> {
   final Baselines baselines = {};
 
@@ -60,13 +67,6 @@ class _ValignBaselineInheritedWidget extends InheritedWidget {
       !identical(baselines, oldWidget.baselines);
 }
 
-extension _ValignBaselineInheritedWidgetContext on BuildContext {
-  Baselines get baselines =>
-      dependOnInheritedWidgetOfExactType<_ValignBaselineInheritedWidget>()
-          ?.baselines ??
-      {};
-}
-
 class _ValignBaselineClearer extends SingleChildRenderObjectWidget {
   const _ValignBaselineClearer({required Widget child, Key? key})
       : super(child: child, key: key);
@@ -76,9 +76,11 @@ class _ValignBaselineClearer extends SingleChildRenderObjectWidget {
       _ValignBaselineClearerRenderObject(context.baselines);
 
   @override
-  void updateRenderObject(BuildContext context, RenderObject renderObject) =>
-      (renderObject as _ValignBaselineClearerRenderObject)
-          .setBaselines(context.baselines);
+  void updateRenderObject(
+    BuildContext context,
+    covariant _ValignBaselineClearerRenderObject renderObject,
+  ) =>
+      renderObject.setBaselines(context.baselines);
 }
 
 class _ValignBaselineClearerRenderObject extends RenderProxyBox {
@@ -88,7 +90,7 @@ class _ValignBaselineClearerRenderObject extends RenderProxyBox {
   void setBaselines(Baselines v) {
     if (!identical(v, _baselines)) {
       _baselines = v;
-      markNeedsLayout();
+      markNeedsPaint();
     }
   }
 

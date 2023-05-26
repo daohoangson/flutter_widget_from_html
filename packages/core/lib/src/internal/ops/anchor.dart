@@ -2,6 +2,48 @@ part of '../core_ops.dart';
 
 final _logger = Logger('fwfh.AnchorRegistry');
 
+class Anchor {
+  final GlobalKey anchor;
+  final String id;
+  final AnchorRegistry registry;
+
+  Anchor(AnchorWidgetFactory wf, this.id)
+      : anchor = GlobalKey(debugLabel: id),
+        registry = wf._registry;
+
+  BuildOp get buildOp => BuildOp(
+        debugLabel: 'anchor#$id',
+        mustBeBlock: false,
+        onParsed: (tree) {
+          registry.register(id, anchor);
+          return tree..addAnchor(anchor);
+        },
+        onRenderInline: (tree) {
+          final widget = WidgetPlaceholder(
+            builder: (context, _) => SizedBox(
+              height: tree.styleBuilder.build(context).textStyle.fontSize,
+              key: anchor,
+            ),
+            debugLabel: '${tree.element.localName}--anchor#$id',
+          );
+
+          const baseline = PlaceholderAlignment.baseline;
+          tree.prepend(WidgetBit.inline(tree, widget, alignment: baseline));
+        },
+        onRenderBlock: (_, placeholder) => placeholder.wrapWith(
+          (_, child) => SizedBox(key: anchor, child: child),
+        ),
+        priority: Late.anchor,
+      );
+
+  static void wrapWidgetAnchors(BuildTree tree, WidgetPlaceholder placeholder) {
+    final anchors = tree.anchors;
+    if (anchors?.isNotEmpty == true) {
+      placeholder.wrapWith((_, child) => child..anchors = anchors);
+    }
+  }
+}
+
 class AnchorRegistry {
   final _anchors = <GlobalKey>[];
   final _anchorById = <String, GlobalKey>{};
@@ -236,15 +278,44 @@ class AnchorRegistry {
   }
 }
 
-extension BuildTreeAnchors on BuildTree {
+mixin AnchorWidgetFactory on WidgetFactoryResetter {
+  late AnchorRegistry _registry;
+
+  Widget buildAnchorBodyItem(BuildContext context, int index, Widget widget) =>
+      _registry.buildBodyItem(context, index, widget);
+
+  void prepareAnchorIndexByAnchor(List<Widget> widgets) =>
+      _registry.prepareIndexByAnchor(widgets);
+
+  Future<bool> onTapAnchorWrapper(String id) =>
+      onTapAnchor(id, _registry.ensureVisible);
+
+  Future<bool> onTapAnchor(String id, EnsureVisible scrollTo) => scrollTo(id);
+
+  @override
+  void reset(State state) {
+    super.reset(state);
+    _registry = AnchorRegistry(state.context);
+  }
+}
+
+extension on BuildTree {
   List<Key>? get anchors => value<_BuildTreeAnchors>()?.keys;
 
-  void registerAnchor(Key anchor) {
+  void addAnchor(Key anchor) {
     final keys = anchors ?? (value(_BuildTreeAnchors())!.keys);
     keys.add(anchor);
 
-    parent?.registerAnchor(anchor);
+    parent?.addAnchor(anchor);
   }
+}
+
+extension on Widget {
+  static final _anchors = Expando<Iterable<Key>>();
+
+  Iterable<Key>? get anchors => _anchors[this];
+
+  set anchors(Iterable<Key>? value) => _anchors[this] = value;
 }
 
 class _AnchorBodyItemIndex {

@@ -19,23 +19,23 @@ class TagAudio {
 
   BuildOp get buildOp => BuildOp(
         debugLabel: kTagAudio,
-        onBuilt: (tree, _) {
+        onRenderBlock: (tree, placeholder) {
           if (defaultTargetPlatform != TargetPlatform.android &&
               defaultTargetPlatform != TargetPlatform.iOS &&
               defaultTargetPlatform != TargetPlatform.macOS &&
               !kIsWeb) {
             // these are the just_audio's supported platforms
             // https://pub.dev/packages/just_audio/versions/0.9.5
-            return null;
+            return placeholder;
           }
 
           final attrs = tree.element.attributes;
           final url = wf.urlFull(attrs[kAttributeAudioSrc] ?? '');
           if (url == null) {
-            return null;
+            return placeholder;
           }
 
-          return wf.buildAudioPlayer(
+          final built = wf.buildAudioPlayer(
             tree,
             url,
             autoplay: attrs.containsKey(kAttributeAudioAutoplay),
@@ -44,6 +44,7 @@ class TagAudio {
             preload: attrs.containsKey(kAttributeAudioPreload) &&
                 attrs[kAttributeAudioPreload] != kAttributeAudioPreloadNone,
           );
+          return built ?? placeholder;
         },
       );
 }

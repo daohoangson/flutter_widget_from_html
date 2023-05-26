@@ -9,8 +9,10 @@ abstract class BuildBit {
   /// Creates a build bit.
   const BuildBit(this.parent);
 
-  /// Returns true if this bit should be rendered inline.
-  bool get isInline => true;
+  /// Controls whether to render inline.
+  ///
+  /// Returns `null` if it's indecisive (e.g. [BuildTree] not completely parsed).
+  bool? get isInline => true;
 
   /// The next bit in the tree.
   ///
@@ -88,7 +90,10 @@ abstract class BuildBit {
   /// Returns `null` to use configuration from the previous bit.
   ///
   /// By default, do swallow if not [isInline].
-  bool? get swallowWhitespace => !isInline;
+  bool? get swallowWhitespace {
+    final scopedIsInline = isInline;
+    return scopedIsInline == null ? null : !scopedIsInline;
+  }
 
   /// Creates a copy with the given fields replaced with the new values.
   BuildBit copyWith({BuildTree? parent});
@@ -105,9 +110,6 @@ abstract class BuildTree extends BuildBit {
   static final _buffers = Expando<StringBuffer>();
 
   final _children = <BuildBit>[];
-
-  /// The list of direct children.
-  Iterable<BuildBit> get children => _children;
 
   /// The associated DOM element.
   final dom.Element element;
@@ -134,6 +136,9 @@ abstract class BuildTree extends BuildBit {
       }
     }
   }
+
+  /// The list of direct children.
+  Iterable<BuildBit> get children => _children;
 
   /// The first bit (recursively).
   BuildBit? get first {
@@ -178,16 +183,10 @@ abstract class BuildTree extends BuildBit {
   ///
   /// These are collected from:
   ///
-  /// - [WidgetFactory.parse] or [BuildOp.onChild] via `tree[key] = value`
-  /// - [BuildOp.defaultStyles] returning a map
-  /// - Attribute `style` of [domElement]
+  /// - `HtmlWidget.customStylesBuilder`
+  /// - [BuildOp.defaultStyles]
+  /// - Attribute `style` of [dom.Element]
   Iterable<css.Declaration> get styles;
-
-  /// Adds an inline style.
-  void operator []=(String key, String value);
-
-  /// Gets a styling declaration by `property`.
-  css.Declaration? operator [](String key);
 
   /// Enqueues an HTML styling callback.
   void apply<T>(
@@ -219,6 +218,9 @@ abstract class BuildTree extends BuildBit {
     target._values.addAll(_values);
   }
 
+  /// Gets a styling declaration by [property].
+  css.Declaration? getStyle(String property);
+
   /// Prepends [bit].
   ///
   /// See also: [append].
@@ -226,17 +228,6 @@ abstract class BuildTree extends BuildBit {
     final child = bit.parent == this ? bit : bit.copyWith(parent: this);
     _children.insert(0, child);
     return bit;
-  }
-
-  /// Replaces all children bits with [another].
-  void replaceWith(BuildBit? another) {
-    _children.clear();
-
-    if (another != null) {
-      final child =
-          another.parent == this ? another : another.copyWith(parent: this);
-      _children.add(child);
-    }
   }
 
   /// Registers a build op.
@@ -349,7 +340,7 @@ class _WidgetBitBlock extends WidgetBit<Widget> {
       : super._(parent, child);
 
   @override
-  bool get isInline => false;
+  bool? get isInline => false;
 
   @override
   BuildBit copyWith({BuildTree? parent}) =>

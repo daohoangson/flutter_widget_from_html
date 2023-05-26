@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:html/dom.dart' as dom;
 
+import 'core_data.dart';
 import 'core_html_widget.dart';
 import 'core_widget_factory.dart';
 
@@ -39,9 +40,7 @@ const widget0 = SizedBox.shrink();
 ///     element.classes.contains('name') ? {'color': 'red'} : null,
 /// )
 /// ```
-typedef CustomStylesBuilder = Map<String, String>? Function(
-  dom.Element element,
-);
+typedef CustomStylesBuilder = StylesMap? Function(dom.Element element);
 
 /// A callback to render custom widget for a DOM element.
 ///
@@ -91,29 +90,6 @@ typedef OnLoadingBuilder = Widget? Function(
   double? loadingProgress,
 );
 
-/// An extension on [Widget] to keep track of anchors.
-extension WidgetAnchors on Widget {
-  static final _anchors = Expando<Iterable<Key>>();
-
-  /// Anchor keys of this widget and its children.
-  Iterable<Key>? get anchors => _anchors[this];
-
-  /// Set anchor keys.
-  bool setAnchorsIfUnset(Iterable<Key>? anchors) {
-    if (anchors == null) {
-      return false;
-    }
-
-    final existing = _anchors[this];
-    if (existing != null) {
-      return false;
-    }
-
-    _anchors[this] = anchors;
-    return true;
-  }
-}
-
 /// A widget builder that can be extended with callbacks.
 class WidgetPlaceholder extends StatelessWidget {
   /// A human-readable description of this placeholder.
@@ -146,8 +122,6 @@ class WidgetPlaceholder extends StatelessWidget {
     for (final builder in _builders) {
       built = unwrap(context, builder(context, built) ?? widget0);
     }
-
-    built.setAnchorsIfUnset(anchors);
 
     return built;
   }
