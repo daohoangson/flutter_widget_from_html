@@ -285,13 +285,14 @@ class Builder extends BuildTree {
   }
 }
 
+@immutable
 class BuilderOp {
   final BuildOp op;
   final Builder tree;
 
-  BuilderOp._(this.tree, this.op);
+  const BuilderOp._(this.tree, this.op);
 
-  Iterable<css.Declaration>? get defaultStyles {
+  List<css.Declaration>? get defaultStyles {
     final map = op.defaultStyles?.call(tree);
     if (map == null) {
       return null;
