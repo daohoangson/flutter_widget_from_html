@@ -93,10 +93,8 @@ class BoxModel {
 class Late {
   static const _step = Priority._step;
 
-  static const anchor = displayBlock - _step;
-  static const displayBlock = displayInlineBlock - _step;
+  static const anchor = displayInlineBlock - _step;
   static const displayInlineBlock = tagSummary - _step;
-  static const tagSummary = tagTableCaptionRenderBlock - _step;
-  static const tagTableCaptionRenderBlock = displayNone - _step;
+  static const tagSummary = displayNone - _step;
   static const displayNone = Priority._max;
 }

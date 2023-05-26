@@ -63,8 +63,7 @@ class StyleSizing {
   factory StyleSizing() => const StyleSizing._(
         blockOp: BuildOp(
           debugLabel: 'display: block',
-          onRenderBlock: _blockBypass,
-          priority: Late.displayBlock,
+          mustBeBlock: true,
         ),
         childOp: BuildOp(
           debugLabel: 'sizing (min-width=0)',
@@ -86,9 +85,6 @@ class StyleSizing {
     required this.childOp,
     required this.sizingOp,
   });
-
-  static Widget _blockBypass(BuildTree _, WidgetPlaceholder placeholder) =>
-      placeholder;
 
   static Widget _childZero(BuildTree subTree, WidgetPlaceholder placeholder) {
     if (_StyleSizingInput.tryParse(subTree)?.preferredWidth == k100percent) {

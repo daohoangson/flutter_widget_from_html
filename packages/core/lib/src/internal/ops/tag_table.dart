@@ -105,13 +105,8 @@ class TagTable {
         subTree.register(
           BuildOp(
             debugLabel: kTagTableCaption,
-            onRenderBlock: (captionTree, placeholder) {
-              if (!placeholder.isEmpty) {
-                data.captions.add(placeholder);
-              }
-              return placeholder;
-            },
-            priority: Late.tagTableCaptionRenderBlock,
+            mustBeBlock: true,
+            onRenderedBlock: (_, placeholder) => data.captions.add(placeholder),
           ),
         );
         break;
@@ -142,7 +137,7 @@ class TagTable {
 
   Widget _onTableRenderBlock(
     BuildTree tableTree,
-    WidgetPlaceholder placeholder,
+    WidgetPlaceholder _,
   ) {
     final data = tableTree.tableData;
 
@@ -153,7 +148,7 @@ class TagTable {
     }
     _prepareHtmlTableCellBuilders(tableTree, data.footer);
     if (data.builders.isEmpty) {
-      return placeholder;
+      return _;
     }
 
     final border = tryParseBorder(tableTree);
