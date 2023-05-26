@@ -75,7 +75,7 @@ class TagRuby {
 
           return replacement;
         },
-        priority: Prioritiy.tagRuby,
+        priority: Priority.tagRuby,
       );
 
   static StylesMap _cssDisplayNone(BuildTree _) =>

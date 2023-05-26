@@ -17,6 +17,6 @@ class TagPre {
         onRenderBlock: (tree, placeholder) => placeholder.wrapWith(
           (_, child) => wf.buildHorizontalScrollView(tree, child),
         ),
-        priority: Prioritiy.tagPre,
+        priority: Priority.tagPre,
       );
 }

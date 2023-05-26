@@ -785,7 +785,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
             },
             onRenderBlock: (tree, placeholder) =>
                 buildDivider(tree) ?? placeholder,
-            priority: Prioritiy.tagHr,
+            priority: Priority.tagHr,
           ),
         );
         break;

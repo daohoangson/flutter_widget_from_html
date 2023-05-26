@@ -78,14 +78,14 @@ class TagLi {
                         debugLabel: '$kTagLi--$i',
                       );
                     },
-                    priority: Prioritiy.tagLiItem,
+                    priority: Priority.tagLiItem,
                   ),
                 );
               }
               break;
           }
         },
-        priority: Prioritiy.tagLiList,
+        priority: Priority.tagLiList,
       );
 
   Widget _buildItem(

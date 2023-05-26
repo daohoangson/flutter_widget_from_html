@@ -60,7 +60,7 @@ class TagImg {
           const baseline = PlaceholderAlignment.baseline;
           tree.append(WidgetBit.inline(tree, built, alignment: baseline));
         },
-        priority: Prioritiy.tagImg,
+        priority: Priority.tagImg,
       );
 
   ImageMetadata _parse(BuildTree tree) {

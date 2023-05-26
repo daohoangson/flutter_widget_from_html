@@ -63,7 +63,7 @@ class TagTable {
           }
         }
       },
-      priority: Prioritiy.tagTableAttributeBorder,
+      priority: Priority.tagTableAttributeBorder,
     );
 
     cellPaddingOp = BuildOp(
@@ -81,7 +81,7 @@ class TagTable {
           );
         }
       },
-      priority: Prioritiy.tagTableAttributeCellPadding,
+      priority: Priority.tagTableAttributeCellPadding,
     );
 
     tableOp = BuildOp(
@@ -342,13 +342,13 @@ class _TagTableRow {
     _rowOp = BuildOp(
       debugLabel: kTagTableRow,
       onChild: _onRowChild,
-      priority: Prioritiy.tagTableRow,
+      priority: Priority.tagTableRow,
     );
     _cellOp = BuildOp(
       debugLabel: kTagTableCell,
       mustBeBlock: true,
       onRenderedBlock: _onCellRenderedBlock,
-      priority: Prioritiy.tagTableCellRenderedBlock,
+      priority: Priority.tagTableCellRenderedBlock,
     );
   }
 
@@ -411,7 +411,7 @@ class _TagTableRowGroup {
     _groupOp = BuildOp(
       debugLabel: debugLabel,
       onChild: _onGroupChild,
-      priority: Prioritiy.tagTableRowGroup,
+      priority: Priority.tagTableRowGroup,
     );
   }
 
