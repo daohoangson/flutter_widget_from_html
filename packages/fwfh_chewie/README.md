@@ -16,7 +16,7 @@ Add this to your app's `pubspec.yaml` file:
 ```yaml
 dependencies:
   flutter_widget_from_html_core: any
-  fwfh_chewie: ^0.11.0-0
+  fwfh_chewie: ^0.12.0-0
 ```
 
 ## Usage
