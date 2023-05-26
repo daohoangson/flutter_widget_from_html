@@ -155,7 +155,7 @@ class TextStyleOps {
     return style;
   }
 
-  static List<String> fontFamilyTryParse(Iterable<css.Expression> expressions) {
+  static List<String> fontFamilyTryParse(List<css.Expression> expressions) {
     final list = <String>[];
 
     for (final expression in expressions) {
