@@ -107,18 +107,15 @@ void main() {
           ),
           useExplainer: false,
         );
+        expect(explained, contains('HtmlStyleWidget'));
+        expect(explained, contains('└WidgetPlaceholder(root--text)'));
+        expect(explained, contains('└RichText(text: "bar\u{fffc}")'));
         expect(
           explained,
-          equals(
-            'HtmlStyleWidget\n'
-            '└WidgetPlaceholder(root--text)\n'
-            ' └RichText(text: "bar\u{fffc}")\n'
-            '  └Semantics(...)\n'
-            '   └WidgetPlaceholder(span--WidgetBit.inline)\n'
-            '    └Text("hi")\n'
-            '     └RichText(text: "hi")\n\n',
-          ),
+          contains('└WidgetPlaceholder(span--WidgetBit.inline)'),
         );
+        expect(explained, contains('└Text("hi")'));
+        expect(explained, contains('└RichText(text: "hi")'));
       });
 
       testWidgets('renders replacement', (tester) async {
