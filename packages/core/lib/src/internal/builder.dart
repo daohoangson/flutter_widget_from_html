@@ -63,8 +63,7 @@ class Builder extends BuildTree {
       return null;
     }
 
-    var placeholder = column ??
-        WidgetPlaceholder(debugLabel: '${element.localName}--default');
+    var placeholder = column ?? const _WidgetPlaceholderDefault();
     for (final op in _buildOps) {
       placeholder = WidgetPlaceholder.lazy(
         op.onRenderBlock(placeholder),
@@ -78,6 +77,10 @@ class Builder extends BuildTree {
 
     // TODO: avoid special handling of anchors
     Anchor.wrapWidgetAnchors(this, placeholder);
+
+    for (final op in _buildOps) {
+      op.onRenderedBlock(placeholder);
+    }
 
     return placeholder;
   }
@@ -312,6 +315,9 @@ class BuilderOp {
 
   void onRenderInline() => op.onRenderInline?.call(tree);
 
+  void onRenderedBlock(WidgetPlaceholder placeholder) =>
+      op.onRenderedBlock?.call(tree, placeholder);
+
   static int _compare(BuilderOp a0, BuilderOp b0) {
     final a = a0.op;
     final b = b0.op;
@@ -345,4 +351,31 @@ Iterable<BuilderOp> _prepareParentOps(
   return newOps.isNotEmpty == true
       ? List.unmodifiable([...ops, ...newOps])
       : ops;
+}
+
+class _WidgetPlaceholderDefault extends StatelessWidget
+    implements
+        // ignore: avoid_implementing_value_types
+        WidgetPlaceholder {
+  const _WidgetPlaceholderDefault();
+
+  @override
+  Widget build(BuildContext context) => widget0;
+
+  @override
+  Widget callBuilders(BuildContext context, Widget? child) => child ?? widget0;
+
+  @override
+  String? get debugLabel => null;
+
+  @override
+  bool get isEmpty => true;
+
+  @override
+  WidgetPlaceholder wrapWith(WidgetPlaceholderBuilder builder) {
+    // We don't want to waste time creating unneccessary placeholder,
+    // this const default placeholder is used instead.
+    // Create a real one when the first builder is provided.
+    return WidgetPlaceholder(builder: builder);
+  }
 }

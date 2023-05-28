@@ -91,6 +91,6 @@ class TagDetails {
             },
           );
         },
-        priority: Prioritiy.tagDetails,
+        priority: Priority.tagDetails,
       );
 }

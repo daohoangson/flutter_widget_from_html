@@ -1,3 +1,7 @@
+## 0.12.0-alpha.2
+
+- Add support for BuildOp.onRenderedBlock (#923)
+
 ## 0.12.0-alpha.1
 
 Breaking changes since #917:

@@ -62,6 +62,7 @@ class TagRuby {
                     rt: rtTree.build(),
                     ruby: rubyTree.build(),
                   ),
+                  debugLabel: kTagRuby,
                 ),
                 alignment: PlaceholderAlignment.baseline,
               ),
@@ -75,7 +76,7 @@ class TagRuby {
 
           return replacement;
         },
-        priority: Prioritiy.tagRuby,
+        priority: Priority.tagRuby,
       );
 
   static StylesMap _cssDisplayNone(BuildTree _) =>

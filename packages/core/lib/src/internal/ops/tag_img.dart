@@ -50,7 +50,7 @@ class TagImg {
           _builts[tree] = built;
           return tree;
         },
-        onRenderBlock: (tree, placeholder) => _builts[tree] ?? placeholder,
+        onRenderBlock: (tree, _) => _builts[tree] ?? _,
         onRenderInline: (tree) {
           final built = _builts[tree];
           if (built == null) {
@@ -60,7 +60,7 @@ class TagImg {
           const baseline = PlaceholderAlignment.baseline;
           tree.append(WidgetBit.inline(tree, built, alignment: baseline));
         },
-        priority: Prioritiy.tagImg,
+        priority: Priority.tagImg,
       );
 
   ImageMetadata _parse(BuildTree tree) {

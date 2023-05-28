@@ -20,6 +20,6 @@ class TagQ {
           lastParent.append(TextBit(lastParent, closing));
           return tree;
         },
-        priority: Prioritiy.tagQ,
+        priority: Priority.tagQ,
       );
 }

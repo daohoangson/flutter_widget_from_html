@@ -7,7 +7,7 @@ part of '../core_ops.dart';
 ///
 /// User's build op has a default priority of 10 so they should run
 /// after our early ops and before our normal ops.
-class Prioritiy {
+class Priority {
   static const _baseEarly00 = -3000000000000000;
   static const _baseNormal00 = 1000000000000000;
   static const _baseBoxModel = 5000000000000000;
@@ -32,9 +32,9 @@ class Prioritiy {
 }
 
 class Early {
-  static const _step = Prioritiy._step;
+  static const _step = Priority._step;
 
-  static const attributeAlign = Prioritiy._baseEarly00 + _step;
+  static const attributeAlign = Priority._baseEarly00 + _step;
   static const attributeDir = attributeAlign + _step;
   static const cssTextAlign = attributeDir + _step;
   static const tagAcronym = cssTextAlign + _step;
@@ -78,9 +78,9 @@ class Early {
 ///
 /// Values in other groups are sorted alphabetically.
 class BoxModel {
-  static const _step = Prioritiy._step;
+  static const _step = Priority._step;
 
-  static const sizing = Prioritiy._baseBoxModel + _step;
+  static const sizing = Priority._baseBoxModel + _step;
   static const verticalAlign = sizing + _step;
   static const padding = verticalAlign + _step;
   static const border = padding + _step;
@@ -90,13 +90,10 @@ class BoxModel {
 }
 
 class Late {
-  static const _step = Prioritiy._step;
+  static const _step = Priority._step;
 
-  static const anchor = displayBlock - _step;
-  static const displayBlock = displayInlineBlock - _step;
+  static const anchor = displayInlineBlock - _step;
   static const displayInlineBlock = tagSummary - _step;
-  static const tagSummary = tagTableCaptionRenderBlock - _step;
-  static const tagTableCaptionRenderBlock = tagTableCellRenderBlock - _step;
-  static const tagTableCellRenderBlock = displayNone - _step;
-  static const displayNone = Prioritiy._max;
+  static const tagSummary = displayNone - _step;
+  static const displayNone = Priority._max;
 }

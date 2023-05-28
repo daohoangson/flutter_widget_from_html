@@ -69,23 +69,21 @@ class TagLi {
                 subTree.register(
                   BuildOp(
                     debugLabel: kTagLi,
-                    onRenderBlock: (itemTree, item) {
+                    onRenderBlock: (itemTree, placeholder) {
                       final i = listTree.increaseListItems() - 1;
 
-                      return WidgetPlaceholder(
-                        builder: (context, _) =>
-                            _buildItem(context, listTree, itemTree, item, i),
-                        debugLabel: '$kTagLi--$i',
+                      return placeholder.wrapWith(
+                        (ctx, w) => _buildItem(ctx, listTree, itemTree, w, i),
                       );
                     },
-                    priority: Prioritiy.tagLiItem,
+                    priority: Priority.tagLiItem,
                   ),
                 );
               }
               break;
           }
         },
-        priority: Prioritiy.tagLiList,
+        priority: Priority.tagLiList,
       );
 
   Widget _buildItem(
