@@ -6,11 +6,10 @@ import 'video_player/video_player.dart';
 
 /// A mixin that can build player for VIDEO.
 mixin ChewieFactory on WidgetFactory {
-  BuildOp? _tagVideo;
-
   /// Builds [VideoPlayer].
   Widget? buildVideoPlayer(
-    BuildTree tree,
+    // ignore: deprecated_member_use
+    BuildMetadata meta,
     String url, {
     required bool autoplay,
     required bool controls,
@@ -21,7 +20,7 @@ mixin ChewieFactory on WidgetFactory {
   }) {
     final dimensOk = height != null && height > 0 && width != null && width > 0;
     final poster = posterUrl != null
-        ? buildImage(tree, ImageMetadata(sources: [ImageSource(posterUrl)]))
+        ? buildImage(meta, ImageMetadata(sources: [ImageSource(posterUrl)]))
         : null;
     return VideoPlayer(
       url,
@@ -30,21 +29,22 @@ mixin ChewieFactory on WidgetFactory {
       autoplay: autoplay,
       controls: controls,
       errorBuilder: (context, _, error) =>
-          onErrorBuilder(context, tree, error, url) ?? widget0,
+          onErrorBuilder(context, meta, error, url) ?? widget0,
       loadingBuilder: (context, _, child) =>
-          onLoadingBuilder(context, tree, null, url) ?? widget0,
+          onLoadingBuilder(context, meta, null, url) ?? widget0,
       loop: loop,
       poster: poster,
     );
   }
 
   @override
-  void parse(BuildTree tree) {
-    switch (tree.element.localName) {
+  // ignore: deprecated_member_use
+  void parse(BuildMetadata meta) {
+    switch (meta.element.localName) {
       case kTagVideo:
-        tree.register(_tagVideo ??= TagVideo(this).buildOp);
+        meta.register(TagVideo(this, meta).op);
         break;
     }
-    return super.parse(tree);
+    return super.parse(meta);
   }
 }
