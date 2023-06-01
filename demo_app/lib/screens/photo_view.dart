@@ -63,7 +63,7 @@ class _InlinePhotoViewWidgetFactory extends WidgetFactory {
   @override
   void parse(BuildTree tree) {
     if (tree.element.classes.contains('image')) {
-      tree.register(BuildOp(defaultStyles: (_) => {'margin': '1em 0'}));
+      tree.register(BuildOp.v1(defaultStyles: (_) => {'margin': '1em 0'}));
     }
 
     super.parse(tree);
@@ -101,7 +101,7 @@ class _PopupPhotoViewWidgetFactory extends WidgetFactory {
   @override
   void parse(BuildTree tree) {
     if (tree.element.classes.contains('image')) {
-      tree.register(BuildOp(defaultStyles: (_) => {'margin': '1em 0'}));
+      tree.register(BuildOp.v1(defaultStyles: (_) => {'margin': '1em 0'}));
     }
 
     super.parse(tree);

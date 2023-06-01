@@ -305,7 +305,7 @@ class _BuildBitWidgetFactory extends WidgetFactory {
 
     if (classes.contains('output--String')) {
       tree.register(
-        BuildOp(
+        BuildOp.v1(
           onParsed: (tree) => tree..append(_OutputStringBit(tree)),
         ),
       );
@@ -313,7 +313,7 @@ class _BuildBitWidgetFactory extends WidgetFactory {
 
     if (classes.contains('output--Widget')) {
       tree.register(
-        BuildOp(onParsed: (tree) => tree..append(_OutputWidgetBit(tree))),
+        BuildOp.v1(onParsed: (tree) => tree..append(_OutputWidgetBit(tree))),
       );
     }
 

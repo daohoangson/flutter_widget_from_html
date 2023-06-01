@@ -16,7 +16,7 @@ class StyleMargin {
 
   StyleMargin(this.wf);
 
-  BuildOp get buildOp => BuildOp(
+  BuildOp get buildOp => BuildOp.v1(
         debugLabel: kCssMargin,
         mustBeBlock: false,
         onRenderBlock: (tree, placeholder) {

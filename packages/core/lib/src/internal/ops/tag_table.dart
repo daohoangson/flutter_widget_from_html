@@ -37,102 +37,26 @@ class TagTable {
   late final BuildOp tableOp;
 
   TagTable(this.wf) {
-    borderOp = BuildOp(
+    borderOp = const BuildOp.v1(
       debugLabel: '$kTagTable--$kAttributeBorder',
-      defaultStyles: (tree) {
-        final data = tree.tableData;
-        return {
-          if (data.border > 0.0) kCssBorder: '${data.border}px solid black',
-          kCssBorderCollapse: kCssBorderCollapseSeparate,
-          kCssBorderSpacing: '${data.borderSpacing}px',
-        };
-      },
-      onChild: (tree, subTree) {
-        final data = tree.tableData;
-        if (data.border > 0) {
-          switch (subTree.element.localName) {
-            case kTagTableCell:
-            case kTagTableHeaderCell:
-              subTree.register(
-                const BuildOp(
-                  debugLabel: '$kTagTable--$kAttributeBorder--child',
-                  defaultStyles: _cssBorderInherit,
-                  priority: Early.tagTableAttributeBorderChild,
-                ),
-              );
-          }
-        }
-      },
+      defaultStyles: _borderDefaultStyles,
+      onChild: _onBorderChild,
       priority: Priority.tagTableAttributeBorder,
     );
 
-    cellPaddingOp = BuildOp(
+    cellPaddingOp = const BuildOp.v1(
       debugLabel: '$kTagTable--$kAttributeCellPadding',
-      onChild: (tree, subTree) {
-        if (subTree.element.localName == 'td' ||
-            subTree.element.localName == 'th') {
-          final data = tree.tableData;
-          subTree.register(
-            BuildOp(
-              debugLabel: '$kTagTable--$kAttributeCellPadding--child',
-              defaultStyles: (_) => {kCssPadding: '${data.cellPadding}px'},
-              priority: Early.tagTableAttributeCellPaddingChild,
-            ),
-          );
-        }
-      },
+      onChild: _onCellPaddingChild,
       priority: Priority.tagTableAttributeCellPadding,
     );
 
-    tableOp = BuildOp(
+    tableOp = BuildOp.v1(
       debugLabel: kTagTable,
       onChild: _onTableChild,
       onParsed: _onTableParsed,
       onRenderBlock: _onTableRenderBlock,
       priority: Early.tagTableRenderBlock,
     );
-  }
-
-  void _onTableChild(BuildTree tableTree, BuildTree subTree) {
-    if (subTree.element.parent != tableTree.element) {
-      return;
-    }
-
-    final data = tableTree.tableData;
-    final which = _getCssDisplayValue(subTree);
-    switch (which) {
-      case kCssDisplayTableCaption:
-        subTree.register(
-          BuildOp(
-            debugLabel: kTagTableCaption,
-            mustBeBlock: true,
-            onRenderedBlock: (_, block) => data.captions.add(block),
-          ),
-        );
-        break;
-      case kCssDisplayTableHeaderGroup:
-      case kCssDisplayTableRowGroup:
-      case kCssDisplayTableFooterGroup:
-        final group = which == kCssDisplayTableHeaderGroup
-            ? data.header
-            : which == kCssDisplayTableRowGroup
-                ? data.newBody()
-                : data.footer;
-        subTree.register(group._groupOp);
-        break;
-      case kCssDisplayTableRow:
-        subTree.register(data.newBody().newRow()._rowOp);
-        break;
-      case kCssDisplayTableCell:
-        data.latestBody.latestRow._registerCellOp(subTree);
-        break;
-    }
-  }
-
-  BuildTree _onTableParsed(BuildTree tableTree) {
-    StyleBorder.skip(tableTree);
-    StyleSizing.skip(tableTree);
-    return tableTree;
   }
 
   Widget _onTableRenderBlock(BuildTree tableTree, WidgetPlaceholder _) {
@@ -273,6 +197,18 @@ class TagTable {
     }
   }
 
+  static StylesMap _borderDefaultStyles(BuildTree tree) {
+    final data = tree.tableData;
+    return {
+      if (data.border > 0.0) kCssBorder: '${data.border}px solid black',
+      kCssBorderCollapse: kCssBorderCollapseSeparate,
+      kCssBorderSpacing: '${data.borderSpacing}px',
+    };
+  }
+
+  static StylesMap _cssBorderInherit(BuildTree _) =>
+      {kCssBorder: kCssBorderInherit};
+
   static String? _getCssDisplayValue(BuildTree tree) {
     for (final style in tree.element.styles.reversed) {
       if (style.property == kCssDisplay) {
@@ -302,8 +238,78 @@ class TagTable {
     return null;
   }
 
-  static StylesMap _cssBorderInherit(BuildTree _) =>
-      {kCssBorder: kCssBorderInherit};
+  static void _onBorderChild(BuildTree tableTree, BuildTree subTree) {
+    final data = tableTree.tableData;
+    if (data.border > 0) {
+      switch (subTree.element.localName) {
+        case kTagTableCell:
+        case kTagTableHeaderCell:
+          subTree.register(
+            const BuildOp.v1(
+              debugLabel: '$kTagTable--$kAttributeBorder--child',
+              defaultStyles: _cssBorderInherit,
+              priority: Early.tagTableAttributeBorderChild,
+            ),
+          );
+      }
+    }
+  }
+
+  static void _onCellPaddingChild(BuildTree tableTree, BuildTree subTree) {
+    if (subTree.element.localName == 'td' ||
+        subTree.element.localName == 'th') {
+      final data = tableTree.tableData;
+      subTree.register(
+        BuildOp.v1(
+          debugLabel: '$kTagTable--$kAttributeCellPadding--child',
+          defaultStyles: (_) => {kCssPadding: '${data.cellPadding}px'},
+          priority: Early.tagTableAttributeCellPaddingChild,
+        ),
+      );
+    }
+  }
+
+  static void _onTableChild(BuildTree tableTree, BuildTree subTree) {
+    if (subTree.element.parent != tableTree.element) {
+      return;
+    }
+
+    final data = tableTree.tableData;
+    final which = _getCssDisplayValue(subTree);
+    switch (which) {
+      case kCssDisplayTableCaption:
+        subTree.register(
+          BuildOp.v1(
+            debugLabel: kTagTableCaption,
+            mustBeBlock: true,
+            onRenderedBlock: (_, block) => data.captions.add(block),
+          ),
+        );
+        break;
+      case kCssDisplayTableHeaderGroup:
+      case kCssDisplayTableRowGroup:
+      case kCssDisplayTableFooterGroup:
+        final group = which == kCssDisplayTableHeaderGroup
+            ? data.header
+            : which == kCssDisplayTableRowGroup
+                ? data.newBody()
+                : data.footer;
+        subTree.register(group._groupOp);
+        break;
+      case kCssDisplayTableRow:
+        subTree.register(data.newBody().newRow()._rowOp);
+        break;
+      case kCssDisplayTableCell:
+        data.latestBody.latestRow._registerCellOp(subTree);
+        break;
+    }
+  }
+
+  static BuildTree _onTableParsed(BuildTree tableTree) {
+    StyleBorder.skip(tableTree);
+    StyleSizing.skip(tableTree);
+    return tableTree;
+  }
 }
 
 extension on BuildTree {
@@ -331,12 +337,12 @@ class _TagTableRow {
   late final BuildOp _cellOp;
 
   _TagTableRow() {
-    _rowOp = BuildOp(
+    _rowOp = BuildOp.v1(
       debugLabel: kTagTableRow,
       onChild: _onRowChild,
       priority: Priority.tagTableRow,
     );
-    _cellOp = BuildOp(
+    _cellOp = BuildOp.v1(
       debugLabel: kTagTableCell,
       mustBeBlock: true,
       onRenderedBlock: _onCellRenderedBlock,
@@ -374,7 +380,7 @@ class _TagTableRow {
   void _registerCellOp(BuildTree cellTree) {
     if (cellTree.element.attributes.containsKey(kAttributeValign)) {
       cellTree.register(
-        const BuildOp(
+        const BuildOp.v1(
           debugLabel: kTagTableCell,
           defaultStyles: _cssVerticalAlignFromAttribute,
           priority: Early.tagTableCellAttributeValign,
@@ -399,7 +405,7 @@ class _TagTableRowGroup {
   late final BuildOp _groupOp;
 
   _TagTableRowGroup(String debugLabel) {
-    _groupOp = BuildOp(
+    _groupOp = BuildOp.v1(
       debugLabel: debugLabel,
       onChild: _onGroupChild,
       priority: Priority.tagTableRowGroup,

@@ -9,11 +9,9 @@ class TagA {
 
   TagA(this.wf);
 
-  BuildOp get buildOp => BuildOp(
+  BuildOp get buildOp => BuildOp.v1(
         debugLabel: 'a[href]',
-        defaultStyles: (_) => const {
-          kCssTextDecoration: kCssTextDecorationUnderline,
-        },
+        defaultStyles: _defaultStyles,
         onParsed: (tree) {
           final href = tree.element.attributes[kAttributeAHref];
           if (href == null) {
@@ -40,6 +38,12 @@ class TagA {
           debugLabel: 'fwfh: a[href] default color',
         ),
       );
+
+  static StylesMap _defaultStyles(BuildTree _) {
+    return const {
+      kCssTextDecoration: kCssTextDecorationUnderline,
+    };
+  }
 
   static HtmlStyle _builder(HtmlStyle style, GestureRecognizer value) =>
       style.copyWith(gestureRecognizer: value);

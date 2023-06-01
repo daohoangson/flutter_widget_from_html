@@ -21,6 +21,7 @@ part 'ops/column.dart';
 part 'ops/priorities.dart';
 part 'ops/style_background.dart';
 part 'ops/style_border.dart';
+part 'ops/style_display.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_padding.dart';
 part 'ops/style_sizing.dart';

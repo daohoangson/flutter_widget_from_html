@@ -202,8 +202,18 @@ class _BuildOpDefaultStyles extends WidgetFactory {
   @override
   void parse(BuildTree tree) {
     tree
-      ..register(BuildOp(defaultStyles: (_) => {'color': '#f00'}, priority: 1))
-      ..register(BuildOp(defaultStyles: (_) => {'color': '#0f0'}, priority: 2));
+      ..register(
+        BuildOp.v1(
+          defaultStyles: (_) => {'color': '#f00'},
+          priority: 1,
+        ),
+      )
+      ..register(
+        BuildOp.v1(
+          defaultStyles: (_) => {'color': '#0f0'},
+          priority: 2,
+        ),
+      );
 
     return super.parse(tree);
   }
@@ -213,7 +223,7 @@ class _BuildOpOnParsedText extends WidgetFactory {
   @override
   void parse(BuildTree tree) {
     if (tree.element.classes.contains('text')) {
-      tree.register(BuildOp(onParsed: (tree) => tree..addText(' bar')));
+      tree.register(BuildOp.v1(onParsed: (tree) => tree..addText(' bar')));
     }
 
     return super.parse(tree);
@@ -225,7 +235,7 @@ class _BuildOpOnParsedWidgetBlock extends WidgetFactory {
   void parse(BuildTree tree) {
     if (tree.element.classes.contains('widget-block')) {
       tree.register(
-        BuildOp(
+        BuildOp.v1(
           onParsed: (tree) =>
               tree..append(WidgetBit.block(tree, const Text('hi'))),
         ),
@@ -241,7 +251,7 @@ class _BuildOpOnParsedWidgetInline extends WidgetFactory {
   void parse(BuildTree tree) {
     if (tree.element.classes.contains('widget-inline')) {
       tree.register(
-        BuildOp(
+        BuildOp.v1(
           onParsed: (tree) =>
               tree..append(WidgetBit.inline(tree, const Text('hi'))),
         ),
@@ -257,7 +267,7 @@ class _BuildOpOnParsedReplace extends WidgetFactory {
   void parse(BuildTree tree) {
     if (tree.element.classes.contains('replace')) {
       tree.register(
-        BuildOp(
+        BuildOp.v1(
           onParsed: (tree) => tree.parent!.sub()..addText('hi'),
         ),
       );
@@ -270,7 +280,7 @@ class _BuildOpOnParsedReplace extends WidgetFactory {
 class _BuildOpOnRenderBlock extends WidgetFactory {
   @override
   void parse(BuildTree tree) {
-    tree.register(BuildOp(onRenderBlock: (_, __) => const Text('Hi')));
+    tree.register(BuildOp.v1(onRenderBlock: (_, __) => const Text('Hi')));
     return super.parse(tree);
   }
 }
@@ -285,13 +295,13 @@ class _BuildOpPriority extends WidgetFactory {
   void parse(BuildTree tree) {
     tree
       ..register(
-        BuildOp(
+        BuildOp.v1(
           onParsed: (tree) => tree..addText(' A'),
           priority: a,
         ),
       )
       ..register(
-        BuildOp(
+        BuildOp.v1(
           onParsed: (tree) => tree..addText(' B'),
           priority: b,
         ),

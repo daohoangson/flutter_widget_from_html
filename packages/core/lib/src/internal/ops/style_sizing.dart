@@ -61,17 +61,17 @@ class StyleSizing {
   }
 
   factory StyleSizing() => const StyleSizing._(
-        blockOp: BuildOp(
+        blockOp: BuildOp.v1(
           debugLabel: 'display: block',
           mustBeBlock: true,
         ),
-        childOp: BuildOp(
+        childOp: BuildOp.v1(
           debugLabel: 'sizing (min-width=0)',
           mustBeBlock: false,
           onRenderBlock: _childZero,
           priority: BoxModel.sizingMinWidthZero,
         ),
-        sizingOp: BuildOp(
+        sizingOp: BuildOp.v1(
           debugLabel: 'sizing',
           mustBeBlock: false,
           onRenderBlock: _sizingBlock,

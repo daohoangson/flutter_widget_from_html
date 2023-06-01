@@ -12,7 +12,7 @@ class TagDetails {
   WidgetPlaceholder? _summary;
 
   TagDetails(this.wf) {
-    _summaryOp = BuildOp(
+    _summaryOp = BuildOp.v1(
       debugLabel: kTagSummary,
       onParsed: (tree) {
         if (tree.isEmpty) {
@@ -43,7 +43,7 @@ class TagDetails {
     );
   }
 
-  BuildOp get buildOp => BuildOp(
+  BuildOp get buildOp => BuildOp.v1(
         debugLabel: kTagDetails,
         onChild: (tree, subTree) {
           final e = subTree.element;

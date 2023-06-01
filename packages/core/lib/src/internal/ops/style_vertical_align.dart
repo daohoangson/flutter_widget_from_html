@@ -15,7 +15,7 @@ class StyleVerticalAlign {
 
   StyleVerticalAlign(this.wf);
 
-  BuildOp get buildOp => BuildOp(
+  BuildOp get buildOp => BuildOp.v1(
         debugLabel: kCssVerticalAlign,
         mustBeBlock: false,
         onParsed: (tree) {

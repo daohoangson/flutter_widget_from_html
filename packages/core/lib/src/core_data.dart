@@ -22,7 +22,7 @@ typedef StylesMap = Map<String, String>;
 /// below just changes the color:
 ///
 /// ```dart
-/// BuildOp(
+/// BuildOp.v1(
 ///   defaultStyles: (_) => {'color': 'red'},
 /// )
 /// ```
@@ -39,7 +39,7 @@ typedef DefaultStyles = StylesMap Function(BuildTree tree);
 /// it's easy to check whether an element is direct child:
 ///
 /// ```dart
-/// BuildOp(
+/// BuildOp.v1(
 ///   onChild: (tree, subTree) {
 ///     if (!subTree.element.parent != tree.element) return;
 ///     subTree.doSomething();
@@ -121,7 +121,7 @@ class BuildOp {
   final int priority;
 
   /// Creates a build op.
-  const BuildOp({
+  const BuildOp.v1({
     this.debugLabel,
     this.defaultStyles,
     this.mustBeBlock,
