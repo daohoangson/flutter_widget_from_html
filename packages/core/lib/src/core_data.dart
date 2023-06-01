@@ -120,6 +120,55 @@ class BuildOp {
   /// Default: 10.
   final int priority;
 
+  /// Creates a legacy build op.
+  @Deprecated('Use BuildOp.v1 instead.')
+  factory BuildOp({
+    Map<String, String> Function(dom.Element element)? defaultStyles,
+    void Function(BuildMetadata childMeta)? onChild,
+    void Function(BuildMetadata meta, BuildTree tree)? onTree,
+    void Function(BuildMetadata meta, BuildTree tree)? onTreeFlattening,
+    Iterable<Widget>? Function(
+      BuildTree tree,
+      Iterable<WidgetPlaceholder> children,
+    )? onWidgets,
+    bool onWidgetsIsOptional = false,
+    int priority = 10,
+  }) {
+    return BuildOp.v1(
+      defaultStyles:
+          defaultStyles != null ? (tree) => defaultStyles(tree.element) : null,
+      mustBeBlock: onWidgetsIsOptional ? null : (onWidgets != null),
+      onChild: onChild != null ? (_, subTree) => onChild(subTree) : null,
+      onParsed: onTree != null
+          ? (tree) {
+              onTree(tree, tree);
+              return tree;
+            }
+          : null,
+      onRenderBlock: onWidgets != null
+          ? (tree, placeholder) {
+              final children = onWidgets(tree, [placeholder]);
+              switch (children?.length) {
+                case null:
+                  return placeholder;
+                case 0:
+                  return widget0;
+                case 1:
+                  return children?.first ?? widget0;
+                default:
+                  throw UnsupportedError(
+                    'onWidgets must return 0 or 1 widget, got ${children?.length}',
+                  );
+              }
+            }
+          : null,
+      onRenderInline: onTreeFlattening != null
+          ? (tree) => onTreeFlattening(tree, tree)
+          : null,
+      priority: priority,
+    );
+  }
+
   /// Creates a build op.
   const BuildOp.v1({
     this.debugLabel,
