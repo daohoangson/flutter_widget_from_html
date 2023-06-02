@@ -570,14 +570,9 @@ class Explainer {
       return _htmlListMarker(widget);
     }
 
-    if (widget is InheritedWidget) {
-      switch (widget.runtimeType.toString()) {
-        case 'HtmlStyleWidget':
-          return _widget(widget.child);
-        case 'TshWidget':
-          // TODO: remove when our minimum core version > 0.10
-          return _widget(widget.child);
-      }
+    if (widget.runtimeType.toString() == 'HtmlStyleWidget' &&
+        widget is InheritedWidget) {
+      return _widget(widget.child);
     }
 
     if (widget.runtimeType.toString() == 'ValignBaselineContainer') {

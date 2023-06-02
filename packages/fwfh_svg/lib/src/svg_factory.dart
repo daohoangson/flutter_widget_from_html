@@ -17,8 +17,7 @@ mixin SvgFactory on WidgetFactory {
   bool get svgAllowDrawingOutsideViewBox => false;
 
   @override
-  // ignore: deprecated_member_use
-  Widget? buildImageWidget(BuildMetadata meta, ImageSource src) {
+  Widget? buildImageWidget(BuildTree tree, ImageSource src) {
     final url = src.url;
 
     BytesLoader? bytesLoader;
@@ -35,10 +34,10 @@ mixin SvgFactory on WidgetFactory {
     }
 
     if (bytesLoader == null) {
-      return super.buildImageWidget(meta, src);
+      return super.buildImageWidget(tree, src);
     }
 
-    return _buildSvgPicture(meta, src, bytesLoader);
+    return _buildSvgPicture(tree, src, bytesLoader);
   }
 
   /// Returns an [SvgAssetLoader].
@@ -85,32 +84,28 @@ mixin SvgFactory on WidgetFactory {
   }
 
   @override
-  // ignore: deprecated_member_use
-  void parse(BuildMetadata meta) {
-    final localName = meta.element.localName;
+  void parse(BuildTree tree) {
+    final localName = tree.element.localName;
 
     switch (localName) {
       case 'svg':
-        meta.register(
-          // ignore: deprecated_member_use
+        tree.register(
           _tagSvg ??= BuildOp(
-            onWidgets: (meta, widgets) {
-              final bytesLoader = SvgStringLoader(meta.element.outerHtml);
-              return [
-                _buildSvgPicture(meta, const ImageSource(''), bytesLoader)
-              ];
+            debugLabel: localName,
+            onRenderBlock: (tree, _) {
+              final bytesLoader = SvgStringLoader(tree.element.outerHtml);
+              return _buildSvgPicture(tree, const ImageSource(''), bytesLoader);
             },
           ),
         );
         break;
     }
 
-    return super.parse(meta);
+    return super.parse(tree);
   }
 
   Widget _buildSvgPicture(
-    // ignore: deprecated_member_use
-    BuildMetadata meta,
+    BuildTree tree,
     ImageSource src,
     BytesLoader bytesLoader,
   ) {
@@ -124,7 +119,7 @@ mixin SvgFactory on WidgetFactory {
       fit: BoxFit.fill,
       height: src.height,
       placeholderBuilder: (context) {
-        final loading = onLoadingBuilder(context, meta, null, src);
+        final loading = onLoadingBuilder(context, tree, null, src);
         if (loading != null) {
           return loading;
         }

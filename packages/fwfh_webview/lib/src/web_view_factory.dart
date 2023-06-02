@@ -32,15 +32,14 @@ mixin WebViewFactory on WidgetFactory {
   /// AND sandbox restrictions are unset (no `sandbox` attribute)
   /// or `allow-scripts` is explicitly allowed.
   Widget? buildWebView(
-    // ignore: deprecated_member_use
-    BuildMetadata meta,
+    BuildTree tree,
     String url, {
     double? height,
     Iterable<String>? sandbox,
     double? width,
   }) {
     if (!webView) {
-      return buildWebViewLinkOnly(meta, url);
+      return buildWebViewLinkOnly(tree, url);
     }
 
     final dimensOk = height != null && height > 0 && width != null && width > 0;
@@ -57,8 +56,7 @@ mixin WebViewFactory on WidgetFactory {
           return false;
         }
 
-        // ignore: deprecated_member_use
-        gestureTapCallback(newUrl)?.call();
+        onTapUrl(newUrl);
         return true;
       },
       js: js,
@@ -68,58 +66,51 @@ mixin WebViewFactory on WidgetFactory {
   }
 
   /// Builds fallback link when [HtmlWidget.webView] is disabled.
-  // ignore: deprecated_member_use
-  Widget? buildWebViewLinkOnly(BuildMetadata meta, String url) =>
-      GestureDetector(
-        // ignore: deprecated_member_use
-        onTap: gestureTapCallback(url),
+  Widget? buildWebViewLinkOnly(BuildTree tree, String url) => GestureDetector(
+        onTap: () => onTapUrl(url),
         child: Text(url),
       );
 
   @override
-  // ignore: deprecated_member_use
-  void parse(BuildMetadata meta) {
-    switch (meta.element.localName) {
+  void parse(BuildTree tree) {
+    switch (tree.element.localName) {
       case kTagIframe:
-        meta.register(
-          // ignore: deprecated_member_use
+        tree.register(
           _tagIframe ??= BuildOp(
-            onWidgets: (meta, widgets) {
+            debugLabel: kTagIframe,
+            onRenderBlock: (tree, placeholder) {
               if (defaultTargetPlatform != TargetPlatform.android &&
                   defaultTargetPlatform != TargetPlatform.iOS &&
                   !kIsWeb) {
                 // Android & iOS are the webview_flutter's supported platforms
                 // Flutter web support is implemented by this package
                 // https://pub.dev/packages/webview_flutter/versions/2.0.12
-                return widgets;
+                return placeholder;
               }
 
-              final a = meta.element.attributes;
+              final a = tree.element.attributes;
               final src = urlFull(a[kAttributeIframeSrc] ?? '');
               if (src == null) {
-                return widgets;
+                return placeholder;
               }
 
               final height = tryParseDoubleFromMap(a, kAttributeIframeHeight);
               final width = tryParseDoubleFromMap(a, kAttributeIframeWidth);
               final sandbox = a[kAttributeIframeSandbox]?.split(RegExp(r'\s+'));
 
-              // ignore: deprecated_member_use
-              return listOrNull(
-                    buildWebView(
-                      meta,
-                      src,
-                      height: height,
-                      sandbox: sandbox,
-                      width: width,
-                    ),
-                  ) ??
-                  widgets;
+              final built = buildWebView(
+                tree,
+                src,
+                height: height,
+                sandbox: sandbox,
+                width: width,
+              );
+              return built ?? placeholder;
             },
           ),
         );
         break;
     }
-    return super.parse(meta);
+    return super.parse(tree);
   }
 }

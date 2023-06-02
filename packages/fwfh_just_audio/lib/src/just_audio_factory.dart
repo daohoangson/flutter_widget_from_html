@@ -10,8 +10,7 @@ mixin JustAudioFactory on WidgetFactory {
 
   /// Builds [AudioPlayer].
   Widget? buildAudioPlayer(
-    // ignore: deprecated_member_use
-    BuildMetadata meta,
+    BuildTree tree,
     String url, {
     required bool autoplay,
     required bool loop,
@@ -27,13 +26,12 @@ mixin JustAudioFactory on WidgetFactory {
       );
 
   @override
-  // ignore: deprecated_member_use
-  void parse(BuildMetadata meta) {
-    switch (meta.element.localName) {
+  void parse(BuildTree tree) {
+    switch (tree.element.localName) {
       case kTagAudio:
-        meta.register(_tagAudio ??= TagAudio(this).buildOp);
+        tree.register(_tagAudio ??= TagAudio(this).buildOp);
         break;
     }
-    return super.parse(meta);
+    return super.parse(tree);
   }
 }
