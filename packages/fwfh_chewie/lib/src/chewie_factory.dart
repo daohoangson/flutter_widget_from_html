@@ -24,7 +24,7 @@ mixin ChewieFactory on WidgetFactory {
         : null;
     return VideoPlayer(
       url,
-      aspectRatio: dimensOk ? width / height : 16 / 9,
+      aspectRatio: dimensOk ? width! / height! : 16 / 9,
       autoResize: !dimensOk,
       autoplay: autoplay,
       controls: controls,
