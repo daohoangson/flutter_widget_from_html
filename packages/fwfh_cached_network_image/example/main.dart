@@ -5,7 +5,7 @@ import 'package:fwfh_cached_network_image/fwfh_cached_network_image.dart';
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
