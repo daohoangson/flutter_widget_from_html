@@ -1,3 +1,7 @@
+## 0.13.0-alpha.1
+
+- Implement `BuildOp.v1` constructor (#930)
+
 ## 0.12.0-alpha.2
 
 - Add support for BuildOp.onRenderedBlock (#923)
