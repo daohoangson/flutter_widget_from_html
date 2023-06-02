@@ -90,7 +90,7 @@ mixin SvgFactory on WidgetFactory {
     switch (localName) {
       case 'svg':
         tree.register(
-          _tagSvg ??= BuildOp(
+          _tagSvg ??= BuildOp.v1(
             debugLabel: localName,
             onRenderBlock: (tree, _) {
               final bytesLoader = SvgStringLoader(tree.element.outerHtml);
