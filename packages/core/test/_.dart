@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:logging/logging.dart';
 
 export '_constants.dart';
 
@@ -790,6 +793,42 @@ class HitTestApp extends StatelessWidget {
           ),
         ),
       );
+}
+
+class LoggerApp extends StatefulWidget {
+  final Widget child;
+  final List<LogRecord> records;
+
+  const LoggerApp({
+    required this.child,
+    Key? key,
+    required this.records,
+  }) : super(key: key);
+
+  @override
+  State<LoggerApp> createState() => _LoggerAppState();
+}
+
+class _LoggerAppState extends State<LoggerApp> {
+  late final StreamSubscription<LogRecord> _subscription;
+  @override
+  void initState() {
+    super.initState();
+    _subscription = Logger.root.onRecord.listen(_onLogRecord);
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
+  }
+
+  void _onLogRecord(LogRecord record) => widget.records.add(record);
 }
 
 extension RenderBoxGetter on GlobalKey {

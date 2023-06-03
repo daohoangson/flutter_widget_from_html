@@ -124,7 +124,7 @@ class BuildOp {
   @Deprecated('Use BuildOp.v1 instead.')
   factory BuildOp({
     Map<String, String> Function(dom.Element element)? defaultStyles,
-    void Function(BuildMetadata childMeta)? onChild,
+    void Function(BuildMetadata subTree)? onChild,
     void Function(BuildMetadata meta, BuildTree tree)? onTree,
     void Function(BuildMetadata meta, BuildTree tree)? onTreeFlattening,
     Iterable<Widget>? Function(
@@ -157,7 +157,7 @@ class BuildOp {
                   return children?.first ?? widget0;
                 default:
                   throw UnsupportedError(
-                    'onWidgets must return 0 or 1 widget, got ${children?.length}',
+                    'onWidgets must return exactly 1 widget, got ${children?.length}',
                   );
               }
             }
