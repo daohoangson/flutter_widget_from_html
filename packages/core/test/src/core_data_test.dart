@@ -243,7 +243,7 @@ void main() {
           hw: HtmlWidget(
             html,
             factoryBuilder: () => _BuildOpWidgetFactory(
-              BuildOp(onWidgets: (_, __) => null),
+              BuildOp(onWidgets: (_, __) => listOrNull(null)),
             ),
             key: hwKey,
           ),
@@ -291,7 +291,7 @@ void main() {
           hw: HtmlWidget(
             html,
             factoryBuilder: () => _BuildOpWidgetFactory(
-              BuildOp(onWidgets: (_, __) => const [Text('Hi')]),
+              BuildOp(onWidgets: (_, __) => listOrNull(const Text('Hi'))),
             ),
             key: hwKey,
           ),
