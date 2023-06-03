@@ -8,53 +8,51 @@ const kTagSummary = 'summary';
 class TagDetails {
   final WidgetFactory wf;
 
-  late final BuildOp _summaryOp;
-  WidgetPlaceholder? _summary;
-
-  TagDetails(this.wf) {
-    _summaryOp = BuildOp.v1(
-      debugLabel: kTagSummary,
-      onParsed: (tree) {
-        if (tree.isEmpty) {
-          return tree;
-        }
-
-        final marker = WidgetBit.inline(
-          tree,
-          WidgetPlaceholder(
-            builder: (context, child) {
-              final style = tree.styleBuilder.build(context);
-              return HtmlDetailsMarker(style: style.textStyle);
-            },
-            debugLabel: '$kTagSummary--inlineMarker',
-          ),
-        );
-        return tree..prepend(marker);
-      },
-      onRenderBlock: (_, placeholder) {
-        if (_summary != null) {
-          return placeholder;
-        }
-
-        _summary = placeholder;
-        return WidgetPlaceholder(debugLabel: '$kTagSummary--block');
-      },
-      priority: Late.tagSummary,
-    );
-  }
+  TagDetails(this.wf);
 
   BuildOp get buildOp => BuildOp.v1(
         debugLabel: kTagDetails,
-        onChild: (tree, subTree) {
+        onChild: (detailsTree, subTree) {
           final e = subTree.element;
-          if (e.parent != tree.element) {
+          if (e.parent != detailsTree.element) {
             return;
           }
           if (e.localName != kTagSummary) {
             return;
           }
 
-          subTree.register(_summaryOp);
+          subTree.register(
+            BuildOp.v1(
+              debugLabel: kTagSummary,
+              onParsed: (summaryTree) {
+                if (summaryTree.isEmpty) {
+                  return summaryTree;
+                }
+
+                final marker = WidgetBit.inline(
+                  summaryTree,
+                  WidgetPlaceholder(
+                    builder: (context, child) {
+                      final style = summaryTree.styleBuilder.build(context);
+                      return HtmlDetailsMarker(style: style.textStyle);
+                    },
+                    debugLabel: '$kTagSummary--inlineMarker',
+                  ),
+                );
+                return summaryTree..prepend(marker);
+              },
+              onRenderBlock: (_, placeholder) {
+                final summaries = detailsTree.summaries;
+                if (summaries.isNotEmpty) {
+                  return placeholder;
+                }
+
+                summaries.add(placeholder);
+                return WidgetPlaceholder(debugLabel: '$kTagSummary--block');
+              },
+              priority: Late.tagSummary,
+            ),
+          );
         },
         onRenderBlock: (tree, placeholder) {
           final attrs = tree.element.attributes;
@@ -64,18 +62,22 @@ class TagDetails {
             (context, child) {
               final style = tree.styleBuilder.build(context);
               final textStyle = style.textStyle;
-              final summary = _summary ??
-                  wf.buildText(
-                    tree,
-                    style,
-                    TextSpan(
-                      children: [
-                        WidgetSpan(child: HtmlDetailsMarker(style: textStyle)),
-                        // TODO: i18n
-                        TextSpan(text: 'Details', style: textStyle),
-                      ],
-                    ),
-                  );
+              final summaries = tree.summaries;
+              final summary = summaries.isNotEmpty
+                  ? summaries.first
+                  : wf.buildText(
+                      tree,
+                      style,
+                      TextSpan(
+                        children: [
+                          WidgetSpan(
+                            child: HtmlDetailsMarker(style: textStyle),
+                          ),
+                          // TODO: i18n
+                          TextSpan(text: 'Details', style: textStyle),
+                        ],
+                      ),
+                    );
 
               return HtmlDetails(
                 open: open,
@@ -93,4 +95,21 @@ class TagDetails {
         },
         priority: Priority.tagDetails,
       );
+}
+
+extension on BuildTree {
+  List<Widget> get summaries {
+    final existing = value<_TagDetailsData>();
+    if (existing != null) {
+      return existing.summaries;
+    }
+
+    final newData = _TagDetailsData();
+    value(newData);
+    return newData.summaries;
+  }
+}
+
+class _TagDetailsData {
+  final summaries = <Widget>[];
 }

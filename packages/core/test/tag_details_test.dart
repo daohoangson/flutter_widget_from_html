@@ -119,7 +119,27 @@ void main() {
       expect(contentsFinder, findsNothing);
     });
 
-    testWidgets('double summary', (WidgetTester tester) async {
+    testWidgets('double DETAILS', (WidgetTester tester) async {
+      const html = '<details open><summary>Foo1</summary>Foo2</details>'
+          '<details open><summary>Bar1</summary>Bar2</details>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Column:children='
+          '[HtmlDetails:open=true,child=[Column:children='
+          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@bottom(:Foo1))]],'
+          '[HtmlDetailsContents:child=[RichText:(:Foo2)]]'
+          ']],'
+          '[HtmlDetails:open=true,child=[Column:children='
+          '[HtmlSummary:child=[RichText:(:[HtmlDetailsMarker]@bottom(:Bar1))]],'
+          '[HtmlDetailsContents:child=[RichText:(:Bar2)]]'
+          ']]]',
+        ),
+      );
+    });
+
+    testWidgets('double SUMMARY', (WidgetTester tester) async {
       const html = '<details><summary>One</summary>'
           '<summary>Two</summary>Foo</details>';
       final explained = await explain(tester, html);
