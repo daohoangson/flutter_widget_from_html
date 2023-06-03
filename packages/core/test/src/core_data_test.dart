@@ -1,5 +1,7 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -312,7 +314,7 @@ void main() {
         await explain(
           tester,
           null,
-          hw: LoggerApp(
+          hw: _LoggerApp(
             records: records,
             child: HtmlWidget(
               html,
@@ -446,4 +448,40 @@ class _BuildOpWidgetFactory extends WidgetFactory {
 
     return super.parse(tree);
   }
+}
+
+class _LoggerApp extends StatefulWidget {
+  final Widget child;
+  final List<LogRecord> records;
+
+  const _LoggerApp({
+    required this.child,
+    Key? key,
+    required this.records,
+  }) : super(key: key);
+
+  @override
+  State<_LoggerApp> createState() => _LoggerAppState();
+}
+
+class _LoggerAppState extends State<_LoggerApp> {
+  late final StreamSubscription<LogRecord> _subscription;
+  @override
+  void initState() {
+    super.initState();
+    _subscription = Logger.root.onRecord.listen(_onLogRecord);
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
+  }
+
+  void _onLogRecord(LogRecord record) => widget.records.add(record);
 }
