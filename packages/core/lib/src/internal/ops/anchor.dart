@@ -306,7 +306,9 @@ extension on BuildTree {
     final keys = anchors ?? (value(_BuildTreeAnchors())!.keys);
     keys.add(anchor);
 
-    parent?.addAnchor(anchor);
+    if (hasParent) {
+      parent.addAnchor(anchor);
+    }
   }
 }
 

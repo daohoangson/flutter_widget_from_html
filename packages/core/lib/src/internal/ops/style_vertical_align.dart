@@ -20,7 +20,7 @@ class StyleVerticalAlign {
         mustBeBlock: false,
         onParsed: (tree) {
           final parent = tree.parent;
-          if (tree.isInline != true || parent == null) {
+          if (tree.isInline != true) {
             return tree;
           }
 

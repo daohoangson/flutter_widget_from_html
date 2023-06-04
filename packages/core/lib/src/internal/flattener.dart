@@ -42,11 +42,11 @@ class Flattener implements Flattened {
   }) {
     _saveSpan();
 
-    final scopedTree = _bit.parent!;
+    final scopedTree = _bit.parent;
     final scopedStyleBuilder = _styleBuilder;
     final placeholder = WidgetPlaceholder.lazy(
       child,
-      debugLabel: '${_bit.parent?.element.localName}--Flattener.inlineWidget',
+      debugLabel: '${scopedTree.element.localName}--Flattener.inlineWidget',
     );
 
     placeholder.wrapWith((context, widget) {
@@ -74,7 +74,7 @@ class Flattener implements Flattened {
 
     final placeholder = WidgetPlaceholder.lazy(
       value,
-      debugLabel: '${_bit.parent?.element.localName}--Flattener.widget',
+      debugLabel: '${_bit.parent.element.localName}--Flattener.widget',
     );
     final scopedStyleBuilder = _styleBuilder;
     placeholder.wrapWith((context, child) {
@@ -281,9 +281,6 @@ extension on BuildBit {
     // the below code will find the best style for this whitespace bit
     // easy case: whitespace at the beginning of a tag, use the previous style
     final parent = this.parent;
-    if (parent == null) {
-      return null;
-    }
     if (this is! WhitespaceBit) {
       return parent.styleBuilder;
     }
@@ -297,12 +294,12 @@ extension on BuildBit {
       final next = nextNonWhitespace;
       if (next != null) {
         var tree = parent;
-        while (tree.parent?.last == this) {
-          tree = tree.parent!;
+        while (tree.parent.last == this) {
+          tree = tree.parent;
         }
 
         if (tree.parent == next.parent) {
-          return next.parent!.styleBuilder;
+          return next.parent.styleBuilder;
         } else {
           return null;
         }

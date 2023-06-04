@@ -9,10 +9,6 @@ extension StyleDisplayInlineBlock on WidgetFactory {
 
   static BuildTree _onParsed(BuildTree tree) {
     final parent = tree.parent;
-    if (parent == null) {
-      return tree;
-    }
-
     return parent.sub()
       ..append(
         WidgetBit.inline(
@@ -34,5 +30,5 @@ extension StyleDisplayNone on WidgetFactory {
         priority: Late.displayNone,
       );
 
-  static BuildTree _onParsed(BuildTree tree) => tree.parent?.sub() ?? tree;
+  static BuildTree _onParsed(BuildTree tree) => tree.parent.sub();
 }

@@ -334,7 +334,10 @@ class _CircularBit extends Mock implements BuildTree {
 }
 
 class _CustomBit extends BuildBit {
-  const _CustomBit(BuildTree? parent) : super(parent);
+  @override
+  final BuildTree parent;
+
+  const _CustomBit(this.parent);
 
   @override
   void flatten(Flattened _) => throw UnimplementedError();
@@ -345,7 +348,10 @@ class _CustomBit extends BuildBit {
 }
 
 class _OutputStringBit extends BuildBit {
-  const _OutputStringBit(BuildTree? parent) : super(parent);
+  @override
+  final BuildTree parent;
+
+  const _OutputStringBit(this.parent);
 
   @override
   void flatten(Flattened f) => f.write(text: 'foo');
@@ -356,7 +362,10 @@ class _OutputStringBit extends BuildBit {
 }
 
 class _OutputWidgetBit extends BuildBit {
-  const _OutputWidgetBit(BuildTree? parent) : super(parent);
+  @override
+  final BuildTree parent;
+
+  const _OutputWidgetBit(this.parent);
 
   @override
   bool? get isInline => false;

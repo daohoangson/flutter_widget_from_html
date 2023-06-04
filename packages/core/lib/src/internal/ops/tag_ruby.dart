@@ -38,11 +38,7 @@ extension TagRuby on WidgetFactory {
   }
 
   static BuildTree _onParsed(BuildTree tree) {
-    final replacement = tree.parent?.sub();
-    if (replacement == null) {
-      return tree;
-    }
-
+    final replacement = tree.parent.sub();
     final rubyBits = <BuildBit>[];
     for (final bit in tree.children) {
       if (!bit.isRtTree || rubyBits.isEmpty) {

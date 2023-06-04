@@ -13,7 +13,10 @@ extension TagBr on WidgetFactory {
 }
 
 class TagBrBit extends BuildBit {
-  const TagBrBit(BuildTree? parent) : super(parent);
+  @override
+  final BuildTree parent;
+
+  const TagBrBit(this.parent);
 
   @override
   bool? get swallowWhitespace => true;

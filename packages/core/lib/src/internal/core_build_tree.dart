@@ -28,6 +28,7 @@ class CoreBuildTree extends BuildTree {
 
   final _buildOps = SplayTreeSet<_CoreBuildOp>(_CoreBuildOp._compare);
   final _isInlines = <bool>[];
+  final BuildTree? _parent;
   final Iterable<_CoreBuildOp> _parentOps;
   final _styles = <css.Declaration>[];
 
@@ -39,10 +40,10 @@ class CoreBuildTree extends BuildTree {
     Iterable<_CoreBuildOp> parentOps = const [],
     required HtmlStyleBuilder styleBuilder,
     required this.wf,
-  })  : _parentOps = parentOps,
+  })  : _parent = parent,
+        _parentOps = parentOps,
         super(
           element: element,
-          parent: parent,
           styleBuilder: styleBuilder,
         );
 
@@ -61,7 +62,13 @@ class CoreBuildTree extends BuildTree {
       );
 
   @override
+  bool get hasParent => _parent != null;
+
+  @override
   bool? get isInline => _isInlines.isEmpty ? null : _isInlines.last;
+
+  @override
+  BuildTree get parent => _parent!;
 
   @override
   Iterable<css.Declaration> get styles => _styles;
@@ -109,16 +116,17 @@ class CoreBuildTree extends BuildTree {
     BuildTree? parent,
     HtmlStyleBuilder? styleBuilder,
   }) {
-    final p = parent ?? this.parent;
-    final sb =
-        styleBuilder ?? this.styleBuilder.copyWith(parent: p?.styleBuilder);
+    final copiedParent = parent ?? this.parent;
+    final sb = styleBuilder ??
+        this.styleBuilder.copyWith(parent: copiedParent.styleBuilder);
     final copied = CoreBuildTree._(
       customStylesBuilder: customStylesBuilder,
       customWidgetBuilder: customWidgetBuilder,
       element: element ?? this.element,
-      parent: p,
-      parentOps:
-          p is CoreBuildTree ? _prepareParentOps(p._parentOps, p) : const [],
+      parent: copiedParent,
+      parentOps: copiedParent is CoreBuildTree
+          ? _prepareParentOps(copiedParent._parentOps, copiedParent)
+          : const [],
       styleBuilder: sb,
       wf: wf,
     );
