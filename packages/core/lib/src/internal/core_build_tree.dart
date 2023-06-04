@@ -14,34 +14,51 @@ import 'flattener.dart';
 
 // https://infra.spec.whatwg.org/#ascii-whitespace
 const _asciiWhitespace = r'[\u{0009}\u{000A}\u{000C}\u{000D}\u{0020}]';
-final _logger = Logger('fwfh.Builder');
 final _regExpSpaceLeading = RegExp('^$_asciiWhitespace+', unicode: true);
 final _regExpSpaceTrailing = RegExp('$_asciiWhitespace+\$', unicode: true);
 final _regExpSpaces = RegExp('$_asciiWhitespace+', unicode: true);
 
-class Builder extends BuildTree {
+final _logger = Logger('fwfh.Builder');
+final _rootElement = dom.Element.tag('root');
+
+class CoreBuildTree extends BuildTree {
   final CustomStylesBuilder? customStylesBuilder;
   final CustomWidgetBuilder? customWidgetBuilder;
-  final Iterable<BuilderOp> parentOps;
   final WidgetFactory wf;
 
-  final _buildOps = SplayTreeSet<BuilderOp>(BuilderOp._compare);
+  final _buildOps = SplayTreeSet<_CoreBuildOp>(_CoreBuildOp._compare);
   final _isInlines = <bool>[];
+  final Iterable<_CoreBuildOp> _parentOps;
   final _styles = <css.Declaration>[];
 
-  Builder({
-    required this.customStylesBuilder,
-    required this.customWidgetBuilder,
+  CoreBuildTree._({
+    this.customStylesBuilder,
+    this.customWidgetBuilder,
     required dom.Element element,
     BuildTree? parent,
-    this.parentOps = const [],
+    Iterable<_CoreBuildOp> parentOps = const [],
     required HtmlStyleBuilder styleBuilder,
     required this.wf,
-  }) : super(
+  })  : _parentOps = parentOps,
+        super(
           element: element,
           parent: parent,
           styleBuilder: styleBuilder,
         );
+
+  factory CoreBuildTree.root({
+    CustomStylesBuilder? customStylesBuilder,
+    CustomWidgetBuilder? customWidgetBuilder,
+    required HtmlStyleBuilder styleBuilder,
+    required WidgetFactory wf,
+  }) =>
+      CoreBuildTree._(
+        customStylesBuilder: customStylesBuilder,
+        customWidgetBuilder: customWidgetBuilder,
+        element: _rootElement,
+        styleBuilder: styleBuilder,
+        wf: wf,
+      );
 
   @override
   bool? get isInline => _isInlines.isEmpty ? null : _isInlines.last;
@@ -86,7 +103,7 @@ class Builder extends BuildTree {
   }
 
   @override
-  Builder copyWith({
+  CoreBuildTree copyWith({
     bool copyContents = true,
     dom.Element? element,
     BuildTree? parent,
@@ -95,12 +112,13 @@ class Builder extends BuildTree {
     final p = parent ?? this.parent;
     final sb =
         styleBuilder ?? this.styleBuilder.copyWith(parent: p?.styleBuilder);
-    final copied = Builder(
+    final copied = CoreBuildTree._(
       customStylesBuilder: customStylesBuilder,
       customWidgetBuilder: customWidgetBuilder,
       element: element ?? this.element,
       parent: p,
-      parentOps: p is Builder ? _prepareParentOps(p.parentOps, p) : const [],
+      parentOps:
+          p is CoreBuildTree ? _prepareParentOps(p._parentOps, p) : const [],
       styleBuilder: sb,
       wf: wf,
     );
@@ -144,7 +162,7 @@ class Builder extends BuildTree {
 
   @override
   void register(BuildOp op) {
-    _buildOps.add(BuilderOp._(this, op));
+    _buildOps.add(_CoreBuildOp(this, op));
     _logger.finest(
       'Registered ${op.debugLabel ?? 'a build op'} '
       'for ${element.localName?.toUpperCase()} tag',
@@ -152,7 +170,7 @@ class Builder extends BuildTree {
   }
 
   @override
-  Builder sub({dom.Element? element}) => copyWith(
+  CoreBuildTree sub({dom.Element? element}) => copyWith(
         copyContents: false,
         element: element,
         parent: this,
@@ -262,7 +280,7 @@ class Builder extends BuildTree {
   void _parseEverything() {
     wf.parse(this);
 
-    for (final op in parentOps) {
+    for (final op in _parentOps) {
       op.onChild(this);
     }
 
@@ -288,12 +306,28 @@ class Builder extends BuildTree {
   }
 }
 
-@immutable
-class BuilderOp {
-  final BuildOp op;
-  final Builder tree;
+bool _mustBeBlock(_CoreBuildOp op) =>
+    op.op.mustBeBlock ?? op.op.onRenderBlock != null;
 
-  const BuilderOp._(this.tree, this.op);
+Iterable<_CoreBuildOp> _prepareParentOps(
+  Iterable<_CoreBuildOp> ops,
+  CoreBuildTree builder,
+) {
+  // try to reuse existing list if possible
+  final newOps = builder._buildOps
+      .where((op) => op.op.onChild != null)
+      .toList(growable: false);
+  return newOps.isNotEmpty == true
+      ? List.unmodifiable([...ops, ...newOps])
+      : ops;
+}
+
+@immutable
+class _CoreBuildOp {
+  final BuildOp op;
+  final CoreBuildTree tree;
+
+  const _CoreBuildOp(this.tree, this.op);
 
   List<css.Declaration>? get defaultStyles {
     final map = op.defaultStyles?.call(tree);
@@ -318,7 +352,7 @@ class BuilderOp {
   void onRenderedBlock(WidgetPlaceholder placeholder) =>
       op.onRenderedBlock?.call(tree, placeholder);
 
-  static int _compare(BuilderOp a0, BuilderOp b0) {
+  static int _compare(_CoreBuildOp a0, _CoreBuildOp b0) {
     final a = a0.op;
     final b = b0.op;
     if (identical(a, b)) {
@@ -335,22 +369,6 @@ class BuilderOp {
       return cmp;
     }
   }
-}
-
-bool _mustBeBlock(BuilderOp op) =>
-    op.op.mustBeBlock ?? op.op.onRenderBlock != null;
-
-Iterable<BuilderOp> _prepareParentOps(
-  Iterable<BuilderOp> ops,
-  Builder builder,
-) {
-  // try to reuse existing list if possible
-  final newOps = builder._buildOps
-      .where((op) => op.op.onChild != null)
-      .toList(growable: false);
-  return newOps.isNotEmpty == true
-      ? List.unmodifiable([...ops, ...newOps])
-      : ops;
 }
 
 class _WidgetPlaceholderDefault extends StatelessWidget

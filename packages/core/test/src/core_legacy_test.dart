@@ -10,7 +10,7 @@ import 'package:logging/logging.dart';
 import '../_.dart';
 
 void main() {
-  group('BuildOp.new (legacy)', () {
+  group('BuildOp.new', () {
     group('defaultStyles', () {
       testWidgets('renders inline style normally', (tester) async {
         const html = '<span style="color: #f00; color: #0f0;">Foo</span>';
@@ -363,6 +363,20 @@ void main() {
       });
     });
   });
+
+  group('WidgetFactory', () {
+    group('gestureTapCallback', () {
+      test('calls onTapUrl', () {
+        final wf = _WidgetFactoryGestureTapCallback();
+        const url = 'https://domain.com';
+
+        final onTap = wf.gestureTapCallback(url);
+
+        onTap?.call();
+        expect(wf.urls, equals([url]));
+      });
+    });
+  });
 }
 
 class _BuildOpDefaultStyles extends WidgetFactory {
@@ -484,4 +498,14 @@ class _LoggerAppState extends State<_LoggerApp> {
   }
 
   void _onLogRecord(LogRecord record) => widget.records.add(record);
+}
+
+class _WidgetFactoryGestureTapCallback extends WidgetFactory {
+  final urls = <String>[];
+
+  @override
+  Future<bool> onTapUrl(String url) async {
+    urls.add(url);
+    return true;
+  }
 }

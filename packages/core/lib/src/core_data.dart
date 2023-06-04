@@ -5,6 +5,7 @@ import 'package:fwfh_text_style/fwfh_text_style.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'core_helpers.dart';
+import 'core_legacy.dart';
 import 'core_widget_factory.dart';
 
 part 'data/build_bits.dart';

@@ -400,10 +400,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     _recognizersNeedDisposing.clear();
   }
 
-  /// Prepares [GestureTapCallback].
-  @Deprecated('Use .onTapUrl instead.')
-  GestureTapCallback? gestureTapCallback(String url) => () => onTapUrl(url);
-
   /// Returns [context]-based dependencies.
   ///
   /// Includes these by default:

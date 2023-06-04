@@ -7,7 +7,7 @@ import '../core_widget_factory.dart';
 
 /// An extension on [dom.Element].
 extension DomElementExtension on dom.Element {
-  static final _expando = Expando<List<css.Declaration>>();
+  static Expando<List<css.Declaration>>? _expando;
 
   /// Returns CSS declarations from the element's `style` attribute.
   ///
@@ -17,17 +17,18 @@ extension DomElementExtension on dom.Element {
   /// Parsing CSS is a non-trivial task but the result is cached
   /// so it's safe to call this again and again.
   List<css.Declaration> get styles {
-    final existing = _expando[this];
+    final expando = _expando ??= Expando();
+    final existing = expando[this];
     if (existing != null) {
       return existing;
     }
 
     if (!attributes.containsKey('style')) {
-      return _expando[this] = const [];
+      return expando[this] = const [];
     }
 
     final styleSheet = css.parse('*{${attributes['style']}}');
-    return _expando[this] = styleSheet.collectDeclarations();
+    return expando[this] = styleSheet.collectDeclarations();
   }
 }
 
@@ -39,19 +40,20 @@ extension CssAngleTermExtension on css.AngleTerm {
 
 /// An extension on [css.Declaration].
 extension CssDeclarationExtension on css.Declaration {
-  static final _expando = Expando<List<css.Expression>>();
+  static Expando<List<css.Expression>>? _expando;
 
   /// Returns CSS expressions.
   ///
   /// Collecting expressions is a non-trivial task but the result is cached
   /// so it's safe to call this again and again.
   List<css.Expression> get values {
-    final existing = _expando[this];
+    final expando = _expando ??= Expando();
+    final existing = expando[this];
     if (existing != null) {
       return existing;
     }
 
-    return _expando[this] = _ExpressionsCollector.collect(this);
+    return expando[this] = _ExpressionsCollector.collect(this);
   }
 
   /// Returns the CSS expression.
@@ -71,19 +73,20 @@ extension CssDeclarationExtension on css.Declaration {
 
 /// An extension on [css.FunctionTerm].
 extension CssFunctionTermExtension on css.FunctionTerm {
-  static final _expando = Expando<List<css.Expression>>();
+  static Expando<List<css.Expression>>? _expando;
 
   /// Returns function parameters.
   ///
   /// Collecting parameters is a non-trivial task but the result is cached
   /// so it's safe to call this again and again.
   List<css.Expression> get params {
-    final existing = _expando[this];
+    final expando = _expando ??= Expando();
+    final existing = expando[this];
     if (existing != null) {
       return existing;
     }
 
-    return _expando[this] = _ExpressionsCollector.collect(this)
+    return expando[this] = _ExpressionsCollector.collect(this)
         .where((e) => (e is! css.OperatorComma) && (e is! css.OperatorSlash))
         .toList(growable: false);
   }

@@ -1,9 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart' show WidgetTester, testWidgets;
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:flutter_widget_from_html_core/src/internal/builder.dart'
-    as builder;
-import 'package:html/dom.dart' as dom;
+import 'package:flutter_widget_from_html_core/src/internal/core_build_tree.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -382,10 +380,7 @@ String _data(BuildTree text) => text.bits
     )
     .join();
 
-BuildTree _text() => builder.Builder(
-      customStylesBuilder: null,
-      customWidgetBuilder: null,
-      element: dom.Element.tag('root'),
+BuildTree _text() => CoreBuildTree.root(
       styleBuilder: HtmlStyleBuilder(),
       wf: WidgetFactory(),
     );

@@ -10,7 +10,7 @@ import 'package:logging/logging.dart';
 import 'core_data.dart';
 import 'core_helpers.dart';
 import 'core_widget_factory.dart';
-import 'internal/builder.dart' as builder;
+import 'internal/core_build_tree.dart';
 import 'internal/html_style_widget.dart';
 
 final _logger = Logger('fwfh.HtmlWidget');
@@ -131,10 +131,9 @@ class HtmlWidgetState extends State<HtmlWidget> {
 
   bool get enableCaching => widget.enableCaching ?? !buildAsync;
 
-  builder.Builder get _rootBuilder => builder.Builder(
+  CoreBuildTree get _rootTree => CoreBuildTree.root(
         customStylesBuilder: widget.customStylesBuilder,
         customWidgetBuilder: widget.customWidgetBuilder,
-        element: _rootElement,
         styleBuilder: _rootStyleBuilder,
         wf: _wf,
       );
@@ -197,7 +196,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
             return _sliverToBoxAdapterIfNeeded(
               _wf.onErrorBuilder(
                     context,
-                    _rootBuilder,
+                    _rootTree,
                     snapshot.error,
                     snapshot.stackTrace,
                   ) ??
@@ -205,7 +204,7 @@ class HtmlWidgetState extends State<HtmlWidget> {
             );
           } else {
             return _sliverToBoxAdapterIfNeeded(
-              _wf.onLoadingBuilder(context, _rootBuilder) ?? widget0,
+              _wf.onLoadingBuilder(context, _rootTree) ?? widget0,
             );
           }
         },
@@ -244,8 +243,8 @@ class HtmlWidgetState extends State<HtmlWidget> {
       final domNodes = _parseHtml(widget.html);
       built = _buildBody(this, domNodes);
     } catch (error, stackTrace) {
-      built = _wf.onErrorBuilder(context, _rootBuilder, error, stackTrace) ??
-          widget0;
+      built =
+          _wf.onErrorBuilder(context, _rootTree, error, stackTrace) ?? widget0;
     }
 
     Timeline.finishSync();
@@ -261,8 +260,6 @@ class HtmlWidgetState extends State<HtmlWidget> {
   Widget _wrapper(Widget child) =>
       HtmlStyleWidget(style: _rootStyle, child: child);
 }
-
-final _rootElement = dom.Element.tag('root');
 
 class _RootStyleBuilder extends HtmlStyleBuilder {
   final HtmlWidgetState state;
@@ -290,10 +287,10 @@ Widget _buildBody(HtmlWidgetState state, dom.NodeList domNodes) {
   final wf = state._wf;
   wf.reset(state);
 
-  final rootBuilder = state._rootBuilder;
-  rootBuilder.addBitsFromNodes(domNodes);
+  final rootTree = state._rootTree;
+  rootTree.addBitsFromNodes(domNodes);
 
-  final built = rootBuilder.build()?.wrapWith(wf.buildBodyWidget) ?? widget0;
+  final built = rootTree.build()?.wrapWith(wf.buildBodyWidget) ?? widget0;
 
   _logger.fine('Built body successfuly.');
 

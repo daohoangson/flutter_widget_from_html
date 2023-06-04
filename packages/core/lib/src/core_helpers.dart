@@ -27,10 +27,6 @@ const kShouldBuildAsync = 10000;
 /// A no op widget.
 const widget0 = SizedBox.shrink();
 
-/// A tree of [BuildBit]s.
-@Deprecated('Use BuildTree instead.')
-typedef BuildMetadata = BuildTree;
-
 /// A callback to specify custom styling.
 ///
 /// The returned `Map` will be applied as inline styles.
@@ -192,10 +188,6 @@ Uint8List? bytesFromDataUri(String dataUri) {
 
   return bytes?.isNotEmpty == true ? bytes : null;
 }
-
-/// Returns [List<T>] if [x] is provided or `null` otherwise.
-@Deprecated('Use BuildOp.onRenderBlock instead.')
-Iterable<T>? listOrNull<T>(T? x) => x == null ? null : [x];
 
 /// Parses [key] from [map] as an double literal and return its value.
 double? tryParseDoubleFromMap(Map<dynamic, String> map, String key) {
