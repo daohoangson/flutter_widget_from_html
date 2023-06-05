@@ -8,7 +8,7 @@ class StyleBorder {
   StyleBorder(this.wf);
 
   BuildOp get buildOp => BuildOp.v1(
-        debugLabel: '$kCssBorder--block',
+        debugLabel: kCssBorder,
         mustBeBlock: false,
         onParsed: (tree) {
           final parent = tree.parent;

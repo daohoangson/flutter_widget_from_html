@@ -18,7 +18,7 @@ final _regExpSpaceLeading = RegExp('^$_asciiWhitespace+', unicode: true);
 final _regExpSpaceTrailing = RegExp('$_asciiWhitespace+\$', unicode: true);
 final _regExpSpaces = RegExp('$_asciiWhitespace+', unicode: true);
 
-final _logger = Logger('fwfh.Builder');
+final _logger = Logger('fwfh.CoreBuildTree');
 final _rootElement = dom.Element.tag('root');
 
 class CoreBuildTree extends BuildTree {
