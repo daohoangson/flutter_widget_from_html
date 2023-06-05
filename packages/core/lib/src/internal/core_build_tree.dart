@@ -206,7 +206,7 @@ class CoreBuildTree extends BuildTree {
       .._parseEverything()
       ..addBitsFromNodes(element.nodes);
 
-    final isBlock = subBuilder._buildOps.where(_mustBeBlock).isNotEmpty;
+    final isBlock = subBuilder._buildOps.where(_renderBlock).isNotEmpty;
     subBuilder._isInlines.add(!isBlock);
 
     BuildTree subTree = subBuilder;
@@ -314,9 +314,6 @@ class CoreBuildTree extends BuildTree {
   }
 }
 
-bool _mustBeBlock(_CoreBuildOp op) =>
-    op.op.mustBeBlock ?? op.op.onRenderBlock != null;
-
 Iterable<_CoreBuildOp> _prepareParentOps(
   Iterable<_CoreBuildOp> ops,
   CoreBuildTree builder,
@@ -329,6 +326,9 @@ Iterable<_CoreBuildOp> _prepareParentOps(
       ? List.unmodifiable([...ops, ...newOps])
       : ops;
 }
+
+bool _renderBlock(_CoreBuildOp op) =>
+    op.op.alwaysRenderBlock ?? op.op.onRenderBlock != null;
 
 @immutable
 class _CoreBuildOp {

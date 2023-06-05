@@ -16,8 +16,8 @@ const kTagCenter = 'center';
 
 extension StyleTextAlign on WidgetFactory {
   BuildOp get styleTextAlign => const BuildOp.v1(
+        alwaysRenderBlock: false,
         debugLabel: kCssTextAlign,
-        mustBeBlock: false,
         onParsed: _onParsed,
         onRenderBlock: _onRenderBlock,
         priority: Early.cssTextAlign,

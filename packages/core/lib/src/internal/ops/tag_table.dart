@@ -280,8 +280,8 @@ class TagTable {
       case kCssDisplayTableCaption:
         subTree.register(
           BuildOp.v1(
+            alwaysRenderBlock: true,
             debugLabel: kTagTableCaption,
-            mustBeBlock: true,
             onRenderedBlock: (_, block) => data.captions.add(block),
           ),
         );
@@ -343,8 +343,8 @@ class _TagTableRow {
       priority: Priority.tagTableRow,
     );
     _cellOp = BuildOp.v1(
+      alwaysRenderBlock: true,
       debugLabel: kTagTableCell,
-      mustBeBlock: true,
       onRenderedBlock: _onCellRenderedBlock,
     );
   }

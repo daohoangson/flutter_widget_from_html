@@ -12,8 +12,8 @@ class Anchor {
         registry = wf._registry;
 
   BuildOp get buildOp => BuildOp.v1(
+        alwaysRenderBlock: false,
         debugLabel: 'anchor#$id',
-        mustBeBlock: false,
         onParsed: (tree) {
           registry.register(id, anchor);
           return tree..addAnchor(anchor);

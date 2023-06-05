@@ -25,8 +25,8 @@ class StylePadding {
   StylePadding(this.wf);
 
   BuildOp get buildOp => BuildOp.v1(
+        alwaysRenderBlock: false,
         debugLabel: kCssPadding,
-        mustBeBlock: false,
         onRenderBlock: (tree, placeholder) {
           final padding = tryParseCssLengthBox(tree, kCssPadding);
           if (padding == null) {

@@ -9,8 +9,8 @@ class StyleBackground {
   StyleBackground(this.wf);
 
   BuildOp get buildOp => BuildOp.v1(
+        alwaysRenderBlock: false,
         debugLabel: kCssBackground,
-        mustBeBlock: false,
         onRenderBlock: (tree, placeholder) {
           final color = _parseColor(tree);
           if (color == null) {

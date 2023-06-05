@@ -16,9 +16,9 @@ class TagImg {
   TagImg(this.wf);
 
   BuildOp get buildOp => BuildOp.v1(
+        alwaysRenderBlock: false,
         debugLabel: kTagImg,
         defaultStyles: _defaultStyles,
-        mustBeBlock: false,
         onParsed: (tree) {
           final data = _parse(tree);
           final built = wf.buildImage(tree, data);

@@ -87,19 +87,19 @@ typedef OnRenderedBlock = void Function(BuildTree tree, Widget block);
 /// A building operation to customize how a DOM element is rendered.
 @immutable
 class BuildOp {
-  /// A human-readable description of this op.
-  final String? debugLabel;
-
-  /// {@macro flutter_widget_from_html.defaultStyles}
-  final DefaultStyles? defaultStyles;
-
   /// Controls whether the element must be rendered as a block.
   ///
   /// Default: `true` if [onRenderBlock] is set, `false` otherwise.
   ///
   /// If an element has multiple build ops and one of them require block rendering,
   /// it will be rendered as block.
-  final bool? mustBeBlock;
+  final bool? alwaysRenderBlock;
+
+  /// A human-readable description of this op.
+  final String? debugLabel;
+
+  /// {@macro flutter_widget_from_html.defaultStyles}
+  final DefaultStyles? defaultStyles;
 
   /// {@macro flutter_widget_from_html.onChild}
   final OnChild? onChild;
@@ -136,9 +136,9 @@ class BuildOp {
     int priority = 10,
   }) {
     return BuildOp.v1(
+      alwaysRenderBlock: onWidgetsIsOptional ? null : (onWidgets != null),
       defaultStyles:
           defaultStyles != null ? (tree) => defaultStyles(tree.element) : null,
-      mustBeBlock: onWidgetsIsOptional ? null : (onWidgets != null),
       onChild: onChild != null ? (_, subTree) => onChild(subTree) : null,
       onParsed: onTree != null
           ? (tree) {
@@ -172,9 +172,9 @@ class BuildOp {
 
   /// Creates a build op.
   const BuildOp.v1({
+    this.alwaysRenderBlock,
     this.debugLabel,
     this.defaultStyles,
-    this.mustBeBlock,
     this.onChild,
     this.onParsed,
     this.onRenderBlock,
