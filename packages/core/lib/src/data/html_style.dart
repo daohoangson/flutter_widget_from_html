@@ -55,12 +55,17 @@ class HtmlStyle {
     );
   }
 
+  /// The input [TextStyle].
+  @Deprecated('Use .textStyle instead.')
+  TextStyle get style => textStyle;
+
   /// Creates a copy with the given fields replaced with the new values.
   HtmlStyle copyWith({
     GestureRecognizer? gestureRecognizer,
     HtmlStyle? parent,
     TextAlign? textAlign,
     TextDirection? textDirection,
+    @Deprecated('Use .textStyle instead.') TextStyle? style,
     TextStyle? textStyle,
     CssWhitespace? whitespace,
   }) {
@@ -70,7 +75,7 @@ class HtmlStyle {
       parent: parent ?? this.parent,
       textAlign: textAlign ?? this.textAlign,
       textDirection: textDirection ?? this.textDirection,
-      textStyle: textStyle ?? this.textStyle,
+      textStyle: textStyle ?? style ?? this.textStyle,
       whitespace: whitespace ?? this.whitespace,
     );
   }

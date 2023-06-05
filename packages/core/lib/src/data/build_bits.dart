@@ -192,6 +192,13 @@ abstract class BuildTree extends BuildBit {
   /// - Attribute `style` of [dom.Element]
   Iterable<css.Declaration> get styles;
 
+  @Deprecated('Use BuildOp.defaultStyles instead.')
+  void operator []=(String key, String value);
+
+  /// Gets a styling declaration by [key].
+  @Deprecated('Use .getStyle instead.')
+  css.Declaration? operator [](String key) => getStyle(key);
+
   /// Enqueues an HTML styling callback.
   void apply<T>(
     HtmlStyle Function(HtmlStyle style, T input) callback,

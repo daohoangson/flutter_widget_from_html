@@ -73,6 +73,12 @@ class CoreBuildTree extends BuildTree {
   @override
   Iterable<css.Declaration> get styles => _styles;
 
+  @override
+  void operator []=(String key, String value) {
+    final styleSheet = css.parse('*{$key: $value;}');
+    _styles.addAll(styleSheet.collectDeclarations());
+  }
+
   void addBitsFromNodes(dom.NodeList domNodes) {
     for (final domNode in domNodes) {
       _addBitsFromNode(domNode);

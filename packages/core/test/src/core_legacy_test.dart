@@ -5,11 +5,58 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:flutter_widget_from_html_core/src/internal/core_parser.dart';
 import 'package:logging/logging.dart';
 
 import '../_.dart';
 
 void main() {
+  group('BuildMetadata', () {
+    testWidgets('SmilieScreen works', (tester) async {
+      const html = '<p>Hello <img class="smilie smilie-1" alt=":)" '
+          'src="http://domain.com/sprites.png" />!</p>';
+      final explained = await explain(
+        tester,
+        null,
+        hw: HtmlWidget(
+          html,
+          factoryBuilder: () => _BuildMetadataSmilies(),
+          key: hwKey,
+        ),
+      );
+      expect(explained, contains('Hello 🙂!'));
+    });
+
+    testWidgets('style operators work', (tester) async {
+      const html = '<span class="setter">Foo</span> '
+          '<span class="getter" style="-fwfh-font-size: 42px">bar</span>';
+      final explained = await explain(
+        tester,
+        null,
+        hw: HtmlWidget(
+          html,
+          factoryBuilder: () => _BuildMetadataStyleOperators(),
+          key: hwKey,
+        ),
+      );
+      expect(explained, equals('[RichText:(:(@42.0:Foo)(: )(@42.0:bar))]'));
+    });
+
+    testWidgets('tsb enqueues', (tester) async {
+      const html = '<span class="tsb-enqueue">Foo</span>';
+      final explained = await explain(
+        tester,
+        null,
+        hw: HtmlWidget(
+          html,
+          factoryBuilder: () => _BuildMetadataTsbEnqueue(),
+          key: hwKey,
+        ),
+      );
+      expect(explained, contains('#12345678'));
+    });
+  });
+
   group('BuildOp.new', () {
     group('defaultStyles', () {
       testWidgets('renders inline style normally', (tester) async {
@@ -377,6 +424,84 @@ void main() {
       });
     });
   });
+}
+
+class _BuildMetadataSmilies extends WidgetFactory {
+  /// Exact code from the demo app for v0.10
+  /// https://github.com/daohoangson/flutter_widget_from_html/blob/v0.10.0/demo_app/lib/screens/smilie.dart
+  static const kSmilies = {':)': '🙂'};
+
+  final smilieOp = BuildOp(
+    onTree: (meta, tree) {
+      final alt = meta.element.attributes['alt'];
+      tree.addText(kSmilies[alt] ?? alt ?? '');
+    },
+  );
+
+  @override
+  void parse(BuildMetadata meta) {
+    final e = meta.element;
+    if (e.localName == 'img' &&
+        e.classes.contains('smilie') &&
+        e.attributes.containsKey('alt')) {
+      meta.register(smilieOp);
+      return;
+    }
+
+    return super.parse(meta);
+  }
+}
+
+class _BuildMetadataStyleOperators extends WidgetFactory {
+  @override
+  void parse(BuildMetadata meta) {
+    if (meta.element.classes.contains('setter')) {
+      meta['font-size'] = '42px';
+    }
+
+    if (meta.element.classes.contains('getter')) {
+      meta.register(
+        BuildOp(
+          onTree: (meta, tree) {
+            final value = meta['-fwfh-font-size']?.value;
+            meta.tsb.enqueue(
+              (p, _) {
+                final length = value != null ? tryParseCssLength(value) : null;
+                final fontSize = length?.getValue(p);
+                return p.copyWith(style: p.style.copyWith(fontSize: fontSize));
+              },
+              null,
+            );
+          },
+        ),
+      );
+    }
+
+    return super.parse(meta);
+  }
+}
+
+class _BuildMetadataTsbEnqueue extends WidgetFactory {
+  @override
+  void parse(BuildMetadata meta) {
+    if (meta.element.classes.contains('tsb-enqueue')) {
+      meta.register(
+        BuildOp(
+          onTreeFlattening: (meta, tree) {
+            /// Similar code in background color styling for v0.10
+            /// https://github.com/daohoangson/flutter_widget_from_html/blob/v0.10.0/packages/core/lib/src/internal/ops/style_bg_color.dart
+            meta.tsb.enqueue(_backgroundColor, const Color(0x12345678));
+          },
+        ),
+      );
+      return;
+    }
+
+    return super.parse(meta);
+  }
+
+  static TextStyleHtml _backgroundColor(TextStyleHtml p, Color c) =>
+      p.copyWith(style: p.style.copyWith(background: Paint()..color = c));
 }
 
 class _BuildOpDefaultStyles extends WidgetFactory {
