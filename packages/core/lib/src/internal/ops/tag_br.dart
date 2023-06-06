@@ -2,16 +2,21 @@ part of '../core_ops.dart';
 
 const kTagBr = 'br';
 
-class TagBr {
-  BuildOp get buildOp => BuildOp(
+extension TagBr on WidgetFactory {
+  BuildOp get tagBr => const BuildOp.v1(
         debugLabel: kTagBr,
-        onParsed: (tree) => tree..append(TagBrBit(tree)),
+        onParsed: _onParsed,
         priority: Priority.tagBr,
       );
+
+  static BuildTree _onParsed(BuildTree tree) => tree..append(TagBrBit(tree));
 }
 
 class TagBrBit extends BuildBit {
-  const TagBrBit(BuildTree? parent) : super(parent);
+  @override
+  final BuildTree parent;
+
+  const TagBrBit(this.parent);
 
   @override
   bool? get swallowWhitespace => true;

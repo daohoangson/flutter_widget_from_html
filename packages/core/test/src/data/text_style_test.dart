@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 void main() {
   group('HtmlStyle', () {
-    group('getDependency', () {
+    group('value', () {
       final dep1 = _Dep1();
       final style = HtmlStyle.root(
         [
@@ -16,13 +16,19 @@ void main() {
         null,
       );
 
+      test('returns value', () {
+        final dep = style.value<_Dep1>();
+        expect(dep, equals(dep1));
+      });
+
       test('returns dependency', () {
+        // ignore: deprecated_member_use_from_same_package
         final dep = style.getDependency<_Dep1>();
         expect(dep, equals(dep1));
       });
 
-      test('throws exception', () {
-        expect(() => style.getDependency<_Dep2>(), throwsA(isA<StateError>()));
+      test('returns null', () {
+        expect(style.value<_Dep2>(), isNull);
       });
     });
   });

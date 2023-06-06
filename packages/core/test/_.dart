@@ -566,8 +566,21 @@ class Explainer {
       return '[widget0]';
     }
 
+    if (widget is HtmlDetails) {
+      return '[HtmlDetails:open=${widget.open},child=${_widget(widget.child)}]';
+    }
+
+    if (widget is HtmlDetailsContents) {
+      return '[HtmlDetailsContents:child=${_widget(widget.child)}]';
+    }
+
     if (widget is HtmlListMarker) {
       return _htmlListMarker(widget);
+    }
+
+    if (widget is HtmlSummary) {
+      final child = widget.child;
+      return '[HtmlSummary:child=${child != null ? _widget(child) : null}]';
     }
 
     if (widget.runtimeType.toString() == 'HtmlStyleWidget' &&

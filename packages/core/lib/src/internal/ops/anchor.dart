@@ -11,9 +11,9 @@ class Anchor {
       : anchor = GlobalKey(debugLabel: id),
         registry = wf._registry;
 
-  BuildOp get buildOp => BuildOp(
+  BuildOp get buildOp => BuildOp.v1(
+        alwaysRenderBlock: false,
         debugLabel: 'anchor#$id',
-        mustBeBlock: false,
         onParsed: (tree) {
           registry.register(id, anchor);
           return tree..addAnchor(anchor);
@@ -306,7 +306,9 @@ extension on BuildTree {
     final keys = anchors ?? (value(_BuildTreeAnchors())!.keys);
     keys.add(anchor);
 
-    parent?.addAnchor(anchor);
+    if (hasParent) {
+      parent.addAnchor(anchor);
+    }
   }
 }
 

@@ -1,10 +1,10 @@
 import 'package:csslib/visitor.dart' as css;
-import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fwfh_text_style/fwfh_text_style.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'core_helpers.dart';
+import 'core_legacy.dart';
 import 'core_widget_factory.dart';
 
 part 'data/build_bits.dart';
@@ -22,7 +22,7 @@ typedef StylesMap = Map<String, String>;
 /// below just changes the color:
 ///
 /// ```dart
-/// BuildOp(
+/// BuildOp.v1(
 ///   defaultStyles: (_) => {'color': 'red'},
 /// )
 /// ```
@@ -39,7 +39,7 @@ typedef DefaultStyles = StylesMap Function(BuildTree tree);
 /// it's easy to check whether an element is direct child:
 ///
 /// ```dart
-/// BuildOp(
+/// BuildOp.v1(
 ///   onChild: (tree, subTree) {
 ///     if (!subTree.element.parent != tree.element) return;
 ///     subTree.doSomething();
@@ -86,19 +86,19 @@ typedef OnRenderedBlock = void Function(BuildTree tree, Widget block);
 /// A building operation to customize how a DOM element is rendered.
 @immutable
 class BuildOp {
-  /// A human-readable description of this op.
-  final String? debugLabel;
-
-  /// {@macro flutter_widget_from_html.defaultStyles}
-  final DefaultStyles? defaultStyles;
-
   /// Controls whether the element must be rendered as a block.
   ///
   /// Default: `true` if [onRenderBlock] is set, `false` otherwise.
   ///
   /// If an element has multiple build ops and one of them require block rendering,
   /// it will be rendered as block.
-  final bool? mustBeBlock;
+  final bool? alwaysRenderBlock;
+
+  /// A human-readable description of this op.
+  final String? debugLabel;
+
+  /// {@macro flutter_widget_from_html.defaultStyles}
+  final DefaultStyles? defaultStyles;
 
   /// {@macro flutter_widget_from_html.onChild}
   final OnChild? onChild;
@@ -120,11 +120,60 @@ class BuildOp {
   /// Default: 10.
   final int priority;
 
+  /// Creates a legacy build op.
+  @Deprecated('Use BuildOp.v1 instead.')
+  factory BuildOp({
+    Map<String, String> Function(dom.Element element)? defaultStyles,
+    void Function(BuildMetadata subTree)? onChild,
+    void Function(BuildMetadata meta, BuildTree tree)? onTree,
+    void Function(BuildMetadata meta, BuildTree tree)? onTreeFlattening,
+    Iterable<Widget>? Function(
+      BuildTree tree,
+      Iterable<WidgetPlaceholder> children,
+    )? onWidgets,
+    bool onWidgetsIsOptional = false,
+    int priority = 10,
+  }) {
+    return BuildOp.v1(
+      alwaysRenderBlock: onWidgetsIsOptional ? null : (onWidgets != null),
+      defaultStyles:
+          defaultStyles != null ? (tree) => defaultStyles(tree.element) : null,
+      onChild: onChild != null ? (_, subTree) => onChild(subTree) : null,
+      onParsed: onTree != null
+          ? (tree) {
+              onTree(tree, tree);
+              return tree;
+            }
+          : null,
+      onRenderBlock: onWidgets != null
+          ? (tree, placeholder) {
+              final children = onWidgets(tree, [placeholder]);
+              switch (children?.length) {
+                case null:
+                  return placeholder;
+                case 0:
+                  return widget0;
+                case 1:
+                  return children?.first ?? widget0;
+                default:
+                  throw UnsupportedError(
+                    'onWidgets must return exactly 1 widget, got ${children?.length}',
+                  );
+              }
+            }
+          : null,
+      onRenderInline: onTreeFlattening != null
+          ? (tree) => onTreeFlattening(tree, tree)
+          : null,
+      priority: priority,
+    );
+  }
+
   /// Creates a build op.
-  const BuildOp({
+  const BuildOp.v1({
+    this.alwaysRenderBlock,
     this.debugLabel,
     this.defaultStyles,
-    this.mustBeBlock,
     this.onChild,
     this.onParsed,
     this.onRenderBlock,

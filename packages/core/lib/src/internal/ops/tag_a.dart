@@ -9,11 +9,9 @@ class TagA {
 
   TagA(this.wf);
 
-  BuildOp get buildOp => BuildOp(
+  BuildOp get buildOp => BuildOp.v1(
         debugLabel: 'a[href]',
-        defaultStyles: (_) => const {
-          kCssTextDecoration: kCssTextDecorationUnderline,
-        },
+        defaultStyles: _defaultStyles,
         onParsed: (tree) {
           final href = tree.element.attributes[kAttributeAHref];
           if (href == null) {
@@ -34,13 +32,25 @@ class TagA {
         priority: Priority.tagA,
       );
 
-  static HtmlStyle defaultColor(HtmlStyle style, void _) => style.copyWith(
+  static HtmlStyle defaultColor(HtmlStyle style, BuildContext? context) =>
+      style.copyWith(
         textStyle: style.textStyle.copyWith(
-          color: style.getDependency<ThemeData>().colorScheme.primary,
+          color: Theme.of(context!).colorScheme.primary,
           debugLabel: 'fwfh: a[href] default color',
         ),
       );
 
+  static StylesMap _defaultStyles(BuildTree _) {
+    return const {
+      kCssTextDecoration: kCssTextDecorationUnderline,
+    };
+  }
+
   static HtmlStyle _builder(HtmlStyle style, GestureRecognizer value) =>
-      style.copyWith(gestureRecognizer: value);
+      style.copyWith<GestureRecognizer>(value: value);
+}
+
+extension GestureRecognizerGetter on HtmlStyle {
+  /// The [GestureRecognizer] for inline spans.
+  GestureRecognizer? get gestureRecognizer => value();
 }

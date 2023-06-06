@@ -29,33 +29,9 @@ class TagLi {
 
   TagLi(this.wf);
 
-  BuildOp get buildOp => BuildOp(
+  BuildOp get buildOp => BuildOp.v1(
         debugLabel: kTagUnorderedList,
-        defaultStyles: (tree) {
-          final attrs = tree.element.attributes;
-          final depth = tree.listData.depth;
-
-          final styles = {
-            kCssDisplay: kCssDisplayBlock,
-            kCssListStyleType: tree.element.localName == kTagOrderedList
-                ? _listStyleTypeFromAttributeType(
-                      attrs[kAttributeLiType] ?? '',
-                    ) ??
-                    kCssListStyleTypeDecimal
-                : depth == 0
-                    ? kCssListStyleTypeDisc
-                    : depth == 1
-                        ? kCssListStyleTypeCircle
-                        : kCssListStyleTypeSquare,
-            '$kCssPadding$kSuffixInlineStart': '40px',
-          };
-
-          if (depth == 0) {
-            styles[kCssMargin] = '1em 0';
-          }
-
-          return styles;
-        },
+        defaultStyles: _defaultStyles,
         onChild: (listTree, subTree) {
           final element = subTree.element;
 
@@ -67,7 +43,7 @@ class TagLi {
             case kTagLi:
               if (element.parent == listTree.element) {
                 subTree.register(
-                  BuildOp(
+                  BuildOp.v1(
                     debugLabel: kTagLi,
                     onRenderBlock: (itemTree, placeholder) {
                       final i = listTree.increaseListItems() - 1;
@@ -112,6 +88,25 @@ class TagLi {
       textDirection: style.textDirection,
       child: child,
     );
+  }
+
+  static StylesMap _defaultStyles(BuildTree tree) {
+    final attrs = tree.element.attributes;
+    final depth = tree.listData.depth;
+    final listStyleType = tree.element.localName == kTagOrderedList
+        ? (_listStyleTypeFromAttributeType(attrs[kAttributeLiType] ?? '') ??
+            kCssListStyleTypeDecimal)
+        : depth == 0
+            ? kCssListStyleTypeDisc
+            : depth == 1
+                ? kCssListStyleTypeCircle
+                : kCssListStyleTypeSquare;
+    return {
+      kCssDisplay: kCssDisplayBlock,
+      kCssListStyleType: listStyleType,
+      '$kCssPadding$kSuffixInlineStart': '40px',
+      if (depth == 0) kCssMargin: '1em 0',
+    };
   }
 }
 

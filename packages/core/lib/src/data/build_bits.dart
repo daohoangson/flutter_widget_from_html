@@ -3,11 +3,13 @@ part of '../core_data.dart';
 /// A piece of HTML being built.
 @immutable
 abstract class BuildBit {
-  /// The container tree.
-  final BuildTree? parent;
-
   /// Creates a build bit.
-  const BuildBit(this.parent);
+  const BuildBit();
+
+  /// Returns `true` if this build bit has a parent.
+  ///
+  /// This normally only returns `false` if it is the root tree.
+  bool get hasParent => true;
 
   /// Controls whether to render inline.
   ///
@@ -22,10 +24,10 @@ abstract class BuildBit {
     BuildBit? x = this;
 
     while (x != null) {
-      final siblings = x.parent?._children;
-      if (siblings == null) {
+      if (!x.hasParent) {
         return null;
       }
+      final siblings = x.parent._children;
       final i = siblings.indexOf(x);
       if (i == -1) {
         return null;
@@ -49,6 +51,9 @@ abstract class BuildBit {
     return null;
   }
 
+  /// The container tree.
+  BuildTree get parent;
+
   /// The previous bit in the tree.
   ///
   /// Note: the previous bit may not have the same parent or grandparent,
@@ -57,10 +62,10 @@ abstract class BuildBit {
     BuildBit? x = this;
 
     while (x != null) {
-      final siblings = x.parent?._children;
-      if (siblings == null) {
+      if (!x.hasParent) {
         return null;
       }
+      final siblings = x.parent._children;
       final i = siblings.indexOf(x);
       if (i == -1) {
         return null;
@@ -122,9 +127,8 @@ abstract class BuildTree extends BuildBit {
   /// Creates a tree.
   BuildTree({
     required this.element,
-    BuildTree? parent,
     required this.styleBuilder,
-  }) : super(parent);
+  });
 
   /// The list of bits including direct children and sub-tree's.
   Iterable<BuildBit> get bits sync* {
@@ -188,7 +192,15 @@ abstract class BuildTree extends BuildBit {
   /// - Attribute `style` of [dom.Element]
   Iterable<css.Declaration> get styles;
 
-  /// Enqueues an HTML styling callback.
+  /// Adds an inline style.
+  @Deprecated('Use BuildOp.defaultStyles instead.')
+  void operator []=(String key, String value);
+
+  /// Gets a styling declaration by [key].
+  @Deprecated('Use .getStyle instead.')
+  css.Declaration? operator [](String key) => getStyle(key);
+
+  /// {@macro flutter_widget_from_html.enqueue}
   void apply<T>(
     HtmlStyle Function(HtmlStyle style, T input) callback,
     T input,
@@ -258,6 +270,9 @@ abstract class BuildTree extends BuildBit {
     return str;
   }
 
+  /// Gets or sets value of type [T].
+  ///
+  /// These values are not passed down to sub-trees.
   T? value<T>([T? newValue]) {
     if (newValue == null) {
       // read mode
@@ -284,14 +299,18 @@ abstract class BuildTree extends BuildBit {
 
 /// A simple text bit.
 class TextBit extends BuildBit {
+  // The text data.
   final String data;
 
+  @override
+  final BuildTree parent;
+
   /// Creates with string.
-  const TextBit(BuildTree parent, this.data) : super(parent);
+  const TextBit(this.parent, this.data);
 
   @override
   BuildBit copyWith({BuildTree? parent}) =>
-      TextBit(parent ?? this.parent!, data);
+      TextBit(parent ?? this.parent, data);
 
   @override
   void flatten(Flattened f) => f.write(text: data);
@@ -305,7 +324,10 @@ abstract class WidgetBit<T> extends BuildBit {
   /// The widget to be rendered.
   final WidgetPlaceholder child;
 
-  const WidgetBit._(BuildTree parent, this.child) : super(parent);
+  @override
+  final BuildTree parent;
+
+  const WidgetBit._(this.parent, this.child);
 
   /// Creates a block widget.
   static WidgetBit<Widget> block(BuildTree parent, Widget child) =>
@@ -344,7 +366,7 @@ class _WidgetBitBlock extends WidgetBit<Widget> {
 
   @override
   BuildBit copyWith({BuildTree? parent}) =>
-      _WidgetBitBlock(parent ?? this.parent!, child);
+      _WidgetBitBlock(parent ?? this.parent, child);
 
   @override
   void flatten(Flattened f) => f.widget(child);
@@ -366,7 +388,7 @@ class _WidgetBitInline extends WidgetBit<InlineSpan> {
 
   @override
   BuildBit copyWith({BuildTree? parent}) =>
-      _WidgetBitInline(parent ?? this.parent!, child, alignment, baseline);
+      _WidgetBitInline(parent ?? this.parent, child, alignment, baseline);
 
   @override
   void flatten(Flattened f) => f.inlineWidget(
@@ -381,17 +403,21 @@ class _WidgetBitInline extends WidgetBit<InlineSpan> {
 
 /// A whitespace bit.
 class WhitespaceBit extends BuildBit {
+  /// The whitespace data.
   final String data;
 
+  @override
+  final BuildTree parent;
+
   /// Creates a whitespace.
-  const WhitespaceBit(BuildTree parent, this.data) : super(parent);
+  const WhitespaceBit(this.parent, this.data);
 
   @override
   bool get swallowWhitespace => true;
 
   @override
   BuildBit copyWith({BuildTree? parent}) =>
-      WhitespaceBit(parent ?? this.parent!, data);
+      WhitespaceBit(parent ?? this.parent, data);
 
   @override
   void flatten(Flattened f) => f.write(whitespace: data);

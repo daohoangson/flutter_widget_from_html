@@ -1,9 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart' show WidgetTester, testWidgets;
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:flutter_widget_from_html_core/src/internal/builder.dart'
-    as builder;
-import 'package:html/dom.dart' as dom;
+import 'package:flutter_widget_from_html_core/src/internal/core_build_tree.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -305,7 +303,7 @@ class _BuildBitWidgetFactory extends WidgetFactory {
 
     if (classes.contains('output--String')) {
       tree.register(
-        BuildOp(
+        BuildOp.v1(
           onParsed: (tree) => tree..append(_OutputStringBit(tree)),
         ),
       );
@@ -313,7 +311,7 @@ class _BuildBitWidgetFactory extends WidgetFactory {
 
     if (classes.contains('output--Widget')) {
       tree.register(
-        BuildOp(onParsed: (tree) => tree..append(_OutputWidgetBit(tree))),
+        BuildOp.v1(onParsed: (tree) => tree..append(_OutputWidgetBit(tree))),
       );
     }
 
@@ -336,7 +334,10 @@ class _CircularBit extends Mock implements BuildTree {
 }
 
 class _CustomBit extends BuildBit {
-  const _CustomBit(BuildTree? parent) : super(parent);
+  @override
+  final BuildTree parent;
+
+  const _CustomBit(this.parent);
 
   @override
   void flatten(Flattened _) => throw UnimplementedError();
@@ -347,7 +348,10 @@ class _CustomBit extends BuildBit {
 }
 
 class _OutputStringBit extends BuildBit {
-  const _OutputStringBit(BuildTree? parent) : super(parent);
+  @override
+  final BuildTree parent;
+
+  const _OutputStringBit(this.parent);
 
   @override
   void flatten(Flattened f) => f.write(text: 'foo');
@@ -358,7 +362,10 @@ class _OutputStringBit extends BuildBit {
 }
 
 class _OutputWidgetBit extends BuildBit {
-  const _OutputWidgetBit(BuildTree? parent) : super(parent);
+  @override
+  final BuildTree parent;
+
+  const _OutputWidgetBit(this.parent);
 
   @override
   bool? get isInline => false;
@@ -382,10 +389,7 @@ String _data(BuildTree text) => text.bits
     )
     .join();
 
-BuildTree _text() => builder.Builder(
-      customStylesBuilder: null,
-      customWidgetBuilder: null,
-      element: dom.Element.tag('root'),
+BuildTree _text() => CoreBuildTree.root(
       styleBuilder: HtmlStyleBuilder(),
       wf: WidgetFactory(),
     );

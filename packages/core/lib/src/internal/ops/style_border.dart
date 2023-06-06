@@ -7,12 +7,12 @@ class StyleBorder {
 
   StyleBorder(this.wf);
 
-  BuildOp get buildOp => BuildOp(
-        debugLabel: '$kCssBorder--block',
-        mustBeBlock: false,
+  BuildOp get buildOp => BuildOp.v1(
+        alwaysRenderBlock: false,
+        debugLabel: kCssBorder,
         onParsed: (tree) {
           final parent = tree.parent;
-          if (tree.isInline != true || parent == null) {
+          if (tree.isInline != true) {
             return tree;
           }
 

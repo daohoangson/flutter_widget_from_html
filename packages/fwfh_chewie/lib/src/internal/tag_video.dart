@@ -20,7 +20,7 @@ class TagVideo {
 
   TagVideo(this.wf);
 
-  BuildOp get buildOp => BuildOp(
+  BuildOp get buildOp => BuildOp.v1(
         debugLabel: kTagVideo,
         onChild: (tree, subTree) {
           final e = subTree.element;

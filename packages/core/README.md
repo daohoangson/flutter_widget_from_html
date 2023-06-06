@@ -17,7 +17,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html_core: ^0.12.0-0
+  flutter_widget_from_html_core: ^0.13.0-0
 ```
 
 ## Usage
@@ -240,11 +240,11 @@ Notes:
   - Optionally, pass any object on enqueue and your callback will receive it as the second parameter.
 
 ```dart
-// example 1: simple callback setting accent color from theme
+// example 1: simple callback setting text color
 tree.apply(
   (style, _) => style.copyWith(
     textStyle: style.textStyle.copyWith(
-      color: style.getDependency<ThemeData>().accentColor,
+      color: Colors.red,
     ),
   ),
   null,
@@ -261,7 +261,7 @@ tree.apply(callback, TextAlign.justify);
 - Other complicated styling are supported via `BuildOp`
 
 ```dart
-tree.register(BuildOp(
+tree.register(BuildOp.v1(
   onParsed: (tree) {
     // can be used to change text, inline contents, etc.
     tree.append(...);
@@ -308,7 +308,7 @@ class SmilieScreen extends StatelessWidget {
 }
 
 class _SmiliesWidgetFactory extends WidgetFactory {
-  final smilieOp = BuildOp(
+  final smilieOp = BuildOp.v1(
     onParsed: (tree) {
       final alt = tree.element.attributes['alt'];
       tree.addText(kSmilies[alt] ?? alt);

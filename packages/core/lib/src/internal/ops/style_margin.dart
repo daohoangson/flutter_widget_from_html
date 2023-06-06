@@ -16,9 +16,9 @@ class StyleMargin {
 
   StyleMargin(this.wf);
 
-  BuildOp get buildOp => BuildOp(
+  BuildOp get buildOp => BuildOp.v1(
+        alwaysRenderBlock: false,
         debugLabel: kCssMargin,
-        mustBeBlock: false,
         onRenderBlock: (tree, placeholder) {
           final margin = tryParseCssLengthBox(tree, kCssMargin);
           if (margin == null) {

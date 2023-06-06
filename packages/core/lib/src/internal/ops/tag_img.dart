@@ -15,27 +15,10 @@ class TagImg {
 
   TagImg(this.wf);
 
-  BuildOp get buildOp => BuildOp(
+  BuildOp get buildOp => BuildOp.v1(
+        alwaysRenderBlock: false,
         debugLabel: kTagImg,
-        defaultStyles: (tree) {
-          final attrs = tree.element.attributes;
-          final styles = {
-            kCssHeight: 'auto',
-            kCssMinWidth: '0px',
-            kCssMinHeight: '0px',
-            kCssWidth: 'auto',
-          };
-
-          if (attrs.containsKey(kAttributeImgHeight)) {
-            styles[kCssHeight] = '${attrs[kAttributeImgHeight]}px';
-          }
-          if (attrs.containsKey(kAttributeImgWidth)) {
-            styles[kCssWidth] = '${attrs[kAttributeImgWidth]}px';
-          }
-
-          return styles;
-        },
-        mustBeBlock: false,
+        defaultStyles: _defaultStyles,
         onParsed: (tree) {
           final data = _parse(tree);
           final built = wf.buildImage(tree, data);
@@ -50,16 +33,8 @@ class TagImg {
           _builts[tree] = built;
           return tree;
         },
-        onRenderBlock: (tree, _) => _builts[tree] ?? _,
-        onRenderInline: (tree) {
-          final built = _builts[tree];
-          if (built == null) {
-            return;
-          }
-
-          const baseline = PlaceholderAlignment.baseline;
-          tree.append(WidgetBit.inline(tree, built, alignment: baseline));
-        },
+        onRenderBlock: _onRenderBlock,
+        onRenderInline: _onRenderInline,
         priority: Priority.tagImg,
       );
 
@@ -79,5 +54,32 @@ class TagImg {
           : const [],
       title: attrs[kAttributeImgTitle],
     );
+  }
+
+  static StylesMap _defaultStyles(BuildTree tree) {
+    final attrs = tree.element.attributes;
+    final height = attrs[kAttributeImgHeight];
+    final width = attrs[kAttributeImgWidth];
+    return {
+      kCssHeight: 'auto',
+      kCssMinWidth: '0px',
+      kCssMinHeight: '0px',
+      kCssWidth: 'auto',
+      if (height != null) kCssHeight: '${height}px',
+      if (width != null) kCssWidth: '${width}px',
+    };
+  }
+
+  static Widget _onRenderBlock(BuildTree tree, WidgetPlaceholder _) =>
+      _builts[tree] ?? _;
+
+  static void _onRenderInline(BuildTree tree) {
+    final built = _builts[tree];
+    if (built == null) {
+      return;
+    }
+
+    const baseline = PlaceholderAlignment.baseline;
+    tree.append(WidgetBit.inline(tree, built, alignment: baseline));
   }
 }

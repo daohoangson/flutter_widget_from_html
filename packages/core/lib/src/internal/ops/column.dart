@@ -128,6 +128,7 @@ class ColumnPlaceholder extends WidgetPlaceholder {
 extension on HtmlStyle {
   CrossAxisAlignment get columnCrossAxisAlignment {
     final isLtr = textDirection == TextDirection.ltr;
+    final TextAlign? textAlign = value();
     switch (textAlign ?? TextAlign.start) {
       case TextAlign.center:
         return CrossAxisAlignment.center;

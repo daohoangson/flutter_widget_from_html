@@ -6,7 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart'
     show
         // we want to limit Material usages to be as generic as possible
-        ThemeData;
+        Theme;
 import 'package:flutter/widgets.dart';
 import 'package:logging/logging.dart';
 
@@ -21,6 +21,7 @@ part 'ops/column.dart';
 part 'ops/priorities.dart';
 part 'ops/style_background.dart';
 part 'ops/style_border.dart';
+part 'ops/style_display.dart';
 part 'ops/style_margin.dart';
 part 'ops/style_padding.dart';
 part 'ops/style_sizing.dart';

@@ -3,42 +3,27 @@ part of '../core_data.dart';
 /// An HTML styling set.
 @immutable
 class HtmlStyle {
-  final Iterable<dynamic> _deps;
-
-  /// The [GestureRecognizer] for inline spans.
-  final GestureRecognizer? gestureRecognizer;
-
   /// The parent style.
   final HtmlStyle? parent;
-
-  /// The text alignment.
-  final TextAlign? textAlign;
-
-  /// The text direction.
-  final TextDirection textDirection;
 
   /// The input [TextStyle].
   final TextStyle textStyle;
 
-  /// The whitespace behavior.
-  final CssWhitespace whitespace;
+  final Iterable<dynamic> _values;
 
-  const HtmlStyle._({
-    required Iterable<dynamic> deps,
-    this.gestureRecognizer,
+  const HtmlStyle._(
+    this._values, {
     this.parent,
-    this.textAlign,
-    required this.textDirection,
     required this.textStyle,
-    required this.whitespace,
-  }) : _deps = deps;
+  });
 
   /// Creates the root HTML styling set.
   factory HtmlStyle.root(Iterable<dynamic> deps, TextStyle? widgetTextStyle) {
-    var textStyle = _getDependency<TextStyle>(deps).merge(widgetTextStyle);
+    var textStyle = _getValue<TextStyle>(deps)!;
+    textStyle = textStyle.merge(widgetTextStyle);
     textStyle = FwfhTextStyle.from(textStyle);
 
-    final tsf = _getDependency<TextScaleFactor>(deps);
+    final tsf = _getValue<TextScaleFactor>(deps)!;
     final fontSize = textStyle.fontSize;
     if (tsf.value != 1.0 && fontSize != null) {
       textStyle = textStyle.copyWith(
@@ -47,45 +32,53 @@ class HtmlStyle {
       );
     }
 
-    return HtmlStyle._(
-      deps: deps,
-      textStyle: textStyle,
-      textDirection: _getDependency<TextDirection>(deps),
-      whitespace: CssWhitespace.normal,
-    );
+    return HtmlStyle._(deps, textStyle: textStyle);
   }
+
+  /// The input [TextStyle].
+  @Deprecated('Use .textStyle instead.')
+  TextStyle get style => textStyle;
+
+  /// The text direction.
+  TextDirection get textDirection => value()!;
+
+  /// The number of font pixels for each logical pixel.
+  double get textScaleFactor => value<TextScaleFactor>()!.value;
+
+  /// The whitespace behavior.
+  CssWhitespace get whitespace => value()!;
 
   /// Creates a copy with the given fields replaced with the new values.
-  HtmlStyle copyWith({
-    GestureRecognizer? gestureRecognizer,
+  ///
+  /// These values are passed down to children's styles.
+  HtmlStyle copyWith<T>({
     HtmlStyle? parent,
-    TextAlign? textAlign,
-    TextDirection? textDirection,
+    @Deprecated('Use .textStyle instead.') TextStyle? style,
     TextStyle? textStyle,
-    CssWhitespace? whitespace,
+    T? value,
   }) {
     return HtmlStyle._(
-      deps: _deps,
-      gestureRecognizer: gestureRecognizer ?? this.gestureRecognizer,
+      value != null ? _values.copyWith<T>(value) : _values,
       parent: parent ?? this.parent,
-      textAlign: textAlign ?? this.textAlign,
-      textDirection: textDirection ?? this.textDirection,
-      textStyle: textStyle ?? this.textStyle,
-      whitespace: whitespace ?? this.whitespace,
+      textStyle: textStyle ?? style ?? this.textStyle,
     );
   }
 
-  /// Gets dependency value by type.
-  ///
-  /// See [WidgetFactory.getDependencies].
-  T getDependency<T>() => _getDependency<T>(_deps);
+  /// Gets dependency by type [T].
+  @Deprecated('Use .value instead.')
+  T? getDependency<T>() => value<T>();
 
-  static T _getDependency<T>(Iterable<dynamic> deps) {
-    for (final value in deps.whereType<T>()) {
+  /// Gets value of type [T].
+  ///
+  /// The initial set of values are populated by [WidgetFactory.getDependencies].
+  /// Parser and builder may use [BuildTree.apply] to add more.
+  T? value<T>() => _getValue(_values);
+
+  static T? _getValue<T>(Iterable<dynamic> values) {
+    for (final value in values.whereType<T>()) {
       return value;
     }
-
-    throw StateError('The $T dependency could not be found');
+    return null;
   }
 }
 
@@ -99,7 +92,12 @@ class HtmlStyleBuilder {
 
   HtmlStyleBuilder([this.parent, this._queue]);
 
+  /// {@template flutter_widget_from_html.enqueue}
   /// Enqueues an HTML styling callback.
+  ///
+  /// The callback will receive the current [HtmlStyle] being built.
+  /// As a special case, declare `T=BuildContext?` to receive the [BuildContext].
+  /// {@endtemplate}
   void enqueue<T>(
     HtmlStyle Function(HtmlStyle style, T input) callback,
     T input,
@@ -125,7 +123,7 @@ class HtmlStyleBuilder {
     var built = parentBuilt.copyWith(parent: parentBuilt);
     final l = queue.length;
     for (var i = 0; i < l; i++) {
-      built = queue[i](built);
+      built = queue[i](context, built);
       assert(
         identical(built.parent, parentBuilt),
         'The HTML styling set should be modified by calling copyWith() '
@@ -174,6 +172,10 @@ class HtmlStyleBuilder {
       '${parent != null ? '(parent=#${parent.hashCode})' : ''}';
 }
 
+extension on Iterable<dynamic> {
+  Iterable<dynamic> copyWith<T>(T value) => [...where((e) => e is! T), value];
+}
+
 @immutable
 class _HtmlStyleCallback<T> {
   final HtmlStyle Function(HtmlStyle style, T input) callback;
@@ -181,5 +183,13 @@ class _HtmlStyleCallback<T> {
 
   const _HtmlStyleCallback(this.callback, this.input);
 
-  HtmlStyle call(HtmlStyle style) => callback(style, input);
+  HtmlStyle call(BuildContext context, HtmlStyle style) {
+    if (input == null && isType<BuildContext?>()) {
+      return callback(style, context as T);
+    }
+
+    return callback(style, input);
+  }
+
+  bool isType<Other>() => T == Other;
 }
