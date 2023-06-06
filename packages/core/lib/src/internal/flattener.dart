@@ -4,6 +4,7 @@ import 'package:logging/logging.dart';
 import '../core_data.dart';
 import '../core_helpers.dart';
 import '../core_widget_factory.dart';
+import 'core_ops.dart';
 import 'margin_vertical.dart';
 
 final _logger = Logger('fwfh.Flattener');
@@ -255,7 +256,7 @@ class Flattener implements Flattened {
           return widget0;
         }
 
-        final textAlign = style.textAlign ?? TextAlign.start;
+        final TextAlign textAlign = style.value() ?? TextAlign.start;
         if (span is WidgetSpan && textAlign == TextAlign.start) {
           return span.child;
         }

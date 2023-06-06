@@ -87,7 +87,7 @@ class TagDetails {
                     HtmlSummary(style: style.textStyle, child: summary),
                     HtmlDetailsContents(child: child),
                   ],
-                  dir: style.getDependency(),
+                  dir: style.textDirection,
                 ),
               );
             },

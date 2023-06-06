@@ -5,8 +5,6 @@ import 'package:flutter/material.dart'
         // we want to limit Material usages to be as generic as possible
         CircularProgressIndicator,
         Divider,
-        Theme,
-        ThemeData,
         Tooltip;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -337,17 +335,17 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   /// Builds [RichText].
   Widget? buildText(BuildTree tree, HtmlStyle style, InlineSpan text) {
     const selectionColorDefault = DefaultSelectionStyle.defaultColor;
-    final selectionRegistrar = style.getDependency<SelectionRegistrar?>();
-    final selectionStyle = style.getDependency<DefaultSelectionStyle>();
+    final selectionRegistrar = style.value<SelectionRegistrar>();
+    final selectionStyle = style.value<DefaultSelectionStyle>();
 
     Widget built = RichText(
       maxLines: tree.maxLines > 0 ? tree.maxLines : null,
       overflow: tree.overflow,
-      selectionColor: selectionStyle.selectionColor ?? selectionColorDefault,
+      selectionColor: selectionStyle?.selectionColor ?? selectionColorDefault,
       selectionRegistrar: selectionRegistrar,
       softWrap: style.whitespace != CssWhitespace.nowrap,
       text: text,
-      textAlign: style.textAlign ?? TextAlign.start,
+      textAlign: style.value() ?? TextAlign.start,
       textDirection: style.textDirection,
     );
 
@@ -404,27 +402,15 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   ///
   /// Includes these by default:
   ///
+  /// - [CssWhitespace.normal]
   /// - [TextDirection] via [Directionality.of]
   /// - [DefaultSelectionStyle] via [DefaultSelectionStyle.of]
   /// - [TextStyle] via [DefaultTextStyle.of]
   /// - [SelectionRegistrar] via [SelectionContainer.maybeOf]
   /// - [TextScaleFactor] via [MediaQuery.textScaleFactorOf]
-  /// - [ThemeData] via [Theme.of]
   ///
-  /// Use [HtmlStyle.getDependency] to get value by type.
-  ///
-  /// ```dart
-  /// // in normal widget building:
-  /// final scale = MediaQuery.of(context).textScaleFactor;
-  /// final color = Theme.of(context).accentColor;
-  ///
-  /// // in build ops:
-  /// final tsf = style.getDependency<TextScaleFactor>();
-  /// final color = style.getDependency<ThemeData>().accentColor;
-  /// ```
-  ///
-  /// It's recommended to use values from [HtmlStyle] instead of
-  /// obtaining from [BuildContext] for performance reason.
+  /// It's recommended to use [HtmlStyle.value] instead of
+  /// obtaining dependencies from [BuildContext] for performance reason.
   ///
   /// ```dart
   /// // avoid doing this:
@@ -433,14 +419,17 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   /// // do this:
   /// final buildOpValue = style.textDirection;
   /// ```
-  Iterable<dynamic> getDependencies(BuildContext context) => [
-        Directionality.maybeOf(context) ?? TextDirection.ltr,
-        DefaultSelectionStyle.of(context),
-        DefaultTextStyle.of(context).style,
-        SelectionContainer.maybeOf(context),
-        TextScaleFactor(MediaQuery.textScaleFactorOf(context)),
-        Theme.of(context),
-      ];
+  Iterable<dynamic> getDependencies(BuildContext context) {
+    final selectionRegistrar = SelectionContainer.maybeOf(context);
+    return [
+      CssWhitespace.normal,
+      Directionality.maybeOf(context) ?? TextDirection.ltr,
+      DefaultSelectionStyle.of(context),
+      DefaultTextStyle.of(context).style,
+      TextScaleFactor(MediaQuery.textScaleFactorOf(context)),
+      if (selectionRegistrar != null) selectionRegistrar,
+    ];
+  }
 
   /// Returns marker text for the specified list style [type] at index [i].
   String getListMarkerText(String type, int i) {
@@ -620,7 +609,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kTagA:
         if (attrs.containsKey(kAttributeAHref)) {
           tree
-            ..apply(TagA.defaultColor, null)
+            ..apply<BuildContext?>(TagA.defaultColor, null)
             ..register(_tagA ??= TagA(this).buildOp);
         }
 

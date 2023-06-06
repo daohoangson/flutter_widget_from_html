@@ -200,7 +200,7 @@ abstract class BuildTree extends BuildBit {
   @Deprecated('Use .getStyle instead.')
   css.Declaration? operator [](String key) => getStyle(key);
 
-  /// Enqueues an HTML styling callback.
+  /// {@macro flutter_widget_from_html.enqueue}
   void apply<T>(
     HtmlStyle Function(HtmlStyle style, T input) callback,
     T input,
@@ -270,6 +270,9 @@ abstract class BuildTree extends BuildBit {
     return str;
   }
 
+  /// Gets or sets value of type [T].
+  ///
+  /// These values are not passed down to sub-trees.
   T? value<T>([T? newValue]) {
     if (newValue == null) {
       // read mode

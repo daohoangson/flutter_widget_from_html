@@ -32,9 +32,10 @@ class TagA {
         priority: Priority.tagA,
       );
 
-  static HtmlStyle defaultColor(HtmlStyle style, void _) => style.copyWith(
+  static HtmlStyle defaultColor(HtmlStyle style, BuildContext? context) =>
+      style.copyWith(
         textStyle: style.textStyle.copyWith(
-          color: style.getDependency<ThemeData>().colorScheme.primary,
+          color: Theme.of(context!).colorScheme.primary,
           debugLabel: 'fwfh: a[href] default color',
         ),
       );
@@ -46,5 +47,10 @@ class TagA {
   }
 
   static HtmlStyle _builder(HtmlStyle style, GestureRecognizer value) =>
-      style.copyWith(gestureRecognizer: value);
+      style.copyWith<GestureRecognizer>(value: value);
+}
+
+extension GestureRecognizerGetter on HtmlStyle {
+  /// The [GestureRecognizer] for inline spans.
+  GestureRecognizer? get gestureRecognizer => value();
 }

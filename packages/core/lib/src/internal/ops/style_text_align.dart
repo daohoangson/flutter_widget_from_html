@@ -44,7 +44,7 @@ extension StyleTextAlign on WidgetFactory {
   }
 
   static HtmlStyle _textAlign(HtmlStyle style, TextAlign value) =>
-      style.copyWith(textAlign: value);
+      style.copyWith(value: value);
 }
 
 extension on BuildTree {

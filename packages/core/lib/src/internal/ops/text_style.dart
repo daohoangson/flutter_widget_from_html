@@ -147,9 +147,9 @@ class TextStyleOps {
   static HtmlStyle textDirection(HtmlStyle style, String v) {
     switch (v) {
       case kCssDirectionLtr:
-        return style.copyWith(textDirection: TextDirection.ltr);
+        return style.copyWith(value: TextDirection.ltr);
       case kCssDirectionRtl:
-        return style.copyWith(textDirection: TextDirection.rtl);
+        return style.copyWith(value: TextDirection.rtl);
     }
 
     return style;
@@ -215,8 +215,8 @@ class TextStyleOps {
     return null;
   }
 
-  static HtmlStyle whitespace(HtmlStyle style, CssWhitespace v) =>
-      style.copyWith(whitespace: v);
+  static HtmlStyle whitespace(HtmlStyle style, CssWhitespace value) =>
+      style.copyWith(value: value);
 
   static CssWhitespace? whitespaceTryParse(String value) {
     switch (value) {
@@ -251,7 +251,7 @@ class TextStyleOps {
       v.getValue(
         style,
         baseValue: style.parent?.textStyle.fontSize,
-        scaleFactor: style.getDependency<TextScaleFactor>().value,
+        scaleFactor: style.textScaleFactor,
       );
 
   static double? _fontSizeTryParseTerm(HtmlStyle style, String v) {
@@ -324,7 +324,7 @@ class TextStyleOps {
     final lengthValue = length.getValue(
       style,
       baseValue: fontSize,
-      scaleFactor: style.getDependency<TextScaleFactor>().value,
+      scaleFactor: style.textScaleFactor,
     );
     if (lengthValue == null) {
       return null;

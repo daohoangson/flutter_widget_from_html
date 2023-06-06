@@ -240,11 +240,11 @@ Notes:
   - Optionally, pass any object on enqueue and your callback will receive it as the second parameter.
 
 ```dart
-// example 1: simple callback setting accent color from theme
+// example 1: simple callback setting text color
 tree.apply(
   (style, _) => style.copyWith(
     textStyle: style.textStyle.copyWith(
-      color: style.getDependency<ThemeData>().accentColor,
+      color: Colors.red,
     ),
   ),
   null,
