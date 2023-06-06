@@ -192,6 +192,7 @@ abstract class BuildTree extends BuildBit {
   /// - Attribute `style` of [dom.Element]
   Iterable<css.Declaration> get styles;
 
+  /// Adds an inline style.
   @Deprecated('Use BuildOp.defaultStyles instead.')
   void operator []=(String key, String value);
 
