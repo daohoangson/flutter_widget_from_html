@@ -21,7 +21,6 @@ class HtmlStyle {
   factory HtmlStyle.root(Iterable<dynamic> deps, TextStyle? widgetTextStyle) {
     var textStyle = _getValue<TextStyle>(deps)!;
     textStyle = textStyle.merge(widgetTextStyle);
-    textStyle = FwfhTextStyle.from(textStyle);
 
     final tsf = _getValue<TextScaleFactor>(deps)!;
     final fontSize = textStyle.fontSize;
