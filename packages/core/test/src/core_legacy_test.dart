@@ -65,7 +65,7 @@ void main() {
         expect(explained, equals('[RichText:(#FF00FF00:Foo)]'));
       });
 
-      testWidgets('renders defaultStyles in reversed', (tester) async {
+      testWidgets('renders defaultStyles with priority', (tester) async {
         const html = '<span>Foo</span>';
         final explained = await explain(
           tester,
@@ -511,13 +511,13 @@ class _BuildOpDefaultStyles extends WidgetFactory {
       ..register(
         BuildOp(
           defaultStyles: (_) => {'color': '#f00'},
-          priority: 1,
+          priority: 2,
         ),
       )
       ..register(
         BuildOp(
           defaultStyles: (_) => {'color': '#0f0'},
-          priority: 2,
+          priority: 1,
         ),
       );
 

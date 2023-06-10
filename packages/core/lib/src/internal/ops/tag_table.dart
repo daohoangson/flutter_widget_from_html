@@ -383,7 +383,7 @@ class _TagTableRow {
         const BuildOp.v1(
           debugLabel: kTagTableCell,
           defaultStyles: _cssVerticalAlignFromAttribute,
-          priority: Early.tagTableCellAttributeValign,
+          priority: Early.tagTableCellValignParsed,
         ),
       );
     }

@@ -620,21 +620,57 @@ void main() {
   });
 
   group('tags', () {
-    const html = 'Hello <foo>World</foo>!';
+    group('color: red', () {
+      const html = 'Hello <foo>World</foo>!';
 
-    testWidgets('renders without value', (WidgetTester tester) async {
-      final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(e, equals('[RichText:(:Hello World!)]'));
+      testWidgets('renders without value', (WidgetTester tester) async {
+        final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
+        expect(e, equals('[RichText:(:Hello World!)]'));
+      });
+
+      testWidgets('renders with value', (WidgetTester tester) async {
+        final explained = await explain(
+          tester,
+          HtmlWidget(
+            html,
+            key: helper.hwKey,
+            tags: {
+              'foo': BuildOp.v1(defaultStyles: (_) => {'color': 'red'})
+            },
+          ),
+        );
+        expect(explained, equals('[RichText:(:Hello (#FFFF0000:World)(:!))]'));
+      });
     });
 
-    testWidgets('renders with value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        HtmlWidget(html, key: helper.hwKey, tags: {
-          'foo': BuildOp.v1(defaultStyles: (_) => {'color': 'red'})
-        }),
-      );
-      expect(explained, equals('[RichText:(:Hello (#FFFF0000:World)(:!))]'));
+    group('resets FIGURE margin', () {
+      const html = '<figure>Foo</figure>';
+
+      testWidgets('renders without value', (WidgetTester tester) async {
+        final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
+        expect(
+          e,
+          equals(
+            '[Padding:(0,40,0,40),child='
+            '[CssBlock:child=[RichText:(:Foo)]]'
+            ']',
+          ),
+        );
+      });
+
+      testWidgets('renders with value', (WidgetTester tester) async {
+        final explained = await explain(
+          tester,
+          HtmlWidget(
+            html,
+            key: helper.hwKey,
+            tags: {
+              'figure': BuildOp.v1(defaultStyles: (_) => {'margin': '0'})
+            },
+          ),
+        );
+        expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+      });
     });
   });
 
