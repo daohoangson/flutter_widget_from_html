@@ -224,24 +224,55 @@ void main() {
   });
 
   group('customStylesBuilder', () {
-    const html = 'Hello <span class="name">World</span>!';
+    group('color: red', () {
+      const html = 'Hello <span class="name">World</span>!';
 
-    testWidgets('renders without value', (WidgetTester tester) async {
-      final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(e, equals('[RichText:(:Hello World!)]'));
+      testWidgets('renders without value', (WidgetTester tester) async {
+        final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
+        expect(e, equals('[RichText:(:Hello World!)]'));
+      });
+
+      testWidgets('renders with value', (WidgetTester tester) async {
+        final explained = await explain(
+          tester,
+          HtmlWidget(
+            html,
+            customStylesBuilder: (e) =>
+                e.classes.contains('name') ? {'color': 'red'} : null,
+            key: helper.hwKey,
+          ),
+        );
+        expect(explained, equals('[RichText:(:Hello (#FFFF0000:World)(:!))]'));
+      });
     });
 
-    testWidgets('renders with value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        HtmlWidget(
-          html,
-          customStylesBuilder: (e) =>
-              e.classes.contains('name') ? {'color': 'red'} : null,
-          key: helper.hwKey,
-        ),
-      );
-      expect(explained, equals('[RichText:(:Hello (#FFFF0000:World)(:!))]'));
+    group('resets FIGURE margin', () {
+      const html = '<figure class="name">Foo</figure>';
+
+      testWidgets('renders without value', (WidgetTester tester) async {
+        final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
+        expect(
+          e,
+          equals(
+            '[Padding:(0,40,0,40),child='
+            '[CssBlock:child=[RichText:(:Foo)]]'
+            ']',
+          ),
+        );
+      });
+
+      testWidgets('renders with value', (WidgetTester tester) async {
+        final explained = await explain(
+          tester,
+          HtmlWidget(
+            html,
+            customStylesBuilder: (e) =>
+                e.classes.contains('name') ? {'margin': '0'} : null,
+            key: helper.hwKey,
+          ),
+        );
+        expect(explained, equals('[CssBlock:child=[RichText:(:Foo)]]'));
+      });
     });
   });
 
