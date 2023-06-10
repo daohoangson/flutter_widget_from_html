@@ -27,6 +27,7 @@ class HtmlWidget extends core.HtmlWidget {
     super.onTapUrl,
     super.rebuildTriggers,
     super.renderMode,
+    super.tags,
     super.textStyle,
   }) : super(factoryBuilder: factoryBuilder ?? _getEnhancedWf);
 

@@ -970,6 +970,11 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
           break;
       }
     }
+
+    final tagBuildOp = _widget?.tags[localName];
+    if (tagBuildOp != null) {
+      tree.register(tagBuildOp);
+    }
   }
 
   /// Parses inline style [css.Declaration] one by one.

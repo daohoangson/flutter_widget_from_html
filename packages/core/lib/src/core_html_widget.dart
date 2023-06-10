@@ -88,6 +88,9 @@ class HtmlWidget extends StatefulWidget {
   /// and can be put inside a `CustomScrollView`.
   final RenderMode renderMode;
 
+  /// The custom styling for tags.
+  final Map<String, BuildOp> tags;
+
   /// The default styling for text elements.
   final TextStyle? textStyle;
 
@@ -109,6 +112,7 @@ class HtmlWidget extends StatefulWidget {
     this.onTapUrl,
     List<dynamic>? rebuildTriggers,
     this.renderMode = RenderMode.column,
+    this.tags = const {},
     this.textStyle,
   })  : _rebuildTriggers = rebuildTriggers,
         super(key: key);

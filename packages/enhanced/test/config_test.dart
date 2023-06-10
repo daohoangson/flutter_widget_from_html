@@ -562,6 +562,25 @@ void main() {
     });
   });
 
+  group('tags', () {
+    const html = 'Hello <foo>World</foo>!';
+
+    testWidgets('renders without value', (WidgetTester tester) async {
+      final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
+      expect(e, equals('[RichText:(:Hello World!)]'));
+    });
+
+    testWidgets('renders with value', (WidgetTester tester) async {
+      final explained = await explain(
+        tester,
+        HtmlWidget(html, key: helper.hwKey, tags: {
+          'foo': BuildOp.v1(defaultStyles: (_) => {'color': 'red'})
+        }),
+      );
+      expect(explained, equals('[RichText:(:Hello (#FFFF0000:World)(:!))]'));
+    });
+  });
+
   group('textStyle', () {
     const html = 'Foo';
 
