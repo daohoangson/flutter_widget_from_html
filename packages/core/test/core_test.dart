@@ -1571,7 +1571,7 @@ Future<void> main() async {
   });
 
   group('white-space', () {
-    const text = '\n  Foo\n  bar  \n';
+    const text = '\nFoo bar.\n\tFoo  bar.\n\t\t';
 
     testWidgets('renders pre', (tester) async {
       const html = '<div style="white-space: pre">$text</div>';
@@ -1581,8 +1581,8 @@ Future<void> main() async {
 
     testWidgets('renders normal', (tester) async {
       const html = '<div style="white-space: normal">$text</div>';
-      final explained = await explain(tester, html);
-      expect(explained, equals('[CssBlock:child=[RichText:(:Foo bar)]]'));
+      final e = await explain(tester, html);
+      expect(e, equals('[CssBlock:child=[RichText:(:Foo bar. Foo bar.)]]'));
     });
 
     testWidgets('renders nowrap', (tester) async {
@@ -1590,7 +1590,37 @@ Future<void> main() async {
       final explained = await explain(tester, html);
       expect(
         explained,
-        equals('[CssBlock:child=[RichText:softWrap=false,(:Foo bar)]]'),
+        equals(
+          '[CssBlock:child=[RichText:softWrap=false,(:Foo\u00A0bar.\u00A0Foo\u00A0bar.)]]',
+        ),
+      );
+    });
+
+    testWidgets('renders inline nowrap', (tester) async {
+      const html = '<p><span style="white-space: nowrap">$text</span></p>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssBlock:child=[RichText:(:Foo\u00A0bar.\u00A0Foo\u00A0bar.)]]',
+        ),
+      );
+    });
+
+    testWidgets('#939: renders inline nowrap', (tester) async {
+      const html =
+          '<p style="line-height: 1.2;">For any two real numbers x and y, '
+          'prove that: <span style="white-space:nowrap">|x  +  y|  ≤  |x|  +  |y|.</span></p>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[CssBlock:child=[RichText:'
+          '(+height=1.2:For any two real numbers x and y, prove that: '
+          '(+height=1.2:|x\u00A0+\u00A0y|\u00A0≤\u00A0|x|\u00A0+\u00A0|y|.)'
+          ')'
+          ']]',
+        ),
       );
     });
 
