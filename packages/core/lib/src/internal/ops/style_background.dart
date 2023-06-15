@@ -32,12 +32,8 @@ class StyleBackground {
         priority: BoxModel.background,
       );
 
-  static HtmlStyle _color(HtmlStyle style, Color color) => style.copyWith(
-        textStyle: style.textStyle.copyWith(
-          background: Paint()..color = color,
-          debugLabel: 'fwfh: $kCssBackgroundColor',
-        ),
-      );
+  static HtmlStyle _color(HtmlStyle style, Color color) =>
+      style.mergeWith(TextStyle(background: Paint()..color = color));
 
   static Color? _parseColor(BuildTree tree) {
     Color? color;

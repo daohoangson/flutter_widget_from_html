@@ -52,21 +52,17 @@ void textDecorationApply(BuildTree tree, css.Declaration style) {
   }
 }
 
-HtmlStyle textDecorationColor(HtmlStyle style, Color v) => style.copyWith(
-      textStyle: style.textStyle.copyWith(
-        decorationColor: v,
-        debugLabel: 'fwfh: $kCssTextDecorationColor',
-      ),
-    );
+HtmlStyle textDecorationColor(HtmlStyle style, Color v) =>
+    style.mergeWith(TextStyle(decorationColor: v));
 
 HtmlStyle textDecorationLine(HtmlStyle p, TextDecorationLine v) {
-  final parent = p.parent?.textStyle.decoration;
+  final parent = p.parent?.textDecoration;
   final parentOverline = parent?.contains(TextDecoration.overline) == true;
   final parentLineThrough =
       parent?.contains(TextDecoration.lineThrough) == true;
   final parentUnderline = parent?.contains(TextDecoration.underline) == true;
 
-  final current = p.textStyle.decoration;
+  final current = p.textDecoration;
   final currentOverline = current?.contains(TextDecoration.overline) == true;
   final currentLineThrough =
       current?.contains(TextDecoration.lineThrough) == true;
@@ -91,29 +87,14 @@ HtmlStyle textDecorationLine(HtmlStyle p, TextDecorationLine v) {
     list.add(TextDecoration.underline);
   }
 
-  final combined = TextDecoration.combine(list);
-  return p.copyWith(
-    textStyle: p.textStyle.copyWith(
-      decoration: combined,
-      debugLabel: 'fwfh: $kCssTextDecorationLine',
-    ),
-  );
+  return p.mergeWith(TextStyle(decoration: TextDecoration.combine(list)));
 }
 
 HtmlStyle textDecorationStyle(HtmlStyle style, TextDecorationStyle v) =>
-    style.copyWith(
-      textStyle: style.textStyle.copyWith(
-        decorationStyle: v,
-        debugLabel: 'fwfh: $kCssTextDecorationStyle',
-      ),
-    );
+    style.mergeWith(TextStyle(decorationStyle: v));
 
-HtmlStyle textDecorationThickness(HtmlStyle style, double v) => style.copyWith(
-      textStyle: style.textStyle.copyWith(
-        decorationThickness: v,
-        debugLabel: 'fwfh: $kCssTextDecorationThickness',
-      ),
-    );
+HtmlStyle textDecorationThickness(HtmlStyle style, double v) =>
+    style.mergeWith(TextStyle(decorationThickness: v));
 
 @immutable
 class TextDecorationLine {

@@ -33,12 +33,7 @@ class TagA {
       );
 
   static HtmlStyle defaultColor(HtmlStyle style, BuildContext? context) =>
-      style.copyWith(
-        textStyle: style.textStyle.copyWith(
-          color: Theme.of(context!).colorScheme.primary,
-          debugLabel: 'fwfh: a[href] default color',
-        ),
-      );
+      style.mergeWith(TextStyle(color: Theme.of(context!).colorScheme.primary));
 
   static StylesMap _defaultStyles(BuildTree _) {
     return const {
