@@ -25,6 +25,8 @@ class Flattener implements Flattened {
 
   Flattener(this.wf, this.tree) {
     _loopSubTree(tree, flatten: false);
+
+    _resetLoop(tree.styleBuilder);
     for (final bit in tree.bits) {
       _loop(bit);
     }

@@ -338,19 +338,12 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
     final selectionRegistrar = style.value<SelectionRegistrar>();
     final selectionStyle = style.value<DefaultSelectionStyle>();
 
-    StrutStyle? strutStyle;
-    final height = style.value<LineHeight>()?.value;
-    if (height != null) {
-      strutStyle = StrutStyle.fromTextStyle(style.textStyle, height: height);
-    }
-
     Widget built = RichText(
       maxLines: tree.maxLines > 0 ? tree.maxLines : null,
       overflow: tree.overflow,
       selectionColor: selectionStyle?.selectionColor ?? selectionColorDefault,
       selectionRegistrar: selectionRegistrar,
       softWrap: style.whitespace != CssWhitespace.nowrap,
-      strutStyle: strutStyle,
       text: text,
       textAlign: style.value() ?? TextAlign.start,
       textDirection: style.textDirection,

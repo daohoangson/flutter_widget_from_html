@@ -121,12 +121,27 @@ class TextStyleOps {
     WidgetFactory wf,
   ) =>
       (style, v) {
-        final lineHeight = _lineHeightTryParse(wf, style, v);
-        if (lineHeight == null) {
+        final height = _lineHeightTryParse(wf, style, v);
+        if (height == null) {
           return style;
         }
 
-        return style.copyWith<LineHeight>(value: lineHeight);
+        if (height == -1) {
+          return style.copyWith(
+            textStyle: style.textStyle.copyWith(
+              debugLabel: 'fwfh: $kCssLineHeight $height',
+              // ignore: avoid_redundant_argument_values
+              height: null,
+            ),
+          );
+        }
+
+        return style.copyWith(
+          textStyle: style.textStyle.copyWith(
+            debugLabel: 'fwfh: $kCssLineHeight $height',
+            height: height,
+          ),
+        );
       };
 
   static HtmlStyle textDirection(HtmlStyle style, String v) {
@@ -277,7 +292,7 @@ class TextStyleOps {
   static double? _fontSizeMultiplyWith(double? fontSize, double value) =>
       fontSize != null ? fontSize * value : null;
 
-  static LineHeight? _lineHeightTryParse(
+  static double? _lineHeightTryParse(
     WidgetFactory wf,
     HtmlStyle style,
     css.Expression v,
@@ -286,13 +301,13 @@ class TextStyleOps {
       if (v is css.NumberTerm) {
         final number = v.number.toDouble();
         if (number > 0) {
-          return LineHeight(number);
+          return number;
         }
       }
 
       switch (v.valueAsString) {
         case kCssLineHeightNormal:
-          return const LineHeight(null);
+          return -1;
       }
     }
 
@@ -315,7 +330,7 @@ class TextStyleOps {
       return null;
     }
 
-    return LineHeight(lengthValue / fontSize);
+    return lengthValue / fontSize;
   }
 }
 

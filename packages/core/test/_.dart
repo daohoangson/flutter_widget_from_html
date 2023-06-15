@@ -711,10 +711,6 @@ class Explainer {
       );
     }
 
-    if (widget is RichText && widget.strutStyle != null) {
-      attr.add('height=${widget.strutStyle?.height?.toStringAsFixed(1)}');
-    }
-
     if (widget is Tooltip) {
       attr.add('message=${widget.message}');
     }

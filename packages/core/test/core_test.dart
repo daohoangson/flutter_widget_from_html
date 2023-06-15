@@ -1453,37 +1453,37 @@ Future<void> main() async {
     testWidgets('renders number', (WidgetTester tester) async {
       const html = '<span style="line-height: 1">Foo</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:height=1.0,(:Foo)]'));
+      expect(explained, equals('[RichText:(+height=1.0:Foo)]'));
     });
 
     testWidgets('renders decimal', (WidgetTester tester) async {
       const html = '<span style="line-height: 1.1">Foo</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:height=1.1,(:Foo)]'));
+      expect(explained, equals('[RichText:(+height=1.1:Foo)]'));
     });
 
     testWidgets('renders em', (WidgetTester tester) async {
       const html = '<span style="line-height: 5em">Foo</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:height=5.0,(:Foo)]'));
+      expect(explained, equals('[RichText:(+height=5.0:Foo)]'));
     });
 
     testWidgets('renders percentage', (WidgetTester tester) async {
       const html = '<span style="line-height: 50%">Foo</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:height=0.5,(:Foo)]'));
+      expect(explained, equals('[RichText:(+height=0.5:Foo)]'));
     });
 
     testWidgets('renders pt', (WidgetTester tester) async {
       const html = '<span style="line-height: 50pt">Foo</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:height=6.7,(:Foo)]'));
+      expect(explained, equals('[RichText:(+height=6.7:Foo)]'));
     });
 
     testWidgets('renders px', (WidgetTester tester) async {
       const html = '<span style="line-height: 50px">Foo</span>';
       final explained = await explain(tester, html);
-      expect(explained, equals('[RichText:height=5.0,(:Foo)]'));
+      expect(explained, equals('[RichText:(+height=5.0:Foo)]'));
     });
 
     testWidgets('renders invalid', (WidgetTester tester) async {
@@ -1493,47 +1493,23 @@ Future<void> main() async {
     });
 
     testWidgets('renders child element (same)', (WidgetTester tester) async {
-      const html = '<div style="line-height: 1">Foo <div>bar</div></div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[CssBlock:child=[Column:children='
-          '[RichText:height=1.0,(:Foo)],'
-          '[CssBlock:child=[RichText:height=1.0,(:bar)]]'
-          ']]',
-        ),
-      );
+      const html = '<span style="line-height: 1">Foo <em>bar</em></span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(:(+height=1.0:Foo )(+height=1.0+i:bar))]'));
     });
 
     testWidgets('renders child element (override)', (tester) async {
-      const html = '<div style="line-height: 1">Foo '
-          '<div style="line-height: 2">bar</div></div>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[CssBlock:child=[Column:children='
-          '[RichText:height=1.0,(:Foo)],'
-          '[CssBlock:child=[RichText:height=2.0,(:bar)]]'
-          ']]',
-        ),
-      );
+      const html = '<span style="line-height: 1">Foo '
+          '<em style="line-height: 2">bar</em></span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(:(+height=1.0:Foo )(+height=2.0+i:bar))]'));
     });
 
     testWidgets('renders child element (normal)', (WidgetTester tester) async {
-      const html = '<div style="line-height: 1">Foo '
-          '<div style="line-height: normal">bar</div></span>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[CssBlock:child=[Column:children='
-          '[RichText:height=1.0,(:Foo)],'
-          '[CssBlock:child=[RichText:(:bar)]]'
-          ']]',
-        ),
-      );
+      const html = '<span style="line-height: 1">Foo '
+          '<em style="line-height: normal">bar</em></span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[RichText:(:(+height=1.0:Foo )(+i:bar))]'));
     });
   });
 
