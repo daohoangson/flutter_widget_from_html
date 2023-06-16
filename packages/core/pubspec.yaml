@@ -17,6 +17,7 @@ dependencies:
   html: ^0.15.0
 
 dependency_overrides:
+  win32: 3.1.4
   fwfh_text_style:
     path: ../fwfh_text_style
 
