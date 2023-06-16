@@ -29,17 +29,17 @@ class HtmlStyle {
     return HtmlStyle._(deps, textStyle);
   }
 
-  /// The [TextStyle] font size.
-  double? get fontSize => _textStyle.fontSize;
+  /// The [TextStyle.color] value.
+  Color? get color => _textStyle.color;
 
-  /// The foreground [Color].
-  Color? get foregroundColor => _textStyle.color;
+  /// The [TextStyle.fontSize] value.
+  double? get fontSize => _textStyle.fontSize;
 
   /// The calculated [TextStyle].
   @Deprecated('Use .textStyle instead.')
   TextStyle get style => textStyle;
 
-  /// The [TextDecoration].
+  /// The [TextStyle.decoration] value.
   TextDecoration? get textDecoration => _textStyle.decoration;
 
   /// The text direction.
@@ -49,6 +49,8 @@ class HtmlStyle {
   double get textScaleFactor => value<TextScaleFactor>()!.value;
 
   /// The calculated [TextStyle].
+  ///
+  /// This includes [LineHeight] if set.
   TextStyle get textStyle {
     var calculated = _textStyle;
     final height = value<LineHeight>();

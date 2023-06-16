@@ -191,7 +191,7 @@ class CssBorderSide {
   BorderSide? _getValue(HtmlStyle style) => identical(this, none)
       ? null
       : BorderSide(
-          color: color ?? style.foregroundColor ?? const BorderSide().color,
+          color: color ?? style.color ?? const BorderSide().color,
           // TODO: add proper support for other border styles
           style: this.style != null ? BorderStyle.solid : BorderStyle.none,
           // TODO: look for official document regarding this default value
