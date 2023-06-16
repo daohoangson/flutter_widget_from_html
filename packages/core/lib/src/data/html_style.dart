@@ -6,22 +6,16 @@ class HtmlStyle {
   /// The parent style.
   final HtmlStyle? parent;
 
-  /// The input [TextStyle].
-  final TextStyle textStyle;
+  final TextStyle _textStyle;
 
   final Iterable<dynamic> _values;
 
-  const HtmlStyle._(
-    this._values, {
-    this.parent,
-    required this.textStyle,
-  });
+  const HtmlStyle._(this._values, this._textStyle, [this.parent]);
 
   /// Creates the root HTML styling set.
   factory HtmlStyle.root(Iterable<dynamic> deps, TextStyle? widgetTextStyle) {
     var textStyle = _getValue<TextStyle>(deps)!;
     textStyle = textStyle.merge(widgetTextStyle);
-    textStyle = FwfhTextStyle.from(textStyle);
 
     final tsf = _getValue<TextScaleFactor>(deps)!;
     final fontSize = textStyle.fontSize;
@@ -32,12 +26,21 @@ class HtmlStyle {
       );
     }
 
-    return HtmlStyle._(deps, textStyle: textStyle);
+    return HtmlStyle._(deps, textStyle);
   }
 
-  /// The input [TextStyle].
+  /// The [TextStyle.color] value.
+  Color? get color => _textStyle.color;
+
+  /// The [TextStyle.fontSize] value.
+  double? get fontSize => _textStyle.fontSize;
+
+  /// The calculated [TextStyle].
   @Deprecated('Use .textStyle instead.')
   TextStyle get style => textStyle;
+
+  /// The [TextStyle.decoration] value.
+  TextDecoration? get textDecoration => _textStyle.decoration;
 
   /// The text direction.
   TextDirection get textDirection => value()!;
@@ -45,28 +48,45 @@ class HtmlStyle {
   /// The number of font pixels for each logical pixel.
   double get textScaleFactor => value<TextScaleFactor>()!.value;
 
+  /// The calculated [TextStyle].
+  ///
+  /// This includes [LineHeight] if set.
+  TextStyle get textStyle {
+    var calculated = _textStyle;
+    final height = value<LineHeight>();
+    if (height != null) {
+      calculated = calculated.copyWith(height: height.value);
+    }
+    return calculated;
+  }
+
   /// The whitespace behavior.
   CssWhitespace get whitespace => value()!;
 
   /// Creates a copy with the given fields replaced with the new values.
   ///
-  /// These values are passed down to children's styles.
+  /// Children inherit these values from their parent.
   HtmlStyle copyWith<T>({
     HtmlStyle? parent,
-    @Deprecated('Use .textStyle instead.') TextStyle? style,
-    TextStyle? textStyle,
+    @Deprecated('Use .mergeWith instead.') TextStyle? style,
     T? value,
   }) {
     return HtmlStyle._(
       value != null ? _values.copyWith<T>(value) : _values,
-      parent: parent ?? this.parent,
-      textStyle: textStyle ?? style ?? this.textStyle,
+      style != null ? _textStyle.merge(style) : _textStyle,
+      parent ?? this.parent,
     );
   }
 
   /// Gets dependency by type [T].
   @Deprecated('Use .value instead.')
   T? getDependency<T>() => value<T>();
+
+  /// Creates a copy with the [TextStyle] merged with the new [style].
+  ///
+  /// Children inherit text style from their parent.
+  HtmlStyle mergeWith(TextStyle style) =>
+      HtmlStyle._(_values, _textStyle.merge(style), parent);
 
   /// Gets value of type [T].
   ///

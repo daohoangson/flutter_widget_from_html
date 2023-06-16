@@ -276,13 +276,6 @@ packages:
       relative: true
     source: path
     version: "0.12.0-alpha.1"
-  fwfh_text_style:
-    dependency: "direct overridden"
-    description:
-      path: "../packages/fwfh_text_style"
-      relative: true
-    source: path
-    version: "2.22.8+3"
   fwfh_url_launcher:
     dependency: "direct overridden"
     description:
