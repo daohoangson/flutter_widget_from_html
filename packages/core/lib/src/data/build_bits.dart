@@ -110,11 +110,23 @@ abstract class BuildBit {
   String toString() => '$runtimeType#$hashCode';
 }
 
-/// A tree of [BuildBit]s.
-abstract class BuildTree extends BuildBit {
-  static final _buffers = Expando<StringBuffer>();
+abstract class BuildTreeProperties {
+  /// Gets non-inherited property of type [T].
+  ///
+  /// These values are not passed down to sub-trees.
+  /// See https://developer.mozilla.org/en-US/docs/Web/CSS/Inheritance#non-inherited_properties
+  T? getNonInheritedProperty<T>();
 
-  final _children = <BuildBit>[];
+  /// Sets non-inherited property of type [T].
+  ///
+  /// These values are not passed down to sub-trees.
+  /// See https://developer.mozilla.org/en-US/docs/Web/CSS/Inheritance#non-inherited_properties
+  T setNonInheritedProperty<T>(T value);
+}
+
+/// A tree of [BuildBit]s.
+abstract class BuildTree extends BuildBit implements BuildTreeProperties {
+  static final _buffers = Expando<StringBuffer>();
 
   /// The associated DOM element.
   final dom.Element element;
@@ -122,7 +134,9 @@ abstract class BuildTree extends BuildBit {
   /// The associated [HtmlStyle] builder.
   final HtmlStyleBuilder styleBuilder;
 
-  final _values = <dynamic>[];
+  final _children = <BuildBit>[];
+
+  final _nonInheritedProperties = <dynamic>[];
 
   /// Creates a tree.
   BuildTree({
@@ -227,7 +241,18 @@ abstract class BuildTree extends BuildBit {
 
   @protected
   void copyTo(BuildTree target) {
-    target._values.addAll(_values);
+    target._nonInheritedProperties.addAll(_nonInheritedProperties);
+  }
+
+  @override
+  T? getNonInheritedProperty<T>() {
+    for (final property in _nonInheritedProperties) {
+      if (property is T) {
+        return property;
+      }
+    }
+
+    return null;
   }
 
   /// Gets a styling declaration by [property].
@@ -244,6 +269,17 @@ abstract class BuildTree extends BuildBit {
 
   /// Registers a build op.
   void register(BuildOp op);
+
+  @override
+  T setNonInheritedProperty<T>(T value) {
+    final index = _nonInheritedProperties.indexWhere((p) => p is T);
+    if (index == -1) {
+      _nonInheritedProperties.add(value);
+    } else {
+      _nonInheritedProperties[index] = value;
+    }
+    return value;
+  }
 
   /// Creates a sub tree without [append]ing.
   BuildTree sub();
@@ -268,32 +304,6 @@ abstract class BuildTree extends BuildBit {
     _buffers[this] = null;
 
     return str;
-  }
-
-  /// Gets or sets value of type [T].
-  ///
-  /// These values are not passed down to sub-trees.
-  T? value<T>([T? newValue]) {
-    if (newValue == null) {
-      // read mode
-      for (final oldValue in _values) {
-        if (oldValue is T) {
-          return oldValue;
-        }
-      }
-
-      return null;
-    } else {
-      // write mode
-      final index = _values.indexWhere((e) => e is T);
-      if (index == -1) {
-        _values.add(newValue);
-      } else {
-        _values[index] = newValue;
-      }
-
-      return newValue;
-    }
   }
 }
 

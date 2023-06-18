@@ -313,20 +313,17 @@ class TagTable {
 }
 
 extension on BuildTree {
-  _TagTableData get tableData {
-    final existing = value<_TagTableData>();
-    if (existing != null) {
-      return existing;
-    }
+  _TagTableData get tableData =>
+      getNonInheritedProperty<_TagTableData>() ??
+      setNonInheritedProperty<_TagTableData>(_parse());
 
+  _TagTableData _parse() {
     final attrs = element.attributes;
-    final newData = _TagTableData(
+    return _TagTableData(
       border: tryParseDoubleFromMap(attrs, kAttributeBorder) ?? 0.0,
       borderSpacing: tryParseDoubleFromMap(attrs, kAttributeCellSpacing) ?? 2.0,
       cellPadding: tryParseDoubleFromMap(attrs, kAttributeCellPadding) ?? 1.0,
     );
-    value(newData);
-    return newData;
   }
 }
 

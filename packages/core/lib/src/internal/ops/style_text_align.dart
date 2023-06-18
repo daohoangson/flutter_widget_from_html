@@ -48,19 +48,12 @@ extension StyleTextAlign on WidgetFactory {
 }
 
 extension on BuildTree {
-  _StyleTextAlignData get textAlignData {
-    final existing = value<_StyleTextAlignData>();
-    if (existing != null) {
-      return existing;
-    }
+  _StyleTextAlignData get textAlignData =>
+      getNonInheritedProperty<_StyleTextAlignData>() ??
+      setNonInheritedProperty<_StyleTextAlignData>(_parse());
 
-    final newData = _parse(this);
-    value(newData);
-    return newData;
-  }
-
-  static _StyleTextAlignData _parse(BuildTree tree) {
-    final term = tree.getStyle(kCssTextAlign)?.term;
+  _StyleTextAlignData _parse() {
+    final term = getStyle(kCssTextAlign)?.term;
     if (term == null) {
       return const _StyleTextAlignData(null, null);
     }

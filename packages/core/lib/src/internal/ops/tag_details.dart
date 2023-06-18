@@ -42,12 +42,12 @@ class TagDetails {
                 return summaryTree..prepend(marker);
               },
               onRenderBlock: (_, placeholder) {
-                final summaries = detailsTree.summaries;
-                if (summaries.isNotEmpty) {
+                final data = detailsTree.detailsData;
+                if (data.summaries.isNotEmpty) {
                   return placeholder;
                 }
 
-                summaries.add(placeholder);
+                data.summaries.add(placeholder);
                 return WidgetPlaceholder(debugLabel: '$kTagSummary--block');
               },
               priority: Late.tagSummary,
@@ -62,7 +62,7 @@ class TagDetails {
             (context, child) {
               final style = tree.styleBuilder.build(context);
               final textStyle = style.textStyle;
-              final summaries = tree.summaries;
+              final summaries = tree.detailsData.summaries;
               final summary = summaries.isNotEmpty
                   ? summaries.first
                   : wf.buildText(
@@ -98,16 +98,9 @@ class TagDetails {
 }
 
 extension on BuildTree {
-  List<Widget> get summaries {
-    final existing = value<_TagDetailsData>();
-    if (existing != null) {
-      return existing.summaries;
-    }
-
-    final newData = _TagDetailsData();
-    value(newData);
-    return newData.summaries;
-  }
+  _TagDetailsData get detailsData =>
+      getNonInheritedProperty<_TagDetailsData>() ??
+      setNonInheritedProperty<_TagDetailsData>(_TagDetailsData());
 }
 
 class _TagDetailsData {

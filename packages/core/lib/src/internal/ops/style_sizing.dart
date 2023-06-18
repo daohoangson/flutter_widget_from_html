@@ -87,7 +87,7 @@ class StyleSizing {
   });
 
   static Widget _childZero(BuildTree subTree, WidgetPlaceholder placeholder) {
-    if (_StyleSizingInput.tryParse(subTree)?.preferredWidth == k100percent) {
+    if (subTree.sizingInput?.preferredWidth == k100percent) {
       return placeholder;
     }
 
@@ -96,12 +96,12 @@ class StyleSizing {
       return placeholder;
     }
 
-    final parentMeta = _elementTree[parentElement];
-    if (parentMeta == null) {
+    final parentTree = _elementTree[parentElement];
+    if (parentTree == null) {
       return placeholder;
     }
 
-    final parentInput = _StyleSizingInput.tryParse(parentMeta);
+    final parentInput = parentTree.sizingInput;
     if (parentInput == null ||
         (parentInput.minWidth == null && parentInput.preferredWidth == null)) {
       return placeholder;
@@ -121,7 +121,7 @@ class StyleSizing {
       return placeholder;
     }
 
-    final input = _StyleSizingInput.tryParse(tree);
+    final input = tree.sizingInput;
     if (input == null) {
       return placeholder;
     }
@@ -136,7 +136,7 @@ class StyleSizing {
       return;
     }
 
-    final input = _StyleSizingInput.tryParse(tree);
+    final input = tree.sizingInput;
     if (input == null) {
       return;
     }
@@ -200,6 +200,88 @@ class StyleSizing {
   }
 }
 
+extension on BuildTree {
+  _StyleSizingInput? get sizingInput {
+    final input = getNonInheritedProperty<_StyleSizingInput>() ??
+        setNonInheritedProperty<_StyleSizingInput>(_parse());
+
+    if (input.maxHeight == null &&
+        input.maxWidth == null &&
+        input.minHeight == null &&
+        input.minWidth == null &&
+        input.preferredHeight == null &&
+        input.preferredWidth == null) {
+      return null;
+    }
+
+    return input;
+  }
+
+  _StyleSizingInput _parse() {
+    CssLength? maxHeight;
+    CssLength? maxWidth;
+    CssLength? minHeight;
+    CssLength? minWidth;
+    Axis? preferredAxis;
+    CssLength? preferredHeight;
+    CssLength? preferredWidth;
+
+    for (final style in styles) {
+      final value = style.value;
+      if (value == null) {
+        continue;
+      }
+
+      switch (style.property) {
+        case kCssHeight:
+          final parsedHeight = tryParseCssLength(value);
+          if (parsedHeight != null) {
+            preferredAxis = Axis.vertical;
+            preferredHeight = parsedHeight;
+          }
+          break;
+        case kCssMaxHeight:
+          maxHeight = tryParseCssLength(value) ?? maxHeight;
+          break;
+        case kCssMaxWidth:
+          maxWidth = tryParseCssLength(value) ?? maxWidth;
+          break;
+        case kCssMinHeight:
+          minHeight = tryParseCssLength(value) ?? minHeight;
+          break;
+        case kCssMinWidth:
+          minWidth = tryParseCssLength(value) ?? minWidth;
+          break;
+        case kCssWidth:
+          final parsedWidth = tryParseCssLength(value);
+          if (parsedWidth != null) {
+            preferredAxis = Axis.horizontal;
+            preferredWidth = parsedWidth;
+          }
+          break;
+      }
+    }
+
+    if (preferredWidth == null && StyleSizing._treeIsBlock[this] == true) {
+      // `display: block` implies a 100% width
+      // but it MUST NOT reset width value if specified
+      // we need to keep track of block width to calculate contraints correctly
+      preferredWidth = StyleSizing.k100percent;
+      preferredAxis ??= Axis.horizontal;
+    }
+
+    return _StyleSizingInput(
+      maxHeight: maxHeight,
+      maxWidth: maxWidth,
+      minHeight: minHeight,
+      minWidth: minWidth,
+      preferredAxis: preferredAxis,
+      preferredHeight: preferredHeight,
+      preferredWidth: preferredWidth,
+    );
+  }
+}
+
 class _MinWidthZero extends ConstraintsTransformBox {
   const _MinWidthZero({
     required Widget child,
@@ -237,90 +319,4 @@ class _StyleSizingInput {
     this.preferredHeight,
     this.preferredWidth,
   });
-
-  factory _StyleSizingInput.fromTree(BuildTree tree) {
-    CssLength? maxHeight;
-    CssLength? maxWidth;
-    CssLength? minHeight;
-    CssLength? minWidth;
-    Axis? preferredAxis;
-    CssLength? preferredHeight;
-    CssLength? preferredWidth;
-
-    for (final style in tree.styles) {
-      final value = style.value;
-      if (value == null) {
-        continue;
-      }
-
-      switch (style.property) {
-        case kCssHeight:
-          final parsedHeight = tryParseCssLength(value);
-          if (parsedHeight != null) {
-            preferredAxis = Axis.vertical;
-            preferredHeight = parsedHeight;
-          }
-          break;
-        case kCssMaxHeight:
-          maxHeight = tryParseCssLength(value) ?? maxHeight;
-          break;
-        case kCssMaxWidth:
-          maxWidth = tryParseCssLength(value) ?? maxWidth;
-          break;
-        case kCssMinHeight:
-          minHeight = tryParseCssLength(value) ?? minHeight;
-          break;
-        case kCssMinWidth:
-          minWidth = tryParseCssLength(value) ?? minWidth;
-          break;
-        case kCssWidth:
-          final parsedWidth = tryParseCssLength(value);
-          if (parsedWidth != null) {
-            preferredAxis = Axis.horizontal;
-            preferredWidth = parsedWidth;
-          }
-          break;
-      }
-    }
-
-    if (preferredWidth == null && StyleSizing._treeIsBlock[tree] == true) {
-      // `display: block` implies a 100% width
-      // but it MUST NOT reset width value if specified
-      // we need to keep track of block width to calculate contraints correctly
-      preferredWidth = StyleSizing.k100percent;
-      preferredAxis ??= Axis.horizontal;
-    }
-
-    return _StyleSizingInput(
-      maxHeight: maxHeight,
-      maxWidth: maxWidth,
-      minHeight: minHeight,
-      minWidth: minWidth,
-      preferredAxis: preferredAxis,
-      preferredHeight: preferredHeight,
-      preferredWidth: preferredWidth,
-    );
-  }
-
-  static _StyleSizingInput? tryParse(BuildTree tree) {
-    _StyleSizingInput input;
-    final existing = tree.value<_StyleSizingInput>();
-    if (existing == null) {
-      input = _StyleSizingInput.fromTree(tree);
-      tree.value(input);
-    } else {
-      input = existing;
-    }
-
-    if (input.maxHeight == null &&
-        input.maxWidth == null &&
-        input.minHeight == null &&
-        input.minWidth == null &&
-        input.preferredHeight == null &&
-        input.preferredWidth == null) {
-      return null;
-    }
-
-    return input;
-  }
 }

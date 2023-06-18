@@ -11,7 +11,7 @@ const kCssBorderRadiusTopLeft = 'border-top-left-radius';
 const kCssBorderRadiusTopRight = 'border-top-right-radius';
 
 CssBorder tryParseBorder(BuildTree tree) {
-  final existing = tree.value<CssBorder>();
+  final existing = tree.getNonInheritedProperty<CssBorder>();
   if (existing != null) {
     return existing;
   }
@@ -30,7 +30,7 @@ CssBorder tryParseBorder(BuildTree tree) {
     }
   }
 
-  tree.value(border);
+  tree.setNonInheritedProperty<CssBorder>(border);
 
   return border;
 }

@@ -38,25 +38,22 @@ const kCssLineHeight = 'line-height';
 const kCssLineHeightNormal = 'normal';
 
 extension BuildTreeEllipsis on BuildTree {
-  _BuildTreeEllipsis get _ => value() ?? _BuildTreeEllipsis();
+  _BuildTreeEllipsis get _ellipsis =>
+      getNonInheritedProperty<_BuildTreeEllipsis>() ??
+      setNonInheritedProperty<_BuildTreeEllipsis>(const _BuildTreeEllipsis());
 
-  set _(_BuildTreeEllipsis v) => value<_BuildTreeEllipsis>(v);
+  int get maxLines => _ellipsis.maxLines;
 
-  int get maxLines => _.maxLines;
+  set maxLines(int value) => setNonInheritedProperty<_BuildTreeEllipsis>(
+        _ellipsis.copyWith(maxLines: value),
+      );
 
-  set maxLines(int value) {
-    final v = _;
-    v.maxLines = value;
-    _ = v;
-  }
+  TextOverflow get overflow => _ellipsis.overflow;
 
-  TextOverflow get overflow => _.overflow;
-
-  set overflow(TextOverflow value) {
-    final v = _;
-    v.overflow = value;
-    _ = v;
-  }
+  set overflow(TextOverflow value) =>
+      setNonInheritedProperty<_BuildTreeEllipsis>(
+        _ellipsis.copyWith(overflow: value),
+      );
 }
 
 // ignore: avoid_classes_with_only_static_members
@@ -292,7 +289,22 @@ class TextStyleOps {
   }
 }
 
+@immutable
 class _BuildTreeEllipsis {
-  int maxLines = -1;
-  TextOverflow overflow = TextOverflow.clip;
+  final int maxLines;
+  final TextOverflow overflow;
+
+  const _BuildTreeEllipsis({
+    this.maxLines = -1,
+    this.overflow = TextOverflow.clip,
+  });
+
+  _BuildTreeEllipsis copyWith({
+    int? maxLines,
+    TextOverflow? overflow,
+  }) =>
+      _BuildTreeEllipsis(
+        maxLines: maxLines ?? this.maxLines,
+        overflow: overflow ?? this.overflow,
+      );
 }
