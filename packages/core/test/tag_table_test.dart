@@ -392,6 +392,10 @@ Future<void> main() async {
       final explained = await explain(tester, html, useExplainer: false);
       expect(
         explained,
+        isNot(contains('└HtmlTableCell(columnStart: 0, rowStart: 0)')),
+      );
+      expect(
+        explained,
         contains('└HtmlTableCell(columnStart: 0, rowStart: 0, width: 50.0)'),
       );
     });
@@ -399,6 +403,27 @@ Future<void> main() async {
     testWidgets('renders width: 100%', (WidgetTester tester) async {
       const html = '<table><tr><td style="width: 100%">Foo</td></tr></table>';
       final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        isNot(contains('└HtmlTableCell(columnStart: 0, rowStart: 0)')),
+      );
+      expect(
+        explained,
+        contains('└HtmlTableCell(columnStart: 0, rowStart: 0, width: 100.0%)'),
+      );
+    });
+
+    testWidgets('renders width: 100% within TABLE', (tester) async {
+      const html = '<table><tr><td>'
+          '<table><tr><td style="width: 100%">'
+          'Foo'
+          '</td></tr></table>'
+          '</td></tr></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        contains('└HtmlTableCell(columnStart: 0, rowStart: 0)'),
+      );
       expect(
         explained,
         contains('└HtmlTableCell(columnStart: 0, rowStart: 0, width: 100.0%)'),

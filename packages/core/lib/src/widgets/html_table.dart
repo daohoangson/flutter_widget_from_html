@@ -337,7 +337,7 @@ class _TableRenderLayouter {
         drySize =
             Size(constraints.hasBoundedWidth ? constraints.maxWidth : 100.0, 0);
         try {
-          drySize = performLayoutGetDryLayout(child, const BoxConstraints());
+          drySize = performLayoutGetDryLayout(child, constraints);
         } catch (dryLayoutError, stackTrace) {
           debugPrint('Ignored _performLayoutDry error: '
               '$dryLayoutError\n$stackTrace');
