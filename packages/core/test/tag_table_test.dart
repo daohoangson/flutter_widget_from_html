@@ -380,6 +380,32 @@ Future<void> main() async {
     });
   });
 
+  group('width', () {
+    testWidgets('renders without width', (WidgetTester tester) async {
+      const html = '<table><tr><td>Foo</td></tr></table>';
+      final e = await explain(tester, html, useExplainer: false);
+      expect(e, contains('└HtmlTableCell(columnStart: 0, rowStart: 0)'));
+    });
+
+    testWidgets('renders width: 50px', (WidgetTester tester) async {
+      const html = '<table><tr><td style="width: 50px">Foo</td></tr></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        contains('└HtmlTableCell(columnStart: 0, rowStart: 0, width: 50.0)'),
+      );
+    });
+
+    testWidgets('renders width: 100%', (WidgetTester tester) async {
+      const html = '<table><tr><td style="width: 100%">Foo</td></tr></table>';
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        contains('└HtmlTableCell(columnStart: 0, rowStart: 0, width: 100.0%)'),
+      );
+    });
+  });
+
   group('error handling', () {
     testWidgets('missing header', (WidgetTester tester) async {
       const html = '<table><tbody>'

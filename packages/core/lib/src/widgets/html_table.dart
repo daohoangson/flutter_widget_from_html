@@ -206,6 +206,7 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
     properties.add(IntProperty('columnStart', columnStart));
     properties.add(IntProperty('rowSpan', rowSpan, defaultValue: 1));
     properties.add(IntProperty('rowStart', rowStart));
+    properties.add(DiagnosticsProperty('width', width, defaultValue: null));
   }
 
   @override
