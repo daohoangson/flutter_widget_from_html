@@ -337,7 +337,7 @@ class _TableRenderLayouter {
         drySize =
             Size(constraints.hasBoundedWidth ? constraints.maxWidth : 100.0, 0);
         try {
-          drySize = performLayoutGetDryLayout(child, constraints);
+          drySize = performLayoutGetDryLayout(child, const BoxConstraints());
         } catch (dryLayoutError, stackTrace) {
           debugPrint('Ignored _performLayoutDry error: '
               '$dryLayoutError\n$stackTrace');
@@ -560,13 +560,19 @@ class _TableRenderLayouter {
     }
 
     final result = effectiveMinValues.toList(growable: false);
-    if (valuesSum > .0) {
-      for (var i = 0; i < values.length; i++) {
-        if (result[i] == 0) {
-          // calculate widths using weighted distribution
-          // e.g. if a column has huge dry width, it will have bigger width
-          result[i] = values[i] / valuesSum * remaining;
-        }
+    final resultZeros = result.where((r) => r == .0).length;
+    for (var i = 0; i < values.length; i++) {
+      if (result[i] != .0) {
+        continue;
+      }
+
+      if (valuesSum > .0 && valuesSum.isFinite) {
+        // calculate widths using weighted distribution
+        // e.g. if a column has huge dry width, it will have bigger width
+        result[i] = values[i] / valuesSum * remaining;
+      } else {
+        // split the remaining width between zero fields if SUM(values) is not usable
+        result[i] = remaining / resultZeros;
       }
     }
 
