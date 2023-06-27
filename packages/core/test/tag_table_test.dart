@@ -909,6 +909,18 @@ Future<void> main() async {
     <td style="background: green; width: 70%">Bar</td>
   </tr>
 </table>''',
+              'width_in_percent_100_nested': '''
+<table border="1">
+  <tr>
+    <td>
+      <table border="1">
+        <tr>
+          <td style="width: 100%">Foo</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>''',
               'width_in_px': '''
 <table border="1">
   <tr>
