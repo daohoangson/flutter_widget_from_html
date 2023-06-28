@@ -543,7 +543,7 @@ class _TableRenderLayouter {
   ) {
     final effectiveMinValues = List.filled(values.length, .0);
     for (var i = 0; i < values.length; i++) {
-      if (calculatedMinValues[i] > 0 && calculatedMinValues[i] >= values[i]) {
+      if (calculatedMinValues[i] > .0 && calculatedMinValues[i] >= values[i]) {
         // min value is smaller than in-calculation width
         // let's keep the current value as long as possible
         // we want the column to grow to its dry size naturally
@@ -552,27 +552,30 @@ class _TableRenderLayouter {
     }
 
     final remaining = max(.0, available - effectiveMinValues.sum);
+    var valuesCount = 0;
     var valuesSum = .0;
     for (var i = 0; i < values.length; i++) {
-      if (effectiveMinValues[i] == 0) {
+      if (effectiveMinValues[i] == .0) {
+        valuesCount++;
         valuesSum += values[i];
       }
     }
 
     final result = effectiveMinValues.toList(growable: false);
-    final resultZeros = result.where((r) => r == .0).length;
-    for (var i = 0; i < values.length; i++) {
-      if (result[i] != .0) {
-        continue;
-      }
+    if (valuesCount > 0) {
+      for (var i = 0; i < values.length; i++) {
+        if (result[i] != .0) {
+          continue;
+        }
 
-      if (valuesSum > .0 && valuesSum.isFinite) {
-        // calculate widths using weighted distribution
-        // e.g. if a column has huge dry width, it will have bigger width
-        result[i] = values[i] / valuesSum * remaining;
-      } else {
-        // split the remaining width between zero fields if SUM(values) is not usable
-        result[i] = remaining / resultZeros;
+        if (valuesSum.isFinite) {
+          // calculate widths using weighted distribution
+          // e.g. if a column has huge dry width, it will have bigger width
+          result[i] = values[i] / valuesSum * remaining;
+        } else {
+          // split the remaining width equally if SUM(values) is not usable
+          result[i] = remaining / valuesCount;
+        }
       }
     }
 
