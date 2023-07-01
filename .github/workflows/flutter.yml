@@ -46,6 +46,8 @@ jobs:
         run: |
           set -e
 
+          flutter doctor -v
+
           _runtime=$(xcrun simctl list runtimes ios -j | jq -r '.runtimes[-1]')
           _runtimeId=$(echo $_runtime | jq -r .identifier)
           echo "_runtimeId=$_runtimeId"
