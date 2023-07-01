@@ -34,7 +34,7 @@ jobs:
 
   integration_test:
     name: Integration test
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
       - name: Setup Flutter
@@ -46,6 +46,10 @@ jobs:
         run: |
           set -e
 
+          # Use Xcode 14.3.1 because webview_flutter_wkwebview@3.6.0 needs iOS 16.4
+          # https://github.com/flutter/flutter/issues/129587
+          # https://github.com/flutter/packages/commit/96c8e2d7f8127397d210fcc42b924e8536404362
+          sudo xcode-select -s '/Applications/Xcode_14.3.1.app/Contents/Developer'
           flutter doctor -v
 
           _runtime=$(xcrun simctl list runtimes ios -j | jq -r '.runtimes[-1]')
