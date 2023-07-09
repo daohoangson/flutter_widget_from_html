@@ -1,3 +1,12 @@
+## 0.10.2
+
+- Fix 100% width TD in recursive TABLEs (#952)
+
+## 0.10.1
+
+- Add support for Flutter 3.10 (#889)
+- Apply OpenSSF Scorecard (#888)
+
 ## 0.10.0
 
 - Add support for Flutter 3.7 (#861)

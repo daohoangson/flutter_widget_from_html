@@ -15,7 +15,7 @@ class HtmlWidget extends core.HtmlWidget {
   const HtmlWidget(
     super.html, {
     super.buildAsync,
-    bool super.enableCaching = true,
+    super.enableCaching,
     WidgetFactory Function()? factoryBuilder,
     super.key,
     super.baseUrl,

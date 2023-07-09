@@ -36,15 +36,12 @@ class PopupMenu extends StatelessWidget {
         switch (pmv) {
           case _PopupMenuValue.scrollToTop:
             value.key.currentState?.scrollToAnchor('top');
-            break;
           case _PopupMenuValue.showPerformanceOverlay:
             notifier.value = value.copyWith(
               showPerformanceOverlay: !value.showPerformanceOverlay,
             );
-            break;
           case _PopupMenuValue.toggleIsSelectable:
             notifier.value = value.copyWith(isSelectable: !value.isSelectable);
-            break;
         }
       },
       itemBuilder: (context) {

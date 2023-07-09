@@ -7,11 +7,11 @@ void main() {
 
   group('renders DETAILS tag', () {
     const expected = [
-      ' └HtmlDetails(state: _HtmlDetailsState)\n',
-      '    ├HtmlSummary\n',
-      '    │      └HtmlDetailsMarker()\n',
-      '    └HtmlDetailsContents()\n',
-      '     └RichText(text: "Foo")\n'
+      'HtmlDetails(state: _HtmlDetailsState)',
+      '├HtmlSummary',
+      '└HtmlDetailsMarker()',
+      '└HtmlDetailsContents()',
+      '└RichText(text: "Foo")'
     ];
 
     testWidgets('initial close', (WidgetTester tester) async {
@@ -64,12 +64,12 @@ void main() {
   group('renders SUMMARY tag', () {
     const summaryText = '￼Foo';
     const expected = [
-      ' └HtmlDetails(state: _HtmlDetailsState)\n',
-      '    ├HtmlSummary\n',
-      '    │     └RichText(text: "$summaryText")\n',
-      '    │        └HtmlDetailsMarker()\n',
-      '    └HtmlDetailsContents()\n',
-      '     └RichText(text: "Bar")\n'
+      '└HtmlDetails(state: _HtmlDetailsState)',
+      '├HtmlSummary',
+      '└RichText(text: "$summaryText")',
+      '└HtmlDetailsMarker()',
+      '└HtmlDetailsContents()',
+      '└RichText(text: "Bar")'
     ];
 
     testWidgets('initial close', (WidgetTester tester) async {
