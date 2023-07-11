@@ -56,6 +56,7 @@ class CssBorder {
 
   /// Creates a copy of this border with the sides from [other].
   CssBorder copyFrom(CssBorder other) => copyWith(
+        all: other._all,
         bottom: other._bottom,
         inlineEnd: other._inlineEnd,
         inlineStart: other._inlineStart,
