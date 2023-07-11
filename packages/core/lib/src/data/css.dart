@@ -71,6 +71,7 @@ class CssBorder {
   /// Creates a copy of this border but with the given fields
   /// replaced with the new values.
   CssBorder copyWith({
+    CssBorderSide? all,
     CssBorderSide? bottom,
     CssBorderSide? inlineEnd,
     CssBorderSide? inlineStart,
@@ -84,13 +85,16 @@ class CssBorder {
   }) =>
       CssBorder(
         inherit: inherit,
-        all: _all,
-        bottom: CssBorderSide._copyWith(_bottom, bottom),
-        inlineEnd: CssBorderSide._copyWith(_inlineEnd, inlineEnd),
-        inlineStart: CssBorderSide._copyWith(_inlineStart, inlineStart),
-        left: CssBorderSide._copyWith(_left, left),
-        right: CssBorderSide._copyWith(_right, right),
-        top: CssBorderSide._copyWith(_top, top),
+        all: CssBorderSide._copyWith(_all, all),
+        bottom: all != null ? null : CssBorderSide._copyWith(_bottom, bottom),
+        inlineEnd:
+            all != null ? null : CssBorderSide._copyWith(_inlineEnd, inlineEnd),
+        inlineStart: all != null
+            ? null
+            : CssBorderSide._copyWith(_inlineStart, inlineStart),
+        left: all != null ? null : CssBorderSide._copyWith(_left, left),
+        right: all != null ? null : CssBorderSide._copyWith(_right, right),
+        top: all != null ? null : CssBorderSide._copyWith(_top, top),
         radiusBottomLeft: radiusBottomLeft ?? this.radiusBottomLeft,
         radiusBottomRight: radiusBottomRight ?? this.radiusBottomRight,
         radiusTopLeft: radiusTopLeft ?? this.radiusTopLeft,
