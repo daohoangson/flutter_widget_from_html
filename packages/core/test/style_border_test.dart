@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '_.dart';
 
 const _border1 = '1.0@solid#FF001234';
+const _border2 = '2.0@solid#FF001234';
 
 void main() {
   testWidgets('renders text without border', (WidgetTester tester) async {
@@ -56,15 +57,8 @@ void main() {
   group('2 values', () {
     testWidgets('parses width style', (WidgetTester tester) async {
       const html = '<span style="border: 2px solid">Foo</span>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[Container:'
-          'border=2.0@solid#FF001234,'
-          'child=[RichText:(:Foo)]]',
-        ),
-      );
+      final e = await explain(tester, html);
+      expect(e, equals('[Container:border=$_border2,child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('ignores width color', (WidgetTester tester) async {
@@ -75,15 +69,8 @@ void main() {
 
     testWidgets('parses style width', (WidgetTester tester) async {
       const html = '<span style="border: 2px solid">Foo</span>';
-      final explained = await explain(tester, html);
-      expect(
-        explained,
-        equals(
-          '[Container:'
-          'border=2.0@solid#FF001234,'
-          'child=[RichText:(:Foo)]]',
-        ),
-      );
+      final e = await explain(tester, html);
+      expect(e, equals('[Container:border=$_border2,child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('ignores style color', (WidgetTester tester) async {
@@ -747,6 +734,34 @@ void main() {
         ),
       );
     });
+
+    testWidgets('#959: border-radius then border', (tester) async {
+      const html = '<span style="border-radius: 1px; '
+          'border: solid 2px red;">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:border=2.0@solid#FFFF0000,'
+          'radius=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
+
+    testWidgets('#959: border then border-radius', (tester) async {
+      const html = '<span style="border: solid 2px red; '
+          'border-radius: 1px;">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(
+        explained,
+        equals(
+          '[Container:border=2.0@solid#FFFF0000,'
+          'radius=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],'
+          'child=[RichText:(:Foo)]]',
+        ),
+      );
+    });
   });
 
   group('box-sizing', () {
@@ -789,7 +804,7 @@ void main() {
         explained,
         equals(
           '[Container:'
-          'border=(2.0@solid#FF001234,$_border1,$_border1,$_border1),'
+          'border=($_border2,$_border1,$_border1,$_border1),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -803,7 +818,7 @@ void main() {
         explained,
         equals(
           '[Container:'
-          'border=(2.0@solid#FF001234,$_border1,$_border1,$_border1),'
+          'border=($_border2,$_border1,$_border1,$_border1),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -817,7 +832,7 @@ void main() {
         explained,
         equals(
           '[Container:'
-          'border=($_border1,2.0@solid#FF001234,$_border1,$_border1),'
+          'border=($_border1,$_border2,$_border1,$_border1),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -831,7 +846,7 @@ void main() {
         explained,
         equals(
           '[Container:'
-          'border=($_border1,$_border1,2.0@solid#FF001234,$_border1),'
+          'border=($_border1,$_border1,$_border2,$_border1),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -845,7 +860,7 @@ void main() {
         explained,
         equals(
           '[Container:'
-          'border=($_border1,$_border1,2.0@solid#FF001234,$_border1),'
+          'border=($_border1,$_border1,$_border2,$_border1),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -859,7 +874,7 @@ void main() {
         explained,
         equals(
           '[Container:'
-          'border=($_border1,$_border1,$_border1,2.0@solid#FF001234),'
+          'border=($_border1,$_border1,$_border1,$_border2),'
           'child=[RichText:(:Foo)]]',
         ),
       );
@@ -875,7 +890,7 @@ void main() {
           explained,
           equals(
             '[Container:'
-            'border=($_border1,$_border1,$_border1,2.0@solid#FF001234),'
+            'border=($_border1,$_border1,$_border1,$_border2),'
             'child=[RichText:(:Foo)]]',
           ),
         );
@@ -887,7 +902,7 @@ void main() {
           explained,
           equals(
             '[Container:'
-            'border=($_border1,2.0@solid#FF001234,$_border1,$_border1),'
+            'border=($_border1,$_border2,$_border1,$_border1),'
             'child=[RichText:dir=rtl,(:Foo)]]',
           ),
         );
@@ -904,7 +919,7 @@ void main() {
           explained,
           equals(
             '[Container:'
-            'border=($_border1,2.0@solid#FF001234,$_border1,$_border1),'
+            'border=($_border1,$_border2,$_border1,$_border1),'
             'child=[RichText:(:Foo)]]',
           ),
         );
@@ -916,11 +931,67 @@ void main() {
           explained,
           equals(
             '[Container:'
-            'border=($_border1,$_border1,$_border1,2.0@solid#FF001234),'
+            'border=($_border1,$_border1,$_border1,$_border2),'
             'child=[RichText:dir=rtl,(:Foo)]]',
           ),
         );
       });
+    });
+
+    testWidgets('ovewrites border-top with border', (tester) async {
+      const html =
+          '<span style="border-top: solid; border: 2px solid">Foo</span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Container:border=$_border2,child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('ovewrites border-block-start with border', (tester) async {
+      const html =
+          '<span style="border-block-start: solid; border: 2px solid">Foo</span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Container:border=$_border2,child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('ovewrites border-right with border', (tester) async {
+      const html =
+          '<span style="border-right: solid; border: 2px solid">Foo</span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Container:border=$_border2,child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('ovewrites border-bottom with border', (tester) async {
+      const html =
+          '<span style="border-bottom: solid; border: 2px solid">Foo</span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Container:border=$_border2,child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('ovewrites border-block-end with border', (tester) async {
+      const html =
+          '<span style="border-block-end: solid; border: 2px solid">Foo</span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Container:border=$_border2,child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('ovewrites border-left with border', (tester) async {
+      const html =
+          '<span style="border-left: solid; border: 2px solid">Foo</span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Container:border=$_border2,child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('ovewrites border-inline-start with border', (tester) async {
+      const html =
+          '<span style="border-inline-start: solid; border: 2px solid">Foo</span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Container:border=$_border2,child=[RichText:(:Foo)]]'));
+    });
+
+    testWidgets('ovewrites border-inline-end with border', (tester) async {
+      const html =
+          '<span style="border-inline-end: solid; border: 2px solid">Foo</span>';
+      final e = await explain(tester, html);
+      expect(e, equals('[Container:border=$_border2,child=[RichText:(:Foo)]]'));
     });
 
     testWidgets('overwrites style', (tester) async {
