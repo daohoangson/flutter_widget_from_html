@@ -17,7 +17,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_widget_from_html_core: ^0.10.2
+  flutter_widget_from_html_core: ^0.10.3
 ```
 
 ## Usage
