@@ -73,7 +73,7 @@ CssBorder _tryParseBorderSide(CssBorder border, css.Declaration style) {
         );
 
   if (suffix.isEmpty) {
-    return CssBorder(all: borderSide);
+    return border.copyWith(all: borderSide);
   }
 
   switch (suffix) {

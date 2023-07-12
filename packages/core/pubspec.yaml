@@ -10,7 +10,7 @@ environment:
   sdk: ">=2.13.0 <4.0.0"
 
 dependencies:
-  csslib: ^0.17.0
+  csslib: ">=0.17.0 <2.0.0"
   flutter:
     sdk: flutter
   html: ^0.15.0
