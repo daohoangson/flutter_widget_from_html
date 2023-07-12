@@ -1,3 +1,7 @@
+## 0.10.3
+
+- Fix `border-radius` being overwritten by `border` (#966)
+
 ## 0.10.2
 
 - Fix 100% width TD in recursive TABLEs (#952)
