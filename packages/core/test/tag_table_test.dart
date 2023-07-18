@@ -9,7 +9,7 @@ import '_.dart';
 
 String _padding(String child) => '[HtmlTableCell:child='
     '[Padding:(1,1,1,1),child='
-    '[Align:alignment=centerLeft,widthFactor=1.0,child='
+    '[Align:alignment=centerLeft,heightFactor=1.0,widthFactor=1.0,child='
     '$child]]]';
 
 String _richtext(String text) => _padding('[RichText:(:$text)]');
@@ -552,7 +552,7 @@ Future<void> main() async {
           '[HtmlTableCell:child='
           '[Container:bg=#FFFF0000,child='
           '[Padding:(1,1,1,1),child='
-          '[Align:alignment=centerLeft,widthFactor=1.0,child='
+          '[Align:alignment=centerLeft,heightFactor=1.0,widthFactor=1.0,child='
           '[RichText:(:Foo)]'
           ']]]]]',
         ),
