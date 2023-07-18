@@ -775,7 +775,12 @@ Future<void> main() async {
       await tester.pumpAndSettle();
 
       expect(
-        key.renderBox.getDryLayout(const BoxConstraints()),
+        key.renderBox.getDryLayout(
+          const BoxConstraints(
+            maxHeight: 100,
+            maxWidth: 100,
+          ),
+        ),
         equals(const Size(100, 50)),
       );
     });
