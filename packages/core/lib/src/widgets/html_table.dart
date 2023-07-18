@@ -377,7 +377,7 @@ class _TableRenderLayouter {
     final availableWidth = step1.availableWidth;
     final cells = step1.cells;
     final children = step1.children;
-    final loosenConstraints = constraints.loosen();
+    final loosenConstraints = BoxConstraints(maxWidth: constraints.maxWidth);
     final naiveColumnWidths = step2.naiveColumnWidths;
 
     final childMinWidths = List<double?>.filled(children.length, null);
