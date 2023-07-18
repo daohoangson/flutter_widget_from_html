@@ -544,7 +544,7 @@ class _TableRenderLayouter {
       var childHeight =
           data.calculateHeight(tro, step4.rowHeights) + deltaHeight;
       var childWidth = data.calculateWidth(tro, step3.columnWidths);
-      if (childSize.height > childHeight) {
+      if (childSize.height != childHeight) {
         final cc2 = BoxConstraints.tight(Size(childWidth, childHeight));
         // side effect
         childSize = layouter(child, cc2);
