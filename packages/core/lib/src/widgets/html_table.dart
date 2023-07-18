@@ -8,6 +8,8 @@ import 'css_sizing.dart';
 
 final _logger = Logger('fwfh.HtmlTable');
 
+const epsilon = .0001;
+
 /// A TABLE widget.
 class HtmlTable extends MultiChildRenderObjectWidget {
   /// The table border sides.
@@ -359,26 +361,12 @@ class _TableRenderLayouter {
       }
     }
 
-    final availableWidth = step1.availableWidth;
-    if (availableWidth != null) {
-      final columnWidthsSum = naiveColumnWidths.sum;
-      const zeroEpsilon = .0001;
-      final zeroCount = naiveColumnWidths.where((v) => v < zeroEpsilon).length;
-      if (zeroCount > 0 && columnWidthsSum < availableWidth) {
-        final defaultColumnWidth =
-            (availableWidth - columnWidthsSum) / zeroCount;
-        for (var i = 0; i < naiveColumnWidths.length; i++) {
-          if (naiveColumnWidths[i] < zeroEpsilon) {
-            naiveColumnWidths[i] = defaultColumnWidth;
-          }
-        }
-      }
-    }
-
     return _TableDataStep2(
       step1,
       cellWidths: cellWidths,
-      naiveColumnWidths: naiveColumnWidths,
+      naiveColumnWidths: naiveColumnWidths
+          .map<double?>((v) => v > epsilon ? v : null)
+          .toList(growable: false),
     );
   }
 
@@ -390,12 +378,15 @@ class _TableRenderLayouter {
     final loosenConstraints = constraints.loosen();
     final naiveColumnWidths = step2.naiveColumnWidths;
 
+    var columnWidths = naiveColumnWidths.map((v) => v ?? .0).toList();
+    final nullWidths = naiveColumnWidths.where((v) => v == null).length;
+
     final childMinWidths = List<double?>.filled(children.length, null);
     final cellSizes = List<Size?>.filled(children.length, null);
-    var columnWidths = [...naiveColumnWidths];
     final minColumnWidths = List.filled(step1.columnCount, .0);
 
-    if (availableWidth == null || columnWidths.sum <= availableWidth) {
+    if (nullWidths == 0 &&
+        (availableWidth == null || columnWidths.sum <= availableWidth)) {
       return _TableDataStep3(
         step2,
         cellSizes: cellSizes,
@@ -408,8 +399,13 @@ class _TableRenderLayouter {
     while (shouldLoop) {
       shouldLoop = false;
 
-      columnWidths =
-          redistributeValues(columnWidths, minColumnWidths, availableWidth);
+      if (availableWidth != null) {
+        columnWidths = redistributeValues(
+          columnWidths,
+          minColumnWidths,
+          availableWidth,
+        );
+      }
 
       for (var i = 0; i < children.length; i++) {
         if (childMinWidths[i] != null) {
@@ -438,7 +434,7 @@ class _TableRenderLayouter {
         }
 
         // table is too crowded
-        // calculating min to avoid breaking line in the middle of a word
+        // get min width to avoid breaking line in the middle of a word
         try {
           final childMinWidth = child.getMinIntrinsicWidth(double.infinity);
           childMinWidths[i] = childMinWidth;
@@ -592,11 +588,9 @@ class _TableRenderLayouter {
   ) {
     final effectiveMinValues = List.filled(values.length, .0);
     for (var i = 0; i < values.length; i++) {
-      if (calculatedMinValues[i] > .0 && calculatedMinValues[i] >= values[i]) {
-        // min value is smaller than in-calculation width
-        // let's keep the current value as long as possible
-        // we want the column to grow to its dry size naturally
-        effectiveMinValues[i] = calculatedMinValues[i];
+      final calculatedMinValue = calculatedMinValues[i];
+      if (calculatedMinValue >= values[i]) {
+        effectiveMinValues[i] = calculatedMinValue;
       }
     }
 
@@ -604,7 +598,7 @@ class _TableRenderLayouter {
     var valuesCount = 0;
     var valuesSum = .0;
     for (var i = 0; i < values.length; i++) {
-      if (effectiveMinValues[i] == .0) {
+      if (effectiveMinValues[i] < epsilon) {
         valuesCount++;
         valuesSum += values[i];
       }
@@ -613,11 +607,11 @@ class _TableRenderLayouter {
     final result = effectiveMinValues.toList(growable: false);
     if (valuesCount > 0) {
       for (var i = 0; i < values.length; i++) {
-        if (result[i] != .0) {
+        if (result[i] > epsilon) {
           continue;
         }
 
-        if (valuesSum.isFinite) {
+        if (valuesSum > .0 && valuesSum.isFinite) {
           // calculate widths using weighted distribution
           // e.g. if a column has huge dry width, it will have bigger width
           result[i] = values[i] / valuesSum * remaining;
@@ -654,7 +648,7 @@ class _TableDataStep2 {
   final _TableDataStep1 step1;
 
   final List<double?> cellWidths;
-  final List<double> naiveColumnWidths;
+  final List<double?> naiveColumnWidths;
 
   const _TableDataStep2(
     this.step1, {
