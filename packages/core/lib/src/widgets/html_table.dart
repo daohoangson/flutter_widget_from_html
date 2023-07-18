@@ -221,6 +221,8 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
 extension on Iterable<double> {
   double get sum => isEmpty ? 0.0 : reduce(_sum);
 
+  int get zeros => where((v) => v == 0.0).length;
+
   static double _sum(double value, double element) => value + element;
 }
 
@@ -354,10 +356,10 @@ class _TableRenderLayouter {
 
     final naiveColumnWidths = List.filled(step1.columnCount, .0);
     for (var i = 0; i < cells.length; i++) {
-      final cell = cells[i];
+      final data = cells[i];
       final cellWidth = cellWidths[i];
       if (cellWidth != null) {
-        naiveColumnWidths.setMaxColumnWidths(tro, cell, cellWidth);
+        naiveColumnWidths.setMaxColumnWidths(tro, data, cellWidth);
       }
     }
 
@@ -378,14 +380,12 @@ class _TableRenderLayouter {
     final loosenConstraints = constraints.loosen();
     final naiveColumnWidths = step2.naiveColumnWidths;
 
-    var columnWidths = naiveColumnWidths.map((v) => v ?? .0).toList();
-    final nullWidths = naiveColumnWidths.where((v) => v == null).length;
-
     final childMinWidths = List<double?>.filled(children.length, null);
     final cellSizes = List<Size?>.filled(children.length, null);
+    var columnWidths = naiveColumnWidths.map((v) => v ?? .0).toList();
     final minColumnWidths = List.filled(step1.columnCount, .0);
 
-    if (nullWidths == 0 &&
+    if (columnWidths.zeros == 0 &&
         (availableWidth == null || columnWidths.sum <= availableWidth)) {
       return _TableDataStep3(
         step2,
@@ -399,7 +399,7 @@ class _TableRenderLayouter {
     while (shouldLoop) {
       shouldLoop = false;
 
-      if (availableWidth != null) {
+      if (columnWidths.zeros == 0 && availableWidth != null) {
         columnWidths = redistributeValues(
           columnWidths,
           minColumnWidths,
@@ -424,6 +424,7 @@ class _TableRenderLayouter {
           final layoutSize = layouter(child, loosenConstraints);
           cellSizes[i] = layoutSize;
           childWidth = layoutSize.width;
+          columnWidths.setMaxColumnWidths(tro, data, childWidth);
         }
 
         final dataGaps = tro._calculateColumnGaps(data);
