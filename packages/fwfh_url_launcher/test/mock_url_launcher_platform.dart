@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:url_launcher_platform_interface/link.dart';
 import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 
 Iterable<String> get mockLaunchedUrls {
@@ -13,9 +13,7 @@ Iterable<String> get mockLaunchedUrls {
 
 void mockUrlLauncherPlatform() => _FakeUrlLauncherPlatform();
 
-class _FakeUrlLauncherPlatform extends Fake
-    with MockPlatformInterfaceMixin
-    implements UrlLauncherPlatform {
+class _FakeUrlLauncherPlatform extends UrlLauncherPlatform {
   final List<String> urls = [];
 
   _FakeUrlLauncherPlatform() {
@@ -23,8 +21,11 @@ class _FakeUrlLauncherPlatform extends Fake
   }
 
   @override
+  LinkDelegate? get linkDelegate => throw UnimplementedError();
+
+  @override
   Future<bool> canLaunch(String url) async {
-    return true;
+    return url.contains('can-launch');
   }
 
   @override
