@@ -65,7 +65,7 @@ class StylePadding {
               child: wf.buildColumnPlaceholder(meta, widgets),
             ).wrapWith(
               (context, child) => _build(meta, context, child, padding),
-            )
+            ),
           ];
         },
         onWidgetsIsOptional: true,

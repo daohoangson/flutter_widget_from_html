@@ -69,7 +69,7 @@ void main() {
               html,
               key: hwKey,
               renderMode: RenderMode.sliverList,
-            )
+            ),
           ],
         ),
         useExplainer: false,

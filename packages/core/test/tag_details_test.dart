@@ -11,7 +11,7 @@ void main() {
       '├HtmlSummary',
       '└HtmlDetailsMarker()',
       '└HtmlDetailsContents()',
-      '└RichText(text: "Foo")'
+      '└RichText(text: "Foo")',
     ];
 
     testWidgets('initial close', (WidgetTester tester) async {
@@ -69,7 +69,7 @@ void main() {
       '└RichText(text: "$summaryText")',
       '└HtmlDetailsMarker()',
       '└HtmlDetailsContents()',
-      '└RichText(text: "Bar")'
+      '└RichText(text: "Bar")',
     ];
 
     testWidgets('initial close', (WidgetTester tester) async {

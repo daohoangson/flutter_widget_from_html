@@ -115,7 +115,7 @@ class _SliderState extends State<_Slider> {
             data: MediaQuery.of(context)
                 .copyWith(textScaleFactor: _textScaleFactor),
             child: _Panel(),
-          )
+          ),
         ],
       );
 }
