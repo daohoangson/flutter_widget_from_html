@@ -253,7 +253,7 @@ abstract class _TextStyleProxy implements TextStyle {
   ui.ParagraphStyle getParagraphStyle({
     TextAlign? textAlign,
     TextDirection? textDirection,
-    double textScaleFactor = 1.0,
+    TextScaler textScaler = TextScaler.noScaling,
     String? ellipsis,
     int? maxLines,
     TextHeightBehavior? textHeightBehavior,
@@ -268,7 +268,7 @@ abstract class _TextStyleProxy implements TextStyle {
       ref.getParagraphStyle(
         textAlign: textAlign,
         textDirection: textDirection,
-        textScaleFactor: textScaleFactor,
+        textScaler: textScaler,
         ellipsis: ellipsis,
         maxLines: maxLines,
         textHeightBehavior: textHeightBehavior,
@@ -282,8 +282,15 @@ abstract class _TextStyleProxy implements TextStyle {
       );
 
   @override
-  ui.TextStyle getTextStyle({double textScaleFactor = 1.0}) =>
-      ref.getTextStyle(textScaleFactor: textScaleFactor);
+  ui.TextStyle getTextStyle({
+    double textScaleFactor = 1.0,
+    TextScaler textScaler = TextScaler.noScaling,
+  }) =>
+      ref.getTextStyle(
+        // ignore: deprecated_member_use
+        textScaleFactor: textScaleFactor,
+        textScaler: textScaler,
+      );
 
   @override
   bool operator ==(Object other) {
