@@ -43,7 +43,7 @@ Future<String> explain(
     textStyle: textStyle,
   );
 
-  final ThemeData theme = ThemeData();
+  final ThemeData theme = ThemeData(useMaterial3: false);
 
   await tester.pumpWidget(
     MaterialApp(
