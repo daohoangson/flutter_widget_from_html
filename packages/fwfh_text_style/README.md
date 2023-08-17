@@ -16,7 +16,7 @@ Add this to your app's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  fwfh_text_style: ^2.7.3
+  fwfh_text_style: ^2.23.8
 ```
 
 ## Usage

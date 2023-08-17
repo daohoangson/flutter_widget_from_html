@@ -1,3 +1,8 @@
+# 2.23.8
+
+- Add support for `TextScaler` (#996)
+- Restrict minimum Flutter version (>=3.14.0-0)
+
 # 2.22.8+2
 
 - Add support for Flutter 3.10 (#889)
