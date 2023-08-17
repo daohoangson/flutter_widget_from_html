@@ -1,9 +1,10 @@
 name: demo_app
 description: Flutter Widget from HTML demo app.
 version: 0.0.1
+publish_to: "none"
 
 environment:
-  sdk: ">=2.6.0 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   carousel_slider: ^4.0.0
@@ -31,8 +32,6 @@ dependency_overrides:
     path: ../packages/fwfh_chewie
   fwfh_just_audio:
     path: ../packages/fwfh_just_audio
-  fwfh_selectable_text:
-    path: ../packages/fwfh_selectable_text
   fwfh_svg:
     path: ../packages/fwfh_svg
   fwfh_text_style:
@@ -45,7 +44,7 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  golden_toolkit: ^0.13.0
+  golden_toolkit: ^0.15.0
   integration_test:
     sdk: flutter
   lint: any

@@ -117,7 +117,7 @@ class AnchorRegistry {
       return completer.complete(false);
     }
 
-    _widgetsBindingInstance?.addPostFrameCallback(
+    WidgetsBinding.instance.addPostFrameCallback(
       (_) => _ensureVisible(
         id,
         completer: completer,
@@ -150,12 +150,12 @@ class AnchorRegistry {
       if (currentContext != null) {
         // we have body key, find the nearest scrollable accestor
         // should work for ListView render mode
-        scrollState = Scrollable.of(currentContext);
+        scrollState = Scrollable.maybeOf(currentContext);
       }
     }
     // plan B: look for scrollable from the root build context
     // should work for Column, SliverList render mode
-    scrollState ??= Scrollable.of(_rootContext);
+    scrollState ??= Scrollable.maybeOf(_rootContext);
 
     final position = scrollState?.position;
     if (position == null) {
@@ -226,9 +226,6 @@ class AnchorRegistry {
     _anchorById[id] = anchor;
   }
 }
-
-// TODO: remove workaround when our minimum Flutter version >2.12
-WidgetsBinding? get _widgetsBindingInstance => WidgetsBinding.instance;
 
 class _AnchorBodyItemIndex {
   final bool isExact;

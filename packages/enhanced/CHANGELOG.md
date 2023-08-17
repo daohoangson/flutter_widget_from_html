@@ -1,3 +1,45 @@
+## 0.10.3
+
+- Fix `border-radius` being overwritten by `border` (#966)
+
+## 0.10.2
+
+- Fix 100% width TD in recursive TABLEs (#952)
+
+## 0.10.1
+
+- Add support for Flutter 3.10 (#889)
+- Apply OpenSSF Scorecard (#888)
+- Remove default value `enableCaching=true` (#893)
+
+## 0.10.0
+
+- Add support for Flutter 3.7 (#861)
+- Update dependency flutter_svg to v2 (#862)
+
+## 0.9.1
+
+- Adjust text-decoration-line cascading logic (#843)
+- Try catch possible errors during table layout (#846)
+- Add support for `list-style-type: none` (#847)
+- Add support for `src` attribute in VIDEO tag (#848)
+- Adjust sizing logic for IMG tag (#854)
+- Redistribute table column width to avoid overflow (#856)
+
+## 0.9.0+2
+
+- Add support for webview_flutter@4.0.0 (#841)
+
+## 0.9.0+1
+
+- Fix context usage across async gaps (#835)
+
+## 0.9.0
+
+- Requires Flutter 3.3 (#821)
+- Add support for `SelectionArea` (#821)
+- Breaking changes: remove support for web view `HtmlWidget` parameters (#830)
+
 ## 0.8.5
 
 - Improve `IFRAME` error & timer handling (#709)

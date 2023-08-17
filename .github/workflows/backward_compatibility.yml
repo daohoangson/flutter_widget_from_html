@@ -7,6 +7,9 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
 jobs:
   test:
     strategy:
@@ -16,7 +19,7 @@ jobs:
           - enhanced
           - fwfh_cached_network_image
           - fwfh_chewie
-          - fwfh_selectable_text
+          - fwfh_just_audio
           - fwfh_svg
           - fwfh_url_launcher
           - fwfh_webview
@@ -30,7 +33,7 @@ jobs:
     env:
       GOLDEN_SKIP: "yes"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
       - name: Update pubspec.yaml
         run: |
           set -e
@@ -65,15 +68,16 @@ jobs:
           yq e ".environment.sdk = \"${_sdkVersion}\"" -i pubspec.yaml
 
           # extract Flutter version to install later
-          _flutterVersion=$( yq e '.environment.flutter' pubspec.yaml )
+          _flutterVersion=$( yq e '.environment.flutter' pubspec.yaml | sed -e 's/^>=//' | sed -e 's/-0$//' )
           echo "FLUTTER_VERSION=${_flutterVersion}" >> $GITHUB_ENV
 
           # output for debugging
           cat pubspec.yaml
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
         with:
+          cache: true
           flutter-version: ${{ env.FLUTTER_VERSION }}
       - run: flutter test
 
@@ -97,7 +101,7 @@ jobs:
     env:
       GOLDEN_SKIP: "yes"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
       - name: Update pubspec.yaml
         run: |
           set -e
@@ -110,7 +114,8 @@ jobs:
           # output for debugging
           cat pubspec.yaml
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
         with:
+          cache: true
           channel: ${{ matrix.channel }}
       - run: flutter test

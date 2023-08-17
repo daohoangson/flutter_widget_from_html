@@ -19,7 +19,7 @@ const html = '''
 ''';
 
 class IframeScreen extends StatefulWidget {
-  const IframeScreen({Key key}) : super(key: key);
+  const IframeScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _State();
@@ -38,32 +38,47 @@ class _State extends State<IframeScreen> {
           children: <Widget>[
             CheckboxListTile(
               value: webView,
-              onChanged: (v) => setState(() => webView = v),
-              title: HtmlWidget('<var>.webView</var>'),
+              onChanged: (v) => setState(() => webView = v == true),
+              title: const HtmlWidget('<var>.webView</var>'),
               subtitle: const Text('Renders web view, default ❌'),
             ),
             CheckboxListTile(
               value: webViewJs,
-              onChanged: (v) => setState(() {
+              onChanged: (v0) => setState(() {
+                final v = v0 == true;
                 if (v) {
                   webView = true;
                 }
                 webViewJs = v;
               }),
-              title: HtmlWidget('<var>.webViewJs</var>'),
+              title: const HtmlWidget('<var>.webViewJs</var>'),
               subtitle: const Text('Allows JavaScript execution, default ✅'),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: HtmlWidget(
                 html,
-                // ignore: deprecated_member_use
-                webView: webView,
-                // ignore: deprecated_member_use
-                webViewJs: webViewJs,
+                factoryBuilder: () => _WidgetFactory(
+                  webView: webView,
+                  webViewJs: webViewJs,
+                ),
+                rebuildTriggers: RebuildTriggers([webView, webViewJs]),
               ),
             ),
           ],
         ),
       );
+}
+
+class _WidgetFactory extends WidgetFactory {
+  @override
+  final bool webView;
+
+  @override
+  final bool webViewJs;
+
+  _WidgetFactory({
+    required this.webView,
+    required this.webViewJs,
+  });
 }

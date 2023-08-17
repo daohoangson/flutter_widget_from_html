@@ -46,13 +46,6 @@ if [ -z "$UPDATE_GOLDENS" ]; then
   )
 
   (
-    cd ./packages/fwfh_selectable_text &&
-      flutter analyze &&
-      flutter test "$@" &&
-      echo 'packages/fwfh_selectable_text OK'
-  )
-
-  (
     cd ./packages/fwfh_url_launcher &&
       flutter analyze &&
       flutter test "$@" &&

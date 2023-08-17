@@ -68,16 +68,6 @@ class WebView extends StatefulWidget {
   /// Default: `true`.
   final bool unsupportedWorkaroundForIssue37;
 
-  /// Controls whether or not to apply workaround for
-  /// [crash on Android device](https://github.com/daohoangson/flutter_widget_from_html/issues/375)
-  /// issue.
-  ///
-  /// If your app targets Android 10, it's better to switch to the new webview
-  /// implemention: [hybrid composition](https://pub.dev/packages/webview_flutter#using-hybrid-composition).
-  ///
-  /// Default: `true`.
-  final bool unsupportedWorkaroundForIssue375;
-
   /// {@template web_view.userAgent}
   /// The value used for the HTTP `User-Agent` request header.
   ///
@@ -100,13 +90,11 @@ class WebView extends StatefulWidget {
     this.js = true,
     this.mediaPlaybackAlwaysAllow = false,
     this.unsupportedWorkaroundForIssue37 = true,
-    this.unsupportedWorkaroundForIssue375 = true,
     this.userAgent,
-    Key? key,
-  })  :
+    super.key,
+  }) :
         // ignore: avoid_bool_literals_in_conditional_expressions
-        autoResize = js ? (autoResize ?? js) : false,
-        super(key: key);
+        autoResize = js ? (autoResize ?? js) : false;
 
   @override
   State<WebView> createState() => WebViewState();

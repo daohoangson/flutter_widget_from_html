@@ -41,7 +41,6 @@ Future<void> main() async {
     <span style="text-decoration: overline">
       <span style="text-decoration: underline">
         All   decorations...
-        <span style="text-decoration: none">and none</span>
       </span>
     </span>
   </span>
@@ -56,8 +55,7 @@ Future<void> main() async {
       str,
       equals(
         '[Column:children='
-        '[CssBlock:child=[RichText:(:(+l+o+u:All decorations... )'
-        '(:and none))]],'
+        '[CssBlock:child=[RichText:(+l+o+u:All decorations...)]],'
         '[CssBlock:child=[RichText:(:I​Like​Playing​football​​game)]],'
         '[CssBlock:child=[RichText:(:\u00A0)]]'
         ']',
@@ -583,8 +581,8 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[CssBlock:child='
           '[DecoratedBox:bg=#FFFF0000,child='
+          '[CssBlock:child='
           '[RichText:(:Foo)]]]',
         ),
       );
@@ -599,8 +597,10 @@ Future<void> main() async {
         equals(
           '[SizedBox:0.0x1.0],'
           '[Padding:(0,1,0,1),child='
-          '[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child='
-          '[Padding:(2,2,2,2),child=[RichText:(:Foo)]]]'
+          '[DecoratedBox:bg=#FFFF0000,child='
+          '[Padding:(2,2,2,2),child='
+          '[CssBlock:child='
+          '[RichText:(:Foo)]]]'
           ']],[SizedBox:0.0x1.0]',
         ),
       );
@@ -612,7 +612,9 @@ Future<void> main() async {
       expect(
         explained,
         equals(
-          '[CssBlock:child=[DecoratedBox:bg=#FFFF0000,child=[Column:children='
+          '[DecoratedBox:bg=#FFFF0000,child='
+          '[CssBlock:child='
+          '[Column:children='
           '[CssBlock:child=[RichText:(:A)]],'
           '[SizedBox:0.0x10.0],'
           '[CssBlock:child=[RichText:(:B)]]'
@@ -1275,11 +1277,18 @@ Future<void> main() async {
 
     group('textScaleFactor=2', () {
       Future<String> explain2x(WidgetTester tester, String html) async {
-        // TODO: remove lint ignore when our minimum Flutter version >2.11
+        // TODO: remove lint ignore when our minimum Flutter version >= 3.10
         // ignore: deprecated_member_use
-        tester.binding.window.textScaleFactorTestValue = 2;
-        // ignore: deprecated_member_use
-        addTearDown(tester.binding.window.clearTextScaleFactorTestValue);
+        tester.binding.window.platformDispatcher.textScaleFactorTestValue = 2;
+        addTearDown(
+          tester
+              .binding
+              // ignore: deprecated_member_use
+              .window
+              // ignore: deprecated_member_use
+              .platformDispatcher
+              .clearTextScaleFactorTestValue,
+        );
 
         final explained = await explain(tester, html);
         return explained;

@@ -36,7 +36,7 @@ void main() {
   testWidgets(
     'WebView',
     (WidgetTester tester) async {
-      final testCase = webViewTestCases.currentValue;
+      final testCase = webViewTestCases.currentValue!;
       final test = await testCase.run(tester);
       test.expectValueEquals(testCase.input);
     },
@@ -92,7 +92,6 @@ class WebViewTestCase {
       autoResize: true,
       autoResizeIntervals: [interval, interval * 2, interval * 3],
       debuggingEnabled: true,
-      unsupportedWorkaroundForIssue375: issue375,
     );
     final test = _AspectRatioTest(child: webView);
 
@@ -120,7 +119,7 @@ class _AspectRatioTest extends StatelessWidget {
 
   final Widget child;
 
-  const _AspectRatioTest({@required this.child, Key key}) : super(key: key);
+  const _AspectRatioTest({required this.child});
 
   @override
   Widget build(BuildContext context) {

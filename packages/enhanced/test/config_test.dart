@@ -72,8 +72,6 @@ void main() {
       required bool enableCaching,
       RebuildTriggers? rebuildTriggers,
       TextStyle? textStyle,
-      bool webView = false,
-      bool webViewJs = true,
     }) =>
         helper.explain(
           tester,
@@ -86,8 +84,6 @@ void main() {
             key: helper.hwKey,
             rebuildTriggers: rebuildTriggers,
             textStyle: textStyle ?? const TextStyle(),
-            webView: webView,
-            webViewJs: webViewJs,
           ),
         );
 
@@ -129,7 +125,7 @@ void main() {
       await explain(
         tester,
         html,
-        baseUrl: Uri.http('domain.com', ''),
+        baseUrl: Uri.http('domain.com'),
         enableCaching: true,
       );
       final built2 = helper.buildCurrentState();
@@ -195,30 +191,6 @@ void main() {
         textStyle: const TextStyle(fontSize: 20),
       );
       expect(explained2, equals('[RichText:(@20.0:Foo)]'));
-    });
-
-    testWidgets('rebuild new webView', (tester) async {
-      const html = 'Foo';
-
-      final explained1 = await explain(tester, html, enableCaching: true);
-      expect(explained1, equals('[RichText:(:Foo)]'));
-      final built1 = helper.buildCurrentState();
-
-      await explain(tester, html, enableCaching: true, webView: true);
-      final built2 = helper.buildCurrentState();
-      enableCachingExpect(built1, built2, isFalse);
-    });
-
-    testWidgets('rebuild new webViewJs', (tester) async {
-      const html = 'Foo';
-
-      final explained1 = await explain(tester, html, enableCaching: true);
-      expect(explained1, equals('[RichText:(:Foo)]'));
-      final built1 = helper.buildCurrentState();
-
-      await explain(tester, html, enableCaching: true, webViewJs: false);
-      final built2 = helper.buildCurrentState();
-      enableCachingExpect(built1, built2, isFalse);
     });
 
     testWidgets('skips caching', (WidgetTester tester) async {
@@ -325,33 +297,6 @@ void main() {
         ),
       );
       expect(e, equals('[Column:children=[RichText:(:Foo)],[Text:Bar]]'));
-    });
-  });
-
-  group('isSelectable', () {
-    const html = 'Foo';
-
-    testWidgets('renders RichText', (WidgetTester tester) async {
-      final hw = HtmlWidget(html, key: helper.hwKey);
-      final explained = await explain(tester, hw);
-      expect(explained, equals('[RichText:(:Foo)]'));
-    });
-
-    testWidgets('renders SelectableText', (WidgetTester tester) async {
-      final hw = HtmlWidget(html, isSelectable: true, key: helper.hwKey);
-      final explained = await explain(tester, hw);
-      expect(explained, equals('[SelectableText:(:Foo)]'));
-    });
-
-    testWidgets('renders onSelectionChanged', (WidgetTester tester) async {
-      final hw = HtmlWidget(
-        html,
-        isSelectable: true,
-        key: helper.hwKey,
-        onSelectionChanged: (_, __) {},
-      );
-      final explained = await explain(tester, hw);
-      expect(explained, equals('[SelectableText:+onSelectionChanged,(:Foo)]'));
     });
   });
 
@@ -547,7 +492,7 @@ void main() {
       const href = 'default';
       await explain(
         tester,
-        HtmlWidget('<a href="$href">Tap me</a>'),
+        const HtmlWidget('<a href="$href">Tap me</a>'),
       );
       await tester.pumpAndSettle();
       expect(await helper.tapText(tester, 'Tap me'), equals(1));
@@ -635,205 +580,6 @@ void main() {
         ),
       );
       expect(e, equals('[RichText:(+i:Foo)]'));
-    });
-  });
-
-  group('webView', () {
-    const webViewSrc = 'http://domain.com';
-    const html = '<iframe src="$webViewSrc"></iframe>';
-    const webViewDefaultAspectRatio = '1.78';
-
-    testWidgets('renders false value', (WidgetTester tester) async {
-      final e = await explain(tester, HtmlWidget(html, key: helper.hwKey));
-      expect(e, equals('[GestureDetector:child=[Text:$webViewSrc]]'));
-    });
-
-    testWidgets('renders true value', (WidgetTester tester) async {
-      final explained = await explain(
-        tester,
-        HtmlWidget(
-          html,
-          key: helper.hwKey,
-          webView: true,
-        ),
-      );
-      expect(
-        explained,
-        equals(
-          '[WebView:'
-          'url=$webViewSrc,'
-          'aspectRatio=$webViewDefaultAspectRatio,'
-          'autoResize=true'
-          ']',
-        ),
-      );
-    });
-
-    group('webViewDebuggingEnabled', () {
-      testWidgets('renders true value', (WidgetTester tester) async {
-        final explained = await explain(
-          tester,
-          HtmlWidget(
-            html,
-            key: helper.hwKey,
-            webView: true,
-            webViewDebuggingEnabled: true,
-          ),
-        );
-        expect(
-          explained,
-          equals(
-            '[WebView:'
-            'url=$webViewSrc,'
-            'aspectRatio=$webViewDefaultAspectRatio,'
-            'autoResize=true,'
-            'debuggingEnabled=true'
-            ']',
-          ),
-        );
-      });
-
-      testWidgets('renders false value', (WidgetTester tester) async {
-        final explained = await explain(
-          tester,
-          HtmlWidget(html, key: helper.hwKey, webView: true),
-        );
-        expect(
-          explained,
-          equals(
-            '[WebView:'
-            'url=$webViewSrc,'
-            'aspectRatio=$webViewDefaultAspectRatio,'
-            'autoResize=true'
-            ']',
-          ),
-        );
-      });
-    });
-
-    group('webViewJs', () {
-      testWidgets('renders true value', (WidgetTester tester) async {
-        final explained = await explain(
-          tester,
-          HtmlWidget(html, key: helper.hwKey, webView: true),
-        );
-        expect(
-          explained,
-          equals(
-            '[WebView:'
-            'url=$webViewSrc,'
-            'aspectRatio=$webViewDefaultAspectRatio,'
-            'autoResize=true'
-            ']',
-          ),
-        );
-      });
-
-      testWidgets('renders false value', (WidgetTester tester) async {
-        final explained = await explain(
-          tester,
-          HtmlWidget(
-            html,
-            key: helper.hwKey,
-            webView: true,
-            webViewJs: false,
-          ),
-        );
-        expect(
-          explained,
-          equals(
-            '[WebView:'
-            'url=$webViewSrc,'
-            'aspectRatio=$webViewDefaultAspectRatio,'
-            'js=false'
-            ']',
-          ),
-        );
-      });
-    });
-
-    group('webViewMediaPlaybackAlwaysAllow', () {
-      testWidgets('renders true value', (WidgetTester tester) async {
-        final explained = await explain(
-          tester,
-          HtmlWidget(
-            html,
-            key: helper.hwKey,
-            webView: true,
-            webViewMediaPlaybackAlwaysAllow: true,
-          ),
-        );
-        expect(
-          explained,
-          equals(
-            '[WebView:'
-            'url=$webViewSrc,'
-            'aspectRatio=$webViewDefaultAspectRatio,'
-            'autoResize=true,'
-            'mediaPlaybackAlwaysAllow=true'
-            ']',
-          ),
-        );
-      });
-
-      testWidgets('renders false value', (WidgetTester tester) async {
-        final explained = await explain(
-          tester,
-          HtmlWidget(html, key: helper.hwKey, webView: true),
-        );
-        expect(
-          explained,
-          equals(
-            '[WebView:'
-            'url=$webViewSrc,'
-            'aspectRatio=$webViewDefaultAspectRatio,'
-            'autoResize=true'
-            ']',
-          ),
-        );
-      });
-    });
-
-    group('webViewUserAgent', () {
-      testWidgets('renders string', (WidgetTester tester) async {
-        final explained = await explain(
-          tester,
-          HtmlWidget(
-            html,
-            key: helper.hwKey,
-            webView: true,
-            webViewUserAgent: 'Foo',
-          ),
-        );
-        expect(
-          explained,
-          equals(
-            '[WebView:'
-            'url=$webViewSrc,'
-            'aspectRatio=$webViewDefaultAspectRatio,'
-            'autoResize=true,'
-            'userAgent=Foo'
-            ']',
-          ),
-        );
-      });
-
-      testWidgets('renders null value', (WidgetTester tester) async {
-        final explained = await explain(
-          tester,
-          HtmlWidget(html, key: helper.hwKey, webView: true),
-        );
-        expect(
-          explained,
-          equals(
-            '[WebView:'
-            'url=$webViewSrc,'
-            'aspectRatio=$webViewDefaultAspectRatio,'
-            'autoResize=true'
-            ']',
-          ),
-        );
-      });
     });
   });
 }
