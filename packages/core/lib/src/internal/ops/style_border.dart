@@ -58,7 +58,7 @@ class StyleBorder {
               child: wf.buildColumnPlaceholder(meta, widgets),
             ).wrapWith(
               (context, child) => _buildBorder(meta, context, child, border),
-            )
+            ),
           ];
         },
         onWidgetsIsOptional: true,
