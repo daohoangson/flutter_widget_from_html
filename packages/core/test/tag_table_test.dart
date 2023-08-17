@@ -959,7 +959,7 @@ Future<void> main() async {
 class _Golden extends StatelessWidget {
   final String contents;
 
-  const _Golden(this.contents, {Key? key}) : super(key: key);
+  const _Golden(this.contents);
 
   @override
   Widget build(BuildContext _) => Scaffold(

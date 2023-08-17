@@ -741,8 +741,7 @@ class HitTestApp extends StatelessWidget {
   final String html;
   final List<String> list;
 
-  const HitTestApp({required this.html, Key? key, required this.list})
-      : super(key: key);
+  const HitTestApp({required this.html, super.key, required this.list});
 
   @override
   Widget build(BuildContext _) => MaterialApp(

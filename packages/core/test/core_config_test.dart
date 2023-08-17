@@ -627,11 +627,10 @@ class _OnTapUrlApp extends StatelessWidget {
   final List? onTapCallbackResults;
 
   const _OnTapUrlApp({
-    Key? key,
     required this.href,
     this.onTapCallbackResults,
     this.onTapUrl,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext _) => MaterialApp(

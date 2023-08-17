@@ -6,10 +6,10 @@ class TshWidget extends InheritedWidget {
   final TextStyleHtml? tsh;
 
   const TshWidget({
-    Key? key,
-    required Widget child,
+    super.key,
+    required super.child,
     required this.tsh,
-  }) : super(key: key, child: child);
+  });
 
   @override
   bool updateShouldNotify(TshWidget oldWidget) =>

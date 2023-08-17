@@ -53,11 +53,11 @@ class VideoPlayer extends StatefulWidget {
     this.autoplay = false,
     this.controls = false,
     this.errorBuilder,
-    Key? key,
+    super.key,
     this.loadingBuilder,
     this.loop = false,
     this.poster,
-  }) : super(key: key);
+  });
 
   @override
   State<VideoPlayer> createState() => _VideoPlayerState();
