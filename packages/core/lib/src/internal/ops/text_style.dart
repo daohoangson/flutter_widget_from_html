@@ -192,7 +192,7 @@ class TextStyleOps {
       v.getValue(
         p,
         baseValue: p.parent?.style.fontSize,
-        scaleFactor: p.getDependency<MediaQueryData>().textScaleFactor,
+        textScaler: p.getDependency<MediaQueryData>().textScaler,
       );
 
   static double? _fontSizeTryParseTerm(TextStyleHtml p, String v) {
@@ -265,7 +265,7 @@ class TextStyleOps {
     final lengthValue = length.getValue(
       p,
       baseValue: fontSize,
-      scaleFactor: p.getDependency<MediaQueryData>().textScaleFactor,
+      textScaler: p.getDependency<MediaQueryData>().textScaler,
     );
     if (lengthValue == null) {
       return null;

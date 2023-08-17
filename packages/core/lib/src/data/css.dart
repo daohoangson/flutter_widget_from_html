@@ -234,10 +234,10 @@ class CssLength {
   double? getValue(
     TextStyleHtml tsh, {
     double? baseValue,
-    double? scaleFactor,
+    TextScaler? textScaler,
   }) {
     double value;
-    var effectiveScaleFactor = scaleFactor ?? 1.0;
+    var effectiveTextScaler = textScaler ?? TextScaler.noScaling;
 
     switch (unit) {
       case CssLengthUnit.auto:
@@ -249,7 +249,7 @@ class CssLength {
         }
 
         value = baseValue * number;
-        effectiveScaleFactor = 1;
+        effectiveTextScaler = TextScaler.noScaling;
         break;
       case CssLengthUnit.percentage:
         // TODO: remove ignore https://github.com/passsy/dart-lint/issues/27
@@ -259,7 +259,7 @@ class CssLength {
         }
 
         value = baseValue * number / 100;
-        effectiveScaleFactor = 1;
+        effectiveTextScaler = TextScaler.noScaling;
         break;
       case CssLengthUnit.pt:
         value = number * 96 / 72;
@@ -269,7 +269,7 @@ class CssLength {
         break;
     }
 
-    return value * effectiveScaleFactor;
+    return value > .0 ? effectiveTextScaler.scale(value) : value;
   }
 
   @override

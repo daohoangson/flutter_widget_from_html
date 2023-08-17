@@ -89,8 +89,8 @@ class _AudioPlayerState extends State<AudioPlayer> {
         builder: (_, bc) {
           final isNarrow = bc.hasBoundedWidth && bc.maxWidth <= 320;
           final theme = Theme.of(context);
-          final iconSize = DefaultTextStyle.of(context).style.fontSize! *
-              MediaQuery.of(context).textScaleFactor;
+          final fontSize = DefaultTextStyle.of(context).style.fontSize ?? .0;
+          final iconSize = MediaQuery.textScalerOf(context).scale(fontSize);
 
           return DecoratedBox(
             decoration: BoxDecoration(
@@ -189,7 +189,7 @@ class _PositionText extends StatelessWidget {
             return Text(
               text,
               style: TextStyle(fontSize: size),
-              textScaleFactor: 1,
+              textScaler: TextScaler.noScaling,
             );
           },
           stream: positionStream,

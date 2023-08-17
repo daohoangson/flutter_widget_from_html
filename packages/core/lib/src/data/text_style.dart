@@ -35,10 +35,10 @@ class TextStyleHtml {
     style = FwfhTextStyle.from(style);
 
     final mqd = _getDependency<MediaQueryData>(deps);
-    final tsf = mqd.textScaleFactor;
+    final textScaler = mqd.textScaler;
     final fontSize = style.fontSize;
-    if (tsf != 1 && fontSize != null) {
-      style = style.copyWith(fontSize: fontSize * tsf);
+    if (fontSize != null && fontSize > .0) {
+      style = style.copyWith(fontSize: textScaler.scale(fontSize));
     }
 
     return TextStyleHtml._(
