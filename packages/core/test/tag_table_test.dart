@@ -146,14 +146,20 @@ Future<void> main() async {
       const html =
           '<table border="1"><tbody><tr><td>Foo</td></tr></tbody></table>';
       final explained = await explain(tester, html, useExplainer: false);
-      expect(explained, contains('HtmlTable(borderSpacing: 2.0)'));
+      expect(
+        explained,
+        contains('HtmlTable(border: all(BorderSide), borderSpacing: 2.0)'),
+      );
     });
 
     testWidgets('renders style', (WidgetTester tester) async {
       const html = '<table style="border: 1px solid black"><tbody>'
           '<tr><td>Foo</td></tr></tbody></table>';
       final explained = await explain(tester, html, useExplainer: false);
-      expect(explained, contains('HtmlTable(borderSpacing: 2.0)'));
+      expect(
+        explained,
+        contains('HtmlTable(border: all(BorderSide), borderSpacing: 2.0)'),
+      );
     });
   });
 
@@ -226,8 +232,13 @@ Future<void> main() async {
       const html = '<table border="1" style="border-collapse: collapse"><tbody>'
           '<tr><td>Foo</td></tr>'
           '</tbody></table>';
-      final e = await explain(tester, html, useExplainer: false);
-      expect(e, contains('(borderCollapse: true, borderSpacing: 2.0)'));
+      final explained = await explain(tester, html, useExplainer: false);
+      expect(
+        explained,
+        contains(
+          'HtmlTable(border: all(BorderSide), borderCollapse: true, borderSpacing: 2.0)',
+        ),
+      );
     });
   });
 
