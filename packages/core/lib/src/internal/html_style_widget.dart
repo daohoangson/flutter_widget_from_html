@@ -6,10 +6,10 @@ class HtmlStyleWidget extends InheritedWidget {
   final HtmlStyle? style;
 
   const HtmlStyleWidget({
-    Key? key,
-    required Widget child,
+    super.key,
+    required super.child,
     required this.style,
-  }) : super(key: key, child: child);
+  });
 
   @override
   bool updateShouldNotify(HtmlStyleWidget oldWidget) =>

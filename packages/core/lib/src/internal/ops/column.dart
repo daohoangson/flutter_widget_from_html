@@ -9,10 +9,10 @@ class ColumnPlaceholder extends WidgetPlaceholder {
 
   ColumnPlaceholder({
     required this.children,
-    Key? key,
+    super.key,
     required this.tree,
     required this.wf,
-  }) : super(debugLabel: '${tree.element.localName}--column', key: key);
+  }) : super(debugLabel: '${tree.element.localName}--column');
 
   bool get isBody => _isBody[this] == true;
 

@@ -102,10 +102,9 @@ class WidgetPlaceholder extends StatelessWidget {
     WidgetPlaceholderBuilder? builder,
     Widget? child,
     this.debugLabel,
-    Key? key,
+    super.key,
   })  : _builders = builder != null ? [builder] : [],
-        _firstChild = child,
-        super(key: key);
+        _firstChild = child;
 
   /// Whether this placeholder renders anything.
   bool get isEmpty => _firstChild == null && _builders.isEmpty;

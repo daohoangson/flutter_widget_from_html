@@ -358,8 +358,7 @@ abstract class WidgetBit<T> extends BuildBit {
 }
 
 class _WidgetBitBlock extends WidgetBit<Widget> {
-  const _WidgetBitBlock(BuildTree parent, WidgetPlaceholder child)
-      : super._(parent, child);
+  const _WidgetBitBlock(super.parent, super.child) : super._();
 
   @override
   bool? get isInline => false;
@@ -380,11 +379,11 @@ class _WidgetBitInline extends WidgetBit<InlineSpan> {
   final TextBaseline baseline;
 
   const _WidgetBitInline(
-    BuildTree parent,
-    WidgetPlaceholder child,
+    super.parent,
+    super.child,
     this.alignment,
     this.baseline,
-  ) : super._(parent, child);
+  ) : super._();
 
   @override
   BuildBit copyWith({BuildTree? parent}) =>
