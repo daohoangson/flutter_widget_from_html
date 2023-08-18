@@ -110,31 +110,44 @@ class TextStyleBuilder<T1> {
   /// Builds a [TextStyleHtml] by calling queued callbacks.
   TextStyleHtml build(BuildContext context) {
     final parentOutput = parent?.build(context);
-    if (parentOutput == null || parentOutput != _parentOutput) {
+    if (parentOutput == null || !identical(parentOutput, _parentOutput)) {
       _parentOutput = parentOutput;
       _output = null;
     }
 
-    if (_output != null) {
-      return _output!;
+    final cachedOutput = _output;
+    if (cachedOutput != null) {
+      return cachedOutput;
     }
 
-    if (_builders == null) {
-      // TODO: remove lint ignore
-      // ignore: unnecessary_null_checks
-      return _output = _parentOutput!;
+    final builders = _builders;
+    final inputs = _inputs;
+    if (builders == null || inputs == null) {
+      if (parentOutput != null) {
+        _output = parentOutput;
+        return parentOutput;
+      } else {
+        throw StateError(
+          "TextStyleBuilder does't have either parent or builders.",
+        );
+      }
     }
 
-    _output = _parentOutput?.copyWith(parent: _parentOutput);
-    final l = _builders!.length;
+    _output = parentOutput?.copyWith(parent: parentOutput);
+    final l = builders.length;
     for (var i = 0; i < l; i++) {
-      final builder = _builders![i];
+      final builder = builders[i];
       // ignore: avoid_dynamic_calls
-      _output = builder(_output, _inputs![i]) as TextStyleHtml;
-      assert(_output?.parent == _parentOutput);
+      _output = builder(_output, inputs[i]) as TextStyleHtml;
+      assert(identical(_output?.parent, parentOutput));
     }
 
-    return _output!;
+    final output = _output;
+    if (output != null) {
+      return output;
+    } else {
+      throw StateError("TextStyleBuilder doesn't have any output.");
+    }
   }
 
   /// Returns `true` if this shares same styling with [other].

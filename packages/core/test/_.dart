@@ -43,7 +43,7 @@ Future<String> explain(
     textStyle: textStyle,
   );
 
-  final ThemeData theme = ThemeData();
+  final ThemeData theme = ThemeData(useMaterial3: false);
 
   await tester.pumpWidget(
     MaterialApp(
@@ -142,13 +142,6 @@ Future<String> explainWithoutPumping({
     );
     str = str.replaceAll(RegExp(r'(, )?softWrap: [a-z\s]+'), '');
     str = str.replaceAll(RegExp('(, )?textDirection: ltr+'), '');
-
-    // TODO: remove trimming when our minimum Flutter version >=3.3
-    // old versions implement `BorderSide.toString` while newer ones don't...
-    str = str.replaceAllMapped(
-      RegExp('\\(border: .+?, (\\w+:)'),
-      (m) => '(${m.group(1)}',
-    );
 
     // delete leading comma (because of property trimmings)
     str = str.replaceAll('(, ', '(');
@@ -741,8 +734,7 @@ class HitTestApp extends StatelessWidget {
   final String html;
   final List<String> list;
 
-  const HitTestApp({required this.html, Key? key, required this.list})
-      : super(key: key);
+  const HitTestApp({required this.html, super.key, required this.list});
 
   @override
   Widget build(BuildContext _) => MaterialApp(
