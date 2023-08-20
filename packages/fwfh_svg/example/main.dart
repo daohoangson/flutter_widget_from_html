@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         ),
         body: Center(
           child: HtmlWidget(
-            '<img src="https://raw.githubusercontent.com/dnfield/flutter_svg/master/example/assets/flutter_logo.svg" />',
+            '<img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/15ce2adbfc7e2009a998c6c044db77105666f7e9/demo_app/logos/icon.svg" />',
             factoryBuilder: () => MyWidgetFactory(),
           ),
         ),

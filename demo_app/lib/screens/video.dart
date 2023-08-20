@@ -88,7 +88,7 @@ class _State extends State<VideoScreen> {
           attributes.add('loop');
         }
         if (poster) {
-          attributes.add('poster="asset:logos/android.png"');
+          attributes.add('poster="asset:logos/icon.png"');
         }
         if (widthHeight) {
           attributes.add('width="320" height="180"');
