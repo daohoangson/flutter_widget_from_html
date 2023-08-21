@@ -15,7 +15,7 @@ const kHtml = '''
   <a name="top"></a>A paragraph with <strong>&lt;strong&gt;</strong>, <em>&lt;em&gt;phasized</em>
   and <span style="color: red">colored</span> text.
   With an inline Flutter logo:
-  <img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/15ce2adbfc7e2009a998c6c044db77105666f7e9/demo_app/logos/icon.png" style="width: 1em" />.
+  <img src="https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/0000998/demo_app/logos/icon.png" style="width: 1em" />.
 </p>
 
 <p>&lt;RUBY&gt; <ruby style="font-size: 200%">明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp></ruby></td></p>

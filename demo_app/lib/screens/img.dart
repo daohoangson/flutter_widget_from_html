@@ -135,7 +135,7 @@ class _State extends State<ImgScreen> {
 
   String _htmlSvg() {
     const network =
-        'https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/15ce2adbfc7e2009a998c6c044db77105666f7e9/demo_app/logos/icon.svg';
+        'https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/0000998/demo_app/logos/icon.svg';
     const asset = 'asset:test/images/icon.svg?package=fwfh_svg';
     const dataUri =
         'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjMyMCIgdmlld0JveD0iMCAwIDMyMCAzMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iMzIwIiBmaWxsPSIjRkFGQUZBIi8+CjxwYXRoIGQ9Ik0xODguMDAyIDE2OUgyMjMuNVYyNDEuNUgyNzJWMjc3SDE4OFYxNjlIMTg4LjAwMloiIGZpbGw9ImJsYWNrIi8+CjxwYXRoIGQ9Ik00OCAxNjlIODRMMTA4LjUgMjA2LjgxMUwxMzMgMTY5SDE2OVYyNzdIMTM1VjIyMy4yNzFMMTA5IDI2MS41SDEwOEw4MiAyMjMuMjcxVjI3N0g0OFYxNjlaIiBmaWxsPSIjMDg1ODlDIi8+CjxwYXRoIGQ9Ik0yMDMuNjU5IDc3LjY4NTNMMTcyIDc3LjVWNDJIMjcyVjc3LjVIMjQwVjE1MEgyMDRWNzcuNUwyMDMuNjU5IDc3LjY4NTNaIiBmaWxsPSIjMUZCQ0ZEIi8+CjxwYXRoIGQ9Ik00OCA0Mkg4NFY3Ny41SDExN1Y0MkgxNTNWOTZWMTUwSDExN1YxMTMuNUg4NFYxNTBINDhWNDJaIiBmaWxsPSIjNDREMUZEIi8+Cjwvc3ZnPgo=';

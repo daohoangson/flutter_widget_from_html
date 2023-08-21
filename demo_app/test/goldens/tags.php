@@ -26,7 +26,7 @@ foreach ($map as $test => $html) {
   }
 
   // replace asset path with real URL
-  $html = str_replace('asset:logos/icon.png', 'https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/15ce2adbfc7e2009a998c6c044db77105666f7e9/demo_app/logos/icon.png', $html);
+  $html = str_replace('asset:logos/icon.png', 'https://raw.githubusercontent.com/daohoangson/flutter_widget_from_html/0000998/demo_app/logos/icon.png', $html);
 
   foreach ($tags as $tag) {
     if (!isset($tagTests[$tag])) $tagTests[$tag] = [];
