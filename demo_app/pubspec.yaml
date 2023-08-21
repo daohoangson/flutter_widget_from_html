@@ -42,6 +42,7 @@ dependency_overrides:
     path: ../packages/fwfh_webview
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
   flutter_test:
     sdk: flutter
   golden_toolkit: ^0.15.0
@@ -64,3 +65,13 @@ flutter:
       fonts:
         - asset: packages/golden_toolkit/fonts/Roboto-Regular.ttf
   uses-material-design: true
+
+flutter_launcher_icons:
+  image_path: logos/icon.png
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  macos:
+    generate: true
+  web:
+    generate: true
