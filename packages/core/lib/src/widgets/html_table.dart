@@ -346,9 +346,12 @@ class _TableRenderLayouter {
 
   _TableDataStep2 step2NaiveColumnWidths(_TableDataStep1 step1) {
     final cells = step1.cells;
-    final cellWidths = cells
-        .map((cell) => cell.width?.clamp(0, constraints.maxWidth))
-        .toList(growable: false);
+    final cellWidths = cells.map((cell) {
+      // use width from cell attribute if it is some sensible value
+      // otherwise, ignore and measure via layouter for real
+      final cellWidth = cell.width?.clamp(0, constraints.maxWidth);
+      return cellWidth?.isFinite == true ? cellWidth : null;
+    }).toList(growable: false);
 
     final naiveColumnWidths = List.filled(step1.columnCount, .0);
     for (var i = 0; i < cells.length; i++) {
@@ -373,7 +376,6 @@ class _TableRenderLayouter {
     final availableWidth = step1.availableWidth;
     final cells = step1.cells;
     final children = step1.children;
-    final loosenConstraints = constraints.loosen();
     final naiveColumnWidths = step2.naiveColumnWidths;
 
     final childMinWidths = List<double?>.filled(children.length, null);
@@ -416,8 +418,8 @@ class _TableRenderLayouter {
         if (childWidth == null) {
           // side effect
           // no pre-configured width to use
-          // have to layout cells without minimums for the initial width
-          final layoutSize = layouter(child, loosenConstraints);
+          // have to layout cells without constraints for the initial width
+          final layoutSize = layouter(child, const BoxConstraints());
           cellSizes[i] = layoutSize;
           childWidth = layoutSize.width;
           columnWidths.setMaxColumnWidths(tro, data, childWidth);
