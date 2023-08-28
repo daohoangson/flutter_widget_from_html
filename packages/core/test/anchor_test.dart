@@ -69,7 +69,7 @@ void main() {
               html,
               key: hwKey,
               renderMode: RenderMode.sliverList,
-            )
+            ),
           ],
         ),
         useExplainer: false,
@@ -437,9 +437,8 @@ class _ColumnTestApp extends StatelessWidget {
   const _ColumnTestApp({
     this.baseUrl,
     this.html,
-    Key? key,
     this.keyBottom,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext _) => Scaffold(
@@ -462,7 +461,7 @@ class _ColumnTestApp extends StatelessWidget {
 class _ListViewTestApp extends StatelessWidget {
   final String? html;
 
-  const _ListViewTestApp({this.html, Key? key}) : super(key: key);
+  const _ListViewTestApp({this.html});
 
   @override
   Widget build(BuildContext _) => Scaffold(
@@ -478,7 +477,7 @@ class _ListViewTestApp extends StatelessWidget {
 class _SliverListTestApp extends StatelessWidget {
   final Key? keyBottom;
 
-  const _SliverListTestApp({Key? key, this.keyBottom}) : super(key: key);
+  const _SliverListTestApp({this.keyBottom});
 
   @override
   Widget build(BuildContext _) => Scaffold(

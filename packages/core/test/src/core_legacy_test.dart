@@ -595,9 +595,8 @@ class _LoggerApp extends StatefulWidget {
 
   const _LoggerApp({
     required this.child,
-    Key? key,
     required this.records,
-  }) : super(key: key);
+  });
 
   @override
   State<_LoggerApp> createState() => _LoggerAppState();

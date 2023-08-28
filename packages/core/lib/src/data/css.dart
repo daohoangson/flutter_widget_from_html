@@ -256,8 +256,6 @@ class CssLength {
         effectiveScaleFactor = 1;
         break;
       case CssLengthUnit.percentage:
-        // TODO: remove ignore https://github.com/passsy/dart-lint/issues/27
-        // ignore: invariant_booleans
         if (baseValue == null) {
           return null;
         }

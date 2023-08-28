@@ -35,17 +35,13 @@ class CoreBuildTree extends BuildTree {
   CoreBuildTree._({
     this.customStylesBuilder,
     this.customWidgetBuilder,
-    required dom.Element element,
+    required super.element,
     BuildTree? parent,
     Iterable<_CoreBuildOp> parentOps = const [],
-    required HtmlStyleBuilder styleBuilder,
+    required super.styleBuilder,
     required this.wf,
   })  : _parent = parent,
-        _parentOps = parentOps,
-        super(
-          element: element,
-          styleBuilder: styleBuilder,
-        );
+        _parentOps = parentOps;
 
   factory CoreBuildTree.root({
     CustomStylesBuilder? customStylesBuilder,
