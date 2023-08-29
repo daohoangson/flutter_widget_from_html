@@ -196,7 +196,7 @@ class CssBorderSide {
   BorderSide? _getValue(HtmlStyle style) => identical(this, none)
       ? null
       : BorderSide(
-          color: color ?? style.color ?? const BorderSide().color,
+          color: color ?? style.textStyle.color ?? const BorderSide().color,
           // TODO: add proper support for other border styles
           style: this.style != null ? BorderStyle.solid : BorderStyle.none,
           // TODO: look for official document regarding this default value
@@ -247,7 +247,7 @@ class CssLength {
       case CssLengthUnit.auto:
         return null;
       case CssLengthUnit.em:
-        baseValue ??= style.fontSize;
+        baseValue ??= style.textStyle.fontSize;
         if (baseValue == null) {
           return null;
         }

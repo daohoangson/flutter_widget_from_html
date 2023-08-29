@@ -52,17 +52,21 @@ void textDecorationApply(BuildTree tree, css.Declaration style) {
   }
 }
 
-HtmlStyle textDecorationColor(HtmlStyle style, Color v) =>
-    style.mergeWith(TextStyle(decorationColor: v));
+HtmlStyle textDecorationColor(HtmlStyle style, Color v) => style.copyWith(
+      textStyle: style.textStyle.copyWith(
+        decorationColor: v,
+        debugLabel: 'fwfh: $kCssTextDecorationColor',
+      ),
+    );
 
 HtmlStyle textDecorationLine(HtmlStyle p, TextDecorationLine v) {
-  final parent = p.parent?.textDecoration;
+  final parent = p.parent?.textStyle.decoration;
   final parentOverline = parent?.contains(TextDecoration.overline) == true;
   final parentLineThrough =
       parent?.contains(TextDecoration.lineThrough) == true;
   final parentUnderline = parent?.contains(TextDecoration.underline) == true;
 
-  final current = p.textDecoration;
+  final current = p.textStyle.decoration;
   final currentOverline = current?.contains(TextDecoration.overline) == true;
   final currentLineThrough =
       current?.contains(TextDecoration.lineThrough) == true;
@@ -87,14 +91,29 @@ HtmlStyle textDecorationLine(HtmlStyle p, TextDecorationLine v) {
     list.add(TextDecoration.underline);
   }
 
-  return p.mergeWith(TextStyle(decoration: TextDecoration.combine(list)));
+  final combined = TextDecoration.combine(list);
+  return p.copyWith(
+    textStyle: p.textStyle.copyWith(
+      decoration: combined,
+      debugLabel: 'fwfh: $kCssTextDecorationLine',
+    ),
+  );
 }
 
 HtmlStyle textDecorationStyle(HtmlStyle style, TextDecorationStyle v) =>
-    style.mergeWith(TextStyle(decorationStyle: v));
+    style.copyWith(
+      textStyle: style.textStyle.copyWith(
+        decorationStyle: v,
+        debugLabel: 'fwfh: $kCssTextDecorationStyle',
+      ),
+    );
 
-HtmlStyle textDecorationThickness(HtmlStyle style, double v) =>
-    style.mergeWith(TextStyle(decorationThickness: v));
+HtmlStyle textDecorationThickness(HtmlStyle style, double v) => style.copyWith(
+      textStyle: style.textStyle.copyWith(
+        decorationThickness: v,
+        debugLabel: 'fwfh: $kCssTextDecorationThickness',
+      ),
+    );
 
 @immutable
 class TextDecorationLine {

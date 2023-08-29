@@ -1,4 +1,4 @@
-part of '../core_data.dart';
+import 'package:flutter/material.dart';
 
 /// The number of font pixels for each logical pixel.
 ///

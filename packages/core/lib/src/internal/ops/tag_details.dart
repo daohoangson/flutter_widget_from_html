@@ -84,7 +84,7 @@ class TagDetails {
                 child: wf.buildColumnWidget(
                   context,
                   [
-                    HtmlSummary(style: textStyle, child: summary),
+                    HtmlSummary(style: style.textStyle, child: summary),
                     HtmlDetailsContents(child: child),
                   ],
                   dir: style.textDirection,

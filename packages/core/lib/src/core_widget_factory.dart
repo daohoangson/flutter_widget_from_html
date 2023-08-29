@@ -5,8 +5,6 @@ import 'package:flutter/material.dart'
         // we want to limit Material usages to be as generic as possible
         CircularProgressIndicator,
         Divider,
-        Theme,
-        ThemeData,
         Tooltip;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -408,8 +406,8 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
   /// - [TextDirection] via [Directionality.of]
   /// - [DefaultSelectionStyle] via [DefaultSelectionStyle.of]
   /// - [TextStyle] via [DefaultTextStyle.of]
-  /// - [TextScaleFactor] via [MediaQuery.textScaleFactorOf]
   /// - [SelectionRegistrar] via [SelectionContainer.maybeOf]
+  /// - [TextScaleFactor] via [MediaQuery.textScaleFactorOf]
   ///
   /// It's recommended to use [HtmlStyle.value] instead of
   /// obtaining dependencies from [BuildContext] for performance reason.
@@ -611,7 +609,7 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
       case kTagA:
         if (attrs.containsKey(kAttributeAHref)) {
           tree
-            ..apply<BuildContext?>(tagAColor, null)
+            ..apply<BuildContext?>(TagA.defaultColor, null)
             ..register(_tagA ??= TagA(this).buildOp);
         }
 
@@ -1130,16 +1128,6 @@ class WidgetFactory extends WidgetFactoryResetter with AnchorWidgetFactory {
 
     final widget = state.widget;
     _widget = widget is HtmlWidget ? widget : null;
-  }
-
-  /// Use [ThemeData.colorScheme] primary for hyperlink's text color.
-  HtmlStyle tagAColor(HtmlStyle style, BuildContext? context) {
-    if (context == null) {
-      return style;
-    }
-
-    final primaryColor = Theme.of(context).colorScheme.primary;
-    return style.mergeWith(TextStyle(color: primaryColor));
   }
 
   /// Resolves full URL with [HtmlWidget.baseUrl] if available.
