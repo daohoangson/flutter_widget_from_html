@@ -46,7 +46,6 @@ function publish {
 (cd packages/fwfh_chewie && publish)
 (cd packages/fwfh_just_audio && publish)
 (cd packages/fwfh_svg && publish)
-(cd packages/fwfh_text_style && publish)
 (cd packages/fwfh_url_launcher && publish)
 (cd packages/fwfh_webview && publish)
 (cd packages/enhanced && publish)

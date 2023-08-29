@@ -29,6 +29,7 @@ Future<String> explain(
   WidgetTester tester,
   String? html, {
   String? Function(Explainer, Widget)? explainer,
+  double? height,
   Widget? hw,
   GlobalKey? key,
   bool rtl = false,
@@ -61,6 +62,7 @@ Future<String> explain(
                     color: kColor,
                     fontSize: 10.0,
                     fontWeight: FontWeight.normal,
+                    height: height,
                   ),
               child: Directionality(
                 textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,

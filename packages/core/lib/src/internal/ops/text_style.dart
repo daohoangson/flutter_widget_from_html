@@ -80,8 +80,8 @@ class TextStyleOps {
         }
 
         if (height == -1) {
-          // ignore: avoid_redundant_argument_values
-          return p.copyWith(style: p.style.copyWith(height: null));
+          final normal = p.getDependency<NormalLineHeight>();
+          return p.copyWith(style: p.style.copyWith(height: normal.value));
         }
 
         return p.copyWith(style: p.style.copyWith(height: height));

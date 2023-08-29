@@ -32,7 +32,6 @@ class TextStyleHtml {
   /// Creates the root text style.
   factory TextStyleHtml.root(Iterable<dynamic> deps, TextStyle? widgetStyle) {
     var style = _getDependency<TextStyle>(deps).merge(widgetStyle);
-    style = FwfhTextStyle.from(style);
 
     final mqd = _getDependency<MediaQueryData>(deps);
     final tsf = mqd.textScaleFactor;
@@ -42,7 +41,10 @@ class TextStyleHtml {
     }
 
     return TextStyleHtml._(
-      deps: deps,
+      deps: [
+        ...deps,
+        NormalLineHeight(style.height),
+      ],
       style: style,
       textDirection: _getDependency<TextDirection>(deps),
       whitespace: CssWhitespace.normal,
