@@ -41,7 +41,7 @@ Future<void> main() async {
 
   group('IMG', () {
     testWidgets('renders asset picture', (WidgetTester tester) async {
-      const assetName = 'test/images/logo.svg';
+      const assetName = 'test/images/icon.svg';
       const html = '<img src="asset:$assetName" />';
       final explained = await helper.explain(tester, html);
       expect(
@@ -49,14 +49,14 @@ Future<void> main() async {
         equals(
           '[CssSizing:$sizingConstraints,child='
           '[SvgPicture:'
-          'bytesLoader=SvgAssetLoader(assetName: test/images/logo.svg, packageName: null)'
+          'bytesLoader=SvgAssetLoader(assetName: test/images/icon.svg, packageName: null)'
           ']]',
         ),
       );
     });
 
     testWidgets('renders file picture', (WidgetTester tester) async {
-      final filePath = '${Directory.current.path}/test/images/logo.svg';
+      final filePath = '${Directory.current.path}/test/images/icon.svg';
       final html = '<img src="file://$filePath" />';
       final explained = await helper.explain(tester, html);
       expect(

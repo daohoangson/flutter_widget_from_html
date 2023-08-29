@@ -127,11 +127,14 @@ class TextStyleOps {
         }
 
         if (height == -1) {
+          final normal = style.value<NormalLineHeight>();
+          if (normal == null) {
+            return style;
+          }
           return style.copyWith(
             textStyle: style.textStyle.copyWith(
-              debugLabel: 'fwfh: $kCssLineHeight $height',
-              // ignore: avoid_redundant_argument_values
-              height: null,
+              debugLabel: 'fwfh: $kCssLineHeight normal',
+              height: normal.value,
             ),
           );
         }

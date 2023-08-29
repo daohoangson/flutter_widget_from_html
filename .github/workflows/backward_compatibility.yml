@@ -34,7 +34,7 @@ jobs:
     env:
       GOLDEN_SKIP: "yes"
     steps:
-      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
       - name: Update pubspec.yaml
         run: |
           set -e
@@ -91,8 +91,6 @@ jobs:
           - stable
 
     # In case one of these fails, create a new PR against the `release/*` branch
-    # and publish a new version to make sure there is a compatible version
-    # of `fwfh_text_style` for all active Flutter versions.
     name: core@${{ matrix.channel }}
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -102,7 +100,7 @@ jobs:
     env:
       GOLDEN_SKIP: "yes"
     steps:
-      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
       - name: Update pubspec.yaml
         run: |
           set -e

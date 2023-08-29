@@ -17,13 +17,6 @@ set -e
 )
 
 (
-  cd ./packages/fwfh_text_style &&
-    flutter analyze &&
-    flutter test "$@" &&
-    echo 'packages/fwfh_text_style OK'
-)
-
-(
   cd ./packages/fwfh_svg &&
     flutter analyze &&
     flutter test "$@" &&
