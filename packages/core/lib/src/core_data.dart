@@ -7,6 +7,7 @@ import 'core_helpers.dart';
 part 'data/build_bits.dart';
 part 'data/css.dart';
 part 'data/image.dart';
+part 'data/normal_line_height.dart';
 part 'data/text_style.dart';
 
 /// A building element metadata.

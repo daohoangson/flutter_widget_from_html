@@ -1491,11 +1491,34 @@ Future<void> main() async {
       expect(e, equals('[RichText:(:(+height=1.0:Foo )(+height=2.0+i:bar))]'));
     });
 
-    testWidgets('renders child element (normal)', (WidgetTester tester) async {
-      const html = '<span style="line-height: 1">Foo '
-          '<em style="line-height: normal">bar</em></span>';
-      final e = await explain(tester, html);
-      expect(e, equals('[RichText:(:(+height=1.0:Foo )(+i:bar))]'));
+    group('reset to normal', () {
+      testWidgets('cannot reset to null', (tester) async {
+        const html = '<span style="line-height: 2">Foo '
+            '<em style="line-height: normal">bar</em></span>';
+        final explained = await explain(
+          tester,
+          html,
+          // ignore: avoid_redundant_argument_values
+          height: null,
+        );
+        expect(
+          explained,
+          equals('[RichText:(:(+height=2.0:Foo )(+height=2.0+i:bar))]'),
+        );
+      });
+
+      testWidgets('reset to 1', (tester) async {
+        const html = '<span style="line-height: 2">Foo '
+            '<em style="line-height: normal">bar</em></span>';
+        final explained = await explain(tester, html, height: 1);
+        expect(
+          explained,
+          equals(
+            '[RichText:(+height=1.0:(+height=2.0:Foo )'
+            '(+height=1.0+i:bar))]',
+          ),
+        );
+      });
     });
   });
 

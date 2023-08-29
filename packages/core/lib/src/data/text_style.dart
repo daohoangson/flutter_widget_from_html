@@ -41,7 +41,10 @@ class TextStyleHtml {
     }
 
     return TextStyleHtml._(
-      deps: deps,
+      deps: [
+        ...deps,
+        NormalLineHeight(style.height),
+      ],
       style: style,
       textDirection: _getDependency<TextDirection>(deps),
       whitespace: CssWhitespace.normal,
