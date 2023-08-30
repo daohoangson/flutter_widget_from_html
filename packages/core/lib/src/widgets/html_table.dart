@@ -432,24 +432,19 @@ class _TableRenderLayouter {
           maxColumnWidths.setMaxColumnWidths(tro, data, childWidth);
         }
 
-        try {
-          final childMinWidth = step3GetMinIntrinsicWidth(
-            step2,
-            child: child,
-            data: data,
-            columnWidths: columnWidths,
-            maxColumnWidths: maxColumnWidths,
-          );
+        final childMinWidth = step3GetMinIntrinsicWidth(
+          step2,
+          child: child,
+          data: data,
+          columnWidths: columnWidths,
+          maxColumnWidths: maxColumnWidths,
+        );
+        if (childMinWidth != null) {
+          childMinWidths[i] = childMinWidth;
+          minColumnWidths.setMaxColumnWidths(tro, data, childMinWidth);
 
-          if (childMinWidth != null) {
-            childMinWidths[i] = childMinWidth;
-            minColumnWidths.setMaxColumnWidths(tro, data, childMinWidth);
-
-            // the loop should run at least one more time with new min-width
-            shouldLoop = true;
-          }
-        } catch (error, stackTrace) {
-          _logger.fine('Skipped measuring child#$i', error, stackTrace);
+          // the loop should run at least one more time with new min-width
+          shouldLoop = true;
         }
       }
 
