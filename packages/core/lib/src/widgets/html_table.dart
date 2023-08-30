@@ -217,7 +217,7 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
 extension on Iterable<double> {
   double get sum => isEmpty ? 0.0 : reduce(_sum);
 
-  int get zeros => where((v) => v == 0.0).length;
+  int get zeros => where((v) => v <= epsilon).length;
 
   static double _sum(double value, double element) => value + element;
 }
@@ -381,6 +381,7 @@ class _TableRenderLayouter {
     final childMinWidths = List<double?>.filled(children.length, null);
     final cellSizes = List<Size?>.filled(children.length, null);
     var columnWidths = naiveColumnWidths.map((v) => v ?? .0).toList();
+    final maxColumnWidths = [...columnWidths];
     final minColumnWidths = List.filled(step1.columnCount, .0);
 
     if (columnWidths.zeros == 0 &&
@@ -399,9 +400,9 @@ class _TableRenderLayouter {
 
       if (columnWidths.zeros == 0 && availableWidth != null) {
         columnWidths = redistributeValues(
-          columnWidths,
-          minColumnWidths,
-          availableWidth,
+          available: availableWidth,
+          maxValues: maxColumnWidths,
+          minValues: minColumnWidths,
         );
       }
 
@@ -423,14 +424,16 @@ class _TableRenderLayouter {
           cellSizes[i] = layoutSize;
           childWidth = layoutSize.width;
           columnWidths.setMaxColumnWidths(tro, data, childWidth);
+          maxColumnWidths.setMaxColumnWidths(tro, data, childWidth);
         }
 
         try {
           final childMinWidth = step3GetMinIntrinsicWidth(
             step2,
             child: child,
-            columnWidths: columnWidths,
             data: data,
+            columnWidths: columnWidths,
+            maxColumnWidths: maxColumnWidths,
           );
 
           if (childMinWidth != null) {
@@ -465,29 +468,33 @@ class _TableRenderLayouter {
   double? step3GetMinIntrinsicWidth(
     _TableDataStep2 step2, {
     required RenderBox child,
-    required List<double> columnWidths,
     required _TableCellData data,
+    required List<double> columnWidths,
+    required List<double> maxColumnWidths,
   }) {
     final step1 = step2.step1;
     final availableWidth = step1.availableWidth;
 
-    if (availableWidth == null) {
-      // unlimited available space
-      return null;
-    }
+    final widthSum = columnWidths.sumRange(data);
+    final maxWidthSum = maxColumnWidths.sumRange(data);
+    if (widthSum >= maxWidthSum) {
+      // cell has more than requested width
+      // skip measuring if not absolutely needed because it's expensive
 
-    final dataGaps = tro._calculateColumnGaps(data);
-    final inCalculationWidth = columnWidths.sumRange(data) + dataGaps;
-    if (inCalculationWidth <= availableWidth) {
-      // current widths are good
-      return null;
+      if (availableWidth == null) {
+        // unlimited available space
+        return null;
+      }
+
+      if (columnWidths.sum <= availableWidth) {
+        // current widths are good enough
+        return null;
+      }
     }
 
     // table is too crowded
     // get min width to avoid breaking line in the middle of a word
-    final childMinWidth = child.getMinIntrinsicWidth(double.infinity);
-
-    return childMinWidth;
+    return child.getMinIntrinsicWidth(double.infinity);
   }
 
   _TableDataStep4 step4ChildSizesAndRowHeights(_TableDataStep3 step3) {
@@ -607,44 +614,47 @@ class _TableRenderLayouter {
     );
   }
 
-  static List<double> redistributeValues(
-    List<double> values,
-    List<double> calculatedMinValues,
-    double available,
-  ) {
-    final effectiveMinValues = List.filled(values.length, .0);
-    for (var i = 0; i < calculatedMinValues.length; i++) {
-      final calculatedMinValue = calculatedMinValues[i];
-      if (calculatedMinValue > epsilon) {
-        effectiveMinValues[i] = calculatedMinValue;
-      }
+  static List<double> redistributeValues({
+    required double available,
+    required List<double> maxValues,
+    required List<double> minValues,
+  }) {
+    final result = [...minValues];
+    final remaining = max(.0, available - result.sum);
+    if (remaining <= epsilon) {
+      // nothing left to redistribute
+      return result;
     }
 
-    final remaining = max(.0, available - effectiveMinValues.sum);
-    var valuesCount = 0;
-    var valuesSum = .0;
-    for (var i = 0; i < values.length; i++) {
-      if (effectiveMinValues[i] <= epsilon) {
-        valuesCount++;
-        valuesSum += values[i];
-      }
+    final dirties = List.filled(result.length, .0);
+    for (var i = 0; i < result.length; i++) {
+      dirties[i] = maxValues[i] - result[i];
     }
 
-    final result = effectiveMinValues.toList(growable: false);
-    if (valuesCount > 0) {
-      for (var i = 0; i < values.length; i++) {
-        if (result[i] > epsilon) {
+    final dirtyCount = dirties.length - dirties.zeros;
+    final dirtySum = dirties.sum;
+    if (dirtyCount > 0) {
+      for (var i = 0; i < dirties.length; i++) {
+        if (dirties[i] <= epsilon) {
           continue;
         }
 
-        if (valuesSum > .0 && valuesSum.isFinite) {
+        final double delta;
+        if (dirtySum.isFinite && dirtySum > epsilon) {
           // calculate widths using weighted distribution
-          // e.g. if a column has huge dry width, it will have bigger width
-          result[i] = values[i] / valuesSum * remaining;
+          // e.g. if a column has large difference, it will grow more
+          delta = dirties[i] / dirtySum * remaining;
         } else {
-          // split the remaining width equally if SUM(values) is not usable
-          result[i] = remaining / valuesCount;
+          // split the remaining equally between dirties
+          // if SUM(values) is not usable
+          delta = remaining / dirtyCount;
         }
+        result[i] = min(maxValues[i], result[i] + delta);
+      }
+    } else {
+      for (var i = 0; i < result.length; i++) {
+        // split the remaining equally between values
+        result[i] = min(maxValues[i], result[i] + remaining / result.length);
       }
     }
 
