@@ -928,16 +928,6 @@ Future<void> main() async {
     <td valign="baseline">Foo</td>
   </tr>
 </table>''',
-              // TODO: doesn't match browser output
-              'valign_baseline_computeDryLayout': '''
-<div style="width: 100px; height: 100px;">
-  <table border="1">
-    <tr>
-      <td valign="baseline">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</td>
-      <td valign="baseline"><div style="margin: 10px">Foo</div></td>
-    </tr>
-  </table>
-</div>''',
               'rtl': '''
 <table dir="rtl">
   <tr>
