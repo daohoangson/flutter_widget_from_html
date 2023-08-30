@@ -215,7 +215,16 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
 extension on Iterable<double> {
   double get sum => isEmpty ? 0.0 : reduce(_sum);
 
+  Iterable<double> get zeros => where((v) => v.isZero);
+
   static double _sum(double value, double element) => value + element;
+}
+
+extension on double {
+  bool get isZero {
+    const epsilon = .01;
+    return this <= epsilon;
+  }
 }
 
 extension on List<double> {
@@ -286,14 +295,6 @@ class _TableRenderLayouter {
   final ChildLayouter layouter;
   final _TableRenderObject tro;
 
-  final List<_TableCellData> cells = [];
-  final List<RenderBox> children = [];
-  final List<Size> drySizes = [];
-
-  double captionHeight = .0;
-  int columnCount = 0;
-  int rowCount = 0;
-
   _TableRenderLayouter(this.tro, this.constraints)
       : layouter = ChildLayoutHelper.layoutChild;
 
@@ -305,114 +306,144 @@ class _TableRenderLayouter {
       return _TableRenderLayout(Rect.zero, constraints.smallest);
     }
 
-    step1GuessDrySizes(firstChild);
-
-    final columnGapsSum = (columnCount + 1) * tro.columnGap;
-    final gapsAndPaddings = tro.paddingLeft + columnGapsSum + tro.paddingRight;
-    final availableWidth = constraints.maxWidth - gapsAndPaddings;
-    final dryColumnWidths = step2DryColumnWidths();
-
-    final columnWidths = step3ColumnWiths(availableWidth, dryColumnWidths);
-
-    final childSizes = List.filled(children.length, Size.zero);
-    final rowHeights = List.filled(rowCount, .0);
-    step4ChildSizesAndRowHeights(columnWidths, childSizes, rowHeights);
-
-    return step5CalculateChildrenOffsetMaybeRelayout(
-      childSizes,
-      columnWidths,
-      rowHeights,
-    );
+    final step1 = step1Prepare(firstChild);
+    final step2 = step2NaiveColumnWidths(step1);
+    final step3 = step3MinIntrinsicWidth(step2);
+    final step4 = step4ChildSizesAndRowHeights(step3);
+    return step5CalculateChildrenOffsetMaybeRelayout(step4);
   }
 
-  void step1GuessDrySizes(RenderBox firstChild) {
+  _TableDataStep1 step1Prepare(RenderBox firstChild) {
+    final cells = <_TableCellData>[];
+    final children = <RenderBox>[];
+    int columnCount = 0;
+    int rowCount = 0;
     RenderBox? child = firstChild;
-    var i = 0;
     while (child != null) {
       final data = child.parentData! as _TableCellData;
       children.add(child);
       cells.add(data);
 
-      Size drySize;
-      final width = data.width?.clamp(0, constraints.maxWidth);
-      if (width != null) {
-        drySize = Size(width, .0);
-      } else {
-        final boundedWidthOr100 =
-            constraints.hasBoundedWidth ? constraints.maxWidth : 100.0;
-        drySize = Size(boundedWidthOr100, 0);
-        try {
-          const bc0 = BoxConstraints();
-          drySize = ChildLayoutHelper.dryLayoutChild(child, bc0);
-        } catch (error, stackTrace) {
-          _logger.fine('Skipped guessing size for child#$i', error, stackTrace);
-        }
-      }
-      drySizes.add(drySize);
-
       columnCount = max(columnCount, data.columnStart + data.columnSpan);
       rowCount = max(rowCount, data.rowStart + data.rowSpan);
 
       child = data.nextSibling;
-      i++;
     }
+
+    // calculate the available width if possible
+    // this may be null if table is inside a horizontal scroll view
+    double? availableWidth;
+    if (constraints.hasBoundedWidth) {
+      final columnGapsSum = (columnCount + 1) * tro.columnGap;
+      final gapsAndPaddings =
+          tro.paddingLeft + columnGapsSum + tro.paddingRight;
+      availableWidth = constraints.maxWidth - gapsAndPaddings;
+    }
+
+    return _TableDataStep1(
+      availableWidth: availableWidth,
+      cells: cells,
+      children: children,
+      columnCount: columnCount,
+      rowCount: rowCount,
+    );
   }
 
-  Iterable<double> step2DryColumnWidths() {
-    final dryColumnWidths = List.filled(columnCount, .0);
-    for (var i = 0; i < children.length; i++) {
-      final data = children[i].parentData! as _TableCellData;
-      final drySize = drySizes[i];
-      dryColumnWidths.setMaxColumnWidths(tro, data, drySize.width);
+  _TableDataStep2 step2NaiveColumnWidths(_TableDataStep1 step1) {
+    final cells = step1.cells;
+    final cellWidths = cells.map((cell) {
+      // use width from cell attribute if it is some sensible value
+      // otherwise, ignore and measure via layouter for real
+      final cellWidth = cell.width?.clamp(0, constraints.maxWidth);
+      return cellWidth?.isFinite == true ? cellWidth : null;
+    }).toList(growable: false);
+
+    final naiveColumnWidths = List.filled(step1.columnCount, .0);
+    for (var i = 0; i < cells.length; i++) {
+      final data = cells[i];
+      final cellWidth = cellWidths[i];
+      if (cellWidth != null) {
+        naiveColumnWidths.setMaxColumnWidths(tro, data, cellWidth);
+      }
     }
 
-    return dryColumnWidths;
+    return _TableDataStep2(
+      step1,
+      cellWidths: cellWidths,
+      naiveColumnWidths: naiveColumnWidths
+          .map<double?>((v) => !v.isZero ? v : null)
+          .toList(growable: false),
+    );
   }
 
-  List<double> step3ColumnWiths(
-    double availableWidth,
-    Iterable<double> dryColumnWidths,
-  ) {
-    // being naive: take dry widths as render widths
-    var columnWidths = [...dryColumnWidths];
-    if (availableWidth.isInfinite || dryColumnWidths.sum <= availableWidth) {
-      return columnWidths;
+  _TableDataStep3 step3MinIntrinsicWidth(_TableDataStep2 step2) {
+    final step1 = step2.step1;
+    final availableWidth = step1.availableWidth;
+    final cells = step1.cells;
+    final children = step1.children;
+    final naiveColumnWidths = step2.naiveColumnWidths;
+
+    final childMinWidths = List<double?>.filled(children.length, null);
+    final cellSizes = List<Size?>.filled(children.length, null);
+    var columnWidths = naiveColumnWidths.map((v) => v ?? .0).toList();
+    final maxColumnWidths = [...columnWidths];
+    final minColumnWidths = List.filled(step1.columnCount, .0);
+
+    if (columnWidths.zeros.isEmpty &&
+        (availableWidth == null || columnWidths.sum <= availableWidth)) {
+      return _TableDataStep3(
+        step2,
+        cellSizes: cellSizes,
+        columnWidths: columnWidths,
+      );
     }
 
-    final minColumnWidths = List.filled(columnCount, 0.0);
     var shouldLoop = true;
     var loopCount = 0;
     while (shouldLoop) {
       shouldLoop = false;
 
-      columnWidths =
-          redistributeValues(columnWidths, minColumnWidths, availableWidth);
+      if (columnWidths.zeros.isEmpty && availableWidth != null) {
+        columnWidths = redistributeValues(
+          available: availableWidth,
+          maxValues: maxColumnWidths,
+          minValues: minColumnWidths,
+        );
+      }
 
       for (var i = 0; i < children.length; i++) {
+        if (childMinWidths[i] != null) {
+          // this child has been measured already
+          continue;
+        }
+
         final child = children[i];
         final data = cells[i];
-        final drySize = drySizes[i];
 
-        final dataGaps = tro._calculateColumnGaps(data);
-        final inCalculationWidth = columnWidths.sumRange(data) + dataGaps;
-        if (drySize.width > inCalculationWidth) {
-          double? minWidth;
-          try {
-            // this call is expensive, we try to avoid it as much as possible
-            // width being smaller than dry size means the table is too crowded
-            // calculating min to avoid breaking line in the middle of a word
-            minWidth = child.getMinIntrinsicWidth(double.infinity);
-          } catch (error, stackTrace) {
-            minWidth = drySize.width;
-            _logger.fine('Skipped measuring child#$i', error, stackTrace);
-          }
-
-          minColumnWidths.setMaxColumnWidths(tro, data, minWidth);
-
+        var childWidth = step2.cellWidths[i] ?? cellSizes[i]?.width;
+        if (childWidth == null) {
           // side effect
-          // keep track of min width in the array to avoid
-          // processing the same child more than once
-          drySizes[i] = Size(minWidth, 0);
+          // no pre-configured width to use
+          // have to layout cells without constraints for the initial width
+          final layoutSize = layouter(child, const BoxConstraints());
+          cellSizes[i] = layoutSize;
+          childWidth = layoutSize.width;
+          columnWidths.setMaxColumnWidths(tro, data, childWidth);
+          maxColumnWidths.setMaxColumnWidths(tro, data, childWidth);
+          _logger.fine('Got child#$i size without contraints: $layoutSize');
+        }
+
+        final childMinWidth = step3GetMinIntrinsicWidth(
+          step2,
+          child: child,
+          data: data,
+          columnWidths: columnWidths,
+          maxColumnWidths: maxColumnWidths,
+        );
+        if (childMinWidth != null) {
+          childMinWidths[i] = childMinWidth;
+          minColumnWidths.setMaxColumnWidths(tro, data, childMinWidth);
+          _logger.info('Got child#$i min width: $childMinWidth');
 
           // the loop should run at least one more time with new min-width
           shouldLoop = true;
@@ -420,7 +451,7 @@ class _TableRenderLayouter {
       }
 
       loopCount++;
-      if (loopCount > columnCount) {
+      if (loopCount > step1.columnCount) {
         // using column count to stop early, not a typo
         // we don't want to waste too much time in this loop
         // in case the table is extra long with many many rows
@@ -429,29 +460,72 @@ class _TableRenderLayouter {
       }
     }
 
-    return columnWidths;
+    return _TableDataStep3(
+      step2,
+      cellSizes: cellSizes,
+      columnWidths: columnWidths,
+    );
   }
 
-  void step4ChildSizesAndRowHeights(
-    List<double> columnWidths,
-    List<Size> childSizes,
-    List<double> rowHeights,
-  ) {
+  double? step3GetMinIntrinsicWidth(
+    _TableDataStep2 step2, {
+    required RenderBox child,
+    required _TableCellData data,
+    required List<double> columnWidths,
+    required List<double> maxColumnWidths,
+  }) {
+    final step1 = step2.step1;
+    final availableWidth = step1.availableWidth;
+
+    final widthSum = columnWidths.sumRange(data);
+    final maxWidthSum = maxColumnWidths.sumRange(data);
+    if (widthSum >= maxWidthSum) {
+      // cell has more than requested width
+      // skip measuring if not absolutely needed because it's expensive
+
+      if (availableWidth == null) {
+        // unlimited available space
+        return null;
+      }
+
+      if (columnWidths.sum <= availableWidth) {
+        // current widths are good enough
+        return null;
+      }
+    }
+
+    // table is too crowded
+    // get min width to avoid breaking line in the middle of a word
+    return child.getMinIntrinsicWidth(double.infinity);
+  }
+
+  _TableDataStep4 step4ChildSizesAndRowHeights(_TableDataStep3 step3) {
+    final step2 = step3.step2;
+    final step1 = step2.step1;
+    final cellSizes = step3.cellSizes;
+    final cells = step1.cells;
+    final children = step1.children;
+
+    final childSizes = List.generate(
+      cellSizes.length,
+      (i) => cellSizes[i] ?? Size.zero,
+    );
+    final rowHeights = List.filled(step1.rowCount, .0);
+
     for (var i = 0; i < children.length; i++) {
       final child = children[i];
       final data = cells[i];
-      final drySize = drySizes[i];
+      final cellSize = cellSizes[i];
 
-      final childWidth = data.calculateWidth(tro, columnWidths);
-      final canUseDrySize = childWidth == drySize.width &&
-          drySize.height > 0 &&
-          identical(layouter, ChildLayoutHelper.dryLayoutChild);
+      final childWidth = data.calculateWidth(tro, step3.columnWidths);
       Size childSize;
-      if (canUseDrySize) {
-        childSize = drySize;
+      if (cellSize != null && cellSize.width == childWidth) {
+        childSize = cellSize;
       } else {
         // side effect
+        // layout with tight constraints to get the expected width
         childSize = layouter(child, BoxConstraints.tightFor(width: childWidth));
+        _logger.fine('Got child#$i size with width=$childWidth: $childSize');
       }
       childSizes[i] = childSize;
 
@@ -463,40 +537,57 @@ class _TableRenderLayouter {
         rowHeights[row] = max(rowHeights[row], rowHeight);
       }
     }
+
+    return _TableDataStep4(
+      step3,
+      childSizes: childSizes,
+      rowHeights: rowHeights,
+    );
   }
 
   _TableRenderLayout step5CalculateChildrenOffsetMaybeRelayout(
-    List<Size> childSizes,
-    List<double> columnWidths,
-    List<double> rowHeights,
+    _TableDataStep4 step4,
   ) {
-    final columnGapsSum = (columnCount + 1) * tro.columnGap;
-    final rowGapsSum = (rowCount + 1) * tro.rowGap;
+    final step3 = step4.step3;
+    final step2 = step3.step2;
+    final step1 = step2.step1;
+    final cells = step1.cells;
+    final children = step1.children;
+
+    final columnGapsSum = (step1.columnCount + 1) * tro.columnGap;
+    final rowGapsSum = (step1.rowCount + 1) * tro.rowGap;
     final calculatedHeight =
-        tro.paddingTop + rowHeights.sum + rowGapsSum + tro.paddingBottom;
+        tro.paddingTop + step4.rowHeights.sum + rowGapsSum + tro.paddingBottom;
     final constraintedHeight = constraints.constrainHeight(calculatedHeight);
     final deltaHeight =
-        max(0, (constraintedHeight - calculatedHeight) / rowCount);
-    final calculatedWidth =
-        tro.paddingLeft + columnWidths.sum + columnGapsSum + tro.paddingRight;
+        max(0, (constraintedHeight - calculatedHeight) / step1.rowCount);
+    final calculatedWidth = tro.paddingLeft +
+        step3.columnWidths.sum +
+        columnGapsSum +
+        tro.paddingRight;
+
+    var captionHeight = .0;
+
     for (var i = 0; i < children.length; i++) {
       final child = children[i];
       final data = cells[i];
-      var childSize = childSizes[i];
+      var childSize = step4.childSizes[i];
 
-      var childHeight = data.calculateHeight(tro, rowHeights) + deltaHeight;
-      var childWidth = data.calculateWidth(tro, columnWidths);
+      var childHeight =
+          data.calculateHeight(tro, step4.rowHeights) + deltaHeight;
+      var childWidth = data.calculateWidth(tro, step3.columnWidths);
       if (childSize.height != childHeight) {
         final cc2 = BoxConstraints.tight(Size(childWidth, childHeight));
         // side effect
         childSize = layouter(child, cc2);
         childHeight = childSize.height;
         childWidth = childSize.width;
+        _logger.fine('Laid out child#$i at ${childWidth}x$childHeight');
       }
 
-      final calculatedY = data.calculateY(tro, rowHeights);
+      final calculatedY = data.calculateY(tro, step4.rowHeights);
       if (child.hasSize) {
-        final calculatedX = data.calculateX(tro, columnWidths);
+        final calculatedX = data.calculateX(tro, step3.columnWidths);
 
         double x;
         switch (tro._textDirection) {
@@ -527,51 +618,100 @@ class _TableRenderLayouter {
     );
   }
 
-  static List<double> redistributeValues(
-    List<double> values,
-    List<double> calculatedMinValues,
-    double available,
-  ) {
-    final effectiveMinValues = List.filled(values.length, .0);
-    for (var i = 0; i < values.length; i++) {
-      if (calculatedMinValues[i] > .0 && calculatedMinValues[i] >= values[i]) {
-        // min value is smaller than in-calculation width
-        // let's keep the current value as long as possible
-        // we want the column to grow to its dry size naturally
-        effectiveMinValues[i] = calculatedMinValues[i];
-      }
+  static List<double> redistributeValues({
+    required double available,
+    required List<double> maxValues,
+    required List<double> minValues,
+  }) {
+    final result = [...minValues];
+    final remaining = max(.0, available - result.sum);
+    if (remaining.isZero) {
+      // nothing left to redistribute
+      return result;
     }
 
-    final remaining = max(.0, available - effectiveMinValues.sum);
-    var valuesCount = 0;
-    var valuesSum = .0;
-    for (var i = 0; i < values.length; i++) {
-      if (effectiveMinValues[i] == .0) {
-        valuesCount++;
-        valuesSum += values[i];
-      }
+    final dirties = List.filled(result.length, .0);
+    for (var i = 0; i < result.length; i++) {
+      dirties[i] = max(.0, maxValues[i] - result[i]);
+    }
+    final dirtySum = dirties.sum;
+    if (dirtySum.isZero) {
+      // no dirty value that needs adjusting
+      return result;
     }
 
-    final result = effectiveMinValues.toList(growable: false);
-    if (valuesCount > 0) {
-      for (var i = 0; i < values.length; i++) {
-        if (result[i] != .0) {
-          continue;
-        }
-
-        if (valuesSum.isFinite) {
-          // calculate widths using weighted distribution
-          // e.g. if a column has huge dry width, it will have bigger width
-          result[i] = values[i] / valuesSum * remaining;
-        } else {
-          // split the remaining width equally if SUM(values) is not usable
-          result[i] = remaining / valuesCount;
-        }
+    for (var i = 0; i < dirties.length; i++) {
+      if (dirties[i].isZero) {
+        continue;
       }
+
+      // calculate delta using weighted distribution
+      // e.g. if a value has larger difference, it will grow more
+      final delta = dirties[i] / dirtySum * remaining;
+      result[i] = min(maxValues[i], result[i] + delta);
     }
 
     return result;
   }
+}
+
+@immutable
+class _TableDataStep1 {
+  final double? availableWidth;
+  final List<_TableCellData> cells;
+  final List<RenderBox> children;
+  final int columnCount;
+  final int rowCount;
+
+  const _TableDataStep1({
+    this.availableWidth,
+    required this.cells,
+    required this.children,
+    required this.columnCount,
+    required this.rowCount,
+  });
+}
+
+@immutable
+class _TableDataStep2 {
+  final _TableDataStep1 step1;
+
+  final List<double?> cellWidths;
+  final List<double?> naiveColumnWidths;
+
+  const _TableDataStep2(
+    this.step1, {
+    required this.cellWidths,
+    required this.naiveColumnWidths,
+  });
+}
+
+@immutable
+class _TableDataStep3 {
+  final _TableDataStep2 step2;
+
+  final List<Size?> cellSizes;
+  final List<double> columnWidths;
+
+  const _TableDataStep3(
+    this.step2, {
+    required this.cellSizes,
+    required this.columnWidths,
+  });
+}
+
+@immutable
+class _TableDataStep4 {
+  final _TableDataStep3 step3;
+
+  final List<Size> childSizes;
+  final List<double> rowHeights;
+
+  const _TableDataStep4(
+    this.step3, {
+    required this.childSizes,
+    required this.rowHeights,
+  });
 }
 
 class _TableRenderObject extends RenderBox
