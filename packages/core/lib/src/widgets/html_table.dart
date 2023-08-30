@@ -425,22 +425,21 @@ class _TableRenderLayouter {
           columnWidths.setMaxColumnWidths(tro, data, childWidth);
         }
 
-        final dataGaps = tro._calculateColumnGaps(data);
-        final inCalculationWidth = columnWidths.sumRange(data) + dataGaps;
-        if (childWidth <= inCalculationWidth) {
-          // current width is good, nothing to do here
-          continue;
-        }
-
-        // table is too crowded
-        // get min width to avoid breaking line in the middle of a word
         try {
-          final childMinWidth = child.getMinIntrinsicWidth(double.infinity);
-          childMinWidths[i] = childMinWidth;
-          minColumnWidths.setMaxColumnWidths(tro, data, childMinWidth);
+          final childMinWidth = step3GetMinIntrinsicWidth(
+            step2,
+            child: child,
+            columnWidths: columnWidths,
+            data: data,
+          );
 
-          // the loop should run at least one more time with new min-width
-          shouldLoop = true;
+          if (childMinWidth != null) {
+            childMinWidths[i] = childMinWidth;
+            minColumnWidths.setMaxColumnWidths(tro, data, childMinWidth);
+
+            // the loop should run at least one more time with new min-width
+            shouldLoop = true;
+          }
         } catch (error, stackTrace) {
           _logger.fine('Skipped measuring child#$i', error, stackTrace);
         }
@@ -461,6 +460,34 @@ class _TableRenderLayouter {
       cellSizes: cellSizes,
       columnWidths: columnWidths,
     );
+  }
+
+  double? step3GetMinIntrinsicWidth(
+    _TableDataStep2 step2, {
+    required RenderBox child,
+    required List<double> columnWidths,
+    required _TableCellData data,
+  }) {
+    final step1 = step2.step1;
+    final availableWidth = step1.availableWidth;
+
+    if (availableWidth == null) {
+      // unlimited available space
+      return null;
+    }
+
+    final dataGaps = tro._calculateColumnGaps(data);
+    final inCalculationWidth = columnWidths.sumRange(data) + dataGaps;
+    if (inCalculationWidth <= availableWidth) {
+      // current widths are good
+      return null;
+    }
+
+    // table is too crowded
+    // get min width to avoid breaking line in the middle of a word
+    final childMinWidth = child.getMinIntrinsicWidth(double.infinity);
+
+    return childMinWidth;
   }
 
   _TableDataStep4 step4ChildSizesAndRowHeights(_TableDataStep3 step3) {
