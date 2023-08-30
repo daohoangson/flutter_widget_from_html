@@ -613,9 +613,9 @@ class _TableRenderLayouter {
     double available,
   ) {
     final effectiveMinValues = List.filled(values.length, .0);
-    for (var i = 0; i < values.length; i++) {
+    for (var i = 0; i < calculatedMinValues.length; i++) {
       final calculatedMinValue = calculatedMinValues[i];
-      if (calculatedMinValue >= values[i]) {
+      if (calculatedMinValue > epsilon) {
         effectiveMinValues[i] = calculatedMinValue;
       }
     }
@@ -624,7 +624,7 @@ class _TableRenderLayouter {
     var valuesCount = 0;
     var valuesSum = .0;
     for (var i = 0; i < values.length; i++) {
-      if (effectiveMinValues[i] < epsilon) {
+      if (effectiveMinValues[i] <= epsilon) {
         valuesCount++;
         valuesSum += values[i];
       }
