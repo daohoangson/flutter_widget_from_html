@@ -628,34 +628,23 @@ class _TableRenderLayouter {
 
     final dirties = List.filled(result.length, .0);
     for (var i = 0; i < result.length; i++) {
-      dirties[i] = maxValues[i] - result[i];
+      dirties[i] = max(.0, maxValues[i] - result[i]);
+    }
+    final dirtySum = dirties.sum;
+    if (dirtySum <= epsilon) {
+      // no dirty value that needs adjusting
+      return result;
     }
 
-    final dirtyCount = dirties.length - dirties.zeros;
-    final dirtySum = dirties.sum;
-    if (dirtyCount > 0) {
-      for (var i = 0; i < dirties.length; i++) {
-        if (dirties[i] <= epsilon) {
-          continue;
-        }
+    for (var i = 0; i < dirties.length; i++) {
+      if (dirties[i] <= epsilon) {
+        continue;
+      }
 
-        final double delta;
-        if (dirtySum.isFinite && dirtySum > epsilon) {
-          // calculate widths using weighted distribution
-          // e.g. if a column has large difference, it will grow more
-          delta = dirties[i] / dirtySum * remaining;
-        } else {
-          // split the remaining equally between dirties
-          // if SUM(values) is not usable
-          delta = remaining / dirtyCount;
-        }
-        result[i] = min(maxValues[i], result[i] + delta);
-      }
-    } else {
-      for (var i = 0; i < result.length; i++) {
-        // split the remaining equally between values
-        result[i] = min(maxValues[i], result[i] + remaining / result.length);
-      }
+      // calculate delta using weighted distribution
+      // e.g. if a value has larger difference, it will grow more
+      final delta = dirties[i] / dirtySum * remaining;
+      result[i] = min(maxValues[i], result[i] + delta);
     }
 
     return result;
