@@ -8,8 +8,6 @@ import 'css_sizing.dart';
 
 final _logger = Logger('fwfh.HtmlTable');
 
-const epsilon = .0001;
-
 /// A TABLE widget.
 class HtmlTable extends MultiChildRenderObjectWidget {
   /// The table border sides.
@@ -217,9 +215,16 @@ class HtmlTableCell extends ParentDataWidget<_TableCellData> {
 extension on Iterable<double> {
   double get sum => isEmpty ? 0.0 : reduce(_sum);
 
-  int get zeros => where((v) => v <= epsilon).length;
+  Iterable<double> get zeros => where((v) => v.isZero);
 
   static double _sum(double value, double element) => value + element;
+}
+
+extension on double {
+  bool get isZero {
+    const epsilon = .01;
+    return this <= epsilon;
+  }
 }
 
 extension on List<double> {
@@ -366,7 +371,7 @@ class _TableRenderLayouter {
       step1,
       cellWidths: cellWidths,
       naiveColumnWidths: naiveColumnWidths
-          .map<double?>((v) => v > epsilon ? v : null)
+          .map<double?>((v) => !v.isZero ? v : null)
           .toList(growable: false),
     );
   }
@@ -384,7 +389,7 @@ class _TableRenderLayouter {
     final maxColumnWidths = [...columnWidths];
     final minColumnWidths = List.filled(step1.columnCount, .0);
 
-    if (columnWidths.zeros == 0 &&
+    if (columnWidths.zeros.isEmpty &&
         (availableWidth == null || columnWidths.sum <= availableWidth)) {
       return _TableDataStep3(
         step2,
@@ -398,7 +403,7 @@ class _TableRenderLayouter {
     while (shouldLoop) {
       shouldLoop = false;
 
-      if (columnWidths.zeros == 0 && availableWidth != null) {
+      if (columnWidths.zeros.isEmpty && availableWidth != null) {
         columnWidths = redistributeValues(
           available: availableWidth,
           maxValues: maxColumnWidths,
@@ -621,7 +626,7 @@ class _TableRenderLayouter {
   }) {
     final result = [...minValues];
     final remaining = max(.0, available - result.sum);
-    if (remaining <= epsilon) {
+    if (remaining.isZero) {
       // nothing left to redistribute
       return result;
     }
@@ -631,13 +636,13 @@ class _TableRenderLayouter {
       dirties[i] = max(.0, maxValues[i] - result[i]);
     }
     final dirtySum = dirties.sum;
-    if (dirtySum <= epsilon) {
+    if (dirtySum.isZero) {
       // no dirty value that needs adjusting
       return result;
     }
 
     for (var i = 0; i < dirties.length; i++) {
-      if (dirties[i] <= epsilon) {
+      if (dirties[i].isZero) {
         continue;
       }
 
