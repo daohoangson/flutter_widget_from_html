@@ -79,13 +79,7 @@ class StyleVerticalAlign {
               return child;
             }
 
-            return wf.buildAlign(
-              tree,
-              child,
-              alignment,
-              heightFactor: 1.0,
-              widthFactor: 1.0,
-            );
+            return wf.buildAlign(tree, child, alignment, widthFactor: 1.0);
           });
         },
         priority: BoxModel.verticalAlign,
@@ -117,13 +111,7 @@ class StyleVerticalAlign {
 
     final alignment =
         padding.bottom > 0 ? Alignment.topCenter : Alignment.bottomCenter;
-    return wf.buildAlign(
-      tree,
-      withPadding,
-      alignment,
-      heightFactor: 1.0,
-      widthFactor: 1.0,
-    );
+    return wf.buildAlign(tree, withPadding, alignment, widthFactor: 1.0);
   }
 }
 
