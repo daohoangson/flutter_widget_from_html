@@ -430,6 +430,7 @@ class _TableRenderLayouter {
           childWidth = layoutSize.width;
           columnWidths.setMaxColumnWidths(tro, data, childWidth);
           maxColumnWidths.setMaxColumnWidths(tro, data, childWidth);
+          _logger.fine('Got child#$i size without contraints: $layoutSize');
         }
 
         final childMinWidth = step3GetMinIntrinsicWidth(
@@ -442,6 +443,7 @@ class _TableRenderLayouter {
         if (childMinWidth != null) {
           childMinWidths[i] = childMinWidth;
           minColumnWidths.setMaxColumnWidths(tro, data, childMinWidth);
+          _logger.info('Got child#$i min width: $childMinWidth');
 
           // the loop should run at least one more time with new min-width
           shouldLoop = true;
@@ -523,6 +525,7 @@ class _TableRenderLayouter {
         // side effect
         // layout with tight constraints to get the expected width
         childSize = layouter(child, BoxConstraints.tightFor(width: childWidth));
+        _logger.fine('Got child#$i size with width=$childWidth: $childSize');
       }
       childSizes[i] = childSize;
 
@@ -579,6 +582,7 @@ class _TableRenderLayouter {
         childSize = layouter(child, cc2);
         childHeight = childSize.height;
         childWidth = childSize.width;
+        _logger.fine('Laid out child#$i at ${childWidth}x$childHeight');
       }
 
       final calculatedY = data.calculateY(tro, step4.rowHeights);
