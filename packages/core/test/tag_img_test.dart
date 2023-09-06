@@ -267,20 +267,18 @@ void main() {
   });
 
   group('baseUrl', () {
-    final defaultBaseUrl = Uri.parse('http://base.com/path/');
-
     Future<void> test(
       WidgetTester tester,
       String html,
       String fullUrl, {
-      Uri? baseUrl,
+      String baseUrl = 'http://base.com/path/',
     }) async {
       final explained = await helper.explain(
         tester,
         null,
         hw: HtmlWidget(
           html,
-          baseUrl: baseUrl,
+          baseUrl: baseUrl.isNotEmpty ? Uri.parse(baseUrl) : null,
           key: helper.hwKey,
         ),
       );
@@ -297,62 +295,37 @@ void main() {
     testWidgets('renders full url', (WidgetTester tester) async {
       const fullUrl = 'http://domain.com/image.png';
       const html = '<img src="$fullUrl" />';
-      await test(
-        tester,
-        html,
-        fullUrl,
-        baseUrl: defaultBaseUrl,
-      );
+      await test(tester, html, fullUrl);
     });
 
     testWidgets('renders protocol relative url', (WidgetTester tester) async {
       const html = '<img src="//protocol.relative" />';
       const fullUrl = 'http://protocol.relative';
-      await test(
-        tester,
-        html,
-        fullUrl,
-        baseUrl: defaultBaseUrl,
-      );
+      await test(tester, html, fullUrl);
     });
 
     testWidgets('renders protocol relative url (https)', (tester) async {
       const html = '<img src="//protocol.relative/secured" />';
       const fullUrl = 'https://protocol.relative/secured';
-      await test(
-        tester,
-        html,
-        fullUrl,
-        baseUrl: Uri.parse('https://base.com/secured'),
-      );
+      await test(tester, html, fullUrl, baseUrl: 'https://base.com/secured');
     });
 
     testWidgets('renders protocol relative url (no base)', (tester) async {
       const html = '<img src="//protocol.relative/secured" />';
       const fullUrl = 'https://protocol.relative/secured';
-      await test(tester, html, fullUrl);
+      await test(tester, html, fullUrl, baseUrl: '');
     });
 
     testWidgets('renders root relative url', (WidgetTester tester) async {
       const html = '<img src="/root.relative" />';
       const fullUrl = 'http://base.com/root.relative';
-      await test(
-        tester,
-        html,
-        fullUrl,
-        baseUrl: defaultBaseUrl,
-      );
+      await test(tester, html, fullUrl);
     });
 
     testWidgets('renders relative url', (WidgetTester tester) async {
       const html = '<img src="relative" />';
       const fullUrl = 'http://base.com/path/relative';
-      await test(
-        tester,
-        html,
-        fullUrl,
-        baseUrl: defaultBaseUrl,
-      );
+      await test(tester, html, fullUrl);
     });
   });
 
