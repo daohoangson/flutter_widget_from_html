@@ -39,8 +39,9 @@ String? webViewExplainer(helper.Explainer parent, Widget widget) {
 Future<String> explain(
   WidgetTester tester,
   String html, {
-  bool webView = true,
+  Uri? baseUrl,
   bool useExplainer = true,
+  bool webView = true,
 }) async =>
     helper.explain(
       tester,
@@ -48,6 +49,7 @@ Future<String> explain(
       explainer: webViewExplainer,
       hw: HtmlWidget(
         html,
+        baseUrl: baseUrl,
         key: helper.hwKey,
         factoryBuilder: () => _WidgetFactory(webView: webView),
       ),

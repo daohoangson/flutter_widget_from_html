@@ -16,19 +16,70 @@ void main() {
     expect(explained, equals('[GestureDetector:child=[Text:$src]]'));
   });
 
-  testWidgets('renders web view', (tester) async {
-    const html = '<iframe src="$src"></iframe>';
-    final explained = await explain(tester, html);
-    expect(
-      explained,
-      equals(
-        '[WebView:'
-        'url=$src,'
-        'aspectRatio=$defaultAspectRatio,'
-        'autoResize=true'
-        ']',
-      ),
+  group('renders web view', () {
+    Future<void> test(
+      WidgetTester tester,
+      String html,
+      String fullUrl, {
+      String baseUrl = 'http://base.com/path/',
+    }) async {
+      final explained = await explain(
+        tester,
+        html,
+        baseUrl: baseUrl.isNotEmpty ? Uri.parse(baseUrl) : null,
+      );
+      expect(
+        explained,
+        equals(
+          '[WebView:'
+          'url=$fullUrl,'
+          'aspectRatio=$defaultAspectRatio,'
+          'autoResize=true'
+          ']',
+        ),
+      );
+    }
+
+    testWidgets('with full url', (WidgetTester tester) async {
+      const fullUrl = 'http://domain.com/iframe';
+      const html = '<iframe src="$fullUrl"></iframe>';
+      await test(tester, html, fullUrl);
+    });
+
+    testWidgets('with protocol relative url', (WidgetTester tester) async {
+      const html = '<iframe src="//protocol.relative"></iframe>';
+      const fullUrl = 'http://protocol.relative';
+      await test(tester, html, fullUrl);
+    });
+
+    testWidgets('with protocol relative url (https)', (tester) async {
+      const html = '<iframe src="//protocol.relative/secured"></iframe>';
+      const fullUrl = 'https://protocol.relative/secured';
+      await test(tester, html, fullUrl, baseUrl: 'https://base.com/secured');
+    });
+
+    testWidgets(
+      'with protocol relative url (no base)',
+      (tester) async {
+        const html = '<iframe src="//protocol.relative/secured"></iframe>';
+        const fullUrl = 'https://protocol.relative/secured';
+        await test(tester, html, fullUrl, baseUrl: '');
+      },
+      // TODO: do not skip test when minimum core version is updated
+      skip: true,
     );
+
+    testWidgets('with root relative url', (WidgetTester tester) async {
+      const html = '<iframe src="/root.relative"></iframe>';
+      const fullUrl = 'http://base.com/root.relative';
+      await test(tester, html, fullUrl);
+    });
+
+    testWidgets('with relative url', (WidgetTester tester) async {
+      const html = '<iframe src="relative"></iframe>';
+      const fullUrl = 'http://base.com/path/relative';
+      await test(tester, html, fullUrl);
+    });
   });
 
   group('useExplainer: false', () {

@@ -1139,6 +1139,11 @@ class WidgetFactory {
 
     final baseUrl = _widget?.baseUrl;
     if (baseUrl == null) {
+      if (uri.hasAuthority) {
+        // special handling for protocol relative URL without base: assume HTTPS
+        return Uri(scheme: 'https').resolveUri(uri).toString();
+      }
+
       return null;
     }
 
