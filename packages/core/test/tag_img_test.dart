@@ -267,18 +267,20 @@ void main() {
   });
 
   group('baseUrl', () {
+    final defaultBaseUrl = Uri.parse('http://base.com/path/');
+
     Future<void> test(
       WidgetTester tester,
       String html,
       String fullUrl, {
-      Uri? baseUrl,
+      required Uri? baseUrl,
     }) async {
       final explained = await helper.explain(
         tester,
         null,
         hw: HtmlWidget(
           html,
-          baseUrl: baseUrl ?? Uri.parse('http://base.com/path/'),
+          baseUrl: baseUrl,
           key: helper.hwKey,
         ),
       );
@@ -295,13 +297,23 @@ void main() {
     testWidgets('renders full url', (WidgetTester tester) async {
       const fullUrl = 'http://domain.com/image.png';
       const html = '<img src="$fullUrl" />';
-      await test(tester, html, fullUrl);
+      await test(
+        tester,
+        html,
+        fullUrl,
+        baseUrl: defaultBaseUrl,
+      );
     });
 
     testWidgets('renders protocol relative url', (WidgetTester tester) async {
       const html = '<img src="//protocol.relative" />';
       const fullUrl = 'http://protocol.relative';
-      await test(tester, html, fullUrl);
+      await test(
+        tester,
+        html,
+        fullUrl,
+        baseUrl: defaultBaseUrl,
+      );
     });
 
     testWidgets('renders protocol relative url (https)', (tester) async {
@@ -318,13 +330,23 @@ void main() {
     testWidgets('renders root relative url', (WidgetTester tester) async {
       const html = '<img src="/root.relative" />';
       const fullUrl = 'http://base.com/root.relative';
-      await test(tester, html, fullUrl);
+      await test(
+        tester,
+        html,
+        fullUrl,
+        baseUrl: defaultBaseUrl,
+      );
     });
 
     testWidgets('renders relative url', (WidgetTester tester) async {
       const html = '<img src="relative" />';
       const fullUrl = 'http://base.com/path/relative';
-      await test(tester, html, fullUrl);
+      await test(
+        tester,
+        html,
+        fullUrl,
+        baseUrl: defaultBaseUrl,
+      );
     });
   });
 

@@ -16,19 +16,82 @@ void main() {
     expect(explained, equals('[GestureDetector:child=[Text:$src]]'));
   });
 
-  testWidgets('renders web view', (tester) async {
-    const html = '<iframe src="$src"></iframe>';
-    final explained = await explain(tester, html);
-    expect(
-      explained,
-      equals(
-        '[WebView:'
-        'url=$src,'
-        'aspectRatio=$defaultAspectRatio,'
-        'autoResize=true'
-        ']',
-      ),
-    );
+  group('renders web view', () {
+    final defaultBaseUrl = Uri.parse('http://base.com/path/');
+
+    Future<void> test(
+      WidgetTester tester,
+      String html,
+      String fullUrl, {
+      required Uri? baseUrl,
+    }) async {
+      final explained = await explain(tester, html, baseUrl: baseUrl);
+      expect(
+        explained,
+        equals(
+          '[WebView:'
+          'url=$fullUrl,'
+          'aspectRatio=$defaultAspectRatio,'
+          'autoResize=true'
+          ']',
+        ),
+      );
+    }
+
+    testWidgets('with full url', (WidgetTester tester) async {
+      const fullUrl = 'http://domain.com/iframe';
+      const html = '<iframe src="$fullUrl"></iframe>';
+      await test(
+        tester,
+        html,
+        fullUrl,
+        baseUrl: defaultBaseUrl,
+      );
+    });
+
+    testWidgets('with protocol relative url', (WidgetTester tester) async {
+      const html = '<iframe src="//protocol.relative"></iframe>';
+      const fullUrl = 'http://protocol.relative';
+      await test(
+        tester,
+        html,
+        fullUrl,
+        baseUrl: defaultBaseUrl,
+      );
+    });
+
+    testWidgets('with protocol relative url (https)', (tester) async {
+      const html = '<iframe src="//protocol.relative/secured"></iframe>';
+      const fullUrl = 'https://protocol.relative/secured';
+      await test(
+        tester,
+        html,
+        fullUrl,
+        baseUrl: Uri.parse('https://base.com/secured'),
+      );
+    });
+
+    testWidgets('with root relative url', (WidgetTester tester) async {
+      const html = '<iframe src="/root.relative"></iframe>';
+      const fullUrl = 'http://base.com/root.relative';
+      await test(
+        tester,
+        html,
+        fullUrl,
+        baseUrl: defaultBaseUrl,
+      );
+    });
+
+    testWidgets('with relative url', (WidgetTester tester) async {
+      const html = '<iframe src="relative"></iframe>';
+      const fullUrl = 'http://base.com/path/relative';
+      await test(
+        tester,
+        html,
+        fullUrl,
+        baseUrl: defaultBaseUrl,
+      );
+    });
   });
 
   group('useExplainer: false', () {
