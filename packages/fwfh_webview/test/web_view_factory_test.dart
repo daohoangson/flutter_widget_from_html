@@ -23,7 +23,7 @@ void main() {
       WidgetTester tester,
       String html,
       String fullUrl, {
-      required Uri? baseUrl,
+      Uri? baseUrl,
     }) async {
       final explained = await explain(tester, html, baseUrl: baseUrl);
       expect(
@@ -69,6 +69,12 @@ void main() {
         fullUrl,
         baseUrl: Uri.parse('https://base.com/secured'),
       );
+    });
+
+    testWidgets('with protocol relative url (no base)', (tester) async {
+      const html = '<iframe src="//protocol.relative/secured"></iframe>';
+      const fullUrl = 'https://protocol.relative/secured';
+      await test(tester, html, fullUrl);
     });
 
     testWidgets('with root relative url', (WidgetTester tester) async {

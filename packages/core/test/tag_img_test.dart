@@ -273,7 +273,7 @@ void main() {
       WidgetTester tester,
       String html,
       String fullUrl, {
-      required Uri? baseUrl,
+      Uri? baseUrl,
     }) async {
       final explained = await helper.explain(
         tester,
@@ -325,6 +325,12 @@ void main() {
         fullUrl,
         baseUrl: Uri.parse('https://base.com/secured'),
       );
+    });
+
+    testWidgets('renders protocol relative url (no base)', (tester) async {
+      const html = '<img src="//protocol.relative/secured" />';
+      const fullUrl = 'https://protocol.relative/secured';
+      await test(tester, html, fullUrl);
     });
 
     testWidgets('renders root relative url', (WidgetTester tester) async {
