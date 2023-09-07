@@ -58,16 +58,11 @@ void main() {
       await test(tester, html, fullUrl, baseUrl: 'https://base.com/secured');
     });
 
-    testWidgets(
-      'with protocol relative url (no base)',
-      (tester) async {
-        const html = '<iframe src="//protocol.relative/secured"></iframe>';
-        const fullUrl = 'https://protocol.relative/secured';
-        await test(tester, html, fullUrl, baseUrl: '');
-      },
-      // TODO: do not skip test when minimum core version is updated
-      skip: true,
-    );
+    testWidgets('with protocol relative url (no base)', (tester) async {
+      const html = '<iframe src="//protocol.relative/secured"></iframe>';
+      const fullUrl = 'https://protocol.relative/secured';
+      await test(tester, html, fullUrl, baseUrl: '');
+    });
 
     testWidgets('with root relative url', (WidgetTester tester) async {
       const html = '<iframe src="/root.relative"></iframe>';
