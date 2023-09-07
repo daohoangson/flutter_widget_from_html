@@ -1,4 +1,4 @@
-## 0.7.0+6
+## 0.7.0+7
 
 - Add screenshots, funding and topics to pubspec files (#1010)
 
