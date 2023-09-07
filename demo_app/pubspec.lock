@@ -267,14 +267,14 @@ packages:
       path: "../packages/enhanced"
       relative: true
     source: path
-    version: "0.10.3"
+    version: "0.10.4"
   flutter_widget_from_html_core:
     dependency: "direct main"
     description:
       path: "../packages/core"
       relative: true
     source: path
-    version: "0.10.3"
+    version: "0.10.4"
   frontend_server_client:
     dependency: transitive
     description:
@@ -1056,10 +1056,10 @@ packages:
     dependency: transitive
     description:
       name: webview_flutter
-      sha256: "789d52bd789373cc1e100fb634af2127e86c99cf9abde09499743270c5de8d00"
+      sha256: "04a0782fb058b7c71f2048935583488f4d32e9147ca403abc4e58f1de9964629"
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.2"
+    version: "4.2.3"
   webview_flutter_android:
     dependency: transitive
     description:
@@ -1088,10 +1088,10 @@ packages:
     dependency: transitive
     description:
       name: win32
-      sha256: f2add6fa510d3ae152903412227bda57d0d5a8da61d2c39c1fb022c9429a41c0
+      sha256: "9e82a402b7f3d518fb9c02d0e9ae45952df31b9bf34d77baf19da2de03fc2aaa"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.6"
+    version: "5.0.7"
   xdg_directories:
     dependency: transitive
     description:

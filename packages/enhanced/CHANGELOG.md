@@ -1,3 +1,8 @@
+## 0.10.4
+
+- Add support for Flutter 3.13 (#995)
+- Remove package `fwfh_text_style` (#1009)
+
 ## 0.10.3
 
 - Fix `border-radius` being overwritten by `border` (#966)
