@@ -1,3 +1,8 @@
+## 0.8.0
+
+- Assume HTTPS for protocol relative URL without base (#1016)
+- Add screenshots, funding and topics to pubspec files (#1010)
+
 ## 0.7.0+2
 
 - Add support for Flutter 3.10 (#889)
