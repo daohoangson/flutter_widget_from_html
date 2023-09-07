@@ -1,3 +1,7 @@
+## 0.7.1+3
+
+- Add screenshots, funding and topics to pubspec files (#1010)
+
 ## 0.7.1+2
 
 - Add support for Flutter 3.10 (#889)
