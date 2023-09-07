@@ -26,3 +26,10 @@ dev_dependencies:
   measurer: ^2.1.1
   plugin_platform_interface: any
   webview_flutter_platform_interface: ^2.0.0
+
+funding:
+  - https://patreon.com/daohoangson
+  - https://buymeacoffee.com/daohoangson
+
+topics:
+  - fwfh

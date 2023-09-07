@@ -23,3 +23,10 @@ dev_dependencies:
   just_audio_platform_interface: ">=4.0.0 <5.0.0"
   lint: any
   tuple: any
+
+funding:
+  - https://patreon.com/daohoangson
+  - https://buymeacoffee.com/daohoangson
+
+topics:
+  - fwfh

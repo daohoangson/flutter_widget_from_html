@@ -46,3 +46,21 @@ dev_dependencies:
 flutter:
   assets:
     - test/images/
+
+funding:
+  - https://patreon.com/daohoangson
+  - https://buymeacoffee.com/daohoangson
+
+screenshots:
+  - description: Demo rendering of HTML tags
+    path: example/HelloWorldScreen1.gif
+  - description: Demo rendering of HTML tags
+    path: example/HelloWorldScreen2.gif
+  - description: Demo rendering of HTML tags
+    path: example/HelloWorldScreen3.gif
+
+topics:
+  - widget
+  - html
+  - css
+  - fwfh

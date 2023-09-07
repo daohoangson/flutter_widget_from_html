@@ -24,3 +24,19 @@ dev_dependencies:
 flutter:
   assets:
     - test/images/
+
+funding:
+  - https://patreon.com/daohoangson
+  - https://buymeacoffee.com/daohoangson
+
+screenshots:
+  - description: Demo rendering of HTML tags
+    path: example/HelloWorldCoreScreen1.gif
+  - description: Demo rendering of HTML tags
+    path: example/HelloWorldCoreScreen2.jpg
+
+topics:
+  - widget
+  - html
+  - css
+  - fwfh

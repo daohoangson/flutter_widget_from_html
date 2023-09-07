@@ -22,3 +22,10 @@ dev_dependencies:
     sdk: flutter
   lint: any
   url_launcher_platform_interface: any
+
+funding:
+  - https://patreon.com/daohoangson
+  - https://buymeacoffee.com/daohoangson
+
+topics:
+  - fwfh
