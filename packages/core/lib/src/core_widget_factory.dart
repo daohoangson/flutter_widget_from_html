@@ -682,9 +682,10 @@ class WidgetFactory {
           ..tsb.enqueue(TextStyleOps.fontStyle, FontStyle.italic);
         break;
       case 'div':
-        final displayExperssion = meta.element.styles.where((element) => element.property == "display").firstOrNull;
-        final display = displayExperssion?.term ?? "block";
-        if (display == "flex") {
+        final displayExpressions = meta.element.styles.where((element) => element.property == 'display');
+        final displayExpression = displayExpressions.isNotEmpty ? displayExpressions.first : null;
+        final display = displayExpression?.term ?? 'block';
+        if (display == 'flex') {
           meta.register(_flexOp(meta));
         }
 
@@ -1157,27 +1158,27 @@ class WidgetFactory {
     return baseUrl.resolveUri(uri).toString();
   }
 
-  /// Builds custom widget for flex layout elements from [meta]
+  /// Builds custom widget for div elements with display: flex from [meta]
   BuildOp _flexOp(BuildMetadata meta) {
     return BuildOp(
       onWidgets: (meta, widgets) {
-        final id = meta.element.id;
-        var flexDirection = "row";
-        var justifyContent = "flex-start";
-        var alignItems = "flex-start";
+        final String id = meta.element.id;
+        String flexDirection = 'row';
+        String justifyContent = 'flex-start';
+        String alignItems = 'flex-start';
 
         for (final element in meta.element.styles) {
-          final value = element.term;
+          final String? value = element.term;
 
           if (value != null) {
             switch (element.property) {
-              case "flex-direction":
+              case 'flex-direction':
                 flexDirection = value;
               break;
-              case "justify-content":
+              case 'justify-content':
                 justifyContent = value;
               break;
-              case "align-items":
+              case 'align-items':
                 alignItems = value;
               break;
             }
@@ -1187,7 +1188,7 @@ class WidgetFactory {
         return [
           Flex(
             key: Key(id),
-            direction: "row" == flexDirection ? Axis.horizontal : Axis.vertical,
+            direction: 'row' == flexDirection ? Axis.horizontal : Axis.vertical,
             mainAxisAlignment: _toMainAxisAlignment(justifyContent),
             crossAxisAlignment: _toCrossAxisAlignment(alignItems),
             children: widgets.toList()
@@ -1200,17 +1201,17 @@ class WidgetFactory {
   /// Converts CSS [justifyContent] to Flutter Grid MainAxisAlignment
   static MainAxisAlignment _toMainAxisAlignment(String justifyContent) {
     switch (justifyContent) {
-      case "flex-start":
+      case 'flex-start':
         return MainAxisAlignment.start;
-      case "flex-end":
+      case 'flex-end':
         return MainAxisAlignment.end;
-      case "center":
+      case 'center':
         return MainAxisAlignment.center;
-      case "space-between":
+      case 'space-between':
         return MainAxisAlignment.spaceBetween;
-      case "space-around":
+      case 'space-around':
         return MainAxisAlignment.spaceAround;
-      case "space-evenly":
+      case 'space-evenly':
         return MainAxisAlignment.spaceEvenly;
       default:
         return MainAxisAlignment.start;
@@ -1220,15 +1221,15 @@ class WidgetFactory {
   /// Converts CSS [alignItems] to Flutter Grid CrossAxisAlignment
   static CrossAxisAlignment _toCrossAxisAlignment(String alignItems) {
     switch (alignItems) {
-      case "flex-start":
+      case 'flex-start':
         return CrossAxisAlignment.start;
-      case "flex-end":
+      case 'flex-end':
         return CrossAxisAlignment.end;
-      case "center":
+      case 'center':
         return CrossAxisAlignment.center;
-      case "baseline":
+      case 'baseline':
         return CrossAxisAlignment.baseline;
-      case "stretch":
+      case 'stretch':
         return CrossAxisAlignment.stretch;
       default:
         return CrossAxisAlignment.start;
