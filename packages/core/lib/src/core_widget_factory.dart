@@ -681,10 +681,17 @@ class WidgetFactory {
           ..[kCssDisplay] = kCssDisplayBlock
           ..tsb.enqueue(TextStyleOps.fontStyle, FontStyle.italic);
         break;
+      case 'div':
+        final displayExperssion = meta.element.styles.where((element) => element.property == "display").firstOrNull;
+        final display = displayExperssion?.term ?? "block";
+        if (display == "flex") {
+          meta.register(_flexOp(meta));
+        }
 
+        meta[kCssDisplay] = kCssDisplayBlock;
+        break;
       case 'article':
       case 'aside':
-      case 'div':
       case 'figcaption':
       case 'footer':
       case 'header':
@@ -1148,6 +1155,84 @@ class WidgetFactory {
     }
 
     return baseUrl.resolveUri(uri).toString();
+  }
+
+  /// Builds custom widget for flex layout elements from [meta]
+  BuildOp _flexOp(BuildMetadata meta) {
+    return BuildOp(
+      onWidgets: (meta, widgets) {
+        final id = meta.element.id;
+        var flexDirection = "row";
+        var justifyContent = "flex-start";
+        var alignItems = "flex-start";
+
+        for (final element in meta.element.styles) {
+          final value = element.term;
+
+          if (value != null) {
+            switch (element.property) {
+              case "flex-direction":
+                flexDirection = value;
+              break;
+              case "justify-content":
+                justifyContent = value;
+              break;
+              case "align-items":
+                alignItems = value;
+              break;
+            }
+          }
+        }
+
+        return [
+          Flex(
+            key: Key(id),
+            direction: "row" == flexDirection ? Axis.horizontal : Axis.vertical,
+            mainAxisAlignment: _toMainAxisAlignment(justifyContent),
+            crossAxisAlignment: _toCrossAxisAlignment(alignItems),
+            children: widgets.toList()
+          )
+        ];
+      },      
+    );
+  }
+
+  /// Converts CSS [justifyContent] to Flutter Grid MainAxisAlignment
+  static MainAxisAlignment _toMainAxisAlignment(String justifyContent) {
+    switch (justifyContent) {
+      case "flex-start":
+        return MainAxisAlignment.start;
+      case "flex-end":
+        return MainAxisAlignment.end;
+      case "center":
+        return MainAxisAlignment.center;
+      case "space-between":
+        return MainAxisAlignment.spaceBetween;
+      case "space-around":
+        return MainAxisAlignment.spaceAround;
+      case "space-evenly":
+        return MainAxisAlignment.spaceEvenly;
+      default:
+        return MainAxisAlignment.start;
+    }
+  }
+
+  /// Converts CSS [alignItems] to Flutter Grid CrossAxisAlignment
+  static CrossAxisAlignment _toCrossAxisAlignment(String alignItems) {
+    switch (alignItems) {
+      case "flex-start":
+        return CrossAxisAlignment.start;
+      case "flex-end":
+        return CrossAxisAlignment.end;
+      case "center":
+        return CrossAxisAlignment.center;
+      case "baseline":
+        return CrossAxisAlignment.baseline;
+      case "stretch":
+        return CrossAxisAlignment.stretch;
+      default:
+        return CrossAxisAlignment.start;
+    }
   }
 
   BuildOp _anchorOp(String id) {
