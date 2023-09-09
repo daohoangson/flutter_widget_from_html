@@ -47,13 +47,15 @@ class MyWidgetFactory extends WidgetFactory with WebViewFactory {
 
 Configurable getters:
 
-|                                 | Type   | Default |
-|---------------------------------|--------|---------|
-| webView                         | bool   | true    |
-| webViewDebuggingEnabled         | bool   | false   |
-| webViewJs                       | bool   | true    |
-| webViewMediaPlaybackAlwaysAllow | bool   | false   |
-| webViewUserAgent                | String | null    |
+|                                  | Type     | Default |
+|----------------------------------|----------|---------|
+| webView                          | bool     | true    |
+| webViewDebuggingEnabled          | bool     | false   |
+| webViewJs                        | bool     | true    |
+| webViewMediaPlaybackAlwaysAllow  | bool     | false   |
+| webViewOnAndroidHideCustomWidget | Function | null    |
+| webViewOnAndroidShowCustomWidget | Function | null    |
+| webViewUserAgent                 | String   | null    |
 
 Supported IFRAME attributes:
 

@@ -36,6 +36,8 @@ abstract class FakeWebViewController extends PlatformWebViewController {
   static FakeWebViewController? get instance => _instance;
 
   bool? androidMediaPlaybackRequiresUserGesture;
+  OnHideCustomWidgetCallback? androidOnHideCustomWidget;
+  OnShowCustomWidgetCallback? androidOnShowCustomWidget;
   bool? debuggingEnabled;
   JavaScriptMode? javaScriptMode;
   String? userAgent;
@@ -145,8 +147,10 @@ class __FakeAndroidWebViewController extends FakeWebViewController
   Future<void> setCustomWidgetCallbacks({
     required OnHideCustomWidgetCallback? onHideCustomWidget,
     required OnShowCustomWidgetCallback? onShowCustomWidget,
-  }) =>
-      throw UnimplementedError();
+  }) async {
+    androidOnHideCustomWidget = onHideCustomWidget;
+    androidOnShowCustomWidget = onShowCustomWidget;
+  }
 
   @override
   Future<void> setGeolocationPermissionsPromptCallbacks({

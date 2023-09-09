@@ -387,6 +387,48 @@ void main() {
     });
   });
 
+  testWidgets('onAndroidShowCustomWidget', (WidgetTester tester) async {
+    const html = 'foo';
+    final url = Uri.dataFromString(html, mimeType: 'text/html').toString();
+    const aspectRatio = 16 / 9;
+
+    runApp(
+      MaterialApp(
+        home: Scaffold(
+          body: WebView(
+            url,
+            aspectRatio: aspectRatio,
+          ),
+        ),
+      ),
+    );
+
+    final webViewFinder = find.byType(Placeholder);
+    final fullscreenFinder = find.text('Fullscreen');
+    await tester.pumpAndSettle();
+    expect(webViewFinder, findsOneWidget);
+    expect(fullscreenFinder, findsNothing);
+
+    // video goes fullscreen
+    FakeWebViewController.instance?.androidOnShowCustomWidget?.call(
+      const Scaffold(
+        body: Center(
+          child: Text('Fullscreen'),
+        ),
+      ),
+      () {},
+    );
+    await tester.pumpAndSettle();
+    expect(webViewFinder, findsNothing);
+    expect(fullscreenFinder, findsOneWidget);
+
+    // user exits fullscreen
+    FakeWebViewController.instance?.androidOnHideCustomWidget?.call();
+    await tester.pumpAndSettle();
+    expect(webViewFinder, findsOneWidget);
+    expect(fullscreenFinder, findsNothing);
+  });
+
   group('unsupportedWorkaroundForIssue37', () {
     testWidgets('reloads on pause', (WidgetTester tester) async {
       const html = 'reloads on pause';
