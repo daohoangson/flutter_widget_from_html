@@ -61,6 +61,23 @@ class WebView extends StatefulWidget {
   /// {@endtemplate}
   final bool mediaPlaybackAlwaysAllow;
 
+  /// {@template web_view.onAndroidHideCustomWidget}
+  /// Sets the callback that is invoked when the host application wants to
+  /// hide a custom widget.
+  ///
+  /// Default: pop the most recent route from the nearest navigator.
+  /// {@endtemplate}
+  final void Function()? onAndroidHideCustomWidget;
+
+  /// {@template web_view.onAndroidShowCustomWidget}
+  /// Sets the callback that is invoked when the host application wants to
+  /// show a custom widget. The most common use case this method is invoked
+  /// a video element wants to be displayed in fullscreen.
+  ///
+  /// Default: push a page route with the webview in fullscreen.
+  /// {@endtemplate}
+  final void Function(Widget child)? onAndroidShowCustomWidget;
+
   /// Controls whether or not to apply workaround for
   /// [video continue playing after locking the phone or navigate to another screen](https://github.com/daohoangson/flutter_widget_from_html/issues/37)
   /// issue.
@@ -89,6 +106,8 @@ class WebView extends StatefulWidget {
     this.interceptNavigationRequest,
     this.js = true,
     this.mediaPlaybackAlwaysAllow = false,
+    this.onAndroidHideCustomWidget,
+    this.onAndroidShowCustomWidget,
     this.unsupportedWorkaroundForIssue37 = true,
     this.userAgent,
     super.key,

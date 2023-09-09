@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart' as lib;
 import 'package:webview_flutter_android/webview_flutter_android.dart' as lib;
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart'
@@ -62,6 +62,15 @@ class WebViewState extends State<WebView> {
       lib.AndroidWebViewController.enableDebugging(widget.debuggingEnabled);
       platformController.setMediaPlaybackRequiresUserGesture(
         !widget.mediaPlaybackAlwaysAllow,
+      );
+
+      final onHideCustomWidget =
+          widget.onAndroidHideCustomWidget ?? _onAndroidHideCustomWidgetDefault;
+      final onShowCustomWidget =
+          widget.onAndroidShowCustomWidget ?? _onAndroidShowCustomWidgetDefault;
+      platformController.setCustomWidgetCallbacks(
+        onHideCustomWidget: onHideCustomWidget,
+        onShowCustomWidget: (child, _) => onShowCustomWidget(child),
       );
     }
   }
@@ -151,6 +160,19 @@ class WebViewState extends State<WebView> {
     return intercepted
         ? lib.NavigationDecision.prevent
         : lib.NavigationDecision.navigate;
+  }
+
+  void _onAndroidHideCustomWidgetDefault() {
+    Navigator.of(context).pop();
+  }
+
+  void _onAndroidShowCustomWidgetDefault(Widget child) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => child,
+        fullscreenDialog: true,
+      ),
+    );
   }
 
   void _onPageFinished(String url) {
