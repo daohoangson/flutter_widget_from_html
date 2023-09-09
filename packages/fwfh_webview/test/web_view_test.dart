@@ -9,6 +9,7 @@ import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import 'mock_webview_platform.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   mockWebViewPlatform();
 
   group('autoResize', () {
@@ -71,6 +72,60 @@ void main() {
       );
       expectAspectRatioEquals(defaultAspectRatio);
       await cleanUp(tester);
+    });
+  });
+
+  group('debuggingEnabled', () {
+    const html = 'foo';
+    final url = Uri.dataFromString(html, mimeType: 'text/html').toString();
+    const aspectRatio = 16 / 9;
+
+    group('android', () {
+      testWidgets('renders without value', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        runApp(WebView(url, aspectRatio: aspectRatio));
+        expect(FakeWebViewController.instance?.debuggingEnabled, isFalse);
+        debugDefaultTargetPlatformOverride = null;
+      });
+
+      testWidgets('renders true', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        runApp(WebView(url, aspectRatio: aspectRatio, debuggingEnabled: true));
+        expect(FakeWebViewController.instance?.debuggingEnabled, isTrue);
+        debugDefaultTargetPlatformOverride = null;
+      });
+
+      testWidgets('renders false', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        // ignore: avoid_redundant_argument_values
+        runApp(WebView(url, aspectRatio: aspectRatio, debuggingEnabled: false));
+        expect(FakeWebViewController.instance?.debuggingEnabled, isFalse);
+        debugDefaultTargetPlatformOverride = null;
+      });
+    });
+
+    group('ios', () {
+      testWidgets('renders without value', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        runApp(WebView(url, aspectRatio: aspectRatio));
+        expect(FakeWebViewController.instance?.debuggingEnabled, isFalse);
+        debugDefaultTargetPlatformOverride = null;
+      });
+
+      testWidgets('renders true', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        runApp(WebView(url, aspectRatio: aspectRatio, debuggingEnabled: true));
+        expect(FakeWebViewController.instance?.debuggingEnabled, isTrue);
+        debugDefaultTargetPlatformOverride = null;
+      });
+
+      testWidgets('renders false', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        // ignore: avoid_redundant_argument_values
+        runApp(WebView(url, aspectRatio: aspectRatio, debuggingEnabled: false));
+        expect(FakeWebViewController.instance?.debuggingEnabled, isFalse);
+        debugDefaultTargetPlatformOverride = null;
+      });
     });
   });
 

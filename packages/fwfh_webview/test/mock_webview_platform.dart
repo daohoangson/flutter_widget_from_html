@@ -1,23 +1,48 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
-void mockWebViewPlatform() => _FakeWebViewPlatform();
+void mockWebViewPlatform() {
+  _FakeWebViewPlatform();
+
+  const codec = StandardMessageCodec();
+  final emptyList = codec.encodeMessage([]);
+  final messenger =
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+  messenger.setMockMessageHandler(
+    'dev.flutter.pigeon.webview_flutter_android.InstanceManagerHostApi.clear',
+    (_) => Future.value(emptyList),
+  );
+  messenger.setMockMessageHandler(
+    'dev.flutter.pigeon.webview_flutter_android.WebViewHostApi.setWebContentsDebuggingEnabled',
+    (message) async {
+      final decodedMessage = codec.decodeMessage(message) as List<Object?>;
+      FakeWebViewController.instance?.debuggingEnabled =
+          decodedMessage[0] == true;
+      return emptyList;
+    },
+  );
+}
 
 abstract class FakeWebViewController extends PlatformWebViewController {
   static FakeWebViewController? _instance;
   static FakeWebViewController? get instance => _instance;
 
+  bool? debuggingEnabled;
+  JavaScriptMode? javaScriptMode;
+  String? userAgent;
+
   Uri? _currentUri;
   _FakeNavigationDelegate? _handler;
-  JavaScriptMode? javaScriptMode;
   Timer? _onPageFinishedTimer;
   final _uris = <Uri>[];
-  String? userAgent;
 
   FakeWebViewController(super.params) : super.implementation() {
     _instance = this;
@@ -111,6 +136,59 @@ abstract class FakeWebViewController extends PlatformWebViewController {
   }
 }
 
+class __FakeAndroidWebViewController extends FakeWebViewController
+    implements AndroidWebViewController {
+  __FakeAndroidWebViewController(super.params);
+
+  @override
+  Future<void> setCustomWidgetCallbacks({
+    required OnHideCustomWidgetCallback? onHideCustomWidget,
+    required OnShowCustomWidgetCallback? onShowCustomWidget,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> setGeolocationPermissionsPromptCallbacks({
+    OnGeolocationPermissionsShowPrompt? onShowPrompt,
+    OnGeolocationPermissionsHidePrompt? onHidePrompt,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> setMediaPlaybackRequiresUserGesture(bool require) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> setOnShowFileSelector(
+    Future<List<String>> Function(FileSelectorParams params)?
+        onShowFileSelector,
+  ) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> setTextZoom(int textZoom) => throw UnimplementedError();
+
+  @override
+  int get webViewIdentifier => throw UnimplementedError();
+}
+
+class __FakeWebKitWebViewController extends FakeWebViewController
+    implements WebKitWebViewController {
+  __FakeWebKitWebViewController(super.params);
+
+  @override
+  Future<void> setAllowsBackForwardNavigationGestures(bool enabled) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> setInspectable(bool value) async {
+    debuggingEnabled = value;
+  }
+
+  @override
+  int get webViewIdentifier => throw UnimplementedError();
+}
+
 class _FakeNavigationDelegate extends PlatformNavigationDelegate {
   NavigationRequestCallback? _onNavigationRequest;
   PageEventCallback? _onPageFinished;
@@ -195,7 +273,11 @@ class _FakeWebViewPlatform extends Fake
   PlatformWebViewController createPlatformWebViewController(
     PlatformWebViewControllerCreationParams params,
   ) {
-    return FakeWebViewController(params);
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return __FakeWebKitWebViewController(params);
+    } else {
+      return __FakeAndroidWebViewController(params);
+    }
   }
 
   @override

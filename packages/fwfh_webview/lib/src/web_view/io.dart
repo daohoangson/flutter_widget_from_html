@@ -73,6 +73,8 @@ class WebViewState extends State<WebView> {
         onHideCustomWidget: onHideCustomWidget,
         onShowCustomWidget: (child, _) => onShowCustomWidget(child),
       );
+    } else if (platformController is lib.WebKitWebViewController) {
+      platformController.setInspectable(widget.debuggingEnabled);
     }
   }
 
