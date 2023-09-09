@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fwfh_webview/src/web_view/web_view.dart';
 import 'package:measurer/measurer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 import 'mock_webview_platform.dart';
 
@@ -186,6 +188,75 @@ void main() {
 
       expect(navigationRequestUrls, equals([]));
       expect(result2, equals(NavigationDecision.navigate));
+    });
+  });
+
+  group('mediaPlaybackAlwaysAllow', () {
+    const html = 'foo';
+    final url = Uri.dataFromString(html, mimeType: 'text/html').toString();
+    const aspectRatio = 16 / 9;
+
+    // ignore: prefer_function_declarations_over_variables
+    final expectMediaTypesRequiringUserAction = (Matcher matcher) {
+      expect(
+        FakeWebViewController.instance?.params,
+        isA<WebKitWebViewControllerCreationParams>().having(
+          (_) => _.mediaTypesRequiringUserAction,
+          'mediaTypesRequiringUserAction',
+          matcher,
+        ),
+      );
+    };
+
+    testWidgets('renders without value', (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+
+      runApp(
+        WebView(
+          url,
+          aspectRatio: aspectRatio,
+        ),
+      );
+
+      expectMediaTypesRequiringUserAction(
+        equals([PlaybackMediaTypes.audio, PlaybackMediaTypes.video]),
+      );
+
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('renders true', (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+
+      runApp(
+        WebView(
+          url,
+          aspectRatio: aspectRatio,
+          mediaPlaybackAlwaysAllow: true,
+        ),
+      );
+
+      expectMediaTypesRequiringUserAction(isEmpty);
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    testWidgets('renders false', (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+
+      runApp(
+        WebView(
+          url,
+          aspectRatio: aspectRatio,
+          // ignore: avoid_redundant_argument_values
+          mediaPlaybackAlwaysAllow: false,
+        ),
+      );
+
+      expectMediaTypesRequiringUserAction(
+        equals([PlaybackMediaTypes.audio, PlaybackMediaTypes.video]),
+      );
+
+      debugDefaultTargetPlatformOverride = null;
     });
   });
 

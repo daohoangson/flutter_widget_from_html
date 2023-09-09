@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart' as lib;
 import 'package:webview_flutter_android/webview_flutter_android.dart' as lib;
@@ -31,7 +32,7 @@ class WebViewState extends State<WebView> {
 
   void _initController() {
     var params = const lib.PlatformWebViewControllerCreationParams();
-    if (lib.WebViewPlatform.instance is lib.WebKitWebViewPlatform) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       params = lib.WebKitWebViewControllerCreationParams(
         allowsInlineMediaPlayback: true,
         mediaTypesRequiringUserAction: widget.mediaPlaybackAlwaysAllow

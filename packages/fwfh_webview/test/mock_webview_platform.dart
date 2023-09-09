@@ -8,25 +8,6 @@ import 'package:webview_flutter_platform_interface/webview_flutter_platform_inte
 
 void mockWebViewPlatform() => _FakeWebViewPlatform();
 
-class _FakeNavigationDelegate extends PlatformNavigationDelegate {
-  NavigationRequestCallback? _onNavigationRequest;
-  PageEventCallback? _onPageFinished;
-
-  _FakeNavigationDelegate(super.params) : super.implementation();
-
-  @override
-  Future<void> setOnNavigationRequest(
-    NavigationRequestCallback onNavigationRequest,
-  ) async {
-    _onNavigationRequest = onNavigationRequest;
-  }
-
-  @override
-  Future<void> setOnPageFinished(PageEventCallback onPageFinished) async {
-    _onPageFinished = onPageFinished;
-  }
-}
-
 class FakeWebViewController extends PlatformWebViewController {
   static FakeWebViewController? _instance;
   static FakeWebViewController? get instance => _instance;
@@ -130,6 +111,25 @@ class FakeWebViewController extends PlatformWebViewController {
         _handler?._onPageFinished?.call(uri.toString());
       },
     );
+  }
+}
+
+class _FakeNavigationDelegate extends PlatformNavigationDelegate {
+  NavigationRequestCallback? _onNavigationRequest;
+  PageEventCallback? _onPageFinished;
+
+  _FakeNavigationDelegate(super.params) : super.implementation();
+
+  @override
+  Future<void> setOnNavigationRequest(
+    NavigationRequestCallback onNavigationRequest,
+  ) async {
+    _onNavigationRequest = onNavigationRequest;
+  }
+
+  @override
+  Future<void> setOnPageFinished(PageEventCallback onPageFinished) async {
+    _onPageFinished = onPageFinished;
   }
 }
 
