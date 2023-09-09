@@ -41,47 +41,64 @@ class WebViewState extends State<WebView> {
       );
     }
 
-    _controller = lib.WebViewController.fromPlatformCreationParams(params)
-      ..setJavaScriptMode(
+    _controller = lib.WebViewController.fromPlatformCreationParams(params);
+    _initControllerIgnoringError(
+      _controller.setJavaScriptMode(
         widget.js
             ? lib.JavaScriptMode.unrestricted
             : lib.JavaScriptMode.disabled,
-      )
-      ..setNavigationDelegate(
+      ),
+    );
+    _initControllerIgnoringError(
+      _controller.setNavigationDelegate(
         lib.NavigationDelegate(
           onPageFinished: _onPageFinished,
           onNavigationRequest: widget.interceptNavigationRequest != null
               ? (req) => _interceptNavigationRequest(req)
               : null,
         ),
-      )
-      ..setUserAgent(widget.userAgent)
-      ..loadRequest(Uri.parse(widget.url));
+      ),
+    );
+    _initControllerIgnoringError(_controller.setUserAgent(widget.userAgent));
 
     final platformController = _controller.platform;
     if (platformController is lib.AndroidWebViewController) {
-      lib.AndroidWebViewController.enableDebugging(widget.debuggingEnabled);
-      platformController.setMediaPlaybackRequiresUserGesture(
-        !widget.mediaPlaybackAlwaysAllow,
+      _initControllerIgnoringError(
+        lib.AndroidWebViewController.enableDebugging(widget.debuggingEnabled),
+      );
+      _initControllerIgnoringError(
+        platformController.setMediaPlaybackRequiresUserGesture(
+          !widget.mediaPlaybackAlwaysAllow,
+        ),
       );
 
       final onHideCustomWidget =
           widget.onAndroidHideCustomWidget ?? _onAndroidHideCustomWidgetDefault;
       final onShowCustomWidget =
           widget.onAndroidShowCustomWidget ?? _onAndroidShowCustomWidgetDefault;
-      platformController.setCustomWidgetCallbacks(
-        onHideCustomWidget: onHideCustomWidget,
-        onShowCustomWidget: (child, _) => onShowCustomWidget(child),
+      _initControllerIgnoringError(
+        platformController.setCustomWidgetCallbacks(
+          onHideCustomWidget: onHideCustomWidget,
+          onShowCustomWidget: (child, _) => onShowCustomWidget(child),
+        ),
       );
     } else if (platformController is lib.WebKitWebViewController) {
-      try {
-        platformController.setInspectable(widget.debuggingEnabled);
-      } catch (_) {
-        // FWFUnsupportedVersionError might be thrown
-        // because setInspectable is only supported on versions 16.4+
-        // it is inspectable by default on lower version anyway so let's ignore this error
-      }
+      _initControllerIgnoringError(
+        platformController.setInspectable(widget.debuggingEnabled),
+      );
     }
+
+    final uri = Uri.tryParse(widget.url);
+    if (uri != null) {
+      _initControllerIgnoringError(_controller.loadRequest(uri));
+    }
+  }
+
+  static void _initControllerIgnoringError(Future<void> f) {
+    f.onError((error, _) {
+      // TODO: use logger to keep track of stack trace
+      debugPrint('Ignored controller error: $error');
+    });
   }
 
   @override
