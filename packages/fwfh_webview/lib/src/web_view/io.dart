@@ -74,7 +74,13 @@ class WebViewState extends State<WebView> {
         onShowCustomWidget: (child, _) => onShowCustomWidget(child),
       );
     } else if (platformController is lib.WebKitWebViewController) {
-      platformController.setInspectable(widget.debuggingEnabled);
+      try {
+        platformController.setInspectable(widget.debuggingEnabled);
+      } catch (_) {
+        // FWFUnsupportedVersionError might be thrown
+        // because setInspectable is only supported on versions 16.4+
+        // it is inspectable by default on lower version anyway so let's ignore this error
+      }
     }
   }
 
