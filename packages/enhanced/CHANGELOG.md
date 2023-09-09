@@ -1,3 +1,7 @@
+## 0.10.5+1
+
+- Add support for fullscreen webview in Android (#1022)
+
 ## 0.10.5
 
 - Replace the deprecated `DecoderCallback` in tests (#1014)
