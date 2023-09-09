@@ -1,3 +1,7 @@
+## 0.9.0
+
+- Add support for fullscreen webview in Android (#1022)
+
 ## 0.8.0
 
 - Assume HTTPS for protocol relative URL without base (#1016)
