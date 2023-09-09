@@ -15,7 +15,9 @@ void mockWebViewPlatform() {
   const codec = StandardMessageCodec();
   final emptyList = codec.encodeMessage([]);
   final messenger =
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+      // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+      // ignore: unnecessary_non_null_assertion
+      TestDefaultBinaryMessengerBinding.instance!.defaultBinaryMessenger;
   messenger.setMockMessageHandler(
     'dev.flutter.pigeon.webview_flutter_android.InstanceManagerHostApi.clear',
     (_) => Future.value(emptyList),

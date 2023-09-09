@@ -5,6 +5,7 @@ import '_.dart';
 import 'mock_webview_platform.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   mockWebViewPlatform();
 
   const src = 'http://domain.com';
