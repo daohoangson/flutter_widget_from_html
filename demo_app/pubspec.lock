@@ -267,7 +267,7 @@ packages:
       path: "../packages/enhanced"
       relative: true
     source: path
-    version: "0.10.5+1"
+    version: "0.10.5+2"
   flutter_widget_from_html_core:
     dependency: "direct main"
     description:
@@ -329,7 +329,7 @@ packages:
       path: "../packages/fwfh_webview"
       relative: true
     source: path
-    version: "0.9.0"
+    version: "0.9.0+1"
   glob:
     dependency: transitive
     description:
