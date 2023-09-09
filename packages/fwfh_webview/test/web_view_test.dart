@@ -191,6 +191,43 @@ void main() {
     });
   });
 
+  group('js', () {
+    const html = 'foo';
+    final url = Uri.dataFromString(html, mimeType: 'text/html').toString();
+    const aspectRatio = 16 / 9;
+
+    testWidgets('renders without value', (WidgetTester tester) async {
+      runApp(WebView(url, aspectRatio: aspectRatio));
+      expect(
+        FakeWebViewController.instance?.javaScriptMode,
+        JavaScriptMode.unrestricted,
+      );
+    });
+
+    testWidgets('renders true', (WidgetTester tester) async {
+      runApp(
+        WebView(
+          url,
+          aspectRatio: aspectRatio,
+          // ignore: avoid_redundant_argument_values
+          js: true,
+        ),
+      );
+      expect(
+        FakeWebViewController.instance?.javaScriptMode,
+        JavaScriptMode.unrestricted,
+      );
+    });
+
+    testWidgets('renders false', (WidgetTester tester) async {
+      runApp(WebView(url, aspectRatio: aspectRatio, js: false));
+      expect(
+        FakeWebViewController.instance?.javaScriptMode,
+        JavaScriptMode.disabled,
+      );
+    });
+  });
+
   group('mediaPlaybackAlwaysAllow', () {
     const html = 'foo';
     final url = Uri.dataFromString(html, mimeType: 'text/html').toString();
@@ -282,6 +319,22 @@ void main() {
       runApp(const SizedBox.shrink());
       await tester.pump();
       expect(FakeWebViewController.instance?.urls, equals([url, url]));
+    });
+  });
+
+  group('userAgent', () {
+    const html = 'foo';
+    final url = Uri.dataFromString(html, mimeType: 'text/html').toString();
+    const aspectRatio = 16 / 9;
+
+    testWidgets('renders without value', (WidgetTester tester) async {
+      runApp(WebView(url, aspectRatio: aspectRatio));
+      expect(FakeWebViewController.instance?.userAgent, isNull);
+    });
+
+    testWidgets('renders string', (WidgetTester tester) async {
+      runApp(WebView(url, aspectRatio: aspectRatio, userAgent: 'fwfh'));
+      expect(FakeWebViewController.instance?.userAgent, equals('fwfh'));
     });
   });
 }

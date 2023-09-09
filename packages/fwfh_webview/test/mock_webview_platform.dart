@@ -8,15 +8,16 @@ import 'package:webview_flutter_platform_interface/webview_flutter_platform_inte
 
 void mockWebViewPlatform() => _FakeWebViewPlatform();
 
-class FakeWebViewController extends PlatformWebViewController {
+abstract class FakeWebViewController extends PlatformWebViewController {
   static FakeWebViewController? _instance;
   static FakeWebViewController? get instance => _instance;
 
   Uri? _currentUri;
   _FakeNavigationDelegate? _handler;
-  bool _js = true;
+  JavaScriptMode? javaScriptMode;
   Timer? _onPageFinishedTimer;
   final _uris = <Uri>[];
+  String? userAgent;
 
   FakeWebViewController(super.params) : super.implementation() {
     _instance = this;
@@ -52,10 +53,6 @@ class FakeWebViewController extends PlatformWebViewController {
 
   @override
   Future<Object> runJavaScriptReturningResult(String javascript) async {
-    if (!_js) {
-      throw UnsupportedError('JavaScript is disabled');
-    }
-
     final params = _currentUri?.queryParameters;
     if (params == null) {
       return '';
@@ -73,8 +70,8 @@ class FakeWebViewController extends PlatformWebViewController {
   }
 
   @override
-  Future<void> setJavaScriptMode(JavaScriptMode javaScriptMode) async {
-    _js = javaScriptMode == JavaScriptMode.unrestricted;
+  Future<void> setJavaScriptMode(JavaScriptMode value) async {
+    javaScriptMode = value;
   }
 
   @override
@@ -87,8 +84,8 @@ class FakeWebViewController extends PlatformWebViewController {
   }
 
   @override
-  Future<void> setUserAgent(String? userAgent) async {
-    // intentionally left empty
+  Future<void> setUserAgent(String? value) async {
+    userAgent = value;
   }
 
   Future<void> _onPageStarted(Uri uri) async {
