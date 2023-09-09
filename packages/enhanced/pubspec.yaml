@@ -16,7 +16,7 @@ dependencies:
   fwfh_just_audio: ^0.9.0+3
   fwfh_svg: ^0.8.0+3
   fwfh_url_launcher: ^0.9.0+3
-  fwfh_webview: ^0.9.0
+  fwfh_webview: ^0.9.0+1
   html: ^0.15.0
 
 dependency_overrides:
