@@ -35,6 +35,7 @@ abstract class FakeWebViewController extends PlatformWebViewController {
   static FakeWebViewController? _instance;
   static FakeWebViewController? get instance => _instance;
 
+  bool? androidMediaPlaybackRequiresUserGesture;
   bool? debuggingEnabled;
   JavaScriptMode? javaScriptMode;
   String? userAgent;
@@ -155,8 +156,9 @@ class __FakeAndroidWebViewController extends FakeWebViewController
       throw UnimplementedError();
 
   @override
-  Future<void> setMediaPlaybackRequiresUserGesture(bool require) =>
-      throw UnimplementedError();
+  Future<void> setMediaPlaybackRequiresUserGesture(bool require) async {
+    androidMediaPlaybackRequiresUserGesture = require;
+  }
 
   @override
   Future<void> setOnShowFileSelector(
