@@ -38,8 +38,12 @@ jobs:
       matrix:
         include:
           - api-level: 29
+            channel: stable
             target: google_apis
             profile: pixel_3a
+          - api-level: 30
+            channel: canary
+            target: aosp_atd
     name: Integration test (Android)
     runs-on: macos-latest
     steps:
@@ -62,12 +66,13 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-pr1022
+          key: avd-${{ matrix.api-level }}
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # v2.28.0
         with:
           api-level: ${{ matrix.api-level }}
+          channel: ${{ matrix.channel }}
           target: ${{ matrix.target }}
           profile: ${{ matrix.profile }}
           force-avd-creation: false
@@ -78,6 +83,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # v2.28.0
         with:
           api-level: ${{ matrix.api-level }}
+          channel: ${{ matrix.channel }}
           target: ${{ matrix.target }}
           profile: ${{ matrix.profile }}
           force-avd-creation: false
