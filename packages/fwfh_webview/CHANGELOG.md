@@ -1,4 +1,4 @@
-## 0.9.0+1
+## 0.9.0+2
 
 - Add support for fullscreen webview in Android (#1022)
 
