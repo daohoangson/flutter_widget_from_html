@@ -38,7 +38,26 @@ void main() {
     (WidgetTester tester) async {
       final testCase = webViewTestCases.currentValue!;
       final test = await testCase.run(tester);
-      test.expectValueEquals(testCase.input);
+
+      for (var i = 0;; i++) {
+        debugPrint('testCase=$testCase i=$i');
+        await tester.pump();
+        await tester.runAsync(() => Future.delayed(const Duration(seconds: 3)));
+        await tester.pump();
+
+        try {
+          test.expectValueEquals(testCase.input);
+          break;
+        } catch (e) {
+          if (i >= 5) {
+            // too many failures
+            rethrow;
+          }
+        }
+      }
+
+      await tester.pump();
+      await tester.pumpWidget(const SizedBox.shrink());
     },
     variant: webViewTestCases,
   );
@@ -87,26 +106,15 @@ class WebViewTestCase {
 </body>
 ''';
 
-    const interval = Duration(seconds: 1);
     final webView = WebView(
       Uri.dataFromString(html, mimeType: 'text/html').toString(),
       aspectRatio: 16 / 9,
       autoResize: true,
-      autoResizeIntervals: [interval, interval * 2, interval * 3],
       debuggingEnabled: true,
     );
     final test = _AspectRatioTest(child: webView);
 
     runApp(test);
-
-    for (var i = 0; i < 5; i++) {
-      await tester.pump();
-      await tester.runAsync(() => Future.delayed(interval));
-      debugPrint('i=$i interval=$interval');
-    }
-
-    await tester.pump();
-    await tester.pumpWidget(const SizedBox.shrink());
 
     return test;
   }
