@@ -137,6 +137,9 @@ class WebViewState extends State<WebView> {
 
   Future<void> _autoResize() async {
     if (!mounted) {
+      if (widget.debuggingEnabled) {
+        debugPrint('_autoResize: mounted=false');
+      }
       return;
     }
 
@@ -146,20 +149,19 @@ class WebViewState extends State<WebView> {
     ]);
     if (!mounted) {
       if (widget.debuggingEnabled) {
-        debugPrint('_autoResize: mounted=false');
+        debugPrint('_autoResize: evals=$evals mounted=false');
       }
       return;
     }
 
     final w = double.tryParse(evals[0]) ?? 0;
     final h = double.tryParse(evals[1]) ?? 0;
-
     final r = (h > 0 && w > 0) ? (w / h) : _aspectRatio;
     final changed = (r - _aspectRatio).abs() > 0.0001;
     if (widget.debuggingEnabled) {
-      debugPrint('_autoResize: ${w}x$h->$r changed=$changed mounted=$mounted');
+      debugPrint('_autoResize: ${w}x$h->$r changed=$changed');
     }
-    if (changed && mounted) {
+    if (changed) {
       setState(() => _aspectRatio = r);
     }
   }
@@ -201,6 +203,10 @@ class WebViewState extends State<WebView> {
   }
 
   void _onPageFinished(String url) {
+    if (widget.debuggingEnabled) {
+      debugPrint('_onPageFinished: url=$url');
+    }
+
     _firstFinishedUrl ??= url;
 
     if (widget.autoResize) {

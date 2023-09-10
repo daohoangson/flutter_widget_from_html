@@ -102,6 +102,7 @@ class WebViewTestCase {
     for (var i = 0; i < 5; i++) {
       await tester.pump();
       await tester.runAsync(() => Future.delayed(interval));
+      debugPrint('i=$i interval=$interval');
     }
 
     await tester.pump();
