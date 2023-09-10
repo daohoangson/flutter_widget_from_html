@@ -16,14 +16,14 @@ jobs:
         uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
         with:
           cache: true
-      - name: Setup Java 18
-        uses: actions/setup-java@cd89f46ac9d01407894225f350157564c9c7cee2 # v3.12.0
-        with:
-          cache: gradle
-          distribution: temurin
-          java-version: 18
+      - name: Gradle cache
+        uses: gradle/gradle-build-action@ef76a971e2fa3f867b617efd72f2fbd72cf6f8bc # v2.8.0
 
-      - run: flutter build apk --debug
+      - name: Run flutter build apk --debug
+        run: |
+          set -e
+          export JAVA_HOME=$JAVA_HOME_17_X64
+          flutter build apk --debug
       - name: Upload debug APK
         id: appetize
         run: |
@@ -53,7 +53,11 @@ jobs:
           ( cd ./test/goldens && php tags.php >tags.html )
           cp -R ./test/goldens build/web/supported
 
-      - run: flutter build apk --release --split-per-abi
+      - name: Run flutter build apk --release
+        run: |
+          set -e
+          export JAVA_HOME=$JAVA_HOME_17_X64
+          flutter build apk --release --split-per-abi
       - name: Copy APKs
         run: cp -R build/app/outputs/apk/release build/web/apks
 

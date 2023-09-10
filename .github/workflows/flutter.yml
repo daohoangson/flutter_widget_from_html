@@ -59,6 +59,7 @@ jobs:
       - name: Gradle cache
         uses: gradle/gradle-build-action@ef76a971e2fa3f867b617efd72f2fbd72cf6f8bc # v2.8.0
         with:
+          # only update gradle cache from demo_app.yml jobs
           cache-read-only: false
 
       - name: AVD cache
