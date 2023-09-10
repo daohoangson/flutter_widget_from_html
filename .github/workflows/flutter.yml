@@ -37,10 +37,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - api-level: 29
-            channel: stable
-            target: google_apis
-            profile: pixel_3a
+          # - api-level: 29
+          #   channel: stable
+          #   target: google_apis
+          #   profile: pixel_3a
           - api-level: 30
             channel: canary
             target: aosp_atd
