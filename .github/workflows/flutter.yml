@@ -34,6 +34,12 @@ jobs:
       - uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d # v3.1.4
 
   integration_test_android:
+    strategy:
+      matrix:
+        include:
+          - api-level: 29
+            target: google_apis
+            profile: pixel_3a
     name: Integration test (Android)
     runs-on: macos-latest
     steps:
@@ -61,9 +67,9 @@ jobs:
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # v2.28.0
         with:
-          api-level: 29
-          target: google_apis
-          profile: pixel_3a
+          api-level: ${{ matrix.api-level }}
+          target: ${{ matrix.target }}
+          profile: ${{ matrix.profile }}
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
@@ -71,9 +77,9 @@ jobs:
       - name: Run tests on Android emulator
         uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # v2.28.0
         with:
-          api-level: 29
-          target: google_apis
-          profile: pixel_3a
+          api-level: ${{ matrix.api-level }}
+          target: ${{ matrix.target }}
+          profile: ${{ matrix.profile }}
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
