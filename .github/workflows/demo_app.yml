@@ -40,11 +40,7 @@ jobs:
           echo
 
           _url=$( cat build/appetize.json | jq -r .publicURL )
-
-          _url="${_url//'%'/'%25'}"
-          _url="${_url//$'\n'/'%0A'}"
-          _url="${_url//$'\r'/'%0D'}"
-          echo "::set-output name=url::${_url}"
+          echo "url=${_url}" >> $GITHUB_OUTPUT
       - run: flutter build web
       - name: Generate supported/tags.html
         run: |
@@ -87,11 +83,7 @@ jobs:
           else
             _url=$( now --token "$TOKEN" )
           fi
-
-          _url="${_url//'%'/'%25'}"
-          _url="${_url//$'\n'/'%0A'}"
-          _url="${_url//$'\r'/'%0D'}"
-          echo "::set-output name=url::${_url}"
+          echo "url=${_url}" >> $GITHUB_OUTPUT
       - name: Create commit comment
         if: steps.now.conclusion == 'success'
         uses: daohoangson/comment-on-github@35b21121fdbadf807678bec8210cdd7f22a934fe # v2.2.2
