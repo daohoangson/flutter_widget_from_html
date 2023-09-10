@@ -41,14 +41,14 @@ jobs:
           #   arch: x86
           #   channel: stable
           #   target: google_apis
-          # - api-level: 30
-          #   arch: x86
-          #   channel: canary
-          #   target: aosp_atd
-          - api-level: 33
-            arch: x86_64
-            channel: stable
-            target: google_apis
+          - api-level: 30
+            arch: x86
+            channel: canary
+            target: aosp_atd
+          # - api-level: 33
+          #   arch: x86_64
+          #   channel: stable
+          #   target: google_apis
     name: Integration test (Android)
     runs-on: macos-latest
     steps:
