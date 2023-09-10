@@ -70,12 +70,14 @@ class WebViewTestCase {
 
       const width = window.innerWidth;
       if (width === 0) {
+        console.log('setTimeout 10ms', { attempts, width });
         return setTimeout(resize, 10);
       }
 
       const height = width / $input;
       block.style.height = height + 'px';
       block.innerHTML = 'input={input}, attempts=' + attempts;
+      console.log('setTimeout 100ms', { attempts, width, height });
 
       return setTimeout(resize, 100);
     }

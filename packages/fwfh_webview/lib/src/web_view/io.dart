@@ -124,6 +124,9 @@ class WebViewState extends State<WebView> {
   Future<String> eval(String js) async {
     try {
       final result = await _controller.runJavaScriptReturningResult(js);
+      if (widget.debuggingEnabled) {
+        debugPrint('eval: $js -> $result');
+      }
       return '$result';
     } catch (evalError) {
       debugPrint('evalError: $evalError');
@@ -142,6 +145,9 @@ class WebViewState extends State<WebView> {
       eval('document.body.scrollHeight'),
     ]);
     if (!mounted) {
+      if (widget.debuggingEnabled) {
+        debugPrint('_autoResize: mounted=false');
+      }
       return;
     }
 
@@ -150,6 +156,9 @@ class WebViewState extends State<WebView> {
 
     final r = (h > 0 && w > 0) ? (w / h) : _aspectRatio;
     final changed = (r - _aspectRatio).abs() > 0.0001;
+    if (widget.debuggingEnabled) {
+      debugPrint('_autoResize: ${w}x$h->$r changed=$changed mounted=$mounted');
+    }
     if (changed && mounted) {
       setState(() => _aspectRatio = r);
     }
