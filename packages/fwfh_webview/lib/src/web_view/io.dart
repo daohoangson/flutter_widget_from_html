@@ -22,7 +22,10 @@ class WebViewState extends State<WebView> {
     super.initState();
     _aspectRatio = widget.aspectRatio;
 
-    _initController();
+    _initController().onError((error, _) {
+      // TODO: use logger to keep track of stack trace
+      debugPrint('Ignored controller error: $error');
+    });
 
     if (widget.unsupportedWorkaroundForIssue37) {
       _issue37 = _Issue37(this);
@@ -30,7 +33,7 @@ class WebViewState extends State<WebView> {
     }
   }
 
-  void _initController() {
+  Future<void> _initController() async {
     var params = const lib.PlatformWebViewControllerCreationParams();
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       params = lib.WebKitWebViewControllerCreationParams(
@@ -42,63 +45,44 @@ class WebViewState extends State<WebView> {
     }
 
     _controller = lib.WebViewController.fromPlatformCreationParams(params);
-    _initControllerIgnoringError(
-      _controller.setJavaScriptMode(
-        widget.js
-            ? lib.JavaScriptMode.unrestricted
-            : lib.JavaScriptMode.disabled,
+    await _controller.setJavaScriptMode(
+      widget.js ? lib.JavaScriptMode.unrestricted : lib.JavaScriptMode.disabled,
+    );
+    await _controller.setNavigationDelegate(
+      lib.NavigationDelegate(
+        onPageFinished: _onPageFinished,
+        onNavigationRequest: widget.interceptNavigationRequest != null
+            ? (req) => _interceptNavigationRequest(req)
+            : null,
       ),
     );
-    _initControllerIgnoringError(
-      _controller.setNavigationDelegate(
-        lib.NavigationDelegate(
-          onPageFinished: _onPageFinished,
-          onNavigationRequest: widget.interceptNavigationRequest != null
-              ? (req) => _interceptNavigationRequest(req)
-              : null,
-        ),
-      ),
-    );
-    _initControllerIgnoringError(_controller.setUserAgent(widget.userAgent));
+    await _controller.setUserAgent(widget.userAgent);
 
     final platformController = _controller.platform;
     if (platformController is lib.AndroidWebViewController) {
-      _initControllerIgnoringError(
-        lib.AndroidWebViewController.enableDebugging(widget.debuggingEnabled),
+      await lib.AndroidWebViewController.enableDebugging(
+        widget.debuggingEnabled,
       );
-      _initControllerIgnoringError(
-        platformController.setMediaPlaybackRequiresUserGesture(
-          !widget.mediaPlaybackAlwaysAllow,
-        ),
+      await platformController.setMediaPlaybackRequiresUserGesture(
+        !widget.mediaPlaybackAlwaysAllow,
       );
 
       final onHideCustomWidget =
           widget.onAndroidHideCustomWidget ?? _onAndroidHideCustomWidgetDefault;
       final onShowCustomWidget =
           widget.onAndroidShowCustomWidget ?? _onAndroidShowCustomWidgetDefault;
-      _initControllerIgnoringError(
-        platformController.setCustomWidgetCallbacks(
-          onHideCustomWidget: onHideCustomWidget,
-          onShowCustomWidget: (child, _) => onShowCustomWidget(child),
-        ),
+      await platformController.setCustomWidgetCallbacks(
+        onHideCustomWidget: onHideCustomWidget,
+        onShowCustomWidget: (child, _) => onShowCustomWidget(child),
       );
     } else if (platformController is lib.WebKitWebViewController) {
-      _initControllerIgnoringError(
-        platformController.setInspectable(widget.debuggingEnabled),
-      );
+      await platformController.setInspectable(widget.debuggingEnabled);
     }
 
     final uri = Uri.tryParse(widget.url);
-    if (uri != null) {
-      _initControllerIgnoringError(_controller.loadRequest(uri));
+    if (mounted && uri != null) {
+      await _controller.loadRequest(uri);
     }
-  }
-
-  static void _initControllerIgnoringError(Future<void> f) {
-    f.onError((error, _) {
-      // TODO: use logger to keep track of stack trace
-      debugPrint('Ignored controller error: $error');
-    });
   }
 
   @override

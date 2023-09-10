@@ -70,7 +70,13 @@ abstract class FakeWebViewController extends PlatformWebViewController {
 
   @override
   Future<void> loadRequest(LoadRequestParams params) async {
-    _onPageStarted(params.uri);
+    final uri = params.uri;
+    const queryParam = 'loadRequest';
+    if (uri.queryParameters[queryParam] == 'error') {
+      throw PlatformException(code: queryParam);
+    } else {
+      _onPageStarted(uri);
+    }
   }
 
   @override
@@ -88,8 +94,9 @@ abstract class FakeWebViewController extends PlatformWebViewController {
       return '';
     }
 
-    if (params['runJavaScriptReturningResult'] == 'error') {
-      throw PlatformException(code: 'code');
+    const queryParam = 'runJavaScriptReturningResult';
+    if (params[queryParam] == 'error') {
+      throw PlatformException(code: queryParam);
     }
 
     if (params.containsKey(javascript)) {

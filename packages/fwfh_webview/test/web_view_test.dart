@@ -454,6 +454,17 @@ void main() {
     });
   });
 
+  group('url', () {
+    testWidgets('handles load error', (WidgetTester tester) async {
+      runApp(
+        const WebView(
+          'http://domain.com?loadRequest=error',
+          aspectRatio: 16 / 9,
+        ),
+      );
+    });
+  });
+
   group('userAgent', () {
     const html = 'foo';
     final url = Uri.dataFromString(html, mimeType: 'text/html').toString();
