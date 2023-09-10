@@ -16,7 +16,7 @@ Add this to your app's `pubspec.yaml` file:
 ```yaml
 dependencies:
   flutter_widget_from_html_core: any
-  fwfh_webview: ^0.7.0
+  fwfh_webview: ^0.9.0
 ```
 
 ## Usage
@@ -47,13 +47,15 @@ class MyWidgetFactory extends WidgetFactory with WebViewFactory {
 
 Configurable getters:
 
-|                                 | Type   | Default |
-|---------------------------------|--------|---------|
-| webView                         | bool   | true    |
-| webViewDebuggingEnabled         | bool   | false   |
-| webViewJs                       | bool   | true    |
-| webViewMediaPlaybackAlwaysAllow | bool   | false   |
-| webViewUserAgent                | String | null    |
+|                                  | Type     | Default |
+|----------------------------------|----------|---------|
+| webView                          | bool     | true    |
+| webViewDebuggingEnabled          | bool     | false   |
+| webViewJs                        | bool     | true    |
+| webViewMediaPlaybackAlwaysAllow  | bool     | false   |
+| webViewOnAndroidHideCustomWidget | Function | null    |
+| webViewOnAndroidShowCustomWidget | Function | null    |
+| webViewUserAgent                 | String   | null    |
 
 Supported IFRAME attributes:
 

@@ -1,39 +1,51 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
-void mockWebViewPlatform() => _FakeWebViewPlatform();
+void mockWebViewPlatform() {
+  _FakeWebViewPlatform();
 
-class _FakeNavigationDelegate extends PlatformNavigationDelegate {
-  NavigationRequestCallback? _onNavigationRequest;
-  PageEventCallback? _onPageFinished;
-
-  _FakeNavigationDelegate(super.params) : super.implementation();
-
-  @override
-  Future<void> setOnNavigationRequest(
-    NavigationRequestCallback onNavigationRequest,
-  ) async {
-    _onNavigationRequest = onNavigationRequest;
-  }
-
-  @override
-  Future<void> setOnPageFinished(PageEventCallback onPageFinished) async {
-    _onPageFinished = onPageFinished;
-  }
+  const codec = StandardMessageCodec();
+  final emptyList = codec.encodeMessage([]);
+  final messenger =
+      // TODO: remove lint ignore when our minimum Flutter version >= 3.10
+      // ignore: unnecessary_non_null_assertion
+      TestDefaultBinaryMessengerBinding.instance!.defaultBinaryMessenger;
+  messenger.setMockMessageHandler(
+    'dev.flutter.pigeon.webview_flutter_android.InstanceManagerHostApi.clear',
+    (_) => Future.value(emptyList),
+  );
+  messenger.setMockMessageHandler(
+    'dev.flutter.pigeon.webview_flutter_android.WebViewHostApi.setWebContentsDebuggingEnabled',
+    (message) async {
+      final decodedMessage = codec.decodeMessage(message) as List<Object?>;
+      FakeWebViewController.instance?.debuggingEnabled =
+          decodedMessage[0] == true;
+      return emptyList;
+    },
+  );
 }
 
-class FakeWebViewController extends PlatformWebViewController {
+abstract class FakeWebViewController extends PlatformWebViewController {
   static FakeWebViewController? _instance;
   static FakeWebViewController? get instance => _instance;
 
+  bool? androidMediaPlaybackRequiresUserGesture;
+  OnHideCustomWidgetCallback? androidOnHideCustomWidget;
+  OnShowCustomWidgetCallback? androidOnShowCustomWidget;
+  bool? debuggingEnabled;
+  JavaScriptMode? javaScriptMode;
+  String? userAgent;
+
   Uri? _currentUri;
   _FakeNavigationDelegate? _handler;
-  bool _js = true;
   Timer? _onPageFinishedTimer;
   final _uris = <Uri>[];
 
@@ -58,7 +70,13 @@ class FakeWebViewController extends PlatformWebViewController {
 
   @override
   Future<void> loadRequest(LoadRequestParams params) async {
-    _onPageStarted(params.uri);
+    final uri = params.uri;
+    const queryParam = 'loadRequest';
+    if (uri.queryParameters[queryParam] == 'error') {
+      throw PlatformException(code: queryParam);
+    } else {
+      _onPageStarted(uri);
+    }
   }
 
   @override
@@ -71,17 +89,14 @@ class FakeWebViewController extends PlatformWebViewController {
 
   @override
   Future<Object> runJavaScriptReturningResult(String javascript) async {
-    if (!_js) {
-      throw UnsupportedError('JavaScript is disabled');
-    }
-
     final params = _currentUri?.queryParameters;
     if (params == null) {
       return '';
     }
 
-    if (params['runJavaScriptReturningResult'] == 'error') {
-      throw PlatformException(code: 'code');
+    const queryParam = 'runJavaScriptReturningResult';
+    if (params[queryParam] == 'error') {
+      throw PlatformException(code: queryParam);
     }
 
     if (params.containsKey(javascript)) {
@@ -92,8 +107,8 @@ class FakeWebViewController extends PlatformWebViewController {
   }
 
   @override
-  Future<void> setJavaScriptMode(JavaScriptMode javaScriptMode) async {
-    _js = javaScriptMode == JavaScriptMode.unrestricted;
+  Future<void> setJavaScriptMode(JavaScriptMode value) async {
+    javaScriptMode = value;
   }
 
   @override
@@ -106,8 +121,8 @@ class FakeWebViewController extends PlatformWebViewController {
   }
 
   @override
-  Future<void> setUserAgent(String? userAgent) async {
-    // intentionally left empty
+  Future<void> setUserAgent(String? value) async {
+    userAgent = value;
   }
 
   Future<void> _onPageStarted(Uri uri) async {
@@ -130,6 +145,81 @@ class FakeWebViewController extends PlatformWebViewController {
         _handler?._onPageFinished?.call(uri.toString());
       },
     );
+  }
+}
+
+class __FakeAndroidWebViewController extends FakeWebViewController
+    implements AndroidWebViewController {
+  __FakeAndroidWebViewController(super.params);
+
+  @override
+  Future<void> setCustomWidgetCallbacks({
+    required OnHideCustomWidgetCallback? onHideCustomWidget,
+    required OnShowCustomWidgetCallback? onShowCustomWidget,
+  }) async {
+    androidOnHideCustomWidget = onHideCustomWidget;
+    androidOnShowCustomWidget = onShowCustomWidget;
+  }
+
+  @override
+  Future<void> setGeolocationPermissionsPromptCallbacks({
+    OnGeolocationPermissionsShowPrompt? onShowPrompt,
+    OnGeolocationPermissionsHidePrompt? onHidePrompt,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> setMediaPlaybackRequiresUserGesture(bool require) async {
+    androidMediaPlaybackRequiresUserGesture = require;
+  }
+
+  @override
+  Future<void> setOnShowFileSelector(
+    Future<List<String>> Function(FileSelectorParams params)?
+        onShowFileSelector,
+  ) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> setTextZoom(int textZoom) => throw UnimplementedError();
+
+  @override
+  int get webViewIdentifier => throw UnimplementedError();
+}
+
+class __FakeWebKitWebViewController extends FakeWebViewController
+    implements WebKitWebViewController {
+  __FakeWebKitWebViewController(super.params);
+
+  @override
+  Future<void> setAllowsBackForwardNavigationGestures(bool enabled) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> setInspectable(bool value) async {
+    debuggingEnabled = value;
+  }
+
+  @override
+  int get webViewIdentifier => throw UnimplementedError();
+}
+
+class _FakeNavigationDelegate extends PlatformNavigationDelegate {
+  NavigationRequestCallback? _onNavigationRequest;
+  PageEventCallback? _onPageFinished;
+
+  _FakeNavigationDelegate(super.params) : super.implementation();
+
+  @override
+  Future<void> setOnNavigationRequest(
+    NavigationRequestCallback onNavigationRequest,
+  ) async {
+    _onNavigationRequest = onNavigationRequest;
+  }
+
+  @override
+  Future<void> setOnPageFinished(PageEventCallback onPageFinished) async {
+    _onPageFinished = onPageFinished;
   }
 }
 
@@ -198,7 +288,11 @@ class _FakeWebViewPlatform extends Fake
   PlatformWebViewController createPlatformWebViewController(
     PlatformWebViewControllerCreationParams params,
   ) {
-    return FakeWebViewController(params);
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return __FakeWebKitWebViewController(params);
+    } else {
+      return __FakeAndroidWebViewController(params);
+    }
   }
 
   @override
