@@ -9,6 +9,13 @@ import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart'
 
 import 'web_view.dart';
 
+Future<void> _ignoreError(Future<void> future) => future.onError(
+      (error, _) {
+        // TODO: use logger to keep track of stack trace
+        debugPrint('Ignored controller error: $error');
+      },
+    );
+
 class WebViewState extends State<WebView> {
   final _timers = <Timer>[];
   late final lib.WebViewController _controller;
@@ -22,10 +29,7 @@ class WebViewState extends State<WebView> {
     super.initState();
     _aspectRatio = widget.aspectRatio;
 
-    _initController().onError((error, _) {
-      // TODO: use logger to keep track of stack trace
-      debugPrint('Ignored controller error: $error');
-    });
+    _ignoreError(_initController());
 
     if (widget.unsupportedWorkaroundForIssue37) {
       _issue37 = _Issue37(this);
@@ -60,8 +64,8 @@ class WebViewState extends State<WebView> {
 
     final platformController = _controller.platform;
     if (platformController is lib.AndroidWebViewController) {
-      await lib.AndroidWebViewController.enableDebugging(
-        widget.debuggingEnabled,
+      await _ignoreError(
+        lib.AndroidWebViewController.enableDebugging(widget.debuggingEnabled),
       );
       await platformController.setMediaPlaybackRequiresUserGesture(
         !widget.mediaPlaybackAlwaysAllow,
@@ -76,7 +80,9 @@ class WebViewState extends State<WebView> {
         onShowCustomWidget: (child, _) => onShowCustomWidget(child),
       );
     } else if (platformController is lib.WebKitWebViewController) {
-      await platformController.setInspectable(widget.debuggingEnabled);
+      await _ignoreError(
+        platformController.setInspectable(widget.debuggingEnabled),
+      );
     }
 
     final uri = Uri.tryParse(widget.url);
