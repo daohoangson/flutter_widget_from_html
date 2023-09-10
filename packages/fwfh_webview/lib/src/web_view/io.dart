@@ -128,8 +128,8 @@ class WebViewState extends State<WebView> {
         debugPrint('eval: $js -> $result');
       }
       return '$result';
-    } catch (evalError) {
-      debugPrint('evalError: $evalError');
+    } catch (e) {
+      debugPrint('eval: $js -> error $e');
     }
 
     return '';
@@ -137,9 +137,6 @@ class WebViewState extends State<WebView> {
 
   Future<void> _autoResize() async {
     if (!mounted) {
-      if (widget.debuggingEnabled) {
-        debugPrint('_autoResize: mounted=false');
-      }
       return;
     }
 
@@ -148,9 +145,6 @@ class WebViewState extends State<WebView> {
       eval('document.body.scrollHeight'),
     ]);
     if (!mounted) {
-      if (widget.debuggingEnabled) {
-        debugPrint('_autoResize: evals=$evals mounted=false');
-      }
       return;
     }
 
@@ -158,9 +152,6 @@ class WebViewState extends State<WebView> {
     final h = double.tryParse(evals[1]) ?? 0;
     final r = (h > 0 && w > 0) ? (w / h) : _aspectRatio;
     final changed = (r - _aspectRatio).abs() > 0.0001;
-    if (widget.debuggingEnabled) {
-      debugPrint('_autoResize: ${w}x$h->$r changed=$changed');
-    }
     if (changed) {
       setState(() => _aspectRatio = r);
     }
@@ -203,10 +194,6 @@ class WebViewState extends State<WebView> {
   }
 
   void _onPageFinished(String url) {
-    if (widget.debuggingEnabled) {
-      debugPrint('_onPageFinished: url=$url');
-    }
-
     _firstFinishedUrl ??= url;
 
     if (widget.autoResize) {
