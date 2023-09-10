@@ -38,12 +38,17 @@ jobs:
       matrix:
         include:
           # - api-level: 29
+          #   arch: x86
           #   channel: stable
           #   target: google_apis
-          #   profile: pixel_3a
-          - api-level: 30
-            channel: canary
-            target: aosp_atd
+          # - api-level: 30
+          #   arch: x86
+          #   channel: canary
+          #   target: aosp_atd
+          - api-level: 33
+            arch: x86_64
+            channel: stable
+            target: google_apis
     name: Integration test (Android)
     runs-on: macos-latest
     steps:
@@ -68,9 +73,9 @@ jobs:
         uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # v2.28.0
         with:
           api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch }}
           channel: ${{ matrix.channel }}
           target: ${{ matrix.target }}
-          profile: ${{ matrix.profile }}
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
@@ -79,9 +84,9 @@ jobs:
         uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # v2.28.0
         with:
           api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch }}
           channel: ${{ matrix.channel }}
           target: ${{ matrix.target }}
-          profile: ${{ matrix.profile }}
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
