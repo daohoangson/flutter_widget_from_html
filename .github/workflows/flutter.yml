@@ -13,7 +13,6 @@ permissions:
 
 jobs:
   unit_test:
-    if: false
     name: Unit test
     runs-on: ubuntu-latest
     steps:
@@ -95,7 +94,6 @@ jobs:
           script: ./tool/integration.sh
 
   integration_test_ios:
-    if: false
     name: Integration test (iOS)
     runs-on: macos-latest
     steps:
