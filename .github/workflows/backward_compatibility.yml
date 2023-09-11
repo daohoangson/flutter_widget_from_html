@@ -77,7 +77,6 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
         with:
-          cache: true
           flutter-version: ${{ env.FLUTTER_VERSION }}
       - run: flutter test
 
@@ -114,6 +113,5 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
         with:
-          cache: true
           channel: ${{ matrix.channel }}
       - run: flutter test
