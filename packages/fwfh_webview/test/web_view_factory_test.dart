@@ -1,10 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
+import '../../core/test/_.dart' as helper;
 import '_.dart';
 import 'mock_webview_platform.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   mockWebViewPlatform();
 
   const src = 'http://domain.com';
@@ -16,19 +19,65 @@ void main() {
     expect(explained, equals('[GestureDetector:child=[Text:$src]]'));
   });
 
-  testWidgets('renders web view', (tester) async {
-    const html = '<iframe src="$src"></iframe>';
-    final explained = await explain(tester, html);
-    expect(
-      explained,
-      equals(
-        '[WebView:'
-        'url=$src,'
-        'aspectRatio=$defaultAspectRatio,'
-        'autoResize=true'
-        ']',
-      ),
-    );
+  group('renders web view', () {
+    Future<void> test(
+      WidgetTester tester,
+      String html,
+      String fullUrl, {
+      String baseUrl = 'http://base.com/path/',
+    }) async {
+      final explained = await explain(
+        tester,
+        html,
+        baseUrl: baseUrl.isNotEmpty ? Uri.parse(baseUrl) : null,
+      );
+      expect(
+        explained,
+        equals(
+          '[WebView:'
+          'url=$fullUrl,'
+          'aspectRatio=$defaultAspectRatio,'
+          'autoResize=true'
+          ']',
+        ),
+      );
+    }
+
+    testWidgets('with full url', (WidgetTester tester) async {
+      const fullUrl = 'http://domain.com/iframe';
+      const html = '<iframe src="$fullUrl"></iframe>';
+      await test(tester, html, fullUrl);
+    });
+
+    testWidgets('with protocol relative url', (WidgetTester tester) async {
+      const html = '<iframe src="//protocol.relative"></iframe>';
+      const fullUrl = 'http://protocol.relative';
+      await test(tester, html, fullUrl);
+    });
+
+    testWidgets('with protocol relative url (https)', (tester) async {
+      const html = '<iframe src="//protocol.relative/secured"></iframe>';
+      const fullUrl = 'https://protocol.relative/secured';
+      await test(tester, html, fullUrl, baseUrl: 'https://base.com/secured');
+    });
+
+    testWidgets('with protocol relative url (no base)', (tester) async {
+      const html = '<iframe src="//protocol.relative/secured"></iframe>';
+      const fullUrl = 'https://protocol.relative/secured';
+      await test(tester, html, fullUrl, baseUrl: '');
+    });
+
+    testWidgets('with root relative url', (WidgetTester tester) async {
+      const html = '<iframe src="/root.relative"></iframe>';
+      const fullUrl = 'http://base.com/root.relative';
+      await test(tester, html, fullUrl);
+    });
+
+    testWidgets('with relative url', (WidgetTester tester) async {
+      const html = '<iframe src="relative"></iframe>';
+      const fullUrl = 'http://base.com/path/relative';
+      await test(tester, html, fullUrl);
+    });
   });
 
   group('useExplainer: false', () {
@@ -64,6 +113,37 @@ void main() {
     const html = '<iframe src="$src" width="400" height="300"></iframe>';
     final explained = await explain(tester, html);
     expect(explained, equals('[WebView:url=$src,aspectRatio=1.33]'));
+  });
+
+  group('gestureTapCallback', () {
+    testWidgets('triggers callback', (tester) async {
+      const html = '<iframe src="http://domain.com/iframe"></iframe>';
+      final urls = <String>[];
+      await helper.explain(
+        tester,
+        null,
+        hw: HtmlWidget(
+          html,
+          key: helper.hwKey,
+          factoryBuilder: () => WebViewWidgetFactory(),
+          onTapUrl: (url) {
+            urls.add(url);
+            return false;
+          },
+        ),
+      );
+
+      await tester.runAsync(
+        () => Future.delayed(const Duration(milliseconds: 100)),
+      );
+      await tester.pumpAndSettle();
+
+      await FakeWebViewController.instance?.onNavigationRequest(
+        url: 'http://domain.com/tap',
+        isMainFrame: true,
+      );
+      expect(urls, equals(['http://domain.com/tap']));
+    });
   });
 
   group('sandbox', () {

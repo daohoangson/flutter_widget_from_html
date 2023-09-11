@@ -23,6 +23,12 @@ mixin WebViewFactory on WidgetFactory {
   /// {@macro web_view.mediaPlaybackAlwaysAllow}
   bool get webViewMediaPlaybackAlwaysAllow => false;
 
+  /// {@macro web_view.onAndroidHideCustomWidget}
+  void Function()? get webViewOnAndroidHideCustomWidget => null;
+
+  /// {@macro web_view.onAndroidShowCustomWidget}
+  void Function(Widget widget)? get webViewOnAndroidShowCustomWidget => null;
+
   /// {@macro web_view.userAgent}
   String? get webViewUserAgent => null;
 
@@ -61,6 +67,8 @@ mixin WebViewFactory on WidgetFactory {
       },
       js: js,
       mediaPlaybackAlwaysAllow: webViewMediaPlaybackAlwaysAllow,
+      onAndroidHideCustomWidget: webViewOnAndroidHideCustomWidget,
+      onAndroidShowCustomWidget: webViewOnAndroidShowCustomWidget,
       userAgent: webViewUserAgent,
     );
   }

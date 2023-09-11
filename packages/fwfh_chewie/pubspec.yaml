@@ -24,3 +24,11 @@ dev_dependencies:
   lint: any
   plugin_platform_interface: any
   video_player_platform_interface: ">=5.0.0 <7.0.0"
+
+funding:
+  - https://patreon.com/daohoangson
+  - https://buymeacoffee.com/daohoangson
+
+topics:
+  - video
+  - fwfh
