@@ -1,3 +1,9 @@
+## 0.13.0-alpha.2
+
+- Fix inline `white-space: nowrap`. (#944)
+- Remove package `fwfh_text_style` (#935)
+- Remove guess dry sizes logic from `HtmlTable` (#972)
+
 ## 0.13.0-alpha.1
 
 - Implement `BuildOp.v1` constructor (#930)
