@@ -40,10 +40,6 @@ class HtmlStyle {
     );
   }
 
-  /// The input [TextStyle].
-  @Deprecated('Use .textStyle instead.')
-  TextStyle get style => textStyle;
-
   /// The text direction.
   TextDirection get textDirection => value()!;
 
@@ -68,10 +64,6 @@ class HtmlStyle {
       textStyle: textStyle ?? style ?? this.textStyle,
     );
   }
-
-  /// Gets dependency by type [T].
-  @Deprecated('Use .value instead.')
-  T? getDependency<T>() => value<T>();
 
   /// Gets value of type [T].
   ///

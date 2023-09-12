@@ -411,6 +411,33 @@ void main() {
     });
   });
 
+  group('TextStyleHtml', () {
+    group('getDependency', () {
+      final dep1 = _LegacyTextStyleHtmlDep1();
+      final style = HtmlStyle.root(
+        [
+          const TextScaleFactor(1.0),
+          TextDirection.ltr,
+          const TextStyle(inherit: false),
+          dep1,
+        ],
+        null,
+      );
+
+      test('returns value', () {
+        final dep = style.getDependency<_LegacyTextStyleHtmlDep1>();
+        expect(dep, equals(dep1));
+      });
+
+      test('throws value', () {
+        expect(
+          () => style.getDependency<_LegacyTextStyleHtmlDep2>(),
+          throwsStateError,
+        );
+      });
+    });
+  });
+
   group('WidgetFactory', () {
     group('gestureTapCallback', () {
       test('calls onTapUrl', () {
@@ -588,6 +615,10 @@ class _BuildOpWidgetFactory extends WidgetFactory {
     return super.parse(tree);
   }
 }
+
+class _LegacyTextStyleHtmlDep1 {}
+
+class _LegacyTextStyleHtmlDep2 {}
 
 class _LoggerApp extends StatefulWidget {
   final Widget child;
