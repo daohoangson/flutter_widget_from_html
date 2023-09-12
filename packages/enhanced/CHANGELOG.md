@@ -1,3 +1,7 @@
+## 0.13.0-alpha.3
+
+- Fix legacy implementations (#1027)
+
 ## 0.13.0-alpha.2
 
 - Fix inline `white-space: nowrap`. (#944)
