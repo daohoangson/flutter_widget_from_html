@@ -1,3 +1,7 @@
+## 0.13.0-alpha.4
+
+- Make `WidgetPlaceholder.firstChild` public (#1027)
+
 ## 0.13.0-alpha.3
 
 - Fix legacy implementations (#1027)
