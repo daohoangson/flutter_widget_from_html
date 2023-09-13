@@ -397,9 +397,6 @@ class _WidgetPlaceholderDefault extends StatelessWidget
   String? get debugLabel => null;
 
   @override
-  Widget? get firstChild => null;
-
-  @override
   bool get isEmpty => true;
 
   @override

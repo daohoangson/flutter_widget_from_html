@@ -95,10 +95,8 @@ class WidgetPlaceholder extends StatelessWidget {
   /// A human-readable description of this placeholder.
   final String? debugLabel;
 
-  /// The first child widget.
-  final Widget? firstChild;
-
   final List<WidgetPlaceholderBuilder> _builders;
+  final Widget? _firstChild;
 
   /// Creates a placeholder.
   WidgetPlaceholder({
@@ -107,13 +105,13 @@ class WidgetPlaceholder extends StatelessWidget {
     this.debugLabel,
     super.key,
   })  : _builders = builder != null ? [builder] : [],
-        firstChild = child;
+        _firstChild = child;
 
   /// Whether this placeholder renders anything.
-  bool get isEmpty => firstChild == null && _builders.isEmpty;
+  bool get isEmpty => _firstChild == null && _builders.isEmpty;
 
   @override
-  Widget build(BuildContext context) => callBuilders(context, firstChild);
+  Widget build(BuildContext context) => callBuilders(context, _firstChild);
 
   /// Calls builder callbacks on the specified [child] widget.
   @protected
