@@ -1161,6 +1161,9 @@ class WidgetFactory {
   /// Builds custom widget for div elements with display: flex from [meta]
   BuildOp _flexOp(BuildMetadata meta) {
     return BuildOp(
+      onChild: (childMeta) {
+        childMeta.register(_flexItemOp(childMeta));
+      },
       onWidgets: (meta, widgets) {
         final String id = meta.element.id;
         String flexDirection = 'row';
@@ -1195,6 +1198,18 @@ class WidgetFactory {
           )
         ];
       },      
+    );
+  }
+
+  /// Build op for child elements of flex containers
+  BuildOp _flexItemOp(BuildMetadata meta) {
+    return BuildOp(
+      defaultStyles: (element) {
+        return {
+          kCssWidth: "auto",
+          kCssHeight: "auto"
+        };
+      }
     );
   }
 
@@ -1240,10 +1255,6 @@ class WidgetFactory {
     final anchor = GlobalKey(debugLabel: id);
 
     return BuildOp(
-      onTree: (meta, tree) {
-        _anchorRegistry.register(id, anchor);
-        tree.registerAnchor(anchor);
-      },
       onTreeFlattening: (meta, tree) {
         final widget = WidgetPlaceholder('#$id').wrapWith(
           (context, _) => SizedBox(
