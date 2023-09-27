@@ -1,3 +1,14 @@
+## 0.10.5
+
+- Replace the deprecated `DecoderCallback` in tests (#1014)
+- Assume HTTPS for protocol relative URL without base (#1016)
+- Add screenshots, funding and topics to pubspec files (#1010)
+
+## 0.10.4
+
+- Add support for Flutter 3.13 (#995)
+- Remove package `fwfh_text_style` (#1009)
+
 ## 0.10.3
 
 - Fix `border-radius` being overwritten by `border` (#966)

@@ -21,6 +21,5 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa # v2.10.0
         with:
-          cache: true
           channel: master
       - run: ./tool/test.sh

@@ -1,12 +1,20 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart' as lib;
 import 'package:webview_flutter_android/webview_flutter_android.dart' as lib;
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart'
     as lib;
 
 import 'web_view.dart';
+
+Future<void> _ignoreError(Future<void> future) => future.onError(
+      (error, _) {
+        // TODO: use logger to keep track of stack trace
+        debugPrint('Ignored controller error: $error');
+      },
+    );
 
 class WebViewState extends State<WebView> {
   final _timers = <Timer>[];
@@ -21,7 +29,7 @@ class WebViewState extends State<WebView> {
     super.initState();
     _aspectRatio = widget.aspectRatio;
 
-    _initController();
+    _ignoreError(_initController());
 
     if (widget.unsupportedWorkaroundForIssue37) {
       _issue37 = _Issue37(this);
@@ -29,9 +37,9 @@ class WebViewState extends State<WebView> {
     }
   }
 
-  void _initController() {
+  Future<void> _initController() async {
     var params = const lib.PlatformWebViewControllerCreationParams();
-    if (lib.WebViewPlatform.instance is lib.WebKitWebViewPlatform) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       params = lib.WebKitWebViewControllerCreationParams(
         allowsInlineMediaPlayback: true,
         mediaTypesRequiringUserAction: widget.mediaPlaybackAlwaysAllow
@@ -40,29 +48,46 @@ class WebViewState extends State<WebView> {
       );
     }
 
-    _controller = lib.WebViewController.fromPlatformCreationParams(params)
-      ..setJavaScriptMode(
-        widget.js
-            ? lib.JavaScriptMode.unrestricted
-            : lib.JavaScriptMode.disabled,
-      )
-      ..setNavigationDelegate(
-        lib.NavigationDelegate(
-          onPageFinished: _onPageFinished,
-          onNavigationRequest: widget.interceptNavigationRequest != null
-              ? (req) => _interceptNavigationRequest(req)
-              : null,
-        ),
-      )
-      ..setUserAgent(widget.userAgent)
-      ..loadRequest(Uri.parse(widget.url));
+    _controller = lib.WebViewController.fromPlatformCreationParams(params);
+    await _controller.setJavaScriptMode(
+      widget.js ? lib.JavaScriptMode.unrestricted : lib.JavaScriptMode.disabled,
+    );
+    await _controller.setNavigationDelegate(
+      lib.NavigationDelegate(
+        onPageFinished: _onPageFinished,
+        onNavigationRequest: widget.interceptNavigationRequest != null
+            ? (req) => _interceptNavigationRequest(req)
+            : null,
+      ),
+    );
+    await _controller.setUserAgent(widget.userAgent);
 
     final platformController = _controller.platform;
     if (platformController is lib.AndroidWebViewController) {
-      lib.AndroidWebViewController.enableDebugging(widget.debuggingEnabled);
-      platformController.setMediaPlaybackRequiresUserGesture(
+      await _ignoreError(
+        lib.AndroidWebViewController.enableDebugging(widget.debuggingEnabled),
+      );
+      await platformController.setMediaPlaybackRequiresUserGesture(
         !widget.mediaPlaybackAlwaysAllow,
       );
+
+      final onHideCustomWidget =
+          widget.onAndroidHideCustomWidget ?? _onAndroidHideCustomWidgetDefault;
+      final onShowCustomWidget =
+          widget.onAndroidShowCustomWidget ?? _onAndroidShowCustomWidgetDefault;
+      await platformController.setCustomWidgetCallbacks(
+        onHideCustomWidget: onHideCustomWidget,
+        onShowCustomWidget: (child, _) => onShowCustomWidget(child),
+      );
+    } else if (platformController is lib.WebKitWebViewController) {
+      await _ignoreError(
+        platformController.setInspectable(widget.debuggingEnabled),
+      );
+    }
+
+    final uri = Uri.tryParse(widget.url);
+    if (mounted && uri != null) {
+      await _controller.loadRequest(uri);
     }
   }
 
@@ -100,8 +125,8 @@ class WebViewState extends State<WebView> {
     try {
       final result = await _controller.runJavaScriptReturningResult(js);
       return '$result';
-    } catch (evalError) {
-      debugPrint('evalError: $evalError');
+    } catch (e) {
+      debugPrint('eval: $js -> error $e');
     }
 
     return '';
@@ -122,10 +147,9 @@ class WebViewState extends State<WebView> {
 
     final w = double.tryParse(evals[0]) ?? 0;
     final h = double.tryParse(evals[1]) ?? 0;
-
     final r = (h > 0 && w > 0) ? (w / h) : _aspectRatio;
     final changed = (r - _aspectRatio).abs() > 0.0001;
-    if (changed && mounted) {
+    if (changed) {
       setState(() => _aspectRatio = r);
     }
   }
@@ -151,6 +175,19 @@ class WebViewState extends State<WebView> {
     return intercepted
         ? lib.NavigationDecision.prevent
         : lib.NavigationDecision.navigate;
+  }
+
+  void _onAndroidHideCustomWidgetDefault() {
+    Navigator.of(context).pop();
+  }
+
+  void _onAndroidShowCustomWidgetDefault(Widget child) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => child,
+        fullscreenDialog: true,
+      ),
+    );
   }
 
   void _onPageFinished(String url) {

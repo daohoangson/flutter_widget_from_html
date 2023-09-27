@@ -52,6 +52,7 @@ void _test(
     );
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   mockVideoPlayerPlatform();
   mockWebViewPlatform();
 

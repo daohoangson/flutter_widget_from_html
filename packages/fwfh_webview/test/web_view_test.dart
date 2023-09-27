@@ -1,12 +1,15 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fwfh_webview/src/web_view/web_view.dart';
 import 'package:measurer/measurer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 import 'mock_webview_platform.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   mockWebViewPlatform();
 
   group('autoResize', () {
@@ -69,6 +72,60 @@ void main() {
       );
       expectAspectRatioEquals(defaultAspectRatio);
       await cleanUp(tester);
+    });
+  });
+
+  group('debuggingEnabled', () {
+    const html = 'foo';
+    final url = Uri.dataFromString(html, mimeType: 'text/html').toString();
+    const aspectRatio = 16 / 9;
+
+    group('android', () {
+      testWidgets('renders without value', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        runApp(WebView(url, aspectRatio: aspectRatio));
+        expect(FakeWebViewController.instance?.debuggingEnabled, isFalse);
+        debugDefaultTargetPlatformOverride = null;
+      });
+
+      testWidgets('renders true', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        runApp(WebView(url, aspectRatio: aspectRatio, debuggingEnabled: true));
+        expect(FakeWebViewController.instance?.debuggingEnabled, isTrue);
+        debugDefaultTargetPlatformOverride = null;
+      });
+
+      testWidgets('renders false', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        // ignore: avoid_redundant_argument_values
+        runApp(WebView(url, aspectRatio: aspectRatio, debuggingEnabled: false));
+        expect(FakeWebViewController.instance?.debuggingEnabled, isFalse);
+        debugDefaultTargetPlatformOverride = null;
+      });
+    });
+
+    group('ios', () {
+      testWidgets('renders without value', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        runApp(WebView(url, aspectRatio: aspectRatio));
+        expect(FakeWebViewController.instance?.debuggingEnabled, isFalse);
+        debugDefaultTargetPlatformOverride = null;
+      });
+
+      testWidgets('renders true', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        runApp(WebView(url, aspectRatio: aspectRatio, debuggingEnabled: true));
+        expect(FakeWebViewController.instance?.debuggingEnabled, isTrue);
+        debugDefaultTargetPlatformOverride = null;
+      });
+
+      testWidgets('renders false', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        // ignore: avoid_redundant_argument_values
+        runApp(WebView(url, aspectRatio: aspectRatio, debuggingEnabled: false));
+        expect(FakeWebViewController.instance?.debuggingEnabled, isFalse);
+        debugDefaultTargetPlatformOverride = null;
+      });
     });
   });
 
@@ -189,6 +246,189 @@ void main() {
     });
   });
 
+  group('js', () {
+    const html = 'foo';
+    final url = Uri.dataFromString(html, mimeType: 'text/html').toString();
+    const aspectRatio = 16 / 9;
+
+    testWidgets('renders without value', (WidgetTester tester) async {
+      runApp(WebView(url, aspectRatio: aspectRatio));
+      expect(
+        FakeWebViewController.instance?.javaScriptMode,
+        JavaScriptMode.unrestricted,
+      );
+    });
+
+    testWidgets('renders true', (WidgetTester tester) async {
+      runApp(
+        WebView(
+          url,
+          aspectRatio: aspectRatio,
+          // ignore: avoid_redundant_argument_values
+          js: true,
+        ),
+      );
+      expect(
+        FakeWebViewController.instance?.javaScriptMode,
+        JavaScriptMode.unrestricted,
+      );
+    });
+
+    testWidgets('renders false', (WidgetTester tester) async {
+      runApp(WebView(url, aspectRatio: aspectRatio, js: false));
+      expect(
+        FakeWebViewController.instance?.javaScriptMode,
+        JavaScriptMode.disabled,
+      );
+    });
+  });
+
+  group('mediaPlaybackAlwaysAllow', () {
+    const html = 'foo';
+    final url = Uri.dataFromString(html, mimeType: 'text/html').toString();
+    const aspectRatio = 16 / 9;
+
+    group('android', () {
+      testWidgets('renders without value', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        runApp(WebView(url, aspectRatio: aspectRatio));
+        expect(
+          FakeWebViewController
+              .instance?.androidMediaPlaybackRequiresUserGesture,
+          isTrue,
+        );
+        debugDefaultTargetPlatformOverride = null;
+      });
+
+      testWidgets('renders true', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        runApp(
+          WebView(
+            url,
+            aspectRatio: aspectRatio,
+            mediaPlaybackAlwaysAllow: true,
+          ),
+        );
+        expect(
+          FakeWebViewController
+              .instance?.androidMediaPlaybackRequiresUserGesture,
+          isFalse,
+        );
+        debugDefaultTargetPlatformOverride = null;
+      });
+
+      testWidgets('renders false', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        runApp(
+          WebView(
+            url,
+            aspectRatio: aspectRatio,
+            // ignore: avoid_redundant_argument_values
+            mediaPlaybackAlwaysAllow: false,
+          ),
+        );
+        expect(
+          FakeWebViewController
+              .instance?.androidMediaPlaybackRequiresUserGesture,
+          isTrue,
+        );
+        debugDefaultTargetPlatformOverride = null;
+      });
+    });
+
+    group('ios', () {
+      // ignore: prefer_function_declarations_over_variables
+      final expectMediaTypesRequiringUserAction = (bool require) {
+        expect(
+          FakeWebViewController.instance?.params,
+          isA<WebKitWebViewControllerCreationParams>().having(
+            (_) => _.mediaTypesRequiringUserAction,
+            'mediaTypesRequiringUserAction',
+            require
+                ? equals([PlaybackMediaTypes.audio, PlaybackMediaTypes.video])
+                : isEmpty,
+          ),
+        );
+      };
+
+      testWidgets('renders without value', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        runApp(WebView(url, aspectRatio: aspectRatio));
+        expectMediaTypesRequiringUserAction(true);
+        debugDefaultTargetPlatformOverride = null;
+      });
+
+      testWidgets('renders true', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        runApp(
+          WebView(
+            url,
+            aspectRatio: aspectRatio,
+            mediaPlaybackAlwaysAllow: true,
+          ),
+        );
+        expectMediaTypesRequiringUserAction(false);
+        debugDefaultTargetPlatformOverride = null;
+      });
+
+      testWidgets('renders false', (WidgetTester tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        runApp(
+          WebView(
+            url,
+            aspectRatio: aspectRatio,
+            // ignore: avoid_redundant_argument_values
+            mediaPlaybackAlwaysAllow: false,
+          ),
+        );
+        expectMediaTypesRequiringUserAction(true);
+        debugDefaultTargetPlatformOverride = null;
+      });
+    });
+  });
+
+  testWidgets('onAndroidShowCustomWidget', (WidgetTester tester) async {
+    const html = 'foo';
+    final url = Uri.dataFromString(html, mimeType: 'text/html').toString();
+    const aspectRatio = 16 / 9;
+
+    runApp(
+      MaterialApp(
+        home: Scaffold(
+          body: WebView(
+            url,
+            aspectRatio: aspectRatio,
+          ),
+        ),
+      ),
+    );
+
+    final webViewFinder = find.byType(Placeholder);
+    final fullscreenFinder = find.text('Fullscreen');
+    await tester.pumpAndSettle();
+    expect(webViewFinder, findsOneWidget);
+    expect(fullscreenFinder, findsNothing);
+
+    // video goes fullscreen
+    FakeWebViewController.instance?.androidOnShowCustomWidget?.call(
+      const Scaffold(
+        body: Center(
+          child: Text('Fullscreen'),
+        ),
+      ),
+      () {},
+    );
+    await tester.pumpAndSettle();
+    expect(webViewFinder, findsNothing);
+    expect(fullscreenFinder, findsOneWidget);
+
+    // user exits fullscreen
+    FakeWebViewController.instance?.androidOnHideCustomWidget?.call();
+    await tester.pumpAndSettle();
+    expect(webViewFinder, findsOneWidget);
+    expect(fullscreenFinder, findsNothing);
+  });
+
   group('unsupportedWorkaroundForIssue37', () {
     testWidgets('reloads on pause', (WidgetTester tester) async {
       const html = 'reloads on pause';
@@ -211,6 +451,33 @@ void main() {
       runApp(const SizedBox.shrink());
       await tester.pump();
       expect(FakeWebViewController.instance?.urls, equals([url, url]));
+    });
+  });
+
+  group('url', () {
+    testWidgets('handles load error', (WidgetTester tester) async {
+      runApp(
+        const WebView(
+          'http://domain.com?loadRequest=error',
+          aspectRatio: 16 / 9,
+        ),
+      );
+    });
+  });
+
+  group('userAgent', () {
+    const html = 'foo';
+    final url = Uri.dataFromString(html, mimeType: 'text/html').toString();
+    const aspectRatio = 16 / 9;
+
+    testWidgets('renders without value', (WidgetTester tester) async {
+      runApp(WebView(url, aspectRatio: aspectRatio));
+      expect(FakeWebViewController.instance?.userAgent, isNull);
+    });
+
+    testWidgets('renders string', (WidgetTester tester) async {
+      runApp(WebView(url, aspectRatio: aspectRatio, userAgent: 'fwfh'));
+      expect(FakeWebViewController.instance?.userAgent, equals('fwfh'));
     });
   });
 }
