@@ -3,6 +3,22 @@ import 'package:flutter/material.dart';
 import '../../../flutter_widget_from_html_core.dart';
 import '../core_ops.dart';
 
+const kCssFlexDirection = 'flex-direction';
+const kCssFlexDirectionRow = 'row';
+const kCssJustifyContent = 'justify-content';
+const kCssJustifyContentFlexStart = 'flex-start';
+const kCssJustifyContentFlexEnd = 'flex-end';
+const kCssJustifyContentCenter = 'center';
+const kCssJustifyContentSpaceBetween = 'space-between';
+const kCssJustifyContentSpaceAround = 'space-around';
+const kCssJustifyContentSpaceEvenly = 'space-evenly';
+const kCssAlignItems = 'align-items';
+const kCssAlignItemsFlexStart = 'flex-start';
+const kCssAlignItemsFlexEnd = 'flex-end';
+const kCssAlignItemsCenter = 'center';
+const kCssAlignItemsBaseline = 'baseline';
+const kCssAlignItemsStretch = 'stretch';
+
 // ignore: avoid_classes_with_only_static_members
 class FlexOps {
 
@@ -14,22 +30,22 @@ class FlexOps {
       },
       onWidgets: (meta, widgets) {
         final String id = meta.element.id;
-        String flexDirection = 'row';
-        String justifyContent = 'flex-start';
-        String alignItems = 'flex-start';
+        String flexDirection = kCssFlexDirectionRow;
+        String justifyContent = kCssJustifyContentFlexStart;
+        String alignItems = kCssAlignItemsFlexStart;
 
         for (final element in meta.element.styles) {
           final String? value = element.term;
 
           if (value != null) {
             switch (element.property) {
-              case 'flex-direction':
+              case kCssFlexDirection:
                 flexDirection = value;
               break;
-              case 'justify-content':
+              case kCssJustifyContent:
                 justifyContent = value;
               break;
-              case 'align-items':
+              case kCssAlignItems:
                 alignItems = value;
               break;
             }
@@ -39,7 +55,7 @@ class FlexOps {
         return [
           Flex(
             key: Key(id),
-            direction: 'row' == flexDirection ? Axis.horizontal : Axis.vertical,
+            direction: kCssFlexDirectionRow == flexDirection ? Axis.horizontal : Axis.vertical,
             mainAxisAlignment: _toMainAxisAlignment(justifyContent),
             crossAxisAlignment: _toCrossAxisAlignment(alignItems),
             children: widgets.toList()
@@ -54,8 +70,8 @@ class FlexOps {
     return BuildOp(
       defaultStyles: (element) {
         return {
-          kCssWidth: "auto",
-          kCssHeight: "auto"
+          kCssWidth: kCssWidthAuto,
+          kCssHeight: kCssHeightAuto
         };
       }
     );
@@ -64,17 +80,17 @@ class FlexOps {
   /// Converts CSS [justifyContent] to Flutter Grid MainAxisAlignment
   static MainAxisAlignment _toMainAxisAlignment(String justifyContent) {
     switch (justifyContent) {
-      case 'flex-start':
+      case kCssJustifyContentFlexStart:
         return MainAxisAlignment.start;
-      case 'flex-end':
+      case kCssJustifyContentFlexEnd:
         return MainAxisAlignment.end;
-      case 'center':
+      case kCssJustifyContentCenter:
         return MainAxisAlignment.center;
-      case 'space-between':
+      case kCssJustifyContentSpaceBetween:
         return MainAxisAlignment.spaceBetween;
-      case 'space-around':
+      case kCssJustifyContentSpaceAround:
         return MainAxisAlignment.spaceAround;
-      case 'space-evenly':
+      case kCssJustifyContentSpaceEvenly:
         return MainAxisAlignment.spaceEvenly;
       default:
         return MainAxisAlignment.start;
@@ -84,15 +100,15 @@ class FlexOps {
   /// Converts CSS [alignItems] to Flutter Grid CrossAxisAlignment
   static CrossAxisAlignment _toCrossAxisAlignment(String alignItems) {
     switch (alignItems) {
-      case 'flex-start':
+      case kCssAlignItemsFlexStart:
         return CrossAxisAlignment.start;
-      case 'flex-end':
+      case kCssAlignItemsFlexEnd:
         return CrossAxisAlignment.end;
-      case 'center':
+      case kCssAlignItemsCenter:
         return CrossAxisAlignment.center;
-      case 'baseline':
+      case kCssAlignItemsBaseline:
         return CrossAxisAlignment.baseline;
-      case 'stretch':
+      case kCssAlignItemsStretch:
         return CrossAxisAlignment.stretch;
       default:
         return CrossAxisAlignment.start;

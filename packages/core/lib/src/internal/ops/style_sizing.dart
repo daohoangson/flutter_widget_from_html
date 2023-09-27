@@ -6,6 +6,8 @@ const kCssMaxWidth = 'max-width';
 const kCssMinHeight = 'min-height';
 const kCssMinWidth = 'min-width';
 const kCssWidth = 'width';
+const kCssWidthAuto = 'auto';
+const kCssHeightAuto = 'auto';
 
 extension CssLengthToSizing on CssLength {
   CssSizingValue? getSizing(TextStyleHtml tsh) {
