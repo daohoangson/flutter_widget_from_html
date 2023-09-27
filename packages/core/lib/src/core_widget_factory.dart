@@ -1163,6 +1163,10 @@ class WidgetFactory {
     final anchor = GlobalKey(debugLabel: id);
 
     return BuildOp(
+      onTree: (meta, tree) {
+        _anchorRegistry.register(id, anchor);
+        tree.registerAnchor(anchor);
+      },
       onTreeFlattening: (meta, tree) {
         final widget = WidgetPlaceholder('#$id').wrapWith(
           (context, _) => SizedBox(
