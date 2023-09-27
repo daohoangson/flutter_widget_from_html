@@ -26,7 +26,7 @@ class WidgetFactory {
 
   late AnchorRegistry _anchorRegistry;
 
-  BuildOp? _styleBgColor;
+  BuildOp? _styleBg;
   BuildOp? _styleBorder;
   BuildOp? _styleDisplayInlineBlock;
   BuildOp? _styleDisplayNone;
@@ -155,9 +155,10 @@ class WidgetFactory {
     BoxBorder? border,
     BorderRadius? borderRadius,
     Color? color,
+    String? bgImageUrl,
     bool isBorderBox = true,
   }) {
-    if (border == null && borderRadius == null && color == null) {
+    if (border == null && borderRadius == null && color == null && bgImageUrl == null) {
       return child;
     }
 
@@ -171,6 +172,7 @@ class WidgetFactory {
       border: border,
       borderRadius: borderRadius,
       color: color,
+      image: _buildDecorationImage(bgImageUrl)
     );
 
     if (!isBorderBox || container != null) {
@@ -186,6 +188,31 @@ class WidgetFactory {
         child: decoratedBox?.child ?? child,
       );
     }
+  }
+
+  /// Builds decoration image from [url]
+  DecorationImage? _buildDecorationImage(String? url) {
+    if (url == null) {
+      return null;
+    }
+
+    ImageProvider? provider;
+    
+    if (url.startsWith('asset:')) {
+      provider = imageProviderFromAsset(url);
+    } else if (url.startsWith('data:image/')) {
+      provider = imageProviderFromDataUri(url);
+    } else if (url.startsWith('file:')) {
+      provider = imageProviderFromFileUri(url);
+    } else {
+      provider = imageProviderFromNetwork(url);
+    }
+    
+    if (provider == null) {
+      return null;
+    }
+
+    return DecorationImage(image: provider);
   }
 
   /// Builds 1-pixel-height divider.
@@ -952,8 +979,9 @@ class WidgetFactory {
     switch (key) {
       case kCssBackground:
       case kCssBackgroundColor:
-        _styleBgColor ??= StyleBgColor(this).buildOp;
-        meta.register(_styleBgColor!);
+      case kCssBackgroundImage:
+        _styleBg ??= StyleBg(this).buildOp;
+        meta.register(_styleBg!);
         break;
 
       case kCssColor:
