@@ -11,7 +11,7 @@ import 'internal/core_ops.dart';
 import 'internal/core_parser.dart';
 import 'internal/flattener.dart';
 import 'internal/margin_vertical.dart';
-import 'internal/ops/flex.dart';
+import 'internal/ops/style_display_flex.dart';
 import 'internal/platform_specific/fallback.dart'
     if (dart.library.io) 'internal/platform_specific/io.dart';
 
@@ -1079,7 +1079,7 @@ class WidgetFactory {
 
     switch (value) {
       case kCssDisplayFlex:
-        meta.register(FlexOps.flexOp(meta));
+        meta.register(StyleDisplayFlexOps.flexOp(meta));
         break;
       case kCssDisplayBlock:
         StyleSizing.registerBlock(this, meta);

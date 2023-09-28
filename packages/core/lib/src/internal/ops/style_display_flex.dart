@@ -20,7 +20,7 @@ const kCssAlignItemsBaseline = 'baseline';
 const kCssAlignItemsStretch = 'stretch';
 
 // ignore: avoid_classes_with_only_static_members
-class FlexOps {
+class StyleDisplayFlexOps {
 
   /// Builds custom widget for div elements with display: flex from [meta]
   static BuildOp flexOp(BuildMetadata meta) {
