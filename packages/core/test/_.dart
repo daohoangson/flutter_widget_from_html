@@ -686,7 +686,7 @@ class Explainer {
       attr.add('message=${widget.message}');
     }
 
-    if (widget is Flex) {
+    if (widget is! Column && (widget is Flex)) {
       attr.addAll(_flex(widget));
     }
 
