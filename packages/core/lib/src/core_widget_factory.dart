@@ -683,13 +683,6 @@ class WidgetFactory {
           ..tsb.enqueue(TextStyleOps.fontStyle, FontStyle.italic);
         break;
       case 'div':
-        final displayExpressions = meta.element.styles.where((element) => element.property == 'display');
-        final displayExpression = displayExpressions.isNotEmpty ? displayExpressions.first : null;
-        final display = displayExpression?.term ?? 'block';
-        if (display == 'flex') {
-          meta.register(FlexOps.flexOp(meta));
-        }
-
         meta[kCssDisplay] = kCssDisplayBlock;
         break;
       case 'article':
@@ -1085,6 +1078,9 @@ class WidgetFactory {
     StyleSizing.registerChild(this, meta);
 
     switch (value) {
+      case kCssDisplayFlex:
+        meta.register(FlexOps.flexOp(meta));
+        break;
       case kCssDisplayBlock:
         StyleSizing.registerBlock(this, meta);
         break;
