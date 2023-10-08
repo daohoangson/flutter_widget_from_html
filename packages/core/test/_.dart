@@ -555,10 +555,13 @@ class Explainer {
   List<String> _flex(Flex flex) {
     final List<String> result = [];
 
-    result.add('direction=${flex.direction.toString().replaceFirst('Axis.', '')}');
-    result.add('mainAxisAlignment=${flex.mainAxisAlignment.toString().replaceFirst('MainAxisAlignment.', '')}');
-    result.add('crossAxisAlignment=${flex.crossAxisAlignment.toString().replaceFirst('CrossAxisAlignment.', '')}');
-    
+    result.add(
+        'direction=${flex.direction.toString().replaceFirst('Axis.', '')}');
+    result.add(
+        'mainAxisAlignment=${flex.mainAxisAlignment.toString().replaceFirst('MainAxisAlignment.', '')}');
+    result.add(
+        'crossAxisAlignment=${flex.crossAxisAlignment.toString().replaceFirst('CrossAxisAlignment.', '')}');
+
     return result;
   }
 

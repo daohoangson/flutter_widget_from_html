@@ -21,7 +21,6 @@ const kCssAlignItemsStretch = 'stretch';
 
 // ignore: avoid_classes_with_only_static_members
 class StyleDisplayFlexOps {
-
   /// Builds custom widget for div elements with display: flex from [meta]
   static BuildOp flexOp(BuildMetadata meta) {
     return BuildOp(
@@ -41,40 +40,36 @@ class StyleDisplayFlexOps {
             switch (element.property) {
               case kCssFlexDirection:
                 flexDirection = value;
-              break;
+                break;
               case kCssJustifyContent:
                 justifyContent = value;
-              break;
+                break;
               case kCssAlignItems:
                 alignItems = value;
-              break;
+                break;
             }
           }
         }
 
         return [
           Flex(
-            key: Key(id),
-            direction: kCssFlexDirectionRow == flexDirection ? Axis.horizontal : Axis.vertical,
-            mainAxisAlignment: _toMainAxisAlignment(justifyContent),
-            crossAxisAlignment: _toCrossAxisAlignment(alignItems),
-            children: widgets.toList()
-          )
+              key: Key(id),
+              direction: kCssFlexDirectionRow == flexDirection
+                  ? Axis.horizontal
+                  : Axis.vertical,
+              mainAxisAlignment: _toMainAxisAlignment(justifyContent),
+              crossAxisAlignment: _toCrossAxisAlignment(alignItems),
+              children: widgets.toList())
         ];
-      },      
+      },
     );
   }
 
   /// Build op for child elements of flex containers
   static BuildOp _flexItemOp(BuildMetadata meta) {
-    return BuildOp(
-      defaultStyles: (element) {
-        return {
-          kCssWidth: kCssWidthAuto,
-          kCssHeight: kCssHeightAuto
-        };
-      }
-    );
+    return BuildOp(defaultStyles: (element) {
+      return {kCssWidth: kCssWidthAuto, kCssHeight: kCssHeightAuto};
+    });
   }
 
   /// Converts CSS [justifyContent] to Flutter Grid MainAxisAlignment
@@ -114,5 +109,4 @@ class StyleDisplayFlexOps {
         return CrossAxisAlignment.start;
     }
   }
-  
 }

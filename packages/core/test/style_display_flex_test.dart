@@ -8,7 +8,10 @@ void main() {
 
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
-      expect(explained, equals('[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start]'));
+      expect(
+          explained,
+          equals(
+              '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start]'));
     });
   });
 
@@ -17,7 +20,10 @@ void main() {
 
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
-      expect(explained, equals('[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start]'));
+      expect(
+          explained,
+          equals(
+              '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start]'));
     });
   });
 
@@ -26,7 +32,10 @@ void main() {
 
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
-      expect(explained, equals('[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start]'));
+      expect(
+          explained,
+          equals(
+              '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start]'));
     });
   });
 
@@ -35,7 +44,10 @@ void main() {
 
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
-      expect(explained, equals('[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=end]'));
+      expect(
+          explained,
+          equals(
+              '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=end]'));
     });
   });
 
@@ -44,17 +56,23 @@ void main() {
 
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
-      expect(explained,
-          equals('[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=stretch]'));
+      expect(
+          explained,
+          equals(
+              '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=stretch]'));
     });
   });
 
   group('vertical alignment - flex start', () {
-    const html = '<div style="display: flex; justify-content: flex-start;"></div>';
+    const html =
+        '<div style="display: flex; justify-content: flex-start;"></div>';
 
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
-      expect(explained, equals('[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start]'));
+      expect(
+          explained,
+          equals(
+              '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start]'));
     });
   });
 
@@ -63,43 +81,62 @@ void main() {
 
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
-      expect(explained, equals('[Flex:direction=horizontal,mainAxisAlignment=center,crossAxisAlignment=start]'));
+      expect(
+          explained,
+          equals(
+              '[Flex:direction=horizontal,mainAxisAlignment=center,crossAxisAlignment=start]'));
     });
   });
 
   group('vertical alignment - flex end', () {
-    const html = '<div style="display: flex; justify-content: flex-end;"></div>';
+    const html =
+        '<div style="display: flex; justify-content: flex-end;"></div>';
 
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
-      expect(explained, equals('[Flex:direction=horizontal,mainAxisAlignment=end,crossAxisAlignment=start]'));
+      expect(
+          explained,
+          equals(
+              '[Flex:direction=horizontal,mainAxisAlignment=end,crossAxisAlignment=start]'));
     });
   });
 
   group('vertical alignment - space between', () {
-    const html = '<div style="display: flex; justify-content: space-between;"></div>';
+    const html =
+        '<div style="display: flex; justify-content: space-between;"></div>';
 
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
-      expect(explained, equals('[Flex:direction=horizontal,mainAxisAlignment=spaceBetween,crossAxisAlignment=start]'));
+      expect(
+          explained,
+          equals(
+              '[Flex:direction=horizontal,mainAxisAlignment=spaceBetween,crossAxisAlignment=start]'));
     });
   });
 
   group('vertical alignment - space around', () {
-    const html = '<div style="display: flex; justify-content: space-around;"></div>';
+    const html =
+        '<div style="display: flex; justify-content: space-around;"></div>';
 
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
-      expect(explained, equals('[Flex:direction=horizontal,mainAxisAlignment=spaceAround,crossAxisAlignment=start]'));
+      expect(
+          explained,
+          equals(
+              '[Flex:direction=horizontal,mainAxisAlignment=spaceAround,crossAxisAlignment=start]'));
     });
   });
 
   group('vertical alignment - space evenly', () {
-    const html = '<div style="display: flex; justify-content: space-evenly;"></div>';
+    const html =
+        '<div style="display: flex; justify-content: space-evenly;"></div>';
 
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
-      expect(explained, equals('[Flex:direction=horizontal,mainAxisAlignment=spaceEvenly,crossAxisAlignment=start]'));
+      expect(
+          explained,
+          equals(
+              '[Flex:direction=horizontal,mainAxisAlignment=spaceEvenly,crossAxisAlignment=start]'));
     });
   });
 
@@ -108,7 +145,10 @@ void main() {
 
     testWidgets('renders', (WidgetTester tester) async {
       final explained = await explain(tester, html);
-      expect(explained, equals('[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start]'));
+      expect(
+          explained,
+          equals(
+              '[Flex:direction=horizontal,mainAxisAlignment=start,crossAxisAlignment=start]'));
     });
   });
 }
