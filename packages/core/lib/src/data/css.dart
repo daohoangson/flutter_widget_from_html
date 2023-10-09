@@ -181,10 +181,10 @@ class CssBorderSide {
   final TextDecorationStyle? style;
 
   /// The width of this side of the border.
-  final CssLength width;
+  final CssLength? width;
 
   /// Creates the side of a border.
-  const CssBorderSide({this.color, this.style, required this.width});
+  const CssBorderSide({this.color, this.style, this.width});
 
   /// A border that is not rendered.
   static const none = CssBorderSide(width: CssLength.zero);
@@ -192,7 +192,7 @@ class CssBorderSide {
   /// Returns `true` if either [style] or [width] is invalid.
   ///
   /// Border will use the default text color so [color] is not required.
-  bool get isNoOp => style == null || !width.isPositive;
+  bool get isNoOp => style == null || width?.isPositive != true;
 
   BorderSide? _getValue(TextStyleHtml tsh) {
     if (identical(this, none)) {
@@ -204,7 +204,7 @@ class CssBorderSide {
       return null;
     }
 
-    final scopedWidth = width.getValue(tsh);
+    final scopedWidth = width?.getValue(tsh);
     if (scopedWidth == null) {
       return null;
     }
@@ -225,7 +225,7 @@ class CssBorderSide {
             : CssBorderSide(
                 color: value.color ?? base.color,
                 style: value.style ?? base.style,
-                width: value.width.isPositive ? value.width : base.width,
+                width: value.width ?? base.width,
               );
 
     if (copied?.isNoOp == true) {
