@@ -42,13 +42,13 @@ class CssBorder {
 
   /// Returns `true` if all sides are unset, all radius are zero.
   bool get isNoOp =>
-      (_all == null || _all == CssBorderSide.none) &&
-      (_bottom == null || _bottom == CssBorderSide.none) &&
-      (_inlineEnd == null || _inlineEnd == CssBorderSide.none) &&
-      (_inlineStart == null || _inlineStart == CssBorderSide.none) &&
-      (_left == null || _left == CssBorderSide.none) &&
-      (_right == null || _right == CssBorderSide.none) &&
-      (_top == null || _top == CssBorderSide.none) &&
+      (_all?.isNoOp != false) &&
+      (_bottom?.isNoOp != false) &&
+      (_inlineEnd?.isNoOp != false) &&
+      (_inlineStart?.isNoOp != false) &&
+      (_left?.isNoOp != false) &&
+      (_right?.isNoOp != false) &&
+      (_top?.isNoOp != false) &&
       radiusBottomLeft == CssRadius.zero &&
       radiusBottomRight == CssRadius.zero &&
       radiusTopLeft == CssRadius.zero &&
@@ -181,35 +181,59 @@ class CssBorderSide {
   final TextDecorationStyle? style;
 
   /// The width of this side of the border.
-  final CssLength? width;
+  final CssLength width;
 
   /// Creates the side of a border.
-  const CssBorderSide({this.color, this.style, this.width});
+  const CssBorderSide({this.color, this.style, required this.width});
 
   /// A border that is not rendered.
-  static const none = CssBorderSide();
+  static const none = CssBorderSide(width: CssLength.zero);
 
-  BorderSide? _getValue(TextStyleHtml tsh) => identical(this, none)
-      ? null
-      : BorderSide(
-          color: color ?? tsh.style.color ?? const BorderSide().color,
-          // TODO: add proper support for other border styles
-          style: style != null ? BorderStyle.solid : BorderStyle.none,
-          // TODO: look for official document regarding this default value
-          // WebKit & Blink seem to follow the same (hidden?) specs
-          width: width?.getValue(tsh) ?? 1.0,
-        );
+  /// Returns `true` if either [style] or [width] is invalid.
+  ///
+  /// Border will use the default text color so [color] is not required.
+  bool get isNoOp => style == null || !width.isPositive;
 
-  static CssBorderSide? _copyWith(CssBorderSide? base, CssBorderSide? value) =>
-      base == null || value == none
-          ? value
-          : value == null
-              ? base
-              : CssBorderSide(
-                  color: value.color ?? base.color,
-                  style: value.style ?? base.style,
-                  width: value.width ?? base.width,
-                );
+  BorderSide? _getValue(TextStyleHtml tsh) {
+    if (identical(this, none)) {
+      return null;
+    }
+
+    final scopedColor = color ?? tsh.style.color;
+    if (scopedColor == null) {
+      return null;
+    }
+
+    final scopedWidth = width.getValue(tsh);
+    if (scopedWidth == null) {
+      return null;
+    }
+
+    return BorderSide(
+      color: scopedColor,
+      // TODO: add proper support for other border styles
+      style: style != null ? BorderStyle.solid : BorderStyle.none,
+      width: scopedWidth,
+    );
+  }
+
+  static CssBorderSide? _copyWith(CssBorderSide? base, CssBorderSide? value) {
+    final copied = base == null || value == none
+        ? value
+        : value == null
+            ? base
+            : CssBorderSide(
+                color: value.color ?? base.color,
+                style: value.style ?? base.style,
+                width: value.width.isPositive ? value.width : base.width,
+              );
+
+    if (copied?.isNoOp == true) {
+      return none;
+    }
+
+    return copied;
+  }
 }
 
 /// A length measurement.
