@@ -187,7 +187,7 @@ class CssBorderSide {
   const CssBorderSide({this.color, this.style, this.width});
 
   /// A border that is not rendered.
-  static const none = CssBorderSide(width: CssLength.zero);
+  static const none = CssBorderSide();
 
   /// Returns `true` if either [style] or [width] is invalid.
   ///
