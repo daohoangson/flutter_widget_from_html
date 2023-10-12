@@ -573,7 +573,7 @@ Future<void> main() async {
     });
 
     testWidgets('#1028: row color', (WidgetTester tester) async {
-      // https://github.com/daohoangson/flutter_widget_from_html/issues/171
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1028
       const html = '<table><tr style="background-color: #f00">'
           '<td>Foo</td><td>Bar</td>'
           '</tr></table>';
@@ -981,6 +981,30 @@ Future<void> main() async {
   <tr>
     <td valign="baseline"><div style="padding: 10px">$multiline</div></td>
     <td valign="baseline">Foo</td>
+  </tr>
+</table>''',
+              'row_color': '''
+<!-- https://github.com/daohoangson/flutter_widget_from_html/issues/1028 -->
+<table style="border-collapse: collapse;">
+  <tr>
+    <th>First Name</th>
+    <th>Last Name</th>
+    <th>Points</th>
+  </tr>
+  <tr style="background-color: #f2f2f2;">
+    <td>Jill</td>
+    <td>Smith</td>
+    <td>50</td>
+  </tr>
+  <tr>
+    <td>Eve</td>
+    <td>Jackson</td>
+    <td>94</td>
+  </tr>
+  <tr style="background-color: #f2f2f2;">
+    <td>Adam</td>
+    <td>Johnson</td>
+    <td>67</td>
   </tr>
 </table>''',
               'rtl': '''
