@@ -30,7 +30,7 @@ class CoreBuildTree extends BuildTree {
   final _isInlines = <bool>[];
   final BuildTree? _parent;
   final Iterable<_CoreBuildOp> _parentOps;
-  final _styles = <css.Declaration>[];
+  final _styles = _LockableDeclarations();
 
   CoreBuildTree._({
     this.customStylesBuilder,
@@ -67,7 +67,7 @@ class CoreBuildTree extends BuildTree {
   BuildTree get parent => _parent!;
 
   @override
-  Iterable<css.Declaration> get styles => _styles;
+  LockableList<css.Declaration> get styles => _styles;
 
   @override
   void operator []=(String key, String value) {
@@ -159,7 +159,12 @@ class CoreBuildTree extends BuildTree {
 
   @override
   css.Declaration? getStyle(String property) {
-    for (final style in _styles.reversed) {
+    final values = _styles._values;
+    if (values == null) {
+      return null;
+    }
+
+    for (final style in values.reversed) {
       if (style.property == property) {
         // TODO: add support for `!important`
         // https://github.com/daohoangson/flutter_widget_from_html/issues/773
@@ -308,8 +313,12 @@ class CoreBuildTree extends BuildTree {
       _styles.addAll(elementStyles);
     }
 
-    for (final style in _styles) {
-      wf.parseStyle(this, style);
+    _styles._isLocked = true;
+    final values = _styles._values;
+    if (values != null) {
+      for (final style in values.toList(growable: false)) {
+        wf.parseStyle(this, style);
+      }
     }
 
     wf.parseStyleDisplay(this, getStyle(kCssDisplay)?.term);
@@ -378,6 +387,46 @@ class _CoreBuildOp {
     } else {
       return cmp;
     }
+  }
+}
+
+class _LockableDeclarations extends LockableList<css.Declaration> {
+  var _isLocked = false;
+  List<css.Declaration>? _values;
+
+  @override
+  bool get isLocked => _isLocked;
+
+  @override
+  Iterator<css.Declaration> get iterator =>
+      _values?.iterator ?? const <css.Declaration>[].iterator;
+
+  @override
+  void add(css.Declaration value) {
+    assert(!_isLocked, 'Adding after being locked is undeterministic.');
+    _values ??= [];
+    _values?.add(value);
+  }
+
+  @override
+  void addAll(Iterable<css.Declaration> iterable) {
+    assert(!_isLocked, 'Adding after being locked is undeterministic.');
+    _values ??= [];
+    _values?.addAll(iterable);
+  }
+
+  @override
+  void insert(int index, css.Declaration element) {
+    assert(!_isLocked, 'Inserting after being locked is undeterministic.');
+    _values ??= [];
+    _values?.insert(index, element);
+  }
+
+  @override
+  void insertAll(int index, Iterable<css.Declaration> iterable) {
+    assert(!_isLocked, 'Inserting after being locked is undeterministic.');
+    _values ??= [];
+    _values?.insertAll(index, iterable);
   }
 }
 

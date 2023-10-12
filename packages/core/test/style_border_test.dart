@@ -1193,6 +1193,12 @@ void main() {
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
+    testWidgets('#1044: border zero', (WidgetTester tester) async {
+      const html = '<span style="border: 0 solid red">Foo</span>';
+      final explained = await explain(tester, html);
+      expect(explained, equals('[RichText:(:Foo)]'));
+    });
+
     testWidgets('negative value', (WidgetTester tester) async {
       const html = '<span style="border: -1px">Foo</span>';
       final explained = await explain(tester, html);
