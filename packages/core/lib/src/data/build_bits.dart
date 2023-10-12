@@ -200,13 +200,6 @@ abstract class BuildTree extends BuildBit {
   @Deprecated('Use .getStyle instead.')
   css.Declaration? operator [](String key) => getStyle(key);
 
-  /// {@macro flutter_widget_from_html.enqueue}
-  void apply<T>(
-    HtmlStyle Function(HtmlStyle style, T input) callback,
-    T input,
-  ) =>
-      styleBuilder.enqueue(callback, input);
-
   /// Appends [bit].
   ///
   /// See also: [prepend].

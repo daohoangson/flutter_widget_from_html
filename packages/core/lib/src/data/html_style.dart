@@ -40,10 +40,6 @@ class HtmlStyle {
     );
   }
 
-  /// The input [TextStyle].
-  @Deprecated('Use .textStyle instead.')
-  TextStyle get style => textStyle;
-
   /// The text direction.
   TextDirection get textDirection => value()!;
 
@@ -69,10 +65,6 @@ class HtmlStyle {
     );
   }
 
-  /// Gets dependency by type [T].
-  @Deprecated('Use .value instead.')
-  T? getDependency<T>() => value<T>();
-
   /// Gets value of type [T].
   ///
   /// The initial set of values are populated by [WidgetFactory.getDependencies].
@@ -97,17 +89,15 @@ class HtmlStyleBuilder {
 
   HtmlStyleBuilder([this.parent, this._queue]);
 
-  /// {@template flutter_widget_from_html.enqueue}
   /// Enqueues an HTML styling callback.
   ///
   /// The callback will receive the current [HtmlStyle] being built.
   /// As a special case, declare `T=BuildContext?` to receive the [BuildContext].
-  /// {@endtemplate}
   void enqueue<T>(
-    HtmlStyle Function(HtmlStyle style, T input) callback,
-    T input,
-  ) {
-    final item = _HtmlStyleCallback(callback, input);
+    HtmlStyle Function(HtmlStyle style, T input) callback, [
+    T? input,
+  ]) {
+    final item = _HtmlStyleCallback(callback, input as T);
     final queue = _queue ??= [];
     queue.add(item);
   }

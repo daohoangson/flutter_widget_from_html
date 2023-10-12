@@ -71,7 +71,7 @@ class TagLi {
   ) {
     final tree = itemTree.sub()
       ..maxLines = 1
-      ..apply(TextStyleOps.whitespace, CssWhitespace.nowrap);
+      ..styleBuilder.enqueue(TextStyleOps.whitespace, CssWhitespace.nowrap);
     final listData = listTree.listData;
     final listStyleType = itemTree.itemStyleType ?? listTree.listStyleType;
     final index = listData.markerReversed

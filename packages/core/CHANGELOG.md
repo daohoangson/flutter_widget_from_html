@@ -1,3 +1,13 @@
+## 0.13.1-alpha.1
+
+- Remove `BuildTree.apply` (#1027)
+- Restore optional second param for `HtmlStyleBuilder.enqueue` (#1027)
+
+## 0.13.0-alpha.5
+
+- Expose core legacy in enhanced package (#1027)
+- Fix border 0 is still being rendered (#1045)
+
 ## 0.13.0-alpha.2
 
 - Fix inline `white-space: nowrap`. (#944)

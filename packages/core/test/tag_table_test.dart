@@ -552,7 +552,7 @@ Future<void> main() async {
   });
 
   group('background', () {
-    testWidgets('#171: cell color', (WidgetTester tester) async {
+    testWidgets('cell color', (WidgetTester tester) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/171
       const html = '<table><tr>'
           '<td style="background-color: #f00">Foo</td>'
@@ -572,7 +572,7 @@ Future<void> main() async {
       );
     });
 
-    testWidgets('#1028: row color', (WidgetTester tester) async {
+    testWidgets('row color', (WidgetTester tester) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/1028
       const html = '<table><tr style="background-color: #f00">'
           '<td>Foo</td><td>Bar</td>'

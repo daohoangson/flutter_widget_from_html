@@ -17,7 +17,7 @@ void textDecorationApply(BuildTree tree, css.Declaration style) {
         style.property == kCssTextDecorationLine) {
       final line = TextDecorationLine.tryParse(value);
       if (line != null) {
-        tree.apply(textDecorationLine, line);
+        tree.styleBuilder.enqueue(textDecorationLine, line);
         continue;
       }
     }
@@ -26,7 +26,7 @@ void textDecorationApply(BuildTree tree, css.Declaration style) {
         style.property == kCssTextDecorationStyle) {
       final tds = tryParseTextDecorationStyle(value);
       if (tds != null) {
-        tree.apply(textDecorationStyle, tds);
+        tree.styleBuilder.enqueue(textDecorationStyle, tds);
         continue;
       }
     }
@@ -35,7 +35,7 @@ void textDecorationApply(BuildTree tree, css.Declaration style) {
         style.property == kCssTextDecorationColor) {
       final color = tryParseColor(value);
       if (color != null) {
-        tree.apply(textDecorationColor, color);
+        tree.styleBuilder.enqueue(textDecorationColor, color);
         continue;
       }
     }
@@ -45,7 +45,8 @@ void textDecorationApply(BuildTree tree, css.Declaration style) {
         style.property == kCssTextDecorationWidth) {
       final length = tryParseCssLength(value);
       if (length != null && length.unit == CssLengthUnit.percentage) {
-        tree.apply(textDecorationThickness, length.number / 100.0);
+        tree.styleBuilder
+            .enqueue(textDecorationThickness, length.number / 100.0);
         continue;
       }
     }

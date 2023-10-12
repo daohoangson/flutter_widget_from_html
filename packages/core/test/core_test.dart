@@ -955,7 +955,7 @@ Future<void> main() async {
       expect(e, equals('[CssBlock:child=[RichText:(:1 [RichText:(:2)])]]'));
     });
 
-    testWidgets('#646: renders onRenderBlock inline', (tester) async {
+    testWidgets('renders onRenderBlock inline', (tester) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/646
       const html = '<span style="display:inline-block;">Foo</span>';
       final explained = await explain(
@@ -971,7 +971,7 @@ Future<void> main() async {
       expect(explained, equals('[Text:Bar]'));
     });
 
-    testWidgets('#799: inline block with bg, v-align', (tester) async {
+    testWidgets('inline block with bg, v-align', (tester) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/799
       const html = '<span style="background-color: #FF6600; '
           'display: inline-block; vertical-align: middle">Foo</span>';

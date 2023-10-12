@@ -763,7 +763,7 @@ void main() {
       );
     });
 
-    testWidgets('#909: ignore radius if border is not uniform', (t) async {
+    testWidgets('ignore radius if border is not uniform', (t) async {
       // https://github.com/daohoangson/flutter_widget_from_html/issues/909
       const html = '<section style="border-bottom: 1px solid rgb(62, 62, 62); '
           'border-bottom-right-radius: 0px;">Foo</section>';
@@ -1193,7 +1193,8 @@ void main() {
       expect(explained, equals('[RichText:(:Foo)]'));
     });
 
-    testWidgets('#1044: border zero', (WidgetTester tester) async {
+    testWidgets('border zero', (WidgetTester tester) async {
+      // https://github.com/daohoangson/flutter_widget_from_html/issues/1044
       const html = '<span style="border: 0 solid red">Foo</span>';
       final explained = await explain(tester, html);
       expect(explained, equals('[RichText:(:Foo)]'));

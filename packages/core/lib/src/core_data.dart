@@ -42,7 +42,7 @@ typedef DefaultStyles = StylesMap Function(BuildTree tree);
 /// ```dart
 /// BuildOp.v1(
 ///   onChild: (tree, subTree) {
-///     if (!subTree.element.parent != tree.element) return;
+///     if (subTree.element.parent != tree.element) return;
 ///     subTree.doSomething();
 ///   },
 /// );

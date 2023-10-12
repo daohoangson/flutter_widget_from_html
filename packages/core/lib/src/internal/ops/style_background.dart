@@ -27,7 +27,7 @@ class StyleBackground {
             return;
           }
 
-          tree.apply(_color, color);
+          tree.styleBuilder.enqueue(_color, color);
         },
         priority: BoxModel.background,
       );

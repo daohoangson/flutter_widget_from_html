@@ -267,7 +267,7 @@ tree.apply(callback, TextAlign.justify);
 tree.register(BuildOp.v1(
   onParsed: (tree) {
     // can be used to change text, inline contents, etc.
-    tree.append(...);
+    return tree..append(...);
   },
   onRenderBlock: (tree, child) {
     // use this to render special widget, wrap it into something else, etc.
@@ -314,7 +314,7 @@ class _SmiliesWidgetFactory extends WidgetFactory {
   final smilieOp = BuildOp.v1(
     onParsed: (tree) {
       final alt = tree.element.attributes['alt'];
-      tree.addText(kSmilies[alt] ?? alt);
+      return tree..addText(kSmilies[alt] ?? alt ?? '');
     },
   );
 

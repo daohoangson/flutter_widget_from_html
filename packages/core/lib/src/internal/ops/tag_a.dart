@@ -27,7 +27,7 @@ class TagA {
             return tree;
           }
 
-          return tree..apply(_builder, recognizer);
+          return tree..styleBuilder.enqueue(_builder, recognizer);
         },
         priority: Priority.tagA,
       );
