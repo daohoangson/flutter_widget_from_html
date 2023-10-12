@@ -40,7 +40,7 @@ void main() {
         expect(list, equals([true]));
       });
 
-      group('mutations', () {
+      group('modifications', () {
         final red = _parseCss('color: red').first;
         final green = _parseCss('color: green').first;
         final blue = _parseCss('color: blue').first;

@@ -1,5 +1,6 @@
 part of '../core_data.dart';
 
+/// A collection of values, that may be locked to prevent modification.
 abstract class LockableList<T> extends Iterable<T> {
   /// Returns `true` if this list should not be modified.
   bool get isLocked;
