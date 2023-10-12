@@ -1,10 +1,7 @@
-## 0.13.0-alpha.4
+## 0.13.0-alpha.5
 
-- Make `WidgetPlaceholder.firstChild` public (#1027)
-
-## 0.13.0-alpha.3
-
-- Fix legacy implementations (#1027)
+- Expose core legacy in enhanced package (#1027)
+- Fix border 0 is still being rendered (#1045)
 
 ## 0.13.0-alpha.2
 
