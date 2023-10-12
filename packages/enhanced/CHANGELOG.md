@@ -51,6 +51,10 @@ Major breaking changes if you have custom rendering:
 - Removed: BuildMetadata, RebuildTriggers
 - Changed: BuildBit, WidgetPlaceholder
 
+# 0.10.6
+
+- Fix border 0 is still being rendered (#1045)
+
 ## 0.10.5+3
 
 - Add support for fullscreen webview in Android (#1022)
