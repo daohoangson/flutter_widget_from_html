@@ -190,7 +190,7 @@ abstract class BuildTree extends BuildBit {
   /// - `HtmlWidget.customStylesBuilder`
   /// - [BuildOp.defaultStyles]
   /// - Attribute `style` of [dom.Element]
-  Iterable<css.Declaration> get styles;
+  LockableList<css.Declaration> get styles;
 
   /// Adds an inline style.
   @Deprecated('Use BuildOp.defaultStyles instead.')

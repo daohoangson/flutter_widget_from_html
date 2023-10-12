@@ -338,6 +338,7 @@ class _TagTableRow {
 
   _TagTableRow() {
     _rowOp = BuildOp.v1(
+      alwaysRenderBlock: true,
       debugLabel: kTagTableRow,
       onChild: _onRowChild,
       priority: Priority.tagTableRow,
@@ -356,6 +357,11 @@ class _TagTableRow {
     }
     if (TagTable._getCssDisplayValue(cellTree) != kCssDisplayTableCell) {
       return;
+    }
+
+    for (final style in rowTree.styles) {
+      // forward all row styles to its cells, this is quite dangerous...
+      cellTree.styles.add(style);
     }
 
     _registerCellOp(cellTree);
